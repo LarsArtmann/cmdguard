@@ -40,56 +40,48 @@
 - `internal/commands/root.go:142,155`
 **Action:** Add error checking for `fmt.Fprintln`/`fmt.Fprintf` calls
 
-### 2. Code Duplication [NOT_DONE]
-**Source:** AGENTS.md (verified in code)
-**Details:** Version command logic duplicated in `main.go:86-92` and `root.go:148-158`
-**Action:** Extract to single source of truth
-
-### 3. Manual DI Wiring [NOT_DONE]
-**Source:** AGENTS.md → Transformation Plan
-**File:** `pkg/cmdguard/public_api.go:90`
-**Details:** `SetValidator()` manual wiring still exists
-**Action:** Use proper constructor injection
-
-### 4. False Documentation Claims [NOT_DONE]
+### 2. False Documentation Claims [NOT_DONE]
 **Source:** README.md (lines 164-165)
 **Claims:**
 - "No duplicate command names" validation - NOT IMPLEMENTED
 - "No conflicting aliases" validation - NOT IMPLEMENTED
 **Action:** Either implement these validations or remove from documentation
 
-### 5. Broken Code Examples in Documentation [NOT_DONE]
+### 3. Broken Code Examples in Documentation [NOT_DONE]
 **Source:** README.md (lines 45-77, 81-95)
 **Details:** Code examples missing `"fmt"` import, will not compile
 **Action:** Fix examples to be copy-pasteable
 
-### 6. WithValidationHook is a No-Op [NOT_DONE]
+### 4. WithValidationHook is a No-Op [NOT_DONE]
 **Source:** README.md (lines 154-155) → `pkg/cmdguard/public_api.go:130-135`
 **Details:** Hook is documented but implementation discards it (returns `nil`)
 **Action:** Either implement or remove from API
+**Related:** Lower Priority "Design validation hook interface", "Allow custom validators"
 
-### 10. Architecture Diagram Outdated [NOT_DONE]
+### 5. Architecture Diagram Outdated [NOT_DONE]
 **Source:** POST_DECISION_STATE.md (Technical Debt)
 **Details:** Architecture diagram doesn't include logging layer
 **Action:** Update architecture diagram with logging layer
 
-### 7. Incomplete Context Handling [NOT_DONE]
+### 6. Incomplete Context Handling [NOT_DONE]
 **Source:** ARCHITECTURE_REVIEW.md (P1)
 **File:** `internal/di/module.go:123-127`
 **Details:** Context passed to `Shutdown()` is completely ignored
 **Action:** Implement proper context-aware shutdown
 
-### 8. Silent Config Errors [NOT_DONE]
+### 7. Silent Config Errors [NOT_DONE]
 **Source:** ARCHITECTURE_REVIEW.md (P1)
 **File:** `internal/config/provider.go:32-35`
 **Details:** Errors discarded with `_` assignment
 **Action:** Properly handle/return config loading errors
 
-### 9. No Error Aggregation [NOT_DONE]
+### 8. No Error Aggregation [NOT_DONE]
 **Source:** ARCHITECTURE_REVIEW.md (P2)
 **File:** `internal/di/module.go:115-117`
 **Details:** Returns only `errs[0]` instead of using `errors.Join()`
 **Action:** Aggregate multiple errors with `errors.Join()`
+
+**Note:** Items "Code Duplication" and "Manual DI Wiring" were moved to Medium/High Priority sections to avoid duplication.
 
 ---
 
@@ -117,15 +109,23 @@
 
 ---
 
+## Superseded by Option A Decision
+
+| Task | Original Location | Reason Obsolete |
+|------|-------------------|-----------------|
+| Remove `cmd/` folder | High Priority | Framework needs CLI entry point |
+| Redesign public API | High Priority | Framework pattern is being kept |
+| Add compile-time validation | High Priority | Guard-library specific feature |
+| Define guard architecture in ARCHITECTURE.md | Medium Priority | Framework approach doesn't need separate guard architecture |
+
+---
+
 ## Planned Changes (From Transformation Plan)
 
 ### High Priority - Core Architecture
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Remove `cmd/` folder | ❌ NOT_DONE | Folder still exists at `cmd/cmdguard/` |
-| Redesign public API | ❌ NOT_DONE | Still uses multi-step Initialize/Validate pattern |
-| Add compile-time validation | ❌ NOT_DONE | No interception of Cobra calls |
 | Fix DI usage | ❌ NOT_DONE | Manual wiring via `SetValidator()` exists |
 | Add justfile | ❌ NOT_DONE | No justfile found |
 
@@ -135,7 +135,6 @@
 |------|--------|-------|
 | Improve test coverage (80%+) | 🔄 PARTIAL | config at ~47.6% per plan |
 | Fix 4 errcheck violations | ❌ NOT_DONE | See Critical Issues #1 |
-| Define guard architecture in ARCHITECTURE.md | ❌ NOT_DONE | Task 1.2 |
 | Fix code duplication (7 clone groups) | ❌ NOT_DONE | Task 3.3 |
 | Add integration tests | ❌ NOT_DONE | Task 3.4 |
 | Create examples directory | ❌ NOT_DONE | Task 3.5 |
@@ -225,15 +224,16 @@
 
 | Category | Total | Done | Partial | Not Done |
 |----------|-------|------|---------|----------|
-| Critical Issues | 10 | 0 | 0 | 10 |
-| High Priority | 5 | 0 | 0 | 5 |
-| Medium Priority | 13 | 0 | 1 | 12 |
-| Lower Priority | 26 | 0 | 0 | 26 |
+| Critical Issues | 8 | 0 | 0 | 8 |
+| High Priority | 2 | 0 | 0 | 2 |
+| Medium Priority | 12 | 0 | 1 | 11 |
+| Lower Priority | 24 | 0 | 0 | 24 |
 | API Options | 7 | 0 | 0 | 7 |
 | Missing Docs | 7 | 0 | 0 | 7 |
 | CLI UX Violations | 3 | 0 | 0 | 3 |
 | Decisions | 3 | 3 | 0 | 0 |
-| **TOTAL** | **74** | **3** | **1** | **70** |
+| Superseded (Option A) | 4 | - | - | - |
+| **TOTAL ACTIONABLE** | **66** | **3** | **1** | **62** |
 
 ---
 
@@ -277,3 +277,10 @@
 - No new actionable TODOs (all P0-P3 items already tracked)
 - Disproved 1 claim ("No Structured Logging" - logger.go exists with full slog)
 - Status doc has historical inaccuracies (line counts, versions) - not actionable
+- **DE-DUPLICATION PASS COMPLETE**
+- Removed 2 duplicate Critical Issues (#2 Code Duplication, #3 Manual DI Wiring - merged into other sections)
+- Renumbered Critical Issues from 10 to 8
+- Added "Superseded by Option A Decision" section (4 items)
+- Moved 3 High Priority items to Superseded (Remove cmd/, Redesign API, Compile-time validation)
+- Moved 1 Medium Priority item to Superseded (Define guard architecture)
+- Updated statistics: 74 → 66 actionable items
