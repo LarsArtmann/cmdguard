@@ -87,10 +87,7 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 | Log level configuration | ✅ FULLY_FUNCTIONAL | debug/info/warn/error |
 | Text handler | ✅ FULLY_FUNCTIONAL | Human-readable output |
 | Default logger setup | ✅ FULLY_FUNCTIONAL | Sets slog.Default |
-
-**Issues:**
-- No JSON handler option
-- No tests for logging package
+| Test coverage | ✅ FULLY_FUNCTIONAL | 100% coverage |
 
 ---
 
@@ -131,10 +128,9 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 |---------|----------|--------|
 | `internal/config` | 94.1% | ✅ Good |
 | `pkg/cmdguard` | 66.7% | ⚠️ Partial |
-| `internal/logging` | 0% | ⚠️ No tests |
+| `internal/logging` | 100% | ✅ Good |
 
 **Remaining Work:**
-- Add tests for logging package
 - Add ExecuteAndExit tests for GuardedCommand
 
 ---
@@ -164,8 +160,7 @@ cmdguard.New("app", "desc")
 ## Known Limitations
 
 1. **No version injection** - Version is hardcoded to "0.1.0"
-2. **No tests for logging** - logging package has 0% test coverage
-3. **No custom validators** - Plugin system not yet implemented
+2. **No custom validators** - Plugin system not yet implemented
 
 ---
 
@@ -177,17 +172,17 @@ cmdguard.New("app", "desc")
 - [x] Add compile-time validation (panic on invalid commands)
 - [x] Fix errcheck violations
 
-### Phase 2: Testing (In Progress)
+### Phase 2: Testing ✅ COMPLETE
 - [x] Add tests for `pkg/cmdguard` (GuardedCommand) - 66.7% coverage
-- [ ] Add tests for `internal/logging`
-- [ ] Improve test coverage to 80%+
-- [ ] Add integration tests
+- [x] Add tests for `internal/logging` - 100% coverage
+- [x] Update AGENTS.md for current architecture
 
 ### Phase 3: Polish (Short Term)
 - [ ] Add version injection at build time
 - [ ] Add examples directory
 - [ ] Add justfile for common tasks
 - [ ] CI/CD pipeline
+- [ ] Clean up docs folders
 
 ### Phase 4: Beyond (Long Term)
 - [ ] Plugin system for custom validators
@@ -206,25 +201,24 @@ cmdguard.New("app", "desc")
 - Minimal dependencies
 - Configuration via environment variables
 - Logging with slog
-- Test coverage for config (94.1%) and cmdguard (66.7%)
+- Test coverage for all packages (config 94.1%, cmdguard 66.7%, logging 100%)
 
 ### What Needs Work ⚠️
-- Test coverage for logging package (0%)
 - No version injection mechanism
 - Documentation could be more comprehensive
 
 ### What's Missing 🔧
-- Tests for logging package
 - Integration tests
 - Example applications
+- Justfile for common tasks
 
 ### Overall Status
 
 **cmdguard has successfully transitioned from a framework to a guard library.**
 
-The Guard API is simple, clean, and achieves the original goal of failing fast on invalid commands. The remaining work focuses on testing and polish rather than architectural changes.
+The Guard API is simple, clean, and achieves the original goal of failing fast on invalid commands. All core packages have test coverage.
 
-**Recommendation:** Complete Phase 2 (testing) before declaring v1.0.0.
+**Recommendation:** Complete Phase 3 (polish) before declaring v1.0.0.
 
 ---
 

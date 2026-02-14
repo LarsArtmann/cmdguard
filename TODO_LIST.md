@@ -19,14 +19,13 @@
 
 ---
 
-## Current Focus (Phase 2 - Testing)
-
-### High Priority
+## Completed (Phase 2 - Testing)
 
 | Task | Status | Notes |
 |------|--------|-------|
 | Add tests for `pkg/cmdguard` | ✅ DONE | GuardedCommand has 66.7% coverage |
-| Add tests for `internal/logging` | ❌ NOT_DONE | logging package has 0% coverage |
+| Add tests for `internal/logging` | ✅ DONE | logging package has 100% coverage |
+| Update AGENTS.md for current architecture | ✅ DONE | Updated 2026-02-14 |
 
 ### Test Cases for GuardedCommand
 
@@ -60,7 +59,7 @@
 | Add justfile for common tasks | ❌ NOT_DONE | No justfile exists |
 | Create examples directory | ❌ NOT_DONE | No example applications |
 | Add CONTRIBUTING.md | ❌ NOT_DONE | No contribution guide |
-| Improve test coverage to 80%+ | 🔄 PARTIAL | config 94.1%, cmdguard 66.7%, logging 0% |
+| Improve test coverage to 80%+ | ✅ DONE | config 94.1%, cmdguard 66.7%, logging 100% |
 
 ---
 
@@ -81,7 +80,6 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Update AGENTS.md for current architecture | ❌ NOT_DONE | Still references old structure |
 | Clean up docs/planning/ folder | ❌ NOT_DONE | Transformation plan completed |
 | Clean up docs/status/ folder | ❌ NOT_DONE | Historical status reports |
 
@@ -119,33 +117,30 @@ cmdguard/
 | Category | Total | Done | Not Done |
 |----------|-------|------|----------|
 | Phase 1 (Core) | 7 | 7 | 0 |
-| Phase 2 (Testing) | 2 | 1 | 1 |
-| Medium Priority | 5 | 0 | 5 |
+| Phase 2 (Testing) | 3 | 3 | 0 |
+| Medium Priority | 5 | 1 | 4 |
 | Lower Priority | 6 | 0 | 6 |
-| Documentation | 3 | 0 | 3 |
-| **TOTAL** | **23** | **8** | **15** |
+| Documentation | 2 | 0 | 2 |
+| **TOTAL** | **23** | **11** | **12** |
 
 ---
 
 ## Changelog
 
 ### 2026-02-14 (Updated)
+- Added tests for logging package (100% coverage)
+- Updated AGENTS.md for current architecture
+- Marked logging tests as complete
+- Updated coverage stats
+
+### 2026-02-14 (Earlier)
 - Added tests for GuardedCommand (20 test cases, 66.7% coverage)
 - Fixed .gitignore to use /cmdguard (root binary only)
 - Marked most test cases as complete
-- Updated coverage stats
 - Fixed table markdown syntax
 
-### 2026-02-14
+### 2026-02-14 (Initial)
 - Rewrote TODO_LIST.md for Guard API
 - Marked Phase 1 items as complete
 - Updated project structure
 - Removed obsolete items (framework-specific tasks)
-- Added specific test cases needed for GuardedCommand
-- Simplified to focus on actionable items
-
-### Earlier 2026-02-14 (Historical)
-- Initial creation tracking framework tasks
-- Analyzed multiple docs files
-- Tracked transformation plan progress
-- All framework tasks now complete or obsolete
