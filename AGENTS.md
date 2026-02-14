@@ -41,6 +41,27 @@ cd examples/basic && go build -o myapp .
 ```
 cmdguard/
 ├── pkg/cmdguard/           # Public API - GuardedCommand (main entry point)
+│   └── guarded_command.go  # Guard API implementation
+├── internal/
+│   ├── config/             # Configuration management (Koanf)
+│   └── logging/            # Structured logging (slog)
+├── docs/
+│   ├── planning/           # Execution plans
+│   ├── status/             # Status reports
+│   └── CLI_DESIGN_PRINCIPLES.md
+├── FEATURES.md             # Feature status documentation
+├── AGENTS.md               # This file
+├── go.mod
+└── README.md
+```
+
+### Package Guidelines
+
+| Package | Purpose | Importable? | Status |
+|---------|---------|-------------|--------|
+| `pkg/cmdguard` | Public Guard API | Yes | ✅ Active |
+| `internal/config` | Configuration | No | ✅ Active |
+| `internal/logging` | Logging utilities | No | ✅ Active |
 ├── internal/
 │   ├── commands/           # Cobra command registry and setup
 │   ├── config/             # Koanf-based configuration management
@@ -55,18 +76,7 @@ cmdguard/
 └── README.md
 ```
 
-### Package Guidelines
 
-| Package | Purpose | Importable? |
-|---------|---------|-------------|
-| `pkg/cmdguard` | Public API | Yes |
-| `internal/commands` | Command registry | No |
-| `internal/config` | Configuration | No |
-| `internal/di` | DI container setup | No |
-| `internal/logging` | Logging utilities | No |
-| `internal/validation` | Validation logic | No |
-
-**Critical:** Never import `internal/` packages from outside the module.
 
 ---
 
@@ -91,27 +101,6 @@ cmdguard/
 - **Error handling** - Always check errors, wrap with context using `fmt.Errorf("...: %w", err)`
 - **Interface naming** - `-er` suffix (e.g., `Validator`, `Healthchecker`)
 - **Constructor naming** - `New` + type name (e.g., `NewValidator`)
-
-### DI Patterns (samber/do/v2)
-
-**Correct:** Constructor injection
-```go
-func NewRegistry(i do.Injector) (*Registry, error) {
-    cfg, err := do.Invoke[*config.Config](i)
-    if err != nil {
-        return nil, fmt.Errorf("failed to invoke config: %w", err)
-    }
-    return &Registry{cfg: cfg}, nil
-}
-```
-
-**Avoid:** Manual wiring after creation
-```go
-// DON'T DO THIS
-registry := module.MustInvokeRegistry()
-validator := module.MustInvokeValidator()
-registry.SetValidator(validator)  // Manual wiring!
-```
 
 ### Validation Patterns
 
@@ -249,10 +238,11 @@ See `docs/CLI_DESIGN_PRINCIPLES.md` for detailed UX guidelines.
 
 ## Known Issues & Gotchas
 
-1. **DI manual wiring** - Registry still uses `SetValidator()` instead of constructor injection
-2. **Test coverage** - Only config and validation packages have tests (~48% coverage for config)
+1. **Test coverage** - Only config package has tests (~48% coverage)
+2. **No pkg/cmdguard tests** - Guard API needs unit tests
 3. **No integration tests** - Need end-to-end tests with actual CLI execution
 4. **No examples** - Users need working examples in examples/ directory
+5. **gopls warnings** - Stale cached references to deleted files (harmless)
 
 ---
 
@@ -266,10 +256,18 @@ Per `docs/planning/2026-02-14_09-27-COMPREHENSIVE_EXECUTION_PLAN.md`:
 - ✅ Add compile-time validation - Panic on invalid commands
 - ✅ Update AGENTS.md - Document new API
 
-### Phase 2: Core (4% → 64%) 🔄 IN PROGRESS
-- 🔄 Fix DI usage - Remove manual service linking
-- 🔄 Fix errcheck violations - Check all fmt errors
-- 🔄 Improve test coverage - Target 80%+ for all packages
+### Phase 2: Core (4% → 64%) ✅ COMPLETE
+- ✅ Fix errcheck violations - All fmt errors checked
+- ✅ Implement Guard API - Single-step initialization
+- ✅ Add compile-time validation - Panic on invalid commands
+
+### Phase 3: Polish (20% → 80%) 🔄 IN PROGRESS
+- ✅ Remove orphaned packages - Simplified architecture
+- 🔄 Improve test coverage - Target 80%+ for config
+- ⏳ Add integration tests - End-to-end validation
+- ⏳ Create examples directory - Working examples
+- ⏳ Add justfile - Standardize build commands
+- ⏳ Fix code duplication - N/A after cleanup
 
 ### Phase 3: Polish (20% → 80%) ⏳ PENDING
 - ⏳ Add integration tests - End-to-end validation
