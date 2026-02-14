@@ -8,14 +8,14 @@
 
 ## Legend
 
-|| Status | Meaning |
-||--------|---------|
-|| ✅ **FULLY_FUNCTIONAL** | Feature works as designed, tested, and documented |
-|| ⚠️ **PARTIALLY_FUNCTIONAL** | Feature works but has limitations, gaps, or known issues |
-|| 🔧 **BROKEN** | Feature does not work or is non-functional |
-|| 📝 **PLANNED** | Feature is designed but not yet implemented |
-|| 🗑️ **DEPRECATED** | Feature exists but is scheduled for removal |
-|| ❓ **UNKNOWN** | Status cannot be determined |
+| Status | Meaning |
+|--------|---------|
+| ✅ **FULLY_FUNCTIONAL** | Feature works as designed, tested, and documented |
+| ⚠️ **PARTIALLY_FUNCTIONAL** | Feature works but has limitations, gaps, or known issues |
+| 🔧 **BROKEN** | Feature does not work or is non-functional |
+| 📝 **PLANNED** | Feature is designed but not yet implemented |
+| 🗑️ **DEPRECATED** | Feature exists but is scheduled for removal |
+| ❓ **UNKNOWN** | Status cannot be determined |
 
 ---
 
@@ -25,16 +25,16 @@
 
 The Guard API provides single-step initialization with panic-at-construction-time validation.
 
-|| Feature | Status | Notes |
-||---------|--------|-------|
-|| `New(name, short)` | ✅ FULLY_FUNCTIONAL | Creates guarded root command |
-|| `AddCommand(cmd)` | ✅ FULLY_FUNCTIONAL | Adds subcommand, panics if invalid |
-|| `AddSubcommand(parent, child)` | ✅ FULLY_FUNCTIONAL | Adds nested subcommand |
-|| `Execute(ctx)` | ✅ FULLY_FUNCTIONAL | Runs command with context |
-|| `ExecuteAndExit(ctx)` | ✅ FULLY_FUNCTIONAL | Runs command and calls os.Exit |
-|| `Command()` | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command |
-|| `Config()` | ✅ FULLY_FUNCTIONAL | Returns application config |
-|| `IsStrictMode()` | ✅ FULLY_FUNCTIONAL | Returns strict mode status |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| `New(name, short)` | ✅ FULLY_FUNCTIONAL | Creates guarded root command |
+| `AddCommand(cmd)` | ✅ FULLY_FUNCTIONAL | Adds subcommand, panics if invalid |
+| `AddSubcommand(parent, child)` | ✅ FULLY_FUNCTIONAL | Adds nested subcommand |
+| `Execute(ctx)` | ✅ FULLY_FUNCTIONAL | Runs command with context |
+| `ExecuteAndExit(ctx)` | ✅ FULLY_FUNCTIONAL | Runs command and calls os.Exit |
+| `Command()` | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command |
+| `Config()` | ✅ FULLY_FUNCTIONAL | Returns application config |
+| `IsStrictMode()` | ✅ FULLY_FUNCTIONAL | Returns strict mode status |
 
 **Design:**
 - Single-step initialization (no Initialize/Validate methods)
@@ -46,14 +46,14 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 ### Command Validation
 
-|| Feature | Status | Notes |
-||---------|--------|-------|
-|| Handler validation | ✅ FULLY_FUNCTIONAL | Ensures commands have Run or RunE |
-|| Subcommand detection | ✅ FULLY_FUNCTIONAL | Parent commands don't need handlers |
-|| Strict mode enforcement | ✅ FULLY_FUNCTIONAL | Requires RunE in strict mode |
-|| Command name validation | ✅ FULLY_FUNCTIONAL | Ensures command has a name |
-|| Panic on invalid | ✅ FULLY_FUNCTIONAL | Fails fast at construction time |
-|| Tree validation | ✅ FULLY_FUNCTIONAL | Recursive validation of all commands |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Handler validation | ✅ FULLY_FUNCTIONAL | Ensures commands have Run or RunE |
+| Subcommand detection | ✅ FULLY_FUNCTIONAL | Parent commands don't need handlers |
+| Strict mode enforcement | ✅ FULLY_FUNCTIONAL | Requires RunE in strict mode |
+| Command name validation | ✅ FULLY_FUNCTIONAL | Ensures command has a name |
+| Panic on invalid | ✅ FULLY_FUNCTIONAL | Fails fast at construction time |
+| Tree validation | ✅ FULLY_FUNCTIONAL | Recursive validation of all commands |
 
 **Validation Rules:**
 1. Every command must have a name
@@ -65,13 +65,13 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 ### Configuration Management
 
-|| Feature | Status | Notes |
-||---------|--------|-------|
-|| Environment variables | ✅ FULLY_FUNCTIONAL | `CMDGUARD_*` prefix |
-|| Default values | ✅ FULLY_FUNCTIONAL | Sensible defaults set |
-|| `StrictMode` option | ✅ FULLY_FUNCTIONAL | Boolean via env |
-|| `LogLevel` option | ✅ FULLY_FUNCTIONAL | Validated enum values |
-|| Config struct | ✅ FULLY_FUNCTIONAL | Clean type definition |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Environment variables | ✅ FULLY_FUNCTIONAL | `CMDGUARD_*` prefix |
+| Default values | ✅ FULLY_FUNCTIONAL | Sensible defaults set |
+| `StrictMode` option | ✅ FULLY_FUNCTIONAL | Boolean via env |
+| `LogLevel` option | ✅ FULLY_FUNCTIONAL | Validated enum values |
+| Config struct | ✅ FULLY_FUNCTIONAL | Clean type definition |
 
 **Environment Variables:**
 - `CMDGUARD_LOG_LEVEL` - Set log level (debug, info, warn, error)
@@ -81,12 +81,12 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 ### Logging
 
-|| Feature | Status | Notes |
-||---------|--------|-------|
-|| slog integration | ✅ FULLY_FUNCTIONAL | Structured logging |
-|| Log level configuration | ✅ FULLY_FUNCTIONAL | debug/info/warn/error |
-|| Text handler | ✅ FULLY_FUNCTIONAL | Human-readable output |
-|| Default logger setup | ✅ FULLY_FUNCTIONAL | Sets slog.Default |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| slog integration | ✅ FULLY_FUNCTIONAL | Structured logging |
+| Log level configuration | ✅ FULLY_FUNCTIONAL | debug/info/warn/error |
+| Text handler | ✅ FULLY_FUNCTIONAL | Human-readable output |
+| Default logger setup | ✅ FULLY_FUNCTIONAL | Sets slog.Default |
 
 **Issues:**
 - No JSON handler option
@@ -96,14 +96,14 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 ### Built-in Commands
 
-|| Feature | Status | Notes |
-||---------|--------|-------|
-|| `help` command | ✅ FULLY_FUNCTIONAL | Cobra default via fang |
-|| `version` command | ✅ FULLY_FUNCTIONAL | Prints version info |
-|| `validate` command | ✅ FULLY_FUNCTIONAL | Validates command tree |
-|| Global flags | ✅ FULLY_FUNCTIONAL | --config, --log-level, --strict |
-|| Short flags | ✅ FULLY_FUNCTIONAL | -c, -l, -s |
-|| Flag validation in PreRunE | ✅ FULLY_FUNCTIONAL | log-level enum check |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| `help` command | ✅ FULLY_FUNCTIONAL | Cobra default via fang |
+| `version` command | ✅ FULLY_FUNCTIONAL | Prints version info |
+| `validate` command | ✅ FULLY_FUNCTIONAL | Validates command tree |
+| Global flags | ✅ FULLY_FUNCTIONAL | --config, --log-level, --strict |
+| Short flags | ✅ FULLY_FUNCTIONAL | -c, -l, -s |
+| Flag validation in PreRunE | ✅ FULLY_FUNCTIONAL | log-level enum check |
 
 **Issues:**
 - Version hardcoded to "0.1.0"
@@ -113,11 +113,11 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 ## Dependencies
 
-|| Dependency | Version | Status | Purpose |
-||------------|---------|--------|---------|
-|| `github.com/spf13/cobra` | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework |
-|| `github.com/charmbracelet/fang` | v0.4.4 | ✅ FULLY_FUNCTIONAL | Cobra styling |
-|| `github.com/stretchr/testify` | v1.11.1 | ✅ FULLY_FUNCTIONAL | Testing |
+| Dependency | Version | Status | Purpose |
+|------------|---------|--------|---------|
+| `github.com/spf13/cobra` | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework |
+| `github.com/charmbracelet/fang` | v0.4.4 | ✅ FULLY_FUNCTIONAL | Cobra styling |
+| `github.com/stretchr/testify` | v1.11.1 | ✅ FULLY_FUNCTIONAL | Testing |
 
 **Removed Dependencies:**
 - `samber/do/v2` - No longer needed (no DI container)
@@ -127,15 +127,15 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 ## Testing
 
-|| Package | Coverage | Status |
-||---------|----------|--------|
-|| `internal/config` | 94.1% | ✅ Good |
-|| `internal/logging` | 0% | ⚠️ No tests |
-|| `pkg/cmdguard` | 0% | ⚠️ No tests |
+| Package | Coverage | Status |
+|---------|----------|--------|
+| `internal/config` | 94.1% | ✅ Good |
+| `pkg/cmdguard` | 66.7% | ⚠️ Partial |
+| `internal/logging` | 0% | ⚠️ No tests |
 
-**Issues:**
-- No tests for GuardedCommand public API
-- No tests for logging package
+**Remaining Work:**
+- Add tests for logging package
+- Add ExecuteAndExit tests for GuardedCommand
 
 ---
 
@@ -164,9 +164,8 @@ cmdguard.New("app", "desc")
 ## Known Limitations
 
 1. **No version injection** - Version is hardcoded to "0.1.0"
-2. **No tests for public API** - GuardedCommand has 0% test coverage
-3. **No tests for logging** - logging package has 0% test coverage
-4. **No custom validators** - Plugin system not yet implemented
+2. **No tests for logging** - logging package has 0% test coverage
+3. **No custom validators** - Plugin system not yet implemented
 
 ---
 
@@ -178,8 +177,8 @@ cmdguard.New("app", "desc")
 - [x] Add compile-time validation (panic on invalid commands)
 - [x] Fix errcheck violations
 
-### Phase 2: Testing (Current)
-- [ ] Add tests for `pkg/cmdguard` (GuardedCommand)
+### Phase 2: Testing (In Progress)
+- [x] Add tests for `pkg/cmdguard` (GuardedCommand) - 66.7% coverage
 - [ ] Add tests for `internal/logging`
 - [ ] Improve test coverage to 80%+
 - [ ] Add integration tests
@@ -207,14 +206,14 @@ cmdguard.New("app", "desc")
 - Minimal dependencies
 - Configuration via environment variables
 - Logging with slog
+- Test coverage for config (94.1%) and cmdguard (66.7%)
 
 ### What Needs Work ⚠️
-- Test coverage (only config package is well-tested)
+- Test coverage for logging package (0%)
 - No version injection mechanism
 - Documentation could be more comprehensive
 
 ### What's Missing 🔧
-- Tests for GuardedCommand
 - Tests for logging package
 - Integration tests
 - Example applications
