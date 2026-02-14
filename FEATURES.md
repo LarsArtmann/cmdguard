@@ -71,10 +71,12 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 | Default values | ✅ FULLY_FUNCTIONAL | Sensible defaults set |
 | `StrictMode` option | ✅ FULLY_FUNCTIONAL | Boolean via env |
 | `LogLevel` option | ✅ FULLY_FUNCTIONAL | Validated enum values |
+| `LogFormat` option | ✅ FULLY_FUNCTIONAL | text/json via env |
 | Config struct | ✅ FULLY_FUNCTIONAL | Clean type definition |
 
 **Environment Variables:**
 - `CMDGUARD_LOG_LEVEL` - Set log level (debug, info, warn, error)
+- `CMDGUARD_LOG_FORMAT` - Set log format (text, json)
 - `CMDGUARD_STRICT_MODE` - Enable strict mode (true/false)
 
 ---
@@ -85,7 +87,9 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 |---------|--------|-------|
 | slog integration | ✅ FULLY_FUNCTIONAL | Structured logging |
 | Log level configuration | ✅ FULLY_FUNCTIONAL | debug/info/warn/error |
+| Log format configuration | ✅ FULLY_FUNCTIONAL | text/json via CMDGUARD_LOG_FORMAT |
 | Text handler | ✅ FULLY_FUNCTIONAL | Human-readable output |
+| JSON handler | ✅ FULLY_FUNCTIONAL | Machine-parseable output |
 | Default logger setup | ✅ FULLY_FUNCTIONAL | Sets slog.Default |
 | Test coverage | ✅ FULLY_FUNCTIONAL | 100% coverage |
 

@@ -179,7 +179,18 @@ Configuration via environment variables:
 | Variable | Values | Default |
 |----------|--------|---------|
 | `CMDGUARD_LOG_LEVEL` | debug, info, warn, error | info |
+| `CMDGUARD_LOG_FORMAT` | text, json | text |
 | `CMDGUARD_STRICT_MODE` | true, false | false |
+
+### JSON Logging
+
+For machine-parseable logs, set the format to JSON:
+
+```bash
+export CMDGUARD_LOG_FORMAT=json
+myapp command
+# Output: {"time":"2026-02-14T10:00:00Z","level":"INFO","msg":"message"}
+```
 
 ## Architecture
 
@@ -223,7 +234,7 @@ Go lacks compile-time macros. The closest equivalent to "fail at compile time" i
 
 ## Project Status
 
-**Work in progress.** API may change.
+**v0.1.0 released.** Core API is stable. JSON logging added in v0.2.0.
 
 ## License
 
