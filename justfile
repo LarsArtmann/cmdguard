@@ -9,6 +9,10 @@ default:
 build:
     go build ./...
 
+# Build with specific version (via ldflags)
+build-version version:
+    go build -ldflags "-X github.com/larsartmann/cmdguard/pkg/cmdguard.version={{version}}" ./...
+
 # Run all tests
 test:
     go test ./...

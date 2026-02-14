@@ -18,7 +18,7 @@
 //
 //	    // This will panic if command has no handler
 //	    root.AddCommand(&cobra.Command{
-//	        Use:   "sub",
+//	    Use:   "sub",
 //	        Short: "Subcommand",
 //	        Run: func(cmd *cobra.Command, args []string) {
 //	            // handler
@@ -43,6 +43,10 @@ import (
 	"github.com/larsartmann/cmdguard/internal/logging"
 	"github.com/spf13/cobra"
 )
+
+// version is set at build time via ldflags:
+// go build -ldflags "-X github.com/larsartmann/cmdguard/pkg/cmdguard.version=X"
+var version = "dev"
 
 // GuardedCommand wraps a cobra.Command with compile-time validation.
 // It panics on construction if commands are invalid, ensuring errors
@@ -174,6 +178,11 @@ func (g *GuardedCommand) IsStrictMode() bool {
 	return g.strictMode
 }
 
+// Version returns the current version string.
+func Version() string {
+	return version
+}
+
 // validateCommand checks if a command is valid.
 // Returns error if command has no handler and no subcommands.
 func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
@@ -210,7 +219,7 @@ func (g *GuardedCommand) addDefaultCommands() {
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version "+version)
 		},
 	})
 
