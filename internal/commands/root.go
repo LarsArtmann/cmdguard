@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/charmbracelet/fang"
 	"github.com/larsartmann/cmdguard/internal/config"
@@ -49,12 +50,10 @@ and samber/do/v2 (DI) with compile-time and runtime validation.`,
 	root.PreRunE = func(cmd *cobra.Command, args []string) error {
 		level, _ := cmd.Flags().GetString("log-level")
 		validLevels := []string{"debug", "info", "warn", "error"}
-		for _, valid := range validLevels {
-			if level == valid {
-				return nil
-			}
+		if !slices.Contains(validLevels, level) {
+			return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
 		}
-		return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
+		return nil
 	}
 
 	// Initialize logger based on config
