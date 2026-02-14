@@ -35,6 +35,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/charmbracelet/fang"
@@ -86,12 +87,10 @@ func New(name, short string) *GuardedCommand {
 	cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
 		level, _ := cmd.Flags().GetString("log-level")
 		validLevels := []string{"debug", "info", "warn", "error"}
-		for _, valid := range validLevels {
-			if level == valid {
-				return nil
-			}
+		if !slices.Contains(validLevels, level) {
+			return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
 		}
-		return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
+		return nil
 	}
 
 	g := &GuardedCommand{
