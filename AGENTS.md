@@ -1,40 +1,38 @@
 # AGENTS.md - cmdguard Project Guide
 
-**Last Updated:** 2026-02-14  
-**Project:** cmdguard - CLI Validation Library  
-**Go Version:** 1.26.0
+**Last Updated:** 2026-02-14 09:35 UTC  
+**Project:** cmdguard - CLI Guard Library  
+**Go Version:** 1.26.0  
+**Status:** Phase 1 Complete (1% → 51% Foundation)
 
 ---
 
 ## Quick Start
 
 ```bash
-# Build the CLI application
-go build -o cmdguard ./cmd/cmdguard
-
 # Run tests
 go test ./...
 go test -v ./internal/...          # Verbose output
 go test -cover ./...               # With coverage
+go test -race ./...                # Race detection
 
-# Run the application
-./cmdguard --help
-./cmdguard validate
-./cmdguard version
+# Build a binary (using examples/)
+cd examples/basic && go build -o myapp .
 ```
 
 ---
 
 ## Project Overview
 
-**cmdguard** is a Go library/framework for building validated Cobra CLI applications. It provides:
+**cmdguard** is a Go library for building validated Cobra CLI applications with compile-time enforcement. It provides:
 
-- **Lifecycle management** - Structured init → validate → execute → shutdown flow
+- **Compile-time validation** - Panics at construction if commands are invalid
+- **Single-step initialization** - No multi-step init, validate, execute flow
+- **Guard philosophy** - Fail fast at startup, not at runtime
 - **Dependency injection** - Built on `samber/do/v2`
 - **Configuration management** - Integrated with `knadh/koanf`
-- **Runtime validation** - Ensures commands have handlers and flags are properly bound
 
-**Current Status:** Work in progress. The project is transitioning from a framework approach to a "guard library" approach with compile-time enforcement. See `/docs/planning/` for transformation plan.
+**Current Status:** Phase 1 Complete (Foundation). Guard API implemented, cmd/ folder removed.
 
 ---
 
@@ -42,8 +40,7 @@ go test -cover ./...               # With coverage
 
 ```
 cmdguard/
-├── cmd/cmdguard/           # CLI application entry point (planned for removal)
-├── pkg/cmdguard/           # Public API - main library entry point
+├── pkg/cmdguard/           # Public API - GuardedCommand (main entry point)
 ├── internal/
 │   ├── commands/           # Cobra command registry and setup
 │   ├── config/             # Koanf-based configuration management
@@ -252,23 +249,33 @@ See `docs/CLI_DESIGN_PRINCIPLES.md` for detailed UX guidelines.
 
 ## Known Issues & Gotchas
 
-1. **Unused import in root.go** - `log/slog` imported but not used (L7)
-2. **Missing dependency** - `internal/logging/logger.go` imports `github.com/charmbracelet/log` which is not in go.mod
-3. **Errcheck violations** - Several `fmt.Fprintln`/`fmt.Fprintf` errors not checked
-4. **Code duplication** - Version command logic duplicated in `main.go` and `root.go`
+1. **DI manual wiring** - Registry still uses `SetValidator()` instead of constructor injection
+2. **Test coverage** - Only config and validation packages have tests (~48% coverage for config)
+3. **No integration tests** - Need end-to-end tests with actual CLI execution
+4. **No examples** - Users need working examples in examples/ directory
 
 ---
 
-## Planned Changes
+## Transformation Progress
 
-Per `docs/planning/2026-02-14_04-21_CMDGUARD_TRANSFORMATION_PLAN.md`:
+Per `docs/planning/2026-02-14_09-27-COMPREHENSIVE_EXECUTION_PLAN.md`:
 
-1. **Remove `cmd/` folder** - Establish as library, not application
-2. **Redesign public API** - Single-step initialization, panic on invalid
-3. **Add compile-time validation** - Intercept Cobra calls to enforce correctness
-4. **Fix DI usage** - Remove manual service linking
-5. **Improve test coverage** - Target 80%+ for all packages
-6. **Add justfile** - Standardize build commands
+### Phase 1: Foundation (1% → 51%) ✅ COMPLETE
+- ✅ Remove `cmd/` folder - Establish as library
+- ✅ Redesign public API - Guard API with single-step initialization
+- ✅ Add compile-time validation - Panic on invalid commands
+- ✅ Update AGENTS.md - Document new API
+
+### Phase 2: Core (4% → 64%) 🔄 IN PROGRESS
+- 🔄 Fix DI usage - Remove manual service linking
+- 🔄 Fix errcheck violations - Check all fmt errors
+- 🔄 Improve test coverage - Target 80%+ for all packages
+
+### Phase 3: Polish (20% → 80%) ⏳ PENDING
+- ⏳ Add integration tests - End-to-end validation
+- ⏳ Create examples directory - Working examples
+- ⏳ Add justfile - Standardize build commands
+- ⏳ Fix code duplication - 7 clone groups detected
 
 ---
 
@@ -277,16 +284,32 @@ Per `docs/planning/2026-02-14_04-21_CMDGUARD_TRANSFORMATION_PLAN.md`:
 ### Adding a New Command
 
 ```go
-// In registry.go or setupCommands()
-registry.AddCommand(&cobra.Command{
-    Use:   "newcmd",
-    Short: "Brief description",
-    RunE: func(cmd *cobra.Command, args []string) error {
-        // Implementation
-        return nil
-    },
-})
+package main
+
+import (
+    "context"
+    "github.com/larsartmann/cmdguard/pkg/cmdguard"
+    "github.com/spf13/cobra"
+)
+
+func main() {
+    root := cmdguard.New("myapp", "My application")
+    
+    root.AddCommand(&cobra.Command{
+        Use:   "newcmd",
+        Short: "Brief description",
+        RunE: func(cmd *cobra.Command, args []string) error {
+            // Implementation
+            return nil
+        },
+    })
+    
+    root.ExecuteAndExit(context.Background())
+}
 ```
+
+**Note:** `AddCommand` will panic if the command has no handler and no subcommands.
+This is intentional - errors are caught at startup, not at runtime.
 
 ### Adding a Service
 
@@ -314,10 +337,15 @@ registry.AddCommand(&cobra.Command{
 
 ### Validation at Runtime vs Compile-time
 
-**Current:** Runtime validation after initialization  
-**Planned:** Panic at construction time (guard approach)  
+**Before:** Runtime validation after initialization (framework approach)  
+**Now:** Panic at construction time (guard approach) ✅ IMPLEMENTED
 
 Rationale: Go lacks compile-time macros; panic at init is closest to "fail fast" philosophy.
+
+The Guard API (`GuardedCommand`) panics if:
+- Command has no handler and no subcommands
+- Strict mode requires RunE but Run provided
+- Commands added after execution begins
 
 ### Koanf over Viper
 
@@ -328,10 +356,68 @@ Rationale: Go lacks compile-time macros; panic at init is closest to "fail fast"
 
 ---
 
+## Guard API Reference
+
+### Basic Usage
+
+```go
+package main
+
+import (
+    "context"
+    "github.com/larsartmann/cmdguard/pkg/cmdguard"
+    "github.com/spf13/cobra"
+)
+
+func main() {
+    // Single-step initialization
+    root := cmdguard.New("myapp", "My application")
+    
+    // Add command (panics if invalid)
+    root.AddCommand(&cobra.Command{
+        Use:   "hello",
+        Short: "Say hello",
+        Run: func(cmd *cobra.Command, args []string) {
+            fmt.Println("Hello, World!")
+        },
+    })
+    
+    // Execute
+    root.ExecuteAndExit(context.Background())
+}
+```
+
+### GuardedCommand Methods
+
+| Method | Description |
+|--------|-------------|
+| `New(name, short)` | Create new guarded command |
+| `AddCommand(cmd)` | Add subcommand (panics if invalid) |
+| `AddSubcommand(parent, child)` | Add nested subcommand |
+| `Execute(ctx)` | Run with context |
+| `ExecuteAndExit(ctx)` | Run and exit with code |
+| `Command()` | Access underlying cobra command |
+| `Config()` | Get configuration |
+| `IsStrictMode()` | Check strict mode |
+
+### Panic Conditions (Intentional)
+
+The Guard API panics at construction time if:
+1. Command has no `Run`/`RunE` and no subcommands
+2. Strict mode requires `RunE` but only `Run` provided
+3. Commands added after `Execute()` called
+4. Command has no name
+
+This ensures errors are caught immediately at startup, not when users run commands.
+
+---
+
 ## Links & References
 
 - [Cobra Documentation](https://github.com/spf13/cobra)
 - [samber/do/v2 Documentation](https://github.com/samber/do)
 - [koanf Documentation](https://github.com/knadh/koanf)
 - [CLI Design Principles](./docs/CLI_DESIGN_PRINCIPLES.md)
-- [Transformation Plan](./docs/planning/2026-02-14_04-21_CMDGUARD_TRANSFORMATION_PLAN.md)
+- [Original Transformation Plan](./docs/planning/2026-02-14_04-21_CMDGUARD_TRANSFORMATION_PLAN.md)
+- [Comprehensive Execution Plan](./docs/planning/2026-02-14_09-27-COMPREHENSIVE_EXECUTION_PLAN.md)
+- [Feature Status](./FEATURES.md)
