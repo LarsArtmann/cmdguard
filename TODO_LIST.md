@@ -13,7 +13,7 @@
 | README.md | ✅ Done | 2026-02-14 |
 | docs/ARCHITECTURE_REVIEW.md | ✅ Done | 2026-02-14 |
 | docs/CLI_DESIGN_PRINCIPLES.md | ✅ Done | 2026-02-14 |
-| docs/status/2026-02-14_05-28_DECISION_POINT.md | ⏳ Pending | - |
+| docs/status/2026-02-14_05-28_DECISION_POINT.md | ✅ Done | 2026-02-14 |
 | docs/status/2026-02-14_04-19_CLI_IMPROVEMENTS.md | ⏳ Pending | - |
 | docs/status/2026-02-14_05-44_POST_DECISION_STATE.md | ⏳ Pending | - |
 | docs/status/2026-02-14_04-25_COMPREHENSIVE_STATUS.md | ⏳ Pending | - |
@@ -23,7 +23,15 @@
 
 ---
 
-## Critical Issues (Verified in Code)
+## Key Decisions (From DECISION_POINT.md)
+
+| Decision | Status | Notes |
+|----------|--------|-------|
+| Keep framework approach (Option A) | ✅ ADOPTED | Not rebuilding as guard library |
+| README describes framework | ✅ DONE | API reference present |
+| Documentation aligned with implementation | ✅ DONE | Claims verified |
+
+---
 
 ### 1. Errcheck Violations [NOT_DONE]
 **Source:** AGENTS.md (verified in code)
@@ -201,7 +209,8 @@
 | API Options | 7 | 0 | 0 | 7 |
 | Missing Docs | 4 | 0 | 0 | 4 |
 | CLI UX Violations | 3 | 0 | 0 | 3 |
-| **TOTAL** | **53** | **0** | **1** | **52** |
+| Decisions | 3 | 3 | 0 | 0 |
+| **TOTAL** | **56** | **3** | **1** | **52** |
 
 ---
 
@@ -223,3 +232,6 @@
 - Analyzed CLI_DESIGN_PRINCIPLES.md
 - Found 3 CLI UX violations (missing examples, missing defaults, no flag suggestions)
 - 4 principles compliant (BoolP, short flags, enum validation, kebab-case)
+- Analyzed DECISION_POINT.md
+- Documented 3 key decisions (keep framework, README update, docs alignment)
+- All action items already tracked - no new TODOs
