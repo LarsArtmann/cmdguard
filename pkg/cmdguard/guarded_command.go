@@ -211,7 +211,7 @@ func (g *GuardedCommand) addDefaultCommands() {
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
 		},
 	})
 
@@ -223,7 +223,9 @@ func (g *GuardedCommand) addDefaultCommands() {
 			if err := g.validateCommandTree(); err != nil {
 				return fmt.Errorf("validation failed: %w", err)
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands validated successfully")
+			if _, err := fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands validated successfully"); err != nil {
+				return fmt.Errorf("failed to write output: %w", err)
+			}
 			return nil
 		},
 	})
