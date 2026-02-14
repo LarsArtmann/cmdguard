@@ -60,12 +60,13 @@
 
 ### 5. Architecture Diagram Outdated [NOT_DONE]
 **Source:** POST_DECISION_STATE.md (Technical Debt)
-**Details:** Architecture diagram doesn't include logging layer
-**Action:** Update architecture diagram with logging layer
+**Details:** `architecture.d2` doesn't include logging layer
+**Note:** `architecture_detailed.d2` already has logging layer - consider using that or updating the simpler diagram
+**Action:** Update `architecture.d2` with logging layer or reference the detailed diagram
 
 ### 6. Incomplete Context Handling [NOT_DONE]
 **Source:** ARCHITECTURE_REVIEW.md (P1)
-**File:** `internal/di/module.go:123-127`
+**File:** `internal/di/module.go:122-126`
 **Details:** Context passed to `Shutdown()` is completely ignored
 **Action:** Implement proper context-aware shutdown
 
@@ -75,11 +76,11 @@
 **Details:** Errors discarded with `_` assignment
 **Action:** Properly handle/return config loading errors
 
-### 8. No Error Aggregation [NOT_DONE]
+### 8. Error Aggregation [DONE]
 **Source:** ARCHITECTURE_REVIEW.md (P2)
-**File:** `internal/di/module.go:115-117`
-**Details:** Returns only `errs[0]` instead of using `errors.Join()`
-**Action:** Aggregate multiple errors with `errors.Join()`
+**File:** `internal/di/module.go:115-116`
+**Details:** Was returning only `errs[0]` instead of using `errors.Join()`
+**Action:** ✅ Fixed - now uses `errors.Join(errs...)`
 
 **Note:** Items "Code Duplication" and "Manual DI Wiring" were moved to Medium/High Priority sections to avoid duplication.
 
@@ -233,7 +234,7 @@
 | CLI UX Violations | 3 | 0 | 0 | 3 |
 | Decisions | 3 | 3 | 0 | 0 |
 | Superseded (Option A) | 4 | - | - | - |
-| **TOTAL ACTIONABLE** | **66** | **3** | **1** | **62** |
+| **TOTAL ACTIONABLE** | **66** | **4** | **1** | **61** |
 
 ---
 
@@ -283,4 +284,5 @@
 - Added "Superseded by Option A Decision" section (4 items)
 - Moved 3 High Priority items to Superseded (Remove cmd/, Redesign API, Compile-time validation)
 - Moved 1 Medium Priority item to Superseded (Define guard architecture)
-- Updated statistics: 74 → 66 actionable items
+- Added changelog entry for error aggregation fix
+- Updated statistics: 1 critical issue resolved (error aggregation)
