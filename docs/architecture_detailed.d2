@@ -1,0 +1,671 @@
+# cmdguard Detailed Architecture Diagram
+# Generated: 2026-02-14
+# Review: Crush AI Assistant
+
+direction: down
+
+# ============================================================
+# STYLES
+# ============================================================
+
+classes: {
+  public: {
+    style: {
+      fill: "#e3f2fd"
+      stroke: "#1976d2"
+      stroke-width: 2
+      border-radius: 8
+    }
+  }
+
+  internal: {
+    style: {
+      fill: "#f5f5f5"
+      stroke: "#616161"
+      stroke-width: 1
+      border-radius: 4
+    }
+  }
+
+  external: {
+    style: {
+      fill: "#fff3e0"
+      stroke: "#f57c00"
+      stroke-width: 2
+      border-radius: 8
+      stroke-dash: 3
+    }
+  }
+
+  interface: {
+    style: {
+      fill: "#e8f5e9"
+      stroke: "#388e3c"
+      stroke-width: 2
+      border-radius: 4
+    }
+  }
+
+  datastore: {
+    shape: cylinder
+    style: {
+      fill: "#fce4ec"
+      stroke: "#c2185b"
+      stroke-width: 2
+    }
+  }
+
+  issue: {
+    style: {
+      fill: "#ffebee"
+      stroke: "#c62828"
+      stroke-width: 2
+      border-radius: 4
+    }
+  }
+
+  test: {
+    style: {
+      fill: "#e0f2f1"
+      stroke: "#00796b"
+      stroke-width: 1
+      border-radius: 4
+      stroke-dash: 3
+    }
+  }
+}
+
+# ============================================================
+# TITLE
+# ============================================================
+
+title: |md
+  # cmdguard Architecture
+  ### Detailed Component Diagram with Dependencies & Data Flow
+| {near: top-center}
+
+# ============================================================
+# PUBLIC API LAYER
+# ============================================================
+
+public_api: {
+  class: public
+  label: |md
+    **pkg/cmdguard**
+    Public API
+  |
+
+  application: {
+    class: public
+    label: |md
+      **Application**
+      - New()
+      - Initialize() / InitializeWithOptions()
+      - Validate() / MustValidate()
+      - Execute() / ExecuteAndExit()
+      - Shutdown() / HealthCheck()
+      - AddCommand()
+    |
+  }
+
+  options: {
+    class: interface
+    label: |md
+      **Option Pattern**
+      - WithCommand(cmd)
+      - WithValidationHook(hook) ⚠️
+    |
+  }
+
+  application -> options: uses
+}
+
+# ============================================================
+# INTERNAL COMPONENTS
+# ============================================================
+
+internal_layer: {
+  label: |md
+    **internal/** (Private Implementation)
+  |
+
+  # ----------------------------------------------------------
+  # DI MODULE
+  # ----------------------------------------------------------
+
+  di_pkg: {
+    class: internal
+    label: |md
+      **di/module.go**
+      Dependency Injection
+    |
+
+    module: {
+      class: internal
+      label: |md
+        **Module**
+        - injector: do.Injector
+        - ProvideServices()
+        - Invoke*/MustInvoke*
+        - HealthCheck()
+        - Shutdown() / ShutdownWithContext()
+      |
+    }
+
+    services: {
+      class: interface
+      label: |md
+        **Registered Services**
+        - Config (lazy)
+        - Registry (lazy)
+        - Validator (lazy)
+        - CommandRegistry (lazy)
+        - FlagValidator (transient)
+      |
+    }
+
+    module -> services: registers
+  }
+
+  # ----------------------------------------------------------
+  # COMMANDS PACKAGE
+  # ----------------------------------------------------------
+
+  commands_pkg: {
+    class: internal
+    label: |md
+      **commands/root.go**
+      Command Registry
+    |
+
+    registry: {
+      class: internal
+      label: |md
+        **Registry**
+        - root: *cobra.Command
+        - cfg: *Config
+        - validator: *Validator
+        - logger: *slog.Logger
+        ---
+        + Root() *cobra.Command
+        + AddCommand()
+        + Execute() / ExecuteAndExit()
+        + Validate()
+        + SetupCommands()
+      |
+    }
+
+    commands: {
+      class: interface
+      label: |md
+        **Built-in Commands**
+        - validate
+        - version
+      |
+    }
+
+    flags: {
+      class: interface
+      label: |md
+        **Global Flags**
+        --config, -c
+        --log-level, -l
+        --strict, -s
+      |
+    }
+
+    registry -> commands: creates
+    registry -> flags: defines
+  }
+
+  # ----------------------------------------------------------
+  # CONFIG PACKAGE
+  # ----------------------------------------------------------
+
+  config_pkg: {
+    class: internal
+    label: |md
+      **config/provider.go**
+      Configuration Management
+    |
+
+    config: {
+      class: internal
+      label: |md
+        **Config**
+        - StrictMode: bool
+        - ConfigFile: string
+        - LogLevel: string
+        ---
+        + Validate()
+        + Shutdown()
+      |
+    }
+
+    loading: {
+      class: interface
+      label: |md
+        **Loading Order**
+        1. Defaults
+        2. config.yaml
+        3. CMDGUARD_* env vars
+        4. Custom config file
+      |
+    }
+
+    config -> loading: uses
+  }
+
+  # ----------------------------------------------------------
+  # VALIDATION PACKAGE
+  # ----------------------------------------------------------
+
+  validation_pkg: {
+    class: internal
+    label: |md
+      **validation/**
+      Validation Framework
+    |
+
+    val_registry: {
+      class: internal
+      label: |md
+        **Registry**
+        - mu: sync.RWMutex
+        - commands: map[string]*CommandInfo
+        - flags: map[string][]*FlagInfo
+        ---
+        + RegisterCommand()
+        + RegisterSubcommand()
+        + GetCommand() / GetFlags()
+        + MarkFlagBound()
+      |
+    }
+
+    validator: {
+      class: internal
+      label: |md
+        **Validator**
+        - registry: *Registry
+        - cfg: *Config
+        ---
+        + ValidateAll()
+        + ValidateCommands()
+        + ValidateFlags()
+        + ValidateCommandTree()
+      |
+    }
+
+    flag_validator: {
+      class: internal
+      label: |md
+        **FlagValidator**
+        (transient service)
+        ---
+        + ValidateFlag()
+        + ValidateFlagAccess()
+      |
+    }
+
+    metadata: {
+      class: interface
+      label: |md
+        **Metadata Types**
+        CommandInfo:
+        - Name, Handler
+        - HasSubcommands
+        - Flags []*FlagInfo
+        ---
+        FlagInfo:
+        - Name, Shorthand
+        - Type, IsBound
+        - IsRequired, Default
+      |
+    }
+
+    val_registry -> metadata: stores
+    validator -> val_registry: queries
+    flag_validator -> config_pkg.config: reads strict mode
+  }
+
+  # ----------------------------------------------------------
+  # LOGGING PACKAGE
+  # ----------------------------------------------------------
+
+  logging_pkg: {
+    class: internal
+    label: |md
+      **logging/logger.go**
+      Structured Logging
+    |
+
+    logger: {
+      class: internal
+      label: |md
+        **Logger Factory**
+        NewLogger(level string) *slog.Logger
+        ---
+        Levels: debug, info, warn, error
+        Handler: TextHandler → stderr
+      |
+    }
+  }
+}
+
+# ============================================================
+# EXTERNAL DEPENDENCIES
+# ============================================================
+
+external_deps: {
+  label: |md
+    **External Dependencies**
+  |
+
+  cobra: {
+    class: external
+    label: |md
+      **spf13/cobra**
+      CLI Framework
+      ---
+      - Command
+      - Flags (pflag)
+      - Help generation
+    |
+  }
+
+  do_di: {
+    class: external
+    label: |md
+      **samber/do/v2**
+      DI Container
+      ---
+      - Injector
+      - Provide/Invoke
+      - HealthCheck/Shutdown
+      - Scoping
+    |
+  }
+
+  koanf: {
+    class: external
+    label: |md
+      **knadh/koanf**
+      Configuration
+      ---
+      - Hierarchical config
+      - File/Env/Flag providers
+      - YAML parsing
+    |
+  }
+
+  fang: {
+    class: external
+    label: |md
+      **charmbracelet/fang**
+      Styled Execution
+      ---
+      - Error styling
+      - Execution wrapper
+    |
+  }
+
+  slog: {
+    class: external
+    label: |md
+      **log/slog**
+      Standard Library
+      ---
+      - Structured logging
+      - TextHandler
+    |
+  }
+}
+
+# ============================================================
+# COMMAND LINE INTERFACE
+# ============================================================
+
+cli: {
+  class: public
+  label: |md
+    **cmd/cmdguard/main.go**
+    CLI Entry Point
+    ---
+    - Creates Module
+    - Sets up commands
+    - Runs validation
+    - Executes with fang
+    - Graceful shutdown
+  |
+}
+
+# ============================================================
+# TESTS
+# ============================================================
+
+tests: {
+  label: |md
+    **Test Coverage**
+  |
+
+  config_tests: {
+    class: test
+    label: |md
+      **config/**
+      - TestNewConfig
+      - TestConfig_Validate
+      - TestGetConfigFilePath
+      ✅ Good coverage
+    |
+  }
+
+  validation_tests: {
+    class: test
+    label: |md
+      **validation/**
+      - TestNewRegistry
+      - TestRegistry_*
+      - TestValidator_*
+      - TestFlagValidator_*
+      ✅ Good coverage
+    |
+  }
+
+  missing_tests: {
+    class: issue
+    label: |md
+      **Missing Tests**
+      - commands/* ❌
+      - di/* ❌
+      - pkg/cmdguard ❌
+      - cmd/cmdguard ❌
+    |
+  }
+}
+
+# ============================================================
+# DATA STORES
+# ============================================================
+
+data: {
+  config_file: {
+    class: datastore
+    label: |md
+      **config.yaml**
+      Configuration File
+    |
+  }
+
+  env_vars: {
+    class: datastore
+    label: |md
+      **Environment**
+      CMDGUARD_* variables
+    |
+  }
+}
+
+# ============================================================
+# RELATIONSHIPS - DEPENDENCY FLOW
+# ============================================================
+
+# Public API depends on internal packages
+public_api.application -> internal_layer.di_pkg.module: uses
+public_api.application -> internal_layer.commands_pkg.registry: uses
+public_api.application -> internal_layer.validation_pkg.validator: uses
+public_api.application -> internal_layer.config_pkg.config: uses
+
+# DI Module provides services
+internal_layer.di_pkg.module -> internal_layer.config_pkg.config: provides
+internal_layer.di_pkg.module -> internal_layer.validation_pkg.val_registry: provides
+internal_layer.di_pkg.module -> internal_layer.validation_pkg.validator: provides
+internal_layer.di_pkg.module -> internal_layer.commands_pkg.registry: provides
+
+# Commands depend on validation
+internal_layer.commands_pkg.registry -> internal_layer.validation_pkg.validator: SetValidator()
+internal_layer.commands_pkg.registry -> internal_layer.logging_pkg.logger: uses
+
+# Validation depends on config
+internal_layer.validation_pkg.validator -> internal_layer.config_pkg.config: reads strict mode
+
+# External dependencies
+internal_layer.commands_pkg.registry -> external_deps.cobra: wraps
+internal_layer.di_pkg.module -> external_deps.do_di: uses
+internal_layer.config_pkg.config -> external_deps.koanf: uses
+internal_layer.logging_pkg.logger -> external_deps.slog: uses
+internal_layer.commands_pkg.registry -> external_deps.fang: Execute()
+
+# CLI entry point
+cli -> internal_layer.di_pkg.module: creates
+cli -> internal_layer.commands_pkg.registry: configures
+cli -> internal_layer.validation_pkg.validator: validates
+
+# Data sources
+internal_layer.config_pkg.config -> data.config_file: loads
+internal_layer.config_pkg.config -> data.env_vars: loads
+
+# ============================================================
+# DATA FLOW - LIFECYCLE
+# ============================================================
+
+lifecycle: {
+  label: |md
+    **Application Lifecycle**
+  |
+
+  step1: {
+    class: interface
+    label: |md
+      **1. New()**
+      Create Application
+      Initialize DI module
+    |
+  }
+
+  step2: {
+    class: interface
+    label: |md
+      **2. Initialize()**
+      Register services
+      Invoke dependencies
+      Setup commands
+    |
+  }
+
+  step3: {
+    class: interface
+    label: |md
+      **3. Validate()**
+      Check all commands have handlers
+      Check all flags are bound
+      Run custom hooks
+    |
+  }
+
+  step4: {
+    class: interface
+    label: |md
+      **4. Execute()**
+      Parse flags
+      Run command
+      Handle errors (fang)
+    |
+  }
+
+  step5: {
+    class: interface
+    label: |md
+      **5. Shutdown()**
+      Cleanup resources
+      Shutdown services
+    |
+  }
+
+  step1 -> step2 -> step3 -> step4 -> step5: flow
+}
+
+# ============================================================
+# ISSUES & RECOMMENDATIONS
+# ============================================================
+
+issues: {
+  label: |md
+    **Known Issues**
+  |
+
+  issue1: {
+    class: issue
+    label: |md
+      **🔴 P0: Broken Hook**
+      WithValidationHook accepts
+      but never stores/executes hook
+    |
+  }
+
+  issue2: {
+    class: issue
+    label: |md
+      **🟡 P1: Missing Context**
+      ShutdownWithContext ignores
+      context timeout
+    |
+  }
+
+  issue3: {
+    class: issue
+    label: |md
+      **🟡 P1: Silent Errors**
+      Config loading errors
+      silently ignored
+    |
+  }
+
+  issue4: {
+    class: issue
+    label: |md
+      **🟢 P2: Error Aggregation**
+      Shutdown returns only
+      first error, not all
+    |
+  }
+}
+
+# ============================================================
+# LEGEND
+# ============================================================
+
+legend: {
+  label: |md
+    **Legend**
+
+    - 🔵 Blue: Public API
+    - ⚪ Gray: Internal Implementation
+    - 🟠 Orange: External Dependency
+    - 🟢 Green: Interface/Contract
+    - 🩷 Pink: Data Store
+    - 🔴 Red: Issue/Problem
+    - 🟣 Purple: Test
+    - ---- Dashed: Interface/Abstract
+  |
+  near: bottom-right
+}
