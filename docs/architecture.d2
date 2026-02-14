@@ -1,0 +1,229 @@
+# cmdguard Architecture Diagram
+# A CLI validation library ensuring commands and flags are properly implemented
+
+direction: right
+
+# External Dependencies
+external: {
+  label: External Dependencies
+  style: {
+    fill: "#f0f0f0"
+    stroke: "#666"
+    stroke-dash: 3
+  }
+
+  cobra: {
+    label: |go
+      spf13/cobra
+      CLI framework
+    |
+    shape: rectangle
+  }
+
+  fang: {
+    label: |go
+      charmbracelet/fang
+      Styling
+    |
+    shape: rectangle
+  }
+
+  koanf: {
+    label: |go
+      knadh/koanf
+      Config management
+    |
+    shape: rectangle
+  }
+
+  do: {
+    label: |go
+      samber/do/v2
+      Dependency Injection
+    |
+    shape: rectangle
+  }
+}
+
+# Entry Point
+entry: {
+  label: Entry Point
+  style: {
+    fill: "#e1f5fe"
+    stroke: "#0288d1"
+  }
+
+  main: {
+    label: |go
+      cmd/cmdguard/main.go
+      Application bootstrap
+    |
+    shape: rectangle
+    style: {
+      fill: "#b3e5fc"
+      stroke: "#0288d1"
+    }
+  }
+}
+
+# Public API Layer
+public: {
+  label: Public API
+  style: {
+    fill: "#e8f5e9"
+    stroke: "#388e3c"
+  }
+
+  api: {
+    label: |go
+      pkg/cmdguard/
+      public_api.go
+
+      Application struct
+      - Initialize()
+      - Validate()
+      - Execute()
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+}
+
+# Internal Layer
+internal: {
+  label: Internal Packages
+  style: {
+    fill: "#fff3e0"
+    stroke: "#f57c00"
+  }
+
+  di: {
+    label: |go
+      internal/di/
+      module.go
+
+      Module struct
+      - ProvideServices()
+      - Invoke*()
+      - HealthCheck()
+      - Shutdown()
+    |
+    shape: rectangle
+    style: {
+      fill: "#ffe0b2"
+      stroke: "#f57c00"
+    }
+  }
+
+  commands: {
+    label: |go
+      internal/commands/
+      root.go
+
+      Registry struct
+      - Root() *cobra.Command
+      - AddCommand()
+      - Execute()
+      - Validate()
+    |
+    shape: rectangle
+    style: {
+      fill: "#ffe0b2"
+      stroke: "#f57c00"
+    }
+  }
+
+  validation: {
+    label: Validation Layer
+    style: {
+      fill: "#fce4ec"
+      stroke: "#c2185b"
+    }
+
+    registry: {
+      label: |go
+        registry.go
+
+        Registry struct
+        - RegisterCommand()
+        - RegisterSubcommand()
+        - GetCommands()
+      |
+      shape: rectangle
+      style: {
+        fill: "#f8bbd9"
+        stroke: "#c2185b"
+      }
+    }
+
+    validator: {
+      label: |go
+        validator.go
+
+        Validator struct
+        - ValidateAll()
+        - ValidateCommands()
+        - ValidateFlags()
+        - ValidateCommandTree()
+
+        FlagValidator struct
+        - ValidateFlag()
+      |
+      shape: rectangle
+      style: {
+        fill: "#f8bbd9"
+        stroke: "#c2185b"
+      }
+    }
+  }
+
+  config: {
+    label: |go
+      internal/config/
+      provider.go
+
+      Config struct
+      - StrictMode
+      - ConfigFile
+      - LogLevel
+
+      NewConfig()
+    |
+    shape: rectangle
+    style: {
+      fill: "#ffe0b2"
+      stroke: "#f57c00"
+    }
+  }
+}
+
+# Dependency Flow
+entry.main -> public.api: uses
+public.api -> internal.di: creates & uses
+public.api -> internal.commands: invokes
+public.api -> internal.validation.validator: invokes
+public.api -> internal.config: invokes
+
+# DI Wiring
+internal.di -> internal.config: provides
+internal.di -> internal.validation.registry: provides
+internal.di -> internal.validation.validator: provides
+internal.di -> internal.commands: provides
+
+# Internal Dependencies
+internal.commands -> internal.config: uses
+internal.commands -> internal.validation.validator: uses
+internal.validation.validator -> internal.validation.registry: uses
+internal.validation.validator -> internal.config: uses
+internal.validation.registry -> internal.config: uses
+
+# External Dependencies
+internal.commands -> external.cobra: wraps
+internal.commands -> external.fang: executes with
+internal.config -> external.koanf: loads config
+internal.di -> external.do: uses
+public.api -> external.cobra: accepts commands
+entry.main -> external.fang: error styling
