@@ -10,7 +10,7 @@
 | File | Status | Date Analyzed |
 |------|--------|---------------|
 | AGENTS.md | ✅ Done | 2026-02-14 |
-| README.md | ⏳ Pending | - |
+| README.md | ✅ Done | 2026-02-14 |
 | docs/ARCHITECTURE_REVIEW.md | ⏳ Pending | - |
 | docs/CLI_DESIGN_PRINCIPLES.md | ⏳ Pending | - |
 | docs/status/2026-02-14_05-28_DECISION_POINT.md | ⏳ Pending | - |
@@ -43,6 +43,23 @@
 **Details:** `SetValidator()` manual wiring still exists
 **Action:** Use proper constructor injection
 
+### 4. False Documentation Claims [NOT_DONE]
+**Source:** README.md (lines 164-165)
+**Claims:**
+- "No duplicate command names" validation - NOT IMPLEMENTED
+- "No conflicting aliases" validation - NOT IMPLEMENTED
+**Action:** Either implement these validations or remove from documentation
+
+### 5. Broken Code Examples in Documentation [NOT_DONE]
+**Source:** README.md (lines 45-77, 81-95)
+**Details:** Code examples missing `"fmt"` import, will not compile
+**Action:** Fix examples to be copy-pasteable
+
+### 6. WithValidationHook is a No-Op [NOT_DONE]
+**Source:** README.md (lines 154-155) → `pkg/cmdguard/public_api.go:130-135`
+**Details:** Hook is documented but implementation discards it (returns `nil`)
+**Action:** Either implement or remove from API
+
 ---
 
 ## Disproved Issues (Remove from Documentation)
@@ -51,6 +68,17 @@
 |-------|---------|--------|
 | Unused `log/slog` import in root.go:7 | `slog` IS used at lines 23, 141, 154 | Remove from AGENTS.md |
 | Missing `charmbracelet/log` dependency | `logger.go` only imports stdlib (`log/slog`, `os`) | Remove from AGENTS.md |
+
+---
+
+## Missing Documentation (Exists but not documented)
+
+| Feature | Location | Action |
+|---------|----------|--------|
+| `app.IsStrictMode()` | `pkg/cmdguard/public_api.go:191` | Add to README API Reference |
+| `app.AddCommand()` | `pkg/cmdguard/public_api.go:212` | Add to README API Reference |
+| Built-in `validate` command | Auto-added by `SetupCommands()` | Document in README |
+| Built-in `version` command | Auto-added by `SetupCommands()` | Document in README |
 
 ---
 
@@ -100,11 +128,12 @@
 
 | Category | Total | Done | Partial | Not Done |
 |----------|-------|------|---------|----------|
-| Critical Issues | 3 | 0 | 0 | 3 |
+| Critical Issues | 6 | 0 | 0 | 6 |
 | High Priority | 5 | 0 | 0 | 5 |
 | Medium Priority | 6 | 0 | 1 | 5 |
 | Lower Priority | 12 | 0 | 0 | 12 |
-| **TOTAL** | **26** | **0** | **1** | **25** |
+| Missing Docs | 4 | 0 | 0 | 4 |
+| **TOTAL** | **33** | **0** | **1** | **32** |
 
 ---
 
@@ -115,3 +144,6 @@
 - Analyzed AGENTS.md
 - Verified issues against actual code
 - Disproved 2 claims (unused import, missing dependency)
+- Analyzed README.md
+- Found 3 new critical issues (false docs, broken examples, no-op hook)
+- Found 4 undocumented API methods
