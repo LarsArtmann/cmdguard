@@ -1,5 +1,5 @@
 # Binaries
-cmdguard
+/cmdguard
 *.exe
 *.dll
 *.so
