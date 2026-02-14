@@ -60,8 +60,7 @@ func run() error {
 
 	// Graceful shutdown
 	if err := module.Shutdown(); err != nil {
-		// Log shutdown error but don't fail
-		fmt.Fprintf(os.Stderr, "shutdown error: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "shutdown error: %v\n", err)
 	}
 
 	return nil
@@ -77,7 +76,9 @@ func setupCommands(registry *commands.Registry, validator *validation.Validator)
 			if err := validator.ValidateAll(); err != nil {
 				return fmt.Errorf("validation failed: %w", err)
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands and flags validated successfully")
+			if _, err := fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands and flags validated successfully"); err != nil {
+				return fmt.Errorf("failed to write output: %w", err)
+			}
 			return nil
 		},
 	})
@@ -87,7 +88,7 @@ func setupCommands(registry *commands.Registry, validator *validation.Validator)
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
 		},
 	})
 
@@ -100,7 +101,9 @@ func setupCommands(registry *commands.Registry, validator *validation.Validator)
 			name, _ := cmd.Flags().GetString("name")
 			count, _ := cmd.Flags().GetInt("count")
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Hello %s! Count: %d\n", name, count)
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Hello %s! Count: %d\n", name, count); err != nil {
+				return fmt.Errorf("failed to write output: %w", err)
+			}
 			return nil
 		},
 	}

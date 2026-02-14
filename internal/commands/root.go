@@ -138,7 +138,9 @@ func (r *Registry) createValidateCommand() *cobra.Command {
 			}
 
 			slog.Info("All commands and flags validated successfully")
-			fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands and flags validated successfully")
+			if _, err := fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands and flags validated successfully"); err != nil {
+				return fmt.Errorf("failed to write output: %w", err)
+			}
 			return nil
 		},
 	}
@@ -151,7 +153,7 @@ func (r *Registry) createVersionCommand() *cobra.Command {
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
 			slog.Info("version command executed", "version", "0.1.0")
-			fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
 		},
 	}
 }
