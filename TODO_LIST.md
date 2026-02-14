@@ -11,7 +11,7 @@
 |------|--------|---------------|
 | AGENTS.md | ✅ Done | 2026-02-14 |
 | README.md | ✅ Done | 2026-02-14 |
-| docs/ARCHITECTURE_REVIEW.md | ⏳ Pending | - |
+| docs/ARCHITECTURE_REVIEW.md | ✅ Done | 2026-02-14 |
 | docs/CLI_DESIGN_PRINCIPLES.md | ⏳ Pending | - |
 | docs/status/2026-02-14_05-28_DECISION_POINT.md | ⏳ Pending | - |
 | docs/status/2026-02-14_04-19_CLI_IMPROVEMENTS.md | ⏳ Pending | - |
@@ -59,6 +59,24 @@
 **Source:** README.md (lines 154-155) → `pkg/cmdguard/public_api.go:130-135`
 **Details:** Hook is documented but implementation discards it (returns `nil`)
 **Action:** Either implement or remove from API
+
+### 7. Incomplete Context Handling [NOT_DONE]
+**Source:** ARCHITECTURE_REVIEW.md (P1)
+**File:** `internal/di/module.go:123-127`
+**Details:** Context passed to `Shutdown()` is completely ignored
+**Action:** Implement proper context-aware shutdown
+
+### 8. Silent Config Errors [NOT_DONE]
+**Source:** ARCHITECTURE_REVIEW.md (P1)
+**File:** `internal/config/provider.go:32-35`
+**Details:** Errors discarded with `_` assignment
+**Action:** Properly handle/return config loading errors
+
+### 9. No Error Aggregation [NOT_DONE]
+**Source:** ARCHITECTURE_REVIEW.md (P2)
+**File:** `internal/di/module.go:115-117`
+**Details:** Returns only `errs[0]` instead of using `errors.Join()`
+**Action:** Aggregate multiple errors with `errors.Join()`
 
 ---
 
@@ -121,6 +139,35 @@
 | Tracing | ❌ NOT_DONE | Beyond 80% |
 | Security audit | ❌ NOT_DONE | Beyond 80% |
 | Complete test suite | ❌ NOT_DONE | Beyond 80% |
+| Validation caching | ❌ NOT_DONE | Skip re-validation if tree unchanged |
+| Parallel validation | ❌ NOT_DONE | For large command trees |
+| Lazy config loading | ❌ NOT_DONE | Only load when accessed |
+| Path traversal validation | ❌ NOT_DONE | For config file paths |
+| Refactor: slices.Contains | ❌ NOT_DONE | root.go:52 loop simplification |
+
+### Suggested API Options (Not Implemented)
+
+| Option | Status | Notes |
+|--------|--------|-------|
+| `WithConfigFile(path string)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+| `WithLogger(logger *slog.Logger)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+| `WithShutdownTimeout(timeout)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+| `WithPreRunHook(hook func() error)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+| `WithPostRunHook(hook func() error)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+| `WithPanicRecovery(enabled bool)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+| `AddValidator(v CommandValidator)` | ❌ NOT_DONE | ARCHITECTURE_REVIEW suggestion |
+
+---
+
+## Test Coverage Gaps (0% Coverage)
+
+| Package | Has Tests | Action |
+|---------|-----------|--------|
+| `internal/commands` | ❌ NO | Add `*_test.go` files |
+| `internal/di` | ❌ NO | Add `*_test.go` files |
+| `pkg/cmdguard` | ❌ NO | Add `*_test.go` files |
+| `internal/config` | ✅ YES | ~47.6% coverage |
+| `internal/validation` | ✅ YES | Tests exist |
 
 ---
 
@@ -128,12 +175,13 @@
 
 | Category | Total | Done | Partial | Not Done |
 |----------|-------|------|---------|----------|
-| Critical Issues | 6 | 0 | 0 | 6 |
+| Critical Issues | 9 | 0 | 0 | 9 |
 | High Priority | 5 | 0 | 0 | 5 |
 | Medium Priority | 6 | 0 | 1 | 5 |
-| Lower Priority | 12 | 0 | 0 | 12 |
+| Lower Priority | 19 | 0 | 0 | 19 |
+| API Options | 7 | 0 | 0 | 7 |
 | Missing Docs | 4 | 0 | 0 | 4 |
-| **TOTAL** | **33** | **0** | **1** | **32** |
+| **TOTAL** | **50** | **0** | **1** | **49** |
 
 ---
 
@@ -147,3 +195,8 @@
 - Analyzed README.md
 - Found 3 new critical issues (false docs, broken examples, no-op hook)
 - Found 4 undocumented API methods
+- Analyzed ARCHITECTURE_REVIEW.md
+- Found 3 new critical issues (context handling, silent errors, error aggregation)
+- Found test coverage gaps (0% in commands/di/pkg)
+- Added 7 suggested API options
+- Added 5 performance/code quality improvements
