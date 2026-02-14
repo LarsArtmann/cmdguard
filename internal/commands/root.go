@@ -4,10 +4,12 @@ package commands
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/charmbracelet/fang"
 	"github.com/larsartmann/cmdguard/internal/config"
+	"github.com/larsartmann/cmdguard/internal/logging"
 	"github.com/larsartmann/cmdguard/internal/validation"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
@@ -18,6 +20,7 @@ type Registry struct {
 	root      *cobra.Command
 	cfg       *config.Config
 	validator *validation.Validator
+	logger    *slog.Logger
 }
 
 // NewRegistry creates a new command registry with the root command.
@@ -54,9 +57,14 @@ and samber/do/v2 (DI) with compile-time and runtime validation.`,
 		return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
 	}
 
+	// Initialize logger based on config
+	logger := logging.NewLogger(cfg.LogLevel)
+	slog.SetDefault(logger)
+
 	return &Registry{
-		root: root,
-		cfg:  cfg,
+		root:   root,
+		cfg:    cfg,
+		logger: logger,
 	}, nil
 }
 
@@ -130,6 +138,7 @@ func (r *Registry) createValidateCommand() *cobra.Command {
 				return fmt.Errorf("validation failed: %w", err)
 			}
 
+			slog.Info("All commands and flags validated successfully")
 			fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands and flags validated successfully")
 			return nil
 		},
@@ -142,6 +151,7 @@ func (r *Registry) createVersionCommand() *cobra.Command {
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
+			slog.Info("version command executed", "version", "0.1.0")
 			fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
 		},
 	}

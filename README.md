@@ -1,18 +1,24 @@
 # cmdguard
 
-**A compile-time guard for Cobra CLI applications.**
+**A Go library for building correct Cobra CLI applications.**
 
-Make it impossible to create broken CLI commands. Catch errors at construction time, not at runtime.
+Import this library to add compile-time and construction-time safeguards to your CLI commands. It validates commands and flags as you build them, catching errors before they reach users.
 
 ```go
-// This will PANIC at init time - impossible to ignore
-root := cmdguard.New("myapp", "My CLI")
-root.AddCommand(&cobra.Command{
-    Use: "broken",  // PANIC: no Run or RunE handler!
-})
+import "github.com/larsartmann/cmdguard"
 
-// This will PANIC - flag accessed before declaration
-root.Flags().GetString("undeclared")  // PANIC: flag not registered
+func main() {
+    // Guarded command - validates at construction
+    root, err := cmdguard.New("myapp", "My CLI")
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // This returns an error - must handle it
+    if err := root.AddCommand(&cobra.Command{Use: "broken"}); err != nil {
+        log.Fatal(err) // "command 'broken' has no handler"
+    }
+}
 ```
 
 ## The Problem
@@ -27,15 +33,7 @@ root.AddCommand(&cobra.Command{Use: "sub"})  // No handler!
 // "Error: unknown command sub"
 ```
 
-## The Solution
 
-Guard your commands. Fail fast at construction time:
-
-```go
-// This PANICS immediately - impossible to ship broken code
-root := cmdguard.New("myapp", "My CLI")
-root.AddCommand(&cobra.Command{Use: "sub"})  // PANIC: command "sub" has no handler
-```
 
 ## Installation
 
@@ -50,22 +48,28 @@ package main
 
 import (
     "context"
+    "log"
     "github.com/larsartmann/cmdguard"
     "github.com/spf13/cobra"
 )
 
 func main() {
     // Create guarded root command
-    root := cmdguard.New("myapp", "My application")
+    root, err := cmdguard.New("myapp", "My application")
+    if err != nil {
+        log.Fatal(err)
+    }
 
-    // Add command - panics if invalid
-    root.AddCommand(&cobra.Command{
+    // Add command - returns error if invalid
+    if err := root.AddCommand(&cobra.Command{
         Use:   "hello",
         Short: "Say hello",
         Run: func(cmd *cobra.Command, args []string) {
             // Safe: handler is required
         },
-    })
+    }); err != nil {
+        log.Fatal(err)
+    }
 
     // Execute - safe to run
     root.Execute(context.Background())
@@ -76,62 +80,56 @@ func main() {
 
 | Violation | Result | When Caught |
 |-----------|--------|-------------|
-| Command without handler | **PANIC** | At `AddCommand()` |
-| Duplicate command name | **PANIC** | At `AddCommand()` |
-| Flag accessed before registration | **PANIC** | At `Flags().Get*()` |
-| Duplicate flag name | **PANIC** | At flag registration |
-| Conflicting aliases | **PANIC** | At alias registration |
-| Subcommand without parent handler | **PANIC** | At validation |
+| Command without handler | **error** | At `AddCommand()` |
+| Duplicate command name | **error** | At `AddCommand()` |
+| Flag accessed before registration | **error** | At `Flags().Get*()` |
+| Duplicate flag name | **error** | At flag registration |
+| Conflicting aliases | **error** | At alias registration |
+| Subcommand without parent handler | **error** | At validation |
 
 ## Philosophy
 
-**Fail fast, fail loud.**
+**Fail fast with clear errors.**
 
 - **NOT a framework** - We don't manage your CLI
-- **NOT a validator** - We don't return errors you might ignore
-- **IS a guard** - We panic immediately on invalid construction
+- **IS a library** - You use our types to build your CLI
+- **IS a guard** - We return errors on invalid construction
 
 This follows the Go proverb: "Make the zero value useful." The zero value of a guarded command is a valid command.
 
-## Why Panic?
+## Why Return Errors?
 
-Because broken commands are **programmer errors**, not runtime errors:
+Because broken commands are **programmer errors**, but we respect Go conventions:
 
-1. **Impossible to ignore** - Unlike returned errors
+1. **Explicit error handling** - Following Go idioms
 2. **Catches bugs early** - At construction, not execution
-3. **Self-documenting** - Stack trace shows exactly where the bug is
-4. **Zero runtime overhead** - No validation needed at execution
+3. **Clear error messages** - Tell you exactly what's wrong
+4. **Testable** - You can test error conditions
 
 ## Comparison
 
-### Without cmdguard (framework approach)
+### Without cmdguard
 
 ```go
-app := cmdguard.New()
-app.Initialize()
+root := &cobra.Command{Use: "myapp"}
 
-// Returns error - might be ignored
-if err := app.AddCommand(&cobra.Command{Use: "bad"}); err != nil {
-    log.Println(err)  // Might be missed!
-}
+// No validation - compiles fine
+root.AddCommand(&cobra.Command{Use: "bad"})  // No handler!
 
-// Validate later - might be skipped
-if err := app.Validate(); err != nil {
-    panic(err)  // Too late!
-}
-
-app.Execute()
+// Error only shows when user runs it
+root.Execute()  // User sees: "Error: unknown command"
 ```
 
-### With cmdguard (guard approach)
+### With cmdguard
 
 ```go
-root := cmdguard.New("myapp", "My app")
+root, _ := cmdguard.New("myapp", "My app")
 
-// PANIC immediately - impossible to ignore or skip
-root.AddCommand(&cobra.Command{Use: "bad"})  // PANIC!
+// Returns error - must handle it
+if err := root.AddCommand(&cobra.Command{Use: "bad"}); err != nil {
+    log.Fatal(err)  // "command 'bad' has no handler" - caught early!
+}
 
-// Never reaches here if invalid
 root.Execute()
 ```
 
