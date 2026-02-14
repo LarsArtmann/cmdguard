@@ -11,45 +11,45 @@ import (
 
 func TestNewLogger(t *testing.T) {
 	tests := []struct {
-		name          string
-		level         string
-		expectedLevel slog.Level
+		name  string
+		format string
+		level string
 	}{
 		{
-			name:          "debug level",
-			level:         "debug",
-			expectedLevel: slog.LevelDebug,
+			name:   "text format with debug level",
+			format: "text",
+			level:  "debug",
 		},
 		{
-			name:          "info level",
-			level:         "info",
-			expectedLevel: slog.LevelInfo,
+			name:   "json format with info level",
+			format: "json",
+			level:  "info",
 		},
 		{
-			name:          "warn level",
-			level:         "warn",
-			expectedLevel: slog.LevelWarn,
+			name:   "text format with warn level",
+			format: "text",
+			level:  "warn",
 		},
 		{
-			name:          "error level",
-			level:         "error",
-			expectedLevel: slog.LevelError,
+			name:   "json format with error level",
+			format: "json",
+			level:  "error",
 		},
 		{
-			name:          "unknown level defaults to info",
-			level:         "unknown",
-			expectedLevel: slog.LevelInfo,
+			name:   "unknown format defaults to text",
+			format: "unknown",
+			level:  "info",
 		},
 		{
-			name:          "empty level defaults to info",
-			level:         "",
-			expectedLevel: slog.LevelInfo,
+			name:   "empty format defaults to text",
+			format: "",
+			level:  "info",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			logger := NewLogger(tt.level)
+			logger := NewLogger(tt.format, tt.level)
 			assert.NotNil(t, logger)
 		})
 	}
@@ -106,7 +106,79 @@ func TestParseLevel(t *testing.T) {
 	}
 }
 
-func TestLoggerOutput(t *testing.T) {
+func TestParseFormat(t *testing.T) {
+	tests := []struct {
+		name         string
+		format       string
+		expectedFormat Format
+	}{
+		{
+			name:         "text format",
+			format:       "text",
+			expectedFormat: FormatText,
+		},
+		{
+			name:         "json format",
+			format:       "json",
+			expectedFormat: FormatJSON,
+		},
+		{
+			name:         "unknown defaults to text",
+			format:       "unknown",
+			expectedFormat: FormatText,
+		},
+		{
+			name:         "empty defaults to text",
+			format:       "",
+			expectedFormat: FormatText,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := parseFormat(tt.format)
+			assert.Equal(t, tt.expectedFormat, result)
+		})
+	}
+}
+
+func TestValidFormat(t *testing.T) {
+	tests := []struct {
+		name    string
+		format  string
+		isValid bool
+	}{
+		{
+			name:    "text is valid",
+			format:  "text",
+			isValid: true,
+		},
+		{
+			name:    "json is valid",
+			format:  "json",
+			isValid: true,
+		},
+		{
+			name:    "unknown is invalid",
+			format:  "unknown",
+			isValid: false,
+		},
+		{
+			name:    "empty is invalid",
+			format:  "",
+			isValid: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ValidFormat(tt.format)
+			assert.Equal(t, tt.isValid, result)
+		})
+	}
+}
+
+func TestLoggerOutput_Text(t *testing.T) {
 	var buf bytes.Buffer
 	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -125,12 +197,27 @@ func TestLoggerOutput(t *testing.T) {
 	require.Contains(t, output, "error message")
 }
 
+func TestLoggerOutput_JSON(t *testing.T) {
+	var buf bytes.Buffer
+	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	logger := slog.New(handler)
+
+	logger.Info("json test", "key", "value")
+
+	output := buf.String()
+	require.Contains(t, output, "json test")
+	require.Contains(t, output, "key")
+	require.Contains(t, output, "value")
+}
+
 func TestLoggerLevelFiltering(t *testing.T) {
 	tests := []struct {
-		name           string
-		logLevel       slog.Level
-		logFunc        func(*slog.Logger)
-		shouldContain  string
+		name             string
+		logLevel         slog.Level
+		logFunc          func(*slog.Logger)
+		shouldContain    string
 		shouldNotContain string
 	}{
 		{

@@ -10,38 +10,57 @@ import (
 
 func TestLoad(t *testing.T) {
 	tests := []struct {
-		name     string
-		envLevel string
-		envStrict string
-		wantLevel string
+		name       string
+		envLevel   string
+		envFormat  string
+		envStrict  string
+		wantLevel  string
+		wantFormat string
 		wantStrict bool
 	}{
 		{
 			name:       "creates config with defaults",
 			envLevel:   "",
+			envFormat:  "",
 			envStrict:  "",
 			wantLevel:  "info",
+			wantFormat: "text",
 			wantStrict: false,
 		},
 		{
 			name:       "loads log level from env",
 			envLevel:   "debug",
+			envFormat:  "",
 			envStrict:  "",
 			wantLevel:  "debug",
+			wantFormat: "text",
+			wantStrict: false,
+		},
+		{
+			name:       "loads log format from env",
+			envLevel:   "",
+			envFormat:  "json",
+			envStrict:  "",
+			wantLevel:  "info",
+			wantFormat: "json",
 			wantStrict: false,
 		},
 		{
 			name:       "loads strict mode from env",
 			envLevel:   "",
+			envFormat:  "",
 			envStrict:  "true",
 			wantLevel:  "info",
+			wantFormat: "text",
 			wantStrict: true,
 		},
 		{
-			name:       "loads both from env",
+			name:       "loads all from env",
 			envLevel:   "error",
+			envFormat:  "json",
 			envStrict:  "true",
 			wantLevel:  "error",
+			wantFormat: "json",
 			wantStrict: true,
 		},
 	}
@@ -53,6 +72,10 @@ func TestLoad(t *testing.T) {
 				_ = os.Setenv("CMDGUARD_LOG_LEVEL", tt.envLevel)
 				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 			}
+			if tt.envFormat != "" {
+				_ = os.Setenv("CMDGUARD_LOG_FORMAT", tt.envFormat)
+				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
+			}
 			if tt.envStrict != "" {
 				_ = os.Setenv("CMDGUARD_STRICT_MODE", tt.envStrict)
 				defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
@@ -62,6 +85,7 @@ func TestLoad(t *testing.T) {
 
 			require.NotNil(t, cfg)
 			assert.Equal(t, tt.wantLevel, cfg.LogLevel)
+			assert.Equal(t, tt.wantFormat, cfg.LogFormat)
 			assert.Equal(t, tt.wantStrict, cfg.StrictMode)
 		})
 	}

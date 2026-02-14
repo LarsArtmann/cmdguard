@@ -13,6 +13,7 @@ type Config struct {
 	StrictMode bool   `koanf:"strict_mode"`
 	ConfigFile string `koanf:"config_file"`
 	LogLevel   string `koanf:"log_level"`
+	LogFormat  string `koanf:"log_format"`
 }
 
 // Load loads configuration from environment variables.
@@ -20,12 +21,16 @@ type Config struct {
 func Load() *Config {
 	cfg := &Config{
 		LogLevel:   "info",
+		LogFormat:  "text",
 		StrictMode: false,
 	}
 
 	// Load from environment variables
 	if level := os.Getenv("CMDGUARD_LOG_LEVEL"); level != "" {
 		cfg.LogLevel = level
+	}
+	if format := os.Getenv("CMDGUARD_LOG_FORMAT"); format != "" {
+		cfg.LogFormat = format
 	}
 	if os.Getenv("CMDGUARD_STRICT_MODE") == "true" {
 		cfg.StrictMode = true
@@ -40,6 +45,12 @@ func (c *Config) Validate() error {
 		validLevels := []string{"debug", "info", "warn", "error"}
 		if !slices.Contains(validLevels, c.LogLevel) {
 			return fmt.Errorf("invalid log level %q, must be one of: debug, info, warn, error", c.LogLevel)
+		}
+	}
+	if c.LogFormat != "" {
+		validFormats := []string{"text", "json"}
+		if !slices.Contains(validFormats, c.LogFormat) {
+			return fmt.Errorf("invalid log format %q, must be one of: text, json", c.LogFormat)
 		}
 	}
 	return nil

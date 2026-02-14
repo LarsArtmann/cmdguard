@@ -71,7 +71,7 @@ func New(name, short string) *GuardedCommand {
 	cfg := loadConfig()
 
 	// Initialize logger
-	logger := logging.NewLogger(cfg.LogLevel)
+	logger := logging.NewLogger(cfg.LogFormat, cfg.LogLevel)
 	slog.SetDefault(logger)
 
 	// Create root command
@@ -279,12 +279,16 @@ func loadConfig() *config.Config {
 	// Full config loading is done in the config package
 	cfg := &config.Config{
 		LogLevel:   "info",
+		LogFormat:  "text",
 		StrictMode: false,
 	}
 
 	// Try to load from environment
 	if level := os.Getenv("CMDGUARD_LOG_LEVEL"); level != "" {
 		cfg.LogLevel = level
+	}
+	if format := os.Getenv("CMDGUARD_LOG_FORMAT"); format != "" {
+		cfg.LogFormat = format
 	}
 	if os.Getenv("CMDGUARD_STRICT_MODE") == "true" {
 		cfg.StrictMode = true
