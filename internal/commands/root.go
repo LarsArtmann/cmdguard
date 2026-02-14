@@ -37,10 +37,22 @@ and samber/do/v2 (DI) with compile-time and runtime validation.`,
 		SilenceErrors: true,
 	}
 
-	// Add global flags
-	root.PersistentFlags().String("config", "", "config file path")
-	root.PersistentFlags().String("log-level", "info", "log level (debug, info, warn, error)")
-	root.PersistentFlags().Bool("strict", false, "enable strict mode validation")
+	// Add global flags with short versions and clear defaults
+	root.PersistentFlags().StringP("config", "c", "", "Config file path (default: config.yaml)")
+	root.PersistentFlags().StringP("log-level", "l", "info", "Log level: debug, info, warn, error")
+	root.PersistentFlags().BoolP("strict", "s", false, "Enable strict mode validation")
+
+	// Validate log-level enum values
+	root.PreRunE = func(cmd *cobra.Command, args []string) error {
+		level, _ := cmd.Flags().GetString("log-level")
+		validLevels := []string{"debug", "info", "warn", "error"}
+		for _, valid := range validLevels {
+			if level == valid {
+				return nil
+			}
+		}
+		return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
+	}
 
 	return &Registry{
 		root: root,
