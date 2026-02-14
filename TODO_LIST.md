@@ -15,7 +15,7 @@
 | docs/CLI_DESIGN_PRINCIPLES.md | ✅ Done | 2026-02-14 |
 | docs/status/2026-02-14_05-28_DECISION_POINT.md | ✅ Done | 2026-02-14 |
 | docs/status/2026-02-14_04-19_CLI_IMPROVEMENTS.md | ✅ Done | 2026-02-14 |
-| docs/status/2026-02-14_05-44_POST_DECISION_STATE.md | ⏳ Pending | - |
+| docs/status/2026-02-14_05-44_POST_DECISION_STATE.md | ✅ Done | 2026-02-14 |
 | docs/status/2026-02-14_04-25_COMPREHENSIVE_STATUS.md | ⏳ Pending | - |
 | docs/status/2026-02-14_04-11_BUILD_VERIFICATION_COMPLETE.md | ⏳ Pending | - |
 | docs/planning/2026-02-14_04-21_CMDGUARD_TRANSFORMATION_PLAN.md | ⏳ Pending | - |
@@ -68,6 +68,11 @@
 **Details:** Hook is documented but implementation discards it (returns `nil`)
 **Action:** Either implement or remove from API
 
+### 10. Architecture Diagram Outdated [NOT_DONE]
+**Source:** POST_DECISION_STATE.md (Technical Debt)
+**Details:** Architecture diagram doesn't include logging layer
+**Action:** Update architecture diagram with logging layer
+
 ### 7. Incomplete Context Handling [NOT_DONE]
 **Source:** ARCHITECTURE_REVIEW.md (P1)
 **File:** `internal/di/module.go:123-127`
@@ -105,6 +110,9 @@
 | `app.AddCommand()` | `pkg/cmdguard/public_api.go:212` | Add to README API Reference |
 | Built-in `validate` command | Auto-added by `SetupCommands()` | Document in README |
 | Built-in `version` command | Auto-added by `SetupCommands()` | Document in README |
+| API usage examples | README | Add examples section per POST_DECISION_STATE.md |
+| CONTRIBUTING.md | Project root | Create per POST_DECISION_STATE.md |
+| Version tagging strategy | Documentation | Define per POST_DECISION_STATE.md |
 
 ---
 
@@ -130,18 +138,29 @@
 | Fix code duplication (7 clone groups) | ❌ NOT_DONE | Task 3.3 |
 | Add integration tests | ❌ NOT_DONE | Task 3.4 |
 | Create examples directory | ❌ NOT_DONE | Task 3.5 |
+| Add command registry tests | ❌ NOT_DONE | POST_DECISION_STATE.md |
+| Add logging output tests | ❌ NOT_DONE | POST_DECISION_STATE.md |
+| Add flag type validation | ❌ NOT_DONE | POST_DECISION_STATE.md |
+| Add command dependency validation | ❌ NOT_DONE | POST_DECISION_STATE.md |
+| Implement strict mode for missing flags | ❌ NOT_DONE | POST_DECISION_STATE.md |
 
 ### Lower Priority - Future Work
 
 | Task | Status | Notes |
 |------|--------|-------|
 | Add CI/CD workflow | ❌ NOT_DONE | Task 4.1 |
+| CI/CD Go version matrix testing | ❌ NOT_DONE | POST_DECISION_STATE.md |
 | Benchmarks | ❌ NOT_DONE | Beyond 80% |
 | Fuzz testing | ❌ NOT_DONE | Beyond 80% |
 | Release automation | ❌ NOT_DONE | Beyond 80% |
+| Go module versioning | ❌ NOT_DONE | POST_DECISION_STATE.md |
+| Release notes automation | ❌ NOT_DONE | POST_DECISION_STATE.md |
 | Container image | ❌ NOT_DONE | Beyond 80% |
 | Homebrew formula | ❌ NOT_DONE | Beyond 80% |
 | Plugin system | ❌ NOT_DONE | Beyond 80% |
+| Middleware support for commands | ❌ NOT_DONE | POST_DECISION_STATE.md Plugin System |
+| Design validation hook interface | ❌ NOT_DONE | POST_DECISION_STATE.md |
+| Allow custom validators | ❌ NOT_DONE | POST_DECISION_STATE.md |
 | Telemetry | ❌ NOT_DONE | Beyond 80% |
 | Metrics | ❌ NOT_DONE | Beyond 80% |
 | Tracing | ❌ NOT_DONE | Beyond 80% |
@@ -202,15 +221,15 @@
 
 | Category | Total | Done | Partial | Not Done |
 |----------|-------|------|---------|----------|
-| Critical Issues | 9 | 0 | 0 | 9 |
+| Critical Issues | 10 | 0 | 0 | 10 |
 | High Priority | 5 | 0 | 0 | 5 |
-| Medium Priority | 6 | 0 | 1 | 5 |
-| Lower Priority | 19 | 0 | 0 | 19 |
+| Medium Priority | 11 | 0 | 1 | 10 |
+| Lower Priority | 25 | 0 | 0 | 25 |
 | API Options | 7 | 0 | 0 | 7 |
-| Missing Docs | 4 | 0 | 0 | 4 |
+| Missing Docs | 7 | 0 | 0 | 7 |
 | CLI UX Violations | 3 | 0 | 0 | 3 |
 | Decisions | 3 | 3 | 0 | 0 |
-| **TOTAL** | **56** | **3** | **1** | **52** |
+| **TOTAL** | **71** | **3** | **1** | **67** |
 
 ---
 
@@ -235,3 +254,8 @@
 - Analyzed DECISION_POINT.md
 - Documented 3 key decisions (keep framework, README update, docs alignment)
 - All action items already tracked - no new TODOs
+- Analyzed POST_DECISION_STATE.md
+- Added 1 critical issue (architecture diagram outdated)
+- Added 5 medium priority items (tests, validation enhancements)
+- Added 6 lower priority items (CI/CD matrix, plugin system)
+- Added 3 documentation items (API examples, CONTRIBUTING.md, version tagging)
