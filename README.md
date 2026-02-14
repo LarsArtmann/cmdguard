@@ -47,7 +47,9 @@ package main
 
 import (
     "context"
+    "fmt"
     "log"
+
     "github.com/larsartmann/cmdguard/pkg/cmdguard"
     "github.com/spf13/cobra"
 )
@@ -79,18 +81,30 @@ func main() {
 ### With Options
 
 ```go
-app := cmdguard.New()
+package main
 
-if err := app.InitializeWithOptions(
-    cmdguard.WithCommand(&cobra.Command{
-        Use:   "version",
-        Short: "Print version",
-        Run: func(cmd *cobra.Command, args []string) {
-            fmt.Println("v1.0.0")
-        },
-    }),
-); err != nil {
-    log.Fatal(err)
+import (
+    "fmt"
+    "log"
+
+    "github.com/larsartmann/cmdguard/pkg/cmdguard"
+    "github.com/spf13/cobra"
+)
+
+func main() {
+    app := cmdguard.New()
+
+    if err := app.InitializeWithOptions(
+        cmdguard.WithCommand(&cobra.Command{
+            Use:   "version",
+            Short: "Print version",
+            Run: func(cmd *cobra.Command, args []string) {
+                fmt.Println("v1.0.0")
+            },
+        }),
+    ); err != nil {
+        log.Fatal(err)
+    }
 }
 ```
 

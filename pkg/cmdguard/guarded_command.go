@@ -1,0 +1,284 @@
+// Package cmdguard provides compile-time guarded CLI construction.
+//
+// The guard approach panics at construction time if commands are invalid,
+// ensuring errors are caught immediately rather than at runtime.
+//
+// Basic usage:
+//
+//	package main
+//
+//	import (
+//	    "context"
+//	    "github.com/larsartmann/cmdguard/pkg/cmdguard"
+//	)
+//
+//	func main() {
+//	    // Single-step initialization - panics on invalid
+//	    root := cmdguard.New("myapp", "My application")
+//
+//	    // This will panic if command has no handler
+//	    root.AddCommand(&cobra.Command{
+//	        Use:   "sub",
+//	        Short: "Subcommand",
+//	        Run: func(cmd *cobra.Command, args []string) {
+//	            // handler
+//	        },
+//	    })
+//
+//	    // Execute
+//	    root.Execute(context.Background())
+//	}
+package cmdguard
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"os"
+	"strings"
+
+	"github.com/charmbracelet/fang"
+	"github.com/larsartmann/cmdguard/internal/config"
+	"github.com/larsartmann/cmdguard/internal/logging"
+	"github.com/spf13/cobra"
+)
+
+// GuardedCommand wraps a cobra.Command with compile-time validation.
+// It panics on construction if commands are invalid, ensuring errors
+// are caught immediately at startup rather than at runtime.
+type GuardedCommand struct {
+	cmd        *cobra.Command
+	cfg        *config.Config
+	logger     *slog.Logger
+	validated  bool
+	strictMode bool
+}
+
+// New creates a new GuardedCommand with the given name and description.
+// This is the single entry point for creating a guarded CLI application.
+//
+// Example:
+//
+//	root := cmdguard.New("myapp", "My application description")
+//	root.Execute(context.Background())
+func New(name, short string) *GuardedCommand {
+	// Load configuration early
+	cfg := loadConfig()
+
+	// Initialize logger
+	logger := logging.NewLogger(cfg.LogLevel)
+	slog.SetDefault(logger)
+
+	// Create root command
+	cmd := &cobra.Command{
+		Use:           name,
+		Short:         short,
+		SilenceUsage:  true,
+		SilenceErrors: true,
+	}
+
+	// Add global flags
+	cmd.PersistentFlags().StringP("config", "c", "", "Config file path")
+	cmd.PersistentFlags().StringP("log-level", "l", cfg.LogLevel, "Log level: debug, info, warn, error")
+	cmd.PersistentFlags().BoolP("strict", "s", cfg.StrictMode, "Enable strict mode validation")
+
+	// Validate log-level in PreRunE
+	cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		level, _ := cmd.Flags().GetString("log-level")
+		validLevels := []string{"debug", "info", "warn", "error"}
+		for _, valid := range validLevels {
+			if level == valid {
+				return nil
+			}
+		}
+		return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
+	}
+
+	g := &GuardedCommand{
+		cmd:        cmd,
+		cfg:        cfg,
+		logger:     logger,
+		strictMode: cfg.StrictMode,
+	}
+
+	// Add default commands
+	g.addDefaultCommands()
+
+	return g
+}
+
+// AddCommand adds a subcommand to the guarded command.
+// PANICS if the command is invalid (no handler and no subcommands).
+//
+// This is intentional - it ensures errors are caught at startup
+// rather than when the command is invoked.
+func (g *GuardedCommand) AddCommand(cmd *cobra.Command) {
+	if g.validated {
+		panic("cmdguard: cannot add commands after execution")
+	}
+
+	// Validate command before adding
+	if err := g.validateCommand(cmd); err != nil {
+		panic(fmt.Sprintf("cmdguard: invalid command %q: %v", cmd.Name(), err))
+	}
+
+	g.cmd.AddCommand(cmd)
+	g.logger.Debug("added command", "command", cmd.Name())
+}
+
+// AddSubcommand adds a subcommand to a parent command.
+// PANICS if the subcommand is invalid.
+func (g *GuardedCommand) AddSubcommand(parent *cobra.Command, child *cobra.Command) {
+	if g.validated {
+		panic("cmdguard: cannot add commands after execution")
+	}
+
+	// Validate child before adding
+	if err := g.validateCommand(child); err != nil {
+		panic(fmt.Sprintf("cmdguard: invalid subcommand %q: %v", child.Name(), err))
+	}
+
+	parent.AddCommand(child)
+	g.logger.Debug("added subcommand",
+		"parent", parent.Name(),
+		"child", child.Name(),
+	)
+}
+
+// Execute runs the command with the given context.
+func (g *GuardedCommand) Execute(ctx context.Context) error {
+	g.validated = true
+	return fang.Execute(ctx, g.cmd)
+}
+
+// ExecuteAndExit runs the command and exits with appropriate exit code.
+func (g *GuardedCommand) ExecuteAndExit(ctx context.Context) {
+	if err := g.Execute(ctx); err != nil {
+		// fang handles error styling
+		os.Exit(1)
+	}
+}
+
+// Command returns the underlying cobra command for advanced customization.
+// Use with caution - modifications bypass guard validation.
+func (g *GuardedCommand) Command() *cobra.Command {
+	return g.cmd
+}
+
+// Config returns the application configuration.
+func (g *GuardedCommand) Config() *config.Config {
+	return g.cfg
+}
+
+// IsStrictMode returns true if strict mode is enabled.
+func (g *GuardedCommand) IsStrictMode() bool {
+	return g.strictMode
+}
+
+// validateCommand checks if a command is valid.
+// Returns error if command has no handler and no subcommands.
+func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
+	// Check for command name
+	if cmd.Name() == "" {
+		return fmt.Errorf("command has no name")
+	}
+
+	// Commands with subcommands don't need a handler
+	if len(cmd.Commands()) > 0 {
+		return nil
+	}
+
+	// Check for handler
+	hasRun := cmd.Run != nil
+	hasRunE := cmd.RunE != nil
+
+	if !hasRun && !hasRunE {
+		return fmt.Errorf("command has no handler (Run or RunE) and no subcommands")
+	}
+
+	// In strict mode, require RunE (returns error)
+	if g.strictMode && !hasRunE {
+		return fmt.Errorf("strict mode requires RunE handler that returns error")
+	}
+
+	return nil
+}
+
+// addDefaultCommands adds the built-in commands.
+func (g *GuardedCommand) addDefaultCommands() {
+	// Add version command
+	g.cmd.AddCommand(&cobra.Command{
+		Use:   "version",
+		Short: "Print version information",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version 0.1.0")
+		},
+	})
+
+	// Add validate command (self-validation)
+	g.cmd.AddCommand(&cobra.Command{
+		Use:   "validate",
+		Short: "Validate command tree",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := g.validateCommandTree(); err != nil {
+				return fmt.Errorf("validation failed: %w", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands validated successfully")
+			return nil
+		},
+	})
+}
+
+// validateCommandTree validates all commands in the tree.
+func (g *GuardedCommand) validateCommandTree() error {
+	var errors []string
+
+	for _, cmd := range g.cmd.Commands() {
+		if err := g.validateCommand(cmd); err != nil {
+			errors = append(errors, fmt.Sprintf("%s: %v", cmd.Name(), err))
+		}
+		// Recursively validate subcommands
+		if err := g.validateSubcommands(cmd); err != nil {
+			errors = append(errors, err.Error())
+		}
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("validation failed:\n  - %s", strings.Join(errors, "\n  - "))
+	}
+
+	return nil
+}
+
+// validateSubcommands recursively validates subcommands.
+func (g *GuardedCommand) validateSubcommands(parent *cobra.Command) error {
+	for _, cmd := range parent.Commands() {
+		if err := g.validateCommand(cmd); err != nil {
+			return fmt.Errorf("%s %s: %v", parent.Name(), cmd.Name(), err)
+		}
+		if err := g.validateSubcommands(cmd); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// loadConfig loads configuration from files and environment.
+func loadConfig() *config.Config {
+	// This is a simplified version that loads defaults
+	// Full config loading is done in the config package
+	cfg := &config.Config{
+		LogLevel:   "info",
+		StrictMode: false,
+	}
+
+	// Try to load from environment
+	if level := os.Getenv("CMDGUARD_LOG_LEVEL"); level != "" {
+		cfg.LogLevel = level
+	}
+	if os.Getenv("CMDGUARD_STRICT_MODE") == "true" {
+		cfg.StrictMode = true
+	}
+
+	return cfg
+}
