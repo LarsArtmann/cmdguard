@@ -12,24 +12,24 @@ import (
 
 func setupTestValidator(t *testing.T) (*Validator, *Registry, do.Injector) {
 	injector := do.New()
-	
+
 	// Provide config
 	do.Provide(injector, func(i do.Injector) (*config.Config, error) {
 		return &config.Config{}, nil
 	})
-	
+
 	// Provide registry
 	do.Provide(injector, NewRegistry)
-	
+
 	// Provide validator
 	do.Provide(injector, NewValidator)
-	
+
 	registry, err := do.Invoke[*Registry](injector)
 	require.NoError(t, err)
-	
+
 	validator, err := do.Invoke[*Validator](injector)
 	require.NoError(t, err)
-	
+
 	return validator, registry, injector
 }
 
@@ -42,7 +42,7 @@ func TestNewValidator(t *testing.T) {
 
 func TestValidator_ValidateCommands(t *testing.T) {
 	validator, registry, _ := setupTestValidator(t)
-	
+
 	tests := []struct {
 		name    string
 		setup   func()
@@ -92,15 +92,15 @@ func TestValidator_ValidateCommands(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup()
-			
+
 			err := validator.ValidateCommands()
-			
+
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg)
 				return
 			}
-			
+
 			require.NoError(t, err)
 		})
 	}
@@ -108,21 +108,21 @@ func TestValidator_ValidateCommands(t *testing.T) {
 
 func TestValidator_ValidateFlags(t *testing.T) {
 	validator, registry, _ := setupTestValidator(t)
-	
+
 	// Register command with unbound flag
 	cmd := &cobra.Command{Use: "test"}
 	cmd.Flags().String("name", "default", "name flag")
-	
+
 	err := registry.RegisterCommand(cmd)
 	require.NoError(t, err)
-	
+
 	// Flag is marked as bound by default, so validation passes
 	err = validator.ValidateFlags()
 	require.NoError(t, err)
-	
+
 	// Unmark the flag
 	registry.UnmarkFlagBound("test", "name")
-	
+
 	// Now validation should fail
 	err = validator.ValidateFlags()
 	require.Error(t, err)
@@ -131,7 +131,7 @@ func TestValidator_ValidateFlags(t *testing.T) {
 
 func TestValidator_ValidateCommandTree(t *testing.T) {
 	validator, _, _ := setupTestValidator(t)
-	
+
 	// Create command tree
 	root := &cobra.Command{
 		Use: "root",
@@ -139,20 +139,20 @@ func TestValidator_ValidateCommandTree(t *testing.T) {
 			return nil
 		},
 	}
-	
+
 	child := &cobra.Command{
 		Use: "child",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},
 	}
-	
+
 	root.AddCommand(child)
-	
+
 	// Validate entire tree
 	err := validator.ValidateCommandTree(root)
 	require.NoError(t, err)
-	
+
 	// Verify commands were registered
 	assert.Equal(t, 2, validator.registry.CommandCount())
 }
@@ -178,21 +178,21 @@ func TestValidator_IsStrictMode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			injector := do.New()
-			
+
 			// Provide config with strict setting
 			do.Provide(injector, func(i do.Injector) (*config.Config, error) {
 				return &config.Config{StrictMode: tt.strict}, nil
 			})
-			
+
 			// Provide registry
 			do.Provide(injector, NewRegistry)
-			
+
 			// Provide validator
 			do.Provide(injector, NewValidator)
-			
+
 			validator, err := do.Invoke[*Validator](injector)
 			require.NoError(t, err)
-			
+
 			assert.Equal(t, tt.expected, validator.IsStrictMode())
 		})
 	}
@@ -200,12 +200,12 @@ func TestValidator_IsStrictMode(t *testing.T) {
 
 func TestNewFlagValidator(t *testing.T) {
 	injector := do.New()
-	
+
 	// Provide config
 	do.Provide(injector, func(i do.Injector) (*config.Config, error) {
 		return &config.Config{StrictMode: true}, nil
 	})
-	
+
 	fv, err := NewFlagValidator(injector)
 	require.NoError(t, err)
 	assert.NotNil(t, fv)
@@ -216,7 +216,7 @@ func TestFlagValidator_ValidateFlag(t *testing.T) {
 	tests := []struct {
 		name    string
 		strict  bool
-		value   interface{}
+		value   any
 		wantErr bool
 	}{
 		{
@@ -242,15 +242,15 @@ func TestFlagValidator_ValidateFlag(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fv := &FlagValidator{strict: tt.strict}
-			
+
 			err := fv.ValidateFlag("test-flag", tt.value)
-			
+
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), "is required in strict mode")
 				return
 			}
-			
+
 			require.NoError(t, err)
 		})
 	}
@@ -258,15 +258,15 @@ func TestFlagValidator_ValidateFlag(t *testing.T) {
 
 func TestFlagValidator_ValidateFlagAccess(t *testing.T) {
 	fv := &FlagValidator{}
-	
+
 	// Create command with flag
 	cmd := &cobra.Command{Use: "test"}
 	cmd.Flags().String("name", "default", "name flag")
-	
+
 	// Valid flag access
 	err := fv.ValidateFlagAccess(cmd, "name")
 	require.NoError(t, err)
-	
+
 	// Invalid flag access
 	err = fv.ValidateFlagAccess(cmd, "nonexistent")
 	require.Error(t, err)

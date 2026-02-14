@@ -158,7 +158,7 @@ func NewFlagValidator(i do.Injector) (*FlagValidator, error) {
 }
 
 // ValidateFlag checks if a flag value is valid.
-func (v *FlagValidator) ValidateFlag(name string, value interface{}) error {
+func (v *FlagValidator) ValidateFlag(name string, value any) error {
 	if v.strict && value == nil {
 		return fmt.Errorf("flag %q is required in strict mode", name)
 	}

@@ -99,14 +99,14 @@ func setupCommands(registry *commands.Registry, validator *validation.Validator)
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name, _ := cmd.Flags().GetString("name")
 			count, _ := cmd.Flags().GetInt("count")
-			
+
 			fmt.Fprintf(cmd.OutOrStdout(), "Hello %s! Count: %d\n", name, count)
 			return nil
 		},
 	}
-	
+
 	exampleCmd.Flags().String("name", "World", "name to greet")
 	exampleCmd.Flags().Int("count", 1, "number of greetings")
-	
+
 	registry.AddCommand(exampleCmd)
 }

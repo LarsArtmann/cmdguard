@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
@@ -108,13 +109,7 @@ func (c *Config) Shutdown() error {
 func (c *Config) Validate() error {
 	if c.LogLevel != "" {
 		validLevels := []string{"debug", "info", "warn", "error"}
-		found := false
-		for _, level := range validLevels {
-			if c.LogLevel == level {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(validLevels, c.LogLevel)
 		if !found {
 			return fmt.Errorf("invalid log level %q, must be one of: debug, info, warn, error", c.LogLevel)
 		}

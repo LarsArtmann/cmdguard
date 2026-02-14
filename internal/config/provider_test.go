@@ -119,11 +119,12 @@ func TestGetConfigFilePath(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := GetConfigFilePath(tt.configFile)
 
-			if tt.want == "" {
+			switch tt.want {
+			case "":
 				assert.Empty(t, got)
-			} else if tt.want == "/" {
+			case "/":
 				assert.NotEmpty(t, got)
-			} else {
+			default:
 				assert.Equal(t, tt.want, got)
 			}
 		})

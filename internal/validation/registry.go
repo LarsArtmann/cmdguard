@@ -3,6 +3,7 @@ package validation
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/larsartmann/cmdguard/internal/config"
@@ -26,7 +27,7 @@ type FlagInfo struct {
 	Type       string
 	IsBound    bool
 	IsRequired bool
-	Default    interface{}
+	Default    any
 }
 
 // Registry tracks commands and flags for validation.
@@ -82,7 +83,7 @@ func (r *Registry) RegisterCommand(cmd *cobra.Command) error {
 }
 
 // RegisterSubcommand adds a subcommand under a parent.
-func (r *Registry) RegisterSubcommand(parent *cobra.Command, child *cobra.Command) error {
+func (r *Registry) RegisterSubcommand(parent, child *cobra.Command) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -126,9 +127,7 @@ func (r *Registry) GetCommands() map[string]*CommandInfo {
 
 	// Return a copy
 	result := make(map[string]*CommandInfo, len(r.commands))
-	for k, v := range r.commands {
-		result[k] = v
-	}
+	maps.Copy(result, r.commands)
 	return result
 }
 

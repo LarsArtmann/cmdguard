@@ -43,11 +43,11 @@ import (
 
 // Application is the main entry point for cmdguard.
 type Application struct {
-	module     *di.Module
-	registry   *commands.Registry
-	validator  *validation.Validator
-	config     *config.Config
-	rootCmd    *cobra.Command
+	module      *di.Module
+	registry    *commands.Registry
+	validator   *validation.Validator
+	config      *config.Config
+	rootCmd     *cobra.Command
 	initialized bool
 }
 

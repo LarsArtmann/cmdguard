@@ -67,22 +67,22 @@ func (m *Module) HealthCheck() error {
 	if err := do.HealthCheck[*config.Config](m.injector); err != nil {
 		return err
 	}
-	
+
 	// Check registry health
 	if err := do.HealthCheck[*validation.Registry](m.injector); err != nil {
 		return err
 	}
-	
+
 	// Check validator health
 	if err := do.HealthCheck[*validation.Validator](m.injector); err != nil {
 		return err
 	}
-	
+
 	// Check commands registry health
 	if err := do.HealthCheck[*commands.Registry](m.injector); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -95,27 +95,27 @@ func (m *Module) HealthCheckWithContext(ctx context.Context) error {
 func (m *Module) Shutdown() error {
 	// Shutdown individual services in reverse order of dependency
 	var errs []error
-	
+
 	if err := do.Shutdown[*commands.Registry](m.injector); err != nil {
 		errs = append(errs, err)
 	}
-	
+
 	if err := do.Shutdown[*validation.Validator](m.injector); err != nil {
 		errs = append(errs, err)
 	}
-	
+
 	if err := do.Shutdown[*validation.Registry](m.injector); err != nil {
 		errs = append(errs, err)
 	}
-	
+
 	if err := do.Shutdown[*config.Config](m.injector); err != nil {
 		errs = append(errs, err)
 	}
-	
+
 	if len(errs) > 0 {
 		return errs[0] // Return first error
 	}
-	
+
 	return nil
 }
 

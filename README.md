@@ -32,16 +32,16 @@ import (
 
 func main() {
     app := cmdguard.New()
-    
+
     if err := app.Initialize(); err != nil {
         panic(err)
     }
-    
+
     // Validate before running
     if err := app.Validate(); err != nil {
         panic(err)
     }
-    
+
     app.ExecuteAndExit(context.Background())
 }
 ```
@@ -63,18 +63,18 @@ import (
 func main() {
     // Create DI module
     module := di.NewModule()
-    
+
     // Register services
     module.ProvideServices()
-    
+
     // Get services
     cfg := module.MustInvokeConfig()
     registry := module.MustInvokeRegistry()
     validator := module.MustInvokeValidator()
-    
+
     // Link and validate
     registry.SetValidator(validator)
-    
+
     // Run
     ctx := context.Background()
     registry.ExecuteAndExit(ctx)
@@ -119,12 +119,12 @@ RootScope (application lifecycle)
 
 ## Validation Levels
 
-| Level | Target | Validation |
-|-------|--------|------------|
-| Compile-time | Command structs | Interface compliance |
-| Startup | Flag definitions | Schema matching |
-| Runtime | Command execution | Handler exists |
-| Runtime | Flag access | Flag registered |
+| Level        | Target            | Validation           |
+| ------------ | ----------------- | -------------------- |
+| Compile-time | Command structs   | Interface compliance |
+| Startup      | Flag definitions  | Schema matching      |
+| Runtime      | Command execution | Handler exists       |
+| Runtime      | Flag access       | Flag registered      |
 
 ## Commands
 
