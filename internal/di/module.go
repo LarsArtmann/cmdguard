@@ -3,6 +3,7 @@ package di
 
 import (
 	"context"
+	"errors"
 
 	"github.com/larsartmann/cmdguard/internal/commands"
 	"github.com/larsartmann/cmdguard/internal/config"
@@ -113,7 +114,7 @@ func (m *Module) Shutdown() error {
 	}
 
 	if len(errs) > 0 {
-		return errs[0] // Return first error
+		return errors.Join(errs...)
 	}
 
 	return nil
