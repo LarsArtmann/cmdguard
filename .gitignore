@@ -1,0 +1,30 @@
+# Binaries
+cmdguard
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Output of go coverage
+coverage.out
+*.cover
+
+# Go vendor directory
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config files (example)
+config.yaml
