@@ -84,9 +84,9 @@ func TestGuardedCommand_ParentWithChildren(t *testing.T) {
 }
 
 func TestGuardedCommand_StrictMode(t *testing.T) {
-	// Set strict mode via environment
-	os.Setenv("CMDGUARD_STRICT_MODE", "true")
-	defer os.Unsetenv("CMDGUARD_STRICT_MODE")
+	// Set strict mode via environment (errors ignored for test setup)
+	_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+	defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
 	root := cmdguard.New("testapp", "Test application")
 	assert.True(t, root.IsStrictMode(), "Should be in strict mode")
@@ -108,9 +108,9 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 }
 
 func TestGuardedCommand_ConfigAccess(t *testing.T) {
-	// Set custom log level
-	os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
-	defer os.Unsetenv("CMDGUARD_LOG_LEVEL")
+	// Set custom log level (errors ignored for test setup)
+	_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
+	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
 	root := cmdguard.New("testapp", "Test application")
 	cfg := root.Config()
