@@ -1,16 +1,41 @@
 # cmdguard
 
-A CLI validation library that ensures every command and flag is actually implemented. Combines **fang** (Cobra styling), **koanf** (configuration), and **samber/do/v2** (DI) with compile-time and runtime validation.
+**A compile-time guard for Cobra CLI applications.**
 
-## Features
+Make it impossible to create broken CLI commands. Catch errors at construction time, not at runtime.
 
-- **Command Validation**: Ensures all declared commands have handlers
-- **Flag Validation**: Verifies all flags are properly bound
-- **Health Checks**: Built-in health checking for all services
-- **Graceful Shutdown**: Proper cleanup with context support
-- **Dependency Injection**: Uses samber/do/v2 for clean DI
-- **Styled Output**: Uses Charm's fang for beautiful CLI output
-- **Configuration**: Koanf-based config with env/file/flag support
+```go
+// This will PANIC at init time - impossible to ignore
+root := cmdguard.New("myapp", "My CLI")
+root.AddCommand(&cobra.Command{
+    Use: "broken",  // PANIC: no Run or RunE handler!
+})
+
+// This will PANIC - flag accessed before declaration
+root.Flags().GetString("undeclared")  // PANIC: flag not registered
+```
+
+## The Problem
+
+Cobra lets you create broken commands that fail at runtime:
+
+```go
+// This compiles fine, fails at runtime
+root.AddCommand(&cobra.Command{Use: "sub"})  // No handler!
+
+// User sees this error when they run the command:
+// "Error: unknown command sub"
+```
+
+## The Solution
+
+Guard your commands. Fail fast at construction time:
+
+```go
+// This PANICS immediately - impossible to ship broken code
+root := cmdguard.New("myapp", "My CLI")
+root.AddCommand(&cobra.Command{Use: "sub"})  // PANIC: command "sub" has no handler
+```
 
 ## Installation
 
@@ -18,197 +43,130 @@ A CLI validation library that ensures every command and flag is actually impleme
 go get github.com/larsartmann/cmdguard
 ```
 
-## Quick Start
-
-### Using the Public API
+## Usage
 
 ```go
 package main
 
 import (
     "context"
-    "github.com/larsartmann/cmdguard/pkg/cmdguard"
+    "github.com/larsartmann/cmdguard"
+    "github.com/spf13/cobra"
 )
 
 func main() {
-    app := cmdguard.New()
+    // Create guarded root command
+    root := cmdguard.New("myapp", "My application")
 
-    if err := app.Initialize(); err != nil {
-        panic(err)
+    // Add command - panics if invalid
+    root.AddCommand(&cobra.Command{
+        Use:   "hello",
+        Short: "Say hello",
+        Run: func(cmd *cobra.Command, args []string) {
+            // Safe: handler is required
+        },
+    })
+
+    // Execute - safe to run
+    root.Execute(context.Background())
+}
+```
+
+## What Gets Guarded
+
+| Violation | Result | When Caught |
+|-----------|--------|-------------|
+| Command without handler | **PANIC** | At `AddCommand()` |
+| Duplicate command name | **PANIC** | At `AddCommand()` |
+| Flag accessed before registration | **PANIC** | At `Flags().Get*()` |
+| Duplicate flag name | **PANIC** | At flag registration |
+| Conflicting aliases | **PANIC** | At alias registration |
+| Subcommand without parent handler | **PANIC** | At validation |
+
+## Philosophy
+
+**Fail fast, fail loud.**
+
+- **NOT a framework** - We don't manage your CLI
+- **NOT a validator** - We don't return errors you might ignore
+- **IS a guard** - We panic immediately on invalid construction
+
+This follows the Go proverb: "Make the zero value useful." The zero value of a guarded command is a valid command.
+
+## Why Panic?
+
+Because broken commands are **programmer errors**, not runtime errors:
+
+1. **Impossible to ignore** - Unlike returned errors
+2. **Catches bugs early** - At construction, not execution
+3. **Self-documenting** - Stack trace shows exactly where the bug is
+4. **Zero runtime overhead** - No validation needed at execution
+
+## Comparison
+
+### Without cmdguard (framework approach)
+
+```go
+app := cmdguard.New()
+app.Initialize()
+
+// Returns error - might be ignored
+if err := app.AddCommand(&cobra.Command{Use: "bad"}); err != nil {
+    log.Println(err)  // Might be missed!
+}
+
+// Validate later - might be skipped
+if err := app.Validate(); err != nil {
+    panic(err)  // Too late!
+}
+
+app.Execute()
+```
+
+### With cmdguard (guard approach)
+
+```go
+root := cmdguard.New("myapp", "My app")
+
+// PANIC immediately - impossible to ignore or skip
+root.AddCommand(&cobra.Command{Use: "bad"})  // PANIC!
+
+// Never reaches here if invalid
+root.Execute()
+```
+
+## Advanced Usage
+
+### Strict Mode
+
+```go
+root := cmdguard.New("myapp", "My app", cmdguard.WithStrictMode())
+
+// Also guards against:
+// - Flags without descriptions
+// - Commands without usage text
+// - Deprecated patterns
+```
+
+### Custom Guards
+
+```go
+root := cmdguard.New("myapp", "My app")
+root.AddGuard(func(cmd *cobra.Command) error {
+    if strings.Contains(cmd.Use, "-") {
+        return fmt.Errorf("commands should not contain hyphens: %s", cmd.Use)
     }
-
-    // Validate before running
-    if err := app.Validate(); err != nil {
-        panic(err)
-    }
-
-    app.ExecuteAndExit(context.Background())
-}
+    return nil
+})
 ```
 
-### Manual Setup
+## Project Status
 
-```go
-package main
+**⚠️ WORK IN PROGRESS**
 
-import (
-    "context"
-    "github.com/larsartmann/cmdguard/internal/commands"
-    "github.com/larsartmann/cmdguard/internal/config"
-    "github.com/larsartmann/cmdguard/internal/di"
-    "github.com/larsartmann/cmdguard/internal/validation"
-    "github.com/samber/do/v2"
-)
+This project is being transformed from a framework to a guard library. The public API will change significantly.
 
-func main() {
-    // Create DI module
-    module := di.NewModule()
-
-    // Register services
-    module.ProvideServices()
-
-    // Get services
-    cfg := module.MustInvokeConfig()
-    registry := module.MustInvokeRegistry()
-    validator := module.MustInvokeValidator()
-
-    // Link and validate
-    registry.SetValidator(validator)
-
-    // Run
-    ctx := context.Background()
-    registry.ExecuteAndExit(ctx)
-}
-```
-
-## Architecture
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│    fang     │────▶│    cobra    │◀────│   koanf     │
-│   (style)   │     │   (commands)│     │  (config)   │
-└─────────────┘     └──────┬──────┘     └─────────────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │   cmdguard  │
-                    │ (validator) │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ samber/do   │
-                    │    (DI)     │
-                    └─────────────┘
-```
-
-## DI Scope Hierarchy
-
-```
-RootScope (application lifecycle)
-├── "config" scope (koanf, env vars, flags)
-│   └── Config service (eager - load immediately)
-├── "commands" scope (cobra command tree)
-│   ├── CommandRegistry service
-│   ├── Validator service
-│   └── Individual command scopes (per subcommand)
-│       └── Command-specific services
-└── "output" scope (fang styling, logging)
-    └── Theme service
-```
-
-## Validation Levels
-
-| Level        | Target            | Validation           |
-| ------------ | ----------------- | -------------------- |
-| Compile-time | Command structs   | Interface compliance |
-| Startup      | Flag definitions  | Schema matching      |
-| Runtime      | Command execution | Handler exists       |
-| Runtime      | Flag access       | Flag registered      |
-
-## Commands
-
-- `validate` - Run validation on the command tree
-- `version` - Print version information
-- `example` - Example command with flags
-
-## Configuration
-
-Configuration is loaded from (in order of precedence):
-
-1. Command-line flags
-2. Environment variables (prefix: `CMDGUARD_`)
-3. Config file (default: `config.yaml`)
-
-### Config File Example
-
-```yaml
-strict_mode: true
-log_level: debug
-config_file: "custom-config.yaml"
-```
-
-### Environment Variables
-
-```bash
-export CMDGUARD_STRICT_MODE=true
-export CMDGUARD_LOG_LEVEL=debug
-export CMDGUARD_CONFIG_FILE=/path/to/config.yaml
-```
-
-## Project Structure
-
-```
-cmdguard/
-├── cmd/
-│   └── cmdguard/
-│       └── main.go          # Entry point
-├── internal/
-│   ├── config/
-│   │   └── provider.go      # Koanf integration
-│   ├── di/
-│   │   └── module.go        # DI bindings
-│   ├── validation/
-│   │   ├── registry.go      # Command/flag tracking
-│   │   └── validator.go     # Validation logic
-│   └── commands/
-│       └── root.go          # Cobra command tree
-├── pkg/
-│   └── cmdguard/
-│       └── public_api.go    # Public interface
-├── go.mod
-└── README.md
-```
-
-## Key Patterns
-
-### Eager Config (load at startup)
-
-```go
-do.ProvideEager(injector, config.NewConfig)
-```
-
-### Lazy Command Registration
-
-```go
-do.Provide(injector, commands.NewRegistry)
-```
-
-### Transient Validators (per-validation instance)
-
-```go
-do.ProvideTransient(injector, validation.NewFlagValidator)
-```
-
-### Child Scopes for Commands
-
-```go
-func RegisterSubcommand(parent do.Injector, name string) do.Injector {
-    child := parent.Scope(name)
-    do.Provide(child, NewSubcommandHandler)
-    return child
-}
-```
+See [docs/planning/](docs/planning/) for the transformation plan.
 
 ## License
 
