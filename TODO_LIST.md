@@ -7,15 +7,15 @@
 
 ## Completed (Phase 1)
 
-|| Task | Completed |
-||------|-----------|
-|| Remove `cmd/` folder | ✅ Done |
-|| Redesign public API for single-step initialization | ✅ Done |
-|| Add compile-time validation (panic on invalid) | ✅ Done |
-|| Fix errcheck violations | ✅ Done |
-|| Remove orphaned internal packages | ✅ Done |
-|| Rewrite README for Guard API | ✅ Done |
-|| Rewrite FEATURES.md for Guard API | ✅ Done |
+| Task | Completed |
+|------|-----------|
+| Remove `cmd/` folder | ✅ Done |
+| Redesign public API for single-step initialization | ✅ Done |
+| Add compile-time validation (panic on invalid) | ✅ Done |
+| Fix errcheck violations | ✅ Done |
+| Remove orphaned internal packages | ✅ Done |
+| Rewrite README for Guard API | ✅ Done |
+| Rewrite FEATURES.md for Guard API | ✅ Done |
 
 ---
 
@@ -23,67 +23,67 @@
 
 ### High Priority
 
-|| Task | Status | Notes |
-||------|--------|-------|
-|| Add tests for `pkg/cmdguard` | ❌ NOT_DONE | GuardedCommand has 0% coverage |
-|| Add tests for `internal/logging` | ❌ NOT_DONE | logging package has 0% coverage |
+| Task | Status | Notes |
+|------|--------|-------|
+| Add tests for `pkg/cmdguard` | ✅ DONE | GuardedCommand has 66.7% coverage |
+| Add tests for `internal/logging` | ❌ NOT_DONE | logging package has 0% coverage |
 
-### Test Cases Needed for GuardedCommand
+### Test Cases for GuardedCommand
 
-- [ ] `New()` creates GuardedCommand with defaults
-- [ ] `New()` loads config from environment
-- [ ] `AddCommand()` panics on invalid command (no handler)
-- [ ] `AddCommand()` panics on command without name
-- [ ] `AddCommand()` accepts valid command
-- [ ] `AddCommand()` panics after Execute() called
-- [ ] `AddSubcommand()` panics on invalid child
-- [ ] `AddSubcommand()` adds to parent correctly
-- [ ] `Execute()` runs command successfully
+- [x] `New()` creates GuardedCommand with defaults
+- [x] `New()` loads config from environment
+- [x] `AddCommand()` panics on invalid command (no handler)
+- [x] `AddCommand()` panics on command without name
+- [x] `AddCommand()` accepts valid command
+- [x] `AddCommand()` panics after Execute() called
+- [x] `AddSubcommand()` panics on invalid child
+- [x] `AddSubcommand()` adds to parent correctly
+- [x] `Execute()` runs command successfully
 - [ ] `ExecuteAndExit()` exits with code 0 on success
 - [ ] `ExecuteAndExit()` exits with code 1 on error
-- [ ] Strict mode requires RunE (not Run)
-- [ ] Parent commands don't need handlers
-- [ ] `validate` command works
-- [ ] `version` command works
-- [ ] Log-level validation in PreRunE
-- [ ] `Command()` returns underlying cobra.Command
-- [ ] `Config()` returns config
-- [ ] `IsStrictMode()` returns correct value
+- [x] Strict mode requires RunE (not Run)
+- [x] Parent commands don't need handlers
+- [x] `validate` command works
+- [x] `version` command works
+- [x] Log-level validation in PreRunE
+- [x] `Command()` returns underlying cobra.Command
+- [x] `Config()` returns config
+- [x] `IsStrictMode()` returns correct value
 
 ---
 
 ## Medium Priority
 
-|| Task | Status | Notes |
-||------|--------|-------|
-|| Add version injection at build time | ❌ NOT_DONE | Version hardcoded to "0.1.0" |
-|| Add justfile for common tasks | ❌ NOT_DONE | No justfile exists |
-|| Create examples directory | ❌ NOT_DONE | No example applications |
-|| Add CONTRIBUTING.md | ❌ NOT_DONE | No contribution guide |
-|| Improve test coverage to 80%+ | 🔄 PARTIAL | config at 94.1%, others at 0% |
+| Task | Status | Notes |
+|------|--------|-------|
+| Add version injection at build time | ❌ NOT_DONE | Version hardcoded to "0.1.0" |
+| Add justfile for common tasks | ❌ NOT_DONE | No justfile exists |
+| Create examples directory | ❌ NOT_DONE | No example applications |
+| Add CONTRIBUTING.md | ❌ NOT_DONE | No contribution guide |
+| Improve test coverage to 80%+ | 🔄 PARTIAL | config 94.1%, cmdguard 66.7%, logging 0% |
 
 ---
 
 ## Lower Priority
 
-|| Task | Status | Notes |
-||------|--------|-------|
-|| Add CI/CD workflow | ❌ NOT_DONE | No GitHub Actions |
-|| Add JSON logging option | ❌ NOT_DONE | Only text handler |
-|| Plugin system for custom validators | ❌ NOT_DONE | Future enhancement |
-|| Enhanced flag validation | ❌ NOT_DONE | Type validation, required flags |
-|| Performance benchmarks | ❌ NOT_DONE | Not yet needed |
-|| Release automation | ❌ NOT_DONE | Manual releases |
+| Task | Status | Notes |
+|------|--------|-------|
+| Add CI/CD workflow | ❌ NOT_DONE | No GitHub Actions |
+| Add JSON logging option | ❌ NOT_DONE | Only text handler |
+| Plugin system for custom validators | ❌ NOT_DONE | Future enhancement |
+| Enhanced flag validation | ❌ NOT_DONE | Type validation, required flags |
+| Performance benchmarks | ❌ NOT_DONE | Not yet needed |
+| Release automation | ❌ NOT_DONE | Manual releases |
 
 ---
 
 ## Documentation Updates Needed
 
-|| Task | Status | Notes |
-||------|--------|-------|
-|| Update AGENTS.md for current architecture | ❌ NOT_DONE | Still references old structure |
-|| Clean up docs/planning/ folder | ❌ NOT_DONE | Transformation plan completed |
-|| Clean up docs/status/ folder | ❌ NOT_DONE | Historical status reports |
+| Task | Status | Notes |
+|------|--------|-------|
+| Update AGENTS.md for current architecture | ❌ NOT_DONE | Still references old structure |
+| Clean up docs/planning/ folder | ❌ NOT_DONE | Transformation plan completed |
+| Clean up docs/status/ folder | ❌ NOT_DONE | Historical status reports |
 
 ---
 
@@ -119,15 +119,22 @@ cmdguard/
 | Category | Total | Done | Not Done |
 |----------|-------|------|----------|
 | Phase 1 (Core) | 7 | 7 | 0 |
-| Phase 2 (Testing) | 2 | 0 | 2 |
+| Phase 2 (Testing) | 2 | 1 | 1 |
 | Medium Priority | 5 | 0 | 5 |
 | Lower Priority | 6 | 0 | 6 |
 | Documentation | 3 | 0 | 3 |
-| **TOTAL** | **23** | **7** | **16** |
+| **TOTAL** | **23** | **8** | **15** |
 
 ---
 
 ## Changelog
+
+### 2026-02-14 (Updated)
+- Added tests for GuardedCommand (20 test cases, 66.7% coverage)
+- Fixed .gitignore to use /cmdguard (root binary only)
+- Marked most test cases as complete
+- Updated coverage stats
+- Fixed table markdown syntax
 
 ### 2026-02-14
 - Rewrote TODO_LIST.md for Guard API
