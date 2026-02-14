@@ -1,4 +1,4 @@
-// Package config provides Koanf-based configuration management for cmdguard.
+// Package config provides configuration management for cmdguard.
 package config
 
 import (
@@ -6,14 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/env"
-	"github.com/knadh/koanf/providers/file"
-	"github.com/knadh/koanf/providers/posflag"
-	"github.com/knadh/koanf/v2"
-	"github.com/samber/do/v2"
-	"github.com/spf13/cobra"
 )
 
 // Config holds the application configuration.
@@ -23,94 +15,30 @@ type Config struct {
 	LogLevel   string `koanf:"log_level"`
 }
 
-// NewConfig creates a new Config instance loaded from files, env vars, and flags.
-// This is registered as an eager service to ensure config is loaded immediately.
-func NewConfig(i do.Injector) (*Config, error) {
-	k := koanf.New(".")
-
-	// Try to load from default config file first
-	_ = k.Load(file.Provider("config.yaml"), yaml.Parser())
-
-	// Load from environment variables with CMDGUARD_ prefix
-	_ = k.Load(env.Provider("CMDGUARD_", ".", nil), nil)
-
-	// Check for custom config file via env
-	if configFile := os.Getenv("CMDGUARD_CONFIG_FILE"); configFile != "" {
-		if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
-			return nil, fmt.Errorf("failed to load config file %q: %w", configFile, err)
-		}
+// Load loads configuration from environment variables.
+// Returns config with defaults if no environment variables are set.
+func Load() *Config {
+	cfg := &Config{
+		LogLevel:   "info",
+		StrictMode: false,
 	}
-
-	var cfg Config
-	if err := k.Unmarshal("", &cfg); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
-	}
-
-	// Set defaults
-	if cfg.LogLevel == "" {
-		cfg.LogLevel = "info"
-	}
-
-	return &cfg, nil
-}
-
-// NewConfigWithCommand creates a Config that also loads from cobra flags.
-// This should be called after cobra flags are parsed.
-func NewConfigWithCommand(i do.Injector, cmd *cobra.Command) (*Config, error) {
-	k := koanf.New(".")
-
-	// Try to load from default config file first
-	_ = k.Load(file.Provider("config.yaml"), yaml.Parser())
 
 	// Load from environment variables
-	_ = k.Load(env.Provider("CMDGUARD_", ".", nil), nil)
-
-	// Load from cobra flags if available
-	if cmd != nil {
-		// Get config file from flag if provided
-		configFile, _ := cmd.Flags().GetString("config")
-		if configFile != "" {
-			if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
-				return nil, fmt.Errorf("failed to load config file %q: %w", configFile, err)
-			}
-		}
-
-		// Load remaining flags
-		if err := k.Load(posflagProvider(cmd, ".", k), nil); err != nil {
-			return nil, fmt.Errorf("failed to load flags: %w", err)
-		}
+	if level := os.Getenv("CMDGUARD_LOG_LEVEL"); level != "" {
+		cfg.LogLevel = level
+	}
+	if os.Getenv("CMDGUARD_STRICT_MODE") == "true" {
+		cfg.StrictMode = true
 	}
 
-	var cfg Config
-	if err := k.Unmarshal("", &cfg); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
-	}
-
-	// Set defaults
-	if cfg.LogLevel == "" {
-		cfg.LogLevel = "info"
-	}
-
-	return &cfg, nil
-}
-
-// posflagProvider adapts cobra pflag to koanf provider.
-func posflagProvider(cmd *cobra.Command, delim string, k *koanf.Koanf) koanf.Provider {
-	return posflag.Provider(cmd.Flags(), delim, k)
-}
-
-// Shutdown implements the Shutdowner interface for graceful cleanup.
-func (c *Config) Shutdown() error {
-	// No cleanup needed for config
-	return nil
+	return cfg
 }
 
 // Validate performs validation on the configuration.
 func (c *Config) Validate() error {
 	if c.LogLevel != "" {
 		validLevels := []string{"debug", "info", "warn", "error"}
-		found := slices.Contains(validLevels, c.LogLevel)
-		if !found {
+		if !slices.Contains(validLevels, c.LogLevel) {
 			return fmt.Errorf("invalid log level %q, must be one of: debug, info, warn, error", c.LogLevel)
 		}
 	}

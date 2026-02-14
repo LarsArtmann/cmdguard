@@ -1,38 +1,68 @@
 package config
 
 import (
+	"os"
 	"testing"
 
-	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewConfig(t *testing.T) {
+func TestLoad(t *testing.T) {
 	tests := []struct {
-		name    string
-		wantErr bool
+		name     string
+		envLevel string
+		envStrict string
+		wantLevel string
+		wantStrict bool
 	}{
 		{
-			name:    "creates config with defaults",
-			wantErr: false,
+			name:       "creates config with defaults",
+			envLevel:   "",
+			envStrict:  "",
+			wantLevel:  "info",
+			wantStrict: false,
+		},
+		{
+			name:       "loads log level from env",
+			envLevel:   "debug",
+			envStrict:  "",
+			wantLevel:  "debug",
+			wantStrict: false,
+		},
+		{
+			name:       "loads strict mode from env",
+			envLevel:   "",
+			envStrict:  "true",
+			wantLevel:  "info",
+			wantStrict: true,
+		},
+		{
+			name:       "loads both from env",
+			envLevel:   "error",
+			envStrict:  "true",
+			wantLevel:  "error",
+			wantStrict: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			injector := do.New()
-			cfg, err := NewConfig(injector)
-
-			if tt.wantErr {
-				require.Error(t, err)
-				return
+			// Set env vars (errors ignored - test environment setup)
+			if tt.envLevel != "" {
+				_ = os.Setenv("CMDGUARD_LOG_LEVEL", tt.envLevel)
+				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+			}
+			if tt.envStrict != "" {
+				_ = os.Setenv("CMDGUARD_STRICT_MODE", tt.envStrict)
+				defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 			}
 
-			require.NoError(t, err)
-			assert.NotNil(t, cfg)
-			assert.Equal(t, "info", cfg.LogLevel, "default log level should be info")
-			assert.False(t, cfg.StrictMode, "default strict mode should be false")
+			cfg := Load()
+
+			require.NotNil(t, cfg)
+			assert.Equal(t, tt.wantLevel, cfg.LogLevel)
+			assert.Equal(t, tt.wantStrict, cfg.StrictMode)
 		})
 	}
 }
@@ -45,7 +75,7 @@ func TestConfig_Validate(t *testing.T) {
 		errMsg  string
 	}{
 		{
-			name:    "valid log levels",
+			name:    "valid log level debug",
 			config:  Config{LogLevel: "debug"},
 			wantErr: false,
 		},

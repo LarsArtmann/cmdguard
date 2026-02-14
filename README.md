@@ -1,34 +1,32 @@
 # cmdguard
 
-**A Go framework for building validated Cobra CLI applications.**
+**A Go library for building validated Cobra CLI applications with compile-time guards.**
 
-This framework provides lifecycle management, dependency injection, and validation for Cobra-based CLI applications. It wraps Cobra with structured initialization and runtime validation.
+This library wraps Cobra with panic-at-construction-time validation, ensuring invalid commands are caught immediately at startup rather than at runtime.
 
 ```go
 package main
 
 import (
     "context"
-    "log"
     "github.com/larsartmann/cmdguard/pkg/cmdguard"
 )
 
 func main() {
-    // Create application
-    app := cmdguard.New()
+    // Single-step initialization - panics on invalid
+    root := cmdguard.New("myapp", "My application description")
 
-    // Initialize services and DI container
-    if err := app.Initialize(); err != nil {
-        log.Fatal(err)
-    }
+    // Add commands - panics if invalid (no handler)
+    root.AddCommand(&cobra.Command{
+        Use:   "hello",
+        Short: "Say hello",
+        Run: func(cmd *cobra.Command, args []string) {
+            fmt.Println("Hello, World!")
+        },
+    })
 
-    // Validate command tree before execution
-    if err := app.Validate(); err != nil {
-        log.Fatal(err)
-    }
-
-    // Execute and exit
-    app.ExecuteAndExit(context.Background())
+    // Execute
+    root.ExecuteAndExit(context.Background())
 }
 ```
 
@@ -48,21 +46,17 @@ package main
 import (
     "context"
     "fmt"
-    "log"
 
     "github.com/larsartmann/cmdguard/pkg/cmdguard"
     "github.com/spf13/cobra"
 )
 
 func main() {
-    app := cmdguard.New()
+    // Create guarded root command
+    root := cmdguard.New("myapp", "My CLI application")
 
-    if err := app.Initialize(); err != nil {
-        log.Fatal(err)
-    }
-
-    // Add custom commands
-    app.AddCommand(&cobra.Command{
+    // Add custom commands - panics if command has no handler
+    root.AddCommand(&cobra.Command{
         Use:   "hello",
         Short: "Say hello",
         Run: func(cmd *cobra.Command, args []string) {
@@ -70,41 +64,57 @@ func main() {
         },
     })
 
-    if err := app.Validate(); err != nil {
-        log.Fatal(err)
-    }
-
-    app.ExecuteAndExit(context.Background())
+    // Execute
+    root.ExecuteAndExit(context.Background())
 }
 ```
 
-### With Options
+### Nested Commands
 
 ```go
-package main
-
-import (
-    "fmt"
-    "log"
-
-    "github.com/larsartmann/cmdguard/pkg/cmdguard"
-    "github.com/spf13/cobra"
-)
-
 func main() {
-    app := cmdguard.New()
+    root := cmdguard.New("myapp", "My CLI")
 
-    if err := app.InitializeWithOptions(
-        cmdguard.WithCommand(&cobra.Command{
-            Use:   "version",
-            Short: "Print version",
-            Run: func(cmd *cobra.Command, args []string) {
-                fmt.Println("v1.0.0")
-            },
-        }),
-    ); err != nil {
-        log.Fatal(err)
+    // Parent command (intermediate)
+    parent := &cobra.Command{
+        Use:   "db",
+        Short: "Database operations",
     }
+
+    // Child commands
+    parent.AddCommand(&cobra.Command{
+        Use:   "migrate",
+        Short: "Run migrations",
+        RunE: func(cmd *cobra.Command, args []string) error {
+            return runMigrations()
+        },
+    })
+
+    // Add nested structure - AddSubcommand validates children
+    root.AddCommand(parent)
+    root.ExecuteAndExit(context.Background())
+}
+```
+
+### Strict Mode
+
+```go
+func main() {
+    // Enable strict mode via environment
+    os.Setenv("CMDGUARD_STRICT_MODE", "true")
+
+    root := cmdguard.New("myapp", "My CLI")
+
+    // In strict mode, this panics - RunE required instead of Run
+    root.AddCommand(&cobra.Command{
+        Use:   "strict",
+        Short: "Must use RunE in strict mode",
+        RunE: func(cmd *cobra.Command, args []string) error {
+            return nil
+        },
+    })
+
+    root.ExecuteAndExit(context.Background())
 }
 ```
 
