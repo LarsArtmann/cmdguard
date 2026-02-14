@@ -1,39 +1,36 @@
 # cmdguard
 
-**A Go library for building correct Cobra CLI applications.**
+**A Go framework for building validated Cobra CLI applications.**
 
-Import this library to add compile-time and construction-time safeguards to your CLI commands. It validates commands and flags as you build them, catching errors before they reach users.
+This framework provides lifecycle management, dependency injection, and validation for Cobra-based CLI applications. It wraps Cobra with structured initialization and runtime validation.
 
 ```go
-import "github.com/larsartmann/cmdguard"
+package main
+
+import (
+    "context"
+    "log"
+    "github.com/larsartmann/cmdguard/pkg/cmdguard"
+)
 
 func main() {
-    // Guarded command - validates at construction
-    root, err := cmdguard.New("myapp", "My CLI")
-    if err != nil {
+    // Create application
+    app := cmdguard.New()
+
+    // Initialize services and DI container
+    if err := app.Initialize(); err != nil {
         log.Fatal(err)
     }
-    
-    // This returns an error - must handle it
-    if err := root.AddCommand(&cobra.Command{Use: "broken"}); err != nil {
-        log.Fatal(err) // "command 'broken' has no handler"
+
+    // Validate command tree before execution
+    if err := app.Validate(); err != nil {
+        log.Fatal(err)
     }
+
+    // Execute and exit
+    app.ExecuteAndExit(context.Background())
 }
 ```
-
-## The Problem
-
-Cobra lets you create broken commands that fail at runtime:
-
-```go
-// This compiles fine, fails at runtime
-root.AddCommand(&cobra.Command{Use: "sub"})  // No handler!
-
-// User sees this error when they run the command:
-// "Error: unknown command sub"
-```
-
-
 
 ## Installation
 
@@ -43,128 +40,161 @@ go get github.com/larsartmann/cmdguard
 
 ## Usage
 
+### Basic Setup
+
 ```go
 package main
 
 import (
     "context"
     "log"
-    "github.com/larsartmann/cmdguard"
+    "github.com/larsartmann/cmdguard/pkg/cmdguard"
     "github.com/spf13/cobra"
 )
 
 func main() {
-    // Create guarded root command
-    root, err := cmdguard.New("myapp", "My application")
-    if err != nil {
+    app := cmdguard.New()
+
+    if err := app.Initialize(); err != nil {
         log.Fatal(err)
     }
 
-    // Add command - returns error if invalid
-    if err := root.AddCommand(&cobra.Command{
+    // Add custom commands
+    app.AddCommand(&cobra.Command{
         Use:   "hello",
         Short: "Say hello",
         Run: func(cmd *cobra.Command, args []string) {
-            // Safe: handler is required
+            fmt.Println("Hello, World!")
         },
-    }); err != nil {
+    })
+
+    if err := app.Validate(); err != nil {
         log.Fatal(err)
     }
 
-    // Execute - safe to run
-    root.Execute(context.Background())
+    app.ExecuteAndExit(context.Background())
 }
 ```
 
-## What Gets Guarded
-
-| Violation | Result | When Caught |
-|-----------|--------|-------------|
-| Command without handler | **error** | At `AddCommand()` |
-| Duplicate command name | **error** | At `AddCommand()` |
-| Flag accessed before registration | **error** | At `Flags().Get*()` |
-| Duplicate flag name | **error** | At flag registration |
-| Conflicting aliases | **error** | At alias registration |
-| Subcommand without parent handler | **error** | At validation |
-
-## Philosophy
-
-**Fail fast with clear errors.**
-
-- **NOT a framework** - We don't manage your CLI
-- **IS a library** - You use our types to build your CLI
-- **IS a guard** - We return errors on invalid construction
-
-This follows the Go proverb: "Make the zero value useful." The zero value of a guarded command is a valid command.
-
-## Why Return Errors?
-
-Because broken commands are **programmer errors**, but we respect Go conventions:
-
-1. **Explicit error handling** - Following Go idioms
-2. **Catches bugs early** - At construction, not execution
-3. **Clear error messages** - Tell you exactly what's wrong
-4. **Testable** - You can test error conditions
-
-## Comparison
-
-### Without cmdguard
+### With Options
 
 ```go
-root := &cobra.Command{Use: "myapp"}
+app := cmdguard.New()
 
-// No validation - compiles fine
-root.AddCommand(&cobra.Command{Use: "bad"})  // No handler!
-
-// Error only shows when user runs it
-root.Execute()  // User sees: "Error: unknown command"
+if err := app.InitializeWithOptions(
+    cmdguard.WithCommand(&cobra.Command{
+        Use:   "version",
+        Short: "Print version",
+        Run: func(cmd *cobra.Command, args []string) {
+            fmt.Println("v1.0.0")
+        },
+    }),
+); err != nil {
+    log.Fatal(err)
+}
 ```
 
-### With cmdguard
+## Architecture
+
+The framework provides:
+
+- **Dependency Injection**: Built on `samber/do/v2` for service management
+- **Configuration Management**: Integrated with `koanf` for config loading
+- **Command Registry**: Centralized command management and validation
+- **Lifecycle Management**: Structured init → validate → execute → shutdown flow
+
+### Components
+
+| Component | Purpose |
+|-----------|---------|
+| `Application` | Main entry point, orchestrates lifecycle |
+| `Module` | DI container and service provider |
+| `Registry` | Command registration and management |
+| `Validator` | Runtime validation of command tree |
+| `Config` | Configuration management |
+
+## API Reference
+
+### Application
 
 ```go
-root, _ := cmdguard.New("myapp", "My app")
+// Create new application
+app := cmdguard.New()
 
-// Returns error - must handle it
-if err := root.AddCommand(&cobra.Command{Use: "bad"}); err != nil {
-    log.Fatal(err)  // "command 'bad' has no handler" - caught early!
+// Initialize services
+err := app.Initialize()
+err := app.InitializeWithOptions(opts...)
+
+// Validation
+err := app.Validate()
+app.MustValidate()  // Panics on error
+
+// Execution
+err := app.Execute(ctx)
+app.ExecuteAndExit(ctx)  // Calls os.Exit
+
+// Access components
+root := app.Root()           // *cobra.Command
+registry := app.Registry()   // *commands.Registry
+config := app.Config()       // *config.Config
+validator := app.Validator() // *validation.Validator
+injector := app.Injector()   // do.Injector
+
+// Lifecycle
+err := app.Shutdown()
+err := app.HealthCheck()
+```
+
+### Options
+
+```go
+// Add command during initialization
+cmdguard.WithCommand(cmd *cobra.Command)
+
+// Add validation hook
+cmdguard.WithValidationHook(hook func() error)
+```
+
+## Validation
+
+The framework validates:
+
+- All commands have handlers (Run or RunE)
+- Flags are properly bound
+- No duplicate command names
+- No conflicting aliases
+
+```go
+// Run validation
+if err := app.Validate(); err != nil {
+    log.Fatal("Validation failed:", err)
 }
 
-root.Execute()
+// Or panic on validation failure
+app.MustValidate()
 ```
 
-## Advanced Usage
+## Configuration
 
-### Strict Mode
-
-```go
-root := cmdguard.New("myapp", "My app", cmdguard.WithStrictMode())
-
-// Also guards against:
-// - Flags without descriptions
-// - Commands without usage text
-// - Deprecated patterns
-```
-
-### Custom Guards
+Configuration is loaded from:
+1. Default values
+2. Config file (YAML)
+3. Environment variables
+4. Command-line flags
 
 ```go
-root := cmdguard.New("myapp", "My app")
-root.AddGuard(func(cmd *cobra.Command) error {
-    if strings.Contains(cmd.Use, "-") {
-        return fmt.Errorf("commands should not contain hyphens: %s", cmd.Use)
-    }
-    return nil
-})
+// Access config
+config := app.Config()
+if config.StrictMode {
+    // Additional validations enabled
+}
 ```
 
 ## Project Status
 
 **⚠️ WORK IN PROGRESS**
 
-This project is being transformed from a framework to a guard library. The public API will change significantly.
-
-See [docs/planning/](docs/planning/) for the transformation plan.
+The API is evolving. Expect breaking changes in future releases.
 
 ## License
 
