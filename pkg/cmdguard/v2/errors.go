@@ -38,6 +38,9 @@ var (
 
 	// ErrInvalidDuration indicates an invalid duration format.
 	ErrInvalidDuration = errors.New("invalid duration")
+
+	// ErrInvalidFlagType indicates the flag type F is not a struct or pointer to struct.
+	ErrInvalidFlagType = errors.New("invalid flag type")
 )
 
 // CommandError wraps an error with command context.

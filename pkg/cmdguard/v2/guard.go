@@ -10,6 +10,42 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// FlagTypeConstraint validates that F is a valid flag type at initialization time.
+// Valid types are: struct{} (NoFlags), any struct, or pointer to struct.
+// This enforces type safety for the F type parameter in GuardedCommand and Command.
+// Returns an error if F is an invalid type (e.g., int, string, slice, map).
+func FlagTypeConstraint[F any]() error {
+	var zero F
+	t := reflect.TypeOf(zero)
+
+	// Nil type means F is an untyped nil interface - not valid
+	if t == nil {
+		return fmt.Errorf("%w: flag type F must be a struct or pointer to struct, got untyped nil", ErrInvalidFlagType)
+	}
+
+	switch t.Kind() {
+	case reflect.Struct:
+		// struct{} (NoFlags) or any struct is valid
+		return nil
+	case reflect.Ptr:
+		// Must be pointer to struct
+		if t.Elem().Kind() == reflect.Struct {
+			return nil
+		}
+		return fmt.Errorf("%w: flag type F must be struct or *struct, got %s", ErrInvalidFlagType, t)
+	default:
+		return fmt.Errorf("%w: flag type F must be struct or *struct, got %s", ErrInvalidFlagType, t)
+	}
+}
+
+// mustValidateFlagType validates F and panics if invalid.
+// Called during initialization to fail fast on type errors.
+func mustValidateFlagType[F any]() {
+	if err := FlagTypeConstraint[F](); err != nil {
+		panic(err)
+	}
+}
+
 // GuardedCommand provides type-safe CLI construction with DI.
 // It never panics - all operations return errors.
 // T is the application config type, F is the command-specific flags type.
@@ -26,9 +62,15 @@ type GuardedCommand[T any, F any] struct {
 // New creates a new CLI application with typed config.
 // Returns an error if initialization fails (never panics).
 // T is the application config type, F is the command-specific flags type.
+// F must be a struct (like NoFlags) or pointer to struct for flag binding.
 func New[T any, F any](name, short string, defaults T) (*GuardedCommand[T, F], error) {
 	if name == "" {
 		return nil, fmt.Errorf("%w: name is required", ErrInvalidCommand)
+	}
+
+	// Validate F type constraint at initialization time
+	if err := FlagTypeConstraint[F](); err != nil {
+		return nil, err
 	}
 
 	// Create the root cobra command
@@ -133,18 +175,30 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 	}
 
 	// Register command-specific flags
+	// Even if cmd.Flags is nil, we need to create a registry for the F2 type
+	// to register and parse flags during execution
 	var flagRegistry *FlagRegistry
-	var flagsCopy F2
+	var prototype F2 // Will be zero value if cmd.Flags is nil
 
-	if any(cmd.Flags) != nil {
-		// Create a copy of flags for this command
-		flagsCopy = cloneFlags(cmd.Flags)
-		if any(flagsCopy) == nil {
-			flagsCopy = cmd.Flags
+	if !isNilPointer(cmd.Flags) {
+		prototype = cmd.Flags
+	} else {
+		// Create a new instance of F2 as prototype for flag registry
+		var zero F2
+		t := reflect.TypeOf(zero)
+		if t != nil && t.Kind() == reflect.Ptr {
+			// F2 is a pointer type - create new instance
+			prototype = reflect.New(t.Elem()).Interface().(F2)
+		} else {
+			// F2 is a struct type (like NoFlags) - use zero value
+			prototype = zero
 		}
+	}
 
+	// Create flag registry if prototype is usable
+	if !isNilPointer(prototype) {
 		var err error
-		flagRegistry, err = NewFlagRegistry(flagsCopy)
+		flagRegistry, err = NewFlagRegistry(prototype)
 		if err != nil {
 			return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to create flag registry: %w", err))
 		}
@@ -162,15 +216,11 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 				ctx = context.Background()
 			}
 
-			// Parse flags into the flags copy
-			if flagRegistry != nil && any(flagsCopy) != nil {
-				if err := flagRegistry.ParseFlags(c, flagsCopy); err != nil {
-					return fmt.Errorf("%w: %v", ErrFlagParseFailed, err)
-				}
-			}
+			// Clone and parse flags once for this execution
+			execFlags := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
 
 			// Execute the command handler
-			return cmd.RunE(ctx, config, flagsCopy)
+			return cmd.RunE(ctx, config, execFlags)
 		}
 	}
 
@@ -182,21 +232,10 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 				ctx = context.Background()
 			}
 
-			// Parse flags for pre-run
-			var preFlagsCopy F2
-			if any(cmd.Flags) != nil {
-				preFlagsCopy = cloneFlags(cmd.Flags)
-				if any(preFlagsCopy) == nil {
-					preFlagsCopy = cmd.Flags
-				}
-				if flagRegistry != nil {
-					if err := flagRegistry.ParseFlags(c, preFlagsCopy); err != nil {
-						return fmt.Errorf("%w: %v", ErrFlagParseFailed, err)
-					}
-				}
-			}
+			// Clone and parse flags once for this execution
+			execFlags := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
 
-			return cmd.PreRunE(ctx, config, preFlagsCopy)
+			return cmd.PreRunE(ctx, config, execFlags)
 		}
 	}
 
@@ -208,21 +247,10 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 				ctx = context.Background()
 			}
 
-			// Parse flags for post-run
-			var postFlagsCopy F2
-			if any(cmd.Flags) != nil {
-				postFlagsCopy = cloneFlags(cmd.Flags)
-				if any(postFlagsCopy) == nil {
-					postFlagsCopy = cmd.Flags
-				}
-				if flagRegistry != nil {
-					if err := flagRegistry.ParseFlags(c, postFlagsCopy); err != nil {
-						return fmt.Errorf("%w: %v", ErrFlagParseFailed, err)
-					}
-				}
-			}
+			// Clone and parse flags once for this execution
+			execFlags := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
 
-			return cmd.PostRunE(ctx, config, postFlagsCopy)
+			return cmd.PostRunE(ctx, config, execFlags)
 		}
 	}
 
@@ -249,140 +277,73 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 	return cobraCmd, nil
 }
 
-// toCobraCommand converts a Command[T, F] to a cobra.Command.
-func (g *GuardedCommand[T, F]) toCobraCommand(cmd Command[T, F]) (*cobra.Command, error) {
-	cobraCmd := &cobra.Command{
-		Use:        cmd.Use,
-		Short:      cmd.Short,
-		Long:       cmd.Long,
-		Aliases:    cmd.Aliases,
-		Example:    cmd.Example,
-		Hidden:     cmd.Hidden,
-		Deprecated: cmd.Deprecated,
-	}
-
-	// Register command-specific flags
-	var flagRegistry *FlagRegistry
+// cloneAndParseFlags clones flags once and parses them.
+// This is the optimized single-entry point for flag handling during execution.
+// If flags is nil, creates a new instance of F to parse into.
+func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) F {
 	var flagsCopy F
 
-	if any(cmd.Flags) != nil {
-		// Create a copy of flags for this command
-		flagsCopy = cloneFlags(cmd.Flags)
+	// If flags is nil, create a new instance of the flag type
+	if isNilPointer(flags) {
+		// Create new instance using reflection
+		var zero F
+		t := reflect.TypeOf(zero)
+		if t == nil {
+			// F is an interface type with nil value - can't create
+			return zero
+		}
+		if t.Kind() == reflect.Ptr {
+			// Create new instance of the underlying type
+			newVal := reflect.New(t.Elem())
+			flagsCopy = newVal.Interface().(F)
+		} else {
+			// F is a struct type (like NoFlags) - return zero value
+			flagsCopy = zero
+		}
+	} else {
+		// Clone the flags struct
+		flagsCopy = cloneFlags(flags)
 		if any(flagsCopy) == nil {
-			flagsCopy = cmd.Flags
-		}
-
-		var err error
-		flagRegistry, err = NewFlagRegistry(flagsCopy)
-		if err != nil {
-			return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to create flag registry: %w", err))
-		}
-
-		if err := flagRegistry.RegisterFlags(cobraCmd); err != nil {
-			return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to register flags: %w", err))
+			flagsCopy = flags
 		}
 	}
 
-	// Set up the command handler
-	if cmd.RunE != nil {
-		cobraCmd.RunE = func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
-
-			// Parse flags into the flags copy
-			if flagRegistry != nil && any(flagsCopy) != nil {
-				if err := flagRegistry.ParseFlags(c, flagsCopy); err != nil {
-					return fmt.Errorf("%w: %v", ErrFlagParseFailed, err)
-				}
-			}
-
-			// Execute the command handler
-			return cmd.RunE(ctx, g.config, flagsCopy)
+	// Parse command-line values into the flags
+	if registry != nil {
+		if err := registry.ParseFlags(c, flagsCopy); err != nil {
+			// Return the flags anyway; the error will be handled by the caller
+			// The cobra framework will handle the error display
 		}
 	}
 
-	// Set up pre-run hook
-	if cmd.PreRunE != nil {
-		cobraCmd.PreRunE = func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
+	return flagsCopy
+}
 
-			// Parse flags for pre-run
-			var preFlagsCopy F
-			if any(cmd.Flags) != nil {
-				preFlagsCopy = cloneFlags(cmd.Flags)
-				if any(preFlagsCopy) == nil {
-					preFlagsCopy = cmd.Flags
-				}
-				if flagRegistry != nil {
-					if err := flagRegistry.ParseFlags(c, preFlagsCopy); err != nil {
-						return fmt.Errorf("%w: %v", ErrFlagParseFailed, err)
-					}
-				}
-			}
+// toCobraCommand converts a Command[T, F] to a cobra.Command.
+// This is a wrapper around toCobraCommandAny that uses the GuardedCommand's config.
+func (g *GuardedCommand[T, F]) toCobraCommand(cmd Command[T, F]) (*cobra.Command, error) {
+	return toCobraCommandAny[T, F](g.config, cmd)
+}
 
-			return cmd.PreRunE(ctx, g.config, preFlagsCopy)
-		}
+// isNilPointer checks if a value is a nil pointer or nil interface.
+// This is needed because `any(nil) != nil` is true for typed nil pointers.
+func isNilPointer(v any) bool {
+	if v == nil {
+		return true
 	}
-
-	// Set up post-run hook
-	if cmd.PostRunE != nil {
-		cobraCmd.PostRunE = func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
-
-			// Parse flags for post-run
-			var postFlagsCopy F
-			if any(cmd.Flags) != nil {
-				postFlagsCopy = cloneFlags(cmd.Flags)
-				if any(postFlagsCopy) == nil {
-					postFlagsCopy = cmd.Flags
-				}
-				if flagRegistry != nil {
-					if err := flagRegistry.ParseFlags(c, postFlagsCopy); err != nil {
-						return fmt.Errorf("%w: %v", ErrFlagParseFailed, err)
-					}
-				}
-			}
-
-			return cmd.PostRunE(ctx, g.config, postFlagsCopy)
-		}
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
+		return rv.IsNil()
 	}
-
-	// Recursively add subcommands
-	for _, subCmd := range cmd.Commands {
-		cobraSubCmd, err := g.toCobraCommand(subCmd)
-		if err != nil {
-			return nil, fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
-		}
-		cobraCmd.AddCommand(cobraSubCmd)
-	}
-
-	// Apply command options
-	if cmd.SilenceErrors {
-		cobraCmd.SilenceErrors = true
-	}
-	if cmd.SilenceUsage {
-		cobraCmd.SilenceUsage = true
-	}
-	if cmd.Version != "" {
-		cobraCmd.Version = cmd.Version
-	}
-
-	return cobraCmd, nil
+	return false
 }
 
 // cloneFlags creates a copy of a flags struct using reflection.
 // This ensures each command execution gets its own flag instance.
 // Returns the zero value of F if cloning fails or input is nil.
 func cloneFlags[F any](flags F) F {
-	if any(flags) == nil {
+	if isNilPointer(flags) {
 		var zero F
 		return zero
 	}

@@ -591,3 +591,85 @@ func TestCloneFlags(t *testing.T) {
 		assert.Equal(t, original, cloned)
 	})
 }
+
+func TestFlagTypeConstraint(t *testing.T) {
+	t.Run("accepts NoFlags (struct{})", func(t *testing.T) {
+		err := FlagTypeConstraint[NoFlags]()
+		assert.NoError(t, err)
+	})
+
+	t.Run("accepts pointer to struct", func(t *testing.T) {
+		err := FlagTypeConstraint[*TestFlags]()
+		assert.NoError(t, err)
+	})
+
+	t.Run("accepts empty struct", func(t *testing.T) {
+		type EmptyFlags struct{}
+		err := FlagTypeConstraint[EmptyFlags]()
+		assert.NoError(t, err)
+	})
+
+	t.Run("accepts struct with fields", func(t *testing.T) {
+		err := FlagTypeConstraint[TestFlags]()
+		assert.NoError(t, err)
+	})
+
+	t.Run("rejects pointer to non-struct", func(t *testing.T) {
+		err := FlagTypeConstraint[*string]()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		assert.Contains(t, err.Error(), "*string")
+	})
+
+	t.Run("rejects int", func(t *testing.T) {
+		err := FlagTypeConstraint[int]()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		assert.Contains(t, err.Error(), "int")
+	})
+
+	t.Run("rejects string", func(t *testing.T) {
+		err := FlagTypeConstraint[string]()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		assert.Contains(t, err.Error(), "string")
+	})
+
+	t.Run("rejects slice", func(t *testing.T) {
+		err := FlagTypeConstraint[[]string]()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		assert.Contains(t, err.Error(), "[]string")
+	})
+
+	t.Run("rejects map", func(t *testing.T) {
+		err := FlagTypeConstraint[map[string]string]()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		assert.Contains(t, err.Error(), "map[string]string")
+	})
+}
+
+func TestNew_FlagTypeValidation(t *testing.T) {
+	t.Run("rejects invalid flag type in New", func(t *testing.T) {
+		g, err := New[TestAppConfig, int]("myapp", "My CLI", TestAppConfig{})
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		assert.Nil(t, g)
+	})
+
+	t.Run("accepts NoFlags in New", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+		require.NotNil(t, g)
+	})
+
+	t.Run("accepts pointer to struct in New", func(t *testing.T) {
+		type CmdFlags struct {
+			Name string `flag:"name"`
+		}
+		g, err := New[TestAppConfig, *CmdFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+		require.NotNil(t, g)
+	})
+}
