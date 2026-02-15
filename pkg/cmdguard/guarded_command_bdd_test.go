@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = Describe("GuardedCommand", func() {
+var _ = Describe("GuardedCommand - User Expectations", func() {
 	var root *cmdguard.GuardedCommand
 
 	BeforeEach(func() {
@@ -20,25 +20,21 @@ var _ = Describe("GuardedCommand", func() {
 		os.Unsetenv("CMDGUARD_STRICT_MODE")
 	})
 
-	Describe("Creating a GuardedCommand", func() {
-		Context("with default settings", func() {
+	Describe("As a CLI developer creating a new application", func() {
+		Context("when I create a new GuardedCommand with basic settings", func() {
 			BeforeEach(func() {
-				root = cmdguard.New("testapp", "Test application")
+				root = cmdguard.New("myapp", "My awesome CLI tool")
 			})
 
-			It("should create a command with the given name", func() {
-				Expect(root.Command().Name()).To(Equal("testapp"))
+			It("should have my application name for help output", func() {
+				Expect(root.Command().Name()).To(Equal("myapp"))
 			})
 
-			It("should create a command with the given description", func() {
-				Expect(root.Command().Short).To(Equal("Test application"))
+			It("should show my description when users run --help", func() {
+				Expect(root.Command().Short).To(Equal("My awesome CLI tool"))
 			})
 
-			It("should not be in strict mode by default", func() {
-				Expect(root.IsStrictMode()).To(BeFalse())
-			})
-
-			It("should have built-in version command", func() {
+			It("should provide version out of the box without me writing code", func() {
 				cmd := root.Command()
 				versionCmd, _, err := cmd.Find([]string{"version"})
 				Expect(err).ToNot(HaveOccurred())
@@ -46,7 +42,7 @@ var _ = Describe("GuardedCommand", func() {
 				Expect(versionCmd.Name()).To(Equal("version"))
 			})
 
-			It("should have built-in validate command", func() {
+			It("should provide a validate command to check my CLI setup", func() {
 				cmd := root.Command()
 				validateCmd, _, err := cmd.Find([]string{"validate"})
 				Expect(err).ToNot(HaveOccurred())
@@ -55,54 +51,54 @@ var _ = Describe("GuardedCommand", func() {
 			})
 		})
 
-		Context("when loading configuration from environment", func() {
+		Context("when I want to configure behavior via environment variables", func() {
 			BeforeEach(func() {
 				os.Setenv("CMDGUARD_STRICT_MODE", "true")
-				root = cmdguard.New("testapp", "Test application")
+				root = cmdguard.New("myapp", "My CLI")
 			})
 
 			AfterEach(func() {
 				os.Unsetenv("CMDGUARD_STRICT_MODE")
 			})
 
-			It("should enable strict mode from environment", func() {
+			It("should pick up strict mode setting automatically", func() {
 				Expect(root.IsStrictMode()).To(BeTrue())
 			})
 		})
 	})
 
-	Describe("Adding commands", func() {
+	Describe("As a library user adding commands to my CLI", func() {
 		BeforeEach(func() {
-			root = cmdguard.New("testapp", "Test application")
+			root = cmdguard.New("myapp", "My CLI")
 		})
 
-		Context("when command is valid", func() {
-			It("should accept commands with Run handler", func() {
+		Context("when I add a properly implemented command", func() {
+			It("should accept commands with error-returning handlers (RunE)", func() {
 				cmd := &cobra.Command{
-					Use:  "valid",
-					Short: "A valid command",
-					Run:   func(cmd *cobra.Command, args []string) {},
-				}
-				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
-			})
-
-			It("should accept commands with RunE handler", func() {
-				cmd := &cobra.Command{
-					Use:   "valid",
-					Short: "A valid command",
+					Use:   "deploy",
+					Short: "Deploy the application",
 					RunE:  func(cmd *cobra.Command, args []string) error { return nil },
 				}
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})
 
-			It("should accept parent commands with subcommands", func() {
+			It("should accept commands with simple handlers (Run)", func() {
+				cmd := &cobra.Command{
+					Use:   "status",
+					Short: "Show status",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
+			})
+
+			It("should accept command groups with subcommands (like 'git remote add')", func() {
 				parent := &cobra.Command{
-					Use:   "parent",
-					Short: "Parent command",
+					Use:   "remote",
+					Short: "Manage remotes",
 				}
 				child := &cobra.Command{
-					Use:  "child",
-					Short: "Child command",
+					Use:  "add",
+					Short: "Add a remote",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
 				parent.AddCommand(child)
@@ -110,65 +106,97 @@ var _ = Describe("GuardedCommand", func() {
 			})
 		})
 
-		Context("when command is invalid", func() {
-			It("should panic on missing handler", func() {
+		Context("when I accidentally forget to implement a command", func() {
+			It("should fail fast with a clear error if I forget the handler", func() {
 				cmd := &cobra.Command{
-					Use:   "invalid",
-					Short: "Invalid command",
+					Use:   "incomplete",
+					Short: "I forgot to add Run or RunE",
 				}
 				Expect(func() { root.AddCommand(cmd) }).To(Panic())
 			})
 
-			It("should panic on missing name", func() {
+			It("should tell me this is a cmdguard validation failure", func() {
 				cmd := &cobra.Command{
-					Short: "No name command",
-					Run:   func(cmd *cobra.Command, args []string) {},
-				}
-				Expect(func() { root.AddCommand(cmd) }).To(Panic())
-			})
-
-			It("should panic with message containing cmdguard prefix", func() {
-				cmd := &cobra.Command{
-					Use:   "invalid",
-					Short: "Invalid command",
+					Use:   "incomplete",
+					Short: "Missing handler",
 				}
 				panicFn := func() { root.AddCommand(cmd) }
 				Expect(panicFn).To(PanicWith(ContainSubstring("cmdguard:")))
 			})
+
+			It("should fail fast if I forget the command name", func() {
+				cmd := &cobra.Command{
+					Short: "I forgot Use field",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				Expect(func() { root.AddCommand(cmd) }).To(Panic())
+			})
 		})
 
-		Context("in strict mode", func() {
+		Context("when I add subcommands to an existing command", func() {
+			var parent *cobra.Command
+
 			BeforeEach(func() {
-				os.Setenv("CMDGUARD_STRICT_MODE", "true")
-				root = cmdguard.New("testapp", "Test application")
+				parent = &cobra.Command{
+					Use:   "db",
+					Short: "Database operations",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				root.AddCommand(parent)
 			})
 
-			AfterEach(func() {
-				os.Unsetenv("CMDGUARD_STRICT_MODE")
+			It("should accept valid subcommands", func() {
+				child := &cobra.Command{
+					Use:  "migrate",
+					Short: "Run migrations",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				Expect(func() { root.AddSubcommand(parent, child) }).NotTo(Panic())
 			})
 
-			It("should accept RunE handlers", func() {
+			It("should catch incomplete subcommands", func() {
+				child := &cobra.Command{
+					Use:   "broken",
+					Short: "Missing handler",
+				}
+				Expect(func() { root.AddSubcommand(parent, child) }).To(Panic())
+			})
+		})
+	})
+
+	Describe("As a security-conscious operator in strict environments", func() {
+		BeforeEach(func() {
+			os.Setenv("CMDGUARD_STRICT_MODE", "true")
+			root = cmdguard.New("myapp", "My CLI")
+		})
+
+		AfterEach(func() {
+			os.Unsetenv("CMDGUARD_STRICT_MODE")
+		})
+
+		Context("when strict mode is enabled", func() {
+			It("should require proper error handling (RunE) for all commands", func() {
 				cmd := &cobra.Command{
-					Use:   "valid",
-					Short: "Valid in strict mode",
+					Use:   "deploy",
+					Short: "Production deployment",
 					RunE:  func(cmd *cobra.Command, args []string) error { return nil },
 				}
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})
 
-			It("should reject Run handlers", func() {
+			It("should reject commands that silently swallow errors (Run)", func() {
 				cmd := &cobra.Command{
-					Use:   "invalid",
-					Short: "Invalid in strict mode",
+					Use:   "unsafe",
+					Short: "This could hide errors",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
 				Expect(func() { root.AddCommand(cmd) }).To(Panic())
 			})
 
-			It("should mention strict mode in panic message", func() {
+			It("should explain why Run handlers are rejected in strict mode", func() {
 				cmd := &cobra.Command{
-					Use:   "invalid",
-					Short: "Invalid in strict mode",
+					Use:   "unsafe",
+					Short: "No error handling",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
 				panicFn := func() { root.AddCommand(cmd) }
@@ -177,153 +205,26 @@ var _ = Describe("GuardedCommand", func() {
 		})
 	})
 
-	Describe("Adding subcommands", func() {
-		var parent *cobra.Command
-
+	Describe("As a user running the CLI application", func() {
 		BeforeEach(func() {
-			root = cmdguard.New("testapp", "Test application")
-			parent = &cobra.Command{
-				Use:   "parent",
-				Short: "Parent command",
-				Run:   func(cmd *cobra.Command, args []string) {},
-			}
-			root.AddCommand(parent)
+			root = cmdguard.New("myapp", "My CLI")
 		})
 
-		Context("when subcommand is valid", func() {
-			It("should accept subcommands with Run handler", func() {
-				child := &cobra.Command{
-					Use:  "child",
-					Short: "Child command",
-					Run:   func(cmd *cobra.Command, args []string) {},
-				}
-				Expect(func() { root.AddSubcommand(parent, child) }).NotTo(Panic())
-			})
-		})
-
-		Context("when subcommand is invalid", func() {
-			It("should panic on missing handler", func() {
-				child := &cobra.Command{
-					Use:   "invalid",
-					Short: "Invalid child",
-				}
-				Expect(func() { root.AddSubcommand(parent, child) }).To(Panic())
-			})
-		})
-	})
-
-	Describe("Command execution", func() {
-		BeforeEach(func() {
-			root = cmdguard.New("testapp", "Test application")
-		})
-
-		Context("when executing version command", func() {
-			It("should run without error", func() {
+		Context("when I run built-in commands", func() {
+			It("should execute 'version' successfully", func() {
 				root.Command().SetArgs([]string{"version"})
 				err := root.Execute(context.Background())
 				Expect(err).ToNot(HaveOccurred())
 			})
-		})
 
-		Context("when executing validate command", func() {
-			It("should run without error", func() {
+			It("should execute 'validate' successfully", func() {
 				root.Command().SetArgs([]string{"validate"})
 				err := root.Execute(context.Background())
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
-	})
 
-	Describe("Version function", func() {
-		It("should return a version string", func() {
-			version := cmdguard.Version()
-			Expect(version).ToNot(BeEmpty())
-		})
-
-		It("should return dev by default", func() {
-			version := cmdguard.Version()
-			Expect(version).To(Equal("dev"))
-		})
-	})
-
-	Describe("Accessing configuration", func() {
-		BeforeEach(func() {
-			root = cmdguard.New("testapp", "Test application")
-		})
-
-		It("should provide access to config", func() {
-			cfg := root.Config()
-			Expect(cfg).ToNot(BeNil())
-		})
-
-		It("should provide access to underlying command", func() {
-			cmd := root.Command()
-			Expect(cmd).ToNot(BeNil())
-			Expect(cmd.Name()).To(Equal("testapp"))
-		})
-	})
-
-	Describe("ExecuteAndExit", func() {
-		BeforeEach(func() {
-			root = cmdguard.New("testapp", "Test application")
-		})
-
-		Context("when command executes successfully", func() {
-			It("should not call os.Exit", func() {
-				root.Command().SetArgs([]string{"version"})
-				Expect(func() { root.ExecuteAndExit(context.Background()) }).NotTo(Panic())
-			})
-		})
-	})
-
-	Describe("Adding commands after execution", func() {
-		Context("when trying to add command after Execute", func() {
-			It("should panic when adding command after execution", func() {
-				root = cmdguard.New("testapp", "Test application")
-				root.Command().SetArgs([]string{"version"})
-				_ = root.Execute(context.Background())
-
-				cmd := &cobra.Command{
-					Use:  "late",
-					Short: "Late command",
-					Run:   func(cmd *cobra.Command, args []string) {},
-				}
-				Expect(func() { root.AddCommand(cmd) }).To(PanicWith(ContainSubstring("cannot add commands after execution")))
-			})
-
-			It("should panic when adding subcommand after execution", func() {
-				root = cmdguard.New("testapp", "Test application")
-				parent := &cobra.Command{
-					Use:  "parent",
-					Short: "Parent command",
-					Run:   func(cmd *cobra.Command, args []string) {},
-				}
-				root.AddCommand(parent)
-				root.Command().SetArgs([]string{"version"})
-				_ = root.Execute(context.Background())
-
-				child := &cobra.Command{
-					Use:  "child",
-					Short: "Child command",
-					Run:   func(cmd *cobra.Command, args []string) {},
-				}
-				Expect(func() { root.AddSubcommand(parent, child) }).To(PanicWith(ContainSubstring("cannot add commands after execution")))
-			})
-		})
-	})
-
-	Describe("Command execution", func() {
-		Context("when running commands", func() {
-			It("should execute version command successfully", func() {
-				root = cmdguard.New("testapp", "Test application")
-				root.Command().SetArgs([]string{"version"})
-
-				err := root.Execute(context.Background())
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
-		Context("with CMDGUARD_LOG_FORMAT env var", func() {
+		Context("when I configure logging via environment", func() {
 			BeforeEach(func() {
 				os.Setenv("CMDGUARD_LOG_FORMAT", "json")
 			})
@@ -332,11 +233,92 @@ var _ = Describe("GuardedCommand", func() {
 				os.Unsetenv("CMDGUARD_LOG_FORMAT")
 			})
 
-			It("should use json format", func() {
-				root = cmdguard.New("testapp", "Test application")
+			It("should use my configured format", func() {
+				root = cmdguard.New("myapp", "My CLI")
 				Expect(root.Config().LogFormat).To(Equal("json"))
 			})
 		})
 	})
-})
 
+	Describe("As a developer needing to inspect configuration", func() {
+		BeforeEach(func() {
+			root = cmdguard.New("myapp", "My CLI")
+		})
+
+		Context("when I need programmatic access to settings", func() {
+			It("should expose the configuration object", func() {
+				cfg := root.Config()
+				Expect(cfg).ToNot(BeNil())
+			})
+
+			It("should expose the underlying Cobra command for advanced usage", func() {
+				cmd := root.Command()
+				Expect(cmd).ToNot(BeNil())
+				Expect(cmd.Name()).To(Equal("myapp"))
+			})
+		})
+	})
+
+	Describe("As a developer using ExecuteAndExit for main() simplicity", func() {
+		BeforeEach(func() {
+			root = cmdguard.New("myapp", "My CLI")
+		})
+
+		Context("when the command succeeds", func() {
+			It("should complete without calling os.Exit (no panic)", func() {
+				root.Command().SetArgs([]string{"version"})
+				Expect(func() { root.ExecuteAndExit(context.Background()) }).NotTo(Panic())
+			})
+		})
+	})
+
+	Describe("As a developer making mistakes after initialization", func() {
+		Context("when I try to add commands after the CLI has started", func() {
+			It("should prevent runtime modification of commands", func() {
+				root = cmdguard.New("myapp", "My CLI")
+				root.Command().SetArgs([]string{"version"})
+				_ = root.Execute(context.Background())
+
+				lateCmd := &cobra.Command{
+					Use:  "too-late",
+					Short: "Added after execution",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				Expect(func() { root.AddCommand(lateCmd) }).To(PanicWith(ContainSubstring("cannot add commands after execution")))
+			})
+
+			It("should also prevent adding subcommands after execution", func() {
+				root = cmdguard.New("myapp", "My CLI")
+				parent := &cobra.Command{
+					Use:  "db",
+					Short: "Database commands",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				root.AddCommand(parent)
+				root.Command().SetArgs([]string{"version"})
+				_ = root.Execute(context.Background())
+
+				child := &cobra.Command{
+					Use:  "migrate",
+					Short: "Too late to add",
+					Run:   func(cmd *cobra.Command, args []string) {},
+				}
+				Expect(func() { root.AddSubcommand(parent, child) }).To(PanicWith(ContainSubstring("cannot add commands after execution")))
+			})
+		})
+	})
+
+	Describe("As a developer embedding cmdguard in my application", func() {
+		Context("when I call the Version function", func() {
+			It("should return a version string for my --version output", func() {
+				version := cmdguard.Version()
+				Expect(version).ToNot(BeEmpty())
+			})
+
+			It("should return 'dev' when not built with ldflags", func() {
+				version := cmdguard.Version()
+				Expect(version).To(Equal("dev"))
+			})
+		})
+	})
+})
