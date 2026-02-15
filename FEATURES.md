@@ -177,8 +177,10 @@ cmdguard.New("app", "desc")
 - [x] Fix errcheck violations
 
 ### Phase 2: Testing ✅ COMPLETE
-- [x] Add tests for `pkg/cmdguard` (GuardedCommand) - 66.7% coverage
+- [x] Add BDD tests using Ginkgo/Gomega - 67 specs across 4 packages
+- [x] Add tests for `pkg/cmdguard` (GuardedCommand) - 94.3% coverage
 - [x] Add tests for `internal/logging` - 100% coverage
+- [x] Add tests for `internal/config` - 95.7% coverage
 - [x] Update AGENTS.md for current architecture
 
 ### Phase 3: Polish (Short Term)
@@ -205,7 +207,7 @@ cmdguard.New("app", "desc")
 - Minimal dependencies
 - Configuration via environment variables
 - Logging with slog
-- Test coverage for all packages (config 94.1%, cmdguard 66.7%, logging 100%)
+- Test coverage for all packages (config 95.7%, cmdguard 94.3%, logging 100%)
 
 ### What Needs Work ⚠️
 - No version injection mechanism

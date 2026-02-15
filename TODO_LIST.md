@@ -68,7 +68,7 @@ cmdguard/
 │   ├── guarded_command.go    # Public API
 │   └── guarded_command_test.go
 ├── internal/
-│   ├── config/               # Configuration (82.6% coverage)
+│   ├── config/               # Configuration (95.7% coverage)
 │   └── logging/              # Logging (100% coverage)
 ├── examples/
 │   ├── basic/main.go         # Simple CLI example
