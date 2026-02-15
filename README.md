@@ -1,6 +1,6 @@
 # cmdguard
 
-**A Go library for building validated Cobra CLI applications with panic-at-construction-time guards.**
+**A Go library for building validated Cobra CLI applications with panic-at-construction-time guards and type-safe flags.**
 
 This library wraps Cobra with validation that panics at construction time, ensuring invalid commands are caught immediately at startup rather than failing silently at runtime.
 
@@ -11,6 +11,71 @@ go get github.com/larsartmann/cmdguard
 ```
 
 ## Quick Start
+
+### v2 API (Recommended) - Type-Safe Commands
+
+The v2 API provides full type safety for both configuration and command-specific flags:
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+
+    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+)
+
+// AppConfig is your application-level configuration
+type AppConfig struct {
+    Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
+    Output  string `flag:"output" short:"o" default:"text" help:"Output format"`
+}
+
+// GreetFlags defines command-specific flags (fully typed!)
+type GreetFlags struct {
+    Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+    Shout bool   `flag:"shout" short:"s" default:"false" help:"Uppercase output"`
+}
+
+func main() {
+    // Create CLI with typed config - T=AppConfig, F=NoFlags (root has no flags)
+    cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI application", AppConfig{})
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
+        os.Exit(1)
+    }
+
+    // Add a command with typed flags - T=AppConfig, F=*GreetFlags
+    greetCmd := v2.Command[AppConfig, *GreetFlags]{
+        Use:   "greet",
+        Short: "Greet someone",
+        Flags: &GreetFlags{},
+        RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+            msg := fmt.Sprintf("Hello, %s!", flags.Name)
+            if flags.Shout {
+                msg = strings.ToUpper(msg)
+            }
+            fmt.Println(msg)
+            return nil
+        },
+    }
+
+    // Use AddAnyCommand when command flags type differs from root flags type
+    if err := v2.AddAnyCommand(cli, greetCmd); err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to add command: %v\n", err)
+        os.Exit(1)
+    }
+
+    // Execute
+    cli.ExecuteAndExit(context.Background())
+}
+```
+
+### v1 API - Simple Cobra Wrapper
+
+For simpler use cases or migration from raw Cobra:
 
 ```go
 package main
@@ -24,10 +89,8 @@ import (
 )
 
 func main() {
-    // Single-step initialization
     root := cmdguard.New("myapp", "My CLI application")
 
-    // Add commands - panics if invalid (no handler)
     root.AddCommand(&cobra.Command{
         Use:   "hello",
         Short: "Say hello",
@@ -36,8 +99,252 @@ func main() {
         },
     })
 
-    // Execute
     root.ExecuteAndExit(context.Background())
+}
+```
+
+## API Comparison
+
+| Feature | v1 API | v2 API |
+|---------|--------|--------|
+| Type-safe config | No | Yes (type parameter T) |
+| Type-safe flags | No | Yes (type parameter F) |
+| DI integration | No | Yes (samber/do/v2) |
+| Flag tags | No | Yes (`flag`, `short`, `default`, `help`) |
+| Lifecycle hooks | No | Yes (PreRunE, PostRunE) |
+| Health checks | No | Yes |
+| Graceful shutdown | No | Yes |
+
+## v2 API Reference
+
+### GuardedCommand[T, F]
+
+The main CLI type with two type parameters:
+- `T` - Application-level config type
+- `F` - Root command flags type (use `v2.NoFlags` if none)
+
+```go
+// Create root command
+cli, err := v2.New[T, F](name, shortDescription, defaultConfig)
+
+// Add subcommands with same F type
+cli.AddCommand(cmd Command[T, F]) error
+
+// Add subcommands with different F type
+v2.AddAnyCommand[T, F, F2](cli, cmd Command[T, F2]) error
+
+// Execution
+err := cli.Execute(ctx)           // Returns error
+cli.ExecuteAndExit(ctx)           // Calls os.Exit(1) on error
+
+// DI and lifecycle
+scope := cli.Scope()              // do.Injector for service registration
+err := cli.HealthCheck()          // Run health checks
+err := cli.Shutdown(ctx)          // Graceful shutdown
+
+// Configuration access
+cfg := cli.Config()               // *T - typed config
+cli.SetConfig(cfg)                // Update config
+
+// Advanced
+cmd := cli.RootCommand()          // Underlying cobra.Command
+cli.AddGlobalFlag(name, short, default, help)
+cli.AddGlobalBoolFlag(name, short, default, help)
+```
+
+### Command[T, F]
+
+Type-safe command definition:
+
+```go
+type Command[T any, F any] struct {
+    Use        string               // Command name/usage
+    Short      string               // Short description
+    Long       string               // Long description
+    Aliases    []string             // Alternative names
+    Example    string               // Example usage
+    Flags      F                    // Typed flags struct
+    RunE       func(ctx, cfg, flags) error
+    PreRunE    func(ctx, cfg, flags) error
+    PostRunE   func(ctx, cfg, flags) error
+    Commands   []Command[T, F]      // Subcommands
+    Hidden     bool                 // Hide from help
+    Deprecated string               // Deprecation message
+}
+```
+
+### Flag Tags
+
+Define flags using struct tags:
+
+```go
+type MyFlags struct {
+    // Required: flag name
+    Name string `flag:"name"`
+    
+    // Optional: short flag (-n)
+    Name string `flag:"name" short:"n"`
+    
+    // Optional: default value
+    Name string `flag:"name" default:"World"`
+    
+    // Optional: help text
+    Name string `flag:"name" help:"Name to greet"`
+    
+    // All together
+    Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+    Count int    `flag:"count" short:"c" default:"1" help:"Number of times"`
+    Verbose bool  `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
+}
+```
+
+### NoFlags
+
+Use `v2.NoFlags` for commands without flags:
+
+```go
+versionCmd := v2.Command[AppConfig, v2.NoFlags]{
+    Use:   "version",
+    Short: "Print version",
+    RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+        fmt.Println("v1.0.0")
+        return nil
+    },
+}
+```
+
+### AddAnyCommand
+
+When a command's flags type differs from the CLI root:
+
+```go
+// CLI root has NoFlags
+cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "...", AppConfig{})
+
+// Greet command has *GreetFlags - different type!
+greetCmd := v2.Command[AppConfig, *GreetFlags]{
+    Use:   "greet",
+    Flags: &GreetFlags{},
+    RunE:  ...,
+}
+
+// Use AddAnyCommand (standalone function, not method)
+v2.AddAnyCommand(cli, greetCmd)
+```
+
+### DI Integration
+
+Register and invoke services:
+
+```go
+// Register services
+v2.Provide(scope, func(i do.Injector) (*Database, error) {
+    return &Database{...}, nil
+})
+
+v2.ProvideValue(scope, config)
+
+// Invoke services in handlers
+RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+    db := do.MustInvoke[*Database](cli.Scope())
+    // use db...
+},
+```
+
+### Lifecycle Hooks
+
+```go
+cmd := v2.Command[AppConfig, *Flags]{
+    Use: "example",
+    PreRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+        // Validation before main handler
+        if flags.Count < 1 {
+            return fmt.Errorf("count must be at least 1")
+        }
+        return nil
+    },
+    RunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+        // Main command logic
+        return nil
+    },
+    PostRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+        // Cleanup after main handler (called even on error)
+        return nil
+    },
+}
+```
+
+### Functional Options
+
+```go
+cmd, err := v2.NewCommand[AppConfig, NoFlags]("version",
+    v2.WithShort("Print version"),
+    v2.WithRunE(func(ctx context.Context, cfg *AppConfig, flags NoFlags) error {
+        fmt.Println("v1.0.0")
+        return nil
+    }),
+)
+```
+
+## Examples
+
+### Nested Commands
+
+```go
+func main() {
+    cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})
+
+    dbCmd := v2.Command[AppConfig, v2.NoFlags]{
+        Use:   "db",
+        Short: "Database operations",
+        Commands: []v2.Command[AppConfig, v2.NoFlags]{
+            {
+                Use:   "migrate",
+                Short: "Run migrations",
+                RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+                    return runMigrations()
+                },
+            },
+            {
+                Use:   "rollback",
+                Short: "Rollback migrations",
+                RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+                    return rollbackMigrations()
+                },
+            },
+        },
+    }
+
+    cli.AddCommand(dbCmd)
+    cli.ExecuteAndExit(context.Background())
+}
+```
+
+### Mixed Flag Types
+
+```go
+func main() {
+    cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})
+
+    // Command with GreetFlags
+    v2.AddAnyCommand(cli, v2.Command[AppConfig, *GreetFlags]{
+        Use:   "greet",
+        Flags: &GreetFlags{},
+        RunE:  greetHandler,
+    })
+
+    // Command with ConfigFlags (different type!)
+    v2.AddAnyCommand(cli, v2.Command[AppConfig, *ConfigFlags]{
+        Use:   "config",
+        Flags: &ConfigFlags{},
+        RunE:  configHandler,
+    })
+
+    // Command with no flags
+    cli.AddCommand(v2.Command[AppConfig, v2.NoFlags]{
+        Use:  "version",
+        RunE: versionHandler,
+    })
 }
 ```
 
@@ -47,169 +354,9 @@ cmdguard validates commands at construction time:
 
 - **Panic on invalid commands** - Commands without handlers (`Run` or `RunE`) cause immediate panic
 - **Panic on empty names** - Commands must have a valid `Use` field
-- **Strict mode** - Optional enforcement of `RunE` (error-returning handlers)
+- **Type-safe flags** - v2 API ensures flags are properly typed
 
 This "fail fast" approach catches configuration errors during development, not production.
-
-## API Reference
-
-### GuardedCommand
-
-```go
-// Create root command
-root := cmdguard.New(name, shortDescription)
-
-// Add subcommands (panics if invalid)
-root.AddCommand(cmd *cobra.Command)
-
-// Add nested subcommands (panics if child is invalid)
-root.AddSubcommand(parent, child *cobra.Command)
-
-// Execution
-err := root.Execute(ctx)           // Returns error
-root.ExecuteAndExit(ctx)           // Calls os.Exit(1) on error
-
-// Access underlying Cobra command for advanced customization
-cmd := root.Command()
-
-// Configuration access
-cfg := root.Config()
-strict := root.IsStrictMode()
-```
-
-### Built-in Commands
-
-Every GuardedCommand includes:
-
-- `version` - Prints version information
-- `validate` - Validates the entire command tree
-- `help` - Cobra's built-in help
-
-### Global Flags
-
-- `--config, -c` - Config file path
-- `--log-level, -l` - Log level (debug, info, warn, error)
-- `--strict, -s` - Enable strict mode
-
-## Examples
-
-### Nested Commands
-
-```go
-func main() {
-    root := cmdguard.New("myapp", "My CLI")
-
-    // Parent command (intermediate - no handler needed when it has children)
-    db := &cobra.Command{
-        Use:   "db",
-        Short: "Database operations",
-    }
-
-    // Leaf commands must have handlers
-    db.AddCommand(&cobra.Command{
-        Use:   "migrate",
-        Short: "Run migrations",
-        RunE: func(cmd *cobra.Command, args []string) error {
-            return runMigrations()
-        },
-    })
-
-    root.AddCommand(db)
-    root.ExecuteAndExit(context.Background())
-}
-```
-
-### Strict Mode
-
-Strict mode requires all handlers to be `RunE` (returning error):
-
-```go
-func main() {
-    // Enable via environment
-    os.Setenv("CMDGUARD_STRICT_MODE", "true")
-
-    root := cmdguard.New("myapp", "My CLI")
-
-    // This works in strict mode
-    root.AddCommand(&cobra.Command{
-        Use:   "check",
-        Short: "Run checks",
-        RunE: func(cmd *cobra.Command, args []string) error {
-            return nil
-        },
-    })
-
-    // This would panic in strict mode (Run instead of RunE)
-    // root.AddCommand(&cobra.Command{
-    //     Use: "bad",
-    //     Run: func(cmd *cobra.Command, args []string) {},
-    // })
-
-    root.ExecuteAndExit(context.Background())
-}
-```
-
-### Custom Flags
-
-```go
-func main() {
-    root := cmdguard.New("myapp", "My CLI")
-
-    cmd := &cobra.Command{
-        Use:   "greet",
-        Short: "Greet someone",
-        RunE: func(cmd *cobra.Command, args []string) error {
-            name, _ := cmd.Flags().GetString("name")
-            fmt.Printf("Hello, %s!\n", name)
-            return nil
-        },
-    }
-
-    cmd.Flags().StringP("name", "n", "World", "Name to greet")
-    root.AddCommand(cmd)
-
-    root.ExecuteAndExit(context.Background())
-}
-```
-
-## Configuration
-
-Configuration via environment variables:
-
-| Variable | Values | Default |
-|----------|--------|---------|
-| `CMDGUARD_LOG_LEVEL` | debug, info, warn, error | info |
-| `CMDGUARD_LOG_FORMAT` | text, json | text |
-| `CMDGUARD_STRICT_MODE` | true, false | false |
-
-### JSON Logging
-
-For machine-parseable logs, set the format to JSON:
-
-```bash
-export CMDGUARD_LOG_FORMAT=json
-myapp command
-# Output: {"time":"2026-02-14T10:00:00Z","level":"INFO","msg":"message"}
-```
-
-## Architecture
-
-```
-pkg/cmdguard/
-└── guarded_command.go    # Public API (GuardedCommand)
-
-internal/
-├── config/               # Configuration loading
-└── logging/              # slog integration
-```
-
-### Dependencies
-
-| Library | Purpose |
-|---------|---------|
-| `github.com/spf13/cobra` | CLI framework |
-| `github.com/charmbracelet/fang` | Beautiful CLI output |
-| `log/slog` | Structured logging (stdlib) |
 
 ## Philosophy
 
@@ -225,6 +372,7 @@ Go lacks compile-time macros. The closest equivalent to "fail at compile time" i
 
 - You want guaranteed-valid CLI configurations
 - You prefer "crash early" over "handle errors later"
+- You want type-safe flags (v2)
 - You're building CLIs where panics are acceptable (most CLIs)
 
 **When NOT to use cmdguard:**
@@ -234,7 +382,8 @@ Go lacks compile-time macros. The closest equivalent to "fail at compile time" i
 
 ## Project Status
 
-**v0.1.0 released.** Core API is stable. JSON logging added in v0.2.0.
+- **v1** - Stable, minimal Cobra wrapper
+- **v2** - Stable, full type-safe API with DI integration
 
 ## License
 
