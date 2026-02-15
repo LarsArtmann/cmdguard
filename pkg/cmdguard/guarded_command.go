@@ -68,7 +68,7 @@ type GuardedCommand struct {
 //	root.Execute(context.Background())
 func New(name, short string) *GuardedCommand {
 	// Load configuration early
-	cfg := loadConfig()
+	cfg := config.Load()
 
 	// Initialize logger
 	logger := logging.NewLogger(cfg.LogFormat, cfg.LogLevel)
@@ -271,28 +271,4 @@ func (g *GuardedCommand) validateSubcommands(parent *cobra.Command) error {
 		}
 	}
 	return nil
-}
-
-// loadConfig loads configuration from files and environment.
-func loadConfig() *config.Config {
-	// This is a simplified version that loads defaults
-	// Full config loading is done in the config package
-	cfg := &config.Config{
-		LogLevel:   "info",
-		LogFormat:  "text",
-		StrictMode: false,
-	}
-
-	// Try to load from environment
-	if level := os.Getenv("CMDGUARD_LOG_LEVEL"); level != "" {
-		cfg.LogLevel = level
-	}
-	if format := os.Getenv("CMDGUARD_LOG_FORMAT"); format != "" {
-		cfg.LogFormat = format
-	}
-	if os.Getenv("CMDGUARD_STRICT_MODE") == "true" {
-		cfg.StrictMode = true
-	}
-
-	return cfg
 }
