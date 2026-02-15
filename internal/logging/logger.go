@@ -16,12 +16,26 @@ const (
 	FormatJSON Format = "json"
 )
 
+// Level represents the log severity level.
+type Level string
+
+const (
+	// LevelDebug enables all logs.
+	LevelDebug Level = "debug"
+	// LevelInfo enables info and above.
+	LevelInfo Level = "info"
+	// LevelWarn enables warn and above.
+	LevelWarn Level = "warn"
+	// LevelError enables only error logs.
+	LevelError Level = "error"
+)
+
 // NewLogger creates a new slog.Logger with the specified format and level.
 // Format can be "text" or "json". Defaults to text.
 // Level can be "debug", "info", "warn", "error". Defaults to info.
 func NewLogger(format, level string) *slog.Logger {
-	logLevel := parseLevel(level)
-	logFormat := parseFormat(format)
+	logLevel := ParseLevel(level).SlogLevel()
+	logFormat := ParseFormat(format)
 
 	var handler slog.Handler
 	opts := &slog.HandlerOptions{
@@ -38,8 +52,60 @@ func NewLogger(format, level string) *slog.Logger {
 	return slog.New(handler)
 }
 
-// parseFormat converts string format to Format type.
-func parseFormat(format string) Format {
+// ValidFormat returns true if the format is valid.
+func ValidFormat(format string) bool {
+	switch format {
+	case "text", "json":
+		return true
+	default:
+		return false
+	}
+}
+
+// ValidLevel returns true if the level is valid.
+func ValidLevel(level string) bool {
+	switch level {
+	case "debug", "info", "warn", "error":
+		return true
+	default:
+		return false
+	}
+}
+
+// ParseLevel converts string level to Level type.
+func ParseLevel(level string) Level {
+	switch level {
+	case "debug":
+		return LevelDebug
+	case "info":
+		return LevelInfo
+	case "warn":
+		return LevelWarn
+	case "error":
+		return LevelError
+	default:
+		return LevelInfo
+	}
+}
+
+// SlogLevel converts Level to slog.Level.
+func (l Level) SlogLevel() slog.Level {
+	switch l {
+	case LevelDebug:
+		return slog.LevelDebug
+	case LevelInfo:
+		return slog.LevelInfo
+	case LevelWarn:
+		return slog.LevelWarn
+	case LevelError:
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
+
+// ParseFormat converts string format to Format type.
+func ParseFormat(format string) Format {
 	switch format {
 	case "json":
 		return FormatJSON
@@ -50,28 +116,12 @@ func parseFormat(format string) Format {
 	}
 }
 
-// parseLevel converts string level to slog.Level.
-func parseLevel(level string) slog.Level {
-	switch level {
-	case "debug":
-		return slog.LevelDebug
-	case "info":
-		return slog.LevelInfo
-	case "warn":
-		return slog.LevelWarn
-	case "error":
-		return slog.LevelError
-	default:
-		return slog.LevelInfo
-	}
+// String returns the string representation of Format.
+func (f Format) String() string {
+	return string(f)
 }
 
-// ValidFormat returns true if the format is valid.
-func ValidFormat(format string) bool {
-	switch format {
-	case "text", "json":
-		return true
-	default:
-		return false
-	}
+// String returns the string representation of Level.
+func (l Level) String() string {
+	return string(l)
 }
