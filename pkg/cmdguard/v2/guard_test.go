@@ -563,3 +563,56 @@ func TestGuardedCommand_Integration(t *testing.T) {
 		require.NoError(t, g.Shutdown(context.Background()))
 	})
 }
+
+func TestCloneFlags(t *testing.T) {
+	type TestFlags struct {
+		Name  string
+		Count int
+	}
+
+	t.Run("clones struct", func(t *testing.T) {
+		original := TestFlags{Name: "test", Count: 42}
+		cloned := cloneFlags(original)
+
+		require.NotNil(t, cloned)
+		clonedFlags, ok := cloned.(TestFlags)
+		require.True(t, ok)
+		assert.Equal(t, original.Name, clonedFlags.Name)
+		assert.Equal(t, original.Count, clonedFlags.Count)
+
+		// Verify it's a copy (modifying clone doesn't affect original)
+		clonedFlags.Name = "modified"
+		assert.Equal(t, "test", original.Name)
+	})
+
+	t.Run("clones pointer to struct", func(t *testing.T) {
+		original := &TestFlags{Name: "test", Count: 42}
+		cloned := cloneFlags(original)
+
+		require.NotNil(t, cloned)
+		clonedFlags, ok := cloned.(*TestFlags)
+		require.True(t, ok)
+		assert.Equal(t, original.Name, clonedFlags.Name)
+		assert.Equal(t, original.Count, clonedFlags.Count)
+
+		// Verify it's a different pointer
+		assert.NotSame(t, original, clonedFlags)
+	})
+
+	t.Run("returns nil for nil", func(t *testing.T) {
+		cloned := cloneFlags(nil)
+		assert.Nil(t, cloned)
+	})
+
+	t.Run("returns nil for nil pointer", func(t *testing.T) {
+		var original *TestFlags
+		cloned := cloneFlags(original)
+		assert.Nil(t, cloned)
+	})
+
+	t.Run("returns as-is for non-struct", func(t *testing.T) {
+		original := "string value"
+		cloned := cloneFlags(original)
+		assert.Equal(t, original, cloned)
+	})
+}

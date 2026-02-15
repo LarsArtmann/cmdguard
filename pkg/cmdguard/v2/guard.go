@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
@@ -226,15 +227,37 @@ func (g *GuardedCommand[T]) toCobraCommand(cmd Command[T]) (*cobra.Command, erro
 	return cobraCmd, nil
 }
 
-// cloneFlags creates a copy of a flags struct.
+// cloneFlags creates a copy of a flags struct using reflection.
+// This ensures each command execution gets its own flag instance.
 // Returns nil if cloning fails.
 func cloneFlags(flags any) any {
 	if flags == nil {
 		return nil
 	}
 
-	// For now, just return the original flags
-	// Proper cloning would require reflection to create a new instance
+	// Use reflection to create a new instance
+	v := reflect.ValueOf(flags)
+
+	// Handle pointer to struct
+	if v.Kind() == reflect.Pointer {
+		if v.IsNil() {
+			return nil
+		}
+		// Create new pointer to same type
+		newPtr := reflect.New(v.Elem().Type())
+		// Copy the value
+		newPtr.Elem().Set(v.Elem())
+		return newPtr.Interface()
+	}
+
+	// Handle struct directly
+	if v.Kind() == reflect.Struct {
+		newStruct := reflect.New(v.Type()).Elem()
+		newStruct.Set(v)
+		return newStruct.Interface()
+	}
+
+	// For other types, return as-is (can't clone safely)
 	return flags
 }
 
