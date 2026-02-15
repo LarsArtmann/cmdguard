@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -15,10 +16,8 @@ type Enum struct {
 // ParseEnum creates a new Enum from a string value.
 // Returns an error if the value is not in the allowed list.
 func ParseEnum(value string, allowed []string) (Enum, error) {
-	for _, a := range allowed {
-		if value == a {
-			return Enum{value: value, allowed: allowed}, nil
-		}
+	if slices.Contains(allowed, value) {
+		return Enum{value: value, allowed: allowed}, nil
 	}
 	return Enum{}, NewEnumError(value, allowed)
 }
@@ -166,11 +165,9 @@ func (e Enum) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler for Enum.
 func (e *Enum) UnmarshalText(text []byte) error {
 	value := string(text)
-	for _, a := range e.allowed {
-		if value == a {
-			e.value = value
-			return nil
-		}
+	if slices.Contains(e.allowed, value) {
+		e.value = value
+		return nil
 	}
 	if len(e.allowed) == 0 {
 		// If no allowed values set yet, just accept any value

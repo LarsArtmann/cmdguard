@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -240,14 +241,7 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 		}
 
 		value := flag.Value.String()
-		valid := false
-		for _, allowed := range tag.Values {
-			if value == allowed {
-				valid = true
-				break
-			}
-		}
-		if !valid {
+		if !slices.Contains(tag.Values, value) {
 			return NewFlagError(tag.Name, NewEnumError(value, tag.Values))
 		}
 	}

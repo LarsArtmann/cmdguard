@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -248,14 +249,7 @@ func ValidateConfig(cfg any) error {
 				}
 			}
 
-			valid := false
-			for _, allowed := range tag.Values {
-				if value == allowed {
-					valid = true
-					break
-				}
-			}
-			if !valid {
+			if !slices.Contains(tag.Values, value) {
 				errs = append(errs, NewConfigError(tag.Field, NewEnumError(value, tag.Values)))
 			}
 		}
