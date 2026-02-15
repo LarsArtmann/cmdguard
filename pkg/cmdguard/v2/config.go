@@ -37,7 +37,7 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 	}
 
 	v := reflect.ValueOf(cfg)
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
@@ -140,7 +140,7 @@ func (t FlagTag) DefaultValue() any {
 // SetField sets a field value on a config struct using reflection.
 func SetField(cfg any, fieldName string, value any) error {
 	v := reflect.ValueOf(cfg)
-	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
+	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("config must be a pointer to struct")
 	}
 
@@ -211,7 +211,7 @@ func ValidateConfig(cfg any) error {
 	}
 
 	v := reflect.ValueOf(cfg)
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
