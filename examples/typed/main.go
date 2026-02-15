@@ -49,7 +49,7 @@ func main() {
 	fmt.Println()
 
 	// Create the CLI with typed config
-	cli, err := v2.New[AppConfig]("myapp", "A typed CLI application", AppConfig{})
+	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
 		os.Exit(1)
@@ -104,54 +104,52 @@ func registerServices(scope *v2.Scope, cfg AppConfig) {
 	}
 }
 
-func addCommands(cli *v2.GuardedCommand[AppConfig]) error {
+func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 	// Greet command with typed flags
-	greetCmd := v2.Command[AppConfig]{
+	greetCmd := v2.Command[AppConfig, *GreetFlags]{
 		Use:     "greet [message]",
 		Short:   "Greet someone",
 		Long:    "Greet someone with a customizable message.",
 		Example: "myapp greet --name Alice --shout --count 3",
 		Flags:   &GreetFlags{},
-		PreRunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+		PreRunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			if cfg.Verbose {
 				fmt.Println("Preparing to greet...")
 			}
-			greetFlags := flags.(*GreetFlags)
-			if greetFlags.Count < 1 {
+			if flags.Count < 1 {
 				return fmt.Errorf("count must be at least 1")
 			}
 			return nil
 		},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
-			greetFlags := flags.(*GreetFlags)
+		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			logger := do.MustInvoke[*Logger](cli.Scope())
 
-			for i := 0; i < greetFlags.Count; i++ {
-				msg := fmt.Sprintf("%s, %s%s", greetFlags.Prefix, greetFlags.Name, greetFlags.Suffix)
-				if greetFlags.Shout {
+			for i := 0; i < flags.Count; i++ {
+				msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
+				if flags.Shout {
 					msg = stringsToUpper(msg)
 				}
 				fmt.Println(msg)
-				logger.Log(fmt.Sprintf("Greeted %s (iteration %d)", greetFlags.Name, i+1))
+				logger.Log(fmt.Sprintf("Greeted %s (iteration %d)", flags.Name, i+1))
 			}
 			return nil
 		},
-		PostRunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+		PostRunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			if cfg.Verbose {
 				fmt.Println("Greeting complete!")
 			}
 			return nil
 		},
 	}
-	if err := cli.AddCommand(greetCmd); err != nil {
+	if err := v2.AddAnyCommand(cli, greetCmd); err != nil {
 		return fmt.Errorf("failed to add greet command: %w", err)
 	}
 
 	// Version command
-	versionCmd := v2.Command[AppConfig]{
+	versionCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:   "version",
 		Short: "Print version information",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("myapp version 1.0.0")
 			fmt.Println("Built with cmdguard v2")
 			return nil
@@ -162,10 +160,10 @@ func addCommands(cli *v2.GuardedCommand[AppConfig]) error {
 	}
 
 	// Config command that uses the app config
-	configCmd := v2.Command[AppConfig]{
+	configCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:   "config",
 		Short: "Show current configuration",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("Current configuration:")
 			fmt.Printf("  Verbose: %v\n", cfg.Verbose)
 			fmt.Printf("  Output:  %s\n", cfg.Output)
@@ -178,14 +176,14 @@ func addCommands(cli *v2.GuardedCommand[AppConfig]) error {
 	}
 
 	// Parent command with subcommands
-	dbCmd := v2.Command[AppConfig]{
+	dbCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:   "db",
 		Short: "Database operations",
-		Commands: []v2.Command[AppConfig]{
+		Commands: []v2.Command[AppConfig, v2.NoFlags]{
 			{
 				Use:   "status",
 				Short: "Check database connection",
-				RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 					db := do.MustInvoke[Database](cli.Scope())
 					fmt.Printf("Database: %s\n", db)
 					fmt.Println("Status: Connected (simulated)")
@@ -195,7 +193,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig]) error {
 			{
 				Use:   "migrate",
 				Short: "Run database migrations",
-				RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 					fmt.Println("Running migrations...")
 					fmt.Println("Migration complete!")
 					return nil
@@ -208,11 +206,11 @@ func addCommands(cli *v2.GuardedCommand[AppConfig]) error {
 	}
 
 	// Hidden command (won't show in help)
-	hiddenCmd := v2.Command[AppConfig]{
+	hiddenCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:    "secret",
 		Short:  "Secret command",
 		Hidden: true,
-		RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("You found the secret command!")
 			return nil
 		},
@@ -222,11 +220,11 @@ func addCommands(cli *v2.GuardedCommand[AppConfig]) error {
 	}
 
 	// Deprecated command
-	deprecatedCmd := v2.Command[AppConfig]{
+	deprecatedCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:        "oldcmd",
 		Short:      "Old command (deprecated)",
 		Deprecated: "Use 'greet' instead",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags any) error {
+		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("This command is deprecated. Use 'greet' instead.")
 			return nil
 		},

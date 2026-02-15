@@ -17,7 +17,7 @@ type TestAppConfig struct {
 func TestNew(t *testing.T) {
 	t.Run("creates GuardedCommand", func(t *testing.T) {
 		defaults := TestAppConfig{}
-		g, err := New[TestAppConfig]("myapp", "My CLI application", defaults)
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI application", defaults)
 		require.NoError(t, err)
 		require.NotNil(t, g)
 
@@ -28,7 +28,7 @@ func TestNew(t *testing.T) {
 
 	t.Run("error: empty name", func(t *testing.T) {
 		defaults := TestAppConfig{}
-		g, err := New[TestAppConfig]("", "My CLI", defaults)
+		g, err := New[TestAppConfig, NoFlags]("", "My CLI", defaults)
 		require.Error(t, err)
 		assert.ErrorIs(t, err, ErrInvalidCommand)
 		assert.Nil(t, g)
@@ -36,7 +36,7 @@ func TestNew(t *testing.T) {
 
 	t.Run("registers config in scope", func(t *testing.T) {
 		defaults := TestAppConfig{Verbose: true}
-		g, err := New[TestAppConfig]("myapp", "My CLI", defaults)
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", defaults)
 		require.NoError(t, err)
 
 		cfg := g.Config()
@@ -46,7 +46,7 @@ func TestNew(t *testing.T) {
 
 	t.Run("creates scope", func(t *testing.T) {
 		defaults := TestAppConfig{}
-		g, err := New[TestAppConfig]("myapp", "My CLI", defaults)
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", defaults)
 		require.NoError(t, err)
 
 		scope := g.ScopeStruct()
@@ -58,7 +58,7 @@ func TestNew(t *testing.T) {
 func TestNewWithLong(t *testing.T) {
 	t.Run("creates GuardedCommand with long description", func(t *testing.T) {
 		defaults := TestAppConfig{}
-		g, err := NewWithLong[TestAppConfig]("myapp", "short", "long description", defaults)
+		g, err := NewWithLong[TestAppConfig, NoFlags]("myapp", "short", "long description", defaults)
 		require.NoError(t, err)
 		require.NotNil(t, g)
 
@@ -69,7 +69,7 @@ func TestNewWithLong(t *testing.T) {
 
 	t.Run("error: empty name", func(t *testing.T) {
 		defaults := TestAppConfig{}
-		g, err := NewWithLong[TestAppConfig]("", "short", "long", defaults)
+		g, err := NewWithLong[TestAppConfig, NoFlags]("", "short", "long", defaults)
 		require.Error(t, err)
 		assert.Nil(t, g)
 	})
@@ -77,12 +77,12 @@ func TestNewWithLong(t *testing.T) {
 
 func TestGuardedCommand_AddCommand(t *testing.T) {
 	t.Run("adds valid command", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
@@ -95,10 +95,10 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	})
 
 	t.Run("error: invalid command", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "greet",
 			// No RunE
 		}
@@ -109,19 +109,19 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	})
 
 	t.Run("adds command with subcommands", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		subCmd := Command[TestAppConfig]{
+		subCmd := Command[TestAppConfig, NoFlags]{
 			Use: "list",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use:      "greet",
-			Commands: []Command[TestAppConfig]{subCmd},
+			Commands: []Command[TestAppConfig, NoFlags]{subCmd},
 		}
 
 		err = g.AddCommand(cmd)
@@ -136,13 +136,13 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 func TestGuardedCommand_AddCommandFunc(t *testing.T) {
 	t.Run("adds command via function", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		err = g.AddCommandFunc(func() Command[TestAppConfig] {
-			return Command[TestAppConfig]{
+		err = g.AddCommandFunc(func() Command[TestAppConfig, NoFlags] {
+			return Command[TestAppConfig, NoFlags]{
 				Use: "greet",
-				RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+				RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 					return nil
 				},
 			}
@@ -156,7 +156,7 @@ func TestGuardedCommand_AddCommandFunc(t *testing.T) {
 
 func TestGuardedCommand_Execute(t *testing.T) {
 	t.Run("executes help command", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"--help"})
@@ -165,12 +165,12 @@ func TestGuardedCommand_Execute(t *testing.T) {
 
 	t.Run("executes subcommand", func(t *testing.T) {
 		executed := false
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				executed = true
 				return nil
 			},
@@ -183,13 +183,13 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 
 	t.Run("error: unknown subcommand", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		// Add a valid subcommand first
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "valid",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
@@ -202,20 +202,20 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 
 	t.Run("executes with flags", func(t *testing.T) {
-		var receivedFlags any
+		var receivedName string
 
 		type GreetFlags struct {
 			Name string `flag:"name" default:"World"`
 		}
 
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, *GreetFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, *GreetFlags]{
 			Use:   "greet",
 			Flags: &GreetFlags{},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
-				receivedFlags = flags
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
+				receivedName = flags.Name
 				return nil
 			},
 		}
@@ -223,16 +223,13 @@ func TestGuardedCommand_Execute(t *testing.T) {
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"greet", "--name", "Alice"})
 		require.NoError(t, err)
-		require.NotNil(t, receivedFlags)
-
-		greetFlags := receivedFlags.(*GreetFlags)
-		assert.Equal(t, "Alice", greetFlags.Name)
+		assert.Equal(t, "Alice", receivedName)
 	})
 }
 
 func TestGuardedCommand_Scope(t *testing.T) {
 	t.Run("returns injector", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		injector := g.Scope()
@@ -240,7 +237,7 @@ func TestGuardedCommand_Scope(t *testing.T) {
 	})
 
 	t.Run("returns scope struct", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		scope := g.ScopeStruct()
@@ -252,7 +249,7 @@ func TestGuardedCommand_Scope(t *testing.T) {
 func TestGuardedCommand_Config(t *testing.T) {
 	t.Run("returns config", func(t *testing.T) {
 		defaults := TestAppConfig{Verbose: true, Output: "/tmp/out"}
-		g, err := New[TestAppConfig]("myapp", "My CLI", defaults)
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", defaults)
 		require.NoError(t, err)
 
 		cfg := g.Config()
@@ -262,7 +259,7 @@ func TestGuardedCommand_Config(t *testing.T) {
 	})
 
 	t.Run("SetConfig updates config", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		newCfg := TestAppConfig{Verbose: true, Output: "/new/path"}
@@ -276,7 +273,7 @@ func TestGuardedCommand_Config(t *testing.T) {
 
 func TestGuardedCommand_RootCommand(t *testing.T) {
 	t.Run("returns cobra command", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		rootCmd := g.RootCommand()
@@ -288,7 +285,7 @@ func TestGuardedCommand_RootCommand(t *testing.T) {
 
 func TestGuardedCommand_Shutdown(t *testing.T) {
 	t.Run("shutdown succeeds", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		err = g.Shutdown(context.Background())
@@ -298,7 +295,7 @@ func TestGuardedCommand_Shutdown(t *testing.T) {
 
 func TestGuardedCommand_HealthCheck(t *testing.T) {
 	t.Run("health check succeeds", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		err = g.HealthCheck()
@@ -308,25 +305,25 @@ func TestGuardedCommand_HealthCheck(t *testing.T) {
 
 func TestGuardedCommand_Metadata(t *testing.T) {
 	t.Run("Name returns name", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 		assert.Equal(t, "myapp", g.Name())
 	})
 
 	t.Run("Short returns short description", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 		assert.Equal(t, "My CLI", g.Short())
 	})
 
 	t.Run("Long returns long description", func(t *testing.T) {
-		g, err := NewWithLong[TestAppConfig]("myapp", "short", "long desc", TestAppConfig{})
+		g, err := NewWithLong[TestAppConfig, NoFlags]("myapp", "short", "long desc", TestAppConfig{})
 		require.NoError(t, err)
 		assert.Equal(t, "long desc", g.Long())
 	})
 
 	t.Run("SetLong updates long description", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		g.SetLong("new long description")
@@ -335,7 +332,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 	})
 
 	t.Run("SetVersion sets version", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		g.SetVersion("v1.0.0")
@@ -345,7 +342,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 
 func TestGuardedCommand_AddGlobalFlag(t *testing.T) {
 	t.Run("adds global string flag", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		g.AddGlobalFlag("config", "c", "/etc/config.yaml", "Config file path")
@@ -357,7 +354,7 @@ func TestGuardedCommand_AddGlobalFlag(t *testing.T) {
 	})
 
 	t.Run("adds global bool flag", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
 		g.AddGlobalBoolFlag("debug", "d", true, "Enable debug mode")
@@ -373,16 +370,16 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 	t.Run("calls PreRunE before RunE", func(t *testing.T) {
 		var order []string
 
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "test",
-			PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				order = append(order, "pre")
 				return nil
 			},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				order = append(order, "run")
 				return nil
 			},
@@ -397,16 +394,16 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 	t.Run("calls PostRunE after RunE", func(t *testing.T) {
 		var order []string
 
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				order = append(order, "run")
 				return nil
 			},
-			PostRunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			PostRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				order = append(order, "post")
 				return nil
 			},
@@ -421,15 +418,15 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 	t.Run("PreRunE error stops execution", func(t *testing.T) {
 		called := false
 
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use: "test",
-			PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return errors.New("pre-run error")
 			},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				called = true
 				return nil
 			},
@@ -444,13 +441,13 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 
 func TestGuardedCommand_CommandOptions(t *testing.T) {
 	t.Run("hidden command", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use:    "secret",
 			Hidden: true,
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
@@ -461,13 +458,13 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 	})
 
 	t.Run("deprecated command", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use:        "old",
 			Deprecated: "use new-cmd instead",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
@@ -478,13 +475,13 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 	})
 
 	t.Run("command with aliases", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use:      "list",
 			Aliases:  []string{"ls", "l"},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
@@ -495,13 +492,13 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 	})
 
 	t.Run("command with version", func(t *testing.T) {
-		g, err := New[TestAppConfig]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig]{
+		cmd := Command[TestAppConfig, NoFlags]{
 			Use:     "versioned",
 			Version: "v1.2.3",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
@@ -519,41 +516,26 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			Shout bool   `flag:"shout" short:"s" default:"false" help:"Shout the greeting"`
 		}
 
-		type FarewellFlags struct {
-			Polite bool `flag:"polite" default:"true" help:"Be polite"`
-		}
-
 		var greetResult struct {
 			name  string
 			shout bool
 		}
 
-		g, err := New[TestAppConfig]("greet-cli", "A greeting CLI", TestAppConfig{})
+		g, err := New[TestAppConfig, *GreetFlags]("greet-cli", "A greeting CLI", TestAppConfig{})
 		require.NoError(t, err)
 
-		greetCmd := Command[TestAppConfig]{
+		greetCmd := Command[TestAppConfig, *GreetFlags]{
 			Use:   "greet [name]",
 			Short: "Greet someone",
 			Long:  "Send a greeting to the specified person.",
 			Flags: &GreetFlags{},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
-				f := flags.(*GreetFlags)
-				greetResult.name = f.Name
-				greetResult.shout = f.Shout
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
+				greetResult.name = flags.Name
+				greetResult.shout = flags.Shout
 				return nil
 			},
 		}
 		require.NoError(t, g.AddCommand(greetCmd))
-
-		farewellCmd := Command[TestAppConfig]{
-			Use:   "farewell",
-			Short: "Say farewell",
-			Flags: &FarewellFlags{},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags any) error {
-				return nil
-			},
-		}
-		require.NoError(t, g.AddCommand(farewellCmd))
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"greet", "--name", "Alice", "--shout"})
 		require.NoError(t, err)
@@ -575,13 +557,12 @@ func TestCloneFlags(t *testing.T) {
 		cloned := cloneFlags(original)
 
 		require.NotNil(t, cloned)
-		clonedFlags, ok := cloned.(TestFlags)
-		require.True(t, ok)
-		assert.Equal(t, original.Name, clonedFlags.Name)
-		assert.Equal(t, original.Count, clonedFlags.Count)
+		// cloned is already TestFlags, no type assertion needed
+		assert.Equal(t, original.Name, cloned.Name)
+		assert.Equal(t, original.Count, cloned.Count)
 
 		// Verify it's a copy (modifying clone doesn't affect original)
-		clonedFlags.Name = "modified"
+		cloned.Name = "modified"
 		assert.Equal(t, "test", original.Name)
 	})
 
@@ -590,23 +571,17 @@ func TestCloneFlags(t *testing.T) {
 		cloned := cloneFlags(original)
 
 		require.NotNil(t, cloned)
-		clonedFlags, ok := cloned.(*TestFlags)
-		require.True(t, ok)
-		assert.Equal(t, original.Name, clonedFlags.Name)
-		assert.Equal(t, original.Count, clonedFlags.Count)
+		// cloned is already *TestFlags, no type assertion needed
+		assert.Equal(t, original.Name, cloned.Name)
+		assert.Equal(t, original.Count, cloned.Count)
 
 		// Verify it's a different pointer
-		assert.NotSame(t, original, clonedFlags)
-	})
-
-	t.Run("returns nil for nil", func(t *testing.T) {
-		cloned := cloneFlags(nil)
-		assert.Nil(t, cloned)
+		assert.NotSame(t, original, cloned)
 	})
 
 	t.Run("returns nil for nil pointer", func(t *testing.T) {
-		var original *TestFlags
-		cloned := cloneFlags(original)
+		var original *TestFlags // nil
+		cloned := cloneFlags[*TestFlags](original)
 		assert.Nil(t, cloned)
 	})
 

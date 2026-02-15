@@ -5,9 +5,14 @@ import (
 	"fmt"
 )
 
+// NoFlags is a convenience type for commands without command-specific flags.
+// Use it as the F type parameter: Command[MyConfig, NoFlags]
+type NoFlags = struct{}
+
 // Command represents a type-safe CLI command with typed flags and config.
 // The type parameter T is the application-level config type.
-type Command[T any] struct {
+// The type parameter F is the command-specific flags type (use NoFlags if none).
+type Command[T any, F any] struct {
 	// Use is the command name and usage (e.g., "greet [name]")
 	Use string
 
@@ -30,25 +35,25 @@ type Command[T any] struct {
 	//       Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
 	//       Shout bool   `flag:"shout" default:"false" help:"Shout the greeting"`
 	//   }
-	Flags any
+	Flags F
 
 	// RunE is the command handler. It receives:
 	// - ctx: context for cancellation and deadlines
 	// - cfg: typed application-level config
 	// - flags: typed command-specific flags (same type as Flags field)
 	// Returns an error if the command fails.
-	RunE func(ctx context.Context, cfg *T, flags any) error
+	RunE func(ctx context.Context, cfg *T, flags F) error
 
 	// PreRunE is called before RunE for validation.
 	// Use this to validate flag combinations or prerequisites.
-	PreRunE func(ctx context.Context, cfg *T, flags any) error
+	PreRunE func(ctx context.Context, cfg *T, flags F) error
 
 	// PostRunE is called after RunE for cleanup.
 	// Called even if RunE returns an error.
-	PostRunE func(ctx context.Context, cfg *T, flags any) error
+	PostRunE func(ctx context.Context, cfg *T, flags F) error
 
 	// Commands are subcommands of this command.
-	Commands []Command[T]
+	Commands []Command[T, F]
 
 	// Hidden hides the command from help output
 	Hidden bool
@@ -68,7 +73,7 @@ type Command[T any] struct {
 
 // Validate checks that the command is properly configured.
 // Returns an error if the command is invalid.
-func (c Command[T]) Validate() error {
+func (c Command[T, F]) Validate() error {
 	if c.Use == "" {
 		return fmt.Errorf("%w: command has no Use field", ErrInvalidCommand)
 	}
@@ -89,114 +94,114 @@ func (c Command[T]) Validate() error {
 }
 
 // HasSubcommands returns true if this command has subcommands.
-func (c Command[T]) HasSubcommands() bool {
+func (c Command[T, F]) HasSubcommands() bool {
 	return len(c.Commands) > 0
 }
 
 // HasHandler returns true if this command has a RunE handler.
-func (c Command[T]) HasHandler() bool {
+func (c Command[T, F]) HasHandler() bool {
 	return c.RunE != nil
 }
 
 // IsExecutable returns true if this command can be executed directly.
 // A command is executable if it has a RunE handler.
-func (c Command[T]) IsExecutable() bool {
+func (c Command[T, F]) IsExecutable() bool {
 	return c.RunE != nil
 }
 
 // CommandOption is a functional option for configuring a Command.
-type CommandOption[T any] func(*Command[T])
+type CommandOption[T any, F any] func(*Command[T, F])
 
 // WithShort sets the short description.
-func WithShort[T any](short string) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithShort[T any, F any](short string) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Short = short
 	}
 }
 
 // WithLong sets the long description.
-func WithLong[T any](long string) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithLong[T any, F any](long string) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Long = long
 	}
 }
 
 // WithAliases sets the command aliases.
-func WithAliases[T any](aliases ...string) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithAliases[T any, F any](aliases ...string) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Aliases = aliases
 	}
 }
 
 // WithExample sets the example usage.
-func WithExample[T any](example string) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithExample[T any, F any](example string) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Example = example
 	}
 }
 
 // WithFlags sets the command-specific flags struct.
-func WithFlags[T any](flags any) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithFlags[T any, F any](flags F) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Flags = flags
 	}
 }
 
 // WithRunE sets the command handler.
-func WithRunE[T any](runE func(ctx context.Context, cfg *T, flags any) error) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithRunE[T any, F any](runE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.RunE = runE
 	}
 }
 
 // WithPreRunE sets the pre-run validation hook.
-func WithPreRunE[T any](preRunE func(ctx context.Context, cfg *T, flags any) error) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithPreRunE[T any, F any](preRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.PreRunE = preRunE
 	}
 }
 
 // WithPostRunE sets the post-run cleanup hook.
-func WithPostRunE[T any](postRunE func(ctx context.Context, cfg *T, flags any) error) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithPostRunE[T any, F any](postRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.PostRunE = postRunE
 	}
 }
 
 // WithSubcommands sets the subcommands.
-func WithSubcommands[T any](cmds ...Command[T]) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithSubcommands[T any, F any](cmds ...Command[T, F]) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Commands = cmds
 	}
 }
 
 // WithHidden sets whether the command is hidden.
-func WithHidden[T any](hidden bool) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithHidden[T any, F any](hidden bool) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Hidden = hidden
 	}
 }
 
 // WithDeprecated marks the command as deprecated.
-func WithDeprecated[T any](msg string) CommandOption[T] {
-	return func(c *Command[T]) {
+func WithDeprecated[T any, F any](msg string) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
 		c.Deprecated = msg
 	}
 }
 
 // NewCommand creates a new command with functional options.
-func NewCommand[T any](use string, opts ...CommandOption[T]) (Command[T], error) {
+func NewCommand[T any, F any](use string, opts ...CommandOption[T, F]) (Command[T, F], error) {
 	if use == "" {
-		return Command[T]{}, fmt.Errorf("%w: use is required", ErrMissingName)
+		return Command[T, F]{}, fmt.Errorf("%w: use is required", ErrMissingName)
 	}
 
-	cmd := Command[T]{Use: use}
+	cmd := Command[T, F]{Use: use}
 	for _, opt := range opts {
 		opt(&cmd)
 	}
 
 	if err := cmd.Validate(); err != nil {
-		return Command[T]{}, err
+		return Command[T, F]{}, err
 	}
 
 	return cmd, nil
@@ -204,8 +209,8 @@ func NewCommand[T any](use string, opts ...CommandOption[T]) (Command[T], error)
 
 // MustNewCommand creates a new command and panics on error.
 // Use only in static initialization where failure is fatal.
-func MustNewCommand[T any](use string, opts ...CommandOption[T]) Command[T] {
-	cmd, err := NewCommand[T](use, opts...)
+func MustNewCommand[T any, F any](use string, opts ...CommandOption[T, F]) Command[T, F] {
+	cmd, err := NewCommand[T, F](use, opts...)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create command %q: %v", use, err))
 	}
