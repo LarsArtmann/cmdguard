@@ -10,10 +10,10 @@ import (
 
 // Config holds the application configuration.
 type Config struct {
-	StrictMode bool   `koanf:"strict_mode"`
-	ConfigFile string `koanf:"config_file"`
-	LogLevel   string `koanf:"log_level"`
-	LogFormat  string `koanf:"log_format"`
+	StrictMode bool
+	ConfigFile string
+	LogLevel   string
+	LogFormat  string
 }
 
 // Load loads configuration from environment variables.
