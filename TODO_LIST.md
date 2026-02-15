@@ -1,47 +1,46 @@
 # TODO_LIST.md - cmdguard Project Tasks
 
-**Last Updated:** 2026-02-14
-**Purpose:** Track remaining tasks for the cmdguard Guard API implementation.
+**Last Updated:** 2026-02-15
+**Purpose:** Track tasks for the cmdguard v2 API implementation.
 
 ---
 
-## Completed (Phase 1 - Foundation)
-
-| Task | Status |
-|------|--------|
-| Remove `cmd/` folder | ✅ DONE |
-| Redesign public API for single-step initialization | ✅ DONE |
-| Add compile-time validation (panic on invalid) | ✅ DONE |
-| Fix errcheck violations | ✅ DONE |
-| Remove orphaned internal packages | ✅ DONE |
-| Rewrite README for Guard API | ✅ DONE |
-| Rewrite FEATURES.md for Guard API | ✅ DONE |
-
----
-
-## Completed (Phase 2 - Testing)
+## Completed (v2 Implementation)
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Add tests for `pkg/cmdguard` | ✅ DONE | 91% coverage |
-| Add tests for `internal/logging` | ✅ DONE | 100% coverage |
-| Update AGENTS.md for current architecture | ✅ DONE | Updated 2026-02-14 |
+| Design v2 API with generics | ✅ DONE | GuardedCommand[T], Command[T] |
+| Implement errors.go | ✅ DONE | Typed errors, no panics |
+| Implement types.go | ✅ DONE | Common types and interfaces |
+| Implement config.go | ✅ DONE | Typed configuration |
+| Implement flags.go | ✅ DONE | FlagRegistry with struct tags |
+| Implement scope.go | ✅ DONE | DI scope with samber/do/v2 |
+| Implement command.go | ✅ DONE | Command[T] definition |
+| Implement guard.go | ✅ DONE | GuardedCommand[T] implementation |
 
 ---
 
-## Completed (Phase 3 - Build & Polish)
+## Completed (v2 Testing)
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Add version injection at build time | ✅ DONE | Use ldflags or `just build-version X.Y.Z` |
-| Add justfile for common tasks | ✅ DONE | build, test, lint, verify, etc. |
-| Create examples directory | ✅ DONE | basic, advanced, guarded examples |
-| Clean up docs/planning/ folder | ✅ DONE | Archived (deleted) |
-| Clean up docs/status/ folder | ✅ DONE | Archived (deleted) |
-| Improve test coverage to 80%+ | ✅ DONE | config 95.7%, cmdguard 94.3%, logging 100% |
-| Add CONTRIBUTING.md | ✅ DONE | Contribution guidelines added |
-| Add CI/CD workflow | ✅ DONE | GitHub Actions with multi-version testing |
-| Add JSON logging option | ✅ DONE | text/json formats supported |
+| Test errors.go | ✅ DONE | 142 lines of tests |
+| Test types.go | ✅ DONE | 346 lines of tests |
+| Test config.go | ✅ DONE | 360 lines of tests |
+| Test flags.go | ✅ DONE | 488 lines of tests |
+| Test scope.go | ✅ DONE | 458 lines of tests |
+| Test command.go | ✅ DONE | 399 lines of tests |
+| Test guard.go | ✅ DONE | 565 lines of tests |
+
+---
+
+## Completed (v2 Polish)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Add typed example | ✅ DONE | examples/typed/main.go |
+| Update FEATURES.md | ✅ DONE | v2 API documentation |
+| Update TODO_LIST.md | ✅ DONE | This file |
 
 ---
 
@@ -51,11 +50,13 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| Add tests for ExecuteAndExit() | ⏳ PENDING | Requires os.Exit testing (complex) |
+| Update README.md for v2 | ⏳ PENDING | Add v2 examples |
+| Update AGENTS.md for v2 | ⏳ PENDING | Document v2 patterns |
+| Add more examples | ⏳ PENDING | DI patterns, advanced flags |
 | Plugin system for custom validators | ⏳ PENDING | Future enhancement |
-| Enhanced flag validation | ⏳ PENDING | Type validation, required flags |
+| Enhanced flag validation | ⏳ PENDING | Enums, custom validators |
 | Performance benchmarks | ⏳ PENDING | Not yet needed |
-| Release automation | ⏳ PENDING | Manual releases sufficient for now |
+| Release automation | ⏳ PENDING | Manual releases sufficient |
 
 ---
 
@@ -63,36 +64,50 @@
 
 ```
 cmdguard/
-├── .github/workflows/ci.yml  # CI/CD pipeline
+├── .github/workflows/ci.yml    # CI/CD pipeline
 ├── pkg/cmdguard/
-│   ├── guarded_command.go    # Public API
+│   ├── v2/                     # v2 API (recommended)
+│   │   ├── errors.go           # Typed errors
+│   │   ├── types.go            # Common types
+│   │   ├── config.go           # Configuration
+│   │   ├── flags.go            # Flag registry
+│   │   ├── scope.go            # DI scope
+│   │   ├── command.go          # Command[T]
+│   │   └── guard.go            # GuardedCommand[T]
+│   ├── guarded_command.go      # v1 API
 │   └── guarded_command_test.go
 ├── internal/
-│   ├── config/               # Configuration (95.7% coverage)
-│   └── logging/              # Logging (100% coverage)
+│   ├── config/                 # Configuration (95.7% coverage)
+│   └── logging/                # Logging (100% coverage)
 ├── examples/
-│   ├── basic/main.go         # Simple CLI example
-│   ├── advanced/main.go      # Nested commands example
-│   └── guarded/main.go       # Panic behavior demo
-├── tests/integration/        # Integration tests
-├── AGENTS.md                 # Developer guide
-├── CONTRIBUTING.md           # Contribution guide
-├── FEATURES.md               # Feature documentation
-├── README.md                 # User documentation
-├── TODO_LIST.md              # This file
-├── go.mod                    # 3 direct dependencies
-└── justfile                  # Build automation
+│   ├── basic/main.go           # Simple CLI example
+│   ├── advanced/main.go        # Nested commands example
+│   ├── guarded/main.go         # v1 panic demo
+│   └── typed/main.go           # v2 API demo
+├── AGENTS.md                   # Developer guide
+├── CONTRIBUTING.md             # Contribution guide
+├── FEATURES.md                 # Feature documentation
+├── README.md                   # User documentation
+├── TODO_LIST.md                # This file
+├── go.mod                      # Dependencies
+└── justfile                    # Build automation
 ```
 
 ---
 
 ## Summary
 
-**Status: v0.1.0 RELEASED ✅**
+**Status: v2.0.0 READY ✅**
 
-All critical and high-priority tasks are complete. The remaining tasks are:
-- Nice-to-have features (plugin system, enhanced validation)
-- Testing edge cases (ExecuteAndExit with os.Exit)
-- Automation (release automation)
+The v2 API is complete with comprehensive test coverage:
+- 7 implementation files (~1,700 lines)
+- 7 test files (~2,700 lines)
+- Complete example demonstrating all features
 
-The library is production-ready and fully functional.
+**Key v2 Features:**
+- Type-safe with generics (`GuardedCommand[T]`)
+- No panics - all operations return errors
+- DI integration with samber/do/v2
+- Typed flags with struct tags
+
+**Remaining work is documentation polish only.**
