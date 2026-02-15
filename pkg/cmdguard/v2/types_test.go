@@ -72,7 +72,7 @@ func TestMustEnum(t *testing.T) {
 		defer func() {
 			r := recover()
 			require.NotNil(t, r)
-			assert.Contains(t, fmt.Sprintf("%v", r), "invalid enum value")
+			assert.Contains(t, fmt.Sprintf("%v", r), "invalid value")
 		}()
 		MustEnum("invalid", []string{"valid"})
 	})
