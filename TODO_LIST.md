@@ -38,7 +38,7 @@
 | Create examples directory | ✅ DONE | basic, advanced, guarded examples |
 | Clean up docs/planning/ folder | ✅ DONE | Archived (deleted) |
 | Clean up docs/status/ folder | ✅ DONE | Archived (deleted) |
-| Improve test coverage to 80%+ | ✅ DONE | config 82.6%, cmdguard 91%, logging 100% |
+| Improve test coverage to 80%+ | ✅ DONE | config 95.7%, cmdguard 94.3%, logging 100% |
 | Add CONTRIBUTING.md | ✅ DONE | Contribution guidelines added |
 | Add CI/CD workflow | ✅ DONE | GitHub Actions with multi-version testing |
 | Add JSON logging option | ✅ DONE | text/json formats supported |

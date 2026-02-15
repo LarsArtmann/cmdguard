@@ -130,12 +130,14 @@ The Guard API provides single-step initialization with panic-at-construction-tim
 
 | Package | Coverage | Status |
 |---------|----------|--------|
-| `internal/config` | 94.1% | ✅ Good |
-| `pkg/cmdguard` | 66.7% | ⚠️ Partial |
+| `internal/config` | 95.7% | ✅ Good |
+| `pkg/cmdguard` | 94.3% | ✅ Good |
 | `internal/logging` | 100% | ✅ Good |
 
-**Remaining Work:**
-- Add ExecuteAndExit tests for GuardedCommand
+**Test Quality:**
+- BDD tests with persona-based scenarios (developer, operator, security-conscious user)
+- Fuzz tests for validation and environment variable parsing
+- Edge case coverage for malformed inputs
 
 ---
 
@@ -183,12 +185,12 @@ cmdguard.New("app", "desc")
 - [x] Add tests for `internal/config` - 95.7% coverage
 - [x] Update AGENTS.md for current architecture
 
-### Phase 3: Polish (Short Term)
-- [ ] Add version injection at build time
-- [ ] Add examples directory
-- [ ] Add justfile for common tasks
-- [ ] CI/CD pipeline
-- [ ] Clean up docs folders
+### Phase 3: Polish ✅ COMPLETE
+- [x] Add version injection at build time
+- [x] Add examples directory (basic, advanced, guarded)
+- [x] Add justfile for common tasks
+- [x] CI/CD pipeline (GitHub Actions)
+- [x] Clean up docs folders
 
 ### Phase 4: Beyond (Long Term)
 - [ ] Plugin system for custom validators
@@ -214,9 +216,8 @@ cmdguard.New("app", "desc")
 - Documentation could be more comprehensive
 
 ### What's Missing 🔧
-- Integration tests
-- Example applications
-- Justfile for common tasks
+- Plugin system for custom validators (planned)
+- Enhanced flag validation (planned)
 
 ### Overall Status
 
