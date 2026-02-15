@@ -120,11 +120,19 @@ func (t FlagTag) DefaultValue() any {
 		// For slices, parse comma-separated values
 		return strings.Split(t.Default, ",")
 	default:
-		// Handle custom types (Enum, Duration, etc.)
-		if t.Type == reflect.TypeOf(Enum{}) || t.Type == reflect.TypeOf(LogLevel{}) || t.Type == reflect.TypeOf(LogFormat{}) {
+		// Handle custom types (Enum, Duration, LogLevel, LogFormat)
+		switch t.Type {
+		case reflect.TypeOf(Duration{}):
+			d, err := ParseDuration(t.Default)
+			if err != nil {
+				return Duration{}
+			}
+			return d
+		case reflect.TypeOf(Enum{}), reflect.TypeOf(LogLevel{}), reflect.TypeOf(LogFormat{}):
+			return t.Default
+		default:
 			return t.Default
 		}
-		return t.Default
 	}
 }
 
