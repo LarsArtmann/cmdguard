@@ -136,6 +136,14 @@ func (g *GuardedCommand[T, F]) AddCommand(cmd Command[T, F]) error {
 	return nil
 }
 
+// MustAddCommand adds a subcommand to the CLI and panics on error.
+// Use this for static command trees where errors indicate programmer mistakes.
+func (g *GuardedCommand[T, F]) MustAddCommand(cmd Command[T, F]) {
+	if err := g.AddCommand(cmd); err != nil {
+		panic(fmt.Sprintf("failed to add command %q: %v", cmd.Use, err))
+	}
+}
+
 // AddCommandFunc adds a command using a constructor function.
 // Useful for lazy initialization.
 func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {
@@ -159,6 +167,14 @@ func AddAnyCommand[T any, F any, F2 any](g *GuardedCommand[T, F], cmd Command[T,
 
 	g.rootCmd.AddCommand(cobraCmd)
 	return nil
+}
+
+// MustAddAnyCommand adds a command with different flags and panics on error.
+// Use this for static command trees where errors indicate programmer mistakes.
+func MustAddAnyCommand[T any, F any, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) {
+	if err := AddAnyCommand(g, cmd); err != nil {
+		panic(fmt.Sprintf("failed to add command %q: %v", cmd.Use, err))
+	}
 }
 
 // toCobraCommandAny converts a Command[T, F2] to a cobra.Command.

@@ -593,13 +593,18 @@ func TestCloneFlags(t *testing.T) {
 }
 
 func TestFlagTypeConstraint(t *testing.T) {
+	type testFlags struct {
+		Name  string
+		Count int
+	}
+
 	t.Run("accepts NoFlags (struct{})", func(t *testing.T) {
 		err := FlagTypeConstraint[NoFlags]()
 		assert.NoError(t, err)
 	})
 
 	t.Run("accepts pointer to struct", func(t *testing.T) {
-		err := FlagTypeConstraint[*TestFlags]()
+		err := FlagTypeConstraint[*testFlags]()
 		assert.NoError(t, err)
 	})
 
@@ -610,7 +615,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("accepts struct with fields", func(t *testing.T) {
-		err := FlagTypeConstraint[TestFlags]()
+		err := FlagTypeConstraint[testFlags]()
 		assert.NoError(t, err)
 	})
 
@@ -671,5 +676,98 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 		g, err := New[TestAppConfig, *CmdFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 		require.NotNil(t, g)
+	})
+}
+
+func TestGuardedCommand_MustAddCommand(t *testing.T) {
+	t.Run("adds valid command without panic", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		cmd := Command[TestAppConfig, NoFlags]{
+			Use: "greet",
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+				return nil
+			},
+		}
+
+		assert.NotPanics(t, func() {
+			g.MustAddCommand(cmd)
+		})
+
+		rootCmd := g.RootCommand()
+		require.Len(t, rootCmd.Commands(), 1)
+	})
+
+	t.Run("panics on invalid command", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		cmd := Command[TestAppConfig, NoFlags]{
+			Use: "greet",
+			// No RunE
+		}
+
+		assert.Panics(t, func() {
+			g.MustAddCommand(cmd)
+		})
+	})
+
+	t.Run("panic message contains command use", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		cmd := Command[TestAppConfig, NoFlags]{
+			Use: "my-command",
+			// No RunE
+		}
+
+		defer func() {
+			r := recover()
+			require.NotNil(t, r)
+			assert.Contains(t, r.(string), "my-command")
+		}()
+
+		g.MustAddCommand(cmd)
+	})
+}
+
+func TestMustAddAnyCommand(t *testing.T) {
+	type DifferentFlags struct {
+		Value string `flag:"value"`
+	}
+
+	t.Run("adds command with different flags without panic", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		cmd := Command[TestAppConfig, *DifferentFlags]{
+			Use:   "custom",
+			Flags: &DifferentFlags{},
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *DifferentFlags) error {
+				return nil
+			},
+		}
+
+		assert.NotPanics(t, func() {
+			MustAddAnyCommand(g, cmd)
+		})
+
+		rootCmd := g.RootCommand()
+		require.Len(t, rootCmd.Commands(), 1)
+	})
+
+	t.Run("panics on invalid command", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		cmd := Command[TestAppConfig, *DifferentFlags]{
+			Use: "custom",
+			// No RunE
+		}
+
+		assert.Panics(t, func() {
+			MustAddAnyCommand(g, cmd)
+		})
 	})
 }
