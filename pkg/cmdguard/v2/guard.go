@@ -38,14 +38,6 @@ func FlagTypeConstraint[F any]() error {
 	}
 }
 
-// mustValidateFlagType validates F and panics if invalid.
-// Called during initialization to fail fast on type errors.
-func mustValidateFlagType[F any]() {
-	if err := FlagTypeConstraint[F](); err != nil {
-		panic(err)
-	}
-}
-
 // GuardedCommand provides type-safe CLI construction with DI.
 // It never panics - all operations return errors.
 // T is the application config type, F is the command-specific flags type.
