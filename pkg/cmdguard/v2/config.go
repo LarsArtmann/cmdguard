@@ -20,13 +20,14 @@ type Config struct {
 
 // FlagTag represents parsed struct tag information for a flag.
 type FlagTag struct {
-	Name    string
-	Short   string
-	Default string
-	Help    string
-	Values  []string // For enums
-	Field   string
-	Type    reflect.Type
+	Name     string
+	Short    string
+	Default  string
+	Help     string
+	Values   []string // For enums
+	Required bool
+	Field    string
+	Type     reflect.Type
 }
 
 // ParseFlagTags extracts flag information from a config struct.
@@ -83,6 +84,11 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 		// Parse allowed values (for enums)
 		if values := field.Tag.Get("values"); values != "" {
 			tag.Values = strings.Split(values, ",")
+		}
+
+		// Parse required tag
+		if req := field.Tag.Get("required"); req != "" {
+			tag.Required, _ = strconv.ParseBool(req)
 		}
 
 		tags = append(tags, tag)

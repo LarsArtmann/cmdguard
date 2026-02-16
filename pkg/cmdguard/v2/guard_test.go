@@ -900,7 +900,7 @@ func BenchmarkCloneAndParseFlags(b *testing.B) {
 
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			_ = cloneAndParseFlags(cobraCmd, flags, registry)
+			_, _ = cloneAndParseFlags(cobraCmd, flags, registry)
 		}
 	})
 
@@ -914,7 +914,7 @@ func BenchmarkCloneAndParseFlags(b *testing.B) {
 
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			_ = cloneAndParseFlags(cobraCmd, flags, registry)
+			_, _ = cloneAndParseFlags(cobraCmd, flags, registry)
 		}
 	})
 
@@ -931,7 +931,7 @@ func BenchmarkCloneAndParseFlags(b *testing.B) {
 
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			_ = cloneAndParseFlags(cobraCmd, flags, registry)
+			_, _ = cloneAndParseFlags(cobraCmd, flags, registry)
 		}
 	})
 }

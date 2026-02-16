@@ -225,7 +225,10 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 			}
 
 			// Clone and parse flags once for this execution
-			execFlags := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			execFlags, err := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			if err != nil {
+				return err
+			}
 
 			// Execute the command handler
 			return cmd.RunE(ctx, config, execFlags)
@@ -241,7 +244,10 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 			}
 
 			// Clone and parse flags once for this execution
-			execFlags := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			execFlags, err := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			if err != nil {
+				return err
+			}
 
 			return cmd.PreRunE(ctx, config, execFlags)
 		}
@@ -256,7 +262,10 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 			}
 
 			// Clone and parse flags once for this execution
-			execFlags := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			execFlags, err := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			if err != nil {
+				return err
+			}
 
 			return cmd.PostRunE(ctx, config, execFlags)
 		}
@@ -288,7 +297,7 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 // cloneAndParseFlags clones flags once and parses them.
 // This is the optimized single-entry point for flag handling during execution.
 // If flags is nil, creates a new instance of F to parse into.
-func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) F {
+func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) (F, error) {
 	var flagsCopy F
 
 	// If flags is nil, create a new instance of the flag type
@@ -298,7 +307,7 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 		t := reflect.TypeOf(zero)
 		if t == nil {
 			// F is an interface type with nil value - can't create
-			return zero
+			return zero, nil
 		}
 		if t.Kind() == reflect.Ptr {
 			// Create new instance of the underlying type
@@ -319,12 +328,11 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 	// Parse command-line values into the flags
 	if registry != nil {
 		if err := registry.ParseFlags(c, flagsCopy); err != nil {
-			// Return the flags anyway; the error will be handled by the caller
-			// The cobra framework will handle the error display
+			return flagsCopy, fmt.Errorf("parse flags: %w", err)
 		}
 	}
 
-	return flagsCopy
+	return flagsCopy, nil
 }
 
 // toCobraCommand converts a Command[T, F] to a cobra.Command.

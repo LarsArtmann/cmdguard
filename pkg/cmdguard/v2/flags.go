@@ -221,13 +221,9 @@ func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error
 	}
 }
 
-// ValidateFlags validates flag values against allowed values.
+// ValidateFlags validates flag values against allowed values and checks required flags.
 func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
-		if len(tag.Values) == 0 {
-			continue
-		}
-
 		flag := cmd.Flags().Lookup(tag.Name)
 		if flag == nil {
 			flag = cmd.PersistentFlags().Lookup(tag.Name)
@@ -236,13 +232,17 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 			continue
 		}
 
-		if !flag.Changed {
-			continue
+		// Check required flags
+		if tag.Required && !flag.Changed {
+			return NewFlagError(tag.Name, fmt.Errorf("required flag not set"))
 		}
 
-		value := flag.Value.String()
-		if !slices.Contains(tag.Values, value) {
-			return NewFlagError(tag.Name, NewEnumError(value, tag.Values))
+		// Validate enum values
+		if len(tag.Values) > 0 && flag.Changed {
+			value := flag.Value.String()
+			if !slices.Contains(tag.Values, value) {
+				return NewFlagError(tag.Name, NewEnumError(value, tag.Values))
+			}
 		}
 	}
 	return nil
