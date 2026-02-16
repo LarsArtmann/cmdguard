@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-02-15  
+**Last Updated:** 2026-02-14  
 **Version:** 2.0.0  
 **Go Version:** 1.26.0
 
@@ -70,7 +70,9 @@ Type-safe command definition with typed flags.
 | Short flags | ✅ FULLY_FUNCTIONAL | `short:"n"` for `-n` |
 | Default values | ✅ FULLY_FUNCTIONAL | `default:"value"` tag |
 | Help text | ✅ FULLY_FUNCTIONAL | `help:"description"` tag |
-| Required flags | ✅ FULLY_FUNCTIONAL | `required:"true"` tag |
+| Required flags | ✅ FULLY_FUNCTIONAL | `required:"true"` tag, validated at runtime |
+| Flag typo suggestions | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based suggestions |
+| `SuggestFlag(available, input)` | ✅ FULLY_FUNCTIONAL | Returns closest match for typos |
 | FlagRegistry | ✅ FULLY_FUNCTIONAL | Parse and validate flags |
 
 ### Dependency Injection (Scope)
@@ -96,6 +98,19 @@ Type-safe command definition with typed flags.
 | Error wrapping | ✅ FULLY_FUNCTIONAL | Compatible with errors.Is/As |
 | NewCommandError | ✅ FULLY_FUNCTIONAL | Command-specific errors |
 | No panics | ✅ FULLY_FUNCTIONAL | All operations return errors |
+| FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message |
+| NewFlagErrorWithSuggestion | ✅ FULLY_FUNCTIONAL | Creates FlagError with suggestion text |
+
+### Helper Types
+
+|| Feature | Status | Notes |
+|---------|--------|-------|
+| `LogLevel` type | ✅ FULLY_FUNCTIONAL | Enum for debug/info/warn/error |
+| `LogLevel.SlogLevel()` | ✅ FULLY_FUNCTIONAL | Converts to slog.Level |
+| `LogLevel.UnmarshalText()` | ✅ FULLY_FUNCTIONAL | Validates against allowed values |
+| `Enum[T]` type | ✅ FULLY_FUNCTIONAL | Generic enum with validation |
+| `MustEnum(value, allowed)` | ✅ FULLY_FUNCTIONAL | Creates enum, panics if invalid |
+| `NoFlags` type | ✅ FULLY_FUNCTIONAL | Sentinel for commands without flags |
 
 ---
 
@@ -192,12 +207,15 @@ v2.New[AppConfig]("myapp", "My CLI", AppConfig{})
 - No panics - all operations return errors
 - DI integration with samber/do/v2
 - Typed flags with struct tags
+- Required flag validation
+- Flag typo suggestions with Levenshtein distance
+- LogLevel to slog.Level conversion
 - Comprehensive test coverage
 - Clean public API
+- Example tests demonstrating API usage
 
 ### What Needs Work ⚠️
 - Documentation could be more comprehensive
-- More examples needed
 
 ### What's Missing 🔧
 - Plugin system for custom validators (planned)
