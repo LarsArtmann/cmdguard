@@ -132,6 +132,8 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 		err := json.Unmarshal([]byte(`{"level":"any"}`), &c)
 		require.NoError(t, err)
 		assert.Equal(t, "any", c.Level.String())
+		// When no allowed values defined, any value is accepted and allowed list is initialized
+		assert.Equal(t, []string{"any"}, c.Level.Allowed())
 	})
 }
 

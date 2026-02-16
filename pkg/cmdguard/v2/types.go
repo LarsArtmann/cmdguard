@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"log/slog"
 	"slices"
 	"time"
 )
@@ -132,6 +133,22 @@ func (l LogLevel) String() string {
 	return l.value
 }
 
+// SlogLevel converts LogLevel to slog.Level for use with log/slog.
+func (l LogLevel) SlogLevel() slog.Level {
+	switch l.value {
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
+
 // LogFormat is a type-safe log format enum.
 type LogFormat Enum
 
@@ -163,6 +180,7 @@ func (e Enum) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler for Enum.
+// If no allowed values are defined, accepts any value and sets allowed to contain it.
 func (e *Enum) UnmarshalText(text []byte) error {
 	value := string(text)
 	if slices.Contains(e.allowed, value) {
@@ -170,8 +188,9 @@ func (e *Enum) UnmarshalText(text []byte) error {
 		return nil
 	}
 	if len(e.allowed) == 0 {
-		// If no allowed values set yet, just accept any value
+		// If no allowed values set yet, accept any value and initialize allowed list
 		e.value = value
+		e.allowed = []string{value}
 		return nil
 	}
 	return NewEnumError(value, e.allowed)
