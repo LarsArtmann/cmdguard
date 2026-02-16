@@ -67,12 +67,17 @@ func NewCommandError(name string, err error) *CommandError {
 
 // FlagError wraps an error with flag context.
 type FlagError struct {
-	FlagName string
-	Err      error
+	FlagName   string
+	Err        error
+	Suggestion string
 }
 
 func (e *FlagError) Error() string {
-	return fmt.Sprintf("flag %q: %v", e.FlagName, e.Err)
+	msg := fmt.Sprintf("flag %q: %v", e.FlagName, e.Err)
+	if e.Suggestion != "" {
+		msg += fmt.Sprintf(" (did you mean --%s?)", e.Suggestion)
+	}
+	return msg
 }
 
 func (e *FlagError) Unwrap() error {
@@ -84,6 +89,15 @@ func NewFlagError(name string, err error) *FlagError {
 	return &FlagError{
 		FlagName: name,
 		Err:      err,
+	}
+}
+
+// NewFlagErrorWithSuggestion creates a new FlagError with a suggestion.
+func NewFlagErrorWithSuggestion(name string, err error, suggestion string) *FlagError {
+	return &FlagError{
+		FlagName:   name,
+		Err:        err,
+		Suggestion: suggestion,
 	}
 }
 
