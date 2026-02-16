@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -769,5 +770,203 @@ func TestMustAddAnyCommand(t *testing.T) {
 		assert.Panics(t, func() {
 			MustAddAnyCommand(g, cmd)
 		})
+	})
+}
+
+// Benchmark flags structs with varying sizes
+type SmallFlags struct {
+	Name string `flag:"name"`
+}
+
+type MediumFlags struct {
+	Name    string `flag:"name"`
+	Count   int    `flag:"count"`
+	Enabled bool   `flag:"enabled"`
+	Path    string `flag:"path"`
+	Timeout int    `flag:"timeout"`
+}
+
+type LargeFlags struct {
+	Name     string `flag:"name"`
+	Count    int    `flag:"count"`
+	Enabled  bool   `flag:"enabled"`
+	Path     string `flag:"path"`
+	Timeout  int    `flag:"timeout"`
+	Host     string `flag:"host"`
+	Port     int    `flag:"port"`
+	User     string `flag:"user"`
+	Password string `flag:"password"`
+	Database string `flag:"database"`
+	Debug    bool   `flag:"debug"`
+	Verbose  bool   `flag:"verbose"`
+	Format   string `flag:"format"`
+	Output   string `flag:"output"`
+	MaxConns int    `flag:"max-conns"`
+	Retries  int    `flag:"retries"`
+	Interval int    `flag:"interval"`
+	Region   string `flag:"region"`
+	Profile  string `flag:"profile"`
+}
+
+func BenchmarkCloneFlags(b *testing.B) {
+	b.Run("NoFlags", func(b *testing.B) {
+		var flags NoFlags
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("SmallFlags struct", func(b *testing.B) {
+		flags := SmallFlags{Name: "test"}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("SmallFlags pointer", func(b *testing.B) {
+		flags := &SmallFlags{Name: "test"}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("MediumFlags struct", func(b *testing.B) {
+		flags := MediumFlags{
+			Name: "test", Count: 42, Enabled: true,
+			Path: "/path", Timeout: 30,
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("MediumFlags pointer", func(b *testing.B) {
+		flags := &MediumFlags{
+			Name: "test", Count: 42, Enabled: true,
+			Path: "/path", Timeout: 30,
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("LargeFlags struct", func(b *testing.B) {
+		flags := LargeFlags{
+			Name: "test", Count: 42, Enabled: true, Path: "/path",
+			Timeout: 30, Host: "localhost", Port: 8080, User: "user",
+			Password: "pass", Database: "db", Debug: true, Verbose: false,
+			Format: "json", Output: "/out", MaxConns: 100, Retries: 3,
+			Interval: 60, Region: "us-east-1", Profile: "prod",
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("LargeFlags pointer", func(b *testing.B) {
+		flags := &LargeFlags{
+			Name: "test", Count: 42, Enabled: true, Path: "/path",
+			Timeout: 30, Host: "localhost", Port: 8080, User: "user",
+			Password: "pass", Database: "db", Debug: true, Verbose: false,
+			Format: "json", Output: "/out", MaxConns: 100, Retries: 3,
+			Interval: 60, Region: "us-east-1", Profile: "prod",
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+
+	b.Run("nil pointer", func(b *testing.B) {
+		var flags *LargeFlags
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneFlags(flags)
+		}
+	})
+}
+
+func BenchmarkCloneAndParseFlags(b *testing.B) {
+	b.Run("NoFlags with registry", func(b *testing.B) {
+		var flags NoFlags
+		registry, _ := NewFlagRegistry(flags)
+		cobraCmd := &cobra.Command{}
+
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneAndParseFlags(cobraCmd, flags, registry)
+		}
+	})
+
+	b.Run("MediumFlags with registry", func(b *testing.B) {
+		flags := &MediumFlags{
+			Name: "test", Count: 42, Enabled: true,
+			Path: "/path", Timeout: 30,
+		}
+		registry, _ := NewFlagRegistry(flags)
+		cobraCmd := &cobra.Command{}
+
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneAndParseFlags(cobraCmd, flags, registry)
+		}
+	})
+
+	b.Run("LargeFlags with registry", func(b *testing.B) {
+		flags := &LargeFlags{
+			Name: "test", Count: 42, Enabled: true, Path: "/path",
+			Timeout: 30, Host: "localhost", Port: 8080, User: "user",
+			Password: "pass", Database: "db", Debug: true, Verbose: false,
+			Format: "json", Output: "/out", MaxConns: 100, Retries: 3,
+			Interval: 60, Region: "us-east-1", Profile: "prod",
+		}
+		registry, _ := NewFlagRegistry(flags)
+		cobraCmd := &cobra.Command{}
+
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_ = cloneAndParseFlags(cobraCmd, flags, registry)
+		}
+	})
+}
+
+func BenchmarkNewFlagRegistry(b *testing.B) {
+	b.Run("SmallFlags", func(b *testing.B) {
+		flags := &SmallFlags{Name: "test"}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _ = NewFlagRegistry(flags)
+		}
+	})
+
+	b.Run("MediumFlags", func(b *testing.B) {
+		flags := &MediumFlags{
+			Name: "test", Count: 42, Enabled: true,
+			Path: "/path", Timeout: 30,
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _ = NewFlagRegistry(flags)
+		}
+	})
+
+	b.Run("LargeFlags", func(b *testing.B) {
+		flags := &LargeFlags{
+			Name: "test", Count: 42, Enabled: true, Path: "/path",
+			Timeout: 30, Host: "localhost", Port: 8080, User: "user",
+			Password: "pass", Database: "db", Debug: true, Verbose: false,
+			Format: "json", Output: "/out", MaxConns: 100, Retries: 3,
+			Interval: 60, Region: "us-east-1", Profile: "prod",
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _ = NewFlagRegistry(flags)
+		}
 	})
 }
