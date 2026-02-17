@@ -49,6 +49,7 @@ type GuardedCommand[T any, F any] struct {
 	config   *T
 	scope    *Scope
 	rootCmd  *cobra.Command
+	registry *FlagRegistry
 }
 
 // New creates a new CLI application with typed config.
@@ -89,14 +90,27 @@ func New[T any, F any](name, short string, defaults T) (*GuardedCommand[T, F], e
 		return nil, fmt.Errorf("failed to register flag registry: %w", err)
 	}
 
-	return &GuardedCommand[T, F]{
-		name:     name,
-		short:    short,
-		defaults: defaults,
-		config:   &cfg,
-		scope:    scope,
-		rootCmd:  rootCmd,
-	}, nil
+	// Register global flags from T's flag: tags with Cobra
+	if err := registry.RegisterFlags(rootCmd); err != nil {
+		return nil, fmt.Errorf("failed to register global flags: %w", err)
+	}
+
+	g := &GuardedCommand[T, F]{
+		name:      name,
+		short:     short,
+		defaults:  defaults,
+		config:    &cfg,
+		scope:     scope,
+		rootCmd:   rootCmd,
+		registry:  registry,
+	}
+
+	// Add PersistentPreRunE to parse global flags into config before any command runs
+	rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
+		return registry.ParseFlags(c, g.config)
+	}
+
+	return g, nil
 }
 
 // NewWithLong creates a new CLI application with a long description.
@@ -299,6 +313,7 @@ func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Com
 // If flags is nil, creates a new instance of F to parse into.
 func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) (F, error) {
 	var flagsCopy F
+	var flagsPtr any // Pointer to flags for parsing (SetField requires pointer)
 
 	// If flags is nil, create a new instance of the flag type
 	if isNilPointer(flags) {
@@ -313,9 +328,12 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 			// Create new instance of the underlying type
 			newVal := reflect.New(t.Elem())
 			flagsCopy = newVal.Interface().(F)
+			flagsPtr = flagsCopy
 		} else {
-			// F is a struct type (like NoFlags) - return zero value
-			flagsCopy = zero
+			// F is a struct type (like NoFlags) - create pointer for parsing
+			newPtr := reflect.New(t)
+			flagsPtr = newPtr.Interface()
+			flagsCopy = newPtr.Elem().Interface().(F)
 		}
 	} else {
 		// Clone the flags struct
@@ -323,12 +341,29 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 		if any(flagsCopy) == nil {
 			flagsCopy = flags
 		}
+
+		// Create pointer for parsing
+		t := reflect.TypeOf(flagsCopy)
+		if t.Kind() == reflect.Ptr {
+			flagsPtr = flagsCopy
+		} else {
+			// F is a struct - create pointer for parsing
+			newPtr := reflect.New(t)
+			newPtr.Elem().Set(reflect.ValueOf(flagsCopy))
+			flagsPtr = newPtr.Interface()
+		}
 	}
 
 	// Parse command-line values into the flags
 	if registry != nil {
-		if err := registry.ParseFlags(c, flagsCopy); err != nil {
+		if err := registry.ParseFlags(c, flagsPtr); err != nil {
 			return flagsCopy, fmt.Errorf("parse flags: %w", err)
+		}
+		// Copy parsed values back to flagsCopy if it was a struct
+		t := reflect.TypeOf(flagsCopy)
+		if t != nil && t.Kind() != reflect.Ptr {
+			// flagsPtr is *F, dereference to get the parsed values
+			flagsCopy = reflect.ValueOf(flagsPtr).Elem().Interface().(F)
 		}
 	}
 
