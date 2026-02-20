@@ -83,7 +83,6 @@ Type-safe command definition with typed flags.
 | `Provide(scope, constructor)` | ✅ FULLY_FUNCTIONAL | Register service     |
 | `ProvideValue(scope, value)`  | ✅ FULLY_FUNCTIONAL | Register value       |
 | `Invoke[T](scope)`            | ✅ FULLY_FUNCTIONAL | Get service          |
-| `MustInvoke[T](scope)`        | ✅ FULLY_FUNCTIONAL | Panics on error      |
 | `Child(name)`                 | ✅ FULLY_FUNCTIONAL | Create child scope   |
 | `Shutdown(ctx)`               | ✅ FULLY_FUNCTIONAL | Cleanup services     |
 | `HealthCheck()`               | ✅ FULLY_FUNCTIONAL | Check service health |
@@ -97,6 +96,7 @@ Type-safe command definition with typed flags.
 | Typed errors               | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc. |
 | Error wrapping             | ✅ FULLY_FUNCTIONAL | Compatible with errors.Is/As               |
 | NewCommandError            | ✅ FULLY_FUNCTIONAL | Command-specific errors                    |
+| NewServiceError            | ✅ FULLY_FUNCTIONAL | DI service-specific errors                 |
 | No panics                  | ✅ FULLY_FUNCTIONAL | All operations return errors               |
 | FlagError with suggestion  | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message  |
 | NewFlagErrorWithSuggestion | ✅ FULLY_FUNCTIONAL | Creates FlagError with suggestion text     |

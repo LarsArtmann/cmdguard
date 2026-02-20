@@ -148,16 +148,9 @@ func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error {
 
 // parseFlag reads a flag value and sets it on the config struct.
 func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error {
-	flags := cmd.Flags()
-
-	// Check if flag was changed by user
-	flag := flags.Lookup(tag.Name)
-	if flag == nil {
-		// Try persistent flags
-		flag = cmd.PersistentFlags().Lookup(tag.Name)
-	}
-	if flag == nil {
-		return NewFlagError(tag.Name, fmt.Errorf("flag not found"))
+	flag, err := r.lookupFlag(cmd, tag)
+	if err != nil {
+		return err
 	}
 
 	// Skip if flag wasn't changed and we're not using defaults
@@ -166,62 +159,118 @@ func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error
 	}
 
 	value := flag.Value.String()
+	return r.parseAndSetValue(cfg, tag, value)
+}
 
+// lookupFlag finds a flag in the command.
+func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag, error) {
+	flag := cmd.Flags().Lookup(tag.Name)
+	if flag == nil {
+		// Try persistent flags
+		flag = cmd.PersistentFlags().Lookup(tag.Name)
+	}
+	if flag == nil {
+		return nil, NewFlagError(tag.Name, fmt.Errorf("flag not found"))
+	}
+	return flag, nil
+}
+
+// parseAndSetValue parses the flag value based on type and sets it on config.
+func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) error {
 	// Parse and set the value based on type
 	switch tag.Type.Kind() {
 	case reflect.String:
 		return SetField(cfg, tag.Field, value)
 	case reflect.Bool:
-		v, err := strconv.ParseBool(value)
-		if err != nil {
-			return NewFlagError(tag.Name, err)
-		}
-		return SetField(cfg, tag.Field, v)
+		return r.parseAndSetBool(cfg, tag, value)
 	case reflect.Int, reflect.Int64:
-		v, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return NewFlagError(tag.Name, err)
-		}
-		return SetField(cfg, tag.Field, int(v))
+		return r.parseAndSetInt(cfg, tag, value)
 	case reflect.Float64:
-		v, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			return NewFlagError(tag.Name, err)
-		}
-		return SetField(cfg, tag.Field, v)
+		return r.parseAndSetFloat64(cfg, tag, value)
 	case reflect.Slice:
 		return SetField(cfg, tag.Field, strings.Split(value, ","))
 	default:
-		// Handle custom types
-		switch tag.Type {
-		case reflect.TypeOf(Duration{}):
-			parsed, err := ParseDuration(value)
-			if err != nil {
-				return NewFlagError(tag.Name, err)
-			}
-			return SetField(cfg, tag.Field, parsed)
-		case reflect.TypeOf(LogLevel{}):
-			parsed, err := ParseLogLevel(value)
-			if err != nil {
-				return NewFlagError(tag.Name, err)
-			}
-			return SetField(cfg, tag.Field, parsed)
-		case reflect.TypeOf(LogFormat{}):
-			parsed, err := ParseLogFormat(value)
-			if err != nil {
-				return NewFlagError(tag.Name, err)
-			}
-			return SetField(cfg, tag.Field, parsed)
-		case reflect.TypeOf(Enum{}):
-			parsed, err := ParseEnum(value, tag.Values)
-			if err != nil {
-				return NewFlagError(tag.Name, err)
-			}
-			return SetField(cfg, tag.Field, parsed)
-		default:
-			return SetField(cfg, tag.Field, value)
-		}
+		return r.parseAndSetCustom(cfg, tag, value)
 	}
+}
+
+// parseAndSetBool parses and sets a boolean value.
+func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error {
+	v, err := strconv.ParseBool(value)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, v)
+}
+
+// parseAndSetInt parses and sets an integer value.
+func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error {
+	v, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, int(v))
+}
+
+// parseAndSetFloat64 parses and sets a float64 value.
+func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) error {
+	v, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, v)
+}
+
+// parseAndSetCustom handles custom type parsing.
+func (r *FlagRegistry) parseAndSetCustom(cfg any, tag FlagTag, value string) error {
+	switch tag.Type {
+	case reflect.TypeOf(Duration{}):
+		return r.parseAndSetDuration(cfg, tag, value)
+	case reflect.TypeOf(LogLevel{}):
+		return r.parseAndSetLogLevel(cfg, tag, value)
+	case reflect.TypeOf(LogFormat{}):
+		return r.parseAndSetLogFormat(cfg, tag, value)
+	case reflect.TypeOf(Enum{}):
+		return r.parseAndSetEnum(cfg, tag, value)
+	default:
+		return SetField(cfg, tag.Field, value)
+	}
+}
+
+// parseAndSetDuration parses and sets a Duration value.
+func (r *FlagRegistry) parseAndSetDuration(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseDuration(value)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetLogLevel parses and sets a LogLevel value.
+func (r *FlagRegistry) parseAndSetLogLevel(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseLogLevel(value)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetLogFormat parses and sets a LogFormat value.
+func (r *FlagRegistry) parseAndSetLogFormat(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseLogFormat(value)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetEnum parses and sets an Enum value.
+func (r *FlagRegistry) parseAndSetEnum(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseEnum(value, tag.Values)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+	return SetField(cfg, tag.Field, parsed)
 }
 
 // ValidateFlags validates flag values against allowed values and checks required flags.
