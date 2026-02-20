@@ -302,8 +302,11 @@ func main() {
     root.AddCommand(cmdguard.Command[Config]{
         Use: "users",
         RunE: func(ctx context.Context, cfg *Config, flags any) error {
-            // Access services via DI
-            db := do.MustInvoke[Database](root.Scope())
+            // Access services via DI with proper error handling
+            db, err := v2.Invoke[*Database](root.ScopeStruct())
+            if err != nil {
+                return v2.NewServiceError("*Database", err)
+            }
             users, err := db.ListUsers(ctx)
             // ...
         },
