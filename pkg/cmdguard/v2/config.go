@@ -46,55 +46,66 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 		return nil, fmt.Errorf("config must be a struct, got %T", cfg)
 	}
 
-	t := v.Type()
+	return parseStructTags(v.Type())
+}
+
+// parseStructTags parses all flag tags from a struct type.
+func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 	var tags []FlagTag
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		flagTag := field.Tag.Get("flag")
-
-		// Skip fields without flag tag
-		if flagTag == "" || flagTag == "-" {
-			continue
+		tag := parseFieldTag(field)
+		if tag != nil {
+			tags = append(tags, *tag)
 		}
-
-		tag := FlagTag{
-			Field: field.Name,
-			Type:  field.Type,
-		}
-
-		// Parse flag name
-		tag.Name = flagTag
-
-		// Parse short form
-		if short := field.Tag.Get("short"); short != "" {
-			tag.Short = short
-		}
-
-		// Parse default value
-		if def := field.Tag.Get("default"); def != "" {
-			tag.Default = def
-		}
-
-		// Parse help text
-		if help := field.Tag.Get("help"); help != "" {
-			tag.Help = help
-		}
-
-		// Parse allowed values (for enums)
-		if values := field.Tag.Get("values"); values != "" {
-			tag.Values = strings.Split(values, ",")
-		}
-
-		// Parse required tag
-		if req := field.Tag.Get("required"); req != "" {
-			tag.Required, _ = strconv.ParseBool(req)
-		}
-
-		tags = append(tags, tag)
 	}
 
 	return tags, nil
+}
+
+// parseFieldTag parses flag tags from a single struct field.
+// Returns nil if the field doesn't have a flag tag.
+func parseFieldTag(field reflect.StructField) *FlagTag {
+	flagTag := field.Tag.Get("flag")
+
+	// Skip fields without flag tag
+	if flagTag == "" || flagTag == "-" {
+		return nil
+	}
+
+	tag := FlagTag{
+		Field: field.Name,
+		Type:  field.Type,
+		Name:  flagTag,
+	}
+
+	// Parse short form
+	if short := field.Tag.Get("short"); short != "" {
+		tag.Short = short
+	}
+
+	// Parse default value
+	if def := field.Tag.Get("default"); def != "" {
+		tag.Default = def
+	}
+
+	// Parse help text
+	if help := field.Tag.Get("help"); help != "" {
+		tag.Help = help
+	}
+
+	// Parse allowed values (for enums)
+	if values := field.Tag.Get("values"); values != "" {
+		tag.Values = strings.Split(values, ",")
+	}
+
+	// Parse required tag
+	if req := field.Tag.Get("required"); req != "" {
+		tag.Required, _ = strconv.ParseBool(req)
+	}
+
+	return &tag
 }
 
 // DefaultValue returns the default value for a flag based on its type.
@@ -103,43 +114,66 @@ func (t FlagTag) DefaultValue() any {
 		return reflect.Zero(t.Type).Interface()
 	}
 
+	return t.parseDefaultValue()
+}
+
+// parseDefaultValue parses the default value based on type.
+func (t FlagTag) parseDefaultValue() any {
 	switch t.Type.Kind() {
 	case reflect.String:
 		return t.Default
 	case reflect.Bool:
-		v, _ := strconv.ParseBool(t.Default)
-		return v
+		return parseBoolDefault(t.Default)
 	case reflect.Int, reflect.Int64:
-		// Check if it's a Duration type
-		if t.Type == reflect.TypeOf(Duration{}) {
-			d, err := ParseDuration(t.Default)
-			if err != nil {
-				return Duration{}
-			}
-			return d
-		}
-		v, _ := strconv.ParseInt(t.Default, 10, 64)
-		return int(v)
+		return t.parseIntDefault()
 	case reflect.Float64:
-		v, _ := strconv.ParseFloat(t.Default, 64)
-		return v
+		return parseFloat64Default(t.Default)
 	case reflect.Slice:
-		// For slices, parse comma-separated values
 		return strings.Split(t.Default, ",")
 	default:
-		// Handle custom types (Enum, Duration, LogLevel, LogFormat)
-		switch t.Type {
-		case reflect.TypeOf(Duration{}):
-			d, err := ParseDuration(t.Default)
-			if err != nil {
-				return Duration{}
-			}
-			return d
-		case reflect.TypeOf(Enum{}), reflect.TypeOf(LogLevel{}), reflect.TypeOf(LogFormat{}):
-			return t.Default
-		default:
-			return t.Default
+		return t.parseCustomDefault()
+	}
+}
+
+// parseBoolDefault parses a boolean default value.
+func parseBoolDefault(s string) bool {
+	v, _ := strconv.ParseBool(s)
+	return v
+}
+
+// parseIntDefault parses an integer default value.
+func (t FlagTag) parseIntDefault() any {
+	// Check if it's a Duration type
+	if t.Type == reflect.TypeOf(Duration{}) {
+		d, err := ParseDuration(t.Default)
+		if err != nil {
+			return Duration{}
 		}
+		return d
+	}
+	v, _ := strconv.ParseInt(t.Default, 10, 64)
+	return int(v)
+}
+
+// parseFloat64Default parses a float64 default value.
+func parseFloat64Default(s string) float64 {
+	v, _ := strconv.ParseFloat(s, 64)
+	return v
+}
+
+// parseCustomDefault handles custom type defaults.
+func (t FlagTag) parseCustomDefault() any {
+	switch t.Type {
+	case reflect.TypeOf(Duration{}):
+		d, err := ParseDuration(t.Default)
+		if err != nil {
+			return Duration{}
+		}
+		return d
+	case reflect.TypeOf(Enum{}), reflect.TypeOf(LogLevel{}), reflect.TypeOf(LogFormat{}):
+		return t.Default
+	default:
+		return t.Default
 	}
 }
 
@@ -257,6 +291,11 @@ func ValidateConfig(cfg any) error {
 		return fmt.Errorf("config must be a struct, got %T", cfg)
 	}
 
+	return validateStruct(v, cfg)
+}
+
+// validateStruct validates all fields of a struct.
+func validateStruct(v reflect.Value, cfg any) error {
 	var errs []error
 
 	tags, err := ParseFlagTags(cfg)
@@ -265,31 +304,8 @@ func ValidateConfig(cfg any) error {
 	}
 
 	for _, tag := range tags {
-		field := v.FieldByName(tag.Field)
-		if !field.IsValid() {
-			continue
-		}
-
-		// Validate enum values
-		if len(tag.Values) > 0 {
-			var value string
-			switch field.Kind() {
-			case reflect.String:
-				value = field.String()
-			default:
-				// Handle custom enum types
-				if field.Type() == reflect.TypeOf(Enum{}) ||
-					field.Type() == reflect.TypeOf(LogLevel{}) ||
-					field.Type() == reflect.TypeOf(LogFormat{}) {
-					value = field.MethodByName("String").Call(nil)[0].String()
-				} else {
-					continue
-				}
-			}
-
-			if !slices.Contains(tag.Values, value) {
-				errs = append(errs, NewConfigError(tag.Field, NewEnumError(value, tag.Values)))
-			}
+		if err := validateTag(v, tag); err != nil {
+			errs = append(errs, err)
 		}
 	}
 
@@ -298,6 +314,45 @@ func ValidateConfig(cfg any) error {
 	}
 
 	return nil
+}
+
+// validateTag validates a single flag tag against its field.
+func validateTag(v reflect.Value, tag FlagTag) error {
+	field := v.FieldByName(tag.Field)
+	if !field.IsValid() {
+		return nil
+	}
+
+	// Validate enum values
+	if len(tag.Values) > 0 {
+		value, ok := getFieldValue(field)
+		if !ok {
+			return nil
+		}
+
+		if !slices.Contains(tag.Values, value) {
+			return NewConfigError(tag.Field, NewEnumError(value, tag.Values))
+		}
+	}
+
+	return nil
+}
+
+// getFieldValue extracts the string value from a field.
+// Returns the value and true if it could be extracted.
+func getFieldValue(field reflect.Value) (string, bool) {
+	switch field.Kind() {
+	case reflect.String:
+		return field.String(), true
+	default:
+		// Handle custom enum types
+		if field.Type() == reflect.TypeOf(Enum{}) ||
+			field.Type() == reflect.TypeOf(LogLevel{}) ||
+			field.Type() == reflect.TypeOf(LogFormat{}) {
+			return field.MethodByName("String").Call(nil)[0].String(), true
+		}
+		return "", false
+	}
 }
 
 // MergeConfigs merges multiple config sources.
