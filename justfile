@@ -74,3 +74,25 @@ deps-list:
 update:
     go get -u ./...
     go mod tidy
+
+# Dogfooding - Self-validate against HOW_TO_GOLANG policy
+dogfood:
+    @echo "🐕 Dogfooding cmdguard..."
+    @echo ""
+    @echo "=== Checking file size limits (250 lines max) ==="
+    @find . -name "*.go" -not -path "./vendor/*" -not -path "./.git/*" -exec wc -l {} + | sort -rn | head -20 | awk '{if ($1 > 250) print "❌ OVER LIMIT: " $0; else print "✅ OK: " $0}'
+    @echo ""
+    @echo "=== Checking function size limits (30 lines max) ==="
+    @find . -name "*.go" -not -path "./vendor/*" -not -path "./.git/*" -exec awk '/^func \(/,/^}/ {lines++} /^}/ {if (lines > 30) print "❌ OVER LIMIT: " FILENAME " (" lines " lines)"; lines=0}' {} \; | head -20
+    @echo ""
+    @echo "=== Checking for banned libraries ==="
+    @grep -r "stretchr/testify" --include="*.go" . 2>/dev/null && echo "❌ FOUND: testify (banned)" || echo "✅ No testify found"
+    @grep -r "pkg/errors" --include="*.go" . 2>/dev/null && echo "❌ FOUND: pkg/errors (banned)" || echo "✅ No pkg/errors found"
+    @echo ""
+    @echo "=== Running build ==="
+    @just build
+    @echo ""
+    @echo "=== Running tests ==="
+    @just test
+    @echo ""
+    @echo "🐕 Dogfooding complete!"
