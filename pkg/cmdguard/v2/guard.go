@@ -43,14 +43,15 @@ func FlagTypeConstraint[F any]() error {
 // It never panics - all operations return errors.
 // T is the application config type, F is the command-specific flags type.
 type GuardedCommand[T any, F any] struct {
-	name     string
-	short    string
-	long     string
-	defaults T
-	config   *T
-	scope    *Scope
-	rootCmd  *cobra.Command
-	registry *FlagRegistry
+	name              string
+	short             string
+	long              string
+	defaults          T
+	config            *T
+	scope             *Scope
+	rootCmd           *cobra.Command
+	registry          *FlagRegistry
+	registeredCmds    map[string]bool // tracks registered command paths for duplicate detection
 }
 
 // New creates a new CLI application with typed config.
@@ -97,13 +98,14 @@ func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error
 	}
 
 	g := &GuardedCommand[T, F]{
-		name:     name,
-		short:    short,
-		defaults: defaults,
-		config:   &cfg,
-		scope:    scope,
-		rootCmd:  rootCmd,
-		registry: registry,
+		name:           name,
+		short:          short,
+		defaults:       defaults,
+		config:         &cfg,
+		scope:          scope,
+		rootCmd:        rootCmd,
+		registry:       registry,
+		registeredCmds: make(map[string]bool),
 	}
 
 	// Add PersistentPreRunE to parse global flags into config before any command runs
@@ -127,11 +129,20 @@ func NewWithLong[T, F any](name, short, long string, defaults T) (*GuardedComman
 
 // AddCommand adds a subcommand to the CLI.
 // Returns an error instead of panicking on invalid commands.
+// Returns ErrDuplicateCommand if a command with the same name already exists.
 func (g *GuardedCommand[T, F]) AddCommand(cmd Command[T, F]) error {
+	// Check for duplicate command name
+	if g.registeredCmds[cmd.Use] {
+		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.Use)
+	}
+
 	// Validate the command
 	if err := cmd.Validate(); err != nil {
 		return err
 	}
+
+	// Register this command before processing to detect duplicates in subcommands
+	g.registeredCmds[cmd.Use] = true
 
 	// Convert to cobra command
 	cobraCmd, err := g.toCobraCommand(cmd)
@@ -160,11 +171,20 @@ func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {
 // AddAnyCommand adds a command with a different flags type to a GuardedCommand.
 // This is a standalone function because Go doesn't support type parameters on methods.
 // Use this when commands need different flag types than the CLI root.
+// Returns ErrDuplicateCommand if a command with the same name already exists.
 func AddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) error {
+	// Check for duplicate command name
+	if g.registeredCmds[cmd.Use] {
+		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.Use)
+	}
+
 	// Validate the command
 	if err := cmd.Validate(); err != nil {
 		return err
 	}
+
+	// Register this command before processing
+	g.registeredCmds[cmd.Use] = true
 
 	// Convert to cobra command with F2 flags type
 	cobraCmd, err := toCobraCommandAny(g.config, cmd)

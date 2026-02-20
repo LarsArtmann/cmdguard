@@ -73,6 +73,7 @@ type Command[T any, F any] struct {
 
 // Validate checks that the command is properly configured.
 // Returns an error if the command is invalid.
+// Also checks for duplicate subcommand names within this command.
 func (c Command[T, F]) Validate() error {
 	if c.Use == "" {
 		return fmt.Errorf("%w: command has no Use field", ErrInvalidCommand)
@@ -81,6 +82,15 @@ func (c Command[T, F]) Validate() error {
 	// A command must have either a RunE handler or subcommands
 	if c.RunE == nil && len(c.Commands) == 0 {
 		return fmt.Errorf("%w: %q has no RunE and no subcommands", ErrMissingHandler, c.Use)
+	}
+
+	// Check for duplicate subcommand names within this command
+	seen := make(map[string]bool)
+	for _, sub := range c.Commands {
+		if seen[sub.Use] {
+			return fmt.Errorf("%w: duplicate subcommand %q in command %q", ErrDuplicateCommand, sub.Use, c.Use)
+		}
+		seen[sub.Use] = true
 	}
 
 	// Validate subcommands recursively

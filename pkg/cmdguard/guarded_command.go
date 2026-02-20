@@ -52,11 +52,12 @@ var version = "dev"
 // It panics on construction if commands are invalid, ensuring errors
 // are caught immediately at startup rather than at runtime.
 type GuardedCommand struct {
-	cmd        *cobra.Command
-	cfg        *config.Config
-	logger     *slog.Logger
-	validated  bool
-	strictMode bool
+	cmd             *cobra.Command
+	cfg             *config.Config
+	logger          *slog.Logger
+	validated       bool
+	strictMode      bool
+	registeredCmds  map[string]bool // tracks registered command names for duplicate detection
 }
 
 // New creates a new GuardedCommand with the given name and description.
@@ -98,10 +99,11 @@ func New(name, short string) *GuardedCommand {
 	}
 
 	g := &GuardedCommand{
-		cmd:        cmd,
-		cfg:        cfg,
-		logger:     logger,
-		strictMode: cfg.StrictMode,
+		cmd:            cmd,
+		cfg:            cfg,
+		logger:         logger,
+		strictMode:     cfg.StrictMode,
+		registeredCmds: make(map[string]bool),
 	}
 
 	// Add default commands
@@ -112,6 +114,7 @@ func New(name, short string) *GuardedCommand {
 
 // AddCommand adds a subcommand to the guarded command.
 // PANICS if the command is invalid (no handler and no subcommands).
+// PANICS if a command with the same name already exists.
 //
 // This is intentional - it ensures errors are caught at startup
 // rather than when the command is invoked.
@@ -120,20 +123,37 @@ func (g *GuardedCommand) AddCommand(cmd *cobra.Command) {
 		panic("cmdguard: cannot add commands after execution")
 	}
 
+	// Check for duplicate command name
+	if g.registeredCmds[cmd.Name()] {
+		panic(fmt.Sprintf("cmdguard: duplicate command %q", cmd.Name()))
+	}
+
+	// Check for duplicate subcommand names within this command
+	g.checkDuplicateSubcommands(cmd)
+
 	// Validate command before adding
 	if err := g.validateCommand(cmd); err != nil {
 		panic(fmt.Sprintf("cmdguard: invalid command %q: %v", cmd.Name(), err))
 	}
 
 	g.cmd.AddCommand(cmd)
+	g.registeredCmds[cmd.Name()] = true
 	g.logger.Debug("added command", "command", cmd.Name())
 }
 
 // AddSubcommand adds a subcommand to a parent command.
 // PANICS if the subcommand is invalid.
+// PANICS if a subcommand with the same name already exists under the parent.
 func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 	if g.validated {
 		panic("cmdguard: cannot add commands after execution")
+	}
+
+	// Check for duplicate subcommand name under this parent
+	for _, existing := range parent.Commands() {
+		if existing.Name() == child.Name() {
+			panic(fmt.Sprintf("cmdguard: duplicate subcommand %q in command %q", child.Name(), parent.Name()))
+		}
 	}
 
 	// Validate child before adding
@@ -258,6 +278,18 @@ func (g *GuardedCommand) validateCommandTree() error {
 	}
 
 	return nil
+}
+
+// checkDuplicateSubcommands checks for duplicate subcommand names within a command.
+// PANICS if duplicates are found.
+func (g *GuardedCommand) checkDuplicateSubcommands(parent *cobra.Command) {
+	seen := make(map[string]bool)
+	for _, cmd := range parent.Commands() {
+		if seen[cmd.Name()] {
+			panic(fmt.Sprintf("cmdguard: duplicate subcommand %q in command %q", cmd.Name(), parent.Name()))
+		}
+		seen[cmd.Name()] = true
+	}
 }
 
 // validateSubcommands recursively validates subcommands.

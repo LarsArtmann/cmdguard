@@ -83,6 +83,30 @@ func TestCommand_Validate(t *testing.T) {
 		assert.Contains(t, err.Error(), "invalid-sub")
 	})
 
+	t.Run("error: duplicate subcommand names", func(t *testing.T) {
+		cmd := Command[TestConfig, NoFlags]{
+			Use: "root",
+			Commands: []Command[TestConfig, NoFlags]{
+				{
+					Use: "duplicate",
+					RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+						return nil
+					},
+				},
+				{
+					Use: "duplicate",
+					RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+						return nil
+					},
+				},
+			},
+		}
+		err := cmd.Validate()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrDuplicateCommand)
+		assert.Contains(t, err.Error(), "duplicate")
+	})
+
 	t.Run("valid with flags", func(t *testing.T) {
 		type Flags struct {
 			Verbose bool `flag:"verbose" default:"false"`
