@@ -436,8 +436,8 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			assert.Equal(t, 1, exitErr.ExitCode())
 		}
-		assert.Contains(t, stderr.String(), "Error:")
-		assert.Contains(t, stderr.String(), "intentional failure")
+		assert.Contains(t, stderr.String(), "ERROR")
+		assert.Contains(t, stderr.String(), "Intentional failure")
 	})
 
 	t.Run("stderr contains error message", func(t *testing.T) {
@@ -467,7 +467,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		cmd.Stderr = &stderr
 		_ = cmd.Run()
 
-		assert.Contains(t, stderr.String(), "boom error")
+		assert.Contains(t, stderr.String(), "Boom error")
 	})
 }
 

@@ -187,7 +187,27 @@ func MustAddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]
 // toCobraCommandAny converts a Command[T, F2] to a cobra.Command.
 // This is a variant of toCobraCommand that works with any flags type.
 func toCobraCommandAny[T, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command, error) {
-	cobraCmd := &cobra.Command{
+	cobraCmd := createCobraCommand(cmd)
+	flagRegistry, err := setupFlagRegistry(cobraCmd, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	setupRunHandler(cobraCmd, cmd, config, flagRegistry)
+	setupPreRunHandler(cobraCmd, cmd, config, flagRegistry)
+	setupPostRunHandler(cobraCmd, cmd, config, flagRegistry)
+
+	if err := addSubcommands(cobraCmd, cmd, config); err != nil {
+		return nil, err
+	}
+
+	applyCommandOptions(cobraCmd, cmd)
+	return cobraCmd, nil
+}
+
+// createCobraCommand creates the base cobra.Command from Command metadata.
+func createCobraCommand[T, F any](cmd Command[T, F]) *cobra.Command {
+	return &cobra.Command{
 		Use:        cmd.Use,
 		Short:      cmd.Short,
 		Long:       cmd.Long,
@@ -196,117 +216,105 @@ func toCobraCommandAny[T, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command
 		Hidden:     cmd.Hidden,
 		Deprecated: cmd.Deprecated,
 	}
+}
 
-	// Register command-specific flags
-	// Even if cmd.Flags is nil, we need to create a registry for the F2 type
-	// to register and parse flags during execution
-	var flagRegistry *FlagRegistry
-	var prototype F2 // Will be zero value if cmd.Flags is nil
-
-	if !isNilPointer(cmd.Flags) {
-		prototype = cmd.Flags
-	} else {
-		// Create a new instance of F2 as prototype for flag registry
-		var zero F2
-		t := reflect.TypeOf(zero)
-		if t != nil && t.Kind() == reflect.Ptr {
-			// F2 is a pointer type - create new instance
-			prototype = reflect.New(t.Elem()).Interface().(F2)
-		} else {
-			// F2 is a struct type (like NoFlags) - use zero value
-			prototype = zero
-		}
+// setupFlagRegistry creates and registers flags for the command.
+func setupFlagRegistry[T, F any](cobraCmd *cobra.Command, cmd Command[T, F]) (*FlagRegistry, error) {
+	prototype := createFlagPrototype(cmd.Flags)
+	if isNilPointer(prototype) {
+		return nil, nil
 	}
 
-	// Create flag registry if prototype is usable
-	if !isNilPointer(prototype) {
-		var err error
-		flagRegistry, err = NewFlagRegistry(prototype)
-		if err != nil {
-			return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to create flag registry: %w", err))
-		}
-
-		if err := flagRegistry.RegisterFlags(cobraCmd); err != nil {
-			return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to register flags: %w", err))
-		}
+	registry, err := NewFlagRegistry(prototype)
+	if err != nil {
+		return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to create flag registry: %w", err))
 	}
 
-	// Set up the command handler
-	if cmd.RunE != nil {
-		cobraCmd.RunE = func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
-
-			// Clone and parse flags once for this execution
-			execFlags, err := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
-			if err != nil {
-				return err
-			}
-
-			// Execute the command handler
-			return cmd.RunE(ctx, config, execFlags)
-		}
+	if err := registry.RegisterFlags(cobraCmd); err != nil {
+		return nil, NewCommandError(cmd.Use, fmt.Errorf("failed to register flags: %w", err))
 	}
 
-	// Set up pre-run hook
-	if cmd.PreRunE != nil {
-		cobraCmd.PreRunE = func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
+	return registry, nil
+}
 
-			// Clone and parse flags once for this execution
-			execFlags, err := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
-			if err != nil {
-				return err
-			}
-
-			return cmd.PreRunE(ctx, config, execFlags)
-		}
+// createFlagPrototype creates a flag prototype from the flags value.
+func createFlagPrototype[F any](flags F) F {
+	if !isNilPointer(flags) {
+		return flags
 	}
 
-	// Set up post-run hook
-	if cmd.PostRunE != nil {
-		cobraCmd.PostRunE = func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
-			}
+	var zero F
+	t := reflect.TypeOf(zero)
+	if t != nil && t.Kind() == reflect.Ptr {
+		return reflect.New(t.Elem()).Interface().(F)
+	}
+	return zero
+}
 
-			// Clone and parse flags once for this execution
-			execFlags, err := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
-			if err != nil {
-				return err
-			}
+// setupRunHandler configures the RunE handler for the command.
+func setupRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
+	if cmd.RunE == nil {
+		return
+	}
+	cobraCmd.RunE = func(c *cobra.Command, args []string) error {
+		return executeHandler(c, cmd.RunE, cmd.Flags, config, registry)
+	}
+}
 
-			return cmd.PostRunE(ctx, config, execFlags)
-		}
+// setupPreRunHandler configures the PreRunE handler for the command.
+func setupPreRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
+	if cmd.PreRunE == nil {
+		return
+	}
+	cobraCmd.PreRunE = func(c *cobra.Command, args []string) error {
+		return executeHandler(c, cmd.PreRunE, cmd.Flags, config, registry)
+	}
+}
+
+// setupPostRunHandler configures the PostRunE handler for the command.
+func setupPostRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
+	if cmd.PostRunE == nil {
+		return
+	}
+	cobraCmd.PostRunE = func(c *cobra.Command, args []string) error {
+		return executeHandler(c, cmd.PostRunE, cmd.Flags, config, registry)
+	}
+}
+
+// executeHandler is a generic handler executor for RunE, PreRunE, PostRunE.
+func executeHandler[T, F any](c *cobra.Command, handler func(context.Context, *T, F) error, flags F, config *T, registry *FlagRegistry) error {
+	ctx := c.Context()
+	if ctx == nil {
+		ctx = context.Background()
 	}
 
-	// Recursively add subcommands
+	execFlags, err := cloneAndParseFlags(c, flags, registry)
+	if err != nil {
+		return err
+	}
+
+	return handler(ctx, config, execFlags)
+}
+
+// addSubcommands recursively adds subcommands to the parent command.
+func addSubcommands[T, F any](parent *cobra.Command, cmd Command[T, F], config *T) error {
 	for _, subCmd := range cmd.Commands {
-		cobraSubCmd, err := toCobraCommandAny[T, F2](config, subCmd)
+		cobraSubCmd, err := toCobraCommandAny[T, F](config, subCmd)
 		if err != nil {
-			return nil, fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
+			return fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
 		}
-		cobraCmd.AddCommand(cobraSubCmd)
+		parent.AddCommand(cobraSubCmd)
 	}
+	return nil
+}
 
-	// Apply command options
-	if cmd.SilenceErrors {
-		cobraCmd.SilenceErrors = true
-	}
-	if cmd.SilenceUsage {
-		cobraCmd.SilenceUsage = true
-	}
+// applyCommandOptions applies command options like SilenceErrors, SilenceUsage, Version.
+func applyCommandOptions[T, F any](cobraCmd *cobra.Command, cmd Command[T, F]) {
+	cobraCmd.SilenceErrors = cmd.SilenceErrors
+	cobraCmd.SilenceUsage = cmd.SilenceUsage
 	if cmd.Version != "" {
 		cobraCmd.Version = cmd.Version
 	}
-
-	return cobraCmd, nil
 }
 
 // cloneAndParseFlags clones flags once and parses them.
