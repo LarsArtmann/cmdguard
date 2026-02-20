@@ -23,6 +23,7 @@ import (
     "context"
     "fmt"
     "os"
+    "strings"
 
     "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )

@@ -94,3 +94,6 @@ jobs:
 
     - name: Test guarded example
       run: go run ./examples/guarded/main.go validate
+
+    - name: Test typed example
+      run: go run ./examples/typed/main.go greet --name=CI

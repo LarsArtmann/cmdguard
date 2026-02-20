@@ -3,6 +3,7 @@ package v2
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -262,6 +263,13 @@ func TestLogLevel(t *testing.T) {
 	t.Run("ParseLogLevel invalid", func(t *testing.T) {
 		_, err := ParseLogLevel("invalid")
 		require.Error(t, err)
+	})
+
+	t.Run("SlogLevel conversion", func(t *testing.T) {
+		assert.Equal(t, slog.LevelDebug, LogLevelDebug.SlogLevel())
+		assert.Equal(t, slog.LevelInfo, LogLevelInfo.SlogLevel())
+		assert.Equal(t, slog.LevelWarn, LogLevelWarn.SlogLevel())
+		assert.Equal(t, slog.LevelError, LogLevelError.SlogLevel())
 	})
 }
 

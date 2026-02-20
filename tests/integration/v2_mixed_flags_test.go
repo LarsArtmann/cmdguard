@@ -13,8 +13,8 @@ import (
 // RootConfig is the application-level configuration for tests.
 type RootConfig struct {
 	Debug   bool   `flag:"debug" short:"d" default:"false" help:"Enable debug mode"`
-	Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
-	Level   string `flag:"level" default:"info" help:"Log level"`
+	Verbose bool   `flag:"verbose" short:"v" help:"Verbose output"`
+	Level   string `flag:"level" help:"Log level"`
 }
 
 // GreetFlags are flags for the greet command.
