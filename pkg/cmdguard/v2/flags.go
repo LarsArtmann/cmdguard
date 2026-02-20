@@ -140,38 +140,64 @@ func (r *FlagRegistry) addEnumFlag(flags *pflag.FlagSet, tag FlagTag) {
 // ValidateFlags validates flag values against allowed values and checks required flags.
 func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
-		// Check required flags
-		if tag.Required {
-			flag := cmd.Flags().Lookup(tag.Name)
-			if flag == nil {
-				flag = cmd.PersistentFlags().Lookup(tag.Name)
-			}
-			if flag == nil || !flag.Changed {
-				return NewFlagError(tag.Name, fmt.Errorf("required flag not set"))
-			}
-		}
-
-		// Validate enum values
-		if len(tag.Values) > 0 {
-			flag := cmd.Flags().Lookup(tag.Name)
-			if flag == nil {
-				flag = cmd.PersistentFlags().Lookup(tag.Name)
-			}
-			if flag != nil && flag.Changed {
-				value := flag.Value.String()
-				found := false
-				for _, allowed := range tag.Values {
-					if value == allowed {
-						found = true
-						break
-					}
-				}
-				if !found {
-					return NewFlagError(tag.Name, fmt.Errorf("invalid value %q, must be one of: %v", value, tag.Values))
-				}
-			}
+		if err := r.validateTag(cmd, tag); err != nil {
+			return err
 		}
 	}
 	return nil
+}
+
+// validateTag validates a single flag tag.
+func (r *FlagRegistry) validateTag(cmd *cobra.Command, tag FlagTag) error {
+	if err := r.validateRequiredFlag(cmd, tag); err != nil {
+		return err
+	}
+	return r.validateEnumValue(cmd, tag)
+}
+
+// validateRequiredFlag checks if a required flag was set.
+func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) error {
+	if !tag.Required {
+		return nil
+	}
+	flag := r.lookupFlagForValidation(cmd, tag.Name)
+	if flag == nil || !flag.Changed {
+		return NewFlagError(tag.Name, fmt.Errorf("required flag not set"))
+	}
+	return nil
+}
+
+// validateEnumValue validates that an enum flag has an allowed value.
+func (r *FlagRegistry) validateEnumValue(cmd *cobra.Command, tag FlagTag) error {
+	if len(tag.Values) == 0 {
+		return nil
+	}
+	flag := r.lookupFlagForValidation(cmd, tag.Name)
+	if flag == nil || !flag.Changed {
+		return nil
+	}
+	if !r.isAllowedValue(flag.Value.String(), tag.Values) {
+		return NewFlagError(tag.Name, fmt.Errorf("invalid value, must be one of: %v", tag.Values))
+	}
+	return nil
+}
+
+// lookupFlagForValidation finds a flag by name for validation purposes.
+func (r *FlagRegistry) lookupFlagForValidation(cmd *cobra.Command, name string) *pflag.Flag {
+	flag := cmd.Flags().Lookup(name)
+	if flag == nil {
+		flag = cmd.PersistentFlags().Lookup(name)
+	}
+	return flag
+}
+
+// isAllowedValue checks if a value is in the allowed list.
+func (r *FlagRegistry) isAllowedValue(value string, allowed []string) bool {
+	for _, a := range allowed {
+		if value == a {
+			return true
+		}
+	}
+	return false
 }
 
