@@ -20,11 +20,11 @@ ERROR: Flag needs an argument: --severity-min
 
 ### 1. Inconsistent Naming Conventions
 
-| What User Expected | What Exists | Problem |
-|-------------------|-------------|---------|
-| `--severity` | `--severity-min` | Different naming pattern |
-| `--strict` | `--strict-mode` | Unnecessary suffix |
-| `--fix` (no args) | `--fix` (works) | Inconsistent behavior |
+| What User Expected | What Exists      | Problem                  |
+| ------------------ | ---------------- | ------------------------ |
+| `--severity`       | `--severity-min` | Different naming pattern |
+| `--strict`         | `--strict-mode`  | Unnecessary suffix       |
+| `--fix` (no args)  | `--fix` (works)  | Inconsistent behavior    |
 
 **Rule:** Use consistent naming. If `--fix` is boolean, `--strict` should be too.
 
@@ -45,10 +45,10 @@ ERROR: Flag needs an argument: --severity-min
 
 ### 3. Poor Error Messages
 
-| Current Error | Better Error |
-|--------------|--------------|
-| `Unknown flag: --severity` | `Unknown flag: --severity. Did you mean --severity-min?` |
-| `Flag needs an argument` | `--strict-mode requires one of: disabled, enforced, warn` |
+| Current Error              | Better Error                                              |
+| -------------------------- | --------------------------------------------------------- |
+| `Unknown flag: --severity` | `Unknown flag: --severity. Did you mean --severity-min?`  |
+| `Flag needs an argument`   | `--strict-mode requires one of: disabled, enforced, warn` |
 
 **Rule:** Error messages should suggest fixes.
 

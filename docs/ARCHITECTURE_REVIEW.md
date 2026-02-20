@@ -11,20 +11,20 @@
 
 **cmdguard** is a Go library for building validated Cobra CLI applications with a "guard" approach - panicking at construction time if commands are invalid. It enforces correctness at initialization rather than runtime.
 
-|| Library | Purpose |
-|---------|---------|
-| `spf13/cobra` | CLI command framework |
+|                      | Library                           | Purpose |
+| -------------------- | --------------------------------- | ------- |
+| `spf13/cobra`        | CLI command framework             |
 | `charmbracelet/fang` | Styled error output and execution |
 
 ### Overall Assessment
 
-|| Criterion | Score | Notes |
-|-----------|-------|-------|
-| **Architecture** | 9/10 | Clean, simple, focused |
-| **Code Quality** | 9/10 | Well-structured, idiomatic Go |
-| **Test Coverage** | 9/10 | 91%+ coverage on main packages |
-| **Documentation** | 8/10 | Good inline docs, principles doc |
-| **Production Readiness** | 8/10 | Ready for early adopters |
+|                          | Criterion | Score                            | Notes |
+| ------------------------ | --------- | -------------------------------- | ----- |
+| **Architecture**         | 9/10      | Clean, simple, focused           |
+| **Code Quality**         | 9/10      | Well-structured, idiomatic Go    |
+| **Test Coverage**        | 9/10      | 91%+ coverage on main packages   |
+| **Documentation**        | 8/10      | Good inline docs, principles doc |
+| **Production Readiness** | 8/10      | Ready for early adopters         |
 
 ---
 
@@ -79,17 +79,17 @@ Create   Validate+Panic   Run CLI
 
 **Public API Surface:**
 
-|| Method | Purpose | Panics? |
-|--------|---------|---------|
-| `New(name, short)` | Constructor | No |
-| `AddCommand(cmd)` | Add subcommand | Yes, if invalid |
-| `AddSubcommand(parent, child)` | Add nested subcommand | Yes, if invalid |
-| `Execute(ctx)` | Run command | No |
-| `ExecuteAndExit(ctx)` | Run and exit | No |
-| `Command()` | Get underlying cobra.Command | No |
-| `Config()` | Get configuration | No |
-| `IsStrictMode()` | Check strict mode | No |
-| `Version()` | Get version string | No |
+|                                | Method                       | Purpose         | Panics? |
+| ------------------------------ | ---------------------------- | --------------- | ------- |
+| `New(name, short)`             | Constructor                  | No              |
+| `AddCommand(cmd)`              | Add subcommand               | Yes, if invalid |
+| `AddSubcommand(parent, child)` | Add nested subcommand        | Yes, if invalid |
+| `Execute(ctx)`                 | Run command                  | No              |
+| `ExecuteAndExit(ctx)`          | Run and exit                 | No              |
+| `Command()`                    | Get underlying cobra.Command | No              |
+| `Config()`                     | Get configuration            | No              |
+| `IsStrictMode()`               | Check strict mode            | No              |
+| `Version()`                    | Get version string           | No              |
 
 ---
 
@@ -108,10 +108,10 @@ type Config struct {
 
 **Environment Variables:**
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CMDGUARD_LOG_LEVEL` | `info` | Log level |
-| `CMDGUARD_LOG_FORMAT` | `text` | Output format |
+| Variable               | Default | Description        |
+| ---------------------- | ------- | ------------------ |
+| `CMDGUARD_LOG_LEVEL`   | `info`  | Log level          |
+| `CMDGUARD_LOG_FORMAT`  | `text`  | Output format      |
 | `CMDGUARD_STRICT_MODE` | `false` | Enable strict mode |
 
 ---
@@ -166,30 +166,30 @@ parent.AddCommand(&cobra.Command{Use: "start", Run: ...})
 
 Every GuardedCommand includes:
 
-| Command | Purpose |
-|---------|---------|
-| `version` | Print version information |
+| Command    | Purpose                      |
+| ---------- | ---------------------------- |
+| `version`  | Print version information    |
 | `validate` | Validate entire command tree |
 
 ---
 
 ## Global Flags
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--config` | `-c` | `""` | Config file path |
-| `--log-level` | `-l` | `info` | Log level (debug/info/warn/error) |
-| `--strict` | `-s` | `false` | Enable strict validation |
+| Flag          | Short | Default | Description                       |
+| ------------- | ----- | ------- | --------------------------------- |
+| `--config`    | `-c`  | `""`    | Config file path                  |
+| `--log-level` | `-l`  | `info`  | Log level (debug/info/warn/error) |
+| `--strict`    | `-s`  | `false` | Enable strict validation          |
 
 ---
 
 ## Test Coverage
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| `pkg/cmdguard` | 91.0% | ✅ Excellent |
-| `internal/config` | 82.6% | ✅ Good |
-| `internal/logging` | 100% | ✅ Complete |
+| Package            | Coverage | Status       |
+| ------------------ | -------- | ------------ |
+| `pkg/cmdguard`     | 91.0%    | ✅ Excellent |
+| `internal/config`  | 82.6%    | ✅ Good      |
+| `internal/logging` | 100%     | ✅ Complete  |
 
 ---
 
@@ -229,6 +229,7 @@ func main() {
 ### Why Panic Instead of Error?
 
 Go lacks compile-time macros. Panicking at construction time is the closest to "fail fast":
+
 - Errors caught immediately at startup
 - No silent failures at runtime
 - Forces developers to fix issues before deployment
@@ -236,6 +237,7 @@ Go lacks compile-time macros. Panicking at construction time is the closest to "
 ### Why No DI Framework?
 
 The Guard API is intentionally simple:
+
 - No external DI container needed
 - Configuration loaded inline
 - Services created at construction time
@@ -244,6 +246,7 @@ The Guard API is intentionally simple:
 ### Why Fang Instead of Raw Cobra?
 
 `charmbracelet/fang` provides:
+
 - Beautiful error styling
 - Consistent output formatting
 - Better UX out of the box
@@ -284,5 +287,5 @@ cmdguard implements a clean "guard" approach to CLI construction:
 
 ---
 
-*Review generated by Crush AI Assistant*
-*Assisted-by: Crush via crush@charm.land*
+_Review generated by Crush AI Assistant_
+_Assisted-by: Crush via crush@charm.land_

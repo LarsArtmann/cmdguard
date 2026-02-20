@@ -12,7 +12,7 @@ import (
 // Config is the default application configuration.
 // Custom configs should embed or mirror this structure.
 type Config struct {
-	LogLevel   LogLevel `flag:"log-level" short:"l" default:"info" help:"Log level: debug, info, warn, error"`
+	LogLevel   LogLevel  `flag:"log-level" short:"l" default:"info" help:"Log level: debug, info, warn, error"`
 	LogFormat  LogFormat `flag:"log-format" default:"text" help:"Log format: text, json"`
 	StrictMode bool      `flag:"strict" short:"s" default:"false" help:"Enable strict mode validation"`
 	ConfigFile string    `flag:"config" short:"c" default:"" help:"Path to config file"`

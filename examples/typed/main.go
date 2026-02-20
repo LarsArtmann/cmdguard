@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 	"github.com/samber/do/v2"
 )
 
@@ -23,11 +23,11 @@ type AppConfig struct {
 
 // GreetFlags defines flags for the greet command.
 type GreetFlags struct {
-	Name    string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-	Shout   bool   `flag:"shout" short:"s" default:"false" help:"Print greeting in uppercase"`
-	Count   int    `flag:"count" short:"c" default:"1" help:"Number of times to greet"`
-	Prefix  string `flag:"prefix" default:"Hello" help:"Greeting prefix"`
-	Suffix  string `flag:"suffix" default:"!" help:"Greeting suffix"`
+	Name   string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+	Shout  bool   `flag:"shout" short:"s" default:"false" help:"Print greeting in uppercase"`
+	Count  int    `flag:"count" short:"c" default:"1" help:"Number of times to greet"`
+	Prefix string `flag:"prefix" default:"Hello" help:"Greeting prefix"`
+	Suffix string `flag:"suffix" default:"!" help:"Greeting suffix"`
 }
 
 // Database is a service registered via DI.

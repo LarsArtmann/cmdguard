@@ -259,9 +259,9 @@ var _ = Describe("Level precedence - User Expectations", func() {
 	Describe("As a user understanding log level filtering", func() {
 		Context("when understanding which levels include which", func() {
 			levels := []struct {
-				name     string
-				allows   []string
-				blocks   []string
+				name   string
+				allows []string
+				blocks []string
 			}{
 				{"debug", []string{"debug", "info", "warn", "error"}, []string{}},
 				{"info", []string{"info", "warn", "error"}, []string{"debug"}},

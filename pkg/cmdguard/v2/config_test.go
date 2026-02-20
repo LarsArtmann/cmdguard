@@ -179,7 +179,6 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 	}
 }
 
-
 func TestSetField(t *testing.T) {
 	t.Run("set string field", func(t *testing.T) {
 		cfg := &struct {

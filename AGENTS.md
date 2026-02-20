@@ -56,21 +56,21 @@ cmdguard/
 
 ### Package Guidelines
 
-| Package | Purpose | Importable? | Coverage |
-|---------|---------|-------------|----------|
-| `pkg/cmdguard` | Public Guard API | Yes | 66.7% |
-| `internal/config` | Configuration | No | 94.1% |
-| `internal/logging` | Logging utilities | No | 100% |
+| Package            | Purpose           | Importable? | Coverage |
+| ------------------ | ----------------- | ----------- | -------- |
+| `pkg/cmdguard`     | Public Guard API  | Yes         | 66.7%    |
+| `internal/config`  | Configuration     | No          | 94.1%    |
+| `internal/logging` | Logging utilities | No          | 100%     |
 
 ---
 
 ## Key Dependencies
 
-| Library | Purpose | Version |
-|---------|---------|---------|
-| `github.com/spf13/cobra` | CLI framework | v1.10.2 |
-| `github.com/charmbracelet/fang` | Cobra styling | v0.4.4 |
-| `github.com/stretchr/testify` | Testing | v1.11.1 |
+| Library                         | Purpose       | Version |
+| ------------------------------- | ------------- | ------- |
+| `github.com/spf13/cobra`        | CLI framework | v1.10.2 |
+| `github.com/charmbracelet/fang` | Cobra styling | v0.4.4  |
+| `github.com/stretchr/testify`   | Testing       | v1.11.1 |
 
 ---
 
@@ -166,7 +166,7 @@ import (
 
 func main() {
     root := cmdguard.New("myapp", "My application")
-    
+
     root.AddCommand(&cobra.Command{
         Use:   "hello",
         Short: "Say hello",
@@ -174,27 +174,28 @@ func main() {
             fmt.Println("Hello, World!")
         },
     })
-    
+
     root.ExecuteAndExit(context.Background())
 }
 ```
 
 ### GuardedCommand Methods
 
-| Method | Description |
-|--------|-------------|
-| `New(name, short)` | Create new guarded command |
-| `AddCommand(cmd)` | Add subcommand (panics if invalid) |
-| `AddSubcommand(parent, child)` | Add nested subcommand |
-| `Execute(ctx)` | Run with context |
-| `ExecuteAndExit(ctx)` | Run and exit with code |
-| `Command()` | Access underlying cobra command |
-| `Config()` | Get configuration |
-| `IsStrictMode()` | Check strict mode |
+| Method                         | Description                        |
+| ------------------------------ | ---------------------------------- |
+| `New(name, short)`             | Create new guarded command         |
+| `AddCommand(cmd)`              | Add subcommand (panics if invalid) |
+| `AddSubcommand(parent, child)` | Add nested subcommand              |
+| `Execute(ctx)`                 | Run with context                   |
+| `ExecuteAndExit(ctx)`          | Run and exit with code             |
+| `Command()`                    | Access underlying cobra command    |
+| `Config()`                     | Get configuration                  |
+| `IsStrictMode()`               | Check strict mode                  |
 
 ### Panic Conditions (Intentional)
 
 The Guard API panics at construction time if:
+
 1. Command has no `Run`/`RunE` and no subcommands
 2. Strict mode requires `RunE` but only `Run` provided
 3. Command has no name
@@ -204,6 +205,7 @@ The Guard API panics at construction time if:
 ## Configuration
 
 Environment variables (prefix `CMDGUARD_`):
+
 - `CMDGUARD_LOG_LEVEL` - debug, info, warn, error (default: info)
 - `CMDGUARD_STRICT_MODE` - true/false (default: false)
 
@@ -221,10 +223,12 @@ Rationale: Fail-fast philosophy. Go lacks compile-time macros; panic at init is 
 ### Minimal Dependencies
 
 Removed:
+
 - `samber/do/v2` - No DI container needed
 - `knadh/koanf/v2` - Direct env var reading is simpler
 
 Kept:
+
 - `cobra` - CLI framework
 - `fang` - Beautiful help output
 - `testify` - Testing assertions

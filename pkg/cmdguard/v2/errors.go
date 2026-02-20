@@ -119,7 +119,7 @@ func (e *ConfigError) Unwrap() error {
 func NewConfigError(field string, err error) *ConfigError {
 	return &ConfigError{
 		Field: field,
-		Err:    err,
+		Err:   err,
 	}
 }
 

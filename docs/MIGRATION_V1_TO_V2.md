@@ -4,14 +4,14 @@ This guide helps you migrate from the v1 API (`pkg/cmdguard`) to the v2 API (`pk
 
 ## Quick Reference
 
-| Feature | v1 | v2 |
-|---------|----|----|
-| **Command Type** | `*cobra.Command` | `Command[T, F]` |
-| **Flags** | Cobra flags API | Struct tags |
-| **Config** | Fixed `config.Config` | Custom type `T` |
-| **Error Handling** | Panics on invalid | Returns errors |
-| **DI** | None | Built-in `Scope` |
-| **Type Safety** | Runtime only | Compile-time + runtime |
+| Feature            | v1                    | v2                     |
+| ------------------ | --------------------- | ---------------------- |
+| **Command Type**   | `*cobra.Command`      | `Command[T, F]`        |
+| **Flags**          | Cobra flags API       | Struct tags            |
+| **Config**         | Fixed `config.Config` | Custom type `T`        |
+| **Error Handling** | Panics on invalid     | Returns errors         |
+| **DI**             | None                  | Built-in `Scope`       |
+| **Type Safety**    | Runtime only          | Compile-time + runtime |
 
 ## Key Changes
 
@@ -28,11 +28,13 @@ import v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 ### 2. CLI Creation
 
 **v1:**
+
 ```go
 root := cmdguard.New("myapp", "My application")
 ```
 
 **v2:**
+
 ```go
 type AppConfig struct {
     LogLevel string `flag:"log-level" short:"l" default:"info" help:"Log level"`
@@ -48,6 +50,7 @@ if err != nil {
 ### 3. Adding Commands
 
 **v1:**
+
 ```go
 root.AddCommand(&cobra.Command{
     Use:   "greet",
@@ -60,6 +63,7 @@ root.AddCommand(&cobra.Command{
 ```
 
 **v2:**
+
 ```go
 type GreetFlags struct {
     Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
@@ -83,6 +87,7 @@ if err := root.AddCommand(greetCmd); err != nil {
 ### 4. Flag Definitions
 
 **v1 (Cobra flags):**
+
 ```go
 cmd := &cobra.Command{Use: "greet"}
 cmd.Flags().StringP("name", "n", "World", "Name to greet")
@@ -90,6 +95,7 @@ cmd.Flags().BoolP("shout", "s", false, "Shout the greeting")
 ```
 
 **v2 (Struct tags):**
+
 ```go
 type GreetFlags struct {
     Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
@@ -100,12 +106,14 @@ type GreetFlags struct {
 ### 5. Error Handling
 
 **v1 (Panics):**
+
 ```go
 // This panics if command is invalid
 root.AddCommand(&cobra.Command{Use: "invalid"}) // No handler!
 ```
 
 **v2 (Returns errors):**
+
 ```go
 // This returns an error
 err := root.AddCommand(v2.Command[AppConfig, v2.NoFlags]{Use: "invalid"})
@@ -118,6 +126,7 @@ if err != nil {
 ### 6. Command Handlers
 
 **v1:**
+
 ```go
 Run: func(cmd *cobra.Command, args []string) {
     // Access flags via cmd.Flags().GetString()
@@ -129,6 +138,7 @@ RunE: func(cmd *cobra.Command, args []string) error {
 ```
 
 **v2:**
+
 ```go
 RunE: func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
     // ctx: context for cancellation
@@ -141,6 +151,7 @@ RunE: func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
 ### 7. Lifecycle Hooks
 
 **v1:**
+
 ```go
 cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
     return nil
@@ -151,6 +162,7 @@ cmd.PostRunE = func(cmd *cobra.Command, args []string) error {
 ```
 
 **v2:**
+
 ```go
 v2.Command[AppConfig, GreetFlags]{
     PreRunE: func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
@@ -168,6 +180,7 @@ v2.Command[AppConfig, GreetFlags]{
 ### 8. Subcommands
 
 **v1:**
+
 ```go
 parent := &cobra.Command{Use: "parent"}
 child := &cobra.Command{Use: "child", Run: func(...){}}
@@ -176,6 +189,7 @@ root.AddCommand(parent)
 ```
 
 **v2:**
+
 ```go
 parentCmd := v2.Command[AppConfig, v2.NoFlags]{
     Use: "parent",
@@ -191,6 +205,7 @@ root.AddCommand(parentCmd)
 **v1:** Not available
 
 **v2:**
+
 ```go
 // Register services
 scope := root.Scope()
@@ -209,6 +224,7 @@ RunE: func(ctx context.Context, cfg *AppConfig, flags Flags) error {
 ### 10. Execution
 
 **v1:**
+
 ```go
 root.Execute(context.Background())
 // or
@@ -216,6 +232,7 @@ root.ExecuteAndExit(context.Background())
 ```
 
 **v2:**
+
 ```go
 root.Execute(context.Background())
 // or
@@ -352,7 +369,7 @@ func main() {
         Run: func(cmd *cobra.Command, args []string) {
             name, _ := cmd.Flags().GetString("name")
             shout, _ := cmd.Flags().GetBool("shout")
-            
+
             msg := fmt.Sprintf("Hello, %s!", name)
             if shout {
                 msg = strings.ToUpper(msg)
@@ -362,7 +379,7 @@ func main() {
     }
     greetCmd.Flags().StringP("name", "n", "World", "Name to greet")
     greetCmd.Flags().BoolP("shout", "s", false, "Shout the greeting")
-    
+
     root.AddCommand(greetCmd)
     root.ExecuteAndExit(context.Background())
 }
@@ -377,7 +394,7 @@ import (
     "context"
     "fmt"
     "strings"
-    
+
     v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
@@ -392,7 +409,7 @@ type GreetFlags struct {
 
 func main() {
     defaults := AppConfig{LogLevel: "info"}
-    
+
     root, err := v2.New[AppConfig, v2.NoFlags]("myapp", "My application", defaults)
     if err != nil {
         panic(err)
@@ -423,12 +440,14 @@ func main() {
 ## When to Stay on v1
 
 Stay on v1 if:
+
 - You need direct cobra command access
 - You prefer panics over error returns
 - You don't need type-safe flags
 - You're using the built-in `config.Config` struct
 
 Migrate to v2 if:
+
 - You want compile-time type safety
 - You prefer struct tags for flags
 - You need custom config types

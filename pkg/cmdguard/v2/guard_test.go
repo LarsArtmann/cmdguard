@@ -584,8 +584,8 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 		require.NoError(t, err)
 
 		cmd := Command[TestAppConfig, NoFlags]{
-			Use:      "list",
-			Aliases:  []string{"ls", "l"},
+			Use:     "list",
+			Aliases: []string{"ls", "l"},
 			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				return nil
 			},

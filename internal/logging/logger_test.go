@@ -11,9 +11,9 @@ import (
 
 func TestNewLogger(t *testing.T) {
 	tests := []struct {
-		name  string
+		name   string
 		format string
-		level string
+		level  string
 	}{
 		{
 			name:   "text format with debug level",
@@ -108,28 +108,28 @@ func TestParseLevel(t *testing.T) {
 
 func TestParseFormat(t *testing.T) {
 	tests := []struct {
-		name         string
-		format       string
+		name           string
+		format         string
 		expectedFormat Format
 	}{
 		{
-			name:         "text format",
-			format:       "text",
+			name:           "text format",
+			format:         "text",
 			expectedFormat: FormatText,
 		},
 		{
-			name:         "json format",
-			format:       "json",
+			name:           "json format",
+			format:         "json",
 			expectedFormat: FormatJSON,
 		},
 		{
-			name:         "unknown defaults to text",
-			format:       "unknown",
+			name:           "unknown defaults to text",
+			format:         "unknown",
 			expectedFormat: FormatText,
 		},
 		{
-			name:         "empty defaults to text",
-			format:       "",
+			name:           "empty defaults to text",
+			format:         "",
 			expectedFormat: FormatText,
 		},
 	}

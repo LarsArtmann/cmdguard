@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/charmbracelet/fang"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +57,7 @@ type GuardedCommand[T any, F any] struct {
 // Returns an error if initialization fails (never panics).
 // T is the application config type, F is the command-specific flags type.
 // F must be a struct (like NoFlags) or pointer to struct for flag binding.
-func New[T any, F any](name, short string, defaults T) (*GuardedCommand[T, F], error) {
+func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error) {
 	if name == "" {
 		return nil, fmt.Errorf("%w: name is required", ErrInvalidCommand)
 	}
@@ -96,13 +97,13 @@ func New[T any, F any](name, short string, defaults T) (*GuardedCommand[T, F], e
 	}
 
 	g := &GuardedCommand[T, F]{
-		name:      name,
-		short:     short,
-		defaults:  defaults,
-		config:    &cfg,
-		scope:     scope,
-		rootCmd:   rootCmd,
-		registry:  registry,
+		name:     name,
+		short:    short,
+		defaults: defaults,
+		config:   &cfg,
+		scope:    scope,
+		rootCmd:  rootCmd,
+		registry: registry,
 	}
 
 	// Add PersistentPreRunE to parse global flags into config before any command runs
@@ -114,7 +115,7 @@ func New[T any, F any](name, short string, defaults T) (*GuardedCommand[T, F], e
 }
 
 // NewWithLong creates a new CLI application with a long description.
-func NewWithLong[T any, F any](name, short, long string, defaults T) (*GuardedCommand[T, F], error) {
+func NewWithLong[T, F any](name, short, long string, defaults T) (*GuardedCommand[T, F], error) {
 	g, err := New[T, F](name, short, defaults)
 	if err != nil {
 		return nil, err
@@ -159,7 +160,7 @@ func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {
 // AddAnyCommand adds a command with a different flags type to a GuardedCommand.
 // This is a standalone function because Go doesn't support type parameters on methods.
 // Use this when commands need different flag types than the CLI root.
-func AddAnyCommand[T any, F any, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) error {
+func AddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) error {
 	// Validate the command
 	if err := cmd.Validate(); err != nil {
 		return err
@@ -177,7 +178,7 @@ func AddAnyCommand[T any, F any, F2 any](g *GuardedCommand[T, F], cmd Command[T,
 
 // MustAddAnyCommand adds a command with different flags and panics on error.
 // Use this for static command trees where errors indicate programmer mistakes.
-func MustAddAnyCommand[T any, F any, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) {
+func MustAddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) {
 	if err := AddAnyCommand(g, cmd); err != nil {
 		panic(fmt.Sprintf("failed to add command %q: %v", cmd.Use, err))
 	}
@@ -185,7 +186,7 @@ func MustAddAnyCommand[T any, F any, F2 any](g *GuardedCommand[T, F], cmd Comman
 
 // toCobraCommandAny converts a Command[T, F2] to a cobra.Command.
 // This is a variant of toCobraCommand that works with any flags type.
-func toCobraCommandAny[T any, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command, error) {
+func toCobraCommandAny[T, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command, error) {
 	cobraCmd := &cobra.Command{
 		Use:        cmd.Use,
 		Short:      cmd.Short,
@@ -428,17 +429,9 @@ func cloneFlags[F any](flags F) F {
 
 // Execute runs the CLI application.
 // Returns an error if execution fails (never panics).
+// Uses fang for beautiful error styling.
 func (g *GuardedCommand[T, F]) Execute(ctx context.Context) error {
-	// Set context on root command
-	g.rootCmd.SetContext(ctx)
-
-	// Execute the cobra command
-	err := g.rootCmd.Execute()
-	if err != nil {
-		return fmt.Errorf("command execution failed: %w", err)
-	}
-
-	return nil
+	return fang.Execute(ctx, g.rootCmd)
 }
 
 // ExecuteWithArgs runs the CLI application with specific arguments.
@@ -450,9 +443,10 @@ func (g *GuardedCommand[T, F]) ExecuteWithArgs(ctx context.Context, args []strin
 
 // ExecuteAndExit runs the CLI and exits with the appropriate exit code.
 // This is the simplest way to run a CLI application.
+// Uses fang for beautiful error styling.
 func (g *GuardedCommand[T, F]) ExecuteAndExit(ctx context.Context) {
 	if err := g.Execute(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		// fang handles error styling
 		os.Exit(1)
 	}
 }

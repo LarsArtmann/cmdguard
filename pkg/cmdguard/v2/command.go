@@ -113,84 +113,84 @@ func (c Command[T, F]) IsExecutable() bool {
 type CommandOption[T any, F any] func(*Command[T, F])
 
 // WithShort sets the short description.
-func WithShort[T any, F any](short string) CommandOption[T, F] {
+func WithShort[T, F any](short string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Short = short
 	}
 }
 
 // WithLong sets the long description.
-func WithLong[T any, F any](long string) CommandOption[T, F] {
+func WithLong[T, F any](long string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Long = long
 	}
 }
 
 // WithAliases sets the command aliases.
-func WithAliases[T any, F any](aliases ...string) CommandOption[T, F] {
+func WithAliases[T, F any](aliases ...string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Aliases = aliases
 	}
 }
 
 // WithExample sets the example usage.
-func WithExample[T any, F any](example string) CommandOption[T, F] {
+func WithExample[T, F any](example string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Example = example
 	}
 }
 
 // WithFlags sets the command-specific flags struct.
-func WithFlags[T any, F any](flags F) CommandOption[T, F] {
+func WithFlags[T, F any](flags F) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Flags = flags
 	}
 }
 
 // WithRunE sets the command handler.
-func WithRunE[T any, F any](runE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+func WithRunE[T, F any](runE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.RunE = runE
 	}
 }
 
 // WithPreRunE sets the pre-run validation hook.
-func WithPreRunE[T any, F any](preRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+func WithPreRunE[T, F any](preRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.PreRunE = preRunE
 	}
 }
 
 // WithPostRunE sets the post-run cleanup hook.
-func WithPostRunE[T any, F any](postRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+func WithPostRunE[T, F any](postRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.PostRunE = postRunE
 	}
 }
 
 // WithSubcommands sets the subcommands.
-func WithSubcommands[T any, F any](cmds ...Command[T, F]) CommandOption[T, F] {
+func WithSubcommands[T, F any](cmds ...Command[T, F]) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Commands = cmds
 	}
 }
 
 // WithHidden sets whether the command is hidden.
-func WithHidden[T any, F any](hidden bool) CommandOption[T, F] {
+func WithHidden[T, F any](hidden bool) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Hidden = hidden
 	}
 }
 
 // WithDeprecated marks the command as deprecated.
-func WithDeprecated[T any, F any](msg string) CommandOption[T, F] {
+func WithDeprecated[T, F any](msg string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.Deprecated = msg
 	}
 }
 
 // NewCommand creates a new command with functional options.
-func NewCommand[T any, F any](use string, opts ...CommandOption[T, F]) (Command[T, F], error) {
+func NewCommand[T, F any](use string, opts ...CommandOption[T, F]) (Command[T, F], error) {
 	if use == "" {
 		return Command[T, F]{}, fmt.Errorf("%w: use is required", ErrMissingName)
 	}
@@ -209,7 +209,7 @@ func NewCommand[T any, F any](use string, opts ...CommandOption[T, F]) (Command[
 
 // MustNewCommand creates a new command and panics on error.
 // Use only in static initialization where failure is fatal.
-func MustNewCommand[T any, F any](use string, opts ...CommandOption[T, F]) Command[T, F] {
+func MustNewCommand[T, F any](use string, opts ...CommandOption[T, F]) Command[T, F] {
 	cmd, err := NewCommand[T, F](use, opts...)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create command %q: %v", use, err))

@@ -101,8 +101,8 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 	// Run (not RunE) should panic in strict mode
 	assert.Panics(t, func() {
 		root.AddCommand(&cobra.Command{
-			Use:  "bad",
-			Run:  func(cmd *cobra.Command, args []string) {},
+			Use: "bad",
+			Run: func(cmd *cobra.Command, args []string) {},
 		})
 	}, "Run without RunE should panic in strict mode")
 }

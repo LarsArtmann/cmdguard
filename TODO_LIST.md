@@ -7,40 +7,40 @@
 
 ## Completed (v2 Implementation)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Design v2 API with generics | ✅ DONE | GuardedCommand[T], Command[T] |
-| Implement errors.go | ✅ DONE | Typed errors, no panics |
-| Implement types.go | ✅ DONE | Common types and interfaces |
-| Implement config.go | ✅ DONE | Typed configuration |
-| Implement flags.go | ✅ DONE | FlagRegistry with struct tags |
-| Implement scope.go | ✅ DONE | DI scope with samber/do/v2 |
-| Implement command.go | ✅ DONE | Command[T] definition |
-| Implement guard.go | ✅ DONE | GuardedCommand[T] implementation |
+| Task                        | Status  | Notes                            |
+| --------------------------- | ------- | -------------------------------- |
+| Design v2 API with generics | ✅ DONE | GuardedCommand[T], Command[T]    |
+| Implement errors.go         | ✅ DONE | Typed errors, no panics          |
+| Implement types.go          | ✅ DONE | Common types and interfaces      |
+| Implement config.go         | ✅ DONE | Typed configuration              |
+| Implement flags.go          | ✅ DONE | FlagRegistry with struct tags    |
+| Implement scope.go          | ✅ DONE | DI scope with samber/do/v2       |
+| Implement command.go        | ✅ DONE | Command[T] definition            |
+| Implement guard.go          | ✅ DONE | GuardedCommand[T] implementation |
 
 ---
 
 ## Completed (v2 Testing)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Test errors.go | ✅ DONE | 142 lines of tests |
-| Test types.go | ✅ DONE | 346 lines of tests |
-| Test config.go | ✅ DONE | 360 lines of tests |
-| Test flags.go | ✅ DONE | 488 lines of tests |
-| Test scope.go | ✅ DONE | 458 lines of tests |
+| Task            | Status  | Notes              |
+| --------------- | ------- | ------------------ |
+| Test errors.go  | ✅ DONE | 142 lines of tests |
+| Test types.go   | ✅ DONE | 346 lines of tests |
+| Test config.go  | ✅ DONE | 360 lines of tests |
+| Test flags.go   | ✅ DONE | 488 lines of tests |
+| Test scope.go   | ✅ DONE | 458 lines of tests |
 | Test command.go | ✅ DONE | 399 lines of tests |
-| Test guard.go | ✅ DONE | 565 lines of tests |
+| Test guard.go   | ✅ DONE | 565 lines of tests |
 
 ---
 
 ## Completed (v2 Polish)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Add typed example | ✅ DONE | examples/typed/main.go |
-| Update FEATURES.md | ✅ DONE | v2 API documentation |
-| Update TODO_LIST.md | ✅ DONE | This file |
+| Task                | Status  | Notes                  |
+| ------------------- | ------- | ---------------------- |
+| Add typed example   | ✅ DONE | examples/typed/main.go |
+| Update FEATURES.md  | ✅ DONE | v2 API documentation   |
+| Update TODO_LIST.md | ✅ DONE | This file              |
 
 ---
 
@@ -48,15 +48,15 @@
 
 ### Low Priority
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Update README.md for v2 | ⏳ PENDING | Add v2 examples |
-| Update AGENTS.md for v2 | ⏳ PENDING | Document v2 patterns |
-| Add more examples | ⏳ PENDING | DI patterns, advanced flags |
-| Plugin system for custom validators | ⏳ PENDING | Future enhancement |
-| Enhanced flag validation | ⏳ PENDING | Enums, custom validators |
-| Performance benchmarks | ⏳ PENDING | Not yet needed |
-| Release automation | ⏳ PENDING | Manual releases sufficient |
+| Task                                | Status     | Notes                       |
+| ----------------------------------- | ---------- | --------------------------- |
+| Update README.md for v2             | ⏳ PENDING | Add v2 examples             |
+| Update AGENTS.md for v2             | ⏳ PENDING | Document v2 patterns        |
+| Add more examples                   | ⏳ PENDING | DI patterns, advanced flags |
+| Plugin system for custom validators | ⏳ PENDING | Future enhancement          |
+| Enhanced flag validation            | ⏳ PENDING | Enums, custom validators    |
+| Performance benchmarks              | ⏳ PENDING | Not yet needed              |
+| Release automation                  | ⏳ PENDING | Manual releases sufficient  |
 
 ---
 
@@ -100,11 +100,13 @@ cmdguard/
 **Status: v2.0.0 READY ✅**
 
 The v2 API is complete with comprehensive test coverage:
+
 - 7 implementation files (~1,700 lines)
 - 7 test files (~2,700 lines)
 - Complete example demonstrating all features
 
 **Key v2 Features:**
+
 - Type-safe with generics (`GuardedCommand[T]`)
 - No panics - all operations return errors
 - DI integration with samber/do/v2

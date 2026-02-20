@@ -1,6 +1,7 @@
 # Project Split Analysis: cmdguard
 
 ## Executive Summary
+
 cmdguard is a focused Go library for building validated Cobra CLI applications with two API versions (v1 panic-based, v2 type-safe with DI). The project is cohesive, small (~15 source files), and single-purpose. Splitting is **not recommended** as the codebase is well-organized and the components are tightly coupled to a single domain.
 
 ## Current Architecture
@@ -16,6 +17,7 @@ cmdguard/
 ```
 
 **Key Components:**
+
 - **v1 API**: Simple Cobra wrapper with panic-on-invalid behavior
 - **v2 API**: Type-safe generics (GuardedCommand[T,F]), DI via samber/do/v2, struct-tag flags
 - **Internal**: Small utility packages for config/logging (only used by v1)
@@ -24,13 +26,13 @@ cmdguard/
 
 ### Rationale
 
-| Criterion | Assessment |
-|-----------|------------|
-| Project size | Small (~15 source files) |
-| Domain cohesion | Single domain: CLI validation/wrapping |
-| Dependency overlap | High - v1/v2 share same core purpose |
+| Criterion                 | Assessment                                           |
+| ------------------------- | ---------------------------------------------------- |
+| Project size              | Small (~15 source files)                             |
+| Domain cohesion           | Single domain: CLI validation/wrapping               |
+| Dependency overlap        | High - v1/v2 share same core purpose                 |
 | Independent deployability | No - versions are alternative, not separate products |
-| Team scaling need | None evident |
+| Team scaling need         | None evident                                         |
 
 ### Why Not Split
 
@@ -42,9 +44,9 @@ cmdguard/
 
 ### Potential (But Not Recommended) Extractions
 
-| Name | Purpose | Key Files | Priority |
-|------|---------|------|----------|
-| cmdguard-types | CLI-specific types (Enum, Duration, LogLevel) | /Users/larsartmann/projects/cmdguard/pkg/cmdguard/v2/types.go | Low |
+| Name           | Purpose                                       | Key Files                                                     | Priority |
+| -------------- | --------------------------------------------- | ------------------------------------------------------------- | -------- |
+| cmdguard-types | CLI-specific types (Enum, Duration, LogLevel) | /Users/larsartmann/projects/cmdguard/pkg/cmdguard/v2/types.go | Low      |
 
 These types are CLI-specific and add little value as a separate package.
 

@@ -131,7 +131,7 @@ func (g *GuardedCommand) AddCommand(cmd *cobra.Command) {
 
 // AddSubcommand adds a subcommand to a parent command.
 // PANICS if the subcommand is invalid.
-func (g *GuardedCommand) AddSubcommand(parent *cobra.Command, child *cobra.Command) {
+func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 	if g.validated {
 		panic("cmdguard: cannot add commands after execution")
 	}

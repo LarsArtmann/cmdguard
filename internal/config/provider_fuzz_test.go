@@ -207,7 +207,7 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 
 func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 	corpus := []struct {
-		value       string
+		value        string
 		expectStrict bool
 	}{
 		{"true", true},

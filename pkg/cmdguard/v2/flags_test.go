@@ -47,11 +47,11 @@ func TestNewFlagRegistry(t *testing.T) {
 func TestFlagRegistry_RegisterFlags(t *testing.T) {
 	t.Run("registers all flag types", func(t *testing.T) {
 		type TestConfig struct {
-			String   string  `flag:"string" default:"str"`
-			Bool     bool    `flag:"bool" default:"true"`
-			Int      int     `flag:"int" default:"42"`
-			Float    float64 `flag:"float" default:"3.14"`
-			Strings  []string `flag:"strings" default:"a,b,c"`
+			String  string   `flag:"string" default:"str"`
+			Bool    bool     `flag:"bool" default:"true"`
+			Int     int      `flag:"int" default:"42"`
+			Float   float64  `flag:"float" default:"3.14"`
+			Strings []string `flag:"strings" default:"a,b,c"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})

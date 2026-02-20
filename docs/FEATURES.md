@@ -4,10 +4,10 @@ This document provides a comprehensive reference for all cmdguard features acros
 
 ## API Versions
 
-| Version | Package | Description |
-|---------|---------|-------------|
-| v1 | `pkg/cmdguard` | Simple Cobra wrapper with panic-on-invalid guards |
-| v2 | `pkg/cmdguard/v2` | Full type-safe API with DI, lifecycle hooks, flag tags |
+| Version | Package           | Description                                            |
+| ------- | ----------------- | ------------------------------------------------------ |
+| v1      | `pkg/cmdguard`    | Simple Cobra wrapper with panic-on-invalid guards      |
+| v2      | `pkg/cmdguard/v2` | Full type-safe API with DI, lifecycle hooks, flag tags |
 
 ---
 
@@ -16,6 +16,7 @@ This document provides a comprehensive reference for all cmdguard features acros
 ### Type-Safe Commands
 
 Commands are generic over two type parameters:
+
 - `T` - Application-level configuration type
 - `F` - Command-specific flags type
 
@@ -50,12 +51,12 @@ cmd := v2.Command[Config, v2.NoFlags]{
 
 Define flags declaratively using struct tags:
 
-| Tag | Required | Description | Example |
-|-----|----------|-------------|---------|
-| `flag` | Yes | Flag name | `flag:"verbose"` |
-| `short` | No | Short flag (-v) | `short:"v"` |
-| `default` | No | Default value | `default:"false"` |
-| `help` | No | Help text | `help:"Enable verbose"` |
+| Tag       | Required | Description     | Example                 |
+| --------- | -------- | --------------- | ----------------------- |
+| `flag`    | Yes      | Flag name       | `flag:"verbose"`        |
+| `short`   | No       | Short flag (-v) | `short:"v"`             |
+| `default` | No       | Default value   | `default:"false"`       |
+| `help`    | No       | Help text       | `help:"Enable verbose"` |
 
 ```go
 type ServerFlags struct {
@@ -95,7 +96,7 @@ func setupDI(scope *v2.Scope, cfg Config) {
     v2.Provide(scope, func(i do.Injector) (*Database, error) {
         return &Database{URL: cfg.DBURL}, nil
     })
-    
+
     // Provide value directly
     v2.ProvideValue(scope, &Logger{Level: cfg.LogLevel})
 }
@@ -186,11 +187,11 @@ cmd, err := v2.NewCommand[Config, Flags]("greet",
 
 Commands are validated at construction time:
 
-| Check | Error Type |
-|-------|------------|
-| Empty `Use` field | `ErrMissingName` |
-| No `RunE` and no subcommands | `ErrMissingHandler` |
-| Invalid subcommands (recursive) | Wrapped error |
+| Check                           | Error Type          |
+| ------------------------------- | ------------------- |
+| Empty `Use` field               | `ErrMissingName`    |
+| No `RunE` and no subcommands    | `ErrMissingHandler` |
+| Invalid subcommands (recursive) | Wrapped error       |
 
 ```go
 // Validate explicitly
@@ -219,6 +220,7 @@ root.ExecuteAndExit(context.Background())
 ### Panic-at-Construction-Time
 
 Invalid commands panic immediately:
+
 - Commands without `Run` or `RunE`
 - Commands with empty `Use` field
 - (Optional) Commands with `Run` instead of `RunE` in strict mode
@@ -235,19 +237,19 @@ root := cmdguard.New("myapp", "My CLI")
 
 ### Built-in Commands
 
-| Command | Description |
-|---------|-------------|
-| `version` | Prints version info |
+| Command    | Description            |
+| ---------- | ---------------------- |
+| `version`  | Prints version info    |
 | `validate` | Validates command tree |
-| `help` | Cobra's help command |
+| `help`     | Cobra's help command   |
 
 ### Global Flags (v1)
 
-| Flag | Env Var | Default | Description |
-|------|---------|---------|-------------|
-| `--config, -c` | `CMDGUARD_CONFIG_FILE` | | Config file path |
-| `--log-level, -l` | `CMDGUARD_LOG_LEVEL` | `info` | Log level (debug, info, warn, error) |
-| `--strict, -s` | `CMDGUARD_STRICT_MODE` | `false` | Enable strict mode |
+| Flag              | Env Var                | Default | Description                          |
+| ----------------- | ---------------------- | ------- | ------------------------------------ |
+| `--config, -c`    | `CMDGUARD_CONFIG_FILE` |         | Config file path                     |
+| `--log-level, -l` | `CMDGUARD_LOG_LEVEL`   | `info`  | Log level (debug, info, warn, error) |
+| `--strict, -s`    | `CMDGUARD_STRICT_MODE` | `false` | Enable strict mode                   |
 
 ---
 
@@ -266,16 +268,16 @@ var (
 
 ## Comparison with Raw Cobra
 
-| Feature | Raw Cobra | cmdguard v1 | cmdguard v2 |
-|---------|-----------|-------------|-------------|
-| Invalid command detection | Runtime | Construction | Construction |
-| Type-safe config | No | No | Yes |
-| Type-safe flags | No | No | Yes |
-| Flag binding | Manual | Manual | Automatic (tags) |
-| DI integration | Manual | No | Yes |
-| Lifecycle hooks | Basic | Basic | Full (Pre/Post) |
-| Health checks | No | No | Yes |
-| Graceful shutdown | Manual | No | Yes |
+| Feature                   | Raw Cobra | cmdguard v1  | cmdguard v2      |
+| ------------------------- | --------- | ------------ | ---------------- |
+| Invalid command detection | Runtime   | Construction | Construction     |
+| Type-safe config          | No        | No           | Yes              |
+| Type-safe flags           | No        | No           | Yes              |
+| Flag binding              | Manual    | Manual       | Automatic (tags) |
+| DI integration            | Manual    | No           | Yes              |
+| Lifecycle hooks           | Basic     | Basic        | Full (Pre/Post)  |
+| Health checks             | No        | No           | Yes              |
+| Graceful shutdown         | Manual    | No           | Yes              |
 
 ---
 
@@ -298,11 +300,11 @@ pkg/cmdguard/v2/
 
 ## Dependencies
 
-| Library | Purpose | Version |
-|---------|---------|---------|
-| `github.com/spf13/cobra` | CLI framework | v1.10.2 |
-| `github.com/samber/do/v2` | DI container | v2.0.0 |
-| `github.com/charmbracelet/fang` | CLI styling | v0.4.4 |
+| Library                         | Purpose       | Version |
+| ------------------------------- | ------------- | ------- |
+| `github.com/spf13/cobra`        | CLI framework | v1.10.2 |
+| `github.com/samber/do/v2`       | DI container  | v2.0.0  |
+| `github.com/charmbracelet/fang` | CLI styling   | v0.4.4  |
 
 ---
 
@@ -310,9 +312,9 @@ pkg/cmdguard/v2/
 
 See `examples/` directory:
 
-| Example | API | Description |
-|---------|-----|-------------|
-| `basic` | v1 | Simple CLI with validation |
-| `advanced` | v1 | Nested commands, config |
-| `guarded` | v1 | Strict mode, custom validation |
-| `typed` | v2 | Full type-safe CLI with DI |
+| Example    | API | Description                    |
+| ---------- | --- | ------------------------------ |
+| `basic`    | v1  | Simple CLI with validation     |
+| `advanced` | v1  | Nested commands, config        |
+| `guarded`  | v1  | Strict mode, custom validation |
+| `typed`    | v2  | Full type-safe CLI with DI     |

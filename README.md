@@ -106,21 +106,22 @@ func main() {
 
 ## API Comparison
 
-| Feature | v1 API | v2 API |
-|---------|--------|--------|
-| Type-safe config | No | Yes (type parameter T) |
-| Type-safe flags | No | Yes (type parameter F) |
-| DI integration | No | Yes (samber/do/v2) |
-| Flag tags | No | Yes (`flag`, `short`, `default`, `help`) |
-| Lifecycle hooks | No | Yes (PreRunE, PostRunE) |
-| Health checks | No | Yes |
-| Graceful shutdown | No | Yes |
+| Feature           | v1 API | v2 API                                   |
+| ----------------- | ------ | ---------------------------------------- |
+| Type-safe config  | No     | Yes (type parameter T)                   |
+| Type-safe flags   | No     | Yes (type parameter F)                   |
+| DI integration    | No     | Yes (samber/do/v2)                       |
+| Flag tags         | No     | Yes (`flag`, `short`, `default`, `help`) |
+| Lifecycle hooks   | No     | Yes (PreRunE, PostRunE)                  |
+| Health checks     | No     | Yes                                      |
+| Graceful shutdown | No     | Yes                                      |
 
 ## v2 API Reference
 
 ### GuardedCommand[T, F]
 
 The main CLI type with two type parameters:
+
 - `T` - Application-level config type
 - `F` - Root command flags type (use `v2.NoFlags` if none)
 
@@ -182,16 +183,16 @@ Define flags using struct tags:
 type MyFlags struct {
     // Required: flag name
     Name string `flag:"name"`
-    
+
     // Optional: short flag (-n)
     Name string `flag:"name" short:"n"`
-    
+
     // Optional: default value
     Name string `flag:"name" default:"World"`
-    
+
     // Optional: help text
     Name string `flag:"name" help:"Name to greet"`
-    
+
     // All together
     Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
     Count int    `flag:"count" short:"c" default:"1" help:"Number of times"`

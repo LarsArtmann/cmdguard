@@ -10,13 +10,13 @@
 
 ### Current Issues (v1)
 
-| Issue | Current | Impact |
-|-------|---------|--------|
-| **Panics** | `AddCommand` panics on invalid | Library crashes applications |
-| **No Single Truth** | Flags defined separately from config | Drift, duplication |
-| **No Type Safety** | Flags return `string`, manual parsing | Runtime errors |
-| **No DI** | Manual service wiring | Hard to test, hard to extend |
-| **Static** | Can't add plugin config dynamically | Limits extensibility |
+| Issue               | Current                               | Impact                       |
+| ------------------- | ------------------------------------- | ---------------------------- |
+| **Panics**          | `AddCommand` panics on invalid        | Library crashes applications |
+| **No Single Truth** | Flags defined separately from config  | Drift, duplication           |
+| **No Type Safety**  | Flags return `string`, manual parsing | Runtime errors               |
+| **No DI**           | Manual service wiring                 | Hard to test, hard to extend |
+| **Static**          | Can't add plugin config dynamically   | Limits extensibility         |
 
 ### Design Goals
 
@@ -78,7 +78,7 @@ package main
 
 import (
     "context"
-    
+
     "github.com/larsartmann/cmdguard/v2/pkg/cmdguard"
     "github.com/samber/do/v2"
 )
@@ -92,20 +92,20 @@ type Config struct {
 
 func main() {
     ctx := context.Background()
-    
+
     // Create root scope with config
     root := cmdguard.New("myapp", "My application", Config{})
-    
+
     // Register services in root scope
     do.Provide(root, NewLogger)
     do.Provide(root, NewDatabase)
-    
+
     // Build command tree (returns errors, never panics)
     if err := root.AddCommand(greetCmd()); err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
-    
+
     // Execute - injects typed config everywhere
     if err := root.Execute(ctx); err != nil {
         os.Exit(1)
@@ -127,12 +127,12 @@ func greetCmd() *cmdguard.Command[Config] {
         RunE: func(ctx context.Context, cfg *Config, flags *GreetFlags) error {
             // cfg is typed! cfg.LogLevel is Enum, not string
             // flags is typed! flags.Name is string
-            
+
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
             if flags.Shout {
                 msg = strings.ToUpper(msg)
             }
-            
+
             fmt.Println(msg)
             return nil
         },
@@ -150,18 +150,18 @@ func RegisterPlugin(scope do.Injector) error {
         Enabled  bool   `flag:"enabled" default:"true"`
         Endpoint string `flag:"endpoint" default:"http://localhost:8080"`
     }
-    
+
     // Register in plugin scope (child of root)
     pluginScope := do.Scope(scope, "my-plugin")
-    
+
     do.Provide(pluginScope, func(i do.Injector) (PluginConfig, error) {
         // Auto-populated from flags with prefix: --my-plugin-enabled, --my-plugin-endpoint
         return cmdguard.ResolveConfig[PluginConfig](i, "my-plugin")
     })
-    
+
     // Register plugin services
     do.Provide(pluginScope, NewPluginService)
-    
+
     return nil
 }
 ```
@@ -222,16 +222,16 @@ type Command[T any] struct {
     Long    string                              // Long description
     Aliases []string                            // Aliases
     Example string                              // Example usage
-    
+
     // Flags is populated from struct tags
     Flags   any                                 // Struct with flag tags
-    
+
     // RunE receives typed config and typed flags
     RunE    func(ctx context.Context, cfg *T, flags any) error
-    
+
     // PreRunE for validation
     PreRunE func(ctx context.Context, cfg *T, flags any) error
-    
+
     // Subcommands
     Commands []Command[T]
 }
@@ -274,11 +274,11 @@ func (g *GuardedCommand[T]) AddCommand(cmd Command[T]) error {
     if cmd.Use == "" {
         return fmt.Errorf("%w: command has no name", ErrInvalidCommand)
     }
-    
+
     if cmd.RunE == nil && len(cmd.Commands) == 0 {
         return fmt.Errorf("%w: %q has no RunE and no subcommands", ErrMissingHandler, cmd.Use)
     }
-    
+
     // ... rest of implementation
     return nil
 }
@@ -292,12 +292,12 @@ func (g *GuardedCommand[T]) AddCommand(cmd Command[T]) error {
 // Register services in root scope
 func main() {
     root := cmdguard.New("app", "desc", Config{})
-    
+
     // Services available everywhere
     do.Provide(root.Scope(), NewLogger)
     do.Provide(root.Scope(), NewDatabase)
     do.Provide(root.Scope(), NewCache)
-    
+
     // Command-specific scope
     root.AddCommand(cmdguard.Command[Config]{
         Use: "users",
@@ -362,21 +362,25 @@ func ParseDuration(s string) (Duration, error) {
 ## Migration Path (v1 → v2)
 
 ### Step 1: Add DI Scope Support
+
 - Add samber/do/v2 dependency
 - Wrap existing GuardedCommand in DI scope
 - Keep existing API working
 
 ### Step 2: Add Typed Config
+
 - Create `TypedGuardedCommand[T]`
 - Implement flag auto-generation from struct tags
 - Add `AddCommand` that returns error
 
 ### Step 3: Remove Panics
+
 - Replace all `panic()` calls with error returns
 - Update all `AddCommand` signatures
 - Update documentation
 
 ### Step 4: Deprecate Old API
+
 - Mark v1 API as deprecated
 - Provide migration guide
 - Eventually remove in v3

@@ -97,7 +97,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Manage remotes",
 				}
 				child := &cobra.Command{
-					Use:  "add",
+					Use:   "add",
 					Short: "Add a remote",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
@@ -147,7 +147,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 
 			It("should accept valid subcommands", func() {
 				child := &cobra.Command{
-					Use:  "migrate",
+					Use:   "migrate",
 					Short: "Run migrations",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
@@ -280,7 +280,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 				_ = root.Execute(context.Background())
 
 				lateCmd := &cobra.Command{
-					Use:  "too-late",
+					Use:   "too-late",
 					Short: "Added after execution",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
@@ -290,7 +290,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 			It("should also prevent adding subcommands after execution", func() {
 				root = cmdguard.New("myapp", "My CLI")
 				parent := &cobra.Command{
-					Use:  "db",
+					Use:   "db",
 					Short: "Database commands",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
@@ -299,7 +299,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 				_ = root.Execute(context.Background())
 
 				child := &cobra.Command{
-					Use:  "migrate",
+					Use:   "migrate",
 					Short: "Too late to add",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}

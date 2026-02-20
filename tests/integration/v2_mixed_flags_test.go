@@ -5,7 +5,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

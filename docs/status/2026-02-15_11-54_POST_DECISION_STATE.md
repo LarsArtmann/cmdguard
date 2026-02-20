@@ -13,6 +13,7 @@
 The v2 API implementation is functionally complete with comprehensive test coverage (88-100%). However, a critical coding standards violation was identified that must be addressed before release.
 
 **Critical Issue:** `cloneFlags` function uses `any` type, violating `HOW_TO_GOLANG.md` Section 1 "Non-Negotiables":
+
 > **No `any` types** — use proper types, generics, or concrete interfaces
 
 ---
@@ -82,12 +83,12 @@ RunE func(ctx context.Context, cfg *T, flags any) error
 
 ### Solution Options
 
-| Option | Approach | Pros | Cons |
-|--------|----------|------|------|
-| A | `Command[T, F]` - add second type param | Full type safety | Breaking API change, complex |
-| B | `FlagCloner` interface | Type-safe, extensible | Users must implement Clone() |
-| C | Accept as exception | No code change | Violates documented standards |
-| D | Generic `cloneFlags[T any]` | Partial fix | Still returns `any` at boundaries |
+| Option | Approach                                | Pros                  | Cons                              |
+| ------ | --------------------------------------- | --------------------- | --------------------------------- |
+| A      | `Command[T, F]` - add second type param | Full type safety      | Breaking API change, complex      |
+| B      | `FlagCloner` interface                  | Type-safe, extensible | Users must implement Clone()      |
+| C      | Accept as exception                     | No code change        | Violates documented standards     |
+| D      | Generic `cloneFlags[T any]`             | Partial fix           | Still returns `any` at boundaries |
 
 **Decision Required:** User must choose approach before proceeding.
 
@@ -97,27 +98,27 @@ RunE func(ctx context.Context, cfg *T, flags any) error
 
 ### v2 API Implementation (Complete)
 
-| Component | Lines | Description |
-|-----------|-------|-------------|
-| `errors.go` | 151 | Typed errors: ErrInvalidCommand, ErrMissingHandler |
-| `types.go` | 245 | Common types, interfaces, Enum support |
-| `config.go` | 314 | Typed configuration with koanf-style patterns |
-| `flags.go` | 271 | FlagRegistry with struct tag parsing |
-| `scope.go` | 189 | DI scope wrapping samber/do/v2 |
-| `command.go` | 213 | Command[T] type-safe definition |
-| `guard.go` | 369 | GuardedCommand[T] main implementation |
+| Component    | Lines | Description                                        |
+| ------------ | ----- | -------------------------------------------------- |
+| `errors.go`  | 151   | Typed errors: ErrInvalidCommand, ErrMissingHandler |
+| `types.go`   | 245   | Common types, interfaces, Enum support             |
+| `config.go`  | 314   | Typed configuration with koanf-style patterns      |
+| `flags.go`   | 271   | FlagRegistry with struct tag parsing               |
+| `scope.go`   | 189   | DI scope wrapping samber/do/v2                     |
+| `command.go` | 213   | Command[T] type-safe definition                    |
+| `guard.go`   | 369   | GuardedCommand[T] main implementation              |
 
 ### v2 Test Suite (Complete)
 
-| Test File | Lines | Coverage Focus |
-|-----------|-------|----------------|
-| `errors_test.go` | 142 | Error types, wrapping, Is/As |
-| `types_test.go` | 428 | Enums, validation, type helpers |
-| `config_test.go` | 453 | Configuration loading, defaults |
-| `flags_test.go` | 488 | Flag parsing, validation, edge cases |
-| `scope_test.go` | 458 | DI scope, lifecycle, health checks |
-| `command_test.go` | 399 | Command validation, options |
-| `guard_test.go` | 618 | Full integration, Execute, cloning |
+| Test File         | Lines | Coverage Focus                       |
+| ----------------- | ----- | ------------------------------------ |
+| `errors_test.go`  | 142   | Error types, wrapping, Is/As         |
+| `types_test.go`   | 428   | Enums, validation, type helpers      |
+| `config_test.go`  | 453   | Configuration loading, defaults      |
+| `flags_test.go`   | 488   | Flag parsing, validation, edge cases |
+| `scope_test.go`   | 458   | DI scope, lifecycle, health checks   |
+| `command_test.go` | 399   | Command validation, options          |
+| `guard_test.go`   | 618   | Full integration, Execute, cloning   |
 
 ### Session Improvements (Complete)
 
@@ -136,12 +137,12 @@ RunE func(ctx context.Context, cfg *T, flags any) error
 
 ## Test Coverage
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| `pkg/cmdguard/v2` | 88.3% | Good |
-| `pkg/cmdguard` (v1) | 94.3% | Good |
-| `internal/config` | 95.7% | Excellent |
-| `internal/logging` | 100.0% | Excellent |
+| Package             | Coverage | Status    |
+| ------------------- | -------- | --------- |
+| `pkg/cmdguard/v2`   | 88.3%    | Good      |
+| `pkg/cmdguard` (v1) | 94.3%    | Good      |
+| `internal/config`   | 95.7%    | Excellent |
+| `internal/logging`  | 100.0%   | Excellent |
 
 ---
 
@@ -149,34 +150,34 @@ RunE func(ctx context.Context, cfg *T, flags any) error
 
 ### Blocking (Must Resolve)
 
-| Task | Status | Description |
-|------|--------|-------------|
+| Task                         | Status      | Description                        |
+| ---------------------------- | ----------- | ---------------------------------- |
 | Fix `any` type in cloneFlags | **BLOCKED** | Awaiting user decision on approach |
 
 ### High Priority (After Blocker)
 
-| Task | Effort | Description |
-|------|--------|-------------|
-| Push commits to remote | 1m | `git push origin master` |
-| Decide v1/v2 API strategy | - | Deprecate v1, keep both, or merge? |
-| Remove orphaned packages | 10m | Delete internal/commands, internal/di, internal/validation |
+| Task                      | Effort | Description                                                |
+| ------------------------- | ------ | ---------------------------------------------------------- |
+| Push commits to remote    | 1m     | `git push origin master`                                   |
+| Decide v1/v2 API strategy | -      | Deprecate v1, keep both, or merge?                         |
+| Remove orphaned packages  | 10m    | Delete internal/commands, internal/di, internal/validation |
 
 ### Medium Priority
 
-| Task | Effort | Description |
-|------|--------|-------------|
-| Add version/validate commands to v2 | 15m | Feature parity with v1 |
-| Update README.md for v2 | 20m | Add v2 examples, migration guide |
-| Implement middleware chain | 20m | Logging, metrics, tracing hooks |
-| Integrate go-playground/validator | 25m | Struct validation tags |
+| Task                                | Effort | Description                      |
+| ----------------------------------- | ------ | -------------------------------- |
+| Add version/validate commands to v2 | 15m    | Feature parity with v1           |
+| Update README.md for v2             | 20m    | Add v2 examples, migration guide |
+| Implement middleware chain          | 20m    | Logging, metrics, tracing hooks  |
+| Integrate go-playground/validator   | 25m    | Struct validation tags           |
 
 ### Low Priority
 
-| Task | Effort | Description |
-|------|--------|-------------|
-| Add samber/lo dependency | 15m | Functional utilities |
-| Remove unnecessary type arguments | 5m | Type inference fix |
-| Create examples/middleware | 15m | Demonstrate interceptor usage |
+| Task                              | Effort | Description                   |
+| --------------------------------- | ------ | ----------------------------- |
+| Add samber/lo dependency          | 15m    | Functional utilities          |
+| Remove unnecessary type arguments | 5m     | Type inference fix            |
+| Create examples/middleware        | 15m    | Demonstrate interceptor usage |
 
 ---
 
@@ -184,12 +185,13 @@ RunE func(ctx context.Context, cfg *T, flags any) error
 
 ### Dual API Situation
 
-| API | Philosophy | Status |
-|-----|------------|--------|
-| v1 (`pkg/cmdguard/`) | Panic-at-construction | Documented in README |
-| v2 (`pkg/cmdguard/v2/`) | No panics, type-safe | NOT documented |
+| API                     | Philosophy            | Status               |
+| ----------------------- | --------------------- | -------------------- |
+| v1 (`pkg/cmdguard/`)    | Panic-at-construction | Documented in README |
+| v2 (`pkg/cmdguard/v2/`) | No panics, type-safe  | NOT documented       |
 
 **Strategic Options:**
+
 1. Deprecate v1 - Add deprecation notice
 2. Keep both - v1 simple, v2 enterprise
 3. Merge - Single unified API
@@ -217,16 +219,17 @@ pkg/cmdguard/public_api.go
 
 ## Dependencies
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| github.com/spf13/cobra | v1.10.2 | CLI framework |
-| github.com/samber/do/v2 | v2.0.0 | Dependency injection |
-| github.com/charmbracelet/fang | v0.4.4 | CLI styling |
-| github.com/stretchr/testify | v1.11.1 | Testing assertions |
-| github.com/onsi/ginkgo/v2 | v2.28.1 | BDD testing |
-| github.com/onsi/gomega | v1.39.1 | BDD matchers |
+| Dependency                    | Version | Purpose              |
+| ----------------------------- | ------- | -------------------- |
+| github.com/spf13/cobra        | v1.10.2 | CLI framework        |
+| github.com/samber/do/v2       | v2.0.0  | Dependency injection |
+| github.com/charmbracelet/fang | v0.4.4  | CLI styling          |
+| github.com/stretchr/testify   | v1.11.1 | Testing assertions   |
+| github.com/onsi/ginkgo/v2     | v2.28.1 | BDD testing          |
+| github.com/onsi/gomega        | v1.39.1 | BDD matchers         |
 
 **Potential additions:**
+
 - `github.com/samber/lo` - Functional utilities
 - `github.com/go-playground/validator/v10` - Struct validation
 
@@ -242,10 +245,10 @@ pkg/cmdguard/public_api.go
 
 ## Decision Log
 
-| Date | Decision | Rationale |
-|------|----------|-----------|
+| Date       | Decision                        | Rationale                        |
+| ---------- | ------------------------------- | -------------------------------- |
 | 2026-02-15 | Identified `any` type violation | Project standards prohibit `any` |
-| 2026-02-15 | Block release until resolved | Quality gate enforcement |
+| 2026-02-15 | Block release until resolved    | Quality gate enforcement         |
 
 ---
 
@@ -260,4 +263,4 @@ pkg/cmdguard/public_api.go
 
 ---
 
-*Generated by AI Assistant on 2026-02-15*
+_Generated by AI Assistant on 2026-02-15_

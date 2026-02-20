@@ -25,6 +25,7 @@ just verify
 ```
 
 This runs:
+
 - Build check
 - All tests
 - Linting
@@ -74,6 +75,7 @@ chore: maintenance tasks
 ```
 
 Example:
+
 ```bash
 git commit -m "feat: add JSON logging option
 
@@ -116,6 +118,7 @@ if err := doSomething(); err != nil {
 - Use `t.Parallel()` for parallel tests when possible
 
 Example:
+
 ```go
 func TestNewGuardedCommand(t *testing.T) {
     tests := []struct {
@@ -151,11 +154,13 @@ func TestNewGuardedCommand(t *testing.T) {
 ### Guard Philosophy
 
 cmdguard follows a "fail fast" philosophy:
+
 - Panic at construction time for invalid commands
 - No runtime validation errors
 - Invalid states should be unrepresentable
 
 When adding features:
+
 1. Validate at construction time when possible
 2. Panic with clear error messages
 3. Never allow invalid states at runtime
