@@ -26,31 +26,15 @@ type GuardedCommand[T any, F any] struct {
 // T is the application config type, F is the command-specific flags type.
 // F must be a struct (like NoFlags) or pointer to struct for flag binding.
 func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error) {
-	if name == "" {
-		return nil, fmt.Errorf("%w: name is required", ErrInvalidCommand)
+	if err := validateName(name); err != nil {
+		return nil, err
 	}
 
-	// Validate F type constraint at initialization time
 	if err := FlagTypeConstraint[F](); err != nil {
 		return nil, err
 	}
 
-	// Create the root cobra command
-	rootCmd := &cobra.Command{
-		Use:   name,
-		Short: short,
-	}
-
-	g := &GuardedCommand[T, F]{
-		name:           name,
-		short:          short,
-		defaults:       defaults,
-		scope:          nil, // initialized below
-		rootCmd:        rootCmd,
-		registry:       nil, // initialized below
-		registeredCmds: make(map[string]bool),
-	}
-
+	g := createGuardedCommand[T, F](name, short, defaults)
 	if err := g.initialize(defaults); err != nil {
 		return nil, err
 	}
@@ -58,20 +42,55 @@ func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error
 	return g, nil
 }
 
+// validateName checks that the command name is not empty.
+func validateName(name string) error {
+	if name == "" {
+		return fmt.Errorf("%w: name is required", ErrInvalidCommand)
+	}
+	return nil
+}
+
+// createGuardedCommand creates a new GuardedCommand with basic fields set.
+func createGuardedCommand[T, F any](name, short string, defaults T) *GuardedCommand[T, F] {
+	return &GuardedCommand[T, F]{
+		name:           name,
+		short:          short,
+		defaults:       defaults,
+		scope:          nil, // initialized below
+		rootCmd:        &cobra.Command{Use: name, Short: short},
+		registry:       nil, // initialized below
+		registeredCmds: make(map[string]bool),
+	}
+}
+
 // initialize sets up the DI scope, flag registry, and global flags.
 func (g *GuardedCommand[T, F]) initialize(defaults T) error {
-	// Create the DI scope
 	g.scope = NewScope(g.name)
 
-	// Register defaults in scope
+	if err := g.registerConfig(defaults); err != nil {
+		return err
+	}
+
+	if err := g.setupFlagRegistry(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// registerConfig registers the config in the DI scope.
+func (g *GuardedCommand[T, F]) registerConfig(defaults T) error {
 	cfg := defaults
 	if err := ProvideValue(g.scope, &cfg); err != nil {
 		return fmt.Errorf("failed to register config: %w", err)
 	}
 	g.config = &cfg
+	return nil
+}
 
-	// Register flag registry for root config
-	registry, err := NewFlagRegistry(&cfg)
+// setupFlagRegistry creates and configures the flag registry.
+func (g *GuardedCommand[T, F]) setupFlagRegistry() error {
+	registry, err := NewFlagRegistry(g.config)
 	if err != nil {
 		return fmt.Errorf("failed to create flag registry: %w", err)
 	}
@@ -80,12 +99,10 @@ func (g *GuardedCommand[T, F]) initialize(defaults T) error {
 	}
 	g.registry = registry
 
-	// Register global flags from T's flag: tags with Cobra
 	if err := registry.RegisterFlags(g.rootCmd); err != nil {
 		return fmt.Errorf("failed to register global flags: %w", err)
 	}
 
-	// Add PersistentPreRunE to parse global flags into config before any command runs
 	g.rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
 		return registry.ParseFlags(c, g.config)
 	}
