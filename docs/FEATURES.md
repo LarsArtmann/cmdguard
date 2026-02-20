@@ -101,10 +101,16 @@ func setupDI(scope *v2.Scope, cfg Config) {
     v2.ProvideValue(scope, &Logger{Level: cfg.LogLevel})
 }
 
-// Invoke in handlers
+// Invoke in handlers (with proper error handling)
 RunE: func(ctx context.Context, cfg *Config, flags *Flags) error {
-    db := do.MustInvoke[*Database](cli.Scope())
-    logger := do.MustInvoke[*Logger](cli.Scope())
+    db, err := v2.Invoke[*Database](cli.ScopeStruct())
+    if err != nil {
+        return v2.NewServiceError("*Database", err)
+    }
+    logger, err := v2.Invoke[*Logger](cli.ScopeStruct())
+    if err != nil {
+        return v2.NewServiceError("*Logger", err)
+    }
     // ...
 }
 ```

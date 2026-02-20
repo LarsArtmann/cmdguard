@@ -246,9 +246,12 @@ v2.Provide(scope, func(i do.Injector) (*Database, error) {
 
 v2.ProvideValue(scope, config)
 
-// Invoke services in handlers
+// Invoke services in handlers (with proper error handling)
 RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-    db := do.MustInvoke[*Database](cli.Scope())
+    db, err := v2.Invoke[*Database](cli.ScopeStruct())
+    if err != nil {
+        return v2.NewServiceError("*Database", err)
+    }
     // use db...
 },
 ```

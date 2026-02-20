@@ -55,7 +55,6 @@ func (s *Scope) Child(name string) *Scope {
 func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error  // ✅
 func ProvideValue[T any](scope *Scope, value T) error                           // ✅
 func Invoke[T any](scope *Scope) (T, error)                                     // ✅
-func MustInvoke[T any](scope *Scope) T                                          // ✅
 ```
 
 ✅ **Lifecycle management:**
@@ -121,7 +120,7 @@ func (g *GuardedCommand[T, F]) ScopeStruct() *Scope {
 
 ✅ **88.7% coverage** with comprehensive tests:
 - `TestNewScope`, `TestScope_Child`, `TestProvide`, `TestProvideValue`
-- `TestInvoke`, `TestMustInvoke`, `TestScope_Shutdown`
+- `TestInvoke`, `TestScope_Shutdown`
 - `TestScope_HealthCheck`, `TestScopedProvider`, `TestRegisterInScope`
 - `TestScope_Integration` - full workflow test
 
@@ -139,18 +138,21 @@ ok  github.com/larsartmann/projects/cmdguard/pkg/cmdguard/v2  1.398s
 
 **Location:** `examples/typed/main.go:125, 187`
 
-**Fix Applied:** Changed to use `v2.MustInvoke[T](cli.ScopeStruct())` consistently.
+**Fix Applied:** Changed to use `v2.Invoke[T]` with proper error handling - no panics.
 
 ### Issue 2: Closure Capture Instead of DI ✅ FIXED
 
 **Location:** `examples/typed/main.go:93-100`
 
-**Fix Applied:** Providers now invoke dependencies from DI:
+**Fix Applied:** Providers now invoke dependencies from DI with error handling:
 
 ```go
-// Now correctly invokes config from DI
+// Now correctly invokes config from DI with error handling
 if err := v2.Provide(scope, func(i do.Injector) (*Logger, error) {
-    cfg := v2.MustInvoke[*AppConfig](scope)
+    cfg, err := v2.Invoke[*AppConfig](scope)
+    if err != nil {
+        return nil, v2.NewServiceError("*AppConfig", err)
+    }
     return &Logger{verbose: cfg.Verbose}, nil
 }); err != nil {
 ```
@@ -243,7 +245,8 @@ All medium/high priority issues have been fixed:
 | `do.Provide()` | Register provider | `Provide[T]()` wraps it | ✅ |
 | `do.ProvideValue()` | Register value | `ProvideValue[T]()` wraps it | ✅ |
 | `do.Invoke[T]()` | Get service | `Invoke[T]()` wraps it | ✅ |
-| `do.MustInvoke[T]()` | Get or panic | `MustInvoke[T]()` wraps it | ✅ |
+| `do.Invoke[T]()` | Get service | `Invoke[T]()` wraps it | ✅ |
+| Error handling | Typed errors | `ServiceError` wraps DI errors | ✅ |
 | `ShutdownWithContext()` | Graceful shutdown | `Shutdown()` uses it | ✅ |
 | `HealthCheck()` | Health checks | `HealthCheck()` uses it | ✅ |
 | `Healthchecker` interface | Service health | Demo in examples | ✅ |
@@ -265,8 +268,9 @@ cmdguard uses samber/do/v2 **correctly and comprehensively**. The `Scope` wrappe
 - Full lifecycle interface demonstration
 
 **All Issues Resolved:**
-- ✅ Example uses consistent `v2.MustInvoke` API
-- ✅ Providers invoke dependencies from DI, not closures
+- ✅ All `MustInvoke` removed - no panics, proper typed error handling
+- ✅ Providers invoke dependencies from DI with error handling
 - ✅ Lifecycle interfaces (Healthchecker/Shutdowner) demonstrated
+- ✅ `ServiceError` type for wrapping DI errors with context
 
 The implementation is production-ready and demonstrates proper samber/do/v2 usage patterns.

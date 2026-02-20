@@ -3,7 +3,6 @@ package v2
 import (
 	"fmt"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 
@@ -14,6 +13,11 @@ import (
 // FlagRegistry manages flag registration and parsing.
 type FlagRegistry struct {
 	tags []FlagTag
+}
+
+// Tags returns all parsed flag tags.
+func (r *FlagRegistry) Tags() []FlagTag {
+	return r.tags
 }
 
 // NewFlagRegistry creates a new FlagRegistry from a config struct.
@@ -131,5 +135,43 @@ func (r *FlagRegistry) addEnumFlag(flags *pflag.FlagSet, tag FlagTag) {
 	} else {
 		flags.String(tag.Name, tag.Default, help)
 	}
+}
+
+// ValidateFlags validates flag values against allowed values and checks required flags.
+func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
+	for _, tag := range r.tags {
+		// Check required flags
+		if tag.Required {
+			flag := cmd.Flags().Lookup(tag.Name)
+			if flag == nil {
+				flag = cmd.PersistentFlags().Lookup(tag.Name)
+			}
+			if flag == nil || !flag.Changed {
+				return NewFlagError(tag.Name, fmt.Errorf("required flag not set"))
+			}
+		}
+
+		// Validate enum values
+		if len(tag.Values) > 0 {
+			flag := cmd.Flags().Lookup(tag.Name)
+			if flag == nil {
+				flag = cmd.PersistentFlags().Lookup(tag.Name)
+			}
+			if flag != nil && flag.Changed {
+				value := flag.Value.String()
+				found := false
+				for _, allowed := range tag.Values {
+					if value == allowed {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return NewFlagError(tag.Name, fmt.Errorf("invalid value %q, must be one of: %v", value, tag.Values))
+				}
+			}
+		}
+	}
+	return nil
 }
 

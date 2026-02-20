@@ -105,8 +105,14 @@ func main() {
 		},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *QueryFlags) error {
 			// Invoke services from DI container
-			db := do.MustInvoke[*DatabaseService](cli.Scope())
-			logger := do.MustInvoke[*LoggerService](cli.Scope())
+			db, err := v2.Invoke[*DatabaseService](cli.ScopeStruct())
+			if err != nil {
+				return v2.NewServiceError("*DatabaseService", err)
+			}
+			logger, err := v2.Invoke[*LoggerService](cli.ScopeStruct())
+			if err != nil {
+				return v2.NewServiceError("*LoggerService", err)
+			}
 
 			logger.Info(fmt.Sprintf("Querying table: %s (limit: %d)", flags.Table, flags.Limit))
 
@@ -127,7 +133,10 @@ func main() {
 		},
 		PostRunE: func(ctx context.Context, cfg *AppConfig, flags *QueryFlags) error {
 			// Cleanup after execution
-			logger := do.MustInvoke[*LoggerService](cli.Scope())
+			logger, err := v2.Invoke[*LoggerService](cli.ScopeStruct())
+			if err != nil {
+				return v2.NewServiceError("*LoggerService", err)
+			}
 			logger.Info("Query completed")
 			return nil
 		},
