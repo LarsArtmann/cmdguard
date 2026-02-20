@@ -90,12 +90,6 @@ func Invoke[T any](scope *Scope) (T, error) {
 	return do.Invoke[T](scope.injector)
 }
 
-// MustInvoke retrieves a service or panics.
-// Use only when the service is guaranteed to exist.
-func MustInvoke[T any](scope *Scope) T {
-	return do.MustInvoke[T](scope.injector)
-}
-
 // Shutdown gracefully shuts down all services in this scope.
 // Services implementing the Shutdowner interface will be notified.
 func (s *Scope) Shutdown(ctx context.Context) error {

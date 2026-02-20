@@ -33,6 +33,9 @@ var (
 	// ErrServiceNotFound indicates a service was not found in the DI container.
 	ErrServiceNotFound = errors.New("service not found")
 
+	// ErrServiceConstruction indicates a service provider failed during construction.
+	ErrServiceConstruction = errors.New("service construction failed")
+
 	// ErrInvalidEnum indicates an invalid enum value.
 	ErrInvalidEnum = errors.New("invalid enum value")
 
@@ -165,4 +168,24 @@ func NewDurationError(value string, err error) *DurationError {
 		Value: value,
 		Err:   err,
 	}
+}
+
+// ServiceError wraps a DI service error with type context.
+// Use this when service invocation or construction fails.
+type ServiceError struct {
+	ServiceType string
+	Err         error
+}
+
+func (e *ServiceError) Error() string {
+	return fmt.Sprintf("service %q: %v", e.ServiceType, e.Err)
+}
+
+func (e *ServiceError) Unwrap() error {
+	return e.Err
+}
+
+// NewServiceError creates a new ServiceError.
+func NewServiceError(serviceType string, err error) *ServiceError {
+	return &ServiceError{ServiceType: serviceType, Err: err}
 }

@@ -131,7 +131,10 @@ func TestProvide(t *testing.T) {
 		// Register a service that uses the dependency
 		type Service string
 		err := Provide(scope, func(i do.Injector) (Service, error) {
-			dep := do.MustInvoke[Dep](i)
+			dep, err := do.Invoke[Dep](i)
+			if err != nil {
+				return "", err
+			}
 			return Service(dep + "-enhanced"), nil
 		})
 		require.NoError(t, err)
@@ -218,24 +221,6 @@ func TestInvoke(t *testing.T) {
 		boolVal, err := Invoke[bool](scope)
 		require.NoError(t, err)
 		assert.True(t, boolVal)
-	})
-}
-
-func TestMustInvoke(t *testing.T) {
-	t.Run("returns registered service", func(t *testing.T) {
-		scope := NewScope("test")
-		require.NoError(t, ProvideValue(scope, "hello"))
-
-		value := MustInvoke[string](scope)
-		assert.Equal(t, "hello", value)
-	})
-
-	t.Run("panics for unregistered service", func(t *testing.T) {
-		scope := NewScope("test")
-
-		assert.Panics(t, func() {
-			MustInvoke[string](scope)
-		})
 	})
 }
 
@@ -419,7 +404,10 @@ func TestScope_Integration(t *testing.T) {
 		require.NoError(t, ProvideValue(root, Config{Debug: true}))
 
 		require.NoError(t, Provide(root, func(i do.Injector) (string, error) {
-			cfg := do.MustInvoke[Config](i)
+			cfg, err := do.Invoke[Config](i)
+			if err != nil {
+				return "", err
+			}
 			if cfg.Debug {
 				return "debug-mode", nil
 			}

@@ -114,7 +114,10 @@ func registerServices(scope *v2.Scope) {
 
 	// Register a logger service - gets config via DI, not closure capture
 	if err := v2.Provide(scope, func(i do.Injector) (*Logger, error) {
-		cfg := v2.MustInvoke[*AppConfig](scope)
+		cfg, err := v2.Invoke[*AppConfig](scope)
+		if err != nil {
+			return nil, v2.NewServiceError("*AppConfig", err)
+		}
 		return &Logger{verbose: cfg.Verbose}, nil
 	}); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to register logger: %v\n", err)
@@ -144,7 +147,10 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			logger := v2.MustInvoke[*Logger](cli.ScopeStruct())
+			logger, err := v2.Invoke[*Logger](cli.ScopeStruct())
+			if err != nil {
+				return v2.NewServiceError("*Logger", err)
+			}
 
 			for i := 0; i < flags.Count; i++ {
 				msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
@@ -206,7 +212,10 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 				Use:   "status",
 				Short: "Check database connection",
 				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-					db := v2.MustInvoke[*Database](cli.ScopeStruct())
+					db, err := v2.Invoke[*Database](cli.ScopeStruct())
+					if err != nil {
+						return v2.NewServiceError("*Database", err)
+					}
 					fmt.Printf("Database: %s\n", db.connectionString)
 					fmt.Println("Status: Connected (simulated)")
 					return nil
