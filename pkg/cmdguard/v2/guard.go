@@ -10,15 +10,15 @@ import (
 // It never panics - all operations return errors.
 // T is the application config type, F is the command-specific flags type.
 type GuardedCommand[T any, F any] struct {
-	name              string
-	short             string
-	long              string
-	defaults          T
-	config            *T
-	scope             *Scope
-	rootCmd           *cobra.Command
-	registry          *FlagRegistry
-	registeredCmds    map[string]bool // tracks registered command paths for duplicate detection
+	name           string
+	short          string
+	long           string
+	defaults       T
+	config         *T
+	scope          *Scope
+	rootCmd        *cobra.Command
+	registry       *FlagRegistry
+	registeredCmds map[string]bool // tracks registered command paths for duplicate detection
 }
 
 // New creates a new CLI application with typed config.

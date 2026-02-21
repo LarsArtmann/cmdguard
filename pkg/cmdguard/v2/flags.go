@@ -200,4 +200,3 @@ func (r *FlagRegistry) isAllowedValue(value string, allowed []string) bool {
 	}
 	return false
 }
-

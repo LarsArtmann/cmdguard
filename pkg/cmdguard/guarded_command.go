@@ -52,12 +52,12 @@ var version = "dev"
 // It panics on construction if commands are invalid, ensuring errors
 // are caught immediately at startup rather than at runtime.
 type GuardedCommand struct {
-	cmd             *cobra.Command
-	cfg             *config.Config
-	logger          *slog.Logger
-	validated       bool
-	strictMode      bool
-	registeredCmds  map[string]bool // tracks registered command names for duplicate detection
+	cmd            *cobra.Command
+	cfg            *config.Config
+	logger         *slog.Logger
+	validated      bool
+	strictMode     bool
+	registeredCmds map[string]bool // tracks registered command names for duplicate detection
 }
 
 // New creates a new GuardedCommand with the given name and description.
