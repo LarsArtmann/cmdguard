@@ -126,3 +126,29 @@ func (t FlagTag) parseCustomDefault() any {
 		return t.Default
 	}
 }
+
+// DefaultValue returns the default value for a flag based on its type.
+func (t FlagTag) DefaultValue() any {
+	if t.Default == "" {
+		return reflect.Zero(t.Type).Interface()
+	}
+	return t.parseDefaultValue()
+}
+
+// parseDefaultValue parses the default value based on type.
+func (t FlagTag) parseDefaultValue() any {
+	switch t.Type.Kind() {
+	case reflect.String:
+		return t.Default
+	case reflect.Bool:
+		return parseBoolDefault(t.Default)
+	case reflect.Int, reflect.Int64:
+		return t.parseIntDefault()
+	case reflect.Float64:
+		return parseFloat64Default(t.Default)
+	case reflect.Slice:
+		return strings.Split(t.Default, ",")
+	default:
+		return t.parseCustomDefault()
+	}
+}
