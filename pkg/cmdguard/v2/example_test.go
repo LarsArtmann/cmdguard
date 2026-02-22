@@ -148,8 +148,11 @@ func Example_withEnum() {
 		Version string `flag:"version" short:"v" required:"true" help:"Version to deploy"`
 	}
 
+	// Parse enum value (error handling omitted for brevity in this example)
+	env, _ := v2.ParseEnum("dev", []string{"dev", "staging", "prod"})
+
 	cli, err := v2.New[AppConfig, *DeployFlags]("deployer", "Deployment CLI", AppConfig{
-		Environment: v2.MustEnum("dev", []string{"dev", "staging", "prod"}),
+		Environment: env,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -250,7 +253,10 @@ func Example_withFunctionalOptions() {
 		return
 	}
 
-	cli.MustAddCommand(cmd)
+	if err := cli.AddCommand(cmd); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return
+	}
 
 	_ = cli.ExecuteWithArgs(context.Background(), []string{"version"})
 	// Output:

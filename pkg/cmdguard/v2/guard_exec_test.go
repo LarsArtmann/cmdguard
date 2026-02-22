@@ -107,6 +107,32 @@ func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
 	})
 }
 
+// runExecuteAndExitSubprocess handles the subprocess execution for ExecuteAndExit tests.
+// When envVar is set to "1", it runs the test command and exits. Otherwise, it returns
+// indicating the parent process should run the subprocess.
+func runExecuteAndExitSubprocess(envVar, use, errorMsg string) bool {
+	if os.Getenv(envVar) == "1" {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Setup error: %v\n", err)
+			os.Exit(1)
+		}
+
+		cmd := Command[TestAppConfig, NoFlags]{
+			Use: use,
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+				return errors.New(errorMsg)
+			},
+		}
+		_ = g.AddCommand(cmd)
+
+		_ = g.ExecuteWithArgs(context.Background(), []string{use})
+		g.ExecuteAndExit(context.Background())
+		return true
+	}
+	return false
+}
+
 func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 	t.Run("returns normally on success", func(t *testing.T) {
 		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
@@ -119,23 +145,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 	})
 
 	t.Run("exits with code 1 on error", func(t *testing.T) {
-		if os.Getenv("BE_TEST_EXEC_AND_EXIT") == "1" {
-			g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error creating app: %v\n", err)
-				os.Exit(1)
-			}
-
-			cmd := Command[TestAppConfig, NoFlags]{
-				Use: "fail",
-				RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-					return errors.New("intentional failure")
-				},
-			}
-			_ = g.AddCommand(cmd)
-
-			_ = g.ExecuteWithArgs(context.Background(), []string{"fail"})
-			g.ExecuteAndExit(context.Background())
+		if runExecuteAndExitSubprocess("BE_TEST_EXEC_AND_EXIT", "fail", "intentional failure") {
 			return
 		}
 
@@ -156,23 +166,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 	})
 
 	t.Run("stderr contains error message", func(t *testing.T) {
-		if os.Getenv("BE_TEST_EXEC_STDERR") == "1" {
-			g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Setup error: %v\n", err)
-				os.Exit(1)
-			}
-
-			cmd := Command[TestAppConfig, NoFlags]{
-				Use: "boom",
-				RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-					return errors.New("boom error")
-				},
-			}
-			_ = g.AddCommand(cmd)
-
-			_ = g.ExecuteWithArgs(context.Background(), []string{"boom"})
-			g.ExecuteAndExit(context.Background())
+		if runExecuteAndExitSubprocess("BE_TEST_EXEC_STDERR", "boom", "boom error") {
 			return
 		}
 

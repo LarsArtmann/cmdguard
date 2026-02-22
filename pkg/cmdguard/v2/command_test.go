@@ -348,31 +348,21 @@ func TestNewCommand(t *testing.T) {
 	})
 }
 
-func TestMustNewCommand(t *testing.T) {
-	t.Run("creates valid command", func(t *testing.T) {
-		cmd := MustNewCommand[TestConfig, NoFlags]("test",
+func TestNewCommand_ErrorCases(t *testing.T) {
+	t.Run("returns error on empty use", func(t *testing.T) {
+		_, err := NewCommand[TestConfig, NoFlags]("",
 			WithRunE[TestConfig, NoFlags](func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
 				return nil
 			}),
 		)
-		assert.Equal(t, "test", cmd.Use)
-		assert.NotNil(t, cmd.RunE)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "use is required")
 	})
 
-	t.Run("panics on empty use", func(t *testing.T) {
-		assert.Panics(t, func() {
-			MustNewCommand[TestConfig, NoFlags]("",
-				WithRunE[TestConfig, NoFlags](func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-					return nil
-				}),
-			)
-		})
-	})
-
-	t.Run("panics on validation failure", func(t *testing.T) {
-		assert.Panics(t, func() {
-			MustNewCommand[TestConfig, NoFlags]("test") // No RunE
-		})
+	t.Run("returns error on validation failure", func(t *testing.T) {
+		_, err := NewCommand[TestConfig, NoFlags]("test") // No RunE
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "no handler")
 	})
 }
 

@@ -124,81 +124,83 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 }
 
 func TestFlagRegistry_ParseFlags(t *testing.T) {
-	t.Run("parse string flag", func(t *testing.T) {
-		type TestConfig struct {
-			Name string `flag:"name" default:"default"`
+	t.Run("parse basic flag types", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			flag     string
+			value    string
+			wantErr  bool
+			validate func(t *testing.T, cfg interface{})
+		}{
+			{
+				name:  "string flag",
+				flag:  "name",
+				value: "custom",
+				validate: func(t *testing.T, cfg interface{}) {
+					assert.Equal(t, "custom", cfg.(*struct{ Name string }).Name)
+				},
+			},
+			{
+				name:  "bool flag",
+				flag:  "verbose",
+				value: "true",
+				validate: func(t *testing.T, cfg interface{}) {
+					assert.True(t, cfg.(*struct{ Verbose bool }).Verbose)
+				},
+			},
+			{
+				name:  "int flag",
+				flag:  "count",
+				value: "42",
+				validate: func(t *testing.T, cfg interface{}) {
+					assert.Equal(t, 42, cfg.(*struct{ Count int }).Count)
+				},
+			},
+			{
+				name:  "float64 flag",
+				flag:  "rate",
+				value: "3.14159",
+				validate: func(t *testing.T, cfg interface{}) {
+					assert.InDelta(t, 3.14159, cfg.(*struct{ Rate float64 }).Rate, 0.00001)
+				},
+			},
 		}
 
-		cfg := &TestConfig{}
-		registry, err := NewFlagRegistry(*cfg)
-		require.NoError(t, err)
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				var cfg interface{}
+				switch tt.flag {
+				case "name":
+					type TestConfig struct{ Name string }
+					cfg = &TestConfig{Name: "default"}
+				case "verbose":
+					type TestConfig struct{ Verbose bool }
+					cfg = &TestConfig{Verbose: false}
+				case "count":
+					type TestConfig struct{ Count int }
+					cfg = &TestConfig{Count: 0}
+				case "rate":
+					type TestConfig struct{ Rate float64 }
+					cfg = &TestConfig{Rate: 0.0}
+				}
 
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+				registry, err := NewFlagRegistry(cfg)
+				require.NoError(t, err)
 
-		// Set flag value
-		require.NoError(t, cmd.PersistentFlags().Set("name", "custom"))
+				cmd := &cobra.Command{Use: "test"}
+				require.NoError(t, registry.RegisterFlags(cmd))
 
-		err = registry.ParseFlags(cmd, cfg)
-		require.NoError(t, err)
-		assert.Equal(t, "custom", cfg.Name)
-	})
+				require.NoError(t, cmd.PersistentFlags().Set(tt.flag, tt.value))
 
-	t.Run("parse bool flag", func(t *testing.T) {
-		type TestConfig struct {
-			Verbose bool `flag:"verbose" default:"false"`
+				err = registry.ParseFlags(cmd, cfg)
+				if tt.wantErr {
+					require.Error(t, err)
+					return
+				}
+				require.NoError(t, err)
+				tt.validate(t, cfg)
+			})
 		}
-
-		cfg := &TestConfig{}
-		registry, err := NewFlagRegistry(*cfg)
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("verbose", "true"))
-
-		err = registry.ParseFlags(cmd, cfg)
-		require.NoError(t, err)
-		assert.True(t, cfg.Verbose)
-	})
-
-	t.Run("parse int flag", func(t *testing.T) {
-		type TestConfig struct {
-			Count int `flag:"count" default:"0"`
-		}
-
-		cfg := &TestConfig{}
-		registry, err := NewFlagRegistry(*cfg)
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("count", "42"))
-
-		err = registry.ParseFlags(cmd, cfg)
-		require.NoError(t, err)
-		assert.Equal(t, 42, cfg.Count)
-	})
-
-	t.Run("parse float64 flag", func(t *testing.T) {
-		type TestConfig struct {
-			Rate float64 `flag:"rate" default:"0.0"`
-		}
-
-		cfg := &TestConfig{}
-		registry, err := NewFlagRegistry(*cfg)
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("rate", "3.14159"))
-
-		err = registry.ParseFlags(cmd, cfg)
-		require.NoError(t, err)
-		assert.InDelta(t, 3.14159, cfg.Rate, 0.00001)
 	})
 
 	t.Run("parse Duration flag", func(t *testing.T) {

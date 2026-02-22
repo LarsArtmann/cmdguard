@@ -216,13 +216,3 @@ func NewCommand[T, F any](use string, opts ...CommandOption[T, F]) (Command[T, F
 
 	return cmd, nil
 }
-
-// MustNewCommand creates a new command and panics on error.
-// Use only in static initialization where failure is fatal.
-func MustNewCommand[T, F any](use string, opts ...CommandOption[T, F]) Command[T, F] {
-	cmd, err := NewCommand[T, F](use, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("failed to create command %q: %v", use, err))
-	}
-	return cmd
-}

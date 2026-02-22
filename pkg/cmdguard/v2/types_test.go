@@ -2,7 +2,6 @@ package v2
 
 import (
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"testing"
 	"time"
@@ -63,24 +62,17 @@ func TestParseEnum(t *testing.T) {
 	}
 }
 
-func TestMustEnum(t *testing.T) {
-	t.Run("valid value", func(t *testing.T) {
-		e := MustEnum("info", []string{"debug", "info", "warn"})
-		assert.Equal(t, "info", e.String())
-	})
-
-	t.Run("panics on invalid", func(t *testing.T) {
-		defer func() {
-			r := recover()
-			require.NotNil(t, r)
-			assert.Contains(t, fmt.Sprintf("%v", r), "invalid value")
-		}()
-		MustEnum("invalid", []string{"valid"})
+func TestParseEnum_ErrorCases(t *testing.T) {
+	t.Run("returns error on invalid", func(t *testing.T) {
+		_, err := ParseEnum("invalid", []string{"valid"})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid value")
 	})
 }
 
 func TestEnum_Methods(t *testing.T) {
-	e := MustEnum("test", []string{"a", "test", "b"})
+	e, err := ParseEnum("test", []string{"a", "test", "b"})
+	require.NoError(t, err)
 
 	t.Run("String", func(t *testing.T) {
 		assert.Equal(t, "test", e.String())
@@ -106,8 +98,11 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 		Level Enum `json:"level"`
 	}
 
+	validLevel, err := ParseEnum("info", []string{"debug", "info", "warn"})
+	require.NoError(t, err)
+
 	t.Run("marshal", func(t *testing.T) {
-		c := config{Level: MustEnum("info", []string{"debug", "info", "warn"})}
+		c := config{Level: validLevel}
 		data, err := json.Marshal(c)
 		require.NoError(t, err)
 		assert.JSONEq(t, `{"level":"info"}`, string(data))
@@ -168,18 +163,10 @@ func TestParseDuration(t *testing.T) {
 	}
 }
 
-func TestMustDuration(t *testing.T) {
-	t.Run("valid value", func(t *testing.T) {
-		d := MustDuration("30s")
-		assert.Equal(t, 30*time.Second, d.Duration())
-	})
-
-	t.Run("panics on invalid", func(t *testing.T) {
-		defer func() {
-			r := recover()
-			require.NotNil(t, r)
-		}()
-		MustDuration("invalid")
+func TestParseDuration_ErrorCases(t *testing.T) {
+	t.Run("returns error on invalid", func(t *testing.T) {
+		_, err := ParseDuration("invalid")
+		require.Error(t, err)
 	})
 }
 
@@ -192,7 +179,8 @@ func TestFromDuration(t *testing.T) {
 }
 
 func TestDuration_Methods(t *testing.T) {
-	d := MustDuration("2h30m")
+	d, err := ParseDuration("2h30m")
+	require.NoError(t, err)
 
 	t.Run("Duration", func(t *testing.T) {
 		assert.Equal(t, 2*time.Hour+30*time.Minute, d.Duration())
@@ -223,7 +211,9 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 	}
 
 	t.Run("marshal", func(t *testing.T) {
-		c := config{Timeout: MustDuration("30s")}
+		validDuration, err := ParseDuration("30s")
+		require.NoError(t, err)
+		c := config{Timeout: validDuration}
 		data, err := json.Marshal(c)
 		require.NoError(t, err)
 		assert.JSONEq(t, `{"timeout":"30s"}`, string(data))
