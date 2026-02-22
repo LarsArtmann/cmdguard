@@ -14,6 +14,21 @@ import (
 	"github.com/larsartmann/cmdguard/internal/logging"
 )
 
+// validationTestCase represents a single validation test case
+type validationTestCase struct {
+	input    string
+	expected bool
+}
+
+// testValidation is a parameterized helper for testing validation functions
+func testValidation(name string, validator func(string) bool, cases []validationTestCase) {
+	It("should NOT accept uppercase "+name+" (case-sensitive)", func() {
+		for _, tc := range cases {
+			Expect(validator(tc.input)).To(Equal(tc.expected))
+		}
+	})
+}
+
 // captureStderr captures stderr output during test execution
 func captureStderr(fn func()) string {
 	old := os.Stderr
@@ -359,16 +374,16 @@ var _ = Describe("Output destination - User Expectations", func() {
 var _ = Describe("Case sensitivity - User Expectations", func() {
 	Describe("As a user providing configuration values", func() {
 		Context("when I provide uppercase or mixed-case values", func() {
-			It("should NOT accept uppercase level (case-sensitive)", func() {
-				Expect(logging.ValidLevel("DEBUG")).To(BeFalse())
-				Expect(logging.ValidLevel("INFO")).To(BeFalse())
-				Expect(logging.ValidLevel("Error")).To(BeFalse())
+			testValidation("level", logging.ValidLevel, []validationTestCase{
+				{"DEBUG", false},
+				{"INFO", false},
+				{"Error", false},
 			})
 
-			It("should NOT accept uppercase format (case-sensitive)", func() {
-				Expect(logging.ValidFormat("JSON")).To(BeFalse())
-				Expect(logging.ValidFormat("TEXT")).To(BeFalse())
-				Expect(logging.ValidFormat("Json")).To(BeFalse())
+			testValidation("format", logging.ValidFormat, []validationTestCase{
+				{"JSON", false},
+				{"TEXT", false},
+				{"Json", false},
 			})
 
 			It("should fall back gracefully when given uppercase", func() {
