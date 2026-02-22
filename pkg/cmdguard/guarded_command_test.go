@@ -10,6 +10,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// hasSubcommand checks if a command with the given name exists in the GuardedCommand's subcommands.
+func hasSubcommand(g *GuardedCommand, name string) bool {
+	for _, cmd := range g.cmd.Commands() {
+		if cmd.Name() == name {
+			return true
+		}
+	}
+	return false
+}
+
 func TestNew(t *testing.T) {
 	t.Run("creates GuardedCommand with defaults", func(t *testing.T) {
 		_ = os.Unsetenv("CMDGUARD_LOG_LEVEL")
@@ -285,27 +295,13 @@ func TestGuardedCommand_DefaultCommands(t *testing.T) {
 	t.Run("version command is added", func(t *testing.T) {
 		g := New("testapp", "Test")
 
-		found := false
-		for _, cmd := range g.cmd.Commands() {
-			if cmd.Name() == "version" {
-				found = true
-				break
-			}
-		}
-		assert.True(t, found, "version command should be added by default")
+		assert.True(t, hasSubcommand(g, "version"), "version command should be added by default")
 	})
 
 	t.Run("validate command is added", func(t *testing.T) {
 		g := New("testapp", "Test")
 
-		found := false
-		for _, cmd := range g.cmd.Commands() {
-			if cmd.Name() == "validate" {
-				found = true
-				break
-			}
-		}
-		assert.True(t, found, "validate command should be added by default")
+		assert.True(t, hasSubcommand(g, "validate"), "validate command should be added by default")
 	})
 }
 
