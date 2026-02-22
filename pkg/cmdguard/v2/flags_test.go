@@ -171,16 +171,16 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 				var cfg interface{}
 				switch tt.flag {
 				case "name":
-					type TestConfig struct{ Name string }
+					type TestConfig struct{ Name string `flag:"name" default:"default"` }
 					cfg = &TestConfig{Name: "default"}
 				case "verbose":
-					type TestConfig struct{ Verbose bool }
+					type TestConfig struct{ Verbose bool `flag:"verbose" default:"false"` }
 					cfg = &TestConfig{Verbose: false}
 				case "count":
-					type TestConfig struct{ Count int }
+					type TestConfig struct{ Count int `flag:"count" default:"0"` }
 					cfg = &TestConfig{Count: 0}
 				case "rate":
-					type TestConfig struct{ Rate float64 }
+					type TestConfig struct{ Rate float64 `flag:"rate" default:"0.0"` }
 					cfg = &TestConfig{Rate: 0.0}
 				}
 
