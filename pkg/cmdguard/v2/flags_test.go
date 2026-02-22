@@ -433,7 +433,7 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 		assert.Contains(t, help, "Enable verbose output")
 	})
 
-	t.Run("help without short flag", func(t *testing.T) {
+	helpTestWithConfig := func(t *testing.T, notContains string) {
 		type TestConfig struct {
 			Name string `flag:"name" help:"The name"`
 		}
@@ -443,20 +443,15 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 
 		help := registry.GenerateHelp()
 		assert.Contains(t, help, "--name")
-		assert.NotContains(t, help, "-,")
+		assert.NotContains(t, help, notContains)
+	}
+
+	t.Run("help without short flag", func(t *testing.T) {
+		helpTestWithConfig(t, "-,")
 	})
 
 	t.Run("help without default", func(t *testing.T) {
-		type TestConfig struct {
-			Name string `flag:"name" help:"The name"`
-		}
-
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		help := registry.GenerateHelp()
-		assert.Contains(t, help, "--name")
-		assert.NotContains(t, help, "default:")
+		helpTestWithConfig(t, "default:")
 	})
 }
 
