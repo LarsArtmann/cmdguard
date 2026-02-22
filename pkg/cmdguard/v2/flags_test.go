@@ -354,16 +354,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Name string `flag:"name" default:"default"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("name", "anything"))
-
-		err = registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		assertFlagValidationPasses(t, TestConfig{}, "name", "anything")
 	})
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
@@ -389,16 +380,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Name string `flag:"name" required:"true" help:"required name"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("name", "test-value"))
-
-		err = registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		assertFlagValidationPasses(t, TestConfig{}, "name", "test-value")
 	})
 
 	t.Run("required false does not enforce", func(t *testing.T) {
@@ -674,4 +656,22 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 		err := NewFlagErrorWithSuggestion("flag", inner, "suggestion")
 		assert.ErrorIs(t, err, inner)
 	})
+}
+
+// assertFlagValidationPasses creates a FlagRegistry from the given config,
+// registers flags on a test command, sets the specified flag value, and
+// asserts that validation passes without error.
+func assertFlagValidationPasses[T any](t *testing.T, cfg T, flagName, flagValue string) {
+	t.Helper()
+
+	registry, err := NewFlagRegistry(cfg)
+	require.NoError(t, err)
+
+	cmd := &cobra.Command{Use: "test"}
+	require.NoError(t, registry.RegisterFlags(cmd))
+
+	require.NoError(t, cmd.PersistentFlags().Set(flagName, flagValue))
+
+	err = registry.ValidateFlags(cmd)
+	require.NoError(t, err)
 }
