@@ -1,4 +1,4 @@
-# Status Report: Must* Function Removal
+# Status Report: Must\* Function Removal
 
 **Date:** 2026-02-22 09:42
 **Completed:** 2026-02-20
@@ -15,13 +15,13 @@ Successfully removed all `Must*` functions from v2 package to achieve true "no p
 
 ## Final State
 
-### Must* Functions Removed
+### Must\* Functions Removed
 
-| Function            | File             | Alternative     |
-| ------------------- | ---------------- | --------------- |
-| `MustAddCommand`    | guard_command.go | `AddCommand`    |
-| `MustEnum`          | types.go         | `ParseEnum`     |
-| `MustDuration`      | types.go         | `ParseDuration` |
+| Function         | File             | Alternative     |
+| ---------------- | ---------------- | --------------- |
+| `MustAddCommand` | guard_command.go | `AddCommand`    |
+| `MustEnum`       | types.go         | `ParseEnum`     |
+| `MustDuration`   | types.go         | `ParseDuration` |
 
 > Note: `MustNewCommand` and `MustAddAnyCommand` were already removed in a previous session.
 
