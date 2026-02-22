@@ -273,30 +273,47 @@ func TestLogLevel(t *testing.T) {
 	})
 }
 
-func TestLogLevel_MarshalUnmarshal(t *testing.T) {
-	type config struct {
-		Level LogLevel `json:"level"`
-	}
-
+// testMarshalUnmarshal tests JSON marshaling and unmarshaling for string-based enum types.
+func testMarshalUnmarshal[T any](
+	t *testing.T,
+	validValue T,
+	validString string,
+	invalidString string,
+	newValue func() T,
+	stringFunc func(T) string,
+) {
 	t.Run("marshal", func(t *testing.T) {
-		c := config{Level: LogLevelInfo}
+		type config struct {
+			Value T `json:"value"`
+		}
+		c := config{Value: validValue}
 		data, err := json.Marshal(c)
 		require.NoError(t, err)
-		assert.JSONEq(t, `{"level":"info"}`, string(data))
+		assert.JSONEq(t, `{"value":"`+validString+`"}`, string(data))
 	})
 
 	t.Run("unmarshal valid", func(t *testing.T) {
+		type config struct {
+			Value T `json:"value"`
+		}
 		var c config
-		err := json.Unmarshal([]byte(`{"level":"debug"}`), &c)
+		err := json.Unmarshal([]byte(`{"value":"`+validString+`"}`), &c)
 		require.NoError(t, err)
-		assert.Equal(t, "debug", c.Level.String())
+		assert.Equal(t, validString, stringFunc(c.Value))
 	})
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
+		type config struct {
+			Value T `json:"value"`
+		}
 		var c config
-		err := json.Unmarshal([]byte(`{"level":"trace"}`), &c)
+		err := json.Unmarshal([]byte(`{"value":"`+invalidString+`"}`), &c)
 		require.Error(t, err)
 	})
+}
+
+func TestLogLevel_MarshalUnmarshal(t *testing.T) {
+	testMarshalUnmarshal(t, LogLevelInfo, "info", "trace", func() LogLevel { return LogLevel{} }, func(l LogLevel) string { return l.String() })
 }
 
 func TestLogFormat(t *testing.T) {
@@ -321,29 +338,7 @@ func TestLogFormat(t *testing.T) {
 }
 
 func TestLogFormat_MarshalUnmarshal(t *testing.T) {
-	type config struct {
-		Format LogFormat `json:"format"`
-	}
-
-	t.Run("marshal", func(t *testing.T) {
-		c := config{Format: LogFormatJSON}
-		data, err := json.Marshal(c)
-		require.NoError(t, err)
-		assert.JSONEq(t, `{"format":"json"}`, string(data))
-	})
-
-	t.Run("unmarshal valid", func(t *testing.T) {
-		var c config
-		err := json.Unmarshal([]byte(`{"format":"text"}`), &c)
-		require.NoError(t, err)
-		assert.Equal(t, "text", c.Format.String())
-	})
-
-	t.Run("unmarshal invalid", func(t *testing.T) {
-		var c config
-		err := json.Unmarshal([]byte(`{"format":"xml"}`), &c)
-		require.Error(t, err)
-	})
+	testMarshalUnmarshal(t, LogFormatJSON, "json", "xml", func() LogFormat { return LogFormat{} }, func(f LogFormat) string { return f.String() })
 }
 
 func TestPtr(t *testing.T) {

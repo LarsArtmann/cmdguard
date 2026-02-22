@@ -36,7 +36,7 @@ var _ = Describe("Configuration - User Expectations", func() {
 
 		Context("when I want structured logs for my log aggregator", func() {
 			BeforeEach(func() {
-		_ = os.Setenv("CMDGUARD_LOG_FORMAT", "json")
+				_ = os.Setenv("CMDGUARD_LOG_FORMAT", "json")
 			})
 
 			It("should switch to JSON format", func() {
@@ -48,7 +48,7 @@ var _ = Describe("Configuration - User Expectations", func() {
 
 		Context("when I want verbose logs for debugging", func() {
 			BeforeEach(func() {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
+				_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
 			})
 
 			It("should enable debug logging", func() {
@@ -62,7 +62,7 @@ var _ = Describe("Configuration - User Expectations", func() {
 	Describe("As a platform operator running in strict environments", func() {
 		Context("when I need guaranteed error handling behavior", func() {
 			BeforeEach(func() {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+				_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
 			})
 
 			It("should enable strict mode", func() {
@@ -73,7 +73,7 @@ var _ = Describe("Configuration - User Expectations", func() {
 
 		Context("when strict mode is set to non-true values", func() {
 			BeforeEach(func() {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "yes")
+				_ = os.Setenv("CMDGUARD_STRICT_MODE", "yes")
 			})
 
 			It("should NOT enable strict mode (only 'true' is accepted)", func() {
@@ -86,9 +86,9 @@ var _ = Describe("Configuration - User Expectations", func() {
 	Describe("As a user configuring via CI/CD environment variables", func() {
 		Context("when I combine multiple settings", func() {
 			BeforeEach(func() {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "warn")
-		_ = os.Setenv("CMDGUARD_LOG_FORMAT", "json")
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+				_ = os.Setenv("CMDGUARD_LOG_LEVEL", "warn")
+				_ = os.Setenv("CMDGUARD_LOG_FORMAT", "json")
+				_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
 			})
 
 			It("should apply all settings together", func() {
@@ -198,7 +198,7 @@ var _ = Describe("Environment variable precedence - User Expectations", func() {
 	Describe("As a DevOps engineer understanding configuration priority", func() {
 		Context("when environment variable overrides default", func() {
 			BeforeEach(func() {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "error")
+				_ = os.Setenv("CMDGUARD_LOG_LEVEL", "error")
 			})
 
 			It("should use environment variable over default", func() {
@@ -210,7 +210,7 @@ var _ = Describe("Environment variable precedence - User Expectations", func() {
 		Context("when I set all common log levels", func() {
 			It("should accept all standard levels", func() {
 				for _, level := range []string{"debug", "info", "warn", "error"} {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", level)
+					_ = os.Setenv("CMDGUARD_LOG_LEVEL", level)
 					cfg := config.Load()
 					Expect(cfg.LogLevel).To(Equal(level))
 					Expect(cfg.Validate()).To(Succeed(), "Level %s should be valid", level)
@@ -236,7 +236,7 @@ var _ = Describe("Strict mode behavior - User Expectations", func() {
 			for _, value := range truthyAttempts {
 				value := value // capture range variable
 				It("should NOT enable strict mode for '"+value+"' (only 'true' works)", func() {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
+					_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
 					cfg := config.Load()
 					Expect(cfg.StrictMode).To(BeFalse(), "Only 'true' should enable strict mode, not '%s'", value)
 				})
@@ -245,7 +245,7 @@ var _ = Describe("Strict mode behavior - User Expectations", func() {
 
 		Context("when I set strict mode to 'true' (lowercase)", func() {
 			It("should enable strict mode", func() {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+				_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
 				cfg := config.Load()
 				Expect(cfg.StrictMode).To(BeTrue())
 			})
