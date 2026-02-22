@@ -3,7 +3,7 @@
 **Report Date:** 2026-02-20 06:41 UTC  
 **Reporter:** Crush (AI Assistant)  
 **Branch:** master  
-**Commit:** ad10ca9  
+**Commit:** ad10ca9
 
 ---
 
@@ -13,13 +13,13 @@ This report documents significant code quality improvements made to cmdguard, fo
 
 ### Key Metrics
 
-| Metric | Before | After | Status |
-|--------|--------|-------|--------|
-| Files > 250 lines | N/A | 17 files | ❌ Violations |
-| Functions > 30 lines | 4+ | 2 files | ⚠️ Partial |
-| Banned libraries | N/A | 1 (testify) | ❌ Violations |
-| Test coverage | ~88% | ~88% | ✅ Good |
-| Build status | Unknown | ✅ Passing | ✅ Good |
+| Metric               | Before  | After       | Status        |
+| -------------------- | ------- | ----------- | ------------- |
+| Files > 250 lines    | N/A     | 17 files    | ❌ Violations |
+| Functions > 30 lines | 4+      | 2 files     | ⚠️ Partial    |
+| Banned libraries     | N/A     | 1 (testify) | ❌ Violations |
+| Test coverage        | ~88%    | ~88%        | ✅ Good       |
+| Build status         | Unknown | ✅ Passing  | ✅ Good       |
 
 ---
 
@@ -37,6 +37,7 @@ just dogfood
 ```
 
 **Checks implemented:**
+
 - File size limits (250 lines max)
 - Function size limits (30 lines max)
 - Banned library detection (testify, pkg/errors)
@@ -44,6 +45,7 @@ just dogfood
 - Test execution
 
 **Files modified:**
+
 - `justfile` (+22 lines)
 
 ---
@@ -55,27 +57,29 @@ just dogfood
 
 Refactored monolithic `toCobraCommandAny` function (122 lines) into focused helper functions:
 
-| Function | Lines | Responsibility |
-|----------|-------|----------------|
-| `toCobraCommandAny` | 20 | Orchestration |
-| `createCobraCommand` | 10 | Command metadata |
-| `setupFlagRegistry` | 16 | Flag registration |
-| `createFlagPrototype` | 11 | Prototype creation |
-| `setupRunHandler` | 8 | RunE setup |
-| `setupPreRunHandler` | 8 | PreRunE setup |
-| `setupPostRunHandler` | 8 | PostRunE setup |
-| `executeHandler` | 14 | Generic execution |
-| `addSubcommands` | 11 | Recursive addition |
-| `applyCommandOptions` | 6 | Options application |
+| Function              | Lines | Responsibility      |
+| --------------------- | ----- | ------------------- |
+| `toCobraCommandAny`   | 20    | Orchestration       |
+| `createCobraCommand`  | 10    | Command metadata    |
+| `setupFlagRegistry`   | 16    | Flag registration   |
+| `createFlagPrototype` | 11    | Prototype creation  |
+| `setupRunHandler`     | 8     | RunE setup          |
+| `setupPreRunHandler`  | 8     | PreRunE setup       |
+| `setupPostRunHandler` | 8     | PostRunE setup      |
+| `executeHandler`      | 14    | Generic execution   |
+| `addSubcommands`      | 11    | Recursive addition  |
+| `applyCommandOptions` | 6     | Options application |
 
 **Before:** Single 122-line function  
-**After:** 10 functions, maximum 20 lines each  
+**After:** 10 functions, maximum 20 lines each
 
 **Test adjustments:**
+
 - Updated tests to match fang's styled error output ("ERROR" vs "Error:")
 - All 7 test packages passing
 
 **Files modified:**
+
 - `pkg/cmdguard/v2/guard.go` (+98/-90 lines)
 - `pkg/cmdguard/v2/guard_test.go` (+6/-6 lines)
 
@@ -85,23 +89,23 @@ Refactored monolithic `toCobraCommandAny` function (122 lines) into focused help
 
 ### HOW_TO_GOLANG Non-Negotiables
 
-| Rule | Status | Notes |
-|------|--------|-------|
-| Files ≤ 250 lines | ❌ 17 violations | Top: guard_test.go (1103), flags_test.go (678) |
-| Functions ≤ 30 lines | ⚠️ 2 violations | config.go (44), flags.go (76) |
-| No `any` types | ✅ Compliant | Proper generics usage |
-| No magic strings | ✅ Compliant | Constants extracted |
-| No nested conditionals > 3 levels | ✅ Compliant | Early returns used |
-| No duplicated code > 3 instances | ✅ Compliant | DRY principles followed |
+| Rule                              | Status           | Notes                                          |
+| --------------------------------- | ---------------- | ---------------------------------------------- |
+| Files ≤ 250 lines                 | ❌ 17 violations | Top: guard_test.go (1103), flags_test.go (678) |
+| Functions ≤ 30 lines              | ⚠️ 2 violations  | config.go (44), flags.go (76)                  |
+| No `any` types                    | ✅ Compliant     | Proper generics usage                          |
+| No magic strings                  | ✅ Compliant     | Constants extracted                            |
+| No nested conditionals > 3 levels | ✅ Compliant     | Early returns used                             |
+| No duplicated code > 3 instances  | ✅ Compliant     | DRY principles followed                        |
 
 ### Banned Libraries
 
-| Library | Status | Files Affected |
-|---------|--------|----------------|
+| Library          | Status    | Files Affected            |
+| ---------------- | --------- | ------------------------- |
 | stretchr/testify | ❌ Active | 14 test files, 28 matches |
-| pkg/errors | ✅ Clean | None found |
-| viper | ✅ Clean | Not used |
-| gorm | ✅ Clean | Not used |
+| pkg/errors       | ✅ Clean  | None found                |
+| viper            | ✅ Clean  | Not used                  |
+| gorm             | ✅ Clean  | Not used                  |
 
 ---
 
@@ -109,23 +113,23 @@ Refactored monolithic `toCobraCommandAny` function (122 lines) into focused help
 
 ### P1: Critical (File Size)
 
-| File | Lines | Over By | Impact |
-|------|-------|---------|--------|
-| `pkg/cmdguard/v2/guard_test.go` | 1103 | +853 | High - Main test file |
-| `pkg/cmdguard/v2/flags_test.go` | 678 | +428 | Medium |
-| `pkg/cmdguard/v2/guard.go` | 556 | +306 | High - Core implementation |
-| `pkg/cmdguard/guarded_command_test.go` | 479 | +229 | Medium |
-| `pkg/cmdguard/v2/scope_test.go` | 458 | +208 | Medium |
-| `pkg/cmdguard/v2/config_test.go` | 452 | +202 | Medium |
-| `pkg/cmdguard/v2/types_test.go` | 438 | +188 | Medium |
-| `pkg/cmdguard/v2/command_test.go` | 406 | +156 | Medium |
+| File                                   | Lines | Over By | Impact                     |
+| -------------------------------------- | ----- | ------- | -------------------------- |
+| `pkg/cmdguard/v2/guard_test.go`        | 1103  | +853    | High - Main test file      |
+| `pkg/cmdguard/v2/flags_test.go`        | 678   | +428    | Medium                     |
+| `pkg/cmdguard/v2/guard.go`             | 556   | +306    | High - Core implementation |
+| `pkg/cmdguard/guarded_command_test.go` | 479   | +229    | Medium                     |
+| `pkg/cmdguard/v2/scope_test.go`        | 458   | +208    | Medium                     |
+| `pkg/cmdguard/v2/config_test.go`       | 452   | +202    | Medium                     |
+| `pkg/cmdguard/v2/types_test.go`        | 438   | +188    | Medium                     |
+| `pkg/cmdguard/v2/command_test.go`      | 406   | +156    | Medium                     |
 
 ### P2: High (Function Size)
 
-| File | Function | Lines | Over By |
-|------|----------|-------|---------|
-| `pkg/cmdguard/v2/flags.go` | Unknown | 76 | +46 |
-| `pkg/cmdguard/v2/config.go` | Unknown | 44 | +14 |
+| File                        | Function | Lines | Over By |
+| --------------------------- | -------- | ----- | ------- |
+| `pkg/cmdguard/v2/flags.go`  | Unknown  | 76    | +46     |
+| `pkg/cmdguard/v2/config.go` | Unknown  | 44    | +14     |
 
 ### P3: Medium (Test Framework)
 
@@ -198,13 +202,13 @@ Refactored monolithic `toCobraCommandAny` function (122 lines) into focused help
 
 ## Technical Debt Register
 
-| Item | Priority | Effort | Risk |
-|------|----------|--------|------|
-| Split guard.go | P1 | Medium | Low |
-| Split test files | P2 | High | Low |
-| Migrate to ginkgo | P3 | Very High | Medium |
-| Add koanf | P4 | Medium | Medium |
-| Add cockroachdb/errors | P4 | Low | Low |
+| Item                   | Priority | Effort    | Risk   |
+| ---------------------- | -------- | --------- | ------ |
+| Split guard.go         | P1       | Medium    | Low    |
+| Split test files       | P2       | High      | Low    |
+| Migrate to ginkgo      | P3       | Very High | Medium |
+| Add koanf              | P4       | Medium    | Medium |
+| Add cockroachdb/errors | P4       | Low       | Low    |
 
 ---
 
@@ -212,21 +216,21 @@ Refactored monolithic `toCobraCommandAny` function (122 lines) into focused help
 
 ### Current
 
-| Library | Version | Purpose | Status |
-|---------|---------|---------|--------|
-| spf13/cobra | v1.10.2 | CLI framework | ✅ Good |
-| samber/do/v2 | v2.0.0 | DI container | ✅ Good |
-| charmbracelet/fang | v0.4.4 | CLI styling | ✅ Good |
-| stretchr/testify | v1.11.1 | Testing | ❌ Banned |
+| Library            | Version | Purpose       | Status    |
+| ------------------ | ------- | ------------- | --------- |
+| spf13/cobra        | v1.10.2 | CLI framework | ✅ Good   |
+| samber/do/v2       | v2.0.0  | DI container  | ✅ Good   |
+| charmbracelet/fang | v0.4.4  | CLI styling   | ✅ Good   |
+| stretchr/testify   | v1.11.1 | Testing       | ❌ Banned |
 
 ### Recommended Additions
 
-| Library | Purpose | Priority |
-|---------|---------|----------|
-| cockroachdb/errors | Error handling | Low |
-| knadh/koanf | Configuration | Medium |
-| onsi/ginkgo/v2 | BDD testing | High |
-| onsi/gomega | Assertions | High |
+| Library            | Purpose        | Priority |
+| ------------------ | -------------- | -------- |
+| cockroachdb/errors | Error handling | Low      |
+| knadh/koanf        | Configuration  | Medium   |
+| onsi/ginkgo/v2     | BDD testing    | High     |
+| onsi/gomega        | Assertions     | High     |
 
 ---
 
@@ -234,12 +238,12 @@ Refactored monolithic `toCobraCommandAny` function (122 lines) into focused help
 
 ### Coverage by Package
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| internal/config | 95.7% | ✅ Excellent |
-| internal/logging | 100% | ✅ Complete |
-| pkg/cmdguard | 94.3% | ✅ Excellent |
-| pkg/cmdguard/v2 | 88.6% | ✅ Good |
+| Package          | Coverage | Status       |
+| ---------------- | -------- | ------------ |
+| internal/config  | 95.7%    | ✅ Excellent |
+| internal/logging | 100%     | ✅ Complete  |
+| pkg/cmdguard     | 94.3%    | ✅ Excellent |
+| pkg/cmdguard/v2  | 88.6%    | ✅ Good      |
 
 ### Test Execution
 

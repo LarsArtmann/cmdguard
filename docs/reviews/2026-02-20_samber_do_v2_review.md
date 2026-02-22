@@ -18,12 +18,12 @@ _All issues identified have been fixed._
 
 ## Files Analyzed
 
-| File | Lines | Purpose | Assessment |
-|------|-------|---------|------------|
-| `pkg/cmdguard/v2/scope.go` | 189 | DI wrapper | ✅ Excellent |
-| `pkg/cmdguard/v2/guard.go` | 555 | CLI framework | ✅ Good |
-| `pkg/cmdguard/v2/scope_test.go` | 458 | DI tests | ✅ Comprehensive |
-| `examples/typed/main.go` | 260 | Example app | ✅ Fixed |
+| File                            | Lines | Purpose       | Assessment       |
+| ------------------------------- | ----- | ------------- | ---------------- |
+| `pkg/cmdguard/v2/scope.go`      | 189   | DI wrapper    | ✅ Excellent     |
+| `pkg/cmdguard/v2/guard.go`      | 555   | CLI framework | ✅ Good          |
+| `pkg/cmdguard/v2/scope_test.go` | 458   | DI tests      | ✅ Comprehensive |
+| `examples/typed/main.go`        | 260   | Example app   | ✅ Fixed         |
 
 ---
 
@@ -119,6 +119,7 @@ func (g *GuardedCommand[T, F]) ScopeStruct() *Scope {
 ### 3. Test Coverage
 
 ✅ **88.7% coverage** with comprehensive tests:
+
 - `TestNewScope`, `TestScope_Child`, `TestProvide`, `TestProvideValue`
 - `TestInvoke`, `TestScope_Shutdown`
 - `TestScope_HealthCheck`, `TestScopedProvider`, `TestRegisterInScope`
@@ -226,32 +227,32 @@ func ScopedProvider[T any](parent *Scope, scopeName string, provider func(do.Inj
 
 All medium/high priority issues have been fixed:
 
-| Priority | Issue | Status |
-|----------|-------|--------|
-| ~~MEDIUM~~ | ~~Inconsistent API usage~~ | ✅ Fixed |
-| ~~MEDIUM~~ | ~~Closure capture~~ | ✅ Fixed |
-| ~~LOW~~ | ~~Missing lifecycle demo~~ | ✅ Fixed |
-| LOW | Type safety in RegisterInScope | Documented limitation |
-| LOW | ScopedProvider lifetime | Documented expectation |
+| Priority   | Issue                          | Status                 |
+| ---------- | ------------------------------ | ---------------------- |
+| ~~MEDIUM~~ | ~~Inconsistent API usage~~     | ✅ Fixed               |
+| ~~MEDIUM~~ | ~~Closure capture~~            | ✅ Fixed               |
+| ~~LOW~~    | ~~Missing lifecycle demo~~     | ✅ Fixed               |
+| LOW        | Type safety in RegisterInScope | Documented limitation  |
+| LOW        | ScopedProvider lifetime        | Documented expectation |
 
 ---
 
 ## API Compliance Checklist
 
-| Feature | samber/do/v2 API | cmdguard Usage | Status |
-|---------|------------------|----------------|--------|
-| `do.New()` | Root injector | `NewScope()` uses it | ✅ |
-| `do.Scope()` | Child scopes | `Child()` uses it | ✅ |
-| `do.Provide()` | Register provider | `Provide[T]()` wraps it | ✅ |
-| `do.ProvideValue()` | Register value | `ProvideValue[T]()` wraps it | ✅ |
-| `do.Invoke[T]()` | Get service | `Invoke[T]()` wraps it | ✅ |
-| `do.Invoke[T]()` | Get service | `Invoke[T]()` wraps it | ✅ |
-| Error handling | Typed errors | `ServiceError` wraps DI errors | ✅ |
-| `ShutdownWithContext()` | Graceful shutdown | `Shutdown()` uses it | ✅ |
-| `HealthCheck()` | Health checks | `HealthCheck()` uses it | ✅ |
-| `Healthchecker` interface | Service health | Demo in examples | ✅ |
-| `Shutdowner` interface | Service cleanup | Demo in examples | ✅ |
-| Hooks (Before/After) | Lifecycle hooks | Not used | - |
+| Feature                   | samber/do/v2 API  | cmdguard Usage                 | Status |
+| ------------------------- | ----------------- | ------------------------------ | ------ |
+| `do.New()`                | Root injector     | `NewScope()` uses it           | ✅     |
+| `do.Scope()`              | Child scopes      | `Child()` uses it              | ✅     |
+| `do.Provide()`            | Register provider | `Provide[T]()` wraps it        | ✅     |
+| `do.ProvideValue()`       | Register value    | `ProvideValue[T]()` wraps it   | ✅     |
+| `do.Invoke[T]()`          | Get service       | `Invoke[T]()` wraps it         | ✅     |
+| `do.Invoke[T]()`          | Get service       | `Invoke[T]()` wraps it         | ✅     |
+| Error handling            | Typed errors      | `ServiceError` wraps DI errors | ✅     |
+| `ShutdownWithContext()`   | Graceful shutdown | `Shutdown()` uses it           | ✅     |
+| `HealthCheck()`           | Health checks     | `HealthCheck()` uses it        | ✅     |
+| `Healthchecker` interface | Service health    | Demo in examples               | ✅     |
+| `Shutdowner` interface    | Service cleanup   | Demo in examples               | ✅     |
+| Hooks (Before/After)      | Lifecycle hooks   | Not used                       | -      |
 
 ---
 
@@ -260,6 +261,7 @@ All medium/high priority issues have been fixed:
 cmdguard uses samber/do/v2 **correctly and comprehensively**. The `Scope` wrapper is well-designed and follows best practices. All identified issues have been fixed.
 
 **Key Wins:**
+
 - Generic wrappers provide clean, type-safe API
 - Nil safety with error returns (no panics)
 - Proper scope hierarchy for plugin isolation
@@ -268,6 +270,7 @@ cmdguard uses samber/do/v2 **correctly and comprehensively**. The `Scope` wrappe
 - Full lifecycle interface demonstration
 
 **All Issues Resolved:**
+
 - ✅ All `MustInvoke` removed - no panics, proper typed error handling
 - ✅ Providers invoke dependencies from DI with error handling
 - ✅ Lifecycle interfaces (Healthchecker/Shutdowner) demonstrated

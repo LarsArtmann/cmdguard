@@ -426,7 +426,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 
 		// ExecuteAndExit should return normally without calling os.Exit
 		assert.NotPanics(t, func() {
-			g.ExecuteWithArgs(context.Background(), []string{"--help"})
+			_ = g.ExecuteWithArgs(context.Background(), []string{"--help"})
 		})
 	})
 
@@ -444,9 +444,9 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 					return errors.New("intentional failure")
 				},
 			}
-			g.AddCommand(cmd)
+			_ = g.AddCommand(cmd)
 
-			g.ExecuteWithArgs(context.Background(), []string{"fail"})
+			_ = g.ExecuteWithArgs(context.Background(), []string{"fail"})
 			g.ExecuteAndExit(context.Background())
 			return
 		}
@@ -481,9 +481,9 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 					return errors.New("boom error")
 				},
 			}
-			g.AddCommand(cmd)
+			_ = g.AddCommand(cmd)
 
-			g.ExecuteWithArgs(context.Background(), []string{"boom"})
+			_ = g.ExecuteWithArgs(context.Background(), []string{"boom"})
 			g.ExecuteAndExit(context.Background())
 			return
 		}

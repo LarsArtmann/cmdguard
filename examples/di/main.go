@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 	"github.com/samber/do/v2"
 )
 
@@ -78,15 +78,21 @@ func main() {
 
 	// Register services in DI container
 	// These services will be available to all commands
-	v2.Provide(scopeStruct, func(i do.Injector) (*DatabaseService, error) {
+	if err := v2.Provide(scopeStruct, func(i do.Injector) (*DatabaseService, error) {
 		// In real app, use config to configure connection
 		return NewDatabaseService(), nil
-	})
+	}); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to provide DatabaseService: %v\n", err)
+		os.Exit(1)
+	}
 
-	v2.Provide(scopeStruct, func(i do.Injector) (*LoggerService, error) {
+	if err := v2.Provide(scopeStruct, func(i do.Injector) (*LoggerService, error) {
 		// Access config through injector if needed
 		return NewLoggerService(false), nil
-	})
+	}); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to provide LoggerService: %v\n", err)
+		os.Exit(1)
+	}
 
 	// Add commands
 	queryCmd := v2.Command[AppConfig, *QueryFlags]{
@@ -149,6 +155,8 @@ func main() {
 
 	// Execute
 	ctx := context.Background()
-	defer cli.Shutdown(ctx) // Cleanup services on exit
+	defer func() {
+		_ = cli.Shutdown(ctx) // Cleanup services on exit
+	}()
 	cli.ExecuteAndExit(ctx)
 }

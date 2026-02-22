@@ -15,9 +15,9 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 	var root *cmdguard.GuardedCommand
 
 	BeforeEach(func() {
-		os.Unsetenv("CMDGUARD_LOG_LEVEL")
-		os.Unsetenv("CMDGUARD_LOG_FORMAT")
-		os.Unsetenv("CMDGUARD_STRICT_MODE")
+		_ = os.Unsetenv("CMDGUARD_LOG_LEVEL")
+		_ = os.Unsetenv("CMDGUARD_LOG_FORMAT")
+		_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
 	})
 
 	Describe("As a CLI developer creating a new application", func() {
@@ -53,12 +53,12 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 
 		Context("when I want to configure behavior via environment variables", func() {
 			BeforeEach(func() {
-				os.Setenv("CMDGUARD_STRICT_MODE", "true")
+				_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
 				root = cmdguard.New("myapp", "My CLI")
 			})
 
 			AfterEach(func() {
-				os.Unsetenv("CMDGUARD_STRICT_MODE")
+				_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
 			})
 
 			It("should pick up strict mode setting automatically", func() {
@@ -166,12 +166,12 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 
 	Describe("As a security-conscious operator in strict environments", func() {
 		BeforeEach(func() {
-			os.Setenv("CMDGUARD_STRICT_MODE", "true")
+			_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
 			root = cmdguard.New("myapp", "My CLI")
 		})
 
 		AfterEach(func() {
-			os.Unsetenv("CMDGUARD_STRICT_MODE")
+			_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
 		})
 
 		Context("when strict mode is enabled", func() {
@@ -226,11 +226,11 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 
 		Context("when I configure logging via environment", func() {
 			BeforeEach(func() {
-				os.Setenv("CMDGUARD_LOG_FORMAT", "json")
+				_ = os.Setenv("CMDGUARD_LOG_FORMAT", "json")
 			})
 
 			AfterEach(func() {
-				os.Unsetenv("CMDGUARD_LOG_FORMAT")
+				_ = os.Unsetenv("CMDGUARD_LOG_FORMAT")
 			})
 
 			It("should use my configured format", func() {
