@@ -34,14 +34,6 @@ func (g *GuardedCommand[T, F]) AddCommand(cmd Command[T, F]) error {
 	return nil
 }
 
-// MustAddCommand adds a subcommand to the CLI, panicking on error.
-// Use this in examples or when the command is guaranteed to be valid.
-func (g *GuardedCommand[T, F]) MustAddCommand(cmd Command[T, F]) {
-	if err := g.AddCommand(cmd); err != nil {
-		panic(err)
-	}
-}
-
 // AddCommandFunc adds a command using a constructor function.
 // Useful for lazy initialization.
 func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {

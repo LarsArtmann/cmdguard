@@ -59,7 +59,6 @@ Type-safe command definition with typed flags.
 | `Aliases`, `Version`              | ✅ FULLY_FUNCTIONAL | Additional metadata       |
 | `Validate()`                      | ✅ FULLY_FUNCTIONAL | Command validation        |
 | `NewCommand(use, short, opts...)` | ✅ FULLY_FUNCTIONAL | Constructor with options  |
-| `MustNewCommand(...)`             | ✅ FULLY_FUNCTIONAL | Panics on error           |
 
 ### Flag System
 
@@ -109,7 +108,6 @@ Type-safe command definition with typed flags.
 | `LogLevel.SlogLevel()`     | ✅ FULLY_FUNCTIONAL | Converts to slog.Level              |
 | `LogLevel.UnmarshalText()` | ✅ FULLY_FUNCTIONAL | Validates against allowed values    |
 | `Enum[T]` type             | ✅ FULLY_FUNCTIONAL | Generic enum with validation        |
-| `MustEnum(value, allowed)` | ✅ FULLY_FUNCTIONAL | Creates enum, panics if invalid     |
 | `NoFlags` type             | ✅ FULLY_FUNCTIONAL | Sentinel for commands without flags |
 
 ---

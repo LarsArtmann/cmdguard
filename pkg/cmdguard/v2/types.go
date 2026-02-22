@@ -22,16 +22,6 @@ func ParseEnum(value string, allowed []string) (Enum, error) {
 	return Enum{}, NewEnumError(value, allowed)
 }
 
-// MustEnum creates a new Enum or panics.
-// Use only in tests or when the value is guaranteed to be valid.
-func MustEnum(value string, allowed []string) Enum {
-	e, err := ParseEnum(value, allowed)
-	if err != nil {
-		panic(err)
-	}
-	return e
-}
-
 // String returns the enum value as a string.
 func (e Enum) String() string {
 	return e.value
@@ -65,16 +55,6 @@ func ParseDuration(s string) (Duration, error) {
 		return Duration{}, NewDurationError(s, err)
 	}
 	return Duration{duration: d}, nil
-}
-
-// MustDuration creates a new Duration or panics.
-// Use only in tests or when the value is guaranteed to be valid.
-func MustDuration(s string) Duration {
-	d, err := ParseDuration(s)
-	if err != nil {
-		panic(err)
-	}
-	return d
 }
 
 // FromDuration creates a Duration from a time.Duration.

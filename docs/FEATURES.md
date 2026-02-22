@@ -204,9 +204,6 @@ Commands are validated at construction time:
 if err := cmd.Validate(); err != nil {
     // Handle error
 }
-
-// Or use MustNewCommand which panics
-cmd := v2.MustNewCommand[Config, Flags]("greet", opts...)
 ```
 
 ---
