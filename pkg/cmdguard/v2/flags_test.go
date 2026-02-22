@@ -302,16 +302,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("mode", "staging"))
-
-		err = registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		assertFlagValidationPasses(t, TestConfig{}, "mode", "staging")
 	})
 
 	t.Run("invalid value returns error", func(t *testing.T) {
