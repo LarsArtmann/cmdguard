@@ -34,20 +34,20 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 				Expect(root.Command().Short).To(Equal("My awesome CLI tool"))
 			})
 
-			It("should provide version out of the box without me writing code", func() {
+			assertBuiltinCommandExists := func(cmdName string) {
 				cmd := root.Command()
-				versionCmd, _, err := cmd.Find([]string{"version"})
+				foundCmd, _, err := cmd.Find([]string{cmdName})
 				Expect(err).ToNot(HaveOccurred())
-				Expect(versionCmd).ToNot(BeNil())
-				Expect(versionCmd.Name()).To(Equal("version"))
+				Expect(foundCmd).ToNot(BeNil())
+				Expect(foundCmd.Name()).To(Equal(cmdName))
+			}
+
+			It("should provide version out of the box without me writing code", func() {
+				assertBuiltinCommandExists("version")
 			})
 
 			It("should provide a validate command to check my CLI setup", func() {
-				cmd := root.Command()
-				validateCmd, _, err := cmd.Find([]string{"validate"})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(validateCmd).ToNot(BeNil())
-				Expect(validateCmd.Name()).To(Equal("validate"))
+				assertBuiltinCommandExists("validate")
 			})
 		})
 
