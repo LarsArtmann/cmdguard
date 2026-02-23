@@ -8,21 +8,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func setupFlagTest[T any](t *testing.T, config T) (*FlagRegistry, *cobra.Command) {
+	t.Helper()
+
+	registry, err := NewFlagRegistry(config)
+	require.NoError(t, err)
+
+	cmd := &cobra.Command{Use: "test"}
+	require.NoError(t, registry.RegisterFlags(cmd))
+
+	return registry, cmd
+}
+
 func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	t.Run("valid values pass", func(t *testing.T) {
 		type TestConfig struct {
 			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		require.NoError(t, cmd.PersistentFlags().Set("mode", "staging"))
 
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.NoError(t, err)
 	})
 
@@ -31,16 +39,12 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Manually set an invalid value (bypassing validation)
 		require.NoError(t, cmd.PersistentFlags().Set("mode", "invalid"))
 
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "mode")
 	})
@@ -50,14 +54,10 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Don't change the flag - should pass validation
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.NoError(t, err)
 	})
 
@@ -66,15 +66,11 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Name string `flag:"name" default:"default"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		require.NoError(t, cmd.PersistentFlags().Set("name", "anything"))
 
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.NoError(t, err)
 	})
 
@@ -83,14 +79,10 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Name string `flag:"name" required:"true" help:"required name"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Don't set the flag - should fail validation
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "name")
 		assert.Contains(t, err.Error(), "required")
@@ -101,15 +93,11 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Name string `flag:"name" required:"true" help:"required name"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		require.NoError(t, cmd.PersistentFlags().Set("name", "test-value"))
 
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.NoError(t, err)
 	})
 
@@ -118,14 +106,10 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			Name string `flag:"name" required:"false" help:"optional name"`
 		}
 
-		registry, err := NewFlagRegistry(TestConfig{})
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
+		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Don't set the flag - should pass since required:"false"
-		err = registry.ValidateFlags(cmd)
+		err := registry.ValidateFlags(cmd)
 		require.NoError(t, err)
 	})
 }
