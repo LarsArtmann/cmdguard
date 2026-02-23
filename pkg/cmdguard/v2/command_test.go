@@ -12,6 +12,16 @@ type TestConfig struct {
 	Name string
 }
 
+// newTestCommand creates a test command with RunE handler
+func newTestCommand() Command[TestConfig, NoFlags] {
+	return Command[TestConfig, NoFlags]{
+		Use: "test",
+		RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+			return nil
+		},
+	}
+}
+
 func TestCommand_Validate(t *testing.T) {
 	t.Run("valid command with RunE", func(t *testing.T) {
 		cmd := Command[TestConfig, NoFlags]{
@@ -136,24 +146,14 @@ func TestCommand_HasSubcommands(t *testing.T) {
 	})
 
 	t.Run("returns false without subcommands", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
-			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCommand()
 		assert.False(t, cmd.HasSubcommands())
 	})
 }
 
 func TestCommand_HasHandler(t *testing.T) {
 	t.Run("returns true with RunE", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
-			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCommand()
 		assert.True(t, cmd.HasHandler())
 	})
 
@@ -167,12 +167,7 @@ func TestCommand_HasHandler(t *testing.T) {
 
 func TestCommand_IsExecutable(t *testing.T) {
 	t.Run("returns true with RunE", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
-			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCommand()
 		assert.True(t, cmd.IsExecutable())
 	})
 

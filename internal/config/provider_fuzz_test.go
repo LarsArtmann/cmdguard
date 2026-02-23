@@ -52,13 +52,7 @@ func FuzzValidate_LogLevel(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, level string, expectValid bool) {
-		cfg := &Config{LogLevel: level}
-		err := cfg.Validate()
-		if expectValid {
-			assert.NoError(t, err)
-		} else {
-			assert.Error(t, err)
-		}
+		validateConfigField(t, &Config{LogLevel: level}, expectValid)
 	})
 }
 
@@ -96,13 +90,7 @@ func FuzzValidate_LogFormat(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, format string, expectValid bool) {
-		cfg := &Config{LogFormat: format}
-		err := cfg.Validate()
-		if expectValid {
-			assert.NoError(t, err)
-		} else {
-			assert.Error(t, err)
-		}
+		validateConfigField(t, &Config{LogFormat: format}, expectValid)
 	})
 }
 
@@ -147,6 +135,16 @@ func FuzzGetConfigFilePath(f *testing.F) {
 			assert.Equal(t, abs, result)
 		}
 	})
+}
+
+func validateConfigField(t *testing.T, cfg *Config, expectValid bool) {
+	t.Helper()
+	err := cfg.Validate()
+	if expectValid {
+		assert.NoError(t, err)
+	} else {
+		assert.Error(t, err)
+	}
 }
 
 func fuzzLoadWithEnvVar(f *testing.F, envVarName string, corpus []string) {
