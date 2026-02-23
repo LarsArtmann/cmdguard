@@ -149,6 +149,23 @@ func FuzzGetConfigFilePath(f *testing.F) {
 	})
 }
 
+func fuzzLoadWithEnvVar(f *testing.F, envVarName string, corpus []string) {
+	for _, value := range corpus {
+		f.Add(value)
+	}
+
+	f.Fuzz(func(t *testing.T, value string) {
+		_ = os.Setenv(envVarName, value)
+		defer func() { _ = os.Unsetenv(envVarName) }()
+
+		cfg := Load()
+		require.NotNil(t, cfg)
+		// Just verify it doesn't crash and returns a valid config
+		// OS may handle edge cases (null bytes, etc.) differently
+		_ = cfg.Validate()
+	})
+}
+
 func FuzzLoad_EnvVarLevel(f *testing.F) {
 	// Note: Load() returns the raw env var value; Validate() checks it
 	// Some values (null bytes, etc.) may be handled differently by the OS
@@ -161,20 +178,7 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 		strings.Repeat("a", 1000),
 		"🎉",
 	}
-	for _, level := range corpus {
-		f.Add(level)
-	}
-
-	f.Fuzz(func(t *testing.T, level string) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", level)
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		// Just verify it doesn't crash and returns a valid config
-		// OS may handle edge cases (null bytes, etc.) differently
-		_ = cfg.Validate()
-	})
+	fuzzLoadWithEnvVar(f, "CMDGUARD_LOG_LEVEL", corpus)
 }
 
 func FuzzLoad_EnvVarFormat(f *testing.F) {
@@ -189,20 +193,7 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 		strings.Repeat("a", 1000),
 		"🎉",
 	}
-	for _, format := range corpus {
-		f.Add(format)
-	}
-
-	f.Fuzz(func(t *testing.T, format string) {
-		_ = os.Setenv("CMDGUARD_LOG_FORMAT", format)
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		// Just verify it doesn't crash and returns a valid config
-		// OS may handle edge cases (null bytes, etc.) differently
-		_ = cfg.Validate()
-	})
+	fuzzLoadWithEnvVar(f, "CMDGUARD_LOG_FORMAT", corpus)
 }
 
 func FuzzLoad_EnvVarStrictMode(f *testing.F) {
@@ -303,40 +294,29 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 	})
 }
 
+func testShellInjectionPayload(t *testing.T, payload string) {
+	t.Helper()
+	_ = os.Setenv("CMDGUARD_LOG_LEVEL", payload)
+	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+
+	cfg := Load()
+	require.NotNil(t, cfg)
+	assert.Equal(t, payload, cfg.LogLevel)
+
+	err := cfg.Validate()
+	assert.Error(t, err)
+}
+
 func TestLoad_EnvVarInjection(t *testing.T) {
 	t.Run("shell injection attempt in level", func(t *testing.T) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "$(whoami)")
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		assert.Equal(t, "$(whoami)", cfg.LogLevel)
-
-		err := cfg.Validate()
-		assert.Error(t, err)
+		testShellInjectionPayload(t, "$(whoami)")
 	})
 
 	t.Run("backtick injection attempt", func(t *testing.T) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "`id`")
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		assert.Equal(t, "`id`", cfg.LogLevel)
-
-		err := cfg.Validate()
-		assert.Error(t, err)
+		testShellInjectionPayload(t, "`id`")
 	})
 
 	t.Run("pipe injection attempt", func(t *testing.T) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug|cat /etc/passwd")
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		assert.Equal(t, "debug|cat /etc/passwd", cfg.LogLevel)
-
-		err := cfg.Validate()
-		assert.Error(t, err)
+		testShellInjectionPayload(t, "debug|cat /etc/passwd")
 	})
 }

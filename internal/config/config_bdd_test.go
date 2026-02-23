@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -8,6 +9,32 @@ import (
 
 	"github.com/larsartmann/cmdguard/internal/config"
 )
+
+// testEnvVarLoad tests that setting an environment variable correctly updates config
+type envVarTestCase struct {
+	varName     string
+	value       string
+	expected    string
+	contextDesc string
+	itDesc      string
+	validate    bool
+}
+
+func testEnvVarLoad(tc envVarTestCase, getter func(*config.Config) string) {
+	Context(tc.contextDesc, func() {
+		BeforeEach(func() {
+			_ = os.Setenv(fmt.Sprintf("CMDGUARD_%s", tc.varName), tc.value)
+		})
+
+		It(tc.itDesc, func() {
+			cfg := config.Load()
+			Expect(getter(cfg)).To(Equal(tc.expected))
+			if tc.validate {
+				Expect(cfg.Validate()).To(Succeed())
+			}
+		})
+	})
+}
 
 var _ = Describe("Configuration - User Expectations", func() {
 	BeforeEach(func() {
@@ -34,29 +61,29 @@ var _ = Describe("Configuration - User Expectations", func() {
 			})
 		})
 
-		Context("when I want structured logs for my log aggregator", func() {
-			BeforeEach(func() {
-				_ = os.Setenv("CMDGUARD_LOG_FORMAT", "json")
-			})
+		testEnvVarLoad(
+			envVarTestCase{
+				varName:     "LOG_FORMAT",
+				value:       "json",
+				expected:    "json",
+				contextDesc: "when I want structured logs for my log aggregator",
+				itDesc:      "should switch to JSON format",
+				validate:    true,
+			},
+			func(c *config.Config) string { return c.LogFormat },
+		)
 
-			It("should switch to JSON format", func() {
-				cfg := config.Load()
-				Expect(cfg.LogFormat).To(Equal("json"))
-				Expect(cfg.Validate()).To(Succeed())
-			})
-		})
-
-		Context("when I want verbose logs for debugging", func() {
-			BeforeEach(func() {
-				_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
-			})
-
-			It("should enable debug logging", func() {
-				cfg := config.Load()
-				Expect(cfg.LogLevel).To(Equal("debug"))
-				Expect(cfg.Validate()).To(Succeed())
-			})
-		})
+		testEnvVarLoad(
+			envVarTestCase{
+				varName:     "LOG_LEVEL",
+				value:       "debug",
+				expected:    "debug",
+				contextDesc: "when I want verbose logs for debugging",
+				itDesc:      "should enable debug logging",
+				validate:    true,
+			},
+			func(c *config.Config) string { return c.LogLevel },
+		)
 	})
 
 	Describe("As a platform operator running in strict environments", func() {
