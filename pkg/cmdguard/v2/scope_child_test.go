@@ -19,13 +19,7 @@ func TestScope_Child(t *testing.T) {
 	})
 
 	t.Run("child inherits from parent", func(t *testing.T) {
-		parent := NewScope("parent")
-		require.NoError(t, ProvideValue(parent, "parent-value"))
-
-		child := parent.Child("child")
-		value, err := Invoke[string](child)
-		require.NoError(t, err)
-		assert.Equal(t, "parent-value", value)
+		assertChildInheritsParent(t)
 	})
 
 	t.Run("grandchild scope", func(t *testing.T) {
@@ -116,4 +110,14 @@ func TestScope_Path(t *testing.T) {
 		assert.Equal(t, []string{"root", "level1", "level2"}, level2.Path())
 		assert.Equal(t, []string{"root", "level1", "level2", "level3"}, level3.Path())
 	})
+}
+
+func assertChildInheritsParent(t *testing.T) {
+	parent := NewScope("parent")
+	require.NoError(t, ProvideValue(parent, "parent-value"))
+
+	child := parent.Child("child")
+	value, err := Invoke[string](child)
+	require.NoError(t, err)
+	assert.Equal(t, "parent-value", value)
 }

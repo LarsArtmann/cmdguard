@@ -51,14 +51,6 @@ func TestScope_Integration(t *testing.T) {
 	})
 
 	t.Run("child scope can override parent services", func(t *testing.T) {
-		parent := NewScope("parent")
-		require.NoError(t, ProvideValue(parent, "parent-value"))
-
-		child := parent.Child("child")
-
-		// Initially inherits parent value
-		value, err := Invoke[string](child)
-		require.NoError(t, err)
-		assert.Equal(t, "parent-value", value)
+		assertChildInheritsParent(t)
 	})
 }
