@@ -22,6 +22,20 @@ func newTestCommand() Command[TestConfig, NoFlags] {
 	}
 }
 
+// testHandlerFunc is the signature for RunE/PreRunE/PostRunE handlers
+type testHandlerFunc[T any, F any] func(ctx context.Context, cfg *T, flags F) error
+
+// testHandlerOption tests that a handler option correctly sets the handler field
+func testHandlerOption(t *testing.T, name string, applyOption func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags]), getField func(*Command[TestConfig, NoFlags]) any) {
+	t.Helper()
+	handler := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+		return nil
+	}
+	cmd := Command[TestConfig, NoFlags]{Use: "test"}
+	applyOption(&cmd, handler)
+	assert.NotNil(t, getField(&cmd), "expected %s to set the handler", name)
+}
+
 func TestCommand_Validate(t *testing.T) {
 	t.Run("valid command with RunE", func(t *testing.T) {
 		cmd := Command[TestConfig, NoFlags]{
@@ -215,30 +229,21 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithRunE", func(t *testing.T) {
-		handler := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-			return nil
-		}
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithRunE[TestConfig, NoFlags](handler)(&cmd)
-		assert.NotNil(t, cmd.RunE)
+		testHandlerOption(t, "WithRunE", func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
+			WithRunE[TestConfig, NoFlags](handler)(cmd)
+		}, func(cmd *Command[TestConfig, NoFlags]) any { return cmd.RunE })
 	})
 
 	t.Run("WithPreRunE", func(t *testing.T) {
-		preRun := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-			return nil
-		}
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithPreRunE[TestConfig, NoFlags](preRun)(&cmd)
-		assert.NotNil(t, cmd.PreRunE)
+		testHandlerOption(t, "WithPreRunE", func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
+			WithPreRunE[TestConfig, NoFlags](handler)(cmd)
+		}, func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PreRunE })
 	})
 
 	t.Run("WithPostRunE", func(t *testing.T) {
-		postRun := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-			return nil
-		}
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithPostRunE[TestConfig, NoFlags](postRun)(&cmd)
-		assert.NotNil(t, cmd.PostRunE)
+		testHandlerOption(t, "WithPostRunE", func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
+			WithPostRunE[TestConfig, NoFlags](handler)(cmd)
+		}, func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PostRunE })
 	})
 
 	t.Run("WithSubcommands", func(t *testing.T) {

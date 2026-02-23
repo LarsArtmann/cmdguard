@@ -189,14 +189,38 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	assert.Equal(t, "down", migrateFlags.Direction)
 }
 
+// assertCommandExecution runs a command multiple times and verifies the execution state.
+func assertCommandExecution[
+	T any,
+	F any,
+](
+	t *testing.T,
+	ctx context.Context,
+	cli *v2.GuardedCommand[T, F],
+	args []string,
+	wantExecuted string,
+	assertFlags func(t *testing.T, flags any),
+) {
+	t.Helper()
+
+	for i := 0; i < 3; i++ {
+		err := cli.ExecuteWithArgs(ctx, args)
+		require.NoError(t, err)
+		assert.Equal(t, wantExecuted, lastExecuted)
+		assertFlags(t, lastFlags)
+	}
+}
+
+var (
+	lastExecuted string
+	lastFlags    any
+)
+
 func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	ctx := context.Background()
 
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
 	require.NoError(t, err)
-
-	var lastExecuted string
-	var lastFlags any
 
 	// Add command A with GreetFlags
 	err = cli.AddCommand(v2.Command[RootConfig, *GreetFlags]{
@@ -225,24 +249,18 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	require.NoError(t, err)
 
 	// Execute A multiple times
-	for i := 0; i < 3; i++ {
-		err = cli.ExecuteWithArgs(ctx, []string{"cmd-a", "--name=test"})
-		require.NoError(t, err)
-		assert.Equal(t, "A", lastExecuted)
-		gf, ok := lastFlags.(*GreetFlags)
+	assertCommandExecution(t, ctx, cli, []string{"cmd-a", "--name=test"}, "A", func(t *testing.T, flags any) {
+		gf, ok := flags.(*GreetFlags)
 		assert.True(t, ok)
 		assert.Equal(t, "test", gf.Name)
-	}
+	})
 
 	// Execute B multiple times
-	for i := 0; i < 3; i++ {
-		err = cli.ExecuteWithArgs(ctx, []string{"cmd-b", "--x=42"})
-		require.NoError(t, err)
-		assert.Equal(t, "B", lastExecuted)
-		mf, ok := lastFlags.(*MathFlags)
+	assertCommandExecution(t, ctx, cli, []string{"cmd-b", "--x=42"}, "B", func(t *testing.T, flags any) {
+		mf, ok := flags.(*MathFlags)
 		assert.True(t, ok)
 		assert.Equal(t, 42, mf.X)
-	}
+	})
 
 	// Interleave executions
 	for i := 0; i < 5; i++ {
