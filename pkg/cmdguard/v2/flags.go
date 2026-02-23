@@ -70,12 +70,17 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 	return nil
 }
 
-func (r *FlagRegistry) addStringFlag(flags *pflag.FlagSet, tag FlagTag) {
-	if tag.Short != "" {
-		flags.StringP(tag.Name, tag.Short, tag.Default, tag.Help)
+// registerStringFlag registers a string flag with optional shorthand.
+func registerStringFlag(flags *pflag.FlagSet, name, short, value, usage string) {
+	if short != "" {
+		_ = flags.StringP(name, short, value, usage)
 	} else {
-		flags.String(tag.Name, tag.Default, tag.Help)
+		_ = flags.String(name, value, usage)
 	}
+}
+
+func (r *FlagRegistry) addStringFlag(flags *pflag.FlagSet, tag FlagTag) {
+	registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
 }
 
 func (r *FlagRegistry) addBoolFlag(flags *pflag.FlagSet, tag FlagTag) {
@@ -118,11 +123,7 @@ func (r *FlagRegistry) addStringSliceFlag(flags *pflag.FlagSet, tag FlagTag) {
 }
 
 func (r *FlagRegistry) addDurationFlag(flags *pflag.FlagSet, tag FlagTag) {
-	if tag.Short != "" {
-		flags.StringP(tag.Name, tag.Short, tag.Default, tag.Help)
-	} else {
-		flags.String(tag.Name, tag.Default, tag.Help)
-	}
+	r.addStringFlag(flags, tag)
 }
 
 func (r *FlagRegistry) addEnumFlag(flags *pflag.FlagSet, tag FlagTag) {
@@ -130,11 +131,7 @@ func (r *FlagRegistry) addEnumFlag(flags *pflag.FlagSet, tag FlagTag) {
 	if len(tag.Values) > 0 {
 		help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
 	}
-	if tag.Short != "" {
-		flags.StringP(tag.Name, tag.Short, tag.Default, help)
-	} else {
-		flags.String(tag.Name, tag.Default, help)
-	}
+	registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
 }
 
 // ValidateFlags validates flag values against allowed values and checks required flags.
