@@ -228,22 +228,42 @@ func TestCommandOptions(t *testing.T) {
 		assert.Equal(t, flags, cmd.Flags)
 	})
 
-	t.Run("WithRunE", func(t *testing.T) {
-		testHandlerOption(t, "WithRunE", func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
-			WithRunE[TestConfig, NoFlags](handler)(cmd)
-		}, func(cmd *Command[TestConfig, NoFlags]) any { return cmd.RunE })
-	})
+	t.Run("HandlerOptions", func(t *testing.T) {
+		type handlerTestCase struct {
+			name      string
+			apply     func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags])
+			getField  func(*Command[TestConfig, NoFlags]) any
+		}
 
-	t.Run("WithPreRunE", func(t *testing.T) {
-		testHandlerOption(t, "WithPreRunE", func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
-			WithPreRunE[TestConfig, NoFlags](handler)(cmd)
-		}, func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PreRunE })
-	})
+		tests := []handlerTestCase{
+			{
+				name: "WithRunE",
+				apply: func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
+					WithRunE[TestConfig, NoFlags](handler)(cmd)
+				},
+				getField: func(cmd *Command[TestConfig, NoFlags]) any { return cmd.RunE },
+			},
+			{
+				name: "WithPreRunE",
+				apply: func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
+					WithPreRunE[TestConfig, NoFlags](handler)(cmd)
+				},
+				getField: func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PreRunE },
+			},
+			{
+				name: "WithPostRunE",
+				apply: func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
+					WithPostRunE[TestConfig, NoFlags](handler)(cmd)
+				},
+				getField: func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PostRunE },
+			},
+		}
 
-	t.Run("WithPostRunE", func(t *testing.T) {
-		testHandlerOption(t, "WithPostRunE", func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
-			WithPostRunE[TestConfig, NoFlags](handler)(cmd)
-		}, func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PostRunE })
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				testHandlerOption(t, tt.name, tt.apply, tt.getField)
+			})
+		}
 	})
 
 	t.Run("WithSubcommands", func(t *testing.T) {

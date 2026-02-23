@@ -1,0 +1,158 @@
+# golangci-lint configuration for cmdguard
+# Documentation: https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  go: "1.26"
+  modules-download-mode: readonly
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 50
+  max-same-issues: 10
+
+linters-settings:
+  gci:
+    # Enable gci for import formatting
+    sections:
+      - standard # Standard library imports
+      - default # Default section for all other imports
+      - prefix(github.com/larsartmann/cmdguard) # Project imports
+    skip-generated: true
+    custom-order: true
+
+  gofmt:
+    simplify: true
+
+  goimports:
+    local-prefixes: github.com/larsartmann/cmdguard
+
+  govet:
+    enable-all: true
+    disable:
+      - shadow # Disabled due to false positives with common patterns
+
+  staticcheck:
+    checks: ["all"]
+
+  errcheck:
+    check-blank: true
+    check-type-assertions: true
+
+  gocyclo:
+    min-complexity: 15
+
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+
+  misspell:
+    locale: US
+
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+
+linters:
+  enable:
+    # Formatting
+    - gci # Enable gci for import formatting
+    - gofmt
+    - goimports
+
+    # Error handling
+    - errcheck
+    - errorlint
+
+    # Code quality
+    - gocyclo
+    - goconst
+    - govet
+    - staticcheck
+    - ineffassign
+    - deadcode
+    - unused
+
+    # Style
+    - revive
+    - misspell
+    - whitespace
+    - wsl
+
+    # Security
+    - gosec
+
+    # Performance
+    - prealloc
+
+  disable:
+    # Disabled linters that conflict with project preferences
+    - lll # Line length limit - we prefer readability over strict limits
+    - gochecknoglobals # Globals are acceptable for this project
+    - gochecknoinits # Init functions are used intentionally
+    - godox # We use TODO comments intentionally
+    - nlreturn # Too strict for our style
+    - exhaustivestruct # Not practical for this project
+    - varnamelen # Short variable names are acceptable in limited scope
+    - wrapcheck # We handle errors appropriately without mandatory wrapping
+    - exhaustruct # Too strict for this project
+    - paralleltest # Tests are fast enough without parallelization
+    - testpackage # We test internal packages
+    - forbidigo # We allow fmt.Printf in examples
+    - cyclop # We use gocyclo instead
+
+  fast: false
+
+# Exclusions for specific paths or patterns
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests
+    - path: _test\.go$
+      linters:
+        - gocyclo
+        - gosec
+        - dupl
+
+    # Exclude shadow checking in test files
+    - path: _test\.go$
+      text: "shadow"
+      linters:
+        - govet
+
+    # Exclude error return check for deferred Close in tests
+    - path: _test\.go$
+      text: "Error return value of .*\.Close is not checked"
+      linters:
+        - errcheck
+
+    # Exclude known false positives
+    - text: "weak cryptographic primitive"
+      linters:
+        - gosec
+
+    # Exclude unused-parameter for interface implementations
+    - text: "unused-parameter: parameter '.*' seems to be unused, consider removing or renaming it as _"
+      linters:
+        - revive
