@@ -12,53 +12,65 @@ import (
 var errTest = errors.New("test error")
 
 func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
-	t.Run("calls PreRunE before RunE", func(t *testing.T) {
-		var order []string
-
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
-
-		cmd := Command[TestAppConfig, NoFlags]{
-			Use: "test",
-			PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				order = append(order, "pre")
-				return nil
+	tests := []struct {
+		name     string
+		hookName string
+		setupCmd func(order *[]string) Command[TestAppConfig, NoFlags]
+		want     []string
+	}{
+		{
+			name:     "calls PreRunE before RunE",
+			hookName: "pre",
+			setupCmd: func(order *[]string) Command[TestAppConfig, NoFlags] {
+				return Command[TestAppConfig, NoFlags]{
+					Use: "test",
+					PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+						*order = append(*order, "pre")
+						return nil
+					},
+					RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+						*order = append(*order, "run")
+						return nil
+					},
+				}
 			},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				order = append(order, "run")
-				return nil
+			want: []string{"pre", "run"},
+		},
+		{
+			name:     "calls PostRunE after RunE",
+			hookName: "post",
+			setupCmd: func(order *[]string) Command[TestAppConfig, NoFlags] {
+				return Command[TestAppConfig, NoFlags]{
+					Use: "test",
+					RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+						*order = append(*order, "run")
+						return nil
+					},
+					PostRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+						*order = append(*order, "post")
+						return nil
+					},
+				}
 			},
-		}
-		require.NoError(t, g.AddCommand(cmd))
+			want: []string{"run", "post"},
+		},
+	}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"test"})
-		require.NoError(t, err)
-		assert.Equal(t, []string{"pre", "run"}, order)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var order []string
 
-	t.Run("calls PostRunE after RunE", func(t *testing.T) {
-		var order []string
+			g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+			require.NoError(t, err)
 
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+			cmd := tt.setupCmd(&order)
+			require.NoError(t, g.AddCommand(cmd))
 
-		cmd := Command[TestAppConfig, NoFlags]{
-			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				order = append(order, "run")
-				return nil
-			},
-			PostRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				order = append(order, "post")
-				return nil
-			},
-		}
-		require.NoError(t, g.AddCommand(cmd))
-
-		err = g.ExecuteWithArgs(context.Background(), []string{"test"})
-		require.NoError(t, err)
-		assert.Equal(t, []string{"run", "post"}, order)
-	})
+			err = g.ExecuteWithArgs(context.Background(), []string{"test"})
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, order)
+		})
+	}
 
 	t.Run("PreRunE error stops execution", func(t *testing.T) {
 		called := false
