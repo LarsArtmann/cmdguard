@@ -97,71 +97,66 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 }
 
 func TestGuardedCommand_CommandOptions(t *testing.T) {
-	t.Run("hidden command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+	tests := []struct {
+		name           string
+		use            string
+		hidden         bool
+		deprecated     string
+		aliases        []string
+		version        string
+		wantHidden     bool
+		wantDeprecated string
+		wantAliases    []string
+		wantVersion    string
+	}{
+		{
+			name:       "hidden command",
+			use:        "secret",
+			hidden:     true,
+			wantHidden: true,
+		},
+		{
+			name:           "deprecated command",
+			use:            "old",
+			deprecated:     "use new-cmd instead",
+			wantDeprecated: "use new-cmd instead",
+		},
+		{
+			name:        "command with aliases",
+			use:         "list",
+			aliases:     []string{"ls", "l"},
+			wantAliases: []string{"ls", "l"},
+		},
+		{
+			name:        "command with version",
+			use:         "versioned",
+			version:     "v1.2.3",
+			wantVersion: "v1.2.3",
+		},
+	}
 
-		cmd := Command[TestAppConfig, NoFlags]{
-			Use:    "secret",
-			Hidden: true,
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				return nil
-			},
-		}
-		require.NoError(t, g.AddCommand(cmd))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+			require.NoError(t, err)
 
-		cobraCmd := g.RootCommand().Commands()[0]
-		assert.True(t, cobraCmd.Hidden)
-	})
+			cmd := Command[TestAppConfig, NoFlags]{
+				Use:        tt.use,
+				Hidden:     tt.hidden,
+				Deprecated: tt.deprecated,
+				Aliases:    tt.aliases,
+				Version:    tt.version,
+				RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+					return nil
+				},
+			}
+			require.NoError(t, g.AddCommand(cmd))
 
-	t.Run("deprecated command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
-
-		cmd := Command[TestAppConfig, NoFlags]{
-			Use:        "old",
-			Deprecated: "use new-cmd instead",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				return nil
-			},
-		}
-		require.NoError(t, g.AddCommand(cmd))
-
-		cobraCmd := g.RootCommand().Commands()[0]
-		assert.Equal(t, "use new-cmd instead", cobraCmd.Deprecated)
-	})
-
-	t.Run("command with aliases", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
-
-		cmd := Command[TestAppConfig, NoFlags]{
-			Use:     "list",
-			Aliases: []string{"ls", "l"},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				return nil
-			},
-		}
-		require.NoError(t, g.AddCommand(cmd))
-
-		cobraCmd := g.RootCommand().Commands()[0]
-		assert.Equal(t, []string{"ls", "l"}, cobraCmd.Aliases)
-	})
-
-	t.Run("command with version", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
-
-		cmd := Command[TestAppConfig, NoFlags]{
-			Use:     "versioned",
-			Version: "v1.2.3",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				return nil
-			},
-		}
-		require.NoError(t, g.AddCommand(cmd))
-
-		cobraCmd := g.RootCommand().Commands()[0]
-		assert.Equal(t, "v1.2.3", cobraCmd.Version)
-	})
+			cobraCmd := g.RootCommand().Commands()[0]
+			assert.Equal(t, tt.wantHidden, cobraCmd.Hidden)
+			assert.Equal(t, tt.wantDeprecated, cobraCmd.Deprecated)
+			assert.Equal(t, tt.wantAliases, cobraCmd.Aliases)
+			assert.Equal(t, tt.wantVersion, cobraCmd.Version)
+		})
+	}
 }

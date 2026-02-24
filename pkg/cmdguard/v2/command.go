@@ -116,7 +116,7 @@ func (c Command[T, F]) HasHandler() bool {
 // IsExecutable returns true if this command can be executed directly.
 // A command is executable if it has a RunE handler.
 func (c Command[T, F]) IsExecutable() bool {
-	return c.RunE != nil
+	return c.HasHandler()
 }
 
 // CommandOption is a functional option for configuring a Command.

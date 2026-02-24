@@ -4,28 +4,33 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func captureOutput(f func()) string {
-	old := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	f()
-
-	w.Close()
-	os.Stdout = old
-
-	out, _ := io.ReadAll(r)
-	return string(out)
+// newGreetCmd creates a new greet command instance for testing.
+// This helper ensures consistency across tests and avoids code duplication.
+func newGreetCmd() v2.Command[AppConfig, *GreetFlags] {
+	return v2.Command[AppConfig, *GreetFlags]{
+		Use:   "greet",
+		Short: "Greet someone",
+		Flags: &GreetFlags{},
+		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
+			if flags.Shout {
+				msg = stringsToUpper(msg)
+			}
+			for i := 0; i < flags.Count; i++ {
+				fmt.Println(msg)
+			}
+			return nil
+		},
+	}
 }
 
 func TestTypedExample_CreateCLI(t *testing.T) {
@@ -67,21 +72,7 @@ func TestTypedExample_GreetCommand(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{Verbose: false})
 	require.NoError(t, err)
 
-	greetCmd := v2.Command[AppConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Flags: &GreetFlags{},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
-			if flags.Shout {
-				msg = stringsToUpper(msg)
-			}
-			for i := 0; i < flags.Count; i++ {
-				fmt.Println(msg)
-			}
-			return nil
-		},
-	}
+	greetCmd := newGreetCmd()
 
 	err = v2.AddAnyCommand(cli, greetCmd)
 	require.NoError(t, err)
@@ -98,21 +89,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{Verbose: false})
 	require.NoError(t, err)
 
-	greetCmd := v2.Command[AppConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Flags: &GreetFlags{},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
-			if flags.Shout {
-				msg = stringsToUpper(msg)
-			}
-			for i := 0; i < flags.Count; i++ {
-				fmt.Println(msg)
-			}
-			return nil
-		},
-	}
+	greetCmd := newGreetCmd()
 
 	err = v2.AddAnyCommand(cli, greetCmd)
 	require.NoError(t, err)
@@ -125,7 +102,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	assert.Contains(t, output, "Hello, Alice!")
 
 	// Test with shout flag
-	output = captureOutput(func() {
+
 		cli.RootCommand().SetArgs([]string{"greet", "--name", "Bob", "--shout"})
 		_ = cli.Execute(context.Background())
 	})
@@ -147,7 +124,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 	_ = v2.AddAnyCommand(cli, greetCmd)
 
-	output = captureOutput(func() {
+
 		cli.RootCommand().SetArgs([]string{"greet", "--count", "3"})
 		_ = cli.Execute(context.Background())
 	})

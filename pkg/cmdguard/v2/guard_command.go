@@ -40,6 +40,14 @@ func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {
 	return g.AddCommand(fn())
 }
 
+// MustAddAnyCommand adds a command with a different flags type to a GuardedCommand.
+// Panics on error. Use this for simpler code when errors are not expected.
+func MustAddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) {
+	if err := AddAnyCommand(g, cmd); err != nil {
+		panic(fmt.Sprintf("MustAddAnyCommand: %v", err))
+	}
+}
+
 // AddAnyCommand adds a command with a different flags type to a GuardedCommand.
 // This is a standalone function because Go doesn't support type parameters on methods.
 // Use this when commands need different flag types than the CLI root.
