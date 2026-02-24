@@ -6,6 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Version is the current version of the cmdguard v2 package.
+// This follows semantic versioning (https://semver.org/).
+const Version = "2.0.0"
+
 // GuardedCommand provides type-safe CLI construction with DI.
 // It never panics - all operations return errors.
 // T is the application config type, F is the command-specific flags type.

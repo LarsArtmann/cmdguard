@@ -1,6 +1,6 @@
 # TODO_LIST.md - cmdguard Project Tasks
 
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-02-24
 **Purpose:** Track tasks for the cmdguard v2 API implementation.
 
 ---
@@ -22,25 +22,32 @@
 
 ## Completed (v2 Testing)
 
-| Task            | Status  | Notes              |
-| --------------- | ------- | ------------------ |
-| Test errors.go  | ✅ DONE | 142 lines of tests |
-| Test types.go   | ✅ DONE | 346 lines of tests |
-| Test config.go  | ✅ DONE | 360 lines of tests |
-| Test flags.go   | ✅ DONE | 488 lines of tests |
-| Test scope.go   | ✅ DONE | 458 lines of tests |
-| Test command.go | ✅ DONE | 399 lines of tests |
-| Test guard.go   | ✅ DONE | 565 lines of tests |
+| Task                | Status  | Notes                   |
+| ------------------- | ------- | ----------------------- |
+| Test errors.go      | ✅ DONE | 142 lines of tests      |
+| Test types.go       | ✅ DONE | 346 lines of tests      |
+| Test config.go      | ✅ DONE | 360 lines of tests      |
+| Test flags.go       | ✅ DONE | 488 lines of tests      |
+| Test scope.go       | ✅ DONE | 458 lines of tests      |
+| Test command.go     | ✅ DONE | 399 lines of tests      |
+| Test guard.go       | ✅ DONE | 565 lines of tests      |
+| Integration tests   | ✅ DONE | examples/\* tests added |
+| Coverage v2 to 90%+ | ✅ DONE | Now at 90.6%            |
 
 ---
 
 ## Completed (v2 Polish)
 
-| Task                | Status  | Notes                  |
-| ------------------- | ------- | ---------------------- |
-| Add typed example   | ✅ DONE | examples/typed/main.go |
-| Update FEATURES.md  | ✅ DONE | v2 API documentation   |
-| Update TODO_LIST.md | ✅ DONE | This file              |
+| Task                        | Status  | Notes                      |
+| --------------------------- | ------- | -------------------------- |
+| Add typed example           | ✅ DONE | examples/typed/main.go     |
+| Update FEATURES.md          | ✅ DONE | v2 API documentation       |
+| Add .golangci.yml           | ✅ DONE | Lint config with gci       |
+| Add CI badge to README      | ✅ DONE | GitHub Actions badge       |
+| Add version constant        | ✅ DONE | v2.Version = "2.0.0"       |
+| Update README with DI docs  | ✅ DONE | Enhanced Scope/DI patterns |
+| Update architecture diagram | ✅ DONE | docs/architecture.d2       |
+| Update TODO_LIST.md         | ✅ DONE | This file                  |
 
 ---
 
@@ -50,7 +57,6 @@
 
 | Task                                | Status     | Notes                       |
 | ----------------------------------- | ---------- | --------------------------- |
-| Update README.md for v2             | ⏳ PENDING | Add v2 examples             |
 | Update AGENTS.md for v2             | ⏳ PENDING | Document v2 patterns        |
 | Add more examples                   | ⏳ PENDING | DI patterns, advanced flags |
 | Plugin system for custom validators | ⏳ PENDING | Future enhancement          |
@@ -65,6 +71,7 @@
 ```
 cmdguard/
 ├── .github/workflows/ci.yml    # CI/CD pipeline
+├── .golangci.yml               # Lint configuration
 ├── pkg/cmdguard/
 │   ├── v2/                     # v2 API (recommended)
 │   │   ├── errors.go           # Typed errors
@@ -73,21 +80,32 @@ cmdguard/
 │   │   ├── flags.go            # Flag registry
 │   │   ├── scope.go            # DI scope
 │   │   ├── command.go          # Command[T]
-│   │   └── guard.go            # GuardedCommand[T]
+│   │   └── guard.go            # GuardedCommand[T] + Version
 │   ├── guarded_command.go      # v1 API
 │   └── guarded_command_test.go
 ├── internal/
 │   ├── config/                 # Configuration (95.7% coverage)
 │   └── logging/                # Logging (100% coverage)
 ├── examples/
-│   ├── basic/main.go           # Simple CLI example
-│   ├── advanced/main.go        # Nested commands example
-│   ├── guarded/main.go         # v1 panic demo
-│   └── typed/main.go           # v2 API demo
+│   ├── basic/main.go           # Simple CLI example + tests
+│   ├── basic/main_test.go      # Integration tests
+│   ├── advanced/main.go        # Nested commands + tests
+│   ├── advanced/main_test.go   # Integration tests
+│   ├── guarded/main.go         # v1 panic demo + tests
+│   ├── guarded/main_test.go    # Integration tests
+│   ├── typed/main.go           # v2 API demo + tests
+│   ├── typed/main_test.go      # Integration tests
+│   ├── di/main.go              # DI patterns demo + tests
+│   ├── di/main_test.go         # Integration tests
+│   └── middleware/main.go      # Middleware demo + tests
+│   └── middleware/main_test.go   # Integration tests
+├── docs/
+│   ├── architecture.d2         # Updated D2 diagram
+│   └── architecture.svg        # Generated diagram
 ├── AGENTS.md                   # Developer guide
 ├── CONTRIBUTING.md             # Contribution guide
 ├── FEATURES.md                 # Feature documentation
-├── README.md                   # User documentation
+├── README.md                   # User documentation (with CI badge)
 ├── TODO_LIST.md                # This file
 ├── go.mod                      # Dependencies
 └── justfile                    # Build automation
@@ -97,19 +115,32 @@ cmdguard/
 
 ## Summary
 
-**Status: v2.0.0 READY ✅**
+**Status: v2.0.0 COMPLETE ✅**
 
 The v2 API is complete with comprehensive test coverage:
 
 - 7 implementation files (~1,700 lines)
 - 7 test files (~2,700 lines)
-- Complete example demonstrating all features
+- 6 example directories with integration tests (~1,800 lines)
+- 90.6% coverage on v2 package
+- All examples have test coverage
 
 **Key v2 Features:**
 
-- Type-safe with generics (`GuardedCommand[T]`)
+- Type-safe with generics (`GuardedCommand[T, F]`)
 - No panics - all operations return errors
 - DI integration with samber/do/v2
 - Typed flags with struct tags
+- Comprehensive linting with golangci-lint
+- CI/CD with GitHub Actions
 
-**Remaining work is documentation polish only.**
+**Code Quality:**
+
+- `.golangci.yml` with gci formatter enabled
+- All tests passing
+- Examples have integration tests
+- Architecture diagram updated
+
+---
+
+_This document reflects the v2.0.0 release state. Last updated 2026-02-24._

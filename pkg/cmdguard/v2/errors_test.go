@@ -140,3 +140,24 @@ func TestErrorChaining(t *testing.T) {
 		require.NotNil(t, cmdErr)
 	})
 }
+
+func TestServiceError(t *testing.T) {
+	t.Run("Error message", func(t *testing.T) {
+		inner := errors.New("service not initialized")
+		err := NewServiceError("*DatabaseService", inner)
+		assert.Contains(t, err.Error(), "*DatabaseService")
+		assert.Contains(t, err.Error(), "service not initialized")
+	})
+
+	t.Run("Unwrap", func(t *testing.T) {
+		inner := errors.New("inner error")
+		err := NewServiceError("*LoggerService", inner)
+		unwrapped := err.Unwrap()
+		assert.Equal(t, inner, unwrapped)
+	})
+
+	t.Run("errors.Is support", func(t *testing.T) {
+		err := NewServiceError("*DatabaseService", ErrServiceNotFound)
+		assert.True(t, errors.Is(err, ErrServiceNotFound))
+	})
+}

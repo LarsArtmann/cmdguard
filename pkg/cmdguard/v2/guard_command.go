@@ -121,23 +121,6 @@ func setupFlagRegistry[T, F any](cobraCmd *cobra.Command, cmd Command[T, F]) (*F
 	return registry, nil
 }
 
-// setupHandler configures a cobra handler (RunE, PreRunE, or PostRunE) for the command.
-func setupHandler[T, F any](
-	cobraCmd *cobra.Command,
-	cmd Command[T, F],
-	config *T,
-	registry *FlagRegistry,
-	handler func(context.Context, *T, F) error,
-	setter func(*cobra.Command, func(*cobra.Command, []string) error),
-) {
-	if handler == nil {
-		return
-	}
-	setter(cobraCmd, func(c *cobra.Command, args []string) error {
-		return executeHandler(c, handler, cmd.Flags, config, registry)
-	})
-}
-
 // setupRunHandler configures the RunE handler for the command.
 func setupRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
 	setupHandler(cobraCmd, cmd, config, registry, cmd.RunE, func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
@@ -156,6 +139,23 @@ func setupPreRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], co
 func setupPostRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
 	setupHandler(cobraCmd, cmd, config, registry, cmd.PostRunE, func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
 		c.PostRunE = fn
+	})
+}
+
+// setupHandler configures a cobra handler (RunE, PreRunE, or PostRunE) for the command.
+func setupHandler[T, F any](
+	cobraCmd *cobra.Command,
+	cmd Command[T, F],
+	config *T,
+	registry *FlagRegistry,
+	handler func(context.Context, *T, F) error,
+	setter func(*cobra.Command, func(*cobra.Command, []string) error),
+) {
+	if handler == nil {
+		return
+	}
+	setter(cobraCmd, func(c *cobra.Command, args []string) error {
+		return executeHandler(c, handler, cmd.Flags, config, registry)
 	})
 }
 

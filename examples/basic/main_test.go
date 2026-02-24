@@ -67,7 +67,9 @@ func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	cmd := root.Command()
 	assert.Equal(t, "basic", cmd.Use)
 	assert.Equal(t, "A basic CLI example", cmd.Short)
-	assert.Len(t, cmd.Commands(), 2)
+	// GuardedCommand adds built-in commands (completion, help, validate, version)
+	// plus our 2 custom commands
+	assert.GreaterOrEqual(t, len(cmd.Commands()), 2)
 }
 
 func TestBasicExample_HelpOutput(t *testing.T) {

@@ -113,3 +113,76 @@ func TestGuardedCommand_AddCommandFunc(t *testing.T) {
 		require.Len(t, rootCmd.Commands(), 1)
 	})
 }
+
+func TestAddAnyCommand(t *testing.T) {
+	t.Run("adds command with different flag type", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		type GreetFlags struct {
+			Name string
+		}
+
+		cmd := Command[TestAppConfig, *GreetFlags]{
+			Use:   "greet",
+			Short: "Greet someone",
+			Flags: &GreetFlags{},
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
+				return nil
+			},
+		}
+
+		err = AddAnyCommand(g, cmd)
+		require.NoError(t, err)
+
+		rootCmd := g.RootCommand()
+		require.Len(t, rootCmd.Commands(), 1)
+	})
+
+	t.Run("error when command has no handler", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		type OtherFlags struct {
+			Value string
+		}
+
+		cmd := Command[TestAppConfig, *OtherFlags]{
+			Use:   "invalid",
+			Flags: &OtherFlags{},
+			// No RunE
+		}
+
+		err = AddAnyCommand(g, cmd)
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrMissingHandler)
+	})
+
+	t.Run("error on duplicate command", func(t *testing.T) {
+		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		require.NoError(t, err)
+
+		type OtherFlags struct{}
+
+		cmd1 := Command[TestAppConfig, *OtherFlags]{
+			Use: "test",
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *OtherFlags) error {
+				return nil
+			},
+		}
+
+		cmd2 := Command[TestAppConfig, *OtherFlags]{
+			Use: "test",
+			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *OtherFlags) error {
+				return nil
+			},
+		}
+
+		err = AddAnyCommand(g, cmd1)
+		require.NoError(t, err)
+
+		err = AddAnyCommand(g, cmd2)
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrDuplicateCommand)
+	})
+}

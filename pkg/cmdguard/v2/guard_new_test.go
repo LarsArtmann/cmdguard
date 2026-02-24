@@ -12,6 +12,13 @@ type TestAppConfig struct {
 	Output  string `flag:"output" short:"o" default:"-" help:"Output file"`
 }
 
+func TestVersion(t *testing.T) {
+	t.Run("version is set", func(t *testing.T) {
+		assert.NotEmpty(t, Version)
+		assert.Equal(t, "2.0.0", Version)
+	})
+}
+
 func TestNew(t *testing.T) {
 	t.Run("creates GuardedCommand", func(t *testing.T) {
 		defaults := TestAppConfig{}

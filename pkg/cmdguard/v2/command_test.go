@@ -230,9 +230,9 @@ func TestCommandOptions(t *testing.T) {
 
 	t.Run("HandlerOptions", func(t *testing.T) {
 		type handlerTestCase struct {
-			name      string
-			apply     func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags])
-			getField  func(*Command[TestConfig, NoFlags]) any
+			name     string
+			apply    func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags])
+			getField func(*Command[TestConfig, NoFlags]) any
 		}
 
 		tests := []handlerTestCase{

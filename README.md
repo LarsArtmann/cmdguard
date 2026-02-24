@@ -1,5 +1,7 @@
 # cmdguard
 
+[![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
+
 **A Go library for building validated Cobra CLI applications with panic-at-construction-time guards and type-safe flags.**
 
 This library wraps Cobra with validation that panics at construction time, ensuring invalid commands are caught immediately at startup rather than failing silently at runtime.
@@ -236,24 +238,95 @@ v2.AddAnyCommand(cli, greetCmd)
 
 ### DI Integration
 
-Register and invoke services:
+cmdguard v2 provides built-in dependency injection through [samber/do/v2](https://github.com/samber/do), enabling clean service management and lifecycle handling.
+
+#### Scope Hierarchy
+
+Each `GuardedCommand` has a root scope that can create child scopes:
 
 ```go
-// Register services
-v2.Provide(scope, func(i do.Injector) (*Database, error) {
-    return &Database{...}, nil
+// Get the root scope
+scope := cli.ScopeStruct()
+
+// Create child scopes for isolation
+childScope := scope.Child("worker")
+
+// Access scope hierarchy
+path := scope.Path()     // Returns ["myapp"]
+isRoot := scope.IsRoot() // Returns true for root scope
+```
+
+#### Registering Services
+
+Register services using constructors or values:
+
+```go
+// Register with constructor (lazy initialization)
+err := v2.Provide(scope, func(i do.Injector) (*Database, error) {
+    // Access config through injector
+    cfg, err := v2.Invoke[*AppConfig](scope)
+    if err != nil {
+        return nil, err
+    }
+    return &Database{DSN: cfg.DSN}, nil
 })
 
-v2.ProvideValue(scope, config)
+// Register pre-constructed value
+err = v2.ProvideValue(scope, &Logger{Level: "info"})
+```
 
-// Invoke services in handlers (with proper error handling)
+#### Invoking Services
+
+Retrieve services in command handlers:
+
+```go
 RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
     db, err := v2.Invoke[*Database](cli.ScopeStruct())
     if err != nil {
         return v2.NewServiceError("*Database", err)
     }
-    // use db...
+    // Use db...
 },
+```
+
+#### Scoped Providers
+
+Create providers that operate within specific scopes:
+
+```go
+// Register a scoped provider
+err := v2.ScopedProvider(scope, "worker", func(i do.Injector) (*Worker, error) {
+    return &Worker{}, nil
+})
+
+// Invoke within that scope
+worker, err := v2.Invoke[*Worker](scope.Child("worker"))
+```
+
+#### Lifecycle Management
+
+Services can implement lifecycle hooks:
+
+```go
+// Implement do.HealthcheckerWithContext for health checks
+type Database struct{}
+
+func (d *Database) HealthCheck(ctx context.Context) error {
+    return d.Ping(ctx)
+}
+
+// Implement do.Shutdowner for graceful shutdown
+type Server struct{}
+
+func (s *Server) Shutdown() error {
+    return s.server.Close()
+}
+
+// Run health checks
+err := cli.HealthCheck()
+
+// Graceful shutdown
+err := cli.Shutdown(ctx)
 ```
 
 ### Lifecycle Hooks

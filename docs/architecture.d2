@@ -1,5 +1,5 @@
-# cmdguard Architecture Diagram
-# A CLI validation library ensuring commands and flags are properly implemented
+# cmdguard v2 Architecture Diagram
+# Type-safe CLI construction with DI and generics
 
 direction: right
 
@@ -28,15 +28,7 @@ external: {
     shape: rectangle
   }
 
-  koanf: {
-    label: |go
-      knadh/koanf
-      Config management
-    |
-    shape: rectangle
-  }
-
-  do: {
+  samberdo: {
     label: |go
       samber/do/v2
       Dependency Injection
@@ -45,44 +37,112 @@ external: {
   }
 }
 
-# Entry Point
-entry: {
-  label: Entry Point
-  style: {
-    fill: "#e1f5fe"
-    stroke: "#0288d1"
-  }
-
-  main: {
-    label: |go
-      cmd/cmdguard/main.go
-      Application bootstrap
-    |
-    shape: rectangle
-    style: {
-      fill: "#b3e5fc"
-      stroke: "#0288d1"
-    }
-  }
-}
-
-# Public API Layer
+# Public API Layer (v2)
 public: {
-  label: Public API
+  label: Public API (v2)
   style: {
     fill: "#e8f5e9"
     stroke: "#388e3c"
   }
 
-  api: {
+  guarded: {
     label: |go
-      pkg/cmdguard/
-      public_api.go
+      pkg/cmdguard/v2
+      guard.go
 
-      Application struct
-      - Initialize()
-      - Validate()
+      GuardedCommand[T, F]
+      - New[T, F]()
+      - AddCommand()
       - Execute()
+      - Scope()
+      - Config()
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+
+  command: {
+    label: |go
+      command.go
+
+      Command[T, F]
+      - Use, Short, Long
+      - Flags F
+      - RunE, PreRunE, PostRunE
+      - Validate()
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+
+  scope: {
+    label: |go
+      scope.go
+
+      Scope
+      - Provide()
+      - ProvideValue()
+      - Invoke[T]()
+      - Child()
+      - HealthCheck()
+      - Shutdown()
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+
+  flags: {
+    label: |go
+      flags.go
+
+      FlagRegistry
+      - RegisterFlags()
+      - ParseFlags()
+      - ValidateFlags()
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+
+  types: {
+    label: |go
+      types.go
+
+      Custom Types
+      - LogLevel
+      - LogFormat
+      - Duration
+      - Enum[T]
+      - NoFlags
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+
+  errors: {
+    label: |go
+      errors.go
+
+      Error Types
+      - *CommandError
+      - *FlagError
+      - *ServiceError
+      - *ConfigError
     |
     shape: rectangle
     style: {
@@ -100,97 +160,28 @@ internal: {
     stroke: "#f57c00"
   }
 
-  di: {
-    label: |go
-      internal/di/
-      module.go
-
-      Module struct
-      - ProvideServices()
-      - Invoke*()
-      - HealthCheck()
-      - Shutdown()
-    |
-    shape: rectangle
-    style: {
-      fill: "#ffe0b2"
-      stroke: "#f57c00"
-    }
-  }
-
-  commands: {
-    label: |go
-      internal/commands/
-      root.go
-
-      Registry struct
-      - Root() *cobra.Command
-      - AddCommand()
-      - Execute()
-      - Validate()
-    |
-    shape: rectangle
-    style: {
-      fill: "#ffe0b2"
-      stroke: "#f57c00"
-    }
-  }
-
-  validation: {
-    label: Validation Layer
-    style: {
-      fill: "#fce4ec"
-      stroke: "#c2185b"
-    }
-
-    registry: {
-      label: |go
-        registry.go
-
-        Registry struct
-        - RegisterCommand()
-        - RegisterSubcommand()
-        - GetCommands()
-      |
-      shape: rectangle
-      style: {
-        fill: "#f8bbd9"
-        stroke: "#c2185b"
-      }
-    }
-
-    validator: {
-      label: |go
-        validator.go
-
-        Validator struct
-        - ValidateAll()
-        - ValidateCommands()
-        - ValidateFlags()
-        - ValidateCommandTree()
-
-        FlagValidator struct
-        - ValidateFlag()
-      |
-      shape: rectangle
-      style: {
-        fill: "#f8bbd9"
-        stroke: "#c2185b"
-      }
-    }
-  }
-
   config: {
     label: |go
       internal/config/
-      provider.go
 
-      Config struct
-      - StrictMode
-      - ConfigFile
-      - LogLevel
+      Config Provider
+      - Environment variables
+      - CMDGUARD_* prefix
+    |
+    shape: rectangle
+    style: {
+      fill: "#ffe0b2"
+      stroke: "#f57c00"
+    }
+  }
 
-      NewConfig()
+  logging: {
+    label: |go
+      internal/logging/
+
+      Logger
+      - Structured logging (slog)
+      - Log level management
     |
     shape: rectangle
     style: {
@@ -200,30 +191,61 @@ internal: {
   }
 }
 
-# Dependency Flow
-entry.main -> public.api: uses
-public.api -> internal.di: creates & uses
-public.api -> internal.commands: invokes
-public.api -> internal.validation.validator: invokes
-public.api -> internal.config: invokes
+# Examples Layer
+examples: {
+  label: Examples
+  style: {
+    fill: "#e1f5fe"
+    stroke: "#0288d1"
+  }
 
-# DI Wiring
-internal.di -> internal.config: provides
-internal.di -> internal.validation.registry: provides
-internal.di -> internal.validation.validator: provides
-internal.di -> internal.commands: provides
+  basic: {
+    label: examples/basic/
+    shape: rectangle
+    style: {fill: "#b3e5fc"}
+  }
 
-# Internal Dependencies
-internal.commands -> internal.config: uses
-internal.commands -> internal.validation.validator: uses
-internal.validation.validator -> internal.validation.registry: uses
-internal.validation.validator -> internal.config: uses
-internal.validation.registry -> internal.config: uses
+  typed: {
+    label: examples/typed/
+    shape: rectangle
+    style: {fill: "#b3e5fc"}
+  }
+
+  di: {
+    label: examples/di/
+    shape: rectangle
+    style: {fill: "#b3e5fc"}
+  }
+
+  middleware: {
+    label: examples/middleware/
+    shape: rectangle
+    style: {fill: "#b3e5fc"}
+  }
+}
+
+# Relationships
+public.guarded -> public.command: uses
+public.guarded -> public.scope: contains
+public.guarded -> public.flags: uses
+public.guarded -> public.errors: returns
+
+public.command -> public.types: uses
+public.flags -> public.types: uses
+public.scope -> public.errors: returns
 
 # External Dependencies
-internal.commands -> external.cobra: wraps
-internal.commands -> external.fang: executes with
-internal.config -> external.koanf: loads config
-internal.di -> external.do: uses
-public.api -> external.cobra: accepts commands
-entry.main -> external.fang: error styling
+public.guarded -> external.cobra: wraps
+public.scope -> external.samberdo: uses
+public.flags -> external.cobra: registers
+
+# Internal Usage
+public.guarded -> internal.config: reads
+public.guarded -> internal.logging: uses
+
+# Examples Usage
+examples.basic -> public.guarded: demonstrates
+examples.typed -> public.guarded: demonstrates
+examples.typed -> public.command: demonstrates
+examples.di -> public.scope: demonstrates
+examples.middleware -> public.command: demonstrates

@@ -107,42 +107,47 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		assert.Equal(t, expected, cfg.Timeout)
 	})
 
+	// testParseableFlag tests parsing of flag values that implement pflag.Value interface.
+	testParseableFlag := func[T flagValueParser](t *testing.T, name, validValue string, expected T, invalidValue string) {
+		t.Helper()
+
+		type TestConfig struct {
+			Value T `flag:"value"`
+		}
+
+		t.Run("parse valid "+name, func(t *testing.T) {
+			cfg := &TestConfig{}
+			registry, err := NewFlagRegistry(*cfg)
+			require.NoError(t, err)
+
+			cmd := &cobra.Command{Use: "test"}
+			require.NoError(t, registry.RegisterFlags(cmd))
+
+			require.NoError(t, cmd.PersistentFlags().Set("value", validValue))
+
+			err = registry.ParseFlags(cmd, cfg)
+			require.NoError(t, err)
+			assert.Equal(t, expected, cfg.Value)
+		})
+
+		t.Run("parse invalid "+name+" returns error", func(t *testing.T) {
+			cfg := &TestConfig{}
+			registry, err := NewFlagRegistry(*cfg)
+			require.NoError(t, err)
+
+			cmd := &cobra.Command{Use: "test"}
+			require.NoError(t, registry.RegisterFlags(cmd))
+
+			require.NoError(t, cmd.PersistentFlags().Set("value", invalidValue))
+
+			err = registry.ParseFlags(cmd, cfg)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "value")
+		})
+	}
+
 	t.Run("parse LogLevel flag", func(t *testing.T) {
-		type TestConfig struct {
-			Level LogLevel `flag:"level" default:"info"`
-		}
-
-		cfg := &TestConfig{}
-		registry, err := NewFlagRegistry(*cfg)
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("level", "debug"))
-
-		err = registry.ParseFlags(cmd, cfg)
-		require.NoError(t, err)
-		assert.Equal(t, LogLevelDebug, cfg.Level)
-	})
-
-	t.Run("parse invalid LogLevel returns error", func(t *testing.T) {
-		type TestConfig struct {
-			Level LogLevel `flag:"level" default:"info"`
-		}
-
-		cfg := &TestConfig{}
-		registry, err := NewFlagRegistry(*cfg)
-		require.NoError(t, err)
-
-		cmd := &cobra.Command{Use: "test"}
-		require.NoError(t, registry.RegisterFlags(cmd))
-
-		require.NoError(t, cmd.PersistentFlags().Set("level", "invalid"))
-
-		err = registry.ParseFlags(cmd, cfg)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "level")
+		testParseableFlag(t, "LogLevel", "debug", LogLevelDebug, "invalid")
 	})
 
 	t.Run("parse Enum flag", func(t *testing.T) {
@@ -180,6 +185,10 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 		err = registry.ParseFlags(cmd, cfg)
 		require.Error(t, err)
+	})
+
+	t.Run("parse LogFormat flag", func(t *testing.T) {
+		testParseableFlag(t, "LogFormat", "json", LogFormatJSON, "invalid")
 	})
 }
 
