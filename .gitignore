@@ -29,5 +29,9 @@ Thumbs.db
 
 # Config files (example)
 config.yaml
+
 # Dependencies
 node_modules/
+
+# Backup files
+*.backup

@@ -107,7 +107,7 @@ linters:
           - dupl
 
       - path: '_test\.go$'
-        text: 'shadow'
+        text: "shadow"
         linters:
           - govet
 
@@ -116,17 +116,17 @@ linters:
         linters:
           - errcheck
 
-      - text: 'weak cryptographic primitive'
+      - text: "weak cryptographic primitive"
         linters:
           - gosec
 
-      - text: 'unused-parameter: parameter .+ seems to be unused'
+      - text: "unused-parameter: parameter .+ seems to be unused"
         linters:
           - revive
 
       # BDD tests conventionally use dot imports with Ginkgo/Gomega
       - path: '_test\.go$'
-        text: 'dot-imports'
+        text: "dot-imports"
         linters:
           - revive
 
@@ -137,13 +137,13 @@ linters:
 
       # Test helpers often have t *testing.T before context.Context
       - path: '_test\.go$'
-        text: 'context-as-argument'
+        text: "context-as-argument"
         linters:
           - revive
 
       # Allow prealloc to be skipped for small slices where it doesn't matter
       - path: 'flags_suggest\.go$'
-        text: 'prealloc'
+        text: "prealloc"
         linters:
           - prealloc
 
