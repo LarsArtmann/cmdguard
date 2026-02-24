@@ -7,10 +7,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 )
 
 func TestBasicExample_HelloCommand(t *testing.T) {

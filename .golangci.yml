@@ -1,36 +1,36 @@
-# golangci-lint configuration for cmdguard
-# Documentation: https://golangci-lint.run/usage/configuration/
+version: "2"
 
 run:
   timeout: 5m
   go: "1.26"
   modules-download-mode: readonly
 
-issues:
-  exclude-use-default: false
-  max-issues-per-linter: 50
-  max-same-issues: 10
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/larsartmann/cmdguard)
+      skip-generated: true
+      custom-order: true
+
+    gofmt:
+      simplify: true
+
+    goimports:
+      local-prefixes: github.com/larsartmann/cmdguard
 
 linters-settings:
-  gci:
-    # Enable gci for import formatting
-    sections:
-      - standard # Standard library imports
-      - default # Default section for all other imports
-      - prefix(github.com/larsartmann/cmdguard) # Project imports
-    skip-generated: true
-    custom-order: true
-
-  gofmt:
-    simplify: true
-
-  goimports:
-    local-prefixes: github.com/larsartmann/cmdguard
-
   govet:
     enable-all: true
     disable:
-      - shadow # Disabled due to false positives with common patterns
+      - shadow
 
   staticcheck:
     checks: ["all"]
@@ -77,82 +77,76 @@ linters-settings:
 
 linters:
   enable:
-    # Formatting
-    - gci # Enable gci for import formatting
-    - gofmt
-    - goimports
-
-    # Error handling
     - errcheck
     - errorlint
-
-    # Code quality
     - gocyclo
     - goconst
     - govet
     - staticcheck
     - ineffassign
-    - deadcode
     - unused
-
-    # Style
     - revive
     - misspell
     - whitespace
-    - wsl
-
-    # Security
     - gosec
-
-    # Performance
     - prealloc
 
-  disable:
-    # Disabled linters that conflict with project preferences
-    - lll # Line length limit - we prefer readability over strict limits
-    - gochecknoglobals # Globals are acceptable for this project
-    - gochecknoinits # Init functions are used intentionally
-    - godox # We use TODO comments intentionally
-    - nlreturn # Too strict for our style
-    - exhaustivestruct # Not practical for this project
-    - varnamelen # Short variable names are acceptable in limited scope
-    - wrapcheck # We handle errors appropriately without mandatory wrapping
-    - exhaustruct # Too strict for this project
-    - paralleltest # Tests are fast enough without parallelization
-    - testpackage # We test internal packages
-    - forbidigo # We allow fmt.Printf in examples
-    - cyclop # We use gocyclo instead
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
 
-  fast: false
+    rules:
+      - path: '_test\.go$'
+        linters:
+          - gocyclo
+          - gosec
+          - dupl
 
-# Exclusions for specific paths or patterns
+      - path: '_test\.go$'
+        text: 'shadow'
+        linters:
+          - govet
+
+      - path: '_test\.go$'
+        text: 'Error return value of .+\.Close is not checked'
+        linters:
+          - errcheck
+
+      - text: 'weak cryptographic primitive'
+        linters:
+          - gosec
+
+      - text: 'unused-parameter: parameter .+ seems to be unused'
+        linters:
+          - revive
+
+      # BDD tests conventionally use dot imports with Ginkgo/Gomega
+      - path: '_test\.go$'
+        text: 'dot-imports'
+        linters:
+          - revive
+
+      # Test files may intentionally use type assertions on errors for testing
+      - path: '_test\.go$'
+        linters:
+          - errorlint
+
+      # Test helpers often have t *testing.T before context.Context
+      - path: '_test\.go$'
+        text: 'context-as-argument'
+        linters:
+          - revive
+
+      # Allow prealloc to be skipped for small slices where it doesn't matter
+      - path: 'flags_suggest\.go$'
+        text: 'prealloc'
+        linters:
+          - prealloc
+
 issues:
-  exclude-rules:
-    # Exclude some linters from running on tests
-    - path: _test\.go$
-      linters:
-        - gocyclo
-        - gosec
-        - dupl
-
-    # Exclude shadow checking in test files
-    - path: _test\.go$
-      text: "shadow"
-      linters:
-        - govet
-
-    # Exclude error return check for deferred Close in tests
-    - path: _test\.go$
-      text: "Error return value of .*\.Close is not checked"
-      linters:
-        - errcheck
-
-    # Exclude known false positives
-    - text: "weak cryptographic primitive"
-      linters:
-        - gosec
-
-    # Exclude unused-parameter for interface implementations
-    - text: "unused-parameter: parameter '.*' seems to be unused, consider removing or renaming it as _"
-      linters:
-        - revive
+  max-issues-per-linter: 50
+  max-same-issues: 10

@@ -5,9 +5,10 @@ import (
 	"context"
 	"testing"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // RootConfig is the application-level configuration for tests.
@@ -32,7 +33,7 @@ type MathFlags struct {
 // ConfigFlags are flags for the config command (yet another type).
 type ConfigFlags struct {
 	File string `flag:"file" short:"f" default:"" help:"Config file path"`
-	Json bool   `flag:"json" default:"false" help:"Output as JSON"`
+	JSON bool   `flag:"json" default:"false" help:"Output as JSON"`
 }
 
 // DBFlags are flags for database commands.
@@ -94,7 +95,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *ConfigFlags](cli, v2.Command[RootConfig, *ConfigFlags]{
 		Use:   "config",
 		Short: "Manage config",
-		Flags: &ConfigFlags{File: "", Json: false},
+		Flags: &ConfigFlags{File: "", JSON: false},
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *ConfigFlags) error {
 			configCalled = true
 			configFlags = flags
@@ -122,7 +123,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, configCalled)
 	assert.Equal(t, "/etc/app.yaml", configFlags.File)
-	assert.True(t, configFlags.Json)
+	assert.True(t, configFlags.JSON)
 }
 
 func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {

@@ -89,11 +89,5 @@ jobs:
       - name: Test basic example
         run: go run ./examples/basic/main.go hello
 
-      - name: Test advanced example
-        run: go run ./examples/advanced/main.go db migrate
-
-      - name: Test guarded example
-        run: go run ./examples/guarded/main.go validate
-
       - name: Test typed example
         run: go run ./examples/typed/main.go greet --name=CI

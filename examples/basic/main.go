@@ -5,8 +5,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 	"github.com/spf13/cobra"
+
+	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 )
 
 func main() {

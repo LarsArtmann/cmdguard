@@ -2,15 +2,18 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"os"
 	"testing"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
-	"github.com/larsartmann/cmdguard/pkg/testutil"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // newGreetCmd creates a new greet command instance for testing.
@@ -31,6 +34,21 @@ func newGreetCmd() v2.Command[AppConfig, *GreetFlags] {
 			return nil
 		},
 	}
+}
+
+// captureOutput captures stdout during the execution of f and returns it as a string.
+func captureOutput(f func()) string {
+	old := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	f()
+
+	w.Close()
+	var buf bytes.Buffer
+	_, _ = io.Copy(&buf, r) // Error intentionally ignored in test helper
+	os.Stdout = old
+	return buf.String()
 }
 
 func TestTypedExample_CreateCLI(t *testing.T) {
@@ -102,7 +120,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	assert.Contains(t, output, "Hello, Alice!")
 
 	// Test with shout flag
-
+	output = captureOutput(func() {
 		cli.RootCommand().SetArgs([]string{"greet", "--name", "Bob", "--shout"})
 		_ = cli.Execute(context.Background())
 	})
@@ -124,7 +142,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 	_ = v2.AddAnyCommand(cli, greetCmd)
 
-
+	output = captureOutput(func() {
 		cli.RootCommand().SetArgs([]string{"greet", "--count", "3"})
 		_ = cli.Execute(context.Background())
 	})

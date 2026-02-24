@@ -73,7 +73,7 @@ func (g *GuardedCommand) checkDuplicateSubcommands(parent *cobra.Command) {
 func (g *GuardedCommand) validateSubcommands(parent *cobra.Command) error {
 	for _, cmd := range parent.Commands() {
 		if err := g.validateCommand(cmd); err != nil {
-			return fmt.Errorf("%s %s: %v", parent.Name(), cmd.Name(), err)
+			return fmt.Errorf("%s %s: %w", parent.Name(), cmd.Name(), err)
 		}
 		if err := g.validateSubcommands(cmd); err != nil {
 			return err

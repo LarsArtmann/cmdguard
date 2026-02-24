@@ -87,21 +87,16 @@ cmdguard/
 │   ├── config/                 # Configuration (95.7% coverage)
 │   └── logging/                # Logging (100% coverage)
 ├── examples/
-│   ├── basic/main.go           # Simple CLI example + tests
-│   ├── basic/main_test.go      # Integration tests
-│   ├── advanced/main.go        # Nested commands + tests
-│   ├── advanced/main_test.go   # Integration tests
-│   ├── guarded/main.go         # v1 panic demo + tests
-│   ├── guarded/main_test.go    # Integration tests
-│   ├── typed/main.go           # v2 API demo + tests
-│   ├── typed/main_test.go      # Integration tests
-│   ├── di/main.go              # DI patterns demo + tests
-│   ├── di/main_test.go         # Integration tests
-│   └── middleware/main.go      # Middleware demo + tests
-│   └── middleware/main_test.go   # Integration tests
+│   ├── basic/                  # v1 API demo
+│   │   ├── main.go
+│   │   └── main_test.go
+│   └── typed/                  # v2 API demo (DI, flags, lifecycle)
+│       ├── main.go
+│       └── main_test.go
 ├── docs/
-│   ├── architecture.d2         # Updated D2 diagram
-│   └── architecture.svg        # Generated diagram
+│   ├── architecture.d2         # D2 diagram source
+│   ├── architecture.svg        # Generated diagram
+│   └── status/                 # Status reports
 ├── AGENTS.md                   # Developer guide
 ├── CONTRIBUTING.md             # Contribution guide
 ├── FEATURES.md                 # Feature documentation
@@ -121,9 +116,9 @@ The v2 API is complete with comprehensive test coverage:
 
 - 7 implementation files (~1,700 lines)
 - 7 test files (~2,700 lines)
-- 6 example directories with integration tests (~1,800 lines)
+- 2 example directories with integration tests
 - 90.6% coverage on v2 package
-- All examples have test coverage
+- All tests passing
 
 **Key v2 Features:**
 
