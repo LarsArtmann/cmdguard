@@ -34,15 +34,18 @@ func TestProvide(t *testing.T) {
 
 		// Register a dependency
 		type Dep string
+
 		require.NoError(t, ProvideValue(scope, Dep("dependency")))
 
 		// Register a service that uses the dependency
 		type Service string
+
 		err := Provide(scope, func(i do.Injector) (Service, error) {
 			dep, err := do.Invoke[Dep](i)
 			if err != nil {
 				return "", err
 			}
+
 			return Service(dep + "-enhanced"), nil
 		})
 		require.NoError(t, err)
@@ -101,7 +104,7 @@ func TestInvoke(t *testing.T) {
 		value, err := Invoke[string](nil)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "scope is nil")
-		assert.Equal(t, "", value)
+		assert.Empty(t, value)
 	})
 
 	t.Run("returns error for unregistered service", func(t *testing.T) {
@@ -109,7 +112,7 @@ func TestInvoke(t *testing.T) {
 
 		value, err := Invoke[string](scope)
 		require.Error(t, err)
-		assert.Equal(t, "", value)
+		assert.Empty(t, value)
 	})
 
 	t.Run("can invoke different types", func(t *testing.T) {

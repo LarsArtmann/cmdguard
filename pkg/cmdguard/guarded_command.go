@@ -45,7 +45,7 @@ import (
 )
 
 // version is set at build time via ldflags:
-// go build -ldflags "-X github.com/larsartmann/cmdguard/pkg/cmdguard.version=X"
+// go build -ldflags "-X github.com/larsartmann/cmdguard/pkg/cmdguard.version=X".
 var version = "dev"
 
 // GuardedCommand wraps a cobra.Command with compile-time validation.
@@ -85,16 +85,22 @@ func New(name, short string) *GuardedCommand {
 
 	// Add global flags
 	cmd.PersistentFlags().StringP("config", "c", "", "Config file path")
-	cmd.PersistentFlags().StringP("log-level", "l", cfg.LogLevel, "Log level: debug, info, warn, error")
+	cmd.PersistentFlags().
+		StringP("log-level", "l", cfg.LogLevel, "Log level: debug, info, warn, error")
 	cmd.PersistentFlags().BoolP("strict", "s", cfg.StrictMode, "Enable strict mode validation")
 
 	// Validate log-level in PreRunE
 	cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
 		level, _ := cmd.Flags().GetString("log-level")
+
 		validLevels := []string{"debug", "info", "warn", "error"}
 		if !slices.Contains(validLevels, level) {
-			return fmt.Errorf("invalid --log-level %q: must be one of: debug, info, warn, error", level)
+			return fmt.Errorf(
+				"invalid --log-level %q: must be one of: debug, info, warn, error",
+				level,
+			)
 		}
+
 		return nil
 	}
 
@@ -132,7 +138,8 @@ func (g *GuardedCommand) AddCommand(cmd *cobra.Command) {
 	g.checkDuplicateSubcommands(cmd)
 
 	// Validate command before adding
-	if err := g.validateCommand(cmd); err != nil {
+	err := g.validateCommand(cmd)
+	if err != nil {
 		panic(fmt.Sprintf("cmdguard: invalid command %q: %v", cmd.Name(), err))
 	}
 
@@ -152,12 +159,19 @@ func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 	// Check for duplicate subcommand name under this parent
 	for _, existing := range parent.Commands() {
 		if existing.Name() == child.Name() {
-			panic(fmt.Sprintf("cmdguard: duplicate subcommand %q in command %q", child.Name(), parent.Name()))
+			panic(
+				fmt.Sprintf(
+					"cmdguard: duplicate subcommand %q in command %q",
+					child.Name(),
+					parent.Name(),
+				),
+			)
 		}
 	}
 
 	// Validate child before adding
-	if err := g.validateCommand(child); err != nil {
+	err := g.validateCommand(child)
+	if err != nil {
 		panic(fmt.Sprintf("cmdguard: invalid subcommand %q: %v", child.Name(), err))
 	}
 
@@ -171,12 +185,14 @@ func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 // Execute runs the command with the given context.
 func (g *GuardedCommand) Execute(ctx context.Context) error {
 	g.validated = true
+
 	return fang.Execute(ctx, g.cmd)
 }
 
 // ExecuteAndExit runs the command and exits with appropriate exit code.
 func (g *GuardedCommand) ExecuteAndExit(ctx context.Context) {
-	if err := g.Execute(ctx); err != nil {
+	err := g.Execute(ctx)
+	if err != nil {
 		// fang handles error styling
 		os.Exit(1)
 	}
@@ -219,12 +235,18 @@ func (g *GuardedCommand) addDefaultCommands() {
 		Use:   "validate",
 		Short: "Validate command tree",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := g.validateCommandTree(); err != nil {
+			err := g.validateCommandTree()
+			if err != nil {
 				return fmt.Errorf("validation failed: %w", err)
 			}
-			if _, err := fmt.Fprintln(cmd.OutOrStdout(), "✓ All commands validated successfully"); err != nil {
+
+			if _, err := fmt.Fprintln(
+				cmd.OutOrStdout(),
+				"✓ All commands validated successfully",
+			); err != nil {
 				return fmt.Errorf("failed to write output: %w", err)
 			}
+
 			return nil
 		},
 	})

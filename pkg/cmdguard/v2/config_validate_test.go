@@ -13,6 +13,7 @@ func TestValidateConfig(t *testing.T) {
 			Name  string `flag:"name"`
 			Count int    `flag:"count"`
 		}
+
 		err := ValidateConfig(TestConfig{Name: "test", Count: 10})
 		require.NoError(t, err)
 	})
@@ -33,6 +34,7 @@ func TestValidateConfig(t *testing.T) {
 		type TestConfig struct {
 			Level string `flag:"level" values:"debug,info,warn"`
 		}
+
 		err := ValidateConfig(TestConfig{Level: "info"})
 		require.NoError(t, err)
 	})
@@ -41,6 +43,7 @@ func TestValidateConfig(t *testing.T) {
 		type TestConfig struct {
 			Level string `flag:"level" values:"debug,info,warn"`
 		}
+
 		err := ValidateConfig(TestConfig{Level: "invalid"})
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "config validation")
@@ -50,6 +53,7 @@ func TestValidateConfig(t *testing.T) {
 		type TestConfig struct {
 			Name string `flag:"name"`
 		}
+
 		err := ValidateConfig(&TestConfig{Name: "test"})
 		require.NoError(t, err)
 	})
@@ -58,6 +62,7 @@ func TestValidateConfig(t *testing.T) {
 		type TestConfig struct {
 			Level LogLevel `flag:"level" values:"debug,info,warn,error"`
 		}
+
 		cfg := TestConfig{Level: LogLevelInfo}
 		err := ValidateConfig(cfg)
 		require.NoError(t, err)
@@ -67,6 +72,7 @@ func TestValidateConfig(t *testing.T) {
 		type TestConfig struct {
 			Format LogFormat `flag:"format" values:"text,json"`
 		}
+
 		cfg := TestConfig{Format: LogFormatText}
 		err := ValidateConfig(cfg)
 		require.NoError(t, err)

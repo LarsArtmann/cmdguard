@@ -26,9 +26,11 @@ func TestScope_Integration(t *testing.T) {
 			if err != nil {
 				return "", err
 			}
+
 			if cfg.Debug {
 				return "debug-mode", nil
 			}
+
 			return "production-mode", nil
 		}))
 
@@ -47,6 +49,7 @@ func TestScope_Integration(t *testing.T) {
 		// Shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+
 		require.NoError(t, root.Shutdown(ctx))
 	})
 

@@ -18,6 +18,7 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 	root := cmdguard.New("basic", "A basic CLI example")
 
 	var output bytes.Buffer
+
 	root.AddCommand(&cobra.Command{
 		Use:   "hello",
 		Short: "Say hello",

@@ -81,12 +81,13 @@ func TestGuardedCommand_ParentWithChildren(t *testing.T) {
 
 	// Verify structure (built-in: validate, version + parent)
 	cmd := root.Command()
-	assert.Equal(t, 3, len(cmd.Commands()))
+	assert.Len(t, cmd.Commands(), 3)
 }
 
 func TestGuardedCommand_StrictMode(t *testing.T) {
 	// Set strict mode via environment (errors ignored for test setup)
 	_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+
 	defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
 	root := cmdguard.New("testapp", "Test application")
@@ -111,6 +112,7 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 func TestGuardedCommand_ConfigAccess(t *testing.T) {
 	// Set custom log level (errors ignored for test setup)
 	_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
+
 	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
 	root := cmdguard.New("testapp", "Test application")
@@ -151,16 +153,24 @@ func TestGuardedCommand_BuiltInCommands(t *testing.T) {
 
 	// Check that built-in commands exist
 	commands := cmd.Commands()
-	require.GreaterOrEqual(t, len(commands), 2, "Should have at least version and validate commands")
+	require.GreaterOrEqual(
+		t,
+		len(commands),
+		2,
+		"Should have at least version and validate commands",
+	)
 
 	// Find version command
 	var hasVersion bool
+
 	for _, c := range commands {
 		if c.Name() == "version" {
 			hasVersion = true
+
 			break
 		}
 	}
+
 	assert.True(t, hasVersion, "Should have version command")
 }
 
@@ -169,6 +179,7 @@ func TestGuardedCommand_ExecuteWithContext(t *testing.T) {
 
 	// Add a command that writes to output
 	var output bytes.Buffer
+
 	root.AddCommand(&cobra.Command{
 		Use:   "test",
 		Short: "Test command",

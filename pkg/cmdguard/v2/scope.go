@@ -65,7 +65,9 @@ func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil", ErrInvalidScope)
 	}
+
 	do.Provide(scope.injector, provider)
+
 	return nil
 }
 
@@ -75,7 +77,9 @@ func ProvideValue[T any](scope *Scope, value T) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil", ErrInvalidScope)
 	}
+
 	do.ProvideValue(scope.injector, value)
+
 	return nil
 }
 
@@ -96,10 +100,12 @@ func (s *Scope) Shutdown(ctx context.Context) error {
 	if s.injector == nil {
 		return nil
 	}
+
 	report := s.injector.ShutdownWithContext(ctx)
 	if report.Succeed {
 		return nil
 	}
+
 	return report
 }
 
@@ -110,15 +116,18 @@ func (s *Scope) ShutdownAll(ctx context.Context) error {
 	// Shutdown from child to parent
 	current := s
 	for current != nil {
-		if err := current.Shutdown(ctx); err != nil {
+		err := current.Shutdown(ctx)
+		if err != nil {
 			errs = append(errs, fmt.Errorf("scope %q: %w", current.name, err))
 		}
+
 		current = current.parent
 	}
 
 	if len(errs) > 0 {
 		return fmt.Errorf("shutdown errors: %v", errs)
 	}
+
 	return nil
 }
 
@@ -127,20 +136,27 @@ func (s *Scope) HealthCheck() error {
 	if s.injector == nil {
 		return nil
 	}
+
 	results := s.injector.HealthCheck()
 	for _, err := range results {
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
 // ScopedProvider creates a provider that runs within a named child scope.
 // Useful for plugins that need their own isolated scope.
-func ScopedProvider[T any](parent *Scope, scopeName string, provider func(do.Injector) (T, error)) func(do.Injector) (T, error) {
+func ScopedProvider[T any](
+	parent *Scope,
+	scopeName string,
+	provider func(do.Injector) (T, error),
+) func(do.Injector) (T, error) {
 	return func(i do.Injector) (T, error) {
 		childScope := parent.Child(scopeName)
+
 		return provider(childScope.Injector())
 	}
 }
@@ -159,7 +175,11 @@ func RegisterInScope(parent *Scope, name string, providers ...any) (*Scope, erro
 		case func(do.Injector) (any, error):
 			do.Provide(child.injector, fn)
 		default:
-			return nil, fmt.Errorf("provider %d: invalid type %T, must be func(do.Injector) (T, error)", i, p)
+			return nil, fmt.Errorf(
+				"provider %d: invalid type %T, must be func(do.Injector) (T, error)",
+				i,
+				p,
+			)
 		}
 	}
 
@@ -174,10 +194,12 @@ func (s *Scope) IsRoot() bool {
 // Path returns the full scope path from root to this scope.
 func (s *Scope) Path() []string {
 	var path []string
+
 	current := s
 	for current != nil {
 		path = append([]string{current.name}, path...)
 		current = current.parent
 	}
+
 	return path
 }

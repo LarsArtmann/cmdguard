@@ -17,6 +17,7 @@ func TestMergeConfigs(t *testing.T) {
 		type TestConfig struct {
 			Name string
 		}
+
 		cfg := &TestConfig{Name: "test"}
 		result := MergeConfigs(cfg)
 		require.NotNil(t, result)
@@ -42,6 +43,7 @@ func TestMergeConfigs(t *testing.T) {
 		type TestConfig struct {
 			Name string
 		}
+
 		override := &TestConfig{Name: "override"}
 		result := MergeConfigs[TestConfig](nil, override)
 		require.NotNil(t, result)
@@ -52,6 +54,7 @@ func TestMergeConfigs(t *testing.T) {
 		type TestConfig struct {
 			Name string
 		}
+
 		base := &TestConfig{Name: "base"}
 		result := MergeConfigs(base, nil)
 		require.NotNil(t, result)
@@ -62,6 +65,7 @@ func TestMergeConfigs(t *testing.T) {
 		type Inner struct {
 			Value string
 		}
+
 		type Outer struct {
 			Inner Inner
 			Name  string

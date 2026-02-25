@@ -6,7 +6,7 @@ import (
 )
 
 // NoFlags is a convenience type for commands without command-specific flags.
-// Use it as the F type parameter: Command[MyConfig, NoFlags]
+// Use it as the F type parameter: Command[MyConfig, NoFlags].
 type NoFlags = struct{}
 
 // Command represents a type-safe CLI command with typed flags and config.
@@ -88,14 +88,21 @@ func (c Command[T, F]) Validate() error {
 	seen := make(map[string]bool)
 	for _, sub := range c.Commands {
 		if seen[sub.Use] {
-			return fmt.Errorf("%w: duplicate subcommand %q in command %q", ErrDuplicateCommand, sub.Use, c.Use)
+			return fmt.Errorf(
+				"%w: duplicate subcommand %q in command %q",
+				ErrDuplicateCommand,
+				sub.Use,
+				c.Use,
+			)
 		}
+
 		seen[sub.Use] = true
 	}
 
 	// Validate subcommands recursively
 	for i, sub := range c.Commands {
-		if err := sub.Validate(); err != nil {
+		err := sub.Validate()
+		if err != nil {
 			return fmt.Errorf("subcommand %d of %q: %w", i, c.Use, err)
 		}
 	}
@@ -165,14 +172,18 @@ func WithRunE[T, F any](runE func(ctx context.Context, cfg *T, flags F) error) C
 }
 
 // WithPreRunE sets the pre-run validation hook.
-func WithPreRunE[T, F any](preRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+func WithPreRunE[T, F any](
+	preRunE func(ctx context.Context, cfg *T, flags F) error,
+) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.PreRunE = preRunE
 	}
 }
 
 // WithPostRunE sets the post-run cleanup hook.
-func WithPostRunE[T, F any](postRunE func(ctx context.Context, cfg *T, flags F) error) CommandOption[T, F] {
+func WithPostRunE[T, F any](
+	postRunE func(ctx context.Context, cfg *T, flags F) error,
+) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.PostRunE = postRunE
 	}
@@ -210,7 +221,8 @@ func NewCommand[T, F any](use string, opts ...CommandOption[T, F]) (Command[T, F
 		opt(&cmd)
 	}
 
-	if err := cmd.Validate(); err != nil {
+	err := cmd.Validate()
+	if err != nil {
 		return Command[T, F]{}, err
 	}
 

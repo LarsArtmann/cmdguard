@@ -29,9 +29,11 @@ func Load() *Config {
 	if level := os.Getenv("CMDGUARD_LOG_LEVEL"); level != "" {
 		cfg.LogLevel = level
 	}
+
 	if format := os.Getenv("CMDGUARD_LOG_FORMAT"); format != "" {
 		cfg.LogFormat = format
 	}
+
 	if os.Getenv("CMDGUARD_STRICT_MODE") == "true" {
 		cfg.StrictMode = true
 	}
@@ -44,15 +46,20 @@ func (c *Config) Validate() error {
 	if c.LogLevel != "" {
 		validLevels := []string{"debug", "info", "warn", "error"}
 		if !slices.Contains(validLevels, c.LogLevel) {
-			return fmt.Errorf("invalid log level %q, must be one of: debug, info, warn, error", c.LogLevel)
+			return fmt.Errorf(
+				"invalid log level %q, must be one of: debug, info, warn, error",
+				c.LogLevel,
+			)
 		}
 	}
+
 	if c.LogFormat != "" {
 		validFormats := []string{"text", "json"}
 		if !slices.Contains(validFormats, c.LogFormat) {
 			return fmt.Errorf("invalid log format %q, must be one of: text, json", c.LogFormat)
 		}
 	}
+
 	return nil
 }
 
@@ -61,9 +68,11 @@ func GetConfigFilePath(configFile string) string {
 	if configFile == "" {
 		return ""
 	}
+
 	absPath, err := filepath.Abs(configFile)
 	if err != nil {
 		return configFile
 	}
+
 	return absPath
 }

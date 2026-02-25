@@ -26,10 +26,12 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 					Use: "test",
 					PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 						*order = append(*order, "pre")
+
 						return nil
 					},
 					RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 						*order = append(*order, "run")
+
 						return nil
 					},
 				}
@@ -44,10 +46,12 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 					Use: "test",
 					RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 						*order = append(*order, "run")
+
 						return nil
 					},
 					PostRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 						*order = append(*order, "post")
+
 						return nil
 					},
 				}
@@ -85,6 +89,7 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			},
 			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				called = true
+
 				return nil
 			},
 		}

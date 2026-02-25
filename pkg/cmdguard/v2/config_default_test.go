@@ -18,7 +18,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "string default",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(""),
+				Type:    reflect.TypeFor[string](),
 				Default: "hello",
 			},
 			expected: "hello",
@@ -26,7 +26,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "bool true",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(false),
+				Type:    reflect.TypeFor[bool](),
 				Default: "true",
 			},
 			expected: true,
@@ -34,7 +34,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "bool false",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(false),
+				Type:    reflect.TypeFor[bool](),
 				Default: "false",
 			},
 			expected: false,
@@ -42,7 +42,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "int default",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(0),
+				Type:    reflect.TypeFor[int](),
 				Default: "42",
 			},
 			expected: 42,
@@ -50,7 +50,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "float64 default",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(0.0),
+				Type:    reflect.TypeFor[float64](),
 				Default: "3.14",
 			},
 			expected: 3.14,
@@ -58,7 +58,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "empty default returns zero",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(0),
+				Type:    reflect.TypeFor[int](),
 				Default: "",
 			},
 			expected: 0,
@@ -66,7 +66,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "slice default",
 			tag: FlagTag{
-				Type:    reflect.TypeOf([]string{}),
+				Type:    reflect.TypeFor[[]string](),
 				Default: "a,b,c",
 			},
 			expected: []string{"a", "b", "c"},
@@ -74,7 +74,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "Duration default",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(Duration{}),
+				Type:    reflect.TypeFor[Duration](),
 				Default: "5m",
 			},
 			expected: FromDuration(5 * time.Minute),
@@ -82,7 +82,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{
 			name: "LogLevel default",
 			tag: FlagTag{
-				Type:    reflect.TypeOf(LogLevel{}),
+				Type:    reflect.TypeFor[LogLevel](),
 				Default: "info",
 			},
 			expected: "info", // Returns string for these types
@@ -106,12 +106,15 @@ func TestConfig_DefaultConfig(t *testing.T) {
 
 		// Find LogLevel tag
 		var logLevelTag *FlagTag
+
 		for _, tag := range tags {
 			if tag.Name == "log-level" {
 				logLevelTag = &tag
+
 				break
 			}
 		}
+
 		require.NotNil(t, logLevelTag)
 		assert.Equal(t, "info", logLevelTag.Default)
 		assert.Equal(t, "l", logLevelTag.Short)

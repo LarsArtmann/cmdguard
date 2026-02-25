@@ -19,6 +19,7 @@ func ParseEnum(value string, allowed []string) (Enum, error) {
 	if slices.Contains(allowed, value) {
 		return Enum{value: value, allowed: allowed}, nil
 	}
+
 	return Enum{}, NewEnumError(value, allowed)
 }
 
@@ -54,6 +55,7 @@ func ParseDuration(s string) (Duration, error) {
 	if err != nil {
 		return Duration{}, NewDurationError(s, err)
 	}
+
 	return Duration{duration: d}, nil
 }
 
@@ -104,6 +106,7 @@ func ParseLogLevel(s string) (LogLevel, error) {
 	if err != nil {
 		return LogLevel{}, err
 	}
+
 	return LogLevel(e), nil
 }
 
@@ -143,6 +146,7 @@ func ParseLogFormat(s string) (LogFormat, error) {
 	if err != nil {
 		return LogFormat{}, err
 	}
+
 	return LogFormat(e), nil
 }
 
@@ -164,14 +168,18 @@ func (e *Enum) UnmarshalText(text []byte) error {
 	value := string(text)
 	if slices.Contains(e.allowed, value) {
 		e.value = value
+
 		return nil
 	}
+
 	if len(e.allowed) == 0 {
 		// If no allowed values set yet, accept any value and initialize allowed list
 		e.value = value
 		e.allowed = []string{value}
+
 		return nil
 	}
+
 	return NewEnumError(value, e.allowed)
 }
 
@@ -186,7 +194,9 @@ func (d *Duration) UnmarshalText(text []byte) error {
 	if err != nil {
 		return err
 	}
+
 	*d = parsed
+
 	return nil
 }
 
@@ -201,7 +211,9 @@ func (l *LogLevel) UnmarshalText(text []byte) error {
 	if err != nil {
 		return err
 	}
+
 	*l = parsed
+
 	return nil
 }
 
@@ -216,6 +228,8 @@ func (f *LogFormat) UnmarshalText(text []byte) error {
 	if err != nil {
 		return err
 	}
+
 	*f = parsed
+
 	return nil
 }

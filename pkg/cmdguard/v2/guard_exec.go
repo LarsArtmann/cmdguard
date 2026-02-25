@@ -20,6 +20,7 @@ func (g *GuardedCommand[T, F]) Execute(ctx context.Context) error {
 // Useful for testing.
 func (g *GuardedCommand[T, F]) ExecuteWithArgs(ctx context.Context, args []string) error {
 	g.rootCmd.SetArgs(args)
+
 	return g.Execute(ctx)
 }
 
@@ -27,7 +28,8 @@ func (g *GuardedCommand[T, F]) ExecuteWithArgs(ctx context.Context, args []strin
 // This is the simplest way to run a CLI application.
 // Uses fang for beautiful error styling.
 func (g *GuardedCommand[T, F]) ExecuteAndExit(ctx context.Context) {
-	if err := g.Execute(ctx); err != nil {
+	err := g.Execute(ctx)
+	if err != nil {
 		// fang handles error styling
 		os.Exit(1)
 	}
@@ -105,6 +107,10 @@ func (g *GuardedCommand[T, F]) AddGlobalFlag(name, shorthand, defaultValue, help
 }
 
 // AddGlobalBoolFlag adds a persistent boolean flag available to all commands.
-func (g *GuardedCommand[T, F]) AddGlobalBoolFlag(name, shorthand string, defaultValue bool, help string) {
+func (g *GuardedCommand[T, F]) AddGlobalBoolFlag(
+	name, shorthand string,
+	defaultValue bool,
+	help string,
+) {
 	g.rootCmd.PersistentFlags().BoolP(name, shorthand, defaultValue, help)
 }

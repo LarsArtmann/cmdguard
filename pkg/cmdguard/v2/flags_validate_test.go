@@ -23,7 +23,7 @@ func setupFlagTest[T any](t *testing.T, config T) (*FlagRegistry, *cobra.Command
 func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	t.Run("valid values pass", func(t *testing.T) {
 		type TestConfig struct {
-			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
+			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
@@ -36,7 +36,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("invalid value returns error", func(t *testing.T) {
 		type TestConfig struct {
-			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
+			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
@@ -51,7 +51,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("unchanged flag skips validation", func(t *testing.T) {
 		type TestConfig struct {
-			Mode string `flag:"mode" values:"dev,staging,prod" default:"dev"`
+			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
@@ -63,7 +63,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("flag without values skips validation", func(t *testing.T) {
 		type TestConfig struct {
-			Name string `flag:"name" default:"default"`
+			Name string `default:"default" flag:"name"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
@@ -76,7 +76,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
 		type TestConfig struct {
-			Name string `flag:"name" required:"true" help:"required name"`
+			Name string `flag:"name" help:"required name" required:"true"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
@@ -90,7 +90,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("required flag set passes validation", func(t *testing.T) {
 		type TestConfig struct {
-			Name string `flag:"name" required:"true" help:"required name"`
+			Name string `flag:"name" help:"required name" required:"true"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
@@ -103,7 +103,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("required false does not enforce", func(t *testing.T) {
 		type TestConfig struct {
-			Name string `flag:"name" required:"false" help:"optional name"`
+			Name string `flag:"name" help:"optional name" required:"false"`
 		}
 
 		registry, cmd := setupFlagTest(t, TestConfig{})

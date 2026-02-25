@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -98,19 +98,19 @@ func TestEditDistance(t *testing.T) {
 
 func TestNewFlagErrorWithSuggestion(t *testing.T) {
 	t.Run("error includes suggestion", func(t *testing.T) {
-		err := NewFlagErrorWithSuggestion("verboose", fmt.Errorf("unknown flag"), "verbose")
+		err := NewFlagErrorWithSuggestion("verboose", errors.New("unknown flag"), "verbose")
 		assert.Contains(t, err.Error(), "verboose")
 		assert.Contains(t, err.Error(), "unknown flag")
 		assert.Contains(t, err.Error(), "did you mean --verbose")
 	})
 
 	t.Run("empty suggestion omits hint", func(t *testing.T) {
-		err := NewFlagError("test", fmt.Errorf("some error"))
+		err := NewFlagError("test", errors.New("some error"))
 		assert.NotContains(t, err.Error(), "did you mean")
 	})
 
 	t.Run("unwraps to inner error", func(t *testing.T) {
-		inner := fmt.Errorf("inner error")
+		inner := errors.New("inner error")
 		err := NewFlagErrorWithSuggestion("flag", inner, "suggestion")
 		assert.ErrorIs(t, err, inner)
 	})

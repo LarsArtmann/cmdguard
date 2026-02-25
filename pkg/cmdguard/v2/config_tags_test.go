@@ -10,9 +10,9 @@ import (
 func TestParseFlagTags(t *testing.T) {
 	t.Run("valid struct", func(t *testing.T) {
 		type TestConfig struct {
-			Name    string `flag:"name" short:"n" default:"test" help:"The name"`
-			Count   int    `flag:"count" default:"10" help:"The count"`
-			Enabled bool   `flag:"enabled" short:"e" default:"true" help:"Enable feature"`
+			Name    string `default:"test" flag:"name"    help:"The name"       short:"n"`
+			Count   int    `default:"10"   flag:"count"   help:"The count"`
+			Enabled bool   `default:"true" flag:"enabled" help:"Enable feature" short:"e"`
 		}
 
 		tags, err := ParseFlagTags(TestConfig{})
@@ -79,7 +79,8 @@ func TestParseFlagTags(t *testing.T) {
 	t.Run("embedded Config", func(t *testing.T) {
 		type AppConfig struct {
 			Config
-			AppName string `flag:"app-name" default:"myapp"`
+
+			AppName string `default:"myapp" flag:"app-name"`
 		}
 
 		tags, err := ParseFlagTags(AppConfig{})

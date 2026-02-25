@@ -258,6 +258,7 @@ func TestFormat_String(t *testing.T) {
 
 func TestLoggerOutput_Text(t *testing.T) {
 	var buf bytes.Buffer
+
 	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})
@@ -277,6 +278,7 @@ func TestLoggerOutput_Text(t *testing.T) {
 
 func TestLoggerOutput_JSON(t *testing.T) {
 	var buf bytes.Buffer
+
 	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})
@@ -324,6 +326,7 @@ func TestLoggerLevelFiltering(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buf bytes.Buffer
+
 			handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
 				Level: tt.logLevel,
 			})

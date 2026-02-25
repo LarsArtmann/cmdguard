@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-// Sentinel errors for type checking with errors.Is()
+// Sentinel errors for type checking with errors.Is().
 var (
 	// ErrInvalidCommand indicates a command is malformed or missing required fields.
 	ErrInvalidCommand = errors.New("invalid command")
@@ -80,6 +80,7 @@ func (e *FlagError) Error() string {
 	if e.Suggestion != "" {
 		msg += fmt.Sprintf(" (did you mean --%s?)", e.Suggestion)
 	}
+
 	return msg
 }
 

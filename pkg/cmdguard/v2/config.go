@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"slices"
@@ -9,10 +10,10 @@ import (
 // Config is the default application configuration.
 // Custom configs should embed or mirror this structure.
 type Config struct {
-	LogLevel   LogLevel  `flag:"log-level" short:"l" default:"info" help:"Log level: debug, info, warn, error"`
-	LogFormat  LogFormat `flag:"log-format" default:"text" help:"Log format: text, json"`
-	StrictMode bool      `flag:"strict" short:"s" default:"false" help:"Enable strict mode validation"`
-	ConfigFile string    `flag:"config" short:"c" default:"" help:"Path to config file"`
+	LogLevel   LogLevel  `default:"info"  flag:"log-level"  help:"Log level: debug, info, warn, error" short:"l"`
+	LogFormat  LogFormat `default:"text"  flag:"log-format" help:"Log format: text, json"`
+	StrictMode bool      `default:"false" flag:"strict"     help:"Enable strict mode validation"       short:"s"`
+	ConfigFile string    `default:""      flag:"config"     help:"Path to config file"                 short:"c"`
 }
 
 // FlagTag represents parsed struct tag information for a flag.
@@ -31,7 +32,7 @@ type FlagTag struct {
 // Returns all validation errors found.
 func ValidateConfig(cfg any) error {
 	if cfg == nil {
-		return fmt.Errorf("config must not be nil")
+		return errors.New("config must not be nil")
 	}
 
 	v := reflect.ValueOf(cfg)
@@ -56,7 +57,8 @@ func validateStruct(v reflect.Value, cfg any) error {
 	}
 
 	for _, tag := range tags {
-		if err := validateTag(v, tag); err != nil {
+		err := validateTag(v, tag)
+		if err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -95,11 +97,12 @@ func getFieldValue(field reflect.Value) (string, bool) {
 	case reflect.String:
 		return field.String(), true
 	default:
-		if field.Type() == reflect.TypeOf(Enum{}) ||
-			field.Type() == reflect.TypeOf(LogLevel{}) ||
-			field.Type() == reflect.TypeOf(LogFormat{}) {
+		if field.Type() == reflect.TypeFor[Enum]() ||
+			field.Type() == reflect.TypeFor[LogLevel]() ||
+			field.Type() == reflect.TypeFor[LogFormat]() {
 			return field.MethodByName("String").Call(nil)[0].String(), true
 		}
+
 		return "", false
 	}
 }
@@ -114,6 +117,7 @@ func MergeConfigs[T any](configs ...*T) *T {
 	result := configs[0]
 	if result == nil {
 		var zero T
+
 		result = &zero
 	}
 
@@ -121,6 +125,7 @@ func MergeConfigs[T any](configs ...*T) *T {
 		if cfg == nil {
 			continue
 		}
+
 		mergeStruct(reflect.ValueOf(result).Elem(), reflect.ValueOf(cfg).Elem())
 	}
 
@@ -143,6 +148,7 @@ func mergeStruct(dst, src reflect.Value) {
 
 		if dstField.Kind() == reflect.Struct && srcField.Kind() == reflect.Struct {
 			mergeStruct(dstField, srcField)
+
 			continue
 		}
 

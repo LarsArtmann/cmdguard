@@ -30,16 +30,19 @@ type GuardedCommand[T any, F any] struct {
 // T is the application config type, F is the command-specific flags type.
 // F must be a struct (like NoFlags) or pointer to struct for flag binding.
 func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error) {
-	if err := validateName(name); err != nil {
+	err := validateName(name)
+	if err != nil {
 		return nil, err
 	}
 
-	if err := FlagTypeConstraint[F](); err != nil {
+	err = FlagTypeConstraint[F]()
+	if err != nil {
 		return nil, err
 	}
 
 	g := createGuardedCommand[T, F](name, short, defaults)
-	if err := g.initialize(defaults); err != nil {
+	err = g.initialize(defaults)
+	if err != nil {
 		return nil, err
 	}
 
@@ -51,6 +54,7 @@ func validateName(name string) error {
 	if name == "" {
 		return fmt.Errorf("%w: name is required", ErrInvalidCommand)
 	}
+
 	return nil
 }
 
@@ -71,11 +75,13 @@ func createGuardedCommand[T, F any](name, short string, defaults T) *GuardedComm
 func (g *GuardedCommand[T, F]) initialize(defaults T) error {
 	g.scope = NewScope(g.name)
 
-	if err := g.registerConfig(defaults); err != nil {
+	err := g.registerConfig(defaults)
+	if err != nil {
 		return err
 	}
 
-	if err := g.setupFlagRegistry(); err != nil {
+	err = g.setupFlagRegistry()
+	if err != nil {
 		return err
 	}
 
@@ -85,10 +91,13 @@ func (g *GuardedCommand[T, F]) initialize(defaults T) error {
 // registerConfig registers the config in the DI scope.
 func (g *GuardedCommand[T, F]) registerConfig(defaults T) error {
 	cfg := defaults
-	if err := ProvideValue(g.scope, &cfg); err != nil {
+	err := ProvideValue(g.scope, &cfg)
+	if err != nil {
 		return fmt.Errorf("failed to register config: %w", err)
 	}
+
 	g.config = &cfg
+
 	return nil
 }
 
@@ -98,9 +107,11 @@ func (g *GuardedCommand[T, F]) setupFlagRegistry() error {
 	if err != nil {
 		return fmt.Errorf("failed to create flag registry: %w", err)
 	}
+
 	if err := ProvideValue(g.scope, registry); err != nil {
 		return fmt.Errorf("failed to register flag registry: %w", err)
 	}
+
 	g.registry = registry
 
 	if err := registry.RegisterFlags(g.rootCmd); err != nil {
@@ -120,8 +131,10 @@ func NewWithLong[T, F any](name, short, long string, defaults T) (*GuardedComman
 	if err != nil {
 		return nil, err
 	}
+
 	g.long = long
 	g.rootCmd.Long = long
+
 	return g, nil
 }
 

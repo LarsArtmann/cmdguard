@@ -12,7 +12,7 @@ type TestConfig struct {
 	Name string
 }
 
-// newTestCommand creates a test command with RunE handler
+// newTestCommand creates a test command with RunE handler.
 func newTestCommand() Command[TestConfig, NoFlags] {
 	return Command[TestConfig, NoFlags]{
 		Use: "test",
@@ -22,12 +22,18 @@ func newTestCommand() Command[TestConfig, NoFlags] {
 	}
 }
 
-// testHandlerFunc is the signature for RunE/PreRunE/PostRunE handlers
+// testHandlerFunc is the signature for RunE/PreRunE/PostRunE handlers.
 type testHandlerFunc[T any, F any] func(ctx context.Context, cfg *T, flags F) error
 
-// testHandlerOption tests that a handler option correctly sets the handler field
-func testHandlerOption(t *testing.T, name string, applyOption func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags]), getField func(*Command[TestConfig, NoFlags]) any) {
+// testHandlerOption tests that a handler option correctly sets the handler field.
+func testHandlerOption(
+	t *testing.T,
+	name string,
+	applyOption func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags]),
+	getField func(*Command[TestConfig, NoFlags]) any,
+) {
 	t.Helper()
+
 	handler := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
 		return nil
 	}
@@ -133,7 +139,7 @@ func TestCommand_Validate(t *testing.T) {
 
 	t.Run("valid with flags", func(t *testing.T) {
 		type Flags struct {
-			Verbose bool `flag:"verbose" default:"false"`
+			Verbose bool `default:"false" flag:"verbose"`
 		}
 
 		cmd := Command[TestConfig, *Flags]{
@@ -222,6 +228,7 @@ func TestCommandOptions(t *testing.T) {
 		type Flags struct {
 			Verbose bool `flag:"verbose"`
 		}
+
 		flags := &Flags{}
 		cmd := Command[TestConfig, *Flags]{Use: "test"}
 		WithFlags[TestConfig, *Flags](flags)(&cmd)
@@ -296,11 +303,14 @@ func TestCommandOptions(t *testing.T) {
 
 func TestNewCommand(t *testing.T) {
 	t.Run("creates valid command", func(t *testing.T) {
-		cmd, err := NewCommand[TestConfig, NoFlags]("test",
+		cmd, err := NewCommand[TestConfig, NoFlags](
+			"test",
 			WithShort[TestConfig, NoFlags]("short description"),
-			WithRunE[TestConfig, NoFlags](func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			}),
+			WithRunE[TestConfig, NoFlags](
+				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					return nil
+				},
+			),
 		)
 		require.NoError(t, err)
 		assert.Equal(t, "test", cmd.Use)
@@ -309,10 +319,13 @@ func TestNewCommand(t *testing.T) {
 	})
 
 	t.Run("error: empty use", func(t *testing.T) {
-		cmd, err := NewCommand[TestConfig, NoFlags]("",
-			WithRunE[TestConfig, NoFlags](func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			}),
+		cmd, err := NewCommand[TestConfig, NoFlags](
+			"",
+			WithRunE[TestConfig, NoFlags](
+				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					return nil
+				},
+			),
 		)
 		require.Error(t, err)
 		assert.ErrorIs(t, err, ErrMissingName)
@@ -351,10 +364,13 @@ func TestNewCommand(t *testing.T) {
 	})
 
 	t.Run("creates command with subcommands", func(t *testing.T) {
-		subCmd, err := NewCommand[TestConfig, NoFlags]("sub",
-			WithRunE[TestConfig, NoFlags](func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			}),
+		subCmd, err := NewCommand[TestConfig, NoFlags](
+			"sub",
+			WithRunE[TestConfig, NoFlags](
+				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					return nil
+				},
+			),
 		)
 		require.NoError(t, err)
 
@@ -370,10 +386,13 @@ func TestNewCommand(t *testing.T) {
 
 func TestNewCommand_ErrorCases(t *testing.T) {
 	t.Run("returns error on empty use", func(t *testing.T) {
-		_, err := NewCommand[TestConfig, NoFlags]("",
-			WithRunE[TestConfig, NoFlags](func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-				return nil
-			}),
+		_, err := NewCommand[TestConfig, NoFlags](
+			"",
+			WithRunE[TestConfig, NoFlags](
+				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					return nil
+				},
+			),
 		)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "use is required")
@@ -389,15 +408,18 @@ func TestNewCommand_ErrorCases(t *testing.T) {
 func TestCommand_CompleteStructure(t *testing.T) {
 	t.Run("complete command definition", func(t *testing.T) {
 		type AppFlags struct {
-			Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
-			Output  string `flag:"output" short:"o" default:"-" help:"Output file"`
+			Verbose bool   `default:"false" flag:"verbose" help:"Enable verbose output" short:"v"`
+			Output  string `default:"-"     flag:"output"  help:"Output file"           short:"o"`
 		}
 
-		subCmd, err := NewCommand[TestConfig, *AppFlags]("sub",
+		subCmd, err := NewCommand[TestConfig, *AppFlags](
+			"sub",
 			WithShort[TestConfig, *AppFlags]("A subcommand"),
-			WithRunE[TestConfig, *AppFlags](func(ctx context.Context, cfg *TestConfig, flags *AppFlags) error {
-				return nil
-			}),
+			WithRunE[TestConfig, *AppFlags](
+				func(ctx context.Context, cfg *TestConfig, flags *AppFlags) error {
+					return nil
+				},
+			),
 		)
 		require.NoError(t, err)
 

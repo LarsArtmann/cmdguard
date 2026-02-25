@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"fmt"
 	"os"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -10,7 +9,7 @@ import (
 	"github.com/larsartmann/cmdguard/internal/config"
 )
 
-// testEnvVarLoad tests that setting an environment variable correctly updates config
+// testEnvVarLoad tests that setting an environment variable correctly updates config.
 type envVarTestCase struct {
 	varName     string
 	value       string
@@ -23,12 +22,13 @@ type envVarTestCase struct {
 func testEnvVarLoad(tc envVarTestCase, getter func(*config.Config) string) {
 	Context(tc.contextDesc, func() {
 		BeforeEach(func() {
-			_ = os.Setenv(fmt.Sprintf("CMDGUARD_%s", tc.varName), tc.value)
+			_ = os.Setenv("CMDGUARD_"+tc.varName, tc.value)
 		})
 
 		It(tc.itDesc, func() {
 			cfg := config.Load()
 			Expect(getter(cfg)).To(Equal(tc.expected))
+
 			if tc.validate {
 				Expect(cfg.Validate()).To(Succeed())
 			}
@@ -261,11 +261,12 @@ var _ = Describe("Strict mode behavior - User Expectations", func() {
 			truthyAttempts := []string{"yes", "1", "TRUE", "True", "on", "enabled"}
 
 			for _, value := range truthyAttempts {
-				value := value // capture range variable
 				It("should NOT enable strict mode for '"+value+"' (only 'true' works)", func() {
 					_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
 					cfg := config.Load()
-					Expect(cfg.StrictMode).To(BeFalse(), "Only 'true' should enable strict mode, not '%s'", value)
+					Expect(
+						cfg.StrictMode,
+					).To(BeFalse(), "Only 'true' should enable strict mode, not '%s'", value)
 				})
 			}
 		})

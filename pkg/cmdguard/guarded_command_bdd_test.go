@@ -284,7 +284,9 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Added after execution",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
-				Expect(func() { root.AddCommand(lateCmd) }).To(PanicWith(ContainSubstring("cannot add commands after execution")))
+				Expect(
+					func() { root.AddCommand(lateCmd) },
+				).To(PanicWith(ContainSubstring("cannot add commands after execution")))
 			})
 
 			It("should also prevent adding subcommands after execution", func() {
@@ -303,7 +305,9 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Too late to add",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
-				Expect(func() { root.AddSubcommand(parent, child) }).To(PanicWith(ContainSubstring("cannot add commands after execution")))
+				Expect(
+					func() { root.AddSubcommand(parent, child) },
+				).To(PanicWith(ContainSubstring("cannot add commands after execution")))
 			})
 		})
 	})

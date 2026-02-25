@@ -70,14 +70,19 @@ func TestLoad(t *testing.T) {
 			// Set env vars (errors ignored - test environment setup)
 			if tt.envLevel != "" {
 				_ = os.Setenv("CMDGUARD_LOG_LEVEL", tt.envLevel)
+
 				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 			}
+
 			if tt.envFormat != "" {
 				_ = os.Setenv("CMDGUARD_LOG_FORMAT", tt.envFormat)
+
 				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
 			}
+
 			if tt.envStrict != "" {
 				_ = os.Setenv("CMDGUARD_STRICT_MODE", tt.envStrict)
+
 				defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 			}
 
@@ -138,6 +143,7 @@ func TestConfig_Validate(t *testing.T) {
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg)
+
 				return
 			}
 

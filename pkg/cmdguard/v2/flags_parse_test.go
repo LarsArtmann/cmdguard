@@ -12,7 +12,7 @@ import (
 func TestFlagRegistry_ParseFlags(t *testing.T) {
 	t.Run("parse string flag", func(t *testing.T) {
 		type TestConfig struct {
-			Name string `flag:"name" default:"default"`
+			Name string `default:"default" flag:"name"`
 		}
 
 		cfg := &TestConfig{}
@@ -32,7 +32,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 	t.Run("parse bool flag", func(t *testing.T) {
 		type TestConfig struct {
-			Verbose bool `flag:"verbose" default:"false"`
+			Verbose bool `default:"false" flag:"verbose"`
 		}
 
 		cfg := &TestConfig{}
@@ -51,7 +51,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 	t.Run("parse int flag", func(t *testing.T) {
 		type TestConfig struct {
-			Count int `flag:"count" default:"0"`
+			Count int `default:"0" flag:"count"`
 		}
 
 		cfg := &TestConfig{}
@@ -70,7 +70,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 	t.Run("parse float64 flag", func(t *testing.T) {
 		type TestConfig struct {
-			Rate float64 `flag:"rate" default:"0.0"`
+			Rate float64 `default:"0.0" flag:"rate"`
 		}
 
 		cfg := &TestConfig{}
@@ -89,7 +89,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 	t.Run("parse Duration flag", func(t *testing.T) {
 		type TestConfig struct {
-			Timeout Duration `flag:"timeout" default:"1m"`
+			Timeout Duration `default:"1m" flag:"timeout"`
 		}
 
 		cfg := &TestConfig{}
@@ -103,6 +103,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 		err = registry.ParseFlags(cmd, cfg)
 		require.NoError(t, err)
+
 		expected := FromDuration(5*time.Minute + 30*time.Second)
 		assert.Equal(t, expected, cfg.Timeout)
 	})
@@ -147,7 +148,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 	t.Run("parse Enum flag", func(t *testing.T) {
 		type TestConfig struct {
-			Mode Enum `flag:"mode" values:"dev,staging,prod" default:"dev"`
+			Mode Enum `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
 
 		cfg := &TestConfig{}
@@ -166,7 +167,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 
 	t.Run("parse invalid Enum returns error", func(t *testing.T) {
 		type TestConfig struct {
-			Mode Enum `flag:"mode" values:"dev,staging,prod" default:"dev"`
+			Mode Enum `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
 
 		cfg := &TestConfig{}

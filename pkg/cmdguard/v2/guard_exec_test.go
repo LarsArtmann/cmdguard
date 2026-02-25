@@ -31,6 +31,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			Use: "greet",
 			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
 				executed = true
+
 				return nil
 			},
 		}
@@ -64,7 +65,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 		var receivedName string
 
 		type GreetFlags struct {
-			Name string `flag:"name" default:"World"`
+			Name string `default:"World" flag:"name"`
 		}
 
 		g, err := New[TestAppConfig, *GreetFlags]("myapp", "My CLI", TestAppConfig{})
@@ -75,6 +76,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			Flags: &GreetFlags{},
 			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
 				receivedName = flags.Name
+
 				return nil
 			},
 		}
@@ -128,8 +130,10 @@ func runExecuteAndExitSubprocess(envVar, use, errorMsg string) bool {
 
 		_ = g.ExecuteWithArgs(context.Background(), []string{use})
 		g.ExecuteAndExit(context.Background())
+
 		return true
 	}
+
 	return false
 }
 
@@ -151,16 +155,21 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 
 		// Run the test in a subprocess
 		cmd := exec.Command(os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
+
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_AND_EXIT=1")
+
 		var stderr bytes.Buffer
+
 		cmd.Stderr = &stderr
 		err := cmd.Run()
 
 		// The subprocess should have exited with code 1
 		require.Error(t, err, "expected exit code 1")
+
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			assert.Equal(t, 1, exitErr.ExitCode())
 		}
+
 		assert.Contains(t, stderr.String(), "ERROR")
 		assert.Contains(t, stderr.String(), "Intentional failure")
 	})
@@ -171,8 +180,11 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		}
 
 		cmd := exec.Command(os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
+
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_STDERR=1")
+
 		var stderr bytes.Buffer
+
 		cmd.Stderr = &stderr
 		_ = cmd.Run()
 

@@ -11,8 +11,8 @@ import (
 func TestGuardedCommand_Integration(t *testing.T) {
 	t.Run("complete CLI workflow", func(t *testing.T) {
 		type GreetFlags struct {
-			Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-			Shout bool   `flag:"shout" short:"s" default:"false" help:"Shout the greeting"`
+			Name  string `default:"World" flag:"name"  help:"Name to greet"      short:"n"`
+			Shout bool   `default:"false" flag:"shout" help:"Shout the greeting" short:"s"`
 		}
 
 		var greetResult struct {
@@ -31,12 +31,16 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
 				greetResult.name = flags.Name
 				greetResult.shout = flags.Shout
+
 				return nil
 			},
 		}
 		require.NoError(t, g.AddCommand(greetCmd))
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"greet", "--name", "Alice", "--shout"})
+		err = g.ExecuteWithArgs(
+			context.Background(),
+			[]string{"greet", "--name", "Alice", "--shout"},
+		)
 		require.NoError(t, err)
 		assert.Equal(t, "Alice", greetResult.name)
 		assert.True(t, greetResult.shout)

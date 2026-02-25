@@ -1,96 +1,119 @@
 version: "2"
-
 run:
   timeout: 5m
   go: "1.26"
+  build-tags: []
   modules-download-mode: readonly
-
-formatters:
-  enable:
-    - gci
-    - gofmt
-    - goimports
-
-  settings:
-    gci:
-      sections:
-        - standard
-        - default
-        - prefix(github.com/larsartmann/cmdguard)
-      skip-generated: true
-      custom-order: true
-
-    gofmt:
-      simplify: true
-
-    goimports:
-      local-prefixes: github.com/larsartmann/cmdguard
-
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - shadow
-
-  staticcheck:
-    checks: ["all"]
-
-  errcheck:
-    check-blank: true
-    check-type-assertions: true
-
-  gocyclo:
-    min-complexity: 15
-
-  goconst:
-    min-len: 3
-    min-occurrences: 3
-
-  misspell:
-    locale: US
-
-  revive:
-    rules:
-      - name: blank-imports
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: dot-imports
-      - name: error-return
-      - name: error-strings
-      - name: error-naming
-      - name: exported
-      - name: if-return
-      - name: increment-decrement
-      - name: var-naming
-      - name: var-declaration
-      - name: package-comments
-      - name: range
-      - name: receiver-naming
-      - name: time-naming
-      - name: unexported-return
-      - name: indent-error-flow
-      - name: empty-block
-      - name: superfluous-else
-      - name: unused-parameter
-      - name: unreachable-code
-      - name: redefines-builtin-id
-
+  allow-parallel-runners: false
+  allow-serial-runners: false
+output:
+  formats: {}
 linters:
   enable:
-    - errcheck
-    - errorlint
-    - gocyclo
-    - goconst
-    - govet
-    - staticcheck
-    - ineffassign
+    - gosmopolitan
+    - gochecknoinits
+    - nlreturn
+    - godoclint
+    - testableexamples
+    - wastedassign
     - unused
-    - revive
-    - misspell
+    - staticcheck
+    - gomoddirectives
+    - err113
+    - rowserrcheck
+    - iface
+    - testpackage
+    - unconvert
+    - errorlint
+    - nestif
+    - maintidx
+    - bidichk
+    - nilnesserr
+    - paralleltest
+    - ginkgolinter
+    - nakedret
+    - perfsprint
+    - unqueryvet
     - whitespace
-    - gosec
+    - usetesting
+    - copyloopvar
+    - unparam
+    - bodyclose
+    - gocheckcompilerdirectives
+    - dogsled
+    - noinlineerr
+    - fatcontext
+    - embeddedstructfieldcheck
+    - iotamixing
+    - gocritic
+    - grouper
+    - sqlclosecheck
+    - asasalint
+    - exhaustruct
+    - canonicalheader
+    - testifylint
     - prealloc
-
+    - mirror
+    - protogetter
+    - arangolint
+    - godox
+    - exptostd
+    - thelper
+    - gocognit
+    - ineffassign
+    - varnamelen
+    - wrapcheck
+    - gochecksumtype
+    - importas
+    - gosec
+    - recvcheck
+    - funcorder
+    - goprintffuncname
+    - mnd
+    - inamedparam
+    - makezero
+    - goconst
+    - containedctx
+    - interfacebloat
+    - spancheck
+    - predeclared
+    - wsl_v5
+    - reassign
+    - dupl
+    - usestdlibvars
+    - errname
+    - tagalign
+    - nilnil
+    - ireturn
+    - tparallel
+    - gochecknoglobals
+    - tagliatelle
+    - modernize
+    - nosprintfhostport
+    - errcheck
+    - misspell
+    - forcetypeassert
+    - goheader
+    - intrange
+    - nolintlint
+    - gomodguard
+    - govet
+    - asciicheck
+    - decorder
+    - godot
+    - nonamedreturns
+    - dupword
+    - gocyclo
+    - depguard
+    - funlen
+    - contextcheck
+    - exhaustive
+    - zerologlint
+    - revive
+    - promlinter
+    - cyclop
+    - forbidigo
+    - durationcheck
   exclusions:
     generated: lax
     presets:
@@ -98,55 +121,59 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
-
     rules:
-      - path: '_test\.go$'
+      - path: _test\.go$
         linters:
           - gocyclo
           - gosec
           - dupl
-
-      - path: '_test\.go$'
-        text: "shadow"
+      - path: _test\.go$
+        text: shadow
         linters:
           - govet
-
-      - path: '_test\.go$'
-        text: 'Error return value of .+\.Close is not checked'
+      - path: _test\.go$
+        text: Error return value of .+\.Close is not checked
         linters:
           - errcheck
-
-      - text: "weak cryptographic primitive"
+      - text: weak cryptographic primitive
         linters:
           - gosec
-
       - text: "unused-parameter: parameter .+ seems to be unused"
         linters:
           - revive
-
-      # BDD tests conventionally use dot imports with Ginkgo/Gomega
-      - path: '_test\.go$'
-        text: "dot-imports"
+      - path: _test\.go$
+        text: dot-imports
         linters:
           - revive
-
-      # Test files may intentionally use type assertions on errors for testing
-      - path: '_test\.go$'
+      - path: _test\.go$
         linters:
           - errorlint
-
-      # Test helpers often have t *testing.T before context.Context
-      - path: '_test\.go$'
-        text: "context-as-argument"
+      - path: _test\.go$
+        text: context-as-argument
         linters:
           - revive
-
-      # Allow prealloc to be skipped for small slices where it doesn't matter
-      - path: 'flags_suggest\.go$'
-        text: "prealloc"
+      - path: flags_suggest\.go$
+        text: prealloc
         linters:
           - prealloc
-
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+    - golines
+  settings:
+    gci:
+      custom-order: true
+      sections:
+        - standard
+        - default
+        - prefix(github.com/larsartmann/cmdguard)
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/larsartmann/cmdguard
 issues:
   max-issues-per-linter: 50
   max-same-issues: 10

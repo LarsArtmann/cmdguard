@@ -1,8 +1,10 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -26,16 +28,19 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &FlagRegistry{tags: tags}, nil
 }
 
 // RegisterFlags adds flags to a cobra command based on the config struct.
 func (r *FlagRegistry) RegisterFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
-		if err := r.registerFlag(cmd, tag); err != nil {
+		err := r.registerFlag(cmd, tag)
+		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -57,9 +62,9 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 	default:
 		// Handle custom types
 		switch tag.Type {
-		case reflect.TypeOf(Duration{}):
+		case reflect.TypeFor[Duration]():
 			r.addDurationFlag(flags, tag)
-		case reflect.TypeOf(Enum{}), reflect.TypeOf(LogLevel{}), reflect.TypeOf(LogFormat{}):
+		case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
 			r.addEnumFlag(flags, tag)
 		default:
 			// Default to string for unknown types
@@ -115,6 +120,7 @@ func (r *FlagRegistry) addStringSliceFlag(flags *pflag.FlagSet, tag FlagTag) {
 	if tag.Default != "" {
 		def = strings.Split(tag.Default, ",")
 	}
+
 	if tag.Short != "" {
 		flags.StringSliceP(tag.Name, tag.Short, def, tag.Help)
 	} else {
@@ -131,24 +137,29 @@ func (r *FlagRegistry) addEnumFlag(flags *pflag.FlagSet, tag FlagTag) {
 	if len(tag.Values) > 0 {
 		help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
 	}
+
 	registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
 }
 
 // ValidateFlags validates flag values against allowed values and checks required flags.
 func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
-		if err := r.validateTag(cmd, tag); err != nil {
+		err := r.validateTag(cmd, tag)
+		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
 // validateTag validates a single flag tag.
 func (r *FlagRegistry) validateTag(cmd *cobra.Command, tag FlagTag) error {
-	if err := r.validateRequiredFlag(cmd, tag); err != nil {
+	err := r.validateRequiredFlag(cmd, tag)
+	if err != nil {
 		return err
 	}
+
 	return r.validateEnumValue(cmd, tag)
 }
 
@@ -157,10 +168,12 @@ func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) err
 	if !tag.Required {
 		return nil
 	}
+
 	flag := r.lookupFlagForValidation(cmd, tag.Name)
 	if flag == nil || !flag.Changed {
-		return NewFlagError(tag.Name, fmt.Errorf("required flag not set"))
+		return NewFlagError(tag.Name, errors.New("required flag not set"))
 	}
+
 	return nil
 }
 
@@ -169,13 +182,16 @@ func (r *FlagRegistry) validateEnumValue(cmd *cobra.Command, tag FlagTag) error 
 	if len(tag.Values) == 0 {
 		return nil
 	}
+
 	flag := r.lookupFlagForValidation(cmd, tag.Name)
 	if flag == nil || !flag.Changed {
 		return nil
 	}
+
 	if !r.isAllowedValue(flag.Value.String(), tag.Values) {
 		return NewFlagError(tag.Name, fmt.Errorf("invalid value, must be one of: %v", tag.Values))
 	}
+
 	return nil
 }
 
@@ -185,15 +201,11 @@ func (r *FlagRegistry) lookupFlagForValidation(cmd *cobra.Command, name string) 
 	if flag == nil {
 		flag = cmd.PersistentFlags().Lookup(name)
 	}
+
 	return flag
 }
 
 // isAllowedValue checks if a value is in the allowed list.
 func (r *FlagRegistry) isAllowedValue(value string, allowed []string) bool {
-	for _, a := range allowed {
-		if value == a {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowed, value)
 }

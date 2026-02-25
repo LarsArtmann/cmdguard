@@ -88,6 +88,7 @@ func TestEnum_Methods(t *testing.T) {
 
 	t.Run("IsEmpty", func(t *testing.T) {
 		assert.False(t, e.IsEmpty())
+
 		var empty Enum
 		assert.True(t, empty.IsEmpty())
 	})
@@ -110,6 +111,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("unmarshal valid", func(t *testing.T) {
 		var c config
+
 		c.Level = Enum{allowed: []string{"debug", "info", "warn"}}
 		err := json.Unmarshal([]byte(`{"level":"info"}`), &c)
 		require.NoError(t, err)
@@ -118,6 +120,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
 		var c config
+
 		c.Level = Enum{allowed: []string{"debug", "info"}}
 		err := json.Unmarshal([]byte(`{"level":"invalid"}`), &c)
 		require.Error(t, err)
@@ -125,6 +128,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("unmarshal with no allowed", func(t *testing.T) {
 		var c config
+
 		err := json.Unmarshal([]byte(`{"level":"any"}`), &c)
 		require.NoError(t, err)
 		assert.Equal(t, "any", c.Level.String())
@@ -192,6 +196,7 @@ func TestDuration_Methods(t *testing.T) {
 
 	t.Run("IsZero", func(t *testing.T) {
 		assert.False(t, d.IsZero())
+
 		var zero Duration
 		assert.True(t, zero.IsZero())
 	})
@@ -213,6 +218,7 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 	t.Run("marshal", func(t *testing.T) {
 		validDuration, err := ParseDuration("30s")
 		require.NoError(t, err)
+
 		c := config{Timeout: validDuration}
 		data, err := json.Marshal(c)
 		require.NoError(t, err)
@@ -221,6 +227,7 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("unmarshal valid", func(t *testing.T) {
 		var c config
+
 		err := json.Unmarshal([]byte(`{"timeout":"1h"}`), &c)
 		require.NoError(t, err)
 		assert.Equal(t, time.Hour, c.Timeout.Duration())
@@ -228,6 +235,7 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
 		var c config
+
 		err := json.Unmarshal([]byte(`{"timeout":"invalid"}`), &c)
 		require.Error(t, err)
 	})
@@ -276,6 +284,7 @@ func testMarshalUnmarshal[T any](
 		type config struct {
 			Value T `json:"value"`
 		}
+
 		c := config{Value: validValue}
 		data, err := json.Marshal(c)
 		require.NoError(t, err)
@@ -286,7 +295,9 @@ func testMarshalUnmarshal[T any](
 		type config struct {
 			Value T `json:"value"`
 		}
+
 		var c config
+
 		err := json.Unmarshal([]byte(`{"value":"`+validString+`"}`), &c)
 		require.NoError(t, err)
 		assert.Equal(t, validString, stringFunc(c.Value))
@@ -296,14 +307,23 @@ func testMarshalUnmarshal[T any](
 		type config struct {
 			Value T `json:"value"`
 		}
+
 		var c config
+
 		err := json.Unmarshal([]byte(`{"value":"`+invalidString+`"}`), &c)
 		require.Error(t, err)
 	})
 }
 
 func TestLogLevel_MarshalUnmarshal(t *testing.T) {
-	testMarshalUnmarshal(t, LogLevelInfo, "info", "trace", func() LogLevel { return LogLevel{} }, func(l LogLevel) string { return l.String() })
+	testMarshalUnmarshal(
+		t,
+		LogLevelInfo,
+		"info",
+		"trace",
+		func() LogLevel { return LogLevel{} },
+		func(l LogLevel) string { return l.String() },
+	)
 }
 
 func TestLogFormat(t *testing.T) {
@@ -328,28 +348,36 @@ func TestLogFormat(t *testing.T) {
 }
 
 func TestLogFormat_MarshalUnmarshal(t *testing.T) {
-	testMarshalUnmarshal(t, LogFormatJSON, "json", "xml", func() LogFormat { return LogFormat{} }, func(f LogFormat) string { return f.String() })
+	testMarshalUnmarshal(
+		t,
+		LogFormatJSON,
+		"json",
+		"xml",
+		func() LogFormat { return LogFormat{} },
+		func(f LogFormat) string { return f.String() },
+	)
 }
 
 func TestPtr(t *testing.T) {
 	t.Run("int", func(t *testing.T) {
 		v := 42
-		p := Ptr(v)
+		p := &v
 		require.NotNil(t, p)
 		assert.Equal(t, 42, *p)
 	})
 
 	t.Run("string", func(t *testing.T) {
 		v := "hello"
-		p := Ptr(v)
+		p := &v
 		require.NotNil(t, p)
 		assert.Equal(t, "hello", *p)
 	})
 
 	t.Run("struct", func(t *testing.T) {
 		type s struct{ Name string }
+
 		v := s{Name: "test"}
-		p := Ptr(v)
+		p := &v
 		require.NotNil(t, p)
 		assert.Equal(t, "test", p.Name)
 	})
@@ -358,18 +386,21 @@ func TestPtr(t *testing.T) {
 func TestValueOrDefault(t *testing.T) {
 	t.Run("nil pointer returns default", func(t *testing.T) {
 		var p *int
+
 		result := ValueOrDefault(p, 10)
 		assert.Equal(t, 10, result)
 	})
 
 	t.Run("non-nil pointer returns value", func(t *testing.T) {
-		p := Ptr(42)
+		v := 42
+		p := &v
 		result := ValueOrDefault(p, 10)
 		assert.Equal(t, 42, result)
 	})
 
 	t.Run("empty string default", func(t *testing.T) {
 		var p *string
+
 		result := ValueOrDefault(p, "default")
 		assert.Equal(t, "default", result)
 	})
@@ -378,6 +409,7 @@ func TestValueOrDefault(t *testing.T) {
 func TestEnsureValid(t *testing.T) {
 	t.Run("nil returns error", func(t *testing.T) {
 		var p *int
+
 		err := EnsureValid(p, "myField")
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "myField")
@@ -385,15 +417,17 @@ func TestEnsureValid(t *testing.T) {
 	})
 
 	t.Run("non-nil returns nil", func(t *testing.T) {
-		p := Ptr(42)
+		v := 42
+		p := &v
 		err := EnsureValid(p, "myField")
 		require.NoError(t, err)
 	})
 }
 
-// Helper functions for type checking
+// Helper functions for type checking.
 func IsEnumError(err error) bool {
 	var e *EnumError
+
 	return AsEnumError(err, &e)
 }
 
@@ -401,6 +435,7 @@ func AsEnumError(err error, target **EnumError) bool {
 	switch e := err.(type) {
 	case *EnumError:
 		*target = e
+
 		return true
 	default:
 		return false
@@ -409,6 +444,7 @@ func AsEnumError(err error, target **EnumError) bool {
 
 func IsDurationError(err error) bool {
 	var e *DurationError
+
 	return AsDurationError(err, &e)
 }
 
@@ -416,6 +452,7 @@ func AsDurationError(err error, target **DurationError) bool {
 	switch e := err.(type) {
 	case *DurationError:
 		*target = e
+
 		return true
 	default:
 		return false

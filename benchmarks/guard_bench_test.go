@@ -9,24 +9,25 @@ import (
 )
 
 type BenchConfig struct {
-	Verbose bool   `flag:"verbose" short:"v" default:"false"`
-	Output  string `flag:"output" short:"o" default:"text"`
+	Verbose bool   `default:"false" flag:"verbose" short:"v"`
+	Output  string `default:"text"  flag:"output"  short:"o"`
 }
 
 type BenchFlags struct {
-	Name  string `flag:"name" short:"n" default:"World"`
-	Count int    `flag:"count" short:"c" default:"1"`
+	Name  string `default:"World" flag:"name"  short:"n"`
+	Count int    `default:"1"     flag:"count" short:"c"`
 }
 
 // BenchmarkNew measures CLI creation performance.
 func BenchmarkNew(b *testing.B) {
 	defaults := BenchConfig{}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		cli, err := v2.New[BenchConfig, v2.NoFlags]("myapp", "My CLI", defaults)
 		if err != nil {
 			b.Fatal(err)
 		}
+
 		_ = cli
 	}
 }
@@ -34,12 +35,18 @@ func BenchmarkNew(b *testing.B) {
 // BenchmarkNewWithLong measures CLI creation with long description.
 func BenchmarkNewWithLong(b *testing.B) {
 	defaults := BenchConfig{}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		cli, err := v2.NewWithLong[BenchConfig, v2.NoFlags]("myapp", "short", "long description", defaults)
+
+	for b.Loop() {
+		cli, err := v2.NewWithLong[BenchConfig, v2.NoFlags](
+			"myapp",
+			"short",
+			"long description",
+			defaults,
+		)
 		if err != nil {
 			b.Fatal(err)
 		}
+
 		_ = cli
 	}
 }
@@ -48,8 +55,7 @@ func BenchmarkNewWithLong(b *testing.B) {
 func BenchmarkAddCommand(b *testing.B) {
 	defaults := BenchConfig{}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// Need fresh CLI for each iteration since we can't add same command twice
 		testCli, err := v2.New[BenchConfig, v2.NoFlags]("myapp", "My CLI", defaults)
 		if err != nil {
@@ -74,6 +80,7 @@ func BenchmarkAddCommand(b *testing.B) {
 // BenchmarkExecute measures command execution.
 func BenchmarkExecute(b *testing.B) {
 	defaults := BenchConfig{}
+
 	cli, err := v2.New[BenchConfig, v2.NoFlags]("myapp", "My CLI", defaults)
 	if err != nil {
 		b.Fatal(err)
@@ -92,8 +99,8 @@ func BenchmarkExecute(b *testing.B) {
 	}
 
 	ctx := context.Background()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		// Execute with help to avoid actual command running
 		err := cli.ExecuteWithArgs(ctx, []string{"--help"})
 		if err != nil {
@@ -104,8 +111,7 @@ func BenchmarkExecute(b *testing.B) {
 
 // BenchmarkCommandCreation measures creating command definitions.
 func BenchmarkCommandCreation(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		cmd := v2.Command[BenchConfig, *BenchFlags]{
 			Use:   "greet",
 			Short: "Greet someone",
@@ -120,17 +126,20 @@ func BenchmarkCommandCreation(b *testing.B) {
 
 // BenchmarkNewCommand measures the NewCommand constructor.
 func BenchmarkNewCommand(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags]("greet",
+	for b.Loop() {
+		cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
+			"greet",
 			v2.WithShort[BenchConfig, v2.NoFlags]("Greet someone"),
-			v2.WithRunE[BenchConfig, v2.NoFlags](func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
-				return nil
-			}),
+			v2.WithRunE[BenchConfig, v2.NoFlags](
+				func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
+					return nil
+				},
+			),
 		)
 		if err != nil {
 			b.Fatal(err)
 		}
+
 		_ = cmd
 	}
 }

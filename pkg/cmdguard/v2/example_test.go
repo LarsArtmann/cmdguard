@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -13,13 +14,14 @@ import (
 func Example_basic() {
 	// Define your application config
 	type AppConfig struct {
-		Verbose bool `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
+		Verbose bool `default:"false" flag:"verbose" help:"Enable verbose output" short:"v"`
 	}
 
 	// Create the CLI
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A simple CLI application", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -31,12 +33,15 @@ func Example_basic() {
 			if cfg.Verbose {
 				fmt.Println("Verbose mode enabled")
 			}
+
 			fmt.Println("Hello, World!")
+
 			return nil
 		},
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -49,19 +54,20 @@ func Example_basic() {
 // Example_withFlags demonstrates commands with typed flags.
 func Example_withFlags() {
 	type AppConfig struct {
-		Debug bool `flag:"debug" short:"d" default:"false" help:"Enable debug mode"`
+		Debug bool `default:"false" flag:"debug" help:"Enable debug mode" short:"d"`
 	}
 
 	// Define command-specific flags
 	type GreetFlags struct {
-		Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-		Shout bool   `flag:"shout" short:"s" default:"false" help:"Shout the greeting"`
-		Count int    `flag:"count" short:"c" default:"1" help:"Number of greetings"`
+		Name  string `default:"World" flag:"name"  help:"Name to greet"       short:"n"`
+		Shout bool   `default:"false" flag:"shout" help:"Shout the greeting"  short:"s"`
+		Count int    `default:"1"     flag:"count" help:"Number of greetings" short:"c"`
 	}
 
 	cli, err := v2.New[AppConfig, *GreetFlags]("greeter", "A greeting CLI", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -70,22 +76,28 @@ func Example_withFlags() {
 		Short: "Greet someone",
 		Flags: &GreetFlags{}, // Initialize with defaults
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			for i := 0; i < flags.Count; i++ {
+			for range flags.Count {
 				msg := fmt.Sprintf("Hello, %s!", flags.Name)
 				if flags.Shout {
 					msg = strings.ToUpper(msg)
 				}
+
 				fmt.Println(msg)
 			}
+
 			return nil
 		},
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
-	_ = cli.ExecuteWithArgs(context.Background(), []string{"greet", "--name", "Alice", "--count", "2"})
+	_ = cli.ExecuteWithArgs(
+		context.Background(),
+		[]string{"greet", "--name", "Alice", "--count", "2"},
+	)
 	// Output:
 	// Hello, Alice!
 	// Hello, Alice!
@@ -94,12 +106,13 @@ func Example_withFlags() {
 // Example_withSubcommands demonstrates nested command hierarchies.
 func Example_withSubcommands() {
 	type AppConfig struct {
-		LogLevel v2.LogLevel `flag:"log-level" default:"info" help:"Log level"`
+		LogLevel v2.LogLevel `default:"info" flag:"log-level" help:"Log level"`
 	}
 
 	cli, err := v2.New[AppConfig, v2.NoFlags]("git", "Git version control", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -114,6 +127,7 @@ func Example_withSubcommands() {
 				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 					fmt.Println("origin")
 					fmt.Println("upstream")
+
 					return nil
 				},
 			},
@@ -122,6 +136,7 @@ func Example_withSubcommands() {
 				Short: "Add a remote",
 				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 					fmt.Println("Remote added")
+
 					return nil
 				},
 			},
@@ -129,6 +144,7 @@ func Example_withSubcommands() {
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -141,11 +157,11 @@ func Example_withSubcommands() {
 // Example_withEnum demonstrates using enum types for restricted values.
 func Example_withEnum() {
 	type AppConfig struct {
-		Environment v2.Enum `flag:"env" default:"dev" values:"dev,staging,prod" help:"Target environment"`
+		Environment v2.Enum `default:"dev" flag:"env" help:"Target environment" values:"dev,staging,prod"`
 	}
 
 	type DeployFlags struct {
-		Version string `flag:"version" short:"v" required:"true" help:"Version to deploy"`
+		Version string `flag:"version" help:"Version to deploy" required:"true" short:"v"`
 	}
 
 	// Parse enum value (error handling omitted for brevity in this example)
@@ -156,6 +172,7 @@ func Example_withEnum() {
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -165,11 +182,13 @@ func Example_withEnum() {
 		Flags: &DeployFlags{},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *DeployFlags) error {
 			fmt.Printf("Deploying version %s to %s\n", flags.Version, cfg.Environment.String())
+
 			return nil
 		},
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -183,14 +202,15 @@ func Example_withPreRunE() {
 	type AppConfig struct{}
 
 	type CreateUserFlags struct {
-		Email    string `flag:"email" required:"true" help:"User email"`
-		Password string `flag:"password" required:"true" help:"User password"`
-		Admin    bool   `flag:"admin" default:"false" help:"Grant admin privileges"`
+		Email    string `flag:"email"    help:"User email"             required:"true"`
+		Password string `flag:"password" help:"User password"          required:"true"`
+		Admin    bool   `flag:"admin"    help:"Grant admin privileges"                 default:"false"`
 	}
 
 	cli, err := v2.New[AppConfig, *CreateUserFlags]("userctl", "User management CLI", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -201,8 +221,9 @@ func Example_withPreRunE() {
 		PreRunE: func(ctx context.Context, cfg *AppConfig, flags *CreateUserFlags) error {
 			// Custom validation
 			if len(flags.Password) < 8 {
-				return fmt.Errorf("password must be at least 8 characters")
+				return errors.New("password must be at least 8 characters")
 			}
+
 			return nil
 		},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *CreateUserFlags) error {
@@ -210,12 +231,15 @@ func Example_withPreRunE() {
 			if flags.Admin {
 				role = "admin"
 			}
+
 			fmt.Printf("Created %s: %s\n", role, flags.Email)
+
 			return nil
 		},
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -236,6 +260,7 @@ func Example_withFunctionalOptions() {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "My application", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
@@ -245,16 +270,19 @@ func Example_withFunctionalOptions() {
 		v2.WithShort[AppConfig, v2.NoFlags]("Show version info"),
 		v2.WithRunE(func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("myapp version 1.0.0")
+
 			return nil
 		}),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 
 	if err := cli.AddCommand(cmd); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+
 		return
 	}
 

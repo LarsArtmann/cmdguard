@@ -17,6 +17,7 @@ func hasSubcommand(g *GuardedCommand, name string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -37,6 +38,7 @@ func TestNew(t *testing.T) {
 	t.Run("loads config from environment", func(t *testing.T) {
 		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
 		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+
 		defer func() {
 			_ = os.Unsetenv("CMDGUARD_LOG_LEVEL")
 			_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
@@ -137,12 +139,15 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 		})
 
 		found := false
+
 		for _, c := range parent.Commands() {
 			if c.Name() == "child" {
 				found = true
+
 				break
 			}
 		}
+
 		assert.True(t, found, "child command should be added to parent")
 	})
 
@@ -204,6 +209,7 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 		assert.False(t, g.IsStrictMode())
 
 		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+
 		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
 		g2 := New("testapp2", "Test2")
@@ -276,6 +282,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 
 	t.Run("strict mode requires RunE", func(t *testing.T) {
 		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
+
 		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
 		g := New("testapp", "Test")
@@ -412,12 +419,15 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find version command
 		var versionCmd *cobra.Command
+
 		for _, cmd := range g.cmd.Commands() {
 			if cmd.Name() == "version" {
 				versionCmd = cmd
+
 				break
 			}
 		}
+
 		require.NotNil(t, versionCmd)
 
 		// Execute it
@@ -437,12 +447,15 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find validate command
 		var validateCmd *cobra.Command
+
 		for _, c := range g.cmd.Commands() {
 			if c.Name() == "validate" {
 				validateCmd = c
+
 				break
 			}
 		}
+
 		require.NotNil(t, validateCmd)
 
 		// Execute it
@@ -459,12 +472,15 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find validate command
 		var validateCmd *cobra.Command
+
 		for _, c := range g.cmd.Commands() {
 			if c.Name() == "validate" {
 				validateCmd = c
+
 				break
 			}
 		}
+
 		require.NotNil(t, validateCmd)
 
 		// Execute it - should error

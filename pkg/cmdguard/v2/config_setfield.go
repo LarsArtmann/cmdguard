@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -18,20 +19,25 @@ func SetField(cfg any, fieldName string, value any) error {
 	// Handle type conversions
 	if val.Type().ConvertibleTo(field.Type()) {
 		field.Set(val.Convert(field.Type()))
+
 		return nil
 	}
 
 	// Handle string to custom type conversions
 	if val.Kind() == reflect.String {
-		if err := setStringField(field, val.String()); err != nil {
+		err := setStringField(field, val.String())
+		if err != nil {
 			return err
 		}
+
 		return nil
 	}
 
 	// Handle time.Duration to Duration conversion
-	if val.Type() == reflect.TypeOf(time.Duration(0)) && field.Type() == reflect.TypeOf(Duration{}) {
+	if val.Type() == reflect.TypeFor[time.Duration]() &&
+		field.Type() == reflect.TypeFor[Duration]() {
 		field.Set(reflect.ValueOf(FromDuration(val.Interface().(time.Duration))))
+
 		return nil
 	}
 
@@ -42,10 +48,11 @@ func SetField(cfg any, fieldName string, value any) error {
 func getField(cfg any, fieldName string) (reflect.Value, error) {
 	v := reflect.ValueOf(cfg)
 	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
-		return reflect.Value{}, fmt.Errorf("config must be a pointer to struct")
+		return reflect.Value{}, errors.New("config must be a pointer to struct")
 	}
 
 	v = v.Elem()
+
 	field := v.FieldByName(fieldName)
 	if !field.IsValid() {
 		return reflect.Value{}, fmt.Errorf("field %q not found", fieldName)
@@ -61,16 +68,18 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 // setStringField handles string to custom type conversions.
 func setStringField(field reflect.Value, str string) error {
 	switch field.Type() {
-	case reflect.TypeOf(LogLevel{}):
+	case reflect.TypeFor[LogLevel]():
 		return parseAndSetLogLevel(field, str)
-	case reflect.TypeOf(LogFormat{}):
+	case reflect.TypeFor[LogFormat]():
 		return parseAndSetLogFormat(field, str)
-	case reflect.TypeOf(Duration{}):
+	case reflect.TypeFor[Duration]():
 		return parseAndSetDuration(field, str)
-	case reflect.TypeOf(Enum{}):
+	case reflect.TypeFor[Enum]():
 		field.Set(reflect.ValueOf(Enum{value: str}))
+
 		return nil
 	}
+
 	return fmt.Errorf("unsupported string conversion for %s", field.Type())
 }
 
@@ -80,7 +89,9 @@ func parseAndSetLogLevel(field reflect.Value, str string) error {
 	if err != nil {
 		return err
 	}
+
 	field.Set(reflect.ValueOf(parsed))
+
 	return nil
 }
 
@@ -90,7 +101,9 @@ func parseAndSetLogFormat(field reflect.Value, str string) error {
 	if err != nil {
 		return err
 	}
+
 	field.Set(reflect.ValueOf(parsed))
+
 	return nil
 }
 
@@ -100,6 +113,8 @@ func parseAndSetDuration(field reflect.Value, str string) error {
 	if err != nil {
 		return err
 	}
+
 	field.Set(reflect.ValueOf(parsed))
+
 	return nil
 }

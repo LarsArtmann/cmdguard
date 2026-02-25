@@ -4,6 +4,8 @@ import "fmt"
 
 // Ptr returns a pointer to any value.
 // Useful for optional config fields.
+//
+//go:fix inline
 func Ptr[T any](v T) *T {
 	return &v
 }
@@ -13,6 +15,7 @@ func ValueOrDefault[T any](v *T, def T) T {
 	if v == nil {
 		return def
 	}
+
 	return *v
 }
 
@@ -21,5 +24,6 @@ func EnsureValid[T any](v *T, name string) error {
 	if v == nil {
 		return fmt.Errorf("%s: must not be nil", name)
 	}
+
 	return nil
 }

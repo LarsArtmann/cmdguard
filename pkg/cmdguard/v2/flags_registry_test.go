@@ -11,9 +11,10 @@ import (
 func TestNewFlagRegistry(t *testing.T) {
 	t.Run("valid config", func(t *testing.T) {
 		type TestConfig struct {
-			Name  string `flag:"name" help:"name help" default:"default-name"`
-			Count int    `flag:"count" help:"count help" default:"10"`
+			Name  string `default:"default-name" flag:"name"  help:"name help"`
+			Count int    `default:"10"           flag:"count" help:"count help"`
 		}
+
 		cfg := TestConfig{}
 
 		registry, err := NewFlagRegistry(cfg)
@@ -31,11 +32,12 @@ func TestNewFlagRegistry(t *testing.T) {
 
 	t.Run("config with short flags", func(t *testing.T) {
 		type TestConfig struct {
-			Name string `flag:"name" short:"n" help:"name help"`
+			Name string `flag:"name" help:"name help" short:"n"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
 		require.NoError(t, err)
+
 		tags := registry.Tags()
 		require.Len(t, tags, 1)
 		assert.Equal(t, "n", tags[0].Short)
@@ -45,11 +47,11 @@ func TestNewFlagRegistry(t *testing.T) {
 func TestFlagRegistry_RegisterFlags(t *testing.T) {
 	t.Run("registers all flag types", func(t *testing.T) {
 		type TestConfig struct {
-			String  string   `flag:"string" default:"str"`
-			Bool    bool     `flag:"bool" default:"true"`
-			Int     int      `flag:"int" default:"42"`
-			Float   float64  `flag:"float" default:"3.14"`
-			Strings []string `flag:"strings" default:"a,b,c"`
+			String  string   `default:"str"   flag:"string"`
+			Bool    bool     `default:"true"  flag:"bool"`
+			Int     int      `default:"42"    flag:"int"`
+			Float   float64  `default:"3.14"  flag:"float"`
+			Strings []string `default:"a,b,c" flag:"strings"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
@@ -70,8 +72,8 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 
 	t.Run("registers custom types", func(t *testing.T) {
 		type TestConfig struct {
-			Level  LogLevel  `flag:"level" default:"info"`
-			Format LogFormat `flag:"format" default:"json"`
+			Level  LogLevel  `default:"info" flag:"level"`
+			Format LogFormat `default:"json" flag:"format"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
@@ -87,7 +89,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 
 	t.Run("registers Duration type", func(t *testing.T) {
 		type TestConfig struct {
-			Timeout Duration `flag:"timeout" default:"30s"`
+			Timeout Duration `default:"30s" flag:"timeout"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
@@ -104,7 +106,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 
 	t.Run("registers enum with values", func(t *testing.T) {
 		type TestConfig struct {
-			Mode Enum `flag:"mode" values:"dev,staging,prod" default:"dev"`
+			Mode Enum `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
@@ -124,7 +126,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 func TestFlagRegistry_Tags(t *testing.T) {
 	t.Run("returns all tags", func(t *testing.T) {
 		type TestConfig struct {
-			Name  string `flag:"name" help:"name help"`
+			Name  string `flag:"name"  help:"name help"`
 			Count int    `flag:"count" help:"count help"`
 		}
 
@@ -138,6 +140,7 @@ func TestFlagRegistry_Tags(t *testing.T) {
 		for i, tag := range tags {
 			names[i] = tag.Name
 		}
+
 		assert.Contains(t, names, "name")
 		assert.Contains(t, names, "count")
 	})
@@ -147,8 +150,8 @@ func TestFlagRegistry_FlagNames(t *testing.T) {
 	t.Run("returns all flag names", func(t *testing.T) {
 		type TestConfig struct {
 			Verbose bool   `flag:"verbose" short:"v"`
-			Config  string `flag:"config" short:"c"`
-			Output  string `flag:"output" short:"o"`
+			Config  string `flag:"config"  short:"c"`
+			Output  string `flag:"output"  short:"o"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
@@ -175,8 +178,8 @@ func TestFlagRegistry_FlagNames(t *testing.T) {
 func TestFlagRegistry_GenerateHelp(t *testing.T) {
 	t.Run("generates help for all flags", func(t *testing.T) {
 		type TestConfig struct {
-			Name    string `flag:"name,n" help:"The name to use" default:"default"`
-			Verbose bool   `flag:"verbose,v" help:"Enable verbose output"`
+			Name    string `default:"default" flag:"name,n"    help:"The name to use"`
+			Verbose bool   `                  flag:"verbose,v" help:"Enable verbose output"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})
@@ -210,9 +213,9 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 func TestFlagRegistry_ShortFlags(t *testing.T) {
 	t.Run("register short flags", func(t *testing.T) {
 		type TestConfig struct {
-			Name    string `flag:"name" short:"n" default:""`
-			Count   int    `flag:"count" short:"c" default:"0"`
-			Verbose bool   `flag:"verbose" short:"v" default:"false"`
+			Name    string `default:""      flag:"name"    short:"n"`
+			Count   int    `default:"0"     flag:"count"   short:"c"`
+			Verbose bool   `default:"false" flag:"verbose" short:"v"`
 		}
 
 		registry, err := NewFlagRegistry(TestConfig{})

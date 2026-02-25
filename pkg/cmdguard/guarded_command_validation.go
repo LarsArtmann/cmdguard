@@ -1,6 +1,7 @@
 package cmdguard
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,7 +13,7 @@ import (
 func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
 	// Check for command name
 	if cmd.Name() == "" {
-		return fmt.Errorf("command has no name")
+		return errors.New("command has no name")
 	}
 
 	// Commands with subcommands don't need a handler
@@ -25,12 +26,12 @@ func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
 	hasRunE := cmd.RunE != nil
 
 	if !hasRun && !hasRunE {
-		return fmt.Errorf("command has no handler (Run or RunE) and no subcommands")
+		return errors.New("command has no handler (Run or RunE) and no subcommands")
 	}
 
 	// In strict mode, require RunE (returns error)
 	if g.strictMode && !hasRunE {
-		return fmt.Errorf("strict mode requires RunE handler that returns error")
+		return errors.New("strict mode requires RunE handler that returns error")
 	}
 
 	return nil
@@ -41,11 +42,13 @@ func (g *GuardedCommand) validateCommandTree() error {
 	var errors []string
 
 	for _, cmd := range g.cmd.Commands() {
-		if err := g.validateCommand(cmd); err != nil {
+		err := g.validateCommand(cmd)
+		if err != nil {
 			errors = append(errors, fmt.Sprintf("%s: %v", cmd.Name(), err))
 		}
 		// Recursively validate subcommands
-		if err := g.validateSubcommands(cmd); err != nil {
+		err = g.validateSubcommands(cmd)
+		if err != nil {
 			errors = append(errors, err.Error())
 		}
 	}
@@ -63,8 +66,15 @@ func (g *GuardedCommand) checkDuplicateSubcommands(parent *cobra.Command) {
 	seen := make(map[string]bool)
 	for _, cmd := range parent.Commands() {
 		if seen[cmd.Name()] {
-			panic(fmt.Sprintf("cmdguard: duplicate subcommand %q in command %q", cmd.Name(), parent.Name()))
+			panic(
+				fmt.Sprintf(
+					"cmdguard: duplicate subcommand %q in command %q",
+					cmd.Name(),
+					parent.Name(),
+				),
+			)
 		}
+
 		seen[cmd.Name()] = true
 	}
 }
@@ -72,12 +82,16 @@ func (g *GuardedCommand) checkDuplicateSubcommands(parent *cobra.Command) {
 // validateSubcommands recursively validates subcommands.
 func (g *GuardedCommand) validateSubcommands(parent *cobra.Command) error {
 	for _, cmd := range parent.Commands() {
-		if err := g.validateCommand(cmd); err != nil {
+		err := g.validateCommand(cmd)
+		if err != nil {
 			return fmt.Errorf("%s %s: %w", parent.Name(), cmd.Name(), err)
 		}
-		if err := g.validateSubcommands(cmd); err != nil {
+
+		err = g.validateSubcommands(cmd)
+		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }

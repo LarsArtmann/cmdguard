@@ -131,6 +131,7 @@ func FuzzGetConfigFilePath(f *testing.F) {
 			assert.Empty(t, result)
 		} else {
 			assert.NotEmpty(t, result)
+
 			abs, _ := filepath.Abs(configFile)
 			assert.Equal(t, abs, result)
 		}
@@ -139,6 +140,7 @@ func FuzzGetConfigFilePath(f *testing.F) {
 
 func validateConfigField(t *testing.T, cfg *Config, expectValid bool) {
 	t.Helper()
+
 	err := cfg.Validate()
 	if expectValid {
 		assert.NoError(t, err)
@@ -154,6 +156,7 @@ func fuzzLoadWithEnvVar(f *testing.F, envVarName string, corpus []string) {
 
 	f.Fuzz(func(t *testing.T, value string) {
 		_ = os.Setenv(envVarName, value)
+
 		defer func() { _ = os.Unsetenv(envVarName) }()
 
 		cfg := Load()
@@ -222,6 +225,7 @@ func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, value string, expectStrict bool) {
 		_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
+
 		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
 		cfg := Load()
@@ -234,14 +238,17 @@ func TestValidate_EdgeCases(t *testing.T) {
 	t.Run("concurrent validation should be safe", func(t *testing.T) {
 		cfg := &Config{LogLevel: "debug"}
 		done := make(chan bool)
-		for i := 0; i < 100; i++ {
+
+		for range 100 {
 			go func() {
 				err := cfg.Validate()
 				assert.NoError(t, err)
+
 				done <- true
 			}()
 		}
-		for i := 0; i < 100; i++ {
+
+		for range 100 {
 			<-done
 		}
 	})
@@ -294,7 +301,9 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 
 func testShellInjectionPayload(t *testing.T, payload string) {
 	t.Helper()
+
 	_ = os.Setenv("CMDGUARD_LOG_LEVEL", payload)
+
 	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
 	cfg := Load()

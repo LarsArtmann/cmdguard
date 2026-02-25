@@ -8,8 +8,8 @@ import (
 )
 
 type TestAppConfig struct {
-	Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
-	Output  string `flag:"output" short:"o" default:"-" help:"Output file"`
+	Verbose bool   `default:"false" flag:"verbose" help:"Enable verbose output" short:"v"`
+	Output  string `default:"-"     flag:"output"  help:"Output file"           short:"o"`
 }
 
 func TestVersion(t *testing.T) {
@@ -28,7 +28,7 @@ func TestNew(t *testing.T) {
 
 		assert.Equal(t, "myapp", g.Name())
 		assert.Equal(t, "My CLI application", g.Short())
-		assert.Equal(t, "", g.Long())
+		assert.Empty(t, g.Long())
 	})
 
 	t.Run("error: empty name", func(t *testing.T) {
@@ -63,7 +63,12 @@ func TestNew(t *testing.T) {
 func TestNewWithLong(t *testing.T) {
 	t.Run("creates GuardedCommand with long description", func(t *testing.T) {
 		defaults := TestAppConfig{}
-		g, err := NewWithLong[TestAppConfig, NoFlags]("myapp", "short", "long description", defaults)
+		g, err := NewWithLong[TestAppConfig, NoFlags](
+			"myapp",
+			"short",
+			"long description",
+			defaults,
+		)
 		require.NoError(t, err)
 		require.NotNil(t, g)
 
@@ -98,6 +103,7 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 		type CmdFlags struct {
 			Name string `flag:"name"`
 		}
+
 		g, err := New[TestAppConfig, *CmdFlags]("myapp", "My CLI", TestAppConfig{})
 		require.NoError(t, err)
 		require.NotNil(t, g)

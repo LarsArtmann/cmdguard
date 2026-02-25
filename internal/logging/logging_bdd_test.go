@@ -14,13 +14,13 @@ import (
 	"github.com/larsartmann/cmdguard/internal/logging"
 )
 
-// validationTestCase represents a single validation test case
+// validationTestCase represents a single validation test case.
 type validationTestCase struct {
 	input    string
 	expected bool
 }
 
-// testValidation is a parameterized helper for testing validation functions
+// testValidation is a parameterized helper for testing validation functions.
 func testValidation(name string, validator func(string) bool, cases []validationTestCase) {
 	It("should NOT accept uppercase "+name+" (case-sensitive)", func() {
 		for _, tc := range cases {
@@ -29,7 +29,7 @@ func testValidation(name string, validator func(string) bool, cases []validation
 	})
 }
 
-// captureStderr captures stderr output during test execution
+// captureStderr captures stderr output during test execution.
 func captureStderr(fn func()) string {
 	old := os.Stderr
 	r, w, _ := os.Pipe()
@@ -41,7 +41,9 @@ func captureStderr(fn func()) string {
 	os.Stderr = old
 
 	var buf bytes.Buffer
+
 	_, _ = io.Copy(&buf, r)
+
 	return buf.String()
 }
 
@@ -55,7 +57,9 @@ var _ = Describe("Logging - User Expectations", func() {
 				})
 
 				var parsed map[string]any
-				Expect(json.Unmarshal([]byte(output), &parsed)).To(Succeed(), "Output should be valid JSON")
+				Expect(
+					json.Unmarshal([]byte(output), &parsed),
+				).To(Succeed(), "Output should be valid JSON")
 
 				Expect(parsed["msg"]).To(Equal("user logged in"))
 				Expect(parsed["level"]).To(Equal("INFO"))
@@ -130,7 +134,9 @@ var _ = Describe("Logging - User Expectations", func() {
 					logger.Info("test message")
 				})
 
-				Expect(strings.HasPrefix(strings.TrimSpace(output), "{")).To(BeFalse(), "Text format should not start with JSON brace")
+				Expect(
+					strings.HasPrefix(strings.TrimSpace(output), "{"),
+				).To(BeFalse(), "Text format should not start with JSON brace")
 			})
 		})
 	})
@@ -144,7 +150,9 @@ var _ = Describe("Logging - User Expectations", func() {
 				})
 
 				Expect(output).To(ContainSubstring("app started"))
-				Expect(strings.HasPrefix(strings.TrimSpace(output), "{")).To(BeFalse(), "Should use text format as fallback")
+				Expect(
+					strings.HasPrefix(strings.TrimSpace(output), "{"),
+				).To(BeFalse(), "Should use text format as fallback")
 			})
 		})
 
@@ -285,7 +293,6 @@ var _ = Describe("Level precedence - User Expectations", func() {
 			}
 
 			for _, level := range levels {
-				level := level // capture range variable
 				Context("when log level is "+level.name, func() {
 					It("should allow expected levels and block others", func() {
 						output := captureStderr(func() {
@@ -321,7 +328,9 @@ var _ = Describe("Edge cases - User Expectations", func() {
 				})
 
 				var parsed map[string]any
-				Expect(json.Unmarshal([]byte(output), &parsed)).To(Succeed(), "Should produce valid JSON despite special chars")
+				Expect(
+					json.Unmarshal([]byte(output), &parsed),
+				).To(Succeed(), "Should produce valid JSON despite special chars")
 				Expect(parsed["msg"]).To(ContainSubstring("quotes"))
 			})
 		})
@@ -392,7 +401,9 @@ var _ = Describe("Case sensitivity - User Expectations", func() {
 					logger.Info("test")
 				})
 
-				Expect(output).To(ContainSubstring("test"), "Should still work with fallback to defaults")
+				Expect(
+					output,
+				).To(ContainSubstring("test"), "Should still work with fallback to defaults")
 			})
 		})
 	})
@@ -412,8 +423,12 @@ var _ = Describe("Text format parsing - User Expectations", func() {
 				keyPattern := regexp.MustCompile(`key1=value1`)
 
 				Expect(levelPattern.MatchString(output)).To(BeTrue(), "Should contain level=INFO")
-				Expect(msgPattern.MatchString(output)).To(BeTrue(), "Should contain msg=test message")
-				Expect(keyPattern.MatchString(output)).To(BeTrue(), "Should contain key=value pairs")
+				Expect(
+					msgPattern.MatchString(output),
+				).To(BeTrue(), "Should contain msg=test message")
+				Expect(
+					keyPattern.MatchString(output),
+				).To(BeTrue(), "Should contain key=value pairs")
 			})
 		})
 	})

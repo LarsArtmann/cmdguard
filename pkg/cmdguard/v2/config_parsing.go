@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 // The struct must have `flag` tags on its fields.
 func ParseFlagTags(cfg any) ([]FlagTag, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("config must not be nil")
+		return nil, errors.New("config must not be nil")
 	}
 
 	v := reflect.ValueOf(cfg)
@@ -30,8 +31,9 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 	var tags []FlagTag
 
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
+	for field := range t.Fields() {
+		field := field
+
 		tag := parseFieldFlag(field)
 		if tag != nil {
 			tags = append(tags, *tag)
@@ -88,39 +90,45 @@ func parseFieldFlag(field reflect.StructField) *FlagTag {
 // parseBoolDefault parses a boolean default value.
 func parseBoolDefault(s string) bool {
 	v, _ := strconv.ParseBool(s)
+
 	return v
 }
 
 // parseIntDefault parses an integer default value.
 func (t FlagTag) parseIntDefault() any {
 	// Check if it's a Duration type
-	if t.Type == reflect.TypeOf(Duration{}) {
+	if t.Type == reflect.TypeFor[Duration]() {
 		d, err := ParseDuration(t.Default)
 		if err != nil {
 			return Duration{}
 		}
+
 		return d
 	}
+
 	v, _ := strconv.ParseInt(t.Default, 10, 64)
+
 	return int(v)
 }
 
 // parseFloat64Default parses a float64 default value.
 func parseFloat64Default(s string) float64 {
 	v, _ := strconv.ParseFloat(s, 64)
+
 	return v
 }
 
 // parseCustomDefault handles custom type defaults.
 func (t FlagTag) parseCustomDefault() any {
 	switch t.Type {
-	case reflect.TypeOf(Duration{}):
+	case reflect.TypeFor[Duration]():
 		d, err := ParseDuration(t.Default)
 		if err != nil {
 			return Duration{}
 		}
+
 		return d
-	case reflect.TypeOf(Enum{}), reflect.TypeOf(LogLevel{}), reflect.TypeOf(LogFormat{}):
+	case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
 		return t.Default
 	default:
 		return t.Default
@@ -132,6 +140,7 @@ func (t FlagTag) DefaultValue() any {
 	if t.Default == "" {
 		return reflect.Zero(t.Type).Interface()
 	}
+
 	return t.parseDefaultValue()
 }
 

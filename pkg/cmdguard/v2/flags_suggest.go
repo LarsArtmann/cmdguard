@@ -27,6 +27,7 @@ func SuggestFlag(validNames []string, input string) string {
 	if bestDist <= maxEditDistance {
 		return bestMatch
 	}
+
 	return ""
 }
 
@@ -36,6 +37,7 @@ func editDistance(a, b string) int {
 	if aLen == 0 {
 		return bLen
 	}
+
 	if bLen == 0 {
 		return aLen
 	}
@@ -50,17 +52,20 @@ func editDistance(a, b string) int {
 
 	for i := 1; i <= aLen; i++ {
 		curr[0] = i
+
 		for j := 1; j <= bLen; j++ {
 			cost := 1
 			if a[i-1] == b[j-1] {
 				cost = 0
 			}
+
 			curr[j] = minInt(
 				prev[j]+1,      // deletion
 				curr[j-1]+1,    // insertion
 				prev[j-1]+cost, // substitution
 			)
 		}
+
 		prev, curr = curr, prev
 	}
 
@@ -73,28 +78,35 @@ func minInt(a, b, c int) int {
 		if a < c {
 			return a
 		}
+
 		return c
 	}
+
 	if b < c {
 		return b
 	}
+
 	return c
 }
 
 // GenerateHelp generates help text for all flags.
 func (r *FlagRegistry) GenerateHelp() string {
 	var lines []string
+
 	for _, tag := range r.tags {
 		line := "  --" + tag.Name
 		if tag.Short != "" {
 			line += ", -" + tag.Short
 		}
+
 		line += "\t" + tag.Help
 		if tag.Default != "" {
 			line += " (default: " + tag.Default + ")"
 		}
+
 		lines = append(lines, line)
 	}
+
 	return strings.Join(lines, "\n")
 }
 
@@ -104,5 +116,6 @@ func (r *FlagRegistry) FlagNames() []string {
 	for i, tag := range r.tags {
 		names[i] = tag.Name
 	}
+
 	return names
 }

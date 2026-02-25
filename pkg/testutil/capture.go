@@ -17,8 +17,10 @@ func CaptureOutput(f func()) string {
 	f()
 
 	w.Close()
+
 	os.Stdout = old
 
 	out, _ := io.ReadAll(r)
+
 	return string(out)
 }

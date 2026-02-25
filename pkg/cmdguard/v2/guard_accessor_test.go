@@ -77,7 +77,12 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 	})
 
 	t.Run("Long returns long description", func(t *testing.T) {
-		g, err := NewWithLong[TestAppConfig, NoFlags]("myapp", "short", "long desc", TestAppConfig{})
+		g, err := NewWithLong[TestAppConfig, NoFlags](
+			"myapp",
+			"short",
+			"long desc",
+			TestAppConfig{},
+		)
 		require.NoError(t, err)
 		assert.Equal(t, "long desc", g.Long())
 	})

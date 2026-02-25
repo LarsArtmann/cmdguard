@@ -119,6 +119,7 @@ func FuzzValidFormat(f *testing.F) {
 
 func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 	var buf bytes.Buffer
+
 	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})
@@ -131,6 +132,7 @@ func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 	require.Len(t, lines, 1, "should produce exactly one JSON line")
 
 	var parsed map[string]any
+
 	err := json.Unmarshal([]byte(lines[0]), &parsed)
 	require.NoError(t, err, "output should be valid JSON")
 
@@ -143,6 +145,7 @@ func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 
 func TestNewLogger_TextOutputFormat(t *testing.T) {
 	var buf bytes.Buffer
+
 	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
@@ -177,7 +180,15 @@ func TestLevel_CaseSensitivity(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			result := ParseLevel(tt.input)
-			assert.Equal(t, tt.expected, result, "ParseLevel(%q) = %v, want %v", tt.input, result, tt.expected)
+			assert.Equal(
+				t,
+				tt.expected,
+				result,
+				"ParseLevel(%q) = %v, want %v",
+				tt.input,
+				result,
+				tt.expected,
+			)
 		})
 	}
 }
@@ -198,7 +209,15 @@ func TestFormat_CaseSensitivity(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			result := ParseFormat(tt.input)
-			assert.Equal(t, tt.expected, result, "ParseFormat(%q) = %v, want %v", tt.input, result, tt.expected)
+			assert.Equal(
+				t,
+				tt.expected,
+				result,
+				"ParseFormat(%q) = %v, want %v",
+				tt.input,
+				result,
+				tt.expected,
+			)
 		})
 	}
 }

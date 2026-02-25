@@ -31,6 +31,7 @@ func (g *GuardedCommand[T, F]) AddCommand(cmd Command[T, F]) error {
 	}
 
 	g.rootCmd.AddCommand(cobraCmd)
+
 	return nil
 }
 
@@ -43,7 +44,8 @@ func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {
 // MustAddAnyCommand adds a command with a different flags type to a GuardedCommand.
 // Panics on error. Use this for simpler code when errors are not expected.
 func MustAddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) {
-	if err := AddAnyCommand(g, cmd); err != nil {
+	err := AddAnyCommand(g, cmd)
+	if err != nil {
 		panic(fmt.Sprintf("MustAddAnyCommand: %v", err))
 	}
 }
@@ -73,6 +75,7 @@ func AddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) er
 	}
 
 	g.rootCmd.AddCommand(cobraCmd)
+
 	return nil
 }
 
@@ -80,6 +83,7 @@ func AddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) er
 // This is a variant of toCobraCommand that works with any flags type.
 func toCobraCommandAny[T, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command, error) {
 	cobraCmd := createCobraCommand(cmd)
+
 	flagRegistry, err := setupFlagRegistry(cobraCmd, cmd)
 	if err != nil {
 		return nil, err
@@ -94,6 +98,7 @@ func toCobraCommandAny[T, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command
 	}
 
 	applyCommandOptions(cobraCmd, cmd)
+
 	return cobraCmd, nil
 }
 
@@ -111,7 +116,10 @@ func createCobraCommand[T, F any](cmd Command[T, F]) *cobra.Command {
 }
 
 // setupFlagRegistry creates and registers flags for the command.
-func setupFlagRegistry[T, F any](cobraCmd *cobra.Command, cmd Command[T, F]) (*FlagRegistry, error) {
+func setupFlagRegistry[T, F any](
+	cobraCmd *cobra.Command,
+	cmd Command[T, F],
+) (*FlagRegistry, error) {
 	prototype := createFlagPrototype(cmd.Flags)
 	if isNilPointer(prototype) {
 		return nil, nil
@@ -130,24 +138,60 @@ func setupFlagRegistry[T, F any](cobraCmd *cobra.Command, cmd Command[T, F]) (*F
 }
 
 // setupRunHandler configures the RunE handler for the command.
-func setupRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
-	setupHandler(cobraCmd, cmd, config, registry, cmd.RunE, func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
-		c.RunE = fn
-	})
+func setupRunHandler[T, F any](
+	cobraCmd *cobra.Command,
+	cmd Command[T, F],
+	config *T,
+	registry *FlagRegistry,
+) {
+	setupHandler(
+		cobraCmd,
+		cmd,
+		config,
+		registry,
+		cmd.RunE,
+		func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
+			c.RunE = fn
+		},
+	)
 }
 
 // setupPreRunHandler configures the PreRunE handler for the command.
-func setupPreRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
-	setupHandler(cobraCmd, cmd, config, registry, cmd.PreRunE, func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
-		c.PreRunE = fn
-	})
+func setupPreRunHandler[T, F any](
+	cobraCmd *cobra.Command,
+	cmd Command[T, F],
+	config *T,
+	registry *FlagRegistry,
+) {
+	setupHandler(
+		cobraCmd,
+		cmd,
+		config,
+		registry,
+		cmd.PreRunE,
+		func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
+			c.PreRunE = fn
+		},
+	)
 }
 
 // setupPostRunHandler configures the PostRunE handler for the command.
-func setupPostRunHandler[T, F any](cobraCmd *cobra.Command, cmd Command[T, F], config *T, registry *FlagRegistry) {
-	setupHandler(cobraCmd, cmd, config, registry, cmd.PostRunE, func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
-		c.PostRunE = fn
-	})
+func setupPostRunHandler[T, F any](
+	cobraCmd *cobra.Command,
+	cmd Command[T, F],
+	config *T,
+	registry *FlagRegistry,
+) {
+	setupHandler(
+		cobraCmd,
+		cmd,
+		config,
+		registry,
+		cmd.PostRunE,
+		func(c *cobra.Command, fn func(*cobra.Command, []string) error) {
+			c.PostRunE = fn
+		},
+	)
 }
 
 // setupHandler configures a cobra handler (RunE, PreRunE, or PostRunE) for the command.
@@ -162,13 +206,20 @@ func setupHandler[T, F any](
 	if handler == nil {
 		return
 	}
+
 	setter(cobraCmd, func(c *cobra.Command, args []string) error {
 		return executeHandler(c, handler, cmd.Flags, config, registry)
 	})
 }
 
 // executeHandler is a generic handler executor for RunE, PreRunE, PostRunE.
-func executeHandler[T, F any](c *cobra.Command, handler func(context.Context, *T, F) error, flags F, config *T, registry *FlagRegistry) error {
+func executeHandler[T, F any](
+	c *cobra.Command,
+	handler func(context.Context, *T, F) error,
+	flags F,
+	config *T,
+	registry *FlagRegistry,
+) error {
 	ctx := c.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -189,14 +240,17 @@ func addSubcommands[T, F any](parent *cobra.Command, cmd Command[T, F], config *
 		if err != nil {
 			return fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
 		}
+
 		parent.AddCommand(cobraSubCmd)
 	}
+
 	return nil
 }
 
 // applyCommandOptions applies command options like SilenceErrors, SilenceUsage, Version.
 func applyCommandOptions[T, F any](cobraCmd *cobra.Command, cmd Command[T, F]) {
 	cobraCmd.SilenceErrors = cmd.SilenceErrors
+
 	cobraCmd.SilenceUsage = cmd.SilenceUsage
 	if cmd.Version != "" {
 		cobraCmd.Version = cmd.Version

@@ -42,6 +42,7 @@ func TestCloneFlags(t *testing.T) {
 
 	t.Run("returns nil for nil pointer", func(t *testing.T) {
 		var original *TestFlags // nil
+
 		cloned := cloneFlags[*TestFlags](original)
 		assert.Nil(t, cloned)
 	})
@@ -71,6 +72,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 
 	t.Run("accepts empty struct", func(t *testing.T) {
 		type EmptyFlags struct{}
+
 		err := FlagTypeConstraint[EmptyFlags]()
 		assert.NoError(t, err)
 	})

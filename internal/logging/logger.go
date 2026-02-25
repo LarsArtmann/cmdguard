@@ -38,6 +38,7 @@ func NewLogger(format, level string) *slog.Logger {
 	logFormat := ParseFormat(format)
 
 	var handler slog.Handler
+
 	opts := &slog.HandlerOptions{
 		Level: logLevel,
 	}

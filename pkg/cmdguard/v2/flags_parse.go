@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
 	"strconv"
 	"strings"
@@ -13,10 +13,12 @@ import (
 // ParseFlags populates a config struct from parsed flags.
 func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error {
 	for _, tag := range r.tags {
-		if err := r.parseFlag(cmd, cfg, tag); err != nil {
+		err := r.parseFlag(cmd, cfg, tag)
+		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -33,6 +35,7 @@ func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error
 	}
 
 	value := flag.Value.String()
+
 	return r.parseAndSetValue(cfg, tag, value)
 }
 
@@ -43,9 +46,11 @@ func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag,
 		// Try persistent flags
 		flag = cmd.PersistentFlags().Lookup(tag.Name)
 	}
+
 	if flag == nil {
-		return nil, NewFlagError(tag.Name, fmt.Errorf("flag not found"))
+		return nil, NewFlagError(tag.Name, errors.New("flag not found"))
 	}
+
 	return flag, nil
 }
 
@@ -74,6 +79,7 @@ func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, v)
 }
 
@@ -83,6 +89,7 @@ func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error 
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, int(v))
 }
 
@@ -92,19 +99,20 @@ func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) er
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, v)
 }
 
 // parseAndSetCustom handles custom type parsing.
 func (r *FlagRegistry) parseAndSetCustom(cfg any, tag FlagTag, value string) error {
 	switch tag.Type {
-	case reflect.TypeOf(Duration{}):
+	case reflect.TypeFor[Duration]():
 		return r.parseAndSetDuration(cfg, tag, value)
-	case reflect.TypeOf(LogLevel{}):
+	case reflect.TypeFor[LogLevel]():
 		return r.parseAndSetLogLevel(cfg, tag, value)
-	case reflect.TypeOf(LogFormat{}):
+	case reflect.TypeFor[LogFormat]():
 		return r.parseAndSetLogFormat(cfg, tag, value)
-	case reflect.TypeOf(Enum{}):
+	case reflect.TypeFor[Enum]():
 		return r.parseAndSetEnum(cfg, tag, value)
 	default:
 		return SetField(cfg, tag.Field, value)
@@ -117,6 +125,7 @@ func (r *FlagRegistry) parseAndSetDuration(cfg any, tag FlagTag, value string) e
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, parsed)
 }
 
@@ -126,6 +135,7 @@ func (r *FlagRegistry) parseAndSetLogLevel(cfg any, tag FlagTag, value string) e
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, parsed)
 }
 
@@ -135,6 +145,7 @@ func (r *FlagRegistry) parseAndSetLogFormat(cfg any, tag FlagTag, value string) 
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, parsed)
 }
 
@@ -144,5 +155,6 @@ func (r *FlagRegistry) parseAndSetEnum(cfg any, tag FlagTag, value string) error
 	if err != nil {
 		return NewFlagError(tag.Name, err)
 	}
+
 	return SetField(cfg, tag.Field, parsed)
 }

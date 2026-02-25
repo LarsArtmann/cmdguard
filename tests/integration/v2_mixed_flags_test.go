@@ -13,40 +13,40 @@ import (
 
 // RootConfig is the application-level configuration for tests.
 type RootConfig struct {
-	Debug   bool   `flag:"debug" short:"d" default:"false" help:"Enable debug mode"`
-	Verbose bool   `flag:"verbose" short:"v" help:"Verbose output"`
-	Level   string `flag:"level" help:"Log level"`
+	Debug   bool   `default:"false" flag:"debug"   help:"Enable debug mode" short:"d"`
+	Verbose bool   `                flag:"verbose" help:"Verbose output"    short:"v"`
+	Level   string `                flag:"level"   help:"Log level"`
 }
 
 // GreetFlags are flags for the greet command.
 type GreetFlags struct {
-	Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-	Shout bool   `flag:"shout" short:"s" default:"false" help:"Shout the greeting"`
+	Name  string `default:"World" flag:"name"  help:"Name to greet"      short:"n"`
+	Shout bool   `default:"false" flag:"shout" help:"Shout the greeting" short:"s"`
 }
 
 // MathFlags are flags for the math command (different type than GreetFlags).
 type MathFlags struct {
-	X int `flag:"x" default:"0" help:"First operand"`
-	Y int `flag:"y" default:"0" help:"Second operand"`
+	X int `default:"0" flag:"x" help:"First operand"`
+	Y int `default:"0" flag:"y" help:"Second operand"`
 }
 
 // ConfigFlags are flags for the config command (yet another type).
 type ConfigFlags struct {
-	File string `flag:"file" short:"f" default:"" help:"Config file path"`
-	JSON bool   `flag:"json" default:"false" help:"Output as JSON"`
+	File string `default:""      flag:"file" help:"Config file path" short:"f"`
+	JSON bool   `default:"false" flag:"json" help:"Output as JSON"`
 }
 
 // DBFlags are flags for database commands.
 type DBFlags struct {
-	Host     string `flag:"host" default:"localhost" help:"Database host"`
-	Port     int    `flag:"port" default:"5432" help:"Database port"`
-	Database string `flag:"database" default:"" help:"Database name"`
+	Host     string `default:"localhost" flag:"host"     help:"Database host"`
+	Port     int    `default:"5432"      flag:"port"     help:"Database port"`
+	Database string `default:""          flag:"database" help:"Database name"`
 }
 
 // MigrateFlags are flags for migration commands.
 type MigrateFlags struct {
-	Steps     int    `flag:"steps" default:"0" help:"Number of migrations"`
-	Direction string `flag:"direction" default:"up" help:"Migration direction"`
+	Steps     int    `default:"0"  flag:"steps"     help:"Number of migrations"`
+	Direction string `default:"up" flag:"direction" help:"Migration direction"`
 }
 
 func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
@@ -73,35 +73,44 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
+
 			return nil
 		},
 	})
 	require.NoError(t, err)
 
 	// Add math command with different flag type
-	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](cli, v2.Command[RootConfig, *MathFlags]{
-		Use:   "math",
-		Short: "Do math",
-		Flags: &MathFlags{X: 0, Y: 0},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
-			mathCalled = true
-			mathFlags = flags
-			return nil
+	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](
+		cli,
+		v2.Command[RootConfig, *MathFlags]{
+			Use:   "math",
+			Short: "Do math",
+			Flags: &MathFlags{X: 0, Y: 0},
+			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
+				mathCalled = true
+				mathFlags = flags
+
+				return nil
+			},
 		},
-	})
+	)
 	require.NoError(t, err)
 
 	// Add config command with yet another flag type
-	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *ConfigFlags](cli, v2.Command[RootConfig, *ConfigFlags]{
-		Use:   "config",
-		Short: "Manage config",
-		Flags: &ConfigFlags{File: "", JSON: false},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *ConfigFlags) error {
-			configCalled = true
-			configFlags = flags
-			return nil
+	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *ConfigFlags](
+		cli,
+		v2.Command[RootConfig, *ConfigFlags]{
+			Use:   "config",
+			Short: "Manage config",
+			Flags: &ConfigFlags{File: "", JSON: false},
+			RunE: func(ctx context.Context, cfg *RootConfig, flags *ConfigFlags) error {
+				configCalled = true
+				configFlags = flags
+
+				return nil
+			},
 		},
-	})
+	)
 	require.NoError(t, err)
 
 	// Test greet command with flags
@@ -151,6 +160,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 				RunE: func(ctx context.Context, cfg *RootConfig, flags *DBFlags) error {
 					statusCalled = true
 					statusFlags = flags
+
 					return nil
 				},
 			},
@@ -168,6 +178,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags
+
 			return nil
 		},
 	}
@@ -204,7 +215,7 @@ func assertCommandExecution[
 ) {
 	t.Helper()
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		err := cli.ExecuteWithArgs(ctx, args)
 		require.NoError(t, err)
 		assert.Equal(t, wantExecuted, lastExecuted)
@@ -231,40 +242,59 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
+
 			return nil
 		},
 	})
 	require.NoError(t, err)
 
 	// Add command B with MathFlags
-	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](cli, v2.Command[RootConfig, *MathFlags]{
-		Use:   "cmd-b",
-		Short: "Command B",
-		Flags: &MathFlags{X: 0, Y: 0},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
-			lastExecuted = "B"
-			lastFlags = flags
-			return nil
+	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](
+		cli,
+		v2.Command[RootConfig, *MathFlags]{
+			Use:   "cmd-b",
+			Short: "Command B",
+			Flags: &MathFlags{X: 0, Y: 0},
+			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
+				lastExecuted = "B"
+				lastFlags = flags
+
+				return nil
+			},
 		},
-	})
+	)
 	require.NoError(t, err)
 
 	// Execute A multiple times
-	assertCommandExecution(t, ctx, cli, []string{"cmd-a", "--name=test"}, "A", func(t *testing.T, flags any) {
-		gf, ok := flags.(*GreetFlags)
-		assert.True(t, ok)
-		assert.Equal(t, "test", gf.Name)
-	})
+	assertCommandExecution(
+		t,
+		ctx,
+		cli,
+		[]string{"cmd-a", "--name=test"},
+		"A",
+		func(t *testing.T, flags any) {
+			gf, ok := flags.(*GreetFlags)
+			assert.True(t, ok)
+			assert.Equal(t, "test", gf.Name)
+		},
+	)
 
 	// Execute B multiple times
-	assertCommandExecution(t, ctx, cli, []string{"cmd-b", "--x=42"}, "B", func(t *testing.T, flags any) {
-		mf, ok := flags.(*MathFlags)
-		assert.True(t, ok)
-		assert.Equal(t, 42, mf.X)
-	})
+	assertCommandExecution(
+		t,
+		ctx,
+		cli,
+		[]string{"cmd-b", "--x=42"},
+		"B",
+		func(t *testing.T, flags any) {
+			mf, ok := flags.(*MathFlags)
+			assert.True(t, ok)
+			assert.Equal(t, 42, mf.X)
+		},
+	)
 
 	// Interleave executions
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		err = cli.ExecuteWithArgs(ctx, []string{"cmd-a", "--shout"})
 		require.NoError(t, err)
 		assert.Equal(t, "A", lastExecuted)
@@ -284,26 +314,34 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 	var executed bool
 
 	// Add command with NoFlags
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, v2.NoFlags](cli, v2.Command[RootConfig, v2.NoFlags]{
-		Use:   "simple",
-		Short: "Simple command",
-		RunE: func(ctx context.Context, cfg *RootConfig, flags v2.NoFlags) error {
-			executed = true
-			return nil
+	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, v2.NoFlags](
+		cli,
+		v2.Command[RootConfig, v2.NoFlags]{
+			Use:   "simple",
+			Short: "Simple command",
+			RunE: func(ctx context.Context, cfg *RootConfig, flags v2.NoFlags) error {
+				executed = true
+
+				return nil
+			},
 		},
-	})
+	)
 	require.NoError(t, err)
 
 	// Add command with actual flags
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet command",
-		Flags: &GreetFlags{Name: "World", Shout: false},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
-			executed = true
-			return nil
+	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
+		cli,
+		v2.Command[RootConfig, *GreetFlags]{
+			Use:   "greet",
+			Short: "Greet command",
+			Flags: &GreetFlags{Name: "World", Shout: false},
+			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+				executed = true
+
+				return nil
+			},
 		},
-	})
+	)
 	require.NoError(t, err)
 
 	// Test simple command (NoFlags)
@@ -333,24 +371,30 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 	)
 
 	// Add command with lifecycle hooks
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet with lifecycle",
-		Flags: &GreetFlags{Name: "World", Shout: false},
-		PreRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
-			preRunCalled = true
-			return nil
+	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
+		cli,
+		v2.Command[RootConfig, *GreetFlags]{
+			Use:   "greet",
+			Short: "Greet with lifecycle",
+			Flags: &GreetFlags{Name: "World", Shout: false},
+			PreRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+				preRunCalled = true
+
+				return nil
+			},
+			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+				runCalled = true
+				receivedFlags = flags
+
+				return nil
+			},
+			PostRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+				postRunCalled = true
+
+				return nil
+			},
 		},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
-			runCalled = true
-			receivedFlags = flags
-			return nil
-		},
-		PostRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
-			postRunCalled = true
-			return nil
-		},
-	})
+	)
 	require.NoError(t, err)
 
 	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=TestUser", "--shout"})
@@ -368,19 +412,25 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	require.NoError(t, err)
 
 	// Command without Use should fail
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "",
-		Short: "Invalid command",
-		RunE:  func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error { return nil },
-	})
+	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
+		cli,
+		v2.Command[RootConfig, *GreetFlags]{
+			Use:   "",
+			Short: "Invalid command",
+			RunE:  func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error { return nil },
+		},
+	)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "no Use field")
 
 	// Command without RunE and no subcommands should fail
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "invalid",
-		Short: "No handler",
-	})
+	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
+		cli,
+		v2.Command[RootConfig, *GreetFlags]{
+			Use:   "invalid",
+			Short: "No handler",
+		},
+	)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "no RunE")
 }
@@ -399,15 +449,19 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 
 	var receivedConfig *RootConfig
 
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "check",
-		Short: "Check config access",
-		Flags: &GreetFlags{},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
-			receivedConfig = cfg
-			return nil
+	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
+		cli,
+		v2.Command[RootConfig, *GreetFlags]{
+			Use:   "check",
+			Short: "Check config access",
+			Flags: &GreetFlags{},
+			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+				receivedConfig = cfg
+
+				return nil
+			},
 		},
-	})
+	)
 	require.NoError(t, err)
 
 	err = cli.ExecuteWithArgs(ctx, []string{"check"})
@@ -433,6 +487,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 		Short: "Run up migrations",
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
 			executedFlags = flags
+
 			return nil
 		},
 	}

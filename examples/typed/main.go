@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -17,18 +18,18 @@ import (
 // This is shared across all commands and can be populated
 // from flags, config files, or environment variables.
 type AppConfig struct {
-	Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
-	Output  string `flag:"output" short:"o" default:"text" help:"Output format (text, json)"`
-	APIURL  string `flag:"api-url" default:"https://api.example.com" help:"API server URL"`
+	Verbose bool   `default:"false"                   flag:"verbose" help:"Enable verbose output"      short:"v"`
+	Output  string `default:"text"                    flag:"output"  help:"Output format (text, json)" short:"o"`
+	APIURL  string `default:"https://api.example.com" flag:"api-url" help:"API server URL"`
 }
 
 // GreetFlags defines flags for the greet command.
 type GreetFlags struct {
-	Name   string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-	Shout  bool   `flag:"shout" short:"s" default:"false" help:"Print greeting in uppercase"`
-	Count  int    `flag:"count" short:"c" default:"1" help:"Number of times to greet"`
-	Prefix string `flag:"prefix" default:"Hello" help:"Greeting prefix"`
-	Suffix string `flag:"suffix" default:"!" help:"Greeting suffix"`
+	Name   string `default:"World" flag:"name"   help:"Name to greet"               short:"n"`
+	Shout  bool   `default:"false" flag:"shout"  help:"Print greeting in uppercase" short:"s"`
+	Count  int    `default:"1"     flag:"count"  help:"Number of times to greet"    short:"c"`
+	Prefix string `default:"Hello" flag:"prefix" help:"Greeting prefix"`
+	Suffix string `default:"!"     flag:"suffix" help:"Greeting suffix"`
 }
 
 // Logger is a service registered via DI.
@@ -47,6 +48,7 @@ func (l *Logger) HealthCheck(ctx context.Context) error {
 	if l.verbose {
 		fmt.Println("[LOG] Health check passed")
 	}
+
 	return nil
 }
 
@@ -102,6 +104,7 @@ func main() {
 	// Graceful shutdown
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	if err := cli.Shutdown(shutdownCtx); err != nil {
 		fmt.Fprintf(os.Stderr, "Shutdown error: %v\n", err)
 	}
@@ -109,23 +112,26 @@ func main() {
 
 func registerServices(scope *v2.Scope) {
 	// Register config first so providers can depend on it
-	if err := v2.ProvideValue(scope, AppConfig{Verbose: true}); err != nil {
+	err := v2.ProvideValue(scope, AppConfig{Verbose: true})
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to register config: %v\n", err)
 	}
 
 	// Register a logger service - gets config via DI, not closure capture
-	if err := v2.Provide(scope, func(i do.Injector) (*Logger, error) {
+	err = v2.Provide(scope, func(i do.Injector) (*Logger, error) {
 		cfg, err := v2.Invoke[*AppConfig](scope)
 		if err != nil {
 			return nil, v2.NewServiceError("*AppConfig", err)
 		}
 		return &Logger{verbose: cfg.Verbose}, nil
-	}); err != nil {
+	})
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to register logger: %v\n", err)
 	}
 
 	// Register a database service (simulated)
-	if err := v2.ProvideValue(scope, &Database{connectionString: "postgres://localhost:5432/mydb"}); err != nil {
+	err = v2.ProvideValue(scope, &Database{connectionString: "postgres://localhost:5432/mydb"})
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to register database: %v\n", err)
 	}
 }
@@ -142,9 +148,11 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			if cfg.Verbose {
 				fmt.Println("Preparing to greet...")
 			}
+
 			if flags.Count < 1 {
-				return fmt.Errorf("count must be at least 1")
+				return errors.New("count must be at least 1")
 			}
+
 			return nil
 		},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
@@ -153,24 +161,28 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 				return v2.NewServiceError("*Logger", err)
 			}
 
-			for i := 0; i < flags.Count; i++ {
+			for i := range flags.Count {
 				msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 				if flags.Shout {
 					msg = stringsToUpper(msg)
 				}
+
 				fmt.Println(msg)
 				logger.Log(fmt.Sprintf("Greeted %s (iteration %d)", flags.Name, i+1))
 			}
+
 			return nil
 		},
 		PostRunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			if cfg.Verbose {
 				fmt.Println("Greeting complete!")
 			}
+
 			return nil
 		},
 	}
-	if err := v2.AddAnyCommand(cli, greetCmd); err != nil {
+	err := v2.AddAnyCommand(cli, greetCmd)
+	if err != nil {
 		return fmt.Errorf("failed to add greet command: %w", err)
 	}
 
@@ -181,10 +193,12 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("myapp version 1.0.0")
 			fmt.Println("Built with cmdguard v2")
+
 			return nil
 		},
 	}
-	if err := cli.AddCommand(versionCmd); err != nil {
+	err = cli.AddCommand(versionCmd)
+	if err != nil {
 		return fmt.Errorf("failed to add version command: %w", err)
 	}
 
@@ -197,10 +211,12 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			fmt.Printf("  Verbose: %v\n", cfg.Verbose)
 			fmt.Printf("  Output:  %s\n", cfg.Output)
 			fmt.Printf("  API URL: %s\n", cfg.APIURL)
+
 			return nil
 		},
 	}
-	if err := cli.AddCommand(configCmd); err != nil {
+	err = cli.AddCommand(configCmd)
+	if err != nil {
 		return fmt.Errorf("failed to add config command: %w", err)
 	}
 
@@ -217,8 +233,10 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 					if err != nil {
 						return v2.NewServiceError("*Database", err)
 					}
+
 					fmt.Printf("Database: %s\n", db.connectionString)
 					fmt.Println("Status: Connected (simulated)")
+
 					return nil
 				},
 			},
@@ -228,12 +246,14 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 					fmt.Println("Running migrations...")
 					fmt.Println("Migration complete!")
+
 					return nil
 				},
 			},
 		},
 	}
-	if err := cli.AddCommand(dbCmd); err != nil {
+	err = cli.AddCommand(dbCmd)
+	if err != nil {
 		return fmt.Errorf("failed to add db command: %w", err)
 	}
 
@@ -247,7 +267,8 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 	}
-	if err := cli.AddCommand(hiddenCmd); err != nil {
+	err = cli.AddCommand(hiddenCmd)
+	if err != nil {
 		return fmt.Errorf("failed to add hidden command: %w", err)
 	}
 
@@ -261,7 +282,8 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 	}
-	if err := cli.AddCommand(deprecatedCmd); err != nil {
+	err = cli.AddCommand(deprecatedCmd)
+	if err != nil {
 		return fmt.Errorf("failed to add deprecated command: %w", err)
 	}
 
@@ -277,5 +299,6 @@ func stringsToUpper(s string) string {
 			result[i] = c
 		}
 	}
+
 	return string(result)
 }
