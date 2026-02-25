@@ -60,6 +60,7 @@ type Database struct {
 // Shutdown implements do.Shutdowner for lifecycle demonstration.
 func (d *Database) Shutdown() error {
 	fmt.Printf("[DB] Closing connection to %s\n", d.connectionString)
+
 	return nil
 }
 
@@ -123,6 +124,7 @@ func registerServices(scope *v2.Scope) {
 		if err != nil {
 			return nil, v2.NewServiceError("*AppConfig", err)
 		}
+
 		return &Logger{verbose: cfg.Verbose}, nil
 	})
 	if err != nil {
@@ -181,6 +183,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 	}
+
 	err := v2.AddAnyCommand(cli, greetCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add greet command: %w", err)
@@ -197,6 +200,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 	}
+
 	err = cli.AddCommand(versionCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add version command: %w", err)
@@ -215,6 +219,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 	}
+
 	err = cli.AddCommand(configCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add config command: %w", err)
@@ -252,6 +257,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			},
 		},
 	}
+
 	err = cli.AddCommand(dbCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add db command: %w", err)
@@ -264,9 +270,11 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		Hidden: true,
 		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("You found the secret command!")
+
 			return nil
 		},
 	}
+
 	err = cli.AddCommand(hiddenCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add hidden command: %w", err)
@@ -279,9 +287,11 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		Deprecated: "Use 'greet' instead",
 		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("This command is deprecated. Use 'greet' instead.")
+
 			return nil
 		},
 	}
+
 	err = cli.AddCommand(deprecatedCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add deprecated command: %w", err)

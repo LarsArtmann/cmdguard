@@ -32,7 +32,6 @@ func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 	var tags []FlagTag
 
 	for field := range t.Fields() {
-		field := field
 
 		tag := parseFieldFlag(field)
 		if tag != nil {

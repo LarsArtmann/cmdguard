@@ -41,6 +41,7 @@ func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error
 	}
 
 	g := createGuardedCommand[T, F](name, short, defaults)
+
 	err = g.initialize(defaults)
 	if err != nil {
 		return nil, err
@@ -91,6 +92,7 @@ func (g *GuardedCommand[T, F]) initialize(defaults T) error {
 // registerConfig registers the config in the DI scope.
 func (g *GuardedCommand[T, F]) registerConfig(defaults T) error {
 	cfg := defaults
+
 	err := ProvideValue(g.scope, &cfg)
 	if err != nil {
 		return fmt.Errorf("failed to register config: %w", err)

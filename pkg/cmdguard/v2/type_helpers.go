@@ -6,8 +6,9 @@ import "fmt"
 // Useful for optional config fields.
 //
 //go:fix inline
+//go:fix inline
 func Ptr[T any](v T) *T {
-	return &v
+	return new(v)
 }
 
 // ValueOrDefault returns the value if not nil, otherwise the default.
