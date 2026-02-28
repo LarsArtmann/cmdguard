@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -12,7 +11,7 @@ import (
 // The struct must have `flag` tags on its fields.
 func ParseFlagTags(cfg any) ([]FlagTag, error) {
 	if cfg == nil {
-		return nil, errors.New("config must not be nil")
+		return nil, ErrConfigNil
 	}
 
 	v := reflect.ValueOf(cfg)
@@ -21,7 +20,7 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 	}
 
 	if v.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("config must be a struct, got %T", cfg)
+		return nil, fmt.Errorf("%w: expected struct, got %T", ErrInvalidFlagType, cfg)
 	}
 
 	return parseStructTags(v.Type())

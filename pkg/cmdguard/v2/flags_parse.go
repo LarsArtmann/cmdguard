@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"errors"
 	"reflect"
 	"strconv"
 	"strings"
@@ -48,7 +47,7 @@ func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag,
 	}
 
 	if flag == nil {
-		return nil, NewFlagError(tag.Name, errors.New("flag not found"))
+		return nil, NewFlagError(tag.Name, ErrFlagNotFound)
 	}
 
 	return flag, nil

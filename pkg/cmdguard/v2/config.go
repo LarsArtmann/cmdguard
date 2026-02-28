@@ -32,7 +32,7 @@ type FlagTag struct {
 // Returns all validation errors found.
 func ValidateConfig(cfg any) error {
 	if cfg == nil {
-		return errors.New("config must not be nil")
+		return ErrConfigNil
 	}
 
 	v := reflect.ValueOf(cfg)
@@ -41,7 +41,7 @@ func ValidateConfig(cfg any) error {
 	}
 
 	if v.Kind() != reflect.Struct {
-		return fmt.Errorf("config must be a struct, got %T", cfg)
+		return fmt.Errorf("%w: expected struct, got %T", ErrInvalidFlagType, cfg)
 	}
 
 	return validateStruct(v, cfg)

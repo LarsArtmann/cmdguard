@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -48,7 +47,7 @@ func SetField(cfg any, fieldName string, value any) error {
 func getField(cfg any, fieldName string) (reflect.Value, error) {
 	v := reflect.ValueOf(cfg)
 	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
-		return reflect.Value{}, errors.New("config must be a pointer to struct")
+		return reflect.Value{}, ErrConfigNotPointer
 	}
 
 	v = v.Elem()

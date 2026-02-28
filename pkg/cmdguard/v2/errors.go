@@ -47,6 +47,18 @@ var (
 
 	// ErrInvalidFlagType indicates the flag type F is not a struct or pointer to struct.
 	ErrInvalidFlagType = errors.New("invalid flag type")
+
+	// ErrConfigNil indicates a nil config was passed where a config struct is required.
+	ErrConfigNil = errors.New("config must not be nil")
+
+	// ErrFlagNotFound indicates a flag was not found in the command.
+	ErrFlagNotFound = errors.New("flag not found")
+
+	// ErrRequiredFlag indicates a required flag was not set.
+	ErrRequiredFlag = errors.New("required flag not set")
+
+	// ErrConfigNotPointer indicates config is not a pointer to struct.
+	ErrConfigNotPointer = errors.New("config must be a pointer to struct")
 )
 
 // CommandError wraps an error with command context.
