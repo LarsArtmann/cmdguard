@@ -1,9 +1,9 @@
 # AGENTS.md - cmdguard Project Guide
 
-**Last Updated:** 2026-02-14  
-**Project:** cmdguard - CLI Guard Library  
-**Go Version:** 1.26.0  
-**Status:** Phase 2 Complete - Testing at 100% for all packages
+**Last Updated:** 2026-02-28
+**Project:** cmdguard - CLI Guard Library
+**Go Version:** 1.26.0
+**Status:** v2.0.0 COMPLETE - Production Ready
 
 ---
 
@@ -16,21 +16,23 @@ go test -v -cover ./...        # Verbose with coverage
 go test -race ./...            # Race detection
 
 # Build examples
-cd examples/basic && go build -o myapp .
+cd examples/typed && go build -o myapp .
 ```
 
 ---
 
 ## Project Overview
 
-**cmdguard** is a Go library for building validated Cobra CLI applications with fail-fast validation. It provides:
+**cmdguard** is a Go library for building validated Cobra CLI applications with type-safe dependency injection.
 
-- **Compile-time validation** - Panics at construction if commands are invalid
-- **Single-step initialization** - No multi-step init, validate, execute flow
-- **Guard philosophy** - Fail fast at startup, not at runtime
-- **Minimal dependencies** - Only cobra, fang, and testify
+**Two APIs Available:**
 
-**Current Status:** Phase 2 Complete. All packages tested with 100% coverage.
+| API | Package | Use Case |
+|-----|---------|----------|
+| **v2** (Recommended) | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
+| v1 (Legacy) | `pkg/cmdguard` | Simple, panic-at-construction |
+
+**Current Status:** v2.0.0 Complete. All packages tested with 90%+ coverage.
 
 ---
 
@@ -38,120 +40,313 @@ cd examples/basic && go build -o myapp .
 
 ```
 cmdguard/
-├── pkg/cmdguard/           # Public API - GuardedCommand
-│   └── guarded_command.go  # Guard API implementation
+├── pkg/cmdguard/
+│   ├── v2/                      # v2 API (recommended)
+│   │   ├── errors.go            # Typed errors
+│   │   ├── types.go             # Common types (Enum, Duration, LogLevel)
+│   │   ├── config.go            # Configuration merging/validation
+│   │   ├── flags.go             # FlagRegistry with struct tags
+│   │   ├── flags_parse.go       # Flag parsing
+│   │   ├── flags_suggest.go     # Typo suggestions
+│   │   ├── scope.go             # DI scope with samber/do/v2
+│   │   ├── command.go           # Command[T] definition
+│   │   ├── guard.go             # GuardedCommand[T]
+│   │   ├── guard_command.go     # Command conversion
+│   │   ├── guard_exec.go        # Execution logic
+│   │   └── guard_flags.go       # Flag setup
+│   └── guarded_command.go       # v1 API
 ├── internal/
-│   ├── config/             # Configuration (environment variables)
-│   └── logging/            # Structured logging (slog)
-├── examples/               # Example applications
-│   └── basic/              # Basic CLI example
+│   ├── config/                  # Configuration (95.7% coverage)
+│   └── logging/                 # Structured logging (100% coverage)
+├── examples/
+│   ├── basic/                   # v1 API demo
+│   └── typed/                   # v2 API demo with DI
 ├── docs/
+│   ├── architecture.d2          # D2 diagram source
 │   └── CLI_DESIGN_PRINCIPLES.md
-├── FEATURES.md             # Feature status
-├── TODO_LIST.md            # Remaining tasks
-├── justfile                # Build commands
-├── go.mod
-└── README.md
+├── AGENTS.md                    # This file
+├── FEATURES.md                  # Feature status
+├── TODO_LIST.md                 # Remaining tasks
+├── .golangci.yml                # Lint configuration
+└── README.md                    # User documentation
 ```
 
 ### Package Guidelines
 
 | Package            | Purpose           | Importable? | Coverage |
 | ------------------ | ----------------- | ----------- | -------- |
-| `pkg/cmdguard`     | Public Guard API  | Yes         | 66.7%    |
-| `internal/config`  | Configuration     | No          | 94.1%    |
+| `pkg/cmdguard/v2`  | v2 Type-safe API  | Yes         | 90.6%    |
+| `pkg/cmdguard`     | v1 Guard API      | Yes         | 94.3%    |
+| `internal/config`  | Configuration     | No          | 95.7%    |
 | `internal/logging` | Logging utilities | No          | 100%     |
 
 ---
 
 ## Key Dependencies
 
-| Library                         | Purpose       | Version |
-| ------------------------------- | ------------- | ------- |
-| `github.com/spf13/cobra`        | CLI framework | v1.10.2 |
-| `github.com/charmbracelet/fang` | Cobra styling | v0.4.4  |
-| `github.com/stretchr/testify`   | Testing       | v1.11.1 |
+| Library                         | Purpose            | Version |
+| ------------------------------- | ------------------ | ------- |
+| `github.com/spf13/cobra`        | CLI framework      | v1.10.2 |
+| `github.com/samber/do/v2`       | Dependency injection | v2.0.0  |
+| `github.com/charmbracelet/fang` | Cobra styling      | v0.4.4  |
+| `github.com/onsi/ginkgo/v2`     | BDD testing        | v2.28.1 |
+| `github.com/onsi/gomega`        | Test matchers      | v1.39.1 |
 
 ---
 
-## Coding Standards
+## v2 API (Recommended)
 
-### Go Conventions
-
-- **Go 1.26.0** - Use modern Go features
-- **gofumpt** formatting preferred
-- **Error handling** - Always check errors, wrap with context
-- **Interface naming** - `-er` suffix (e.g., `Validator`)
-- **Constructor naming** - `New` + type name (e.g., `NewLogger`)
-
-### Validation Patterns
+### Basic Usage
 
 ```go
-// Valid: Has RunE handler
-cmd := &cobra.Command{
-    Use: "test",
-    RunE: func(cmd *cobra.Command, args []string) error {
+package main
+
+import (
+    "context"
+    "fmt"
+
+    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+)
+
+// Define your config - single source of truth
+type AppConfig struct {
+    LogLevel  v2.LogLevel `flag:"log-level" short:"l" default:"info" help:"Log level"`
+    LogFormat string      `flag:"log-format" default:"text" help:"Log format"`
+}
+
+func main() {
+    ctx := context.Background()
+
+    // Create CLI with typed config
+    root, err := v2.New[AppConfig, v2.NoFlags]("myapp", "My application", AppConfig{})
+    if err != nil {
+        panic(err)
+    }
+
+    // Add command
+    err = root.AddCommand(v2.Command[AppConfig, v2.NoFlags]{
+        Use:   "hello",
+        Short: "Say hello",
+        RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+            fmt.Printf("Hello! Log level: %s\n", cfg.LogLevel)
+            return nil
+        },
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    // Execute
+    if err := root.Execute(ctx); err != nil {
+        fmt.Println("Error:", err)
+    }
+}
+```
+
+### Dependency Injection with samber/do/v2
+
+```go
+package main
+
+import (
+    "context"
+    "database/sql"
+    "fmt"
+
+    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+    "github.com/samber/do/v2"
+)
+
+type DatabaseService struct {
+    db *sql.DB
+}
+
+// Compile-time interface verification
+var _ do.Shutdowner = (*DatabaseService)(nil)
+var _ do.HealthcheckerWithContext = (*DatabaseService)(nil)
+
+func NewDatabaseService(i do.Injector) (*DatabaseService, error) {
+    // Use MustInvoke for required dependencies
+    cfg := do.MustInvoke[*AppConfig](i)
+
+    db, err := sql.Open("postgres", cfg.DatabaseURL)
+    if err != nil {
+        return nil, err
+    }
+
+    return &DatabaseService{db: db}, nil
+}
+
+func (d *DatabaseService) Shutdown(ctx context.Context) error {
+    return d.db.Close()
+}
+
+func (d *DatabaseService) HealthCheck(ctx context.Context) error {
+    return d.db.PingContext(ctx)
+}
+
+func main() {
+    root, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My app", AppConfig{})
+
+    // Register services in DI scope
+    v2.Provide(root.ScopeStruct(), NewDatabaseService)
+
+    // Add command that uses DI
+    root.AddCommand(v2.Command[AppConfig, v2.NoFlags]{
+        Use:   "check",
+        Short: "Health check",
+        RunE: func(ctx context.Context, cfg *AppConfig, _ v2.NoFlags) error {
+            // Get service from DI
+            db, err := v2.Invoke[*DatabaseService](root.ScopeStruct())
+            if err != nil {
+                return err
+            }
+
+            // Use service
+            return db.db.PingContext(ctx)
+        },
+    })
+
+    // Health check before starting
+    if err := root.HealthCheckWithContext(context.Background()); err != nil {
+        panic(err)
+    }
+
+    // Execute
+    root.ExecuteAndExit(context.Background())
+
+    // Shutdown on exit
+    ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+    defer cancel()
+    root.Shutdown(ctx)
+}
+```
+
+### DI Helper Functions
+
+```go
+// Provide - Register a service provider
+v2.Provide(scope, NewDatabaseService)
+
+// ProvideNamed - Register named service (multiple implementations)
+v2.ProvideNamed[Cache](scope, "redis", NewRedisCache)
+v2.ProvideNamed[Cache](scope, "memory", NewMemoryCache)
+
+// ProvideValue - Register existing value
+v2.ProvideValue(scope, &MyService{})
+
+// Invoke - Get service (returns error)
+svc, err := v2.Invoke[*DatabaseService](scope)
+
+// MustInvoke - Get service (panics on error, for constructors)
+svc := v2.MustInvoke[*DatabaseService](scope)
+
+// InvokeNamed - Get named service
+redis, err := v2.InvokeNamed[Cache](scope, "redis")
+
+// MustInvokeNamed - Get named service (panics on error)
+redis := v2.MustInvokeNamed[Cache](scope, "redis")
+
+// HealthCheck - Run health checks
+err := scope.HealthCheck()
+
+// HealthCheckWithContext - Run health checks with context
+err := scope.HealthCheckWithContext(ctx)
+
+// Shutdown - Graceful shutdown
+err := scope.Shutdown(ctx)
+
+// Child - Create child scope
+child := scope.Child("plugin-scope")
+```
+
+### Command with Custom Flags
+
+```go
+type GreetFlags struct {
+    Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+    Shout bool   `flag:"shout" default:"false" help:"Shout the greeting"`
+}
+
+root.AddCommand(v2.Command[AppConfig, GreetFlags]{
+    Use:   "greet",
+    Short: "Greet someone",
+    Flags: GreetFlags{}, // Provide defaults
+    RunE: func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
+        msg := fmt.Sprintf("Hello, %s!", flags.Name)
+        if flags.Shout {
+            msg = strings.ToUpper(msg)
+        }
+        fmt.Println(msg)
         return nil
+    },
+})
+```
+
+### Subcommands
+
+```go
+parent := v2.Command[AppConfig, v2.NoFlags]{
+    Use:   "user",
+    Short: "User management",
+    Commands: []v2.Command[AppConfig, v2.NoFlags]{
+        {
+            Use:   "list",
+            Short: "List users",
+            RunE:  listUsersHandler,
+        },
+        {
+            Use:   "create",
+            Short: "Create user",
+            RunE:  createUserHandler,
+        },
     },
 }
 
-// Valid: Has subcommands (intermediate command)
-parent := &cobra.Command{Use: "parent"}
-parent.AddCommand(child)
-
-// Invalid: No handler, no subcommands - WILL PANIC
-cmd := &cobra.Command{Use: "invalid"}
+root.AddCommand(parent)
 ```
 
----
-
-## Testing
-
-### Test Commands
-
-```bash
-# Run all tests with coverage
-go test -cover ./...
-
-# Verbose output
-go test -v ./...
-
-# Race detection
-go test -race ./...
-```
-
-### Test Pattern
-
-Use `testify/assert` with table-driven tests:
+### Error Handling
 
 ```go
-func TestSomething(t *testing.T) {
-    tests := []struct {
-        name    string
-        input   string
-        want    string
-        wantErr bool
-    }{
-        {name: "valid", input: "test", want: "result"},
-        {name: "invalid", input: "", wantErr: true},
-    }
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            got, err := DoSomething(tt.input)
-            if tt.wantErr {
-                require.Error(t, err)
-                return
-            }
-            require.NoError(t, err)
-            assert.Equal(t, tt.want, got)
-        })
-    }
+// All v2 functions return errors
+root, err := v2.New[Config, NoFlags]("app", "My app", Config{})
+if err != nil {
+    // Handle initialization error
 }
+
+// Check specific errors with errors.Is
+if errors.Is(err, v2.ErrInvalidCommand) {
+    // Handle invalid command
+}
+
+if errors.Is(err, v2.ErrDuplicateCommand) {
+    // Handle duplicate command name
+}
+
+// Available sentinel errors:
+// - ErrInvalidCommand
+// - ErrMissingHandler
+// - ErrMissingName
+// - ErrDuplicateCommand
+// - ErrFlagParseFailed
+// - ErrConfigValidation
+// - ErrInvalidScope
+// - ErrServiceNotFound
+// - ErrServiceConstruction
+// - ErrServiceRegistration
+// - ErrInvalidEnum
+// - ErrInvalidDuration
+// - ErrInvalidFlagType
+// - ErrConfigNil
+// - ErrConfigNotPointer
+// - ErrFlagNotFound
+// - ErrRequiredFlag
 ```
 
 ---
 
-## Guard API Reference
+## v1 API (Legacy)
 
 ### Basic Usage
 
@@ -179,26 +374,68 @@ func main() {
 }
 ```
 
-### GuardedCommand Methods
-
-| Method                         | Description                        |
-| ------------------------------ | ---------------------------------- |
-| `New(name, short)`             | Create new guarded command         |
-| `AddCommand(cmd)`              | Add subcommand (panics if invalid) |
-| `AddSubcommand(parent, child)` | Add nested subcommand              |
-| `Execute(ctx)`                 | Run with context                   |
-| `ExecuteAndExit(ctx)`          | Run and exit with code             |
-| `Command()`                    | Access underlying cobra command    |
-| `Config()`                     | Get configuration                  |
-| `IsStrictMode()`               | Check strict mode                  |
-
 ### Panic Conditions (Intentional)
 
-The Guard API panics at construction time if:
+The v1 Guard API panics at construction time if:
 
 1. Command has no `Run`/`RunE` and no subcommands
 2. Strict mode requires `RunE` but only `Run` provided
 3. Command has no name
+
+---
+
+## Coding Standards
+
+### Go Conventions
+
+- **Go 1.26.0** - Use modern Go features
+- **gofumpt** formatting preferred
+- **Error handling** - Always check errors, wrap with context
+- **Interface naming** - `-er` suffix (e.g., `Validator`)
+- **Constructor naming** - `New` + type name (e.g., `NewLogger`)
+- **File size** - Max 250 lines (split if larger)
+- **Function size** - Max 30 lines (extract if larger)
+
+### Testing
+
+Use Ginkgo/Gomega for BDD-style tests:
+
+```go
+package v2_test
+
+import (
+    . "github.com/onsi/ginkgo/v2"
+    . "github.com/onsi/gomega"
+    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+)
+
+var _ = Describe("Command", func() {
+    Describe("Validate", func() {
+        It("returns error for empty Use field", func() {
+            cmd := v2.Command[struct{}, struct{}]{}
+            err := cmd.Validate()
+            Expect(err).To(HaveOccurred())
+            Expect(errors.Is(err, v2.ErrInvalidCommand)).To(BeTrue())
+        })
+    })
+})
+```
+
+### Test Commands
+
+```bash
+# Run all tests with coverage
+go test -cover ./...
+
+# Verbose output
+go test -v ./...
+
+# Race detection
+go test -race ./...
+
+# Specific package
+go test -v ./pkg/cmdguard/v2/...
+```
 
 ---
 
@@ -213,33 +450,37 @@ Environment variables (prefix `CMDGUARD_`):
 
 ## Architecture Decisions
 
-### Guard API over Framework
+### v2 Design Principles
 
-**Before:** Multi-step initialization with separate Validate step  
-**Now:** Single-step, panic at construction time
+1. **Type Safety** - Generic type parameters for config and flags
+2. **No Panics** - All operations return errors
+3. **DI-Powered** - samber/do/v2 for dependency injection
+4. **Typed Flags** - Struct tags for flag definitions
+5. **Composable** - Commands are values, easy to test
 
-Rationale: Fail-fast philosophy. Go lacks compile-time macros; panic at init is closest to catching errors early.
+### Why samber/do/v2?
 
-### Minimal Dependencies
+- Clean API with no global state
+- Scope support for nested DI containers
+- Lifecycle hooks (Shutdowner, Healthchecker)
+- Compile-time dependency checking
+- Context-aware operations
 
-Removed:
+### Error Handling Strategy
 
-- `samber/do/v2` - No DI container needed
-- `knadh/koanf/v2` - Direct env var reading is simpler
-
-Kept:
-
-- `cobra` - CLI framework
-- `fang` - Beautiful help output
-- `testify` - Testing assertions
+- Sentinel errors for `errors.Is()` checking
+- Wrapped errors with context
+- No panics in library code
+- Rich error types (CommandError, FlagError, ServiceError)
 
 ---
 
 ## Links
 
 - [Cobra Documentation](https://github.com/spf13/cobra)
+- [samber/do/v2 Documentation](https://github.com/samber/do)
 - [fang Documentation](https://github.com/charmbracelet/fang)
-- [testify Documentation](https://github.com/stretchr/testify)
+- [Ginkgo Documentation](https://onsi.github.io/ginkgo/)
 - [CLI Design Principles](./docs/CLI_DESIGN_PRINCIPLES.md)
 - [Feature Status](./FEATURES.md)
 - [TODO List](./TODO_LIST.md)
