@@ -79,6 +79,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Deploy the application",
 					RunE:  func(cmd *cobra.Command, args []string) error { return nil },
 				}
+
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})
 
@@ -88,6 +89,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Show status",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
+
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})
 
@@ -112,6 +114,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Use:   "incomplete",
 					Short: "I forgot to add Run or RunE",
 				}
+
 				Expect(func() { root.AddCommand(cmd) }).To(Panic())
 			})
 
@@ -129,6 +132,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "I forgot Use field",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
+
 				Expect(func() { root.AddCommand(cmd) }).To(Panic())
 			})
 		})
@@ -151,6 +155,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Run migrations",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
+
 				Expect(func() { root.AddSubcommand(parent, child) }).NotTo(Panic())
 			})
 
@@ -159,6 +164,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Use:   "broken",
 					Short: "Missing handler",
 				}
+
 				Expect(func() { root.AddSubcommand(parent, child) }).To(Panic())
 			})
 		})
@@ -181,6 +187,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Production deployment",
 					RunE:  func(cmd *cobra.Command, args []string) error { return nil },
 				}
+
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})
 
@@ -190,6 +197,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "This could hide errors",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
+
 				Expect(func() { root.AddCommand(cmd) }).To(Panic())
 			})
 
@@ -284,6 +292,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Added after execution",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
+
 				Expect(
 					func() { root.AddCommand(lateCmd) },
 				).To(PanicWith(ContainSubstring("cannot add commands after execution")))
@@ -305,6 +314,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 					Short: "Too late to add",
 					Run:   func(cmd *cobra.Command, args []string) {},
 				}
+
 				Expect(
 					func() { root.AddSubcommand(parent, child) },
 				).To(PanicWith(ContainSubstring("cannot add commands after execution")))

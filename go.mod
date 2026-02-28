@@ -1,6 +1,6 @@
 module github.com/larsartmann/cmdguard
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/charmbracelet/fang v0.4.4

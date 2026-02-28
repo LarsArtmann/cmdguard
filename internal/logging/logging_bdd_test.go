@@ -307,6 +307,7 @@ var _ = Describe("Level precedence - User Expectations", func() {
 							Expect(output).To(ContainSubstring(allowed+" message"),
 								"Level %s should allow %s", level.name, allowed)
 						}
+
 						for _, blocked := range level.blocks {
 							Expect(output).ToNot(ContainSubstring(blocked+" message"),
 								"Level %s should block %s", level.name, blocked)
