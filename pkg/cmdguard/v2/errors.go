@@ -36,6 +36,9 @@ var (
 	// ErrServiceConstruction indicates a service provider failed during construction.
 	ErrServiceConstruction = errors.New("service construction failed")
 
+	// ErrServiceRegistration indicates a service failed to register in the DI container.
+	ErrServiceRegistration = errors.New("service registration failed")
+
 	// ErrInvalidEnum indicates an invalid enum value.
 	ErrInvalidEnum = errors.New("invalid enum value")
 

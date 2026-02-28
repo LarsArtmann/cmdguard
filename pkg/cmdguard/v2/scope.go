@@ -71,6 +71,19 @@ func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 	return nil
 }
 
+// ProvideNamed registers a named service provider in this scope.
+// Use this when you need to register multiple implementations of the same interface.
+// Returns an error if registration fails.
+func ProvideNamed[T any](scope *Scope, name string, provider func(do.Injector) (T, error)) error {
+	if scope == nil {
+		return fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+	}
+
+	do.ProvideNamed(scope.injector, name, provider)
+
+	return nil
+}
+
 // ProvideValue registers a value directly in this scope.
 // Useful for registering already-constructed services.
 func ProvideValue[T any](scope *Scope, value T) error {
@@ -92,6 +105,37 @@ func Invoke[T any](scope *Scope) (T, error) {
 	}
 
 	return do.Invoke[T](scope.injector)
+}
+
+// MustInvoke retrieves a service from the scope, panicking on error.
+// Use this in constructors where errors are not expected.
+func MustInvoke[T any](scope *Scope) T {
+	if scope == nil {
+		panic(fmt.Sprintf("%v: scope is nil", ErrInvalidScope))
+	}
+
+	return do.MustInvoke[T](scope.injector)
+}
+
+// InvokeNamed retrieves a named service from the scope.
+// Returns an error if the service is not found or construction fails.
+func InvokeNamed[T any](scope *Scope, name string) (T, error) {
+	var zero T
+	if scope == nil {
+		return zero, fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+	}
+
+	return do.InvokeNamed[T](scope.injector, name)
+}
+
+// MustInvokeNamed retrieves a named service from the scope, panicking on error.
+// Use this in constructors where errors are not expected.
+func MustInvokeNamed[T any](scope *Scope, name string) T {
+	if scope == nil {
+		panic(fmt.Sprintf("%v: scope is nil", ErrInvalidScope))
+	}
+
+	return do.MustInvokeNamed[T](scope.injector, name)
 }
 
 // Shutdown gracefully shuts down all services in this scope.
@@ -125,7 +169,7 @@ func (s *Scope) ShutdownAll(ctx context.Context) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("shutdown errors: %v", errs)
+		return fmt.Errorf("%w: %v", ErrServiceConstruction, errs)
 	}
 
 	return nil
@@ -138,6 +182,23 @@ func (s *Scope) HealthCheck() error {
 	}
 
 	results := s.injector.HealthCheck()
+	for _, err := range results {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// HealthCheckWithContext runs health checks with context on all services.
+// Services implementing HealthcheckerWithContext will use the provided context.
+func (s *Scope) HealthCheckWithContext(ctx context.Context) error {
+	if s.injector == nil {
+		return nil
+	}
+
+	results := s.injector.HealthCheckWithContext(ctx)
 	for _, err := range results {
 		if err != nil {
 			return err
@@ -170,15 +231,16 @@ func RegisterInScope(parent *Scope, name string, providers ...any) (*Scope, erro
 
 	child := parent.Child(name)
 
-	for i, p := range providers {
-		switch fn := p.(type) {
+	for providerIndex, provider := range providers {
+		switch fn := provider.(type) {
 		case func(do.Injector) (any, error):
 			do.Provide(child.injector, fn)
 		default:
 			return nil, fmt.Errorf(
-				"provider %d: invalid type %T, must be func(do.Injector) (T, error)",
-				i,
-				p,
+				"%w: provider %d has invalid type %T, expected func(do.Injector) (T, error)",
+				ErrServiceRegistration,
+				providerIndex,
+				provider,
 			)
 		}
 	}
