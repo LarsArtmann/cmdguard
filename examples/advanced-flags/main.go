@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // GlobalConfig contains application-wide settings.
