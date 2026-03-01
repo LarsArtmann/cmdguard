@@ -143,3 +143,103 @@ func BenchmarkNewCommand(b *testing.B) {
 		_ = cmd
 	}
 }
+
+// BenchmarkScopeCreation measures DI scope creation.
+func BenchmarkScopeCreation(b *testing.B) {
+	for b.Loop() {
+		scope := v2.NewScope("benchmark")
+		_ = scope
+	}
+}
+
+// BenchmarkParseFlagTags measures flag tag parsing.
+func BenchmarkParseFlagTags(b *testing.B) {
+	type TestConfig struct {
+		Name    string `flag:"name" short:"n" default:"test" help:"Name"`
+		Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Verbose"`
+		Count   int    `flag:"count" short:"c" default:"1" help:"Count"`
+		Timeout string `flag:"timeout" default:"30s" help:"Timeout"`
+	}
+
+	cfg := &TestConfig{}
+
+	for b.Loop() {
+		tags, err := v2.ParseFlagTags(cfg)
+		if err != nil {
+			b.Fatal(err)
+		}
+		_ = tags
+	}
+}
+
+// BenchmarkFlagRegistryCreation measures FlagRegistry creation.
+func BenchmarkFlagRegistryCreation(b *testing.B) {
+	type TestConfig struct {
+		Name    string `flag:"name" default:"test" help:"Name"`
+		Verbose bool   `flag:"verbose" default:"false" help:"Verbose"`
+	}
+
+	cfg := &TestConfig{}
+
+	for b.Loop() {
+		registry, err := v2.NewFlagRegistry(cfg)
+		if err != nil {
+			b.Fatal(err)
+		}
+		_ = registry
+	}
+}
+
+// BenchmarkCommandValidate measures command validation.
+func BenchmarkCommandValidate(b *testing.B) {
+	cmd := v2.Command[BenchConfig, v2.NoFlags]{
+		Use:   "test",
+		Short: "Test command",
+		RunE: func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
+			return nil
+		},
+	}
+
+	for b.Loop() {
+		err := cmd.Validate()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkParseDuration measures duration parsing.
+func BenchmarkParseDuration(b *testing.B) {
+	durations := []string{
+		"30s",
+		"5m",
+		"1h30m",
+		"24h",
+		"100ms",
+	}
+
+	for b.Loop() {
+		for _, d := range durations {
+			duration, err := v2.ParseDuration(d)
+			if err != nil {
+				b.Fatal(err)
+			}
+			_ = duration
+		}
+	}
+}
+
+// BenchmarkParseLogLevel measures log level parsing.
+func BenchmarkParseLogLevel(b *testing.B) {
+	levels := []string{"debug", "info", "warn", "error"}
+
+	for b.Loop() {
+		for _, level := range levels {
+			ll, err := v2.ParseLogLevel(level)
+			if err != nil {
+				b.Fatal(err)
+			}
+			_ = ll
+		}
+	}
+}
