@@ -12,13 +12,13 @@ cmdguard contains several components with extraction potential. This document an
 
 **Key Findings:**
 
-| Component | Extraction Potential | Unique Value | Recommendation |
-|-----------|---------------------|--------------|----------------|
-| Type-Safe Flag System | **High** | Struct tags + generics + Cobra integration | Extract as standalone lib |
-| DI Scope Wrapper | **Medium** | Simplified samber/do/v2 API | Keep internal, document pattern |
-| Error Types | **Low** | CLI-specific sentinel errors | Keep internal |
-| Config Provider | **Low** | Simple env var loading | Use koanf instead |
-| Logging Setup | **Low** | Basic slog wrapper | Use charmbracelet/log directly |
+| Component             | Extraction Potential | Unique Value                               | Recommendation                  |
+| --------------------- | -------------------- | ------------------------------------------ | ------------------------------- |
+| Type-Safe Flag System | **High**             | Struct tags + generics + Cobra integration | Extract as standalone lib       |
+| DI Scope Wrapper      | **Medium**           | Simplified samber/do/v2 API                | Keep internal, document pattern |
+| Error Types           | **Low**              | CLI-specific sentinel errors               | Keep internal                   |
+| Config Provider       | **Low**              | Simple env var loading                     | Use koanf instead               |
+| Logging Setup         | **Low**              | Basic slog wrapper                         | Use charmbracelet/log directly  |
 
 ---
 
@@ -47,28 +47,31 @@ registry.ValidateFlags(cmd)
 
 #### Unique Features
 
-| Feature | cmdguard | Kong | go-flags | pflag |
-|---------|----------|------|----------|-------|
-| Struct tags | ✅ | ✅ | ✅ | ❌ |
-| Cobra integration | ✅ Native | Manual | Manual | ✅ Native |
-| Type inference | ✅ Automatic | Mapper interface | Reflection | Manual |
-| Required validation | ✅ `required:"true"` | ✅ | ✅ | ❌ |
-| Typo suggestions | ✅ Levenshtein | ❌ | ❌ | ❌ |
-| Generic type safety | ✅ Compile-time | ❌ Runtime | ❌ Runtime | ❌ Runtime |
+| Feature             | cmdguard             | Kong             | go-flags   | pflag      |
+| ------------------- | -------------------- | ---------------- | ---------- | ---------- |
+| Struct tags         | ✅                   | ✅               | ✅         | ❌         |
+| Cobra integration   | ✅ Native            | Manual           | Manual     | ✅ Native  |
+| Type inference      | ✅ Automatic         | Mapper interface | Reflection | Manual     |
+| Required validation | ✅ `required:"true"` | ✅               | ✅         | ❌         |
+| Typo suggestions    | ✅ Levenshtein       | ❌               | ❌         | ❌         |
+| Generic type safety | ✅ Compile-time      | ❌ Runtime       | ❌ Runtime | ❌ Runtime |
 
 #### Alternatives
 
 **Kong** (`github.com/alecthomas/kong`) - ~2.4k stars
+
 - Declarative struct tags, type-safe mappers
 - No Cobra integration (separate CLI framework)
 - No typo suggestions
 
 **go-flags** (`github.com/jessevdk/go-flags`) - ~2.6k stars
+
 - Extensive struct tag support
 - No Cobra integration
 - Legacy API design
 
 **pflag** (stdlib for Cobra) - Industry standard
+
 - No struct tag support
 - Manual flag registration
 
@@ -90,6 +93,7 @@ flagtags.Validate(cmd, &Config{})
 ```
 
 **Value Proposition:**
+
 1. **Only library with native Cobra/pflag integration + struct tags**
 2. **Typo suggestions** - unique among flag libraries
 3. **Generic compile-time safety** - unlike reflection-based alternatives
@@ -126,27 +130,30 @@ scope.Shutdown(ctx)
 
 #### Unique Features
 
-| Feature | cmdguard Scope | samber/do/v2 | fx | wire |
-|---------|---------------|--------------|-----|------|
-| Scope hierarchy | ✅ | ✅ Native | ❌ | ❌ |
-| Generic API | ✅ | ✅ | ❌ | ✅ |
-| CLI-focused | ✅ | ❌ | ❌ | ❌ |
-| Health checks | ✅ | ✅ | ✅ | ❌ |
-| Graceful shutdown | ✅ | ✅ | ✅ | Manual |
+| Feature           | cmdguard Scope | samber/do/v2 | fx  | wire   |
+| ----------------- | -------------- | ------------ | --- | ------ |
+| Scope hierarchy   | ✅             | ✅ Native    | ❌  | ❌     |
+| Generic API       | ✅             | ✅           | ❌  | ✅     |
+| CLI-focused       | ✅             | ❌           | ❌  | ❌     |
+| Health checks     | ✅             | ✅           | ✅  | ❌     |
+| Graceful shutdown | ✅             | ✅           | ✅  | Manual |
 
 #### Alternatives
 
 **samber/do/v2** - Direct use
+
 - Same functionality, more verbose
 - No scope path tracking
 - No CLI convenience methods
 
 **uber-go/fx** - ~5.8k stars
+
 - Lifecycle hooks (OnStart/OnStop) - **gap in cmdguard**
 - No hierarchical scopes
 - Requires module pattern
 
 **google/wire** - ~13k stars
+
 - Compile-time safety
 - No runtime scopes
 - Requires code generation
@@ -156,6 +163,7 @@ scope.Shutdown(ctx)
 **Keep internal** but document as reusable pattern.
 
 **Missing features to add:**
+
 - `OnStart` / `OnStop` lifecycle hooks (fx pattern)
 - Per-command scope factory
 - Ordered shutdown priority
@@ -193,6 +201,7 @@ NewServiceError(type, err)      // "service 'x': ..."
 #### Alternatives
 
 **cockroachdb/errors** - General purpose
+
 - No CLI-specific types
 - More features than needed
 
@@ -222,6 +231,7 @@ cfg := config.Load()
 #### Alternatives
 
 **koanf** (`github.com/knadh/koanf/v2`) - Recommended by HOW_TO_GOLANG.md
+
 - Multiple format support (YAML, JSON, TOML, ENV)
 - Hot reload capable
 - No global state
@@ -251,6 +261,7 @@ logger := logging.NewLogger("text", "debug")
 #### Alternatives
 
 **charmbracelet/log** - Recommended by HOW_TO_GOLANG.md
+
 - Full slog handler implementation
 - Styled output
 - Context integration
@@ -269,6 +280,7 @@ logger := logging.NewLogger("text", "debug")
 **Repository:** `github.com/larsartmann/flagtags`
 
 **Scope:**
+
 - `pkg/cmdguard/v2/flags.go`
 - `pkg/cmdguard/v2/flags_parse.go`
 - `pkg/cmdguard/v2/flags_suggest.go`
@@ -306,6 +318,7 @@ type FlagTag struct {
 ```
 
 **Unique Value:**
+
 1. Only library combining struct tags + Cobra integration + typo suggestions
 2. Generic compile-time safety
 3. Zero boilerplate
@@ -349,34 +362,37 @@ Keep internal. Too small for extraction.
 
 ### CLI Frameworks with Type-Safe Flags
 
-| Library | Stars | Struct Tags | DI Integration | Fail-Fast |
-|---------|-------|-------------|----------------|-----------|
-| Kong | ~2.4k | ✅ | Manual | Parse-time |
-| go-flags | ~2.6k | ✅ | None | Parse-time |
-| Cobra+Fx | ~38k+5.8k | ❌ | ✅ Manual | ValidateApp() |
-| Wire+CLI | ~13k | Varies | ✅ Generated | Compile-time |
+| Library  | Stars     | Struct Tags | DI Integration | Fail-Fast     |
+| -------- | --------- | ----------- | -------------- | ------------- |
+| Kong     | ~2.4k     | ✅          | Manual         | Parse-time    |
+| go-flags | ~2.6k     | ✅          | None           | Parse-time    |
+| Cobra+Fx | ~38k+5.8k | ❌          | ✅ Manual      | ValidateApp() |
+| Wire+CLI | ~13k      | Varies      | ✅ Generated   | Compile-time  |
 
 ### DI Libraries with Scope Support
 
-| Library | Stars | Scope Hierarchy | Generic API | Lifecycle |
-|---------|-------|-----------------|-------------|-----------|
-| samber/do/v2 | ~2k | ✅ | ✅ | ✅ |
-| uber-go/fx | ~5.8k | ❌ | ❌ | ✅ OnStart/OnStop |
-| google/wire | ~13k | ❌ | ✅ | Manual |
+| Library      | Stars | Scope Hierarchy | Generic API | Lifecycle         |
+| ------------ | ----- | --------------- | ----------- | ----------------- |
+| samber/do/v2 | ~2k   | ✅              | ✅          | ✅                |
+| uber-go/fx   | ~5.8k | ❌              | ❌          | ✅ OnStart/OnStop |
+| google/wire  | ~13k  | ❌              | ✅          | Manual            |
 
 ---
 
 ## Action Items
 
 ### Phase 1: Document Patterns (Low Effort)
+
 - [ ] Document DI scope pattern in docs/
 - [ ] Add lifecycle hook examples
 
 ### Phase 2: Align with Library Policy (Medium Effort)
+
 - [ ] Replace `internal/config` with koanf
 - [ ] Replace `internal/logging` with charmbracelet/log
 
 ### Phase 3: Extract flagtags (High Effort, High Value)
+
 - [ ] Create `github.com/larsartmann/flagtags` repository
 - [ ] Extract flag-related code
 - [ ] Add standalone tests

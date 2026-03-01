@@ -27,10 +27,10 @@ cd examples/typed && go build -o myapp .
 
 **Two APIs Available:**
 
-| API | Package | Use Case |
-|-----|---------|----------|
+| API                  | Package           | Use Case                         |
+| -------------------- | ----------------- | -------------------------------- |
 | **v2** (Recommended) | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
-| v1 (Legacy) | `pkg/cmdguard` | Simple, panic-at-construction |
+| v1 (Legacy)          | `pkg/cmdguard`    | Simple, panic-at-construction    |
 
 **Current Status:** v2.0.0 Complete. All packages tested with 90%+ coverage.
 
@@ -84,13 +84,13 @@ cmdguard/
 
 ## Key Dependencies
 
-| Library                         | Purpose            | Version |
-| ------------------------------- | ------------------ | ------- |
-| `github.com/spf13/cobra`        | CLI framework      | v1.10.2 |
+| Library                         | Purpose              | Version |
+| ------------------------------- | -------------------- | ------- |
+| `github.com/spf13/cobra`        | CLI framework        | v1.10.2 |
 | `github.com/samber/do/v2`       | Dependency injection | v2.0.0  |
-| `github.com/charmbracelet/fang` | Cobra styling      | v0.4.4  |
-| `github.com/onsi/ginkgo/v2`     | BDD testing        | v2.28.1 |
-| `github.com/onsi/gomega`        | Test matchers      | v1.39.1 |
+| `github.com/charmbracelet/fang` | Cobra styling        | v0.4.4  |
+| `github.com/onsi/ginkgo/v2`     | BDD testing          | v2.28.1 |
+| `github.com/onsi/gomega`        | Test matchers        | v1.39.1 |
 
 ---
 
