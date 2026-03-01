@@ -1,6 +1,6 @@
 # TODO_LIST.md - cmdguard Project Tasks
 
-**Last Updated:** 2026-02-24
+**Last Updated:** 2026-02-28
 **Purpose:** Track tasks for the cmdguard v2 API implementation.
 
 ---
@@ -57,11 +57,11 @@
 
 | Task                                | Status     | Notes                       |
 | ----------------------------------- | ---------- | --------------------------- |
-| Update AGENTS.md for v2             | ⏳ PENDING | Document v2 patterns        |
-| Add more examples                   | ⏳ PENDING | DI patterns, advanced flags |
+| Update AGENTS.md for v2             | ✅ DONE    | Document v2 patterns        |
+| Add more examples                   | ✅ DONE    | DI patterns, advanced flags |
 | Plugin system for custom validators | ⏳ PENDING | Future enhancement          |
 | Enhanced flag validation            | ⏳ PENDING | Enums, custom validators    |
-| Performance benchmarks              | ⏳ PENDING | Not yet needed              |
+| Performance benchmarks              | ✅ DONE    | Added comprehensive suite   |
 | Release automation                  | ⏳ PENDING | Manual releases sufficient  |
 
 ---
@@ -90,9 +90,17 @@ cmdguard/
 │   ├── basic/                  # v1 API demo
 │   │   ├── main.go
 │   │   └── main_test.go
-│   └── typed/                  # v2 API demo (DI, flags, lifecycle)
+│   ├── typed/                  # v2 API demo (DI, flags, lifecycle)
+│   │   ├── main.go
+│   │   └── main_test.go
+│   ├── di/                     # DI patterns (Shutdowner, Healthchecker)
+│   │   ├── main.go
+│   │   └── main_test.go
+│   └── advanced-flags/         # Advanced flag usage
 │       ├── main.go
 │       └── main_test.go
+├── benchmarks/
+│   └── guard_bench_test.go     # Performance benchmarks
 ├── docs/
 │   ├── architecture.d2         # D2 diagram source
 │   ├── architecture.svg        # Generated diagram
@@ -110,7 +118,7 @@ cmdguard/
 
 ## Summary
 
-**Status: v2.0.0 COMPLETE ✅**
+**Status: v2.0.0 COMPLETE WITH DOCUMENTATION ✅**
 
 The v2 API is complete with comprehensive test coverage:
 
@@ -138,4 +146,4 @@ The v2 API is complete with comprehensive test coverage:
 
 ---
 
-_This document reflects the v2.0.0 release state. Last updated 2026-02-24._
+_This document reflects the v2.0.0 release state with all planned examples and benchmarks complete. Last updated 2026-02-28._
