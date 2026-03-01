@@ -37,7 +37,7 @@ type DatabaseService struct {
 
 // Verify interface implementations at compile time.
 var (
-	_ do.Shutdowner             = (*DatabaseService)(nil)
+	_ do.Shutdowner               = (*DatabaseService)(nil)
 	_ do.HealthcheckerWithContext = (*DatabaseService)(nil)
 )
 

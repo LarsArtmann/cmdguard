@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"slices"

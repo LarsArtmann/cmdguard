@@ -26,16 +26,16 @@ import (
 
 // GlobalConfig contains application-wide settings.
 type GlobalConfig struct {
-	LogLevel  v2.LogLevel  `flag:"log-level" short:"l" default:"info" help:"Log level (debug, info, warn, error)"`
-	LogFormat string       `flag:"log-format" default:"text" help:"Log format (text, json)"`
-	Timeout   v2.Duration  `flag:"timeout" default:"30s" help:"Default timeout"`
+	LogLevel  v2.LogLevel `flag:"log-level" short:"l" default:"info" help:"Log level (debug, info, warn, error)"`
+	LogFormat string      `flag:"log-format" default:"text" help:"Log format (text, json)"`
+	Timeout   v2.Duration `flag:"timeout" default:"30s" help:"Default timeout"`
 }
 
 // ServerFlags for the server command.
 type ServerFlags struct {
-	Port     int          `flag:"port" short:"p" default:"8080" help:"Server port"`
-	Host     string       `flag:"host" default:"localhost" help:"Server host"`
-	LogLevel v2.LogLevel  `flag:"log-level" default:"" help:"Override log level"`
+	Port     int         `flag:"port" short:"p" default:"8080" help:"Server port"`
+	Host     string      `flag:"host" default:"localhost" help:"Server host"`
+	LogLevel v2.LogLevel `flag:"log-level" default:"" help:"Override log level"`
 }
 
 // ConfigFlags for the config command.

@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("DI Example", func() {
 	var (
-		ctx context.Context
+		ctx  context.Context
 		root *v2.GuardedCommand[Config, v2.NoFlags]
 	)
 
