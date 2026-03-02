@@ -1,6 +1,6 @@
 # cmdguard Component Analysis
 
-**Last Updated:** 2026-02-28
+**Last Updated:** 2026-03-01
 **Version:** 2.0.0
 **Status:** Analysis Complete
 
@@ -12,13 +12,13 @@ cmdguard contains several components with extraction potential. This document an
 
 **Key Findings:**
 
-| Component             | Extraction Potential | Unique Value                               | Recommendation                  |
-| --------------------- | -------------------- | ------------------------------------------ | ------------------------------- |
-| Type-Safe Flag System | **High**             | Struct tags + generics + Cobra integration | Extract as standalone lib       |
-| DI Scope Wrapper      | **Medium**           | Simplified samber/do/v2 API                | Keep internal, document pattern |
-| Error Types           | **Low**              | CLI-specific sentinel errors               | Keep internal                   |
-| Config Provider       | **Low**              | Simple env var loading                     | Use koanf instead               |
-| Logging Setup         | **Low**              | Basic slog wrapper                         | Use charmbracelet/log directly  |
+| Component             | Extraction Potential | Unique Value                                          | Recommendation                  |
+| --------------------- | -------------------- | ----------------------------------------------------- | ------------------------------- |
+| Type-Safe Flag System | **Medium**           | Typo suggestions + DI integration + custom types      | Extract if typo UX is priority  |
+| DI Scope Wrapper      | **Medium**           | Simplified samber/do/v2 API                           | Keep internal, document pattern |
+| Error Types           | **Low**              | CLI-specific sentinel errors                          | Keep internal                   |
+| Config Provider       | **Low**              | Simple env var loading                                | Use koanf instead               |
+| Logging Setup         | **Low**              | Basic slog wrapper                                    | Use charmbracelet/log directly  |
 
 ---
 
@@ -47,22 +47,36 @@ registry.ValidateFlags(cmd)
 
 #### Unique Features
 
-| Feature             | cmdguard             | Kong             | go-flags   | pflag      |
-| ------------------- | -------------------- | ---------------- | ---------- | ---------- |
-| Struct tags         | ✅                   | ✅               | ✅         | ❌         |
-| Cobra integration   | ✅ Native            | Manual           | Manual     | ✅ Native  |
-| Type inference      | ✅ Automatic         | Mapper interface | Reflection | Manual     |
-| Required validation | ✅ `required:"true"` | ✅               | ✅         | ❌         |
-| Typo suggestions    | ✅ Levenshtein       | ❌               | ❌         | ❌         |
-| Generic type safety | ✅ Compile-time      | ❌ Runtime       | ❌ Runtime | ❌ Runtime |
+| Feature             | cmdguard             | sflags          | Kong             | go-flags   | structcli   |
+| ------------------- | -------------------- | --------------- | ---------------- | ---------- | ----------- |
+| Struct tags         | ✅                   | ✅              | ✅               | ✅         | ✅          |
+| Cobra integration   | ✅ Native            | ✅ Native       | Manual           | Manual     | ✅ Native   |
+| Type inference      | ✅ Automatic         | ✅ Reflection   | Mapper interface | Reflection | Reflection  |
+| Required validation | ✅ `required:"true"` | ✅              | ✅               | ✅         | ✅          |
+| Typo suggestions    | ✅ Levenshtein       | ❌              | ❌               | ❌         | ❌          |
+| Generic type safety | ✅ Compile-time      | ❌ Runtime      | ❌ Runtime       | ❌ Runtime | ❌ Runtime  |
+| Custom types         | ✅ Enum/Duration     | ❌              | ✅ Mappers       | ❌         | ❌          |
+| DI integration       | ✅ samber/do/v2      | ❌              | ❌               | ❌         | ❌          |
 
 #### Alternatives
 
+**sflags** (`github.com/octago/sflags`) - ~167 stars
+
+- Struct-based flags generator for pflag, cobra, urfave/cli, kingpin
+- **Direct competitor** - also provides Cobra + struct tags
+- No typo suggestions, no DI integration, no custom types
+
+**structcli** (`github.com/leodido/structcli`) - ~8 stars
+
+- "Eliminate Cobra boilerplate" with struct declarations
+- Native Cobra integration
+- Newer project, smaller ecosystem
+
 **Kong** (`github.com/alecthomas/kong`) - ~2.4k stars
 
-- Declarative struct tags, type-safe mappers
+- Declarative struct tags, type-safe mappers, plugin system
 - No Cobra integration (separate CLI framework)
-- No typo suggestions
+- More features but requires full framework adoption
 
 **go-flags** (`github.com/jessevdk/go-flags`) - ~2.6k stars
 
@@ -70,12 +84,36 @@ registry.ValidateFlags(cmd)
 - No Cobra integration
 - Legacy API design
 
+**commandeer** (`github.com/jaffee/commandeer`) - ~175 stars
+
+- Dev-friendly CLI apps from struct fields/tags
+- Cobra integration available
+- No typo suggestions, no DI
+
 **pflag** (stdlib for Cobra) - Industry standard
 
 - No struct tag support
 - Manual flag registration
 
-#### Extraction Recommendation: **HIGH**
+#### API Comparison: cmdguard vs sflags
+
+```go
+// sflags approach - manual iteration
+flags, _ := sflags.ParseStruct(cfg)
+for _, flag := range flags {
+    switch f := flag.(type) {
+    case *sflags.Flag:
+        cmd.Flags().Var(f.Value, f.Name, f.Usage)
+    }
+}
+
+// cmdguard approach - single call with typo suggestions
+registry, _ := NewFlagRegistry(cfg)
+registry.RegisterFlags(cmd)   // one call
+registry.ValidateFlags(cmd)   // includes "did you mean?" suggestions
+```
+
+#### Extraction Recommendation: **MEDIUM**
 
 **Proposed Library:** `github.com/larsartmann/flagtags`
 
@@ -94,10 +132,13 @@ flagtags.Validate(cmd, &Config{})
 
 **Value Proposition:**
 
-1. **Only library with native Cobra/pflag integration + struct tags**
-2. **Typo suggestions** - unique among flag libraries
-3. **Generic compile-time safety** - unlike reflection-based alternatives
-4. **Zero-boilerplate** - one function call for registration
+1. **Typo suggestions via Levenshtein distance** - UNIQUE among all flag libraries
+2. **DI integration with samber/do/v2** - no competitor has this
+3. **Custom types (Enum, Duration, LogLevel)** with built-in validation
+4. **Generic compile-time safety** - unlike reflection-based alternatives
+
+**Note:** "Struct tags + Cobra integration" is NOT unique - sflags, structcli, and commandeer
+all provide this. The differentiation is typo UX, DI, and custom types.
 
 ---
 
@@ -319,9 +360,12 @@ type FlagTag struct {
 
 **Unique Value:**
 
-1. Only library combining struct tags + Cobra integration + typo suggestions
-2. Generic compile-time safety
-3. Zero boilerplate
+1. **Typo suggestions** - unique UX feature no competitor has
+2. **DI integration** - enables clean service injection in CLI apps
+3. **Custom types** - Enum, Duration, LogLevel with validation
+
+**Competitive Reality:** sflags, structcli, commandeer all provide struct tags + Cobra.
+Extraction is only worthwhile if typo suggestions and DI are the primary value props.
 
 ---
 
@@ -391,12 +435,25 @@ Keep internal. Too small for extraction.
 - [ ] Replace `internal/config` with koanf
 - [ ] Replace `internal/logging` with charmbracelet/log
 
-### Phase 3: Extract flagtags (High Effort, High Value)
+### Phase 3: Evaluate flagtags Extraction (High Effort, Medium Value)
 
+**Decision Required:** Only extract if typo suggestions and DI integration are strategic priorities.
+
+**Pros of extraction:**
+- Cleaner separation of concerns
+- Independent versioning
+- Could benefit Go community
+
+**Cons of extraction:**
+- sflags already covers struct tags + Cobra (167 stars, established)
+- Niche market - typo UX is valuable but not widely requested
+- Maintenance overhead of separate repo
+
+**If proceeding:**
 - [ ] Create `github.com/larsartmann/flagtags` repository
 - [ ] Extract flag-related code
 - [ ] Add standalone tests
-- [ ] Document API
+- [ ] Document API with emphasis on typo suggestions
 - [ ] Update cmdguard to use flagtags
 
 ---
