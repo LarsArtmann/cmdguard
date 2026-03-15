@@ -89,6 +89,7 @@ cmdguard/
 | `github.com/spf13/cobra`        | CLI framework        | v1.10.2 |
 | `github.com/samber/do/v2`       | Dependency injection | v2.0.0  |
 | `github.com/charmbracelet/fang` | Cobra styling        | v0.4.4  |
+| `github.com/knadh/koanf/v2`     | Configuration        | v2.3.3  |
 | `github.com/onsi/ginkgo/v2`     | BDD testing          | v2.28.1 |
 | `github.com/onsi/gomega`        | Test matchers        | v1.39.1 |
 
@@ -441,10 +442,78 @@ go test -v ./pkg/cmdguard/v2/...
 
 ## Configuration
 
-Environment variables (prefix `CMDGUARD_`):
+Uses [knadh/koanf](https://github.com/knadh/koanf) for configuration management per library policy.
+
+### Configuration Sources (Priority Order)
+
+1. **Environment variables** (highest priority)
+2. **Config file** (YAML)
+3. **Default values** (lowest priority)
+
+### Environment Variables
+
+Prefix: `CMDGUARD_`
 
 - `CMDGUARD_LOG_LEVEL` - debug, info, warn, error (default: info)
+- `CMDGUARD_LOG_FORMAT` - text, json (default: text)
 - `CMDGUARD_STRICT_MODE` - true/false (default: false)
+
+### Config File (YAML)
+
+```yaml
+log_level: debug
+log_format: json
+strict_mode: true
+```
+
+### Programmatic Usage
+
+```go
+package main
+
+import (
+    "github.com/larsartmann/cmdguard/internal/config"
+)
+
+func main() {
+    // Create loader
+    loader := config.NewLoader()
+
+    // Load configuration (optional config file path)
+    err := loader.Load("config.yaml")
+    if err != nil {
+        panic(err)
+    }
+
+    // Get values
+    logLevel := loader.GetString("log_level")
+    strictMode := loader.GetBool("strict_mode")
+
+    // Or unmarshal to struct
+    type Config struct {
+        LogLevel   string `koanf:"log_level"`
+        LogFormat  string `koanf:"log_format"`
+        StrictMode bool   `koanf:"strict_mode"`
+    }
+
+    var cfg Config
+    err = loader.Unmarshal(&cfg)
+}
+```
+
+### Priority Example
+
+```yaml
+# config.yaml
+log_level: warn
+```
+
+```bash
+# Environment overrides file
+export CMDGUARD_LOG_LEVEL=debug
+
+# Final value: debug (env wins)
+```
 
 ---
 
