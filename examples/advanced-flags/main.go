@@ -87,7 +87,7 @@ func main() {
 	}
 
 	// Server command with custom flags
-	if err := root.AddCommand(v2.Command[GlobalConfig, ServerFlags]{
+	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, ServerFlags]{
 		Use:   "server",
 		Short: "Start the server",
 		Long:  "Start the HTTP server with configurable host and port.",
@@ -110,7 +110,7 @@ func main() {
 	}
 
 	// Config command with required flag
-	if err := root.AddCommand(v2.Command[GlobalConfig, ConfigFlags]{
+	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, ConfigFlags]{
 		Use:   "config",
 		Short: "Configuration management",
 		Flags: ConfigFlags{},
@@ -138,7 +138,7 @@ func main() {
 	}
 
 	// Enum demo command
-	if err := root.AddCommand(v2.Command[GlobalConfig, EnumFlags]{
+	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, EnumFlags]{
 		Use:   "env",
 		Short: "Environment settings",
 		Flags: EnumFlags{},
@@ -163,7 +163,7 @@ func main() {
 	}
 
 	// Duration demo command
-	if err := root.AddCommand(v2.Command[GlobalConfig, DurationFlags]{
+	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, DurationFlags]{
 		Use:   "duration",
 		Short: "Duration settings demo",
 		Flags: DurationFlags{},

@@ -37,7 +37,7 @@ type DatabaseService struct {
 
 // Verify interface implementations at compile time.
 var (
-	_ do.Shutdowner               = (*DatabaseService)(nil)
+	_ do.ShutdownerWithError      = (*DatabaseService)(nil)
 	_ do.HealthcheckerWithContext = (*DatabaseService)(nil)
 )
 
@@ -52,7 +52,7 @@ func NewDatabaseService(i do.Injector) (*DatabaseService, error) {
 }
 
 // Shutdown implements the Shutdowner interface.
-func (d *DatabaseService) Shutdown(ctx context.Context) error {
+func (d *DatabaseService) Shutdown() error {
 	fmt.Println("Database: shutting down...")
 	d.connected = false
 	fmt.Println("Database: disconnected")
@@ -120,7 +120,7 @@ func main() {
 		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Running health checks...")
 
-			if err := root.HealthCheckWithContext(ctx); err != nil {
+			if err := root.ScopeStruct().HealthCheckWithContext(ctx); err != nil {
 				fmt.Printf("Health check FAILED: %v\n", err)
 				return err
 			}
@@ -173,7 +173,7 @@ func main() {
 	}
 
 	// Run health check before starting
-	if err := root.HealthCheckWithContext(ctx); err != nil {
+	if err := root.ScopeStruct().HealthCheckWithContext(ctx); err != nil {
 		fmt.Printf("Initial health check failed: %v\n", err)
 		os.Exit(1)
 	}
