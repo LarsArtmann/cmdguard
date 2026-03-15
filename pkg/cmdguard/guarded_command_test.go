@@ -36,13 +36,8 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("loads config from environment", func(t *testing.T) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", "debug")
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
-
-		defer func() {
-			_ = os.Unsetenv("CMDGUARD_LOG_LEVEL")
-			_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
-		}()
+		t.Setenv("CMDGUARD_LOG_LEVEL", "debug")
+		t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 		g := New("testapp", "Test")
 
@@ -204,13 +199,10 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 	})
 
 	t.Run("IsStrictMode returns correct value", func(t *testing.T) {
-		_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
 		g := New("testapp", "Test")
 		assert.False(t, g.IsStrictMode())
 
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
-
-		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
+		t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 		g2 := New("testapp2", "Test2")
 		assert.True(t, g2.IsStrictMode())
@@ -281,9 +273,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 	})
 
 	t.Run("strict mode requires RunE", func(t *testing.T) {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", "true")
-
-		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
+		t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 		g := New("testapp", "Test")
 

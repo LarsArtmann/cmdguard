@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -67,23 +66,17 @@ func TestLoad(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Set env vars (errors ignored - test environment setup)
+			// Set env vars
 			if tt.envLevel != "" {
-				_ = os.Setenv("CMDGUARD_LOG_LEVEL", tt.envLevel)
-
-				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+				t.Setenv("CMDGUARD_LOG_LEVEL", tt.envLevel)
 			}
 
 			if tt.envFormat != "" {
-				_ = os.Setenv("CMDGUARD_LOG_FORMAT", tt.envFormat)
-
-				defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
+				t.Setenv("CMDGUARD_LOG_FORMAT", tt.envFormat)
 			}
 
 			if tt.envStrict != "" {
-				_ = os.Setenv("CMDGUARD_STRICT_MODE", tt.envStrict)
-
-				defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
+				t.Setenv("CMDGUARD_STRICT_MODE", tt.envStrict)
 			}
 
 			cfg := Load()
