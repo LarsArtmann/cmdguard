@@ -280,6 +280,7 @@ func testMarshalUnmarshal[T any](
 	newValue func() T,
 	stringFunc func(T) string,
 ) {
+	t.Helper()
 	t.Run("marshal", func(t *testing.T) {
 		type config struct {
 			Value T `json:"value"`
