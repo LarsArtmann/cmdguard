@@ -12,13 +12,13 @@ cmdguard contains several components with extraction potential. This document an
 
 **Key Findings:**
 
-| Component             | Extraction Potential | Unique Value                                          | Recommendation                  |
-| --------------------- | -------------------- | ----------------------------------------------------- | ------------------------------- |
-| Type-Safe Flag System | **Medium**           | Typo suggestions + DI integration + custom types      | Extract if typo UX is priority  |
-| DI Scope Wrapper      | **Medium**           | Simplified samber/do/v2 API                           | Keep internal, document pattern |
-| Error Types           | **Low**              | CLI-specific sentinel errors                          | Keep internal                   |
-| Config Provider       | **Low**              | Simple env var loading                                | Use koanf instead               |
-| Logging Setup         | **Low**              | Basic slog wrapper                                    | Use charmbracelet/log directly  |
+| Component             | Extraction Potential | Unique Value                                     | Recommendation                  |
+| --------------------- | -------------------- | ------------------------------------------------ | ------------------------------- |
+| Type-Safe Flag System | **Medium**           | Typo suggestions + DI integration + custom types | Extract if typo UX is priority  |
+| DI Scope Wrapper      | **Medium**           | Simplified samber/do/v2 API                      | Keep internal, document pattern |
+| Error Types           | **Low**              | CLI-specific sentinel errors                     | Keep internal                   |
+| Config Provider       | **Low**              | Simple env var loading                           | Use koanf instead               |
+| Logging Setup         | **Low**              | Basic slog wrapper                               | Use charmbracelet/log directly  |
 
 ---
 
@@ -47,16 +47,16 @@ registry.ValidateFlags(cmd)
 
 #### Unique Features
 
-| Feature             | cmdguard             | sflags          | Kong             | go-flags   | structcli   |
-| ------------------- | -------------------- | --------------- | ---------------- | ---------- | ----------- |
-| Struct tags         | ✅                   | ✅              | ✅               | ✅         | ✅          |
-| Cobra integration   | ✅ Native            | ✅ Native       | Manual           | Manual     | ✅ Native   |
-| Type inference      | ✅ Automatic         | ✅ Reflection   | Mapper interface | Reflection | Reflection  |
-| Required validation | ✅ `required:"true"` | ✅              | ✅               | ✅         | ✅          |
-| Typo suggestions    | ✅ Levenshtein       | ❌              | ❌               | ❌         | ❌          |
-| Generic type safety | ✅ Compile-time      | ❌ Runtime      | ❌ Runtime       | ❌ Runtime | ❌ Runtime  |
-| Custom types         | ✅ Enum/Duration     | ❌              | ✅ Mappers       | ❌         | ❌          |
-| DI integration       | ✅ samber/do/v2      | ❌              | ❌               | ❌         | ❌          |
+| Feature             | cmdguard             | sflags        | Kong             | go-flags   | structcli  |
+| ------------------- | -------------------- | ------------- | ---------------- | ---------- | ---------- |
+| Struct tags         | ✅                   | ✅            | ✅               | ✅         | ✅         |
+| Cobra integration   | ✅ Native            | ✅ Native     | Manual           | Manual     | ✅ Native  |
+| Type inference      | ✅ Automatic         | ✅ Reflection | Mapper interface | Reflection | Reflection |
+| Required validation | ✅ `required:"true"` | ✅            | ✅               | ✅         | ✅         |
+| Typo suggestions    | ✅ Levenshtein       | ❌            | ❌               | ❌         | ❌         |
+| Generic type safety | ✅ Compile-time      | ❌ Runtime    | ❌ Runtime       | ❌ Runtime | ❌ Runtime |
+| Custom types        | ✅ Enum/Duration     | ❌            | ✅ Mappers       | ❌         | ❌         |
+| DI integration      | ✅ samber/do/v2      | ❌            | ❌               | ❌         | ❌         |
 
 #### Alternatives
 
@@ -440,16 +440,19 @@ Keep internal. Too small for extraction.
 **Decision Required:** Only extract if typo suggestions and DI integration are strategic priorities.
 
 **Pros of extraction:**
+
 - Cleaner separation of concerns
 - Independent versioning
 - Could benefit Go community
 
 **Cons of extraction:**
+
 - sflags already covers struct tags + Cobra (167 stars, established)
 - Niche market - typo UX is valuable but not widely requested
 - Maintenance overhead of separate repo
 
 **If proceeding:**
+
 - [ ] Create `github.com/larsartmann/flagtags` repository
 - [ ] Extract flag-related code
 - [ ] Add standalone tests
