@@ -20,6 +20,15 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 		_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
 	})
 
+	// createDeployCommand creates a test command with RunE handler
+	createDeployCommand := func(short string) *cobra.Command {
+		return &cobra.Command{
+			Use:   "deploy",
+			Short: short,
+			RunE:  func(cmd *cobra.Command, args []string) error { return nil },
+		}
+	}
+
 	Describe("As a CLI developer creating a new application", func() {
 		Context("when I create a new GuardedCommand with basic settings", func() {
 			BeforeEach(func() {
@@ -74,11 +83,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 
 		Context("when I add a properly implemented command", func() {
 			It("should accept commands with error-returning handlers (RunE)", func() {
-				cmd := &cobra.Command{
-					Use:   "deploy",
-					Short: "Deploy the application",
-					RunE:  func(cmd *cobra.Command, args []string) error { return nil },
-				}
+				cmd := createDeployCommand("Deploy the application")
 
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})
@@ -182,11 +187,7 @@ var _ = Describe("GuardedCommand - User Expectations", func() {
 
 		Context("when strict mode is enabled", func() {
 			It("should require proper error handling (RunE) for all commands", func() {
-				cmd := &cobra.Command{
-					Use:   "deploy",
-					Short: "Production deployment",
-					RunE:  func(cmd *cobra.Command, args []string) error { return nil },
-				}
+				cmd := createDeployCommand("Production deployment")
 
 				Expect(func() { root.AddCommand(cmd) }).NotTo(Panic())
 			})

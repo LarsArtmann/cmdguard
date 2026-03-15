@@ -46,7 +46,7 @@ log_level: warn
 log_format: json
 strict_mode: true
 `
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	require.NoError(t, err)
 
 	loader := NewLoader()
@@ -68,7 +68,7 @@ func TestKoanfLoader_EnvOverridesFile(t *testing.T) {
 log_level: warn
 log_format: json
 `
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	require.NoError(t, err)
 
 	// Set environment variables
@@ -82,7 +82,7 @@ log_format: json
 	// Verify env overrides file
 	assert.Equal(t, "debug", loader.GetString("log_level"))
 	assert.Equal(t, "json", loader.GetString("log_format")) // From file
-	assert.Equal(t, true, loader.GetBool("strict_mode"))     // From env
+	assert.Equal(t, true, loader.GetBool("strict_mode"))    // From env
 }
 
 func TestKoanfLoader_Unmarshal(t *testing.T) {
@@ -128,7 +128,7 @@ func TestKoanfLoader_Priority(t *testing.T) {
 
 	// File sets log_level to warn
 	configContent := `log_level: warn`
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	require.NoError(t, err)
 
 	// Env sets log_level to debug

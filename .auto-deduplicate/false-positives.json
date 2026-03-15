@@ -1,0 +1,9 @@
+[
+  {
+    "fingerprint": "c3389b9a90cecbaa5b9d985618452c92583dc1ab88ce9d75061263ed3c33df48",
+    "files": ["/Users/larsartmann/projects/cmdguard/pkg/cmdguard/v2/flags_validate_test.go"],
+    "reason": "FALSE_POSITIVE",
+    "marked_at": "2026-03-15T12:04:08.853745+01:00",
+    "marked_by": "auto-deduplicate"
+  }
+]
