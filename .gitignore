@@ -6,6 +6,12 @@
 *.so
 *.dylib
 
+# Example binaries
+/examples/*/typed_example
+/examples/*/di_example
+/examples/*/advanced_flags_example
+/examples/*/basic_example
+
 # Test binaries
 *.test
 
