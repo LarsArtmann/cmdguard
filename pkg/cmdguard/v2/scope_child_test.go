@@ -114,6 +114,7 @@ func TestScope_Path(t *testing.T) {
 
 func assertChildInheritsParent(t *testing.T) {
 	t.Helper()
+
 	parent := NewScope("parent")
 	require.NoError(t, ProvideValue(parent, "parent-value"))
 

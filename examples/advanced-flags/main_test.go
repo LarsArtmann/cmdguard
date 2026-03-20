@@ -10,10 +10,15 @@ import (
 )
 
 func TestAdvancedFlags_CreateCLI(t *testing.T) {
-	cli, err := v2.New[GlobalConfig, v2.NoFlags]("advflags", "Advanced Flags Example", GlobalConfig{})
+	cli, err := v2.New[GlobalConfig, v2.NoFlags](
+		"advflags",
+		"Advanced Flags Example",
+		GlobalConfig{},
+	)
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
+
 	if cli == nil {
 		t.Fatal("CLI is nil")
 	}
@@ -25,7 +30,11 @@ func TestAdvancedFlags_CreateCLI(t *testing.T) {
 }
 
 func TestAdvancedFlags_ServerCommand(t *testing.T) {
-	cli, err := v2.New[GlobalConfig, v2.NoFlags]("advflags", "Advanced Flags Example", GlobalConfig{})
+	cli, err := v2.New[GlobalConfig, v2.NoFlags](
+		"advflags",
+		"Advanced Flags Example",
+		GlobalConfig{},
+	)
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
@@ -53,7 +62,11 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 }
 
 func TestAdvancedFlags_ConfigCommand(t *testing.T) {
-	cli, err := v2.New[GlobalConfig, v2.NoFlags]("advflags", "Advanced Flags Example", GlobalConfig{})
+	cli, err := v2.New[GlobalConfig, v2.NoFlags](
+		"advflags",
+		"Advanced Flags Example",
+		GlobalConfig{},
+	)
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
@@ -76,6 +89,7 @@ func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 func TestAdvancedFlags_EnumValidation(t *testing.T) {
 	// Test valid environment
 	flags := EnumFlags{Environment: "production", Region: "us-west-2"}
+
 	err := flags.Validate()
 	if err != nil {
 		t.Errorf("Expected no error for valid environment, got: %v", err)
@@ -83,10 +97,12 @@ func TestAdvancedFlags_EnumValidation(t *testing.T) {
 
 	// Test invalid environment
 	flags = EnumFlags{Environment: "invalid", Region: "us-west-2"}
+
 	err = flags.Validate()
 	if err == nil {
 		t.Error("Expected error for invalid environment, got nil")
 	}
+
 	if err != nil && err.Error() == "" {
 		t.Error("Expected error message for invalid environment")
 	}
@@ -147,6 +163,7 @@ func TestGlobalConfig_LogLevel(t *testing.T) {
 	if cfg.LogLevel.String() != "debug" {
 		t.Errorf("Expected log level 'debug', got: %s", cfg.LogLevel.String())
 	}
+
 	if cfg.LogFormat != "json" {
 		t.Errorf("Expected log format 'json', got: %s", cfg.LogFormat)
 	}

@@ -17,7 +17,7 @@ func TestKoanfLoader_LoadDefaults(t *testing.T) {
 	// Verify defaults
 	assert.Equal(t, "info", loader.GetString("log_level"))
 	assert.Equal(t, "text", loader.GetString("log_format"))
-	assert.Equal(t, false, loader.GetBool("strict_mode"))
+	assert.False(t, loader.GetBool("strict_mode"))
 }
 
 func TestKoanfLoader_LoadEnv(t *testing.T) {
@@ -33,7 +33,7 @@ func TestKoanfLoader_LoadEnv(t *testing.T) {
 	// Verify env overrides defaults
 	assert.Equal(t, "debug", loader.GetString("log_level"))
 	assert.Equal(t, "json", loader.GetString("log_format"))
-	assert.Equal(t, true, loader.GetBool("strict_mode"))
+	assert.True(t, loader.GetBool("strict_mode"))
 }
 
 func TestKoanfLoader_LoadFile(t *testing.T) {
@@ -56,7 +56,7 @@ strict_mode: true
 	// Verify file overrides defaults
 	assert.Equal(t, "warn", loader.GetString("log_level"))
 	assert.Equal(t, "json", loader.GetString("log_format"))
-	assert.Equal(t, true, loader.GetBool("strict_mode"))
+	assert.True(t, loader.GetBool("strict_mode"))
 }
 
 func TestKoanfLoader_EnvOverridesFile(t *testing.T) {
@@ -82,7 +82,7 @@ log_format: json
 	// Verify env overrides file
 	assert.Equal(t, "debug", loader.GetString("log_level"))
 	assert.Equal(t, "json", loader.GetString("log_format")) // From file
-	assert.Equal(t, true, loader.GetBool("strict_mode"))    // From env
+	assert.True(t, loader.GetBool("strict_mode"))           // From env
 }
 
 func TestKoanfLoader_Unmarshal(t *testing.T) {
@@ -101,12 +101,13 @@ func TestKoanfLoader_Unmarshal(t *testing.T) {
 	}
 
 	var cfg TestConfig
+
 	err = loader.Unmarshal(&cfg)
 	require.NoError(t, err)
 
 	assert.Equal(t, "error", cfg.LogLevel)
 	assert.Equal(t, "json", cfg.LogFormat)
-	assert.Equal(t, true, cfg.StrictMode)
+	assert.True(t, cfg.StrictMode)
 }
 
 func TestKoanfLoader_MissingFile(t *testing.T) {

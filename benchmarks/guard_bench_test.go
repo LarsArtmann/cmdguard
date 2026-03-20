@@ -155,10 +155,10 @@ func BenchmarkScopeCreation(b *testing.B) {
 // BenchmarkParseFlagTags measures flag tag parsing.
 func BenchmarkParseFlagTags(b *testing.B) {
 	type TestConfig struct {
-		Name    string `flag:"name" short:"n" default:"test" help:"Name"`
-		Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Verbose"`
-		Count   int    `flag:"count" short:"c" default:"1" help:"Count"`
-		Timeout string `flag:"timeout" default:"30s" help:"Timeout"`
+		Name    string `default:"test"  flag:"name"    help:"Name"    short:"n"`
+		Verbose bool   `default:"false" flag:"verbose" help:"Verbose" short:"v"`
+		Count   int    `default:"1"     flag:"count"   help:"Count"   short:"c"`
+		Timeout string `default:"30s"   flag:"timeout" help:"Timeout"`
 	}
 
 	cfg := &TestConfig{}
@@ -168,6 +168,7 @@ func BenchmarkParseFlagTags(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
+
 		_ = tags
 	}
 }
@@ -175,8 +176,8 @@ func BenchmarkParseFlagTags(b *testing.B) {
 // BenchmarkFlagRegistryCreation measures FlagRegistry creation.
 func BenchmarkFlagRegistryCreation(b *testing.B) {
 	type TestConfig struct {
-		Name    string `flag:"name" default:"test" help:"Name"`
-		Verbose bool   `flag:"verbose" default:"false" help:"Verbose"`
+		Name    string `default:"test"  flag:"name"    help:"Name"`
+		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
 	}
 
 	cfg := &TestConfig{}
@@ -186,6 +187,7 @@ func BenchmarkFlagRegistryCreation(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
+
 		_ = registry
 	}
 }
@@ -224,6 +226,7 @@ func BenchmarkParseDuration(b *testing.B) {
 			if err != nil {
 				b.Fatal(err)
 			}
+
 			_ = duration
 		}
 	}
@@ -239,6 +242,7 @@ func BenchmarkParseLogLevel(b *testing.B) {
 			if err != nil {
 				b.Fatal(err)
 			}
+
 			_ = ll
 		}
 	}

@@ -13,6 +13,7 @@ func TestDIExample_CreateCLI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
+
 	if cli == nil {
 		t.Fatal("CLI is nil")
 	}
@@ -46,9 +47,11 @@ func TestDIExample_ServiceRegistration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to invoke database service: %v", err)
 	}
+
 	if db == nil {
 		t.Fatal("Database service is nil")
 	}
+
 	if !db.IsConnected() {
 		t.Error("Database should be connected")
 	}
@@ -58,6 +61,7 @@ func TestDIExample_ServiceRegistration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to invoke API service: %v", err)
 	}
+
 	if api == nil {
 		t.Fatal("API service is nil")
 	}
@@ -80,6 +84,7 @@ func TestDIExample_MustInvoke(t *testing.T) {
 	if db == nil {
 		t.Fatal("MustInvoke returned nil")
 	}
+
 	if !db.IsConnected() {
 		t.Error("Database should be connected")
 	}
@@ -99,6 +104,7 @@ func TestDIExample_HealthCheck(t *testing.T) {
 
 	// Health check should pass when service is registered and connected
 	ctx := context.Background()
+
 	err = cli.ScopeStruct().HealthCheckWithContext(ctx)
 	if err != nil {
 		t.Errorf("Health check failed: %v", err)

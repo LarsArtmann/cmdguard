@@ -15,18 +15,20 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 	"github.com/samber/do/v2"
+
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // Config is the application configuration.
 type Config struct {
-	LogLevel  v2.LogLevel `flag:"log-level" short:"l" default:"info" help:"Log level"`
-	ServerURL string      `flag:"server-url" default:"http://localhost:8080" help:"Server URL"`
+	LogLevel  v2.LogLevel `default:"info"                  flag:"log-level"  help:"Log level"  short:"l"`
+	ServerURL string      `default:"http://localhost:8080" flag:"server-url" help:"Server URL"`
 }
 
 // DatabaseService simulates a database connection.
@@ -54,16 +56,20 @@ func NewDatabaseService(i do.Injector) (*DatabaseService, error) {
 // Shutdown implements the Shutdowner interface.
 func (d *DatabaseService) Shutdown() error {
 	fmt.Println("Database: shutting down...")
+
 	d.connected = false
+
 	fmt.Println("Database: disconnected")
+
 	return nil
 }
 
 // HealthCheck implements the HealthcheckerWithContext interface.
 func (d *DatabaseService) HealthCheck(ctx context.Context) error {
 	if !d.connected {
-		return fmt.Errorf("database not connected")
+		return errors.New("database not connected")
 	}
+
 	return nil
 }
 
@@ -80,15 +86,18 @@ type APIService struct {
 // NewAPIService creates a new API service.
 func NewAPIService(i do.Injector) (*APIService, error) {
 	db := do.MustInvoke[*DatabaseService](i)
+
 	return &APIService{client: db}, nil
 }
 
 // Call simulates an API call.
 func (a *APIService) Call(ctx context.Context) error {
 	if !a.client.IsConnected() {
-		return fmt.Errorf("database not available")
+		return errors.New("database not available")
 	}
+
 	fmt.Println("API: calling database...")
+
 	return nil
 }
 
@@ -120,12 +129,15 @@ func main() {
 		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Running health checks...")
 
-			if err := root.ScopeStruct().HealthCheckWithContext(ctx); err != nil {
+			err := root.ScopeStruct().HealthCheckWithContext(ctx)
+			if err != nil {
 				fmt.Printf("Health check FAILED: %v\n", err)
+
 				return err
 			}
 
 			fmt.Println("All health checks PASSED!")
+
 			return nil
 		},
 	}); err != nil {
@@ -142,6 +154,7 @@ func main() {
 			if err != nil {
 				return err
 			}
+
 			return api.Call(ctx)
 		},
 	}); err != nil {
@@ -159,12 +172,15 @@ func main() {
 			shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
-			if err := root.Shutdown(shutdownCtx); err != nil {
+			err := root.Shutdown(shutdownCtx)
+			if err != nil {
 				fmt.Printf("Shutdown error: %v\n", err)
+
 				return err
 			}
 
 			fmt.Println("Shutdown complete!")
+
 			return nil
 		},
 	}); err != nil {

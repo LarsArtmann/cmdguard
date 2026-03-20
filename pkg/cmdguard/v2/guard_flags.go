@@ -28,7 +28,7 @@ func FlagTypeConstraint[F any]() error {
 	case reflect.Struct:
 		// struct{} (NoFlags) or any struct is valid
 		return nil
-	case reflect.Ptr:
+	case reflect.Pointer:
 		// Must be pointer to struct
 		if t.Elem().Kind() == reflect.Struct {
 			return nil
@@ -57,7 +57,7 @@ func createFlagPrototype[F any](flags F) F {
 	var zero F
 
 	t := reflect.TypeOf(zero)
-	if t != nil && t.Kind() == reflect.Ptr {
+	if t != nil && t.Kind() == reflect.Pointer {
 		return reflect.New(t.Elem()).Interface().(F)
 	}
 
@@ -73,7 +73,7 @@ func isNilPointer(v any) bool {
 
 	rv := reflect.ValueOf(v)
 	switch rv.Kind() {
-	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
+	case reflect.Pointer, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
 		return rv.IsNil()
 	}
 
@@ -139,7 +139,7 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 			return zero, nil
 		}
 
-		if t.Kind() == reflect.Ptr {
+		if t.Kind() == reflect.Pointer {
 			// Create new instance of the underlying type
 			newVal := reflect.New(t.Elem())
 			flagsCopy = newVal.Interface().(F)
@@ -159,7 +159,7 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 
 		// Create pointer for parsing
 		t := reflect.TypeOf(flagsCopy)
-		if t.Kind() == reflect.Ptr {
+		if t.Kind() == reflect.Pointer {
 			flagsPtr = flagsCopy
 		} else {
 			// F is a struct - create pointer for parsing
@@ -177,7 +177,7 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 		}
 		// Copy parsed values back to flagsCopy if it was a struct
 		t := reflect.TypeOf(flagsCopy)
-		if t != nil && t.Kind() != reflect.Ptr {
+		if t != nil && t.Kind() != reflect.Pointer {
 			// flagsPtr is *F, dereference to get the parsed values
 			flagsCopy = reflect.ValueOf(flagsPtr).Elem().Interface().(F)
 		}

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
@@ -26,29 +27,29 @@ import (
 
 // GlobalConfig contains application-wide settings.
 type GlobalConfig struct {
-	LogLevel  v2.LogLevel `flag:"log-level" short:"l" default:"info" help:"Log level (debug, info, warn, error)"`
-	LogFormat string      `flag:"log-format" default:"text" help:"Log format (text, json)"`
-	Timeout   v2.Duration `flag:"timeout" default:"30s" help:"Default timeout"`
+	LogLevel  v2.LogLevel `default:"info" flag:"log-level"  help:"Log level (debug, info, warn, error)" short:"l"`
+	LogFormat string      `default:"text" flag:"log-format" help:"Log format (text, json)"`
+	Timeout   v2.Duration `default:"30s"  flag:"timeout"    help:"Default timeout"`
 }
 
 // ServerFlags for the server command.
 type ServerFlags struct {
-	Port     int         `flag:"port" short:"p" default:"8080" help:"Server port"`
-	Host     string      `flag:"host" default:"localhost" help:"Server host"`
-	LogLevel v2.LogLevel `flag:"log-level" default:"" help:"Override log level"`
+	Port     int         `default:"8080"      flag:"port"      help:"Server port"        short:"p"`
+	Host     string      `default:"localhost" flag:"host"      help:"Server host"`
+	LogLevel v2.LogLevel `default:""          flag:"log-level" help:"Override log level"`
 }
 
 // ConfigFlags for the config command.
 type ConfigFlags struct {
-	ConfigFile   string `flag:"config" short:"c" default:"" help:"Config file path"`
-	RequiredFlag string `flag:"required-flag" required:"true" help:"Required flag demo"`
-	OutputFormat string `flag:"output" default:"yaml" help:"Output format (json, yaml)"`
+	ConfigFile   string `default:""     flag:"config"        help:"Config file path"           short:"c"`
+	RequiredFlag string `               flag:"required-flag" help:"Required flag demo"                   required:"true"`
+	OutputFormat string `default:"yaml" flag:"output"        help:"Output format (json, yaml)"`
 }
 
 // EnumFlags demonstrates enum-like validation.
 type EnumFlags struct {
-	Environment string `flag:"env" default:"development" help:"Environment (development, staging, production)"`
-	Region      string `flag:"region" default:"us-east-1" help:"AWS region"`
+	Environment string `default:"development" flag:"env"    help:"Environment (development, staging, production)"`
+	Region      string `default:"us-east-1"   flag:"region" help:"AWS region"`
 }
 
 // Validate implements custom validation for EnumFlags.
@@ -57,30 +58,30 @@ func (f EnumFlags) Validate() error {
 	if !contains(validEnvs, f.Environment) {
 		return fmt.Errorf("invalid environment: %q (must be one of: %v)", f.Environment, validEnvs)
 	}
+
 	return nil
 }
 
 func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 // DurationFlags demonstrates duration parsing.
 type DurationFlags struct {
-	SessionTimeout v2.Duration `flag:"session-timeout" default:"1h" help:"Session timeout duration"`
-	RetryDelay     v2.Duration `flag:"retry-delay" default:"5s" help:"Retry delay between attempts"`
-	MaxWait        v2.Duration `flag:"max-wait" default:"0s" help:"Maximum wait time (0 = no limit)"`
+	SessionTimeout v2.Duration `default:"1h" flag:"session-timeout" help:"Session timeout duration"`
+	RetryDelay     v2.Duration `default:"5s" flag:"retry-delay"     help:"Retry delay between attempts"`
+	MaxWait        v2.Duration `default:"0s" flag:"max-wait"        help:"Maximum wait time (0 = no limit)"`
 }
 
 func main() {
 	ctx := context.Background()
 
 	// Create CLI with global config
-	root, err := v2.New[GlobalConfig, v2.NoFlags]("advflags", "Advanced Flags Example", GlobalConfig{})
+	root, err := v2.New[GlobalConfig, v2.NoFlags](
+		"advflags",
+		"Advanced Flags Example",
+		GlobalConfig{},
+	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
@@ -102,6 +103,7 @@ func main() {
 			fmt.Printf("Starting server on %s:%d\n", flags.Host, flags.Port)
 			fmt.Printf("Log level: %s\n", logLevel)
 			fmt.Printf("Timeout: %s\n", cfg.Timeout)
+
 			return nil
 		},
 	}); err != nil {
@@ -124,12 +126,14 @@ func main() {
 						suggestFormat(flags.OutputFormat))
 				}
 			}
+
 			return nil
 		},
 		RunE: func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
 			fmt.Printf("Config file: %s\n", flags.ConfigFile)
 			fmt.Printf("Required flag: %s\n", flags.RequiredFlag)
 			fmt.Printf("Output format: %s\n", flags.OutputFormat)
+
 			return nil
 		},
 	}); err != nil {
@@ -175,6 +179,7 @@ func main() {
 				flags.RetryDelay,
 				flags.RetryDelay.Milliseconds())
 			fmt.Printf("Max wait: %s\n", flags.MaxWait)
+
 			return nil
 		},
 	}); err != nil {
@@ -195,6 +200,7 @@ func suggestFormat(input string) string {
 
 	// Find closest match
 	var bestMatch string
+
 	bestDistance := len(input)
 
 	for _, format := range validFormats {
@@ -217,6 +223,7 @@ func levenshteinDistance(s1, s2 string) int {
 	if len(s1) == 0 {
 		return len(s2)
 	}
+
 	if len(s2) == 0 {
 		return len(s1)
 	}
@@ -231,6 +238,7 @@ func levenshteinDistance(s1, s2 string) int {
 	for i := 0; i <= len(s1); i++ {
 		matrix[i][0] = i
 	}
+
 	for j := 0; j <= len(s2); j++ {
 		matrix[0][j] = j
 	}
@@ -252,11 +260,4 @@ func levenshteinDistance(s1, s2 string) int {
 	}
 
 	return matrix[len(s1)][len(s2)]
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

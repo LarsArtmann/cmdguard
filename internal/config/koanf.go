@@ -35,16 +35,18 @@ func NewLoader() *Loader {
 // Load loads configuration from all sources with the following priority:
 // 1. Environment variables (highest priority)
 // 2. Config file (if provided)
-// 3. Default values (lowest priority)
+// 3. Default values (lowest priority).
 func (l *Loader) Load(configPath string) error {
 	// 1. Load defaults
-	if err := l.loadDefaults(); err != nil {
+	err := l.loadDefaults()
+	if err != nil {
 		return fmt.Errorf("failed to load defaults: %w", err)
 	}
 
 	// 2. Load config file (if path provided)
 	if configPath != "" {
-		if err := l.loadFile(configPath); err != nil {
+		err := l.loadFile(configPath)
+		if err != nil {
 			// Config file is optional, don't fail if not found
 			if !strings.Contains(err.Error(), "no such file") {
 				return fmt.Errorf("failed to load config file: %w", err)
@@ -53,7 +55,8 @@ func (l *Loader) Load(configPath string) error {
 	}
 
 	// 3. Load environment variables (highest priority)
-	if err := l.loadEnv(); err != nil {
+	err := l.loadEnv()
+	if err != nil {
 		return fmt.Errorf("failed to load environment: %w", err)
 	}
 
@@ -76,13 +79,14 @@ func (l *Loader) loadFile(path string) error {
 
 // loadEnv loads configuration from environment variables.
 // Only variables with CMDGUARD_ prefix are loaded.
-// Example: CMDGUARD_LOG_LEVEL=debug becomes log_level=debug
+// Example: CMDGUARD_LOG_LEVEL=debug becomes log_level=debug.
 func (l *Loader) loadEnv() error {
 	return l.k.Load(env.Provider(".", env.Opt{
 		Prefix: "CMDGUARD_",
 		TransformFunc: func(key, value string) (string, any) {
 			// Transform: CMDGUARD_LOG_LEVEL -> log_level
 			key = strings.ToLower(strings.TrimPrefix(key, "CMDGUARD_"))
+
 			return key, value
 		},
 	}), nil)
