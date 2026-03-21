@@ -61,7 +61,7 @@ func TestParseFlagTags(t *testing.T) {
 	t.Run("non-struct config", func(t *testing.T) {
 		tags, err := ParseFlagTags("not a struct")
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "must be a struct")
+		assert.Contains(t, err.Error(), "expected struct")
 		assert.Nil(t, tags)
 	})
 

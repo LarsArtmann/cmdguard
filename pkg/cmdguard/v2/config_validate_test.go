@@ -27,7 +27,7 @@ func TestValidateConfig(t *testing.T) {
 	t.Run("non-struct config", func(t *testing.T) {
 		err := ValidateConfig("not a struct")
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "must be a struct")
+		assert.Contains(t, err.Error(), "expected struct")
 	})
 
 	t.Run("valid enum value", func(t *testing.T) {

@@ -27,7 +27,7 @@ func TestNewFlagRegistry(t *testing.T) {
 		registry, err := NewFlagRegistry("not a struct")
 		require.Error(t, err)
 		assert.Nil(t, registry)
-		assert.Contains(t, err.Error(), "must be a struct")
+		assert.Contains(t, err.Error(), "expected struct")
 	})
 
 	t.Run("config with short flags", func(t *testing.T) {
