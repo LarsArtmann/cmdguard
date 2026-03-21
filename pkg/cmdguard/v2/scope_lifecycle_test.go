@@ -8,6 +8,7 @@ import (
 func TestScope_Shutdown(t *testing.T) {
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		scope := &Scope{injector: nil}
+
 		err := scope.Shutdown(context.Background())
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)
@@ -48,9 +49,11 @@ func TestScope_ShutdownAll(t *testing.T) {
 		if err := ProvideValue(parent, "parent-value"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
+
 		if err := ProvideValue(child, "child-value"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
+
 		if err := ProvideValue(grandchild, "grandchild-value"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
@@ -65,6 +68,7 @@ func TestScope_ShutdownAll(t *testing.T) {
 func TestScope_HealthCheck(t *testing.T) {
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		scope := &Scope{injector: nil}
+
 		err := scope.HealthCheck()
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)

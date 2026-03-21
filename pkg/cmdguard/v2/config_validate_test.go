@@ -23,6 +23,7 @@ func TestValidateConfig(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "must not be nil") {
 			t.Errorf("expected error to contain 'must not be nil', got: %v", err)
 		}
@@ -33,6 +34,7 @@ func TestValidateConfig(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "expected struct") {
 			t.Errorf("expected error to contain 'expected struct', got: %v", err)
 		}
@@ -58,6 +60,7 @@ func TestValidateConfig(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "config validation") {
 			t.Errorf("expected error to contain 'config validation', got: %v", err)
 		}
@@ -80,6 +83,7 @@ func TestValidateConfig(t *testing.T) {
 		}
 
 		cfg := TestConfig{Level: LogLevelInfo}
+
 		err := ValidateConfig(cfg)
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)
@@ -92,6 +96,7 @@ func TestValidateConfig(t *testing.T) {
 		}
 
 		cfg := TestConfig{Format: LogFormatText}
+
 		err := ValidateConfig(cfg)
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)

@@ -290,7 +290,7 @@ func TestCommandOptions(t *testing.T) {
 		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
 		}
-		WithRunE[testConfig, NoFlags](handler)(&cmd)
+		WithRunE(handler)(&cmd)
 
 		if cmd.RunE == nil {
 			t.Error("RunE = nil, want non-nil handler")
@@ -302,7 +302,7 @@ func TestCommandOptions(t *testing.T) {
 		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
 		}
-		WithPreRunE[testConfig, NoFlags](handler)(&cmd)
+		WithPreRunE(handler)(&cmd)
 
 		if cmd.PreRunE == nil {
 			t.Error("PreRunE = nil, want non-nil handler")
@@ -314,7 +314,7 @@ func TestCommandOptions(t *testing.T) {
 		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
 		}
-		WithPostRunE[testConfig, NoFlags](handler)(&cmd)
+		WithPostRunE(handler)(&cmd)
 
 		if cmd.PostRunE == nil {
 			t.Error("PostRunE = nil, want non-nil handler")
@@ -329,7 +329,7 @@ func TestCommandOptions(t *testing.T) {
 			},
 		}
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		WithSubcommands[testConfig, NoFlags](subCmd)(&cmd)
+		WithSubcommands(subCmd)(&cmd)
 
 		if len(cmd.Commands) != 1 {
 			t.Errorf("len(Commands) = %d, want 1", len(cmd.Commands))
@@ -370,7 +370,7 @@ func TestNewCommand(t *testing.T) {
 		cmd, err := NewCommand[testConfig, NoFlags](
 			"test",
 			WithShort[testConfig, NoFlags]("short description"),
-			WithRunE[testConfig, NoFlags](
+			WithRunE(
 				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 					return nil
 				},
@@ -396,7 +396,7 @@ func TestNewCommand(t *testing.T) {
 	t.Run("error: empty use", func(t *testing.T) {
 		cmd, err := NewCommand[testConfig, NoFlags](
 			"",
-			WithRunE[testConfig, NoFlags](
+			WithRunE(
 				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 					return nil
 				},
@@ -440,7 +440,7 @@ func TestNewCommand(t *testing.T) {
 			WithLong[testConfig, NoFlags]("long"),
 			WithAliases[testConfig, NoFlags]("alias1", "alias2"),
 			WithExample[testConfig, NoFlags]("example"),
-			WithRunE[testConfig, NoFlags](handler),
+			WithRunE(handler),
 			WithHidden[testConfig, NoFlags](true),
 			WithDeprecated[testConfig, NoFlags]("deprecated"),
 		)
@@ -484,7 +484,7 @@ func TestNewCommand(t *testing.T) {
 	t.Run("creates command with subcommands", func(t *testing.T) {
 		subCmd, err := NewCommand[testConfig, NoFlags](
 			"sub",
-			WithRunE[testConfig, NoFlags](
+			WithRunE(
 				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 					return nil
 				},
@@ -495,7 +495,7 @@ func TestNewCommand(t *testing.T) {
 		}
 
 		root, err := NewCommand[testConfig, NoFlags]("root",
-			WithSubcommands[testConfig, NoFlags](subCmd),
+			WithSubcommands(subCmd),
 		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -525,7 +525,7 @@ func TestCommand_CompleteStructure(t *testing.T) {
 		subCmd, err := NewCommand[testConfig, *appFlags](
 			"sub",
 			WithShort[testConfig, *appFlags]("A subcommand"),
-			WithRunE[testConfig, *appFlags](
+			WithRunE(
 				func(ctx context.Context, cfg *testConfig, flags *appFlags) error {
 					return nil
 				},

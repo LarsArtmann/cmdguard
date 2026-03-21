@@ -19,6 +19,7 @@ func TestScopedProvider(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if value != "plugin-value" {
 			t.Errorf("expected value 'plugin-value', got %q", value)
 		}
@@ -31,9 +32,11 @@ func TestRegisterInScope(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "parent scope is nil") {
 			t.Errorf("expected error to contain 'parent scope is nil', got: %v", err)
 		}
+
 		if child != nil {
 			t.Errorf("expected child to be nil, got %v", child)
 		}
@@ -50,12 +53,15 @@ func TestRegisterInScope(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if child == nil {
 			t.Fatal("expected child to not be nil")
 		}
+
 		if child.Name() != "child" {
 			t.Errorf("expected name 'child', got %q", child.Name())
 		}
+
 		if child.Parent() != parent {
 			t.Error("expected parent to be the same")
 		}
@@ -71,9 +77,11 @@ func TestRegisterInScope(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "invalid type") {
 			t.Errorf("expected error to contain 'invalid type', got: %v", err)
 		}
+
 		if child != nil {
 			t.Errorf("expected child to be nil, got %v", child)
 		}
@@ -90,6 +98,7 @@ func TestRegisterInScope(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if child == nil {
 			t.Fatal("expected child to not be nil")
 		}

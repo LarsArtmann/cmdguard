@@ -10,6 +10,7 @@ import (
 func TestProvide(t *testing.T) {
 	t.Run("registers service provider", func(t *testing.T) {
 		scope := NewScope("test")
+
 		err := Provide(scope, func(i do.Injector) (string, error) {
 			return "test-value", nil
 		})
@@ -21,6 +22,7 @@ func TestProvide(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking, got: %v", err)
 		}
+
 		if value != "test-value" {
 			t.Errorf("expected value 'test-value', got %q", value)
 		}
@@ -33,6 +35,7 @@ func TestProvide(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "scope is nil") {
 			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
 		}
@@ -67,6 +70,7 @@ func TestProvide(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking, got: %v", err)
 		}
+
 		if value != Service("dependency-enhanced") {
 			t.Errorf("expected value 'dependency-enhanced', got %q", value)
 		}
@@ -76,6 +80,7 @@ func TestProvide(t *testing.T) {
 func TestProvideValue(t *testing.T) {
 	t.Run("registers value directly", func(t *testing.T) {
 		scope := NewScope("test")
+
 		err := ProvideValue(scope, 42)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -85,6 +90,7 @@ func TestProvideValue(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking, got: %v", err)
 		}
+
 		if value != 42 {
 			t.Errorf("expected value 42, got %d", value)
 		}
@@ -95,6 +101,7 @@ func TestProvideValue(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "scope is nil") {
 			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
 		}
@@ -107,6 +114,7 @@ func TestProvideValue(t *testing.T) {
 		}
 
 		scope := NewScope("test")
+
 		cfg := Config{Name: "app", Port: 8080}
 		if err := ProvideValue(scope, cfg); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
@@ -116,9 +124,11 @@ func TestProvideValue(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking, got: %v", err)
 		}
+
 		if value.Name != "app" {
 			t.Errorf("expected name 'app', got %q", value.Name)
 		}
+
 		if value.Port != 8080 {
 			t.Errorf("expected port 8080, got %d", value.Port)
 		}
@@ -136,6 +146,7 @@ func TestInvoke(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking, got: %v", err)
 		}
+
 		if value != "hello" {
 			t.Errorf("expected value 'hello', got %q", value)
 		}
@@ -146,9 +157,11 @@ func TestInvoke(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "scope is nil") {
 			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
 		}
+
 		if value != "" {
 			t.Errorf("expected empty value, got %q", value)
 		}
@@ -161,6 +174,7 @@ func TestInvoke(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if value != "" {
 			t.Errorf("expected empty value, got %q", value)
 		}
@@ -171,9 +185,11 @@ func TestInvoke(t *testing.T) {
 		if err := ProvideValue(scope, 123); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
+
 		if err := ProvideValue(scope, "text"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
+
 		if err := ProvideValue(scope, true); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
@@ -182,6 +198,7 @@ func TestInvoke(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking int, got: %v", err)
 		}
+
 		if intVal != 123 {
 			t.Errorf("expected int value 123, got %d", intVal)
 		}
@@ -190,6 +207,7 @@ func TestInvoke(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking string, got: %v", err)
 		}
+
 		if strVal != "text" {
 			t.Errorf("expected string value 'text', got %q", strVal)
 		}
@@ -198,6 +216,7 @@ func TestInvoke(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking bool, got: %v", err)
 		}
+
 		if !boolVal {
 			t.Error("expected bool value true")
 		}

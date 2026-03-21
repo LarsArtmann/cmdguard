@@ -1,21 +1,24 @@
 package v2
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func setupFlagTest[T any](t *testing.T, config T) (*FlagRegistry, *cobra.Command) {
 	t.Helper()
 
 	registry, err := NewFlagRegistry(config)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 
 	cmd := &cobra.Command{Use: "test"}
-	require.NoError(t, registry.RegisterFlags(cmd))
+	if err := registry.RegisterFlags(cmd); err != nil {
+		t.Fatalf("expected no error registering flags, got: %v", err)
+	}
 
 	return registry, cmd
 }
@@ -28,10 +31,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
-		require.NoError(t, cmd.PersistentFlags().Set("mode", "staging"))
+		if err := cmd.PersistentFlags().Set("mode", "staging"); err != nil {
+			t.Fatalf("expected no error setting flag, got: %v", err)
+		}
 
 		err := registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("invalid value returns error", func(t *testing.T) {
@@ -42,11 +49,17 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Manually set an invalid value (bypassing validation)
-		require.NoError(t, cmd.PersistentFlags().Set("mode", "invalid"))
+		if err := cmd.PersistentFlags().Set("mode", "invalid"); err != nil {
+			t.Fatalf("expected no error setting flag, got: %v", err)
+		}
 
 		err := registry.ValidateFlags(cmd)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "mode")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "mode") {
+			t.Errorf("expected error to contain 'mode', got: %v", err)
+		}
 	})
 
 	t.Run("unchanged flag skips validation", func(t *testing.T) {
@@ -58,7 +71,9 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		// Don't change the flag - should pass validation
 		err := registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("flag without values skips validation", func(t *testing.T) {
@@ -68,10 +83,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
-		require.NoError(t, cmd.PersistentFlags().Set("name", "anything"))
+		if err := cmd.PersistentFlags().Set("name", "anything"); err != nil {
+			t.Fatalf("expected no error setting flag, got: %v", err)
+		}
 
 		err := registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
@@ -83,9 +102,15 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		// Don't set the flag - should fail validation
 		err := registry.ValidateFlags(cmd)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "name")
-		assert.Contains(t, err.Error(), "required")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "name") {
+			t.Errorf("expected error to contain 'name', got: %v", err)
+		}
+		if !strings.Contains(err.Error(), "required") {
+			t.Errorf("expected error to contain 'required', got: %v", err)
+		}
 	})
 
 	t.Run("required flag set passes validation", func(t *testing.T) {
@@ -95,10 +120,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
-		require.NoError(t, cmd.PersistentFlags().Set("name", "test-value"))
+		if err := cmd.PersistentFlags().Set("name", "test-value"); err != nil {
+			t.Fatalf("expected no error setting flag, got: %v", err)
+		}
 
 		err := registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("required false does not enforce", func(t *testing.T) {
@@ -110,6 +139,8 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		// Don't set the flag - should pass since required:"false"
 		err := registry.ValidateFlags(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 }

@@ -4,9 +4,6 @@ import (
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestFlagTag_DefaultValue(t *testing.T) {
@@ -89,10 +86,12 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.tag.DefaultValue()
-			assert.Equal(t, tt.expected, result)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.tag.DefaultValue()
+			if !reflect.DeepEqual(tc.expected, result) {
+				t.Errorf("expected %v, got %v", tc.expected, result)
+			}
 		})
 	}
 }
@@ -101,8 +100,12 @@ func TestConfig_DefaultConfig(t *testing.T) {
 	t.Run("default values", func(t *testing.T) {
 		cfg := Config{}
 		tags, err := ParseFlagTags(cfg)
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(tags), 4)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+		if len(tags) < 4 {
+			t.Fatalf("expected at least 4 tags, got %d", len(tags))
+		}
 
 		// Find LogLevel tag
 		var logLevelTag *FlagTag
@@ -115,8 +118,14 @@ func TestConfig_DefaultConfig(t *testing.T) {
 			}
 		}
 
-		require.NotNil(t, logLevelTag)
-		assert.Equal(t, "info", logLevelTag.Default)
-		assert.Equal(t, "l", logLevelTag.Short)
+		if logLevelTag == nil {
+			t.Fatal("expected logLevelTag to not be nil")
+		}
+		if logLevelTag.Default != "info" {
+			t.Errorf("expected Default 'info', got %q", logLevelTag.Default)
+		}
+		if logLevelTag.Short != "l" {
+			t.Errorf("expected Short 'l', got %q", logLevelTag.Short)
+		}
 	})
 }

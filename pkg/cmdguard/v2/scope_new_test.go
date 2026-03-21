@@ -12,12 +12,15 @@ func TestNewScope(t *testing.T) {
 		if scope == nil {
 			t.Fatal("expected scope to not be nil")
 		}
+
 		if scope.Name() != "root" {
 			t.Errorf("expected name to be 'root', got %q", scope.Name())
 		}
+
 		if scope.Parent() != nil {
 			t.Errorf("expected parent to be nil, got %v", scope.Parent())
 		}
+
 		if !scope.IsRoot() {
 			t.Error("expected IsRoot to be true")
 		}
@@ -34,13 +37,16 @@ func TestNewScope(t *testing.T) {
 func TestNewScopeFromInjector(t *testing.T) {
 	t.Run("creates scope from existing injector", func(t *testing.T) {
 		injector := do.New()
+
 		scope := NewScopeFromInjector(injector, "custom")
 		if scope == nil {
 			t.Fatal("expected scope to not be nil")
 		}
+
 		if scope.Name() != "custom" {
 			t.Errorf("expected name to be 'custom', got %q", scope.Name())
 		}
+
 		if scope.Injector() != injector {
 			t.Error("expected injector to be the same")
 		}
@@ -48,6 +54,7 @@ func TestNewScopeFromInjector(t *testing.T) {
 
 	t.Run("scope is root when created from injector", func(t *testing.T) {
 		injector := do.New()
+
 		scope := NewScopeFromInjector(injector, "root")
 		if !scope.IsRoot() {
 			t.Error("expected IsRoot to be true")

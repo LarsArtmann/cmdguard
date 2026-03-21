@@ -41,6 +41,7 @@ func TestScope_Integration(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking config, got: %v", err)
 		}
+
 		if !cfg.Debug {
 			t.Error("expected Debug to be true")
 		}
@@ -49,6 +50,7 @@ func TestScope_Integration(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error invoking mode, got: %v", err)
 		}
+
 		if mode != "debug-mode" {
 			t.Errorf("expected mode to be 'debug-mode', got %q", mode)
 		}
