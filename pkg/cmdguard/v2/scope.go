@@ -107,16 +107,6 @@ func Invoke[T any](scope *Scope) (T, error) {
 	return do.Invoke[T](scope.injector)
 }
 
-// MustInvoke retrieves a service from the scope, panicking on error.
-// Use this in constructors where errors are not expected.
-func MustInvoke[T any](scope *Scope) T {
-	if scope == nil {
-		panic(fmt.Sprintf("%v: scope is nil", ErrInvalidScope))
-	}
-
-	return do.MustInvoke[T](scope.injector)
-}
-
 // InvokeNamed retrieves a named service from the scope.
 // Returns an error if the service is not found or construction fails.
 func InvokeNamed[T any](scope *Scope, name string) (T, error) {
@@ -126,16 +116,6 @@ func InvokeNamed[T any](scope *Scope, name string) (T, error) {
 	}
 
 	return do.InvokeNamed[T](scope.injector, name)
-}
-
-// MustInvokeNamed retrieves a named service from the scope, panicking on error.
-// Use this in constructors where errors are not expected.
-func MustInvokeNamed[T any](scope *Scope, name string) T {
-	if scope == nil {
-		panic(fmt.Sprintf("%v: scope is nil", ErrInvalidScope))
-	}
-
-	return do.MustInvokeNamed[T](scope.injector, name)
 }
 
 // Shutdown gracefully shuts down all services in this scope.
