@@ -1,6 +1,6 @@
 module github.com/larsartmann/cmdguard
 
-go 1.26.0
+go 1.26.1
 
 require (
 	github.com/charmbracelet/fang v1.0.0
@@ -8,7 +8,7 @@ require (
 	github.com/knadh/koanf/providers/confmap v1.0.0
 	github.com/knadh/koanf/providers/env/v2 v2.0.0
 	github.com/knadh/koanf/providers/file v1.2.1
-	github.com/knadh/koanf/v2 v2.3.3
+	github.com/knadh/koanf/v2 v2.3.4
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 	github.com/samber/do/v2 v2.0.0
