@@ -7,123 +7,153 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGuardedCommand_Execute(t *testing.T) {
 	t.Run("executes help command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"--help"})
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("executes subcommand", func(t *testing.T) {
 		executed := false
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				executed = true
 
 				return nil
 			},
 		}
-		require.NoError(t, g.AddCommand(cmd))
+		if err := g.AddCommand(cmd); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"greet"})
-		require.NoError(t, err)
-		assert.True(t, executed)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if !executed {
+			t.Error("command was not executed")
+		}
 	})
 
 	t.Run("error: unknown subcommand", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		// Add a valid subcommand first
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: "valid",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
-		require.NoError(t, g.AddCommand(cmd))
+		if err := g.AddCommand(cmd); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		// Now try an unknown subcommand - Cobra should return an error
 		err = g.ExecuteWithArgs(context.Background(), []string{"unknown"})
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "unknown")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !strings.Contains(err.Error(), "unknown") {
+			t.Errorf("error should contain 'unknown', got %q", err.Error())
+		}
 	})
 
 	t.Run("executes with flags", func(t *testing.T) {
 		var receivedName string
 
-		type GreetFlags struct {
+		type greetFlags struct {
 			Name string `default:"World" flag:"name"`
 		}
 
-		g, err := New[TestAppConfig, *GreetFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, *greetFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		cmd := Command[TestAppConfig, *GreetFlags]{
+		cmd := Command[testAppConfig, *greetFlags]{
 			Use:   "greet",
-			Flags: &GreetFlags{},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
+			Flags: &greetFlags{},
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags *greetFlags) error {
 				receivedName = flags.Name
 
 				return nil
 			},
 		}
-		require.NoError(t, g.AddCommand(cmd))
+		if err := g.AddCommand(cmd); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"greet", "--name", "Alice"})
-		require.NoError(t, err)
-		assert.Equal(t, "Alice", receivedName)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if receivedName != "Alice" {
+			t.Errorf("receivedName = %q, want %q", receivedName, "Alice")
+		}
 	})
 }
 
 func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
 	t.Run("passes args to command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
-		require.NoError(t, g.AddCommand(cmd))
+		if err := g.AddCommand(cmd); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"greet"})
-		require.NoError(t, err)
-
-		// Verify command executed successfully with the given args
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 }
 
-// runExecuteAndExitSubprocess handles the subprocess execution for ExecuteAndExit tests.
-// When envVar is set to "1", it runs the test command and exits. Otherwise, it returns
-// indicating the parent process should run the subprocess.
-func runExecuteAndExitSubprocess(envVar, use, errorMsg string) bool {
+var errTestIntentionalFailure = errors.New("intentional failure")
+
+func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 	if os.Getenv(envVar) == "1" {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Setup error: %v\n", err)
 			os.Exit(1)
 		}
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: use,
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
-				return errors.New(errorMsg)
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+				return testErr
 			},
 		}
 		_ = g.AddCommand(cmd)
@@ -139,21 +169,27 @@ func runExecuteAndExitSubprocess(envVar, use, errorMsg string) bool {
 
 func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 	t.Run("returns normally on success", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		// ExecuteAndExit should return normally without calling os.Exit
-		assert.NotPanics(t, func() {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					t.Errorf("ExecuteAndExit panicked: %v", r)
+				}
+			}()
+
 			_ = g.ExecuteWithArgs(context.Background(), []string{"--help"})
-		})
+		}()
 	})
 
 	t.Run("exits with code 1 on error", func(t *testing.T) {
-		if runExecuteAndExitSubprocess("BE_TEST_EXEC_AND_EXIT", "fail", "intentional failure") {
+		if runExecuteAndExitSubprocess("BE_TEST_EXEC_AND_EXIT", "fail", errTestIntentionalFailure) {
 			return
 		}
 
-		// Run the test in a subprocess
 		cmd := exec.Command(os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
 
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_AND_EXIT=1")
@@ -161,21 +197,29 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		var stderr bytes.Buffer
 
 		cmd.Stderr = &stderr
+
 		err := cmd.Run()
-
-		// The subprocess should have exited with code 1
-		require.Error(t, err, "expected exit code 1")
-
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			assert.Equal(t, 1, exitErr.ExitCode())
+		if err == nil {
+			t.Fatal("expected error (exit code 1)")
 		}
 
-		assert.Contains(t, stderr.String(), "ERROR")
-		assert.Contains(t, stderr.String(), "Intentional failure")
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			if exitErr.ExitCode() != 1 {
+				t.Errorf("exit code = %d, want 1", exitErr.ExitCode())
+			}
+		}
+
+		if !strings.Contains(stderr.String(), "ERROR") {
+			t.Errorf("stderr should contain 'ERROR', got %q", stderr.String())
+		}
+
+		if !strings.Contains(strings.ToLower(stderr.String()), "intentional failure") {
+			t.Errorf("stderr should contain 'intentional failure', got %q", stderr.String())
+		}
 	})
 
 	t.Run("stderr contains error message", func(t *testing.T) {
-		if runExecuteAndExitSubprocess("BE_TEST_EXEC_STDERR", "boom", "boom error") {
+		if runExecuteAndExitSubprocess("BE_TEST_EXEC_STDERR", "boom", errors.New("boom error")) {
 			return
 		}
 
@@ -188,6 +232,8 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		cmd.Stderr = &stderr
 		_ = cmd.Run()
 
-		assert.Contains(t, stderr.String(), "Boom error")
+		if !strings.Contains(strings.ToLower(stderr.String()), "boom error") {
+			t.Errorf("stderr should contain 'boom error', got %q", stderr.String())
+		}
 	})
 }

@@ -1,56 +1,76 @@
 package v2
 
 import (
+	"errors"
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCloneFlags(t *testing.T) {
-	type TestFlags struct {
+	type testFlags struct {
 		Name  string
 		Count int
 	}
 
 	t.Run("clones struct", func(t *testing.T) {
-		original := TestFlags{Name: "test", Count: 42}
+		original := testFlags{Name: "test", Count: 42}
 		cloned := cloneFlags(original)
 
-		require.NotNil(t, cloned)
-		// cloned is already TestFlags, no type assertion needed
-		assert.Equal(t, original.Name, cloned.Name)
-		assert.Equal(t, original.Count, cloned.Count)
+		if cloned.Name != original.Name {
+			t.Errorf("Name = %q, want %q", cloned.Name, original.Name)
+		}
 
-		// Verify it's a copy (modifying clone doesn't affect original)
+		if cloned.Count != original.Count {
+			t.Errorf("Count = %d, want %d", cloned.Count, original.Count)
+		}
+
 		cloned.Name = "modified"
-		assert.Equal(t, "test", original.Name)
+		if original.Name != "test" {
+			t.Errorf(
+				"original.Name = %q, want %q (should be unaffected by clone modification)",
+				original.Name,
+				"test",
+			)
+		}
 	})
 
 	t.Run("clones pointer to struct", func(t *testing.T) {
-		original := &TestFlags{Name: "test", Count: 42}
+		original := &testFlags{Name: "test", Count: 42}
 		cloned := cloneFlags(original)
 
-		require.NotNil(t, cloned)
-		// cloned is already *TestFlags, no type assertion needed
-		assert.Equal(t, original.Name, cloned.Name)
-		assert.Equal(t, original.Count, cloned.Count)
+		if cloned == nil {
+			t.Fatal("expected non-nil cloned value")
+		}
 
-		// Verify it's a different pointer
-		assert.NotSame(t, original, cloned)
+		if cloned.Name != original.Name {
+			t.Errorf("Name = %q, want %q", cloned.Name, original.Name)
+		}
+
+		if cloned.Count != original.Count {
+			t.Errorf("Count = %d, want %d", cloned.Count, original.Count)
+		}
+
+		if cloned == original {
+			t.Error("cloned should be a different pointer from original")
+		}
 	})
 
 	t.Run("returns nil for nil pointer", func(t *testing.T) {
-		var original *TestFlags // nil
+		var original *testFlags
 
-		cloned := cloneFlags[*TestFlags](original)
-		assert.Nil(t, cloned)
+		cloned := cloneFlags(original)
+		if cloned != nil {
+			t.Errorf("cloneFlags(nil) = %v, want nil", cloned)
+		}
 	})
 
 	t.Run("returns as-is for non-struct", func(t *testing.T) {
 		original := "string value"
+
 		cloned := cloneFlags(original)
-		assert.Equal(t, original, cloned)
+		if cloned != original {
+			t.Errorf("cloneFlags(%q) = %q, want %q", original, cloned, original)
+		}
 	})
 }
 
@@ -62,58 +82,106 @@ func TestFlagTypeConstraint(t *testing.T) {
 
 	t.Run("accepts NoFlags (struct{})", func(t *testing.T) {
 		err := FlagTypeConstraint[NoFlags]()
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("accepts pointer to struct", func(t *testing.T) {
 		err := FlagTypeConstraint[*testFlags]()
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("accepts empty struct", func(t *testing.T) {
-		type EmptyFlags struct{}
+		type emptyFlags struct{}
 
-		err := FlagTypeConstraint[EmptyFlags]()
-		assert.NoError(t, err)
+		err := FlagTypeConstraint[emptyFlags]()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("accepts struct with fields", func(t *testing.T) {
 		err := FlagTypeConstraint[testFlags]()
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("rejects pointer to non-struct", func(t *testing.T) {
 		err := FlagTypeConstraint[*string]()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidFlagType)
-		assert.Contains(t, err.Error(), "*string")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidFlagType) {
+			t.Errorf("expected ErrInvalidFlagType, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "*string") {
+			t.Errorf("error should contain '*string', got %q", err.Error())
+		}
 	})
 
 	t.Run("rejects int", func(t *testing.T) {
 		err := FlagTypeConstraint[int]()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidFlagType)
-		assert.Contains(t, err.Error(), "int")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidFlagType) {
+			t.Errorf("expected ErrInvalidFlagType, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "int") {
+			t.Errorf("error should contain 'int', got %q", err.Error())
+		}
 	})
 
 	t.Run("rejects string", func(t *testing.T) {
 		err := FlagTypeConstraint[string]()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidFlagType)
-		assert.Contains(t, err.Error(), "string")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidFlagType) {
+			t.Errorf("expected ErrInvalidFlagType, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "string") {
+			t.Errorf("error should contain 'string', got %q", err.Error())
+		}
 	})
 
 	t.Run("rejects slice", func(t *testing.T) {
 		err := FlagTypeConstraint[[]string]()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidFlagType)
-		assert.Contains(t, err.Error(), "[]string")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidFlagType) {
+			t.Errorf("expected ErrInvalidFlagType, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "[]string") {
+			t.Errorf("error should contain '[]string', got %q", err.Error())
+		}
 	})
 
 	t.Run("rejects map", func(t *testing.T) {
 		err := FlagTypeConstraint[map[string]string]()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidFlagType)
-		assert.Contains(t, err.Error(), "map[string]string")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidFlagType) {
+			t.Errorf("expected ErrInvalidFlagType, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "map[string]string") {
+			t.Errorf("error should contain 'map[string]string', got %q", err.Error())
+		}
 	})
 }

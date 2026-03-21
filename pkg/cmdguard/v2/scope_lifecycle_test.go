@@ -3,33 +3,41 @@ package v2
 import (
 	"context"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestScope_Shutdown(t *testing.T) {
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		scope := &Scope{injector: nil}
 		err := scope.Shutdown(context.Background())
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("shuts down successfully", func(t *testing.T) {
 		scope := NewScope("test")
-		require.NoError(t, ProvideValue(scope, "value"))
+		if err := ProvideValue(scope, "value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
 
 		err := scope.Shutdown(context.Background())
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 }
 
 func TestScope_ShutdownAll(t *testing.T) {
 	t.Run("shuts down single scope", func(t *testing.T) {
 		scope := NewScope("root")
-		require.NoError(t, ProvideValue(scope, "value"))
+		if err := ProvideValue(scope, "value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
 
 		err := scope.ShutdownAll(context.Background())
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("shuts down scope hierarchy", func(t *testing.T) {
@@ -37,12 +45,20 @@ func TestScope_ShutdownAll(t *testing.T) {
 		child := parent.Child("child")
 		grandchild := child.Child("grandchild")
 
-		require.NoError(t, ProvideValue(parent, "parent-value"))
-		require.NoError(t, ProvideValue(child, "child-value"))
-		require.NoError(t, ProvideValue(grandchild, "grandchild-value"))
+		if err := ProvideValue(parent, "parent-value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
+		if err := ProvideValue(child, "child-value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
+		if err := ProvideValue(grandchild, "grandchild-value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
 
 		err := grandchild.ShutdownAll(context.Background())
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 }
 
@@ -50,14 +66,20 @@ func TestScope_HealthCheck(t *testing.T) {
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		scope := &Scope{injector: nil}
 		err := scope.HealthCheck()
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("returns nil for healthy services", func(t *testing.T) {
 		scope := NewScope("test")
-		require.NoError(t, ProvideValue(scope, "value"))
+		if err := ProvideValue(scope, "value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
 
 		err := scope.HealthCheck()
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 }

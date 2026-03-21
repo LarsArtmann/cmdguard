@@ -2,15 +2,14 @@ package v2
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestMergeConfigs(t *testing.T) {
 	t.Run("empty configs", func(t *testing.T) {
 		result := MergeConfigs[int]()
-		assert.Nil(t, result)
+		if result != nil {
+			t.Errorf("expected nil, got %v", result)
+		}
 	})
 
 	t.Run("single config", func(t *testing.T) {
@@ -20,8 +19,12 @@ func TestMergeConfigs(t *testing.T) {
 
 		cfg := &TestConfig{Name: "test"}
 		result := MergeConfigs(cfg)
-		require.NotNil(t, result)
-		assert.Equal(t, "test", result.Name)
+		if result == nil {
+			t.Fatal("expected result to not be nil")
+		}
+		if result.Name != "test" {
+			t.Errorf("expected name 'test', got %q", result.Name)
+		}
 	})
 
 	t.Run("merge two configs", func(t *testing.T) {
@@ -34,9 +37,15 @@ func TestMergeConfigs(t *testing.T) {
 		override := &TestConfig{Name: "override", Count: 0} // Zero value won't override
 
 		result := MergeConfigs(base, override)
-		require.NotNil(t, result)
-		assert.Equal(t, "override", result.Name) // Overridden
-		assert.Equal(t, 10, result.Count)        // Not overridden (zero value)
+		if result == nil {
+			t.Fatal("expected result to not be nil")
+		}
+		if result.Name != "override" { // Overridden
+			t.Errorf("expected name 'override', got %q", result.Name)
+		}
+		if result.Count != 10 { // Not overridden (zero value)
+			t.Errorf("expected count 10, got %d", result.Count)
+		}
 	})
 
 	t.Run("nil base config", func(t *testing.T) {
@@ -45,9 +54,13 @@ func TestMergeConfigs(t *testing.T) {
 		}
 
 		override := &TestConfig{Name: "override"}
-		result := MergeConfigs[TestConfig](nil, override)
-		require.NotNil(t, result)
-		assert.Equal(t, "override", result.Name)
+		result := MergeConfigs(nil, override)
+		if result == nil {
+			t.Fatal("expected result to not be nil")
+		}
+		if result.Name != "override" {
+			t.Errorf("expected name 'override', got %q", result.Name)
+		}
 	})
 
 	t.Run("nil override config", func(t *testing.T) {
@@ -57,8 +70,12 @@ func TestMergeConfigs(t *testing.T) {
 
 		base := &TestConfig{Name: "base"}
 		result := MergeConfigs(base, nil)
-		require.NotNil(t, result)
-		assert.Equal(t, "base", result.Name)
+		if result == nil {
+			t.Fatal("expected result to not be nil")
+		}
+		if result.Name != "base" {
+			t.Errorf("expected name 'base', got %q", result.Name)
+		}
 	})
 
 	t.Run("nested struct merge", func(t *testing.T) {
@@ -75,9 +92,15 @@ func TestMergeConfigs(t *testing.T) {
 		override := &Outer{Inner: Inner{Value: "override-inner"}, Name: ""}
 
 		result := MergeConfigs(base, override)
-		require.NotNil(t, result)
-		assert.Equal(t, "override-inner", result.Inner.Value)
-		assert.Equal(t, "base", result.Name) // Not overridden (empty)
+		if result == nil {
+			t.Fatal("expected result to not be nil")
+		}
+		if result.Inner.Value != "override-inner" {
+			t.Errorf("expected inner value 'override-inner', got %q", result.Inner.Value)
+		}
+		if result.Name != "base" { // Not overridden (empty)
+			t.Errorf("expected name 'base', got %q", result.Name)
+		}
 	})
 
 	t.Run("multiple configs", func(t *testing.T) {
@@ -92,9 +115,17 @@ func TestMergeConfigs(t *testing.T) {
 		third := &TestConfig{C: "c3"}
 
 		result := MergeConfigs(first, second, third)
-		require.NotNil(t, result)
-		assert.Equal(t, "a1", result.A)
-		assert.Equal(t, "b2", result.B)
-		assert.Equal(t, "c3", result.C)
+		if result == nil {
+			t.Fatal("expected result to not be nil")
+		}
+		if result.A != "a1" {
+			t.Errorf("expected A 'a1', got %q", result.A)
+		}
+		if result.B != "b2" {
+			t.Errorf("expected B 'b2', got %q", result.B)
+		}
+		if result.C != "c3" {
+			t.Errorf("expected C 'c3', got %q", result.C)
+		}
 	})
 }

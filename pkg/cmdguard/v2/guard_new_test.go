@@ -1,111 +1,191 @@
 package v2
 
 import (
+	"errors"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-type TestAppConfig struct {
+type testAppConfig struct {
 	Verbose bool   `default:"false" flag:"verbose" help:"Enable verbose output" short:"v"`
 	Output  string `default:"-"     flag:"output"  help:"Output file"           short:"o"`
 }
 
 func TestVersion(t *testing.T) {
 	t.Run("version is set", func(t *testing.T) {
-		assert.NotEmpty(t, Version)
-		assert.Equal(t, "2.0.0", Version)
+		if Version == "" {
+			t.Error("Version is empty")
+		}
+
+		if Version != "2.0.0" {
+			t.Errorf("Version = %q, want %q", Version, "2.0.0")
+		}
 	})
 }
 
 func TestNew(t *testing.T) {
 	t.Run("creates GuardedCommand", func(t *testing.T) {
-		defaults := TestAppConfig{}
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI application", defaults)
-		require.NoError(t, err)
-		require.NotNil(t, g)
+		defaults := testAppConfig{}
 
-		assert.Equal(t, "myapp", g.Name())
-		assert.Equal(t, "My CLI application", g.Short())
-		assert.Empty(t, g.Long())
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI application", defaults)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
+
+		if g.Name() != "myapp" {
+			t.Errorf("Name() = %q, want %q", g.Name(), "myapp")
+		}
+
+		if g.Short() != "My CLI application" {
+			t.Errorf("Short() = %q, want %q", g.Short(), "My CLI application")
+		}
+
+		if g.Long() != "" {
+			t.Errorf("Long() = %q, want empty", g.Long())
+		}
 	})
 
 	t.Run("error: empty name", func(t *testing.T) {
-		defaults := TestAppConfig{}
-		g, err := New[TestAppConfig, NoFlags]("", "My CLI", defaults)
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidCommand)
-		assert.Nil(t, g)
+		defaults := testAppConfig{}
+
+		g, err := New[testAppConfig, NoFlags]("", "My CLI", defaults)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidCommand) {
+			t.Errorf("expected ErrInvalidCommand, got %v", err)
+		}
+
+		if g != nil {
+			t.Errorf("expected nil GuardedCommand, got %v", g)
+		}
 	})
 
 	t.Run("registers config in scope", func(t *testing.T) {
-		defaults := TestAppConfig{Verbose: true}
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", defaults)
-		require.NoError(t, err)
+		defaults := testAppConfig{Verbose: true}
+
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", defaults)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		cfg := g.Config()
-		require.NotNil(t, cfg)
-		assert.True(t, cfg.Verbose)
+		if cfg == nil {
+			t.Fatal("expected non-nil config")
+		}
+
+		if !cfg.Verbose {
+			t.Error("cfg.Verbose = false, want true")
+		}
 	})
 
 	t.Run("creates scope", func(t *testing.T) {
-		defaults := TestAppConfig{}
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", defaults)
-		require.NoError(t, err)
+		defaults := testAppConfig{}
+
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", defaults)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		scope := g.ScopeStruct()
-		require.NotNil(t, scope)
-		assert.Equal(t, "myapp", scope.Name())
+		if scope == nil {
+			t.Fatal("expected non-nil scope")
+		}
+
+		if scope.Name() != "myapp" {
+			t.Errorf("scope.Name() = %q, want %q", scope.Name(), "myapp")
+		}
 	})
 }
 
 func TestNewWithLong(t *testing.T) {
 	t.Run("creates GuardedCommand with long description", func(t *testing.T) {
-		defaults := TestAppConfig{}
-		g, err := NewWithLong[TestAppConfig, NoFlags](
+		defaults := testAppConfig{}
+
+		g, err := NewWithLong[testAppConfig, NoFlags](
 			"myapp",
 			"short",
 			"long description",
 			defaults,
 		)
-		require.NoError(t, err)
-		require.NotNil(t, g)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		assert.Equal(t, "myapp", g.Name())
-		assert.Equal(t, "short", g.Short())
-		assert.Equal(t, "long description", g.Long())
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
+
+		if g.Name() != "myapp" {
+			t.Errorf("Name() = %q, want %q", g.Name(), "myapp")
+		}
+
+		if g.Short() != "short" {
+			t.Errorf("Short() = %q, want %q", g.Short(), "short")
+		}
+
+		if g.Long() != "long description" {
+			t.Errorf("Long() = %q, want %q", g.Long(), "long description")
+		}
 	})
 
 	t.Run("error: empty name", func(t *testing.T) {
-		defaults := TestAppConfig{}
-		g, err := NewWithLong[TestAppConfig, NoFlags]("", "short", "long", defaults)
-		require.Error(t, err)
-		assert.Nil(t, g)
+		defaults := testAppConfig{}
+
+		g, err := NewWithLong[testAppConfig, NoFlags]("", "short", "long", defaults)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if g != nil {
+			t.Errorf("expected nil GuardedCommand, got %v", g)
+		}
 	})
 }
 
 func TestNew_FlagTypeValidation(t *testing.T) {
 	t.Run("rejects invalid flag type in New", func(t *testing.T) {
-		g, err := New[TestAppConfig, int]("myapp", "My CLI", TestAppConfig{})
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidFlagType)
-		assert.Nil(t, g)
+		g, err := New[testAppConfig, int]("myapp", "My CLI", testAppConfig{})
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidFlagType) {
+			t.Errorf("expected ErrInvalidFlagType, got %v", err)
+		}
+
+		if g != nil {
+			t.Errorf("expected nil GuardedCommand, got %v", g)
+		}
 	})
 
 	t.Run("accepts NoFlags in New", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
-		require.NotNil(t, g)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
 	})
 
 	t.Run("accepts pointer to struct in New", func(t *testing.T) {
-		type CmdFlags struct {
+		type cmdFlags struct {
 			Name string `flag:"name"`
 		}
 
-		g, err := New[TestAppConfig, *CmdFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
-		require.NotNil(t, g)
+		g, err := New[testAppConfig, *cmdFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
 	})
 }

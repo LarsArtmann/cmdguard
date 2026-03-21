@@ -2,10 +2,8 @@ package v2
 
 import (
 	"errors"
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestSentinelErrors(t *testing.T) {
@@ -29,8 +27,13 @@ func TestSentinelErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Error(t, tt.err)
-			assert.Contains(t, tt.err.Error(), tt.msg)
+			if tt.err == nil {
+				t.Fatal("expected non-nil error")
+			}
+
+			if !strings.Contains(tt.err.Error(), tt.msg) {
+				t.Errorf("error %q does not contain %q", tt.err.Error(), tt.msg)
+			}
 		})
 	}
 }
@@ -38,94 +41,144 @@ func TestSentinelErrors(t *testing.T) {
 func TestCommandError(t *testing.T) {
 	t.Run("Error message", func(t *testing.T) {
 		err := NewCommandError("test-cmd", ErrMissingHandler)
-		assert.Contains(t, err.Error(), "test-cmd")
-		assert.Contains(t, err.Error(), "command has no handler")
+		if !strings.Contains(err.Error(), "test-cmd") {
+			t.Errorf("expected error to contain 'test-cmd', got %q", err.Error())
+		}
+
+		if !strings.Contains(err.Error(), "command has no handler") {
+			t.Errorf("expected error to contain 'command has no handler', got %q", err.Error())
+		}
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
 		err := NewCommandError("test-cmd", ErrMissingHandler)
+
 		unwrapped := err.Unwrap()
-		require.ErrorIs(t, unwrapped, ErrMissingHandler)
+		if !errors.Is(unwrapped, ErrMissingHandler) {
+			t.Errorf("expected unwrapped error to be ErrMissingHandler, got %v", unwrapped)
+		}
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewCommandError("test-cmd", ErrInvalidCommand)
-		require.ErrorIs(t, err, ErrInvalidCommand)
+		if !errors.Is(err, ErrInvalidCommand) {
+			t.Errorf("expected error to match ErrInvalidCommand")
+		}
 	})
 }
 
 func TestFlagError(t *testing.T) {
+	innerErr := errors.New("invalid value")
+
 	t.Run("Error message", func(t *testing.T) {
-		err := NewFlagError("test-flag", errors.New("invalid value"))
-		assert.Contains(t, err.Error(), "test-flag")
-		assert.Contains(t, err.Error(), "invalid value")
+		err := NewFlagError("test-flag", innerErr)
+		if !strings.Contains(err.Error(), "test-flag") {
+			t.Errorf("expected error to contain 'test-flag', got %q", err.Error())
+		}
+
+		if !strings.Contains(err.Error(), "invalid value") {
+			t.Errorf("expected error to contain 'invalid value', got %q", err.Error())
+		}
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
-		inner := errors.New("inner error")
-		err := NewFlagError("test-flag", inner)
-		unwrapped := err.Unwrap()
-		assert.Equal(t, inner, unwrapped)
+		unwrapped := NewFlagError("test-flag", innerErr).Unwrap()
+		if !errors.Is(unwrapped, innerErr) {
+			t.Errorf("expected unwrapped error to be %v, got %v", innerErr, unwrapped)
+		}
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewFlagError("test-flag", ErrFlagParseFailed)
-		require.ErrorIs(t, err, ErrFlagParseFailed)
+		if !errors.Is(err, ErrFlagParseFailed) {
+			t.Errorf("expected error to match ErrFlagParseFailed")
+		}
 	})
 }
 
 func TestConfigError(t *testing.T) {
+	innerErr := errors.New("must be one of debug,info,warn,error")
+
 	t.Run("Error message", func(t *testing.T) {
-		err := NewConfigError("LogLevel", errors.New("must be one of debug,info,warn,error"))
-		assert.Contains(t, err.Error(), "LogLevel")
-		assert.Contains(t, err.Error(), "must be one of")
+		err := NewConfigError("LogLevel", innerErr)
+		if !strings.Contains(err.Error(), "LogLevel") {
+			t.Errorf("expected error to contain 'LogLevel', got %q", err.Error())
+		}
+
+		if !strings.Contains(err.Error(), "must be one of") {
+			t.Errorf("expected error to contain 'must be one of', got %q", err.Error())
+		}
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
-		inner := errors.New("inner error")
-		err := NewConfigError("field", inner)
-		unwrapped := err.Unwrap()
-		assert.Equal(t, inner, unwrapped)
+		unwrapped := NewConfigError("field", innerErr).Unwrap()
+		if !errors.Is(unwrapped, innerErr) {
+			t.Errorf("expected unwrapped error to be %v, got %v", innerErr, unwrapped)
+		}
 	})
 }
 
 func TestEnumError(t *testing.T) {
 	t.Run("Error message", func(t *testing.T) {
 		err := NewEnumError("invalid", []string{"valid1", "valid2"})
-		assert.Contains(t, err.Error(), "invalid")
-		assert.Contains(t, err.Error(), "valid1")
-		assert.Contains(t, err.Error(), "valid2")
+
+		errMsg := err.Error()
+		if !strings.Contains(errMsg, "invalid") {
+			t.Errorf("expected error to contain 'invalid', got %q", errMsg)
+		}
+
+		if !strings.Contains(errMsg, "valid1") {
+			t.Errorf("expected error to contain 'valid1', got %q", errMsg)
+		}
+
+		if !strings.Contains(errMsg, "valid2") {
+			t.Errorf("expected error to contain 'valid2', got %q", errMsg)
+		}
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
 		err := NewEnumError("invalid", []string{"valid"})
+
 		unwrapped := err.Unwrap()
-		require.ErrorIs(t, unwrapped, ErrInvalidEnum)
+		if !errors.Is(unwrapped, ErrInvalidEnum) {
+			t.Errorf("expected unwrapped error to be ErrInvalidEnum")
+		}
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewEnumError("invalid", []string{"valid"})
-		require.ErrorIs(t, err, ErrInvalidEnum)
+		if !errors.Is(err, ErrInvalidEnum) {
+			t.Errorf("expected error to match ErrInvalidEnum")
+		}
 	})
 }
 
 func TestDurationError(t *testing.T) {
+	innerErr := errors.New("time: invalid duration")
+
 	t.Run("Error message", func(t *testing.T) {
-		err := NewDurationError("not-a-duration", errors.New("time: invalid duration"))
-		assert.Contains(t, err.Error(), "not-a-duration")
-		assert.Contains(t, err.Error(), "time: invalid duration")
+		err := NewDurationError("not-a-duration", innerErr)
+		if !strings.Contains(err.Error(), "not-a-duration") {
+			t.Errorf("expected error to contain 'not-a-duration', got %q", err.Error())
+		}
+
+		if !strings.Contains(err.Error(), "time: invalid duration") {
+			t.Errorf("expected error to contain 'time: invalid duration', got %q", err.Error())
+		}
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
-		inner := errors.New("inner error")
-		err := NewDurationError("bad", inner)
-		unwrapped := err.Unwrap()
-		require.ErrorIs(t, unwrapped, ErrInvalidDuration)
+		unwrapped := NewDurationError("bad", innerErr).Unwrap()
+		if !errors.Is(unwrapped, ErrInvalidDuration) {
+			t.Errorf("expected unwrapped error to be ErrInvalidDuration")
+		}
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
-		err := NewDurationError("bad", errors.New("inner"))
-		require.ErrorIs(t, err, ErrInvalidDuration)
+		err := NewDurationError("bad", innerErr)
+		if !errors.Is(err, ErrInvalidDuration) {
+			t.Errorf("expected error to match ErrInvalidDuration")
+		}
 	})
 }
 
@@ -135,29 +188,43 @@ func TestErrorChaining(t *testing.T) {
 		flagErr := NewFlagError("my-flag", enumErr)
 		cmdErr := NewCommandError("my-cmd", flagErr)
 
-		// All levels should be accessible via errors.Is
-		require.ErrorIs(t, cmdErr, ErrInvalidEnum)
-		require.NotNil(t, cmdErr)
+		if !errors.Is(cmdErr, ErrInvalidEnum) {
+			t.Errorf("expected error chain to contain ErrInvalidEnum")
+		}
+
+		if cmdErr == nil {
+			t.Error("expected non-nil command error")
+		}
 	})
 }
 
 func TestServiceError(t *testing.T) {
+	innerErr := errors.New("service not initialized")
+
 	t.Run("Error message", func(t *testing.T) {
-		inner := errors.New("service not initialized")
-		err := NewServiceError("*DatabaseService", inner)
-		assert.Contains(t, err.Error(), "*DatabaseService")
-		assert.Contains(t, err.Error(), "service not initialized")
+		err := NewServiceError("*DatabaseService", innerErr)
+
+		errMsg := err.Error()
+		if !strings.Contains(errMsg, "*DatabaseService") {
+			t.Errorf("expected error to contain '*DatabaseService', got %q", errMsg)
+		}
+
+		if !strings.Contains(errMsg, "service not initialized") {
+			t.Errorf("expected error to contain 'service not initialized', got %q", errMsg)
+		}
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
-		inner := errors.New("inner error")
-		err := NewServiceError("*LoggerService", inner)
-		unwrapped := err.Unwrap()
-		assert.Equal(t, inner, unwrapped)
+		unwrapped := NewServiceError("*LoggerService", innerErr).Unwrap()
+		if !errors.Is(unwrapped, innerErr) {
+			t.Errorf("expected unwrapped error to be %v, got %v", innerErr, unwrapped)
+		}
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewServiceError("*DatabaseService", ErrServiceNotFound)
-		require.ErrorIs(t, err, ErrServiceNotFound)
+		if !errors.Is(err, ErrServiceNotFound) {
+			t.Errorf("expected error to match ErrServiceNotFound")
+		}
 	})
 }

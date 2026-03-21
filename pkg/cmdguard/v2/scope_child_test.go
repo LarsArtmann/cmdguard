@@ -2,9 +2,6 @@ package v2
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestScope_Child(t *testing.T) {
@@ -12,10 +9,18 @@ func TestScope_Child(t *testing.T) {
 		parent := NewScope("parent")
 		child := parent.Child("child")
 
-		require.NotNil(t, child)
-		assert.Equal(t, "child", child.Name())
-		assert.Equal(t, parent, child.Parent())
-		assert.False(t, child.IsRoot())
+		if child == nil {
+			t.Fatal("expected child to not be nil")
+		}
+		if child.Name() != "child" {
+			t.Errorf("expected name to be 'child', got %q", child.Name())
+		}
+		if child.Parent() != parent {
+			t.Error("expected parent to be the same")
+		}
+		if child.IsRoot() {
+			t.Error("expected IsRoot to be false")
+		}
 	})
 
 	t.Run("child inherits from parent", func(t *testing.T) {
@@ -27,28 +32,38 @@ func TestScope_Child(t *testing.T) {
 		child := parent.Child("child")
 		grandchild := child.Child("grandchild")
 
-		assert.Equal(t, child, grandchild.Parent())
-		assert.Equal(t, parent, grandchild.Parent().Parent())
+		if grandchild.Parent() != child {
+			t.Error("expected grandchild parent to be child")
+		}
+		if grandchild.Parent().Parent() != parent {
+			t.Error("expected grandchild grandparent to be parent")
+		}
 	})
 }
 
 func TestScope_Name(t *testing.T) {
 	t.Run("returns scope name", func(t *testing.T) {
 		scope := NewScope("my-scope")
-		assert.Equal(t, "my-scope", scope.Name())
+		if scope.Name() != "my-scope" {
+			t.Errorf("expected name to be 'my-scope', got %q", scope.Name())
+		}
 	})
 }
 
 func TestScope_Parent(t *testing.T) {
 	t.Run("returns nil for root scope", func(t *testing.T) {
 		scope := NewScope("root")
-		assert.Nil(t, scope.Parent())
+		if scope.Parent() != nil {
+			t.Errorf("expected parent to be nil, got %v", scope.Parent())
+		}
 	})
 
 	t.Run("returns parent for child scope", func(t *testing.T) {
 		parent := NewScope("parent")
 		child := parent.Child("child")
-		assert.Equal(t, parent, child.Parent())
+		if child.Parent() != parent {
+			t.Error("expected parent to be the same")
+		}
 	})
 }
 
@@ -56,20 +71,26 @@ func TestScope_Injector(t *testing.T) {
 	t.Run("returns underlying injector", func(t *testing.T) {
 		scope := NewScope("test")
 		injector := scope.Injector()
-		require.NotNil(t, injector)
+		if injector == nil {
+			t.Fatal("expected injector to not be nil")
+		}
 	})
 }
 
 func TestScope_IsRoot(t *testing.T) {
 	t.Run("returns true for root scope", func(t *testing.T) {
 		scope := NewScope("root")
-		assert.True(t, scope.IsRoot())
+		if !scope.IsRoot() {
+			t.Error("expected IsRoot to be true")
+		}
 	})
 
 	t.Run("returns false for child scope", func(t *testing.T) {
 		parent := NewScope("parent")
 		child := parent.Child("child")
-		assert.False(t, child.IsRoot())
+		if child.IsRoot() {
+			t.Error("expected IsRoot to be false")
+		}
 	})
 
 	t.Run("returns false for nested child", func(t *testing.T) {
@@ -78,10 +99,18 @@ func TestScope_IsRoot(t *testing.T) {
 		level2 := level1.Child("level2")
 		level3 := level2.Child("level3")
 
-		assert.True(t, root.IsRoot())
-		assert.False(t, level1.IsRoot())
-		assert.False(t, level2.IsRoot())
-		assert.False(t, level3.IsRoot())
+		if !root.IsRoot() {
+			t.Error("expected root IsRoot to be true")
+		}
+		if level1.IsRoot() {
+			t.Error("expected level1 IsRoot to be false")
+		}
+		if level2.IsRoot() {
+			t.Error("expected level2 IsRoot to be false")
+		}
+		if level3.IsRoot() {
+			t.Error("expected level3 IsRoot to be false")
+		}
 	})
 }
 
@@ -89,14 +118,20 @@ func TestScope_Path(t *testing.T) {
 	t.Run("returns single element for root scope", func(t *testing.T) {
 		scope := NewScope("root")
 		path := scope.Path()
-		assert.Equal(t, []string{"root"}, path)
+		expected := []string{"root"}
+		if !slicesEqual(path, expected) {
+			t.Errorf("expected path %v, got %v", expected, path)
+		}
 	})
 
 	t.Run("returns path for child scope", func(t *testing.T) {
 		parent := NewScope("parent")
 		child := parent.Child("child")
 		path := child.Path()
-		assert.Equal(t, []string{"parent", "child"}, path)
+		expected := []string{"parent", "child"}
+		if !slicesEqual(path, expected) {
+			t.Errorf("expected path %v, got %v", expected, path)
+		}
 	})
 
 	t.Run("returns full path for nested scopes", func(t *testing.T) {
@@ -105,10 +140,18 @@ func TestScope_Path(t *testing.T) {
 		level2 := level1.Child("level2")
 		level3 := level2.Child("level3")
 
-		assert.Equal(t, []string{"root"}, root.Path())
-		assert.Equal(t, []string{"root", "level1"}, level1.Path())
-		assert.Equal(t, []string{"root", "level1", "level2"}, level2.Path())
-		assert.Equal(t, []string{"root", "level1", "level2", "level3"}, level3.Path())
+		if !slicesEqual(root.Path(), []string{"root"}) {
+			t.Errorf("expected root path [root], got %v", root.Path())
+		}
+		if !slicesEqual(level1.Path(), []string{"root", "level1"}) {
+			t.Errorf("expected level1 path [root level1], got %v", level1.Path())
+		}
+		if !slicesEqual(level2.Path(), []string{"root", "level1", "level2"}) {
+			t.Errorf("expected level2 path [root level1 level2], got %v", level2.Path())
+		}
+		if !slicesEqual(level3.Path(), []string{"root", "level1", "level2", "level3"}) {
+			t.Errorf("expected level3 path [root level1 level2 level3], got %v", level3.Path())
+		}
 	})
 }
 
@@ -116,10 +159,16 @@ func assertChildInheritsParent(t *testing.T) {
 	t.Helper()
 
 	parent := NewScope("parent")
-	require.NoError(t, ProvideValue(parent, "parent-value"))
+	if err := ProvideValue(parent, "parent-value"); err != nil {
+		t.Fatalf("expected no error providing value, got: %v", err)
+	}
 
 	child := parent.Child("child")
 	value, err := Invoke[string](child)
-	require.NoError(t, err)
-	assert.Equal(t, "parent-value", value)
+	if err != nil {
+		t.Fatalf("expected no error invoking, got: %v", err)
+	}
+	if value != "parent-value" {
+		t.Errorf("expected value 'parent-value', got %q", value)
+	}
 }

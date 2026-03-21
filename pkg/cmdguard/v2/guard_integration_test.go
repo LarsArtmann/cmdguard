@@ -3,14 +3,11 @@ package v2
 import (
 	"context"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGuardedCommand_Integration(t *testing.T) {
 	t.Run("complete CLI workflow", func(t *testing.T) {
-		type GreetFlags struct {
+		type greetFlags struct {
 			Name  string `default:"World" flag:"name"  help:"Name to greet"      short:"n"`
 			Shout bool   `default:"false" flag:"shout" help:"Shout the greeting" short:"s"`
 		}
@@ -20,31 +17,45 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			shout bool
 		}
 
-		g, err := New[TestAppConfig, *GreetFlags]("greet-cli", "A greeting CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, *greetFlags]("greet-cli", "A greeting CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		greetCmd := Command[TestAppConfig, *GreetFlags]{
+		greetCmd := Command[testAppConfig, *greetFlags]{
 			Use:   "greet [name]",
 			Short: "Greet someone",
 			Long:  "Send a greeting to the specified person.",
-			Flags: &GreetFlags{},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
+			Flags: &greetFlags{},
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags *greetFlags) error {
 				greetResult.name = flags.Name
 				greetResult.shout = flags.Shout
 
 				return nil
 			},
 		}
-		require.NoError(t, g.AddCommand(greetCmd))
+		if err := g.AddCommand(greetCmd); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.ExecuteWithArgs(
 			context.Background(),
 			[]string{"greet", "--name", "Alice", "--shout"},
 		)
-		require.NoError(t, err)
-		assert.Equal(t, "Alice", greetResult.name)
-		assert.True(t, greetResult.shout)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		require.NoError(t, g.Shutdown(context.Background()))
+		if greetResult.name != "Alice" {
+			t.Errorf("greetResult.name = %q, want %q", greetResult.name, "Alice")
+		}
+
+		if !greetResult.shout {
+			t.Error("greetResult.shout = false, want true")
+		}
+
+		if err := g.Shutdown(context.Background()); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 }

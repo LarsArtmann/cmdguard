@@ -1,11 +1,10 @@
 package v2
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/samber/do/v2"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestScopedProvider(t *testing.T) {
@@ -17,17 +16,27 @@ func TestScopedProvider(t *testing.T) {
 		})
 
 		value, err := provider(parent.Injector())
-		require.NoError(t, err)
-		assert.Equal(t, "plugin-value", value)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+		if value != "plugin-value" {
+			t.Errorf("expected value 'plugin-value', got %q", value)
+		}
 	})
 }
 
 func TestRegisterInScope(t *testing.T) {
 	t.Run("returns error for nil parent", func(t *testing.T) {
 		child, err := RegisterInScope(nil, "child")
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "parent scope is nil")
-		assert.Nil(t, child)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "parent scope is nil") {
+			t.Errorf("expected error to contain 'parent scope is nil', got: %v", err)
+		}
+		if child != nil {
+			t.Errorf("expected child to be nil, got %v", child)
+		}
 	})
 
 	t.Run("creates child scope with providers", func(t *testing.T) {
@@ -38,10 +47,18 @@ func TestRegisterInScope(t *testing.T) {
 		}
 
 		child, err := RegisterInScope(parent, "child", provider)
-		require.NoError(t, err)
-		require.NotNil(t, child)
-		assert.Equal(t, "child", child.Name())
-		assert.Equal(t, parent, child.Parent())
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+		if child == nil {
+			t.Fatal("expected child to not be nil")
+		}
+		if child.Name() != "child" {
+			t.Errorf("expected name 'child', got %q", child.Name())
+		}
+		if child.Parent() != parent {
+			t.Error("expected parent to be the same")
+		}
 	})
 
 	t.Run("returns error for invalid provider type", func(t *testing.T) {
@@ -51,9 +68,15 @@ func TestRegisterInScope(t *testing.T) {
 		invalidProvider := "not-a-function"
 
 		child, err := RegisterInScope(parent, "child", invalidProvider)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid type")
-		assert.Nil(t, child)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "invalid type") {
+			t.Errorf("expected error to contain 'invalid type', got: %v", err)
+		}
+		if child != nil {
+			t.Errorf("expected child to be nil, got %v", child)
+		}
 	})
 
 	t.Run("supports single provider", func(t *testing.T) {
@@ -64,7 +87,11 @@ func TestRegisterInScope(t *testing.T) {
 		}
 
 		child, err := RegisterInScope(parent, "child", provider)
-		require.NoError(t, err)
-		require.NotNil(t, child)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+		if child == nil {
+			t.Fatal("expected child to not be nil")
+		}
 	})
 }

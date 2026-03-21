@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/samber/do/v2"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestScope_Integration(t *testing.T) {
@@ -19,9 +17,11 @@ func TestScope_Integration(t *testing.T) {
 		type Config struct {
 			Debug bool
 		}
-		require.NoError(t, ProvideValue(root, Config{Debug: true}))
+		if err := ProvideValue(root, Config{Debug: true}); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
 
-		require.NoError(t, Provide(root, func(i do.Injector) (string, error) {
+		if err := Provide(root, func(i do.Injector) (string, error) {
 			cfg, err := do.Invoke[Config](i)
 			if err != nil {
 				return "", err
@@ -32,25 +32,39 @@ func TestScope_Integration(t *testing.T) {
 			}
 
 			return "production-mode", nil
-		}))
+		}); err != nil {
+			t.Fatalf("expected no error providing service, got: %v", err)
+		}
 
 		// Verify services
 		cfg, err := Invoke[Config](root)
-		require.NoError(t, err)
-		assert.True(t, cfg.Debug)
+		if err != nil {
+			t.Fatalf("expected no error invoking config, got: %v", err)
+		}
+		if !cfg.Debug {
+			t.Error("expected Debug to be true")
+		}
 
 		mode, err := Invoke[string](root)
-		require.NoError(t, err)
-		assert.Equal(t, "debug-mode", mode)
+		if err != nil {
+			t.Fatalf("expected no error invoking mode, got: %v", err)
+		}
+		if mode != "debug-mode" {
+			t.Errorf("expected mode to be 'debug-mode', got %q", mode)
+		}
 
 		// Health check
-		require.NoError(t, root.HealthCheck())
+		if err := root.HealthCheck(); err != nil {
+			t.Errorf("expected no error from health check, got: %v", err)
+		}
 
 		// Shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		require.NoError(t, root.Shutdown(ctx))
+		if err := root.Shutdown(ctx); err != nil {
+			t.Errorf("expected no error from shutdown, got: %v", err)
+		}
 	})
 
 	t.Run("child scope can override parent services", func(t *testing.T) {

@@ -2,437 +2,562 @@ package v2
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-type TestConfig struct {
+type testConfig struct {
 	Name string
 }
 
-// newTestCommand creates a test command with RunE handler.
-func newTestCommand() Command[TestConfig, NoFlags] {
-	return Command[TestConfig, NoFlags]{
+func newTestCommand() Command[testConfig, NoFlags] {
+	return Command[testConfig, NoFlags]{
 		Use: "test",
-		RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+		RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
 		},
 	}
 }
 
-// testHandlerFunc is the signature for RunE/PreRunE/PostRunE handlers.
-type testHandlerFunc[T any, F any] func(ctx context.Context, cfg *T, flags F) error
-
-// testHandlerOption tests that a handler option correctly sets the handler field.
-func testHandlerOption(
-	t *testing.T,
-	name string,
-	applyOption func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags]),
-	getField func(*Command[TestConfig, NoFlags]) any,
-) {
-	t.Helper()
-
-	handler := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-		return nil
-	}
-	cmd := Command[TestConfig, NoFlags]{Use: "test"}
-	applyOption(&cmd, handler)
-	assert.NotNil(t, getField(&cmd), "expected %s to set the handler", name)
-}
-
 func TestCommand_Validate(t *testing.T) {
 	t.Run("valid command with RunE", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 				return nil
 			},
 		}
+
 		err := cmd.Validate()
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("valid command with subcommands", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
-			Commands: []Command[TestConfig, NoFlags]{
+			Commands: []Command[testConfig, NoFlags]{
 				{
 					Use: "sub",
-					RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 						return nil
 					},
 				},
 			},
 		}
+
 		err := cmd.Validate()
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("error: empty Use field", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
-			RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+		cmd := Command[testConfig, NoFlags]{
+			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 				return nil
 			},
 		}
+
 		err := cmd.Validate()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrInvalidCommand)
-		assert.Contains(t, err.Error(), "no Use field")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrInvalidCommand) {
+			t.Errorf("expected ErrInvalidCommand, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "no Use field") {
+			t.Errorf("error should contain 'no Use field', got %q", err.Error())
+		}
 	})
 
 	t.Run("error: no RunE and no subcommands", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 		}
+
 		err := cmd.Validate()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrMissingHandler)
-		assert.Contains(t, err.Error(), "no RunE and no subcommands")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrMissingHandler) {
+			t.Errorf("expected ErrMissingHandler, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "no RunE and no subcommands") {
+			t.Errorf("error should contain 'no RunE and no subcommands', got %q", err.Error())
+		}
 	})
 
 	t.Run("validates subcommands recursively", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
-			Commands: []Command[TestConfig, NoFlags]{
+			Commands: []Command[testConfig, NoFlags]{
 				{
 					Use: "valid-sub",
-					RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 						return nil
 					},
 				},
 				{
-					Use: "invalid-sub", // No RunE
+					Use: "invalid-sub",
 				},
 			},
 		}
+
 		err := cmd.Validate()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "subcommand 1")
-		assert.Contains(t, err.Error(), "invalid-sub")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !strings.Contains(err.Error(), "subcommand 1") {
+			t.Errorf("error should contain 'subcommand 1', got %q", err.Error())
+		}
+
+		if !strings.Contains(err.Error(), "invalid-sub") {
+			t.Errorf("error should contain 'invalid-sub', got %q", err.Error())
+		}
 	})
 
 	t.Run("error: duplicate subcommand names", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
-			Commands: []Command[TestConfig, NoFlags]{
+			Commands: []Command[testConfig, NoFlags]{
 				{
 					Use: "duplicate",
-					RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 						return nil
 					},
 				},
 				{
 					Use: "duplicate",
-					RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 						return nil
 					},
 				},
 			},
 		}
+
 		err := cmd.Validate()
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrDuplicateCommand)
-		assert.Contains(t, err.Error(), "duplicate")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrDuplicateCommand) {
+			t.Errorf("expected ErrDuplicateCommand, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "duplicate") {
+			t.Errorf("error should contain 'duplicate', got %q", err.Error())
+		}
 	})
 
 	t.Run("valid with flags", func(t *testing.T) {
-		type Flags struct {
+		type flags struct {
 			Verbose bool `default:"false" flag:"verbose"`
 		}
 
-		cmd := Command[TestConfig, *Flags]{
+		cmd := Command[testConfig, *flags]{
 			Use:   "test",
-			Flags: &Flags{},
-			RunE: func(ctx context.Context, cfg *TestConfig, flags *Flags) error {
+			Flags: &flags{},
+			RunE: func(ctx context.Context, cfg *testConfig, flags *flags) error {
 				return nil
 			},
 		}
+
 		err := cmd.Validate()
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 }
 
 func TestCommand_HasSubcommands(t *testing.T) {
 	t.Run("returns true with subcommands", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
-			Commands: []Command[TestConfig, NoFlags]{
+			Commands: []Command[testConfig, NoFlags]{
 				{Use: "sub"},
 			},
 		}
-		assert.True(t, cmd.HasSubcommands())
+		if !cmd.HasSubcommands() {
+			t.Error("HasSubcommands() = false, want true")
+		}
 	})
 
 	t.Run("returns false without subcommands", func(t *testing.T) {
 		cmd := newTestCommand()
-		assert.False(t, cmd.HasSubcommands())
+		if cmd.HasSubcommands() {
+			t.Error("HasSubcommands() = true, want false")
+		}
 	})
 }
 
 func TestCommand_HasHandler(t *testing.T) {
 	t.Run("returns true with RunE", func(t *testing.T) {
 		cmd := newTestCommand()
-		assert.True(t, cmd.HasHandler())
+		if !cmd.HasHandler() {
+			t.Error("HasHandler() = false, want true")
+		}
 	})
 
 	t.Run("returns false without RunE", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 		}
-		assert.False(t, cmd.HasHandler())
+		if cmd.HasHandler() {
+			t.Error("HasHandler() = true, want false")
+		}
 	})
 }
 
 func TestCommand_IsExecutable(t *testing.T) {
 	t.Run("returns true with RunE", func(t *testing.T) {
 		cmd := newTestCommand()
-		assert.True(t, cmd.IsExecutable())
+		if !cmd.IsExecutable() {
+			t.Error("IsExecutable() = false, want true")
+		}
 	})
 
 	t.Run("returns false without RunE", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{
+		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 		}
-		assert.False(t, cmd.IsExecutable())
+		if cmd.IsExecutable() {
+			t.Error("IsExecutable() = true, want false")
+		}
 	})
 }
 
 func TestCommandOptions(t *testing.T) {
 	t.Run("WithShort", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithShort[TestConfig, NoFlags]("short description")(&cmd)
-		assert.Equal(t, "short description", cmd.Short)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithShort[testConfig, NoFlags]("short description")(&cmd)
+
+		if cmd.Short != "short description" {
+			t.Errorf("Short = %q, want %q", cmd.Short, "short description")
+		}
 	})
 
 	t.Run("WithLong", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithLong[TestConfig, NoFlags]("long description")(&cmd)
-		assert.Equal(t, "long description", cmd.Long)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithLong[testConfig, NoFlags]("long description")(&cmd)
+
+		if cmd.Long != "long description" {
+			t.Errorf("Long = %q, want %q", cmd.Long, "long description")
+		}
 	})
 
 	t.Run("WithAliases", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithAliases[TestConfig, NoFlags]("alias1", "alias2")(&cmd)
-		assert.Equal(t, []string{"alias1", "alias2"}, cmd.Aliases)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithAliases[testConfig, NoFlags]("alias1", "alias2")(&cmd)
+
+		if len(cmd.Aliases) != 2 || cmd.Aliases[0] != "alias1" || cmd.Aliases[1] != "alias2" {
+			t.Errorf("Aliases = %v, want [alias1 alias2]", cmd.Aliases)
+		}
 	})
 
 	t.Run("WithExample", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithExample[TestConfig, NoFlags]("example usage")(&cmd)
-		assert.Equal(t, "example usage", cmd.Example)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithExample[testConfig, NoFlags]("example usage")(&cmd)
+
+		if cmd.Example != "example usage" {
+			t.Errorf("Example = %q, want %q", cmd.Example, "example usage")
+		}
 	})
 
 	t.Run("WithFlags", func(t *testing.T) {
-		type Flags struct {
+		type flags struct {
 			Verbose bool `flag:"verbose"`
 		}
 
-		flags := &Flags{}
-		cmd := Command[TestConfig, *Flags]{Use: "test"}
-		WithFlags[TestConfig, *Flags](flags)(&cmd)
-		assert.Equal(t, flags, cmd.Flags)
+		flagsInst := &flags{}
+		cmd := Command[testConfig, *flags]{Use: "test"}
+		WithFlags[testConfig, *flags](flagsInst)(&cmd)
+
+		if cmd.Flags != flagsInst {
+			t.Errorf("Flags = %p, want %p", cmd.Flags, flagsInst)
+		}
 	})
 
-	t.Run("HandlerOptions", func(t *testing.T) {
-		type handlerTestCase struct {
-			name     string
-			apply    func(*Command[TestConfig, NoFlags], testHandlerFunc[TestConfig, NoFlags])
-			getField func(*Command[TestConfig, NoFlags]) any
+	t.Run("WithRunE", func(t *testing.T) {
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			return nil
 		}
+		WithRunE[testConfig, NoFlags](handler)(&cmd)
 
-		tests := []handlerTestCase{
-			{
-				name: "WithRunE",
-				apply: func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
-					WithRunE[TestConfig, NoFlags](handler)(cmd)
-				},
-				getField: func(cmd *Command[TestConfig, NoFlags]) any { return cmd.RunE },
-			},
-			{
-				name: "WithPreRunE",
-				apply: func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
-					WithPreRunE[TestConfig, NoFlags](handler)(cmd)
-				},
-				getField: func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PreRunE },
-			},
-			{
-				name: "WithPostRunE",
-				apply: func(cmd *Command[TestConfig, NoFlags], handler testHandlerFunc[TestConfig, NoFlags]) {
-					WithPostRunE[TestConfig, NoFlags](handler)(cmd)
-				},
-				getField: func(cmd *Command[TestConfig, NoFlags]) any { return cmd.PostRunE },
-			},
+		if cmd.RunE == nil {
+			t.Error("RunE = nil, want non-nil handler")
 		}
+	})
 
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				testHandlerOption(t, tt.name, tt.apply, tt.getField)
-			})
+	t.Run("WithPreRunE", func(t *testing.T) {
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			return nil
+		}
+		WithPreRunE[testConfig, NoFlags](handler)(&cmd)
+
+		if cmd.PreRunE == nil {
+			t.Error("PreRunE = nil, want non-nil handler")
+		}
+	})
+
+	t.Run("WithPostRunE", func(t *testing.T) {
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			return nil
+		}
+		WithPostRunE[testConfig, NoFlags](handler)(&cmd)
+
+		if cmd.PostRunE == nil {
+			t.Error("PostRunE = nil, want non-nil handler")
 		}
 	})
 
 	t.Run("WithSubcommands", func(t *testing.T) {
-		subCmd := Command[TestConfig, NoFlags]{
+		subCmd := Command[testConfig, NoFlags]{
 			Use: "sub",
-			RunE: func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 				return nil
 			},
 		}
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithSubcommands[TestConfig, NoFlags](subCmd)(&cmd)
-		require.Len(t, cmd.Commands, 1)
-		assert.Equal(t, "sub", cmd.Commands[0].Use)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithSubcommands[testConfig, NoFlags](subCmd)(&cmd)
+
+		if len(cmd.Commands) != 1 {
+			t.Errorf("len(Commands) = %d, want 1", len(cmd.Commands))
+		}
+
+		if cmd.Commands[0].Use != "sub" {
+			t.Errorf("Commands[0].Use = %q, want %q", cmd.Commands[0].Use, "sub")
+		}
 	})
 
 	t.Run("WithHidden", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithHidden[TestConfig, NoFlags](true)(&cmd)
-		assert.True(t, cmd.Hidden)
-		WithHidden[TestConfig, NoFlags](false)(&cmd)
-		assert.False(t, cmd.Hidden)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithHidden[testConfig, NoFlags](true)(&cmd)
+
+		if !cmd.Hidden {
+			t.Error("Hidden = false, want true")
+		}
+
+		WithHidden[testConfig, NoFlags](false)(&cmd)
+
+		if cmd.Hidden {
+			t.Error("Hidden = true, want false")
+		}
 	})
 
 	t.Run("WithDeprecated", func(t *testing.T) {
-		cmd := Command[TestConfig, NoFlags]{Use: "test"}
-		WithDeprecated[TestConfig, NoFlags]("use new-cmd instead")(&cmd)
-		assert.Equal(t, "use new-cmd instead", cmd.Deprecated)
+		cmd := Command[testConfig, NoFlags]{Use: "test"}
+		WithDeprecated[testConfig, NoFlags]("use new-cmd instead")(&cmd)
+
+		if cmd.Deprecated != "use new-cmd instead" {
+			t.Errorf("Deprecated = %q, want %q", cmd.Deprecated, "use new-cmd instead")
+		}
 	})
 }
 
 func TestNewCommand(t *testing.T) {
 	t.Run("creates valid command", func(t *testing.T) {
-		cmd, err := NewCommand[TestConfig, NoFlags](
+		cmd, err := NewCommand[testConfig, NoFlags](
 			"test",
-			WithShort[TestConfig, NoFlags]("short description"),
-			WithRunE[TestConfig, NoFlags](
-				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+			WithShort[testConfig, NoFlags]("short description"),
+			WithRunE[testConfig, NoFlags](
+				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 					return nil
 				},
 			),
 		)
-		require.NoError(t, err)
-		assert.Equal(t, "test", cmd.Use)
-		assert.Equal(t, "short description", cmd.Short)
-		assert.NotNil(t, cmd.RunE)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cmd.Use != "test" {
+			t.Errorf("Use = %q, want %q", cmd.Use, "test")
+		}
+
+		if cmd.Short != "short description" {
+			t.Errorf("Short = %q, want %q", cmd.Short, "short description")
+		}
+
+		if cmd.RunE == nil {
+			t.Error("RunE = nil, want non-nil")
+		}
 	})
 
 	t.Run("error: empty use", func(t *testing.T) {
-		cmd, err := NewCommand[TestConfig, NoFlags](
+		cmd, err := NewCommand[testConfig, NoFlags](
 			"",
-			WithRunE[TestConfig, NoFlags](
-				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+			WithRunE[testConfig, NoFlags](
+				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 					return nil
 				},
 			),
 		)
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrMissingName)
-		assert.Equal(t, Command[TestConfig, NoFlags]{}, cmd)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrMissingName) {
+			t.Errorf("expected ErrMissingName, got %v", err)
+		}
+
+		if cmd.Use != "" {
+			t.Errorf("expected empty command on error, got Use=%q", cmd.Use)
+		}
 	})
 
 	t.Run("error: validation fails", func(t *testing.T) {
-		cmd, err := NewCommand[TestConfig, NoFlags]("test") // No RunE
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrMissingHandler)
-		assert.Equal(t, Command[TestConfig, NoFlags]{}, cmd)
+		cmd, err := NewCommand[testConfig, NoFlags]("test")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrMissingHandler) {
+			t.Errorf("expected ErrMissingHandler, got %v", err)
+		}
+
+		if cmd.Use != "" {
+			t.Errorf("expected empty command on error, got Use=%q", cmd.Use)
+		}
 	})
 
 	t.Run("applies all options", func(t *testing.T) {
-		handler := func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
 		}
-		cmd, err := NewCommand[TestConfig, NoFlags]("test",
-			WithShort[TestConfig, NoFlags]("short"),
-			WithLong[TestConfig, NoFlags]("long"),
-			WithAliases[TestConfig, NoFlags]("alias1", "alias2"),
-			WithExample[TestConfig, NoFlags]("example"),
-			WithRunE[TestConfig, NoFlags](handler),
-			WithHidden[TestConfig, NoFlags](true),
-			WithDeprecated[TestConfig, NoFlags]("deprecated"),
+
+		cmd, err := NewCommand[testConfig, NoFlags]("test",
+			WithShort[testConfig, NoFlags]("short"),
+			WithLong[testConfig, NoFlags]("long"),
+			WithAliases[testConfig, NoFlags]("alias1", "alias2"),
+			WithExample[testConfig, NoFlags]("example"),
+			WithRunE[testConfig, NoFlags](handler),
+			WithHidden[testConfig, NoFlags](true),
+			WithDeprecated[testConfig, NoFlags]("deprecated"),
 		)
-		require.NoError(t, err)
-		assert.Equal(t, "test", cmd.Use)
-		assert.Equal(t, "short", cmd.Short)
-		assert.Equal(t, "long", cmd.Long)
-		assert.Equal(t, []string{"alias1", "alias2"}, cmd.Aliases)
-		assert.Equal(t, "example", cmd.Example)
-		assert.NotNil(t, cmd.RunE)
-		assert.True(t, cmd.Hidden)
-		assert.Equal(t, "deprecated", cmd.Deprecated)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cmd.Use != "test" {
+			t.Errorf("Use = %q, want %q", cmd.Use, "test")
+		}
+
+		if cmd.Short != "short" {
+			t.Errorf("Short = %q, want %q", cmd.Short, "short")
+		}
+
+		if cmd.Long != "long" {
+			t.Errorf("Long = %q, want %q", cmd.Long, "long")
+		}
+
+		if len(cmd.Aliases) != 2 || cmd.Aliases[0] != "alias1" || cmd.Aliases[1] != "alias2" {
+			t.Errorf("Aliases = %v, want [alias1 alias2]", cmd.Aliases)
+		}
+
+		if cmd.Example != "example" {
+			t.Errorf("Example = %q, want %q", cmd.Example, "example")
+		}
+
+		if cmd.RunE == nil {
+			t.Error("RunE = nil, want non-nil")
+		}
+
+		if !cmd.Hidden {
+			t.Error("Hidden = false, want true")
+		}
+
+		if cmd.Deprecated != "deprecated" {
+			t.Errorf("Deprecated = %q, want %q", cmd.Deprecated, "deprecated")
+		}
 	})
 
 	t.Run("creates command with subcommands", func(t *testing.T) {
-		subCmd, err := NewCommand[TestConfig, NoFlags](
+		subCmd, err := NewCommand[testConfig, NoFlags](
 			"sub",
-			WithRunE[TestConfig, NoFlags](
-				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
+			WithRunE[testConfig, NoFlags](
+				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 					return nil
 				},
 			),
 		)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		root, err := NewCommand[TestConfig, NoFlags]("root",
-			WithSubcommands[TestConfig, NoFlags](subCmd),
+		root, err := NewCommand[testConfig, NoFlags]("root",
+			WithSubcommands[testConfig, NoFlags](subCmd),
 		)
-		require.NoError(t, err)
-		assert.Equal(t, "root", root.Use)
-		assert.True(t, root.HasSubcommands())
-		assert.False(t, root.HasHandler())
-	})
-}
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-func TestNewCommand_ErrorCases(t *testing.T) {
-	t.Run("returns error on empty use", func(t *testing.T) {
-		_, err := NewCommand[TestConfig, NoFlags](
-			"",
-			WithRunE[TestConfig, NoFlags](
-				func(ctx context.Context, cfg *TestConfig, flags NoFlags) error {
-					return nil
-				},
-			),
-		)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "use is required")
-	})
+		if root.Use != "root" {
+			t.Errorf("Use = %q, want %q", root.Use, "root")
+		}
 
-	t.Run("returns error on validation failure", func(t *testing.T) {
-		_, err := NewCommand[TestConfig, NoFlags]("test") // No RunE
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "no handler")
+		if !root.HasSubcommands() {
+			t.Error("HasSubcommands() = false, want true")
+		}
+
+		if root.HasHandler() {
+			t.Error("HasHandler() = true, want false")
+		}
 	})
 }
 
 func TestCommand_CompleteStructure(t *testing.T) {
 	t.Run("complete command definition", func(t *testing.T) {
-		type AppFlags struct {
+		type appFlags struct {
 			Verbose bool   `default:"false" flag:"verbose" help:"Enable verbose output" short:"v"`
 			Output  string `default:"-"     flag:"output"  help:"Output file"           short:"o"`
 		}
 
-		subCmd, err := NewCommand[TestConfig, *AppFlags](
+		subCmd, err := NewCommand[testConfig, *appFlags](
 			"sub",
-			WithShort[TestConfig, *AppFlags]("A subcommand"),
-			WithRunE[TestConfig, *AppFlags](
-				func(ctx context.Context, cfg *TestConfig, flags *AppFlags) error {
+			WithShort[testConfig, *appFlags]("A subcommand"),
+			WithRunE[testConfig, *appFlags](
+				func(ctx context.Context, cfg *testConfig, flags *appFlags) error {
 					return nil
 				},
 			),
 		)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		root, err := NewCommand[TestConfig, *AppFlags]("myapp",
-			WithShort[TestConfig, *AppFlags]("My CLI application"),
-			WithFlags[TestConfig, *AppFlags](&AppFlags{}),
-			WithSubcommands[TestConfig, *AppFlags](subCmd),
+		root, err := NewCommand[testConfig, *appFlags]("myapp",
+			WithShort[testConfig, *appFlags]("My CLI application"),
+			WithFlags[testConfig, *appFlags](&appFlags{}),
+			WithSubcommands[testConfig, *appFlags](subCmd),
 		)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		assert.Equal(t, "myapp", root.Use)
-		assert.True(t, root.HasSubcommands())
-		assert.False(t, root.HasHandler())
-		assert.NotNil(t, root.Flags)
+		if root.Use != "myapp" {
+			t.Errorf("Use = %q, want %q", root.Use, "myapp")
+		}
+
+		if !root.HasSubcommands() {
+			t.Error("HasSubcommands() = false, want true")
+		}
+
+		if root.HasHandler() {
+			t.Error("HasHandler() = true, want false")
+		}
+
+		if root.Flags == nil {
+			t.Error("Flags = nil, want non-nil")
+		}
 	})
 }

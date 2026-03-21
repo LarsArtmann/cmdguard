@@ -2,187 +2,246 @@ package v2
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGuardedCommand_AddCommand(t *testing.T) {
 	t.Run("adds valid command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
 
 		err = g.AddCommand(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		rootCmd := g.RootCommand()
-		require.Len(t, rootCmd.Commands(), 1)
+		if len(rootCmd.Commands()) != 1 {
+			t.Errorf("len(rootCmd.Commands()) = %d, want 1", len(rootCmd.Commands()))
+		}
 	})
 
 	t.Run("error: invalid command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			// No RunE
 		}
 
 		err = g.AddCommand(cmd)
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrMissingHandler)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrMissingHandler) {
+			t.Errorf("expected ErrMissingHandler, got %v", err)
+		}
 	})
 
 	t.Run("adds command with subcommands", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		subCmd := Command[TestAppConfig, NoFlags]{
+		subCmd := Command[testAppConfig, NoFlags]{
 			Use: "list",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use:      "greet",
-			Commands: []Command[TestAppConfig, NoFlags]{subCmd},
+			Commands: []Command[testAppConfig, NoFlags]{subCmd},
 		}
 
 		err = g.AddCommand(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		rootCmd := g.RootCommand()
-		require.Len(t, rootCmd.Commands(), 1)
+		if len(rootCmd.Commands()) != 1 {
+			t.Errorf("len(rootCmd.Commands()) = %d, want 1", len(rootCmd.Commands()))
+		}
+
 		greetCmd := rootCmd.Commands()[0]
-		require.Len(t, greetCmd.Commands(), 1)
+		if len(greetCmd.Commands()) != 1 {
+			t.Errorf("len(greetCmd.Commands()) = %d, want 1", len(greetCmd.Commands()))
+		}
 	})
 
 	t.Run("error: duplicate command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		cmd1 := Command[TestAppConfig, NoFlags]{
+		cmd1 := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
 
-		cmd2 := Command[TestAppConfig, NoFlags]{
+		cmd2 := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return nil
 			},
 		}
 
 		err = g.AddCommand(cmd1)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.AddCommand(cmd2)
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrDuplicateCommand)
-		assert.Contains(t, err.Error(), "greet")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrDuplicateCommand) {
+			t.Errorf("expected ErrDuplicateCommand, got %v", err)
+		}
+
+		if !strings.Contains(err.Error(), "greet") {
+			t.Errorf("error should contain 'greet', got %q", err.Error())
+		}
 	})
 }
 
 func TestGuardedCommand_AddCommandFunc(t *testing.T) {
 	t.Run("adds command via function", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		err = g.AddCommandFunc(func() Command[TestAppConfig, NoFlags] {
-			return Command[TestAppConfig, NoFlags]{
+		err = g.AddCommandFunc(func() Command[testAppConfig, NoFlags] {
+			return Command[testAppConfig, NoFlags]{
 				Use: "greet",
-				RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+				RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 					return nil
 				},
 			}
 		})
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		rootCmd := g.RootCommand()
-		require.Len(t, rootCmd.Commands(), 1)
+		if len(rootCmd.Commands()) != 1 {
+			t.Errorf("len(rootCmd.Commands()) = %d, want 1", len(rootCmd.Commands()))
+		}
 	})
 }
 
 func TestAddAnyCommand(t *testing.T) {
 	t.Run("adds command with different flag type", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		type GreetFlags struct {
+		type greetFlags struct {
 			Name string
 		}
 
-		cmd := Command[TestAppConfig, *GreetFlags]{
+		cmd := Command[testAppConfig, *greetFlags]{
 			Use:   "greet",
 			Short: "Greet someone",
-			Flags: &GreetFlags{},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *GreetFlags) error {
+			Flags: &greetFlags{},
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags *greetFlags) error {
 				return nil
 			},
 		}
 
 		err = AddAnyCommand(g, cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		rootCmd := g.RootCommand()
-		require.Len(t, rootCmd.Commands(), 1)
+		if len(rootCmd.Commands()) != 1 {
+			t.Errorf("len(rootCmd.Commands()) = %d, want 1", len(rootCmd.Commands()))
+		}
 	})
 
 	t.Run("error when command has no handler", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		type OtherFlags struct {
+		type otherFlags struct {
 			Value string
 		}
 
-		cmd := Command[TestAppConfig, *OtherFlags]{
+		cmd := Command[testAppConfig, *otherFlags]{
 			Use:   "invalid",
-			Flags: &OtherFlags{},
-			// No RunE
+			Flags: &otherFlags{},
 		}
 
 		err = AddAnyCommand(g, cmd)
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrMissingHandler)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrMissingHandler) {
+			t.Errorf("expected ErrMissingHandler, got %v", err)
+		}
 	})
 
 	t.Run("error on duplicate command", func(t *testing.T) {
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		type OtherFlags struct{}
+		type otherFlags struct{}
 
-		cmd1 := Command[TestAppConfig, *OtherFlags]{
+		cmd1 := Command[testAppConfig, *otherFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *OtherFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags *otherFlags) error {
 				return nil
 			},
 		}
 
-		cmd2 := Command[TestAppConfig, *OtherFlags]{
+		cmd2 := Command[testAppConfig, *otherFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags *OtherFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags *otherFlags) error {
 				return nil
 			},
 		}
 
 		err = AddAnyCommand(g, cmd1)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = AddAnyCommand(g, cmd2)
-		require.Error(t, err)
-		require.ErrorIs(t, err, ErrDuplicateCommand)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrDuplicateCommand) {
+			t.Errorf("expected ErrDuplicateCommand, got %v", err)
+		}
 	})
 }

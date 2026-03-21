@@ -1,10 +1,8 @@
 package v2
 
 import (
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestValidateConfig(t *testing.T) {
@@ -15,19 +13,29 @@ func TestValidateConfig(t *testing.T) {
 		}
 
 		err := ValidateConfig(TestConfig{Name: "test", Count: 10})
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("nil config", func(t *testing.T) {
 		err := ValidateConfig(nil)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "must not be nil")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "must not be nil") {
+			t.Errorf("expected error to contain 'must not be nil', got: %v", err)
+		}
 	})
 
 	t.Run("non-struct config", func(t *testing.T) {
 		err := ValidateConfig("not a struct")
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "expected struct")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "expected struct") {
+			t.Errorf("expected error to contain 'expected struct', got: %v", err)
+		}
 	})
 
 	t.Run("valid enum value", func(t *testing.T) {
@@ -36,7 +44,9 @@ func TestValidateConfig(t *testing.T) {
 		}
 
 		err := ValidateConfig(TestConfig{Level: "info"})
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("invalid enum value", func(t *testing.T) {
@@ -45,8 +55,12 @@ func TestValidateConfig(t *testing.T) {
 		}
 
 		err := ValidateConfig(TestConfig{Level: "invalid"})
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "config validation")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "config validation") {
+			t.Errorf("expected error to contain 'config validation', got: %v", err)
+		}
 	})
 
 	t.Run("pointer to config", func(t *testing.T) {
@@ -55,7 +69,9 @@ func TestValidateConfig(t *testing.T) {
 		}
 
 		err := ValidateConfig(&TestConfig{Name: "test"})
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("LogLevel field with values", func(t *testing.T) {
@@ -65,7 +81,9 @@ func TestValidateConfig(t *testing.T) {
 
 		cfg := TestConfig{Level: LogLevelInfo}
 		err := ValidateConfig(cfg)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 
 	t.Run("LogFormat field with values", func(t *testing.T) {
@@ -75,6 +93,8 @@ func TestValidateConfig(t *testing.T) {
 
 		cfg := TestConfig{Format: LogFormatText}
 		err := ValidateConfig(cfg)
-		require.NoError(t, err)
+		if err != nil {
+			t.Errorf("expected no error, got: %v", err)
+		}
 	})
 }

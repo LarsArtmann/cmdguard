@@ -4,32 +4,43 @@ import (
 	"context"
 	"errors"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var errTest = errors.New("test error")
+
+func slicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
 
 func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 	tests := []struct {
 		name     string
 		hookName string
-		setupCmd func(order *[]string) Command[TestAppConfig, NoFlags]
+		setupCmd func(order *[]string) Command[testAppConfig, NoFlags]
 		want     []string
 	}{
 		{
 			name:     "calls PreRunE before RunE",
 			hookName: "pre",
-			setupCmd: func(order *[]string) Command[TestAppConfig, NoFlags] {
-				return Command[TestAppConfig, NoFlags]{
+			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
+				return Command[testAppConfig, NoFlags]{
 					Use: "test",
-					PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+					PreRunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 						*order = append(*order, "pre")
 
 						return nil
 					},
-					RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+					RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 						*order = append(*order, "run")
 
 						return nil
@@ -41,15 +52,15 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 		{
 			name:     "calls PostRunE after RunE",
 			hookName: "post",
-			setupCmd: func(order *[]string) Command[TestAppConfig, NoFlags] {
-				return Command[TestAppConfig, NoFlags]{
+			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
+				return Command[testAppConfig, NoFlags]{
 					Use: "test",
-					RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+					RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 						*order = append(*order, "run")
 
 						return nil
 					},
-					PostRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+					PostRunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 						*order = append(*order, "post")
 
 						return nil
@@ -64,40 +75,58 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var order []string
 
-			g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-			require.NoError(t, err)
+			g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			cmd := tt.setupCmd(&order)
-			require.NoError(t, g.AddCommand(cmd))
+			if err := g.AddCommand(cmd); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			err = g.ExecuteWithArgs(context.Background(), []string{"test"})
-			require.NoError(t, err)
-			assert.Equal(t, tt.want, order)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if !slicesEqual(order, tt.want) {
+				t.Errorf("order = %v, want %v", order, tt.want)
+			}
 		})
 	}
 
 	t.Run("PreRunE error stops execution", func(t *testing.T) {
 		called := false
 
-		g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-		require.NoError(t, err)
+		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		cmd := Command[TestAppConfig, NoFlags]{
+		cmd := Command[testAppConfig, NoFlags]{
 			Use: "test",
-			PreRunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			PreRunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				return errTest
 			},
-			RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 				called = true
 
 				return nil
 			},
 		}
-		require.NoError(t, g.AddCommand(cmd))
+		if err := g.AddCommand(cmd); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		err = g.ExecuteWithArgs(context.Background(), []string{"test"})
-		require.Error(t, err)
-		assert.False(t, called)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if called {
+			t.Error("RunE should not have been called when PreRunE fails")
+		}
 	})
 }
 
@@ -142,26 +171,41 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g, err := New[TestAppConfig, NoFlags]("myapp", "My CLI", TestAppConfig{})
-			require.NoError(t, err)
+			g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
-			cmd := Command[TestAppConfig, NoFlags]{
+			cmd := Command[testAppConfig, NoFlags]{
 				Use:        tt.use,
 				Hidden:     tt.hidden,
 				Deprecated: tt.deprecated,
 				Aliases:    tt.aliases,
 				Version:    tt.version,
-				RunE: func(ctx context.Context, cfg *TestAppConfig, flags NoFlags) error {
+				RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
 					return nil
 				},
 			}
-			require.NoError(t, g.AddCommand(cmd))
+			if err := g.AddCommand(cmd); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			cobraCmd := g.RootCommand().Commands()[0]
-			assert.Equal(t, tt.wantHidden, cobraCmd.Hidden)
-			assert.Equal(t, tt.wantDeprecated, cobraCmd.Deprecated)
-			assert.Equal(t, tt.wantAliases, cobraCmd.Aliases)
-			assert.Equal(t, tt.wantVersion, cobraCmd.Version)
+			if cobraCmd.Hidden != tt.wantHidden {
+				t.Errorf("Hidden = %v, want %v", cobraCmd.Hidden, tt.wantHidden)
+			}
+
+			if cobraCmd.Deprecated != tt.wantDeprecated {
+				t.Errorf("Deprecated = %q, want %q", cobraCmd.Deprecated, tt.wantDeprecated)
+			}
+
+			if !slicesEqual(cobraCmd.Aliases, tt.wantAliases) {
+				t.Errorf("Aliases = %v, want %v", cobraCmd.Aliases, tt.wantAliases)
+			}
+
+			if cobraCmd.Version != tt.wantVersion {
+				t.Errorf("Version = %q, want %q", cobraCmd.Version, tt.wantVersion)
+			}
 		})
 	}
 }
