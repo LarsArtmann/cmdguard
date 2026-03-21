@@ -10,29 +10,29 @@
 
 ### a) FULLY DONE ✅
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| v2 API Core | ✅ DONE | Type-safe CLI with generics, DI integration |
-| v1 API | ✅ DONE | Legacy API with panic-at-construction validation |
-| Test Coverage | ✅ DONE | All tests passing |
-| Build | ✅ DONE | No compilation errors |
-| Error Handling | ✅ DONE | Typed errors, no panics |
-| Dependency Injection | ✅ DONE | samber/do/v2 integration |
-| Typed Flags | ✅ DONE | Struct tags, validation, suggestions |
-| Benchmarks | ✅ DONE | Performance suite added |
-| Documentation | ✅ DONE | AGENTS.md, FEATURES.md, TODO_LIST.md |
-| Examples | ✅ DONE | basic, typed, di, advanced-flags |
-| CI/CD | ✅ DONE | GitHub Actions workflow |
-| Config Package | ✅ DONE | 85.1% coverage |
-| Logging Package | ✅ DONE | 100% coverage |
+| Component            | Status  | Details                                          |
+| -------------------- | ------- | ------------------------------------------------ |
+| v2 API Core          | ✅ DONE | Type-safe CLI with generics, DI integration      |
+| v1 API               | ✅ DONE | Legacy API with panic-at-construction validation |
+| Test Coverage        | ✅ DONE | All tests passing                                |
+| Build                | ✅ DONE | No compilation errors                            |
+| Error Handling       | ✅ DONE | Typed errors, no panics                          |
+| Dependency Injection | ✅ DONE | samber/do/v2 integration                         |
+| Typed Flags          | ✅ DONE | Struct tags, validation, suggestions             |
+| Benchmarks           | ✅ DONE | Performance suite added                          |
+| Documentation        | ✅ DONE | AGENTS.md, FEATURES.md, TODO_LIST.md             |
+| Examples             | ✅ DONE | basic, typed, di, advanced-flags                 |
+| CI/CD                | ✅ DONE | GitHub Actions workflow                          |
+| Config Package       | ✅ DONE | 85.1% coverage                                   |
+| Logging Package      | ✅ DONE | 100% coverage                                    |
 
 ### b) PARTIALLY DONE ⚠️
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| testify removal | 🔄 IN PROGRESS | 21 test files being refactored |
-| Type inference cleanup | ⚠️ 82 LSP warnings | Unnecessary type arguments in tests |
-| Coverage v2 | ⚠️ 89.1% | Slight decrease from 90.6% (pending finalization) |
+| Component              | Status             | Details                                           |
+| ---------------------- | ------------------ | ------------------------------------------------- |
+| testify removal        | 🔄 IN PROGRESS     | 21 test files being refactored                    |
+| Type inference cleanup | ⚠️ 82 LSP warnings | Unnecessary type arguments in tests               |
+| Coverage v2            | ⚠️ 89.1%           | Slight decrease from 90.6% (pending finalization) |
 
 **In-Progress Changes (Staged):**
 
@@ -49,11 +49,11 @@
 
 ### c) NOT STARTED 🔲
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Release v2.0.0 | ⏳ PENDING | Awaiting testify refactor completion |
-| Plugin system | 🔲 FUTURE | Custom validators |
-| Enhanced flag validation | 🔲 FUTURE | Enums, custom validators |
+| Component                | Status     | Notes                                |
+| ------------------------ | ---------- | ------------------------------------ |
+| Release v2.0.0           | ⏳ PENDING | Awaiting testify refactor completion |
+| Plugin system            | 🔲 FUTURE  | Custom validators                    |
+| Enhanced flag validation | 🔲 FUTURE  | Enums, custom validators             |
 
 ### d) TOTALLY FUCKED UP ❌
 
@@ -65,14 +65,14 @@
 
 ### Test Coverage
 
-| Package | Coverage | Status |
-|---------|---------|--------|
-| `pkg/cmdguard/v2` | 89.1% | ⚠️ Slightly decreased from 90.6% |
-| `pkg/cmdguard` (v1) | 91.1% | ✅ Good |
-| `internal/config` | 85.1% | ⚠️ Slightly decreased from 95.7% |
-| `internal/logging` | 100% | ✅ Excellent |
-| `benchmarks` | N/A | No statements |
-| `examples/*` | 5-42% | ✅ Integration tests exist |
+| Package             | Coverage | Status                           |
+| ------------------- | -------- | -------------------------------- |
+| `pkg/cmdguard/v2`   | 89.1%    | ⚠️ Slightly decreased from 90.6% |
+| `pkg/cmdguard` (v1) | 91.1%    | ✅ Good                          |
+| `internal/config`   | 85.1%    | ⚠️ Slightly decreased from 95.7% |
+| `internal/logging`  | 100%     | ✅ Excellent                     |
+| `benchmarks`        | N/A      | No statements                    |
+| `examples/*`        | 5-42%    | ✅ Integration tests exist       |
 
 ### Build Status
 
@@ -83,11 +83,11 @@ go test ./...   ✅ ALL TESTS PASSING
 
 ### Code Quality
 
-| Issue | Count | Severity |
-|-------|-------|----------|
-| LSP Warnings (infertypeargs) | 82 | Low (cosmetic) |
-| Compilation Errors | 0 | N/A |
-| Test Failures | 0 | N/A |
+| Issue                        | Count | Severity       |
+| ---------------------------- | ----- | -------------- |
+| LSP Warnings (infertypeargs) | 82    | Low (cosmetic) |
+| Compilation Errors           | 0     | N/A            |
+| Test Failures                | 0     | N/A            |
 
 ---
 
@@ -161,6 +161,7 @@ go test ./...   ✅ ALL TESTS PASSING
 **Question:** Should we keep `github.com/stretchr/testify` as a dependency for future use cases (like `suite` for complex test fixtures), or is the standard Go testing approach preferred for this project going forward?
 
 **Context:**
+
 - The testify refactor removes all testify usage
 - Some testify packages (`suite`, `mock`) offer features standard `testing` lacks
 - Project memory (AGENTS.md) doesn't specify testing library preference
