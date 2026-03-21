@@ -55,7 +55,7 @@ func (l *Loader) Load(configPath string) error {
 	}
 
 	// 3. Load environment variables (highest priority)
-	err := l.loadEnv()
+	err = l.loadEnv()
 	if err != nil {
 		return fmt.Errorf("failed to load environment: %w", err)
 	}

@@ -4,9 +4,9 @@ cmdguard is a focused library, not a full-fledged CLI framework. Here's what it 
 
 ---
 
-## Not a Replacement for Cobra
+## Not a Replacement for Cobra + Fang
 
-cmdguard _wraps_ Cobra, it doesn't replace it. Under the hood, it uses `cobra.Command` for all execution.
+cmdguard _wraps_ Cobra and _uses_ Fang, it doesn't replace them. Under the hood, it uses `cobra.Command` for command structure and `fang.Execute` for styled error output.
 
 ```go
 // You still get a cobra.Command underneath
@@ -109,11 +109,11 @@ It won't fix:
 
 ## Summary
 
-| What cmdguard IS | What cmdguard IS NOT         |
-| ---------------- | ---------------------------- |
-| A library        | An executable                |
-| Wraps Cobra      | Replaces Cobra               |
-| Type-safe        | Code-generated               |
-| Fail-fast (v1)   | Graceful error handling (v1) |
-| DI-powered       | A complete framework         |
-| Go only          | Multi-language               |
+| What cmdguard IS        | What cmdguard IS NOT         |
+| ----------------------- | ---------------------------- |
+| A library               | An executable                |
+| Wraps Cobra + uses fang | Replaces Cobra               |
+| Type-safe               | Code-generated               |
+| Fail-fast (v1)          | Graceful error handling (v1) |
+| DI-powered              | A complete framework         |
+| Go only                 | Multi-language               |

@@ -1,6 +1,6 @@
 # What This Project Is
 
-cmdguard is a Go library that wraps the [Cobra](https://github.com/spf13/cobra) CLI framework with construction-time validation, type-safe flags, and dependency injection.
+cmdguard is a Go library that wraps the [Cobra](https://github.com/spf13/cobra) CLI framework with [fang](https://github.com/charmbracelet/fang) for styled error output, adding construction-time validation, type-safe flags, and dependency injection.
 
 ---
 
