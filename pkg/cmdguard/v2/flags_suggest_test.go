@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSuggestFlag(t *testing.T) {
@@ -112,6 +113,6 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 	t.Run("unwraps to inner error", func(t *testing.T) {
 		inner := errors.New("inner error")
 		err := NewFlagErrorWithSuggestion("flag", inner, "suggestion")
-		assert.ErrorIs(t, err, inner)
+		require.ErrorIs(t, err, inner)
 	})
 }

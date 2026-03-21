@@ -175,7 +175,7 @@ func main() {
 			fmt.Printf("Session timeout: %s (%g seconds)\n",
 				flags.SessionTimeout,
 				flags.SessionTimeout.Seconds())
-			fmt.Printf("Retry delay: %s (%g milliseconds)\n",
+			fmt.Printf("Retry delay: %s (%d milliseconds)\n",
 				flags.RetryDelay,
 				flags.RetryDelay.Milliseconds())
 			fmt.Printf("Max wait: %s\n", flags.MaxWait)

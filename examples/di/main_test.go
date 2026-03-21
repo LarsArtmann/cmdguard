@@ -79,10 +79,10 @@ func TestDIExample_MustInvoke(t *testing.T) {
 		t.Fatalf("Failed to register database service: %v", err)
 	}
 
-	// Test MustInvoke
-	db := v2.MustInvoke[*DatabaseService](cli.ScopeStruct())
-	if db == nil {
-		t.Fatal("MustInvoke returned nil")
+	// Test Invoke (MustInvoke removed)
+	db, err := v2.Invoke[*DatabaseService](cli.ScopeStruct())
+	if err != nil {
+		t.Fatalf("Failed to invoke database service: %v", err)
 	}
 
 	if !db.IsConnected() {

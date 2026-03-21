@@ -29,7 +29,7 @@ func TestSentinelErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Error(t, tt.err)
+			require.Error(t, tt.err)
 			assert.Contains(t, tt.err.Error(), tt.msg)
 		})
 	}
@@ -45,12 +45,12 @@ func TestCommandError(t *testing.T) {
 	t.Run("Unwrap", func(t *testing.T) {
 		err := NewCommandError("test-cmd", ErrMissingHandler)
 		unwrapped := err.Unwrap()
-		assert.ErrorIs(t, unwrapped, ErrMissingHandler)
+		require.ErrorIs(t, unwrapped, ErrMissingHandler)
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewCommandError("test-cmd", ErrInvalidCommand)
-		assert.ErrorIs(t, err, ErrInvalidCommand)
+		require.ErrorIs(t, err, ErrInvalidCommand)
 	})
 }
 
@@ -70,7 +70,7 @@ func TestFlagError(t *testing.T) {
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewFlagError("test-flag", ErrFlagParseFailed)
-		assert.ErrorIs(t, err, ErrFlagParseFailed)
+		require.ErrorIs(t, err, ErrFlagParseFailed)
 	})
 }
 
@@ -100,12 +100,12 @@ func TestEnumError(t *testing.T) {
 	t.Run("Unwrap", func(t *testing.T) {
 		err := NewEnumError("invalid", []string{"valid"})
 		unwrapped := err.Unwrap()
-		assert.ErrorIs(t, unwrapped, ErrInvalidEnum)
+		require.ErrorIs(t, unwrapped, ErrInvalidEnum)
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewEnumError("invalid", []string{"valid"})
-		assert.ErrorIs(t, err, ErrInvalidEnum)
+		require.ErrorIs(t, err, ErrInvalidEnum)
 	})
 }
 
@@ -120,12 +120,12 @@ func TestDurationError(t *testing.T) {
 		inner := errors.New("inner error")
 		err := NewDurationError("bad", inner)
 		unwrapped := err.Unwrap()
-		assert.ErrorIs(t, unwrapped, ErrInvalidDuration)
+		require.ErrorIs(t, unwrapped, ErrInvalidDuration)
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewDurationError("bad", errors.New("inner"))
-		assert.ErrorIs(t, err, ErrInvalidDuration)
+		require.ErrorIs(t, err, ErrInvalidDuration)
 	})
 }
 
@@ -136,7 +136,7 @@ func TestErrorChaining(t *testing.T) {
 		cmdErr := NewCommandError("my-cmd", flagErr)
 
 		// All levels should be accessible via errors.Is
-		assert.ErrorIs(t, cmdErr, ErrInvalidEnum)
+		require.ErrorIs(t, cmdErr, ErrInvalidEnum)
 		require.NotNil(t, cmdErr)
 	})
 }
@@ -158,6 +158,6 @@ func TestServiceError(t *testing.T) {
 
 	t.Run("errors.Is support", func(t *testing.T) {
 		err := NewServiceError("*DatabaseService", ErrServiceNotFound)
-		assert.ErrorIs(t, err, ErrServiceNotFound)
+		require.ErrorIs(t, err, ErrServiceNotFound)
 	})
 }

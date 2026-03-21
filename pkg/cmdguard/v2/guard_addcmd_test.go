@@ -38,7 +38,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		err = g.AddCommand(cmd)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrMissingHandler)
+		require.ErrorIs(t, err, ErrMissingHandler)
 	})
 
 	t.Run("adds command with subcommands", func(t *testing.T) {
@@ -89,7 +89,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		err = g.AddCommand(cmd2)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrDuplicateCommand)
+		require.ErrorIs(t, err, ErrDuplicateCommand)
 		assert.Contains(t, err.Error(), "greet")
 	})
 }
@@ -155,7 +155,7 @@ func TestAddAnyCommand(t *testing.T) {
 
 		err = AddAnyCommand(g, cmd)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrMissingHandler)
+		require.ErrorIs(t, err, ErrMissingHandler)
 	})
 
 	t.Run("error on duplicate command", func(t *testing.T) {
@@ -183,6 +183,6 @@ func TestAddAnyCommand(t *testing.T) {
 
 		err = AddAnyCommand(g, cmd2)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrDuplicateCommand)
+		require.ErrorIs(t, err, ErrDuplicateCommand)
 	})
 }

@@ -179,7 +179,7 @@ func TestFromDuration(t *testing.T) {
 	d := FromDuration(td)
 	assert.Equal(t, td, d.Duration())
 	assert.Equal(t, int64(300000), d.Milliseconds())
-	assert.Equal(t, float64(300), d.Seconds())
+	assert.InDelta(t, float64(300), d.Seconds(), 0.001)
 }
 
 func TestDuration_Methods(t *testing.T) {
@@ -206,7 +206,7 @@ func TestDuration_Methods(t *testing.T) {
 	})
 
 	t.Run("Seconds", func(t *testing.T) {
-		assert.Equal(t, float64(9000), d.Seconds())
+		assert.InDelta(t, float64(9000), d.Seconds(), 0.001)
 	})
 }
 

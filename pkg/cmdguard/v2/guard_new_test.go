@@ -35,7 +35,7 @@ func TestNew(t *testing.T) {
 		defaults := TestAppConfig{}
 		g, err := New[TestAppConfig, NoFlags]("", "My CLI", defaults)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidCommand)
+		require.ErrorIs(t, err, ErrInvalidCommand)
 		assert.Nil(t, g)
 	})
 
@@ -89,7 +89,7 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 	t.Run("rejects invalid flag type in New", func(t *testing.T) {
 		g, err := New[TestAppConfig, int]("myapp", "My CLI", TestAppConfig{})
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		require.ErrorIs(t, err, ErrInvalidFlagType)
 		assert.Nil(t, g)
 	})
 

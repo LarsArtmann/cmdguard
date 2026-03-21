@@ -85,35 +85,35 @@ func TestFlagTypeConstraint(t *testing.T) {
 	t.Run("rejects pointer to non-struct", func(t *testing.T) {
 		err := FlagTypeConstraint[*string]()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		require.ErrorIs(t, err, ErrInvalidFlagType)
 		assert.Contains(t, err.Error(), "*string")
 	})
 
 	t.Run("rejects int", func(t *testing.T) {
 		err := FlagTypeConstraint[int]()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		require.ErrorIs(t, err, ErrInvalidFlagType)
 		assert.Contains(t, err.Error(), "int")
 	})
 
 	t.Run("rejects string", func(t *testing.T) {
 		err := FlagTypeConstraint[string]()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		require.ErrorIs(t, err, ErrInvalidFlagType)
 		assert.Contains(t, err.Error(), "string")
 	})
 
 	t.Run("rejects slice", func(t *testing.T) {
 		err := FlagTypeConstraint[[]string]()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		require.ErrorIs(t, err, ErrInvalidFlagType)
 		assert.Contains(t, err.Error(), "[]string")
 	})
 
 	t.Run("rejects map", func(t *testing.T) {
 		err := FlagTypeConstraint[map[string]string]()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidFlagType)
+		require.ErrorIs(t, err, ErrInvalidFlagType)
 		assert.Contains(t, err.Error(), "map[string]string")
 	})
 }

@@ -78,7 +78,7 @@ func TestCommand_Validate(t *testing.T) {
 		}
 		err := cmd.Validate()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidCommand)
+		require.ErrorIs(t, err, ErrInvalidCommand)
 		assert.Contains(t, err.Error(), "no Use field")
 	})
 
@@ -88,7 +88,7 @@ func TestCommand_Validate(t *testing.T) {
 		}
 		err := cmd.Validate()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrMissingHandler)
+		require.ErrorIs(t, err, ErrMissingHandler)
 		assert.Contains(t, err.Error(), "no RunE and no subcommands")
 	})
 
@@ -133,7 +133,7 @@ func TestCommand_Validate(t *testing.T) {
 		}
 		err := cmd.Validate()
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrDuplicateCommand)
+		require.ErrorIs(t, err, ErrDuplicateCommand)
 		assert.Contains(t, err.Error(), "duplicate")
 	})
 
@@ -328,14 +328,14 @@ func TestNewCommand(t *testing.T) {
 			),
 		)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrMissingName)
+		require.ErrorIs(t, err, ErrMissingName)
 		assert.Equal(t, Command[TestConfig, NoFlags]{}, cmd)
 	})
 
 	t.Run("error: validation fails", func(t *testing.T) {
 		cmd, err := NewCommand[TestConfig, NoFlags]("test") // No RunE
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrMissingHandler)
+		require.ErrorIs(t, err, ErrMissingHandler)
 		assert.Equal(t, Command[TestConfig, NoFlags]{}, cmd)
 	})
 
