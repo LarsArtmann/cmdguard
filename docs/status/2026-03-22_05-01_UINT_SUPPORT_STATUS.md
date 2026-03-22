@@ -8,12 +8,12 @@
 
 ## Executive Summary
 
-| Metric | Value |
-|--------|-------|
-| Total Packages | 11 |
-| Test Coverage | ~89% core v2, 100% logging |
-| All Tests Passing | ✅ YES |
-| Go Version | 1.26.0 |
+| Metric            | Value                      |
+| ----------------- | -------------------------- |
+| Total Packages    | 11                         |
+| Test Coverage     | ~89% core v2, 100% logging |
+| All Tests Passing | ✅ YES                     |
+| Go Version        | 1.26.0                     |
 
 ---
 
@@ -63,9 +63,11 @@
 ## ISSUES IDENTIFIED
 
 ### Critical (Blocking)
+
 - None
 
 ### Warnings (Non-blocking)
+
 - golangci-lint type inference errors in `command_test.go`
 - Multiple test files exceed line size limits
 
@@ -105,22 +107,23 @@
 
 ### Current Flag Type Support Matrix
 
-| Type | Registration | Parsing | Status |
-|------|--------------|---------|--------|
-| string | ✅ | ✅ | Done |
-| bool | ✅ | ✅ | Done |
-| int | ✅ | ✅ | Done |
-| int64 | ✅ | ✅ | Done |
-| uint | ✅ | ✅ | Done |
-| uint64 | ✅ | ✅ | Done |
-| float64 | ✅ | ✅ | Done |
-| Duration | ✅ | ✅ | Done |
-| Enum | ✅ | ✅ | Done |
-| LogLevel | ✅ | ✅ | Done |
-| LogFormat | ✅ | ✅ | Done |
-| []string | ✅ | ✅ | Done |
+| Type      | Registration | Parsing | Status |
+| --------- | ------------ | ------- | ------ |
+| string    | ✅           | ✅      | Done   |
+| bool      | ✅           | ✅      | Done   |
+| int       | ✅           | ✅      | Done   |
+| int64     | ✅           | ✅      | Done   |
+| uint      | ✅           | ✅      | Done   |
+| uint64    | ✅           | ✅      | Done   |
+| float64   | ✅           | ✅      | Done   |
+| Duration  | ✅           | ✅      | Done   |
+| Enum      | ✅           | ✅      | Done   |
+| LogLevel  | ✅           | ✅      | Done   |
+| LogFormat | ✅           | ✅      | Done   |
+| []string  | ✅           | ✅      | Done   |
 
 ### Missing Types (Lower Priority)
+
 - int8, int16, int32
 - uint8, uint16, uint32
 - float32
@@ -154,7 +157,7 @@ var flagParsers = map[reflect.Kind]FlagParser{
 **Why does the pre-commit hook's golangci-lint fail with type inference errors, but `go test` passes?**
 
 ```
-pkg/cmdguard/v2/command_test.go:240:12: in call to WithShort, 
+pkg/cmdguard/v2/command_test.go:240:12: in call to WithShort,
 cannot infer T (declared at pkg/cmdguard/v2/command.go:133:16)
 ```
 

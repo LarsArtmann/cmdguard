@@ -3,11 +3,10 @@ package cmdguard
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // hasSubcommand checks if a command with the given name exists in the GuardedCommand's subcommands.
@@ -28,11 +27,21 @@ func TestNew(t *testing.T) {
 
 		g := New("testapp", "Test application")
 
-		require.NotNil(t, g)
-		assert.NotNil(t, g.cmd)
-		assert.NotNil(t, g.cfg)
-		assert.Equal(t, "testapp", g.cmd.Use)
-		assert.Equal(t, "Test application", g.cmd.Short)
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
+		if g.cmd == nil {
+			t.Error("expected non-nil cmd")
+		}
+		if g.cfg == nil {
+			t.Error("expected non-nil cfg")
+		}
+		if g.cmd.Use != "testapp" {
+			t.Errorf("cmd.Use = %q, want %q", g.cmd.Use, "testapp")
+		}
+		if g.cmd.Short != "Test application" {
+			t.Errorf("cmd.Short = %q, want %q", g.cmd.Short, "Test application")
+		}
 	})
 
 	t.Run("loads config from environment", func(t *testing.T) {
@@ -41,10 +50,18 @@ func TestNew(t *testing.T) {
 
 		g := New("testapp", "Test")
 
-		require.NotNil(t, g)
-		assert.Equal(t, "debug", g.cfg.LogLevel)
-		assert.True(t, g.cfg.StrictMode)
-		assert.True(t, g.strictMode)
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
+		if g.cfg.LogLevel != "debug" {
+			t.Errorf("cfg.LogLevel = %q, want %q", g.cfg.LogLevel, "debug")
+		}
+		if !g.cfg.StrictMode {
+			t.Error("cfg.StrictMode = false, want true")
+		}
+		if !g.strictMode {
+			t.Error("strictMode = false, want true")
+		}
 	})
 }
 
@@ -57,9 +74,19 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Run: func(cmd *cobra.Command, args []string) {},
 		}
 
-		assert.NotPanics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddCommand(cmd)
-		})
+		}()
+
+		if didPanic {
+			t.Error("AddCommand should not panic for valid command")
+		}
 	})
 
 	t.Run("accepts valid command with RunE", func(t *testing.T) {
@@ -72,9 +99,19 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			},
 		}
 
-		assert.NotPanics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddCommand(cmd)
-		})
+		}()
+
+		if didPanic {
+			t.Error("AddCommand should not panic for valid command")
+		}
 	})
 
 	t.Run("panics on command without handler", func(t *testing.T) {
@@ -84,9 +121,19 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Use: "invalid",
 		}
 
-		assert.Panics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddCommand(cmd)
-		})
+		}()
+
+		if !didPanic {
+			t.Error("AddCommand should panic for command without handler")
+		}
 	})
 
 	t.Run("panics on command without name", func(t *testing.T) {
@@ -94,9 +141,19 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := &cobra.Command{}
 
-		assert.Panics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddCommand(cmd)
-		})
+		}()
+
+		if !didPanic {
+			t.Error("AddCommand should panic for command without name")
+		}
 	})
 
 	t.Run("panics after Execute called", func(t *testing.T) {
@@ -108,9 +165,19 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Run: func(cmd *cobra.Command, args []string) {},
 		}
 
-		assert.Panics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddCommand(cmd)
-		})
+		}()
+
+		if !didPanic {
+			t.Error("AddCommand should panic after Execute called")
+		}
 	})
 }
 
@@ -129,21 +196,31 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 			Run: func(cmd *cobra.Command, args []string) {},
 		}
 
-		assert.NotPanics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddSubcommand(parent, child)
-		})
+		}()
+
+		if didPanic {
+			t.Error("AddSubcommand should not panic for valid child")
+		}
 
 		found := false
-
 		for _, c := range parent.Commands() {
 			if c.Name() == "child" {
 				found = true
-
 				break
 			}
 		}
 
-		assert.True(t, found, "child command should be added to parent")
+		if !found {
+			t.Error("child command should be added to parent")
+		}
 	})
 
 	t.Run("panics on invalid child", func(t *testing.T) {
@@ -160,9 +237,19 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 			// No Run or RunE
 		}
 
-		assert.Panics(t, func() {
+		didPanic := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					didPanic = true
+				}
+			}()
 			g.AddSubcommand(parent, child)
-		})
+		}()
+
+		if !didPanic {
+			t.Error("AddSubcommand should panic for invalid child")
+		}
 	})
 }
 
@@ -174,8 +261,12 @@ func TestGuardedCommand_Execute(t *testing.T) {
 		}
 
 		err := g.Execute(context.Background())
-		require.NoError(t, err)
-		assert.True(t, g.validated)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !g.validated {
+			t.Error("validated = false, want true")
+		}
 	})
 }
 
@@ -185,8 +276,12 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 
 		cmd := g.Command()
 
-		require.NotNil(t, cmd)
-		assert.Equal(t, "testapp", cmd.Use)
+		if cmd == nil {
+			t.Fatal("expected non-nil command")
+		}
+		if cmd.Use != "testapp" {
+			t.Errorf("cmd.Use = %q, want %q", cmd.Use, "testapp")
+		}
 	})
 
 	t.Run("Config returns config", func(t *testing.T) {
@@ -194,18 +289,26 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 
 		cfg := g.Config()
 
-		require.NotNil(t, cfg)
-		assert.Equal(t, "info", cfg.LogLevel)
+		if cfg == nil {
+			t.Fatal("expected non-nil config")
+		}
+		if cfg.LogLevel != "info" {
+			t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, "info")
+		}
 	})
 
 	t.Run("IsStrictMode returns correct value", func(t *testing.T) {
 		g := New("testapp", "Test")
-		assert.False(t, g.IsStrictMode())
+		if g.IsStrictMode() {
+			t.Error("IsStrictMode() = true, want false")
+		}
 
 		t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 		g2 := New("testapp2", "Test2")
-		assert.True(t, g2.IsStrictMode())
+		if !g2.IsStrictMode() {
+			t.Error("IsStrictMode() = false, want true")
+		}
 	})
 }
 
@@ -219,7 +322,9 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		}
 
 		err := g.validateCommand(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("command with RunE is valid", func(t *testing.T) {
@@ -233,7 +338,9 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		}
 
 		err := g.validateCommand(cmd)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("command without name is invalid", func(t *testing.T) {
@@ -242,8 +349,12 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		cmd := &cobra.Command{}
 
 		err := g.validateCommand(cmd)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "no name")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "no name") {
+			t.Errorf("error should contain 'no name', got: %v", err)
+		}
 	})
 
 	t.Run("command without handler is invalid", func(t *testing.T) {
@@ -254,8 +365,12 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		}
 
 		err := g.validateCommand(cmd)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "no handler")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "no handler") {
+			t.Errorf("error should contain 'no handler', got: %v", err)
+		}
 	})
 
 	t.Run("parent command with subcommands does not need handler", func(t *testing.T) {
@@ -269,7 +384,9 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		parent.AddCommand(child)
 
 		err := g.validateCommand(parent)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("strict mode requires RunE", func(t *testing.T) {
@@ -283,8 +400,12 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		}
 
 		err := g.validateCommand(cmd)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "strict mode requires RunE")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "strict mode requires RunE") {
+			t.Errorf("error should contain 'strict mode requires RunE', got: %v", err)
+		}
 	})
 }
 
@@ -292,21 +413,29 @@ func TestGuardedCommand_DefaultCommands(t *testing.T) {
 	t.Run("version command is added", func(t *testing.T) {
 		g := New("testapp", "Test")
 
-		assert.True(t, hasSubcommand(g, "version"), "version command should be added by default")
+		if !hasSubcommand(g, "version") {
+			t.Error("version command should be added by default")
+		}
 	})
 
 	t.Run("validate command is added", func(t *testing.T) {
 		g := New("testapp", "Test")
 
-		assert.True(t, hasSubcommand(g, "validate"), "validate command should be added by default")
+		if !hasSubcommand(g, "validate") {
+			t.Error("validate command should be added by default")
+		}
 	})
 }
 
 func TestVersion(t *testing.T) {
 	t.Run("returns version string", func(t *testing.T) {
 		v := Version()
-		assert.NotEmpty(t, v)
-		assert.Equal(t, "dev", v) // Default value without ldflags
+		if v == "" {
+			t.Error("version should not be empty")
+		}
+		if v != "dev" {
+			t.Errorf("Version() = %q, want %q", v, "dev")
+		}
 	})
 }
 
@@ -324,7 +453,9 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 		g.AddCommand(parent)
 
 		err := g.validateCommandTree()
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("returns error for invalid nested command", func(t *testing.T) {
@@ -341,8 +472,12 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 		g.cmd.AddCommand(parent)
 
 		err := g.validateCommandTree()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "invalid") {
+			t.Errorf("error should contain 'invalid', got: %v", err)
+		}
 	})
 }
 
@@ -361,7 +496,9 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 		parent.AddCommand(child)
 
 		err := g.validateSubcommands(parent)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("returns error for invalid subcommand", func(t *testing.T) {
@@ -376,8 +513,12 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 		parent.AddCommand(invalidChild)
 
 		err := g.validateSubcommands(parent)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "parent invalid")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "parent invalid") {
+			t.Errorf("error should contain 'parent invalid', got: %v", err)
+		}
 	})
 
 	t.Run("validates nested subcommands", func(t *testing.T) {
@@ -399,7 +540,9 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 		parent.AddCommand(child)
 
 		err := g.validateSubcommands(parent)
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 }
 
@@ -409,16 +552,16 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find version command
 		var versionCmd *cobra.Command
-
 		for _, cmd := range g.cmd.Commands() {
 			if cmd.Name() == "version" {
 				versionCmd = cmd
-
 				break
 			}
 		}
 
-		require.NotNil(t, versionCmd)
+		if versionCmd == nil {
+			t.Fatal("version command not found")
+		}
 
 		// Execute it
 		versionCmd.Run(versionCmd, []string{})
@@ -437,20 +580,22 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find validate command
 		var validateCmd *cobra.Command
-
 		for _, c := range g.cmd.Commands() {
 			if c.Name() == "validate" {
 				validateCmd = c
-
 				break
 			}
 		}
 
-		require.NotNil(t, validateCmd)
+		if validateCmd == nil {
+			t.Fatal("validate command not found")
+		}
 
 		// Execute it
 		err := validateCmd.RunE(validateCmd, []string{})
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	})
 
 	t.Run("validate command fails with invalid tree", func(t *testing.T) {
@@ -462,20 +607,24 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find validate command
 		var validateCmd *cobra.Command
-
 		for _, c := range g.cmd.Commands() {
 			if c.Name() == "validate" {
 				validateCmd = c
-
 				break
 			}
 		}
 
-		require.NotNil(t, validateCmd)
+		if validateCmd == nil {
+			t.Fatal("validate command not found")
+		}
 
 		// Execute it - should error
 		err := validateCmd.RunE(validateCmd, []string{})
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "validation failed")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "validation failed") {
+			t.Errorf("error should contain 'validation failed', got: %v", err)
+		}
 	})
 }
