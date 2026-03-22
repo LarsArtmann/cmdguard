@@ -9,15 +9,15 @@
 
 ## EXECUTIVE SUMMARY
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| **Linter Issues** | 0 | ✅ PERFECT |
-| **Tests** | 10/10 packages pass | ✅ PERFECT |
-| **Code Coverage** | 83.8% (v2 core) | ✅ EXCELLENT |
-| **Go Files** | 71 | 📊 |
-| **Total Lines** | 14,947 | 📊 |
-| **Go Version** | 1.26.0 | ✅ CURRENT |
-| **golangci-lint** | v2.10.1 | ✅ CURRENT |
+| Metric            | Value               | Status       |
+| ----------------- | ------------------- | ------------ |
+| **Linter Issues** | 0                   | ✅ PERFECT   |
+| **Tests**         | 10/10 packages pass | ✅ PERFECT   |
+| **Code Coverage** | 83.8% (v2 core)     | ✅ EXCELLENT |
+| **Go Files**      | 71                  | 📊           |
+| **Total Lines**   | 14,947              | 📊           |
+| **Go Version**    | 1.26.0              | ✅ CURRENT   |
+| **golangci-lint** | v2.10.1             | ✅ CURRENT   |
 
 ---
 
@@ -25,38 +25,38 @@
 
 ### A) FULLY DONE ✅
 
-| Task | Status | Details |
-|------|--------|---------|
+| Task                        | Status  | Details                                                                          |
+| --------------------------- | ------- | -------------------------------------------------------------------------------- |
 | Fix exhaustive switch cases | ✅ DONE | 6 switch statements fixed in config.go, flags.go, flags_parse.go, guard_flags.go |
-| Remove unused functions | ✅ DONE | Removed addUint64Flag, addFloat32Flag, parseAndSetUint64, parseAndSetFloat32 |
-| Disable problematic linters | ✅ DONE | Disabled 27 problematic style linters in .golangci.yml |
-| Fix linter configuration | ✅ DONE | Configured for golangci-lint v2.10.1 compatibility |
-| Commit all changes | ✅ DONE | Commit a8d936b pushed to origin/master |
-| Push to remote | ✅ DONE | Branch up-to-date with origin/master |
-| All tests pass | ✅ DONE | 10/10 packages pass (1.324s integration) |
-| Linter shows 0 issues | ✅ DONE | Verified with `golangci-lint run ./...` |
+| Remove unused functions     | ✅ DONE | Removed addUint64Flag, addFloat32Flag, parseAndSetUint64, parseAndSetFloat32     |
+| Disable problematic linters | ✅ DONE | Disabled 27 problematic style linters in .golangci.yml                           |
+| Fix linter configuration    | ✅ DONE | Configured for golangci-lint v2.10.1 compatibility                               |
+| Commit all changes          | ✅ DONE | Commit a8d936b pushed to origin/master                                           |
+| Push to remote              | ✅ DONE | Branch up-to-date with origin/master                                             |
+| All tests pass              | ✅ DONE | 10/10 packages pass (1.324s integration)                                         |
+| Linter shows 0 issues       | ✅ DONE | Verified with `golangci-lint run ./...`                                          |
 
 ### B) PARTIALLY DONE ⚠️
 
-| Task | Status | Notes |
-|------|--------|-------|
-| CLI[T] flag parsing bug | ⚠️ KNOWN BUG | AddCommand doesn't parse flags correctly (receives value instead of pointer) |
-| File size limits | ⚠️ 8 files exceed 350 lines | Largest: guarded_command_test.go (669 lines) |
-| Coverage variance | ⚠️ Examples low | basic/typed examples have 0% coverage (demo code) |
+| Task                    | Status                      | Notes                                                                        |
+| ----------------------- | --------------------------- | ---------------------------------------------------------------------------- |
+| CLI[T] flag parsing bug | ⚠️ KNOWN BUG                | AddCommand doesn't parse flags correctly (receives value instead of pointer) |
+| File size limits        | ⚠️ 8 files exceed 350 lines | Largest: guarded_command_test.go (669 lines)                                 |
+| Coverage variance       | ⚠️ Examples low             | basic/typed examples have 0% coverage (demo code)                            |
 
 ### C) NOT STARTED 📝
 
-| Task | Priority | Notes |
-|------|---------|-------|
-| CLI[T] flag parsing bug fix | HIGH | Bug documented but not prioritized |
-| Large file refactoring | MEDIUM | 8 files >350 lines need splitting |
-| Example coverage improvement | LOW | Not critical - examples are demos |
+| Task                         | Priority | Notes                              |
+| ---------------------------- | -------- | ---------------------------------- |
+| CLI[T] flag parsing bug fix  | HIGH     | Bug documented but not prioritized |
+| Large file refactoring       | MEDIUM   | 8 files >350 lines need splitting  |
+| Example coverage improvement | LOW      | Not critical - examples are demos  |
 
 ### D) TOTALLY FUCKED UP 🔴
 
-| Issue | Severity | Status |
-|-------|----------|--------|
-| None | - | Clean state achieved |
+| Issue | Severity | Status               |
+| ----- | -------- | -------------------- |
+| None  | -        | Clean state achieved |
 
 ---
 
@@ -64,43 +64,43 @@
 
 ### Test Coverage by Package
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| internal/logging | 100.0% | ✅ EXCELLENT |
-| pkg/cmdguard | 87.8% | ✅ EXCELLENT |
-| internal/config | 85.1% | ✅ EXCELLENT |
-| pkg/cmdguard/v2 | 83.8% | ✅ EXCELLENT |
-| examples/advanced-flags | 42.2% | ⚠️ ACCEPTABLE |
-| examples/di | 7.5% | ⚠️ ACCEPTABLE |
-| examples/basic | 0.0% | ⚠️ DEMO ONLY |
-| examples/typed | 0.0% | ⚠️ DEMO ONLY |
-| benchmarks | N/A | 📊 BENCHMARK |
+| Package                 | Coverage | Status        |
+| ----------------------- | -------- | ------------- |
+| internal/logging        | 100.0%   | ✅ EXCELLENT  |
+| pkg/cmdguard            | 87.8%    | ✅ EXCELLENT  |
+| internal/config         | 85.1%    | ✅ EXCELLENT  |
+| pkg/cmdguard/v2         | 83.8%    | ✅ EXCELLENT  |
+| examples/advanced-flags | 42.2%    | ⚠️ ACCEPTABLE |
+| examples/di             | 7.5%     | ⚠️ ACCEPTABLE |
+| examples/basic          | 0.0%     | ⚠️ DEMO ONLY  |
+| examples/typed          | 0.0%     | ⚠️ DEMO ONLY  |
+| benchmarks              | N/A      | 📊 BENCHMARK  |
 
 ### Code Metrics (scc)
 
-| Metric | Value |
-|--------|-------|
-| Files | 104 |
-| Total Lines | 26,870 |
+| Metric        | Value  |
+| ------------- | ------ |
+| Files         | 104    |
+| Total Lines   | 26,870 |
 | Go Code Lines | 11,452 |
-| Comments | 818 |
-| Blanks | 2,677 |
-| Complexity | 2,699 |
+| Comments      | 818    |
+| Blanks        | 2,677  |
+| Complexity    | 2,699  |
 
 ### Complexity Top 10
 
-| Rank | File | Complexity | Lines |
-|------|------|------------|-------|
-| 1 | flags_parse_test.go | 140 | 472 |
-| 2 | v2_mixed_flags_test.go | 122 | 662 |
-| 3 | flags_registry_test.go | 121 | 450 |
-| 4 | guarded_command_test.go | 110 | 669 |
-| 5 | provider_fuzz_test.go | 82 | 435 |
-| 6 | helpers_test.go | 78 | 304 |
-| 7 | main_test.go (typed) | 71 | 412 |
-| 8 | scope_provide_test.go | 68 | 224 |
-| 9 | guard_accessor_test.go | 68 | 216 |
-| 10 | command_options_test.go | 67 | 285 |
+| Rank | File                    | Complexity | Lines |
+| ---- | ----------------------- | ---------- | ----- |
+| 1    | flags_parse_test.go     | 140        | 472   |
+| 2    | v2_mixed_flags_test.go  | 122        | 662   |
+| 3    | flags_registry_test.go  | 121        | 450   |
+| 4    | guarded_command_test.go | 110        | 669   |
+| 5    | provider_fuzz_test.go   | 82         | 435   |
+| 6    | helpers_test.go         | 78         | 304   |
+| 7    | main_test.go (typed)    | 71         | 412   |
+| 8    | scope_provide_test.go   | 68         | 224   |
+| 9    | guard_accessor_test.go  | 68         | 216   |
+| 10   | command_options_test.go | 67         | 285   |
 
 ---
 
@@ -109,6 +109,7 @@
 ### Enabled Linters (58 total)
 
 **Type Safety & Correctness:**
+
 - errorlint, errcheck, errchkjson, errname
 - exhaustive, usestdlibvars
 - ginkgolinter, gomodguard, gosec
@@ -120,11 +121,13 @@
 - unconvert, unused
 
 **Testing:**
+
 - testifylint, tparallel
 - testableexamples, fatcontext
 - gocognit (excluded in tests), dupl (excluded in tests)
 
 **Code Quality:**
+
 - asasalint, asciicheck
 - bodyclose, containedctx
 - contextcheck, copyloopvar
@@ -143,6 +146,7 @@
 - wastedassign, zerologlint
 
 **Formatting & Style:**
+
 - canonicalheader, dupl, gofumpt
 - goheader, godot, goprintffuncname
 - importas, iotamixing
@@ -173,25 +177,25 @@ unparam, usetesting, wsl_v5, cyclop
 
 ### HIGH PRIORITY
 
-| Issue | Location | Impact |
-|-------|----------|--------|
+| Issue                          | Location        | Impact                                           |
+| ------------------------------ | --------------- | ------------------------------------------------ |
 | CLI[T] AddCommand flag parsing | pkg/cmdguard/v2 | AddCommand doesn't parse command flags correctly |
 
 **Details:** `ParseFlags()` expects a pointer to struct but `AddCommand` receives a value. This causes flag defaults to not be applied correctly.
 
 ### MEDIUM PRIORITY
 
-| Issue | Location | Impact |
-|-------|----------|--------|
-| Large test files | 8 files >350 lines | Maintenance difficulty |
-| CLI[T] incomplete | v2 CLI[T] API | Not fully tested |
+| Issue             | Location           | Impact                 |
+| ----------------- | ------------------ | ---------------------- |
+| Large test files  | 8 files >350 lines | Maintenance difficulty |
+| CLI[T] incomplete | v2 CLI[T] API      | Not fully tested       |
 
 ### LOW PRIORITY
 
-| Issue | Location | Impact |
-|-------|----------|--------|
-| Example coverage | examples/* | Demo code not fully tested |
-| Complexity in tests | flags_parse_test.go | 140 complexity score |
+| Issue               | Location            | Impact                     |
+| ------------------- | ------------------- | -------------------------- |
+| Example coverage    | examples/\*         | Demo code not fully tested |
+| Complexity in tests | flags_parse_test.go | 140 complexity score       |
 
 ---
 
@@ -233,33 +237,33 @@ unparam, usetesting, wsl_v5, cyclop
 
 ## SECTION 6: TOP 25 THINGS TO GET DONE NEXT
 
-| # | Task | Priority | Effort | Impact |
-|---|------|----------|--------|--------|
-| 1 | Fix CLI[T] AddCommand flag parsing bug | HIGH | MEDIUM | CRITICAL |
-| 2 | Split guarded_command_test.go (669 lines) | MEDIUM | HIGH | MAINTENANCE |
-| 3 | Split v2_mixed_flags_test.go (662 lines) | MEDIUM | HIGH | MAINTENANCE |
-| 4 | Add CLI[T] integration tests | HIGH | MEDIUM | QUALITY |
-| 5 | Add example/basic unit tests | MEDIUM | LOW | COVERAGE |
-| 6 | Add example/typed unit tests | MEDIUM | LOW | COVERAGE |
-| 7 | Refactor flags_parse_test.go complexity | MEDIUM | HIGH | CODE QUALITY |
-| 8 | Add API examples to godoc | LOW | LOW | DOCS |
-| 9 | Audit error message consistency | LOW | LOW | UX |
-| 10 | Add flag validation examples | MEDIUM | LOW | DOCS |
-| 11 | Improve flag suggestion algorithm | MEDIUM | MEDIUM | UX |
-| 12 | Add more CLI[T] options | MEDIUM | MEDIUM | FEATURE |
-| 13 | Document DI patterns | LOW | MEDIUM | DOCS |
-| 14 | Add performance benchmarks | LOW | LOW | METRICS |
-| 15 | Add fuzz tests to flags_parse.go | MEDIUM | MEDIUM | QUALITY |
-| 16 | Add fuzz tests to config_parsing.go | MEDIUM | MEDIUM | QUALITY |
-| 17 | Improve error types | MEDIUM | LOW | DX |
-| 18 | Add migration guide v1→v2 | MEDIUM | MEDIUM | DOCS |
-| 19 | Add changelog | LOW | LOW | DOCS |
-| 20 | Set up release automation | LOW | MEDIUM | CI/CD |
-| 21 | Add GitHub Actions workflow | LOW | LOW | CI/CD |
-| 22 | Add codecov integration | LOW | LOW | CI/CD |
-| 23 | Add badge to README | LOW | LOW | DOCS |
-| 24 | Review and update AGENTS.md | LOW | LOW | DOCS |
-| 25 | Deprecate v1 API timeline | MEDIUM | LOW | ROADMAP |
+| #   | Task                                      | Priority | Effort | Impact       |
+| --- | ----------------------------------------- | -------- | ------ | ------------ |
+| 1   | Fix CLI[T] AddCommand flag parsing bug    | HIGH     | MEDIUM | CRITICAL     |
+| 2   | Split guarded_command_test.go (669 lines) | MEDIUM   | HIGH   | MAINTENANCE  |
+| 3   | Split v2_mixed_flags_test.go (662 lines)  | MEDIUM   | HIGH   | MAINTENANCE  |
+| 4   | Add CLI[T] integration tests              | HIGH     | MEDIUM | QUALITY      |
+| 5   | Add example/basic unit tests              | MEDIUM   | LOW    | COVERAGE     |
+| 6   | Add example/typed unit tests              | MEDIUM   | LOW    | COVERAGE     |
+| 7   | Refactor flags_parse_test.go complexity   | MEDIUM   | HIGH   | CODE QUALITY |
+| 8   | Add API examples to godoc                 | LOW      | LOW    | DOCS         |
+| 9   | Audit error message consistency           | LOW      | LOW    | UX           |
+| 10  | Add flag validation examples              | MEDIUM   | LOW    | DOCS         |
+| 11  | Improve flag suggestion algorithm         | MEDIUM   | MEDIUM | UX           |
+| 12  | Add more CLI[T] options                   | MEDIUM   | MEDIUM | FEATURE      |
+| 13  | Document DI patterns                      | LOW      | MEDIUM | DOCS         |
+| 14  | Add performance benchmarks                | LOW      | LOW    | METRICS      |
+| 15  | Add fuzz tests to flags_parse.go          | MEDIUM   | MEDIUM | QUALITY      |
+| 16  | Add fuzz tests to config_parsing.go       | MEDIUM   | MEDIUM | QUALITY      |
+| 17  | Improve error types                       | MEDIUM   | LOW    | DX           |
+| 18  | Add migration guide v1→v2                 | MEDIUM   | MEDIUM | DOCS         |
+| 19  | Add changelog                             | LOW      | LOW    | DOCS         |
+| 20  | Set up release automation                 | LOW      | MEDIUM | CI/CD        |
+| 21  | Add GitHub Actions workflow               | LOW      | LOW    | CI/CD        |
+| 22  | Add codecov integration                   | LOW      | LOW    | CI/CD        |
+| 23  | Add badge to README                       | LOW      | LOW    | DOCS         |
+| 24  | Review and update AGENTS.md               | LOW      | LOW    | DOCS         |
+| 25  | Deprecate v1 API timeline                 | MEDIUM   | LOW    | ROADMAP      |
 
 ---
 
@@ -270,11 +274,13 @@ unparam, usetesting, wsl_v5, cyclop
 **The Problem:**
 
 The CLI[T] API has a fundamental design tension between:
+
 1. **Simplicity** — Users want `New[Config]("app", ...)` without flag type parameter
 2. **Flexibility** — Some commands need custom flags (GreetFlags struct)
 3. **Type Safety** — We want compile-time verification of flag types
 
 **Current State:**
+
 - `CLI[Config, Flags]` — Full generic (verbose but type-safe)
 - `CLI[T]` alias — Config only, uses `NoFlags` (simple but limited)
 - `SimpleCLI` — v1 wrapper for legacy compatibility
@@ -282,12 +288,14 @@ The CLI[T] API has a fundamental design tension between:
 **The Question:**
 
 Should we:
+
 - **Option A:** Keep dual API (CLI[T] for simple, CLI[T,F] for complex)
 - **Option B:** Make Flags optional in CLI[T,F] via interface or maybe `...Flags`
 - **Option C:** Create separate SimpleCLI that auto-detects flag needs
 - **Option D:** Other approach?
 
 **Why I Can't Decide:**
+
 - Option A: Confusing for users (two similar APIs)
 - Option B: Type system limitations in Go make variadic generics awkward
 - Option C: Magic/automatic behavior is hard to understand
@@ -316,15 +324,15 @@ c8a1d4c docs: add v2.1 minimal improvement plan and improve status report format
 
 ### Commit Activity (Last 7 Days)
 
-| Date | Commits | Files Changed |
-|------|---------|---------------|
-| 2026-03-22 | 2 | 9 |
-| 2026-03-21 | 1 | 2 |
-| 2026-03-20 | 2 | 5 |
-| 2026-03-19 | 2 | 8 |
-| 2026-03-18 | 1 | 12 |
-| 2026-03-17 | 2 | 4 |
-| 2026-03-16 | 1 | 3 |
+| Date       | Commits | Files Changed |
+| ---------- | ------- | ------------- |
+| 2026-03-22 | 2       | 9             |
+| 2026-03-21 | 1       | 2             |
+| 2026-03-20 | 2       | 5             |
+| 2026-03-19 | 2       | 8             |
+| 2026-03-18 | 1       | 12            |
+| 2026-03-17 | 2       | 4             |
+| 2026-03-16 | 1       | 3             |
 
 ---
 
@@ -362,14 +370,14 @@ Editor:         (varies by developer)
 
 ## APPENDIX B: DEPENDENCIES
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| spf13/cobra | v1.10.2 | CLI framework |
-| samber/do/v2 | v2.0.0 | Dependency injection |
-| charmbracelet/fang | v0.4.4 | Cobra styling |
-| knadh/koanf/v2 | v2.3.3 | Configuration |
-| onsi/ginkgo/v2 | v2.28.1 | BDD testing |
-| onsi/gomega | v1.39.1 | Test matchers |
+| Library            | Version | Purpose              |
+| ------------------ | ------- | -------------------- |
+| spf13/cobra        | v1.10.2 | CLI framework        |
+| samber/do/v2       | v2.0.0  | Dependency injection |
+| charmbracelet/fang | v0.4.4  | Cobra styling        |
+| knadh/koanf/v2     | v2.3.3  | Configuration        |
+| onsi/ginkgo/v2     | v2.28.1 | BDD testing          |
+| onsi/gomega        | v1.39.1 | Test matchers        |
 
 ## APPENDIX C: FILE STRUCTURE
 
