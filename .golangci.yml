@@ -9,6 +9,7 @@ run:
 output:
   formats: {}
 linters:
+  disable-all: true
   enable:
     - testpackage
     - maintidx
@@ -120,6 +121,7 @@ linters:
     - gosec
     - errname
     - gosmopolitan
+    - cyclop
   exclusions:
     generated: lax
     presets:
@@ -133,6 +135,14 @@ linters:
           - gocyclo
           - gosec
           - dupl
+      - path: _test\.go$
+        text: "cyclop"
+        linters:
+          - "cyclop"
+      - path: _test\.go$
+        text: "cognitive complexity"
+        linters:
+          - gocognit
       - path: _test\.go$
         text: shadow
         linters:
@@ -183,3 +193,23 @@ formatters:
 issues:
   max-issues-per-linter: 50
   max-same-issues: 10
+  exclude-rules:
+    - path: _test\.go$
+      linters:
+        - cyclop
+
+linters-settings:
+  depguard:
+    rules:
+      Main:
+        allow:
+          - $STD
+      Test:
+        files:
+          - _test\.go$
+        allow:
+          - $STD
+          - github.com/spf13/cobra
+          - github.com/spf13/pflag
+  gocognit:
+    min-complexity: 30

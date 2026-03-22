@@ -32,6 +32,13 @@ type GreetFlags struct {
 	Suffix string `default:"!"     flag:"suffix" help:"Greeting suffix"`
 }
 
+// StatsFlags defines flags demonstrating uint and float32 support.
+type StatsFlags struct {
+	MaxRetries uint    `default:"3"   flag:"max-retries" help:"Maximum retry attempts"`
+	Threshold  float32 `default:"0.5" flag:"threshold"   help:"Threshold value (0.0-1.0)"`
+	PageSize   uint    `default:"10"  flag:"page-size"   help:"Items per page"`
+}
+
 // Logger is a service registered via DI.
 type Logger struct {
 	verbose bool
@@ -295,6 +302,27 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 	err = cli.AddCommand(deprecatedCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add deprecated command: %w", err)
+	}
+
+	// Stats command demonstrating uint and float32 flag support
+	statsCmd := v2.Command[AppConfig, *StatsFlags]{
+		Use:     "stats",
+		Short:   "Display statistics configuration",
+		Example: "myapp stats --max-retries 5 --threshold 0.75 --page-size 20",
+		Flags:   &StatsFlags{},
+		RunE: func(ctx context.Context, cfg *AppConfig, flags *StatsFlags) error {
+			fmt.Println("Statistics Configuration:")
+			fmt.Printf("  Max Retries: %d\n", flags.MaxRetries)
+			fmt.Printf("  Threshold:   %.2f\n", flags.Threshold)
+			fmt.Printf("  Page Size:   %d\n", flags.PageSize)
+
+			return nil
+		},
+	}
+
+	err = v2.AddAnyCommand(cli, statsCmd)
+	if err != nil {
+		return fmt.Errorf("failed to add stats command: %w", err)
 	}
 
 	return nil

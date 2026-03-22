@@ -65,19 +65,21 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 	case reflect.Slice:
 		r.addStringSliceFlag(flags, tag)
 	default:
-		// Handle custom types
-		switch tag.Type {
-		case reflect.TypeFor[Duration]():
-			r.addDurationFlag(flags, tag)
-		case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
-			r.addEnumFlag(flags, tag)
-		default:
-			// Default to string for unknown types
-			r.addStringFlag(flags, tag)
-		}
+		r.addCustomTypeFlag(flags, tag)
 	}
 
 	return nil
+}
+
+func (r *FlagRegistry) addCustomTypeFlag(flags *pflag.FlagSet, tag FlagTag) {
+	switch tag.Type {
+	case reflect.TypeFor[Duration]():
+		r.addDurationFlag(flags, tag)
+	case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
+		r.addEnumFlag(flags, tag)
+	default:
+		r.addStringFlag(flags, tag)
+	}
 }
 
 // registerStringFlag registers a string flag with optional shorthand.
