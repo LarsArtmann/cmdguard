@@ -5,8 +5,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/spf13/cobra"
-
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
