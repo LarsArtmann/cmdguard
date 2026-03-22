@@ -44,10 +44,10 @@ func NewLogger(format, level string) *slog.Logger {
 	}
 
 	switch logFormat {
+	case FormatText:
+		handler = slog.NewTextHandler(os.Stderr, opts)
 	case FormatJSON:
 		handler = slog.NewJSONHandler(os.Stderr, opts)
-	default:
-		handler = slog.NewTextHandler(os.Stderr, opts)
 	}
 
 	return slog.New(handler)
