@@ -1088,11 +1088,43 @@ func (c *CLI[T]) Scope() *Scope {
 }
 ```
 
+**Nil-Safety Design:**
+
+To prevent panics when calling DI helpers on CLI without DI:
+
+```go
+// SafeInvoke returns an error instead of panicking when scope is nil
+func SafeInvoke[T any](scope *Scope) (T, error) {
+    var zero T
+    if scope == nil {
+        return zero, fmt.Errorf("%w: DI not enabled, use WithDI() option", ErrInvalidScope)
+    }
+    return do.Invoke[T](scope.injector)
+}
+
+// MustInvoke panics with descriptive message when scope is nil
+func MustInvoke[T any](scope *Scope) T {
+    if scope == nil {
+        panic("DI not enabled: use WithDI() option or check CLI.Scope() != nil")
+    }
+    return do.MustInvoke[T](scope.injector)
+}
+
+// Provide returns error when scope is nil
+func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
+    if scope == nil {
+        return fmt.Errorf("%w: DI not enabled, use WithDI() option", ErrInvalidScope)
+    }
+    return do.Provide(scope.injector, provider)
+}
+```
+
 **Benefits:**
 
 - Simpler for basic use cases
 - Follows samber/do best practices
 - Opt-in complexity
+- Nil-safe DI helpers prevent panics
 
 ### Improvement 4: Fix `any` in FlagRegistry (P2)
 
@@ -1589,6 +1621,77 @@ func main() {
     root.ExecuteAndExit(context.Background())
 }
 ```
+
+---
+
+## Deprecation & Backward Compatibility Plan
+
+### Deprecation Strategy
+
+To minimize disruption for existing users, we follow a gradual deprecation approach:
+
+#### v2.1.0 (Breaking Changes)
+
+1. **Add new API alongside old API**
+2. **Mark old API as deprecated** (but still functional)
+
+```go
+// NEW API (v2.1.0)
+type CLI[T any] struct { ... }
+func New[T any](name, short string, defaults T, opts ...Option[T]) (*CLI[T], error)
+
+// OLD API (marked deprecated in v2.1.0, removed in v3.0.0)
+type GuardedCommand[T any, F any] struct { ... }  // Deprecated: use CLI[T]
+
+// Add deprecation comment
+// Deprecated: Use CLI[T].AddCommand instead. Will be removed in v3.0.0.
+func AddAnyCommand[T, F, F2 any](g *GuardedCommand[T, F], cmd Command[T, F2]) error
+```
+
+#### v2.2.0 (Optional)
+
+- Emit deprecation warnings at runtime when old API is used
+- Update documentation to point to new API
+
+#### v3.0.0 (Breaking)
+
+- Remove deprecated types and functions
+- Full migration complete
+
+### Type Alias Strategy (Alternative)
+
+For a smoother transition, use type aliases:
+
+```go
+// v2.1.0: Type alias for backward compatibility
+type GuardedCommand[T any, F any] = CLI[T]  // Single type param only!
+
+// ERROR: This won't work because F is ignored
+// We need a runtime check instead
+
+// Better: Keep both APIs, add deprecation notices
+```
+
+### Recommended Migration Path for Users
+
+| Timeline | Action |
+|----------|--------|
+| v2.1.0 | Update imports, change `GuardedCommand[Config, NoFlags]` → `CLI[Config]` |
+| v2.1.0 | Remove `v2.AddAnyCommand` → use `cli.AddCommand` directly |
+| v2.1.0 | Replace `NewWithLong` → `New` with `WithLong` option |
+| v2.2.0 | (Optional) Enable `WithDI()` if using DI features |
+| v3.0.0 | Remove any remaining deprecated API usage |
+
+### Compatibility Matrix
+
+| Old API | New API | Compatibility |
+|---------|---------|--------------|
+| `GuardedCommand[T, F]` | `CLI[T]` | Type alias (F ignored) |
+| `AddAnyCommand` | `AddCommand` | Direct replacement |
+| `AddCommandFunc` | `AddCommand(fn())` | Remove, inline call |
+| `NewWithLong` | `New` + `WithLong` | Same behavior |
+| `ScopeStruct` | `Scope` | Same behavior (returns `*Scope`) |
+| `Scope` | (removed) | Use `Scope()` method instead |
 
 ---
 
