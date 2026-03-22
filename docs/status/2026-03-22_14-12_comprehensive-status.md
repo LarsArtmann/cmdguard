@@ -8,12 +8,12 @@
 
 ## Executive Summary
 
-| Metric | Status | Notes |
-|--------|--------|-------|
-| **Tests** | ✅ PASSING | All 11 packages pass |
-| **Build** | ✅ PASSING | No compilation errors |
-| **Lint** | ⚠️ 406 issues | Pre-existing issues |
-| **Coverage** | ~89% | v2 package |
+| Metric       | Status        | Notes                 |
+| ------------ | ------------- | --------------------- |
+| **Tests**    | ✅ PASSING    | All 11 packages pass  |
+| **Build**    | ✅ PASSING    | No compilation errors |
+| **Lint**     | ⚠️ 406 issues | Pre-existing issues   |
+| **Coverage** | ~89%          | v2 package            |
 
 ---
 
@@ -21,42 +21,42 @@
 
 ### A) FULLY DONE ✅
 
-| Task | Status | Notes |
-|------|--------|-------|
-| v2 API implementation | ✅ Complete | `GuardedCommand[T, F]` with typed DI |
-| CLI[T] simplified API | ✅ Complete | New convenience wrapper |
-| Test file restructuring | ✅ Complete | Split large files (643→3, 563→2) |
-| Dependency cleanup | ✅ Complete | Removed testify, simplified deps |
-| Cyclop linter disabled | ✅ Complete | Test complexity limits too strict |
-| Depguard linter disabled | ✅ Complete | Configuration issues resolved |
-| Enum/Duration types | ✅ Complete | Full marshal/unmarshal support |
-| Flag registry | ✅ Complete | Struct tag-based flag parsing |
-| DI integration | ✅ Complete | samber/do/v2 for lifecycle |
-| Examples | ✅ Complete | basic, di, typed, advanced-flags |
+| Task                     | Status      | Notes                                |
+| ------------------------ | ----------- | ------------------------------------ |
+| v2 API implementation    | ✅ Complete | `GuardedCommand[T, F]` with typed DI |
+| CLI[T] simplified API    | ✅ Complete | New convenience wrapper              |
+| Test file restructuring  | ✅ Complete | Split large files (643→3, 563→2)     |
+| Dependency cleanup       | ✅ Complete | Removed testify, simplified deps     |
+| Cyclop linter disabled   | ✅ Complete | Test complexity limits too strict    |
+| Depguard linter disabled | ✅ Complete | Configuration issues resolved        |
+| Enum/Duration types      | ✅ Complete | Full marshal/unmarshal support       |
+| Flag registry            | ✅ Complete | Struct tag-based flag parsing        |
+| DI integration           | ✅ Complete | samber/do/v2 for lifecycle           |
+| Examples                 | ✅ Complete | basic, di, typed, advanced-flags     |
 
 ### B) PARTIALLY DONE ⚠️
 
-| Task | Status | Blockers |
-|------|--------|----------|
-| Lint cleanup | ⚠️ 406 issues | Pre-existing; disabling linters breaks pre-commit |
-| Pre-commit hook | ⚠️ Fails lint | Requires lint to pass |
-| golangci.yml config | ⚠️ Deprecated | `linters-settings` vs `linters.settings` |
+| Task                | Status        | Blockers                                          |
+| ------------------- | ------------- | ------------------------------------------------- |
+| Lint cleanup        | ⚠️ 406 issues | Pre-existing; disabling linters breaks pre-commit |
+| Pre-commit hook     | ⚠️ Fails lint | Requires lint to pass                             |
+| golangci.yml config | ⚠️ Deprecated | `linters-settings` vs `linters.settings`          |
 
 ### C) NOT STARTED ⏳
 
-| Task | Priority | Notes |
-|------|----------|-------|
-| err113 fix | Medium | Dynamic error wrapping (25 issues) |
-| exhaustive fix | Medium | Switch case completeness (6 issues) |
-| testpackage rename | Low | Rename `_test.go` packages |
-| tagalign fix | Low | Struct tag alignment (11 issues) |
-| wrapcheck fix | Medium | Error wrapping (9 issues) |
+| Task               | Priority | Notes                               |
+| ------------------ | -------- | ----------------------------------- |
+| err113 fix         | Medium   | Dynamic error wrapping (25 issues)  |
+| exhaustive fix     | Medium   | Switch case completeness (6 issues) |
+| testpackage rename | Low      | Rename `_test.go` packages          |
+| tagalign fix       | Low      | Struct tag alignment (11 issues)    |
+| wrapcheck fix      | Medium   | Error wrapping (9 issues)           |
 
 ### D) TOTALLY FUCKED UP 🔴
 
-| Issue | Status | Resolution |
-|-------|--------|------------|
-| None | - | Clean state |
+| Issue | Status | Resolution  |
+| ----- | ------ | ----------- |
+| None  | -      | Clean state |
 
 ---
 
@@ -79,11 +79,11 @@
 
 ### High-Impact Issues (Should Fix)
 
-| Linter | Count | Impact | Effort |
-|--------|-------|--------|--------|
-| **exhaustive** | 6 | HIGH | Low - Add missing cases |
-| **wrapcheck** | 9 | HIGH | Low - Wrap errors |
-| **testpackage** | 19 | LOW | High - Rename all packages |
+| Linter          | Count | Impact | Effort                     |
+| --------------- | ----- | ------ | -------------------------- |
+| **exhaustive**  | 6     | HIGH   | Low - Add missing cases    |
+| **wrapcheck**   | 9     | HIGH   | Low - Wrap errors          |
+| **testpackage** | 19    | LOW    | High - Rename all packages |
 
 ### Pre-existing Issues (Not Our Fault)
 
@@ -96,12 +96,12 @@
 
 ## Code Quality Metrics
 
-| Metric | Value | Target |
-|--------|-------|--------|
-| Test Coverage (v2) | ~89% | 90%+ |
-| Test Files | 24 | - |
-| Source Files | 45 | - |
-| Examples | 4 | - |
+| Metric             | Value | Target |
+| ------------------ | ----- | ------ |
+| Test Coverage (v2) | ~89%  | 90%+   |
+| Test Files         | 24    | -      |
+| Source Files       | 45    | -      |
+| Examples           | 4     | -      |
 
 ---
 
@@ -209,11 +209,13 @@
 **How to properly configure golangci-lint v2.8 schema?**
 
 The project uses v2 configuration format but:
+
 - `linters-settings` is deprecated (should be `linters.settings`)
-- `exclusions` is deprecated (should be `excludes`)  
+- `exclusions` is deprecated (should be `excludes`)
 - `disable-all` may not be valid
 
 Error from validation:
+
 ```
 jsonschema: "linters" does not validate with "/properties/linters/additionalProperties": additional properties 'disable-all' not allowed
 jsonschema: "issues" does not validate with "/properties/issues/additionalProperties": additional properties 'exclude-rules' not allowed
@@ -265,6 +267,6 @@ pkg/cmdguard/v2/cli.go # New CLI[T] API
 
 ---
 
-*Generated: 2026-03-22 14:12*
-*Branch: master*
-*Commits since last report: 4*
+_Generated: 2026-03-22 14:12_
+_Branch: master_
+_Commits since last report: 4_

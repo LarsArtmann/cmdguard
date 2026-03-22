@@ -108,6 +108,13 @@ func (t FlagTag) parseIntDefault() any {
 	return int(v)
 }
 
+// parseUintDefault parses an unsigned integer default value.
+func (t FlagTag) parseUintDefault() any {
+	v, _ := strconv.ParseUint(t.Default, 10, 64)
+
+	return uint(v)
+}
+
 // parseFloat64Default parses a float64 default value.
 func parseFloat64Default(s string) float64 {
 	v, _ := strconv.ParseFloat(s, 64)
@@ -148,12 +155,22 @@ func (t FlagTag) parseDefaultValue() any {
 		return t.Default
 	case reflect.Bool:
 		return parseBoolDefault(t.Default)
-	case reflect.Int, reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return t.parseIntDefault()
-	case reflect.Float64:
+	case reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Uintptr:
+		return t.parseUintDefault()
+	case reflect.Float32, reflect.Float64:
 		return parseFloat64Default(t.Default)
 	case reflect.Slice:
 		return strings.Split(t.Default, ",")
+	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,
+		reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Struct, reflect.UnsafePointer:
+		return t.parseCustomDefault()
 	default:
 		return t.parseCustomDefault()
 	}

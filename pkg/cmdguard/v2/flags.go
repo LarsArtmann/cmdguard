@@ -52,18 +52,22 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 		r.addStringFlag(flags, tag)
 	case reflect.Bool:
 		r.addBoolFlag(flags, tag)
-	case reflect.Int, reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		r.addIntFlag(flags, tag)
-	case reflect.Uint:
+	case reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Uintptr:
 		r.addUintFlag(flags, tag)
-	case reflect.Uint64:
-		r.addUint64Flag(flags, tag)
-	case reflect.Float64:
+	case reflect.Float32, reflect.Float64:
 		r.addFloat64Flag(flags, tag)
-	case reflect.Float32:
-		r.addFloat32Flag(flags, tag)
 	case reflect.Slice:
 		r.addStringSliceFlag(flags, tag)
+	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,
+		reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Struct, reflect.UnsafePointer:
+		r.addCustomTypeFlag(flags, tag)
 	default:
 		r.addCustomTypeFlag(flags, tag)
 	}
@@ -122,30 +126,12 @@ func (r *FlagRegistry) addUintFlag(flags *pflag.FlagSet, tag FlagTag) {
 	}
 }
 
-func (r *FlagRegistry) addUint64Flag(flags *pflag.FlagSet, tag FlagTag) {
-	def, _ := strconv.ParseUint(tag.Default, 10, 64)
-	if tag.Short != "" {
-		flags.Uint64P(tag.Name, tag.Short, def, tag.Help)
-	} else {
-		flags.Uint64(tag.Name, def, tag.Help)
-	}
-}
-
 func (r *FlagRegistry) addFloat64Flag(flags *pflag.FlagSet, tag FlagTag) {
 	def, _ := strconv.ParseFloat(tag.Default, 64)
 	if tag.Short != "" {
 		flags.Float64P(tag.Name, tag.Short, def, tag.Help)
 	} else {
 		flags.Float64(tag.Name, def, tag.Help)
-	}
-}
-
-func (r *FlagRegistry) addFloat32Flag(flags *pflag.FlagSet, tag FlagTag) {
-	def, _ := strconv.ParseFloat(tag.Default, 32)
-	if tag.Short != "" {
-		flags.Float32P(tag.Name, tag.Short, float32(def), tag.Help)
-	} else {
-		flags.Float32(tag.Name, float32(def), tag.Help)
 	}
 }
 

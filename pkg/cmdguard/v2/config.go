@@ -95,13 +95,21 @@ func getFieldValue(field reflect.Value) (string, bool) {
 	switch field.Kind() {
 	case reflect.String:
 		return field.String(), true
-	default:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64,
+		reflect.Bool, reflect.Complex64, reflect.Complex128:
 		if field.Type() == reflect.TypeFor[Enum]() ||
 			field.Type() == reflect.TypeFor[LogLevel]() ||
 			field.Type() == reflect.TypeFor[LogFormat]() {
 			return field.MethodByName("String").Call(nil)[0].String(), true
 		}
 
+		fallthrough
+	case reflect.Invalid, reflect.Array, reflect.Chan, reflect.Func, reflect.Interface,
+		reflect.Map, reflect.Pointer, reflect.Slice, reflect.Struct, reflect.UnsafePointer:
+		return "", false
+	default:
 		return "", false
 	}
 }

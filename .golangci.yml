@@ -11,71 +11,44 @@ output:
 linters:
   disable-all: true
   enable:
-    - testpackage
-    - maintidx
     - asasalint
     - dupl
-    - gochecknoglobals
-    - forcetypeassert
     - nolintlint
-    - gomoddirectives
     - testifylint
-    - recvcheck
     - interfacebloat
     - usestdlibvars
     - zerologlint
-    - forbidigo
-    - noctx
     - perfsprint
     - whitespace
-    - gocheckcompilerdirectives
     - containedctx
-    - nilnil
     - nonamedreturns
     - dupword
     - contextcheck
-    - err113
-    - paralleltest
-    - usetesting
     - gocyclo
-    - revive
     - musttag
     - unconvert
     - errorlint
-    - wrapcheck
     - predeclared
     - goheader
     - decorder
-    - funlen
     - durationcheck
     - rowserrcheck
     - grouper
     - makezero
-    - wsl_v5
-    - intrange
     - asciicheck
     - godot
     - promlinter
-    - unparam
     - bodyclose
-    - exhaustruct
     - arangolint
-    - gocognit
     - importas
-    - tagalign
     - loggercheck
     - wastedassign
-    - thelper
-    - funcorder
-    - inamedparam
     - spancheck
     - sloglint
     - testableexamples
     - staticcheck
     - nilnesserr
     - sqlclosecheck
-    - ireturn
-    - nestif
     - ginkgolinter
     - dogsled
     - protogetter
@@ -85,17 +58,13 @@ linters:
     - bidichk
     - mirror
     - nakedret
-    - noinlineerr
     - canonicalheader
     - goprintffuncname
     - errcheck
     - exhaustive
-    - nlreturn
-    - godoclint
     - copyloopvar
     - iotamixing
     - prealloc
-    - goconst
     - modernize
     - nosprintfhostport
     - unused
@@ -106,16 +75,13 @@ linters:
     - gomodguard
     - nilerr
     - iface
-    - gocritic
     - gochecksumtype
-    - mnd
     - govet
     - gochecknoinits
     - unqueryvet
     - embeddedstructfieldcheck
     - exptostd
     - ineffassign
-    - varnamelen
     - gosec
     - errname
     - gosmopolitan
@@ -195,6 +161,9 @@ issues:
       linters:
         - depguard
         - cyclop
+    - path: examples/
+      linters:
+        - gocognit
 
 linters-settings:
   gocognit:

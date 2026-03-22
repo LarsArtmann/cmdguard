@@ -61,18 +61,22 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 		return SetField(cfg, tag.Field, value)
 	case reflect.Bool:
 		return r.parseAndSetBool(cfg, tag, value)
-	case reflect.Int, reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return r.parseAndSetInt(cfg, tag, value)
-	case reflect.Uint:
+	case reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Uintptr:
 		return r.parseAndSetUint(cfg, tag, value)
-	case reflect.Uint64:
-		return r.parseAndSetUint64(cfg, tag, value)
-	case reflect.Float64:
+	case reflect.Float32, reflect.Float64:
 		return r.parseAndSetFloat64(cfg, tag, value)
-	case reflect.Float32:
-		return r.parseAndSetFloat32(cfg, tag, value)
 	case reflect.Slice:
 		return SetField(cfg, tag.Field, strings.Split(value, ","))
+	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,
+		reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Struct, reflect.UnsafePointer:
+		return r.parseAndSetCustom(cfg, tag, value)
 	default:
 		return r.parseAndSetCustom(cfg, tag, value)
 	}
@@ -108,17 +112,6 @@ func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error
 	return SetField(cfg, tag.Field, uint(v))
 }
 
-// parseAndSetUint64 parses and sets a uint64 value.
-func (r *FlagRegistry) parseAndSetUint64(cfg any, tag FlagTag, value string) error {
-	v, err := strconv.ParseUint(value, 10, 64)
-	if err != nil {
-		return NewFlagError(tag.Name, err)
-	}
-
-	return SetField(cfg, tag.Field, v)
-}
-
-// parseAndSetFloat64 parses and sets a float64 value.
 func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) error {
 	v, err := strconv.ParseFloat(value, 64)
 	if err != nil {
@@ -126,16 +119,6 @@ func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) er
 	}
 
 	return SetField(cfg, tag.Field, v)
-}
-
-// parseAndSetFloat32 parses and sets a float32 value.
-func (r *FlagRegistry) parseAndSetFloat32(cfg any, tag FlagTag, value string) error {
-	v, err := strconv.ParseFloat(value, 32)
-	if err != nil {
-		return NewFlagError(tag.Name, err)
-	}
-
-	return SetField(cfg, tag.Field, float32(v))
 }
 
 // parseAndSetCustom handles custom type parsing.
