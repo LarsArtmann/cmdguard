@@ -1,12 +1,11 @@
-// Package integration provides end-to-end tests for cmdguard v2 API.
+// Package integration provides end-to-end tests for cmdguard.
 package integration
 
 import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/spf13/cobra"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
@@ -54,7 +53,9 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 
 	// Create CLI with RootConfig and GreetFlags
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	var (
 		greetCalled  bool
@@ -73,11 +74,12 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
-
 			return nil
 		},
 	})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Add math command with different flag type
 	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](
@@ -89,12 +91,13 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
 				mathCalled = true
 				mathFlags = flags
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Add config command with yet another flag type
 	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *ConfigFlags](
@@ -106,40 +109,67 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *ConfigFlags) error {
 				configCalled = true
 				configFlags = flags
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Test greet command with flags
 	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=Alice", "--shout"})
-	require.NoError(t, err)
-	assert.True(t, greetCalled)
-	assert.Equal(t, "Alice", greetFlags.Name)
-	assert.True(t, greetFlags.Shout)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !greetCalled {
+		t.Error("greetCalled should be true")
+	}
+	if greetFlags.Name != "Alice" {
+		t.Errorf("greetFlags.Name = %q, want %q", greetFlags.Name, "Alice")
+	}
+	if !greetFlags.Shout {
+		t.Error("greetFlags.Shout should be true")
+	}
 
 	// Test math command with different flags
 	err = cli.ExecuteWithArgs(ctx, []string{"math", "--x=10", "--y=20"})
-	require.NoError(t, err)
-	assert.True(t, mathCalled)
-	assert.Equal(t, 10, mathFlags.X)
-	assert.Equal(t, 20, mathFlags.Y)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !mathCalled {
+		t.Error("mathCalled should be true")
+	}
+	if mathFlags.X != 10 {
+		t.Errorf("mathFlags.X = %d, want %d", mathFlags.X, 10)
+	}
+	if mathFlags.Y != 20 {
+		t.Errorf("mathFlags.Y = %d, want %d", mathFlags.Y, 20)
+	}
 
 	// Test config command with yet more flags
 	err = cli.ExecuteWithArgs(ctx, []string{"config", "--file=/etc/app.yaml", "--json"})
-	require.NoError(t, err)
-	assert.True(t, configCalled)
-	assert.Equal(t, "/etc/app.yaml", configFlags.File)
-	assert.True(t, configFlags.JSON)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !configCalled {
+		t.Error("configCalled should be true")
+	}
+	if configFlags.File != "/etc/app.yaml" {
+		t.Errorf("configFlags.File = %q, want %q", configFlags.File, "/etc/app.yaml")
+	}
+	if !configFlags.JSON {
+		t.Error("configFlags.JSON should be true")
+	}
 }
 
 func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	ctx := context.Background()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	var (
 		migrateCalled bool
@@ -160,7 +190,6 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 				RunE: func(ctx context.Context, cfg *RootConfig, flags *DBFlags) error {
 					statusCalled = true
 					statusFlags = flags
-
 					return nil
 				},
 			},
@@ -168,7 +197,9 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	}
 
 	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *DBFlags](cli, dbCmd)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Add migrate command with different flag type at same level as db
 	migrateCmd := v2.Command[RootConfig, *MigrateFlags]{
@@ -178,27 +209,44 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags
-
 			return nil
 		},
 	}
 
 	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *MigrateFlags](cli, migrateCmd)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Test db status with DBFlags
 	err = cli.ExecuteWithArgs(ctx, []string{"db", "status", "--host=prod-db", "--port=3306"})
-	require.NoError(t, err)
-	assert.True(t, statusCalled)
-	assert.Equal(t, "prod-db", statusFlags.Host)
-	assert.Equal(t, 3306, statusFlags.Port)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !statusCalled {
+		t.Error("statusCalled should be true")
+	}
+	if statusFlags.Host != "prod-db" {
+		t.Errorf("statusFlags.Host = %q, want %q", statusFlags.Host, "prod-db")
+	}
+	if statusFlags.Port != 3306 {
+		t.Errorf("statusFlags.Port = %d, want %d", statusFlags.Port, 3306)
+	}
 
 	// Test migrate with MigrateFlags
 	err = cli.ExecuteWithArgs(ctx, []string{"migrate", "--steps=5", "--direction=down"})
-	require.NoError(t, err)
-	assert.True(t, migrateCalled)
-	assert.Equal(t, 5, migrateFlags.Steps)
-	assert.Equal(t, "down", migrateFlags.Direction)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !migrateCalled {
+		t.Error("migrateCalled should be true")
+	}
+	if migrateFlags.Steps != 5 {
+		t.Errorf("migrateFlags.Steps = %d, want %d", migrateFlags.Steps, 5)
+	}
+	if migrateFlags.Direction != "down" {
+		t.Errorf("migrateFlags.Direction = %q, want %q", migrateFlags.Direction, "down")
+	}
 }
 
 // assertCommandExecution runs a command multiple times and verifies the execution state.
@@ -217,8 +265,12 @@ func assertCommandExecution[
 
 	for range 3 {
 		err := cli.ExecuteWithArgs(ctx, args)
-		require.NoError(t, err)
-		assert.Equal(t, wantExecuted, lastExecuted)
+		if err != nil {
+			t.Fatalf("unexpected error on iteration %d: %v", i+1, err)
+		}
+		if wantExecuted != lastExecuted {
+			t.Errorf("iteration %d: lastExecuted = %q, want %q", i, lastExecuted, wantExecuted)
+		}
 		assertFlags(t, lastFlags)
 	}
 }
@@ -232,7 +284,9 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	ctx := context.Background()
 
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Add command A with GreetFlags
 	err = cli.AddCommand(v2.Command[RootConfig, *GreetFlags]{
@@ -242,11 +296,12 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
-
 			return nil
 		},
 	})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Add command B with MathFlags
 	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](
@@ -258,12 +313,13 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
 				lastExecuted = "B"
 				lastFlags = flags
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Execute A multiple times
 	assertCommandExecution(
@@ -274,8 +330,12 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		"A",
 		func(t *testing.T, flags any) {
 			gf, ok := flags.(*GreetFlags)
-			assert.True(t, ok)
-			assert.Equal(t, "test", gf.Name)
+			if !ok {
+				t.Fatalf("expected *GreetFlags, got %T", flags)
+			}
+			if gf.Name != "test" {
+				t.Errorf("gf.Name = %q, want %q", gf.Name, "test")
+			}
 		},
 	)
 
@@ -288,20 +348,32 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		"B",
 		func(t *testing.T, flags any) {
 			mf, ok := flags.(*MathFlags)
-			assert.True(t, ok)
-			assert.Equal(t, 42, mf.X)
+			if !ok {
+				t.Fatalf("expected *MathFlags, got %T", flags)
+			}
+			if mf.X != 42 {
+				t.Errorf("mf.X = %d, want %d", mf.X, 42)
+			}
 		},
 	)
 
 	// Interleave executions
 	for range 5 {
 		err = cli.ExecuteWithArgs(ctx, []string{"cmd-a", "--shout"})
-		require.NoError(t, err)
-		assert.Equal(t, "A", lastExecuted)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if lastExecuted != "A" {
+			t.Errorf("lastExecuted = %q, want %q", lastExecuted, "A")
+		}
 
 		err = cli.ExecuteWithArgs(ctx, []string{"cmd-b", "--y=99"})
-		require.NoError(t, err)
-		assert.Equal(t, "B", lastExecuted)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if lastExecuted != "B" {
+			t.Errorf("lastExecuted = %q, want %q", lastExecuted, "B")
+		}
 	}
 }
 
@@ -309,7 +381,9 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 	ctx := context.Background()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	var executed bool
 
@@ -321,12 +395,13 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 			Short: "Simple command",
 			RunE: func(ctx context.Context, cfg *RootConfig, flags v2.NoFlags) error {
 				executed = true
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Add command with actual flags
 	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
@@ -337,31 +412,42 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 			Flags: &GreetFlags{Name: "World", Shout: false},
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				executed = true
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Test simple command (NoFlags)
 	executed = false
 	err = cli.ExecuteWithArgs(ctx, []string{"simple"})
-	require.NoError(t, err)
-	assert.True(t, executed)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !executed {
+		t.Error("executed should be true")
+	}
 
 	// Test greet command with flags
 	executed = false
 	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=Bob"})
-	require.NoError(t, err)
-	assert.True(t, executed)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !executed {
+		t.Error("executed should be true")
+	}
 }
 
 func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 	ctx := context.Background()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	var (
 		preRunCalled  bool
@@ -379,37 +465,50 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 			Flags: &GreetFlags{Name: "World", Shout: false},
 			PreRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				preRunCalled = true
-
 				return nil
 			},
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				runCalled = true
 				receivedFlags = flags
-
 				return nil
 			},
 			PostRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				postRunCalled = true
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=TestUser", "--shout"})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	assert.True(t, preRunCalled)
-	assert.True(t, runCalled)
-	assert.True(t, postRunCalled)
-	assert.Equal(t, "TestUser", receivedFlags.Name)
-	assert.True(t, receivedFlags.Shout)
+	if !preRunCalled {
+		t.Error("preRunCalled should be true")
+	}
+	if !runCalled {
+		t.Error("runCalled should be true")
+	}
+	if !postRunCalled {
+		t.Error("postRunCalled should be true")
+	}
+	if receivedFlags.Name != "TestUser" {
+		t.Errorf("receivedFlags.Name = %q, want %q", receivedFlags.Name, "TestUser")
+	}
+	if !receivedFlags.Shout {
+		t.Error("receivedFlags.Shout should be true")
+	}
 }
 
 func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Command without Use should fail
 	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
@@ -420,8 +519,9 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 			RunE:  func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error { return nil },
 		},
 	)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "no Use field")
+	if err == nil {
+		t.Error("expected error for empty Use field")
+	}
 
 	// Command without RunE and no subcommands should fail
 	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
@@ -431,8 +531,9 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 			Short: "No handler",
 		},
 	)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "no RunE")
+	if err == nil {
+		t.Error("expected error for missing RunE")
+	}
 }
 
 func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
@@ -445,7 +546,9 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 	}
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", defaultConfig)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	var receivedConfig *RootConfig
 
@@ -457,26 +560,37 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 			Flags: &GreetFlags{},
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				receivedConfig = cfg
-
 				return nil
 			},
 		},
 	)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	err = cli.ExecuteWithArgs(ctx, []string{"check"})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	require.NotNil(t, receivedConfig)
-	assert.True(t, receivedConfig.Verbose)
-	assert.Equal(t, "debug", receivedConfig.Level)
+	if receivedConfig == nil {
+		t.Fatal("receivedConfig is nil")
+	}
+	if !receivedConfig.Verbose {
+		t.Error("receivedConfig.Verbose should be true")
+	}
+	if receivedConfig.Level != "debug" {
+		t.Errorf("receivedConfig.Level = %q, want %q", receivedConfig.Level, "debug")
+	}
 }
 
 func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	ctx := context.Background()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	var executedFlags *MigrateFlags
 
@@ -487,7 +601,6 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 		Short: "Run up migrations",
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
 			executedFlags = flags
-
 			return nil
 		},
 	}
@@ -500,9 +613,15 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	}
 
 	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *MigrateFlags](cli, migrateCmd)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	err = cli.ExecuteWithArgs(ctx, []string{"migrate", "up", "--steps=3"})
-	require.NoError(t, err)
-	assert.Equal(t, 3, executedFlags.Steps)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if executedFlags.Steps != 3 {
+		t.Errorf("executedFlags.Steps = %d, want %d", executedFlags.Steps, 3)
+	}
 }
