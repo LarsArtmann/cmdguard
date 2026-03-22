@@ -263,10 +263,13 @@ child := scope.Child("plugin-scope")
 
 ### Command with Custom Flags
 
+Supported flag types: `string`, `bool`, `int`, `uint`, `float64`, `[]string`, `Duration`, `Enum`, `LogLevel`, `LogFormat`
+
 ```go
 type GreetFlags struct {
-    Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-    Shout bool   `flag:"shout" default:"false" help:"Shout the greeting"`
+    Name    string   `flag:"name"    short:"n" default:"World" help:"Name to greet"`
+    Count   uint     `flag:"count"   short:"c" default:"1"    help:"Number of greetings"`
+    Shout   bool     `flag:"shout"   default:"false"         help:"Shout the greeting"`
 }
 
 root.AddCommand(v2.Command[AppConfig, GreetFlags]{
@@ -274,11 +277,13 @@ root.AddCommand(v2.Command[AppConfig, GreetFlags]{
     Short: "Greet someone",
     Flags: GreetFlags{}, // Provide defaults
     RunE: func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
-        msg := fmt.Sprintf("Hello, %s!", flags.Name)
-        if flags.Shout {
-            msg = strings.ToUpper(msg)
+        for i := uint(0); i < flags.Count; i++ {
+            msg := fmt.Sprintf("Hello, %s!", flags.Name)
+            if flags.Shout {
+                msg = strings.ToUpper(msg)
+            }
+            fmt.Println(msg)
         }
-        fmt.Println(msg)
         return nil
     },
 })
