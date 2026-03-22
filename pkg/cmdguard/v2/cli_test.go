@@ -218,6 +218,8 @@ func TestCLIAccessors(t *testing.T) {
 		rootCmd := cli.RootCommand()
 		if rootCmd == nil {
 			t.Error("RootCommand() returned nil")
+
+			return
 		}
 
 		if rootCmd.Use != "test" {

@@ -140,6 +140,24 @@ func NewWithLong[T, F any](name, short, long string, defaults T) (*GuardedComman
 	return g, nil
 }
 
+// SimpleCLI is a type alias for CLIs that don't need command-specific flags.
+// Use this when your CLI only has global config (T) and all commands share NoFlags.
+// This is an alias, not a new type, so it works seamlessly with all GuardedCommand methods.
+type SimpleCLI[T any] = GuardedCommand[T, NoFlags]
+
+// NewSimple creates a new CLI application with typed config and no command-specific flags.
+// This is a convenience wrapper around New[T, NoFlags] for the common case where
+// commands don't need additional flags beyond the global config.
+func NewSimple[T any](name, short string, defaults T) (*SimpleCLI[T], error) {
+	return New[T, NoFlags](name, short, defaults)
+}
+
+// NewSimpleWithLong creates a new CLI application with a long description and no command-specific flags.
+// This is a convenience wrapper around NewWithLong[T, NoFlags].
+func NewSimpleWithLong[T any](name, short, long string, defaults T) (*SimpleCLI[T], error) {
+	return NewWithLong[T, NoFlags](name, short, long, defaults)
+}
+
 // toCobraCommand converts a Command[T, F] to a cobra.Command.
 // This is a wrapper around toCobraCommandAny that uses the GuardedCommand's config.
 func (g *GuardedCommand[T, F]) toCobraCommand(cmd Command[T, F]) (*cobra.Command, error) {
