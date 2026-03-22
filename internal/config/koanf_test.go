@@ -4,40 +4,53 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestKoanfLoader_LoadDefaults(t *testing.T) {
 	loader := NewLoader()
 	err := loader.Load("")
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	// Verify defaults
-	assert.Equal(t, "info", loader.GetString("log_level"))
-	assert.Equal(t, "text", loader.GetString("log_format"))
-	assert.False(t, loader.GetBool("strict_mode"))
+	if got := loader.GetString("log_level"); got != "info" {
+		t.Errorf("GetString(log_level) = %q, want %q", got, "info")
+	}
+
+	if got := loader.GetString("log_format"); got != "text" {
+		t.Errorf("GetString(log_format) = %q, want %q", got, "text")
+	}
+
+	if loader.GetBool("strict_mode") {
+		t.Errorf("GetBool(strict_mode) = true, want false")
+	}
 }
 
 func TestKoanfLoader_LoadEnv(t *testing.T) {
-	// Set environment variables
 	t.Setenv("CMDGUARD_LOG_LEVEL", "debug")
 	t.Setenv("CMDGUARD_LOG_FORMAT", "json")
 	t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 	loader := NewLoader()
 	err := loader.Load("")
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	// Verify env overrides defaults
-	assert.Equal(t, "debug", loader.GetString("log_level"))
-	assert.Equal(t, "json", loader.GetString("log_format"))
-	assert.True(t, loader.GetBool("strict_mode"))
+	if got := loader.GetString("log_level"); got != "debug" {
+		t.Errorf("GetString(log_level) = %q, want %q", got, "debug")
+	}
+
+	if got := loader.GetString("log_format"); got != "json" {
+		t.Errorf("GetString(log_format) = %q, want %q", got, "json")
+	}
+
+	if !loader.GetBool("strict_mode") {
+		t.Errorf("GetBool(strict_mode) = false, want true")
+	}
 }
 
 func TestKoanfLoader_LoadFile(t *testing.T) {
-	// Create temporary config file
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "config.yaml")
 
@@ -47,20 +60,30 @@ log_format: json
 strict_mode: true
 `
 	err := os.WriteFile(configPath, []byte(configContent), 0o644)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	loader := NewLoader()
 	err = loader.Load(configPath)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	// Verify file overrides defaults
-	assert.Equal(t, "warn", loader.GetString("log_level"))
-	assert.Equal(t, "json", loader.GetString("log_format"))
-	assert.True(t, loader.GetBool("strict_mode"))
+	if got := loader.GetString("log_level"); got != "warn" {
+		t.Errorf("GetString(log_level) = %q, want %q", got, "warn")
+	}
+
+	if got := loader.GetString("log_format"); got != "json" {
+		t.Errorf("GetString(log_format) = %q, want %q", got, "json")
+	}
+
+	if !loader.GetBool("strict_mode") {
+		t.Errorf("GetBool(strict_mode) = false, want true")
+	}
 }
 
 func TestKoanfLoader_EnvOverridesFile(t *testing.T) {
-	// Create temporary config file
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "config.yaml")
 
@@ -69,20 +92,30 @@ log_level: warn
 log_format: json
 `
 	err := os.WriteFile(configPath, []byte(configContent), 0o644)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	// Set environment variables
 	t.Setenv("CMDGUARD_LOG_LEVEL", "debug")
 	t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 	loader := NewLoader()
 	err = loader.Load(configPath)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	// Verify env overrides file
-	assert.Equal(t, "debug", loader.GetString("log_level"))
-	assert.Equal(t, "json", loader.GetString("log_format")) // From file
-	assert.True(t, loader.GetBool("strict_mode"))           // From env
+	if got := loader.GetString("log_level"); got != "debug" {
+		t.Errorf("GetString(log_level) = %q, want %q", got, "debug")
+	}
+
+	if got := loader.GetString("log_format"); got != "json" {
+		t.Errorf("GetString(log_format) = %q, want %q", got, "json")
+	}
+
+	if !loader.GetBool("strict_mode") {
+		t.Errorf("GetBool(strict_mode) = false, want true")
+	}
 }
 
 func TestKoanfLoader_Unmarshal(t *testing.T) {
@@ -92,7 +125,9 @@ func TestKoanfLoader_Unmarshal(t *testing.T) {
 
 	loader := NewLoader()
 	err := loader.Load("")
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	type TestConfig struct {
 		LogLevel   string `koanf:"log_level"`
@@ -103,42 +138,57 @@ func TestKoanfLoader_Unmarshal(t *testing.T) {
 	var cfg TestConfig
 
 	err = loader.Unmarshal(&cfg)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	assert.Equal(t, "error", cfg.LogLevel)
-	assert.Equal(t, "json", cfg.LogFormat)
-	assert.True(t, cfg.StrictMode)
+	if cfg.LogLevel != "error" {
+		t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, "error")
+	}
+
+	if cfg.LogFormat != "json" {
+		t.Errorf("cfg.LogFormat = %q, want %q", cfg.LogFormat, "json")
+	}
+
+	if !cfg.StrictMode {
+		t.Errorf("cfg.StrictMode = false, want true")
+	}
 }
 
 func TestKoanfLoader_MissingFile(t *testing.T) {
-	// Try to load non-existent file
 	loader := NewLoader()
 	err := loader.Load("/nonexistent/path/config.yaml")
-
 	// Should not error (file is optional)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Should have defaults
-	assert.Equal(t, "info", loader.GetString("log_level"))
+	if got := loader.GetString("log_level"); got != "info" {
+		t.Errorf("GetString(log_level) = %q, want %q", got, "info")
+	}
 }
 
 func TestKoanfLoader_Priority(t *testing.T) {
-	// Priority test: env > file > defaults
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "config.yaml")
 
-	// File sets log_level to warn
 	configContent := `log_level: warn`
 	err := os.WriteFile(configPath, []byte(configContent), 0o644)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-	// Env sets log_level to debug
 	t.Setenv("CMDGUARD_LOG_LEVEL", "debug")
 
 	loader := NewLoader()
 	err = loader.Load(configPath)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	// Should be debug (env wins)
-	assert.Equal(t, "debug", loader.GetString("log_level"))
+	if got := loader.GetString("log_level"); got != "debug" {
+		t.Errorf("GetString(log_level) = %q, want %q", got, "debug")
+	}
 }

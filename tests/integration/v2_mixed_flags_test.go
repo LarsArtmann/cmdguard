@@ -80,8 +80,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	}
 
 	// Add math command with different flag type
-	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *MathFlags]{
 			Use:   "math",
 			Short: "Do math",
@@ -98,8 +97,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	}
 
 	// Add config command with yet another flag type
-	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *ConfigFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *ConfigFlags]{
 			Use:   "config",
 			Short: "Manage config",
@@ -194,7 +192,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *DBFlags](cli, dbCmd)
+	err = v2.AddAnyCommand(cli, dbCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -211,7 +209,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *MigrateFlags](cli, migrateCmd)
+	err = v2.AddAnyCommand(cli, migrateCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -261,7 +259,7 @@ func assertCommandExecution[
 ) {
 	t.Helper()
 
-	for range 3 {
+	for i := range 3 {
 		err := cli.ExecuteWithArgs(ctx, args)
 		if err != nil {
 			t.Fatalf("unexpected error on iteration %d: %v", i+1, err)
@@ -302,8 +300,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	}
 
 	// Add command B with MathFlags
-	err = v2.AddAnyCommand[RootConfig, *GreetFlags, *MathFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *MathFlags]{
 			Use:   "cmd-b",
 			Short: "Command B",
@@ -386,8 +383,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 	var executed bool
 
 	// Add command with NoFlags
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, v2.NoFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, v2.NoFlags]{
 			Use:   "simple",
 			Short: "Simple command",
@@ -402,8 +398,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 	}
 
 	// Add command with actual flags
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "greet",
 			Short: "Greet command",
@@ -455,8 +450,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 	)
 
 	// Add command with lifecycle hooks
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "greet",
 			Short: "Greet with lifecycle",
@@ -509,8 +503,7 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	}
 
 	// Command without Use should fail
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "",
 			Short: "Invalid command",
@@ -522,8 +515,7 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	}
 
 	// Command without RunE and no subcommands should fail
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "invalid",
 			Short: "No handler",
@@ -550,8 +542,7 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 
 	var receivedConfig *RootConfig
 
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *GreetFlags](
-		cli,
+	err = v2.AddAnyCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "check",
 			Short: "Check config access",
@@ -610,7 +601,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 		Commands: []v2.Command[RootConfig, *MigrateFlags]{migrateUpCmd},
 	}
 
-	err = v2.AddAnyCommand[RootConfig, v2.NoFlags, *MigrateFlags](cli, migrateCmd)
+	err = v2.AddAnyCommand(cli, migrateCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
