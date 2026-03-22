@@ -18,7 +18,8 @@
 5. [Recommended Improvements](#recommended-improvements)
 6. [Proposed API Surface](#proposed-api-surface)
 7. [Migration Guide](#migration-guide)
-8. [Implementation Checklist](#implementation-checklist)
+8. [Deprecation & Backward Compatibility Plan](#deprecation--backward-compatibility-plan)
+9. [Implementation Checklist](#implementation-checklist)
 
 ---
 
@@ -36,6 +37,20 @@ This document captures comprehensive research on Go API design best practices, s
 | `any` Usage       | `NewFlagRegistry(cfg any)` violates "no `any`" policy         | P2       |
 | samber/do Pattern | Missing `Package()` function for library integration          | P2       |
 | API Surface       | Duplicate scope access methods (`Scope()` vs `ScopeStruct()`) | P2       |
+
+### Clarification on `any` Usage
+
+The "no `any`" policy applies to **accidental** use where generics could be used instead. However, **intentional `any`** in type parameters is valid:
+
+```go
+// ✅ INTENTIONAL: Accepting any struct type for flags (cannot use constraint)
+func (c *CLI[T]) AddCommand(cmd Command[T, any]) error
+
+// ❌ ACCIDENTAL: Using any when generics would work
+func NewFlagRegistry(cfg any) (*FlagRegistry, error)  // Fixed: NewFlagRegistry[F any](cfg *F)
+```
+
+The proposed API uses `Command[T, any]` intentionally because Go doesn't have a "any struct" constraint. This is explicit and documented.
 
 ---
 
@@ -1674,24 +1689,24 @@ type GuardedCommand[T any, F any] = CLI[T]  // Single type param only!
 
 ### Recommended Migration Path for Users
 
-| Timeline | Action |
-|----------|--------|
-| v2.1.0 | Update imports, change `GuardedCommand[Config, NoFlags]` → `CLI[Config]` |
-| v2.1.0 | Remove `v2.AddAnyCommand` → use `cli.AddCommand` directly |
-| v2.1.0 | Replace `NewWithLong` → `New` with `WithLong` option |
-| v2.2.0 | (Optional) Enable `WithDI()` if using DI features |
-| v3.0.0 | Remove any remaining deprecated API usage |
+| Timeline | Action                                                                   |
+| -------- | ------------------------------------------------------------------------ |
+| v2.1.0   | Update imports, change `GuardedCommand[Config, NoFlags]` → `CLI[Config]` |
+| v2.1.0   | Remove `v2.AddAnyCommand` → use `cli.AddCommand` directly                |
+| v2.1.0   | Replace `NewWithLong` → `New` with `WithLong` option                     |
+| v2.2.0   | (Optional) Enable `WithDI()` if using DI features                        |
+| v3.0.0   | Remove any remaining deprecated API usage                                |
 
 ### Compatibility Matrix
 
-| Old API | New API | Compatibility |
-|---------|---------|--------------|
-| `GuardedCommand[T, F]` | `CLI[T]` | Type alias (F ignored) |
-| `AddAnyCommand` | `AddCommand` | Direct replacement |
-| `AddCommandFunc` | `AddCommand(fn())` | Remove, inline call |
-| `NewWithLong` | `New` + `WithLong` | Same behavior |
-| `ScopeStruct` | `Scope` | Same behavior (returns `*Scope`) |
-| `Scope` | (removed) | Use `Scope()` method instead |
+| Old API                | New API            | Compatibility                    |
+| ---------------------- | ------------------ | -------------------------------- |
+| `GuardedCommand[T, F]` | `CLI[T]`           | Type alias (F ignored)           |
+| `AddAnyCommand`        | `AddCommand`       | Direct replacement               |
+| `AddCommandFunc`       | `AddCommand(fn())` | Remove, inline call              |
+| `NewWithLong`          | `New` + `WithLong` | Same behavior                    |
+| `ScopeStruct`          | `Scope`            | Same behavior (returns `*Scope`) |
+| `Scope`                | (removed)          | Use `Scope()` method instead     |
 
 ---
 
@@ -1706,6 +1721,13 @@ type GuardedCommand[T any, F any] = CLI[T]  // Single type param only!
 - [ ] Make `AddCommand` accept `Command[T, any]` (works with any flags)
 - [ ] Remove `AddAnyCommand` (no longer needed)
 - [ ] Remove `AddCommandFunc` (redundant)
+- [ ] Add deprecation type aliases for backward compatibility
+
+### Phase 1.5: Deprecation (v2.1.0)
+
+- [ ] Add `Deprecated:` comments to removed functions
+- [ ] Create compatibility shims if needed
+- [ ] Document migration path in MIGRATION.md
 
 ### Phase 2: DI Improvements (v2.1.0)
 
@@ -1718,8 +1740,11 @@ type GuardedCommand[T any, F any] = CLI[T]  // Single type param only!
 
 ### Phase 3: Type Safety (v2.1.0)
 
-- [ ] Update `NewFlagRegistry` to be generic: `NewFlagRegistry[T any](cfg *T)`
+- [ ] Update `NewFlagRegistry` to be generic: `NewFlagRegistry[F any](cfg *F)`
+- [ ] Update `ParseFlags` to be generic: `ParseFlags(cmd *cobra.Command, cfg *F)`
+- [ ] Update `FlagRegistry` to `FlagRegistry[F]` struct
 - [ ] Review all `any` usages in package
+- [ ] Ensure no accidental `any` remains where generics would work
 
 ### Phase 4: Documentation (v2.1.0)
 

@@ -126,6 +126,35 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 	})
 
+	t.Run("parse uint64 flag", func(t *testing.T) {
+		type TestConfig struct {
+			MaxBytes uint64 `default:"0" flag:"max-bytes"`
+		}
+
+		cfg := &TestConfig{}
+		registry, err := NewFlagRegistry(*cfg)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+
+		cmd := &cobra.Command{Use: "test"}
+		if err := registry.RegisterFlags(cmd); err != nil {
+			t.Fatalf("expected no error registering flags, got: %v", err)
+		}
+
+		if err := cmd.PersistentFlags().Set("max-bytes", "18446744073709551615"); err != nil {
+			t.Fatalf("expected no error setting flag, got: %v", err)
+		}
+
+		err = registry.ParseFlags(cmd, cfg)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+		if cfg.MaxBytes != 18446744073709551615 {
+			t.Errorf("expected MaxBytes 18446744073709551615, got %d", cfg.MaxBytes)
+		}
+	})
+
 	t.Run("parse float64 flag", func(t *testing.T) {
 		type TestConfig struct {
 			Rate float64 `default:"0.0" flag:"rate"`

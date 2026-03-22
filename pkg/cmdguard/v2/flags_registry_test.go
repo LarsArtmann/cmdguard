@@ -78,6 +78,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			Bool    bool     `default:"true"  flag:"bool"`
 			Int     int      `default:"42"    flag:"int"`
 			Uint    uint     `default:"10"    flag:"uint"`
+			Uint64  uint64   `default:"1024"  flag:"uint64"`
 			Float   float64  `default:"3.14"  flag:"float"`
 			Strings []string `default:"a,b,c" flag:"strings"`
 		}
@@ -417,6 +418,33 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 
 		if flag.Shorthand != "w" {
 			t.Errorf("flag.Shorthand = %q, want %q", flag.Shorthand, "w")
+		}
+	})
+
+	t.Run("register uint64 short flags", func(t *testing.T) {
+		type testConfig struct {
+			Bytes uint64 `default:"1024" flag:"bytes" short:"b"`
+		}
+
+		registry, err := NewFlagRegistry(testConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		cmd := &cobra.Command{Use: "test"}
+
+		err = registry.RegisterFlags(cmd)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		flag := cmd.PersistentFlags().Lookup("bytes")
+		if flag == nil {
+			t.Fatal("expected 'bytes' flag to be registered")
+		}
+
+		if flag.Shorthand != "b" {
+			t.Errorf("flag.Shorthand = %q, want %q", flag.Shorthand, "b")
 		}
 	})
 }
