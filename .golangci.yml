@@ -85,7 +85,6 @@ linters:
     - errchkjson
     - bidichk
     - mirror
-    - cyclop
     - nakedret
     - noinlineerr
     - canonicalheader
