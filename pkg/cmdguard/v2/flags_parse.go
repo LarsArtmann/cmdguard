@@ -69,6 +69,8 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 		return r.parseAndSetUint64(cfg, tag, value)
 	case reflect.Float64:
 		return r.parseAndSetFloat64(cfg, tag, value)
+	case reflect.Float32:
+		return r.parseAndSetFloat32(cfg, tag, value)
 	case reflect.Slice:
 		return SetField(cfg, tag.Field, strings.Split(value, ","))
 	default:
@@ -124,6 +126,16 @@ func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) er
 	}
 
 	return SetField(cfg, tag.Field, v)
+}
+
+// parseAndSetFloat32 parses and sets a float32 value.
+func (r *FlagRegistry) parseAndSetFloat32(cfg any, tag FlagTag, value string) error {
+	v, err := strconv.ParseFloat(value, 32)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+
+	return SetField(cfg, tag.Field, float32(v))
 }
 
 // parseAndSetCustom handles custom type parsing.

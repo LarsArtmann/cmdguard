@@ -60,6 +60,8 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 		r.addUint64Flag(flags, tag)
 	case reflect.Float64:
 		r.addFloat64Flag(flags, tag)
+	case reflect.Float32:
+		r.addFloat32Flag(flags, tag)
 	case reflect.Slice:
 		r.addStringSliceFlag(flags, tag)
 	default:
@@ -133,6 +135,15 @@ func (r *FlagRegistry) addFloat64Flag(flags *pflag.FlagSet, tag FlagTag) {
 		flags.Float64P(tag.Name, tag.Short, def, tag.Help)
 	} else {
 		flags.Float64(tag.Name, def, tag.Help)
+	}
+}
+
+func (r *FlagRegistry) addFloat32Flag(flags *pflag.FlagSet, tag FlagTag) {
+	def, _ := strconv.ParseFloat(tag.Default, 32)
+	if tag.Short != "" {
+		flags.Float32P(tag.Name, tag.Short, float32(def), tag.Help)
+	} else {
+		flags.Float32(tag.Name, float32(def), tag.Help)
 	}
 }
 

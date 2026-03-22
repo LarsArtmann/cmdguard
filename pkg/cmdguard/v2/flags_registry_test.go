@@ -111,6 +111,10 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			t.Error("expected 'uint' flag to be registered")
 		}
 
+		if flags.Lookup("uint64") == nil {
+			t.Error("expected 'uint64' flag to be registered")
+		}
+
 		if flags.Lookup("float") == nil {
 			t.Error("expected 'float' flag to be registered")
 		}

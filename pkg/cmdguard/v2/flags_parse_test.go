@@ -156,6 +156,36 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 	})
 
+	t.Run("parse float32 flag", func(t *testing.T) {
+		type TestConfig struct {
+			Alpha float32 `default:"1.0" flag:"alpha"`
+		}
+
+		cfg := &TestConfig{}
+		registry, err := NewFlagRegistry(*cfg)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+
+		cmd := &cobra.Command{Use: "test"}
+		if err := registry.RegisterFlags(cmd); err != nil {
+			t.Fatalf("expected no error registering flags, got: %v", err)
+		}
+
+		if err := cmd.PersistentFlags().Set("alpha", "0.5"); err != nil {
+			t.Fatalf("expected no error setting flag, got: %v", err)
+		}
+
+		err = registry.ParseFlags(cmd, cfg)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+		delta := float32(0.001)
+		if cfg.Alpha < 0.5-delta || cfg.Alpha > 0.5+delta {
+			t.Errorf("expected Alpha ~0.5, got %f", cfg.Alpha)
+		}
+	})
+
 	t.Run("parse Duration flag", func(t *testing.T) {
 		type TestConfig struct {
 			Timeout Duration `default:"1m" flag:"timeout"`
