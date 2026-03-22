@@ -9,82 +9,101 @@ run:
 output:
   formats: {}
 linters:
-  disable-all: true
   enable:
-    - asasalint
-    - dupl
-    - nolintlint
-    - testifylint
-    - interfacebloat
-    - usestdlibvars
-    - zerologlint
-    - perfsprint
+    - noctx
+    - revive
     - whitespace
-    - containedctx
     - nonamedreturns
-    - dupword
-    - contextcheck
-    - gocyclo
-    - musttag
-    - unconvert
-    - errorlint
-    - predeclared
-    - goheader
-    - decorder
-    - durationcheck
-    - rowserrcheck
+    - tagliatelle
+    - exhaustive
+    - iface
+    - gocognit
+    - sloglint
+    - modernize
     - grouper
-    - makezero
-    - asciicheck
-    - godot
+    - testifylint
+    - usestdlibvars
+    - goheader
+    - fatcontext
+    - godox
+    - goprintffuncname
+    - dupl
+    - durationcheck
+    - ginkgolinter
+    - errchkjson
+    - mirror
+    - gosec
+    - gosmopolitan
+    - predeclared
     - promlinter
+    - cyclop
+    - forcetypeassert
+    - nestif
+    - thelper
+    - usetesting
+    - rowserrcheck
+    - spancheck
+    - asciicheck
+    - interfacebloat
+    - zerologlint
+    - containedctx
+    - gocyclo
+    - decorder
+    - recvcheck
+    - wrapcheck
+    - musttag
+    - testableexamples
+    - reassign
+    - nosprintfhostport
+    - wastedassign
+    - canonicalheader
+    - prealloc
+    - ineffassign
+    - errorlint
+    - bidichk
+    - gochecksumtype
+    - makezero
+    - asasalint
+    - contextcheck
+    - unconvert
     - bodyclose
     - arangolint
     - importas
+    - govet
+    - nolintlint
+    - dupword
     - loggercheck
-    - wastedassign
-    - spancheck
-    - sloglint
-    - testableexamples
-    - staticcheck
+    - maintidx
+    - paralleltest
+    - unparam
     - nilnesserr
     - sqlclosecheck
-    - ginkgolinter
     - dogsled
-    - protogetter
-    - reassign
-    - tagliatelle
-    - errchkjson
-    - bidichk
-    - mirror
-    - nakedret
-    - canonicalheader
-    - goprintffuncname
-    - errcheck
-    - exhaustive
-    - copyloopvar
-    - iotamixing
-    - prealloc
-    - modernize
-    - nosprintfhostport
-    - unused
-    - fatcontext
-    - godox
-    - tparallel
     - misspell
     - gomodguard
-    - nilerr
-    - iface
-    - gochecksumtype
-    - govet
     - gochecknoinits
     - unqueryvet
-    - embeddedstructfieldcheck
-    - exptostd
-    - ineffassign
-    - gosec
     - errname
-    - gosmopolitan
+    - perfsprint
+    - staticcheck
+    - nakedret
+    - unused
+    - exptostd
+    - funlen
+    - goconst
+    - nilnil
+    - nilerr
+    - gocritic
+    - intrange
+    - godot
+    - protogetter
+    - copyloopvar
+    - tparallel
+    - embeddedstructfieldcheck
+    - gochecknoglobals
+    - errcheck
+    - iotamixing
+    - exhaustruct
   exclusions:
     generated: lax
     presets:
@@ -99,11 +118,11 @@ linters:
           - gosec
           - dupl
       - path: _test\.go$
-        text: "cyclop"
+        text: cyclop
         linters:
-          - "cyclop"
+          - cyclop
       - path: _test\.go$
-        text: "cognitive complexity"
+        text: cognitive complexity
         linters:
           - gocognit
       - path: _test\.go$
@@ -156,15 +175,3 @@ formatters:
 issues:
   max-issues-per-linter: 50
   max-same-issues: 10
-  exclude-rules:
-    - path: _test\.go$
-      linters:
-        - depguard
-        - cyclop
-    - path: examples/
-      linters:
-        - gocognit
-
-linters-settings:
-  gocognit:
-    min-complexity: 30

@@ -266,3 +266,274 @@ func TestCLISubcommands(t *testing.T) {
 		}
 	})
 }
+
+func TestCLIInjector(t *testing.T) {
+	t.Run("returns DI injector", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if cli.Injector() == nil {
+			t.Error("Injector() returned nil")
+		}
+	})
+}
+
+func TestCLISetConfig(t *testing.T) {
+	t.Run("updates config", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cli.SetConfig(testCLIConfig{Verbose: true, Level: "debug"})
+
+		cfg := cli.Config()
+		if cfg == nil {
+			t.Fatal("Config() returned nil")
+		}
+
+		if !cfg.Verbose {
+			t.Error("Verbose not updated")
+		}
+
+		if cfg.Level != "debug" {
+			t.Errorf("Level = %q, want %q", cfg.Level, "debug")
+		}
+	})
+}
+
+func TestCLIShutdown(t *testing.T) {
+	t.Run("shutdown succeeds", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		err = cli.Shutdown(context.Background())
+		if err != nil {
+			t.Errorf("Shutdown failed: %v", err)
+		}
+	})
+}
+
+func TestCLIHealthCheck(t *testing.T) {
+	t.Run("health check succeeds", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		err = cli.HealthCheck()
+		if err != nil {
+			t.Errorf("HealthCheck failed: %v", err)
+		}
+	})
+}
+
+func TestCLIHealthCheckWithContext(t *testing.T) {
+	t.Run("health check with context succeeds", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		err = cli.HealthCheckWithContext(context.Background())
+		if err != nil {
+			t.Errorf("HealthCheckWithContext failed: %v", err)
+		}
+	})
+}
+
+func TestCLISetLong(t *testing.T) {
+	t.Run("updates long description", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cli.SetLong("new long description")
+
+		if cli.Long() != "new long description" {
+			t.Errorf("Long() = %q, want %q", cli.Long(), "new long description")
+		}
+
+		if cli.RootCommand().Long != "new long description" {
+			t.Error("RootCommand().Long not updated")
+		}
+	})
+}
+
+func TestCLISetVersion(t *testing.T) {
+	t.Run("updates version", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cli.SetVersion("2.0.0")
+
+		if cli.RootCommand().Version != "2.0.0" {
+			t.Errorf("RootCommand().Version = %q, want %q", cli.RootCommand().Version, "2.0.0")
+		}
+	})
+}
+
+func TestCLIAddGlobalFlag(t *testing.T) {
+	t.Run("adds global string flag", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cli.AddGlobalFlag("custom", "c", "default", "help text")
+
+		flag := cli.RootCommand().PersistentFlags().Lookup("custom")
+		if flag == nil {
+			t.Error("flag not added")
+		}
+	})
+}
+
+func TestCLIAddGlobalBoolFlag(t *testing.T) {
+	t.Run("adds global bool flag", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cli.AddGlobalBoolFlag("debug", "d", true, "enable debug")
+
+		flag := cli.RootCommand().PersistentFlags().Lookup("debug")
+		if flag == nil {
+			t.Error("flag not added")
+		}
+	})
+}
+
+func TestCLIPrePostRunE(t *testing.T) {
+	t.Run("calls PreRunE and PostRunE", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		preRan, postRan := false, false
+
+		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
+			Use: "test",
+			PreRunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+				preRan = true
+				return nil
+			},
+			RunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+				return nil
+			},
+			PostRunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+				postRan = true
+				return nil
+			},
+		}
+
+		err = v2.AddCommand(cli, cmd)
+		if err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(context.Background(), []string{"test"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+
+		if !preRan {
+			t.Error("PreRunE not called")
+		}
+
+		if !postRan {
+			t.Error("PostRunE not called")
+		}
+	})
+}
+
+func TestCLIPreRunEWithFlags(t *testing.T) {
+	t.Run("PreRunE receives parsed flags", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		type testFlags struct {
+			Name string `flag:"name" default:"default" help:"name"`
+		}
+
+		var receivedName string
+
+		cmd := v2.Command[testCLIConfig, testFlags]{
+			Use:   "test",
+			Flags: testFlags{},
+			PreRunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+				receivedName = f.Name
+				return nil
+			},
+			RunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+				return nil
+			},
+		}
+
+		err = v2.AddCommand(cli, cmd)
+		if err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(context.Background(), []string{"test", "--name", "custom"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+
+		if receivedName != "custom" {
+			t.Errorf("receivedName = %q, want %q", receivedName, "custom")
+		}
+	})
+}
+
+func TestCLIPostRunEWithFlags(t *testing.T) {
+	t.Run("PostRunE receives parsed flags", func(t *testing.T) {
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		type testFlags struct {
+			Value string `flag:"value" default:"default" help:"value"`
+		}
+
+		var receivedValue string
+
+		cmd := v2.Command[testCLIConfig, testFlags]{
+			Use:   "test",
+			Flags: testFlags{},
+			RunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+				return nil
+			},
+			PostRunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+				receivedValue = f.Value
+				return nil
+			},
+		}
+
+		err = v2.AddCommand(cli, cmd)
+		if err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(context.Background(), []string{"test", "--value", "postvalue"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+
+		if receivedValue != "postvalue" {
+			t.Errorf("receivedValue = %q, want %q", receivedValue, "postvalue")
+		}
+	})
+}

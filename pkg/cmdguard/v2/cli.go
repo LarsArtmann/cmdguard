@@ -186,14 +186,12 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 				ctx = context.Background()
 			}
 
-			if flagRegistry != nil {
-				err = flagRegistry.ParseFlags(c, cmd.Flags)
-				if err != nil {
-					return err
-				}
+			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			if parseErr != nil {
+				return parseErr
 			}
 
-			return cmd.RunE(ctx, config, cmd.Flags)
+			return cmd.RunE(ctx, config, flags)
 		}
 	}
 
@@ -204,14 +202,12 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 				ctx = context.Background()
 			}
 
-			if flagRegistry != nil {
-				err = flagRegistry.ParseFlags(c, cmd.Flags)
-				if err != nil {
-					return err
-				}
+			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			if parseErr != nil {
+				return parseErr
 			}
 
-			return cmd.PreRunE(ctx, config, cmd.Flags)
+			return cmd.PreRunE(ctx, config, flags)
 		}
 	}
 
@@ -222,7 +218,12 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 				ctx = context.Background()
 			}
 
-			return cmd.PostRunE(ctx, config, cmd.Flags)
+			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
+			if parseErr != nil {
+				return parseErr
+			}
+
+			return cmd.PostRunE(ctx, config, flags)
 		}
 	}
 
