@@ -8,12 +8,12 @@
 
 ## Executive Summary
 
-| Metric | Value |
-|--------|-------|
-| Flag Types Supported | 11 (string, bool, int, uint, float, Duration, Enum, etc.) |
-| Core Package Coverage | 89.1% |
-| File Size Issues | flags.go (243 lines), flags_parse.go (195 lines) |
-| Architecture Issues | **CRITICAL - Switch statement duplication** |
+| Metric                | Value                                                     |
+| --------------------- | --------------------------------------------------------- |
+| Flag Types Supported  | 11 (string, bool, int, uint, float, Duration, Enum, etc.) |
+| Core Package Coverage | 89.1%                                                     |
+| File Size Issues      | flags.go (243 lines), flags_parse.go (195 lines)          |
+| Architecture Issues   | **CRITICAL - Switch statement duplication**               |
 
 ---
 
@@ -74,6 +74,7 @@ case reflect.Bool: ...
 ```
 
 **Why this is bad:**
+
 - Adding a new type requires editing TWO places
 - Easy to forget one location
 - Violates DRY (Don't Repeat Yourself)
@@ -100,11 +101,13 @@ All 7+ parser functions are nearly identical. Should be ONE generic function.
 ### 3. TYPE SAFETY VIOLATION
 
 Using `any` and reflection means:
+
 - Wrong types fail at RUNTIME, not COMPILE TIME
 - `SetField(cfg any, tag FlagTag, value any)` loses type information
 - No compile-time guarantees
 
 **Could use generics:**
+
 ```go
 func SetField[T any](cfg *T, fieldName string, value any) error
 ```
@@ -112,6 +115,7 @@ func SetField[T any](cfg *T, fieldName string, value any) error
 ### 4. NO NUMERIC RANGE VALIDATION
 
 We parse but don't validate:
+
 - No min/max for integers
 - No positive-only validation for uint
 - No precision checking for floats
@@ -194,6 +198,7 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 ```
 
 **Benefits:**
+
 - Add new type: ONE file, ONE implementation
 - Test each parser in isolation
 - No duplicated switch statements
@@ -213,8 +218,9 @@ func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
 ## SPLIT BRAINS?
 
 **YES - FlagType definitions:**
+
 - `flags.go` defines registration types
-- `flags_parse.go` defines parsing types  
+- `flags_parse.go` defines parsing types
 - `types.go` defines Enum/Duration/LogLevel
 
 These should be consolidated or clearly documented.
@@ -223,33 +229,33 @@ These should be consolidated or clearly documented.
 
 ## DUPLICATION ANALYSIS
 
-| Pattern | Count | Location |
-|---------|-------|----------|
-| switch(reflect.Kind) | 2 | flags.go, flags_parse.go |
-| parseAndSet* functions | 7 | flags_parse.go |
-| add*Flag functions | 7 | flags.go |
-| NewFlagError wrapping | 7 | flags_parse.go |
+| Pattern                 | Count | Location                 |
+| ----------------------- | ----- | ------------------------ |
+| switch(reflect.Kind)    | 2     | flags.go, flags_parse.go |
+| parseAndSet\* functions | 7     | flags_parse.go           |
+| add\*Flag functions     | 7     | flags.go                 |
+| NewFlagError wrapping   | 7     | flags_parse.go           |
 
 ---
 
 ## FILE SIZE ANALYSIS
 
-| File | Lines | Limit | Status |
-|------|-------|-------|--------|
-| flags.go | 243 | 350 | ✅ OK |
-| flags_parse.go | 195 | 350 | ✅ OK |
-| command_test.go | 563 | 350 | ❌ OVER |
-| types_test.go | 643 | 350 | ❌ OVER |
+| File            | Lines | Limit | Status  |
+| --------------- | ----- | ----- | ------- |
+| flags.go        | 243   | 350   | ✅ OK   |
+| flags_parse.go  | 195   | 350   | ✅ OK   |
+| command_test.go | 563   | 350   | ❌ OVER |
+| types_test.go   | 643   | 350   | ❌ OVER |
 
 ---
 
 ## TESTING ANALYSIS
 
-| Test Type | Coverage | Status |
-|-----------|----------|--------|
-| Unit Tests | 89.1% | ✅ Good |
-| BDD Tests | 0% | ❌ Missing |
-| Integration Tests | Minimal | ⚠️ Needs work |
+| Test Type         | Coverage | Status        |
+| ----------------- | -------- | ------------- |
+| Unit Tests        | 89.1%    | ✅ Good       |
+| BDD Tests         | 0%       | ❌ Missing    |
+| Integration Tests | Minimal  | ⚠️ Needs work |
 
 **Recommendation:** Add Ginkgo BDD tests for critical flows
 
@@ -258,11 +264,13 @@ These should be consolidated or clearly documented.
 ## CUSTOMER VALUE ANALYSIS
 
 **What we built:**
+
 - ✅ uint support for natural numbers (counts, sizes)
 - ✅ float32 support for decimals
 - ⚠️ But architecture has technical debt
 
 **Customer impact:**
+
 - **Immediate:** Can use `uint` for port numbers, counts, sizes
 - **Risk:** Technical debt may slow future development
 - **Long-term:** Need refactoring before adding complex features
@@ -278,6 +286,7 @@ These should be consolidated or clearly documented.
 Current state allows adding types quickly, but creates maintenance debt. The duplicated switch statements are a code smell that will compound.
 
 **Options:**
+
 1. **Refactor now** - Take time to create proper interface, then add types
 2. **Add types now, refactor later** - Faster short-term, debt later
 3. **Hybrid** - Refactor critical paths, leave simple cases as-is

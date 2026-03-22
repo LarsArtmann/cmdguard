@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"log/slog"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -36,45 +37,21 @@ func FuzzParseLevel(f *testing.F) {
 		str := result.String()
 
 		validLevels := []Level{LevelDebug, LevelInfo, LevelWarn, LevelError}
-		found := false
-
-		for _, valid := range validLevels {
-			if result == valid {
-				found = true
-
-				break
-			}
-		}
+		found := slices.Contains(validLevels, result)
 
 		if !found {
 			t.Errorf("ParseLevel(%q) = %v, expected valid level", level, result)
 		}
 
 		validStrings := []string{"debug", "info", "warn", "error"}
-		found = false
-
-		for _, valid := range validStrings {
-			if str == valid {
-				found = true
-
-				break
-			}
-		}
+		found = slices.Contains(validStrings, str)
 
 		if !found {
 			t.Errorf("ParseLevel(%q).String() = %q, expected valid string", level, str)
 		}
 
 		validInts := []int{-4, 0, 4, 8}
-		found = false
-
-		for _, valid := range validInts {
-			if int(slogLevel) == valid {
-				found = true
-
-				break
-			}
-		}
+		found = slices.Contains(validInts, int(slogLevel))
 
 		if !found {
 			t.Errorf("ParseLevel(%q).SlogLevel() = %d, expected valid level", level, int(slogLevel))
@@ -107,30 +84,14 @@ func FuzzParseFormat(f *testing.F) {
 		str := result.String()
 
 		validFormats := []Format{FormatText, FormatJSON}
-		found := false
-
-		for _, valid := range validFormats {
-			if result == valid {
-				found = true
-
-				break
-			}
-		}
+		found := slices.Contains(validFormats, result)
 
 		if !found {
 			t.Errorf("ParseFormat(%q) = %v, expected valid format", format, result)
 		}
 
 		validStrings := []string{"text", "json"}
-		found = false
-
-		for _, valid := range validStrings {
-			if str == valid {
-				found = true
-
-				break
-			}
-		}
+		found = slices.Contains(validStrings, str)
 
 		if !found {
 			t.Errorf("ParseFormat(%q).String() = %q, expected valid string", format, str)
