@@ -132,7 +132,6 @@ The v1 Guard API provides panic-at-construction validation.
 | `github.com/spf13/cobra`        | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework        |
 | `github.com/samber/do/v2`       | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection |
 | `github.com/charmbracelet/fang` | v0.4.4  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
-| `github.com/stretchr/testify`   | v1.11.1 | ✅ FULLY_FUNCTIONAL | Testing              |
 
 ---
 
@@ -140,7 +139,7 @@ The v1 Guard API provides panic-at-construction validation.
 
 | Package            | Coverage | Status  |
 | ------------------ | -------- | ------- |
-| `pkg/cmdguard/v2`  | 90%+     | ✅ Good |
+| `pkg/cmdguard/v2`  | 89.0%    | ✅ Good |
 | `pkg/cmdguard`     | 94.3%    | ✅ Good |
 | `internal/config`  | 95.7%    | ✅ Good |
 | `internal/logging` | 100%     | ✅ Good |

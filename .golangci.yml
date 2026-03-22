@@ -75,7 +75,6 @@ linters:
     - nilnesserr
     - sqlclosecheck
     - ireturn
-    - depguard
     - nestif
     - ginkgolinter
     - dogsled
@@ -120,7 +119,6 @@ linters:
     - gosec
     - errname
     - gosmopolitan
-    - cyclop
   exclusions:
     generated: lax
     presets:
@@ -195,20 +193,9 @@ issues:
   exclude-rules:
     - path: _test\.go$
       linters:
+        - depguard
         - cyclop
 
 linters-settings:
-  depguard:
-    rules:
-      Main:
-        allow:
-          - $STD
-      Test:
-        files:
-          - _test\.go$
-        allow:
-          - $STD
-          - github.com/spf13/cobra
-          - github.com/spf13/pflag
   gocognit:
     min-complexity: 30

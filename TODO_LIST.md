@@ -32,7 +32,7 @@
 | Test command.go     | ✅ DONE | 399 lines of tests      |
 | Test guard.go       | ✅ DONE | 565 lines of tests      |
 | Integration tests   | ✅ DONE | examples/\* tests added |
-| Coverage v2 to 90%+ | ✅ DONE | Now at 90.6%            |
+| Coverage v2 to 90%+ | ✅ DONE | Now at 89.0%            |
 
 ---
 
@@ -125,7 +125,7 @@ The v2 API is complete with comprehensive test coverage:
 - 7 implementation files (~1,700 lines)
 - 7 test files (~2,700 lines)
 - 2 example directories with integration tests
-- 90.6% coverage on v2 package
+- 90.0% coverage on v2 package
 - All tests passing
 
 **Key v2 Features:**
