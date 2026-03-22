@@ -102,7 +102,12 @@ func TestParseLevel(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ParseLevel(tt.level).SlogLevel()
 			if result != tt.expectedLevel {
-				t.Errorf("ParseLevel(%q).SlogLevel() = %v, want %v", tt.level, result, tt.expectedLevel)
+				t.Errorf(
+					"ParseLevel(%q).SlogLevel() = %v, want %v",
+					tt.level,
+					result,
+					tt.expectedLevel,
+				)
 			}
 		})
 	}
@@ -260,12 +265,15 @@ func TestLevel_String(t *testing.T) {
 	if got := LevelDebug.String(); got != "debug" {
 		t.Errorf("LevelDebug.String() = %q, want %q", got, "debug")
 	}
+
 	if got := LevelInfo.String(); got != "info" {
 		t.Errorf("LevelInfo.String() = %q, want %q", got, "info")
 	}
+
 	if got := LevelWarn.String(); got != "warn" {
 		t.Errorf("LevelWarn.String() = %q, want %q", got, "warn")
 	}
+
 	if got := LevelError.String(); got != "error" {
 		t.Errorf("LevelError.String() = %q, want %q", got, "error")
 	}
@@ -275,6 +283,7 @@ func TestFormat_String(t *testing.T) {
 	if got := FormatText.String(); got != "text" {
 		t.Errorf("FormatText.String() = %q, want %q", got, "text")
 	}
+
 	if got := FormatJSON.String(); got != "json" {
 		t.Errorf("FormatJSON.String() = %q, want %q", got, "json")
 	}
@@ -297,12 +306,15 @@ func TestLoggerOutput_Text(t *testing.T) {
 	if !strings.Contains(output, "debug message") {
 		t.Error("output missing 'debug message'")
 	}
+
 	if !strings.Contains(output, "info message") {
 		t.Error("output missing 'info message'")
 	}
+
 	if !strings.Contains(output, "warn message") {
 		t.Error("output missing 'warn message'")
 	}
+
 	if !strings.Contains(output, "error message") {
 		t.Error("output missing 'error message'")
 	}
@@ -322,9 +334,11 @@ func TestLoggerOutput_JSON(t *testing.T) {
 	if !strings.Contains(output, "json test") {
 		t.Error("output missing 'json test'")
 	}
+
 	if !strings.Contains(output, "key") {
 		t.Error("output missing 'key'")
 	}
+
 	if !strings.Contains(output, "value") {
 		t.Error("output missing 'value'")
 	}
@@ -376,6 +390,7 @@ func TestLoggerLevelFiltering(t *testing.T) {
 			if !strings.Contains(output, tt.shouldContain) {
 				t.Errorf("output should contain %q, but doesn't", tt.shouldContain)
 			}
+
 			if strings.Contains(output, tt.shouldNotContain) {
 				t.Errorf("output should not contain %q, but does", tt.shouldNotContain)
 			}

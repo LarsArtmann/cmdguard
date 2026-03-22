@@ -163,12 +163,14 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, value string) {
 		_ = os.Setenv("CMDGUARD_LOG_LEVEL", value)
+
 		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
 		cfg := Load()
 		if cfg == nil {
 			t.Fatalf("Load() returned nil")
 		}
+
 		_ = cfg.Validate()
 	})
 }
@@ -189,12 +191,14 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, value string) {
 		_ = os.Setenv("CMDGUARD_LOG_FORMAT", value)
+
 		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
 
 		cfg := Load()
 		if cfg == nil {
 			t.Fatalf("Load() returned nil")
 		}
+
 		_ = cfg.Validate()
 	})
 }
@@ -227,12 +231,14 @@ func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, value string, expectStrict bool) {
 		_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
+
 		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
 		cfg := Load()
 		if cfg == nil {
 			t.Fatalf("Load() returned nil")
 		}
+
 		if cfg.StrictMode != expectStrict {
 			t.Errorf("Load().StrictMode = %v, want %v", cfg.StrictMode, expectStrict)
 		}
@@ -250,6 +256,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 				if err != nil {
 					t.Errorf("concurrent validation failed: %v", err)
 				}
+
 				done <- true
 			}()
 		}
@@ -261,10 +268,12 @@ func TestValidate_EdgeCases(t *testing.T) {
 
 	t.Run("both fields invalid returns first error", func(t *testing.T) {
 		cfg := &Config{LogLevel: "invalid", LogFormat: "xml"}
+
 		err := cfg.Validate()
 		if err == nil {
 			t.Fatalf("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "invalid log level") {
 			t.Errorf("error should contain 'invalid log level', got %q", err.Error())
 		}
@@ -272,6 +281,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 
 	t.Run("null bytes in level", func(t *testing.T) {
 		cfg := &Config{LogLevel: "debug\x00info"}
+
 		err := cfg.Validate()
 		if err == nil {
 			t.Errorf("expected error for null bytes in level, got nil")
@@ -280,6 +290,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 
 	t.Run("control characters in level", func(t *testing.T) {
 		cfg := &Config{LogLevel: "de\x01bug"}
+
 		err := cfg.Validate()
 		if err == nil {
 			t.Errorf("expected error for control characters in level, got nil")
@@ -304,6 +315,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 
 	t.Run("very deep path traversal", func(t *testing.T) {
 		deepPath := strings.Repeat("../", 1000) + "etc/passwd"
+
 		result := GetConfigFilePath(deepPath)
 		if result == "" {
 			t.Errorf("GetConfigFilePath(%q) = empty, got %q", deepPath, result)
@@ -315,6 +327,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 		if result == "" {
 			t.Errorf("GetConfigFilePath(%q) = empty, got %q", "🎉-config.yaml", result)
 		}
+
 		if !strings.Contains(result, "🎉") {
 			t.Errorf("result should contain 🎉, got %q", result)
 		}
@@ -325,12 +338,14 @@ func testShellInjectionPayload(t *testing.T, payload string) {
 	t.Helper()
 
 	_ = os.Setenv("CMDGUARD_LOG_LEVEL", payload)
+
 	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
 	cfg := Load()
 	if cfg == nil {
 		t.Fatalf("Load() returned nil")
 	}
+
 	if cfg.LogLevel != payload {
 		t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, payload)
 	}
@@ -374,14 +389,18 @@ func FuzzKoanfLoader_LoadEnv(f *testing.F) {
 	f.Fuzz(func(t *testing.T, level, format string) {
 		if level != "" {
 			_ = os.Setenv("CMDGUARD_LOG_LEVEL", level)
+
 			defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 		}
+
 		if format != "" {
 			_ = os.Setenv("CMDGUARD_LOG_FORMAT", format)
+
 			defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
 		}
 
 		loader := NewLoader()
+
 		err := loader.Load("")
 		if err != nil {
 			t.Errorf("Load() error = %v", err)

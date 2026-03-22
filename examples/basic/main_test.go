@@ -35,10 +35,12 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 
 	// Test hello command
 	root.Command().SetArgs([]string{"hello"})
+
 	err := root.Execute(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if output.String() != "Hello, World!\n" {
 		t.Errorf("output = %q, want %q", output.String(), "Hello, World!\n")
 	}
@@ -48,10 +50,12 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 
 	// Test goodbye command
 	root.Command().SetArgs([]string{"goodbye"})
+
 	err = root.Execute(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if output.String() != "Goodbye, World!\n" {
 		t.Errorf("output = %q, want %q", output.String(), "Goodbye, World!\n")
 	}
@@ -76,6 +80,7 @@ func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	if cmd.Use != "basic" {
 		t.Errorf("cmd.Use = %q, want %q", cmd.Use, "basic")
 	}
+
 	if cmd.Short != "A basic CLI example" {
 		t.Errorf("cmd.Short = %q, want %q", cmd.Short, "A basic CLI example")
 	}

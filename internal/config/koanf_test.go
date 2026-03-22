@@ -8,6 +8,7 @@ import (
 
 func TestKoanfLoader_LoadDefaults(t *testing.T) {
 	loader := NewLoader()
+
 	err := loader.Load("")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -32,6 +33,7 @@ func TestKoanfLoader_LoadEnv(t *testing.T) {
 	t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 	loader := NewLoader()
+
 	err := loader.Load("")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -59,12 +61,14 @@ log_level: warn
 log_format: json
 strict_mode: true
 `
+
 	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	loader := NewLoader()
+
 	err = loader.Load(configPath)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -91,6 +95,7 @@ func TestKoanfLoader_EnvOverridesFile(t *testing.T) {
 log_level: warn
 log_format: json
 `
+
 	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -100,6 +105,7 @@ log_format: json
 	t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 	loader := NewLoader()
+
 	err = loader.Load(configPath)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -124,6 +130,7 @@ func TestKoanfLoader_Unmarshal(t *testing.T) {
 	t.Setenv("CMDGUARD_STRICT_MODE", "true")
 
 	loader := NewLoader()
+
 	err := loader.Load("")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -174,6 +181,7 @@ func TestKoanfLoader_Priority(t *testing.T) {
 	configPath := filepath.Join(tmpDir, "config.yaml")
 
 	configContent := `log_level: warn`
+
 	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -182,6 +190,7 @@ func TestKoanfLoader_Priority(t *testing.T) {
 	t.Setenv("CMDGUARD_LOG_LEVEL", "debug")
 
 	loader := NewLoader()
+
 	err = loader.Load(configPath)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

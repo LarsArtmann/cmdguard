@@ -57,6 +57,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "mode") {
 			t.Errorf("expected error to contain 'mode', got: %v", err)
 		}
@@ -105,9 +106,11 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "name") {
 			t.Errorf("expected error to contain 'name', got: %v", err)
 		}
+
 		if !strings.Contains(err.Error(), "required") {
 			t.Errorf("expected error to contain 'required', got: %v", err)
 		}

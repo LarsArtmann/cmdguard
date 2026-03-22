@@ -49,6 +49,7 @@ func captureOutput(f func()) string {
 	w.Close()
 
 	var buf bytes.Buffer
+
 	_, _ = io.Copy(&buf, r) // Error intentionally ignored in test helper
 	os.Stdout = old
 
@@ -60,6 +61,7 @@ func TestTypedExample_CreateCLI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if cli == nil {
 		t.Fatal("cli is nil")
 	}
@@ -83,6 +85,7 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 		Short: "Print version information",
 		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("myapp version 1.0.0")
+
 			return nil
 		},
 	}
@@ -179,6 +182,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 			for range flags.Count {
 				fmt.Println(msg)
 			}
+
 			return nil
 		},
 	}
@@ -194,11 +198,13 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 	// Count the occurrences
 	occurrences := 0
+
 	for i := 0; i <= len(output)-len("Hello, World!"); i++ {
 		if output[i:i+len("Hello, World!")] == "Hello, World!" {
 			occurrences++
 		}
 	}
+
 	if occurrences != 3 {
 		t.Errorf("expected 3 occurrences of 'Hello, World!', got %d", occurrences)
 	}
@@ -222,6 +228,7 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 			fmt.Printf("Verbose: %v\n", cfg.Verbose)
 			fmt.Printf("Output: %s\n", cfg.Output)
 			fmt.Printf("API URL: %s\n", cfg.APIURL)
+
 			return nil
 		},
 	}
@@ -240,9 +247,11 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 	if !strings.Contains(output, "Verbose: false") {
 		t.Errorf("output should contain %q, got %q", "Verbose: false", output)
 	}
+
 	if !strings.Contains(output, "Output: text") {
 		t.Errorf("output should contain %q, got %q", "Output: text", output)
 	}
+
 	if !strings.Contains(output, "API URL: https://api.example.com") {
 		t.Errorf("output should contain %q, got %q", "API URL: https://api.example.com", output)
 	}
@@ -272,6 +281,7 @@ func TestTypedExample_DIRegistration(t *testing.T) {
 		if err != nil {
 			return nil, err
 		}
+
 		return &Logger{verbose: cfg.Verbose}, nil
 	})
 	if err != nil {
@@ -283,9 +293,11 @@ func TestTypedExample_DIRegistration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if logger == nil {
 		t.Fatal("logger is nil")
 	}
+
 	if !logger.verbose {
 		t.Error("logger.verbose should be true")
 	}
@@ -314,7 +326,9 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 			if err != nil {
 				return err
 			}
+
 			fmt.Printf("Database: %s\n", db.connectionString)
+
 			return nil
 		},
 	}
@@ -348,10 +362,12 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 			if flags.Count < 1 {
 				return errors.New("count should be at least 1")
 			}
+
 			return nil
 		},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			fmt.Println("Greeting executed")
+
 			return nil
 		},
 	}
@@ -363,10 +379,12 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 
 	// Test with invalid count
 	cli.RootCommand().SetArgs([]string{"greet", "--count", "0"})
+
 	err = cli.Execute(context.Background())
 	if err == nil {
 		t.Fatal("expected error for count < 1")
 	}
+
 	if !strings.Contains(err.Error(), "count should be at least 1") {
 		t.Errorf("error should contain %q, got %q", "count should be at least 1", err.Error())
 	}
@@ -375,8 +393,10 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 	cli, _ = v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	greetCmd.RunE = func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 		fmt.Println("Greeting executed")
+
 		return nil
 	}
+
 	err = v2.AddAnyCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

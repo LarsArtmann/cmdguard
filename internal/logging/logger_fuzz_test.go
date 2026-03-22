@@ -37,36 +37,45 @@ func FuzzParseLevel(f *testing.F) {
 
 		validLevels := []Level{LevelDebug, LevelInfo, LevelWarn, LevelError}
 		found := false
+
 		for _, valid := range validLevels {
 			if result == valid {
 				found = true
+
 				break
 			}
 		}
+
 		if !found {
 			t.Errorf("ParseLevel(%q) = %v, expected valid level", level, result)
 		}
 
 		validStrings := []string{"debug", "info", "warn", "error"}
 		found = false
+
 		for _, valid := range validStrings {
 			if str == valid {
 				found = true
+
 				break
 			}
 		}
+
 		if !found {
 			t.Errorf("ParseLevel(%q).String() = %q, expected valid string", level, str)
 		}
 
 		validInts := []int{-4, 0, 4, 8}
 		found = false
+
 		for _, valid := range validInts {
 			if int(slogLevel) == valid {
 				found = true
+
 				break
 			}
 		}
+
 		if !found {
 			t.Errorf("ParseLevel(%q).SlogLevel() = %d, expected valid level", level, int(slogLevel))
 		}
@@ -99,24 +108,30 @@ func FuzzParseFormat(f *testing.F) {
 
 		validFormats := []Format{FormatText, FormatJSON}
 		found := false
+
 		for _, valid := range validFormats {
 			if result == valid {
 				found = true
+
 				break
 			}
 		}
+
 		if !found {
 			t.Errorf("ParseFormat(%q) = %v, expected valid format", format, result)
 		}
 
 		validStrings := []string{"text", "json"}
 		found = false
+
 		for _, valid := range validStrings {
 			if str == valid {
 				found = true
+
 				break
 			}
 		}
+
 		if !found {
 			t.Errorf("ParseFormat(%q).String() = %q, expected valid string", format, str)
 		}
@@ -182,6 +197,7 @@ func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 	logger.Info("test message", "key", "value", "count", 42)
 
 	output := buf.String()
+
 	lines := strings.Split(strings.TrimSpace(output), "\n")
 	if len(lines) != 1 {
 		t.Fatalf("should produce exactly one JSON line, got %d lines", len(lines))
@@ -197,15 +213,19 @@ func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 	if parsed["msg"] != "test message" {
 		t.Errorf("parsed[\"msg\"] = %v, want %q", parsed["msg"], "test message")
 	}
+
 	if parsed["key"] != "value" {
 		t.Errorf("parsed[\"key\"] = %v, want %q", parsed["key"], "value")
 	}
+
 	if parsed["count"] != float64(42) {
 		t.Errorf("parsed[\"count\"] = %v, want %v", parsed["count"], float64(42))
 	}
+
 	if _, ok := parsed["time"]; !ok {
 		t.Error("parsed output missing 'time' field")
 	}
+
 	if _, ok := parsed["level"]; !ok {
 		t.Error("parsed output missing 'level' field")
 	}
@@ -225,9 +245,11 @@ func TestNewLogger_TextOutputFormat(t *testing.T) {
 	if !strings.Contains(output, "test message") {
 		t.Error("output missing 'test message'")
 	}
+
 	if !strings.Contains(output, "key=value") {
 		t.Error("output missing 'key=value'")
 	}
+
 	if !strings.Contains(output, "level=INFO") {
 		t.Error("output missing 'level=INFO'")
 	}
@@ -312,24 +334,31 @@ func TestValidLevel_EdgeCases(t *testing.T) {
 	if ValidLevel(" debug") {
 		t.Error("leading space should be invalid")
 	}
+
 	if ValidLevel("debug ") {
 		t.Error("trailing space should be invalid")
 	}
+
 	if ValidLevel("DEBUG") {
 		t.Error("uppercase should be invalid")
 	}
+
 	if ValidLevel("") {
 		t.Error("empty should be invalid")
 	}
+
 	if ValidLevel("   ") {
 		t.Error("whitespace only should be invalid")
 	}
+
 	if ValidLevel("debug\x00") {
 		t.Error("null byte should be invalid")
 	}
+
 	if ValidLevel("🎉") {
 		t.Error("emoji should be invalid")
 	}
+
 	if ValidLevel(strings.Repeat("a", 10000)) {
 		t.Error("very long string should be invalid")
 	}
@@ -339,18 +368,23 @@ func TestValidFormat_EdgeCases(t *testing.T) {
 	if ValidFormat(" json") {
 		t.Error("leading space should be invalid")
 	}
+
 	if ValidFormat("json ") {
 		t.Error("trailing space should be invalid")
 	}
+
 	if ValidFormat("JSON") {
 		t.Error("uppercase should be invalid")
 	}
+
 	if ValidFormat("") {
 		t.Error("empty should be invalid")
 	}
+
 	if ValidFormat("   ") {
 		t.Error("whitespace only should be invalid")
 	}
+
 	if ValidFormat(strings.Repeat("a", 10000)) {
 		t.Error("very long string should be invalid")
 	}

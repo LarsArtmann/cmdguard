@@ -99,10 +99,12 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 func TestConfig_DefaultConfig(t *testing.T) {
 	t.Run("default values", func(t *testing.T) {
 		cfg := Config{}
+
 		tags, err := ParseFlagTags(cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if len(tags) < 4 {
 			t.Fatalf("expected at least 4 tags, got %d", len(tags))
 		}
@@ -121,9 +123,11 @@ func TestConfig_DefaultConfig(t *testing.T) {
 		if logLevelTag == nil {
 			t.Fatal("expected logLevelTag to not be nil")
 		}
+
 		if logLevelTag.Default != "info" {
 			t.Errorf("expected Default 'info', got %q", logLevelTag.Default)
 		}
+
 		if logLevelTag.Short != "l" {
 			t.Errorf("expected Short 'l', got %q", logLevelTag.Short)
 		}

@@ -72,6 +72,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
+
 			return nil
 		},
 	})
@@ -88,6 +89,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
 				mathCalled = true
 				mathFlags = flags
+
 				return nil
 			},
 		},
@@ -105,6 +107,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *ConfigFlags) error {
 				configCalled = true
 				configFlags = flags
+
 				return nil
 			},
 		},
@@ -118,12 +121,15 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !greetCalled {
 		t.Error("greetCalled should be true")
 	}
+
 	if greetFlags.Name != "Alice" {
 		t.Errorf("greetFlags.Name = %q, want %q", greetFlags.Name, "Alice")
 	}
+
 	if !greetFlags.Shout {
 		t.Error("greetFlags.Shout should be true")
 	}
@@ -133,12 +139,15 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !mathCalled {
 		t.Error("mathCalled should be true")
 	}
+
 	if mathFlags.X != 10 {
 		t.Errorf("mathFlags.X = %d, want %d", mathFlags.X, 10)
 	}
+
 	if mathFlags.Y != 20 {
 		t.Errorf("mathFlags.Y = %d, want %d", mathFlags.Y, 20)
 	}
@@ -148,12 +157,15 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !configCalled {
 		t.Error("configCalled should be true")
 	}
+
 	if configFlags.File != "/etc/app.yaml" {
 		t.Errorf("configFlags.File = %q, want %q", configFlags.File, "/etc/app.yaml")
 	}
+
 	if !configFlags.JSON {
 		t.Error("configFlags.JSON should be true")
 	}
@@ -186,6 +198,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 				RunE: func(ctx context.Context, cfg *RootConfig, flags *DBFlags) error {
 					statusCalled = true
 					statusFlags = flags
+
 					return nil
 				},
 			},
@@ -205,6 +218,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags
+
 			return nil
 		},
 	}
@@ -219,12 +233,15 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !statusCalled {
 		t.Error("statusCalled should be true")
 	}
+
 	if statusFlags.Host != "prod-db" {
 		t.Errorf("statusFlags.Host = %q, want %q", statusFlags.Host, "prod-db")
 	}
+
 	if statusFlags.Port != 3306 {
 		t.Errorf("statusFlags.Port = %d, want %d", statusFlags.Port, 3306)
 	}
@@ -234,12 +251,15 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !migrateCalled {
 		t.Error("migrateCalled should be true")
 	}
+
 	if migrateFlags.Steps != 5 {
 		t.Errorf("migrateFlags.Steps = %d, want %d", migrateFlags.Steps, 5)
 	}
+
 	if migrateFlags.Direction != "down" {
 		t.Errorf("migrateFlags.Direction = %q, want %q", migrateFlags.Direction, "down")
 	}
@@ -264,9 +284,11 @@ func assertCommandExecution[
 		if err != nil {
 			t.Fatalf("unexpected error on iteration %d: %v", i+1, err)
 		}
+
 		if wantExecuted != lastExecuted {
 			t.Errorf("iteration %d: lastExecuted = %q, want %q", i, lastExecuted, wantExecuted)
 		}
+
 		assertFlags(t, lastFlags)
 	}
 }
@@ -292,6 +314,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
+
 			return nil
 		},
 	})
@@ -308,6 +331,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
 				lastExecuted = "B"
 				lastFlags = flags
+
 				return nil
 			},
 		},
@@ -328,6 +352,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 			if !ok {
 				t.Fatalf("expected *GreetFlags, got %T", flags)
 			}
+
 			if gf.Name != "test" {
 				t.Errorf("gf.Name = %q, want %q", gf.Name, "test")
 			}
@@ -346,6 +371,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 			if !ok {
 				t.Fatalf("expected *MathFlags, got %T", flags)
 			}
+
 			if mf.X != 42 {
 				t.Errorf("mf.X = %d, want %d", mf.X, 42)
 			}
@@ -358,6 +384,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if lastExecuted != "A" {
 			t.Errorf("lastExecuted = %q, want %q", lastExecuted, "A")
 		}
@@ -366,6 +393,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if lastExecuted != "B" {
 			t.Errorf("lastExecuted = %q, want %q", lastExecuted, "B")
 		}
@@ -389,6 +417,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 			Short: "Simple command",
 			RunE: func(ctx context.Context, cfg *RootConfig, flags v2.NoFlags) error {
 				executed = true
+
 				return nil
 			},
 		},
@@ -405,6 +434,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 			Flags: &GreetFlags{Name: "World", Shout: false},
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				executed = true
+
 				return nil
 			},
 		},
@@ -415,20 +445,24 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 
 	// Test simple command (NoFlags)
 	executed = false
+
 	err = cli.ExecuteWithArgs(ctx, []string{"simple"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !executed {
 		t.Error("executed should be true")
 	}
 
 	// Test greet command with flags
 	executed = false
+
 	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=Bob"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if !executed {
 		t.Error("executed should be true")
 	}
@@ -457,15 +491,18 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 			Flags: &GreetFlags{Name: "World", Shout: false},
 			PreRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				preRunCalled = true
+
 				return nil
 			},
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				runCalled = true
 				receivedFlags = flags
+
 				return nil
 			},
 			PostRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				postRunCalled = true
+
 				return nil
 			},
 		},
@@ -482,15 +519,19 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 	if !preRunCalled {
 		t.Error("preRunCalled should be true")
 	}
+
 	if !runCalled {
 		t.Error("runCalled should be true")
 	}
+
 	if !postRunCalled {
 		t.Error("postRunCalled should be true")
 	}
+
 	if receivedFlags.Name != "TestUser" {
 		t.Errorf("receivedFlags.Name = %q, want %q", receivedFlags.Name, "TestUser")
 	}
+
 	if !receivedFlags.Shout {
 		t.Error("receivedFlags.Shout should be true")
 	}
@@ -549,6 +590,7 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 			Flags: &GreetFlags{},
 			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
 				receivedConfig = cfg
+
 				return nil
 			},
 		},
@@ -565,9 +607,11 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 	if receivedConfig == nil {
 		t.Fatal("receivedConfig is nil")
 	}
+
 	if !receivedConfig.Verbose {
 		t.Error("receivedConfig.Verbose should be true")
 	}
+
 	if receivedConfig.Level != "debug" {
 		t.Errorf("receivedConfig.Level = %q, want %q", receivedConfig.Level, "debug")
 	}
@@ -590,6 +634,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 		Short: "Run up migrations",
 		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
 			executedFlags = flags
+
 			return nil
 		},
 	}
@@ -610,6 +655,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if executedFlags.Steps != 3 {
 		t.Errorf("executedFlags.Steps = %d, want %d", executedFlags.Steps, 3)
 	}

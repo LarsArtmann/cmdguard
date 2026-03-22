@@ -30,15 +30,19 @@ func TestNew(t *testing.T) {
 		if g == nil {
 			t.Fatal("expected non-nil GuardedCommand")
 		}
+
 		if g.cmd == nil {
 			t.Error("expected non-nil cmd")
 		}
+
 		if g.cfg == nil {
 			t.Error("expected non-nil cfg")
 		}
+
 		if g.cmd.Use != "testapp" {
 			t.Errorf("cmd.Use = %q, want %q", g.cmd.Use, "testapp")
 		}
+
 		if g.cmd.Short != "Test application" {
 			t.Errorf("cmd.Short = %q, want %q", g.cmd.Short, "Test application")
 		}
@@ -53,12 +57,15 @@ func TestNew(t *testing.T) {
 		if g == nil {
 			t.Fatal("expected non-nil GuardedCommand")
 		}
+
 		if g.cfg.LogLevel != "debug" {
 			t.Errorf("cfg.LogLevel = %q, want %q", g.cfg.LogLevel, "debug")
 		}
+
 		if !g.cfg.StrictMode {
 			t.Error("cfg.StrictMode = false, want true")
 		}
+
 		if !g.strictMode {
 			t.Error("strictMode = false, want true")
 		}
@@ -75,12 +82,14 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 		}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddCommand(cmd)
 		}()
 
@@ -100,12 +109,14 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 		}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddCommand(cmd)
 		}()
 
@@ -122,12 +133,14 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 		}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddCommand(cmd)
 		}()
 
@@ -142,12 +155,14 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 		cmd := &cobra.Command{}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddCommand(cmd)
 		}()
 
@@ -166,12 +181,14 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 		}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddCommand(cmd)
 		}()
 
@@ -197,12 +214,14 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 		}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddSubcommand(parent, child)
 		}()
 
@@ -211,9 +230,11 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 		}
 
 		found := false
+
 		for _, c := range parent.Commands() {
 			if c.Name() == "child" {
 				found = true
+
 				break
 			}
 		}
@@ -238,12 +259,14 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 		}
 
 		didPanic := false
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					didPanic = true
 				}
 			}()
+
 			g.AddSubcommand(parent, child)
 		}()
 
@@ -264,6 +287,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if !g.validated {
 			t.Error("validated = false, want true")
 		}
@@ -279,6 +303,7 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 		if cmd == nil {
 			t.Fatal("expected non-nil command")
 		}
+
 		if cmd.Use != "testapp" {
 			t.Errorf("cmd.Use = %q, want %q", cmd.Use, "testapp")
 		}
@@ -292,6 +317,7 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 		if cfg == nil {
 			t.Fatal("expected non-nil config")
 		}
+
 		if cfg.LogLevel != "info" {
 			t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, "info")
 		}
@@ -352,6 +378,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "no name") {
 			t.Errorf("error should contain 'no name', got: %v", err)
 		}
@@ -368,6 +395,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "no handler") {
 			t.Errorf("error should contain 'no handler', got: %v", err)
 		}
@@ -403,6 +431,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "strict mode requires RunE") {
 			t.Errorf("error should contain 'strict mode requires RunE', got: %v", err)
 		}
@@ -433,6 +462,7 @@ func TestVersion(t *testing.T) {
 		if v == "" {
 			t.Error("version should not be empty")
 		}
+
 		if v != "dev" {
 			t.Errorf("Version() = %q, want %q", v, "dev")
 		}
@@ -475,6 +505,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "invalid") {
 			t.Errorf("error should contain 'invalid', got: %v", err)
 		}
@@ -516,6 +547,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "parent invalid") {
 			t.Errorf("error should contain 'parent invalid', got: %v", err)
 		}
@@ -552,9 +584,11 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find version command
 		var versionCmd *cobra.Command
+
 		for _, cmd := range g.cmd.Commands() {
 			if cmd.Name() == "version" {
 				versionCmd = cmd
+
 				break
 			}
 		}
@@ -580,9 +614,11 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find validate command
 		var validateCmd *cobra.Command
+
 		for _, c := range g.cmd.Commands() {
 			if c.Name() == "validate" {
 				validateCmd = c
+
 				break
 			}
 		}
@@ -607,9 +643,11 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 		// Find validate command
 		var validateCmd *cobra.Command
+
 		for _, c := range g.cmd.Commands() {
 			if c.Name() == "validate" {
 				validateCmd = c
+
 				break
 			}
 		}
@@ -623,6 +661,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "validation failed") {
 			t.Errorf("error should contain 'validation failed', got: %v", err)
 		}

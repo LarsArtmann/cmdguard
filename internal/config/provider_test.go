@@ -82,12 +82,15 @@ func TestLoad(t *testing.T) {
 			if cfg == nil {
 				t.Fatal("Load() returned nil, expected non-nil config")
 			}
+
 			if cfg.LogLevel != tt.wantLevel {
 				t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, tt.wantLevel)
 			}
+
 			if cfg.LogFormat != tt.wantFormat {
 				t.Errorf("cfg.LogFormat = %q, want %q", cfg.LogFormat, tt.wantFormat)
 			}
+
 			if cfg.StrictMode != tt.wantStrict {
 				t.Errorf("cfg.StrictMode = %v, want %v", cfg.StrictMode, tt.wantStrict)
 			}
@@ -143,6 +146,7 @@ func TestConfig_Validate(t *testing.T) {
 				if err == nil {
 					t.Fatalf("expected error containing %q, got nil", tt.errMsg)
 				}
+
 				if !strings.Contains(err.Error(), tt.errMsg) {
 					t.Errorf("error = %q, want to contain %q", err.Error(), tt.errMsg)
 				}

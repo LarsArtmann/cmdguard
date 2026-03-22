@@ -15,6 +15,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -34,6 +35,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.Name != "custom" {
 			t.Errorf("expected Name 'custom', got %q", cfg.Name)
 		}
@@ -45,6 +47,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -63,6 +66,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if !cfg.Verbose {
 			t.Error("expected Verbose to be true")
 		}
@@ -74,6 +78,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -92,6 +97,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.Count != 42 {
 			t.Errorf("expected Count 42, got %d", cfg.Count)
 		}
@@ -103,6 +109,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -121,6 +128,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.Workers != 10 {
 			t.Errorf("expected Workers 10, got %d", cfg.Workers)
 		}
@@ -132,6 +140,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -150,6 +159,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.MaxBytes != 18446744073709551615 {
 			t.Errorf("expected MaxBytes 18446744073709551615, got %d", cfg.MaxBytes)
 		}
@@ -161,6 +171,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -179,6 +190,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		delta := 0.00001
 		if cfg.Rate < 3.14159-delta || cfg.Rate > 3.14159+delta {
 			t.Errorf("expected Rate ~3.14159, got %f", cfg.Rate)
@@ -191,6 +203,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -209,6 +222,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		delta := float32(0.001)
 		if cfg.Alpha < 0.5-delta || cfg.Alpha > 0.5+delta {
 			t.Errorf("expected Alpha ~0.5, got %f", cfg.Alpha)
@@ -221,6 +235,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -252,6 +267,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -270,6 +286,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.Level.String() != "debug" {
 			t.Errorf("expected Level 'debug', got %q", cfg.Level.String())
 		}
@@ -281,6 +298,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -299,6 +317,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "level") {
 			t.Errorf("expected error to contain 'level', got: %v", err)
 		}
@@ -310,6 +329,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -328,6 +348,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.Mode.String() != "prod" {
 			t.Errorf("expected Mode 'prod', got %q", cfg.Mode.String())
 		}
@@ -339,6 +360,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -365,6 +387,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -383,6 +406,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
+
 		if cfg.Format.String() != "json" {
 			t.Errorf("expected Format 'json', got %q", cfg.Format.String())
 		}
@@ -394,6 +418,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -412,6 +437,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "format") {
 			t.Errorf("expected error to contain 'format', got: %v", err)
 		}
@@ -425,6 +451,7 @@ func TestFlagRegistry_FlagNotFound(t *testing.T) {
 		}
 
 		cfg := &TestConfig{}
+
 		registry, err := NewFlagRegistry(*cfg)
 		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -437,6 +464,7 @@ func TestFlagRegistry_FlagNotFound(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
+
 		if !strings.Contains(err.Error(), "not found") {
 			t.Errorf("expected error to contain 'not found', got: %v", err)
 		}

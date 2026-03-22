@@ -31,6 +31,7 @@ func TestGuardedCommand_FullLifecycle(t *testing.T) {
 	if cmd == nil {
 		t.Fatal("cmd is nil")
 	}
+
 	if cmd.Name() != "testapp" {
 		t.Errorf("cmd.Name() = %q, want %q", cmd.Name(), "testapp")
 	}
@@ -40,12 +41,14 @@ func TestGuardedCommand_PanicOnInvalidCommand(t *testing.T) {
 	root := cmdguard.New("testapp", "Test application")
 
 	didPanic := false
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
 				didPanic = true
 			}
 		}()
+
 		root.AddCommand(&cobra.Command{
 			Use:   "invalid",
 			Short: "This has no handler",
@@ -61,12 +64,14 @@ func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
 	root := cmdguard.New("testapp", "Test application")
 
 	didPanic := false
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
 				didPanic = true
 			}
 		}()
+
 		root.AddCommand(&cobra.Command{
 			Short: "No name here",
 			Run:   func(cmd *cobra.Command, args []string) {},
@@ -116,12 +121,14 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 	})
 
 	didPanic := false
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
 				didPanic = true
 			}
 		}()
+
 		root.AddCommand(&cobra.Command{
 			Use: "bad",
 			Run: func(cmd *cobra.Command, args []string) {},
@@ -142,6 +149,7 @@ func TestGuardedCommand_ConfigAccess(t *testing.T) {
 	if cfg == nil {
 		t.Fatal("config is nil")
 	}
+
 	if cfg.LogLevel != "debug" {
 		t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, "debug")
 	}
@@ -165,10 +173,12 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 	root.AddCommand(parent)
 
 	cmd := root.Command()
+
 	dbCmd, _, err := cmd.Find([]string{"db"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if dbCmd.Name() != "db" {
 		t.Errorf("dbCmd.Name() = %q, want %q", dbCmd.Name(), "db")
 	}
@@ -184,9 +194,11 @@ func TestGuardedCommand_BuiltInCommands(t *testing.T) {
 	}
 
 	var hasVersion bool
+
 	for _, c := range commands {
 		if c.Name() == "version" {
 			hasVersion = true
+
 			break
 		}
 	}
@@ -213,6 +225,7 @@ func TestGuardedCommand_ExecuteWithContext(t *testing.T) {
 	root.Command().SetArgs([]string{"test"})
 
 	ctx := context.Background()
+
 	err := root.Execute(ctx)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
