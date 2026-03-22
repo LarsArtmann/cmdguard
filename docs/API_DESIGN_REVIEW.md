@@ -1159,23 +1159,39 @@ func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error
 **New:**
 
 ```go
-// Package returns a samber/do package function for DI integration
+// Package returns a samber/do package function for DI integration.
+// This follows samber/do best practices for library integration.
+//
+// Note: CLI initialization errors cannot be returned from Package() because
+// do.Package expects a void function. Applications should call NewCLI()
+// separately and handle errors, or use WithDI() option for CLI-managed DI.
+//
+// Usage pattern 1 (recommended - let CLI manage DI):
+//   cli, err := v2.New[Config]("app", "My app", Config{}, v2.WithDI())
+//   // CLI is automatically registered in the scope
+//
+// Usage pattern 2 (manual integration):
+//   injector := do.New()
+//   cli, err := v2.New[Config]("app", "My app", Config{})
+//   if err != nil { /* handle */ }
+//   do.ProvideValue(injector, cli)
 func Package[T any](name, short string, defaults T, opts ...Option[T]) func(do.Injector) {
-    return func(i do.Injector) {
-        cli, err := New[T](name, short, defaults, opts...)
-        if err != nil {
-            panic(err)  // Or handle differently
-        }
-        do.ProvideValue(i, cli)
-    }
+    return do.Package(
+        // Register defaults as a lazy value
+        do.Lazy(func(i do.Injector) (T, error) {
+            return defaults, nil
+        }),
+    )
 }
 ```
 
 **Benefits:**
 
 - Follows samber/do best practices
-- Easy integration with existing DI containers
 - Composable with other packages
+- Lazy evaluation of defaults
+
+**Note on error handling:** Since `do.Package()` requires a void function, CLI initialization errors must be handled separately. The `WithDI()` option handles this internally by creating the CLI within the scope's initialization.
 
 ### Improvement 8: Consistent Functional Options (P1)
 
@@ -1243,8 +1259,8 @@ type Scope struct {
     // private fields
 }
 
-// FlagRegistry manages flag registration and parsing
-type FlagRegistry struct {
+// FlagRegistry[F] is parameterized with the flags type for compile-time safety.
+type FlagRegistry[F any] struct {
     // private fields
 }
 
@@ -1354,11 +1370,17 @@ func WithDeprecated[T, F any](msg string) CommandOption[T, F]
 ### Flag Registry
 
 ```go
-func NewFlagRegistry[T any](cfg *T) (*FlagRegistry, error)
-func (r *FlagRegistry) RegisterFlags(cmd *cobra.Command) error
-func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error
-func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error
-func (r *FlagRegistry) Tags() []FlagTag
+// FlagRegistry[F] is parameterized with the flags type for compile-time safety.
+// This eliminates `any` usage, complying with project policy.
+type FlagRegistry[F any] struct {
+    // private fields
+}
+
+func NewFlagRegistry[F any](cfg *F) (*FlagRegistry[F], error)
+func (r *FlagRegistry[F]) RegisterFlags(cmd *cobra.Command) error
+func (r *FlagRegistry[F]) ValidateFlags(cmd *cobra.Command) error
+func (r *FlagRegistry[F]) ParseFlags(cmd *cobra.Command, cfg *F) error  // No any!
+func (r *FlagRegistry[F]) Tags() []FlagTag
 ```
 
 ### Package Integration (samber/do)
