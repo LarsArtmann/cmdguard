@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| All Tests Passing | ✅ YES | GREEN |
-| Core Coverage (v2) | 89.0% | GOOD |
-| All Tests Passing | ✅ YES | GREEN |
-| Flag Types Supported | 11 | COMPLETE |
-| Architecture Issues | 3 CRITICAL | NEEDS ATTENTION |
+| Metric               | Value      | Status          |
+| -------------------- | ---------- | --------------- |
+| All Tests Passing    | ✅ YES     | GREEN           |
+| Core Coverage (v2)   | 89.0%      | GOOD            |
+| All Tests Passing    | ✅ YES     | GREEN           |
+| Flag Types Supported | 11         | COMPLETE        |
+| Architecture Issues  | 3 CRITICAL | NEEDS ATTENTION |
 
 ---
 
@@ -22,40 +22,40 @@
 
 ### A) FULLY DONE ✅
 
-| Item | Status | Details |
-|------|--------|---------|
-| uint flag support | ✅ COMPLETE | Registration + parsing + tests |
-| uint64 flag support | ✅ COMPLETE | Already existed |
-| float32 flag support | ✅ COMPLETE | Registration + parsing + tests |
-| Documentation | ✅ COMPLETE | AGENTS.md updated |
-| Testify removal | ✅ COMPLETE | Full removal from v2 |
-| Architectural analysis | ✅ COMPLETE | Report generated |
+| Item                   | Status      | Details                        |
+| ---------------------- | ----------- | ------------------------------ |
+| uint flag support      | ✅ COMPLETE | Registration + parsing + tests |
+| uint64 flag support    | ✅ COMPLETE | Already existed                |
+| float32 flag support   | ✅ COMPLETE | Registration + parsing + tests |
+| Documentation          | ✅ COMPLETE | AGENTS.md updated              |
+| Testify removal        | ✅ COMPLETE | Full removal from v2           |
+| Architectural analysis | ✅ COMPLETE | Report generated               |
 
 ### B) PARTIALLY DONE ⏳
 
-| Item | Status | Details |
-|------|--------|---------|
-| FlagParser interface | 0% | Not started - architectural refactoring needed |
-| Code deduplication | 0% | Switch statements duplicated |
-| BDD tests | 0% | No Ginkgo BDD for flag flows |
+| Item                 | Status | Details                                        |
+| -------------------- | ------ | ---------------------------------------------- |
+| FlagParser interface | 0%     | Not started - architectural refactoring needed |
+| Code deduplication   | 0%     | Switch statements duplicated                   |
+| BDD tests            | 0%     | No Ginkgo BDD for flag flows                   |
 
 ### C) NOT STARTED 🔲
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Smaller integer types | LOW | int8/uint8/int16/uint16/int32/uint32 |
-| Range validation | MEDIUM | min/max tags for numeric types |
-| File splitting | MEDIUM | command_test.go (563 lines), types_test.go (643 lines) |
-| Environment variable binding | LOW | Auto-bind ENV vars |
-| Shell completion | LOW | Auto-generate completions |
+| Item                         | Priority | Notes                                                  |
+| ---------------------------- | -------- | ------------------------------------------------------ |
+| Smaller integer types        | LOW      | int8/uint8/int16/uint16/int32/uint32                   |
+| Range validation             | MEDIUM   | min/max tags for numeric types                         |
+| File splitting               | MEDIUM   | command_test.go (563 lines), types_test.go (643 lines) |
+| Environment variable binding | LOW      | Auto-bind ENV vars                                     |
+| Shell completion             | LOW      | Auto-generate completions                              |
 
 ### D) TOTALLY FUCKED UP! ❌
 
-| Issue | Severity | Impact |
-|-------|----------|--------|
+| Issue                        | Severity | Impact                                                   |
+| ---------------------------- | -------- | -------------------------------------------------------- |
 | DUPLICATED SWITCH STATEMENTS | CRITICAL | flags.go and flags_parse.go have identical type switches |
-| PARSER FUNCTION DUPLICATION | HIGH | 7 nearly identical parseAndSet* functions |
-| TYPE SAFETY VIOLATION | MEDIUM | Reflection-based `any` types lose compile-time safety |
+| PARSER FUNCTION DUPLICATION  | HIGH     | 7 nearly identical parseAndSet\* functions               |
+| TYPE SAFETY VIOLATION        | MEDIUM   | Reflection-based `any` types lose compile-time safety    |
 
 ---
 
@@ -130,39 +130,43 @@
 ### Data Flow Analysis
 
 ```
-User Input → pflag → FlagRegistry.RegisterFlags() 
-          → pflag.Parse() 
-          → FlagRegistry.ParseFlags() 
-          → SetField() 
+User Input → pflag → FlagRegistry.RegisterFlags()
+          → pflag.Parse()
+          → FlagRegistry.ParseFlags()
+          → SetField()
           → User Struct
 ```
 
 **Issues:**
+
 - Reflection at boundaries breaks type safety
 - Multiple switch statements create maintenance burden
 - No validation layer
 
 ### State Analysis
 
-| State | Representable? | How? |
-|-------|----------------|------|
-| Invalid int | ✅ YES | Should be impossible |
-| Negative uint | ✅ Trapped | No range validation |
-| Invalid float | ✅ Trapped | Parse error |
-| Missing required | ✅ YES | ErrRequiredFlag |
+| State            | Representable? | How?                 |
+| ---------------- | -------------- | -------------------- |
+| Invalid int      | ✅ YES         | Should be impossible |
+| Negative uint    | ✅ Trapped     | No range validation  |
+| Invalid float    | ✅ Trapped     | Parse error          |
+| Missing required | ✅ YES         | ErrRequiredFlag      |
 
 **Issues:**
+
 - uint can be negative via int cast (parseAndSetInt truncates int64)
 - No min/max constraints
 
 ### Composition Analysis
 
 **Good:**
+
 - Separation of concerns (register/parse/validate)
 - Custom types (Duration, Enum, LogLevel) extend nicely
 - DI via samber/do/v2
 
 **Bad:**
+
 - FlagParser interface missing (should exist)
 - Numeric parsers should be consolidated
 
@@ -172,22 +176,22 @@ No booleans improperly used as state enums found.
 
 ### Type Safety Analysis
 
-| Location | Current | Should Be |
-|----------|---------|-----------|
-| SetField | `any` | Generics |
-| tag.Type | `reflect.Type` | Constrained interface |
-| parseAndSet* | `any` return | Typed return |
+| Location      | Current        | Should Be             |
+| ------------- | -------------- | --------------------- |
+| SetField      | `any`          | Generics              |
+| tag.Type      | `reflect.Type` | Constrained interface |
+| parseAndSet\* | `any` return   | Typed return          |
 
 ---
 
 ## SPLIT BRAINS IDENTIFIED
 
-| Brain | Location | Issue |
-|-------|----------|-------|
-| Flag registration | flags.go | Separated from parsing |
-| Flag parsing | flags_parse.go | Separated from registration |
-| Custom types | types.go | Far from flags code |
-| Tag parsing | flags_tags.go | Far from flags usage |
+| Brain             | Location       | Issue                       |
+| ----------------- | -------------- | --------------------------- |
+| Flag registration | flags.go       | Separated from parsing      |
+| Flag parsing      | flags_parse.go | Separated from registration |
+| Custom types      | types.go       | Far from flags code         |
+| Tag parsing       | flags_tags.go  | Far from flags usage        |
 
 **Recommendation:** Consolidate flag handling into single cohesive module
 
@@ -195,13 +199,13 @@ No booleans improperly used as state enums found.
 
 ## DUPLICATION ANALYSIS
 
-| Pattern | Count | Locations |
-|---------|-------|-----------|
-| switch(reflect.Kind) | 2 | flags.go, flags_parse.go |
-| parseAndSet* | 7 | flags_parse.go |
-| add*Flag | 7 | flags.go |
-| NewFlagError | 7 | flags_parse.go |
-| strconv.Parse* | 5 | flags_parse.go |
+| Pattern              | Count | Locations                |
+| -------------------- | ----- | ------------------------ |
+| switch(reflect.Kind) | 2     | flags.go, flags_parse.go |
+| parseAndSet\*        | 7     | flags_parse.go           |
+| add\*Flag            | 7     | flags.go                 |
+| NewFlagError         | 7     | flags_parse.go           |
+| strconv.Parse\*      | 5     | flags_parse.go           |
 
 **Total Duplicate Code:** ~150 lines of near-identical code
 
@@ -209,24 +213,24 @@ No booleans improperly used as state enums found.
 
 ## TESTING STATUS
 
-| Type | Coverage | Status |
-|------|----------|--------|
-| Unit Tests | 89.0% v2 | ✅ GOOD |
-| BDD Tests | 0% | ❌ MISSING |
-| Integration | Minimal | ⚠️ NEEDS WORK |
-| Fuzz Tests | 1 file | ⚠️ MINIMAL |
+| Type        | Coverage | Status        |
+| ----------- | -------- | ------------- |
+| Unit Tests  | 89.0% v2 | ✅ GOOD       |
+| BDD Tests   | 0%       | ❌ MISSING    |
+| Integration | Minimal  | ⚠️ NEEDS WORK |
+| Fuzz Tests  | 1 file   | ⚠️ MINIMAL    |
 
 ---
 
 ## CUSTOMER VALUE
 
-| Feature | Customer Impact | Status |
-|---------|----------------|--------|
-| uint flags | Can use natural numbers (counts, ports) | ✅ WORKING |
-| float32 flags | Can use precision decimals | ✅ WORKING |
-| Clean API | Easy to use library | ✅ WORKING |
-| Type safety | Fewer runtime errors | ⚠️ PARTIAL |
-| Performance | Fast flag parsing | ✅ WORKING |
+| Feature       | Customer Impact                         | Status     |
+| ------------- | --------------------------------------- | ---------- |
+| uint flags    | Can use natural numbers (counts, ports) | ✅ WORKING |
+| float32 flags | Can use precision decimals              | ✅ WORKING |
+| Clean API     | Easy to use library                     | ✅ WORKING |
+| Type safety   | Fewer runtime errors                    | ⚠️ PARTIAL |
+| Performance   | Fast flag parsing                       | ✅ WORKING |
 
 **Assessment:** Customer-facing features work. Technical debt may slow future development.
 
@@ -234,23 +238,23 @@ No booleans improperly used as state enums found.
 
 ## FILE SIZES
 
-| File | Lines | Limit | Status |
-|------|-------|-------|--------|
-| flags.go | 243 | 350 | ✅ OK |
-| flags_parse.go | 195 | 350 | ✅ OK |
-| command_test.go | 563 | 350 | ❌ OVER (+213) |
-| types_test.go | 643 | 350 | ❌ OVER (+293) |
-| guarded_command_test.go | 481 | 350 | ❌ OVER (+131) |
-| v2_mixed_flags_test.go | 508 | 350 | ❌ OVER (+158) |
+| File                    | Lines | Limit | Status         |
+| ----------------------- | ----- | ----- | -------------- |
+| flags.go                | 243   | 350   | ✅ OK          |
+| flags_parse.go          | 195   | 350   | ✅ OK          |
+| command_test.go         | 563   | 350   | ❌ OVER (+213) |
+| types_test.go           | 643   | 350   | ❌ OVER (+293) |
+| guarded_command_test.go | 481   | 350   | ❌ OVER (+131) |
+| v2_mixed_flags_test.go  | 508   | 350   | ❌ OVER (+158) |
 
 ---
 
 ## ERRORS CENTRALIZATION
 
-| Package | Errors | Status |
-|---------|--------|--------|
-| pkg/cmdguard/v2/errors.go | ~20 | ✅ Centralized |
-| pkg/errors | 0 | ❌ Empty |
+| Package                   | Errors | Status         |
+| ------------------------- | ------ | -------------- |
+| pkg/cmdguard/v2/errors.go | ~20    | ✅ Centralized |
+| pkg/errors                | 0      | ❌ Empty       |
 
 **Recommendation:** Consolidate all errors in pkg/errors
 
@@ -258,12 +262,12 @@ No booleans improperly used as state enums found.
 
 ## EXTERNAL DEPENDENCIES
 
-| Library | Usage | Wrapped? |
-|---------|-------|----------|
-| spf13/cobra | CLI framework | NO - direct use |
-| spf13/pflag | Flag parsing | NO - direct use |
-| samber/do/v2 | DI | NO - direct use |
-| knadh/koanf | Config | NO - direct use |
+| Library      | Usage         | Wrapped?        |
+| ------------ | ------------- | --------------- |
+| spf13/cobra  | CLI framework | NO - direct use |
+| spf13/pflag  | Flag parsing  | NO - direct use |
+| samber/do/v2 | DI            | NO - direct use |
+| knadh/koanf  | Config        | NO - direct use |
 
 **Recommendation:** Consider adapter pattern for external libs
 
@@ -271,13 +275,13 @@ No booleans improperly used as state enums found.
 
 ## NAMING REVIEW
 
-| Current | Quality | Recommendation |
-|---------|---------|----------------|
-| FlagRegistry | ✅ GOOD | Keep |
-| addUintFlag | ✅ GOOD | Keep |
-| parseAndSetUint | ⚠️ OK | Could be SetUint |
-| FlagTag | ✅ GOOD | Keep |
-| registerFlag | ✅ GOOD | Keep |
+| Current         | Quality | Recommendation   |
+| --------------- | ------- | ---------------- |
+| FlagRegistry    | ✅ GOOD | Keep             |
+| addUintFlag     | ✅ GOOD | Keep             |
+| parseAndSetUint | ⚠️ OK   | Could be SetUint |
+| FlagTag         | ✅ GOOD | Keep             |
+| registerFlag    | ✅ GOOD | Keep             |
 
 ---
 
@@ -285,9 +289,10 @@ No booleans improperly used as state enums found.
 
 **Should we refactor to FlagParser interface BEFORE adding more flag types?**
 
-The duplicated switch statements are a maintenance burden. Every new type requires editing TWO files. 
+The duplicated switch statements are a maintenance burden. Every new type requires editing TWO files.
 
 **Options:**
+
 1. **Refactor now** - Clean architecture, then add types
 2. **Add types now** - Faster short-term, debt later
 3. **Hybrid** - Refactor critical paths only
