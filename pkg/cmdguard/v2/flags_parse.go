@@ -63,8 +63,10 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 		return r.parseAndSetBool(cfg, tag, value)
 	case reflect.Int, reflect.Int64:
 		return r.parseAndSetInt(cfg, tag, value)
-	case reflect.Uint, reflect.Uint64:
+	case reflect.Uint:
 		return r.parseAndSetUint(cfg, tag, value)
+	case reflect.Uint64:
+		return r.parseAndSetUint64(cfg, tag, value)
 	case reflect.Float64:
 		return r.parseAndSetFloat64(cfg, tag, value)
 	case reflect.Slice:
@@ -102,6 +104,16 @@ func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error
 	}
 
 	return SetField(cfg, tag.Field, uint(v))
+}
+
+// parseAndSetUint64 parses and sets a uint64 value.
+func (r *FlagRegistry) parseAndSetUint64(cfg any, tag FlagTag, value string) error {
+	v, err := strconv.ParseUint(value, 10, 64)
+	if err != nil {
+		return NewFlagError(tag.Name, err)
+	}
+
+	return SetField(cfg, tag.Field, v)
 }
 
 // parseAndSetFloat64 parses and sets a float64 value.
