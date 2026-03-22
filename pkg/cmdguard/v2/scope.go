@@ -118,6 +118,30 @@ func InvokeNamed[T any](scope *Scope, name string) (T, error) {
 	return do.InvokeNamed[T](scope.injector, name)
 }
 
+// MustInvoke retrieves a service from the scope, panicking on error.
+// Use this in constructors where the service is guaranteed to exist.
+// For safer error handling, use Invoke instead.
+func MustInvoke[T any](scope *Scope) T {
+	service, err := Invoke[T](scope)
+	if err != nil {
+		panic(fmt.Sprintf("MustInvoke: failed to get service: %v", err))
+	}
+
+	return service
+}
+
+// MustInvokeNamed retrieves a named service from the scope, panicking on error.
+// Use this in constructors where the service is guaranteed to exist.
+// For safer error handling, use InvokeNamed instead.
+func MustInvokeNamed[T any](scope *Scope, name string) T {
+	service, err := InvokeNamed[T](scope, name)
+	if err != nil {
+		panic(fmt.Sprintf("MustInvokeNamed: failed to get service %q: %v", name, err))
+	}
+
+	return service
+}
+
 // Shutdown gracefully shuts down all services in this scope.
 // Services implementing the Shutdowner interface will be notified.
 func (s *Scope) Shutdown(ctx context.Context) error {
