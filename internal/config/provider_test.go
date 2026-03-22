@@ -1,10 +1,8 @@
 package config
 
 import (
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLoad(t *testing.T) {
@@ -81,10 +79,18 @@ func TestLoad(t *testing.T) {
 
 			cfg := Load()
 
-			require.NotNil(t, cfg)
-			assert.Equal(t, tt.wantLevel, cfg.LogLevel)
-			assert.Equal(t, tt.wantFormat, cfg.LogFormat)
-			assert.Equal(t, tt.wantStrict, cfg.StrictMode)
+			if cfg == nil {
+				t.Fatal("Load() returned nil, expected non-nil config")
+			}
+			if cfg.LogLevel != tt.wantLevel {
+				t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, tt.wantLevel)
+			}
+			if cfg.LogFormat != tt.wantFormat {
+				t.Errorf("cfg.LogFormat = %q, want %q", cfg.LogFormat, tt.wantFormat)
+			}
+			if cfg.StrictMode != tt.wantStrict {
+				t.Errorf("cfg.StrictMode = %v, want %v", cfg.StrictMode, tt.wantStrict)
+			}
 		})
 	}
 }
@@ -134,13 +140,19 @@ func TestConfig_Validate(t *testing.T) {
 			err := tt.config.Validate()
 
 			if tt.wantErr {
-				require.Error(t, err)
-				assert.Contains(t, err.Error(), tt.errMsg)
+				if err == nil {
+					t.Fatalf("expected error containing %q, got nil", tt.errMsg)
+				}
+				if !strings.Contains(err.Error(), tt.errMsg) {
+					t.Errorf("error = %q, want to contain %q", err.Error(), tt.errMsg)
+				}
 
 				return
 			}
 
-			require.NoError(t, err)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
 		})
 	}
 }
@@ -174,11 +186,17 @@ func TestGetConfigFilePath(t *testing.T) {
 
 			switch tt.want {
 			case "":
-				assert.Empty(t, got)
+				if got != "" {
+					t.Errorf("GetConfigFilePath(%q) = %q, want empty", tt.configFile, got)
+				}
 			case "/":
-				assert.NotEmpty(t, got)
+				if got == "" {
+					t.Errorf("GetConfigFilePath(%q) = empty, want non-empty", tt.configFile)
+				}
 			default:
-				assert.Equal(t, tt.want, got)
+				if got != tt.want {
+					t.Errorf("GetConfigFilePath(%q) = %q, want %q", tt.configFile, got, tt.want)
+				}
 			}
 		})
 	}

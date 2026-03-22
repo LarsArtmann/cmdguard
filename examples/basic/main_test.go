@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 )
@@ -38,8 +36,12 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 	// Test hello command
 	root.Command().SetArgs([]string{"hello"})
 	err := root.Execute(context.Background())
-	require.NoError(t, err)
-	assert.Equal(t, "Hello, World!\n", output.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if output.String() != "Hello, World!\n" {
+		t.Errorf("output = %q, want %q", output.String(), "Hello, World!\n")
+	}
 
 	// Reset output for next test
 	output.Reset()
@@ -47,8 +49,12 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 	// Test goodbye command
 	root.Command().SetArgs([]string{"goodbye"})
 	err = root.Execute(context.Background())
-	require.NoError(t, err)
-	assert.Equal(t, "Goodbye, World!\n", output.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if output.String() != "Goodbye, World!\n" {
+		t.Errorf("output = %q, want %q", output.String(), "Goodbye, World!\n")
+	}
 }
 
 func TestBasicExample_RootHasSubcommands(t *testing.T) {
@@ -67,11 +73,17 @@ func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	})
 
 	cmd := root.Command()
-	assert.Equal(t, "basic", cmd.Use)
-	assert.Equal(t, "A basic CLI example", cmd.Short)
-	// GuardedCommand adds built-in commands (completion, help, validate, version)
-	// plus our 2 custom commands
-	assert.GreaterOrEqual(t, len(cmd.Commands()), 2)
+	if cmd.Use != "basic" {
+		t.Errorf("cmd.Use = %q, want %q", cmd.Use, "basic")
+	}
+	if cmd.Short != "A basic CLI example" {
+		t.Errorf("cmd.Short = %q, want %q", cmd.Short, "A basic CLI example")
+	}
+
+	// GuardedCommand adds built-in commands (completion, help, validate, version + our 2 custom commands)
+	if len(cmd.Commands()) < 2 {
+		t.Errorf("len(cmd.Commands()) = %d, want at least 2", len(cmd.Commands()))
+	}
 }
 
 func TestBasicExample_HelpOutput(t *testing.T) {
@@ -80,13 +92,22 @@ func TestBasicExample_HelpOutput(t *testing.T) {
 	}
 
 	root := cmdguard.New("basic", "A basic CLI example")
+
 	root.AddCommand(&cobra.Command{
 		Use:   "hello",
 		Short: "Say hello",
 		Run:   func(cmd *cobra.Command, args []string) {},
 	})
 
+	root.AddCommand(&cobra.Command{
+		Use:   "goodbye",
+		Short: "Say goodbye",
+		Run:   func(cmd *cobra.Command, args []string) {},
+	})
+
+	// Set args to run help
 	root.Command().SetArgs([]string{"--help"})
-	// Help returns error with exit code, but we just want to verify it doesn't panic
+
+	// Execute should not panic, we just want to verify it doesn't crash
 	_ = root.Execute(context.Background())
 }

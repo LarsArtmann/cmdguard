@@ -3,10 +3,8 @@ package logging
 import (
 	"bytes"
 	"log/slog"
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNewLogger(t *testing.T) {
@@ -50,7 +48,9 @@ func TestNewLogger(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			logger := NewLogger(tt.format, tt.level)
-			assert.NotNil(t, logger)
+			if logger == nil {
+				t.Error("NewLogger() returned nil, expected non-nil logger")
+			}
 		})
 	}
 }
@@ -101,7 +101,9 @@ func TestParseLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ParseLevel(tt.level).SlogLevel()
-			assert.Equal(t, tt.expectedLevel, result)
+			if result != tt.expectedLevel {
+				t.Errorf("ParseLevel(%q).SlogLevel() = %v, want %v", tt.level, result, tt.expectedLevel)
+			}
 		})
 	}
 }
@@ -137,7 +139,9 @@ func TestParseFormat(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ParseFormat(tt.format)
-			assert.Equal(t, tt.expectedFormat, result)
+			if result != tt.expectedFormat {
+				t.Errorf("ParseFormat(%q) = %v, want %v", tt.format, result, tt.expectedFormat)
+			}
 		})
 	}
 }
@@ -173,7 +177,9 @@ func TestValidFormat(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ValidFormat(tt.format)
-			assert.Equal(t, tt.isValid, result)
+			if result != tt.isValid {
+				t.Errorf("ValidFormat(%q) = %v, want %v", tt.format, result, tt.isValid)
+			}
 		})
 	}
 }
@@ -196,7 +202,9 @@ func TestValidLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ValidLevel(tt.level)
-			assert.Equal(t, tt.isValid, result)
+			if result != tt.isValid {
+				t.Errorf("ValidLevel(%q) = %v, want %v", tt.level, result, tt.isValid)
+			}
 		})
 	}
 }
@@ -218,7 +226,9 @@ func TestParseLevel_Type(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ParseLevel(tt.level)
-			assert.Equal(t, tt.expectedLevel, result)
+			if result != tt.expectedLevel {
+				t.Errorf("ParseLevel(%q) = %v, want %v", tt.level, result, tt.expectedLevel)
+			}
 		})
 	}
 }
@@ -239,21 +249,35 @@ func TestLevel_SlogLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := tt.level.SlogLevel()
-			assert.Equal(t, tt.expectedLevel, result)
+			if result != tt.expectedLevel {
+				t.Errorf("Level(%q).SlogLevel() = %v, want %v", tt.level, result, tt.expectedLevel)
+			}
 		})
 	}
 }
 
 func TestLevel_String(t *testing.T) {
-	assert.Equal(t, "debug", LevelDebug.String())
-	assert.Equal(t, "info", LevelInfo.String())
-	assert.Equal(t, "warn", LevelWarn.String())
-	assert.Equal(t, "error", LevelError.String())
+	if got := LevelDebug.String(); got != "debug" {
+		t.Errorf("LevelDebug.String() = %q, want %q", got, "debug")
+	}
+	if got := LevelInfo.String(); got != "info" {
+		t.Errorf("LevelInfo.String() = %q, want %q", got, "info")
+	}
+	if got := LevelWarn.String(); got != "warn" {
+		t.Errorf("LevelWarn.String() = %q, want %q", got, "warn")
+	}
+	if got := LevelError.String(); got != "error" {
+		t.Errorf("LevelError.String() = %q, want %q", got, "error")
+	}
 }
 
 func TestFormat_String(t *testing.T) {
-	assert.Equal(t, "text", FormatText.String())
-	assert.Equal(t, "json", FormatJSON.String())
+	if got := FormatText.String(); got != "text" {
+		t.Errorf("FormatText.String() = %q, want %q", got, "text")
+	}
+	if got := FormatJSON.String(); got != "json" {
+		t.Errorf("FormatJSON.String() = %q, want %q", got, "json")
+	}
 }
 
 func TestLoggerOutput_Text(t *testing.T) {
@@ -270,10 +294,18 @@ func TestLoggerOutput_Text(t *testing.T) {
 	logger.Error("error message")
 
 	output := buf.String()
-	require.Contains(t, output, "debug message")
-	require.Contains(t, output, "info message")
-	require.Contains(t, output, "warn message")
-	require.Contains(t, output, "error message")
+	if !strings.Contains(output, "debug message") {
+		t.Error("output missing 'debug message'")
+	}
+	if !strings.Contains(output, "info message") {
+		t.Error("output missing 'info message'")
+	}
+	if !strings.Contains(output, "warn message") {
+		t.Error("output missing 'warn message'")
+	}
+	if !strings.Contains(output, "error message") {
+		t.Error("output missing 'error message'")
+	}
 }
 
 func TestLoggerOutput_JSON(t *testing.T) {
@@ -287,9 +319,15 @@ func TestLoggerOutput_JSON(t *testing.T) {
 	logger.Info("json test", "key", "value")
 
 	output := buf.String()
-	require.Contains(t, output, "json test")
-	require.Contains(t, output, "key")
-	require.Contains(t, output, "value")
+	if !strings.Contains(output, "json test") {
+		t.Error("output missing 'json test'")
+	}
+	if !strings.Contains(output, "key") {
+		t.Error("output missing 'key'")
+	}
+	if !strings.Contains(output, "value") {
+		t.Error("output missing 'value'")
+	}
 }
 
 func TestLoggerLevelFiltering(t *testing.T) {
@@ -335,8 +373,12 @@ func TestLoggerLevelFiltering(t *testing.T) {
 			tt.logFunc(logger)
 
 			output := buf.String()
-			assert.Contains(t, output, tt.shouldContain)
-			assert.NotContains(t, output, tt.shouldNotContain)
+			if !strings.Contains(output, tt.shouldContain) {
+				t.Errorf("output should contain %q, but doesn't", tt.shouldContain)
+			}
+			if strings.Contains(output, tt.shouldNotContain) {
+				t.Errorf("output should not contain %q, but does", tt.shouldNotContain)
+			}
 		})
 	}
 }

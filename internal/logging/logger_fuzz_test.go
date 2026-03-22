@@ -6,9 +6,6 @@ import (
 	"log/slog"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func FuzzParseLevel(f *testing.F) {
@@ -38,9 +35,41 @@ func FuzzParseLevel(f *testing.F) {
 		slogLevel := result.SlogLevel()
 		str := result.String()
 
-		assert.Contains(t, []Level{LevelDebug, LevelInfo, LevelWarn, LevelError}, result)
-		assert.Contains(t, []string{"debug", "info", "warn", "error"}, str)
-		assert.Contains(t, []int{-4, 0, 4, 8}, int(slogLevel))
+		validLevels := []Level{LevelDebug, LevelInfo, LevelWarn, LevelError}
+		found := false
+		for _, valid := range validLevels {
+			if result == valid {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("ParseLevel(%q) = %v, expected valid level", level, result)
+		}
+
+		validStrings := []string{"debug", "info", "warn", "error"}
+		found = false
+		for _, valid := range validStrings {
+			if str == valid {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("ParseLevel(%q).String() = %q, expected valid string", level, str)
+		}
+
+		validInts := []int{-4, 0, 4, 8}
+		found = false
+		for _, valid := range validInts {
+			if int(slogLevel) == valid {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("ParseLevel(%q).SlogLevel() = %d, expected valid level", level, int(slogLevel))
+		}
 	})
 }
 
@@ -68,8 +97,29 @@ func FuzzParseFormat(f *testing.F) {
 		result := ParseFormat(format)
 		str := result.String()
 
-		assert.Contains(t, []Format{FormatText, FormatJSON}, result)
-		assert.Contains(t, []string{"text", "json"}, str)
+		validFormats := []Format{FormatText, FormatJSON}
+		found := false
+		for _, valid := range validFormats {
+			if result == valid {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("ParseFormat(%q) = %v, expected valid format", format, result)
+		}
+
+		validStrings := []string{"text", "json"}
+		found = false
+		for _, valid := range validStrings {
+			if str == valid {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("ParseFormat(%q).String() = %q, expected valid string", format, str)
+		}
 	})
 }
 
@@ -91,7 +141,9 @@ func FuzzValidLevel(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, level string, expectValid bool) {
 		result := ValidLevel(level)
-		assert.Equal(t, expectValid, result)
+		if result != expectValid {
+			t.Errorf("ValidLevel(%q) = %v, want %v", level, result, expectValid)
+		}
 	})
 }
 
@@ -113,7 +165,9 @@ func FuzzValidFormat(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, format string, expectValid bool) {
 		result := ValidFormat(format)
-		assert.Equal(t, expectValid, result)
+		if result != expectValid {
+			t.Errorf("ValidFormat(%q) = %v, want %v", format, result, expectValid)
+		}
 	})
 }
 
@@ -129,18 +183,32 @@ func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 
 	output := buf.String()
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	require.Len(t, lines, 1, "should produce exactly one JSON line")
+	if len(lines) != 1 {
+		t.Fatalf("should produce exactly one JSON line, got %d lines", len(lines))
+	}
 
 	var parsed map[string]any
 
 	err := json.Unmarshal([]byte(lines[0]), &parsed)
-	require.NoError(t, err, "output should be valid JSON")
+	if err != nil {
+		t.Fatalf("output should be valid JSON: %v", err)
+	}
 
-	assert.Equal(t, "test message", parsed["msg"])
-	assert.Equal(t, "value", parsed["key"])
-	assert.Equal(t, float64(42), parsed["count"])
-	assert.Contains(t, parsed, "time")
-	assert.Contains(t, parsed, "level")
+	if parsed["msg"] != "test message" {
+		t.Errorf("parsed[\"msg\"] = %v, want %q", parsed["msg"], "test message")
+	}
+	if parsed["key"] != "value" {
+		t.Errorf("parsed[\"key\"] = %v, want %q", parsed["key"], "value")
+	}
+	if parsed["count"] != float64(42) {
+		t.Errorf("parsed[\"count\"] = %v, want %v", parsed["count"], float64(42))
+	}
+	if _, ok := parsed["time"]; !ok {
+		t.Error("parsed output missing 'time' field")
+	}
+	if _, ok := parsed["level"]; !ok {
+		t.Error("parsed output missing 'level' field")
+	}
 }
 
 func TestNewLogger_TextOutputFormat(t *testing.T) {
@@ -154,9 +222,15 @@ func TestNewLogger_TextOutputFormat(t *testing.T) {
 	logger.Info("test message", "key", "value")
 
 	output := buf.String()
-	assert.Contains(t, output, "test message")
-	assert.Contains(t, output, "key=value")
-	assert.Contains(t, output, "level=INFO")
+	if !strings.Contains(output, "test message") {
+		t.Error("output missing 'test message'")
+	}
+	if !strings.Contains(output, "key=value") {
+		t.Error("output missing 'key=value'")
+	}
+	if !strings.Contains(output, "level=INFO") {
+		t.Error("output missing 'level=INFO'")
+	}
 }
 
 func TestLevel_CaseSensitivity(t *testing.T) {
@@ -180,15 +254,9 @@ func TestLevel_CaseSensitivity(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			result := ParseLevel(tt.input)
-			assert.Equal(
-				t,
-				tt.expected,
-				result,
-				"ParseLevel(%q) = %v, want %v",
-				tt.input,
-				result,
-				tt.expected,
-			)
+			if result != tt.expected {
+				t.Errorf("ParseLevel(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
 		})
 	}
 }
@@ -209,15 +277,9 @@ func TestFormat_CaseSensitivity(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			result := ParseFormat(tt.input)
-			assert.Equal(
-				t,
-				tt.expected,
-				result,
-				"ParseFormat(%q) = %v, want %v",
-				tt.input,
-				result,
-				tt.expected,
-			)
+			if result != tt.expected {
+				t.Errorf("ParseFormat(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
 		})
 	}
 }
@@ -239,27 +301,57 @@ func TestLevel_WhitespaceHandling(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			result := ParseLevel(tt.input)
-			assert.Equal(t, tt.expected, result)
+			if result != tt.expected {
+				t.Errorf("ParseLevel(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
 		})
 	}
 }
 
 func TestValidLevel_EdgeCases(t *testing.T) {
-	assert.False(t, ValidLevel(" debug"), "leading space should be invalid")
-	assert.False(t, ValidLevel("debug "), "trailing space should be invalid")
-	assert.False(t, ValidLevel("DEBUG"), "uppercase should be invalid")
-	assert.False(t, ValidLevel(""), "empty should be invalid")
-	assert.False(t, ValidLevel("   "), "whitespace only should be invalid")
-	assert.False(t, ValidLevel("debug\x00"), "null byte should be invalid")
-	assert.False(t, ValidLevel("🎉"), "emoji should be invalid")
-	assert.False(t, ValidLevel(strings.Repeat("a", 10000)), "very long string should be invalid")
+	if ValidLevel(" debug") {
+		t.Error("leading space should be invalid")
+	}
+	if ValidLevel("debug ") {
+		t.Error("trailing space should be invalid")
+	}
+	if ValidLevel("DEBUG") {
+		t.Error("uppercase should be invalid")
+	}
+	if ValidLevel("") {
+		t.Error("empty should be invalid")
+	}
+	if ValidLevel("   ") {
+		t.Error("whitespace only should be invalid")
+	}
+	if ValidLevel("debug\x00") {
+		t.Error("null byte should be invalid")
+	}
+	if ValidLevel("🎉") {
+		t.Error("emoji should be invalid")
+	}
+	if ValidLevel(strings.Repeat("a", 10000)) {
+		t.Error("very long string should be invalid")
+	}
 }
 
 func TestValidFormat_EdgeCases(t *testing.T) {
-	assert.False(t, ValidFormat(" json"), "leading space should be invalid")
-	assert.False(t, ValidFormat("json "), "trailing space should be invalid")
-	assert.False(t, ValidFormat("JSON"), "uppercase should be invalid")
-	assert.False(t, ValidFormat(""), "empty should be invalid")
-	assert.False(t, ValidFormat("   "), "whitespace only should be invalid")
-	assert.False(t, ValidFormat(strings.Repeat("a", 10000)), "very long string should be invalid")
+	if ValidFormat(" json") {
+		t.Error("leading space should be invalid")
+	}
+	if ValidFormat("json ") {
+		t.Error("trailing space should be invalid")
+	}
+	if ValidFormat("JSON") {
+		t.Error("uppercase should be invalid")
+	}
+	if ValidFormat("") {
+		t.Error("empty should be invalid")
+	}
+	if ValidFormat("   ") {
+		t.Error("whitespace only should be invalid")
+	}
+	if ValidFormat(strings.Repeat("a", 10000)) {
+		t.Error("very long string should be invalid")
+	}
 }

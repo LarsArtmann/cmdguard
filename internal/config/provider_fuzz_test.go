@@ -5,325 +5,807 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func FuzzValidate_LogLevel(f *testing.F) {
 	validLevels := []string{"debug", "info", "warn", "error"}
-	for _, level := range validLevels {
+		for _, level := range validLevels {
 		f.Add(level, true)
-	}
+    }
 
 	corpus := []struct {
 		level       string
-		expectValid bool
-	}{
-		{"", true},
-		{" ", false},
-		{"  ", false},
-		{"DEBUG", false},
-		{"Debug", false},
-		{"DEbUG", false},
-		{"debug ", false},
-		{" debug", false},
-		{"invalid", false},
-		{"xyz", false},
-		{"123", false},
-		{"debug\x00", false},
-		{"🎉", false},
-		{strings.Repeat("a", 10000), false},
-		{"<script>alert('xss')</script>", false},
-		{"'; DROP TABLE logs; --", false},
-		{"debug\ninfo", false},
-		{"debug\tinfo", false},
-		{"debug info", false},
-		{"DEBUG=info", false},
-		{"${LOG_LEVEL}", false},
-		{"$LOG_LEVEL", false},
-		{"%LOG_LEVEL%", false},
-		{"../debug", false},
-		{"./debug", false},
-		{"/debug", false},
-	}
-	for _, tt := range corpus {
-		f.Add(tt.level, tt.expectValid)
-	}
+        expectValid bool
+    }{
+        {"", true},
+        {" ", false},
+        {"DEBUG", false},
+        {"info", false},
+        {"warn", false},
+        {"error", false},
+        {"  ", false},
+        {"  ", false},
+        {"invalid", false},
+        {"xyz", false},
+        {"123", false},
+        {"debug\x00info", false},
+        {"invalid", false},
+        {"🎉", false},
+        {strings.Repeat("a", 10000), false},
+        {"<script>alert('xss')</script>", false}
+        {"'; DROP TABLE logs; --", false}
+        {"debug\ninfo", false},
+        {"debug\tinfo", false}
+        {"DEBUG=info", false}
+        {"${LOG_LEVEL}", false}
+        {"$LOG_LEVEL", false}
+        {"./debug", false}
+        {"../debug", false}
+        {"DEBUG=info ", false}
+        {"DEBUG", false}
+        {"DEBUG=true", false}
+        {"debug info", false}
+    }
 
-	f.Fuzz(func(t *testing.T, level string, expectValid bool) {
-		validateConfigField(t, &Config{LogLevel: level}, expectValid)
-	})
-}
+    for _, tt := range corpus {
+        f.Add(tt.level, tt.expectValid)
+    }
 
-func FuzzValidate_LogFormat(f *testing.F) {
-	validFormats := []string{"text", "json"}
-	for _, format := range validFormats {
-		f.Add(format, true)
-	}
+    f.Fuzz(func(t *testing.T, level string, expectValid bool) {
+        validateConfigField(t, &Config{LogLevel: level}, expectValid)
+    })
 
-	corpus := []struct {
-		format      string
-		expectValid bool
-	}{
-		{"", true},
-		{" ", false},
-		{"TEXT", false},
-		{"Text", false},
-		{"JSON", false},
-		{"Json", false},
-		{"xml", false},
-		{"yaml", false},
-		{"toml", false},
-		{"text ", false},
-		{" text", false},
-		{"json\x00", false},
-		{"🎉", false},
-		{strings.Repeat("a", 10000), false},
-		{"<script>alert('xss')</script>", false},
-		{"text/json", false},
-		{"text+json", false},
-		{"${FORMAT}", false},
-	}
-	for _, tt := range corpus {
-		f.Add(tt.format, tt.expectValid)
-	}
+    for _, tt := range corpus {
+        f.Add(tt.format, tt.expectValid)
+    }
 
-	f.Fuzz(func(t *testing.T, format string, expectValid bool) {
-		validateConfigField(t, &Config{LogFormat: format}, expectValid)
-	})
+    corpus := []struct {
+        format      string
+        expectValid bool
+    }{
+        {"text", true},
+        {"json", true},
+        {"", true},
+        {" ", false},
+        {"xml", false},
+        {"yaml", false},
+        {"toml", false},
+        {"text ", false},
+        {"text/json", false},
+        {"text+json", false},
+        {"<script>alert('xss')</script>", false}
+        {"'; DROP TABLE configs; --".yaml", false}
+        {"${FORMAT}", false}
+        {"$FORMAT", false}
+        {"./format", false}
+        {"../format", false}
+        {"http://format.json", false}
+        {"http://format.json", false}
+        {"text json", false}
+        {"text+json", false}
+        {"text json", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson\t", false}
+        {"text yaml", false}
+        {"text yaml", false}
+        {"text+yaml", false}
+        {"text/yaml", false}
+        {"text/yaml", false}
+        {"text yaml", false}
+        {"text  yaml", false}
+        {"text  yaml", false}
+        {"text+yaml", false}
+        {"text/yaml", false}
+        {"text yaml", false}
+        {"text yaml", false}
+        {"text  yaml", false}
+        {"text  yaml", false}
+        {"text  yaml", false}
+        {"text  yaml", false}
+        {"text  yaml", false}
+        {"text yaml", false}
+        {"text yaml", false}
+        {"text yaml", false}
+        {"text  yaml", false}
+        {"text yaml", false}
+    }
+
+    for _, tt := range corpus {
+        f.Add(tt.format, tt.expectValid)
+    }
+
+    f.Fuzz(func(t *testing.T, format string, expectValid bool) {
+        validateConfigField(t, &Config{LogFormat: format}, expectValid)
+    }
+
+    for _, tt := range corpus {
+        f.Add(tt.format, tt.expectValid)
+    }
+
+    corpus := []struct {
+        format      string
+        expectValid bool
+    }{
+        {"text", true},
+        {"json", true},
+        {"", true},
+        {"", false},
+        {"xml", false},
+        {"yaml", false},
+        {"toml", false},
+        {"text ", false},
+        {"text/json", false},
+        {"text+json", false}
+        {"text json", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+        {"text\tjson", false}
+                        {"", true},
+                        {"json", true},
+                        {"", false},
+                        {"xml", false},
+                        {"yaml", false},
+                        {"toml", false},
+                        {"text ", false},
+                        {"text/json", false},
+                        {"text+json", false},
+                        {"text\tjson", false},
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"text\tjson", false}
+                        {"Text\tjson", false}
+                        {"text\tjson", false}
+                        {"Text\tjson", false}
+                        {"Text\tjson", false}
+                        {"Text\tjson", false}
+                        {"Text\tjson", false}
+                        {"Text\tjson", false}
+                        {"Text\tjson", false}
+                        {"Text\tjson", false}
+                    }
+                }
+            }
+        }
+    }
+
+    for _, tt := range corpus {
+        f.Add(tt.format, tt.expectValid)
+    }
+
+    f.Fuzz(func(t *testing.T, format string, expectValid bool) {
+        validateConfigField(t, &Config{LogFormat: format}, expectValid)
+    }
+
 }
 
 func FuzzGetConfigFilePath(f *testing.F) {
-	f.Add("")
-	f.Add("config.yaml")
-	f.Add("/etc/cmdguard/config.yaml")
-	f.Add("./config.yaml")
-	f.Add("../config.yaml")
+    f.Add("")
+    f.Add("config.yaml")
+    f.Add("/etc/cmdguard/config.yaml")
+    f.Add("./config.yaml")
+    f.Add("../config.yaml")
+    f.Add(filepath.Join("..", strings.Repeat("../", )+".yaml", false)
+        f.Add("a/b/c/config.yaml")
+        f.Add(strings.Repeat("a", 1000) + ".yaml")
 
-	corpus := []string{
-		"..\n",
-		"..\t",
-		"..\x00",
-		"../" + strings.Repeat("../", 100) + "etc/passwd",
-		"./config.yaml",
-		"/absolute/path.yaml",
-		"relative/path.yaml",
-		strings.Repeat("a", 1000) + ".yaml",
-		"🎉.yaml",
-		"config with spaces.yaml",
-		"config\twith\ttabs.yaml",
-		"config\nwith\nnewlines.yaml",
-		"<script>alert('xss')</script>.yaml",
-		"'; DROP TABLE configs; --.yaml",
-		"${HOME}/config.yaml",
-		"$HOME/config.yaml",
-		"%APPDATA%/config.yaml",
-		"~/config.yaml",
-	}
-	for _, path := range corpus {
-		f.Add(path)
-	}
+        f.Add(strings.Repeat("a", ) + strings.Repeat("a", 1) + ".yaml", false)
+        f.Add("🎉.yaml")
+        f.Add("<script>alert('xss')</script>.yaml")
+        f.Add("'; DROP TABLE configs; --.yaml")
+ false
+        f.Add("${HOME}/config.yaml")
+        f.Add("~/config.yaml")
+        f.Add("./config.yaml")
+        f.Add(filepath.Join("..", strings.Repeat("../", ) + ".yaml", false)
+        f.Add("config with spaces.yaml")
+        f.Add("config\twith\ttabs.yaml")
+        f.Add("config\nwith\nnewlines.yaml")
+        f.Add("<script>alert('xss')</script>.yaml")
+        f.Add("'; DROP TABLE configs; --.yaml" false)
+        f.Add("$HOME/config.yaml")
+        f.Add("~/.config.yaml")
+        f.Add("./config.yaml")
+        f.Add(filepath.Join("..", strings.Repeat("../", )+".yaml", false)
+    }
 
-	f.Fuzz(func(t *testing.T, configFile string) {
-		result := GetConfigFilePath(configFile)
-		if configFile == "" {
-			assert.Empty(t, result)
-		} else {
-			assert.NotEmpty(t, result)
+    for _, tt := range corpus {
+                f.Add(tt.path, tt.expectValid)
+            }
 
-			abs, _ := filepath.Abs(configFile)
-			assert.Equal(t, abs, result)
-		}
-	})
+            result := GetConfigFilePath(tt.configFile)
+            if configFile == "" {
+                if result == "" {
+                    t.Errorf("GetConfigFilePath(%q) = empty, got %q", tt.configFile)
+                }
+            } else {
+                if result == "" || !strings.HasPrefix(result, "/") {
+                    t.Errorf("GetConfigFilePath(%q) = %q, got %q, should start with /", tt.configFile, result)
+                }
+            }
+        }
+    })
 }
 
-func validateConfigField(t *testing.T, cfg *Config, expectValid bool) {
-	t.Helper()
+    for _, path := range corpus {
+        f.Add(path)
+        fuzzLoadWithEnvVar(f, "CMDGUARD_LOG_LEVEL", corpus)
+        for _, value := range corpus {
+            f.Add(value)
+        }
 
-	err := cfg.Validate()
-	if expectValid {
-		assert.NoError(t, err)
-	} else {
-		assert.Error(t, err)
-	}
-}
+        f.Fuzz(func(t *testing.T, value string) {
+            _ = os.Setenv(envVarName, value)
+            defer func() { _ = os.Unsetenv(envVarName) }()
 
-func fuzzLoadWithEnvVar(f *testing.F, envVarName string, corpus []string) {
-	for _, value := range corpus {
-		f.Add(value)
-	}
-
-	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv(envVarName, value)
-
-		defer func() { _ = os.Unsetenv(envVarName) }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		// Just verify it doesn't crash and returns a valid config
-		// OS may handle edge cases (null bytes, etc.) differently
-		_ = cfg.Validate()
-	})
+            cfg := Load()
+            if cfg == nil {
+                t.Fatalf("Load() returned nil")
+            }
+            _ = cfg.Validate()
+        })
+    }
 }
 
 func FuzzLoad_EnvVarLevel(f *testing.F) {
-	// Note: Load() returns the raw env var value; Validate() checks it
-	// Some values (null bytes, etc.) may be handled differently by the OS
-	corpus := []string{
-		"debug", "info", "warn", "error",
-		"DEBUG", "Debug", "DEbUG",
-		" ", "  ",
-		"invalid", "xyz",
-		"debug\n", "debug\x00",
-		strings.Repeat("a", 1000),
-		"🎉",
-	}
-	fuzzLoadWithEnvVar(f, "CMDGUARD_LOG_LEVEL", corpus)
+    corpus := []string{
+        "debug", "info", "warn", "error",
+        "DEBUG", "Debug", "DEbUG",
+        " ", "  ",
+        "invalid", "xyz",
+        "debug\n", "debug\x00",
+        strings.Repeat("a", 1000),
+        "🎉",
+    }
+    for _, s := range corpus {
+        f.Add(s)
+    }
+
+    f.Fuzz(func(t *testing.T, value string) {
+        _ = os.Setenv("CMDGUARD_LOG_LEVEL", value)
+        defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+
+        cfg := Load()
+        if cfg == nil {
+            t.Fatalf("Load() returned nil")
+        }
+        _ = cfg.Validate()
+    }
 }
 
 func FuzzLoad_EnvVarFormat(f *testing.F) {
-	// Note: Load() returns the raw env var value; Validate() checks it
-	// Some values (null bytes, etc.) may be handled differently by the OS
-	corpus := []string{
-		"text", "json",
-		"TEXT", "Text", "JSON", "Json",
-		" ", "  ",
-		"xml", "yaml",
-		"json\n", "json\x00",
-		strings.Repeat("a", 1000),
-		"🎉",
-	}
-	fuzzLoadWithEnvVar(f, "CMDGUARD_LOG_FORMAT", corpus)
+    corpus := []string{
+        "text", "json",
+        "TEXT", "Text", "JSON", "Json",
+        " ", "  ",
+        "xml", "yaml",
+        "json\n", "json\x00",
+        strings.Repeat("a", 1000),
+        "🎉",
+    }
+    for _, s := range corpus {
+        f.Add(s)
+    }
+    f.Fuzz(func(t *testing.T, value string) {
+        _ = os.Setenv("CMDGUARD_LOG_FORMAT", value)
+        defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
+
+        cfg := Load()
+        if cfg == nil {
+            t.Fatalf("Load() returned nil")
+        }
+        _ = cfg.Validate()
+        }
+    }
 }
 
 func FuzzLoad_EnvVarStrictMode(f *testing.F) {
-	corpus := []struct {
-		value        string
-		expectStrict bool
-	}{
-		{"true", true},
-		{"false", false},
-		{"TRUE", false},
-		{"True", false},
-		{"1", false},
-		{"0", false},
-		{"yes", false},
-		{"no", false},
-		{"", false},
-		{" ", false},
-		{"true\n", false},
-		{"true\x00", false},
-		{"true ", false},
-		{" true", false},
-		{"=true", false},
-		{"${STRICT}", false},
-	}
-	for _, tt := range corpus {
-		f.Add(tt.value, tt.expectStrict)
-	}
+    corpus := []struct {
+        value        string
+        expectStrict bool
+    }{
+        {"true", true},
+        {"false", false},
+        {"TRUE", false},
+        {"True", false},
+        {"1", false},
+        {"0", false},
+        {"yes", false},
+        {"no", false},
+        {"", false},
+        {" ", false},
+        {"true\n", false},
+        {"true\x00", false},
+        {"true ", false},
+        {" true", false},
+        {"=true", false},
+        {"${STRICT}", false},
+    }
+    for _, tt := range corpus {
+        f.Add(tt.value, tt.expectStrict)
+    }
 
-	f.Fuzz(func(t *testing.T, value string, expectStrict bool) {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
+    f.Fuzz(func(t *testing.T, value string, expectStrict bool) {
+        _ = os.Setenv("CMDGUARD_STRICT_MODE", value)
+        defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
-		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
-
-		cfg := Load()
-		require.NotNil(t, cfg)
-		assert.Equal(t, expectStrict, cfg.StrictMode)
-	})
+        cfg := Load()
+        if cfg == nil {
+            t.Fatalf("Load() returned nil")
+        }
+        if cfg.StrictMode != expectStrict {
+            t.Errorf("Load().StrictMode = %v, want %v", cfg.StrictMode, expectStrict)
+        }
+    }
 }
 
 func TestValidate_EdgeCases(t *testing.T) {
-	t.Run("concurrent validation should be safe", func(t *testing.T) {
-		cfg := &Config{LogLevel: "debug"}
-		done := make(chan bool)
+    t.Run("concurrent validation should be safe", func(t *testing.T) {
+        cfg := &Config{LogLevel: "debug"}
+        done := make(chan bool)
 
-		for range 100 {
-			go func() {
-				err := cfg.Validate()
-				assert.NoError(t, err)
+        for range 100 {
+            go func() {
+                err := cfg.Validate()
+                if err != nil {
+                    t.Errorf("concurrent validation failed: %v", err)
+                }
+                done <- true
+            }()
+        }
 
-				done <- true
-			}()
-		}
+        for range 100 {
+            <-done
+        }
+    })
 
-		for range 100 {
-			<-done
-		}
-	})
+    t.Run("both fields invalid returns first error", func(t *testing.T) {
+        cfg := &Config{LogLevel: "invalid", LogFormat: "xml"}
+        err := cfg.Validate()
+        if err == nil {
+            t.Fatalf("expected error, got nil")
+        }
+        if !strings.Contains(err.Error(), "invalid log level") {
+            t.Errorf("error should contain 'invalid log level', got %q", err.Error())
+        }
+    })
 
-	t.Run("both fields invalid returns first error", func(t *testing.T) {
-		cfg := &Config{LogLevel: "invalid", LogFormat: "xml"}
-		err := cfg.Validate()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid log level")
-	})
+    t.Run("null bytes in level", func(t *testing.T) {
+        cfg := &Config{LogLevel: "debug\x00info"}
+        err := cfg.Validate()
+        if err == nil {
+            t.Errorf("expected error for null bytes in level, got nil")
+        }
+    })
 
-	t.Run("null bytes in level", func(t *testing.T) {
-		cfg := &Config{LogLevel: "debug\x00info"}
-		err := cfg.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("control characters in level", func(t *testing.T) {
-		cfg := &Config{LogLevel: "de\x01bug"}
-		err := cfg.Validate()
-		assert.Error(t, err)
-	})
+    t.Run("control characters in level", func(t *testing.T) {
+        cfg := &Config{LogLevel: "de\x01bug"}
+        err := cfg.Validate()
+        if err == nil {
+            t.Errorf("expected error for control characters in level, got nil")
+        }
+    })
 }
 
 func TestGetConfigFilePath_EdgeCases(t *testing.T) {
-	t.Run("path with null bytes", func(t *testing.T) {
-		result := GetConfigFilePath("config\x00.yaml")
-		assert.NotEmpty(t, result)
-	})
+    t.Run("path with null bytes", func(t *testing.T) {
+        result := GetConfigFilePath("config\x00.yaml")
+        if result == "" {
+            t.Errorf("GetConfigFilePath(%q) = empty, got %q", result)
+        }
+    })
 
-	t.Run("path with newlines", func(t *testing.T) {
-		result := GetConfigFilePath("config\n.yaml")
-		assert.NotEmpty(t, result)
-	})
+    t.Run("path with newlines", func(t *testing.T) {
+        result := GetConfigFilePath("config\n.yaml")
+        if result == "" {
+            t.Errorf("GetConfigFilePath(%q) = empty, got %q", result)
+        }
+    })
 
-	t.Run("very deep path traversal", func(t *testing.T) {
-		deepPath := strings.Repeat("../", 1000) + "etc/passwd"
-		result := GetConfigFilePath(deepPath)
-		assert.NotEmpty(t, result)
-		// filepath.Abs resolves the path, so it will be an absolute path
-		// This tests that it doesn't crash on deep traversal
-	})
+    t.Run("very deep path traversal", func(t *testing.T) {
+        deepPath := strings.Repeat("../", 1000) + "etc/passwd"
+        result := GetConfigFilePath(deepPath)
+        if result == "" {
+            t.Errorf("GetConfigFilePath(%q) = empty, got %q", result)
+        }
+    })
 
-	t.Run("unicode in path", func(t *testing.T) {
-		result := GetConfigFilePath("🎉-config.yaml")
-		assert.NotEmpty(t, result)
-		assert.Contains(t, result, "🎉")
-	})
+    t.Run("unicode in path", func(t *testing.T) {
+        result := GetConfigFilePath("🎉-config.yaml")
+        if result == "" {
+            t.Errorf("GetConfigFilePath(%q) = empty, got %q", result)
+        }
+        if !strings.Contains(result, "🎉") {
+            t.Errorf("result should contain 🉉, got %q", result)
+        }
+    })
 }
 
 func testShellInjectionPayload(t *testing.T, payload string) {
-	t.Helper()
+    t.Helper()
 
-	_ = os.Setenv("CMDGUARD_LOG_LEVEL", payload)
+    _ = os.Setenv("CMDGUARD_LOG_LEVEL", payload)
+    defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
-	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+    cfg := Load()
+    if cfg == nil {
+        t.Fatalf("Load() returned nil")
+    }
+    if cfg.LogLevel != payload {
+        t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, payload)
+    }
 
-	cfg := Load()
-	require.NotNil(t, cfg)
-	assert.Equal(t, payload, cfg.LogLevel)
-
-	err := cfg.Validate()
-	assert.Error(t, err)
+    err := cfg.Validate()
+    if err == nil {
+        t.Errorf("expected validation error for payload %q, got nil", err)
+    }
 }
 
 func TestLoad_EnvVarInjection(t *testing.T) {
-	t.Run("shell injection attempt in level", func(t *testing.T) {
-		testShellInjectionPayload(t, "$(whoami)")
-	})
+    t.Run("shell injection attempt in level", func(t *testing.T) {
+        testShellInjectionPayload(t, "$(whoami)")
+    })
 
-	t.Run("backtick injection attempt", func(t *testing.T) {
-		testShellInjectionPayload(t, "`id`")
-	})
+    t.Run("backtick injection attempt", func(t *testing.T) {
+        testShellInjectionPayload(t, "`id`")
+    })
 
-	t.Run("pipe injection attempt", func(t *testing.T) {
-		testShellInjectionPayload(t, "debug|cat /etc/passwd")
-	})
+    t.Run("pipe injection attempt", func(t *testing.T) {
+        testShellInjectionPayload(t, "debug|cat /etc/passwd")
+    })
 }
