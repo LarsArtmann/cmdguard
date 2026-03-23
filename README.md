@@ -2,9 +2,16 @@
 
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 
-**A Go library for building validated Cobra CLI applications with panic-at-construction-time guards and type-safe flags.**
+**A Go library for building validated CLI applications with type-safe flags and dependency injection.**
 
-This library wraps Cobra with validation that panics at construction time, ensuring invalid commands are caught immediately at startup rather than failing silently at runtime.
+cmdguard wraps [Cobra](https://github.com/spf13/cobra) with validation and provides two APIs:
+
+| API                  | Package           | Description                                |
+| -------------------- | ----------------- | ------------------------------------------ |
+| **v2** (Recommended) | `pkg/cmdguard/v2` | Type-safe, DI-powered, returns errors      |
+| v1                   | `pkg/cmdguard`    | Simple wrapper, panics on invalid commands |
+
+v2 is the recommended API—it never panics and provides full type safety for configuration and command flags.
 
 ## Installation
 
@@ -430,38 +437,41 @@ func main() {
 
 cmdguard validates commands at construction time:
 
-- **Panic on invalid commands** - Commands without handlers (`Run` or `RunE`) cause immediate panic
-- **Panic on empty names** - Commands must have a valid `Use` field
-- **Type-safe flags** - v2 API ensures flags are properly typed
+- **v2 API (recommended)** returns errors on invalid commands—no panics
+- **v1 API** panics on invalid commands for fail-fast behavior
+- **Type-safe flags** ensure flags are properly typed at compile time
+- **DI integration** (v2) enables clean service management and lifecycle handling
 
-This "fail fast" approach catches configuration errors during development, not production.
+This approach catches configuration errors during development, not production.
 
 ## Philosophy
 
-**Why panics?**
+**Why two APIs?**
 
-Go lacks compile-time macros. The closest equivalent to "fail at compile time" is "fail at init time". By panicking on invalid commands during construction:
+- **v1** panics on invalid commands—simple, fail-fast approach
+- **v2** returns errors—flexible, production-friendly, type-safe
 
-1. Errors are caught during development, not production
-2. Invalid states are impossible to represent at runtime
-3. The API is simple - no error handling boilerplate
+**When to use v2 (recommended):**
 
-**When to use cmdguard:**
+- You want type-safe flags with struct tags
+- You need dependency injection for services
+- You prefer graceful error handling over panics
+- You're building production CLIs
 
-- You want guaranteed-valid CLI configurations
-- You prefer "crash early" over "handle errors later"
-- You want type-safe flags (v2)
-- You're building CLIs where panics are acceptable (most CLIs)
+**When to use v1:**
 
-**When NOT to use cmdguard:**
-
-- You need to handle configuration errors gracefully
-- You're embedding CLI in a larger application that can't panic
+- You want a simple Cobra wrapper
+- You prefer "crash early" over error handling
+- You're building quick scripts or prototypes
 
 ## Project Status
 
-- **v1** - Stable, minimal Cobra wrapper
-- **v2** - Stable, full type-safe API with DI integration
+| API    | Status | Description                            |
+| ------ | ------ | -------------------------------------- |
+| **v2** | Stable | Full type-safe API with DI integration |
+| v1     | Stable | Simple Cobra wrapper with panics       |
+
+Both APIs are production-ready. Use v2 for new projects.
 
 ## License
 
