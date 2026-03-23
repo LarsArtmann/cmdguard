@@ -53,7 +53,7 @@ func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error
 // validateName checks that the command name is not empty.
 func validateName(name string) error {
 	if name == "" {
-		return fmt.Errorf("%w: name is required", ErrInvalidCommand)
+		return fmt.Errorf("%w: name is required, name=%q", ErrInvalidCommand, name)
 	}
 
 	return nil
@@ -95,7 +95,7 @@ func (g *GuardedCommand[T, F]) registerConfig(defaults T) error {
 
 	err := ProvideValue(g.scope, &cfg)
 	if err != nil {
-		return fmt.Errorf("failed to register config: %w", err)
+		return fmt.Errorf("failed to register config type=%T: %w", cfg, err)
 	}
 
 	g.config = &cfg
@@ -107,7 +107,7 @@ func (g *GuardedCommand[T, F]) registerConfig(defaults T) error {
 func (g *GuardedCommand[T, F]) setupFlagRegistry() error {
 	registry, err := NewFlagRegistry(g.config)
 	if err != nil {
-		return fmt.Errorf("failed to create flag registry: %w", err)
+		return fmt.Errorf("failed to create flag registry: config=%T: %w", g.config, err)
 	}
 
 	if err := ProvideValue(g.scope, registry); err != nil {

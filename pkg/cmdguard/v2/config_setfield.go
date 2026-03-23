@@ -10,7 +10,13 @@ import (
 func SetField(cfg any, fieldName string, value any) error {
 	field, err := getField(cfg, fieldName)
 	if err != nil {
-		return err
+		return fmt.Errorf(
+			"SetField: cfg=%T, fieldName=%q, value=%T: %w",
+			cfg,
+			fieldName,
+			value,
+			err,
+		)
 	}
 
 	val := reflect.ValueOf(value)
@@ -26,7 +32,13 @@ func SetField(cfg any, fieldName string, value any) error {
 	if val.Kind() == reflect.String {
 		err := setStringField(field, val.String())
 		if err != nil {
-			return err
+			return fmt.Errorf(
+				"SetField: cfg=%T, fieldName=%q, value=%q: %w",
+				cfg,
+				fieldName,
+				value,
+				err,
+			)
 		}
 
 		return nil
@@ -40,25 +52,44 @@ func SetField(cfg any, fieldName string, value any) error {
 		return nil
 	}
 
-	return fmt.Errorf("cannot convert %T to %s", value, field.Type())
+	return fmt.Errorf(
+		"SetField: cannot convert cfg=%T, fieldName=%q, value=%T to %s",
+		cfg,
+		fieldName,
+		value,
+		field.Type(),
+	)
 }
 
 // getField retrieves a field from config by name.
 func getField(cfg any, fieldName string) (reflect.Value, error) {
 	v := reflect.ValueOf(cfg)
 	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
-		return reflect.Value{}, ErrConfigNotPointer
+		return reflect.Value{}, fmt.Errorf(
+			"getField: cfg=%T, fieldName=%q: %w",
+			cfg,
+			fieldName,
+			ErrConfigNotPointer,
+		)
 	}
 
 	v = v.Elem()
 
 	field := v.FieldByName(fieldName)
 	if !field.IsValid() {
-		return reflect.Value{}, fmt.Errorf("field %q not found", fieldName)
+		return reflect.Value{}, fmt.Errorf(
+			"getField: cfg=%T, fieldName=%q not found",
+			cfg,
+			fieldName,
+		)
 	}
 
 	if !field.CanSet() {
-		return reflect.Value{}, fmt.Errorf("field %q is not settable", fieldName)
+		return reflect.Value{}, fmt.Errorf(
+			"getField: cfg=%T, fieldName=%q is not settable",
+			cfg,
+			fieldName,
+		)
 	}
 
 	return field, nil
@@ -68,18 +99,31 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 func setStringField(field reflect.Value, str string) error {
 	switch field.Type() {
 	case reflect.TypeFor[LogLevel]():
-		return parseAndSetLogLevel(field, str)
+		if err := parseAndSetLogLevel(field, str); err != nil {
+			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+		}
+		return nil
 	case reflect.TypeFor[LogFormat]():
-		return parseAndSetLogFormat(field, str)
+		if err := parseAndSetLogFormat(field, str); err != nil {
+			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+		}
+		return nil
 	case reflect.TypeFor[Duration]():
-		return parseAndSetDuration(field, str)
+		if err := parseAndSetDuration(field, str); err != nil {
+			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+		}
+		return nil
 	case reflect.TypeFor[Enum]():
 		field.Set(reflect.ValueOf(Enum{value: str}))
 
 		return nil
 	}
 
-	return fmt.Errorf("unsupported string conversion for %s", field.Type())
+	return fmt.Errorf(
+		"setStringField: field=%s, str=%q: unsupported string conversion",
+		field.Type(),
+		str,
+	)
 }
 
 // parseAndSetLogLevel parses and sets a LogLevel field.

@@ -66,14 +66,14 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	err := ProvideValue(cli.scope, &cfg)
 	if err != nil {
-		return fmt.Errorf("failed to register config: %w", err)
+		return fmt.Errorf("failed to register config type=%T: %w", cfg, err)
 	}
 
 	cli.config = &cfg
 
 	registry, err := NewFlagRegistry(cli.config)
 	if err != nil {
-		return fmt.Errorf("failed to create flag registry: %w", err)
+		return fmt.Errorf("failed to create flag registry: config=%T: %w", cli.config, err)
 	}
 
 	err = ProvideValue(cli.scope, registry)

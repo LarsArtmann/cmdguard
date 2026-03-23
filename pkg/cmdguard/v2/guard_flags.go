@@ -19,8 +19,9 @@ func FlagTypeConstraint[F any]() error {
 	// Nil type means F is an untyped nil interface - not valid
 	if t == nil {
 		return fmt.Errorf(
-			"%w: flag type F must be a struct or pointer to struct, got untyped nil",
+			"%w: flag type F must be a struct or pointer to struct, got untyped nil, type=%T",
 			ErrInvalidFlagType,
+			zero,
 		)
 	}
 
@@ -41,15 +42,17 @@ func FlagTypeConstraint[F any]() error {
 		reflect.Array, reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Slice,
 		reflect.String, reflect.UnsafePointer:
 		return fmt.Errorf(
-			"%w: flag type F must be struct or *struct, got %s",
+			"%w: flag type F must be struct or *struct, got %s, type=%T",
 			ErrInvalidFlagType,
 			t,
+			zero,
 		)
 	default:
 		return fmt.Errorf(
-			"%w: flag type F must be struct or *struct, got %s",
+			"%w: flag type F must be struct or *struct, got %s, type=%T",
 			ErrInvalidFlagType,
 			t,
+			zero,
 		)
 	}
 }
@@ -184,7 +187,13 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 	if registry != nil {
 		err := registry.ParseFlags(c, flagsPtr)
 		if err != nil {
-			return flagsCopy, fmt.Errorf("parse flags: %w", err)
+			return flagsCopy, fmt.Errorf(
+				"parse flags: command=%q, registry=%T, flags=%T: %w",
+				c.Name(),
+				registry,
+				flags,
+				err,
+			)
 		}
 		// Copy parsed values back to flagsCopy if it was a struct
 		t := reflect.TypeOf(flagsCopy)

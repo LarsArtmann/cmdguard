@@ -78,8 +78,8 @@ func TestRegisterInScope(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "invalid type") {
-			t.Errorf("expected error to contain 'invalid type', got: %v", err)
+		if !strings.Contains(err.Error(), "provider type=") {
+			t.Errorf("expected error to contain 'provider type=', got: %v", err)
 		}
 
 		if child != nil {

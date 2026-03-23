@@ -63,7 +63,7 @@ func (s *Scope) Injector() do.Injector {
 // Returns an error if registration fails.
 func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
-		return fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+		return fmt.Errorf("%w: scope is nil, provider=%T", ErrInvalidScope, provider)
 	}
 
 	do.Provide(scope.injector, provider)
@@ -76,7 +76,7 @@ func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 // Returns an error if registration fails.
 func ProvideNamed[T any](scope *Scope, name string, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
-		return fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+		return fmt.Errorf("%w: scope is nil, name=%q, provider=%T", ErrInvalidScope, name, provider)
 	}
 
 	do.ProvideNamed(scope.injector, name, provider)
@@ -88,7 +88,7 @@ func ProvideNamed[T any](scope *Scope, name string, provider func(do.Injector) (
 // Useful for registering already-constructed services.
 func ProvideValue[T any](scope *Scope, value T) error {
 	if scope == nil {
-		return fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+		return fmt.Errorf("%w: scope is nil, value type=%T", ErrInvalidScope, value)
 	}
 
 	do.ProvideValue(scope.injector, value)
@@ -101,7 +101,7 @@ func ProvideValue[T any](scope *Scope, value T) error {
 func Invoke[T any](scope *Scope) (T, error) {
 	var zero T
 	if scope == nil {
-		return zero, fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+		return zero, fmt.Errorf("%w: scope is nil, result type=%T", ErrInvalidScope, zero)
 	}
 
 	return do.Invoke[T](scope.injector)
@@ -112,7 +112,12 @@ func Invoke[T any](scope *Scope) (T, error) {
 func InvokeNamed[T any](scope *Scope, name string) (T, error) {
 	var zero T
 	if scope == nil {
-		return zero, fmt.Errorf("%w: scope is nil", ErrInvalidScope)
+		return zero, fmt.Errorf(
+			"%w: scope is nil, name=%q, result type=%T",
+			ErrInvalidScope,
+			name,
+			zero,
+		)
 	}
 
 	return do.InvokeNamed[T](scope.injector, name)
@@ -230,7 +235,12 @@ func ScopedProvider[T any](
 // Returns the child scope for further operations.
 func RegisterInScope(parent *Scope, name string, providers ...any) (*Scope, error) {
 	if parent == nil {
-		return nil, fmt.Errorf("%w: parent scope is nil", ErrInvalidScope)
+		return nil, fmt.Errorf(
+			"%w: parent scope is nil, name=%q, providers=%d",
+			ErrInvalidScope,
+			name,
+			len(providers),
+		)
 	}
 
 	child := parent.Child(name)
@@ -241,8 +251,10 @@ func RegisterInScope(parent *Scope, name string, providers ...any) (*Scope, erro
 			do.Provide(child.injector, fn)
 		default:
 			return nil, fmt.Errorf(
-				"%w: provider %d has invalid type %T, expected func(do.Injector) (T, error)",
+				"%w: scope=%q, providers=%d, provider index=%d, provider type=%T",
 				ErrServiceRegistration,
+				name,
+				len(providers),
 				providerIndex,
 				provider,
 			)
