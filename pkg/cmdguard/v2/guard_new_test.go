@@ -189,3 +189,76 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 		}
 	})
 }
+
+func TestNewSimple(t *testing.T) {
+	t.Run("creates SimpleCLI with defaults", func(t *testing.T) {
+		g, err := NewSimple[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if g == nil {
+			t.Fatal("expected non-nil SimpleCLI")
+		}
+
+		if g.Name() != "myapp" {
+			t.Errorf("Name() = %q, want %q", g.Name(), "myapp")
+		}
+
+		if g.Short() != "My CLI" {
+			t.Errorf("Short() = %q, want %q", g.Short(), "My CLI")
+		}
+	})
+
+	t.Run("returns error for empty name", func(t *testing.T) {
+		g, err := NewSimple[testAppConfig]("", "My CLI", testAppConfig{})
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if g != nil {
+			t.Errorf("expected nil SimpleCLI, got %v", g)
+		}
+	})
+}
+
+func TestNewSimpleWithLong(t *testing.T) {
+	t.Run("creates SimpleCLI with long description", func(t *testing.T) {
+		g, err := NewSimpleWithLong[testAppConfig](
+			"myapp",
+			"short",
+			"long description",
+			testAppConfig{},
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if g == nil {
+			t.Fatal("expected non-nil SimpleCLI")
+		}
+
+		if g.Name() != "myapp" {
+			t.Errorf("Name() = %q, want %q", g.Name(), "myapp")
+		}
+
+		if g.Short() != "short" {
+			t.Errorf("Short() = %q, want %q", g.Short(), "short")
+		}
+
+		if g.Long() != "long description" {
+			t.Errorf("Long() = %q, want %q", g.Long(), "long description")
+		}
+	})
+
+	t.Run("returns error for empty name", func(t *testing.T) {
+		g, err := NewSimpleWithLong[testAppConfig]("", "short", "long", testAppConfig{})
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if g != nil {
+			t.Errorf("expected nil SimpleCLI, got %v", g)
+		}
+	})
+}

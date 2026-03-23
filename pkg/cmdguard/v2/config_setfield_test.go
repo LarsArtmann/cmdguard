@@ -149,6 +149,28 @@ func TestSetField(t *testing.T) {
 		}
 	})
 
+	t.Run("invalid LogFormat", func(t *testing.T) {
+		cfg := &struct {
+			Format LogFormat
+		}{}
+
+		err := SetField(cfg, "Format", "invalid-format")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+	})
+
+	t.Run("invalid Duration", func(t *testing.T) {
+		cfg := &struct {
+			Timeout Duration
+		}{}
+
+		err := SetField(cfg, "Timeout", "not-a-duration")
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+	})
+
 	t.Run("incompatible types", func(t *testing.T) {
 		cfg := &struct {
 			Name string

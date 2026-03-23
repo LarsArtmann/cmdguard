@@ -45,6 +45,22 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 			expected: 42,
 		},
 		{
+			name: "uint default",
+			tag: FlagTag{
+				Type:    reflect.TypeFor[uint](),
+				Default: "42",
+			},
+			expected: uint(42),
+		},
+		{
+			name: "uint32 default",
+			tag: FlagTag{
+				Type:    reflect.TypeFor[uint32](),
+				Default: "4294967295",
+			},
+			expected: uint(4294967295),
+		},
+		{
 			name: "float64 default",
 			tag: FlagTag{
 				Type:    reflect.TypeFor[float64](),
