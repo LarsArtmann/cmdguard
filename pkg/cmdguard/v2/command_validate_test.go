@@ -21,7 +21,9 @@ func newTestCommand() Command[testConfig, NoFlags] {
 }
 
 func TestCommand_Validate(t *testing.T) {
+	t.Parallel()
 	t.Run("valid command with RunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
@@ -36,6 +38,7 @@ func TestCommand_Validate(t *testing.T) {
 	})
 
 	t.Run("valid command with subcommands", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
@@ -55,6 +58,7 @@ func TestCommand_Validate(t *testing.T) {
 	})
 
 	t.Run("error: empty Use field", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 				return nil
@@ -76,6 +80,7 @@ func TestCommand_Validate(t *testing.T) {
 	})
 
 	t.Run("error: no RunE and no subcommands", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 		}
@@ -95,6 +100,7 @@ func TestCommand_Validate(t *testing.T) {
 	})
 
 	t.Run("validates subcommands recursively", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
@@ -125,6 +131,7 @@ func TestCommand_Validate(t *testing.T) {
 	})
 
 	t.Run("error: duplicate subcommand names", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
@@ -158,6 +165,7 @@ func TestCommand_Validate(t *testing.T) {
 	})
 
 	t.Run("valid with flags", func(t *testing.T) {
+		t.Parallel()
 		type flags struct {
 			Verbose bool `default:"false" flag:"verbose"`
 		}
@@ -178,7 +186,9 @@ func TestCommand_Validate(t *testing.T) {
 }
 
 func TestCommand_HasSubcommands(t *testing.T) {
+	t.Parallel()
 	t.Run("returns true with subcommands", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
@@ -193,6 +203,7 @@ func TestCommand_HasSubcommands(t *testing.T) {
 	})
 
 	t.Run("returns false without subcommands", func(t *testing.T) {
+		t.Parallel()
 		cmd := newTestCommand()
 		if cmd.HasSubcommands() {
 			t.Error("HasSubcommands() = true, want false")
@@ -201,7 +212,9 @@ func TestCommand_HasSubcommands(t *testing.T) {
 }
 
 func TestCommand_HasHandler(t *testing.T) {
+	t.Parallel()
 	t.Run("returns true with RunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := newTestCommand()
 		if !cmd.HasHandler() {
 			t.Error("HasHandler() = false, want true")
@@ -209,6 +222,7 @@ func TestCommand_HasHandler(t *testing.T) {
 	})
 
 	t.Run("returns false without RunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 		}
@@ -219,7 +233,9 @@ func TestCommand_HasHandler(t *testing.T) {
 }
 
 func TestCommand_IsExecutable(t *testing.T) {
+	t.Parallel()
 	t.Run("returns true with RunE and no subcommands", func(t *testing.T) {
+		t.Parallel()
 		cmd := newTestCommand()
 		if !cmd.IsExecutable() {
 			t.Error("IsExecutable() = false, want true")
@@ -227,6 +243,7 @@ func TestCommand_IsExecutable(t *testing.T) {
 	})
 
 	t.Run("returns false without RunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
 		}

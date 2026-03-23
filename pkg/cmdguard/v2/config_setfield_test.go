@@ -7,7 +7,9 @@ import (
 )
 
 func TestSetField(t *testing.T) {
+	t.Parallel()
 	t.Run("set string field", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Name string
 		}{}
@@ -23,6 +25,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("set int field", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Count int
 		}{}
@@ -38,6 +41,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("set bool field", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Enabled bool
 		}{}
@@ -53,6 +57,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("non-pointer config", func(t *testing.T) {
+		t.Parallel()
 		cfg := struct{ Name string }{}
 
 		err := SetField(cfg, "Name", "test")
@@ -66,6 +71,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("field not found", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct{ Name string }{}
 
 		err := SetField(cfg, "Missing", "test")
@@ -79,6 +85,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("string to LogLevel", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Level LogLevel
 		}{}
@@ -94,6 +101,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("string to LogFormat", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Format LogFormat
 		}{}
@@ -109,6 +117,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("string to Duration", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Timeout Duration
 		}{}
@@ -124,6 +133,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("time.Duration to Duration", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Timeout Duration
 		}{}
@@ -139,6 +149,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("invalid LogLevel", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Level LogLevel
 		}{}
@@ -150,6 +161,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("invalid LogFormat", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Format LogFormat
 		}{}
@@ -161,6 +173,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("invalid Duration", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Timeout Duration
 		}{}
@@ -172,6 +185,7 @@ func TestSetField(t *testing.T) {
 	})
 
 	t.Run("incompatible types", func(t *testing.T) {
+		t.Parallel()
 		cfg := &struct {
 			Name string
 		}{}

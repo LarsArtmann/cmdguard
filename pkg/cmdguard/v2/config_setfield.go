@@ -47,7 +47,15 @@ func SetField(cfg any, fieldName string, value any) error {
 	// Handle time.Duration to Duration conversion
 	if val.Type() == reflect.TypeFor[time.Duration]() &&
 		field.Type() == reflect.TypeFor[Duration]() {
-		field.Set(reflect.ValueOf(FromDuration(val.Interface().(time.Duration))))
+		duration, ok := val.Interface().(time.Duration)
+		if !ok {
+			return fmt.Errorf(
+				"SetField: internal error: type assertion failed for time.Duration, cfg=%T, fieldName=%q",
+				cfg,
+				fieldName,
+			)
+		}
+		field.Set(reflect.ValueOf(FromDuration(duration)))
 
 		return nil
 	}

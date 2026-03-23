@@ -7,7 +7,9 @@ import (
 )
 
 func TestCommandOptions(t *testing.T) {
+	t.Parallel()
 	t.Run("WithShort", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithShort[testConfig, NoFlags]("short description")(&cmd)
 
@@ -17,6 +19,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithLong", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithLong[testConfig, NoFlags]("long description")(&cmd)
 
@@ -26,6 +29,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithAliases", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithAliases[testConfig, NoFlags]("alias1", "alias2")(&cmd)
 
@@ -35,6 +39,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithExample", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithExample[testConfig, NoFlags]("example usage")(&cmd)
 
@@ -44,6 +49,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithFlags", func(t *testing.T) {
+		t.Parallel()
 		type flags struct {
 			Verbose bool `flag:"verbose"`
 		}
@@ -58,6 +64,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithRunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
@@ -70,6 +77,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithPreRunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
@@ -82,6 +90,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithPostRunE", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
 			return nil
@@ -94,6 +103,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithSubcommands", func(t *testing.T) {
+		t.Parallel()
 		subCmd := Command[testConfig, NoFlags]{
 			Use: "sub",
 			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
@@ -113,6 +123,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithHidden", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithHidden[testConfig, NoFlags](true)(&cmd)
 
@@ -128,6 +139,7 @@ func TestCommandOptions(t *testing.T) {
 	})
 
 	t.Run("WithDeprecated", func(t *testing.T) {
+		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithDeprecated[testConfig, NoFlags]("use new-cmd instead")(&cmd)
 
@@ -138,7 +150,9 @@ func TestCommandOptions(t *testing.T) {
 }
 
 func TestNewCommand(t *testing.T) {
+	t.Parallel()
 	t.Run("creates valid command", func(t *testing.T) {
+		t.Parallel()
 		cmd, err := NewCommand[testConfig, NoFlags](
 			"test",
 			WithShort[testConfig, NoFlags]("short description"),
@@ -166,6 +180,7 @@ func TestNewCommand(t *testing.T) {
 	})
 
 	t.Run("error: empty use", func(t *testing.T) {
+		t.Parallel()
 		cmd, err := NewCommand[testConfig, NoFlags](
 			"",
 			WithRunE(
@@ -188,6 +203,7 @@ func TestNewCommand(t *testing.T) {
 	})
 
 	t.Run("error: validation fails", func(t *testing.T) {
+		t.Parallel()
 		_, err := NewCommand[testConfig, NoFlags]("test")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -200,7 +216,9 @@ func TestNewCommand(t *testing.T) {
 }
 
 func TestCommand_CompleteStructure(t *testing.T) {
+	t.Parallel()
 	t.Run("creates command with all fields", func(t *testing.T) {
+		t.Parallel()
 		subCmd := Command[testConfig, NoFlags]{
 			Use:   "sub",
 			Short: "subcommand",

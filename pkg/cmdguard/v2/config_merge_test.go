@@ -5,7 +5,9 @@ import (
 )
 
 func TestMergeConfigs(t *testing.T) {
+	t.Parallel()
 	t.Run("empty configs", func(t *testing.T) {
+		t.Parallel()
 		result := MergeConfigs[int]()
 		if result != nil {
 			t.Errorf("expected nil, got %v", result)
@@ -13,6 +15,7 @@ func TestMergeConfigs(t *testing.T) {
 	})
 
 	t.Run("single config", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string
 		}
@@ -30,6 +33,7 @@ func TestMergeConfigs(t *testing.T) {
 	})
 
 	t.Run("merge two configs", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name  string
 			Count int
@@ -53,6 +57,7 @@ func TestMergeConfigs(t *testing.T) {
 	})
 
 	t.Run("nil base config", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string
 		}
@@ -70,6 +75,7 @@ func TestMergeConfigs(t *testing.T) {
 	})
 
 	t.Run("nil override config", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string
 		}
@@ -87,6 +93,7 @@ func TestMergeConfigs(t *testing.T) {
 	})
 
 	t.Run("nested struct merge", func(t *testing.T) {
+		t.Parallel()
 		type Inner struct {
 			Value string
 		}
@@ -114,6 +121,7 @@ func TestMergeConfigs(t *testing.T) {
 	})
 
 	t.Run("multiple configs", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			A string
 			B string

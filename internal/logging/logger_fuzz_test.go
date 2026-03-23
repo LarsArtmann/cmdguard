@@ -102,7 +102,7 @@ func FuzzParseFormat(f *testing.F) {
 func FuzzValidLevel(f *testing.F) {
 	validLevels := []string{"debug", "info", "warn", "error"}
 	for _, level := range validLevels {
-		f.Add(level, true)
+		f.Add(level)
 	}
 
 	corpus := []string{
@@ -112,13 +112,21 @@ func FuzzValidLevel(f *testing.F) {
 		"🎉", "debug\x00",
 	}
 	for _, s := range corpus {
-		f.Add(s, false)
+		f.Add(s)
 	}
 
-	f.Fuzz(func(t *testing.T, level string, expectValid bool) {
+	validSet := map[string]bool{
+		"debug": true,
+		"info":  true,
+		"warn":  true,
+		"error": true,
+	}
+
+	f.Fuzz(func(t *testing.T, level string) {
 		result := ValidLevel(level)
-		if result != expectValid {
-			t.Errorf("ValidLevel(%q) = %v, want %v", level, result, expectValid)
+		expected := validSet[level]
+		if result != expected {
+			t.Errorf("ValidLevel(%q) = %v, want %v", level, result, expected)
 		}
 	})
 }
@@ -126,7 +134,7 @@ func FuzzValidLevel(f *testing.F) {
 func FuzzValidFormat(f *testing.F) {
 	validFormats := []string{"text", "json"}
 	for _, format := range validFormats {
-		f.Add(format, true)
+		f.Add(format)
 	}
 
 	corpus := []string{
@@ -136,13 +144,19 @@ func FuzzValidFormat(f *testing.F) {
 		"🎉", "json\x00",
 	}
 	for _, s := range corpus {
-		f.Add(s, false)
+		f.Add(s)
 	}
 
-	f.Fuzz(func(t *testing.T, format string, expectValid bool) {
+	validSet := map[string]bool{
+		"text": true,
+		"json": true,
+	}
+
+	f.Fuzz(func(t *testing.T, format string) {
 		result := ValidFormat(format)
-		if result != expectValid {
-			t.Errorf("ValidFormat(%q) = %v, want %v", format, result, expectValid)
+		expected := validSet[format]
+		if result != expected {
+			t.Errorf("ValidFormat(%q) = %v, want %v", format, result, expected)
 		}
 	})
 }

@@ -7,6 +7,7 @@ import (
 )
 
 func TestFlagTag_DefaultValue(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		tag      FlagTag
@@ -104,6 +105,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			result := tc.tag.DefaultValue()
 			if !reflect.DeepEqual(tc.expected, result) {
 				t.Errorf("expected %v, got %v", tc.expected, result)
@@ -113,7 +115,9 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 }
 
 func TestConfig_DefaultConfig(t *testing.T) {
+	t.Parallel()
 	t.Run("default values", func(t *testing.T) {
+		t.Parallel()
 		cfg := Config{}
 
 		tags, err := ParseFlagTags(cfg)

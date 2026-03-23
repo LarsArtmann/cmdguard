@@ -67,7 +67,9 @@ func createFlagPrototype[F any](flags F) F {
 
 	t := reflect.TypeOf(zero)
 	if t != nil && t.Kind() == reflect.Pointer {
-		return reflect.New(t.Elem()).Interface().(F)
+		if proto, ok := reflect.New(t.Elem()).Interface().(F); ok {
+			return proto
+		}
 	}
 
 	return zero
@@ -119,7 +121,12 @@ func cloneFlags[F any](flags F) F {
 		// Copy the value
 		newPtr.Elem().Set(v.Elem())
 
-		return newPtr.Interface().(F)
+		if cloned, ok := newPtr.Interface().(F); ok {
+			return cloned
+		}
+		var zero F
+
+		return zero
 	}
 
 	// Handle struct directly
@@ -127,7 +134,12 @@ func cloneFlags[F any](flags F) F {
 		newStruct := reflect.New(v.Type()).Elem()
 		newStruct.Set(v)
 
-		return newStruct.Interface().(F)
+		if cloned, ok := newStruct.Interface().(F); ok {
+			return cloned
+		}
+		var zero F
+
+		return zero
 	}
 
 	// For other types, return as-is (can't clone safely)
@@ -156,13 +168,27 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 		if t.Kind() == reflect.Pointer {
 			// Create new instance of the underlying type
 			newVal := reflect.New(t.Elem())
-			flagsCopy = newVal.Interface().(F)
-			flagsPtr = flagsCopy
+			if fc, ok := newVal.Interface().(F); ok {
+				flagsCopy = fc
+				flagsPtr = flagsCopy
+			} else {
+				return zero, fmt.Errorf(
+					"cloneAndParseFlags: failed to create flag instance for type %T",
+					zero,
+				)
+			}
 		} else {
 			// F is a struct type (like NoFlags) - create pointer for parsing
 			newPtr := reflect.New(t)
 			flagsPtr = newPtr.Interface()
-			flagsCopy = newPtr.Elem().Interface().(F)
+			if fc, ok := newPtr.Elem().Interface().(F); ok {
+				flagsCopy = fc
+			} else {
+				return zero, fmt.Errorf(
+					"cloneAndParseFlags: failed to create flag instance for type %T",
+					zero,
+				)
+			}
 		}
 	} else {
 		// Clone the flags struct
@@ -199,7 +225,9 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 		t := reflect.TypeOf(flagsCopy)
 		if t != nil && t.Kind() != reflect.Pointer {
 			// flagsPtr is *F, dereference to get the parsed values
-			flagsCopy = reflect.ValueOf(flagsPtr).Elem().Interface().(F)
+			if fc, ok := reflect.ValueOf(flagsPtr).Elem().Interface().(F); ok {
+				flagsCopy = fc
+			}
 		}
 	}
 
