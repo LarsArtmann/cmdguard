@@ -1,8 +1,8 @@
-// Package errors provides custom error types and error handling utilities.
+// Package apperrors provides custom error types and error handling utilities.
 //
 // This package defines application-specific error types that can be used
 // throughout the codebase for consistent error handling and reporting.
-package errors
+package apperrors
 
 // CodedError is an error with an associated code for categorization.
 type CodedError struct {

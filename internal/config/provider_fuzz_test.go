@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -162,9 +161,10 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", value) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
-
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+		t.Setenv(
+			"CMDGUARD_LOG_LEVEL",
+			value,
+		)
 
 		cfg := Load()
 		if cfg == nil {
@@ -190,9 +190,10 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv("CMDGUARD_LOG_FORMAT", value) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
-
-		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
+		t.Setenv(
+			"CMDGUARD_LOG_FORMAT",
+			value,
+		)
 
 		cfg := Load()
 		if cfg == nil {
@@ -217,9 +218,10 @@ func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", value) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
-
-		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
+		t.Setenv(
+			"CMDGUARD_STRICT_MODE",
+			value,
+		)
 
 		cfg := Load()
 		if cfg == nil {
@@ -380,15 +382,11 @@ func FuzzKoanfLoader_LoadEnv(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, level, format string) {
 		if level != "" {
-			_ = os.Setenv("CMDGUARD_LOG_LEVEL", level) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
-
-			defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+			t.Setenv("CMDGUARD_LOG_LEVEL", level)
 		}
 
 		if format != "" {
-			_ = os.Setenv("CMDGUARD_LOG_FORMAT", format) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
-
-			defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
+			t.Setenv("CMDGUARD_LOG_FORMAT", format)
 		}
 
 		loader := NewLoader()

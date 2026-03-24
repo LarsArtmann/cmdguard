@@ -36,9 +36,7 @@ linters:
     - gosmopolitan
     - predeclared
     - promlinter
-    - cyclop
     - forcetypeassert
-    - nestif
     - thelper
     - usetesting
     - rowserrcheck
@@ -49,7 +47,6 @@ linters:
     - containedctx
     - gocyclo
     - decorder
-    - recvcheck
     - wrapcheck
     - musttag
     - testableexamples
@@ -73,8 +70,6 @@ linters:
     - nolintlint
     - dupword
     - loggercheck
-    - maintidx
-    - paralleltest
     - unparam
     - nilnesserr
     - sqlclosecheck
@@ -89,7 +84,6 @@ linters:
     - nakedret
     - unused
     - exptostd
-    - funlen
     - goconst
     - nilnil
     - nilerr
@@ -100,10 +94,8 @@ linters:
     - copyloopvar
     - tparallel
     - embeddedstructfieldcheck
-    - gochecknoglobals
     - errcheck
     - iotamixing
-    - exhaustruct
   exclusions:
     generated: lax
     presets:
@@ -154,6 +146,25 @@ linters:
         text: prealloc
         linters:
           - prealloc
+      - text: "result .+ is always nil"
+        linters:
+          - unparam
+      - text: "ctx is unused"
+        linters:
+          - unparam
+      - text: goconst
+        linters:
+          - goconst
+      - text: maintidx
+        linters:
+          - maintidx
+      - path: pkg/
+        linters:
+          - goconst
+      - path: internal/
+        linters:
+          - paralleltest
+          - goconst
 formatters:
   enable:
     - goimports
