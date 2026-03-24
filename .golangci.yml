@@ -10,92 +10,100 @@ output:
   formats: {}
 linters:
   enable:
-    - noctx
-    - revive
+    - goconst
+    - gochecknoglobals
+    - gochecksumtype
     - whitespace
-    - nonamedreturns
-    - tagliatelle
-    - exhaustive
-    - iface
-    - gocognit
-    - sloglint
-    - modernize
-    - grouper
-    - testifylint
-    - usestdlibvars
-    - goheader
     - fatcontext
-    - godox
-    - goprintffuncname
-    - dupl
-    - durationcheck
-    - ginkgolinter
     - errchkjson
     - mirror
     - gosec
-    - gosmopolitan
-    - predeclared
-    - promlinter
-    - forcetypeassert
-    - thelper
-    - usetesting
-    - rowserrcheck
-    - spancheck
     - asciicheck
-    - interfacebloat
-    - zerologlint
-    - containedctx
-    - gocyclo
-    - decorder
-    - wrapcheck
-    - musttag
     - testableexamples
-    - reassign
-    - nosprintfhostport
-    - wastedassign
-    - canonicalheader
-    - prealloc
-    - ineffassign
-    - errorlint
     - bidichk
-    - gochecksumtype
-    - makezero
-    - asasalint
-    - contextcheck
-    - unconvert
-    - bodyclose
-    - arangolint
-    - importas
-    - govet
-    - nolintlint
-    - dupword
-    - loggercheck
-    - unparam
-    - nilnesserr
-    - sqlclosecheck
-    - dogsled
-    - misspell
-    - gomodguard
-    - gochecknoinits
-    - unqueryvet
-    - errname
-    - perfsprint
-    - staticcheck
-    - nakedret
     - unused
-    - exptostd
-    - goconst
-    - nilnil
     - nilerr
-    - gocritic
+    - recvcheck
+    - testifylint
+    - sqlclosecheck
+    - errname
+    - nonamedreturns
+    - goheader
+    - promlinter
+    - containedctx
+    - musttag
+    - asasalint
+    - govet
     - intrange
+    - revive
+    - godox
+    - durationcheck
+    - contextcheck
     - godot
+    - goprintffuncname
+    - thelper
+    - spancheck
+    - reassign
+    - nakedret
     - protogetter
     - copyloopvar
-    - tparallel
+    - cyclop
+    - wrapcheck
+    - nilnesserr
+    - gomodguard
+    - zerologlint
+    - loggercheck
+    - staticcheck
+    - exptostd
+    - paralleltest
+    - dupl
+    - gosmopolitan
+    - predeclared
+    - prealloc
+    - errorlint
+    - exhaustruct
+    - funlen
+    - gocognit
+    - modernize
+    - usestdlibvars
+    - nolintlint
+    - gocritic
     - embeddedstructfieldcheck
+    - makezero
+    - importas
+    - unparam
+    - perfsprint
+    - noctx
+    - sloglint
+    - ginkgolinter
+    - rowserrcheck
+    - gochecknoinits
+    - nilnil
     - errcheck
+    - maintidx
+    - canonicalheader
+    - ineffassign
+    - dogsled
+    - unqueryvet
+    - tparallel
     - iotamixing
+    - usetesting
+    - gocyclo
+    - decorder
+    - unconvert
+    - nestif
+    - tagliatelle
+    - exhaustive
+    - grouper
+    - forcetypeassert
+    - interfacebloat
+    - wastedassign
+    - dupword
+    - misspell
+    - iface
+    - nosprintfhostport
+    - bodyclose
+    - arangolint
   exclusions:
     generated: lax
     presets:
@@ -146,10 +154,10 @@ linters:
         text: prealloc
         linters:
           - prealloc
-      - text: "result .+ is always nil"
+      - text: result .+ is always nil
         linters:
           - unparam
-      - text: "ctx is unused"
+      - text: ctx is unused
         linters:
           - unparam
       - text: goconst

@@ -8,6 +8,8 @@ import (
 
 // Enum provides type-safe enum values with validation.
 // Use this for config fields that must be one of a set of allowed values.
+//
+//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
 type Enum struct {
 	value   string
 	allowed []string
@@ -44,6 +46,8 @@ func (e Enum) IsEmpty() bool {
 }
 
 // Duration wraps time.Duration with parsing validation.
+//
+//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
 type Duration struct {
 	duration time.Duration
 }
@@ -90,9 +94,13 @@ func (d Duration) Seconds() float64 {
 }
 
 // LogLevel is a type-safe log level enum.
+//
+//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
 type LogLevel Enum
 
 // Log level constants.
+//
+//nolint:gochecknoglobals // Predefined constants for type-safe defaults
 var (
 	LogLevelDebug = LogLevel{value: "debug", allowed: []string{"debug", "info", "warn", "error"}}
 	LogLevelInfo  = LogLevel{value: "info", allowed: []string{"debug", "info", "warn", "error"}}
@@ -132,9 +140,13 @@ func (l LogLevel) SlogLevel() slog.Level {
 }
 
 // LogFormat is a type-safe log format enum.
+//
+//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
 type LogFormat Enum
 
 // Log format constants.
+//
+//nolint:gochecknoglobals // Predefined constants for type-safe defaults
 var (
 	LogFormatText = LogFormat{value: "text", allowed: []string{"text", "json"}}
 	LogFormatJSON = LogFormat{value: "json", allowed: []string{"text", "json"}}
