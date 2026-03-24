@@ -120,7 +120,7 @@ func (g *GuardedCommand[T, F]) setupFlagRegistry() error {
 		return fmt.Errorf("failed to register global flags: %w", err)
 	}
 
-	g.rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
+	g.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
 		return registry.ParseFlags(c, g.config)
 	}
 

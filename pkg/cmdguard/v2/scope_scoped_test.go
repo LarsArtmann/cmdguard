@@ -11,7 +11,7 @@ func TestScopedProvider(t *testing.T) {
 	t.Run("creates provider in child scope", func(t *testing.T) {
 		parent := NewScope("parent")
 
-		provider := ScopedProvider(parent, "plugin", func(i do.Injector) (string, error) {
+		provider := ScopedProvider(parent, "plugin", func(_ do.Injector) (string, error) {
 			return "plugin-value", nil
 		})
 
@@ -45,7 +45,7 @@ func TestRegisterInScope(t *testing.T) {
 	t.Run("creates child scope with providers", func(t *testing.T) {
 		parent := NewScope("parent")
 
-		provider := func(i do.Injector) (any, error) {
+		provider := func(_ do.Injector) (any, error) {
 			return "service-value", nil
 		}
 
@@ -90,7 +90,7 @@ func TestRegisterInScope(t *testing.T) {
 	t.Run("supports single provider", func(t *testing.T) {
 		parent := NewScope("parent")
 
-		provider := func(i do.Injector) (any, error) {
+		provider := func(_ do.Injector) (any, error) {
 			return "single-value", nil
 		}
 

@@ -14,7 +14,7 @@ type testConfig struct {
 func newTestCommand() Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
 		Use: "test",
-		RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			return nil
 		},
 	}
@@ -26,7 +26,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -44,7 +44,7 @@ func TestCommand_Validate(t *testing.T) {
 			Commands: []Command[testConfig, NoFlags]{
 				{
 					Use: "sub",
-					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 						return nil
 					},
 				},
@@ -60,7 +60,7 @@ func TestCommand_Validate(t *testing.T) {
 	t.Run("error: empty Use field", func(t *testing.T) {
 		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{
-			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -106,7 +106,7 @@ func TestCommand_Validate(t *testing.T) {
 			Commands: []Command[testConfig, NoFlags]{
 				{
 					Use: "valid-sub",
-					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 						return nil
 					},
 				},
@@ -137,13 +137,13 @@ func TestCommand_Validate(t *testing.T) {
 			Commands: []Command[testConfig, NoFlags]{
 				{
 					Use: "duplicate",
-					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 						return nil
 					},
 				},
 				{
 					Use: "duplicate",
-					RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 						return nil
 					},
 				},
@@ -173,7 +173,7 @@ func TestCommand_Validate(t *testing.T) {
 		cmd := Command[testConfig, *flags]{
 			Use:   "test",
 			Flags: &flags{},
-			RunE: func(ctx context.Context, cfg *testConfig, flags *flags) error {
+			RunE: func(_ context.Context, _ *testConfig, _ *flags) error {
 				return nil
 			},
 		}

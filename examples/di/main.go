@@ -133,7 +133,7 @@ func main() {
 			if err != nil {
 				fmt.Printf("Health check FAILED: %v\n", err)
 
-				return err
+				return fmt.Errorf("health check failed: %w", err)
 			}
 
 			fmt.Println("All health checks PASSED!")
@@ -176,7 +176,7 @@ func main() {
 			if err != nil {
 				fmt.Printf("Shutdown error: %v\n", err)
 
-				return err
+				return fmt.Errorf("shutdown failed: %w", err)
 			}
 
 			fmt.Println("Shutdown complete!")

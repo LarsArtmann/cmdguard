@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/charmbracelet/fang"
@@ -13,7 +14,11 @@ import (
 // Returns an error if execution fails (never panics).
 // Uses fang for beautiful error styling.
 func (g *GuardedCommand[T, F]) Execute(ctx context.Context) error {
-	return fang.Execute(ctx, g.rootCmd)
+	if err := fang.Execute(ctx, g.rootCmd); err != nil {
+		return fmt.Errorf("failed to execute CLI: %w", err)
+	}
+
+	return nil
 }
 
 // ExecuteWithArgs runs the CLI application with specific arguments.

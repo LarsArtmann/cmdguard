@@ -141,7 +141,7 @@ func MergeConfigs[T any](configs ...*T) *T {
 
 // mergeStruct merges non-zero fields from src into dst.
 func mergeStruct(dst, src reflect.Value) {
-	for i := 0; i < dst.NumField(); i++ {
+	for i := range dst.NumField() {
 		dstField := dst.Field(i)
 		srcField := src.Field(i)
 

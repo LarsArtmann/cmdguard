@@ -16,7 +16,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -60,7 +60,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		subCmd := Command[testAppConfig, NoFlags]{
 			Use: "list",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -94,14 +94,14 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd1 := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return nil
 			},
 		}
 
 		cmd2 := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -136,7 +136,7 @@ func TestGuardedCommand_AddCommandFunc(t *testing.T) {
 		err = g.AddCommandFunc(func() Command[testAppConfig, NoFlags] {
 			return Command[testAppConfig, NoFlags]{
 				Use: "greet",
-				RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+				RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 					return nil
 				},
 			}
@@ -167,7 +167,7 @@ func TestAddAnyCommand(t *testing.T) {
 			Use:   "greet",
 			Short: "Greet someone",
 			Flags: &greetFlags{},
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags *greetFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ *greetFlags) error {
 				return nil
 			},
 		}
@@ -218,14 +218,14 @@ func TestAddAnyCommand(t *testing.T) {
 
 		cmd1 := Command[testAppConfig, *otherFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags *otherFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ *otherFlags) error {
 				return nil
 			},
 		}
 
 		cmd2 := Command[testAppConfig, *otherFlags]{
 			Use: "test",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags *otherFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ *otherFlags) error {
 				return nil
 			},
 		}

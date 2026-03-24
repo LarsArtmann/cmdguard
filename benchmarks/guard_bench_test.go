@@ -65,7 +65,7 @@ func BenchmarkAddCommand(b *testing.B) {
 		cmd := v2.Command[BenchConfig, v2.NoFlags]{
 			Use:   "greet",
 			Short: "Greet someone",
-			RunE: func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
 				return nil
 			},
 		}
@@ -89,7 +89,7 @@ func BenchmarkExecute(b *testing.B) {
 	cmd := v2.Command[BenchConfig, v2.NoFlags]{
 		Use:   "hello",
 		Short: "Say hello",
-		RunE: func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
+		RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
 			return nil
 		},
 	}
@@ -98,7 +98,7 @@ func BenchmarkExecute(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	ctx := context.Background()
+	ctx := b.Context()
 
 	for b.Loop() {
 		// Execute with help to avoid actual command running
@@ -116,7 +116,7 @@ func BenchmarkCommandCreation(b *testing.B) {
 			Use:   "greet",
 			Short: "Greet someone",
 			Flags: &BenchFlags{},
-			RunE: func(ctx context.Context, cfg *BenchConfig, flags *BenchFlags) error {
+			RunE: func(_ context.Context, _ *BenchConfig, _ *BenchFlags) error {
 				return nil
 			},
 		}
@@ -131,7 +131,7 @@ func BenchmarkNewCommand(b *testing.B) {
 			"greet",
 			v2.WithShort[BenchConfig, v2.NoFlags]("Greet someone"),
 			v2.WithRunE[BenchConfig, v2.NoFlags](
-				func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
+				func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
 					return nil
 				},
 			),
@@ -197,7 +197,7 @@ func BenchmarkCommandValidate(b *testing.B) {
 	cmd := v2.Command[BenchConfig, v2.NoFlags]{
 		Use:   "test",
 		Short: "Test command",
-		RunE: func(ctx context.Context, cfg *BenchConfig, flags v2.NoFlags) error {
+		RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
 			return nil
 		},
 	}

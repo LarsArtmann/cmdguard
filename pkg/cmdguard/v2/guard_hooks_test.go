@@ -35,12 +35,12 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
 					Use: "test",
-					PreRunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+					PreRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 						*order = append(*order, "pre")
 
 						return nil
 					},
-					RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+					RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 						*order = append(*order, "run")
 
 						return nil
@@ -55,12 +55,12 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
 					Use: "test",
-					RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+					RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 						*order = append(*order, "run")
 
 						return nil
 					},
-					PostRunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+					PostRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 						*order = append(*order, "post")
 
 						return nil
@@ -85,7 +85,7 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
-			err = g.ExecuteWithArgs(context.Background(), []string{"test"})
+			err = g.ExecuteWithArgs(t.Context(), []string{"test"})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -106,10 +106,10 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use: "test",
-			PreRunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			PreRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return errTest
 			},
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				called = true
 
 				return nil
@@ -119,7 +119,7 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"test"})
+		err = g.ExecuteWithArgs(t.Context(), []string{"test"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -182,7 +182,7 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 				Deprecated: tt.deprecated,
 				Aliases:    tt.aliases,
 				Version:    tt.version,
-				RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+				RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 					return nil
 				},
 			}

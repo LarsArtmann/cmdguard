@@ -76,7 +76,7 @@ func TestCLIAddCommand(t *testing.T) {
 			Use:   "greet",
 			Short: "Greet someone",
 			Flags: greetFlags{},
-			RunE: func(ctx context.Context, cfg *testCLIConfig, flags greetFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ greetFlags) error {
 				return nil
 			},
 		}
@@ -96,7 +96,7 @@ func TestCLIAddCommand(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:   "version",
 			Short: "Show version",
-			RunE: func(ctx context.Context, cfg *testCLIConfig, flags v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				return nil
 			},
 		}
@@ -116,7 +116,7 @@ func TestCLIAddCommand(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:   "test",
 			Short: "Test command",
-			RunE: func(ctx context.Context, cfg *testCLIConfig, flags v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				return nil
 			},
 		}
@@ -160,7 +160,7 @@ func TestCLIExecute(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:   "run",
 			Short: "Run the command",
-			RunE: func(ctx context.Context, cfg *testCLIConfig, flags v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				executed = true
 
 				return nil
@@ -172,7 +172,7 @@ func TestCLIExecute(t *testing.T) {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
 
-		ctx := context.Background()
+		ctx := t.Context()
 
 		err = cli.ExecuteWithArgs(ctx, []string{"run"})
 		if err != nil {
@@ -238,7 +238,7 @@ func TestCLISubcommands(t *testing.T) {
 		subCmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:   "list",
 			Short: "List items",
-			RunE: func(ctx context.Context, cfg *testCLIConfig, flags v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				return nil
 			},
 		}
@@ -311,7 +311,7 @@ func TestCLIShutdown(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		err = cli.Shutdown(context.Background())
+		err = cli.Shutdown(t.Context())
 		if err != nil {
 			t.Errorf("Shutdown failed: %v", err)
 		}
@@ -339,7 +339,7 @@ func TestCLIHealthCheckWithContext(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		err = cli.HealthCheckWithContext(context.Background())
+		err = cli.HealthCheckWithContext(t.Context())
 		if err != nil {
 			t.Errorf("HealthCheckWithContext failed: %v", err)
 		}
@@ -423,14 +423,14 @@ func TestCLIPrePostRunE(t *testing.T) {
 
 		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use: "test",
-			PreRunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+			PreRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				preRan = true
 				return nil
 			},
-			RunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				return nil
 			},
-			PostRunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+			PostRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				postRan = true
 				return nil
 			},
@@ -441,7 +441,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
 
-		err = cli.ExecuteWithArgs(context.Background(), []string{"test"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
 		if err != nil {
 			t.Fatalf("ExecuteWithArgs failed: %v", err)
 		}
@@ -472,11 +472,11 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, testFlags]{
 			Use:   "test",
 			Flags: testFlags{},
-			PreRunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+			PreRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedName = f.Name
 				return nil
 			},
-			RunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ testFlags) error {
 				return nil
 			},
 		}
@@ -486,7 +486,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
 
-		err = cli.ExecuteWithArgs(context.Background(), []string{"test", "--name", "custom"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"test", "--name", "custom"})
 		if err != nil {
 			t.Fatalf("ExecuteWithArgs failed: %v", err)
 		}
@@ -513,10 +513,10 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, testFlags]{
 			Use:   "test",
 			Flags: testFlags{},
-			RunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ testFlags) error {
 				return nil
 			},
-			PostRunE: func(ctx context.Context, cfg *testCLIConfig, f testFlags) error {
+			PostRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedValue = f.Value
 				return nil
 			},
@@ -527,7 +527,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
 
-		err = cli.ExecuteWithArgs(context.Background(), []string{"test", "--value", "postvalue"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"test", "--value", "postvalue"})
 		if err != nil {
 			t.Fatalf("ExecuteWithArgs failed: %v", err)
 		}
@@ -559,13 +559,13 @@ func TestCLIExecuteAndExit(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:   "run",
 			Short: "Run",
-			RunE: func(ctx context.Context, cfg *testCLIConfig, f v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				return nil
 			},
 		}
 		if err := v2.AddCommand(cli, cmd); err != nil {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
-		cli.ExecuteAndExit(context.Background())
+		cli.ExecuteAndExit(t.Context())
 	})
 }

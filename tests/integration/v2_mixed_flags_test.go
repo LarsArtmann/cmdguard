@@ -47,7 +47,7 @@ type MigrateFlags struct {
 }
 
 func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	// Create CLI with RootConfig and GreetFlags
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
@@ -69,7 +69,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		Use:   "greet",
 		Short: "Greet someone",
 		Flags: &GreetFlags{Name: "World", Shout: false},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+		RunE: func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
 
@@ -86,7 +86,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			Use:   "math",
 			Short: "Do math",
 			Flags: &MathFlags{X: 0, Y: 0},
-			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
+			RunE: func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
 				mathCalled = true
 				mathFlags = flags
 
@@ -104,7 +104,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			Use:   "config",
 			Short: "Manage config",
 			Flags: &ConfigFlags{File: "", JSON: false},
-			RunE: func(ctx context.Context, cfg *RootConfig, flags *ConfigFlags) error {
+			RunE: func(_ context.Context, _ *RootConfig, flags *ConfigFlags) error {
 				configCalled = true
 				configFlags = flags
 
@@ -172,7 +172,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
 	if err != nil {
@@ -195,7 +195,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 			{
 				Use:   "status",
 				Short: "Check database status",
-				RunE: func(ctx context.Context, cfg *RootConfig, flags *DBFlags) error {
+				RunE: func(_ context.Context, _ *RootConfig, flags *DBFlags) error {
 					statusCalled = true
 					statusFlags = flags
 
@@ -215,7 +215,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		Use:   "migrate",
 		Short: "Run migrations",
 		Flags: &MigrateFlags{Steps: 0, Direction: "up"},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
+		RunE: func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags
 
@@ -271,13 +271,14 @@ func assertCommandExecution[
 	F any,
 ](
 	t *testing.T,
-	ctx context.Context,
 	cli *v2.GuardedCommand[T, F],
 	args []string,
 	wantExecuted string,
 	assertFlags func(t *testing.T, flags any),
 ) {
 	t.Helper()
+
+	ctx := t.Context()
 
 	for i := range 3 {
 		err := cli.ExecuteWithArgs(ctx, args)
@@ -299,7 +300,7 @@ var (
 )
 
 func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
 	if err != nil {
@@ -311,7 +312,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		Use:   "cmd-a",
 		Short: "Command A",
 		Flags: &GreetFlags{Name: "default", Shout: false},
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+		RunE: func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
 
@@ -328,7 +329,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 			Use:   "cmd-b",
 			Short: "Command B",
 			Flags: &MathFlags{X: 0, Y: 0},
-			RunE: func(ctx context.Context, cfg *RootConfig, flags *MathFlags) error {
+			RunE: func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
 				lastExecuted = "B"
 				lastFlags = flags
 
@@ -343,11 +344,11 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	// Execute A multiple times
 	assertCommandExecution(
 		t,
-		ctx,
 		cli,
 		[]string{"cmd-a", "--name=test"},
 		"A",
 		func(t *testing.T, flags any) {
+			t.Helper()
 			gf, ok := flags.(*GreetFlags)
 			if !ok {
 				t.Fatalf("expected *GreetFlags, got %T", flags)
@@ -362,11 +363,11 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	// Execute B multiple times
 	assertCommandExecution(
 		t,
-		ctx,
 		cli,
 		[]string{"cmd-b", "--x=42"},
 		"B",
 		func(t *testing.T, flags any) {
+			t.Helper()
 			mf, ok := flags.(*MathFlags)
 			if !ok {
 				t.Fatalf("expected *MathFlags, got %T", flags)
@@ -401,7 +402,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
 	if err != nil {
@@ -415,7 +416,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 		v2.Command[RootConfig, v2.NoFlags]{
 			Use:   "simple",
 			Short: "Simple command",
-			RunE: func(ctx context.Context, cfg *RootConfig, flags v2.NoFlags) error {
+			RunE: func(_ context.Context, _ *RootConfig, _ v2.NoFlags) error {
 				executed = true
 
 				return nil
@@ -432,7 +433,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 			Use:   "greet",
 			Short: "Greet command",
 			Flags: &GreetFlags{Name: "World", Shout: false},
-			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+			RunE: func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 				executed = true
 
 				return nil
@@ -469,7 +470,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
 	if err != nil {
@@ -489,18 +490,18 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 			Use:   "greet",
 			Short: "Greet with lifecycle",
 			Flags: &GreetFlags{Name: "World", Shout: false},
-			PreRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+			PreRunE: func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 				preRunCalled = true
 
 				return nil
 			},
-			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+			RunE: func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 				runCalled = true
 				receivedFlags = flags
 
 				return nil
 			},
-			PostRunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+			PostRunE: func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 				postRunCalled = true
 
 				return nil
@@ -548,7 +549,7 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "",
 			Short: "Invalid command",
-			RunE:  func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error { return nil },
+			RunE:  func(_ context.Context, _ *RootConfig, _ *GreetFlags) error { return nil },
 		},
 	)
 	if err == nil {
@@ -568,7 +569,7 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	defaultConfig := RootConfig{
 		Debug:   false,
@@ -588,7 +589,7 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 			Use:   "check",
 			Short: "Check config access",
 			Flags: &GreetFlags{},
-			RunE: func(ctx context.Context, cfg *RootConfig, flags *GreetFlags) error {
+			RunE: func(_ context.Context, cfg *RootConfig, _ *GreetFlags) error {
 				receivedConfig = cfg
 
 				return nil
@@ -618,7 +619,7 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
 	if err != nil {
@@ -632,7 +633,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	migrateUpCmd := v2.Command[RootConfig, *MigrateFlags]{
 		Use:   "up",
 		Short: "Run up migrations",
-		RunE: func(ctx context.Context, cfg *RootConfig, flags *MigrateFlags) error {
+		RunE: func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
 			executedFlags = flags
 
 			return nil

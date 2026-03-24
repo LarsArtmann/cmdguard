@@ -66,7 +66,7 @@ func TestCommandOptions(t *testing.T) {
 	t.Run("WithRunE", func(t *testing.T) {
 		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			return nil
 		}
 		WithRunE(handler)(&cmd)
@@ -79,7 +79,7 @@ func TestCommandOptions(t *testing.T) {
 	t.Run("WithPreRunE", func(t *testing.T) {
 		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			return nil
 		}
 		WithPreRunE(handler)(&cmd)
@@ -92,7 +92,7 @@ func TestCommandOptions(t *testing.T) {
 	t.Run("WithPostRunE", func(t *testing.T) {
 		t.Parallel()
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		handler := func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			return nil
 		}
 		WithPostRunE(handler)(&cmd)
@@ -106,7 +106,7 @@ func TestCommandOptions(t *testing.T) {
 		t.Parallel()
 		subCmd := Command[testConfig, NoFlags]{
 			Use: "sub",
-			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -157,7 +157,7 @@ func TestNewCommand(t *testing.T) {
 			"test",
 			WithShort[testConfig, NoFlags]("short description"),
 			WithRunE(
-				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+				func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					return nil
 				},
 			),
@@ -184,7 +184,7 @@ func TestNewCommand(t *testing.T) {
 		cmd, err := NewCommand[testConfig, NoFlags](
 			"",
 			WithRunE(
-				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+				func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					return nil
 				},
 			),
@@ -222,7 +222,7 @@ func TestCommand_CompleteStructure(t *testing.T) {
 		subCmd := Command[testConfig, NoFlags]{
 			Use:   "sub",
 			Short: "subcommand",
-			RunE: func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -234,17 +234,17 @@ func TestCommand_CompleteStructure(t *testing.T) {
 			WithAliases[testConfig, NoFlags]("r", "root-cmd"),
 			WithExample[testConfig, NoFlags]("root sub"),
 			WithRunE(
-				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+				func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					return nil
 				},
 			),
 			WithPreRunE(
-				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+				func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					return nil
 				},
 			),
 			WithPostRunE(
-				func(ctx context.Context, cfg *testConfig, flags NoFlags) error {
+				func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					return nil
 				},
 			),

@@ -3,7 +3,6 @@ package integration
 
 import (
 	"bytes"
-	"context"
 	"os"
 	"testing"
 
@@ -21,7 +20,7 @@ func TestGuardedCommand_FullLifecycle(t *testing.T) {
 	root.AddCommand(&cobra.Command{
 		Use:   "hello",
 		Short: "Say hello",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 			cmd.SetOut(os.Stdout)
 			cmd.Println("Hello, World!")
 		},
@@ -74,7 +73,7 @@ func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
 
 		root.AddCommand(&cobra.Command{
 			Short: "No name here",
-			Run:   func(cmd *cobra.Command, args []string) {},
+			Run:   func(_ *cobra.Command, _ []string) {},
 		})
 	}()
 
@@ -94,7 +93,7 @@ func TestGuardedCommand_ParentWithChildren(t *testing.T) {
 	child := &cobra.Command{
 		Use:   "child",
 		Short: "Child command",
-		Run:   func(cmd *cobra.Command, args []string) {},
+		Run:   func(_ *cobra.Command, _ []string) {},
 	}
 
 	parent.AddCommand(child)
@@ -117,7 +116,7 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 	root.AddCommand(&cobra.Command{
 		Use:   "check",
 		Short: "Run checks",
-		RunE:  func(cmd *cobra.Command, args []string) error { return nil },
+		RunE:  func(_ *cobra.Command, _ []string) error { return nil },
 	})
 
 	didPanic := false
@@ -131,7 +130,7 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 
 		root.AddCommand(&cobra.Command{
 			Use: "bad",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		})
 	}()
 
@@ -166,7 +165,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 	child := &cobra.Command{
 		Use:   "migrate",
 		Short: "Run migrations",
-		RunE:  func(cmd *cobra.Command, args []string) error { return nil },
+		RunE:  func(*cobra.Command, []string) error { return nil },
 	}
 
 	root.AddSubcommand(parent, child)
@@ -216,7 +215,7 @@ func TestGuardedCommand_ExecuteWithContext(t *testing.T) {
 	root.AddCommand(&cobra.Command{
 		Use:   "test",
 		Short: "Test command",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 			cmd.SetOut(&output)
 			cmd.Println("test output")
 		},
@@ -224,7 +223,7 @@ func TestGuardedCommand_ExecuteWithContext(t *testing.T) {
 
 	root.Command().SetArgs([]string{"test"})
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	err := root.Execute(ctx)
 	if err != nil {

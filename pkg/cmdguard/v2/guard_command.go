@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -76,7 +77,7 @@ func toCobraCommandAny[T, F2 any](config *T, cmd Command[T, F2]) (*cobra.Command
 	cobraCmd := createCobraCommand(cmd)
 
 	flagRegistry, err := setupFlagRegistry(cobraCmd, cmd)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrNoFlags) {
 		return nil, err
 	}
 
@@ -107,13 +108,14 @@ func createCobraCommand[T, F any](cmd Command[T, F]) *cobra.Command {
 }
 
 // setupFlagRegistry creates and registers flags for the command.
+// Returns ErrNoFlags if the command has no flags to register.
 func setupFlagRegistry[T, F any](
 	cobraCmd *cobra.Command,
 	cmd Command[T, F],
 ) (*FlagRegistry, error) {
 	prototype := createFlagPrototype(cmd.Flags)
 	if isNilPointer(prototype) {
-		return nil, nil
+		return nil, ErrNoFlags
 	}
 
 	registry, err := NewFlagRegistry(prototype)
@@ -198,7 +200,7 @@ func setupHandler[T, F any](
 		return
 	}
 
-	setter(cobraCmd, func(c *cobra.Command, args []string) error {
+	setter(cobraCmd, func(c *cobra.Command, _ []string) error {
 		return executeHandler(c, handler, cmd.Flags, config, registry)
 	})
 }

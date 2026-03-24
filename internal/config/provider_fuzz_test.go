@@ -162,7 +162,7 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv("CMDGUARD_LOG_LEVEL", value)
+		_ = os.Setenv("CMDGUARD_LOG_LEVEL", value) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
 
 		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 
@@ -190,7 +190,7 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv("CMDGUARD_LOG_FORMAT", value)
+		_ = os.Setenv("CMDGUARD_LOG_FORMAT", value) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
 
 		defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
 
@@ -217,7 +217,7 @@ func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		_ = os.Setenv("CMDGUARD_STRICT_MODE", value)
+		_ = os.Setenv("CMDGUARD_STRICT_MODE", value) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
 
 		defer func() { _ = os.Unsetenv("CMDGUARD_STRICT_MODE") }()
 
@@ -331,9 +331,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 func testShellInjectionPayload(t *testing.T, payload string) {
 	t.Helper()
 
-	_ = os.Setenv("CMDGUARD_LOG_LEVEL", payload)
-
-	defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
+	t.Setenv("CMDGUARD_LOG_LEVEL", payload)
 
 	cfg := Load()
 	if cfg == nil {
@@ -382,13 +380,13 @@ func FuzzKoanfLoader_LoadEnv(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, level, format string) {
 		if level != "" {
-			_ = os.Setenv("CMDGUARD_LOG_LEVEL", level)
+			_ = os.Setenv("CMDGUARD_LOG_LEVEL", level) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
 
 			defer func() { _ = os.Unsetenv("CMDGUARD_LOG_LEVEL") }()
 		}
 
 		if format != "" {
-			_ = os.Setenv("CMDGUARD_LOG_FORMAT", format)
+			_ = os.Setenv("CMDGUARD_LOG_FORMAT", format) //nolint:usetesting // Fuzz tests need os.Setenv for arbitrary values including null bytes
 
 			defer func() { _ = os.Unsetenv("CMDGUARD_LOG_FORMAT") }()
 		}

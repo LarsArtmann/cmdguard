@@ -90,7 +90,7 @@ func New(name, short string) *GuardedCommand {
 	cmd.PersistentFlags().BoolP("strict", "s", cfg.StrictMode, "Enable strict mode validation")
 
 	// Validate log-level in PreRunE
-	cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+	cmd.PreRunE = func(cmd *cobra.Command, _ []string) error {
 		level, _ := cmd.Flags().GetString("log-level")
 
 		validLevels := []string{"debug", "info", "warn", "error"}
@@ -186,7 +186,11 @@ func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 func (g *GuardedCommand) Execute(ctx context.Context) error {
 	g.validated = true
 
-	return fang.Execute(ctx, g.cmd)
+	if err := fang.Execute(ctx, g.cmd); err != nil {
+		return fmt.Errorf("failed to execute CLI: %w", err)
+	}
+
+	return nil
 }
 
 // ExecuteAndExit runs the command and exits with appropriate exit code.
@@ -225,7 +229,7 @@ func (g *GuardedCommand) addDefaultCommands() {
 	g.cmd.AddCommand(&cobra.Command{
 		Use:   "version",
 		Short: "Print version information",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version "+version)
 		},
 	})
@@ -234,7 +238,7 @@ func (g *GuardedCommand) addDefaultCommands() {
 	g.cmd.AddCommand(&cobra.Command{
 		Use:   "validate",
 		Short: "Validate command tree",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			err := g.validateCommandTree()
 			if err != nil {
 				return fmt.Errorf("validation failed: %w", err)

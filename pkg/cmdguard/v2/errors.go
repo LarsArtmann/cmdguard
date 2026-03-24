@@ -59,6 +59,9 @@ var (
 
 	// ErrConfigNotPointer indicates config is not a pointer to struct.
 	ErrConfigNotPointer = errors.New("config must be a pointer to struct")
+
+	// ErrNoFlags indicates the command has no flags to register.
+	ErrNoFlags = errors.New("no flags to register")
 )
 
 // CommandError wraps an error with command context.

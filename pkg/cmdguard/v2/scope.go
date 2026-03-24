@@ -224,7 +224,7 @@ func ScopedProvider[T any](
 	scopeName string,
 	provider func(do.Injector) (T, error),
 ) func(do.Injector) (T, error) {
-	return func(i do.Injector) (T, error) {
+	return func(_ do.Injector) (T, error) {
 		childScope := parent.Child(scopeName)
 
 		return provider(childScope.Injector())

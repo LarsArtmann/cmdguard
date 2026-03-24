@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"context"
 	"testing"
 )
 
@@ -12,7 +11,7 @@ func TestGuardedCommand_Shutdown(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.Shutdown(context.Background())
+		err = g.Shutdown(t.Context())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

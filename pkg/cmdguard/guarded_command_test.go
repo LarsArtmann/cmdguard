@@ -1,7 +1,6 @@
 package cmdguard
 
 import (
-	"context"
 	"os"
 	"strings"
 	"testing"
@@ -78,7 +77,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := &cobra.Command{
 			Use: "sub",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 
 		didPanic := false
@@ -103,7 +102,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := &cobra.Command{
 			Use: "sub",
-			RunE: func(cmd *cobra.Command, args []string) error {
+			RunE: func(*cobra.Command, []string) error {
 				return nil
 			},
 		}
@@ -177,7 +176,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := &cobra.Command{
 			Use: "sub",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 
 		didPanic := false
@@ -204,13 +203,13 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		g.AddCommand(parent)
 
 		child := &cobra.Command{
 			Use: "child",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 
 		didPanic := false
@@ -249,7 +248,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		g.AddCommand(parent)
 
@@ -279,11 +278,11 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 func TestGuardedCommand_Execute(t *testing.T) {
 	t.Run("executes command successfully", func(t *testing.T) {
 		g := New("testapp", "Test")
-		g.cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		g.cmd.RunE = func(*cobra.Command, []string) error {
 			return nil
 		}
 
-		err := g.Execute(context.Background())
+		err := g.Execute(t.Context())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -344,7 +343,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 
 		cmd := &cobra.Command{
 			Use: "sub",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 
 		err := g.validateCommand(cmd)
@@ -358,7 +357,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 
 		cmd := &cobra.Command{
 			Use: "sub",
-			RunE: func(cmd *cobra.Command, args []string) error {
+			RunE: func(*cobra.Command, []string) error {
 				return nil
 			},
 		}
@@ -407,7 +406,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 		parent := &cobra.Command{Use: "parent"}
 		child := &cobra.Command{
 			Use: "child",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		parent.AddCommand(child)
 
@@ -424,7 +423,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 
 		cmd := &cobra.Command{
 			Use: "sub",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 
 		err := g.validateCommand(cmd)
@@ -477,7 +476,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 		parent := &cobra.Command{Use: "parent"}
 		child := &cobra.Command{
 			Use: "child",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		parent.AddCommand(child)
 		g.AddCommand(parent)
@@ -494,7 +493,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 		// Create a command tree with an invalid nested subcommand
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		// Manually add an invalid child (bypassing guard validation)
 		invalidChild := &cobra.Command{Use: "invalid"} // No handler
@@ -518,11 +517,11 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		child := &cobra.Command{
 			Use: "child",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		parent.AddCommand(child)
 
@@ -537,7 +536,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		// Manually add invalid child (bypassing guard)
 		invalidChild := &cobra.Command{Use: "invalid"} // No handler
@@ -558,15 +557,15 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		child := &cobra.Command{
 			Use: "child",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		grandchild := &cobra.Command{
 			Use: "grandchild",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		child.AddCommand(grandchild)
 		parent.AddCommand(child)
@@ -608,7 +607,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 		// Add a valid command
 		cmd := &cobra.Command{
 			Use: "testcmd",
-			Run: func(cmd *cobra.Command, args []string) {},
+			Run: func(*cobra.Command, []string) {},
 		}
 		g.AddCommand(cmd)
 

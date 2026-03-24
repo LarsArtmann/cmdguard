@@ -65,23 +65,31 @@ func (l *Loader) Load(configPath string) error {
 
 // loadDefaults loads default configuration values.
 func (l *Loader) loadDefaults() error {
-	return l.k.Load(confmap.Provider(map[string]any{
+	if err := l.k.Load(confmap.Provider(map[string]any{
 		"strict_mode": false,
 		"log_level":   "info",
 		"log_format":  "text",
-	}, "."), nil)
+	}, "."), nil); err != nil {
+		return fmt.Errorf("failed to load default configuration: %w", err)
+	}
+
+	return nil
 }
 
 // loadFile loads configuration from a YAML file.
 func (l *Loader) loadFile(path string) error {
-	return l.k.Load(file.Provider(path), yaml.Parser())
+	if err := l.k.Load(file.Provider(path), yaml.Parser()); err != nil {
+		return fmt.Errorf("failed to load configuration file %q: %w", path, err)
+	}
+
+	return nil
 }
 
 // loadEnv loads configuration from environment variables.
 // Only variables with CMDGUARD_ prefix are loaded.
 // Example: CMDGUARD_LOG_LEVEL=debug becomes log_level=debug.
 func (l *Loader) loadEnv() error {
-	return l.k.Load(env.Provider(".", env.Opt{
+	if err := l.k.Load(env.Provider(".", env.Opt{
 		Prefix: "CMDGUARD_",
 		TransformFunc: func(key, value string) (string, any) {
 			// Transform: CMDGUARD_LOG_LEVEL -> log_level
@@ -89,18 +97,30 @@ func (l *Loader) loadEnv() error {
 
 			return key, value
 		},
-	}), nil)
+	}), nil); err != nil {
+		return fmt.Errorf("failed to load environment configuration: %w", err)
+	}
+
+	return nil
 }
 
 // Unmarshal unmarshals the configuration into the provided struct.
 // The struct should have `koanf` tags for field mapping.
 func (l *Loader) Unmarshal(dest any) error {
-	return l.k.Unmarshal("", dest)
+	if err := l.k.Unmarshal("", dest); err != nil {
+		return fmt.Errorf("failed to unmarshal configuration: %w", err)
+	}
+
+	return nil
 }
 
 // UnmarshalWithConf unmarshals with custom configuration.
 func (l *Loader) UnmarshalWithConf(path string, dest any, conf koanf.UnmarshalConf) error {
-	return l.k.UnmarshalWithConf(path, dest, conf)
+	if err := l.k.UnmarshalWithConf(path, dest, conf); err != nil {
+		return fmt.Errorf("failed to unmarshal configuration with path %q: %w", path, err)
+	}
+
+	return nil
 }
 
 // GetString returns a string value from the configuration.

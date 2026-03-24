@@ -12,7 +12,7 @@ func TestScope_Shutdown(t *testing.T) {
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		scope := &Scope{injector: nil}
 
-		err := scope.Shutdown(context.Background())
+		err := scope.Shutdown(t.Context())
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)
 		}
@@ -24,7 +24,7 @@ func TestScope_Shutdown(t *testing.T) {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
 
-		err := scope.Shutdown(context.Background())
+		err := scope.Shutdown(t.Context())
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)
 		}
@@ -38,7 +38,7 @@ func TestScope_ShutdownAll(t *testing.T) {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
 
-		err := scope.ShutdownAll(context.Background())
+		err := scope.ShutdownAll(t.Context())
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)
 		}
@@ -61,7 +61,7 @@ func TestScope_ShutdownAll(t *testing.T) {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
 
-		err := grandchild.ShutdownAll(context.Background())
+		err := grandchild.ShutdownAll(t.Context())
 		if err != nil {
 			t.Errorf("expected no error, got: %v", err)
 		}
@@ -93,7 +93,7 @@ func TestScope_HealthCheck(t *testing.T) {
 
 type failingShutdownService struct{}
 
-func (f *failingShutdownService) Shutdown(ctx context.Context) error {
+func (f *failingShutdownService) Shutdown(_ context.Context) error {
 	return context.DeadlineExceeded
 }
 
@@ -101,7 +101,7 @@ func TestScope_ShutdownAll_WithError(t *testing.T) {
 	t.Run("accumulates errors from shutdown failures", func(t *testing.T) {
 		scope := NewScope("test")
 
-		do.Provide(scope.Injector(), func(i do.Injector) (*failingShutdownService, error) {
+		do.Provide(scope.Injector(), func(_ do.Injector) (*failingShutdownService, error) {
 			return &failingShutdownService{}, nil
 		})
 
@@ -110,7 +110,7 @@ func TestScope_ShutdownAll_WithError(t *testing.T) {
 			t.Fatalf("expected no error invoking, got: %v", err)
 		}
 
-		err = scope.ShutdownAll(context.Background())
+		err = scope.ShutdownAll(t.Context())
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

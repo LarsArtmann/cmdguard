@@ -9,7 +9,10 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
+
+const testTimeout = 5 * time.Second
 
 func TestGuardedCommand_Execute(t *testing.T) {
 	t.Run("executes help command", func(t *testing.T) {
@@ -18,7 +21,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"--help"})
+		err = g.ExecuteWithArgs(t.Context(), []string{"--help"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -34,7 +37,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				executed = true
 
 				return nil
@@ -44,7 +47,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"greet"})
+		err = g.ExecuteWithArgs(t.Context(), []string{"greet"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -62,7 +65,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use: "valid",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -70,7 +73,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"unknown"})
+		err = g.ExecuteWithArgs(t.Context(), []string{"unknown"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -95,7 +98,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 		cmd := Command[testAppConfig, *greetFlags]{
 			Use:   "greet",
 			Flags: &greetFlags{},
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags *greetFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, flags *greetFlags) error {
 				receivedName = flags.Name
 
 				return nil
@@ -105,7 +108,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"greet", "--name", "Alice"})
+		err = g.ExecuteWithArgs(t.Context(), []string{"greet", "--name", "Alice"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -125,7 +128,7 @@ func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use: "greet",
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return nil
 			},
 		}
@@ -133,7 +136,7 @@ func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(context.Background(), []string{"greet"})
+		err = g.ExecuteWithArgs(t.Context(), []string{"greet"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -152,7 +155,7 @@ func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use: use,
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags NoFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return testErr
 			},
 		}
@@ -181,7 +184,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 				}
 			}()
 
-			_ = g.ExecuteWithArgs(context.Background(), []string{"--help"})
+			_ = g.ExecuteWithArgs(t.Context(), []string{"--help"})
 		}()
 	})
 
@@ -190,7 +193,10 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 			return
 		}
 
-		cmd := exec.Command(os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
+		ctx, cancel := context.WithTimeout(t.Context(), testTimeout)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
 
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_AND_EXIT=1")
 
@@ -223,7 +229,10 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 			return
 		}
 
-		cmd := exec.Command(os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
+		ctx, cancel := context.WithTimeout(t.Context(), testTimeout)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
 
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_STDERR=1")
 

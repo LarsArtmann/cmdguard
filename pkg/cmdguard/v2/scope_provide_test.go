@@ -11,7 +11,7 @@ func TestProvide(t *testing.T) {
 	t.Run("registers service provider", func(t *testing.T) {
 		scope := NewScope("test")
 
-		err := Provide(scope, func(i do.Injector) (string, error) {
+		err := Provide(scope, func(_ do.Injector) (string, error) {
 			return "test-value", nil
 		})
 		if err != nil {
@@ -29,7 +29,7 @@ func TestProvide(t *testing.T) {
 	})
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
-		err := Provide(nil, func(i do.Injector) (string, error) {
+		err := Provide(nil, func(_ do.Injector) (string, error) {
 			return "value", nil
 		})
 		if err == nil {
@@ -227,7 +227,7 @@ func TestProvideNamed(t *testing.T) {
 	t.Run("registers named service provider", func(t *testing.T) {
 		scope := NewScope("test")
 
-		err := ProvideNamed(scope, "cache-memory", func(i do.Injector) (string, error) {
+		err := ProvideNamed(scope, "cache-memory", func(_ do.Injector) (string, error) {
 			return "memory-cache", nil
 		})
 		if err != nil {
@@ -245,7 +245,7 @@ func TestProvideNamed(t *testing.T) {
 	})
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
-		err := ProvideNamed(nil, "name", func(i do.Injector) (string, error) {
+		err := ProvideNamed(nil, "name", func(_ do.Injector) (string, error) {
 			return "value", nil
 		})
 		if err == nil {
@@ -260,13 +260,13 @@ func TestProvideNamed(t *testing.T) {
 	t.Run("can register multiple named implementations", func(t *testing.T) {
 		scope := NewScope("test")
 
-		if err := ProvideNamed(scope, "impl1", func(i do.Injector) (string, error) {
+		if err := ProvideNamed(scope, "impl1", func(_ do.Injector) (string, error) {
 			return "implementation-1", nil
 		}); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if err := ProvideNamed(scope, "impl2", func(i do.Injector) (string, error) {
+		if err := ProvideNamed(scope, "impl2", func(_ do.Injector) (string, error) {
 			return "implementation-2", nil
 		}); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -296,7 +296,7 @@ func TestInvokeNamed(t *testing.T) {
 	t.Run("returns named service", func(t *testing.T) {
 		scope := NewScope("test")
 
-		if err := ProvideNamed(scope, "my-service", func(i do.Injector) (int, error) {
+		if err := ProvideNamed(scope, "my-service", func(_ do.Injector) (int, error) {
 			return 42, nil
 		}); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
@@ -368,7 +368,7 @@ func TestMustInvokeNamed(t *testing.T) {
 	t.Run("returns named service", func(t *testing.T) {
 		scope := NewScope("test")
 
-		if err := ProvideNamed(scope, "my-service", func(i do.Injector) (int, error) {
+		if err := ProvideNamed(scope, "my-service", func(_ do.Injector) (int, error) {
 			return 99, nil
 		}); err != nil {
 			t.Fatalf("expected no error, got: %v", err)

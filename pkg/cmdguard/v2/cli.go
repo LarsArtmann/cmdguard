@@ -88,7 +88,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		return fmt.Errorf("failed to register global flags: %w", err)
 	}
 
-	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
+	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
 		return registry.ParseFlags(c, cli.config)
 	}
 
@@ -180,7 +180,7 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 	}
 
 	if cmd.RunE != nil {
-		cobraCmd.RunE = func(c *cobra.Command, args []string) error {
+		cobraCmd.RunE = func(c *cobra.Command, _ []string) error {
 			ctx := c.Context()
 			if ctx == nil {
 				ctx = context.Background()
@@ -196,7 +196,7 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 	}
 
 	if cmd.PreRunE != nil {
-		cobraCmd.PreRunE = func(c *cobra.Command, args []string) error {
+		cobraCmd.PreRunE = func(c *cobra.Command, _ []string) error {
 			ctx := c.Context()
 			if ctx == nil {
 				ctx = context.Background()
@@ -212,7 +212,7 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 	}
 
 	if cmd.PostRunE != nil {
-		cobraCmd.PostRunE = func(c *cobra.Command, args []string) error {
+		cobraCmd.PostRunE = func(c *cobra.Command, _ []string) error {
 			ctx := c.Context()
 			if ctx == nil {
 				ctx = context.Background()
@@ -252,7 +252,11 @@ func isNoFlags[F any](flags F) bool {
 
 // Execute runs the CLI application.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
-	return fang.Execute(ctx, cli.rootCmd)
+	if err := fang.Execute(ctx, cli.rootCmd); err != nil {
+		return fmt.Errorf("failed to execute CLI: %w", err)
+	}
+
+	return nil
 }
 
 // ExecuteWithArgs runs the CLI application with specific arguments.

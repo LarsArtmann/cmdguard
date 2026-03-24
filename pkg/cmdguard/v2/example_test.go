@@ -29,7 +29,7 @@ func Example_basic() {
 	err = cli.AddCommand(v2.Command[AppConfig, v2.NoFlags]{
 		Use:   "hello",
 		Short: "Say hello",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+		RunE: func(_ context.Context, cfg *AppConfig, _ v2.NoFlags) error {
 			if cfg.Verbose {
 				fmt.Println("Verbose mode enabled")
 			}
@@ -75,7 +75,7 @@ func Example_withFlags() {
 		Use:   "greet",
 		Short: "Greet someone",
 		Flags: &GreetFlags{}, // Initialize with defaults
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+		RunE: func(_ context.Context, _ *AppConfig, flags *GreetFlags) error {
 			for range flags.Count {
 				msg := fmt.Sprintf("Hello, %s!", flags.Name)
 				if flags.Shout {
@@ -124,7 +124,7 @@ func Example_withSubcommands() {
 			{
 				Use:   "list",
 				Short: "List remotes",
-				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+				RunE: func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 					fmt.Println("origin")
 					fmt.Println("upstream")
 
@@ -134,7 +134,7 @@ func Example_withSubcommands() {
 			{
 				Use:   "add",
 				Short: "Add a remote",
-				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+				RunE: func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 					fmt.Println("Remote added")
 
 					return nil
@@ -180,7 +180,7 @@ func Example_withEnum() {
 		Use:   "deploy",
 		Short: "Deploy to environment",
 		Flags: &DeployFlags{},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *DeployFlags) error {
+		RunE: func(_ context.Context, cfg *AppConfig, flags *DeployFlags) error {
 			fmt.Printf("Deploying version %s to %s\n", flags.Version, cfg.Environment.String())
 
 			return nil
@@ -218,7 +218,7 @@ func Example_withPreRunE() {
 		Use:   "create",
 		Short: "Create a new user",
 		Flags: &CreateUserFlags{},
-		PreRunE: func(ctx context.Context, cfg *AppConfig, flags *CreateUserFlags) error {
+		PreRunE: func(_ context.Context, _ *AppConfig, flags *CreateUserFlags) error {
 			// Custom validation
 			if len(flags.Password) < 8 {
 				return errors.New("password must be at least 8 characters")
@@ -226,7 +226,7 @@ func Example_withPreRunE() {
 
 			return nil
 		},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *CreateUserFlags) error {
+		RunE: func(_ context.Context, _ *AppConfig, flags *CreateUserFlags) error {
 			role := "user"
 			if flags.Admin {
 				role = "admin"
@@ -268,7 +268,7 @@ func Example_withFunctionalOptions() {
 	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
 		"version",
 		v2.WithShort[AppConfig, v2.NoFlags]("Show version info"),
-		v2.WithRunE(func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+		v2.WithRunE(func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("myapp version 1.0.0")
 
 			return nil

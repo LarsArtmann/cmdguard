@@ -27,7 +27,7 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			Short: "Greet someone",
 			Long:  "Send a greeting to the specified person.",
 			Flags: &greetFlags{},
-			RunE: func(ctx context.Context, cfg *testAppConfig, flags *greetFlags) error {
+			RunE: func(_ context.Context, _ *testAppConfig, flags *greetFlags) error {
 				greetResult.name = flags.Name
 				greetResult.shout = flags.Shout
 
@@ -39,7 +39,7 @@ func TestGuardedCommand_Integration(t *testing.T) {
 		}
 
 		err = g.ExecuteWithArgs(
-			context.Background(),
+			t.Context(),
 			[]string{"greet", "--name", "Alice", "--shout"},
 		)
 		if err != nil {
@@ -54,7 +54,7 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			t.Error("greetResult.shout = false, want true")
 		}
 
-		if err := g.Shutdown(context.Background()); err != nil {
+		if err := g.Shutdown(t.Context()); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
