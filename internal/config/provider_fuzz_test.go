@@ -146,6 +146,18 @@ func FuzzGetConfigFilePath(f *testing.F) {
 	})
 }
 
+// isValidEnvValue checks if a string is valid for use as an environment variable value.
+// Environment variables cannot contain null bytes or newlines on some platforms (e.g., Darwin).
+func isValidEnvValue(s string) bool {
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case '\x00', '\n', '\r':
+			return false
+		}
+	}
+	return true
+}
+
 func FuzzLoad_EnvVarLevel(f *testing.F) {
 	corpus := []string{
 		"debug", "info", "warn", "error",
@@ -161,6 +173,10 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
+		if !isValidEnvValue(value) {
+			return
+		}
+
 		t.Setenv(
 			"CMDGUARD_LOG_LEVEL",
 			value,
@@ -190,6 +206,10 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
+		if !isValidEnvValue(value) {
+			return
+		}
+
 		t.Setenv(
 			"CMDGUARD_LOG_FORMAT",
 			value,
@@ -218,6 +238,10 @@ func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
+		if !isValidEnvValue(value) {
+			return
+		}
+
 		t.Setenv(
 			"CMDGUARD_STRICT_MODE",
 			value,
@@ -381,6 +405,14 @@ func FuzzKoanfLoader_LoadEnv(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, level, format string) {
+		if level != "" && !isValidEnvValue(level) {
+			return
+		}
+
+		if format != "" && !isValidEnvValue(format) {
+			return
+		}
+
 		if level != "" {
 			t.Setenv("CMDGUARD_LOG_LEVEL", level)
 		}

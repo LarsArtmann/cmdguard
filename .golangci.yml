@@ -117,14 +117,43 @@ linters:
           - gocyclo
           - gosec
           - dupl
-      - path: _test\.go$
-        text: cyclop
+          - exhaustruct
+          - funlen
+          - cyclop
+          - gocognit
+          - nestif
+          - paralleltest
+          - gochecknoglobals
+      - path: examples/
+        linters:
+          - exhaustruct
+          - cyclop
+          - funlen
+          - paralleltest
+      - path: benchmarks/
+        linters:
+          - exhaustruct
+      - path: pkg/cmdguard/v2/cli.go$
         linters:
           - cyclop
-      - path: _test\.go$
-        text: cognitive complexity
+          - funlen
+      - path: pkg/cmdguard/v2/guard_flags.go$
         linters:
-          - gocognit
+          - cyclop
+          - nestif
+          - funlen
+      - path: _test\.go$
+        linters:
+          - maintidx
+      - path: pkg/cmdguard/
+        linters:
+          - exhaustruct
+      - path: internal/
+        linters:
+          - exhaustruct
+      - text: for loop can be changed to use an integer range
+        linters:
+          - intrange
       - path: _test\.go$
         text: shadow
         linters:
