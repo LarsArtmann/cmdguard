@@ -36,7 +36,7 @@ func (r *FlagRegistry) RegisterFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
 		err := r.registerFlag(cmd, tag)
 		if err != nil {
-			return err
+			return fmt.Errorf("registering flags on command %q: %w", cmd.Use, err)
 		}
 	}
 
@@ -166,7 +166,7 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
 		err := r.validateTag(cmd, tag)
 		if err != nil {
-			return err
+			return fmt.Errorf("validating flag %q on command %q: %w", tag.Name, cmd.Use, err)
 		}
 	}
 
@@ -177,7 +177,7 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 func (r *FlagRegistry) validateTag(cmd *cobra.Command, tag FlagTag) error {
 	err := r.validateRequiredFlag(cmd, tag)
 	if err != nil {
-		return err
+		return fmt.Errorf("validating required flag %q on command %q: %w", tag.Name, cmd.Use, err)
 	}
 
 	return r.validateEnumValue(cmd, tag)
@@ -191,7 +191,7 @@ func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) err
 
 	flag := r.lookupFlagForValidation(cmd, tag.Name)
 	if flag == nil || !flag.Changed {
-		return NewFlagError(tag.Name, ErrRequiredFlag)
+		return fmt.Errorf("required flag %q not set on command %q: %w", tag.Name, cmd.Use, ErrRequiredFlag)
 	}
 
 	return nil
@@ -209,7 +209,8 @@ func (r *FlagRegistry) validateEnumValue(cmd *cobra.Command, tag FlagTag) error 
 	}
 
 	if !r.isAllowedValue(flag.Value.String(), tag.Values) {
-		return NewFlagError(tag.Name, fmt.Errorf("invalid value, must be one of: %v", tag.Values))
+		return fmt.Errorf("enum flag %q on command %q has invalid value %q: must be one of: %v",
+			tag.Name, cmd.Use, flag.Value.String(), tag.Values)
 	}
 
 	return nil

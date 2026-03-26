@@ -52,7 +52,7 @@ func validateStruct(v reflect.Value, cfg any) error {
 
 	tags, err := ParseFlagTags(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing flag tags for %T: %w", cfg, err)
 	}
 
 	for _, tag := range tags {
@@ -63,7 +63,7 @@ func validateStruct(v reflect.Value, cfg any) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("%w: %v", ErrConfigValidation, errs)
+		return fmt.Errorf("validating config %T: %w: %v", cfg, ErrConfigValidation, errs)
 	}
 
 	return nil

@@ -34,7 +34,7 @@ type CLIOption[T any] func(*CLI[T])
 func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
 	err := validateName(name)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating CLI %q: %w", name, err)
 	}
 
 	cli := &CLI[T]{
@@ -53,7 +53,7 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 
 	err = cli.initialize(defaults)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("initializing CLI %q: %w", name, err)
 	}
 
 	return cli, nil
@@ -78,14 +78,14 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	err = ProvideValue(cli.scope, registry)
 	if err != nil {
-		return fmt.Errorf("failed to register flag registry: %w", err)
+		return fmt.Errorf("registering flag registry for %T: %w", defaults, err)
 	}
 
 	cli.registry = registry
 
 	err = registry.RegisterFlags(cli.rootCmd)
 	if err != nil {
-		return fmt.Errorf("failed to register global flags: %w", err)
+		return fmt.Errorf("registering global flags for %T: %w", defaults, err)
 	}
 
 	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
@@ -126,14 +126,14 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 
 	err := cmd.Validate()
 	if err != nil {
-		return err
+		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.Use, cli.name, err)
 	}
 
 	cli.registeredCmds[cmd.Use] = true
 
 	cobraCmd, err := cliToCobraCommand(cli.config, cmd)
 	if err != nil {
-		return err
+		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.Use, cli.name, err)
 	}
 
 	cli.rootCmd.AddCommand(cobraCmd)
@@ -182,7 +182,7 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 
 			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
 			if parseErr != nil {
-				return parseErr
+				return fmt.Errorf("parsing flags for command %q: %w", cmd.Use, parseErr)
 			}
 
 			return cmd.RunE(ctx, config, flags)
@@ -198,7 +198,7 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 
 			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
 			if parseErr != nil {
-				return parseErr
+				return fmt.Errorf("parsing flags for pre-run of command %q: %w", cmd.Use, parseErr)
 			}
 
 			return cmd.PreRunE(ctx, config, flags)
@@ -214,7 +214,7 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 
 			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
 			if parseErr != nil {
-				return parseErr
+				return fmt.Errorf("parsing flags for post-run of command %q: %w", cmd.Use, parseErr)
 			}
 
 			return cmd.PostRunE(ctx, config, flags)

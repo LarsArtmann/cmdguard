@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error {
 	for _, tag := range r.tags {
 		err := r.parseFlag(cmd, cfg, tag)
 		if err != nil {
-			return err
+			return fmt.Errorf("parsing flags for command %q: %w", cmd.Use, err)
 		}
 	}
 
@@ -25,7 +26,7 @@ func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error {
 func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error {
 	flag, err := r.lookupFlag(cmd, tag)
 	if err != nil {
-		return err
+		return fmt.Errorf("looking up flag %q on command %q: %w", tag.Name, cmd.Use, err)
 	}
 
 	// Skip if flag wasn't changed and we're not using defaults
@@ -47,7 +48,7 @@ func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag,
 	}
 
 	if flag == nil {
-		return nil, NewFlagError(tag.Name, ErrFlagNotFound)
+		return nil, fmt.Errorf("flag %q not found in command %q: %w", tag.Name, cmd.Use, ErrFlagNotFound)
 	}
 
 	return flag, nil
@@ -86,7 +87,7 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error {
 	v, err := strconv.ParseBool(value)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing bool flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, v)
@@ -96,7 +97,7 @@ func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error
 func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error {
 	v, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing int flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, int(v))
@@ -106,7 +107,7 @@ func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error 
 func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error {
 	v, err := strconv.ParseUint(value, 10, 64)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing uint flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, uint(v))
@@ -115,7 +116,7 @@ func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error
 func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) error {
 	v, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing float64 flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, v)
@@ -141,7 +142,7 @@ func (r *FlagRegistry) parseAndSetCustom(cfg any, tag FlagTag, value string) err
 func (r *FlagRegistry) parseAndSetDuration(cfg any, tag FlagTag, value string) error {
 	parsed, err := ParseDuration(value)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing duration flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, parsed)
@@ -151,7 +152,7 @@ func (r *FlagRegistry) parseAndSetDuration(cfg any, tag FlagTag, value string) e
 func (r *FlagRegistry) parseAndSetLogLevel(cfg any, tag FlagTag, value string) error {
 	parsed, err := ParseLogLevel(value)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing log level flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, parsed)
@@ -161,7 +162,7 @@ func (r *FlagRegistry) parseAndSetLogLevel(cfg any, tag FlagTag, value string) e
 func (r *FlagRegistry) parseAndSetLogFormat(cfg any, tag FlagTag, value string) error {
 	parsed, err := ParseLogFormat(value)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing log format flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, parsed)
@@ -171,7 +172,7 @@ func (r *FlagRegistry) parseAndSetLogFormat(cfg any, tag FlagTag, value string) 
 func (r *FlagRegistry) parseAndSetEnum(cfg any, tag FlagTag, value string) error {
 	parsed, err := ParseEnum(value, tag.Values)
 	if err != nil {
-		return NewFlagError(tag.Name, err)
+		return fmt.Errorf("parsing enum flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, parsed)

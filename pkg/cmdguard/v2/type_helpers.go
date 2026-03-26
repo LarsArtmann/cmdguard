@@ -23,7 +23,7 @@ func ValueOrDefault[T any](v *T, def T) T {
 // EnsureValid validates that a pointer is not nil and returns an error with context.
 func EnsureValid[T any](v *T, name string) error {
 	if v == nil {
-		return fmt.Errorf("%s: must not be nil", name)
+		return fmt.Errorf("%s (%T): must not be nil", name, v)
 	}
 
 	return nil

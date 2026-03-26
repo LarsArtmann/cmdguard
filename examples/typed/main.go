@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -130,7 +129,7 @@ func registerServices(scope *v2.Scope) {
 	err = v2.Provide(scope, func(i do.Injector) (*Logger, error) {
 		cfg, err := v2.Invoke[*AppConfig](scope)
 		if err != nil {
-			return nil, v2.NewServiceError("*AppConfig", err)
+			return nil, fmt.Errorf("invoking *AppConfig in scope %p: %w", scope, err)
 		}
 
 		return &Logger{verbose: cfg.Verbose}, nil
@@ -160,7 +159,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			}
 
 			if flags.Count < 1 {
-				return errors.New("count must be at least 1")
+				return fmt.Errorf("count must be at least 1 (got %d)", flags.Count)
 			}
 
 			return nil
@@ -168,7 +167,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			logger, err := v2.Invoke[*Logger](cli.ScopeStruct())
 			if err != nil {
-				return v2.NewServiceError("*Logger", err)
+				return fmt.Errorf("invoking *Logger in scope %p: %w", cli.ScopeStruct(), err)
 			}
 
 			for i := range flags.Count {

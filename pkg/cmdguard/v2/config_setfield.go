@@ -50,9 +50,10 @@ func SetField(cfg any, fieldName string, value any) error {
 		duration, ok := val.Interface().(time.Duration)
 		if !ok {
 			return fmt.Errorf(
-				"SetField: internal error: type assertion failed for time.Duration, cfg=%T, fieldName=%q",
+				"SetField: type assertion failed for time.Duration, cfg=%T, fieldName=%q, value=%v",
 				cfg,
 				fieldName,
+				value,
 			)
 		}
 		field.Set(reflect.ValueOf(FromDuration(duration)))
@@ -138,7 +139,7 @@ func setStringField(field reflect.Value, str string) error {
 func parseAndSetLogLevel(field reflect.Value, str string) error {
 	parsed, err := ParseLogLevel(str)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing log level field %s with %q: %w", field.Type(), str, err)
 	}
 
 	field.Set(reflect.ValueOf(parsed))
@@ -150,7 +151,7 @@ func parseAndSetLogLevel(field reflect.Value, str string) error {
 func parseAndSetLogFormat(field reflect.Value, str string) error {
 	parsed, err := ParseLogFormat(str)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing log format field %s with %q: %w", field.Type(), str, err)
 	}
 
 	field.Set(reflect.ValueOf(parsed))
@@ -162,7 +163,7 @@ func parseAndSetLogFormat(field reflect.Value, str string) error {
 func parseAndSetDuration(field reflect.Value, str string) error {
 	parsed, err := ParseDuration(str)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing duration field %s with %q: %w", field.Type(), str, err)
 	}
 
 	field.Set(reflect.ValueOf(parsed))
