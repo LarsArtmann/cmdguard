@@ -191,7 +191,12 @@ func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) err
 
 	flag := r.lookupFlagForValidation(cmd, tag.Name)
 	if flag == nil || !flag.Changed {
-		return fmt.Errorf("required flag %q not set on command %q: %w", tag.Name, cmd.Use, ErrRequiredFlag)
+		return fmt.Errorf(
+			"required flag %q not set on command %q: %w",
+			tag.Name,
+			cmd.Use,
+			ErrRequiredFlag,
+		)
 	}
 
 	return nil

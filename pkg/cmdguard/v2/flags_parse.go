@@ -48,7 +48,12 @@ func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag,
 	}
 
 	if flag == nil {
-		return nil, fmt.Errorf("flag %q not found in command %q: %w", tag.Name, cmd.Use, ErrFlagNotFound)
+		return nil, fmt.Errorf(
+			"flag %q not found in command %q: %w",
+			tag.Name,
+			cmd.Use,
+			ErrFlagNotFound,
+		)
 	}
 
 	return flag, nil
