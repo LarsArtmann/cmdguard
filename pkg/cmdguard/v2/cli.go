@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/charmbracelet/fang"
+	"charm.land/fang/v2"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )
@@ -95,8 +95,6 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	return nil
 }
 
-// --- Functional Options ---
-
 // WithCLIVersion sets the version string.
 func WithCLIVersion[T any](version string) CLIOption[T] {
 	return func(cli *CLI[T]) {
@@ -120,11 +118,7 @@ func WithCLIScope[T any](scope *Scope) CLIOption[T] {
 	}
 }
 
-// --- AddCommand (accepts any flags type) ---
-
 // AddCommand adds a subcommand to the CLI with any flags type.
-// This function uses a type parameter for the flags, allowing each command
-// to have its own flags type independent of other commands.
 func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	if cli.registeredCmds[cmd.Use] {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.Use)
@@ -248,8 +242,6 @@ func isNoFlags[F any](flags F) bool {
 	}
 }
 
-// --- Execution Methods ---
-
 // Execute runs the CLI application.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	if err := fang.Execute(ctx, cli.rootCmd); err != nil {
@@ -273,8 +265,6 @@ func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 		fmt.Println(err)
 	}
 }
-
-// --- Accessor Methods ---
 
 // Scope returns the DI scope for service registration.
 func (cli *CLI[T]) Scope() *Scope {

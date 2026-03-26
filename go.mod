@@ -3,7 +3,7 @@ module github.com/larsartmann/cmdguard
 go 1.26
 
 require (
-	github.com/charmbracelet/fang v1.0.0
+	charm.land/fang/v2 v2.0.1
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/confmap v1.0.0
 	github.com/knadh/koanf/providers/env/v2 v2.0.0

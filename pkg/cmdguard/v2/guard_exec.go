@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/fang"
+	"charm.land/fang/v2"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )

@@ -37,7 +37,7 @@ import (
 	"os"
 	"slices"
 
-	"github.com/charmbracelet/fang"
+	"charm.land/fang/v2"
 	"github.com/spf13/cobra"
 
 	"github.com/larsartmann/cmdguard/internal/config"
