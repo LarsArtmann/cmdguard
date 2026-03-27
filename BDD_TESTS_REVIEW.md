@@ -22,15 +22,15 @@ The project **does not use Ginkgo**. There are no Ginkgo imports, no `Describe`/
 
 ## Test Inventory
 
-| Package | Test Files | Focus Area |
-|---------|------------|------------|
-| `pkg/cmdguard/v2/` | 34 | Core v2 API |
-| `pkg/cmdguard/` | 3 | v1 API |
-| `internal/config/` | 4 | Configuration |
-| `internal/logging/` | 4 | Logging |
-| `tests/integration/` | 5 | E2E integration |
-| `examples/*/` | 6 | Example tests |
-| **Total** | **56** | |
+| Package              | Test Files | Focus Area      |
+| -------------------- | ---------- | --------------- |
+| `pkg/cmdguard/v2/`   | 34         | Core v2 API     |
+| `pkg/cmdguard/`      | 3          | v1 API          |
+| `internal/config/`   | 4          | Configuration   |
+| `internal/logging/`  | 4          | Logging         |
+| `tests/integration/` | 5          | E2E integration |
+| `examples/*/`        | 6          | Example tests   |
+| **Total**            | **56**     |                 |
 
 ---
 
@@ -38,14 +38,14 @@ The project **does not use Ginkgo**. There are no Ginkgo imports, no `Describe`/
 
 ### What's Working Well
 
-| Aspect | Evidence | Quality |
-|--------|----------|---------|
-| Helper functions | `newTestCmd()`, `captureOutput()`, `runCLIWithArgs()` | Good |
-| Table-driven tests | `TestParseLevel`, `TestSuggestFlag`, `TestEditDistance` | Good |
-| Subprocess testing | `TestGuardedCommand_ExecuteAndExit` | Excellent |
-| Edge case coverage | nil scope, empty names, duplicate commands | Good |
-| Integration tests | `tests/integration/v2_mixed_flags_*` | Good |
-| Parallel tests | `t.Parallel()` in validation tests | Good |
+| Aspect             | Evidence                                                | Quality   |
+| ------------------ | ------------------------------------------------------- | --------- |
+| Helper functions   | `newTestCmd()`, `captureOutput()`, `runCLIWithArgs()`   | Good      |
+| Table-driven tests | `TestParseLevel`, `TestSuggestFlag`, `TestEditDistance` | Good      |
+| Subprocess testing | `TestGuardedCommand_ExecuteAndExit`                     | Excellent |
+| Edge case coverage | nil scope, empty names, duplicate commands              | Good      |
+| Integration tests  | `tests/integration/v2_mixed_flags_*`                    | Good      |
+| Parallel tests     | `t.Parallel()` in validation tests                      | Good      |
 
 ### Test Structure Analysis
 
@@ -64,18 +64,19 @@ Standard Pattern Used:
 
 ### What's Missing (End-User Perspective)
 
-| Category | Current State | BDD Requirement | Gap |
-|----------|---------------|-----------------|-----|
-| User scenarios | API contracts | "As a user, I want..." | Critical |
-| Behavioral descriptions | Function names | Given/When/Then | Critical |
-| Acceptance criteria | Implicit | Explicit | High |
-| User journey tests | Per-function | End-to-end flows | Medium |
-| Help text validation | Limited | Comprehensive | Medium |
-| Error UX | Error exists | User-friendly messages | Medium |
+| Category                | Current State  | BDD Requirement        | Gap      |
+| ----------------------- | -------------- | ---------------------- | -------- |
+| User scenarios          | API contracts  | "As a user, I want..." | Critical |
+| Behavioral descriptions | Function names | Given/When/Then        | Critical |
+| Acceptance criteria     | Implicit       | Explicit               | High     |
+| User journey tests      | Per-function   | End-to-end flows       | Medium   |
+| Help text validation    | Limited        | Comprehensive          | Medium   |
+| Error UX                | Error exists   | User-friendly messages | Medium   |
 
 ### Examples of Missing BDD Scenarios
 
 #### 1. User Discovers Commands
+
 ```go
 // MISSING: As a user, I want to see what commands are available
 func TestUserCanDiscoverCommands(t *testing.T) {
@@ -86,6 +87,7 @@ func TestUserCanDiscoverCommands(t *testing.T) {
 ```
 
 #### 2. User Gets Helpful Error Messages
+
 ```go
 // MISSING: As a user, I want helpful suggestions when I mistype a flag
 func TestUserGetsTypoSuggestions(t *testing.T) {
@@ -96,6 +98,7 @@ func TestUserGetsTypoSuggestions(t *testing.T) {
 ```
 
 #### 3. User Understands Flag Defaults
+
 ```go
 // MISSING: As a user, I want to know what the default values are
 func TestUserCanSeeFlagDefaults(t *testing.T) {
@@ -106,6 +109,7 @@ func TestUserCanSeeFlagDefaults(t *testing.T) {
 ```
 
 #### 4. User Recovers from Errors
+
 ```go
 // MISSING: As a user, I want clear guidance when validation fails
 func TestUserGetsValidationGuidance(t *testing.T) {
@@ -121,23 +125,25 @@ func TestUserGetsValidationGuidance(t *testing.T) {
 
 ### Test Coverage by Category
 
-| Category | Coverage | Notes |
-|----------|----------|-------|
-| Unit tests | High | Good API surface coverage |
-| Integration tests | Medium | 5 files, good scenarios |
-| E2E/Acceptance | Low | Missing user journeys |
-| Error path tests | Medium | Error checks exist but shallow |
-| Edge cases | High | Good boundary testing |
+| Category          | Coverage | Notes                          |
+| ----------------- | -------- | ------------------------------ |
+| Unit tests        | High     | Good API surface coverage      |
+| Integration tests | Medium   | 5 files, good scenarios        |
+| E2E/Acceptance    | Low      | Missing user journeys          |
+| Error path tests  | Medium   | Error checks exist but shallow |
+| Edge cases        | High     | Good boundary testing          |
 
 ### Test Naming Convention
 
 **Current:** `TestFunctionName_Scenario`
+
 ```go
 TestNew_CreatesGuardedCommand
 TestCommand_Validate_ErrorEmptyUseField
 ```
 
 **BDD Style (Missing):** `TestFeature_Scenario_Outcome`
+
 ```go
 TestUserCanCreateCLI_WithValidConfig_Succeeds
 TestUserCanGreet_WithCustomName_ReturnsPersonalizedGreeting
@@ -150,10 +156,12 @@ TestUserCanGreet_WithCustomName_ReturnsPersonalizedGreeting
 ### Priority 1: Adopt Ginkgo (As Documented)
 
 The `AGENTS.md` explicitly states to use Ginkgo. Either:
+
 1. **Add Ginkgo** and migrate tests, OR
 2. **Update AGENTS.md** to reflect the actual testing approach
 
 **If adopting Ginkgo:**
+
 ```go
 package v2_test
 
@@ -294,6 +302,7 @@ func TestUserGetsHelpfulErrors(t *testing.T) {
 The current test suite provides **good technical coverage** but **lacks end-user perspective**. Tests verify that functions work correctly but don't verify that users can accomplish their goals.
 
 **Key Metrics:**
+
 - Technical coverage: 7/10
 - BDD compliance: 2/10
 - User perspective: 3/10
@@ -303,4 +312,4 @@ The current test suite provides **good technical coverage** but **lacks end-user
 
 ---
 
-*Review completed. See action items above for next steps.*
+_Review completed. See action items above for next steps._
