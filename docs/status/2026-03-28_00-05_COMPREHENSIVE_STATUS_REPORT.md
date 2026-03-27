@@ -19,26 +19,26 @@
 
 ### Core Implementation
 
-| Task | Status | Notes |
-|------|--------|-------|
-| v1 API (panic-based) | ✅ COMPLETE | `pkg/cmdguard/` - Simple Cobra wrapper |
-| v2 API (type-safe) | ✅ COMPLETE | `pkg/cmdguard/v2/` - Generic-based, DI-powered |
-| Struct-tag flag system | ✅ COMPLETE | Full support with typo suggestions |
-| DI Scope wrapper | ✅ COMPLETE | samber/do/v2 integration |
-| Error types | ✅ COMPLETE | Typed errors, no panics in v2 |
-| Lifecycle hooks | ✅ COMPLETE | PreRunE, PostRunE support |
-| Health checks | ✅ COMPLETE | Service health verification |
-| Graceful shutdown | ✅ COMPLETE | Proper cleanup on exit |
+| Task                   | Status      | Notes                                          |
+| ---------------------- | ----------- | ---------------------------------------------- |
+| v1 API (panic-based)   | ✅ COMPLETE | `pkg/cmdguard/` - Simple Cobra wrapper         |
+| v2 API (type-safe)     | ✅ COMPLETE | `pkg/cmdguard/v2/` - Generic-based, DI-powered |
+| Struct-tag flag system | ✅ COMPLETE | Full support with typo suggestions             |
+| DI Scope wrapper       | ✅ COMPLETE | samber/do/v2 integration                       |
+| Error types            | ✅ COMPLETE | Typed errors, no panics in v2                  |
+| Lifecycle hooks        | ✅ COMPLETE | PreRunE, PostRunE support                      |
+| Health checks          | ✅ COMPLETE | Service health verification                    |
+| Graceful shutdown      | ✅ COMPLETE | Proper cleanup on exit                         |
 
 ### Testing
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| `internal/logging` | 100.0% | 🏆 Perfect |
-| `pkg/cmdguard` | 87.0% | ✅ Excellent |
-| `pkg/cmdguard/v2` | 81.2% | ✅ Good |
-| `internal/config` | 78.9% | ✅ Good |
-| `examples/*` | 3-42% | ⚠️ Expected for examples |
+| Package            | Coverage | Status                   |
+| ------------------ | -------- | ------------------------ |
+| `internal/logging` | 100.0%   | 🏆 Perfect               |
+| `pkg/cmdguard`     | 87.0%    | ✅ Excellent             |
+| `pkg/cmdguard/v2`  | 81.2%    | ✅ Good                  |
+| `internal/config`  | 78.9%    | ✅ Good                  |
+| `examples/*`       | 3-42%    | ⚠️ Expected for examples |
 
 **Test Execution:** ALL PASSING (9/9 packages)
 
@@ -57,39 +57,39 @@
 
 ### Documentation
 
-| Document | Status | Lines |
-|----------|--------|-------|
-| README.md | ✅ Complete | Usage, API reference, examples |
-| AGENTS.md | ✅ Complete | Developer guide, patterns |
-| FEATURES.md | ✅ Complete | Feature status matrix |
-| TODO_LIST.md | ✅ Complete | All tasks done |
-| CONTRIBUTING.md | ✅ Complete | Contribution guidelines |
-| CHANGELOG.md | ✅ Complete | Version history |
-| Architecture diagrams | ✅ Complete | D2 + SVG generated |
-| 7 status reports | ✅ Complete | Historical tracking |
+| Document              | Status      | Lines                          |
+| --------------------- | ----------- | ------------------------------ |
+| README.md             | ✅ Complete | Usage, API reference, examples |
+| AGENTS.md             | ✅ Complete | Developer guide, patterns      |
+| FEATURES.md           | ✅ Complete | Feature status matrix          |
+| TODO_LIST.md          | ✅ Complete | All tasks done                 |
+| CONTRIBUTING.md       | ✅ Complete | Contribution guidelines        |
+| CHANGELOG.md          | ✅ Complete | Version history                |
+| Architecture diagrams | ✅ Complete | D2 + SVG generated             |
+| 7 status reports      | ✅ Complete | Historical tracking            |
 
 ### CI/CD & Tooling
 
-| Task | Status | Notes |
-|------|--------|-------|
+| Task              | Status      | Notes                        |
+| ----------------- | ----------- | ---------------------------- |
 | GitHub Actions CI | ✅ Complete | Tests on Go 1.24, 1.25, 1.26 |
-| golangci-lint | ✅ Complete | Configured in .golangci.yml |
-| justfile | ✅ Complete | Build automation |
-| Examples | ✅ Complete | 4 working examples |
-| Benchmarks | ✅ Complete | Performance tests |
+| golangci-lint     | ✅ Complete | Configured in .golangci.yml  |
+| justfile          | ✅ Complete | Build automation             |
+| Examples          | ✅ Complete | 4 working examples           |
+| Benchmarks        | ✅ Complete | Performance tests            |
 
 ### Code Quality Fixes (Recently Completed)
 
-| Issue | Count | Status |
-|-------|-------|--------|
-| nilnil | 1 | ✅ Fixed |
-| noctx | 2 | ✅ Fixed |
-| thelper | 2 | ✅ Fixed |
-| wrapcheck | 9 | ✅ Fixed |
-| intrange | 1 | ✅ Fixed |
-| usetesting | 6 | ✅ Fixed |
-| revive | 1 | ✅ Fixed |
-| gocritic | 1 | ✅ Fixed |
+| Issue      | Count | Status   |
+| ---------- | ----- | -------- |
+| nilnil     | 1     | ✅ Fixed |
+| noctx      | 2     | ✅ Fixed |
+| thelper    | 2     | ✅ Fixed |
+| wrapcheck  | 9     | ✅ Fixed |
+| intrange   | 1     | ✅ Fixed |
+| usetesting | 6     | ✅ Fixed |
+| revive     | 1     | ✅ Fixed |
+| gocritic   | 1     | ✅ Fixed |
 
 **Commit:** `639a496` - "fix: resolve all linter issues"
 
@@ -103,11 +103,11 @@ The project has achieved all planned milestones. No partially implemented featur
 
 ### Optional Enhancements (Lower Priority)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Plugin system | ⏳ Not Started | Custom validators - future enhancement |
-| Enhanced flag validation | ⏳ Not Started | More enum types - future enhancement |
-| Release automation | ⏳ Not Started | Manual releases sufficient |
+| Task                     | Status         | Notes                                  |
+| ------------------------ | -------------- | -------------------------------------- |
+| Plugin system            | ⏳ Not Started | Custom validators - future enhancement |
+| Enhanced flag validation | ⏳ Not Started | More enum types - future enhancement   |
+| Release automation       | ⏳ Not Started | Manual releases sufficient             |
 
 ---
 
@@ -115,12 +115,12 @@ The project has achieved all planned milestones. No partially implemented featur
 
 ### Phase 4 Features (Future Consideration)
 
-| Feature | Priority | Notes |
-|---------|----------|-------|
-| Plugin system | Low | Custom command validators |
-| Additional flag types | Low | More custom types beyond Enum/Duration |
-| Automated releases | Low | CI/CD for versioning |
-| Web documentation | Low | GitHub Pages or similar |
+| Feature               | Priority | Notes                                  |
+| --------------------- | -------- | -------------------------------------- |
+| Plugin system         | Low      | Custom command validators              |
+| Additional flag types | Low      | More custom types beyond Enum/Duration |
+| Automated releases    | Low      | CI/CD for versioning                   |
+| Web documentation     | Low      | GitHub Pages or similar                |
 
 ---
 
@@ -130,17 +130,18 @@ The project has achieved all planned milestones. No partially implemented featur
 
 **Assessment:** ZERO critical issues
 
-| Category | Status |
-|----------|--------|
-| Build | ✅ Clean (when disk space available) |
-| Tests | ✅ All passing |
-| Runtime | ✅ No panics in v2 |
-| Security | ✅ No known vulnerabilities |
-| Dependencies | ✅ Up to date |
+| Category     | Status                               |
+| ------------ | ------------------------------------ |
+| Build        | ✅ Clean (when disk space available) |
+| Tests        | ✅ All passing                       |
+| Runtime      | ✅ No panics in v2                   |
+| Security     | ✅ No known vulnerabilities          |
+| Dependencies | ✅ Up to date                        |
 
 ### Infrastructure Note
 
 **Temporary Issue:** Disk space constraint during build cache operations
+
 - **Impact:** Build cache downloads may fail
 - **Workaround:** `go clean -cache` resolves
 - **Code Status:** Unaffected - all tests pass
@@ -238,6 +239,7 @@ The project has achieved all planned milestones. No partially implemented featur
 **Context:**
 
 Currently, validation happens via:
+
 ```go
 PreRunE: func(ctx context.Context, cfg *Config, flags *Flags) error {
     if flags.Count < 1 {
@@ -248,6 +250,7 @@ PreRunE: func(ctx context.Context, cfg *Config, flags *Flags) error {
 ```
 
 A plugin system would allow:
+
 ```go
 // Hypothetical
 cli.AddValidator("count", func(v int) error {
@@ -257,11 +260,13 @@ cli.AddValidator("count", func(v int) error {
 ```
 
 **Pros of Plugin System:**
+
 - Reusable validators across commands
 - Declarative validation in struct tags
 - Cleaner command definitions
 
 **Cons:**
+
 - Added complexity
 - PreRunE pattern works well
 - Go's explicit error handling is idiomatic
@@ -274,14 +279,14 @@ cli.AddValidator("count", func(v int) error {
 
 ### Repository Statistics
 
-| Metric | Value |
-|--------|-------|
-| Go Source Files | 84 |
-| Test Files | 56 |
-| Total Go Lines | ~12,246 |
-| Markdown Lines | ~8,317 |
-| Test Coverage (avg) | ~86% |
-| Dependencies | 15 direct |
+| Metric              | Value     |
+| ------------------- | --------- |
+| Go Source Files     | 84        |
+| Test Files          | 56        |
+| Total Go Lines      | ~12,246   |
+| Markdown Lines      | ~8,317    |
+| Test Coverage (avg) | ~86%      |
+| Dependencies        | 15 direct |
 
 ### File Distribution
 
@@ -320,14 +325,14 @@ a52b6fb refactor(v2): enhance error messages
 
 ## Dependencies Status
 
-| Dependency | Version | Status |
-|------------|---------|--------|
-| cobra | v1.10.2 | ✅ Latest |
-| samber/do/v2 | v2.0.0 | ✅ Latest |
-| charmbracelet/fang | v2.0.1 | ✅ Latest |
-| knadh/koanf/v2 | v2.3.3 | ✅ Latest |
-| onsi/ginkgo/v2 | v2.28.1 | ✅ Latest |
-| onsi/gomega | v1.39.1 | ✅ Latest |
+| Dependency         | Version | Status    |
+| ------------------ | ------- | --------- |
+| cobra              | v1.10.2 | ✅ Latest |
+| samber/do/v2       | v2.0.0  | ✅ Latest |
+| charmbracelet/fang | v2.0.1  | ✅ Latest |
+| knadh/koanf/v2     | v2.3.3  | ✅ Latest |
+| onsi/ginkgo/v2     | v2.28.1 | ✅ Latest |
+| onsi/gomega        | v1.39.1 | ✅ Latest |
 
 **Security:** No known vulnerabilities in dependencies.
 
@@ -338,6 +343,7 @@ a52b6fb refactor(v2): enhance error messages
 **cmdguard is production-ready and stable.**
 
 The v2 API delivers on all promises:
+
 - ✅ Type-safe with generics
 - ✅ No panics - all operations return errors
 - ✅ DI integration with samber/do/v2
