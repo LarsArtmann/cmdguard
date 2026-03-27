@@ -169,6 +169,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 		{"path with newlines", "config\n.yaml", false, nil},
 		{"very deep path traversal", strings.Repeat("../", 1000) + "etc/passwd", false, nil},
 		{"unicode in path", "🎉-config.yaml", false, func(t *testing.T, result string) {
+			t.Helper()
 			if !strings.Contains(result, "🎉") {
 				t.Errorf("result should contain 🎉, got %q", result)
 			}
