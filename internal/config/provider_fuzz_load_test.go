@@ -6,6 +6,25 @@ import (
 	"testing"
 )
 
+// fuzzEnvVarLoad tests that Load() handles environment variable fuzzing safely.
+// It sets the given env var to the fuzzed value and verifies Load() doesn't panic.
+func fuzzEnvVarLoad(t *testing.T, envVar, value string) {
+	t.Helper()
+
+	if !isValidEnvValue(value) {
+		return
+	}
+
+	t.Setenv(envVar, value)
+
+	cfg := Load()
+	if cfg == nil {
+		t.Fatalf("Load() returned nil")
+	}
+
+	_ = cfg.Validate()
+}
+
 func FuzzLoad_EnvVarLevel(f *testing.F) {
 	corpus := []string{
 		"debug", "info", "warn", "error",
@@ -21,21 +40,7 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		if !isValidEnvValue(value) {
-			return
-		}
-
-		t.Setenv(
-			"CMDGUARD_LOG_LEVEL",
-			value,
-		)
-
-		cfg := Load()
-		if cfg == nil {
-			t.Fatalf("Load() returned nil")
-		}
-
-		_ = cfg.Validate()
+		fuzzEnvVarLoad(t, "CMDGUARD_LOG_LEVEL", value)
 	})
 }
 
@@ -54,21 +59,7 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
-		if !isValidEnvValue(value) {
-			return
-		}
-
-		t.Setenv(
-			"CMDGUARD_LOG_FORMAT",
-			value,
-		)
-
-		cfg := Load()
-		if cfg == nil {
-			t.Fatalf("Load() returned nil")
-		}
-
-		_ = cfg.Validate()
+		fuzzEnvVarLoad(t, "CMDGUARD_LOG_FORMAT", value)
 	})
 }
 
@@ -147,59 +138,56 @@ func TestValidate_EdgeCases(t *testing.T) {
 		}
 	})
 
-	t.Run("null bytes in level", func(t *testing.T) {
-		cfg := &Config{LogLevel: "debug\x00info"}
+	invalidLevelTests := []struct {
+		name  string
+		level string
+	}{
+		{"null bytes in level", "debug\x00info"},
+		{"control characters in level", "de\x01bug"},
+	}
 
-		err := cfg.Validate()
-		if err == nil {
-			t.Errorf("expected error for null bytes in level, got nil")
-		}
-	})
+	for _, tt := range invalidLevelTests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &Config{LogLevel: tt.level}
 
-	t.Run("control characters in level", func(t *testing.T) {
-		cfg := &Config{LogLevel: "de\x01bug"}
-
-		err := cfg.Validate()
-		if err == nil {
-			t.Errorf("expected error for control characters in level, got nil")
-		}
-	})
+			err := cfg.Validate()
+			if err == nil {
+				t.Errorf("expected error for %s, got nil", tt.name)
+			}
+		})
+	}
 }
 
 func TestGetConfigFilePath_EdgeCases(t *testing.T) {
-	t.Run("path with null bytes", func(t *testing.T) {
-		result := GetConfigFilePath("config\x00.yaml")
-		if result == "" {
-			t.Errorf("GetConfigFilePath(%q) = empty, got %q", "config\x00.yaml", result)
-		}
-	})
+	tests := []struct {
+		name      string
+		input     string
+		wantEmpty bool
+		check     func(t *testing.T, result string)
+	}{
+		{"path with null bytes", "config\x00.yaml", false, nil},
+		{"path with newlines", "config\n.yaml", false, nil},
+		{"very deep path traversal", strings.Repeat("../", 1000) + "etc/passwd", false, nil},
+		{"unicode in path", "🎉-config.yaml", false, func(t *testing.T, result string) {
+			if !strings.Contains(result, "🎉") {
+				t.Errorf("result should contain 🎉, got %q", result)
+			}
+		}},
+	}
 
-	t.Run("path with newlines", func(t *testing.T) {
-		result := GetConfigFilePath("config\n.yaml")
-		if result == "" {
-			t.Errorf("GetConfigFilePath(%q) = empty, got %q", "config\n.yaml", result)
-		}
-	})
-
-	t.Run("very deep path traversal", func(t *testing.T) {
-		deepPath := strings.Repeat("../", 1000) + "etc/passwd"
-
-		result := GetConfigFilePath(deepPath)
-		if result == "" {
-			t.Errorf("GetConfigFilePath(%q) = empty, got %q", deepPath, result)
-		}
-	})
-
-	t.Run("unicode in path", func(t *testing.T) {
-		result := GetConfigFilePath("🎉-config.yaml")
-		if result == "" {
-			t.Errorf("GetConfigFilePath(%q) = empty, got %q", "🎉-config.yaml", result)
-		}
-
-		if !strings.Contains(result, "🎉") {
-			t.Errorf("result should contain 🎉, got %q", result)
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := GetConfigFilePath(tt.input)
+			if tt.wantEmpty && result != "" {
+				t.Errorf("GetConfigFilePath(%q) = %q, want empty", tt.input, result)
+			} else if !tt.wantEmpty && result == "" {
+				t.Errorf("GetConfigFilePath(%q) = empty, want non-empty", tt.input)
+			}
+			if tt.check != nil {
+				tt.check(t, result)
+			}
+		})
+	}
 }
 
 func testShellInjectionPayload(t *testing.T, payload string) {

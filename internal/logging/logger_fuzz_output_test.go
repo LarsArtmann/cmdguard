@@ -8,6 +8,26 @@ import (
 	"testing"
 )
 
+func assertParseLevel(t *testing.T, input string, expected Level) {
+	t.Helper()
+	t.Run(input, func(t *testing.T) {
+		result := ParseLevel(input)
+		if result != expected {
+			t.Errorf("ParseLevel(%q) = %v, want %v", input, result, expected)
+		}
+	})
+}
+
+func assertParseFormat(t *testing.T, input string, expected Format) {
+	t.Helper()
+	t.Run(input, func(t *testing.T) {
+		result := ParseFormat(input)
+		if result != expected {
+			t.Errorf("ParseFormat(%q) = %v, want %v", input, result, expected)
+		}
+	})
+}
+
 func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 	var buf bytes.Buffer
 
@@ -94,14 +114,8 @@ func TestLevel_CaseSensitivity(t *testing.T) {
 		{"error", LevelError},
 		{"ERROR", LevelInfo},
 	}
-
 	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := ParseLevel(tt.input)
-			if result != tt.expected {
-				t.Errorf("ParseLevel(%q) = %v, want %v", tt.input, result, tt.expected)
-			}
-		})
+		assertParseLevel(t, tt.input, tt.expected)
 	}
 }
 
@@ -117,14 +131,8 @@ func TestFormat_CaseSensitivity(t *testing.T) {
 		{"JSON", FormatText},
 		{"Json", FormatText},
 	}
-
 	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := ParseFormat(tt.input)
-			if result != tt.expected {
-				t.Errorf("ParseFormat(%q) = %v, want %v", tt.input, result, tt.expected)
-			}
-		})
+		assertParseFormat(t, tt.input, tt.expected)
 	}
 }
 
@@ -141,14 +149,8 @@ func TestLevel_WhitespaceHandling(t *testing.T) {
 		{"", LevelInfo},
 		{"   ", LevelInfo},
 	}
-
 	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := ParseLevel(tt.input)
-			if result != tt.expected {
-				t.Errorf("ParseLevel(%q) = %v, want %v", tt.input, result, tt.expected)
-			}
-		})
+		assertParseLevel(t, tt.input, tt.expected)
 	}
 }
 

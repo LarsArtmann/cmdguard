@@ -24,12 +24,7 @@ func TestCommand_Validate(t *testing.T) {
 	t.Parallel()
 	t.Run("valid command with RunE", func(t *testing.T) {
 		t.Parallel()
-		cmd := Command[testConfig, NoFlags]{
-			Use: "test",
-			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCommand()
 
 		err := cmd.Validate()
 		if err != nil {

@@ -53,6 +53,15 @@ func captureOutput(f func()) string {
 	return buf.String()
 }
 
+// runCLIWithArgs captures output from executing CLI with given args.
+// This helper reduces duplication in tests that need to run commands and check output.
+func runCLIWithArgs(cli *v2.GuardedCommand[AppConfig, v2.NoFlags], args ...string) string {
+	return captureOutput(func() {
+		cli.RootCommand().SetArgs(args)
+		_ = cli.Execute(context.Background())
+	})
+}
+
 func TestTypedExample_CreateCLI(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
@@ -80,11 +89,7 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 	versionCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:   "version",
 		Short: "Print version information",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-			fmt.Println("myapp version 1.0.0")
-
-			return nil
-		},
+		RunE:  printRunE("myapp version 1.0.0"),
 	}
 
 	err = cli.AddCommand(versionCmd)
@@ -92,10 +97,7 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	output := captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"version"})
-		_ = cli.Execute(context.Background())
-	})
+	output := runCLIWithArgs(cli, "version")
 
 	if !strings.Contains(output, "myapp version 1.0.0") {
 		t.Errorf("output should contain %q, got %q", "myapp version 1.0.0", output)
@@ -120,10 +122,7 @@ func TestTypedExample_GreetCommand(t *testing.T) {
 	}
 
 	// Test basic greeting
-	output := captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"greet"})
-		_ = cli.Execute(context.Background())
-	})
+	output := runCLIWithArgs(cli, "greet")
 	if !strings.Contains(output, "Hello, World!") {
 		t.Errorf("output should contain %q, got %q", "Hello, World!", output)
 	}

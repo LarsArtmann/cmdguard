@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-02-14  
 **Version:** 2.0.0  
-**Go Version:** 1.26.0
+**Go Version:** 1.26.1
 
 ---
 
@@ -131,7 +131,7 @@ The v1 Guard API provides panic-at-construction validation.
 | ------------------------------- | ------- | ------------------- | -------------------- |
 | `github.com/spf13/cobra`        | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework        |
 | `github.com/samber/do/v2`       | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection |
-| `github.com/charmbracelet/fang` | v0.4.4  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
+| `github.com/charmbracelet/fang` | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
 
 ---
 

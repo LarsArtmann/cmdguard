@@ -217,13 +217,7 @@ func TestWithCLIScope(t *testing.T) {
 func TestCLIExecuteAndExit(t *testing.T) {
 	t.Run("calls ExecuteAndExit successfully", func(t *testing.T) {
 		cli, _ := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "run",
-			Short: "Run",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCLICmd("run")
 		if err := v2.AddCommand(cli, cmd); err != nil {
 			t.Fatalf("AddCommand failed: %v", err)
 		}

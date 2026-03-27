@@ -12,6 +12,17 @@ type testCLIConfig struct {
 	Level   string `default:"info"  flag:"level"   help:"Log level"`
 }
 
+// newTestCLICmd creates a Command with a no-op RunE handler for testing.
+// This helper reduces duplication across CLI test files.
+func newTestCLICmd(use string) v2.Command[testCLIConfig, v2.NoFlags] {
+	return v2.Command[testCLIConfig, v2.NoFlags]{
+		Use: use,
+		RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+			return nil
+		},
+	}
+}
+
 func TestNewCLI(t *testing.T) {
 	t.Run("creates CLI with defaults", func(t *testing.T) {
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
@@ -93,13 +104,8 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "version",
-			Short: "Show version",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCLICmd("version")
+		cmd.Short = "Show version"
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -113,13 +119,8 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "test",
-			Short: "Test command",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
-		}
+		cmd := newTestCLICmd("test")
+		cmd.Short = "Test command"
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -235,13 +236,8 @@ func TestCLISubcommands(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		subCmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "list",
-			Short: "List items",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
-		}
+		subCmd := newTestCLICmd("list")
+		subCmd.Short = "List items"
 
 		parentCmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:      "items",

@@ -155,10 +155,6 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
 		var c config
-
-		err := json.Unmarshal([]byte(`{"timeout":"invalid"}`), &c)
-		if err == nil {
-			t.Error("expected error, got nil")
-		}
+		expectUnmarshalError(t, &c, `{"timeout":"invalid"}`)
 	})
 }

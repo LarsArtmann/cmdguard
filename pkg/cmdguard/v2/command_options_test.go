@@ -104,12 +104,8 @@ func TestCommandOptions(t *testing.T) {
 
 	t.Run("WithSubcommands", func(t *testing.T) {
 		t.Parallel()
-		subCmd := Command[testConfig, NoFlags]{
-			Use: "sub",
-			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				return nil
-			},
-		}
+		subCmd := newTestCommand()
+		subCmd.Use = "sub"
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithSubcommands(subCmd)(&cmd)
 

@@ -22,6 +22,18 @@ func slicesEqual(a, b []string) bool {
 	return true
 }
 
+// makeHookRunE creates a RunE function that appends msg to order and returns nil.
+func makeHookRunE(
+	order *[]string,
+	msg string,
+) func(context.Context, *testAppConfig, NoFlags) error {
+	return func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+		*order = append(*order, msg)
+
+		return nil
+	}
+}
+
 func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -34,17 +46,9 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			hookName: "pre",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					Use: "test",
-					PreRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-						*order = append(*order, "pre")
-
-						return nil
-					},
-					RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-						*order = append(*order, "run")
-
-						return nil
-					},
+					Use:     "test",
+					PreRunE: makeHookRunE(order, "pre"),
+					RunE:    makeHookRunE(order, "run"),
 				}
 			},
 			want: []string{"pre", "run"},
@@ -54,17 +58,9 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			hookName: "post",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					Use: "test",
-					RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-						*order = append(*order, "run")
-
-						return nil
-					},
-					PostRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-						*order = append(*order, "post")
-
-						return nil
-					},
+					Use:      "test",
+					RunE:     makeHookRunE(order, "run"),
+					PostRunE: makeHookRunE(order, "post"),
 				}
 			},
 			want: []string{"run", "post"},

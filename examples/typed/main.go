@@ -71,6 +71,17 @@ func (d *Database) Shutdown() error {
 	return nil
 }
 
+// printRunE creates a RunE function that prints messages and returns nil.
+func printRunE(messages ...string) func(context.Context, *AppConfig, v2.NoFlags) error {
+	return func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+		for _, msg := range messages {
+			fmt.Println(msg)
+		}
+
+		return nil
+	}
+}
+
 func main() {
 	fmt.Println("=== Typed CLI Example (v2 API) ===")
 	fmt.Println()
@@ -200,12 +211,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 	versionCmd := v2.Command[AppConfig, v2.NoFlags]{
 		Use:   "version",
 		Short: "Print version information",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-			fmt.Println("myapp version 1.0.0")
-			fmt.Println("Built with cmdguard v2")
-
-			return nil
-		},
+		RunE:  printRunE("myapp version 1.0.0", "Built with cmdguard v2"),
 	}
 
 	err = cli.AddCommand(versionCmd)
@@ -255,12 +261,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			{
 				Use:   "migrate",
 				Short: "Run database migrations",
-				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-					fmt.Println("Running migrations...")
-					fmt.Println("Migration complete!")
-
-					return nil
-				},
+				RunE:  printRunE("Running migrations...", "Migration complete!"),
 			},
 		},
 	}
@@ -275,11 +276,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		Use:    "secret",
 		Short:  "Secret command",
 		Hidden: true,
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-			fmt.Println("You found the secret command!")
-
-			return nil
-		},
+		RunE:   printRunE("You found the secret command!"),
 	}
 
 	err = cli.AddCommand(hiddenCmd)
@@ -292,11 +289,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		Use:        "oldcmd",
 		Short:      "Old command (deprecated)",
 		Deprecated: "Use 'greet' instead",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-			fmt.Println("This command is deprecated. Use 'greet' instead.")
-
-			return nil
-		},
+		RunE:       printRunE("This command is deprecated. Use 'greet' instead."),
 	}
 
 	err = cli.AddCommand(deprecatedCmd)

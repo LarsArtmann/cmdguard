@@ -7,148 +7,71 @@ import (
 )
 
 func TestSuggestFlag(t *testing.T) {
-	validNames := []string{"verbose", "version", "config", "help", "output"}
+	defaultNames := []string{"verbose", "version", "config", "help", "output"}
 
-	t.Run("exact match returns same name", func(t *testing.T) {
-		result := SuggestFlag(validNames, "verbose")
-		if result != "verbose" {
-			t.Errorf("SuggestFlag() = %q, want %q", result, "verbose")
-		}
-	})
+	tests := []struct {
+		name       string
+		validNames []string
+		input      string
+		want       string
+		wantOneOf  []string // Alternative: check result is one of these
+	}{
+		{"exact match returns same name", defaultNames, "verbose", "verbose", nil},
+		{"one character typo returns suggestion", defaultNames, "verbosee", "verbose", nil},
+		{"missing character returns suggestion", defaultNames, "verbos", "verbose", nil},
+		{"transposed characters returns suggestion", defaultNames, "verbsoe", "verbose", nil},
+		{"similar prefix returns closest match", defaultNames, "confing", "config", nil},
+		{"too different returns empty", defaultNames, "xyzzy", "", nil},
+		{"empty valid names returns empty", []string{}, "test", "", nil},
+		{"single valid name match", []string{"help"}, "hlep", "help", nil},
+		{
+			"selects closest match among multiple",
+			[]string{"start", "status", "stop"},
+			"stat",
+			"",
+			[]string{"start", "status", "stop"},
+		},
+	}
 
-	t.Run("one character typo returns suggestion", func(t *testing.T) {
-		result := SuggestFlag(validNames, "verbosee")
-		if result != "verbose" {
-			t.Errorf("SuggestFlag() = %q, want %q", result, "verbose")
-		}
-	})
-
-	t.Run("missing character returns suggestion", func(t *testing.T) {
-		result := SuggestFlag(validNames, "verbos")
-		if result != "verbose" {
-			t.Errorf("SuggestFlag() = %q, want %q", result, "verbose")
-		}
-	})
-
-	t.Run("transposed characters returns suggestion", func(t *testing.T) {
-		result := SuggestFlag(validNames, "verbsoe")
-		if result != "verbose" {
-			t.Errorf("SuggestFlag() = %q, want %q", result, "verbose")
-		}
-	})
-
-	t.Run("similar prefix returns closest match", func(t *testing.T) {
-		result := SuggestFlag(validNames, "confing")
-		if result != "config" {
-			t.Errorf("SuggestFlag() = %q, want %q", result, "config")
-		}
-	})
-
-	t.Run("too different returns empty", func(t *testing.T) {
-		result := SuggestFlag(validNames, "xyzzy")
-		if result != "" {
-			t.Errorf("SuggestFlag() = %q, want empty", result)
-		}
-	})
-
-	t.Run("empty valid names returns empty", func(t *testing.T) {
-		result := SuggestFlag([]string{}, "test")
-		if result != "" {
-			t.Errorf("SuggestFlag() = %q, want empty", result)
-		}
-	})
-
-	t.Run("single valid name match", func(t *testing.T) {
-		result := SuggestFlag([]string{"help"}, "hlep")
-		if result != "help" {
-			t.Errorf("SuggestFlag() = %q, want %q", result, "help")
-		}
-	})
-
-	t.Run("selects closest match among multiple", func(t *testing.T) {
-		names := []string{"start", "status", "stop"}
-
-		result := SuggestFlag(names, "stat")
-		if !containsString(names, result) {
-			t.Errorf("SuggestFlag() = %q, expected to be one of %v", result, names)
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SuggestFlag(tt.validNames, tt.input)
+			if tt.wantOneOf != nil {
+				if !containsString(tt.wantOneOf, result) {
+					t.Errorf("SuggestFlag() = %q, expected to be one of %v", result, tt.wantOneOf)
+				}
+			} else if result != tt.want {
+				t.Errorf("SuggestFlag() = %q, want %q", result, tt.want)
+			}
+		})
+	}
 }
 
 func TestEditDistance(t *testing.T) {
-	t.Run("identical strings have distance 0", func(t *testing.T) {
-		if editDistance("hello", "hello") != 0 {
-			t.Errorf(
-				"editDistance(\"hello\", \"hello\") = %d, want 0",
-				editDistance("hello", "hello"),
-			)
-		}
-	})
+	tests := []struct {
+		name string
+		a, b string
+		want int
+	}{
+		{"identical strings have distance 0", "hello", "hello", 0},
+		{"empty to string", "", "hello", 5},
+		{"string to empty", "hello", "", 5},
+		{"both empty", "", "", 0},
+		{"single insertion", "hell", "hello", 1},
+		{"single deletion", "hello", "hell", 1},
+		{"single substitution", "hello", "hallo", 1},
+		{"transposition counts as 2", "ab", "ba", 2},
+		{"multiple edits", "kitten", "sitting", 3},
+		{"case sensitive", "Hello", "hello", 1},
+	}
 
-	t.Run("empty strings", func(t *testing.T) {
-		if editDistance("", "hello") != 5 {
-			t.Errorf("editDistance(\"\", \"hello\") = %d, want 5", editDistance("", "hello"))
-		}
-
-		if editDistance("hello", "") != 5 {
-			t.Errorf("editDistance(\"hello\", \"\") = %d, want 5", editDistance("hello", ""))
-		}
-
-		if editDistance("", "") != 0 {
-			t.Errorf("editDistance(\"\", \"\") = %d, want 0", editDistance("", ""))
-		}
-	})
-
-	t.Run("single insertion", func(t *testing.T) {
-		if editDistance("hell", "hello") != 1 {
-			t.Errorf(
-				"editDistance(\"hell\", \"hello\") = %d, want 1",
-				editDistance("hell", "hello"),
-			)
-		}
-	})
-
-	t.Run("single deletion", func(t *testing.T) {
-		if editDistance("hello", "hell") != 1 {
-			t.Errorf(
-				"editDistance(\"hello\", \"hell\") = %d, want 1",
-				editDistance("hello", "hell"),
-			)
-		}
-	})
-
-	t.Run("single substitution", func(t *testing.T) {
-		if editDistance("hello", "hallo") != 1 {
-			t.Errorf(
-				"editDistance(\"hello\", \"hallo\") = %d, want 1",
-				editDistance("hello", "hallo"),
-			)
-		}
-	})
-
-	t.Run("transposition counts as 2", func(t *testing.T) {
-		if editDistance("ab", "ba") != 2 {
-			t.Errorf("editDistance(\"ab\", \"ba\") = %d, want 2", editDistance("ab", "ba"))
-		}
-	})
-
-	t.Run("multiple edits", func(t *testing.T) {
-		if editDistance("kitten", "sitting") != 3 {
-			t.Errorf(
-				"editDistance(\"kitten\", \"sitting\") = %d, want 3",
-				editDistance("kitten", "sitting"),
-			)
-		}
-	})
-
-	t.Run("case sensitive", func(t *testing.T) {
-		if editDistance("Hello", "hello") != 1 {
-			t.Errorf(
-				"editDistance(\"Hello\", \"hello\") = %d, want 1",
-				editDistance("Hello", "hello"),
-			)
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := editDistance(tt.a, tt.b); got != tt.want {
+				t.Errorf("editDistance(%q, %q) = %d, want %d", tt.a, tt.b, got, tt.want)
+			}
+		})
+	}
 }
 
 var (

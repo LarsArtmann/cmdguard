@@ -307,7 +307,7 @@ pkg/cmdguard/v2/
 | ------------------------------- | ------------- | ------- |
 | `github.com/spf13/cobra`        | CLI framework | v1.10.2 |
 | `github.com/samber/do/v2`       | DI container  | v2.0.0  |
-| `github.com/charmbracelet/fang` | CLI styling   | v0.4.4  |
+| `github.com/charmbracelet/fang` | CLI styling   | v2.0.1  |
 
 ---
 

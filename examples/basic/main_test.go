@@ -17,21 +17,13 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 
 	var output bytes.Buffer
 
-	root.AddCommand(&cobra.Command{
-		Use:   "hello",
-		Short: "Say hello",
-		Run: func(cmd *cobra.Command, args []string) {
-			output.WriteString("Hello, World!\n")
-		},
-	})
+	root.AddCommand(newCommand("hello", "Say hello", func(_ *cobra.Command, _ []string) {
+		output.WriteString("Hello, World!\n")
+	}))
 
-	root.AddCommand(&cobra.Command{
-		Use:   "goodbye",
-		Short: "Say goodbye",
-		Run: func(cmd *cobra.Command, args []string) {
-			output.WriteString("Goodbye, World!\n")
-		},
-	})
+	root.AddCommand(newCommand("goodbye", "Say goodbye", func(_ *cobra.Command, _ []string) {
+		output.WriteString("Goodbye, World!\n")
+	}))
 
 	// Test hello command
 	root.Command().SetArgs([]string{"hello"})
@@ -64,17 +56,9 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	root := cmdguard.New("basic", "A basic CLI example")
 
-	root.AddCommand(&cobra.Command{
-		Use:   "hello",
-		Short: "Say hello",
-		Run:   func(cmd *cobra.Command, args []string) {},
-	})
-
-	root.AddCommand(&cobra.Command{
-		Use:   "goodbye",
-		Short: "Say goodbye",
-		Run:   func(cmd *cobra.Command, args []string) {},
-	})
+	emptyRun := func(_ *cobra.Command, _ []string) {}
+	root.AddCommand(newCommand("hello", "Say hello", emptyRun))
+	root.AddCommand(newCommand("goodbye", "Say goodbye", emptyRun))
 
 	cmd := root.Command()
 	if cmd.Use != "basic" {
@@ -98,17 +82,9 @@ func TestBasicExample_HelpOutput(t *testing.T) {
 
 	root := cmdguard.New("basic", "A basic CLI example")
 
-	root.AddCommand(&cobra.Command{
-		Use:   "hello",
-		Short: "Say hello",
-		Run:   func(cmd *cobra.Command, args []string) {},
-	})
-
-	root.AddCommand(&cobra.Command{
-		Use:   "goodbye",
-		Short: "Say goodbye",
-		Run:   func(cmd *cobra.Command, args []string) {},
-	})
+	emptyRun := func(_ *cobra.Command, _ []string) {}
+	root.AddCommand(newCommand("hello", "Say hello", emptyRun))
+	root.AddCommand(newCommand("goodbye", "Say goodbye", emptyRun))
 
 	// Set args to run help
 	root.Command().SetArgs([]string{"--help"})

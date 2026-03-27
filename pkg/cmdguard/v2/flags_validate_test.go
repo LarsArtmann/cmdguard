@@ -23,6 +23,21 @@ func setupFlagTest[T any](t *testing.T, config T) (*FlagRegistry, *cobra.Command
 	return registry, cmd
 }
 
+func setFlagAndAssertValid(
+	t *testing.T,
+	cmd *cobra.Command,
+	registry *FlagRegistry,
+	flagName, flagValue string,
+) {
+	t.Helper()
+	if err := cmd.PersistentFlags().Set(flagName, flagValue); err != nil {
+		t.Fatalf("expected no error setting flag, got: %v", err)
+	}
+	if err := registry.ValidateFlags(cmd); err != nil {
+		t.Errorf("expected no error, got: %v", err)
+	}
+}
+
 func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	t.Run("valid values pass", func(t *testing.T) {
 		type TestConfig struct {
@@ -77,22 +92,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		}
 	})
 
-	t.Run("flag without values skips validation", func(t *testing.T) {
+	// flag without values skips validation
+	{
 		type TestConfig struct {
 			Name string `default:"default" flag:"name"`
 		}
-
 		registry, cmd := setupFlagTest(t, TestConfig{})
-
-		if err := cmd.PersistentFlags().Set("name", "anything"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err := registry.ValidateFlags(cmd)
-		if err != nil {
-			t.Errorf("expected no error, got: %v", err)
-		}
-	})
+		setFlagAndAssertValid(t, cmd, registry, "name", "anything")
+	}
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
 		type TestConfig struct {
@@ -116,22 +123,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		}
 	})
 
-	t.Run("required flag set passes validation", func(t *testing.T) {
+	// required flag set passes validation
+	{
 		type TestConfig struct {
 			Name string `flag:"name" help:"required name" required:"true"`
 		}
-
 		registry, cmd := setupFlagTest(t, TestConfig{})
-
-		if err := cmd.PersistentFlags().Set("name", "test-value"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err := registry.ValidateFlags(cmd)
-		if err != nil {
-			t.Errorf("expected no error, got: %v", err)
-		}
-	})
+		setFlagAndAssertValid(t, cmd, registry, "name", "test-value")
+	}
 
 	t.Run("required false does not enforce", func(t *testing.T) {
 		type TestConfig struct {

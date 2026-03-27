@@ -7,6 +7,14 @@ import (
 	"github.com/samber/do/v2"
 )
 
+// provideTestNamed is a helper that reduces boilerplate in tests by wrapping
+// ProvideNamed with a simple value-returning provider function.
+func provideTestNamed[T any](scope *Scope, name string, value T) error {
+	return ProvideNamed(scope, name, func(_ do.Injector) (T, error) {
+		return value, nil
+	})
+}
+
 func TestProvideNamed(t *testing.T) {
 	t.Run("registers named service provider", func(t *testing.T) {
 		scope := NewScope("test")
@@ -44,15 +52,11 @@ func TestProvideNamed(t *testing.T) {
 	t.Run("can register multiple named implementations", func(t *testing.T) {
 		scope := NewScope("test")
 
-		if err := ProvideNamed(scope, "impl1", func(_ do.Injector) (string, error) {
-			return "implementation-1", nil
-		}); err != nil {
+		if err := provideTestNamed(scope, "impl1", "implementation-1"); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if err := ProvideNamed(scope, "impl2", func(_ do.Injector) (string, error) {
-			return "implementation-2", nil
-		}); err != nil {
+		if err := provideTestNamed(scope, "impl2", "implementation-2"); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
@@ -80,9 +84,7 @@ func TestInvokeNamed(t *testing.T) {
 	t.Run("returns named service", func(t *testing.T) {
 		scope := NewScope("test")
 
-		if err := ProvideNamed(scope, "my-service", func(_ do.Injector) (int, error) {
-			return 42, nil
-		}); err != nil {
+		if err := provideTestNamed(scope, "my-service", 42); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
@@ -152,9 +154,7 @@ func TestMustInvokeNamed(t *testing.T) {
 	t.Run("returns named service", func(t *testing.T) {
 		scope := NewScope("test")
 
-		if err := ProvideNamed(scope, "my-service", func(_ do.Injector) (int, error) {
-			return 99, nil
-		}); err != nil {
+		if err := provideTestNamed(scope, "my-service", 99); err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 

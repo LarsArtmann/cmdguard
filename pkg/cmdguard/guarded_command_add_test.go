@@ -6,6 +6,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// assertPanics runs fn and returns true if it panicked.
+func assertPanics(t *testing.T, fn func()) bool {
+	t.Helper()
+	didPanic := false
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				didPanic = true
+			}
+		}()
+		fn()
+	}()
+	return didPanic
+}
+
 func TestGuardedCommand_AddCommand(t *testing.T) {
 	t.Run("accepts valid command with Run", func(t *testing.T) {
 		g := New("testapp", "Test")
@@ -15,19 +30,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Run: func(*cobra.Command, []string) {},
 		}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddCommand(cmd)
-		}()
-
-		if didPanic {
+		if assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should not panic for valid command")
 		}
 	})
@@ -42,19 +45,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			},
 		}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddCommand(cmd)
-		}()
-
-		if didPanic {
+		if assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should not panic for valid command")
 		}
 	})
@@ -66,19 +57,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Use: "invalid",
 		}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddCommand(cmd)
-		}()
-
-		if !didPanic {
+		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should panic for command without handler")
 		}
 	})
@@ -88,19 +67,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := &cobra.Command{}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddCommand(cmd)
-		}()
-
-		if !didPanic {
+		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should panic for command without name")
 		}
 	})
@@ -114,19 +81,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Run: func(*cobra.Command, []string) {},
 		}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddCommand(cmd)
-		}()
-
-		if !didPanic {
+		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should panic after Execute called")
 		}
 	})
@@ -147,19 +102,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 			Run: func(*cobra.Command, []string) {},
 		}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddSubcommand(parent, child)
-		}()
-
-		if didPanic {
+		if assertPanics(t, func() { g.AddSubcommand(parent, child) }) {
 			t.Error("AddSubcommand should not panic for valid child")
 		}
 
@@ -191,19 +134,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 			Use: "invalid-child",
 		}
 
-		didPanic := false
-
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					didPanic = true
-				}
-			}()
-
-			g.AddSubcommand(parent, child)
-		}()
-
-		if !didPanic {
+		if !assertPanics(t, func() { g.AddSubcommand(parent, child) }) {
 			t.Error("AddSubcommand should panic for invalid child")
 		}
 	})

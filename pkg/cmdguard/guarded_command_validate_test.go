@@ -119,21 +119,23 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 }
 
 func TestGuardedCommand_DefaultCommands(t *testing.T) {
-	t.Run("version command is added", func(t *testing.T) {
-		g := New("testapp", "Test")
+	tests := []struct {
+		name    string
+		cmdName string
+	}{
+		{"version command is added", "version"},
+		{"validate command is added", "validate"},
+	}
 
-		if !hasSubcommand(g, "version") {
-			t.Error("version command should be added by default")
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := New("testapp", "Test")
 
-	t.Run("validate command is added", func(t *testing.T) {
-		g := New("testapp", "Test")
-
-		if !hasSubcommand(g, "validate") {
-			t.Error("validate command should be added by default")
-		}
-	})
+			if !hasSubcommand(g, tt.cmdName) {
+				t.Errorf("%s command should be added by default", tt.cmdName)
+			}
+		})
+	}
 }
 
 func TestGuardedCommand_ValidateCommandTree(t *testing.T) {

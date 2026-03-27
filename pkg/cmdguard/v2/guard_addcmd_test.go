@@ -14,14 +14,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		cmd := Command[testAppConfig, NoFlags]{
-			Use: "greet",
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return nil
-			},
-		}
-
-		err = g.AddCommand(cmd)
+		err = g.AddCommand(newTestCmd("greet"))
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -58,12 +51,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		subCmd := Command[testAppConfig, NoFlags]{
-			Use: "list",
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return nil
-			},
-		}
+		subCmd := newTestCmd("list")
 
 		cmd := Command[testAppConfig, NoFlags]{
 			Use:      "greet",
@@ -92,19 +80,8 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		cmd1 := Command[testAppConfig, NoFlags]{
-			Use: "greet",
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return nil
-			},
-		}
-
-		cmd2 := Command[testAppConfig, NoFlags]{
-			Use: "greet",
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return nil
-			},
-		}
+		cmd1 := newTestCmd("greet")
+		cmd2 := newTestCmd("greet")
 
 		err = g.AddCommand(cmd1)
 		if err != nil {
@@ -216,26 +193,19 @@ func TestAddAnyCommand(t *testing.T) {
 
 		type otherFlags struct{}
 
-		cmd1 := Command[testAppConfig, *otherFlags]{
+		cmd := Command[testAppConfig, *otherFlags]{
 			Use: "test",
 			RunE: func(_ context.Context, _ *testAppConfig, _ *otherFlags) error {
 				return nil
 			},
 		}
 
-		cmd2 := Command[testAppConfig, *otherFlags]{
-			Use: "test",
-			RunE: func(_ context.Context, _ *testAppConfig, _ *otherFlags) error {
-				return nil
-			},
-		}
-
-		err = AddAnyCommand(g, cmd1)
+		err = AddAnyCommand(g, cmd)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = AddAnyCommand(g, cmd2)
+		err = AddAnyCommand(g, cmd)
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

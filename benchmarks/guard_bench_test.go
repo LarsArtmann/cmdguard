@@ -18,6 +18,18 @@ type BenchFlags struct {
 	Count int    `default:"1"     flag:"count" short:"c"`
 }
 
+// newBenchCommand creates a command with standard benchmark configuration.
+// This helper reduces duplication across benchmark functions.
+func newBenchCommand(use, short string) v2.Command[BenchConfig, v2.NoFlags] {
+	return v2.Command[BenchConfig, v2.NoFlags]{
+		Use:   use,
+		Short: short,
+		RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
+			return nil
+		},
+	}
+}
+
 // BenchmarkNew measures CLI creation performance.
 func BenchmarkNew(b *testing.B) {
 	defaults := BenchConfig{}
@@ -62,15 +74,7 @@ func BenchmarkAddCommand(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		cmd := v2.Command[BenchConfig, v2.NoFlags]{
-			Use:   "greet",
-			Short: "Greet someone",
-			RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
-				return nil
-			},
-		}
-
-		err = testCli.AddCommand(cmd)
+		err = testCli.AddCommand(newBenchCommand("greet", "Greet someone"))
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -86,15 +90,7 @@ func BenchmarkExecute(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	cmd := v2.Command[BenchConfig, v2.NoFlags]{
-		Use:   "hello",
-		Short: "Say hello",
-		RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
-			return nil
-		},
-	}
-
-	if err := cli.AddCommand(cmd); err != nil {
+	if err := cli.AddCommand(newBenchCommand("hello", "Say hello")); err != nil {
 		b.Fatal(err)
 	}
 
@@ -194,13 +190,7 @@ func BenchmarkFlagRegistryCreation(b *testing.B) {
 
 // BenchmarkCommandValidate measures command validation.
 func BenchmarkCommandValidate(b *testing.B) {
-	cmd := v2.Command[BenchConfig, v2.NoFlags]{
-		Use:   "test",
-		Short: "Test command",
-		RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
-			return nil
-		},
-	}
+	cmd := newBenchCommand("test", "Test command")
 
 	for b.Loop() {
 		err := cmd.Validate()

@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-02-28
 **Project:** cmdguard - CLI Guard Library
-**Go Version:** 1.26.0
+**Go Version:** 1.26.1
 **Status:** v2.0.0 COMPLETE - Production Ready
 
 ---
@@ -88,7 +88,7 @@ cmdguard/
 | ------------------------------- | -------------------- | ------- |
 | `github.com/spf13/cobra`        | CLI framework        | v1.10.2 |
 | `github.com/samber/do/v2`       | Dependency injection | v2.0.0  |
-| `github.com/charmbracelet/fang` | Cobra styling        | v0.4.4  |
+| `github.com/charmbracelet/fang` | Cobra styling        | v2.0.1  |
 | `github.com/knadh/koanf/v2`     | Configuration        | v2.3.3  |
 | `github.com/onsi/ginkgo/v2`     | BDD testing          | v2.28.1 |
 | `github.com/onsi/gomega`        | Test matchers        | v1.39.1 |
@@ -394,7 +394,7 @@ The v1 Guard API panics at construction time if:
 
 ### Go Conventions
 
-- **Go 1.26.0** - Use modern Go features
+- **Go 1.26.1** - Use modern Go features
 - **gofumpt** formatting preferred
 - **Error handling** - Always check errors, wrap with context
 - **Interface naming** - `-er` suffix (e.g., `Validator`)

@@ -63,13 +63,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		cmd := Command[testAppConfig, NoFlags]{
-			Use: "valid",
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return nil
-			},
-		}
-		if err := g.AddCommand(cmd); err != nil {
+		if err := g.AddCommand(newTestCmd("valid")); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
@@ -126,13 +120,7 @@ func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		cmd := Command[testAppConfig, NoFlags]{
-			Use: "greet",
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return nil
-			},
-		}
-		if err := g.AddCommand(cmd); err != nil {
+		if err := g.AddCommand(newTestCmd("greet")); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
@@ -153,12 +141,7 @@ func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 			os.Exit(1)
 		}
 
-		cmd := Command[testAppConfig, NoFlags]{
-			Use: use,
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return testErr
-			},
-		}
+		cmd := newTestCmd(use, testErr)
 		_ = g.AddCommand(cmd)
 
 		_ = g.ExecuteWithArgs(context.Background(), []string{use})

@@ -115,31 +115,25 @@ func TestLogFormat(t *testing.T) {
 	})
 }
 
+// testPtrGeneric tests that Ptr returns a valid pointer to the given value.
+func testPtrGeneric[T comparable](t *testing.T, v T) {
+	t.Helper()
+	p := Ptr(v)
+	if p == nil {
+		t.Fatal("expected non-nil pointer")
+	}
+	if *p != v {
+		t.Errorf("*p = %v, want %v", *p, v)
+	}
+}
+
 func TestPtr(t *testing.T) {
 	t.Run("int", func(t *testing.T) {
-		v := 42
-
-		p := Ptr(v)
-		if p == nil {
-			t.Fatal("expected non-nil pointer")
-		}
-
-		if *p != 42 {
-			t.Errorf("*p = %d, want %d", *p, 42)
-		}
+		testPtrGeneric(t, 42)
 	})
 
 	t.Run("string", func(t *testing.T) {
-		v := "hello"
-
-		p := Ptr(v)
-		if p == nil {
-			t.Fatal("expected non-nil pointer")
-		}
-
-		if *p != "hello" {
-			t.Errorf("*p = %q, want %q", *p, "hello")
-		}
+		testPtrGeneric(t, "hello")
 	})
 
 	t.Run("struct", func(t *testing.T) {
@@ -237,26 +231,19 @@ func TestLogLevel_MarshalUnmarshal(t *testing.T) {
 		}
 	})
 
-	t.Run("unmarshal valid", func(t *testing.T) {
-		var c config
-
-		err := json.Unmarshal([]byte(`{"value":"info"}`), &c)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		if c.Value.String() != "info" {
-			t.Errorf("unmarshaled Value = %q, want %q", c.Value.String(), "info")
-		}
-	})
+	// unmarshal valid
+	var c1 config
+	expectUnmarshalValidString(
+		t,
+		&c1,
+		`{"value":"info"}`,
+		"info",
+		func() string { return c1.Value.String() },
+	)
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
 		var c config
-
-		err := json.Unmarshal([]byte(`{"value":"trace"}`), &c)
-		if err == nil {
-			t.Error("expected error, got nil")
-		}
+		expectUnmarshalError(t, &c, `{"value":"trace"}`)
 	})
 }
 
@@ -280,25 +267,44 @@ func TestLogFormat_MarshalUnmarshal(t *testing.T) {
 		}
 	})
 
-	t.Run("unmarshal valid", func(t *testing.T) {
-		var c config
-
-		err := json.Unmarshal([]byte(`{"value":"json"}`), &c)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		if c.Value.String() != "json" {
-			t.Errorf("unmarshaled Value = %q, want %q", c.Value.String(), "json")
-		}
-	})
+	// unmarshal valid
+	var c2 config
+	expectUnmarshalValidString(
+		t,
+		&c2,
+		`{"value":"json"}`,
+		"json",
+		func() string { return c2.Value.String() },
+	)
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
 		var c config
-
-		err := json.Unmarshal([]byte(`{"value":"xml"}`), &c)
-		if err == nil {
-			t.Error("expected error, got nil")
-		}
+		expectUnmarshalError(t, &c, `{"value":"xml"}`)
 	})
+}
+
+// expectUnmarshalError tests that unmarshaling invalid JSON returns an error.
+func expectUnmarshalError(t *testing.T, target any, jsonStr string) {
+	t.Helper()
+	err := json.Unmarshal([]byte(jsonStr), target)
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+}
+
+// expectUnmarshalValidString tests that unmarshaling valid JSON succeeds and the extracted string matches expected.
+func expectUnmarshalValidString(
+	t *testing.T,
+	target any,
+	jsonStr, expected string,
+	extractStr func() string,
+) {
+	t.Helper()
+	err := json.Unmarshal([]byte(jsonStr), target)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := extractStr(); got != expected {
+		t.Errorf("unmarshaled Value = %q, want %q", got, expected)
+	}
 }

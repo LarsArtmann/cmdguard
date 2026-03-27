@@ -31,10 +31,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 
 	// Test with name flag
-	output := captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"greet", "--name", "Alice"})
-		_ = cli.Execute(context.Background())
-	})
+	output := runCLIWithArgs(cli, "greet", "--name", "Alice")
 	if !strings.Contains(output, "Hello, Alice!") {
 		t.Errorf("output should contain %q, got %q", "Hello, Alice!", output)
 	}
@@ -69,10 +66,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 	_ = v2.AddAnyCommand(cli, greetCmd)
 
-	output = captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"greet", "--count", "3"})
-		_ = cli.Execute(context.Background())
-	})
+	output = runCLIWithArgs(cli, "greet", "--count", "3")
 	// With count=3, we should see "Hello, World!" three times
 	if !strings.Contains(output, "Hello, World!") {
 		t.Errorf("output should contain %q, got %q", "Hello, World!", output)
@@ -119,10 +113,7 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	output := captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"config"})
-		_ = cli.Execute(context.Background())
-	})
+	output := runCLIWithArgs(cli, "config")
 
 	// Verify the default config values are displayed
 	if !strings.Contains(output, "Verbose: false") {
@@ -219,10 +210,7 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	output := captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"db-status"})
-		_ = cli.Execute(context.Background())
-	})
+	output := runCLIWithArgs(cli, "db-status")
 
 	if !strings.Contains(output, "postgres://test:5432/db") {
 		t.Errorf("output should contain %q, got %q", "postgres://test:5432/db", output)
@@ -283,10 +271,7 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	output := captureOutput(func() {
-		cli.RootCommand().SetArgs([]string{"greet", "--count", "1"})
-		_ = cli.Execute(context.Background())
-	})
+	output := runCLIWithArgs(cli, "greet", "--count", "1")
 	if !strings.Contains(output, "Greeting executed") {
 		t.Errorf("output should contain %q, got %q", "Greeting executed", output)
 	}
