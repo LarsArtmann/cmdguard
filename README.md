@@ -473,6 +473,13 @@ This approach catches configuration errors during development, not production.
 
 Both APIs are production-ready. Use v2 for new projects.
 
+## Documentation
+
+- [Quick Start Guide](docs/QUICKSTART.md) - Get started with cmdguard v2 in 5 minutes
+- [Migration Guide v1 to v2](docs/MIGRATION_v1_v2.md) - Migrating from v1 to v2 API
+- [FEATURES.md](docs/FEATURES.md) - Feature status and roadmap
+- [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) - Design guidelines
+
 ## License
 
 MIT

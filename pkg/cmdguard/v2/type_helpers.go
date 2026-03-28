@@ -6,7 +6,6 @@ import "fmt"
 // Useful for optional config fields.
 //
 //go:fix inline
-//go:fix inline
 func Ptr[T any](v T) *T {
 	return new(v)
 }

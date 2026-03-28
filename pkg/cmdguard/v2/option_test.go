@@ -295,3 +295,35 @@ func TestOption_WithStructs(t *testing.T) {
 		t.Error("Option[struct] should work correctly")
 	}
 }
+
+func TestOption_MarshalText(t *testing.T) {
+	// Test Some with string
+	someOpt := Some("hello")
+	text, err := someOpt.MarshalText()
+	if err != nil {
+		t.Fatalf("MarshalText failed: %v", err)
+	}
+	if string(text) != "hello" {
+		t.Errorf("Some.MarshalText() should return 'hello', got %s", string(text))
+	}
+
+	// Test Some with int
+	someInt := Some(42)
+	text, err = someInt.MarshalText()
+	if err != nil {
+		t.Fatalf("MarshalText failed: %v", err)
+	}
+	if string(text) != "42" {
+		t.Errorf("Some(42).MarshalText() should return '42', got %s", string(text))
+	}
+
+	// Test None
+	noneOpt := None[string]()
+	text, err = noneOpt.MarshalText()
+	if err != nil {
+		t.Fatalf("MarshalText failed: %v", err)
+	}
+	if string(text) != "" {
+		t.Errorf("None.MarshalText() should return '', got %s", string(text))
+	}
+}
