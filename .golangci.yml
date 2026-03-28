@@ -124,15 +124,21 @@ linters:
           - nestif
           - paralleltest
           - gochecknoglobals
+          - staticcheck
       - path: examples/
         linters:
           - exhaustruct
           - cyclop
           - funlen
           - paralleltest
+          - staticcheck
       - path: benchmarks/
         linters:
           - exhaustruct
+          - staticcheck
+      - path: tests/
+        linters:
+          - staticcheck
       - path: pkg/cmdguard/v2/cli.go$
         linters:
           - cyclop

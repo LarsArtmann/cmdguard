@@ -34,8 +34,8 @@ func TestVersion(t *testing.T) {
 			t.Error("Version is empty")
 		}
 
-		if Version != "2.0.0" {
-			t.Errorf("Version = %q, want %q", Version, "2.0.0")
+		if Version != "2.1.0" {
+			t.Errorf("Version = %q, want %q", Version, "2.1.0")
 		}
 	})
 }
