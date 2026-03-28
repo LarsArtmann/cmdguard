@@ -321,5 +321,3 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 
 	return nil
 }
-
-
