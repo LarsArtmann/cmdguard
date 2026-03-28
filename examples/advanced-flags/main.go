@@ -76,8 +76,9 @@ type DurationFlags struct {
 func main() {
 	ctx := context.Background()
 
-	// Create CLI with global config
-	root, err := v2.New[GlobalConfig, v2.NoFlags](
+	// Create CLI with global config using CLI[T] API (v2.1+)
+	// CLI[T] uses a single type parameter for cleaner API
+	root, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
 		GlobalConfig{},
@@ -88,7 +89,8 @@ func main() {
 	}
 
 	// Server command with custom flags
-	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, ServerFlags]{
+	// CLI[T] uses v2.AddCommand function which supports any flags type per command
+	if err := v2.AddCommand(root, v2.Command[GlobalConfig, ServerFlags]{
 		Use:   "server",
 		Short: "Start the server",
 		Long:  "Start the HTTP server with configurable host and port.",
@@ -112,7 +114,7 @@ func main() {
 	}
 
 	// Config command with required flag
-	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, ConfigFlags]{
+	if err := v2.AddCommand(root, v2.Command[GlobalConfig, ConfigFlags]{
 		Use:   "config",
 		Short: "Configuration management",
 		Flags: ConfigFlags{},
@@ -142,7 +144,7 @@ func main() {
 	}
 
 	// Enum demo command
-	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, EnumFlags]{
+	if err := v2.AddCommand(root, v2.Command[GlobalConfig, EnumFlags]{
 		Use:   "env",
 		Short: "Environment settings",
 		Flags: EnumFlags{},
@@ -167,7 +169,7 @@ func main() {
 	}
 
 	// Duration demo command
-	if err := v2.AddAnyCommand(root, v2.Command[GlobalConfig, DurationFlags]{
+	if err := v2.AddCommand(root, v2.Command[GlobalConfig, DurationFlags]{
 		Use:   "duration",
 		Short: "Duration settings demo",
 		Flags: DurationFlags{},

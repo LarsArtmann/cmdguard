@@ -105,32 +105,34 @@ func (a *APIService) Call(ctx context.Context) error {
 func main() {
 	ctx := context.Background()
 
-	// Create CLI with typed config
-	root, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
+	// Create CLI with typed config using CLI[T] API (v2.1+)
+	// CLI[T] uses a single type parameter for cleaner API
+	root, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Register services in DI scope
-	if err := v2.Provide(root.ScopeStruct(), NewDatabaseService); err != nil {
+	if err := v2.Provide(root.Scope(), NewDatabaseService); err != nil {
 		fmt.Fprintf(os.Stderr, "Error registering database: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := v2.Provide(root.ScopeStruct(), NewAPIService); err != nil {
+	if err := v2.Provide(root.Scope(), NewAPIService); err != nil {
 		fmt.Fprintf(os.Stderr, "Error registering API: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Add health check command
-	if err := root.AddCommand(v2.Command[Config, v2.NoFlags]{
+	// CLI[T] uses v2.AddCommand function to support any flags type per command
+	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
 		Use:   "check",
 		Short: "Run health checks",
 		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Running health checks...")
 
-			err := root.ScopeStruct().HealthCheckWithContext(ctx)
+			err := root.Scope().HealthCheckWithContext(ctx)
 			if err != nil {
 				fmt.Printf("Health check FAILED: %v\n", err)
 
@@ -147,11 +149,11 @@ func main() {
 	}
 
 	// Add API call command
-	if err := root.AddCommand(v2.Command[Config, v2.NoFlags]{
+	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
 		Use:   "call",
 		Short: "Call the API",
 		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
-			api, err := v2.Invoke[*APIService](root.ScopeStruct())
+			api, err := v2.Invoke[*APIService](root.Scope())
 			if err != nil {
 				return err
 			}
@@ -164,7 +166,7 @@ func main() {
 	}
 
 	// Add shutdown command
-	if err := root.AddCommand(v2.Command[Config, v2.NoFlags]{
+	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
 		Use:   "shutdown",
 		Short: "Shutdown services gracefully",
 		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
@@ -190,7 +192,7 @@ func main() {
 	}
 
 	// Run health check before starting
-	if err := root.ScopeStruct().HealthCheckWithContext(ctx); err != nil {
+	if err := root.Scope().HealthCheckWithContext(ctx); err != nil {
 		fmt.Printf("Initial health check failed: %v\n", err)
 		os.Exit(1)
 	}

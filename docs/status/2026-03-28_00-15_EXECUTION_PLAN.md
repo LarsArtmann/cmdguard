@@ -9,13 +9,13 @@
 
 ### 🔍 Critical Oversights
 
-| Issue | Severity | Notes |
-|-------|----------|-------|
-| API Divergence | HIGH | `GuardedCommand[T,F]` vs `CLI[T]` - examples use old API but new one exists |
-| Missing Middleware | MEDIUM | No cross-cutting concerns support (logging, metrics, retries) |
-| No Progress UI | MEDIUM | Long-running commands need progress indicators |
-| Duplicate Code | LOW | `stringsToUpper` in examples duplicates stdlib |
-| Shell Completion | LOW | No helpers for generating completions |
+| Issue              | Severity | Notes                                                                       |
+| ------------------ | -------- | --------------------------------------------------------------------------- |
+| API Divergence     | HIGH     | `GuardedCommand[T,F]` vs `CLI[T]` - examples use old API but new one exists |
+| Missing Middleware | MEDIUM   | No cross-cutting concerns support (logging, metrics, retries)               |
+| No Progress UI     | MEDIUM   | Long-running commands need progress indicators                              |
+| Duplicate Code     | LOW      | `stringsToUpper` in examples duplicates stdlib                              |
+| Shell Completion   | LOW      | No helpers for generating completions                                       |
 
 ### 🎯 What Could Be Better
 
@@ -40,18 +40,21 @@
 ### Phase 1: API Alignment (Week 1)
 
 **Step 1.1:** Audit Current API Usage
+
 - **Work:** Low (1-2 hours)
 - **Impact:** HIGH - Clarifies API direction
 - **Action:** Document which API (`GuardedCommand` vs `CLI`) each example uses
 - **Files:** All examples
 
 **Step 1.2:** Update Examples to Use `CLI[T]`
+
 - **Work:** Medium (4-6 hours)
 - **Impact:** HIGH - Promotes best practice
 - **Action:** Migrate examples/typed to use `CLI[T]` API
 - **Files:** `examples/typed/main.go`, `examples/typed/main_test.go`
 
 **Step 1.3:** Deprecation Path for `GuardedCommand`
+
 - **Work:** Low (1 hour)
 - **Impact:** MEDIUM - Clear migration path
 - **Action:** Add deprecation notice to `GuardedCommand` recommending `CLI[T]`
@@ -60,24 +63,28 @@
 ### Phase 2: Core Improvements (Week 2-3)
 
 **Step 2.1:** Fix Duplicate Code in Examples
+
 - **Work:** Low (30 min)
 - **Impact:** LOW - Code hygiene
 - **Action:** Replace custom `stringsToUpper` with `strings.ToUpper`
 - **Files:** `examples/typed/main.go`
 
 **Step 2.2:** Add Middleware Support
+
 - **Work:** High (8-10 hours)
 - **Impact:** HIGH - Enables cross-cutting concerns
 - **Action:** Create `Middleware` type and `Use` method on `CLI[T]`
 - **Files:** New `pkg/cmdguard/v2/middleware.go`
 
 **Step 2.3:** Add Progress/Spinner Type
+
 - **Work:** Medium (4-6 hours)
 - **Impact:** MEDIUM - Better UX for long commands
 - **Action:** Create `Progress` type using `charmbracelet/bubbles/spinner`
 - **Files:** New `pkg/cmdguard/v2/progress.go`
 
 **Step 2.4:** Add Shell Completion Helpers
+
 - **Work:** Medium (3-4 hours)
 - **Impact:** MEDIUM - Better CLI experience
 - **Action:** Add `EnableCompletion()` method to `CLI[T]`
@@ -86,18 +93,21 @@
 ### Phase 3: Type System Enhancements (Week 4)
 
 **Step 3.1:** Add Generic Option Type
+
 - **Work:** Medium (3-4 hours)
 - **Impact:** HIGH - Type-safe optional values
 - **Action:** Create `Option[T]` type similar to Rust's Option
 - **Files:** `pkg/cmdguard/v2/types.go`
 
 **Step 3.2:** Add Result Type for Error Handling
+
 - **Work:** Medium (3-4 hours)
 - **Impact:** HIGH - Explicit error handling
 - **Action:** Create `Result[T]` type for operations that may fail
 - **Files:** `pkg/cmdguard/v2/types.go`
 
 **Step 3.3:** Add Validation Types
+
 - **Work:** Medium (4-5 hours)
 - **Impact:** MEDIUM - Reusable validators
 - **Action:** Create `Validated[T]` wrapper with validation functions
@@ -106,18 +116,21 @@
 ### Phase 4: Integration Features (Week 5-6)
 
 **Step 4.1:** Config File Auto-Loading
+
 - **Work:** High (6-8 hours)
 - **Impact:** HIGH - Common use case
 - **Action:** Integrate koanf for automatic config file loading
 - **Files:** `pkg/cmdguard/v2/config.go`
 
 **Step 4.2:** Environment Variable Binding
+
 - **Work:** Medium (3-4 hours)
 - **Impact:** MEDIUM - 12-factor app support
 - **Action:** Add `env:"VAR_NAME"` struct tag support
 - **Files:** `pkg/cmdguard/v2/flags.go`, `pkg/cmdguard/v2/config.go`
 
 **Step 4.3:** Add Command Groups/Namespaces
+
 - **Work:** Medium (4-5 hours)
 - **Impact:** MEDIUM - Better organization
 - **Action:** Add `AddCommandGroup()` for organizing related commands
@@ -127,21 +140,21 @@
 
 ## 3. Work vs Impact Matrix
 
-| Step | Work Required | Impact | Priority |
-|------|---------------|--------|----------|
-| 1.1 API Audit | 🟢 Low | 🔴 HIGH | P0 |
-| 1.2 Update Examples | 🟡 Medium | 🔴 HIGH | P0 |
-| 1.3 Deprecation Path | 🟢 Low | 🟡 MEDIUM | P1 |
-| 2.1 Fix Examples | 🟢 Low | 🟢 LOW | P2 |
-| 2.2 Middleware | 🔴 High | 🔴 HIGH | P1 |
-| 2.3 Progress UI | 🟡 Medium | 🟡 MEDIUM | P2 |
-| 2.4 Shell Completion | 🟡 Medium | 🟡 MEDIUM | P2 |
-| 3.1 Option Type | 🟡 Medium | 🔴 HIGH | P1 |
-| 3.2 Result Type | 🟡 Medium | 🔴 HIGH | P1 |
-| 3.3 Validation | 🟡 Medium | 🟡 MEDIUM | P2 |
-| 4.1 Config Loading | 🔴 High | 🔴 HIGH | P1 |
-| 4.2 Env Binding | 🟡 Medium | 🟡 MEDIUM | P2 |
-| 4.3 Command Groups | 🟡 Medium | 🟡 MEDIUM | P3 |
+| Step                 | Work Required | Impact    | Priority |
+| -------------------- | ------------- | --------- | -------- |
+| 1.1 API Audit        | 🟢 Low        | 🔴 HIGH   | P0       |
+| 1.2 Update Examples  | 🟡 Medium     | 🔴 HIGH   | P0       |
+| 1.3 Deprecation Path | 🟢 Low        | 🟡 MEDIUM | P1       |
+| 2.1 Fix Examples     | 🟢 Low        | 🟢 LOW    | P2       |
+| 2.2 Middleware       | 🔴 High       | 🔴 HIGH   | P1       |
+| 2.3 Progress UI      | 🟡 Medium     | 🟡 MEDIUM | P2       |
+| 2.4 Shell Completion | 🟡 Medium     | 🟡 MEDIUM | P2       |
+| 3.1 Option Type      | 🟡 Medium     | 🔴 HIGH   | P1       |
+| 3.2 Result Type      | 🟡 Medium     | 🔴 HIGH   | P1       |
+| 3.3 Validation       | 🟡 Medium     | 🟡 MEDIUM | P2       |
+| 4.1 Config Loading   | 🔴 High       | 🔴 HIGH   | P1       |
+| 4.2 Env Binding      | 🟡 Medium     | 🟡 MEDIUM | P2       |
+| 4.3 Command Groups   | 🟡 Medium     | 🟡 MEDIUM | P3       |
 
 ---
 
@@ -149,23 +162,23 @@
 
 ### ✅ Reusable Components
 
-| Component | Location | Use For |
-|-----------|----------|---------|
-| `Scope` | `scope.go` | Middleware DI injection |
-| `Enum` | `types.go` | Validation enums |
-| `Duration` | `types.go` | Timeout configs |
-| `FlagRegistry` | `flags.go` | Custom flag types |
-| `Command[T,F]` | `command.go` | Middleware wrapping |
+| Component      | Location     | Use For                 |
+| -------------- | ------------ | ----------------------- |
+| `Scope`        | `scope.go`   | Middleware DI injection |
+| `Enum`         | `types.go`   | Validation enums        |
+| `Duration`     | `types.go`   | Timeout configs         |
+| `FlagRegistry` | `flags.go`   | Custom flag types       |
+| `Command[T,F]` | `command.go` | Middleware wrapping     |
 
 ### 🔧 Libraries to Leverage
 
-| Library | Use Case | Already Used? |
-|---------|----------|---------------|
-| `charmbracelet/bubbles` | Progress spinners | ❌ No - add |
-| `charmbracelet/lipgloss` | Styled output | ✅ Yes (via fang) |
-| `samber/do/v2` | DI / Middleware | ✅ Yes |
-| `spf13/cobra` | Completion | ✅ Yes - enable |
-| `knadh/koanf/v2` | Config loading | ✅ Yes - integrate |
+| Library                  | Use Case          | Already Used?      |
+| ------------------------ | ----------------- | ------------------ |
+| `charmbracelet/bubbles`  | Progress spinners | ❌ No - add        |
+| `charmbracelet/lipgloss` | Styled output     | ✅ Yes (via fang)  |
+| `samber/do/v2`           | DI / Middleware   | ✅ Yes             |
+| `spf13/cobra`            | Completion        | ✅ Yes - enable    |
+| `knadh/koanf/v2`         | Config loading    | ✅ Yes - integrate |
 
 ---
 
@@ -202,12 +215,14 @@ CLI[T]                          -- Root (single type param)
 ### Type Safety Improvements
 
 1. **Option[T]:** Make nil impossible
+
    ```go
    type Option[T any] struct { value T; ok bool }
    func (o Option[T]) Unwrap() (T, error)
    ```
 
 2. **Result[T]:** Explicit success/failure
+
    ```go
    type Result[T any] struct { value T; err error }
    func (r Result[T]) Expect(msg string) T
@@ -225,21 +240,21 @@ CLI[T]                          -- Root (single type param)
 
 ### Already Integrated ✅
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| cobra | v1.10.2 | CLI framework |
-| samber/do/v2 | v2.0.0 | DI container |
-| charmbracelet/fang | v2.0.1 | Styling |
-| knadh/koanf/v2 | v2.3.3 | Config management |
+| Library            | Version | Purpose           |
+| ------------------ | ------- | ----------------- |
+| cobra              | v1.10.2 | CLI framework     |
+| samber/do/v2       | v2.0.0  | DI container      |
+| charmbracelet/fang | v2.0.1  | Styling           |
+| knadh/koanf/v2     | v2.3.3  | Config management |
 
 ### Recommended Additions
 
-| Library | Purpose | Benefit |
-|---------|---------|---------|
-| charmbracelet/bubbles | Progress UI | Beautiful spinners/progress bars |
-| charmbracelet/huh | Interactive forms | Better user input |
-| samber/lo | Functional helpers | Map, Filter, Reduce |
-| stretchr/testify | Testing (careful) | Assertions (use minimal) |
+| Library               | Purpose            | Benefit                          |
+| --------------------- | ------------------ | -------------------------------- |
+| charmbracelet/bubbles | Progress UI        | Beautiful spinners/progress bars |
+| charmbracelet/huh     | Interactive forms  | Better user input                |
+| samber/lo             | Functional helpers | Map, Filter, Reduce              |
+| stretchr/testify      | Testing (careful)  | Assertions (use minimal)         |
 
 ### Integration Strategy
 
@@ -274,21 +289,19 @@ CLI[T]                          -- Root (single type param)
 
 ## Success Metrics
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Examples using `CLI[T]` | 0/4 | 4/4 |
-| Custom duplicate code | 1+ instances | 0 |
-| Test coverage (v2) | 81.2% | 85%+ |
-| New types added | 4 | 7+ (Option, Result, Validated) |
-| Middleware support | ❌ | ✅ |
-| Shell completion | ❌ | ✅ |
+| Metric                  | Current      | Target                         |
+| ----------------------- | ------------ | ------------------------------ |
+| Examples using `CLI[T]` | 0/4          | 4/4                            |
+| Custom duplicate code   | 1+ instances | 0                              |
+| Test coverage (v2)      | 81.2%        | 85%+                           |
+| New types added         | 4            | 7+ (Option, Result, Validated) |
+| Middleware support      | ❌           | ✅                             |
+| Shell completion        | ❌           | ✅                             |
 
 ---
 
 _Ready to execute. Each step is self-contained and independently committable._
 
-
 💘 Generated with Crush
-
 
 Assisted-by: Crush AI Assistant via Crush <crush@charm.land>

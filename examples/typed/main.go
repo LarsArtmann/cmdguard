@@ -87,8 +87,10 @@ func main() {
 	fmt.Println("=== Typed CLI Example (v2 API) ===")
 	fmt.Println()
 
-	// Create the CLI with typed config
-	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
+	// Create the CLI with typed config using the new CLI[T] API (v2.1+)
+	// CLI[T] uses a single type parameter for the config type.
+	// Each command can have its own flags type.
+	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
 		os.Exit(1)
@@ -101,7 +103,7 @@ func main() {
 	cli.AddGlobalBoolFlag("debug", "d", false, "Enable debug mode")
 
 	// Register services in the DI scope
-	registerServices(cli.ScopeStruct())
+	registerServices(cli.Scope())
 
 	// Add commands
 	if err := addCommands(cli); err != nil {
@@ -157,8 +159,9 @@ func registerServices(scope *v2.Scope) {
 	}
 }
 
-func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
+func addCommands(cli *v2.CLI[AppConfig]) error {
 	// Greet command with typed flags
+	// Using CLI[T] API - each command can have its own flags type
 	greetCmd := v2.Command[AppConfig, *GreetFlags]{
 		Use:     "greet [message]",
 		Short:   "Greet someone",
@@ -177,9 +180,9 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			return nil
 		},
 		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			logger, err := v2.Invoke[*Logger](cli.ScopeStruct())
+			logger, err := v2.Invoke[*Logger](cli.Scope())
 			if err != nil {
-				return fmt.Errorf("invoking *Logger in scope %p: %w", cli.ScopeStruct(), err)
+				return fmt.Errorf("invoking *Logger in scope %p: %w", cli.Scope(), err)
 			}
 
 			for i := range flags.Count {
@@ -203,7 +206,8 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		},
 	}
 
-	err := v2.AddAnyCommand(cli, greetCmd)
+	// CLI[T] uses AddCommand function (not method) - supports any flags type per command
+	err := v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add greet command: %w", err)
 	}
@@ -215,7 +219,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		RunE:  printRunE("myapp version 1.0.0", "Built with cmdguard v2"),
 	}
 
-	err = cli.AddCommand(versionCmd)
+	err = v2.AddCommand(cli, versionCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add version command: %w", err)
 	}
@@ -234,7 +238,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		},
 	}
 
-	err = cli.AddCommand(configCmd)
+	err = v2.AddCommand(cli, configCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add config command: %w", err)
 	}
@@ -248,7 +252,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 				Use:   "status",
 				Short: "Check database connection",
 				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-					db, err := v2.Invoke[*Database](cli.ScopeStruct())
+					db, err := v2.Invoke[*Database](cli.Scope())
 					if err != nil {
 						return v2.NewServiceError("*Database", err)
 					}
@@ -267,7 +271,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		},
 	}
 
-	err = cli.AddCommand(dbCmd)
+	err = v2.AddCommand(cli, dbCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add db command: %w", err)
 	}
@@ -280,7 +284,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		RunE:   printRunE("You found the secret command!"),
 	}
 
-	err = cli.AddCommand(hiddenCmd)
+	err = v2.AddCommand(cli, hiddenCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add hidden command: %w", err)
 	}
@@ -293,7 +297,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		RunE:       printRunE("This command is deprecated. Use 'greet' instead."),
 	}
 
-	err = cli.AddCommand(deprecatedCmd)
+	err = v2.AddCommand(cli, deprecatedCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add deprecated command: %w", err)
 	}
@@ -314,7 +318,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 		},
 	}
 
-	err = v2.AddAnyCommand(cli, statsCmd)
+	err = v2.AddCommand(cli, statsCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add stats command: %w", err)
 	}

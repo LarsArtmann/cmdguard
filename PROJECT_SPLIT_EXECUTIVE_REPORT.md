@@ -1,5 +1,7 @@
 # Project Split Analysis: cmdguard
 
+**Last Updated:** 2026-03-28
+
 ## Executive Summary
 
 cmdguard is a focused Go library for building validated Cobra CLI applications with two API versions (v1 panic-based, v2 type-safe with DI). The project is cohesive, small (~15 source files), and single-purpose. Splitting is **not recommended** as the codebase is well-organized and the components are tightly coupled to a single domain.

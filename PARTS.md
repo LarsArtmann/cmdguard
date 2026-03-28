@@ -1,8 +1,8 @@
 # cmdguard Component Analysis
 
-**Last Updated:** 2026-03-01
+**Last Updated:** 2026-03-28
 **Version:** 2.0.0
-**Status:** Analysis Complete
+**Status:** Analysis Complete - Partially Implemented
 
 ---
 
@@ -144,7 +144,7 @@ all provide this. The differentiation is typo UX, DI, and custom types.
 
 ### 2. DI Scope Wrapper (`pkg/cmdguard/v2/scope.go`)
 
-**Lines of Code:** ~270
+**Lines of Code:** ~283
 **Dependencies:** samber/do/v2
 **Complexity:** Low-Medium
 
@@ -164,9 +164,10 @@ ProvideValue(scope, &Logger{})
 // Generic invocation
 db, err := Invoke[*Database](scope)
 
-// Lifecycle
+// Lifecycle via samber/do interfaces (Shutdowner, Healthchecker)
 scope.HealthCheck()
 scope.Shutdown(ctx)
+scope.ShutdownAll(ctx)  // shutdown entire hierarchy
 ```
 
 #### Unique Features
@@ -203,11 +204,19 @@ scope.Shutdown(ctx)
 
 **Keep internal** but document as reusable pattern.
 
-**Missing features to add:**
+**Implemented features:**
 
-- `OnStart` / `OnStop` lifecycle hooks (fx pattern)
-- Per-command scope factory
-- Ordered shutdown priority
+- Scope hierarchy with `Child()` and `Path()`
+- Generic providers: `Provide`, `ProvideNamed`, `ProvideValue`
+- Generic invocation: `Invoke`, `InvokeNamed`, `MustInvoke`, `MustInvokeNamed`
+- Lifecycle via samber/do/v2: `Shutdowner`, `Healthchecker`, `HealthcheckerWithContext`
+- Scoped providers: `ScopedProvider`, `RegisterInScope`
+
+**Missing features (from fx pattern):**
+
+- `OnStart` / `OnStop` lifecycle hooks - handled by samber/do/v2 interfaces
+- Per-command scope factory - partially addressed via `ScopedProvider`
+- Ordered shutdown priority - use `ShutdownAll()` for hierarchy
 
 ---
 

@@ -1,5 +1,7 @@
 # What This Project Is Not
 
+**Last Updated:** 2026-03-28
+
 cmdguard is a focused library, not a full-fledged CLI framework. Here's what it deliberately avoids:
 
 ---
@@ -26,7 +28,7 @@ package main
 import "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 
 func main() {
-    cli, _ := v2.New[AppConfig]("myapp", "My CLI", AppConfig{})
+    cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})
     cli.ExecuteAndExit(context.Background())
 }
 ```
