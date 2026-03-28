@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/samber/do/v2"
@@ -184,7 +185,7 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 			for i := range flags.Count {
 				msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 				if flags.Shout {
-					msg = stringsToUpper(msg)
+					msg = strings.ToUpper(msg)
 				}
 
 				fmt.Println(msg)
@@ -321,15 +322,4 @@ func addCommands(cli *v2.GuardedCommand[AppConfig, v2.NoFlags]) error {
 	return nil
 }
 
-func stringsToUpper(s string) string {
-	result := make([]byte, len(s))
-	for i, c := range []byte(s) {
-		if c >= 'a' && c <= 'z' {
-			result[i] = c - 32
-		} else {
-			result[i] = c
-		}
-	}
 
-	return string(result)
-}
