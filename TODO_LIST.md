@@ -2,6 +2,22 @@
 
 **Generated:** 2026-03-28
 **Files Processed:** 200
+**Last Updated:** 2026-03-28 11:05
+
+## ✅ COMPLETED (Session 2026-03-28)
+
+- [x] Fix wrapcheck errors in types.go (json.Marshal/Unmarshal) - DONE
+- [x] Update FEATURES.md (coverage to 89.9%) - DONE
+- [x] Increase v2 coverage from 81.8% to 89.9% - DONE
+- [x] Add comprehensive flow_context tests (344 lines, 44 tests) - DONE
+- [x] Fix flow_context cancel bug (selfCancel tracking) - DONE
+- [x] Create Migration Guide v1→v2 (docs/MIGRATION_v1_v2.md) - DONE
+- [x] Create Quickstart Guide (docs/QUICKSTART.md) - DONE
+- [x] Add deprecation notices to GuardedCommand API - DONE
+- [x] Bump version to 2.1.0 - DONE
+- [x] Fix go.mod for go 1.26 compatibility - DONE
+- [x] Verify all linter issues resolved (thelper, nilnil, noctx, exhaustive, wrapcheck) - DONE
+- [x] Verify all fuzz tests pass - DONE
 
 ## 🟡 MEDIUM Priority
 
@@ -11,19 +27,7 @@
 - [ ] Update `FlagRegistry` to `FlagRegistry[F]` struct (source: API_DESIGN_REVIEW.md)
 - [ ] Update `NewFlagRegistry` to be generic (source: API_DESIGN_REVIEW.md)
 - [ ] Update `ParseFlags` to be generic (source: API_DESIGN_REVIEW.md)
-- [ ] Fix nilnil linter issue - return sentinel error (source: pkg/cmdguard/v2/guard_command.go:116)
-- [ ] Fix noctx linter issue - use exec.CommandContext (source: pkg/cmdguard/v2/guard_exec_test.go:193,226)
-- [ ] Fix thelper linter issue - add t.Helper() to assertion helpers (source: tests/integration/v2_mixed_flags_test.go:350,369)
-- [ ] Fix wrapcheck errors - wrap external errors with context (source: pkg/cmdguard/v2/cli.go:254-255, pkg/cmdguard/v2/guard_exec.go:16, internal/config/koanf.go:68,77,98,103, pkg/cmdguard/guarded_command.go:189, examples/di/main.go:136,179)
-- [ ] Fix exhaustive switch case in config.go (source: pkg/cmdguard/v2/config.go:95)
-- [ ] Fix exhaustive switch case in config_parsing.go (source: pkg/cmdguard/v2/config_parsing.go:146)
-- [ ] Fix exhaustive switch case in flags.go (source: pkg/cmdguard/v2/flags.go:50)
-- [ ] Fix exhaustive switch case in flags_parse.go (source: pkg/cmdguard/v2/flags_parse.go:59)
-- [ ] Fix exhaustive switch case in guard_flags.go (source: pkg/cmdguard/v2/guard_flags.go:27,75)
-- [ ] Fix FuzzLoad_EnvVarStrictMode fuzz test (source: internal/config/provider_fuzz_test.go:243)
-- [ ] Fix FuzzKoanfLoader_FilePath fuzz test (source: internal/config/provider_fuzz_test.go:432)
-- [ ] Fix FuzzValidLevel fuzz test (source: internal/logging/logger_fuzz_test.go:121)
-- [ ] Fix FuzzValidFormat fuzz test (source: internal/logging/logger_fuzz_test.go:145)
+- [ ] Fix CLI[T] AddCommand flag parsing bug using cloneAndParseFlags pattern (source: pkg/cmdguard/v2/cli.go:190)
 - [ ] Update all existing tests for new API (source: API_DESIGN_REVIEW.md)
 - [ ] Fix usetesting - replace os.Setenv with t.Setenv in tests (source: COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Update README.md (source: API_DESIGN_REVIEW.md)
@@ -44,7 +48,7 @@
 - [ ] Fix err113 dynamic error wrapping issues (source: docs/status/2026-03-22_14-12_comprehensive-status.md)
 - [ ] Update FEATURES.md (source: api-redesign-v2.1.md)
 - [ ] Update API_DESIGN_REVIEW.md (source: api-redesign-v2.1.md)
-- [ ] Update version to 2.1.0 (source: api-redesign-v2.1.md)
+
 - [ ] Improve flag suggestion algorithm (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Improve error types (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Update README.md with ID usage examples (source: docs/planning/go-composable-business-types-usage.md)
