@@ -241,25 +241,35 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 	root.SetValue("inherited", "from-root")
 	child.SetValueLocal("local", "child-only")
 
-	t.Run("inherited value", func(t *testing.T) {
-		val, ok := child.GetValue("inherited")
-		if !ok {
-			t.Error("expected to find inherited value")
-		}
-		if val != "from-root" {
-			t.Errorf("expected 'from-root', got %v", val)
-		}
-	})
+	testCases := []struct {
+		name     string
+		getter   func() (any, bool)
+		expected any
+	}{
+		{
+			name:     "inherited value",
+			getter:   func() (any, bool) { return child.GetValue("inherited") },
+			expected: "from-root",
+		},
+		{
+			name:     "local value",
+			getter:   func() (any, bool) { return child.GetValue("local") },
+			expected: "child-only",
+		},
+	}
 
-	t.Run("local value", func(t *testing.T) {
-		val, ok := child.GetValue("local")
-		if !ok {
-			t.Error("expected to find local value")
-		}
-		if val != "child-only" {
-			t.Errorf("expected 'child-only', got %v", val)
-		}
-	})
+	for _, tc := range testCases {
+		tc := tc // capture range variable
+		t.Run(tc.name, func(t *testing.T) {
+			val, ok := tc.getter()
+			if !ok {
+				t.Error("expected to find value")
+			}
+			if val != tc.expected {
+				t.Errorf("expected %v, got %v", tc.expected, val)
+			}
+		})
+	}
 
 	t.Run("missing value", func(t *testing.T) {
 		_, ok := root.GetValue("nonexistent")
