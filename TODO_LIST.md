@@ -173,7 +173,7 @@
 - [ ] Configure exhaustruct for external structs (source: COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Split funlen functions (source: COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Rename BaseError to avoid inheritance hint (source: docs/status/2026-03-23_20-51_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Rename test packages to use _test suffix (source: docs/status/2026-03-22_14-12_comprehensive-status.md)
+- [ ] Rename test packages to use \_test suffix (source: docs/status/2026-03-22_14-12_comprehensive-status.md)
 - [ ] Create `github.com/larsartmann/flagtags` repository (source: PARTS.md)
 - [ ] Extract flag-related code to standalone library (source: PARTS.md)
 - [ ] Add more custom types (URL, Email, Port, FilePath) (source: 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
