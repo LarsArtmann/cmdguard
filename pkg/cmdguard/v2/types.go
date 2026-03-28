@@ -407,7 +407,12 @@ func (o Option[T]) IfNone(f func()) {
 func (o Option[T]) MarshalJSON() ([]byte, error) {
 	if o.ok {
 		// Use any to access the concrete type's marshaler
-		return json.Marshal(any(o.value))
+		data, err := json.Marshal(any(o.value))
+		if err != nil {
+			return nil, fmt.Errorf("marshaling Option value: %w", err)
+		}
+
+		return data, nil
 	}
 
 	return []byte("null"), nil
@@ -425,7 +430,7 @@ func (o *Option[T]) UnmarshalJSON(data []byte) error {
 	var v T
 
 	if err := json.Unmarshal(data, &v); err != nil {
-		return err
+		return fmt.Errorf("unmarshaling Option value: %w", err)
 	}
 
 	o.value = v

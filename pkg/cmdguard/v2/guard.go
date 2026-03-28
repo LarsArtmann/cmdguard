@@ -8,11 +8,21 @@ import (
 
 // Version is the current version of the cmdguard v2 package.
 // This follows semantic versioning (https://semver.org/).
-const Version = "2.0.0"
+const Version = "2.1.0"
 
 // GuardedCommand provides type-safe CLI construction with DI.
 // It never panics - all operations return errors.
 // T is the application config type, F is the command-specific flags type.
+//
+// Deprecated: Use CLI[T] instead, which allows each command to have its own flags type.
+// GuardedCommand[T, F] will be removed in v3.0. See MIGRATION.md for upgrade guide.
+// Example migration:
+//
+//	// Old:
+//	cli, err := v2.New[Config, v2.NoFlags]("myapp", "My App", Config{})
+//
+//	// New:
+//	cli, err := v2.NewCLI[Config]("myapp", "My App", Config{})
 type GuardedCommand[T any, F any] struct {
 	name           string
 	short          string
@@ -29,6 +39,9 @@ type GuardedCommand[T any, F any] struct {
 // Returns an error if initialization fails (never panics).
 // T is the application config type, F is the command-specific flags type.
 // F must be a struct (like NoFlags) or pointer to struct for flag binding.
+//
+// Deprecated: Use NewCLI[T] instead, which allows each command to have its own flags type.
+// This function will be removed in v3.0.
 func New[T, F any](name, short string, defaults T) (*GuardedCommand[T, F], error) {
 	err := validateName(name)
 	if err != nil {

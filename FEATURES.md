@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-02-14  
+**Last Updated:** 2026-03-28  
 **Version:** 2.0.0  
 **Go Version:** 1.26.1
 
@@ -139,7 +139,7 @@ The v1 Guard API provides panic-at-construction validation.
 
 | Package            | Coverage | Status  |
 | ------------------ | -------- | ------- |
-| `pkg/cmdguard/v2`  | 89.0%    | ✅ Good |
+| `pkg/cmdguard/v2`  | 90.0%    | ✅ Good |
 | `pkg/cmdguard`     | 94.3%    | ✅ Good |
 | `internal/config`  | 95.7%    | ✅ Good |
 | `internal/logging` | 100%     | ✅ Good |
