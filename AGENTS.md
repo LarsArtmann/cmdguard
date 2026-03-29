@@ -261,6 +261,60 @@ err := scope.Shutdown(ctx)
 child := scope.Child("plugin-scope")
 ```
 
+### BranchingFlowContext
+
+`BranchingFlowContext` tracks the command execution path and allows context values to flow through the command tree. It's automatically created when `Execute` is called and accessible via `GetBranchingFlowContext`.
+
+```go
+// BranchingFlowContext is automatically integrated with CLI[T]
+// Access it after Execute
+root, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+
+// Access flow context in command handlers
+root.AddCommand(v2.Command[AppConfig, v2.NoFlags]{
+    Use:   "check",
+    Short: "Check flow context",
+    RunE: func(ctx context.Context, cfg *AppConfig, _ v2.NoFlags) error {
+        // Get branching flow context from context
+        bfc, ok := v2.GetBranchingFlowContext(ctx)
+        if !ok {
+            return errors.New("no flow context")
+        }
+
+        // Access path and values
+        fmt.Println("Path:", bfc.PathString())
+        fmt.Println("Depth:", bfc.Depth())
+
+        return nil
+    },
+})
+
+root.ExecuteAndExit(context.Background())
+
+// After Execute, access via CLI method
+fc := root.FlowContext()
+```
+
+**Key Functions:**
+
+| Function | Purpose |
+|----------|---------|
+| `NewBranchingFlowContext(ctx)` | Create root context |
+| `GetBranchingFlowContext(ctx)` | Get from context (returns ok) |
+| `RequireBranchingFlowContext(ctx)` | Get or panic |
+| `WithBranchingFlowContext(ctx, bfc)` | Wrap context with flow context |
+| `bfc.Branch(name)` | Create child context for subcommand |
+| `bfc.PathString()` | Get dot-separated path (e.g., "app.subcmd") |
+| `bfc.SetValue(key, val)` | Set value (propagates to children) |
+| `bfc.GetValue(key)` | Get value (looks up hierarchy) |
+| `bfc.Cancel()` | Cancel this and all children |
+
+**Use Cases:**
+- Track which commands are executing (audit logging)
+- Propagate request-scoped values down command tree
+- Cancel all child operations on error
+- Debug command execution paths
+
 ### Command with Custom Flags
 
 Supported flag types: `string`, `bool`, `int`, `uint`, `float64`, `[]string`, `Duration`, `Enum`, `LogLevel`, `LogFormat`

@@ -23,6 +23,7 @@ type CLI[T any] struct {
 	rootCmd        *cobra.Command
 	registry       *FlagRegistry
 	registeredCmds map[string]bool
+	flowCtx       *BranchingFlowContext
 }
 
 // CLIOption is a functional option for configuring a CLI.
@@ -243,8 +244,15 @@ func isNoFlags[F any](flags F) bool {
 }
 
 // Execute runs the CLI application.
+// The context is wrapped with a BranchingFlowContext for command path tracking.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
-	if err := fang.Execute(ctx, cli.rootCmd); err != nil {
+	if cli.flowCtx == nil {
+		cli.flowCtx = NewBranchingFlowContext(ctx)
+	}
+
+	flowCtx := WithBranchingFlowContext(ctx, cli.flowCtx)
+
+	if err := fang.Execute(flowCtx, cli.rootCmd); err != nil {
 		return fmt.Errorf("failed to execute CLI: %w", err)
 	}
 
@@ -331,6 +339,12 @@ func (cli *CLI[T]) SetLong(long string) {
 func (cli *CLI[T]) SetVersion(version string) {
 	cli.version = version
 	cli.rootCmd.Version = version
+}
+
+// FlowContext returns the branching flow context for command path tracking.
+// This is nil until Execute is called.
+func (cli *CLI[T]) FlowContext() *BranchingFlowContext {
+	return cli.flowCtx
 }
 
 // AddGlobalFlag adds a persistent flag available to all commands.
