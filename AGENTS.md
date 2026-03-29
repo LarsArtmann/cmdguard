@@ -297,19 +297,20 @@ fc := root.FlowContext()
 
 **Key Functions:**
 
-| Function | Purpose |
-|----------|---------|
-| `NewBranchingFlowContext(ctx)` | Create root context |
-| `GetBranchingFlowContext(ctx)` | Get from context (returns ok) |
-| `RequireBranchingFlowContext(ctx)` | Get or panic |
-| `WithBranchingFlowContext(ctx, bfc)` | Wrap context with flow context |
-| `bfc.Branch(name)` | Create child context for subcommand |
-| `bfc.PathString()` | Get dot-separated path (e.g., "app.subcmd") |
-| `bfc.SetValue(key, val)` | Set value (propagates to children) |
-| `bfc.GetValue(key)` | Get value (looks up hierarchy) |
-| `bfc.Cancel()` | Cancel this and all children |
+| Function                             | Purpose                                     |
+| ------------------------------------ | ------------------------------------------- |
+| `NewBranchingFlowContext(ctx)`       | Create root context                         |
+| `GetBranchingFlowContext(ctx)`       | Get from context (returns ok)               |
+| `RequireBranchingFlowContext(ctx)`   | Get or panic                                |
+| `WithBranchingFlowContext(ctx, bfc)` | Wrap context with flow context              |
+| `bfc.Branch(name)`                   | Create child context for subcommand         |
+| `bfc.PathString()`                   | Get dot-separated path (e.g., "app.subcmd") |
+| `bfc.SetValue(key, val)`             | Set value (propagates to children)          |
+| `bfc.GetValue(key)`                  | Get value (looks up hierarchy)              |
+| `bfc.Cancel()`                       | Cancel this and all children                |
 
 **Use Cases:**
+
 - Track which commands are executing (audit logging)
 - Propagate request-scoped values down command tree
 - Cancel all child operations on error

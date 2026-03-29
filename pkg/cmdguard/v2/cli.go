@@ -23,7 +23,7 @@ type CLI[T any] struct {
 	rootCmd        *cobra.Command
 	registry       *FlagRegistry
 	registeredCmds map[string]bool
-	flowCtx       *BranchingFlowContext
+	flowCtx        *BranchingFlowContext
 }
 
 // CLIOption is a functional option for configuring a CLI.
