@@ -31,7 +31,6 @@
 - [ ] Update `FlagRegistry` to `FlagRegistry[F]` struct (source: API_DESIGN_REVIEW.md)
 - [ ] Update `NewFlagRegistry` to be generic (source: API_DESIGN_REVIEW.md)
 - [ ] Update `ParseFlags` to be generic (source: API_DESIGN_REVIEW.md)
-- [ ] Fix CLI[T] AddCommand flag parsing bug using cloneAndParseFlags pattern (source: pkg/cmdguard/v2/cli.go:190)
 - [ ] Update all existing tests for new API (source: API_DESIGN_REVIEW.md)
 - [ ] Fix usetesting - replace os.Setenv with t.Setenv in tests (source: COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Update README.md (source: API_DESIGN_REVIEW.md)
@@ -44,7 +43,7 @@
 - [ ] Fix intrange - use range for integers pattern (source: COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Fix gocritic issue (source: COMPREHENSIVE_STATUS_REPORT.md)
 - [ ] Fix revive style issue (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Remove duplicate `//go:fix inline` directive (source: type_helpers.go:9)
+- [x] Remove duplicate `//go:fix inline` directive (source: type_helpers.go:9) - DONE
 - [ ] Update examples/basic/main.go (source: api-redesign-v2.1.md)
 - [ ] Update examples/typed/main.go (source: api-redesign-v2.1.md)
 - [ ] Refactor flags_parse_test.go complexity (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
