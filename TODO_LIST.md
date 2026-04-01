@@ -123,7 +123,7 @@
 - [ ] DI Pattern Example (source: PARETO_EXECUTION_MASTERPLAN.md)
 - [ ] Mixed Flags Example (source: PARETO_EXECUTION_MASTERPLAN.md)
 - [x] MIGRATION.md guide (source: API_DESIGN_REVIEW.md) - DONE
-- [ ] Add `Package()` function for samber/do integration (source: API_DESIGN_REVIEW.md)
+- [x] Add `Package()` function for samber/do integration (source: API_DESIGN_REVIEW.md) - DONE
 - [x] Add `WithScope()` option to inject existing scope (source: API_DESIGN_REVIEW.md) - DONE (WithCLIScope exists)
 - [x] Add deprecation type aliases for backward compatibility (source: API_DESIGN_REVIEW.md) - DONE (SimpleCLI alias)
 - [x] Add `Deprecated:` comments to removed functions (source: API_DESIGN_REVIEW.md) - DONE
