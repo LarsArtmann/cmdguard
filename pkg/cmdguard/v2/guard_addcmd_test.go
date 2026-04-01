@@ -103,32 +103,6 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	})
 }
 
-func TestGuardedCommand_AddCommandFunc(t *testing.T) {
-	t.Run("adds command via function", func(t *testing.T) {
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		err = g.AddCommandFunc(func() Command[testAppConfig, NoFlags] {
-			return Command[testAppConfig, NoFlags]{
-				Use: "greet",
-				RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-					return nil
-				},
-			}
-		})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		rootCmd := g.RootCommand()
-		if len(rootCmd.Commands()) != 1 {
-			t.Errorf("len(rootCmd.Commands()) = %d, want 1", len(rootCmd.Commands()))
-		}
-	})
-}
-
 func TestAddAnyCommand(t *testing.T) {
 	t.Run("adds command with different flag type", func(t *testing.T) {
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})

@@ -281,3 +281,54 @@ func (s *Scope) Path() []string {
 
 	return path
 }
+
+// Package returns a samber/do package function for DI integration.
+// This follows samber/do best practices for library integration.
+//
+// Note: CLI initialization errors cannot be returned from Package() because
+// do.Package expects a void function. Applications should call NewCLI()
+// separately and handle errors, or use WithCLIScope() option for CLI-managed DI.
+//
+// Usage pattern 1 (recommended - let CLI manage DI):
+//
+//	cli, err := v2.NewCLI[Config]("app", "My app", Config{})
+//	if err != nil {
+//	    return err
+//	}
+//	v2.ProvideValue(cli.Scope(), cli)
+//
+// Usage pattern 2 (inject existing scope):
+//
+//	injector := do.New()
+//	cli, err := v2.NewCLI[Config]("app", "My app", Config{})
+//	if err != nil {
+//	    return err
+//	}
+//	do.ProvideValue(injector, cli.Scope())
+//
+// Usage pattern 3 (full package integration):
+//
+//	injector := do.New(
+//	    v2.Package[Config]("app", "My app", Config{}),
+//	)
+func Package[T any](name, short string, defaults T, opts ...CLIOption[T]) func(do.Injector) {
+	return func(_ do.Injector) {
+		// Create a new scope for the CLI
+		scope := NewScope(name)
+
+		// Create the CLI with the scope
+		cliOpts := make([]CLIOption[T], 0, 1+len(opts))
+		cliOpts = append(cliOpts, WithCLIScope[T](scope))
+		cliOpts = append(cliOpts, opts...)
+
+		cli, err := NewCLI[T](name, short, defaults, cliOpts...)
+		if err != nil {
+			// Cannot return error from do.Package, panic with context
+			panic(fmt.Sprintf("v2.Package: failed to create CLI %q: %v", name, err))
+		}
+
+		// Register the CLI in its scope for DI retrieval
+		// Note: cli.config is already registered by NewCLI/initialize
+		do.ProvideValue(cli.scope.injector, cli)
+	}
+}

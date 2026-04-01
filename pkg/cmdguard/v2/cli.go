@@ -61,7 +61,9 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 }
 
 func (cli *CLI[T]) initialize(defaults T) error {
-	cli.scope = NewScope(cli.name)
+	if cli.scope == nil {
+		cli.scope = NewScope(cli.name)
+	}
 
 	cfg := defaults
 

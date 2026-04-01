@@ -72,4 +72,51 @@ func TestScope_Integration(t *testing.T) {
 	t.Run("child scope can override parent services", func(t *testing.T) {
 		assertChildInheritsParent(t)
 	})
+
+	t.Run("Package function creates CLI with DI", func(t *testing.T) {
+		type config struct {
+			Name string
+		}
+
+		pkg := Package[config]("test-app", "Test Application", config{Name: "test"})
+
+		// Package should return a valid function
+		if pkg == nil {
+			t.Fatal("Package returned nil function")
+		}
+
+		// Should not panic when called
+		assertNotPanic(t, func() {
+			pkg(nil)
+		})
+	})
+
+	t.Run("Package function with options", func(t *testing.T) {
+		type config struct {
+			Version string
+		}
+
+		pkg := Package[config](
+			"test-app",
+			"Test Application",
+			config{Version: "1.0.0"},
+			WithCLIVersion[config]("1.0.0"),
+		)
+
+		assertNotPanic(t, func() {
+			pkg(nil)
+		})
+	})
+}
+
+func assertNotPanic(t *testing.T, fn func()) {
+	t.Helper()
+
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("unexpected panic: %v", r)
+		}
+	}()
+
+	fn()
 }

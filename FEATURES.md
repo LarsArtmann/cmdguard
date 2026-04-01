@@ -1,7 +1,7 @@
 # cmdguard Features
 
-**Last Updated:** 2026-03-28  
-**Version:** 2.0.0  
+**Last Updated:** 2026-04-01  
+**Version:** 2.1.0  
 **Go Version:** 1.26.1
 
 ---
@@ -23,38 +23,56 @@
 
 The v2 API is a complete rewrite offering type-safe CLI construction with dependency injection.
 
-### GuardedCommand[T]
+### CLI[T] (Recommended)
 
-Type-safe CLI with generic configuration type.
+Type-safe CLI with single type parameter. Each command can have its own flags type.
 
-| Feature                                       | Status              | Notes                                |
-| --------------------------------------------- | ------------------- | ------------------------------------ |
-| `New[T](name, short, defaults)`               | ✅ FULLY_FUNCTIONAL | Creates typed CLI, never panics      |
-| `NewWithLong[T](name, short, long, defaults)` | ✅ FULLY_FUNCTIONAL | Creates CLI with long description    |
-| `AddCommand(cmd)`                             | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
-| `AddCommandFunc(fn)`                          | ✅ FULLY_FUNCTIONAL | Lazy command initialization          |
-| `Execute(ctx)`                                | ✅ FULLY_FUNCTIONAL | Runs command with context            |
-| `ExecuteWithArgs(ctx, args)`                  | ✅ FULLY_FUNCTIONAL | For testing                          |
-| `ExecuteAndExit(ctx)`                         | ✅ FULLY_FUNCTIONAL | Runs and calls os.Exit               |
-| `Scope()`                                     | ✅ FULLY_FUNCTIONAL | Returns DI injector                  |
-| `ScopeStruct()`                               | ✅ FULLY_FUNCTIONAL | Returns Scope for advanced ops       |
-| `Config()`                                    | ✅ FULLY_FUNCTIONAL | Returns typed config \*T             |
-| `SetConfig(cfg)`                              | ✅ FULLY_FUNCTIONAL | Updates configuration                |
-| `Shutdown(ctx)`                               | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
-| `HealthCheck()`                               | ✅ FULLY_FUNCTIONAL | Runs health checks                   |
-| `RootCommand()`                               | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command     |
+| Feature                                     | Status              | Notes                                |
+| ------------------------------------------- | ------------------- | ------------------------------------ |
+| `NewCLI[T](name, short, defaults, opts...)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, never panics      |
+| `AddCommand(cli, cmd)`                      | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
+| `Execute(ctx)`                              | ✅ FULLY_FUNCTIONAL | Runs command with context            |
+| `ExecuteWithArgs(ctx, args)`                | ✅ FULLY_FUNCTIONAL | For testing                          |
+| `ExecuteAndExit(ctx)`                       | ✅ FULLY_FUNCTIONAL | Runs and calls os.Exit               |
+| `Scope()`                                   | ✅ FULLY_FUNCTIONAL | Returns DI scope                     |
+| `Config()`                                  | ✅ FULLY_FUNCTIONAL | Returns typed config \*T             |
+| `Shutdown(ctx)`                             | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
+| `HealthCheck()`                             | ✅ FULLY_FUNCTIONAL | Runs health checks                   |
+| `RootCommand()`                             | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command     |
+| Functional options (`WithCLIVersion`, etc.) | ✅ FULLY_FUNCTIONAL | Configuration options                |
 
-### Command[T]
+### GuardedCommand[T, F] (Deprecated)
+
+Type-safe CLI with generic configuration type. Use CLI[T] instead.
+
+| Feature                            | Status              | Notes                                |
+| ---------------------------------- | ------------------- | ------------------------------------ |
+| `New[T, F](name, short, defaults)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, never panics      |
+| `NewWithLong[T, F](...)`           | 🗑️ DEPRECATED       | Use New + options instead            |
+| `AddCommand(cmd)`                  | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
+| `AddAnyCommand[T, F, F2](g, cmd)`  | ✅ FULLY_FUNCTIONAL | Add command with different flags     |
+| `Execute(ctx)`                     | ✅ FULLY_FUNCTIONAL | Runs command with context            |
+| `ExecuteWithArgs(ctx, args)`       | ✅ FULLY_FUNCTIONAL | For testing                          |
+| `ExecuteAndExit(ctx)`              | ✅ FULLY_FUNCTIONAL | Runs and calls os.Exit               |
+| `Scope()`                          | ✅ FULLY_FUNCTIONAL | Returns DI scope                     |
+| `ScopeStruct()`                    | 🗑️ DEPRECATED       | Use Scope() instead                  |
+| `Config()`                         | ✅ FULLY_FUNCTIONAL | Returns typed config \*T             |
+| `SetConfig(cfg)`                   | ✅ FULLY_FUNCTIONAL | Updates configuration                |
+| `Shutdown(ctx)`                    | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
+| `HealthCheck()`                    | ✅ FULLY_FUNCTIONAL | Runs health checks                   |
+| `RootCommand()`                    | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command     |
+
+### Command[T, F]
 
 Type-safe command definition with typed flags.
 
 | Feature                           | Status              | Notes                     |
 | --------------------------------- | ------------------- | ------------------------- |
 | `Use`, `Short`, `Long` fields     | ✅ FULLY_FUNCTIONAL | Standard command metadata |
-| `Flags any`                       | ✅ FULLY_FUNCTIONAL | Struct with flag tags     |
+| `Flags F`                         | ✅ FULLY_FUNCTIONAL | Struct with flag tags     |
 | `RunE func(ctx, *T, flags)`       | ✅ FULLY_FUNCTIONAL | Type-safe handler         |
 | `PreRunE` / `PostRunE`            | ✅ FULLY_FUNCTIONAL | Lifecycle hooks           |
-| `Commands []Command[T]`           | ✅ FULLY_FUNCTIONAL | Nested subcommands        |
+| `Commands []Command[T, F]`        | ✅ FULLY_FUNCTIONAL | Nested subcommands        |
 | `Hidden`, `Deprecated`            | ✅ FULLY_FUNCTIONAL | Visibility options        |
 | `Aliases`, `Version`              | ✅ FULLY_FUNCTIONAL | Additional metadata       |
 | `Validate()`                      | ✅ FULLY_FUNCTIONAL | Command validation        |
@@ -102,8 +120,8 @@ Type-safe command definition with typed flags.
 
 ### Helper Types
 
-|                            | Feature             | Status                              | Notes |
-| -------------------------- | ------------------- | ----------------------------------- | ----- |
+| Feature                    | Status              | Notes                               |
+| -------------------------- | ------------------- | ----------------------------------- |
 | `LogLevel` type            | ✅ FULLY_FUNCTIONAL | Enum for debug/info/warn/error      |
 | `LogLevel.SlogLevel()`     | ✅ FULLY_FUNCTIONAL | Converts to slog.Level              |
 | `LogLevel.UnmarshalText()` | ✅ FULLY_FUNCTIONAL | Validates against allowed values    |
@@ -139,7 +157,7 @@ The v1 Guard API provides panic-at-construction validation.
 
 | Package            | Coverage | Status  |
 | ------------------ | -------- | ------- |
-| `pkg/cmdguard/v2`  | 90.0%    | ✅ Good |
+| `pkg/cmdguard/v2`  | 90.2%    | ✅ Good |
 | `pkg/cmdguard`     | 94.3%    | ✅ Good |
 | `internal/config`  | 95.7%    | ✅ Good |
 | `internal/logging` | 100%     | ✅ Good |
@@ -151,10 +169,10 @@ The v1 Guard API provides panic-at-construction validation.
 ### v2 API Design
 
 ```
-v2.New[AppConfig]("myapp", "My CLI", AppConfig{})
-    └── GuardedCommand[AppConfig]
-        ├── AddCommand(Command[AppConfig]{...}) - returns error
-        ├── Scope() - DI injector for services
+v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
+    └── CLI[AppConfig]
+        ├── AddCommand(cli, Command[AppConfig]{...}) - returns error
+        ├── Scope() - DI scope for services
         ├── Execute(ctx) - run CLI
         └── Shutdown(ctx) - cleanup
 ```
@@ -172,8 +190,8 @@ v2.New[AppConfig]("myapp", "My CLI", AppConfig{})
 
 ### Phase 1: v2 Foundation ✅ COMPLETE
 
-- [x] Implement GuardedCommand[T] with generics
-- [x] Implement Command[T] with typed flags
+- [x] Implement CLI[T] with single type parameter
+- [x] Implement Command[T, F] with typed flags
 - [x] Implement Scope for DI
 - [x] Implement FlagRegistry with struct tags
 - [x] Comprehensive error types
@@ -232,8 +250,8 @@ v2.New[AppConfig]("myapp", "My CLI", AppConfig{})
 
 The v2 API successfully delivers type-safe, DI-powered CLI construction without panics. All core packages have comprehensive test coverage.
 
-**Recommendation:** v2.0.0 release candidate.
+**Recommendation:** v2.1.0 release.
 
 ---
 
-_This document reflects the v2 API implementation. Last updated 2026-02-15._
+**Last updated 2026-04-01.**

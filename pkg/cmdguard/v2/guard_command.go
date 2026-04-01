@@ -36,12 +36,6 @@ func (g *GuardedCommand[T, F]) AddCommand(cmd Command[T, F]) error {
 	return nil
 }
 
-// AddCommandFunc adds a command using a constructor function.
-// Useful for lazy initialization.
-func (g *GuardedCommand[T, F]) AddCommandFunc(fn func() Command[T, F]) error {
-	return g.AddCommand(fn())
-}
-
 // AddAnyCommand adds a command with a different flags type to a GuardedCommand.
 // This is a standalone function because Go doesn't support type parameters on methods.
 // Use this when commands need different flag types than the CLI root.
