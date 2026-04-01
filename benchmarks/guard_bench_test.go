@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/samber/do/v2"
 )
 
 type BenchConfig struct {
@@ -235,5 +236,170 @@ func BenchmarkParseLogLevel(b *testing.B) {
 
 			_ = ll
 		}
+	}
+}
+
+// BenchmarkParseURL measures URL parsing.
+func BenchmarkParseURL(b *testing.B) {
+	urls := []string{
+		"https://example.com",
+		"https://example.com:8080/path",
+		"https://user:pass@example.com/api/v1",
+		"http://localhost:3000/health",
+		"https://api.example.com/v2/users?page=1",
+	}
+
+	for b.Loop() {
+		for _, u := range urls {
+			url, err := v2.ParseURL(u)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			_ = url
+		}
+	}
+}
+
+// BenchmarkParseEmail measures email parsing.
+func BenchmarkParseEmail(b *testing.B) {
+	emails := []string{
+		"user@example.com",
+		"test.user@company.org",
+		"admin+alias@subdomain.example.co.uk",
+		"user123@mail.example.com",
+		"contact@support.example.net",
+	}
+
+	for b.Loop() {
+		for _, e := range emails {
+			email, err := v2.ParseEmail(e)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			_ = email
+		}
+	}
+}
+
+// BenchmarkParsePort measures port parsing (numeric).
+func BenchmarkParsePort(b *testing.B) {
+	ports := []string{
+		"8080",
+		"3000",
+		"443",
+		"22",
+		"9000",
+	}
+
+	for b.Loop() {
+		for _, p := range ports {
+			port, err := v2.ParsePort(p)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			_ = port
+		}
+	}
+}
+
+// BenchmarkParsePortNamed measures port parsing (named ports).
+func BenchmarkParsePortNamed(b *testing.B) {
+	ports := []string{"http", "https", "ssh", "ftp", "smtp"}
+
+	for b.Loop() {
+		for _, p := range ports {
+			port, err := v2.ParsePort(p)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			_ = port
+		}
+	}
+}
+
+// BenchmarkParseFilePath measures file path parsing.
+func BenchmarkParseFilePath(b *testing.B) {
+	paths := []string{
+		"/tmp/test.txt",
+		"/home/user/projects/cmdguard/main.go",
+		"/var/log/app.log",
+		"./relative/path/file.yaml",
+		"/etc/config/app.toml",
+	}
+
+	for b.Loop() {
+		for _, p := range paths {
+			fp, err := v2.ParseFilePath(p, false)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			_ = fp
+		}
+	}
+}
+
+// BenchmarkParseHostPort measures host:port parsing.
+func BenchmarkParseHostPort(b *testing.B) {
+	hostports := []string{
+		"localhost:8080",
+		"example.com:443",
+		"127.0.0.1:3000",
+		":8080",
+		"api.example.com:9000",
+	}
+
+	for b.Loop() {
+		for _, hp := range hostports {
+			hostPort, err := v2.ParseHostPort(hp)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			_ = hostPort
+		}
+	}
+}
+
+// BenchmarkScopeProvide measures DI service registration.
+func BenchmarkScopeProvide(b *testing.B) {
+	type Service struct {
+		Name string
+	}
+
+	scope := v2.NewScope("bench")
+
+	for b.Loop() {
+		err := v2.Provide[Service](scope, func(i do.Injector) (Service, error) {
+			return Service{Name: "test"}, nil
+		})
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkScopeInvoke measures DI service retrieval.
+func BenchmarkScopeInvoke(b *testing.B) {
+	type Service struct {
+		Name string
+	}
+
+	scope := v2.NewScope("bench")
+	_ = v2.Provide[Service](scope, func(i do.Injector) (Service, error) {
+		return Service{Name: "test"}, nil
+	})
+
+	for b.Loop() {
+		svc, err := v2.Invoke[Service](scope)
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		_ = svc
 	}
 }
