@@ -39,6 +39,7 @@ func setFlagAndAssertValid(
 }
 
 func TestFlagRegistry_ValidateFlags(t *testing.T) {
+	t.Parallel()
 	t.Run("valid values pass", func(t *testing.T) {
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`

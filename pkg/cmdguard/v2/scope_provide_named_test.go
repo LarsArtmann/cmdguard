@@ -16,6 +16,7 @@ func provideTestNamed[T any](scope *Scope, name string, value T) error {
 }
 
 func TestProvideNamed(t *testing.T) {
+	t.Parallel()
 	t.Run("registers named service provider", func(t *testing.T) {
 		scope := NewScope("test")
 

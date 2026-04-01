@@ -15,6 +15,7 @@ import (
 const testTimeout = 5 * time.Second
 
 func TestGuardedCommand_Execute(t *testing.T) {
+	t.Parallel()
 	t.Run("executes help command", func(t *testing.T) {
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {

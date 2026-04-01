@@ -8,6 +8,7 @@ import (
 )
 
 func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
+	t.Parallel()
 	t.Run("parse LogLevel flag valid", func(t *testing.T) {
 		type TestConfig struct {
 			Level LogLevel `flag:"level"`

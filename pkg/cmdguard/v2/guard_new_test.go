@@ -29,6 +29,7 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 }
 
 func TestVersion(t *testing.T) {
+	t.Parallel()
 	t.Run("version is set", func(t *testing.T) {
 		if Version == "" {
 			t.Error("Version is empty")

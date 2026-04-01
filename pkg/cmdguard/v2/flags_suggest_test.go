@@ -7,6 +7,7 @@ import (
 )
 
 func TestSuggestFlag(t *testing.T) {
+	t.Parallel()
 	defaultNames := []string{"verbose", "version", "config", "help", "output"}
 
 	tests := []struct {

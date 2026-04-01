@@ -35,6 +35,7 @@ func makeHookRunE(
 }
 
 func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		hookName string

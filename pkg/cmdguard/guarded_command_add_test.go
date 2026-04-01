@@ -22,6 +22,7 @@ func assertPanics(t *testing.T, fn func()) bool {
 }
 
 func TestGuardedCommand_AddCommand(t *testing.T) {
+	t.Parallel()
 	t.Run("accepts valid command with Run", func(t *testing.T) {
 		g := New("testapp", "Test")
 

@@ -8,6 +8,7 @@ import (
 )
 
 func TestProvide(t *testing.T) {
+	t.Parallel()
 	t.Run("registers service provider", func(t *testing.T) {
 		scope := NewScope("test")
 

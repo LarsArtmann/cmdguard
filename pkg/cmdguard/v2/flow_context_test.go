@@ -7,6 +7,7 @@ import (
 )
 
 func TestNewBranchingFlowContext(t *testing.T) {
+	t.Parallel()
 	t.Run("with context.TODO", func(t *testing.T) {
 		bfc := NewBranchingFlowContext(context.TODO())
 		if bfc == nil {

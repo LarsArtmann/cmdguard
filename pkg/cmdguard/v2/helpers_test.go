@@ -8,6 +8,7 @@ import (
 )
 
 func TestLogLevel(t *testing.T) {
+	t.Parallel()
 	t.Run("constants", func(t *testing.T) {
 		if LogLevelDebug.String() != "debug" {
 			t.Errorf("LogLevelDebug.String() = %q, want %q", LogLevelDebug.String(), "debug")

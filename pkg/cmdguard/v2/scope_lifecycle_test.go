@@ -9,6 +9,7 @@ import (
 )
 
 func TestScope_Shutdown(t *testing.T) {
+	t.Parallel()
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		scope := &Scope{injector: nil}
 

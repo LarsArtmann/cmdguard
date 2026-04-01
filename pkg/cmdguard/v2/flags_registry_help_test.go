@@ -8,6 +8,7 @@ import (
 )
 
 func TestFlagRegistry_GenerateHelp(t *testing.T) {
+	t.Parallel()
 	t.Run("generates help for all flags", func(t *testing.T) {
 		type testConfig struct {
 			Name    string `default:"default" flag:"name,n"    help:"The name to use"`

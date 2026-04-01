@@ -7,6 +7,7 @@ import (
 )
 
 func TestCloneFlags(t *testing.T) {
+	t.Parallel()
 	type testFlags struct {
 		Name  string
 		Count int

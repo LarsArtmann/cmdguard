@@ -24,6 +24,7 @@ func newTestCLICmd(use string) v2.Command[testCLIConfig, v2.NoFlags] {
 }
 
 func TestNewCLI(t *testing.T) {
+	t.Parallel()
 	t.Run("creates CLI with defaults", func(t *testing.T) {
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {

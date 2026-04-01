@@ -6,6 +6,7 @@ import (
 )
 
 func TestValidateConfig(t *testing.T) {
+	t.Parallel()
 	t.Run("valid config", func(t *testing.T) {
 		type TestConfig struct {
 			Name  string `flag:"name"`

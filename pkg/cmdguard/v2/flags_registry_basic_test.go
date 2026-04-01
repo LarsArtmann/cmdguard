@@ -13,6 +13,7 @@ func containsString(slice []string, s string) bool {
 }
 
 func TestNewFlagRegistry(t *testing.T) {
+	t.Parallel()
 	t.Run("valid config", func(t *testing.T) {
 		type testConfig struct {
 			Name  string `default:"default-name" flag:"name"  help:"name help"`

@@ -8,6 +8,7 @@ import (
 )
 
 func TestScopedProvider(t *testing.T) {
+	t.Parallel()
 	t.Run("creates provider in child scope", func(t *testing.T) {
 		parent := NewScope("parent")
 

@@ -7,6 +7,7 @@ import (
 )
 
 func TestNewScope(t *testing.T) {
+	t.Parallel()
 	t.Run("creates root scope", func(t *testing.T) {
 		scope := NewScope("root")
 		if scope == nil {

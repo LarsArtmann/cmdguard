@@ -5,6 +5,7 @@ import (
 )
 
 func TestGuardedCommand_Scope(t *testing.T) {
+	t.Parallel()
 	t.Run("returns injector", func(t *testing.T) {
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {

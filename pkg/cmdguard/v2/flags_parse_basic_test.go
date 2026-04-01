@@ -8,6 +8,7 @@ import (
 )
 
 func TestFlagRegistry_ParseFlags(t *testing.T) {
+	t.Parallel()
 	t.Run("parse string flag", func(t *testing.T) {
 		type TestConfig struct {
 			Name string `default:"default" flag:"name"`

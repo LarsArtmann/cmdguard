@@ -7,6 +7,7 @@ import (
 )
 
 func TestSome(t *testing.T) {
+	t.Parallel()
 	opt := Some(42)
 	if !opt.IsSome() {
 		t.Error("Some(42).IsSome() should be true")

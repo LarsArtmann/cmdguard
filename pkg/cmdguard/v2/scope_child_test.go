@@ -5,6 +5,7 @@ import (
 )
 
 func TestScope_Child(t *testing.T) {
+	t.Parallel()
 	t.Run("creates child scope", func(t *testing.T) {
 		parent := NewScope("parent")
 		child := parent.Child("child")

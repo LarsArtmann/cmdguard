@@ -6,6 +6,7 @@ import (
 )
 
 func TestGuardedCommand_Integration(t *testing.T) {
+	t.Parallel()
 	t.Run("complete CLI workflow", func(t *testing.T) {
 		type greetFlags struct {
 			Name  string `default:"World" flag:"name"  help:"Name to greet"      short:"n"`

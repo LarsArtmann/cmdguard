@@ -8,6 +8,7 @@ import (
 )
 
 func TestCLISetLong(t *testing.T) {
+	t.Parallel()
 	t.Run("updates long description", func(t *testing.T) {
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {

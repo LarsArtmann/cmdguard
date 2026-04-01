@@ -9,6 +9,7 @@ import (
 )
 
 func TestScope_Integration(t *testing.T) {
+	t.Parallel()
 	t.Run("full workflow with DI", func(t *testing.T) {
 		// Create root scope
 		root := NewScope("app")
