@@ -321,7 +321,7 @@ func Package[T any](name, short string, defaults T, opts ...CLIOption[T]) func(d
 		cliOpts = append(cliOpts, WithCLIScope[T](scope))
 		cliOpts = append(cliOpts, opts...)
 
-		cli, err := NewCLI[T](name, short, defaults, cliOpts...)
+		cli, err := NewCLI(name, short, defaults, cliOpts...)
 		if err != nil {
 			// Cannot return error from do.Package, panic with context
 			panic(fmt.Sprintf("v2.Package: failed to create CLI %q: %v", name, err))

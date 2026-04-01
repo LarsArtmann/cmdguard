@@ -62,6 +62,21 @@ var (
 
 	// ErrNoFlags indicates the command has no flags to register.
 	ErrNoFlags = errors.New("no flags to register")
+
+	// ErrInvalidURL indicates an invalid URL format.
+	ErrInvalidURL = errors.New("invalid URL")
+
+	// ErrInvalidEmail indicates an invalid email address format.
+	ErrInvalidEmail = errors.New("invalid email address")
+
+	// ErrInvalidPort indicates an invalid port number.
+	ErrInvalidPort = errors.New("invalid port")
+
+	// ErrInvalidFilePath indicates an invalid file path.
+	ErrInvalidFilePath = errors.New("invalid file path")
+
+	// ErrInvalidHostPort indicates an invalid host:port format.
+	ErrInvalidHostPort = errors.New("invalid host:port")
 )
 
 // CommandError wraps an error with command context.

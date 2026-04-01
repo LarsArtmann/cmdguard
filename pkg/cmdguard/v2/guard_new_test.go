@@ -210,7 +210,7 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 
 func TestNewSimple(t *testing.T) {
 	t.Run("creates SimpleCLI with defaults", func(t *testing.T) {
-		g, err := NewSimple[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		g, err := NewSimple("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -229,7 +229,7 @@ func TestNewSimple(t *testing.T) {
 	})
 
 	t.Run("returns error for empty name", func(t *testing.T) {
-		g, err := NewSimple[testAppConfig]("", "My CLI", testAppConfig{})
+		g, err := NewSimple("", "My CLI", testAppConfig{})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -242,7 +242,7 @@ func TestNewSimple(t *testing.T) {
 
 func TestNewSimpleWithLong(t *testing.T) {
 	t.Run("creates SimpleCLI with long description", func(t *testing.T) {
-		g, err := NewSimpleWithLong[testAppConfig](
+		g, err := NewSimpleWithLong(
 			"myapp",
 			"short",
 			"long description",
@@ -270,7 +270,7 @@ func TestNewSimpleWithLong(t *testing.T) {
 	})
 
 	t.Run("returns error for empty name", func(t *testing.T) {
-		g, err := NewSimpleWithLong[testAppConfig]("", "short", "long", testAppConfig{})
+		g, err := NewSimpleWithLong("", "short", "long", testAppConfig{})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

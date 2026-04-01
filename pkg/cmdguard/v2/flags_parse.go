@@ -138,6 +138,16 @@ func (r *FlagRegistry) parseAndSetCustom(cfg any, tag FlagTag, value string) err
 		return r.parseAndSetLogFormat(cfg, tag, value)
 	case reflect.TypeFor[Enum]():
 		return r.parseAndSetEnum(cfg, tag, value)
+	case reflect.TypeFor[URL]():
+		return r.parseAndSetURL(cfg, tag, value)
+	case reflect.TypeFor[Email]():
+		return r.parseAndSetEmail(cfg, tag, value)
+	case reflect.TypeFor[Port]():
+		return r.parseAndSetPort(cfg, tag, value)
+	case reflect.TypeFor[FilePath]():
+		return r.parseAndSetFilePath(cfg, tag, value)
+	case reflect.TypeFor[HostPort]():
+		return r.parseAndSetHostPort(cfg, tag, value)
 	default:
 		return SetField(cfg, tag.Field, value)
 	}
@@ -178,6 +188,57 @@ func (r *FlagRegistry) parseAndSetEnum(cfg any, tag FlagTag, value string) error
 	parsed, err := ParseEnum(value, tag.Values)
 	if err != nil {
 		return fmt.Errorf("parsing enum flag %q with value %q: %w", tag.Name, value, err)
+	}
+
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetURL parses and sets a URL value.
+func (r *FlagRegistry) parseAndSetURL(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseURL(value)
+	if err != nil {
+		return fmt.Errorf("parsing URL flag %q with value %q: %w", tag.Name, value, err)
+	}
+
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetEmail parses and sets an Email value.
+func (r *FlagRegistry) parseAndSetEmail(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseEmail(value)
+	if err != nil {
+		return fmt.Errorf("parsing email flag %q with value %q: %w", tag.Name, value, err)
+	}
+
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetPort parses and sets a Port value.
+func (r *FlagRegistry) parseAndSetPort(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParsePort(value)
+	if err != nil {
+		return fmt.Errorf("parsing port flag %q with value %q: %w", tag.Name, value, err)
+	}
+
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetFilePath parses and sets a FilePath value.
+func (r *FlagRegistry) parseAndSetFilePath(cfg any, tag FlagTag, value string) error {
+	// Note: FilePath parsing does NOT check if the path exists
+	parsed, err := ParseFilePath(value, false)
+	if err != nil {
+		return fmt.Errorf("parsing file path flag %q with value %q: %w", tag.Name, value, err)
+	}
+
+	return SetField(cfg, tag.Field, parsed)
+}
+
+// parseAndSetHostPort parses and sets a HostPort value.
+func (r *FlagRegistry) parseAndSetHostPort(cfg any, tag FlagTag, value string) error {
+	parsed, err := ParseHostPort(value)
+	if err != nil {
+		return fmt.Errorf("parsing host:port flag %q with value %q: %w", tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, parsed)

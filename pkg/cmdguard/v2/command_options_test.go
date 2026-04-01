@@ -56,7 +56,7 @@ func TestCommandOptions(t *testing.T) {
 
 		flagsInst := &flags{}
 		cmd := Command[testConfig, *flags]{Use: "test"}
-		WithFlags[testConfig, *flags](flagsInst)(&cmd)
+		WithFlags(flagsInst)(&cmd)
 
 		if cmd.Flags != flagsInst {
 			t.Errorf("Flags = %p, want %p", cmd.Flags, flagsInst)
@@ -149,7 +149,7 @@ func TestNewCommand(t *testing.T) {
 	t.Parallel()
 	t.Run("creates valid command", func(t *testing.T) {
 		t.Parallel()
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand[testConfig](
 			"test",
 			WithShort[testConfig, NoFlags]("short description"),
 			WithRunE(
@@ -177,7 +177,7 @@ func TestNewCommand(t *testing.T) {
 
 	t.Run("error: empty use", func(t *testing.T) {
 		t.Parallel()
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand[testConfig](
 			"",
 			WithRunE(
 				func(_ context.Context, _ *testConfig, _ NoFlags) error {
@@ -223,7 +223,7 @@ func TestCommand_CompleteStructure(t *testing.T) {
 			},
 		}
 
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand[testConfig](
 			"root",
 			WithShort[testConfig, NoFlags]("root command"),
 			WithLong[testConfig, NoFlags]("root command long description"),

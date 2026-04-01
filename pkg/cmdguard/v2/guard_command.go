@@ -223,7 +223,7 @@ func executeHandler[T, F any](
 // addSubcommands recursively adds subcommands to the parent command.
 func addSubcommands[T, F any](parent *cobra.Command, cmd Command[T, F], config *T) error {
 	for _, subCmd := range cmd.Commands {
-		cobraSubCmd, err := toCobraCommandAny[T, F](config, subCmd)
+		cobraSubCmd, err := toCobraCommandAny(config, subCmd)
 		if err != nil {
 			return fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
 		}

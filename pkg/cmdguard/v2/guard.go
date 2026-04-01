@@ -182,5 +182,5 @@ func NewSimpleWithLong[T any](name, short, long string, defaults T) (*SimpleCLI[
 // toCobraCommand converts a Command[T, F] to a cobra.Command.
 // This is a wrapper around toCobraCommandAny that uses the GuardedCommand's config.
 func (g *GuardedCommand[T, F]) toCobraCommand(cmd Command[T, F]) (*cobra.Command, error) {
-	return toCobraCommandAny[T, F](g.config, cmd)
+	return toCobraCommandAny(g.config, cmd)
 }

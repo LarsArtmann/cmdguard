@@ -78,7 +78,7 @@ func TestScope_Integration(t *testing.T) {
 			Name string
 		}
 
-		pkg := Package[config]("test-app", "Test Application", config{Name: "test"})
+		pkg := Package("test-app", "Test Application", config{Name: "test"})
 
 		// Package should return a valid function
 		if pkg == nil {
@@ -96,7 +96,7 @@ func TestScope_Integration(t *testing.T) {
 			Version string
 		}
 
-		pkg := Package[config](
+		pkg := Package(
 			"test-app",
 			"Test Application",
 			config{Version: "1.0.0"},
