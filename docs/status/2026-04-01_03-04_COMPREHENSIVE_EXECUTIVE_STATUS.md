@@ -20,22 +20,25 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 ## A) FULLY DONE ✅ (64 items)
 
 ### Core API (v2.1.0) - COMPLETE
-| Component | Status | Coverage |
-|-----------|--------|----------|
-| CLI[T] | ✅ FULLY_FUNCTIONAL | 90.2% |
-| GuardedCommand[T,F] | 🗑️ DEPRECATED (works) | 94.3% |
-| Command[T,F] | ✅ FULLY_FUNCTIONAL | - |
-| Scope (DI) | ✅ FULLY_FUNCTIONAL | - |
-| FlagRegistry | ✅ FULLY_FUNCTIONAL | - |
-| Error Types | ✅ FULLY_FUNCTIONAL | - |
+
+| Component           | Status                | Coverage |
+| ------------------- | --------------------- | -------- |
+| CLI[T]              | ✅ FULLY_FUNCTIONAL   | 90.2%    |
+| GuardedCommand[T,F] | 🗑️ DEPRECATED (works) | 94.3%    |
+| Command[T,F]        | ✅ FULLY_FUNCTIONAL   | -        |
+| Scope (DI)          | ✅ FULLY_FUNCTIONAL   | -        |
+| FlagRegistry        | ✅ FULLY_FUNCTIONAL   | -        |
+| Error Types         | ✅ FULLY_FUNCTIONAL   | -        |
 
 ### Recent Fixes (Session 2026-04-01)
+
 - ✅ **Package() function** - Fixed duplicate registration bug
 - ✅ **WithCLIScope option** - Fixed unconditional scope overwrite
 - ✅ **Prealloc linter** - Fixed slice preallocation in Package()
 - ✅ **thelper linter** - Added t.Helper() to test helper
 
 ### Documentation - COMPLETE
+
 - ✅ README.md with full API examples
 - ✅ MIGRATION_v1_v2.md guide
 - ✅ QUICKSTART.md guide
@@ -44,6 +47,7 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 - ✅ AGENTS.md for contributors
 
 ### Testing - COMPREHENSIVE
+
 - ✅ **37 test files** covering all packages
 - ✅ **7,611 lines** of test code
 - ✅ **90.2% coverage** on pkg/cmdguard/v2
@@ -52,6 +56,7 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 - ✅ Integration tests for all major flows
 
 ### Type System - ROBUST
+
 - ✅ Option[T] - Optional values (Rust-style)
 - ✅ Enum - Validated string enums
 - ✅ Duration - Time.Duration wrapper
@@ -63,15 +68,17 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 ## B) PARTIALLY DONE ⚠️ (5 items)
 
 ### Known Issues
-| Issue | Status | Impact | File |
-|-------|--------|--------|------|
+
+| Issue                          | Status                 | Impact | File       |
+| ------------------------------ | ---------------------- | ------ | ---------- |
 | CLI[T] AddCommand flag parsing | ⚠️ UNDER INVESTIGATION | Medium | cli.go:190 |
-| File size limits | ⚠️ 5 files >350 lines | Low | various |
-| Test parallelization | ⚠️ Not enabled | Low | tests |
-| infertypeargs warnings | ⚠️ 16 instances | Info | various |
-| Disk space pre-commit | ⚠️ Intermittent fails | Low | CI |
+| File size limits               | ⚠️ 5 files >350 lines  | Low    | various    |
+| Test parallelization           | ⚠️ Not enabled         | Low    | tests      |
+| infertypeargs warnings         | ⚠️ 16 instances        | Info   | various    |
+| Disk space pre-commit          | ⚠️ Intermittent fails  | Low    | CI         |
 
 ### Partial Implementations
+
 - 🟡 **v3 planning** - Documented but not started
 - 🟡 **Benchmark suite** - Directory exists, no tests
 - 🟡 **Fuzz test corpus** - Planned, not implemented
@@ -82,6 +89,7 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 ## C) NOT STARTED 📝 (134 items)
 
 ### High Priority (Next 25 - See Section F)
+
 1. Add t.Parallel() to tests
 2. Fix CLI[T] AddCommand flag parsing bug
 3. Add custom types (URL, Email, Port, FilePath)
@@ -109,6 +117,7 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 25. Environment variable binding
 
 ### Medium Priority
+
 - API Reference documentation
 - DI Pattern Example
 - Mixed Flags Example
@@ -120,6 +129,7 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 - Lifecycle hook examples
 
 ### Low Priority
+
 - v3 API design document
 - Create github.com/larsartmann/flagtags repo
 - Extract flag-related code to standalone library
@@ -135,11 +145,12 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 **NONE.** All critical bugs have been resolved.
 
 ### Recently Fixed (was fucked up, now fixed)
-| Bug | Fix | Date |
-|-----|-----|------|
-| Package() duplicate registration | Removed duplicate ProvideValue | 2026-04-01 |
-| WithCLIScope ignored | Added nil check in initialize() | 2026-04-01 |
-| Flow context cancel bug | Added selfCancel tracking | 2026-03-28 |
+
+| Bug                              | Fix                             | Date       |
+| -------------------------------- | ------------------------------- | ---------- |
+| Package() duplicate registration | Removed duplicate ProvideValue  | 2026-04-01 |
+| WithCLIScope ignored             | Added nil check in initialize() | 2026-04-01 |
+| Flow context cancel bug          | Added selfCancel tracking       | 2026-03-28 |
 
 ---
 
@@ -209,43 +220,43 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 
 ### Immediate (This Week)
 
-| # | Task | Effort | Impact | Status |
-|---|------|--------|--------|--------|
-| 1 | Add t.Parallel() to tests | 30m | High | 📝 NOT STARTED |
-| 2 | Fix CLI[T] AddCommand flag parsing | 1h | Critical | 📝 NOT STARTED |
-| 3 | Add URL type with validation | 2h | High | 📝 NOT STARTED |
-| 4 | Add Email type with validation | 1h | High | 📝 NOT STARTED |
-| 5 | Add Port type with validation | 1h | High | 📝 NOT STARTED |
-| 6 | Add FilePath type | 1h | Medium | 📝 NOT STARTED |
+| #   | Task                               | Effort | Impact   | Status         |
+| --- | ---------------------------------- | ------ | -------- | -------------- |
+| 1   | Add t.Parallel() to tests          | 30m    | High     | 📝 NOT STARTED |
+| 2   | Fix CLI[T] AddCommand flag parsing | 1h     | Critical | 📝 NOT STARTED |
+| 3   | Add URL type with validation       | 2h     | High     | 📝 NOT STARTED |
+| 4   | Add Email type with validation     | 1h     | High     | 📝 NOT STARTED |
+| 5   | Add Port type with validation      | 1h     | High     | 📝 NOT STARTED |
+| 6   | Add FilePath type                  | 1h     | Medium   | 📝 NOT STARTED |
 
 ### Short Term (Next 2 Weeks)
 
-| # | Task | Effort | Impact | Status |
-|---|------|--------|--------|--------|
-| 7 | Implement Result[T] type | 3h | High | 📝 NOT STARTED |
-| 8 | Add Progress/Spinner type | 4h | Medium | 📝 NOT STARTED |
-| 9 | Add short flags support | 1h | Medium | 📝 NOT STARTED |
-| 10 | Show defaults in help | 2h | Medium | 📝 NOT STARTED |
-| 11 | Add shell completion | 3h | Medium | 📝 NOT STARTED |
-| 12 | Split large test files | 4h | Low | 📝 NOT STARTED |
-| 13 | Add benchmarks | 3h | Medium | 📝 NOT STARTED |
-| 14 | Document DI patterns | 2h | Medium | 📝 NOT STARTED |
+| #   | Task                      | Effort | Impact | Status         |
+| --- | ------------------------- | ------ | ------ | -------------- |
+| 7   | Implement Result[T] type  | 3h     | High   | 📝 NOT STARTED |
+| 8   | Add Progress/Spinner type | 4h     | Medium | 📝 NOT STARTED |
+| 9   | Add short flags support   | 1h     | Medium | 📝 NOT STARTED |
+| 10  | Show defaults in help     | 2h     | Medium | 📝 NOT STARTED |
+| 11  | Add shell completion      | 3h     | Medium | 📝 NOT STARTED |
+| 12  | Split large test files    | 4h     | Low    | 📝 NOT STARTED |
+| 13  | Add benchmarks            | 3h     | Medium | 📝 NOT STARTED |
+| 14  | Document DI patterns      | 2h     | Medium | 📝 NOT STARTED |
 
 ### Medium Term (Next Month)
 
-| # | Task | Effort | Impact | Status |
-|---|------|--------|--------|--------|
-| 15 | Add middleware support | 6h | High | 📝 NOT STARTED |
-| 16 | Create API Reference doc | 4h | Medium | 📝 NOT STARTED |
-| 17 | Replace internal/config with koanf | 6h | Medium | 📝 NOT STARTED |
-| 18 | Add fuzz tests | 4h | Low | 📝 NOT STARTED |
-| 19 | Add Validated[T] wrapper | 3h | Medium | 📝 NOT STARTED |
-| 20 | Config file auto-loading | 4h | Medium | 📝 NOT STARTED |
-| 21 | Environment variable binding | 3h | Medium | 📝 NOT STARTED |
-| 22 | Create v2.1.0 release | 2h | High | 📝 NOT STARTED |
-| 23 | Set up GitHub Actions | 4h | High | 📝 NOT STARTED |
-| 24 | Add changelog | 1h | Low | 📝 NOT STARTED |
-| 25 | Document error handling | 2h | Medium | 📝 NOT STARTED |
+| #   | Task                               | Effort | Impact | Status         |
+| --- | ---------------------------------- | ------ | ------ | -------------- |
+| 15  | Add middleware support             | 6h     | High   | 📝 NOT STARTED |
+| 16  | Create API Reference doc           | 4h     | Medium | 📝 NOT STARTED |
+| 17  | Replace internal/config with koanf | 6h     | Medium | 📝 NOT STARTED |
+| 18  | Add fuzz tests                     | 4h     | Low    | 📝 NOT STARTED |
+| 19  | Add Validated[T] wrapper           | 3h     | Medium | 📝 NOT STARTED |
+| 20  | Config file auto-loading           | 4h     | Medium | 📝 NOT STARTED |
+| 21  | Environment variable binding       | 3h     | Medium | 📝 NOT STARTED |
+| 22  | Create v2.1.0 release              | 2h     | High   | 📝 NOT STARTED |
+| 23  | Set up GitHub Actions              | 4h     | High   | 📝 NOT STARTED |
+| 24  | Add changelog                      | 1h     | Low    | 📝 NOT STARTED |
+| 25  | Document error handling            | 2h     | Medium | 📝 NOT STARTED |
 
 ---
 
@@ -254,16 +265,19 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 ### **QUESTION: What is the actual bug at cli.go:190?**
 
 **Context:**
+
 - TODO_LIST.md mentions: "Fix CLI[T] AddCommand flag parsing bug using cloneAndParseFlags pattern (source: pkg/cmdguard/v2/cli.go:190)"
 - I need to view the code around line 190 to understand the issue
 - Current code at line 190 is inside AddCommand function
 
 **What I've Tried:**
+
 - Looked at cli.go but line numbers may have shifted
 - The cloneAndParseFlags pattern exists in guard_command.go
 - Need to understand what specific bug exists
 
 **Why I Need Help:**
+
 - Without understanding the actual bug, I might:
   - Fix the wrong thing
   - Introduce regressions
@@ -271,6 +285,7 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 - The TODO entry is vague - what specifically is broken?
 
 **What Would Help:**
+
 - Clarify what behavior is expected vs actual
 - Example test case that demonstrates the bug
 - Or confirmation that this TODO is outdated and should be removed
@@ -280,25 +295,28 @@ All systems operational. v2.1.0 API is complete, tested, and production-ready. R
 ## TECHNICAL METRICS
 
 ### Code Statistics
-| Metric | Value |
-|--------|-------|
-| Total Go Files | 84 |
-| Total Lines of Code | 25,681 |
-| Test Files | 37 |
-| Test Lines | 7,611 |
-| Source Lines | 3,819 (v2 package) |
-| Coverage (v2) | 90.2% |
-| Coverage (internal/config) | 95.7% |
-| Coverage (internal/logging) | 100% |
+
+| Metric                      | Value              |
+| --------------------------- | ------------------ |
+| Total Go Files              | 84                 |
+| Total Lines of Code         | 25,681             |
+| Test Files                  | 37                 |
+| Test Lines                  | 7,611              |
+| Source Lines                | 3,819 (v2 package) |
+| Coverage (v2)               | 90.2%              |
+| Coverage (internal/config)  | 95.7%              |
+| Coverage (internal/logging) | 100%               |
 
 ### Dependencies
-| Package | Version | Status |
-|---------|---------|--------|
-| cobra | v1.10.2 | ✅ OK |
-| samber/do/v2 | v2.0.0 | ✅ OK |
-| charmbracelet/fang | v2.0.1 | ✅ OK |
+
+| Package            | Version | Status |
+| ------------------ | ------- | ------ |
+| cobra              | v1.10.2 | ✅ OK  |
+| samber/do/v2       | v2.0.0  | ✅ OK  |
+| charmbracelet/fang | v2.0.1  | ✅ OK  |
 
 ### Test Results
+
 ```
 ok  	github.com/larsartmann/cmdguard/benchmarks	[no tests]
 ok  	github.com/larsartmann/cmdguard/examples/advanced-flags
@@ -317,6 +335,7 @@ ok  	github.com/larsartmann/cmdguard/tests/integration
 ## RECENT ACTIVITY
 
 ### Commits (Last 10)
+
 1. `04be6e5` - docs: Add comprehensive execution plan
 2. `a99d7c7` - docs: Mark Package() function as complete
 3. `2a63447` - fix: CLI[T] WithCLIScope and Package() function
@@ -329,6 +348,7 @@ ok  	github.com/larsartmann/cmdguard/tests/integration
 10. `109311b` - chore: remove dead code, add tests
 
 ### Files Changed (Session 2026-04-01)
+
 - `pkg/cmdguard/v2/cli.go` - Fixed WithCLIScope bug
 - `pkg/cmdguard/v2/scope.go` - Fixed Package() bug + prealloc
 - `pkg/cmdguard/v2/scope_integration_test.go` - Added t.Helper()
@@ -341,13 +361,13 @@ ok  	github.com/larsartmann/cmdguard/tests/integration
 
 ## RISK ASSESSMENT
 
-| Risk | Level | Mitigation |
-|------|-------|------------|
-| Disk space exhaustion | 🔴 HIGH | Clean caches, add CI cleanup |
-| Flag parsing bug | 🟡 MEDIUM | Investigate cli.go:190 |
-| Test file size | 🟡 MEDIUM | Split large files |
-| Missing documentation | 🟡 MEDIUM | Create API reference |
-| v2→v3 migration | 🟢 LOW | GuardedCommand deprecated, not removed |
+| Risk                  | Level     | Mitigation                             |
+| --------------------- | --------- | -------------------------------------- |
+| Disk space exhaustion | 🔴 HIGH   | Clean caches, add CI cleanup           |
+| Flag parsing bug      | 🟡 MEDIUM | Investigate cli.go:190                 |
+| Test file size        | 🟡 MEDIUM | Split large files                      |
+| Missing documentation | 🟡 MEDIUM | Create API reference                   |
+| v2→v3 migration       | 🟢 LOW    | GuardedCommand deprecated, not removed |
 
 ---
 
@@ -358,6 +378,7 @@ ok  	github.com/larsartmann/cmdguard/tests/integration
 The cmdguard v2.1.0 library is stable, well-tested, and ready for production use. Recent fixes resolved critical bugs in DI integration. The codebase has excellent test coverage (90.2%) and comprehensive documentation.
 
 **Immediate Actions Required:**
+
 1. Investigate cli.go:190 bug (my #1 question)
 2. Add t.Parallel() to tests
 3. Add custom types (URL, Email, Port)
@@ -366,5 +387,5 @@ The cmdguard v2.1.0 library is stable, well-tested, and ready for production use
 
 ---
 
-*Report Generated: 2026-04-01 03:04 CEST*  
-*Next Review: 2026-04-02*
+_Report Generated: 2026-04-01 03:04 CEST_  
+_Next Review: 2026-04-02_

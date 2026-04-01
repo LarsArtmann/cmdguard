@@ -56,7 +56,7 @@ func TestCommandOptions(t *testing.T) {
 
 		flagsInst := &flags{}
 		cmd := Command[testConfig, *flags]{Use: "test"}
-		WithFlags(flagsInst)(&cmd)
+		WithFlags[testConfig, *flags](flagsInst)(&cmd)
 
 		if cmd.Flags != flagsInst {
 			t.Errorf("Flags = %p, want %p", cmd.Flags, flagsInst)
