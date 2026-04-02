@@ -32,7 +32,11 @@ func ParseFilePath(s string, checkExists bool) (FilePath, error) {
 	// Convert to absolute path
 	absPath, err := filepath.Abs(cleanPath)
 	if err != nil {
-		return FilePath{}, fmt.Errorf("%w: failed to resolve absolute path: %v", ErrInvalidFilePath, err)
+		return FilePath{}, fmt.Errorf(
+			"%w: failed to resolve absolute path: %w",
+			ErrInvalidFilePath,
+			err,
+		)
 	}
 
 	fp := FilePath{
@@ -46,10 +50,14 @@ func ParseFilePath(s string, checkExists bool) (FilePath, error) {
 		_, err := os.Stat(absPath)
 		if err != nil {
 			if os.IsNotExist(err) {
-				return FilePath{}, fmt.Errorf("%w: path does not exist: %s", ErrInvalidFilePath, absPath)
+				return FilePath{}, fmt.Errorf(
+					"%w: path does not exist: %s",
+					ErrInvalidFilePath,
+					absPath,
+				)
 			}
 
-			return FilePath{}, fmt.Errorf("%w: cannot access path: %v", ErrInvalidFilePath, err)
+			return FilePath{}, fmt.Errorf("%w: cannot access path: %w", ErrInvalidFilePath, err)
 		}
 
 		fp.exists = true

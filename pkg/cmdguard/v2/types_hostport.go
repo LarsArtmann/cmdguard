@@ -24,12 +24,12 @@ func ParseHostPort(s string) (HostPort, error) {
 
 	host, portStr, err := net.SplitHostPort(s)
 	if err != nil {
-		return HostPort{}, fmt.Errorf("%w: %v", ErrInvalidHostPort, err)
+		return HostPort{}, fmt.Errorf("%w: %w", ErrInvalidHostPort, err)
 	}
 
 	port, err := ParsePort(portStr)
 	if err != nil {
-		return HostPort{}, fmt.Errorf("%w: invalid port: %v", ErrInvalidHostPort, err)
+		return HostPort{}, fmt.Errorf("%w: invalid port: %w", ErrInvalidHostPort, err)
 	}
 
 	return HostPort{host: host, port: port}, nil

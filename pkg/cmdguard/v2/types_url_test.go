@@ -85,7 +85,7 @@ func TestURL(t *testing.T) {
 		}
 	})
 
-	t.Run("URL URL returns copy", func(t *testing.T) {
+	t.Run("URL returns copy", func(t *testing.T) {
 		t.Parallel()
 		u, _ := v2.ParseURL("https://example.com")
 		url1 := u.URL()

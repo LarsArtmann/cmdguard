@@ -23,7 +23,7 @@ func ParseURL(s string) (URL, error) {
 
 	u, err := url.Parse(s)
 	if err != nil {
-		return URL{}, fmt.Errorf("%w: %v", ErrInvalidURL, err)
+		return URL{}, fmt.Errorf("%w: %w", ErrInvalidURL, err)
 	}
 
 	if u.Scheme == "" {

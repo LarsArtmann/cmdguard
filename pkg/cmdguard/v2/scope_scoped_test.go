@@ -10,6 +10,7 @@ import (
 func TestScopedProvider(t *testing.T) {
 	t.Parallel()
 	t.Run("creates provider in child scope", func(t *testing.T) {
+		t.Parallel()
 		parent := NewScope("parent")
 
 		provider := ScopedProvider(parent, "plugin", func(_ do.Injector) (string, error) {
@@ -28,7 +29,9 @@ func TestScopedProvider(t *testing.T) {
 }
 
 func TestRegisterInScope(t *testing.T) {
+	t.Parallel()
 	t.Run("returns error for nil parent", func(t *testing.T) {
+		t.Parallel()
 		child, err := RegisterInScope(nil, "child")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -44,6 +47,7 @@ func TestRegisterInScope(t *testing.T) {
 	})
 
 	t.Run("creates child scope with providers", func(t *testing.T) {
+		t.Parallel()
 		parent := NewScope("parent")
 
 		provider := func(_ do.Injector) (any, error) {
@@ -69,6 +73,7 @@ func TestRegisterInScope(t *testing.T) {
 	})
 
 	t.Run("returns error for invalid provider type", func(t *testing.T) {
+		t.Parallel()
 		parent := NewScope("parent")
 
 		// Invalid provider - wrong signature
@@ -89,6 +94,7 @@ func TestRegisterInScope(t *testing.T) {
 	})
 
 	t.Run("supports single provider", func(t *testing.T) {
+		t.Parallel()
 		parent := NewScope("parent")
 
 		provider := func(_ do.Injector) (any, error) {

@@ -23,7 +23,7 @@ func ParseEmail(s string) (Email, error) {
 
 	addr, err := mail.ParseAddress(s)
 	if err != nil {
-		return Email{}, fmt.Errorf("%w: %v", ErrInvalidEmail, err)
+		return Email{}, fmt.Errorf("%w: %w", ErrInvalidEmail, err)
 	}
 
 	return Email{address: addr.Address}, nil
