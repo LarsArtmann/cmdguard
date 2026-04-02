@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-02 09:26  
 **Version:** v2.1.0  
-**Status:** PRODUCTION READY  
+**Status:** PRODUCTION READY
 
 ---
 
@@ -16,32 +16,32 @@ cmdguard v2.1.0 is **COMPLETE and PRODUCTION READY**. All planned features have 
 
 ### A) FULLY DONE ✓
 
-| Item | Status | Notes |
-|------|--------|-------|
-| **v2 API Implementation** | ✅ DONE | Type-safe CLI with DI, no panics |
-| **Custom Types** | ✅ DONE | URL, Email, Port, FilePath, HostPort |
-| **Flag Registry** | ✅ DONE | Struct tags, suggestions, parsing |
-| **Flow Context** | ✅ DONE | BranchingFlowContext for command paths |
-| **Dependency Injection** | ✅ DONE | samber/do/v2 integration |
-| **File Size Compliance** | ✅ DONE | All files ≤350 lines |
-| **Test Coverage** | ✅ DONE | 90%+ coverage on core packages |
-| **Benchmarks** | ✅ DONE | Custom type parsing benchmarks |
-| **t.Parallel()** | ✅ DONE | 32 test files parallelized |
-| **Error Handling** | ✅ DONE | Proper %w wrapping for errors |
+| Item                      | Status  | Notes                                  |
+| ------------------------- | ------- | -------------------------------------- |
+| **v2 API Implementation** | ✅ DONE | Type-safe CLI with DI, no panics       |
+| **Custom Types**          | ✅ DONE | URL, Email, Port, FilePath, HostPort   |
+| **Flag Registry**         | ✅ DONE | Struct tags, suggestions, parsing      |
+| **Flow Context**          | ✅ DONE | BranchingFlowContext for command paths |
+| **Dependency Injection**  | ✅ DONE | samber/do/v2 integration               |
+| **File Size Compliance**  | ✅ DONE | All files ≤350 lines                   |
+| **Test Coverage**         | ✅ DONE | 90%+ coverage on core packages         |
+| **Benchmarks**            | ✅ DONE | Custom type parsing benchmarks         |
+| **t.Parallel()**          | ✅ DONE | 32 test files parallelized             |
+| **Error Handling**        | ✅ DONE | Proper %w wrapping for errors          |
 
 ### B) PARTIALLY DONE
 
-| Item | Status | Notes |
-|------|--------|-------|
+| Item                               | Status       | Notes                                        |
+| ---------------------------------- | ------------ | -------------------------------------------- |
 | **benchmarks/guard_bench_test.go** | ⚠️ 406 lines | 56 over limit (15.7%) - Excluded from funlen |
 
 ### C) NOT STARTED (Future Considerations)
 
-| Item | Status | Notes |
-|------|--------|-------|
-| **v3.0 Planning** | 📋 TODO | Deprecation of v2.New in favor of NewCLI[T] |
-| **Performance Optimization** | 📋 TODO | Profile and optimize hot paths |
-| **Documentation Website** | 📋 TODO | Consider docs site generation |
+| Item                         | Status  | Notes                                       |
+| ---------------------------- | ------- | ------------------------------------------- |
+| **v3.0 Planning**            | 📋 TODO | Deprecation of v2.New in favor of NewCLI[T] |
+| **Performance Optimization** | 📋 TODO | Profile and optimize hot paths              |
+| **Documentation Website**    | 📋 TODO | Consider docs site generation               |
 
 ### D) TOTALLY FUCKED UP - NONE ✓
 
@@ -52,6 +52,7 @@ No critical issues. All tests pass, CI green.
 ## What We Should Improve
 
 ### High Priority
+
 1. **Reduce benchmarks/guard_bench_test.go** (406 lines → target 350)
 2. **Split flags_registry_basic_test.go** (287 lines)
 3. **Split flags_parse_basic_test.go** (229 lines)
@@ -59,6 +60,7 @@ No critical issues. All tests pass, CI green.
 5. **Split helpers_test.go** (311 lines)
 
 ### Medium Priority
+
 6. **Split scope_provide_basic_test.go** (225 lines)
 7. **Split command_options_test.go** (299 lines)
 8. **Reduce cyclop complexity** in parseAndSetCustom and ParsePort
@@ -66,6 +68,7 @@ No critical issues. All tests pass, CI green.
 10. **Performance benchmarks** for CLI startup time
 
 ### Low Priority
+
 11. **Documentation examples** for each custom type
 12. **Changelog generation** for v2.1.0 release
 13. **Semantic versioning** enforcement via git tags
@@ -108,9 +111,10 @@ No critical issues. All tests pass, CI green.
 
 **How should we handle the migration from v1 to v2 API?**
 
-The v1 API (`pkg/cmdguard`) uses panic-at-construction and simple patterns. The v2 API (`pkg/cmdguard/v2`) uses generics, DI, and is type-safe. 
+The v1 API (`pkg/cmdguard`) uses panic-at-construction and simple patterns. The v2 API (`pkg/cmdguard/v2`) uses generics, DI, and is type-safe.
 
 Questions:
+
 - Should we deprecate v1 entirely in v3.0?
 - Should we provide an automated migration tool?
 - Should we maintain both APIs indefinitely?
@@ -127,6 +131,7 @@ Last commit: c6c928d fix: Improve error wrapping and add t.Parallel() to subtest
 ```
 
 ### Recent Commits (5 ahead of origin/master)
+
 ```
 c6c928d fix: Improve error wrapping and add t.Parallel() to subtests
 c673952 refactor: Split large files into focused modules
@@ -158,11 +163,11 @@ ok  github.com/larsartmann/cmdguard/tests/integration   1.302s
 
 ## File Size Summary
 
-| File | Lines | Over Limit |
-|------|-------|------------|
-| benchmarks/guard_bench_test.go | 406 | +56 |
-| pkg/cmdguard/v2/cli.go | 360 | +10 |
-| pkg/cmdguard/v2/flow_context.go | 355 | +5 |
+| File                            | Lines | Over Limit |
+| ------------------------------- | ----- | ---------- |
+| benchmarks/guard_bench_test.go  | 406   | +56        |
+| pkg/cmdguard/v2/cli.go          | 360   | +10        |
+| pkg/cmdguard/v2/flow_context.go | 355   | +5         |
 
 All other files under 350 lines ✓
 
@@ -212,4 +217,4 @@ cmdguard/
 
 ---
 
-*Generated: 2026-04-02 09:26*
+_Generated: 2026-04-02 09:26_
