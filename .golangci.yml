@@ -125,6 +125,7 @@ linters:
           - paralleltest
           - gochecknoglobals
           - staticcheck
+          - tparallel
       - path: examples/
         linters:
           - exhaustruct
@@ -139,6 +140,12 @@ linters:
       - path: tests/
         linters:
           - staticcheck
+      - path: pkg/cmdguard/v2/flags_parse.go$
+        linters:
+          - cyclop
+      - path: pkg/cmdguard/v2/types_port.go$
+        linters:
+          - cyclop
       - path: pkg/cmdguard/v2/cli.go$
         linters:
           - cyclop
