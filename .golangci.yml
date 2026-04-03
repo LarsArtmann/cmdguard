@@ -1,253 +1,256 @@
 version: "2"
 run:
-  timeout: 5m
-  go: 1.26.1
-  build-tags: []
-  modules-download-mode: readonly
-  allow-parallel-runners: true
-  allow-serial-runners: true
+    timeout: 5m
+    go: 1.26.1
+    build-tags:
+        - goexperiment.goroutineleakprofile
+        - goexperiment.jsonv2
+        - goexperiment.simd
+    modules-download-mode: readonly
+    allow-parallel-runners: true
+    allow-serial-runners: true
 output:
-  formats: {}
+    formats: {}
 linters:
-  enable:
-    - iotamixing
-    - grouper
-    - misspell
-    - promlinter
-    - musttag
-    - asasalint
-    - dupl
-    - prealloc
-    - dupword
-    - iface
-    - godoclint
-    - recvcheck
-    - godox
-    - spancheck
-    - nakedret
-    - cyclop
-    - embeddedstructfieldcheck
-    - gocyclo
-    - tagliatelle
-    - goheader
-    - loggercheck
-    - decorder
-    - interfacebloat
-    - wsl_v5
-    - fatcontext
-    - modernize
-    - rowserrcheck
-    - arangolint
-    - err113
-    - gomoddirectives
-    - gochecknoglobals
-    - mirror
-    - asciicheck
-    - unused
-    - wrapcheck
-    - gocognit
-    - ginkgolinter
-    - gochecknoinits
-    - containedctx
-    - reassign
-    - paralleltest
-    - errorlint
-    - canonicalheader
-    - nestif
-    - wastedassign
-    - bodyclose
-    - nonamedreturns
-    - nilnesserr
-    - exhaustruct
-    - importas
-    - nilnil
-    - forbidigo
-    - ireturn
-    - noinlineerr
-    - intrange
-    - nolintlint
-    - noctx
-    - usetesting
-    - exhaustive
-    - forcetypeassert
-    - depguard
-    - gocheckcompilerdirectives
-    - thelper
-    - protogetter
-    - gosmopolitan
-    - predeclared
-    - usestdlibvars
-    - unparam
-    - testpackage
-    - sqlclosecheck
-    - gomodguard
-    - staticcheck
-    - gocritic
-    - nilerr
-    - exptostd
-    - funlen
-    - makezero
-    - unqueryvet
-    - unconvert
-    - nlreturn
-    - tagalign
-    - gochecksumtype
-    - errchkjson
-    - govet
-    - revive
-    - contextcheck
-    - ineffassign
-    - dogsled
-    - nosprintfhostport
-    - goconst
-    - testableexamples
-    - zerologlint
-    - sloglint
-    - maintidx
-    - inamedparam
-    - gosec
-    - errname
-    - whitespace
-    - testifylint
-    - godot
-    - goprintffuncname
-    - errcheck
-    - mnd
-    - varnamelen
-    - bidichk
-    - durationcheck
-    - copyloopvar
-    - perfsprint
-    - tparallel
-  exclusions:
-    generated: lax
-    presets:
-      - comments
-      - common-false-positives
-      - legacy
-      - std-error-handling
-    rules:
-      - path: _test\.go$
-        linters:
-          - gocyclo
-          - gosec
-          - dupl
-          - exhaustruct
-          - funlen
-          - cyclop
-          - gocognit
-          - nestif
-          - paralleltest
-          - gochecknoglobals
-          - staticcheck
-          - tparallel
-      - path: examples/
-        linters:
-          - exhaustruct
-          - cyclop
-          - funlen
-          - paralleltest
-          - staticcheck
-      - path: benchmarks/
-        linters:
-          - exhaustruct
-          - staticcheck
-      - path: tests/
-        linters:
-          - staticcheck
-      - path: pkg/cmdguard/v2/flags_parse.go$
-        linters:
-          - cyclop
-      - path: pkg/cmdguard/v2/types_port.go$
-        linters:
-          - cyclop
-      - path: pkg/cmdguard/v2/cli.go$
-        linters:
-          - cyclop
-          - funlen
-      - path: pkg/cmdguard/v2/guard_flags.go$
-        linters:
-          - cyclop
-          - nestif
-          - funlen
-      - path: _test\.go$
-        linters:
-          - maintidx
-      - path: pkg/cmdguard/
-        linters:
-          - exhaustruct
-      - path: internal/
-        linters:
-          - exhaustruct
-      - text: for loop can be changed to use an integer range
-        linters:
-          - intrange
-      - path: _test\.go$
-        text: shadow
-        linters:
-          - govet
-      - path: _test\.go$
-        text: Error return value of .+\.Close is not checked
-        linters:
-          - errcheck
-      - text: weak cryptographic primitive
-        linters:
-          - gosec
-      - text: "unused-parameter: parameter .+ seems to be unused"
-        linters:
-          - revive
-      - path: _test\.go$
-        text: dot-imports
-        linters:
-          - revive
-      - path: _test\.go$
-        linters:
-          - errorlint
-      - path: _test\.go$
-        text: context-as-argument
-        linters:
-          - revive
-      - path: flags_suggest\.go$
-        text: prealloc
-        linters:
-          - prealloc
-      - text: result .+ is always nil
-        linters:
-          - unparam
-      - text: ctx is unused
-        linters:
-          - unparam
-      - text: goconst
-        linters:
-          - goconst
-      - text: maintidx
-        linters:
-          - maintidx
-      - path: pkg/
-        linters:
-          - goconst
-      - path: internal/
-        linters:
-          - paralleltest
-          - goconst
+    enable:
+        - arangolint
+        - asasalint
+        - asciicheck
+        - bidichk
+        - bodyclose
+        - canonicalheader
+        - containedctx
+        - contextcheck
+        - copyloopvar
+        - cyclop
+        - decorder
+        - depguard
+        - dogsled
+        - dupl
+        - dupword
+        - durationcheck
+        - embeddedstructfieldcheck
+        - err113
+        - errcheck
+        - errchkjson
+        - errname
+        - errorlint
+        - exhaustive
+        - exhaustruct
+        - exptostd
+        - fatcontext
+        - forbidigo
+        - forcetypeassert
+        - funlen
+        - ginkgolinter
+        - gocheckcompilerdirectives
+        - gochecknoglobals
+        - gochecknoinits
+        - gochecksumtype
+        - gocognit
+        - goconst
+        - gocritic
+        - gocyclo
+        - godoclint
+        - godot
+        - godox
+        - goheader
+        - gomoddirectives
+        - gomodguard
+        - goprintffuncname
+        - gosec
+        - gosmopolitan
+        - govet
+        - grouper
+        - iface
+        - importas
+        - inamedparam
+        - ineffassign
+        - interfacebloat
+        - intrange
+        - iotamixing
+        - ireturn
+        - loggercheck
+        - maintidx
+        - makezero
+        - mirror
+        - misspell
+        - mnd
+        - modernize
+        - musttag
+        - nakedret
+        - nestif
+        - nilerr
+        - nilnesserr
+        - nilnil
+        - nlreturn
+        - noctx
+        - noinlineerr
+        - nolintlint
+        - nonamedreturns
+        - nosprintfhostport
+        - paralleltest
+        - perfsprint
+        - prealloc
+        - predeclared
+        - promlinter
+        - protogetter
+        - reassign
+        - recvcheck
+        - revive
+        - rowserrcheck
+        - sloglint
+        - spancheck
+        - sqlclosecheck
+        - staticcheck
+        - tagalign
+        - tagliatelle
+        - testableexamples
+        - testifylint
+        - testpackage
+        - thelper
+        - tparallel
+        - unconvert
+        - unparam
+        - unqueryvet
+        - unused
+        - usestdlibvars
+        - usetesting
+        - varnamelen
+        - wastedassign
+        - whitespace
+        - wrapcheck
+        - wsl_v5
+        - zerologlint
+    exclusions:
+        generated: lax
+        presets:
+            - comments
+            - common-false-positives
+            - legacy
+            - std-error-handling
+        rules:
+            - path: _test\.go$
+              linters:
+                - gocyclo
+                - gosec
+                - dupl
+                - exhaustruct
+                - funlen
+                - cyclop
+                - gocognit
+                - nestif
+                - paralleltest
+                - gochecknoglobals
+                - staticcheck
+                - tparallel
+            - path: examples/
+              linters:
+                - exhaustruct
+                - cyclop
+                - funlen
+                - paralleltest
+                - staticcheck
+            - path: benchmarks/
+              linters:
+                - exhaustruct
+                - staticcheck
+            - path: tests/
+              linters:
+                - staticcheck
+            - path: pkg/cmdguard/v2/flags_parse.go$
+              linters:
+                - cyclop
+            - path: pkg/cmdguard/v2/types_port.go$
+              linters:
+                - cyclop
+            - path: pkg/cmdguard/v2/cli.go$
+              linters:
+                - cyclop
+                - funlen
+            - path: pkg/cmdguard/v2/guard_flags.go$
+              linters:
+                - cyclop
+                - nestif
+                - funlen
+            - path: _test\.go$
+              linters:
+                - maintidx
+            - path: pkg/cmdguard/
+              linters:
+                - exhaustruct
+            - path: internal/
+              linters:
+                - exhaustruct
+            - text: for loop can be changed to use an integer range
+              linters:
+                - intrange
+            - path: _test\.go$
+              text: shadow
+              linters:
+                - govet
+            - path: _test\.go$
+              text: Error return value of .+\.Close is not checked
+              linters:
+                - errcheck
+            - text: weak cryptographic primitive
+              linters:
+                - gosec
+            - text: 'unused-parameter: parameter .+ seems to be unused'
+              linters:
+                - revive
+            - path: _test\.go$
+              text: dot-imports
+              linters:
+                - revive
+            - path: _test\.go$
+              linters:
+                - errorlint
+            - path: _test\.go$
+              text: context-as-argument
+              linters:
+                - revive
+            - path: flags_suggest\.go$
+              text: prealloc
+              linters:
+                - prealloc
+            - text: result .+ is always nil
+              linters:
+                - unparam
+            - text: ctx is unused
+              linters:
+                - unparam
+            - text: goconst
+              linters:
+                - goconst
+            - text: maintidx
+              linters:
+                - maintidx
+            - path: pkg/
+              linters:
+                - goconst
+            - path: internal/
+              linters:
+                - paralleltest
+                - goconst
 formatters:
-  enable:
-    - goimports
-    - golines
-    - gci
-    - gofmt
-  settings:
-    gci:
-      custom-order: true
-      sections:
-        - standard
-        - default
-        - prefix(github.com/larsartmann/cmdguard)
-    gofmt:
-      simplify: true
-    goimports:
-      local-prefixes:
-        - github.com/larsartmann/cmdguard
+    enable:
+        - gci
+        - goimports
+        - gofumpt
+        - golines
+    settings:
+        gci:
+            custom-order: true
+            sections:
+                - standard
+                - default
+                - prefix(github.com/larsartmann/cmdguard)
+        gofmt:
+            simplify: true
+        goimports:
+            local-prefixes:
+                - github.com/larsartmann/cmdguard
 issues:
-  max-issues-per-linter: 50
-  max-same-issues: 10
+    max-issues-per-linter: 50
+    max-same-issues: 10
