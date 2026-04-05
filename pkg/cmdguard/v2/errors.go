@@ -77,6 +77,30 @@ var (
 
 	// ErrInvalidHostPort indicates an invalid host:port format.
 	ErrInvalidHostPort = errors.New("invalid host:port")
+
+	// ErrFieldNotFound indicates a struct field was not found by name.
+	ErrFieldNotFound = errors.New("field not found")
+
+	// ErrFieldNotSettable indicates a struct field is unexported or otherwise not settable.
+	ErrFieldNotSettable = errors.New("field is not settable")
+
+	// ErrTypeConversion indicates a type conversion or assertion failed.
+	ErrTypeConversion = errors.New("type conversion failed")
+
+	// ErrUnsupportedConversion indicates a string-to-type conversion is not supported.
+	ErrUnsupportedConversion = errors.New("unsupported string conversion")
+
+	// ErrNilValue indicates a required value was nil.
+	ErrNilValue = errors.New("value must not be nil")
+
+	// ErrFlagInstance indicates a flag struct instance could not be created.
+	ErrFlagInstance = errors.New("failed to create flag instance")
+
+	// ErrLogLevel indicates an invalid log level value.
+	ErrLogLevel = errors.New("invalid log level")
+
+	// ErrLogFormat indicates an invalid log format value.
+	ErrLogFormat = errors.New("invalid log format")
 )
 
 // CommandError wraps an error with command context.

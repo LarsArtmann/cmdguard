@@ -50,10 +50,11 @@ func SetField(cfg any, fieldName string, value any) error {
 		duration, ok := val.Interface().(time.Duration)
 		if !ok {
 			return fmt.Errorf(
-				"SetField: type assertion failed for time.Duration, cfg=%T, fieldName=%q, value=%v",
+				"SetField: type assertion failed for time.Duration, cfg=%T, fieldName=%q, value=%v: %w",
 				cfg,
 				fieldName,
 				value,
+				ErrTypeConversion,
 			)
 		}
 		field.Set(reflect.ValueOf(FromDuration(duration)))
@@ -62,11 +63,12 @@ func SetField(cfg any, fieldName string, value any) error {
 	}
 
 	return fmt.Errorf(
-		"SetField: cannot convert cfg=%T, fieldName=%q, value=%T to %s",
+		"SetField: cannot convert cfg=%T, fieldName=%q, value=%T to %s: %w",
 		cfg,
 		fieldName,
 		value,
 		field.Type(),
+		ErrTypeConversion,
 	)
 }
 
@@ -87,17 +89,19 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 	field := v.FieldByName(fieldName)
 	if !field.IsValid() {
 		return reflect.Value{}, fmt.Errorf(
-			"getField: cfg=%T, fieldName=%q not found",
+			"getField: cfg=%T, fieldName=%q: %w",
 			cfg,
 			fieldName,
+			ErrFieldNotFound,
 		)
 	}
 
 	if !field.CanSet() {
 		return reflect.Value{}, fmt.Errorf(
-			"getField: cfg=%T, fieldName=%q is not settable",
+			"getField: cfg=%T, fieldName=%q: %w",
 			cfg,
 			fieldName,
+			ErrFieldNotSettable,
 		)
 	}
 
@@ -128,11 +132,8 @@ func setStringField(field reflect.Value, str string) error {
 		return nil
 	}
 
-	return fmt.Errorf(
-		"setStringField: field=%s, str=%q: unsupported string conversion",
-		field.Type(),
-		str,
-	)
+	return fmt.Errorf("setStringField: field=%s, str=%q: %w",
+		field.Type(), str, ErrUnsupportedConversion)
 }
 
 // parseAndSetLogLevel parses and sets a LogLevel field.

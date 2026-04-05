@@ -13,12 +13,10 @@ output:
     formats: {}
 linters:
     enable:
-        - arangolint
         - asasalint
         - asciicheck
         - bidichk
         - bodyclose
-        - canonicalheader
         - containedctx
         - contextcheck
         - copyloopvar
@@ -29,20 +27,16 @@ linters:
         - dupl
         - dupword
         - durationcheck
-        - embeddedstructfieldcheck
         - err113
         - errcheck
         - errchkjson
         - errname
         - errorlint
         - exhaustive
-        - exhaustruct
         - exptostd
         - fatcontext
-        - forbidigo
         - forcetypeassert
         - funlen
-        - ginkgolinter
         - gocheckcompilerdirectives
         - gochecknoglobals
         - gochecknoinits
@@ -51,77 +45,123 @@ linters:
         - goconst
         - gocritic
         - gocyclo
-        - godoclint
         - godot
-        - godox
-        - goheader
-        - gomoddirectives
-        - gomodguard
-        - goprintffuncname
         - gosec
-        - gosmopolitan
         - govet
-        - grouper
-        - iface
-        - importas
-        - inamedparam
         - ineffassign
         - interfacebloat
         - intrange
-        - iotamixing
-        - ireturn
         - loggercheck
         - maintidx
         - makezero
         - mirror
         - misspell
         - mnd
-        - modernize
-        - musttag
         - nakedret
         - nestif
         - nilerr
         - nilnesserr
         - nilnil
-        - nlreturn
         - noctx
-        - noinlineerr
         - nolintlint
         - nonamedreturns
         - nosprintfhostport
-        - paralleltest
-        - perfsprint
         - prealloc
         - predeclared
-        - promlinter
-        - protogetter
         - reassign
-        - recvcheck
         - revive
         - rowserrcheck
         - sloglint
         - spancheck
         - sqlclosecheck
         - staticcheck
-        - tagalign
         - tagliatelle
-        - testableexamples
-        - testifylint
-        - testpackage
         - thelper
-        - tparallel
         - unconvert
         - unparam
-        - unqueryvet
         - unused
         - usestdlibvars
         - usetesting
-        - varnamelen
         - wastedassign
         - whitespace
         - wrapcheck
-        - wsl_v5
-        - zerologlint
+    settings:
+        depguard:
+            rules:
+                Main:
+                    list-mode: strict
+                    files:
+                        - $all
+                        - "!$test"
+                        - "!**/examples/**"
+                        - "!**/benchmarks/**"
+                        - "!**/tests/**"
+                    allow:
+                        - $gostd
+                        - charm.land/fang/v2
+                        - github.com/knadh/koanf
+                        - github.com/larsartmann/cmdguard
+                        - github.com/samber/do/v2
+                        - github.com/spf13/cobra
+                        - github.com/spf13/pflag
+                Test:
+                    list-mode: strict
+                    files:
+                        - $test
+                    allow:
+                        - $gostd
+                        - charm.land/fang/v2
+                        - github.com/knadh/koanf
+                        - github.com/larsartmann/cmdguard
+                        - github.com/onsi/ginkgo
+                        - github.com/onsi/gomega
+                        - github.com/samber/do/v2
+                        - github.com/stretchr
+                        - github.com/spf13/cobra
+                        - github.com/spf13/pflag
+                Examples:
+                    list-mode: lax
+                    files:
+                        - "**/examples/**"
+                    allow:
+                        - $gostd
+                        - charm.land/fang/v2
+                        - github.com/larsartmann/cmdguard
+                        - github.com/samber/do/v2
+                        - github.com/spf13/cobra
+                        - github.com/spf13/pflag
+                Benchmarks:
+                    list-mode: lax
+                    files:
+                        - "**/benchmarks/**"
+                    allow:
+                        - $gostd
+                        - github.com/larsartmann/cmdguard
+                        - github.com/samber/do/v2
+                        - github.com/spf13/cobra
+                Integration:
+                    list-mode: lax
+                    files:
+                        - "**/tests/**"
+                    allow:
+                        - $gostd
+                        - github.com/larsartmann/cmdguard
+                        - github.com/samber/do/v2
+                        - github.com/spf13/cobra
+        cyclop:
+            max-complexity: 15
+        funlen:
+            lines: 80
+            statements: 60
+        gocognit:
+            min-complexity: 20
+        nestif:
+            min-complexity: 6
+        tagliatelle:
+            case:
+                rules:
+                    json: snake
+                    yaml: snake
     exclusions:
         generated: lax
         presets:
@@ -135,29 +175,29 @@ linters:
                 - gocyclo
                 - gosec
                 - dupl
-                - exhaustruct
                 - funlen
                 - cyclop
                 - gocognit
                 - nestif
-                - paralleltest
                 - gochecknoglobals
-                - staticcheck
-                - tparallel
+                - err113
+                - maintidx
+                - wrapcheck
             - path: examples/
               linters:
-                - exhaustruct
-                - cyclop
                 - funlen
-                - paralleltest
-                - staticcheck
+                - cyclop
+                - err113
+                - mnd
+                - wrapcheck
             - path: benchmarks/
               linters:
-                - exhaustruct
-                - staticcheck
+                - err113
+                - wrapcheck
             - path: tests/
               linters:
-                - staticcheck
+                - err113
+                - wrapcheck
             - path: pkg/cmdguard/v2/flags_parse.go$
               linters:
                 - cyclop
@@ -173,9 +213,6 @@ linters:
                 - cyclop
                 - nestif
                 - funlen
-            - path: _test\.go$
-              linters:
-                - maintidx
             - path: pkg/cmdguard/
               linters:
                 - exhaustruct
@@ -231,14 +268,12 @@ linters:
                 - goconst
             - path: internal/
               linters:
-                - paralleltest
                 - goconst
 formatters:
     enable:
         - gci
         - goimports
         - gofumpt
-        - golines
     settings:
         gci:
             custom-order: true

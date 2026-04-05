@@ -95,10 +95,7 @@ func New(name, short string) *GuardedCommand {
 
 		validLevels := []string{"debug", "info", "warn", "error"}
 		if !slices.Contains(validLevels, level) {
-			return fmt.Errorf(
-				"invalid --log-level %q: must be one of: debug, info, warn, error",
-				level,
-			)
+			return fmt.Errorf("invalid --log-level %q: %w", level, ErrInvalidLogLevel)
 		}
 
 		return nil

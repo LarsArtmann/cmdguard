@@ -8,12 +8,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	ErrCommandNoName          = errors.New("command has no name")
+	ErrCommandNoHandler       = errors.New("command has no handler (Run or RunE) and no subcommands")
+	ErrStrictModeRequiresRunE = errors.New("strict mode requires RunE handler that returns error")
+	ErrValidationFailed       = errors.New("validation failed")
+	ErrInvalidLogLevel        = errors.New("invalid log level")
+)
+
 // validateCommand checks if a command is valid.
 // Returns error if command has no handler and no subcommands.
 func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
-	// Check for command name
 	if cmd.Name() == "" {
-		return errors.New("command has no name")
+		return ErrCommandNoName
 	}
 
 	// Commands with subcommands don't need a handler
@@ -26,12 +33,12 @@ func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
 	hasRunE := cmd.RunE != nil
 
 	if !hasRun && !hasRunE {
-		return errors.New("command has no handler (Run or RunE) and no subcommands")
+		return ErrCommandNoHandler
 	}
 
 	// In strict mode, require RunE (returns error)
 	if g.strictMode && !hasRunE {
-		return errors.New("strict mode requires RunE handler that returns error")
+		return ErrStrictModeRequiresRunE
 	}
 
 	return nil
@@ -39,22 +46,22 @@ func (g *GuardedCommand) validateCommand(cmd *cobra.Command) error {
 
 // validateCommandTree validates all commands in the tree.
 func (g *GuardedCommand) validateCommandTree() error {
-	var errors []string
+	var errs []string
 
 	for _, cmd := range g.cmd.Commands() {
 		err := g.validateCommand(cmd)
 		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s: %v", cmd.Name(), err))
+			errs = append(errs, fmt.Sprintf("%s: %v", cmd.Name(), err))
 		}
 		// Recursively validate subcommands
 		err = g.validateSubcommands(cmd)
 		if err != nil {
-			errors = append(errors, err.Error())
+			errs = append(errs, err.Error())
 		}
 	}
 
-	if len(errors) > 0 {
-		return fmt.Errorf("validation failed:\n  - %s", strings.Join(errors, "\n  - "))
+	if len(errs) > 0 {
+		return fmt.Errorf("%w:\n  - %s", ErrValidationFailed, strings.Join(errs, "\n  - "))
 	}
 
 	return nil

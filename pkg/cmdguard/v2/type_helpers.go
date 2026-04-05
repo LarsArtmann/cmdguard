@@ -1,6 +1,11 @@
 package v2
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var errMustNotBeNil = errors.New("must not be nil")
 
 // Ptr returns a pointer to any value.
 // Useful for optional config fields.
@@ -20,7 +25,7 @@ func ValueOrDefault[T any](v *T, def T) T {
 // EnsureValid validates that a pointer is not nil and returns an error with context.
 func EnsureValid[T any](v *T, name string) error {
 	if v == nil {
-		return fmt.Errorf("%s (%T): must not be nil", name, v)
+		return fmt.Errorf("%s (%T): %w", name, v, errMustNotBeNil)
 	}
 
 	return nil
