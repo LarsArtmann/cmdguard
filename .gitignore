@@ -41,3 +41,7 @@ node_modules/
 
 # Backup files
 *.backup
+# Test coverage
+/coverage
+# Sensitive files
+*.db

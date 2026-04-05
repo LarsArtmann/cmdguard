@@ -9,8 +9,10 @@ import (
 )
 
 var (
-	ErrCommandNoName          = errors.New("command has no name")
-	ErrCommandNoHandler       = errors.New("command has no handler (Run or RunE) and no subcommands")
+	ErrCommandNoName    = errors.New("command has no name")
+	ErrCommandNoHandler = errors.New(
+		"command has no handler (Run or RunE) and no subcommands",
+	)
 	ErrStrictModeRequiresRunE = errors.New("strict mode requires RunE handler that returns error")
 	ErrValidationFailed       = errors.New("validation failed")
 	ErrInvalidLogLevel        = errors.New("invalid log level")

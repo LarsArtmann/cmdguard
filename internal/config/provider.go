@@ -63,7 +63,11 @@ func (c *Config) Validate() error {
 	if c.LogFormat != "" {
 		validFormats := []string{"text", "json"}
 		if !slices.Contains(validFormats, c.LogFormat) {
-			return fmt.Errorf("invalid log format %q, must be one of: text, json: %w", c.LogFormat, errInvalidLogFormat)
+			return fmt.Errorf(
+				"invalid log format %q, must be one of: text, json: %w",
+				c.LogFormat,
+				errInvalidLogFormat,
+			)
 		}
 	}
 
