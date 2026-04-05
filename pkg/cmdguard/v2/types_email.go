@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// emailPartsCount is the expected number of parts when splitting an email at "@".
+const emailPartsCount = 2
+
 // Email wraps a validated email address.
 // Use this for config fields that must be valid email addresses.
 //
@@ -58,7 +61,7 @@ func (e Email) IsEmpty() bool {
 // Local returns the local part of the email (before @).
 func (e Email) Local() string {
 	parts := strings.Split(e.address, "@")
-	if len(parts) != 2 {
+	if len(parts) != emailPartsCount {
 		return ""
 	}
 
@@ -68,7 +71,7 @@ func (e Email) Local() string {
 // Domain returns the domain part of the email (after @).
 func (e Email) Domain() string {
 	parts := strings.Split(e.address, "@")
-	if len(parts) != 2 {
+	if len(parts) != emailPartsCount {
 		return ""
 	}
 

@@ -6,6 +6,16 @@ import (
 	"strings"
 )
 
+// Well-known port constants for named port lookups.
+const (
+	portHTTP  = 80
+	portHTTPS = 443
+	portSSH   = 22
+	portFTP   = 21
+	portDNS   = 53
+	portSMTP  = 25
+)
+
 // Port represents a valid network port number (1-65535).
 // Use this for config fields that specify TCP/UDP ports.
 //
@@ -25,17 +35,17 @@ func ParsePort(s string) (Port, error) {
 	// Check for named ports
 	switch strings.ToLower(s) {
 	case "http":
-		return Port{port: 80}, nil
+		return Port{port: portHTTP}, nil
 	case "https":
-		return Port{port: 443}, nil
+		return Port{port: portHTTPS}, nil
 	case "ssh":
-		return Port{port: 22}, nil
+		return Port{port: portSSH}, nil
 	case "ftp":
-		return Port{port: 21}, nil
+		return Port{port: portFTP}, nil
 	case "dns":
-		return Port{port: 53}, nil
+		return Port{port: portDNS}, nil
 	case "smtp":
-		return Port{port: 25}, nil
+		return Port{port: portSMTP}, nil
 	}
 
 	// Parse numeric port

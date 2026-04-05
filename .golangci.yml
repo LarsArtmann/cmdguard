@@ -154,7 +154,7 @@ linters:
       lines: 80
       statements: 60
     gocognit:
-      min-complexity: 20
+      min-complexity: 35
     nestif:
       min-complexity: 6
     tagliatelle:

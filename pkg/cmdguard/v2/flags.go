@@ -214,8 +214,8 @@ func (r *FlagRegistry) validateEnumValue(cmd *cobra.Command, tag FlagTag) error 
 	}
 
 	if !r.isAllowedValue(flag.Value.String(), tag.Values) {
-		return fmt.Errorf("enum flag %q on command %q has invalid value %q: must be one of: %v",
-			tag.Name, cmd.Use, flag.Value.String(), tag.Values)
+		return fmt.Errorf("enum flag %q on command %q has invalid value %q: must be one of: %v: %w",
+			tag.Name, cmd.Use, flag.Value.String(), tag.Values, ErrInvalidEnum)
 	}
 
 	return nil

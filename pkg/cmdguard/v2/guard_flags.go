@@ -173,9 +173,10 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 				flagsPtr = flagsCopy
 			} else {
 				return zero, fmt.Errorf(
-					"cloneAndParseFlags: failed to create flag instance for type %T (flags=%T)",
+					"cloneAndParseFlags: failed to create flag instance for type %T (flags=%T): %w",
 					zero,
 					flags,
+					ErrFlagInstance,
 				)
 			}
 		} else {
@@ -186,9 +187,10 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 				flagsCopy = fc
 			} else {
 				return zero, fmt.Errorf(
-					"cloneAndParseFlags: failed to create flag instance for type %T (flags=%T)",
+					"cloneAndParseFlags: failed to create flag instance for type %T (flags=%T): %w",
 					zero,
 					flags,
+					ErrFlagInstance,
 				)
 			}
 		}

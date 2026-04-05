@@ -2,10 +2,16 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
+)
+
+var (
+	errInvalidLogLevel  = errors.New("invalid log level")
+	errInvalidLogFormat = errors.New("invalid log format")
 )
 
 // Config holds the application configuration.
@@ -47,8 +53,9 @@ func (c *Config) Validate() error {
 		validLevels := []string{"debug", "info", "warn", "error"}
 		if !slices.Contains(validLevels, c.LogLevel) {
 			return fmt.Errorf(
-				"invalid log level %q, must be one of: debug, info, warn, error",
+				"invalid log level %q, must be one of: debug, info, warn, error: %w",
 				c.LogLevel,
+				errInvalidLogLevel,
 			)
 		}
 	}
@@ -56,7 +63,7 @@ func (c *Config) Validate() error {
 	if c.LogFormat != "" {
 		validFormats := []string{"text", "json"}
 		if !slices.Contains(validFormats, c.LogFormat) {
-			return fmt.Errorf("invalid log format %q, must be one of: text, json", c.LogFormat)
+			return fmt.Errorf("invalid log format %q, must be one of: text, json: %w", c.LogFormat, errInvalidLogFormat)
 		}
 	}
 
