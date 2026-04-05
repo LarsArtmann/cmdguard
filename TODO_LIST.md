@@ -1,224 +1,97 @@
 # TODO List
 
-**Generated:** 2026-03-28
-**Files Processed:** 200
-**Last Updated:** 2026-04-01
+**Generated:** 2026-04-05
+**Purpose:** Actionable items for next 2-4 weeks
 
-## ✅ COMPLETED (Session 2026-04-01)
-
-- [x] Remove AddCommandFunc (redundant) - DONE
-- [x] Update FEATURES.md with v2.1.0 changes (CLI[T], deprecations) - DONE
-- [x] Update API_DESIGN_REVIEW.md implementation checklist - DONE
-
-## ✅ COMPLETED (Session 2026-03-28)
-
-- [x] Fix wrapcheck errors in types.go (json.Marshal/Unmarshal) - DONE
-- [x] Update FEATURES.md (coverage to 89.9%) - DONE
-- [x] Increase v2 coverage from 81.8% to 89.9% - DONE
-- [x] Add comprehensive flow_context tests (344 lines, 44 tests) - DONE
-- [x] Fix flow_context cancel bug (selfCancel tracking) - DONE
-- [x] Create Migration Guide v1→v2 (docs/MIGRATION_v1_v2.md) - DONE
-- [x] Create Quickstart Guide (docs/QUICKSTART.md) - DONE
-- [x] Add deprecation notices to GuardedCommand API - DONE
-- [x] Bump version to 2.1.0 - DONE
-- [x] Fix go.mod for go 1.26 compatibility - DONE
-- [x] Verify all linter issues resolved (thelper, nilnil, noctx, exhaustive, wrapcheck) - DONE
-- [x] Verify all fuzz tests pass - DONE
-- [x] Remove dead code packages (pkg/apperrors, pkg/testutil) - DONE
-- [x] Remove duplicate //go:fix inline directive in type_helpers.go - DONE
-- [x] Increase v2 coverage to 90.2% (added MarshalText tests) - DONE
-- [x] Update README.md with links to new docs - DONE
-
-## 🟡 MEDIUM Priority
+## 🔴 High Priority (This Sprint)
 
 - [ ] Fix CLI[T] AddCommand flag parsing bug using cloneAndParseFlags pattern (source: pkg/cmdguard/v2/cli.go:190)
-- [x] Update `New()` to accept functional options (source: API_DESIGN_REVIEW.md) - DONE (CLI[T] uses CLIOption)
-- [x] Update `Scope()` to return `*Scope` (source: API_DESIGN_REVIEW.md) - DONE (CLI[T].Scope returns \*Scope)
-- [x] Update `FlagRegistry` to `FlagRegistry[F]` struct (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Update `NewFlagRegistry` to be generic (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Update `ParseFlags` to be generic (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Update all existing tests for new API (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Fix usetesting - replace os.Setenv with t.Setenv in tests (source: COMPREHENSIVE_STATUS_REPORT.md) - DONE (already using t.Setenv)
-- [x] Update README.md (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Update AGENTS.md (source: API_DESIGN_REVIEW.md, PARETO_EXECUTION_MASTERPLAN.md) - DONE
-- [x] Update GoDoc comments (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Update example code (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Update Examples to Use CLI[T] API (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md) - DONE
-- [x] Update examples/typed to use SimpleCLI pattern (source: 2026-03-22_14-10_STATUSReport-v2.1.md) - DONE
-- [x] Improve godoc for public APIs (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md) - DONE
-- [x] Fix intrange - use range for integers pattern (source: COMPREHENSIVE_STATUS_REPORT.md) - DONE (already using range)
-- [x] Fix gocritic issue (source: COMPREHENSIVE_STATUS_REPORT.md) - DONE (none found)
-- [x] Fix revive style issue (source: COMPREHENSIVE_STATUS_REPORT.md) - DONE (none found)
-- [x] Remove duplicate `//go:fix inline` directive (source: type_helpers.go:9) - DONE
-- [x] Update examples/basic/main.go (source: api-redesign-v2.1.md) - DONE
-- [x] Update examples/typed/main.go (source: api-redesign-v2.1.md) - DONE
-- [ ] Refactor flags_parse_test.go complexity (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Refactor nestif (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Fix err113 dynamic error wrapping issues (source: docs/status/2026-03-22_14-12_comprehensive-status.md)
-- [x] Update FEATURES.md (source: api-redesign-v2.1.md) - DONE
-- [x] Update API_DESIGN_REVIEW.md (source: api-redesign-v2.1.md) - DONE
+- [ ] Refactor flags_parse_test.go complexity
+- [ ] Refactor nestif complexity in flags parsing
+- [ ] Fix err113 dynamic error wrapping issues
 
-- [ ] Improve flag suggestion algorithm (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Improve error types (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Update README.md with ID usage examples (source: docs/planning/go-composable-business-types-usage.md)
-- [ ] Update AGENTS.md integration patterns (source: docs/planning/go-composable-business-types-usage.md)
-- [ ] Decide on Ginkgo vs stdlib testing and update AGENTS.md (source: BDD_TESTS_REVIEW.md)
+## 🟡 Medium Priority
 
-## 🟢 LOW Priority
+- [ ] Improve flag suggestion algorithm
+- [ ] Improve error types (more specific error categories)
+- [ ] Update README.md with ID usage examples
+- [ ] Update AGENTS.md integration patterns
+- [ ] Decide on Ginkgo vs stdlib testing and update AGENTS.md
+- [ ] Add t.Parallel() to guarded_command_test.go tests
+- [ ] Add tests for `initialize` error paths
+- [ ] Add tests for `cliToCobraCommand` edge cases
+- [ ] Add tests for `cloneAndParseFlags` error paths
 
-- [ ] Review all `any` usages in package (source: API_DESIGN_REVIEW.md)
-- [ ] Document DI patterns (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Document DI scope pattern in docs/ (source: PARTS.md)
-- [ ] Document error handling strategy (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Review gochecknoglobals (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Review recvcheck (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Review unparam (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Create v3.0 API design document (source: 2026-03-22_14-10_STATUSReport-v2.1.md)
-- [ ] Review other examples for duplicate code (source: 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
+## 🧪 Testing & Refactoring
 
-## ⚪ Unknown Priority
+- [ ] Migrate errors_test.go (remove testify)
+- [ ] Migrate config_test.go (remove testify)
+- [ ] Migrate guard_test.go from testify to stdlib
+- [ ] Split guarded_command_test.go (669 lines)
+- [ ] Split v2_mixed_flags_test.go (662 lines)
+- [ ] Split flags.go (358 lines)
+- [ ] Split config.go (352 lines)
+- [ ] Split flags_test.go (678 lines)
+- [ ] Split guard_test.go (1103 lines)
+- [ ] Split config_test.go (452 lines)
+- [ ] Split types_test.go (438 lines)
 
-- [x] Remove `F` type parameter from `GuardedCommand[T, F]` → `CLI[T]` (source: API_DESIGN_REVIEW.md) - DONE (CLI[T] is new API)
-- [x] Rename `GuardedCommand` → `CLI` (source: API_DESIGN_REVIEW.md) - DONE (CLI[T] is new recommended type)
-- [x] Make `AddCommand` accept `Command[T, any]` (source: API_DESIGN_REVIEW.md) - DONE (AddCommand works with any flags)
-- [ ] Remove `AddAnyCommand` (source: API_DESIGN_REVIEW.md) - Still needed for GuardedCommand
-- [x] Remove `AddCommandFunc` (source: API_DESIGN_REVIEW.md) - DONE (removed)
-- [x] Add `WithDI()` option for opt-in DI (source: API_DESIGN_REVIEW.md) - DONE (WithCLIScope exists)
-- [ ] Make scope creation lazy (source: API_DESIGN_REVIEW.md)
-- [x] Remove `ScopeStruct()` method (source: API_DESIGN_REVIEW.md) - DONE (CLI[T] doesn't have it)
-- [ ] Create `pkg/cmdguard/v3/` directory (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `errors.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `types.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `cli.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `command.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `options.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `flags.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `scope.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [x] Add tests for optional DI (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Add tests for functional options (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Verify 90%+ coverage maintained (source: API_DESIGN_REVIEW.md) - DONE (90.2%)
-- [x] Increase v2 coverage from 81.2% to 90%+ (source: docs/status/2026-03-28_00-05_COMPREHENSIVE_STATUS_REPORT.md) - DONE
-- [ ] Add t.Parallel() to guarded_command_test.go tests (source: pkg/cmdguard/guarded_command_test.go)
-- [ ] Add tests for `initialize` error paths (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add tests for `cliToCobraCommand` edge cases (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add tests for `cloneAndParseFlags` error paths (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md)
-- [x] Write tests for v2.1 additions (source: 2026-03-22_14-10_STATUSReport-v2.1.md) - DONE
-- [ ] Add fuzz test corpus in testdata/fuzz/ directories (source: docs/status/2026-03-28_00-05_COMPREHENSIVE_STATUS_REPORT.md)
-- [x] Add CLI[T] integration tests (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md) - DONE
-- [ ] Migrate errors_test.go (remove testify) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Migrate config_test.go (remove testify) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Migrate guard_test.go from testify to stdlib (source: docs/planning/2026-02-20_COMPREHENSIVE_EXECUTION_PLAN.md)
-- [ ] Split guarded_command_test.go (669 lines) (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Split v2_mixed_flags_test.go (662 lines) (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Split flags.go (358 lines) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Split config.go (352 lines) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Split flags_test.go (678 lines) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Split guard_test.go (1103 lines) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Split config_test.go (452 lines) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Split types_test.go (438 lines) (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [x] README v2 Rewrite (source: PARETO_EXECUTION_MASTERPLAN.md) - DONE
-- [x] Quickstart Example (source: PARETO_EXECUTION_MASTERPLAN.md) - DONE (docs/QUICKSTART.md)
-- [x] Migration Guide v1 → v2 (source: PARETO_EXECUTION_MASTERPLAN.md, 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md) - DONE (docs/MIGRATION_v1_v2.md)
-- [ ] API Reference (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] DI Pattern Example (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Mixed Flags Example (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [x] MIGRATION.md guide (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Add `Package()` function for samber/do integration (source: API_DESIGN_REVIEW.md) - DONE
-- [x] Add `WithScope()` option to inject existing scope (source: API_DESIGN_REVIEW.md) - DONE (WithCLIScope exists)
-- [x] Add deprecation type aliases for backward compatibility (source: API_DESIGN_REVIEW.md) - DONE (SimpleCLI alias)
-- [x] Add `Deprecated:` comments to removed functions (source: API_DESIGN_REVIEW.md) - DONE
-- [ ] Create compatibility shims if needed (source: API_DESIGN_REVIEW.md)
-- [x] Add Deprecation Path for GuardedCommand (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md) - DONE (marked deprecated in guard.go)
-- [ ] Add Middleware Support (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md)
-- [ ] Add Progress/Spinner Type using charmbracelet/bubbles (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add Shell Completion Helpers (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add Result[T] type for error handling (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add Validated[T] wrapper with validation functions (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Config File Auto-Loading integration with koanf (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Environment Variable Binding with env struct tags (source: docs/status/2026-03-28_00-15_EXECUTION_PLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Replace `internal/config` with koanf (source: PARTS.md)
-- [ ] Replace `internal/logging` with charmbracelet/log (source: PARTS.md)
-- [ ] Add short flags for common options (source: CLI_DESIGN_PRINCIPLES.md)
-- [ ] Validate enum values for --log-level (source: CLI_DESIGN_PRINCIPLES.md)
-- [ ] Show defaults in help text (source: CLI_DESIGN_PRINCIPLES.md)
-- [x] Add flag suggestions on unknown flag errors (source: CLI_DESIGN_PRINCIPLES.md, 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md) - DONE (already exists)
-- [x] Create Option[T] type implementation (source: 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md) - DONE
-- [ ] Benchmark: Command Creation (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Benchmark: Flag Parsing (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Benchmark: DI Resolution (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Benchmark Report (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Add comprehensive performance benchmarks (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add benchmark regression detection to CI (source: docs/status/2026-03-28_00-05_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Implement `flags_parse.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `flags_validate.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `scope_provide.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Implement `cli_exec.go` for v3 (source: v3.0-major-redesign-plan.md)
-- [ ] Write tests for v3 implementation (source: v3.0-major-redesign-plan.md)
-- [ ] Create v3 examples (source: v3.0-major-redesign-plan.md)
-- [ ] Write MIGRATION_V2_TO_V3.md (source: v3.0-major-redesign-plan.md)
-- [ ] Advanced DI Example (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Middleware Example (source: PARETO_EXECUTION_MASTERPLAN.md, 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Testing Example (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Error Handling Example (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Add example/basic unit tests (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add example/typed unit tests (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add example with real database connection (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add example with HTTP server (source: 2026-03-23_15-34_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Create example application for branded IDs (source: docs/planning/go-composable-business-types-usage.md)
-- [ ] Add lifecycle hook examples (source: PARTS.md)
-- [ ] Create examples/docs-generator/main.go (source: api-redesign-v2.1.md)
-- [ ] Add flag documentation generator (source: api-redesign-v2.1.md)
-- [ ] Define FlagDoc struct (source: api-redesign-v2.1.md)
-- [ ] Add GenerateDocs() method to CLI (source: api-redesign-v2.1.md)
-- [ ] Implement markdown documentation generator (source: api-redesign-v2.1.md)
-- [ ] Add GenerateDocsToFile() helper (source: api-redesign-v2.1.md)
-- [ ] Add API examples to godoc (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add flag validation examples (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Remove `NewWithLong()` (superseded by `WithLong()` option) (source: API_DESIGN_REVIEW.md)
-- [ ] Create cliConfig internal struct (source: api-redesign-v2.1.md)
-- [ ] Create type alias CLI = GuardedCommand (source: api-redesign-v2.1.md)
-- [ ] Add deprecation notice to GuardedCommand (source: api-redesign-v2.1.md)
-- [ ] Consolidate Scope() methods (source: api-redesign-v2.1.md)
-- [ ] Reduce cyclomatic complexity (cyclop) (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Extract constants (goconst) (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Configure exhaustruct for external structs (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Split funlen functions (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Rename BaseError to avoid inheritance hint (source: docs/status/2026-03-23_20-51_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Rename test packages to use \_test suffix (source: docs/status/2026-03-22_14-12_comprehensive-status.md)
-- [ ] Create `github.com/larsartmann/flagtags` repository (source: PARTS.md)
-- [ ] Extract flag-related code to standalone library (source: PARTS.md)
-- [ ] Add more custom types (URL, Email, Port, FilePath) (source: 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Create command groups feature (source: 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Implement plugin system for custom validators (source: FEATURES.md)
-- [ ] Add enhanced flag validation enums (source: FEATURES.md)
-- [ ] Custom validation hooks (source: ARCHITECTURE_REVIEW.md)
-- [ ] Metrics/telemetry integration (source: ARCHITECTURE_REVIEW.md)
-- [ ] Config file support YAML/TOML (source: ARCHITECTURE_REVIEW.md)
-- [ ] Changelog v2.0 (source: PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Create v2.1.0 release tag and release notes (source: 2026-03-22_14-10_STATUSReport-v2.1.md)
-- [ ] Add changelog (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Set up release automation (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md, FEATURES.md)
-- [ ] Add GitHub Actions workflow (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add codecov integration (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add badge to README (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Set up CI/CD pipeline (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add pre-commit hooks (source: COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Create contribution guide (source: COMPREHENSIVE_STATUS_REPORT.md, PARETO_EXECUTION_MASTERPLAN.md)
-- [ ] Deprecate v1 API timeline (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Remove testify/ginkgo completely (source: 2026-03-22_14-10_STATUSReport-v2.1.md)
-- [ ] Run full test suite (source: api-redesign-v2.1.md)
-- [ ] Run linter (source: api-redesign-v2.1.md)
-- [ ] Verify build passes (source: api-redesign-v2.1.md)
-- [ ] Manual testing of examples (source: api-redesign-v2.1.md)
-- [ ] Add WithColor option for fang integration (source: api-redesign-v2.1.md)
-- [ ] Audit error message consistency (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add more CLI[T] options (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add fuzz tests to flags_parse.go (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add fuzz tests to config_parsing.go (source: 2026-03-22_16-58_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add context to exec.Command instances (source: docs/status/2026-03-23_20-51_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Fuzz test corpus entries (source: 2026-03-28_02-44_COMPREHENSIVE_STATUS_REPORT.md)
-- [ ] Add tests for ID serialization in config (source: docs/planning/go-composable-business-types-usage.md)
-- [ ] Add integration tests for command handlers with IDs (source: docs/planning/go-composable-business-types-usage.md)
-- [ ] Add tests/acceptance/ directory with user-journey tests (source: BDD_TESTS_REVIEW.md)
-- [ ] Add validation interface abstraction (source: docs/planning/2026-02-20_COMPREHENSIVE_EXECUTION_PLAN.md)
-- [ ] Add FlagRegistry interface (source: docs/planning/2026-02-20_COMPREHENSIVE_EXECUTION_PLAN.md)
+## 📚 Documentation
+
+- [ ] API Reference documentation
+- [ ] DI Pattern Example
+- [ ] Mixed Flags Example
+
+## ⚙️ Configuration & Options
+
+- [ ] Remove AddAnyCommand (superseded by AddCommand)
+- [ ] Make scope creation lazy
+- [ ] Create compatibility shims if needed
+- [ ] Add Middleware Support
+- [ ] Add WithColor option for fang integration
+- [ ] Add more CLI[T] options
+
+## 📊 Performance
+
+- [ ] Benchmark: Command Creation
+- [ ] Benchmark: Flag Parsing
+- [ ] Benchmark: DI Resolution
+- [ ] Benchmark Report
+- [ ] Add comprehensive performance benchmarks
+- [ ] Add benchmark regression detection to CI
+
+## 🎯 Examples
+
+- [ ] Add example/basic unit tests
+- [ ] Add example/typed unit tests
+- [ ] Add example with real database connection
+- [ ] Add example with HTTP server
+- [ ] Add lifecycle hook examples
+- [ ] Advanced DI Example
+- [ ] Middleware Example
+- [ ] Testing Example
+- [ ] Error Handling Example
+
+## 🛠️ Linting & Code Quality
+
+- [ ] Reduce cyclomatic complexity (cyclop)
+- [ ] Extract constants (goconst)
+- [ ] Split funlen functions
+- [ ] Rename BaseError to avoid inheritance hint
+- [ ] Audit error message consistency
+- [ ] Add context to exec.Command instances
+
+## 🔍 Testing
+
+- [ ] Run full test suite
+- [ ] Run linter
+- [ ] Verify build passes
+- [ ] Manual testing of examples
+- [ ] Add integration tests for command handlers with IDs
+- [ ] Add tests/acceptance/ directory with user-journey tests
+
+## ⚡ Quick Wins
+
+- [ ] Add short flags for common options
+- [ ] Validate enum values for --log-level
+- [ ] Show defaults in help text
