@@ -146,94 +146,109 @@ func cloneFlags[F any](flags F) F {
 	return flags
 }
 
+// createNilFlags creates a new flag instance when flags is a nil pointer.
+// Returns (flagsCopy, flagsPtr, error).
+func createNilFlags[F any]() (F, any, error) {
+	var zero F
+
+	t := reflect.TypeOf(zero)
+	if t == nil {
+		return zero, nil, nil
+	}
+
+	if t.Kind() == reflect.Pointer {
+		newVal := reflect.New(t.Elem())
+		fc, ok := newVal.Interface().(F)
+		if !ok {
+			return zero, nil, fmt.Errorf(
+				"cloneAndParseFlags: failed to create flag instance for type %T: %w",
+				zero,
+				ErrFlagInstance,
+			)
+		}
+
+		return fc, fc, nil
+	}
+
+	newPtr := reflect.New(t)
+	fc, ok := newPtr.Elem().Interface().(F)
+	if !ok {
+		return zero, nil, fmt.Errorf(
+			"cloneAndParseFlags: failed to create flag instance for type %T: %w",
+			zero,
+			ErrFlagInstance,
+		)
+	}
+
+	return fc, newPtr.Interface(), nil
+}
+
+// flagsToPtr converts a flags value to a pointer for parsing.
+// If flags is already a pointer, returns it directly.
+// If flags is a struct, creates a pointer to a copy.
+func flagsToPtr[F any](flags F) (F, any) {
+	t := reflect.TypeOf(flags)
+	if t.Kind() == reflect.Pointer {
+		return flags, flags
+	}
+
+	newPtr := reflect.New(t)
+	newPtr.Elem().Set(reflect.ValueOf(flags))
+
+	return flags, newPtr.Interface()
+}
+
+// parseAndSyncFlags parses flags via the registry and syncs parsed values back.
+func parseAndSyncFlags[F any](
+	c *cobra.Command, flags F, flagsPtr any, registry *FlagRegistry,
+) (F, error) {
+	if registry == nil {
+		return flags, nil
+	}
+
+	err := registry.ParseFlags(c, flagsPtr)
+	if err != nil {
+		return flags, fmt.Errorf(
+			"parse flags: command=%q, registry=%T, flags=%T: %w",
+			c.Name(),
+			registry,
+			flags,
+			err,
+		)
+	}
+
+	t := reflect.TypeOf(flags)
+	if t != nil && t.Kind() != reflect.Pointer {
+		if fc, ok := reflect.ValueOf(flagsPtr).Elem().Interface().(F); ok {
+			return fc, nil
+		}
+	}
+
+	return flags, nil
+}
+
 // cloneAndParseFlags clones flags once and parses them.
 // This is the optimized single-entry point for flag handling during execution.
 // If flags is nil, creates a new instance of F to parse into.
 func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) (F, error) {
 	var flagsCopy F
 
-	var flagsPtr any // Pointer to flags for parsing (SetField requires pointer)
+	var flagsPtr any
 
-	// If flags is nil, create a new instance of the flag type
 	if isNilPointer(flags) {
-		// Create new instance using reflection
-		var zero F
-
-		t := reflect.TypeOf(zero)
-		if t == nil {
-			// F is an interface type with nil value - can't create
-			return zero, nil
-		}
-
-		if t.Kind() == reflect.Pointer {
-			// Create new instance of the underlying type
-			newVal := reflect.New(t.Elem())
-			if fc, ok := newVal.Interface().(F); ok {
-				flagsCopy = fc
-				flagsPtr = flagsCopy
-			} else {
-				return zero, fmt.Errorf(
-					"cloneAndParseFlags: failed to create flag instance for type %T (flags=%T): %w",
-					zero,
-					flags,
-					ErrFlagInstance,
-				)
-			}
-		} else {
-			// F is a struct type (like NoFlags) - create pointer for parsing
-			newPtr := reflect.New(t)
-			flagsPtr = newPtr.Interface()
-			if fc, ok := newPtr.Elem().Interface().(F); ok {
-				flagsCopy = fc
-			} else {
-				return zero, fmt.Errorf(
-					"cloneAndParseFlags: failed to create flag instance for type %T (flags=%T): %w",
-					zero,
-					flags,
-					ErrFlagInstance,
-				)
-			}
+		var err error
+		flagsCopy, flagsPtr, err = createNilFlags[F]()
+		if err != nil {
+			return flagsCopy, err
 		}
 	} else {
-		// Clone the flags struct
 		flagsCopy = cloneFlags(flags)
 		if any(flagsCopy) == nil {
 			flagsCopy = flags
 		}
 
-		// Create pointer for parsing
-		t := reflect.TypeOf(flagsCopy)
-		if t.Kind() == reflect.Pointer {
-			flagsPtr = flagsCopy
-		} else {
-			// F is a struct - create pointer for parsing
-			newPtr := reflect.New(t)
-			newPtr.Elem().Set(reflect.ValueOf(flagsCopy))
-			flagsPtr = newPtr.Interface()
-		}
+		flagsCopy, flagsPtr = flagsToPtr(flagsCopy)
 	}
 
-	// Parse command-line values into the flags
-	if registry != nil {
-		err := registry.ParseFlags(c, flagsPtr)
-		if err != nil {
-			return flagsCopy, fmt.Errorf(
-				"parse flags: command=%q, registry=%T, flags=%T: %w",
-				c.Name(),
-				registry,
-				flags,
-				err,
-			)
-		}
-		// Copy parsed values back to flagsCopy if it was a struct
-		t := reflect.TypeOf(flagsCopy)
-		if t != nil && t.Kind() != reflect.Pointer {
-			// flagsPtr is *F, dereference to get the parsed values
-			if fc, ok := reflect.ValueOf(flagsPtr).Elem().Interface().(F); ok {
-				flagsCopy = fc
-			}
-		}
-	}
-
-	return flagsCopy, nil
+	return parseAndSyncFlags(c, flagsCopy, flagsPtr, registry)
 }
