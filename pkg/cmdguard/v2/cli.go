@@ -161,18 +161,21 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 	)
 
 	if !isNoFlags(cmd.Flags) {
-		flagRegistry, err = NewFlagRegistry(cmd.Flags)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to create flag registry for command %q: %w",
-				cmd.Use,
-				err,
-			)
-		}
+		prototype := createFlagPrototype(cmd.Flags)
+		if !isNilPointer(prototype) {
+			flagRegistry, err = NewFlagRegistry(prototype)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to create flag registry for command %q: %w",
+					cmd.Use,
+					err,
+				)
+			}
 
-		err = flagRegistry.RegisterFlags(cobraCmd)
-		if err != nil {
-			return nil, fmt.Errorf("failed to register flags for command %q: %w", cmd.Use, err)
+			err = flagRegistry.RegisterFlags(cobraCmd)
+			if err != nil {
+				return nil, fmt.Errorf("failed to register flags for command %q: %w", cmd.Use, err)
+			}
 		}
 	}
 
