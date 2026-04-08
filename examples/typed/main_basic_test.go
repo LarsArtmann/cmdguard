@@ -64,7 +64,7 @@ func runCLIWithArgs(cli *v2.CLI[AppConfig], args ...string) string {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_CreateCLI(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
+	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

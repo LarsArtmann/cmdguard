@@ -10,7 +10,7 @@ import (
 
 func TestDIExample_CreateCLI(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
+	cli, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
@@ -27,25 +27,27 @@ func TestDIExample_CreateCLI(t *testing.T) {
 
 func TestDIExample_ServiceRegistration(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
+	cli, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
 	// Register database service
-	err = v2.Provide(cli.ScopeStruct(), NewDatabaseService)
+	scope := cli.Scope()
+
+	err = v2.Provide(scope, NewDatabaseService)
 	if err != nil {
 		t.Fatalf("Failed to register database service: %v", err)
 	}
 
 	// Register API service
-	err = v2.Provide(cli.ScopeStruct(), NewAPIService)
+	err = v2.Provide(scope, NewAPIService)
 	if err != nil {
 		t.Fatalf("Failed to register API service: %v", err)
 	}
 
 	// Verify database service can be invoked
-	db, err := v2.Invoke[*DatabaseService](cli.ScopeStruct())
+	db, err := v2.Invoke[*DatabaseService](scope)
 	if err != nil {
 		t.Fatalf("Failed to invoke database service: %v", err)
 	}
@@ -59,7 +61,7 @@ func TestDIExample_ServiceRegistration(t *testing.T) {
 	}
 
 	// Verify API service can be invoked
-	api, err := v2.Invoke[*APIService](cli.ScopeStruct())
+	api, err := v2.Invoke[*APIService](scope)
 	if err != nil {
 		t.Fatalf("Failed to invoke API service: %v", err)
 	}
@@ -71,19 +73,21 @@ func TestDIExample_ServiceRegistration(t *testing.T) {
 
 func TestDIExample_MustInvoke(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
+	cli, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
 	// Register services
-	err = v2.Provide(cli.ScopeStruct(), NewDatabaseService)
+	scope := cli.Scope()
+
+	err = v2.Provide(scope, NewDatabaseService)
 	if err != nil {
 		t.Fatalf("Failed to register database service: %v", err)
 	}
 
 	// Test Invoke (MustInvoke removed)
-	db, err := v2.Invoke[*DatabaseService](cli.ScopeStruct())
+	db, err := v2.Invoke[*DatabaseService](scope)
 	if err != nil {
 		t.Fatalf("Failed to invoke database service: %v", err)
 	}
@@ -95,13 +99,15 @@ func TestDIExample_MustInvoke(t *testing.T) {
 
 func TestDIExample_HealthCheck(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
+	cli, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
 	// Register database service
-	err = v2.Provide(cli.ScopeStruct(), NewDatabaseService)
+	scope := cli.Scope()
+
+	err = v2.Provide(scope, NewDatabaseService)
 	if err != nil {
 		t.Fatalf("Failed to register database service: %v", err)
 	}
@@ -109,7 +115,7 @@ func TestDIExample_HealthCheck(t *testing.T) {
 	// Health check should pass when service is registered and connected
 	ctx := context.Background()
 
-	err = cli.ScopeStruct().HealthCheckWithContext(ctx)
+	err = scope.HealthCheckWithContext(ctx)
 	if err != nil {
 		t.Errorf("Health check failed: %v", err)
 	}
@@ -122,7 +128,7 @@ func TestDIExample_ConfigAccess(t *testing.T) {
 		ServerURL: "http://localhost:8080",
 	}
 
-	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", cfg)
+	cli, err := v2.NewCLI[Config]("di-app", "DI Example App", cfg)
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
