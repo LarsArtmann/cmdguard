@@ -24,7 +24,7 @@ func TestParseLevel_Type(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := ParseLevel(tt.level)
 			if result != tt.expectedLevel {
 				t.Errorf("ParseLevel(%q) = %v, want %v", tt.level, result, tt.expectedLevel)
@@ -49,7 +49,7 @@ func TestLevel_SlogLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := tt.level.SlogLevel()
 			if result != tt.expectedLevel {
 				t.Errorf("Level(%q).SlogLevel() = %v, want %v", tt.level, result, tt.expectedLevel)
@@ -179,7 +179,7 @@ func TestLoggerLevelFiltering(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			var buf bytes.Buffer
 
 			handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{

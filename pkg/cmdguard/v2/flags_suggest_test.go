@@ -36,7 +36,7 @@ func TestSuggestFlag(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := SuggestFlag(tt.validNames, tt.input)
 			if tt.wantOneOf != nil {
 				if !containsString(tt.wantOneOf, result) {
@@ -70,7 +70,7 @@ func TestEditDistance(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			if got := editDistance(tt.a, tt.b); got != tt.want {
 				t.Errorf("editDistance(%q, %q) = %d, want %d", tt.a, tt.b, got, tt.want)
 			}

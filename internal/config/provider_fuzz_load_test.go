@@ -151,7 +151,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 
 	for _, tt := range invalidLevelTests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			cfg := &Config{LogLevel: tt.level}
 
 			err := cfg.Validate()
@@ -183,7 +183,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := GetConfigFilePath(tt.input)
 			if tt.wantEmpty && result != "" {
 				t.Errorf("GetConfigFilePath(%q) = %q, want empty", tt.input, result)

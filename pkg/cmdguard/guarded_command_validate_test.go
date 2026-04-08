@@ -131,7 +131,7 @@ func TestGuardedCommand_DefaultCommands(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			g := New("testapp", "Test")
 
 			if !hasSubcommand(g, tt.cmdName) {

@@ -70,7 +70,7 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			var order []string
 
 			g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
@@ -171,7 +171,7 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)

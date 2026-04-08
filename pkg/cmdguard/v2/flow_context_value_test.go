@@ -62,7 +62,7 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			val, ok := tc.getter()
 			if !ok {
 				t.Error("expected to find value")

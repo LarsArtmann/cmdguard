@@ -46,7 +46,7 @@ func TestNewLogger(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			logger := NewLogger(tt.format, tt.level)
 			if logger == nil {
 				t.Error("NewLogger() returned nil, expected non-nil logger")
@@ -101,7 +101,7 @@ func TestParseLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := ParseLevel(tt.level).SlogLevel()
 			if result != tt.expectedLevel {
 				t.Errorf(
@@ -146,7 +146,7 @@ func TestParseFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := ParseFormat(tt.format)
 			if result != tt.expectedFormat {
 				t.Errorf("ParseFormat(%q) = %v, want %v", tt.format, result, tt.expectedFormat)
@@ -186,7 +186,7 @@ func TestValidFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := ValidFormat(tt.format)
 			if result != tt.isValid {
 				t.Errorf("ValidFormat(%q) = %v, want %v", tt.format, result, tt.isValid)
@@ -213,7 +213,7 @@ func TestValidLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-		t.Parallel()
+			t.Parallel()
 			result := ValidLevel(tt.level)
 			if result != tt.isValid {
 				t.Errorf("ValidLevel(%q) = %v, want %v", tt.level, result, tt.isValid)
