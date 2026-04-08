@@ -23,7 +23,7 @@ go get github.com/larsartmann/cmdguard
 
 ### v2 API (Recommended) - Type-Safe Commands
 
-The v2 API provides full type safety for both configuration and command-specific flags:
+The v2 API uses `CLI[T]` with a single type parameter for your config type. Each command can have its own flags type via `Command[T, F]`.
 
 ```go
 package main
@@ -50,15 +50,15 @@ type GreetFlags struct {
 }
 
 func main() {
-    // Create CLI with typed config - T=AppConfig, F=NoFlags (root has no flags)
-    cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI application", AppConfig{})
+    // Create CLI with typed config
+    cli, err := v2.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
         os.Exit(1)
     }
 
-    // Add a command with typed flags - T=AppConfig, F=*GreetFlags
-    greetCmd := v2.Command[AppConfig, *GreetFlags]{
+    // Add a command with typed flags
+    err = v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{
         Use:   "greet",
         Short: "Greet someone",
         Flags: &GreetFlags{},
@@ -70,16 +70,17 @@ func main() {
             fmt.Println(msg)
             return nil
         },
-    }
-
-    // Use AddAnyCommand when command flags type differs from root flags type
-    if err := v2.AddAnyCommand(cli, greetCmd); err != nil {
+    })
+    if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to add command: %v\n", err)
         os.Exit(1)
     }
 
     // Execute
-    cli.ExecuteAndExit(context.Background())
+    if err := cli.Execute(context.Background()); err != nil {
+        fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+        os.Exit(1)
+    }
 }
 ```
 
@@ -127,29 +128,32 @@ func main() {
 
 ## v2 API Reference
 
-### GuardedCommand[T, F]
+### CLI[T]
 
-The main CLI type with two type parameters:
-
-- `T` - Application-level config type
-- `F` - Root command flags type (use `v2.NoFlags` if none)
+The main CLI type with a single type parameter `T` for your application config.
 
 ```go
-// Create root command
-cli, err := v2.New[T, F](name, shortDescription, defaultConfig)
+// Create root CLI
+cli, err := v2.NewCLI[T](name, shortDescription, defaultConfig)
 
-// Add subcommands with same F type
-cli.AddCommand(cmd Command[T, F]) error
+// With options
+cli, err := v2.NewCLI[T](name, short, defaults,
+    v2.WithCLIVersion[T]("1.0.0"),
+    v2.WithCLILong[T]("A longer description..."),
+    v2.WithSilenceErrors[T](),
+    v2.WithSilenceUsage[T](),
+    v2.WithColor[T](false),  // disable fang styling
+)
 
-// Add subcommands with different F type
-v2.AddAnyCommand[T, F, F2](cli, cmd Command[T, F2]) error
+// Add subcommands (standalone function — each command has its own flags type)
+err = v2.AddCommand(cli, cmd)
 
 // Execution
 err := cli.Execute(ctx)           // Returns error
 cli.ExecuteAndExit(ctx)           // Calls os.Exit(1) on error
 
 // DI and lifecycle
-scope := cli.Scope()              // do.Injector for service registration
+scope := cli.Scope()              // *Scope for service registration
 err := cli.HealthCheck()          // Run health checks
 err := cli.Shutdown(ctx)          // Graceful shutdown
 
@@ -161,6 +165,7 @@ cli.SetConfig(cfg)                // Update config
 cmd := cli.RootCommand()          // Underlying cobra.Command
 cli.AddGlobalFlag(name, short, default, help)
 cli.AddGlobalBoolFlag(name, short, default, help)
+cli.SetVersion("1.0.0")
 ```
 
 ### Command[T, F]
@@ -175,9 +180,9 @@ type Command[T any, F any] struct {
     Aliases    []string             // Alternative names
     Example    string               // Example usage
     Flags      F                    // Typed flags struct
-    RunE       func(ctx, cfg, flags) error
-    PreRunE    func(ctx, cfg, flags) error
-    PostRunE   func(ctx, cfg, flags) error
+    RunE       func(ctx, *T, F) error
+    PreRunE    func(ctx, *T, F) error
+    PostRunE   func(ctx, *T, F) error
     Commands   []Command[T, F]      // Subcommands
     Hidden     bool                 // Hide from help
     Deprecated string               // Deprecation message
@@ -203,74 +208,69 @@ type MyFlags struct {
     Name string `flag:"name" help:"Name to greet"`
 
     // All together
-    Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-    Count int    `flag:"count" short:"c" default:"1" help:"Number of times"`
-    Verbose bool  `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
+    Name    string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+    Count   int    `flag:"count" short:"c" default:"1" help:"Number of times"`
+    Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
 }
 ```
+
+Supported types: `string`, `bool`, `int`, `uint`, `float64`, `[]string`, `time.Duration`.
 
 ### NoFlags
 
 Use `v2.NoFlags` for commands without flags:
 
 ```go
-versionCmd := v2.Command[AppConfig, v2.NoFlags]{
+err = v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
     Use:   "version",
     Short: "Print version",
     RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
         fmt.Println("v1.0.0")
         return nil
     },
-}
+})
 ```
 
-### AddAnyCommand
+### Mixing Flag Types
 
-When a command's flags type differs from the CLI root:
+`AddCommand` is a standalone function, not a method, because each command can have a different flags type:
 
 ```go
-// CLI root has NoFlags
-cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "...", AppConfig{})
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{})
 
-// Greet command has *GreetFlags - different type!
-greetCmd := v2.Command[AppConfig, *GreetFlags]{
+// Command with GreetFlags
+v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{
     Use:   "greet",
     Flags: &GreetFlags{},
-    RunE:  ...,
-}
+    RunE:  greetHandler,
+})
 
-// Use AddAnyCommand (standalone function, not method)
-v2.AddAnyCommand(cli, greetCmd)
+// Command with ConfigFlags (different type!)
+v2.AddCommand(cli, v2.Command[AppConfig, *ConfigFlags]{
+    Use:   "config",
+    Flags: &ConfigFlags{},
+    RunE:  configHandler,
+})
+
+// Command with no flags
+v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
+    Use:  "version",
+    RunE: versionHandler,
+})
 ```
 
 ### DI Integration
 
 cmdguard v2 provides built-in dependency injection through [samber/do/v2](https://github.com/samber/do), enabling clean service management and lifecycle handling.
 
-#### Scope Hierarchy
-
-Each `GuardedCommand` has a root scope that can create child scopes:
-
-```go
-// Get the root scope
-scope := cli.ScopeStruct()
-
-// Create child scopes for isolation
-childScope := scope.Child("worker")
-
-// Access scope hierarchy
-path := scope.Path()     // Returns ["myapp"]
-isRoot := scope.IsRoot() // Returns true for root scope
-```
-
 #### Registering Services
 
-Register services using constructors or values:
-
 ```go
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{})
+scope := cli.Scope()
+
 // Register with constructor (lazy initialization)
 err := v2.Provide(scope, func(i do.Injector) (*Database, error) {
-    // Access config through injector
     cfg, err := v2.Invoke[*AppConfig](scope)
     if err != nil {
         return nil, err
@@ -284,30 +284,15 @@ err = v2.ProvideValue(scope, &Logger{Level: "info"})
 
 #### Invoking Services
 
-Retrieve services in command handlers:
-
 ```go
 RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-    db, err := v2.Invoke[*Database](cli.ScopeStruct())
+    db, err := v2.Invoke[*Database](cli.Scope())
     if err != nil {
         return v2.NewServiceError("*Database", err)
     }
     // Use db...
+    return nil
 },
-```
-
-#### Scoped Providers
-
-Create providers that operate within specific scopes:
-
-```go
-// Register a scoped provider
-err := v2.ScopedProvider(scope, "worker", func(i do.Injector) (*Worker, error) {
-    return &Worker{}, nil
-})
-
-// Invoke within that scope
-worker, err := v2.Invoke[*Worker](scope.Child("worker"))
 ```
 
 #### Lifecycle Management
@@ -315,16 +300,12 @@ worker, err := v2.Invoke[*Worker](scope.Child("worker"))
 Services can implement lifecycle hooks:
 
 ```go
-// Implement do.HealthcheckerWithContext for health checks
-type Database struct{}
-
+// Health checks — implement do.HealthcheckerWithContext
 func (d *Database) HealthCheck(ctx context.Context) error {
     return d.Ping(ctx)
 }
 
-// Implement do.Shutdowner for graceful shutdown
-type Server struct{}
-
+// Graceful shutdown — implement do.Shutdowner
 func (s *Server) Shutdown() error {
     return s.server.Close()
 }
@@ -336,10 +317,23 @@ err := cli.HealthCheck()
 err := cli.Shutdown(ctx)
 ```
 
+#### Scope Hierarchy
+
+```go
+scope := cli.Scope()
+
+// Create child scopes for isolation
+childScope := scope.Child("worker")
+
+// Access scope hierarchy
+path := scope.Path()     // Returns ["myapp"]
+isRoot := scope.IsRoot() // Returns true for root scope
+```
+
 ### Lifecycle Hooks
 
 ```go
-cmd := v2.Command[AppConfig, *Flags]{
+err = v2.AddCommand(cli, v2.Command[AppConfig, *Flags]{
     Use: "example",
     PreRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         // Validation before main handler
@@ -353,18 +347,20 @@ cmd := v2.Command[AppConfig, *Flags]{
         return nil
     },
     PostRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-        // Cleanup after main handler (called even on error)
+        // Cleanup after main handler (only called on success)
         return nil
     },
-}
+})
 ```
 
 ### Functional Options
 
+Commands can be built with functional options:
+
 ```go
-cmd, err := v2.NewCommand[AppConfig, NoFlags]("version",
-    v2.WithShort("Print version"),
-    v2.WithRunE(func(ctx context.Context, cfg *AppConfig, flags NoFlags) error {
+cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
+    v2.WithShort[AppConfig, v2.NoFlags]("Print version"),
+    v2.WithRunE[AppConfig, v2.NoFlags](func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
         fmt.Println("v1.0.0")
         return nil
     }),
@@ -377,7 +373,7 @@ cmd, err := v2.NewCommand[AppConfig, NoFlags]("version",
 
 ```go
 func main() {
-    cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})
+    cli, _ := v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
 
     dbCmd := v2.Command[AppConfig, v2.NoFlags]{
         Use:   "db",
@@ -400,38 +396,14 @@ func main() {
         },
     }
 
-    cli.AddCommand(dbCmd)
+    v2.AddCommand(cli, dbCmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```
 
-### Mixed Flag Types
+### Full DI Example
 
-```go
-func main() {
-    cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})
-
-    // Command with GreetFlags
-    v2.AddAnyCommand(cli, v2.Command[AppConfig, *GreetFlags]{
-        Use:   "greet",
-        Flags: &GreetFlags{},
-        RunE:  greetHandler,
-    })
-
-    // Command with ConfigFlags (different type!)
-    v2.AddAnyCommand(cli, v2.Command[AppConfig, *ConfigFlags]{
-        Use:   "config",
-        Flags: &ConfigFlags{},
-        RunE:  configHandler,
-    })
-
-    // Command with no flags
-    cli.AddCommand(v2.Command[AppConfig, v2.NoFlags]{
-        Use:  "version",
-        RunE: versionHandler,
-    })
-}
-```
+See [`examples/typed/main.go`](examples/typed/main.go) for a complete example with DI, lifecycle hooks, typed flags, and nested commands.
 
 ## How It Works
 
@@ -477,7 +449,6 @@ Both APIs are production-ready. Use v2 for new projects.
 
 - [Quick Start Guide](docs/QUICKSTART.md) - Get started with cmdguard v2 in 5 minutes
 - [Migration Guide v1 to v2](docs/MIGRATION_v1_v2.md) - Migrating from v1 to v2 API
-- [FEATURES.md](docs/FEATURES.md) - Feature status and roadmap
 - [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) - Design guidelines
 
 ## License
