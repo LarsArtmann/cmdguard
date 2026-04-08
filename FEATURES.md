@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-04-01  
+**Last Updated:** 2026-04-05
 **Version:** 2.1.0  
 **Go Version:** 1.26.1
 
@@ -41,26 +41,16 @@ Type-safe CLI with single type parameter. Each command can have its own flags ty
 | `RootCommand()`                             | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command     |
 | Functional options (`WithCLIVersion`, etc.) | ✅ FULLY_FUNCTIONAL | Configuration options                |
 
-### GuardedCommand[T, F] (Deprecated)
+### CLI Options
 
-Type-safe CLI with generic configuration type. Use CLI[T] instead.
-
-| Feature                            | Status              | Notes                                |
-| ---------------------------------- | ------------------- | ------------------------------------ |
-| `New[T, F](name, short, defaults)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, never panics      |
-| `NewWithLong[T, F](...)`           | 🗑️ DEPRECATED       | Use New + options instead            |
-| `AddCommand(cmd)`                  | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
-| `AddAnyCommand[T, F, F2](g, cmd)`  | ✅ FULLY_FUNCTIONAL | Add command with different flags     |
-| `Execute(ctx)`                     | ✅ FULLY_FUNCTIONAL | Runs command with context            |
-| `ExecuteWithArgs(ctx, args)`       | ✅ FULLY_FUNCTIONAL | For testing                          |
-| `ExecuteAndExit(ctx)`              | ✅ FULLY_FUNCTIONAL | Runs and calls os.Exit               |
-| `Scope()`                          | ✅ FULLY_FUNCTIONAL | Returns DI scope                     |
-| `ScopeStruct()`                    | 🗑️ DEPRECATED       | Use Scope() instead                  |
-| `Config()`                         | ✅ FULLY_FUNCTIONAL | Returns typed config \*T             |
-| `SetConfig(cfg)`                   | ✅ FULLY_FUNCTIONAL | Updates configuration                |
-| `Shutdown(ctx)`                    | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
-| `HealthCheck()`                    | ✅ FULLY_FUNCTIONAL | Runs health checks                   |
-| `RootCommand()`                    | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command     |
+| Option                        | Status              | Notes                          |
+| ----------------------------- | ------------------- | ------------------------------ |
+| `WithCLIVersion[T](v)`        | ✅ FULLY_FUNCTIONAL | Set version string             |
+| `WithCLILong[T](desc)`        | ✅ FULLY_FUNCTIONAL | Set long description           |
+| `WithCLIScope[T](scope)`      | ✅ FULLY_FUNCTIONAL | Custom DI scope                |
+| `WithSilenceErrors[T]()`      | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing  |
+| `WithSilenceUsage[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress usage on error        |
+| `WithColor[T](bool)`          | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling    |
 
 ### Command[T, F]
 
@@ -157,9 +147,10 @@ The v1 Guard API provides panic-at-construction validation.
 
 | Package            | Coverage | Status  |
 | ------------------ | -------- | ------- |
-| `pkg/cmdguard/v2`  | 90.2%    | ✅ Good |
-| `pkg/cmdguard`     | 94.3%    | ✅ Good |
-| `internal/config`  | 95.7%    | ✅ Good |
+| `pkg/cmdguard/v2`  | 87.9%    | ✅ Good |
+| `pkg/cmdguard`     | 87.0%    | ✅ Good |
+| `pkg/errtypes`     | 100%     | ✅ Good |
+| `internal/config`  | 78.9%    | ✅ Good |
 | `internal/logging` | 100%     | ✅ Good |
 
 ---
@@ -254,4 +245,4 @@ The v2 API successfully delivers type-safe, DI-powered CLI construction without 
 
 ---
 
-**Last updated 2026-04-01.**
+**Last updated 2026-04-05.**
