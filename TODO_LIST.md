@@ -16,7 +16,7 @@
 - [x] Rename pkg/errors to pkg/errtypes, BaseError to CodedError
 - [x] Migrate all callers to NewCLI/AddCommand API
 - [x] Remove deprecated GuardedCommand[T,F] code (1,624 lines)
-- [x] Rename guard_* files to cli_* and flag_helpers
+- [x] Rename guard*\* files to cli*\* and flag_helpers
 - [x] Update README.md with v2.1 API
 - [x] Update AGENTS.md with v2.1 API patterns
 - [x] Update FEATURES.md (remove deprecated section)

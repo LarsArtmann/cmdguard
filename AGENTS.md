@@ -99,12 +99,12 @@ cmdguard/
 
 ## Key Dependencies
 
-| Library                    | Purpose              | Version |
-| -------------------------- | -------------------- | ------- |
-| `github.com/spf13/cobra`   | CLI framework        | v1.10.2 |
-| `github.com/samber/do/v2`  | Dependency injection | v2.0.0  |
-| `charm.land/fang/v2`       | Cobra styling        | v2.0.1  |
-| `github.com/knadh/koanf/v2` | Configuration       | v2.3.4  |
+| Library                     | Purpose              | Version |
+| --------------------------- | -------------------- | ------- |
+| `github.com/spf13/cobra`    | CLI framework        | v1.10.2 |
+| `github.com/samber/do/v2`   | Dependency injection | v2.0.0  |
+| `charm.land/fang/v2`        | Cobra styling        | v2.0.1  |
+| `github.com/knadh/koanf/v2` | Configuration        | v2.3.4  |
 
 ---
 
@@ -128,35 +128,35 @@ cli, err := v2.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
 
 Functional options:
 
-| Option                        | Purpose                                     |
-| ----------------------------- | ------------------------------------------- |
-| `WithCLIVersion[T](v)`        | Set version string                          |
-| `WithCLILong[T](desc)`        | Set long description                        |
-| `WithCLIScope[T](scope)`      | Set custom DI scope                         |
-| `WithSilenceErrors[T]()`      | Suppress cobra error printing               |
-| `WithSilenceUsage[T]()`       | Suppress usage on error                     |
-| `WithColor[T](bool)`          | Enable/disable fang styling (default: true) |
+| Option                   | Purpose                                     |
+| ------------------------ | ------------------------------------------- |
+| `WithCLIVersion[T](v)`   | Set version string                          |
+| `WithCLILong[T](desc)`   | Set long description                        |
+| `WithCLIScope[T](scope)` | Set custom DI scope                         |
+| `WithSilenceErrors[T]()` | Suppress cobra error printing               |
+| `WithSilenceUsage[T]()`  | Suppress usage on error                     |
+| `WithColor[T](bool)`     | Enable/disable fang styling (default: true) |
 
 ### CLI[T] Methods
 
-| Method                   | Returns       | Purpose                      |
-| ------------------------ | ------------- | ---------------------------- |
-| `Execute(ctx)`           | `error`       | Run CLI with context         |
-| `ExecuteWithArgs(ctx, args)` | `error`   | Run with specific args       |
-| `ExecuteAndExit(ctx)`    |               | Run and os.Exit(1) on error  |
-| `Scope()`                | `*Scope`      | DI scope                     |
-| `Injector()`             | `do.Injector` | Raw samber/do injector       |
-| `Config()`               | `*T`          | Typed config                 |
-| `SetConfig(cfg)`         |               | Update config                |
-| `RootCommand()`          | `*cobra.Command` | Underlying cobra command  |
-| `Shutdown(ctx)`          | `error`       | Graceful shutdown            |
-| `HealthCheck()`          | `error`       | Run health checks            |
-| `HealthCheckWithContext(ctx)` | `error`  | Health checks with context   |
-| `SetVersion(v)`          |               | Set version at runtime       |
-| `SetLong(desc)`          |               | Set long description         |
-| `FlowContext()`          | `*BranchingFlowContext` | Path tracking (nil until Execute) |
-| `AddGlobalFlag(...)`     |               | Persistent string flag       |
-| `AddGlobalBoolFlag(...)` |               | Persistent bool flag         |
+| Method                        | Returns                 | Purpose                           |
+| ----------------------------- | ----------------------- | --------------------------------- |
+| `Execute(ctx)`                | `error`                 | Run CLI with context              |
+| `ExecuteWithArgs(ctx, args)`  | `error`                 | Run with specific args            |
+| `ExecuteAndExit(ctx)`         |                         | Run and os.Exit(1) on error       |
+| `Scope()`                     | `*Scope`                | DI scope                          |
+| `Injector()`                  | `do.Injector`           | Raw samber/do injector            |
+| `Config()`                    | `*T`                    | Typed config                      |
+| `SetConfig(cfg)`              |                         | Update config                     |
+| `RootCommand()`               | `*cobra.Command`        | Underlying cobra command          |
+| `Shutdown(ctx)`               | `error`                 | Graceful shutdown                 |
+| `HealthCheck()`               | `error`                 | Run health checks                 |
+| `HealthCheckWithContext(ctx)` | `error`                 | Health checks with context        |
+| `SetVersion(v)`               |                         | Set version at runtime            |
+| `SetLong(desc)`               |                         | Set long description              |
+| `FlowContext()`               | `*BranchingFlowContext` | Path tracking (nil until Execute) |
+| `AddGlobalFlag(...)`          |                         | Persistent string flag            |
+| `AddGlobalBoolFlag(...)`      |                         | Persistent bool flag              |
 
 ### Basic Usage
 

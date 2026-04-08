@@ -43,14 +43,14 @@ Type-safe CLI with single type parameter. Each command can have its own flags ty
 
 ### CLI Options
 
-| Option                        | Status              | Notes                          |
-| ----------------------------- | ------------------- | ------------------------------ |
-| `WithCLIVersion[T](v)`        | ✅ FULLY_FUNCTIONAL | Set version string             |
-| `WithCLILong[T](desc)`        | ✅ FULLY_FUNCTIONAL | Set long description           |
-| `WithCLIScope[T](scope)`      | ✅ FULLY_FUNCTIONAL | Custom DI scope                |
-| `WithSilenceErrors[T]()`      | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing  |
-| `WithSilenceUsage[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress usage on error        |
-| `WithColor[T](bool)`          | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling    |
+| Option                   | Status              | Notes                         |
+| ------------------------ | ------------------- | ----------------------------- |
+| `WithCLIVersion[T](v)`   | ✅ FULLY_FUNCTIONAL | Set version string            |
+| `WithCLILong[T](desc)`   | ✅ FULLY_FUNCTIONAL | Set long description          |
+| `WithCLIScope[T](scope)` | ✅ FULLY_FUNCTIONAL | Custom DI scope               |
+| `WithSilenceErrors[T]()` | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing |
+| `WithSilenceUsage[T]()`  | ✅ FULLY_FUNCTIONAL | Suppress usage on error       |
+| `WithColor[T](bool)`     | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling   |
 
 ### Command[T, F]
 
