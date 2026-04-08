@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"charm.land/fang/v2"
 	"github.com/samber/do/v2"
@@ -275,7 +276,7 @@ func (cli *CLI[T]) ExecuteWithArgs(ctx context.Context, args []string) error {
 func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 	err := cli.Execute(ctx)
 	if err != nil {
-		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
@@ -360,4 +361,13 @@ func (cli *CLI[T]) AddGlobalFlag(name, shorthand, defaultValue, help string) {
 // AddGlobalBoolFlag adds a persistent boolean flag available to all commands.
 func (cli *CLI[T]) AddGlobalBoolFlag(name, shorthand string, defaultValue bool, help string) {
 	cli.rootCmd.PersistentFlags().BoolP(name, shorthand, defaultValue, help)
+}
+
+// validateName checks that the command name is not empty.
+func validateName(name string) error {
+	if name == "" {
+		return fmt.Errorf("%w: name is required, name=%q", ErrInvalidCommand, name)
+	}
+
+	return nil
 }

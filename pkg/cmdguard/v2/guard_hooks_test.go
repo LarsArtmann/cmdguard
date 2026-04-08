@@ -22,7 +22,6 @@ func slicesEqual(a, b []string) bool {
 	return true
 }
 
-// makeHookRunE creates a RunE function that appends msg to order and returns nil.
 func makeHookRunE(
 	order *[]string,
 	msg string,
@@ -34,7 +33,7 @@ func makeHookRunE(
 	}
 }
 
-func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
+func TestCLI_PreRunE_PostRunE(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name     string
@@ -73,17 +72,17 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 			t.Parallel()
 			var order []string
 
-			g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
 			cmd := tt.setupCmd(&order)
-			if err := g.AddCommand(cmd); err != nil {
+			if err := AddCommand(cli, cmd); err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
-			err = g.ExecuteWithArgs(t.Context(), []string{"test"})
+			err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -98,7 +97,7 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 		t.Parallel()
 		called := false
 
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -114,11 +113,11 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 				return nil
 			},
 		}
-		if err := g.AddCommand(cmd); err != nil {
+		if err := AddCommand(cli, cmd); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(t.Context(), []string{"test"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -129,7 +128,7 @@ func TestGuardedCommand_PreRunE_PostRunE(t *testing.T) {
 	})
 }
 
-func TestGuardedCommand_CommandOptions(t *testing.T) {
+func TestCLI_CommandOptions(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name           string
@@ -172,7 +171,7 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -187,11 +186,11 @@ func TestGuardedCommand_CommandOptions(t *testing.T) {
 					return nil
 				},
 			}
-			if err := g.AddCommand(cmd); err != nil {
+			if err := AddCommand(cli, cmd); err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
-			cobraCmd := g.RootCommand().Commands()[0]
+			cobraCmd := cli.RootCommand().Commands()[0]
 			if cobraCmd.Hidden != tt.wantHidden {
 				t.Errorf("Hidden = %v, want %v", cobraCmd.Hidden, tt.wantHidden)
 			}

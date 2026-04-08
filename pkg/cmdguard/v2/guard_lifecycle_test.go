@@ -4,32 +4,32 @@ import (
 	"testing"
 )
 
-func TestGuardedCommand_Shutdown(t *testing.T) {
+func TestCLI_Shutdown(t *testing.T) {
 	t.Parallel()
 	t.Run("shutdown succeeds", func(t *testing.T) {
 		t.Parallel()
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.Shutdown(t.Context())
+		err = cli.Shutdown(t.Context())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
 }
 
-func TestGuardedCommand_HealthCheck(t *testing.T) {
+func TestCLI_HealthCheck(t *testing.T) {
 	t.Parallel()
 	t.Run("health check succeeds", func(t *testing.T) {
 		t.Parallel()
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.HealthCheck()
+		err = cli.HealthCheck()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

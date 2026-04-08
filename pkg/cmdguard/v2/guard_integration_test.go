@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGuardedCommand_Integration(t *testing.T) {
+func TestCLI_Integration(t *testing.T) {
 	t.Parallel()
 	t.Run("complete CLI workflow", func(t *testing.T) {
 		type greetFlags struct {
@@ -18,7 +18,7 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			shout bool
 		}
 
-		g, err := New[testAppConfig, *greetFlags]("greet-cli", "A greeting CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("greet-cli", "A greeting CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -35,11 +35,11 @@ func TestGuardedCommand_Integration(t *testing.T) {
 				return nil
 			},
 		}
-		if err := g.AddCommand(greetCmd); err != nil {
+		if err := AddCommand(cli, greetCmd); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(
+		err = cli.ExecuteWithArgs(
 			t.Context(),
 			[]string{"greet", "--name", "Alice", "--shout"},
 		)
@@ -55,7 +55,7 @@ func TestGuardedCommand_Integration(t *testing.T) {
 			t.Error("greetResult.shout = false, want true")
 		}
 
-		if err := g.Shutdown(t.Context()); err != nil {
+		if err := cli.Shutdown(t.Context()); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})

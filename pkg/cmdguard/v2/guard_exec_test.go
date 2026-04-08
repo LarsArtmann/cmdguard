@@ -14,16 +14,16 @@ import (
 
 const testTimeout = 5 * time.Second
 
-func TestGuardedCommand_Execute(t *testing.T) {
+func TestCLI_Execute(t *testing.T) {
 	t.Parallel()
 	t.Run("executes help command", func(t *testing.T) {
 		t.Parallel()
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(t.Context(), []string{"--help"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"--help"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -33,7 +33,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 		t.Parallel()
 		executed := false
 
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -46,11 +46,11 @@ func TestGuardedCommand_Execute(t *testing.T) {
 				return nil
 			},
 		}
-		if err := g.AddCommand(cmd); err != nil {
+		if err := AddCommand(cli, cmd); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(t.Context(), []string{"greet"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"greet"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -62,16 +62,16 @@ func TestGuardedCommand_Execute(t *testing.T) {
 
 	t.Run("error: unknown subcommand", func(t *testing.T) {
 		t.Parallel()
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if err := g.AddCommand(newTestCmd("valid")); err != nil {
+		if err := AddCommand(cli, newTestCmd("valid")); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(t.Context(), []string{"unknown"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"unknown"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -89,7 +89,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 			Name string `default:"World" flag:"name"`
 		}
 
-		g, err := New[testAppConfig, *greetFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -103,11 +103,11 @@ func TestGuardedCommand_Execute(t *testing.T) {
 				return nil
 			},
 		}
-		if err := g.AddCommand(cmd); err != nil {
+		if err := AddCommand(cli, cmd); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(t.Context(), []string{"greet", "--name", "Alice"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"greet", "--name", "Alice"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -118,20 +118,20 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 }
 
-func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
+func TestCLI_ExecuteWithArgs(t *testing.T) {
 	t.Parallel()
 	t.Run("passes args to command", func(t *testing.T) {
 		t.Parallel()
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if err := g.AddCommand(newTestCmd("greet")); err != nil {
+		if err := AddCommand(cli, newTestCmd("greet")); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = g.ExecuteWithArgs(t.Context(), []string{"greet"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"greet"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -142,17 +142,17 @@ var errTestIntentionalFailure = errors.New("intentional failure")
 
 func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 	if os.Getenv(envVar) == "1" {
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Setup error: %v\n", err)
 			os.Exit(1)
 		}
 
 		cmd := newTestCmd(use, testErr)
-		_ = g.AddCommand(cmd)
+		_ = AddCommand(cli, cmd)
 
-		_ = g.ExecuteWithArgs(context.Background(), []string{use})
-		g.ExecuteAndExit(context.Background())
+		_ = cli.ExecuteWithArgs(context.Background(), []string{use})
+		cli.ExecuteAndExit(context.Background())
 
 		return true
 	}
@@ -160,11 +160,11 @@ func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 	return false
 }
 
-func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
+func TestCLI_ExecuteAndExit(t *testing.T) {
 	t.Parallel()
 	t.Run("returns normally on success", func(t *testing.T) {
 		t.Parallel()
-		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -176,7 +176,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 				}
 			}()
 
-			_ = g.ExecuteWithArgs(t.Context(), []string{"--help"})
+			_ = cli.ExecuteWithArgs(t.Context(), []string{"--help"})
 		}()
 	})
 
@@ -189,7 +189,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		ctx, cancel := context.WithTimeout(t.Context(), testTimeout)
 		defer cancel()
 
-		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
+		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=TestCLI_ExecuteAndExit")
 
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_AND_EXIT=1")
 
@@ -226,7 +226,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 		ctx, cancel := context.WithTimeout(t.Context(), testTimeout)
 		defer cancel()
 
-		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=TestGuardedCommand_ExecuteAndExit")
+		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=TestCLI_ExecuteAndExit")
 
 		cmd.Env = append(os.Environ(), "BE_TEST_EXEC_STDERR=1")
 
