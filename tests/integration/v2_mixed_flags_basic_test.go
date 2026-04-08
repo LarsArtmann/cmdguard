@@ -50,7 +50,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -64,7 +64,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		configFlags  *ConfigFlags
 	)
 
-	err = cli.AddCommand(v2.Command[RootConfig, *GreetFlags]{
+	err = v2.AddCommand(cli, v2.Command[RootConfig, *GreetFlags]{
 		Use:   "greet",
 		Short: "Greet someone",
 		Flags: &GreetFlags{Name: "World", Shout: false},
@@ -79,7 +79,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *MathFlags]{
 			Use:   "math",
 			Short: "Do math",
@@ -96,7 +96,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *ConfigFlags]{
 			Use:   "config",
 			Short: "Manage config",
@@ -169,7 +169,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -199,7 +199,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand(cli, dbCmd)
+	err = v2.AddCommand(cli, dbCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -216,7 +216,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand(cli, migrateCmd)
+	err = v2.AddCommand(cli, migrateCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

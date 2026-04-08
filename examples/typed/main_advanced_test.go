@@ -15,7 +15,7 @@ import (
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags](
+	cli, err := v2.NewCLI[AppConfig](
 		"myapp",
 		"A typed CLI application",
 		AppConfig{Verbose: false},
@@ -26,7 +26,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 
 	greetCmd := newGreetCmd()
 
-	err = v2.AddAnyCommand(cli, greetCmd)
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -47,7 +47,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 
 	// Test with count flag - recreate CLI to avoid flag pollution
-	cli, _ = v2.New[AppConfig, v2.NoFlags](
+	cli, _ = v2.NewCLI[AppConfig](
 		"myapp",
 		"A typed CLI application",
 		AppConfig{Verbose: false},
@@ -65,7 +65,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 			return nil
 		},
 	}
-	_ = v2.AddAnyCommand(cli, greetCmd)
+	_ = v2.AddCommand(cli, greetCmd)
 
 	output = runCLIWithArgs(cli, "greet", "--count", "3")
 	// With count=3, we should see "Hello, World!" three times
@@ -89,7 +89,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_ConfigCommand(t *testing.T) {
 	// Use default config values for this test
-	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{
+	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{
 		Verbose: false,
 		Output:  "text",
 		APIURL:  "https://api.example.com",
@@ -110,7 +110,7 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 		},
 	}
 
-	err = cli.AddCommand(configCmd)
+	err = v2.AddCommand(cli, configCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -133,7 +133,7 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_DIRegistration(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags](
+	cli, err := v2.NewCLI[AppConfig](
 		"myapp",
 		"A typed CLI application",
 		AppConfig{Verbose: true},
@@ -142,7 +142,7 @@ func TestTypedExample_DIRegistration(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	scope := cli.ScopeStruct()
+	scope := cli.Scope()
 
 	// Register config
 	err = v2.ProvideValue(scope, AppConfig{Verbose: true})
@@ -180,12 +180,12 @@ func TestTypedExample_DIRegistration(t *testing.T) {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_DatabaseService(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
+	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	scope := cli.ScopeStruct()
+	scope := cli.Scope()
 
 	// Register database
 	err = v2.ProvideValue(scope, &Database{connectionString: "postgres://test:5432/db"})
@@ -209,7 +209,7 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 		},
 	}
 
-	err = cli.AddCommand(dbCmd)
+	err = v2.AddCommand(cli, dbCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -223,7 +223,7 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_PreRunEValidation(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
+	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -246,7 +246,7 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand(cli, greetCmd)
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -264,14 +264,14 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 	}
 
 	// Reset and test with valid count
-	cli, _ = v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
+	cli, _ = v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	greetCmd.RunE = func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 		fmt.Println("Greeting executed")
 
 		return nil
 	}
 
-	err = v2.AddAnyCommand(cli, greetCmd)
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

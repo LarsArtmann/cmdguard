@@ -11,7 +11,7 @@ import (
 
 func TestAdvancedFlags_CreateCLI(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[GlobalConfig, v2.NoFlags](
+	cli, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
 		GlobalConfig{},
@@ -32,7 +32,7 @@ func TestAdvancedFlags_CreateCLI(t *testing.T) {
 
 func TestAdvancedFlags_ServerCommand(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[GlobalConfig, v2.NoFlags](
+	cli, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
 		GlobalConfig{},
@@ -41,7 +41,6 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
-	// Add server command using AddAnyCommand (different flag type)
 	serverCmd := v2.Command[GlobalConfig, ServerFlags]{
 		Use:   "server",
 		Short: "Start the server",
@@ -51,7 +50,7 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand(cli, serverCmd)
+	err = v2.AddCommand(cli, serverCmd)
 	if err != nil {
 		t.Fatalf("Failed to add server command: %v", err)
 	}
@@ -65,7 +64,7 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 
 func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[GlobalConfig, v2.NoFlags](
+	cli, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
 		GlobalConfig{},
@@ -83,7 +82,7 @@ func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 		},
 	}
 
-	err = v2.AddAnyCommand(cli, configCmd)
+	err = v2.AddCommand(cli, configCmd)
 	if err != nil {
 		t.Fatalf("Failed to add config command: %v", err)
 	}

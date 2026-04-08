@@ -37,7 +37,7 @@ func BenchmarkNew(b *testing.B) {
 	defaults := BenchConfig{}
 
 	for b.Loop() {
-		cli, err := v2.New[BenchConfig, v2.NoFlags]("myapp", "My CLI", defaults)
+		cli, err := v2.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -51,11 +51,11 @@ func BenchmarkNewWithLong(b *testing.B) {
 	defaults := BenchConfig{}
 
 	for b.Loop() {
-		cli, err := v2.NewWithLong[BenchConfig, v2.NoFlags](
+		cli, err := v2.NewCLI[BenchConfig](
 			"myapp",
 			"short",
-			"long description",
 			defaults,
+			v2.WithCLILong[BenchConfig]("long description"),
 		)
 		if err != nil {
 			b.Fatal(err)
@@ -71,12 +71,12 @@ func BenchmarkAddCommand(b *testing.B) {
 
 	for b.Loop() {
 		// Need fresh CLI for each iteration since we can't add same command twice
-		testCli, err := v2.New[BenchConfig, v2.NoFlags]("myapp", "My CLI", defaults)
+		testCli, err := v2.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
 		if err != nil {
 			b.Fatal(err)
 		}
 
-		err = testCli.AddCommand(newBenchCommand("greet", "Greet someone"))
+		err = v2.AddCommand(testCli, newBenchCommand("greet", "Greet someone"))
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -87,12 +87,12 @@ func BenchmarkAddCommand(b *testing.B) {
 func BenchmarkExecute(b *testing.B) {
 	defaults := BenchConfig{}
 
-	cli, err := v2.New[BenchConfig, v2.NoFlags]("myapp", "My CLI", defaults)
+	cli, err := v2.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
 	if err != nil {
 		b.Fatal(err)
 	}
 
-	if err := cli.AddCommand(newBenchCommand("hello", "Say hello")); err != nil {
+	if err := v2.AddCommand(cli, newBenchCommand("hello", "Say hello")); err != nil {
 		b.Fatal(err)
 	}
 

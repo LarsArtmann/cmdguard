@@ -11,10 +11,9 @@ import (
 // assertCommandExecution runs a command multiple times and verifies the execution state.
 func assertCommandExecution[
 	T any,
-	F any,
 ](
 	t *testing.T,
-	cli *v2.GuardedCommand[T, F],
+	cli *v2.CLI[T],
 	args []string,
 	wantExecuted string,
 	assertFlags func(t *testing.T, flags any),
@@ -46,12 +45,12 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = cli.AddCommand(v2.Command[RootConfig, *GreetFlags]{
+	err = v2.AddCommand(cli, v2.Command[RootConfig, *GreetFlags]{
 		Use:   "cmd-a",
 		Short: "Command A",
 		Flags: &GreetFlags{Name: "default", Shout: false},
@@ -66,7 +65,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *MathFlags]{
 			Use:   "cmd-b",
 			Short: "Command B",
@@ -144,14 +143,14 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	var executed bool
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, v2.NoFlags]{
 			Use:   "simple",
 			Short: "Simple command",
@@ -166,7 +165,7 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "greet",
 			Short: "Greet command",

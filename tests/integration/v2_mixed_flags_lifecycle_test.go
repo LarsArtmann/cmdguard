@@ -12,7 +12,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -24,7 +24,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 		receivedFlags *GreetFlags
 	)
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "greet",
 			Short: "Greet with lifecycle",
@@ -79,12 +79,12 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 
 func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	t.Parallel()
-	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "",
 			Short: "Invalid command",
@@ -95,7 +95,7 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 		t.Error("expected error for empty Use field")
 	}
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "invalid",
 			Short: "No handler",
@@ -116,14 +116,14 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 		Level:   "debug",
 	}
 
-	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", defaultConfig)
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", defaultConfig)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	var receivedConfig *RootConfig
 
-	err = v2.AddAnyCommand(cli,
+	err = v2.AddCommand(cli,
 		v2.Command[RootConfig, *GreetFlags]{
 			Use:   "check",
 			Short: "Check config access",
@@ -161,7 +161,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
+	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -185,7 +185,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 		Commands: []v2.Command[RootConfig, *MigrateFlags]{migrateUpCmd},
 	}
 
-	err = v2.AddAnyCommand(cli, migrateCmd)
+	err = v2.AddCommand(cli, migrateCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

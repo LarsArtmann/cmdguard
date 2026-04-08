@@ -55,7 +55,7 @@ func captureOutput(f func()) string {
 
 // runCLIWithArgs captures output from executing CLI with given args.
 // This helper reduces duplication in tests that need to run commands and check output.
-func runCLIWithArgs(cli *v2.GuardedCommand[AppConfig, v2.NoFlags], args ...string) string {
+func runCLIWithArgs(cli *v2.CLI[AppConfig], args ...string) string {
 	return captureOutput(func() {
 		cli.RootCommand().SetArgs(args)
 		_ = cli.Execute(context.Background())
@@ -81,7 +81,7 @@ func TestTypedExample_CreateCLI(t *testing.T) {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_VersionCommand(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
+	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -94,7 +94,7 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 		RunE:  printRunE("myapp version 1.0.0"),
 	}
 
-	err = cli.AddCommand(versionCmd)
+	err = v2.AddCommand(cli, versionCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -108,7 +108,7 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_GreetCommand(t *testing.T) {
-	cli, err := v2.New[AppConfig, v2.NoFlags](
+	cli, err := v2.NewCLI[AppConfig](
 		"myapp",
 		"A typed CLI application",
 		AppConfig{Verbose: false},
@@ -119,7 +119,7 @@ func TestTypedExample_GreetCommand(t *testing.T) {
 
 	greetCmd := newGreetCmd()
 
-	err = v2.AddAnyCommand(cli, greetCmd)
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
