@@ -1,97 +1,67 @@
 # TODO List
 
-**Generated:** 2026-04-05
-**Purpose:** Actionable items for next 2-4 weeks
+**Updated:** 2026-04-05
+**Status:** v2.1.0 — Code complete. Remaining: examples, docs, CI polish.
 
-## 🔴 High Priority (This Sprint)
+## Completed This Sprint ✅
 
-- [ ] Fix CLI[T] AddCommand flag parsing bug using cloneAndParseFlags pattern (source: pkg/cmdguard/v2/cli.go:190)
-- [ ] Refactor flags_parse_test.go complexity
-- [ ] Refactor nestif complexity in flags parsing
-- [ ] Fix err113 dynamic error wrapping issues
+- [x] Fix CLI[T] AddCommand flag parsing (cloneAndParseFlags pattern)
+- [x] Refactor nestif complexity in flag_helpers.go
+- [x] Fix err113 dynamic error issues (already clean)
+- [x] Add t.Parallel() to all v2 tests
+- [x] Add tests for `initialize` error paths
+- [x] Add tests for `cliToCobraCommand` edge cases
+- [x] Add tests for flag helper functions
+- [x] Add WithSilenceErrors, WithSilenceUsage, WithColor CLI options
+- [x] Rename pkg/errors to pkg/errtypes, BaseError to CodedError
+- [x] Migrate all callers to NewCLI/AddCommand API
+- [x] Remove deprecated GuardedCommand[T,F] code (1,624 lines)
+- [x] Rename guard_* files to cli_* and flag_helpers
+- [x] Update README.md with v2.1 API
+- [x] Update AGENTS.md with v2.1 API patterns
+- [x] Update FEATURES.md (remove deprecated section)
 
-## 🟡 Medium Priority
+## Remaining Work
+
+### 🟡 Medium Priority
 
 - [ ] Improve flag suggestion algorithm
-- [ ] Improve error types (more specific error categories)
-- [ ] Update README.md with ID usage examples
-- [ ] Update AGENTS.md integration patterns
-- [ ] Decide on Ginkgo vs stdlib testing and update AGENTS.md
-- [ ] Add t.Parallel() to guarded_command_test.go tests
-- [ ] Add tests for `initialize` error paths
-- [ ] Add tests for `cliToCobraCommand` edge cases
-- [ ] Add tests for `cloneAndParseFlags` error paths
+- [ ] Migrate remaining testify usage to stdlib (if any remains)
+- [ ] Add fuzz tests to flags_parse.go and config_parsing.go
 
-## 🧪 Testing & Refactoring
+### 📚 Documentation
 
-- [ ] Migrate errors_test.go (remove testify)
-- [ ] Migrate config_test.go (remove testify)
-- [ ] Migrate guard_test.go from testify to stdlib
-- [ ] Split guarded_command_test.go (669 lines)
-- [ ] Split v2_mixed_flags_test.go (662 lines)
-- [ ] Split flags.go (358 lines)
-- [ ] Split config.go (352 lines)
-- [ ] Split flags_test.go (678 lines)
-- [ ] Split guard_test.go (1103 lines)
-- [ ] Split config_test.go (452 lines)
-- [ ] Split types_test.go (438 lines)
+- [ ] API Reference documentation (godoc examples)
+- [ ] Update docs/QUICKSTART.md for v2.1 API
+- [ ] Update docs/MIGRATION_v1_v2.md for v2.1 API
+- [ ] DI Pattern Example in docs/
+- [ ] Error Handling Example in docs/
 
-## 📚 Documentation
+### 🎯 Examples
 
-- [ ] API Reference documentation
-- [ ] DI Pattern Example
-- [ ] Mixed Flags Example
+- [ ] Add example with real database connection
+- [ ] Add lifecycle hook examples
+- [ ] Advanced DI Example
 
-## ⚙️ Configuration & Options
+### 📊 Performance
 
-- [ ] Remove AddAnyCommand (superseded by AddCommand)
-- [ ] Make scope creation lazy
-- [ ] Create compatibility shims if needed
-- [ ] Add Middleware Support
-- [ ] Add WithColor option for fang integration
-- [ ] Add more CLI[T] options
-
-## 📊 Performance
-
-- [ ] Benchmark: Command Creation
-- [ ] Benchmark: Flag Parsing
-- [ ] Benchmark: DI Resolution
-- [ ] Benchmark Report
 - [ ] Add comprehensive performance benchmarks
 - [ ] Add benchmark regression detection to CI
 
-## 🎯 Examples
+### ⚙️ Release & CI
 
-- [ ] Add example/basic unit tests
-- [ ] Add example/typed unit tests
-- [ ] Add example with real database connection
-- [ ] Add example with HTTP server
-- [ ] Add lifecycle hook examples
-- [ ] Advanced DI Example
-- [ ] Middleware Example
-- [ ] Testing Example
-- [ ] Error Handling Example
+- [ ] Create v2.1.0 release tag and notes
+- [ ] Set up release automation
+- [ ] Add codecov integration
+- [ ] Fix pre-commit hooks (currently 5 pre-existing errors)
+- [ ] Migrate benchmarks from deprecated v2.New to v2.NewCLI
 
-## 🛠️ Linting & Code Quality
+### 🔮 Future (v3.0+)
 
-- [ ] Reduce cyclomatic complexity (cyclop)
-- [ ] Extract constants (goconst)
-- [ ] Split funlen functions
-- [ ] Rename BaseError to avoid inheritance hint
-- [ ] Audit error message consistency
-- [ ] Add context to exec.Command instances
-
-## 🔍 Testing
-
-- [ ] Run full test suite
-- [ ] Run linter
-- [ ] Verify build passes
-- [ ] Manual testing of examples
-- [ ] Add integration tests for command handlers with IDs
-- [ ] Add tests/acceptance/ directory with user-journey tests
-
-## ⚡ Quick Wins
-
-- [ ] Add short flags for common options
-- [ ] Validate enum values for --log-level
-- [ ] Show defaults in help text
+- [ ] Plugin system for custom validators
+- [ ] Enhanced flag validation (enums, custom validators)
+- [ ] Config file auto-loading with koanf
+- [ ] Shell completion helpers
+- [ ] Result[T] type for error handling
+- [ ] Progress/Spinner Type (bubbles)
+- [ ] Command groups feature
