@@ -62,4 +62,89 @@ func TestNewCLI(t *testing.T) {
 			t.Fatal("expected error for empty name")
 		}
 	})
+
+	t.Run("WithSilenceErrors sets SilenceErrors", func(t *testing.T) {
+		t.Parallel()
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test CLI", testCLIConfig{},
+			v2.WithSilenceErrors[testCLIConfig](),
+		)
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if !cli.RootCommand().SilenceErrors {
+			t.Error("expected SilenceErrors to be true")
+		}
+	})
+
+	t.Run("WithSilenceUsage sets SilenceUsage", func(t *testing.T) {
+		t.Parallel()
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test CLI", testCLIConfig{},
+			v2.WithSilenceUsage[testCLIConfig](),
+		)
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if !cli.RootCommand().SilenceUsage {
+			t.Error("expected SilenceUsage to be true")
+		}
+	})
+
+	t.Run("WithColor false disables fang", func(t *testing.T) {
+		t.Parallel()
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test CLI", testCLIConfig{},
+			v2.WithColor[testCLIConfig](false),
+		)
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if cli == nil {
+			t.Fatal("cli is nil")
+		}
+	})
+
+	t.Run("WithColor true keeps fang enabled", func(t *testing.T) {
+		t.Parallel()
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test CLI", testCLIConfig{},
+			v2.WithColor[testCLIConfig](true),
+		)
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if cli == nil {
+			t.Fatal("cli is nil")
+		}
+	})
+
+	t.Run("combines multiple options", func(t *testing.T) {
+		t.Parallel()
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test CLI", testCLIConfig{},
+			v2.WithSilenceErrors[testCLIConfig](),
+			v2.WithSilenceUsage[testCLIConfig](),
+			v2.WithCLIVersion[testCLIConfig]("2.0.0"),
+		)
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if !cli.RootCommand().SilenceErrors {
+			t.Error("expected SilenceErrors to be true")
+		}
+
+		if !cli.RootCommand().SilenceUsage {
+			t.Error("expected SilenceUsage to be true")
+		}
+
+		if cli.RootCommand().Version != "2.0.0" {
+			t.Errorf("Version = %q, want %q", cli.RootCommand().Version, "2.0.0")
+		}
+	})
 }

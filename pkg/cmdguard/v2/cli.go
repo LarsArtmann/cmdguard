@@ -25,6 +25,8 @@ type CLI[T any] struct {
 	registry       *FlagRegistry
 	registeredCmds map[string]bool
 	flowCtx        *BranchingFlowContext
+	useFang        bool
+	fangOpts       []fang.Option
 }
 
 // CLIOption is a functional option for configuring a CLI.
@@ -47,6 +49,7 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 		rootCmd:        &cobra.Command{Use: name, Short: short},
 		registry:       nil,
 		registeredCmds: make(map[string]bool),
+		useFang:        true,
 	}
 
 	for _, opt := range opts {
@@ -119,6 +122,28 @@ func WithCLILong[T any](long string) CLIOption[T] {
 func WithCLIScope[T any](scope *Scope) CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.scope = scope
+	}
+}
+
+// WithSilenceErrors suppresses automatic error printing from cobra.
+func WithSilenceErrors[T any]() CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.rootCmd.SilenceErrors = true
+	}
+}
+
+// WithSilenceUsage suppresses automatic usage printing on error.
+func WithSilenceUsage[T any]() CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.rootCmd.SilenceUsage = true
+	}
+}
+
+// WithColor enables or disables colored output from fang.
+// When disabled, falls back to cobra's default plain text output.
+func WithColor[T any](enabled bool) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.useFang = enabled
 	}
 }
 
@@ -258,8 +283,16 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 
 	flowCtx := WithBranchingFlowContext(ctx, cli.flowCtx)
 
-	if err := fang.Execute(flowCtx, cli.rootCmd); err != nil {
-		return fmt.Errorf("failed to execute CLI: %w", err)
+	var execErr error
+
+	if cli.useFang {
+		execErr = fang.Execute(flowCtx, cli.rootCmd, cli.fangOpts...)
+	} else {
+		execErr = cli.rootCmd.ExecuteContext(flowCtx)
+	}
+
+	if execErr != nil {
+		return fmt.Errorf("failed to execute CLI: %w", execErr)
 	}
 
 	return nil
