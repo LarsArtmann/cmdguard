@@ -7,7 +7,9 @@ import (
 )
 
 func TestBranchingFlowContext_Branch(t *testing.T) {
+	t.Parallel()
 	t.Run("creates child context", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		child, cancel := root.Branch("subcommand")
 		defer cancel()
@@ -27,6 +29,7 @@ func TestBranchingFlowContext_Branch(t *testing.T) {
 	})
 
 	t.Run("inherits values", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		root.SetValueLocal("key", "root-value")
 
@@ -40,6 +43,7 @@ func TestBranchingFlowContext_Branch(t *testing.T) {
 	})
 
 	t.Run("supports multiple branches", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		child1, cancel1 := root.Branch("cmd1")
 		defer cancel1()
@@ -59,7 +63,9 @@ func TestBranchingFlowContext_Branch(t *testing.T) {
 }
 
 func TestBranchingFlowContext_BranchWithTimeout(t *testing.T) {
+	t.Parallel()
 	t.Run("valid timeout", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		child, cancel, err := root.BranchWithTimeout("cmd", "100ms")
 		if err != nil {
@@ -76,6 +82,7 @@ func TestBranchingFlowContext_BranchWithTimeout(t *testing.T) {
 	})
 
 	t.Run("invalid timeout", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		_, _, err := root.BranchWithTimeout("cmd", "invalid")
 
@@ -86,7 +93,9 @@ func TestBranchingFlowContext_BranchWithTimeout(t *testing.T) {
 }
 
 func TestBranchingFlowContext_BranchWithDeadline(t *testing.T) {
+	t.Parallel()
 	t.Run("valid deadline", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		future := time.Now().Add(time.Hour).Format(time.RFC3339)
 		child, cancel, err := root.BranchWithDeadline("cmd", future)
@@ -100,6 +109,7 @@ func TestBranchingFlowContext_BranchWithDeadline(t *testing.T) {
 	})
 
 	t.Run("invalid deadline", func(t *testing.T) {
+		t.Parallel()
 		root := NewBranchingFlowContext(context.Background())
 		_, _, err := root.BranchWithDeadline("cmd", "invalid")
 
@@ -110,6 +120,7 @@ func TestBranchingFlowContext_BranchWithDeadline(t *testing.T) {
 }
 
 func TestBranchingFlowContext_Path(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 
 	if len(root.Path()) != 0 {

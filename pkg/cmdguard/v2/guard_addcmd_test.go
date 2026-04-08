@@ -10,6 +10,7 @@ import (
 func TestGuardedCommand_AddCommand(t *testing.T) {
 	t.Parallel()
 	t.Run("adds valid command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -27,6 +28,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	})
 
 	t.Run("error: invalid command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -47,6 +49,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	})
 
 	t.Run("adds command with subcommands", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -76,6 +79,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	})
 
 	t.Run("error: duplicate command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -105,7 +109,9 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 }
 
 func TestAddAnyCommand(t *testing.T) {
+	t.Parallel()
 	t.Run("adds command with different flag type", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -136,6 +142,7 @@ func TestAddAnyCommand(t *testing.T) {
 	})
 
 	t.Run("error when command has no handler", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -161,6 +168,7 @@ func TestAddAnyCommand(t *testing.T) {
 	})
 
 	t.Run("error on duplicate command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)

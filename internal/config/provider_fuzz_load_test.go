@@ -105,7 +105,9 @@ func FuzzLoad_EnvVarStrictMode(f *testing.F) {
 }
 
 func TestValidate_EdgeCases(t *testing.T) {
+	t.Parallel()
 	t.Run("concurrent validation should be safe", func(t *testing.T) {
+		t.Parallel()
 		cfg := &Config{LogLevel: "debug"}
 		done := make(chan bool)
 
@@ -126,6 +128,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 	})
 
 	t.Run("both fields invalid returns first error", func(t *testing.T) {
+		t.Parallel()
 		cfg := &Config{LogLevel: "invalid", LogFormat: "xml"}
 
 		err := cfg.Validate()
@@ -148,6 +151,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 
 	for _, tt := range invalidLevelTests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			cfg := &Config{LogLevel: tt.level}
 
 			err := cfg.Validate()
@@ -159,6 +163,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 }
 
 func TestGetConfigFilePath_EdgeCases(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		input     string
@@ -178,6 +183,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := GetConfigFilePath(tt.input)
 			if tt.wantEmpty && result != "" {
 				t.Errorf("GetConfigFilePath(%q) = %q, want empty", tt.input, result)
@@ -211,6 +217,7 @@ func testShellInjectionPayload(t *testing.T, payload string) {
 	}
 }
 
+//nolint:paralleltest // calls testShellInjectionPayload which uses t.Setenv
 func TestLoad_EnvVarInjection(t *testing.T) {
 	t.Run("shell injection attempt in level", func(t *testing.T) {
 		testShellInjectionPayload(t, "$(whoami)")

@@ -31,6 +31,7 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 func TestVersion(t *testing.T) {
 	t.Parallel()
 	t.Run("version is set", func(t *testing.T) {
+		t.Parallel()
 		if Version == "" {
 			t.Error("Version is empty")
 		}
@@ -42,7 +43,9 @@ func TestVersion(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
+	t.Parallel()
 	t.Run("creates GuardedCommand", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{}
 
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI application", defaults)
@@ -68,6 +71,7 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("error: empty name", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{}
 
 		g, err := New[testAppConfig, NoFlags]("", "My CLI", defaults)
@@ -85,6 +89,7 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("registers config in scope", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{Verbose: true}
 
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", defaults)
@@ -103,6 +108,7 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("creates scope", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{}
 
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", defaults)
@@ -122,7 +128,9 @@ func TestNew(t *testing.T) {
 }
 
 func TestNewWithLong(t *testing.T) {
+	t.Parallel()
 	t.Run("creates GuardedCommand with long description", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{}
 
 		g, err := NewWithLong[testAppConfig, NoFlags](
@@ -153,6 +161,7 @@ func TestNewWithLong(t *testing.T) {
 	})
 
 	t.Run("error: empty name", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{}
 
 		g, err := NewWithLong[testAppConfig, NoFlags]("", "short", "long", defaults)
@@ -167,7 +176,9 @@ func TestNewWithLong(t *testing.T) {
 }
 
 func TestNew_FlagTypeValidation(t *testing.T) {
+	t.Parallel()
 	t.Run("rejects invalid flag type in New", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, int]("myapp", "My CLI", testAppConfig{})
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -183,6 +194,7 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 	})
 
 	t.Run("accepts NoFlags in New", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -194,6 +206,7 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 	})
 
 	t.Run("accepts pointer to struct in New", func(t *testing.T) {
+		t.Parallel()
 		type cmdFlags struct {
 			Name string `flag:"name"`
 		}
@@ -210,7 +223,9 @@ func TestNew_FlagTypeValidation(t *testing.T) {
 }
 
 func TestNewSimple(t *testing.T) {
+	t.Parallel()
 	t.Run("creates SimpleCLI with defaults", func(t *testing.T) {
+		t.Parallel()
 		g, err := NewSimple("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -230,6 +245,7 @@ func TestNewSimple(t *testing.T) {
 	})
 
 	t.Run("returns error for empty name", func(t *testing.T) {
+		t.Parallel()
 		g, err := NewSimple("", "My CLI", testAppConfig{})
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -242,7 +258,9 @@ func TestNewSimple(t *testing.T) {
 }
 
 func TestNewSimpleWithLong(t *testing.T) {
+	t.Parallel()
 	t.Run("creates SimpleCLI with long description", func(t *testing.T) {
+		t.Parallel()
 		g, err := NewSimpleWithLong(
 			"myapp",
 			"short",
@@ -271,6 +289,7 @@ func TestNewSimpleWithLong(t *testing.T) {
 	})
 
 	t.Run("returns error for empty name", func(t *testing.T) {
+		t.Parallel()
 		g, err := NewSimpleWithLong("", "short", "long", testAppConfig{})
 		if err == nil {
 			t.Fatal("expected error, got nil")

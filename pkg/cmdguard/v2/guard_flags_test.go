@@ -14,6 +14,7 @@ func TestCloneFlags(t *testing.T) {
 	}
 
 	t.Run("clones struct", func(t *testing.T) {
+		t.Parallel()
 		original := testFlags{Name: "test", Count: 42}
 		cloned := cloneFlags(original)
 
@@ -36,6 +37,7 @@ func TestCloneFlags(t *testing.T) {
 	})
 
 	t.Run("clones pointer to struct", func(t *testing.T) {
+		t.Parallel()
 		original := &testFlags{Name: "test", Count: 42}
 		cloned := cloneFlags(original)
 
@@ -57,6 +59,7 @@ func TestCloneFlags(t *testing.T) {
 	})
 
 	t.Run("returns nil for nil pointer", func(t *testing.T) {
+		t.Parallel()
 		var original *testFlags
 
 		cloned := cloneFlags(original)
@@ -66,6 +69,7 @@ func TestCloneFlags(t *testing.T) {
 	})
 
 	t.Run("returns as-is for non-struct", func(t *testing.T) {
+		t.Parallel()
 		original := "string value"
 
 		cloned := cloneFlags(original)
@@ -76,12 +80,14 @@ func TestCloneFlags(t *testing.T) {
 }
 
 func TestFlagTypeConstraint(t *testing.T) {
+	t.Parallel()
 	type testFlags struct {
 		Name  string
 		Count int
 	}
 
 	t.Run("accepts NoFlags (struct{})", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[NoFlags]()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -89,6 +95,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("accepts pointer to struct", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[*testFlags]()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -96,6 +103,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("accepts empty struct", func(t *testing.T) {
+		t.Parallel()
 		type emptyFlags struct{}
 
 		err := FlagTypeConstraint[emptyFlags]()
@@ -105,6 +113,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("accepts struct with fields", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[testFlags]()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -112,6 +121,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("rejects pointer to non-struct", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[*string]()
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -127,6 +137,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("rejects int", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[int]()
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -142,6 +153,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("rejects string", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[string]()
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -157,6 +169,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("rejects slice", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[[]string]()
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -172,6 +185,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 	})
 
 	t.Run("rejects map", func(t *testing.T) {
+		t.Parallel()
 		err := FlagTypeConstraint[map[string]string]()
 		if err == nil {
 			t.Fatal("expected error, got nil")

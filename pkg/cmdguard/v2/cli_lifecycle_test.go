@@ -10,6 +10,7 @@ import (
 func TestCLISetLong(t *testing.T) {
 	t.Parallel()
 	t.Run("updates long description", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -28,7 +29,9 @@ func TestCLISetLong(t *testing.T) {
 }
 
 func TestCLISetVersion(t *testing.T) {
+	t.Parallel()
 	t.Run("updates version", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -43,7 +46,9 @@ func TestCLISetVersion(t *testing.T) {
 }
 
 func TestCLIAddGlobalFlag(t *testing.T) {
+	t.Parallel()
 	t.Run("adds global string flag", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -59,7 +64,9 @@ func TestCLIAddGlobalFlag(t *testing.T) {
 }
 
 func TestCLIAddGlobalBoolFlag(t *testing.T) {
+	t.Parallel()
 	t.Run("adds global bool flag", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -75,7 +82,9 @@ func TestCLIAddGlobalBoolFlag(t *testing.T) {
 }
 
 func TestCLIPrePostRunE(t *testing.T) {
+	t.Parallel()
 	t.Run("calls PreRunE and PostRunE", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -119,7 +128,9 @@ func TestCLIPrePostRunE(t *testing.T) {
 }
 
 func TestCLIPreRunEWithFlags(t *testing.T) {
+	t.Parallel()
 	t.Run("PreRunE receives parsed flags", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -160,7 +171,9 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 }
 
 func TestCLIPostRunEWithFlags(t *testing.T) {
+	t.Parallel()
 	t.Run("PostRunE receives parsed flags", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -201,7 +214,9 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 }
 
 func TestWithCLIScope(t *testing.T) {
+	t.Parallel()
 	t.Run("sets custom scope", func(t *testing.T) {
+		t.Parallel()
 		customScope := v2.NewScope("custom")
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
 			v2.WithCLIScope[testCLIConfig](customScope))
@@ -216,7 +231,9 @@ func TestWithCLIScope(t *testing.T) {
 }
 
 func TestCLIExecuteAndExit(t *testing.T) {
+	t.Parallel()
 	t.Run("calls ExecuteAndExit successfully", func(t *testing.T) {
+		t.Parallel()
 		cli, _ := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		cmd := newTestCLICmd("run")
 		if err := v2.AddCommand(cli, cmd); err != nil {

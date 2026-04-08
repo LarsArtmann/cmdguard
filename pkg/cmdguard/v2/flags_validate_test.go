@@ -41,6 +41,7 @@ func setFlagAndAssertValid(
 func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	t.Parallel()
 	t.Run("valid values pass", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -58,6 +59,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	})
 
 	t.Run("invalid value returns error", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -80,6 +82,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	})
 
 	t.Run("unchanged flag skips validation", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -103,6 +106,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	}
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string `flag:"name" help:"required name" required:"true"`
 		}
@@ -134,6 +138,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	}
 
 	t.Run("required false does not enforce", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string `flag:"name" help:"optional name" required:"false"`
 		}

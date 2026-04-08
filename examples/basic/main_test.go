@@ -13,6 +13,7 @@ import (
 )
 
 func TestBasicExample_HelloCommand(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("basic", "A basic CLI example")
 
 	var output bytes.Buffer
@@ -54,6 +55,7 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 }
 
 func TestBasicExample_RootHasSubcommands(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("basic", "A basic CLI example")
 
 	emptyRun := func(_ *cobra.Command, _ []string) {}
@@ -76,6 +78,7 @@ func TestBasicExample_RootHasSubcommands(t *testing.T) {
 }
 
 func TestBasicExample_HelpOutput(t *testing.T) {
+	t.Parallel()
 	if os.Getenv("CI") == "true" {
 		t.Skip("Skipping help output test in CI")
 	}

@@ -47,6 +47,7 @@ type MigrateFlags struct {
 }
 
 func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
@@ -165,6 +166,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})

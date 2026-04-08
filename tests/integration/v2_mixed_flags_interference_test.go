@@ -43,6 +43,7 @@ var (
 )
 
 func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, *GreetFlags]("testapp", "Test application", RootConfig{})
@@ -140,6 +141,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})

@@ -7,6 +7,7 @@ import (
 )
 
 func TestKoanfLoader_LoadDefaults(t *testing.T) {
+	t.Parallel()
 	loader := NewLoader()
 
 	err := loader.Load("")
@@ -53,6 +54,7 @@ func TestKoanfLoader_LoadEnv(t *testing.T) {
 }
 
 func TestKoanfLoader_LoadFile(t *testing.T) {
+	t.Parallel()
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "config.yaml")
 
@@ -163,6 +165,7 @@ func TestKoanfLoader_Unmarshal(t *testing.T) {
 }
 
 func TestKoanfLoader_MissingFile(t *testing.T) {
+	t.Parallel()
 	loader := NewLoader()
 	err := loader.Load("/nonexistent/path/config.yaml")
 	// Should not error (file is optional)

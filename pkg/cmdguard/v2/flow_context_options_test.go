@@ -6,6 +6,7 @@ import (
 )
 
 func TestWithFlowContextValue(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	child, cancel := root.Branch("cmd", WithFlowContextValue("key", "value"))
 	defer cancel()
@@ -16,6 +17,7 @@ func TestWithFlowContextValue(t *testing.T) {
 }
 
 func TestWithFlowContextValues(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	values := map[any]any{
 		"key1": "value1",
@@ -33,6 +35,7 @@ func TestWithFlowContextValues(t *testing.T) {
 }
 
 func TestWithBranchingFlowContext(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	bfc := NewBranchingFlowContext(ctx)
 
@@ -48,6 +51,7 @@ func TestWithBranchingFlowContext(t *testing.T) {
 }
 
 func TestGetBranchingFlowContext_NilContext(t *testing.T) {
+	t.Parallel()
 	_, ok := GetBranchingFlowContext(context.TODO())
 	if ok {
 		t.Error("expected ok to be false for context.TODO()")
@@ -55,6 +59,7 @@ func TestGetBranchingFlowContext_NilContext(t *testing.T) {
 }
 
 func TestGetBranchingFlowContext_NotFound(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	_, ok := GetBranchingFlowContext(ctx)
 	if ok {
@@ -63,7 +68,9 @@ func TestGetBranchingFlowContext_NotFound(t *testing.T) {
 }
 
 func TestRequireBranchingFlowContext(t *testing.T) {
+	t.Parallel()
 	t.Run("found", func(t *testing.T) {
+		t.Parallel()
 		ctx := context.Background()
 		bfc := NewBranchingFlowContext(ctx)
 		wrapped := WithBranchingFlowContext(ctx, bfc)
@@ -75,6 +82,7 @@ func TestRequireBranchingFlowContext(t *testing.T) {
 	})
 
 	t.Run("not found panics", func(t *testing.T) {
+		t.Parallel()
 		defer func() {
 			if r := recover(); r == nil {
 				t.Error("expected panic when no branching flow context")

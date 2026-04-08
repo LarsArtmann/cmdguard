@@ -9,6 +9,7 @@ import (
 )
 
 func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
@@ -77,6 +78,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -105,6 +107,7 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	defaultConfig := RootConfig{
@@ -155,6 +158,7 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 }
 
 func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	cli, err := v2.New[RootConfig, v2.NoFlags]("testapp", "Test application", RootConfig{})

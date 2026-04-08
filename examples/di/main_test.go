@@ -9,6 +9,7 @@ import (
 )
 
 func TestDIExample_CreateCLI(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
@@ -25,6 +26,7 @@ func TestDIExample_CreateCLI(t *testing.T) {
 }
 
 func TestDIExample_ServiceRegistration(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
@@ -68,6 +70,7 @@ func TestDIExample_ServiceRegistration(t *testing.T) {
 }
 
 func TestDIExample_MustInvoke(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
@@ -91,6 +94,7 @@ func TestDIExample_MustInvoke(t *testing.T) {
 }
 
 func TestDIExample_HealthCheck(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[Config, v2.NoFlags]("di-app", "DI Example App", Config{})
 	if err != nil {
 		t.Fatalf("Failed to create CLI: %v", err)
@@ -112,6 +116,7 @@ func TestDIExample_HealthCheck(t *testing.T) {
 }
 
 func TestDIExample_ConfigAccess(t *testing.T) {
+	t.Parallel()
 	cfg := Config{
 		LogLevel:  v2.LogLevel{},
 		ServerURL: "http://localhost:8080",

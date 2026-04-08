@@ -62,6 +62,7 @@ func runCLIWithArgs(cli *v2.GuardedCommand[AppConfig, v2.NoFlags], args ...strin
 	})
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_CreateCLI(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
@@ -78,6 +79,7 @@ func TestTypedExample_CreateCLI(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_VersionCommand(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
@@ -104,6 +106,7 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_GreetCommand(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags](
 		"myapp",

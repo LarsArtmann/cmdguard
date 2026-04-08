@@ -10,6 +10,7 @@ import (
 )
 
 func TestAdvancedFlags_CreateCLI(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[GlobalConfig, v2.NoFlags](
 		"advflags",
 		"Advanced Flags Example",
@@ -30,6 +31,7 @@ func TestAdvancedFlags_CreateCLI(t *testing.T) {
 }
 
 func TestAdvancedFlags_ServerCommand(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[GlobalConfig, v2.NoFlags](
 		"advflags",
 		"Advanced Flags Example",
@@ -62,6 +64,7 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 }
 
 func TestAdvancedFlags_ConfigCommand(t *testing.T) {
+	t.Parallel()
 	cli, err := v2.New[GlobalConfig, v2.NoFlags](
 		"advflags",
 		"Advanced Flags Example",
@@ -87,6 +90,7 @@ func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 }
 
 func TestAdvancedFlags_EnumValidation(t *testing.T) {
+	t.Parallel()
 	// Test valid environment
 	flags := EnumFlags{Environment: "production", Region: "us-west-2"}
 
@@ -109,6 +113,7 @@ func TestAdvancedFlags_EnumValidation(t *testing.T) {
 }
 
 func TestAdvancedFlags_DurationParsing(t *testing.T) {
+	t.Parallel()
 	// Test valid duration parsing
 	duration, err := v2.ParseDuration("1h30m")
 	if err != nil {
@@ -129,6 +134,7 @@ func TestAdvancedFlags_DurationParsing(t *testing.T) {
 }
 
 func TestAdvancedFlags_FormatSuggestion(t *testing.T) {
+	t.Parallel()
 	// Test suggestion for typo
 	suggestion := suggestFormat("yam")
 	if suggestion != "yaml" {
@@ -148,6 +154,7 @@ func TestAdvancedFlags_FormatSuggestion(t *testing.T) {
 }
 
 func TestGlobalConfig_LogLevel(t *testing.T) {
+	t.Parallel()
 	// Test that LogLevel type works correctly using ParseLogLevel
 	logLevel, err := v2.ParseLogLevel("debug")
 	if err != nil {

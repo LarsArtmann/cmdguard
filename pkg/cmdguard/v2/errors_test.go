@@ -28,6 +28,7 @@ func TestSentinelErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if tt.err == nil {
 				t.Fatal("expected non-nil error")
 			}
@@ -40,7 +41,9 @@ func TestSentinelErrors(t *testing.T) {
 }
 
 func TestCommandError(t *testing.T) {
+	t.Parallel()
 	t.Run("Error message", func(t *testing.T) {
+		t.Parallel()
 		err := NewCommandError("test-cmd", ErrMissingHandler)
 		if !strings.Contains(err.Error(), "test-cmd") {
 			t.Errorf("expected error to contain 'test-cmd', got %q", err.Error())
@@ -52,6 +55,7 @@ func TestCommandError(t *testing.T) {
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
 		err := NewCommandError("test-cmd", ErrMissingHandler)
 
 		unwrapped := err.Unwrap()
@@ -61,6 +65,7 @@ func TestCommandError(t *testing.T) {
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
+		t.Parallel()
 		err := NewCommandError("test-cmd", ErrInvalidCommand)
 		if !errors.Is(err, ErrInvalidCommand) {
 			t.Errorf("expected error to match ErrInvalidCommand")
@@ -69,9 +74,11 @@ func TestCommandError(t *testing.T) {
 }
 
 func TestFlagError(t *testing.T) {
+	t.Parallel()
 	innerErr := errors.New("invalid value")
 
 	t.Run("Error message", func(t *testing.T) {
+		t.Parallel()
 		err := NewFlagError("test-flag", innerErr)
 		if !strings.Contains(err.Error(), "test-flag") {
 			t.Errorf("expected error to contain 'test-flag', got %q", err.Error())
@@ -83,6 +90,7 @@ func TestFlagError(t *testing.T) {
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
 		unwrapped := NewFlagError("test-flag", innerErr).Unwrap()
 		if !errors.Is(unwrapped, innerErr) {
 			t.Errorf("expected unwrapped error to be %v, got %v", innerErr, unwrapped)
@@ -90,6 +98,7 @@ func TestFlagError(t *testing.T) {
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
+		t.Parallel()
 		err := NewFlagError("test-flag", ErrFlagParseFailed)
 		if !errors.Is(err, ErrFlagParseFailed) {
 			t.Errorf("expected error to match ErrFlagParseFailed")
@@ -98,9 +107,11 @@ func TestFlagError(t *testing.T) {
 }
 
 func TestConfigError(t *testing.T) {
+	t.Parallel()
 	innerErr := errors.New("must be one of debug,info,warn,error")
 
 	t.Run("Error message", func(t *testing.T) {
+		t.Parallel()
 		err := NewConfigError("LogLevel", innerErr)
 		if !strings.Contains(err.Error(), "LogLevel") {
 			t.Errorf("expected error to contain 'LogLevel', got %q", err.Error())
@@ -112,6 +123,7 @@ func TestConfigError(t *testing.T) {
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
 		unwrapped := NewConfigError("field", innerErr).Unwrap()
 		if !errors.Is(unwrapped, innerErr) {
 			t.Errorf("expected unwrapped error to be %v, got %v", innerErr, unwrapped)
@@ -120,7 +132,9 @@ func TestConfigError(t *testing.T) {
 }
 
 func TestEnumError(t *testing.T) {
+	t.Parallel()
 	t.Run("Error message", func(t *testing.T) {
+		t.Parallel()
 		err := NewEnumError("invalid", []string{"valid1", "valid2"})
 
 		errMsg := err.Error()
@@ -138,6 +152,7 @@ func TestEnumError(t *testing.T) {
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
 		err := NewEnumError("invalid", []string{"valid"})
 
 		unwrapped := err.Unwrap()
@@ -147,6 +162,7 @@ func TestEnumError(t *testing.T) {
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
+		t.Parallel()
 		err := NewEnumError("invalid", []string{"valid"})
 		if !errors.Is(err, ErrInvalidEnum) {
 			t.Errorf("expected error to match ErrInvalidEnum")
@@ -155,9 +171,11 @@ func TestEnumError(t *testing.T) {
 }
 
 func TestDurationError(t *testing.T) {
+	t.Parallel()
 	innerErr := errors.New("time: invalid duration")
 
 	t.Run("Error message", func(t *testing.T) {
+		t.Parallel()
 		err := NewDurationError("not-a-duration", innerErr)
 		if !strings.Contains(err.Error(), "not-a-duration") {
 			t.Errorf("expected error to contain 'not-a-duration', got %q", err.Error())
@@ -169,6 +187,7 @@ func TestDurationError(t *testing.T) {
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
 		unwrapped := NewDurationError("bad", innerErr).Unwrap()
 		if !errors.Is(unwrapped, ErrInvalidDuration) {
 			t.Errorf("expected unwrapped error to be ErrInvalidDuration")
@@ -176,6 +195,7 @@ func TestDurationError(t *testing.T) {
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
+		t.Parallel()
 		err := NewDurationError("bad", innerErr)
 		if !errors.Is(err, ErrInvalidDuration) {
 			t.Errorf("expected error to match ErrInvalidDuration")
@@ -184,7 +204,9 @@ func TestDurationError(t *testing.T) {
 }
 
 func TestErrorChaining(t *testing.T) {
+	t.Parallel()
 	t.Run("nested errors", func(t *testing.T) {
+		t.Parallel()
 		enumErr := NewEnumError("bad", []string{"good"})
 		flagErr := NewFlagError("my-flag", enumErr)
 		cmdErr := NewCommandError("my-cmd", flagErr)
@@ -200,9 +222,11 @@ func TestErrorChaining(t *testing.T) {
 }
 
 func TestServiceError(t *testing.T) {
+	t.Parallel()
 	innerErr := errors.New("service not initialized")
 
 	t.Run("Error message", func(t *testing.T) {
+		t.Parallel()
 		err := NewServiceError("*DatabaseService", innerErr)
 
 		errMsg := err.Error()
@@ -216,6 +240,7 @@ func TestServiceError(t *testing.T) {
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
 		unwrapped := NewServiceError("*LoggerService", innerErr).Unwrap()
 		if !errors.Is(unwrapped, innerErr) {
 			t.Errorf("expected unwrapped error to be %v, got %v", innerErr, unwrapped)
@@ -223,6 +248,7 @@ func TestServiceError(t *testing.T) {
 	})
 
 	t.Run("errors.Is support", func(t *testing.T) {
+		t.Parallel()
 		err := NewServiceError("*DatabaseService", ErrServiceNotFound)
 		if !errors.Is(err, ErrServiceNotFound) {
 			t.Errorf("expected error to match ErrServiceNotFound")

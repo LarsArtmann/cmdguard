@@ -15,6 +15,7 @@ func containsString(slice []string, s string) bool {
 func TestNewFlagRegistry(t *testing.T) {
 	t.Parallel()
 	t.Run("valid config", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Name  string `default:"default-name" flag:"name"  help:"name help"`
 			Count int    `default:"10"           flag:"count" help:"count help"`
@@ -37,6 +38,7 @@ func TestNewFlagRegistry(t *testing.T) {
 	})
 
 	t.Run("non-struct config", func(t *testing.T) {
+		t.Parallel()
 		registry, err := NewFlagRegistry("not a struct")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -52,6 +54,7 @@ func TestNewFlagRegistry(t *testing.T) {
 	})
 
 	t.Run("config with short flags", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Name string `flag:"name" help:"name help" short:"n"`
 		}
@@ -73,7 +76,9 @@ func TestNewFlagRegistry(t *testing.T) {
 }
 
 func TestFlagRegistry_RegisterFlags(t *testing.T) {
+	t.Parallel()
 	t.Run("registers all flag types", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			String  string   `default:"str"   flag:"string"`
 			Bool    bool     `default:"true"  flag:"bool"`
@@ -127,6 +132,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 	})
 
 	t.Run("registers custom types", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Level  LogLevel  `default:"info" flag:"level"`
 			Format LogFormat `default:"json" flag:"format"`
@@ -154,6 +160,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 	})
 
 	t.Run("registers Duration type", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Timeout Duration `default:"30s" flag:"timeout"`
 		}
@@ -181,6 +188,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 	})
 
 	t.Run("registers enum with values", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Mode Enum `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -209,7 +217,9 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 }
 
 func TestFlagRegistry_Tags(t *testing.T) {
+	t.Parallel()
 	t.Run("returns all tags", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Name  string `flag:"name"  help:"name help"`
 			Count int    `flag:"count" help:"count help"`
@@ -241,7 +251,9 @@ func TestFlagRegistry_Tags(t *testing.T) {
 }
 
 func TestFlagRegistry_FlagNames(t *testing.T) {
+	t.Parallel()
 	t.Run("returns all flag names", func(t *testing.T) {
+		t.Parallel()
 		type testConfig struct {
 			Verbose bool   `flag:"verbose" short:"v"`
 			Config  string `flag:"config"  short:"c"`
@@ -272,6 +284,7 @@ func TestFlagRegistry_FlagNames(t *testing.T) {
 	})
 
 	t.Run("empty registry returns empty slice", func(t *testing.T) {
+		t.Parallel()
 		type emptyConfig struct{}
 
 		registry, err := NewFlagRegistry(emptyConfig{})

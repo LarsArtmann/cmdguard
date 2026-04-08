@@ -13,6 +13,7 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags](
 		"myapp",
@@ -85,6 +86,7 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_ConfigCommand(t *testing.T) {
 	// Use default config values for this test
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{
@@ -129,6 +131,7 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_DIRegistration(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags](
 		"myapp",
@@ -175,6 +178,7 @@ func TestTypedExample_DIRegistration(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_DatabaseService(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
@@ -217,6 +221,7 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_PreRunEValidation(t *testing.T) {
 	cli, err := v2.New[AppConfig, v2.NoFlags]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {

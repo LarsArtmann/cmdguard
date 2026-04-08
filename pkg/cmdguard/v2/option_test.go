@@ -18,6 +18,7 @@ func TestSome(t *testing.T) {
 }
 
 func TestNone(t *testing.T) {
+	t.Parallel()
 	opt := None[int]()
 	if opt.IsSome() {
 		t.Error("None().IsSome() should be false")
@@ -28,6 +29,7 @@ func TestNone(t *testing.T) {
 }
 
 func TestOption_Get(t *testing.T) {
+	t.Parallel()
 	// Test Some
 	someOpt := Some("hello")
 	val, ok := someOpt.Get()
@@ -50,6 +52,7 @@ func TestOption_Get(t *testing.T) {
 }
 
 func TestOption_Unwrap(t *testing.T) {
+	t.Parallel()
 	opt := Some(42)
 	if opt.Unwrap() != 42 {
 		t.Error("Some(42).Unwrap() should return 42")
@@ -65,6 +68,7 @@ func TestOption_Unwrap(t *testing.T) {
 }
 
 func TestOption_UnwrapOr(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(42)
 	if someOpt.UnwrapOr(0) != 42 {
 		t.Error("Some(42).UnwrapOr(0) should return 42")
@@ -77,6 +81,7 @@ func TestOption_UnwrapOr(t *testing.T) {
 }
 
 func TestOption_UnwrapOrElse(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(42)
 	result := someOpt.UnwrapOrElse(func() int { return 100 })
 	if result != 42 {
@@ -91,6 +96,7 @@ func TestOption_UnwrapOrElse(t *testing.T) {
 }
 
 func TestOption_UnwrapOrError(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(42)
 	val, err := someOpt.UnwrapOrError(errors.New("not found"))
 	if err != nil {
@@ -108,6 +114,7 @@ func TestOption_UnwrapOrError(t *testing.T) {
 }
 
 func TestOption_Expect(t *testing.T) {
+	t.Parallel()
 	opt := Some(42)
 	if opt.Expect("should not panic") != 42 {
 		t.Error("Expect should return value")
@@ -122,6 +129,7 @@ func TestOption_Expect(t *testing.T) {
 }
 
 func TestOption_Map(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(21)
 	result := someOpt.Map(func(v int) int { return v * 2 })
 	if result.UnwrapOr(0) != 42 {
@@ -136,6 +144,7 @@ func TestOption_Map(t *testing.T) {
 }
 
 func TestOption_MapOr(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(21)
 	result := someOpt.MapOr(0, func(v int) int { return v * 2 })
 	if result != 42 {
@@ -150,6 +159,7 @@ func TestOption_MapOr(t *testing.T) {
 }
 
 func TestOption_And(t *testing.T) {
+	t.Parallel()
 	x := Some(42)
 	y := Some(100)
 	result := x.And(y)
@@ -165,6 +175,7 @@ func TestOption_And(t *testing.T) {
 }
 
 func TestOption_Or(t *testing.T) {
+	t.Parallel()
 	x := Some(42)
 	y := Some(100)
 	result := x.Or(y)
@@ -180,6 +191,7 @@ func TestOption_Or(t *testing.T) {
 }
 
 func TestOption_Filter(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(42)
 	result := someOpt.Filter(func(v int) bool { return v > 40 })
 	if result.IsNone() {
@@ -199,6 +211,7 @@ func TestOption_Filter(t *testing.T) {
 }
 
 func TestOption_IfSome(t *testing.T) {
+	t.Parallel()
 	called := false
 	Some(42).IfSome(func(v int) { called = true })
 	if !called {
@@ -213,6 +226,7 @@ func TestOption_IfSome(t *testing.T) {
 }
 
 func TestOption_IfNone(t *testing.T) {
+	t.Parallel()
 	called := false
 	Some(42).IfNone(func() { called = true })
 	if called {
@@ -227,6 +241,7 @@ func TestOption_IfNone(t *testing.T) {
 }
 
 func TestOption_MarshalJSON(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(42)
 	data, err := json.Marshal(someOpt)
 	if err != nil {
@@ -247,6 +262,7 @@ func TestOption_MarshalJSON(t *testing.T) {
 }
 
 func TestOption_UnmarshalJSON(t *testing.T) {
+	t.Parallel()
 	var opt Option[int]
 	err := json.Unmarshal([]byte("42"), &opt)
 	if err != nil {
@@ -266,6 +282,7 @@ func TestOption_UnmarshalJSON(t *testing.T) {
 }
 
 func TestOption_String(t *testing.T) {
+	t.Parallel()
 	someOpt := Some(42)
 	if someOpt.String() != "Some(42)" {
 		t.Errorf("Some.String() should be Some(42), got %s", someOpt.String())
@@ -278,6 +295,7 @@ func TestOption_String(t *testing.T) {
 }
 
 func TestOption_WithStrings(t *testing.T) {
+	t.Parallel()
 	opt := Some("hello")
 	if opt.UnwrapOr("") != "hello" {
 		t.Error("Option[string] should work correctly")
@@ -285,6 +303,7 @@ func TestOption_WithStrings(t *testing.T) {
 }
 
 func TestOption_WithStructs(t *testing.T) {
+	t.Parallel()
 	type Config struct {
 		Name  string
 		Value int
@@ -298,6 +317,7 @@ func TestOption_WithStructs(t *testing.T) {
 }
 
 func TestOption_MarshalText(t *testing.T) {
+	t.Parallel()
 	// Test Some with string
 	someOpt := Some("hello")
 	text, err := someOpt.MarshalText()

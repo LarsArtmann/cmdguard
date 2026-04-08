@@ -17,6 +17,7 @@ const testTimeout = 5 * time.Second
 func TestGuardedCommand_Execute(t *testing.T) {
 	t.Parallel()
 	t.Run("executes help command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -29,6 +30,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 
 	t.Run("executes subcommand", func(t *testing.T) {
+		t.Parallel()
 		executed := false
 
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
@@ -59,6 +61,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 
 	t.Run("error: unknown subcommand", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -79,6 +82,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 
 	t.Run("executes with flags", func(t *testing.T) {
+		t.Parallel()
 		var receivedName string
 
 		type greetFlags struct {
@@ -115,7 +119,9 @@ func TestGuardedCommand_Execute(t *testing.T) {
 }
 
 func TestGuardedCommand_ExecuteWithArgs(t *testing.T) {
+	t.Parallel()
 	t.Run("passes args to command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -155,7 +161,9 @@ func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 }
 
 func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
+	t.Parallel()
 	t.Run("returns normally on success", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -173,6 +181,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 	})
 
 	t.Run("exits with code 1 on error", func(t *testing.T) {
+		t.Parallel()
 		if runExecuteAndExitSubprocess("BE_TEST_EXEC_AND_EXIT", "fail", errTestIntentionalFailure) {
 			return
 		}
@@ -209,6 +218,7 @@ func TestGuardedCommand_ExecuteAndExit(t *testing.T) {
 	})
 
 	t.Run("stderr contains error message", func(t *testing.T) {
+		t.Parallel()
 		if runExecuteAndExitSubprocess("BE_TEST_EXEC_STDERR", "boom", errors.New("boom error")) {
 			return
 		}

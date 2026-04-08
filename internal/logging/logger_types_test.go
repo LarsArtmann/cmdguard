@@ -8,6 +8,7 @@ import (
 )
 
 func TestParseLevel_Type(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		level         string
@@ -23,6 +24,7 @@ func TestParseLevel_Type(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := ParseLevel(tt.level)
 			if result != tt.expectedLevel {
 				t.Errorf("ParseLevel(%q) = %v, want %v", tt.level, result, tt.expectedLevel)
@@ -32,6 +34,7 @@ func TestParseLevel_Type(t *testing.T) {
 }
 
 func TestLevel_SlogLevel(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		level         Level
@@ -46,6 +49,7 @@ func TestLevel_SlogLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := tt.level.SlogLevel()
 			if result != tt.expectedLevel {
 				t.Errorf("Level(%q).SlogLevel() = %v, want %v", tt.level, result, tt.expectedLevel)
@@ -55,6 +59,7 @@ func TestLevel_SlogLevel(t *testing.T) {
 }
 
 func TestLevel_String(t *testing.T) {
+	t.Parallel()
 	if got := LevelDebug.String(); got != "debug" {
 		t.Errorf("LevelDebug.String() = %q, want %q", got, "debug")
 	}
@@ -73,6 +78,7 @@ func TestLevel_String(t *testing.T) {
 }
 
 func TestFormat_String(t *testing.T) {
+	t.Parallel()
 	if got := FormatText.String(); got != "text" {
 		t.Errorf("FormatText.String() = %q, want %q", got, "text")
 	}
@@ -83,6 +89,7 @@ func TestFormat_String(t *testing.T) {
 }
 
 func TestLoggerOutput_Text(t *testing.T) {
+	t.Parallel()
 	var buf bytes.Buffer
 
 	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
@@ -114,6 +121,7 @@ func TestLoggerOutput_Text(t *testing.T) {
 }
 
 func TestLoggerOutput_JSON(t *testing.T) {
+	t.Parallel()
 	var buf bytes.Buffer
 
 	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
@@ -138,6 +146,7 @@ func TestLoggerOutput_JSON(t *testing.T) {
 }
 
 func TestLoggerLevelFiltering(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name             string
 		logLevel         slog.Level
@@ -170,6 +179,7 @@ func TestLoggerLevelFiltering(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			var buf bytes.Buffer
 
 			handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{

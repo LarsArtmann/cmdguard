@@ -26,6 +26,7 @@ func TestParseDuration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			d, err := ParseDuration(tt.input)
 			if tt.wantErr {
 				if err == nil {
@@ -49,7 +50,9 @@ func TestParseDuration(t *testing.T) {
 }
 
 func TestParseDuration_ErrorCases(t *testing.T) {
+	t.Parallel()
 	t.Run("returns error on invalid", func(t *testing.T) {
+		t.Parallel()
 		_, err := ParseDuration("invalid")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -58,6 +61,7 @@ func TestParseDuration_ErrorCases(t *testing.T) {
 }
 
 func TestFromDuration(t *testing.T) {
+	t.Parallel()
 	td := 5 * time.Minute
 
 	d := FromDuration(td)
@@ -76,24 +80,28 @@ func TestFromDuration(t *testing.T) {
 }
 
 func TestDuration_Methods(t *testing.T) {
+	t.Parallel()
 	d, err := ParseDuration("2h30m")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	t.Run("Duration", func(t *testing.T) {
+		t.Parallel()
 		if d.Duration() != 2*time.Hour+30*time.Minute {
 			t.Errorf("Duration() = %v, want %v", d.Duration(), 2*time.Hour+30*time.Minute)
 		}
 	})
 
 	t.Run("String", func(t *testing.T) {
+		t.Parallel()
 		if d.String() != "2h30m0s" {
 			t.Errorf("String() = %q, want %q", d.String(), "2h30m0s")
 		}
 	})
 
 	t.Run("IsZero", func(t *testing.T) {
+		t.Parallel()
 		if d.IsZero() {
 			t.Error("IsZero() = true, want false")
 		}
@@ -105,12 +113,14 @@ func TestDuration_Methods(t *testing.T) {
 	})
 
 	t.Run("Milliseconds", func(t *testing.T) {
+		t.Parallel()
 		if d.Milliseconds() != 9000000 {
 			t.Errorf("Milliseconds() = %d, want %d", d.Milliseconds(), 9000000)
 		}
 	})
 
 	t.Run("Seconds", func(t *testing.T) {
+		t.Parallel()
 		got := d.Seconds()
 		if got < 8999.999 || got > 9000.001 {
 			t.Errorf("Seconds() = %f, want approximately 9000", got)
@@ -119,11 +129,13 @@ func TestDuration_Methods(t *testing.T) {
 }
 
 func TestDuration_MarshalUnmarshal(t *testing.T) {
+	t.Parallel()
 	type config struct {
 		Timeout Duration `json:"timeout"`
 	}
 
 	t.Run("marshal", func(t *testing.T) {
+		t.Parallel()
 		validDuration, err := ParseDuration("30s")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -142,6 +154,7 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 	})
 
 	t.Run("unmarshal valid", func(t *testing.T) {
+		t.Parallel()
 		var c config
 
 		err := json.Unmarshal([]byte(`{"timeout":"1h"}`), &c)
@@ -155,6 +168,7 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 	})
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
+		t.Parallel()
 		var c config
 		expectUnmarshalError(t, &c, `{"timeout":"invalid"}`)
 	})

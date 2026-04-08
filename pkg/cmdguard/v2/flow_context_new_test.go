@@ -8,6 +8,7 @@ import (
 func TestNewBranchingFlowContext(t *testing.T) {
 	t.Parallel()
 	t.Run("with context.TODO", func(t *testing.T) {
+		t.Parallel()
 		bfc := NewBranchingFlowContext(context.TODO())
 		if bfc == nil {
 			t.Fatal("expected non-nil BranchingFlowContext")
@@ -24,6 +25,7 @@ func TestNewBranchingFlowContext(t *testing.T) {
 	})
 
 	t.Run("with valid context", func(t *testing.T) {
+		t.Parallel()
 		ctx := context.Background()
 		bfc := NewBranchingFlowContext(ctx)
 		if bfc.Context != ctx {

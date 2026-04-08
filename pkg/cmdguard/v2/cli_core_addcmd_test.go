@@ -17,7 +17,9 @@ func newTestCLICmd(use string) v2.Command[testCLIConfig, v2.NoFlags] {
 }
 
 func TestCLIAddCommand(t *testing.T) {
+	t.Parallel()
 	t.Run("adds command with different flags type", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -43,6 +45,7 @@ func TestCLIAddCommand(t *testing.T) {
 	})
 
 	t.Run("adds command with NoFlags", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -58,6 +61,7 @@ func TestCLIAddCommand(t *testing.T) {
 	})
 
 	t.Run("returns error for duplicate command", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -78,6 +82,7 @@ func TestCLIAddCommand(t *testing.T) {
 	})
 
 	t.Run("returns error for invalid command", func(t *testing.T) {
+		t.Parallel()
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)

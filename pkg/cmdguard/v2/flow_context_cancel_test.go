@@ -6,6 +6,7 @@ import (
 )
 
 func TestBranchingFlowContext_IsLeaf(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 
 	if !root.IsLeaf() {
@@ -24,6 +25,7 @@ func TestBranchingFlowContext_IsLeaf(t *testing.T) {
 }
 
 func TestBranchingFlowContext_Root(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	child, cancel := root.Branch("child")
 	defer cancel()
@@ -42,6 +44,7 @@ func TestBranchingFlowContext_Root(t *testing.T) {
 }
 
 func TestBranchingFlowContext_Cancel(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	child, cancelChild := root.Branch("child")
 	grandchild, cancelGrandchild := child.Branch("grandchild")
@@ -71,6 +74,7 @@ func TestBranchingFlowContext_Cancel(t *testing.T) {
 }
 
 func TestBranchingFlowContext_CancelChildren(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	child, cancelChild := root.Branch("child")
 	_ = cancelChild
@@ -91,6 +95,7 @@ func TestBranchingFlowContext_CancelChildren(t *testing.T) {
 }
 
 func TestBranchingFlowContext_CancelSiblings(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	sibling1, cancel1 := root.Branch("sibling1")
 	sibling2, cancel2 := root.Branch("sibling2")

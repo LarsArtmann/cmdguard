@@ -8,6 +8,7 @@ import (
 func TestValidateConfig(t *testing.T) {
 	t.Parallel()
 	t.Run("valid config", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name  string `flag:"name"`
 			Count int    `flag:"count"`
@@ -20,6 +21,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("nil config", func(t *testing.T) {
+		t.Parallel()
 		err := ValidateConfig(nil)
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -31,6 +33,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("non-struct config", func(t *testing.T) {
+		t.Parallel()
 		err := ValidateConfig("not a struct")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -42,6 +45,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("valid enum value", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Level string `flag:"level" values:"debug,info,warn"`
 		}
@@ -53,6 +57,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("invalid enum value", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Level string `flag:"level" values:"debug,info,warn"`
 		}
@@ -68,6 +73,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("pointer to config", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string `flag:"name"`
 		}
@@ -79,6 +85,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("LogLevel field with values", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Level LogLevel `flag:"level" values:"debug,info,warn,error"`
 		}
@@ -92,6 +99,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("LogFormat field with values", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Format LogFormat `flag:"format" values:"text,json"`
 		}

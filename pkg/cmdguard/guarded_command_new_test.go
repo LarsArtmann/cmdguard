@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//nolint:paralleltest // uses t.Setenv
 func TestNew(t *testing.T) {
 	t.Run("creates GuardedCommand with defaults", func(t *testing.T) {
 		_ = os.Unsetenv("CMDGUARD_LOG_LEVEL")
@@ -60,7 +61,9 @@ func TestNew(t *testing.T) {
 }
 
 func TestGuardedCommand_Execute(t *testing.T) {
+	t.Parallel()
 	t.Run("executes command successfully", func(t *testing.T) {
+		t.Parallel()
 		g := New("testapp", "Test")
 		g.cmd.RunE = func(*cobra.Command, []string) error {
 			return nil
@@ -77,6 +80,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	})
 }
 
+//nolint:paralleltest // uses t.Setenv
 func TestGuardedCommand_Accessors(t *testing.T) {
 	t.Run("Command returns underlying cobra command", func(t *testing.T) {
 		g := New("testapp", "Test")
@@ -122,7 +126,9 @@ func TestGuardedCommand_Accessors(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
+	t.Parallel()
 	t.Run("returns version string", func(t *testing.T) {
+		t.Parallel()
 		v := Version()
 		if v == "" {
 			t.Error("version should not be empty")

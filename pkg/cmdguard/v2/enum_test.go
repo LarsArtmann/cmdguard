@@ -47,6 +47,7 @@ func TestParseEnum(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			e, err := ParseEnum(tt.value, tt.allowed)
 			if tt.wantErr {
 				if err == nil {
@@ -74,7 +75,9 @@ func TestParseEnum(t *testing.T) {
 }
 
 func TestParseEnum_ErrorCases(t *testing.T) {
+	t.Parallel()
 	t.Run("returns error on invalid", func(t *testing.T) {
+		t.Parallel()
 		_, err := ParseEnum("invalid", []string{"valid"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -87,30 +90,35 @@ func TestParseEnum_ErrorCases(t *testing.T) {
 }
 
 func TestEnum_Methods(t *testing.T) {
+	t.Parallel()
 	e, err := ParseEnum("test", []string{"a", "test", "b"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	t.Run("String", func(t *testing.T) {
+		t.Parallel()
 		if e.String() != "test" {
 			t.Errorf("String() = %q, want %q", e.String(), "test")
 		}
 	})
 
 	t.Run("Value", func(t *testing.T) {
+		t.Parallel()
 		if e.Value() != "test" {
 			t.Errorf("Value() = %q, want %q", e.Value(), "test")
 		}
 	})
 
 	t.Run("Allowed", func(t *testing.T) {
+		t.Parallel()
 		if !slicesEqual(e.Allowed(), []string{"a", "test", "b"}) {
 			t.Errorf("Allowed() = %v, want %v", e.Allowed(), []string{"a", "test", "b"})
 		}
 	})
 
 	t.Run("IsEmpty", func(t *testing.T) {
+		t.Parallel()
 		if e.IsEmpty() {
 			t.Error("IsEmpty() = true, want false")
 		}
@@ -123,6 +131,7 @@ func TestEnum_Methods(t *testing.T) {
 }
 
 func TestEnum_MarshalUnmarshal(t *testing.T) {
+	t.Parallel()
 	type config struct {
 		Level Enum `json:"level"`
 	}
@@ -133,6 +142,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 	}
 
 	t.Run("marshal", func(t *testing.T) {
+		t.Parallel()
 		c := config{Level: validLevel}
 
 		data, err := json.Marshal(c)
@@ -146,6 +156,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 	})
 
 	t.Run("unmarshal valid", func(t *testing.T) {
+		t.Parallel()
 		var c config
 
 		c.Level = Enum{allowed: []string{"debug", "info", "warn"}}
@@ -161,6 +172,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 	})
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
+		t.Parallel()
 		var c config
 
 		c.Level = Enum{allowed: []string{"debug", "info"}}
@@ -172,6 +184,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 	})
 
 	t.Run("unmarshal with no allowed", func(t *testing.T) {
+		t.Parallel()
 		var c config
 
 		err := json.Unmarshal([]byte(`{"level":"any"}`), &c)

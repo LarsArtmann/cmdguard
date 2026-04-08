@@ -6,6 +6,7 @@ import (
 )
 
 func TestNewLogger(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name   string
 		format string
@@ -45,6 +46,7 @@ func TestNewLogger(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			logger := NewLogger(tt.format, tt.level)
 			if logger == nil {
 				t.Error("NewLogger() returned nil, expected non-nil logger")
@@ -54,6 +56,7 @@ func TestNewLogger(t *testing.T) {
 }
 
 func TestParseLevel(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		level         string
@@ -98,6 +101,7 @@ func TestParseLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := ParseLevel(tt.level).SlogLevel()
 			if result != tt.expectedLevel {
 				t.Errorf(
@@ -112,6 +116,7 @@ func TestParseLevel(t *testing.T) {
 }
 
 func TestParseFormat(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name           string
 		format         string
@@ -141,6 +146,7 @@ func TestParseFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := ParseFormat(tt.format)
 			if result != tt.expectedFormat {
 				t.Errorf("ParseFormat(%q) = %v, want %v", tt.format, result, tt.expectedFormat)
@@ -150,6 +156,7 @@ func TestParseFormat(t *testing.T) {
 }
 
 func TestValidFormat(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		format  string
@@ -179,6 +186,7 @@ func TestValidFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := ValidFormat(tt.format)
 			if result != tt.isValid {
 				t.Errorf("ValidFormat(%q) = %v, want %v", tt.format, result, tt.isValid)
@@ -188,6 +196,7 @@ func TestValidFormat(t *testing.T) {
 }
 
 func TestValidLevel(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		level   string
@@ -204,6 +213,7 @@ func TestValidLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+		t.Parallel()
 			result := ValidLevel(tt.level)
 			if result != tt.isValid {
 				t.Errorf("ValidLevel(%q) = %v, want %v", tt.level, result, tt.isValid)

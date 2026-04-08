@@ -10,6 +10,7 @@ import (
 func TestFlagRegistry_ParseFlags(t *testing.T) {
 	t.Parallel()
 	t.Run("parse string flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Name string `default:"default" flag:"name"`
 		}
@@ -41,6 +42,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 	})
 
 	t.Run("parse bool flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Verbose bool `default:"false" flag:"verbose"`
 		}
@@ -72,6 +74,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 	})
 
 	t.Run("parse int flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Count int `default:"0" flag:"count"`
 		}
@@ -103,6 +106,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 	})
 
 	t.Run("parse uint flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Workers uint `default:"0" flag:"workers"`
 		}
@@ -134,6 +138,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 	})
 
 	t.Run("parse uint64 flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			MaxBytes uint64 `default:"0" flag:"max-bytes"`
 		}
@@ -165,6 +170,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 	})
 
 	t.Run("parse float64 flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Alpha float64 `default:"1.0" flag:"alpha"`
 		}
@@ -196,6 +202,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 	})
 
 	t.Run("parse Duration flag", func(t *testing.T) {
+		t.Parallel()
 		type TestConfig struct {
 			Timeout Duration `default:"1m" flag:"timeout"`
 		}

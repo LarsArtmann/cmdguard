@@ -6,6 +6,7 @@ import (
 )
 
 func TestFlowContextAccessor(t *testing.T) {
+	t.Parallel()
 	root := NewBranchingFlowContext(context.Background())
 	child, cancel := root.Branch("level1")
 	grandchild, _ := child.Branch("level2")
@@ -25,6 +26,7 @@ func TestFlowContextAccessor(t *testing.T) {
 }
 
 func TestGet_Typed(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	bfc := NewBranchingFlowContext(ctx)
 	bfc.SetValue("string-key", "string-value")
@@ -33,6 +35,7 @@ func TestGet_Typed(t *testing.T) {
 	wrapped := WithBranchingFlowContext(ctx, bfc)
 
 	t.Run("string value", func(t *testing.T) {
+		t.Parallel()
 		val, ok := Get[string](wrapped, "string-key")
 		if !ok {
 			t.Fatal("expected to find string value")
@@ -43,6 +46,7 @@ func TestGet_Typed(t *testing.T) {
 	})
 
 	t.Run("int value", func(t *testing.T) {
+		t.Parallel()
 		val, ok := Get[int](wrapped, "int-key")
 		if !ok {
 			t.Fatal("expected to find int value")
@@ -53,6 +57,7 @@ func TestGet_Typed(t *testing.T) {
 	})
 
 	t.Run("missing value", func(t *testing.T) {
+		t.Parallel()
 		_, ok := Get[string](wrapped, "nonexistent")
 		if ok {
 			t.Error("expected not to find nonexistent value")
@@ -61,6 +66,7 @@ func TestGet_Typed(t *testing.T) {
 }
 
 func TestMustGet(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	bfc := NewBranchingFlowContext(ctx)
 	bfc.SetValue("key", "value")
@@ -68,6 +74,7 @@ func TestMustGet(t *testing.T) {
 	wrapped := WithBranchingFlowContext(ctx, bfc)
 
 	t.Run("found", func(t *testing.T) {
+		t.Parallel()
 		val := MustGet[string](wrapped, "key")
 		if val != "value" {
 			t.Errorf("expected 'value', got %q", val)
@@ -75,6 +82,7 @@ func TestMustGet(t *testing.T) {
 	})
 
 	t.Run("missing panics", func(t *testing.T) {
+		t.Parallel()
 		defer func() {
 			if r := recover(); r == nil {
 				t.Error("expected panic for missing key")

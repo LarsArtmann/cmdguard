@@ -12,6 +12,7 @@ import (
 )
 
 func TestGuardedCommand_FullLifecycle(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 	if root == nil {
 		t.Fatal("root is nil")
@@ -37,6 +38,7 @@ func TestGuardedCommand_FullLifecycle(t *testing.T) {
 }
 
 func TestGuardedCommand_PanicOnInvalidCommand(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 
 	didPanic := false
@@ -60,6 +62,7 @@ func TestGuardedCommand_PanicOnInvalidCommand(t *testing.T) {
 }
 
 func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 
 	didPanic := false
@@ -83,6 +86,7 @@ func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
 }
 
 func TestGuardedCommand_ParentWithChildren(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 
 	parent := &cobra.Command{
@@ -155,6 +159,7 @@ func TestGuardedCommand_ConfigAccess(t *testing.T) {
 }
 
 func TestGuardedCommand_AddSubcommand(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 
 	parent := &cobra.Command{
@@ -184,6 +189,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 }
 
 func TestGuardedCommand_BuiltInCommands(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 	cmd := root.Command()
 
@@ -208,6 +214,7 @@ func TestGuardedCommand_BuiltInCommands(t *testing.T) {
 }
 
 func TestGuardedCommand_ExecuteWithContext(t *testing.T) {
+	t.Parallel()
 	root := cmdguard.New("testapp", "Test application")
 
 	var output bytes.Buffer

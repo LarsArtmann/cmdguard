@@ -7,6 +7,7 @@ import (
 func TestGuardedCommand_Scope(t *testing.T) {
 	t.Parallel()
 	t.Run("returns injector", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -19,6 +20,7 @@ func TestGuardedCommand_Scope(t *testing.T) {
 	})
 
 	t.Run("returns scope struct", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -37,6 +39,7 @@ func TestGuardedCommand_Scope(t *testing.T) {
 
 func TestGuardedCommand_Config(t *testing.T) {
 	t.Run("returns config", func(t *testing.T) {
+		t.Parallel()
 		defaults := testAppConfig{Verbose: true, Output: "/tmp/out"}
 
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", defaults)
@@ -59,6 +62,7 @@ func TestGuardedCommand_Config(t *testing.T) {
 	})
 
 	t.Run("SetConfig updates config", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -80,6 +84,7 @@ func TestGuardedCommand_Config(t *testing.T) {
 
 func TestGuardedCommand_RootCommand(t *testing.T) {
 	t.Run("returns cobra command", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -102,6 +107,7 @@ func TestGuardedCommand_RootCommand(t *testing.T) {
 
 func TestGuardedCommand_Metadata(t *testing.T) {
 	t.Run("Name returns name", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -113,6 +119,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 	})
 
 	t.Run("Short returns short description", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -124,6 +131,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 	})
 
 	t.Run("Long returns long description", func(t *testing.T) {
+		t.Parallel()
 		g, err := NewWithLong[testAppConfig, NoFlags](
 			"myapp",
 			"short",
@@ -140,6 +148,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 	})
 
 	t.Run("SetLong updates long description", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -157,6 +166,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 	})
 
 	t.Run("SetVersion sets version", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -172,6 +182,7 @@ func TestGuardedCommand_Metadata(t *testing.T) {
 
 func TestGuardedCommand_AddGlobalFlag(t *testing.T) {
 	t.Run("adds global string flag", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -194,6 +205,7 @@ func TestGuardedCommand_AddGlobalFlag(t *testing.T) {
 	})
 
 	t.Run("adds global bool flag", func(t *testing.T) {
+		t.Parallel()
 		g, err := New[testAppConfig, NoFlags]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
