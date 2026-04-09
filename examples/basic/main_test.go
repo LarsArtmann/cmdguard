@@ -12,19 +12,26 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 )
 
+func testHelloRun(output *bytes.Buffer) func(*cobra.Command, []string) {
+	return func(_ *cobra.Command, _ []string) {
+		output.WriteString("Hello, World!\n")
+	}
+}
+
+func testGoodbyeRun(output *bytes.Buffer) func(*cobra.Command, []string) {
+	return func(_ *cobra.Command, _ []string) {
+		output.WriteString("Goodbye, World!\n")
+	}
+}
+
 func TestBasicExample_HelloCommand(t *testing.T) {
 	t.Parallel()
 	root := cmdguard.New("basic", "A basic CLI example")
 
 	var output bytes.Buffer
 
-	root.AddCommand(newCommand("hello", "Say hello", func(_ *cobra.Command, _ []string) {
-		output.WriteString("Hello, World!\n")
-	}))
-
-	root.AddCommand(newCommand("goodbye", "Say goodbye", func(_ *cobra.Command, _ []string) {
-		output.WriteString("Goodbye, World!\n")
-	}))
+	root.AddCommand(newCommand("hello", "Say hello", testHelloRun(&output)))
+	root.AddCommand(newCommand("goodbye", "Say goodbye", testGoodbyeRun(&output)))
 
 	// Test hello command
 	root.Command().SetArgs([]string{"hello"})

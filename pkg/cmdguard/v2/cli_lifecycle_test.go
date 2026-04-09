@@ -235,7 +235,7 @@ func TestCLIExecuteAndExit(t *testing.T) {
 	t.Run("calls ExecuteAndExit successfully", func(t *testing.T) {
 		t.Parallel()
 		cli, _ := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		cmd := newTestCLICmd("run")
+		cmd := newTestCLICommand[testCLIConfig]("run")
 		if err := v2.AddCommand(cli, cmd); err != nil {
 			t.Fatalf("AddCommand failed: %v", err)
 		}

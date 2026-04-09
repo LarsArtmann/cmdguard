@@ -7,15 +7,6 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
-func newTestCLICmd(use string) v2.Command[testCLIConfig, v2.NoFlags] {
-	return v2.Command[testCLIConfig, v2.NoFlags]{
-		Use: use,
-		RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-			return nil
-		},
-	}
-}
-
 func TestCLIAddCommand(t *testing.T) {
 	t.Parallel()
 	t.Run("adds command with different flags type", func(t *testing.T) {
@@ -51,7 +42,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICmd("version")
+		cmd := newTestCLICommand[testCLIConfig]("version")
 		cmd.Short = "Show version"
 
 		err = v2.AddCommand(cli, cmd)
@@ -67,7 +58,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICmd("test")
+		cmd := newTestCLICommand[testCLIConfig]("test")
 		cmd.Short = "Test command"
 
 		err = v2.AddCommand(cli, cmd)
