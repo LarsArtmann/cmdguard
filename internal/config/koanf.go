@@ -10,7 +10,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/knadh/koanf/parsers/yaml"
@@ -48,7 +50,7 @@ func (l *Loader) Load(configPath string) error {
 		err := l.loadFile(configPath)
 		if err != nil {
 			// Config file is optional, don't fail if not found
-			if !strings.Contains(err.Error(), "no such file") {
+			if !errors.Is(err, os.ErrNotExist) {
 				return fmt.Errorf("failed to load config file: %w", err)
 			}
 		}
