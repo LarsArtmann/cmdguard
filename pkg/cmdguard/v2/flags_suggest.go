@@ -59,10 +59,9 @@ func editDistance(a, b string) int {
 				cost = 0
 			}
 
-			curr[j] = minInt(
-				prev[j]+1,      // deletion
-				curr[j-1]+1,    // insertion
-				prev[j-1]+cost, // substitution
+			curr[j] = min(
+				min(prev[j]+1, curr[j-1]+1),
+				prev[j-1]+cost,
 			)
 		}
 
@@ -70,23 +69,6 @@ func editDistance(a, b string) int {
 	}
 
 	return prev[bLen]
-}
-
-// minInt returns the minimum of three integers.
-func minInt(a, b, c int) int {
-	if a < b {
-		if a < c {
-			return a
-		}
-
-		return c
-	}
-
-	if b < c {
-		return b
-	}
-
-	return c
 }
 
 // GenerateHelp generates help text for all flags.
