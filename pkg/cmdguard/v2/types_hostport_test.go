@@ -21,9 +21,7 @@ func TestHostPort(t *testing.T) {
 		if hp.Host() != "localhost" {
 			t.Errorf("Host() = %q, want %q", hp.Host(), "localhost")
 		}
-		if hp.Port().Int() != 8080 {
-			t.Errorf("Port().Int() = %d, want %d", hp.Port().Int(), 8080)
-		}
+		testHostPortPortInt(t, hp, 8080)
 	})
 
 	t.Run("ParseHostPort any host", func(t *testing.T) {
@@ -40,19 +38,24 @@ func TestHostPort(t *testing.T) {
 		}
 	})
 
-	t.Run("ParseHostPort empty", func(t *testing.T) {
+	t.Run("ParseHostPort error cases", func(t *testing.T) {
 		t.Parallel()
-		_, err := v2.ParseHostPort("")
-		if err == nil {
-			t.Fatal("expected error for empty host:port")
+		tests := []struct {
+			name  string
+			input string
+		}{
+			{"empty", ""},
+			{"invalid", "not-valid"},
 		}
-	})
-
-	t.Run("ParseHostPort invalid", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParseHostPort("not-valid")
-		if err == nil {
-			t.Fatal("expected error for invalid host:port")
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+				testParseError(
+					t,
+					func() (v2.HostPort, error) { return v2.ParseHostPort(tt.input) },
+					"host:port",
+				)
+			})
 		}
 	})
 
@@ -65,9 +68,7 @@ func TestHostPort(t *testing.T) {
 		if hp.Host() != "example.com" {
 			t.Errorf("Host() = %q, want %q", hp.Host(), "example.com")
 		}
-		if hp.Port().Int() != 443 {
-			t.Errorf("Port().Int() = %d, want %d", hp.Port().Int(), 443)
-		}
+		testHostPortPortInt(t, hp, 443)
 	})
 
 	t.Run("MustParseHostPort valid", func(t *testing.T) {
@@ -76,19 +77,12 @@ func TestHostPort(t *testing.T) {
 		if hp.Host() != "127.0.0.1" {
 			t.Errorf("Host() = %q, want %q", hp.Host(), "127.0.0.1")
 		}
-		if hp.Port().Int() != 3000 {
-			t.Errorf("Port().Int() = %d, want %d", hp.Port().Int(), 3000)
-		}
+		testHostPortPortInt(t, hp, 3000)
 	})
 
 	t.Run("MustParseHostPort panic", func(t *testing.T) {
 		t.Parallel()
-		defer func() {
-			if r := recover(); r == nil {
-				t.Fatal("expected panic for invalid host:port")
-			}
-		}()
-		v2.MustParseHostPort("invalid")
+		testMustParsePanics(t, v2.MustParseHostPort, "host:port")
 	})
 
 	t.Run("HostPort IsEmpty", func(t *testing.T) {
@@ -121,8 +115,6 @@ func TestHostPort(t *testing.T) {
 		if hp.Host() != "localhost" {
 			t.Errorf("Host() = %q, want %q", hp.Host(), "localhost")
 		}
-		if hp.Port().Int() != 9090 {
-			t.Errorf("Port().Int() = %d, want %d", hp.Port().Int(), 9090)
-		}
+		testHostPortPortInt(t, hp, 9090)
 	})
 }

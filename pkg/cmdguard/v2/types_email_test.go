@@ -29,19 +29,24 @@ func TestEmail(t *testing.T) {
 		}
 	})
 
-	t.Run("ParseEmail empty", func(t *testing.T) {
+	t.Run("ParseEmail error cases", func(t *testing.T) {
 		t.Parallel()
-		_, err := v2.ParseEmail("")
-		if err == nil {
-			t.Fatal("expected error for empty email")
+		tests := []struct {
+			name  string
+			input string
+		}{
+			{"empty", ""},
+			{"invalid", "not-an-email"},
 		}
-	})
-
-	t.Run("ParseEmail invalid", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParseEmail("not-an-email")
-		if err == nil {
-			t.Fatal("expected error for invalid email")
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+				testParseError(
+					t,
+					func() (v2.Email, error) { return v2.ParseEmail(tt.input) },
+					"email",
+				)
+			})
 		}
 	})
 
@@ -55,12 +60,7 @@ func TestEmail(t *testing.T) {
 
 	t.Run("MustParseEmail panic", func(t *testing.T) {
 		t.Parallel()
-		defer func() {
-			if r := recover(); r == nil {
-				t.Fatal("expected panic for invalid email")
-			}
-		}()
-		v2.MustParseEmail("invalid")
+		testMustParsePanics(t, v2.MustParseEmail, "email")
 	})
 
 	t.Run("Email IsEmpty", func(t *testing.T) {

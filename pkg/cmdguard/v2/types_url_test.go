@@ -35,27 +35,21 @@ func TestURL(t *testing.T) {
 		}
 	})
 
-	t.Run("ParseURL empty", func(t *testing.T) {
+	t.Run("ParseURL error cases", func(t *testing.T) {
 		t.Parallel()
-		_, err := v2.ParseURL("")
-		if err == nil {
-			t.Fatal("expected error for empty URL")
+		tests := []struct {
+			name  string
+			input string
+		}{
+			{"empty", ""},
+			{"missing scheme", "example.com/path"},
+			{"missing host", "http:///path"},
 		}
-	})
-
-	t.Run("ParseURL missing scheme", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParseURL("example.com/path")
-		if err == nil {
-			t.Fatal("expected error for URL without scheme")
-		}
-	})
-
-	t.Run("ParseURL missing host", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParseURL("http:///path")
-		if err == nil {
-			t.Fatal("expected error for URL without host")
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+				testParseError(t, func() (v2.URL, error) { return v2.ParseURL(tt.input) }, "URL")
+			})
 		}
 	})
 
@@ -69,12 +63,7 @@ func TestURL(t *testing.T) {
 
 	t.Run("MustParseURL panic", func(t *testing.T) {
 		t.Parallel()
-		defer func() {
-			if r := recover(); r == nil {
-				t.Fatal("expected panic for invalid URL")
-			}
-		}()
-		v2.MustParseURL("")
+		testMustParsePanics(t, v2.MustParseURL, "URL")
 	})
 
 	t.Run("URL IsEmpty", func(t *testing.T) {

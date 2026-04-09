@@ -23,68 +23,47 @@ func TestPort(t *testing.T) {
 		}
 	})
 
-	t.Run("ParsePort named http", func(t *testing.T) {
+	t.Run("ParsePort named", func(t *testing.T) {
 		t.Parallel()
-		p, err := v2.ParsePort("http")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
+		tests := []struct {
+			name     string
+			input    string
+			expected int
+		}{
+			{"http", "http", 80},
+			{"https", "https", 443},
+			{"ssh", "ssh", 22},
 		}
-		if p.Int() != 80 {
-			t.Errorf("Int() = %d, want %d", p.Int(), 80)
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+				p, err := v2.ParsePort(tt.input)
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				if p.Int() != tt.expected {
+					t.Errorf("Int() = %d, want %d", p.Int(), tt.expected)
+				}
+			})
 		}
 	})
 
-	t.Run("ParsePort named https", func(t *testing.T) {
+	t.Run("ParsePort error cases", func(t *testing.T) {
 		t.Parallel()
-		p, err := v2.ParsePort("https")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
+		tests := []struct {
+			name  string
+			input string
+		}{
+			{"empty", ""},
+			{"out of range", "70000"},
+			{"zero", "0"},
+			{"negative", "-1"},
 		}
-		if p.Int() != 443 {
-			t.Errorf("Int() = %d, want %d", p.Int(), 443)
-		}
-	})
-
-	t.Run("ParsePort named ssh", func(t *testing.T) {
-		t.Parallel()
-		p, err := v2.ParsePort("ssh")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if p.Int() != 22 {
-			t.Errorf("Int() = %d, want %d", p.Int(), 22)
-		}
-	})
-
-	t.Run("ParsePort empty", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParsePort("")
-		if err == nil {
-			t.Fatal("expected error for empty port")
-		}
-	})
-
-	t.Run("ParsePort out of range", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParsePort("70000")
-		if err == nil {
-			t.Fatal("expected error for out of range port")
-		}
-	})
-
-	t.Run("ParsePort zero", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParsePort("0")
-		if err == nil {
-			t.Fatal("expected error for port 0")
-		}
-	})
-
-	t.Run("ParsePort negative", func(t *testing.T) {
-		t.Parallel()
-		_, err := v2.ParsePort("-1")
-		if err == nil {
-			t.Fatal("expected error for negative port")
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+				testParseError(t, func() (v2.Port, error) { return v2.ParsePort(tt.input) }, "port")
+			})
 		}
 	})
 
@@ -101,10 +80,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("PortFromInt invalid", func(t *testing.T) {
 		t.Parallel()
-		_, err := v2.PortFromInt(70000)
-		if err == nil {
-			t.Fatal("expected error for out of range port")
-		}
+		testParseError(t, func() (v2.Port, error) { return v2.PortFromInt(70000) }, "port")
 	})
 
 	t.Run("Port IsValid", func(t *testing.T) {
@@ -153,12 +129,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("MustParsePort panic", func(t *testing.T) {
 		t.Parallel()
-		defer func() {
-			if r := recover(); r == nil {
-				t.Fatal("expected panic for invalid port")
-			}
-		}()
-		v2.MustParsePort("invalid")
+		testMustParsePanics(t, v2.MustParsePort, "port")
 	})
 
 	t.Run("Port MarshalText", func(t *testing.T) {

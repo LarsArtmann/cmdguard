@@ -20,6 +20,15 @@ func newTestCommand() Command[testConfig, NoFlags] {
 	}
 }
 
+func newTestSubcommand(use string) Command[testConfig, NoFlags] {
+	return Command[testConfig, NoFlags]{
+		Use: use,
+		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+			return nil
+		},
+	}
+}
+
 func TestCommand_Validate(t *testing.T) {
 	t.Parallel()
 	t.Run("valid command with RunE", func(t *testing.T) {
@@ -37,12 +46,7 @@ func TestCommand_Validate(t *testing.T) {
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
-				{
-					Use: "sub",
-					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-						return nil
-					},
-				},
+				newTestSubcommand("sub"),
 			},
 		}
 
@@ -99,15 +103,8 @@ func TestCommand_Validate(t *testing.T) {
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
-				{
-					Use: "valid-sub",
-					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-						return nil
-					},
-				},
-				{
-					Use: "invalid-sub",
-				},
+				newTestSubcommand("valid-sub"),
+				{Use: "invalid-sub"},
 			},
 		}
 
@@ -130,18 +127,8 @@ func TestCommand_Validate(t *testing.T) {
 		cmd := Command[testConfig, NoFlags]{
 			Use: "root",
 			Commands: []Command[testConfig, NoFlags]{
-				{
-					Use: "duplicate",
-					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-						return nil
-					},
-				},
-				{
-					Use: "duplicate",
-					RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-						return nil
-					},
-				},
+				newTestSubcommand("duplicate"),
+				newTestSubcommand("duplicate"),
 			},
 		}
 

@@ -167,9 +167,5 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 		}
 	})
 
-	t.Run("unmarshal invalid", func(t *testing.T) {
-		t.Parallel()
-		var c config
-		expectUnmarshalError(t, &c, `{"timeout":"invalid"}`)
-	})
+	runUnmarshalErrorTest[config](t, "unmarshal invalid", `{"timeout":"invalid"}`)
 }

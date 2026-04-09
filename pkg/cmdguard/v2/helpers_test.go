@@ -263,11 +263,7 @@ func TestLogLevel_MarshalUnmarshal(t *testing.T) {
 		func() string { return c1.Value.String() },
 	)
 
-	t.Run("unmarshal invalid", func(t *testing.T) {
-		t.Parallel()
-		var c config
-		expectUnmarshalError(t, &c, `{"value":"trace"}`)
-	})
+	runUnmarshalErrorTest[config](t, "unmarshal invalid", `{"value":"trace"}`)
 }
 
 func TestLogFormat_MarshalUnmarshal(t *testing.T) {
@@ -302,11 +298,7 @@ func TestLogFormat_MarshalUnmarshal(t *testing.T) {
 		func() string { return c2.Value.String() },
 	)
 
-	t.Run("unmarshal invalid", func(t *testing.T) {
-		t.Parallel()
-		var c config
-		expectUnmarshalError(t, &c, `{"value":"xml"}`)
-	})
+	runUnmarshalErrorTest[config](t, "unmarshal invalid", `{"value":"xml"}`)
 }
 
 // expectUnmarshalError tests that unmarshaling invalid JSON returns an error.
@@ -316,6 +308,15 @@ func expectUnmarshalError(t *testing.T, target any, jsonStr string) {
 	if err == nil {
 		t.Error("expected error, got nil")
 	}
+}
+
+// runUnmarshalErrorTest runs an unmarshal error test with the given name and JSON.
+func runUnmarshalErrorTest[T any](t *testing.T, name, jsonStr string) {
+	t.Run(name, func(t *testing.T) {
+		t.Parallel()
+		var c T
+		expectUnmarshalError(t, &c, jsonStr)
+	})
 }
 
 // expectUnmarshalValidString tests that unmarshaling valid JSON succeeds and the extracted string matches expected.
