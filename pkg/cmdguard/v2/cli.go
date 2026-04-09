@@ -170,15 +170,36 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	return nil
 }
 
+// prepareRunContext extracts context from cobra, parses flags, and returns both.
+func prepareRunContext[F any](
+	c *cobra.Command, cmdFlags F, registry *FlagRegistry, phase string,
+) (context.Context, F, error) {
+	ctx := c.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	flags, parseErr := cloneAndParseFlags(c, cmdFlags, registry)
+	if parseErr != nil {
+		var zero F
+		return ctx, zero, fmt.Errorf("parsing flags for %s: %w", phase, parseErr)
+	}
+
+	return ctx, flags, nil
+}
+
 func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, error) {
 	cobraCmd := &cobra.Command{
-		Use:        cmd.Use,
-		Short:      cmd.Short,
-		Long:       cmd.Long,
-		Aliases:    cmd.Aliases,
-		Hidden:     cmd.Hidden,
-		Deprecated: cmd.Deprecated,
-		Version:    cmd.Version,
+		Use:           cmd.Use,
+		Short:         cmd.Short,
+		Long:          cmd.Long,
+		Example:       cmd.Example,
+		Aliases:       cmd.Aliases,
+		Hidden:        cmd.Hidden,
+		Deprecated:    cmd.Deprecated,
+		Version:       cmd.Version,
+		SilenceErrors: cmd.SilenceErrors,
+		SilenceUsage:  cmd.SilenceUsage,
 	}
 
 	var (
@@ -206,50 +227,42 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 	}
 
 	if cmd.RunE != nil {
+		handler := cmd.RunE
 		cobraCmd.RunE = func(c *cobra.Command, _ []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
+			ctx, flags, err := prepareRunContext(c, cmd.Flags, flagRegistry, "command "+cmd.Use)
+			if err != nil {
+				return err
 			}
 
-			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
-			if parseErr != nil {
-				return fmt.Errorf("parsing flags for command %q: %w", cmd.Use, parseErr)
-			}
-
-			return cmd.RunE(ctx, config, flags)
+			return handler(ctx, config, flags)
 		}
 	}
 
 	if cmd.PreRunE != nil {
+		handler := cmd.PreRunE
 		cobraCmd.PreRunE = func(c *cobra.Command, _ []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
+			ctx, flags, err := prepareRunContext(
+				c, cmd.Flags, flagRegistry, "pre-run of command "+cmd.Use,
+			)
+			if err != nil {
+				return err
 			}
 
-			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
-			if parseErr != nil {
-				return fmt.Errorf("parsing flags for pre-run of command %q: %w", cmd.Use, parseErr)
-			}
-
-			return cmd.PreRunE(ctx, config, flags)
+			return handler(ctx, config, flags)
 		}
 	}
 
 	if cmd.PostRunE != nil {
+		handler := cmd.PostRunE
 		cobraCmd.PostRunE = func(c *cobra.Command, _ []string) error {
-			ctx := c.Context()
-			if ctx == nil {
-				ctx = context.Background()
+			ctx, flags, err := prepareRunContext(
+				c, cmd.Flags, flagRegistry, "post-run of command "+cmd.Use,
+			)
+			if err != nil {
+				return err
 			}
 
-			flags, parseErr := cloneAndParseFlags(c, cmd.Flags, flagRegistry)
-			if parseErr != nil {
-				return fmt.Errorf("parsing flags for post-run of command %q: %w", cmd.Use, parseErr)
-			}
-
-			return cmd.PostRunE(ctx, config, flags)
+			return handler(ctx, config, flags)
 		}
 	}
 
