@@ -90,7 +90,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	cli.registry = registry
 
-	err = registry.RegisterFlags(cli.rootCmd)
+	err = registry.RegisterPersistentFlags(cli.rootCmd)
 	if err != nil {
 		return fmt.Errorf("registering global flags for %T: %w", defaults, err)
 	}

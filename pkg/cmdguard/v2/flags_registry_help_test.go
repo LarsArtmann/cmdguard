@@ -91,7 +91,7 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		flags := cmd.PersistentFlags()
+		flags := cmd.Flags()
 
 		nameFlag := flags.Lookup("name")
 		if nameFlag == nil {
@@ -139,7 +139,7 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		flag := cmd.PersistentFlags().Lookup("workers")
+		flag := cmd.Flags().Lookup("workers")
 		if flag == nil {
 			t.Fatal("expected 'workers' flag to be registered")
 		}
@@ -167,7 +167,7 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		flag := cmd.PersistentFlags().Lookup("bytes")
+		flag := cmd.Flags().Lookup("bytes")
 		if flag == nil {
 			t.Fatal("expected 'bytes' flag to be registered")
 		}

@@ -32,9 +32,21 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 }
 
 // RegisterFlags adds flags to a cobra command based on the config struct.
+// Flags are registered as local (non-persistent) — they only apply to this command.
 func (r *FlagRegistry) RegisterFlags(cmd *cobra.Command) error {
+	return r.registerAllFlags(cmd.Flags(), cmd)
+}
+
+// RegisterPersistentFlags adds flags as persistent — they propagate to all subcommands.
+// Use this for root-level config flags that must be available on every command.
+func (r *FlagRegistry) RegisterPersistentFlags(cmd *cobra.Command) error {
+	return r.registerAllFlags(cmd.PersistentFlags(), cmd)
+}
+
+// registerAllFlags registers all flags to the given flag set.
+func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Command) error {
 	for _, tag := range r.tags {
-		err := r.registerFlag(cmd, tag)
+		err := r.registerFlag(flagSet, tag)
 		if err != nil {
 			return fmt.Errorf("registering flags on command %q: %w", cmd.Use, err)
 		}
@@ -43,9 +55,8 @@ func (r *FlagRegistry) RegisterFlags(cmd *cobra.Command) error {
 	return nil
 }
 
-// registerFlag adds a single flag to the command.
-func (r *FlagRegistry) registerFlag(cmd *cobra.Command, tag FlagTag) error {
-	flags := cmd.PersistentFlags()
+// registerFlag adds a single flag to the given flag set.
+func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
 
 	switch tag.Type.Kind() {
 	case reflect.String:

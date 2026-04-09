@@ -27,7 +27,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("level", "debug"); err != nil {
+		if err := cmd.Flags().Set("level", "debug"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -59,7 +59,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("level", "invalid"); err != nil {
+		if err := cmd.Flags().Set("level", "invalid"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -91,7 +91,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("mode", "invalid"); err != nil {
+		if err := cmd.Flags().Set("mode", "invalid"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -119,7 +119,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("format", "json"); err != nil {
+		if err := cmd.Flags().Set("format", "json"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -151,7 +151,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("format", "invalid"); err != nil {
+		if err := cmd.Flags().Set("format", "invalid"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 

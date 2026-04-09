@@ -27,7 +27,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("name", "custom"); err != nil {
+		if err := cmd.Flags().Set("name", "custom"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -59,7 +59,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("verbose", "true"); err != nil {
+		if err := cmd.Flags().Set("verbose", "true"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -91,7 +91,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("count", "42"); err != nil {
+		if err := cmd.Flags().Set("count", "42"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -123,7 +123,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("workers", "10"); err != nil {
+		if err := cmd.Flags().Set("workers", "10"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -155,7 +155,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("max-bytes", "18446744073709551615"); err != nil {
+		if err := cmd.Flags().Set("max-bytes", "18446744073709551615"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -187,7 +187,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("alpha", "0.5"); err != nil {
+		if err := cmd.Flags().Set("alpha", "0.5"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -219,7 +219,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 			t.Fatalf("expected no error registering flags, got: %v", err)
 		}
 
-		if err := cmd.PersistentFlags().Set("timeout", "5m30s"); err != nil {
+		if err := cmd.Flags().Set("timeout", "5m30s"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 

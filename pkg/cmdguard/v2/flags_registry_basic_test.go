@@ -101,7 +101,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		flags := cmd.PersistentFlags()
+		flags := cmd.Flags()
 		if flags.Lookup("string") == nil {
 			t.Error("expected 'string' flag to be registered")
 		}
@@ -150,11 +150,11 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if cmd.PersistentFlags().Lookup("level") == nil {
+		if cmd.Flags().Lookup("level") == nil {
 			t.Error("expected 'level' flag to be registered")
 		}
 
-		if cmd.PersistentFlags().Lookup("format") == nil {
+		if cmd.Flags().Lookup("format") == nil {
 			t.Error("expected 'format' flag to be registered")
 		}
 	})
@@ -177,7 +177,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		flag := cmd.PersistentFlags().Lookup("timeout")
+		flag := cmd.Flags().Lookup("timeout")
 		if flag == nil {
 			t.Fatal("expected 'timeout' flag to be registered")
 		}
@@ -205,7 +205,7 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		flag := cmd.PersistentFlags().Lookup("mode")
+		flag := cmd.Flags().Lookup("mode")
 		if flag == nil {
 			t.Fatal("expected 'mode' flag to be registered")
 		}

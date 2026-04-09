@@ -30,7 +30,7 @@ func setFlagAndAssertValid(
 	flagName, flagValue string,
 ) {
 	t.Helper()
-	if err := cmd.PersistentFlags().Set(flagName, flagValue); err != nil {
+	if err := cmd.Flags().Set(flagName, flagValue); err != nil {
 		t.Fatalf("expected no error setting flag, got: %v", err)
 	}
 	if err := registry.ValidateFlags(cmd); err != nil {
@@ -48,7 +48,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
-		if err := cmd.PersistentFlags().Set("mode", "staging"); err != nil {
+		if err := cmd.Flags().Set("mode", "staging"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
@@ -67,7 +67,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Manually set an invalid value (bypassing validation)
-		if err := cmd.PersistentFlags().Set("mode", "invalid"); err != nil {
+		if err := cmd.Flags().Set("mode", "invalid"); err != nil {
 			t.Fatalf("expected no error setting flag, got: %v", err)
 		}
 
