@@ -57,7 +57,6 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 
 // registerFlag adds a single flag to the given flag set.
 func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
-
 	switch tag.Type.Kind() {
 	case reflect.String:
 		r.addStringFlag(flags, tag)
