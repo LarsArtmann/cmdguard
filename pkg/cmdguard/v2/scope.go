@@ -60,7 +60,8 @@ func (s *Scope) Injector() do.Injector {
 }
 
 // Provide registers a service provider in this scope.
-// Returns an error if registration fails.
+// The provider is invoked lazily on first Invoke call.
+// Returns an error only if scope is nil.
 func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil, provider=%T", ErrInvalidScope, provider)
@@ -73,7 +74,7 @@ func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 
 // ProvideNamed registers a named service provider in this scope.
 // Use this when you need to register multiple implementations of the same interface.
-// Returns an error if registration fails.
+// Returns an error only if scope is nil.
 func ProvideNamed[T any](scope *Scope, name string, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil, name=%q, provider=%T", ErrInvalidScope, name, provider)
@@ -86,6 +87,7 @@ func ProvideNamed[T any](scope *Scope, name string, provider func(do.Injector) (
 
 // ProvideValue registers a value directly in this scope.
 // Useful for registering already-constructed services.
+// Returns an error only if scope is nil.
 func ProvideValue[T any](scope *Scope, value T) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil, value type=%T", ErrInvalidScope, value)
