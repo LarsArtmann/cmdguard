@@ -54,6 +54,8 @@ func NewLoggerWriter(format, level string, w io.Writer) *slog.Logger {
 	switch logFormat {
 	case FormatJSON:
 		handler = slog.NewJSONHandler(w, opts)
+	case FormatText:
+		handler = slog.NewTextHandler(w, opts)
 	default:
 		handler = slog.NewTextHandler(w, opts)
 	}
