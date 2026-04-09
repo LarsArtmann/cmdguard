@@ -312,6 +312,7 @@ func expectUnmarshalError(t *testing.T, target any, jsonStr string) {
 
 // runUnmarshalErrorTest runs an unmarshal error test with the given name and JSON.
 func runUnmarshalErrorTest[T any](t *testing.T, name, jsonStr string) {
+	t.Helper()
 	t.Run(name, func(t *testing.T) {
 		t.Parallel()
 		var c T

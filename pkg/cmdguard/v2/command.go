@@ -49,7 +49,7 @@ type Command[T any, F any] struct {
 	PreRunE func(ctx context.Context, cfg *T, flags F) error
 
 	// PostRunE is called after RunE for cleanup.
-	// Called even if RunE returns an error.
+	// Only called if RunE succeeds (Cobra behavior).
 	PostRunE func(ctx context.Context, cfg *T, flags F) error
 
 	// Commands are subcommands of this command.
