@@ -45,15 +45,15 @@ This proposal migrates cmdguard's development environment and CI pipeline to **N
 
 The following tools are required to build, test, lint, and develop cmdguard:
 
-| Tool             | Version             | Source                    | Used By              |
-| ---------------- | ------------------- | ------------------------- | -------------------- |
-| Go               | 1.26 (go.mod)       | Manual / CI setup-go      | Build, test, run     |
-| golangci-lint    | 2.x (latest in CI)  | Manual / CI golangci-lint-action | Lint, format  |
-| just             | Latest (CI)         | Manual / CI setup-just    | Task runner          |
-| golines          | Latest (via gci)    | Implicit via golangci-lint| Code formatting      |
-| gci              | Latest              | Implicit via golangci-lint| Import ordering      |
-| gofumpt          | Latest              | Implicit via golangci-lint| Code formatting      |
-| goimports        | Latest              | Implicit via golangci-lint| Import management    |
+| Tool          | Version            | Source                           | Used By           |
+| ------------- | ------------------ | -------------------------------- | ----------------- |
+| Go            | 1.26 (go.mod)      | Manual / CI setup-go             | Build, test, run  |
+| golangci-lint | 2.x (latest in CI) | Manual / CI golangci-lint-action | Lint, format      |
+| just          | Latest (CI)        | Manual / CI setup-just           | Task runner       |
+| golines       | Latest (via gci)   | Implicit via golangci-lint       | Code formatting   |
+| gci           | Latest             | Implicit via golangci-lint       | Import ordering   |
+| gofumpt       | Latest             | Implicit via golangci-lint       | Code formatting   |
+| goimports     | Latest             | Implicit via golangci-lint       | Import management |
 
 ### 2.2 Build Targets (from justfile)
 
@@ -80,12 +80,12 @@ dogfood        → Self-validation checks
 
 ### 2.3 CI Pipeline (from `.github/workflows/ci.yml`)
 
-| Job        | Go Version(s)        | Steps                                              |
-| ---------- | -------------------- | -------------------------------------------------- |
-| `test`     | 1.24, 1.25, 1.26     | checkout → setup-go → cache → download → build → test → race → coverage |
-| `lint`     | 1.26                 | checkout → setup-go → golangci-lint-action (latest) |
-| `verify`   | 1.26                 | checkout → setup-go → setup-just → just verify     |
-| `examples` | 1.26                 | checkout → setup-go → go run basic → go run typed  |
+| Job        | Go Version(s)    | Steps                                                                   |
+| ---------- | ---------------- | ----------------------------------------------------------------------- |
+| `test`     | 1.24, 1.25, 1.26 | checkout → setup-go → cache → download → build → test → race → coverage |
+| `lint`     | 1.26             | checkout → setup-go → golangci-lint-action (latest)                     |
+| `verify`   | 1.26             | checkout → setup-go → setup-just → just verify                          |
+| `examples` | 1.26             | checkout → setup-go → go run basic → go run typed                       |
 
 ### 2.4 Key Observations
 
@@ -104,14 +104,14 @@ dogfood        → Self-validation checks
 
 ### 3.1 Problems Solved
 
-| Problem                              | Current State                                      | With Nix Flakes                          |
-| ------------------------------------ | -------------------------------------------------- | ---------------------------------------- |
-| Version drift between developers     | "Install Go 1.26, golangci-lint 2.x, just"        | `nix develop` — exact versions, locked   |
-| CI uses `latest` for golangci-lint   | Builds can break when upstream releases changes    | Pinned in flake.lock                     |
-| Onboarding friction                  | Multiple manual tool installations                 | Install Nix → `nix develop` → done      |
-| macOS vs Linux inconsistencies       | Different package managers, different versions     | Same derivation on both platforms        |
-| No unified `check` command           | Separate CI jobs with different setups             | `nix flake check` — all checks in one    |
-| Formatter not enforced               | `go fmt` manual; golangci-lint formatters separate | `nix fmt` for Nix; flake check for Go   |
+| Problem                            | Current State                                      | With Nix Flakes                        |
+| ---------------------------------- | -------------------------------------------------- | -------------------------------------- |
+| Version drift between developers   | "Install Go 1.26, golangci-lint 2.x, just"         | `nix develop` — exact versions, locked |
+| CI uses `latest` for golangci-lint | Builds can break when upstream releases changes    | Pinned in flake.lock                   |
+| Onboarding friction                | Multiple manual tool installations                 | Install Nix → `nix develop` → done     |
+| macOS vs Linux inconsistencies     | Different package managers, different versions     | Same derivation on both platforms      |
+| No unified `check` command         | Separate CI jobs with different setups             | `nix flake check` — all checks in one  |
+| Formatter not enforced             | `go fmt` manual; golangci-lint formatters separate | `nix fmt` for Nix; flake check for Go  |
 
 ### 3.2 What We Keep
 
@@ -167,17 +167,17 @@ flake.nix
 
 ### 4.3 Design Decisions
 
-| Decision                            | Choice                | Rationale                                           |
-| ----------------------------------- | --------------------- | --------------------------------------------------- |
-| Flake framework                     | Raw flake-utils       | Simple; no need for flake-parts complexity           |
-| Go version source                   | nixpkgs-unstable      | Go 1.26 may not be in stable nixpkgs                |
-| Library packaging                   | Skip                  | cmdguard is a Go library, not a distributable binary |
-| Example binary packaging            | Optional (Phase 2)    | Nice-to-have; not critical for dev workflow          |
-| Vendor hash management              | N/A (library)         | Only needed if building binaries with buildGoModule  |
-| Nix formatter                       | nixfmt-rfc-style      | Official Nix formatting standard                    |
-| Go formatting via Nix               | Via golangci-lint fmt | Respect existing .golangci.yml formatter config     |
-| direnv integration                  | Yes                   | Seamless shell activation on cd                     |
-| Replace CI or augment               | Augment               | Keep GitHub Actions; add Nix-based CI option        |
+| Decision                 | Choice                | Rationale                                            |
+| ------------------------ | --------------------- | ---------------------------------------------------- |
+| Flake framework          | Raw flake-utils       | Simple; no need for flake-parts complexity           |
+| Go version source        | nixpkgs-unstable      | Go 1.26 may not be in stable nixpkgs                 |
+| Library packaging        | Skip                  | cmdguard is a Go library, not a distributable binary |
+| Example binary packaging | Optional (Phase 2)    | Nice-to-have; not critical for dev workflow          |
+| Vendor hash management   | N/A (library)         | Only needed if building binaries with buildGoModule  |
+| Nix formatter            | nixfmt-rfc-style      | Official Nix formatting standard                     |
+| Go formatting via Nix    | Via golangci-lint fmt | Respect existing .golangci.yml formatter config      |
+| direnv integration       | Yes                   | Seamless shell activation on cd                      |
+| Replace CI or augment    | Augment               | Keep GitHub Actions; add Nix-based CI option         |
 
 ---
 
@@ -370,6 +370,7 @@ For projects that grow beyond a single `flake.nix`, extract checks into a separa
 ```
 
 Usage in `flake.nix`:
+
 ```nix
 checks = import ./nix/checks.nix { inherit pkgs self; };
 ```
@@ -382,14 +383,14 @@ checks = import ./nix/checks.nix { inherit pkgs self; };
 
 **Goal:** Get `nix develop` working with the correct toolchain.
 
-| Step | Action                                                                 | Verification                                  |
-| ---- | ---------------------------------------------------------------------- | --------------------------------------------- |
-| 1.1  | Create `flake.nix` with devShell only (no checks yet)                  | `nix develop` drops into shell with Go 1.26   |
-| 1.2  | Create `.envrc` with `use flake`                                       | `direnv allow` activates shell on `cd`        |
-| 1.3  | Add `flake.lock` to git                                                | `git add flake.nix flake.lock .envrc`         |
-| 1.4  | Verify `go build ./...` works inside devShell                          | `nix develop -c go build ./...`               |
-| 1.5  | Verify `just verify` works inside devShell                             | `nix develop -c just verify`                  |
-| 1.6  | Add `.direnv/` and `.envrc` to `.gitignore` if `.direnv/` not already | Check .gitignore                              |
+| Step | Action                                                                | Verification                                |
+| ---- | --------------------------------------------------------------------- | ------------------------------------------- |
+| 1.1  | Create `flake.nix` with devShell only (no checks yet)                 | `nix develop` drops into shell with Go 1.26 |
+| 1.2  | Create `.envrc` with `use flake`                                      | `direnv allow` activates shell on `cd`      |
+| 1.3  | Add `flake.lock` to git                                               | `git add flake.nix flake.lock .envrc`       |
+| 1.4  | Verify `go build ./...` works inside devShell                         | `nix develop -c go build ./...`             |
+| 1.5  | Verify `just verify` works inside devShell                            | `nix develop -c just verify`                |
+| 1.6  | Add `.direnv/` and `.envrc` to `.gitignore` if `.direnv/` not already | Check .gitignore                            |
 
 **Estimated time:** 1–2 hours
 
@@ -399,14 +400,14 @@ checks = import ./nix/checks.nix { inherit pkgs self; };
 
 **Goal:** `nix flake check` runs build + test + lint + formatting.
 
-| Step | Action                                                        | Verification                                     |
-| ---- | ------------------------------------------------------------- | ------------------------------------------------ |
-| 2.1  | Add `build` check to `flake.nix`                              | `nix flake check -L` passes build                |
-| 2.2  | Add `test` check (with race detector)                         | `nix flake check -L` passes tests                |
-| 2.3  | Add `lint` check (golangci-lint)                              | `nix flake check -L` passes lint                 |
-| 2.4  | Add `gofmt` check (golangci-lint fmt dry-run)                 | `nix flake check -L` passes formatting check     |
-| 2.5  | Add `formatting` check (treefmt for .nix)                     | `nix flake check -L` passes Nix formatting       |
-| 2.6  | Verify all checks pass together                               | `nix flake check -L` — all green                 |
+| Step | Action                                        | Verification                                 |
+| ---- | --------------------------------------------- | -------------------------------------------- |
+| 2.1  | Add `build` check to `flake.nix`              | `nix flake check -L` passes build            |
+| 2.2  | Add `test` check (with race detector)         | `nix flake check -L` passes tests            |
+| 2.3  | Add `lint` check (golangci-lint)              | `nix flake check -L` passes lint             |
+| 2.4  | Add `gofmt` check (golangci-lint fmt dry-run) | `nix flake check -L` passes formatting check |
+| 2.5  | Add `formatting` check (treefmt for .nix)     | `nix flake check -L` passes Nix formatting   |
+| 2.6  | Verify all checks pass together               | `nix flake check -L` — all green             |
 
 **Estimated time:** 1–2 hours
 
@@ -416,11 +417,11 @@ checks = import ./nix/checks.nix { inherit pkgs self; };
 
 **Goal:** `nix fmt` formats Nix files; `golangci-lint fmt` remains for Go files.
 
-| Step | Action                                          | Verification                              |
-| ---- | ------------------------------------------------ | ----------------------------------------- |
-| 3.1  | Configure treefmt with `nixfmt` in `flake.nix`  | `nix fmt` formats `.nix` files            |
-| 3.2  | Run `nix fmt` and verify output                 | `nix fmt && git diff —-stat` shows changes |
-| 3.3  | Commit formatted Nix files                      | `git commit`                              |
+| Step | Action                                         | Verification                               |
+| ---- | ---------------------------------------------- | ------------------------------------------ |
+| 3.1  | Configure treefmt with `nixfmt` in `flake.nix` | `nix fmt` formats `.nix` files             |
+| 3.2  | Run `nix fmt` and verify output                | `nix fmt && git diff —-stat` shows changes |
+| 3.3  | Commit formatted Nix files                     | `git commit`                               |
 
 **Estimated time:** 30 minutes
 
@@ -428,19 +429,19 @@ checks = import ./nix/checks.nix { inherit pkgs self; };
 
 **Goal:** Add Nix-based CI job alongside existing GitHub Actions.
 
-| Step | Action                                                                      | Verification                           |
-| ---- | --------------------------------------------------------------------------- | -------------------------------------- |
-| 4.1  | Add `nix-flake-check` job to `.github/workflows/ci.yml`                     | CI passes with new job                 |
-| 4.2  | Use `DeterminantSystems/nix-installer-action` or `cachix/install-nix-action` | Nix installs in CI                     |
-| 4.3  | Enable Cachix (optional) for CI caching                                     | Subsequent CI runs faster              |
-| 4.4  | Keep existing jobs (test matrix, lint, verify, examples) unchanged          | All existing jobs still pass           |
+| Step | Action                                                                       | Verification                 |
+| ---- | ---------------------------------------------------------------------------- | ---------------------------- |
+| 4.1  | Add `nix-flake-check` job to `.github/workflows/ci.yml`                      | CI passes with new job       |
+| 4.2  | Use `DeterminantSystems/nix-installer-action` or `cachix/install-nix-action` | Nix installs in CI           |
+| 4.3  | Enable Cachix (optional) for CI caching                                      | Subsequent CI runs faster    |
+| 4.4  | Keep existing jobs (test matrix, lint, verify, examples) unchanged           | All existing jobs still pass |
 
 **Estimated time:** 2–3 hours
 
 ### Phase 5: Polish
 
 | Step | Action                                                          | Verification                            |
-| ---- | ---------------------------------------------------------------- | --------------------------------------- |
+| ---- | --------------------------------------------------------------- | --------------------------------------- |
 | 5.1  | Update `.gitignore` with `.direnv/`                             | Nix artifacts not tracked               |
 | 5.2  | Update `AGENTS.md` with Nix commands                            | Documentation reflects new workflow     |
 | 5.3  | Update `CONTRIBUTING.md` with Nix setup instructions            | Contributors know how to use Nix        |
@@ -464,6 +465,7 @@ KEPT:    justfile, go.mod, go.sum, .golangci.yml, all .go files
 ```
 
 Contributors who don't use Nix continue to:
+
 - Install Go, golangci-lint, and just manually
 - Use `just verify`, `just test`, `just lint`
 - Run CI via existing GitHub Actions
@@ -525,29 +527,30 @@ The `vendorHash` would need updating whenever `go.sum` changes. Tools like `nix-
 
 ### 8.1 Technical Risks
 
-| Risk                                          | Likelihood | Impact | Mitigation                                                 |
-| --------------------------------------------- | ---------- | ------ | ---------------------------------------------------------- |
-| Go 1.26 not available in nixpkgs              | Medium     | High   | Use `nixpkgs-unstable`; create Go overlay if needed        |
-| golangci-lint v2 not in nixpkgs               | Low        | High   | Override with `buildGoModule` or use nixpkgs-unstable      |
-| `go build ./...` in Nix sandbox has network issues | Low   | Medium | Set `GOPROXY=off` and pre-fetch with `go mod download`     |
-| Build tags not working in Nix environment     | Low        | Low    | Pass `GOFLAGS=-tags=...` in check derivation               |
-| Race detector not available in Nix Go package | Very Low   | Medium | Verify with `go test -race` in devShell first              |
-| `golangci-lint fmt` requires `$HOME`          | Medium     | Low    | Set `HOME=$(mktemp -d)` in check derivation                |
+| Risk                                               | Likelihood | Impact | Mitigation                                             |
+| -------------------------------------------------- | ---------- | ------ | ------------------------------------------------------ |
+| Go 1.26 not available in nixpkgs                   | Medium     | High   | Use `nixpkgs-unstable`; create Go overlay if needed    |
+| golangci-lint v2 not in nixpkgs                    | Low        | High   | Override with `buildGoModule` or use nixpkgs-unstable  |
+| `go build ./...` in Nix sandbox has network issues | Low        | Medium | Set `GOPROXY=off` and pre-fetch with `go mod download` |
+| Build tags not working in Nix environment          | Low        | Low    | Pass `GOFLAGS=-tags=...` in check derivation           |
+| Race detector not available in Nix Go package      | Very Low   | Medium | Verify with `go test -race` in devShell first          |
+| `golangci-lint fmt` requires `$HOME`               | Medium     | Low    | Set `HOME=$(mktemp -d)` in check derivation            |
 
 ### 8.2 Adoption Risks
 
-| Risk                                          | Likelihood | Impact | Mitigation                                                 |
-| --------------------------------------------- | ---------- | ------ | ---------------------------------------------------------- |
-| Contributors unfamiliar with Nix              | High       | Low    | Keep non-Nix workflow; Nix is optional                     |
-| Nix daemon overhead on macOS                  | Low        | Low    | Document `nix-daemon` setup                                |
-| `flake.lock` conflicts in PRs                 | Medium     | Low    | Document update process: `nix flake update`                |
-| Longer CI times (Nix build overhead)          | Medium     | Medium | Use `magic-nix-cache-action` or Cachix                     |
+| Risk                                 | Likelihood | Impact | Mitigation                                  |
+| ------------------------------------ | ---------- | ------ | ------------------------------------------- |
+| Contributors unfamiliar with Nix     | High       | Low    | Keep non-Nix workflow; Nix is optional      |
+| Nix daemon overhead on macOS         | Low        | Low    | Document `nix-daemon` setup                 |
+| `flake.lock` conflicts in PRs        | Medium     | Low    | Document update process: `nix flake update` |
+| Longer CI times (Nix build overhead) | Medium     | Medium | Use `magic-nix-cache-action` or Cachix      |
 
 ### 8.3 Go 1.26 + Nix Specific Concerns
 
 1. **Go 1.26 release timing** — If Go 1.26 was released very recently, it may only be in `nixpkgs-unstable`. This is fine for a dev environment but may cause CI instability if the channel updates unexpectedly.
 
 2. **Overlay fallback** — If Go 1.26 is not available, an overlay can build it:
+
    ```nix
    goPkg = pkgs.go_1_26 or (pkgs.callPackage (
      { buildGo123Module, fetchFromGitHub }:
@@ -571,19 +574,19 @@ The `vendorHash` would need updating whenever `go.sum` changes. Tools like `nix-
 
 ## 9. Open Questions
 
-| #  | Question                                                               | Owner        | Decision Needed Before |
-| -- | ---------------------------------------------------------------------- | ------------ | ---------------------- |
-| 1  | Is Go 1.26 available in nixpkgs-unstable today?                       | Implementor  | Phase 1 start          |
-| 2  | Is golangci-lint v2 (major version 2) available in nixpkgs?           | Implementor  | Phase 2 start          |
-| 3  | Should we use `flake-parts` or raw `flake-utils`?                     | Maintainer   | Phase 1 start          |
-| 4  | Should we enable Cachix for CI caching?                                | Maintainer   | Phase 4 start          |
-| 5  | Should `nix flake check` eventually replace the existing CI matrix?   | Maintainer   | After Phase 4          |
-| 6  | Should example binaries be packaged as Nix packages?                   | Maintainer   | Phase 5 or later       |
-| 7  | Should we add `gomod2nix` for Go dependency management in Nix?        | Maintainer   | Phase 5 or later       |
-| 8  | Minimum Nix version required? (Flakes stable since Nix 2.4+)          | Implementor  | Phase 1 start          |
-| 9  | Should `.envrc` be committed or added to `.gitignore`?                 | Maintainer   | Phase 1                |
-| 10 | Should we use `nixfmt` or `alejandra` for Nix formatting?             | Implementor  | Phase 3                |
-| 11 | Do the experimental Go build tags affect Nix-built Go?                 | Implementor  | Phase 2                |
+| #   | Question                                                            | Owner       | Decision Needed Before |
+| --- | ------------------------------------------------------------------- | ----------- | ---------------------- |
+| 1   | Is Go 1.26 available in nixpkgs-unstable today?                     | Implementor | Phase 1 start          |
+| 2   | Is golangci-lint v2 (major version 2) available in nixpkgs?         | Implementor | Phase 2 start          |
+| 3   | Should we use `flake-parts` or raw `flake-utils`?                   | Maintainer  | Phase 1 start          |
+| 4   | Should we enable Cachix for CI caching?                             | Maintainer  | Phase 4 start          |
+| 5   | Should `nix flake check` eventually replace the existing CI matrix? | Maintainer  | After Phase 4          |
+| 6   | Should example binaries be packaged as Nix packages?                | Maintainer  | Phase 5 or later       |
+| 7   | Should we add `gomod2nix` for Go dependency management in Nix?      | Maintainer  | Phase 5 or later       |
+| 8   | Minimum Nix version required? (Flakes stable since Nix 2.4+)        | Implementor | Phase 1 start          |
+| 9   | Should `.envrc` be committed or added to `.gitignore`?              | Maintainer  | Phase 1                |
+| 10  | Should we use `nixfmt` or `alejandra` for Nix formatting?           | Implementor | Phase 3                |
+| 11  | Do the experimental Go build tags affect Nix-built Go?              | Implementor | Phase 2                |
 
 ---
 
@@ -653,13 +656,13 @@ nix eval github:NixOS/nixpkgs/nixpkgs-unstable#go.meta.version
 
 ## Appendix C: Commands Summary
 
-| Command                  | What It Does                                       |
-| ------------------------ | -------------------------------------------------- |
-| `nix develop`            | Enter dev shell with Go, golangci-lint, just       |
-| `nix develop -c just verify` | Run just verify inside Nix shell              |
-| `nix flake check -L`     | Run all checks (build, test, lint, format)         |
-| `nix flake check -L .#test` | Run only the test check                         |
-| `nix fmt`                | Format Nix files                                   |
-| `nix flake update`       | Update all flake inputs (nixpkgs, etc.)            |
-| `nix flake lock --update-input nixpkgs` | Update only nixpkgs                |
-| `direnv allow`           | Enable automatic shell activation on cd            |
+| Command                                 | What It Does                                 |
+| --------------------------------------- | -------------------------------------------- |
+| `nix develop`                           | Enter dev shell with Go, golangci-lint, just |
+| `nix develop -c just verify`            | Run just verify inside Nix shell             |
+| `nix flake check -L`                    | Run all checks (build, test, lint, format)   |
+| `nix flake check -L .#test`             | Run only the test check                      |
+| `nix fmt`                               | Format Nix files                             |
+| `nix flake update`                      | Update all flake inputs (nixpkgs, etc.)      |
+| `nix flake lock --update-input nixpkgs` | Update only nixpkgs                          |
+| `direnv allow`                          | Enable automatic shell activation on cd      |
