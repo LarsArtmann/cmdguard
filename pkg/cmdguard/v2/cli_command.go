@@ -39,69 +39,22 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 		SilenceUsage:  cmd.SilenceUsage,
 	}
 
-	var (
-		flagRegistry *FlagRegistry
-		err          error
+	flagRegistry, err := initCommandFlags(cobraCmd, cmd.Use, cmd.Flags)
+	if err != nil {
+		return nil, err
+	}
+
+	wireHandler(&cobraCmd.RunE, cmd.RunE, config, cmd.Flags, flagRegistry, "command "+cmd.Use)
+
+	wireHandler(
+		&cobraCmd.PreRunE, cmd.PreRunE, config, cmd.Flags, flagRegistry,
+		"pre-run of command "+cmd.Use,
 	)
 
-	if !isNoFlags(cmd.Flags) {
-		prototype := createFlagPrototype(cmd.Flags)
-		if !isNilPointer(prototype) {
-			flagRegistry, err = NewFlagRegistry(prototype)
-			if err != nil {
-				return nil, fmt.Errorf(
-					"failed to create flag registry for command %q: %w",
-					cmd.Use,
-					err,
-				)
-			}
-
-			err = flagRegistry.RegisterFlags(cobraCmd)
-			if err != nil {
-				return nil, fmt.Errorf("failed to register flags for command %q: %w", cmd.Use, err)
-			}
-		}
-	}
-
-	if cmd.RunE != nil {
-		handler := cmd.RunE
-		cobraCmd.RunE = func(c *cobra.Command, _ []string) error {
-			ctx, flags, err := prepareRunContext(c, cmd.Flags, flagRegistry, "command "+cmd.Use)
-			if err != nil {
-				return err
-			}
-
-			return handler(ctx, config, flags)
-		}
-	}
-
-	if cmd.PreRunE != nil {
-		handler := cmd.PreRunE
-		cobraCmd.PreRunE = func(c *cobra.Command, _ []string) error {
-			ctx, flags, err := prepareRunContext(
-				c, cmd.Flags, flagRegistry, "pre-run of command "+cmd.Use,
-			)
-			if err != nil {
-				return err
-			}
-
-			return handler(ctx, config, flags)
-		}
-	}
-
-	if cmd.PostRunE != nil {
-		handler := cmd.PostRunE
-		cobraCmd.PostRunE = func(c *cobra.Command, _ []string) error {
-			ctx, flags, err := prepareRunContext(
-				c, cmd.Flags, flagRegistry, "post-run of command "+cmd.Use,
-			)
-			if err != nil {
-				return err
-			}
-
-			return handler(ctx, config, flags)
-		}
-	}
+	wireHandler(
+		&cobraCmd.PostRunE, cmd.PostRunE, config, cmd.Flags, flagRegistry,
+		"post-run of command "+cmd.Use,
+	)
 
 	for _, subCmd := range cmd.Commands {
 		subCobraCmd, err := cliToCobraCommand(config, subCmd)
@@ -121,5 +74,50 @@ func isNoFlags[F any](flags F) bool {
 		return true
 	default:
 		return false
+	}
+}
+
+func initCommandFlags[F any](
+	cobraCmd *cobra.Command, use string, flags F,
+) (*FlagRegistry, error) {
+	if isNoFlags(flags) {
+		return (*FlagRegistry)(nil), nil
+	}
+
+	prototype := createFlagPrototype(flags)
+	if isNilPointer(prototype) {
+		return (*FlagRegistry)(nil), nil
+	}
+
+	registry, err := NewFlagRegistry(prototype)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create flag registry for command %q: %w", use, err)
+	}
+
+	err = registry.RegisterFlags(cobraCmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to register flags for command %q: %w", use, err)
+	}
+
+	return registry, nil
+}
+
+func wireHandler[T, F any](
+	target *func(*cobra.Command, []string) error,
+	handler func(context.Context, *T, F) error,
+	config *T, flags F, registry *FlagRegistry, phase string,
+) {
+	if handler == nil {
+		return
+	}
+
+	h := handler
+	*target = func(c *cobra.Command, _ []string) error {
+		ctx, parsed, err := prepareRunContext(c, flags, registry, phase)
+		if err != nil {
+			return err
+		}
+
+		return h(ctx, config, parsed)
 	}
 }
