@@ -2,6 +2,7 @@
 package logging
 
 import (
+	"io"
 	"log/slog"
 	"os"
 )
@@ -33,21 +34,28 @@ const (
 // NewLogger creates a new slog.Logger with the specified format and level.
 // Format can be "text" or "json". Defaults to text.
 // Level can be "debug", "info", "warn", "error". Defaults to info.
+// Writes to os.Stderr by default.
 func NewLogger(format, level string) *slog.Logger {
+	return NewLoggerWriter(format, level, os.Stderr)
+}
+
+// NewLoggerWriter creates a new slog.Logger writing to the given writer.
+// Falls back to text format for unrecognized formats.
+func NewLoggerWriter(format, level string, w io.Writer) *slog.Logger {
 	logLevel := ParseLevel(level).SlogLevel()
 	logFormat := ParseFormat(format)
-
-	var handler slog.Handler
 
 	opts := &slog.HandlerOptions{
 		Level: logLevel,
 	}
 
+	var handler slog.Handler
+
 	switch logFormat {
-	case FormatText:
-		handler = slog.NewTextHandler(os.Stderr, opts)
 	case FormatJSON:
-		handler = slog.NewJSONHandler(os.Stderr, opts)
+		handler = slog.NewJSONHandler(w, opts)
+	default:
+		handler = slog.NewTextHandler(w, opts)
 	}
 
 	return slog.New(handler)
