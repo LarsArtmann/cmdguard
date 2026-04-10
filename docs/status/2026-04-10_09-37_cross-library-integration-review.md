@@ -13,17 +13,17 @@
 
 **TL;DR — Recommendations:**
 
-| Library | Verdict | Priority |
-|---|---|---|
-| **go-output** | **INTEGRATE — High Priority** | P0 |
-| **go-business-rules** | **INTEGRATE — Medium Priority** | P1 |
-| **go-filewatcher** | **INTEGRATE — Low Priority** | P2 |
-| **gogenfilter** | **CONSIDER — Niche Use** | P3 |
-| **universal-workflow** | **DO NOT INTEGRATE** | — |
-| **go-cqrs-lite** | **DO NOT INTEGRATE** | — |
-| **go-localfirst** | **DO NOT INTEGRATE** | — |
-| **go-localsync** | **DO NOT INTEGRATE** | — |
-| **go-plugin-mvp** | **DO NOT INTEGRATE** | — |
+| Library                | Verdict                         | Priority |
+| ---------------------- | ------------------------------- | -------- |
+| **go-output**          | **INTEGRATE — High Priority**   | P0       |
+| **go-business-rules**  | **INTEGRATE — Medium Priority** | P1       |
+| **go-filewatcher**     | **INTEGRATE — Low Priority**    | P2       |
+| **gogenfilter**        | **CONSIDER — Niche Use**        | P3       |
+| **universal-workflow** | **DO NOT INTEGRATE**            | —        |
+| **go-cqrs-lite**       | **DO NOT INTEGRATE**            | —        |
+| **go-localfirst**      | **DO NOT INTEGRATE**            | —        |
+| **go-localsync**       | **DO NOT INTEGRATE**            | —        |
+| **go-plugin-mvp**      | **DO NOT INTEGRATE**            | —        |
 
 ---
 
@@ -33,7 +33,7 @@
 
 ### 1. go-output
 
-> *Multi-format output rendering (12 formats: table, JSON, CSV, Markdown, Mermaid, DOT, etc.)*
+> _Multi-format output rendering (12 formats: table, JSON, CSV, Markdown, Mermaid, DOT, etc.)_
 
 **Module:** `github.com/larsartmann/go-output`
 **Dependencies:** charm.land/lipgloss/v2, go-faster/yaml (minimal)
@@ -66,7 +66,7 @@ The existing `cmdguard/` bridge in go-output proves this was designed for integr
 
 ### 2. go-business-rules
 
-> *Severity-aware validation framework (Info/Warning/Error/Critical) with fluent rule builders*
+> _Severity-aware validation framework (Info/Warning/Error/Critical) with fluent rule builders_
 
 **Module:** `github.com/artmann/businessrules` (v1.1.0)
 **Dependencies:** ZERO runtime deps (only ginkgo/gomega for tests)
@@ -98,7 +98,7 @@ Not as a dependency, but as an **optional companion**. Add documentation showing
 
 ### 3. go-filewatcher
 
-> *High-level, composable file system watcher built on fsnotify*
+> _High-level, composable file system watcher built on fsnotify_
 
 **Module:** `github.com/larsartmann/go-filewatcher`
 **Dependencies:** fsnotify (1 direct dependency)
@@ -130,7 +130,7 @@ Good fit for a specific use case, but the proprietary license is a concern. If r
 
 ### 4. gogenfilter
 
-> *Detect and filter auto-generated Go code files (sqlc, templ, protobuf, mockgen, etc.)*
+> _Detect and filter auto-generated Go code files (sqlc, templ, protobuf, mockgen, etc.)_
 
 **Module:** `github.com/larsartmann/gogenfilter`
 **Dependencies:** go-faster/yaml (1 direct dependency)
@@ -163,7 +163,7 @@ Well-engineered but very niche for cmdguard. Only relevant if cmdguard adds code
 
 ### 5. universal-workflow
 
-> *DAG-based workflow orchestration with dependency resolution, parallel execution, and visualization*
+> _DAG-based workflow orchestration with dependency resolution, parallel execution, and visualization_
 
 **Module:** `github.com/LarsArtmann/universal-workflow`
 **Dependencies:** Heavy — bubbletea, lipgloss, cobra, koanf, watermill, samber/do, samber/mo, cockroachdb/errors, graph, otel, posthog, gorilla/websocket, ginkgo/gomega
@@ -194,7 +194,7 @@ Wrong domain, too heavy. If a cmdguard user needs workflow orchestration, they c
 
 ### 6. go-cqrs-lite
 
-> *Lightweight CQRS and Event Sourcing library with branded IDs and catalog generation*
+> _Lightweight CQRS and Event Sourcing library with branded IDs and catalog generation_
 
 **Module:** `github.com/larsartmann/go-cqrs-lite`
 **Dependencies:** 3 direct (google/uuid, cockroachdb/errors, go-json-experiment/json)
@@ -224,7 +224,7 @@ Excellent library, wrong home. go-cqrs-lite belongs in backend services, not CLI
 
 ### 7. go-localfirst
 
-> *Local-first application framework with CRDT sync, event sourcing, and embedded Pebble storage*
+> _Local-first application framework with CRDT sync, event sourcing, and embedded Pebble storage_
 
 **Module:** `github.com/larsartmann/go-localfirst`
 **Dependencies:** Heavy — gin, pebble, casbin, websocket, prometheus, samber/do, jwt, htmx, zap
@@ -252,7 +252,7 @@ go-localfirst is a reference application, not an importable library. The `pkg/sy
 
 ### 8. go-localsync
 
-> *Pluggable SDK for syncing data from external providers (GitHub, etc.) to local SQLite*
+> _Pluggable SDK for syncing data from external providers (GitHub, etc.) to local SQLite_
 
 **Module:** `github.com/larsartmann/go-localsync`
 **Dependencies:** sqlite, go-github, go-localfirst, go-composable-business-types, ginkgo/gomega
@@ -280,7 +280,7 @@ Solves a completely different problem. No integration point with cmdguard.
 
 ### 9. go-plugin-mvp
 
-> *WebAssembly plugin system with event-driven architecture*
+> _WebAssembly plugin system with event-driven architecture_
 
 **Module:** `github.com/larsartmann/go-plugin-mvp` (v0.1.0)
 **Dependencies:** extism/go-sdk, watermill, wazero, yaml
@@ -313,18 +313,18 @@ Interesting concept but premature and out of scope. If cmdguard ever adds a plug
 
 ### a) FULLY DONE
 
-| Task | Status |
-|---|---|
-| go-output exploration and analysis | Complete — README, go.mod, source files, cmdguard/ bridge |
-| universal-workflow exploration and analysis | Complete — README, go.mod, architecture, test coverage |
-| go-business-rules exploration and analysis | Complete — README, go.mod, all source files |
-| go-cqrs-lite exploration and analysis | Complete — README, go.mod, all packages |
-| go-localfirst exploration and analysis | Complete — README, go.mod, pkg/sync, architecture |
-| go-localsync exploration and analysis | Complete — README, go.mod, provider/storage interfaces |
-| go-plugin-mvp exploration and analysis | Complete — README, go.mod, plugin architecture, WASM |
-| go-filewatcher exploration and analysis | Complete — README, go.mod, options, filters, middleware |
-| gogenfilter exploration and analysis | Complete — README, go.mod, filter/detection logic |
-| Pro/Contra synthesis for all 9 libraries | Complete |
+| Task                                        | Status                                                    |
+| ------------------------------------------- | --------------------------------------------------------- |
+| go-output exploration and analysis          | Complete — README, go.mod, source files, cmdguard/ bridge |
+| universal-workflow exploration and analysis | Complete — README, go.mod, architecture, test coverage    |
+| go-business-rules exploration and analysis  | Complete — README, go.mod, all source files               |
+| go-cqrs-lite exploration and analysis       | Complete — README, go.mod, all packages                   |
+| go-localfirst exploration and analysis      | Complete — README, go.mod, pkg/sync, architecture         |
+| go-localsync exploration and analysis       | Complete — README, go.mod, provider/storage interfaces    |
+| go-plugin-mvp exploration and analysis      | Complete — README, go.mod, plugin architecture, WASM      |
+| go-filewatcher exploration and analysis     | Complete — README, go.mod, options, filters, middleware   |
+| gogenfilter exploration and analysis        | Complete — README, go.mod, filter/detection logic         |
+| Pro/Contra synthesis for all 9 libraries    | Complete                                                  |
 
 ### b) PARTIALLY DONE
 
@@ -332,12 +332,12 @@ Nothing partially done — all analyses are complete.
 
 ### c) NOT STARTED
 
-| Task | Notes |
-|---|---|
-| Actual integration code for go-output | Report recommends documenting, not code dependency |
-| Actual integration code for go-business-rules | Report recommends documenting pattern, not code dependency |
-| README updates in cmdguard for companion libraries | Follow-up task |
-| Example code showing cmdguard + go-output usage | Follow-up task |
+| Task                                               | Notes                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------- |
+| Actual integration code for go-output              | Report recommends documenting, not code dependency         |
+| Actual integration code for go-business-rules      | Report recommends documenting pattern, not code dependency |
+| README updates in cmdguard for companion libraries | Follow-up task                                             |
+| Example code showing cmdguard + go-output usage    | Follow-up task                                             |
 
 ### d) TOTALLY FUCKED UP
 
@@ -385,6 +385,7 @@ Nothing partially done — all analyses are complete.
 **What is the intended dependency direction between cmdguard and go-output?**
 
 The `go-output/cmdguard/` bridge already exists, but:
+
 - If cmdguard imports go-output → users who don't need output formatting pay the dependency cost
 - If go-output imports cmdguard → circular concern (currently avoided since go-output/cmdguard/ uses compatible types, not imports)
 - If neither imports the other → the bridge is documentation-only (current state)

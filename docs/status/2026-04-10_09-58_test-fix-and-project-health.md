@@ -15,15 +15,15 @@ This session continued from the cross-library integration review. The report was
 
 ## a) FULLY DONE
 
-| Task | Details | Verified |
-|---|---|---|
-| Cross-library integration review | 9 libraries analyzed, pro/contra written, committed at `4332903` | Yes — report on disk |
-| Fix `flags_validate_test.go:39` compilation error | `:=` → `=` for redeclared `err` in `setFlagAndAssertValid` helper | Yes — all tests pass |
-| Full test suite verification | 11/11 packages pass with `-race` | Yes — 0 failures |
-| Coverage report | v2: 87.7%, v1: 87.1%, errtypes: 100%, logging: 97.1%, config: 79.0% | Yes |
-| Build verification | `go build ./...` — clean | Yes |
-| Go vet | `go vet ./...` — clean | Yes |
-| Lint check | `golangci-lint run ./...` — 160 pre-existing issues (none new) | Yes |
+| Task                                              | Details                                                             | Verified             |
+| ------------------------------------------------- | ------------------------------------------------------------------- | -------------------- |
+| Cross-library integration review                  | 9 libraries analyzed, pro/contra written, committed at `4332903`    | Yes — report on disk |
+| Fix `flags_validate_test.go:39` compilation error | `:=` → `=` for redeclared `err` in `setFlagAndAssertValid` helper   | Yes — all tests pass |
+| Full test suite verification                      | 11/11 packages pass with `-race`                                    | Yes — 0 failures     |
+| Coverage report                                   | v2: 87.7%, v1: 87.1%, errtypes: 100%, logging: 97.1%, config: 79.0% | Yes                  |
+| Build verification                                | `go build ./...` — clean                                            | Yes                  |
+| Go vet                                            | `go vet ./...` — clean                                              | Yes                  |
+| Lint check                                        | `golangci-lint run ./...` — 160 pre-existing issues (none new)      | Yes                  |
 
 ### Test Results (All Passing)
 
@@ -43,33 +43,33 @@ ok  github.com/larsartmann/cmdguard/tests/integration         3.040s
 
 ### Coverage by Package
 
-| Package | Coverage |
-|---|---|
-| `pkg/errtypes` | 100.0% |
-| `internal/logging` | 97.1% |
-| `pkg/cmdguard/v2` | 87.7% |
-| `pkg/cmdguard` (v1) | 87.1% |
-| `internal/config` | 79.0% |
-| `examples/advanced-flags` | 42.2% |
-| `examples/basic` | 14.3% |
-| `examples/di` | 7.5% |
-| `examples/typed` | 3.6% |
+| Package                   | Coverage |
+| ------------------------- | -------- |
+| `pkg/errtypes`            | 100.0%   |
+| `internal/logging`        | 97.1%    |
+| `pkg/cmdguard/v2`         | 87.7%    |
+| `pkg/cmdguard` (v1)       | 87.1%    |
+| `internal/config`         | 79.0%    |
+| `examples/advanced-flags` | 42.2%    |
+| `examples/basic`          | 14.3%    |
+| `examples/di`             | 7.5%     |
+| `examples/typed`          | 3.6%     |
 
 ### Lint Breakdown (160 pre-existing issues)
 
-| Linter | Count | Scope |
-|---|---|---|
-| varnamelen | 50 | Short variable names in tests |
-| testpackage | 27 | Tests in internal test packages |
-| ireturn | 23 | Returning interfaces |
-| forbidigo | 20 | `fmt.Print*` in examples |
-| godoclint | 15 | Missing doc comments |
-| noinlineerr | 10 | Non-inlined errors |
-| tagalign | 8 | Struct tag alignment |
-| wsl_v5 | 2 | Whitespace/style |
-| tparallel | 2 | Missing t.Parallel() |
-| staticcheck | 1 | Static analysis |
-| gochecknoglobals | 2 | Global variables |
+| Linter           | Count | Scope                           |
+| ---------------- | ----- | ------------------------------- |
+| varnamelen       | 50    | Short variable names in tests   |
+| testpackage      | 27    | Tests in internal test packages |
+| ireturn          | 23    | Returning interfaces            |
+| forbidigo        | 20    | `fmt.Print*` in examples        |
+| godoclint        | 15    | Missing doc comments            |
+| noinlineerr      | 10    | Non-inlined errors              |
+| tagalign         | 8     | Struct tag alignment            |
+| wsl_v5           | 2     | Whitespace/style                |
+| tparallel        | 2     | Missing t.Parallel()            |
+| staticcheck      | 1     | Static analysis                 |
+| gochecknoglobals | 2     | Global variables                |
 
 **None of these are new.** The fix in `flags_validate_test.go` introduced zero new lint issues.
 
@@ -83,18 +83,18 @@ Nothing partially done. The test fix is complete and verified. The cross-library
 
 ## c) NOT STARTED
 
-| Task | Priority | Notes |
-|---|---|---|
-| Add "Output Formatting" section to README for go-output | P0 | Document existing `go-output/cmdguard/` bridge |
-| Create `examples/output-formats/` demo | P0 | cmdguard + go-output working example |
-| Verify go-output cmdguard bridge against v2.1 API | P0 | Compilation check |
-| Add "Validation" section to README for go-business-rules | P1 | PreRunE + businessrules pattern |
-| Create `examples/validation/` demo | P1 | cmdguard + go-business-rules example |
-| Consider `WithValidation()` option | P1 | Optional integration |
-| Address 160 pre-existing lint issues | P2 | Mostly style (varnamelen, testpackage, forbidigo) |
-| Improve example test coverage | P2 | Currently 3.6%–42.2% |
-| Tag go-output with v1.0.0 | P2 | External repo |
-| Address go-filewatcher/gogenfilter licensing | P3 | Proprietary → MIT for companion status |
+| Task                                                     | Priority | Notes                                             |
+| -------------------------------------------------------- | -------- | ------------------------------------------------- |
+| Add "Output Formatting" section to README for go-output  | P0       | Document existing `go-output/cmdguard/` bridge    |
+| Create `examples/output-formats/` demo                   | P0       | cmdguard + go-output working example              |
+| Verify go-output cmdguard bridge against v2.1 API        | P0       | Compilation check                                 |
+| Add "Validation" section to README for go-business-rules | P1       | PreRunE + businessrules pattern                   |
+| Create `examples/validation/` demo                       | P1       | cmdguard + go-business-rules example              |
+| Consider `WithValidation()` option                       | P1       | Optional integration                              |
+| Address 160 pre-existing lint issues                     | P2       | Mostly style (varnamelen, testpackage, forbidigo) |
+| Improve example test coverage                            | P2       | Currently 3.6%–42.2%                              |
+| Tag go-output with v1.0.0                                | P2       | External repo                                     |
+| Address go-filewatcher/gogenfilter licensing             | P3       | Proprietary → MIT for companion status            |
 
 ---
 
@@ -163,16 +163,17 @@ Nothing partially done. The test fix is complete and verified. The cross-library
 
 The `go-output/cmdguard/` bridge already exists and provides `EnumFlag[T]`, `OutputFormatFlag`, `ColorModeFlag`, `SortByFlag`. But the architectural model is unclear:
 
-| Option | Pros | Cons |
-|---|---|---|
-| **A: cmdguard imports go-output** | Tight integration, auto-discovery of formats | Users who don't need formatting pay the dep cost; adds lipgloss + yaml to cmdguard's tree |
-| **B: go-output imports cmdguard** | go-output knows cmdguard's types directly | go-output becomes coupled to cmdguard's API; circular concern |
-| **C: Neither imports the other (current)** | Zero coupling, both are independent | Bridge is documentation-only; users must discover it themselves; no compile-time guarantees |
-| **D: Separate `cmdguard-output` adapter module** | Clean separation; users opt-in explicitly | Another module to maintain; coordination overhead |
+| Option                                           | Pros                                         | Cons                                                                                        |
+| ------------------------------------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **A: cmdguard imports go-output**                | Tight integration, auto-discovery of formats | Users who don't need formatting pay the dep cost; adds lipgloss + yaml to cmdguard's tree   |
+| **B: go-output imports cmdguard**                | go-output knows cmdguard's types directly    | go-output becomes coupled to cmdguard's API; circular concern                               |
+| **C: Neither imports the other (current)**       | Zero coupling, both are independent          | Bridge is documentation-only; users must discover it themselves; no compile-time guarantees |
+| **D: Separate `cmdguard-output` adapter module** | Clean separation; users opt-in explicitly    | Another module to maintain; coordination overhead                                           |
 
-**Option C** is the current state. The bridge in `go-output/cmdguard/` does NOT import cmdguard — it provides types that are *compatible* with cmdguard's flag system by convention. This is clever but fragile.
+**Option C** is the current state. The bridge in `go-output/cmdguard/` does NOT import cmdguard — it provides types that are _compatible_ with cmdguard's flag system by convention. This is clever but fragile.
 
 **My recommendation:** Option C with enhanced documentation. The zero-coupling model is correct for cmdguard's "minimal dependencies" philosophy. But the bridge needs:
+
 - A compilation verification test in go-output's CI
 - Prominent documentation in cmdguard's README
 - A working example
@@ -183,31 +184,31 @@ The `go-output/cmdguard/` bridge already exists and provides `EnumFlag[T]`, `Out
 
 ## Session Metrics
 
-| Metric | Value |
-|---|---|
-| Commits this session | 1 (this one) |
-| Prior session commit | `4332903` — already on master |
-| Files modified | 1 (`flags_validate_test.go`) |
-| Lines changed | 1 (`:=` → `=`) |
-| Tests fixed | 1 compilation error → 0 failures |
-| Test packages passing | 11/11 |
-| Race detection | Enabled, clean |
-| New lint issues | 0 |
-| Build status | Clean |
-| Go vet | Clean |
+| Metric                | Value                            |
+| --------------------- | -------------------------------- |
+| Commits this session  | 1 (this one)                     |
+| Prior session commit  | `4332903` — already on master    |
+| Files modified        | 1 (`flags_validate_test.go`)     |
+| Lines changed         | 1 (`:=` → `=`)                   |
+| Tests fixed           | 1 compilation error → 0 failures |
+| Test packages passing | 11/11                            |
+| Race detection        | Enabled, clean                   |
+| New lint issues       | 0                                |
+| Build status          | Clean                            |
+| Go vet                | Clean                            |
 
 ---
 
 ## Project Health Dashboard
 
-| Check | Status |
-|---|---|
-| `go build ./...` | PASS |
-| `go vet ./...` | PASS |
-| `go test ./... -race` | PASS (11/11) |
-| `golangci-lint run` | 160 pre-existing issues, 0 new |
-| Cross-library review | Committed, awaiting decision on #1 question |
-| Uncommitted changes | 1 file: `flags_validate_test.go` fix |
+| Check                 | Status                                      |
+| --------------------- | ------------------------------------------- |
+| `go build ./...`      | PASS                                        |
+| `go vet ./...`        | PASS                                        |
+| `go test ./... -race` | PASS (11/11)                                |
+| `golangci-lint run`   | 160 pre-existing issues, 0 new              |
+| Cross-library review  | Committed, awaiting decision on #1 question |
+| Uncommitted changes   | 1 file: `flags_validate_test.go` fix        |
 
 ---
 
