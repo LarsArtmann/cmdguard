@@ -104,7 +104,13 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 	}
 }
 
-func registerAndSetFlag[T any](t *testing.T, registry *FlagRegistry, cmd *cobra.Command, cfg *T, flagName, flagValue string) {
+func registerAndSetFlag[T any](
+	t *testing.T,
+	registry *FlagRegistry,
+	cmd *cobra.Command,
+	cfg *T,
+	flagName, flagValue string,
+) {
 	t.Helper()
 	if err := registry.RegisterFlags(cmd); err != nil {
 		t.Fatalf("expected no error registering flags, got: %v", err)
@@ -119,7 +125,13 @@ func registerAndSetFlag[T any](t *testing.T, registry *FlagRegistry, cmd *cobra.
 	}
 }
 
-func registerAndParseInvalidFlag[T any](t *testing.T, registry *FlagRegistry, cmd *cobra.Command, cfg *T, flagName, flagValue string) {
+func registerAndParseInvalidFlag[T any](
+	t *testing.T,
+	registry *FlagRegistry,
+	cmd *cobra.Command,
+	cfg *T,
+	flagName, flagValue string,
+) {
 	t.Helper()
 	if err := registry.RegisterFlags(cmd); err != nil {
 		t.Fatalf("expected no error registering flags, got: %v", err)
