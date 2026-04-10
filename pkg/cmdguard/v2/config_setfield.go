@@ -57,6 +57,7 @@ func SetField(cfg any, fieldName string, value any) error {
 				ErrTypeConversion,
 			)
 		}
+
 		field.Set(reflect.ValueOf(FromDuration(duration)))
 
 		return nil
@@ -112,19 +113,25 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 func setStringField(field reflect.Value, str string) error {
 	switch field.Type() {
 	case reflect.TypeFor[LogLevel]():
-		if err := parseAndSetLogLevel(field, str); err != nil {
+		err := parseAndSetLogLevel(field, str)
+		if err != nil {
 			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
 		}
+
 		return nil
 	case reflect.TypeFor[LogFormat]():
-		if err := parseAndSetLogFormat(field, str); err != nil {
+		err := parseAndSetLogFormat(field, str)
+		if err != nil {
 			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
 		}
+
 		return nil
 	case reflect.TypeFor[Duration]():
-		if err := parseAndSetDuration(field, str); err != nil {
+		err := parseAndSetDuration(field, str)
+		if err != nil {
 			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
 		}
+
 		return nil
 	case reflect.TypeFor[Enum]():
 		field.Set(reflect.ValueOf(Enum{value: str}))

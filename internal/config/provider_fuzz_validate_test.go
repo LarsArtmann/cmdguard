@@ -154,5 +154,6 @@ func isValidEnvValue(s string) bool {
 			return false
 		}
 	}
+
 	return true
 }

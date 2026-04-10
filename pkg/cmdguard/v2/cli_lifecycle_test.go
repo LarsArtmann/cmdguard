@@ -11,6 +11,7 @@ func TestCLISetLong(t *testing.T) {
 	t.Parallel()
 	t.Run("updates long description", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -32,6 +33,7 @@ func TestCLISetVersion(t *testing.T) {
 	t.Parallel()
 	t.Run("updates version", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -49,6 +51,7 @@ func TestCLIAddGlobalFlag(t *testing.T) {
 	t.Parallel()
 	t.Run("adds global string flag", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -67,6 +70,7 @@ func TestCLIAddGlobalBoolFlag(t *testing.T) {
 	t.Parallel()
 	t.Run("adds global bool flag", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -85,6 +89,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 	t.Parallel()
 	t.Run("calls PreRunE and PostRunE", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -96,6 +101,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 			Use: "test",
 			PreRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				preRan = true
+
 				return nil
 			},
 			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
@@ -103,6 +109,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 			},
 			PostRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				postRan = true
+
 				return nil
 			},
 		}
@@ -131,13 +138,14 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 	t.Parallel()
 	t.Run("PreRunE receives parsed flags", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
 		type testFlags struct {
-			Name string `flag:"name" default:"default" help:"name"`
+			Name string `default:"default" flag:"name" help:"name"`
 		}
 
 		var receivedName string
@@ -147,6 +155,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 			Flags: testFlags{},
 			PreRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedName = f.Name
+
 				return nil
 			},
 			RunE: func(_ context.Context, _ *testCLIConfig, _ testFlags) error {
@@ -174,13 +183,14 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 	t.Parallel()
 	t.Run("PostRunE receives parsed flags", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
 		type testFlags struct {
-			Value string `flag:"value" default:"default" help:"value"`
+			Value string `default:"default" flag:"value" help:"value"`
 		}
 
 		var receivedValue string
@@ -193,6 +203,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 			},
 			PostRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedValue = f.Value
+
 				return nil
 			},
 		}
@@ -217,7 +228,9 @@ func TestWithCLIScope(t *testing.T) {
 	t.Parallel()
 	t.Run("sets custom scope", func(t *testing.T) {
 		t.Parallel()
+
 		customScope := v2.NewScope("custom")
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
 			v2.WithCLIScope[testCLIConfig](customScope))
 		if err != nil {
@@ -234,11 +247,15 @@ func TestCLIExecuteAndExit(t *testing.T) {
 	t.Parallel()
 	t.Run("calls ExecuteAndExit successfully", func(t *testing.T) {
 		t.Parallel()
+
 		cli, _ := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+
 		cmd := newTestCLICommand[testCLIConfig]("run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
+		err := v2.AddCommand(cli, cmd)
+		if err != nil {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
+
 		cli.ExecuteAndExit(t.Context())
 	})
 }

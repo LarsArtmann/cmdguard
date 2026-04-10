@@ -12,6 +12,7 @@ func TestScope_Shutdown(t *testing.T) {
 	t.Parallel()
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		t.Parallel()
+
 		scope := &Scope{injector: nil}
 
 		err := scope.Shutdown(t.Context())
@@ -22,6 +23,7 @@ func TestScope_Shutdown(t *testing.T) {
 
 	t.Run("shuts down successfully", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 		if err := ProvideValue(scope, "value"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
@@ -38,6 +40,7 @@ func TestScope_ShutdownAll(t *testing.T) {
 	t.Parallel()
 	t.Run("shuts down single scope", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("root")
 		if err := ProvideValue(scope, "value"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
@@ -51,6 +54,7 @@ func TestScope_ShutdownAll(t *testing.T) {
 
 	t.Run("shuts down scope hierarchy", func(t *testing.T) {
 		t.Parallel()
+
 		parent := NewScope("parent")
 		child := parent.Child("child")
 		grandchild := child.Child("grandchild")
@@ -78,6 +82,7 @@ func TestScope_HealthCheck(t *testing.T) {
 	t.Parallel()
 	t.Run("returns nil for nil injector", func(t *testing.T) {
 		t.Parallel()
+
 		scope := &Scope{injector: nil}
 
 		err := scope.HealthCheck()
@@ -88,6 +93,7 @@ func TestScope_HealthCheck(t *testing.T) {
 
 	t.Run("returns nil for healthy services", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 		if err := ProvideValue(scope, "value"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
@@ -110,6 +116,7 @@ func TestScope_ShutdownAll_WithError(t *testing.T) {
 	t.Parallel()
 	t.Run("accumulates errors from shutdown failures", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		do.Provide(scope.Injector(), func(_ do.Injector) (*failingShutdownService, error) {

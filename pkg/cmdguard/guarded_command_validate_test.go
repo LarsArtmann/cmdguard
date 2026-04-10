@@ -121,6 +121,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 
 func TestGuardedCommand_DefaultCommands(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name    string
 		cmdName string
@@ -132,6 +133,7 @@ func TestGuardedCommand_DefaultCommands(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			g := New("testapp", "Test")
 
 			if !hasSubcommand(g, tt.cmdName) {
@@ -145,6 +147,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 	t.Parallel()
 	t.Run("validates command tree successfully", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		// Add a valid command with subcommand
@@ -164,6 +167,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 
 	t.Run("returns error for invalid nested command", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		// Create a command tree with an invalid nested subcommand
@@ -191,6 +195,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 	t.Parallel()
 	t.Run("validates valid subcommands", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		parent := &cobra.Command{
@@ -211,6 +216,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 
 	t.Run("returns error for invalid subcommand", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		parent := &cobra.Command{
@@ -233,6 +239,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 
 	t.Run("validates nested subcommands", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		parent := &cobra.Command{
@@ -261,6 +268,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 	t.Parallel()
 	t.Run("version command executes", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		// Find version command
@@ -284,6 +292,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 	t.Run("validate command succeeds with valid tree", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		// Add a valid command
@@ -317,6 +326,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 
 	t.Run("validate command fails with invalid tree", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		// Manually add invalid command (bypassing guard)

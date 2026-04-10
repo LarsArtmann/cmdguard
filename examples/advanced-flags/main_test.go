@@ -11,6 +11,7 @@ import (
 
 func TestAdvancedFlags_CreateCLI(t *testing.T) {
 	t.Parallel()
+
 	cli, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
@@ -32,6 +33,7 @@ func TestAdvancedFlags_CreateCLI(t *testing.T) {
 
 func TestAdvancedFlags_ServerCommand(t *testing.T) {
 	t.Parallel()
+
 	cli, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
@@ -64,6 +66,7 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 
 func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 	t.Parallel()
+
 	cli, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",

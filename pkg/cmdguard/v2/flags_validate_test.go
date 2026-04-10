@@ -30,10 +30,14 @@ func setFlagAndAssertValid(
 	flagName, flagValue string,
 ) {
 	t.Helper()
-	if err := cmd.Flags().Set(flagName, flagValue); err != nil {
+
+	err := cmd.Flags().Set(flagName, flagValue)
+	if err != nil {
 		t.Fatalf("expected no error setting flag, got: %v", err)
 	}
-	if err := registry.ValidateFlags(cmd); err != nil {
+
+	err := registry.ValidateFlags(cmd)
+	if err != nil {
 		t.Errorf("expected no error, got: %v", err)
 	}
 }
@@ -42,6 +46,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 	t.Parallel()
 	t.Run("valid values pass", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -60,6 +65,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("invalid value returns error", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -83,6 +89,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 	t.Run("unchanged flag skips validation", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Mode string `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -101,12 +108,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		type TestConfig struct {
 			Name string `default:"default" flag:"name"`
 		}
+
 		registry, cmd := setupFlagTest(t, TestConfig{})
 		setFlagAndAssertValid(t, cmd, registry, "name", "anything")
 	}
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Name string `flag:"name" help:"required name" required:"true"`
 		}
@@ -133,12 +142,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		type TestConfig struct {
 			Name string `flag:"name" help:"required name" required:"true"`
 		}
+
 		registry, cmd := setupFlagTest(t, TestConfig{})
 		setFlagAndAssertValid(t, cmd, registry, "name", "test-value")
 	}
 
 	t.Run("required false does not enforce", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Name string `flag:"name" help:"optional name" required:"false"`
 		}

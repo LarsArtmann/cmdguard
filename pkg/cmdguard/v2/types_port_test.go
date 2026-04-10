@@ -11,13 +11,16 @@ func TestPort(t *testing.T) {
 
 	t.Run("ParsePort numeric", func(t *testing.T) {
 		t.Parallel()
+
 		p, err := v2.ParsePort("8080")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if p.Int() != 8080 {
 			t.Errorf("Int() = %d, want %d", p.Int(), 8080)
 		}
+
 		if p.String() != "8080" {
 			t.Errorf("String() = %q, want %q", p.String(), "8080")
 		}
@@ -25,6 +28,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("ParsePort named", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []struct {
 			name     string
 			input    string
@@ -37,10 +41,12 @@ func TestPort(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
+
 				p, err := v2.ParsePort(tt.input)
 				if err != nil {
 					t.Fatalf("unexpected error: %v", err)
 				}
+
 				if p.Int() != tt.expected {
 					t.Errorf("Int() = %d, want %d", p.Int(), tt.expected)
 				}
@@ -50,6 +56,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("ParsePort error cases", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []struct {
 			name  string
 			input string
@@ -69,10 +76,12 @@ func TestPort(t *testing.T) {
 
 	t.Run("PortFromInt valid", func(t *testing.T) {
 		t.Parallel()
+
 		p, err := v2.PortFromInt(8080)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if p.Int() != 8080 {
 			t.Errorf("Int() = %d, want %d", p.Int(), 8080)
 		}
@@ -85,6 +94,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("Port IsValid", func(t *testing.T) {
 		t.Parallel()
+
 		p, _ := v2.ParsePort("8080")
 		if !p.IsValid() {
 			t.Error("IsValid() = false, want true")
@@ -93,10 +103,12 @@ func TestPort(t *testing.T) {
 
 	t.Run("Port IsWellKnown", func(t *testing.T) {
 		t.Parallel()
+
 		p, _ := v2.ParsePort("80")
 		if !p.IsWellKnown() {
 			t.Error("IsWellKnown() = false, want true for port 80")
 		}
+
 		p2, _ := v2.ParsePort("8080")
 		if p2.IsWellKnown() {
 			t.Error("IsWellKnown() = true, want false for port 8080")
@@ -105,6 +117,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("Port IsRegistered", func(t *testing.T) {
 		t.Parallel()
+
 		p, _ := v2.ParsePort("8080")
 		if !p.IsRegistered() {
 			t.Error("IsRegistered() = false, want true for port 8080")
@@ -113,6 +126,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("Port IsDynamic", func(t *testing.T) {
 		t.Parallel()
+
 		p, _ := v2.ParsePort("50000")
 		if !p.IsDynamic() {
 			t.Error("IsDynamic() = false, want true for port 50000")
@@ -121,6 +135,7 @@ func TestPort(t *testing.T) {
 
 	t.Run("MustParsePort valid", func(t *testing.T) {
 		t.Parallel()
+
 		p := v2.MustParsePort("443")
 		if p.Int() != 443 {
 			t.Errorf("Int() = %d, want %d", p.Int(), 443)
@@ -134,11 +149,14 @@ func TestPort(t *testing.T) {
 
 	t.Run("Port MarshalText", func(t *testing.T) {
 		t.Parallel()
+
 		p, _ := v2.ParsePort("8080")
+
 		data, err := p.MarshalText()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if string(data) != "8080" {
 			t.Errorf("MarshalText() = %q, want %q", string(data), "8080")
 		}
@@ -146,11 +164,14 @@ func TestPort(t *testing.T) {
 
 	t.Run("Port UnmarshalText", func(t *testing.T) {
 		t.Parallel()
+
 		var p v2.Port
+
 		err := p.UnmarshalText([]byte("9090"))
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if p.Int() != 9090 {
 			t.Errorf("Int() = %d, want %d", p.Int(), 9090)
 		}

@@ -11,7 +11,9 @@ func TestInitializeErrorPaths(t *testing.T) {
 	t.Parallel()
 	t.Run("NewCLI with custom scope works", func(t *testing.T) {
 		t.Parallel()
+
 		scope := v2.NewScope("custom")
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithCLIScope[testCLIConfig](scope),
@@ -27,6 +29,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 	t.Run("AddCommand with nil pointer flags creates prototype", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -53,6 +56,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 	t.Run("AddCommand with nested subcommands", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -82,6 +86,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 	t.Run("AddCommand with command missing RunE and subcommands", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -100,6 +105,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 	t.Run("AddCommand with empty Use field", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -120,6 +126,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 	t.Run("AddCommand with flags containing multiple fields", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)

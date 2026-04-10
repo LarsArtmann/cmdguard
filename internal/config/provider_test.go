@@ -99,6 +99,7 @@ func TestLoad(t *testing.T) {
 
 func TestConfig_Validate(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name    string
 		config  Config
@@ -141,6 +142,7 @@ func TestConfig_Validate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			err := tt.config.Validate()
 
 			if tt.wantErr {
@@ -164,6 +166,7 @@ func TestConfig_Validate(t *testing.T) {
 
 func TestGetConfigFilePath(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name       string
 		configFile string
@@ -189,6 +192,7 @@ func TestGetConfigFilePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got := GetConfigFilePath(tt.configFile)
 
 			switch tt.want {

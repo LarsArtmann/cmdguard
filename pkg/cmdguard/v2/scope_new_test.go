@@ -10,6 +10,7 @@ func TestNewScope(t *testing.T) {
 	t.Parallel()
 	t.Run("creates root scope", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("root")
 		if scope == nil {
 			t.Fatal("expected scope to not be nil")
@@ -30,6 +31,7 @@ func TestNewScope(t *testing.T) {
 
 	t.Run("creates scope with injector", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 		if scope.Injector() == nil {
 			t.Fatal("expected injector to not be nil")
@@ -41,6 +43,7 @@ func TestNewScopeFromInjector(t *testing.T) {
 	t.Parallel()
 	t.Run("creates scope from existing injector", func(t *testing.T) {
 		t.Parallel()
+
 		injector := do.New()
 
 		scope := NewScopeFromInjector(injector, "custom")
@@ -59,6 +62,7 @@ func TestNewScopeFromInjector(t *testing.T) {
 
 	t.Run("scope is root when created from injector", func(t *testing.T) {
 		t.Parallel()
+
 		injector := do.New()
 
 		scope := NewScopeFromInjector(injector, "root")

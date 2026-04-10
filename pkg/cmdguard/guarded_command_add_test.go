@@ -9,15 +9,19 @@ import (
 // assertPanics runs fn and returns true if it panicked.
 func assertPanics(t *testing.T, fn func()) bool {
 	t.Helper()
+
 	didPanic := false
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
 				didPanic = true
 			}
 		}()
+
 		fn()
 	}()
+
 	return didPanic
 }
 
@@ -25,6 +29,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 	t.Parallel()
 	t.Run("accepts valid command with Run", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		cmd := &cobra.Command{
@@ -39,6 +44,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 	t.Run("accepts valid command with RunE", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		cmd := &cobra.Command{
@@ -55,6 +61,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 	t.Run("panics on command without handler", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		cmd := &cobra.Command{
@@ -68,6 +75,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 	t.Run("panics on command without name", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		cmd := &cobra.Command{}
@@ -79,6 +87,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 	t.Run("panics after Execute called", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 		g.validated = true // Simulate post-execute state
 
@@ -97,6 +106,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 	t.Parallel()
 	t.Run("adds subcommand to parent", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		parent := &cobra.Command{
@@ -131,6 +141,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 	t.Run("panics on invalid child", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 
 		parent := &cobra.Command{

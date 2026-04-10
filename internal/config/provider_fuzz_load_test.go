@@ -108,6 +108,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 	t.Parallel()
 	t.Run("concurrent validation should be safe", func(t *testing.T) {
 		t.Parallel()
+
 		cfg := &Config{LogLevel: "debug"}
 		done := make(chan bool)
 
@@ -129,6 +130,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 
 	t.Run("both fields invalid returns first error", func(t *testing.T) {
 		t.Parallel()
+
 		cfg := &Config{LogLevel: "invalid", LogFormat: "xml"}
 
 		err := cfg.Validate()
@@ -152,6 +154,7 @@ func TestValidate_EdgeCases(t *testing.T) {
 	for _, tt := range invalidLevelTests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cfg := &Config{LogLevel: tt.level}
 
 			err := cfg.Validate()
@@ -175,6 +178,7 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 		{"very deep path traversal", strings.Repeat("../", 1000) + "etc/passwd", false, nil},
 		{"unicode in path", "🎉-config.yaml", false, func(t *testing.T, result string) {
 			t.Helper()
+
 			if !strings.Contains(result, "🎉") {
 				t.Errorf("result should contain 🎉, got %q", result)
 			}
@@ -184,12 +188,14 @@ func TestGetConfigFilePath_EdgeCases(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := GetConfigFilePath(tt.input)
 			if tt.wantEmpty && result != "" {
 				t.Errorf("GetConfigFilePath(%q) = %q, want empty", tt.input, result)
 			} else if !tt.wantEmpty && result == "" {
 				t.Errorf("GetConfigFilePath(%q) = empty, want non-empty", tt.input)
 			}
+
 			if tt.check != nil {
 				tt.check(t, result)
 			}

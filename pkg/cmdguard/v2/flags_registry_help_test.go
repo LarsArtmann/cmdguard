@@ -11,6 +11,7 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 	t.Parallel()
 	t.Run("generates help for all flags", func(t *testing.T) {
 		t.Parallel()
+
 		type testConfig struct {
 			Name    string `default:"default" flag:"name,n"    help:"The name to use"`
 			Verbose bool   `                  flag:"verbose,v" help:"Enable verbose output"`
@@ -53,6 +54,7 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 
 	t.Run("help formatting without optional elements", func(t *testing.T) {
 		t.Parallel()
+
 		type testConfig struct {
 			Name string `flag:"name" help:"The name"`
 		}
@@ -73,6 +75,7 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 	t.Parallel()
 	t.Run("register short flags", func(t *testing.T) {
 		t.Parallel()
+
 		type testConfig struct {
 			Name    string `default:""      flag:"name"    short:"n"`
 			Count   int    `default:"0"     flag:"count"   short:"c"`
@@ -123,6 +126,7 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 
 	t.Run("register uint short flags", func(t *testing.T) {
 		t.Parallel()
+
 		type testConfig struct {
 			Workers uint `default:"4" flag:"workers" short:"w"`
 		}
@@ -151,6 +155,7 @@ func TestFlagRegistry_ShortFlags(t *testing.T) {
 
 	t.Run("register uint64 short flags", func(t *testing.T) {
 		t.Parallel()
+
 		type testConfig struct {
 			Bytes uint64 `default:"1024" flag:"bytes" short:"b"`
 		}

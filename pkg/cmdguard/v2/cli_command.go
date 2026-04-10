@@ -19,6 +19,7 @@ func prepareRunContext[F any](
 	flags, parseErr := cloneAndParseFlags(c, cmdFlags, registry)
 	if parseErr != nil {
 		var zero F
+
 		return ctx, zero, fmt.Errorf("parsing flags for %s: %w", phase, parseErr)
 	}
 

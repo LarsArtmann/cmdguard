@@ -67,11 +67,12 @@ func (l *Loader) Load(configPath string) error {
 
 // loadDefaults loads default configuration values.
 func (l *Loader) loadDefaults() error {
-	if err := l.k.Load(confmap.Provider(map[string]any{
+	err := l.k.Load(confmap.Provider(map[string]any{
 		"strict_mode": false,
 		"log_level":   "info",
 		"log_format":  "text",
-	}, "."), nil); err != nil {
+	}, "."), nil)
+	if err != nil {
 		return fmt.Errorf("failed to load default configuration: %w", err)
 	}
 
@@ -80,7 +81,8 @@ func (l *Loader) loadDefaults() error {
 
 // loadFile loads configuration from a YAML file.
 func (l *Loader) loadFile(path string) error {
-	if err := l.k.Load(file.Provider(path), yaml.Parser()); err != nil {
+	err := l.k.Load(file.Provider(path), yaml.Parser())
+	if err != nil {
 		return fmt.Errorf("failed to load configuration file %q: %w", path, err)
 	}
 
@@ -91,15 +93,15 @@ func (l *Loader) loadFile(path string) error {
 // Only variables with CMDGUARD_ prefix are loaded.
 // Example: CMDGUARD_LOG_LEVEL=debug becomes log_level=debug.
 func (l *Loader) loadEnv() error {
-	if err := l.k.Load(env.Provider(".", env.Opt{
+	err := l.k.Load(env.Provider(".", env.Opt{
 		Prefix: "CMDGUARD_",
 		TransformFunc: func(key, value string) (string, any) {
-			// Transform: CMDGUARD_LOG_LEVEL -> log_level
 			key = strings.ToLower(strings.TrimPrefix(key, "CMDGUARD_"))
 
 			return key, value
 		},
-	}), nil); err != nil {
+	}), nil)
+	if err != nil {
 		return fmt.Errorf("failed to load environment configuration: %w", err)
 	}
 
@@ -109,7 +111,8 @@ func (l *Loader) loadEnv() error {
 // Unmarshal unmarshals the configuration into the provided struct.
 // The struct should have `koanf` tags for field mapping.
 func (l *Loader) Unmarshal(dest any) error {
-	if err := l.k.Unmarshal("", dest); err != nil {
+	err := l.k.Unmarshal("", dest)
+	if err != nil {
 		return fmt.Errorf("failed to unmarshal configuration: %w", err)
 	}
 
@@ -118,7 +121,8 @@ func (l *Loader) Unmarshal(dest any) error {
 
 // UnmarshalWithConf unmarshals with custom configuration.
 func (l *Loader) UnmarshalWithConf(path string, dest any, conf koanf.UnmarshalConf) error {
-	if err := l.k.UnmarshalWithConf(path, dest, conf); err != nil {
+	err := l.k.UnmarshalWithConf(path, dest, conf)
+	if err != nil {
 		return fmt.Errorf("failed to unmarshal configuration with path %q: %w", path, err)
 	}
 

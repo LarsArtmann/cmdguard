@@ -124,6 +124,7 @@ func cloneFlags[F any](flags F) F {
 		if cloned, ok := newPtr.Interface().(F); ok {
 			return cloned
 		}
+
 		var zero F
 
 		return zero
@@ -137,6 +138,7 @@ func cloneFlags[F any](flags F) F {
 		if cloned, ok := newStruct.Interface().(F); ok {
 			return cloned
 		}
+
 		var zero F
 
 		return zero
@@ -158,6 +160,7 @@ func createNilFlags[F any]() (F, any, error) {
 
 	if t.Kind() == reflect.Pointer {
 		newVal := reflect.New(t.Elem())
+
 		fc, ok := newVal.Interface().(F)
 		if !ok {
 			return zero, nil, fmt.Errorf(
@@ -171,6 +174,7 @@ func createNilFlags[F any]() (F, any, error) {
 	}
 
 	newPtr := reflect.New(t)
+
 	fc, ok := newPtr.Elem().Interface().(F)
 	if !ok {
 		return zero, nil, fmt.Errorf(
@@ -237,6 +241,7 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 
 	if isNilPointer(flags) {
 		var err error
+
 		flagsCopy, flagsPtr, err = createNilFlags[F]()
 		if err != nil {
 			return flagsCopy, err

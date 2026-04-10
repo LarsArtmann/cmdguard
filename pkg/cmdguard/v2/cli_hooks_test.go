@@ -35,6 +35,7 @@ func makeHookRunE(
 
 func TestCLI_PreRunE_PostRunE(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		hookName string
@@ -70,6 +71,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			var order []string
 
 			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
@@ -95,6 +97,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 
 	t.Run("PreRunE error stops execution", func(t *testing.T) {
 		t.Parallel()
+
 		called := false
 
 		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
@@ -130,6 +133,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 
 func TestCLI_CommandOptions(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name           string
 		use            string
@@ -171,6 +175,7 @@ func TestCLI_CommandOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)

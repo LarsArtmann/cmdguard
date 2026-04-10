@@ -12,6 +12,7 @@ func assertParseLevel(t *testing.T, input string, expected Level) {
 	t.Helper()
 	t.Run(input, func(t *testing.T) {
 		t.Parallel()
+
 		result := ParseLevel(input)
 		if result != expected {
 			t.Errorf("ParseLevel(%q) = %v, want %v", input, result, expected)
@@ -23,6 +24,7 @@ func assertParseFormat(t *testing.T, input string, expected Format) {
 	t.Helper()
 	t.Run(input, func(t *testing.T) {
 		t.Parallel()
+
 		result := ParseFormat(input)
 		if result != expected {
 			t.Errorf("ParseFormat(%q) = %v, want %v", input, result, expected)
@@ -32,6 +34,7 @@ func assertParseFormat(t *testing.T, input string, expected Format) {
 
 func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 	t.Parallel()
+
 	var buf bytes.Buffer
 
 	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
@@ -78,6 +81,7 @@ func TestNewLogger_JSONOutputIsValid(t *testing.T) {
 
 func TestNewLogger_TextOutputFormat(t *testing.T) {
 	t.Parallel()
+
 	var buf bytes.Buffer
 
 	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
@@ -103,6 +107,7 @@ func TestNewLogger_TextOutputFormat(t *testing.T) {
 
 func TestLevel_CaseSensitivity(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected Level
@@ -126,6 +131,7 @@ func TestLevel_CaseSensitivity(t *testing.T) {
 
 func TestFormat_CaseSensitivity(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected Format
@@ -144,6 +150,7 @@ func TestFormat_CaseSensitivity(t *testing.T) {
 
 func TestLevel_WhitespaceHandling(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected Level
@@ -163,6 +170,7 @@ func TestLevel_WhitespaceHandling(t *testing.T) {
 
 func TestValidLevel_EdgeCases(t *testing.T) {
 	t.Parallel()
+
 	if ValidLevel(" debug") {
 		t.Error("leading space should be invalid")
 	}
@@ -198,6 +206,7 @@ func TestValidLevel_EdgeCases(t *testing.T) {
 
 func TestValidFormat_EdgeCases(t *testing.T) {
 	t.Parallel()
+
 	if ValidFormat(" json") {
 		t.Error("leading space should be invalid")
 	}

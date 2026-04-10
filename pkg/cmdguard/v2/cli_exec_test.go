@@ -18,6 +18,7 @@ func TestCLI_Execute(t *testing.T) {
 	t.Parallel()
 	t.Run("executes help command", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -31,6 +32,7 @@ func TestCLI_Execute(t *testing.T) {
 
 	t.Run("executes subcommand", func(t *testing.T) {
 		t.Parallel()
+
 		executed := false
 
 		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
@@ -62,6 +64,7 @@ func TestCLI_Execute(t *testing.T) {
 
 	t.Run("error: unknown subcommand", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -83,6 +86,7 @@ func TestCLI_Execute(t *testing.T) {
 
 	t.Run("executes with flags", func(t *testing.T) {
 		t.Parallel()
+
 		var receivedName string
 
 		type greetFlags struct {
@@ -122,6 +126,7 @@ func TestCLI_ExecuteWithArgs(t *testing.T) {
 	t.Parallel()
 	t.Run("passes args to command", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -164,6 +169,7 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 	t.Parallel()
 	t.Run("returns normally on success", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -182,6 +188,7 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 
 	t.Run("exits with code 1 on error", func(t *testing.T) {
 		t.Parallel()
+
 		if runExecuteAndExitSubprocess("BE_TEST_EXEC_AND_EXIT", "fail", errTestIntentionalFailure) {
 			return
 		}
@@ -220,6 +227,7 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 
 	t.Run("stderr contains error message", func(t *testing.T) {
 		t.Parallel()
+
 		if runExecuteAndExitSubprocess("BE_TEST_EXEC_STDERR", "boom", errors.New("boom error")) {
 			return
 		}

@@ -183,7 +183,8 @@ func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 func (g *GuardedCommand) Execute(ctx context.Context) error {
 	g.validated = true
 
-	if err := fang.Execute(ctx, g.cmd); err != nil {
+	err := fang.Execute(ctx, g.cmd)
+	if err != nil {
 		return fmt.Errorf("failed to execute CLI: %w", err)
 	}
 

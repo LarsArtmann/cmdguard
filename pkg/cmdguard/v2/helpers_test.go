@@ -11,6 +11,7 @@ func TestLogLevel(t *testing.T) {
 	t.Parallel()
 	t.Run("constants", func(t *testing.T) {
 		t.Parallel()
+
 		if LogLevelDebug.String() != "debug" {
 			t.Errorf("LogLevelDebug.String() = %q, want %q", LogLevelDebug.String(), "debug")
 		}
@@ -30,6 +31,7 @@ func TestLogLevel(t *testing.T) {
 
 	t.Run("ParseLogLevel valid", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []string{"debug", "info", "warn", "error"}
 		for _, v := range tests {
 			l, err := ParseLogLevel(v)
@@ -45,6 +47,7 @@ func TestLogLevel(t *testing.T) {
 
 	t.Run("ParseLogLevel invalid", func(t *testing.T) {
 		t.Parallel()
+
 		_, err := ParseLogLevel("invalid")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -53,6 +56,7 @@ func TestLogLevel(t *testing.T) {
 
 	t.Run("SlogLevel conversion", func(t *testing.T) {
 		t.Parallel()
+
 		if LogLevelDebug.SlogLevel() != slog.LevelDebug {
 			t.Errorf(
 				"LogLevelDebug.SlogLevel() = %v, want %v",
@@ -91,6 +95,7 @@ func TestLogFormat(t *testing.T) {
 	t.Parallel()
 	t.Run("constants", func(t *testing.T) {
 		t.Parallel()
+
 		if LogFormatText.String() != "text" {
 			t.Errorf("LogFormatText.String() = %q, want %q", LogFormatText.String(), "text")
 		}
@@ -102,6 +107,7 @@ func TestLogFormat(t *testing.T) {
 
 	t.Run("ParseLogFormat valid", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []string{"text", "json"}
 		for _, v := range tests {
 			f, err := ParseLogFormat(v)
@@ -117,6 +123,7 @@ func TestLogFormat(t *testing.T) {
 
 	t.Run("ParseLogFormat invalid", func(t *testing.T) {
 		t.Parallel()
+
 		_, err := ParseLogFormat("xml")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -127,10 +134,12 @@ func TestLogFormat(t *testing.T) {
 // testPtrGeneric tests that Ptr returns a valid pointer to the given value.
 func testPtrGeneric[T comparable](t *testing.T, v T) {
 	t.Helper()
+
 	p := Ptr(v)
 	if p == nil {
 		t.Fatal("expected non-nil pointer")
 	}
+
 	if *p != v {
 		t.Errorf("*p = %v, want %v", *p, v)
 	}
@@ -150,6 +159,7 @@ func TestPtr(t *testing.T) {
 
 	t.Run("struct", func(t *testing.T) {
 		t.Parallel()
+
 		type s struct{ Name string }
 
 		v := s{Name: "test"}
@@ -169,6 +179,7 @@ func TestValueOrDefault(t *testing.T) {
 	t.Parallel()
 	t.Run("nil pointer returns default", func(t *testing.T) {
 		t.Parallel()
+
 		var p *int
 
 		result := ValueOrDefault(p, 10)
@@ -179,6 +190,7 @@ func TestValueOrDefault(t *testing.T) {
 
 	t.Run("non-nil pointer returns value", func(t *testing.T) {
 		t.Parallel()
+
 		v := 42
 		p := &v
 
@@ -190,6 +202,7 @@ func TestValueOrDefault(t *testing.T) {
 
 	t.Run("empty string default", func(t *testing.T) {
 		t.Parallel()
+
 		var p *string
 
 		result := ValueOrDefault(p, "default")
@@ -203,6 +216,7 @@ func TestEnsureValid(t *testing.T) {
 	t.Parallel()
 	t.Run("nil returns error", func(t *testing.T) {
 		t.Parallel()
+
 		var p *int
 
 		err := EnsureValid(p, "myField")
@@ -221,6 +235,7 @@ func TestEnsureValid(t *testing.T) {
 
 	t.Run("non-nil returns nil", func(t *testing.T) {
 		t.Parallel()
+
 		v := 42
 		p := &v
 
@@ -233,6 +248,7 @@ func TestEnsureValid(t *testing.T) {
 
 func TestLogLevel_MarshalUnmarshal(t *testing.T) {
 	t.Parallel()
+
 	type config struct {
 		Value LogLevel `json:"value"`
 	}
@@ -241,6 +257,7 @@ func TestLogLevel_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("marshal", func(t *testing.T) {
 		t.Parallel()
+
 		c := config{Value: validLevel}
 
 		data, err := json.Marshal(c)
@@ -268,6 +285,7 @@ func TestLogLevel_MarshalUnmarshal(t *testing.T) {
 
 func TestLogFormat_MarshalUnmarshal(t *testing.T) {
 	t.Parallel()
+
 	type config struct {
 		Value LogFormat `json:"value"`
 	}
@@ -276,6 +294,7 @@ func TestLogFormat_MarshalUnmarshal(t *testing.T) {
 
 	t.Run("marshal", func(t *testing.T) {
 		t.Parallel()
+
 		c := config{Value: validFormat}
 
 		data, err := json.Marshal(c)
@@ -304,6 +323,7 @@ func TestLogFormat_MarshalUnmarshal(t *testing.T) {
 // expectUnmarshalError tests that unmarshaling invalid JSON returns an error.
 func expectUnmarshalError(t *testing.T, target any, jsonStr string) {
 	t.Helper()
+
 	err := json.Unmarshal([]byte(jsonStr), target)
 	if err == nil {
 		t.Error("expected error, got nil")
@@ -315,6 +335,7 @@ func runUnmarshalErrorTest[T any](t *testing.T, name, jsonStr string) {
 	t.Helper()
 	t.Run(name, func(t *testing.T) {
 		t.Parallel()
+
 		var c T
 		expectUnmarshalError(t, &c, jsonStr)
 	})
@@ -328,10 +349,12 @@ func expectUnmarshalValidString(
 	extractStr func() string,
 ) {
 	t.Helper()
+
 	err := json.Unmarshal([]byte(jsonStr), target)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if got := extractStr(); got != expected {
 		t.Errorf("unmarshaled Value = %q, want %q", got, expected)
 	}

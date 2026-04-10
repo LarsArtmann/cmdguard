@@ -19,6 +19,7 @@ func TestProvideNamed(t *testing.T) {
 	t.Parallel()
 	t.Run("registers named service provider", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		err := ProvideNamed(scope, "cache-memory", func(_ do.Injector) (string, error) {
@@ -40,6 +41,7 @@ func TestProvideNamed(t *testing.T) {
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		err := ProvideNamed(nil, "name", func(_ do.Injector) (string, error) {
 			return "value", nil
 		})
@@ -54,6 +56,7 @@ func TestProvideNamed(t *testing.T) {
 
 	t.Run("can register multiple named implementations", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		if err := provideTestNamed(scope, "impl1", "implementation-1"); err != nil {
@@ -88,6 +91,7 @@ func TestInvokeNamed(t *testing.T) {
 	t.Parallel()
 	t.Run("returns named service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		if err := provideTestNamed(scope, "my-service", 42); err != nil {
@@ -106,6 +110,7 @@ func TestInvokeNamed(t *testing.T) {
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		value, err := InvokeNamed[string](nil, "name")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -125,8 +130,10 @@ func TestMustInvoke(t *testing.T) {
 	t.Parallel()
 	t.Run("returns registered service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
-		if err := ProvideValue(scope, "hello"); err != nil {
+		err := ProvideValue(scope, "hello")
+		if err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
 
@@ -138,6 +145,7 @@ func TestMustInvoke(t *testing.T) {
 
 	t.Run("panics for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		defer func() {
 			if r := recover(); r == nil {
 				t.Error("expected panic, got none")
@@ -149,6 +157,7 @@ func TestMustInvoke(t *testing.T) {
 
 	t.Run("panics for unregistered service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		defer func() {
@@ -165,9 +174,11 @@ func TestMustInvokeNamed(t *testing.T) {
 	t.Parallel()
 	t.Run("returns named service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
-		if err := provideTestNamed(scope, "my-service", 99); err != nil {
+		err := provideTestNamed(scope, "my-service", 99)
+		if err != nil {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
@@ -179,6 +190,7 @@ func TestMustInvokeNamed(t *testing.T) {
 
 	t.Run("panics for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		defer func() {
 			if r := recover(); r == nil {
 				t.Error("expected panic, got none")
@@ -190,6 +202,7 @@ func TestMustInvokeNamed(t *testing.T) {
 
 	t.Run("panics for unregistered named service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		defer func() {

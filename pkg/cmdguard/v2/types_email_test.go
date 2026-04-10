@@ -11,19 +11,24 @@ func TestEmail(t *testing.T) {
 
 	t.Run("ParseEmail valid", func(t *testing.T) {
 		t.Parallel()
+
 		e, err := v2.ParseEmail("user@example.com")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if e.String() != "user@example.com" {
 			t.Errorf("String() = %q, want %q", e.String(), "user@example.com")
 		}
+
 		if e.Address() != "user@example.com" {
 			t.Errorf("Address() = %q, want %q", e.Address(), "user@example.com")
 		}
+
 		if e.Local() != "user" {
 			t.Errorf("Local() = %q, want %q", e.Local(), "user")
 		}
+
 		if e.Domain() != "example.com" {
 			t.Errorf("Domain() = %q, want %q", e.Domain(), "example.com")
 		}
@@ -31,6 +36,7 @@ func TestEmail(t *testing.T) {
 
 	t.Run("ParseEmail error cases", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []struct {
 			name  string
 			input string
@@ -52,6 +58,7 @@ func TestEmail(t *testing.T) {
 
 	t.Run("MustParseEmail valid", func(t *testing.T) {
 		t.Parallel()
+
 		e := v2.MustParseEmail("test@test.com")
 		if e.String() != "test@test.com" {
 			t.Errorf("String() = %q, want %q", e.String(), "test@test.com")
@@ -65,6 +72,7 @@ func TestEmail(t *testing.T) {
 
 	t.Run("Email IsEmpty", func(t *testing.T) {
 		t.Parallel()
+
 		e, _ := v2.ParseEmail("user@example.com")
 		if e.IsEmpty() {
 			t.Error("IsEmpty() = true, want false")
@@ -73,11 +81,14 @@ func TestEmail(t *testing.T) {
 
 	t.Run("Email MarshalText", func(t *testing.T) {
 		t.Parallel()
+
 		e, _ := v2.ParseEmail("user@example.com")
+
 		data, err := e.MarshalText()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if string(data) != "user@example.com" {
 			t.Errorf("MarshalText() = %q, want %q", string(data), "user@example.com")
 		}
@@ -85,11 +96,14 @@ func TestEmail(t *testing.T) {
 
 	t.Run("Email UnmarshalText", func(t *testing.T) {
 		t.Parallel()
+
 		var e v2.Email
+
 		err := e.UnmarshalText([]byte("test@example.com"))
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+
 		if e.String() != "test@example.com" {
 			t.Errorf("String() = %q, want %q", e.String(), "test@example.com")
 		}

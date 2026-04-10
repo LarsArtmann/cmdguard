@@ -89,6 +89,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		"A",
 		func(t *testing.T, flags any) {
 			t.Helper()
+
 			gf, ok := flags.(*GreetFlags)
 			if !ok {
 				t.Fatalf("expected *GreetFlags, got %T", flags)
@@ -107,6 +108,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		"B",
 		func(t *testing.T, flags any) {
 			t.Helper()
+
 			mf, ok := flags.(*MathFlags)
 			if !ok {
 				t.Fatalf("expected *MathFlags, got %T", flags)

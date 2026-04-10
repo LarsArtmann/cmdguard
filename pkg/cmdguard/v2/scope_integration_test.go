@@ -78,6 +78,7 @@ func TestScope_Integration(t *testing.T) {
 
 	t.Run("Package function creates CLI with DI", func(t *testing.T) {
 		t.Parallel()
+
 		type config struct {
 			Name string
 		}
@@ -97,6 +98,7 @@ func TestScope_Integration(t *testing.T) {
 
 	t.Run("Package function with options", func(t *testing.T) {
 		t.Parallel()
+
 		type config struct {
 			Version string
 		}

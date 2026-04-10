@@ -202,6 +202,7 @@ func (b *BranchingFlowContext) GetValue(key any) (any, bool) {
 // Value retrieves a value, returning nil if not found.
 func (b *BranchingFlowContext) Value(key any) any {
 	v, _ := b.GetValue(key)
+
 	return v
 }
 
@@ -287,6 +288,7 @@ func GetBranchingFlowContext(ctx context.Context) (*BranchingFlowContext, bool) 
 	}
 
 	bfc, ok := val.(*BranchingFlowContext)
+
 	return bfc, ok
 }
 
@@ -331,16 +333,19 @@ func Get[T any](ctx context.Context, key any) (T, bool) {
 	bfc, ok := GetBranchingFlowContext(ctx)
 	if !ok {
 		var zero T
+
 		return zero, false
 	}
 
 	val := bfc.Value(key)
 	if val == nil {
 		var zero T
+
 		return zero, false
 	}
 
 	typed, ok := val.(T)
+
 	return typed, ok
 }
 

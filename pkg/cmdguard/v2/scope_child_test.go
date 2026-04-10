@@ -8,6 +8,7 @@ func TestScope_Child(t *testing.T) {
 	t.Parallel()
 	t.Run("creates child scope", func(t *testing.T) {
 		t.Parallel()
+
 		parent := NewScope("parent")
 		child := parent.Child("child")
 
@@ -35,6 +36,7 @@ func TestScope_Child(t *testing.T) {
 
 	t.Run("grandchild scope", func(t *testing.T) {
 		t.Parallel()
+
 		parent := NewScope("parent")
 		child := parent.Child("child")
 		grandchild := child.Child("grandchild")
@@ -53,6 +55,7 @@ func TestScope_Name(t *testing.T) {
 	t.Parallel()
 	t.Run("returns scope name", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("my-scope")
 		if scope.Name() != "my-scope" {
 			t.Errorf("expected name to be 'my-scope', got %q", scope.Name())
@@ -64,6 +67,7 @@ func TestScope_Parent(t *testing.T) {
 	t.Parallel()
 	t.Run("returns nil for root scope", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("root")
 		if scope.Parent() != nil {
 			t.Errorf("expected parent to be nil, got %v", scope.Parent())
@@ -72,6 +76,7 @@ func TestScope_Parent(t *testing.T) {
 
 	t.Run("returns parent for child scope", func(t *testing.T) {
 		t.Parallel()
+
 		parent := NewScope("parent")
 
 		child := parent.Child("child")
@@ -85,6 +90,7 @@ func TestScope_Injector(t *testing.T) {
 	t.Parallel()
 	t.Run("returns underlying injector", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		injector := scope.Injector()
@@ -98,6 +104,7 @@ func TestScope_IsRoot(t *testing.T) {
 	t.Parallel()
 	t.Run("returns true for root scope", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("root")
 		if !scope.IsRoot() {
 			t.Error("expected IsRoot to be true")
@@ -106,6 +113,7 @@ func TestScope_IsRoot(t *testing.T) {
 
 	t.Run("returns false for child scope", func(t *testing.T) {
 		t.Parallel()
+
 		parent := NewScope("parent")
 
 		child := parent.Child("child")
@@ -116,6 +124,7 @@ func TestScope_IsRoot(t *testing.T) {
 
 	t.Run("returns false for nested child", func(t *testing.T) {
 		t.Parallel()
+
 		root := NewScope("root")
 		level1 := root.Child("level1")
 		level2 := level1.Child("level2")
@@ -143,6 +152,7 @@ func TestScope_Path(t *testing.T) {
 	t.Parallel()
 	t.Run("returns single element for root scope", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("root")
 		path := scope.Path()
 
@@ -154,6 +164,7 @@ func TestScope_Path(t *testing.T) {
 
 	t.Run("returns path for child scope", func(t *testing.T) {
 		t.Parallel()
+
 		parent := NewScope("parent")
 		child := parent.Child("child")
 		path := child.Path()
@@ -166,6 +177,7 @@ func TestScope_Path(t *testing.T) {
 
 	t.Run("returns full path for nested scopes", func(t *testing.T) {
 		t.Parallel()
+
 		root := NewScope("root")
 		level1 := root.Child("level1")
 		level2 := level1.Child("level2")

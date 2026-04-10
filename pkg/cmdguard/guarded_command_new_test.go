@@ -64,6 +64,7 @@ func TestGuardedCommand_Execute(t *testing.T) {
 	t.Parallel()
 	t.Run("executes command successfully", func(t *testing.T) {
 		t.Parallel()
+
 		g := New("testapp", "Test")
 		g.cmd.RunE = func(*cobra.Command, []string) error {
 			return nil
@@ -129,6 +130,7 @@ func TestVersion(t *testing.T) {
 	t.Parallel()
 	t.Run("returns version string", func(t *testing.T) {
 		t.Parallel()
+
 		v := Version()
 		if v == "" {
 			t.Error("version should not be empty")

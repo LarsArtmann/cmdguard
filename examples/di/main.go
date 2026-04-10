@@ -93,6 +93,7 @@ func NewAPIService(i do.Injector) (*APIService, error) {
 // Call simulates an API call.
 func (a *APIService) Call(ctx context.Context) error {
 	_ = ctx // context required by interface but not used in this example
+
 	if !a.client.IsConnected() {
 		return errors.New("database not available")
 	}

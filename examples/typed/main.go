@@ -53,6 +53,7 @@ func (l *Logger) Log(msg string) {
 // HealthCheck implements do.HealthcheckerWithContext for lifecycle demonstration.
 func (l *Logger) HealthCheck(ctx context.Context) error {
 	_ = ctx // context required by interface but not used in this example
+
 	if l.verbose {
 		fmt.Println("[LOG] Health check passed")
 	}

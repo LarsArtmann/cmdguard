@@ -79,6 +79,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 
 func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	t.Parallel()
+
 	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

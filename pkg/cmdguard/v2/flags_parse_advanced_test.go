@@ -11,6 +11,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 	t.Parallel()
 	t.Run("parse LogLevel flag valid", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Level LogLevel `flag:"level"`
 		}
@@ -43,6 +44,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 
 	t.Run("parse LogLevel flag invalid returns error", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Level LogLevel `flag:"level"`
 		}
@@ -75,6 +77,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 
 	t.Run("parse invalid Enum returns error", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Mode Enum `default:"dev" flag:"mode" values:"dev,staging,prod"`
 		}
@@ -103,6 +106,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 
 	t.Run("parse LogFormat flag valid", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Format LogFormat `flag:"format"`
 		}
@@ -135,6 +139,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 
 	t.Run("parse LogFormat flag invalid returns error", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Format LogFormat `flag:"format"`
 		}
@@ -170,6 +175,7 @@ func TestFlagRegistry_FlagNotFound(t *testing.T) {
 	t.Parallel()
 	t.Run("missing flag returns error", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Name string `flag:"name"`
 		}

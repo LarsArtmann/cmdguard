@@ -117,6 +117,7 @@ func FuzzValidLevel(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, level string) {
 		result := ValidLevel(level)
+
 		expected := validSet[level]
 		if result != expected {
 			t.Errorf("ValidLevel(%q) = %v, want %v", level, result, expected)
@@ -147,6 +148,7 @@ func FuzzValidFormat(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, format string) {
 		result := ValidFormat(format)
+
 		expected := validSet[format]
 		if result != expected {
 			t.Errorf("ValidFormat(%q) = %v, want %v", format, result, expected)

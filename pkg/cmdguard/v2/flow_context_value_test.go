@@ -7,7 +7,9 @@ import (
 
 func TestBranchingFlowContext_SetValue(t *testing.T) {
 	t.Parallel()
+
 	root := NewBranchingFlowContext(context.Background())
+
 	child, cancel := root.Branch("child")
 	defer cancel()
 
@@ -16,6 +18,7 @@ func TestBranchingFlowContext_SetValue(t *testing.T) {
 	if root.Value("propagate") != "yes" {
 		t.Error("root should have value")
 	}
+
 	if child.Value("propagate") != "yes" {
 		t.Error("child should inherit value from root")
 	}
@@ -23,7 +26,9 @@ func TestBranchingFlowContext_SetValue(t *testing.T) {
 
 func TestBranchingFlowContext_SetValueLocal(t *testing.T) {
 	t.Parallel()
+
 	root := NewBranchingFlowContext(context.Background())
+
 	child, cancel := root.Branch("child")
 	defer cancel()
 
@@ -36,7 +41,9 @@ func TestBranchingFlowContext_SetValueLocal(t *testing.T) {
 
 func TestBranchingFlowContext_GetValue(t *testing.T) {
 	t.Parallel()
+
 	root := NewBranchingFlowContext(context.Background())
+
 	child, cancel := root.Branch("child")
 	defer cancel()
 
@@ -63,10 +70,12 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+
 			val, ok := tc.getter()
 			if !ok {
 				t.Error("expected to find value")
 			}
+
 			if val != tc.expected {
 				t.Errorf("expected %v, got %v", tc.expected, val)
 			}
@@ -75,6 +84,7 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 
 	t.Run("missing value", func(t *testing.T) {
 		t.Parallel()
+
 		_, ok := root.GetValue("nonexistent")
 		if ok {
 			t.Error("expected not to find nonexistent value")

@@ -8,6 +8,7 @@ import (
 
 func TestSuggestFlag(t *testing.T) {
 	t.Parallel()
+
 	defaultNames := []string{"verbose", "version", "config", "help", "output"}
 
 	tests := []struct {
@@ -37,6 +38,7 @@ func TestSuggestFlag(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := SuggestFlag(tt.validNames, tt.input)
 			if tt.wantOneOf != nil {
 				if !containsString(tt.wantOneOf, result) {
@@ -51,6 +53,7 @@ func TestSuggestFlag(t *testing.T) {
 
 func TestEditDistance(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name string
 		a, b string
@@ -71,6 +74,7 @@ func TestEditDistance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			if got := editDistance(tt.a, tt.b); got != tt.want {
 				t.Errorf("editDistance(%q, %q) = %d, want %d", tt.a, tt.b, got, tt.want)
 			}
@@ -88,6 +92,7 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 	t.Parallel()
 	t.Run("error includes suggestion", func(t *testing.T) {
 		t.Parallel()
+
 		err := NewFlagErrorWithSuggestion("verboose", errUnknownFlag, "verbose")
 
 		errMsg := err.Error()
@@ -106,6 +111,7 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 
 	t.Run("empty suggestion omits hint", func(t *testing.T) {
 		t.Parallel()
+
 		err := NewFlagError("test", errSomeError)
 		if strings.Contains(err.Error(), "did you mean") {
 			t.Errorf("error should not contain 'did you mean', got %q", err.Error())
@@ -114,6 +120,7 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 
 	t.Run("unwraps to inner error", func(t *testing.T) {
 		t.Parallel()
+
 		err := NewFlagErrorWithSuggestion("flag", errInnerError, "suggestion")
 		if !errors.Is(err, errInnerError) {
 			t.Errorf("expected error to unwrap to errInnerError")

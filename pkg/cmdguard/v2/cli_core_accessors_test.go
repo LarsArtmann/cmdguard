@@ -10,6 +10,7 @@ func TestCLIAccessors(t *testing.T) {
 	t.Parallel()
 	t.Run("Scope returns DI scope", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -22,6 +23,7 @@ func TestCLIAccessors(t *testing.T) {
 
 	t.Run("Config returns config pointer", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -35,6 +37,7 @@ func TestCLIAccessors(t *testing.T) {
 
 	t.Run("RootCommand returns cobra command", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -57,6 +60,7 @@ func TestCLISubcommands(t *testing.T) {
 	t.Parallel()
 	t.Run("adds nested subcommands", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -93,6 +97,7 @@ func TestCLIInjector(t *testing.T) {
 	t.Parallel()
 	t.Run("returns DI injector", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)

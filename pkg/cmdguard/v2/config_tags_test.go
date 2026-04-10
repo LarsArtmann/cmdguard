@@ -23,6 +23,7 @@ func TestParseFlagTags(t *testing.T) {
 	t.Parallel()
 	t.Run("valid struct", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Name    string `default:"test" flag:"name"    help:"The name"       short:"n"`
 			Count   int    `default:"10"   flag:"count"   help:"The count"`
@@ -62,6 +63,7 @@ func TestParseFlagTags(t *testing.T) {
 
 	t.Run("pointer to struct", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Field string `flag:"field"`
 		}
@@ -82,6 +84,7 @@ func TestParseFlagTags(t *testing.T) {
 
 	t.Run("skips fields without flag tag", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Tagged   string `flag:"tagged"`
 			Untagged string
@@ -104,6 +107,7 @@ func TestParseFlagTags(t *testing.T) {
 
 	t.Run("nil config", func(t *testing.T) {
 		t.Parallel()
+
 		tags, err := ParseFlagTags(nil)
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -120,6 +124,7 @@ func TestParseFlagTags(t *testing.T) {
 
 	t.Run("non-struct config", func(t *testing.T) {
 		t.Parallel()
+
 		tags, err := ParseFlagTags("not a struct")
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -136,6 +141,7 @@ func TestParseFlagTags(t *testing.T) {
 
 	t.Run("with values tag", func(t *testing.T) {
 		t.Parallel()
+
 		type TestConfig struct {
 			Level string `flag:"level" values:"debug,info,warn,error"`
 		}
@@ -157,6 +163,7 @@ func TestParseFlagTags(t *testing.T) {
 
 	t.Run("embedded Config", func(t *testing.T) {
 		t.Parallel()
+
 		type AppConfig struct {
 			Config
 

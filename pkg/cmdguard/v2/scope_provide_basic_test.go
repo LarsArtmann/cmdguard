@@ -11,6 +11,7 @@ func TestProvide(t *testing.T) {
 	t.Parallel()
 	t.Run("registers service provider", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		err := Provide(scope, func(_ do.Injector) (string, error) {
@@ -32,6 +33,7 @@ func TestProvide(t *testing.T) {
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		err := Provide(nil, func(_ do.Injector) (string, error) {
 			return "value", nil
 		})
@@ -46,6 +48,7 @@ func TestProvide(t *testing.T) {
 
 	t.Run("provider can use dependencies", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		// Register a dependency
@@ -85,6 +88,7 @@ func TestProvideValue(t *testing.T) {
 	t.Parallel()
 	t.Run("registers value directly", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		err := ProvideValue(scope, 42)
@@ -104,6 +108,7 @@ func TestProvideValue(t *testing.T) {
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		err := ProvideValue(nil, 42)
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -116,6 +121,7 @@ func TestProvideValue(t *testing.T) {
 
 	t.Run("can register struct values", func(t *testing.T) {
 		t.Parallel()
+
 		type Config struct {
 			Name string
 			Port int
@@ -147,6 +153,7 @@ func TestInvoke(t *testing.T) {
 	t.Parallel()
 	t.Run("returns registered service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 		if err := ProvideValue(scope, "hello"); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)
@@ -164,6 +171,7 @@ func TestInvoke(t *testing.T) {
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
+
 		value, err := Invoke[string](nil)
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -180,6 +188,7 @@ func TestInvoke(t *testing.T) {
 
 	t.Run("returns error for unregistered service", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 
 		value, err := Invoke[string](scope)
@@ -194,6 +203,7 @@ func TestInvoke(t *testing.T) {
 
 	t.Run("can invoke different types", func(t *testing.T) {
 		t.Parallel()
+
 		scope := NewScope("test")
 		if err := ProvideValue(scope, 123); err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)

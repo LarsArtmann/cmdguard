@@ -15,6 +15,7 @@ func TestNewCLI(t *testing.T) {
 	t.Parallel()
 	t.Run("creates CLI with defaults", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -35,6 +36,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("creates CLI with options", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"myapp",
 			"My Application",
@@ -57,6 +59,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("returns error for empty name", func(t *testing.T) {
 		t.Parallel()
+
 		_, err := v2.NewCLI[testCLIConfig]("", "short", testCLIConfig{})
 		if err == nil {
 			t.Fatal("expected error for empty name")
@@ -65,6 +68,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("WithSilenceErrors sets SilenceErrors", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithSilenceErrors[testCLIConfig](),
@@ -80,6 +84,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("WithSilenceUsage sets SilenceUsage", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithSilenceUsage[testCLIConfig](),
@@ -95,6 +100,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("WithColor false disables fang", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithColor[testCLIConfig](false),
@@ -110,6 +116,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("WithColor true keeps fang enabled", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithColor[testCLIConfig](true),
@@ -125,6 +132,7 @@ func TestNewCLI(t *testing.T) {
 
 	t.Run("combines multiple options", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithSilenceErrors[testCLIConfig](),

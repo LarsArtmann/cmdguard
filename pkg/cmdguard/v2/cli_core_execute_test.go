@@ -11,6 +11,7 @@ func TestCLIExecute(t *testing.T) {
 	t.Parallel()
 	t.Run("executes command", func(t *testing.T) {
 		t.Parallel()
+
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
