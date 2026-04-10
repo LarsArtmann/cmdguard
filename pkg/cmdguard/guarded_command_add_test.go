@@ -25,6 +25,13 @@ func assertPanics(t *testing.T, fn func()) bool {
 	return didPanic
 }
 
+func newCobraCommand(name string) *cobra.Command {
+	return &cobra.Command{
+		Use: name,
+		Run: func(*cobra.Command, []string) {},
+	}
+}
+
 func TestGuardedCommand_AddCommand(t *testing.T) {
 	t.Parallel()
 	t.Run("accepts valid command with Run", func(t *testing.T) {
@@ -32,10 +39,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		g := New("testapp", "Test")
 
-		cmd := &cobra.Command{
-			Use: "sub",
-			Run: func(*cobra.Command, []string) {},
-		}
+		cmd := newCobraCommand("sub")
 
 		if assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should not panic for valid command")
@@ -86,10 +90,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 		g := New("testapp", "Test")
 		g.validated = true // Simulate post-execute state
 
-		cmd := &cobra.Command{
-			Use: "sub",
-			Run: func(*cobra.Command, []string) {},
-		}
+		cmd := newCobraCommand("sub")
 
 		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should panic after Execute called")
@@ -104,16 +105,10 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 		g := New("testapp", "Test")
 
-		parent := &cobra.Command{
-			Use: "parent",
-			Run: func(*cobra.Command, []string) {},
-		}
+		parent := newCobraCommand("parent")
 		g.AddCommand(parent)
 
-		child := &cobra.Command{
-			Use: "child",
-			Run: func(*cobra.Command, []string) {},
-		}
+		child := newCobraCommand("child")
 
 		if assertPanics(t, func() { g.AddSubcommand(parent, child) }) {
 			t.Error("AddSubcommand should not panic for valid child")

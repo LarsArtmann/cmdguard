@@ -72,10 +72,7 @@ func TestCommandOptions(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		}
-		WithRunE(handler)(&cmd)
+		WithRunE(noOpHandler())(&cmd)
 
 		if cmd.RunE == nil {
 			t.Error("RunE = nil, want non-nil handler")
@@ -86,10 +83,7 @@ func TestCommandOptions(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		}
-		WithPreRunE(handler)(&cmd)
+		WithPreRunE(noOpHandler())(&cmd)
 
 		if cmd.PreRunE == nil {
 			t.Error("PreRunE = nil, want non-nil handler")
@@ -100,10 +94,7 @@ func TestCommandOptions(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
-		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		}
-		WithPostRunE(handler)(&cmd)
+		WithPostRunE(noOpHandler())(&cmd)
 
 		if cmd.PostRunE == nil {
 			t.Error("PostRunE = nil, want non-nil handler")
@@ -192,11 +183,7 @@ func TestNewCommand(t *testing.T) {
 
 		cmd, err := NewCommand[testConfig](
 			"",
-			WithRunE(
-				func(_ context.Context, _ *testConfig, _ NoFlags) error {
-					return nil
-				},
-			),
+			WithRunE(noOpHandler()),
 		)
 		if err == nil {
 			t.Fatal("expected error, got nil")
@@ -233,9 +220,7 @@ func TestCommand_CompleteStructure(t *testing.T) {
 		subCmd := Command[testConfig, NoFlags]{
 			Use:   "sub",
 			Short: "subcommand",
-			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				return nil
-			},
+			RunE:  noOpHandler(),
 		}
 
 		cmd, err := NewCommand[testConfig](
@@ -244,21 +229,9 @@ func TestCommand_CompleteStructure(t *testing.T) {
 			WithLong[testConfig, NoFlags]("root command long description"),
 			WithAliases[testConfig, NoFlags]("r", "root-cmd"),
 			WithExample[testConfig, NoFlags]("root sub"),
-			WithRunE(
-				func(_ context.Context, _ *testConfig, _ NoFlags) error {
-					return nil
-				},
-			),
-			WithPreRunE(
-				func(_ context.Context, _ *testConfig, _ NoFlags) error {
-					return nil
-				},
-			),
-			WithPostRunE(
-				func(_ context.Context, _ *testConfig, _ NoFlags) error {
-					return nil
-				},
-			),
+			WithRunE(noOpHandler()),
+			WithPreRunE(noOpHandler()),
+			WithPostRunE(noOpHandler()),
 			WithSubcommands(subCmd),
 			WithHidden[testConfig, NoFlags](false),
 			WithDeprecated[testConfig, NoFlags](""),

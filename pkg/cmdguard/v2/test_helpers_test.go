@@ -5,12 +5,24 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
 	t.Helper()
 	if d.Duration() != expected {
 		t.Errorf("expected %v, got %v", expected, d.Duration())
+	}
+}
+
+func assertErrorContains(t *testing.T, err error, substrings ...string) {
+	t.Helper()
+	errMsg := err.Error()
+	for _, s := range substrings {
+		if !strings.Contains(errMsg, s) {
+			t.Errorf("error should contain %q, got %q", s, errMsg)
+		}
 	}
 }
 
@@ -39,5 +51,41 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 		RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			return runErr
 		},
+	}
+}
+
+func registerAndSetFlag[T any](t *testing.T, registry *FlagRegistry, cmd *cobra.Command, cfg *T, flagName, flagValue string) {
+	t.Helper()
+	if err := registry.RegisterFlags(cmd); err != nil {
+		t.Fatalf("expected no error registering flags, got: %v", err)
+	}
+
+	if err := cmd.Flags().Set(flagName, flagValue); err != nil {
+		t.Fatalf("expected no error setting flag, got: %v", err)
+	}
+
+	if err := registry.ParseFlags(cmd, cfg); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+}
+
+func registerAndParseInvalidFlag[T any](t *testing.T, registry *FlagRegistry, cmd *cobra.Command, cfg *T, flagName, flagValue string) {
+	t.Helper()
+	if err := registry.RegisterFlags(cmd); err != nil {
+		t.Fatalf("expected no error registering flags, got: %v", err)
+	}
+
+	if err := cmd.Flags().Set(flagName, flagValue); err != nil {
+		t.Fatalf("expected no error setting flag, got: %v", err)
+	}
+
+	if err := registry.ParseFlags(cmd, cfg); err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+func noOpHandler() func(context.Context, *testConfig, NoFlags) error {
+	return func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		return nil
 	}
 }

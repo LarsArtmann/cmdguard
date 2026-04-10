@@ -24,18 +24,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("level", "debug"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "level", "debug")
 
 		if cfg.Level.String() != "debug" {
 			t.Errorf("expected Level 'debug', got %q", cfg.Level.String())
@@ -70,9 +59,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "level") {
-			t.Errorf("expected error to contain 'level', got: %v", err)
-		}
+		assertErrorContains(t, err, "level")
 	})
 
 	t.Run("parse invalid Enum returns error", func(t *testing.T) {
@@ -119,18 +106,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("format", "json"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "format", "json")
 
 		if cfg.Format.String() != "json" {
 			t.Errorf("expected Format 'json', got %q", cfg.Format.String())
@@ -165,9 +141,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "format") {
-			t.Errorf("expected error to contain 'format', got: %v", err)
-		}
+		assertErrorContains(t, err, "format")
 	})
 }
 

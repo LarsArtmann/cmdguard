@@ -3,7 +3,6 @@ package v2
 import (
 	"context"
 	"errors"
-	"strings"
 	"testing"
 )
 
@@ -76,9 +75,7 @@ func TestCommand_Validate(t *testing.T) {
 			t.Errorf("expected ErrInvalidCommand, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "no Use field") {
-			t.Errorf("error should contain 'no Use field', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "no Use field")
 	})
 
 	t.Run("error: no RunE and no subcommands", func(t *testing.T) {
@@ -97,9 +94,7 @@ func TestCommand_Validate(t *testing.T) {
 			t.Errorf("expected ErrMissingHandler, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "no RunE and no subcommands") {
-			t.Errorf("error should contain 'no RunE and no subcommands', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "no RunE and no subcommands")
 	})
 
 	t.Run("validates subcommands recursively", func(t *testing.T) {
@@ -118,13 +113,7 @@ func TestCommand_Validate(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "subcommand 1") {
-			t.Errorf("error should contain 'subcommand 1', got %q", err.Error())
-		}
-
-		if !strings.Contains(err.Error(), "invalid-sub") {
-			t.Errorf("error should contain 'invalid-sub', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "subcommand 1", "invalid-sub")
 	})
 
 	t.Run("error: duplicate subcommand names", func(t *testing.T) {
@@ -147,9 +136,7 @@ func TestCommand_Validate(t *testing.T) {
 			t.Errorf("expected ErrDuplicateCommand, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "duplicate") {
-			t.Errorf("error should contain 'duplicate', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "duplicate")
 	})
 
 	t.Run("valid with flags", func(t *testing.T) {

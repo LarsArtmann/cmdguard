@@ -48,13 +48,7 @@ func TestCommandError(t *testing.T) {
 		t.Parallel()
 
 		err := NewCommandError("test-cmd", ErrMissingHandler)
-		if !strings.Contains(err.Error(), "test-cmd") {
-			t.Errorf("expected error to contain 'test-cmd', got %q", err.Error())
-		}
-
-		if !strings.Contains(err.Error(), "command has no handler") {
-			t.Errorf("expected error to contain 'command has no handler', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "test-cmd", "command has no handler")
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
@@ -87,13 +81,7 @@ func TestFlagError(t *testing.T) {
 		t.Parallel()
 
 		err := NewFlagError("test-flag", innerErr)
-		if !strings.Contains(err.Error(), "test-flag") {
-			t.Errorf("expected error to contain 'test-flag', got %q", err.Error())
-		}
-
-		if !strings.Contains(err.Error(), "invalid value") {
-			t.Errorf("expected error to contain 'invalid value', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "test-flag", "invalid value")
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
@@ -124,13 +112,7 @@ func TestConfigError(t *testing.T) {
 		t.Parallel()
 
 		err := NewConfigError("LogLevel", innerErr)
-		if !strings.Contains(err.Error(), "LogLevel") {
-			t.Errorf("expected error to contain 'LogLevel', got %q", err.Error())
-		}
-
-		if !strings.Contains(err.Error(), "must be one of") {
-			t.Errorf("expected error to contain 'must be one of', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "LogLevel", "must be one of")
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
@@ -194,13 +176,7 @@ func TestDurationError(t *testing.T) {
 		t.Parallel()
 
 		err := NewDurationError("not-a-duration", innerErr)
-		if !strings.Contains(err.Error(), "not-a-duration") {
-			t.Errorf("expected error to contain 'not-a-duration', got %q", err.Error())
-		}
-
-		if !strings.Contains(err.Error(), "time: invalid duration") {
-			t.Errorf("expected error to contain 'time: invalid duration', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "not-a-duration", "time: invalid duration")
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {

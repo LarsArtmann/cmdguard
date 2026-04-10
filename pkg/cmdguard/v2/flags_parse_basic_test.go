@@ -24,18 +24,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("name", "custom"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "name", "custom")
 
 		if cfg.Name != "custom" {
 			t.Errorf("expected Name 'custom', got %q", cfg.Name)
@@ -57,18 +46,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("verbose", "true"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "verbose", "true")
 
 		if !cfg.Verbose {
 			t.Error("expected Verbose to be true")
@@ -90,18 +68,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("count", "42"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "count", "42")
 
 		if cfg.Count != 42 {
 			t.Errorf("expected Count 42, got %d", cfg.Count)
@@ -123,18 +90,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("workers", "10"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "workers", "10")
 
 		if cfg.Workers != 10 {
 			t.Errorf("expected Workers 10, got %d", cfg.Workers)
@@ -156,18 +112,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("max-bytes", "18446744073709551615"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "max-bytes", "18446744073709551615")
 
 		if cfg.MaxBytes != 18446744073709551615 {
 			t.Errorf("expected MaxBytes 18446744073709551615, got %d", cfg.MaxBytes)
@@ -189,18 +134,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("alpha", "0.5"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "alpha", "0.5")
 
 		if cfg.Alpha != 0.5 {
 			t.Errorf("expected Alpha %f, got %f", 0.5, cfg.Alpha)
@@ -222,18 +156,7 @@ func TestFlagRegistry_ParseFlags(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
-
-		if err := cmd.Flags().Set("timeout", "5m30s"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
-
-		err = registry.ParseFlags(cmd, cfg)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		registerAndSetFlag(t, registry, cmd, cfg, "timeout", "5m30s")
 
 		expected := FromDuration(5*time.Minute + 30*time.Second)
 		if cfg.Timeout != expected {

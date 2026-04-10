@@ -3,7 +3,6 @@ package v2
 import (
 	"encoding/json"
 	"log/slog"
-	"strings"
 	"testing"
 )
 
@@ -226,13 +225,7 @@ func TestEnsureValid(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "myField") {
-			t.Errorf("error should contain 'myField', got %q", err.Error())
-		}
-
-		if !strings.Contains(err.Error(), "must not be nil") {
-			t.Errorf("error should contain 'must not be nil', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "myField", "must not be nil")
 	})
 
 	t.Run("non-nil returns nil", func(t *testing.T) {
