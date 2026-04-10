@@ -3,6 +3,7 @@ package v2
 import (
 	"encoding/json"
 	"errors"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -68,7 +69,7 @@ func TestParseEnum(t *testing.T) {
 					t.Errorf("String() = %q, want %q", e.String(), tt.wantValue)
 				}
 
-				if !slicesEqual(e.Allowed(), tt.allowed) {
+				if !slices.Equal(e.Allowed(), tt.allowed) {
 					t.Errorf("Allowed() = %v, want %v", e.Allowed(), tt.allowed)
 				}
 			}
@@ -119,7 +120,7 @@ func TestEnum_Methods(t *testing.T) {
 	t.Run("Allowed", func(t *testing.T) {
 		t.Parallel()
 
-		if !slicesEqual(e.Allowed(), []string{"a", "test", "b"}) {
+		if !slices.Equal(e.Allowed(), []string{"a", "test", "b"}) {
 			t.Errorf("Allowed() = %v, want %v", e.Allowed(), []string{"a", "test", "b"})
 		}
 	})
@@ -209,7 +210,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 			t.Errorf("unmarshaled Level = %q, want %q", c.Level.String(), "any")
 		}
 
-		if !slicesEqual(c.Level.Allowed(), []string{"any"}) {
+		if !slices.Equal(c.Level.Allowed(), []string{"any"}) {
 			t.Errorf("Allowed() = %v, want %v", c.Level.Allowed(), []string{"any"})
 		}
 	})

@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -157,7 +158,7 @@ func TestScope_Path(t *testing.T) {
 		path := scope.Path()
 
 		expected := []string{"root"}
-		if !slicesEqual(path, expected) {
+		if !slices.Equal(path, expected) {
 			t.Errorf("expected path %v, got %v", expected, path)
 		}
 	})
@@ -170,7 +171,7 @@ func TestScope_Path(t *testing.T) {
 		path := child.Path()
 
 		expected := []string{"parent", "child"}
-		if !slicesEqual(path, expected) {
+		if !slices.Equal(path, expected) {
 			t.Errorf("expected path %v, got %v", expected, path)
 		}
 	})
@@ -183,19 +184,19 @@ func TestScope_Path(t *testing.T) {
 		level2 := level1.Child("level2")
 		level3 := level2.Child("level3")
 
-		if !slicesEqual(root.Path(), []string{"root"}) {
+		if !slices.Equal(root.Path(), []string{"root"}) {
 			t.Errorf("expected root path [root], got %v", root.Path())
 		}
 
-		if !slicesEqual(level1.Path(), []string{"root", "level1"}) {
+		if !slices.Equal(level1.Path(), []string{"root", "level1"}) {
 			t.Errorf("expected level1 path [root level1], got %v", level1.Path())
 		}
 
-		if !slicesEqual(level2.Path(), []string{"root", "level1", "level2"}) {
+		if !slices.Equal(level2.Path(), []string{"root", "level1", "level2"}) {
 			t.Errorf("expected level2 path [root level1 level2], got %v", level2.Path())
 		}
 
-		if !slicesEqual(level3.Path(), []string{"root", "level1", "level2", "level3"}) {
+		if !slices.Equal(level3.Path(), []string{"root", "level1", "level2", "level3"}) {
 			t.Errorf("expected level3 path [root level1 level2 level3], got %v", level3.Path())
 		}
 	})

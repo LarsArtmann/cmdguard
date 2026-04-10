@@ -13,6 +13,14 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+// greetRunE returns a RunE function that prints "Greeting executed".
+func greetRunE() func(context.Context, *AppConfig, *GreetFlags) error {
+	return func(_ context.Context, _ *AppConfig, _ *GreetFlags) error {
+		fmt.Println("Greeting executed")
+		return nil
+	}
+}
+
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	cli, err := v2.NewCLI[AppConfig](
@@ -239,11 +247,7 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 
 			return nil
 		},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			fmt.Println("Greeting executed")
-
-			return nil
-		},
+		RunE: greetRunE(),
 	}
 
 	err = v2.AddCommand(cli, greetCmd)
@@ -265,11 +269,7 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 
 	// Reset and test with valid count
 	cli, _ = v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
-	greetCmd.RunE = func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-		fmt.Println("Greeting executed")
-
-		return nil
-	}
+	greetCmd.RunE = greetRunE()
 
 	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {

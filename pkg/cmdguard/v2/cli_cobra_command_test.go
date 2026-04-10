@@ -4,6 +4,7 @@ package v2
 import (
 	"context"
 	"errors"
+	"slices"
 	"testing"
 )
 
@@ -113,7 +114,7 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 	}
 
 	want := []string{"pre", "run", "post"}
-	if !slicesEqual(order, want) {
+	if !slices.Equal(order, want) {
 		t.Errorf("hook order = %v, want %v", order, want)
 	}
 }

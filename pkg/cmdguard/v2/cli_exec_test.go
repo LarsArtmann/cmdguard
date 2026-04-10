@@ -220,9 +220,7 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 			t.Errorf("stderr should contain 'ERROR', got %q", stderr.String())
 		}
 
-		if !strings.Contains(strings.ToLower(stderr.String()), "intentional failure") {
-			t.Errorf("stderr should contain 'intentional failure', got %q", stderr.String())
-		}
+		assertStderrContains(t, stderr.String(), "intentional failure")
 	})
 
 	t.Run("stderr contains error message", func(t *testing.T) {
@@ -244,8 +242,6 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 		cmd.Stderr = &stderr
 		_ = cmd.Run()
 
-		if !strings.Contains(strings.ToLower(stderr.String()), "boom error") {
-			t.Errorf("stderr should contain 'boom error', got %q", stderr.String())
-		}
+		assertStderrContains(t, stderr.String(), "boom error")
 	})
 }

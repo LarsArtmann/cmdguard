@@ -1,19 +1,26 @@
 package v2
 
-import "context"
+import (
+	"context"
+	"strings"
+	"testing"
+	"time"
+)
 
-func slicesEqual[T comparable](a, b []T) bool {
-	if len(a) != len(b) {
-		return false
+func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
+	t.Helper()
+	if d.Duration() != expected {
+		t.Errorf("expected %v, got %v", expected, d.Duration())
 	}
+}
 
-	for i := range a {
-		if a[i] != b[i] {
-			return false
+func assertStderrContains(t *testing.T, stderr string, substrings ...string) {
+	t.Helper()
+	for _, s := range substrings {
+		if !strings.Contains(strings.ToLower(stderr), strings.ToLower(s)) {
+			t.Errorf("stderr should contain %q, got %q", s, stderr)
 		}
 	}
-
-	return true
 }
 
 type testAppConfig struct {

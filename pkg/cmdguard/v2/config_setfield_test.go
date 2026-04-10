@@ -135,9 +135,7 @@ func TestSetField(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if cfg.Timeout.Duration() != 30*time.Second {
-			t.Errorf("expected Timeout 30s, got %v", cfg.Timeout.Duration())
-		}
+		assertDurationField(t, cfg.Timeout, 30*time.Second)
 	})
 
 	t.Run("time.Duration to Duration", func(t *testing.T) {
@@ -152,9 +150,7 @@ func TestSetField(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if cfg.Timeout.Duration() != 45*time.Second {
-			t.Errorf("expected Timeout 45s, got %v", cfg.Timeout.Duration())
-		}
+		assertDurationField(t, cfg.Timeout, 45*time.Second)
 	})
 
 	t.Run("invalid LogLevel", func(t *testing.T) {
