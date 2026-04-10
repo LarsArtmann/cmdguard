@@ -36,7 +36,7 @@ func setFlagAndAssertValid(
 		t.Fatalf("expected no error setting flag, got: %v", err)
 	}
 
-	err := registry.ValidateFlags(cmd)
+	err = registry.ValidateFlags(cmd)
 	if err != nil {
 		t.Errorf("expected no error, got: %v", err)
 	}
