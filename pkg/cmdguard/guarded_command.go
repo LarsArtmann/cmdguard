@@ -38,10 +38,9 @@ import (
 	"slices"
 
 	"charm.land/fang/v2"
-	"github.com/spf13/cobra"
-
 	"github.com/larsartmann/cmdguard/internal/config"
 	"github.com/larsartmann/cmdguard/internal/logging"
+	"github.com/spf13/cobra"
 )
 
 // version is set at build time via ldflags:

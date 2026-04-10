@@ -202,7 +202,8 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 			t.Fatal("expected error (exit code 1)")
 		}
 
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
 			if exitErr.ExitCode() != 1 {
 				t.Errorf("exit code = %d, want 1", exitErr.ExitCode())
 			}
