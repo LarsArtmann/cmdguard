@@ -148,7 +148,7 @@ func main() {
 				return fmt.Errorf("health check failed: %w", err)
 			}
 
-		fmt.Println("All health checks PASSED!")
+			fmt.Println("All health checks PASSED!")
 
 			return nil
 		},

@@ -27,60 +27,60 @@
 
 ### Phase 1: Critical Fixes (Immediate)
 
-| Step | Task | Files | Verification |
-|---|---|---|---|
-| 1.1 | Add pre-commit compilation gate | `justfile` or `Makefile` | `just precommit` runs build + test |
-| 1.2 | Document the #1 architecture question | `docs/adr/001-dependency-direction.md` | ADR format |
+| Step | Task                                  | Files                                  | Verification                       |
+| ---- | ------------------------------------- | -------------------------------------- | ---------------------------------- |
+| 1.1  | Add pre-commit compilation gate       | `justfile` or `Makefile`               | `just precommit` runs build + test |
+| 1.2  | Document the #1 architecture question | `docs/adr/001-dependency-direction.md` | ADR format                         |
 
 ### Phase 2: P0 Integration — go-output Companion
 
-| Step | Task | Work Required | Impact |
-|---|---|---|---|
-| 2.1 | **DECISION REQUIRED:** Answer #1 question | Discussion with Lars | Blocks everything below |
-| 2.2 | Add "Output Formatting" section to README | `README.md` ~30 lines | High user value |
-| 2.3 | Create `examples/output-formats/` | New dir, ~150 lines | Demonstrates integration |
-| 2.4 | Verify go-output bridge compiles | CI check or manual | Prevents bitrot |
-| 2.5 | Add output format auto-detection helper | `pkg/cmdguard/v2/output.go` ~50 lines | UX improvement |
+| Step | Task                                      | Work Required                         | Impact                   |
+| ---- | ----------------------------------------- | ------------------------------------- | ------------------------ |
+| 2.1  | **DECISION REQUIRED:** Answer #1 question | Discussion with Lars                  | Blocks everything below  |
+| 2.2  | Add "Output Formatting" section to README | `README.md` ~30 lines                 | High user value          |
+| 2.3  | Create `examples/output-formats/`         | New dir, ~150 lines                   | Demonstrates integration |
+| 2.4  | Verify go-output bridge compiles          | CI check or manual                    | Prevents bitrot          |
+| 2.5  | Add output format auto-detection helper   | `pkg/cmdguard/v2/output.go` ~50 lines | UX improvement           |
 
 ### Phase 3: P1 Integration — go-business-rules Companion
 
-| Step | Task | Work Required | Impact |
-|---|---|---|---|
-| 3.1 | Add "Validation" section to README | `README.md` ~40 lines | User guidance |
-| 3.2 | Create `examples/validation/` | New dir, ~200 lines | Demonstrates pattern |
-| 3.3 | Design `WithValidation()` API | `pkg/cmdguard/v2/command.go` | Optional integration |
-| 3.4 | Implement `WithValidation()` option | ~30 lines | Clean API |
-| 3.5 | Add validation to one existing example | `examples/typed/` | Real usage |
+| Step | Task                                   | Work Required                | Impact               |
+| ---- | -------------------------------------- | ---------------------------- | -------------------- |
+| 3.1  | Add "Validation" section to README     | `README.md` ~40 lines        | User guidance        |
+| 3.2  | Create `examples/validation/`          | New dir, ~200 lines          | Demonstrates pattern |
+| 3.3  | Design `WithValidation()` API          | `pkg/cmdguard/v2/command.go` | Optional integration |
+| 3.4  | Implement `WithValidation()` option    | ~30 lines                    | Clean API            |
+| 3.5  | Add validation to one existing example | `examples/typed/`            | Real usage           |
 
 ### Phase 4: Code Quality Improvements
 
-| Step | Task | Work Required | Impact |
-|---|---|---|---|
-| 4.1 | Triage 160 lint issues | Review each category | Cleaner codebase |
-| 4.2 | Fix forbidigo issues in examples | 20 findings | Removes lint noise |
-| 4.3 | Improve example coverage | `examples/typed/`: 3.6% → 50% | Better demos |
-| 4.4 | Use `slices` package everywhere | Audit + replace | Modern Go |
-| 4.5 | Use `maps` package where applicable | Go 1.21+ feature | Modern Go |
+| Step | Task                                | Work Required                 | Impact             |
+| ---- | ----------------------------------- | ----------------------------- | ------------------ |
+| 4.1  | Triage 160 lint issues              | Review each category          | Cleaner codebase   |
+| 4.2  | Fix forbidigo issues in examples    | 20 findings                   | Removes lint noise |
+| 4.3  | Improve example coverage            | `examples/typed/`: 3.6% → 50% | Better demos       |
+| 4.4  | Use `slices` package everywhere     | Audit + replace               | Modern Go          |
+| 4.5  | Use `maps` package where applicable | Go 1.21+ feature              | Modern Go          |
 
 ### Phase 5: Type System Architecture Improvements
 
-| Step | Task | Work Required | Impact |
-|---|---|---|---|
-| 5.1 | Add `Option[T]` marshaling support | `types_option.go` | JSON interop |
-| 5.2 | Consider `Result[T, E]` type | New file ~100 lines | Error handling pattern |
-| 5.3 | Add branded ID support | `types_branded.go` ~50 lines | Type safety |
-| 5.4 | Review Enum[T] for generic improvements | `enum.go` | Cleaner API |
-| 5.5 | Add Duration marshaling helpers | `duration.go` | Config interop |
+| Step | Task                                    | Work Required                | Impact                 |
+| ---- | --------------------------------------- | ---------------------------- | ---------------------- |
+| 5.1  | Add `Option[T]` marshaling support      | `types_option.go`            | JSON interop           |
+| 5.2  | Consider `Result[T, E]` type            | New file ~100 lines          | Error handling pattern |
+| 5.3  | Add branded ID support                  | `types_branded.go` ~50 lines | Type safety            |
+| 5.4  | Review Enum[T] for generic improvements | `enum.go`                    | Cleaner API            |
+| 5.5  | Add Duration marshaling helpers         | `duration.go`                | Config interop         |
 
 ### Phase 6: Ecosystem & Documentation
 
-| Step | Task | Work Required | Impact |
-|---|---|---|---|
-| 6.1 | Create `docs/ECOSYSTEM.md` | New file ~100 lines | Companion library guide |
-| 6.2 | Update FEATURES.md | Add companion section | User discovery |
-| 6.3 | Update AGENTS.md | Integration patterns | Dev reference |
-| 6.4 | Add CI workflow | `.github/workflows/ci.yml` | Quality gates |
-| 6.5 | Cross-link companion repos | README badges | Ecosystem coherence |
+| Step | Task                       | Work Required              | Impact                  |
+| ---- | -------------------------- | -------------------------- | ----------------------- |
+| 6.1  | Create `docs/ECOSYSTEM.md` | New file ~100 lines        | Companion library guide |
+| 6.2  | Update FEATURES.md         | Add companion section      | User discovery          |
+| 6.3  | Update AGENTS.md           | Integration patterns       | Dev reference           |
+| 6.4  | Add CI workflow            | `.github/workflows/ci.yml` | Quality gates           |
+| 6.5  | Cross-link companion repos | README badges              | Ecosystem coherence     |
 
 ---
 
@@ -260,41 +260,41 @@ func (fs *FlagSet) Parse(args []string) error
 
 ### Already Used (Keep Using)
 
-| Library | Purpose | Verdict |
-|---|---|---|
-| `github.com/spf13/cobra` | CLI framework | Core dependency, essential |
-| `github.com/samber/do/v2` | Dependency injection | Clean DI, keep |
-| `charm.land/fang/v2` | Cobra styling | Good for UX, keep |
-| `github.com/knadh/koanf/v2` | Configuration | Flexible config, keep |
+| Library                     | Purpose              | Verdict                    |
+| --------------------------- | -------------------- | -------------------------- |
+| `github.com/spf13/cobra`    | CLI framework        | Core dependency, essential |
+| `github.com/samber/do/v2`   | Dependency injection | Clean DI, keep             |
+| `charm.land/fang/v2`        | Cobra styling        | Good for UX, keep          |
+| `github.com/knadh/koanf/v2` | Configuration        | Flexible config, keep      |
 
 ### Recommended Additions
 
-| Library | Purpose | Work | Impact |
-|---|---|---|---|
-| `golang.org/x/exp/slices` → stdlib `slices` | Slice operations | Replace custom helpers | Medium |
-| `golang.org/x/exp/maps` → stdlib `maps` | Map operations | Modern Go patterns | Low |
-| `github.com/samber/mo` | Functional types | Option, Result, Either | Medium |
-| `github.com/google/uuid` | UUID generation | For branded ID examples | Low |
-| `github.com/stretchr/testify` | Test assertions | More expressive tests | Medium |
+| Library                                     | Purpose          | Work                    | Impact |
+| ------------------------------------------- | ---------------- | ----------------------- | ------ |
+| `golang.org/x/exp/slices` → stdlib `slices` | Slice operations | Replace custom helpers  | Medium |
+| `golang.org/x/exp/maps` → stdlib `maps`     | Map operations   | Modern Go patterns      | Low    |
+| `github.com/samber/mo`                      | Functional types | Option, Result, Either  | Medium |
+| `github.com/google/uuid`                    | UUID generation  | For branded ID examples | Low    |
+| `github.com/stretchr/testify`               | Test assertions  | More expressive tests   | Medium |
 
 ### For Companion Integration
 
-| Library | Companion | Integration Pattern |
-|---|---|---|
-| `github.com/larsartmann/go-output` | Recommended P0 | Documentation + examples |
-| `github.com/artmann/businessrules` | Recommended P1 | PreRunE + WithValidation |
-| `github.com/larsartmann/go-filewatcher` | Consider P2 | Watch command example |
-| `github.com/larsartmann/gogenfilter` | Consider P3 | Codegen command example |
+| Library                                 | Companion      | Integration Pattern      |
+| --------------------------------------- | -------------- | ------------------------ |
+| `github.com/larsartmann/go-output`      | Recommended P0 | Documentation + examples |
+| `github.com/artmann/businessrules`      | Recommended P1 | PreRunE + WithValidation |
+| `github.com/larsartmann/go-filewatcher` | Consider P2    | Watch command example    |
+| `github.com/larsartmann/gogenfilter`    | Consider P3    | Codegen command example  |
 
 ### Not Recommended (Per Review)
 
-| Library | Why Not |
-|---|---|
+| Library              | Why Not                      |
+| -------------------- | ---------------------------- |
 | `universal-workflow` | Heavy deps, different domain |
-| `go-cqrs-lite` | Backend pattern, not CLI |
-| `go-localfirst` | Reference app, not library |
-| `go-localsync` | Private deps, sync domain |
-| `go-plugin-mvp` | MVP, WASM complexity |
+| `go-cqrs-lite`       | Backend pattern, not CLI     |
+| `go-localfirst`      | Reference app, not library   |
+| `go-localsync`       | Private deps, sync domain    |
+| `go-plugin-mvp`      | MVP, WASM complexity         |
 
 ---
 
@@ -310,6 +310,7 @@ func (fs *FlagSet) Parse(args []string) error
 - Option D: Separate adapter module (coordination overhead)
 
 **Why I can't decide:** This is a product architecture decision, not a technical one. It depends on:
+
 - Whether cmdguard wants to be "batteries included" or "minimal core"
 - Whether go-output is positioned as "the" output library or "a" output library
 - Long-term maintenance commitment to the integration
