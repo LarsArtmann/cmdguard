@@ -14,20 +14,21 @@ This session discovered and resolved a critical syntax error in `examples/di/mai
 
 ## a) FULLY DONE
 
-| Task | Details | Status |
-|---|---|---|
-| Build error diagnosis | Identified syntax errors in `examples/di/main.go:115-170` | Done |
-| Build fix verification | `go build ./...` now passes | Done |
-| Full test suite | 11/11 packages pass | Done |
-| Status report creation | This document | Done |
+| Task                   | Details                                                   | Status |
+| ---------------------- | --------------------------------------------------------- | ------ |
+| Build error diagnosis  | Identified syntax errors in `examples/di/main.go:115-170` | Done   |
+| Build fix verification | `go build ./...` now passes                               | Done   |
+| Full test suite        | 11/11 packages pass                                       | Done   |
+| Status report creation | This document                                             | Done   |
 
 ### Build Error Details
 
 **Error Location:** `examples/di/main.go`  
 **Error Type:** Syntax error — non-declaration statement outside function body  
-**Root Cause:** Prior refactoring session introduced malformed code around lines 115-170  
+**Root Cause:** Prior refactoring session introduced malformed code around lines 115-170
 
 **Compiler Output:**
+
 ```
 examples/di/main.go:115:2: syntax error: non-declaration statement outside function body
 examples/di/main.go:130:62: method has multiple receivers
@@ -65,13 +66,13 @@ Nothing partially done. The build issue was resolved, and all tests pass.
 
 All work from the comprehensive execution plan (2026-04-10_10-05) remains pending:
 
-| Task | Priority | Blocker |
-|---|---|---|
-| Document go-output bridge in README | P0 | Q1: Dependency direction |
-| Create output-formats example | P0 | Q1: Dependency direction |
-| Add validation documentation | P1 | None |
-| Triage 160 lint issues | P2 | None |
-| Add CI workflow | P2 | None |
+| Task                                | Priority | Blocker                  |
+| ----------------------------------- | -------- | ------------------------ |
+| Document go-output bridge in README | P0       | Q1: Dependency direction |
+| Create output-formats example       | P0       | Q1: Dependency direction |
+| Add validation documentation        | P1       | None                     |
+| Triage 160 lint issues              | P2       | None                     |
+| Add CI workflow                     | P2       | None                     |
 
 ---
 
@@ -150,12 +151,14 @@ Same as execution plan (2026-04-10_10-05), condensed:
 This question is unchanged from the prior report. It blocks all P0 integration work.
 
 **Options:**
+
 - **A:** cmdguard imports go-output (tight coupling)
 - **B:** go-output imports cmdguard (reverse coupling)
 - **C:** Neither imports the other (current state, documentation-only bridge)
 - **D:** Separate adapter module (coordination overhead)
 
 **Why this matters:**
+
 - Determines whether cmdguard README can recommend go-output as "the" output library
 - Affects whether example code can import both in a single file
 - Influences whether the bridge needs compile-time verification
@@ -166,31 +169,32 @@ This question is unchanged from the prior report. It blocks all P0 integration w
 
 ## Session Metrics
 
-| Metric | Value |
-|---|---|
-| Commits this session | 0 (status report only) |
+| Metric                    | Value                    |
+| ------------------------- | ------------------------ |
+| Commits this session      | 0 (status report only)   |
 | Commits since last report | 2 (`37c2bd6`, `fd86f1d`) |
-| Build status | PASS |
-| Test status | 11/11 PASS |
-| Lint issues | 160 (pre-existing) |
-| New issues | 0 |
-| Uncommitted changes | 0 |
+| Build status              | PASS                     |
+| Test status               | 11/11 PASS               |
+| Lint issues               | 160 (pre-existing)       |
+| New issues                | 0                        |
+| Uncommitted changes       | 0                        |
 
 ---
 
 ## Project Health Dashboard
 
-| Check | Status |
-|---|---|
-| `go build ./...` | PASS |
-| `go test ./...` | PASS (11/11) |
-| Working tree | Clean |
-| Commits ahead | 2 |
-| Blockers | 1 (Q1: dependency direction) |
+| Check            | Status                       |
+| ---------------- | ---------------------------- |
+| `go build ./...` | PASS                         |
+| `go test ./...`  | PASS (11/11)                 |
+| Working tree     | Clean                        |
+| Commits ahead    | 2                            |
+| Blockers         | 1 (Q1: dependency direction) |
 
 ---
 
 **READY FOR:**
+
 - Push to origin (2 commits ready)
 - Decision on Q1 to unblock P0 work
 - Next implementation phase
