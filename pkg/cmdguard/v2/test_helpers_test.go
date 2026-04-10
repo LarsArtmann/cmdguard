@@ -9,6 +9,56 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func assertNoError(t *testing.T, err error, msg ...string) {
+	t.Helper()
+	if err != nil {
+		if len(msg) > 0 {
+			t.Fatalf("%s: %v", msg[0], err)
+		}
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func assertPanics(t *testing.T, fn func()) {
+	t.Helper()
+
+	didPanic := false
+
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				didPanic = true
+			}
+		}()
+
+		fn()
+	}()
+
+	if !didPanic {
+		t.Error("expected panic, got none")
+	}
+}
+
+func assertPanicsWithMessage(t *testing.T, fn func(), msg string) {
+	t.Helper()
+
+	didPanic := false
+
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				didPanic = true
+			}
+		}()
+
+		fn()
+	}()
+
+	if !didPanic {
+		t.Errorf("expected panic with message containing %q, got none", msg)
+	}
+}
+
 func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
 	t.Helper()
 	if d.Duration() != expected {

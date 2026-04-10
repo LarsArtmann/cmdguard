@@ -68,13 +68,9 @@ func TestOption_Unwrap(t *testing.T) {
 	}
 
 	// Test panic on None
-	defer func() {
-		if r := recover(); r == nil {
-			t.Error("None().Unwrap() should panic")
-		}
-	}()
-
-	None[int]().Unwrap()
+	assertPanics(t, func() {
+		None[int]().Unwrap()
+	})
 }
 
 func TestOption_UnwrapOr(t *testing.T) {
@@ -139,13 +135,9 @@ func TestOption_Expect(t *testing.T) {
 		t.Error("Expect should return value")
 	}
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Error("None().Expect should panic")
-		}
-	}()
-
-	None[int]().Expect("custom error message")
+	assertPanics(t, func() {
+		None[int]().Expect("custom error message")
+	})
 }
 
 func TestOption_Map(t *testing.T) {

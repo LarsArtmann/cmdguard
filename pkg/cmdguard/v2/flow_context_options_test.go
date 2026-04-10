@@ -95,13 +95,9 @@ func TestRequireBranchingFlowContext(t *testing.T) {
 	t.Run("not found panics", func(t *testing.T) {
 		t.Parallel()
 
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic when no branching flow context")
-			}
-		}()
-
-		ctx := context.Background()
-		RequireBranchingFlowContext(ctx)
+		assertPanics(t, func() {
+			ctx := context.Background()
+			RequireBranchingFlowContext(ctx)
+		})
 	})
 }

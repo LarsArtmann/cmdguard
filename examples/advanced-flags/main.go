@@ -81,6 +81,12 @@ func execute(ctx context.Context, cli *v2.CLI[GlobalConfig]) {
 	}
 }
 
+// fatal prints the error to stderr and exits with code 1.
+func fatal(format string, args ...any) {
+	fmt.Fprintf(os.Stderr, format, args...)
+	os.Exit(1)
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -92,8 +98,7 @@ func main() {
 		GlobalConfig{},
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		fatal("Error: %v\n", err)
 	}
 
 	// Server command with custom flags
@@ -117,8 +122,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding server command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding server command: %v\n", err)
 	}
 
 	// Config command with required flag
@@ -147,8 +151,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding config command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding config command: %v\n", err)
 	}
 
 	// Enum demo command
@@ -172,8 +175,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding env command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding env command: %v\n", err)
 	}
 
 	// Duration demo command
@@ -193,8 +195,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding duration command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding duration command: %v\n", err)
 	}
 
 	// Execute

@@ -111,24 +111,27 @@ func execute(ctx context.Context, cli *v2.CLI[Config]) {
 	}
 }
 
+// fatal prints the error to stderr and exits with code 1.
+func fatal(format string, args ...any) {
+	fmt.Fprintf(os.Stderr, format, args...)
+	os.Exit(1)
+}
+
 func main() {
 	ctx := context.Background()
 
 	root, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		fatal("Error: %v\n", err)
 	}
 
 	// Register services in DI scope
 	if err := v2.Provide(root.Scope(), NewDatabaseService); err != nil {
-		fmt.Fprintf(os.Stderr, "Error registering database: %v\n", err)
-		os.Exit(1)
+		fatal("Error registering database: %v\n", err)
 	}
 
 	if err := v2.Provide(root.Scope(), NewAPIService); err != nil {
-		fmt.Fprintf(os.Stderr, "Error registering API: %v\n", err)
-		os.Exit(1)
+		fatal("Error registering API: %v\n", err)
 	}
 
 	// Add health check command
@@ -145,13 +148,12 @@ func main() {
 				return fmt.Errorf("health check failed: %w", err)
 			}
 
-			fmt.Println("All health checks PASSED!")
+		fmt.Println("All health checks PASSED!")
 
 			return nil
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding check command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding check command: %v\n", err)
 	}
 
 	// Add API call command
@@ -167,8 +169,7 @@ func main() {
 			return api.Call(ctx)
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding call command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding call command: %v\n", err)
 	}
 
 	// Add shutdown command
@@ -193,14 +194,12 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding shutdown command: %v\n", err)
-		os.Exit(1)
+		fatal("Error adding shutdown command: %v\n", err)
 	}
 
 	// Run health check before starting
 	if err := root.Scope().HealthCheckWithContext(ctx); err != nil {
-		fmt.Printf("Initial health check failed: %v\n", err)
-		os.Exit(1)
+		fatal("Initial health check failed: %v\n", err)
 	}
 
 	// Execute
@@ -211,6 +210,6 @@ func main() {
 	defer cancel()
 
 	if err := root.Shutdown(shutdownCtx); err != nil {
-		fmt.Fprintf(os.Stderr, "Shutdown error: %v\n", err)
+		fatal("Shutdown error: %v\n", err)
 	}
 }

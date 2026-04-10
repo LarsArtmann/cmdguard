@@ -84,6 +84,12 @@ func printRunE(messages ...string) func(context.Context, *AppConfig, v2.NoFlags)
 	}
 }
 
+// fatal prints the error to stderr and exits with code 1.
+func fatal(format string, args ...any) {
+	fmt.Fprintf(os.Stderr, format, args...)
+	os.Exit(1)
+}
+
 func main() {
 	fmt.Println("=== Typed CLI Example (v2 API) ===")
 	fmt.Println()
@@ -93,8 +99,7 @@ func main() {
 	// Each command can have its own flags type.
 	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
-		os.Exit(1)
+		fatal("Failed to create CLI: %v\n", err)
 	}
 
 	// Set version
@@ -108,20 +113,18 @@ func main() {
 
 	// Add commands
 	if err := addCommands(cli); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to add commands: %v\n", err)
-		os.Exit(1)
+		fatal("Failed to add commands: %v\n", err)
 	}
 
 	// Run health checks
 	if err := cli.HealthCheck(); err != nil {
-		fmt.Fprintf(os.Stderr, "Health check failed: %v\n", err)
+		fatal("Health check failed: %v\n", err)
 	}
 
 	// Execute the CLI
 	ctx := context.Background()
 	if err := cli.Execute(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		fatal("Error: %v\n", err)
 	}
 
 	// Graceful shutdown
@@ -129,7 +132,7 @@ func main() {
 	defer cancel()
 
 	if err := cli.Shutdown(shutdownCtx); err != nil {
-		fmt.Fprintf(os.Stderr, "Shutdown error: %v\n", err)
+		fatal("Shutdown error: %v\n", err)
 	}
 }
 
@@ -137,7 +140,7 @@ func registerServices(scope *v2.Scope) {
 	// Register config first so providers can depend on it
 	err := v2.ProvideValue(scope, AppConfig{Verbose: true})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to register config: %v\n", err)
+		fatal("Failed to register config: %v\n", err)
 	}
 
 	// Register a logger service - gets config via DI, not closure capture
@@ -150,13 +153,13 @@ func registerServices(scope *v2.Scope) {
 		return &Logger{verbose: cfg.Verbose}, nil
 	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to register logger: %v\n", err)
+		fatal("Failed to register logger: %v\n", err)
 	}
 
 	// Register a database service (simulated)
 	err = v2.ProvideValue(scope, &Database{connectionString: "postgres://localhost:5432/mydb"})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to register database: %v\n", err)
+		fatal("Failed to register database: %v\n", err)
 	}
 }
 

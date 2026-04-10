@@ -146,13 +146,9 @@ func TestMustInvoke(t *testing.T) {
 	t.Run("panics for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic, got none")
-			}
-		}()
-
-		MustInvoke[string](nil)
+		assertPanics(t, func() {
+			MustInvoke[string](nil)
+		})
 	})
 
 	t.Run("panics for unregistered service", func(t *testing.T) {
@@ -160,13 +156,9 @@ func TestMustInvoke(t *testing.T) {
 
 		scope := NewScope("test")
 
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic, got none")
-			}
-		}()
-
-		MustInvoke[string](scope)
+		assertPanics(t, func() {
+			MustInvoke[string](scope)
+		})
 	})
 }
 
@@ -191,13 +183,9 @@ func TestMustInvokeNamed(t *testing.T) {
 	t.Run("panics for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic, got none")
-			}
-		}()
-
-		MustInvokeNamed[string](nil, "name")
+		assertPanics(t, func() {
+			MustInvokeNamed[string](nil, "name")
+		})
 	})
 
 	t.Run("panics for unregistered named service", func(t *testing.T) {
@@ -205,12 +193,8 @@ func TestMustInvokeNamed(t *testing.T) {
 
 		scope := NewScope("test")
 
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic, got none")
-			}
-		}()
-
-		MustInvokeNamed[string](scope, "nonexistent")
+		assertPanics(t, func() {
+			MustInvokeNamed[string](scope, "nonexistent")
+		})
 	})
 }

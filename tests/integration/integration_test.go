@@ -11,6 +11,26 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/cmdguard"
 )
 
+func expectPanic(t *testing.T, fn func()) {
+	t.Helper()
+
+	didPanic := false
+
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				didPanic = true
+			}
+		}()
+
+		fn()
+	}()
+
+	if !didPanic {
+		t.Error("expected panic")
+	}
+}
+
 func TestGuardedCommand_FullLifecycle(t *testing.T) {
 	t.Parallel()
 
@@ -43,24 +63,12 @@ func TestGuardedCommand_PanicOnInvalidCommand(t *testing.T) {
 
 	root := cmdguard.New("testapp", "Test application")
 
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
+	expectPanic(t, func() {
 		root.AddCommand(&cobra.Command{
 			Use:   "invalid",
 			Short: "This has no handler",
 		})
-	}()
-
-	if !didPanic {
-		t.Errorf("expected panic for command without handler")
-	}
+	})
 }
 
 func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
@@ -68,24 +76,12 @@ func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
 
 	root := cmdguard.New("testapp", "Test application")
 
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
+	expectPanic(t, func() {
 		root.AddCommand(&cobra.Command{
 			Short: "No name here",
 			Run:   func(_ *cobra.Command, _ []string) {},
 		})
-	}()
-
-	if !didPanic {
-		t.Errorf("expected panic for command without name")
-	}
+	})
 }
 
 func TestGuardedCommand_ParentWithChildren(t *testing.T) {
@@ -127,24 +123,12 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 		RunE:  func(_ *cobra.Command, _ []string) error { return nil },
 	})
 
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
+	expectPanic(t, func() {
 		root.AddCommand(&cobra.Command{
 			Use: "bad",
 			Run: func(*cobra.Command, []string) {},
 		})
-	}()
-
-	if !didPanic {
-		t.Errorf("expected panic for Run without RunE in strict mode")
-	}
+	})
 }
 
 func TestGuardedCommand_ConfigAccess(t *testing.T) {

@@ -6,6 +6,22 @@ import (
 	"testing"
 )
 
+func assertConfigValues(t *testing.T, loader *Loader, level, format string, strict bool) {
+	t.Helper()
+
+	if got := loader.GetString("log_level"); got != level {
+		t.Errorf("GetString(log_level) = %q, want %q", got, level)
+	}
+
+	if got := loader.GetString("log_format"); got != format {
+		t.Errorf("GetString(log_format) = %q, want %q", got, format)
+	}
+
+	if loader.GetBool("strict_mode") != strict {
+		t.Errorf("GetBool(strict_mode) = %v, want %v", loader.GetBool("strict_mode"), strict)
+	}
+}
+
 func TestKoanfLoader_LoadDefaults(t *testing.T) {
 	t.Parallel()
 
@@ -16,17 +32,7 @@ func TestKoanfLoader_LoadDefaults(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if got := loader.GetString("log_level"); got != "info" {
-		t.Errorf("GetString(log_level) = %q, want %q", got, "info")
-	}
-
-	if got := loader.GetString("log_format"); got != "text" {
-		t.Errorf("GetString(log_format) = %q, want %q", got, "text")
-	}
-
-	if loader.GetBool("strict_mode") {
-		t.Errorf("GetBool(strict_mode) = true, want false")
-	}
+	assertConfigValues(t, loader, "info", "text", false)
 }
 
 func TestKoanfLoader_LoadEnv(t *testing.T) {
@@ -41,17 +47,7 @@ func TestKoanfLoader_LoadEnv(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if got := loader.GetString("log_level"); got != "debug" {
-		t.Errorf("GetString(log_level) = %q, want %q", got, "debug")
-	}
-
-	if got := loader.GetString("log_format"); got != "json" {
-		t.Errorf("GetString(log_format) = %q, want %q", got, "json")
-	}
-
-	if !loader.GetBool("strict_mode") {
-		t.Errorf("GetBool(strict_mode) = false, want true")
-	}
+	assertConfigValues(t, loader, "debug", "json", true)
 }
 
 func TestKoanfLoader_LoadFile(t *testing.T) {
@@ -77,17 +73,7 @@ strict_mode: true
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if got := loader.GetString("log_level"); got != "warn" {
-		t.Errorf("GetString(log_level) = %q, want %q", got, "warn")
-	}
-
-	if got := loader.GetString("log_format"); got != "json" {
-		t.Errorf("GetString(log_format) = %q, want %q", got, "json")
-	}
-
-	if !loader.GetBool("strict_mode") {
-		t.Errorf("GetBool(strict_mode) = false, want true")
-	}
+	assertConfigValues(t, loader, "warn", "json", true)
 }
 
 func TestKoanfLoader_EnvOverridesFile(t *testing.T) {
@@ -114,17 +100,7 @@ log_format: json
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if got := loader.GetString("log_level"); got != "debug" {
-		t.Errorf("GetString(log_level) = %q, want %q", got, "debug")
-	}
-
-	if got := loader.GetString("log_format"); got != "json" {
-		t.Errorf("GetString(log_format) = %q, want %q", got, "json")
-	}
-
-	if !loader.GetBool("strict_mode") {
-		t.Errorf("GetBool(strict_mode) = false, want true")
-	}
+	assertConfigValues(t, loader, "debug", "json", true)
 }
 
 func TestKoanfLoader_Unmarshal(t *testing.T) {
@@ -170,15 +146,11 @@ func TestKoanfLoader_MissingFile(t *testing.T) {
 
 	loader := NewLoader()
 	err := loader.Load("/nonexistent/path/config.yaml")
-	// Should not error (file is optional)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Should have defaults
-	if got := loader.GetString("log_level"); got != "info" {
-		t.Errorf("GetString(log_level) = %q, want %q", got, "info")
-	}
+	assertConfigValues(t, loader, "info", "text", false)
 }
 
 func TestKoanfLoader_Priority(t *testing.T) {
@@ -201,8 +173,5 @@ func TestKoanfLoader_Priority(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Should be debug (env wins)
-	if got := loader.GetString("log_level"); got != "debug" {
-		t.Errorf("GetString(log_level) = %q, want %q", got, "debug")
-	}
+	assertConfigValues(t, loader, "debug", "text", false)
 }
