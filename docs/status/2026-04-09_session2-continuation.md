@@ -8,12 +8,12 @@
 
 ## Completed This Session
 
-| # | Commit | Description |
-|---|--------|-------------|
-| 10 | `377d3b5` | **refactor(v2): split cli.go into focused files under 250-line limit** |
-| 11 | `644d14d` | **chore: remove orphaned pkg/errors package** |
-| 12 | `b5a8681` | **test(logging): add NewLoggerWriter tests for custom writer output** |
-| 13 | `5bba90f` | **refactor(v2): extract initCommandFlags and wireHandler from cliToCobraCommand** |
+| #   | Commit    | Description                                                                       |
+| --- | --------- | --------------------------------------------------------------------------------- |
+| 10  | `377d3b5` | **refactor(v2): split cli.go into focused files under 250-line limit**            |
+| 11  | `644d14d` | **chore: remove orphaned pkg/errors package**                                     |
+| 12  | `b5a8681` | **test(logging): add NewLoggerWriter tests for custom writer output**             |
+| 13  | `5bba90f` | **refactor(v2): extract initCommandFlags and wireHandler from cliToCobraCommand** |
 
 ---
 
@@ -23,12 +23,12 @@
 
 Split `pkg/cmdguard/v2/cli.go` (419 lines) into four focused files:
 
-| File | Lines | Responsibility |
-|------|-------|----------------|
-| `cli.go` | 170 | CLI struct, NewCLI, initialize, AddCommand, Execute, validateName |
-| `cli_options.go` | 49 | CLIOption type and WithCLI* functional options |
-| `cli_accessors.go` | 91 | Getter/setter methods (Scope, Config, Shutdown, etc.) |
-| `cli_command.go` | 125 | cliToCobraCommand, prepareRunContext, isNoFlags |
+| File               | Lines | Responsibility                                                    |
+| ------------------ | ----- | ----------------------------------------------------------------- |
+| `cli.go`           | 170   | CLI struct, NewCLI, initialize, AddCommand, Execute, validateName |
+| `cli_options.go`   | 49    | CLIOption type and WithCLI\* functional options                   |
+| `cli_accessors.go` | 91    | Getter/setter methods (Scope, Config, Shutdown, etc.)             |
+| `cli_command.go`   | 125   | cliToCobraCommand, prepareRunContext, isNoFlags                   |
 
 ### 2. pkg/errors Removed (commit 11)
 
@@ -38,6 +38,7 @@ Split `pkg/cmdguard/v2/cli.go` (419 lines) into four focused files:
 ### 3. NewLoggerWriter Tests (commit 12)
 
 Added three test functions in `internal/logging/logger_basic_test.go`:
+
 - `TestNewLoggerWriter` — text/JSON/unknown format writes to bytes.Buffer
 - `TestNewLoggerWriter_NilWriter` — io.Discard safety
 - `TestNewLogger_DelegatesToNewLoggerWriter` — verifies delegation chain
@@ -45,6 +46,7 @@ Added three test functions in `internal/logging/logger_basic_test.go`:
 ### 4. cliToCobraCommand Refactor (commit 13)
 
 Extracted two helpers from `cliToCobraCommand`:
+
 - `initCommandFlags[F]` — flag registry creation + registration (early returns)
 - `wireHandler[T, F]` — generic handler wiring via pointer-to-field assignment
 
@@ -85,12 +87,12 @@ All 11 packages pass.
 
 ## Remaining Audit Items (Low Priority / Design Decisions)
 
-| Item | Status | Notes |
-|------|--------|-------|
-| `flow_context.go` shared `values` map | Open | No synchronization — design question: single-goroutine intent? |
-| `Option[T].Unwrap()/Expect()` panics | By design | Rust-style, documented |
-| 189+ paralleltest warnings in tests | Low priority | Widespread but cosmetic |
-| 4 files still >250 lines | Reduced | `cli.go` now 170, `flow_context.go` (355), `scope.go` (334), `flag_helpers.go` (254) remain |
+| Item                                  | Status       | Notes                                                                                       |
+| ------------------------------------- | ------------ | ------------------------------------------------------------------------------------------- |
+| `flow_context.go` shared `values` map | Open         | No synchronization — design question: single-goroutine intent?                              |
+| `Option[T].Unwrap()/Expect()` panics  | By design    | Rust-style, documented                                                                      |
+| 189+ paralleltest warnings in tests   | Low priority | Widespread but cosmetic                                                                     |
+| 4 files still >250 lines              | Reduced      | `cli.go` now 170, `flow_context.go` (355), `scope.go` (334), `flag_helpers.go` (254) remain |
 
 ---
 

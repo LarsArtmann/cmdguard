@@ -236,9 +236,27 @@ func TestNewLoggerWriter(t *testing.T) {
 		expectJSON    bool
 		expectMessage string
 	}{
-		{name: "text format writes to custom writer", format: "text", level: "info", expectJSON: false, expectMessage: "test-text"},
-		{name: "json format writes to custom writer", format: "json", level: "info", expectJSON: true, expectMessage: "test-json"},
-		{name: "unknown format defaults to text", format: "unknown", level: "info", expectJSON: false, expectMessage: "test-unknown"},
+		{
+			name:          "text format writes to custom writer",
+			format:        "text",
+			level:         "info",
+			expectJSON:    false,
+			expectMessage: "test-text",
+		},
+		{
+			name:          "json format writes to custom writer",
+			format:        "json",
+			level:         "info",
+			expectJSON:    true,
+			expectMessage: "test-json",
+		},
+		{
+			name:          "unknown format defaults to text",
+			format:        "unknown",
+			level:         "info",
+			expectJSON:    false,
+			expectMessage: "test-unknown",
+		},
 	}
 
 	for _, tt := range tests {
