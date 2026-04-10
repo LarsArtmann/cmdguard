@@ -145,17 +145,19 @@ func testPtrGeneric[T comparable](t *testing.T, v T) {
 	}
 }
 
+// runPtrTest runs a single pointer test case.
+func runPtrTest[T comparable](t *testing.T, name string, value T) {
+	t.Run(name, func(t *testing.T) {
+		t.Parallel()
+		testPtrGeneric(t, value)
+	})
+}
+
 func TestPtr(t *testing.T) {
 	t.Parallel()
-	t.Run("int", func(t *testing.T) {
-		t.Parallel()
-		testPtrGeneric(t, 42)
-	})
 
-	t.Run("string", func(t *testing.T) {
-		t.Parallel()
-		testPtrGeneric(t, "hello")
-	})
+	runPtrTest(t, "int", 42)
+	runPtrTest(t, "string", "hello")
 
 	t.Run("struct", func(t *testing.T) {
 		t.Parallel()

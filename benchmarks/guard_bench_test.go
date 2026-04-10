@@ -284,16 +284,8 @@ func BenchmarkParseEmail(b *testing.B) {
 	}
 }
 
-// BenchmarkParsePort measures port parsing (numeric).
-func BenchmarkParsePort(b *testing.B) {
-	ports := []string{
-		"8080",
-		"3000",
-		"443",
-		"22",
-		"9000",
-	}
-
+// benchmarkParsePorts is a helper for parsing port benchmarks.
+func benchmarkParsePorts(b *testing.B, ports []string) {
 	for b.Loop() {
 		for _, p := range ports {
 			port, err := v2.ParsePort(p)
@@ -306,20 +298,24 @@ func BenchmarkParsePort(b *testing.B) {
 	}
 }
 
+// BenchmarkParsePort measures port parsing (numeric).
+func BenchmarkParsePort(b *testing.B) {
+	ports := []string{
+		"8080",
+		"3000",
+		"443",
+		"22",
+		"9000",
+	}
+
+	benchmarkParsePorts(b, ports)
+}
+
 // BenchmarkParsePortNamed measures port parsing (named ports).
 func BenchmarkParsePortNamed(b *testing.B) {
 	ports := []string{"http", "https", "ssh", "ftp", "smtp"}
 
-	for b.Loop() {
-		for _, p := range ports {
-			port, err := v2.ParsePort(p)
-			if err != nil {
-				b.Fatal(err)
-			}
-
-			_ = port
-		}
-	}
+	benchmarkParsePorts(b, ports)
 }
 
 // BenchmarkParseFilePath measures file path parsing.
@@ -366,19 +362,24 @@ func BenchmarkParseHostPort(b *testing.B) {
 	}
 }
 
+// benchService is a shared service type for scope benchmarks.
+type benchService struct {
+	Name string
+}
+
+// provideBenchService is a helper that provides a benchService to a scope.
+func provideBenchService(scope *v2.Scope) error {
+	return v2.Provide[benchService](scope, func(i do.Injector) (benchService, error) {
+		return benchService{Name: "test"}, nil
+	})
+}
+
 // BenchmarkScopeProvide measures DI service registration.
 func BenchmarkScopeProvide(b *testing.B) {
-	type Service struct {
-		Name string
-	}
-
 	scope := v2.NewScope("bench")
 
 	for b.Loop() {
-		err := v2.Provide[Service](scope, func(i do.Injector) (Service, error) {
-			return Service{Name: "test"}, nil
-		})
-		if err != nil {
+		if err := provideBenchService(scope); err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -386,17 +387,13 @@ func BenchmarkScopeProvide(b *testing.B) {
 
 // BenchmarkScopeInvoke measures DI service retrieval.
 func BenchmarkScopeInvoke(b *testing.B) {
-	type Service struct {
-		Name string
+	scope := v2.NewScope("bench")
+	if err := provideBenchService(scope); err != nil {
+		b.Fatal(err)
 	}
 
-	scope := v2.NewScope("bench")
-	_ = v2.Provide[Service](scope, func(i do.Injector) (Service, error) {
-		return Service{Name: "test"}, nil
-	})
-
 	for b.Loop() {
-		svc, err := v2.Invoke[Service](scope)
+		svc, err := v2.Invoke[benchService](scope)
 		if err != nil {
 			b.Fatal(err)
 		}

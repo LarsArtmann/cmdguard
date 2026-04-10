@@ -103,11 +103,17 @@ func (a *APIService) Call(ctx context.Context) error {
 	return nil
 }
 
+// execute runs the CLI and exits on error.
+func execute(ctx context.Context, cli *v2.CLI[Config]) {
+	if err := cli.Execute(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
 func main() {
 	ctx := context.Background()
 
-	// Create CLI with typed config using CLI[T] API (v2.1+)
-	// CLI[T] uses a single type parameter for cleaner API
 	root, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -126,7 +132,6 @@ func main() {
 	}
 
 	// Add health check command
-	// CLI[T] uses v2.AddCommand function to support any flags type per command
 	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
 		Use:   "check",
 		Short: "Run health checks",
@@ -199,10 +204,7 @@ func main() {
 	}
 
 	// Execute
-	if err := root.Execute(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
+	execute(ctx, root)
 
 	// Graceful shutdown on exit
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

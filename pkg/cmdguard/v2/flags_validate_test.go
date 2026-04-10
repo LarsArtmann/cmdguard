@@ -103,15 +103,16 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		}
 	})
 
-	// flag without values skips validation
-	{
-		type TestConfig struct {
+	t.Run("flag without values skips validation", func(t *testing.T) {
+		t.Parallel()
+
+		type testConfigFlagWithoutValues struct {
 			Name string `default:"default" flag:"name"`
 		}
 
-		registry, cmd := setupFlagTest(t, TestConfig{})
+		registry, cmd := setupFlagTest(t, testConfigFlagWithoutValues{})
 		setFlagAndAssertValid(t, cmd, registry, "name", "anything")
-	}
+	})
 
 	t.Run("required flag not set returns error", func(t *testing.T) {
 		t.Parallel()
@@ -137,15 +138,16 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		}
 	})
 
-	// required flag set passes validation
-	{
-		type TestConfig struct {
+	t.Run("required flag set passes validation", func(t *testing.T) {
+		t.Parallel()
+
+		type testConfigRequiredFlagSet struct {
 			Name string `flag:"name" help:"required name" required:"true"`
 		}
 
-		registry, cmd := setupFlagTest(t, TestConfig{})
+		registry, cmd := setupFlagTest(t, testConfigRequiredFlagSet{})
 		setFlagAndAssertValid(t, cmd, registry, "name", "test-value")
-	}
+	})
 
 	t.Run("required false does not enforce", func(t *testing.T) {
 		t.Parallel()

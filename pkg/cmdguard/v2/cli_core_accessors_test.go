@@ -68,18 +68,8 @@ func TestCLISubcommands(t *testing.T) {
 
 		subCmd := newTestCLICommand[testCLIConfig]("list")
 		subCmd.Short = "List items"
-
-		parentCmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:      "items",
-			Short:    "Item management",
-			Commands: []v2.Command[testCLIConfig, v2.NoFlags]{subCmd},
-		}
-
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:      "admin",
-			Short:    "Admin commands",
-			Commands: []v2.Command[testCLIConfig, v2.NoFlags]{parentCmd},
-		}
+		parentCmd := newTestParentCommand("items", "Item management", subCmd)
+		cmd := newTestParentCommand("admin", "Admin commands", parentCmd)
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {

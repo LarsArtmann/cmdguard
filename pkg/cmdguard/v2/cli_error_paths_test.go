@@ -64,14 +64,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 		childCmd := newTestCLICommand[testCLIConfig]("child")
 		childCmd.Short = "Child command"
-
-		parentCmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "parent",
-			Short: "Parent command",
-			Commands: []v2.Command[testCLIConfig, v2.NoFlags]{
-				childCmd,
-			},
-		}
+		parentCmd := newTestParentCommand("parent", "Parent command", childCmd)
 
 		err = v2.AddCommand(cli, parentCmd)
 		if err != nil {

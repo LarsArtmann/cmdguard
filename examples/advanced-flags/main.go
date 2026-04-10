@@ -73,6 +73,14 @@ type DurationFlags struct {
 	MaxWait        v2.Duration `default:"0s" flag:"max-wait"        help:"Maximum wait time (0 = no limit)"`
 }
 
+// execute runs the CLI and exits on error.
+func execute(ctx context.Context, cli *v2.CLI[GlobalConfig]) {
+	if err := cli.Execute(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -190,10 +198,7 @@ func main() {
 	}
 
 	// Execute
-	if err := root.Execute(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
+	execute(ctx, root)
 }
 
 // suggestFormat returns a suggestion for invalid format.
