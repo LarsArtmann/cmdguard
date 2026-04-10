@@ -9,11 +9,13 @@ import (
 
 func newTestCLICommand[C any](use string) v2.Command[C, v2.NoFlags] {
 	return v2.Command[C, v2.NoFlags]{
-		Use: use,
-		RunE: func(_ context.Context, _ *C, _ v2.NoFlags) error {
-			return nil
-		},
+		Use:  use,
+		RunE: noOpRunE[C],
 	}
+}
+
+func noOpRunE[C any](_ context.Context, _ *C, _ v2.NoFlags) error {
+	return nil
 }
 
 func testParseError[T any](t *testing.T, parseFn func() (T, error), typeName string) {

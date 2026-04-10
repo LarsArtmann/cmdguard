@@ -104,9 +104,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 
 				return nil
 			},
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
+			RunE: noOpRunE[testCLIConfig],
 			PostRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				postRan = true
 

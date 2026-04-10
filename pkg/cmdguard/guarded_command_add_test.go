@@ -47,12 +47,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		g := New("testapp", "Test")
 
-		cmd := &cobra.Command{
-			Use: "sub",
-			RunE: func(*cobra.Command, []string) error {
-				return nil
-			},
-		}
+		cmd := newTestCommand("sub")
 
 		if assertPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should not panic for valid command")

@@ -37,12 +37,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 	t.Run("command with RunE is valid", func(t *testing.T) {
 		g := New("testapp", "Test")
 
-		cmd := &cobra.Command{
-			Use: "sub",
-			RunE: func(*cobra.Command, []string) error {
-				return nil
-			},
-		}
+		cmd := newTestCommand("sub")
 
 		err := g.validateCommand(cmd)
 		if err != nil {

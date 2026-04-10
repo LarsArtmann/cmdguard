@@ -1,23 +1,10 @@
 package v2
 
 import (
+	"slices"
 	"strings"
 	"testing"
 )
-
-func slicesEqualStr(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
-}
 
 func TestParseFlagTags(t *testing.T) {
 	t.Parallel()
@@ -156,7 +143,7 @@ func TestParseFlagTags(t *testing.T) {
 		}
 
 		expected := []string{"debug", "info", "warn", "error"}
-		if !slicesEqualStr(tags[0].Values, expected) {
+		if !slices.Equal(tags[0].Values, expected) {
 			t.Errorf("expected Values %v, got %v", expected, tags[0].Values)
 		}
 	})

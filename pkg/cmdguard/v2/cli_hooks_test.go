@@ -3,24 +3,11 @@ package v2
 import (
 	"context"
 	"errors"
+	"slices"
 	"testing"
 )
 
 var errTest = errors.New("test error")
-
-func slicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
-}
 
 func makeHookRunE(
 	order *[]string,
@@ -89,7 +76,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
-			if !slicesEqual(order, tt.want) {
+			if !slices.Equal(order, tt.want) {
 				t.Errorf("order = %v, want %v", order, tt.want)
 			}
 		})
@@ -204,7 +191,7 @@ func TestCLI_CommandOptions(t *testing.T) {
 				t.Errorf("Deprecated = %q, want %q", cobraCmd.Deprecated, tt.wantDeprecated)
 			}
 
-			if !slicesEqual(cobraCmd.Aliases, tt.wantAliases) {
+			if !slices.Equal(cobraCmd.Aliases, tt.wantAliases) {
 				t.Errorf("Aliases = %v, want %v", cobraCmd.Aliases, tt.wantAliases)
 			}
 

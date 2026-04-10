@@ -62,13 +62,8 @@ func TestInitializeErrorPaths(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		childCmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "child",
-			Short: "Child command",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
-		}
+		childCmd := newTestCLICommand[testCLIConfig]("child")
+		childCmd.Short = "Child command"
 
 		parentCmd := v2.Command[testCLIConfig, v2.NoFlags]{
 			Use:   "parent",
@@ -112,10 +107,8 @@ func TestInitializeErrorPaths(t *testing.T) {
 		}
 
 		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use: "",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				return nil
-			},
+			Use:  "",
+			RunE: noOpRunE[testCLIConfig],
 		}
 
 		err = v2.AddCommand(cli, cmd)
