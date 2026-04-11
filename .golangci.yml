@@ -229,6 +229,7 @@ linters:
           - err113
           - mnd
           - wrapcheck
+          - forbidigo  # examples MUST print output to demonstrate CLI behavior
       - path: benchmarks/
         linters:
           - err113
