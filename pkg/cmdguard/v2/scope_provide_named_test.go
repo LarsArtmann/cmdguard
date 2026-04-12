@@ -132,6 +132,7 @@ func TestMustInvoke(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
+
 		err := ProvideValue(scope, "hello")
 		if err != nil {
 			t.Fatalf("expected no error providing value, got: %v", err)

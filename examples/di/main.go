@@ -105,7 +105,8 @@ func (a *APIService) Call(ctx context.Context) error {
 
 // execute runs the CLI and exits on error.
 func execute(ctx context.Context, cli *v2.CLI[Config]) {
-	if err := cli.Execute(ctx); err != nil {
+	err := cli.Execute(ctx)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}

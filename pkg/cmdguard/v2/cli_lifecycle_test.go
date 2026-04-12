@@ -249,6 +249,7 @@ func TestCLIExecuteAndExit(t *testing.T) {
 		cli, _ := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 
 		cmd := newTestCLICommand[testCLIConfig]("run")
+
 		err := v2.AddCommand(cli, cmd)
 		if err != nil {
 			t.Fatalf("AddCommand failed: %v", err)

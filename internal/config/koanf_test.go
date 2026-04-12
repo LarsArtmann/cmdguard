@@ -22,17 +22,22 @@ func assertConfigValues(t *testing.T, loader *Loader, level, format string, stri
 	}
 }
 
-func TestKoanfLoader_LoadDefaults(t *testing.T) {
-	t.Parallel()
+func testLoadAndAssertDefaults(t *testing.T, path string) {
+	t.Helper()
 
 	loader := NewLoader()
 
-	err := loader.Load("")
+	err := loader.Load(path)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	assertConfigValues(t, loader, "info", "text", false)
+}
+
+func TestKoanfLoader_LoadDefaults(t *testing.T) {
+	t.Parallel()
+	testLoadAndAssertDefaults(t, "")
 }
 
 func TestKoanfLoader_LoadEnv(t *testing.T) {
@@ -143,14 +148,7 @@ func TestKoanfLoader_Unmarshal(t *testing.T) {
 
 func TestKoanfLoader_MissingFile(t *testing.T) {
 	t.Parallel()
-
-	loader := NewLoader()
-	err := loader.Load("/nonexistent/path/config.yaml")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	assertConfigValues(t, loader, "info", "text", false)
+	testLoadAndAssertDefaults(t, "/nonexistent/path/config.yaml")
 }
 
 func TestKoanfLoader_Priority(t *testing.T) {

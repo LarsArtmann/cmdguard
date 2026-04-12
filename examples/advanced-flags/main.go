@@ -75,7 +75,8 @@ type DurationFlags struct {
 
 // execute runs the CLI and exits on error.
 func execute(ctx context.Context, cli *v2.CLI[GlobalConfig]) {
-	if err := cli.Execute(ctx); err != nil {
+	err := cli.Execute(ctx)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}

@@ -17,6 +17,7 @@ import (
 func greetRunE() func(context.Context, *AppConfig, *GreetFlags) error {
 	return func(_ context.Context, _ *AppConfig, _ *GreetFlags) error {
 		fmt.Println("Greeting executed")
+
 		return nil
 	}
 }

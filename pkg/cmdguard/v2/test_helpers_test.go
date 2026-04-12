@@ -11,10 +11,12 @@ import (
 
 func assertNoError(t *testing.T, err error, msg ...string) {
 	t.Helper()
+
 	if err != nil {
 		if len(msg) > 0 {
 			t.Fatalf("%s: %v", msg[0], err)
 		}
+
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
@@ -61,6 +63,7 @@ func assertPanicsWithMessage(t *testing.T, fn func(), msg string) {
 
 func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
 	t.Helper()
+
 	if d.Duration() != expected {
 		t.Errorf("expected %v, got %v", expected, d.Duration())
 	}
@@ -68,6 +71,7 @@ func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
 
 func assertErrorContains(t *testing.T, err error, substrings ...string) {
 	t.Helper()
+
 	errMsg := err.Error()
 	for _, s := range substrings {
 		if !strings.Contains(errMsg, s) {
@@ -78,6 +82,7 @@ func assertErrorContains(t *testing.T, err error, substrings ...string) {
 
 func assertStderrContains(t *testing.T, stderr string, substrings ...string) {
 	t.Helper()
+
 	for _, s := range substrings {
 		if !strings.Contains(strings.ToLower(stderr), strings.ToLower(s)) {
 			t.Errorf("stderr should contain %q, got %q", s, stderr)
@@ -112,15 +117,11 @@ func registerAndSetFlag[T any](
 	flagName, flagValue string,
 ) {
 	t.Helper()
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("expected no error registering flags, got: %v", err)
-	}
 
-	if err := cmd.Flags().Set(flagName, flagValue); err != nil {
-		t.Fatalf("expected no error setting flag, got: %v", err)
-	}
+	registerAndParseFlags(t, registry, cmd, flagName, flagValue)
 
-	if err := registry.ParseFlags(cmd, cfg); err != nil {
+	err := registry.ParseFlags(cmd, cfg)
+	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 }
@@ -133,16 +134,31 @@ func registerAndParseInvalidFlag[T any](
 	flagName, flagValue string,
 ) {
 	t.Helper()
-	if err := registry.RegisterFlags(cmd); err != nil {
+
+	registerAndParseFlags(t, registry, cmd, flagName, flagValue)
+
+	err := registry.ParseFlags(cmd, cfg)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+func registerAndParseFlags(
+	t *testing.T,
+	registry *FlagRegistry,
+	cmd *cobra.Command,
+	flagName, flagValue string,
+) {
+	t.Helper()
+
+	err := registry.RegisterFlags(cmd)
+	if err != nil {
 		t.Fatalf("expected no error registering flags, got: %v", err)
 	}
 
-	if err := cmd.Flags().Set(flagName, flagValue); err != nil {
+	err = cmd.Flags().Set(flagName, flagValue)
+	if err != nil {
 		t.Fatalf("expected no error setting flag, got: %v", err)
-	}
-
-	if err := registry.ParseFlags(cmd, cfg); err == nil {
-		t.Fatal("expected error, got nil")
 	}
 }
 

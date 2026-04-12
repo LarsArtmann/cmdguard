@@ -379,7 +379,8 @@ func BenchmarkScopeProvide(b *testing.B) {
 	scope := v2.NewScope("bench")
 
 	for b.Loop() {
-		if err := provideBenchService(scope); err != nil {
+		err := provideBenchService(scope)
+		if err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -388,7 +389,9 @@ func BenchmarkScopeProvide(b *testing.B) {
 // BenchmarkScopeInvoke measures DI service retrieval.
 func BenchmarkScopeInvoke(b *testing.B) {
 	scope := v2.NewScope("bench")
-	if err := provideBenchService(scope); err != nil {
+
+	err := provideBenchService(scope)
+	if err != nil {
 		b.Fatal(err)
 	}
 
