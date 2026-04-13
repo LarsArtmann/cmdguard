@@ -18,10 +18,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 
+	examplesinternal "github.com/larsartmann/cmdguard/examples/internal"
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
@@ -75,17 +75,12 @@ type DurationFlags struct {
 
 // execute runs the CLI and exits on error.
 func execute(ctx context.Context, cli *v2.CLI[GlobalConfig]) {
-	err := cli.Execute(ctx)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
+	examplesinternal.Execute(ctx, cli)
 }
 
 // fatal prints the error to stderr and exits with code 1.
 func fatal(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, format, args...)
-	os.Exit(1)
+	examplesinternal.Fatalf(format, args...)
 }
 
 func main() {

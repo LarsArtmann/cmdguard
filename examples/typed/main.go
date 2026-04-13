@@ -5,12 +5,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/samber/do/v2"
 
+	examplesinternal "github.com/larsartmann/cmdguard/examples/internal"
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
@@ -86,8 +86,7 @@ func printRunE(messages ...string) func(context.Context, *AppConfig, v2.NoFlags)
 
 // fatal prints the error to stderr and exits with code 1.
 func fatal(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, format, args...)
-	os.Exit(1)
+	examplesinternal.Fatalf(format, args...)
 }
 
 func main() {

@@ -24,6 +24,7 @@ import (
 	"os"
 	"strings"
 
+	examplesinternal "github.com/larsartmann/cmdguard/examples/internal"
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
@@ -121,8 +122,7 @@ func ValidateFlags(name string, count int, email string) []error {
 
 // fatal prints the error to stderr and exits with code 1.
 func fatal(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, format, args...)
-	os.Exit(1)
+	examplesinternal.Fatalf(format, args...)
 }
 
 func main() {

@@ -4,25 +4,15 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 // assertPanics runs fn and returns true if it panicked.
 func assertPanics(t *testing.T, fn func()) bool {
 	t.Helper()
 
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
-		fn()
-	}()
-
-	return didPanic
+	return testutil.ExpectPanics(t, fn)
 }
 
 func newCobraCommand(name string) *cobra.Command {

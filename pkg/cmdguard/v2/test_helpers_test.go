@@ -7,58 +7,13 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
-
-func assertNoError(t *testing.T, err error, msg ...string) {
-	t.Helper()
-
-	if err != nil {
-		if len(msg) > 0 {
-			t.Fatalf("%s: %v", msg[0], err)
-		}
-
-		t.Fatalf("unexpected error: %v", err)
-	}
-}
 
 func assertPanics(t *testing.T, fn func()) {
 	t.Helper()
-
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
-		fn()
-	}()
-
-	if !didPanic {
-		t.Error("expected panic, got none")
-	}
-}
-
-func assertPanicsWithMessage(t *testing.T, fn func(), msg string) {
-	t.Helper()
-
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
-		fn()
-	}()
-
-	if !didPanic {
-		t.Errorf("expected panic with message containing %q, got none", msg)
-	}
+	testutil.AssertPanics(t, fn)
 }
 
 func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
@@ -123,23 +78,6 @@ func registerAndSetFlag[T any](
 	err := registry.ParseFlags(cmd, cfg)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
-	}
-}
-
-func registerAndParseInvalidFlag[T any](
-	t *testing.T,
-	registry *FlagRegistry,
-	cmd *cobra.Command,
-	cfg *T,
-	flagName, flagValue string,
-) {
-	t.Helper()
-
-	registerAndParseFlags(t, registry, cmd, flagName, flagValue)
-
-	err := registry.ParseFlags(cmd, cfg)
-	if err == nil {
-		t.Fatal("expected error, got nil")
 	}
 }
 

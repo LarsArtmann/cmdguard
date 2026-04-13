@@ -9,26 +9,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/larsartmann/cmdguard/pkg/cmdguard"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func expectPanic(t *testing.T, fn func()) {
 	t.Helper()
-
-	didPanic := false
-
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				didPanic = true
-			}
-		}()
-
-		fn()
-	}()
-
-	if !didPanic {
-		t.Error("expected panic")
-	}
+	testutil.AssertPanics(t, fn)
 }
 
 func TestGuardedCommand_FullLifecycle(t *testing.T) {
