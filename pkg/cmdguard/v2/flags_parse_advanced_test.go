@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -158,8 +157,6 @@ func TestFlagRegistry_FlagNotFound(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "not found") {
-			t.Errorf("expected error to contain 'not found', got: %v", err)
-		}
+		assertErrorContains(t, err, "not found")
 	})
 }

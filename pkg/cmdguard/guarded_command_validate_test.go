@@ -1,7 +1,6 @@
 package cmdguard
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -63,9 +62,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "no name") {
-			t.Errorf("error should contain 'no name', got: %v", err)
-		}
+		assertErrorContains(t, err, "no name")
 	})
 
 	t.Run("command without handler is invalid", func(t *testing.T) {
@@ -80,9 +77,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "no handler") {
-			t.Errorf("error should contain 'no handler', got: %v", err)
-		}
+		assertErrorContains(t, err, "no handler")
 	})
 
 	t.Run("parent command with subcommands does not need handler", func(t *testing.T) {
@@ -110,9 +105,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "strict mode requires RunE") {
-			t.Errorf("error should contain 'strict mode requires RunE', got: %v", err)
-		}
+		assertErrorContains(t, err, "strict mode requires RunE")
 	})
 }
 
@@ -175,9 +168,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "invalid") {
-			t.Errorf("error should contain 'invalid', got: %v", err)
-		}
+		assertErrorContains(t, err, "invalid")
 	})
 }
 
@@ -213,9 +204,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "parent invalid") {
-			t.Errorf("error should contain 'parent invalid', got: %v", err)
-		}
+		assertErrorContains(t, err, "parent invalid")
 	})
 
 	t.Run("validates nested subcommands", func(t *testing.T) {
@@ -303,8 +292,6 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "validation failed") {
-			t.Errorf("error should contain 'validation failed', got: %v", err)
-		}
+		assertErrorContains(t, err, "validation failed")
 	})
 }

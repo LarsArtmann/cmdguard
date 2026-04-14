@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/samber/do/v2"
@@ -39,9 +38,7 @@ func TestRegisterInScope(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "parent scope is nil") {
-			t.Errorf("expected error to contain 'parent scope is nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "parent scope is nil")
 
 		if child != nil {
 			t.Errorf("expected child to be nil, got %v", child)
@@ -88,9 +85,7 @@ func TestRegisterInScope(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "provider type=") {
-			t.Errorf("expected error to contain 'provider type=', got: %v", err)
-		}
+		assertErrorContains(t, err, "provider type=")
 
 		if child != nil {
 			t.Errorf("expected child to be nil, got %v", child)

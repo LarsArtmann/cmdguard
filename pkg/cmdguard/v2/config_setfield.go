@@ -113,29 +113,13 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 func setStringField(field reflect.Value, str string) error {
 	switch field.Type() {
 	case reflect.TypeFor[LogLevel]():
-		err := parseAndSetLogLevel(field, str)
-		if err != nil {
-			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
-		}
-
-		return nil
+		return wrapErr(parseAndSetLogLevel(field, str), field, str)
 	case reflect.TypeFor[LogFormat]():
-		err := parseAndSetLogFormat(field, str)
-		if err != nil {
-			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
-		}
-
-		return nil
+		return wrapErr(parseAndSetLogFormat(field, str), field, str)
 	case reflect.TypeFor[Duration]():
-		err := parseAndSetDuration(field, str)
-		if err != nil {
-			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
-		}
-
-		return nil
+		return wrapErr(parseAndSetDuration(field, str), field, str)
 	case reflect.TypeFor[Enum]():
 		field.Set(reflect.ValueOf(Enum{value: str}))
-
 		return nil
 	}
 
@@ -143,38 +127,42 @@ func setStringField(field reflect.Value, str string) error {
 		field.Type(), str, ErrUnsupportedConversion)
 }
 
-// parseAndSetLogLevel parses and sets a LogLevel field.
-func parseAndSetLogLevel(field reflect.Value, str string) error {
-	parsed, err := ParseLogLevel(str)
+// wrapErr adds context to a setStringField error.
+func wrapErr(err error, field reflect.Value, str string) error {
+	if err == nil {
+		return nil
+	}
+	return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+}
+
+// parseField is a helper for parsing string values into fields.
+func parseField[T any](
+	field reflect.Value,
+	str string,
+	typeName string,
+	parser func(string) (T, error),
+) error {
+	parsed, err := parser(str)
 	if err != nil {
-		return fmt.Errorf("parsing log level field %s with %q: %w", field.Type(), str, err)
+		return fmt.Errorf("parsing %s field %s with %q: %w", typeName, field.Type(), str, err)
 	}
 
 	field.Set(reflect.ValueOf(parsed))
 
 	return nil
+}
+
+// parseAndSetLogLevel parses and sets a LogLevel field.
+func parseAndSetLogLevel(field reflect.Value, str string) error {
+	return parseField(field, str, "log level", ParseLogLevel)
 }
 
 // parseAndSetLogFormat parses and sets a LogFormat field.
 func parseAndSetLogFormat(field reflect.Value, str string) error {
-	parsed, err := ParseLogFormat(str)
-	if err != nil {
-		return fmt.Errorf("parsing log format field %s with %q: %w", field.Type(), str, err)
-	}
-
-	field.Set(reflect.ValueOf(parsed))
-
-	return nil
+	return parseField(field, str, "log format", ParseLogFormat)
 }
 
 // parseAndSetDuration parses and sets a Duration field.
 func parseAndSetDuration(field reflect.Value, str string) error {
-	parsed, err := ParseDuration(str)
-	if err != nil {
-		return fmt.Errorf("parsing duration field %s with %q: %w", field.Type(), str, err)
-	}
-
-	field.Set(reflect.ValueOf(parsed))
-
-	return nil
+	return parseField(field, str, "duration", ParseDuration)
 }

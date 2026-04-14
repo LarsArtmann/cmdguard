@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"strings"
 	"testing"
 
 	"github.com/samber/do/v2"
@@ -133,8 +132,6 @@ func TestScope_ShutdownAll_WithError(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "scope \"test\"") {
-			t.Errorf("expected error to contain scope name, got: %v", err)
-		}
+		assertErrorContains(t, err, "scope \"test\"")
 	})
 }

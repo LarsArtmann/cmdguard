@@ -64,12 +64,7 @@ func ParsePort(s string) (Port, error) {
 // MustParsePort creates a Port from a string, panicking if invalid.
 // Use only when you know the port is valid (e.g., for constants).
 func MustParsePort(s string) Port {
-	p, err := ParsePort(s)
-	if err != nil {
-		panic(fmt.Sprintf("MustParsePort(%q): %v", s, err))
-	}
-
-	return p
+	return MustParse("MustParsePort", s, ParsePort)
 }
 
 // PortFromInt creates a Port from an int.

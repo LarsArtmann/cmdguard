@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/samber/do/v2"
@@ -49,9 +48,7 @@ func TestProvideNamed(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "scope is nil") {
-			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "scope is nil")
 	})
 
 	t.Run("can register multiple named implementations", func(t *testing.T) {
@@ -116,9 +113,7 @@ func TestInvokeNamed(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "scope is nil") {
-			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "scope is nil")
 
 		if value != "" {
 			t.Errorf("expected empty value, got %q", value)

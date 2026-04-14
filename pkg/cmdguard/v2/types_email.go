@@ -35,12 +35,7 @@ func ParseEmail(s string) (Email, error) {
 // MustParseEmail creates an Email from a string, panicking if invalid.
 // Use only when you know the email is valid (e.g., for constants).
 func MustParseEmail(s string) Email {
-	e, err := ParseEmail(s)
-	if err != nil {
-		panic(fmt.Sprintf("MustParseEmail(%q): %v", s, err))
-	}
-
-	return e
+	return MustParse("MustParseEmail", s, ParseEmail)
 }
 
 // String returns the email address as a string.

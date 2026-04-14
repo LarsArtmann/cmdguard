@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/samber/do/v2"
@@ -41,9 +40,7 @@ func TestProvide(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "scope is nil") {
-			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "scope is nil")
 	})
 
 	t.Run("provider can use dependencies", func(t *testing.T) {
@@ -114,9 +111,7 @@ func TestProvideValue(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "scope is nil") {
-			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "scope is nil")
 	})
 
 	t.Run("can register struct values", func(t *testing.T) {
@@ -177,9 +172,7 @@ func TestInvoke(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "scope is nil") {
-			t.Errorf("expected error to contain 'scope is nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "scope is nil")
 
 		if value != "" {
 			t.Errorf("expected empty value, got %q", value)

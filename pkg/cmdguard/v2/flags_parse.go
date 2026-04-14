@@ -88,43 +88,49 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 	}
 }
 
-// parseAndSetBool parses and sets a boolean value.
-func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error {
-	v, err := strconv.ParseBool(value)
+// parseFlagValue is a helper for parsing values with error handling.
+func parseFlagValue(
+	cfg any,
+	tag FlagTag,
+	value string,
+	typeName string,
+	parser func(string) (any, error),
+) error {
+	v, err := parser(value)
 	if err != nil {
-		return fmt.Errorf("parsing bool flag %q with value %q: %w", tag.Name, value, err)
+		return fmt.Errorf("parsing %s flag %q with value %q: %w", typeName, tag.Name, value, err)
 	}
 
 	return SetField(cfg, tag.Field, v)
+}
+
+// parseAndSetBool parses and sets a boolean value.
+func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error {
+	return parseFlagValue(cfg, tag, value, "bool", func(v string) (any, error) {
+		return strconv.ParseBool(v)
+	})
 }
 
 // parseAndSetInt parses and sets an integer value.
 func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error {
-	v, err := strconv.ParseInt(value, 10, 64)
-	if err != nil {
-		return fmt.Errorf("parsing int flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, int(v))
+	return parseFlagValue(cfg, tag, value, "int", func(v string) (any, error) {
+		parsed, err := strconv.ParseInt(v, 10, 64)
+		return int(parsed), err
+	})
 }
 
 // parseAndSetUint parses and sets an unsigned integer value.
 func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error {
-	v, err := strconv.ParseUint(value, 10, 64)
-	if err != nil {
-		return fmt.Errorf("parsing uint flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, uint(v))
+	return parseFlagValue(cfg, tag, value, "uint", func(v string) (any, error) {
+		parsed, err := strconv.ParseUint(v, 10, 64)
+		return uint(parsed), err
+	})
 }
 
 func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) error {
-	v, err := strconv.ParseFloat(value, 64)
-	if err != nil {
-		return fmt.Errorf("parsing float64 flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, v)
+	return parseFlagValue(cfg, tag, value, "float64", func(v string) (any, error) {
+		return strconv.ParseFloat(v, 64)
+	})
 }
 
 // parseAndSetCustom handles custom type parsing.
@@ -155,91 +161,64 @@ func (r *FlagRegistry) parseAndSetCustom(cfg any, tag FlagTag, value string) err
 
 // parseAndSetDuration parses and sets a Duration value.
 func (r *FlagRegistry) parseAndSetDuration(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseDuration(value)
-	if err != nil {
-		return fmt.Errorf("parsing duration flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "duration", func(v string) (any, error) {
+		return ParseDuration(v)
+	})
 }
 
 // parseAndSetLogLevel parses and sets a LogLevel value.
 func (r *FlagRegistry) parseAndSetLogLevel(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseLogLevel(value)
-	if err != nil {
-		return fmt.Errorf("parsing log level flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "log level", func(v string) (any, error) {
+		return ParseLogLevel(v)
+	})
 }
 
 // parseAndSetLogFormat parses and sets a LogFormat value.
 func (r *FlagRegistry) parseAndSetLogFormat(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseLogFormat(value)
-	if err != nil {
-		return fmt.Errorf("parsing log format flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "log format", func(v string) (any, error) {
+		return ParseLogFormat(v)
+	})
 }
 
 // parseAndSetEnum parses and sets an Enum value.
 func (r *FlagRegistry) parseAndSetEnum(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseEnum(value, tag.Values)
-	if err != nil {
-		return fmt.Errorf("parsing enum flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "enum", func(v string) (any, error) {
+		return ParseEnum(v, tag.Values)
+	})
 }
 
 // parseAndSetURL parses and sets a URL value.
 func (r *FlagRegistry) parseAndSetURL(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseURL(value)
-	if err != nil {
-		return fmt.Errorf("parsing URL flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "URL", func(v string) (any, error) {
+		return ParseURL(v)
+	})
 }
 
 // parseAndSetEmail parses and sets an Email value.
 func (r *FlagRegistry) parseAndSetEmail(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseEmail(value)
-	if err != nil {
-		return fmt.Errorf("parsing email flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "email", func(v string) (any, error) {
+		return ParseEmail(v)
+	})
 }
 
 // parseAndSetPort parses and sets a Port value.
 func (r *FlagRegistry) parseAndSetPort(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParsePort(value)
-	if err != nil {
-		return fmt.Errorf("parsing port flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "port", func(v string) (any, error) {
+		return ParsePort(v)
+	})
 }
 
 // parseAndSetFilePath parses and sets a FilePath value.
 func (r *FlagRegistry) parseAndSetFilePath(cfg any, tag FlagTag, value string) error {
 	// Note: FilePath parsing does NOT check if the path exists
-	parsed, err := ParseFilePath(value, false)
-	if err != nil {
-		return fmt.Errorf("parsing file path flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "file path", func(v string) (any, error) {
+		return ParseFilePath(v, false)
+	})
 }
 
 // parseAndSetHostPort parses and sets a HostPort value.
 func (r *FlagRegistry) parseAndSetHostPort(cfg any, tag FlagTag, value string) error {
-	parsed, err := ParseHostPort(value)
-	if err != nil {
-		return fmt.Errorf("parsing host:port flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	return SetField(cfg, tag.Field, parsed)
+	return parseFlagValue(cfg, tag, value, "host:port", func(v string) (any, error) {
+		return ParseHostPort(v)
+	})
 }

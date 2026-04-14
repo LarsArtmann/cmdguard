@@ -103,11 +103,9 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 				return nil
 			},
 		}
-		if err := AddCommand(cli, cmd); err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+	addCommand(t, cli, cmd)
 
-		err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
+			err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

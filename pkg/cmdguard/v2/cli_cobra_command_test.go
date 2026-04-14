@@ -37,9 +37,7 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
 
-	if err := AddCommand(cli, topCmd); err != nil {
-		t.Fatalf("AddCommand failed: %v", err)
-	}
+	addCommand(t, cli, topCmd)
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{"top", "middle", "leaf"})
 	if err != nil {
@@ -71,9 +69,7 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 		},
 	}
 
-	if err := AddCommand(cli, cmd); err != nil {
-		t.Fatalf("AddCommand failed: %v", err)
-	}
+	addCommand(t, cli, cmd)
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{"ok"})
 	if err != nil {
@@ -102,9 +98,7 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 		PostRunE: makeHookRunE(&order, "post"),
 	}
 
-	if err := AddCommand(cli, cmd); err != nil {
-		t.Fatalf("AddCommand failed: %v", err)
-	}
+	addCommand(t, cli, cmd)
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{"hooks"})
 	if err != nil {
@@ -136,9 +130,7 @@ func TestCLIToCobraCommand_NilContextFallsBack(t *testing.T) {
 		},
 	}
 
-	if err := AddCommand(cli, cmd); err != nil {
-		t.Fatalf("AddCommand failed: %v", err)
-	}
+	addCommand(t, cli, cmd)
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"ctxcheck"})
 	if err != nil {

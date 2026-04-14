@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 	"time"
 )
@@ -69,9 +68,7 @@ func TestSetField(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "pointer to struct") {
-			t.Errorf("expected error to contain 'pointer to struct', got: %v", err)
-		}
+		assertErrorContains(t, err, "pointer to struct")
 	})
 
 	t.Run("field not found", func(t *testing.T) {
@@ -84,9 +81,7 @@ func TestSetField(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "not found") {
-			t.Errorf("expected error to contain 'not found', got: %v", err)
-		}
+		assertErrorContains(t, err, "not found")
 	})
 
 	t.Run("string to LogLevel", func(t *testing.T) {
@@ -200,8 +195,6 @@ func TestSetField(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "cannot convert") {
-			t.Errorf("expected error to contain 'cannot convert', got: %v", err)
-		}
+		assertErrorContains(t, err, "cannot convert")
 	})
 }

@@ -40,12 +40,7 @@ func ParseURL(s string) (URL, error) {
 // MustParseURL creates a URL from a string, panicking if invalid.
 // Use only when you know the URL is valid (e.g., for constants).
 func MustParseURL(s string) URL {
-	u, err := ParseURL(s)
-	if err != nil {
-		panic(fmt.Sprintf("MustParseURL(%q): %v", s, err))
-	}
-
-	return u
+	return MustParse("MustParseURL", s, ParseURL)
 }
 
 // URL returns the underlying *url.URL.

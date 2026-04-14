@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -29,9 +28,7 @@ func TestValidateConfig(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "must not be nil") {
-			t.Errorf("expected error to contain 'must not be nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "must not be nil")
 	})
 
 	t.Run("non-struct config", func(t *testing.T) {
@@ -42,9 +39,7 @@ func TestValidateConfig(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "expected struct") {
-			t.Errorf("expected error to contain 'expected struct', got: %v", err)
-		}
+		assertErrorContains(t, err, "expected struct")
 	})
 
 	t.Run("valid enum value", func(t *testing.T) {
@@ -72,9 +67,7 @@ func TestValidateConfig(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "config validation") {
-			t.Errorf("expected error to contain 'config validation', got: %v", err)
-		}
+		assertErrorContains(t, err, "config validation")
 	})
 
 	t.Run("pointer to config", func(t *testing.T) {

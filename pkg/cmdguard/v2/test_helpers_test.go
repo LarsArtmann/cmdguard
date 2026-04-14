@@ -26,13 +26,7 @@ func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
 
 func assertErrorContains(t *testing.T, err error, substrings ...string) {
 	t.Helper()
-
-	errMsg := err.Error()
-	for _, s := range substrings {
-		if !strings.Contains(errMsg, s) {
-			t.Errorf("error should contain %q, got %q", s, errMsg)
-		}
-	}
+	testutil.AssertErrorContains(t, err, substrings...)
 }
 
 func assertStderrContains(t *testing.T, stderr string, substrings ...string) {
@@ -125,5 +119,13 @@ func setFlag(t *testing.T, cmd *cobra.Command, name, value string) {
 
 	if err := cmd.Flags().Set(name, value); err != nil {
 		t.Fatalf("expected no error setting flag %q to %q, got: %v", name, value, err)
+	}
+}
+
+func addCommand[T any, F any](t *testing.T, cli *CLI[T], cmd Command[T, F]) {
+	t.Helper()
+
+	if err := AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand failed: %v", err)
 	}
 }

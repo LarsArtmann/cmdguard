@@ -2,6 +2,7 @@
 package testutil
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -49,4 +50,16 @@ func ExpectPanics(t *testing.T, fn func()) bool {
 	t.Helper()
 
 	return doPanicTest(fn)
+}
+
+// AssertErrorContains fails the test if the error does not contain all the given substrings.
+func AssertErrorContains(t *testing.T, err error, substrings ...string) {
+	t.Helper()
+
+	errMsg := err.Error()
+	for _, s := range substrings {
+		if !strings.Contains(errMsg, s) {
+			t.Errorf("error should contain %q, got %q", s, errMsg)
+		}
+	}
 }

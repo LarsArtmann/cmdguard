@@ -2,7 +2,6 @@ package v2
 
 import (
 	"slices"
-	"strings"
 	"testing"
 )
 
@@ -100,9 +99,7 @@ func TestParseFlagTags(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "must not be nil") {
-			t.Errorf("expected error to contain 'must not be nil', got: %v", err)
-		}
+		assertErrorContains(t, err, "must not be nil")
 
 		if tags != nil {
 			t.Errorf("expected nil tags, got %v", tags)
@@ -117,9 +114,7 @@ func TestParseFlagTags(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "expected struct") {
-			t.Errorf("expected error to contain 'expected struct', got: %v", err)
-		}
+		assertErrorContains(t, err, "expected struct")
 
 		if tags != nil {
 			t.Errorf("expected nil tags, got %v", tags)
