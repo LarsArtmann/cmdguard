@@ -34,13 +34,9 @@ func ValidateConfig(cfg any) error {
 		return ErrConfigNil
 	}
 
-	v := reflect.ValueOf(cfg)
-	if v.Kind() == reflect.Pointer {
-		v = v.Elem()
-	}
-
-	if v.Kind() != reflect.Struct {
-		return fmt.Errorf("%w: expected struct, got %T", ErrInvalidFlagType, cfg)
+	v, err := derefPointerToStruct(cfg)
+	if err != nil {
+		return err
 	}
 
 	return validateStruct(v, cfg)

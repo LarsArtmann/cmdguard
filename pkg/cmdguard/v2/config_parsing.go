@@ -7,6 +7,21 @@ import (
 	"strings"
 )
 
+// derefPointerToStruct dereferences a pointer to a struct and returns its value.
+// Returns an error if the input is not a pointer to a struct.
+func derefPointerToStruct(cfg any) (reflect.Value, error) {
+	v := reflect.ValueOf(cfg)
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+	}
+
+	if v.Kind() != reflect.Struct {
+		return reflect.Value{}, fmt.Errorf("%w: expected struct, got %T", ErrInvalidFlagType, cfg)
+	}
+
+	return v, nil
+}
+
 // ParseFlagTags extracts flag information from a config struct.
 // The struct must have `flag` tags on its fields.
 func ParseFlagTags(cfg any) ([]FlagTag, error) {
@@ -14,13 +29,9 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 		return nil, ErrConfigNil
 	}
 
-	v := reflect.ValueOf(cfg)
-	if v.Kind() == reflect.Pointer {
-		v = v.Elem()
-	}
-
-	if v.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("%w: expected struct, got %T", ErrInvalidFlagType, cfg)
+	v, err := derefPointerToStruct(cfg)
+	if err != nil {
+		return nil, err
 	}
 
 	return parseStructTags(v.Type())
