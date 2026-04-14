@@ -101,9 +101,7 @@ func TestSetField(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if cfg.Level.String() != "debug" {
-			t.Errorf("expected Level 'debug', got %q", cfg.Level.String())
-		}
+		assertEnumString(t, cfg.Level.String(), "debug", "Level")
 	})
 
 	t.Run("string to LogFormat", func(t *testing.T) {
@@ -118,9 +116,7 @@ func TestSetField(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if cfg.Format.String() != "json" {
-			t.Errorf("expected Format 'json', got %q", cfg.Format.String())
-		}
+		assertEnumString(t, cfg.Format.String(), "json", "Format")
 	})
 
 	t.Run("string to Duration", func(t *testing.T) {

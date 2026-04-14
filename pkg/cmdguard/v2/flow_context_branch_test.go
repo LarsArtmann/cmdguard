@@ -24,8 +24,9 @@ func TestBranchingFlowContext_Branch(t *testing.T) {
 			t.Error("expected child to reference parent")
 		}
 
-		if len(root.Children()) != 1 {
-			t.Errorf("expected 1 child, got %d", len(root.Children()))
+		children := root.Children()
+		if len(children) != 1 {
+			t.Errorf("expected 1 child, got %d", len(children))
 		}
 
 		if child.PathString() != "subcommand" {
@@ -59,8 +60,9 @@ func TestBranchingFlowContext_Branch(t *testing.T) {
 		child2, cancel2 := root.Branch("cmd2")
 		defer cancel2()
 
-		if len(root.Children()) != 2 {
-			t.Errorf("expected 2 children, got %d", len(root.Children()))
+		kids := root.Children()
+		if len(kids) != 2 {
+			t.Errorf("expected 2 children, got %d", len(kids))
 		}
 
 		if child1.PathString() != "cmd1" {

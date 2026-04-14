@@ -25,6 +25,17 @@ func fuzzEnvVarLoad(t *testing.T, envVar, value string) {
 	_ = cfg.Validate()
 }
 
+// fuzzEnvVar is a helper that creates a fuzz test for an environment variable.
+func fuzzEnvVar(f *testing.F, envVar string, corpus []string) {
+	for _, s := range corpus {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(t *testing.T, value string) {
+		fuzzEnvVarLoad(t, envVar, value)
+	})
+}
+
 func FuzzLoad_EnvVarLevel(f *testing.F) {
 	corpus := []string{
 		"debug", "info", "warn", "error",
@@ -35,13 +46,8 @@ func FuzzLoad_EnvVarLevel(f *testing.F) {
 		strings.Repeat("a", 1000),
 		"🎉",
 	}
-	for _, s := range corpus {
-		f.Add(s)
-	}
 
-	f.Fuzz(func(t *testing.T, value string) {
-		fuzzEnvVarLoad(t, "CMDGUARD_LOG_LEVEL", value)
-	})
+	fuzzEnvVar(f, "CMDGUARD_LOG_LEVEL", corpus)
 }
 
 func FuzzLoad_EnvVarFormat(f *testing.F) {
@@ -54,13 +60,8 @@ func FuzzLoad_EnvVarFormat(f *testing.F) {
 		strings.Repeat("a", 1000),
 		"🎉",
 	}
-	for _, s := range corpus {
-		f.Add(s)
-	}
 
-	f.Fuzz(func(t *testing.T, value string) {
-		fuzzEnvVarLoad(t, "CMDGUARD_LOG_FORMAT", value)
-	})
+	fuzzEnvVar(f, "CMDGUARD_LOG_FORMAT", corpus)
 }
 
 func FuzzLoad_EnvVarStrictMode(f *testing.F) {

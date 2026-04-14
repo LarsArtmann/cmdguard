@@ -60,22 +60,22 @@ func (e Email) IsEmpty() bool {
 
 // Local returns the local part of the email (before @).
 func (e Email) Local() string {
-	parts := strings.Split(e.address, "@")
-	if len(parts) != emailPartsCount {
-		return ""
-	}
-
-	return parts[0]
+	return e.emailPart(0)
 }
 
 // Domain returns the domain part of the email (after @).
 func (e Email) Domain() string {
+	return e.emailPart(1)
+}
+
+// emailPart returns the email part at the given index (0=local, 1=domain).
+func (e Email) emailPart(index int) string {
 	parts := strings.Split(e.address, "@")
 	if len(parts) != emailPartsCount {
 		return ""
 	}
 
-	return parts[1]
+	return parts[index]
 }
 
 // MarshalText implements encoding.TextMarshaler for Email.

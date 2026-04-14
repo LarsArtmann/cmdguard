@@ -18,6 +18,17 @@ func hasSubcommand(g *GuardedCommand, name string) bool {
 	return false
 }
 
+// findSubcommand finds and returns a subcommand with the given name, or nil if not found.
+func findSubcommand(g *GuardedCommand, name string) *cobra.Command {
+	for _, cmd := range g.cmd.Commands() {
+		if cmd.Name() == name {
+			return cmd
+		}
+	}
+
+	return nil
+}
+
 //nolint:paralleltest // uses t.Setenv
 func TestGuardedCommand_validateCommand(t *testing.T) {
 	t.Run("command with Run is valid", func(t *testing.T) {
@@ -260,17 +271,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 		cmd := newCobraCommand("testcmd")
 		g.AddCommand(cmd)
 
-		// Find validate command
-		var validateCmd *cobra.Command
-
-		for _, c := range g.cmd.Commands() {
-			if c.Name() == "validate" {
-				validateCmd = c
-
-				break
-			}
-		}
-
+		validateCmd := findSubcommand(g, "validate")
 		if validateCmd == nil {
 			t.Fatal("validate command not found")
 		}
@@ -291,17 +292,7 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 		invalidCmd := &cobra.Command{Use: "invalid"} // No handler
 		g.cmd.AddCommand(invalidCmd)
 
-		// Find validate command
-		var validateCmd *cobra.Command
-
-		for _, c := range g.cmd.Commands() {
-			if c.Name() == "validate" {
-				validateCmd = c
-
-				break
-			}
-		}
-
+		validateCmd := findSubcommand(g, "validate")
 		if validateCmd == nil {
 			t.Fatal("validate command not found")
 		}

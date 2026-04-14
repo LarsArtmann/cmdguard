@@ -56,8 +56,10 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 		expected any
 	}{
 		{
-			name:     "inherited value",
-			getter:   func() (any, bool) { return child.GetValue("inherited") },
+			name: "inherited value",
+			getter: func() (v any, ok bool) {
+				return child.GetValue("inherited")
+			},
 			expected: "from-root",
 		},
 		{

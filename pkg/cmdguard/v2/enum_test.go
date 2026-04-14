@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"slices"
-	"strings"
 	"testing"
 )
 
@@ -87,9 +86,7 @@ func TestParseEnum_ErrorCases(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "invalid value") {
-			t.Errorf("error should contain 'invalid value', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "invalid value")
 	})
 }
 
@@ -178,9 +175,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if c.Level.String() != "info" {
-			t.Errorf("unmarshaled Level = %q, want %q", c.Level.String(), "info")
-		}
+		assertEnumString(t, c.Level.String(), "info", "Level")
 	})
 
 	t.Run("unmarshal invalid", func(t *testing.T) {
@@ -206,9 +201,7 @@ func TestEnum_MarshalUnmarshal(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if c.Level.String() != "any" {
-			t.Errorf("unmarshaled Level = %q, want %q", c.Level.String(), "any")
-		}
+		assertEnumString(t, c.Level.String(), "any", "Level")
 
 		if !slices.Equal(c.Level.Allowed(), []string{"any"}) {
 			t.Errorf("Allowed() = %v, want %v", c.Level.Allowed(), []string{"any"})

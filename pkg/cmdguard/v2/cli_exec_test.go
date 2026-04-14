@@ -79,9 +79,7 @@ func TestCLI_Execute(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "unknown") {
-			t.Errorf("error should contain 'unknown', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "unknown")
 	})
 
 	t.Run("executes with flags", func(t *testing.T) {
@@ -176,13 +174,18 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 		}
 
 		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					t.Errorf("ExecuteAndExit panicked: %v", r)
-				}
+			didPanic := false
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						didPanic = true
+					}
+				}()
+				_ = cli.ExecuteWithArgs(t.Context(), []string{"--help"})
 			}()
-
-			_ = cli.ExecuteWithArgs(t.Context(), []string{"--help"})
+			if didPanic {
+				t.Error("ExecuteAndExit should not panic")
+			}
 		}()
 	})
 

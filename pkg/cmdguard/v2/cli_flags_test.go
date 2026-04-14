@@ -2,7 +2,6 @@ package v2
 
 import (
 	"errors"
-	"strings"
 	"testing"
 )
 
@@ -142,9 +141,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 			t.Errorf("expected ErrInvalidFlagType, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "*string") {
-			t.Errorf("error should contain '*string', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "*string")
 	})
 
 	t.Run("rejects int", func(t *testing.T) {
@@ -159,9 +156,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 			t.Errorf("expected ErrInvalidFlagType, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "int") {
-			t.Errorf("error should contain 'int', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "int")
 	})
 
 	t.Run("rejects string", func(t *testing.T) {
@@ -176,9 +171,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 			t.Errorf("expected ErrInvalidFlagType, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "string") {
-			t.Errorf("error should contain 'string', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "string")
 	})
 
 	t.Run("rejects slice", func(t *testing.T) {
@@ -193,9 +186,7 @@ func TestFlagTypeConstraint(t *testing.T) {
 			t.Errorf("expected ErrInvalidFlagType, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "[]string") {
-			t.Errorf("error should contain '[]string', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "[]string")
 	})
 
 	t.Run("rejects map", func(t *testing.T) {
@@ -210,8 +201,6 @@ func TestFlagTypeConstraint(t *testing.T) {
 			t.Errorf("expected ErrInvalidFlagType, got %v", err)
 		}
 
-		if !strings.Contains(err.Error(), "map[string]string") {
-			t.Errorf("error should contain 'map[string]string', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "map[string]string")
 	})
 }

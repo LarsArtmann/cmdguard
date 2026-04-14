@@ -105,3 +105,25 @@ func noOpHandler() func(context.Context, *testConfig, NoFlags) error {
 		return nil
 	}
 }
+
+func noOpHandlerForTestAppConfig() func(context.Context, *testAppConfig, NoFlags) error {
+	return func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+		return nil
+	}
+}
+
+func assertEnumString(t *testing.T, got, want, fieldName string) {
+	t.Helper()
+
+	if got != want {
+		t.Errorf("unmarshaled %s = %q, want %q", fieldName, got, want)
+	}
+}
+
+func setFlag(t *testing.T, cmd *cobra.Command, name, value string) {
+	t.Helper()
+
+	if err := cmd.Flags().Set(name, value); err != nil {
+		t.Fatalf("expected no error setting flag %q to %q, got: %v", name, value, err)
+	}
+}

@@ -5,61 +5,37 @@ import (
 	"testing"
 )
 
+// loadTestCase holds test case data for TestLoad.
+type loadTestCase struct {
+	name       string
+	envLevel   string
+	envFormat  string
+	envStrict  string
+	wantLevel  string
+	wantFormat string
+	wantStrict bool
+}
+
+// newLoadTestCase creates a loadTestCase with the given values.
+func newLoadTestCase(name, envLevel, envFormat, envStrict, wantLevel, wantFormat string, wantStrict bool) loadTestCase {
+	return loadTestCase{
+		name:       name,
+		envLevel:   envLevel,
+		envFormat:  envFormat,
+		envStrict:  envStrict,
+		wantLevel:  wantLevel,
+		wantFormat: wantFormat,
+		wantStrict: wantStrict,
+	}
+}
+
 func TestLoad(t *testing.T) {
-	tests := []struct {
-		name       string
-		envLevel   string
-		envFormat  string
-		envStrict  string
-		wantLevel  string
-		wantFormat string
-		wantStrict bool
-	}{
-		{
-			name:       "creates config with defaults",
-			envLevel:   "",
-			envFormat:  "",
-			envStrict:  "",
-			wantLevel:  "info",
-			wantFormat: "text",
-			wantStrict: false,
-		},
-		{
-			name:       "loads log level from env",
-			envLevel:   "debug",
-			envFormat:  "",
-			envStrict:  "",
-			wantLevel:  "debug",
-			wantFormat: "text",
-			wantStrict: false,
-		},
-		{
-			name:       "loads log format from env",
-			envLevel:   "",
-			envFormat:  "json",
-			envStrict:  "",
-			wantLevel:  "info",
-			wantFormat: "json",
-			wantStrict: false,
-		},
-		{
-			name:       "loads strict mode from env",
-			envLevel:   "",
-			envFormat:  "",
-			envStrict:  "true",
-			wantLevel:  "info",
-			wantFormat: "text",
-			wantStrict: true,
-		},
-		{
-			name:       "loads all from env",
-			envLevel:   "error",
-			envFormat:  "json",
-			envStrict:  "true",
-			wantLevel:  "error",
-			wantFormat: "json",
-			wantStrict: true,
-		},
+	tests := []loadTestCase{
+		newLoadTestCase("creates config with defaults", "", "", "", "info", "text", false),
+		newLoadTestCase("loads log level from env", "debug", "", "", "debug", "text", false),
+		newLoadTestCase("loads log format from env", "", "json", "", "info", "json", false),
+		newLoadTestCase("loads strict mode from env", "", "", "true", "info", "text", true),
+		newLoadTestCase("loads all from env", "error", "json", "true", "error", "json", true),
 	}
 
 	for _, tt := range tests {

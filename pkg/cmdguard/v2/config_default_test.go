@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+// newFlagTag creates a FlagTag with the given type and default value.
+func newFlagTag[T any](defaultVal string) FlagTag {
+	return FlagTag{
+		Type:    reflect.TypeFor[T](),
+		Default: defaultVal,
+	}
+}
+
 func TestFlagTag_DefaultValue(t *testing.T) {
 	t.Parallel()
 
@@ -14,94 +22,17 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		tag      FlagTag
 		expected any
 	}{
-		{
-			name: "string default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[string](),
-				Default: "hello",
-			},
-			expected: "hello",
-		},
-		{
-			name: "bool true",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[bool](),
-				Default: "true",
-			},
-			expected: true,
-		},
-		{
-			name: "bool false",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[bool](),
-				Default: "false",
-			},
-			expected: false,
-		},
-		{
-			name: "int default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[int](),
-				Default: "42",
-			},
-			expected: 42,
-		},
-		{
-			name: "uint default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[uint](),
-				Default: "42",
-			},
-			expected: uint(42),
-		},
-		{
-			name: "uint32 default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[uint32](),
-				Default: "4294967295",
-			},
-			expected: uint(4294967295),
-		},
-		{
-			name: "float64 default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[float64](),
-				Default: "3.14",
-			},
-			expected: 3.14,
-		},
-		{
-			name: "empty default returns zero",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[int](),
-				Default: "",
-			},
-			expected: 0,
-		},
-		{
-			name: "slice default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[[]string](),
-				Default: "a,b,c",
-			},
-			expected: []string{"a", "b", "c"},
-		},
-		{
-			name: "Duration default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[Duration](),
-				Default: "5m",
-			},
-			expected: FromDuration(5 * time.Minute),
-		},
-		{
-			name: "LogLevel default",
-			tag: FlagTag{
-				Type:    reflect.TypeFor[LogLevel](),
-				Default: "info",
-			},
-			expected: "info", // Returns string for these types
-		},
+		{name: "string default", tag: newFlagTag[string]("hello"), expected: "hello"},
+		{name: "bool true", tag: newFlagTag[bool]("true"), expected: true},
+		{name: "bool false", tag: newFlagTag[bool]("false"), expected: false},
+		{name: "int default", tag: newFlagTag[int]("42"), expected: 42},
+		{name: "uint default", tag: newFlagTag[uint]("42"), expected: uint(42)},
+		{name: "uint32 default", tag: newFlagTag[uint32]("4294967295"), expected: uint(4294967295)},
+		{name: "float64 default", tag: newFlagTag[float64]("3.14"), expected: 3.14},
+		{name: "empty default returns zero", tag: newFlagTag[int](""), expected: 0},
+		{name: "slice default", tag: newFlagTag[[]string]("a,b,c"), expected: []string{"a", "b", "c"}},
+		{name: "Duration default", tag: newFlagTag[Duration]("5m"), expected: FromDuration(5 * time.Minute)},
+		{name: "LogLevel default", tag: newFlagTag[LogLevel]("info"), expected: "info"},
 	}
 
 	for _, tc := range tests {

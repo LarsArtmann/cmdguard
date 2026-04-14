@@ -151,8 +151,9 @@ func TestNewCLI(t *testing.T) {
 			t.Error("expected SilenceUsage to be true")
 		}
 
-		if cli.RootCommand().Version != "2.0.0" {
-			t.Errorf("Version = %q, want %q", cli.RootCommand().Version, "2.0.0")
+		rootCmd := cli.RootCommand()
+		if rootCmd.Version != "2.0.0" {
+			t.Errorf("Version = %q, want %q", rootCmd.Version, "2.0.0")
 		}
 	})
 }

@@ -65,7 +65,7 @@ func TestGuardedCommand_PanicOnEmptyName(t *testing.T) {
 	expectPanic(t, func() {
 		root.AddCommand(&cobra.Command{
 			Short: "No name here",
-			Run:   func(_ *cobra.Command, _ []string) {},
+			Run:   testutil.NoOpCobraRun(),
 		})
 	})
 }
@@ -83,15 +83,16 @@ func TestGuardedCommand_ParentWithChildren(t *testing.T) {
 	child := &cobra.Command{
 		Use:   "child",
 		Short: "Child command",
-		Run:   func(_ *cobra.Command, _ []string) {},
+		Run:   testutil.NoOpCobraRun(),
 	}
 
 	parent.AddCommand(child)
 	root.AddCommand(parent)
 
 	cmd := root.Command()
-	if len(cmd.Commands()) < 3 {
-		t.Errorf("len(cmd.Commands()) = %d, want at least 3", len(cmd.Commands()))
+	cmds := cmd.Commands()
+	if len(cmds) < 3 {
+		t.Errorf("len(cmd.Commands()) = %d, want at least 3", len(cmds))
 	}
 }
 
@@ -106,13 +107,13 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 	root.AddCommand(&cobra.Command{
 		Use:   "check",
 		Short: "Run checks",
-		RunE:  func(_ *cobra.Command, _ []string) error { return nil },
+		RunE:  testutil.NoOpCobraRunE(),
 	})
 
 	expectPanic(t, func() {
 		root.AddCommand(&cobra.Command{
 			Use: "bad",
-			Run: func(*cobra.Command, []string) {},
+			Run:   testutil.NoOpCobraRun(),
 		})
 	})
 }

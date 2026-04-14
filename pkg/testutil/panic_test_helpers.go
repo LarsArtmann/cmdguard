@@ -3,7 +3,20 @@ package testutil
 
 import (
 	"testing"
+
+	"github.com/spf13/cobra"
 )
+
+// NoOpCobraRun returns a no-op Run function for cobra.Command.
+// This reduces duplication in tests that need a valid command with a handler.
+func NoOpCobraRun() func(*cobra.Command, []string) {
+	return func(*cobra.Command, []string) {}
+}
+
+// NoOpCobraRunE returns a no-op RunE function for cobra.Command.
+func NoOpCobraRunE() func(*cobra.Command, []string) error {
+	return func(*cobra.Command, []string) error { return nil }
+}
 
 // doPanicTest runs fn and returns true if it panicked.
 // This is the shared implementation for panic detection.

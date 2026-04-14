@@ -98,25 +98,19 @@ func (e *ValidationError) Error() string {
 	return fmt.Sprintf("%s: %s", e.Field, e.Message)
 }
 
+// addValidationError appends a validation error to the list if err is not nil.
+func addValidationError(errs []error, err error, field string) []error {
+	if err != nil {
+		return append(errs, &ValidationError{Field: field, Message: err.Error()})
+	}
+	return errs
+}
+
 // ValidateFlags performs comprehensive flag validation.
 func ValidateFlags(name string, count int, email string) []error {
-	var errs []error
-
-	err := ValidateName(name)
-	if err != nil {
-		errs = append(errs, &ValidationError{Field: "name", Message: err.Error()})
-	}
-
-	err = ValidateCount(count)
-	if err != nil {
-		errs = append(errs, &ValidationError{Field: "count", Message: err.Error()})
-	}
-
-	err = ValidateEmail(email)
-	if err != nil {
-		errs = append(errs, &ValidationError{Field: "email", Message: err.Error()})
-	}
-
+	errs := addValidationError(nil, ValidateName(name), "name")
+	errs = addValidationError(errs, ValidateCount(count), "count")
+	errs = addValidationError(errs, ValidateEmail(email), "email")
 	return errs
 }
 

@@ -50,9 +50,7 @@ func TestNewFlagRegistry(t *testing.T) {
 			t.Error("expected nil registry")
 		}
 
-		if !strings.Contains(err.Error(), "expected struct") {
-			t.Errorf("error should contain 'expected struct', got %q", err.Error())
-		}
+		assertErrorContains(t, err, "expected struct")
 	})
 
 	t.Run("config with short flags", func(t *testing.T) {

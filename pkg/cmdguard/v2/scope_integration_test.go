@@ -73,7 +73,22 @@ func TestScope_Integration(t *testing.T) {
 
 	t.Run("child scope can override parent services", func(t *testing.T) {
 		t.Parallel()
-		assertChildInheritsParent(t)
+
+		parent := NewScope("parent")
+		if err := ProvideValue(parent, "parent-value"); err != nil {
+			t.Fatalf("expected no error providing value, got: %v", err)
+		}
+
+		child := parent.Child("child")
+
+		value, err := Invoke[string](child)
+		if err != nil {
+			t.Fatalf("expected no error invoking, got: %v", err)
+		}
+
+		if value != "parent-value" {
+			t.Errorf("expected value 'parent-value', got %q", value)
+		}
 	})
 
 	t.Run("Package function creates CLI with DI", func(t *testing.T) {

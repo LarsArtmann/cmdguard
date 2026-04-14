@@ -15,6 +15,14 @@ func assertPanics(t *testing.T, fn func()) bool {
 	return testutil.ExpectPanics(t, fn)
 }
 
+func assertAddCommandPanics(t *testing.T, g *GuardedCommand, cmd *cobra.Command, reason string) {
+	t.Helper()
+
+	if !assertPanics(t, func() { g.AddCommand(cmd) }) {
+		t.Errorf("AddCommand should panic: %s", reason)
+	}
+}
+
 func newCobraCommand(name string) *cobra.Command {
 	return &cobra.Command{
 		Use: name,
@@ -57,9 +65,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 			Use: "invalid",
 		}
 
-		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
-			t.Error("AddCommand should panic for command without handler")
-		}
+		assertAddCommandPanics(t, g, cmd, "command without handler")
 	})
 
 	t.Run("panics on command without name", func(t *testing.T) {
@@ -69,9 +75,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := &cobra.Command{}
 
-		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
-			t.Error("AddCommand should panic for command without name")
-		}
+		assertAddCommandPanics(t, g, cmd, "command without name")
 	})
 
 	t.Run("panics after Execute called", func(t *testing.T) {
@@ -82,9 +86,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := newCobraCommand("sub")
 
-		if !assertPanics(t, func() { g.AddCommand(cmd) }) {
-			t.Error("AddCommand should panic after Execute called")
-		}
+		assertAddCommandPanics(t, g, cmd, "after Execute called")
 	})
 }
 
@@ -126,7 +128,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 		parent := &cobra.Command{
 			Use: "parent",
-			Run: func(*cobra.Command, []string) {},
+			Run: testutil.NoOpCobraRun(),
 		}
 		g.AddCommand(parent)
 

@@ -20,15 +20,17 @@ type BenchFlags struct {
 	Count int    `default:"1"     flag:"count" short:"c"`
 }
 
+// noOpRunE is a shared no-op RunE function to reduce duplication.
+func noOpRunE[T any, F any](_ context.Context, _ *T, _ F) error {
+	return nil
+}
+
 // newBenchCommand creates a command with standard benchmark configuration.
-// This helper reduces duplication across benchmark functions.
 func newBenchCommand(use, short string) v2.Command[BenchConfig, v2.NoFlags] {
 	return v2.Command[BenchConfig, v2.NoFlags]{
 		Use:   use,
 		Short: short,
-		RunE: func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
-			return nil
-		},
+		RunE:  noOpRunE[BenchConfig, v2.NoFlags],
 	}
 }
 
@@ -125,14 +127,10 @@ func BenchmarkCommandCreation(b *testing.B) {
 // BenchmarkNewCommand measures the NewCommand constructor.
 func BenchmarkNewCommand(b *testing.B) {
 	for b.Loop() {
-		cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
+		cmd, err := v2.NewCommand(
 			"greet",
 			v2.WithShort[BenchConfig, v2.NoFlags]("Greet someone"),
-			v2.WithRunE[BenchConfig, v2.NoFlags](
-				func(_ context.Context, _ *BenchConfig, _ v2.NoFlags) error {
-					return nil
-				},
-			),
+			v2.WithRunE(noOpRunE[BenchConfig, v2.NoFlags]),
 		)
 		if err != nil {
 			b.Fatal(err)

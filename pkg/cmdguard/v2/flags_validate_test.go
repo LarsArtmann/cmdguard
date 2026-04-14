@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -53,9 +52,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
-		if err := cmd.Flags().Set("mode", "staging"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
+		setFlag(t, cmd, "mode", "staging")
 
 		err := registry.ValidateFlags(cmd)
 		if err != nil {
@@ -73,18 +70,14 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		registry, cmd := setupFlagTest(t, TestConfig{})
 
 		// Manually set an invalid value (bypassing validation)
-		if err := cmd.Flags().Set("mode", "invalid"); err != nil {
-			t.Fatalf("expected no error setting flag, got: %v", err)
-		}
+		setFlag(t, cmd, "mode", "invalid")
 
 		err := registry.ValidateFlags(cmd)
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "mode") {
-			t.Errorf("expected error to contain 'mode', got: %v", err)
-		}
+		assertErrorContains(t, err, "mode")
 	})
 
 	t.Run("unchanged flag skips validation", func(t *testing.T) {
@@ -129,13 +122,7 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "name") {
-			t.Errorf("expected error to contain 'name', got: %v", err)
-		}
-
-		if !strings.Contains(err.Error(), "required") {
-			t.Errorf("expected error to contain 'required', got: %v", err)
-		}
+		assertErrorContains(t, err, "name", "required")
 	})
 
 	t.Run("required flag set passes validation", func(t *testing.T) {

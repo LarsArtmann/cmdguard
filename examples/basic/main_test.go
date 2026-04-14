@@ -13,9 +13,11 @@ import (
 )
 
 func testHelloRun(output *bytes.Buffer) func(*cobra.Command, []string) {
-	return func(_ *cobra.Command, _ []string) {
+	fn := func(_ *cobra.Command, _ []string) {
 		output.WriteString("Hello, World!\n")
 	}
+
+	return fn
 }
 
 func testGoodbyeRun(output *bytes.Buffer) func(*cobra.Command, []string) {
@@ -81,8 +83,9 @@ func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	}
 
 	// GuardedCommand adds built-in commands (completion, help, validate, version + our 2 custom commands)
-	if len(cmd.Commands()) < 2 {
-		t.Errorf("len(cmd.Commands()) = %d, want at least 2", len(cmd.Commands()))
+	subcmds := cmd.Commands()
+	if len(subcmds) < 2 {
+		t.Errorf("len(cmd.Commands()) = %d, want at least 2", len(subcmds))
 	}
 }
 

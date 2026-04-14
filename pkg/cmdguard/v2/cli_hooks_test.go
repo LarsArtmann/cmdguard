@@ -174,9 +174,7 @@ func TestCLI_CommandOptions(t *testing.T) {
 				Deprecated: tt.deprecated,
 				Aliases:    tt.aliases,
 				Version:    tt.version,
-				RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-					return nil
-				},
+				RunE: noOpHandlerForTestAppConfig(),
 			}
 			if err := AddCommand(cli, cmd); err != nil {
 				t.Fatalf("unexpected error: %v", err)

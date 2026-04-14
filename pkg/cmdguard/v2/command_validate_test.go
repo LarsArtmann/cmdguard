@@ -12,19 +12,15 @@ type testConfig struct {
 
 func newTestCommand() Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		Use: "test",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		},
+		Use:   "test",
+		RunE:  noOpHandler(),
 	}
 }
 
 func newTestSubcommand(use string) Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		Use: use,
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		},
+		Use:   use,
+		RunE:  noOpHandler(),
 	}
 }
 
@@ -61,9 +57,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				return nil
-			},
+			RunE: noOpHandler(),
 		}
 
 		err := cmd.Validate()
@@ -146,12 +140,14 @@ func TestCommand_Validate(t *testing.T) {
 			Verbose bool `default:"false" flag:"verbose"`
 		}
 
+		noOpRunE := func(_ context.Context, _ *testConfig, _ *flags) error {
+			return nil
+		}
+
 		cmd := Command[testConfig, *flags]{
 			Use:   "test",
 			Flags: &flags{},
-			RunE: func(_ context.Context, _ *testConfig, _ *flags) error {
-				return nil
-			},
+			RunE:  noOpRunE,
 		}
 
 		err := cmd.Validate()
