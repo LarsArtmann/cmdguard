@@ -120,6 +120,7 @@ func setStringField(field reflect.Value, str string) error {
 		return wrapErr(parseAndSetDuration(field, str), field, str)
 	case reflect.TypeFor[Enum]():
 		field.Set(reflect.ValueOf(Enum{value: str}))
+
 		return nil
 	}
 
@@ -132,6 +133,7 @@ func wrapErr(err error, field reflect.Value, str string) error {
 	if err == nil {
 		return nil
 	}
+
 	return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
 }
 

@@ -122,15 +122,17 @@ func assertEnumString(t *testing.T, got, want, fieldName string) {
 func setFlag(t *testing.T, cmd *cobra.Command, name, value string) {
 	t.Helper()
 
-	if err := cmd.Flags().Set(name, value); err != nil {
+	err := cmd.Flags().Set(name, value)
+	if err != nil {
 		t.Fatalf("expected no error setting flag %q to %q, got: %v", name, value, err)
 	}
 }
 
-func addCommand[T any, F any](t *testing.T, cli *CLI[T], cmd Command[T, F]) {
+func addCommand[T, F any](t *testing.T, cli *CLI[T], cmd Command[T, F]) {
 	t.Helper()
 
-	if err := AddCommand(cli, cmd); err != nil {
+	err := AddCommand(cli, cmd)
+	if err != nil {
 		t.Fatalf("AddCommand failed: %v", err)
 	}
 }

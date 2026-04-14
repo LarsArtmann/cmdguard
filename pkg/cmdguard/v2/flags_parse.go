@@ -115,6 +115,7 @@ func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error
 func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error {
 	return parseFlagValue(cfg, tag, value, "int", func(v string) (any, error) {
 		parsed, err := strconv.ParseInt(v, 10, 64)
+
 		return int(parsed), err
 	})
 }
@@ -123,6 +124,7 @@ func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error 
 func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error {
 	return parseFlagValue(cfg, tag, value, "uint", func(v string) (any, error) {
 		parsed, err := strconv.ParseUint(v, 10, 64)
+
 		return uint(parsed), err
 	})
 }

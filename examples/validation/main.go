@@ -103,6 +103,7 @@ func addValidationError(errs []error, err error, field string) []error {
 	if err != nil {
 		return append(errs, &ValidationError{Field: field, Message: err.Error()})
 	}
+
 	return errs
 }
 
@@ -111,6 +112,7 @@ func ValidateFlags(name string, count int, email string) []error {
 	errs := addValidationError(nil, ValidateName(name), "name")
 	errs = addValidationError(errs, ValidateCount(count), "count")
 	errs = addValidationError(errs, ValidateEmail(email), "email")
+
 	return errs
 }
 

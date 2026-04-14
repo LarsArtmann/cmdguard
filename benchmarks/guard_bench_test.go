@@ -21,7 +21,7 @@ type BenchFlags struct {
 }
 
 // noOpRunE is a shared no-op RunE function to reduce duplication.
-func noOpRunE[T any, F any](_ context.Context, _ *T, _ F) error {
+func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
 	return nil
 }
 

@@ -33,10 +33,11 @@ func EnsureValid[T any](v *T, name string) error {
 
 // MustParse parses a value or panics with a descriptive message.
 // Use only when you know the value is valid (e.g., for constants).
-func MustParse[T any](name string, s string, parser func(string) (T, error)) T {
+func MustParse[T any](name, s string, parser func(string) (T, error)) T {
 	v, err := parser(s)
 	if err != nil {
 		panic(fmt.Sprintf("%s(%q): %v", name, s, err))
 	}
+
 	return v
 }

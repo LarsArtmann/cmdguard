@@ -90,6 +90,7 @@ func TestGuardedCommand_ParentWithChildren(t *testing.T) {
 	root.AddCommand(parent)
 
 	cmd := root.Command()
+
 	cmds := cmd.Commands()
 	if len(cmds) < 3 {
 		t.Errorf("len(cmd.Commands()) = %d, want at least 3", len(cmds))

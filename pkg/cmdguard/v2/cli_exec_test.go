@@ -167,14 +167,17 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 
 		func() {
 			didPanic := false
+
 			func() {
 				defer func() {
 					if r := recover(); r != nil {
 						didPanic = true
 					}
 				}()
+
 				_ = cli.ExecuteWithArgs(t.Context(), []string{"--help"})
 			}()
+
 			if didPanic {
 				t.Error("ExecuteAndExit should not panic")
 			}
