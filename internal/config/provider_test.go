@@ -17,7 +17,10 @@ type loadTestCase struct {
 }
 
 // newLoadTestCase creates a loadTestCase with the given values.
-func newLoadTestCase(name, envLevel, envFormat, envStrict, wantLevel, wantFormat string, wantStrict bool) loadTestCase {
+func newLoadTestCase(
+	name, envLevel, envFormat, envStrict, wantLevel, wantFormat string,
+	wantStrict bool,
+) loadTestCase {
 	return loadTestCase{
 		name:       name,
 		envLevel:   envLevel,

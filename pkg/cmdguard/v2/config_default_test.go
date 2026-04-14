@@ -30,8 +30,16 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{name: "uint32 default", tag: newFlagTag[uint32]("4294967295"), expected: uint(4294967295)},
 		{name: "float64 default", tag: newFlagTag[float64]("3.14"), expected: 3.14},
 		{name: "empty default returns zero", tag: newFlagTag[int](""), expected: 0},
-		{name: "slice default", tag: newFlagTag[[]string]("a,b,c"), expected: []string{"a", "b", "c"}},
-		{name: "Duration default", tag: newFlagTag[Duration]("5m"), expected: FromDuration(5 * time.Minute)},
+		{
+			name:     "slice default",
+			tag:      newFlagTag[[]string]("a,b,c"),
+			expected: []string{"a", "b", "c"},
+		},
+		{
+			name:     "Duration default",
+			tag:      newFlagTag[Duration]("5m"),
+			expected: FromDuration(5 * time.Minute),
+		},
 		{name: "LogLevel default", tag: newFlagTag[LogLevel]("info"), expected: "info"},
 	}
 

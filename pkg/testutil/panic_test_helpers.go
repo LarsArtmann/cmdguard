@@ -2,6 +2,7 @@
 package testutil
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
@@ -62,4 +63,25 @@ func AssertErrorContains(t *testing.T, err error, substrings ...string) {
 			t.Errorf("error should contain %q, got %q", s, errMsg)
 		}
 	}
+}
+
+// AssertStderrContains fails the test if the stderr does not contain all given substrings (case-insensitive).
+func AssertStderrContains(t *testing.T, stderr string, substrings ...string) {
+	t.Helper()
+
+	for _, s := range substrings {
+		if !strings.Contains(strings.ToLower(stderr), strings.ToLower(s)) {
+			t.Errorf("stderr should contain %q, got %q", s, stderr)
+		}
+	}
+}
+
+// ContainsString checks if a slice contains a specific string.
+func ContainsString(slice []string, s string) bool {
+	return slices.Contains(slice, s)
+}
+
+// StringSliceContains is an alias for ContainsString for better readability.
+func StringSliceContains(slice []string, s string) bool {
+	return slices.Contains(slice, s)
 }

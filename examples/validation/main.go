@@ -134,10 +134,7 @@ func main() {
 	}
 
 	// Execute
-	if err := cli.Execute(context.Background()); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
+	examplesinternal.Execute(context.Background(), cli)
 }
 
 // GreetFlags defines flags for the greet command.

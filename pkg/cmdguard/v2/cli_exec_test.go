@@ -48,7 +48,7 @@ func TestCLI_Execute(t *testing.T) {
 				return nil
 			},
 		}
-	addCommand(t, cli, cmd)
+		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"greet"})
 		if err != nil {
@@ -68,7 +68,7 @@ func TestCLI_Execute(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-	addCommand(t, cli, newTestCmd("valid"))
+		addCommand(t, cli, newTestCmd("valid"))
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"unknown"})
 		if err == nil {
@@ -101,7 +101,7 @@ func TestCLI_Execute(t *testing.T) {
 				return nil
 			},
 		}
-	addCommand(t, cli, cmd)
+		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"greet", "--name", "Alice"})
 		if err != nil {
@@ -124,7 +124,7 @@ func TestCLI_ExecuteWithArgs(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-	addCommand(t, cli, newTestCmd("greet"))
+		addCommand(t, cli, newTestCmd("greet"))
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"greet"})
 		if err != nil {

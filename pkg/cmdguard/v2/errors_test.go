@@ -131,19 +131,7 @@ func TestEnumError(t *testing.T) {
 		t.Parallel()
 
 		err := NewEnumError("invalid", []string{"valid1", "valid2"})
-
-		errMsg := err.Error()
-		if !strings.Contains(errMsg, "invalid") {
-			t.Errorf("expected error to contain 'invalid', got %q", errMsg)
-		}
-
-		if !strings.Contains(errMsg, "valid1") {
-			t.Errorf("expected error to contain 'valid1', got %q", errMsg)
-		}
-
-		if !strings.Contains(errMsg, "valid2") {
-			t.Errorf("expected error to contain 'valid2', got %q", errMsg)
-		}
+		assertStringContains(t, err.Error(), "invalid", "valid1", "valid2")
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {
@@ -226,15 +214,7 @@ func TestServiceError(t *testing.T) {
 		t.Parallel()
 
 		err := NewServiceError("*DatabaseService", innerErr)
-
-		errMsg := err.Error()
-		if !strings.Contains(errMsg, "*DatabaseService") {
-			t.Errorf("expected error to contain '*DatabaseService', got %q", errMsg)
-		}
-
-		if !strings.Contains(errMsg, "service not initialized") {
-			t.Errorf("expected error to contain 'service not initialized', got %q", errMsg)
-		}
+		assertStringContains(t, err.Error(), "*DatabaseService", "service not initialized")
 	})
 
 	t.Run("Unwrap", func(t *testing.T) {

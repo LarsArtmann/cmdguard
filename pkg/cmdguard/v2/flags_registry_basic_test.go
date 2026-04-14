@@ -1,16 +1,13 @@
 package v2
 
 import (
-	"slices"
 	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
-)
 
-func containsString(slice []string, s string) bool {
-	return slices.Contains(slice, s)
-}
+	"github.com/larsartmann/cmdguard/pkg/testutil"
+)
 
 func TestNewFlagRegistry(t *testing.T) {
 	t.Parallel()
@@ -246,11 +243,11 @@ func TestFlagRegistry_Tags(t *testing.T) {
 			names[i] = tag.Name
 		}
 
-		if !containsString(names, "name") {
+		if !testutil.ContainsString(names, "name") {
 			t.Errorf("names should contain 'name', got %v", names)
 		}
 
-		if !containsString(names, "count") {
+		if !testutil.ContainsString(names, "count") {
 			t.Errorf("names should contain 'count', got %v", names)
 		}
 	})
@@ -277,15 +274,15 @@ func TestFlagRegistry_FlagNames(t *testing.T) {
 			t.Errorf("len(names) = %d, want 3", len(names))
 		}
 
-		if !containsString(names, "verbose") {
+		if !testutil.ContainsString(names, "verbose") {
 			t.Errorf("names should contain 'verbose', got %v", names)
 		}
 
-		if !containsString(names, "config") {
+		if !testutil.ContainsString(names, "config") {
 			t.Errorf("names should contain 'config', got %v", names)
 		}
 
-		if !containsString(names, "output") {
+		if !testutil.ContainsString(names, "output") {
 			t.Errorf("names should contain 'output', got %v", names)
 		}
 	})

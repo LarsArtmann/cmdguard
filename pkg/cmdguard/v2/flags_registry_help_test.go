@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -23,33 +22,10 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 		}
 
 		help := registry.GenerateHelp()
-		if !strings.Contains(help, "--name") {
-			t.Errorf("help should contain '--name', got %q", help)
-		}
-
-		if !strings.Contains(help, "-n") {
-			t.Errorf("help should contain '-n', got %q", help)
-		}
-
-		if !strings.Contains(help, "The name to use") {
-			t.Errorf("help should contain 'The name to use', got %q", help)
-		}
-
-		if !strings.Contains(help, "default: default") {
-			t.Errorf("help should contain 'default: default', got %q", help)
-		}
-
-		if !strings.Contains(help, "--verbose") {
-			t.Errorf("help should contain '--verbose', got %q", help)
-		}
-
-		if !strings.Contains(help, "-v") {
-			t.Errorf("help should contain '-v', got %q", help)
-		}
-
-		if !strings.Contains(help, "Enable verbose output") {
-			t.Errorf("help should contain 'Enable verbose output', got %q", help)
-		}
+		assertStringContains(t, help,
+			"--name", "-n", "The name to use", "default: default",
+			"--verbose", "-v", "Enable verbose output",
+		)
 	})
 
 	t.Run("help formatting without optional elements", func(t *testing.T) {
@@ -65,9 +41,7 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 		}
 
 		help := registry.GenerateHelp()
-		if !strings.Contains(help, "--name") {
-			t.Errorf("help should contain '--name', got %q", help)
-		}
+		assertStringContains(t, help, "--name")
 	})
 }
 

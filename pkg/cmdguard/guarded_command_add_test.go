@@ -8,17 +8,10 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
-// assertPanics runs fn and returns true if it panicked.
-func assertPanics(t *testing.T, fn func()) bool {
-	t.Helper()
-
-	return testutil.ExpectPanics(t, fn)
-}
-
 func assertAddCommandPanics(t *testing.T, g *GuardedCommand, cmd *cobra.Command, reason string) {
 	t.Helper()
 
-	if !assertPanics(t, func() { g.AddCommand(cmd) }) {
+	if !testutil.ExpectPanics(t, func() { g.AddCommand(cmd) }) {
 		t.Errorf("AddCommand should panic: %s", reason)
 	}
 }
@@ -39,7 +32,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := newCobraCommand("sub")
 
-		if assertPanics(t, func() { g.AddCommand(cmd) }) {
+		if testutil.ExpectPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should not panic for valid command")
 		}
 	})
@@ -51,7 +44,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := newTestCommand("sub")
 
-		if assertPanics(t, func() { g.AddCommand(cmd) }) {
+		if testutil.ExpectPanics(t, func() { g.AddCommand(cmd) }) {
 			t.Error("AddCommand should not panic for valid command")
 		}
 	})
@@ -102,7 +95,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 		child := newCobraCommand("child")
 
-		if assertPanics(t, func() { g.AddSubcommand(parent, child) }) {
+		if testutil.ExpectPanics(t, func() { g.AddSubcommand(parent, child) }) {
 			t.Error("AddSubcommand should not panic for valid child")
 		}
 
@@ -136,7 +129,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 			Use: "invalid-child",
 		}
 
-		if !assertPanics(t, func() { g.AddSubcommand(parent, child) }) {
+		if !testutil.ExpectPanics(t, func() { g.AddSubcommand(parent, child) }) {
 			t.Error("AddSubcommand should panic for invalid child")
 		}
 	})

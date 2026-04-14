@@ -2,6 +2,7 @@ package v2
 
 import (
 	"errors"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -41,7 +42,7 @@ func TestSuggestFlag(t *testing.T) {
 
 			result := SuggestFlag(tt.validNames, tt.input)
 			if tt.wantOneOf != nil {
-				if !containsString(tt.wantOneOf, result) {
+				if !slices.Contains(tt.wantOneOf, result) {
 					t.Errorf("SuggestFlag() = %q, expected to be one of %v", result, tt.wantOneOf)
 				}
 			} else if result != tt.want {
@@ -94,19 +95,7 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 		t.Parallel()
 
 		err := NewFlagErrorWithSuggestion("verboose", errUnknownFlag, "verbose")
-
-		errMsg := err.Error()
-		if !strings.Contains(errMsg, "verboose") {
-			t.Errorf("error should contain 'verboose', got %q", errMsg)
-		}
-
-		if !strings.Contains(errMsg, "unknown flag") {
-			t.Errorf("error should contain 'unknown flag', got %q", errMsg)
-		}
-
-		if !strings.Contains(errMsg, "did you mean --verbose") {
-			t.Errorf("error should contain 'did you mean --verbose', got %q", errMsg)
-		}
+		assertStringContains(t, err.Error(), "verboose", "unknown flag", "did you mean --verbose")
 	})
 
 	t.Run("empty suggestion omits hint", func(t *testing.T) {

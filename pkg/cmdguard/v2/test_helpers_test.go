@@ -31,10 +31,15 @@ func assertErrorContains(t *testing.T, err error, substrings ...string) {
 
 func assertStderrContains(t *testing.T, stderr string, substrings ...string) {
 	t.Helper()
+	testutil.AssertStderrContains(t, stderr, substrings...)
+}
 
-	for _, s := range substrings {
-		if !strings.Contains(strings.ToLower(stderr), strings.ToLower(s)) {
-			t.Errorf("stderr should contain %q, got %q", s, stderr)
+func assertStringContains(t *testing.T, s string, substrings ...string) {
+	t.Helper()
+
+	for _, sub := range substrings {
+		if !strings.Contains(s, sub) {
+			t.Errorf("expected %q to contain %q", s, sub)
 		}
 	}
 }

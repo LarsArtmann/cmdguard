@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 // hasSubcommand checks if a command with the given name exists in the GuardedCommand's subcommands.
@@ -62,7 +64,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		assertErrorContains(t, err, "no name")
+		testutil.AssertErrorContains(t, err, "no name")
 	})
 
 	t.Run("command without handler is invalid", func(t *testing.T) {
@@ -77,7 +79,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		assertErrorContains(t, err, "no handler")
+		testutil.AssertErrorContains(t, err, "no handler")
 	})
 
 	t.Run("parent command with subcommands does not need handler", func(t *testing.T) {
@@ -105,7 +107,7 @@ func TestGuardedCommand_validateCommand(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		assertErrorContains(t, err, "strict mode requires RunE")
+		testutil.AssertErrorContains(t, err, "strict mode requires RunE")
 	})
 }
 
@@ -168,7 +170,7 @@ func TestGuardedCommand_ValidateCommandTree(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		assertErrorContains(t, err, "invalid")
+		testutil.AssertErrorContains(t, err, "invalid")
 	})
 }
 
@@ -204,7 +206,7 @@ func TestGuardedCommand_ValidateSubcommands(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		assertErrorContains(t, err, "parent invalid")
+		testutil.AssertErrorContains(t, err, "parent invalid")
 	})
 
 	t.Run("validates nested subcommands", func(t *testing.T) {
@@ -292,6 +294,6 @@ func TestGuardedCommand_DefaultCommands_Execution(t *testing.T) {
 			t.Fatal("expected error, got nil")
 		}
 
-		assertErrorContains(t, err, "validation failed")
+		testutil.AssertErrorContains(t, err, "validation failed")
 	})
 }

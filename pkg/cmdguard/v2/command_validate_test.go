@@ -12,15 +12,15 @@ type testConfig struct {
 
 func newTestCommand() Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		Use:   "test",
-		RunE:  noOpHandler(),
+		Use:  "test",
+		RunE: noOpHandler(),
 	}
 }
 
 func newTestSubcommand(use string) Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		Use:   use,
-		RunE:  noOpHandler(),
+		Use:  use,
+		RunE: noOpHandler(),
 	}
 }
 

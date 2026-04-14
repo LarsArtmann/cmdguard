@@ -60,7 +60,7 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		Use: "ok",
+		Use:  "ok",
 		RunE: noOpHandlerForTestAppConfig(),
 		PostRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			postRunCalled = true
@@ -151,8 +151,8 @@ func TestCLIToCobraCommand_SubcommandError(t *testing.T) {
 	}
 
 	invalidChild := Command[testAppConfig, NoFlags]{
-		Use:   "", // empty Use is invalid
-		RunE:  noOpHandlerForTestAppConfig(),
+		Use:  "", // empty Use is invalid
+		RunE: noOpHandlerForTestAppConfig(),
 	}
 
 	parent := Command[testAppConfig, NoFlags]{

@@ -113,7 +113,7 @@ func TestGuardedCommand_StrictMode(t *testing.T) {
 	expectPanic(t, func() {
 		root.AddCommand(&cobra.Command{
 			Use: "bad",
-			Run:   testutil.NoOpCobraRun(),
+			Run: testutil.NoOpCobraRun(),
 		})
 	})
 }

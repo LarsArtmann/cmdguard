@@ -103,9 +103,9 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 				return nil
 			},
 		}
-	addCommand(t, cli, cmd)
+		addCommand(t, cli, cmd)
 
-			err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
+		err = cli.ExecuteWithArgs(t.Context(), []string{"test"})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -172,7 +172,7 @@ func TestCLI_CommandOptions(t *testing.T) {
 				Deprecated: tt.deprecated,
 				Aliases:    tt.aliases,
 				Version:    tt.version,
-				RunE: noOpHandlerForTestAppConfig(),
+				RunE:       noOpHandlerForTestAppConfig(),
 			}
 			if err := AddCommand(cli, cmd); err != nil {
 				t.Fatalf("unexpected error: %v", err)
