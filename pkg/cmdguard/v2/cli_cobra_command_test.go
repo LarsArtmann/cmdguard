@@ -6,6 +6,8 @@ import (
 	"errors"
 	"slices"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
@@ -24,29 +26,25 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 
 	middleCmd := Command[testAppConfig, NoFlags]{
 		Use:      "middle",
+		Long:     "Middle level command",
 		Commands: []Command[testAppConfig, NoFlags]{leafCmd},
 	}
 
 	topCmd := Command[testAppConfig, NoFlags]{
 		Use:      "top",
+		Long:     "Top level command",
 		Commands: []Command[testAppConfig, NoFlags]{middleCmd},
 	}
 
 	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
-	if err != nil {
-		t.Fatalf("NewCLI failed: %v", err)
-	}
+	testutil.AssertNoError(t, err)
 
 	addCommand(t, cli, topCmd)
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{"top", "middle", "leaf"})
-	if err != nil {
-		t.Fatalf("Execute failed: %v", err)
-	}
+	testutil.AssertNoError(t, err)
 
-	if executedCmd != "leaf" {
-		t.Errorf("executedCmd = %q, want %q", executedCmd, "leaf")
-	}
+	testutil.AssertFieldEqQuote(t, executedCmd, "leaf", "executedCmd")
 }
 
 func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
@@ -157,6 +155,7 @@ func TestCLIToCobraCommand_SubcommandError(t *testing.T) {
 
 	parent := Command[testAppConfig, NoFlags]{
 		Use:      "parent",
+		Long:     "Parent command with invalid child",
 		Commands: []Command[testAppConfig, NoFlags]{invalidChild},
 	}
 

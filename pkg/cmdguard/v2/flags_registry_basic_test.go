@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -22,30 +21,20 @@ func TestNewFlagRegistry(t *testing.T) {
 		cfg := testConfig{}
 
 		registry, err := NewFlagRegistry(cfg)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if registry == nil {
-			t.Fatal("expected non-nil registry")
-		}
+		testutil.AssertNotNil(t, registry)
 
-		if len(registry.Tags()) != 2 {
-			t.Errorf("len(registry.Tags()) = %d, want 2", len(registry.Tags()))
-		}
+		testutil.AssertFieldLen(t, registry.Tags(), 2, "Tags")
 	})
 
 	t.Run("non-struct config", func(t *testing.T) {
 		t.Parallel()
 
 		registry, err := NewFlagRegistry("not a struct")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
-		if registry != nil {
-			t.Error("expected nil registry")
-		}
+		testutil.AssertNil(t, registry)
 
 		assertErrorContains(t, err, "expected struct")
 	})
@@ -58,17 +47,13 @@ func TestNewFlagRegistry(t *testing.T) {
 		}
 
 		registry, err := NewFlagRegistry(testConfig{})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		tags := registry.Tags()
-		if len(tags) != 1 {
-			t.Errorf("len(tags) = %d, want 1", len(tags))
-		}
+		testutil.AssertFieldLen(t, tags, 1, "tags")
 
-		if len(tags) > 0 && tags[0].Short != "n" {
-			t.Errorf("tags[0].Short = %q, want %q", tags[0].Short, "n")
+		if len(tags) > 0 {
+			testutil.AssertFieldEqString(t, tags[0].Short, "n", "tags[0].Short")
 		}
 	})
 }
@@ -89,45 +74,20 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 		}
 
 		registry, err := NewFlagRegistry(testConfig{})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		cmd := &cobra.Command{Use: "test"}
 
 		err = registry.RegisterFlags(cmd)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		flags := cmd.Flags()
-		if flags.Lookup("string") == nil {
-			t.Error("expected 'string' flag to be registered")
-		}
-
-		if flags.Lookup("bool") == nil {
-			t.Error("expected 'bool' flag to be registered")
-		}
-
-		if flags.Lookup("int") == nil {
-			t.Error("expected 'int' flag to be registered")
-		}
-
-		if flags.Lookup("uint") == nil {
-			t.Error("expected 'uint' flag to be registered")
-		}
-
-		if flags.Lookup("uint64") == nil {
-			t.Error("expected 'uint64' flag to be registered")
-		}
-
-		if flags.Lookup("float") == nil {
-			t.Error("expected 'float' flag to be registered")
-		}
-
-		if flags.Lookup("strings") == nil {
-			t.Error("expected 'strings' flag to be registered")
-		}
+		testutil.AssertFlagRegistered(t, cmd, "string")
+		testutil.AssertFlagRegistered(t, cmd, "bool")
+		testutil.AssertFlagRegistered(t, cmd, "int")
+		testutil.AssertFlagRegistered(t, cmd, "uint")
+		testutil.AssertFlagRegistered(t, cmd, "uint64")
+		testutil.AssertFlagRegistered(t, cmd, "float")
+		testutil.AssertFlagRegistered(t, cmd, "strings")
 	})
 
 	t.Run("registers custom types", func(t *testing.T) {
@@ -139,24 +99,15 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 		}
 
 		registry, err := NewFlagRegistry(testConfig{})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		cmd := &cobra.Command{Use: "test"}
 
 		err = registry.RegisterFlags(cmd)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if cmd.Flags().Lookup("level") == nil {
-			t.Error("expected 'level' flag to be registered")
-		}
-
-		if cmd.Flags().Lookup("format") == nil {
-			t.Error("expected 'format' flag to be registered")
-		}
+		testutil.AssertFlagRegistered(t, cmd, "level")
+		testutil.AssertFlagRegistered(t, cmd, "format")
 	})
 
 	t.Run("registers Duration type", func(t *testing.T) {
@@ -167,25 +118,19 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 		}
 
 		registry, err := NewFlagRegistry(testConfig{})
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		cmd := &cobra.Command{Use: "test"}
 
 		err = registry.RegisterFlags(cmd)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		flag := cmd.Flags().Lookup("timeout")
 		if flag == nil {
 			t.Fatal("expected 'timeout' flag to be registered")
 		}
 
-		if flag.DefValue != "30s" {
-			t.Errorf("flag.DefValue = %q, want %q", flag.DefValue, "30s")
-		}
+		testutil.AssertFieldEqString(t, flag.DefValue, "30s", "DefValue")
 	})
 
 	t.Run("registers enum with values", func(t *testing.T) {
@@ -212,9 +157,12 @@ func TestFlagRegistry_RegisterFlags(t *testing.T) {
 			t.Fatal("expected 'mode' flag to be registered")
 		}
 
-		if !strings.Contains(flag.Usage, "one of: dev, staging, prod") {
-			t.Errorf("flag.Usage should contain 'one of: dev, staging, prod', got %q", flag.Usage)
-		}
+		testutil.AssertStringFieldContains(
+			t,
+			flag.Usage,
+			"one of: dev, staging, prod",
+			"flag.Usage",
+		)
 	})
 }
 
@@ -234,22 +182,15 @@ func TestFlagRegistry_Tags(t *testing.T) {
 		}
 
 		tags := registry.Tags()
-		if len(tags) != 2 {
-			t.Errorf("len(tags) = %d, want 2", len(tags))
-		}
+		testutil.AssertFieldLen(t, tags, 2, "tags")
 
 		names := make([]string, len(tags))
 		for i, tag := range tags {
 			names[i] = tag.Name
 		}
 
-		if !testutil.ContainsString(names, "name") {
-			t.Errorf("names should contain 'name', got %v", names)
-		}
-
-		if !testutil.ContainsString(names, "count") {
-			t.Errorf("names should contain 'count', got %v", names)
-		}
+		testutil.AssertContainsString(t, names, "name")
+		testutil.AssertContainsString(t, names, "count")
 	})
 }
 
@@ -270,21 +211,11 @@ func TestFlagRegistry_FlagNames(t *testing.T) {
 		}
 
 		names := registry.FlagNames()
-		if len(names) != 3 {
-			t.Errorf("len(names) = %d, want 3", len(names))
-		}
+		testutil.AssertFieldLen(t, names, 3, "names")
 
-		if !testutil.ContainsString(names, "verbose") {
-			t.Errorf("names should contain 'verbose', got %v", names)
-		}
-
-		if !testutil.ContainsString(names, "config") {
-			t.Errorf("names should contain 'config', got %v", names)
-		}
-
-		if !testutil.ContainsString(names, "output") {
-			t.Errorf("names should contain 'output', got %v", names)
-		}
+		testutil.AssertContainsString(t, names, "verbose")
+		testutil.AssertContainsString(t, names, "config")
+		testutil.AssertContainsString(t, names, "output")
 	})
 
 	t.Run("empty registry returns empty slice", func(t *testing.T) {
@@ -298,8 +229,6 @@ func TestFlagRegistry_FlagNames(t *testing.T) {
 		}
 
 		names := registry.FlagNames()
-		if len(names) != 0 {
-			t.Errorf("len(names) = %d, want 0", len(names))
-		}
+		testutil.AssertFieldLen(t, names, 0, "names")
 	})
 }

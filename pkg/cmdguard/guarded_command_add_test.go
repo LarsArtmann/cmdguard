@@ -32,9 +32,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := newCobraCommand("sub")
 
-		if testutil.ExpectPanics(t, func() { g.AddCommand(cmd) }) {
-			t.Error("AddCommand should not panic for valid command")
-		}
+		testutil.AssertDoesNotPanic(t, func() { g.AddCommand(cmd) })
 	})
 
 	t.Run("accepts valid command with RunE", func(t *testing.T) {
@@ -44,9 +42,7 @@ func TestGuardedCommand_AddCommand(t *testing.T) {
 
 		cmd := newTestCommand("sub")
 
-		if testutil.ExpectPanics(t, func() { g.AddCommand(cmd) }) {
-			t.Error("AddCommand should not panic for valid command")
-		}
+		testutil.AssertDoesNotPanic(t, func() { g.AddCommand(cmd) })
 	})
 
 	t.Run("panics on command without handler", func(t *testing.T) {
@@ -95,9 +91,7 @@ func TestGuardedCommand_AddSubcommand(t *testing.T) {
 
 		child := newCobraCommand("child")
 
-		if testutil.ExpectPanics(t, func() { g.AddSubcommand(parent, child) }) {
-			t.Error("AddSubcommand should not panic for valid child")
-		}
+		testutil.AssertDoesNotPanic(t, func() { g.AddSubcommand(parent, child) })
 
 		found := false
 

@@ -3,6 +3,8 @@ package v2
 import (
 	"testing"
 	"time"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestSetField(t *testing.T) {
@@ -15,13 +17,9 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Name", "test")
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if cfg.Name != "test" {
-			t.Errorf("expected Name 'test', got %q", cfg.Name)
-		}
+		testutil.AssertFieldEqString(t, cfg.Name, "test", "Name")
 	})
 
 	t.Run("set int field", func(t *testing.T) {
@@ -32,13 +30,9 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Count", 42)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if cfg.Count != 42 {
-			t.Errorf("expected Count 42, got %d", cfg.Count)
-		}
+		testutil.AssertFieldEq(t, cfg.Count, 42, "Count")
 	})
 
 	t.Run("set bool field", func(t *testing.T) {
@@ -49,13 +43,9 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Enabled", true)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if !cfg.Enabled {
-			t.Error("expected Enabled to be true")
-		}
+		testutil.AssertBoolTrue(t, cfg.Enabled, "Enabled")
 	})
 
 	t.Run("non-pointer config", func(t *testing.T) {
@@ -64,9 +54,7 @@ func TestSetField(t *testing.T) {
 		cfg := struct{ Name string }{}
 
 		err := SetField(cfg, "Name", "test")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
 		assertErrorContains(t, err, "pointer to struct")
 	})
@@ -77,9 +65,7 @@ func TestSetField(t *testing.T) {
 		cfg := &struct{ Name string }{}
 
 		err := SetField(cfg, "Missing", "test")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
 		assertErrorContains(t, err, "not found")
 	})
@@ -92,9 +78,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Level", "debug")
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		assertEnumString(t, cfg.Level.String(), "debug", "Level")
 	})
@@ -107,9 +91,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Format", "json")
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		assertEnumString(t, cfg.Format.String(), "json", "Format")
 	})
@@ -122,9 +104,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Timeout", "30s")
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		assertDurationField(t, cfg.Timeout, 30*time.Second)
 	})
@@ -137,9 +117,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Timeout", 45*time.Second)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		assertDurationField(t, cfg.Timeout, 45*time.Second)
 	})
@@ -152,9 +130,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Level", "invalid")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 	})
 
 	t.Run("invalid LogFormat", func(t *testing.T) {
@@ -165,9 +141,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Format", "invalid-format")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 	})
 
 	t.Run("invalid Duration", func(t *testing.T) {
@@ -178,9 +152,7 @@ func TestSetField(t *testing.T) {
 		}{}
 
 		err := SetField(cfg, "Timeout", "not-a-duration")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 	})
 
 	t.Run("incompatible types", func(t *testing.T) {
@@ -191,9 +163,7 @@ func TestSetField(t *testing.T) {
 		}{}
 		// Use a struct type which is truly incompatible with string
 		err := SetField(cfg, "Name", Duration{duration: 5 * time.Minute})
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
 		assertErrorContains(t, err, "cannot convert")
 	})

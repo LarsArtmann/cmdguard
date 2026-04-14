@@ -3,6 +3,8 @@ package v2
 import (
 	"context"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestWithFlowContextValue(t *testing.T) {
@@ -95,7 +97,7 @@ func TestRequireBranchingFlowContext(t *testing.T) {
 	t.Run("not found panics", func(t *testing.T) {
 		t.Parallel()
 
-		assertPanics(t, func() {
+		testutil.AssertPanics(t, func() {
 			ctx := context.Background()
 			RequireBranchingFlowContext(ctx)
 		})

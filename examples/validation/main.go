@@ -116,23 +116,18 @@ func ValidateFlags(name string, count int, email string) []error {
 	return errs
 }
 
-// fatal prints the error to stderr and exits with code 1.
-func fatal(format string, args ...any) {
-	examplesinternal.Fatalf(format, args...)
-}
-
 func main() {
 	fmt.Println("=== Validation Example (v2 API) ===")
 	fmt.Println()
 
 	cli, err := v2.NewCLI[Config]("validation-example", "Validation demonstration", Config{})
 	if err != nil {
-		fatal("Failed to create CLI: %v\n", err)
+		examplesinternal.Fatalf("Failed to create CLI: %v\n", err)
 	}
 
 	// Add commands
 	if err := addCommands(cli); err != nil {
-		fatal("Failed to add commands: %v\n", err)
+		examplesinternal.Fatalf("Failed to add commands: %v\n", err)
 	}
 
 	// Execute

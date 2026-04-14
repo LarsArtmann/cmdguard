@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 type testCLIConfig struct {
@@ -17,13 +18,9 @@ func TestNewCLI(t *testing.T) {
 		t.Parallel()
 
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if cli == nil {
-			t.Fatal("cli is nil")
-		}
+		testutil.AssertNotNil(t, cli)
 
 		if cli.Name() != "test" {
 			t.Errorf("Name() = %q, want %q", cli.Name(), "test")
@@ -44,9 +41,7 @@ func TestNewCLI(t *testing.T) {
 			v2.WithCLIVersion[testCLIConfig]("1.0.0"),
 			v2.WithCLILong[testCLIConfig]("This is a long description"),
 		)
-		if err != nil {
-			t.Fatalf("NewCLI with options failed: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		if cli.Name() != "myapp" {
 			t.Errorf("Name() = %q, want %q", cli.Name(), "myapp")
@@ -61,9 +56,7 @@ func TestNewCLI(t *testing.T) {
 		t.Parallel()
 
 		_, err := v2.NewCLI[testCLIConfig]("", "short", testCLIConfig{})
-		if err == nil {
-			t.Fatal("expected error for empty name")
-		}
+		testutil.AssertExpectedError(t, err)
 	})
 
 	t.Run("WithSilenceErrors sets SilenceErrors", func(t *testing.T) {
@@ -73,13 +66,9 @@ func TestNewCLI(t *testing.T) {
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithSilenceErrors[testCLIConfig](),
 		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if !cli.RootCommand().SilenceErrors {
-			t.Error("expected SilenceErrors to be true")
-		}
+		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceErrors, "SilenceErrors")
 	})
 
 	t.Run("WithSilenceUsage sets SilenceUsage", func(t *testing.T) {
@@ -89,13 +78,9 @@ func TestNewCLI(t *testing.T) {
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithSilenceUsage[testCLIConfig](),
 		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if !cli.RootCommand().SilenceUsage {
-			t.Error("expected SilenceUsage to be true")
-		}
+		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceUsage, "SilenceUsage")
 	})
 
 	t.Run("WithColor false disables fang", func(t *testing.T) {
@@ -105,13 +90,8 @@ func TestNewCLI(t *testing.T) {
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithColor[testCLIConfig](false),
 		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
-
-		if cli == nil {
-			t.Fatal("cli is nil")
-		}
+		testutil.AssertNoError(t, err)
+		testutil.AssertNotNil(t, cli)
 	})
 
 	t.Run("WithColor true keeps fang enabled", func(t *testing.T) {
@@ -121,13 +101,8 @@ func TestNewCLI(t *testing.T) {
 			"test", "Test CLI", testCLIConfig{},
 			v2.WithColor[testCLIConfig](true),
 		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
-
-		if cli == nil {
-			t.Fatal("cli is nil")
-		}
+		testutil.AssertNoError(t, err)
+		testutil.AssertNotNil(t, cli)
 	})
 
 	t.Run("combines multiple options", func(t *testing.T) {
@@ -139,17 +114,10 @@ func TestNewCLI(t *testing.T) {
 			v2.WithSilenceUsage[testCLIConfig](),
 			v2.WithCLIVersion[testCLIConfig]("2.0.0"),
 		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if !cli.RootCommand().SilenceErrors {
-			t.Error("expected SilenceErrors to be true")
-		}
-
-		if !cli.RootCommand().SilenceUsage {
-			t.Error("expected SilenceUsage to be true")
-		}
+		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceErrors, "SilenceErrors")
+		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceUsage, "SilenceUsage")
 
 		rootCmd := cli.RootCommand()
 		if rootCmd.Version != "2.0.0" {

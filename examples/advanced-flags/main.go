@@ -55,15 +55,11 @@ type EnumFlags struct {
 // Validate implements custom validation for EnumFlags.
 func (f EnumFlags) Validate() error {
 	validEnvs := []string{"development", "staging", "production"}
-	if !contains(validEnvs, f.Environment) {
+	if !slices.Contains(validEnvs, f.Environment) {
 		return fmt.Errorf("invalid environment: %q (must be one of: %v)", f.Environment, validEnvs)
 	}
 
 	return nil
-}
-
-func contains(slice []string, item string) bool {
-	return slices.Contains(slice, item)
 }
 
 // DurationFlags demonstrates duration parsing.
@@ -73,39 +69,25 @@ type DurationFlags struct {
 	MaxWait        v2.Duration `default:"0s" flag:"max-wait"        help:"Maximum wait time (0 = no limit)"`
 }
 
-// execute runs the CLI and exits on error.
-func execute(ctx context.Context, cli *v2.CLI[GlobalConfig]) {
-	examplesinternal.Execute(ctx, cli)
-}
-
-// fatal prints the error to stderr and exits with code 1.
-func fatal(format string, args ...any) {
-	examplesinternal.Fatalf(format, args...)
-}
-
 func main() {
 	ctx := context.Background()
 
-	// Create CLI with global config using CLI[T] API (v2.1+)
-	// CLI[T] uses a single type parameter for cleaner API
 	root, err := v2.NewCLI[GlobalConfig](
 		"advflags",
 		"Advanced Flags Example",
 		GlobalConfig{},
 	)
 	if err != nil {
-		fatal("Error: %v\n", err)
+		examplesinternal.Fatalf("Error: %v\n", err)
 	}
 
 	// Server command with custom flags
-	// CLI[T] uses v2.AddCommand function which supports any flags type per command
 	if err := v2.AddCommand(root, v2.Command[GlobalConfig, ServerFlags]{
 		Use:   "server",
 		Short: "Start the server",
 		Long:  "Start the HTTP server with configurable host and port.",
 		Flags: ServerFlags{},
 		RunE: func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
-			// Use command-specific log level if set, otherwise global
 			logLevel := cfg.LogLevel
 			if flags.LogLevel.String() != "" {
 				logLevel = flags.LogLevel
@@ -118,7 +100,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fatal("Error adding server command: %v\n", err)
+		examplesinternal.Fatalf("Error adding server command: %v\n", err)
 	}
 
 	// Config command with required flag
@@ -127,10 +109,9 @@ func main() {
 		Short: "Configuration management",
 		Flags: ConfigFlags{},
 		PreRunE: func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
-			// Custom validation in PreRunE
 			if flags.OutputFormat != "" {
 				validFormats := []string{"json", "yaml", "yml"}
-				if !contains(validFormats, flags.OutputFormat) {
+				if !slices.Contains(validFormats, flags.OutputFormat) {
 					return fmt.Errorf("invalid output format: %q (suggestions: %s)",
 						flags.OutputFormat,
 						suggestFormat(flags.OutputFormat))
@@ -147,7 +128,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fatal("Error adding config command: %v\n", err)
+		examplesinternal.Fatalf("Error adding config command: %v\n", err)
 	}
 
 	// Enum demo command
@@ -156,14 +137,12 @@ func main() {
 		Short: "Environment settings",
 		Flags: EnumFlags{},
 		PreRunE: func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
-			// Validate environment
 			return flags.Validate()
 		},
 		RunE: func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
 			fmt.Printf("Environment: %s\n", flags.Environment)
 			fmt.Printf("Region: %s\n", flags.Region)
 
-			// Show warning for production
 			if flags.Environment == "production" {
 				fmt.Println("⚠️  Running in PRODUCTION mode!")
 			}
@@ -171,7 +150,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fatal("Error adding env command: %v\n", err)
+		examplesinternal.Fatalf("Error adding env command: %v\n", err)
 	}
 
 	// Duration demo command
@@ -191,18 +170,17 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fatal("Error adding duration command: %v\n", err)
+		examplesinternal.Fatalf("Error adding duration command: %v\n", err)
 	}
 
 	// Execute
-	execute(ctx, root)
+	examplesinternal.Execute(ctx, root)
 }
 
 // suggestFormat returns a suggestion for invalid format.
 func suggestFormat(input string) string {
 	validFormats := []string{"json", "yaml", "yml"}
 
-	// Find closest match
 	var bestMatch string
 
 	bestDistance := len(input)
@@ -232,13 +210,11 @@ func levenshteinDistance(s1, s2 string) int {
 		return len(s1)
 	}
 
-	// Create matrix
 	matrix := make([][]int, len(s1)+1)
 	for i := range matrix {
 		matrix[i] = make([]int, len(s2)+1)
 	}
 
-	// Initialize first column and row
 	for i := 0; i <= len(s1); i++ {
 		matrix[i][0] = i
 	}
@@ -247,7 +223,6 @@ func levenshteinDistance(s1, s2 string) int {
 		matrix[0][j] = j
 	}
 
-	// Fill matrix
 	for i := 1; i <= len(s1); i++ {
 		for j := 1; j <= len(s2); j++ {
 			cost := 0

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestEmail(t *testing.T) {
@@ -17,9 +18,7 @@ func TestEmail(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if e.String() != "user@example.com" {
-			t.Errorf("String() = %q, want %q", e.String(), "user@example.com")
-		}
+		testutil.AssertStringerEq(t, e, "user@example.com")
 
 		if e.Address() != "user@example.com" {
 			t.Errorf("Address() = %q, want %q", e.Address(), "user@example.com")
@@ -60,9 +59,7 @@ func TestEmail(t *testing.T) {
 		t.Parallel()
 
 		e := v2.MustParseEmail("test@test.com")
-		if e.String() != "test@test.com" {
-			t.Errorf("String() = %q, want %q", e.String(), "test@test.com")
-		}
+		testutil.AssertStringerEq(t, e, "test@test.com")
 	})
 
 	t.Run("MustParseEmail panic", func(t *testing.T) {
@@ -104,8 +101,6 @@ func TestEmail(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if e.String() != "test@example.com" {
-			t.Errorf("String() = %q, want %q", e.String(), "test@example.com")
-		}
+		testutil.AssertStringerEq(t, e, "test@example.com")
 	})
 }

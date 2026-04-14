@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestHostPort(t *testing.T) {
@@ -17,9 +18,7 @@ func TestHostPort(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if hp.String() != "localhost:8080" {
-			t.Errorf("String() = %q, want %q", hp.String(), "localhost:8080")
-		}
+		testutil.AssertStringerEq(t, hp, "localhost:8080")
 
 		if hp.Host() != "localhost" {
 			t.Errorf("Host() = %q, want %q", hp.Host(), "localhost")

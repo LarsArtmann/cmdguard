@@ -11,17 +11,10 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
-func assertPanics(t *testing.T, fn func()) {
-	t.Helper()
-	testutil.AssertPanics(t, fn)
-}
-
 func assertDurationField(t *testing.T, d Duration, expected time.Duration) {
 	t.Helper()
 
-	if d.Duration() != expected {
-		t.Errorf("expected %v, got %v", expected, d.Duration())
-	}
+	testutil.AssertEqual(t, d.Duration(), expected)
 }
 
 func assertErrorContains(t *testing.T, err error, substrings ...string) {
@@ -111,12 +104,22 @@ func noOpHandlerForTestAppConfig() func(context.Context, *testAppConfig, NoFlags
 	}
 }
 
+// makeHookRunE creates a RunE function that records execution order.
+func makeHookRunE(
+	order *[]string,
+	msg string,
+) func(context.Context, *testAppConfig, NoFlags) error {
+	return func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+		*order = append(*order, msg)
+
+		return nil
+	}
+}
+
 func assertEnumString(t *testing.T, got, want, fieldName string) {
 	t.Helper()
 
-	if got != want {
-		t.Errorf("unmarshaled %s = %q, want %q", fieldName, got, want)
-	}
+	testutil.AssertFieldEqString(t, got, want, "unmarshaled "+fieldName)
 }
 
 func setFlag(t *testing.T, cmd *cobra.Command, name, value string) {

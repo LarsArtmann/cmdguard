@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestParseDuration(t *testing.T) {
@@ -102,9 +104,7 @@ func TestDuration_Methods(t *testing.T) {
 	t.Run("String", func(t *testing.T) {
 		t.Parallel()
 
-		if d.String() != "2h30m0s" {
-			t.Errorf("String() = %q, want %q", d.String(), "2h30m0s")
-		}
+		testutil.AssertStringerEq(t, d, "2h30m0s")
 	})
 
 	t.Run("IsZero", func(t *testing.T) {

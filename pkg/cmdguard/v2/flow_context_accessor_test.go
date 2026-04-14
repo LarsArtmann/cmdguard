@@ -3,6 +3,8 @@ package v2
 import (
 	"context"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestFlowContextAccessor(t *testing.T) {
@@ -96,7 +98,7 @@ func TestMustGet(t *testing.T) {
 	t.Run("missing panics", func(t *testing.T) {
 		t.Parallel()
 
-		assertPanics(t, func() {
+		testutil.AssertPanics(t, func() {
 			MustGet[string](wrapped, "nonexistent")
 		})
 	})

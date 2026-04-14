@@ -9,17 +9,6 @@ import (
 
 var errTest = errors.New("test error")
 
-func makeHookRunE(
-	order *[]string,
-	msg string,
-) func(context.Context, *testAppConfig, NoFlags) error {
-	return func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-		*order = append(*order, msg)
-
-		return nil
-	}
-}
-
 func TestCLI_PreRunE_PostRunE(t *testing.T) {
 	t.Parallel()
 

@@ -8,19 +8,8 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
-// hasSubcommand checks if a command with the given name exists in the GuardedCommand's subcommands.
-func hasSubcommand(g *GuardedCommand, name string) bool {
-	for _, cmd := range g.cmd.Commands() {
-		if cmd.Name() == name {
-			return true
-		}
-	}
-
-	return false
-}
-
-// findSubcommand finds and returns a subcommand with the given name, or nil if not found.
-func findSubcommand(g *GuardedCommand, name string) *cobra.Command {
+// findCommand iterates over subcommands and returns the first one matching the predicate.
+func findCommand(g *GuardedCommand, name string) *cobra.Command {
 	for _, cmd := range g.cmd.Commands() {
 		if cmd.Name() == name {
 			return cmd
@@ -28,6 +17,16 @@ func findSubcommand(g *GuardedCommand, name string) *cobra.Command {
 	}
 
 	return nil
+}
+
+// hasSubcommand checks if a command with the given name exists in the GuardedCommand's subcommands.
+func hasSubcommand(g *GuardedCommand, name string) bool {
+	return findCommand(g, name) != nil
+}
+
+// findSubcommand finds and returns a subcommand with the given name, or nil if not found.
+func findSubcommand(g *GuardedCommand, name string) *cobra.Command {
+	return findCommand(g, name)
 }
 
 //nolint:paralleltest // uses t.Setenv

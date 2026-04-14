@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestFilePath(t *testing.T) {
@@ -17,9 +18,7 @@ func TestFilePath(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if fp.String() != "test.txt" {
-			t.Errorf("String() = %q, want %q", fp.String(), "test.txt")
-		}
+		testutil.AssertStringerEq(t, fp, "test.txt")
 
 		if fp.IsEmpty() {
 			t.Error("IsEmpty() = true, want false")
@@ -117,9 +116,7 @@ func TestFilePath(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if fp.String() != "/tmp/test.txt" {
-			t.Errorf("String() = %q, want %q", fp.String(), "/tmp/test.txt")
-		}
+		testutil.AssertStringerEq(t, fp, "/tmp/test.txt")
 	})
 
 	t.Run("FilePath Join", func(t *testing.T) {

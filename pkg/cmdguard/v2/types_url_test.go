@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestURL(t *testing.T) {
@@ -17,9 +18,7 @@ func TestURL(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if u.String() != "https://example.com:8080/path" {
-			t.Errorf("String() = %q, want %q", u.String(), "https://example.com:8080/path")
-		}
+		testutil.AssertStringerEq(t, u, "https://example.com:8080/path")
 
 		if u.Scheme() != "https" {
 			t.Errorf("Scheme() = %q, want %q", u.Scheme(), "https")
@@ -121,8 +120,6 @@ func TestURL(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if u.String() != "https://example.com" {
-			t.Errorf("String() = %q, want %q", u.String(), "https://example.com")
-		}
+		testutil.AssertStringerEq(t, u, "https://example.com")
 	})
 }

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log/slog"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestLogLevel(t *testing.T) {
@@ -11,20 +13,23 @@ func TestLogLevel(t *testing.T) {
 	t.Run("constants", func(t *testing.T) {
 		t.Parallel()
 
-		if LogLevelDebug.String() != "debug" {
-			t.Errorf("LogLevelDebug.String() = %q, want %q", LogLevelDebug.String(), "debug")
-		}
+		testutil.AssertFieldEqString(t, LogLevelDebug.String(), "debug", "LogLevelDebug.String()")
 
 		if LogLevelInfo.String() != "info" {
-			t.Errorf("LogLevelInfo.String() = %q, want %q", LogLevelInfo.String(), "info")
+			testutil.AssertFieldEqString(t, LogLevelInfo.String(), "info", "LogLevelInfo.String()")
 		}
 
 		if LogLevelWarn.String() != "warn" {
-			t.Errorf("LogLevelWarn.String() = %q, want %q", LogLevelWarn.String(), "warn")
+			testutil.AssertFieldEqString(t, LogLevelWarn.String(), "warn", "LogLevelWarn.String()")
 		}
 
 		if LogLevelError.String() != "error" {
-			t.Errorf("LogLevelError.String() = %q, want %q", LogLevelError.String(), "error")
+			testutil.AssertFieldEqString(
+				t,
+				LogLevelError.String(),
+				"error",
+				"LogLevelError.String()",
+			)
 		}
 	})
 
@@ -34,13 +39,9 @@ func TestLogLevel(t *testing.T) {
 		tests := []string{"debug", "info", "warn", "error"}
 		for _, v := range tests {
 			l, err := ParseLogLevel(v)
-			if err != nil {
-				t.Fatalf("unexpected error for %q: %v", v, err)
-			}
+			testutil.AssertNoError(t, err)
 
-			if l.String() != v {
-				t.Errorf("ParseLogLevel(%q).String() = %q, want %q", v, l.String(), v)
-			}
+			testutil.AssertFieldEqString(t, l.String(), v, "ParseLogLevel().String()")
 		}
 	})
 
@@ -48,9 +49,7 @@ func TestLogLevel(t *testing.T) {
 		t.Parallel()
 
 		_, err := ParseLogLevel("invalid")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 	})
 
 	t.Run("SlogLevel conversion", func(t *testing.T) {
@@ -96,11 +95,21 @@ func TestLogFormat(t *testing.T) {
 		t.Parallel()
 
 		if LogFormatText.String() != "text" {
-			t.Errorf("LogFormatText.String() = %q, want %q", LogFormatText.String(), "text")
+			testutil.AssertFieldEqString(
+				t,
+				LogFormatText.String(),
+				"text",
+				"LogFormatText.String()",
+			)
 		}
 
 		if LogFormatJSON.String() != "json" {
-			t.Errorf("LogFormatJSON.String() = %q, want %q", LogFormatJSON.String(), "json")
+			testutil.AssertFieldEqString(
+				t,
+				LogFormatJSON.String(),
+				"json",
+				"LogFormatJSON.String()",
+			)
 		}
 	})
 
@@ -110,13 +119,9 @@ func TestLogFormat(t *testing.T) {
 		tests := []string{"text", "json"}
 		for _, v := range tests {
 			f, err := ParseLogFormat(v)
-			if err != nil {
-				t.Fatalf("unexpected error for %q: %v", v, err)
-			}
+			testutil.AssertNoError(t, err)
 
-			if f.String() != v {
-				t.Errorf("ParseLogFormat(%q).String() = %q, want %q", v, f.String(), v)
-			}
+			testutil.AssertFieldEqString(t, f.String(), v, "ParseLogFormat().String()")
 		}
 	})
 
@@ -124,9 +129,7 @@ func TestLogFormat(t *testing.T) {
 		t.Parallel()
 
 		_, err := ParseLogFormat("xml")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 	})
 }
 
@@ -166,12 +169,10 @@ func TestPtr(t *testing.T) {
 		v := s{Name: "test"}
 
 		p := Ptr(v)
-		if p == nil {
-			t.Fatal("expected non-nil pointer")
-		}
+		testutil.AssertNotNil(t, p)
 
 		if p.Name != "test" {
-			t.Errorf("p.Name = %q, want %q", p.Name, "test")
+			testutil.AssertFieldEqString(t, p.Name, "test", "p.Name")
 		}
 	})
 }
@@ -184,9 +185,7 @@ func TestValueOrDefault(t *testing.T) {
 		var p *int
 
 		result := ValueOrDefault(p, 10)
-		if result != 10 {
-			t.Errorf("ValueOrDefault(nil, 10) = %d, want %d", result, 10)
-		}
+		testutil.AssertFieldEq(t, result, 10, "result")
 	})
 
 	t.Run("non-nil pointer returns value", func(t *testing.T) {
@@ -196,9 +195,7 @@ func TestValueOrDefault(t *testing.T) {
 		p := &v
 
 		result := ValueOrDefault(p, 10)
-		if result != 42 {
-			t.Errorf("ValueOrDefault(&42, 10) = %d, want %d", result, 42)
-		}
+		testutil.AssertFieldEq(t, result, 42, "result")
 	})
 
 	t.Run("empty string default", func(t *testing.T) {
@@ -207,9 +204,7 @@ func TestValueOrDefault(t *testing.T) {
 		var p *string
 
 		result := ValueOrDefault(p, "default")
-		if result != "default" {
-			t.Errorf("ValueOrDefault(nil, \"default\") = %q, want %q", result, "default")
-		}
+		testutil.AssertFieldEqString(t, result, "default", "result")
 	})
 }
 
@@ -221,9 +216,7 @@ func TestEnsureValid(t *testing.T) {
 		var p *int
 
 		err := EnsureValid(p, "myField")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
 		assertErrorContains(t, err, "myField", "must not be nil")
 	})
@@ -235,9 +228,7 @@ func TestEnsureValid(t *testing.T) {
 		p := &v
 
 		err := EnsureValid(p, "myField")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 	})
 }
 
@@ -256,13 +247,9 @@ func TestLogLevel_MarshalUnmarshal(t *testing.T) {
 		c := config{Value: validLevel}
 
 		data, err := json.Marshal(c)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if string(data) != `{"value":"info"}` {
-			t.Errorf("json.Marshal() = %q, want %q", string(data), `{"value":"info"}`)
-		}
+		testutil.AssertJSONMarshal(t, data, `{"value":"info"}`)
 	})
 
 	// unmarshal valid
@@ -293,13 +280,9 @@ func TestLogFormat_MarshalUnmarshal(t *testing.T) {
 		c := config{Value: validFormat}
 
 		data, err := json.Marshal(c)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if string(data) != `{"value":"json"}` {
-			t.Errorf("json.Marshal() = %q, want %q", string(data), `{"value":"json"}`)
-		}
+		testutil.AssertJSONMarshal(t, data, `{"value":"json"}`)
 	})
 
 	// unmarshal valid

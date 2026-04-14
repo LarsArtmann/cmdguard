@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/samber/do/v2"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 // provideTestNamed is a helper that reduces boilerplate in tests by wrapping
@@ -142,7 +144,7 @@ func TestMustInvoke(t *testing.T) {
 	t.Run("panics for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		assertPanics(t, func() {
+		testutil.AssertPanics(t, func() {
 			MustInvoke[string](nil)
 		})
 	})
@@ -152,7 +154,7 @@ func TestMustInvoke(t *testing.T) {
 
 		scope := NewScope("test")
 
-		assertPanics(t, func() {
+		testutil.AssertPanics(t, func() {
 			MustInvoke[string](scope)
 		})
 	})
@@ -179,7 +181,7 @@ func TestMustInvokeNamed(t *testing.T) {
 	t.Run("panics for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		assertPanics(t, func() {
+		testutil.AssertPanics(t, func() {
 			MustInvokeNamed[string](nil, "name")
 		})
 	})
@@ -189,7 +191,7 @@ func TestMustInvokeNamed(t *testing.T) {
 
 		scope := NewScope("test")
 
-		assertPanics(t, func() {
+		testutil.AssertPanics(t, func() {
 			MustInvokeNamed[string](scope, "nonexistent")
 		})
 	})

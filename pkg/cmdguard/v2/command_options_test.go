@@ -2,8 +2,9 @@ package v2
 
 import (
 	"context"
-	"errors"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestCommandOptions(t *testing.T) {
@@ -26,7 +27,7 @@ func TestCommandOptions(t *testing.T) {
 		WithLong[testConfig, NoFlags]("long description")(&cmd)
 
 		if cmd.Long != "long description" {
-			t.Errorf("Long = %q, want %q", cmd.Long, "long description")
+			testutil.AssertFieldEqString(t, cmd.Long, "long description", "Long")
 		}
 	})
 
@@ -48,7 +49,7 @@ func TestCommandOptions(t *testing.T) {
 		WithExample[testConfig, NoFlags]("example usage")(&cmd)
 
 		if cmd.Example != "example usage" {
-			t.Errorf("Example = %q, want %q", cmd.Example, "example usage")
+			testutil.AssertFieldEqString(t, cmd.Example, "example usage", "Example")
 		}
 	})
 
@@ -64,7 +65,7 @@ func TestCommandOptions(t *testing.T) {
 		WithFlags[testConfig, *flags](flagsInst)(&cmd)
 
 		if cmd.Flags != flagsInst {
-			t.Errorf("Flags = %p, want %p", cmd.Flags, flagsInst)
+			testutil.AssertPointerEq(t, cmd.Flags, flagsInst)
 		}
 	})
 
@@ -109,12 +110,10 @@ func TestCommandOptions(t *testing.T) {
 		cmd := Command[testConfig, NoFlags]{Use: "test"}
 		WithSubcommands(subCmd)(&cmd)
 
-		if len(cmd.Commands) != 1 {
-			t.Errorf("len(Commands) = %d, want 1", len(cmd.Commands))
-		}
+		testutil.AssertFieldLen(t, cmd.Commands, 1, "Commands")
 
 		if cmd.Commands[0].Use != "sub" {
-			t.Errorf("Commands[0].Use = %q, want %q", cmd.Commands[0].Use, "sub")
+			testutil.AssertFieldEqString(t, cmd.Commands[0].Use, "sub", "Commands[0].Use")
 		}
 	})
 
@@ -142,7 +141,7 @@ func TestCommandOptions(t *testing.T) {
 		WithDeprecated[testConfig, NoFlags]("use new-cmd instead")(&cmd)
 
 		if cmd.Deprecated != "use new-cmd instead" {
-			t.Errorf("Deprecated = %q, want %q", cmd.Deprecated, "use new-cmd instead")
+			testutil.AssertFieldEqString(t, cmd.Deprecated, "use new-cmd instead", "Deprecated")
 		}
 	})
 }
@@ -166,11 +165,11 @@ func TestNewCommand(t *testing.T) {
 		}
 
 		if cmd.Use != "test" {
-			t.Errorf("Use = %q, want %q", cmd.Use, "test")
+			testutil.AssertFieldEqString(t, cmd.Use, "test", "Use")
 		}
 
 		if cmd.Short != "short description" {
-			t.Errorf("Short = %q, want %q", cmd.Short, "short description")
+			testutil.AssertFieldEqString(t, cmd.Short, "short description", "Short")
 		}
 
 		if cmd.RunE == nil {
@@ -185,13 +184,9 @@ func TestNewCommand(t *testing.T) {
 			"",
 			WithRunE(noOpHandler()),
 		)
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
-		if !errors.Is(err, ErrMissingName) {
-			t.Errorf("expected ErrMissingName, got %v", err)
-		}
+		testutil.AssertErrorIs(t, err, ErrMissingName)
 
 		if cmd.Use != "" {
 			t.Errorf("expected empty command on error, got Use=%q", cmd.Use)
@@ -202,13 +197,9 @@ func TestNewCommand(t *testing.T) {
 		t.Parallel()
 
 		_, err := NewCommand[testConfig, NoFlags]("test")
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
-		if !errors.Is(err, ErrMissingHandler) {
-			t.Errorf("expected ErrMissingHandler, got %v", err)
-		}
+		testutil.AssertErrorIs(t, err, ErrMissingHandler)
 	})
 }
 
@@ -241,23 +232,21 @@ func TestCommand_CompleteStructure(t *testing.T) {
 		}
 
 		if cmd.Use != "root" {
-			t.Errorf("Use = %q, want %q", cmd.Use, "root")
+			testutil.AssertFieldEqString(t, cmd.Use, "root", "Use")
 		}
 
 		if cmd.Short != "root command" {
-			t.Errorf("Short = %q, want %q", cmd.Short, "root command")
+			testutil.AssertFieldEqString(t, cmd.Short, "root command", "Short")
 		}
 
 		if cmd.Long != "root command long description" {
-			t.Errorf("Long = %q, want %q", cmd.Long, "root command long description")
+			testutil.AssertFieldEqString(t, cmd.Long, "root command long description", "Long")
 		}
 
-		if len(cmd.Aliases) != 2 {
-			t.Errorf("len(Aliases) = %d, want 2", len(cmd.Aliases))
-		}
+		testutil.AssertFieldLen(t, cmd.Aliases, 2, "Aliases")
 
 		if cmd.Example != "root sub" {
-			t.Errorf("Example = %q, want %q", cmd.Example, "root sub")
+			testutil.AssertFieldEqString(t, cmd.Example, "root sub", "Example")
 		}
 
 		if cmd.RunE == nil {
@@ -272,9 +261,7 @@ func TestCommand_CompleteStructure(t *testing.T) {
 			t.Error("PostRunE = nil, want non-nil")
 		}
 
-		if len(cmd.Commands) != 1 {
-			t.Errorf("len(Commands) = %d, want 1", len(cmd.Commands))
-		}
+		testutil.AssertFieldLen(t, cmd.Commands, 1, "Commands")
 
 		if cmd.Hidden {
 			t.Error("Hidden = true, want false")

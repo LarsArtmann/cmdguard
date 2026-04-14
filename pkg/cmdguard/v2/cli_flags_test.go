@@ -3,6 +3,8 @@ package v2
 import (
 	"errors"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestCloneFlags(t *testing.T) {
@@ -19,13 +21,8 @@ func TestCloneFlags(t *testing.T) {
 		original := testFlags{Name: "test", Count: 42}
 		cloned := cloneFlags(original)
 
-		if cloned.Name != original.Name {
-			t.Errorf("Name = %q, want %q", cloned.Name, original.Name)
-		}
-
-		if cloned.Count != original.Count {
-			t.Errorf("Count = %d, want %d", cloned.Count, original.Count)
-		}
+		testutil.AssertFieldEqString(t, cloned.Name, original.Name, "Name")
+		testutil.AssertFieldEq(t, cloned.Count, original.Count, "Count")
 
 		cloned.Name = "modified"
 		if original.Name != "test" {
@@ -47,13 +44,8 @@ func TestCloneFlags(t *testing.T) {
 			t.Fatal("expected non-nil cloned value")
 		}
 
-		if cloned.Name != original.Name {
-			t.Errorf("Name = %q, want %q", cloned.Name, original.Name)
-		}
-
-		if cloned.Count != original.Count {
-			t.Errorf("Count = %d, want %d", cloned.Count, original.Count)
-		}
+		testutil.AssertFieldEqString(t, cloned.Name, original.Name, "Name")
+		testutil.AssertFieldEq(t, cloned.Count, original.Count, "Count")
 
 		if cloned == original {
 			t.Error("cloned should be a different pointer from original")

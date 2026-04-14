@@ -84,21 +84,13 @@ func printRunE(messages ...string) func(context.Context, *AppConfig, v2.NoFlags)
 	}
 }
 
-// fatal prints the error to stderr and exits with code 1.
-func fatal(format string, args ...any) {
-	examplesinternal.Fatalf(format, args...)
-}
-
 func main() {
 	fmt.Println("=== Typed CLI Example (v2 API) ===")
 	fmt.Println()
 
-	// Create the CLI with typed config using the new CLI[T] API (v2.1+)
-	// CLI[T] uses a single type parameter for the config type.
-	// Each command can have its own flags type.
 	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
 	if err != nil {
-		fatal("Failed to create CLI: %v\n", err)
+		examplesinternal.Fatalf("Failed to create CLI: %v\n", err)
 	}
 
 	// Set version
@@ -112,18 +104,18 @@ func main() {
 
 	// Add commands
 	if err := addCommands(cli); err != nil {
-		fatal("Failed to add commands: %v\n", err)
+		examplesinternal.Fatalf("Failed to add commands: %v\n", err)
 	}
 
 	// Run health checks
 	if err := cli.HealthCheck(); err != nil {
-		fatal("Health check failed: %v\n", err)
+		examplesinternal.Fatalf("Health check failed: %v\n", err)
 	}
 
 	// Execute the CLI
 	ctx := context.Background()
 	if err := cli.Execute(ctx); err != nil {
-		fatal("Error: %v\n", err)
+		examplesinternal.Fatalf("Error: %v\n", err)
 	}
 
 	// Graceful shutdown
@@ -131,7 +123,7 @@ func main() {
 	defer cancel()
 
 	if err := cli.Shutdown(shutdownCtx); err != nil {
-		fatal("Shutdown error: %v\n", err)
+		examplesinternal.Fatalf("Shutdown error: %v\n", err)
 	}
 }
 
@@ -139,7 +131,7 @@ func registerServices(scope *v2.Scope) {
 	// Register config first so providers can depend on it
 	err := v2.ProvideValue(scope, AppConfig{Verbose: true})
 	if err != nil {
-		fatal("Failed to register config: %v\n", err)
+		examplesinternal.Fatalf("Failed to register config: %v\n", err)
 	}
 
 	// Register a logger service - gets config via DI, not closure capture
@@ -152,13 +144,13 @@ func registerServices(scope *v2.Scope) {
 		return &Logger{verbose: cfg.Verbose}, nil
 	})
 	if err != nil {
-		fatal("Failed to register logger: %v\n", err)
+		examplesinternal.Fatalf("Failed to register logger: %v\n", err)
 	}
 
 	// Register a database service (simulated)
 	err = v2.ProvideValue(scope, &Database{connectionString: "postgres://localhost:5432/mydb"})
 	if err != nil {
-		fatal("Failed to register database: %v\n", err)
+		examplesinternal.Fatalf("Failed to register database: %v\n", err)
 	}
 }
 

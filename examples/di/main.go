@@ -103,31 +103,21 @@ func (a *APIService) Call(ctx context.Context) error {
 	return nil
 }
 
-// execute runs the CLI and exits on error.
-func execute(ctx context.Context, cli *v2.CLI[Config]) {
-	examplesinternal.Execute(ctx, cli)
-}
-
-// fatal prints the error to stderr and exits with code 1.
-func fatal(format string, args ...any) {
-	examplesinternal.Fatalf(format, args...)
-}
-
 func main() {
 	ctx := context.Background()
 
 	root, err := v2.NewCLI[Config]("di-app", "DI Example App", Config{})
 	if err != nil {
-		fatal("Error: %v\n", err)
+		examplesinternal.Fatalf("Error: %v\n", err)
 	}
 
 	// Register services in DI scope
 	if err := v2.Provide(root.Scope(), NewDatabaseService); err != nil {
-		fatal("Error registering database: %v\n", err)
+		examplesinternal.Fatalf("Error registering database: %v\n", err)
 	}
 
 	if err := v2.Provide(root.Scope(), NewAPIService); err != nil {
-		fatal("Error registering API: %v\n", err)
+		examplesinternal.Fatalf("Error registering API: %v\n", err)
 	}
 
 	// Add health check command
@@ -149,7 +139,7 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fatal("Error adding check command: %v\n", err)
+		examplesinternal.Fatalf("Error adding check command: %v\n", err)
 	}
 
 	// Add API call command
@@ -165,7 +155,7 @@ func main() {
 			return api.Call(ctx)
 		},
 	}); err != nil {
-		fatal("Error adding call command: %v\n", err)
+		examplesinternal.Fatalf("Error adding call command: %v\n", err)
 	}
 
 	// Add shutdown command
@@ -190,22 +180,22 @@ func main() {
 			return nil
 		},
 	}); err != nil {
-		fatal("Error adding shutdown command: %v\n", err)
+		examplesinternal.Fatalf("Error adding shutdown command: %v\n", err)
 	}
 
 	// Run health check before starting
 	if err := root.Scope().HealthCheckWithContext(ctx); err != nil {
-		fatal("Initial health check failed: %v\n", err)
+		examplesinternal.Fatalf("Initial health check failed: %v\n", err)
 	}
 
 	// Execute
-	execute(ctx, root)
+	examplesinternal.Execute(ctx, root)
 
 	// Graceful shutdown on exit
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := root.Shutdown(shutdownCtx); err != nil {
-		fatal("Shutdown error: %v\n", err)
+		examplesinternal.Fatalf("Shutdown error: %v\n", err)
 	}
 }

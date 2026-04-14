@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestPort(t *testing.T) {
@@ -21,9 +22,7 @@ func TestPort(t *testing.T) {
 			t.Errorf("Int() = %d, want %d", p.Int(), 8080)
 		}
 
-		if p.String() != "8080" {
-			t.Errorf("String() = %q, want %q", p.String(), "8080")
-		}
+		testutil.AssertStringerEq(t, p, "8080")
 	})
 
 	t.Run("ParsePort named", func(t *testing.T) {

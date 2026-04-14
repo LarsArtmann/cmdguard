@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/samber/do/v2"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestProvide(t *testing.T) {
@@ -16,18 +18,12 @@ func TestProvide(t *testing.T) {
 		err := Provide(scope, func(_ do.Injector) (string, error) {
 			return "test-value", nil
 		})
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		value, err := Invoke[string](scope)
-		if err != nil {
-			t.Fatalf("expected no error invoking, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if value != "test-value" {
-			t.Errorf("expected value 'test-value', got %q", value)
-		}
+		testutil.AssertFieldEqString(t, value, "test-value", "value")
 	})
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
@@ -36,9 +32,7 @@ func TestProvide(t *testing.T) {
 		err := Provide(nil, func(_ do.Injector) (string, error) {
 			return "value", nil
 		})
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
+		testutil.AssertExpectedError(t, err)
 
 		assertErrorContains(t, err, "scope is nil")
 	})
@@ -55,7 +49,6 @@ func TestProvide(t *testing.T) {
 			t.Fatalf("expected no error providing value, got: %v", err)
 		}
 
-		// Register a service that uses the dependency
 		type Service string
 
 		err := Provide(scope, func(i do.Injector) (Service, error) {
@@ -66,18 +59,12 @@ func TestProvide(t *testing.T) {
 
 			return Service(dep + "-enhanced"), nil
 		})
-		if err != nil {
-			t.Fatalf("expected no error providing, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		value, err := Invoke[Service](scope)
-		if err != nil {
-			t.Fatalf("expected no error invoking, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if value != Service("dependency-enhanced") {
-			t.Errorf("expected value 'dependency-enhanced', got %q", value)
-		}
+		testutil.AssertFieldEqString(t, string(value), "dependency-enhanced", "value")
 	})
 }
 
@@ -89,18 +76,12 @@ func TestProvideValue(t *testing.T) {
 		scope := NewScope("test")
 
 		err := ProvideValue(scope, 42)
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
 		value, err := Invoke[int](scope)
-		if err != nil {
-			t.Fatalf("expected no error invoking, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if value != 42 {
-			t.Errorf("expected value 42, got %d", value)
-		}
+		testutil.AssertFieldEq(t, value, 42, "value")
 	})
 
 	t.Run("returns error for nil scope", func(t *testing.T) {
@@ -130,17 +111,10 @@ func TestProvideValue(t *testing.T) {
 		}
 
 		value, err := Invoke[Config](scope)
-		if err != nil {
-			t.Fatalf("expected no error invoking, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if value.Name != "app" {
-			t.Errorf("expected name 'app', got %q", value.Name)
-		}
-
-		if value.Port != 8080 {
-			t.Errorf("expected port 8080, got %d", value.Port)
-		}
+		testutil.AssertFieldEqString(t, value.Name, "app", "Name")
+		testutil.AssertFieldEq(t, value.Port, 8080, "Port")
 	})
 }
 
@@ -155,13 +129,9 @@ func TestInvoke(t *testing.T) {
 		}
 
 		value, err := Invoke[string](scope)
-		if err != nil {
-			t.Fatalf("expected no error invoking, got: %v", err)
-		}
+		testutil.AssertNoError(t, err)
 
-		if value != "hello" {
-			t.Errorf("expected value 'hello', got %q", value)
-		}
+		testutil.AssertFieldEqString(t, value, "hello", "value")
 	})
 
 	t.Run("returns error for nil scope", func(t *testing.T) {

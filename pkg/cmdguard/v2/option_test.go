@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestSome(t *testing.T) {
@@ -68,7 +70,7 @@ func TestOption_Unwrap(t *testing.T) {
 	}
 
 	// Test panic on None
-	assertPanics(t, func() {
+	testutil.AssertPanics(t, func() {
 		None[int]().Unwrap()
 	})
 }
@@ -135,7 +137,7 @@ func TestOption_Expect(t *testing.T) {
 		t.Error("Expect should return value")
 	}
 
-	assertPanics(t, func() {
+	testutil.AssertPanics(t, func() {
 		None[int]().Expect("custom error message")
 	})
 }

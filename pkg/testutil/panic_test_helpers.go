@@ -123,7 +123,9 @@ func NoOpCobraRunE() func(*cobra.Command, []string) error {
 }
 
 // doPanicTest runs fn and returns true if it panicked.
-func doPanicTest(fn func()) (didPanic bool) {
+func doPanicTest(fn func()) bool {
+	didPanic := false
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -151,4 +153,185 @@ func ExpectPanics(t *testing.T, fn func()) bool {
 	t.Helper()
 
 	return doPanicTest(fn)
+}
+
+// AssertDoesNotPanic runs fn and fails the test if it panics.
+func AssertDoesNotPanic(t *testing.T, fn func()) {
+	t.Helper()
+
+	if doPanicTest(fn) {
+		t.Error("expected no panic, but it panicked")
+	}
+}
+
+// assertFieldEq is the internal generic assertion for field equality.
+func assertFieldEq[T comparable](t *testing.T, field, expected T, msg string) {
+	t.Helper()
+
+	if field != expected {
+		t.Errorf(msg, expected, field)
+	}
+}
+
+// AssertFieldEq fails the test if field != expected.
+func AssertFieldEq[T comparable](t *testing.T, field, expected T, fieldName string) {
+	assertFieldEq(t, field, expected, "expected "+fieldName+" %v, got %v")
+}
+
+// AssertFieldEqString fails the test if string field != expected (uses %q for formatting).
+func AssertFieldEqString(t *testing.T, field, expected, fieldName string) {
+	assertFieldEq(t, field, expected, "expected "+fieldName+" %q, got %q")
+}
+
+// AssertBoolField fails the test if bool field != expected.
+func AssertBoolField(t *testing.T, field, expected bool, fieldName string) {
+	t.Helper()
+
+	if field != expected {
+		t.Errorf("expected %s to be %v, got %v", fieldName, expected, field)
+	}
+}
+
+// AssertBoolTrue fails the test if field is not true.
+func AssertBoolTrue(t *testing.T, field bool, fieldName string) {
+	t.Helper()
+
+	if !field {
+		t.Error("expected " + fieldName + " to be true")
+	}
+}
+
+// AssertBoolFalse fails the test if field is not false.
+func AssertBoolFalse(t *testing.T, field bool, fieldName string) {
+	t.Helper()
+
+	if field {
+		t.Error("expected " + fieldName + " to be false")
+	}
+}
+
+// assertFlagRegistered is the internal helper for flag registration checks.
+func assertFlagRegistered(t *testing.T, cmd *cobra.Command, flagName string, shouldExist bool) {
+	t.Helper()
+
+	exists := cmd.Flags().Lookup(flagName) != nil
+	if exists != shouldExist {
+		if shouldExist {
+			t.Errorf("expected %q flag to be registered", flagName)
+		} else {
+			t.Errorf("expected %q flag to not be registered", flagName)
+		}
+	}
+}
+
+// AssertFlagRegistered fails the test if the flag is not registered.
+func AssertFlagRegistered(t *testing.T, cmd *cobra.Command, flagName string) {
+	assertFlagRegistered(t, cmd, flagName, true)
+}
+
+// AssertFlagNotRegistered fails the test if the flag is registered.
+func AssertFlagNotRegistered(t *testing.T, cmd *cobra.Command, flagName string) {
+	assertFlagRegistered(t, cmd, flagName, false)
+}
+
+// AssertStringFieldContains fails the test if string field does not contain substring.
+func AssertStringFieldContains(t *testing.T, field, substr, fieldName string) {
+	t.Helper()
+
+	if !strings.Contains(field, substr) {
+		t.Errorf("%s should contain %q, got %q", fieldName, substr, field)
+	}
+}
+
+// assertFieldLen is the internal helper for length assertions.
+func assertFieldLen[T any](t *testing.T, slice []T, expected int, msg string) {
+	t.Helper()
+
+	if len(slice) != expected {
+		t.Errorf(msg, len(slice), expected)
+	}
+}
+
+// AssertFieldLen fails the test if slice length != expected.
+func AssertFieldLen[T any](t *testing.T, slice []T, expected int, fieldName string) {
+	assertFieldLen(t, slice, expected, "len("+fieldName+") = %d, want %d")
+}
+
+// AssertLen is an alias for AssertFieldLen using the field name as description.
+func AssertLen[T any](t *testing.T, slice []T, expected int) {
+	assertFieldLen(t, slice, expected, "len() = %d, want %d")
+}
+
+// AssertNoError fails the test if err != nil.
+func AssertNoError(t *testing.T, err error) {
+	t.Helper()
+
+	if err != nil {
+		t.Errorf("expected no error, got: %v", err)
+	}
+}
+
+// AssertExpectedError fails the test if err == nil.
+func AssertExpectedError(t *testing.T, err error) {
+	t.Helper()
+
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+// assertContainsString is the internal helper for slice containment checks.
+func assertContainsString(t *testing.T, slice []string, s string, shouldContain bool) {
+	t.Helper()
+
+	contains := slices.Contains(slice, s)
+	if contains != shouldContain {
+		if shouldContain {
+			t.Errorf("should contain %q, got %v", s, slice)
+		} else {
+			t.Errorf("should not contain %q, got %v", s, slice)
+		}
+	}
+}
+
+// AssertContainsString fails the test if slice does not contain s.
+func AssertContainsString(t *testing.T, slice []string, s string) {
+	assertContainsString(t, slice, s, true)
+}
+
+// AssertNotContainsString fails the test if slice contains s.
+func AssertNotContainsString(t *testing.T, slice []string, s string) {
+	assertContainsString(t, slice, s, false)
+}
+
+// AssertPointerEq fails the test if pointer addresses are not equal.
+func AssertPointerEq[T any](t *testing.T, got, want *T) {
+	t.Helper()
+
+	if got != want {
+		t.Errorf("got %p, want %p", got, want)
+	}
+}
+
+// AssertJSONMarshal fails the test if json marshal result != expected.
+func AssertJSONMarshal(t *testing.T, got []byte, expected string) {
+	t.Helper()
+
+	if string(got) != expected {
+		t.Errorf("json.Marshal() = %q, want %q", string(got), expected)
+	}
+}
+
+// AssertFieldEqQuote fails the test if got != want for string field (uses %q formatting).
+func AssertFieldEqQuote(t *testing.T, got, want, fieldName string) {
+	assertFieldEq(t, got, want, fieldName+" = %q, want %q")
+}
+
+// AssertStringerEq fails the test if got.String() != want.
+func AssertStringerEq[T fmt.Stringer](t *testing.T, got T, want string) {
+	t.Helper()
+
+	if got.String() != want {
+		t.Errorf("String() = %q, want %q", got.String(), want)
+	}
 }

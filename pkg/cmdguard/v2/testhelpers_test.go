@@ -31,6 +31,22 @@ func noOpRunE[C any](_ context.Context, _ *C, _ v2.NoFlags) error {
 	return nil
 }
 
+// NoOpRunEWithFlags returns a no-op RunE function for commands with flags.
+func NoOpRunEWithFlags[C, F any]() func(context.Context, *C, F) error {
+	return func(_ context.Context, _ *C, _ F) error {
+		return nil
+	}
+}
+
+// RecordingHook returns a RunE function that records execution order.
+func RecordingHook[C, F any](order *[]string, msg string) func(context.Context, *C, F) error {
+	return func(_ context.Context, _ *C, _ F) error {
+		*order = append(*order, msg)
+
+		return nil
+	}
+}
+
 func testParseError[T any](t *testing.T, parseFn func() (T, error), typeName string) {
 	t.Helper()
 

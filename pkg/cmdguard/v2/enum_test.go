@@ -5,6 +5,8 @@ import (
 	"errors"
 	"slices"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
 func TestParseEnum(t *testing.T) {
@@ -64,9 +66,7 @@ func TestParseEnum(t *testing.T) {
 					t.Fatalf("unexpected error: %v", err)
 				}
 
-				if e.String() != tt.wantValue {
-					t.Errorf("String() = %q, want %q", e.String(), tt.wantValue)
-				}
+				testutil.AssertStringerEq(t, e, tt.wantValue)
 
 				if !slices.Equal(e.Allowed(), tt.allowed) {
 					t.Errorf("Allowed() = %v, want %v", e.Allowed(), tt.allowed)
@@ -101,9 +101,7 @@ func TestEnum_Methods(t *testing.T) {
 	t.Run("String", func(t *testing.T) {
 		t.Parallel()
 
-		if e.String() != "test" {
-			t.Errorf("String() = %q, want %q", e.String(), "test")
-		}
+		testutil.AssertStringerEq(t, e, "test")
 	})
 
 	t.Run("Value", func(t *testing.T) {
