@@ -84,6 +84,12 @@ func (c Command[T, F]) Validate() error {
 		return fmt.Errorf("%w: %q has no RunE and no subcommands", ErrMissingHandler, c.Use)
 	}
 
+	// Parent commands (those with subcommands) should have a Long description
+	// for better help text in detailed help output
+	if len(c.Commands) > 0 && c.Long == "" {
+		return fmt.Errorf("%w: %q has subcommands but no Long description", ErrMissingLong, c.Use)
+	}
+
 	// Check for duplicate subcommand names within this command
 	seen := make(map[string]bool)
 	for _, sub := range c.Commands {

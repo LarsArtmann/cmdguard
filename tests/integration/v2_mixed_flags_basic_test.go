@@ -184,6 +184,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	dbCmd := v2.Command[RootConfig, *DBFlags]{
 		Use:   "db",
 		Short: "Database commands",
+		Long:  "Database management and maintenance commands",
 		Flags: &DBFlags{Host: "localhost", Port: 5432, Database: ""},
 		Commands: []v2.Command[RootConfig, *DBFlags]{
 			{

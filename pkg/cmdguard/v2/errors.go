@@ -18,6 +18,9 @@ var (
 	// ErrMissingName indicates a command has no name (Use field is empty).
 	ErrMissingName = errors.New("command has no name")
 
+	// ErrMissingLong indicates a parent command has no long description.
+	ErrMissingLong = errors.New("command has no long description")
+
 	// ErrFlagParseFailed indicates flag parsing failed.
 	ErrFlagParseFailed = errors.New("failed to parse flags")
 

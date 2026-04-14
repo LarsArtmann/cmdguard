@@ -41,7 +41,8 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "root",
+			Use:  "root",
+			Long: "Root command with subcommands",
 			Commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("sub"),
 			},
@@ -95,7 +96,8 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "root",
+			Use:  "root",
+			Long: "Root command",
 			Commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("valid-sub"),
 				{Use: "invalid-sub"},
@@ -114,7 +116,8 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "root",
+			Use:  "root",
+			Long: "Root command",
 			Commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("duplicate"),
 				newTestSubcommand("duplicate"),
@@ -131,6 +134,28 @@ func TestCommand_Validate(t *testing.T) {
 		}
 
 		assertErrorContains(t, err, "duplicate")
+	})
+
+	t.Run("error: parent command without Long", func(t *testing.T) {
+		t.Parallel()
+
+		cmd := Command[testConfig, NoFlags]{
+			Use: "parent",
+			Commands: []Command[testConfig, NoFlags]{
+				newTestSubcommand("child"),
+			},
+		}
+
+		err := cmd.Validate()
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		if !errors.Is(err, ErrMissingLong) {
+			t.Errorf("expected ErrMissingLong, got %v", err)
+		}
+
+		assertErrorContains(t, err, "no Long description")
 	})
 
 	t.Run("valid with flags", func(t *testing.T) {
@@ -163,7 +188,8 @@ func TestCommand_HasSubcommands(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "root",
+			Use:  "root",
+			Long: "Root command",
 			Commands: []Command[testConfig, NoFlags]{
 				{Use: "sub1"},
 				{Use: "sub2"},

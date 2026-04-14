@@ -182,6 +182,7 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	migrateCmd := v2.Command[RootConfig, *MigrateFlags]{
 		Use:      "migrate",
 		Short:    "Migration commands",
+		Long:     "Database migration management commands",
 		Flags:    &MigrateFlags{Steps: 0, Direction: "up"},
 		Commands: []v2.Command[RootConfig, *MigrateFlags]{migrateUpCmd},
 	}
