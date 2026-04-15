@@ -17,42 +17,42 @@ The project is in a healthy state with the latest feature (enforcing Long descri
 
 ### ✅ Fully Done
 
-| Item | Status | Details |
-|------|--------|---------|
+| Item                                             | Status       | Details                                                                 |
+| ------------------------------------------------ | ------------ | ----------------------------------------------------------------------- |
 | Long description enforcement for parent commands | **COMPLETE** | `ErrMissingLong` added, validation in `Command.Validate()`, tests added |
-| Sentinel error `ErrMissingLong` | **COMPLETE** | Added to `errors.go:21` |
-| Validation logic | **COMPLETE** | In `command.go:87-90` - checks if `len(c.Commands) > 0 && c.Long == ""` |
-| Unit tests | **COMPLETE** | `TestCommand_Validate/error:_parent_command_without_Long` passes |
-| Integration test fixes | **COMPLETE** | Updated 2 integration tests with Long descriptions |
-| Helper function update | **COMPLETE** | `newTestParentCommand` now requires `long` parameter |
-| All tests passing | **COMPLETE** | `go test ./... -count=1 -timeout 120s` - 100% pass |
-| Git commit | **COMPLETE** | bb3e15e pushed to origin/master |
-| Git push | **COMPLETE** | Successfully pushed to GitHub |
+| Sentinel error `ErrMissingLong`                  | **COMPLETE** | Added to `errors.go:21`                                                 |
+| Validation logic                                 | **COMPLETE** | In `command.go:87-90` - checks if `len(c.Commands) > 0 && c.Long == ""` |
+| Unit tests                                       | **COMPLETE** | `TestCommand_Validate/error:_parent_command_without_Long` passes        |
+| Integration test fixes                           | **COMPLETE** | Updated 2 integration tests with Long descriptions                      |
+| Helper function update                           | **COMPLETE** | `newTestParentCommand` now requires `long` parameter                    |
+| All tests passing                                | **COMPLETE** | `go test ./... -count=1 -timeout 120s` - 100% pass                      |
+| Git commit                                       | **COMPLETE** | bb3e15e pushed to origin/master                                         |
+| Git push                                         | **COMPLETE** | Successfully pushed to GitHub                                           |
 
 ### ⚠️ Partially Done
 
-| Item | Status | Details |
-|------|--------|---------|
-| Pre-commit hooks | **PARTIAL** | Hooks have pre-existing failures (binary files, TODOs, linter config) - requires `--no-verify` |
-| Lint compliance | **PARTIAL** | 106+ lint issues, but all are pre-existing |
-| golangci-lint run | **PARTIAL** | Multiple pre-existing issues in examples/, internal/, tests/ |
+| Item              | Status      | Details                                                                                        |
+| ----------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| Pre-commit hooks  | **PARTIAL** | Hooks have pre-existing failures (binary files, TODOs, linter config) - requires `--no-verify` |
+| Lint compliance   | **PARTIAL** | 106+ lint issues, but all are pre-existing                                                     |
+| golangci-lint run | **PARTIAL** | Multiple pre-existing issues in examples/, internal/, tests/                                   |
 
 ### ❌ Not Started
 
-| Item | Status | Details |
-|------|--------|---------|
-| StrictMode in v2 | **NOT STARTED** | v1 has it, v2 doesn't - could be future enhancement |
-| RequireLong command option | **NOT STARTED** | Graduated enforcement (warn vs error) |
-| Description type validation | **NOT STARTED** | Type model improvement |
-| Binary file cleanup | **NOT STARTED** | 3 binary files in repo (`basic`, `di`, `validation`) |
-| TODO comment resolution | **NOT STARTED** | 4 TODO comments in codebase |
+| Item                        | Status          | Details                                              |
+| --------------------------- | --------------- | ---------------------------------------------------- |
+| StrictMode in v2            | **NOT STARTED** | v1 has it, v2 doesn't - could be future enhancement  |
+| RequireLong command option  | **NOT STARTED** | Graduated enforcement (warn vs error)                |
+| Description type validation | **NOT STARTED** | Type model improvement                               |
+| Binary file cleanup         | **NOT STARTED** | 3 binary files in repo (`basic`, `di`, `validation`) |
+| TODO comment resolution     | **NOT STARTED** | 4 TODO comments in codebase                          |
 
 ### 🔴 Totally Fucked Up
 
-| Item | Status | Details |
-|------|--------|---------|
-| Pre-commit hook | **PRE-EXISTING** | Cannot commit normally due to binary-check, todo-check, d2-fmt, ast-state-analyzer, go-structure-linter, golangci-lint failures |
-| Binary files in git | **PRE-EXISTING** | `examples/basic/basic`, `examples/di/di`, `examples/validation/validation` should not be committed |
+| Item                | Status           | Details                                                                                                                         |
+| ------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Pre-commit hook     | **PRE-EXISTING** | Cannot commit normally due to binary-check, todo-check, d2-fmt, ast-state-analyzer, go-structure-linter, golangci-lint failures |
+| Binary files in git | **PRE-EXISTING** | `examples/basic/basic`, `examples/di/di`, `examples/validation/validation` should not be committed                              |
 
 ---
 
@@ -116,12 +116,14 @@ The project is in a healthy state with the latest feature (enforcing Long descri
 **Why does the pre-commit hook have so many failing steps that are marked as "not supporting auto-fix" but the hook blocks commits anyway?**
 
 The BuildFlow pre-commit hook has steps like:
+
 - `binary-check` - fails but "cannot automatically fix"
 - `todo-check` - fails but "cannot automatically fix"
 - `d2-fmt` - command fails with "bad usage"
 - `ast-state-analyzer` - "unknown command '.' for 'ast-analyzer'"
 
 These failures prevent commits, but there's no clear path to fix them. **Should we:**
+
 1. Remove these failing steps from the BuildFlow configuration?
 2. Fix the underlying tool issues?
 3. Disable the pre-commit hook entirely?
@@ -169,11 +171,13 @@ ok  github.com/larsartmann/cmdguard/tests/integration     1.145s
 ## Lint Status
 
 **Pre-existing issues (not introduced by this change):**
+
 - 106 total lint issues
 - All issues are in pre-existing code (examples/, internal/, tests/)
 - v2 package core changes have zero new lint issues
 
 **Issue categories:**
+
 - gci: 2 (import formatting)
 - golines: 4 (line length)
 - ireturn: 24 (generic interface returns)
@@ -186,13 +190,13 @@ ok  github.com/larsartmann/cmdguard/tests/integration     1.145s
 
 ## Dependencies
 
-| Package | Version | Status |
-|---------|---------|--------|
-| spf13/cobra | v1.10.2 | ✅ Current |
-| samber/do/v2 | v2.0.0 | ✅ Current |
-| charm.land/fang/v2 | v2.0.1 | ✅ Current |
-| knadh/koanf/v2 | v2.3.4 | ✅ Current |
-| Go | 1.26 | ✅ Current |
+| Package            | Version | Status     |
+| ------------------ | ------- | ---------- |
+| spf13/cobra        | v1.10.2 | ✅ Current |
+| samber/do/v2       | v2.0.0  | ✅ Current |
+| charm.land/fang/v2 | v2.0.1  | ✅ Current |
+| knadh/koanf/v2     | v2.3.4  | ✅ Current |
+| Go                 | 1.26    | ✅ Current |
 
 ---
 
@@ -206,4 +210,4 @@ ok  github.com/larsartmann/cmdguard/tests/integration     1.145s
 
 ---
 
-*Generated by Crush AI Assistant*
+_Generated by Crush AI Assistant_
