@@ -2,6 +2,16 @@ package v2
 
 import "log/slog"
 
+// logLevelAllowed is the set of valid log levels.
+//
+//nolint:gochecknoglobals // Shared constant for DRY
+var logLevelAllowed = []string{"debug", "info", "warn", "error"}
+
+// logFormatAllowed is the set of valid log formats.
+//
+//nolint:gochecknoglobals // Shared constant for DRY
+var logFormatAllowed = []string{"text", "json"}
+
 // LogLevel is a type-safe log level enum.
 //
 //nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
@@ -11,15 +21,15 @@ type LogLevel Enum
 //
 //nolint:gochecknoglobals // Predefined constants for type-safe defaults
 var (
-	LogLevelDebug = LogLevel{value: "debug", allowed: []string{"debug", "info", "warn", "error"}}
-	LogLevelInfo  = LogLevel{value: "info", allowed: []string{"debug", "info", "warn", "error"}}
-	LogLevelWarn  = LogLevel{value: "warn", allowed: []string{"debug", "info", "warn", "error"}}
-	LogLevelError = LogLevel{value: "error", allowed: []string{"debug", "info", "warn", "error"}}
+	LogLevelDebug = LogLevel{value: "debug", allowed: logLevelAllowed}
+	LogLevelInfo  = LogLevel{value: "info", allowed: logLevelAllowed}
+	LogLevelWarn  = LogLevel{value: "warn", allowed: logLevelAllowed}
+	LogLevelError = LogLevel{value: "error", allowed: logLevelAllowed}
 )
 
 // ParseLogLevel creates a LogLevel from a string.
 func ParseLogLevel(s string) (LogLevel, error) {
-	e, err := ParseEnum(s, []string{"debug", "info", "warn", "error"})
+	e, err := ParseEnum(s, logLevelAllowed)
 	if err != nil {
 		return LogLevel{}, err
 	}
@@ -57,13 +67,13 @@ type LogFormat Enum
 //
 //nolint:gochecknoglobals // Predefined constants for type-safe defaults
 var (
-	LogFormatText = LogFormat{value: "text", allowed: []string{"text", "json"}}
-	LogFormatJSON = LogFormat{value: "json", allowed: []string{"text", "json"}}
+	LogFormatText = LogFormat{value: "text", allowed: logFormatAllowed}
+	LogFormatJSON = LogFormat{value: "json", allowed: logFormatAllowed}
 )
 
 // ParseLogFormat creates a LogFormat from a string.
 func ParseLogFormat(s string) (LogFormat, error) {
-	e, err := ParseEnum(s, []string{"text", "json"})
+	e, err := ParseEnum(s, logFormatAllowed)
 	if err != nil {
 		return LogFormat{}, err
 	}

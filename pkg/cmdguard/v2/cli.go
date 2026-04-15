@@ -26,6 +26,7 @@ type CLI[T any] struct {
 	flowCtx        *BranchingFlowContext
 	useFang        bool
 	fangOpts       []fang.Option
+	middleware     []Middleware[T]
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -111,7 +112,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 
 	cli.registeredCmds[cmd.Use] = true
 
-	cobraCmd, err := cliToCobraCommand(cli.config, cmd)
+	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware)
 	if err != nil {
 		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.Use, cli.name, err)
 	}

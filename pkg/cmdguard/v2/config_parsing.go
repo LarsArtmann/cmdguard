@@ -92,45 +92,51 @@ func parseFieldFlag(field reflect.StructField) *FlagTag {
 		tag.Required, _ = strconv.ParseBool(req)
 	}
 
+	// Parse validate tag
+	if validate := field.Tag.Get("validate"); validate != "" {
+		tag.Validate = validate
+	}
+
 	return &tag
 }
 
 // parseBoolDefault parses a boolean default value.
-func parseBoolDefault(s string) bool {
-	v, _ := strconv.ParseBool(s)
+// Returns an error if the string is not empty and not a valid boolean.
+func parseBoolDefault(s string) (bool, error) {
+	if s == "" {
+		return false, nil
+	}
 
-	return v
+	v, err := strconv.ParseBool(s)
+
+	return v, err
 }
 
 // parseIntDefault parses an integer default value.
-func (t FlagTag) parseIntDefault() any {
-	// Check if it's a Duration type
-	if t.Type == reflect.TypeFor[Duration]() {
-		d, err := ParseDuration(t.Default)
-		if err != nil {
-			return Duration{}
-		}
-
-		return d
+func parseIntDefault(s string) (int64, error) {
+	if s == "" {
+		return 0, nil
 	}
 
-	v, _ := strconv.ParseInt(t.Default, 10, 64)
-
-	return int(v)
+	return strconv.ParseInt(s, 10, 64)
 }
 
 // parseUintDefault parses an unsigned integer default value.
-func (t FlagTag) parseUintDefault() any {
-	v, _ := strconv.ParseUint(t.Default, 10, 64)
+func parseUintDefault(s string) (uint64, error) {
+	if s == "" {
+		return 0, nil
+	}
 
-	return uint(v)
+	return strconv.ParseUint(s, 10, 64)
 }
 
 // parseFloat64Default parses a float64 default value.
-func parseFloat64Default(s string) float64 {
-	v, _ := strconv.ParseFloat(s, 64)
+func parseFloat64Default(s string) (float64, error) {
+	if s == "" {
+		return 0, nil
+	}
 
-	return v
+	return strconv.ParseFloat(s, 64)
 }
 
 // parseCustomDefault handles custom type defaults.
@@ -165,18 +171,35 @@ func (t FlagTag) parseDefaultValue() any {
 	case reflect.String:
 		return t.Default
 	case reflect.Bool:
-		return parseBoolDefault(t.Default)
+		v, _ := parseBoolDefault(t.Default)
+
+		return v
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return t.parseIntDefault()
+		if t.Type == reflect.TypeFor[Duration]() {
+			d, err := ParseDuration(t.Default)
+			if err != nil {
+				return Duration{}
+			}
+
+			return d
+		}
+
+		v, _ := parseIntDefault(t.Default)
+
+		return int(v)
 	case reflect.Uint,
 		reflect.Uint8,
 		reflect.Uint16,
 		reflect.Uint32,
 		reflect.Uint64,
 		reflect.Uintptr:
-		return t.parseUintDefault()
+		v, _ := parseUintDefault(t.Default)
+
+		return uint(v)
 	case reflect.Float32, reflect.Float64:
-		return parseFloat64Default(t.Default)
+		v, _ := parseFloat64Default(t.Default)
+
+		return v
 	case reflect.Slice:
 		return strings.Split(t.Default, ",")
 	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,

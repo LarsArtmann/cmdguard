@@ -112,7 +112,7 @@ func (b *BranchingFlowContext) newChild(
 	return &BranchingFlowContext{
 		Context:  ctx,
 		path:     append(slices.Clone(b.path), commandName),
-		values:   b.values,
+		values:   maps.Clone(b.values),
 		cancels:  nil,
 		parent:   b,
 		children: nil,

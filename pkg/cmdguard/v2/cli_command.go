@@ -7,6 +7,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type contextKeyType struct{}
+
+var argsKey = contextKeyType{}
+
+// ArgsFromContext retrieves the positional arguments passed to the current command.
+// Use this in RunE handlers to access positional args, since cmdguard's RunE
+// signature does not include a []string args parameter.
+func ArgsFromContext(ctx context.Context) []string {
+	if ctx == nil {
+		return nil
+	}
+
+	if args, ok := ctx.Value(argsKey).([]string); ok {
+		return args
+	}
+
+	return nil
+}
+
 // prepareRunContext extracts context from cobra, parses flags, and returns both.
 func prepareRunContext[F any](
 	c *cobra.Command, cmdFlags F, registry *FlagRegistry, phase string,
@@ -26,7 +45,9 @@ func prepareRunContext[F any](
 	return ctx, flags, nil
 }
 
-func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, error) {
+func cliToCobraCommand[T, F any](
+	config *T, cmd Command[T, F], middlewares []Middleware[T],
+) (*cobra.Command, error) {
 	cobraCmd := &cobra.Command{
 		Use:           cmd.Use,
 		Short:         cmd.Short,
@@ -40,25 +61,43 @@ func cliToCobraCommand[T, F any](config *T, cmd Command[T, F]) (*cobra.Command, 
 		SilenceUsage:  cmd.SilenceUsage,
 	}
 
+	if cmd.Group != "" {
+		cobraCmd.GroupID = cmd.Group
+	}
+
 	flagRegistry, err := initCommandFlags(cobraCmd, cmd.Use, cmd.Flags)
 	if err != nil {
 		return nil, err
 	}
 
-	wireHandler(&cobraCmd.RunE, cmd.RunE, config, cmd.Flags, flagRegistry, "command "+cmd.Use)
+	info := CommandInfo{
+		Name:    cmd.Use,
+		HasRunE: cmd.RunE != nil,
+	}
 
-	wireHandler(
-		&cobraCmd.PreRunE, cmd.PreRunE, config, cmd.Flags, flagRegistry,
-		"pre-run of command "+cmd.Use,
+	wireHandlerWithMiddleware(
+		&cobraCmd.RunE, cmd.RunE, config, cmd.Flags, flagRegistry,
+		"command "+cmd.Use, info, middlewares,
 	)
 
-	wireHandler(
+	preInfo := info
+	preInfo.Phase = "pre-run"
+
+	wireHandlerWithMiddleware(
+		&cobraCmd.PreRunE, cmd.PreRunE, config, cmd.Flags, flagRegistry,
+		"pre-run of command "+cmd.Use, preInfo, middlewares,
+	)
+
+	postInfo := info
+	postInfo.Phase = "post-run"
+
+	wireHandlerWithMiddleware(
 		&cobraCmd.PostRunE, cmd.PostRunE, config, cmd.Flags, flagRegistry,
-		"post-run of command "+cmd.Use,
+		"post-run of command "+cmd.Use, postInfo, middlewares,
 	)
 
 	for _, subCmd := range cmd.Commands {
-		subCobraCmd, err := cliToCobraCommand(config, subCmd)
+		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares)
 		if err != nil {
 			return nil, fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
 		}
@@ -108,17 +147,36 @@ func wireHandler[T, F any](
 	handler func(context.Context, *T, F) error,
 	config *T, flags F, registry *FlagRegistry, phase string,
 ) {
+	wireHandlerWithMiddleware(target, handler, config, flags, registry, phase, CommandInfo{}, nil)
+}
+
+func wireHandlerWithMiddleware[T, F any](
+	target *func(*cobra.Command, []string) error,
+	handler func(context.Context, *T, F) error,
+	config *T, flags F, registry *FlagRegistry, phase string,
+	info CommandInfo, middlewares []Middleware[T],
+) {
 	if handler == nil {
 		return
 	}
 
 	h := handler
-	*target = func(c *cobra.Command, _ []string) error {
+	*target = func(c *cobra.Command, args []string) error {
 		ctx, parsed, err := prepareRunContext(c, flags, registry, phase)
 		if err != nil {
 			return err
 		}
 
-		return h(ctx, config, parsed)
+		ctx = context.WithValue(ctx, argsKey, args)
+
+		if len(middlewares) == 0 {
+			return h(ctx, config, parsed)
+		}
+
+		chain := buildChain(middlewares, ctx, config, info, func() error {
+			return h(ctx, config, parsed)
+		})
+
+		return chain()
 	}
 }

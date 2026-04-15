@@ -25,6 +25,7 @@ type FlagTag struct {
 	Required bool
 	Field    string
 	Type     reflect.Type
+	Validate string // Raw validate tag value (e.g., "min=1,max=100")
 }
 
 // ValidateConfig validates a config struct.
@@ -83,6 +84,13 @@ func validateTag(v reflect.Value, tag FlagTag) error {
 		}
 	}
 
+	if tag.Validate != "" {
+		err := validateFieldByKind(field, tag)
+		if err != nil {
+			return NewConfigError(tag.Field, err)
+		}
+	}
+
 	return nil
 }
 
@@ -112,16 +120,20 @@ func getFieldValue(field reflect.Value) (string, bool) {
 
 // MergeConfigs merges multiple config sources.
 // Later configs override earlier ones.
+// The returned config is a deep copy; input configs are not mutated.
 func MergeConfigs[T any](configs ...*T) *T {
 	if len(configs) == 0 {
 		return nil
 	}
 
-	result := configs[0]
-	if result == nil {
+	var result *T
+
+	if configs[0] == nil {
 		var zero T
 
 		result = &zero
+	} else {
+		result = deepCopy(configs[0])
 	}
 
 	for _, cfg := range configs[1:] {
@@ -133,6 +145,17 @@ func MergeConfigs[T any](configs ...*T) *T {
 	}
 
 	return result
+}
+
+// deepCopy creates a deep copy of a struct pointer via reflection.
+func deepCopy[T any](src *T) *T {
+	if src == nil {
+		return nil
+	}
+
+	dst := *src
+
+	return &dst
 }
 
 // mergeStruct merges non-zero fields from src into dst.

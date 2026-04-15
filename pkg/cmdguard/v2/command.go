@@ -7,7 +7,7 @@ import (
 
 // NoFlags is a convenience type for commands without command-specific flags.
 // Use it as the F type parameter: Command[MyConfig, NoFlags].
-type NoFlags = struct{}
+type NoFlags struct{}
 
 // Command represents a type-safe CLI command with typed flags and config.
 // The type parameter T is the application-level config type.
@@ -69,6 +69,10 @@ type Command[T any, F any] struct {
 
 	// SilenceUsage suppresses usage output on error
 	SilenceUsage bool
+
+	// Group assigns this command to a named group in help output.
+	// Groups must be registered via WithGroup on the CLI.
+	Group string
 }
 
 // Validate checks that the command is properly configured.

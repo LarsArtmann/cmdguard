@@ -120,4 +120,43 @@ func TestMergeConfigs(t *testing.T) {
 		testutil.AssertFieldEqString(t, result.B, "b2", "B")
 		testutil.AssertFieldEqString(t, result.C, "c3", "C")
 	})
+
+	t.Run("does not mutate input configs", func(t *testing.T) {
+		t.Parallel()
+
+		type TestConfig struct {
+			Name  string
+			Count int
+		}
+
+		base := &TestConfig{Name: "base", Count: 10}
+		override := &TestConfig{Name: "override", Count: 20}
+
+		result := MergeConfigs(base, override)
+
+		testutil.AssertFieldEqString(t, base.Name, "base", "base.Name should not be mutated")
+		testutil.AssertFieldEq(t, base.Count, 10, "base.Count should not be mutated")
+		testutil.AssertFieldEqString(t, result.Name, "override", "result.Name")
+		testutil.AssertFieldEq(t, result.Count, 20, "result.Count")
+	})
+
+	t.Run("returned config is independent", func(t *testing.T) {
+		t.Parallel()
+
+		type TestConfig struct {
+			Name string
+		}
+
+		base := &TestConfig{Name: "original"}
+
+		result := MergeConfigs(base)
+		result.Name = "modified"
+
+		testutil.AssertFieldEqString(
+			t,
+			base.Name,
+			"original",
+			"base should not be affected by result mutation",
+		)
+	})
 }

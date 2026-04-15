@@ -34,8 +34,32 @@ func TestBranchingFlowContext_SetValueLocal(t *testing.T) {
 
 	root.SetValueLocal("local", "only-root")
 
+	if root.Value("local") != "only-root" {
+		t.Error("root should have local value")
+	}
+
 	if child.Value("local") != "only-root" {
-		t.Error("child sees shared values from root")
+		t.Error("child should see parent value via GetValue fallback")
+	}
+}
+
+func TestBranchingFlowContext_ChildValueIsolation(t *testing.T) {
+	t.Parallel()
+
+	root := NewBranchingFlowContext(context.Background())
+	root.SetValueLocal("shared", "root-val")
+
+	child, cancel := root.Branch("child")
+	defer cancel()
+
+	child.SetValueLocal("shared", "child-val")
+
+	if root.Value("shared") != "root-val" {
+		t.Error("root value should not be affected by child's SetValueLocal")
+	}
+
+	if child.Value("shared") != "child-val" {
+		t.Error("child should see its own local value")
 	}
 }
 
