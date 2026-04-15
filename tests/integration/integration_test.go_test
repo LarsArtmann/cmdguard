@@ -1,5 +1,5 @@
 // Package integration provides end-to-end tests for cmdguard.
-package integration
+package integration_test
 
 import (
 	"bytes"

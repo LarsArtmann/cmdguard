@@ -1,4 +1,4 @@
-package cmdguard
+package cmdguard_test
 
 import (
 	"testing"

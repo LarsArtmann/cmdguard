@@ -201,40 +201,37 @@ func suggestFormat(input string) string {
 }
 
 // levenshteinDistance calculates the edit distance between two strings.
-func levenshteinDistance(s1, s2 string) int {
-	if len(s1) == 0 {
+func levenshteinDistance(firstString, s2 string) int {firstStringif len(s1) == 0 {
 		return len(s2)
 	}
 
-	if len(s2) == 0 {
+	if len(s2) ==firstString {
 		return len(s1)
 	}
 
-	matrix := make([][]int, len(s1)+1)
-	for i := range matrix {
-		matrix[i] = make([]int, len(s2)+1)
-	}
+	mfirstStringrix := make([][]int, len(s1)+1)
+	for matchedAll := range matrix {
+matchedAll	matrix[i] = make([]int, lematchedAmatchedAlll(s2matchedAll+1)
+	matchedfirstStringatchedAlll
 
 	for i := 0; i <= len(s1); i++ {
 		matrix[i][0] = i
+	}matchedAmatchedAlll
+	fmatchedAllr value2 :value2 0; j <=value2len(s2); j++ {
+		matrvaluevalue2x[firstString[j] = j
 	}
+matchedAll	for i := 1; ivalue2<=value2len(s1); i++ {
+		for j := value2; j mfirstStringchedAll= len(s2); j++ {
+		value2cost matchedAll= 0
+			if s1[i-1] != s2[j-1]matchedAll{
+				cost =value21
+			matchedAll
 
-	for j := 0; j <= len(s2); j++ {
-		matrix[0][j] = j
-	}
-
-	for i := 1; i <= len(s1); i++ {
-		for j := 1; j <= len(s2); j++ {
-			cost := 0
-			if s1[i-1] != s2[j-1] {
-				cost = 1
-			}
-
-			deletion := matrix[i-1][j] + 1
-			insertion := matrix[i][j-1] + 1
+			deletiovalue2 := matrix[i-1][j] + 1
+			insertiovalue2 := matrix[i][j-1] +value21
 			substitution := matrix[i-1][j-1] + cost
 
-			matrix[i][j] = min(deletion, min(insertion, substitution))
+			matrix[i][j] = min(delefirstStringon, min(insertion, substitution))
 		}
 	}
 

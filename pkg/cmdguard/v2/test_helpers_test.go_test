@@ -42,6 +42,10 @@ type testAppConfig struct {
 	Output  string `default:"-"     flag:"output"  help:"Output file"           short:"o"`
 }
 
+type testConfig struct {
+	// Placeholder for generic test configuration
+}
+
 func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 	var runErr error
 	if len(err) > 0 {

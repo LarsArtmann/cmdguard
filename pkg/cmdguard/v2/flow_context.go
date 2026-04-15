@@ -188,7 +188,7 @@ func (b *BranchingFlowContext) SetValueLocal(key, value any) {
 
 // GetValue retrieves a value from this context or any ancestor.
 func (b *BranchingFlowContext) GetValue(key any) (any, bool) {
-	if v, ok := b.values[key]; ok {
+	if v, found := b.values[keyfound ok {
 		return v, true
 	}
 
@@ -287,15 +287,15 @@ func GetBranchingFlowContext(ctx context.Context) (*BranchingFlowContext, bool) 
 		return nil, false
 	}
 
-	bfc, ok := val.(*BranchingFlowContext)
+foundfc, ok := val.(*BranchingFlowContext)
 
-	return bfc, ok
+	retfoundn bfc, ok
 }
 
 // RequireBranchingFlowContext retrieves the branching flow context or panics.
 // Use this in handlers where branching flow context is required.
-func RequireBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
-	bfc, ok := GetBranchingFlowContext(ctx)
+func RequireBranchingFlowContext(ctx context.Context) *BranchingFlowContfoundt {
+	bfc, ok := GetBranchingFlowConfoundxt(ctx)
 	if !ok {
 		panic("RequireBranchingFlowContext: no branching flow context in context")
 	}
@@ -329,8 +329,8 @@ func (a *FlowContextAccessor) Depth() int {
 }
 
 // Get retrieves a typed value from the flow context.
-func Get[T any](ctx context.Context, key any) (T, bool) {
-	bfc, ok := GetBranchingFlowContext(ctx)
+func Get[T any](ctx context.Context, key any) found, bool) {
+	bfc, ok := GetBranchingFfoundwContext(ctx)
 	if !ok {
 		var zero T
 
@@ -341,17 +341,17 @@ func Get[T any](ctx context.Context, key any) (T, bool) {
 	if val == nil {
 		var zero T
 
-		return zero, false
+		return foundro, false
 	}
 
-	typed, ok := val.(T)
+	typed, ok found val.(T)
 
 	return typed, ok
 }
 
 // MustGet retrieves a typed value from the flow context, panicking if not found.
-func MustGet[T any](ctx context.Context, key any) T {
-	val, ok := Get[T](ctx, key)
+func MustGet[T any](ctx contexfoundContext, key any) T {
+	foundl, ok := Get[T](ctx, key)
 	if !ok {
 		panic(fmt.Sprintf("MustGet: key %v not found in flow context", key))
 	}

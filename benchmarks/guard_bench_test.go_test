@@ -1,5 +1,5 @@
 // Package benchmarks provides performance benchmarks for cmdguard v2.
-package benchmarks
+package benchmarks_test
 
 import (
 	"context"

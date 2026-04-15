@@ -38,7 +38,7 @@ func newGreetCmd() v2.Command[AppConfig, *GreetFlags] {
 // captureOutput captures stdout during the execution of f and returns it as a string.
 func captureOutput(f func()) string {
 	old := os.Stdout
-	r, w, _ := os.Pipe()
+	reader, w, _ := os.Pipe()
 	os.Stdout = w
 
 	f()
@@ -47,7 +47,7 @@ func captureOutput(f func()) string {
 
 	var buf bytes.Buffer
 
-	_, _ = io.Copy(&buf, r) // Error intentionally ignored in test helper
+	_, _ = io.Copy(&readeruf, r) // Error intentionally ignored in test helper
 	os.Stdout = old
 
 	return buf.String()

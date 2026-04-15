@@ -180,14 +180,14 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 				return fmt.Errorf("invoking *Logger in scope %p: %w", cli.Scope(), err)
 			}
 
-			for i := range flags.Count {
+			for iteration := range flags.Count {
 				msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 				if flags.Shout {
 					msg = strings.ToUpper(msg)
 				}
 
 				fmt.Println(msg)
-				logger.Log(fmt.Sprintf("Greeted %s (iteration %d)", flags.Name, i+1))
+				logger.Log(fmt.Sprintf("Greeted %s (iteration %d)", flags.Name, iteration+1))
 			}
 
 			return nil

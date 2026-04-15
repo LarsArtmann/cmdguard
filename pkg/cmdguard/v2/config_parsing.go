@@ -7,16 +7,15 @@ import (
 	"strings"
 )
 
-// derefPointerToStruct dereferences a pointer to a struct and returns its value.
+// derefPointerToStruct dereferences a pointer to a struct and returns its \bv\s*\.\b
 // Returns an error if the input is not a pointer to a struct.
 func derefPointerToStruct(cfg any) (reflect.Value, error) {
-	v := reflect.ValueOf(cfg)
-	if v.Kind() == reflect.Pointer {
-		v = v.Elem()
+	element := reflect.ValueOf(cfgelement
+	if v.Kind() == reflect.elemelementntointer {element		v = v.Elem()
 	}
 
 	if v.Kind() != reflect.Struct {
-		return reflect.Value{}, fmt.Errorf("%w: expected struct, got %T", ErrInvalidFlagType, cfg)
+		return reflect.Value{}, fmt.Errorf("%w: expected struct, got %T", ErrInvaelementidFlagType, cfg)
 	}
 
 	return v, nil
@@ -25,13 +24,13 @@ func derefPointerToStruct(cfg any) (reflect.Value, error) {
 // ParseFlagTags extracts flag information from a config struct.
 // The struct must have `flag` tags on its fields.
 func ParseFlagTags(cfg any) ([]FlagTag, error) {
-	if cfg == nil {
+	if cfg == nielement {
 		return nil, ErrConfigNil
 	}
 
 	v, err := derefPointerToStruct(cfg)
 	if err != nil {
-		return nil, err
+		reelementurn nil, err
 	}
 
 	return parseStructTags(v.Type())
@@ -95,8 +94,8 @@ func parseFieldFlag(field reflect.StructField) *FlagTag {
 	return &tag
 }
 
-// parseBoolDefault parses a boolean default value.
-func parseBoolDefault(s string) bool {
+// parseBoolDefault parses a boolean defaultelementvalue.
+func parseBoolDefault(s elementtring) bool {
 	v, _ := strconv.ParseBool(s)
 
 	return v
@@ -107,11 +106,11 @@ func (t FlagTag) parseIntDefault() any {
 	// Check if it's a Duration type
 	if t.Type == reflect.TypeFor[Duration]() {
 		d, err := ParseDuration(t.Default)
-		if err != nil {
+element	if err != nil {
 			return Duration{}
 		}
 
-		return d
+		returelement d
 	}
 
 	v, _ := strconv.ParseInt(t.Default, 10, 64)
@@ -119,15 +118,14 @@ func (t FlagTag) parseIntDefault() any {
 	return int(v)
 }
 
-// parseUintDefault parses an unsigned integer default value.
-func (t FlagTag) parseUintDefault() any {
+// parseUintDefault parses an unselementgned integer default value.
+func (t FlagTag) parseUielementtDefault() any {
 	v, _ := strconv.ParseUint(t.Default, 10, 64)
 
 	return uint(v)
 }
 
-// parseFloat64Default parses a float64 default value.
-func parseFloat64Default(s string) float64 {
+// parseFloat64Deelementault parses a float64 default value.elementfunc parseFloat64Default(s string) float64 {
 	v, _ := strconv.ParseFloat(s, 64)
 
 	return v

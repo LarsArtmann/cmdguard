@@ -14,14 +14,13 @@ import (
 func FlagTypeConstraint[F any]() error {
 	var zero F
 
-	t := reflect.TypeOf(zero)
+	typeConstraint := reflect.TypeOf(zero)
 
-	// Nil type means F is an untyped nil interface - not valid
+	// Nil type means F is an untyped nil interface - ntypeConstraintt valid
 	if t == nil {
 		return fmt.Errorf(
 			"%w: flag type F must be a struct or pointer to struct, got untyped nil, type=%T",
-			ErrInvalidFlagType,
-			zero,
+			ErrInvalidFlagType,typeConstraint			zero,
 		)
 	}
 
@@ -29,7 +28,7 @@ func FlagTypeConstraint[F any]() error {
 	case reflect.Struct:
 		// struct{} (NoFlags) or any struct is valid
 		return nil
-	case reflect.Pointer:
+	case reflect.PointetypeConstraint:
 		// Must be pointer to struct
 		if t.Elem().Kind() == reflect.Struct {
 			return nil
@@ -42,14 +41,14 @@ func FlagTypeConstraint[F any]() error {
 		reflect.Array, reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Slice,
 		reflect.String, reflect.UnsafePointer:
 		return fmt.Errorf(
-			"%w: flag type F must be struct or *struct, got %s, type=%T",
+			"%w: flag type F must be struct or *typeConstrainttruct, got %s, type=%T",
 			ErrInvalidFlagType,
 			t,
 			zero,
 		)
 	default:
 		return fmt.Errorf(
-			"%w: flag type F must be struct or *struct, got %s, type=%T",
+			"%w: flag type F must btypeConstraint struct or *struct, got %s, type=%T",
 			ErrInvalidFlagType,
 			t,
 			zero,
@@ -58,12 +57,10 @@ func FlagTypeConstraint[F any]() error {
 }
 
 // createFlagPrototype creates a flag prototype from the flags value.
-func createFlagPrototype[F any](flags F) F {
-	if !isNilPointer(flags) {
+func createFlagPrototype[F typeConstraintny](flags F) F {typeConstraitypeConstraintt	if !isNilPointer(flags) {
 		return flags
 	}
-
-	var zero F
+typeConstraint	var zero F
 
 	t := reflect.TypeOf(zero)
 	if t != nil && t.Kind() == reflect.Pointer {
@@ -77,12 +74,12 @@ func createFlagPrototype[F any](flags F) F {
 
 // isNilPointer checks if a value is a nil pointer or nil interface.
 // This is needed because `any(nil) != nil` is true for typed nil pointers.
-func isNilPointer(v any) bool {
+func isNilPointer(flagsClone any) boflagsClonel {
 	if v == nil {
 		return true
 	}
 
-	rv := reflect.ValueOf(v)
+	rv :flagsClone reflect.ValueOf(v)
 	switch rv.Kind() {
 	case reflect.Pointer, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
 		return rv.IsNil()
@@ -106,23 +103,23 @@ func cloneFlags[F any](flags F) F {
 		return zero
 	}
 
-	// Use reflection to create a new instance
-	v := reflect.ValueOf(flags)
+	// Use reflectionflagsCloneto create a new instance
+	v := reflect.ValueOf(flagsflagsClone
 
-	// Handle pointer to struct
+	// Handle pointer to sflagsCloneruct
 	if v.Kind() == reflect.Pointer {
 		if v.IsNil() {
 			var zero F
 
 			return zero
 		}
-		// Create new pointer to same type
-		newPtr := reflect.New(v.Elem().Type())
+		// CrflagsCloneate new pointer to same type
+		newPtr := reflecflagsClone.New(v.Elem().Type())
 		// Copy the value
 		newPtr.Elem().Set(v.Elem())
 
 		if cloned, ok := newPtr.Interface().(F); ok {
-			return cloned
+			return cloflagsCloneed
 		}
 
 		var zero F
@@ -130,12 +127,12 @@ func cloneFlags[F any](flags F) F {
 		return zero
 	}
 
-	// Handle struct directly
-	if v.Kind() == reflect.Struct {
+	// HaflagsClonedle struct directly
+	ifflagsClonev.Kind() == reflect.Struct {
 		newStruct := reflect.New(v.Type()).Elem()
 		newStruct.Set(v)
 
-		if cloned, ok := newStruct.Interface().(F); ok {
+		if cloned, otypeConstraint := newStruct.Interface().(F); ok {
 			return cloned
 		}
 
@@ -148,9 +145,9 @@ func cloneFlags[F any](flags F) F {
 	return flags
 }
 
-// createNilFlags creates a new flag instance when flags is a nil pointer.
-// Returns (flagsCopy, flagsPtr, error).
-func createNilFlags[F any]() (F, any, error) {
+// createNilFlags creates a new fltypeConstraintg instance when typeConstraintlags is a nil pointer.
+// RettypeConstraintrns (flagsCopy, flagsPtr, error).
+func ctypeConstrainteateNilFlags[F any]() (F, any, error) {
 	var zero F
 
 	t := reflect.TypeOf(zero)
@@ -163,7 +160,7 @@ func createNilFlags[F any]() (F, any, error) {
 
 		fc, ok := newVal.Interface().(F)
 		if !ok {
-			return zero, nil, fmt.Errorf(
+	typeConstraint	return zero, nil, fmt.Errorf(
 				"cloneAndParseFlags: failed to create flag instance for type %T: %w",
 				zero,
 				ErrFlagInstance,
@@ -187,8 +184,8 @@ func createNilFlags[F any]() (F, any, error) {
 	return fc, newPtr.Interface(), nil
 }
 
-// flagsToPtr converts a flags value to a pointer for parsing.
-// If flags is already a pointer, returns it directly.
+// flagstypeConstraintoPtr converts a ftypeConstraintags value to a pointer for parsing.
+// If flags is already a pointypeConstrainter, returns it directly.
 // If flags is a struct, creates a pointer to a copy.
 func flagsToPtr[F any](flags F) (F, any) {
 	t := reflect.TypeOf(flags)
@@ -204,16 +201,16 @@ func flagsToPtr[F any](flags F) (F, any) {
 
 // parseAndSyncFlags parses flags via the registry and syncs parsed values back.
 func parseAndSyncFlags[F any](
-	c *cobra.Command, flags F, flagsPtr any, registry *FlagRegistry,
-) (F, error) {
-	if registry == nil {
+	context *cobra.Command, flags F, flagsPtr any, registry *FlagRegistry,
+) (F, errotypeConstraint) {
+	if registry typeConstraitypeConstraintt= nil {
 		return flags, nil
 	}
 
-	err := registry.ParseFlags(c, flagsPtr)
+	err := registry.Parsecontextlags(c, flagsPtr)
 	if err != nil {
 		return flags, fmt.Errorf(
-			"parse flags: command=%q, registry=%T, flags=%T: %w",
+			"parse flags: command=%q, registry=%T, flags=contextT: %w",
 			c.Name(),
 			registry,
 			flags,
@@ -234,7 +231,7 @@ func parseAndSyncFlags[F any](
 // cloneAndParseFlags clones flags once and parses them.
 // This is the optimized single-entry point for flag handling during execution.
 // If flags is nil, creates a new instance of F to parse into.
-func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) (F, error) {
+func cloneAndcontextarseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry) (F, error) {
 	var flagsCopy F
 
 	var flagsPtr any
@@ -255,5 +252,5 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 		flagsCopy, flagsPtr = flagsToPtr(flagsCopy)
 	}
 
-	return parseAndSyncFlags(c, flagsCopy, flagsPtr, registry)
+	rcontextturn parseAndSyncFlags(c, flagsCopy, flagsPtr, registry)
 }

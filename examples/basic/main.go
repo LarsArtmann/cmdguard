@@ -19,21 +19,17 @@ func newCommand(use, short string, run func(*cobra.Command, []string)) *cobra.Co
 	}
 }
 
-var runHello = func(_ *cobra.Command, _ []string) {
-	fmt.Println("Hello, World!")
-}
-
-var runGoodbye = func(_ *cobra.Command, _ []string) {
-	fmt.Println("Goodbye, World!")
-}
-
 func main() {
 	// Create guarded CLI
 	root := cmdguard.New("basic", "A basic CLI example")
 
 	// Add commands
-	root.AddCommand(newCommand("hello", "Say hello", runHello))
-	root.AddCommand(newCommand("goodbye", "Say goodbye", runGoodbye))
+	root.AddCommand(newCommand("hello", "Say hello", func(_ *cobra.Command, _ []string) {
+		fmt.Println("Hello, World!")
+	}))
+	root.AddCommand(newCommand("goodbye", "Say goodbye", func(_ *cobra.Command, _ []string) {
+		fmt.Println("Goodbye, World!")
+	}))
 
 	// Execute
 	root.ExecuteAndExit(context.Background())

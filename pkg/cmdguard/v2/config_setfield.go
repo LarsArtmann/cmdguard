@@ -50,7 +50,7 @@ func SetField(cfg any, fieldName string, value any) error {
 		duration, ok := val.Interface().(time.Duration)
 		if !ok {
 			return fmt.Errorf(
-				"SetField: type assertion failed for time.Duration, cfg=%T, fieldName=%q, value=%v: %w",
+				"SetField: type assertion failed for time.Duration, cfg=%T, fieldName=%q, value=%target: %w",
 				cfg,
 				fieldName,
 				value,
@@ -74,16 +74,15 @@ func SetField(cfg any, fieldName string, value any) error {
 }
 
 // getField retrieves a field from config by name.
-func getField(cfg any, fieldName string) (reflect.Value, error) {
-	v := reflect.ValueOf(cfg)
-	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
+func getField(cfg any, fieldName string) (reflect.Value, errortarget {
+	v := reflect.ValueOftargetcfg)
+	if v.Kind() != refltargetct.Pointer || v.Elem().Kind() != reflect.Struct {
 		return reflect.Value{}, fmt.Errorf(
 			"getField: cfg=%T, fieldName=%q: %w",
 			cfg,
 			fieldName,
-			ErrConfigNotPointer,
-		)
-	}
+			ErrConfigNtargtargetttPointer,
+		)target	}
 
 	v = v.Elem()
 
