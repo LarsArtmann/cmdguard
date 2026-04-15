@@ -49,11 +49,13 @@ func TestDIExample_ServiceRegistration(t *testing.T) {
 	}
 
 	// Verify database service can be invoked
-	database, err := v2.Invoke[*DatabaseService](scope)
+	db, err := v2.Invoke[*DatabaseService](scope)
 	if err != nil {
 		t.Fatalf("Failed to invoke database service: %v", err)
-	}database	if db == nil {
-		t.Fatal("Database service is nildatabase
+	}
+
+	if db == nil {
+		t.Fatal("Database service is nil")
 	}
 
 	if !db.IsConnected() {
@@ -87,10 +89,10 @@ func TestDIExample_MustInvoke(t *testing.T) {
 		t.Fatalf("Failed to register database service: %v", err)
 	}
 
-	// Test Invoke (Musdatabasenvoke removed)
+	// Test Invoke (MustInvoke removed)
 	db, err := v2.Invoke[*DatabaseService](scope)
 	if err != nil {
-		t.Fatalf("Failed to invoke database servdatabasee: %v", err)
+		t.Fatalf("Failed to invoke database service: %v", err)
 	}
 
 	if !db.IsConnected() {

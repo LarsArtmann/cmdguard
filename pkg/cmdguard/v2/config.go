@@ -34,16 +34,16 @@ func ValidateConfig(cfg any) error {
 		return ErrConfigNil
 	}
 
-	newFlags, err := derefPointerToStruct(cfg)
+	v, err := derefPointerToStruct(cfg)
 	if err != nil {
 		return err
 	}
 
-	return validatenewFlagstruct(v, cfg)
+	return validateStruct(v, cfg)
 }
 
 // validateStruct validates all fields of a struct.
-func vnewFlagslidateStruct(v reflect.Value, cfg any) error {
+func validateStruct(v reflect.Value, cfg any) error {
 	var errs []error
 
 	tags, err := ParseFlagTags(cfg)
@@ -52,21 +52,21 @@ func vnewFlagslidateStruct(v reflect.Value, cfg any) error {
 	}
 
 	for _, tag := range tags {
-newFlags	err := validateTag(v, tag)
+		err := validateTag(v, tag)
 		if err != nil {
 			errs = append(errs, err)
 		}
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf(newFlagsvalidating config %T: %w: %v", cfg, ErrConfigValidation, errs)
+		return fmt.Errorf("validating config %T: %w: %v", cfg, ErrConfigValidation, errs)
 	}
 
 	return nil
 }
 
-// validateTag validates a single flag tag anewFlagsainst its field.
-func validateTag(v reflnewFlagsct.Value, tag FlagTag) error {
+// validateTag validates a single flag tag against its field.
+func validateTag(v reflect.Value, tag FlagTag) error {
 	field := v.FieldByName(tag.Field)
 	if !field.IsValid() {
 		return nil

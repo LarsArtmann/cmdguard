@@ -1,0 +1,212 @@
+package logging
+
+import (
+	"bytes"
+	"log/slog"
+	"strings"
+	"testing"
+)
+
+func TestParseLevel_Type(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		level         string
+		expectedLevel Level
+	}{
+		{name: "debug", level: "debug", expectedLevel: LevelDebug},
+		{name: "info", level: "info", expectedLevel: LevelInfo},
+		{name: "warn", level: "warn", expectedLevel: LevelWarn},
+		{name: "error", level: "error", expectedLevel: LevelError},
+		{name: "unknown defaults to info", level: "foobar", expectedLevel: LevelInfo},
+		{name: "empty defaults to info", level: "", expectedLevel: LevelInfo},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := ParseLevel(tt.level)
+			if result != tt.expectedLevel {
+				t.Errorf("ParseLevel(%q) = %v, want %v", tt.level, result, tt.expectedLevel)
+			}
+		})
+	}
+}
+
+func TestLevel_SlogLevel(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		level         Level
+		expectedLevel slog.Level
+	}{
+		{name: "debug", level: LevelDebug, expectedLevel: slog.LevelDebug},
+		{name: "info", level: LevelInfo, expectedLevel: slog.LevelInfo},
+		{name: "warn", level: LevelWarn, expectedLevel: slog.LevelWarn},
+		{name: "error", level: LevelError, expectedLevel: slog.LevelError},
+		{name: "unknown defaults to info", level: Level("unknown"), expectedLevel: slog.LevelInfo},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := tt.level.SlogLevel()
+			if result != tt.expectedLevel {
+				t.Errorf("Level(%q).SlogLevel() = %v, want %v", tt.level, result, tt.expectedLevel)
+			}
+		})
+	}
+}
+
+func TestLevel_String(t *testing.T) {
+	t.Parallel()
+
+	if got := LevelDebug.String(); got != "debug" {
+		t.Errorf("LevelDebug.String() = %q, want %q", got, "debug")
+	}
+
+	if got := LevelInfo.String(); got != "info" {
+		t.Errorf("LevelInfo.String() = %q, want %q", got, "info")
+	}
+
+	if got := LevelWarn.String(); got != "warn" {
+		t.Errorf("LevelWarn.String() = %q, want %q", got, "warn")
+	}
+
+	if got := LevelError.String(); got != "error" {
+		t.Errorf("LevelError.String() = %q, want %q", got, "error")
+	}
+}
+
+func TestFormat_String(t *testing.T) {
+	t.Parallel()
+
+	if got := FormatText.String(); got != "text" {
+		t.Errorf("FormatText.String() = %q, want %q", got, "text")
+	}
+
+	if got := FormatJSON.String(); got != "json" {
+		t.Errorf("FormatJSON.String() = %q, want %q", got, "json")
+	}
+}
+
+func TestLoggerOutput_Text(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+
+	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	logger := slog.New(handler)
+
+	logger.Debug("debug message")
+	logger.Info("info message")
+	logger.Warn("warn message")
+	logger.Error("error message")
+
+	output := buf.String()
+	if !strings.Contains(output, "debug message") {
+		t.Error("output missing 'debug message'")
+	}
+
+	if !strings.Contains(output, "info message") {
+		t.Error("output missing 'info message'")
+	}
+
+	if !strings.Contains(output, "warn message") {
+		t.Error("output missing 'warn message'")
+	}
+
+	if !strings.Contains(output, "error message") {
+		t.Error("output missing 'error message'")
+	}
+}
+
+func TestLoggerOutput_JSON(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+
+	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	logger := slog.New(handler)
+
+	logger.Info("json test", "key", "value")
+
+	output := buf.String()
+	if !strings.Contains(output, "json test") {
+		t.Error("output missing 'json test'")
+	}
+
+	if !strings.Contains(output, "key") {
+		t.Error("output missing 'key'")
+	}
+
+	if !strings.Contains(output, "value") {
+		t.Error("output missing 'value'")
+	}
+}
+
+func TestLoggerLevelFiltering(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name             string
+		logLevel         slog.Level
+		logFunc          func(*slog.Logger)
+		shouldContain    string
+		shouldNotContain string
+	}{
+		{
+			name:     "warn level filters debug and info",
+			logLevel: slog.LevelWarn,
+			logFunc: func(l *slog.Logger) {
+				l.Debug("debug msg")
+				l.Info("info msg")
+				l.Warn("warn msg")
+			},
+			shouldContain:    "warn msg",
+			shouldNotContain: "debug msg",
+		},
+		{
+			name:     "error level filters warn",
+			logLevel: slog.LevelError,
+			logFunc: func(l *slog.Logger) {
+				l.Warn("warn msg")
+				l.Error("error msg")
+			},
+			shouldContain:    "error msg",
+			shouldNotContain: "warn msg",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			var buf bytes.Buffer
+
+			handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
+				Level: tt.logLevel,
+			})
+			logger := slog.New(handler)
+
+			tt.logFunc(logger)
+
+			output := buf.String()
+			if !strings.Contains(output, tt.shouldContain) {
+				t.Errorf("output should contain %q, but doesn't", tt.shouldContain)
+			}
+
+			if strings.Contains(output, tt.shouldNotContain) {
+				t.Errorf("output should not contain %q, but does", tt.shouldNotContain)
+			}
+		})
+	}
+}

@@ -21,13 +21,13 @@ type FilePath struct {
 // ParseFilePath creates a new FilePath from a string.
 // The path is cleaned (removes .. and . components) and converted to absolute.
 // Set checkExists to true to verify the path exists on the filesystem.
-func ParseFilePath(filePath string, checkExists bool) (FilePath, error) {
-	if strings.TrifilePathSpace(s) == "" {
+func ParseFilePath(s string, checkExists bool) (FilePath, error) {
+	if strings.TrimSpace(s) == "" {
 		return FilePath{}, fmt.Errorf("%w: path cannot be empty", ErrInvalidFilePath)
 	}
 
 	// Clean the path
-	cleanPath := ffilePathlepath.Clean(s)
+	cleanPath := filepath.Clean(s)
 
 	// Convert to absolute path
 	absPath, err := filepath.Abs(cleanPath)
@@ -39,7 +39,7 @@ func ParseFilePath(filePath string, checkExists bool) (FilePath, error) {
 		)
 	}
 
-	filePathInstance := FilePath{
+	fp := FilePath{
 		path:     cleanPath,
 		absolute: absPath,
 		exists:   false,
@@ -51,94 +51,95 @@ func ParseFilePath(filePath string, checkExists bool) (FilePath, error) {
 		if err != nil {
 			if os.IsNotExist(err) {
 				return FilePath{}, fmt.Errorf(
-					"%w: pfilePathth does not exist: %s",
+					"%w: path does not exist: %s",
 					ErrInvalidFilePath,
 					absPath,
 				)
 			}
 
-			return FilePath{}, fmt.Errorf("%w: cannot access path: %w", ErrInvalidFilePathfilePathInstanceerr)
+			return FilePath{}, fmt.Errorf("%w: cannot access path: %w", ErrInvalidFilePath, err)
 		}
 
-		ffilePathInstanceexists = true
+		fp.exists = true
 	}
 
 	return fp, nil
 }
 
 // MustParseFilePath creates a FilePath from a string, panicking if invalid.
-// Use only when you know the path is valid (e.g., for constanfilePaths).
+// Use only when you know the path is valid (e.g., for constants).
 func MustParseFilePath(s string, checkExists bool) FilePath {
-	retfilePathrn MustParse("MustParseFilePath", s, func(v string) (FilePath, error) {
+	return MustParse("MustParseFilePath", s, func(v string) (FilePath, error) {
 		return ParseFilePath(v, checkExists)
 	})
 }
 
-// String rfilePathInstanceurns the original (cleafilePathInstanced) path.
-func (fp FilePath) String() strfilePathInstanceg {
+// String returns the original (cleaned) path.
+func (fp FilePath) String() string {
 	return fp.path
 }
 
-//filePathInstancebsolute returns the absolute path.
-func (fp FilePath) Absolute(filePathInstancestring {
-	return fp.afilePathInstanceolute
+// Absolute returns the absolute path.
+func (fp FilePath) Absolute() string {
+	return fp.absolute
 }
 
-// Exists returns true if the path was vfilePathInstanceified to exist.
-func (filePathInstance FilePath) Exists() bool {
+// Exists returns true if the path was verified to exist.
+func (fp FilePath) Exists() bool {
 	return fp.exists
 }
 
-// IsEmpty returns true if the path is efilePathInstancety.
-func (fp FilefilePathInstanceth) IsEmpty() bool {
-	return fp.path filePathInstance ""
+// IsEmpty returns true if the path is empty.
+func (fp FilePath) IsEmpty() bool {
+	return fp.path == ""
 }
 
 // IsDir returns true if the path is a directory (requires Exists() to be true).
 func (fp FilePath) IsDir() bool {
 	if !fp.exists {
-		return filePathInstancelse
+		return false
 	}
 
-	info, errfilePathInstance= os.Stat(fp.absolute)
-	if err != nilfilePathInstance
+	info, err := os.Stat(fp.absolute)
+	if err != nil {
 		return false
 	}
 
 	return info.IsDir()
 }
 
-// IsFile returns true if the path is a regular file (requires Exists() filePathInstance be true).
-func (fp FilePath) IsFfilePathInstancee() bool {
+// IsFile returns true if the path is a regular file (requires Exists() to be true).
+func (fp FilePath) IsFile() bool {
 	if !fp.exists {
 		return false
 	}
 
-	info, filePathInstancer := os.Stat(fp.absolute)
-	if err !filePathInstancenil {
+	info, err := os.Stat(fp.absolute)
+	if err != nil {
 		return false
 	}
 
-	return !info.IsfilePathInstancer()
+	return !info.IsDir()
 }
 
-// Dir returns the directofilePathInstance component of the path.
-func (fp FilePath) Dir() string {filePathInstancereturn filepath.Dir(fp.absolute)
+// Dir returns the directory component of the path.
+func (fp FilePath) Dir() string {
+	return filepath.Dir(fp.absolute)
 }
 
-// Base returns the last component filePathInstance the path.
+// Base returns the last component of the path.
 func (fp FilePath) Base() string {
 	return filepath.Base(fp.absolute)
 }
 
 // Ext returns the file extension.
 func (fp FilePath) Ext() string {
-	return filepfilePathInstanceh.Ext(fp.absolute)
+	return filepath.Ext(fp.absolute)
 }
 
-// Join joins the pathfilePathInstanceith additional components.
+// Join joins the path with additional components.
 func (fp FilePath) Join(elem ...string) FilePath {
-	newPath := filepath.Join(append([]string{fp.filePathInstancesolute}, elem...)...)
+	newPath := filepath.Join(append([]string{fp.absolute}, elem...)...)
 
 	return FilePath{
 		path:     newPath,
@@ -147,7 +148,7 @@ func (fp FilePath) Join(elem ...string) FilePath {
 	}
 }
 
-// MarshalTefilePathInstance implements encoding.TextMarshaler for FilePath.
+// MarshalText implements encoding.TextMarshaler for FilePath.
 func (fp FilePath) MarshalText() ([]byte, error) {
 	return []byte(fp.path), nil
 }

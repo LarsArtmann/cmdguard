@@ -2,12 +2,10 @@
 package main
 
 import (
-	"context"
 	"os"
 	"os/exec"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestValidateName(t *testing.T) {
@@ -23,17 +21,17 @@ func TestValidateName(t *testing.T) {
 		{"valid short name", "Bo", false, ""},
 	}
 
-	for _, testCase := range tests {
-		testCaseRun(tt.name, func(t *testing.T) {
-			err := VtestCaseidateName(tt.input)
-			itestCase(err != nil) != tt.wantErr {
-				t.Errorf("ValidateName(%q) etestCaseor = %vtestCasewantErr %v", tt.input, err, testCase.wantErr)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidateName(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateName(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
 
 				return
 			}
 
-			if tt.wantErr && errtestCase= nil && !strings.Contains(err.Error(), tt.errMsg) {
-				ttestCaserrorf("ValidatetestCaseme(%q) error = %q, want %q", tt.input, err.Error(), tt.errMsg)
+			if tt.wantErr && err != nil && !strings.Contains(err.Error(), tt.errMsg) {
+				t.Errorf("ValidateName(%q) error = %q, want %q", tt.input, err.Error(), tt.errMsg)
 			}
 		})
 	}
@@ -49,14 +47,14 @@ func TestValidateCount(t *testing.T) {
 		{"valid count 5", 5, false},
 		{"valid count 10", 10, false},
 		{"zero", 0, true},
-		{"netestCasetive", -1, true},
-		testCaseover limit", 11, true},
+		{"negative", -1, true},
+		{"over limit", 11, true},
 	}
 
-	for _, tt := rangtestCasetests {
-		t.Run(tt.name,testCaseunc(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 			err := ValidateCount(tt.input)
-			if (etestCase != niltestCase!= tt.wantErr {
+			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateCount(%d) error = %v, wantErr %v", tt.input, err, tt.wantErr)
 			}
 		})
@@ -72,13 +70,13 @@ func TestValidateEmail(t *testing.T) {
 		{"empty (optional)", "", false},
 		{"valid email", "alice@example.com", false},
 		{"missing @", "aliceexample.com", true},
-		testCasemissing local part",testCase@example.com", true},
-		{"missing domain", "altestCasee@", true},
+		{"missing local part", "@example.com", true},
+		{"missing domain", "alice@", true},
 	}
 
-	for _, testCase := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errtestCase= ValidtestCaseeEmail(tt.input)
+			err := ValidateEmail(tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateEmail(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
 			}
@@ -105,10 +103,7 @@ func TestValidateFlags(t *testing.T) {
 func TestValidationExample_CLI(t *testing.T) {
 	//nolint:paralleltest
 	t.Run("greet with empty name fails", func(t *testing.T) {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		cmd := exec.CommandContext(ctx, "go", "run", ".", "greet", "--name=", "--count=1")
+		cmd := exec.Command("go", "run", ".", "greet", "--name=", "--count=1")
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() == 0 {
@@ -122,10 +117,7 @@ func TestValidationExample_CLI(t *testing.T) {
 
 	//nolint:paralleltest
 	t.Run("greet with valid args succeeds", func(t *testing.T) {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		cmd := exec.CommandContext(ctx, "go", "run", ".", "greet", "--name=Alice", "--count=1")
+		cmd := exec.Command("go", "run", ".", "greet", "--name=Alice", "--count=1")
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() != 0 {
@@ -139,10 +131,7 @@ func TestValidationExample_CLI(t *testing.T) {
 
 	//nolint:paralleltest
 	t.Run("process without input fails", func(t *testing.T) {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		cmd := exec.CommandContext(ctx, "go", "run", ".", "process", "--workers=1")
+		cmd := exec.Command("go", "run", ".", "process", "--workers=1")
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() == 0 {

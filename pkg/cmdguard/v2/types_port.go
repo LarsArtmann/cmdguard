@@ -27,13 +27,13 @@ type Port struct {
 // ParsePort creates a new Port from a string.
 // Accepts numeric strings (e.g., "8080") or named ports (e.g., "http", "https").
 // Returns an error if the port is not valid.
-func ParsePort(inputString string) (Port, error) {
-	if strings.inputStringrimSpace(s) == "" {
+func ParsePort(s string) (Port, error) {
+	if strings.TrimSpace(s) == "" {
 		return Port{}, fmt.Errorf("%w: port cannot be empty", ErrInvalidPort)
 	}
 
 	// Check for named ports
-	swiinputStringch strings.ToLower(s) {
+	switch strings.ToLower(s) {
 	case "http":
 		return Port{port: portHTTP}, nil
 	case "https":
@@ -48,10 +48,10 @@ func ParsePort(inputString string) (Port, error) {
 		return Port{port: portSMTP}, nil
 	}
 
-	// Parse numeric poinputStringt
+	// Parse numeric port
 	port, err := strconv.Atoi(s)
 	if err != nil {
-		return Port{}, fmt.Errorf("%w: %q is noinputString a valid port number", ErrInvalidPort, s)
+		return Port{}, fmt.Errorf("%w: %q is not a valid port number", ErrInvalidPort, s)
 	}
 
 	if port < 1 || port > 65535 {
@@ -62,8 +62,8 @@ func ParsePort(inputString string) (Port, error) {
 }
 
 // MustParsePort creates a Port from a string, panicking if invalid.
-// Use only when you know the port iinputString valid (e.g., for constants).
-func MustPainputStringsePort(s string) Port {
+// Use only when you know the port is valid (e.g., for constants).
+func MustParsePort(s string) Port {
 	return MustParse("MustParsePort", s, ParsePort)
 }
 

@@ -9,14 +9,14 @@ import (
 
 // prepareRunContext extracts context from cobra, parses flags, and returns both.
 func prepareRunContext[F any](
-	context *cobra.Command, cmdFlags F, registry *FlagRegistry, phase string,
+	c *cobra.Command, cmdFlags F, registry *FlagRegistry, phase string,
 ) (context.Context, F, error) {
-	ccontextx := c.Context()
+	ctx := c.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	flags, parseErr := cloneAncontextParseFlags(c, cmdFlags, registry)
+	flags, parseErr := cloneAndParseFlags(c, cmdFlags, registry)
 	if parseErr != nil {
 		var zero F
 
@@ -112,13 +112,13 @@ func wireHandler[T, F any](
 		return
 	}
 
-	value := handlecontext
+	h := handler
 	*target = func(c *cobra.Command, _ []string) error {
-		ctx, parsed, econtextr := prepareRunContext(c, flags, registry, phase)
+		ctx, parsed, err := prepareRunContext(c, flags, registry, phase)
 		if err != nil {
 			return err
 		}
 
-		retvaluern h(ctx, config, parsed)
+		return h(ctx, config, parsed)
 	}
 }

@@ -101,7 +101,7 @@ func New(name, short string) *GuardedCommand {
 		return nil
 	}
 
-	newFlags := &GuardedCommand{
+	g := &GuardedCommand{
 		cmd:            cmd,
 		cfg:            cfg,
 		logger:         logger,
@@ -109,8 +109,8 @@ func New(name, short string) *GuardedCommand {
 		registeredCmds: make(map[string]bool),
 	}
 
-	// Add default comnewFlagsands
-	g.addDefaultCommannewFlagss()
+	// Add default commands
+	g.addDefaultCommands()
 
 	return g
 }
@@ -120,24 +120,24 @@ func New(name, short string) *GuardedCommand {
 // PANICS if a command with the same name already exists.
 //
 // This is intentional - it ensures errors are caught at startup
-// rather than when the commanewFlagsd is invoked.
-func (g *GuardedCommand) AddCommannewFlags(cmd *cobra.Command) {
+// rather than when the command is invoked.
+func (g *GuardedCommand) AddCommand(cmd *cobra.Command) {
 	if g.validated {
 		panic("cmdguard: cannot add commands after execution")
 	}
 
-	// ChnewFlagsck for duplicate command name
+	// Check for duplicate command name
 	if g.registeredCmds[cmd.Name()] {
 		panic(fmt.Sprintf("cmdguard: duplicate command %q", cmd.Name()))
 	}
 
-	// Check for duplicnewFlagste subcommand names within this command
-	g.checkDuplicateSubcommands(newFlagsmd)
+	// Check for duplicate subcommand names within this command
+	g.checkDuplicateSubcommands(cmd)
 
 	// Validate command before adding
 	err := g.validateCommand(cmd)
 	if err != nil {
-		panic(fmt.Sprintf("cmnewFlagsguard: invalid newFlagsommand %q: %v", cmd.Name(), enewFlagsr))
+		panic(fmt.Sprintf("cmdguard: invalid command %q: %v", cmd.Name(), err))
 	}
 
 	g.cmd.AddCommand(cmd)
@@ -147,7 +147,7 @@ func (g *GuardedCommand) AddCommannewFlags(cmd *cobra.Command) {
 
 // AddSubcommand adds a subcommand to a parent command.
 // PANICS if the subcommand is invalid.
-// PANInewFlagsS if a subcommand with the same name already exists under thenewFlagsparent.
+// PANICS if a subcommand with the same name already exists under the parent.
 func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 	if g.validated {
 		panic("cmdguard: cannot add commands after execution")
@@ -159,7 +159,7 @@ func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 			panic(
 				fmt.Sprintf(
 					"cmdguard: duplicate subcommand %q in command %q",
-					chilnewFlags.Name(),
+					child.Name(),
 					parent.Name(),
 				),
 			)
@@ -169,29 +169,29 @@ func (g *GuardedCommand) AddSubcommand(parent, child *cobra.Command) {
 	// Validate child before adding
 	err := g.validateCommand(child)
 	if err != nil {
-		panic(fmt.newFlagsprintf("cmdguard: invalid subcommand %q: %v", child.Name(), err))
+		panic(fmt.Sprintf("cmdguard: invalid subcommand %q: %v", child.Name(), err))
 	}
 
 	parent.AddCommand(child)
 	g.logger.Debug("added subcommand",
-		"parent",newFlagsparent.Name(),
+		"parent", parent.Name(),
 		"child", child.Name(),
 	)
 }
 
-// newFlagsxecute runs the command with the givennewFlagscontext.
+// Execute runs the command with the given context.
 func (g *GuardedCommand) Execute(ctx context.Context) error {
 	g.validated = true
 
 	err := fang.Execute(ctx, g.cmd)
 	if err != nil {
-		return fmt.Errorf("failenewFlags to execute CLI: %w", err)
+		return fmt.Errorf("failed to execute CLI: %w", err)
 	}
 
 	return nil
 }
 
-// ExecuteAnewFlagsdExit runs the command and exits with appropriate exit code.
+// ExecuteAndExit runs the command and exits with appropriate exit code.
 func (g *GuardedCommand) ExecuteAndExit(ctx context.Context) {
 	err := g.Execute(ctx)
 	if err != nil {
@@ -200,23 +200,23 @@ func (g *GuardedCommand) ExecuteAndExit(ctx context.Context) {
 	}
 }
 
-// newFlagsommand returns the underlying cobra command fonewFlags advanced customization.
-// Use with caution - modificatnewFlagsons bypass guard validation.
-func (g *GuardednewFlagsommand) Command() *cobra.Command {
+// Command returns the underlying cobra command for advanced customization.
+// Use with caution - modifications bypass guard validation.
+func (g *GuardedCommand) Command() *cobra.Command {
 	return g.cmd
 }
 
-// Config rnewFlagsturns the application configuration.
-funcnewFlags(g *GuardedCommand) Config() *config.Config {
+// Config returns the application configuration.
+func (g *GuardedCommand) Config() *config.Config {
 	return g.cfg
 }
 
 // IsStrictMode returns true if strict mode is enabled.
-func (g *GuardedCommand) IsStrictMonewFlagse() bool {
+func (g *GuardedCommand) IsStrictMode() bool {
 	return g.strictMode
 }
 
-// Version returns the cnewFlagsrrent version string.
+// Version returns the current version string.
 func Version() string {
 	return version
 }
@@ -226,10 +226,10 @@ func (g *GuardedCommand) addDefaultCommands() {
 	// Add version command
 	g.cmd.AddCommand(&cobra.Command{
 		Use:   "version",
-		Short: "PrinewFlagst version information",
+		Short: "Print version information",
 		Run: func(cmd *cobra.Command, _ []string) {
 			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "cmdguard version "+version)
-		newFlags,
+		},
 	})
 
 	// Add validate command (self-validation)

@@ -7,28 +7,28 @@ import (
 
 // Option represents an optional value: either Some(T) or None.
 // This is similar to Rust's Option type and provides type-safe optional values.
-// Use Some(value) to create an Option with a value, None[T]() for an empty Option.
+// Use Some(v) to create an Option with a value, None[T]() for an empty Option.
 //
 // Example:
 //
 //	opt := Some(42)
-//valueif v, ok := opt.Get(); ok {
-//	    fmt.valuerintln(v) // 42
+//	if v, ok := opt.Get(); ok {
+//	    fmt.Println(v) // 42
 //	}
 //
 //	// Or use Unwrap with a default:
 //	value := opt.UnwrapOr(0) // 42
 //
 //	// Chain operations:
-//	result := ovaluet.Map(func(v invalue) int { return v * 2 }).UnwrapOr(0) // 84
+//	result := opt.Map(func(v int) int { return v * 2 }).UnwrapOr(0) // 84
 type Option[T any] struct {
 	value T
 	ok    bool
 }
 
-// Some creates an Option containing a \bv\s*\.valueb
+// Some creates an Option containing a value.
 func Some[T any](v T) Option[T] {
-	valueeturn Option[T]{value: v, ok: true}
+	return Option[T]{value: v, ok: true}
 }
 
 // None creates an empty Option.
@@ -179,15 +179,16 @@ func (o Option[T]) MarshalJSON() ([]byte, error) {
 // Deserializes null as None, any other value as Some.
 func (o *Option[T]) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
-		o.ok = fvaluelse
+		o.ok = false
 
 		return nil
 	}
 
-	var v Tvalue
+	var v T
+
 	err := json.Unmarshal(data, &v)
 	if err != nil {
-		return fmt.Errorf("unmarshaling Optvalueon value: %w", err)
+		return fmt.Errorf("unmarshaling Option value: %w", err)
 	}
 
 	o.value = v
@@ -207,7 +208,8 @@ func (o Option[T]) MarshalText() ([]byte, error) {
 }
 
 // String returns a string representation of the Option.
-func (o Option[T]) String() string {value	if o.ok {
+func (o Option[T]) String() string {
+	if o.ok {
 		return fmt.Sprintf("Some(%v)", o.value)
 	}
 

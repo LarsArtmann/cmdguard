@@ -1,0 +1,143 @@
+package cmdguard
+
+import (
+	"os"
+	"testing"
+
+	"github.com/spf13/cobra"
+)
+
+//nolint:paralleltest // uses t.Setenv
+func TestNew(t *testing.T) {
+	t.Run("creates GuardedCommand with defaults", func(t *testing.T) {
+		_ = os.Unsetenv("CMDGUARD_LOG_LEVEL")
+		_ = os.Unsetenv("CMDGUARD_STRICT_MODE")
+
+		g := New("testapp", "Test application")
+
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
+
+		if g.cmd == nil {
+			t.Error("expected non-nil cmd")
+		}
+
+		if g.cfg == nil {
+			t.Error("expected non-nil cfg")
+		}
+
+		if g.cmd.Use != "testapp" {
+			t.Errorf("cmd.Use = %q, want %q", g.cmd.Use, "testapp")
+		}
+
+		if g.cmd.Short != "Test application" {
+			t.Errorf("cmd.Short = %q, want %q", g.cmd.Short, "Test application")
+		}
+	})
+
+	t.Run("loads config from environment", func(t *testing.T) {
+		t.Setenv("CMDGUARD_LOG_LEVEL", "debug")
+		t.Setenv("CMDGUARD_STRICT_MODE", "true")
+
+		g := New("testapp", "Test")
+
+		if g == nil {
+			t.Fatal("expected non-nil GuardedCommand")
+		}
+
+		if g.cfg.LogLevel != "debug" {
+			t.Errorf("cfg.LogLevel = %q, want %q", g.cfg.LogLevel, "debug")
+		}
+
+		if !g.cfg.StrictMode {
+			t.Error("cfg.StrictMode = false, want true")
+		}
+
+		if !g.strictMode {
+			t.Error("strictMode = false, want true")
+		}
+	})
+}
+
+func TestGuardedCommand_Execute(t *testing.T) {
+	t.Parallel()
+	t.Run("executes command successfully", func(t *testing.T) {
+		t.Parallel()
+
+		g := New("testapp", "Test")
+		g.cmd.RunE = func(*cobra.Command, []string) error {
+			return nil
+		}
+
+		err := g.Execute(t.Context())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if !g.validated {
+			t.Error("validated = false, want true")
+		}
+	})
+}
+
+//nolint:paralleltest // uses t.Setenv
+func TestGuardedCommand_Accessors(t *testing.T) {
+	t.Run("Command returns underlying cobra command", func(t *testing.T) {
+		g := New("testapp", "Test")
+
+		cmd := g.Command()
+
+		if cmd == nil {
+			t.Fatal("expected non-nil command")
+		}
+
+		if cmd.Use != "testapp" {
+			t.Errorf("cmd.Use = %q, want %q", cmd.Use, "testapp")
+		}
+	})
+
+	t.Run("Config returns config", func(t *testing.T) {
+		g := New("testapp", "Test")
+
+		cfg := g.Config()
+
+		if cfg == nil {
+			t.Fatal("expected non-nil config")
+		}
+
+		if cfg.LogLevel != "info" {
+			t.Errorf("cfg.LogLevel = %q, want %q", cfg.LogLevel, "info")
+		}
+	})
+
+	t.Run("IsStrictMode returns correct value", func(t *testing.T) {
+		g := New("testapp", "Test")
+		if g.IsStrictMode() {
+			t.Error("IsStrictMode() = true, want false")
+		}
+
+		t.Setenv("CMDGUARD_STRICT_MODE", "true")
+
+		g2 := New("testapp2", "Test2")
+		if !g2.IsStrictMode() {
+			t.Error("IsStrictMode() = false, want true")
+		}
+	})
+}
+
+func TestVersion(t *testing.T) {
+	t.Parallel()
+	t.Run("returns version string", func(t *testing.T) {
+		t.Parallel()
+
+		v := Version()
+		if v == "" {
+			t.Error("version should not be empty")
+		}
+
+		if v != "dev" {
+			t.Errorf("Version() = %q, want %q", v, "dev")
+		}
+	})
+}

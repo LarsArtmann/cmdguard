@@ -1,0 +1,233 @@
+package logging
+
+import (
+	"bytes"
+	"encoding/json"
+	"log/slog"
+	"strings"
+	"testing"
+)
+
+func assertParseLevel(t *testing.T, input string, expected Level) {
+	t.Helper()
+	t.Run(input, func(t *testing.T) {
+		t.Parallel()
+
+		result := ParseLevel(input)
+		if result != expected {
+			t.Errorf("ParseLevel(%q) = %v, want %v", input, result, expected)
+		}
+	})
+}
+
+func assertParseFormat(t *testing.T, input string, expected Format) {
+	t.Helper()
+	t.Run(input, func(t *testing.T) {
+		t.Parallel()
+
+		result := ParseFormat(input)
+		if result != expected {
+			t.Errorf("ParseFormat(%q) = %v, want %v", input, result, expected)
+		}
+	})
+}
+
+func TestNewLogger_JSONOutputIsValid(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+
+	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	logger := slog.New(handler)
+
+	logger.Info("test message", "key", "value", "count", 42)
+
+	output := buf.String()
+
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	if len(lines) != 1 {
+		t.Fatalf("should produce exactly one JSON line, got %d lines", len(lines))
+	}
+
+	var parsed map[string]any
+
+	err := json.Unmarshal([]byte(lines[0]), &parsed)
+	if err != nil {
+		t.Fatalf("output should be valid JSON: %v", err)
+	}
+
+	if parsed["msg"] != "test message" {
+		t.Errorf("parsed[\"msg\"] = %v, want %q", parsed["msg"], "test message")
+	}
+
+	if parsed["key"] != "value" {
+		t.Errorf("parsed[\"key\"] = %v, want %q", parsed["key"], "value")
+	}
+
+	if parsed["count"] != float64(42) {
+		t.Errorf("parsed[\"count\"] = %v, want %v", parsed["count"], float64(42))
+	}
+
+	if _, ok := parsed["time"]; !ok {
+		t.Error("parsed output missing 'time' field")
+	}
+
+	if _, ok := parsed["level"]; !ok {
+		t.Error("parsed output missing 'level' field")
+	}
+}
+
+func TestNewLogger_TextOutputFormat(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+
+	handler := slog.NewTextHandler(&buf, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	})
+	logger := slog.New(handler)
+
+	logger.Info("test message", "key", "value")
+
+	output := buf.String()
+	if !strings.Contains(output, "test message") {
+		t.Error("output missing 'test message'")
+	}
+
+	if !strings.Contains(output, "key=value") {
+		t.Error("output missing 'key=value'")
+	}
+
+	if !strings.Contains(output, "level=INFO") {
+		t.Error("output missing 'level=INFO'")
+	}
+}
+
+func TestLevel_CaseSensitivity(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected Level
+	}{
+		{"debug", LevelDebug},
+		{"DEBUG", LevelInfo},
+		{"Debug", LevelInfo},
+		{"DEbUG", LevelInfo},
+		{"info", LevelInfo},
+		{"INFO", LevelInfo},
+		{"Info", LevelInfo},
+		{"warn", LevelWarn},
+		{"WARN", LevelInfo},
+		{"error", LevelError},
+		{"ERROR", LevelInfo},
+	}
+	for _, tt := range tests {
+		assertParseLevel(t, tt.input, tt.expected)
+	}
+}
+
+func TestFormat_CaseSensitivity(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected Format
+	}{
+		{"text", FormatText},
+		{"TEXT", FormatText},
+		{"Text", FormatText},
+		{"json", FormatJSON},
+		{"JSON", FormatText},
+		{"Json", FormatText},
+	}
+	for _, tt := range tests {
+		assertParseFormat(t, tt.input, tt.expected)
+	}
+}
+
+func TestLevel_WhitespaceHandling(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected Level
+	}{
+		{" debug", LevelInfo},
+		{"debug ", LevelInfo},
+		{" debug ", LevelInfo},
+		{"\tdebug", LevelInfo},
+		{"debug\n", LevelInfo},
+		{"", LevelInfo},
+		{"   ", LevelInfo},
+	}
+	for _, tt := range tests {
+		assertParseLevel(t, tt.input, tt.expected)
+	}
+}
+
+func TestValidLevel_EdgeCases(t *testing.T) {
+	t.Parallel()
+
+	if ValidLevel(" debug") {
+		t.Error("leading space should be invalid")
+	}
+
+	if ValidLevel("debug ") {
+		t.Error("trailing space should be invalid")
+	}
+
+	if ValidLevel("DEBUG") {
+		t.Error("uppercase should be invalid")
+	}
+
+	if ValidLevel("") {
+		t.Error("empty should be invalid")
+	}
+
+	if ValidLevel("   ") {
+		t.Error("whitespace only should be invalid")
+	}
+
+	if ValidLevel("debug\x00") {
+		t.Error("null byte should be invalid")
+	}
+
+	if ValidLevel("🎉") {
+		t.Error("emoji should be invalid")
+	}
+
+	if ValidLevel(strings.Repeat("a", 10000)) {
+		t.Error("very long string should be invalid")
+	}
+}
+
+func TestValidFormat_EdgeCases(t *testing.T) {
+	t.Parallel()
+
+	if ValidFormat(" json") {
+		t.Error("leading space should be invalid")
+	}
+
+	if ValidFormat("json ") {
+		t.Error("trailing space should be invalid")
+	}
+
+	if ValidFormat("JSON") {
+		t.Error("uppercase should be invalid")
+	}
+
+	if ValidFormat("") {
+		t.Error("empty should be invalid")
+	}
+
+	if ValidFormat("   ") {
+		t.Error("whitespace only should be invalid")
+	}
+
+	if ValidFormat(strings.Repeat("a", 10000)) {
+		t.Error("very long string should be invalid")
+	}
+}

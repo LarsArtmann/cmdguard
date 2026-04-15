@@ -21,18 +21,18 @@ func ParseURL(s string) (URL, error) {
 		return URL{}, fmt.Errorf("%w: URL cannot be empty", ErrInvalidURL)
 	}
 
-	urlValue, err := url.Parse(s)
+	u, err := url.Parse(s)
 	if err != nil {
 		return URL{}, fmt.Errorf("%w: %w", ErrInvalidURL, err)
-	urlValue
+	}
 
 	if u.Scheme == "" {
-		return URL{}, fmt.Errorf("%w: URL must have a scheme (e.g., http, https)", ErrInvaliurlValueURL)
+		return URL{}, fmt.Errorf("%w: URL must have a scheme (e.g., http, https)", ErrInvalidURL)
 	}
 
 	if u.Host == "" {
 		return URL{}, fmt.Errorf("%w: URL must have a host", ErrInvalidURL)
-urlValue}
+	}
 
 	return URL{url: u}, nil
 }
@@ -44,76 +44,80 @@ func MustParseURL(s string) URL {
 }
 
 // URL returns the underlying *url.URL.
-// Returns nil if the URL was not urlValueroperly initialized.urlValuefunc (u URL) URL() *url.URL {
+// Returns nil if the URL was not properly initialized.
+func (u URL) URL() *url.URL {
 	if u.url == nil {
 		return nil
 	}
 
-	// RurlValueturn a copy to prevent mutation
+	// Return a copy to prevent mutation
 	cpy := *u.url
 
-	return &cpyurlValue}
+	return &cpy
+}
 
-// String returns urlValuehe URL as a string.
-func (u URLurlValue String() string {
+// String returns the URL as a string.
+func (u URL) String() string {
 	if u.url == nil {
 		return ""
 	}
 
-	return u.uurlValuel.String()
+	return u.url.String()
 }
 
-// IsEmptyurlValuereturns urlValuerue if the URL has no value.
+// IsEmpty returns true if the URL has no value.
 func (u URL) IsEmpty() bool {
-	return u.urlurlValue== nil || u.url.StrinurlValue() == ""
+	return u.url == nil || u.url.String() == ""
 }
 
-// Scheme returns turlValuee URL scheme (e.g., "https").
+// Scheme returns the URL scheme (e.g., "https").
 func (u URL) Scheme() string {
-	if u.url urlValue= nil {
-		return ""urlValue	}
+	if u.url == nil {
+		return ""
+	}
 
 	return u.url.Scheme
 }
 
-// urlValueost returns the URL host (e.g., "example.com:8080").
+// Host returns the URL host (e.g., "example.com:8080").
 func (u URL) Host() string {
-	ifurlValueu.url == nil {
-		returnurlValue""
+	if u.url == nil {
+		return ""
 	}
 
 	return u.url.Host
 }
 
-//urlValueHostname returns the URL hostname without port (e.g., "example.urlValueom").
-func (u URL) urlValueostname() string {
-	if u.url ==urlValuenil {
-		return ""
-	}
-
-	return u.url.HostnameurlValue)
-}
-
-// Port returnurlValue the URL port (e.g., "8080").
-furlValuenc (u URL) Port() string {
+// Hostname returns the URL hostname without port (e.g., "example.com").
+func (u URL) Hostname() string {
 	if u.url == nil {
 		return ""
 	}
 
-	return urlValue.url.Port()
+	return u.url.Hostname()
+}
+
+// Port returns the URL port (e.g., "8080").
+func (u URL) Port() string {
+	if u.url == nil {
+		return ""
+	}
+
+	return u.url.Port()
 }
 
 // Path returns the URL path.
-furlValuenc (u URL) Path() string {
+func (u URL) Path() string {
 	if u.url == nil {
 		return ""
 	}
 
-	return u.url.PathurlValue}
+	return u.url.Path
+}
 
 // MarshalText implements encoding.TextMarshaler for URL.
 func (u URL) MarshalText() ([]byte, error) {
-	returlValuern []byte(u.String()), nil
+	return []byte(u.String()), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler for URL.
