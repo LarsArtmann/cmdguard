@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"errors"
 	"fmt"
 	"net/mail"
 	"net/url"
@@ -166,7 +165,7 @@ func validateMinLen(value string) error {
 	}
 
 	if len(val) < minLen {
-		return fmt.Errorf("value %q must be at least %d characters", val, minLen)
+		return fmt.Errorf("%w: %q must be at least %d characters", ErrValueTooShort, val, minLen)
 	}
 
 	return nil
@@ -184,7 +183,7 @@ func validateMaxLen(value string) error {
 	}
 
 	if len(val) > maxLen {
-		return fmt.Errorf("value %q must be at most %d characters", val, maxLen)
+		return fmt.Errorf("%w: %q must be at most %d characters", ErrValueTooLong, val, maxLen)
 	}
 
 	return nil
@@ -207,7 +206,7 @@ func validateMin(value string) error {
 	}
 
 	if actual < minVal {
-		return fmt.Errorf("value %v must be at least %v", actual, minVal)
+		return fmt.Errorf("%w: %v must be at least %v", ErrValueTooSmall, actual, minVal)
 	}
 
 	return nil
@@ -230,7 +229,7 @@ func validateMax(value string) error {
 	}
 
 	if actual > maxVal {
-		return fmt.Errorf("value %v must be at most %v", actual, maxVal)
+		return fmt.Errorf("%w: %v must be at most %v", ErrValueTooLarge, actual, maxVal)
 	}
 
 	return nil
@@ -248,7 +247,7 @@ func validateRegex(value string) error {
 	}
 
 	if !re.MatchString(val) {
-		return fmt.Errorf("value %q does not match pattern %q", val, pattern)
+		return fmt.Errorf("%w: %q does not match pattern %q", ErrValuePatternMismatch, val, pattern)
 	}
 
 	return nil
@@ -256,7 +255,7 @@ func validateRegex(value string) error {
 
 func validateNonEmpty(value string) error {
 	if value == "" {
-		return errors.New("value must not be empty")
+		return fmt.Errorf("%w: value must not be empty", ErrValueEmpty)
 	}
 
 	return nil
@@ -286,11 +285,25 @@ func formatFieldValue(field reflect.Value) string {
 		return strconv.FormatFloat(field.Float(), 'f', -1, 64)
 	case reflect.Bool:
 		return strconv.FormatBool(field.Bool())
-	default:
-		if field.CanInterface() {
-			return fmt.Sprintf("%v", field.Interface())
+	case reflect.Complex64, reflect.Complex128:
+		return fmt.Sprintf("%v", field.Complex())
+	case reflect.Array, reflect.Slice:
+		return fmt.Sprintf("%v", field.Interface())
+	case reflect.Map, reflect.Struct:
+		return fmt.Sprintf("%v", field.Interface())
+	case reflect.Ptr, reflect.Interface:
+		if field.Elem().IsValid() {
+			return formatFieldValue(field.Elem())
 		}
 
+		return ""
+	case reflect.Chan, reflect.Func:
+		return fmt.Sprintf("%v", field.Interface())
+	case reflect.Invalid:
+		return ""
+	case reflect.Uintptr, reflect.UnsafePointer:
+		return fmt.Sprintf("%v", field.Interface())
+	default:
 		return ""
 	}
 }

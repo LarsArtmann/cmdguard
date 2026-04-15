@@ -8,6 +8,7 @@ import (
 func TestCLI_Integration(t *testing.T) {
 	t.Parallel()
 	t.Run("complete CLI workflow", func(t *testing.T) {
+		t.Parallel()
 		type greetFlags struct {
 			Name  string `default:"World" flag:"name"  help:"Name to greet"      short:"n"`
 			Shout bool   `default:"false" flag:"shout" help:"Shout the greeting" short:"s"`

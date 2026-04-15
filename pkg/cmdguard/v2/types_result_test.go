@@ -149,7 +149,7 @@ func TestResult_UnwrapErr(t *testing.T) {
 			}
 		}()
 
-		Ok(42).UnwrapErr()
+		_ = Ok(42).UnwrapErr()
 	})
 }
 
@@ -208,7 +208,7 @@ func TestResult_ExpectErr(t *testing.T) {
 			}
 		}()
 
-		Ok(42).ExpectErr("should not be ok")
+		_ = Ok(42).ExpectErr("should not be ok")
 	})
 }
 

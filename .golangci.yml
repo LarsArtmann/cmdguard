@@ -318,6 +318,88 @@ linters:
       - path: internal/
         linters:
           - goconst
+      - path: pkg/cmdguard/v2/
+        linters:
+          - ireturn
+      - path: examples/
+        linters:
+          - gochecknoglobals
+          - varnamelen
+          - ireturn
+      - path: benchmarks/
+        linters:
+          - gochecknoglobals
+          - varnamelen
+          - ireturn
+      - path: tests/
+        linters:
+          - varnamelen
+          - ireturn
+      - path: internal/
+        linters:
+          - varnamelen
+          - ireturn
+      - path: pkg/errtypes/
+        linters:
+          - varnamelen
+      - path: pkg/testutil/
+        linters:
+          - varnamelen
+      - path: pkg/cmdguard/
+        linters:
+          - varnamelen
+      - path: pkg/cmdguard/v2/flags_validate.go
+        linters:
+          - nilerr
+          - err113
+      - path: _test\.go$
+        linters:
+          - godoclint
+          - noinlineerr
+          - tagalign
+          - gochecknoglobals
+      - path: pkg/cmdguard/v2/
+        linters:
+          - noinlineerr
+          - tagalign
+      - path: pkg/cmdguard/v2/cli_command.go
+        linters:
+          - gochecknoglobals
+      - path: pkg/cmdguard/v2/flags_validate.go
+        linters:
+          - gochecknoglobals
+      - path: pkg/cmdguard/
+        linters:
+          - nlreturn
+          - noinlineerr
+      - path: _test\.go$
+        linters:
+          - wsl_v5
+      - path: pkg/
+        linters:
+          - testpackage
+      - path: tests/
+        linters:
+          - testpackage
+          - thelper
+          - godoclint
+      - path: benchmarks/
+        linters:
+          - testpackage
+          - thelper
+      - path: internal/
+        linters:
+          - testpackage
+          - thelper
+      - path: pkg/testutil/
+        linters:
+          - thelper
+      - path: examples/
+        linters:
+          - tagalign
+          - noinlineerr
+          - godoclint
+          - golines
 formatters:
   enable:
     - gci

@@ -108,8 +108,11 @@ func parseBoolDefault(s string) (bool, error) {
 	}
 
 	v, err := strconv.ParseBool(s)
+	if err != nil {
+		return false, fmt.Errorf("failed to parse bool %q: %w", s, err)
+	}
 
-	return v, err
+	return v, nil
 }
 
 // parseIntDefault parses an integer default value.
@@ -118,7 +121,12 @@ func parseIntDefault(s string) (int64, error) {
 		return 0, nil
 	}
 
-	return strconv.ParseInt(s, 10, 64)
+	v, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse int %q: %w", s, err)
+	}
+
+	return v, nil
 }
 
 // parseUintDefault parses an unsigned integer default value.
@@ -127,7 +135,12 @@ func parseUintDefault(s string) (uint64, error) {
 		return 0, nil
 	}
 
-	return strconv.ParseUint(s, 10, 64)
+	v, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse uint %q: %w", s, err)
+	}
+
+	return v, nil
 }
 
 // parseFloat64Default parses a float64 default value.
@@ -136,7 +149,12 @@ func parseFloat64Default(s string) (float64, error) {
 		return 0, nil
 	}
 
-	return strconv.ParseFloat(s, 64)
+	v, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse float %q: %w", s, err)
+	}
+
+	return v, nil
 }
 
 // parseCustomDefault handles custom type defaults.

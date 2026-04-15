@@ -32,10 +32,10 @@ type CommandInfo struct {
 // buildChain builds a single handler from a slice of middleware.
 // Middleware are applied in order: first middleware wraps the second, etc.
 func buildChain[T any](
-	middlewares []Middleware[T],
 	ctx context.Context,
 	cfg *T,
 	info CommandInfo,
+	middlewares []Middleware[T],
 	final func() error,
 ) func() error {
 	for i := len(middlewares) - 1; i >= 0; i-- {
@@ -68,7 +68,7 @@ func RecoveryMiddleware[T any]() Middleware[T] {
 	return func(_ context.Context, _ *T, info CommandInfo, next func() error) (err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				err = fmt.Errorf("panic in command %q: %v", info.Name, r)
+				err = fmt.Errorf("%w: panic in command %q: %v", ErrCommandPanic, info.Name, r)
 			}
 		}()
 

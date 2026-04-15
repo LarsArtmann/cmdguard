@@ -104,6 +104,27 @@ var (
 
 	// ErrLogFormat indicates an invalid log format value.
 	ErrLogFormat = errors.New("invalid log format")
+
+	// ErrValueTooShort indicates a string value is shorter than required.
+	ErrValueTooShort = errors.New("value too short")
+
+	// ErrValueTooLong indicates a string value is longer than allowed.
+	ErrValueTooLong = errors.New("value too long")
+
+	// ErrValueTooSmall indicates a numeric value is smaller than minimum.
+	ErrValueTooSmall = errors.New("value too small")
+
+	// ErrValueTooLarge indicates a numeric value is larger than maximum.
+	ErrValueTooLarge = errors.New("value too large")
+
+	// ErrValuePatternMismatch indicates a value does not match the required pattern.
+	ErrValuePatternMismatch = errors.New("value does not match pattern")
+
+	// ErrValueEmpty indicates a value is empty but is required to be non-empty.
+	ErrValueEmpty = errors.New("value is empty")
+
+	// ErrCommandPanic indicates a command handler panicked during execution.
+	ErrCommandPanic = errors.New("command panicked")
 )
 
 // CommandError wraps an error with command context.

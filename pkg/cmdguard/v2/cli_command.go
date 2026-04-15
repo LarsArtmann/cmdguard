@@ -142,14 +142,6 @@ func initCommandFlags[F any](
 	return registry, nil
 }
 
-func wireHandler[T, F any](
-	target *func(*cobra.Command, []string) error,
-	handler func(context.Context, *T, F) error,
-	config *T, flags F, registry *FlagRegistry, phase string,
-) {
-	wireHandlerWithMiddleware(target, handler, config, flags, registry, phase, CommandInfo{}, nil)
-}
-
 func wireHandlerWithMiddleware[T, F any](
 	target *func(*cobra.Command, []string) error,
 	handler func(context.Context, *T, F) error,
@@ -173,7 +165,7 @@ func wireHandlerWithMiddleware[T, F any](
 			return h(ctx, config, parsed)
 		}
 
-		chain := buildChain(middlewares, ctx, config, info, func() error {
+		chain := buildChain(ctx, config, info, middlewares, func() error {
 			return h(ctx, config, parsed)
 		})
 

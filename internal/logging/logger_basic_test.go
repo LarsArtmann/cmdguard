@@ -2,6 +2,7 @@ package logging
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"log/slog"
 	"strings"
@@ -316,7 +317,7 @@ func TestNewLogger_DelegatesToNewLoggerWriter(t *testing.T) {
 		t.Error("NewLogger returned nil")
 	}
 
-	if logger.Enabled(nil, slog.LevelDebug) == false {
+	if logger.Enabled(context.Background(), slog.LevelDebug) == false {
 		t.Error("expected debug level to be enabled")
 	}
 }

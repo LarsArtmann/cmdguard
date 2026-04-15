@@ -339,8 +339,9 @@ func TestChainMiddleware(t *testing.T) {
 		}
 	}
 
-	chain := buildChain([]Middleware[testConfig]{mw("a"), mw("b"), mw("c")},
+	chain := buildChain(
 		context.Background(), &testConfig{}, CommandInfo{Name: "test"},
+		[]Middleware[testConfig]{mw("a"), mw("b"), mw("c")},
 		func() error {
 			order = append(order, "handler")
 
@@ -379,10 +380,10 @@ func TestChainMiddleware_Empty(t *testing.T) {
 	called := false
 
 	chain := buildChain(
-		[]Middleware[testConfig]{},
 		context.Background(),
 		&testConfig{},
 		CommandInfo{},
+		[]Middleware[testConfig]{},
 		func() error {
 			called = true
 

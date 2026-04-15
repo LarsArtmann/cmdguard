@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"strings"
@@ -103,7 +104,9 @@ func TestValidateFlags(t *testing.T) {
 func TestValidationExample_CLI(t *testing.T) {
 	//nolint:paralleltest
 	t.Run("greet with empty name fails", func(t *testing.T) {
-		cmd := exec.Command("go", "run", ".", "greet", "--name=", "--count=1")
+		cmd := exec.CommandContext(
+			context.Background(), "go", "run", ".", "greet", "--name=", "--count=1",
+		)
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() == 0 {
@@ -117,7 +120,7 @@ func TestValidationExample_CLI(t *testing.T) {
 
 	//nolint:paralleltest
 	t.Run("greet with valid args succeeds", func(t *testing.T) {
-		cmd := exec.Command("go", "run", ".", "greet", "--name=Alice", "--count=1")
+		cmd := exec.CommandContext(context.Background(), "go", "run", ".", "greet", "--name=Alice", "--count=1")
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() != 0 {
@@ -131,7 +134,7 @@ func TestValidationExample_CLI(t *testing.T) {
 
 	//nolint:paralleltest
 	t.Run("process without input fails", func(t *testing.T) {
-		cmd := exec.Command("go", "run", ".", "process", "--workers=1")
+		cmd := exec.CommandContext(context.Background(), "go", "run", ".", "process", "--workers=1")
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() == 0 {

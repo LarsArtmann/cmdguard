@@ -69,7 +69,7 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 	root := NewBranchingFlowContext(context.Background())
 
 	child, cancel := root.Branch("child")
-	defer cancel()
+	t.Cleanup(cancel)
 
 	root.SetValue("inherited", "from-root")
 	child.SetValueLocal("local", "child-only")
@@ -81,7 +81,7 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 	}{
 		{
 			name: "inherited value",
-			getter: func() (v any, ok bool) {
+			getter: func() (any, bool) {
 				return child.GetValue("inherited")
 			},
 			expected: "from-root",

@@ -1,4 +1,3 @@
-// Package config provides configuration management for cmdguard.
 package config
 
 import (

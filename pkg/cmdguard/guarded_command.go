@@ -242,10 +242,11 @@ func (g *GuardedCommand) addDefaultCommands() {
 				return fmt.Errorf("validation failed: %w", err)
 			}
 
-			if _, err := fmt.Fprintln(
+			_, err = fmt.Fprintln(
 				cmd.OutOrStdout(),
 				"✓ All commands validated successfully",
-			); err != nil {
+			)
+			if err != nil {
 				return fmt.Errorf("failed to write output: %w", err)
 			}
 

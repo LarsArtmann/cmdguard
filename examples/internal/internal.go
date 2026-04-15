@@ -10,7 +10,7 @@ import (
 // CLIExecutor is an interface for CLI types that can be executed.
 // This allows examples to share the execute function.
 type CLIExecutor interface {
-	Execute(context.Context) error
+	Execute(ctx context.Context) error
 }
 
 // Fatalf prints the formatted error to stderr and exits with code 1.
