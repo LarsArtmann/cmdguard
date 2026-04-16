@@ -165,7 +165,7 @@ func wireHandlerWithMiddleware[T, F any](
 			return h(ctx, config, parsed)
 		}
 
-		chain := buildChain(ctx, config, info, middlewares, func() error {
+		chain := buildChain[T](ctx, config, info, middlewares, func() error {
 			return h(ctx, config, parsed)
 		})
 
