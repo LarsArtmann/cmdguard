@@ -28,7 +28,7 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 		Short: "Start the server",
 		Long:  "Start the server",
 		Group: "core",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -37,7 +37,7 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 		Short: "Run migrations",
 		Long:  "Run migrations",
 		Group: "core",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -46,7 +46,7 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 		Short: "Print version",
 		Long:  "Print version",
 		Group: "utils",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -99,7 +99,7 @@ func TestCommandGroups_NoGroup(t *testing.T) {
 		Short: "No group assigned",
 		Long:  "No group assigned",
 		Group: "",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -199,21 +199,21 @@ func TestWithGroup_RegistersMultipleGroups(t *testing.T) {
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
 		Use: "a", Short: "A", Long: "A",
 		Group: "alpha",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
 		Use: "b", Short: "B", Long: "B",
 		Group: "beta",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
 		Use: "c", Short: "C", Long: "C",
 		Group: "gamma",
-		RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 

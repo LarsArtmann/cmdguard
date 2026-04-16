@@ -92,16 +92,16 @@ func registerAndParseFlags(
 	}
 }
 
+func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
+	return nil
+}
+
 func noOpHandler() func(context.Context, *testConfig, NoFlags) error {
-	return func(_ context.Context, _ *testConfig, _ NoFlags) error {
-		return nil
-	}
+	return noOpRunE[testConfig, NoFlags]
 }
 
 func noOpHandlerForTestAppConfig() func(context.Context, *testAppConfig, NoFlags) error {
-	return func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-		return nil
-	}
+	return noOpRunE[testAppConfig, NoFlags]
 }
 
 // makeHookRunE creates a RunE function that records execution order.

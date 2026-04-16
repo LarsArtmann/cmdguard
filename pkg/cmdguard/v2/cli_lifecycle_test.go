@@ -7,12 +7,6 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
-func noOpRunEForTestCLIConfigWithFlags[F any]() func(context.Context, *testCLIConfig, F) error {
-	return func(_ context.Context, _ *testCLIConfig, _ F) error {
-		return nil
-	}
-}
-
 func TestCLISetLong(t *testing.T) {
 	t.Parallel()
 	t.Run("updates long description", func(t *testing.T) {
@@ -162,7 +156,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 
 				return nil
 			},
-			RunE: noOpRunEForTestCLIConfigWithFlags[testFlags](),
+			RunE: NoOpRunEWithFlags[testCLIConfig, testFlags](),
 		}
 
 		err = v2.AddCommand(cli, cmd)
@@ -200,7 +194,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 		cmd := v2.Command[testCLIConfig, testFlags]{
 			Use:   "test",
 			Flags: testFlags{},
-			RunE:  noOpRunEForTestCLIConfigWithFlags[testFlags](),
+			RunE:  NoOpRunEWithFlags[testCLIConfig, testFlags](),
 			PostRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedValue = f.Value
 

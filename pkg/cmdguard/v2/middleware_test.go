@@ -163,9 +163,7 @@ func TestMiddleware_CommandInfo(t *testing.T) {
 		Use:   "mycommand",
 		Short: "My command",
 		Long:  "My command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		},
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -202,9 +200,7 @@ func TestTimingMiddleware(t *testing.T) {
 		Use:   "timed",
 		Short: "Timed command",
 		Long:  "Timed command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		},
+		RunE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -306,7 +302,7 @@ func TestMiddleware_Subcommands(t *testing.T) {
 			{
 				Use:   "child",
 				Short: "Child",
-				RunE:  func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+				RunE:  noOpRunE[testConfig, NoFlags],
 			},
 		},
 	})
