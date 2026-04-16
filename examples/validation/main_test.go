@@ -120,7 +120,15 @@ func TestValidationExample_CLI(t *testing.T) {
 
 	//nolint:paralleltest
 	t.Run("greet with valid args succeeds", func(t *testing.T) {
-		cmd := exec.CommandContext(context.Background(), "go", "run", ".", "greet", "--name=Alice", "--count=1")
+		cmd := exec.CommandContext(
+			context.Background(),
+			"go",
+			"run",
+			".",
+			"greet",
+			"--name=Alice",
+			"--count=1",
+		)
 		out, _ := cmd.CombinedOutput()
 
 		if cmd.ProcessState.ExitCode() != 0 {
