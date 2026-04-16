@@ -49,8 +49,8 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 	}
 
 	return Command[testAppConfig, NoFlags]{
-		Use: use,
-		RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+		use: use,
+		runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			return runErr
 		},
 	}
@@ -146,4 +146,26 @@ func mustProvideValue[T any](t *testing.T, scope *Scope, value T) {
 	if err := ProvideValue(scope, value); err != nil {
 		t.Fatalf("expected no error providing value, got: %v", err)
 	}
+}
+
+func mustInvoke[T any](t *testing.T, scope *Scope) T {
+	t.Helper()
+
+	value, err := Invoke[T](scope)
+	if err != nil {
+		t.Fatalf("expected no error invoking value, got: %v", err)
+	}
+
+	return value
+}
+
+func mustInvokeNamed[T any](t *testing.T, scope *Scope, name string) T {
+	t.Helper()
+
+	value, err := InvokeNamed[T](scope, name)
+	if err != nil {
+		t.Fatalf("expected no error invoking named value %q, got: %v", name, err)
+	}
+
+	return value
 }

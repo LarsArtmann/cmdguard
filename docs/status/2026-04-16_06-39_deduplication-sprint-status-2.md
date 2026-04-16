@@ -15,6 +15,7 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 ## a) FULLY DONE
 
 ### Session 1 (committed in `bc0683c`):
+
 1. **Added `noOpRunE[T, F]` generic** to `test_helpers_test.go` (package `v2`)
 2. **Refactored `noOpHandler()` and `noOpHandlerForTestAppConfig()`** to delegate to `noOpRunE`
 3. **Replaced 7 inline no-op lambdas** in `cli_groups_test.go`
@@ -22,6 +23,7 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 5. **Deleted `noOpRunEForTestCLIConfigWithFlags`** from `cli_lifecycle_test.go`, replaced with `NoOpRunEWithFlags`
 
 ### Session 2 (uncommitted — in working tree):
+
 6. **Fixed broken `cli_lifecycle_test.go:197`** — replaced orphaned reference to deleted function
 7. **Added `mustProvideValue[T any](t, scope, value)` helper** to `test_helpers_test.go`
 8. **Replaced 15 `ProvideValue` + error-check boilerplates** across 5 files:
@@ -32,6 +34,7 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
    - `scope_provide_named_test.go`: 1 instance (-4 lines)
 
 ### Other commits:
+
 - `8551c97`: Added explicit type param `buildChain[T]` in `cli_command.go`
 - `aaa6bf1`: Status report doc
 - `d908bb6`: Formatting fix in validation example test
@@ -56,20 +59,23 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 ## c) NOT STARTED
 
 ### High-impact, not started:
+
 1. **Remaining noOpRunE replacements** in v2 test files (11 instances)
 2. **NoOpRunE replacements** in `v2_test` package test files (cli_lifecycle, cli_cobra_command, etc.)
 3. **Scope constructor pattern** — `if child == nil { t.Fatal(...) }` repeated 7x across scope/flow tests
 4. **Flow context value assertion pattern** — 3-line blocks repeated 10x
 5. **Config/option assertion pattern** — `if err != nil { t.Fatalf("expected no error, got: %v", err) }` repeated 8x
-6. **NewCLI assertion pattern** — repeated 18x across cli_core_new, duration, types_* tests
+6. **NewCLI assertion pattern** — repeated 18x across cli*core_new, duration, types*\* tests
 
 ### Medium-impact, not started:
+
 7. **Type MarshalText/UnmarshalText test pattern** — shared `runUnmarshalErrorTest`-like helper across 7 type test files
 8. **Flag error assertion pattern** — 7 instances in cli_cobra_command_test, cli_flags_test, command_validate_test
 9. **`assertNotPanic` in scope_integration_test.go** — duplicates `testutil.AssertPanics` (inverted)
 10. **Examples code** — 23 clone instances in examples/ (lower priority)
 
 ### Low-impact, not started:
+
 11. **Production code clones** — `command.go` has 6 instances of similar option-application patterns (risky to change)
 12. **`pkg/testutil/panic_test_helpers.go`** — 308-line file with internal duplication
 13. **`cli.go` and `flags.go`** — 6 instances of similar error-wrapping patterns
@@ -91,12 +97,14 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 ## e) WHAT WE SHOULD IMPROVE
 
 ### Critical Process Issues:
+
 1. **Run `go vet` synchronously with `GOCACHE=$(mktemp -d)`** — accept the 2-3 min wait, don't background it
 2. **Commit after every verified change** — we're still sitting on uncommitted scope test changes
 3. **Push after every commit** — 4 local-only commits is dangerous
 4. **Fix the Go cache** — `go clean -cache` didn't help. May need to `rm -rf ~/Library/Caches/go-build` entirely
 
 ### Code Improvements:
+
 5. **Use `testutil.AssertNoError` more consistently** — some files use manual `if err != nil { t.Fatalf(...) }` while others use `testutil.AssertNoError`
 6. **Document the two test helper files** — `test_helpers_test.go` (v2) vs `testhelpers_test.go` (v2_test) distinction should be clearer
 7. **Consider adding `mustInvoke[T]` helper** — mirrors `mustProvideValue` for the Invoke + error check pattern
@@ -106,6 +114,7 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 ## f) Top 25 Things to Do Next
 
 ### IMMEDIATE (do right now):
+
 1. ✅ `git add` and commit the `mustProvideValue` + scope test changes
 2. Run `GOCACHE=$(mktemp -d) go vet ./pkg/cmdguard/v2/...` **synchronously** — wait for it
 3. Run `GOCACHE=$(mktemp -d) go test ./pkg/cmdguard/v2/... -count=1 -timeout 180s` **synchronously**
@@ -113,6 +122,7 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 5. `git push origin master`
 
 ### HIGH IMPACT, LOW EFFORT:
+
 6. Replace remaining noOpRunE in `middleware_test.go` (5 instances: lines 50, 91, 126, 232, 262)
 7. Replace in `cli_cobra_command_test.go` (2 instances: lines 20, 63)
 8. Replace in `cli_exec_test.go` (1 instance: line 45)
@@ -121,17 +131,20 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 11. Commit + test + push
 
 ### MEDIUM IMPACT, MEDIUM EFFORT:
+
 12. Add `mustInvoke[T any](t, scope) T` helper for Invoke + error check pattern
 13. Add `assertNotNil(t, got, name)` helper for the `if x == nil { t.Fatal(...) }` pattern (7 instances)
-14. Replace flow context value assertion pattern (10 instances across flow_context_*.go, option_test.go)
-15. Replace config/option assertion pattern (8 instances across config_*.go, option_test.go)
+14. Replace flow context value assertion pattern (10 instances across flow*context*\*.go, option_test.go)
+15. Replace config/option assertion pattern (8 instances across config\_\*.go, option_test.go)
 
 ### MEDIUM IMPACT, HIGHER EFFORT:
+
 16. Add `testMarshalRoundtrip[T any](t, jsonStr, expected)` helper for type tests
 17. Unify `runUnmarshalErrorTest`-like patterns across duration, enum, port, hostport, email, url, filepath tests
-18. Replace flag error assertion pattern (7 instances in cli_*_test.go)
+18. Replace flag error assertion pattern (7 instances in cli\_\*\_test.go)
 
 ### LOWER PRIORITY:
+
 19. Clean up `pkg/testutil/panic_test_helpers.go` internal duplication
 20. Consider shared helpers for NewCLI + assertion pattern (18 instances)
 21. Re-run `art-dupl` to measure total improvement
@@ -150,14 +163,14 @@ Two sessions of deduplication work. Session 1 left code **broken** (undefined fu
 
 ## Metrics
 
-| Metric | Start | After Session 1 | After Session 2 (uncommitted) |
-|--------|-------|-----------------|-------------------------------|
-| Clone groups | 86 | 86 | ~78 (estimated, not yet verified) |
-| Inline no-op lambdas replaced | 0 | 11 | 11 |
-| ProvideValue boilerplates replaced | 0 | 0 | 15 |
-| Lines removed | 0 | -10 | -49 total |
-| Tests passing | unknown | BROKEN | NOT VERIFIED |
-| Commits pushed | — | 0 | 0 |
+| Metric                             | Start   | After Session 1 | After Session 2 (uncommitted)     |
+| ---------------------------------- | ------- | --------------- | --------------------------------- |
+| Clone groups                       | 86      | 86              | ~78 (estimated, not yet verified) |
+| Inline no-op lambdas replaced      | 0       | 11              | 11                                |
+| ProvideValue boilerplates replaced | 0       | 0               | 15                                |
+| Lines removed                      | 0       | -10             | -49 total                         |
+| Tests passing                      | unknown | BROKEN          | NOT VERIFIED                      |
+| Commits pushed                     | —       | 0               | 0                                 |
 
 ## Git Log
 

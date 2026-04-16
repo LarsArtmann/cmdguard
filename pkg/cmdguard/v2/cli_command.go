@@ -49,57 +49,57 @@ func cliToCobraCommand[T, F any](
 	config *T, cmd Command[T, F], middlewares []Middleware[T],
 ) (*cobra.Command, error) {
 	cobraCmd := &cobra.Command{
-		Use:           cmd.Use,
-		Short:         cmd.Short,
-		Long:          cmd.Long,
-		Example:       cmd.Example,
-		Aliases:       cmd.Aliases,
-		Hidden:        cmd.Hidden,
-		Deprecated:    cmd.Deprecated,
-		Version:       cmd.Version,
-		SilenceErrors: cmd.SilenceErrors,
-		SilenceUsage:  cmd.SilenceUsage,
+		Use:           cmd.use,
+		Short:         cmd.short,
+		Long:          cmd.long,
+		Example:       cmd.example,
+		Aliases:       cmd.aliases,
+		Hidden:        cmd.hidden,
+		Deprecated:    cmd.deprecated,
+		Version:       cmd.version,
+		SilenceErrors: cmd.silenceErrors,
+		SilenceUsage:  cmd.silenceUsage,
 	}
 
-	if cmd.Group != "" {
-		cobraCmd.GroupID = cmd.Group
+	if cmd.group != "" {
+		cobraCmd.GroupID = cmd.group
 	}
 
-	flagRegistry, err := initCommandFlags(cobraCmd, cmd.Use, cmd.Flags)
+	flagRegistry, err := initCommandFlags(cobraCmd, cmd.use, cmd.flags)
 	if err != nil {
 		return nil, err
 	}
 
 	info := CommandInfo{
-		Name:    cmd.Use,
-		HasRunE: cmd.RunE != nil,
+		Name:    cmd.use,
+		HasRunE: cmd.runE != nil,
 	}
 
 	wireHandlerWithMiddleware(
-		&cobraCmd.RunE, cmd.RunE, config, cmd.Flags, flagRegistry,
-		"command "+cmd.Use, info, middlewares,
+		&cobraCmd.RunE, cmd.runE, config, cmd.flags, flagRegistry,
+		"command "+cmd.use, info, middlewares,
 	)
 
 	preInfo := info
 	preInfo.Phase = "pre-run"
 
 	wireHandlerWithMiddleware(
-		&cobraCmd.PreRunE, cmd.PreRunE, config, cmd.Flags, flagRegistry,
-		"pre-run of command "+cmd.Use, preInfo, middlewares,
+		&cobraCmd.PreRunE, cmd.preRunE, config, cmd.flags, flagRegistry,
+		"pre-run of command "+cmd.use, preInfo, middlewares,
 	)
 
 	postInfo := info
 	postInfo.Phase = "post-run"
 
 	wireHandlerWithMiddleware(
-		&cobraCmd.PostRunE, cmd.PostRunE, config, cmd.Flags, flagRegistry,
-		"post-run of command "+cmd.Use, postInfo, middlewares,
+		&cobraCmd.PostRunE, cmd.postRunE, config, cmd.flags, flagRegistry,
+		"post-run of command "+cmd.use, postInfo, middlewares,
 	)
 
-	for _, subCmd := range cmd.Commands {
+	for _, subCmd := range cmd.commands {
 		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares)
 		if err != nil {
-			return nil, fmt.Errorf("subcommand of %q: %w", cmd.Use, err)
+			return nil, fmt.Errorf("subcommand of %q: %w", cmd.use, err)
 		}
 
 		cobraCmd.AddCommand(subCobraCmd)

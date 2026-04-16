@@ -20,8 +20,7 @@ func TestProvide(t *testing.T) {
 		})
 		testutil.AssertNoError(t, err)
 
-		value, err := Invoke[string](scope)
-		testutil.AssertNoError(t, err)
+		value := mustInvoke[string](t, scope)
 
 		testutil.AssertFieldEqString(t, value, "test-value", "value")
 	})
@@ -59,8 +58,7 @@ func TestProvide(t *testing.T) {
 		})
 		testutil.AssertNoError(t, err)
 
-		value, err := Invoke[Service](scope)
-		testutil.AssertNoError(t, err)
+		value := mustInvoke[Service](t, scope)
 
 		testutil.AssertFieldEqString(t, string(value), "dependency-enhanced", "value")
 	})
@@ -76,8 +74,7 @@ func TestProvideValue(t *testing.T) {
 		err := ProvideValue(scope, 42)
 		testutil.AssertNoError(t, err)
 
-		value, err := Invoke[int](scope)
-		testutil.AssertNoError(t, err)
+		value := mustInvoke[int](t, scope)
 
 		testutil.AssertFieldEq(t, value, 42, "value")
 	})
@@ -106,8 +103,7 @@ func TestProvideValue(t *testing.T) {
 		cfg := Config{Name: "app", Port: 8080}
 		mustProvideValue(t, scope, cfg)
 
-		value, err := Invoke[Config](scope)
-		testutil.AssertNoError(t, err)
+		value := mustInvoke[Config](t, scope)
 
 		testutil.AssertFieldEqString(t, value.Name, "app", "Name")
 		testutil.AssertFieldEq(t, value.Port, 8080, "Port")
@@ -122,8 +118,7 @@ func TestInvoke(t *testing.T) {
 		scope := NewScope("test")
 		mustProvideValue(t, scope, "hello")
 
-		value, err := Invoke[string](scope)
-		testutil.AssertNoError(t, err)
+		value := mustInvoke[string](t, scope)
 
 		testutil.AssertFieldEqString(t, value, "hello", "value")
 	})

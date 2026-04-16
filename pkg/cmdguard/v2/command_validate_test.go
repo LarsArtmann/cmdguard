@@ -12,15 +12,15 @@ type testConfig struct {
 
 func newTestCommand() Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		Use:  "test",
-		RunE: noOpHandler(),
+		use:  "test",
+		runE: noOpHandler(),
 	}
 }
 
 func newTestSubcommand(use string) Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		Use:  use,
-		RunE: noOpHandler(),
+		use:  use,
+		runE: noOpHandler(),
 	}
 }
 
@@ -41,9 +41,9 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use:  "root",
-			Long: "Root command with subcommands",
-			Commands: []Command[testConfig, NoFlags]{
+			use:  "root",
+			long: "Root command with subcommands",
+			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("sub"),
 			},
 		}
@@ -58,7 +58,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			RunE: noOpHandler(),
+			runE: noOpHandler(),
 		}
 
 		err := cmd.Validate()
@@ -77,7 +77,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "test",
+			use: "test",
 		}
 
 		err := cmd.Validate()
@@ -96,11 +96,11 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use:  "root",
-			Long: "Root command",
-			Commands: []Command[testConfig, NoFlags]{
+			use:  "root",
+			long: "Root command",
+			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("valid-sub"),
-				{Use: "invalid-sub"},
+				{use: "invalid-sub"},
 			},
 		}
 
@@ -116,9 +116,9 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use:  "root",
-			Long: "Root command",
-			Commands: []Command[testConfig, NoFlags]{
+			use:  "root",
+			long: "Root command",
+			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("duplicate"),
 				newTestSubcommand("duplicate"),
 			},
@@ -140,8 +140,8 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "parent",
-			Commands: []Command[testConfig, NoFlags]{
+			use: "parent",
+			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("child"),
 			},
 		}
@@ -170,9 +170,9 @@ func TestCommand_Validate(t *testing.T) {
 		}
 
 		cmd := Command[testConfig, *flags]{
-			Use:   "test",
-			Flags: &flags{},
-			RunE:  noOpRunE,
+			use:   "test",
+			flags: &flags{},
+			runE:  noOpRunE,
 		}
 
 		err := cmd.Validate()
@@ -188,11 +188,11 @@ func TestCommand_HasSubcommands(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use:  "root",
-			Long: "Root command",
-			Commands: []Command[testConfig, NoFlags]{
-				{Use: "sub1"},
-				{Use: "sub2"},
+			use:  "root",
+			long: "Root command",
+			commands: []Command[testConfig, NoFlags]{
+				{use: "sub1", runE: noOpHandler()},
+				{use: "sub2", runE: noOpHandler()},
 			},
 		}
 
@@ -226,7 +226,7 @@ func TestCommand_HasHandler(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "test",
+			use: "test",
 		}
 		if cmd.HasHandler() {
 			t.Error("HasHandler() = true, want false")
@@ -249,7 +249,7 @@ func TestCommand_IsExecutable(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			Use: "test",
+			use: "test",
 		}
 		if cmd.IsExecutable() {
 			t.Error("IsExecutable() = true, want false")

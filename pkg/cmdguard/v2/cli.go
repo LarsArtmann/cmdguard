@@ -101,25 +101,44 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 // AddCommand adds a subcommand to the CLI with any flags type.
 func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
-	if cli.registeredCmds[cmd.Use] {
-		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.Use)
+	if cli.registeredCmds[cmd.use] {
+		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.use)
 	}
 
 	err := cmd.Validate()
 	if err != nil {
-		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.Use, cli.name, err)
+		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.use, cli.name, err)
 	}
 
-	cli.registeredCmds[cmd.Use] = true
+	cli.registeredCmds[cmd.use] = true
 
 	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware)
 	if err != nil {
-		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.Use, cli.name, err)
+		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.use, cli.name, err)
 	}
 
 	cli.rootCmd.AddCommand(cobraCmd)
 
 	return nil
+}
+
+// MustAddCommand adds a subcommand to the CLI or panics.
+// Use this when the command configuration is known at compile time.
+func MustAddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) {
+	err := AddCommand(cli, cmd)
+	if err != nil {
+		panic(fmt.Sprintf("MustAddCommand(%q): %v", cmd.use, err))
+	}
+}
+
+// MustNewCLI creates a new CLI application or panics.
+func MustNewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) *CLI[T] {
+	cli, err := NewCLI(name, short, defaults, opts...)
+	if err != nil {
+		panic(fmt.Sprintf("MustNewCLI(%q): %v", name, err))
+	}
+
+	return cli
 }
 
 // Execute runs the CLI application.

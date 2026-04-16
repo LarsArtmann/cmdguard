@@ -30,10 +30,7 @@ func TestProvideNamed(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		value, err := InvokeNamed[string](scope, "cache-memory")
-		if err != nil {
-			t.Fatalf("expected no error invoking named, got: %v", err)
-		}
+		value := mustInvokeNamed[string](t, scope, "cache-memory")
 
 		if value != "memory-cache" {
 			t.Errorf("expected value 'memory-cache', got %q", value)
@@ -66,15 +63,9 @@ func TestProvideNamed(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		val1, err := InvokeNamed[string](scope, "impl1")
-		if err != nil {
-			t.Fatalf("expected no error invoking impl1, got: %v", err)
-		}
+		val1 := mustInvokeNamed[string](t, scope, "impl1")
 
-		val2, err := InvokeNamed[string](scope, "impl2")
-		if err != nil {
-			t.Fatalf("expected no error invoking impl2, got: %v", err)
-		}
+		val2 := mustInvokeNamed[string](t, scope, "impl2")
 
 		if val1 != "implementation-1" {
 			t.Errorf("expected 'implementation-1', got %q", val1)
@@ -97,10 +88,7 @@ func TestInvokeNamed(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		value, err := InvokeNamed[int](scope, "my-service")
-		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
-		}
+		value := mustInvokeNamed[int](t, scope, "my-service")
 
 		if value != 42 {
 			t.Errorf("expected value 42, got %d", value)
