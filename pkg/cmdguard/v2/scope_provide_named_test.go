@@ -130,10 +130,7 @@ func TestMustInvoke(t *testing.T) {
 
 		scope := NewScope("test")
 
-		err := ProvideValue(scope, "hello")
-		if err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, "hello")
 
 		value := MustInvoke[string](scope)
 		if value != "hello" {

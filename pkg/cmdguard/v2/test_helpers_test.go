@@ -139,3 +139,11 @@ func addCommand[T, F any](t *testing.T, cli *CLI[T], cmd Command[T, F]) {
 		t.Fatalf("AddCommand failed: %v", err)
 	}
 }
+
+func mustProvideValue[T any](t *testing.T, scope *Scope, value T) {
+	t.Helper()
+
+	if err := ProvideValue(scope, value); err != nil {
+		t.Fatalf("expected no error providing value, got: %v", err)
+	}
+}

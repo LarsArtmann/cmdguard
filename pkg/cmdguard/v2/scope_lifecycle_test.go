@@ -24,9 +24,7 @@ func TestScope_Shutdown(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
-		if err := ProvideValue(scope, "value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, "value")
 
 		err := scope.Shutdown(t.Context())
 		if err != nil {
@@ -41,9 +39,7 @@ func TestScope_ShutdownAll(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("root")
-		if err := ProvideValue(scope, "value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, "value")
 
 		err := scope.ShutdownAll(t.Context())
 		if err != nil {
@@ -58,17 +54,11 @@ func TestScope_ShutdownAll(t *testing.T) {
 		child := parent.Child("child")
 		grandchild := child.Child("grandchild")
 
-		if err := ProvideValue(parent, "parent-value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, parent, "parent-value")
 
-		if err := ProvideValue(child, "child-value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, child, "child-value")
 
-		if err := ProvideValue(grandchild, "grandchild-value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, grandchild, "grandchild-value")
 
 		err := grandchild.ShutdownAll(t.Context())
 		if err != nil {
@@ -94,9 +84,7 @@ func TestScope_HealthCheck(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
-		if err := ProvideValue(scope, "value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, "value")
 
 		err := scope.HealthCheck()
 		if err != nil {

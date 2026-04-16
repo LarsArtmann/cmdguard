@@ -206,9 +206,7 @@ func assertChildInheritsParent(t *testing.T) {
 	t.Helper()
 
 	parent := NewScope("parent")
-	if err := ProvideValue(parent, "parent-value"); err != nil {
-		t.Fatalf("expected no error providing value, got: %v", err)
-	}
+	mustProvideValue(t, parent, "parent-value")
 
 	child := parent.Child("child")
 

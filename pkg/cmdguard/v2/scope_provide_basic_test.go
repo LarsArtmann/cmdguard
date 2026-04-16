@@ -45,9 +45,7 @@ func TestProvide(t *testing.T) {
 		// Register a dependency
 		type Dep string
 
-		if err := ProvideValue(scope, Dep("dependency")); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, Dep("dependency"))
 
 		type Service string
 
@@ -106,9 +104,7 @@ func TestProvideValue(t *testing.T) {
 		scope := NewScope("test")
 
 		cfg := Config{Name: "app", Port: 8080}
-		if err := ProvideValue(scope, cfg); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, cfg)
 
 		value, err := Invoke[Config](scope)
 		testutil.AssertNoError(t, err)
@@ -124,9 +120,7 @@ func TestInvoke(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
-		if err := ProvideValue(scope, "hello"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, "hello")
 
 		value, err := Invoke[string](scope)
 		testutil.AssertNoError(t, err)
@@ -168,17 +162,11 @@ func TestInvoke(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
-		if err := ProvideValue(scope, 123); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, 123)
 
-		if err := ProvideValue(scope, "text"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, "text")
 
-		if err := ProvideValue(scope, true); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, scope, true)
 
 		intVal, err := Invoke[int](scope)
 		if err != nil {

@@ -19,9 +19,7 @@ func TestScope_Integration(t *testing.T) {
 		type Config struct {
 			Debug bool
 		}
-		if err := ProvideValue(root, Config{Debug: true}); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, root, Config{Debug: true})
 
 		if err := Provide(root, func(i do.Injector) (string, error) {
 			cfg, err := do.Invoke[Config](i)
@@ -75,9 +73,7 @@ func TestScope_Integration(t *testing.T) {
 		t.Parallel()
 
 		parent := NewScope("parent")
-		if err := ProvideValue(parent, "parent-value"); err != nil {
-			t.Fatalf("expected no error providing value, got: %v", err)
-		}
+		mustProvideValue(t, parent, "parent-value")
 
 		child := parent.Child("child")
 
