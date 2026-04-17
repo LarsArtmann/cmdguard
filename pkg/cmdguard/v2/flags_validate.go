@@ -68,11 +68,13 @@ func lookupValidator(name string) (FlagValidator, bool) {
 // The tag format is a comma-separated list: "email,min=5,max=100".
 // Returns the first validation error encountered.
 func runValidateTag(tag, value string) error {
-	rules := parseValidateRules(tag)
+	rules, err := parseValidateRules(tag)
+	if err != nil {
+		return err
+	}
 
 	for _, rule := range rules {
-		err := rule.Validate(value)
-		if err != nil {
+		if err := rule.Validate(value); err != nil {
 			return err
 		}
 	}
@@ -89,7 +91,8 @@ type validateRule struct {
 
 // parseValidateRules parses a validate tag into individual rules.
 // Format: "email,min=5,max=100".
-func parseValidateRules(tag string) []validateRule {
+// Returns an error if an unknown validator name is encountered.
+func parseValidateRules(tag string) ([]validateRule, error) {
 	var rules []validateRule
 
 	for part := range strings.SplitSeq(tag, ",") {
@@ -102,7 +105,7 @@ func parseValidateRules(tag string) []validateRule {
 
 		validator, ok := lookupValidator(name)
 		if !ok {
-			continue
+			return nil, fmt.Errorf("%w: %q", ErrUnknownValidator, name)
 		}
 
 		if param != "" {
@@ -113,12 +116,13 @@ func parseValidateRules(tag string) []validateRule {
 		}
 
 		rules = append(rules, validateRule{
-			Name:     name,
-			Validate: validator,
+			Name:      name,
+			Parameter: param,
+			Validate:  validator,
 		})
 	}
 
-	return rules
+	return rules, nil
 }
 
 // Built-in validators
@@ -156,12 +160,12 @@ func validateURL(value string) error {
 func validateMinLen(value string) error {
 	minStr, val, ok := strings.Cut(value, ":")
 	if !ok {
-		return nil
+		return fmt.Errorf("%w: minlen requires format \"min:value\"", ErrInvalidValidatorParam)
 	}
 
 	minLen, err := strconv.Atoi(minStr)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: minlen: invalid integer %q", ErrInvalidValidatorParam, minStr)
 	}
 
 	if len(val) < minLen {
@@ -174,12 +178,12 @@ func validateMinLen(value string) error {
 func validateMaxLen(value string) error {
 	maxStr, val, ok := strings.Cut(value, ":")
 	if !ok {
-		return nil
+		return fmt.Errorf("%w: maxlen requires format \"max:value\"", ErrInvalidValidatorParam)
 	}
 
 	maxLen, err := strconv.Atoi(maxStr)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: maxlen: invalid integer %q", ErrInvalidValidatorParam, maxStr)
 	}
 
 	if len(val) > maxLen {
@@ -197,12 +201,12 @@ func validateMin(value string) error {
 
 	minVal, err := strconv.ParseFloat(minStr, 64)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: min: invalid number %q", ErrInvalidValidatorParam, minStr)
 	}
 
 	actual, err := strconv.ParseFloat(val, 64)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: min: value %q is not a number", ErrInvalidValidatorParam, val)
 	}
 
 	if actual < minVal {
@@ -215,17 +219,17 @@ func validateMin(value string) error {
 func validateMax(value string) error {
 	maxStr, val, ok := strings.Cut(value, ":")
 	if !ok {
-		return nil
+		return fmt.Errorf("%w: max requires format \"max:value\"", ErrInvalidValidatorParam)
 	}
 
 	maxVal, err := strconv.ParseFloat(maxStr, 64)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: max: invalid number %q", ErrInvalidValidatorParam, maxStr)
 	}
 
 	actual, err := strconv.ParseFloat(val, 64)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: max: value %q is not a number", ErrInvalidValidatorParam, val)
 	}
 
 	if actual > maxVal {
@@ -243,7 +247,7 @@ func validateRegex(value string) error {
 
 	re, err := regexp.Compile(pattern)
 	if err != nil {
-		return nil
+		return fmt.Errorf("%w: regex: invalid pattern %q", ErrInvalidValidatorParam, pattern)
 	}
 
 	if !re.MatchString(val) {

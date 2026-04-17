@@ -123,6 +123,12 @@ var (
 	// ErrValueEmpty indicates a value is empty but is required to be non-empty.
 	ErrValueEmpty = errors.New("value is empty")
 
+	// ErrUnknownValidator indicates a validator name in a validate tag is not registered.
+	ErrUnknownValidator = errors.New("unknown validator")
+
+	// ErrInvalidValidatorParam indicates a validator parameter could not be parsed.
+	ErrInvalidValidatorParam = errors.New("invalid validator parameter")
+
 	// ErrCommandPanic indicates a command handler panicked during execution.
 	ErrCommandPanic = errors.New("command panicked")
 )

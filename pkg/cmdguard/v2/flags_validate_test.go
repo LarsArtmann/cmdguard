@@ -152,3 +152,101 @@ func TestFlagRegistry_ValidateFlags(t *testing.T) {
 		}
 	})
 }
+
+func TestParseValidateRules_UnknownValidator(t *testing.T) {
+	t.Parallel()
+
+	t.Run("unknown validator name returns error", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := parseValidateRules("emial,min=5")
+		if err == nil {
+			t.Fatal("expected error for unknown validator, got nil")
+		}
+
+		assertErrorContains(t, err, "unknown validator", "emial")
+	})
+
+	t.Run("known validators parse successfully", func(t *testing.T) {
+		t.Parallel()
+
+		rules, err := parseValidateRules("email,minlen=5")
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+
+		if len(rules) != 2 {
+			t.Fatalf("expected 2 rules, got %d", len(rules))
+		}
+	})
+}
+
+func TestValidatorErrors_InvalidParams(t *testing.T) {
+	t.Parallel()
+
+	t.Run("minlen with non-integer param", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateMinLen("abc:hello")
+		if err == nil {
+			t.Fatal("expected error for non-integer minlen param, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("maxlen with non-integer param", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateMaxLen("abc:hello")
+		if err == nil {
+			t.Fatal("expected error for non-integer maxlen param, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("min with non-number param", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateMin("abc:10")
+		if err == nil {
+			t.Fatal("expected error for non-number min param, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("max with non-number param", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateMax("abc:10")
+		if err == nil {
+			t.Fatal("expected error for non-number max param, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("regex with invalid pattern", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateRegex("[invalid:hello")
+		if err == nil {
+			t.Fatal("expected error for invalid regex pattern, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("minlen missing separator", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateMinLen("5")
+		if err == nil {
+			t.Fatal("expected error for minlen without separator, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+}
