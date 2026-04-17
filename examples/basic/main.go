@@ -46,8 +46,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	v2.AddCommand(cli, helloCmd)
-	v2.AddCommand(cli, goodbyeCmd)
+	if err := v2.AddCommand(cli, helloCmd); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	if err := v2.AddCommand(cli, goodbyeCmd); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	cli.ExecuteAndExit(context.Background())
 }
