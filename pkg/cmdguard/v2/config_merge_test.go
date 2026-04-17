@@ -159,4 +159,50 @@ func TestMergeConfigs(t *testing.T) {
 			"base should not be affected by result mutation",
 		)
 	})
+
+	t.Run("deep copies slices and maps", func(t *testing.T) {
+		t.Parallel()
+
+		type ComplexConfig struct {
+			Tags   []string
+			Labels map[string]string
+		}
+
+		base := &ComplexConfig{
+			Tags:   []string{"a", "b", "c"},
+			Labels: map[string]string{"env": "prod"},
+		}
+
+		result := MergeConfigs(base)
+
+		result.Tags[0] = "modified"
+		result.Labels["env"] = "dev"
+
+		testutil.AssertFieldEqString(t, base.Tags[0], "a", "base slice should not be mutated")
+		testutil.AssertFieldEqString(t, base.Labels["env"], "prod", "base map should not be mutated")
+	})
+
+	t.Run("deep copies nested pointers", func(t *testing.T) {
+		t.Parallel()
+
+		type Inner struct {
+			Value string
+		}
+
+		type Outer struct {
+			Ref *Inner
+		}
+
+		base := &Outer{Ref: &Inner{Value: "original"}}
+
+		result := MergeConfigs(base)
+		result.Ref.Value = "modified"
+
+		testutil.AssertFieldEqString(
+			t,
+			base.Ref.Value,
+			"original",
+			"base pointer target should not be mutated",
+		)
+	})
 }

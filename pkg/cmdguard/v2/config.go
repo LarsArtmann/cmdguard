@@ -148,14 +148,63 @@ func MergeConfigs[T any](configs ...*T) *T {
 }
 
 // deepCopy creates a deep copy of a struct pointer via reflection.
+// Handles nested structs, slices, maps, and pointers recursively.
 func deepCopy[T any](src *T) *T {
 	if src == nil {
 		return nil
 	}
 
-	dst := *src
+	dst := new(T)
+	deepCopyValue(reflect.ValueOf(dst).Elem(), reflect.ValueOf(src).Elem())
 
-	return &dst
+	return dst
+}
+
+// deepCopyValue recursively deep-copies a reflect.Value.
+// For structs, performs a shallow copy first (handles unexported fields),
+// then recursively deep-copies settable fields.
+func deepCopyValue(dst, src reflect.Value) {
+	switch src.Kind() {
+	case reflect.Struct:
+		dst.Set(src)
+
+		for i := range src.NumField() {
+			if dst.Field(i).CanSet() {
+				deepCopyValue(dst.Field(i), src.Field(i))
+			}
+		}
+	case reflect.Slice:
+		if src.IsNil() {
+			return
+		}
+
+		dst.Set(reflect.MakeSlice(src.Type(), src.Len(), src.Cap()))
+
+		for i := range src.Len() {
+			deepCopyValue(dst.Index(i), src.Index(i))
+		}
+	case reflect.Map:
+		if src.IsNil() {
+			return
+		}
+
+		dst.Set(reflect.MakeMapWithSize(src.Type(), src.Len()))
+
+		for _, key := range src.MapKeys() {
+			newVal := reflect.New(src.MapIndex(key).Type()).Elem()
+			deepCopyValue(newVal, src.MapIndex(key))
+			dst.SetMapIndex(key, newVal)
+		}
+	case reflect.Pointer:
+		if src.IsNil() {
+			return
+		}
+
+		dst.Set(reflect.New(src.Elem().Type()))
+		deepCopyValue(dst.Elem(), src.Elem())
+	default:
+		dst.Set(src)
+	}
 }
 
 // mergeStruct merges non-zero fields from src into dst.
