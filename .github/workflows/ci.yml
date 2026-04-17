@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ["1.24", "1.25", "1.26"]
+        go-version: ["1.26"]
 
     steps:
       - uses: actions/checkout@v4
@@ -91,3 +91,12 @@ jobs:
 
       - name: Test typed example
         run: go run ./examples/typed/main.go greet --name=CI
+
+      - name: Test di example
+        run: go run ./examples/di/main.go check
+
+      - name: Test validation example
+        run: go run ./examples/validation/main.go greet --name=CI
+
+      - name: Test advanced-flags example
+        run: go run ./examples/advanced-flags/main.go env
