@@ -119,7 +119,14 @@ func setStringField(field reflect.Value, str string) error {
 	case reflect.TypeFor[Duration]():
 		return wrapErr(parseAndSetDuration(field, str), field, str)
 	case reflect.TypeFor[Enum]():
-		current := field.Interface().(Enum)
+		current, ok := field.Interface().(Enum)
+		if !ok {
+			return fmt.Errorf(
+				"setStringField: field=%s: type assertion to Enum failed",
+				field.Type(),
+			)
+		}
+
 		allowed := current.Allowed()
 
 		if len(allowed) == 0 {
