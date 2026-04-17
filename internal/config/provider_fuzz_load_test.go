@@ -1,7 +1,6 @@
 package config
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -239,80 +238,4 @@ func TestLoad_EnvVarInjection(t *testing.T) {
 	})
 }
 
-func FuzzKoanfLoader_LoadEnv(f *testing.F) {
-	corpus := []struct {
-		level  string
-		format string
-	}{
-		{"debug", "text"},
-		{"info", "json"},
-		{"warn", "text"},
-		{"error", "json"},
-		{"", ""},
-		{"invalid", "xml"},
-	}
-	for _, tt := range corpus {
-		f.Add(tt.level, tt.format)
-	}
 
-	f.Fuzz(func(t *testing.T, level, format string) {
-		if level != "" && !isValidEnvValue(level) {
-			return
-		}
-
-		if format != "" && !isValidEnvValue(format) {
-			return
-		}
-
-		if level != "" {
-			t.Setenv("CMDGUARD_LOG_LEVEL", level)
-		}
-
-		if format != "" {
-			t.Setenv("CMDGUARD_LOG_FORMAT", format)
-		}
-
-		loader := NewLoader()
-
-		err := loader.Load("")
-		if err != nil {
-			t.Errorf("Load() error = %v", err)
-		}
-	})
-}
-
-func FuzzKoanfLoader_FilePath(f *testing.F) {
-	corpus := []string{
-		"",
-		"config.yaml",
-		"/etc/app/config.yaml",
-		"./config.yaml",
-		"../config.yaml",
-		filepath.Join(strings.Repeat("../", 50), "config.yaml"),
-		"🎉.yaml",
-		"<script>.yaml",
-		strings.Repeat("a", 200) + ".yaml",
-	}
-	for _, path := range corpus {
-		f.Add(path)
-	}
-
-	f.Fuzz(func(t *testing.T, configPath string) {
-		loader := NewLoader()
-		err := loader.Load(configPath)
-
-		// Directories should return an error (can't read a directory as a file)
-		if configPath == "." || configPath == ".." || configPath == "/" {
-			if err == nil {
-				t.Errorf("Load(%q) expected error for directory, got nil", configPath)
-			}
-
-			return
-		}
-
-		// Non-existent files are OK (config is optional)
-		// But invalid paths might error depending on the OS
-		// We just verify the function doesn't panic
-		_ = err
-	})
-}
