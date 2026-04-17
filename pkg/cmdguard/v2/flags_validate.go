@@ -196,7 +196,7 @@ func validateMaxLen(value string) error {
 func validateMin(value string) error {
 	minStr, val, ok := strings.Cut(value, ":")
 	if !ok {
-		return nil
+		return fmt.Errorf("%w: min requires format \"min:value\"", ErrInvalidValidatorParam)
 	}
 
 	minVal, err := strconv.ParseFloat(minStr, 64)
@@ -242,7 +242,7 @@ func validateMax(value string) error {
 func validateRegex(value string) error {
 	pattern, val, ok := strings.Cut(value, ":")
 	if !ok {
-		return nil
+		return fmt.Errorf("%w: regex requires format \"pattern:value\"", ErrInvalidValidatorParam)
 	}
 
 	re, err := regexp.Compile(pattern)

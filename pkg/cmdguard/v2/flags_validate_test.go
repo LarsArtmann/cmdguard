@@ -249,4 +249,26 @@ func TestValidatorErrors_InvalidParams(t *testing.T) {
 
 		assertErrorContains(t, err, "invalid")
 	})
+
+	t.Run("min missing separator", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateMin("5")
+		if err == nil {
+			t.Fatal("expected error for min without separator, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("regex missing separator", func(t *testing.T) {
+		t.Parallel()
+
+		err := validateRegex("[a-z]+")
+		if err == nil {
+			t.Fatal("expected error for regex without separator, got nil")
+		}
+
+		assertErrorContains(t, err, "invalid")
+	})
 }
