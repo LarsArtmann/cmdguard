@@ -222,14 +222,14 @@ func WithDeprecated[T, F any](msg string) CommandOption[T, F] {
 	}
 }
 
-
-
 // WithGroupID assigns the command to a named group in help output.
 func WithGroupID[T, F any](group string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.group = group
 	}
 }
+
+// NewCommand creates a new executable command with the given options.
 // The runE parameter is required and cannot be nil.
 // Use NewParentCommand for commands with subcommands.
 func NewCommand[T, F any](

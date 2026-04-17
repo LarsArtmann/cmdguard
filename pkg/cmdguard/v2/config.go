@@ -109,9 +109,6 @@ func getFieldValue(field reflect.Value) (string, bool) {
 			return field.MethodByName("String").Call(nil)[0].String(), true
 		}
 
-		fallthrough
-	case reflect.Invalid, reflect.Array, reflect.Chan, reflect.Func, reflect.Interface,
-		reflect.Map, reflect.Pointer, reflect.Slice, reflect.Struct, reflect.UnsafePointer:
 		return "", false
 	default:
 		return "", false
