@@ -242,7 +242,11 @@ func NewCommand[T, F any](
 	}
 
 	if runE == nil {
-		return Command[T, F]{}, fmt.Errorf("%w: runE is required for command %q", ErrMissingHandler, use)
+		return Command[T, F]{}, fmt.Errorf(
+			"%w: runE is required for command %q",
+			ErrMissingHandler,
+			use,
+		)
 	}
 
 	cmd := Command[T, F]{use: use, runE: runE}
@@ -272,11 +276,19 @@ func NewParentCommand[T, F any](
 	}
 
 	if long == "" {
-		return Command[T, F]{}, fmt.Errorf("%w: long description is required for parent command %q", ErrMissingLong, use)
+		return Command[T, F]{}, fmt.Errorf(
+			"%w: long description is required for parent command %q",
+			ErrMissingLong,
+			use,
+		)
 	}
 
 	if len(subcommands) == 0 {
-		return Command[T, F]{}, fmt.Errorf("%w: parent command %q requires at least one subcommand", ErrMissingHandler, use)
+		return Command[T, F]{}, fmt.Errorf(
+			"%w: parent command %q requires at least one subcommand",
+			ErrMissingHandler,
+			use,
+		)
 	}
 
 	cmd := Command[T, F]{use: use, long: long, commands: subcommands}

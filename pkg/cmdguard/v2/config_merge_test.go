@@ -179,7 +179,12 @@ func TestMergeConfigs(t *testing.T) {
 		result.Labels["env"] = "dev"
 
 		testutil.AssertFieldEqString(t, base.Tags[0], "a", "base slice should not be mutated")
-		testutil.AssertFieldEqString(t, base.Labels["env"], "prod", "base map should not be mutated")
+		testutil.AssertFieldEqString(
+			t,
+			base.Labels["env"],
+			"prod",
+			"base map should not be mutated",
+		)
 	})
 
 	t.Run("deep copies nested pointers", func(t *testing.T) {

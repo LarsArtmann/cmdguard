@@ -82,7 +82,8 @@ func main() {
 	}
 
 	// Server command with custom flags
-	serverCmd, err := v2.NewCommand[GlobalConfig, ServerFlags]("server",
+	serverCmd, err := v2.NewCommand[GlobalConfig, ServerFlags](
+		"server",
 		func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
 			logLevel := cfg.LogLevel
 			if flags.LogLevel.String() != "" {
@@ -96,7 +97,9 @@ func main() {
 			return nil
 		},
 		v2.WithShort[GlobalConfig, ServerFlags]("Start the server"),
-		v2.WithLong[GlobalConfig, ServerFlags]("Start the HTTP server with configurable host and port."),
+		v2.WithLong[GlobalConfig, ServerFlags](
+			"Start the HTTP server with configurable host and port.",
+		),
 		v2.WithFlags[GlobalConfig, ServerFlags](ServerFlags{}),
 	)
 	if err != nil {
@@ -108,7 +111,8 @@ func main() {
 	}
 
 	// Config command with required flag
-	configCmd, err := v2.NewCommand[GlobalConfig, ConfigFlags]("config",
+	configCmd, err := v2.NewCommand[GlobalConfig, ConfigFlags](
+		"config",
 		func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
 			fmt.Printf("Config file: %s\n", flags.ConfigFile)
 			fmt.Printf("Required flag: %s\n", flags.RequiredFlag)
@@ -118,18 +122,20 @@ func main() {
 		},
 		v2.WithShort[GlobalConfig, ConfigFlags]("Configuration management"),
 		v2.WithFlags[GlobalConfig, ConfigFlags](ConfigFlags{}),
-		v2.WithPreRunE[GlobalConfig, ConfigFlags](func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
-			if flags.OutputFormat != "" {
-				validFormats := []string{"json", "yaml", "yml"}
-				if !slices.Contains(validFormats, flags.OutputFormat) {
-					return fmt.Errorf("invalid output format: %q (suggestions: %s)",
-						flags.OutputFormat,
-						suggestFormat(flags.OutputFormat))
+		v2.WithPreRunE[GlobalConfig, ConfigFlags](
+			func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
+				if flags.OutputFormat != "" {
+					validFormats := []string{"json", "yaml", "yml"}
+					if !slices.Contains(validFormats, flags.OutputFormat) {
+						return fmt.Errorf("invalid output format: %q (suggestions: %s)",
+							flags.OutputFormat,
+							suggestFormat(flags.OutputFormat))
+					}
 				}
-			}
 
-			return nil
-		}),
+				return nil
+			},
+		),
 	)
 	if err != nil {
 		examplesinternal.Fatalf("Error creating config command: %v\n", err)
@@ -140,7 +146,8 @@ func main() {
 	}
 
 	// Enum demo command
-	envCmd, err := v2.NewCommand[GlobalConfig, EnumFlags]("env",
+	envCmd, err := v2.NewCommand[GlobalConfig, EnumFlags](
+		"env",
 		func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
 			fmt.Printf("Environment: %s\n", flags.Environment)
 			fmt.Printf("Region: %s\n", flags.Region)
@@ -153,9 +160,11 @@ func main() {
 		},
 		v2.WithShort[GlobalConfig, EnumFlags]("Environment settings"),
 		v2.WithFlags[GlobalConfig, EnumFlags](EnumFlags{}),
-		v2.WithPreRunE[GlobalConfig, EnumFlags](func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
-			return flags.Validate()
-		}),
+		v2.WithPreRunE[GlobalConfig, EnumFlags](
+			func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
+				return flags.Validate()
+			},
+		),
 	)
 	if err != nil {
 		examplesinternal.Fatalf("Error creating env command: %v\n", err)

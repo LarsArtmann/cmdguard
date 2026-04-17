@@ -46,6 +46,7 @@ var (
 // NewDatabaseService creates a new database service.
 func NewDatabaseService(i do.Injector) (*DatabaseService, error) {
 	scope := v2.NewScopeFromInjector(i, "provider")
+
 	cfg, err := v2.Invoke[*Config](scope)
 	if err != nil {
 		return nil, fmt.Errorf("resolve config: %w", err)
@@ -90,6 +91,7 @@ type APIService struct {
 // NewAPIService creates a new API service.
 func NewAPIService(i do.Injector) (*APIService, error) {
 	scope := v2.NewScopeFromInjector(i, "provider")
+
 	db, err := v2.Invoke[*DatabaseService](scope)
 	if err != nil {
 		return nil, fmt.Errorf("resolve database: %w", err)

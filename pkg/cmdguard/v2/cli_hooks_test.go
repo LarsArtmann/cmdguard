@@ -35,9 +35,9 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "post",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					use:       "test",
-					runE:      makeHookRunE(order, "run"),
-					postRunE:  makeHookRunE(order, "post"),
+					use:      "test",
+					runE:     makeHookRunE(order, "run"),
+					postRunE: makeHookRunE(order, "post"),
 				}
 			},
 			want: []string{"run", "post"},

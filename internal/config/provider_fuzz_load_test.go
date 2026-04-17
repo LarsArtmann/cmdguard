@@ -237,5 +237,3 @@ func TestLoad_EnvVarInjection(t *testing.T) {
 		testShellInjectionPayload(t, "debug|cat /etc/passwd")
 	})
 }
-
-

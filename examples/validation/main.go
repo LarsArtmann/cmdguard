@@ -302,10 +302,13 @@ func addCommands(cli *v2.CLI[Config]) error {
 	}
 
 	// Process command with validation
-	processCmd, err := v2.NewCommand[Config, *ProcessFlags]("process",
+	processCmd, err := v2.NewCommand[Config, *ProcessFlags](
+		"process",
 		processRunE(),
 		v2.WithShort[Config, *ProcessFlags]("Process a file"),
-		v2.WithLong[Config, *ProcessFlags]("Processes an input file with configurable parallelism."),
+		v2.WithLong[Config, *ProcessFlags](
+			"Processes an input file with configurable parallelism.",
+		),
 		v2.WithExample[Config, *ProcessFlags](`
   # Process a file with 4 workers
   process --input data.txt --workers 4

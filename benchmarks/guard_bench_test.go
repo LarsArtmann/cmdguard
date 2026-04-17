@@ -110,7 +110,6 @@ func BenchmarkExecute(b *testing.B) {
 
 // BenchmarkCommandCreation measures creating command definitions.
 
-
 // BenchmarkNewCommand measures the NewCommand constructor.
 func BenchmarkNewCommand(b *testing.B) {
 	for b.Loop() {

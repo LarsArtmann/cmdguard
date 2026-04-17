@@ -156,7 +156,8 @@ func registerServices(scope *v2.Scope) {
 
 func addCommands(cli *v2.CLI[AppConfig]) error {
 	// Greet command with typed flags
-	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet [message]",
+	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags](
+		"greet [message]",
 		func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			logger, err := v2.Invoke[*Logger](cli.Scope())
 			if err != nil {
@@ -179,24 +180,28 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 		v2.WithLong[AppConfig, *GreetFlags]("Greet someone with a customizable message."),
 		v2.WithExample[AppConfig, *GreetFlags]("myapp greet --name Alice --shout --count 3"),
 		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
-		v2.WithPreRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			if cfg.Verbose {
-				fmt.Println("Preparing to greet...")
-			}
+		v2.WithPreRunE[AppConfig, *GreetFlags](
+			func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+				if cfg.Verbose {
+					fmt.Println("Preparing to greet...")
+				}
 
-			if flags.Count < 1 {
-				return fmt.Errorf("count must be at least 1 (got %d)", flags.Count)
-			}
+				if flags.Count < 1 {
+					return fmt.Errorf("count must be at least 1 (got %d)", flags.Count)
+				}
 
-			return nil
-		}),
-		v2.WithPostRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			if cfg.Verbose {
-				fmt.Println("Greeting complete!")
-			}
+				return nil
+			},
+		),
+		v2.WithPostRunE[AppConfig, *GreetFlags](
+			func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+				if cfg.Verbose {
+					fmt.Println("Greeting complete!")
+				}
 
-			return nil
-		}),
+				return nil
+			},
+		),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create greet command: %w", err)
@@ -315,7 +320,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Stats command demonstrating uint and float32 flag support
-	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags]("stats",
+	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags](
+		"stats",
 		func(ctx context.Context, cfg *AppConfig, flags *StatsFlags) error {
 			fmt.Println("Statistics Configuration:")
 			fmt.Printf("  Max Retries: %d\n", flags.MaxRetries)
@@ -325,7 +331,9 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 			return nil
 		},
 		v2.WithShort[AppConfig, *StatsFlags]("Display statistics configuration"),
-		v2.WithExample[AppConfig, *StatsFlags]("myapp stats --max-retries 5 --threshold 0.75 --page-size 20"),
+		v2.WithExample[AppConfig, *StatsFlags](
+			"myapp stats --max-retries 5 --threshold 0.75 --page-size 20",
+		),
 		v2.WithFlags[AppConfig, *StatsFlags](&StatsFlags{}),
 	)
 	if err != nil {

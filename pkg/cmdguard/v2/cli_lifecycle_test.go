@@ -121,17 +121,23 @@ func TestCLIPrePostRunE(t *testing.T) {
 
 		preRan, postRan := false, false
 
-		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("test", noOpRunE[testCLIConfig],
-			v2.WithPreRunE[testCLIConfig, v2.NoFlags](func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				preRan = true
+		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+			"test",
+			noOpRunE[testCLIConfig],
+			v2.WithPreRunE[testCLIConfig, v2.NoFlags](
+				func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+					preRan = true
 
-				return nil
-			}),
-			v2.WithPostRunE[testCLIConfig, v2.NoFlags](func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
-				postRan = true
+					return nil
+				},
+			),
+			v2.WithPostRunE[testCLIConfig, v2.NoFlags](
+				func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+					postRan = true
 
-				return nil
-			}),
+					return nil
+				},
+			),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)
@@ -173,14 +179,17 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 
 		var receivedName string
 
-		cmd, err := v2.NewCommand[testCLIConfig, testFlags]("test",
+		cmd, err := v2.NewCommand[testCLIConfig, testFlags](
+			"test",
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
 			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
-			v2.WithPreRunE[testCLIConfig, testFlags](func(_ context.Context, _ *testCLIConfig, f testFlags) error {
-				receivedName = f.Name
+			v2.WithPreRunE[testCLIConfig, testFlags](
+				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
+					receivedName = f.Name
 
-				return nil
-			}),
+					return nil
+				},
+			),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)
@@ -218,14 +227,17 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 
 		var receivedValue string
 
-		cmd, err := v2.NewCommand[testCLIConfig, testFlags]("test",
+		cmd, err := v2.NewCommand[testCLIConfig, testFlags](
+			"test",
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
 			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
-			v2.WithPostRunE[testCLIConfig, testFlags](func(_ context.Context, _ *testCLIConfig, f testFlags) error {
-				receivedValue = f.Value
+			v2.WithPostRunE[testCLIConfig, testFlags](
+				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
+					receivedValue = f.Value
 
-				return nil
-			}),
+					return nil
+				},
+			),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)

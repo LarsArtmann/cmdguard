@@ -240,17 +240,20 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags](
+		"greet",
 		greetRunE(),
 		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
 		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
-		v2.WithPreRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			if flags.Count < 1 {
-				return errors.New("count should be at least 1")
-			}
+		v2.WithPreRunE[AppConfig, *GreetFlags](
+			func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+				if flags.Count < 1 {
+					return errors.New("count should be at least 1")
+				}
 
-			return nil
-		}),
+				return nil
+			},
+		),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -275,17 +278,20 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 
 	// Reset and test with valid count
 	cli, _ = v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
-	greetCmd2, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+	greetCmd2, err := v2.NewCommand[AppConfig, *GreetFlags](
+		"greet",
 		greetRunE(),
 		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
 		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
-		v2.WithPreRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			if flags.Count < 1 {
-				return errors.New("count should be at least 1")
-			}
+		v2.WithPreRunE[AppConfig, *GreetFlags](
+			func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+				if flags.Count < 1 {
+					return errors.New("count should be at least 1")
+				}
 
-			return nil
-		}),
+				return nil
+			},
+		),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

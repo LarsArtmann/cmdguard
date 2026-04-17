@@ -88,7 +88,11 @@ func TestCloneFlags(t *testing.T) {
 
 		cloned.Tags[0] = "modified"
 		if original.Tags[0] != "a" {
-			t.Errorf("original.Tags[0] = %q, want %q (deep copy should isolate slices)", original.Tags[0], "a")
+			t.Errorf(
+				"original.Tags[0] = %q, want %q (deep copy should isolate slices)",
+				original.Tags[0],
+				"a",
+			)
 		}
 	})
 
@@ -109,7 +113,11 @@ func TestCloneFlags(t *testing.T) {
 
 		*cloned.Label = "modified"
 		if *original.Label != "original" {
-			t.Errorf("original.Label = %q, want %q (deep copy should isolate pointers)", *original.Label, "original")
+			t.Errorf(
+				"original.Label = %q, want %q (deep copy should isolate pointers)",
+				*original.Label,
+				"original",
+			)
 		}
 	})
 
@@ -129,7 +137,11 @@ func TestCloneFlags(t *testing.T) {
 
 		cloned.Items[0] = "modified"
 		if original.Items[0] != "x" {
-			t.Errorf("original.Items[0] = %q, want %q (deep copy should isolate nested slices)", original.Items[0], "x")
+			t.Errorf(
+				"original.Items[0] = %q, want %q (deep copy should isolate nested slices)",
+				original.Items[0],
+				"x",
+			)
 		}
 	})
 }

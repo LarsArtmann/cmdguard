@@ -32,7 +32,13 @@ func TestBranchingFlowContext_SetValueLocal(t *testing.T) {
 
 	assertFlowValue(t, root, "local", "only-root", "root should have local value")
 
-	assertFlowValue(t, child, "local", "only-root", "child should see parent value via GetValue fallback")
+	assertFlowValue(
+		t,
+		child,
+		"local",
+		"only-root",
+		"child should see parent value via GetValue fallback",
+	)
 }
 
 func TestBranchingFlowContext_ChildValueIsolation(t *testing.T) {
@@ -46,7 +52,13 @@ func TestBranchingFlowContext_ChildValueIsolation(t *testing.T) {
 
 	child.SetValueLocal("shared", "child-val")
 
-	assertFlowValue(t, root, "shared", "root-val", "root value should not be affected by child's SetValueLocal")
+	assertFlowValue(
+		t,
+		root,
+		"shared",
+		"root-val",
+		"root value should not be affected by child's SetValueLocal",
+	)
 
 	assertFlowValue(t, child, "shared", "child-val", "child should see its own local value")
 }

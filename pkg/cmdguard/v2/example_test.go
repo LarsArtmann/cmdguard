@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // ExampleNewCommand demonstrates creating a leaf command with the constructor API.

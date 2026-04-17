@@ -24,6 +24,7 @@ func main() {
 		"hello",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("Hello, World!")
+
 			return nil
 		},
 		v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
@@ -37,6 +38,7 @@ func main() {
 		"goodbye",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("Goodbye, World!")
+
 			return nil
 		},
 		v2.WithShort[AppConfig, v2.NoFlags]("Say goodbye"),

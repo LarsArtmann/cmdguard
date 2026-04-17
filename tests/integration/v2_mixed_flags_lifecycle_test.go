@@ -24,7 +24,8 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 		receivedFlags *GreetFlags
 	)
 
-	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags]("greet",
+	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags](
+		"greet",
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			runCalled = true
 			receivedFlags = flags
@@ -33,16 +34,20 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 		},
 		v2.WithShort[RootConfig, *GreetFlags]("Greet with lifecycle"),
 		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "World", Shout: false}),
-		v2.WithPreRunE[RootConfig, *GreetFlags](func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
-			preRunCalled = true
+		v2.WithPreRunE[RootConfig, *GreetFlags](
+			func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
+				preRunCalled = true
 
-			return nil
-		}),
-		v2.WithPostRunE[RootConfig, *GreetFlags](func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
-			postRunCalled = true
+				return nil
+			},
+		),
+		v2.WithPostRunE[RootConfig, *GreetFlags](
+			func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
+				postRunCalled = true
 
-			return nil
-		}),
+				return nil
+			},
+		),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
