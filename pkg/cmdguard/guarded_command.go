@@ -1,5 +1,8 @@
 // Package cmdguard provides compile-time guarded CLI construction.
 //
+// Deprecated: Use pkg/cmdguard/v2 instead. The v2 API provides type-safe flags,
+// dependency injection, and returns errors instead of panicking.
+//
 // The guard approach panics at construction time if commands are invalid,
 // ensuring errors are caught immediately rather than at runtime.
 //
@@ -51,6 +54,8 @@ var version = "dev"
 // GuardedCommand wraps a cobra.Command with compile-time validation.
 // It panics on construction if commands are invalid, ensuring errors
 // are caught immediately at startup rather than at runtime.
+//
+// Deprecated: Use pkg/cmdguard/v2 instead.
 type GuardedCommand struct {
 	cmd            *cobra.Command
 	cfg            *config.Config
@@ -67,6 +72,8 @@ type GuardedCommand struct {
 //
 //	root := cmdguard.New("myapp", "My application description")
 //	root.Execute(context.Background())
+//
+// Deprecated: Use pkg/cmdguard/v2.NewCLI instead.
 func New(name, short string) *GuardedCommand {
 	// Load configuration early
 	cfg := config.Load()
