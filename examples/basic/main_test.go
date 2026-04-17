@@ -7,40 +7,73 @@ import (
 	"os"
 	"testing"
 
-	"github.com/spf13/cobra"
-
-	"github.com/larsartmann/cmdguard/pkg/cmdguard"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
-func testHelloRun(output *bytes.Buffer) func(*cobra.Command, []string) {
-	fn := func(_ *cobra.Command, _ []string) {
-		output.WriteString("Hello, World!\n")
+func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
+	t.Helper()
+
+	cli, err := v2.NewCLI[AppConfig]("basic", "A basic CLI example", AppConfig{})
+	if err != nil {
+		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	return fn
+	return cli
 }
 
-func testGoodbyeRun(output *bytes.Buffer) func(*cobra.Command, []string) {
-	return func(_ *cobra.Command, _ []string) {
-		output.WriteString("Goodbye, World!\n")
+func addHelloCommand(t *testing.T, cli *v2.CLI[AppConfig], output *bytes.Buffer) {
+	t.Helper()
+
+	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"hello",
+		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
+			if output != nil {
+				output.WriteString("Hello, World!\n")
+			}
+
+			return nil
+		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
+	)
+	if err != nil {
+		t.Fatalf("failed to create hello command: %v", err)
 	}
+
+	v2.AddCommand(cli, cmd)
+}
+
+func addGoodbyeCommand(t *testing.T, cli *v2.CLI[AppConfig], output *bytes.Buffer) {
+	t.Helper()
+
+	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"goodbye",
+		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
+			if output != nil {
+				output.WriteString("Goodbye, World!\n")
+			}
+
+			return nil
+		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Say goodbye"),
+	)
+	if err != nil {
+		t.Fatalf("failed to create goodbye command: %v", err)
+	}
+
+	v2.AddCommand(cli, cmd)
 }
 
 func TestBasicExample_HelloCommand(t *testing.T) {
 	t.Parallel()
 
-	root := cmdguard.New("basic", "A basic CLI example")
+	cli := newTestCLI(t)
 
 	var output bytes.Buffer
 
-	root.AddCommand(newCommand("hello", "Say hello", testHelloRun(&output)))
-	root.AddCommand(newCommand("goodbye", "Say goodbye", testGoodbyeRun(&output)))
+	addHelloCommand(t, cli, &output)
+	addGoodbyeCommand(t, cli, &output)
 
-	// Test hello command
-	root.Command().SetArgs([]string{"hello"})
-
-	err := root.Execute(context.Background())
-	if err != nil {
+	if err := cli.ExecuteWithArgs(context.Background(), []string{"hello"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -48,14 +81,9 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 		t.Errorf("output = %q, want %q", output.String(), "Hello, World!\n")
 	}
 
-	// Reset output for next test
 	output.Reset()
 
-	// Test goodbye command
-	root.Command().SetArgs([]string{"goodbye"})
-
-	err = root.Execute(context.Background())
-	if err != nil {
+	if err := cli.ExecuteWithArgs(context.Background(), []string{"goodbye"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -67,23 +95,20 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	t.Parallel()
 
-	root := cmdguard.New("basic", "A basic CLI example")
+	cli := newTestCLI(t)
+	addHelloCommand(t, cli, nil)
+	addGoodbyeCommand(t, cli, nil)
 
-	emptyRun := func(_ *cobra.Command, _ []string) {}
-	root.AddCommand(newCommand("hello", "Say hello", emptyRun))
-	root.AddCommand(newCommand("goodbye", "Say goodbye", emptyRun))
-
-	cmd := root.Command()
-	if cmd.Use != "basic" {
-		t.Errorf("cmd.Use = %q, want %q", cmd.Use, "basic")
+	root := cli.RootCommand()
+	if root.Use != "basic" {
+		t.Errorf("cmd.Use = %q, want %q", root.Use, "basic")
 	}
 
-	if cmd.Short != "A basic CLI example" {
-		t.Errorf("cmd.Short = %q, want %q", cmd.Short, "A basic CLI example")
+	if root.Short != "A basic CLI example" {
+		t.Errorf("cmd.Short = %q, want %q", root.Short, "A basic CLI example")
 	}
 
-	// GuardedCommand adds built-in commands (completion, help, validate, version + our 2 custom commands)
-	subcmds := cmd.Commands()
+	subcmds := root.Commands()
 	if len(subcmds) < 2 {
 		t.Errorf("len(cmd.Commands()) = %d, want at least 2", len(subcmds))
 	}
@@ -96,15 +121,9 @@ func TestBasicExample_HelpOutput(t *testing.T) {
 		t.Skip("Skipping help output test in CI")
 	}
 
-	root := cmdguard.New("basic", "A basic CLI example")
+	cli := newTestCLI(t)
+	addHelloCommand(t, cli, nil)
+	addGoodbyeCommand(t, cli, nil)
 
-	emptyRun := func(_ *cobra.Command, _ []string) {}
-	root.AddCommand(newCommand("hello", "Say hello", emptyRun))
-	root.AddCommand(newCommand("goodbye", "Say goodbye", emptyRun))
-
-	// Set args to run help
-	root.Command().SetArgs([]string{"--help"})
-
-	// Execute should not panic, we just want to verify it doesn't crash
-	_ = root.Execute(context.Background())
+	_ = cli.ExecuteWithArgs(context.Background(), []string{"--help"})
 }

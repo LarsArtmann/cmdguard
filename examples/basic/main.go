@@ -1,40 +1,53 @@
-// Basic example demonstrating simple cmdguard usage.
+// Basic example demonstrating simple cmdguard v2 usage.
 package main
 
 import (
 	"context"
 	"fmt"
+	"os"
 
-	"github.com/spf13/cobra"
-
-	"github.com/larsartmann/cmdguard/pkg/cmdguard"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
-// newCommand creates a simple cobra command with the given name and run function.
-func newCommand(use, short string, run func(*cobra.Command, []string)) *cobra.Command {
-	return &cobra.Command{
-		Use:   use,
-		Short: short,
-		Run:   run,
-	}
-}
-
-var runHello = func(_ *cobra.Command, _ []string) {
-	fmt.Println("Hello, World!")
-}
-
-var runGoodbye = func(_ *cobra.Command, _ []string) {
-	fmt.Println("Goodbye, World!")
+type AppConfig struct {
+	Verbose bool `default:"false" flag:"verbose" help:"Enable verbose output" short:"v"`
 }
 
 func main() {
-	// Create guarded CLI
-	root := cmdguard.New("basic", "A basic CLI example")
+	cli, err := v2.NewCLI[AppConfig]("basic", "A basic CLI example", AppConfig{})
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
-	// Add commands
-	root.AddCommand(newCommand("hello", "Say hello", runHello))
-	root.AddCommand(newCommand("goodbye", "Say goodbye", runGoodbye))
+	helloCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"hello",
+		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
+			fmt.Println("Hello, World!")
+			return nil
+		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
+	)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
-	// Execute
-	root.ExecuteAndExit(context.Background())
+	goodbyeCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"goodbye",
+		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
+			fmt.Println("Goodbye, World!")
+			return nil
+		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Say goodbye"),
+	)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	v2.AddCommand(cli, helloCmd)
+	v2.AddCommand(cli, goodbyeCmd)
+
+	cli.ExecuteAndExit(context.Background())
 }
