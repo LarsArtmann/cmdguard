@@ -109,17 +109,16 @@ func cloneFlags[F any](flags F) F {
 	// Use reflection to create a new instance
 	v := reflect.ValueOf(flags)
 
-	// Handle pointer to struct
-	if v.Kind() == reflect.Pointer {
+	switch v.Kind() {
+	case reflect.Pointer:
 		if v.IsNil() {
 			var zero F
 
 			return zero
 		}
-		// Create new pointer to same type
+
 		newPtr := reflect.New(v.Elem().Type())
-		// Copy the value
-		newPtr.Elem().Set(v.Elem())
+		deepCopyValue(newPtr.Elem(), v.Elem())
 
 		if cloned, ok := newPtr.Interface().(F); ok {
 			return cloned
@@ -128,12 +127,9 @@ func cloneFlags[F any](flags F) F {
 		var zero F
 
 		return zero
-	}
-
-	// Handle struct directly
-	if v.Kind() == reflect.Struct {
+	case reflect.Struct:
 		newStruct := reflect.New(v.Type()).Elem()
-		newStruct.Set(v)
+		deepCopyValue(newStruct, v)
 
 		if cloned, ok := newStruct.Interface().(F); ok {
 			return cloned
@@ -142,6 +138,7 @@ func cloneFlags[F any](flags F) F {
 		var zero F
 
 		return zero
+	default:
 	}
 
 	// For other types, return as-is (can't clone safely)

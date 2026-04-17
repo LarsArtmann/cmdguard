@@ -73,6 +73,65 @@ func TestCloneFlags(t *testing.T) {
 			t.Errorf("cloneFlags(%q) = %q, want %q", original, cloned, original)
 		}
 	})
+
+	t.Run("deep copies nested slices in struct", func(t *testing.T) {
+		t.Parallel()
+
+		type nestedFlags struct {
+			Tags []string
+		}
+
+		original := nestedFlags{Tags: []string{"a", "b", "c"}}
+		cloned := cloneFlags(original)
+
+		testutil.AssertFieldEq(t, len(cloned.Tags), 3, "len(Tags)")
+
+		cloned.Tags[0] = "modified"
+		if original.Tags[0] != "a" {
+			t.Errorf("original.Tags[0] = %q, want %q (deep copy should isolate slices)", original.Tags[0], "a")
+		}
+	})
+
+	t.Run("deep copies nested pointer in struct", func(t *testing.T) {
+		t.Parallel()
+
+		type ptrFlags struct {
+			Label *string
+		}
+
+		label := "original"
+		original := ptrFlags{Label: &label}
+		cloned := cloneFlags(original)
+
+		if cloned.Label == nil {
+			t.Fatal("expected non-nil Label")
+		}
+
+		*cloned.Label = "modified"
+		if *original.Label != "original" {
+			t.Errorf("original.Label = %q, want %q (deep copy should isolate pointers)", *original.Label, "original")
+		}
+	})
+
+	t.Run("deep copies nested slices in pointer to struct", func(t *testing.T) {
+		t.Parallel()
+
+		type nestedPtr struct {
+			Items []string
+		}
+
+		original := &nestedPtr{Items: []string{"x", "y"}}
+		cloned := cloneFlags(original)
+
+		if cloned == original {
+			t.Error("cloned should be a different pointer")
+		}
+
+		cloned.Items[0] = "modified"
+		if original.Items[0] != "x" {
+			t.Errorf("original.Items[0] = %q, want %q (deep copy should isolate nested slices)", original.Items[0], "x")
+		}
+	})
 }
 
 func TestFlagTypeConstraint(t *testing.T) {
