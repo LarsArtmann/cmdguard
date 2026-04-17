@@ -191,19 +191,19 @@ func MustNewParentCommand[T, F any](...) Command[T, F]
 
 Command options:
 
-| Option                           | Purpose                  |
-| -------------------------------- | ------------------------ |
-| `WithShort[T, F](short)`         | Short description        |
-| `WithLong[T, F](long)`           | Long description         |
-| `WithAliases[T, F](aliases...)`  | Alternative names        |
-| `WithExample[T, F](example)`     | Example usage            |
-| `WithFlags[T, F](flags)`         | Typed flags struct       |
-| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook      |
-| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup     |
-| `WithSubcommands[T, F](cmds...)` | Child commands           |
-| `WithHidden[T, F](hidden)`       | Hide from help           |
-| `WithDeprecated[T, F](msg)`      | Deprecation message      |
-| `WithGroupID[T, F](group)`       | Help group name          |
+| Option                           | Purpose              |
+| -------------------------------- | -------------------- |
+| `WithShort[T, F](short)`         | Short description    |
+| `WithLong[T, F](long)`           | Long description     |
+| `WithAliases[T, F](aliases...)`  | Alternative names    |
+| `WithExample[T, F](example)`     | Example usage        |
+| `WithFlags[T, F](flags)`         | Typed flags struct   |
+| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook  |
+| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup |
+| `WithSubcommands[T, F](cmds...)` | Child commands       |
+| `WithHidden[T, F](hidden)`       | Hide from help       |
+| `WithDeprecated[T, F](msg)`      | Deprecation message  |
+| `WithGroupID[T, F](group)`       | Help group name      |
 
 ### Flag Tags
 

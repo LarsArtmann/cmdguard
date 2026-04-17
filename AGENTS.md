@@ -75,18 +75,13 @@ cmdguard/
 │   │   ├── types_filepath.go     # FilePath type
 │   │   ├── types_hostport.go     # HostPort type
 │   │   ├── types_log.go          # LogLevel type
-│   │   ├── types_option.go       # Option[T] (Rust-like Some/None)
 │   │   ├── types_port.go         # Port type
-│   │   ├── types_result.go       # Result[T] (Rust-like Ok/Err)
 │   │   └── types_url.go          # URL type
 │   └── guarded_command.go        # v1 API (deprecated)
-├── pkg/errtypes/
-│   ├── errors.go                 # CodedError type
-│   └── errors_test.go            # 100% coverage
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── internal/
-│   ├── config/                   # Configuration (koanf-based)
+│   ├── config/                   # Configuration (v1-only, pending removal)
 │   └── logging/                  # Structured logging (100% coverage)
 ├── examples/
 │   ├── basic/                    # v1 API demo
@@ -107,14 +102,13 @@ cmdguard/
 
 ### Package Guidelines
 
-| Package            | Purpose           | Importable? | Coverage |
-| ------------------ | ----------------- | ----------- | -------- |
-| `pkg/cmdguard/v2`  | v2 Type-safe API  | Yes         | 87.9%    |
-| `pkg/cmdguard`     | v1 Guard API      | Yes (deprecated) | 87.0% |
-| `pkg/errtypes`     | Coded error type  | Yes         | 100%     |
-| `pkg/testutil`     | Test helpers      | Yes         | —        |
-| `internal/config`  | Configuration     | No          | 78.9%    |
-| `internal/logging` | Logging utilities | No          | 100%     |
+| Package            | Purpose           | Importable?      | Coverage |
+| ------------------ | ----------------- | ---------------- | -------- |
+| `pkg/cmdguard/v2`  | v2 Type-safe API  | Yes              | 82.2%    |
+| `pkg/cmdguard`     | v1 Guard API      | Yes (deprecated) | 87.4%    |
+| `pkg/testutil`     | Test helpers      | Yes              | —        |
+| `internal/config`  | Configuration     | No               | 95.7%    |
+| `internal/logging` | Logging utilities | No               | 97.1%    |
 
 ---
 
@@ -124,8 +118,8 @@ cmdguard/
 | --------------------------- | -------------------- | ------- |
 | `github.com/spf13/cobra`    | CLI framework        | v1.10.2 |
 | `github.com/samber/do/v2`   | Dependency injection | v2.0.0  |
+| `github.com/spf13/pflag`    | Flag parsing         | v1.0.6  |
 | `charm.land/fang/v2`        | Cobra styling        | v2.0.1  |
-| `github.com/knadh/koanf/v2` | Configuration        | v2.3.4  |
 
 ---
 
@@ -162,20 +156,20 @@ func MustNewParentCommand[T, F any](...) Command[T, F]
 
 ### Command Options
 
-| Option                             | Purpose                           |
-| ---------------------------------- | --------------------------------- |
-| `WithShort[T, F](short)`           | Short description                 |
-| `WithLong[T, F](long)`             | Long description                  |
-| `WithAliases[T, F](aliases...)`    | Alternative names                 |
-| `WithExample[T, F](example)`       | Example usage                     |
-| `WithFlags[T, F](flags)`           | Typed flags struct                |
-| `WithRunE[T, F](runE)`             | Main handler (required for NewCommand) |
-| `WithPreRunE[T, F](preRunE)`       | Pre-validation hook               |
-| `WithPostRunE[T, F](postRunE)`     | Post-success cleanup hook         |
-| `WithSubcommands[T, F](cmds...)`   | Child commands                    |
-| `WithHidden[T, F](hidden)`         | Hide from help                    |
-| `WithDeprecated[T, F](msg)`        | Deprecation message               |
-| `WithGroupID[T, F](group)`         | Help group name                   |
+| Option                           | Purpose                                |
+| -------------------------------- | -------------------------------------- |
+| `WithShort[T, F](short)`         | Short description                      |
+| `WithLong[T, F](long)`           | Long description                       |
+| `WithAliases[T, F](aliases...)`  | Alternative names                      |
+| `WithExample[T, F](example)`     | Example usage                          |
+| `WithFlags[T, F](flags)`         | Typed flags struct                     |
+| `WithRunE[T, F](runE)`           | Main handler (required for NewCommand) |
+| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook                    |
+| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook              |
+| `WithSubcommands[T, F](cmds...)` | Child commands                         |
+| `WithHidden[T, F](hidden)`       | Hide from help                         |
+| `WithDeprecated[T, F](msg)`      | Deprecation message                    |
+| `WithGroupID[T, F](group)`       | Help group name                        |
 
 ### CLI[T] Constructor
 
