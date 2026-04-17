@@ -1,6 +1,6 @@
 # AGENTS.md - cmdguard Project Guide
 
-**Last Updated:** 2026-04-05
+**Last Updated:** 2026-04-17
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
 **Status:** v2.1.0 - Production Ready
@@ -10,7 +10,7 @@
 ## Quick Start
 
 ```bash
-# Run tests (all 11 packages, with race detection)
+# Run tests (all 14 packages, with race detection)
 go test ./... -count=1 -timeout 120s -race
 
 # Build all
@@ -52,21 +52,39 @@ cmdguard/
 ├── pkg/cmdguard/
 │   ├── v2/                       # v2 API (recommended)
 │   │   ├── cli.go                # CLI[T] struct, NewCLI, AddCommand, Execute
-│   │   ├── command.go            # Command[T,F] struct, functional options
-│   │   ├── scope.go              # DI scope wrapping samber/do/v2
+│   │   ├── cli_accessors.go      # CLI accessor methods (Config, Scope, etc.)
+│   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
+│   │   ├── cli_options.go        # CLI functional options (WithCLIVersion, etc.)
+│   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
+│   │   ├── config.go             # Config type constraint
+│   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue
+│   │   ├── config_setfield.go    # SetField for config structs
+│   │   ├── errors.go             # Sentinel errors and error types
 │   │   ├── flags.go              # FlagRegistry with struct tags
 │   │   ├── flags_parse.go        # Flag parsing logic
 │   │   ├── flags_suggest.go      # Typo suggestions (Levenshtein)
+│   │   ├── flags_validate.go     # Flag validation
 │   │   ├── flag_helpers.go       # Flag type constraints, cloning, parsing helpers
 │   │   ├── flow_context.go       # BranchingFlowContext for command path tracking
-│   │   ├── errors.go             # Sentinel errors and error types
-│   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue
-│   │   ├── types.go              # LogLevel, Enum[T], Duration, NoFlags
-│   │   └── types_option.go       # Option[T] (Rust-like Some/None)
-│   └── guarded_command.go        # v1 API
+│   │   ├── middleware.go         # Middleware chain pattern
+│   │   ├── scope.go              # DI scope wrapping samber/do/v2
+│   │   ├── type_helpers.go       # Generic type helpers
+│   │   ├── types_duration.go     # Duration type
+│   │   ├── types_email.go        # Email type
+│   │   ├── types_enum.go         # Enum[T] type
+│   │   ├── types_filepath.go     # FilePath type
+│   │   ├── types_hostport.go     # HostPort type
+│   │   ├── types_log.go          # LogLevel type
+│   │   ├── types_option.go       # Option[T] (Rust-like Some/None)
+│   │   ├── types_port.go         # Port type
+│   │   ├── types_result.go       # Result[T] (Rust-like Ok/Err)
+│   │   └── types_url.go          # URL type
+│   └── guarded_command.go        # v1 API (deprecated)
 ├── pkg/errtypes/
 │   ├── errors.go                 # CodedError type
 │   └── errors_test.go            # 100% coverage
+├── pkg/testutil/
+│   └── panic_test_helpers.go     # Shared test assertions
 ├── internal/
 │   ├── config/                   # Configuration (koanf-based)
 │   └── logging/                  # Structured logging (100% coverage)
@@ -74,7 +92,9 @@ cmdguard/
 │   ├── basic/                    # v1 API demo
 │   ├── typed/                    # v2 API demo with DI and lifecycle
 │   ├── di/                       # DI-focused example
-│   └── advanced-flags/           # Advanced flag types
+│   ├── advanced-flags/           # Advanced flag types
+│   ├── validation/               # Validation patterns example
+│   └── internal/                 # Shared example helpers
 ├── benchmarks/                   # Performance benchmarks
 ├── tests/integration/            # Integration tests
 ├── docs/                         # Documentation
@@ -90,8 +110,9 @@ cmdguard/
 | Package            | Purpose           | Importable? | Coverage |
 | ------------------ | ----------------- | ----------- | -------- |
 | `pkg/cmdguard/v2`  | v2 Type-safe API  | Yes         | 87.9%    |
-| `pkg/cmdguard`     | v1 Guard API      | Yes         | 87.0%    |
+| `pkg/cmdguard`     | v1 Guard API      | Yes (deprecated) | 87.0% |
 | `pkg/errtypes`     | Coded error type  | Yes         | 100%     |
+| `pkg/testutil`     | Test helpers      | Yes         | —        |
 | `internal/config`  | Configuration     | No          | 78.9%    |
 | `internal/logging` | Logging utilities | No          | 100%     |
 
@@ -114,11 +135,47 @@ cmdguard/
 
 `CLI[T]` has one type parameter (config type). Each command gets its own flags type via `Command[T, F]`. Because Go doesn't support additional type parameters on methods, `AddCommand` is a standalone function.
 
+Commands are created via constructors — `NewCommand` for leaf commands, `NewParentCommand` for commands with subcommands. Struct fields are unexported to enforce validation at construction time.
+
 ```go
 cli, err := v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
-v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{...})
-v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{...})
+cmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet", greetHandler,
+    v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+    v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+)
+v2.AddCommand(cli, cmd)
 ```
+
+### Command Constructors
+
+```go
+// Leaf command with handler
+func NewCommand[T, F any](use string, runE func(ctx context.Context, cfg *T, flags F) error, opts ...CommandOption[T, F]) (Command[T, F], error)
+
+// Parent command with subcommands
+func NewParentCommand[T, F any](use string, long string, subcommands []Command[T, F], opts ...CommandOption[T, F]) (Command[T, F], error)
+
+// Panic variants (for compile-time-known config)
+func MustNewCommand[T, F any](...) Command[T, F]
+func MustNewParentCommand[T, F any](...) Command[T, F]
+```
+
+### Command Options
+
+| Option                             | Purpose                           |
+| ---------------------------------- | --------------------------------- |
+| `WithShort[T, F](short)`           | Short description                 |
+| `WithLong[T, F](long)`             | Long description                  |
+| `WithAliases[T, F](aliases...)`    | Alternative names                 |
+| `WithExample[T, F](example)`       | Example usage                     |
+| `WithFlags[T, F](flags)`           | Typed flags struct                |
+| `WithRunE[T, F](runE)`             | Main handler (required for NewCommand) |
+| `WithPreRunE[T, F](preRunE)`       | Pre-validation hook               |
+| `WithPostRunE[T, F](postRunE)`     | Post-success cleanup hook         |
+| `WithSubcommands[T, F](cmds...)`   | Child commands                    |
+| `WithHidden[T, F](hidden)`         | Hide from help                    |
+| `WithDeprecated[T, F](msg)`        | Deprecation message               |
+| `WithGroupID[T, F](group)`         | Help group name                   |
 
 ### CLI[T] Constructor
 
@@ -181,15 +238,18 @@ func main() {
         panic(err)
     }
 
-    err = v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
-        Use:   "hello",
-        Short: "Say hello",
-        RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+    cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("hello",
+        func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
             fmt.Printf("Hello! Verbose: %v\n", cfg.Verbose)
             return nil
         },
-    })
+        v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
+    )
     if err != nil {
+        panic(err)
+    }
+
+    if err := v2.AddCommand(cli, cmd); err != nil {
         panic(err)
     }
 
@@ -208,11 +268,8 @@ type GreetFlags struct {
     Shout bool   `flag:"shout" default:"false"          help:"Shout the greeting"`
 }
 
-err = v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{
-    Use:   "greet",
-    Short: "Greet someone",
-    Flags: &GreetFlags{},
-    RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+    func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         for i := uint(0); i < flags.Count; i++ {
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
             if flags.Shout {
@@ -222,30 +279,26 @@ err = v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{
         }
         return nil
     },
-})
-```
-
-### Mixing Flag Types
-
-Each call to `AddCommand` can use a different flags type:
-
-```go
-v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{Use: "greet", Flags: &GreetFlags{}, RunE: greetHandler})
-v2.AddCommand(cli, v2.Command[AppConfig, *ConfigFlags]{Use: "config", Flags: &ConfigFlags{}, RunE: configHandler})
-v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{Use: "version", RunE: versionHandler})
+    v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+    v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+)
+v2.AddCommand(cli, greetCmd)
 ```
 
 ### Subcommands
 
 ```go
-err = v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
-    Use:   "user",
-    Short: "User management",
-    Commands: []v2.Command[AppConfig, v2.NoFlags]{
-        {Use: "list", Short: "List users", RunE: listUsersHandler},
-        {Use: "create", Short: "Create user", RunE: createUserHandler},
-    },
-})
+listCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("list",
+    listUsersHandler, v2.WithShort[AppConfig, v2.NoFlags]("List users"),
+)
+createCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("create",
+    createUserHandler, v2.WithShort[AppConfig, v2.NoFlags]("Create user"),
+)
+userCmd, err := v2.NewParentCommand[AppConfig, v2.NoFlags]("user",
+    "User management", []v2.Command[AppConfig, v2.NoFlags]{listCmd, createCmd},
+    v2.WithShort[AppConfig, v2.NoFlags]("User management"),
+)
+v2.AddCommand(cli, userCmd)
 ```
 
 ### Dependency Injection
@@ -268,18 +321,14 @@ db, err := v2.Invoke[*Database](cli.Scope())
 ### Lifecycle Hooks
 
 ```go
-err = v2.AddCommand(cli, v2.Command[AppConfig, *Flags]{
-    Use: "example",
-    PreRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+cmd, err := v2.NewCommand[AppConfig, *Flags]("example", runHandler,
+    v2.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return nil // validation
-    },
-    RunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-        return nil // main logic
-    },
-    PostRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    }),
+    v2.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return nil // cleanup (only called on success)
-    },
-})
+    }),
+)
 ```
 
 ### BranchingFlowContext
@@ -298,9 +347,11 @@ bfc.GetValue(key)       // looks up hierarchy
 ```go
 // All v2 functions return errors
 cli, err := v2.NewCLI[Config]("app", "My app", Config{})
+cmd, err := v2.NewCommand[Config, NoFlags]("test", handler)
 
 // Sentinel errors for errors.Is()
 errors.Is(err, v2.ErrInvalidCommand)
+errors.Is(err, v2.ErrMissingName)
 errors.Is(err, v2.ErrDuplicateCommand)
 errors.Is(err, v2.ErrMissingHandler)
 
@@ -313,7 +364,7 @@ v2.NewFlagErrorWithSuggestion(name, err, suggestion)  // includes typo fix
 
 ---
 
-## v1 API (Legacy)
+## v1 API (Legacy / Deprecated)
 
 ```go
 root := cmdguard.New("myapp", "My application")
@@ -321,7 +372,7 @@ root.AddCommand(&cobra.Command{Use: "hello", Short: "Say hello", Run: ...})
 root.ExecuteAndExit(context.Background())
 ```
 
-Panics at construction if command is invalid (intentional fail-fast).
+Panics at construction if command is invalid (intentional fail-fast). Use v2 for new projects.
 
 ---
 
@@ -334,6 +385,7 @@ Panics at construction if command is invalid (intentional fail-fast).
 - **Error handling** - Always check errors, wrap with `fmt.Errorf("context: %w", err)`
 - **No panics** in v2 library code
 - **Functional options** pattern for configuration
+- **Constructor pattern** - All Command creation via `NewCommand`/`NewParentCommand`, struct fields unexported
 
 ### Testing
 
@@ -363,6 +415,7 @@ go build ./...                                   # Verify build
 3. **DI-Powered** - samber/do/v2 for dependency injection
 4. **Typed Flags** - Struct tags for flag definitions
 5. **Standalone AddCommand** - Function (not method) to support per-command flag types
+6. **Constructor validation** - Commands validated at construction, struct fields unexported
 
 ### Key Gotchas
 
@@ -371,6 +424,7 @@ go build ./...                                   # Verify build
 3. v1 `GuardedCommand` in `pkg/cmdguard/guarded_command.go` is the v1 type — do NOT delete
 4. `NoFlags` is `type NoFlags = struct{}` — use `(NoFlags{})` with parens for comparisons
 5. fang provides styled output by default; `WithColor(false)` falls back to plain cobra
+6. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
 
 ---
 
