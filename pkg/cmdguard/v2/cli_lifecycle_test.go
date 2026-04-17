@@ -61,7 +61,19 @@ func TestCLIAddGlobalFlag(t *testing.T) {
 
 		flag := cli.RootCommand().PersistentFlags().Lookup("custom")
 		if flag == nil {
-			t.Error("flag not added")
+			t.Fatal("flag not added")
+		}
+
+		if flag.Shorthand != "c" {
+			t.Errorf("Shorthand = %q, want %q", flag.Shorthand, "c")
+		}
+
+		if flag.DefValue != "default" {
+			t.Errorf("DefValue = %q, want %q", flag.DefValue, "default")
+		}
+
+		if flag.Usage != "help text" {
+			t.Errorf("Usage = %q, want %q", flag.Usage, "help text")
 		}
 	})
 }
@@ -80,7 +92,19 @@ func TestCLIAddGlobalBoolFlag(t *testing.T) {
 
 		flag := cli.RootCommand().PersistentFlags().Lookup("debug")
 		if flag == nil {
-			t.Error("flag not added")
+			t.Fatal("flag not added")
+		}
+
+		if flag.Shorthand != "d" {
+			t.Errorf("Shorthand = %q, want %q", flag.Shorthand, "d")
+		}
+
+		if flag.DefValue != "true" {
+			t.Errorf("DefValue = %q, want %q", flag.DefValue, "true")
+		}
+
+		if flag.Usage != "enable debug" {
+			t.Errorf("Usage = %q, want %q", flag.Usage, "enable debug")
 		}
 	})
 }
@@ -238,6 +262,10 @@ func TestWithCLIScope(t *testing.T) {
 
 		if cli == nil {
 			t.Fatal("cli is nil")
+		}
+
+		if cli.Scope() != customScope {
+			t.Error("cli.Scope() should be the custom scope passed via WithCLIScope")
 		}
 	})
 }

@@ -212,6 +212,10 @@ func TestTimingMiddleware(t *testing.T) {
 	if capturedDuration < 0 {
 		t.Error("duration should be non-negative")
 	}
+
+	if capturedDuration > time.Second {
+		t.Errorf("duration %v seems unreasonably large for a no-op command", capturedDuration)
+	}
 }
 
 func TestRecoveryMiddleware(t *testing.T) {
