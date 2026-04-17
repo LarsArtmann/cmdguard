@@ -49,13 +49,13 @@ verify: build test lint
 run-basic:
     go run ./examples/basic/main.go hello
 
-# Run advanced example
+# Run advanced-flags example
 run-advanced:
-    go run ./examples/advanced/main.go db migrate
+    go run ./examples/advanced-flags/main.go env
 
-# Run guarded example
-run-guarded:
-    go run ./examples/guarded/main.go validate
+# Run validation example
+run-validation:
+    go run ./examples/validation/main.go greet --name=World
 
 # Clean build artifacts
 clean:
