@@ -167,4 +167,44 @@ func TestSetField(t *testing.T) {
 
 		assertErrorContains(t, err, "cannot convert")
 	})
+
+	t.Run("string to Enum with allowed values", func(t *testing.T) {
+		t.Parallel()
+
+		cfg := &struct {
+			Mode Enum
+		}{
+			Mode: Enum{value: "dev", allowed: []string{"dev", "staging", "prod"}},
+		}
+
+		err := SetField(cfg, "Mode", "prod")
+		testutil.AssertNoError(t, err)
+		testutil.AssertFieldEqString(t, cfg.Mode.String(), "prod", "Mode")
+	})
+
+	t.Run("string to Enum with invalid value rejects", func(t *testing.T) {
+		t.Parallel()
+
+		cfg := &struct {
+			Mode Enum
+		}{
+			Mode: Enum{value: "dev", allowed: []string{"dev", "staging", "prod"}},
+		}
+
+		err := SetField(cfg, "Mode", "invalid")
+		testutil.AssertExpectedError(t, err)
+		assertErrorContains(t, err, "invalid")
+	})
+
+	t.Run("string to Enum without allowed values accepts any", func(t *testing.T) {
+		t.Parallel()
+
+		cfg := &struct {
+			Mode Enum
+		}{}
+
+		err := SetField(cfg, "Mode", "anything")
+		testutil.AssertNoError(t, err)
+		testutil.AssertFieldEqString(t, cfg.Mode.String(), "anything", "Mode")
+	})
 }

@@ -119,7 +119,21 @@ func setStringField(field reflect.Value, str string) error {
 	case reflect.TypeFor[Duration]():
 		return wrapErr(parseAndSetDuration(field, str), field, str)
 	case reflect.TypeFor[Enum]():
-		field.Set(reflect.ValueOf(Enum{value: str}))
+		current := field.Interface().(Enum)
+		allowed := current.Allowed()
+
+		if len(allowed) == 0 {
+			field.Set(reflect.ValueOf(Enum{value: str}))
+
+			return nil
+		}
+
+		parsed, err := ParseEnum(str, allowed)
+		if err != nil {
+			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+		}
+
+		field.Set(reflect.ValueOf(parsed))
 
 		return nil
 	}
