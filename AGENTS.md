@@ -10,7 +10,7 @@
 ## Quick Start
 
 ```bash
-# Run tests (all 14 packages, with race detection)
+# Run tests (all packages, with race detection)
 go test ./... -count=1 -timeout 120s -race
 
 # Build all
@@ -34,12 +34,9 @@ go test ./... -count=1 -timeout 120s -cover
 
 **cmdguard** is a Go library for building validated Cobra CLI applications with type-safe dependency injection.
 
-**Two APIs Available:**
-
-| API                  | Package           | Use Case                         |
-| -------------------- | ----------------- | -------------------------------- |
-| **v2** (Recommended) | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
-| v1 (Legacy)          | `pkg/cmdguard`    | Simple, panic-at-construction    |
+| API  | Package           | Use Case                         |
+| ---- | ----------------- | -------------------------------- |
+| v2   | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
 **Current Status:** v2.1.0. All packages tested, 0 lint issues.
 
@@ -77,14 +74,10 @@ cmdguard/
 │   │   ├── types_log.go          # LogLevel type
 │   │   ├── types_port.go         # Port type
 │   │   └── types_url.go          # URL type
-│   └── guarded_command.go        # v1 API (deprecated)
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
-├── internal/
-│   ├── config/                   # Configuration (v1-only, pending removal)
-│   └── logging/                  # Structured logging (100% coverage)
 ├── examples/
-│   ├── basic/                    # v1 API demo
+│   ├── basic/                    # Simple v2 demo
 │   ├── typed/                    # v2 API demo with DI and lifecycle
 │   ├── di/                       # DI-focused example
 │   ├── advanced-flags/           # Advanced flag types
@@ -102,13 +95,10 @@ cmdguard/
 
 ### Package Guidelines
 
-| Package            | Purpose           | Importable?      | Coverage |
-| ------------------ | ----------------- | ---------------- | -------- |
-| `pkg/cmdguard/v2`  | v2 Type-safe API  | Yes              | 82.2%    |
-| `pkg/cmdguard`     | v1 Guard API      | Yes (deprecated) | 87.4%    |
-| `pkg/testutil`     | Test helpers      | Yes              | —        |
-| `internal/config`  | Configuration     | No               | 95.7%    |
-| `internal/logging` | Logging utilities | No               | 97.1%    |
+| Package           | Purpose          | Importable? | Coverage |
+| ----------------- | ---------------- | ----------- | -------- |
+| `pkg/cmdguard/v2` | Type-safe API    | Yes         | 82.2%    |
+| `pkg/testutil`    | Test helpers     | Yes         | —        |
 
 ---
 
@@ -123,7 +113,7 @@ cmdguard/
 
 ---
 
-## v2 API (Recommended)
+## API Reference
 
 ### Architecture: CLI[T] + Command[T, F]
 
@@ -358,18 +348,6 @@ v2.NewFlagErrorWithSuggestion(name, err, suggestion)  // includes typo fix
 
 ---
 
-## v1 API (Legacy / Deprecated)
-
-```go
-root := cmdguard.New("myapp", "My application")
-root.AddCommand(&cobra.Command{Use: "hello", Short: "Say hello", Run: ...})
-root.ExecuteAndExit(context.Background())
-```
-
-Panics at construction if command is invalid (intentional fail-fast). Use v2 for new projects.
-
----
-
 ## Coding Standards
 
 ### Go Conventions
@@ -415,8 +393,7 @@ go build ./...                                   # Verify build
 
 1. `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 2. `PostRunE` is NOT called when `RunE` errors (Cobra behavior)
-3. v1 `GuardedCommand` in `pkg/cmdguard/guarded_command.go` is the v1 type — do NOT delete
-4. `NoFlags` is `type NoFlags = struct{}` — use `(NoFlags{})` with parens for comparisons
+3. `NoFlags` is `type NoFlags = struct{}` — use `(NoFlags{})` with parens for comparisons
 5. fang provides styled output by default; `WithColor(false)` falls back to plain cobra
 6. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
 

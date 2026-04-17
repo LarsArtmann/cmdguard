@@ -124,17 +124,6 @@ Type-safe command definition with typed flags.
 
 ---
 
-## v1 API (pkg/cmdguard) — Deprecated
-
-The v1 Guard API provides panic-at-construction validation. Use `pkg/cmdguard/v2` instead.
-
-| Feature            | Status        | Notes                              |
-| ------------------ | ------------- | ---------------------------------- |
-| `New(name, short)` | 🗑️ DEPRECATED | Use v2.NewCLI instead              |
-| `AddCommand(cmd)`  | 🗑️ DEPRECATED | Use v2.AddCommand instead          |
-| `Execute(ctx)`     | 🗑️ DEPRECATED | Use v2 CLI[T].Execute instead      |
-| `IsStrictMode()`   | 🗑️ DEPRECATED | No v2 equivalent (v2 never panics) |
-
 ---
 
 ## Dependencies
@@ -149,12 +138,9 @@ The v1 Guard API provides panic-at-construction validation. Use `pkg/cmdguard/v2
 
 ## Testing
 
-| Package            | Coverage | Status  |
-| ------------------ | -------- | ------- |
-| `pkg/cmdguard/v2`  | 82.2%    | ✅ Good |
-| `pkg/cmdguard`     | 87.4%    | ✅ Good |
-| `internal/config`  | 95.7%    | ✅ Good |
-| `internal/logging` | 97.1%    | ✅ Good |
+| Package           | Coverage | Status  |
+| ----------------- | -------- | ------- |
+| `pkg/cmdguard/v2` | 82.2%    | ✅ Good |
 
 ---
 
@@ -209,7 +195,6 @@ v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
 ### Phase 4: Beyond (Long Term)
 
 - [ ] Plugin system for custom validators
-- [ ] Enhanced flag validation (enums, custom validators)
 - [ ] Performance benchmarks
 - [ ] Release automation
 

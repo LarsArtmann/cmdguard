@@ -25,6 +25,19 @@ test-v:
 test-cover:
     go test -cover ./...
 
+# Enforce minimum coverage threshold (80%)
+coverage-threshold:
+    @go test ./pkg/cmdguard/v2/... -count=1 -timeout 120s -coverprofile=coverage.out >/dev/null 2>&1
+    @COVERAGE=$$(go tool cover -func=coverage.out | tail -1 | awk '{print $$3}' | sed 's/%//'); \
+    echo "Coverage: $${COVERAGE}%"; \
+    if [ "$$(echo "$$COVERAGE < 80" | bc -l)" = "1" ]; then \
+        echo "FAIL: coverage $${COVERAGE}% is below 80% threshold"; \
+        rm -f coverage.out; \
+        exit 1; \
+    fi
+    @rm -f coverage.out
+    @echo "PASS: coverage meets 80% threshold"
+
 # Run tests with race detector
 test-race:
     go test -race ./...

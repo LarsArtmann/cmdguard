@@ -4,14 +4,9 @@
 
 **A Go library for building validated CLI applications with type-safe flags and dependency injection.**
 
-cmdguard wraps [Cobra](https://github.com/spf13/cobra) with validation and provides two APIs:
+cmdguard wraps [Cobra](https://github.com/spf13/cobra) with type-safe validation and dependency injection.
 
-| API                  | Package           | Description                                |
-| -------------------- | ----------------- | ------------------------------------------ |
-| **v2** (Recommended) | `pkg/cmdguard/v2` | Type-safe, DI-powered, returns errors      |
-| v1                   | `pkg/cmdguard`    | Simple wrapper, panics on invalid commands |
-
-v2 is the recommended API—it never panics and provides full type safety for configuration and command flags.
+The v2 API provides a type-safe, DI-powered, no-panic CLI construction experience.
 
 ## Installation
 
@@ -89,47 +84,17 @@ func main() {
 }
 ```
 
-### v1 API - Simple Cobra Wrapper
+## Features
 
-For simpler use cases or migration from raw Cobra:
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-
-    "github.com/larsartmann/cmdguard/pkg/cmdguard"
-    "github.com/spf13/cobra"
-)
-
-func main() {
-    root := cmdguard.New("myapp", "My CLI application")
-
-    root.AddCommand(&cobra.Command{
-        Use:   "hello",
-        Short: "Say hello",
-        Run: func(cmd *cobra.Command, args []string) {
-            fmt.Println("Hello, World!")
-        },
-    })
-
-    root.ExecuteAndExit(context.Background())
-}
-```
-
-## API Comparison
-
-| Feature           | v1 API | v2 API                                   |
-| ----------------- | ------ | ---------------------------------------- |
-| Type-safe config  | No     | Yes (type parameter T)                   |
-| Type-safe flags   | No     | Yes (type parameter F)                   |
-| DI integration    | No     | Yes (samber/do/v2)                       |
-| Flag tags         | No     | Yes (`flag`, `short`, `default`, `help`) |
-| Lifecycle hooks   | No     | Yes (PreRunE, PostRunE)                  |
-| Health checks     | No     | Yes                                      |
-| Graceful shutdown | No     | Yes                                      |
+| Feature           | Description                                |
+| ----------------- | ------------------------------------------ |
+| Type-safe config  | Yes (type parameter T)                     |
+| Type-safe flags   | Yes (type parameter F)                     |
+| DI integration    | Yes (samber/do/v2)                         |
+| Flag tags         | Yes (`flag`, `short`, `default`, `help`)   |
+| Lifecycle hooks   | Yes (PreRunE, PostRunE)                    |
+| Health checks     | Yes                                        |
+| Graceful shutdown | Yes                                        |
 
 ## v2 API Reference
 
@@ -420,46 +385,30 @@ See [`examples/typed/main.go`](examples/typed/main.go) for a complete example wi
 
 cmdguard validates commands at construction time:
 
-- **v2 API (recommended)** returns errors on invalid commands—no panics
-- **v1 API** panics on invalid commands for fail-fast behavior
-- **Type-safe flags** ensure flags are properly typed at compile time
-- **DI integration** (v2) enables clean service management and lifecycle handling
+- Returns errors on invalid commands—no panics
+- Type-safe flags ensure flags are properly typed at compile time
+- DI integration enables clean service management and lifecycle handling
 
 This approach catches configuration errors during development, not production.
 
 ## Philosophy
 
-**Why two APIs?**
+cmdguard is designed for production CLIs:
 
-- **v1** panics on invalid commands—simple, fail-fast approach
-- **v2** returns errors—flexible, production-friendly, type-safe
-
-**When to use v2 (recommended):**
-
-- You want type-safe flags with struct tags
-- You need dependency injection for services
-- You prefer graceful error handling over panics
-- You're building production CLIs
-
-**When to use v1:**
-
-- You want a simple Cobra wrapper
-- You prefer "crash early" over error handling
-- You're building quick scripts or prototypes
+- Type-safe flags with struct tags
+- Dependency injection for services
+- Graceful error handling—never panics
+- Constructor validation catches errors early
 
 ## Project Status
 
-| API    | Status | Description                            |
-| ------ | ------ | -------------------------------------- |
-| **v2** | Stable | Full type-safe API with DI integration |
-| v1     | Stable | Simple Cobra wrapper with panics       |
-
-Both APIs are production-ready. Use v2 for new projects.
+| Status | Description                            |
+| ------ | -------------------------------------- |
+| Stable | Full type-safe API with DI integration |
 
 ## Documentation
 
 - [Quick Start Guide](docs/QUICKSTART.md) - Get started with cmdguard v2 in 5 minutes
-- [Migration Guide v1 to v2](docs/MIGRATION_v1_v2.md) - Migrating from v1 to v2 API
 - [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) - Design guidelines
 
 ## License
