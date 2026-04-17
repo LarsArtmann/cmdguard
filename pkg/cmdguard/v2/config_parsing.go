@@ -42,13 +42,13 @@ func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 	var tags []FlagTag
 
 	for field := range t.Fields() {
-		tag, err := parseFieldFlag(field)
+		tag, ok, err := parseFieldFlag(field)
 		if err != nil {
 			return nil, err
 		}
 
-		if tag != nil {
-			tags = append(tags, *tag)
+		if ok {
+			tags = append(tags, tag)
 		}
 	}
 
@@ -56,13 +56,14 @@ func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 }
 
 // parseFieldFlag parses flag tags from a single struct field.
-// Returns nil if the field doesn't have a flag tag.
-func parseFieldFlag(field reflect.StructField) (*FlagTag, error) {
+// Returns (FlagTag, true, nil) if a flag tag was found.
+// Returns (FlagTag{}, false, nil) if the field should be skipped.
+func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 	flagTag := field.Tag.Get("flag")
 
 	// Skip fields without flag tag
 	if flagTag == "" || flagTag == "-" {
-		return nil, nil
+		return FlagTag{}, false, nil
 	}
 
 	tag := FlagTag{
@@ -95,7 +96,7 @@ func parseFieldFlag(field reflect.StructField) (*FlagTag, error) {
 	if req := field.Tag.Get("required"); req != "" {
 		required, err := strconv.ParseBool(req)
 		if err != nil {
-			return nil, fmt.Errorf("field %q: invalid required tag %q: %w", field.Name, req, err)
+			return FlagTag{}, false, fmt.Errorf("field %q: invalid required tag %q: %w", field.Name, req, err)
 		}
 
 		tag.Required = required
@@ -106,7 +107,7 @@ func parseFieldFlag(field reflect.StructField) (*FlagTag, error) {
 		tag.Validate = validate
 	}
 
-	return &tag, nil
+	return tag, true, nil
 }
 
 // parseBoolDefault parses a boolean default value.
