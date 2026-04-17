@@ -161,4 +161,19 @@ func TestParseFlagTags(t *testing.T) {
 			t.Errorf("expected at least 1 tag, got %d", len(tags))
 		}
 	})
+
+	t.Run("invalid required tag returns error", func(t *testing.T) {
+		t.Parallel()
+
+		type BadConfig struct {
+			Name string `flag:"name" required:"tru"`
+		}
+
+		_, err := ParseFlagTags(BadConfig{})
+		if err == nil {
+			t.Fatal("expected error for invalid required tag, got nil")
+		}
+
+		assertErrorContains(t, err, "Name", "required", "tru")
+	})
 }

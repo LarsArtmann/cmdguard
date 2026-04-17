@@ -42,7 +42,11 @@ func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 	var tags []FlagTag
 
 	for field := range t.Fields() {
-		tag := parseFieldFlag(field)
+		tag, err := parseFieldFlag(field)
+		if err != nil {
+			return nil, err
+		}
+
 		if tag != nil {
 			tags = append(tags, *tag)
 		}
@@ -53,12 +57,12 @@ func parseStructTags(t reflect.Type) ([]FlagTag, error) {
 
 // parseFieldFlag parses flag tags from a single struct field.
 // Returns nil if the field doesn't have a flag tag.
-func parseFieldFlag(field reflect.StructField) *FlagTag {
+func parseFieldFlag(field reflect.StructField) (*FlagTag, error) {
 	flagTag := field.Tag.Get("flag")
 
 	// Skip fields without flag tag
 	if flagTag == "" || flagTag == "-" {
-		return nil
+		return nil, nil
 	}
 
 	tag := FlagTag{
@@ -89,7 +93,12 @@ func parseFieldFlag(field reflect.StructField) *FlagTag {
 
 	// Parse required tag
 	if req := field.Tag.Get("required"); req != "" {
-		tag.Required, _ = strconv.ParseBool(req)
+		required, err := strconv.ParseBool(req)
+		if err != nil {
+			return nil, fmt.Errorf("field %q: invalid required tag %q: %w", field.Name, req, err)
+		}
+
+		tag.Required = required
 	}
 
 	// Parse validate tag
@@ -97,7 +106,7 @@ func parseFieldFlag(field reflect.StructField) *FlagTag {
 		tag.Validate = validate
 	}
 
-	return &tag
+	return &tag, nil
 }
 
 // parseBoolDefault parses a boolean default value.
