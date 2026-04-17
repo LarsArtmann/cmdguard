@@ -46,7 +46,8 @@ func (r *validatorRegistry) registerBuiltins() {
 }
 
 // RegisterValidator adds a named validator to the global registry.
-// This is not goroutine-safe during init; call before creating any CLI.
+// Safe for concurrent use via internal sync.RWMutex.
+// Must be called before CLI execution to ensure validators are available.
 func RegisterValidator(name string, validator FlagValidator) {
 	globalValidators.mu.Lock()
 	defer globalValidators.mu.Unlock()
