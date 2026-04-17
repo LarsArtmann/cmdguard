@@ -13,6 +13,10 @@ import (
 // It tracks the path through command execution and allows context values to flow
 // through the command tree while supporting independent branching for subcommands.
 //
+// BranchingFlowContext is not goroutine-safe. Concurrent calls to SetValue/Branch
+// require external synchronization. In typical CLI usage this is not needed since
+// command execution is sequential.
+//
 //nolint:containedctx // Intentional: this struct IS a context wrapper for flow control
 type BranchingFlowContext struct {
 	context.Context
