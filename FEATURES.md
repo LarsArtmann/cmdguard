@@ -1,7 +1,7 @@
 # cmdguard Features
 
-**Last Updated:** 2026-04-05
-**Version:** 2.1.0  
+**Last Updated:** 2026-04-17
+**Version:** 2.1.0
 **Go Version:** 1.26.1
 
 ---
@@ -56,17 +56,21 @@ Type-safe CLI with single type parameter. Each command can have its own flags ty
 
 Type-safe command definition with typed flags.
 
-| Feature                           | Status              | Notes                     |
-| --------------------------------- | ------------------- | ------------------------- |
-| `Use`, `Short`, `Long` fields     | ✅ FULLY_FUNCTIONAL | Standard command metadata |
-| `Flags F`                         | ✅ FULLY_FUNCTIONAL | Struct with flag tags     |
-| `RunE func(ctx, *T, flags)`       | ✅ FULLY_FUNCTIONAL | Type-safe handler         |
-| `PreRunE` / `PostRunE`            | ✅ FULLY_FUNCTIONAL | Lifecycle hooks           |
-| `Commands []Command[T, F]`        | ✅ FULLY_FUNCTIONAL | Nested subcommands        |
-| `Hidden`, `Deprecated`            | ✅ FULLY_FUNCTIONAL | Visibility options        |
-| `Aliases`, `Version`              | ✅ FULLY_FUNCTIONAL | Additional metadata       |
-| `Validate()`                      | ✅ FULLY_FUNCTIONAL | Command validation        |
-| `NewCommand(use, short, opts...)` | ✅ FULLY_FUNCTIONAL | Constructor with options  |
+| Feature                           | Status              | Notes                                     |
+| --------------------------------- | ------------------- | ----------------------------------------- |
+| `Use`, `Short`, `Long` fields     | ✅ FULLY_FUNCTIONAL | Set via constructors (unexported fields)  |
+| `Flags F`                         | ✅ FULLY_FUNCTIONAL | Struct with flag tags                     |
+| `RunE func(ctx, *T, flags)`       | ✅ FULLY_FUNCTIONAL | Type-safe handler                         |
+| `PreRunE` / `PostRunE`            | ✅ FULLY_FUNCTIONAL | Set via WithPreRunE/WithPostRunE options  |
+| `Commands []Command[T, F]`        | ✅ FULLY_FUNCTIONAL | Set via NewParentCommand                  |
+| `Hidden`, `Deprecated`            | ✅ FULLY_FUNCTIONAL | Set via WithHidden/WithDeprecated options |
+| `Aliases`                         | ✅ FULLY_FUNCTIONAL | Set via WithAliases option                |
+| `Validate()`                      | ✅ FULLY_FUNCTIONAL | Called by constructors                    |
+| `NewCommand(use, runE, opts...)`  | ✅ FULLY_FUNCTIONAL | Leaf command constructor                  |
+| `NewParentCommand(use, long, subs, opts...)` | ✅ FULLY_FUNCTIONAL | Parent command constructor       |
+| `MustNewCommand(...)`             | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
+| `MustNewParentCommand(...)`       | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
+| Command options (12 total)        | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, etc.   |
 
 ### Flag System
 
@@ -120,16 +124,16 @@ Type-safe command definition with typed flags.
 
 ---
 
-## v1 API (pkg/cmdguard)
+## v1 API (pkg/cmdguard) — Deprecated
 
-The v1 Guard API provides panic-at-construction validation.
+The v1 Guard API provides panic-at-construction validation. Use `pkg/cmdguard/v2` instead.
 
-| Feature            | Status              | Notes                              |
-| ------------------ | ------------------- | ---------------------------------- |
-| `New(name, short)` | ✅ FULLY_FUNCTIONAL | Creates guarded root command       |
-| `AddCommand(cmd)`  | ✅ FULLY_FUNCTIONAL | Adds subcommand, panics if invalid |
-| `Execute(ctx)`     | ✅ FULLY_FUNCTIONAL | Runs command with context          |
-| `IsStrictMode()`   | ✅ FULLY_FUNCTIONAL | Returns strict mode status         |
+| Feature            | Status            | Notes                                |
+| ------------------ | ----------------- | ------------------------------------ |
+| `New(name, short)` | 🗑️ DEPRECATED     | Use v2.NewCLI instead                |
+| `AddCommand(cmd)`  | 🗑️ DEPRECATED     | Use v2.AddCommand instead            |
+| `Execute(ctx)`     | 🗑️ DEPRECATED     | Use v2 CLI[T].Execute instead        |
+| `IsStrictMode()`   | 🗑️ DEPRECATED     | No v2 equivalent (v2 never panics)   |
 
 ---
 
@@ -162,7 +166,8 @@ The v1 Guard API provides panic-at-construction validation.
 ```
 v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
     └── CLI[AppConfig]
-        ├── AddCommand(cli, Command[AppConfig]{...}) - returns error
+        ├── AddCommand(cli, NewCommand[T,F]("cmd", handler, opts...))
+        ├── AddCommand(cli, NewParentCommand[T,F]("cmd", long, subs, opts...))
         ├── Scope() - DI scope for services
         ├── Execute(ctx) - run CLI
         └── Shutdown(ctx) - cleanup
@@ -245,4 +250,4 @@ The v2 API successfully delivers type-safe, DI-powered CLI construction without 
 
 ---
 
-**Last updated 2026-04-05.**
+**Last updated 2026-04-17.**

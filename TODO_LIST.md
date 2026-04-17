@@ -1,7 +1,7 @@
 # TODO List
 
-**Updated:** 2026-04-05
-**Status:** v2.1.0 — Code complete. Remaining: examples, docs, CI polish.
+**Updated:** 2026-04-17
+**Status:** v2.1.0 — Post-refactor audit complete. Constructor API finalized.
 
 ## Completed This Sprint ✅
 
@@ -31,7 +31,7 @@
 
 ### 📚 Documentation
 
-- [ ] API Reference documentation (godoc examples)
+- [x] API Reference documentation (godoc examples)
 - [ ] Update docs/QUICKSTART.md for v2.1 API
 - [ ] Update docs/MIGRATION_v1_v2.md for v2.1 API
 - [ ] DI Pattern Example in docs/
