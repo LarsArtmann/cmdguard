@@ -11,6 +11,9 @@
 /examples/*/di_example
 /examples/*/advanced_flags_example
 /examples/*/basic_example
+/examples/*/validation_example
+/advanced-flags
+/di
 
 # Test binaries
 *.test

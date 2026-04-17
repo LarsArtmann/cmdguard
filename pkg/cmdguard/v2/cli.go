@@ -105,8 +105,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.use)
 	}
 
-	err := cmd.Validate()
-	if err != nil {
+	if err := cmd.Validate(); err != nil {
 		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.use, cli.name, err)
 	}
 
@@ -183,7 +182,7 @@ func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 // validateName checks that the command name is not empty.
 func validateName(name string) error {
 	if name == "" {
-		return fmt.Errorf("%w: name is required, name=%q", ErrInvalidCommand, name)
+		return fmt.Errorf("%w: name is required, name=%q", ErrMissingName, name)
 	}
 
 	return nil

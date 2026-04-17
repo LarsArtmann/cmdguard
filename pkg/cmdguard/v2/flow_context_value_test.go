@@ -15,13 +15,9 @@ func TestBranchingFlowContext_SetValue(t *testing.T) {
 
 	root.SetValue("propagate", "yes")
 
-	if root.Value("propagate") != "yes" {
-		t.Error("root should have value")
-	}
+	assertFlowValue(t, root, "propagate", "yes", "root should have value")
 
-	if child.Value("propagate") != "yes" {
-		t.Error("child should inherit value from root")
-	}
+	assertFlowValue(t, child, "propagate", "yes", "child should inherit value from root")
 }
 
 func TestBranchingFlowContext_SetValueLocal(t *testing.T) {
@@ -34,13 +30,9 @@ func TestBranchingFlowContext_SetValueLocal(t *testing.T) {
 
 	root.SetValueLocal("local", "only-root")
 
-	if root.Value("local") != "only-root" {
-		t.Error("root should have local value")
-	}
+	assertFlowValue(t, root, "local", "only-root", "root should have local value")
 
-	if child.Value("local") != "only-root" {
-		t.Error("child should see parent value via GetValue fallback")
-	}
+	assertFlowValue(t, child, "local", "only-root", "child should see parent value via GetValue fallback")
 }
 
 func TestBranchingFlowContext_ChildValueIsolation(t *testing.T) {
@@ -54,13 +46,9 @@ func TestBranchingFlowContext_ChildValueIsolation(t *testing.T) {
 
 	child.SetValueLocal("shared", "child-val")
 
-	if root.Value("shared") != "root-val" {
-		t.Error("root value should not be affected by child's SetValueLocal")
-	}
+	assertFlowValue(t, root, "shared", "root-val", "root value should not be affected by child's SetValueLocal")
 
-	if child.Value("shared") != "child-val" {
-		t.Error("child should see its own local value")
-	}
+	assertFlowValue(t, child, "shared", "child-val", "child should see its own local value")
 }
 
 func TestBranchingFlowContext_GetValue(t *testing.T) {

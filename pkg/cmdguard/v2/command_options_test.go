@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"context"
 	"testing"
 
 	"github.com/larsartmann/cmdguard/pkg/testutil"
@@ -151,13 +150,9 @@ func TestNewCommand(t *testing.T) {
 	t.Run("creates valid command", func(t *testing.T) {
 		t.Parallel()
 
-		handler := func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			return nil
-		}
-
 		cmd, err := NewCommand[testConfig, NoFlags](
 			"test",
-			handler,
+			noOpRunE[testConfig, NoFlags],
 			WithShort[testConfig, NoFlags]("short description"),
 		)
 		if err != nil {

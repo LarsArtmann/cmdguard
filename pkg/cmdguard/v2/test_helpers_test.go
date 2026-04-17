@@ -140,6 +140,14 @@ func addCommand[T, F any](t *testing.T, cli *CLI[T], cmd Command[T, F]) {
 	}
 }
 
+func assertFlowValue(t *testing.T, bfc *BranchingFlowContext, key, expected any, msg string) {
+	t.Helper()
+
+	if bfc.Value(key) != expected {
+		t.Error(msg)
+	}
+}
+
 func mustProvideValue[T any](t *testing.T, scope *Scope, value T) {
 	t.Helper()
 

@@ -15,9 +15,7 @@ func TestWithFlowContextValue(t *testing.T) {
 	child, cancel := root.Branch("cmd", WithFlowContextValue("key", "value"))
 	defer cancel()
 
-	if child.Value("key") != "value" {
-		t.Error("expected child to have value set via option")
-	}
+	assertFlowValue(t, child, "key", "value", "expected child to have value set via option")
 }
 
 func TestWithFlowContextValues(t *testing.T) {
@@ -32,13 +30,9 @@ func TestWithFlowContextValues(t *testing.T) {
 	child, cancel := root.Branch("cmd", WithFlowContextValues(values))
 	defer cancel()
 
-	if child.Value("key1") != "value1" {
-		t.Error("expected key1 to be set")
-	}
+	assertFlowValue(t, child, "key1", "value1", "expected key1 to be set")
 
-	if child.Value("key2") != "value2" {
-		t.Error("expected key2 to be set")
-	}
+	assertFlowValue(t, child, "key2", "value2", "expected key2 to be set")
 }
 
 func TestWithBranchingFlowContext(t *testing.T) {
