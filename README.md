@@ -57,12 +57,9 @@ func main() {
         os.Exit(1)
     }
 
-    // Add a command with typed flags
-    err = v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{
-        Use:   "greet",
-        Short: "Greet someone",
-        Flags: &GreetFlags{},
-        RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+    // Add a command with typed flags (constructor validates at creation)
+    greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+        func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
             if flags.Shout {
                 msg = strings.ToUpper(msg)
@@ -70,7 +67,15 @@ func main() {
             fmt.Println(msg)
             return nil
         },
-    })
+        v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+        v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+    )
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to create command: %v\n", err)
+        os.Exit(1)
+    }
+
+    err = v2.AddCommand(cli, greetCmd)
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to add command: %v\n", err)
         os.Exit(1)
@@ -170,24 +175,35 @@ cli.SetVersion("1.0.0")
 
 ### Command[T, F]
 
-Type-safe command definition:
+Type-safe command definition created via constructors:
 
 ```go
-type Command[T any, F any] struct {
-    Use        string               // Command name/usage
-    Short      string               // Short description
-    Long       string               // Long description
-    Aliases    []string             // Alternative names
-    Example    string               // Example usage
-    Flags      F                    // Typed flags struct
-    RunE       func(ctx, *T, F) error
-    PreRunE    func(ctx, *T, F) error
-    PostRunE   func(ctx, *T, F) error
-    Commands   []Command[T, F]      // Subcommands
-    Hidden     bool                 // Hide from help
-    Deprecated string               // Deprecation message
-}
+// Leaf command — requires use string and handler
+func NewCommand[T, F any](use string, runE func(ctx context.Context, cfg *T, flags F) error, opts ...CommandOption[T, F]) (Command[T, F], error)
+
+// Parent command — requires use, long description, and subcommands
+func NewParentCommand[T, F any](use string, long string, subcommands []Command[T, F], opts ...CommandOption[T, F]) (Command[T, F], error)
+
+// Panic variants for compile-time-known configuration
+func MustNewCommand[T, F any](...) Command[T, F]
+func MustNewParentCommand[T, F any](...) Command[T, F]
 ```
+
+Command options:
+
+| Option                           | Purpose                  |
+| -------------------------------- | ------------------------ |
+| `WithShort[T, F](short)`         | Short description        |
+| `WithLong[T, F](long)`           | Long description         |
+| `WithAliases[T, F](aliases...)`  | Alternative names        |
+| `WithExample[T, F](example)`     | Example usage            |
+| `WithFlags[T, F](flags)`         | Typed flags struct       |
+| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook      |
+| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup     |
+| `WithSubcommands[T, F](cmds...)` | Child commands           |
+| `WithHidden[T, F](hidden)`       | Hide from help           |
+| `WithDeprecated[T, F](msg)`      | Deprecation message      |
+| `WithGroupID[T, F](group)`       | Help group name          |
 
 ### Flag Tags
 
@@ -221,14 +237,13 @@ Supported types: `string`, `bool`, `int`, `uint`, `float64`, `[]string`, `time.D
 Use `v2.NoFlags` for commands without flags:
 
 ```go
-err = v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
-    Use:   "version",
-    Short: "Print version",
-    RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
+    func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
         fmt.Println("v1.0.0")
         return nil
     },
-})
+    v2.WithShort[AppConfig, v2.NoFlags]("Print version"),
+)
 ```
 
 ### Mixing Flag Types
@@ -239,24 +254,20 @@ err = v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
 cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{})
 
 // Command with GreetFlags
-v2.AddCommand(cli, v2.Command[AppConfig, *GreetFlags]{
-    Use:   "greet",
-    Flags: &GreetFlags{},
-    RunE:  greetHandler,
-})
+greetCmd, _ := v2.NewCommand[AppConfig, *GreetFlags]("greet", greetHandler,
+    v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+)
+v2.AddCommand(cli, greetCmd)
 
 // Command with ConfigFlags (different type!)
-v2.AddCommand(cli, v2.Command[AppConfig, *ConfigFlags]{
-    Use:   "config",
-    Flags: &ConfigFlags{},
-    RunE:  configHandler,
-})
+configCmd, _ := v2.NewCommand[AppConfig, *ConfigFlags]("config", configHandler,
+    v2.WithFlags[AppConfig, *ConfigFlags](&ConfigFlags{}),
+)
+v2.AddCommand(cli, configCmd)
 
 // Command with no flags
-v2.AddCommand(cli, v2.Command[AppConfig, v2.NoFlags]{
-    Use:  "version",
-    RunE: versionHandler,
-})
+versionCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("version", versionHandler)
+v2.AddCommand(cli, versionCmd)
 ```
 
 ### DI Integration
@@ -333,24 +344,19 @@ isRoot := scope.IsRoot() // Returns true for root scope
 ### Lifecycle Hooks
 
 ```go
-err = v2.AddCommand(cli, v2.Command[AppConfig, *Flags]{
-    Use: "example",
-    PreRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+cmd, err := v2.NewCommand[AppConfig, *Flags]("example", runHandler,
+    v2.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         // Validation before main handler
         if flags.Count < 1 {
             return fmt.Errorf("count must be at least 1")
         }
         return nil
-    },
-    RunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-        // Main command logic
-        return nil
-    },
-    PostRunE: func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    }),
+    v2.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         // Cleanup after main handler (only called on success)
         return nil
-    },
-})
+    }),
+)
 ```
 
 ### Functional Options
@@ -358,12 +364,18 @@ err = v2.AddCommand(cli, v2.Command[AppConfig, *Flags]{
 Commands can be built with functional options:
 
 ```go
+// Using NewCommand with functional options
 cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
-    v2.WithShort[AppConfig, v2.NoFlags]("Print version"),
-    v2.WithRunE[AppConfig, v2.NoFlags](func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+    func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
         fmt.Println("v1.0.0")
         return nil
-    }),
+    },
+    v2.WithShort[AppConfig, v2.NoFlags]("Print version"),
+)
+
+// Using MustNewCommand for compile-time-known config (panics on error)
+cmd := v2.MustNewCommand[AppConfig, v2.NoFlags]("version", versionHandler,
+    v2.WithShort[AppConfig, v2.NoFlags]("Print version"),
 )
 ```
 
@@ -375,26 +387,25 @@ cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
 func main() {
     cli, _ := v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
 
-    dbCmd := v2.Command[AppConfig, v2.NoFlags]{
-        Use:   "db",
-        Short: "Database operations",
-        Commands: []v2.Command[AppConfig, v2.NoFlags]{
-            {
-                Use:   "migrate",
-                Short: "Run migrations",
-                RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-                    return runMigrations()
-                },
-            },
-            {
-                Use:   "rollback",
-                Short: "Rollback migrations",
-                RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-                    return rollbackMigrations()
-                },
-            },
+    migrateCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("migrate",
+        func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+            return runMigrations()
         },
-    }
+        v2.WithShort[AppConfig, v2.NoFlags]("Run migrations"),
+    )
+
+    rollbackCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("rollback",
+        func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+            return rollbackMigrations()
+        },
+        v2.WithShort[AppConfig, v2.NoFlags]("Rollback migrations"),
+    )
+
+    dbCmd, _ := v2.NewParentCommand[AppConfig, v2.NoFlags]("db",
+        "Database operations",
+        []v2.Command[AppConfig, v2.NoFlags]{migrateCmd, rollbackCmd},
+        v2.WithShort[AppConfig, v2.NoFlags]("Database operations"),
+    )
 
     v2.AddCommand(cli, dbCmd)
     cli.ExecuteAndExit(context.Background())
