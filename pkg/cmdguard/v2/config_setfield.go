@@ -121,9 +121,9 @@ func setStringField(field reflect.Value, str string) error {
 	case reflect.TypeFor[Enum]():
 		current, ok := field.Interface().(Enum)
 		if !ok {
-			return fmt.Errorf(
-				"setStringField: field=%s: type assertion to Enum failed",
-				field.Type(),
+			return NewConfigError(
+				field.Type().String(),
+				ErrInvalidFlagType,
 			)
 		}
 

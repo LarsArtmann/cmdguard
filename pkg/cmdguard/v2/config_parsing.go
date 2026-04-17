@@ -96,7 +96,12 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 	if req := field.Tag.Get("required"); req != "" {
 		required, err := strconv.ParseBool(req)
 		if err != nil {
-			return FlagTag{}, false, fmt.Errorf("field %q: invalid required tag %q: %w", field.Name, req, err)
+			return FlagTag{}, false, fmt.Errorf(
+				"field %q: invalid required tag %q: %w",
+				field.Name,
+				req,
+				err,
+			)
 		}
 
 		tag.Required = required

@@ -96,7 +96,7 @@ func validateTag(v reflect.Value, tag FlagTag) error {
 
 // getFieldValue extracts the string value from a field.
 func getFieldValue(field reflect.Value) (string, bool) {
-	switch field.Kind() {
+	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
 	case reflect.String:
 		return field.String(), true
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
@@ -161,7 +161,7 @@ func deepCopy[T any](src *T) *T {
 // For structs, performs a shallow copy first (handles unexported fields),
 // then recursively deep-copies settable fields.
 func deepCopyValue(dst, src reflect.Value) {
-	switch src.Kind() {
+	switch src.Kind() { //nolint:exhaustive // default handles remaining kinds
 	case reflect.Struct:
 		dst.Set(src)
 

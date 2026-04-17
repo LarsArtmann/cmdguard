@@ -109,7 +109,7 @@ func cloneFlags[F any](flags F) F {
 	// Use reflection to create a new instance
 	v := reflect.ValueOf(flags)
 
-	switch v.Kind() {
+	switch v.Kind() { //nolint:exhaustive // default handles remaining kinds
 	case reflect.Pointer:
 		if v.IsNil() {
 			var zero F
