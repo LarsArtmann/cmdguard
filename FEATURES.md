@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-04-17
 **Version:** 2.1.0
-**Go Version:** 1.26.1
+**Go Version:** 1.26
 
 ---
 
@@ -56,21 +56,21 @@ Type-safe CLI with single type parameter. Each command can have its own flags ty
 
 Type-safe command definition with typed flags.
 
-| Feature                           | Status              | Notes                                     |
-| --------------------------------- | ------------------- | ----------------------------------------- |
-| `Use`, `Short`, `Long` fields     | ✅ FULLY_FUNCTIONAL | Set via constructors (unexported fields)  |
-| `Flags F`                         | ✅ FULLY_FUNCTIONAL | Struct with flag tags                     |
-| `RunE func(ctx, *T, flags)`       | ✅ FULLY_FUNCTIONAL | Type-safe handler                         |
-| `PreRunE` / `PostRunE`            | ✅ FULLY_FUNCTIONAL | Set via WithPreRunE/WithPostRunE options  |
-| `Commands []Command[T, F]`        | ✅ FULLY_FUNCTIONAL | Set via NewParentCommand                  |
-| `Hidden`, `Deprecated`            | ✅ FULLY_FUNCTIONAL | Set via WithHidden/WithDeprecated options |
-| `Aliases`                         | ✅ FULLY_FUNCTIONAL | Set via WithAliases option                |
-| `Validate()`                      | ✅ FULLY_FUNCTIONAL | Called by constructors                    |
-| `NewCommand(use, runE, opts...)`  | ✅ FULLY_FUNCTIONAL | Leaf command constructor                  |
-| `NewParentCommand(use, long, subs, opts...)` | ✅ FULLY_FUNCTIONAL | Parent command constructor       |
-| `MustNewCommand(...)`             | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
-| `MustNewParentCommand(...)`       | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
-| Command options (12 total)        | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, etc.   |
+| Feature                                      | Status              | Notes                                     |
+| -------------------------------------------- | ------------------- | ----------------------------------------- |
+| `Use`, `Short`, `Long` fields                | ✅ FULLY_FUNCTIONAL | Set via constructors (unexported fields)  |
+| `Flags F`                                    | ✅ FULLY_FUNCTIONAL | Struct with flag tags                     |
+| `RunE func(ctx, *T, flags)`                  | ✅ FULLY_FUNCTIONAL | Type-safe handler                         |
+| `PreRunE` / `PostRunE`                       | ✅ FULLY_FUNCTIONAL | Set via WithPreRunE/WithPostRunE options  |
+| `Commands []Command[T, F]`                   | ✅ FULLY_FUNCTIONAL | Set via NewParentCommand                  |
+| `Hidden`, `Deprecated`                       | ✅ FULLY_FUNCTIONAL | Set via WithHidden/WithDeprecated options |
+| `Aliases`                                    | ✅ FULLY_FUNCTIONAL | Set via WithAliases option                |
+| `Validate()`                                 | ✅ FULLY_FUNCTIONAL | Called by constructors                    |
+| `NewCommand(use, runE, opts...)`             | ✅ FULLY_FUNCTIONAL | Leaf command constructor                  |
+| `NewParentCommand(use, long, subs, opts...)` | ✅ FULLY_FUNCTIONAL | Parent command constructor                |
+| `MustNewCommand(...)`                        | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
+| `MustNewParentCommand(...)`                  | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
+| Command options (12 total)                   | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, etc.   |
 
 ### Flag System
 
@@ -128,12 +128,12 @@ Type-safe command definition with typed flags.
 
 The v1 Guard API provides panic-at-construction validation. Use `pkg/cmdguard/v2` instead.
 
-| Feature            | Status            | Notes                                |
-| ------------------ | ----------------- | ------------------------------------ |
-| `New(name, short)` | 🗑️ DEPRECATED     | Use v2.NewCLI instead                |
-| `AddCommand(cmd)`  | 🗑️ DEPRECATED     | Use v2.AddCommand instead            |
-| `Execute(ctx)`     | 🗑️ DEPRECATED     | Use v2 CLI[T].Execute instead        |
-| `IsStrictMode()`   | 🗑️ DEPRECATED     | No v2 equivalent (v2 never panics)   |
+| Feature            | Status        | Notes                              |
+| ------------------ | ------------- | ---------------------------------- |
+| `New(name, short)` | 🗑️ DEPRECATED | Use v2.NewCLI instead              |
+| `AddCommand(cmd)`  | 🗑️ DEPRECATED | Use v2.AddCommand instead          |
+| `Execute(ctx)`     | 🗑️ DEPRECATED | Use v2 CLI[T].Execute instead      |
+| `IsStrictMode()`   | 🗑️ DEPRECATED | No v2 equivalent (v2 never panics) |
 
 ---
 
@@ -151,11 +151,10 @@ The v1 Guard API provides panic-at-construction validation. Use `pkg/cmdguard/v2
 
 | Package            | Coverage | Status  |
 | ------------------ | -------- | ------- |
-| `pkg/cmdguard/v2`  | 87.9%    | ✅ Good |
-| `pkg/cmdguard`     | 87.0%    | ✅ Good |
-| `pkg/errtypes`     | 100%     | ✅ Good |
-| `internal/config`  | 78.9%    | ✅ Good |
-| `internal/logging` | 100%     | ✅ Good |
+| `pkg/cmdguard/v2`  | 82.2%    | ✅ Good |
+| `pkg/cmdguard`     | 87.4%    | ✅ Good |
+| `internal/config`  | 95.7%    | ✅ Good |
+| `internal/logging` | 97.1%    | ✅ Good |
 
 ---
 
@@ -238,7 +237,6 @@ v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
 ### What's Missing 🔧
 
 - Plugin system for custom validators (planned)
-- Enhanced flag validation (planned)
 
 ### Overall Status
 
