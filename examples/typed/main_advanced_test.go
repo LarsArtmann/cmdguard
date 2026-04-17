@@ -61,11 +61,8 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 		"A typed CLI application",
 		AppConfig{Verbose: false},
 	)
-	greetCmd = v2.Command[AppConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Flags: &GreetFlags{},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+	greetCmd = v2.MustNewCommand[AppConfig, *GreetFlags]("greet",
+		func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 			for range flags.Count {
 				fmt.Println(msg)
@@ -73,7 +70,9 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 
 			return nil
 		},
-	}
+		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+	)
 	_ = v2.AddCommand(cli, greetCmd)
 
 	output = runCLIWithArgs(cli, "greet", "--count", "3")
@@ -107,16 +106,18 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	configCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:   "config",
-		Short: "Show current configuration",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+	configCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("config",
+		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Printf("Verbose: %v\n", cfg.Verbose)
 			fmt.Printf("Output: %s\n", cfg.Output)
 			fmt.Printf("API URL: %s\n", cfg.APIURL)
 
 			return nil
 		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Show current configuration"),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	err = v2.AddCommand(cli, configCmd)
@@ -203,10 +204,8 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 	}
 
 	// Test command that uses database
-	dbCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:   "db-status",
-		Short: "Check database status",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+	dbCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("db-status",
+		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			db, err := v2.Invoke[*Database](scope)
 			if err != nil {
 				return err
@@ -216,6 +215,10 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 
 			return nil
 		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Check database status"),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	err = v2.AddCommand(cli, dbCmd)
@@ -237,18 +240,20 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	greetCmd := v2.Command[AppConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Flags: &GreetFlags{},
-		PreRunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+		greetRunE(),
+		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+		v2.WithPreRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			if flags.Count < 1 {
 				return errors.New("count should be at least 1")
 			}
 
 			return nil
-		},
-		RunE: greetRunE(),
+		}),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	err = v2.AddCommand(cli, greetCmd)
@@ -270,9 +275,23 @@ func TestTypedExample_PreRunEValidation(t *testing.T) {
 
 	// Reset and test with valid count
 	cli, _ = v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
-	greetCmd.RunE = greetRunE()
+	greetCmd2, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+		greetRunE(),
+		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+		v2.WithPreRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+			if flags.Count < 1 {
+				return errors.New("count should be at least 1")
+			}
 
-	err = v2.AddCommand(cli, greetCmd)
+			return nil
+		}),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	err = v2.AddCommand(cli, greetCmd2)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

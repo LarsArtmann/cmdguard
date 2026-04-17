@@ -90,15 +90,17 @@ func TestCLIFlowContextIntegration(t *testing.T) {
 
 		var accessedFlowCtx bool
 
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "check",
-			Short: "Check flow context",
-			RunE: func(ctx context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("check",
+			func(ctx context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				bfc, ok := v2.GetBranchingFlowContext(ctx)
 				accessedFlowCtx = ok && bfc != nil
 
 				return nil
 			},
+			v2.WithShort[testCLIConfig, v2.NoFlags]("Check flow context"),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand failed: %v", err)
 		}
 
 		err = v2.AddCommand(cli, cmd)

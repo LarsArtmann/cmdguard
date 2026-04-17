@@ -156,25 +156,8 @@ func registerServices(scope *v2.Scope) {
 
 func addCommands(cli *v2.CLI[AppConfig]) error {
 	// Greet command with typed flags
-	// Using CLI[T] API - each command can have its own flags type
-	greetCmd := v2.Command[AppConfig, *GreetFlags]{
-		Use:     "greet [message]",
-		Short:   "Greet someone",
-		Long:    "Greet someone with a customizable message.",
-		Example: "myapp greet --name Alice --shout --count 3",
-		Flags:   &GreetFlags{},
-		PreRunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-			if cfg.Verbose {
-				fmt.Println("Preparing to greet...")
-			}
-
-			if flags.Count < 1 {
-				return fmt.Errorf("count must be at least 1 (got %d)", flags.Count)
-			}
-
-			return nil
-		},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet [message]",
+		func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			logger, err := v2.Invoke[*Logger](cli.Scope())
 			if err != nil {
 				return fmt.Errorf("invoking *Logger in scope %p: %w", cli.Scope(), err)
@@ -192,26 +175,46 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 
 			return nil
 		},
-		PostRunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+		v2.WithLong[AppConfig, *GreetFlags]("Greet someone with a customizable message."),
+		v2.WithExample[AppConfig, *GreetFlags]("myapp greet --name Alice --shout --count 3"),
+		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+		v2.WithPreRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+			if cfg.Verbose {
+				fmt.Println("Preparing to greet...")
+			}
+
+			if flags.Count < 1 {
+				return fmt.Errorf("count must be at least 1 (got %d)", flags.Count)
+			}
+
+			return nil
+		}),
+		v2.WithPostRunE[AppConfig, *GreetFlags](func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			if cfg.Verbose {
 				fmt.Println("Greeting complete!")
 			}
 
 			return nil
-		},
+		}),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create greet command: %w", err)
 	}
 
 	// CLI[T] uses AddCommand function (not method) - supports any flags type per command
-	err := v2.AddCommand(cli, greetCmd)
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		return fmt.Errorf("failed to add greet command: %w", err)
 	}
 
 	// Version command
-	versionCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:   "version",
-		Short: "Print version information",
-		RunE:  printRunE("myapp version 1.0.0", "Built with cmdguard v2"),
+	versionCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
+		printRunE("myapp version 1.0.0", "Built with cmdguard v2"),
+		v2.WithShort[AppConfig, v2.NoFlags]("Print version information"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create version command: %w", err)
 	}
 
 	err = v2.AddCommand(cli, versionCmd)
@@ -220,10 +223,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Config command that uses the app config
-	configCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:   "config",
-		Short: "Show current configuration",
-		RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+	configCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("config",
+		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("Current configuration:")
 			fmt.Printf("  Verbose: %v\n", cfg.Verbose)
 			fmt.Printf("  Output:  %s\n", cfg.Output)
@@ -231,6 +232,10 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 
 			return nil
 		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Show current configuration"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create config command: %w", err)
 	}
 
 	err = v2.AddCommand(cli, configCmd)
@@ -239,31 +244,39 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Parent command with subcommands
-	dbCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:   "db",
-		Short: "Database operations",
-		Commands: []v2.Command[AppConfig, v2.NoFlags]{
-			{
-				Use:   "status",
-				Short: "Check database connection",
-				RunE: func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-					db, err := v2.Invoke[*Database](cli.Scope())
-					if err != nil {
-						return v2.NewServiceError("*Database", err)
-					}
+	statusCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("status",
+		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
+			db, err := v2.Invoke[*Database](cli.Scope())
+			if err != nil {
+				return v2.NewServiceError("*Database", err)
+			}
 
-					fmt.Printf("Database: %s\n", db.connectionString)
-					fmt.Println("Status: Connected (simulated)")
+			fmt.Printf("Database: %s\n", db.connectionString)
+			fmt.Println("Status: Connected (simulated)")
 
-					return nil
-				},
-			},
-			{
-				Use:   "migrate",
-				Short: "Run database migrations",
-				RunE:  printRunE("Running migrations...", "Migration complete!"),
-			},
+			return nil
 		},
+		v2.WithShort[AppConfig, v2.NoFlags]("Check database connection"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create db status command: %w", err)
+	}
+
+	migrateSubCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("migrate",
+		printRunE("Running migrations...", "Migration complete!"),
+		v2.WithShort[AppConfig, v2.NoFlags]("Run database migrations"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create db migrate command: %w", err)
+	}
+
+	dbCmd, err := v2.NewParentCommand[AppConfig, v2.NoFlags]("db",
+		"Database operations",
+		[]v2.Command[AppConfig, v2.NoFlags]{statusCmd, migrateSubCmd},
+		v2.WithShort[AppConfig, v2.NoFlags]("Database operations"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create db command: %w", err)
 	}
 
 	err = v2.AddCommand(cli, dbCmd)
@@ -272,11 +285,13 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Hidden command (won't show in help)
-	hiddenCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:    "secret",
-		Short:  "Secret command",
-		Hidden: true,
-		RunE:   printRunE("You found the secret command!"),
+	hiddenCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("secret",
+		printRunE("You found the secret command!"),
+		v2.WithShort[AppConfig, v2.NoFlags]("Secret command"),
+		v2.WithHidden[AppConfig, v2.NoFlags](true),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create hidden command: %w", err)
 	}
 
 	err = v2.AddCommand(cli, hiddenCmd)
@@ -285,11 +300,13 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Deprecated command
-	deprecatedCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:        "oldcmd",
-		Short:      "Old command (deprecated)",
-		Deprecated: "Use 'greet' instead",
-		RunE:       printRunE("This command is deprecated. Use 'greet' instead."),
+	deprecatedCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("oldcmd",
+		printRunE("This command is deprecated. Use 'greet' instead."),
+		v2.WithShort[AppConfig, v2.NoFlags]("Old command (deprecated)"),
+		v2.WithDeprecated[AppConfig, v2.NoFlags]("Use 'greet' instead"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create deprecated command: %w", err)
 	}
 
 	err = v2.AddCommand(cli, deprecatedCmd)
@@ -298,12 +315,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Stats command demonstrating uint and float32 flag support
-	statsCmd := v2.Command[AppConfig, *StatsFlags]{
-		Use:     "stats",
-		Short:   "Display statistics configuration",
-		Example: "myapp stats --max-retries 5 --threshold 0.75 --page-size 20",
-		Flags:   &StatsFlags{},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *StatsFlags) error {
+	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags]("stats",
+		func(ctx context.Context, cfg *AppConfig, flags *StatsFlags) error {
 			fmt.Println("Statistics Configuration:")
 			fmt.Printf("  Max Retries: %d\n", flags.MaxRetries)
 			fmt.Printf("  Threshold:   %.2f\n", flags.Threshold)
@@ -311,6 +324,12 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 
 			return nil
 		},
+		v2.WithShort[AppConfig, *StatsFlags]("Display statistics configuration"),
+		v2.WithExample[AppConfig, *StatsFlags]("myapp stats --max-retries 5 --threshold 0.75 --page-size 20"),
+		v2.WithFlags[AppConfig, *StatsFlags](&StatsFlags{}),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create stats command: %w", err)
 	}
 
 	err = v2.AddCommand(cli, statsCmd)

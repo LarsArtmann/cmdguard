@@ -23,9 +23,9 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "pre",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					Use:     "test",
-					PreRunE: makeHookRunE(order, "pre"),
-					RunE:    makeHookRunE(order, "run"),
+					use:     "test",
+					preRunE: makeHookRunE(order, "pre"),
+					runE:    makeHookRunE(order, "run"),
 				}
 			},
 			want: []string{"pre", "run"},
@@ -35,9 +35,9 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "post",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					Use:      "test",
-					RunE:     makeHookRunE(order, "run"),
-					PostRunE: makeHookRunE(order, "post"),
+					use:       "test",
+					runE:      makeHookRunE(order, "run"),
+					postRunE:  makeHookRunE(order, "post"),
 				}
 			},
 			want: []string{"run", "post"},
@@ -82,11 +82,11 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 		}
 
 		cmd := Command[testAppConfig, NoFlags]{
-			Use: "test",
-			PreRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+			use: "test",
+			preRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				return errTest
 			},
-			RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+			runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				called = true
 
 				return nil
@@ -156,12 +156,12 @@ func TestCLI_CommandOptions(t *testing.T) {
 			}
 
 			cmd := Command[testAppConfig, NoFlags]{
-				Use:        tt.use,
-				Hidden:     tt.hidden,
-				Deprecated: tt.deprecated,
-				Aliases:    tt.aliases,
-				Version:    tt.version,
-				RunE:       noOpHandlerForTestAppConfig(),
+				use:        tt.use,
+				hidden:     tt.hidden,
+				deprecated: tt.deprecated,
+				aliases:    tt.aliases,
+				version:    tt.version,
+				runE:       noOpHandlerForTestAppConfig(),
 			}
 			if err := AddCommand(cli, cmd); err != nil {
 				t.Fatalf("unexpected error: %v", err)

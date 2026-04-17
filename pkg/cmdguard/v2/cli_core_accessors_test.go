@@ -66,8 +66,7 @@ func TestCLISubcommands(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		subCmd := newTestCLICommand[testCLIConfig]("list")
-		subCmd.Short = "List items"
+		subCmd := newTestCLICommandWithShort[testCLIConfig]("list", "List items")
 		parentCmd := newTestParentCommand[testCLIConfig](
 			"items",
 			"Item management",

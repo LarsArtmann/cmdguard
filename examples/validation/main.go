@@ -279,58 +279,70 @@ func configPreRunE() func(context.Context, *Config, *ConfigFlags) error {
 // addCommands adds all example commands to the CLI.
 func addCommands(cli *v2.CLI[Config]) error {
 	// Greet command with validation
-	err := v2.AddCommand(cli, v2.Command[Config, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Long:  "Greets the named person a specified number of times.",
-		Example: `
+	greetCmd, err := v2.NewCommand[Config, *GreetFlags]("greet",
+		greetRunE(),
+		v2.WithShort[Config, *GreetFlags]("Greet someone"),
+		v2.WithLong[Config, *GreetFlags]("Greets the named person a specified number of times."),
+		v2.WithExample[Config, *GreetFlags](`
   # Greet Alice twice
   greet --name Alice --count 2
 
   # Greet in uppercase
-  greet --name Bob --upper`,
-		Flags:   &GreetFlags{},
-		PreRunE: greetPreRunE(),
-		RunE:    greetRunE(),
-	})
+  greet --name Bob --upper`),
+		v2.WithFlags[Config, *GreetFlags](&GreetFlags{}),
+		v2.WithPreRunE[Config, *GreetFlags](greetPreRunE()),
+	)
+	if err != nil {
+		return fmt.Errorf("creating greet command: %w", err)
+	}
+
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		return fmt.Errorf("adding greet command: %w", err)
 	}
 
 	// Process command with validation
-	err = v2.AddCommand(cli, v2.Command[Config, *ProcessFlags]{
-		Use:   "process",
-		Short: "Process a file",
-		Long:  "Processes an input file with configurable parallelism.",
-		Example: `
+	processCmd, err := v2.NewCommand[Config, *ProcessFlags]("process",
+		processRunE(),
+		v2.WithShort[Config, *ProcessFlags]("Process a file"),
+		v2.WithLong[Config, *ProcessFlags]("Processes an input file with configurable parallelism."),
+		v2.WithExample[Config, *ProcessFlags](`
   # Process a file with 4 workers
   process --input data.txt --workers 4
 
   # Dry run to preview
-  process --input data.txt --dry-run`,
-		Flags:   &ProcessFlags{},
-		PreRunE: processPreRunE(),
-		RunE:    processRunE(),
-	})
+  process --input data.txt --dry-run`),
+		v2.WithFlags[Config, *ProcessFlags](&ProcessFlags{}),
+		v2.WithPreRunE[Config, *ProcessFlags](processPreRunE()),
+	)
+	if err != nil {
+		return fmt.Errorf("creating process command: %w", err)
+	}
+
+	err = v2.AddCommand(cli, processCmd)
 	if err != nil {
 		return fmt.Errorf("adding process command: %w", err)
 	}
 
 	// Config command with validation
-	err = v2.AddCommand(cli, v2.Command[Config, *ConfigFlags]{
-		Use:   "config",
-		Short: "Get or set configuration",
-		Long:  "Manages application configuration.",
-		Example: `
+	configCmd, err := v2.NewCommand[Config, *ConfigFlags]("config",
+		configRunE(),
+		v2.WithShort[Config, *ConfigFlags]("Get or set configuration"),
+		v2.WithLong[Config, *ConfigFlags]("Manages application configuration."),
+		v2.WithExample[Config, *ConfigFlags](`
   # Get a config value
   config --get --key database.host
 
   # Set a config value
-  config --set --key database.host --value localhost`,
-		Flags:   &ConfigFlags{},
-		PreRunE: configPreRunE(),
-		RunE:    configRunE(),
-	})
+  config --set --key database.host --value localhost`),
+		v2.WithFlags[Config, *ConfigFlags](&ConfigFlags{}),
+		v2.WithPreRunE[Config, *ConfigFlags](configPreRunE()),
+	)
+	if err != nil {
+		return fmt.Errorf("creating config command: %w", err)
+	}
+
+	err = v2.AddCommand(cli, configCmd)
 	if err != nil {
 		return fmt.Errorf("adding config command: %w", err)
 	}

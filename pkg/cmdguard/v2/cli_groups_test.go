@@ -24,29 +24,29 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "serve",
-		Short: "Start the server",
-		Long:  "Start the server",
-		Group: "core",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use:   "serve",
+		short: "Start the server",
+		long:  "Start the server",
+		group: "core",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "migrate",
-		Short: "Run migrations",
-		Long:  "Run migrations",
-		Group: "core",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use:   "migrate",
+		short: "Run migrations",
+		long:  "Run migrations",
+		group: "core",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "version",
-		Short: "Print version",
-		Long:  "Print version",
-		Group: "utils",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use:   "version",
+		short: "Print version",
+		long:  "Print version",
+		group: "utils",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -95,11 +95,11 @@ func TestCommandGroups_NoGroup(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "ungrouped",
-		Short: "No group assigned",
-		Long:  "No group assigned",
-		Group: "",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use:   "ungrouped",
+		short: "No group assigned",
+		long:  "No group assigned",
+		group: "",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -121,11 +121,11 @@ func TestCommandGroups_CommandExecutionStillWorks(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "run",
-		Short: "Run command",
-		Long:  "Run command",
-		Group: "main",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		use:   "run",
+		short: "Run command",
+		long:  "Run command",
+		group: "main",
+		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			executed = true
 
 			return nil
@@ -155,15 +155,15 @@ func TestCommandGroups_SubcommandsInheritFromParent(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "db",
-		Short: "Database",
-		Long:  "Database operations",
-		Group: "core",
-		Commands: []Command[testConfig, NoFlags]{
+		use:   "db",
+		short: "Database",
+		long:  "Database operations",
+		group: "core",
+		commands: []Command[testConfig, NoFlags]{
 			{
-				Use:   "migrate",
-				Short: "Run migrations",
-				RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+				use:   "migrate",
+				short: "Run migrations",
+				runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					childExecuted = true
 
 					return nil
@@ -197,23 +197,23 @@ func TestWithGroup_RegistersMultipleGroups(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use: "a", Short: "A", Long: "A",
-		Group: "alpha",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use: "a", short: "A", long: "A",
+		group: "alpha",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use: "b", Short: "B", Long: "B",
-		Group: "beta",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use: "b", short: "B", long: "B",
+		group: "beta",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use: "c", Short: "C", Long: "C",
-		Group: "gamma",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use: "c", short: "C", long: "C",
+		group: "gamma",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 

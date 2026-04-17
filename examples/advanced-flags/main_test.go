@@ -43,13 +43,15 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
-	serverCmd := v2.Command[GlobalConfig, ServerFlags]{
-		Use:   "server",
-		Short: "Start the server",
-		Flags: ServerFlags{},
-		RunE: func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
+	serverCmd, err := v2.NewCommand[GlobalConfig, ServerFlags]("server",
+		func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
 			return nil
 		},
+		v2.WithShort[GlobalConfig, ServerFlags]("Start the server"),
+		v2.WithFlags[GlobalConfig, ServerFlags](ServerFlags{}),
+	)
+	if err != nil {
+		t.Fatalf("Failed to create server command: %v", err)
 	}
 
 	err = v2.AddCommand(cli, serverCmd)
@@ -76,13 +78,15 @@ func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
-	configCmd := v2.Command[GlobalConfig, ConfigFlags]{
-		Use:   "config",
-		Short: "Configuration management",
-		Flags: ConfigFlags{},
-		RunE: func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
+	configCmd, err := v2.NewCommand[GlobalConfig, ConfigFlags]("config",
+		func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
 			return nil
 		},
+		v2.WithShort[GlobalConfig, ConfigFlags]("Configuration management"),
+		v2.WithFlags[GlobalConfig, ConfigFlags](ConfigFlags{}),
+	)
+	if err != nil {
+		t.Fatalf("Failed to create config command: %v", err)
 	}
 
 	err = v2.AddCommand(cli, configCmd)

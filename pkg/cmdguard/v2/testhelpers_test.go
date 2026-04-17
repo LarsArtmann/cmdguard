@@ -8,10 +8,14 @@ import (
 )
 
 func newTestCLICommand[C any](use string) v2.Command[C, v2.NoFlags] {
-	return v2.Command[C, v2.NoFlags]{
-		Use:  use,
-		RunE: noOpRunE[C],
-	}
+	return v2.MustNewCommand[C, v2.NoFlags](use, noOpRunE[C])
+}
+
+// newTestCLICommandWithShort creates a leaf command with a short description.
+func newTestCLICommandWithShort[C any](use, short string) v2.Command[C, v2.NoFlags] {
+	return v2.MustNewCommand[C, v2.NoFlags](use, noOpRunE[C],
+		v2.WithShort[C, v2.NoFlags](short),
+	)
 }
 
 // newTestParentCommand creates a parent command with child subcommands.
@@ -19,12 +23,9 @@ func newTestParentCommand[C any](
 	use, short, long string,
 	children ...v2.Command[C, v2.NoFlags],
 ) v2.Command[C, v2.NoFlags] {
-	return v2.Command[C, v2.NoFlags]{
-		Use:      use,
-		Short:    short,
-		Long:     long,
-		Commands: children,
-	}
+	return v2.MustNewParentCommand[C, v2.NoFlags](use, long, children,
+		v2.WithShort[C, v2.NoFlags](short),
+	)
 }
 
 func noOpRunE[C any](_ context.Context, _ *C, _ v2.NoFlags) error {

@@ -25,11 +25,11 @@ func TestCLI_Integration(t *testing.T) {
 		}
 
 		greetCmd := Command[testAppConfig, *greetFlags]{
-			Use:   "greet [name]",
-			Short: "Greet someone",
-			Long:  "Send a greeting to the specified person.",
-			Flags: &greetFlags{},
-			RunE: func(_ context.Context, _ *testAppConfig, flags *greetFlags) error {
+			use:   "greet [name]",
+			short: "Greet someone",
+			long:  "Send a greeting to the specified person.",
+			flags: &greetFlags{},
+			runE: func(_ context.Context, _ *testAppConfig, flags *greetFlags) error {
 				greetResult.name = flags.Name
 				greetResult.shout = flags.Shout
 

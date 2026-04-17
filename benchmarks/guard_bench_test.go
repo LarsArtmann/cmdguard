@@ -27,11 +27,10 @@ func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
 
 // newBenchCommand creates a command with standard benchmark configuration.
 func newBenchCommand(use, short string) v2.Command[BenchConfig, v2.NoFlags] {
-	return v2.Command[BenchConfig, v2.NoFlags]{
-		Use:   use,
-		Short: short,
-		RunE:  noOpRunE[BenchConfig, v2.NoFlags],
-	}
+	return v2.MustNewCommand[BenchConfig, v2.NoFlags](use,
+		noOpRunE[BenchConfig, v2.NoFlags],
+		v2.WithShort[BenchConfig, v2.NoFlags](short),
+	)
 }
 
 // BenchmarkNew measures CLI creation performance.
@@ -110,27 +109,15 @@ func BenchmarkExecute(b *testing.B) {
 }
 
 // BenchmarkCommandCreation measures creating command definitions.
-func BenchmarkCommandCreation(b *testing.B) {
-	for b.Loop() {
-		cmd := v2.Command[BenchConfig, *BenchFlags]{
-			Use:   "greet",
-			Short: "Greet someone",
-			Flags: &BenchFlags{},
-			RunE: func(_ context.Context, _ *BenchConfig, _ *BenchFlags) error {
-				return nil
-			},
-		}
-		_ = cmd
-	}
-}
+
 
 // BenchmarkNewCommand measures the NewCommand constructor.
 func BenchmarkNewCommand(b *testing.B) {
 	for b.Loop() {
-		cmd, err := v2.NewCommand(
+		cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
 			"greet",
+			noOpRunE[BenchConfig, v2.NoFlags],
 			v2.WithShort[BenchConfig, v2.NoFlags]("Greet someone"),
-			v2.WithRunE(noOpRunE[BenchConfig, v2.NoFlags]),
 		)
 		if err != nil {
 			b.Fatal(err)

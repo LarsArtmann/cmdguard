@@ -18,14 +18,16 @@ func TestCLIExecute(t *testing.T) {
 		}
 
 		executed := false
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use:   "run",
-			Short: "Run the command",
-			RunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("run",
+			func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				executed = true
 
 				return nil
 			},
+			v2.WithShort[testCLIConfig, v2.NoFlags]("Run the command"),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand failed: %v", err)
 		}
 
 		err = v2.AddCommand(cli, cmd)

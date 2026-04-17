@@ -64,51 +64,59 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		configFlags  *ConfigFlags
 	)
 
-	err = v2.AddCommand(cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Flags: &GreetFlags{Name: "World", Shout: false},
-		RunE: func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
+	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags]("greet",
+		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
 
 			return nil
 		},
-	})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	err = v2.AddCommand(cli,
-		v2.Command[RootConfig, *MathFlags]{
-			Use:   "math",
-			Short: "Do math",
-			Flags: &MathFlags{X: 0, Y: 0},
-			RunE: func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
-				mathCalled = true
-				mathFlags = flags
-
-				return nil
-			},
-		},
+		v2.WithShort[RootConfig, *GreetFlags]("Greet someone"),
+		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "World", Shout: false}),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli,
-		v2.Command[RootConfig, *ConfigFlags]{
-			Use:   "config",
-			Short: "Manage config",
-			Flags: &ConfigFlags{File: "", JSON: false},
-			RunE: func(_ context.Context, _ *RootConfig, flags *ConfigFlags) error {
-				configCalled = true
-				configFlags = flags
+	err = v2.AddCommand(cli, greetCmd)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-				return nil
-			},
+	mathCmd, err := v2.NewCommand[RootConfig, *MathFlags]("math",
+		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
+			mathCalled = true
+			mathFlags = flags
+
+			return nil
 		},
+		v2.WithShort[RootConfig, *MathFlags]("Do math"),
+		v2.WithFlags[RootConfig, *MathFlags](&MathFlags{X: 0, Y: 0}),
 	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	err = v2.AddCommand(cli, mathCmd)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	configCmd, err := v2.NewCommand[RootConfig, *ConfigFlags]("config",
+		func(_ context.Context, _ *RootConfig, flags *ConfigFlags) error {
+			configCalled = true
+			configFlags = flags
+
+			return nil
+		},
+		v2.WithShort[RootConfig, *ConfigFlags]("Manage config"),
+		v2.WithFlags[RootConfig, *ConfigFlags](&ConfigFlags{File: "", JSON: false}),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	err = v2.AddCommand(cli, configCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -181,23 +189,27 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		statusFlags   *DBFlags
 	)
 
-	dbCmd := v2.Command[RootConfig, *DBFlags]{
-		Use:   "db",
-		Short: "Database commands",
-		Long:  "Database management and maintenance commands",
-		Flags: &DBFlags{Host: "localhost", Port: 5432, Database: ""},
-		Commands: []v2.Command[RootConfig, *DBFlags]{
-			{
-				Use:   "status",
-				Short: "Check database status",
-				RunE: func(_ context.Context, _ *RootConfig, flags *DBFlags) error {
-					statusCalled = true
-					statusFlags = flags
+	statusSubCmd, err := v2.NewCommand[RootConfig, *DBFlags]("status",
+		func(_ context.Context, _ *RootConfig, flags *DBFlags) error {
+			statusCalled = true
+			statusFlags = flags
 
-					return nil
-				},
-			},
+			return nil
 		},
+		v2.WithShort[RootConfig, *DBFlags]("Check database status"),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	dbCmd, err := v2.NewParentCommand[RootConfig, *DBFlags]("db",
+		"Database management and maintenance commands",
+		[]v2.Command[RootConfig, *DBFlags]{statusSubCmd},
+		v2.WithShort[RootConfig, *DBFlags]("Database commands"),
+		v2.WithFlags[RootConfig, *DBFlags](&DBFlags{Host: "localhost", Port: 5432, Database: ""}),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	err = v2.AddCommand(cli, dbCmd)
@@ -205,16 +217,18 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	migrateCmd := v2.Command[RootConfig, *MigrateFlags]{
-		Use:   "migrate",
-		Short: "Run migrations",
-		Flags: &MigrateFlags{Steps: 0, Direction: "up"},
-		RunE: func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
+	migrateCmd, err := v2.NewCommand[RootConfig, *MigrateFlags]("migrate",
+		func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags
 
 			return nil
 		},
+		v2.WithShort[RootConfig, *MigrateFlags]("Run migrations"),
+		v2.WithFlags[RootConfig, *MigrateFlags](&MigrateFlags{Steps: 0, Direction: "up"}),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	err = v2.AddCommand(cli, migrateCmd)

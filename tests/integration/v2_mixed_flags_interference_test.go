@@ -50,34 +50,40 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli, v2.Command[RootConfig, *GreetFlags]{
-		Use:   "cmd-a",
-		Short: "Command A",
-		Flags: &GreetFlags{Name: "default", Shout: false},
-		RunE: func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
+	cmdA, err := v2.NewCommand[RootConfig, *GreetFlags]("cmd-a",
+		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
 
 			return nil
 		},
-	})
+		v2.WithShort[RootConfig, *GreetFlags]("Command A"),
+		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "default", Shout: false}),
+	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli,
-		v2.Command[RootConfig, *MathFlags]{
-			Use:   "cmd-b",
-			Short: "Command B",
-			Flags: &MathFlags{X: 0, Y: 0},
-			RunE: func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
-				lastExecuted = "B"
-				lastFlags = flags
+	err = v2.AddCommand(cli, cmdA)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-				return nil
-			},
+	cmdB, err := v2.NewCommand[RootConfig, *MathFlags]("cmd-b",
+		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
+			lastExecuted = "B"
+			lastFlags = flags
+
+			return nil
 		},
+		v2.WithShort[RootConfig, *MathFlags]("Command B"),
+		v2.WithFlags[RootConfig, *MathFlags](&MathFlags{X: 0, Y: 0}),
 	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	err = v2.AddCommand(cli, cmdB)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -152,33 +158,37 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 
 	var executed bool
 
-	err = v2.AddCommand(cli,
-		v2.Command[RootConfig, v2.NoFlags]{
-			Use:   "simple",
-			Short: "Simple command",
-			RunE: func(_ context.Context, _ *RootConfig, _ v2.NoFlags) error {
-				executed = true
+	simpleCmd, err := v2.NewCommand[RootConfig, v2.NoFlags]("simple",
+		func(_ context.Context, _ *RootConfig, _ v2.NoFlags) error {
+			executed = true
 
-				return nil
-			},
+			return nil
 		},
+		v2.WithShort[RootConfig, v2.NoFlags]("Simple command"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli,
-		v2.Command[RootConfig, *GreetFlags]{
-			Use:   "greet",
-			Short: "Greet command",
-			Flags: &GreetFlags{Name: "World", Shout: false},
-			RunE: func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
-				executed = true
+	err = v2.AddCommand(cli, simpleCmd)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
-				return nil
-			},
+	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags]("greet",
+		func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
+			executed = true
+
+			return nil
 		},
+		v2.WithShort[RootConfig, *GreetFlags]("Greet command"),
+		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "World", Shout: false}),
 	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	err = v2.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

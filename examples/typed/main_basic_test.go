@@ -16,11 +16,8 @@ import (
 // newGreetCmd creates a new greet command instance for testing.
 // This helper ensures consistency across tests and avoids code duplication.
 func newGreetCmd() v2.Command[AppConfig, *GreetFlags] {
-	return v2.Command[AppConfig, *GreetFlags]{
-		Use:   "greet",
-		Short: "Greet someone",
-		Flags: &GreetFlags{},
-		RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+	return v2.MustNewCommand[AppConfig, *GreetFlags]("greet",
+		func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 			if flags.Shout {
 				msg = strings.ToUpper(msg)
@@ -32,7 +29,9 @@ func newGreetCmd() v2.Command[AppConfig, *GreetFlags] {
 
 			return nil
 		},
-	}
+		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+	)
 }
 
 // captureOutput captures stdout during the execution of f and returns it as a string.
@@ -88,10 +87,12 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 
 	cli.SetVersion("1.0.0")
 
-	versionCmd := v2.Command[AppConfig, v2.NoFlags]{
-		Use:   "version",
-		Short: "Print version information",
-		RunE:  printRunE("myapp version 1.0.0"),
+	versionCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
+		printRunE("myapp version 1.0.0"),
+		v2.WithShort[AppConfig, v2.NoFlags]("Print version information"),
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	err = v2.AddCommand(cli, versionCmd)

@@ -121,10 +121,8 @@ func main() {
 	}
 
 	// Add health check command
-	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
-		Use:   "check",
-		Short: "Run health checks",
-		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
+	checkCmd, err := v2.NewCommand[Config]("check",
+		func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Running health checks...")
 
 			err := root.Scope().HealthCheckWithContext(ctx)
@@ -138,15 +136,19 @@ func main() {
 
 			return nil
 		},
-	}); err != nil {
+		v2.WithShort[Config, v2.NoFlags]("Run health checks"),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating check command: %v\n", err)
+	}
+
+	if err := v2.AddCommand(root, checkCmd); err != nil {
 		examplesinternal.Fatalf("Error adding check command: %v\n", err)
 	}
 
 	// Add API call command
-	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
-		Use:   "call",
-		Short: "Call the API",
-		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
+	callCmd, err := v2.NewCommand[Config]("call",
+		func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			api, err := v2.Invoke[*APIService](root.Scope())
 			if err != nil {
 				return err
@@ -154,15 +156,19 @@ func main() {
 
 			return api.Call(ctx)
 		},
-	}); err != nil {
+		v2.WithShort[Config, v2.NoFlags]("Call the API"),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating call command: %v\n", err)
+	}
+
+	if err := v2.AddCommand(root, callCmd); err != nil {
 		examplesinternal.Fatalf("Error adding call command: %v\n", err)
 	}
 
 	// Add shutdown command
-	if err := v2.AddCommand(root, v2.Command[Config, v2.NoFlags]{
-		Use:   "shutdown",
-		Short: "Shutdown services gracefully",
-		RunE: func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
+	shutdownCmd, err := v2.NewCommand[Config]("shutdown",
+		func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Shutting down services...")
 
 			shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -179,7 +185,13 @@ func main() {
 
 			return nil
 		},
-	}); err != nil {
+		v2.WithShort[Config, v2.NoFlags]("Shutdown services gracefully"),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating shutdown command: %v\n", err)
+	}
+
+	if err := v2.AddCommand(root, shutdownCmd); err != nil {
 		examplesinternal.Fatalf("Error adding shutdown command: %v\n", err)
 	}
 

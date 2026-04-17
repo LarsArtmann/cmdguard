@@ -16,8 +16,8 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 	var executedCmd string
 
 	leafCmd := Command[testAppConfig, NoFlags]{
-		Use: "leaf",
-		RunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+		use: "leaf",
+		runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			executedCmd = "leaf"
 
 			return nil
@@ -25,15 +25,15 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 	}
 
 	middleCmd := Command[testAppConfig, NoFlags]{
-		Use:      "middle",
-		Long:     "Middle level command",
-		Commands: []Command[testAppConfig, NoFlags]{leafCmd},
+		use:      "middle",
+		long:     "Middle level command",
+		commands: []Command[testAppConfig, NoFlags]{leafCmd},
 	}
 
 	topCmd := Command[testAppConfig, NoFlags]{
-		Use:      "top",
-		Long:     "Top level command",
-		Commands: []Command[testAppConfig, NoFlags]{middleCmd},
+		use:      "top",
+		long:     "Top level command",
+		commands: []Command[testAppConfig, NoFlags]{middleCmd},
 	}
 
 	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
@@ -58,9 +58,9 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		Use:  "ok",
-		RunE: noOpHandlerForTestAppConfig(),
-		PostRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+		use:  "ok",
+		runE: noOpHandlerForTestAppConfig(),
+		postRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			postRunCalled = true
 
 			return nil
@@ -90,10 +90,10 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		Use:      "hooks",
-		PreRunE:  makeHookRunE(&order, "pre"),
-		RunE:     makeHookRunE(&order, "run"),
-		PostRunE: makeHookRunE(&order, "post"),
+		use:      "hooks",
+		preRunE:  makeHookRunE(&order, "pre"),
+		runE:     makeHookRunE(&order, "run"),
+		postRunE: makeHookRunE(&order, "post"),
 	}
 
 	addCommand(t, cli, cmd)
@@ -120,8 +120,8 @@ func TestCLIToCobraCommand_NilContextFallsBack(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		Use: "ctxcheck",
-		RunE: func(ctx context.Context, _ *testAppConfig, _ NoFlags) error {
+		use: "ctxcheck",
+		runE: func(ctx context.Context, _ *testAppConfig, _ NoFlags) error {
 			gotCtx = ctx
 
 			return nil
@@ -149,14 +149,14 @@ func TestCLIToCobraCommand_SubcommandError(t *testing.T) {
 	}
 
 	invalidChild := Command[testAppConfig, NoFlags]{
-		Use:  "", // empty Use is invalid
-		RunE: noOpHandlerForTestAppConfig(),
+		use:  "", // empty Use is invalid
+		runE: noOpHandlerForTestAppConfig(),
 	}
 
 	parent := Command[testAppConfig, NoFlags]{
-		Use:      "parent",
-		Long:     "Parent command with invalid child",
-		Commands: []Command[testAppConfig, NoFlags]{invalidChild},
+		use:      "parent",
+		long:     "Parent command with invalid child",
+		commands: []Command[testAppConfig, NoFlags]{invalidChild},
 	}
 
 	err = AddCommand(cli, parent)

@@ -21,13 +21,15 @@ func TestCLIAddCommand(t *testing.T) {
 			Name string `default:"World" flag:"name" help:"Name to greet" short:"n"`
 		}
 
-		cmd := v2.Command[testCLIConfig, greetFlags]{
-			Use:   "greet",
-			Short: "Greet someone",
-			Flags: greetFlags{},
-			RunE: func(_ context.Context, _ *testCLIConfig, _ greetFlags) error {
+		cmd, err := v2.NewCommand[testCLIConfig, greetFlags]("greet",
+			func(_ context.Context, _ *testCLIConfig, _ greetFlags) error {
 				return nil
 			},
+			v2.WithShort[testCLIConfig, greetFlags]("Greet someone"),
+			v2.WithFlags[testCLIConfig, greetFlags](greetFlags{}),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand failed: %v", err)
 		}
 
 		err = v2.AddCommand(cli, cmd)
@@ -44,8 +46,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig]("version")
-		cmd.Short = "Show version"
+		cmd := newTestCLICommandWithShort[testCLIConfig]("version", "Show version")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -61,8 +62,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig]("test")
-		cmd.Short = "Test command"
+		cmd := newTestCLICommandWithShort[testCLIConfig]("test", "Test command")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -78,16 +78,9 @@ func TestCLIAddCommand(t *testing.T) {
 	t.Run("returns error for invalid command", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
-
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use: "",
-		}
-
-		err = v2.AddCommand(cli, cmd)
+		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("",
+			noOpRunE[testCLIConfig],
+		)
 		if err == nil {
 			t.Fatal("expected error for invalid command")
 		}

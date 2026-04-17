@@ -44,10 +44,10 @@ func TestMiddleware_BasicChaining(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "run",
-		Short: "Run command",
-		Long:  "Run command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		use:   "run",
+		short: "Run command",
+		long:  "Run command",
+		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			callOrder = append(callOrder, "handler")
 
 			return nil
@@ -85,10 +85,10 @@ func TestMiddleware_ErrorPropagation(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "fail",
-		Short: "Fail command",
-		Long:  "Fail command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		use:   "fail",
+		short: "Fail command",
+		long:  "Fail command",
+		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			return handlerErr
 		},
 	})
@@ -120,10 +120,10 @@ func TestMiddleware_ShortCircuit(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "blocked",
-		Short: "Blocked command",
-		Long:  "Blocked command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		use:   "blocked",
+		short: "Blocked command",
+		long:  "Blocked command",
+		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			handlerCalled = true
 
 			return nil
@@ -160,10 +160,10 @@ func TestMiddleware_CommandInfo(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "mycommand",
-		Short: "My command",
-		Long:  "My command",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use:   "mycommand",
+		short: "My command",
+		long:  "My command",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -197,10 +197,10 @@ func TestTimingMiddleware(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "timed",
-		Short: "Timed command",
-		Long:  "Timed command",
-		RunE:  noOpRunE[testConfig, NoFlags],
+		use:   "timed",
+		short: "Timed command",
+		long:  "Timed command",
+		runE:  noOpRunE[testConfig, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 
@@ -226,10 +226,10 @@ func TestRecoveryMiddleware(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "panic",
-		Short: "Panic command",
-		Long:  "Panic command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		use:   "panic",
+		short: "Panic command",
+		long:  "Panic command",
+		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			panic("something went wrong")
 		},
 	})
@@ -256,10 +256,10 @@ func TestMiddleware_NoMiddleware(t *testing.T) {
 	handlerCalled := false
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "plain",
-		Short: "Plain command",
-		Long:  "Plain command",
-		RunE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+		use:   "plain",
+		short: "Plain command",
+		long:  "Plain command",
+		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			handlerCalled = true
 
 			return nil
@@ -295,14 +295,14 @@ func TestMiddleware_Subcommands(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		Use:   "parent",
-		Short: "Parent",
-		Long:  "Parent command with subcommands",
-		Commands: []Command[testConfig, NoFlags]{
+		use:   "parent",
+		short: "Parent",
+		long:  "Parent command with subcommands",
+		commands: []Command[testConfig, NoFlags]{
 			{
-				Use:   "child",
-				Short: "Child",
-				RunE:  noOpRunE[testConfig, NoFlags],
+				use:   "child",
+				short: "Child",
+				runE:  noOpRunE[testConfig, NoFlags],
 			},
 		},
 	})
@@ -419,11 +419,11 @@ func TestMiddleware_WithFlags(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, *greetFlags]{
-		Use:   "greet",
-		Short: "Greet",
-		Long:  "Greet someone",
-		Flags: &greetFlags{},
-		RunE: func(_ context.Context, _ *testConfig, flags *greetFlags) error {
+		use:   "greet",
+		short: "Greet",
+		long:  "Greet someone",
+		flags: &greetFlags{},
+		runE: func(_ context.Context, _ *testConfig, _ *greetFlags) error {
 			return nil
 		},
 	})

@@ -82,12 +82,8 @@ func main() {
 	}
 
 	// Server command with custom flags
-	if err := v2.AddCommand(root, v2.Command[GlobalConfig, ServerFlags]{
-		Use:   "server",
-		Short: "Start the server",
-		Long:  "Start the HTTP server with configurable host and port.",
-		Flags: ServerFlags{},
-		RunE: func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
+	serverCmd, err := v2.NewCommand[GlobalConfig, ServerFlags]("server",
+		func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
 			logLevel := cfg.LogLevel
 			if flags.LogLevel.String() != "" {
 				logLevel = flags.LogLevel
@@ -99,16 +95,30 @@ func main() {
 
 			return nil
 		},
-	}); err != nil {
+		v2.WithShort[GlobalConfig, ServerFlags]("Start the server"),
+		v2.WithLong[GlobalConfig, ServerFlags]("Start the HTTP server with configurable host and port."),
+		v2.WithFlags[GlobalConfig, ServerFlags](ServerFlags{}),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating server command: %v\n", err)
+	}
+
+	if err := v2.AddCommand(root, serverCmd); err != nil {
 		examplesinternal.Fatalf("Error adding server command: %v\n", err)
 	}
 
 	// Config command with required flag
-	if err := v2.AddCommand(root, v2.Command[GlobalConfig, ConfigFlags]{
-		Use:   "config",
-		Short: "Configuration management",
-		Flags: ConfigFlags{},
-		PreRunE: func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
+	configCmd, err := v2.NewCommand[GlobalConfig, ConfigFlags]("config",
+		func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
+			fmt.Printf("Config file: %s\n", flags.ConfigFile)
+			fmt.Printf("Required flag: %s\n", flags.RequiredFlag)
+			fmt.Printf("Output format: %s\n", flags.OutputFormat)
+
+			return nil
+		},
+		v2.WithShort[GlobalConfig, ConfigFlags]("Configuration management"),
+		v2.WithFlags[GlobalConfig, ConfigFlags](ConfigFlags{}),
+		v2.WithPreRunE[GlobalConfig, ConfigFlags](func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
 			if flags.OutputFormat != "" {
 				validFormats := []string{"json", "yaml", "yml"}
 				if !slices.Contains(validFormats, flags.OutputFormat) {
@@ -119,27 +129,19 @@ func main() {
 			}
 
 			return nil
-		},
-		RunE: func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
-			fmt.Printf("Config file: %s\n", flags.ConfigFile)
-			fmt.Printf("Required flag: %s\n", flags.RequiredFlag)
-			fmt.Printf("Output format: %s\n", flags.OutputFormat)
+		}),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating config command: %v\n", err)
+	}
 
-			return nil
-		},
-	}); err != nil {
+	if err := v2.AddCommand(root, configCmd); err != nil {
 		examplesinternal.Fatalf("Error adding config command: %v\n", err)
 	}
 
 	// Enum demo command
-	if err := v2.AddCommand(root, v2.Command[GlobalConfig, EnumFlags]{
-		Use:   "env",
-		Short: "Environment settings",
-		Flags: EnumFlags{},
-		PreRunE: func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
-			return flags.Validate()
-		},
-		RunE: func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
+	envCmd, err := v2.NewCommand[GlobalConfig, EnumFlags]("env",
+		func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
 			fmt.Printf("Environment: %s\n", flags.Environment)
 			fmt.Printf("Region: %s\n", flags.Region)
 
@@ -149,16 +151,23 @@ func main() {
 
 			return nil
 		},
-	}); err != nil {
+		v2.WithShort[GlobalConfig, EnumFlags]("Environment settings"),
+		v2.WithFlags[GlobalConfig, EnumFlags](EnumFlags{}),
+		v2.WithPreRunE[GlobalConfig, EnumFlags](func(ctx context.Context, cfg *GlobalConfig, flags EnumFlags) error {
+			return flags.Validate()
+		}),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating env command: %v\n", err)
+	}
+
+	if err := v2.AddCommand(root, envCmd); err != nil {
 		examplesinternal.Fatalf("Error adding env command: %v\n", err)
 	}
 
 	// Duration demo command
-	if err := v2.AddCommand(root, v2.Command[GlobalConfig, DurationFlags]{
-		Use:   "duration",
-		Short: "Duration settings demo",
-		Flags: DurationFlags{},
-		RunE: func(ctx context.Context, cfg *GlobalConfig, flags DurationFlags) error {
+	durationCmd, err := v2.NewCommand[GlobalConfig, DurationFlags]("duration",
+		func(ctx context.Context, cfg *GlobalConfig, flags DurationFlags) error {
 			fmt.Printf("Session timeout: %s (%g seconds)\n",
 				flags.SessionTimeout,
 				flags.SessionTimeout.Seconds())
@@ -169,7 +178,14 @@ func main() {
 
 			return nil
 		},
-	}); err != nil {
+		v2.WithShort[GlobalConfig, DurationFlags]("Duration settings demo"),
+		v2.WithFlags[GlobalConfig, DurationFlags](DurationFlags{}),
+	)
+	if err != nil {
+		examplesinternal.Fatalf("Error creating duration command: %v\n", err)
+	}
+
+	if err := v2.AddCommand(root, durationCmd); err != nil {
 		examplesinternal.Fatalf("Error adding duration command: %v\n", err)
 	}
 

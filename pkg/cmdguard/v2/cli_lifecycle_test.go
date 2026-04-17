@@ -97,19 +97,20 @@ func TestCLIPrePostRunE(t *testing.T) {
 
 		preRan, postRan := false, false
 
-		cmd := v2.Command[testCLIConfig, v2.NoFlags]{
-			Use: "test",
-			PreRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("test", noOpRunE[testCLIConfig],
+			v2.WithPreRunE[testCLIConfig, v2.NoFlags](func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				preRan = true
 
 				return nil
-			},
-			RunE: noOpRunE[testCLIConfig],
-			PostRunE: func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
+			}),
+			v2.WithPostRunE[testCLIConfig, v2.NoFlags](func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				postRan = true
 
 				return nil
-			},
+			}),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand failed: %v", err)
 		}
 
 		err = v2.AddCommand(cli, cmd)
@@ -148,15 +149,17 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 
 		var receivedName string
 
-		cmd := v2.Command[testCLIConfig, testFlags]{
-			Use:   "test",
-			Flags: testFlags{},
-			PreRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
+		cmd, err := v2.NewCommand[testCLIConfig, testFlags]("test",
+			NoOpRunEWithFlags[testCLIConfig, testFlags](),
+			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
+			v2.WithPreRunE[testCLIConfig, testFlags](func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedName = f.Name
 
 				return nil
-			},
-			RunE: NoOpRunEWithFlags[testCLIConfig, testFlags](),
+			}),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand failed: %v", err)
 		}
 
 		err = v2.AddCommand(cli, cmd)
@@ -191,15 +194,17 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 
 		var receivedValue string
 
-		cmd := v2.Command[testCLIConfig, testFlags]{
-			Use:   "test",
-			Flags: testFlags{},
-			RunE:  NoOpRunEWithFlags[testCLIConfig, testFlags](),
-			PostRunE: func(_ context.Context, _ *testCLIConfig, f testFlags) error {
+		cmd, err := v2.NewCommand[testCLIConfig, testFlags]("test",
+			NoOpRunEWithFlags[testCLIConfig, testFlags](),
+			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
+			v2.WithPostRunE[testCLIConfig, testFlags](func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 				receivedValue = f.Value
 
 				return nil
-			},
+			}),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand failed: %v", err)
 		}
 
 		err = v2.AddCommand(cli, cmd)
