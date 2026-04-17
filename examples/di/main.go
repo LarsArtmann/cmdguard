@@ -10,7 +10,7 @@
 //
 //	go run examples/di/main.go
 //	go run examples/di/main.go check
-//	go run examples/di/main.db shutdown
+//	go run examples/di/main.go shutdown
 package main
 
 import (
@@ -45,7 +45,11 @@ var (
 
 // NewDatabaseService creates a new database service.
 func NewDatabaseService(i do.Injector) (*DatabaseService, error) {
-	cfg := do.MustInvoke[*Config](i)
+	scope := v2.NewScopeFromInjector(i, "provider")
+	cfg, err := v2.Invoke[*Config](scope)
+	if err != nil {
+		return nil, fmt.Errorf("resolve config: %w", err)
+	}
 
 	return &DatabaseService{
 		connected: true,
@@ -85,7 +89,11 @@ type APIService struct {
 
 // NewAPIService creates a new API service.
 func NewAPIService(i do.Injector) (*APIService, error) {
-	db := do.MustInvoke[*DatabaseService](i)
+	scope := v2.NewScopeFromInjector(i, "provider")
+	db, err := v2.Invoke[*DatabaseService](scope)
+	if err != nil {
+		return nil, fmt.Errorf("resolve database: %w", err)
+	}
 
 	return &APIService{client: db}, nil
 }
