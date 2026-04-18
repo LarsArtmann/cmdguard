@@ -1,47 +1,49 @@
 # TODO List
 
-**Updated:** 2026-04-17
-**Status:** v2.1.0 — Post-refactor audit complete. Constructor API finalized.
+**Updated:** 2026-04-18
+**Status:** v2.1.0 — Post-v1 removal hardening in progress.
 
-## Completed This Sprint ✅
+## Completed (Multi-Session Sprint) ✅
 
 - [x] Fix CLI[T] AddCommand flag parsing (cloneAndParseFlags pattern)
 - [x] Refactor nestif complexity in flag_helpers.go
-- [x] Fix err113 dynamic error issues (already clean)
+- [x] Fix err113 dynamic error issues
 - [x] Add t.Parallel() to all v2 tests
 - [x] Add tests for `initialize` error paths
 - [x] Add tests for `cliToCobraCommand` edge cases
 - [x] Add tests for flag helper functions
 - [x] Add WithSilenceErrors, WithSilenceUsage, WithColor CLI options
-- [x] Rename pkg/errors to pkg/errtypes, BaseError to CodedError
-- [x] Migrate all callers to NewCLI/AddCommand API
-- [x] Remove deprecated GuardedCommand[T,F] code (1,624 lines)
-- [x] Rename guard*\* files to cli*\* and flag_helpers
-- [x] Update README.md with v2.1 API
-- [x] Update AGENTS.md with v2.1 API patterns
-- [x] Update FEATURES.md (remove deprecated section)
+- [x] Remove v1 API, internal packages, v1 integration tests (3,841 lines)
+- [x] Remove Option[T]/Result[T] ghost types (1,501 lines)
+- [x] Remove 6 ghost koanf dependencies
+- [x] Fix nilnil, forcetypeassert, exhaustive, err113 lint issues
+- [x] Update all docs (AGENTS.md, README.md, FEATURES.md) to remove v1 refs
+- [x] Archive 31 old status reports
+- [x] Delete .go_test template artifacts and empty internal/ directory
+- [x] Clean .golangci.yml stale references (guard_flags.go, errtypes, koanf, testify, ginkgo)
 
 ## Remaining Work
 
+### 🔴 High Priority
+
+- [ ] Fix benchmarks to use `NewCLI` instead of deprecated `New`
+- [ ] Unify type dispatch into `TypeHandler` registry (eliminate 3-way split brain)
+- [ ] Fix custom type registration in `flags.go` (only handles 4 of 8 types)
+- [ ] Add fuzz tests to value type parsers (URL, Email, Port, FilePath, HostPort)
+- [ ] Make validator registry instance-scoped (remove global mutable state)
+
 ### 🟡 Medium Priority
 
+- [ ] Add fuzz tests to `flags_parse.go` and `config_parsing.go`
 - [ ] Improve flag suggestion algorithm
-- [ ] Migrate remaining testify usage to stdlib (if any remains)
-- [ ] Add fuzz tests to flags_parse.go and config_parsing.go
+- [ ] Merge split test helper files (`test_helpers_test.go` + `testhelpers_test.go`)
 
 ### 📚 Documentation
 
 - [x] API Reference documentation (godoc examples)
 - [ ] Update docs/QUICKSTART.md for v2.1 API
-- [ ] Update docs/MIGRATION_v1_v2.md for v2.1 API
 - [ ] DI Pattern Example in docs/
 - [ ] Error Handling Example in docs/
-
-### 🎯 Examples
-
-- [ ] Add example with real database connection
-- [ ] Add lifecycle hook examples
-- [ ] Advanced DI Example
 
 ### 📊 Performance
 
@@ -53,15 +55,10 @@
 - [ ] Create v2.1.0 release tag and notes
 - [ ] Set up release automation
 - [ ] Add codecov integration
-- [ ] Fix pre-commit hooks (currently 5 pre-existing errors)
-- [ ] Migrate benchmarks from deprecated v2.New to v2.NewCLI
+- [ ] Fix pre-commit hooks (currently pre-existing errors)
 
 ### 🔮 Future (v3.0+)
 
-- [ ] Plugin system for custom validators
-- [ ] Enhanced flag validation (enums, custom validators)
 - [ ] Config file auto-loading with koanf
 - [ ] Shell completion helpers
-- [ ] Result[T] type for error handling
 - [ ] Progress/Spinner Type (bubbles)
-- [ ] Command groups feature

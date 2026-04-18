@@ -296,7 +296,7 @@ func formatFieldValue(field reflect.Value) string {
 		return fmt.Sprintf("%v", field.Interface())
 	case reflect.Map, reflect.Struct:
 		return fmt.Sprintf("%v", field.Interface())
-	case reflect.Ptr, reflect.Interface:
+	case reflect.Pointer, reflect.Interface:
 		if field.Elem().IsValid() {
 			return formatFieldValue(field.Elem())
 		}

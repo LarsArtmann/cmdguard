@@ -11,41 +11,41 @@
 
 ### A1. Audit Sprint (Sessions 1–3): 17 commits, 0 regressions
 
-| # | Commit | Area | Summary |
-|---|--------|------|---------|
-| 1 | `10f5c73` | Correctness | Validators return errors instead of silently passing on bad config |
-| 2 | `8766fd1` | Correctness | True deep copy in `MergeConfigs` for reference types (slices, maps, pointers) |
-| 3 | `6aaf66e` | Style | Eliminate fallthrough and fix orphaned doc comment |
-| 4 | `14ac747` | Cleanup | Remove dead `pkg/errtypes` package |
-| 5 | `ad92544` | Examples | Migrate `examples/basic` from v1 to v2 API |
-| 6 | `fa1c96d` | CI | Align Go matrix with `go.mod`, test all 5 examples in CI |
-| 7 | `e0fcf87` | Tooling | Fix broken justfile recipe paths, rename `run-guarded` |
-| 8 | `fb5cdfb` | Correctness | Return errors for min/regex validators on missing separator |
-| 9 | `ad0148d` | Correctness | Propagate `required` tag parse error instead of silently ignoring |
-| 10 | `0186cca` | Correctness | Validate Enum values in `SetField` against allowed list |
-| 11 | `ffa9186` | Correctness | Use deep copy in `cloneFlags` to prevent shared mutable state |
-| 12 | `c536230` | Docs | Document `BranchingFlowContext` is not goroutine-safe |
-| 13 | `07dc73a` | Cleanup | Remove dead `internal/config/koanf.go` and orphaned test artifacts |
-| 14 | `5f1b566` | Examples | Fix DI example typo, replace `MustInvoke` with error-returning `Invoke` |
-| 15 | `b211db1` | Examples | Check `AddCommand` error returns in basic example |
-| 16 | `7653743` | Docs | Fix `RegisterValidator` doc to say goroutine-safe |
-| 17 | `a6452f7` | Tests | Strengthen weak test assertions for WithCLIScope, AddGlobalFlag, TimingMiddleware |
+| #   | Commit    | Area        | Summary                                                                           |
+| --- | --------- | ----------- | --------------------------------------------------------------------------------- |
+| 1   | `10f5c73` | Correctness | Validators return errors instead of silently passing on bad config                |
+| 2   | `8766fd1` | Correctness | True deep copy in `MergeConfigs` for reference types (slices, maps, pointers)     |
+| 3   | `6aaf66e` | Style       | Eliminate fallthrough and fix orphaned doc comment                                |
+| 4   | `14ac747` | Cleanup     | Remove dead `pkg/errtypes` package                                                |
+| 5   | `ad92544` | Examples    | Migrate `examples/basic` from v1 to v2 API                                        |
+| 6   | `fa1c96d` | CI          | Align Go matrix with `go.mod`, test all 5 examples in CI                          |
+| 7   | `e0fcf87` | Tooling     | Fix broken justfile recipe paths, rename `run-guarded`                            |
+| 8   | `fb5cdfb` | Correctness | Return errors for min/regex validators on missing separator                       |
+| 9   | `ad0148d` | Correctness | Propagate `required` tag parse error instead of silently ignoring                 |
+| 10  | `0186cca` | Correctness | Validate Enum values in `SetField` against allowed list                           |
+| 11  | `ffa9186` | Correctness | Use deep copy in `cloneFlags` to prevent shared mutable state                     |
+| 12  | `c536230` | Docs        | Document `BranchingFlowContext` is not goroutine-safe                             |
+| 13  | `07dc73a` | Cleanup     | Remove dead `internal/config/koanf.go` and orphaned test artifacts                |
+| 14  | `5f1b566` | Examples    | Fix DI example typo, replace `MustInvoke` with error-returning `Invoke`           |
+| 15  | `b211db1` | Examples    | Check `AddCommand` error returns in basic example                                 |
+| 16  | `7653743` | Docs        | Fix `RegisterValidator` doc to say goroutine-safe                                 |
+| 17  | `a6452f7` | Tests       | Strengthen weak test assertions for WithCLIScope, AddGlobalFlag, TimingMiddleware |
 
 ### A2. Prior Sprint (Pre-audit): 13 commits
 
-| Commit | Summary |
-|--------|---------|
-| `ea5bfc9` | Fix gitignore, unify error sentinel, deduplicate test assertions |
-| `e5c7540` | Convert all consumers to `NewCommand`/`NewParentCommand` constructors |
-| `c562eca` | Add `mustInvoke` test helpers |
-| `5867283` | Add `mustProvideValue` helper, deduplicate scope test boilerplate |
-| `0f4783d` | Update TODO_LIST.md and FEATURES.md |
-| `60da525` | Add godoc examples for constructors |
-| `d82f993` | Add Deprecated notices to v1 API |
-| `099ff35` | Update README.md for v2.1 API |
-| `427355b` | Update AGENTS.md |
-| `bc0683c` | Deduplicate no-op RunE lambdas |
-| `aaa6bf1`–`f9bfcef` | Status reports |
+| Commit              | Summary                                                               |
+| ------------------- | --------------------------------------------------------------------- |
+| `ea5bfc9`           | Fix gitignore, unify error sentinel, deduplicate test assertions      |
+| `e5c7540`           | Convert all consumers to `NewCommand`/`NewParentCommand` constructors |
+| `c562eca`           | Add `mustInvoke` test helpers                                         |
+| `5867283`           | Add `mustProvideValue` helper, deduplicate scope test boilerplate     |
+| `0f4783d`           | Update TODO_LIST.md and FEATURES.md                                   |
+| `60da525`           | Add godoc examples for constructors                                   |
+| `d82f993`           | Add Deprecated notices to v1 API                                      |
+| `099ff35`           | Update README.md for v2.1 API                                         |
+| `427355b`           | Update AGENTS.md                                                      |
+| `bc0683c`           | Deduplicate no-op RunE lambdas                                        |
+| `aaa6bf1`–`f9bfcef` | Status reports                                                        |
 
 ### A3. Test Suite: All Green
 
@@ -71,18 +71,18 @@ ok  github.com/larsartmann/cmdguard/tests/integration          —
 
 ### B1. Lint: 31 issues remaining (was ~40+)
 
-| Linter | Count | Severity | Status |
-|--------|-------|----------|--------|
-| `staticcheck SA1019` | 10 | Low (deprecated v1 usage in integration tests) | Needs migration |
-| `golines` | 6 | Cosmetic | Auto-fixable |
-| `gci` | 3 | Cosmetic | Auto-fixable |
-| `exhaustive` | 3 | Medium (missing switch cases) | Needs `default:` or explicit cases |
-| `errcheck` | 2 | Medium (unchecked error in `examples/basic/main_test.go`) | Quick fix |
-| `nlreturn` | 2 | Cosmetic | Auto-fixable |
-| `wsl_v5` | 2 | Cosmetic | Auto-fixable |
-| `forcetypeassert` | 1 | Medium (unchecked type assertion in `config_setfield.go:122`) | Should guard |
-| `goimports` | 1 | Cosmetic | Auto-fixable |
-| `nilnil` | 1 | Medium (`config_parsing.go:65` returns `nil, nil`) | Should use sentinel error |
+| Linter               | Count | Severity                                                      | Status                             |
+| -------------------- | ----- | ------------------------------------------------------------- | ---------------------------------- |
+| `staticcheck SA1019` | 10    | Low (deprecated v1 usage in integration tests)                | Needs migration                    |
+| `golines`            | 6     | Cosmetic                                                      | Auto-fixable                       |
+| `gci`                | 3     | Cosmetic                                                      | Auto-fixable                       |
+| `exhaustive`         | 3     | Medium (missing switch cases)                                 | Needs `default:` or explicit cases |
+| `errcheck`           | 2     | Medium (unchecked error in `examples/basic/main_test.go`)     | Quick fix                          |
+| `nlreturn`           | 2     | Cosmetic                                                      | Auto-fixable                       |
+| `wsl_v5`             | 2     | Cosmetic                                                      | Auto-fixable                       |
+| `forcetypeassert`    | 1     | Medium (unchecked type assertion in `config_setfield.go:122`) | Should guard                       |
+| `goimports`          | 1     | Cosmetic                                                      | Auto-fixable                       |
+| `nilnil`             | 1     | Medium (`config_parsing.go:65` returns `nil, nil`)            | Should use sentinel error          |
 
 **Assessment:** ~18 are auto-fixable formatting issues. ~13 require manual attention. None are correctness bugs.
 
@@ -90,42 +90,42 @@ ok  github.com/larsartmann/cmdguard/tests/integration          —
 
 **Functions at 0% coverage (12):**
 
-| Function | File | Impact |
-|----------|------|--------|
-| `MustAddCommand` | `cli.go:126` | Low — trivial wrapper |
-| `MustNewCLI` | `cli.go:134` | Low — trivial wrapper |
-| `ArgsFromContext` | `cli_command.go:17` | Low — simple accessor |
-| `WithFangOptions` | `cli_options.go:57` | Low — option function |
-| `RegisterValidator` | `flags_validate.go:51` | Medium — public API |
-| `runValidateTag` | `flags_validate.go:71` | Medium — core validation path |
-| `validateEmail` | `flags_validate.go:131` | Medium — validator |
-| `validateURL` | `flags_validate.go:144` | Medium — validator |
-| `parseAndSetURL` | `flags_parse.go:193` | Medium — parse path |
-| `parseAndSetEmail` | `flags_parse.go:200` | Medium — parse path |
-| `parseAndSetPort` | `flags_parse.go:207` | Medium — parse path |
-| `parseAndSetFilePath` | `flags_parse.go:214` | Medium — parse path |
-| `parseAndSetHostPort` | `flags_parse.go:222` | Medium — parse path |
-| `Exists` | `types_filepath.go:88` | Low — filesystem check |
-| `IsDir` | `types_filepath.go:98` | Low — filesystem check |
-| `IsFile` | `types_filepath.go:112` | Low — filesystem check |
-| `Version` accessor | `command.go:77` | Low — field |
-| `SilenceErrors` accessor | `command.go:80` | Low — field |
-| `SilenceUsage` accessor | `command.go:83` | Low — field |
-| `Group` accessor | `command.go:86` | Low — field |
-| `WithGroupID` | `command.go:226` | Low — option function |
+| Function                 | File                    | Impact                        |
+| ------------------------ | ----------------------- | ----------------------------- |
+| `MustAddCommand`         | `cli.go:126`            | Low — trivial wrapper         |
+| `MustNewCLI`             | `cli.go:134`            | Low — trivial wrapper         |
+| `ArgsFromContext`        | `cli_command.go:17`     | Low — simple accessor         |
+| `WithFangOptions`        | `cli_options.go:57`     | Low — option function         |
+| `RegisterValidator`      | `flags_validate.go:51`  | Medium — public API           |
+| `runValidateTag`         | `flags_validate.go:71`  | Medium — core validation path |
+| `validateEmail`          | `flags_validate.go:131` | Medium — validator            |
+| `validateURL`            | `flags_validate.go:144` | Medium — validator            |
+| `parseAndSetURL`         | `flags_parse.go:193`    | Medium — parse path           |
+| `parseAndSetEmail`       | `flags_parse.go:200`    | Medium — parse path           |
+| `parseAndSetPort`        | `flags_parse.go:207`    | Medium — parse path           |
+| `parseAndSetFilePath`    | `flags_parse.go:214`    | Medium — parse path           |
+| `parseAndSetHostPort`    | `flags_parse.go:222`    | Medium — parse path           |
+| `Exists`                 | `types_filepath.go:88`  | Low — filesystem check        |
+| `IsDir`                  | `types_filepath.go:98`  | Low — filesystem check        |
+| `IsFile`                 | `types_filepath.go:112` | Low — filesystem check        |
+| `Version` accessor       | `command.go:77`         | Low — field                   |
+| `SilenceErrors` accessor | `command.go:80`         | Low — field                   |
+| `SilenceUsage` accessor  | `command.go:83`         | Low — field                   |
+| `Group` accessor         | `command.go:86`         | Low — field                   |
+| `WithGroupID`            | `command.go:226`        | Low — option function         |
 
 **Functions at 50–75% coverage (partial misses):**
 
-| Function | Coverage | File |
-|----------|----------|------|
-| `validateMin` | 50.0% | `flags_validate.go:197` |
-| `getFieldValue` | 50.0% | `config.go:98` |
-| `validateTagRules` | 22.2% | `flags.go:278` |
-| `parseAndSetCustom` | 45.5% | `flags_parse.go:139` |
-| `ParseFilePath` | 53.3% | `types_filepath.go:24` |
-| `validateNonEmpty` | 0.0% | `flags_validate.go:261` |
-| `validateFieldByKind` | 0.0% | `flags_validate.go:270` |
-| `formatFieldValue` | 0.0% | `flags_validate.go:281` |
+| Function              | Coverage | File                    |
+| --------------------- | -------- | ----------------------- |
+| `validateMin`         | 50.0%    | `flags_validate.go:197` |
+| `getFieldValue`       | 50.0%    | `config.go:98`          |
+| `validateTagRules`    | 22.2%    | `flags.go:278`          |
+| `parseAndSetCustom`   | 45.5%    | `flags_parse.go:139`    |
+| `ParseFilePath`       | 53.3%    | `types_filepath.go:24`  |
+| `validateNonEmpty`    | 0.0%     | `flags_validate.go:261` |
+| `validateFieldByKind` | 0.0%     | `flags_validate.go:270` |
+| `formatFieldValue`    | 0.0%     | `flags_validate.go:281` |
 
 ### B3. FEATURES.md coverage table is stale
 
@@ -250,33 +250,33 @@ Should use comma-ok assertion or be guarded by a type check.
 
 Sorted by **impact × urgency / effort**.
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Fix pre-commit hooks (eliminate `--no-verify` requirement) | 🔴 Critical | 2h | CI/Developer Experience |
-| 2 | Auto-fix 14 formatting lint issues (`golangci-lint fmt`) | 🟠 High | 15min | Lint Hygiene |
-| 3 | Fix `nilnil` in `config_parsing.go:65` (use sentinel error) | 🟠 High | 15min | Correctness |
-| 4 | Fix `forcetypeassert` in `config_setfield.go:122` (guard type assertion) | 🟠 High | 15min | Correctness |
-| 5 | Add `//nolint:staticcheck` to `integration_test.go` v1 usage | 🟠 High | 10min | Lint Hygiene |
-| 6 | Fix 3 `exhaustive` switch warnings in `config.go` and `flag_helpers.go` | 🟠 High | 30min | Correctness |
-| 7 | Fix 2 `errcheck` issues in `examples/basic/main_test.go` | 🟠 High | 10min | Correctness |
-| 8 | Write tests for validator functions (email, URL, nonempty, fieldByKind) | 🟡 Medium | 2h | Test Coverage |
-| 9 | Write tests for custom parse functions (URL, email, port, filepath, hostport) | 🟡 Medium | 2h | Test Coverage |
-| 10 | Write tests for `validateTagRules` (22% → 90%+) | 🟡 Medium | 1h | Test Coverage |
-| 11 | Write tests for `MustAddCommand`, `MustNewCLI` (trivial panic wrappers) | 🟡 Medium | 30min | Test Coverage |
-| 12 | Update FEATURES.md coverage table (remove `pkg/errtypes`) | 🟢 Low | 10min | Documentation |
-| 13 | Decide fate of `Option[T]` / `Result[T]` (integrate, extract, or document intent) | 🟡 Medium | 1h | Architecture |
-| 14 | Remove dead command accessors or add tests (`Version`, `SilenceErrors`, etc.) | 🟢 Low | 30min | Cleanup |
-| 15 | Update `docs/QUICKSTART.md` for v2.1 API | 🟡 Medium | 2h | Documentation |
-| 16 | Update `docs/MIGRATION_v1_v2.md` for v2.1 API | 🟡 Medium | 2h | Documentation |
-| 17 | Add fuzz tests to `flags_parse.go` and `config_parsing.go` | 🟡 Medium | 3h | Robustness |
-| 18 | Create v2.1.0 release tag and GitHub release notes | 🟠 High | 1h | Release |
-| 19 | Set up goreleaser for release automation | 🟢 Low | 2h | CI |
-| 20 | Add codecov integration with coverage thresholds | 🟢 Low | 1h | CI |
-| 21 | Migrate benchmarks from deprecated `v2.New` to `v2.NewCLI` | 🟢 Low | 30min | Technical Debt |
-| 22 | Add benchmark regression detection to CI | 🟢 Low | 2h | Performance |
-| 23 | Add lifecycle hook examples | 🟢 Low | 1h | Documentation |
-| 24 | Shell completion helpers | 🟢 Low | 4h | Feature |
-| 25 | Config file auto-loading | 🟢 Low | 8h | Feature |
+| #   | Task                                                                              | Impact      | Effort | Category                |
+| --- | --------------------------------------------------------------------------------- | ----------- | ------ | ----------------------- |
+| 1   | Fix pre-commit hooks (eliminate `--no-verify` requirement)                        | 🔴 Critical | 2h     | CI/Developer Experience |
+| 2   | Auto-fix 14 formatting lint issues (`golangci-lint fmt`)                          | 🟠 High     | 15min  | Lint Hygiene            |
+| 3   | Fix `nilnil` in `config_parsing.go:65` (use sentinel error)                       | 🟠 High     | 15min  | Correctness             |
+| 4   | Fix `forcetypeassert` in `config_setfield.go:122` (guard type assertion)          | 🟠 High     | 15min  | Correctness             |
+| 5   | Add `//nolint:staticcheck` to `integration_test.go` v1 usage                      | 🟠 High     | 10min  | Lint Hygiene            |
+| 6   | Fix 3 `exhaustive` switch warnings in `config.go` and `flag_helpers.go`           | 🟠 High     | 30min  | Correctness             |
+| 7   | Fix 2 `errcheck` issues in `examples/basic/main_test.go`                          | 🟠 High     | 10min  | Correctness             |
+| 8   | Write tests for validator functions (email, URL, nonempty, fieldByKind)           | 🟡 Medium   | 2h     | Test Coverage           |
+| 9   | Write tests for custom parse functions (URL, email, port, filepath, hostport)     | 🟡 Medium   | 2h     | Test Coverage           |
+| 10  | Write tests for `validateTagRules` (22% → 90%+)                                   | 🟡 Medium   | 1h     | Test Coverage           |
+| 11  | Write tests for `MustAddCommand`, `MustNewCLI` (trivial panic wrappers)           | 🟡 Medium   | 30min  | Test Coverage           |
+| 12  | Update FEATURES.md coverage table (remove `pkg/errtypes`)                         | 🟢 Low      | 10min  | Documentation           |
+| 13  | Decide fate of `Option[T]` / `Result[T]` (integrate, extract, or document intent) | 🟡 Medium   | 1h     | Architecture            |
+| 14  | Remove dead command accessors or add tests (`Version`, `SilenceErrors`, etc.)     | 🟢 Low      | 30min  | Cleanup                 |
+| 15  | Update `docs/QUICKSTART.md` for v2.1 API                                          | 🟡 Medium   | 2h     | Documentation           |
+| 16  | Update `docs/MIGRATION_v1_v2.md` for v2.1 API                                     | 🟡 Medium   | 2h     | Documentation           |
+| 17  | Add fuzz tests to `flags_parse.go` and `config_parsing.go`                        | 🟡 Medium   | 3h     | Robustness              |
+| 18  | Create v2.1.0 release tag and GitHub release notes                                | 🟠 High     | 1h     | Release                 |
+| 19  | Set up goreleaser for release automation                                          | 🟢 Low      | 2h     | CI                      |
+| 20  | Add codecov integration with coverage thresholds                                  | 🟢 Low      | 1h     | CI                      |
+| 21  | Migrate benchmarks from deprecated `v2.New` to `v2.NewCLI`                        | 🟢 Low      | 30min  | Technical Debt          |
+| 22  | Add benchmark regression detection to CI                                          | 🟢 Low      | 2h     | Performance             |
+| 23  | Add lifecycle hook examples                                                       | 🟢 Low      | 1h     | Documentation           |
+| 24  | Shell completion helpers                                                          | 🟢 Low      | 4h     | Feature                 |
+| 25  | Config file auto-loading                                                          | 🟢 Low      | 8h     | Feature                 |
 
 ---
 
@@ -296,6 +296,7 @@ The codebase has grown well beyond a "CLI guard library." It now includes:
 `Option[T]` and `Result[T]` are Rust-inspired utility types with 600+ lines of tests — but nothing in cmdguard uses them. They feel like they belong in a separate `pkg/types` or `pkg/functional` package.
 
 **My question:** Is cmdguard meant to be:
+
 1. A **batteries-included CLI framework** (keep everything, document the type system as a feature)?
 2. A **focused CLI guard library** (extract `Option`, `Result`, and rich types to separate packages)?
 3. Something in between?
@@ -306,21 +307,21 @@ This architectural decision affects whether we invest in integrating these types
 
 ## Metrics Summary
 
-| Metric | Value |
-|--------|-------|
+| Metric                                      | Value                  |
+| ------------------------------------------- | ---------------------- |
 | Total source files (`pkg/cmdguard/v2/*.go`) | 36 production, 40 test |
-| Total lines of code (v2 only) | 15,280 |
-| Production LOC | ~4,800 |
-| Test LOC | ~10,480 |
-| Test:Production ratio | 2.18:1 |
-| v2 test coverage | 83.4% |
-| v1 test coverage | 87.4% |
-| Internal packages coverage | 95–97% |
-| Lint issues | 31 (14 auto-fixable) |
-| Open TODO items | ~25 |
-| Commits since last release | 30+ |
-| Pre-commit hooks | Broken (5 errors) |
+| Total lines of code (v2 only)               | 15,280                 |
+| Production LOC                              | ~4,800                 |
+| Test LOC                                    | ~10,480                |
+| Test:Production ratio                       | 2.18:1                 |
+| v2 test coverage                            | 83.4%                  |
+| v1 test coverage                            | 87.4%                  |
+| Internal packages coverage                  | 95–97%                 |
+| Lint issues                                 | 31 (14 auto-fixable)   |
+| Open TODO items                             | ~25                    |
+| Commits since last release                  | 30+                    |
+| Pre-commit hooks                            | Broken (5 errors)      |
 
 ---
 
-*Generated 2026-04-17 19:47 CEST. Branch master @ a6452f7.*
+_Generated 2026-04-17 19:47 CEST. Branch master @ a6452f7._

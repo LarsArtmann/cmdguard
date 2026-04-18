@@ -34,9 +34,9 @@ go test ./... -count=1 -timeout 120s -cover
 
 **cmdguard** is a Go library for building validated Cobra CLI applications with type-safe dependency injection.
 
-| API  | Package           | Use Case                         |
-| ---- | ----------------- | -------------------------------- |
-| v2   | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
+| API | Package           | Use Case                         |
+| --- | ----------------- | -------------------------------- |
+| v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
 **Current Status:** v2.1.0. All packages tested, 0 lint issues.
 
@@ -95,21 +95,21 @@ cmdguard/
 
 ### Package Guidelines
 
-| Package           | Purpose          | Importable? | Coverage |
-| ----------------- | ---------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API    | Yes         | 82.2%    |
-| `pkg/testutil`    | Test helpers     | Yes         | —        |
+| Package           | Purpose       | Importable? | Coverage |
+| ----------------- | ------------- | ----------- | -------- |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | 82.2%    |
+| `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
 
 ## Key Dependencies
 
-| Library                     | Purpose              | Version |
-| --------------------------- | -------------------- | ------- |
-| `github.com/spf13/cobra`    | CLI framework        | v1.10.2 |
-| `github.com/samber/do/v2`   | Dependency injection | v2.0.0  |
-| `github.com/spf13/pflag`    | Flag parsing         | v1.0.6  |
-| `charm.land/fang/v2`        | Cobra styling        | v2.0.1  |
+| Library                   | Purpose              | Version |
+| ------------------------- | -------------------- | ------- |
+| `github.com/spf13/cobra`  | CLI framework        | v1.10.2 |
+| `github.com/samber/do/v2` | Dependency injection | v2.0.0  |
+| `github.com/spf13/pflag`  | Flag parsing         | v1.0.6  |
+| `charm.land/fang/v2`      | Cobra styling        | v2.0.1  |
 
 ---
 
@@ -394,8 +394,8 @@ go build ./...                                   # Verify build
 1. `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 2. `PostRunE` is NOT called when `RunE` errors (Cobra behavior)
 3. `NoFlags` is `type NoFlags = struct{}` — use `(NoFlags{})` with parens for comparisons
-5. fang provides styled output by default; `WithColor(false)` falls back to plain cobra
-6. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
+4. fang provides styled output by default; `WithColor(false)` falls back to plain cobra
+5. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
 
 ---
 

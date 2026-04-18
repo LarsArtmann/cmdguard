@@ -86,15 +86,15 @@ func main() {
 
 ## Features
 
-| Feature           | Description                                |
-| ----------------- | ------------------------------------------ |
-| Type-safe config  | Yes (type parameter T)                     |
-| Type-safe flags   | Yes (type parameter F)                     |
-| DI integration    | Yes (samber/do/v2)                         |
-| Flag tags         | Yes (`flag`, `short`, `default`, `help`)   |
-| Lifecycle hooks   | Yes (PreRunE, PostRunE)                    |
-| Health checks     | Yes                                        |
-| Graceful shutdown | Yes                                        |
+| Feature           | Description                              |
+| ----------------- | ---------------------------------------- |
+| Type-safe config  | Yes (type parameter T)                   |
+| Type-safe flags   | Yes (type parameter F)                   |
+| DI integration    | Yes (samber/do/v2)                       |
+| Flag tags         | Yes (`flag`, `short`, `default`, `help`) |
+| Lifecycle hooks   | Yes (PreRunE, PostRunE)                  |
+| Health checks     | Yes                                      |
+| Graceful shutdown | Yes                                      |
 
 ## v2 API Reference
 

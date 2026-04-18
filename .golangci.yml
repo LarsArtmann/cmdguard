@@ -162,7 +162,6 @@ linters:
           allow:
             - $gostd
             - charm.land/fang/v2
-            - github.com/knadh/koanf
             - github.com/larsartmann/cmdguard
             - github.com/samber/do/v2
             - github.com/spf13/cobra
@@ -178,12 +177,8 @@ linters:
           allow:
             - $gostd
             - charm.land/fang/v2
-            - github.com/knadh/koanf
             - github.com/larsartmann/cmdguard
-            - github.com/onsi/ginkgo
-            - github.com/onsi/gomega
             - github.com/samber/do/v2
-            - github.com/stretchr
             - github.com/spf13/cobra
             - github.com/spf13/pflag
           files:
@@ -248,15 +243,7 @@ linters:
         linters:
           - cyclop
           - funlen
-      - path: pkg/cmdguard/v2/guard_flags.go$
-        linters:
-          - cyclop
-          - nestif
-          - funlen
       - path: pkg/cmdguard/
-        linters:
-          - exhaustruct
-      - path: internal/
         linters:
           - exhaustruct
       - path: examples/
@@ -335,13 +322,6 @@ linters:
         linters:
           - varnamelen
           - ireturn
-      - path: internal/
-        linters:
-          - varnamelen
-          - ireturn
-      - path: pkg/errtypes/
-        linters:
-          - varnamelen
       - path: pkg/testutil/
         linters:
           - varnamelen
@@ -368,10 +348,9 @@ linters:
       - path: pkg/cmdguard/v2/flags_validate.go
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/
+      - path: pkg/cmdguard/v2/flags_validate.go
         linters:
-          - nlreturn
-          - noinlineerr
+          - gochecknoglobals
       - path: _test\.go$
         linters:
           - wsl_v5
