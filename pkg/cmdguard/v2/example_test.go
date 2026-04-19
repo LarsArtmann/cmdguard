@@ -16,12 +16,14 @@ func ExampleNewCommand() {
 	cmd, err := v2.NewCommand[config, v2.NoFlags]("hello",
 		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
 			fmt.Println("Hello, World!")
+
 			return nil
 		},
 		v2.WithShort[config, v2.NoFlags]("Say hello"),
 	)
 	if err != nil {
 		fmt.Println("error:", err)
+
 		return
 	}
 
@@ -39,6 +41,7 @@ func ExampleNewCommand_withFlags() {
 	_, err := v2.NewCommand[config, *greetFlags]("greet",
 		func(ctx context.Context, cfg *config, flags *greetFlags) error {
 			fmt.Printf("Hello, %s!", flags.Name)
+
 			return nil
 		},
 		v2.WithShort[config, *greetFlags]("Greet someone"),
@@ -58,6 +61,7 @@ func ExampleNewParentCommand() {
 	listCmd, _ := v2.NewCommand[config, v2.NoFlags]("list",
 		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
 			fmt.Println("listing items...")
+
 			return nil
 		},
 		v2.WithShort[config, v2.NoFlags]("List items"),
@@ -66,6 +70,7 @@ func ExampleNewParentCommand() {
 	createCmd, _ := v2.NewCommand[config, v2.NoFlags]("create",
 		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
 			fmt.Println("creating item...")
+
 			return nil
 		},
 		v2.WithShort[config, v2.NoFlags]("Create item"),
@@ -78,6 +83,7 @@ func ExampleNewParentCommand() {
 	)
 	if err != nil {
 		fmt.Println("error:", err)
+
 		return
 	}
 
@@ -92,6 +98,7 @@ func ExampleMustNewCommand() {
 	cmd := v2.MustNewCommand[config, v2.NoFlags]("version",
 		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
 			fmt.Println("v1.0.0")
+
 			return nil
 		},
 		v2.WithShort[config, v2.NoFlags]("Print version"),
