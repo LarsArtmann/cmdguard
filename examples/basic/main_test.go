@@ -21,43 +21,22 @@ func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 	return cli
 }
 
-func addHelloCommand(t *testing.T, cli *v2.CLI[AppConfig], output *bytes.Buffer) {
+func addCommand(t *testing.T, cli *v2.CLI[AppConfig], output *bytes.Buffer, name, desc string) {
 	t.Helper()
 
 	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
-		"hello",
+		name,
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			if output != nil {
-				output.WriteString("Hello, World!\n")
+				output.WriteString(desc)
 			}
 
 			return nil
 		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
+		v2.WithShort[AppConfig, v2.NoFlags](desc[:len(desc)-1]),
 	)
 	if err != nil {
-		t.Fatalf("failed to create hello command: %v", err)
-	}
-
-	v2.AddCommand(cli, cmd)
-}
-
-func addGoodbyeCommand(t *testing.T, cli *v2.CLI[AppConfig], output *bytes.Buffer) {
-	t.Helper()
-
-	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
-		"goodbye",
-		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
-			if output != nil {
-				output.WriteString("Goodbye, World!\n")
-			}
-
-			return nil
-		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Say goodbye"),
-	)
-	if err != nil {
-		t.Fatalf("failed to create goodbye command: %v", err)
+		t.Fatalf("failed to create %s command: %v", name, err)
 	}
 
 	v2.AddCommand(cli, cmd)
@@ -70,8 +49,8 @@ func TestBasicExample_HelloCommand(t *testing.T) {
 
 	var output bytes.Buffer
 
-	addHelloCommand(t, cli, &output)
-	addGoodbyeCommand(t, cli, &output)
+	addCommand(t, cli, &output, "hello", "Hello, World!\n")
+	addCommand(t, cli, &output, "goodbye", "Goodbye, World!\n")
 
 	if err := cli.ExecuteWithArgs(context.Background(), []string{"hello"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -96,8 +75,8 @@ func TestBasicExample_RootHasSubcommands(t *testing.T) {
 	t.Parallel()
 
 	cli := newTestCLI(t)
-	addHelloCommand(t, cli, nil)
-	addGoodbyeCommand(t, cli, nil)
+	addCommand(t, cli, nil, "hello", "Hello, World!\n")
+	addCommand(t, cli, nil, "goodbye", "Goodbye, World!\n")
 
 	root := cli.RootCommand()
 	if root.Use != "basic" {
@@ -122,8 +101,8 @@ func TestBasicExample_HelpOutput(t *testing.T) {
 	}
 
 	cli := newTestCLI(t)
-	addHelloCommand(t, cli, nil)
-	addGoodbyeCommand(t, cli, nil)
+	addCommand(t, cli, nil, "hello", "Hello, World!\n")
+	addCommand(t, cli, nil, "goodbye", "Goodbye, World!\n")
 
 	_ = cli.ExecuteWithArgs(context.Background(), []string{"--help"})
 }

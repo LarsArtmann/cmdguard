@@ -19,23 +19,19 @@ func TestMiddleware_BasicChaining(t *testing.T) {
 
 	var callOrder []string
 
-	mw1 := func(_ context.Context, _ *testConfig, _ CommandInfo, next func() error) error {
-		callOrder = append(callOrder, "mw1-before")
-		err := next()
+	makeMiddleware := func(name string) func(context.Context, *testConfig, CommandInfo, func() error) error {
+		return func(_ context.Context, _ *testConfig, _ CommandInfo, next func() error) error {
+			callOrder = append(callOrder, name+"-before")
+			err := next()
 
-		callOrder = append(callOrder, "mw1-after")
+			callOrder = append(callOrder, name+"-after")
 
-		return err
+			return err
+		}
 	}
 
-	mw2 := func(_ context.Context, _ *testConfig, _ CommandInfo, next func() error) error {
-		callOrder = append(callOrder, "mw2-before")
-		err := next()
-
-		callOrder = append(callOrder, "mw2-after")
-
-		return err
-	}
+	mw1 := makeMiddleware("mw1")
+	mw2 := makeMiddleware("mw2")
 
 	cli, err := NewCLI[testConfig]("test", "Test CLI", testConfig{},
 		WithMiddleware(mw1, mw2),
@@ -119,16 +115,20 @@ func TestMiddleware_ShortCircuit(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "blocked",
-		short: "Blocked command",
-		long:  "Blocked command",
-		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			handlerCalled = true
+	makeCommand := func(name, desc string) Command[testConfig, NoFlags] {
+		return Command[testConfig, NoFlags]{
+			use:   name,
+			short: desc + " command",
+			long:  desc + " command",
+			runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+				handlerCalled = true
 
-			return nil
-		},
-	})
+				return nil
+			},
+		}
+	}
+
+	err = AddCommand(cli, makeCommand("blocked", "Blocked"))
 	testutil.AssertNoError(t, err)
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"blocked"})
@@ -259,16 +259,20 @@ func TestMiddleware_NoMiddleware(t *testing.T) {
 
 	handlerCalled := false
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "plain",
-		short: "Plain command",
-		long:  "Plain command",
-		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			handlerCalled = true
+	makeCommand := func(name, desc string) Command[testConfig, NoFlags] {
+		return Command[testConfig, NoFlags]{
+			use:   name,
+			short: desc + " command",
+			long:  desc + " command",
+			runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
+				handlerCalled = true
 
-			return nil
-		},
-	})
+				return nil
+			},
+		}
+	}
+
+	err = AddCommand(cli, makeCommand("plain", "Plain"))
 	testutil.AssertNoError(t, err)
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"plain"})

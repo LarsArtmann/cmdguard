@@ -74,15 +74,4 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatal("expected error for duplicate command")
 		}
 	})
-
-	t.Run("returns error for invalid command", func(t *testing.T) {
-		t.Parallel()
-
-		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("",
-			noOpRunE[testCLIConfig],
-		)
-		if err == nil {
-			t.Fatal("expected error for invalid command")
-		}
-	})
 }

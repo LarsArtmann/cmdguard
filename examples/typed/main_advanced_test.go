@@ -22,6 +22,28 @@ func greetRunE() func(context.Context, *AppConfig, *GreetFlags) error {
 	}
 }
 
+// greetValidationPreRunE returns a PreRunE that validates count >= 1.
+func greetValidationPreRunE() func(context.Context, *AppConfig, *GreetFlags) error {
+	return func(_ context.Context, _ *AppConfig, flags *GreetFlags) error {
+		if flags.Count < 1 {
+			return errors.New("count should be at least 1")
+		}
+
+		return nil
+	}
+}
+
+// newGreetCommandWithValidation creates a greet command with PreRunE validation.
+func newGreetCommandWithValidation() (v2.Command[AppConfig, *GreetFlags], error) {
+	return v2.NewCommand[AppConfig, *GreetFlags](
+		"greet",
+		greetRunE(),
+		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+		v2.WithPreRunE[AppConfig, *GreetFlags](greetValidationPreRunE()),
+	)
+}
+
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 	cli, err := v2.NewCLI[AppConfig](
@@ -235,75 +257,55 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 
 //nolint:paralleltest // captures os.Stdout, not safe for parallel execution
 func TestTypedExample_PreRunEValidation(t *testing.T) {
-	cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	// Test 1: Invalid count should return error
+	t.Run("invalid count", func(t *testing.T) {
+		cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags](
-		"greet",
-		greetRunE(),
-		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
-		v2.WithPreRunE[AppConfig, *GreetFlags](
-			func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-				if flags.Count < 1 {
-					return errors.New("count should be at least 1")
-				}
+		greetCmd, err := newGreetCommandWithValidation()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-				return nil
-			},
-		),
-	)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+		err = v2.AddCommand(cli, greetCmd)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-	err = v2.AddCommand(cli, greetCmd)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+		cli.RootCommand().SetArgs([]string{"greet", "--count", "0"})
 
-	// Test with invalid count
-	cli.RootCommand().SetArgs([]string{"greet", "--count", "0"})
+		err = cli.Execute(context.Background())
+		if err == nil {
+			t.Fatal("expected error for count < 1")
+		}
 
-	err = cli.Execute(context.Background())
-	if err == nil {
-		t.Fatal("expected error for count < 1")
-	}
+		if !strings.Contains(err.Error(), "count should be at least 1") {
+			t.Errorf("error should contain %q, got %q", "count should be at least 1", err.Error())
+		}
+	})
 
-	if !strings.Contains(err.Error(), "count should be at least 1") {
-		t.Errorf("error should contain %q, got %q", "count should be at least 1", err.Error())
-	}
+	// Test 2: Valid count should succeed
+	t.Run("valid count", func(t *testing.T) {
+		cli, err := v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-	// Reset and test with valid count
-	cli, _ = v2.NewCLI[AppConfig]("myapp", "A typed CLI application", AppConfig{})
-	greetCmd2, err := v2.NewCommand[AppConfig, *GreetFlags](
-		"greet",
-		greetRunE(),
-		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
-		v2.WithPreRunE[AppConfig, *GreetFlags](
-			func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-				if flags.Count < 1 {
-					return errors.New("count should be at least 1")
-				}
+		greetCmd, err := newGreetCommandWithValidation()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-				return nil
-			},
-		),
-	)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+		err = v2.AddCommand(cli, greetCmd)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-	err = v2.AddCommand(cli, greetCmd2)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	output := runCLIWithArgs(cli, "greet", "--count", "1")
-	if !strings.Contains(output, "Greeting executed") {
-		t.Errorf("output should contain %q, got %q", "Greeting executed", output)
-	}
+		output := runCLIWithArgs(cli, "greet", "--count", "1")
+		if !strings.Contains(output, "Greeting executed") {
+			t.Errorf("output should contain %q, got %q", "Greeting executed", output)
+		}
+	})
 }
