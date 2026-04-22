@@ -186,89 +186,41 @@ func TestValidatorErrors_InvalidParams(t *testing.T) {
 
 	t.Run("minlen with non-integer param", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateMinLen("abc:hello")
-		if err == nil {
-			t.Fatal("expected error for non-integer minlen param, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "minlen", validateMinLen, "abc:hello")
 	})
 
 	t.Run("maxlen with non-integer param", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateMaxLen("abc:hello")
-		if err == nil {
-			t.Fatal("expected error for non-integer maxlen param, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "maxlen", validateMaxLen, "abc:hello")
 	})
 
 	t.Run("min with non-number param", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateMin("abc:10")
-		if err == nil {
-			t.Fatal("expected error for non-number min param, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "min", validateMin, "abc:10")
 	})
 
 	t.Run("max with non-number param", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateMax("abc:10")
-		if err == nil {
-			t.Fatal("expected error for non-number max param, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "max", validateMax, "abc:10")
 	})
 
 	t.Run("regex with invalid pattern", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateRegex("[invalid:hello")
-		if err == nil {
-			t.Fatal("expected error for invalid regex pattern, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "regex", validateRegex, "[invalid:hello")
 	})
 
 	t.Run("minlen missing separator", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateMinLen("5")
-		if err == nil {
-			t.Fatal("expected error for minlen without separator, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "minlen", validateMinLen, "5")
 	})
 
 	t.Run("min missing separator", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateMin("5")
-		if err == nil {
-			t.Fatal("expected error for min without separator, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "min", validateMin, "5")
 	})
 
 	t.Run("regex missing separator", func(t *testing.T) {
 		t.Parallel()
-
-		err := validateRegex("[a-z]+")
-		if err == nil {
-			t.Fatal("expected error for regex without separator, got nil")
-		}
-
-		assertErrorContains(t, err, "invalid")
+		assertValidatorError(t, "regex", validateRegex, "[a-z]+")
 	})
 }

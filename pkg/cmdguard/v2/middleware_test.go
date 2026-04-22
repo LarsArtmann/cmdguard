@@ -10,6 +10,19 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
+func makeMiddlewareCommand[T any](name, desc string, handlerCalled *bool) Command[T, NoFlags] {
+	return Command[T, NoFlags]{
+		use:   name,
+		short: desc + " command",
+		long:  desc + " command",
+		runE: func(_ context.Context, _ *T, _ NoFlags) error {
+			*handlerCalled = true
+
+			return nil
+		},
+	}
+}
+
 func TestMiddleware_BasicChaining(t *testing.T) {
 	t.Parallel()
 
@@ -115,20 +128,8 @@ func TestMiddleware_ShortCircuit(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 
-	makeCommand := func(name, desc string) Command[testConfig, NoFlags] {
-		return Command[testConfig, NoFlags]{
-			use:   name,
-			short: desc + " command",
-			long:  desc + " command",
-			runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				handlerCalled = true
-
-				return nil
-			},
-		}
-	}
-
-	err = AddCommand(cli, makeCommand("blocked", "Blocked"))
+	cmd := makeMiddlewareCommand[testConfig]("blocked", "Blocked", &handlerCalled)
+	err = AddCommand(cli, cmd)
 	testutil.AssertNoError(t, err)
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"blocked"})
@@ -259,20 +260,8 @@ func TestMiddleware_NoMiddleware(t *testing.T) {
 
 	handlerCalled := false
 
-	makeCommand := func(name, desc string) Command[testConfig, NoFlags] {
-		return Command[testConfig, NoFlags]{
-			use:   name,
-			short: desc + " command",
-			long:  desc + " command",
-			runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				handlerCalled = true
-
-				return nil
-			},
-		}
-	}
-
-	err = AddCommand(cli, makeCommand("plain", "Plain"))
+	cmd := makeMiddlewareCommand[testConfig]("plain", "Plain", &handlerCalled)
+	err = AddCommand(cli, cmd)
 	testutil.AssertNoError(t, err)
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"plain"})

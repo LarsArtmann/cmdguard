@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/larsartmann/cmdguard/examples/internal"
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
@@ -20,28 +21,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	helloCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
-		"hello",
-		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
-			fmt.Println("Hello, World!")
-
-			return nil
-		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
-	)
+	helloCmd, err := internal.NewSimpleCommand[AppConfig]("hello", "Hello, World!", "Say hello")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	goodbyeCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+	goodbyeCmd, err := internal.NewSimpleCommand[AppConfig](
 		"goodbye",
-		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
-			fmt.Println("Goodbye, World!")
-
-			return nil
-		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Say goodbye"),
+		"Goodbye, World!",
+		"Say goodbye",
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

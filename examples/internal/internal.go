@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // CLIExecutor is an interface for CLI types that can be executed.
@@ -26,4 +28,18 @@ func Execute(ctx context.Context, cli CLIExecutor) {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+// NewSimpleCommand creates a simple leaf command that prints a message.
+func NewSimpleCommand[Config any](
+	name, message, short string,
+) (v2.Command[Config, v2.NoFlags], error) {
+	return v2.NewCommand[Config, v2.NoFlags](name,
+		func(_ context.Context, _ *Config, _ v2.NoFlags) error {
+			fmt.Println(message)
+
+			return nil
+		},
+		v2.WithShort[Config, v2.NoFlags](short),
+	)
 }

@@ -7,20 +7,25 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+// newSimpleCmd is a local helper to create simple commands for examples.
+func newSimpleCmd[C any](name, message, short string) (v2.Command[C, v2.NoFlags], error) {
+	return v2.NewCommand[C, v2.NoFlags](name,
+		func(_ context.Context, _ *C, _ v2.NoFlags) error {
+			fmt.Println(message)
+
+			return nil
+		},
+		v2.WithShort[C, v2.NoFlags](short),
+	)
+}
+
 // ExampleNewCommand demonstrates creating a leaf command with the constructor API.
 func ExampleNewCommand() {
 	type config struct {
 		Verbose bool `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
 	}
 
-	cmd, err := v2.NewCommand[config, v2.NoFlags]("hello",
-		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
-			fmt.Println("Hello, World!")
-
-			return nil
-		},
-		v2.WithShort[config, v2.NoFlags]("Say hello"),
-	)
+	cmd, err := newSimpleCmd[config]("hello", "Hello, World!", "Say hello")
 	if err != nil {
 		fmt.Println("error:", err)
 
@@ -58,23 +63,8 @@ func ExampleNewCommand_withFlags() {
 func ExampleNewParentCommand() {
 	type config struct{}
 
-	listCmd, _ := v2.NewCommand[config, v2.NoFlags]("list",
-		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
-			fmt.Println("listing items...")
-
-			return nil
-		},
-		v2.WithShort[config, v2.NoFlags]("List items"),
-	)
-
-	createCmd, _ := v2.NewCommand[config, v2.NoFlags]("create",
-		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
-			fmt.Println("creating item...")
-
-			return nil
-		},
-		v2.WithShort[config, v2.NoFlags]("Create item"),
-	)
+	listCmd, _ := newSimpleCmd[config]("list", "listing items...", "List items")
+	createCmd, _ := newSimpleCmd[config]("create", "creating item...", "Create item")
 
 	parent, err := v2.NewParentCommand[config, v2.NoFlags]("items",
 		"Item management commands",

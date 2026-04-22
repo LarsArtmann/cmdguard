@@ -177,3 +177,14 @@ func mustInvokeNamed[T any](t *testing.T, scope *Scope, name string) T {
 
 	return value
 }
+
+func assertValidatorError(t *testing.T, name string, validator func(string) error, param string) {
+	t.Helper()
+
+	err := validator(param)
+	if err == nil {
+		t.Fatalf("expected error for %s with param %q, got nil", name, param)
+	}
+
+	assertErrorContains(t, err, "invalid")
+}
