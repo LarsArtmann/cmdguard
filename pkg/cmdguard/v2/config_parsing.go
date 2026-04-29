@@ -117,6 +117,18 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		tag.Env = env
 	}
 
+	// Parse count tag (for -vvv → 3 counting flags)
+	if cnt := field.Tag.Get("count"); cnt != "" {
+		count, err := strconv.ParseBool(cnt)
+		if err != nil {
+			return FlagTag{}, false, fmt.Errorf(
+				"field %q: invalid count tag %q: %w",
+				field.Name, cnt, err,
+			)
+		}
+		tag.Count = count
+	}
+
 	return tag, true, nil
 }
 

@@ -56,8 +56,9 @@ func (h TypeHandlerFunc) Default(tag FlagTag) any {
 
 // typeRegistry maps reflect.Type or reflect.Kind to TypeHandlers.
 type typeRegistry struct {
-	byType map[reflect.Type]TypeHandler
-	byKind map[reflect.Kind]TypeHandler
+	byType      map[reflect.Type]TypeHandler
+	byKind      map[reflect.Kind]TypeHandler
+	countHandler TypeHandler
 }
 
 // globalTypeRegistry is the default registry with all built-in types.
@@ -71,6 +72,7 @@ func newTypeRegistry() *typeRegistry {
 
 	r.registerKinds()
 	r.registerCustomTypes()
+	r.registerCountHandler()
 
 	return r
 }
@@ -354,6 +356,28 @@ func (r *typeRegistry) registerCustomTypes() {
 	}
 }
 
+// registerCountHandler registers the counting flag handler.
+// Called during init to support count:"true" tags with int/uint fields.
+func (r *typeRegistry) registerCountHandler() {
+	countHandler := TypeHandlerFunc{
+		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
+			if tag.Short != "" {
+				flags.CountP(tag.Name, tag.Short, tag.Help)
+			} else {
+				flags.Count(tag.Name, tag.Help)
+			}
+			return nil
+		},
+		ParseFunc: func(value string, _ FlagTag) (any, error) {
+			return strconv.Atoi(value)
+		},
+		DefaultFunc: func(_ FlagTag) any {
+			return 0
+		},
+	}
+	r.countHandler = countHandler
+}
+
 // lookupHandler finds the TypeHandler for a given reflect.Type.
 // Checks exact type match first, then falls back to kind-based lookup.
 func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
@@ -380,6 +404,11 @@ func handledByTypeRegistry(typ reflect.Type) bool {
 
 // dispatchRegister dispatches flag registration to the TypeHandler registry.
 func dispatchRegister(flags *pflag.FlagSet, tag FlagTag) error {
+	if tag.Count {
+		if globalTypeRegistry.countHandler != nil {
+			return globalTypeRegistry.countHandler.Register(flags, tag)
+		}
+	}
 	h, ok := globalTypeRegistry.lookupHandler(tag.Type)
 	if !ok {
 		registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
