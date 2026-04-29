@@ -94,6 +94,12 @@ type validateRule struct {
 // Format: "email,min=5,max=100".
 // Returns an error if an unknown validator name is encountered.
 func parseValidateRules(tag string) ([]validateRule, error) {
+	return parseValidateRulesWithRegistry(tag, nil)
+}
+
+// parseValidateRulesWithRegistry parses a validate tag using instance validators first.
+// If instance is nil or the validator is not found, falls back to the global registry.
+func parseValidateRulesWithRegistry(tag string, instance *validatorRegistry) ([]validateRule, error) {
 	var rules []validateRule
 
 	for part := range strings.SplitSeq(tag, ",") {
@@ -104,7 +110,21 @@ func parseValidateRules(tag string) ([]validateRule, error) {
 
 		name, param, _ := strings.Cut(part, "=")
 
-		validator, ok := lookupValidator(name)
+		var validator FlagValidator
+		var ok bool
+
+		// Instance-scoped first
+		if instance != nil {
+			instance.mu.RLock()
+			validator, ok = instance.validators[name]
+			instance.mu.RUnlock()
+		}
+
+		// Fallback to global
+		if !ok {
+			validator, ok = lookupValidator(name)
+		}
+
 		if !ok {
 			return nil, fmt.Errorf("%w: %q", ErrUnknownValidator, name)
 		}

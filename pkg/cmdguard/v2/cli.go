@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"charm.land/fang/v2"
 	"github.com/spf13/cobra"
@@ -13,20 +15,22 @@ import (
 // T is the application config type. Commands can have any flags type.
 // This is the recommended API for new code (v2.1+).
 type CLI[T any] struct {
-	name           string
-	short          string
-	long           string
-	version        string
-	defaults       T
-	config         *T
-	scope          *Scope
-	rootCmd        *cobra.Command
-	registry       *FlagRegistry
-	registeredCmds map[string]bool
-	flowCtx        *BranchingFlowContext
-	useFang        bool
-	fangOpts       []fang.Option
-	middleware     []Middleware[T]
+	name            string
+	short           string
+	long            string
+	version         string
+	defaults        T
+	config          *T
+	scope           *Scope
+	rootCmd         *cobra.Command
+	registry        *FlagRegistry
+	registeredCmds  map[string]bool
+	flowCtx         *BranchingFlowContext
+	useFang         bool
+	fangOpts        []fang.Option
+	middleware       []Middleware[T]
+	envPrefix       string
+	signalHandling  bool
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -87,6 +91,10 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	cli.registry = registry
 
+	if cli.envPrefix != "" {
+		registry.SetEnvPrefix(cli.envPrefix)
+	}
+
 	err = registry.RegisterPersistentFlags(cli.rootCmd)
 	if err != nil {
 		return fmt.Errorf("registering global flags for %T: %w", defaults, err)
@@ -142,7 +150,14 @@ func MustNewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) *CL
 
 // Execute runs the CLI application.
 // The context is wrapped with a BranchingFlowContext for command path tracking.
+// If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
+	if cli.signalHandling {
+		var cancel context.CancelFunc
+		ctx, cancel = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+		defer cancel()
+	}
+
 	if cli.flowCtx == nil {
 		cli.flowCtx = NewBranchingFlowContext(ctx)
 	}

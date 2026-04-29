@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 
 	"github.com/spf13/cobra"
@@ -21,18 +22,43 @@ func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error {
 }
 
 // parseFlag reads a flag value and sets it on the config struct.
+// Priority: explicit flag > environment variable > default value.
 func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error {
 	flag, err := r.lookupFlag(cmd, tag)
 	if err != nil {
 		return fmt.Errorf("looking up flag %q on command %q: %w", tag.Name, cmd.Use, err)
 	}
 
-	// Skip if flag wasn't changed and we're not using defaults
-	if !flag.Changed && tag.Default == "" {
-		return nil
+	var value string
+	hasValue := false
+
+	// Priority 1: explicit flag value
+	if flag.Changed {
+		value = flag.Value.String()
+		hasValue = true
 	}
 
-	value := flag.Value.String()
+	// Priority 2: environment variable
+	if !hasValue && tag.Env != "" {
+		envName := tag.Env
+		if r.envPrefix != "" {
+			envName = r.envPrefix + envName
+		}
+
+		if envVal, ok := os.LookupEnv(envName); ok {
+			value = envVal
+			hasValue = true
+		}
+	}
+
+	// Priority 3: default value
+	if !hasValue {
+		if tag.Default == "" {
+			return nil
+		}
+
+		value = tag.Default
+	}
 
 	return r.parseAndSetValue(cfg, tag, value)
 }

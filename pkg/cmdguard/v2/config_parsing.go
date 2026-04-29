@@ -112,6 +112,11 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		tag.Validate = validate
 	}
 
+	// Parse env tag
+	if env := field.Tag.Get("env"); env != "" {
+		tag.Env = env
+	}
+
 	return tag, true, nil
 }
 

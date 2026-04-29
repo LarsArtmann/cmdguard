@@ -10,12 +10,20 @@ import (
 
 // FlagRegistry manages flag registration and parsing.
 type FlagRegistry struct {
-	tags []FlagTag
+	tags        []FlagTag
+	envPrefix   string
+	validators  *validatorRegistry
 }
 
 // Tags returns all parsed flag tags.
 func (r *FlagRegistry) Tags() []FlagTag {
 	return r.tags
+}
+
+// SetEnvPrefix sets the environment variable prefix for this registry.
+// When set, env tag lookups prepend this prefix (e.g., prefix "APP_" + tag "PORT" → "APP_PORT").
+func (r *FlagRegistry) SetEnvPrefix(prefix string) {
+	r.envPrefix = prefix
 }
 
 // NewFlagRegistry creates a new FlagRegistry from a config struct.
@@ -25,7 +33,15 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 		return nil, err
 	}
 
-	return &FlagRegistry{tags: tags}, nil
+	return &FlagRegistry{tags: tags, validators: newValidatorRegistry()}, nil
+}
+
+// RegisterFlagValidator adds a named validator to this registry's instance-scoped set.
+// Validators are looked up here first, then in the global registry as fallback.
+func (r *FlagRegistry) RegisterFlagValidator(name string, validator FlagValidator) {
+	r.validators.mu.Lock()
+	defer r.validators.mu.Unlock()
+	r.validators.validators[name] = validator
 }
 
 // RegisterFlags adds flags to a cobra command based on the config struct.
@@ -138,6 +154,7 @@ func (r *FlagRegistry) isAllowedValue(value string, allowed []string) bool {
 }
 
 // validateTagRules runs validate tag rules against the flag's current value.
+// Uses instance-scoped validators first, falling back to the global registry.
 func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 	if tag.Validate == "" {
 		return nil
@@ -148,9 +165,15 @@ func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 		return nil
 	}
 
-	err := runValidateTag(tag.Validate, flag.Value.String())
+	rules, err := parseValidateRulesWithRegistry(tag.Validate, r.validators)
 	if err != nil {
 		return fmt.Errorf("validating flag %q on command %q: %w", tag.Name, cmd.Use, err)
+	}
+
+	for _, rule := range rules {
+		if err := rule.Validate(flag.Value.String()); err != nil {
+			return fmt.Errorf("validating flag %q on command %q: %w", tag.Name, cmd.Use, err)
+		}
 	}
 
 	return nil

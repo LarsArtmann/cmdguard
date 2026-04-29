@@ -76,3 +76,19 @@ func WithGroup[T any](id, title string) CLIOption[T] {
 		cli.rootCmd.AddGroup(&cobra.Group{ID: id, Title: title})
 	}
 }
+
+// WithEnvPrefix sets a prefix for environment variable lookups.
+// When set, env tags are prefixed: prefix "APP_" + env tag "PORT" → "APP_PORT".
+func WithEnvPrefix[T any](prefix string) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.envPrefix = prefix
+	}
+}
+
+// WithSignalHandling adds automatic context cancellation on SIGINT/SIGTERM.
+// When a signal is received, the context passed to handlers is cancelled.
+func WithSignalHandling[T any]() CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.signalHandling = true
+	}
+}
