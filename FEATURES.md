@@ -1,31 +1,24 @@
 # cmdguard Features
 
-**Last Updated:** 2026-04-17
-**Version:** 2.1.0
+**Last Updated:** 2026-04-30
+**Version:** 2.2.0
 **Go Version:** 1.26
 
 ---
 
 ## Legend
 
-| Status                  | Meaning                                                  |
-| ----------------------- | -------------------------------------------------------- |
-| ✅ FULLY_FUNCTIONAL     | Feature works as designed, tested, and documented        |
-| ⚠️ PARTIALLY_FUNCTIONAL | Feature works but has limitations, gaps, or known issues |
-| 🔧 BROKEN               | Feature does not work or is non-functional               |
-| 📝 PLANNED              | Feature is designed but not yet implemented              |
-| 🗑️ DEPRECATED           | Feature exists but is scheduled for removal              |
-| ❓ UNKNOWN              | Status cannot be determined                              |
+|| Status                  | Meaning                                                  |
+|| ----------------------- | -------------------------------------------------------- |
+|| ✅ FULLY_FUNCTIONAL     | Feature works as designed, tested, and documented        |
+|| ⚠️ PARTIALLY_FUNCTIONAL | Feature works but has limitations, gaps, or known issues |
+|| 📝 PLANNED              | Feature is designed but not yet implemented              |
 
 ---
 
 ## v2 API (pkg/cmdguard/v2)
 
-The v2 API is a complete rewrite offering type-safe CLI construction with dependency injection.
-
-### CLI[T] (Recommended)
-
-Type-safe CLI with single type parameter. Each command can have its own flags type.
+### CLI[T]
 
 | Feature                                     | Status              | Notes                                |
 | ------------------------------------------- | ------------------- | ------------------------------------ |
@@ -39,90 +32,110 @@ Type-safe CLI with single type parameter. Each command can have its own flags ty
 | `Shutdown(ctx)`                             | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
 | `HealthCheck()`                             | ✅ FULLY_FUNCTIONAL | Runs health checks                   |
 | `RootCommand()`                             | ✅ FULLY_FUNCTIONAL | Returns underlying cobra.Command     |
-| Functional options (`WithCLIVersion`, etc.) | ✅ FULLY_FUNCTIONAL | Configuration options                |
 
 ### CLI Options
 
-| Option                   | Status              | Notes                         |
-| ------------------------ | ------------------- | ----------------------------- |
-| `WithCLIVersion[T](v)`   | ✅ FULLY_FUNCTIONAL | Set version string            |
-| `WithCLILong[T](desc)`   | ✅ FULLY_FUNCTIONAL | Set long description          |
-| `WithCLIScope[T](scope)` | ✅ FULLY_FUNCTIONAL | Custom DI scope               |
-| `WithSilenceErrors[T]()` | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing |
-| `WithSilenceUsage[T]()`  | ✅ FULLY_FUNCTIONAL | Suppress usage on error       |
-| `WithColor[T](bool)`     | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling   |
+| Option                   | Status              | Notes                                |
+| ------------------------ | ------------------- | ------------------------------------ |
+| `WithCLIVersion[T](v)`   | ✅ FULLY_FUNCTIONAL | Set version string                   |
+| `WithCLILong[T](desc)`   | ✅ FULLY_FUNCTIONAL | Set long description                 |
+| `WithCLIScope[T](scope)` | ✅ FULLY_FUNCTIONAL | Custom DI scope                      |
+| `WithSilenceErrors[T]()` | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing        |
+| `WithSilenceUsage[T]()`  | ✅ FULLY_FUNCTIONAL | Suppress usage on error              |
+| `WithFang[T](bool)`      | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling          |
+| `WithColor[T](bool)`     | 🗑️ DEPRECATED      | Use WithFang instead                 |
+| `WithFangOptions[T]()`   | ✅ FULLY_FUNCTIONAL | Pass fang options                    |
+| `WithMiddleware[T]()`     | ✅ FULLY_FUNCTIONAL | Add command middleware                |
+| `WithGroup[T](id,title)` | ✅ FULLY_FUNCTIONAL | Command groups in help               |
+| `WithEnvPrefix[T](pfx)`  | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups           |
+| `WithSignalHandling[T]()` | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation |
 
 ### Command[T, F]
 
-Type-safe command definition with typed flags.
-
 | Feature                                      | Status              | Notes                                     |
 | -------------------------------------------- | ------------------- | ----------------------------------------- |
-| `Use`, `Short`, `Long` fields                | ✅ FULLY_FUNCTIONAL | Set via constructors (unexported fields)  |
-| `Flags F`                                    | ✅ FULLY_FUNCTIONAL | Struct with flag tags                     |
-| `RunE func(ctx, *T, flags)`                  | ✅ FULLY_FUNCTIONAL | Type-safe handler                         |
-| `PreRunE` / `PostRunE`                       | ✅ FULLY_FUNCTIONAL | Set via WithPreRunE/WithPostRunE options  |
-| `Commands []Command[T, F]`                   | ✅ FULLY_FUNCTIONAL | Set via NewParentCommand                  |
-| `Hidden`, `Deprecated`                       | ✅ FULLY_FUNCTIONAL | Set via WithHidden/WithDeprecated options |
-| `Aliases`                                    | ✅ FULLY_FUNCTIONAL | Set via WithAliases option                |
+| `NewCommand` / `NewParentCommand`            | ✅ FULLY_FUNCTIONAL | Constructors with validation              |
+| `MustNewCommand` / `MustNewParentCommand`    | ✅ FULLY_FUNCTIONAL | Panic variants                            |
+| `RunE`, `PreRunE`, `PostRunE`                | ✅ FULLY_FUNCTIONAL | Type-safe handlers                        |
 | `Validate()`                                 | ✅ FULLY_FUNCTIONAL | Called by constructors                    |
-| `NewCommand(use, runE, opts...)`             | ✅ FULLY_FUNCTIONAL | Leaf command constructor                  |
-| `NewParentCommand(use, long, subs, opts...)` | ✅ FULLY_FUNCTIONAL | Parent command constructor                |
-| `MustNewCommand(...)`                        | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
-| `MustNewParentCommand(...)`                  | ✅ FULLY_FUNCTIONAL | Panics on invalid input                   |
-| Command options (12 total)                   | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, etc.   |
+| Command options (15 total)                   | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, etc.   |
 
 ### Flag System
 
 | Feature                         | Status              | Notes                                             |
 | ------------------------------- | ------------------- | ------------------------------------------------- |
 | Struct tag flags                | ✅ FULLY_FUNCTIONAL | `flag:"name" short:"n" default:"val" help:"desc"` |
-| Type inference                  | ✅ FULLY_FUNCTIONAL | string, int, bool, float64 supported              |
+| `env:"VAR"` struct tag          | ✅ FULLY_FUNCTIONAL | Environment variable binding                      |
+| `count:"true"` struct tag       | ✅ FULLY_FUNCTIONAL | Counting flags: -vvv → 3                          |
 | Short flags                     | ✅ FULLY_FUNCTIONAL | `short:"n"` for `-n`                              |
-| Default values                  | ✅ FULLY_FUNCTIONAL | `default:"value"` tag                             |
-| Help text                       | ✅ FULLY_FUNCTIONAL | `help:"description"` tag                          |
-| Required flags                  | ✅ FULLY_FUNCTIONAL | `required:"true"` tag, validated at runtime       |
-| Flag typo suggestions           | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based suggestions            |
-| `SuggestFlag(available, input)` | ✅ FULLY_FUNCTIONAL | Returns closest match for typos                   |
-| FlagRegistry                    | ✅ FULLY_FUNCTIONAL | Parse and validate flags                          |
+| Required flags                  | ✅ FULLY_FUNCTIONAL | `required:"true"` tag                             |
+| `validate:"email,min=5"` tag    | ✅ FULLY_FUNCTIONAL | Built-in + custom validators                      |
+| Flag typo suggestions           | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based                        |
+| Subcommand typo suggestions     | ✅ FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands           |
+| Instance-scoped validators      | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator()               |
+| TypeHandler registry            | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system                   |
+| `RegisterTypeHandler()`         | ✅ FULLY_FUNCTIONAL | Register custom flag types                        |
 
-### Dependency Injection (Scope)
+### Value Types
+
+| Feature    | Status              | Notes                         |
+| ---------- | ------------------- | ----------------------------- |
+| `Duration` | ✅ FULLY_FUNCTIONAL | time.Duration wrapper         |
+| `Enum`     | ✅ FULLY_FUNCTIONAL | Validated enum values         |
+| `LogLevel` | ✅ FULLY_FUNCTIONAL | debug/info/warn/error         |
+| `LogFormat` | ✅ FULLY_FUNCTIONAL | text/json                     |
+| `URL`      | ✅ FULLY_FUNCTIONAL | Validated URL                 |
+| `Email`    | ✅ FULLY_FUNCTIONAL | Validated email               |
+| `Port`     | ✅ FULLY_FUNCTIONAL | 1-65535, named ports          |
+| `FilePath` | ✅ FULLY_FUNCTIONAL | Cleaned paths, existence check |
+| `HostPort` | ✅ FULLY_FUNCTIONAL | host:port validation          |
+
+### Dependency Injection
 
 | Feature                       | Status              | Notes                |
 | ----------------------------- | ------------------- | -------------------- |
 | `NewScope(name)`              | ✅ FULLY_FUNCTIONAL | Creates DI scope     |
-| `Provide(scope, constructor)` | ✅ FULLY_FUNCTIONAL | Register service     |
-| `ProvideValue(scope, value)`  | ✅ FULLY_FUNCTIONAL | Register value       |
-| `Invoke[T](scope)`            | ✅ FULLY_FUNCTIONAL | Get service          |
-| `Child(name)`                 | ✅ FULLY_FUNCTIONAL | Create child scope   |
-| `Shutdown(ctx)`               | ✅ FULLY_FUNCTIONAL | Cleanup services     |
-| `HealthCheck()`               | ✅ FULLY_FUNCTIONAL | Check service health |
-| `IsRoot()`                    | ✅ FULLY_FUNCTIONAL | Check if root scope  |
-| `Path()`                      | ✅ FULLY_FUNCTIONAL | Scope hierarchy path |
+| `Provide[T]`, `ProvideValue` | ✅ FULLY_FUNCTIONAL | Register services    |
+| `Invoke[T]`                   | ✅ FULLY_FUNCTIONAL | Get services         |
+| `Child(name)`                 | ✅ FULLY_FUNCTIONAL | Hierarchical scopes  |
+| `Shutdown`, `HealthCheck`     | ✅ FULLY_FUNCTIONAL | Lifecycle management |
+
+### Rich Output (go-output)
+
+| Feature            | Status              | Notes                                    |
+| ------------------ | ------------------- | ---------------------------------------- |
+| `OutputResult()`   | ✅ FULLY_FUNCTIONAL | Render data in configured format         |
+| `OutputTable()`    | ✅ FULLY_FUNCTIONAL | Convenience for table data               |
+| `OutputStyledTable()` | ✅ FULLY_FUNCTIONAL | Lipgloss-styled terminal tables          |
+| `ParseOutputFormat()` | ✅ FULLY_FUNCTIONAL | String → Format conversion               |
+| 12 output formats | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot |
+
+### Middleware
+
+| Feature               | Status              | Notes                            |
+| --------------------- | ------------------- | -------------------------------- |
+| `TimingMiddleware`    | ✅ FULLY_FUNCTIONAL | Log command execution duration   |
+| `RecoveryMiddleware`  | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers  |
+| Custom middleware     | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
+
+### Helpers
+
+| Feature         | Status              | Notes                           |
+| --------------- | ------------------- | ------------------------------- |
+| `EditInEditor`  | ✅ FULLY_FUNCTIONAL | Open content in $EDITOR         |
+| `Ptr[T]`        | ✅ FULLY_FUNCTIONAL | Pointer helper                  |
+| `ValueOrDefault` | ✅ FULLY_FUNCTIONAL | Nil-safe value access           |
+| `MustParse[T]`  | ✅ FULLY_FUNCTIONAL | Panic-on-fail for constants     |
+| `MergeConfigs`  | ✅ FULLY_FUNCTIONAL | Deep merge config structs       |
 
 ### Error Handling
 
 | Feature                    | Status              | Notes                                      |
 | -------------------------- | ------------------- | ------------------------------------------ |
-| Typed errors               | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc. |
-| Error wrapping             | ✅ FULLY_FUNCTIONAL | Compatible with errors.Is/As               |
-| NewCommandError            | ✅ FULLY_FUNCTIONAL | Command-specific errors                    |
-| NewServiceError            | ✅ FULLY_FUNCTIONAL | DI service-specific errors                 |
-| No panics                  | ✅ FULLY_FUNCTIONAL | All operations return errors               |
+| 30+ sentinel errors        | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc. |
+| Typed errors               | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
 | FlagError with suggestion  | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message  |
-| NewFlagErrorWithSuggestion | ✅ FULLY_FUNCTIONAL | Creates FlagError with suggestion text     |
-
-### Helper Types
-
-| Feature                    | Status              | Notes                               |
-| -------------------------- | ------------------- | ----------------------------------- |
-| `LogLevel` type            | ✅ FULLY_FUNCTIONAL | Enum for debug/info/warn/error      |
-| `LogLevel.SlogLevel()`     | ✅ FULLY_FUNCTIONAL | Converts to slog.Level              |
-| `LogLevel.UnmarshalText()` | ✅ FULLY_FUNCTIONAL | Validates against allowed values    |
-| `Enum[T]` type             | ✅ FULLY_FUNCTIONAL | Generic enum with validation        |
-| `NoFlags` type             | ✅ FULLY_FUNCTIONAL | Sentinel for commands without flags |
-
----
+| No panics (library API)    | ✅ FULLY_FUNCTIONAL | All operations return errors               |
 
 ---
 
@@ -132,7 +145,9 @@ Type-safe command definition with typed flags.
 | ------------------------------- | ------- | ------------------- | -------------------- |
 | `github.com/spf13/cobra`        | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework        |
 | `github.com/samber/do/v2`       | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection |
-| `github.com/charmbracelet/fang` | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
+| `github.com/spf13/pflag`        | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing         |
+| `charm.land/fang/v2`            | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
+| `github.com/larsartmann/go-output` | latest | ✅ FULLY_FUNCTIONAL | Rich output formats  |
 
 ---
 
@@ -140,97 +155,32 @@ Type-safe command definition with typed flags.
 
 | Package           | Coverage | Status  |
 | ----------------- | -------- | ------- |
-| `pkg/cmdguard/v2` | 82.2%    | ✅ Good |
+| `pkg/cmdguard/v2` | 82%+     | ✅ Good |
+| Fuzz tests        | 7 targets | ✅ Good |
 
 ---
 
 ## Architecture
 
-### v2 API Design
+### TypeHandler Registry
 
 ```
-v2.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
-    └── CLI[AppConfig]
-        ├── AddCommand(cli, NewCommand[T,F]("cmd", handler, opts...))
-        ├── AddCommand(cli, NewParentCommand[T,F]("cmd", long, subs, opts...))
-        ├── Scope() - DI scope for services
-        ├── Execute(ctx) - run CLI
-        └── Shutdown(ctx) - cleanup
+TypeHandler interface {
+    Register(flags, tag) error   // Add flag to pflag.FlagSet
+    Parse(value, tag) (any, error)  // Parse string → Go value
+    Default(tag) any              // Compute default value
+}
 ```
 
-**Key Principles:**
+All type dispatch (primitives + 9 custom types) flows through a single registry.
+Custom types can be added via `RegisterTypeHandler(reflect.Type, TypeHandler)`.
 
-1. **Type Safety** - Generic type parameter for config
-2. **No Panics** - All operations return errors
-3. **DI-Powered** - samber/do/v2 integration
-4. **Typed Flags** - Struct tags for flag definitions
+### Flag Priority Chain
 
----
-
-## Feature Roadmap
-
-### Phase 1: v2 Foundation ✅ COMPLETE
-
-- [x] Implement CLI[T] with single type parameter
-- [x] Implement Command[T, F] with typed flags
-- [x] Implement Scope for DI
-- [x] Implement FlagRegistry with struct tags
-- [x] Comprehensive error types
-
-### Phase 2: v2 Testing ✅ COMPLETE
-
-- [x] Test errors.go
-- [x] Test types.go
-- [x] Test config.go
-- [x] Test flags.go
-- [x] Test scope.go
-- [x] Test command.go
-- [x] Test guard.go
-
-### Phase 3: v2 Polish ✅ COMPLETE
-
-- [x] Add typed example (examples/typed/main.go)
-- [x] Update documentation
-
-### Phase 4: Beyond (Long Term)
-
-- [ ] Plugin system for custom validators
-- [ ] Performance benchmarks
-- [ ] Release automation
+```
+explicit flag → env:"VAR" (with optional prefix) → default value
+```
 
 ---
 
-## Honest Assessment Summary
-
-### What Works Well ✅
-
-- Type-safe CLI construction with generics
-- No panics - all operations return errors
-- DI integration with samber/do/v2
-- Typed flags with struct tags
-- Required flag validation
-- Flag typo suggestions with Levenshtein distance
-- LogLevel to slog.Level conversion
-- Comprehensive test coverage
-- Clean public API
-- Example tests demonstrating API usage
-
-### What Needs Work ⚠️
-
-- Documentation could be more comprehensive
-
-### What's Missing 🔧
-
-- Plugin system for custom validators (planned)
-
-### Overall Status
-
-**cmdguard v2 is production-ready.**
-
-The v2 API successfully delivers type-safe, DI-powered CLI construction without panics. All core packages have comprehensive test coverage.
-
-**Recommendation:** v2.1.0 release.
-
----
-
-**Last updated 2026-04-17.**
+**Last updated 2026-04-30.**

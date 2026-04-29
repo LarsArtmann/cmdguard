@@ -1,9 +1,9 @@
 # AGENTS.md - cmdguard Project Guide
 
-**Last Updated:** 2026-04-17
+**Last Updated:** 2026-04-30
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.1.0 - Production Ready
+**Status:** v2.2.0 - SUPERB CLI/TUI Framework
 
 ---
 
@@ -108,8 +108,9 @@ cmdguard/
 | ------------------------- | -------------------- | ------- |
 | `github.com/spf13/cobra`  | CLI framework        | v1.10.2 |
 | `github.com/samber/do/v2` | Dependency injection | v2.0.0  |
-| `github.com/spf13/pflag`  | Flag parsing         | v1.0.6  |
+| `github.com/spf13/pflag`  | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`      | Cobra styling        | v2.0.1  |
+| `github.com/larsartmann/go-output` | Rich output formats | latest |
 
 ---
 
