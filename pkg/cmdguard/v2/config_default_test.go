@@ -27,7 +27,7 @@ func TestFlagTag_DefaultValue(t *testing.T) {
 		{name: "bool false", tag: newFlagTag[bool]("false"), expected: false},
 		{name: "int default", tag: newFlagTag[int]("42"), expected: 42},
 		{name: "uint default", tag: newFlagTag[uint]("42"), expected: uint(42)},
-		{name: "uint32 default", tag: newFlagTag[uint32]("4294967295"), expected: uint(4294967295)},
+		{name: "uint32 default", tag: newFlagTag[uint32]("4294967295"), expected: uint32(4294967295)},
 		{name: "float64 default", tag: newFlagTag[float64]("3.14"), expected: 3.14},
 		{name: "empty default returns zero", tag: newFlagTag[int](""), expected: 0},
 		{

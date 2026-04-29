@@ -3,8 +3,6 @@ package v2
 import (
 	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -59,168 +57,34 @@ func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag,
 	return flag, nil
 }
 
-// parseAndSetValue parses the flag value based on type and sets it on config.
+// parseAndSetValue parses the flag value via the TypeHandler registry and sets it on config.
 func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) error {
-	// Parse and set the value based on type
-	switch tag.Type.Kind() {
-	case reflect.String:
-		return SetField(cfg, tag.Field, value)
-	case reflect.Bool:
-		return r.parseAndSetBool(cfg, tag, value)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return r.parseAndSetInt(cfg, tag, value)
-	case reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Uintptr:
-		return r.parseAndSetUint(cfg, tag, value)
-	case reflect.Float32, reflect.Float64:
-		return r.parseAndSetFloat64(cfg, tag, value)
-	case reflect.Slice:
-		return SetField(cfg, tag.Field, strings.Split(value, ","))
-	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,
-		reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Struct, reflect.UnsafePointer:
-		return r.parseAndSetCustom(cfg, tag, value)
-	default:
-		return r.parseAndSetCustom(cfg, tag, value)
-	}
-}
-
-// parseFlagValue is a helper for parsing values with error handling.
-func parseFlagValue(
-	cfg any,
-	tag FlagTag,
-	value string,
-	typeName string,
-	parser func(string) (any, error),
-) error {
-	v, err := parser(value)
+	parsed, err := dispatchParse(value, tag)
 	if err != nil {
-		return fmt.Errorf("parsing %s flag %q with value %q: %w", typeName, tag.Name, value, err)
+		return fmt.Errorf("parsing flag %q with value %q: %w", tag.Name, value, err)
 	}
 
-	return SetField(cfg, tag.Field, v)
-}
-
-// parseAndSetBool parses and sets a boolean value.
-func (r *FlagRegistry) parseAndSetBool(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "bool", func(v string) (any, error) {
-		return strconv.ParseBool(v)
-	})
-}
-
-// parseAndSetInt parses and sets an integer value.
-func (r *FlagRegistry) parseAndSetInt(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "int", func(v string) (any, error) {
-		parsed, err := strconv.ParseInt(v, 10, 64)
-
-		return int(parsed), err
-	})
-}
-
-// parseAndSetUint parses and sets an unsigned integer value.
-func (r *FlagRegistry) parseAndSetUint(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "uint", func(v string) (any, error) {
-		parsed, err := strconv.ParseUint(v, 10, 64)
-
-		return uint(parsed), err
-	})
-}
-
-func (r *FlagRegistry) parseAndSetFloat64(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "float64", func(v string) (any, error) {
-		return strconv.ParseFloat(v, 64)
-	})
-}
-
-// parseAndSetCustom handles custom type parsing.
-func (r *FlagRegistry) parseAndSetCustom(cfg any, tag FlagTag, value string) error {
-	switch tag.Type {
-	case reflect.TypeFor[Duration]():
-		return r.parseAndSetDuration(cfg, tag, value)
-	case reflect.TypeFor[LogLevel]():
-		return r.parseAndSetLogLevel(cfg, tag, value)
-	case reflect.TypeFor[LogFormat]():
-		return r.parseAndSetLogFormat(cfg, tag, value)
-	case reflect.TypeFor[Enum]():
-		return r.parseAndSetEnum(cfg, tag, value)
-	case reflect.TypeFor[URL]():
-		return r.parseAndSetURL(cfg, tag, value)
-	case reflect.TypeFor[Email]():
-		return r.parseAndSetEmail(cfg, tag, value)
-	case reflect.TypeFor[Port]():
-		return r.parseAndSetPort(cfg, tag, value)
-	case reflect.TypeFor[FilePath]():
-		return r.parseAndSetFilePath(cfg, tag, value)
-	case reflect.TypeFor[HostPort]():
-		return r.parseAndSetHostPort(cfg, tag, value)
-	default:
-		return SetField(cfg, tag.Field, value)
+	// Handle []string from slice parsing
+	if sl, ok := parsed.([]string); ok {
+		return SetField(cfg, tag.Field, sl)
 	}
-}
 
-// parseAndSetDuration parses and sets a Duration value.
-func (r *FlagRegistry) parseAndSetDuration(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "duration", func(v string) (any, error) {
-		return ParseDuration(v)
-	})
-}
+	// Handle type conversion via reflect
+	parsedVal := reflect.ValueOf(parsed)
+	fieldVal := reflect.ValueOf(cfg)
+	if fieldVal.Kind() == reflect.Pointer {
+		fieldVal = fieldVal.Elem()
+	}
+	field := fieldVal.FieldByName(tag.Field)
+	if !field.IsValid() {
+		return fmt.Errorf("field %q not found in %T: %w", tag.Field, cfg, ErrFieldNotFound)
+	}
 
-// parseAndSetLogLevel parses and sets a LogLevel value.
-func (r *FlagRegistry) parseAndSetLogLevel(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "log level", func(v string) (any, error) {
-		return ParseLogLevel(v)
-	})
-}
+	// Use ConvertibleTo for numeric narrowing
+	if parsedVal.Type().ConvertibleTo(field.Type()) {
+		field.Set(parsedVal.Convert(field.Type()))
+		return nil
+	}
 
-// parseAndSetLogFormat parses and sets a LogFormat value.
-func (r *FlagRegistry) parseAndSetLogFormat(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "log format", func(v string) (any, error) {
-		return ParseLogFormat(v)
-	})
-}
-
-// parseAndSetEnum parses and sets an Enum value.
-func (r *FlagRegistry) parseAndSetEnum(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "enum", func(v string) (any, error) {
-		return ParseEnum(v, tag.Values)
-	})
-}
-
-// parseAndSetURL parses and sets a URL value.
-func (r *FlagRegistry) parseAndSetURL(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "URL", func(v string) (any, error) {
-		return ParseURL(v)
-	})
-}
-
-// parseAndSetEmail parses and sets an Email value.
-func (r *FlagRegistry) parseAndSetEmail(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "email", func(v string) (any, error) {
-		return ParseEmail(v)
-	})
-}
-
-// parseAndSetPort parses and sets a Port value.
-func (r *FlagRegistry) parseAndSetPort(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "port", func(v string) (any, error) {
-		return ParsePort(v)
-	})
-}
-
-// parseAndSetFilePath parses and sets a FilePath value.
-func (r *FlagRegistry) parseAndSetFilePath(cfg any, tag FlagTag, value string) error {
-	// Note: FilePath parsing does NOT check if the path exists
-	return parseFlagValue(cfg, tag, value, "file path", func(v string) (any, error) {
-		return ParseFilePath(v, false)
-	})
-}
-
-// parseAndSetHostPort parses and sets a HostPort value.
-func (r *FlagRegistry) parseAndSetHostPort(cfg any, tag FlagTag, value string) error {
-	return parseFlagValue(cfg, tag, value, "host:port", func(v string) (any, error) {
-		return ParseHostPort(v)
-	})
+	return SetField(cfg, tag.Field, parsed)
 }

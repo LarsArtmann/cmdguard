@@ -2,9 +2,7 @@ package v2
 
 import (
 	"fmt"
-	"reflect"
 	"slices"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -54,144 +52,9 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 	return nil
 }
 
-// registerFlag adds a single flag to the given flag set.
+// registerFlag adds a single flag to the given flag set via the TypeHandler registry.
 func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
-	switch tag.Type.Kind() {
-	case reflect.String:
-		r.addStringFlag(flags, tag)
-	case reflect.Bool:
-		return r.addBoolFlag(flags, tag)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return r.addIntFlag(flags, tag)
-	case reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Uintptr:
-		return r.addUintFlag(flags, tag)
-	case reflect.Float32, reflect.Float64:
-		return r.addFloat64Flag(flags, tag)
-	case reflect.Slice:
-		r.addStringSliceFlag(flags, tag)
-	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,
-		reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Struct, reflect.UnsafePointer:
-		r.addCustomTypeFlag(flags, tag)
-	default:
-		r.addCustomTypeFlag(flags, tag)
-	}
-
-	return nil
-}
-
-func (r *FlagRegistry) addCustomTypeFlag(flags *pflag.FlagSet, tag FlagTag) {
-	switch tag.Type {
-	case reflect.TypeFor[Duration]():
-		r.addDurationFlag(flags, tag)
-	case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
-		r.addEnumFlag(flags, tag)
-	default:
-		r.addStringFlag(flags, tag)
-	}
-}
-
-// registerStringFlag registers a string flag with optional shorthand.
-func registerStringFlag(flags *pflag.FlagSet, name, short, value, usage string) {
-	if short != "" {
-		_ = flags.StringP(name, short, value, usage)
-	} else {
-		_ = flags.String(name, value, usage)
-	}
-}
-
-func (r *FlagRegistry) addStringFlag(flags *pflag.FlagSet, tag FlagTag) {
-	registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-}
-
-func (r *FlagRegistry) addBoolFlag(flags *pflag.FlagSet, tag FlagTag) error {
-	def, err := parseBoolDefault(tag.Default)
-	if err != nil {
-		return fmt.Errorf("invalid bool default for flag %q: %w", tag.Name, err)
-	}
-
-	if tag.Short != "" {
-		flags.BoolP(tag.Name, tag.Short, def, tag.Help)
-	} else {
-		flags.Bool(tag.Name, def, tag.Help)
-	}
-
-	return nil
-}
-
-func (r *FlagRegistry) addIntFlag(flags *pflag.FlagSet, tag FlagTag) error {
-	def, err := parseIntDefault(tag.Default)
-	if err != nil {
-		return fmt.Errorf("invalid int default for flag %q: %w", tag.Name, err)
-	}
-
-	if tag.Short != "" {
-		flags.IntP(tag.Name, tag.Short, int(def), tag.Help)
-	} else {
-		flags.Int(tag.Name, int(def), tag.Help)
-	}
-
-	return nil
-}
-
-func (r *FlagRegistry) addUintFlag(flags *pflag.FlagSet, tag FlagTag) error {
-	def, err := parseUintDefault(tag.Default)
-	if err != nil {
-		return fmt.Errorf("invalid uint default for flag %q: %w", tag.Name, err)
-	}
-
-	if tag.Short != "" {
-		flags.UintP(tag.Name, tag.Short, uint(def), tag.Help)
-	} else {
-		flags.Uint(tag.Name, uint(def), tag.Help)
-	}
-
-	return nil
-}
-
-func (r *FlagRegistry) addFloat64Flag(flags *pflag.FlagSet, tag FlagTag) error {
-	def, err := parseFloat64Default(tag.Default)
-	if err != nil {
-		return fmt.Errorf("invalid float64 default for flag %q: %w", tag.Name, err)
-	}
-
-	if tag.Short != "" {
-		flags.Float64P(tag.Name, tag.Short, def, tag.Help)
-	} else {
-		flags.Float64(tag.Name, def, tag.Help)
-	}
-
-	return nil
-}
-
-func (r *FlagRegistry) addStringSliceFlag(flags *pflag.FlagSet, tag FlagTag) {
-	var def []string
-	if tag.Default != "" {
-		def = strings.Split(tag.Default, ",")
-	}
-
-	if tag.Short != "" {
-		flags.StringSliceP(tag.Name, tag.Short, def, tag.Help)
-	} else {
-		flags.StringSlice(tag.Name, def, tag.Help)
-	}
-}
-
-func (r *FlagRegistry) addDurationFlag(flags *pflag.FlagSet, tag FlagTag) {
-	r.addStringFlag(flags, tag)
-}
-
-func (r *FlagRegistry) addEnumFlag(flags *pflag.FlagSet, tag FlagTag) {
-	help := tag.Help
-	if len(tag.Values) > 0 {
-		help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
-	}
-
-	registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
+	return dispatchRegister(flags, tag)
 }
 
 // ValidateFlags validates flag values against allowed values and checks required flags.

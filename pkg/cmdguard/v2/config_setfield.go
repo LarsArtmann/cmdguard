@@ -109,16 +109,10 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 	return field, nil
 }
 
-// setStringField handles string to custom type conversions.
+// setStringField handles string to custom type conversions via the TypeHandler registry.
 func setStringField(field reflect.Value, str string) error {
-	switch field.Type() {
-	case reflect.TypeFor[LogLevel]():
-		return wrapErr(parseAndSetLogLevel(field, str), field, str)
-	case reflect.TypeFor[LogFormat]():
-		return wrapErr(parseAndSetLogFormat(field, str), field, str)
-	case reflect.TypeFor[Duration]():
-		return wrapErr(parseAndSetDuration(field, str), field, str)
-	case reflect.TypeFor[Enum]():
+	// Special handling for Enum (needs current allowed values from the field)
+	if field.Type() == reflect.TypeFor[Enum]() {
 		current, ok := field.Interface().(Enum)
 		if !ok {
 			return NewConfigError(
@@ -131,7 +125,6 @@ func setStringField(field reflect.Value, str string) error {
 
 		if len(allowed) == 0 {
 			field.Set(reflect.ValueOf(Enum{value: str}))
-
 			return nil
 		}
 
@@ -141,7 +134,23 @@ func setStringField(field reflect.Value, str string) error {
 		}
 
 		field.Set(reflect.ValueOf(parsed))
+		return nil
+	}
 
+	// Try the TypeHandler registry for all other types
+	if handledByTypeRegistry(field.Type()) {
+		parsed, err := dispatchParse(str, FlagTag{Type: field.Type()})
+		if err != nil {
+			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+		}
+
+		parsedVal := reflect.ValueOf(parsed)
+		if parsedVal.Type().ConvertibleTo(field.Type()) {
+			field.Set(parsedVal.Convert(field.Type()))
+			return nil
+		}
+
+		field.Set(parsedVal)
 		return nil
 	}
 

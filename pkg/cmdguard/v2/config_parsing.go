@@ -191,54 +191,5 @@ func (t FlagTag) parseCustomDefault() any {
 
 // DefaultValue returns the default value for a flag based on its type.
 func (t FlagTag) DefaultValue() any {
-	if t.Default == "" {
-		return reflect.Zero(t.Type).Interface()
-	}
-
-	return t.parseDefaultValue()
-}
-
-// parseDefaultValue parses the default value based on type.
-func (t FlagTag) parseDefaultValue() any {
-	switch t.Type.Kind() {
-	case reflect.String:
-		return t.Default
-	case reflect.Bool:
-		v, _ := parseBoolDefault(t.Default)
-
-		return v
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		if t.Type == reflect.TypeFor[Duration]() {
-			d, err := ParseDuration(t.Default)
-			if err != nil {
-				return Duration{}
-			}
-
-			return d
-		}
-
-		v, _ := parseIntDefault(t.Default)
-
-		return int(v)
-	case reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Uintptr:
-		v, _ := parseUintDefault(t.Default)
-
-		return uint(v)
-	case reflect.Float32, reflect.Float64:
-		v, _ := parseFloat64Default(t.Default)
-
-		return v
-	case reflect.Slice:
-		return strings.Split(t.Default, ",")
-	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan,
-		reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Struct, reflect.UnsafePointer:
-		return t.parseCustomDefault()
-	default:
-		return t.parseCustomDefault()
-	}
+	return dispatchDefault(t)
 }
