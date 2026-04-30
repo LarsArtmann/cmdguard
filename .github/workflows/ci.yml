@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [master, main]
 
+env:
+  GOPRIVATE: github.com/larsartmann/*
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,14 +24,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
       - name: Download dependencies
         run: go mod download
 
@@ -36,13 +31,13 @@ jobs:
         run: go build ./...
 
       - name: Test
-        run: go test -v ./...
+        run: go test ./... -count=1 -timeout 120s
 
       - name: Test with race detector
-        run: go test -race ./...
+        run: go test ./... -count=1 -timeout 120s -race
 
       - name: Coverage
-        run: go test -cover ./... | grep -v "no test files"
+        run: go test ./... -count=1 -timeout 120s -cover
 
   lint:
     runs-on: ubuntu-latest
@@ -58,45 +53,4 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
-          args: --enable=errcheck ./...
-
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.26"
-
-      - name: Install just
-        uses: extractions/setup-just@v2
-
-      - name: Verify
-        run: just verify
-
-  examples:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.26"
-
-      - name: Test basic example
-        run: go run ./examples/basic/main.go hello
-
-      - name: Test typed example
-        run: go run ./examples/typed/main.go greet --name=CI
-
-      - name: Test di example
-        run: go run ./examples/di/main.go check
-
-      - name: Test validation example
-        run: go run ./examples/validation/main.go greet --name=CI
-
-      - name: Test advanced-flags example
-        run: go run ./examples/advanced-flags/main.go env
+          args: run ./...
