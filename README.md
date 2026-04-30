@@ -86,15 +86,23 @@ func main() {
 
 ## Features
 
-| Feature           | Description                              |
-| ----------------- | ---------------------------------------- |
-| Type-safe config  | Yes (type parameter T)                   |
-| Type-safe flags   | Yes (type parameter F)                   |
-| DI integration    | Yes (samber/do/v2)                       |
-| Flag tags         | Yes (`flag`, `short`, `default`, `help`) |
-| Lifecycle hooks   | Yes (PreRunE, PostRunE)                  |
-| Health checks     | Yes                                      |
-| Graceful shutdown | Yes                                      |
+| Feature              | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| Type-safe config     | Yes (type parameter T)                              |
+| Type-safe flags      | Yes (type parameter F)                              |
+| DI integration       | Yes (samber/do/v2)                                  |
+| Flag tags            | Yes (`flag`, `short`, `default`, `help`, `env`, `count`) |
+| Environment variables | `env:"VAR"` tag with `WithEnvPrefix` prefix support |
+| Counting flags       | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity      |
+| Signal handling      | `WithSignalHandling` for SIGINT/SIGTERM             |
+| Rich output          | 12 formats via go-output (table/json/csv/yaml/...)   |
+| Lifecycle hooks       | Yes (PreRunE, PostRunE)                             |
+| Health checks        | Yes                                                 |
+| Graceful shutdown    | Yes                                                 |
+| $EDITOR integration | `EditInEditor()` for config editing                 |
+| Typo suggestions     | Flag and subcommand "did you mean?"                 |
+| Extensible types     | `RegisterTypeHandler()` for custom flag types        |
+| Fuzz testing        | 7 fuzz targets for input parsers                    |
 
 ## v2 API Reference
 
@@ -102,17 +110,20 @@ func main() {
 
 The main CLI type with a single type parameter `T` for your application config.
 
+### CLI Options (v2.2)
+
 ```go
-// Create root CLI
 cli, err := v2.NewCLI[T](name, shortDescription, defaultConfig)
 
 // With options
 cli, err := v2.NewCLI[T](name, short, defaults,
-    v2.WithCLIVersion[T]("1.0.0"),
+    v2.WithCLIVersion[T]("2.2.0"),
     v2.WithCLILong[T]("A longer description..."),
     v2.WithSilenceErrors[T](),
     v2.WithSilenceUsage[T](),
-    v2.WithColor[T](false),  // disable fang styling
+    v2.WithFang[T](true),            // fang styling (replaces WithColor)
+    v2.WithEnvPrefix[T]("MYAPP_"),   // prefix for env var lookups
+    v2.WithSignalHandling[T](),       // SIGINT/SIGTERM context cancellation
 )
 
 // Add subcommands (standalone function — each command has its own flags type)
@@ -195,7 +206,11 @@ type MyFlags struct {
 }
 ```
 
-Supported types: `string`, `bool`, `int`, `uint`, `float64`, `[]string`, `time.Duration`.
+Supported types: `string`, `bool`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `float32`, `float64`, `[]string`, `time.Duration`.
+
+Custom types: `Duration`, `Enum`, `LogLevel`, `LogFormat`, `URL`, `Email`, `Port`, `FilePath`, `HostPort`.
+
+Add your own with `RegisterTypeHandler(reflect.Type, TypeHandler)`.
 
 ### NoFlags
 
@@ -324,6 +339,66 @@ cmd, err := v2.NewCommand[AppConfig, *Flags]("example", runHandler,
 )
 ```
 
+### Environment Variables (v2.2)
+
+Flags can read from environment variables:
+
+```go
+type DBFlags struct {
+    Host     string `flag:"host"     env:"DB_HOST"     default:"localhost" help:"Database host"`
+    Port     int    `flag:"port"     env:"DB_PORT"     default:"5432"      help:"Database port"`
+    Password string `flag:"password" env:"DB_PASSWORD"                     help:"Database password"`
+}
+
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v2.WithEnvPrefix[AppConfig]("MYAPP_"),
+)
+// Reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
+```
+
+### Counting Flags (v2.2)
+
+```go
+type Flags struct {
+    Verbose int `flag:"verbose" short:"v" help:"Verbosity" count:"true"`
+}
+// -v → 1, -vv → 2, -vvv → 3
+```
+
+### Signal Handling (v2.2)
+
+```go
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v2.WithSignalHandling[AppConfig](),
+)
+// Ctrl+C cancels context in handlers
+```
+
+### Rich Output (v2.2)
+
+```go
+// 12 output formats
+v2.OutputTable(v2.FormatTable, headers, rows)
+v2.OutputTable(v2.FormatJSON, headers, rows)
+
+format, _ := v2.ParseOutputFormat("yaml")
+v2.OutputTable(format, headers, rows)
+
+// Formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot
+```
+
+### Extensible Types (v2.2)
+
+```go
+// Register a custom type handler
+v2.RegisterTypeHandler(reflect.TypeFor[MyType](), v2.TypeHandlerFunc{
+    ParseFunc: func(value string, _ v2.FlagTag) (any, error) {
+        return MyType{Value: value}, nil
+    },
+    DefaultFunc: func(_ v2.FlagTag) any { return MyType{} },
+})
+```
+
 ### Functional Options
 
 Commands can be built with functional options:
@@ -402,9 +477,10 @@ cmdguard is designed for production CLIs:
 
 ## Project Status
 
-| Status | Description                            |
-| ------ | -------------------------------------- |
-| Stable | Full type-safe API with DI integration |
+| Status  | Description                                     |
+| ------- | ----------------------------------------------- |
+| v2.2.0  | Full type-safe API with DI, env, signals, output |
+| License | MIT                                             |
 
 ## Documentation
 
