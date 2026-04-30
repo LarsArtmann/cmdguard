@@ -24,7 +24,7 @@ type CLI[T any] struct {
 	scope          *Scope
 	rootCmd        *cobra.Command
 	registry       *FlagRegistry
-	registeredCmds map[string]bool
+	registeredCmds map[string]struct{}
 	flowCtx        *BranchingFlowContext
 	useFang        bool
 	fangOpts       []fang.Option
@@ -52,7 +52,7 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 		scope:          nil,
 		rootCmd:        &cobra.Command{Use: name, Short: short},
 		registry:       nil,
-		registeredCmds: make(map[string]bool),
+		registeredCmds: make(map[string]struct{}),
 		useFang:        true,
 	}
 
@@ -118,7 +118,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 // AddCommand adds a subcommand to the CLI with any flags type.
 func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
-	if cli.registeredCmds[cmd.use] {
+	if _, exists := cli.registeredCmds[cmd.use]; exists {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.use)
 	}
 
@@ -126,7 +126,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.use, cli.name, err)
 	}
 
-	cli.registeredCmds[cmd.use] = true
+	cli.registeredCmds[cmd.use] = struct{}{}
 
 	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware, cli.envPrefix)
 	if err != nil {
