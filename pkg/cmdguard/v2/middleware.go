@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
 	"time"
 )
 
@@ -63,12 +64,12 @@ func TimingMiddleware[T any](log func(commandName string, d time.Duration)) Midd
 }
 
 // RecoveryMiddleware returns a middleware that recovers from panics in command handlers,
-// converting them to errors.
+// converting them to errors with stack traces.
 func RecoveryMiddleware[T any]() Middleware[T] {
 	return func(_ context.Context, _ *T, info CommandInfo, next func() error) (err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				err = fmt.Errorf("%w: panic in command %q: %v", ErrCommandPanic, info.Name, r)
+				err = fmt.Errorf("%w: panic in command %q: %v\n%s", ErrCommandPanic, info.Name, r, debug.Stack())
 			}
 		}()
 
