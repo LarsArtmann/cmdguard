@@ -103,6 +103,42 @@ func (b *BranchingFlowContext) BranchWithDeadline(
 	return child, cancel, nil
 }
 
+// BranchWithDuration creates a child context with a timeout for a subcommand.
+// Prefer this over BranchWithTimeout — it accepts time.Duration directly
+// instead of parsing a string at runtime.
+func (b *BranchingFlowContext) BranchWithDuration(
+	commandName string,
+	d time.Duration,
+	opts ...FlowContextOption,
+) (*BranchingFlowContext, func()) {
+	branchCtx, cancel := context.WithTimeout(b.Context, d)
+
+	child := b.newChild(branchCtx, commandName)
+	child.selfCancel = cancel
+	applyOptions(child, opts)
+	b.children = append(b.children, child)
+
+	return child, cancel
+}
+
+// BranchWithDeadlineTime creates a child context with a deadline for a subcommand.
+// Prefer this over BranchWithDeadline — it accepts time.Time directly
+// instead of parsing a string at runtime.
+func (b *BranchingFlowContext) BranchWithDeadlineTime(
+	commandName string,
+	deadline time.Time,
+	opts ...FlowContextOption,
+) (*BranchingFlowContext, func()) {
+	branchCtx, cancel := context.WithDeadline(b.Context, deadline)
+
+	child := b.newChild(branchCtx, commandName)
+	child.selfCancel = cancel
+	applyOptions(child, opts)
+	b.children = append(b.children, child)
+
+	return child, cancel
+}
+
 // newChild creates a child BranchingFlowContext with the given context and command name.
 func (b *BranchingFlowContext) newChild(
 	ctx context.Context,
@@ -299,11 +335,15 @@ func RequireBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
 }
 
 // FlowContextAccessor provides convenient access to flow context values.
+//
+// Deprecated: Use BranchingFlowContext methods directly. Will be removed in v3.
 type FlowContextAccessor struct {
 	bfc *BranchingFlowContext
 }
 
 // NewFlowContextAccessor creates an accessor for the branching flow context.
+//
+// Deprecated: Use BranchingFlowContext directly. Will be removed in v3.
 func NewFlowContextAccessor(bfc *BranchingFlowContext) *FlowContextAccessor {
 	return &FlowContextAccessor{bfc: bfc}
 }

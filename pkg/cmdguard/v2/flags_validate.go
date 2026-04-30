@@ -276,10 +276,11 @@ func validateRegex(value string) error {
 	}
 
 	cached, loaded := regexCache.Load(pattern)
+
 	var re *regexp.Regexp
 
 	if loaded {
-		re = cached.(*regexp.Regexp)
+		re = cached.(*regexp.Regexp) //nolint:forcetypeassert // only stores *regexp.Regexp
 	} else {
 		var err error
 
@@ -319,7 +320,7 @@ func validateFieldByKind(field reflect.Value, tag FlagTag) error {
 
 // formatFieldValue converts a reflect.Value to its string representation for validation.
 func formatFieldValue(field reflect.Value) string {
-	switch field.Kind() {
+	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
 	case reflect.String:
 		return field.String()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:

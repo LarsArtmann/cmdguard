@@ -184,5 +184,3 @@ func wireHandlerWithMiddleware[T, F any](
 		return chain()
 	}
 }
-
-
