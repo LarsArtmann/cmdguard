@@ -155,7 +155,7 @@
 
 | Package           | Coverage | Status  |
 | ----------------- | -------- | ------- |
-| `pkg/cmdguard/v2` | 82%+     | ✅ Good |
+| `pkg/cmdguard/v2` | 81.2%    | ✅ Good |
 | Fuzz tests        | 7 targets | ✅ Good |
 
 ---

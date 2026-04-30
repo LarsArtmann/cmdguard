@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-04-30
-**Status:** v2.2.0 — SUPERB CLI/TUI features implemented.
+**Status:** v2.2.0 — Tests + cleanup sprint complete. 806 tests, 81.2% coverage.
 
 ## Completed ✅
 
@@ -21,6 +21,19 @@
 - [x] Add `EditInEditor()` $EDITOR helper
 - [x] Add `WithFang[T]()` as proper name (deprecate `WithColor`)
 - [x] Add fuzz tests for all value type parsers and parsing functions
+- [x] Propagate envPrefix to command-level FlagRegistry
+
+### Phase 2: Test & Cleanup Sprint
+- [x] Add type_handler_test.go (137 tests: custom types, count handler, dispatch, lookup)
+- [x] Add output_test.go (ParseOutputFormat, OutputResult, OutputTable)
+- [x] Add editor_test.go (EditInEditor with mock $EDITOR)
+- [x] Add command_suggest_test.go (SuggestCommand delegation)
+- [x] Add counting_flag_test.go (integration tests -vvv → 3)
+- [x] Add env_tag_test.go (env var priority chain, prefix, override)
+- [x] Add GenerateHelp/FlagNames tests
+- [x] Remove dead code: parseCustomDefault, wrapErr, parseField, parseAndSetLog*
+- [x] Fix SuggestFlag API to return (string, bool) for consistency
+- [x] Move count handler into registerKinds() for consistency
 
 ### Phase 2: Previous Sprint
 - [x] Fix CLI[T] AddCommand flag parsing (cloneAndParseFlags pattern)
@@ -40,12 +53,11 @@
 - [x] Delete .go_test template artifacts and empty internal/ directory
 - [x] Clean .golangci.yml stale references
 
-## Remaining Work
+### Phase 3: Documentation
+- [x] Update docs/QUICKSTART.md for v2.2 API
+- [x] Update README.md with v2.2 features
 
-### 📚 Documentation
-- [ ] Update docs/QUICKSTART.md for v2.2 API (env tags, output, counting flags, etc.)
-- [ ] DI Pattern Example in docs/
-- [ ] Error Handling Example in docs/
+## Remaining Work
 
 ### 📊 Performance
 - [ ] Add comprehensive performance benchmarks
@@ -56,6 +68,15 @@
 - [ ] Set up release automation
 - [ ] Add codecov integration
 - [ ] Fix pre-commit hooks (currently pre-existing errors)
+- [ ] Fix go-output dependency (remove local replace directive)
+
+### 📚 Documentation
+- [ ] DI Pattern Example in docs/
+- [ ] Error Handling Example in docs/
+- [ ] Env tags example in examples/
+- [ ] go-output example in examples/
+- [ ] Counting flags example in examples/
+- [ ] Signal handling example in examples/
 
 ### 🔮 Future (v3.0+)
 - [ ] Config file auto-loading with koanf (YAML/TOML/.env)
@@ -66,3 +87,6 @@
 - [ ] Man page generation via mango-cobra
 - [ ] Telemetry middleware (OpenTelemetry spans)
 - [ ] Plugin system for custom validators and type handlers
+- [ ] `WithOutputFormat[T]` CLI option (auto --output flag)
+- [ ] Fix T27: CLI in DI scope (implement Healthchecker)
+- [ ] Deprecation warning for `WithColor` at runtime

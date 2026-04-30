@@ -38,7 +38,7 @@ go test ./... -count=1 -timeout 120s -cover
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.1.0. All packages tested, 0 lint issues.
+**Current Status:** v2.2.0. 806 tests passing, 81.2% coverage, 0 build errors.
 
 ---
 
@@ -53,9 +53,12 @@ cmdguard/
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
 │   │   ├── cli_options.go        # CLI functional options (WithCLIVersion, etc.)
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
+│   │   ├── command_suggest.go    # Command typo suggestions
 │   │   ├── config.go             # Config type constraint
 │   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue
 │   │   ├── config_setfield.go    # SetField for config structs
+│   │   ├── counting_flag.go      # Counting flag support (count:"true")
+│   │   ├── editor.go             # EditInEditor ($EDITOR support)
 │   │   ├── errors.go             # Sentinel errors and error types
 │   │   ├── flags.go              # FlagRegistry with struct tags
 │   │   ├── flags_parse.go        # Flag parsing logic
@@ -65,6 +68,8 @@ cmdguard/
 │   │   ├── flow_context.go       # BranchingFlowContext for command path tracking
 │   │   ├── middleware.go         # Middleware chain pattern
 │   │   ├── scope.go              # DI scope wrapping samber/do/v2
+│   │   ├── output.go             # Rich output (table/json/csv/yaml)
+│   │   ├── type_handler.go       # Extensible type registry
 │   │   ├── type_helpers.go       # Generic type helpers
 │   │   ├── types_duration.go     # Duration type
 │   │   ├── types_email.go        # Email type
@@ -78,11 +83,17 @@ cmdguard/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
 │   ├── basic/                    # Simple v2 demo
-│   ├── typed/                    # v2 API demo with DI and lifecycle
-│   ├── di/                       # DI-focused example
-│   ├── advanced-flags/           # Advanced flag types
-│   ├── validation/               # Validation patterns example
-│   └── internal/                 # Shared example helpers
+│   ├── counting/                  # Counting flags (-v/-vv/-vvv)
+│   ├── di/                        # DI-focused example
+│   ├── di-patterns/               # DI service patterns
+│   ├── env-tags/                  # Environment variable tags
+│   ├── error-handling/            # Error handling patterns
+│   ├── advanced-flags/            # Advanced flag types
+│   ├── output/                    # Rich output formatting
+│   ├── signals/                   # Signal handling
+│   ├── typed/                     # v2 API demo with DI and lifecycle
+│   ├── validation/                # Validation patterns example
+│   └── internal/                  # Shared example helpers
 ├── benchmarks/                   # Performance benchmarks
 ├── tests/integration/            # Integration tests
 ├── docs/                         # Documentation
@@ -97,7 +108,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | 82.2%    |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | 81.2%    |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -178,6 +189,12 @@ Functional options:
 | `WithSilenceErrors[T]()` | Suppress cobra error printing               |
 | `WithSilenceUsage[T]()`  | Suppress usage on error                     |
 | `WithColor[T](bool)`     | Enable/disable fang styling (default: true) |
+| `WithFang[T](bool)`     | Enable/disable fang styling (preferred)     |
+| `WithFangOptions[T](opts...)` | Custom fang options                    |
+| `WithMiddleware[T](mw...)` | Middleware wrapping every handler        |
+| `WithGroup[T](id, title)` | Register command group on root            |
+| `WithEnvPrefix[T](prefix)` | Prefix for env var lookups              |
+| `WithSignalHandling[T]()` | Cancel context on SIGINT/SIGTERM          |
 
 ### CLI[T] Methods
 
@@ -381,22 +398,33 @@ go build ./...                                   # Verify build
 
 ## Architecture Decisions
 
-### v2.1 Design Principles
+### v2.2 Design Principles
 
 1. **Single type parameter** - `CLI[T]` only parameterizes on config; each command has its own flags type
 2. **No Panics** - All operations return errors
 3. **DI-Powered** - samber/do/v2 for dependency injection
 4. **Typed Flags** - Struct tags for flag definitions
 5. **Standalone AddCommand** - Function (not method) to support per-command flag types
-6. **Constructor validation** - Commands validated at construction, struct fields unexported
+7. **Env tags** - `env:"VAR_NAME"` struct tag reads from environment
+8. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
+9. **Signal handling** - `WithSignalHandling[T]()` for graceful shutdown
+10. **Rich output** - OutputTable/OutputResult with 12+ formats
+11. **Extensible types** - `RegisterTypeHandler()` for custom flag types
+12. **$EDITOR support** - `EditInEditor()` for user input editing
+13. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 
 ### Key Gotchas
 
 1. `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 2. `PostRunE` is NOT called when `RunE` errors (Cobra behavior)
 3. `NoFlags` is `type NoFlags = struct{}` — use `(NoFlags{})` with parens for comparisons
-4. fang provides styled output by default; `WithColor(false)` falls back to plain cobra
+4. fang provides styled output by default; `WithFang(false)` falls back to plain cobra
 5. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
+6. **envPrefix propagation** — `WithEnvPrefix` sets prefix on root AND command-level flags (fixed in v2.2)
+7. **Counting flags** — must use `int` type with `count:"true"` tag; don't reuse flag names from root config
+8. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
+9. **Global type registry** — `RegisterTypeHandler()` writes global state; tests must not run in parallel
+10. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
 
 ---
 
