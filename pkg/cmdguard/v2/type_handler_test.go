@@ -10,7 +10,6 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
-//nolint:fatcontext // context used in closures in test file
 func TestTypeHandler_RegisterCustomTypes(t *testing.T) {
 	t.Parallel()
 
@@ -98,7 +97,11 @@ func TestTypeHandler_RegisterCustomTypes(t *testing.T) {
 				testutil.AssertExpectedError(t, err)
 			} else {
 				testutil.AssertNoError(t, err)
-				testutil.AssertBoolTrue(t, fs.HasFlags(), "flagset should have flags after register")
+				testutil.AssertBoolTrue(
+					t,
+					fs.HasFlags(),
+					"flagset should have flags after register",
+				)
 			}
 		})
 	}
@@ -426,8 +429,6 @@ func TestTypeHandler_LookupHandler_Fallback(t *testing.T) {
 }
 
 func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
-	//nolint:paralleltest // modifies global registry (data race)
-
 	t.Run("custom type can be registered and looked up", func(t *testing.T) {
 		type Widget struct{ Name string }
 
@@ -553,7 +554,13 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 		t.Parallel()
 
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{Name: "name", Short: "n", Default: "world", Help: "name", Type: reflect.TypeFor[string]()}
+		tag := FlagTag{
+			Name:    "name",
+			Short:   "n",
+			Default: "world",
+			Help:    "name",
+			Type:    reflect.TypeFor[string](),
+		}
 		err := dispatchRegister(fs, tag)
 		testutil.AssertNoError(t, err)
 
@@ -566,7 +573,13 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 		t.Parallel()
 
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{Name: "debug", Short: "d", Default: "false", Help: "debug mode", Type: reflect.TypeFor[bool]()}
+		tag := FlagTag{
+			Name:    "debug",
+			Short:   "d",
+			Default: "false",
+			Help:    "debug mode",
+			Type:    reflect.TypeFor[bool](),
+		}
 		err := dispatchRegister(fs, tag)
 		testutil.AssertNoError(t, err)
 
@@ -579,7 +592,12 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 		t.Parallel()
 
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{Name: "ratio", Default: "1.5", Help: "ratio", Type: reflect.TypeFor[float64]()}
+		tag := FlagTag{
+			Name:    "ratio",
+			Default: "1.5",
+			Help:    "ratio",
+			Type:    reflect.TypeFor[float64](),
+		}
 		err := dispatchRegister(fs, tag)
 		testutil.AssertNoError(t, err)
 
@@ -592,7 +610,12 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 		t.Parallel()
 
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{Name: "tags", Default: "a,b", Help: "tags", Type: reflect.TypeFor[[]string]()}
+		tag := FlagTag{
+			Name:    "tags",
+			Default: "a,b",
+			Help:    "tags",
+			Type:    reflect.TypeFor[[]string](),
+		}
 		err := dispatchRegister(fs, tag)
 		testutil.AssertNoError(t, err)
 
@@ -609,7 +632,12 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 		t.Parallel()
 
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{Name: "bad", Default: "notbool", Help: "bad bool", Type: reflect.TypeFor[bool]()}
+		tag := FlagTag{
+			Name:    "bad",
+			Default: "notbool",
+			Help:    "bad bool",
+			Type:    reflect.TypeFor[bool](),
+		}
 		err := dispatchRegister(fs, tag)
 		testutil.AssertExpectedError(t, err)
 	})
@@ -618,7 +646,12 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 		t.Parallel()
 
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{Name: "bad", Default: "notint", Help: "bad int", Type: reflect.TypeFor[int]()}
+		tag := FlagTag{
+			Name:    "bad",
+			Default: "notint",
+			Help:    "bad int",
+			Type:    reflect.TypeFor[int](),
+		}
 		err := dispatchRegister(fs, tag)
 		testutil.AssertExpectedError(t, err)
 	})
@@ -641,8 +674,6 @@ func TestTypeHandlerFunc_NilRegisterFunc(t *testing.T) {
 }
 
 func TestRegisterGoDurationHandler(t *testing.T) {
-	//nolint:paralleltest // modifies global registry (data race)
-
 	RegisterGoDurationHandler()
 
 	t.Run("registers time.Duration handler", func(t *testing.T) {

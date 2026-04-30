@@ -69,7 +69,6 @@ func TestOutputResult_TableData(t *testing.T) {
 
 	t.Run("table format renders table data", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures buffer
 
 		var buf bytes.Buffer
 		data := output.NewTableData([]string{"Name", "Age"})
@@ -87,7 +86,6 @@ func TestOutputResult_TableData(t *testing.T) {
 
 	t.Run("json format renders table data", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures buffer
 
 		var buf bytes.Buffer
 		data := output.NewTableData([]string{"Name"})
@@ -105,7 +103,6 @@ func TestOutputResult_TableData(t *testing.T) {
 
 	t.Run("csv format renders table data", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures buffer
 
 		var buf bytes.Buffer
 		data := output.NewTableData([]string{"Name"})
@@ -123,7 +120,6 @@ func TestOutputResult_TableData(t *testing.T) {
 
 	t.Run("yaml format renders table data", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures buffer
 
 		var buf bytes.Buffer
 		data := output.NewTableData([]string{"Name"})
@@ -145,7 +141,6 @@ func TestOutputResult_AnyData(t *testing.T) {
 
 	t.Run("json format with arbitrary struct", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures buffer
 
 		var buf bytes.Buffer
 		type Person struct {
@@ -177,7 +172,6 @@ func TestOutputTable(t *testing.T) {
 
 	t.Run("renders table with headers and rows", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures stdout
 
 		var buf bytes.Buffer
 		cfg := OutputConfig{Format: FormatTable, Writer: &buf}
@@ -193,7 +187,6 @@ func TestOutputStyledTable(t *testing.T) {
 
 	t.Run("renders styled table", func(t *testing.T) {
 		t.Parallel()
-		//nolint:paralleltest // captures stdout
 
 		err := OutputStyledTable([]string{"Col1"}, [][]string{{"data"}})
 		testutil.AssertNoError(t, err)

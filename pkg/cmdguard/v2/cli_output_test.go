@@ -11,7 +11,6 @@ type outputTestConfig struct {
 	Name string `flag:"name" short:"n" default:"world" help:"Name"`
 }
 
-//nolint:fatcontext // context in closures
 func TestWithOutputFormat(t *testing.T) {
 	t.Parallel()
 

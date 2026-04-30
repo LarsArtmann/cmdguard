@@ -126,6 +126,7 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 				field.Name, cnt, err,
 			)
 		}
+
 		tag.Count = count
 	}
 

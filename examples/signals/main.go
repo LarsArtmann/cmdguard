@@ -29,7 +29,7 @@ type AppConfig struct {
 // ServeFlags defines flags for the serve command.
 type ServeFlags struct {
 	Port    int `flag:"port"    short:"p" default:"8080" help:"Server port"`
-	Workers int `flag:"workers" short:"w" default:"4"   help:"Number of workers"`
+	Workers int `flag:"workers" short:"w" default:"4"    help:"Number of workers"`
 }
 
 func main() {
@@ -50,6 +50,7 @@ func main() {
 			defer ticker.Stop()
 
 			count := 0
+
 			for {
 				select {
 				case <-ctx.Done():
@@ -93,6 +94,7 @@ allowing clean cleanup of resources.`,
 	pingCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("ping",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("pong")
+
 			return nil
 		},
 		v2.WithShort[AppConfig, v2.NoFlags]("Quick health check"),

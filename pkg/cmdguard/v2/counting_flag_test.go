@@ -29,6 +29,7 @@ func TestCountingFlag_Integration(t *testing.T) {
 		cmd, err := NewCommand[countTestConfig, *verbFlags]("run",
 			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
 				result = flags.Verbose
+
 				return nil
 			},
 			WithShort[countTestConfig, *verbFlags]("Run"),
@@ -59,6 +60,7 @@ func TestCountingFlag_Integration(t *testing.T) {
 		cmd, err := NewCommand[countTestConfig, *verbFlags]("run",
 			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
 				result = flags.Verbose
+
 				return nil
 			},
 			WithShort[countTestConfig, *verbFlags]("Run"),
@@ -89,6 +91,7 @@ func TestCountingFlag_Integration(t *testing.T) {
 		cmd, err := NewCommand[countTestConfig, *verbFlags]("run",
 			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
 				result = flags.Verbose
+
 				return nil
 			},
 			WithShort[countTestConfig, *verbFlags]("Run"),

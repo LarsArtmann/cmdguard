@@ -13,8 +13,6 @@ type envTestConfig struct {
 
 func TestEnvTag_Integration(t *testing.T) {
 	t.Run("env var provides default when flag not set", func(t *testing.T) {
-		//nolint:paralleltest // uses t.Setenv
-
 		type dbFlags struct {
 			Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
 		}
@@ -29,6 +27,7 @@ func TestEnvTag_Integration(t *testing.T) {
 		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
+
 				return nil
 			},
 			WithShort[envTestConfig, *dbFlags]("Connect"),
@@ -45,8 +44,6 @@ func TestEnvTag_Integration(t *testing.T) {
 	})
 
 	t.Run("explicit flag overrides env var", func(t *testing.T) {
-		//nolint:paralleltest // uses t.Setenv
-
 		type dbFlags struct {
 			Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
 		}
@@ -61,6 +58,7 @@ func TestEnvTag_Integration(t *testing.T) {
 		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
+
 				return nil
 			},
 			WithShort[envTestConfig, *dbFlags]("Connect"),
@@ -69,7 +67,10 @@ func TestEnvTag_Integration(t *testing.T) {
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
-		err = cli.ExecuteWithArgs(t.Context(), []string{"connect", "--host", "explicit.example.com"})
+		err = cli.ExecuteWithArgs(
+			t.Context(),
+			[]string{"connect", "--host", "explicit.example.com"},
+		)
 		testutil.AssertNoError(t, err)
 		if result != "explicit.example.com" {
 			t.Errorf("host = %q, want %q", result, "explicit.example.com")
@@ -77,8 +78,6 @@ func TestEnvTag_Integration(t *testing.T) {
 	})
 
 	t.Run("default used when env var not set", func(t *testing.T) {
-		//nolint:paralleltest // uses t.Setenv
-
 		type dbFlags struct {
 			Host string `flag:"host" env:"CMDGUARD_TEST_DB_HOST_UNUSED" default:"localhost" help:"Database host"`
 		}
@@ -91,6 +90,7 @@ func TestEnvTag_Integration(t *testing.T) {
 		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
+
 				return nil
 			},
 			WithShort[envTestConfig, *dbFlags]("Connect"),
@@ -107,8 +107,6 @@ func TestEnvTag_Integration(t *testing.T) {
 	})
 
 	t.Run("env prefix is applied to command flags", func(t *testing.T) {
-		//nolint:paralleltest // uses t.Setenv
-
 		type dbFlags struct {
 			Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
 		}
@@ -125,6 +123,7 @@ func TestEnvTag_Integration(t *testing.T) {
 		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
+
 				return nil
 			},
 			WithShort[envTestConfig, *dbFlags]("Connect"),

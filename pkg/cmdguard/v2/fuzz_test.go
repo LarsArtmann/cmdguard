@@ -77,7 +77,9 @@ func FuzzParseFlagTags(f *testing.F) {
 	f.Fuzz(func(t *testing.T, typ string) {
 		switch typ {
 		case "valid":
-			type cfg struct{ Name string `flag:"name" help:"a name" default:"default"` }
+			type cfg struct {
+				Name string `flag:"name" help:"a name" default:"default"`
+			}
 			_, _ = ParseFlagTags(&cfg{})
 		case "empty":
 			type cfg struct{}

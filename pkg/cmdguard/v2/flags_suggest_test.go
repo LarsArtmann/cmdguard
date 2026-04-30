@@ -43,10 +43,21 @@ func TestSuggestFlag(t *testing.T) {
 			result, ok := SuggestFlag(tt.validNames, tt.input)
 			if tt.wantOneOf != nil {
 				if !ok || !slices.Contains(tt.wantOneOf, result) {
-					t.Errorf("SuggestFlag() = (%q, %v), expected to be one of %v", result, ok, tt.wantOneOf)
+					t.Errorf(
+						"SuggestFlag() = (%q, %v), expected to be one of %v",
+						result,
+						ok,
+						tt.wantOneOf,
+					)
 				}
 			} else if result != tt.want || ok != (tt.want != "") {
-				t.Errorf("SuggestFlag() = (%q, %v), want (%q, %v)", result, ok, tt.want, tt.want != "")
+				t.Errorf(
+					"SuggestFlag() = (%q, %v), want (%q, %v)",
+					result,
+					ok,
+					tt.want,
+					tt.want != "",
+				)
 			}
 		})
 	}
@@ -124,9 +135,9 @@ func TestGenerateHelp(t *testing.T) {
 		t.Parallel()
 
 		type helpConfig struct {
-			Name    string `flag:"name"    short:"n" help:"The name"    default:"world"`
-			Count   int    `flag:"count"             help:"The count"   default:"10"`
-			Verbose bool   `flag:"verbose" short:"v" help:"Be verbose"  default:"false"`
+			Name    string `flag:"name"    short:"n" help:"The name"   default:"world"`
+			Count   int    `flag:"count"             help:"The count"  default:"10"`
+			Verbose bool   `flag:"verbose" short:"v" help:"Be verbose" default:"false"`
 		}
 
 		registry, err := NewFlagRegistry(helpConfig{})
@@ -135,7 +146,15 @@ func TestGenerateHelp(t *testing.T) {
 		}
 
 		help := registry.GenerateHelp()
-		assertStringContains(t, help, "--name", "--count", "--verbose", "The name", "default: world")
+		assertStringContains(
+			t,
+			help,
+			"--name",
+			"--count",
+			"--verbose",
+			"The name",
+			"default: world",
+		)
 	})
 
 	t.Run("empty config returns empty help", func(t *testing.T) {

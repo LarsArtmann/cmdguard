@@ -137,7 +137,7 @@ func TestLogFormat(t *testing.T) {
 func testPtrGeneric[T comparable](t *testing.T, v T) {
 	t.Helper()
 
-	p := Ptr(v)
+	p := new(v)
 	if p == nil {
 		t.Fatal("expected non-nil pointer")
 	}
@@ -169,7 +169,7 @@ func TestPtr(t *testing.T) {
 
 		v := s{Name: "test"}
 
-		p := Ptr(v)
+		p := new(v)
 		testutil.AssertNotNil(t, p)
 
 		if p.Name != "test" {

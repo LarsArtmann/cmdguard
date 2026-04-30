@@ -30,6 +30,7 @@ func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error
 	}
 
 	var value string
+
 	hasValue := false
 
 	// Priority 1: explicit flag value
@@ -97,10 +98,12 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 
 	// Handle type conversion via reflect
 	parsedVal := reflect.ValueOf(parsed)
+
 	fieldVal := reflect.ValueOf(cfg)
 	if fieldVal.Kind() == reflect.Pointer {
 		fieldVal = fieldVal.Elem()
 	}
+
 	field := fieldVal.FieldByName(tag.Field)
 	if !field.IsValid() {
 		return fmt.Errorf("field %q not found in %T: %w", tag.Field, cfg, ErrFieldNotFound)
@@ -109,6 +112,7 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 	// Use ConvertibleTo for numeric narrowing
 	if parsedVal.Type().ConvertibleTo(field.Type()) {
 		field.Set(parsedVal.Convert(field.Type()))
+
 		return nil
 	}
 

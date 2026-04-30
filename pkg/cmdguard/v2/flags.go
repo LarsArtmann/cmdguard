@@ -10,9 +10,9 @@ import (
 
 // FlagRegistry manages flag registration and parsing.
 type FlagRegistry struct {
-	tags        []FlagTag
-	envPrefix   string
-	validators  *validatorRegistry
+	tags       []FlagTag
+	envPrefix  string
+	validators *validatorRegistry
 }
 
 // Tags returns all parsed flag tags.
@@ -41,6 +41,7 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 func (r *FlagRegistry) RegisterFlagValidator(name string, validator FlagValidator) {
 	r.validators.mu.Lock()
 	defer r.validators.mu.Unlock()
+
 	r.validators.validators[name] = validator
 }
 

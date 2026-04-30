@@ -110,8 +110,8 @@ func (s *TaskStore) List() []Task {
 
 // AddFlags defines flags for the add command.
 type AddFlags struct {
-	Title    string `flag:"title"    short:"t" help:"Task title"                            required:"true"`
-	Priority string `flag:"priority" short:"p" help:"Priority (low, medium, high)" default:"medium"`
+	Title    string `flag:"title"    short:"t" help:"Task title"                   required:"true"`
+	Priority string `flag:"priority" short:"p" help:"Priority (low, medium, high)"                 default:"medium"`
 }
 
 func main() {

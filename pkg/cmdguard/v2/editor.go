@@ -28,13 +28,16 @@ func EditInEditor(content string) (string, error) {
 	_, err = tmpFile.WriteString(content)
 	if err != nil {
 		tmpFile.Close()
+
 		return "", fmt.Errorf("writing to temp file: %w", err)
 	}
 
 	tmpFile.Close()
 
 	parts := strings.Fields(editor)
-	cmd := exec.Command(parts[0], append(parts[1:], tmpPath)...) //nolint:gosec // editor is user-controlled
+	cmd := exec.Command(
+		parts[0],
+		append(parts[1:], tmpPath)...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

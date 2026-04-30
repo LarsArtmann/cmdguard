@@ -8,12 +8,10 @@ import (
 )
 
 func TestEditInEditor(t *testing.T) {
-	//nolint:paralleltest // uses t.Setenv
-
 	t.Run("uses EDITOR env var", func(t *testing.T) {
 		// Create a script that just writes to the file
 		script := "#!/bin/sh\ncat > \"$1\" << 'EOF'\nedited content\nEOF\n"
-		tmpScript, err := os.CreateTemp("", "editor-test-*.sh")
+		tmpScript, err := os.CreateTemp(t.TempDir(), "editor-test-*.sh")
 		testutil.AssertNoError(t, err)
 		defer os.Remove(tmpScript.Name())
 

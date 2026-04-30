@@ -125,6 +125,7 @@ func setStringField(field reflect.Value, str string) error {
 
 		if len(allowed) == 0 {
 			field.Set(reflect.ValueOf(Enum{value: str}))
+
 			return nil
 		}
 
@@ -134,6 +135,7 @@ func setStringField(field reflect.Value, str string) error {
 		}
 
 		field.Set(reflect.ValueOf(parsed))
+
 		return nil
 	}
 
@@ -147,15 +149,15 @@ func setStringField(field reflect.Value, str string) error {
 		parsedVal := reflect.ValueOf(parsed)
 		if parsedVal.Type().ConvertibleTo(field.Type()) {
 			field.Set(parsedVal.Convert(field.Type()))
+
 			return nil
 		}
 
 		field.Set(parsedVal)
+
 		return nil
 	}
 
 	return fmt.Errorf("setStringField: field=%s, str=%q: %w",
 		field.Type(), str, ErrUnsupportedConversion)
 }
-
-

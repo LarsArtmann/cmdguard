@@ -30,9 +30,9 @@ type AppConfig struct {
 
 // FetchFlags demonstrates error handling with validation.
 type FetchFlags struct {
-	URL     string `flag:"url"  short:"u" help:"URL to fetch" default:""`
-	Port    int    `flag:"port" short:"p" help:"Port number (1-65535)" default:"443"`
-	Timeout int    `flag:"timeout" help:"Timeout in seconds" default:"30"`
+	URL     string `flag:"url"     short:"u" help:"URL to fetch"          default:""`
+	Port    int    `flag:"port"    short:"p" help:"Port number (1-65535)" default:"443"`
+	Timeout int    `flag:"timeout"           help:"Timeout in seconds"    default:"30"`
 }
 
 func main() {
@@ -58,9 +58,10 @@ func main() {
 			func(_ context.Context, _ *AppConfig, flags *FetchFlags) error {
 				var errs []error
 
-				if flags.URL == "" {
-					errs = append(errs, fmt.Errorf("--url is required"))
-				} else if flags.URL == "invalid" {
+				switch flags.URL {
+				case "":
+					errs = append(errs, errors.New("--url is required"))
+				case "invalid":
 					errs = append(errs, v2.NewFlagError("url",
 						fmt.Errorf("%q is not a valid URL", flags.URL)))
 				}

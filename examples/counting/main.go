@@ -29,7 +29,7 @@ type AppConfig struct {
 // GreetFlags demonstrates a counting flag for verbosity.
 type GreetFlags struct {
 	Name string `flag:"name"    short:"n" default:"World" help:"Name to greet"`
-	Verb int    `flag:"verbose" short:"v" default:"0"    help:"Verbosity level (-v, -vv, -vvv)" count:"true"`
+	Verb int    `flag:"verbose" short:"v" default:"0"     help:"Verbosity level (-v, -vv, -vvv)" count:"true"`
 }
 
 func main() {

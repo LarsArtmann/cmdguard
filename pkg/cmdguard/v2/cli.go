@@ -15,25 +15,25 @@ import (
 // T is the application config type. Commands can have any flags type.
 // This is the recommended API for new code (v2.1+).
 type CLI[T any] struct {
-	name            string
-	short           string
-	long            string
-	version         string
-	defaults        T
-	config          *T
-	scope           *Scope
-	rootCmd         *cobra.Command
-	registry        *FlagRegistry
-	registeredCmds  map[string]bool
-	flowCtx         *BranchingFlowContext
-	useFang         bool
-	fangOpts        []fang.Option
-	middleware       []Middleware[T]
-	envPrefix       string
-	signalHandling  bool
-	outputEnabled   bool
-	outputFormat    OutputFormat
-	outputState     *outputState
+	name           string
+	short          string
+	long           string
+	version        string
+	defaults       T
+	config         *T
+	scope          *Scope
+	rootCmd        *cobra.Command
+	registry       *FlagRegistry
+	registeredCmds map[string]bool
+	flowCtx        *BranchingFlowContext
+	useFang        bool
+	fangOpts       []fang.Option
+	middleware     []Middleware[T]
+	envPrefix      string
+	signalHandling bool
+	outputEnabled  bool
+	outputFormat   OutputFormat
+	outputState    *outputState
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -163,6 +163,7 @@ func MustNewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) *CL
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	if cli.signalHandling {
 		var cancel context.CancelFunc
+
 		ctx, cancel = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 		defer cancel()
 	}

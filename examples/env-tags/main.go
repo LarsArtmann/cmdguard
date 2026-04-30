@@ -53,6 +53,7 @@ func main() {
 			fmt.Printf("  Password: %s\n", maskPassword(flags.Password))
 			fmt.Printf("  Name:     %s\n", flags.Name)
 			fmt.Printf("  Debug:    %v\n", cfg.Debug)
+
 			return nil
 		},
 		v2.WithShort[AppConfig, *DBFlags]("Show database config"),

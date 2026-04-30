@@ -65,18 +65,30 @@ func TestSuggestCommand(t *testing.T) {
 
 			match, ok := SuggestCommand(tt.commands, tt.input)
 			if ok != tt.wantMatch {
-				t.Errorf("SuggestCommand(%q) = (%q, %v), want match=%v", tt.input, match, ok, tt.wantMatch)
+				t.Errorf(
+					"SuggestCommand(%q) = (%q, %v), want match=%v",
+					tt.input,
+					match,
+					ok,
+					tt.wantMatch,
+				)
 			}
 			if ok && tt.wantOneOf != nil {
 				found := false
 				for _, w := range tt.wantOneOf {
 					if match == w {
 						found = true
+
 						break
 					}
 				}
 				if !found {
-					t.Errorf("SuggestCommand(%q) = %q, want one of %v", tt.input, match, tt.wantOneOf)
+					t.Errorf(
+						"SuggestCommand(%q) = %q, want one of %v",
+						tt.input,
+						match,
+						tt.wantOneOf,
+					)
 				}
 			}
 		})
@@ -100,7 +112,11 @@ func TestSuggestCommand_DelegatesToSuggestFlag(t *testing.T) {
 		} else {
 			testutil.AssertBoolTrue(t, ok, "should be true when SuggestFlag returns true")
 			if cmdResult != flagResult {
-				t.Errorf("SuggestCommand = %q, SuggestFlag = %q, should match", cmdResult, flagResult)
+				t.Errorf(
+					"SuggestCommand = %q, SuggestFlag = %q, should match",
+					cmdResult,
+					flagResult,
+				)
 			}
 		}
 	})

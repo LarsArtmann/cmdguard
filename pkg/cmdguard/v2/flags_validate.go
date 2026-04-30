@@ -99,7 +99,10 @@ func parseValidateRules(tag string) ([]validateRule, error) {
 
 // parseValidateRulesWithRegistry parses a validate tag using instance validators first.
 // If instance is nil or the validator is not found, falls back to the global registry.
-func parseValidateRulesWithRegistry(tag string, instance *validatorRegistry) ([]validateRule, error) {
+func parseValidateRulesWithRegistry(
+	tag string,
+	instance *validatorRegistry,
+) ([]validateRule, error) {
 	var rules []validateRule
 
 	for part := range strings.SplitSeq(tag, ",") {
@@ -110,10 +113,13 @@ func parseValidateRulesWithRegistry(tag string, instance *validatorRegistry) ([]
 
 		name, param, _ := strings.Cut(part, "=")
 
-		var validator FlagValidator
-		var ok bool
+		var (
+			validator FlagValidator
+			ok        bool
+		)
 
 		// Instance-scoped first
+
 		if instance != nil {
 			instance.mu.RLock()
 			validator, ok = instance.validators[name]
