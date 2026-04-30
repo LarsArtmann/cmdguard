@@ -39,7 +39,9 @@ func addCommand(t *testing.T, cli *v2.CLI[AppConfig], output *bytes.Buffer, name
 		t.Fatalf("failed to create %s command: %v", name, err)
 	}
 
-	v2.AddCommand(cli, cmd)
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("failed to add %s command: %v", name, err)
+	}
 }
 
 func TestBasicExample_HelloCommand(t *testing.T) {

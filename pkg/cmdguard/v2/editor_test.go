@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -9,10 +10,10 @@ import (
 
 func TestEditInEditor(t *testing.T) {
 	t.Run("uses EDITOR env var", func(t *testing.T) {
-		// Create a script that just writes to the file
 		script := "#!/bin/sh\ncat > \"$1\" << 'EOF'\nedited content\nEOF\n"
 		tmpScript, err := os.CreateTemp(t.TempDir(), "editor-test-*.sh")
 		testutil.AssertNoError(t, err)
+
 		defer os.Remove(tmpScript.Name())
 
 		_, err = tmpScript.WriteString(script)
@@ -24,16 +25,15 @@ func TestEditInEditor(t *testing.T) {
 
 		t.Setenv("EDITOR", tmpScript.Name())
 
-		result, err := EditInEditor("original content")
+		result, err := EditInEditor(context.Background(), "original content")
 		testutil.AssertNoError(t, err)
+
 		if result != "edited content\n" {
 			t.Errorf("EditInEditor() = %q, want %q", result, "edited content\n")
 		}
 	})
 
 	t.Run("falls back to vi when EDITOR not set", func(t *testing.T) {
-		// This test just verifies the function doesn't crash with empty EDITOR.
-		// We can't actually test vi behavior, so we skip if vi would run.
 		t.Skip("cannot test vi fallback without an interactive terminal")
 	})
 }

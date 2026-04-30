@@ -9,8 +9,6 @@ var errMustNotBeNil = errors.New("must not be nil")
 
 // Ptr returns a pointer to any value.
 // Useful for optional config fields.
-//
-//go:fix inline
 func Ptr[T any](v T) *T {
 	return new(v)
 }

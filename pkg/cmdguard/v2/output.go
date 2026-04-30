@@ -14,7 +14,7 @@ import (
 type OutputFormat = output.Format
 
 // Output format constants re-exported from go-output for convenience.
-var ( //nolint:gochecknoglobals // re-exports from external package
+var (
 	FormatTable    = output.FormatTable
 	FormatJSON     = output.FormatJSON
 	FormatCSV      = output.FormatCSV

@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/larsartmann/cmdguard/pkg/testutil"
@@ -74,14 +75,7 @@ func TestSuggestCommand(t *testing.T) {
 				)
 			}
 			if ok && tt.wantOneOf != nil {
-				found := false
-				for _, w := range tt.wantOneOf {
-					if match == w {
-						found = true
-
-						break
-					}
-				}
+				found := slices.Contains(tt.wantOneOf, match)
 				if !found {
 					t.Errorf(
 						"SuggestCommand(%q) = %q, want one of %v",

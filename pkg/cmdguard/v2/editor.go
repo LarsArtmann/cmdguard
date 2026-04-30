@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,7 +12,7 @@ import (
 // EditInEditor opens a temporary file in the user's $EDITOR with the given content,
 // waits for the editor to close, and returns the edited content.
 // Falls back to "vi" if $EDITOR is not set.
-func EditInEditor(content string) (string, error) {
+func EditInEditor(ctx context.Context, content string) (string, error) {
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
 		editor = "vi"
@@ -23,6 +24,7 @@ func EditInEditor(content string) (string, error) {
 	}
 
 	tmpPath := tmpFile.Name()
+
 	defer os.Remove(tmpPath)
 
 	_, err = tmpFile.WriteString(content)
@@ -35,9 +37,11 @@ func EditInEditor(content string) (string, error) {
 	tmpFile.Close()
 
 	parts := strings.Fields(editor)
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		parts[0],
-		append(parts[1:], tmpPath)...)
+		append(parts[1:], tmpPath)...,
+	)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

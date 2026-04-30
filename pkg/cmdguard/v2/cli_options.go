@@ -54,6 +54,7 @@ func WithFang[T any](enabled bool) CLIOption[T] {
 }
 
 // WithColor enables or disables colored output from fang.
+//
 // Deprecated: Use WithFang instead. WithColor will be removed in v3.0.
 func WithColor[T any](enabled bool) CLIOption[T] {
 	return WithFang[T](enabled)

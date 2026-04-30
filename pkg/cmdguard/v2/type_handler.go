@@ -297,7 +297,8 @@ func (r *typeRegistry) registerCustomTypes() {
 	r.byType[reflect.TypeFor[Enum]()] = enumHandler
 	r.byType[reflect.TypeFor[LogLevel]()] = TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			help := tag.Help
+			var help string
+
 			if len(tag.Values) > 0 {
 				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
 			} else {
@@ -317,11 +318,16 @@ func (r *typeRegistry) registerCustomTypes() {
 	}
 	r.byType[reflect.TypeFor[LogFormat]()] = TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			help := tag.Help
+			var help string
+
 			if len(tag.Values) > 0 {
 				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
 			} else {
-				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(logFormatAllowed, ", "))
+				help = fmt.Sprintf(
+					"%s (one of: %s)",
+					tag.Help,
+					strings.Join(logFormatAllowed, ", "),
+				)
 			}
 
 			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
@@ -431,6 +437,7 @@ func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
 func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
 	globalTypeRegistry.mu.Lock()
 	defer globalTypeRegistry.mu.Unlock()
+
 	globalTypeRegistry.byType[typ] = handler
 }
 

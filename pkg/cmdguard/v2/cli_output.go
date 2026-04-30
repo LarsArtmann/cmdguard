@@ -75,10 +75,7 @@ func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
 		return nil
 	}
 
-	formatStr, err := c.Flags().GetString("output")
-	if err != nil {
-		return nil // flag not found is ok
-	}
+	formatStr, _ := c.Flags().GetString("output")
 
 	if formatStr == "" {
 		return nil
