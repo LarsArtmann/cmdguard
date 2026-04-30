@@ -316,25 +316,15 @@ func formatFieldValue(field reflect.Value) string {
 		return strconv.FormatFloat(field.Float(), 'f', -1, 64)
 	case reflect.Bool:
 		return strconv.FormatBool(field.Bool())
-	case reflect.Complex64, reflect.Complex128:
-		return fmt.Sprintf("%v", field.Complex())
-	case reflect.Array, reflect.Slice:
-		return fmt.Sprintf("%v", field.Interface())
-	case reflect.Map, reflect.Struct:
-		return fmt.Sprintf("%v", field.Interface())
 	case reflect.Pointer, reflect.Interface:
 		if field.Elem().IsValid() {
 			return formatFieldValue(field.Elem())
 		}
 
 		return ""
-	case reflect.Chan, reflect.Func:
-		return fmt.Sprintf("%v", field.Interface())
 	case reflect.Invalid:
 		return ""
-	case reflect.Uintptr, reflect.UnsafePointer:
-		return fmt.Sprintf("%v", field.Interface())
 	default:
-		return ""
+		return fmt.Sprintf("%v", field.Interface())
 	}
 }
