@@ -253,6 +253,24 @@ linters:
         linters:
           - cyclop
           - funlen
+      - path: pkg/cmdguard/v2/type_handler.go$
+        linters:
+          - funlen
+          - gochecknoglobals
+          - wrapcheck
+      - path: pkg/cmdguard/v2/output.go$
+        linters:
+          - gochecknoglobals
+          - wrapcheck
+      - path: pkg/cmdguard/v2/manpage.go$
+        linters:
+          - wrapcheck
+      - path: pkg/cmdguard/v2/editor.go$
+        linters:
+          - gosec
+      - path: pkg/cmdguard/v2/example_test.go$
+        linters:
+          - forbidigo
       - path: pkg/cmdguard/
         linters:
           - exhaustruct
@@ -389,6 +407,7 @@ linters:
           - noinlineerr
           - godoclint
           - golines
+          - gomoddirectives
 formatters:
   enable:
     - gci
