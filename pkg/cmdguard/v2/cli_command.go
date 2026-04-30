@@ -105,10 +105,6 @@ func cliToCobraCommand[T, F any](
 		cobraCmd.AddCommand(subCobraCmd)
 	}
 
-	if len(cmd.commands) > 0 {
-		wireSubcommandSuggestions(cobraCmd)
-	}
-
 	if cmd.completionFn != nil {
 		cobraCmd.ValidArgsFunction = cmd.completionFn
 	}
@@ -189,11 +185,4 @@ func wireHandlerWithMiddleware[T, F any](
 	}
 }
 
-// wireSubcommandSuggestions enhances parent commands with "did you mean?" suggestions
-// when an unknown subcommand is provided.
-func wireSubcommandSuggestions(cmd *cobra.Command) {
-	root := cmd.Root()
-	root.SetFlagErrorFunc(func(c *cobra.Command, err error) error {
-		return err
-	})
-}
+
