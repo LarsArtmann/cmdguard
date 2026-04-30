@@ -295,121 +295,69 @@ func (r *typeRegistry) registerCustomTypes() {
 		},
 	}
 	r.byType[reflect.TypeFor[Enum]()] = enumHandler
-	r.byType[reflect.TypeFor[LogLevel]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			var help string
 
-			if len(tag.Values) > 0 {
-				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
-			} else {
-				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(logLevelAllowed, ", "))
-			}
+	makeEnumLikeHandler := func(
+		parseFunc func(string) (any, error),
+		defaultAllowed []string,
+	) TypeHandlerFunc {
+		return TypeHandlerFunc{
+			RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
+				allowed := tag.Values
+				if len(allowed) == 0 {
+					allowed = defaultAllowed
+				}
 
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
+				help := fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(allowed, ", "))
+				registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
 
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseLogLevel(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
-	}
-	r.byType[reflect.TypeFor[LogFormat]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			var help string
-
-			if len(tag.Values) > 0 {
-				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
-			} else {
-				help = fmt.Sprintf(
-					"%s (one of: %s)",
-					tag.Help,
-					strings.Join(logFormatAllowed, ", "),
-				)
-			}
-
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseLogFormat(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
+				return nil
+			},
+			ParseFunc: func(value string, _ FlagTag) (any, error) {
+				return parseFunc(value)
+			},
+			DefaultFunc: func(tag FlagTag) any {
+				return tag.Default
+			},
+		}
 	}
 
-	r.byType[reflect.TypeFor[URL]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
+	r.byType[reflect.TypeFor[LogLevel]()] = makeEnumLikeHandler(
+		func(v string) (any, error) { return ParseLogLevel(v) },
+		logLevelAllowed,
+	)
+	r.byType[reflect.TypeFor[LogFormat]()] = makeEnumLikeHandler(
+		func(v string) (any, error) { return ParseLogFormat(v) },
+		logFormatAllowed,
+	)
 
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseURL(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
+	// Simple string-backed types: all use registerStringFlag + custom parse + default passthrough
+	stringParseTypes := []struct {
+		typ       reflect.Type
+		parseFunc func(string) (any, error)
+	}{
+		{reflect.TypeFor[URL](), func(v string) (any, error) { return ParseURL(v) }},
+		{reflect.TypeFor[Email](), func(v string) (any, error) { return ParseEmail(v) }},
+		{reflect.TypeFor[Port](), func(v string) (any, error) { return ParsePort(v) }},
+		{reflect.TypeFor[FilePath](), func(v string) (any, error) { return ParseFilePath(v, false) }},
+		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }},
 	}
 
-	r.byType[reflect.TypeFor[Email]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
+	for _, entry := range stringParseTypes {
+		parseFn := entry.parseFunc
 
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseEmail(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
-	}
+		r.byType[entry.typ] = TypeHandlerFunc{
+			RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
+				registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
 
-	r.byType[reflect.TypeFor[Port]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParsePort(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
-	}
-
-	r.byType[reflect.TypeFor[FilePath]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseFilePath(value, false)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
-	}
-
-	r.byType[reflect.TypeFor[HostPort]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseHostPort(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
+				return nil
+			},
+			ParseFunc: func(value string, _ FlagTag) (any, error) {
+				return parseFn(value)
+			},
+			DefaultFunc: func(tag FlagTag) any {
+				return tag.Default
+			},
+		}
 	}
 }
 
