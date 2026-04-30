@@ -31,9 +31,9 @@ func (e Enum) Value() string {
 	return e.value
 }
 
-// Allowed returns the list of allowed values.
+// Allowed returns a copy of the list of allowed values.
 func (e Enum) Allowed() []string {
-	return e.allowed
+	return slices.Clone(e.allowed)
 }
 
 // IsEmpty returns true if the enum has no value.
