@@ -14,6 +14,12 @@
 /examples/*/validation_example
 /advanced-flags
 /di
+/env-tags
+/subcommands
+/signals
+/output
+/counting
+/error-handling
 
 # Test binaries
 *.test

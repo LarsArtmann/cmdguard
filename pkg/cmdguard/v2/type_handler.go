@@ -338,7 +338,10 @@ func (r *typeRegistry) registerCustomTypes() {
 		{reflect.TypeFor[URL](), func(v string) (any, error) { return ParseURL(v) }},
 		{reflect.TypeFor[Email](), func(v string) (any, error) { return ParseEmail(v) }},
 		{reflect.TypeFor[Port](), func(v string) (any, error) { return ParsePort(v) }},
-		{reflect.TypeFor[FilePath](), func(v string) (any, error) { return ParseFilePath(v, false) }},
+		{
+			reflect.TypeFor[FilePath](),
+			func(v string) (any, error) { return ParseFilePath(v, false) },
+		},
 		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }},
 	}
 

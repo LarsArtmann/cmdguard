@@ -69,7 +69,13 @@ func RecoveryMiddleware[T any]() Middleware[T] {
 	return func(_ context.Context, _ *T, info CommandInfo, next func() error) (err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				err = fmt.Errorf("%w: panic in command %q: %v\n%s", ErrCommandPanic, info.Name, r, debug.Stack())
+				err = fmt.Errorf(
+					"%w: panic in command %q: %v\n%s",
+					ErrCommandPanic,
+					info.Name,
+					r,
+					debug.Stack(),
+				)
 			}
 		}()
 
