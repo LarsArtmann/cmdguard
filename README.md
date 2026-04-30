@@ -86,23 +86,23 @@ func main() {
 
 ## Features
 
-| Feature              | Description                                         |
-| -------------------- | --------------------------------------------------- |
-| Type-safe config     | Yes (type parameter T)                              |
-| Type-safe flags      | Yes (type parameter F)                              |
-| DI integration       | Yes (samber/do/v2)                                  |
-| Flag tags            | Yes (`flag`, `short`, `default`, `help`, `env`, `count`) |
-| Environment variables | `env:"VAR"` tag with `WithEnvPrefix` prefix support |
-| Counting flags       | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity      |
-| Signal handling      | `WithSignalHandling` for SIGINT/SIGTERM             |
-| Rich output          | 12 formats via go-output (table/json/csv/yaml/...)   |
-| Lifecycle hooks       | Yes (PreRunE, PostRunE)                             |
-| Health checks        | Yes                                                 |
-| Graceful shutdown    | Yes                                                 |
-| $EDITOR integration | `EditInEditor()` for config editing                 |
-| Typo suggestions     | Flag and subcommand "did you mean?"                 |
-| Extensible types     | `RegisterTypeHandler()` for custom flag types        |
-| Fuzz testing        | 7 fuzz targets for input parsers                    |
+| Feature               | Description                                              |
+| --------------------- | -------------------------------------------------------- |
+| Type-safe config      | Yes (type parameter T)                                   |
+| Type-safe flags       | Yes (type parameter F)                                   |
+| DI integration        | Yes (samber/do/v2)                                       |
+| Flag tags             | Yes (`flag`, `short`, `default`, `help`, `env`, `count`) |
+| Environment variables | `env:"VAR"` tag with `WithEnvPrefix` prefix support      |
+| Counting flags        | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity           |
+| Signal handling       | `WithSignalHandling` for SIGINT/SIGTERM                  |
+| Rich output           | 12 formats via go-output (table/json/csv/yaml/...)       |
+| Lifecycle hooks       | Yes (PreRunE, PostRunE)                                  |
+| Health checks         | Yes                                                      |
+| Graceful shutdown     | Yes                                                      |
+| $EDITOR integration   | `EditInEditor()` for config editing                      |
+| Typo suggestions      | Flag and subcommand "did you mean?"                      |
+| Extensible types      | `RegisterTypeHandler()` for custom flag types            |
+| Fuzz testing          | 7 fuzz targets for input parsers                         |
 
 ## v2 API Reference
 
@@ -477,10 +477,10 @@ cmdguard is designed for production CLIs:
 
 ## Project Status
 
-| Status  | Description                                     |
-| ------- | ----------------------------------------------- |
+| Status  | Description                                      |
+| ------- | ------------------------------------------------ |
 | v2.2.0  | Full type-safe API with DI, env, signals, output |
-| License | MIT                                             |
+| License | MIT                                              |
 
 ## Documentation
 

@@ -15,20 +15,20 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ## Current Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Build | `go build ./...` — 0 errors | ✅ Clean |
-| Tests (v2) | 815 passing with `-race` | ✅ Clean |
-| Tests (all) | 881 passing across all packages | ✅ Clean |
-| Lint | `golangci-lint run ./...` — 0 issues | ✅ Clean |
-| Coverage | 80.4% (`pkg/cmdguard/v2`) | ✅ Good |
-| Race conditions | 0 | ✅ Clean |
-| Source files | 96 in `pkg/cmdguard/v2/` (33 production, 63 test) | |
-| Total lines | 27,117 in v2 package (16,348 prod, 10,769 test) | |
-| Examples | 12 directories | |
-| Dependencies | All published (no local replace) | ✅ Clean |
-| CI | GitHub Actions (build+test+lint) | ✅ Active |
-| Uncommitted | `go.sum` drift only | ⚠️ Trivial |
+| Metric          | Value                                             | Status     |
+| --------------- | ------------------------------------------------- | ---------- |
+| Build           | `go build ./...` — 0 errors                       | ✅ Clean   |
+| Tests (v2)      | 815 passing with `-race`                          | ✅ Clean   |
+| Tests (all)     | 881 passing across all packages                   | ✅ Clean   |
+| Lint            | `golangci-lint run ./...` — 0 issues              | ✅ Clean   |
+| Coverage        | 80.4% (`pkg/cmdguard/v2`)                         | ✅ Good    |
+| Race conditions | 0                                                 | ✅ Clean   |
+| Source files    | 96 in `pkg/cmdguard/v2/` (33 production, 63 test) |            |
+| Total lines     | 27,117 in v2 package (16,348 prod, 10,769 test)   |            |
+| Examples        | 12 directories                                    |            |
+| Dependencies    | All published (no local replace)                  | ✅ Clean   |
+| CI              | GitHub Actions (build+test+lint)                  | ✅ Active  |
+| Uncommitted     | `go.sum` drift only                               | ⚠️ Trivial |
 
 ---
 
@@ -36,17 +36,17 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ### Session 4 (This Session — 6 commits)
 
-| # | Change | File(s) | Type |
-|---|--------|---------|------|
-| 1 | **Removed dead code `wireSubcommandSuggestions`** — function set `FlagErrorFunc` on root that just `return err` unchanged (cobra's default). Called once per parent command, redundantly overwriting root each time. | `cli_command.go` | Dead code |
-| 2 | **Collapsed `formatFieldValue` duplicate cases** — 4 separate cases (Complex64/128, Array/Slice, Map/Struct, Chan/Func, Uintptr/UnsafePointer) all produced identical `fmt.Sprintf("%v", field.Interface())` output. Replaced with single `default` branch. | `flags_validate.go` | Dedup |
-| 3 | **Cached regex compilation in `validateRegex`** — `sync.Map` cache: first call compiles, subsequent hit cache. Optimized for read-heavy pattern (write-once, read-many). | `flags_validate.go` | Perf |
-| 4 | **Removed unnecessary mutex from `outputState`** — CLI execution is sequential (cobra is not concurrent). `sync.Mutex` added overhead for no benefit. | `cli_output.go` | Simplification |
-| 5 | **Deprecated `IsExecutable()`** — Added `Deprecated:` doc comment pointing to `HasHandler()`. Will remove in v3. | `command.go` | API hygiene |
-| 6 | **Deprecated `FlowContextAccessor`/`NewFlowContextAccessor`** — Thin wrappers around `BranchingFlowContext`. Added `Deprecated:` comments. Will remove in v3. | `flow_context.go` | API hygiene |
-| 7 | **Added `BranchWithDuration(name, time.Duration)`** — Typed alternative to string-based `BranchWithTimeout`. | `flow_context.go` | API |
-| 8 | **Added `BranchWithDeadlineTime(name, time.Time)`** — Typed alternative to string-based `BranchWithDeadline`. | `flow_context.go` | API |
-| 9 | **Updated AGENTS.md** — Deprecation notices, coverage metrics, gotchas for new APIs. | `AGENTS.md` | Docs |
+| #   | Change                                                                                                                                                                                                                                                      | File(s)             | Type           |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | -------------- |
+| 1   | **Removed dead code `wireSubcommandSuggestions`** — function set `FlagErrorFunc` on root that just `return err` unchanged (cobra's default). Called once per parent command, redundantly overwriting root each time.                                        | `cli_command.go`    | Dead code      |
+| 2   | **Collapsed `formatFieldValue` duplicate cases** — 4 separate cases (Complex64/128, Array/Slice, Map/Struct, Chan/Func, Uintptr/UnsafePointer) all produced identical `fmt.Sprintf("%v", field.Interface())` output. Replaced with single `default` branch. | `flags_validate.go` | Dedup          |
+| 3   | **Cached regex compilation in `validateRegex`** — `sync.Map` cache: first call compiles, subsequent hit cache. Optimized for read-heavy pattern (write-once, read-many).                                                                                    | `flags_validate.go` | Perf           |
+| 4   | **Removed unnecessary mutex from `outputState`** — CLI execution is sequential (cobra is not concurrent). `sync.Mutex` added overhead for no benefit.                                                                                                       | `cli_output.go`     | Simplification |
+| 5   | **Deprecated `IsExecutable()`** — Added `Deprecated:` doc comment pointing to `HasHandler()`. Will remove in v3.                                                                                                                                            | `command.go`        | API hygiene    |
+| 6   | **Deprecated `FlowContextAccessor`/`NewFlowContextAccessor`** — Thin wrappers around `BranchingFlowContext`. Added `Deprecated:` comments. Will remove in v3.                                                                                               | `flow_context.go`   | API hygiene    |
+| 7   | **Added `BranchWithDuration(name, time.Duration)`** — Typed alternative to string-based `BranchWithTimeout`.                                                                                                                                                | `flow_context.go`   | API            |
+| 8   | **Added `BranchWithDeadlineTime(name, time.Time)`** — Typed alternative to string-based `BranchWithDeadline`.                                                                                                                                               | `flow_context.go`   | API            |
+| 9   | **Updated AGENTS.md** — Deprecation notices, coverage metrics, gotchas for new APIs.                                                                                                                                                                        | `AGENTS.md`         | Docs           |
 
 ### Session 3 (Prior — 12 commits)
 
@@ -93,31 +93,31 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ## b) PARTIALLY DONE
 
-| Item | Status | What's Left |
-|------|--------|-------------|
-| **Pre-commit hooks** | Script at `scripts/pre-commit`, but must be manually copied to `.git/hooks/`. No `lefthook`/`husky` framework. | Auto-install mechanism |
-| **Benchmarks** | 18 benchmark functions in `benchmarks/guard_bench_test.go`. TODO_LIST says "add CLI construction/flag parsing/command execution benchmarks" — existing ones may already cover these. | Verify coverage, add if missing |
-| **API deprecation** | `IsExecutable`, `FlowContextAccessor` marked `Deprecated:`. `WithColor` already deprecated. | Actual removal deferred to v3 |
-| **Typed branching** | `BranchWithDuration`/`BranchWithDeadlineTime` added as typed alternatives. String-based originals still present. | Remove string-based variants in v3 |
+| Item                 | Status                                                                                                                                                                               | What's Left                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| **Pre-commit hooks** | Script at `scripts/pre-commit`, but must be manually copied to `.git/hooks/`. No `lefthook`/`husky` framework.                                                                       | Auto-install mechanism             |
+| **Benchmarks**       | 18 benchmark functions in `benchmarks/guard_bench_test.go`. TODO_LIST says "add CLI construction/flag parsing/command execution benchmarks" — existing ones may already cover these. | Verify coverage, add if missing    |
+| **API deprecation**  | `IsExecutable`, `FlowContextAccessor` marked `Deprecated:`. `WithColor` already deprecated.                                                                                          | Actual removal deferred to v3      |
+| **Typed branching**  | `BranchWithDuration`/`BranchWithDeadlineTime` added as typed alternatives. String-based originals still present.                                                                     | Remove string-based variants in v3 |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Item | Effort | Impact |
-|---|------|--------|--------|
-| 1 | Codecov integration in CI | Small | Medium |
-| 2 | v2.2.0 release tag and notes | Small | High |
-| 3 | Release automation (goreleaser?) | Medium | Medium |
-| 4 | Benchmark regression detection in CI | Medium | Medium |
-| 5 | Config file auto-loading with koanf | Large | High |
-| 6 | Interactive prompts (huh integration) | Large | Medium |
-| 7 | Spinner/progress middleware (bubbles) | Medium | Low |
-| 8 | Glamour markdown help rendering | Medium | Medium |
-| 9 | Telemetry middleware (OpenTelemetry) | Medium | Low |
-| 10 | Plugin system for custom validators | Large | Medium |
-| 11 | Unexport `derefPointerToStruct` | Tiny | Low |
-| 12 | Generate help string from valid format list | Small | Low |
+| #   | Item                                        | Effort | Impact |
+| --- | ------------------------------------------- | ------ | ------ |
+| 1   | Codecov integration in CI                   | Small  | Medium |
+| 2   | v2.2.0 release tag and notes                | Small  | High   |
+| 3   | Release automation (goreleaser?)            | Medium | Medium |
+| 4   | Benchmark regression detection in CI        | Medium | Medium |
+| 5   | Config file auto-loading with koanf         | Large  | High   |
+| 6   | Interactive prompts (huh integration)       | Large  | Medium |
+| 7   | Spinner/progress middleware (bubbles)       | Medium | Low    |
+| 8   | Glamour markdown help rendering             | Medium | Medium |
+| 9   | Telemetry middleware (OpenTelemetry)        | Medium | Low    |
+| 10  | Plugin system for custom validators         | Large  | Medium |
+| 11  | Unexport `derefPointerToStruct`             | Tiny   | Low    |
+| 12  | Generate help string from valid format list | Small  | Low    |
 
 ---
 
@@ -167,33 +167,33 @@ No regressions, no broken tests, no unfixable issues. The codebase is in its bes
 
 Sorted by **impact × effort** (highest first):
 
-| # | Task | Effort | Impact | Type |
-|---|------|--------|--------|------|
-| 1 | **Tag v2.2.0 release** with CHANGELOG/release notes | 30min | 🔴 High | Release |
-| 2 | **Commit `go.sum` drift** | 2min | 🟡 Medium | Housekeeping |
-| 3 | **Unexport `derefPointerToStruct`** | 5min | 🟢 Low | Encapsulation |
-| 4 | **Verify benchmark coverage** — do existing benchmarks cover CLI construction, flag parsing, command execution? | 30min | 🟡 Medium | Testing |
-| 5 | **Add codecov to CI** | 30min | 🟡 Medium | CI |
-| 6 | **Generate format help string from valid format list** | 30min | 🟢 Low | DRY |
-| 7 | **Collapse `validateMin`/`validateMax`** into parameterized validators | 1hr | 🟢 Low | Dedup |
-| 8 | **Consolidate validation execution paths** (`runValidateTag` vs `parseValidateRulesWithRegistry`) | 1hr | 🟡 Medium | Architecture |
-| 9 | **Set up goreleaser** for release automation | 2hr | 🟡 Medium | CI |
-| 10 | **Add benchmark regression detection** to CI | 1hr | 🟡 Medium | CI |
-| 11 | **Add smoke tests for examples** (verify they compile + run) | 1hr | 🟡 Medium | Testing |
-| 12 | **Make `RegisterInScope` generic** instead of `...any` | 1hr | 🟡 Medium | Architecture |
-| 13 | **Make `NoFlags` a distinct named type** | 30min | 🟡 Medium | API (breaking) |
-| 14 | **Rename `Get[T]`/`MustGet[T]`** to `GetFlowValue[T]`/`MustGetFlowValue[T]` | 15min | 🟢 Low | API (breaking) |
-| 15 | **Remove deprecated APIs** (`IsExecutable`, `FlowContextAccessor`, `WithColor`) | 30min | 🟢 Low | Cleanup (breaking) |
-| 16 | **Add `TimingMiddleware` error parameter** | 30min | 🟢 Low | API (breaking) |
-| 17 | **Add exit code support** to `ExecuteAndExit` | 1hr | 🟢 Low | API (breaking) |
-| 18 | **Config file auto-loading with koanf** (YAML/TOML/.env) | 1-2 days | 🔴 High | Feature |
-| 19 | **Interactive prompts (huh)** with `WithPromptOnMissing` | 1-2 days | 🟡 Medium | Feature |
-| 20 | **Glamour markdown help rendering** | 4hr | 🟡 Medium | Feature |
-| 21 | **Telemetry middleware (OpenTelemetry spans)** | 4hr | 🟢 Low | Feature |
-| 22 | **Spinner/progress middleware (bubbles)** | 4hr | 🟢 Low | Feature |
-| 23 | **Plugin system for custom validators and type handlers** | 1-2 days | 🟡 Medium | Feature |
-| 24 | **Generate accessor methods** via `go generate` | 2hr | 🟢 Low | Code gen |
-| 25 | **Auto-install pre-commit hook** via `go generate` or Makefile | 1hr | 🟢 Low | Tooling |
+| #   | Task                                                                                                            | Effort   | Impact    | Type               |
+| --- | --------------------------------------------------------------------------------------------------------------- | -------- | --------- | ------------------ |
+| 1   | **Tag v2.2.0 release** with CHANGELOG/release notes                                                             | 30min    | 🔴 High   | Release            |
+| 2   | **Commit `go.sum` drift**                                                                                       | 2min     | 🟡 Medium | Housekeeping       |
+| 3   | **Unexport `derefPointerToStruct`**                                                                             | 5min     | 🟢 Low    | Encapsulation      |
+| 4   | **Verify benchmark coverage** — do existing benchmarks cover CLI construction, flag parsing, command execution? | 30min    | 🟡 Medium | Testing            |
+| 5   | **Add codecov to CI**                                                                                           | 30min    | 🟡 Medium | CI                 |
+| 6   | **Generate format help string from valid format list**                                                          | 30min    | 🟢 Low    | DRY                |
+| 7   | **Collapse `validateMin`/`validateMax`** into parameterized validators                                          | 1hr      | 🟢 Low    | Dedup              |
+| 8   | **Consolidate validation execution paths** (`runValidateTag` vs `parseValidateRulesWithRegistry`)               | 1hr      | 🟡 Medium | Architecture       |
+| 9   | **Set up goreleaser** for release automation                                                                    | 2hr      | 🟡 Medium | CI                 |
+| 10  | **Add benchmark regression detection** to CI                                                                    | 1hr      | 🟡 Medium | CI                 |
+| 11  | **Add smoke tests for examples** (verify they compile + run)                                                    | 1hr      | 🟡 Medium | Testing            |
+| 12  | **Make `RegisterInScope` generic** instead of `...any`                                                          | 1hr      | 🟡 Medium | Architecture       |
+| 13  | **Make `NoFlags` a distinct named type**                                                                        | 30min    | 🟡 Medium | API (breaking)     |
+| 14  | **Rename `Get[T]`/`MustGet[T]`** to `GetFlowValue[T]`/`MustGetFlowValue[T]`                                     | 15min    | 🟢 Low    | API (breaking)     |
+| 15  | **Remove deprecated APIs** (`IsExecutable`, `FlowContextAccessor`, `WithColor`)                                 | 30min    | 🟢 Low    | Cleanup (breaking) |
+| 16  | **Add `TimingMiddleware` error parameter**                                                                      | 30min    | 🟢 Low    | API (breaking)     |
+| 17  | **Add exit code support** to `ExecuteAndExit`                                                                   | 1hr      | 🟢 Low    | API (breaking)     |
+| 18  | **Config file auto-loading with koanf** (YAML/TOML/.env)                                                        | 1-2 days | 🔴 High   | Feature            |
+| 19  | **Interactive prompts (huh)** with `WithPromptOnMissing`                                                        | 1-2 days | 🟡 Medium | Feature            |
+| 20  | **Glamour markdown help rendering**                                                                             | 4hr      | 🟡 Medium | Feature            |
+| 21  | **Telemetry middleware (OpenTelemetry spans)**                                                                  | 4hr      | 🟢 Low    | Feature            |
+| 22  | **Spinner/progress middleware (bubbles)**                                                                       | 4hr      | 🟢 Low    | Feature            |
+| 23  | **Plugin system for custom validators and type handlers**                                                       | 1-2 days | 🟡 Medium | Feature            |
+| 24  | **Generate accessor methods** via `go generate`                                                                 | 2hr      | 🟢 Low    | Code gen           |
+| 25  | **Auto-install pre-commit hook** via `go generate` or Makefile                                                  | 1hr      | 🟢 Low    | Tooling            |
 
 ---
 
@@ -215,23 +215,27 @@ This is a product/project decision that requires your input — I can execute an
 ## Session History
 
 ### Session 1 — Foundation Cleanup
+
 - 113 lint → 0 lint
 - 55 race conditions → 0
 - Output.go registry refactor
 - go-output v0.1.0 published
 
 ### Session 2 — v2.2.0 Features
+
 - All v2.2.0 features complete
 - 6 new examples
 - CI workflow
 - Documentation updated
 
 ### Session 3 — Architecture Hardening (12 commits)
+
 - 3 bug fixes (double-cancel, Enum mutation, lost stack traces)
 - 9 architecture improvements (deduplication, delegation, type safety)
 - 2 new features (subcommands example, pre-commit hook)
 
 ### Session 4 — Dead Code & Deprecation Sweep (6 commits)
+
 - Removed dead code (`wireSubcommandSuggestions`, `outputState` mutex)
 - Performance (regex cache via `sync.Map`)
 - Deduplication (`formatFieldValue` collapse)
@@ -277,14 +281,14 @@ ba65a99 feat: add WithOutputFormat, shell completion, and improved deprecation
 
 ## Files Modified (Session 4 Only)
 
-| File | Change |
-|------|--------|
-| `pkg/cmdguard/v2/cli_command.go` | Removed `wireSubcommandSuggestions` function and call site |
-| `pkg/cmdguard/v2/flags_validate.go` | Collapsed `formatFieldValue`, cached regex compilation |
-| `pkg/cmdguard/v2/cli_output.go` | Removed `sync.Mutex` from `outputState` |
-| `pkg/cmdguard/v2/command.go` | Deprecated `IsExecutable` |
-| `pkg/cmdguard/v2/flow_context.go` | Deprecated `FlowContextAccessor`, added `BranchWithDuration`/`BranchWithDeadlineTime` |
-| `AGENTS.md` | Updated metrics, deprecation notices, gotchas |
+| File                                | Change                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------- |
+| `pkg/cmdguard/v2/cli_command.go`    | Removed `wireSubcommandSuggestions` function and call site                            |
+| `pkg/cmdguard/v2/flags_validate.go` | Collapsed `formatFieldValue`, cached regex compilation                                |
+| `pkg/cmdguard/v2/cli_output.go`     | Removed `sync.Mutex` from `outputState`                                               |
+| `pkg/cmdguard/v2/command.go`        | Deprecated `IsExecutable`                                                             |
+| `pkg/cmdguard/v2/flow_context.go`   | Deprecated `FlowContextAccessor`, added `BranchWithDuration`/`BranchWithDeadlineTime` |
+| `AGENTS.md`                         | Updated metrics, deprecation notices, gotchas                                         |
 
 ---
 

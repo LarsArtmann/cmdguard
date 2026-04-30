@@ -115,13 +115,13 @@ cmdguard/
 
 ## Key Dependencies
 
-| Library                   | Purpose              | Version |
-| ------------------------- | -------------------- | ------- |
-| `github.com/spf13/cobra`  | CLI framework        | v1.10.2 |
-| `github.com/samber/do/v2` | Dependency injection | v2.0.0  |
-| `github.com/spf13/pflag`  | Flag parsing         | v1.0.10 |
-| `charm.land/fang/v2`      | Cobra styling        | v2.0.1  |
-| `github.com/larsartmann/go-output` | Rich output formats | latest |
+| Library                            | Purpose              | Version |
+| ---------------------------------- | -------------------- | ------- |
+| `github.com/spf13/cobra`           | CLI framework        | v1.10.2 |
+| `github.com/samber/do/v2`          | Dependency injection | v2.0.0  |
+| `github.com/spf13/pflag`           | Flag parsing         | v1.0.10 |
+| `charm.land/fang/v2`               | Cobra styling        | v2.0.1  |
+| `github.com/larsartmann/go-output` | Rich output formats  | latest  |
 
 ---
 
@@ -181,20 +181,20 @@ cli, err := v2.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
 
 Functional options:
 
-| Option                   | Purpose                                     |
-| ------------------------ | ------------------------------------------- |
-| `WithCLIVersion[T](v)`   | Set version string                          |
-| `WithCLILong[T](desc)`   | Set long description                        |
-| `WithCLIScope[T](scope)` | Set custom DI scope                         |
-| `WithSilenceErrors[T]()` | Suppress cobra error printing               |
-| `WithSilenceUsage[T]()`  | Suppress usage on error                     |
-| `WithColor[T](bool)`     | Enable/disable fang styling (default: true) |
-| `WithFang[T](bool)`     | Enable/disable fang styling (preferred)     |
-| `WithFangOptions[T](opts...)` | Custom fang options                    |
-| `WithMiddleware[T](mw...)` | Middleware wrapping every handler        |
-| `WithGroup[T](id, title)` | Register command group on root            |
-| `WithEnvPrefix[T](prefix)` | Prefix for env var lookups              |
-| `WithSignalHandling[T]()` | Cancel context on SIGINT/SIGTERM          |
+| Option                        | Purpose                                     |
+| ----------------------------- | ------------------------------------------- |
+| `WithCLIVersion[T](v)`        | Set version string                          |
+| `WithCLILong[T](desc)`        | Set long description                        |
+| `WithCLIScope[T](scope)`      | Set custom DI scope                         |
+| `WithSilenceErrors[T]()`      | Suppress cobra error printing               |
+| `WithSilenceUsage[T]()`       | Suppress usage on error                     |
+| `WithColor[T](bool)`          | Enable/disable fang styling (default: true) |
+| `WithFang[T](bool)`           | Enable/disable fang styling (preferred)     |
+| `WithFangOptions[T](opts...)` | Custom fang options                         |
+| `WithMiddleware[T](mw...)`    | Middleware wrapping every handler           |
+| `WithGroup[T](id, title)`     | Register command group on root              |
+| `WithEnvPrefix[T](prefix)`    | Prefix for env var lookups                  |
+| `WithSignalHandling[T]()`     | Cancel context on SIGINT/SIGTERM            |
 
 ### CLI[T] Methods
 
@@ -405,13 +405,13 @@ go build ./...                                   # Verify build
 3. **DI-Powered** - samber/do/v2 for dependency injection
 4. **Typed Flags** - Struct tags for flag definitions
 5. **Standalone AddCommand** - Function (not method) to support per-command flag types
-7. **Env tags** - `env:"VAR_NAME"` struct tag reads from environment
-8. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
-9. **Signal handling** - `WithSignalHandling[T]()` for graceful shutdown
-10. **Rich output** - OutputTable/OutputResult with 12+ formats
-11. **Extensible types** - `RegisterTypeHandler()` for custom flag types
-12. **$EDITOR support** - `EditInEditor()` for user input editing
-13. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
+6. **Env tags** - `env:"VAR_NAME"` struct tag reads from environment
+7. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
+8. **Signal handling** - `WithSignalHandling[T]()` for graceful shutdown
+9. **Rich output** - OutputTable/OutputResult with 12+ formats
+10. **Extensible types** - `RegisterTypeHandler()` for custom flag types
+11. **$EDITOR support** - `EditInEditor()` for user input editing
+12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 
 ### Key Gotchas
 

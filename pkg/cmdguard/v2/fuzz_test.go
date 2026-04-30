@@ -105,7 +105,7 @@ func FuzzSetField(f *testing.F) {
 	f.Add("Nonexistent", "value")
 	f.Add("", "")
 
-	f.Fuzz(func(t *testing.T, fieldName string, value string) {
+	f.Fuzz(func(t *testing.T, fieldName, value string) {
 		cfg := &config{}
 		_ = SetField(cfg, fieldName, value)
 	})

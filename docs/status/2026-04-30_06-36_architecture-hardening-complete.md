@@ -15,20 +15,20 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ## Current Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Build | `go build ./...` — 0 errors | ✅ Clean |
-| Tests | 199 passing with `-race` | ✅ Clean |
-| Lint | `golangci-lint run ./...` — 0 issues | ✅ Clean |
-| Vet | `go vet ./...` — 0 issues | ✅ Clean |
-| Coverage | 80.9% (`pkg/cmdguard/v2`) | ✅ Good |
-| Race conditions | 0 | ✅ Clean |
-| Source files | 96 in `pkg/cmdguard/v2/` (33 production, 63 test) | |
-| Total lines | 16,323 in v2 package | |
-| Examples | 12 directories | |
-| Dependencies | All published (no local replace) | ✅ Clean |
-| CI | GitHub Actions (build+test+lint) | ✅ Active |
-| Uncommitted | Auto-formatting drift only (golines, go.mod tidy) | ⚠️ Trivial |
+| Metric          | Value                                             | Status     |
+| --------------- | ------------------------------------------------- | ---------- |
+| Build           | `go build ./...` — 0 errors                       | ✅ Clean   |
+| Tests           | 199 passing with `-race`                          | ✅ Clean   |
+| Lint            | `golangci-lint run ./...` — 0 issues              | ✅ Clean   |
+| Vet             | `go vet ./...` — 0 issues                         | ✅ Clean   |
+| Coverage        | 80.9% (`pkg/cmdguard/v2`)                         | ✅ Good    |
+| Race conditions | 0                                                 | ✅ Clean   |
+| Source files    | 96 in `pkg/cmdguard/v2/` (33 production, 63 test) |            |
+| Total lines     | 16,323 in v2 package                              |            |
+| Examples        | 12 directories                                    |            |
+| Dependencies    | All published (no local replace)                  | ✅ Clean   |
+| CI              | GitHub Actions (build+test+lint)                  | ✅ Active  |
+| Uncommitted     | Auto-formatting drift only (golines, go.mod tidy) | ⚠️ Trivial |
 
 ---
 
@@ -36,32 +36,32 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ### Bugs Fixed (This Session — 12 commits pushed)
 
-| # | Bug | File | Severity |
-|---|-----|------|----------|
-| 1 | **BranchingFlowContext double-cancellation** — `Cancel()` called both `b.cancels[i]()` and `child.Cancel()`, invoking the same cancel func twice | `flow_context.go` | 🔴 Real bug |
-| 2 | **Enum.Allowed() returns internal slice** — callers could mutate the enum's allowed values | `types_enum.go` | 🟡 Defensive |
-| 3 | **RecoveryMiddleware loses stack trace** — only captured panic value, not the stack | `middleware.go` | 🟡 Debug quality |
+| #   | Bug                                                                                                                                              | File              | Severity         |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ---------------- |
+| 1   | **BranchingFlowContext double-cancellation** — `Cancel()` called both `b.cancels[i]()` and `child.Cancel()`, invoking the same cancel func twice | `flow_context.go` | 🔴 Real bug      |
+| 2   | **Enum.Allowed() returns internal slice** — callers could mutate the enum's allowed values                                                       | `types_enum.go`   | 🟡 Defensive     |
+| 3   | **RecoveryMiddleware loses stack trace** — only captured panic value, not the stack                                                              | `middleware.go`   | 🟡 Debug quality |
 
 ### Architecture Improvements (This Session)
 
-| # | Change | Files | Impact |
-|---|--------|-------|--------|
-| 4 | Use `errors.Join` in `Scope.ShutdownAll` | `scope.go` | Proper error chains for `errors.Is`/`errors.As` |
-| 5 | Fix `Scope.Path()` allocation | `scope.go` | Collect-then-reverse instead of prepend-per-iteration |
-| 6 | Extract shared `lookupFlagInCommand` | `flags.go`, `flags_parse.go` | Eliminated duplicated local→persistent lookup |
-| 7 | `getFieldValue` uses `fmt.Stringer` | `config.go` | No more hardcoded type switch per custom type |
-| 8 | Table-driven type handler registration | `type_handler.go` | **-52 lines**, 5 identical handlers → loop |
-| 9 | `makeEnumLikeHandler` for LogLevel/LogFormat | `type_handler.go` | Deduplicated enum-like help formatting |
-| 10 | `parseAndSetValue` delegates to `SetField` | `flags_parse.go` | **-20 lines**, removed duplicated reflect logic |
-| 11 | `map[string]struct{}` for command set | `cli.go` | Idiomatic Go |
-| 12 | `SetConfig` WARNING documentation | `cli_accessors.go` | Footgun documented |
+| #   | Change                                       | Files                        | Impact                                                |
+| --- | -------------------------------------------- | ---------------------------- | ----------------------------------------------------- |
+| 4   | Use `errors.Join` in `Scope.ShutdownAll`     | `scope.go`                   | Proper error chains for `errors.Is`/`errors.As`       |
+| 5   | Fix `Scope.Path()` allocation                | `scope.go`                   | Collect-then-reverse instead of prepend-per-iteration |
+| 6   | Extract shared `lookupFlagInCommand`         | `flags.go`, `flags_parse.go` | Eliminated duplicated local→persistent lookup         |
+| 7   | `getFieldValue` uses `fmt.Stringer`          | `config.go`                  | No more hardcoded type switch per custom type         |
+| 8   | Table-driven type handler registration       | `type_handler.go`            | **-52 lines**, 5 identical handlers → loop            |
+| 9   | `makeEnumLikeHandler` for LogLevel/LogFormat | `type_handler.go`            | Deduplicated enum-like help formatting                |
+| 10  | `parseAndSetValue` delegates to `SetField`   | `flags_parse.go`             | **-20 lines**, removed duplicated reflect logic       |
+| 11  | `map[string]struct{}` for command set        | `cli.go`                     | Idiomatic Go                                          |
+| 12  | `SetConfig` WARNING documentation            | `cli_accessors.go`           | Footgun documented                                    |
 
 ### New Features
 
-| # | Feature | Files |
-|---|---------|-------|
-| 13 | NewParentCommand example (`examples/subcommands/`) | `main.go` |
-| 14 | Shareable pre-commit hook (`scripts/pre-commit`) | `pre-commit` |
+| #   | Feature                                            | Files        |
+| --- | -------------------------------------------------- | ------------ |
+| 13  | NewParentCommand example (`examples/subcommands/`) | `main.go`    |
+| 14  | Shareable pre-commit hook (`scripts/pre-commit`)   | `pre-commit` |
 
 ### Prior Sessions (Also Done)
 
@@ -87,28 +87,28 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ## b) PARTIALLY DONE
 
-| Item | Status | What's Left |
-|------|--------|-------------|
-| Pre-commit hooks | Script exists at `scripts/pre-commit` but must be manually copied to `.git/hooks/`. No `lefthook`/`husky`/`pre-commit` framework integration. | Auto-install mechanism |
-| Benchmarks | 18 benchmark functions exist in `benchmarks/guard_bench_test.go` but TODO_LIST says "add CLI construction/flag parsing/command execution benchmarks" — unclear if existing ones cover these. | Verify coverage, add if missing |
-| CI codecov | Not integrated | Add `codecov` step to GitHub Actions |
+| Item             | Status                                                                                                                                                                                       | What's Left                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Pre-commit hooks | Script exists at `scripts/pre-commit` but must be manually copied to `.git/hooks/`. No `lefthook`/`husky`/`pre-commit` framework integration.                                                | Auto-install mechanism               |
+| Benchmarks       | 18 benchmark functions exist in `benchmarks/guard_bench_test.go` but TODO_LIST says "add CLI construction/flag parsing/command execution benchmarks" — unclear if existing ones cover these. | Verify coverage, add if missing      |
+| CI codecov       | Not integrated                                                                                                                                                                               | Add `codecov` step to GitHub Actions |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Item | Effort | Impact |
-|---|------|--------|--------|
-| 1 | Codecov integration in CI | Small | Medium |
-| 2 | v2.2.0 release tag and notes | Small | High |
-| 3 | Release automation (goreleaser?) | Medium | Medium |
-| 4 | Benchmark regression detection in CI | Medium | Medium |
-| 5 | Config file auto-loading with koanf | Large | High |
-| 6 | Interactive prompts (huh integration) | Large | Medium |
-| 7 | Spinner/progress middleware (bubbles) | Medium | Low |
-| 8 | Glamour markdown help rendering | Medium | Medium |
-| 9 | Telemetry middleware (OpenTelemetry) | Medium | Low |
-| 10 | Plugin system for custom validators | Large | Medium |
+| #   | Item                                  | Effort | Impact |
+| --- | ------------------------------------- | ------ | ------ |
+| 1   | Codecov integration in CI             | Small  | Medium |
+| 2   | v2.2.0 release tag and notes          | Small  | High   |
+| 3   | Release automation (goreleaser?)      | Medium | Medium |
+| 4   | Benchmark regression detection in CI  | Medium | Medium |
+| 5   | Config file auto-loading with koanf   | Large  | High   |
+| 6   | Interactive prompts (huh integration) | Large  | Medium |
+| 7   | Spinner/progress middleware (bubbles) | Medium | Low    |
+| 8   | Glamour markdown help rendering       | Medium | Medium |
+| 9   | Telemetry middleware (OpenTelemetry)  | Medium | Low    |
+| 10  | Plugin system for custom validators   | Large  | Medium |
 
 ---
 
@@ -172,33 +172,33 @@ No regressions, no broken tests, no unfixable issues. The codebase is in its bes
 
 Sorted by **impact × effort** (highest first):
 
-| # | Task | Effort | Impact | Type |
-|---|------|--------|--------|------|
-| 1 | **Tag v2.2.0 release** with release notes | 30min | 🔴 High | Release |
-| 2 | **Commit the auto-formatting drift** (golines, go.mod tidy) | 5min | 🟡 Medium | Housekeeping |
-| 3 | **Add `.gitignore` entry** for compiled binaries (env-tags, subcommands) | 2min | 🟡 Medium | Housekeeping |
-| 4 | **Verify benchmark coverage** — do existing benchmarks cover CLI construction, flag parsing, command execution? | 30min | 🟡 Medium | Testing |
-| 5 | **Add codecov to CI** | 30min | 🟡 Medium | CI |
-| 6 | **Set up goreleaser** for release automation | 2hr | 🟡 Medium | CI |
-| 7 | **Make `RegisterInScope` generic** instead of `...any` | 1hr | 🟡 Medium | Architecture |
-| 8 | **Change `BranchWithTimeout`/`BranchWithDeadline`** to accept `time.Duration`/`time.Time` | 30min | 🟡 Medium | API |
-| 9 | **Rename `Get[T]`/`MustGet[T]`** to `GetFlowValue[T]`/`MustGetFlowValue[T]` | 15min | 🟢 Low | API |
-| 10 | **Remove `FlowContextAccessor`** — use `BranchingFlowContext` directly | 30min | 🟢 Low | Cleanup |
-| 11 | **Remove `IsExecutable`** method from Command | 5min | 🟢 Low | API |
-| 12 | **Collapse `validateMin`/`validateMax`** into parameterized validators | 1hr | 🟢 Low | Dedup |
-| 13 | **Cache regex compilation** in `validateRegex` | 15min | 🟢 Low | Perf |
-| 14 | **Unexport `derefPointerToStruct`** | 5min | 🟢 Low | Encapsulation |
-| 15 | **Add `.gitignore`** for example binaries | 2min | 🟢 Low | Housekeeping |
-| 16 | **Remove `wireSubcommandSuggestions`** no-op | 15min | 🟢 Low | Dead code |
-| 17 | **Remove `outputState` mutex** — document single-threaded assumption | 15min | 🟢 Low | Simplicity |
-| 18 | **Generate help string from valid format list** in cli_output.go | 30min | 🟢 Low | DRY |
-| 19 | **Make `NoFlags` a distinct named type** | 30min | 🟢 Low | API (breaking) |
-| 20 | **Add `TimingMiddleware` error parameter** | 30min | 🟢 Low | API (breaking) |
-| 21 | **Config file auto-loading with koanf** | 1-2 days | 🔴 High | Feature |
-| 22 | **Interactive prompts (huh)** | 1-2 days | 🟡 Medium | Feature |
-| 23 | **Glamour markdown help rendering** | 4hr | 🟡 Medium | Feature |
-| 24 | **Telemetry middleware (OpenTelemetry)** | 4hr | 🟢 Low | Feature |
-| 25 | **Plugin system for custom validators** | 1-2 days | 🟡 Medium | Feature |
+| #   | Task                                                                                                            | Effort   | Impact    | Type           |
+| --- | --------------------------------------------------------------------------------------------------------------- | -------- | --------- | -------------- |
+| 1   | **Tag v2.2.0 release** with release notes                                                                       | 30min    | 🔴 High   | Release        |
+| 2   | **Commit the auto-formatting drift** (golines, go.mod tidy)                                                     | 5min     | 🟡 Medium | Housekeeping   |
+| 3   | **Add `.gitignore` entry** for compiled binaries (env-tags, subcommands)                                        | 2min     | 🟡 Medium | Housekeeping   |
+| 4   | **Verify benchmark coverage** — do existing benchmarks cover CLI construction, flag parsing, command execution? | 30min    | 🟡 Medium | Testing        |
+| 5   | **Add codecov to CI**                                                                                           | 30min    | 🟡 Medium | CI             |
+| 6   | **Set up goreleaser** for release automation                                                                    | 2hr      | 🟡 Medium | CI             |
+| 7   | **Make `RegisterInScope` generic** instead of `...any`                                                          | 1hr      | 🟡 Medium | Architecture   |
+| 8   | **Change `BranchWithTimeout`/`BranchWithDeadline`** to accept `time.Duration`/`time.Time`                       | 30min    | 🟡 Medium | API            |
+| 9   | **Rename `Get[T]`/`MustGet[T]`** to `GetFlowValue[T]`/`MustGetFlowValue[T]`                                     | 15min    | 🟢 Low    | API            |
+| 10  | **Remove `FlowContextAccessor`** — use `BranchingFlowContext` directly                                          | 30min    | 🟢 Low    | Cleanup        |
+| 11  | **Remove `IsExecutable`** method from Command                                                                   | 5min     | 🟢 Low    | API            |
+| 12  | **Collapse `validateMin`/`validateMax`** into parameterized validators                                          | 1hr      | 🟢 Low    | Dedup          |
+| 13  | **Cache regex compilation** in `validateRegex`                                                                  | 15min    | 🟢 Low    | Perf           |
+| 14  | **Unexport `derefPointerToStruct`**                                                                             | 5min     | 🟢 Low    | Encapsulation  |
+| 15  | **Add `.gitignore`** for example binaries                                                                       | 2min     | 🟢 Low    | Housekeeping   |
+| 16  | **Remove `wireSubcommandSuggestions`** no-op                                                                    | 15min    | 🟢 Low    | Dead code      |
+| 17  | **Remove `outputState` mutex** — document single-threaded assumption                                            | 15min    | 🟢 Low    | Simplicity     |
+| 18  | **Generate help string from valid format list** in cli_output.go                                                | 30min    | 🟢 Low    | DRY            |
+| 19  | **Make `NoFlags` a distinct named type**                                                                        | 30min    | 🟢 Low    | API (breaking) |
+| 20  | **Add `TimingMiddleware` error parameter**                                                                      | 30min    | 🟢 Low    | API (breaking) |
+| 21  | **Config file auto-loading with koanf**                                                                         | 1-2 days | 🔴 High   | Feature        |
+| 22  | **Interactive prompts (huh)**                                                                                   | 1-2 days | 🟡 Medium | Feature        |
+| 23  | **Glamour markdown help rendering**                                                                             | 4hr      | 🟡 Medium | Feature        |
+| 24  | **Telemetry middleware (OpenTelemetry)**                                                                        | 4hr      | 🟢 Low    | Feature        |
+| 25  | **Plugin system for custom validators**                                                                         | 1-2 days | 🟡 Medium | Feature        |
 
 ---
 
@@ -207,6 +207,7 @@ Sorted by **impact × effort** (highest first):
 **Should `NoFlags` remain a type alias or become a distinct type?**
 
 Currently `NoFlags = struct{}` (alias). Changing to `NoFlags struct{}` (distinct type) would:
+
 - ✅ Prevent accidental `struct{}` from matching `NoFlags` behavior
 - ✅ Allow adding methods to `NoFlags` later (e.g., `String()`)
 - ❌ Break any code comparing `Command[T, struct{}]` with `Command[T, NoFlags]`
@@ -219,18 +220,21 @@ This is an API-breaking change. **Is the v2 API considered stable enough that we
 ## Session History
 
 ### Session 1 (prior)
+
 - 113 lint → 0 lint
 - 55 race conditions → 0
 - Output.go registry refactor
 - go-output v0.1.0 published
 
 ### Session 2 (prior)
+
 - v2.2.0 features complete
 - 6 new examples
 - CI workflow
 - Documentation updated
 
 ### Session 3 (this session — 12 commits)
+
 - Fixed 3 bugs (double-cancel, Enum mutation, lost stack traces)
 - 9 architecture improvements (deduplication, delegation, type safety)
 - 2 new features (subcommands example, pre-commit hook)
