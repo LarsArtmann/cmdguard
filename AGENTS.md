@@ -3,7 +3,7 @@
 **Last Updated:** 2026-04-30
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.2.0 - 199 tests, 80.6% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.2.0 - 199 tests, 80.9% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -38,7 +38,7 @@ go test ./... -count=1 -timeout 120s -cover
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.2.0. 806 tests passing, 81.2% coverage, 0 build errors.
+**Current Status:** v2.2.0. 199 tests passing, 80.9% coverage, 0 build errors.
 
 ---
 
@@ -108,7 +108,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | 81.2%    |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | 80.9%    |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -425,6 +425,9 @@ go build ./...                                   # Verify build
 8. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 9. **Global type registry** — `RegisterTypeHandler()` writes global state; tests must not run in parallel
 10. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
+11. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly
+12. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
+13. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 
 ---
 
