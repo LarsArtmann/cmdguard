@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/samber/do/v2"
@@ -180,7 +181,7 @@ func (s *Scope) ShutdownAll(ctx context.Context) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("%w: %v", ErrServiceConstruction, errs)
+		return fmt.Errorf("%w: %w", ErrServiceConstruction, errors.Join(errs...))
 	}
 
 	return nil
@@ -273,15 +274,20 @@ func (s *Scope) IsRoot() bool {
 
 // Path returns the full scope path from root to this scope.
 func (s *Scope) Path() []string {
-	var path []string
+	names := []string{}
 
 	current := s
 	for current != nil {
-		path = append([]string{current.name}, path...)
+		names = append(names, current.name)
 		current = current.parent
 	}
 
-	return path
+	// Reverse to get root-first order
+	for i, j := 0, len(names)-1; i < j; i, j = i+1, j-1 {
+		names[i], names[j] = names[j], names[i]
+	}
+
+	return names
 }
 
 // Package returns a samber/do package function for DI integration.
