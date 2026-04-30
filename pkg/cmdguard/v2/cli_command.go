@@ -109,6 +109,14 @@ func cliToCobraCommand[T, F any](
 		wireSubcommandSuggestions(cobraCmd)
 	}
 
+	if cmd.completionFn != nil {
+		cobraCmd.ValidArgsFunction = cmd.completionFn
+	}
+
+	if len(cmd.validArgs) > 0 {
+		cobraCmd.ValidArgs = cmd.validArgs
+	}
+
 	return cobraCmd, nil
 }
 

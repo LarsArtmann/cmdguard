@@ -29,6 +29,8 @@ type Command[T any, F any] struct {
 	silenceErrors bool
 	silenceUsage  bool
 	group         string
+	completionFn  CompletionFunc
+	validArgs     []string
 }
 
 // Use returns the command name and usage string.

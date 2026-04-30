@@ -31,6 +31,9 @@ type CLI[T any] struct {
 	middleware       []Middleware[T]
 	envPrefix       string
 	signalHandling  bool
+	outputEnabled   bool
+	outputFormat    OutputFormat
+	outputState     *outputState
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -95,13 +98,19 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		registry.SetEnvPrefix(cli.envPrefix)
 	}
 
+	cli.initOutputFlag()
+
 	err = registry.RegisterPersistentFlags(cli.rootCmd)
 	if err != nil {
 		return fmt.Errorf("registering global flags for %T: %w", defaults, err)
 	}
 
 	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
-		return registry.ParseFlags(c, cli.config)
+		if err := registry.ParseFlags(c, cli.config); err != nil {
+			return err
+		}
+
+		return cli.parseOutputFlag(c)
 	}
 
 	return nil
