@@ -255,12 +255,11 @@ func (r *typeRegistry) registerKinds() {
 
 func (r *typeRegistry) registerCustomTypes() {
 	enumHelp := func(tag FlagTag) string {
-		help := tag.Help
 		if len(tag.Values) > 0 {
-			help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
+			return fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
 		}
 
-		return help
+		return tag.Help
 	}
 
 	r.byType[reflect.TypeFor[Duration]()] = TypeHandlerFunc{
@@ -322,11 +321,7 @@ func (r *typeRegistry) registerCustomTypes() {
 			if len(tag.Values) > 0 {
 				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
 			} else {
-				help = fmt.Sprintf(
-					"%s (one of: %s)",
-					tag.Help,
-					strings.Join(logFormatAllowed, ", "),
-				)
+				help = fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(logFormatAllowed, ", "))
 			}
 
 			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
