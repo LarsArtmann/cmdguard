@@ -266,15 +266,29 @@ func validateMax(value string) error {
 	return nil
 }
 
+// regexCache caches compiled regex patterns to avoid recompilation on every validate call.
+var regexCache sync.Map // map[string]*regexp.Regexp
+
 func validateRegex(value string) error {
 	pattern, val, ok := strings.Cut(value, ":")
 	if !ok {
 		return fmt.Errorf("%w: regex requires format \"pattern:value\"", ErrInvalidValidatorParam)
 	}
 
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return fmt.Errorf("%w: regex: invalid pattern %q", ErrInvalidValidatorParam, pattern)
+	cached, loaded := regexCache.Load(pattern)
+	var re *regexp.Regexp
+
+	if loaded {
+		re = cached.(*regexp.Regexp)
+	} else {
+		var err error
+
+		re, err = regexp.Compile(pattern)
+		if err != nil {
+			return fmt.Errorf("%w: regex: invalid pattern %q", ErrInvalidValidatorParam, pattern)
+		}
+
+		regexCache.Store(pattern, re)
 	}
 
 	if !re.MatchString(val) {
