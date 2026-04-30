@@ -23,7 +23,6 @@ type BranchingFlowContext struct {
 
 	path       []string
 	values     map[any]any
-	cancels    []context.CancelFunc
 	selfCancel context.CancelFunc
 	parent     *BranchingFlowContext
 	children   []*BranchingFlowContext
@@ -41,7 +40,6 @@ func NewBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
 		Context:  ctx,
 		path:     []string{},
 		values:   make(map[any]any),
-		cancels:  nil,
 		parent:   nil,
 		children: nil,
 	}
@@ -59,7 +57,6 @@ func (b *BranchingFlowContext) Branch(
 	child.selfCancel = cancel
 	applyOptions(child, opts)
 	b.children = append(b.children, child)
-	b.cancels = append(b.cancels, cancel)
 
 	return child, cancel
 }
@@ -81,7 +78,6 @@ func (b *BranchingFlowContext) BranchWithTimeout(
 	child.selfCancel = cancel
 	applyOptions(child, opts)
 	b.children = append(b.children, child)
-	b.cancels = append(b.cancels, cancel)
 
 	return child, cancel, nil
 }
@@ -103,7 +99,6 @@ func (b *BranchingFlowContext) BranchWithDeadline(
 	child.selfCancel = cancel
 	applyOptions(child, opts)
 	b.children = append(b.children, child)
-	b.cancels = append(b.cancels, cancel)
 
 	return child, cancel, nil
 }
@@ -117,7 +112,6 @@ func (b *BranchingFlowContext) newChild(
 		Context:  ctx,
 		path:     append(slices.Clone(b.path), commandName),
 		values:   maps.Clone(b.values),
-		cancels:  nil,
 		parent:   b,
 		children: nil,
 	}
@@ -211,13 +205,10 @@ func (b *BranchingFlowContext) Value(key any) any {
 }
 
 // Cancel cancels this context and all its children.
+// Each node cancels its own context via selfCancel, then recursively cancels children.
 func (b *BranchingFlowContext) Cancel() {
 	if b.selfCancel != nil {
 		b.selfCancel()
-	}
-
-	for _, cancel := range b.cancels {
-		cancel()
 	}
 
 	for _, child := range b.children {
