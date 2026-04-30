@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-04-30
-**Status:** v2.2.0 — 199 tests, 80.6% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.2.0 — 199 tests, 80.9% coverage, 0 lint issues, 0 race conditions
 
 ## Completed ✅
 
@@ -33,6 +33,7 @@
 - [x] Update docs/QUICKSTART.md for v2.2 API
 - [x] Update README.md with v2.2 features
 - [x] Add 6 working examples (env-tags, output, counting, di-patterns, error-handling, signals)
+- [x] Add subcommands example demonstrating NewParentCommand
 - [x] Update examples/README.md with feature matrix
 
 ### Phase 4: New Features
@@ -48,6 +49,24 @@
 - [x] Add sentinel errors ErrUnsupportedFormat, ErrFormatRequiresTypedData
 - [x] Add context.Context to EditInEditor
 
+### Phase 6: Architecture Hardening
+- [x] Fix BranchingFlowContext double-cancellation bug
+- [x] Fix Enum.Allowed() returning internal slice (defensive copy)
+- [x] Use errors.Join in Scope.ShutdownAll for proper error chains
+- [x] Fix Scope.Path() allocation (collect-then-reverse)
+- [x] Extract shared lookupFlagInCommand (deduplicate flags.go/flags_parse.go)
+- [x] Replace hardcoded type switch in getFieldValue with fmt.Stringer
+- [x] Deduplicate custom type handler registrations (makeEnumLikeHandler + table-driven)
+- [x] Add stack trace capture to RecoveryMiddleware
+- [x] Simplify parseAndSetValue to delegate to SetField (remove duplication)
+- [x] Use map[string]struct{} for command registration set
+- [x] Document SetConfig FlagRegistry desync warning
+
+### Phase 7: Tooling
+- [x] Add shareable pre-commit hook script (scripts/pre-commit)
+- [x] Add GitHub Actions CI workflow (build, test, lint)
+- [x] Add NewParentCommand example
+
 ## Remaining Work
 
 ### ⚡ Performance
@@ -57,14 +76,9 @@
 - [ ] Add benchmark regression detection to CI
 
 ### ⚙️ CI/CD
-- [ ] Add GitHub Actions CI workflow (build, test, lint)
 - [ ] Add codecov integration
-- [ ] Fix pre-commit hooks
 - [ ] Create v2.2.0 release tag and notes
 - [ ] Set up release automation
-
-### 📚 Examples
-- [ ] Add NewParentCommand example
 
 ### 🔮 Future (v3.0+)
 - [ ] Config file auto-loading with koanf (YAML/TOML/.env)
@@ -73,3 +87,13 @@
 - [ ] Glamour markdown help rendering
 - [ ] Telemetry middleware (OpenTelemetry spans)
 - [ ] Plugin system for custom validators and type handlers
+
+### 🧹 Future Cleanup (API-breaking, defer to v3.0)
+- [ ] Make NoFlags a distinct named type (not type alias)
+- [ ] Change TimingMiddleware callback to include error
+- [ ] Change BranchWithTimeout/BranchWithDeadline to accept typed params
+- [ ] Remove FlowContextAccessor (thin wrapper with no added value)
+- [ ] Rename Get[T]/MustGet[T] to more specific names
+- [ ] Make RegisterInScope generic instead of `...any`
+- [ ] Remove or redesign Package() for error-safe DI integration
+- [ ] Add exit code support to ExecuteAndExit
