@@ -141,6 +141,11 @@ func (r *FlagRegistry) validateEnumValue(cmd *cobra.Command, tag FlagTag) error 
 
 // lookupFlagForValidation finds a flag by name for validation purposes.
 func (r *FlagRegistry) lookupFlagForValidation(cmd *cobra.Command, name string) *pflag.Flag {
+	return lookupFlagInCommand(cmd, name)
+}
+
+// lookupFlagInCommand finds a flag by name, checking local then persistent flags.
+func lookupFlagInCommand(cmd *cobra.Command, name string) *pflag.Flag {
 	flag := cmd.Flags().Lookup(name)
 	if flag == nil {
 		flag = cmd.PersistentFlags().Lookup(name)

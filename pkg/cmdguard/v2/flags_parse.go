@@ -66,11 +66,7 @@ func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error
 
 // lookupFlag finds a flag in the command.
 func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag, error) {
-	flag := cmd.Flags().Lookup(tag.Name)
-	if flag == nil {
-		// Try persistent flags
-		flag = cmd.PersistentFlags().Lookup(tag.Name)
-	}
+	flag := lookupFlagInCommand(cmd, tag.Name)
 
 	if flag == nil {
 		return nil, fmt.Errorf(
