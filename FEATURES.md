@@ -49,6 +49,7 @@
 | `WithGroup[T](id,title)` | ✅ FULLY_FUNCTIONAL | Command groups in help               |
 | `WithEnvPrefix[T](pfx)`  | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups           |
 | `WithSignalHandling[T]()` | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation |
+| `WithOutputFormat[T]()` | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
 
 ### Command[T, F]
 
@@ -117,6 +118,22 @@
 | `TimingMiddleware`    | ✅ FULLY_FUNCTIONAL | Log command execution duration   |
 | `RecoveryMiddleware`  | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers  |
 | Custom middleware     | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
+
+### Shell Completion
+
+|| Feature                      | Status              | Notes                                     |
+| ----------------------------- | ------------------- | ----------------------------------------- |
+| `WithCompletion[T,F](fn)`     | ✅ FULLY_FUNCTIONAL | Dynamic shell completion                  |
+| `WithValidArgs[T,F](args...)` | ✅ FULLY_FUNCTIONAL | Static valid arguments                    |
+| `CompletionFunc` type         | ✅ FULLY_FUNCTIONAL | Compatible with cobra ValidArgsFunction   |
+
+### Man Page Generation
+
+|| Feature                         | Status              | Notes                                |
+| ------------------------------- | ------------------- | ------------------------------------ |
+| `cli.ManPage(section)`          | ✅ FULLY_FUNCTIONAL | Generate roff man page               |
+| `cli.WriteManPage(w, section)`  | ✅ FULLY_FUNCTIONAL | Write man page to io.Writer          |
+| `GenerateManPageCommand[T](cli)` | ✅ FULLY_FUNCTIONAL | Create `man` subcommand              |
 
 ### Helpers
 

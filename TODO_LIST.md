@@ -1,92 +1,75 @@
 # TODO List
 
 **Updated:** 2026-04-30
-**Status:** v2.2.0 — Tests + cleanup sprint complete. 806 tests, 81.2% coverage.
+**Status:** v2.2.0 — 199 tests, 80.6% coverage, 0 lint issues, 0 race conditions
 
 ## Completed ✅
 
-### Phase 1: Foundation (1% → 51%)
+### Phase 1: Foundation
 - [x] Unify type dispatch into TypeHandler registry (eliminate 3-way split brain)
 - [x] Fix custom type registration in `setStringField` (URL/Email/Port/FilePath/HostPort)
 - [x] Make validator registry instance-scoped (remove global mutable state)
 - [x] Fix `Ptr[T]` function (returned zero-valued pointer instead of pointer to v)
 - [x] Clean up 52 leftover `_test.go_test` artifact files
 
-### Phase 2: Core Features (4% → 64%)
+### Phase 2: Core Features
 - [x] Add `env:"VAR"` struct tag support with `WithEnvPrefix[T]`
 - [x] Add subcommand typo suggestions (`SuggestCommand`)
 - [x] Add `WithSignalHandling[T]()` for SIGINT/SIGTERM context cancellation
 - [x] Add go-output integration (12 output formats)
 - [x] Add `count:"true"` struct tag for counting flags (-vvv → 3)
-- [x] Add `EditInEditor()` $EDITOR helper
+- [x] Add `EditInEditor()` $EDITOR helper (now with context.Context)
 - [x] Add `WithFang[T]()` as proper name (deprecate `WithColor`)
 - [x] Add fuzz tests for all value type parsers and parsing functions
 - [x] Propagate envPrefix to command-level FlagRegistry
 
 ### Phase 2: Test & Cleanup Sprint
-- [x] Add type_handler_test.go (137 tests: custom types, count handler, dispatch, lookup)
-- [x] Add output_test.go (ParseOutputFormat, OutputResult, OutputTable)
-- [x] Add editor_test.go (EditInEditor with mock $EDITOR)
-- [x] Add command_suggest_test.go (SuggestCommand delegation)
-- [x] Add counting_flag_test.go (integration tests -vvv → 3)
-- [x] Add env_tag_test.go (env var priority chain, prefix, override)
-- [x] Add GenerateHelp/FlagNames tests
+- [x] Add comprehensive tests for all v2.2 features
 - [x] Remove dead code: parseCustomDefault, wrapErr, parseField, parseAndSetLog*
 - [x] Fix SuggestFlag API to return (string, bool) for consistency
 - [x] Move count handler into registerKinds() for consistency
 
-### Phase 2: Previous Sprint
-- [x] Fix CLI[T] AddCommand flag parsing (cloneAndParseFlags pattern)
-- [x] Refactor nestif complexity in flag_helpers.go
-- [x] Fix err113 dynamic error issues
-- [x] Add t.Parallel() to all v2 tests
-- [x] Add tests for `initialize` error paths
-- [x] Add tests for `cliToCobraCommand` edge cases
-- [x] Add tests for flag helper functions
-- [x] Add WithSilenceErrors, WithSilenceUsage, WithColor CLI options
-- [x] Remove v1 API, internal packages, v1 integration tests (3,841 lines)
-- [x] Remove Option[T]/Result[T] ghost types (1,501 lines)
-- [x] Remove 6 ghost koanf dependencies
-- [x] Fix nilnil, forcetypeassert, exhaustive, err113 lint issues
-- [x] Update all docs (AGENTS.md, README.md, FEATURES.md) to remove v1 refs
-- [x] Archive 31 old status reports
-- [x] Delete .go_test template artifacts and empty internal/ directory
-- [x] Clean .golangci.yml stale references
-
-### Phase 3: Documentation
+### Phase 3: Documentation & Examples
 - [x] Update docs/QUICKSTART.md for v2.2 API
 - [x] Update README.md with v2.2 features
+- [x] Add 6 working examples (env-tags, output, counting, di-patterns, error-handling, signals)
+- [x] Update examples/README.md with feature matrix
+
+### Phase 4: New Features
+- [x] Add `WithOutputFormat[T]` CLI option (auto --output flag)
+- [x] Add shell completion wiring (`WithCompletion[T,F]`, `WithValidArgs[T,F]`)
+- [x] Add man page generation via mango-cobra (`cli.ManPage()`, `GenerateManPageCommand`)
+
+### Phase 5: Quality
+- [x] Fix all 55 race conditions (sync.RWMutex on globalTypeRegistry)
+- [x] Remove local go-output replace directive (tagged v0.1.0)
+- [x] Achieve 0 lint issues (was 113)
+- [x] Refactor output.go from monolithic switch to format renderer registry
+- [x] Add sentinel errors ErrUnsupportedFormat, ErrFormatRequiresTypedData
+- [x] Add context.Context to EditInEditor
 
 ## Remaining Work
 
-### 📊 Performance
-- [ ] Add comprehensive performance benchmarks
+### ⚡ Performance
+- [ ] Add CLI construction benchmark
+- [ ] Add flag parsing benchmark
+- [ ] Add command execution benchmark
 - [ ] Add benchmark regression detection to CI
 
-### ⚙️ Release & CI
+### ⚙️ CI/CD
+- [ ] Add GitHub Actions CI workflow (build, test, lint)
+- [ ] Add codecov integration
+- [ ] Fix pre-commit hooks
 - [ ] Create v2.2.0 release tag and notes
 - [ ] Set up release automation
-- [ ] Add codecov integration
-- [ ] Fix pre-commit hooks (currently pre-existing errors)
-- [ ] Fix go-output dependency (remove local replace directive)
 
-### 📚 Documentation
-- [ ] DI Pattern Example in docs/
-- [ ] Error Handling Example in docs/
-- [ ] Env tags example in examples/
-- [ ] go-output example in examples/
-- [ ] Counting flags example in examples/
-- [ ] Signal handling example in examples/
+### 📚 Examples
+- [ ] Add NewParentCommand example
 
 ### 🔮 Future (v3.0+)
 - [ ] Config file auto-loading with koanf (YAML/TOML/.env)
 - [ ] Interactive prompts (huh integration) with `WithPromptOnMissing`
 - [ ] Spinner/progress middleware (bubbles)
-- [ ] Shell completion helpers (`WithCompletion[T,F]`)
-- [ ] Markdown help rendering (glamour)
-- [ ] Man page generation via mango-cobra
+- [ ] Glamour markdown help rendering
 - [ ] Telemetry middleware (OpenTelemetry spans)
 - [ ] Plugin system for custom validators and type handlers
-- [ ] `WithOutputFormat[T]` CLI option (auto --output flag)
-- [ ] Fix T27: CLI in DI scope (implement Healthchecker)
-- [ ] Deprecation warning for `WithColor` at runtime
