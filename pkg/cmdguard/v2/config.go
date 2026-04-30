@@ -105,10 +105,8 @@ func getFieldValue(field reflect.Value) (string, bool) {
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.Bool, reflect.Complex64, reflect.Complex128:
-		if field.Type() == reflect.TypeFor[Enum]() ||
-			field.Type() == reflect.TypeFor[LogLevel]() ||
-			field.Type() == reflect.TypeFor[LogFormat]() {
-			return field.MethodByName("String").Call(nil)[0].String(), true
+		if s, ok := field.Interface().(fmt.Stringer); ok {
+			return s.String(), true
 		}
 
 		return "", false
