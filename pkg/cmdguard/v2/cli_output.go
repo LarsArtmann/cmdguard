@@ -2,14 +2,12 @@ package v2
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/spf13/cobra"
 )
 
 // outputState holds the resolved output format for the CLI.
 type outputState struct {
-	mu     sync.Mutex
 	format OutputFormat
 }
 
@@ -38,9 +36,6 @@ func (cli *CLI[T]) OutputFormat() OutputFormat {
 		return FormatTable
 	}
 
-	cli.outputState.mu.Lock()
-	defer cli.outputState.mu.Unlock()
-
 	return cli.outputState.format
 }
 
@@ -52,9 +47,7 @@ func (cli *CLI[T]) SetOutputFormat(format OutputFormat) {
 		return
 	}
 
-	cli.outputState.mu.Lock()
 	cli.outputState.format = format
-	cli.outputState.mu.Unlock()
 }
 
 // initOutputFlag sets up the --output flag and hooks into flag parsing.
@@ -86,9 +79,7 @@ func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
 		return fmt.Errorf("invalid output format %q: %w", formatStr, err)
 	}
 
-	cli.outputState.mu.Lock()
 	cli.outputState.format = format
-	cli.outputState.mu.Unlock()
 
 	return nil
 }
