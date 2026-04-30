@@ -46,7 +46,7 @@ func prepareRunContext[F any](
 }
 
 func cliToCobraCommand[T, F any](
-	config *T, cmd Command[T, F], middlewares []Middleware[T],
+	config *T, cmd Command[T, F], middlewares []Middleware[T], envPrefix string,
 ) (*cobra.Command, error) {
 	cobraCmd := &cobra.Command{
 		Use:           cmd.use,
@@ -65,7 +65,7 @@ func cliToCobraCommand[T, F any](
 		cobraCmd.GroupID = cmd.group
 	}
 
-	flagRegistry, err := initCommandFlags(cobraCmd, cmd.use, cmd.flags)
+	flagRegistry, err := initCommandFlags(cobraCmd, cmd.use, cmd.flags, envPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func cliToCobraCommand[T, F any](
 	)
 
 	for _, subCmd := range cmd.commands {
-		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares)
+		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, envPrefix)
 		if err != nil {
 			return nil, fmt.Errorf("subcommand of %q: %w", cmd.use, err)
 		}
@@ -122,7 +122,7 @@ func isNoFlags[F any](flags F) bool {
 }
 
 func initCommandFlags[F any](
-	cobraCmd *cobra.Command, use string, flags F,
+	cobraCmd *cobra.Command, use string, flags F, envPrefix string,
 ) (*FlagRegistry, error) {
 	if isNoFlags(flags) {
 		return (*FlagRegistry)(nil), nil
@@ -136,6 +136,10 @@ func initCommandFlags[F any](
 	registry, err := NewFlagRegistry(prototype)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create flag registry for command %q: %w", use, err)
+	}
+
+	if envPrefix != "" {
+		registry.SetEnvPrefix(envPrefix)
 	}
 
 	err = registry.RegisterFlags(cobraCmd)

@@ -40,13 +40,13 @@ func TestSuggestFlag(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			result := SuggestFlag(tt.validNames, tt.input)
+			result, ok := SuggestFlag(tt.validNames, tt.input)
 			if tt.wantOneOf != nil {
-				if !slices.Contains(tt.wantOneOf, result) {
-					t.Errorf("SuggestFlag() = %q, expected to be one of %v", result, tt.wantOneOf)
+				if !ok || !slices.Contains(tt.wantOneOf, result) {
+					t.Errorf("SuggestFlag() = (%q, %v), expected to be one of %v", result, ok, tt.wantOneOf)
 				}
-			} else if result != tt.want {
-				t.Errorf("SuggestFlag() = %q, want %q", result, tt.want)
+			} else if result != tt.want || ok != (tt.want != "") {
+				t.Errorf("SuggestFlag() = (%q, %v), want (%q, %v)", result, ok, tt.want, tt.want != "")
 			}
 		})
 	}
@@ -113,6 +113,69 @@ func TestNewFlagErrorWithSuggestion(t *testing.T) {
 		err := NewFlagErrorWithSuggestion("flag", errInnerError, "suggestion")
 		if !errors.Is(err, errInnerError) {
 			t.Errorf("expected error to unwrap to errInnerError")
+		}
+	})
+}
+
+func TestGenerateHelp(t *testing.T) {
+	t.Parallel()
+
+	t.Run("generates help text for all flags", func(t *testing.T) {
+		t.Parallel()
+
+		type helpConfig struct {
+			Name    string `flag:"name"    short:"n" help:"The name"    default:"world"`
+			Count   int    `flag:"count"             help:"The count"   default:"10"`
+			Verbose bool   `flag:"verbose" short:"v" help:"Be verbose"  default:"false"`
+		}
+
+		registry, err := NewFlagRegistry(helpConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		help := registry.GenerateHelp()
+		assertStringContains(t, help, "--name", "--count", "--verbose", "The name", "default: world")
+	})
+
+	t.Run("empty config returns empty help", func(t *testing.T) {
+		t.Parallel()
+
+		registry, err := NewFlagRegistry(struct{}{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		help := registry.GenerateHelp()
+		if help != "" {
+			t.Errorf("expected empty help, got %q", help)
+		}
+	})
+}
+
+func TestFlagNames(t *testing.T) {
+	t.Parallel()
+
+	t.Run("returns all flag names", func(t *testing.T) {
+		t.Parallel()
+
+		type namesConfig struct {
+			Host string `flag:"host" help:"host" default:"localhost"`
+			Port int    `flag:"port" help:"port" default:"8080"`
+		}
+
+		registry, err := NewFlagRegistry(namesConfig{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		names := registry.FlagNames()
+		if len(names) != 2 {
+			t.Fatalf("expected 2 names, got %d", len(names))
+		}
+
+		if names[0] != "host" || names[1] != "port" {
+			t.Errorf("names = %v, want [host port]", names)
 		}
 	})
 }

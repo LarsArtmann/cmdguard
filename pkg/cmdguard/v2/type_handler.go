@@ -72,12 +72,29 @@ func newTypeRegistry() *typeRegistry {
 
 	r.registerKinds()
 	r.registerCustomTypes()
-	r.registerCountHandler()
 
 	return r
 }
 
 func (r *typeRegistry) registerKinds() {
+	countHandler := TypeHandlerFunc{
+		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
+			if tag.Short != "" {
+				flags.CountP(tag.Name, tag.Short, tag.Help)
+			} else {
+				flags.Count(tag.Name, tag.Help)
+			}
+			return nil
+		},
+		ParseFunc: func(value string, _ FlagTag) (any, error) {
+			return strconv.Atoi(value)
+		},
+		DefaultFunc: func(_ FlagTag) any {
+			return 0
+		},
+	}
+	r.countHandler = countHandler
+
 	r.byKind[reflect.String] = TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
@@ -356,27 +373,7 @@ func (r *typeRegistry) registerCustomTypes() {
 	}
 }
 
-// registerCountHandler registers the counting flag handler.
-// Called during init to support count:"true" tags with int/uint fields.
-func (r *typeRegistry) registerCountHandler() {
-	countHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			if tag.Short != "" {
-				flags.CountP(tag.Name, tag.Short, tag.Help)
-			} else {
-				flags.Count(tag.Name, tag.Help)
-			}
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return strconv.Atoi(value)
-		},
-		DefaultFunc: func(_ FlagTag) any {
-			return 0
-		},
-	}
-	r.countHandler = countHandler
-}
+// registerCountHandler is now part of registerKinds for consistency.
 
 // lookupHandler finds the TypeHandler for a given reflect.Type.
 // Checks exact type match first, then falls back to kind-based lookup.

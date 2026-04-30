@@ -119,7 +119,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 
 	cli.registeredCmds[cmd.use] = true
 
-	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware)
+	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware, cli.envPrefix)
 	if err != nil {
 		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.use, cli.name, err)
 	}

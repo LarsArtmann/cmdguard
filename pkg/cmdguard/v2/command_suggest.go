@@ -7,10 +7,5 @@ func SuggestCommand(validCommands []string, input string) (string, bool) {
 		return "", false
 	}
 
-	match := SuggestFlag(validCommands, input)
-	if match == "" {
-		return "", false
-	}
-
-	return match, true
+	return SuggestFlag(validCommands, input)
 }

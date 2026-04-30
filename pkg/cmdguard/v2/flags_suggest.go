@@ -6,10 +6,10 @@ import "strings"
 const maxEditDistance = 3
 
 // SuggestFlag returns the best matching flag name for a potentially misspelled input.
-// Returns empty string if no good match is found.
-func SuggestFlag(validNames []string, input string) string {
+// Returns the best match and true if a good match is found, or empty string and false otherwise.
+func SuggestFlag(validNames []string, input string) (string, bool) {
 	if len(validNames) == 0 {
-		return ""
+		return "", false
 	}
 
 	bestMatch := ""
@@ -23,12 +23,11 @@ func SuggestFlag(validNames []string, input string) string {
 		}
 	}
 
-	// Only return a match if it's close enough
 	if bestDist <= maxEditDistance {
-		return bestMatch
+		return bestMatch, true
 	}
 
-	return ""
+	return "", false
 }
 
 // editDistance computes the Levenshtein distance between two strings.

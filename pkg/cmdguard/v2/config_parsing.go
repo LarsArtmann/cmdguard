@@ -189,23 +189,6 @@ func parseFloat64Default(s string) (float64, error) {
 	return v, nil
 }
 
-// parseCustomDefault handles custom type defaults.
-func (t FlagTag) parseCustomDefault() any {
-	switch t.Type {
-	case reflect.TypeFor[Duration]():
-		d, err := ParseDuration(t.Default)
-		if err != nil {
-			return Duration{}
-		}
-
-		return d
-	case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
-		return t.Default
-	default:
-		return t.Default
-	}
-}
-
 // DefaultValue returns the default value for a flag based on its type.
 func (t FlagTag) DefaultValue() any {
 	return dispatchDefault(t)
