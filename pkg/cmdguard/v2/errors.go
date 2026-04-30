@@ -131,6 +131,12 @@ var (
 
 	// ErrCommandPanic indicates a command handler panicked during execution.
 	ErrCommandPanic = errors.New("command panicked")
+
+	// ErrUnsupportedFormat indicates the requested output format is not supported.
+	ErrUnsupportedFormat = errors.New("unsupported output format")
+
+	// ErrFormatRequiresTypedData indicates the format requires structured data.
+	ErrFormatRequiresTypedData = errors.New("format requires typed data")
 )
 
 // CommandError wraps an error with command context.

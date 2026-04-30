@@ -13,8 +13,7 @@ type manTestConfig struct {
 }
 
 func TestManPage(t *testing.T) {
-	t.Parallel()
-
+	//nolint:paralleltest // mango-cobra accesses cobra internals unsafely (data race)
 	cli, err := NewCLI[manTestConfig]("testcli", "A test CLI for man pages", manTestConfig{})
 	testutil.AssertNoError(t, err)
 
@@ -28,8 +27,7 @@ func TestManPage(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	t.Run("generates_roff_man_page", func(t *testing.T) {
-		t.Parallel()
-
+		//nolint:paralleltest // mango-cobra accesses cobra internals unsafely
 		content, err := cli.ManPage(1)
 		testutil.AssertNoError(t, err)
 
@@ -43,8 +41,7 @@ func TestManPage(t *testing.T) {
 	})
 
 	t.Run("write_man_page", func(t *testing.T) {
-		t.Parallel()
-
+		//nolint:paralleltest // mango-cobra accesses cobra internals unsafely
 		var buf strings.Builder
 		err := cli.WriteManPage(&buf, 1)
 		testutil.AssertNoError(t, err)
@@ -55,8 +52,7 @@ func TestManPage(t *testing.T) {
 	})
 
 	t.Run("generate_man_page_command", func(t *testing.T) {
-		t.Parallel()
-
+		//nolint:paralleltest // mango-cobra accesses cobra internals unsafely
 		manCmd, err := GenerateManPageCommand(cli)
 		testutil.AssertNoError(t, err)
 

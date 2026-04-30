@@ -133,8 +133,10 @@ linters:
           allow:
             - $gostd
             - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
             - github.com/samber/do/v2
             - github.com/spf13/cobra
+            - github.com/spf13/pflag
           files:
             - "**/benchmarks/**"
           list-mode: lax
@@ -143,6 +145,8 @@ linters:
             - $gostd
             - charm.land/fang/v2
             - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
+            - github.com/larsartmann/go-output/table
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
@@ -163,6 +167,11 @@ linters:
             - $gostd
             - charm.land/fang/v2
             - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
+            - github.com/larsartmann/go-output/table
+            - github.com/muesli/mango
+            - github.com/muesli/mango-cobra
+            - github.com/muesli/roff
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
@@ -178,6 +187,7 @@ linters:
             - $gostd
             - charm.land/fang/v2
             - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
