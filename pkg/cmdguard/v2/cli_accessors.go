@@ -23,6 +23,11 @@ func (cli *CLI[T]) Config() *T {
 }
 
 // SetConfig updates the configuration.
+//
+// WARNING: This replaces the config pointer but does NOT reinitialize the
+// FlagRegistry. Flags parsed after this call will still write to the OLD
+// config struct. Only call this before Execute or when you don't use the
+// typed flag system for this config.
 func (cli *CLI[T]) SetConfig(cfg T) {
 	cli.config = &cfg
 }

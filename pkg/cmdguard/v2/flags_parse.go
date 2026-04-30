@@ -3,7 +3,6 @@ package v2
 import (
 	"fmt"
 	"os"
-	"reflect"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -85,31 +84,6 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 	parsed, err := dispatchParse(value, tag)
 	if err != nil {
 		return fmt.Errorf("parsing flag %q with value %q: %w", tag.Name, value, err)
-	}
-
-	// Handle []string from slice parsing
-	if sl, ok := parsed.([]string); ok {
-		return SetField(cfg, tag.Field, sl)
-	}
-
-	// Handle type conversion via reflect
-	parsedVal := reflect.ValueOf(parsed)
-
-	fieldVal := reflect.ValueOf(cfg)
-	if fieldVal.Kind() == reflect.Pointer {
-		fieldVal = fieldVal.Elem()
-	}
-
-	field := fieldVal.FieldByName(tag.Field)
-	if !field.IsValid() {
-		return fmt.Errorf("field %q not found in %T: %w", tag.Field, cfg, ErrFieldNotFound)
-	}
-
-	// Use ConvertibleTo for numeric narrowing
-	if parsedVal.Type().ConvertibleTo(field.Type()) {
-		field.Set(parsedVal.Convert(field.Type()))
-
-		return nil
 	}
 
 	return SetField(cfg, tag.Field, parsed)
