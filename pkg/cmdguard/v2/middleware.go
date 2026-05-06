@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
+	"slices"
 	"time"
 )
 
@@ -39,8 +40,8 @@ func buildChain[T any](
 	middlewares []Middleware[T],
 	final func() error,
 ) func() error {
-	for i := len(middlewares) - 1; i >= 0; i-- {
-		mw := middlewares[i]
+	for _, v := range slices.Backward(middlewares) {
+		mw := v
 		prev := final
 		final = func() error {
 			return mw(ctx, cfg, info, prev)
