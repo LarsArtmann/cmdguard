@@ -27,9 +27,9 @@ This proposal splits cmdguard into **3 sub-modules** (plus root + testutil) with
 
 ### 2.1 Module Landscape
 
-| Module | Path | Internal Deps | External Deps | State |
-|--------|------|---------------|---------------|-------|
-| `github.com/larsartmann/cmdguard` | `/` (root) | — | cobra, pflag, samber/do/v2, fang/v2, go-output, mango, mango-cobra, roff | Monolith |
+| Module                            | Path       | Internal Deps | External Deps                                                            | State    |
+| --------------------------------- | ---------- | ------------- | ------------------------------------------------------------------------ | -------- |
+| `github.com/larsartmann/cmdguard` | `/` (root) | —             | cobra, pflag, samber/do/v2, fang/v2, go-output, mango, mango-cobra, roff | Monolith |
 
 ### 2.2 Package Dependency Graph (Current)
 
@@ -96,14 +96,14 @@ Moderate god-package tendency, but kept manageable by clear internal clustering 
 
 ### 2.5 Files Over 300 Lines
 
-| File | Lines | Concern |
-|------|-------|---------|
-| type_handler.go | 480 | Flag type dispatch |
-| flow_context.go | 395 | Execution context |
-| flags_validate.go | 345 | Flag validation |
-| scope.go | 342 | DI scope |
-| command.go | 340 | Command model |
-| output.go | 325 | Output formatting |
+| File              | Lines | Concern            |
+| ----------------- | ----- | ------------------ |
+| type_handler.go   | 480   | Flag type dispatch |
+| flow_context.go   | 395   | Execution context  |
+| flags_validate.go | 345   | Flag validation    |
+| scope.go          | 342   | DI scope           |
+| command.go        | 340   | Command model      |
+| output.go         | 325   | Output formatting  |
 
 ---
 
@@ -113,15 +113,15 @@ Moderate god-package tendency, but kept manageable by clear internal clustering 
 
 #### Module 1: `cmdguard-types`
 
-| Field | Content |
-|-------|---------|
-| **Name & path** | `/types` → `github.com/larsartmann/cmdguard/types` |
-| **Purpose** | Validated semantic value types for CLI flags |
-| **Dependencies (prod)** | None (zero external deps — stdlib only) |
-| **Dependencies (test)** | `github.com/larsartmann/cmdguard/testutil` |
-| **Public API** | `Duration`, `Email`, `Enum`, `FilePath`, `HostPort`, `LogLevel`, `LogFormat`, `Port`, `URL` + `Parse`/`MustParse` constructors + type-specific error sentinels + `EnumError`, `DurationError` + `MustParse[T]` helper |
-| **Internal packages** | None |
-| **External deps** | stdlib only |
+| Field                   | Content                                                                                                                                                                                                               |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name & path**         | `/types` → `github.com/larsartmann/cmdguard/types`                                                                                                                                                                    |
+| **Purpose**             | Validated semantic value types for CLI flags                                                                                                                                                                          |
+| **Dependencies (prod)** | None (zero external deps — stdlib only)                                                                                                                                                                               |
+| **Dependencies (test)** | `github.com/larsartmann/cmdguard/testutil`                                                                                                                                                                            |
+| **Public API**          | `Duration`, `Email`, `Enum`, `FilePath`, `HostPort`, `LogLevel`, `LogFormat`, `Port`, `URL` + `Parse`/`MustParse` constructors + type-specific error sentinels + `EnumError`, `DurationError` + `MustParse[T]` helper |
+| **Internal packages**   | None                                                                                                                                                                                                                  |
+| **External deps**       | stdlib only                                                                                                                                                                                                           |
 
 **Includes from current v2:**
 
@@ -141,15 +141,15 @@ Moderate god-package tendency, but kept manageable by clear internal clustering 
 
 #### Module 2: `cmdguard-output`
 
-| Field | Content |
-|-------|---------|
-| **Name & path** | `/output` → `github.com/larsartmann/cmdguard/output` |
-| **Purpose** | Multi-format output rendering |
-| **Dependencies (prod)** | None internal |
-| **Dependencies (test)** | `github.com/larsartmann/cmdguard/testutil` |
-| **Public API** | `OutputFormat`, `OutputConfig`, `ParseOutputFormat`, `DefaultOutputConfig`, `OutputResult`, `OutputTable`, `OutputStyledTable`, format constants |
-| **Internal packages** | None |
-| **External deps** | `github.com/larsartmann/go-output` |
+| Field                   | Content                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Name & path**         | `/output` → `github.com/larsartmann/cmdguard/output`                                                                                             |
+| **Purpose**             | Multi-format output rendering                                                                                                                    |
+| **Dependencies (prod)** | None internal                                                                                                                                    |
+| **Dependencies (test)** | `github.com/larsartmann/cmdguard/testutil`                                                                                                       |
+| **Public API**          | `OutputFormat`, `OutputConfig`, `ParseOutputFormat`, `DefaultOutputConfig`, `OutputResult`, `OutputTable`, `OutputStyledTable`, format constants |
+| **Internal packages**   | None                                                                                                                                             |
+| **External deps**       | `github.com/larsartmann/go-output`                                                                                                               |
 
 **Includes from current v2:**
 
@@ -160,15 +160,15 @@ Moderate god-package tendency, but kept manageable by clear internal clustering 
 
 #### Module 3: `cmdguard` (core — root module)
 
-| Field | Content |
-|-------|---------|
-| **Name & path** | `/` (root) → `github.com/larsartmann/cmdguard` |
-| **Purpose** | CLI framework core — CLI[T], Command[T,F], flag system, DI scope, middleware, flow context, cobra integration |
-| **Dependencies (prod)** | `cmdguard-types`, `cmdguard-output` |
-| **Dependencies (test)** | `github.com/larsartmann/cmdguard/testutil` |
-| **Public API** | All CLI/Command types, flag system, scope/DI, middleware, flow context, type handler registry, editor, manpage generation |
-| **Internal packages** | None |
-| **External deps** | cobra, pflag, samber/do/v2, fang/v2, mango, mango-cobra, roff |
+| Field                   | Content                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Name & path**         | `/` (root) → `github.com/larsartmann/cmdguard`                                                                            |
+| **Purpose**             | CLI framework core — CLI[T], Command[T,F], flag system, DI scope, middleware, flow context, cobra integration             |
+| **Dependencies (prod)** | `cmdguard-types`, `cmdguard-output`                                                                                       |
+| **Dependencies (test)** | `github.com/larsartmann/cmdguard/testutil`                                                                                |
+| **Public API**          | All CLI/Command types, flag system, scope/DI, middleware, flow context, type handler registry, editor, manpage generation |
+| **Internal packages**   | None                                                                                                                      |
+| **External deps**       | cobra, pflag, samber/do/v2, fang/v2, mango, mango-cobra, roff                                                             |
 
 **Stays in core (not extracted):**
 
@@ -180,14 +180,14 @@ Moderate god-package tendency, but kept manageable by clear internal clustering 
 
 #### Module 4: `cmdguard-testutil`
 
-| Field | Content |
-|-------|---------|
-| **Name & path** | `/testutil` → `github.com/larsartmann/cmdguard/testutil` |
-| **Purpose** | Shared test assertion helpers |
-| **Dependencies (prod)** | None |
-| **Dependencies (test)** | None |
-| **Public API** | `AssertEqual`, `AssertNil`, `AssertPanics`, `AssertFlagRegistered`, `NoOpCobraRun`, etc. |
-| **External deps** | `github.com/spf13/cobra` (for cobra-specific test helpers) |
+| Field                   | Content                                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| **Name & path**         | `/testutil` → `github.com/larsartmann/cmdguard/testutil`                                 |
+| **Purpose**             | Shared test assertion helpers                                                            |
+| **Dependencies (prod)** | None                                                                                     |
+| **Dependencies (test)** | None                                                                                     |
+| **Public API**          | `AssertEqual`, `AssertNil`, `AssertPanics`, `AssertFlagRegistered`, `NoOpCobraRun`, etc. |
+| **External deps**       | `github.com/spf13/cobra` (for cobra-specific test helpers)                               |
 
 ### 3.2 Dependency DAG (Proposed)
 
@@ -244,12 +244,12 @@ Options considered:
 
 **Self-review finding:** Several error sentinels are used by both types files and core:
 
-| Sentinel | Types usage | Core usage |
-|----------|-------------|------------|
-| `ErrInvalidURL` | `types_url.go` | `flags_validate.go` |
-| `ErrInvalidEmail` | `types_email.go` | `flags_validate.go` |
-| `ErrInvalidEnum` | `types_enum.go` | `flags.go` |
-| `ErrInvalidDuration` | `types_duration.go` | (tests only) |
+| Sentinel             | Types usage         | Core usage          |
+| -------------------- | ------------------- | ------------------- |
+| `ErrInvalidURL`      | `types_url.go`      | `flags_validate.go` |
+| `ErrInvalidEmail`    | `types_email.go`    | `flags_validate.go` |
+| `ErrInvalidEnum`     | `types_enum.go`     | `flags.go`          |
+| `ErrInvalidDuration` | `types_duration.go` | (tests only)        |
 
 **Decision:** The types module defines its own error sentinels. Core defines its own copies for validation. This is acceptable because:
 
@@ -297,10 +297,10 @@ Rationale:
 
 ### 3.7 Import Path Impact
 
-| Before | After | Breaking? |
-|--------|-------|-----------|
-| `github.com/larsartmann/cmdguard/pkg/cmdguard/v2` | Same — unchanged | **No** |
-| `github.com/larsartmann/cmdguard/pkg/testutil` | Same — but now separate module | **No** (import path unchanged) |
+| Before                                            | After                          | Breaking?                      |
+| ------------------------------------------------- | ------------------------------ | ------------------------------ |
+| `github.com/larsartmann/cmdguard/pkg/cmdguard/v2` | Same — unchanged               | **No**                         |
+| `github.com/larsartmann/cmdguard/pkg/testutil`    | Same — but now separate module | **No** (import path unchanged) |
 
 **New import paths (additive, not replacing):**
 
@@ -337,27 +337,27 @@ Rationale:
 
 ### 4.3 Cross-Reference with how-to-golang
 
-| Check | Result |
-|-------|--------|
-| No banned dependencies | ✅ All deps clean (samber/do/v2, cobra, pflag, fang/v2, go-output) |
-| Files over 300 lines | ⚠️ 6 files exceed limit — address in execution plan |
-| No `any` types | ✅ Uses generics throughout |
-| No magic strings | ✅ Constants used |
-| Clean root | ⚠️ Root has many stray files (PARTS.md, PROGRESS_2026-04-01.md, etc.) — out of scope |
-| Latest Go version | ✅ Go 1.26.2 |
+| Check                  | Result                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| No banned dependencies | ✅ All deps clean (samber/do/v2, cobra, pflag, fang/v2, go-output)                   |
+| Files over 300 lines   | ⚠️ 6 files exceed limit — address in execution plan                                  |
+| No `any` types         | ✅ Uses generics throughout                                                          |
+| No magic strings       | ✅ Constants used                                                                    |
+| Clean root             | ⚠️ Root has many stray files (PARTS.md, PROGRESS_2026-04-01.md, etc.) — out of scope |
+| Latest Go version      | ✅ Go 1.26.2                                                                         |
 
 ---
 
 ## 5. Risk Assessment
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Shared error sentinels create split brains | Low | Medium | Core imports types module's errors (correct DAG direction) |
-| `RegisterTypeHandler` global state | Low | Low | Stays in core; types module has no global state |
-| go.work conflicts with consumers | Low | Low | go.work is ignored by consumers |
-| Test breakage from package splits | Medium | Low | Fix immediately after each step |
-| Re-export maintenance burden | Low | Low | Re-exports are thin type aliases/wrappers |
-| Scope extraction attempted (circular deps) | N/A | N/A | Decided to keep scope in core |
+| Risk                                       | Likelihood | Impact | Mitigation                                                 |
+| ------------------------------------------ | ---------- | ------ | ---------------------------------------------------------- |
+| Shared error sentinels create split brains | Low        | Medium | Core imports types module's errors (correct DAG direction) |
+| `RegisterTypeHandler` global state         | Low        | Low    | Stays in core; types module has no global state            |
+| go.work conflicts with consumers           | Low        | Low    | go.work is ignored by consumers                            |
+| Test breakage from package splits          | Medium     | Low    | Fix immediately after each step                            |
+| Re-export maintenance burden               | Low        | Low    | Re-exports are thin type aliases/wrappers                  |
+| Scope extraction attempted (circular deps) | N/A        | N/A    | Decided to keep scope in core                              |
 
 ---
 

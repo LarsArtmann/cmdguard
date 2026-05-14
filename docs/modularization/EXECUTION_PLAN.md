@@ -16,12 +16,12 @@
 
 ## Impact Tiers
 
-| Tier | Tasks | Impact |
-|------|-------|--------|
-| 1% → 51% (Foundational) | 1–4 | Create modules, extract types and output |
-| 4% → 64% (High leverage) | 5–8 | Wire dependencies, update imports, re-exports |
-| 20% → 80% (Broad value) | 9–10 | Update examples and integration tests |
-| Remaining (Polish) | 11–12 | Dead code cleanup, final verification |
+| Tier                     | Tasks | Impact                                        |
+| ------------------------ | ----- | --------------------------------------------- |
+| 1% → 51% (Foundational)  | 1–4   | Create modules, extract types and output      |
+| 4% → 64% (High leverage) | 5–8   | Wire dependencies, update imports, re-exports |
+| 20% → 80% (Broad value)  | 9–10  | Update examples and integration tests         |
+| Remaining (Polish)       | 11–12 | Dead code cleanup, final verification         |
 
 ---
 
@@ -38,11 +38,13 @@
 **What:** Initialize Go workspace at repository root.
 
 **Steps:**
+
 1. Run `go work init`
 2. Add root module: `go work use .`
 3. Verify: `go work sync`
 
 **Verification:**
+
 ```bash
 go build ./...
 go test ./... -count=1 -timeout 120s -race
@@ -61,6 +63,7 @@ go test ./... -count=1 -timeout 120s -race
 **Rationale:** testutil is a leaf dependency with no internal deps. Extracting it first means other modules can depend on it without circular imports.
 
 **Steps:**
+
 1. Create `/testutil/go.mod`:
    ```
    module github.com/larsartmann/cmdguard/testutil
@@ -75,6 +78,7 @@ go test ./... -count=1 -timeout 120s -race
 7. Run `go work sync`
 
 **Verification:**
+
 ```bash
 cd testutil && go build ./... && go vet ./...
 go build ./...
@@ -92,6 +96,7 @@ go test ./... -count=1 -timeout 120s -race
 **What:** Create `/types/` directory with go.mod and move value type files.
 
 **Steps:**
+
 1. Create `/types/go.mod`:
    ```
    module github.com/larsartmann/cmdguard/types
@@ -119,6 +124,7 @@ go test ./... -count=1 -timeout 120s -race
 10. Verify types module builds independently: `cd types && go build ./... && go vet ./...`
 
 **Verification:**
+
 ```bash
 cd types && go build ./... && go test ./... -race
 go work sync
@@ -135,6 +141,7 @@ go work sync
 **What:** Update root module to import types from the new module instead of local files.
 
 **Steps:**
+
 1. Add types module to root go.mod:
    ```
    require github.com/larsartmann/cmdguard/types v0.0.0
@@ -149,6 +156,7 @@ go work sync
 8. Run `go work sync`
 
 **Verification:**
+
 ```bash
 go build ./...
 go test ./... -count=1 -timeout 120s -race
@@ -160,6 +168,7 @@ golangci-lint run ./...
 **Effort:** 30 min
 
 **Critical:** This is the highest-risk step. If imports don't resolve, check that:
+
 - `go.work` includes both `.` and `./types`
 - Types module's exported symbols match what core expects
 - Package name is `types` (not `v2`)
@@ -171,6 +180,7 @@ golangci-lint run ./...
 **What:** Move value type test files from `pkg/cmdguard/v2/` to `/types/`.
 
 **Steps:**
+
 1. Move these test files to `/types/`:
    - `duration_test.go`
    - `email_test.go`
@@ -185,6 +195,7 @@ golangci-lint run ./...
 5. Verify types tests pass independently
 
 **Verification:**
+
 ```bash
 cd types && go test ./... -race
 go test ./... -count=1 -timeout 120s -race
@@ -201,7 +212,9 @@ go test ./... -count=1 -timeout 120s -race
 **What:** Add re-export type aliases in `pkg/cmdguard/v2` for backward compatibility.
 
 **Steps:**
+
 1. Create `pkg/cmdguard/v2/types_reexport.go`:
+
    ```go
    package v2
 
@@ -244,9 +257,11 @@ go test ./... -count=1 -timeout 120s -race
    var ErrInvalidEmail = types.ErrInvalidEmail
    // ... etc
    ```
+
 2. Verify existing consumers can still import from `pkg/cmdguard/v2`
 
 **Verification:**
+
 ```bash
 go build ./...
 go test ./... -count=1 -timeout 120s -race
@@ -263,6 +278,7 @@ go test ./... -count=1 -timeout 120s -race
 **What:** Create `/output/` module with output rendering logic.
 
 **Steps:**
+
 1. Create `/output/go.mod`:
    ```
    module github.com/larsartmann/cmdguard/output
@@ -283,6 +299,7 @@ go test ./... -count=1 -timeout 120s -race
 12. Run `go work sync`
 
 **Verification:**
+
 ```bash
 cd output && go build ./... && go test ./... -race
 go build ./...
@@ -302,7 +319,9 @@ go test ./... -count=1 -timeout 120s -race
 **What:** Re-export output types from core for backward compatibility.
 
 **Steps:**
+
 1. Create `pkg/cmdguard/v2/output_reexport.go`:
+
    ```go
    package v2
 
@@ -326,6 +345,7 @@ go test ./... -count=1 -timeout 120s -race
    ```
 
 **Verification:**
+
 ```bash
 go build ./...
 go test ./... -count=1 -timeout 120s -race
@@ -342,6 +362,7 @@ go test ./... -count=1 -timeout 120s -race
 **What:** Update example imports if any reference types directly.
 
 **Steps:**
+
 1. Check which examples import types/output directly from v2
 2. If any examples use value types directly, update imports to use either:
    - `github.com/larsartmann/cmdguard/pkg/cmdguard/v2` (re-exports) — **preferred for examples**
@@ -349,6 +370,7 @@ go test ./... -count=1 -timeout 120s -race
 3. Verify each example builds and runs
 
 **Verification:**
+
 ```bash
 go build ./examples/...
 go test ./examples/... -count=1 -timeout 120s -race
@@ -367,10 +389,12 @@ go test ./examples/... -count=1 -timeout 120s -race
 **What:** Update integration test imports.
 
 **Steps:**
+
 1. Check `tests/integration/*.go` for any direct type/output imports
 2. Update if needed (likely no changes — they import `pkg/cmdguard/v2`)
 
 **Verification:**
+
 ```bash
 go test ./tests/... -count=1 -timeout 120s -race
 ```
@@ -386,11 +410,13 @@ go test ./tests/... -count=1 -timeout 120s -race
 **What:** Remove dead code discovered during analysis.
 
 **Steps:**
+
 1. Delete `ErrLogLevel` and `ErrLogFormat` from `errors.go` (never used)
 2. Delete `Ptr`, `ValueOrDefault`, `EnsureValid` from `type_helpers.go` (if still in core; otherwise already removed in types module)
 3. Delete any orphaned test files that moved to types/output modules
 
 **Verification:**
+
 ```bash
 go build ./...
 go test ./... -count=1 -timeout 120s -race
@@ -408,6 +434,7 @@ golangci-lint run ./...
 **What:** Full verification pass across all modules.
 
 **Steps:**
+
 1. Run full test suite:
    ```bash
    go work sync
@@ -477,6 +504,7 @@ Task 1 (go.work)
 ## Per-Module go.mod Templates
 
 ### `/types/go.mod`
+
 ```
 module github.com/larsartmann/cmdguard/types
 
@@ -484,6 +512,7 @@ go 1.26.2
 ```
 
 ### `/output/go.mod`
+
 ```
 module github.com/larsartmann/cmdguard/output
 
@@ -493,6 +522,7 @@ require github.com/larsartmann/go-output v0.2.0
 ```
 
 ### `/testutil/go.mod`
+
 ```
 module github.com/larsartmann/cmdguard/testutil
 
@@ -502,6 +532,7 @@ require github.com/spf13/cobra v1.10.2
 ```
 
 ### `/go.mod` (root, updated)
+
 ```
 module github.com/larsartmann/cmdguard
 
@@ -521,6 +552,7 @@ require (
 ```
 
 ### `go.work`
+
 ```
 go 1.26.2
 
