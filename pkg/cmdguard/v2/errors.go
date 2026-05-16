@@ -146,6 +146,30 @@ var (
 
 	// ErrFormatRequiresTypedData indicates the format requires structured data.
 	ErrFormatRequiresTypedData = errors.New("format requires typed data")
+
+	// ErrMissingVersion indicates a version command was requested but no version is set.
+	ErrMissingVersion = errors.New("version is required but not set")
+
+	// ErrEditorTempFile indicates a temporary file could not be created for editing.
+	ErrEditorTempFile = errors.New("failed to create temp file for editor")
+
+	// ErrEditorWrite indicates writing content to the temp file failed.
+	ErrEditorWrite = errors.New("failed to write to temp file")
+
+	// ErrEditorRun indicates the editor process failed.
+	ErrEditorRun = errors.New("editor execution failed")
+
+	// ErrEditorRead indicates reading the edited file failed.
+	ErrEditorRead = errors.New("failed to read edited file")
+
+	// ErrNegativeArgCount indicates a negative argument count was provided.
+	ErrNegativeArgCount = errors.New("argument count must not be negative")
+
+	// ErrInvalidArgRange indicates min > max in a range argument validator.
+	ErrInvalidArgRange = errors.New("minimum argument count must not exceed maximum")
+
+	// ErrInvalidExitCode indicates an exit code outside the valid 0–255 range.
+	ErrInvalidExitCode = errors.New("exit code must be between 0 and 255")
 )
 
 // CommandError wraps an error with command context.
