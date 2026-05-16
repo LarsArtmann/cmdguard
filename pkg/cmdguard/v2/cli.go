@@ -213,6 +213,7 @@ func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 		code := 1
 
 		var exitCoder ExitCoder
+
 		if errors.As(err, &exitCoder) {
 			code = exitCoder.ExitCode()
 		}
