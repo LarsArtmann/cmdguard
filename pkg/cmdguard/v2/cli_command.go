@@ -113,6 +113,10 @@ func cliToCobraCommand[T, F any](
 		cobraCmd.ValidArgs = cmd.validArgs
 	}
 
+	if cmd.args != nil {
+		cobraCmd.Args = cmd.args
+	}
+
 	return cobraCmd, nil
 }
 

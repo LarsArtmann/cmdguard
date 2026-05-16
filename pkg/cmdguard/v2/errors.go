@@ -21,6 +21,15 @@ var (
 	// ErrMissingLong indicates a parent command has no long description.
 	ErrMissingLong = errors.New("command has no long description")
 
+	// ErrMissingShort indicates a command has no short description.
+	ErrMissingShort = errors.New("command has no short description")
+
+	// ErrTooFewArgs indicates a command received fewer positional arguments than required.
+	ErrTooFewArgs = errors.New("too few arguments")
+
+	// ErrTooManyArgs indicates a command received more positional arguments than allowed.
+	ErrTooManyArgs = errors.New("too many arguments")
+
 	// ErrFlagParseFailed indicates flag parsing failed.
 	ErrFlagParseFailed = errors.New("failed to parse flags")
 
@@ -282,4 +291,34 @@ func (e *ServiceError) Unwrap() error {
 // NewServiceError creates a new ServiceError.
 func NewServiceError(serviceType string, err error) *ServiceError {
 	return &ServiceError{ServiceType: serviceType, Err: err}
+}
+
+// ExitCoder is an interface that errors can implement to provide a specific exit code.
+// When ExecuteAndExit encounters an error implementing ExitCoder, it uses the returned
+// code instead of the default 1.
+type ExitCoder interface {
+	ExitCode() int
+}
+
+// ExitError wraps an error with a specific exit code.
+type ExitError struct {
+	Code int
+	Err  error
+}
+
+func (e *ExitError) Error() string {
+	return e.Err.Error()
+}
+
+func (e *ExitError) Unwrap() error {
+	return e.Err
+}
+
+func (e *ExitError) ExitCode() int {
+	return e.Code
+}
+
+// NewExitError creates a new ExitError with the given code and cause.
+func NewExitError(code int, err error) *ExitError {
+	return &ExitError{Code: code, Err: err}
 }

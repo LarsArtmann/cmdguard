@@ -99,3 +99,25 @@ func WithSignalHandling[T any]() CLIOption[T] {
 		cli.signalHandling = true
 	}
 }
+
+// WithConfigValidation adds a validation function that runs after root flag parsing
+// but before any command handler. Use this to validate the full config struct
+// (e.g., cross-field validation, business rules).
+//
+// The validator receives a pointer to the resolved config. Return an error to
+// stop execution before any command runs.
+func WithConfigValidation[T any](validate func(*T) error) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.configValidate = validate
+	}
+}
+
+// WithStrictValidation enables strict command validation:
+//   - All commands must have a short description
+//
+// This makes it impossible to ship a CLI with commands that produce ugly help output.
+func WithStrictValidation[T any]() CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.strict = true
+	}
+}

@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -34,6 +35,8 @@ type CLI[T any] struct {
 	outputEnabled  bool
 	outputFormat   OutputFormat
 	outputState    *outputState
+	configValidate func(*T) error
+	strict         bool
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -110,6 +113,12 @@ func (cli *CLI[T]) initialize(defaults T) error {
 			return err
 		}
 
+		if cli.configValidate != nil {
+			if err := cli.configValidate(cli.config); err != nil {
+				return fmt.Errorf("validating config: %w", err)
+			}
+		}
+
 		return cli.parseOutputFlag(c)
 	}
 
@@ -122,7 +131,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.use)
 	}
 
-	if err := cmd.Validate(); err != nil {
+	if err := cmd.validate(cli.strict); err != nil {
 		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.use, cli.name, err)
 	}
 
@@ -197,10 +206,18 @@ func (cli *CLI[T]) ExecuteWithArgs(ctx context.Context, args []string) error {
 }
 
 // ExecuteAndExit runs the CLI and exits with the appropriate exit code.
+// If the error implements ExitCoder, its exit code is used; otherwise defaults to 1.
 func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 	err := cli.Execute(ctx)
 	if err != nil {
-		os.Exit(1)
+		code := 1
+
+		var exitCoder ExitCoder
+		if errors.As(err, &exitCoder) {
+			code = exitCoder.ExitCode()
+		}
+
+		os.Exit(code)
 	}
 }
 

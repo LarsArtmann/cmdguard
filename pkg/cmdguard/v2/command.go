@@ -3,6 +3,8 @@ package v2
 import (
 	"context"
 	"fmt"
+
+	"github.com/spf13/cobra"
 )
 
 // NoFlags is a convenience type for commands without command-specific flags.
@@ -31,6 +33,7 @@ type Command[T any, F any] struct {
 	group         string
 	completionFn  CompletionFunc
 	validArgs     []string
+	args          cobra.PositionalArgs
 }
 
 // Use returns the command name and usage string.
@@ -106,8 +109,22 @@ func (c Command[T, F]) IsExecutable() bool {
 
 // Validate checks that the command is properly configured.
 func (c Command[T, F]) Validate() error {
+	return c.validate(false)
+}
+
+// ValidateStrict checks that the command is properly configured with strict rules.
+// In strict mode, all commands must have a short description.
+func (c Command[T, F]) ValidateStrict() error {
+	return c.validate(true)
+}
+
+func (c Command[T, F]) validate(strict bool) error {
 	if c.use == "" {
 		return fmt.Errorf("%w: command has no Use field", ErrInvalidCommand)
+	}
+
+	if strict && c.short == "" {
+		return fmt.Errorf("%w: %q has no short description", ErrMissingShort, c.use)
 	}
 
 	if c.runE == nil && len(c.commands) == 0 {
@@ -133,7 +150,7 @@ func (c Command[T, F]) Validate() error {
 	}
 
 	for i, sub := range c.commands {
-		err := sub.Validate()
+		err := sub.validate(strict)
 		if err != nil {
 			return fmt.Errorf("subcommand %d of %q: %w", i, c.use, err)
 		}
@@ -230,6 +247,51 @@ func WithDeprecated[T, F any](msg string) CommandOption[T, F] {
 func WithGroupID[T, F any](group string) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
 		c.group = group
+	}
+}
+
+// WithArgs sets a custom positional arguments validator.
+// Use this for fine-grained control over argument validation.
+// For common cases, prefer WithExactArgs, WithMinimumArgs, or WithMaximumArgs.
+func WithArgs[T, F any](args cobra.PositionalArgs) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.args = args
+	}
+}
+
+// WithExactArgs requires exactly n positional arguments.
+// The command fails at runtime if a different number of args is provided.
+func WithExactArgs[T, F any](n int) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.args = cobra.ExactArgs(n)
+	}
+}
+
+// WithMinimumArgs requires at least n positional arguments.
+func WithMinimumArgs[T, F any](n int) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.args = cobra.MinimumNArgs(n)
+	}
+}
+
+// WithMaximumArgs allows at most n positional arguments.
+func WithMaximumArgs[T, F any](n int) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.args = cobra.MaximumNArgs(n)
+	}
+}
+
+// WithRangeArgs requires between minArgs and maxArgs positional arguments (inclusive).
+func WithRangeArgs[T, F any](minArgs, maxArgs int) CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.args = cobra.RangeArgs(minArgs, maxArgs)
+	}
+}
+
+// WithNoArgs rejects any positional arguments.
+func WithNoArgs[T, F any]() CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.args = cobra.NoArgs
 	}
 }
 
