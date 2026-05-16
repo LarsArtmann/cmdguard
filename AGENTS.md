@@ -71,6 +71,7 @@ cmdguard/
 │   │   ├── output.go             # Rich output (table/json/csv/yaml)
 │   │   ├── type_handler.go       # Extensible type registry
 │   │   ├── type_helpers.go       # Generic type helpers
+│   │   ├── version.go            # VersionCommand helper
 │   │   ├── types_duration.go     # Duration type
 │   │   ├── types_email.go        # Email type
 │   │   ├── types_enum.go         # Enum[T] type
@@ -172,6 +173,12 @@ func MustNewParentCommand[T, F any](...) Command[T, F]
 | `WithHidden[T, F](hidden)`       | Hide from help                         |
 | `WithDeprecated[T, F](msg)`      | Deprecation message                    |
 | `WithGroupID[T, F](group)`       | Help group name                        |
+| `WithExactArgs[T, F](n)`         | Require exactly n positional args      |
+| `WithMinimumArgs[T, F](n)`       | Require at least n positional args     |
+| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args        |
+| `WithRangeArgs[T, F](min, max)`  | Require between min and max args       |
+| `WithNoArgs[T, F]()`             | Reject any positional args             |
+| `WithArgs[T, F](fn)`             | Custom cobra.PositionalArgs validator  |
 
 ### CLI[T] Constructor
 
@@ -195,6 +202,8 @@ Functional options:
 | `WithGroup[T](id, title)`     | Register command group on root              |
 | `WithEnvPrefix[T](prefix)`    | Prefix for env var lookups                  |
 | `WithSignalHandling[T]()`     | Cancel context on SIGINT/SIGTERM            |
+| `WithConfigValidation[T](fn)` | Validate config after flag parsing          |
+| `WithStrictValidation[T]()`   | Require short descriptions on all commands  |
 
 ### CLI[T] Methods
 
@@ -202,7 +211,7 @@ Functional options:
 | ----------------------------- | ----------------------- | --------------------------------- |
 | `Execute(ctx)`                | `error`                 | Run CLI with context              |
 | `ExecuteWithArgs(ctx, args)`  | `error`                 | Run with specific args            |
-| `ExecuteAndExit(ctx)`         |                         | Run and os.Exit(1) on error       |
+| `ExecuteAndExit(ctx)`         |                         | Run and os.Exit (respects ExitCoder) |
 | `Scope()`                     | `*Scope`                | DI scope                          |
 | `Injector()`                  | `do.Injector`           | Raw samber/do injector            |
 | `Config()`                    | `*T`                    | Typed config                      |
@@ -362,6 +371,38 @@ v2.NewCommandError(name, err)    // wraps with command context
 v2.NewServiceError(type, err)    // wraps with DI service context
 v2.NewFlagError(name, err)       // wraps with flag context
 v2.NewFlagErrorWithSuggestion(name, err, suggestion)  // includes typo fix
+
+// Exit codes
+v2.NewExitError(code, err)       // error with custom exit code for ExecuteAndExit
+errors.As(err, &exitCoder)       // check if error implements ExitCoder
+```
+
+### Version Command
+
+```go
+cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
+    v2.WithCLIVersion[Config]("1.0.0"),
+)
+v2.AddCommand(cli, v2.MustVersionCommand[Config](cli))
+```
+
+### Strict Validation
+
+```go
+cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
+    v2.WithStrictValidation[Config](),  // requires WithShort on all commands
+)
+```
+
+### Config Validation
+
+```go
+cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
+    v2.WithConfigValidation[Config](func(cfg *Config) error {
+        if cfg.Port < 1 { return fmt.Errorf("invalid port") }
+        return nil
+    }),
+)
 ```
 
 ---
@@ -428,6 +469,10 @@ go build ./...                                   # Verify build
 11. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly
 12. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
 13. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
+14. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
+15. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
+16. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
+17. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
 
 ---
 
