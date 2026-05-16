@@ -129,4 +129,3 @@
 - [ ] Rename Get[T]/MustGet[T] to more specific names
 - [ ] Make RegisterInScope generic instead of `...any`
 - [ ] Remove or redesign Package() for error-safe DI integration
-

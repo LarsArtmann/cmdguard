@@ -26,7 +26,7 @@
 | `AddCommand(cli, cmd)`                      | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
 | `Execute(ctx)`                              | ✅ FULLY_FUNCTIONAL | Runs command with context            |
 | `ExecuteWithArgs(ctx, args)`                | ✅ FULLY_FUNCTIONAL | For testing                          |
-| `ExecuteAndExit(ctx)`                       | ✅ FULLY_FUNCTIONAL | Run and os.Exit (respects ExitCoder)  |
+| `ExecuteAndExit(ctx)`                       | ✅ FULLY_FUNCTIONAL | Run and os.Exit (respects ExitCoder) |
 | `Scope()`                                   | ✅ FULLY_FUNCTIONAL | Returns DI scope                     |
 | `Config()`                                  | ✅ FULLY_FUNCTIONAL | Returns typed config \*T             |
 | `Shutdown(ctx)`                             | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
@@ -35,32 +35,32 @@
 
 ### CLI Options
 
-| Option                    | Status              | Notes                                    |
-| ------------------------- | ------------------- | ---------------------------------------- |
-| `WithCLIVersion[T](v)`    | ✅ FULLY_FUNCTIONAL | Set version string                       |
-| `WithCLILong[T](desc)`    | ✅ FULLY_FUNCTIONAL | Set long description                     |
-| `WithCLIScope[T](scope)`  | ✅ FULLY_FUNCTIONAL | Custom DI scope                          |
-| `WithSilenceErrors[T]()`  | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing            |
-| `WithSilenceUsage[T]()`   | ✅ FULLY_FUNCTIONAL | Suppress usage on error                  |
-| `WithFang[T](bool)`       | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling              |
-| `WithColor[T](bool)`      | 🗑️ DEPRECATED       | Use WithFang instead                     |
-| `WithFangOptions[T]()`    | ✅ FULLY_FUNCTIONAL | Pass fang options                        |
-| `WithMiddleware[T]()`     | ✅ FULLY_FUNCTIONAL | Add command middleware                   |
-| `WithGroup[T](id,title)`  | ✅ FULLY_FUNCTIONAL | Command groups in help                   |
-| `WithEnvPrefix[T](pfx)`   | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups               |
-| `WithSignalHandling[T]()` | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
-| `WithOutputFormat[T]()`   | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
-| `WithConfigValidation[T]()` | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing    |
-| `WithStrictValidation[T]()` | ✅ FULLY_FUNCTIONAL | Require short desc on all commands    |
+| Option                      | Status              | Notes                                    |
+| --------------------------- | ------------------- | ---------------------------------------- |
+| `WithCLIVersion[T](v)`      | ✅ FULLY_FUNCTIONAL | Set version string                       |
+| `WithCLILong[T](desc)`      | ✅ FULLY_FUNCTIONAL | Set long description                     |
+| `WithCLIScope[T](scope)`    | ✅ FULLY_FUNCTIONAL | Custom DI scope                          |
+| `WithSilenceErrors[T]()`    | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing            |
+| `WithSilenceUsage[T]()`     | ✅ FULLY_FUNCTIONAL | Suppress usage on error                  |
+| `WithFang[T](bool)`         | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling              |
+| `WithColor[T](bool)`        | 🗑️ DEPRECATED       | Use WithFang instead                     |
+| `WithFangOptions[T]()`      | ✅ FULLY_FUNCTIONAL | Pass fang options                        |
+| `WithMiddleware[T]()`       | ✅ FULLY_FUNCTIONAL | Add command middleware                   |
+| `WithGroup[T](id,title)`    | ✅ FULLY_FUNCTIONAL | Command groups in help                   |
+| `WithEnvPrefix[T](pfx)`     | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups               |
+| `WithSignalHandling[T]()`   | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
+| `WithOutputFormat[T]()`     | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
+| `WithConfigValidation[T]()` | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
+| `WithStrictValidation[T]()` | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
 
 ### Command[T, F]
 
-| Feature                                   | Status              | Notes                                   |
-| ----------------------------------------- | ------------------- | --------------------------------------- |
-| `NewCommand` / `NewParentCommand`         | ✅ FULLY_FUNCTIONAL | Constructors with validation            |
-| `MustNewCommand` / `MustNewParentCommand` | ✅ FULLY_FUNCTIONAL | Panic variants                          |
-| `RunE`, `PreRunE`, `PostRunE`             | ✅ FULLY_FUNCTIONAL | Type-safe handlers                      |
-| `Validate()`                              | ✅ FULLY_FUNCTIONAL | Called by constructors                  |
+| Feature                                   | Status              | Notes                                                    |
+| ----------------------------------------- | ------------------- | -------------------------------------------------------- |
+| `NewCommand` / `NewParentCommand`         | ✅ FULLY_FUNCTIONAL | Constructors with validation                             |
+| `MustNewCommand` / `MustNewParentCommand` | ✅ FULLY_FUNCTIONAL | Panic variants                                           |
+| `RunE`, `PreRunE`, `PostRunE`             | ✅ FULLY_FUNCTIONAL | Type-safe handlers                                       |
+| `Validate()`                              | ✅ FULLY_FUNCTIONAL | Called by constructors                                   |
 | Command options (21 total)                | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, args validators, etc. |
 
 ### Flag System
@@ -139,22 +139,22 @@
 
 ### Positional Arguments
 
-| Feature                            | Status              | Notes                              |
-| ---------------------------------- | ------------------- | ---------------------------------- |
-| `WithExactArgs[T, F](n)`            | ✅ FULLY_FUNCTIONAL | Require exactly n positional args  |
-| `WithMinimumArgs[T, F](n)`          | ✅ FULLY_FUNCTIONAL | Require at least n args            |
-| `WithMaximumArgs[T, F](n)`          | ✅ FULLY_FUNCTIONAL | Allow at most n args               |
-| `WithRangeArgs[T, F](min, max)`     | ✅ FULLY_FUNCTIONAL | Require between min and max args   |
-| `WithNoArgs[T, F]()`                | ✅ FULLY_FUNCTIONAL | Reject any positional args         |
-| `WithArgs[T, F](fn)`                | ✅ FULLY_FUNCTIONAL | Custom cobra.PositionalArgs        |
+| Feature                         | Status              | Notes                             |
+| ------------------------------- | ------------------- | --------------------------------- |
+| `WithExactArgs[T, F](n)`        | ✅ FULLY_FUNCTIONAL | Require exactly n positional args |
+| `WithMinimumArgs[T, F](n)`      | ✅ FULLY_FUNCTIONAL | Require at least n args           |
+| `WithMaximumArgs[T, F](n)`      | ✅ FULLY_FUNCTIONAL | Allow at most n args              |
+| `WithRangeArgs[T, F](min, max)` | ✅ FULLY_FUNCTIONAL | Require between min and max args  |
+| `WithNoArgs[T, F]()`            | ✅ FULLY_FUNCTIONAL | Reject any positional args        |
+| `WithArgs[T, F](fn)`            | ✅ FULLY_FUNCTIONAL | Custom cobra.PositionalArgs       |
 
 ### Version Command
 
-| Feature                        | Status              | Notes                              |
-| ------------------------------ | ------------------- | ---------------------------------- |
-| `VersionCommand[T](cli)`        | ✅ FULLY_FUNCTIONAL | Typed version subcommand           |
-| `MustVersionCommand[T](cli)`    | ✅ FULLY_FUNCTIONAL | Panic variant                      |
-| `GenerateVersionCommand[T](w)`  | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
+| Feature                        | Status              | Notes                                |
+| ------------------------------ | ------------------- | ------------------------------------ |
+| `VersionCommand[T](cli)`       | ✅ FULLY_FUNCTIONAL | Typed version subcommand             |
+| `MustVersionCommand[T](cli)`   | ✅ FULLY_FUNCTIONAL | Panic variant                        |
+| `GenerateVersionCommand[T](w)` | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
 
 ### Helpers
 
@@ -169,12 +169,12 @@
 ### Error Handling
 
 | Feature                   | Status              | Notes                                       |
-| -------------------------- | ------------------- | ------------------------------------------- |
-| 35+ sentinel errors        | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
-| Typed errors               | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
-| `ExitCoder` / `ExitError`  | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
-| FlagError with suggestion  | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
-| No panics (library API)    | ✅ FULLY_FUNCTIONAL | All operations return errors                |
+| ------------------------- | ------------------- | ------------------------------------------- |
+| 35+ sentinel errors       | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
+| Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
+| `ExitCoder` / `ExitError` | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
+| FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
+| No panics (library API)   | ✅ FULLY_FUNCTIONAL | All operations return errors                |
 
 ---
 

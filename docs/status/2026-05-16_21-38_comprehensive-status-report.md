@@ -9,14 +9,14 @@
 
 ## Health Dashboard
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Build | `go build ./...` | ✅ Clean |
-| Tests | 247 total (210 in v2) | ✅ All passing |
-| Race conditions | `-race` flag | ✅ 0 detected |
-| Lint | `golangci-lint run` | ✅ 0 issues |
-| Coverage (v2) | 80.4% | ✅ Good |
-| Dependencies | 5 direct, all stable | ✅ Clean |
+| Metric          | Value                 | Status         |
+| --------------- | --------------------- | -------------- |
+| Build           | `go build ./...`      | ✅ Clean       |
+| Tests           | 247 total (210 in v2) | ✅ All passing |
+| Race conditions | `-race` flag          | ✅ 0 detected  |
+| Lint            | `golangci-lint run`   | ✅ 0 issues    |
+| Coverage (v2)   | 80.4%                 | ✅ Good        |
+| Dependencies    | 5 direct, all stable  | ✅ Clean       |
 
 ---
 
@@ -243,19 +243,19 @@ The answer depends on whether you want to maintain backward compatibility for `E
 
 ## Git Working Tree Summary
 
-| File | Status | Lines Changed |
-|------|--------|--------------|
-| `AGENTS.md` | Modified | +10 |
-| `pkg/cmdguard/v2/cli.go` | Modified | +21 |
-| `pkg/cmdguard/v2/cli_command.go` | Modified | +4 |
-| `pkg/cmdguard/v2/cli_options.go` | Modified | +22 |
-| `pkg/cmdguard/v2/command.go` | Modified | +64 |
-| `pkg/cmdguard/v2/errors.go` | Modified | +39 |
-| `pkg/cmdguard/v2/version.go` | New | +79 |
-| `pkg/cmdguard/v2/cli_superb_test.go` | New | +592 |
+| File                                 | Status   | Lines Changed |
+| ------------------------------------ | -------- | ------------- |
+| `AGENTS.md`                          | Modified | +10           |
+| `pkg/cmdguard/v2/cli.go`             | Modified | +21           |
+| `pkg/cmdguard/v2/cli_command.go`     | Modified | +4            |
+| `pkg/cmdguard/v2/cli_options.go`     | Modified | +22           |
+| `pkg/cmdguard/v2/command.go`         | Modified | +64           |
+| `pkg/cmdguard/v2/errors.go`          | Modified | +39           |
+| `pkg/cmdguard/v2/version.go`         | New      | +79           |
+| `pkg/cmdguard/v2/cli_superb_test.go` | New      | +592          |
 
 **Total: +831 lines across 8 files**
 
 ---
 
-*Report generated 2026-05-16 21:38 CEST by Crush.*
+_Report generated 2026-05-16 21:38 CEST by Crush._
