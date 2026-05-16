@@ -258,6 +258,13 @@ linters:
           - funlen
           - gochecknoglobals
           - wrapcheck
+      - path: pkg/cmdguard/v2/type_handler_kinds.go$
+        linters:
+          - funlen
+          - wrapcheck
+      - path: pkg/cmdguard/v2/type_handler_custom.go$
+        linters:
+          - funlen
       - path: pkg/cmdguard/v2/output.go$
         linters:
           - gochecknoglobals

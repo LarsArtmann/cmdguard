@@ -70,50 +70,7 @@ func cliToCobraCommand[T, F any](
 		return nil, err
 	}
 
-	info := CommandInfo{
-		Name:    cmd.use,
-		Phase:   PhaseRun,
-		HasRunE: cmd.runE != nil,
-	}
-
-	wireHandlerWithMiddleware(handlerConfig[T, F]{
-		target:      &cobraCmd.RunE,
-		handler:     cmd.runE,
-		config:      config,
-		flags:       cmd.flags,
-		registry:    flagRegistry,
-		phase:       "command " + cmd.use,
-		info:        info,
-		middlewares: middlewares,
-	})
-
-	preInfo := info
-	preInfo.Phase = PhasePreRun
-
-	wireHandlerWithMiddleware(handlerConfig[T, F]{
-		target:      &cobraCmd.PreRunE,
-		handler:     cmd.preRunE,
-		config:      config,
-		flags:       cmd.flags,
-		registry:    flagRegistry,
-		phase:       "pre-run of command " + cmd.use,
-		info:        preInfo,
-		middlewares: middlewares,
-	})
-
-	postInfo := info
-	postInfo.Phase = PhasePostRun
-
-	wireHandlerWithMiddleware(handlerConfig[T, F]{
-		target:      &cobraCmd.PostRunE,
-		handler:     cmd.postRunE,
-		config:      config,
-		flags:       cmd.flags,
-		registry:    flagRegistry,
-		phase:       "post-run of command " + cmd.use,
-		info:        postInfo,
-		middlewares: middlewares,
-	})
+	wireAllHandlers(cobraCmd, config, cmd, flagRegistry, middlewares)
 
 	for _, subCmd := range cmd.commands {
 		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, envPrefix)
@@ -137,6 +94,37 @@ func cliToCobraCommand[T, F any](
 	}
 
 	return cobraCmd, nil
+}
+
+func wireAllHandlers[T, F any](
+	cobraCmd *cobra.Command, config *T, cmd Command[T, F],
+	flagRegistry *FlagRegistry, middlewares []Middleware[T],
+) {
+	info := CommandInfo{Name: cmd.use, Phase: PhaseRun, HasRunE: cmd.runE != nil}
+
+	wireHandlerWithMiddleware(handlerConfig[T, F]{
+		target: &cobraCmd.RunE, handler: cmd.runE, config: config,
+		flags: cmd.flags, registry: flagRegistry,
+		phase: "command " + cmd.use, info: info, middlewares: middlewares,
+	})
+
+	preInfo := info
+	preInfo.Phase = PhasePreRun
+
+	wireHandlerWithMiddleware(handlerConfig[T, F]{
+		target: &cobraCmd.PreRunE, handler: cmd.preRunE, config: config,
+		flags: cmd.flags, registry: flagRegistry,
+		phase: "pre-run of command " + cmd.use, info: preInfo, middlewares: middlewares,
+	})
+
+	postInfo := info
+	postInfo.Phase = PhasePostRun
+
+	wireHandlerWithMiddleware(handlerConfig[T, F]{
+		target: &cobraCmd.PostRunE, handler: cmd.postRunE, config: config,
+		flags: cmd.flags, registry: flagRegistry,
+		phase: "post-run of command " + cmd.use, info: postInfo, middlewares: middlewares,
+	})
 }
 
 func isNoFlags[F any](flags F) bool {

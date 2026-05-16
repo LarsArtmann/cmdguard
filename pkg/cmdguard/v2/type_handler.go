@@ -1,26 +1,16 @@
 package v2
 
 import (
-	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
 	"sync"
-	"time"
 
 	"github.com/spf13/pflag"
 )
 
 // TypeHandler defines how a flag type is registered, parsed, defaulted, and set.
-// Each custom type or primitive kind can have its own handler.
-// The registry eliminates the 3-way switch dispatch across flags.go,
-// flags_parse.go, config_setfield.go, and config_parsing.go.
 type TypeHandler interface {
-	// Register adds the flag to the given pflag.FlagSet.
 	Register(flags *pflag.FlagSet, tag FlagTag) error
-	// Parse converts a string value to the appropriate Go value.
 	Parse(value string, tag FlagTag) (any, error)
-	// Default returns the default value for this type given the tag.
 	Default(tag FlagTag) any
 }
 
@@ -79,295 +69,7 @@ func newTypeRegistry() *typeRegistry {
 	return r
 }
 
-func (r *typeRegistry) registerKinds() {
-	countHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			if tag.Short != "" {
-				flags.CountP(tag.Name, tag.Short, tag.Help)
-			} else {
-				flags.Count(tag.Name, tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return strconv.Atoi(value)
-		},
-		DefaultFunc: func(_ FlagTag) any {
-			return 0
-		},
-	}
-	r.countHandler = countHandler
-
-	r.byKind[reflect.String] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return value, nil
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
-	}
-
-	r.byKind[reflect.Bool] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, err := parseBoolDefault(tag.Default)
-			if err != nil {
-				return fmt.Errorf("invalid bool default for flag %q: %w", tag.Name, err)
-			}
-
-			if tag.Short != "" {
-				flags.BoolP(tag.Name, tag.Short, def, tag.Help)
-			} else {
-				flags.Bool(tag.Name, def, tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return strconv.ParseBool(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			v, _ := parseBoolDefault(tag.Default)
-
-			return v
-		},
-	}
-
-	intHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, err := parseIntDefault(tag.Default)
-			if err != nil {
-				return fmt.Errorf("invalid int default for flag %q: %w", tag.Name, err)
-			}
-
-			if tag.Short != "" {
-				flags.IntP(tag.Name, tag.Short, int(def), tag.Help)
-			} else {
-				flags.Int(tag.Name, int(def), tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			parsed, err := strconv.ParseInt(value, 10, 64)
-
-			return parsed, err
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			v, _ := parseIntDefault(tag.Default)
-
-			return v
-		},
-	}
-	for _, k := range []reflect.Kind{reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64} {
-		r.byKind[k] = intHandler
-	}
-
-	uintHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, err := parseUintDefault(tag.Default)
-			if err != nil {
-				return fmt.Errorf("invalid uint default for flag %q: %w", tag.Name, err)
-			}
-
-			if tag.Short != "" {
-				flags.UintP(tag.Name, tag.Short, uint(def), tag.Help)
-			} else {
-				flags.Uint(tag.Name, uint(def), tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			parsed, err := strconv.ParseUint(value, 10, 64)
-
-			return parsed, err
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			v, _ := parseUintDefault(tag.Default)
-
-			return v
-		},
-	}
-	for _, k := range []reflect.Kind{reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr} {
-		r.byKind[k] = uintHandler
-	}
-
-	floatHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, err := parseFloat64Default(tag.Default)
-			if err != nil {
-				return fmt.Errorf("invalid float64 default for flag %q: %w", tag.Name, err)
-			}
-
-			if tag.Short != "" {
-				flags.Float64P(tag.Name, tag.Short, def, tag.Help)
-			} else {
-				flags.Float64(tag.Name, def, tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return strconv.ParseFloat(value, 64)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			v, _ := parseFloat64Default(tag.Default)
-
-			return v
-		},
-	}
-	r.byKind[reflect.Float32] = floatHandler
-	r.byKind[reflect.Float64] = floatHandler
-
-	r.byKind[reflect.Slice] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			var def []string
-			if tag.Default != "" {
-				def = strings.Split(tag.Default, ",")
-			}
-
-			if tag.Short != "" {
-				flags.StringSliceP(tag.Name, tag.Short, def, tag.Help)
-			} else {
-				flags.StringSlice(tag.Name, def, tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return strings.Split(value, ","), nil
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			if tag.Default == "" {
-				return []string(nil)
-			}
-
-			return strings.Split(tag.Default, ",")
-		},
-	}
-}
-
-func (r *typeRegistry) registerCustomTypes() {
-	enumHelp := func(tag FlagTag) string {
-		if len(tag.Values) > 0 {
-			return fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
-		}
-
-		return tag.Help
-	}
-
-	r.byType[reflect.TypeFor[Duration]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseDuration(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			d, err := ParseDuration(tag.Default)
-			if err != nil {
-				return Duration{}
-			}
-
-			return d
-		},
-	}
-
-	enumHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, enumHelp(tag))
-
-			return nil
-		},
-		ParseFunc: func(value string, tag FlagTag) (any, error) {
-			return ParseEnum(value, tag.Values)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			return tag.Default
-		},
-	}
-	r.byType[reflect.TypeFor[Enum]()] = enumHandler
-
-	makeEnumLikeHandler := func(
-		parseFunc func(string) (any, error),
-		defaultAllowed []string,
-	) TypeHandlerFunc {
-		return TypeHandlerFunc{
-			RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-				allowed := tag.Values
-				if len(allowed) == 0 {
-					allowed = defaultAllowed
-				}
-
-				help := fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(allowed, ", "))
-				registerStringFlag(flags, tag.Name, tag.Short, tag.Default, help)
-
-				return nil
-			},
-			ParseFunc: func(value string, _ FlagTag) (any, error) {
-				return parseFunc(value)
-			},
-			DefaultFunc: func(tag FlagTag) any {
-				return tag.Default
-			},
-		}
-	}
-
-	r.byType[reflect.TypeFor[LogLevel]()] = makeEnumLikeHandler(
-		func(v string) (any, error) { return ParseLogLevel(v) },
-		logLevelAllowed,
-	)
-	r.byType[reflect.TypeFor[LogFormat]()] = makeEnumLikeHandler(
-		func(v string) (any, error) { return ParseLogFormat(v) },
-		logFormatAllowed,
-	)
-
-	// Simple string-backed types: all use registerStringFlag + custom parse + default passthrough
-	stringParseTypes := []struct {
-		typ       reflect.Type
-		parseFunc func(string) (any, error)
-	}{
-		{reflect.TypeFor[URL](), func(v string) (any, error) { return ParseURL(v) }},
-		{reflect.TypeFor[Email](), func(v string) (any, error) { return ParseEmail(v) }},
-		{reflect.TypeFor[Port](), func(v string) (any, error) { return ParsePort(v) }},
-		{
-			reflect.TypeFor[FilePath](),
-			func(v string) (any, error) { return ParseFilePath(v, false) },
-		},
-		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }},
-	}
-
-	for _, entry := range stringParseTypes {
-		parseFn := entry.parseFunc
-
-		r.byType[entry.typ] = TypeHandlerFunc{
-			RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-				registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-				return nil
-			},
-			ParseFunc: func(value string, _ FlagTag) (any, error) {
-				return parseFn(value)
-			},
-			DefaultFunc: func(tag FlagTag) any {
-				return tag.Default
-			},
-		}
-	}
-}
-
-// registerCountHandler is now part of registerKinds for consistency.
-
 // lookupHandler finds the TypeHandler for a given reflect.Type.
-// Checks exact type match first, then falls back to kind-based lookup.
 func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -384,7 +86,6 @@ func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
 }
 
 // RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type.
-// This allows users to extend the flag system with their own custom types.
 func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
 	globalTypeRegistry.mu.Lock()
 	defer globalTypeRegistry.mu.Unlock()
@@ -439,42 +140,11 @@ func dispatchDefault(tag FlagTag) any {
 	}
 
 	def := h.Default(tag)
-	// Convert to the exact field type for numeric kinds
+
 	defVal := reflect.ValueOf(def)
 	if defVal.IsValid() && defVal.Type().ConvertibleTo(tag.Type) {
 		return defVal.Convert(tag.Type).Interface()
 	}
 
 	return def
-}
-
-// RegisterGoDurationHandler registers a TypeHandler for time.Duration fields.
-// This allows using Go's native time.Duration type directly in flag structs.
-func RegisterGoDurationHandler() {
-	globalTypeRegistry.mu.Lock()
-	defer globalTypeRegistry.mu.Unlock()
-
-	globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, _ := time.ParseDuration(tag.Default)
-			if tag.Short != "" {
-				flags.DurationP(tag.Name, tag.Short, def, tag.Help)
-			} else {
-				flags.Duration(tag.Name, def, tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return time.ParseDuration(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			d, err := time.ParseDuration(tag.Default)
-			if err != nil {
-				return time.Duration(0)
-			}
-
-			return d
-		},
-	}
 }
