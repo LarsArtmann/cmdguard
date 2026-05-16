@@ -39,7 +39,7 @@ func ValidateConfig(cfg any) error {
 
 	v, err := derefPointerToStruct(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("dereferencing config %T: %w", cfg, err)
 	}
 
 	return validateStruct(v, cfg)

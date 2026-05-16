@@ -24,10 +24,22 @@ import (
 //	}
 type Middleware[T any] func(ctx context.Context, cfg *T, info CommandInfo, next func() error) error
 
+// Phase identifies the execution stage of a command handler.
+type Phase string
+
+const (
+	// PhaseRun is the main command execution phase.
+	PhaseRun Phase = "run"
+	// PhasePreRun is the pre-validation hook phase.
+	PhasePreRun Phase = "pre-run"
+	// PhasePostRun is the post-success cleanup phase.
+	PhasePostRun Phase = "post-run"
+)
+
 // CommandInfo provides command metadata to middleware.
 type CommandInfo struct {
 	Name    string
-	Phase   string
+	Phase   Phase
 	HasRunE bool
 }
 

@@ -1,7 +1,7 @@
 # TODO List
 
-**Updated:** 2026-04-30
-**Status:** v2.2.0 — 199 tests, 80.9% coverage, 0 lint issues, 0 race conditions
+**Updated:** 2026-05-16
+**Status:** v2.3.0-dev — 247 tests (210 in v2), 80.4% coverage, 0 lint issues, 0 race conditions
 
 ## Completed ✅
 
@@ -75,6 +75,27 @@
 - [x] Add GitHub Actions CI workflow (build, test, lint)
 - [x] Add NewParentCommand example
 
+### Phase 8: v2.3 Features
+
+- [x] Add `ExitCoder` interface + `ExitError` struct for custom exit codes in `ExecuteAndExit`
+- [x] Add positional argument validators (`WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithArgs`)
+- [x] Add `WithConfigValidation[T](fn)` CLI option for cross-field validation
+- [x] Add `WithStrictValidation[T]()` CLI option requiring short descriptions on all commands
+- [x] Add `VersionCommand[T](cli)`, `MustVersionCommand[T](cli)`, `GenerateVersionCommand[T](cli, w)`
+
+### Phase 9: Architecture Hardening (v2.3)
+
+- [ ] Fix gopls hint: `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26 idiom)
+- [ ] Extract `handlerConfig[T,F]` struct from 8-param `wireHandlerWithMiddleware`
+- [ ] Add `Phase` typed enum to replace `CommandInfo.Phase string`
+- [ ] Fix 7 unwrapped error returns (add `fmt.Errorf` context)
+- [ ] Consolidate 5 error types into internal `labeledError`
+- [ ] Split `type_handler.go` (481 lines) into 3 files
+- [ ] Split `command.go` (403 lines) — extract args options
+- [ ] Split `flow_context.go` (396 lines) — extract options
+- [ ] Fix `outputFormat`/`outputState.format` split brain
+- [ ] Consolidate value type MarshalText/UnmarshalText patterns
+
 ## Remaining Work
 
 ### ⚡ Performance
@@ -87,7 +108,7 @@
 ### ⚙️ CI/CD
 
 - [ ] Add codecov integration
-- [ ] Create v2.2.0 release tag and notes
+- [ ] Create v2.3.0 release tag and notes
 - [ ] Set up release automation
 
 ### 🔮 Future (v3.0+)
@@ -103,9 +124,9 @@
 
 - [ ] Make NoFlags a distinct named type (not type alias)
 - [ ] Change TimingMiddleware callback to include error
-- [ ] Change BranchWithTimeout/BranchWithDeadline to accept typed params
+- [ ] Remove string-based BranchWithTimeout/BranchWithDeadline (replaced by typed alternatives)
 - [ ] Remove FlowContextAccessor (thin wrapper with no added value)
 - [ ] Rename Get[T]/MustGet[T] to more specific names
 - [ ] Make RegisterInScope generic instead of `...any`
 - [ ] Remove or redesign Package() for error-safe DI integration
-- [ ] Add exit code support to ExecuteAndExit
+

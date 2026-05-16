@@ -72,29 +72,48 @@ func cliToCobraCommand[T, F any](
 
 	info := CommandInfo{
 		Name:    cmd.use,
+		Phase:   PhaseRun,
 		HasRunE: cmd.runE != nil,
 	}
 
-	wireHandlerWithMiddleware(
-		&cobraCmd.RunE, cmd.runE, config, cmd.flags, flagRegistry,
-		"command "+cmd.use, info, middlewares,
-	)
+	wireHandlerWithMiddleware(handlerConfig[T, F]{
+		target:      &cobraCmd.RunE,
+		handler:     cmd.runE,
+		config:      config,
+		flags:       cmd.flags,
+		registry:    flagRegistry,
+		phase:       "command " + cmd.use,
+		info:        info,
+		middlewares: middlewares,
+	})
 
 	preInfo := info
-	preInfo.Phase = "pre-run"
+	preInfo.Phase = PhasePreRun
 
-	wireHandlerWithMiddleware(
-		&cobraCmd.PreRunE, cmd.preRunE, config, cmd.flags, flagRegistry,
-		"pre-run of command "+cmd.use, preInfo, middlewares,
-	)
+	wireHandlerWithMiddleware(handlerConfig[T, F]{
+		target:      &cobraCmd.PreRunE,
+		handler:     cmd.preRunE,
+		config:      config,
+		flags:       cmd.flags,
+		registry:    flagRegistry,
+		phase:       "pre-run of command " + cmd.use,
+		info:        preInfo,
+		middlewares: middlewares,
+	})
 
 	postInfo := info
-	postInfo.Phase = "post-run"
+	postInfo.Phase = PhasePostRun
 
-	wireHandlerWithMiddleware(
-		&cobraCmd.PostRunE, cmd.postRunE, config, cmd.flags, flagRegistry,
-		"post-run of command "+cmd.use, postInfo, middlewares,
-	)
+	wireHandlerWithMiddleware(handlerConfig[T, F]{
+		target:      &cobraCmd.PostRunE,
+		handler:     cmd.postRunE,
+		config:      config,
+		flags:       cmd.flags,
+		registry:    flagRegistry,
+		phase:       "post-run of command " + cmd.use,
+		info:        postInfo,
+		middlewares: middlewares,
+	})
 
 	for _, subCmd := range cmd.commands {
 		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, envPrefix)
@@ -158,31 +177,37 @@ func initCommandFlags[F any](
 	return registry, nil
 }
 
-func wireHandlerWithMiddleware[T, F any](
-	target *func(*cobra.Command, []string) error,
-	handler func(context.Context, *T, F) error,
-	config *T, flags F, registry *FlagRegistry, phase string,
-	info CommandInfo, middlewares []Middleware[T],
-) {
-	if handler == nil {
+type handlerConfig[T, F any] struct {
+	target      *func(*cobra.Command, []string) error
+	handler     func(context.Context, *T, F) error
+	config      *T
+	flags       F
+	registry    *FlagRegistry
+	phase       string
+	info        CommandInfo
+	middlewares []Middleware[T]
+}
+
+func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
+	if cfg.handler == nil {
 		return
 	}
 
-	h := handler
-	*target = func(c *cobra.Command, args []string) error {
-		ctx, parsed, err := prepareRunContext(c, flags, registry, phase)
+	h := cfg.handler
+	*cfg.target = func(c *cobra.Command, args []string) error {
+		ctx, parsed, err := prepareRunContext(c, cfg.flags, cfg.registry, cfg.phase)
 		if err != nil {
 			return err
 		}
 
 		ctx = context.WithValue(ctx, argsKey, args)
 
-		if len(middlewares) == 0 {
-			return h(ctx, config, parsed)
+		if len(cfg.middlewares) == 0 {
+			return h(ctx, cfg.config, parsed)
 		}
 
-		chain := buildChain(ctx, config, info, middlewares, func() error {
-			return h(ctx, config, parsed)
+		chain := buildChain(ctx, cfg.config, cfg.info, cfg.middlewares, func() error {
+			return h(ctx, cfg.config, parsed)
 		})
 
 		return chain()

@@ -30,7 +30,7 @@ func (r *FlagRegistry) SetEnvPrefix(prefix string) {
 func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 	tags, err := ParseFlagTags(cfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parsing flag tags for %T: %w", cfg, err)
 	}
 
 	return &FlagRegistry{tags: tags, validators: newValidatorRegistry()}, nil
@@ -71,7 +71,11 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 
 // registerFlag adds a single flag to the given flag set via the TypeHandler registry.
 func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
-	return dispatchRegister(flags, tag)
+	if err := dispatchRegister(flags, tag); err != nil {
+		return fmt.Errorf("registering flag %q: %w", tag.Name, err)
+	}
+
+	return nil
 }
 
 // ValidateFlags validates flag values against allowed values and checks required flags.

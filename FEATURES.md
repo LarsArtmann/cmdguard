@@ -1,7 +1,7 @@
 # cmdguard Features
 
-**Last Updated:** 2026-04-30
-**Version:** 2.2.0
+**Last Updated:** 2026-05-16
+**Version:** 2.3.0-dev
 **Go Version:** 1.26
 
 ---
@@ -26,7 +26,7 @@
 | `AddCommand(cli, cmd)`                      | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
 | `Execute(ctx)`                              | ✅ FULLY_FUNCTIONAL | Runs command with context            |
 | `ExecuteWithArgs(ctx, args)`                | ✅ FULLY_FUNCTIONAL | For testing                          |
-| `ExecuteAndExit(ctx)`                       | ✅ FULLY_FUNCTIONAL | Runs and calls os.Exit               |
+| `ExecuteAndExit(ctx)`                       | ✅ FULLY_FUNCTIONAL | Run and os.Exit (respects ExitCoder)  |
 | `Scope()`                                   | ✅ FULLY_FUNCTIONAL | Returns DI scope                     |
 | `Config()`                                  | ✅ FULLY_FUNCTIONAL | Returns typed config \*T             |
 | `Shutdown(ctx)`                             | ✅ FULLY_FUNCTIONAL | Graceful shutdown                    |
@@ -50,6 +50,8 @@
 | `WithEnvPrefix[T](pfx)`   | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups               |
 | `WithSignalHandling[T]()` | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
 | `WithOutputFormat[T]()`   | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
+| `WithConfigValidation[T]()` | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing    |
+| `WithStrictValidation[T]()` | ✅ FULLY_FUNCTIONAL | Require short desc on all commands    |
 
 ### Command[T, F]
 
@@ -59,7 +61,7 @@
 | `MustNewCommand` / `MustNewParentCommand` | ✅ FULLY_FUNCTIONAL | Panic variants                          |
 | `RunE`, `PreRunE`, `PostRunE`             | ✅ FULLY_FUNCTIONAL | Type-safe handlers                      |
 | `Validate()`                              | ✅ FULLY_FUNCTIONAL | Called by constructors                  |
-| Command options (15 total)                | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, etc. |
+| Command options (21 total)                | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, args validators, etc. |
 
 ### Flag System
 
@@ -135,6 +137,25 @@
 | `cli.WriteManPage(w, section)`   | ✅ FULLY_FUNCTIONAL | Write man page to io.Writer |
 | `GenerateManPageCommand[T](cli)` | ✅ FULLY_FUNCTIONAL | Create `man` subcommand     |
 
+### Positional Arguments
+
+| Feature                            | Status              | Notes                              |
+| ---------------------------------- | ------------------- | ---------------------------------- |
+| `WithExactArgs[T, F](n)`            | ✅ FULLY_FUNCTIONAL | Require exactly n positional args  |
+| `WithMinimumArgs[T, F](n)`          | ✅ FULLY_FUNCTIONAL | Require at least n args            |
+| `WithMaximumArgs[T, F](n)`          | ✅ FULLY_FUNCTIONAL | Allow at most n args               |
+| `WithRangeArgs[T, F](min, max)`     | ✅ FULLY_FUNCTIONAL | Require between min and max args   |
+| `WithNoArgs[T, F]()`                | ✅ FULLY_FUNCTIONAL | Reject any positional args         |
+| `WithArgs[T, F](fn)`                | ✅ FULLY_FUNCTIONAL | Custom cobra.PositionalArgs        |
+
+### Version Command
+
+| Feature                        | Status              | Notes                              |
+| ------------------------------ | ------------------- | ---------------------------------- |
+| `VersionCommand[T](cli)`        | ✅ FULLY_FUNCTIONAL | Typed version subcommand           |
+| `MustVersionCommand[T](cli)`    | ✅ FULLY_FUNCTIONAL | Panic variant                      |
+| `GenerateVersionCommand[T](w)`  | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
+
 ### Helpers
 
 | Feature          | Status              | Notes                       |
@@ -148,11 +169,12 @@
 ### Error Handling
 
 | Feature                   | Status              | Notes                                       |
-| ------------------------- | ------------------- | ------------------------------------------- |
-| 30+ sentinel errors       | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
-| Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
-| FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
-| No panics (library API)   | ✅ FULLY_FUNCTIONAL | All operations return errors                |
+| -------------------------- | ------------------- | ------------------------------------------- |
+| 35+ sentinel errors        | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
+| Typed errors               | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
+| `ExitCoder` / `ExitError`  | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
+| FlagError with suggestion  | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
+| No panics (library API)    | ✅ FULLY_FUNCTIONAL | All operations return errors                |
 
 ---
 
@@ -172,7 +194,7 @@
 
 | Package           | Coverage  | Status  |
 | ----------------- | --------- | ------- |
-| `pkg/cmdguard/v2` | 80.9%     | ✅ Good |
+| `pkg/cmdguard/v2` | 80.4%     | ✅ Good |
 | Fuzz tests        | 7 targets | ✅ Good |
 
 ---
@@ -200,4 +222,4 @@ explicit flag → env:"VAR" (with optional prefix) → default value
 
 ---
 
-**Last updated 2026-04-30.**
+**Last updated 2026-05-16.**
