@@ -26,12 +26,17 @@ func NewScope(name string) *Scope {
 }
 
 // NewScopeFromInjector creates a Scope from an existing injector.
-func NewScopeFromInjector(injector do.Injector, name string) *Scope {
+// Returns an error if injector is nil.
+func NewScopeFromInjector(injector do.Injector, name string) (*Scope, error) {
+	if injector == nil {
+		return nil, fmt.Errorf("%w: injector is nil, name=%q", ErrInvalidScope, name)
+	}
+
 	return &Scope{
 		injector: injector,
 		name:     name,
 		parent:   nil,
-	}
+	}, nil
 }
 
 // Child creates a child scope that inherits services from this scope.

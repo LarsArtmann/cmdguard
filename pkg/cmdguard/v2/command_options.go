@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -105,28 +106,52 @@ func WithArgs[T, F any](args cobra.PositionalArgs) CommandOption[T, F] {
 }
 
 // WithExactArgs requires exactly n positional arguments.
+// Panics if n is negative.
 func WithExactArgs[T, F any](n int) CommandOption[T, F] {
+	if n < 0 {
+		panic(fmt.Sprintf("WithExactArgs: %v: n=%d", ErrNegativeArgCount, n))
+	}
+
 	return func(c *Command[T, F]) {
 		c.args = cobra.ExactArgs(n)
 	}
 }
 
 // WithMinimumArgs requires at least n positional arguments.
+// Panics if n is negative.
 func WithMinimumArgs[T, F any](n int) CommandOption[T, F] {
+	if n < 0 {
+		panic(fmt.Sprintf("WithMinimumArgs: %v: n=%d", ErrNegativeArgCount, n))
+	}
+
 	return func(c *Command[T, F]) {
 		c.args = cobra.MinimumNArgs(n)
 	}
 }
 
 // WithMaximumArgs allows at most n positional arguments.
+// Panics if n is negative.
 func WithMaximumArgs[T, F any](n int) CommandOption[T, F] {
+	if n < 0 {
+		panic(fmt.Sprintf("WithMaximumArgs: %v: n=%d", ErrNegativeArgCount, n))
+	}
+
 	return func(c *Command[T, F]) {
 		c.args = cobra.MaximumNArgs(n)
 	}
 }
 
 // WithRangeArgs requires between minArgs and maxArgs positional arguments (inclusive).
+// Panics if minArgs is negative or minArgs > maxArgs.
 func WithRangeArgs[T, F any](minArgs, maxArgs int) CommandOption[T, F] {
+	if minArgs < 0 {
+		panic(fmt.Sprintf("WithRangeArgs: %v: min=%d", ErrNegativeArgCount, minArgs))
+	}
+
+	if minArgs > maxArgs {
+		panic(fmt.Sprintf("WithRangeArgs: %v: min=%d max=%d", ErrInvalidArgRange, minArgs, maxArgs))
+	}
+
 	return func(c *Command[T, F]) {
 		c.args = cobra.RangeArgs(minArgs, maxArgs)
 	}

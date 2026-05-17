@@ -343,6 +343,11 @@ func (e *ExitError) ExitCode() int {
 }
 
 // NewExitError creates a new ExitError with the given code and cause.
-func NewExitError(code int, err error) *ExitError {
-	return &ExitError{Code: code, Err: err}
+// Returns an error if the code is outside the valid range 0-255.
+func NewExitError(code int, err error) (*ExitError, error) {
+	if code < 0 || code > 255 {
+		return nil, fmt.Errorf("%w: got %d", ErrInvalidExitCode, code)
+	}
+
+	return &ExitError{Code: code, Err: err}, nil
 }

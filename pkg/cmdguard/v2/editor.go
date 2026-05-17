@@ -20,7 +20,7 @@ func EditInEditor(ctx context.Context, content string) (string, error) {
 
 	tmpFile, err := os.CreateTemp("", "cmdguard-edit-*.txt")
 	if err != nil {
-		return "", fmt.Errorf("creating temp file: %w", err)
+		return "", fmt.Errorf("%w: %w", ErrEditorTempFile, err)
 	}
 
 	tmpPath := tmpFile.Name()
@@ -31,7 +31,7 @@ func EditInEditor(ctx context.Context, content string) (string, error) {
 	if err != nil {
 		tmpFile.Close()
 
-		return "", fmt.Errorf("writing to temp file: %w", err)
+		return "", fmt.Errorf("%w: %w", ErrEditorWrite, err)
 	}
 
 	tmpFile.Close()
@@ -48,12 +48,12 @@ func EditInEditor(ctx context.Context, content string) (string, error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("running editor %q: %w", editor, err)
+		return "", fmt.Errorf("%w: %w", ErrEditorRun, err)
 	}
 
 	edited, err := os.ReadFile(filepath.Clean(tmpPath))
 	if err != nil {
-		return "", fmt.Errorf("reading edited file: %w", err)
+		return "", fmt.Errorf("%w: %w", ErrEditorRead, err)
 	}
 
 	return string(edited), nil

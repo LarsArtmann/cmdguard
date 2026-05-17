@@ -484,7 +484,9 @@ func TestCLI_ErrorChains(t *testing.T) {
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags]("die",
 				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					return v2.NewExitError(42, errors.New("permission denied"))
+					exitErr, _ := v2.NewExitError(42, errors.New("permission denied"))
+
+					return exitErr
 				},
 				v2.WithShort[lifecycleConfig, v2.NoFlags]("Die"),
 			)

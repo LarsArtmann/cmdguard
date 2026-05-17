@@ -21,7 +21,7 @@ func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 	if cli.version == "" {
 		return Command[T, NoFlags]{}, fmt.Errorf(
 			"%w: version command requires WithCLIVersion",
-			ErrMissingName,
+			ErrMissingVersion,
 		)
 	}
 
@@ -56,7 +56,7 @@ func MustVersionCommand[T any](cli *CLI[T]) Command[T, NoFlags] {
 // This provides more control over output format and destination writer.
 func GenerateVersionCommand[T any](cli *CLI[T], w io.Writer) (*cobra.Command, error) {
 	if cli.version == "" {
-		return nil, fmt.Errorf("%w: version command requires WithCLIVersion", ErrMissingName)
+		return nil, fmt.Errorf("%w: version command requires WithCLIVersion", ErrMissingVersion)
 	}
 
 	appName := cli.name

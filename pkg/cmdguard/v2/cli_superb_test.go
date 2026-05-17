@@ -16,14 +16,14 @@ func TestExitError(t *testing.T) {
 	t.Run("Error returns wrapped message", func(t *testing.T) {
 		t.Parallel()
 
-		err := NewExitError(2, errors.New("something failed"))
+		err, _ := NewExitError(2, errors.New("something failed"))
 		testutil.AssertFieldEqString(t, err.Error(), "something failed", "Error()")
 	})
 
 	t.Run("ExitCode returns code", func(t *testing.T) {
 		t.Parallel()
 
-		err := NewExitError(42, errors.New("custom"))
+		err, _ := NewExitError(42, errors.New("custom"))
 		testutil.AssertFieldEq(t, err.ExitCode(), 42, "ExitCode()")
 	})
 
@@ -31,15 +31,19 @@ func TestExitError(t *testing.T) {
 		t.Parallel()
 
 		inner := errors.New("inner")
-		err := NewExitError(1, inner)
+		err, _ := NewExitError(1, inner)
 		testutil.AssertEqual(t, err.Unwrap(), inner)
 	})
 
 	t.Run("implements ExitCoder", func(t *testing.T) {
 		t.Parallel()
 
-		var err error = NewExitError(3, errors.New("fail"))
-		_, ok := err.(ExitCoder)
+		exitErr, errCheck := NewExitError(3, errors.New("fail"))
+		if errCheck != nil {
+			t.Fatal(errCheck)
+		}
+
+		_, ok := interface{}(exitErr).(ExitCoder)
 		if !ok {
 			t.Fatal("expected ExitError to implement ExitCoder")
 		}
@@ -48,7 +52,7 @@ func TestExitError(t *testing.T) {
 	t.Run("errors.As detects ExitCoder", func(t *testing.T) {
 		t.Parallel()
 
-		err := NewExitError(5, errors.New("wrapped"))
+		err, _ := NewExitError(5, errors.New("wrapped"))
 		wrapped := fmt.Errorf("outer: %w", err)
 
 		var exitCoder ExitCoder
@@ -95,7 +99,8 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 
 		cmd, err := NewCommand[testConfig, NoFlags]("fail-custom",
 			func(_ context.Context, _ *testConfig, _ NoFlags) error {
-				return NewExitError(42, errors.New("custom failure"))
+			exitErr, _ := NewExitError(42, errors.New("custom failure"))
+				return exitErr
 			},
 		)
 		testutil.AssertNoError(t, err)

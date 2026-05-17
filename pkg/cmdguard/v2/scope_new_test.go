@@ -46,7 +46,10 @@ func TestNewScopeFromInjector(t *testing.T) {
 
 		injector := do.New()
 
-		scope := NewScopeFromInjector(injector, "custom")
+		scope, err := NewScopeFromInjector(injector, "custom")
+		if err != nil {
+			t.Fatal(err)
+		}
 		if scope == nil {
 			t.Fatal("expected scope to not be nil")
 		}
@@ -65,7 +68,10 @@ func TestNewScopeFromInjector(t *testing.T) {
 
 		injector := do.New()
 
-		scope := NewScopeFromInjector(injector, "root")
+		scope, err := NewScopeFromInjector(injector, "root")
+		if err != nil {
+			t.Fatal(err)
+		}
 		if !scope.IsRoot() {
 			t.Error("expected IsRoot to be true")
 		}
