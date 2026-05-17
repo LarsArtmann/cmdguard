@@ -191,6 +191,7 @@ func parseFloat64Default(s string) (float64, error) {
 }
 
 // DefaultValue returns the default value for a flag based on its type.
+// Uses the global type registry for backward compatibility.
 func (t FlagTag) DefaultValue() any {
-	return dispatchDefault(t)
+	return dispatchDefault(globalTypeRegistry, t)
 }
