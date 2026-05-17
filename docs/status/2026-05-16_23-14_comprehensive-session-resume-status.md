@@ -15,22 +15,22 @@ cmdguard is a **healthy, production-quality Go CLI framework** at v2.3.0-dev. Th
 
 ## Metrics Dashboard
 
-| Metric | Value | Trend |
-|--------|-------|-------|
-| Total tests | 245 | ↑ from 199 (+46) |
-| v2 package tests | 199 | ↑ from 176 |
-| Integration tests | 46 (24 old + 22 BDD new) | ↑ |
-| Coverage (v2) | 80.4% | → stable |
-| Lint issues | 0 | ✅ |
-| Race conditions | 0 | ✅ |
-| Production files | 38 | → stable |
-| Test files | 64 | ↑ |
-| Production LOC | 5,866 | → stable |
-| Test LOC | 11,360 | ↑ (2:1 test:code ratio) |
-| Files > 370 lines | 0 (all production) | ✅ |
-| Largest file | 348 lines (errors.go) | ✅ |
-| Uncommitted changes | 0 | ✅ clean tree |
-| Commits ahead of origin | 3 | (not pushed per policy) |
+| Metric                  | Value                    | Trend                   |
+| ----------------------- | ------------------------ | ----------------------- |
+| Total tests             | 245                      | ↑ from 199 (+46)        |
+| v2 package tests        | 199                      | ↑ from 176              |
+| Integration tests       | 46 (24 old + 22 BDD new) | ↑                       |
+| Coverage (v2)           | 80.4%                    | → stable                |
+| Lint issues             | 0                        | ✅                      |
+| Race conditions         | 0                        | ✅                      |
+| Production files        | 38                       | → stable                |
+| Test files              | 64                       | ↑                       |
+| Production LOC          | 5,866                    | → stable                |
+| Test LOC                | 11,360                   | ↑ (2:1 test:code ratio) |
+| Files > 370 lines       | 0 (all production)       | ✅                      |
+| Largest file            | 348 lines (errors.go)    | ✅                      |
+| Uncommitted changes     | 0                        | ✅ clean tree           |
+| Commits ahead of origin | 3                        | (not pushed per policy) |
 
 ---
 
@@ -38,50 +38,50 @@ cmdguard is a **healthy, production-quality Go CLI framework** at v2.3.0-dev. Th
 
 ### Features (All Working, Tested, Documented)
 
-| Feature | Tests | Status |
-|---------|-------|--------|
-| CLI[T] + Command[T,F] generics API | ✅ | Core framework, stable |
-| Dependency injection (samber/do/v2) | ✅ | Scope, Provide, Invoke, child scopes |
-| Middleware chain (buildChain) | ✅ | Ordered wrapping, RecoveryMiddleware, TimingMiddleware |
-| Typed flags via struct tags | ✅ | string/int/float64/bool/duration/email/URL/Port/FilePath/HostPort/Enum/LogLevel |
-| env:"VAR" tag support | ✅ | WithEnvPrefix for namespacing |
-| count:"true" counting flags (-vvv) | ✅ | |
-| ExitCoder / ExitError | ✅ | Custom exit codes in ExecuteAndExit |
-| Positional args validators (6) | ✅ | ExactArgs, MinimumArgs, MaximumArgs, RangeArgs, NoArgs, generic Args |
-| Config validation (WithConfigValidation) | ✅ | Runs after flag parsing, before handler |
-| Strict validation (WithStrictValidation) | ✅ | Requires short descriptions on all commands |
-| VersionCommand / MustVersionCommand / GenerateVersionCommand | ✅ | |
-| BranchingFlowContext | ✅ | Path tracking, value propagation, branching |
-| Rich output (12 formats) | ✅ | Table/JSON/CSV/TSV/Markdown/XML/HTML/Tree/D2/Mermaid/DOT/YAML |
-| Signal handling (WithSignalHandling) | ✅ | SIGINT/SIGTERM context cancellation |
-| Typo suggestions | ✅ | SuggestFlag + SuggestCommand (Levenshtein) |
-| EditInEditor | ✅ | $EDITOR integration |
-| Man page generation | ✅ | mango-cobra integration |
-| Shell completion wiring | ✅ | WithCompletion, WithValidArgs |
-| Fang styling integration | ✅ | Charm fang for pretty help |
-| 22 BDD integration tests | ✅ | Lifecycle, middleware, DI, errors, config, strict, version, flow, flags |
+| Feature                                                      | Tests | Status                                                                          |
+| ------------------------------------------------------------ | ----- | ------------------------------------------------------------------------------- |
+| CLI[T] + Command[T,F] generics API                           | ✅    | Core framework, stable                                                          |
+| Dependency injection (samber/do/v2)                          | ✅    | Scope, Provide, Invoke, child scopes                                            |
+| Middleware chain (buildChain)                                | ✅    | Ordered wrapping, RecoveryMiddleware, TimingMiddleware                          |
+| Typed flags via struct tags                                  | ✅    | string/int/float64/bool/duration/email/URL/Port/FilePath/HostPort/Enum/LogLevel |
+| env:"VAR" tag support                                        | ✅    | WithEnvPrefix for namespacing                                                   |
+| count:"true" counting flags (-vvv)                           | ✅    |                                                                                 |
+| ExitCoder / ExitError                                        | ✅    | Custom exit codes in ExecuteAndExit                                             |
+| Positional args validators (6)                               | ✅    | ExactArgs, MinimumArgs, MaximumArgs, RangeArgs, NoArgs, generic Args            |
+| Config validation (WithConfigValidation)                     | ✅    | Runs after flag parsing, before handler                                         |
+| Strict validation (WithStrictValidation)                     | ✅    | Requires short descriptions on all commands                                     |
+| VersionCommand / MustVersionCommand / GenerateVersionCommand | ✅    |                                                                                 |
+| BranchingFlowContext                                         | ✅    | Path tracking, value propagation, branching                                     |
+| Rich output (12 formats)                                     | ✅    | Table/JSON/CSV/TSV/Markdown/XML/HTML/Tree/D2/Mermaid/DOT/YAML                   |
+| Signal handling (WithSignalHandling)                         | ✅    | SIGINT/SIGTERM context cancellation                                             |
+| Typo suggestions                                             | ✅    | SuggestFlag + SuggestCommand (Levenshtein)                                      |
+| EditInEditor                                                 | ✅    | $EDITOR integration                                                             |
+| Man page generation                                          | ✅    | mango-cobra integration                                                         |
+| Shell completion wiring                                      | ✅    | WithCompletion, WithValidArgs                                                   |
+| Fang styling integration                                     | ✅    | Charm fang for pretty help                                                      |
+| 22 BDD integration tests                                     | ✅    | Lifecycle, middleware, DI, errors, config, strict, version, flow, flags         |
 
 ### Architecture Hardening (Done This Session + Previous)
 
-| Item | Status |
-|------|--------|
-| handlerConfig[T,F] struct extraction | ✅ Done |
+| Item                                                 | Status  |
+| ---------------------------------------------------- | ------- |
+| handlerConfig[T,F] struct extraction                 | ✅ Done |
 | Phase typed enum (PhaseRun/PhasePreRun/PhasePostRun) | ✅ Done |
-| 6 unwrapped errors fixed (fmt.Errorf wrapping) | ✅ Done |
-| type_handler.go split (480→149+184+150) | ✅ Done |
-| command.go split (402→266+140) | ✅ Done |
-| flow_context.go split (395→273+124) | ✅ Done |
-| wsl_v5 lint fix in cli.go | ✅ Done |
-| go-output/table ambiguous import fixed | ✅ Done |
+| 6 unwrapped errors fixed (fmt.Errorf wrapping)       | ✅ Done |
+| type_handler.go split (480→149+184+150)              | ✅ Done |
+| command.go split (402→266+140)                       | ✅ Done |
+| flow_context.go split (395→273+124)                  | ✅ Done |
+| wsl_v5 lint fix in cli.go                            | ✅ Done |
+| go-output/table ambiguous import fixed               | ✅ Done |
 
 ### Infrastructure
 
-| Item | Status |
-|------|--------|
-| GitHub Actions CI (build, test, lint) | ✅ |
-| Pre-commit hook script | ✅ |
-| go.mod clean (no replace directives) | ✅ |
-| 20+ benchmarks | ✅ |
+| Item                                  | Status |
+| ------------------------------------- | ------ |
+| GitHub Actions CI (build, test, lint) | ✅     |
+| Pre-commit hook script                | ✅     |
+| go.mod clean (no replace directives)  | ✅     |
+| 20+ benchmarks                        | ✅     |
 
 ---
 
@@ -89,30 +89,30 @@ cmdguard is a **healthy, production-quality Go CLI framework** at v2.3.0-dev. Th
 
 ### Phase 9: Architecture Hardening (5 of 10 items done)
 
-| Item | Status | Notes |
-|------|--------|-------|
-| handlerConfig[T,F] extraction | ✅ | |
-| Phase enum | ✅ | Still string alias, not true enum |
-| Error wrapping (6 sites) | ✅ | |
-| File splits (3 files) | ✅ | |
-| outputFormat/outputState split brain | ❌ | Two fields tracking one concept |
-| labeledError consolidation | ❌ | Correctly skipped — would break errors.As discrimination |
-| value type consolidation | ❌ | Correctly skipped — each type has distinct validation |
-| NoFlags type alias | ❌ | `type NoFlags = struct{}` should be distinct type (v3) |
-| globalTypeRegistry global state | ❌ | #1 architectural debt |
-| validateRegex global sync.Map | ❌ | Same issue as globalTypeRegistry |
+| Item                                 | Status | Notes                                                    |
+| ------------------------------------ | ------ | -------------------------------------------------------- |
+| handlerConfig[T,F] extraction        | ✅     |                                                          |
+| Phase enum                           | ✅     | Still string alias, not true enum                        |
+| Error wrapping (6 sites)             | ✅     |                                                          |
+| File splits (3 files)                | ✅     |                                                          |
+| outputFormat/outputState split brain | ❌     | Two fields tracking one concept                          |
+| labeledError consolidation           | ❌     | Correctly skipped — would break errors.As discrimination |
+| value type consolidation             | ❌     | Correctly skipped — each type has distinct validation    |
+| NoFlags type alias                   | ❌     | `type NoFlags = struct{}` should be distinct type (v3)   |
+| globalTypeRegistry global state      | ❌     | #1 architectural debt                                    |
+| validateRegex global sync.Map        | ❌     | Same issue as globalTypeRegistry                         |
 
 ### Test Coverage (80.4% — room for improvement)
 
-| Category | 0% Functions | Impact |
-|----------|-------------|--------|
-| Output renderers (TSV, Markdown, XML, HTML, Tree, D2, Mermaid, DOT, YAML) | 9 | Dead code or untested |
-| Validator internals (validateEmail, validateURL, validateNonEmpty, runValidateTag) | 5 | Core validation untested |
-| Command accessors (Version, SilenceErrors, SilenceUsage, Group) | 4 | Simple getters |
-| Flow context typed branches (BranchWithDuration, BranchWithDeadlineTime) | 2 | API exists but untested |
-| CLI convenience (MustAddCommand, MustNewCLI, WithSignalHandling, WithFangOptions) | 4 | Edge cases |
-| ManPage, GenerateManPage, NewManPage | 3 | Entire manpage module untested |
-| RegisterFlagValidator, RegisterValidator, WithCompletion, WithValidArgs, WithArgs, WithGroupID | 6 | Registered but not exercised |
+| Category                                                                                       | 0% Functions | Impact                         |
+| ---------------------------------------------------------------------------------------------- | ------------ | ------------------------------ |
+| Output renderers (TSV, Markdown, XML, HTML, Tree, D2, Mermaid, DOT, YAML)                      | 9            | Dead code or untested          |
+| Validator internals (validateEmail, validateURL, validateNonEmpty, runValidateTag)             | 5            | Core validation untested       |
+| Command accessors (Version, SilenceErrors, SilenceUsage, Group)                                | 4            | Simple getters                 |
+| Flow context typed branches (BranchWithDuration, BranchWithDeadlineTime)                       | 2            | API exists but untested        |
+| CLI convenience (MustAddCommand, MustNewCLI, WithSignalHandling, WithFangOptions)              | 4            | Edge cases                     |
+| ManPage, GenerateManPage, NewManPage                                                           | 3            | Entire manpage module untested |
+| RegisterFlagValidator, RegisterValidator, WithCompletion, WithValidArgs, WithArgs, WithGroupID | 6            | Registered but not exercised   |
 
 ---
 
@@ -164,13 +164,13 @@ cmdguard is a **healthy, production-quality Go CLI framework** at v2.3.0-dev. Th
 
 The codebase is in genuinely good shape. No data loss risks, no correctness bugs, no race conditions. However, there are architectural debts that should have been addressed:
 
-| Problem | Severity | Why It Matters |
-|---------|----------|---------------|
-| `globalTypeRegistry` is global mutable state | 🔴 HIGH | Prevents test parallelism for custom types. Every test that calls `RegisterTypeHandler` affects all others. 39 references across codebase. |
-| `validateRegex` is global `sync.Map` | 🟡 MEDIUM | Same pattern as globalTypeRegistry — global mutable cache prevents parallel tests for regex validators |
-| Phase enum is `type Phase = string` | 🟢 LOW | Theater, not real type safety. Any string passes. Not a bug, but misleading API. |
-| `NoFlags = struct{}` is type alias | 🟢 LOW | Not a distinct type — users can pass `struct{}{}` directly. Harmless but imprecise. |
-| 38 production functions at 0% coverage | 🟡 MEDIUM | Mostly output renderers and accessor methods, but some (validators, manpage) are real features |
+| Problem                                      | Severity  | Why It Matters                                                                                                                             |
+| -------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `globalTypeRegistry` is global mutable state | 🔴 HIGH   | Prevents test parallelism for custom types. Every test that calls `RegisterTypeHandler` affects all others. 39 references across codebase. |
+| `validateRegex` is global `sync.Map`         | 🟡 MEDIUM | Same pattern as globalTypeRegistry — global mutable cache prevents parallel tests for regex validators                                     |
+| Phase enum is `type Phase = string`          | 🟢 LOW    | Theater, not real type safety. Any string passes. Not a bug, but misleading API.                                                           |
+| `NoFlags = struct{}` is type alias           | 🟢 LOW    | Not a distinct type — users can pass `struct{}{}` directly. Harmless but imprecise.                                                        |
+| 38 production functions at 0% coverage       | 🟡 MEDIUM | Mostly output renderers and accessor methods, but some (validators, manpage) are real features                                             |
 
 ### The "VERSCHLIMMBESSER" Risk
 
@@ -210,33 +210,33 @@ The previous session made `cliToCobraCommand` worse (74→91 lines, broke funlen
 
 ## F) Top #25 Things To Do Next
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Make `globalTypeRegistry` instance-scoped | 🔴 Critical | 2h | Architecture |
-| 2 | Make `validateRegex` instance-scoped | 🔴 Critical | 30min | Architecture |
-| 3 | Test output renderers (TSV/MD/XML/HTML/Tree/D2/Mermaid/DOT/YAML) | 🟡 High | 2h | Coverage |
-| 4 | Test validator internals (validateEmail, validateURL, runValidateTag) | 🟡 High | 1h | Coverage |
-| 5 | Test BranchWithDuration/BranchWithDeadlineTime | 🟡 High | 30min | Coverage |
-| 6 | Test MustAddCommand/MustNewCLI panic variants | 🟢 Medium | 30min | Coverage |
-| 7 | Test command accessor methods (Version, Group, SilenceErrors) | 🟢 Medium | 30min | Coverage |
-| 8 | Test WithSignalHandling | 🟡 High | 1h | Coverage |
-| 9 | Test ManPage/GenerateManPage | 🟢 Medium | 1h | Coverage |
-| 10 | Test WithCompletion/WithValidArgs | 🟢 Medium | 30min | Coverage |
-| 11 | Fix outputFormat/outputState split brain | 🟡 High | 30min | Architecture |
-| 12 | Verify errors.AsType[ExitCoder] viability | 🟢 Medium | 15min | API |
-| 13 | Add coverage CI gate (75%+) | 🟡 High | 30min | CI/CD |
-| 14 | Add test files for examples/ packages (compile check) | 🟢 Medium | 30min | Quality |
-| 15 | Write v2.3.0 release notes | 🟡 High | 1h | Release |
-| 16 | Tag v2.3.0 release | 🟡 High | 15min | Release |
-| 17 | Push commits to origin | 🟢 Medium | 5min | Process |
-| 18 | Update AGENTS.md with latest session findings | 🟢 Medium | 15min | Documentation |
-| 19 | Update TODO_LIST.md — mark Phase 9 items done | 🟢 Low | 15min | Documentation |
-| 20 | Investigate go-error-family adoption decision | 🟡 High | 30min | Architecture |
-| 21 | Add WithFangOptions test | 🟢 Low | 15min | Coverage |
-| 22 | Add RegisterFlagValidator test | 🟢 Low | 15min | Coverage |
-| 23 | Add WithArgs/WithGroupID test | 🟢 Low | 15min | Coverage |
-| 24 | Add CLI construction benchmark | 🟢 Low | 30min | Performance |
-| 25 | Clean up stale docs/status/ and docs/planning/ files | 🟢 Low | 30min | Cleanup |
+| #   | Task                                                                  | Impact      | Effort | Category      |
+| --- | --------------------------------------------------------------------- | ----------- | ------ | ------------- |
+| 1   | Make `globalTypeRegistry` instance-scoped                             | 🔴 Critical | 2h     | Architecture  |
+| 2   | Make `validateRegex` instance-scoped                                  | 🔴 Critical | 30min  | Architecture  |
+| 3   | Test output renderers (TSV/MD/XML/HTML/Tree/D2/Mermaid/DOT/YAML)      | 🟡 High     | 2h     | Coverage      |
+| 4   | Test validator internals (validateEmail, validateURL, runValidateTag) | 🟡 High     | 1h     | Coverage      |
+| 5   | Test BranchWithDuration/BranchWithDeadlineTime                        | 🟡 High     | 30min  | Coverage      |
+| 6   | Test MustAddCommand/MustNewCLI panic variants                         | 🟢 Medium   | 30min  | Coverage      |
+| 7   | Test command accessor methods (Version, Group, SilenceErrors)         | 🟢 Medium   | 30min  | Coverage      |
+| 8   | Test WithSignalHandling                                               | 🟡 High     | 1h     | Coverage      |
+| 9   | Test ManPage/GenerateManPage                                          | 🟢 Medium   | 1h     | Coverage      |
+| 10  | Test WithCompletion/WithValidArgs                                     | 🟢 Medium   | 30min  | Coverage      |
+| 11  | Fix outputFormat/outputState split brain                              | 🟡 High     | 30min  | Architecture  |
+| 12  | Verify errors.AsType[ExitCoder] viability                             | 🟢 Medium   | 15min  | API           |
+| 13  | Add coverage CI gate (75%+)                                           | 🟡 High     | 30min  | CI/CD         |
+| 14  | Add test files for examples/ packages (compile check)                 | 🟢 Medium   | 30min  | Quality       |
+| 15  | Write v2.3.0 release notes                                            | 🟡 High     | 1h     | Release       |
+| 16  | Tag v2.3.0 release                                                    | 🟡 High     | 15min  | Release       |
+| 17  | Push commits to origin                                                | 🟢 Medium   | 5min   | Process       |
+| 18  | Update AGENTS.md with latest session findings                         | 🟢 Medium   | 15min  | Documentation |
+| 19  | Update TODO_LIST.md — mark Phase 9 items done                         | 🟢 Low      | 15min  | Documentation |
+| 20  | Investigate go-error-family adoption decision                         | 🟡 High     | 30min  | Architecture  |
+| 21  | Add WithFangOptions test                                              | 🟢 Low      | 15min  | Coverage      |
+| 22  | Add RegisterFlagValidator test                                        | 🟢 Low      | 15min  | Coverage      |
+| 23  | Add WithArgs/WithGroupID test                                         | 🟢 Low      | 15min  | Coverage      |
+| 24  | Add CLI construction benchmark                                        | 🟢 Low      | 30min  | Performance   |
+| 25  | Clean up stale docs/status/ and docs/planning/ files                  | 🟢 Low      | 30min  | Cleanup       |
 
 ---
 
@@ -245,6 +245,7 @@ The previous session made `cliToCobraCommand` worse (74→91 lines, broke funlen
 **Should `globalTypeRegistry` become instance-scoped on `CLI[T]` (breaking change requiring v3.0) or on `FlagRegistry` (internal, non-breaking but complex)?**
 
 Context:
+
 - `globalTypeRegistry` is a package-level `map[reflect.Type]TypeHandler` protected by `sync.RWMutex`
 - It's written to by `registerKinds()` (init-time) and `RegisterTypeHandler()` (user-facing)
 - It's read by `dispatchRegister()` and `dispatchDefault()` during flag registration
@@ -268,16 +269,16 @@ This decision affects the v2.3 vs v3.0 roadmap. I cannot decide this without kno
 
 ### Commits This Session
 
-| Hash | Message |
-|------|---------|
-| `201226d` | test(integration): add BDD integration tests covering full CLI lifecycle |
+| Hash      | Message                                                                             |
+| --------- | ----------------------------------------------------------------------------------- |
+| `201226d` | test(integration): add BDD integration tests covering full CLI lifecycle            |
 | `ef4cec4` | refactor(v2): split flow_context.go into core + access, add missing sentinel errors |
 
 ### Previous Session Commits (Context)
 
-| Hash | Message |
-|------|---------|
-| `c353950` | refactor(v2): fix funlen, split type_handler and command into focused files |
+| Hash      | Message                                                                                    |
+| --------- | ------------------------------------------------------------------------------------------ |
+| `c353950` | refactor(v2): fix funlen, split type_handler and command into focused files                |
 | `9d7e431` | feat(v2): add exit codes, positional args, config validation, strict mode, version command |
 
 ---

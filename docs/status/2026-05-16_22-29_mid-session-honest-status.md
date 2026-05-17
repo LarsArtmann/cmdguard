@@ -8,13 +8,13 @@
 
 ## Health Dashboard
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Build | `go build ./...` | ✅ Clean |
-| Tests | 247 total (210 in v2) | ✅ All passing |
-| Race conditions | `-race` flag | ✅ 0 detected |
-| Coverage (v2) | 80.4% | ✅ Good |
-| **Lint** | **`golangci-lint run`** | **🔴 1 issue (funlen)** |
+| Metric          | Value                   | Status                  |
+| --------------- | ----------------------- | ----------------------- |
+| Build           | `go build ./...`        | ✅ Clean                |
+| Tests           | 247 total (210 in v2)   | ✅ All passing          |
+| Race conditions | `-race` flag            | ✅ 0 detected           |
+| Coverage (v2)   | 80.4%                   | ✅ Good                 |
+| **Lint**        | **`golangci-lint run`** | **🔴 1 issue (funlen)** |
 
 ### Lint Failure
 
@@ -49,15 +49,15 @@ Root cause: The `handlerConfig[T,F]` struct refactor (commit 3da42bc) replaced 8
 
 ### This Session's Completed Work
 
-| Commit | Description | Impact |
-|--------|-------------|--------|
+| Commit    | Description                                                                        | Impact               |
+| --------- | ---------------------------------------------------------------------------------- | -------------------- |
 | `9d7e431` | feat: exit codes, positional args, config validation, strict mode, version command | +816 lines, 27 tests |
-| `6f0b818` | docs: AGENTS.md update with v2.3 features | Docs accuracy |
-| `374f4ad` | docs: v2.3 architecture hardening plan (75 tasks, mermaid graph) | Planning |
-| `3da42bc` | refactor: handlerConfig struct + Phase enum | Type safety |
-| `f2da838` | docs: markdown table alignment cleanup | Formatting |
-| `17e0316` | docs: SUPERB CLI enforcement gap analysis | Analysis |
-| `ccb01f4` | docs: comprehensive status report (21:38) | Tracking |
+| `6f0b818` | docs: AGENTS.md update with v2.3 features                                          | Docs accuracy        |
+| `374f4ad` | docs: v2.3 architecture hardening plan (75 tasks, mermaid graph)                   | Planning             |
+| `3da42bc` | refactor: handlerConfig struct + Phase enum                                        | Type safety          |
+| `f2da838` | docs: markdown table alignment cleanup                                             | Formatting           |
+| `17e0316` | docs: SUPERB CLI enforcement gap analysis                                          | Analysis             |
+| `ccb01f4` | docs: comprehensive status report (21:38)                                          | Tracking             |
 
 ### Error Wrapping Fixes (in commit 3da42bc)
 
@@ -92,24 +92,24 @@ The `handlerConfig[T,F]` struct replaced 8 positional parameters in `wireHandler
 
 ### From the 75-Task Plan
 
-| Phase | Tasks | Status |
-|-------|-------|--------|
-| Phase 1: Docs & Quick Fixes (F1-F12) | 12 tasks | ✅ Done |
-| Phase 2: Type Safety (F13-F20) | 8 tasks | ✅ Done (but broke lint) |
-| Phase 3: Error Quality (F21-F30) | 10 tasks | ⚠️ 6/10 done (labeledError consolidation correctly skipped) |
-| Phase 4: File Splits (F31-F48) | 18 tasks | ❌ Not started |
-| Phase 5: Value Type Consolidation (F49-F56) | 8 tasks | ❌ Not started (also: should be skipped — see section d) |
-| Phase 6: Benchmarks (F57-F65) | 9 tasks | ❌ Not started |
-| Phase 7: BDD Tests (F66-F72) | 7 tasks | ❌ Not started |
-| Phase 8: Final Verification (F73-F75) | 3 tasks | ❌ Not started |
+| Phase                                       | Tasks    | Status                                                      |
+| ------------------------------------------- | -------- | ----------------------------------------------------------- |
+| Phase 1: Docs & Quick Fixes (F1-F12)        | 12 tasks | ✅ Done                                                     |
+| Phase 2: Type Safety (F13-F20)              | 8 tasks  | ✅ Done (but broke lint)                                    |
+| Phase 3: Error Quality (F21-F30)            | 10 tasks | ⚠️ 6/10 done (labeledError consolidation correctly skipped) |
+| Phase 4: File Splits (F31-F48)              | 18 tasks | ❌ Not started                                              |
+| Phase 5: Value Type Consolidation (F49-F56) | 8 tasks  | ❌ Not started (also: should be skipped — see section d)    |
+| Phase 6: Benchmarks (F57-F65)               | 9 tasks  | ❌ Not started                                              |
+| Phase 7: BDD Tests (F66-F72)                | 7 tasks  | ❌ Not started                                              |
+| Phase 8: Final Verification (F73-F75)       | 3 tasks  | ❌ Not started                                              |
 
 ### Files Over 370 Lines (Still Over Limit)
 
-| File | Lines | Action |
-|------|-------|--------|
-| `type_handler.go` | 480 | Split into 3 files |
-| `command.go` | 402 | Extract args options |
-| `flow_context.go` | 395 | Extract options |
+| File              | Lines | Action               |
+| ----------------- | ----- | -------------------- |
+| `type_handler.go` | 480   | Split into 3 files   |
+| `command.go`      | 402   | Extract args options |
+| `flow_context.go` | 395   | Extract options      |
 
 ### From TODO_LIST.md (Longer Term)
 
@@ -218,11 +218,13 @@ Marshaling "consolidation" across 9 value types is DRY theater. Each type has di
 **Should I revert the `handlerConfig[T,F]` refactor entirely, or fix the funlen by extracting a helper?**
 
 Arguments for reverting:
+
 - The original 8-param function was 74 lines and passed lint
 - The struct version is 91 lines and breaks lint
 - Call sites went from compact to verbose
 
 Arguments for keeping + fixing:
+
 - The struct is genuinely more readable (named fields vs positional)
 - Extracting `wireAllHandlers` would make both functions <40 lines
 - The struct enables future extension without adding params
@@ -245,4 +247,4 @@ ccb01f4 docs(status): add comprehensive status report (2026-05-16)
 
 ---
 
-*Report generated 2026-05-16 22:29 CEST by Crush.*
+_Report generated 2026-05-16 22:29 CEST by Crush._

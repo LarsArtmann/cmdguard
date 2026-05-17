@@ -7,30 +7,30 @@
 
 ## Current Enforcement (What cmdguard already does)
 
-| Enforcement | How |
-|---|---|
-| Name required on all commands | `Validate()` rejects empty `use` |
-| Handler required on leaf commands | `Validate()` rejects no `runE` and no subcommands |
-| Long description required on parent commands | `Validate()` rejects subcommands without `long` |
-| No duplicate commands | `AddCommand` checks `registeredCmds` map |
-| No duplicate subcommands | `Validate()` checks `seen` map |
-| Short description required (opt-in) | `WithStrictValidation[T]()` + `ValidateStrict()` |
-| Config validation before commands run | `WithConfigValidation[T](fn)` |
-| Positional args bounds | `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs`, `WithNoArgs` |
-| Custom exit codes | `ExitCoder` interface + `NewExitError(code, err)` |
-| Version command helper | `VersionCommand[T](cli)` / `MustVersionCommand[T](cli)` |
-| Typed errors with context | `CommandError`, `FlagError`, `ServiceError`, `ConfigError`, `EnumError` |
-| Flag typo suggestions | Levenshtein-based `SuggestFlag` / `SuggestCommand` |
-| Typed flag values | 9 custom types: Duration, Enum, LogLevel, LogFormat, URL, Email, Port, FilePath, HostPort |
-| Flag validators | `validate:"email,min=5,max=100,regex=^..."` struct tags |
-| Required flags | `required:"true"` struct tag |
-| Env var binding | `env:"VAR_NAME"` + `WithEnvPrefix[T]()` |
-| Signal handling | `WithSignalHandling[T]()` for SIGINT/SIGTERM |
-| Panic recovery | `RecoveryMiddleware[T]()` with stack traces |
-| Shell completion | `WithCompletion[T,F](fn)` / `WithValidArgs[T,F](args...)` |
-| Man page generation | `cli.ManPage(section)`, `GenerateManPageCommand[T](cli)` |
-| Styled help output | fang integration (enabled by default) |
-| No panics in library API | All functions return errors |
+| Enforcement                                  | How                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Name required on all commands                | `Validate()` rejects empty `use`                                                          |
+| Handler required on leaf commands            | `Validate()` rejects no `runE` and no subcommands                                         |
+| Long description required on parent commands | `Validate()` rejects subcommands without `long`                                           |
+| No duplicate commands                        | `AddCommand` checks `registeredCmds` map                                                  |
+| No duplicate subcommands                     | `Validate()` checks `seen` map                                                            |
+| Short description required (opt-in)          | `WithStrictValidation[T]()` + `ValidateStrict()`                                          |
+| Config validation before commands run        | `WithConfigValidation[T](fn)`                                                             |
+| Positional args bounds                       | `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs`, `WithNoArgs`      |
+| Custom exit codes                            | `ExitCoder` interface + `NewExitError(code, err)`                                         |
+| Version command helper                       | `VersionCommand[T](cli)` / `MustVersionCommand[T](cli)`                                   |
+| Typed errors with context                    | `CommandError`, `FlagError`, `ServiceError`, `ConfigError`, `EnumError`                   |
+| Flag typo suggestions                        | Levenshtein-based `SuggestFlag` / `SuggestCommand`                                        |
+| Typed flag values                            | 9 custom types: Duration, Enum, LogLevel, LogFormat, URL, Email, Port, FilePath, HostPort |
+| Flag validators                              | `validate:"email,min=5,max=100,regex=^..."` struct tags                                   |
+| Required flags                               | `required:"true"` struct tag                                                              |
+| Env var binding                              | `env:"VAR_NAME"` + `WithEnvPrefix[T]()`                                                   |
+| Signal handling                              | `WithSignalHandling[T]()` for SIGINT/SIGTERM                                              |
+| Panic recovery                               | `RecoveryMiddleware[T]()` with stack traces                                               |
+| Shell completion                             | `WithCompletion[T,F](fn)` / `WithValidArgs[T,F](args...)`                                 |
+| Man page generation                          | `cli.ManPage(section)`, `GenerateManPageCommand[T](cli)`                                  |
+| Styled help output                           | fang integration (enabled by default)                                                     |
+| No panics in library API                     | All functions return errors                                                               |
 
 ---
 
@@ -43,6 +43,7 @@
 Every example test manually constructs `CLI[T]`, calls `ExecuteWithArgs`, captures output. This boilerplate repeats 100+ times. No `NewTestCLI`, no `CaptureOutput`, no `ExecuteForTest`.
 
 **What top frameworks provide:**
+
 - urfave/cli v2: `cli.NewContext()` + `cli_test` helpers for isolated command testing
 - kong: `kong.Parse()` with `kong.Exit(func(s int))` for capture, `kong.Vars` for injection
 - cobra: `rootCmd.SetArgs()` + `bytes.Buffer` stdout/stderr capture (manual)
@@ -114,12 +115,14 @@ Add a strict validation pass in `FlagRegistry` that rejects empty `help` tags wh
 **Impact:** CLIs break in CI, pipes, and CI logs.
 
 Every production CLI respects `NO_COLOR` (https://no-color.org/) and/or provides `--no-color`. Fang/lipgloss handles it implicitly, but:
+
 - No `--no-color` flag
 - No documentation about it
 - No `WithNoColor[T]()` option
 - No `TERM=dumb` handling
 
 **What top frameworks do:**
+
 - urfave/cli v2: Built-in `NO_COLOR` detection
 - kong: `term.IsTerminal` + `NO_COLOR` convention
 - Most production CLIs: Explicit `--no-color` flag + env var check + `TERM=dumb`
@@ -143,6 +146,7 @@ WithNoColor[T]() CLIOption[T]
 When `--output=json` is set, data output is JSON but errors are still plain text. The typed error hierarchy (`CommandError`, `FlagError`, `ServiceError`, `ExitError`) would serialize beautifully but isn't wired for it.
 
 **What top frameworks do:**
+
 - urfave/cli v2: `cli.ErrWriter` + JSON error formatting
 - kong: `--format=json` for machine-readable output including errors
 - Terraform/Pulumi: Structured error output for CI/automation
@@ -170,20 +174,20 @@ type ErrorSchema struct {
 
 ### 6. Examples Don't Cover 12+ Features
 
-| Feature | Has Example? |
-|---|---|
-| `WithStrictValidation` | No |
-| `WithConfigValidation` | No |
-| `VersionCommand` / `MustVersionCommand` | No |
-| Positional args (`WithExactArgs`, etc.) | No |
-| `WithOutputFormat` | No |
-| Middleware (`TimingMiddleware`, `RecoveryMiddleware`) | No |
-| Man page generation | No |
-| Shell completion (`WithCompletion`) | No |
-| `EditInEditor` | No |
-| `MustNewCommand` / `MustNewParentCommand` | No |
-| `ExitCoder` / `ExitError` | No |
-| `WithGroup` / `WithGroupID` | No |
+| Feature                                               | Has Example? |
+| ----------------------------------------------------- | ------------ |
+| `WithStrictValidation`                                | No           |
+| `WithConfigValidation`                                | No           |
+| `VersionCommand` / `MustVersionCommand`               | No           |
+| Positional args (`WithExactArgs`, etc.)               | No           |
+| `WithOutputFormat`                                    | No           |
+| Middleware (`TimingMiddleware`, `RecoveryMiddleware`) | No           |
+| Man page generation                                   | No           |
+| Shell completion (`WithCompletion`)                   | No           |
+| `EditInEditor`                                        | No           |
+| `MustNewCommand` / `MustNewParentCommand`             | No           |
+| `ExitCoder` / `ExitError`                             | No           |
+| `WithGroup` / `WithGroupID`                           | No           |
 
 **Proposal:** Create `examples/superb/` demonstrating all enforcement features together.
 
@@ -192,6 +196,7 @@ type ErrorSchema struct {
 ### 7. README is 25+ Public APIs Behind
 
 **CLI options not in README:**
+
 - `WithConfigValidation[T](fn)` — cross-field config validation
 - `WithStrictValidation[T]()` — require short descriptions
 - `WithOutputFormat[T]()` — auto `--output` flag
@@ -200,12 +205,14 @@ type ErrorSchema struct {
 - `WithFangOptions[T](opts...)` — custom fang styling
 
 **Command options not in README:**
+
 - `WithCompletion[T,F](fn)` — dynamic shell completion
 - `WithValidArgs[T,F](args...)` — static valid args
 - `WithExactArgs[T,F](n)` / `WithMinimumArgs` / `WithMaximumArgs` / `WithRangeArgs` / `WithNoArgs`
 - `WithArgs[T,F](fn)` — custom args validator
 
 **Entire API sections not in README:**
+
 - Version command: `VersionCommand[T]`, `MustVersionCommand[T]`, `GenerateVersionCommand[T]`
 - Man pages: `cli.ManPage(section)`, `cli.WriteManPage(w, section)`, `GenerateManPageCommand[T]`
 - Error types: `ExitCoder`, `ExitError`, `NewExitError(code, err)` + exit codes in `ExecuteAndExit`
@@ -236,16 +243,16 @@ Add `deprecated` struct tag support that warns (not errors) when the flag is use
 
 ## Prioritized Execution Plan
 
-| # | What | Impact | Effort | Priority |
-|---|------|--------|--------|----------|
-| 1 | CLI Test Harness | Critical | Medium | P0 |
-| 2 | `help` tag enforcement in strict mode | High | Small | P0 |
-| 3 | `WithRequireExamples` in strict mode | High | Small | P0 |
-| 4 | Explicit NO_COLOR support | High | Small | P1 |
-| 5 | Structured error output (JSON errors) | High | Medium | P1 |
-| 6 | Comprehensive example (`examples/superb/`) | High | Medium | P1 |
-| 7 | README update for 25+ missing APIs | High | Medium | P1 |
-| 8 | Flag deprecation tag | Medium | Small | P2 |
+| #   | What                                       | Impact   | Effort | Priority |
+| --- | ------------------------------------------ | -------- | ------ | -------- |
+| 1   | CLI Test Harness                           | Critical | Medium | P0       |
+| 2   | `help` tag enforcement in strict mode      | High     | Small  | P0       |
+| 3   | `WithRequireExamples` in strict mode       | High     | Small  | P0       |
+| 4   | Explicit NO_COLOR support                  | High     | Small  | P1       |
+| 5   | Structured error output (JSON errors)      | High     | Medium | P1       |
+| 6   | Comprehensive example (`examples/superb/`) | High     | Medium | P1       |
+| 7   | README update for 25+ missing APIs         | High     | Medium | P1       |
+| 8   | Flag deprecation tag                       | Medium   | Small  | P2       |
 
 ---
 
