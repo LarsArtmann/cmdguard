@@ -11,16 +11,14 @@ type CLIOption[T any] func(*CLI[T])
 // WithCLIVersion sets the version string.
 func WithCLIVersion[T any](version string) CLIOption[T] {
 	return func(cli *CLI[T]) {
-		cli.version = version
-		cli.rootCmd.Version = version
+		cli.setVersion(version)
 	}
 }
 
 // WithCLILong sets the long description.
 func WithCLILong[T any](long string) CLIOption[T] {
 	return func(cli *CLI[T]) {
-		cli.long = long
-		cli.rootCmd.Long = long
+		cli.setLong(long)
 	}
 }
 

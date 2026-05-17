@@ -43,7 +43,7 @@ func TestExitError(t *testing.T) {
 			t.Fatal(errCheck)
 		}
 
-		_, ok := interface{}(exitErr).(ExitCoder)
+		_, ok := any(exitErr).(ExitCoder)
 		if !ok {
 			t.Fatal("expected ExitError to implement ExitCoder")
 		}
@@ -99,7 +99,8 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 
 		cmd, err := NewCommand[testConfig, NoFlags]("fail-custom",
 			func(_ context.Context, _ *testConfig, _ NoFlags) error {
-			exitErr, _ := NewExitError(42, errors.New("custom failure"))
+				exitErr, _ := NewExitError(42, errors.New("custom failure"))
+
 				return exitErr
 			},
 		)

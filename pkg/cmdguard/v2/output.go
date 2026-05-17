@@ -134,8 +134,8 @@ func marshalAndWrite(w io.Writer, label string, data any, fn renderMarshalFunc) 
 
 // tableFormatRegistry maps OutputFormat to rendering functions.
 var tableFormatRegistry = map[OutputFormat]tableRenderer{
-	output.FormatTable:    renderTableStyled,
-	output.FormatCSV:      renderTableCSV,
+	output.FormatTable: renderTableStyled,
+	output.FormatCSV:   renderTableCSV,
 	output.FormatJSON: func(w io.Writer, data *output.TableData) error {
 		return marshalAndWrite(w, "JSON", data, output.MarshalJSON)
 	},

@@ -154,5 +154,9 @@ func (fp FilePath) MarshalText() ([]byte, error) {
 }
 
 func (fp *FilePath) UnmarshalText(text []byte) error {
-	return textUnmarshal(fp, text, func(s string) (FilePath, error) { return ParseFilePath(s, false) })
+	return textUnmarshal(
+		fp,
+		text,
+		func(s string) (FilePath, error) { return ParseFilePath(s, false) },
+	)
 }

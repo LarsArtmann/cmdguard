@@ -34,9 +34,8 @@ type CLI[T any] struct {
 	signalHandling bool
 	outputEnabled  bool
 	outputFormat   OutputFormat
-	outputState    *outputState
-	validationMode  ValidationMode
-	configValidate  func(*T) error
+	validationMode ValidationMode
+	configValidate func(*T) error
 }
 
 // NewCLI creates a new CLI application with typed config.

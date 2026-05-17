@@ -6,11 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// outputState holds the resolved output format for the CLI.
-type outputState struct {
-	format OutputFormat
-}
-
 // WithOutputFormat adds a global --output flag for format selection.
 // When used, the CLI gets a persistent --output flag (short -o) that
 // controls the output format. Access the resolved format via cli.OutputFormat().
@@ -32,22 +27,16 @@ func WithOutputFormat[T any](defaultFormat OutputFormat) CLIOption[T] {
 // OutputFormat returns the resolved output format from the --output flag.
 // If WithOutputFormat was not used, returns FormatTable.
 func (cli *CLI[T]) OutputFormat() OutputFormat {
-	if cli.outputState == nil {
+	if !cli.outputEnabled {
 		return FormatTable
 	}
 
-	return cli.outputState.format
+	return cli.outputFormat
 }
 
 // SetOutputFormat sets the output format at runtime.
 func (cli *CLI[T]) SetOutputFormat(format OutputFormat) {
-	if cli.outputState == nil {
-		cli.outputState = &outputState{format: format}
-
-		return
-	}
-
-	cli.outputState.format = format
+	cli.outputFormat = format
 }
 
 // initOutputFlag sets up the --output flag and hooks into flag parsing.
@@ -55,8 +44,6 @@ func (cli *CLI[T]) initOutputFlag() {
 	if !cli.outputEnabled {
 		return
 	}
-
-	cli.outputState = &outputState{format: cli.outputFormat}
 
 	cli.AddGlobalFlag("output", "o", string(cli.outputFormat),
 		"Output format (table, json, csv, yaml, markdown, xml)")
@@ -79,7 +66,7 @@ func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
 		return fmt.Errorf("invalid output format %q: %w", formatStr, err)
 	}
 
-	cli.outputState.format = format
+	cli.outputFormat = format
 
 	return nil
 }

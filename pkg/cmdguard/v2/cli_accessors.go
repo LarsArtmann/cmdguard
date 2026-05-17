@@ -69,12 +69,20 @@ func (cli *CLI[T]) Long() string {
 
 // SetLong sets the long description.
 func (cli *CLI[T]) SetLong(long string) {
+	cli.setLong(long)
+}
+
+func (cli *CLI[T]) setLong(long string) {
 	cli.long = long
 	cli.rootCmd.Long = long
 }
 
 // SetVersion sets the version string.
 func (cli *CLI[T]) SetVersion(version string) {
+	cli.setVersion(version)
+}
+
+func (cli *CLI[T]) setVersion(version string) {
 	cli.version = version
 	cli.rootCmd.Version = version
 }

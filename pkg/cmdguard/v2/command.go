@@ -140,7 +140,11 @@ func (c Command[T, F]) validate(mode ValidationMode) error {
 	}
 
 	if mode >= Draconian && c.runE != nil && c.example == "" {
-		return fmt.Errorf("%w: %q has no example (required in draconian mode)", ErrMissingExample, c.use)
+		return fmt.Errorf(
+			"%w: %q has no example (required in draconian mode)",
+			ErrMissingExample,
+			c.use,
+		)
 	}
 
 	if c.runE == nil && len(c.commands) == 0 {
