@@ -1,4 +1,6 @@
-# AGENTS.md - cmdguard Project Guide
+# AGENTS.md - cmdguard Contributor & AI Assistant Guide
+
+> **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
 **Last Updated:** 2026-05-17
 **Project:** cmdguard - CLI Guard Library
