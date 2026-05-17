@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"maps"
 	"reflect"
 	"sync"
 
@@ -97,13 +98,8 @@ func (r *typeRegistry) clone() *typeRegistry {
 		countHandler: r.countHandler,
 	}
 
-	for k, v := range r.byType {
-		c.byType[k] = v
-	}
-
-	for k, v := range r.byKind {
-		c.byKind[k] = v
-	}
+	maps.Copy(c.byType, r.byType)
+	maps.Copy(c.byKind, r.byKind)
 
 	return c
 }

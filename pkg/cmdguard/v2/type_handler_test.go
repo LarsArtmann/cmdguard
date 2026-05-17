@@ -346,7 +346,7 @@ func TestTypeHandler_DispatchRegister_WithCount(t *testing.T) {
 			Type: reflect.TypeFor[int](), Count: true,
 		}
 
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertNoError(t, err)
 
 		f := fs.Lookup("verbose")
@@ -364,7 +364,7 @@ func TestTypeHandler_DispatchRegister_WithCount(t *testing.T) {
 			Type: reflect.TypeFor[int](), Count: true,
 		}
 
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertNoError(t, err)
 
 		f := fs.Lookup("verbose")
@@ -462,7 +462,7 @@ func TestTypeHandler_DispatchDefault(t *testing.T) {
 		t.Parallel()
 
 		tag := FlagTag{Type: reflect.TypeFor[int](), Default: ""}
-		result := dispatchDefault(tag)
+		result := dispatchDefault(globalTypeRegistry, tag)
 		testutil.AssertEqual(t, result, 0)
 	})
 
@@ -470,7 +470,7 @@ func TestTypeHandler_DispatchDefault(t *testing.T) {
 		t.Parallel()
 
 		tag := FlagTag{Type: reflect.TypeFor[int](), Default: "42"}
-		result := dispatchDefault(tag)
+		result := dispatchDefault(globalTypeRegistry, tag)
 		testutil.AssertEqual(t, result, 42)
 	})
 
@@ -478,7 +478,7 @@ func TestTypeHandler_DispatchDefault(t *testing.T) {
 		t.Parallel()
 
 		tag := FlagTag{Type: reflect.TypeFor[uint32](), Default: "100"}
-		result := dispatchDefault(tag)
+		result := dispatchDefault(globalTypeRegistry, tag)
 		if result != uint32(100) {
 			t.Errorf("dispatchDefault(100) = %v (%T), want uint32(100)", result, result)
 		}
@@ -489,7 +489,7 @@ func TestTypeHandler_DispatchDefault(t *testing.T) {
 
 		type Foo struct{}
 		tag := FlagTag{Type: reflect.TypeFor[Foo](), Default: "bar"}
-		result := dispatchDefault(tag)
+		result := dispatchDefault(globalTypeRegistry, tag)
 		testutil.AssertEqual(t, result, "bar")
 	})
 }
@@ -501,7 +501,7 @@ func TestTypeHandler_DispatchParse(t *testing.T) {
 		t.Parallel()
 
 		tag := FlagTag{Type: reflect.TypeFor[int]()}
-		result, err := dispatchParse("42", tag)
+		result, err := dispatchParse(globalTypeRegistry, "42", tag)
 		testutil.AssertNoError(t, err)
 		if result != int64(42) {
 			t.Errorf("dispatchParse(42) = %v, want int64(42)", result)
@@ -513,7 +513,7 @@ func TestTypeHandler_DispatchParse(t *testing.T) {
 
 		type Custom struct{}
 		tag := FlagTag{Type: reflect.TypeFor[Custom]()}
-		result, err := dispatchParse("hello", tag)
+		result, err := dispatchParse(globalTypeRegistry, "hello", tag)
 		testutil.AssertNoError(t, err)
 		testutil.AssertEqual(t, result, "hello")
 	})
@@ -539,7 +539,7 @@ func TestHandledByTypeRegistry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			result := handledByTypeRegistry(tt.typ)
+			result := handledByTypeRegistry(globalTypeRegistry, tt.typ)
 			if result != tt.handled {
 				t.Errorf("handledByTypeRegistry(%v) = %v, want %v", tt.typ, result, tt.handled)
 			}
@@ -561,10 +561,10 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 			Help:    "name",
 			Type:    reflect.TypeFor[string](),
 		}
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertNoError(t, err)
 
-		result, err := dispatchParse("hello", tag)
+		result, err := dispatchParse(globalTypeRegistry, "hello", tag)
 		testutil.AssertNoError(t, err)
 		testutil.AssertEqual(t, result, "hello")
 	})
@@ -580,10 +580,10 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 			Help:    "debug mode",
 			Type:    reflect.TypeFor[bool](),
 		}
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertNoError(t, err)
 
-		result, err := dispatchParse("true", tag)
+		result, err := dispatchParse(globalTypeRegistry, "true", tag)
 		testutil.AssertNoError(t, err)
 		testutil.AssertEqual(t, result, true)
 	})
@@ -598,10 +598,10 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 			Help:    "ratio",
 			Type:    reflect.TypeFor[float64](),
 		}
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertNoError(t, err)
 
-		result, err := dispatchParse("2.7", tag)
+		result, err := dispatchParse(globalTypeRegistry, "2.7", tag)
 		testutil.AssertNoError(t, err)
 		testutil.AssertEqual(t, result, 2.7)
 	})
@@ -616,10 +616,10 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 			Help:    "tags",
 			Type:    reflect.TypeFor[[]string](),
 		}
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertNoError(t, err)
 
-		result, err := dispatchParse("x,y,z", tag)
+		result, err := dispatchParse(globalTypeRegistry, "x,y,z", tag)
 		testutil.AssertNoError(t, err)
 		s, ok := result.([]string)
 		testutil.AssertBoolTrue(t, ok, "result should be []string")
@@ -638,7 +638,7 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 			Help:    "bad bool",
 			Type:    reflect.TypeFor[bool](),
 		}
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertExpectedError(t, err)
 	})
 
@@ -652,7 +652,7 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 			Help:    "bad int",
 			Type:    reflect.TypeFor[int](),
 		}
-		err := dispatchRegister(fs, tag)
+		err := dispatchRegister(globalTypeRegistry, fs, tag)
 		testutil.AssertExpectedError(t, err)
 	})
 }

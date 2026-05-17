@@ -37,7 +37,11 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags for %T: %w", ErrFlagParseFailed, cfg, err)
 	}
 
-	return &FlagRegistry{tags: tags, validators: newValidatorRegistry(), types: globalTypeRegistry.clone()}, nil
+	return &FlagRegistry{
+		tags:       tags,
+		validators: newValidatorRegistry(),
+		types:      globalTypeRegistry.clone(),
+	}, nil
 }
 
 // RegisterFlagValidator adds a named validator to this registry's instance-scoped set.
