@@ -47,6 +47,7 @@ package main
 import (
     "context"
     "fmt"
+    "os"
     "strings"
 
     "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
@@ -65,7 +66,8 @@ type GreetFlags struct {
 func main() {
     cli, err := v2.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
     if err != nil {
-        panic(err)
+        fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
+        os.Exit(1)
     }
 
     greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
@@ -81,7 +83,8 @@ func main() {
         v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
     )
     if err != nil {
-        panic(err)
+        fmt.Fprintf(os.Stderr, "Failed to create command: %v\n", err)
+        os.Exit(1)
     }
 
     v2.AddCommand(cli, greetCmd)
