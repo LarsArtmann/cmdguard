@@ -117,17 +117,9 @@ func (u URL) Path() string {
 
 // MarshalText implements encoding.TextMarshaler for URL.
 func (u URL) MarshalText() ([]byte, error) {
-	return []byte(u.String()), nil
+	return textMarshal(u, URL.String)
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for URL.
 func (u *URL) UnmarshalText(text []byte) error {
-	parsed, err := ParseURL(string(text))
-	if err != nil {
-		return err
-	}
-
-	*u = parsed
-
-	return nil
+	return textUnmarshal(u, text, ParseURL)
 }

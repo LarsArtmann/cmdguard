@@ -52,17 +52,9 @@ func (d Duration) Seconds() float64 {
 
 // MarshalText implements encoding.TextMarshaler for Duration.
 func (d Duration) MarshalText() ([]byte, error) {
-	return []byte(d.duration.String()), nil
+	return textMarshal(d, Duration.String)
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for Duration.
 func (d *Duration) UnmarshalText(text []byte) error {
-	parsed, err := ParseDuration(string(text))
-	if err != nil {
-		return err
-	}
-
-	*d = parsed
-
-	return nil
+	return textUnmarshal(d, text, ParseDuration)
 }

@@ -150,18 +150,9 @@ func (fp FilePath) Join(elem ...string) FilePath {
 
 // MarshalText implements encoding.TextMarshaler for FilePath.
 func (fp FilePath) MarshalText() ([]byte, error) {
-	return []byte(fp.path), nil
+	return textMarshal(fp, func(fp FilePath) string { return fp.path })
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for FilePath.
-// Note: This does NOT check if the path exists.
 func (fp *FilePath) UnmarshalText(text []byte) error {
-	parsed, err := ParseFilePath(string(text), false)
-	if err != nil {
-		return err
-	}
-
-	*fp = parsed
-
-	return nil
+	return textUnmarshal(fp, text, func(s string) (FilePath, error) { return ParseFilePath(s, false) })
 }

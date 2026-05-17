@@ -81,17 +81,9 @@ func (hp HostPort) IsAnyHost() bool {
 
 // MarshalText implements encoding.TextMarshaler for HostPort.
 func (hp HostPort) MarshalText() ([]byte, error) {
-	return []byte(hp.String()), nil
+	return textMarshal(hp, HostPort.String)
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for HostPort.
 func (hp *HostPort) UnmarshalText(text []byte) error {
-	parsed, err := ParseHostPort(string(text))
-	if err != nil {
-		return err
-	}
-
-	*hp = parsed
-
-	return nil
+	return textUnmarshal(hp, text, ParseHostPort)
 }

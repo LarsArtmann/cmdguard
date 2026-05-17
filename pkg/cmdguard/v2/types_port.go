@@ -109,17 +109,9 @@ func (p Port) IsDynamic() bool {
 
 // MarshalText implements encoding.TextMarshaler for Port.
 func (p Port) MarshalText() ([]byte, error) {
-	return []byte(p.String()), nil
+	return textMarshal(p, Port.String)
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for Port.
 func (p *Port) UnmarshalText(text []byte) error {
-	parsed, err := ParsePort(string(text))
-	if err != nil {
-		return err
-	}
-
-	*p = parsed
-
-	return nil
+	return textUnmarshal(p, text, ParsePort)
 }

@@ -41,3 +41,20 @@ func MustParse[T any](name, s string, parser func(string) (T, error)) T {
 
 	return v
 }
+
+// textMarshal returns the text representation of a value for encoding.TextMarshaler.
+func textMarshal[T any](v T, fmt func(T) string) ([]byte, error) {
+	return []byte(fmt(v)), nil
+}
+
+// textUnmarshal parses text into a value for encoding.TextUnmarshaler.
+func textUnmarshal[T any](dest *T, text []byte, parse func(string) (T, error)) error {
+	parsed, err := parse(string(text))
+	if err != nil {
+		return err
+	}
+
+	*dest = parsed
+
+	return nil
+}

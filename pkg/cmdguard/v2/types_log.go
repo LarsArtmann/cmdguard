@@ -88,34 +88,18 @@ func (f LogFormat) String() string {
 
 // MarshalText implements encoding.TextMarshaler for LogLevel.
 func (l LogLevel) MarshalText() ([]byte, error) {
-	return []byte(l.value), nil
+	return textMarshal(l, func(l LogLevel) string { return l.value })
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for LogLevel.
 func (l *LogLevel) UnmarshalText(text []byte) error {
-	parsed, err := ParseLogLevel(string(text))
-	if err != nil {
-		return err
-	}
-
-	*l = parsed
-
-	return nil
+	return textUnmarshal(l, text, ParseLogLevel)
 }
 
 // MarshalText implements encoding.TextMarshaler for LogFormat.
 func (f LogFormat) MarshalText() ([]byte, error) {
-	return []byte(f.value), nil
+	return textMarshal(f, func(f LogFormat) string { return f.value })
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler for LogFormat.
 func (f *LogFormat) UnmarshalText(text []byte) error {
-	parsed, err := ParseLogFormat(string(text))
-	if err != nil {
-		return err
-	}
-
-	*f = parsed
-
-	return nil
+	return textUnmarshal(f, text, ParseLogFormat)
 }
