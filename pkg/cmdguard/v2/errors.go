@@ -170,6 +170,9 @@ var (
 
 	// ErrInvalidExitCode indicates an exit code outside the valid 0–255 range.
 	ErrInvalidExitCode = errors.New("exit code must be between 0 and 255")
+
+	// ErrMissingExample indicates a leaf command has no example in draconian mode.
+	ErrMissingExample = errors.New("command has no example")
 )
 
 // CommandError wraps an error with command context.

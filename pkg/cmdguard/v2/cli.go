@@ -35,8 +35,8 @@ type CLI[T any] struct {
 	outputEnabled  bool
 	outputFormat   OutputFormat
 	outputState    *outputState
-	configValidate func(*T) error
-	strict         bool
+	validationMode  ValidationMode
+	configValidate  func(*T) error
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -131,7 +131,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.use)
 	}
 
-	if err := cmd.validate(cli.strict); err != nil {
+	if err := cmd.validate(cli.validationMode); err != nil {
 		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.use, cli.name, err)
 	}
 

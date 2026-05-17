@@ -107,24 +107,40 @@ func (c Command[T, F]) IsExecutable() bool {
 	return c.HasHandler()
 }
 
+// ValidationMode controls how strictly commands are validated.
+type ValidationMode int
+
+const (
+	// Lenient requires only name and handler.
+	Lenient ValidationMode = iota
+	// Strict additionally requires short descriptions on all commands.
+	Strict
+	// Draconian additionally requires examples on leaf commands.
+	Draconian
+)
+
 // Validate checks that the command is properly configured.
 func (c Command[T, F]) Validate() error {
-	return c.validate(false)
+	return c.validate(Lenient)
 }
 
 // ValidateStrict checks that the command is properly configured with strict rules.
 // In strict mode, all commands must have a short description.
 func (c Command[T, F]) ValidateStrict() error {
-	return c.validate(true)
+	return c.validate(Strict)
 }
 
-func (c Command[T, F]) validate(strict bool) error {
+func (c Command[T, F]) validate(mode ValidationMode) error {
 	if c.use == "" {
 		return fmt.Errorf("%w: command has no Use field", ErrInvalidCommand)
 	}
 
-	if strict && c.short == "" {
+	if mode >= Strict && c.short == "" {
 		return fmt.Errorf("%w: %q has no short description", ErrMissingShort, c.use)
+	}
+
+	if mode >= Draconian && c.runE != nil && c.example == "" {
+		return fmt.Errorf("%w: %q has no example (required in draconian mode)", ErrMissingExample, c.use)
 	}
 
 	if c.runE == nil && len(c.commands) == 0 {
@@ -150,7 +166,7 @@ func (c Command[T, F]) validate(strict bool) error {
 	}
 
 	for i, sub := range c.commands {
-		err := sub.validate(strict)
+		err := sub.validate(mode)
 		if err != nil {
 			return fmt.Errorf("subcommand %d of %q: %w", i, c.use, err)
 		}

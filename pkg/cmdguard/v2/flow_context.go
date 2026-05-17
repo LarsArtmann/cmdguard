@@ -45,6 +45,21 @@ func NewBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
 	}
 }
 
+// branchWithCtx creates a child context, registers it, and applies options.
+func (b *BranchingFlowContext) branchWithCtx(
+	branchCtx context.Context,
+	cancel context.CancelFunc,
+	commandName string,
+	opts []FlowContextOption,
+) *BranchingFlowContext {
+	child := b.newChild(branchCtx, commandName)
+	child.selfCancel = cancel
+	applyOptions(child, opts)
+	b.children = append(b.children, child)
+
+	return child
+}
+
 // Branch creates a new child context for a subcommand.
 // The child inherits all values from the parent but has its own cancellation.
 func (b *BranchingFlowContext) Branch(
@@ -53,12 +68,7 @@ func (b *BranchingFlowContext) Branch(
 ) (*BranchingFlowContext, func()) {
 	branchCtx, cancel := context.WithCancel(b.Context)
 
-	child := b.newChild(branchCtx, commandName)
-	child.selfCancel = cancel
-	applyOptions(child, opts)
-	b.children = append(b.children, child)
-
-	return child, cancel
+	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel
 }
 
 // BranchWithTimeout creates a child context with a timeout for a subcommand.
@@ -74,12 +84,7 @@ func (b *BranchingFlowContext) BranchWithTimeout(
 
 	branchCtx, cancel := context.WithTimeout(b.Context, d)
 
-	child := b.newChild(branchCtx, commandName)
-	child.selfCancel = cancel
-	applyOptions(child, opts)
-	b.children = append(b.children, child)
-
-	return child, cancel, nil
+	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel, nil
 }
 
 // BranchWithDeadline creates a child context with a deadline for a subcommand.
@@ -95,12 +100,7 @@ func (b *BranchingFlowContext) BranchWithDeadline(
 
 	branchCtx, cancel := context.WithDeadline(b.Context, t)
 
-	child := b.newChild(branchCtx, commandName)
-	child.selfCancel = cancel
-	applyOptions(child, opts)
-	b.children = append(b.children, child)
-
-	return child, cancel, nil
+	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel, nil
 }
 
 // BranchWithDuration creates a child context with a timeout for a subcommand.
@@ -113,12 +113,7 @@ func (b *BranchingFlowContext) BranchWithDuration(
 ) (*BranchingFlowContext, func()) {
 	branchCtx, cancel := context.WithTimeout(b.Context, d)
 
-	child := b.newChild(branchCtx, commandName)
-	child.selfCancel = cancel
-	applyOptions(child, opts)
-	b.children = append(b.children, child)
-
-	return child, cancel
+	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel
 }
 
 // BranchWithDeadlineTime creates a child context with a deadline for a subcommand.
@@ -131,12 +126,7 @@ func (b *BranchingFlowContext) BranchWithDeadlineTime(
 ) (*BranchingFlowContext, func()) {
 	branchCtx, cancel := context.WithDeadline(b.Context, deadline)
 
-	child := b.newChild(branchCtx, commandName)
-	child.selfCancel = cancel
-	applyOptions(child, opts)
-	b.children = append(b.children, child)
-
-	return child, cancel
+	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel
 }
 
 // newChild creates a child BranchingFlowContext with the given context and command name.

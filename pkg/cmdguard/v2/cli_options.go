@@ -114,10 +114,17 @@ func WithConfigValidation[T any](validate func(*T) error) CLIOption[T] {
 
 // WithStrictValidation enables strict command validation:
 //   - All commands must have a short description
-//
-// This makes it impossible to ship a CLI with commands that produce ugly help output.
 func WithStrictValidation[T any]() CLIOption[T] {
 	return func(cli *CLI[T]) {
-		cli.strict = true
+		cli.validationMode = Strict
+	}
+}
+
+// WithDraconianValidation enables draconian command validation:
+//   - All commands must have a short description
+//   - All leaf commands must have an example
+func WithDraconianValidation[T any]() CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.validationMode = Draconian
 	}
 }

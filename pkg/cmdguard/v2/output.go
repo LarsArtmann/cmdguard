@@ -102,20 +102,89 @@ func OutputStyledTable(headers []string, rows [][]string) error {
 // tableRenderer renders a TableData to a writer.
 type tableRenderer func(w io.Writer, data *output.TableData) error
 
+// renderMarshalFunc produces a string from any data (e.g., JSON, YAML, XML, TSV).
+type renderMarshalFunc func(data any) ([]byte, error)
+
+// renderStringFunc produces a rendered string from TableData (e.g., via .Render()).
+type renderStringFunc func(data *output.TableData) (string, error)
+
+// renderAndWrite calls fn to produce a string, then writes it to w.
+func renderAndWrite(w io.Writer, label string, data *output.TableData, fn renderStringFunc) error {
+	result, err := fn(data)
+	if err != nil {
+		return fmt.Errorf("rendering %s: %w", label, err)
+	}
+
+	fmt.Fprintln(w, result)
+
+	return nil
+}
+
+// marshalAndWrite calls fn to produce bytes from data, then writes them to w.
+func marshalAndWrite(w io.Writer, label string, data any, fn renderMarshalFunc) error {
+	result, err := fn(data)
+	if err != nil {
+		return fmt.Errorf("marshaling %s: %w", label, err)
+	}
+
+	fmt.Fprintln(w, string(result))
+
+	return nil
+}
+
 // tableFormatRegistry maps OutputFormat to rendering functions.
 var tableFormatRegistry = map[OutputFormat]tableRenderer{
 	output.FormatTable:    renderTableStyled,
-	output.FormatJSON:     renderTableJSON,
 	output.FormatCSV:      renderTableCSV,
-	output.FormatTSV:      renderTableTSV,
-	output.FormatMarkdown: renderTableMarkdown,
-	output.FormatYAML:     renderTableYAML,
-	output.FormatXML:      renderTableXML,
-	output.FormatHTML:     renderTableHTML,
-	output.FormatTree:     renderTableTree,
-	output.FormatD2:       renderTableD2,
-	output.FormatMermaid:  renderTableMermaid,
-	output.FormatDOT:      renderTableDOT,
+	output.FormatJSON: func(w io.Writer, data *output.TableData) error {
+		return marshalAndWrite(w, "JSON", data, output.MarshalJSON)
+	},
+	output.FormatTSV: func(w io.Writer, data *output.TableData) error {
+		return marshalAndWrite(w, "TSV", data, output.MarshalTSV)
+	},
+	output.FormatYAML: func(w io.Writer, data *output.TableData) error {
+		return marshalAndWrite(w, "YAML", data, output.MarshalYAML)
+	},
+	output.FormatXML: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "XML", data, func(d *output.TableData) (string, error) {
+			b, err := output.MarshalXMLFromTableData(d)
+
+			return string(b), err
+		})
+	},
+	output.FormatMarkdown: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "markdown", data, func(d *output.TableData) (string, error) {
+			return output.NewMarkdownTableFromData(d).Render()
+		})
+	},
+	output.FormatHTML: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "HTML", data, func(d *output.TableData) (string, error) {
+			r := output.NewHTMLRenderer()
+			r.SetData(d)
+
+			return r.Render()
+		})
+	},
+	output.FormatTree: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "tree", data, func(d *output.TableData) (string, error) {
+			return output.TreeRendererFromTableData(d).Render()
+		})
+	},
+	output.FormatD2: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "D2", data, func(d *output.TableData) (string, error) {
+			return output.D2FromTableData(d).Render()
+		})
+	},
+	output.FormatMermaid: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "Mermaid", data, func(d *output.TableData) (string, error) {
+			return output.MermaidFlowchartRenderer(d).Render()
+		})
+	},
+	output.FormatDOT: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "DOT", data, func(d *output.TableData) (string, error) {
+			return output.DOTFromTableData(d).Render()
+		})
+	},
 }
 
 // anyRenderer renders arbitrary data to a writer.
@@ -123,8 +192,14 @@ type anyRenderer func(w io.Writer, data any) error
 
 // anyFormatRegistry maps OutputFormat to generic rendering functions.
 var anyFormatRegistry = map[OutputFormat]anyRenderer{
-	output.FormatJSON: renderAnyJSON,
-	output.FormatYAML: renderAnyYAML,
+	output.FormatJSON: func(w io.Writer, data any) error {
+		return marshalAndWrite(w, "JSON", data, func(v any) ([]byte, error) {
+			return output.MarshalJSONIndent(v, "", "  ")
+		})
+	},
+	output.FormatYAML: func(w io.Writer, data any) error {
+		return marshalAndWrite(w, "YAML", data, output.MarshalYAML)
+	},
 }
 
 func renderTableData(cfg OutputConfig, data *output.TableData) error {
@@ -163,17 +238,6 @@ func renderTableStyled(w io.Writer, data *output.TableData) error {
 	return nil
 }
 
-func renderTableJSON(w io.Writer, data *output.TableData) error {
-	result, err := output.MarshalJSON(data)
-	if err != nil {
-		return fmt.Errorf("marshaling JSON: %w", err)
-	}
-
-	fmt.Fprintln(w, string(result))
-
-	return nil
-}
-
 func renderTableCSV(w io.Writer, data *output.TableData) error {
 	cw := output.NewCSVWriter(w)
 
@@ -190,136 +254,4 @@ func renderTableCSV(w io.Writer, data *output.TableData) error {
 	cw.Flush()
 
 	return cw.Error()
-}
-
-func renderTableTSV(w io.Writer, data *output.TableData) error {
-	result, err := output.MarshalTSV(data)
-	if err != nil {
-		return fmt.Errorf("marshaling TSV: %w", err)
-	}
-
-	fmt.Fprintln(w, string(result))
-
-	return nil
-}
-
-func renderTableMarkdown(w io.Writer, data *output.TableData) error {
-	md := output.NewMarkdownTableFromData(data)
-
-	result, err := md.Render()
-	if err != nil {
-		return fmt.Errorf("rendering markdown: %w", err)
-	}
-
-	fmt.Fprintln(w, result)
-
-	return nil
-}
-
-func renderTableYAML(w io.Writer, data *output.TableData) error {
-	result, err := output.MarshalYAML(data)
-	if err != nil {
-		return fmt.Errorf("marshaling YAML: %w", err)
-	}
-
-	fmt.Fprintln(w, string(result))
-
-	return nil
-}
-
-func renderTableXML(w io.Writer, data *output.TableData) error {
-	result, err := output.MarshalXMLFromTableData(data)
-	if err != nil {
-		return fmt.Errorf("marshaling XML: %w", err)
-	}
-
-	fmt.Fprintln(w, string(result))
-
-	return nil
-}
-
-func renderTableHTML(w io.Writer, data *output.TableData) error {
-	r := output.NewHTMLRenderer()
-	r.SetData(data)
-
-	result, err := r.Render()
-	if err != nil {
-		return fmt.Errorf("rendering HTML: %w", err)
-	}
-
-	fmt.Fprintln(w, result)
-
-	return nil
-}
-
-func renderTableTree(w io.Writer, data *output.TableData) error {
-	renderer := output.TreeRendererFromTableData(data)
-
-	result, err := renderer.Render()
-	if err != nil {
-		return fmt.Errorf("rendering tree: %w", err)
-	}
-
-	fmt.Fprintln(w, result)
-
-	return nil
-}
-
-func renderTableD2(w io.Writer, data *output.TableData) error {
-	result, err := output.D2FromTableData(data).Render()
-	if err != nil {
-		return fmt.Errorf("rendering D2: %w", err)
-	}
-
-	fmt.Fprintln(w, result)
-
-	return nil
-}
-
-func renderTableMermaid(w io.Writer, data *output.TableData) error {
-	renderer := output.MermaidFlowchartRenderer(data)
-
-	result, err := renderer.Render()
-	if err != nil {
-		return fmt.Errorf("rendering Mermaid: %w", err)
-	}
-
-	fmt.Fprintln(w, result)
-
-	return nil
-}
-
-func renderTableDOT(w io.Writer, data *output.TableData) error {
-	renderer := output.DOTFromTableData(data)
-
-	result, err := renderer.Render()
-	if err != nil {
-		return fmt.Errorf("rendering DOT: %w", err)
-	}
-
-	fmt.Fprintln(w, result)
-
-	return nil
-}
-
-func renderAnyJSON(w io.Writer, data any) error {
-	result, err := output.MarshalJSONIndent(data, "", "  ")
-	if err != nil {
-		return fmt.Errorf("marshaling JSON: %w", err)
-	}
-
-	fmt.Fprintln(w, string(result))
-
-	return nil
-}
-
-func renderAnyYAML(w io.Writer, data any) error {
-	result, err := output.MarshalYAML(data)
-	if err != nil {
-		return fmt.Errorf("marshaling YAML: %w", err)
-	}
-
-	fmt.Fprintln(w, string(result))
-
-	return nil
 }
