@@ -81,10 +81,10 @@ func (r *FlagRegistry) lookupFlag(cmd *cobra.Command, tag FlagTag) (*pflag.Flag,
 
 // parseAndSetValue parses the flag value via the TypeHandler registry and sets it on config.
 func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) error {
-	parsed, err := dispatchParse(value, tag)
+	parsed, err := dispatchParse(r.types, value, tag)
 	if err != nil {
 		return fmt.Errorf("parsing flag %q with value %q: %w", tag.Name, value, err)
 	}
 
-	return SetField(cfg, tag.Field, parsed)
+	return setField(cfg, tag.Field, parsed, r.types)
 }
