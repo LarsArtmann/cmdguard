@@ -154,5 +154,5 @@ func (r *typeRegistry) registerGoDurationHandler() {
 
 			return d
 		},
-	}
+	})
 }
