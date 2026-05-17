@@ -360,9 +360,8 @@ func provideBenchService(scope *v2.Scope) error {
 
 // BenchmarkScopeProvide measures DI service registration.
 func BenchmarkScopeProvide(b *testing.B) {
-	scope := v2.NewScope("bench")
-
 	for b.Loop() {
+		scope := v2.NewScope("bench")
 		err := provideBenchService(scope)
 		if err != nil {
 			b.Fatal(err)
