@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"reflect"
 	"slices"
 
 	"github.com/spf13/cobra"
@@ -81,7 +82,7 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 
 // registerFlag adds a single flag to the given flag set via the TypeHandler registry.
 func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
-	if err := dispatchRegister(flags, tag); err != nil {
+	if err := dispatchRegister(r.types, flags, tag); err != nil {
 		return fmt.Errorf("%w: registering flag %q: %w", ErrFlagParseFailed, tag.Name, err)
 	}
 
