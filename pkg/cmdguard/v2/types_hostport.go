@@ -3,7 +3,6 @@ package v2
 import (
 	"fmt"
 	"net"
-	"strings"
 )
 
 // HostPort combines a hostname and port for network addresses.
@@ -18,8 +17,8 @@ type HostPort struct {
 // ParseHostPort creates a new HostPort from a string.
 // Accepts formats like "localhost:8080", "example.com:443", or ":8080" (any host).
 func ParseHostPort(s string) (HostPort, error) {
-	if strings.TrimSpace(s) == "" {
-		return HostPort{}, fmt.Errorf("%w: host:port cannot be empty", ErrInvalidHostPort)
+	if err := requireNonEmpty(s, "host:port", ErrInvalidHostPort); err != nil {
+		return HostPort{}, err
 	}
 
 	host, portStr, err := net.SplitHostPort(s)

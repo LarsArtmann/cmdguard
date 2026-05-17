@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // FilePath represents a validated file system path.
@@ -22,8 +21,8 @@ type FilePath struct {
 // The path is cleaned (removes .. and . components) and converted to absolute.
 // Set checkExists to true to verify the path exists on the filesystem.
 func ParseFilePath(s string, checkExists bool) (FilePath, error) {
-	if strings.TrimSpace(s) == "" {
-		return FilePath{}, fmt.Errorf("%w: path cannot be empty", ErrInvalidFilePath)
+	if err := requireNonEmpty(s, "path", ErrInvalidFilePath); err != nil {
+		return FilePath{}, err
 	}
 
 	// Clean the path

@@ -3,7 +3,6 @@ package v2
 import (
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 // URL wraps url.URL with parsing validation and text marshaling.
@@ -17,8 +16,8 @@ type URL struct {
 // ParseURL creates a new URL from a string.
 // Returns an error if the string is not a valid URL.
 func ParseURL(s string) (URL, error) {
-	if strings.TrimSpace(s) == "" {
-		return URL{}, fmt.Errorf("%w: URL cannot be empty", ErrInvalidURL)
+	if err := requireNonEmpty(s, "URL", ErrInvalidURL); err != nil {
+		return URL{}, err
 	}
 
 	u, err := url.Parse(s)
