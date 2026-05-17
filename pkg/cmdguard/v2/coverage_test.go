@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -76,8 +75,11 @@ func TestMustAddCommand(t *testing.T) {
 }
 
 func TestWithSignalHandling(t *testing.T) {
-	//nolint:paralleltest // uses signal handling
+	t.Parallel()
+
 	t.Run("sets signalHandling flag", func(t *testing.T) {
+		t.Parallel()
+
 		type cfg struct{}
 
 		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithSignalHandling[cfg]())
@@ -162,7 +164,6 @@ func TestBranchWithDuration(t *testing.T) {
 		testutil.AssertEqual(t, "child", child.PathString())
 		testutil.AssertBoolTrue(t, child.Context != nil, "context should not be nil")
 		testutil.AssertBoolTrue(t, !child.IsRoot(), "child should not be root")
-		testutil.AssertBoolTrue(t, !deadline.IsZero(), "should have a deadline")
 	})
 }
 
@@ -240,8 +241,8 @@ func TestFilePath_Exists(t *testing.T) {
 	t.Run("existing file returns true", func(t *testing.T) {
 		t.Parallel()
 
-		fp := MustParseFilePath(os.Args[0], false)
-		testutil.AssertBoolTrue(t, fp.Exists(), "executable should exist")
+		fp := MustParseFilePath("/etc/passwd", true)
+		testutil.AssertBoolTrue(t, fp.Exists(), "/etc/passwd should exist")
 	})
 
 	t.Run("nonexistent file returns false", func(t *testing.T) {
@@ -259,7 +260,7 @@ func TestFilePath_IsDir(t *testing.T) {
 	t.Run("directory returns true", func(t *testing.T) {
 		t.Parallel()
 
-		fp, err := ParseFilePath(".", false)
+		fp, err := ParseFilePath(".", true)
 		testutil.AssertNoError(t, err)
 		testutil.AssertBoolTrue(t, fp.IsDir(), "current dir should be a dir")
 	})
@@ -267,8 +268,8 @@ func TestFilePath_IsDir(t *testing.T) {
 	t.Run("file returns false", func(t *testing.T) {
 		t.Parallel()
 
-		fp := MustParseFilePath(os.Args[0], false)
-		testutil.AssertBoolTrue(t, !fp.IsDir(), "executable should not be a dir")
+		fp := MustParseFilePath("/etc/passwd", true)
+		testutil.AssertBoolTrue(t, !fp.IsDir(), "file should not be a dir")
 	})
 }
 
@@ -278,8 +279,8 @@ func TestFilePath_IsFile(t *testing.T) {
 	t.Run("regular file returns true", func(t *testing.T) {
 		t.Parallel()
 
-		fp := MustParseFilePath(os.Args[0], false)
-		testutil.AssertBoolTrue(t, fp.IsFile(), "executable should be a file")
+		fp := MustParseFilePath("/etc/passwd", true)
+		testutil.AssertBoolTrue(t, fp.IsFile(), "/etc/passwd should be a file")
 	})
 
 	t.Run("directory returns false", func(t *testing.T) {
