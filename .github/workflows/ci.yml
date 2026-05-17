@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [master, main]
 
-env:
-  GOPRIVATE: github.com/larsartmann/*
-
 jobs:
   test:
     runs-on: ubuntu-latest
