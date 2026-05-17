@@ -8,12 +8,6 @@ import (
 
 var errMustNotBeNil = errors.New("must not be nil")
 
-// Ptr returns a pointer to any value.
-// Useful for optional config fields.
-func Ptr[T any](v T) *T {
-	return new(v)
-}
-
 // ValueOrDefault returns the value if not nil, otherwise the default.
 func ValueOrDefault[T any](v *T, def T) T {
 	if v == nil {

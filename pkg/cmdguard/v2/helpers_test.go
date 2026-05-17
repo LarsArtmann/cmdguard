@@ -137,7 +137,7 @@ func TestLogFormat(t *testing.T) {
 func testPtrGeneric[T comparable](t *testing.T, v T) {
 	t.Helper()
 
-	p := Ptr(v)
+	p := new(v)
 
 	if *p != v {
 		t.Errorf("*p = %v, want %v", *p, v)
