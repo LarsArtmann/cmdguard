@@ -5,7 +5,7 @@
 **Last Updated:** 2026-05-17
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.3.0-dev - 220+ tests, ~82% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.3.0-dev - 224 tests, 84.5% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -40,7 +40,7 @@ go test ./... -count=1 -timeout 120s -cover
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.3.0-dev. 220+ tests passing, ~82% coverage, 0 build errors.
+**Current Status:** v2.3.0-dev. 224 tests passing, 84.5% coverage, 0 build errors.
 
 ---
 
@@ -453,7 +453,7 @@ go build ./...                                   # Verify build
 7. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
 8. **Signal handling** - `WithSignalHandling[T]()` for graceful shutdown
 9. **Rich output** - OutputTable/OutputResult with 12+ formats
-10. **Extensible types** - `RegisterTypeHandler()` for custom flag types
+10. **Instance-scoped registries** — Each `FlagRegistry` clones from package-level defaults; `RegisterTypeHandler()`/`RegisterValidator()` write to global template; `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` write to instance
 11. **$EDITOR support** - `EditInEditor()` for user input editing
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **ValidationMode enum** - `Lenient`/`Strict`/`Draconian` spectrum, `>=` comparison
@@ -470,7 +470,7 @@ go build ./...                                   # Verify build
 6. **envPrefix propagation** — `WithEnvPrefix` sets prefix on root AND command-level flags (fixed in v2.2)
 7. **Counting flags** — must use `int` type with `count:"true"` tag; don't reuse flag names from root config
 8. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
-9. **Global type registry** — `RegisterTypeHandler()` writes global state; tests must not run in parallel
+9. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
 10. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
 11. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly
 12. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
