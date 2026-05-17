@@ -272,6 +272,107 @@ func TestWithStrictValidation(t *testing.T) {
 	})
 }
 
+func TestWithDraconianValidation(t *testing.T) {
+	t.Parallel()
+
+	t.Run("leaf without example fails in draconian mode", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := NewCLI[testConfig]("test", "Test", testConfig{},
+			WithDraconianValidation[testConfig](),
+		)
+		testutil.AssertNoError(t, err)
+
+		cmd, err := NewCommand[testConfig, NoFlags]("noexample",
+			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+			WithShort[testConfig, NoFlags]("Has short but no example"),
+		)
+		testutil.AssertNoError(t, err)
+
+		err = AddCommand(cli, cmd)
+		testutil.AssertExpectedError(t, err)
+		if !errors.Is(err, ErrMissingExample) {
+			t.Errorf("expected ErrMissingExample, got %v", err)
+		}
+	})
+
+	t.Run("leaf with example passes in draconian mode", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := NewCLI[testConfig]("test", "Test", testConfig{},
+			WithDraconianValidation[testConfig](),
+		)
+		testutil.AssertNoError(t, err)
+
+		cmd, err := NewCommand[testConfig, NoFlags]("good",
+			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+			WithShort[testConfig, NoFlags]("Good command"),
+			WithExample[testConfig, NoFlags]("test good"),
+		)
+		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, AddCommand(cli, cmd))
+	})
+
+	t.Run("parent command without example passes in draconian mode", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := NewCLI[testConfig]("test", "Test", testConfig{},
+			WithDraconianValidation[testConfig](),
+		)
+		testutil.AssertNoError(t, err)
+
+		childCmd, err := NewCommand[testConfig, NoFlags]("child",
+			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+			WithShort[testConfig, NoFlags]("Child"),
+			WithExample[testConfig, NoFlags]("test parent child"),
+		)
+		testutil.AssertNoError(t, err)
+
+		parentCmd, err := NewParentCommand[testConfig, NoFlags]("parent",
+			"Parent description", []Command[testConfig, NoFlags]{childCmd},
+			WithShort[testConfig, NoFlags]("Parent"),
+		)
+		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, AddCommand(cli, parentCmd))
+	})
+
+	t.Run("draconian also enforces short description", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := NewCLI[testConfig]("test", "Test", testConfig{},
+			WithDraconianValidation[testConfig](),
+		)
+		testutil.AssertNoError(t, err)
+
+		cmd, err := NewCommand[testConfig, NoFlags]("noshort",
+			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		)
+		testutil.AssertNoError(t, err)
+
+		err = AddCommand(cli, cmd)
+		testutil.AssertExpectedError(t, err)
+		if !errors.Is(err, ErrMissingShort) {
+			t.Errorf("expected ErrMissingShort (draconian includes strict), got %v", err)
+		}
+	})
+
+	t.Run("leaf without example passes in strict mode", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := NewCLI[testConfig]("test", "Test", testConfig{},
+			WithStrictValidation[testConfig](),
+		)
+		testutil.AssertNoError(t, err)
+
+		cmd, err := NewCommand[testConfig, NoFlags]("noexample",
+			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+			WithShort[testConfig, NoFlags]("Has short but no example"),
+		)
+		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, AddCommand(cli, cmd))
+	})
+}
+
 func TestCommand_ValidateStrict(t *testing.T) {
 	t.Parallel()
 
