@@ -40,6 +40,11 @@ func (d Duration) IsZero() bool {
 	return d.duration == 0
 }
 
+// IsEmpty returns true if the duration is zero.
+func (d Duration) IsEmpty() bool {
+	return d.IsZero()
+}
+
 // Milliseconds returns the duration in milliseconds.
 func (d Duration) Milliseconds() int64 {
 	return d.duration.Milliseconds()

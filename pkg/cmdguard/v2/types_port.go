@@ -92,6 +92,11 @@ func (p Port) IsValid() bool {
 	return p.port >= 1 && p.port <= 65535
 }
 
+// IsEmpty returns true if the port is zero (unset).
+func (p Port) IsEmpty() bool {
+	return p.port == 0
+}
+
 // IsWellKnown returns true if the port is in the well-known range (1-1023).
 func (p Port) IsWellKnown() bool {
 	return p.port >= 1 && p.port <= 1023

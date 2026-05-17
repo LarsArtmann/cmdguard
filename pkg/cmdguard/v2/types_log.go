@@ -58,6 +58,11 @@ func (l LogLevel) SlogLevel() slog.Level {
 	}
 }
 
+// IsEmpty returns true if the log level is unset.
+func (l LogLevel) IsEmpty() bool {
+	return l.value == ""
+}
+
 // LogFormat is a type-safe log format enum.
 //
 //nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
@@ -84,6 +89,11 @@ func ParseLogFormat(s string) (LogFormat, error) {
 // String returns the log format as a string.
 func (f LogFormat) String() string {
 	return f.value
+}
+
+// IsEmpty returns true if the log format is unset.
+func (f LogFormat) IsEmpty() bool {
+	return f.value == ""
 }
 
 // MarshalText implements encoding.TextMarshaler for LogLevel.
