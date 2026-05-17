@@ -9,10 +9,13 @@ import (
 )
 
 // FlagRegistry manages flag registration and parsing.
+// Each instance has its own type and validator registries, cloned from
+// package-level defaults at creation time.
 type FlagRegistry struct {
 	tags       []FlagTag
 	envPrefix  string
 	validators *validatorRegistry
+	types      *typeRegistry
 }
 
 // Tags returns all parsed flag tags.
@@ -33,16 +36,18 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags for %T: %w", ErrFlagParseFailed, cfg, err)
 	}
 
-	return &FlagRegistry{tags: tags, validators: newValidatorRegistry()}, nil
+	return &FlagRegistry{tags: tags, validators: newValidatorRegistry(), types: globalTypeRegistry.clone()}, nil
 }
 
 // RegisterFlagValidator adds a named validator to this registry's instance-scoped set.
-// Validators are looked up here first, then in the global registry as fallback.
 func (r *FlagRegistry) RegisterFlagValidator(name string, validator FlagValidator) {
-	r.validators.mu.Lock()
-	defer r.validators.mu.Unlock()
+	r.validators.register(name, validator)
+}
 
-	r.validators.validators[name] = validator
+// RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type
+// on this registry instance. New flags registered after this call will use the handler.
+func (r *FlagRegistry) RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
+	r.types.register(typ, handler)
 }
 
 // RegisterFlags adds flags to a cobra command based on the config struct.

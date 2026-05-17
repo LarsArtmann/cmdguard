@@ -85,30 +85,60 @@ func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
 	return nil, false
 }
 
-// RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type.
-func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
-	globalTypeRegistry.mu.Lock()
-	defer globalTypeRegistry.mu.Unlock()
+// clone returns an independent copy of the typeRegistry.
+// The maps are shallow-copied; TypeHandler values are shared (they are stateless).
+func (r *typeRegistry) clone() *typeRegistry {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 
-	globalTypeRegistry.byType[typ] = handler
+	c := &typeRegistry{
+		byType:       make(map[reflect.Type]TypeHandler, len(r.byType)),
+		byKind:       make(map[reflect.Kind]TypeHandler, len(r.byKind)),
+		countHandler: r.countHandler,
+	}
+
+	for k, v := range r.byType {
+		c.byType[k] = v
+	}
+
+	for k, v := range r.byKind {
+		c.byKind[k] = v
+	}
+
+	return c
 }
 
-// handledByTypeRegistry checks whether the given type has a handler in the registry.
-func handledByTypeRegistry(typ reflect.Type) bool {
-	_, ok := globalTypeRegistry.lookupHandler(typ)
+// register adds or replaces a TypeHandler for a specific reflect.Type.
+func (r *typeRegistry) register(typ reflect.Type, handler TypeHandler) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.byType[typ] = handler
+}
+
+// RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type.
+// This writes to the global defaults template; new FlagRegistries will include
+// this handler. For per-instance registration, use FlagRegistry.RegisterTypeHandler.
+func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
+	globalTypeRegistry.register(typ, handler)
+}
+
+// handledByTypeRegistry checks whether the given type has a handler in the given registry.
+func handledByTypeRegistry(tr *typeRegistry, typ reflect.Type) bool {
+	_, ok := tr.lookupHandler(typ)
 
 	return ok
 }
 
 // dispatchRegister dispatches flag registration to the TypeHandler registry.
-func dispatchRegister(flags *pflag.FlagSet, tag FlagTag) error {
+func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error {
 	if tag.Count {
-		if globalTypeRegistry.countHandler != nil {
-			return globalTypeRegistry.countHandler.Register(flags, tag)
+		if tr.countHandler != nil {
+			return tr.countHandler.Register(flags, tag)
 		}
 	}
 
-	h, ok := globalTypeRegistry.lookupHandler(tag.Type)
+	h, ok := tr.lookupHandler(tag.Type)
 	if !ok {
 		registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
 
@@ -119,8 +149,8 @@ func dispatchRegister(flags *pflag.FlagSet, tag FlagTag) error {
 }
 
 // dispatchParse dispatches value parsing to the TypeHandler registry.
-func dispatchParse(value string, tag FlagTag) (any, error) {
-	h, ok := globalTypeRegistry.lookupHandler(tag.Type)
+func dispatchParse(tr *typeRegistry, value string, tag FlagTag) (any, error) {
+	h, ok := tr.lookupHandler(tag.Type)
 	if !ok {
 		return value, nil
 	}
@@ -129,12 +159,12 @@ func dispatchParse(value string, tag FlagTag) (any, error) {
 }
 
 // dispatchDefault dispatches default value computation to the TypeHandler registry.
-func dispatchDefault(tag FlagTag) any {
+func dispatchDefault(tr *typeRegistry, tag FlagTag) any {
 	if tag.Default == "" {
 		return reflect.Zero(tag.Type).Interface()
 	}
 
-	h, ok := globalTypeRegistry.lookupHandler(tag.Type)
+	h, ok := tr.lookupHandler(tag.Type)
 	if !ok {
 		return tag.Default
 	}
