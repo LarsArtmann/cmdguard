@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"maps"
 	"net/mail"
 	"net/url"
 	"reflect"
@@ -52,24 +53,38 @@ func (r *validatorRegistry) register(name string, validator FlagValidator) {
 	r.validators[name] = validator
 }
 
-// RegisterValidator adds a named validator to the global registry.
-// Safe for concurrent use via internal sync.RWMutex.
-// Must be called before CLI execution to ensure validators are available.
-func RegisterValidator(name string, validator FlagValidator) {
-	globalValidators.mu.Lock()
-	defer globalValidators.mu.Unlock()
+func (r *validatorRegistry) clone() *validatorRegistry {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 
-	globalValidators.validators[name] = validator
+	c := &validatorRegistry{
+		validators: make(map[string]FlagValidator, len(r.validators)),
+	}
+
+	maps.Copy(c.validators, r.validators)
+
+	return c
 }
 
-// lookupValidator finds a validator by name.
-func lookupValidator(name string) (FlagValidator, bool) {
-	globalValidators.mu.RLock()
-	defer globalValidators.mu.RUnlock()
+func (r *validatorRegistry) lookup(name string) (FlagValidator, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 
-	v, ok := globalValidators.validators[name]
+	v, ok := r.validators[name]
 
 	return v, ok
+}
+
+// RegisterValidator adds a named validator to the global defaults template.
+// New FlagRegistries will include this validator. For per-instance registration,
+// use FlagRegistry.RegisterFlagValidator.
+func RegisterValidator(name string, validator FlagValidator) {
+	globalValidators.register(name, validator)
+}
+
+// lookupValidator finds a validator by name in the global registry.
+func lookupValidator(name string) (FlagValidator, bool) {
+	return globalValidators.lookup(name)
 }
 
 // runValidateTag runs all validators specified in a validate tag.
@@ -104,8 +119,7 @@ func parseValidateRules(tag string) ([]validateRule, error) {
 	return parseValidateRulesWithRegistry(tag, nil)
 }
 
-// parseValidateRulesWithRegistry parses a validate tag using instance validators first.
-// If instance is nil or the validator is not found, falls back to the global registry.
+// parseValidateRulesWithRegistry parses a validate tag using the instance registry.
 func parseValidateRulesWithRegistry(
 	tag string,
 	instance *validatorRegistry,
@@ -125,15 +139,10 @@ func parseValidateRulesWithRegistry(
 			ok        bool
 		)
 
-		// Instance-scoped first
-
 		if instance != nil {
-			instance.mu.RLock()
-			validator, ok = instance.validators[name]
-			instance.mu.RUnlock()
+			validator, ok = instance.lookup(name)
 		}
 
-		// Fallback to global
 		if !ok {
 			validator, ok = lookupValidator(name)
 		}

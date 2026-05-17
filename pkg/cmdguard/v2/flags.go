@@ -39,7 +39,7 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 
 	return &FlagRegistry{
 		tags:       tags,
-		validators: newValidatorRegistry(),
+		validators: globalValidators.clone(),
 		types:      globalTypeRegistry.clone(),
 	}, nil
 }
