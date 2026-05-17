@@ -3,6 +3,7 @@ package v2
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 var errMustNotBeNil = errors.New("must not be nil")
@@ -55,6 +56,16 @@ func textUnmarshal[T any](dest *T, text []byte, parse func(string) (T, error)) e
 	}
 
 	*dest = parsed
+
+	return nil
+}
+
+// requireNonEmpty checks that a string is not empty or whitespace-only.
+// Returns a formatted error wrapping the provided sentinel if empty.
+func requireNonEmpty(s string, label string, sentinel error) error {
+	if strings.TrimSpace(s) == "" {
+		return fmt.Errorf("%w: %s cannot be empty", sentinel, label)
+	}
 
 	return nil
 }
