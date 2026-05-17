@@ -79,19 +79,29 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	err := ProvideValue(cli.scope, &cfg)
 	if err != nil {
-		return fmt.Errorf("failed to register config type=%T: %w", cfg, err)
+		return fmt.Errorf("%w: registering config type=%T: %w", ErrServiceRegistration, cfg, err)
 	}
 
 	cli.config = &cfg
 
 	registry, err := NewFlagRegistry(cli.config)
 	if err != nil {
-		return fmt.Errorf("failed to create flag registry: config=%T: %w", cli.config, err)
+		return fmt.Errorf(
+			"%w: creating flag registry for config=%T: %w",
+			ErrServiceRegistration,
+			cli.config,
+			err,
+		)
 	}
 
 	err = ProvideValue(cli.scope, registry)
 	if err != nil {
-		return fmt.Errorf("registering flag registry for %T: %w", defaults, err)
+		return fmt.Errorf(
+			"%w: registering flag registry for %T: %w",
+			ErrServiceRegistration,
+			defaults,
+			err,
+		)
 	}
 
 	cli.registry = registry
@@ -104,7 +114,12 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	err = registry.RegisterPersistentFlags(cli.rootCmd)
 	if err != nil {
-		return fmt.Errorf("registering global flags for %T: %w", defaults, err)
+		return fmt.Errorf(
+			"%w: registering global flags for %T: %w",
+			ErrFlagParseFailed,
+			defaults,
+			err,
+		)
 	}
 
 	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
@@ -114,7 +129,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 		if cli.configValidate != nil {
 			if err := cli.configValidate(cli.config); err != nil {
-				return fmt.Errorf("validating config: %w", err)
+				return fmt.Errorf("%w: %w", ErrConfigValidation, err)
 			}
 		}
 

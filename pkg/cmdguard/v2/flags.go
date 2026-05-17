@@ -30,7 +30,7 @@ func (r *FlagRegistry) SetEnvPrefix(prefix string) {
 func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 	tags, err := ParseFlagTags(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("parsing flag tags for %T: %w", cfg, err)
+		return nil, fmt.Errorf("%w: parsing flag tags for %T: %w", ErrFlagParseFailed, cfg, err)
 	}
 
 	return &FlagRegistry{tags: tags, validators: newValidatorRegistry()}, nil
@@ -62,7 +62,12 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 	for _, tag := range r.tags {
 		err := r.registerFlag(flagSet, tag)
 		if err != nil {
-			return fmt.Errorf("registering flags on command %q: %w", cmd.Use, err)
+			return fmt.Errorf(
+				"%w: registering flags on command %q: %w",
+				ErrFlagParseFailed,
+				cmd.Use,
+				err,
+			)
 		}
 	}
 
@@ -72,7 +77,7 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 // registerFlag adds a single flag to the given flag set via the TypeHandler registry.
 func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
 	if err := dispatchRegister(flags, tag); err != nil {
-		return fmt.Errorf("registering flag %q: %w", tag.Name, err)
+		return fmt.Errorf("%w: registering flag %q: %w", ErrFlagParseFailed, tag.Name, err)
 	}
 
 	return nil
@@ -83,7 +88,13 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
 		err := r.validateTag(cmd, tag)
 		if err != nil {
-			return fmt.Errorf("validating flag %q on command %q: %w", tag.Name, cmd.Use, err)
+			return fmt.Errorf(
+				"%w: validating flag %q on command %q: %w",
+				ErrFlagParseFailed,
+				tag.Name,
+				cmd.Use,
+				err,
+			)
 		}
 	}
 
@@ -94,7 +105,13 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 func (r *FlagRegistry) validateTag(cmd *cobra.Command, tag FlagTag) error {
 	err := r.validateRequiredFlag(cmd, tag)
 	if err != nil {
-		return fmt.Errorf("validating required flag %q on command %q: %w", tag.Name, cmd.Use, err)
+		return fmt.Errorf(
+			"%w: validating required flag %q on command %q: %w",
+			ErrRequiredFlag,
+			tag.Name,
+			cmd.Use,
+			err,
+		)
 	}
 
 	err = r.validateEnumValue(cmd, tag)
@@ -177,12 +194,24 @@ func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 
 	rules, err := parseValidateRulesWithRegistry(tag.Validate, r.validators)
 	if err != nil {
-		return fmt.Errorf("validating flag %q on command %q: %w", tag.Name, cmd.Use, err)
+		return fmt.Errorf(
+			"%w: validating flag %q on command %q: %w",
+			ErrFlagParseFailed,
+			tag.Name,
+			cmd.Use,
+			err,
+		)
 	}
 
 	for _, rule := range rules {
 		if err := rule.Validate(flag.Value.String()); err != nil {
-			return fmt.Errorf("validating flag %q on command %q: %w", tag.Name, cmd.Use, err)
+			return fmt.Errorf(
+				"%w: validating flag %q on command %q: %w",
+				ErrFlagParseFailed,
+				tag.Name,
+				cmd.Use,
+				err,
+			)
 		}
 	}
 

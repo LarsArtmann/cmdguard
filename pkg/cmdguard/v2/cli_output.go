@@ -63,7 +63,7 @@ func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
 
 	format, err := ParseOutputFormat(formatStr)
 	if err != nil {
-		return fmt.Errorf("invalid output format %q: %w", formatStr, err)
+		return fmt.Errorf("%w: %q is not a valid output format", ErrUnsupportedFormat, formatStr)
 	}
 
 	cli.outputFormat = format

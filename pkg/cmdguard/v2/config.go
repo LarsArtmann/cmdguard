@@ -39,7 +39,7 @@ func ValidateConfig(cfg any) error {
 
 	v, err := derefPointerToStruct(cfg)
 	if err != nil {
-		return fmt.Errorf("dereferencing config %T: %w", cfg, err)
+		return fmt.Errorf("%w: dereferencing config %T: %w", ErrConfigNotPointer, cfg, err)
 	}
 
 	return validateStruct(v, cfg)
@@ -51,7 +51,7 @@ func validateStruct(v reflect.Value, cfg any) error {
 
 	tags, err := ParseFlagTags(cfg)
 	if err != nil {
-		return fmt.Errorf("parsing flag tags for %T: %w", cfg, err)
+		return fmt.Errorf("%w: parsing flag tags for %T: %w", ErrFlagParseFailed, cfg, err)
 	}
 
 	for _, tag := range tags {

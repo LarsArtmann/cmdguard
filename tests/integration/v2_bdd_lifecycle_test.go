@@ -611,7 +611,7 @@ func TestCLI_ConfigValidation_Integration(t *testing.T) {
 				t.Fatal("expected validation error")
 			}
 
-			if !strings.Contains(err.Error(), "validating config") {
+			if !strings.Contains(err.Error(), "config validation failed") {
 				t.Errorf("error should mention config validation, got: %v", err)
 			}
 

@@ -187,7 +187,7 @@ func TestWithConfigValidation(t *testing.T) {
 
 		err = cli.ExecuteWithArgs(context.Background(), []string{"run"})
 		testutil.AssertExpectedError(t, err)
-		assertErrorContains(t, err, "validating config", "port must be > 0")
+		assertErrorContains(t, err, "config validation failed", "port must be > 0")
 		testutil.AssertEqual(t, executed, false)
 	})
 }

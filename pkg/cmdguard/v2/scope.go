@@ -167,7 +167,7 @@ func (s *Scope) Shutdown(ctx context.Context) error {
 		return nil
 	}
 
-	return fmt.Errorf("shutdown of scope %q: %w", s.name, report)
+	return fmt.Errorf("%w: shutdown of scope %q: %w", ErrServiceConstruction, s.name, report)
 }
 
 // ShutdownAll shuts down this scope and all parent scopes.
@@ -179,7 +179,10 @@ func (s *Scope) ShutdownAll(ctx context.Context) error {
 	for current != nil {
 		err := current.Shutdown(ctx)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("scope %q: %w", current.name, err))
+			errs = append(
+				errs,
+				fmt.Errorf("%w: scope %q: %w", ErrServiceConstruction, current.name, err),
+			)
 		}
 
 		current = current.parent
@@ -201,7 +204,12 @@ func (s *Scope) HealthCheck() error {
 	results := s.injector.HealthCheck()
 	for _, err := range results {
 		if err != nil {
-			return fmt.Errorf("health check in scope %q: %w", s.name, err)
+			return fmt.Errorf(
+				"%w: health check in scope %q: %w",
+				ErrServiceConstruction,
+				s.name,
+				err,
+			)
 		}
 	}
 
@@ -218,7 +226,12 @@ func (s *Scope) HealthCheckWithContext(ctx context.Context) error {
 	results := s.injector.HealthCheckWithContext(ctx)
 	for _, err := range results {
 		if err != nil {
-			return fmt.Errorf("health check in scope %q: %w", s.name, err)
+			return fmt.Errorf(
+				"%w: health check in scope %q: %w",
+				ErrServiceConstruction,
+				s.name,
+				err,
+			)
 		}
 	}
 
