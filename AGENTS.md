@@ -109,7 +109,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~82%    |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~82%     |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -188,23 +188,23 @@ cli, err := v2.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
 
 Functional options:
 
-| Option                        | Purpose                                     |
-| ----------------------------- | ------------------------------------------- |
-| `WithCLIVersion[T](v)`        | Set version string                          |
-| `WithCLILong[T](desc)`        | Set long description                        |
-| `WithCLIScope[T](scope)`      | Set custom DI scope                         |
-| `WithSilenceErrors[T]()`      | Suppress cobra error printing               |
-| `WithSilenceUsage[T]()`       | Suppress usage on error                     |
-| `WithColor[T](bool)`          | Enable/disable fang styling (default: true) |
-| `WithFang[T](bool)`           | Enable/disable fang styling (preferred)     |
-| `WithFangOptions[T](opts...)` | Custom fang options                         |
-| `WithMiddleware[T](mw...)`    | Middleware wrapping every handler           |
-| `WithGroup[T](id, title)`     | Register command group on root              |
-| `WithEnvPrefix[T](prefix)`    | Prefix for env var lookups                  |
-| `WithSignalHandling[T]()`     | Cancel context on SIGINT/SIGTERM            |
-| `WithConfigValidation[T](fn)` | Validate config after flag parsing          |
-| `WithStrictValidation[T]()`     | Require short descriptions on all commands  |
-| `WithDraconianValidation[T]()`  | Strict + examples on leaf commands          |
+| Option                         | Purpose                                     |
+| ------------------------------ | ------------------------------------------- |
+| `WithCLIVersion[T](v)`         | Set version string                          |
+| `WithCLILong[T](desc)`         | Set long description                        |
+| `WithCLIScope[T](scope)`       | Set custom DI scope                         |
+| `WithSilenceErrors[T]()`       | Suppress cobra error printing               |
+| `WithSilenceUsage[T]()`        | Suppress usage on error                     |
+| `WithColor[T](bool)`           | Enable/disable fang styling (default: true) |
+| `WithFang[T](bool)`            | Enable/disable fang styling (preferred)     |
+| `WithFangOptions[T](opts...)`  | Custom fang options                         |
+| `WithMiddleware[T](mw...)`     | Middleware wrapping every handler           |
+| `WithGroup[T](id, title)`      | Register command group on root              |
+| `WithEnvPrefix[T](prefix)`     | Prefix for env var lookups                  |
+| `WithSignalHandling[T]()`      | Cancel context on SIGINT/SIGTERM            |
+| `WithConfigValidation[T](fn)`  | Validate config after flag parsing          |
+| `WithStrictValidation[T]()`    | Require short descriptions on all commands  |
+| `WithDraconianValidation[T]()` | Strict + examples on leaf commands          |
 
 ### CLI[T] Methods
 
@@ -478,8 +478,8 @@ go build ./...                                   # Verify build
 16. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
 17. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
 18. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
-19. **NewExitError returns (***ExitError**, **error**) — validates 0-255 range; breaking change from `*ExitError`
-20. **NewScopeFromInjector returns (***Scope**, **error**) — nil injector returns error; breaking change from nil dereference
+19. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
+20. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
 21. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
 
 ---

@@ -35,22 +35,22 @@
 
 ### CLI Options
 
-| Option                      | Status              | Notes                                    |
-| --------------------------- | ------------------- | ---------------------------------------- |
-| `WithCLIVersion[T](v)`      | ✅ FULLY_FUNCTIONAL | Set version string                       |
-| `WithCLILong[T](desc)`      | ✅ FULLY_FUNCTIONAL | Set long description                     |
-| `WithCLIScope[T](scope)`    | ✅ FULLY_FUNCTIONAL | Custom DI scope                          |
-| `WithSilenceErrors[T]()`    | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing            |
-| `WithSilenceUsage[T]()`     | ✅ FULLY_FUNCTIONAL | Suppress usage on error                  |
-| `WithFang[T](bool)`         | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling              |
-| `WithColor[T](bool)`        | 🗑️ DEPRECATED       | Use WithFang instead                     |
-| `WithFangOptions[T]()`      | ✅ FULLY_FUNCTIONAL | Pass fang options                        |
-| `WithMiddleware[T]()`       | ✅ FULLY_FUNCTIONAL | Add command middleware                   |
-| `WithGroup[T](id,title)`    | ✅ FULLY_FUNCTIONAL | Command groups in help                   |
-| `WithEnvPrefix[T](pfx)`     | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups               |
-| `WithSignalHandling[T]()`   | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
-| `WithOutputFormat[T]()`     | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
-| `WithConfigValidation[T]()` | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
+| Option                         | Status              | Notes                                    |
+| ------------------------------ | ------------------- | ---------------------------------------- |
+| `WithCLIVersion[T](v)`         | ✅ FULLY_FUNCTIONAL | Set version string                       |
+| `WithCLILong[T](desc)`         | ✅ FULLY_FUNCTIONAL | Set long description                     |
+| `WithCLIScope[T](scope)`       | ✅ FULLY_FUNCTIONAL | Custom DI scope                          |
+| `WithSilenceErrors[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing            |
+| `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error                  |
+| `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling              |
+| `WithColor[T](bool)`           | 🗑️ DEPRECATED       | Use WithFang instead                     |
+| `WithFangOptions[T]()`         | ✅ FULLY_FUNCTIONAL | Pass fang options                        |
+| `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                   |
+| `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                   |
+| `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups               |
+| `WithSignalHandling[T]()`      | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
+| `WithOutputFormat[T]()`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
+| `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
 | `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands       |
 
