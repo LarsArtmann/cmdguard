@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-05-16
+**Last Updated:** 2026-05-17
 **Version:** 2.3.0-dev
 **Go Version:** 1.26
 
@@ -51,7 +51,8 @@
 | `WithSignalHandling[T]()`   | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
 | `WithOutputFormat[T]()`     | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
 | `WithConfigValidation[T]()` | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
-| `WithStrictValidation[T]()` | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
+| `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
+| `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands       |
 
 ### Command[T, F]
 
@@ -194,7 +195,8 @@
 
 | Package           | Coverage  | Status  |
 | ----------------- | --------- | ------- |
-| `pkg/cmdguard/v2` | 80.4%     | ✅ Good |
+| `pkg/cmdguard/v2` | ~82%      | ✅ Good |
+| Benchmarks        | 22 total  | ✅ Good |
 | Fuzz tests        | 7 targets | ✅ Good |
 
 ---
@@ -222,4 +224,4 @@ explicit flag → env:"VAR" (with optional prefix) → default value
 
 ---
 
-**Last updated 2026-05-16.**
+**Last updated 2026-05-17.**

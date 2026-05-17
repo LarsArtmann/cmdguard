@@ -1,9 +1,9 @@
 # AGENTS.md - cmdguard Project Guide
 
-**Last Updated:** 2026-04-30
+**Last Updated:** 2026-05-17
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.2.0 - 199 tests, 80.9% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.3.0-dev - 220+ tests, ~82% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -38,7 +38,7 @@ go test ./... -count=1 -timeout 120s -cover
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.2.0. 199 tests passing, 80.9% coverage, 0 build errors.
+**Current Status:** v2.3.0-dev. 220+ tests passing, ~82% coverage, 0 build errors.
 
 ---
 
@@ -109,7 +109,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | 80.9%    |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~82%    |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -203,7 +203,8 @@ Functional options:
 | `WithEnvPrefix[T](prefix)`    | Prefix for env var lookups                  |
 | `WithSignalHandling[T]()`     | Cancel context on SIGINT/SIGTERM            |
 | `WithConfigValidation[T](fn)` | Validate config after flag parsing          |
-| `WithStrictValidation[T]()`   | Require short descriptions on all commands  |
+| `WithStrictValidation[T]()`     | Require short descriptions on all commands  |
+| `WithDraconianValidation[T]()`  | Strict + examples on leaf commands          |
 
 ### CLI[T] Methods
 
@@ -439,7 +440,7 @@ go build ./...                                   # Verify build
 
 ## Architecture Decisions
 
-### v2.2 Design Principles
+### v2.3 Design Principles
 
 1. **Single type parameter** - `CLI[T]` only parameterizes on config; each command has its own flags type
 2. **No Panics** - All operations return errors
@@ -453,6 +454,9 @@ go build ./...                                   # Verify build
 10. **Extensible types** - `RegisterTypeHandler()` for custom flag types
 11. **$EDITOR support** - `EditInEditor()` for user input editing
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
+13. **ValidationMode enum** - `Lenient`/`Strict`/`Draconian` spectrum, `>=` comparison
+14. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
+15. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
 
 ### Key Gotchas
 
@@ -471,8 +475,12 @@ go build ./...                                   # Verify build
 13. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 14. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
 15. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
-16. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
-17. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
+16. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
+17. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
+18. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
+19. **NewExitError returns (***ExitError**, **error**) — validates 0-255 range; breaking change from `*ExitError`
+20. **NewScopeFromInjector returns (***Scope**, **error**) — nil injector returns error; breaking change from nil dereference
+21. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
 
 ---
 
