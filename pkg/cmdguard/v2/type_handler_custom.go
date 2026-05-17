@@ -119,12 +119,20 @@ func (r *typeRegistry) registerCustomTypes() {
 	}
 }
 
-// RegisterGoDurationHandler registers a TypeHandler for time.Duration fields.
+// RegisterGoDurationHandler registers a TypeHandler for time.Duration fields
+// in the global defaults template. New FlagRegistries will include this handler.
 func RegisterGoDurationHandler() {
-	globalTypeRegistry.mu.Lock()
-	defer globalTypeRegistry.mu.Unlock()
+	globalTypeRegistry.registerGoDurationHandler()
+}
 
-	globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()] = TypeHandlerFunc{
+// RegisterGoDurationHandler registers a TypeHandler for time.Duration fields
+// on this registry instance.
+func (r *FlagRegistry) RegisterGoDurationHandler() {
+	r.types.registerGoDurationHandler()
+}
+
+func (r *typeRegistry) registerGoDurationHandler() {
+	r.register(reflect.TypeFor[time.Duration](), TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, _ := time.ParseDuration(tag.Default)
 			if tag.Short != "" {
