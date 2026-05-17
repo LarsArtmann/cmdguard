@@ -7,7 +7,13 @@ import (
 )
 
 // SetField sets a field value on a config struct using reflection.
+// This is the backward-compatible wrapper that uses the global type registry.
 func SetField(cfg any, fieldName string, value any) error {
+	return setField(cfg, fieldName, value, globalTypeRegistry)
+}
+
+// setField sets a field value on a config struct using reflection with the given type registry.
+func setField(cfg any, fieldName string, value any, tr *typeRegistry) error {
 	field, err := getField(cfg, fieldName)
 	if err != nil {
 		return fmt.Errorf(
@@ -30,7 +36,7 @@ func SetField(cfg any, fieldName string, value any) error {
 
 	// Handle string to custom type conversions
 	if val.Kind() == reflect.String {
-		err := setStringField(field, val.String())
+		err := setStringField(field, val.String(), tr)
 		if err != nil {
 			return fmt.Errorf(
 				"SetField: cfg=%T, fieldName=%q, value=%q: %w",
@@ -110,7 +116,7 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 }
 
 // setStringField handles string to custom type conversions via the TypeHandler registry.
-func setStringField(field reflect.Value, str string) error {
+func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 	// Special handling for Enum (needs current allowed values from the field)
 	if field.Type() == reflect.TypeFor[Enum]() {
 		current, ok := field.Interface().(Enum)
@@ -140,8 +146,8 @@ func setStringField(field reflect.Value, str string) error {
 	}
 
 	// Try the TypeHandler registry for all other types
-	if handledByTypeRegistry(field.Type()) {
-		parsed, err := dispatchParse(str, FlagTag{Type: field.Type()})
+	if handledByTypeRegistry(tr, field.Type()) {
+		parsed, err := dispatchParse(tr, str, FlagTag{Type: field.Type()})
 		if err != nil {
 			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
 		}
