@@ -101,24 +101,24 @@ HELLO, CMDGUARD!
 
 ## Features
 
-| Category | Highlights |
-|----------|-----------|
-| **Type-safe flags** | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups |
-| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely |
-| **Dependency injection** | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks |
-| **Environment variables** | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support |
-| **12 output formats** | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, and more |
-| **Signal handling** | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers |
-| **Typo suggestions** | "did you mean?" for flags and subcommands (Levenshtein distance) |
-| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time |
-| **Counting flags** | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns |
-| **Extensible types** | `RegisterTypeHandler()` for custom flag types with full parse/validate support |
-| **Middleware** | `TimingMiddleware`, `RecoveryMiddleware`, or write your own |
-| **Shell completion** | Dynamic completion via `WithCompletion[T, F](fn)` |
-| **Man page generation** | `GenerateManPageCommand[T](cli)` for roff output |
-| **Positional args** | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom |
-| **Zero panics** | Every v2 API function returns errors — never panics in library code |
-| **220+ tests** | ~82% coverage, race-detected, fuzz-tested |
+| Category                   | Highlights                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups |
+| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                         |
+| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks  |
+| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                |
+| **12 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, and more                               |
+| **Signal handling**        | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers                               |
+| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                 |
+| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                   |
+| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                          |
+| **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                   |
+| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own                                      |
+| **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                |
+| **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                 |
+| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                     |
+| **Zero panics**            | Every v2 API function returns errors — never panics in library code                              |
+| **220+ tests**             | ~82% coverage, race-detected, fuzz-tested                                                        |
 
 ---
 
@@ -218,16 +218,16 @@ v2.NewCommand[AppConfig, *Flags]("deploy", runHandler,
 
 ## Built-in Value Types
 
-| Type | Validation |
-|------|-----------|
-| `Duration` | Wraps `time.Duration` |
-| `Enum[T]` | Validated against allowed values |
-| `LogLevel` | debug / info / warn / error |
-| `URL` | Validated URL string |
-| `Email` | RFC 5322 email validation |
-| `Port` | 1–65535 range |
+| Type       | Validation                         |
+| ---------- | ---------------------------------- |
+| `Duration` | Wraps `time.Duration`              |
+| `Enum[T]`  | Validated against allowed values   |
+| `LogLevel` | debug / info / warn / error        |
+| `URL`      | Validated URL string               |
+| `Email`    | RFC 5322 email validation          |
+| `Port`     | 1–65535 range                      |
 | `FilePath` | Path cleaning and existence checks |
-| `HostPort` | `host:port` validation |
+| `HostPort` | `host:port` validation             |
 
 Add your own with `RegisterTypeHandler()`:
 
@@ -251,38 +251,38 @@ type Flags struct {
 }
 ```
 
-| Tag | Purpose | Example |
-|-----|---------|---------|
-| `flag` | Flag name (required) | `flag:"name"` |
-| `short` | Short flag | `short:"n"` |
-| `default` | Default value | `default:"World"` |
-| `help` | Help text | `help:"Name to greet"` |
-| `env` | Environment variable | `env:"DB_HOST"` |
-| `required` | Mark as required | `required:"true"` |
-| `count` | Counting flag | `count:"true"` |
+| Tag        | Purpose              | Example                |
+| ---------- | -------------------- | ---------------------- |
+| `flag`     | Flag name (required) | `flag:"name"`          |
+| `short`    | Short flag           | `short:"n"`            |
+| `default`  | Default value        | `default:"World"`      |
+| `help`     | Help text            | `help:"Name to greet"` |
+| `env`      | Environment variable | `env:"DB_HOST"`        |
+| `required` | Mark as required     | `required:"true"`      |
+| `count`    | Counting flag        | `count:"true"`         |
 
 ---
 
 ## Command Options
 
-| Option | Purpose |
-|--------|---------|
-| `WithShort[T, F](short)` | Short description |
-| `WithLong[T, F](long)` | Long description |
-| `WithExample[T, F](example)` | Example usage |
-| `WithAliases[T, F](aliases...)` | Alternative names |
-| `WithFlags[T, F](flags)` | Typed flags struct |
-| `WithPreRunE[T, F](fn)` | Pre-validation hook |
-| `WithPostRunE[T, F](fn)` | Post-success cleanup |
-| `WithHidden[T, F](bool)` | Hide from help |
-| `WithDeprecated[T, F](msg)` | Deprecation message |
-| `WithGroupID[T, F](id)` | Help group name |
-| `WithExactArgs[T, F](n)` | Require exactly n positional args |
-| `WithMinimumArgs[T, F](n)` | Require at least n positional args |
-| `WithMaximumArgs[T, F](n)` | Allow at most n positional args |
-| `WithRangeArgs[T, F](min, max)` | Require between min and max args |
-| `WithNoArgs[T, F]()` | Reject any positional args |
-| `WithCompletion[T, F](fn)` | Dynamic shell completion |
+| Option                          | Purpose                            |
+| ------------------------------- | ---------------------------------- |
+| `WithShort[T, F](short)`        | Short description                  |
+| `WithLong[T, F](long)`          | Long description                   |
+| `WithExample[T, F](example)`    | Example usage                      |
+| `WithAliases[T, F](aliases...)` | Alternative names                  |
+| `WithFlags[T, F](flags)`        | Typed flags struct                 |
+| `WithPreRunE[T, F](fn)`         | Pre-validation hook                |
+| `WithPostRunE[T, F](fn)`        | Post-success cleanup               |
+| `WithHidden[T, F](bool)`        | Hide from help                     |
+| `WithDeprecated[T, F](msg)`     | Deprecation message                |
+| `WithGroupID[T, F](id)`         | Help group name                    |
+| `WithExactArgs[T, F](n)`        | Require exactly n positional args  |
+| `WithMinimumArgs[T, F](n)`      | Require at least n positional args |
+| `WithMaximumArgs[T, F](n)`      | Allow at most n positional args    |
+| `WithRangeArgs[T, F](min, max)` | Require between min and max args   |
+| `WithNoArgs[T, F]()`            | Reject any positional args         |
+| `WithCompletion[T, F](fn)`      | Dynamic shell completion           |
 
 ---
 
@@ -300,19 +300,19 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 )
 ```
 
-| Option | Purpose |
-|--------|---------|
-| `WithCLIVersion[T](v)` | Version string |
-| `WithCLILong[T](desc)` | Long description |
-| `WithSilenceErrors[T]()` | Suppress error printing |
-| `WithSilenceUsage[T]()` | Suppress usage on error |
-| `WithFang[T](bool)` | Styled help output |
-| `WithEnvPrefix[T](prefix)` | Prefix for env vars |
-| `WithSignalHandling[T]()` | Cancel context on SIGINT/SIGTERM |
-| `WithMiddleware[T](mw...)` | Middleware for all commands |
-| `WithGroup[T](id, title)` | Help group on root |
-| `WithConfigValidation[T](fn)` | Validate config after flag parsing |
-| `WithStrictValidation[T]()` | Require `WithShort` on all commands |
+| Option                         | Purpose                                         |
+| ------------------------------ | ----------------------------------------------- |
+| `WithCLIVersion[T](v)`         | Version string                                  |
+| `WithCLILong[T](desc)`         | Long description                                |
+| `WithSilenceErrors[T]()`       | Suppress error printing                         |
+| `WithSilenceUsage[T]()`        | Suppress usage on error                         |
+| `WithFang[T](bool)`            | Styled help output                              |
+| `WithEnvPrefix[T](prefix)`     | Prefix for env vars                             |
+| `WithSignalHandling[T]()`      | Cancel context on SIGINT/SIGTERM                |
+| `WithMiddleware[T](mw...)`     | Middleware for all commands                     |
+| `WithGroup[T](id, title)`      | Help group on root                              |
+| `WithConfigValidation[T](fn)`  | Validate config after flag parsing              |
+| `WithStrictValidation[T]()`    | Require `WithShort` on all commands             |
 | `WithDraconianValidation[T]()` | Strict + require `WithExample` on leaf commands |
 
 ---

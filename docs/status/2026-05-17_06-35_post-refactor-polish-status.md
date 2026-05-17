@@ -18,18 +18,18 @@ cmdguard is **public, building, passing all 279 tests (0 failures), 0 lint issue
 
 ## Codebase Metrics
 
-| Metric | Now | Last Report | Delta |
-|--------|-----|-------------|-------|
-| Total tests | 279 | 257 | +22 |
-| v2 test cases | 233 | 211 | +22 |
-| Coverage (v2) | 84.3% | 82.1% | +2.2% |
-| Production code (v2) | 5,953 lines | 5,925 lines | +28 |
-| Test code (v2) | 11,875 lines | 11,473 lines | +402 |
-| Lint issues | 0 | 0 | — |
-| Race conditions | 0 | 0 | — |
-| Build errors | 0 | 0 | — |
-| Go version | 1.26.2 | 1.26.2 | — |
-| Total v2 files | 104 (38 prod + 66 test) | 103 | +1 |
+| Metric               | Now                     | Last Report  | Delta |
+| -------------------- | ----------------------- | ------------ | ----- |
+| Total tests          | 279                     | 257          | +22   |
+| v2 test cases        | 233                     | 211          | +22   |
+| Coverage (v2)        | 84.3%                   | 82.1%        | +2.2% |
+| Production code (v2) | 5,953 lines             | 5,925 lines  | +28   |
+| Test code (v2)       | 11,875 lines            | 11,473 lines | +402  |
+| Lint issues          | 0                       | 0            | —     |
+| Race conditions      | 0                       | 0            | —     |
+| Build errors         | 0                       | 0            | —     |
+| Go version           | 1.26.2                  | 1.26.2       | —     |
+| Total v2 files       | 104 (38 prod + 66 test) | 103          | +1    |
 
 ---
 
@@ -37,18 +37,19 @@ cmdguard is **public, building, passing all 279 tests (0 failures), 0 lint issue
 
 ### This Session (new since last report)
 
-| # | Item | Commit | Impact |
-|---|------|--------|--------|
-| 1 | Remove `GOPRIVATE` from CI workflow | `2eb0cda` | Unblocked pkg.go.dev indexing |
-| 2 | Create GitHub Release v2.0.0 with changelog | (via `gh release create`) | First thing visitors see |
-| 3 | Normalize `IsEmpty()` across all 9 value types | `747046b` | Consistent API (Duration, Port, LogLevel, LogFormat now have IsEmpty) |
-| 4 | Extract `requireNonEmpty` helper | `5b221ad` | 5 duplicate TrimSpace checks → 1 shared function |
-| 5 | Add 9 godoc Example* test functions | `24802f4` | pkg.go.dev shows runnable examples for Port, Email, URL, Duration, HostPort, FilePath, LogLevel |
-| 6 | Add coverage tests for 15 previously-untested functions | `5819087` | Coverage bump 82.1% → 84.3% |
+| #   | Item                                                    | Commit                    | Impact                                                                                          |
+| --- | ------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------- |
+| 1   | Remove `GOPRIVATE` from CI workflow                     | `2eb0cda`                 | Unblocked pkg.go.dev indexing                                                                   |
+| 2   | Create GitHub Release v2.0.0 with changelog             | (via `gh release create`) | First thing visitors see                                                                        |
+| 3   | Normalize `IsEmpty()` across all 9 value types          | `747046b`                 | Consistent API (Duration, Port, LogLevel, LogFormat now have IsEmpty)                           |
+| 4   | Extract `requireNonEmpty` helper                        | `5b221ad`                 | 5 duplicate TrimSpace checks → 1 shared function                                                |
+| 5   | Add 9 godoc Example\* test functions                    | `24802f4`                 | pkg.go.dev shows runnable examples for Port, Email, URL, Duration, HostPort, FilePath, LogLevel |
+| 6   | Add coverage tests for 15 previously-untested functions | `5819087`                 | Coverage bump 82.1% → 84.3%                                                                     |
 
 ### Carried Forward (still done)
 
 All items from previous report remain done:
+
 - ✅ CLI[T] + Command[T, F] type-safe API (25+ features)
 - ✅ 9 built-in value types (Duration, Enum, LogLevel, LogFormat, URL, Email, Port, FilePath, HostPort)
 - ✅ Dependency injection (samber/do/v2)
@@ -65,12 +66,12 @@ All items from previous report remain done:
 
 ## b) PARTIALLY DONE ⚠️
 
-| Item | What's Done | What's Missing |
-|------|-------------|----------------|
-| pkg.go.dev visibility | GOPRIVATE removed, repo public, homepage set | Not yet indexed (takes hours/days after GOPRIVATE removal) |
-| Instance-scoped registries | TypeHandler and validator registries clone from global defaults per FlagRegistry | Global fallback still exists; not fully eliminated |
-| Phase 9 architecture cleanup | Coverage tests added, some error wrapping done | 10 TODO_LIST items remain (file splits, Phase enum, handlerConfig extraction, etc.) |
-| godoc examples | 13 total (4 command + 9 value type) | Missing: Scope/DI examples, OutputTable examples, middleware examples, Enum example |
+| Item                         | What's Done                                                                      | What's Missing                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| pkg.go.dev visibility        | GOPRIVATE removed, repo public, homepage set                                     | Not yet indexed (takes hours/days after GOPRIVATE removal)                          |
+| Instance-scoped registries   | TypeHandler and validator registries clone from global defaults per FlagRegistry | Global fallback still exists; not fully eliminated                                  |
+| Phase 9 architecture cleanup | Coverage tests added, some error wrapping done                                   | 10 TODO_LIST items remain (file splits, Phase enum, handlerConfig extraction, etc.) |
+| godoc examples               | 13 total (4 command + 9 value type)                                              | Missing: Scope/DI examples, OutputTable examples, middleware examples, Enum example |
 
 ---
 
@@ -78,51 +79,51 @@ All items from previous report remain done:
 
 ### CI/CD
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Coverage upload (codecov/coveralls) | High | CI runs coverage but doesn't upload |
-| Benchmark regression detection | Medium | No perf CI gate |
-| Release automation (goreleaser) | Medium | Manual tag + release process |
-| `go vet` + `staticcheck` in CI | Low | golangci-lint covers most of this |
+| Item                                | Priority | Notes                               |
+| ----------------------------------- | -------- | ----------------------------------- |
+| Coverage upload (codecov/coveralls) | High     | CI runs coverage but doesn't upload |
+| Benchmark regression detection      | Medium   | No perf CI gate                     |
+| Release automation (goreleaser)     | Medium   | Manual tag + release process        |
+| `go vet` + `staticcheck` in CI      | Low      | golangci-lint covers most of this   |
 
 ### Documentation
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| More godoc examples (DI, OutputTable, Middleware, Enum) | Medium | 13 exist, could use 10+ more |
-| pkg.go.dev package doc examples | Medium | Package-level doc could be richer |
+| Item                                                    | Priority | Notes                             |
+| ------------------------------------------------------- | -------- | --------------------------------- |
+| More godoc examples (DI, OutputTable, Middleware, Enum) | Medium   | 13 exist, could use 10+ more      |
+| pkg.go.dev package doc examples                         | Medium   | Package-level doc could be richer |
 
 ### v3.0 Features
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Config file auto-loading (koanf) | Future | YAML/TOML/.env |
-| Interactive prompts (huh) | Future | `WithPromptOnMissing` |
-| Spinner/progress middleware | Future | bubbles integration |
-| Glamour markdown help rendering | Future | Rich help pages |
-| Telemetry middleware (OpenTelemetry) | Future | Span creation |
-| Plugin system | Future | Custom validators and type handlers |
+| Item                                 | Priority | Notes                               |
+| ------------------------------------ | -------- | ----------------------------------- |
+| Config file auto-loading (koanf)     | Future   | YAML/TOML/.env                      |
+| Interactive prompts (huh)            | Future   | `WithPromptOnMissing`               |
+| Spinner/progress middleware          | Future   | bubbles integration                 |
+| Glamour markdown help rendering      | Future   | Rich help pages                     |
+| Telemetry middleware (OpenTelemetry) | Future   | Span creation                       |
+| Plugin system                        | Future   | Custom validators and type handlers |
 
 ### v3.0 Cleanup (API-breaking)
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Consolidate error types into `labeledError` | v3 | CommandError/FlagError/ConfigError/ServiceError share pattern |
-| Make NoFlags a distinct named type | v3 | Not type alias |
-| Remove deprecated `WithColor` | v3 | Use `WithFang` |
-| Remove string-based BranchWithTimeout/BranchWithDeadline | v3 | Replaced by typed alternatives |
-| Remove FlowContextAccessor | v3 | Use GetBranchingFlowContext directly |
-| Rename Get[T]/MustGet[T] | v3 | Too generic names |
+| Item                                                     | Priority | Notes                                                         |
+| -------------------------------------------------------- | -------- | ------------------------------------------------------------- |
+| Consolidate error types into `labeledError`              | v3       | CommandError/FlagError/ConfigError/ServiceError share pattern |
+| Make NoFlags a distinct named type                       | v3       | Not type alias                                                |
+| Remove deprecated `WithColor`                            | v3       | Use `WithFang`                                                |
+| Remove string-based BranchWithTimeout/BranchWithDeadline | v3       | Replaced by typed alternatives                                |
+| Remove FlowContextAccessor                               | v3       | Use GetBranchingFlowContext directly                          |
+| Rename Get[T]/MustGet[T]                                 | v3       | Too generic names                                             |
 
 ---
 
 ## d) TOTALLY FUCKED UP 💥
 
-| Item | Severity | Details |
-|------|----------|---------|
-| **Pre-commit hooks still broken** | 🟡 MEDIUM | `git commit --no-verify` still required. The `scripts/pre-commit` exists but `.git/hooks/pre-commit` references a missing path. Either fix the hook or remove `.git/hooks/pre-commit`. |
-| **12 stale status reports in docs/status/** | 🟢 LOW | Internal status reports from past sessions are public. Not harmful but clutters the repo tree. Should archive or .gitignore old ones. |
-| **Untracked status report from earlier session** | 🟢 LOW | `docs/status/2026-05-17_06-27_post-instance-scoped-registries-status.md` exists but never committed. |
+| Item                                             | Severity  | Details                                                                                                                                                                                |
+| ------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pre-commit hooks still broken**                | 🟡 MEDIUM | `git commit --no-verify` still required. The `scripts/pre-commit` exists but `.git/hooks/pre-commit` references a missing path. Either fix the hook or remove `.git/hooks/pre-commit`. |
+| **12 stale status reports in docs/status/**      | 🟢 LOW    | Internal status reports from past sessions are public. Not harmful but clutters the repo tree. Should archive or .gitignore old ones.                                                  |
+| **Untracked status report from earlier session** | 🟢 LOW    | `docs/status/2026-05-17_06-27_post-instance-scoped-registries-status.md` exists but never committed.                                                                                   |
 
 **Nothing is critically broken.** The two items from last report's "Totally Fucked Up" section (GOPRIVATE blocking pkg.go.dev, no GitHub Release) are both now fixed.
 
@@ -164,48 +165,48 @@ All items from previous report remain done:
 
 ### Priority 1: Release & Polish (Critical Path)
 
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 1 | Fix pre-commit hooks (wire scripts/pre-commit correctly) | 15 min | 🟡 Dev experience |
-| 2 | Tag v2.3.0 and create GitHub Release | 15 min | 🔴 Signal stability |
-| 3 | Verify pkg.go.dev has indexed the module | 5 min | 🔴 README badge 404s without this |
-| 4 | Upload coverage to codecov in CI | 30 min | 🟢 Trust signal |
-| 5 | Add coverage badge to README | 5 min | 🟢 Trust signal |
-| 6 | Clean up docs/status/ — archive reports older than 2 weeks | 10 min | 🟢 Repo cleanliness |
+| #   | Action                                                     | Effort | Impact                            |
+| --- | ---------------------------------------------------------- | ------ | --------------------------------- |
+| 1   | Fix pre-commit hooks (wire scripts/pre-commit correctly)   | 15 min | 🟡 Dev experience                 |
+| 2   | Tag v2.3.0 and create GitHub Release                       | 15 min | 🔴 Signal stability               |
+| 3   | Verify pkg.go.dev has indexed the module                   | 5 min  | 🔴 README badge 404s without this |
+| 4   | Upload coverage to codecov in CI                           | 30 min | 🟢 Trust signal                   |
+| 5   | Add coverage badge to README                               | 5 min  | 🟢 Trust signal                   |
+| 6   | Clean up docs/status/ — archive reports older than 2 weeks | 10 min | 🟢 Repo cleanliness               |
 
 ### Priority 2: Adoption & Documentation
 
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 7 | Add ExampleScope / ExampleProvide_Invoke godoc test | 20 min | 🟡 Better pkg.go.dev |
-| 8 | Add ExampleOutputTable godoc test | 15 min | 🟡 Better pkg.go.dev |
-| 9 | Add ExampleMiddleware godoc test | 15 min | 🟡 Better pkg.go.dev |
-| 10 | Add ExampleParseEnum godoc test | 10 min | 🟡 Better pkg.go.dev |
-| 11 | Write "Getting Started" blog post or discussion post | 1-2 hr | 🟡 Marketing |
-| 12 | Submit to Go newsletters / Reddit / HN | 30 min | 🟡 Discovery |
+| #   | Action                                               | Effort | Impact               |
+| --- | ---------------------------------------------------- | ------ | -------------------- |
+| 7   | Add ExampleScope / ExampleProvide_Invoke godoc test  | 20 min | 🟡 Better pkg.go.dev |
+| 8   | Add ExampleOutputTable godoc test                    | 15 min | 🟡 Better pkg.go.dev |
+| 9   | Add ExampleMiddleware godoc test                     | 15 min | 🟡 Better pkg.go.dev |
+| 10  | Add ExampleParseEnum godoc test                      | 10 min | 🟡 Better pkg.go.dev |
+| 11  | Write "Getting Started" blog post or discussion post | 1-2 hr | 🟡 Marketing         |
+| 12  | Submit to Go newsletters / Reddit / HN               | 30 min | 🟡 Discovery         |
 
 ### Priority 3: Code Quality (Phase 9)
 
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 13 | Fix 7 unwrapped error returns (add fmt.Errorf context) | 30 min | 🟢 Error chain quality |
-| 14 | Add `Phase` typed enum to replace `CommandInfo.Phase string` | 15 min | 🟢 Type safety |
-| 15 | Extract `handlerConfig[T,F]` from 8-param wireHandlerWithMiddleware | 15 min | 🟢 Readability |
-| 16 | Split `type_handler.go` (481 lines → 3 files) | 30 min | 🟢 Maintainability |
-| 17 | Split `command.go` (403 lines) — extract args options | 20 min | 🟢 Maintainability |
-| 18 | Split `flow_context.go` (396 lines) — extract options | 20 min | 🟢 Maintainability |
-| 19 | Consolidate 5 error types into internal `labeledError` | 30 min | 🟢 DRY (v3) |
-| 20 | Fix `outputFormat`/`outputState.format` split brain | 30 min | 🟡 Correctness |
-| 21 | Consolidate value type MarshalText/UnmarshalText patterns | 1 hr | 🟢 DRY |
-| 22 | Fix gopls hint: `errors.As` → `errors.AsType[ExitCoder]` | 5 min | 🟢 Modern Go 1.26 |
+| #   | Action                                                              | Effort | Impact                 |
+| --- | ------------------------------------------------------------------- | ------ | ---------------------- |
+| 13  | Fix 7 unwrapped error returns (add fmt.Errorf context)              | 30 min | 🟢 Error chain quality |
+| 14  | Add `Phase` typed enum to replace `CommandInfo.Phase string`        | 15 min | 🟢 Type safety         |
+| 15  | Extract `handlerConfig[T,F]` from 8-param wireHandlerWithMiddleware | 15 min | 🟢 Readability         |
+| 16  | Split `type_handler.go` (481 lines → 3 files)                       | 30 min | 🟢 Maintainability     |
+| 17  | Split `command.go` (403 lines) — extract args options               | 20 min | 🟢 Maintainability     |
+| 18  | Split `flow_context.go` (396 lines) — extract options               | 20 min | 🟢 Maintainability     |
+| 19  | Consolidate 5 error types into internal `labeledError`              | 30 min | 🟢 DRY (v3)            |
+| 20  | Fix `outputFormat`/`outputState.format` split brain                 | 30 min | 🟡 Correctness         |
+| 21  | Consolidate value type MarshalText/UnmarshalText patterns           | 1 hr   | 🟢 DRY                 |
+| 22  | Fix gopls hint: `errors.As` → `errors.AsType[ExitCoder]`            | 5 min  | 🟢 Modern Go 1.26      |
 
 ### Priority 4: Performance & CI
 
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 23 | Add CLI construction benchmark | 15 min | 🟢 Perf visibility |
-| 24 | Add flag parsing benchmark | 15 min | 🟢 Perf visibility |
-| 25 | Set up release automation (goreleaser or gh release) | 1 hr | 🟢 Future-proofing |
+| #   | Action                                               | Effort | Impact             |
+| --- | ---------------------------------------------------- | ------ | ------------------ |
+| 23  | Add CLI construction benchmark                       | 15 min | 🟢 Perf visibility |
+| 24  | Add flag parsing benchmark                           | 15 min | 🟢 Perf visibility |
+| 25  | Set up release automation (goreleaser or gh release) | 1 hr   | 🟢 Future-proofing |
 
 ---
 
@@ -241,17 +242,17 @@ BenchmarkScopeInvoke-32            7179634      156.6 ns/op    160 B/op     5 al
 
 ## Session-to-Session Delta
 
-| Metric | This Report | Last Report (06:09) | Change |
-|--------|-------------|---------------------|--------|
-| Tests | 279 | 257 | +22 |
-| Coverage | 84.3% | 82.1% | +2.2% |
-| GOPRIVATE in CI | Fixed | Blocking | ✅ |
-| GitHub Release v2.0.0 | Created | Missing | ✅ |
-| IsEmpty normalization | Done | Inconsistent | ✅ |
-| requireNonEmpty DRY | Done | 5 duplicates | ✅ |
-| Godoc examples | 13 (4+9) | 4 | +9 |
-| Pre-commit hooks | Still broken | Broken | ⚠️ No change |
+| Metric                | This Report  | Last Report (06:09) | Change       |
+| --------------------- | ------------ | ------------------- | ------------ |
+| Tests                 | 279          | 257                 | +22          |
+| Coverage              | 84.3%        | 82.1%               | +2.2%        |
+| GOPRIVATE in CI       | Fixed        | Blocking            | ✅           |
+| GitHub Release v2.0.0 | Created      | Missing             | ✅           |
+| IsEmpty normalization | Done         | Inconsistent        | ✅           |
+| requireNonEmpty DRY   | Done         | 5 duplicates        | ✅           |
+| Godoc examples        | 13 (4+9)     | 4                   | +9           |
+| Pre-commit hooks      | Still broken | Broken              | ⚠️ No change |
 
 ---
 
-*Report generated by Crush AI Assistant. All metrics verified at time of writing.*
+_Report generated by Crush AI Assistant. All metrics verified at time of writing._

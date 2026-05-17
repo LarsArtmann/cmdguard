@@ -56,7 +56,7 @@ func textUnmarshal[T any](dest *T, text []byte, parse func(string) (T, error)) e
 
 // requireNonEmpty checks that a string is not empty or whitespace-only.
 // Returns a formatted error wrapping the provided sentinel if empty.
-func requireNonEmpty(s string, label string, sentinel error) error {
+func requireNonEmpty(s, label string, sentinel error) error {
 	if strings.TrimSpace(s) == "" {
 		return fmt.Errorf("%w: %s cannot be empty", sentinel, label)
 	}
