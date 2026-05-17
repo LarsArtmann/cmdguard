@@ -45,6 +45,13 @@ func (r *validatorRegistry) registerBuiltins() {
 	r.validators["nonempty"] = validateNonEmpty
 }
 
+func (r *validatorRegistry) register(name string, validator FlagValidator) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.validators[name] = validator
+}
+
 // RegisterValidator adds a named validator to the global registry.
 // Safe for concurrent use via internal sync.RWMutex.
 // Must be called before CLI execution to ensure validators are available.
