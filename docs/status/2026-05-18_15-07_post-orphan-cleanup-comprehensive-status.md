@@ -219,9 +219,11 @@ cmdguard is a production-grade Go library for building validated Cobra CLI appli
 
 `go-output/go.mod` still has `replace github.com/larsartmann/go-output/cmdguard => ./cmdguard` pointing to a directory that no longer exists. This will cause `go mod tidy` to fail in go-output until removed.
 
-### 2. go-output Sub-module Versioning Risk
+### 2. ~~go-output Sub-module Versioning Risk~~ — RESOLVED ✅
 
-go-output's sub-modules (`enum`, `escape`, `testhelpers`) are referenced at `v0.0.0` with local `replace` directives. External consumers of `go-output v0.2.0` may hit resolution errors if these sub-modules aren't properly tagged and published. This could block anyone running `go get github.com/larsartmann/go-output@v0.2.0`.
+~~go-output's sub-modules (`enum`, `escape`, `testhelpers`) are referenced at `v0.0.0` with local `replace` directives. External consumers of `go-output v0.2.0` may hit resolution errors if these sub-modules aren't properly tagged and published. This could block anyone running `go get github.com/larsartmann/go-output@v0.2.0`.~~
+
+**Verified:** `go get github.com/larsartmann/go-output@v0.2.0` resolves cleanly from GOPROXY. Sub-modules are in the same repo and pulled with the parent tag. Not a real issue.
 
 ### 3. Features.md and TODO_LIST.md Stale Metrics
 
@@ -260,7 +262,7 @@ go-output's sub-modules (`enum`, `escape`, `testhelpers`) are referenced at `v0.
 ### Dependencies
 
 11. **Fix go-output replace directive** — remove dead cmdguard replace, ensure sub-modules are tagged
-12. **Verify go-output v0.2.0 is resolvable** from clean GOPROXY — run `GONOSUMCHECK= GONOSUMDB= GOFLAGS= go get github.com/larsartmann/go-output@v0.2.0` in a temp module
+12. ~~Verify go-output v0.2.0 is resolvable~~ — **Verified ✅** resolves cleanly from GOPROXY; sub-modules are in same repo and pulled with parent tag; `replace` directives only affect local dev
 
 ### CI/CD
 
@@ -326,17 +328,9 @@ go-output's sub-modules (`enum`, `escape`, `testhelpers`) are referenced at `v0.
 
 ## g) Top #1 Question I Cannot Figure Out Myself
 
-**Is `go-output v0.2.0` actually resolvable from a clean GOPROXY?**
+~~**Is `go-output v0.2.0` actually resolvable from a clean GOPROXY?**~~ — **RESOLVED ✅**
 
-go-output's `go.mod` has 5 sub-modules at `v0.0.0` with local `replace` directives:
-- `go-output/enum`
-- `go-output/escape`
-- `go-output/testhelpers`
-- `go-output/cmdguard` (now deleted but replace still present)
-
-If these sub-modules aren't tagged and pushed as separate module versions, any external consumer running `go get github.com/larsartmann/go-output@v0.2.0` will fail with `module ... found, but does not contain package`. This would block anyone from using cmdguard in a real project.
-
-**Recommended action:** Run `GONOSUMCHECK=* GONOSUMDB=* GOFLAGS= go get github.com/larsartmann/go-output@v0.2.0` in a temporary empty Go module to verify. If it fails, the sub-modules need to be tagged, or the monorepo structure needs a `go.work` + proper tagging strategy.
+Tested with `go get github.com/larsartmann/go-output@v0.2.0` in a clean temp module. Resolved successfully. The sub-modules (`enum`, `escape`, `testhelpers`) live in the same Git repo and are pulled in with the parent module tag. The `replace` directives in `go-output/go.mod` only affect local development — external consumers get the tagged versions via GOPROXY without issue.
 
 ---
 
