@@ -15,19 +15,19 @@ cmdguard is a production-grade Go library for building validated Cobra CLI appli
 
 ## Health Dashboard
 
-| Metric             | Value          | Status | Trend      |
-| ------------------ | -------------- | ------ | ---------- |
-| Source files (v2)  | 104            | ✅      | Stable     |
-| Test files (v2)    | 66             | ✅      | Stable     |
-| Test functions     | 285            | ✅      | Stable     |
-| Core coverage      | 84.3%          | ✅      | Down 0.2%  |
-| Lint issues        | 0              | ✅      | Stable     |
-| Race conditions    | 0              | ✅      | Stable     |
-| Build errors       | 0              | ✅      | Stable     |
-| Deprecated APIs    | 3 remaining    | ⚠️      | Cleanup    |
-| Examples with tests| 5/12           | ⚠️      | Gap        |
-| TODOs in source    | 0              | ✅      | Clean      |
-| Total lines (v2)   | 17,822         | ✅      | Growing    |
+| Metric              | Value       | Status | Trend     |
+| ------------------- | ----------- | ------ | --------- |
+| Source files (v2)   | 104         | ✅     | Stable    |
+| Test files (v2)     | 66          | ✅     | Stable    |
+| Test functions      | 285         | ✅     | Stable    |
+| Core coverage       | 84.3%       | ✅     | Down 0.2% |
+| Lint issues         | 0           | ✅     | Stable    |
+| Race conditions     | 0           | ✅     | Stable    |
+| Build errors        | 0           | ✅     | Stable    |
+| Deprecated APIs     | 3 remaining | ⚠️     | Cleanup   |
+| Examples with tests | 5/12        | ⚠️     | Gap       |
+| TODOs in source     | 0           | ✅     | Clean     |
+| Total lines (v2)    | 17,822      | ✅     | Growing   |
 
 ---
 
@@ -125,28 +125,28 @@ cmdguard is a production-grade Go library for building validated Cobra CLI appli
 
 ### Examples Test Coverage — 5/12 have tests
 
-| Example         | Tests | Gap                                  |
-| --------------- | ----- | ------------------------------------ |
-| advanced-flags  | ✅     | —                                    |
-| basic           | ✅     | —                                    |
-| di              | ✅     | —                                    |
-| typed           | ✅     | —                                    |
-| validation      | ✅     | —                                    |
-| counting        | ❌     | No test file                         |
-| di-patterns     | ❌     | No test file                         |
-| env-tags        | ❌     | No test file                         |
-| error-handling  | ❌     | No test file                         |
-| output          | ❌     | No test file                         |
-| signals         | ❌     | No test file                         |
-| subcommands     | ❌     | No test file                         |
+| Example        | Tests | Gap          |
+| -------------- | ----- | ------------ |
+| advanced-flags | ✅    | —            |
+| basic          | ✅    | —            |
+| di             | ✅    | —            |
+| typed          | ✅    | —            |
+| validation     | ✅    | —            |
+| counting       | ❌    | No test file |
+| di-patterns    | ❌    | No test file |
+| env-tags       | ❌    | No test file |
+| error-handling | ❌    | No test file |
+| output         | ❌    | No test file |
+| signals        | ❌    | No test file |
+| subcommands    | ❌    | No test file |
 
 ### Deprecated APIs Still Present — 3 items pending v3.0 removal
 
-| API                    | File                        | Replacement                       |
-| ---------------------- | --------------------------- | --------------------------------- |
-| `WithColor[T](bool)`   | `cli_options.go:56`         | `WithFang[T](bool)`               |
-| `IsExecutable()`       | `command.go:105`            | `HasHandler()`                    |
-| `FlowContextAccessor`  | `flow_context_access.go:68` | `BranchingFlowContext` methods    |
+| API                   | File                        | Replacement                    |
+| --------------------- | --------------------------- | ------------------------------ |
+| `WithColor[T](bool)`  | `cli_options.go:56`         | `WithFang[T](bool)`            |
+| `IsExecutable()`      | `command.go:105`            | `HasHandler()`                 |
+| `FlowContextAccessor` | `flow_context_access.go:68` | `BranchingFlowContext` methods |
 
 ### go-output Sub-module Replace Directives — Partially Cleaned
 
@@ -160,35 +160,35 @@ cmdguard is a production-grade Go library for building validated Cobra CLI appli
 
 ### Phase 9: Architecture Hardening (v2.3)
 
-| Item                                                    | Priority |
-| ------------------------------------------------------- | -------- |
-| `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26)     | Low      |
-| Extract `handlerConfig[T,F]` from 8-param function      | Medium   |
-| Add `Phase` typed enum for `CommandInfo.Phase string`   | Medium   |
-| Fix 7 unwrapped error returns                           | Medium   |
-| Consolidate 5 error types into `labeledError`           | Medium   |
-| Split `type_handler.go` (was 481 lines, now 177+185)    | Done ✅   |
-| Split `command.go` (287 lines) — extract args options   | Low      |
-| Split `flow_context.go` (264 lines) — extract options   | Low      |
-| Fix `outputFormat`/`outputState.format` split brain     | Low      |
-| Consolidate value type MarshalText/UnmarshalText        | Low      |
+| Item                                                  | Priority |
+| ----------------------------------------------------- | -------- |
+| `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26)    | Low      |
+| Extract `handlerConfig[T,F]` from 8-param function    | Medium   |
+| Add `Phase` typed enum for `CommandInfo.Phase string` | Medium   |
+| Fix 7 unwrapped error returns                         | Medium   |
+| Consolidate 5 error types into `labeledError`         | Medium   |
+| Split `type_handler.go` (was 481 lines, now 177+185)  | Done ✅  |
+| Split `command.go` (287 lines) — extract args options | Low      |
+| Split `flow_context.go` (264 lines) — extract options | Low      |
+| Fix `outputFormat`/`outputState.format` split brain   | Low      |
+| Consolidate value type MarshalText/UnmarshalText      | Low      |
 
 ### Performance
 
-| Item                                   | Priority |
-| -------------------------------------- | -------- |
-| CLI construction benchmark             | Medium   |
-| Flag parsing benchmark                 | Medium   |
-| Command execution benchmark            | Medium   |
-| Benchmark regression detection in CI   | Low      |
+| Item                                 | Priority |
+| ------------------------------------ | -------- |
+| CLI construction benchmark           | Medium   |
+| Flag parsing benchmark               | Medium   |
+| Command execution benchmark          | Medium   |
+| Benchmark regression detection in CI | Low      |
 
 ### CI/CD
 
-| Item                           | Priority |
-| ------------------------------ | -------- |
-| Codecov integration            | Medium   |
-| v2.3.0 release tag and notes   | High     |
-| Release automation             | Medium   |
+| Item                         | Priority |
+| ---------------------------- | -------- |
+| Codecov integration          | Medium   |
+| v2.3.0 release tag and notes | High     |
+| Release automation           | Medium   |
 
 ### Future (v3.0+)
 
@@ -276,53 +276,53 @@ cmdguard is a production-grade Go library for building validated Cobra CLI appli
 
 ### High Impact (Do First)
 
-| #  | Item                                                | Effort | Impact |
-| -- | --------------------------------------------------- | ------ | ------ |
-| 1  | Fix stale metrics in TODO_LIST.md and FEATURES.md   | 10min  | High   |
-| 2  | Remove Ptr[T] from FEATURES.md                      | 2min   | Medium |
-| 3  | Fix go-output replace for deleted cmdguard/          | 5min   | High   |
-| 4  | Verify go-output v0.2.0 resolves from clean proxy   | 15min  | High   |
-| 5  | Tag v2.3.0 release with release notes               | 30min  | High   |
+| #   | Item                                              | Effort | Impact |
+| --- | ------------------------------------------------- | ------ | ------ |
+| 1   | Fix stale metrics in TODO_LIST.md and FEATURES.md | 10min  | High   |
+| 2   | Remove Ptr[T] from FEATURES.md                    | 2min   | Medium |
+| 3   | Fix go-output replace for deleted cmdguard/       | 5min   | High   |
+| 4   | Verify go-output v0.2.0 resolves from clean proxy | 15min  | High   |
+| 5   | Tag v2.3.0 release with release notes             | 30min  | High   |
 
 ### Architecture Cleanup (Pre-Release Polish)
 
-| #  | Item                                                | Effort | Impact |
-| -- | --------------------------------------------------- | ------ | ------ |
-| 6  | Fix outputFormat/outputState split brain            | 30min  | Medium |
-| 7  | Consolidate 5 error types into labeledError         | 1hr    | Medium |
-| 8  | Fix 7 unwrapped error returns (add fmt.Errorf ctx)  | 30min  | Medium |
-| 9  | Extract handlerConfig[T,F] from wireHandler         | 30min  | Medium |
-| 10 | Add Phase typed enum for CommandInfo.Phase string   | 20min  | Medium |
+| #   | Item                                               | Effort | Impact |
+| --- | -------------------------------------------------- | ------ | ------ |
+| 6   | Fix outputFormat/outputState split brain           | 30min  | Medium |
+| 7   | Consolidate 5 error types into labeledError        | 1hr    | Medium |
+| 8   | Fix 7 unwrapped error returns (add fmt.Errorf ctx) | 30min  | Medium |
+| 9   | Extract handlerConfig[T,F] from wireHandler        | 30min  | Medium |
+| 10  | Add Phase typed enum for CommandInfo.Phase string  | 20min  | Medium |
 
 ### Testing Gaps
 
-| #  | Item                                                | Effort | Impact |
-| -- | --------------------------------------------------- | ------ | ------ |
-| 11 | Add tests for subcommands example                   | 20min  | Medium |
-| 12 | Add tests for env-tags example                      | 20min  | Medium |
-| 13 | Add tests for counting example                      | 20min  | Medium |
-| 14 | Add tests for error-handling example                | 20min  | Medium |
-| 15 | Add tests for di-patterns example                   | 20min  | Medium |
-| 16 | Add tests for output example                        | 20min  | Medium |
-| 17 | Add tests for signals example                       | 20min  | Medium |
-| 18 | Add CLI construction benchmark                      | 20min  | Medium |
-| 19 | Add flag parsing benchmark                          | 20min  | Medium |
-| 20 | Push core coverage to 90%+                          | 2hr    | High   |
+| #   | Item                                 | Effort | Impact |
+| --- | ------------------------------------ | ------ | ------ |
+| 11  | Add tests for subcommands example    | 20min  | Medium |
+| 12  | Add tests for env-tags example       | 20min  | Medium |
+| 13  | Add tests for counting example       | 20min  | Medium |
+| 14  | Add tests for error-handling example | 20min  | Medium |
+| 15  | Add tests for di-patterns example    | 20min  | Medium |
+| 16  | Add tests for output example         | 20min  | Medium |
+| 17  | Add tests for signals example        | 20min  | Medium |
+| 18  | Add CLI construction benchmark       | 20min  | Medium |
+| 19  | Add flag parsing benchmark           | 20min  | Medium |
+| 20  | Push core coverage to 90%+           | 2hr    | High   |
 
 ### CI/CD & Infrastructure
 
-| #  | Item                                                | Effort | Impact |
-| -- | --------------------------------------------------- | ------ | ------ |
-| 21 | Add codecov integration                             | 30min  | Medium |
-| 22 | Add benchmark regression detection to CI            | 1hr    | Medium |
-| 23 | Set up release automation (goreleaser?)             | 2hr    | Medium |
+| #   | Item                                     | Effort | Impact |
+| --- | ---------------------------------------- | ------ | ------ |
+| 21  | Add codecov integration                  | 30min  | Medium |
+| 22  | Add benchmark regression detection to CI | 1hr    | Medium |
+| 23  | Set up release automation (goreleaser?)  | 2hr    | Medium |
 
 ### Future Prep
 
-| #  | Item                                                | Effort | Impact |
-| -- | --------------------------------------------------- | ------ | ------ |
-| 24 | Write v3.0 migration guide (breaking changes list) | 1hr    | Medium |
-| 25 | Evaluate koanf for config file auto-loading         | 2hr    | Low    |
+| #   | Item                                               | Effort | Impact |
+| --- | -------------------------------------------------- | ------ | ------ |
+| 24  | Write v3.0 migration guide (breaking changes list) | 1hr    | Medium |
+| 25  | Evaluate koanf for config file auto-loading        | 2hr    | Low    |
 
 ---
 
@@ -336,15 +336,15 @@ Tested with `go get github.com/larsartmann/go-output@v0.2.0` in a clean temp mod
 
 ## Session History (Recent Commits)
 
-| Date       | Commit   | Description                                                  |
-| ---------- | -------- | ------------------------------------------------------------ |
+| Date       | Commit   | Description                                                    |
+| ---------- | -------- | -------------------------------------------------------------- |
 | 2026-05-18 | (today)  | Deleted go-output/cmdguard/ orphan (404 lines, zero consumers) |
-| 2026-05-17 | aa439dd  | Consistent markdown table formatting, domain language docs    |
-| 2026-05-17 | bd20534  | Remove Ptr[T] — use Go 1.26 new(v) built-in                  |
-| 2026-05-17 | 3b8e9d6  | Post-refactor-polish comprehensive status report              |
-| 2026-05-16 | Multiple | Architecture hardening, error consolidation, coverage push   |
-| 2026-05-16 | Multiple | Test sprint, dead code removal, v2.3 features                |
-| 2026-04-30 | Multiple | v2.2 SUPERB sprint, DI, env tags, output integration         |
+| 2026-05-17 | aa439dd  | Consistent markdown table formatting, domain language docs     |
+| 2026-05-17 | bd20534  | Remove Ptr[T] — use Go 1.26 new(v) built-in                    |
+| 2026-05-17 | 3b8e9d6  | Post-refactor-polish comprehensive status report               |
+| 2026-05-16 | Multiple | Architecture hardening, error consolidation, coverage push     |
+| 2026-05-16 | Multiple | Test sprint, dead code removal, v2.3 features                  |
+| 2026-04-30 | Multiple | v2.2 SUPERB sprint, DI, env tags, output integration           |
 
 ---
 
