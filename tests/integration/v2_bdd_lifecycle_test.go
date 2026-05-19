@@ -12,6 +12,8 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+const cmdRun = "run"
+
 type lifecycleConfig struct {
 	Verbose bool `flag:"verbose" short:"v" default:"false" help:"Verbose"`
 }
@@ -35,9 +37,9 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 			}
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
-				"run",
+				cmdRun,
 				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					order = append(order, "run")
+					order = append(order, cmdRun)
 
 					return nil
 				},
@@ -65,11 +67,11 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 				t.Fatalf("AddCommand: %v", err)
 			}
 
-			if err := cli.ExecuteWithArgs(context.Background(), []string{"run"}); err != nil {
+			if err := cli.ExecuteWithArgs(context.Background(), []string{cmdRun}); err != nil {
 				t.Fatalf("Execute: %v", err)
 			}
 
-			expected := []string{"pre-run", "run", "post-run"}
+			expected := []string{"pre-run", cmdRun, "post-run"}
 			if len(order) != len(expected) {
 				t.Fatalf("execution order: got %v, want %v", order, expected)
 			}

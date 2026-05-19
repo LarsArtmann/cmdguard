@@ -127,7 +127,7 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	)
 
 	for range 5 {
-		err = cli.ExecuteWithArgs(ctx, []string{"cmd-a", "--shout"})
+		err = cli.ExecuteWithArgs(ctx, []string{"cmd-a", flagShout})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

@@ -58,7 +58,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=TestUser", "--shout"})
+	err = cli.ExecuteWithArgs(ctx, []string{cmdNameGreet, "--name=TestUser", flagShout})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

@@ -25,6 +25,13 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+const (
+	defaultEnvironment = "production"
+	formatJSON         = "json"
+	formatYAML         = "yaml"
+	formatYML          = "yml"
+)
+
 // GlobalConfig contains application-wide settings.
 type GlobalConfig struct {
 	LogLevel  v2.LogLevel `default:"info" flag:"log-level"  help:"Log level (debug, info, warn, error)" short:"l"`
@@ -54,7 +61,7 @@ type EnumFlags struct {
 
 // Validate implements custom validation for EnumFlags.
 func (f EnumFlags) Validate() error {
-	validEnvs := []string{"development", "staging", "production"}
+	validEnvs := []string{"development", "staging", defaultEnvironment}
 	if !slices.Contains(validEnvs, f.Environment) {
 		return fmt.Errorf("invalid environment: %q (must be one of: %v)", f.Environment, validEnvs)
 	}
@@ -125,7 +132,7 @@ func main() {
 		v2.WithPreRunE[GlobalConfig, ConfigFlags](
 			func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
 				if flags.OutputFormat != "" {
-					validFormats := []string{"json", "yaml", "yml"}
+					validFormats := []string{formatJSON, formatYAML, formatYML}
 					if !slices.Contains(validFormats, flags.OutputFormat) {
 						return fmt.Errorf("invalid output format: %q (suggestions: %s)",
 							flags.OutputFormat,
@@ -152,7 +159,7 @@ func main() {
 			fmt.Printf("Environment: %s\n", flags.Environment)
 			fmt.Printf("Region: %s\n", flags.Region)
 
-			if flags.Environment == "production" {
+			if flags.Environment == defaultEnvironment {
 				fmt.Println("⚠️  Running in PRODUCTION mode!")
 			}
 
@@ -204,7 +211,7 @@ func main() {
 
 // suggestFormat returns a suggestion for invalid format.
 func suggestFormat(input string) string {
-	validFormats := []string{"json", "yaml", "yml"}
+	validFormats := []string{formatJSON, formatYAML, formatYML}
 
 	var bestMatch string
 

@@ -8,6 +8,12 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+const (
+	defaultGreetName = "World"
+	flagShout        = "--shout"
+	cmdNameGreet     = "greet"
+)
+
 // RootConfig is the application-level configuration for tests.
 type RootConfig struct {
 	Debug   bool   `default:"false" flag:"debug"   help:"Enable debug mode" short:"d"`
@@ -72,7 +78,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 			return nil
 		},
 		v2.WithShort[RootConfig, *GreetFlags]("Greet someone"),
-		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "World", Shout: false}),
+		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: defaultGreetName, Shout: false}),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -121,7 +127,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=Alice", "--shout"})
+	err = cli.ExecuteWithArgs(ctx, []string{"greet", "--name=Alice", flagShout})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

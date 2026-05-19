@@ -98,7 +98,7 @@ func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 func TestAdvancedFlags_EnumValidation(t *testing.T) {
 	t.Parallel()
 	// Test valid environment
-	flags := EnumFlags{Environment: "production", Region: "us-west-2"}
+	flags := EnumFlags{Environment: defaultEnvironment, Region: "us-west-2"}
 
 	err := flags.Validate()
 	if err != nil {
@@ -143,12 +143,12 @@ func TestAdvancedFlags_FormatSuggestion(t *testing.T) {
 	t.Parallel()
 	// Test suggestion for typo
 	suggestion := suggestFormat("yam")
-	if suggestion != "yaml" {
+	if suggestion != formatYAML {
 		t.Errorf("Expected suggestion 'yaml' for 'yam', got: %s", suggestion)
 	}
 
 	suggestion = suggestFormat("jsn")
-	if suggestion != "json" {
+	if suggestion != formatJSON {
 		t.Errorf("Expected suggestion 'json' for 'jsn', got: %s", suggestion)
 	}
 
