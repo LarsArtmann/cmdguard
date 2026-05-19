@@ -1,475 +1,475 @@
 version: "2"
 run:
-    timeout: 5m
-    go: 1.26.2
-    build-tags:
-        - goexperiment.arenas
-        - goexperiment.goroutineleakprofile
-        - goexperiment.jsonv2
-        - goexperiment.runtimesecret
-        - goexperiment.simd
-    modules-download-mode: readonly
-    allow-parallel-runners: true
-    allow-serial-runners: true
+  timeout: 5m
+  go: 1.26.2
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.runtimesecret
+    - goexperiment.simd
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  allow-serial-runners: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - arangolint
-        - asasalint
-        - asciicheck
-        - bidichk
-        - bodyclose
-        - canonicalheader
-        - containedctx
-        - contextcheck
-        - copyloopvar
-        - cyclop
-        - decorder
-        - depguard
-        - dogsled
-        - dupl
-        - dupword
-        - durationcheck
-        - embeddedstructfieldcheck
-        - err113
-        - errcheck
-        - errchkjson
-        - errname
-        - errorlint
-        - exhaustive
-        - exhaustruct
-        - exptostd
-        - fatcontext
-        - forbidigo
-        - forcetypeassert
-        - funlen
-        - ginkgolinter
-        - gocheckcompilerdirectives
-        - gochecknoglobals
-        - gochecknoinits
-        - gochecksumtype
-        - gocognit
-        - goconst
-        - gocritic
-        - gocyclo
-        - godoclint
-        - godot
-        - godox
-        - goheader
-        - gomoddirectives
-        - gomodguard_v2
-        - goprintffuncname
-        - gosec
-        - gosmopolitan
-        - govet
-        - grouper
-        - iface
-        - importas
-        - inamedparam
-        - ineffassign
-        - interfacebloat
-        - intrange
-        - iotamixing
-        - ireturn
-        - loggercheck
-        - maintidx
-        - makezero
-        - mirror
-        - misspell
-        - mnd
-        - modernize
-        - musttag
-        - nakedret
-        - nestif
-        - nilerr
-        - nilnesserr
-        - nilnil
-        - nlreturn
-        - noctx
-        - noinlineerr
-        - nolintlint
-        - nonamedreturns
-        - nosprintfhostport
-        - paralleltest
-        - perfsprint
-        - prealloc
-        - predeclared
-        - promlinter
-        - protogetter
-        - reassign
-        - recvcheck
-        - revive
-        - rowserrcheck
-        - sloglint
-        - spancheck
-        - sqlclosecheck
-        - staticcheck
-        - tagalign
-        - tagliatelle
-        - testableexamples
-        - testifylint
-        - testpackage
-        - thelper
-        - tparallel
-        - unconvert
-        - unparam
-        - unqueryvet
-        - unused
-        - usestdlibvars
-        - usetesting
-        - varnamelen
-        - wastedassign
-        - whitespace
-        - wrapcheck
-        - wsl_v5
-        - zerologlint
-    settings:
-        cyclop:
-            max-complexity: 15
-        depguard:
-            rules:
-                Benchmarks:
-                    allow:
-                        - $gostd
-                        - github.com/larsartmann/cmdguard
-                        - github.com/larsartmann/go-output
-                        - github.com/samber/do/v2
-                        - github.com/spf13/cobra
-                        - github.com/spf13/pflag
-                    files:
-                        - '**/benchmarks/**'
-                    list-mode: lax
-                Examples:
-                    allow:
-                        - $gostd
-                        - charm.land/fang/v2
-                        - github.com/larsartmann/cmdguard
-                        - github.com/larsartmann/go-output
-                        - github.com/larsartmann/go-output/table
-                        - github.com/samber/do/v2
-                        - github.com/spf13/cobra
-                        - github.com/spf13/pflag
-                    files:
-                        - '**/examples/**'
-                    list-mode: lax
-                Integration:
-                    allow:
-                        - $gostd
-                        - github.com/larsartmann/cmdguard
-                        - github.com/samber/do/v2
-                        - github.com/spf13/cobra
-                    files:
-                        - '**/tests/**'
-                    list-mode: lax
-                Main:
-                    allow:
-                        - $gostd
-                        - charm.land/fang/v2
-                        - github.com/larsartmann/cmdguard
-                        - github.com/larsartmann/go-output
-                        - github.com/larsartmann/go-output/table
-                        - github.com/muesli/mango
-                        - github.com/muesli/mango-cobra
-                        - github.com/muesli/roff
-                        - github.com/samber/do/v2
-                        - github.com/spf13/cobra
-                        - github.com/spf13/pflag
-                    files:
-                        - $all
-                        - '!$test'
-                        - '!**/examples/**'
-                        - '!**/benchmarks/**'
-                        - '!**/tests/**'
-                    list-mode: strict
-                Test:
-                    allow:
-                        - $gostd
-                        - charm.land/fang/v2
-                        - github.com/larsartmann/cmdguard
-                        - github.com/larsartmann/go-output
-                        - github.com/samber/do/v2
-                        - github.com/spf13/cobra
-                        - github.com/spf13/pflag
-                    files:
-                        - $test
-                    list-mode: strict
-        exhaustruct:
-            exclude:
-                - os/exec.Cmd
-        funlen:
-            lines: 80
-            statements: 60
-        gocognit:
-            min-complexity: 35
-        gocritic:
-            disabled-checks:
-                - dupImport
-                - ifElseChain
-                - octalLiteral
-                - whyNoLint
-        ireturn:
-            allow:
-                - error
-                - empty
-                - anon
-                - stdlib
-                - generic
-        nestif:
-            min-complexity: 6
-        tagliatelle:
-            case:
-                rules:
-                    json: snake
-                    yaml: snake
-    exclusions:
-        generated: lax
-        presets:
-            - comments
-            - common-false-positives
-            - legacy
-            - std-error-handling
+  enable:
+    - arangolint
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godoclint
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard_v2
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
+  settings:
+    cyclop:
+      max-complexity: 15
+    depguard:
+      rules:
+        Benchmarks:
+          allow:
+            - $gostd
+            - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
+            - github.com/samber/do/v2
+            - github.com/spf13/cobra
+            - github.com/spf13/pflag
+          files:
+            - "**/benchmarks/**"
+          list-mode: lax
+        Examples:
+          allow:
+            - $gostd
+            - charm.land/fang/v2
+            - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
+            - github.com/larsartmann/go-output/table
+            - github.com/samber/do/v2
+            - github.com/spf13/cobra
+            - github.com/spf13/pflag
+          files:
+            - "**/examples/**"
+          list-mode: lax
+        Integration:
+          allow:
+            - $gostd
+            - github.com/larsartmann/cmdguard
+            - github.com/samber/do/v2
+            - github.com/spf13/cobra
+          files:
+            - "**/tests/**"
+          list-mode: lax
+        Main:
+          allow:
+            - $gostd
+            - charm.land/fang/v2
+            - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
+            - github.com/larsartmann/go-output/table
+            - github.com/muesli/mango
+            - github.com/muesli/mango-cobra
+            - github.com/muesli/roff
+            - github.com/samber/do/v2
+            - github.com/spf13/cobra
+            - github.com/spf13/pflag
+          files:
+            - $all
+            - "!$test"
+            - "!**/examples/**"
+            - "!**/benchmarks/**"
+            - "!**/tests/**"
+          list-mode: strict
+        Test:
+          allow:
+            - $gostd
+            - charm.land/fang/v2
+            - github.com/larsartmann/cmdguard
+            - github.com/larsartmann/go-output
+            - github.com/samber/do/v2
+            - github.com/spf13/cobra
+            - github.com/spf13/pflag
+          files:
+            - $test
+          list-mode: strict
+    exhaustruct:
+      exclude:
+        - os/exec.Cmd
+    funlen:
+      lines: 80
+      statements: 60
+    gocognit:
+      min-complexity: 35
+    gocritic:
+      disabled-checks:
+        - dupImport
+        - ifElseChain
+        - octalLiteral
+        - whyNoLint
+    ireturn:
+      allow:
+        - error
+        - empty
+        - anon
+        - stdlib
+        - generic
+    nestif:
+      min-complexity: 6
+    tagliatelle:
+      case:
         rules:
-            - path: _test\.go$
-              linters:
-                - gocyclo
-                - gosec
-                - dupl
-                - funlen
-                - cyclop
-                - gocognit
-                - nestif
-                - gochecknoglobals
-                - err113
-                - maintidx
-                - wrapcheck
-            - path: examples/
-              linters:
-                - funlen
-                - cyclop
-                - err113
-                - mnd
-                - wrapcheck
-                - forbidigo
-            - path: benchmarks/
-              linters:
-                - err113
-                - wrapcheck
-            - path: tests/
-              linters:
-                - err113
-                - wrapcheck
-            - path: pkg/cmdguard/v2/flags_parse.go$
-              linters:
-                - cyclop
-            - path: pkg/cmdguard/v2/types_port.go$
-              linters:
-                - cyclop
-            - path: pkg/cmdguard/v2/cli.go$
-              linters:
-                - cyclop
-                - funlen
-            - path: pkg/cmdguard/v2/type_handler.go$
-              linters:
-                - funlen
-                - gochecknoglobals
-                - wrapcheck
-            - path: pkg/cmdguard/v2/type_handler_kinds.go$
-              linters:
-                - funlen
-                - wrapcheck
-            - path: pkg/cmdguard/v2/type_handler_custom.go$
-              linters:
-                - funlen
-            - path: pkg/cmdguard/v2/output.go$
-              linters:
-                - gochecknoglobals
-                - wrapcheck
-            - path: pkg/cmdguard/v2/manpage.go$
-              linters:
-                - wrapcheck
-            - path: pkg/cmdguard/v2/editor.go$
-              linters:
-                - gosec
-            - path: pkg/cmdguard/v2/editor_test.go$
-              linters:
-                - paralleltest
-            - path: pkg/cmdguard/v2/env_tag_test.go$
-              linters:
-                - paralleltest
-            - path: pkg/cmdguard/v2/manpage_test.go$
-              linters:
-                - paralleltest
-            - path: pkg/cmdguard/v2/type_handler_test.go$
-              linters:
-                - paralleltest
-            - path: pkg/cmdguard/v2/example_test.go$
-              linters:
-                - forbidigo
-            - path: pkg/cmdguard/
-              linters:
-                - exhaustruct
-            - path: examples/
-              linters:
-                - exhaustruct
-            - path: benchmarks/
-              linters:
-                - exhaustruct
-            - path: tests/
-              linters:
-                - exhaustruct
-            - text: for loop can be changed to use an integer range
-              linters:
-                - intrange
-            - path: _test\.go$
-              text: shadow
-              linters:
-                - govet
-            - path: _test\.go$
-              text: Error return value of .+\.Close is not checked
-              linters:
-                - errcheck
-            - text: weak cryptographic primitive
-              linters:
-                - gosec
-            - text: 'unused-parameter: parameter .+ seems to be unused'
-              linters:
-                - revive
-            - path: _test\.go$
-              text: dot-imports
-              linters:
-                - revive
-            - path: _test\.go$
-              linters:
-                - errorlint
-            - path: _test\.go$
-              text: context-as-argument
-              linters:
-                - revive
-            - path: flags_suggest\.go$
-              text: prealloc
-              linters:
-                - prealloc
-            - text: result .+ is always nil
-              linters:
-                - unparam
-            - text: ctx is unused
-              linters:
-                - unparam
-            - text: goconst
-              linters:
-                - goconst
-            - text: maintidx
-              linters:
-                - maintidx
-            - path: pkg/
-              linters:
-                - goconst
-            - path: internal/
-              linters:
-                - goconst
-            - path: pkg/cmdguard/v2/
-              linters:
-                - ireturn
-            - path: examples/
-              linters:
-                - gochecknoglobals
-                - varnamelen
-                - ireturn
-            - path: benchmarks/
-              linters:
-                - gochecknoglobals
-                - varnamelen
-                - ireturn
-            - path: tests/
-              linters:
-                - varnamelen
-                - ireturn
-            - path: pkg/testutil/
-              linters:
-                - varnamelen
-            - path: pkg/cmdguard/
-              linters:
-                - varnamelen
-            - path: pkg/cmdguard/v2/flags_validate.go
-              linters:
-                - nilerr
-                - err113
-            - path: _test\.go$
-              linters:
-                - godoclint
-                - noinlineerr
-                - tagalign
-                - gochecknoglobals
-            - path: pkg/cmdguard/v2/
-              linters:
-                - noinlineerr
-                - tagalign
-            - path: pkg/cmdguard/v2/cli_command.go
-              linters:
-                - gochecknoglobals
-            - path: pkg/cmdguard/v2/flags_validate.go
-              linters:
-                - gochecknoglobals
-            - path: pkg/cmdguard/v2/flags_validate.go
-              linters:
-                - gochecknoglobals
-            - path: _test\.go$
-              linters:
-                - wsl_v5
-            - path: pkg/
-              linters:
-                - testpackage
-            - path: tests/
-              linters:
-                - testpackage
-                - thelper
-                - godoclint
-            - path: benchmarks/
-              linters:
-                - testpackage
-                - thelper
-            - path: internal/
-              linters:
-                - testpackage
-                - thelper
-            - path: pkg/testutil/
-              linters:
-                - thelper
-            - path: examples/
-              linters:
-                - tagalign
-                - noinlineerr
-                - godoclint
-                - golines
-                - gomoddirectives
-            - text: local replacement are not allowed
-              linters:
-                - gomoddirectives
-        paths:
-            - _enum\.go$
+          json: snake
+          yaml: snake
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: _test\.go$
+        linters:
+          - gocyclo
+          - gosec
+          - dupl
+          - funlen
+          - cyclop
+          - gocognit
+          - nestif
+          - gochecknoglobals
+          - err113
+          - maintidx
+          - wrapcheck
+      - path: examples/
+        linters:
+          - funlen
+          - cyclop
+          - err113
+          - mnd
+          - wrapcheck
+          - forbidigo
+      - path: benchmarks/
+        linters:
+          - err113
+          - wrapcheck
+      - path: tests/
+        linters:
+          - err113
+          - wrapcheck
+      - path: pkg/cmdguard/v2/flags_parse.go$
+        linters:
+          - cyclop
+      - path: pkg/cmdguard/v2/types_port.go$
+        linters:
+          - cyclop
+      - path: pkg/cmdguard/v2/cli.go$
+        linters:
+          - cyclop
+          - funlen
+      - path: pkg/cmdguard/v2/type_handler.go$
+        linters:
+          - funlen
+          - gochecknoglobals
+          - wrapcheck
+      - path: pkg/cmdguard/v2/type_handler_kinds.go$
+        linters:
+          - funlen
+          - wrapcheck
+      - path: pkg/cmdguard/v2/type_handler_custom.go$
+        linters:
+          - funlen
+      - path: pkg/cmdguard/v2/output.go$
+        linters:
+          - gochecknoglobals
+          - wrapcheck
+      - path: pkg/cmdguard/v2/manpage.go$
+        linters:
+          - wrapcheck
+      - path: pkg/cmdguard/v2/editor.go$
+        linters:
+          - gosec
+      - path: pkg/cmdguard/v2/editor_test.go$
+        linters:
+          - paralleltest
+      - path: pkg/cmdguard/v2/env_tag_test.go$
+        linters:
+          - paralleltest
+      - path: pkg/cmdguard/v2/manpage_test.go$
+        linters:
+          - paralleltest
+      - path: pkg/cmdguard/v2/type_handler_test.go$
+        linters:
+          - paralleltest
+      - path: pkg/cmdguard/v2/example_test.go$
+        linters:
+          - forbidigo
+      - path: pkg/cmdguard/
+        linters:
+          - exhaustruct
+      - path: examples/
+        linters:
+          - exhaustruct
+      - path: benchmarks/
+        linters:
+          - exhaustruct
+      - path: tests/
+        linters:
+          - exhaustruct
+      - text: for loop can be changed to use an integer range
+        linters:
+          - intrange
+      - path: _test\.go$
+        text: shadow
+        linters:
+          - govet
+      - path: _test\.go$
+        text: Error return value of .+\.Close is not checked
+        linters:
+          - errcheck
+      - text: weak cryptographic primitive
+        linters:
+          - gosec
+      - text: "unused-parameter: parameter .+ seems to be unused"
+        linters:
+          - revive
+      - path: _test\.go$
+        text: dot-imports
+        linters:
+          - revive
+      - path: _test\.go$
+        linters:
+          - errorlint
+      - path: _test\.go$
+        text: context-as-argument
+        linters:
+          - revive
+      - path: flags_suggest\.go$
+        text: prealloc
+        linters:
+          - prealloc
+      - text: result .+ is always nil
+        linters:
+          - unparam
+      - text: ctx is unused
+        linters:
+          - unparam
+      - text: goconst
+        linters:
+          - goconst
+      - text: maintidx
+        linters:
+          - maintidx
+      - path: pkg/
+        linters:
+          - goconst
+      - path: internal/
+        linters:
+          - goconst
+      - path: pkg/cmdguard/v2/
+        linters:
+          - ireturn
+      - path: examples/
+        linters:
+          - gochecknoglobals
+          - varnamelen
+          - ireturn
+      - path: benchmarks/
+        linters:
+          - gochecknoglobals
+          - varnamelen
+          - ireturn
+      - path: tests/
+        linters:
+          - varnamelen
+          - ireturn
+      - path: pkg/testutil/
+        linters:
+          - varnamelen
+      - path: pkg/cmdguard/
+        linters:
+          - varnamelen
+      - path: pkg/cmdguard/v2/flags_validate.go
+        linters:
+          - nilerr
+          - err113
+      - path: _test\.go$
+        linters:
+          - godoclint
+          - noinlineerr
+          - tagalign
+          - gochecknoglobals
+      - path: pkg/cmdguard/v2/
+        linters:
+          - noinlineerr
+          - tagalign
+      - path: pkg/cmdguard/v2/cli_command.go
+        linters:
+          - gochecknoglobals
+      - path: pkg/cmdguard/v2/flags_validate.go
+        linters:
+          - gochecknoglobals
+      - path: pkg/cmdguard/v2/flags_validate.go
+        linters:
+          - gochecknoglobals
+      - path: _test\.go$
+        linters:
+          - wsl_v5
+      - path: pkg/
+        linters:
+          - testpackage
+      - path: tests/
+        linters:
+          - testpackage
+          - thelper
+          - godoclint
+      - path: benchmarks/
+        linters:
+          - testpackage
+          - thelper
+      - path: internal/
+        linters:
+          - testpackage
+          - thelper
+      - path: pkg/testutil/
+        linters:
+          - thelper
+      - path: examples/
+        linters:
+          - tagalign
+          - noinlineerr
+          - godoclint
+          - golines
+          - gomoddirectives
+      - text: local replacement are not allowed
+        linters:
+          - gomoddirectives
+    paths:
+      - _enum\.go$
 formatters:
-    enable:
-        - gci
-        - goimports
-        - gofumpt
-        - golines
-    settings:
-        gci:
-            custom-order: true
-            sections:
-                - standard
-                - default
-                - prefix(github.com/larsartmann/cmdguard)
-        gofmt:
-            simplify: true
-        goimports:
-            local-prefixes:
-                - github.com/larsartmann/cmdguard
-    exclusions:
-        generated: lax
-        paths:
-            - _enum\.go$
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - golines
+  settings:
+    gci:
+      custom-order: true
+      sections:
+        - standard
+        - default
+        - prefix(github.com/larsartmann/cmdguard)
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/larsartmann/cmdguard
+  exclusions:
+    generated: lax
+    paths:
+      - _enum\.go$
 issues:
-    max-issues-per-linter: 50
-    max-same-issues: 10
+  max-issues-per-linter: 50
+  max-same-issues: 10
