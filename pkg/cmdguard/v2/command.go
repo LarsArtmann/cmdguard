@@ -148,11 +148,21 @@ func (c Command[T, F]) validate(mode ValidationMode) error {
 	}
 
 	if c.runE == nil && len(c.commands) == 0 {
-		return fmt.Errorf("%w: %q has no RunE and no subcommands", ErrMissingHandler, c.use)
+		return fmt.Errorf(
+			"%w: mode=%v, %q has no RunE and no subcommands",
+			ErrMissingHandler,
+			mode,
+			c.use,
+		)
 	}
 
 	if len(c.commands) > 0 && c.long == "" {
-		return fmt.Errorf("%w: %q has subcommands but no Long description", ErrMissingLong, c.use)
+		return fmt.Errorf(
+			"%w: mode=%v, %q has subcommands but no Long description",
+			ErrMissingLong,
+			mode,
+			c.use,
+		)
 	}
 
 	seen := make(map[string]bool)
@@ -172,7 +182,7 @@ func (c Command[T, F]) validate(mode ValidationMode) error {
 	for i, sub := range c.commands {
 		err := sub.validate(mode)
 		if err != nil {
-			return fmt.Errorf("subcommand %d of %q: %w", i, c.use, err)
+			return fmt.Errorf("mode=%v, subcommand %d of %q: %w", mode, i, c.use, err)
 		}
 	}
 
@@ -227,16 +237,18 @@ func NewParentCommand[T, F any](
 
 	if long == "" {
 		return Command[T, F]{}, fmt.Errorf(
-			"%w: long description is required for parent command %q",
+			"%w: long=%q for parent command %q",
 			ErrMissingLong,
+			long,
 			use,
 		)
 	}
 
 	if len(subcommands) == 0 {
 		return Command[T, F]{}, fmt.Errorf(
-			"%w: parent command %q requires at least one subcommand",
+			"%w: long=%q, parent command %q requires at least one subcommand",
 			ErrMissingHandler,
+			long,
 			use,
 		)
 	}
@@ -248,7 +260,7 @@ func NewParentCommand[T, F any](
 
 	err := cmd.Validate()
 	if err != nil {
-		return Command[T, F]{}, err
+		return Command[T, F]{}, fmt.Errorf("long=%q: %w", long, err)
 	}
 
 	return cmd, nil

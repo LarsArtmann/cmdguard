@@ -44,7 +44,7 @@ type CLI[T any] struct {
 func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
 	err := validateName(name)
 	if err != nil {
-		return nil, fmt.Errorf("creating CLI %q: %w", name, err)
+		return nil, fmt.Errorf("short=%q: creating CLI %q: %w", short, name, err)
 	}
 
 	cli := &CLI[T]{
@@ -64,7 +64,7 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 
 	err = cli.initialize(defaults)
 	if err != nil {
-		return nil, fmt.Errorf("initializing CLI %q: %w", name, err)
+		return nil, fmt.Errorf("short=%q, initializing CLI %q: %w", short, name, err)
 	}
 
 	return cli, nil

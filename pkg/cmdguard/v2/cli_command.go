@@ -67,7 +67,7 @@ func cliToCobraCommand[T, F any](
 
 	flagRegistry, err := initCommandFlags(cobraCmd, cmd.use, cmd.flags, envPrefix)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("envPrefix=%s: %w", envPrefix, err)
 	}
 
 	wireAllHandlers(cobraCmd, config, cmd, flagRegistry, middlewares)
@@ -75,7 +75,7 @@ func cliToCobraCommand[T, F any](
 	for _, subCmd := range cmd.commands {
 		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, envPrefix)
 		if err != nil {
-			return nil, fmt.Errorf("subcommand of %q: %w", cmd.use, err)
+			return nil, fmt.Errorf("envPrefix=%s, subcommand of %q: %w", envPrefix, cmd.use, err)
 		}
 
 		cobraCmd.AddCommand(subCobraCmd)
@@ -150,7 +150,7 @@ func initCommandFlags[F any](
 
 	registry, err := NewFlagRegistry(prototype)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create flag registry for command %q: %w", use, err)
+		return nil, fmt.Errorf("envPrefix=%s, command %q: %w", envPrefix, use, err)
 	}
 
 	if envPrefix != "" {
@@ -159,7 +159,7 @@ func initCommandFlags[F any](
 
 	err = registry.RegisterFlags(cobraCmd)
 	if err != nil {
-		return nil, fmt.Errorf("failed to register flags for command %q: %w", use, err)
+		return nil, fmt.Errorf("envPrefix=%s, command %q: %w", envPrefix, use, err)
 	}
 
 	return registry, nil
