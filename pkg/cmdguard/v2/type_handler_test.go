@@ -458,20 +458,34 @@ func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
 func TestTypeHandler_DispatchDefault(t *testing.T) {
 	t.Parallel()
 
-	t.Run("empty default returns zero value", func(t *testing.T) {
+	t.Run("dispatchDefault table", func(t *testing.T) {
 		t.Parallel()
 
-		tag := FlagTag{Type: reflect.TypeFor[int](), Default: ""}
-		result := dispatchDefault(globalTypeRegistry, tag)
-		testutil.AssertEqual(t, result, 0)
-	})
+		tests := []struct {
+			name     string
+			tag      FlagTag
+			expected any
+		}{
+			{
+				"empty default returns zero value",
+				FlagTag{Type: reflect.TypeFor[int](), Default: ""},
+				0,
+			},
+			{
+				"int default converts to exact type",
+				FlagTag{Type: reflect.TypeFor[int](), Default: "42"},
+				42,
+			},
+		}
 
-	t.Run("int default converts to exact type", func(t *testing.T) {
-		t.Parallel()
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
 
-		tag := FlagTag{Type: reflect.TypeFor[int](), Default: "42"}
-		result := dispatchDefault(globalTypeRegistry, tag)
-		testutil.AssertEqual(t, result, 42)
+				result := dispatchDefault(globalTypeRegistry, tt.tag)
+				testutil.AssertEqual(t, result, tt.expected)
+			})
+		}
 	})
 
 	t.Run("uint32 default converts to exact type", func(t *testing.T) {
@@ -674,6 +688,8 @@ func TestTypeHandlerFunc_NilRegisterFunc(t *testing.T) {
 }
 
 func TestRegisterGoDurationHandler(t *testing.T) {
+	t.Parallel()
+
 	RegisterGoDurationHandler()
 
 	t.Run("registers time.Duration handler", func(t *testing.T) {
@@ -695,19 +711,29 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("time.Duration empty default returns zero", func(t *testing.T) {
-		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
-		result := h.Default(FlagTag{Default: ""})
-		if result != time.Duration(0) {
-			t.Errorf("Default(empty) = %v, want 0", result)
-		}
-	})
+	t.Run("time.Duration default table", func(t *testing.T) {
+		t.Parallel()
 
-	t.Run("time.Duration invalid default returns zero", func(t *testing.T) {
 		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
-		result := h.Default(FlagTag{Default: "not-a-duration"})
-		if result != time.Duration(0) {
-			t.Errorf("Default(invalid) = %v, want 0", result)
+
+		tests := []struct {
+			name     string
+			defVal   string
+			expected time.Duration
+		}{
+			{"empty default returns zero", "", time.Duration(0)},
+			{"invalid default returns zero", "not-a-duration", time.Duration(0)},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+
+				result := h.Default(FlagTag{Default: tt.defVal})
+				if result != tt.expected {
+					t.Errorf("Default(%s) = %v, want %v", tt.defVal, result, tt.expected)
+				}
+			})
 		}
 	})
 

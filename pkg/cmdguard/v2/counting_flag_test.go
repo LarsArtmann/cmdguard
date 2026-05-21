@@ -14,99 +14,47 @@ type countTestConfig struct {
 func TestCountingFlag_Integration(t *testing.T) {
 	t.Parallel()
 
-	t.Run("-vvv sets count to 3", func(t *testing.T) {
-		t.Parallel()
+	type verbFlags struct {
+		Verbose int `flag:"verbose" short:"v" help:"verbosity level" count:"true"`
+	}
 
-		type verbFlags struct {
-			Verbose int `flag:"verbose" short:"v" help:"verbosity level" count:"true"`
-		}
+	tests := []struct {
+		name        string
+		args        []string
+		wantVerbose int
+	}{
+		{"-vvv sets count to 3", []string{"run", "-vvv"}, 3},
+		{"single -v sets count to 1", []string{"run", "-v"}, 1},
+		{"no flag sets count to 0", []string{"run"}, 0},
+	}
 
-		var result int
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-		cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
-		testutil.AssertNoError(t, err)
+			var result int
 
-		cmd, err := NewCommand[countTestConfig, *verbFlags](
-			"run",
-			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
-				result = flags.Verbose
+			cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
+			testutil.AssertNoError(t, err)
 
-				return nil
-			},
-			WithShort[countTestConfig, *verbFlags]("Run"),
-			WithFlags[countTestConfig, *verbFlags](&verbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+			cmd, err := NewCommand[countTestConfig, *verbFlags](
+				"run",
+				func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
+					result = flags.Verbose
 
-		err = cli.ExecuteWithArgs(t.Context(), []string{"run", "-vvv"})
-		testutil.AssertNoError(t, err)
-		if result != 3 {
-			t.Errorf("verbose count = %d, want 3", result)
-		}
-	})
+					return nil
+				},
+				WithShort[countTestConfig, *verbFlags]("Run"),
+				WithFlags[countTestConfig, *verbFlags](&verbFlags{}),
+			)
+			testutil.AssertNoError(t, err)
+			testutil.AssertNoError(t, AddCommand(cli, cmd))
 
-	t.Run("single -v sets count to 1", func(t *testing.T) {
-		t.Parallel()
-
-		type verbFlags struct {
-			Verbose int `flag:"verbose" short:"v" help:"verbosity level" count:"true"`
-		}
-
-		var result int
-
-		cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[countTestConfig, *verbFlags](
-			"run",
-			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
-				result = flags.Verbose
-
-				return nil
-			},
-			WithShort[countTestConfig, *verbFlags]("Run"),
-			WithFlags[countTestConfig, *verbFlags](&verbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(t.Context(), []string{"run", "-v"})
-		testutil.AssertNoError(t, err)
-		if result != 1 {
-			t.Errorf("verbose count = %d, want 1", result)
-		}
-	})
-
-	t.Run("no flag sets count to 0", func(t *testing.T) {
-		t.Parallel()
-
-		type verbFlags struct {
-			Verbose int `flag:"verbose" short:"v" help:"verbosity level" count:"true"`
-		}
-
-		var result int
-
-		cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[countTestConfig, *verbFlags](
-			"run",
-			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
-				result = flags.Verbose
-
-				return nil
-			},
-			WithShort[countTestConfig, *verbFlags]("Run"),
-			WithFlags[countTestConfig, *verbFlags](&verbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(t.Context(), []string{"run"})
-		testutil.AssertNoError(t, err)
-		if result != 0 {
-			t.Errorf("verbose count = %d, want 0", result)
-		}
-	})
+			err = cli.ExecuteWithArgs(t.Context(), tt.args)
+			testutil.AssertNoError(t, err)
+			if result != tt.wantVerbose {
+				t.Errorf("verbose count = %d, want %d", result, tt.wantVerbose)
+			}
+		})
+	}
 }

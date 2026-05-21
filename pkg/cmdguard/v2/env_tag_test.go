@@ -12,135 +12,78 @@ type envTestConfig struct {
 }
 
 func TestEnvTag_Integration(t *testing.T) {
-	t.Run("env var provides default when flag not set", func(t *testing.T) {
-		type dbFlags struct {
-			Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
-		}
-
-		var result string
-
-		t.Setenv("DB_HOST", "db.example.com")
-
-		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{})
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[envTestConfig, *dbFlags](
-			"connect",
-			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
-				result = flags.Host
-
-				return nil
+	tests := []struct {
+		name       string
+		envKey     string
+		envValue   string
+		args       []string
+		wantHost   string
+		cliOptions []CLIOption[envTestConfig]
+	}{
+		{
+			name:     "env var provides default when flag not set",
+			envKey:   "DB_HOST",
+			envValue: "db.example.com",
+			args:     []string{"connect"},
+			wantHost: "db.example.com",
+		},
+		{
+			name:     "explicit flag overrides env var",
+			envKey:   "DB_HOST",
+			envValue: "db.example.com",
+			args:     []string{"connect", "--host", "explicit.example.com"},
+			wantHost: "explicit.example.com",
+		},
+		{
+			name:     "default used when env var not set",
+			args:     []string{"connect"},
+			wantHost: "localhost",
+		},
+		{
+			name:     "env prefix is applied to command flags",
+			envKey:   "MYAPP_DB_HOST",
+			envValue: "prefixed.example.com",
+			args:     []string{"connect"},
+			wantHost: "prefixed.example.com",
+			cliOptions: []CLIOption[envTestConfig]{
+				WithEnvPrefix[envTestConfig]("MYAPP_"),
 			},
-			WithShort[envTestConfig, *dbFlags]("Connect"),
-			WithFlags[envTestConfig, *dbFlags](&dbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		},
+	}
 
-		err = cli.ExecuteWithArgs(t.Context(), []string{"connect"})
-		testutil.AssertNoError(t, err)
-		if result != "db.example.com" {
-			t.Errorf("host = %q, want %q", result, "db.example.com")
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			type flags struct {
+				Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
+			}
 
-	t.Run("explicit flag overrides env var", func(t *testing.T) {
-		type dbFlags struct {
-			Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
-		}
+			if tt.envKey != "" {
+				t.Setenv(tt.envKey, tt.envValue)
+			}
 
-		var result string
+			var result string
 
-		t.Setenv("DB_HOST", "db.example.com")
+			cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{}, tt.cliOptions...)
+			testutil.AssertNoError(t, err)
 
-		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{})
-		testutil.AssertNoError(t, err)
+			cmd, err := NewCommand[envTestConfig, *flags](
+				"connect",
+				func(_ context.Context, _ *envTestConfig, f *flags) error {
+					result = f.Host
 
-		cmd, err := NewCommand[envTestConfig, *dbFlags](
-			"connect",
-			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
-				result = flags.Host
+					return nil
+				},
+				WithShort[envTestConfig, *flags]("Connect"),
+				WithFlags[envTestConfig, *flags](&flags{}),
+			)
+			testutil.AssertNoError(t, err)
+			testutil.AssertNoError(t, AddCommand(cli, cmd))
 
-				return nil
-			},
-			WithShort[envTestConfig, *dbFlags]("Connect"),
-			WithFlags[envTestConfig, *dbFlags](&dbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(
-			t.Context(),
-			[]string{"connect", "--host", "explicit.example.com"},
-		)
-		testutil.AssertNoError(t, err)
-		if result != "explicit.example.com" {
-			t.Errorf("host = %q, want %q", result, "explicit.example.com")
-		}
-	})
-
-	t.Run("default used when env var not set", func(t *testing.T) {
-		type dbFlags struct {
-			Host string `flag:"host" env:"CMDGUARD_TEST_DB_HOST_UNUSED" default:"localhost" help:"Database host"`
-		}
-
-		var result string
-
-		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{})
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[envTestConfig, *dbFlags](
-			"connect",
-			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
-				result = flags.Host
-
-				return nil
-			},
-			WithShort[envTestConfig, *dbFlags]("Connect"),
-			WithFlags[envTestConfig, *dbFlags](&dbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(t.Context(), []string{"connect"})
-		testutil.AssertNoError(t, err)
-		if result != "localhost" {
-			t.Errorf("host = %q, want %q (default)", result, "localhost")
-		}
-	})
-
-	t.Run("env prefix is applied to command flags", func(t *testing.T) {
-		type dbFlags struct {
-			Host string `flag:"host" env:"DB_HOST" default:"localhost" help:"Database host"`
-		}
-
-		var result string
-
-		t.Setenv("MYAPP_DB_HOST", "prefixed.example.com")
-
-		cli, err := NewCLI[envTestConfig](
-			"app", "test", envTestConfig{},
-			WithEnvPrefix[envTestConfig]("MYAPP_"),
-		)
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[envTestConfig, *dbFlags](
-			"connect",
-			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
-				result = flags.Host
-
-				return nil
-			},
-			WithShort[envTestConfig, *dbFlags]("Connect"),
-			WithFlags[envTestConfig, *dbFlags](&dbFlags{}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(t.Context(), []string{"connect"})
-		testutil.AssertNoError(t, err)
-		if result != "prefixed.example.com" {
-			t.Errorf("host = %q, want %q", result, "prefixed.example.com")
-		}
-	})
+			err = cli.ExecuteWithArgs(t.Context(), tt.args)
+			testutil.AssertNoError(t, err)
+			if result != tt.wantHost {
+				t.Errorf("host = %q, want %q", result, tt.wantHost)
+			}
+		})
+	}
 }

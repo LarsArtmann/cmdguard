@@ -226,19 +226,7 @@ func TestWithStrictValidation(t *testing.T) {
 	t.Run("command with short passes in strict mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
-			"test", "Test", testConfig{},
-			WithStrictValidation[testConfig](),
-		)
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"good",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithShort[testConfig, NoFlags]("A good command"),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		addShortCommandToStrictCLI(t, WithStrictValidation[testConfig]())
 	})
 
 	t.Run("command without short passes without strict mode", func(t *testing.T) {
@@ -382,19 +370,7 @@ func TestWithDraconianValidation(t *testing.T) {
 	t.Run("leaf without example passes in strict mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
-			"test", "Test", testConfig{},
-			WithStrictValidation[testConfig](),
-		)
-		testutil.AssertNoError(t, err)
-
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"noexample",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithShort[testConfig, NoFlags]("Has short but no example"),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		addShortCommandToStrictCLI(t, WithStrictValidation[testConfig]())
 	})
 }
 

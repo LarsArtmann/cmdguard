@@ -18,6 +18,23 @@ type lifecycleConfig struct {
 	Verbose bool `flag:"verbose" short:"v" default:"false" help:"Verbose"`
 }
 
+func newLifecycleCmd(t *testing.T, use, short string) v2.Command[lifecycleConfig, v2.NoFlags] {
+	t.Helper()
+
+	cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
+		use,
+		func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
+			return nil
+		},
+		v2.WithShort[lifecycleConfig, v2.NoFlags](short),
+	)
+	if err != nil {
+		t.Fatalf("NewCommand %s: %v", use, err)
+	}
+
+	return cmd
+}
+
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 	t.Parallel()
 
@@ -205,30 +222,22 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 
 			var order []string
 
-			mw1 := func(
-				_ context.Context, _ *lifecycleConfig, _ v2.CommandInfo, next func() error,
-			) error {
-				order = append(order, "mw1-before")
-				err := next()
-				order = append(order, "mw1-after")
+			trackingMW := func(name string) v2.Middleware[lifecycleConfig] {
+				return func(
+					_ context.Context, _ *lifecycleConfig, _ v2.CommandInfo, next func() error,
+				) error {
+					order = append(order, name+"-before")
+					err := next()
+					order = append(order, name+"-after")
 
-				return err
-			}
-
-			mw2 := func(
-				_ context.Context, _ *lifecycleConfig, _ v2.CommandInfo, next func() error,
-			) error {
-				order = append(order, "mw2-before")
-				err := next()
-				order = append(order, "mw2-after")
-
-				return err
+					return err
+				}
 			}
 
 			cli, err := v2.NewCLI[lifecycleConfig](
 				"mw", "Test", lifecycleConfig{},
 				v2.WithFang[lifecycleConfig](false),
-				v2.WithMiddleware[lifecycleConfig](mw1, mw2),
+				v2.WithMiddleware[lifecycleConfig](trackingMW("mw1"), trackingMW("mw2")),
 			)
 			if err != nil {
 				t.Fatalf("NewCLI: %v", err)
@@ -337,16 +346,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				t.Fatalf("NewCLI: %v", err)
 			}
 
-			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
-				"timed",
-				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					return nil
-				},
-				v2.WithShort[lifecycleConfig, v2.NoFlags]("Timed"),
-			)
-			if err != nil {
-				t.Fatalf("NewCommand: %v", err)
-			}
+			cmd := newLifecycleCmd(t, "timed", "Timed")
 
 			if err := v2.AddCommand(cli, cmd); err != nil {
 				t.Fatalf("AddCommand: %v", err)
@@ -584,47 +584,60 @@ func TestCLI_ErrorChains(t *testing.T) {
 func TestCLI_ConfigValidation_Integration(t *testing.T) {
 	t.Parallel()
 
+	type serverConfig struct {
+		Name string `flag:"name" default:"" help:"Server name"`
+	}
+
+	newValidatedServerCLI := func(t *testing.T) *v2.CLI[serverConfig] {
+		t.Helper()
+
+		cli, err := v2.NewCLI[serverConfig](
+			"server", "Test", serverConfig{},
+			v2.WithFang[serverConfig](false),
+			v2.WithConfigValidation[serverConfig](func(cfg *serverConfig) error {
+				if cfg.Name == "" {
+					return errors.New("name is required")
+				}
+
+				return nil
+			}),
+		)
+		if err != nil {
+			t.Fatalf("NewCLI: %v", err)
+		}
+
+		return cli
+	}
+
+	addStartCmd := func(t *testing.T, cli *v2.CLI[serverConfig], handler func() error) {
+		t.Helper()
+
+		cmd, err := v2.NewCommand[serverConfig, v2.NoFlags](
+			"start",
+			func(_ context.Context, _ *serverConfig, _ v2.NoFlags) error {
+				return handler()
+			},
+			v2.WithShort[serverConfig, v2.NoFlags]("Start"),
+		)
+		if err != nil {
+			t.Fatalf("NewCommand: %v", err)
+		}
+
+		if err := v2.AddCommand(cli, cmd); err != nil {
+			t.Fatalf("AddCommand: %v", err)
+		}
+	}
+
 	t.Run(
 		"Given CLI with config validation requiring non-empty name, "+
 			"When name is empty (default), Then execution is rejected",
 		func(t *testing.T) {
 			t.Parallel()
 
-			type serverConfig struct {
-				Name string `flag:"name" default:"" help:"Server name"`
-			}
+			cli := newValidatedServerCLI(t)
+			addStartCmd(t, cli, func() error { return nil })
 
-			cli, err := v2.NewCLI[serverConfig](
-				"server", "Test", serverConfig{},
-				v2.WithFang[serverConfig](false),
-				v2.WithConfigValidation[serverConfig](func(cfg *serverConfig) error {
-					if cfg.Name == "" {
-						return errors.New("name is required")
-					}
-
-					return nil
-				}),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
-
-			cmd, err := v2.NewCommand[serverConfig, v2.NoFlags](
-				"start",
-				func(_ context.Context, _ *serverConfig, _ v2.NoFlags) error {
-					return nil
-				},
-				v2.WithShort[serverConfig, v2.NoFlags]("Start"),
-			)
-			if err != nil {
-				t.Fatalf("NewCommand: %v", err)
-			}
-
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
-
-			err = cli.ExecuteWithArgs(context.Background(), []string{"start"})
+			err := cli.ExecuteWithArgs(context.Background(), []string{"start"})
 			if err == nil {
 				t.Fatal("expected validation error")
 			}
@@ -645,45 +658,16 @@ func TestCLI_ConfigValidation_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			type serverConfig struct {
-				Name string `flag:"name" default:"" help:"Server name"`
-			}
-
 			var handlerCalled bool
 
-			cli, err := v2.NewCLI[serverConfig](
-				"server", "Test", serverConfig{},
-				v2.WithFang[serverConfig](false),
-				v2.WithConfigValidation[serverConfig](func(cfg *serverConfig) error {
-					if cfg.Name == "" {
-						return errors.New("name is required")
-					}
+			cli := newValidatedServerCLI(t)
+			addStartCmd(t, cli, func() error {
+				handlerCalled = true
 
-					return nil
-				}),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+				return nil
+			})
 
-			cmd, err := v2.NewCommand[serverConfig, v2.NoFlags](
-				"start",
-				func(_ context.Context, _ *serverConfig, _ v2.NoFlags) error {
-					handlerCalled = true
-
-					return nil
-				},
-				v2.WithShort[serverConfig, v2.NoFlags]("Start"),
-			)
-			if err != nil {
-				t.Fatalf("NewCommand: %v", err)
-			}
-
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
-
-			err = cli.ExecuteWithArgs(context.Background(), []string{"start", "--name=production"})
+			err := cli.ExecuteWithArgs(context.Background(), []string{"start", "--name=production"})
 			if err != nil {
 				t.Fatalf("expected success, got: %v", err)
 			}
@@ -713,16 +697,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 				t.Fatalf("NewCLI: %v", err)
 			}
 
-			child, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
-				"child",
-				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					return nil
-				},
-				v2.WithShort[lifecycleConfig, v2.NoFlags]("Child command"),
-			)
-			if err != nil {
-				t.Fatalf("NewCommand child: %v", err)
-			}
+			child := newLifecycleCmd(t, "child", "Child command")
 
 			parent, err := v2.NewParentCommand[lifecycleConfig, v2.NoFlags](
 				"parent",

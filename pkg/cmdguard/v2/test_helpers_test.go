@@ -188,3 +188,21 @@ func assertValidatorError(t *testing.T, name string, validator func(string) erro
 
 	assertErrorContains(t, err, "invalid")
 }
+
+func addShortCommandToStrictCLI(
+	t *testing.T,
+	opts ...CLIOption[testConfig],
+) {
+	t.Helper()
+
+	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, opts...)
+	testutil.AssertNoError(t, err)
+
+	cmd, err := NewCommand[testConfig, NoFlags](
+		"good",
+		noOpHandler(),
+		WithShort[testConfig, NoFlags]("A good command"),
+	)
+	testutil.AssertNoError(t, err)
+	testutil.AssertNoError(t, AddCommand(cli, cmd))
+}
