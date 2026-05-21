@@ -15,7 +15,7 @@ import (
 func (cli *CLI[T]) ManPage(section uint) (string, error) {
 	mp, err := mcobra.NewManPage(section, cli.rootCmd)
 	if err != nil {
-		return "", fmt.Errorf("generating man page: %w", err)
+		return "", fmt.Errorf("section=%d: %w", section, err)
 	}
 
 	return mp.Build(roff.NewDocument()), nil
@@ -25,7 +25,7 @@ func (cli *CLI[T]) ManPage(section uint) (string, error) {
 func (cli *CLI[T]) WriteManPage(w io.Writer, section uint) error {
 	content, err := cli.ManPage(section)
 	if err != nil {
-		return err
+		return fmt.Errorf("section=%d: %w", section, err)
 	}
 
 	_, err = fmt.Fprint(w, content)

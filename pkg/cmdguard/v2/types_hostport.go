@@ -43,7 +43,7 @@ func MustParseHostPort(s string) HostPort {
 func NewHostPort(host, portStr string) (HostPort, error) {
 	port, err := ParsePort(portStr)
 	if err != nil {
-		return HostPort{}, err
+		return HostPort{}, fmt.Errorf("host=%q, port=%q: %w", host, portStr, err)
 	}
 
 	return HostPort{host: host, port: port}, nil

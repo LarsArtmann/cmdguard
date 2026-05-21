@@ -56,11 +56,15 @@ func ValidateName(name string) error {
 // ValidateCount validates the count flag.
 func ValidateCount(count int) error {
 	if count < 1 {
-		return errors.New("count must be at least 1")
+		return fmt.Errorf("count=%d: %w", count, errors.New("count must be at least 1"))
 	}
 
 	if count > 10 {
-		return errors.New("count must be at most 10 (use --verbose for more)")
+		return fmt.Errorf(
+			"count=%d: %w",
+			count,
+			errors.New("count must be at most 10 (use --verbose for more)"),
+		)
 	}
 
 	return nil
@@ -73,16 +77,16 @@ func ValidateEmail(email string) error {
 	}
 
 	if !strings.Contains(email, "@") {
-		return errors.New("email must contain @")
+		return fmt.Errorf("email=%q: %w", email, errors.New("email must contain @"))
 	}
 
 	parts := strings.Split(email, "@")
 	if len(parts) != 2 {
-		return errors.New("email format is invalid")
+		return fmt.Errorf("email=%q: %w", email, errors.New("email format is invalid"))
 	}
 
 	if parts[0] == "" || parts[1] == "" {
-		return errors.New("email format is invalid")
+		return fmt.Errorf("email=%q: %w", email, errors.New("email format is invalid"))
 	}
 
 	return nil

@@ -79,7 +79,7 @@ func (b *BranchingFlowContext) BranchWithTimeout(
 ) (*BranchingFlowContext, func(), error) {
 	d, err := time.ParseDuration(timeout)
 	if err != nil {
-		return nil, nil, fmt.Errorf("invalid timeout %q: %w", timeout, err)
+		return nil, nil, fmt.Errorf("command=%q, invalid timeout %q: %w", commandName, timeout, err)
 	}
 
 	branchCtx, cancel := context.WithTimeout(b.Context, d)
@@ -95,7 +95,12 @@ func (b *BranchingFlowContext) BranchWithDeadline(
 ) (*BranchingFlowContext, func(), error) {
 	t, err := time.Parse(time.RFC3339, deadline)
 	if err != nil {
-		return nil, nil, fmt.Errorf("invalid deadline %q: %w", deadline, err)
+		return nil, nil, fmt.Errorf(
+			"command=%q, invalid deadline %q: %w",
+			commandName,
+			deadline,
+			err,
+		)
 	}
 
 	branchCtx, cancel := context.WithDeadline(b.Context, t)
