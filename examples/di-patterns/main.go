@@ -126,7 +126,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	listCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("list",
+	listCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"list",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			store, err := v2.Invoke[*TaskStore](cli.Scope())
 			if err != nil {
@@ -166,7 +167,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	addCmd, err := v2.NewCommand[AppConfig, *AddFlags]("add",
+	addCmd, err := v2.NewCommand[AppConfig, *AddFlags](
+		"add",
 		func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
 			store, err := v2.Invoke[*TaskStore](cli.Scope())
 			if err != nil {
@@ -192,7 +194,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	checkCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("check",
+	checkCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"check",
 		func(ctx context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("Running health checks...")
 

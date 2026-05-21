@@ -83,7 +83,8 @@ func TestTypedExample_GreetCommandWithFlags(t *testing.T) {
 		"A typed CLI application",
 		AppConfig{Verbose: false},
 	)
-	greetCmd = v2.MustNewCommand[AppConfig, *GreetFlags]("greet",
+	greetCmd = v2.MustNewCommand[AppConfig, *GreetFlags](
+		"greet",
 		func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 			for range flags.Count {
@@ -128,7 +129,8 @@ func TestTypedExample_ConfigCommand(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	configCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("config",
+	configCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"config",
 		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Printf("Verbose: %v\n", cfg.Verbose)
 			fmt.Printf("Output: %s\n", cfg.Output)
@@ -226,7 +228,8 @@ func TestTypedExample_DatabaseService(t *testing.T) {
 	}
 
 	// Test command that uses database
-	dbCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("db-status",
+	dbCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"db-status",
 		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			db, err := v2.Invoke[*Database](scope)
 			if err != nil {

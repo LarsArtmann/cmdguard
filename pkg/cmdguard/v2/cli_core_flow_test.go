@@ -90,7 +90,8 @@ func TestCLIFlowContextIntegration(t *testing.T) {
 
 		var accessedFlowCtx bool
 
-		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("check",
+		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+			"check",
 			func(ctx context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				bfc, ok := v2.GetBranchingFlowContext(ctx)
 				accessedFlowCtx = ok && bfc != nil

@@ -34,7 +34,8 @@ func Execute(ctx context.Context, cli CLIExecutor) {
 func NewSimpleCommand[Config any](
 	name, message, short string,
 ) (v2.Command[Config, v2.NoFlags], error) {
-	return v2.NewCommand[Config, v2.NoFlags](name,
+	return v2.NewCommand[Config, v2.NoFlags](
+		name,
 		func(_ context.Context, _ *Config, _ v2.NoFlags) error {
 			fmt.Println(message)
 

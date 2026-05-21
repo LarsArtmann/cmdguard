@@ -21,7 +21,8 @@ func TestCLIAddCommand(t *testing.T) {
 			Name string `default:"World" flag:"name" help:"Name to greet" short:"n"`
 		}
 
-		cmd, err := v2.NewCommand[testCLIConfig, greetFlags]("greet",
+		cmd, err := v2.NewCommand[testCLIConfig, greetFlags](
+			"greet",
 			func(_ context.Context, _ *testCLIConfig, _ greetFlags) error {
 				return nil
 			},

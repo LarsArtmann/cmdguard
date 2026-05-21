@@ -87,7 +87,8 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	t.Parallel()
 
-	_, err := v2.NewCommand[RootConfig, *GreetFlags]("",
+	_, err := v2.NewCommand[RootConfig, *GreetFlags](
+		"",
 		func(_ context.Context, _ *RootConfig, _ *GreetFlags) error { return nil },
 		v2.WithShort[RootConfig, *GreetFlags]("Invalid command"),
 	)
@@ -95,7 +96,8 @@ func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 		t.Error("expected error for empty Use field")
 	}
 
-	_, err = v2.NewCommand[RootConfig, *GreetFlags]("invalid",
+	_, err = v2.NewCommand[RootConfig, *GreetFlags](
+		"invalid",
 		nil,
 		v2.WithShort[RootConfig, *GreetFlags]("No handler"),
 	)
@@ -121,7 +123,8 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 
 	var receivedConfig *RootConfig
 
-	checkCmd, err := v2.NewCommand[RootConfig, *GreetFlags]("check",
+	checkCmd, err := v2.NewCommand[RootConfig, *GreetFlags](
+		"check",
 		func(_ context.Context, cfg *RootConfig, _ *GreetFlags) error {
 			receivedConfig = cfg
 
@@ -168,7 +171,8 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 
 	var executedFlags *MigrateFlags
 
-	migrateUpCmd, err := v2.NewCommand[RootConfig, *MigrateFlags]("up",
+	migrateUpCmd, err := v2.NewCommand[RootConfig, *MigrateFlags](
+		"up",
 		func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
 			executedFlags = flags
 
@@ -180,7 +184,8 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	migrateCmd, err := v2.NewParentCommand[RootConfig, *MigrateFlags]("migrate",
+	migrateCmd, err := v2.NewParentCommand[RootConfig, *MigrateFlags](
+		"migrate",
 		"Database migration management commands",
 		[]v2.Command[RootConfig, *MigrateFlags]{migrateUpCmd},
 		v2.WithShort[RootConfig, *MigrateFlags]("Migration commands"),

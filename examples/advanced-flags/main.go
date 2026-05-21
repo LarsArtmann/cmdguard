@@ -182,7 +182,8 @@ func main() {
 	}
 
 	// Duration demo command
-	durationCmd, err := v2.NewCommand[GlobalConfig, DurationFlags]("duration",
+	durationCmd, err := v2.NewCommand[GlobalConfig, DurationFlags](
+		"duration",
 		func(ctx context.Context, cfg *GlobalConfig, flags DurationFlags) error {
 			fmt.Printf("Session timeout: %s (%g seconds)\n",
 				flags.SessionTimeout,

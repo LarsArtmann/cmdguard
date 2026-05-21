@@ -18,7 +18,8 @@ func TestCLIExecute(t *testing.T) {
 		}
 
 		executed := false
-		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("run",
+		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+			"run",
 			func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
 				executed = true
 

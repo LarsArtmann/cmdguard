@@ -36,7 +36,8 @@ type DBFlags struct {
 }
 
 func main() {
-	cli, err := v2.NewCLI[AppConfig]("env-demo", "Environment variable demo", AppConfig{},
+	cli, err := v2.NewCLI[AppConfig](
+		"env-demo", "Environment variable demo", AppConfig{},
 		v2.WithEnvPrefix[AppConfig]("MYAPP_"),
 	)
 	if err != nil {
@@ -44,7 +45,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	showCmd, err := v2.NewCommand[AppConfig, *DBFlags]("show",
+	showCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+		"show",
 		func(_ context.Context, cfg *AppConfig, flags *DBFlags) error {
 			fmt.Println("Database Configuration:")
 			fmt.Printf("  Host:     %s\n", flags.Host)

@@ -22,7 +22,8 @@ func TestFlagRegistry_GenerateHelp(t *testing.T) {
 		}
 
 		help := registry.GenerateHelp()
-		assertStringContains(t, help,
+		assertStringContains(
+			t, help,
 			"--name", "-n", "The name to use", "default: default",
 			"--verbose", "-v", "Enable verbose output",
 		)

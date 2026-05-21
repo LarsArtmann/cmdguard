@@ -279,7 +279,8 @@ func configPreRunE() func(context.Context, *Config, *ConfigFlags) error {
 // addCommands adds all example commands to the CLI.
 func addCommands(cli *v2.CLI[Config]) error {
 	// Greet command with validation
-	greetCmd, err := v2.NewCommand[Config, *GreetFlags]("greet",
+	greetCmd, err := v2.NewCommand[Config, *GreetFlags](
+		"greet",
 		greetRunE(),
 		v2.WithShort[Config, *GreetFlags]("Greet someone"),
 		v2.WithLong[Config, *GreetFlags]("Greets the named person a specified number of times."),
@@ -328,7 +329,8 @@ func addCommands(cli *v2.CLI[Config]) error {
 	}
 
 	// Config command with validation
-	configCmd, err := v2.NewCommand[Config, *ConfigFlags]("config",
+	configCmd, err := v2.NewCommand[Config, *ConfigFlags](
+		"config",
 		configRunE(),
 		v2.WithShort[Config, *ConfigFlags]("Get or set configuration"),
 		v2.WithLong[Config, *ConfigFlags]("Manages application configuration."),

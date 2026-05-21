@@ -48,7 +48,8 @@ func main() {
 	}
 
 	// --- migrate command group (all subcommands share DBFlags) ---
-	migrateUpCmd, err := v2.NewCommand[AppConfig, *DBFlags]("up",
+	migrateUpCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+		"up",
 		func(_ context.Context, cfg *AppConfig, flags *DBFlags) error {
 			fmt.Printf("Running migrations UP on %s", flags.Env)
 
@@ -72,7 +73,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	migrateDownCmd, err := v2.NewCommand[AppConfig, *DBFlags]("down",
+	migrateDownCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+		"down",
 		func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 			fmt.Printf("Rolling back last migration on %s", flags.Env)
 
@@ -92,7 +94,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	migrateStatusCmd, err := v2.NewCommand[AppConfig, *DBFlags]("status",
+	migrateStatusCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+		"status",
 		func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 			fmt.Printf("Migration status for %s: 3 applied, 2 pending\n", flags.Env)
 

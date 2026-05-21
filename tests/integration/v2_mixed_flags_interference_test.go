@@ -50,7 +50,8 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmdA, err := v2.NewCommand[RootConfig, *GreetFlags]("cmd-a",
+	cmdA, err := v2.NewCommand[RootConfig, *GreetFlags](
+		"cmd-a",
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
@@ -69,7 +70,8 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmdB, err := v2.NewCommand[RootConfig, *MathFlags]("cmd-b",
+	cmdB, err := v2.NewCommand[RootConfig, *MathFlags](
+		"cmd-b",
 		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
 			lastExecuted = "B"
 			lastFlags = flags
@@ -158,7 +160,8 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 
 	var executed bool
 
-	simpleCmd, err := v2.NewCommand[RootConfig, v2.NoFlags]("simple",
+	simpleCmd, err := v2.NewCommand[RootConfig, v2.NoFlags](
+		"simple",
 		func(_ context.Context, _ *RootConfig, _ v2.NoFlags) error {
 			executed = true
 
@@ -175,7 +178,8 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags]("greet",
+	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags](
+		"greet",
 		func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 			executed = true
 

@@ -42,7 +42,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	fetchCmd, err := v2.NewCommand[AppConfig, *FetchFlags]("fetch",
+	fetchCmd, err := v2.NewCommand[AppConfig, *FetchFlags](
+		"fetch",
 		func(_ context.Context, cfg *AppConfig, flags *FetchFlags) error {
 			fmt.Printf("Fetching from %s:%d (timeout: %ds)\n", flags.URL, flags.Port, flags.Timeout)
 

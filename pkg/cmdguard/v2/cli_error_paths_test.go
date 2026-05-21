@@ -39,7 +39,8 @@ func TestInitializeErrorPaths(t *testing.T) {
 			Name string `default:"test" flag:"name" help:"Name"`
 		}
 
-		cmd, err := v2.NewCommand[testCLIConfig, *ptrFlags]("ptrcmd",
+		cmd, err := v2.NewCommand[testCLIConfig, *ptrFlags](
+			"ptrcmd",
 			func(_ context.Context, _ *testCLIConfig, _ *ptrFlags) error {
 				return nil
 			},
@@ -80,7 +81,8 @@ func TestInitializeErrorPaths(t *testing.T) {
 	t.Run("AddCommand with command missing RunE and subcommands", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("norun", nil,
+		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+			"norun", nil,
 			v2.WithShort[testCLIConfig, v2.NoFlags]("Command without RunE"),
 		)
 		if err == nil {
@@ -91,7 +93,8 @@ func TestInitializeErrorPaths(t *testing.T) {
 	t.Run("AddCommand with empty Use field", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags]("",
+		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+			"",
 			noOpRunE[testCLIConfig],
 		)
 		if err == nil {
@@ -113,7 +116,8 @@ func TestInitializeErrorPaths(t *testing.T) {
 			Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
 		}
 
-		cmd, err := v2.NewCommand[testCLIConfig, multiFlags]("multi",
+		cmd, err := v2.NewCommand[testCLIConfig, multiFlags](
+			"multi",
 			func(_ context.Context, _ *testCLIConfig, _ multiFlags) error {
 				return nil
 			},

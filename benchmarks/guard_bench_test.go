@@ -27,7 +27,8 @@ func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
 
 // newBenchCommand creates a command with standard benchmark configuration.
 func newBenchCommand(use, short string) v2.Command[BenchConfig, v2.NoFlags] {
-	return v2.MustNewCommand[BenchConfig, v2.NoFlags](use,
+	return v2.MustNewCommand[BenchConfig, v2.NoFlags](
+		use,
 		noOpRunE[BenchConfig, v2.NoFlags],
 		v2.WithShort[BenchConfig, v2.NoFlags](short),
 	)

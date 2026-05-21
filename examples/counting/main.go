@@ -39,7 +39,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+	greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags](
+		"greet",
 		func(_ context.Context, _ *AppConfig, flags *GreetFlags) error {
 			msg := fmt.Sprintf("Hello, %s!", flags.Name)
 			fmt.Println(msg)

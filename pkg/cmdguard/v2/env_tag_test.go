@@ -24,7 +24,8 @@ func TestEnvTag_Integration(t *testing.T) {
 		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
+		cmd, err := NewCommand[envTestConfig, *dbFlags](
+			"connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
 
@@ -55,7 +56,8 @@ func TestEnvTag_Integration(t *testing.T) {
 		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
+		cmd, err := NewCommand[envTestConfig, *dbFlags](
+			"connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
 
@@ -87,7 +89,8 @@ func TestEnvTag_Integration(t *testing.T) {
 		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
+		cmd, err := NewCommand[envTestConfig, *dbFlags](
+			"connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
 
@@ -115,12 +118,14 @@ func TestEnvTag_Integration(t *testing.T) {
 
 		t.Setenv("MYAPP_DB_HOST", "prefixed.example.com")
 
-		cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{},
+		cli, err := NewCLI[envTestConfig](
+			"app", "test", envTestConfig{},
 			WithEnvPrefix[envTestConfig]("MYAPP_"),
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[envTestConfig, *dbFlags]("connect",
+		cmd, err := NewCommand[envTestConfig, *dbFlags](
+			"connect",
 			func(_ context.Context, _ *envTestConfig, flags *dbFlags) error {
 				result = flags.Host
 

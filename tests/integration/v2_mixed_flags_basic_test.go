@@ -70,7 +70,8 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		configFlags  *ConfigFlags
 	)
 
-	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags]("greet",
+	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags](
+		"greet",
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
@@ -89,7 +90,8 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	mathCmd, err := v2.NewCommand[RootConfig, *MathFlags]("math",
+	mathCmd, err := v2.NewCommand[RootConfig, *MathFlags](
+		"math",
 		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
 			mathCalled = true
 			mathFlags = flags
@@ -108,7 +110,8 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	configCmd, err := v2.NewCommand[RootConfig, *ConfigFlags]("config",
+	configCmd, err := v2.NewCommand[RootConfig, *ConfigFlags](
+		"config",
 		func(_ context.Context, _ *RootConfig, flags *ConfigFlags) error {
 			configCalled = true
 			configFlags = flags
@@ -195,7 +198,8 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		statusFlags   *DBFlags
 	)
 
-	statusSubCmd, err := v2.NewCommand[RootConfig, *DBFlags]("status",
+	statusSubCmd, err := v2.NewCommand[RootConfig, *DBFlags](
+		"status",
 		func(_ context.Context, _ *RootConfig, flags *DBFlags) error {
 			statusCalled = true
 			statusFlags = flags
@@ -208,7 +212,8 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	dbCmd, err := v2.NewParentCommand[RootConfig, *DBFlags]("db",
+	dbCmd, err := v2.NewParentCommand[RootConfig, *DBFlags](
+		"db",
 		"Database management and maintenance commands",
 		[]v2.Command[RootConfig, *DBFlags]{statusSubCmd},
 		v2.WithShort[RootConfig, *DBFlags]("Database commands"),
@@ -223,7 +228,8 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	migrateCmd, err := v2.NewCommand[RootConfig, *MigrateFlags]("migrate",
+	migrateCmd, err := v2.NewCommand[RootConfig, *MigrateFlags](
+		"migrate",
 		func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags

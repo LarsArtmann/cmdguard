@@ -214,7 +214,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Version command
-	versionCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
+	versionCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"version",
 		printRunE("myapp version 1.0.0", "Built with cmdguard v2"),
 		v2.WithShort[AppConfig, v2.NoFlags]("Print version information"),
 	)
@@ -228,7 +229,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Config command that uses the app config
-	configCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("config",
+	configCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"config",
 		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			fmt.Println("Current configuration:")
 			fmt.Printf("  Verbose: %v\n", cfg.Verbose)
@@ -249,7 +251,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Parent command with subcommands
-	statusCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("status",
+	statusCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"status",
 		func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 			db, err := v2.Invoke[*Database](cli.Scope())
 			if err != nil {
@@ -267,7 +270,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 		return fmt.Errorf("failed to create db status command: %w", err)
 	}
 
-	migrateSubCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("migrate",
+	migrateSubCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"migrate",
 		printRunE("Running migrations...", "Migration complete!"),
 		v2.WithShort[AppConfig, v2.NoFlags]("Run database migrations"),
 	)
@@ -275,7 +279,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 		return fmt.Errorf("failed to create db migrate command: %w", err)
 	}
 
-	dbCmd, err := v2.NewParentCommand[AppConfig, v2.NoFlags]("db",
+	dbCmd, err := v2.NewParentCommand[AppConfig, v2.NoFlags](
+		"db",
 		"Database operations",
 		[]v2.Command[AppConfig, v2.NoFlags]{statusCmd, migrateSubCmd},
 		v2.WithShort[AppConfig, v2.NoFlags]("Database operations"),
@@ -290,7 +295,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Hidden command (won't show in help)
-	hiddenCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("secret",
+	hiddenCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"secret",
 		printRunE("You found the secret command!"),
 		v2.WithShort[AppConfig, v2.NoFlags]("Secret command"),
 		v2.WithHidden[AppConfig, v2.NoFlags](true),
@@ -305,7 +311,8 @@ func addCommands(cli *v2.CLI[AppConfig]) error {
 	}
 
 	// Deprecated command
-	deprecatedCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("oldcmd",
+	deprecatedCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"oldcmd",
 		printRunE("This command is deprecated. Use 'greet' instead."),
 		v2.WithShort[AppConfig, v2.NoFlags]("Old command (deprecated)"),
 		v2.WithDeprecated[AppConfig, v2.NoFlags]("Use 'greet' instead"),

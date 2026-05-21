@@ -16,7 +16,8 @@ import (
 // newGreetCmd creates a new greet command instance for testing.
 // This helper ensures consistency across tests and avoids code duplication.
 func newGreetCmd() v2.Command[AppConfig, *GreetFlags] {
-	return v2.MustNewCommand[AppConfig, *GreetFlags]("greet",
+	return v2.MustNewCommand[AppConfig, *GreetFlags](
+		"greet",
 		func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
 			msg := fmt.Sprintf("%s, %s%s", flags.Prefix, flags.Name, flags.Suffix)
 			if flags.Shout {
@@ -87,7 +88,8 @@ func TestTypedExample_VersionCommand(t *testing.T) {
 
 	cli.SetVersion("1.0.0")
 
-	versionCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version",
+	versionCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"version",
 		printRunE("myapp version 1.0.0"),
 		v2.WithShort[AppConfig, v2.NoFlags]("Print version information"),
 	)

@@ -40,7 +40,8 @@ func TestMustAddCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := MustNewCLI[struct{}]("test", "test app", struct{}{})
-		cmd, err := NewCommand[struct{}, NoFlags]("hello",
+		cmd, err := NewCommand[struct{}, NoFlags](
+			"hello",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 			WithShort[struct{}, NoFlags]("Say hello"),
 		)
@@ -53,7 +54,8 @@ func TestMustAddCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := MustNewCLI[struct{}]("test", "test app", struct{}{})
-		cmd, err := NewCommand[struct{}, NoFlags]("hello",
+		cmd, err := NewCommand[struct{}, NoFlags](
+			"hello",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 		)
 		testutil.AssertNoError(t, err)
@@ -67,7 +69,8 @@ func TestMustAddCommand(t *testing.T) {
 			}
 		}()
 
-		cmd2, _ := NewCommand[struct{}, NoFlags]("hello",
+		cmd2, _ := NewCommand[struct{}, NoFlags](
+			"hello",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 		)
 		MustAddCommand(cli, cmd2)
@@ -108,7 +111,8 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("Version returns version", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags]("test",
+		cmd, err := NewCommand[struct{}, NoFlags](
+			"test",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 			func(c *Command[struct{}, NoFlags]) { c.version = "1.2.3" },
 		)
@@ -119,7 +123,8 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("SilenceErrors returns silenceErrors", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags]("test",
+		cmd, err := NewCommand[struct{}, NoFlags](
+			"test",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 			func(c *Command[struct{}, NoFlags]) { c.silenceErrors = true },
 		)
@@ -130,7 +135,8 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("SilenceUsage returns silenceUsage", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags]("test",
+		cmd, err := NewCommand[struct{}, NoFlags](
+			"test",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 			func(c *Command[struct{}, NoFlags]) { c.silenceUsage = true },
 		)
@@ -141,7 +147,8 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("Group returns group", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags]("test",
+		cmd, err := NewCommand[struct{}, NoFlags](
+			"test",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 			WithGroupID[struct{}, NoFlags]("mygroup"),
 		)

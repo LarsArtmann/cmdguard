@@ -40,7 +40,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	usersCmd, err := v2.NewCommand[AppConfig, *ListFlags]("users",
+	usersCmd, err := v2.NewCommand[AppConfig, *ListFlags](
+		"users",
 		func(_ context.Context, _ *AppConfig, flags *ListFlags) error {
 			format, err := v2.ParseOutputFormat(flags.Format)
 			if err != nil {
@@ -70,7 +71,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	styledCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("styled",
+	styledCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"styled",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			return v2.OutputStyledTable(
 				[]string{"Name", "Status", "Uptime"},

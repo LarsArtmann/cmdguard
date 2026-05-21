@@ -26,7 +26,8 @@ func TestCountingFlag_Integration(t *testing.T) {
 		cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[countTestConfig, *verbFlags]("run",
+		cmd, err := NewCommand[countTestConfig, *verbFlags](
+			"run",
 			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
 				result = flags.Verbose
 
@@ -57,7 +58,8 @@ func TestCountingFlag_Integration(t *testing.T) {
 		cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[countTestConfig, *verbFlags]("run",
+		cmd, err := NewCommand[countTestConfig, *verbFlags](
+			"run",
 			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
 				result = flags.Verbose
 
@@ -88,7 +90,8 @@ func TestCountingFlag_Integration(t *testing.T) {
 		cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[countTestConfig, *verbFlags]("run",
+		cmd, err := NewCommand[countTestConfig, *verbFlags](
+			"run",
 			func(_ context.Context, _ *countTestConfig, flags *verbFlags) error {
 				result = flags.Verbose
 

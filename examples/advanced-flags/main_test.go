@@ -43,7 +43,8 @@ func TestAdvancedFlags_ServerCommand(t *testing.T) {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
-	serverCmd, err := v2.NewCommand[GlobalConfig, ServerFlags]("server",
+	serverCmd, err := v2.NewCommand[GlobalConfig, ServerFlags](
+		"server",
 		func(ctx context.Context, cfg *GlobalConfig, flags ServerFlags) error {
 			return nil
 		},
@@ -78,7 +79,8 @@ func TestAdvancedFlags_ConfigCommand(t *testing.T) {
 		t.Fatalf("Failed to create CLI: %v", err)
 	}
 
-	configCmd, err := v2.NewCommand[GlobalConfig, ConfigFlags]("config",
+	configCmd, err := v2.NewCommand[GlobalConfig, ConfigFlags](
+		"config",
 		func(ctx context.Context, cfg *GlobalConfig, flags ConfigFlags) error {
 			return nil
 		},

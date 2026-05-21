@@ -33,7 +33,8 @@ type ServeFlags struct {
 }
 
 func main() {
-	cli, err := v2.NewCLI[AppConfig]("signal-demo", "Signal handling demo", AppConfig{},
+	cli, err := v2.NewCLI[AppConfig](
+		"signal-demo", "Signal handling demo", AppConfig{},
 		v2.WithSignalHandling[AppConfig](),
 	)
 	if err != nil {
@@ -41,7 +42,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	serveCmd, err := v2.NewCommand[AppConfig, *ServeFlags]("serve",
+	serveCmd, err := v2.NewCommand[AppConfig, *ServeFlags](
+		"serve",
 		func(ctx context.Context, _ *AppConfig, flags *ServeFlags) error {
 			fmt.Printf("Starting server on :%d with %d workers\n", flags.Port, flags.Workers)
 			fmt.Println("Press Ctrl+C to trigger graceful shutdown")
@@ -91,7 +93,8 @@ allowing clean cleanup of resources.`,
 		os.Exit(1)
 	}
 
-	pingCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("ping",
+	pingCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"ping",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("pong")
 

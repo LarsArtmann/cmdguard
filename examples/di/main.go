@@ -137,7 +137,8 @@ func main() {
 	}
 
 	// Add health check command
-	checkCmd, err := v2.NewCommand[Config]("check",
+	checkCmd, err := v2.NewCommand[Config](
+		"check",
 		func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Running health checks...")
 
@@ -163,7 +164,8 @@ func main() {
 	}
 
 	// Add API call command
-	callCmd, err := v2.NewCommand[Config]("call",
+	callCmd, err := v2.NewCommand[Config](
+		"call",
 		func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			api, err := v2.Invoke[*APIService](root.Scope())
 			if err != nil {
@@ -183,7 +185,8 @@ func main() {
 	}
 
 	// Add shutdown command
-	shutdownCmd, err := v2.NewCommand[Config]("shutdown",
+	shutdownCmd, err := v2.NewCommand[Config](
+		"shutdown",
 		func(ctx context.Context, cfg *Config, _ v2.NoFlags) error {
 			fmt.Println("Shutting down services...")
 
