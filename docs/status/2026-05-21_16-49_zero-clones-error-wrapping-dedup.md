@@ -19,32 +19,32 @@ This session eliminated all 7 code duplication clone groups (art-dupl semantic a
 
 ### This Session (2026-05-21)
 
-| What | Files | Impact |
-|------|-------|--------|
-| Eliminated 7/7 code clone groups | 6 test files | -105 net lines, 0 clones remaining |
-| Fixed 6 lint issues introduced by refactoring | 4 files | 0 lint issues |
-| Improved error context in 4 error returns | `flow_context.go`, `manpage.go`, `types_hostport.go`, `examples/validation/main.go` | Better debugging |
+| What                                          | Files                                                                               | Impact                             |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------- |
+| Eliminated 7/7 code clone groups              | 6 test files                                                                        | -105 net lines, 0 clones remaining |
+| Fixed 6 lint issues introduced by refactoring | 4 files                                                                             | 0 lint issues                      |
+| Improved error context in 4 error returns     | `flow_context.go`, `manpage.go`, `types_hostport.go`, `examples/validation/main.go` | Better debugging                   |
 
 ### Deduplication Details
 
-| Clone Group | Location | Fix Applied |
-|-------------|----------|-------------|
-| 7 clones (counting + env tests) | `counting_flag_test.go`, `env_tag_test.go` | Converted to table-driven tests |
-| 2 clones (middleware functions) | `v2_bdd_lifecycle_test.go` | Extracted `trackingMW(name)` helper |
-| 2 clones (Duration default tests) | `type_handler_test.go:698-712` | Merged into table-driven subtest |
-| 2 clones (dispatchDefault tests) | `type_handler_test.go:461-475` | Merged into table-driven subtest |
-| 2 clones (strict validation pass tests) | `cli_superb_test.go:226-242,382-398` | Extracted `addShortCommandToStrictCLI` helper |
-| 2 clones (lifecycle command creation) | `v2_bdd_lifecycle_test.go:340-346,716-722` | Extracted `newLifecycleCmd` helper |
-| 2 clones (config validation setup) | `v2_bdd_lifecycle_test.go:597-607,654-664` | Extracted `newValidatedServerCLI` + `addStartCmd` helpers |
+| Clone Group                             | Location                                   | Fix Applied                                               |
+| --------------------------------------- | ------------------------------------------ | --------------------------------------------------------- |
+| 7 clones (counting + env tests)         | `counting_flag_test.go`, `env_tag_test.go` | Converted to table-driven tests                           |
+| 2 clones (middleware functions)         | `v2_bdd_lifecycle_test.go`                 | Extracted `trackingMW(name)` helper                       |
+| 2 clones (Duration default tests)       | `type_handler_test.go:698-712`             | Merged into table-driven subtest                          |
+| 2 clones (dispatchDefault tests)        | `type_handler_test.go:461-475`             | Merged into table-driven subtest                          |
+| 2 clones (strict validation pass tests) | `cli_superb_test.go:226-242,382-398`       | Extracted `addShortCommandToStrictCLI` helper             |
+| 2 clones (lifecycle command creation)   | `v2_bdd_lifecycle_test.go:340-346,716-722` | Extracted `newLifecycleCmd` helper                        |
+| 2 clones (config validation setup)      | `v2_bdd_lifecycle_test.go:597-607,654-664` | Extracted `newValidatedServerCLI` + `addStartCmd` helpers |
 
 ### Pre-existing Changes (committed this session)
 
-| What | File | Change |
-|------|------|--------|
-| Wrapped error returns with context | `flow_context.go` | `BranchWithTimeout`/`BranchWithDeadline` errors now include commandName |
-| Wrapped error returns with context | `manpage.go` | ManPage error now includes section number |
-| Wrapped error returns with context | `types_hostport.go` | `NewHostPort` error now includes host+port |
-| Wrapped error returns with context | `examples/validation/main.go` | Validation errors now include input values |
+| What                               | File                          | Change                                                                  |
+| ---------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
+| Wrapped error returns with context | `flow_context.go`             | `BranchWithTimeout`/`BranchWithDeadline` errors now include commandName |
+| Wrapped error returns with context | `manpage.go`                  | ManPage error now includes section number                               |
+| Wrapped error returns with context | `types_hostport.go`           | `NewHostPort` error now includes host+port                              |
+| Wrapped error returns with context | `examples/validation/main.go` | Validation errors now include input values                              |
 
 ### Project-Wide (Historical)
 
@@ -62,18 +62,18 @@ This session eliminated all 7 code duplication clone groups (art-dupl semantic a
 
 ### Phase 9: Architecture Hardening (v2.3) — TODO_LIST.md
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Fix `errors.As` → `errors.AsType[ExitCoder]` | Not started | gopls hint, Go 1.26 idiom |
-| Extract `handlerConfig[T,F]` struct | Not started | 8-param `wireHandlerWithMiddleware` |
-| Add `Phase` typed enum | Not started | Replace `CommandInfo.Phase string` |
-| Fix 7 unwrapped error returns | **4/7 done this session** | 3 remaining in other files |
-| Consolidate 5 error types into `labeledError` | Not started | Internal cleanup |
-| Split `type_handler.go` (481 lines) | Not started | → 3 files |
-| Split `command.go` (403 lines) | Not started | Extract args options |
-| Split `flow_context.go` (396 lines) | Not started | Extract options |
-| Fix `outputFormat`/`outputState.format` split brain | Not started | State consistency |
-| Consolidate MarshalText/UnmarshalText patterns | Not started | Value type dedup |
+| Item                                                | Status                    | Notes                               |
+| --------------------------------------------------- | ------------------------- | ----------------------------------- |
+| Fix `errors.As` → `errors.AsType[ExitCoder]`        | Not started               | gopls hint, Go 1.26 idiom           |
+| Extract `handlerConfig[T,F]` struct                 | Not started               | 8-param `wireHandlerWithMiddleware` |
+| Add `Phase` typed enum                              | Not started               | Replace `CommandInfo.Phase string`  |
+| Fix 7 unwrapped error returns                       | **4/7 done this session** | 3 remaining in other files          |
+| Consolidate 5 error types into `labeledError`       | Not started               | Internal cleanup                    |
+| Split `type_handler.go` (481 lines)                 | Not started               | → 3 files                           |
+| Split `command.go` (403 lines)                      | Not started               | Extract args options                |
+| Split `flow_context.go` (396 lines)                 | Not started               | Extract options                     |
+| Fix `outputFormat`/`outputState.format` split brain | Not started               | State consistency                   |
+| Consolidate MarshalText/UnmarshalText patterns      | Not started               | Value type dedup                    |
 
 ### Remaining Unwrapped Errors (3 remaining)
 
@@ -151,43 +151,43 @@ The only known friction point is the **go-output local replace directive** in `g
 
 ### High Impact (Do First)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 1 | Complete Phase 9 unwrapped errors (audit + fix remaining 3) | Medium | Small |
-| 2 | Fix `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26 idiom) | Medium | Small |
-| 3 | Extract `handlerConfig[T,F]` from `wireHandlerWithMiddleware` | High | Medium |
-| 4 | Add `Phase` typed enum to replace `CommandInfo.Phase string` | Medium | Small |
-| 5 | Split `type_handler.go` into 3 focused files | Medium | Medium |
-| 6 | Split `command.go` — extract args options | Medium | Small |
-| 7 | Split `flow_context.go` — extract options | Medium | Small |
-| 8 | Consolidate 5 error types into internal `labeledError` | Medium | Medium |
-| 9 | Fix `outputFormat`/`outputState.format` split brain | Medium | Medium |
-| 10 | Consolidate MarshalText/UnmarshalText patterns | Medium | Medium |
+| #   | Task                                                          | Impact | Effort |
+| --- | ------------------------------------------------------------- | ------ | ------ |
+| 1   | Complete Phase 9 unwrapped errors (audit + fix remaining 3)   | Medium | Small  |
+| 2   | Fix `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26 idiom)  | Medium | Small  |
+| 3   | Extract `handlerConfig[T,F]` from `wireHandlerWithMiddleware` | High   | Medium |
+| 4   | Add `Phase` typed enum to replace `CommandInfo.Phase string`  | Medium | Small  |
+| 5   | Split `type_handler.go` into 3 focused files                  | Medium | Medium |
+| 6   | Split `command.go` — extract args options                     | Medium | Small  |
+| 7   | Split `flow_context.go` — extract options                     | Medium | Small  |
+| 8   | Consolidate 5 error types into internal `labeledError`        | Medium | Medium |
+| 9   | Fix `outputFormat`/`outputState.format` split brain           | Medium | Medium |
+| 10  | Consolidate MarshalText/UnmarshalText patterns                | Medium | Medium |
 
 ### Medium Impact (Do Next)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 11 | Add CLI construction benchmark | High | Small |
-| 12 | Add flag parsing benchmark | High | Small |
-| 13 | Add command execution benchmark | Medium | Small |
-| 14 | Resolve go-output replace directive (use tagged v0.4.0) | High | Small |
-| 15 | Update TODO_LIST.md with current test counts | Low | Small |
-| 16 | Update FEATURES.md last-updated date | Low | Small |
-| 17 | Update AGENTS.md test count (224 → current) | Low | Small |
-| 18 | Clean up ~160 gopls "unnecessary type arguments" hints | Low | Medium |
-| 19 | Add codecov integration to CI | Medium | Small |
-| 20 | Push test coverage from 84.3% → 88%+ | Medium | Medium |
+| #   | Task                                                    | Impact | Effort |
+| --- | ------------------------------------------------------- | ------ | ------ |
+| 11  | Add CLI construction benchmark                          | High   | Small  |
+| 12  | Add flag parsing benchmark                              | High   | Small  |
+| 13  | Add command execution benchmark                         | Medium | Small  |
+| 14  | Resolve go-output replace directive (use tagged v0.4.0) | High   | Small  |
+| 15  | Update TODO_LIST.md with current test counts            | Low    | Small  |
+| 16  | Update FEATURES.md last-updated date                    | Low    | Small  |
+| 17  | Update AGENTS.md test count (224 → current)             | Low    | Small  |
+| 18  | Clean up ~160 gopls "unnecessary type arguments" hints  | Low    | Medium |
+| 19  | Add codecov integration to CI                           | Medium | Small  |
+| 20  | Push test coverage from 84.3% → 88%+                    | Medium | Medium |
 
 ### Ship It
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 21 | Cut v2.3.0 release tag and notes | High | Small |
-| 22 | Set up release automation | Medium | Medium |
-| 23 | Write CHANGELOG.md for v2.3.0 | Medium | Medium |
-| 24 | Verify all examples compile and run with v2.3.0 | Medium | Small |
-| 25 | Create GitHub release with binary assets | High | Medium |
+| #   | Task                                            | Impact | Effort |
+| --- | ----------------------------------------------- | ------ | ------ |
+| 21  | Cut v2.3.0 release tag and notes                | High   | Small  |
+| 22  | Set up release automation                       | Medium | Medium |
+| 23  | Write CHANGELOG.md for v2.3.0                   | Medium | Medium |
+| 24  | Verify all examples compile and run with v2.3.0 | Medium | Small  |
+| 25  | Create GitHub release with binary assets        | High   | Medium |
 
 ---
 
@@ -199,16 +199,16 @@ The only known friction point is the **go-output local replace directive** in `g
 
 ## Quality Metrics
 
-| Metric | Value | Trend |
-|--------|-------|-------|
-| Build errors | 0 | ✅ Stable |
-| Lint issues | 0 | ✅ Stable |
-| Race conditions | 0 | ✅ Stable |
-| Code clones (semantic, t≥40) | 0 | ✅ Was 7, now 0 |
-| Test coverage (v2) | 84.3% | ↗️ Was 84.5% (slight shift from test restructuring) |
-| Source files (v2) | 104 | Stable |
-| Total lines (v2) | 17,824 | ↘️ Down from ~17,929 (-105 net) |
-| Test files (v2) | 66 | Stable |
+| Metric                       | Value  | Trend                                               |
+| ---------------------------- | ------ | --------------------------------------------------- |
+| Build errors                 | 0      | ✅ Stable                                           |
+| Lint issues                  | 0      | ✅ Stable                                           |
+| Race conditions              | 0      | ✅ Stable                                           |
+| Code clones (semantic, t≥40) | 0      | ✅ Was 7, now 0                                     |
+| Test coverage (v2)           | 84.3%  | ↗️ Was 84.5% (slight shift from test restructuring) |
+| Source files (v2)            | 104    | Stable                                              |
+| Total lines (v2)             | 17,824 | ↘️ Down from ~17,929 (-105 net)                     |
+| Test files (v2)              | 66     | Stable                                              |
 
 ## Uncommitted Changes
 
