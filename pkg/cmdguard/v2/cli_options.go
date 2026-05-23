@@ -76,9 +76,9 @@ func WithMiddleware[T any](mw ...Middleware[T]) CLIOption[T] {
 // WithGroup registers a command group on the root command.
 // Groups organize commands in help output under titled sections.
 // Use the Group field on Command to assign a command to a registered group.
-func WithGroup[T any](id, title string) CLIOption[T] {
+func WithGroup[T any](groupID, title string) CLIOption[T] {
 	return func(cli *CLI[T]) {
-		cli.rootCmd.AddGroup(&cobra.Group{ID: id, Title: title})
+		cli.rootCmd.AddGroup(&cobra.Group{ID: groupID, Title: title})
 	}
 }
 

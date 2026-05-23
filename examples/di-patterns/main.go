@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	id "github.com/larsartmann/go-branded-id"
 	"github.com/samber/do/v2"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
@@ -31,19 +32,28 @@ type AppConfig struct {
 	StorePath string `default:"/tmp/todos.json" flag:"store" help:"Path to task store" short:"s"`
 }
 
+// TaskBrand is the phantom type for TaskID.
+type TaskBrand struct{}
+
+// TaskID is a strongly-typed identifier for a task.
+type TaskID = id.ID[TaskBrand, int]
+
 // Task represents a single work item.
 type Task struct {
-	ID       int    `json:"id"`
+	ID       TaskID `json:"id"`
 	Title    string `json:"title"`
 	Priority string `json:"priority"`
 	Done     bool   `json:"done"`
 }
 
+// NextID is the next TaskID to be assigned.
+type NextID = TaskID
+
 // TaskStore is an in-memory task store.
 type TaskStore struct {
 	mu     sync.Mutex
 	tasks  []Task
-	nextID int
+	nextID NextID
 }
 
 var (
@@ -55,7 +65,7 @@ var (
 func NewTaskStore(i do.Injector) (*TaskStore, error) {
 	return &TaskStore{
 		tasks:  []Task{},
-		nextID: 1,
+		nextID: id.NewID[TaskBrand](1),
 	}, nil
 }
 
@@ -92,7 +102,7 @@ func (s *TaskStore) Add(title, priority string) Task {
 	}
 
 	s.tasks = append(s.tasks, task)
-	s.nextID++
+	s.nextID = id.NewID[TaskBrand](s.nextID.Get() + 1)
 
 	return task
 }
@@ -150,7 +160,7 @@ func main() {
 					status = "x"
 				}
 
-				fmt.Printf("  [%s] #%d %s (%s)\n", status, t.ID, t.Title, t.Priority)
+				fmt.Printf("  [%s] #%d %s (%s)\n", status, t.ID.Get(), t.Title, t.Priority)
 			}
 
 			return nil
@@ -177,7 +187,7 @@ func main() {
 
 			task := store.Add(flags.Title, flags.Priority)
 
-			fmt.Printf("Added task #%d: %s (%s)\n", task.ID, task.Title, task.Priority)
+			fmt.Printf("Added task #%d: %s (%s)\n", task.ID.Get(), task.Title, task.Priority)
 
 			return nil
 		},
