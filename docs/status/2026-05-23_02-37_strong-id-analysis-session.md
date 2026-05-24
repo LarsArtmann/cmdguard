@@ -15,15 +15,15 @@ Session focused on resolving Strong ID Analysis violations by introducing brande
 
 ## Current Project State
 
-| Metric | Value |
-| ------ | ----- |
-| Tests | 224 passing |
-| Coverage (v2 core) | 84.3% |
-| Lint issues | 0 |
-| Race conditions | 0 |
-| Build errors | 0 |
-| Go version | 1.26 |
-| Code duplication | 0 groups |
+| Metric             | Value       |
+| ------------------ | ----------- |
+| Tests              | 224 passing |
+| Coverage (v2 core) | 84.3%       |
+| Lint issues        | 0           |
+| Race conditions    | 0           |
+| Build errors       | 0           |
+| Go version         | 1.26        |
+| Code duplication   | 0 groups    |
 
 ---
 
@@ -131,6 +131,7 @@ No broken states. All tests pass, lint is clean, build succeeds. The `di-pattern
 **How should cmdguard handle `go-branded-id` as a dependency — should it be a direct dependency, an optional dependency, or should cmdguard re-export/wrap the branded ID types internally?**
 
 The issue: cmdguard now uses `go-branded-id` in examples (demonstrating best practices for users), but the library itself doesn't expose or re-export these types. This means:
+
 - Users who want branded IDs must take a direct dependency on `go-branded-id`
 - There's no cmdguard-native `Branding[T, B]` or `BrandedID[Brand, Value]` type
 - The `examples/di-patterns` shows the pattern but it's "import this other library" rather than "cmdguard gives you this"
@@ -151,12 +152,12 @@ go.mod                         | +1/-1   (go-branded-id: indirect → direct)
 
 ## Files Changed This Session
 
-| File | Change |
-| ---- | ------ |
-| `pkg/cmdguard/v2/cli_options.go` | Parameter `id` → `groupID` in `WithGroup[T]` |
-| `examples/di-patterns/main.go` | Added `TaskBrand`, `TaskID`, `NextID` branded types |
-| `go.mod` | Promoted `go-branded-id` to direct dependency |
-| `di-patterns` (binary) | Removed untracked compiled binary |
+| File                             | Change                                              |
+| -------------------------------- | --------------------------------------------------- |
+| `pkg/cmdguard/v2/cli_options.go` | Parameter `id` → `groupID` in `WithGroup[T]`        |
+| `examples/di-patterns/main.go`   | Added `TaskBrand`, `TaskID`, `NextID` branded types |
+| `go.mod`                         | Promoted `go-branded-id` to direct dependency       |
+| `di-patterns` (binary)           | Removed untracked compiled binary                   |
 
 ---
 
@@ -172,4 +173,4 @@ Untracked: di-patterns (compiled binary — should be gitignored)
 
 ---
 
-*Generated: 2026-05-23 02:37 — cmdguard v2.3.0-dev*
+_Generated: 2026-05-23 02:37 — cmdguard v2.3.0-dev_
