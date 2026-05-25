@@ -5,7 +5,9 @@ go 1.26.2
 require (
 	charm.land/fang/v2 v2.0.1
 	github.com/larsartmann/go-branded-id v0.1.0
-	github.com/larsartmann/go-output v0.4.0
+	github.com/larsartmann/go-output v0.5.0
+	github.com/larsartmann/go-output/d2 v0.0.0-20260525042732-b9356ba38aa3
+	github.com/larsartmann/go-output/graph v0.0.0-20260525042732-b9356ba38aa3
 	github.com/larsartmann/go-output/table v0.0.0-20260518130518-10e8104067b2
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
@@ -42,7 +44,6 @@ require (
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/term v0.43.0 // indirect

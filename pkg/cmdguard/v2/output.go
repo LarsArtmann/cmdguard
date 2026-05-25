@@ -6,6 +6,8 @@ import (
 	"os"
 
 	output "github.com/larsartmann/go-output"
+	"github.com/larsartmann/go-output/d2"
+	"github.com/larsartmann/go-output/graph"
 	"github.com/larsartmann/go-output/table"
 )
 
@@ -172,17 +174,17 @@ var tableFormatRegistry = map[OutputFormat]tableRenderer{
 	},
 	output.FormatD2: func(w io.Writer, data *output.TableData) error {
 		return renderAndWrite(w, "D2", data, func(d *output.TableData) (string, error) {
-			return output.D2FromTableData(d).Render()
+			return d2.D2FromTableData(d).Render()
 		})
 	},
 	output.FormatMermaid: func(w io.Writer, data *output.TableData) error {
 		return renderAndWrite(w, "Mermaid", data, func(d *output.TableData) (string, error) {
-			return output.MermaidFlowchartRenderer(d).Render()
+			return graph.MermaidFromTableData(d).Render()
 		})
 	},
 	output.FormatDOT: func(w io.Writer, data *output.TableData) error {
 		return renderAndWrite(w, "DOT", data, func(d *output.TableData) (string, error) {
-			return output.DOTFromTableData(d).Render()
+			return graph.DOTFromTableData(d).Render()
 		})
 	},
 }
