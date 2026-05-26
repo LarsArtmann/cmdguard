@@ -59,7 +59,7 @@ func TestJSONLoader_Load(t *testing.T) {
 		t.Parallel()
 
 		type Config struct {
-			Name  string `flag:"name" default:"world"`
+			Name  string `flag:"name"  default:"world"`
 			Count int    `flag:"count" default:"1"`
 		}
 
@@ -85,7 +85,7 @@ func TestJSONLoader_Load(t *testing.T) {
 		t.Parallel()
 
 		type Config struct {
-			Name  string `flag:"name" default:"world"`
+			Name  string `flag:"name"  default:"world"`
 			Count int    `flag:"count" default:"1"`
 		}
 
@@ -203,7 +203,7 @@ func TestUpdateTagDefaultsFromConfig(t *testing.T) {
 		t.Parallel()
 
 		type Config struct {
-			Name  string `flag:"name" default:"world"`
+			Name  string `flag:"name"  default:"world"`
 			Count int    `flag:"count" default:"1"`
 		}
 

@@ -16,24 +16,24 @@ import (
 // T is the application config type. Commands can have any flags type.
 // This is the recommended API for new code (v2.1+).
 type CLI[T any] struct {
-	name           string
-	short          string
-	long           string
-	version        string
-	defaults       T
-	config         *T
-	scope          *Scope
-	rootCmd        *cobra.Command
-	registry       *FlagRegistry
-	registeredCmds map[string]struct{}
-	flowCtx        *BranchingFlowContext
-	useFang        bool
-	fangOpts       []fang.Option
-	middleware     []Middleware[T]
-	envPrefix      string
-	signalHandling bool
-	outputEnabled  bool
-	outputFormat   OutputFormat
+	name             string
+	short            string
+	long             string
+	version          string
+	defaults         T
+	config           *T
+	scope            *Scope
+	rootCmd          *cobra.Command
+	registry         *FlagRegistry
+	registeredCmds   map[string]struct{}
+	flowCtx          *BranchingFlowContext
+	useFang          bool
+	fangOpts         []fang.Option
+	middleware       []Middleware[T]
+	envPrefix        string
+	signalHandling   bool
+	outputEnabled    bool
+	outputFormat     OutputFormat
 	validationMode   ValidationMode
 	configValidate   func(*T) error
 	configFilePaths  []string

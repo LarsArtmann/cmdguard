@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // Auto returns a ConfigFileLoader that selects the appropriate loader

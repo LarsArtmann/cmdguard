@@ -11,8 +11,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 	"gopkg.in/yaml.v3"
+
+	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
 // YAML returns a ConfigFileLoader for YAML files.
@@ -23,7 +24,7 @@ func YAML() v2.ConfigFileLoader {
 
 type yamlLoader struct{}
 
-func (l *yamlLoader) Load(data []byte, cfg any) (setFields []string, err error) {
+func (l *yamlLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]any
 	if err := yaml.Unmarshal(data, &raw); err != nil {
 		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
@@ -34,7 +35,7 @@ func (l *yamlLoader) Load(data []byte, cfg any) (setFields []string, err error) 
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", v2.ErrConfigFileParse, err)
 	}
 
-	setFields = make([]string, 0, len(raw))
+	setFields := make([]string, 0, len(raw))
 	for _, tag := range tags {
 		if _, ok := raw[tag.Name]; ok {
 			setFields = append(setFields, tag.Field)
@@ -56,7 +57,7 @@ func JSON() v2.ConfigFileLoader {
 
 type jsonLoader struct{}
 
-func (l *jsonLoader) Load(data []byte, cfg any) (setFields []string, err error) {
+func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
@@ -67,7 +68,7 @@ func (l *jsonLoader) Load(data []byte, cfg any) (setFields []string, err error) 
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", v2.ErrConfigFileParse, err)
 	}
 
-	setFields = make([]string, 0, len(raw))
+	setFields := make([]string, 0, len(raw))
 	for _, tag := range tags {
 		if _, ok := raw[tag.Name]; ok {
 			setFields = append(setFields, tag.Field)

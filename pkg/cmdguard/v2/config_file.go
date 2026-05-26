@@ -9,7 +9,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-
 )
 
 // ConfigFileLoader loads configuration from a file.
@@ -24,7 +23,7 @@ type ConfigFileLoader interface {
 type jsonLoader struct{}
 
 // Load unmarshals JSON data into cfg and returns the list of fields that were set.
-func (l *jsonLoader) Load(data []byte, cfg any) (setFields []string, err error) {
+func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
@@ -35,7 +34,7 @@ func (l *jsonLoader) Load(data []byte, cfg any) (setFields []string, err error) 
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", ErrConfigFileParse, err)
 	}
 
-	setFields = make([]string, 0, len(raw))
+	setFields := make([]string, 0, len(raw))
 
 	for _, tag := range tags {
 		if _, ok := raw[tag.Name]; ok {
@@ -53,11 +52,11 @@ func (l *jsonLoader) Load(data []byte, cfg any) (setFields []string, err error) 
 // loadConfigFile tries to load a config file from the given paths.
 // Paths are expanded via expandConfigPath. Missing files are skipped.
 // Returns ErrConfigFileNotFound if none of the paths exist.
-func loadConfigFile(paths []string, loader ConfigFileLoader, cfg any) (setFields []string, err error) {
+func loadConfigFile(paths []string, loader ConfigFileLoader, cfg any) ([]string, error) {
 	for _, path := range paths {
 		path = expandConfigPath(path)
 
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(path) //nolint:gosec // intentional config file loading with user-provided paths
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue
@@ -122,8 +121,8 @@ func resolveConfigFlag(args []string) string {
 			return args[i+1]
 		}
 
-		if strings.HasPrefix(arg, "--config=") {
-			return strings.TrimPrefix(arg, "--config=")
+		if val, ok := strings.CutPrefix(arg, "--config="); ok {
+			return val
 		}
 	}
 
