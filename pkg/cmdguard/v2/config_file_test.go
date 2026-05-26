@@ -259,24 +259,16 @@ func TestResolveConfigFlag(t *testing.T) {
 	t.Run("finds --config flag", func(t *testing.T) {
 		t.Parallel()
 
-		oldArgs := os.Args
-		defer func() { os.Args = oldArgs }()
-
-		os.Args = []string{"app", "--config", "/custom/config.json", "subcmd"}
-		result := resolveConfigFlag("config", "")
+		result := resolveConfigFlag([]string{"--config", "/custom/config.json", "subcmd"})
 		if result != "/custom/config.json" {
 			t.Errorf("resolveConfigFlag = %q, want %q", result, "/custom/config.json")
 		}
 	})
 
-	t.Run("finds -c short flag", func(t *testing.T) {
+	t.Run("finds --config= flag", func(t *testing.T) {
 		t.Parallel()
 
-		oldArgs := os.Args
-		defer func() { os.Args = oldArgs }()
-
-		os.Args = []string{"app", "-c", "/custom/config.json"}
-		result := resolveConfigFlag("config", "c")
+		result := resolveConfigFlag([]string{"--config=/custom/config.json"})
 		if result != "/custom/config.json" {
 			t.Errorf("resolveConfigFlag = %q, want %q", result, "/custom/config.json")
 		}
@@ -285,11 +277,7 @@ func TestResolveConfigFlag(t *testing.T) {
 	t.Run("returns empty when not present", func(t *testing.T) {
 		t.Parallel()
 
-		oldArgs := os.Args
-		defer func() { os.Args = oldArgs }()
-
-		os.Args = []string{"app", "subcmd"}
-		result := resolveConfigFlag("config", "")
+		result := resolveConfigFlag([]string{"subcmd"})
 		if result != "" {
 			t.Errorf("resolveConfigFlag = %q, want empty", result)
 		}

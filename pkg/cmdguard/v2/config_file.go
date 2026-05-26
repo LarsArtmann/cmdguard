@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 
-	"github.com/spf13/pflag"
 )
 
 // ConfigFileLoader loads configuration from a file.
@@ -115,23 +113,18 @@ func fieldValueToString(field reflect.Value) (string, bool) {
 	}
 }
 
-// resolveConfigFlag checks os.Args for a --config flag override.
-// Also checks the short form if shortName is provided.
+// resolveConfigFlag scans args for a --config flag override.
+// Supports --config <value> and --config=<value> forms.
 // Returns the flag value if found, otherwise an empty string.
-func resolveConfigFlag(longName, shortName string) string {
-	fs := pflag.NewFlagSet("config", pflag.ContinueOnError)
-	fs.SetOutput(io.Discard)
+func resolveConfigFlag(args []string) string {
+	for i, arg := range args {
+		if arg == "--config" && i+1 < len(args) {
+			return args[i+1]
+		}
 
-	if shortName != "" {
-		fs.StringP(longName, shortName, "", "")
-	} else {
-		fs.String(longName, "", "")
-	}
-
-	_ = fs.Parse(os.Args[1:])
-
-	if path, _ := fs.GetString(longName); path != "" {
-		return path
+		if strings.HasPrefix(arg, "--config=") {
+			return strings.TrimPrefix(arg, "--config=")
+		}
 	}
 
 	return ""
@@ -201,16 +194,7 @@ func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, error) {
 	paths := cli.configFilePaths
 
 	// Check for --config flag override.
-	shortName := ""
-	for _, tag := range cli.registry.Tags() {
-		if tag.Name == "config" && tag.Short != "" {
-			shortName = tag.Short
-
-			break
-		}
-	}
-
-	if override := resolveConfigFlag("config", shortName); override != "" {
+	if override := resolveConfigFlag(os.Args[1:]); override != "" {
 		paths = []string{override}
 	}
 
