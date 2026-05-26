@@ -33,12 +33,16 @@ require (
 	github.com/go-faster/jx v1.2.0 // indirect
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/larsartmann/go-output/delimited v0.0.0-20260526060731-1c1e122196b7 // indirect
 	github.com/larsartmann/go-output/enum v0.0.0 // indirect
 	github.com/larsartmann/go-output/escape v0.0.0 // indirect
+	github.com/larsartmann/go-output/markup v0.0.0-20260526060731-1c1e122196b7 // indirect
+	github.com/larsartmann/go-output/serialization v0.0.0-20260526060731-1c1e122196b7 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.23 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.3.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect

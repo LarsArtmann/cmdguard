@@ -7,7 +7,10 @@ import (
 
 	output "github.com/larsartmann/go-output"
 	"github.com/larsartmann/go-output/d2"
+	"github.com/larsartmann/go-output/delimited"
 	"github.com/larsartmann/go-output/graph"
+	"github.com/larsartmann/go-output/markup"
+	"github.com/larsartmann/go-output/serialization"
 	"github.com/larsartmann/go-output/table"
 )
 
@@ -139,17 +142,17 @@ var tableFormatRegistry = map[OutputFormat]tableRenderer{
 	output.FormatTable: renderTableStyled,
 	output.FormatCSV:   renderTableCSV,
 	output.FormatJSON: func(w io.Writer, data *output.TableData) error {
-		return marshalAndWrite(w, "JSON", data, output.MarshalJSON)
+		return marshalAndWrite(w, "JSON", data, serialization.MarshalJSON)
 	},
 	output.FormatTSV: func(w io.Writer, data *output.TableData) error {
-		return marshalAndWrite(w, "TSV", data, output.MarshalTSV)
+		return marshalAndWrite(w, "TSV", data, delimited.MarshalTSV)
 	},
 	output.FormatYAML: func(w io.Writer, data *output.TableData) error {
-		return marshalAndWrite(w, "YAML", data, output.MarshalYAML)
+		return marshalAndWrite(w, "YAML", data, serialization.MarshalYAML)
 	},
 	output.FormatXML: func(w io.Writer, data *output.TableData) error {
 		return renderAndWrite(w, "XML", data, func(d *output.TableData) (string, error) {
-			b, err := output.MarshalXMLFromTableData(d)
+			b, err := markup.MarshalXMLFromTableData(d)
 
 			return string(b), err
 		})
@@ -161,7 +164,7 @@ var tableFormatRegistry = map[OutputFormat]tableRenderer{
 	},
 	output.FormatHTML: func(w io.Writer, data *output.TableData) error {
 		return renderAndWrite(w, "HTML", data, func(d *output.TableData) (string, error) {
-			r := output.NewHTMLRenderer()
+			r := markup.NewHTMLRenderer()
 			r.SetData(d)
 
 			return r.Render()
@@ -200,7 +203,7 @@ var anyFormatRegistry = map[OutputFormat]anyRenderer{
 		})
 	},
 	output.FormatYAML: func(w io.Writer, data any) error {
-		return marshalAndWrite(w, "YAML", data, output.MarshalYAML)
+		return marshalAndWrite(w, "YAML", data, serialization.MarshalYAML)
 	},
 }
 
@@ -241,7 +244,7 @@ func renderTableStyled(w io.Writer, data *output.TableData) error {
 }
 
 func renderTableCSV(w io.Writer, data *output.TableData) error {
-	cw := output.NewCSVWriter(w)
+	cw := delimited.NewCSVWriter(w)
 
 	if err := cw.WriteHeader(data.GetHeaders()); err != nil {
 		return fmt.Errorf("writing CSV header: %w", err)
