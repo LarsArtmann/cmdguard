@@ -173,6 +173,18 @@ var (
 
 	// ErrMissingExample indicates a leaf command has no example in draconian mode.
 	ErrMissingExample = errors.New("command has no example")
+
+	// ErrConfigFileRead indicates a config file could not be read from disk.
+	ErrConfigFileRead = errors.New("failed to read config file")
+
+	// ErrConfigFileParse indicates a config file could not be parsed.
+	ErrConfigFileParse = errors.New("failed to parse config file")
+
+	// ErrConfigFileLoad indicates config file loading failed.
+	ErrConfigFileLoad = errors.New("failed to load config file")
+
+	// ErrConfigFileNotFound indicates no config file was found in any search path.
+	ErrConfigFileNotFound = errors.New("config file not found")
 )
 
 // CommandError wraps an error with command context.

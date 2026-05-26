@@ -34,8 +34,10 @@ type CLI[T any] struct {
 	signalHandling bool
 	outputEnabled  bool
 	outputFormat   OutputFormat
-	validationMode ValidationMode
-	configValidate func(*T) error
+	validationMode   ValidationMode
+	configValidate   func(*T) error
+	configFilePaths  []string
+	configFileLoader ConfigFileLoader
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -105,6 +107,12 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	}
 
 	cli.registry = registry
+
+	if setFields, err := cli.loadConfigFileOrSkip(); err != nil {
+		return fmt.Errorf("%w: loading config file: %w", ErrConfigFileLoad, err)
+	} else if len(setFields) > 0 {
+		registry.updateTagDefaultsFromConfig(cli.config, setFields)
+	}
 
 	if cli.envPrefix != "" {
 		registry.SetEnvPrefix(cli.envPrefix)

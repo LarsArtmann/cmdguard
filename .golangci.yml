@@ -204,10 +204,7 @@ linters:
       min-complexity: 35
     gocritic:
       disabled-checks:
-        - dupImport
         - ifElseChain
-        - octalLiteral
-        - whyNoLint
     gomoddirectives:
       replace-local: true
     ireturn:
