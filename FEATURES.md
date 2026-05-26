@@ -216,10 +216,23 @@ TypeHandler interface {
 All type dispatch (primitives + 9 custom types) flows through a single registry.
 Custom types can be added via `RegisterTypeHandler(reflect.Type, TypeHandler)`.
 
+### Config File Loading
+
+| Feature                              | Status              | Notes                                      |
+| ------------------------------------ | ------------------- | ------------------------------------------ |
+| `WithConfigFile[T](paths...)`        | ✅ FULLY_FUNCTIONAL | JSON loader, core package                  |
+| `WithConfigFileLoader[T](loader, ...)` | ✅ FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload)   |
+| `$ENV` and `~` expansion             | ✅ FULLY_FUNCTIONAL | Path expansion before loading              |
+| `--config` flag override             | ✅ FULLY_FUNCTIONAL | Overrides default search paths             |
+| Missing file = silent skip           | ✅ FULLY_FUNCTIONAL | Not an error when default path missing     |
+| `configload.YAML()`                  | ✅ FULLY_FUNCTIONAL | YAML loader sub-package                    |
+| `configload.TOML()`                  | ✅ FULLY_FUNCTIONAL | TOML loader sub-package                    |
+| `configload.Auto()`                  | ✅ FULLY_FUNCTIONAL | Extension-based loader selection           |
+
 ### Flag Priority Chain
 
 ```
-explicit flag → env:"VAR" (with optional prefix) → default value
+explicit flag → env:"VAR" (with optional prefix) → config file → default value
 ```
 
 ---

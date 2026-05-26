@@ -57,8 +57,10 @@ cmdguard/
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
 │   │   ├── command_suggest.go    # Command typo suggestions
 │   │   ├── config.go             # Config type constraint
+│   │   ├── config_file.go        # ConfigFileLoader, JSON loader, WithConfigFile
 │   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue
 │   │   ├── config_setfield.go    # SetField for config structs
+│   │   ├── configload/           # Optional YAML/TOML loaders
 │   │   ├── counting_flag.go      # Counting flag support (count:"true")
 │   │   ├── editor.go             # EditInEditor ($EDITOR support)
 │   │   ├── errors.go             # Sentinel errors and error types
@@ -86,6 +88,7 @@ cmdguard/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
 │   ├── basic/                    # Simple v2 demo
+│   ├── config-file/               # Config file loading
 │   ├── counting/                  # Counting flags (-v/-vv/-vvv)
 │   ├── di/                        # DI-focused example
 │   ├── di-patterns/               # DI service patterns
@@ -207,6 +210,8 @@ Functional options:
 | `WithConfigValidation[T](fn)`  | Validate config after flag parsing          |
 | `WithStrictValidation[T]()`    | Require short descriptions on all commands  |
 | `WithDraconianValidation[T]()` | Strict + examples on leaf commands          |
+| `WithConfigFile[T](paths...)`  | Load JSON config file before flags          |
+| `WithConfigFileLoader[T](l,p)` | Load config with custom loader (YAML/TOML)  |
 
 ### CLI[T] Methods
 
@@ -483,6 +488,10 @@ go build ./...                                   # Verify build
 19. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
 20. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
 21. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
+22. **Config file precedence** — `WithConfigFile[T](paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
+23. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
+24. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
+25. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
 
 ---
 

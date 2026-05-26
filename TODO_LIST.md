@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-05-16
-**Status:** v2.3.0-dev — 247 tests (210 in v2), 80.4% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.3.0-dev — 264 tests (227 in v2), 81.2% coverage, 0 lint issues, 0 race conditions
 
 ## Completed ✅
 
@@ -113,7 +113,7 @@
 
 ### 🔮 Future (v3.0+)
 
-- [ ] Config file auto-loading with koanf (YAML/TOML/.env)
+- [x] Config file auto-loading (YAML/TOML/JSON) — custom implementation, no koanf needed
 - [ ] Interactive prompts (huh integration) with `WithPromptOnMissing`
 - [ ] Spinner/progress middleware (bubbles)
 - [ ] Glamour markdown help rendering
