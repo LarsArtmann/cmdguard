@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -90,16 +92,45 @@ func expandConfigPath(path string) string {
 	return path
 }
 
+// fieldValueToString converts a reflect.Value to its string representation.
+// Handles primitives and types implementing fmt.Stringer.
+func fieldValueToString(field reflect.Value) (string, bool) {
+	if s, ok := field.Interface().(fmt.Stringer); ok {
+		return s.String(), true
+	}
+
+	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
+	case reflect.String:
+		return field.String(), true
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return strconv.FormatInt(field.Int(), 10), true
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return strconv.FormatUint(field.Uint(), 10), true
+	case reflect.Float32, reflect.Float64:
+		return strconv.FormatFloat(field.Float(), 'f', -1, 64), true
+	case reflect.Bool:
+		return strconv.FormatBool(field.Bool()), true
+	default:
+		return "", false
+	}
+}
+
 // resolveConfigFlag checks os.Args for a --config flag override.
+// Also checks the short form if shortName is provided.
 // Returns the flag value if found, otherwise an empty string.
-func resolveConfigFlag(flagName string) string {
+func resolveConfigFlag(longName, shortName string) string {
 	fs := pflag.NewFlagSet("config", pflag.ContinueOnError)
 	fs.SetOutput(io.Discard)
-	fs.String(flagName, "", "")
+
+	if shortName != "" {
+		fs.StringP(longName, shortName, "", "")
+	} else {
+		fs.String(longName, "", "")
+	}
 
 	_ = fs.Parse(os.Args[1:])
 
-	if path, _ := fs.GetString(flagName); path != "" {
+	if path, _ := fs.GetString(longName); path != "" {
 		return path
 	}
 
@@ -133,7 +164,7 @@ func (r *FlagRegistry) updateTagDefaultsFromConfig(cfg any, setFields []string) 
 			continue
 		}
 
-		if s, ok := getFieldValue(field); ok {
+		if s, ok := fieldValueToString(field); ok {
 			r.tags[i].Default = s
 		}
 	}
@@ -170,7 +201,16 @@ func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, error) {
 	paths := cli.configFilePaths
 
 	// Check for --config flag override.
-	if override := resolveConfigFlag("config"); override != "" {
+	shortName := ""
+	for _, tag := range cli.registry.Tags() {
+		if tag.Name == "config" && tag.Short != "" {
+			shortName = tag.Short
+
+			break
+		}
+	}
+
+	if override := resolveConfigFlag("config", shortName); override != "" {
 		paths = []string{override}
 	}
 
