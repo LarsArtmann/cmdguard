@@ -1,3 +1,4 @@
+//nolint:nlreturn,tparallel // test file with inline handler returns; top-level parallel blocked by t.Setenv subtests
 package v2_test
 
 import (

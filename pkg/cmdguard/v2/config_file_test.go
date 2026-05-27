@@ -1,3 +1,4 @@
+//nolint:nlreturn // test file with many inline handler returns
 package v2
 
 import (
