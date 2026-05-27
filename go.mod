@@ -7,14 +7,19 @@ require (
 	github.com/larsartmann/go-branded-id v0.1.0
 	github.com/larsartmann/go-output v0.5.0
 	github.com/larsartmann/go-output/d2 v0.0.0-20260525042732-b9356ba38aa3
+	github.com/larsartmann/go-output/delimited v0.0.0
 	github.com/larsartmann/go-output/graph v0.0.0-20260525042732-b9356ba38aa3
+	github.com/larsartmann/go-output/markup v0.0.0-20260526060731-1c1e122196b7
+	github.com/larsartmann/go-output/serialization v0.0.0
 	github.com/larsartmann/go-output/table v0.0.0-20260518130518-10e8104067b2
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
+	github.com/pelletier/go-toml/v2 v2.3.1
 	github.com/samber/do/v2 v2.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -23,7 +28,6 @@ require (
 	github.com/charmbracelet/ultraviolet v0.0.0-20260511121909-c840852527f3 // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
 	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260517005351-920740d613be // indirect
-	github.com/charmbracelet/x/exp/golden v0.0.0-20251106172358-54469c29c2bc // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
@@ -33,17 +37,15 @@ require (
 	github.com/go-faster/jx v1.2.0 // indirect
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/larsartmann/go-output/delimited v0.0.0-20260526060731-1c1e122196b7 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/larsartmann/go-output/enum v0.0.0 // indirect
 	github.com/larsartmann/go-output/escape v0.0.0 // indirect
-	github.com/larsartmann/go-output/markup v0.0.0-20260526060731-1c1e122196b7 // indirect
-	github.com/larsartmann/go-output/serialization v0.0.0-20260526060731-1c1e122196b7 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.23 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.3.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
@@ -52,5 +54,19 @@ require (
 	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/term v0.43.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+)
+
+replace (
+	github.com/larsartmann/go-output => ../go-output
+	github.com/larsartmann/go-output/d2 => ../go-output/d2
+	github.com/larsartmann/go-output/delimited => ../go-output/delimited
+	github.com/larsartmann/go-output/enum => ../go-output/enum
+	github.com/larsartmann/go-output/escape => ../go-output/escape
+	github.com/larsartmann/go-output/graph => ../go-output/graph
+	github.com/larsartmann/go-output/markup => ../go-output/markup
+	github.com/larsartmann/go-output/serialization => ../go-output/serialization
+	github.com/larsartmann/go-output/table => ../go-output/table
+	github.com/larsartmann/go-output/testhelpers => ../go-output/testhelpers
+	github.com/larsartmann/go-output/testhelpers/graphtest => ../go-output/testhelpers/graphtest
 )
