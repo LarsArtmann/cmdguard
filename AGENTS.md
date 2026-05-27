@@ -2,7 +2,7 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-05-17
+**Last Updated:** 2026-05-27
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
 **Status:** v2.3.0-dev - 224 tests, 84.5% coverage, 0 lint issues, 0 race conditions
@@ -12,6 +12,9 @@
 ## Quick Start
 
 ```bash
+# Enter dev shell (Go 1.26, gopls, golangci-lint)
+nix develop
+
 # Run tests (all packages, with race detection)
 go test ./... -count=1 -timeout 120s -race
 
@@ -21,11 +24,14 @@ go build ./...
 # Lint (golangci-lint 2.x)
 golangci-lint run ./...
 
-# Format
-golangci-lint fmt ./...
+# Format (nix + go via treefmt)
+nix fmt
 
 # Coverage
 go test ./... -count=1 -timeout 120s -cover
+
+# Check everything (format check)
+nix flake check
 ```
 
 **Important:** `git commit --no-verify` is required (pre-commit hooks have pre-existing errors).
@@ -107,6 +113,8 @@ cmdguard/
 ├── FEATURES.md                   # Feature status
 ├── TODO_LIST.md                  # Remaining tasks
 ├── .golangci.yml                 # Lint configuration
+├── flake.nix                     # Nix dev shell, formatter, checks
+├── flake.lock                    # Nix lock file
 └── README.md                     # User documentation
 ```
 
@@ -492,6 +500,7 @@ go build ./...                                   # Verify build
 23. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
 24. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
 25. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
+26. **Nix sandbox vs local replace** — `go.mod` has `replace` directives pointing to `../go-output`; Nix sandboxed checks (`buildGoModule`, `go build` in derivations) cannot resolve these, so `flake.nix` only provides devShell + formatter + format check (no build/vet checks)
 
 ---
 
