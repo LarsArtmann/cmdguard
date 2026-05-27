@@ -321,6 +321,8 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithConfigValidation[T](fn)`  | Validate config after flag parsing              |
 | `WithStrictValidation[T]()`    | Require `WithShort` on all commands             |
 | `WithDraconianValidation[T]()` | Strict + require `WithExample` on leaf commands |
+| `WithConfigFile[T](paths...)` | Auto-load JSON config from first found path  |
+| `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML) |
 
 ---
 
@@ -350,22 +352,64 @@ exitCoder.ExitCode() // returns custom exit code
 
 ---
 
-## Examples
+### Must Constructors
 
-See the [`examples/`](examples/) directory:
+`MustNewCommand` and `MustNewParentCommand` panic on error — use when configuration is known at compile time:
 
-- [`basic/`](examples/basic/) — Minimal v2 demo
-- [`typed/`](examples/typed/) — Full DI, lifecycle hooks, typed flags, nested commands
-- [`di/`](examples/di/) — Dependency injection patterns
-- [`di-patterns/`](examples/di-patterns/) — Service registration patterns
-- [`env-tags/`](examples/env-tags/) — Environment variable bindings
-- [`counting/`](examples/counting/) — Counting flags (`-v`/`-vv`/`-vvv`)
-- [`error-handling/`](examples/error-handling/) — Error handling patterns
-- [`output/`](examples/output/) — Rich output formatting
-- [`advanced-flags/`](examples/advanced-flags/) — Custom flag types
-- [`validation/`](examples/validation/) — Validation patterns
-- [`signals/`](examples/signals/) — Signal handling
-- [`config-file/`](examples/config-file/) — Config file loading
+```go
+greetCmd := v2.MustNewCommand[AppConfig, *GreetFlags]("greet", greetHandler,
+    v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
+    v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+)
+
+parentCmd := v2.MustNewParentCommand[AppConfig, v2.NoFlags]("user",
+    "User management", []v2.Command[AppConfig, v2.NoFlags]{listCmd, createCmd},
+    v2.WithShort[AppConfig, v2.NoFlags]("User management"),
+)
+```
+
+---
+
+## Config Files
+
+### JSON (built-in)
+
+```go
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v2.WithConfigFile[AppConfig]("~/.config/myapp/config.json", "/etc/myapp/config.json"),
+)
+```
+
+Paths are tried in order; missing files are silently skipped. Supports `$ENV` and `~` expansion.
+
+### YAML / TOML (custom loaders)
+
+```go
+import "github.com/larsartmann/cmdguard/pkg/cmdguard/v2/configload"
+
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v2.WithConfigFileLoader[AppConfig](configload.YAML(), "config.yaml"),
+)
+```
+
+`configload.YAML()` and `configload.TOML()` return `ConfigFileLoader` implementations. See [`pkg/cmdguard/v2/configload/`](pkg/cmdguard/v2/configload/) for available loaders.
+
+**Precedence:** config file → environment variables → explicit flags → defaults.
+
+---
+
+## Man Page Generation
+
+```go
+manCmd, err := v2.GenerateManPageCommand[AppConfig](cli)
+if err != nil {
+    log.Fatal(err)
+}
+v2.AddCommand(cli, manCmd)
+// $ myapp man
+```
+
+Generates roff-formatted man pages from your command structure.
 
 ---
 
@@ -378,10 +422,25 @@ func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
     bfc, ok := v2.GetBranchingFlowContext(ctx)
     if ok {
         fmt.Println("Path:", bfc.PathString()) // "myapp.resource.list"
-        bfc.SetValue("key", "value")
+        bfc.SetValue("key", "value")              // propagates to children
+        val, _ := bfc.GetValue("key")             // looks up hierarchy
+        _ = val
     }
     return nil
 }
+```
+
+---
+
+## Color Output
+
+cmdguard uses [fang](https://github.com/charmbracelet/fang) for styled help output via [lipgloss](https://github.com/charmbracelet/lipgloss). Lipgloss respects the [`NO_COLOR`](https://no-color.org/) environment variable automatically — set `NO_COLOR=1` to disable colored output.
+
+```go
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v2.WithFang[AppConfig](true),   // styled help (default)
+    v2.WithFang[AppConfig](false),  // plain text help
+)
 ```
 
 ---
@@ -400,10 +459,62 @@ fmt.Println("User wrote:", edited)
 
 ---
 
+## Version Command
+
+```go
+cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v2.WithCLIVersion[AppConfig]("1.0.0"),
+)
+
+versionCmd := v2.MustVersionCommand[AppConfig](cli)
+v2.AddCommand(cli, versionCmd)
+// $ myapp version
+```
+
+---
+
+## Test Helpers
+
+The `testutil` subpackage provides a harness for testing cmdguard CLIs:
+
+```go
+import "github.com/larsartmann/cmdguard/pkg/cmdguard/v2/testutil"
+
+result := testutil.TestCLI(t, cli, []string{"greet", "--name", "Alice"})
+result.AssertNoError()
+result.AssertExitCode(0)
+result.AssertOutputContains("Hello, Alice!")
+```
+
+---
+
+## Examples
+
+See the [`examples/`](examples/) directory:
+
+- [`basic/`](examples/basic/) — Minimal v2 demo
+- [`typed/`](examples/typed/) — Full DI, lifecycle hooks, typed flags, nested commands
+- [`di/`](examples/di/) — Dependency injection patterns
+- [`di-patterns/`](examples/di-patterns/) — Service registration patterns
+- [`env-tags/`](examples/env-tags/) — Environment variable bindings
+- [`counting/`](examples/counting/) — Counting flags (`-v`/`-vv`/`-vvv`)
+- [`error-handling/`](examples/error-handling/) — Error handling patterns
+- [`output/`](examples/output/) — Rich output formatting
+- [`advanced-flags/`](examples/advanced-flags/) — Custom flag types
+- [`validation/`](examples/validation/) — Validation patterns
+- [`signals/`](examples/signals/) — Signal handling
+- [`config-file/`](examples/config-file/) — Config file loading
+- [`kitchen-sink/`](examples/kitchen-sink/) — Full task manager CLI demo (all features)
+
+---
+
 ## Documentation
 
+- [Tutorial](docs/TUTORIAL.md) — Build a task manager CLI step by step
 - [Quick Start Guide](docs/QUICKSTART.md) — Learn cmdguard in 5 minutes
 - [Migrating from Cobra](docs/MIGRATION_FROM_COBRA.md) — Step-by-step migration guide
+- [Framework Comparison](docs/COMPARISON.md) — vs Kong, sflags, go-flags, urfave/cli
+- [Performance](docs/PERFORMANCE.md) — Benchmark results and overhead analysis
 - [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) — Design guidelines
 - [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/pkg/cmdguard/v2) — Full API docs on pkg.go.dev
 
