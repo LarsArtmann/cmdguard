@@ -1,5 +1,3 @@
-// Package v2 provides a type-safe, DI-powered CLI framework with no panics.
-// All functions return errors instead of panicking.
 package v2
 
 import (

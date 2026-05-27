@@ -1,6 +1,7 @@
 # ROADMAP
 
 **Generated:** 2026-04-05
+**Updated:** 2026-05-27
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
@@ -28,11 +29,34 @@
 
 ---
 
+## Completed (v2.2–v2.3)
+
+- [x] Add GitHub Actions workflow
+- [x] Add badge to README
+- [x] Add more custom types: URL, Email, Port, FilePath, HostPort
+- [x] Add middleware support (`TimingMiddleware`, `RecoveryMiddleware`)
+- [x] Create command groups feature (`WithGroup`, `WithGroupID`)
+- [x] Environment Variable Binding with `env` struct tags
+- [x] Config file support JSON/YAML/TOML
+- [x] Shell completion helpers (`WithCompletion`)
+- [x] Man page generation (`GenerateManPageCommand`)
+- [x] `BranchingFlowContext` for command path tracking
+- [x] `EditInEditor` for `$EDITOR` integration
+- [x] Counting flags (`count:"true"`)
+- [x] Positional args validators (`WithExactArgs`, `WithRangeArgs`, etc.)
+- [x] `ExitCoder` / `NewExitError` for custom exit codes
+- [x] `WithStrictValidation` / `WithDraconianValidation`
+- [x] `WithConfigValidation` for post-parse config validation
+- [x] Consumer test harness (`pkg/testutil`)
+- [x] Cobra migration guide (`docs/MIGRATION_FROM_COBRA.md`)
+- [x] Framework comparison (`docs/COMPARISON.md`)
+
+---
+
 ## Advanced Types
 
 - [ ] Add Result[T] type for error handling
 - [ ] Add Validated[T] wrapper with validation functions
-- [ ] Add more custom types: URL, Email, Port, FilePath
 - [ ] Create example application for branded IDs
 
 ---
@@ -61,8 +85,6 @@
 ## CLI Enhancements
 
 - [ ] Add Progress/Spinner Type using charmbracelet/bubbles
-- [ ] Add Shell Completion Helpers
-- [ ] Create command groups feature
 - [ ] Add enhanced flag validation enums
 
 ---
@@ -70,10 +92,8 @@
 ## Configuration
 
 - [ ] Config File Auto-Loading integration with koanf
-- [ ] Environment Variable Binding with env struct tags
 - [ ] Replace `internal/config` with koanf
 - [ ] Replace `internal/logging` with charmbracelet/log
-- [ ] Config file support YAML/TOML
 
 ---
 
@@ -101,9 +121,7 @@
 ## CI/CD & Release
 
 - [ ] Set up release automation
-- [ ] Add GitHub Actions workflow
 - [ ] Add codecov integration
-- [ ] Add badge to README
 - [ ] Set up CI/CD pipeline
 - [ ] Add pre-commit hooks
 - [ ] Create contribution guide
@@ -129,10 +147,9 @@
 
 ## Future Ideas
 
-- [ ] Add middleware support
-- [ ] Add more custom types (URL, Email, Port, FilePath)
-- [ ] Create command groups feature
-- [ ] Implement plugin system for custom validators
-- [ ] Add enhanced flag validation enums
-- [ ] Custom validation hooks
+- [ ] Add structured JSON error output for `--output=json`
+- [ ] Add `--no-color` flag + NO_COLOR support
+- [ ] Add issue/PR templates
+- [ ] Test all examples in CI
 - [ ] Metrics/telemetry integration
+- [ ] Custom validation hooks

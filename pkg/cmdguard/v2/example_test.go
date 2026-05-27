@@ -2,7 +2,11 @@ package v2_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
+
+	"github.com/samber/do/v2"
 
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
@@ -100,4 +104,100 @@ func ExampleMustNewCommand() {
 
 	fmt.Println("command:", cmd.Use())
 	// Output: command: version
+}
+
+// ExampleNewCLI demonstrates creating a CLI with options.
+func ExampleNewCLI() {
+	type config struct {
+		Verbose bool `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
+	}
+
+	cli, err := v2.NewCLI[config]("myapp", "My application", config{},
+		v2.WithCLIVersion[config]("1.0.0"),
+		v2.WithEnvPrefix[config]("MYAPP_"),
+	)
+	if err != nil {
+		fmt.Println("error:", err)
+
+		return
+	}
+
+	fmt.Println("cli created:", cli.RootCommand().Use)
+	// Output: cli created: myapp
+}
+
+// ExampleProvide demonstrates dependency injection with Provide and Invoke.
+func ExampleProvide() {
+	type config struct{}
+
+	type Database struct {
+		DSN string
+	}
+
+	cli, _ := v2.NewCLI[config]("myapp", "My application", config{})
+	scope := cli.Scope()
+
+	// Register a service.
+	_ = v2.Provide(scope, func(i do.Injector) (*Database, error) {
+		return &Database{DSN: "postgres://localhost"}, nil
+	})
+
+	// Invoke the service.
+	db, err := v2.Invoke[*Database](scope)
+	if err != nil {
+		fmt.Println("error:", err)
+
+		return
+	}
+
+	fmt.Println("dsn:", db.DSN)
+	// Output: dsn: postgres://localhost
+}
+
+// ExampleOutputTable demonstrates rendering data in multiple formats.
+func ExampleOutputTable() {
+	headers := []string{"Name", "Age"}
+	rows := [][]string{
+		{"Alice", "30"},
+		{"Bob", "25"},
+	}
+
+	// Output as JSON.
+	_ = v2.OutputTable(v2.FormatJSON, headers, rows)
+
+	fmt.Println("output rendered")
+	// Output:
+	// {"Headers":["Name","Age"],"Rows":[["Alice","30"],["Bob","25"]]}
+	// output rendered
+}
+
+// ExampleTimingMiddleware demonstrates adding timing middleware to a CLI.
+func ExampleTimingMiddleware() {
+	type config struct{}
+
+	cli, _ := v2.NewCLI[config]("myapp", "My application", config{},
+		v2.WithMiddleware[config](v2.TimingMiddleware[config](func(name string, d time.Duration) {
+			fmt.Printf("%s took %v\n", name, d)
+		})),
+	)
+
+	fmt.Println("middleware registered:", cli != nil)
+	// Output: middleware registered: true
+}
+
+// ExampleNewExitError demonstrates creating an error with a custom exit code.
+func ExampleNewExitError() {
+	innerErr := errors.New("configuration invalid")
+	exitErr, err := v2.NewExitError(2, innerErr)
+	if err != nil {
+		fmt.Println("error:", err)
+
+		return
+	}
+
+	var exitCoder v2.ExitCoder
+	if errors.As(exitErr, &exitCoder) {
+		fmt.Println("exit code:", exitCoder.ExitCode())
+	}
+	// Output: exit code: 2
 }

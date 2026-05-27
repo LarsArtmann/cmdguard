@@ -9,6 +9,8 @@
 
 cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type safety, struct-tag-driven flags, and built-in dependency injection via [samber/do/v2](https://github.com/samber/do). Your flags are typed structs — no more stringly-typed `Flags().GetString("name")` calls that fail at runtime.
 
+> **API Stability:** The v2 API is stable and will only receive additive changes until v3. See [CHANGELOG.md](CHANGELOG.md) for deprecation policy.
+
 ---
 
 ## Why cmdguard?
@@ -111,6 +113,9 @@ HELLO, CMDGUARD!
 | **Signal handling**        | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers                               |
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                 |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                   |
+| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                    |
+| **Editor support**         | `EditInEditor()` — open `$EDITOR` for user input                                                 |
+| **Config files**           | `WithConfigFile[T](paths...)` — JSON/YAML/TOML auto-loading with flag override                   |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                          |
 | **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                   |
 | **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own                                      |
@@ -280,6 +285,8 @@ type Flags struct {
 | `WithExactArgs[T, F](n)`        | Require exactly n positional args  |
 | `WithMinimumArgs[T, F](n)`      | Require at least n positional args |
 | `WithMaximumArgs[T, F](n)`      | Allow at most n positional args    |
+|| `WithValidArgs[T, F](args...)`  | Restrict args to allowed values    |
+|| `WithSubcommands[T, F](cmds...)`| Attach child commands (parent)     |
 | `WithRangeArgs[T, F](min, max)` | Require between min and max args   |
 | `WithNoArgs[T, F]()`            | Reject any positional args         |
 | `WithCompletion[T, F](fn)`      | Dynamic shell completion           |
@@ -334,6 +341,11 @@ v2.NewCommandError(name, err)
 v2.NewFlagError(name, err)
 v2.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
 v2.NewExitError(code, err)                            // custom exit code
+
+// ExitCoder interface — check with errors.As
+var exitCoder v2.ExitCoder
+errors.As(err, &exitCoder)
+exitCoder.ExitCode() // returns custom exit code
 ```
 
 ---
@@ -353,12 +365,45 @@ See the [`examples/`](examples/) directory:
 - [`advanced-flags/`](examples/advanced-flags/) — Custom flag types
 - [`validation/`](examples/validation/) — Validation patterns
 - [`signals/`](examples/signals/) — Signal handling
+- [`config-file/`](examples/config-file/) — Config file loading
+
+---
+
+## BranchingFlowContext
+
+Track the command execution path and share values across the hierarchy:
+
+```go
+func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    bfc, ok := v2.GetBranchingFlowContext(ctx)
+    if ok {
+        fmt.Println("Path:", bfc.PathString()) // "myapp.resource.list"
+        bfc.SetValue("key", "value")
+    }
+    return nil
+}
+```
+
+---
+
+## EditInEditor
+
+Open the user's `$EDITOR` to edit content interactively:
+
+```go
+edited, err := v2.EditInEditor(ctx, "# Edit your message here\n")
+if err != nil {
+    return err
+}
+fmt.Println("User wrote:", edited)
+```
 
 ---
 
 ## Documentation
 
 - [Quick Start Guide](docs/QUICKSTART.md) — Learn cmdguard in 5 minutes
+- [Migrating from Cobra](docs/MIGRATION_FROM_COBRA.md) — Step-by-step migration guide
 - [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) — Design guidelines
 - [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/pkg/cmdguard/v2) — Full API docs on pkg.go.dev
 
