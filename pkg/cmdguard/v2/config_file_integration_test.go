@@ -27,14 +27,16 @@ func TestConfigFilePrecedence(t *testing.T) {
 		}
 
 		called := false
-		cli, err := v2.NewCLI[Config]("app", "My app", Config{},
+		cli, err := v2.NewCLI[Config](
+			"app", "My app", Config{},
 			v2.WithConfigFile[Config](configPath),
 		)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		cmd, err := v2.NewCommand[Config, v2.NoFlags]("test",
+		cmd, err := v2.NewCommand[Config, v2.NoFlags](
+			"test",
 			func(_ context.Context, cfg *Config, _ v2.NoFlags) error {
 				if cfg.Name != "file" {
 					t.Errorf("Name = %q, want %q", cfg.Name, "file")
@@ -74,14 +76,16 @@ func TestConfigFilePrecedence(t *testing.T) {
 		}
 
 		called := false
-		cli, err := v2.NewCLI[Config]("app", "My app", Config{},
+		cli, err := v2.NewCLI[Config](
+			"app", "My app", Config{},
 			v2.WithConfigFile[Config](configPath),
 		)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		cmd, err := v2.NewCommand[Config, v2.NoFlags]("test",
+		cmd, err := v2.NewCommand[Config, v2.NoFlags](
+			"test",
 			func(_ context.Context, cfg *Config, _ v2.NoFlags) error {
 				if cfg.Name != "flag" {
 					t.Errorf("Name = %q, want %q", cfg.Name, "flag")
@@ -121,14 +125,16 @@ func TestConfigFilePrecedence(t *testing.T) {
 		t.Setenv("TEST_NAME", "env")
 
 		called := false
-		cli, err := v2.NewCLI[Config]("app", "My app", Config{},
+		cli, err := v2.NewCLI[Config](
+			"app", "My app", Config{},
 			v2.WithConfigFile[Config](configPath),
 		)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		cmd, err := v2.NewCommand[Config, v2.NoFlags]("test",
+		cmd, err := v2.NewCommand[Config, v2.NoFlags](
+			"test",
 			func(_ context.Context, cfg *Config, _ v2.NoFlags) error {
 				if cfg.Name != "env" {
 					t.Errorf("Name = %q, want %q", cfg.Name, "env")
@@ -168,14 +174,16 @@ func TestConfigFilePrecedence(t *testing.T) {
 		t.Setenv("TEST_NAME2", "env")
 
 		called := false
-		cli, err := v2.NewCLI[Config]("app", "My app", Config{},
+		cli, err := v2.NewCLI[Config](
+			"app", "My app", Config{},
 			v2.WithConfigFile[Config](configPath),
 		)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		cmd, err := v2.NewCommand[Config, v2.NoFlags]("test",
+		cmd, err := v2.NewCommand[Config, v2.NoFlags](
+			"test",
 			func(_ context.Context, cfg *Config, _ v2.NoFlags) error {
 				if cfg.Name != "flag" {
 					t.Errorf("Name = %q, want %q", cfg.Name, "flag")
@@ -209,14 +217,16 @@ func TestConfigFilePrecedence(t *testing.T) {
 		}
 
 		called := false
-		cli, err := v2.NewCLI[Config]("app", "My app", Config{},
+		cli, err := v2.NewCLI[Config](
+			"app", "My app", Config{},
 			v2.WithConfigFile[Config]("/does/not/exist.json"),
 		)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		cmd, err := v2.NewCommand[Config, v2.NoFlags]("test",
+		cmd, err := v2.NewCommand[Config, v2.NoFlags](
+			"test",
 			func(_ context.Context, cfg *Config, _ v2.NoFlags) error {
 				if cfg.Name != "default" {
 					t.Errorf("Name = %q, want %q", cfg.Name, "default")
