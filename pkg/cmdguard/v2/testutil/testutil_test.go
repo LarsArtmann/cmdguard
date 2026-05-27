@@ -38,7 +38,8 @@ func TestTestCLI_ExecuteWithArgs(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[testConfig, v2.NoFlags]("hello",
+	cmd, err := v2.NewCommand[testConfig, v2.NoFlags](
+		"hello",
 		func(_ context.Context, _ *testConfig, _ v2.NoFlags) error {
 			return nil
 		},
@@ -68,7 +69,8 @@ func TestTestCLI_ExecuteWithArgs_Error(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[testConfig, v2.NoFlags]("fail",
+	cmd, err := v2.NewCommand[testConfig, v2.NoFlags](
+		"fail",
 		func(_ context.Context, _ *testConfig, _ v2.NoFlags) error {
 			return errors.New("intentional failure")
 		},
@@ -127,7 +129,8 @@ func TestTestCLI_HelpCapture(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[testConfig, v2.NoFlags]("cmd",
+	cmd, err := v2.NewCommand[testConfig, v2.NoFlags](
+		"cmd",
 		func(_ context.Context, _ *testConfig, _ v2.NoFlags) error {
 			return nil
 		},

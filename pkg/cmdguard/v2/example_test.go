@@ -112,7 +112,8 @@ func ExampleNewCLI() {
 		Verbose bool `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
 	}
 
-	cli, err := v2.NewCLI[config]("myapp", "My application", config{},
+	cli, err := v2.NewCLI[config](
+		"myapp", "My application", config{},
 		v2.WithCLIVersion[config]("1.0.0"),
 		v2.WithEnvPrefix[config]("MYAPP_"),
 	)
@@ -175,7 +176,8 @@ func ExampleOutputTable() {
 func ExampleTimingMiddleware() {
 	type config struct{}
 
-	cli, _ := v2.NewCLI[config]("myapp", "My application", config{},
+	cli, _ := v2.NewCLI[config](
+		"myapp", "My application", config{},
 		v2.WithMiddleware[config](v2.TimingMiddleware[config](func(name string, d time.Duration) {
 			fmt.Printf("%s took %v\n", name, d)
 		})),

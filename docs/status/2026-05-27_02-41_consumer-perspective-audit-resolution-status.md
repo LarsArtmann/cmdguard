@@ -19,25 +19,25 @@ Just completed a focused sprint addressing the `CONSUMER_PERSPECTIVE.md` audit d
 
 ### CONSUMER_PERSPECTIVE.md — 12/18 Items Resolved
 
-| Priority | Item | Status | Evidence |
-| --- | --- | --- | --- |
-| **P0** | Remove go-output local replace directive | ✅ ALREADY CLEAN | `go.mod` has no `replace` directives; `go get` works for external consumers |
-| **P0** | Add Cobra migration guide | ✅ DONE | `docs/MIGRATION_FROM_COBRA.md` — 4-phase incremental adoption guide with before/after code |
-| **P0** | Update README with missing 25+ APIs | ✅ DONE | README now documents `BranchingFlowContext`, `EditInEditor`, `WithConfigFile`, `WithValidArgs`, `WithSubcommands`, `ExitCoder`, config files, flow context, editor support |
-| **P1** | Add `doc.go` with comprehensive godoc | ✅ DONE | `pkg/cmdguard/v2/doc.go` — 170-line package overview with quick-start, flags, DI, middleware, output, error handling, custom types |
-| **P1** | Add consumer test harness (`NewTestCLI`) | ✅ DONE | `pkg/cmdguard/v2/testutil/testutil.go` + tests — `TestCLI[T]`, `TestResult`, `ExitCode()` capture; 88.2% coverage |
-| **P1** | Add comparison table/COMPARISON.md | ✅ DONE | `docs/COMPARISON.md` — Honest comparison vs Kong, sflags, go-flags, urfave/cli with feature matrix and API examples |
-| **P1** | Fix stale ROADMAP.md | ✅ DONE | ROADMAP.md updated — 12 completed items moved to "Completed (v2.2–v2.3)" section; unchecked aspirational items remain |
-| **P1** | Add API stability statement | ✅ DONE | README now states: "The v2 API is stable and will only receive additive changes until v3" |
-| **P2** | Add kitchen-sink or real-world example | ❌ NOT DONE | See "Not Started" section below |
-| **P2** | Add godoc examples for key APIs | ✅ DONE | `example_test.go` — Added 6 examples: `NewCLI`, `Provide`/`Invoke`, `OutputTable`, `TimingMiddleware`, `NewExitError` |
-| **P2** | Add step-by-step tutorial | ❌ NOT DONE | See "Not Started" section below |
-| **P2** | Document performance / benchmark results | ✅ DONE | `docs/PERFORMANCE.md` — Full benchmark table with overhead analysis (<10 µs startup, <10 ns validation) |
-| **P2** | Add SECURITY.md | ✅ DONE | `SECURITY.md` — Supported versions, private reporting process, disclosure timeline, best practices |
-| **P3** | Add `--no-color` flag + documentation | ❌ NOT DONE | See "Not Started" section below |
-| **P3** | Add structured JSON error output | ❌ NOT DONE | See "Not Started" section below |
-| **P3** | Add issue/PR templates | ❌ NOT DONE | See "Not Started" section below |
-| **P3** | Test all examples in CI | ❌ NOT DONE | See "Not Started" section below |
+| Priority | Item                                     | Status           | Evidence                                                                                                                                                                   |
+| -------- | ---------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **P0**   | Remove go-output local replace directive | ✅ ALREADY CLEAN | `go.mod` has no `replace` directives; `go get` works for external consumers                                                                                                |
+| **P0**   | Add Cobra migration guide                | ✅ DONE          | `docs/MIGRATION_FROM_COBRA.md` — 4-phase incremental adoption guide with before/after code                                                                                 |
+| **P0**   | Update README with missing 25+ APIs      | ✅ DONE          | README now documents `BranchingFlowContext`, `EditInEditor`, `WithConfigFile`, `WithValidArgs`, `WithSubcommands`, `ExitCoder`, config files, flow context, editor support |
+| **P1**   | Add `doc.go` with comprehensive godoc    | ✅ DONE          | `pkg/cmdguard/v2/doc.go` — 170-line package overview with quick-start, flags, DI, middleware, output, error handling, custom types                                         |
+| **P1**   | Add consumer test harness (`NewTestCLI`) | ✅ DONE          | `pkg/cmdguard/v2/testutil/testutil.go` + tests — `TestCLI[T]`, `TestResult`, `ExitCode()` capture; 88.2% coverage                                                          |
+| **P1**   | Add comparison table/COMPARISON.md       | ✅ DONE          | `docs/COMPARISON.md` — Honest comparison vs Kong, sflags, go-flags, urfave/cli with feature matrix and API examples                                                        |
+| **P1**   | Fix stale ROADMAP.md                     | ✅ DONE          | ROADMAP.md updated — 12 completed items moved to "Completed (v2.2–v2.3)" section; unchecked aspirational items remain                                                      |
+| **P1**   | Add API stability statement              | ✅ DONE          | README now states: "The v2 API is stable and will only receive additive changes until v3"                                                                                  |
+| **P2**   | Add kitchen-sink or real-world example   | ❌ NOT DONE      | See "Not Started" section below                                                                                                                                            |
+| **P2**   | Add godoc examples for key APIs          | ✅ DONE          | `example_test.go` — Added 6 examples: `NewCLI`, `Provide`/`Invoke`, `OutputTable`, `TimingMiddleware`, `NewExitError`                                                      |
+| **P2**   | Add step-by-step tutorial                | ❌ NOT DONE      | See "Not Started" section below                                                                                                                                            |
+| **P2**   | Document performance / benchmark results | ✅ DONE          | `docs/PERFORMANCE.md` — Full benchmark table with overhead analysis (<10 µs startup, <10 ns validation)                                                                    |
+| **P2**   | Add SECURITY.md                          | ✅ DONE          | `SECURITY.md` — Supported versions, private reporting process, disclosure timeline, best practices                                                                         |
+| **P3**   | Add `--no-color` flag + documentation    | ❌ NOT DONE      | See "Not Started" section below                                                                                                                                            |
+| **P3**   | Add structured JSON error output         | ❌ NOT DONE      | See "Not Started" section below                                                                                                                                            |
+| **P3**   | Add issue/PR templates                   | ❌ NOT DONE      | See "Not Started" section below                                                                                                                                            |
+| **P3**   | Test all examples in CI                  | ❌ NOT DONE      | See "Not Started" section below                                                                                                                                            |
 
 ### Code Quality
 
@@ -49,24 +49,24 @@ Just completed a focused sprint addressing the `CONSUMER_PERSPECTIVE.md` audit d
 
 ### Files Created This Session
 
-| File | Purpose | Lines |
-| --- | --- | --- |
-| `docs/MIGRATION_FROM_COBRA.md` | Incremental migration guide for Cobra users | ~270 |
-| `docs/COMPARISON.md` | Framework comparison with alternatives | ~250 |
-| `docs/PERFORMANCE.md` | Benchmark results and overhead analysis | ~120 |
-| `pkg/cmdguard/v2/doc.go` | Comprehensive godoc package overview | ~170 |
-| `pkg/cmdguard/v2/testutil/testutil.go` | Public consumer test harness | ~95 |
-| `pkg/cmdguard/v2/testutil/testutil_test.go` | Tests for test harness | ~145 |
-| `SECURITY.md` | Security policy and vulnerability reporting | ~50 |
+| File                                        | Purpose                                     | Lines |
+| ------------------------------------------- | ------------------------------------------- | ----- |
+| `docs/MIGRATION_FROM_COBRA.md`              | Incremental migration guide for Cobra users | ~270  |
+| `docs/COMPARISON.md`                        | Framework comparison with alternatives      | ~250  |
+| `docs/PERFORMANCE.md`                       | Benchmark results and overhead analysis     | ~120  |
+| `pkg/cmdguard/v2/doc.go`                    | Comprehensive godoc package overview        | ~170  |
+| `pkg/cmdguard/v2/testutil/testutil.go`      | Public consumer test harness                | ~95   |
+| `pkg/cmdguard/v2/testutil/testutil_test.go` | Tests for test harness                      | ~145  |
+| `SECURITY.md`                               | Security policy and vulnerability reporting | ~50   |
 
 ### Files Modified This Session
 
-| File | Changes |
-| --- | --- |
-| `README.md` | Added API stability statement, 7 new feature rows, 2 new command options, BranchingFlowContext section, EditInEditor section, Migrating from Cobra link |
-| `ROADMAP.md` | Moved 12 completed items to new "Completed (v2.2–v2.3)" section |
-| `pkg/cmdguard/v2/errors.go` | Removed 2-line package comment (moved to doc.go) |
-| `pkg/cmdguard/v2/example_test.go` | Added 6 new godoc examples (~100 lines) |
+| File                              | Changes                                                                                                                                                 |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `README.md`                       | Added API stability statement, 7 new feature rows, 2 new command options, BranchingFlowContext section, EditInEditor section, Migrating from Cobra link |
+| `ROADMAP.md`                      | Moved 12 completed items to new "Completed (v2.2–v2.3)" section                                                                                         |
+| `pkg/cmdguard/v2/errors.go`       | Removed 2-line package comment (moved to doc.go)                                                                                                        |
+| `pkg/cmdguard/v2/example_test.go` | Added 6 new godoc examples (~100 lines)                                                                                                                 |
 
 ---
 
@@ -75,6 +75,7 @@ Just completed a focused sprint addressing the `CONSUMER_PERSPECTIVE.md` audit d
 ### README Updates
 
 The README now covers ~85% of the v2 API surface, up from ~60%. Remaining gaps:
+
 - `MustNewCommand` / `MustNewParentCommand` examples in README (only in godoc)
 - `WithConfigFileLoader` (only mentioned in features table, no code example)
 - `GenerateManPageCommand` (mentioned but no code example)
@@ -83,6 +84,7 @@ The README now covers ~85% of the v2 API surface, up from ~60%. Remaining gaps:
 ### Test Harness
 
 `pkg/cmdguard/v2/testutil` provides the core testing utilities but could be expanded:
+
 - No `AssertExitCode` helper (consumers must call `result.ExitCode()` manually)
 - No `AssertOutputContains` helper
 - No support for testing cobra `PersistentPreRunE` hooks in isolation
@@ -90,6 +92,7 @@ The README now covers ~85% of the v2 API surface, up from ~60%. Remaining gaps:
 ### Examples
 
 6 of 12 examples still have no test files. The CI runs `go test ./...` but only compiles them — it doesn't verify they work as documented:
+
 - `examples/config-file/`
 - `examples/counting/`
 - `examples/di-patterns/`
@@ -134,6 +137,7 @@ These items from CONSUMER_PERSPECTIVE.md were explicitly skipped in this session
 ### gopls LSP — 91 Spurious Import Cycle Errors
 
 **What it looks like:** Every single file in `pkg/cmdguard/v2/` shows:
+
 ```
 import cycle not allowed in test
 ```
@@ -230,6 +234,7 @@ Production CLIs expect this. Fang handles it implicitly via `lipgloss` but there
 I created `pkg/testutil/cli_test_helpers.go` (importing `pkg/cmdguard/v2`), which created a real import cycle because `pkg/cmdguard/v2` tests already imported `pkg/testutil`. I immediately recognized the issue, deleted both files from `pkg/testutil/`, and moved the code to `pkg/cmdguard/v2/testutil/` (a child package with no reverse import). `go build`, `go test`, and `golangci-lint` all pass. Yet gopls still reports 91 "import cycle not allowed in test" errors across every file in `pkg/cmdguard/v2/`.
 
 I've verified:
+
 - The old files no longer exist (`ls pkg/testutil/` confirms only `panic_test_helpers.go`)
 - The new package at `pkg/cmdguard/v2/testutil/` compiles and tests pass
 - No test file in `pkg/cmdguard/v2/` imports `pkg/testutil` (only `pkg/cmdguard/v2/testutil`)
@@ -242,13 +247,13 @@ I've verified:
 
 ### Test Counts by Package
 
-| Package | Tests | Coverage |
-| --- | --- | --- |
-| `pkg/cmdguard/v2` | ~240 | 84.0% |
-| `pkg/cmdguard/v2/testutil` | 5 | 88.2% |
-| `examples/*` | ~15 | varies |
-| `tests/integration` | ~10 | n/a |
-| **Total** | **~271** | **~84% core** |
+| Package                    | Tests    | Coverage      |
+| -------------------------- | -------- | ------------- |
+| `pkg/cmdguard/v2`          | ~240     | 84.0%         |
+| `pkg/cmdguard/v2/testutil` | 5        | 88.2%         |
+| `examples/*`               | ~15      | varies        |
+| `tests/integration`        | ~10      | n/a           |
+| **Total**                  | **~271** | **~84% core** |
 
 ### Git Status (This Session)
 
@@ -267,15 +272,15 @@ I've verified:
 
 ### Benchmark Summary
 
-| Metric | Value |
-| --- | --- |
-| `NewCLI` | ~7.4 µs, 86 allocs, ~8 KB |
-| `AddCommand` | ~8.5 µs, 95 allocs, ~9.5 KB |
-| `NewCommand` | ~76 ns, 1 alloc, ~240 B |
-| `Command.Validate` | ~8 ns, 0 allocs |
-| `Execute` (help) | ~919 µs (fang rendering dominates) |
-| `ParseFlagTags` (4 fields) | ~1.5 µs |
-| `Scope.Invoke` | ~179 ns |
+| Metric                     | Value                              |
+| -------------------------- | ---------------------------------- |
+| `NewCLI`                   | ~7.4 µs, 86 allocs, ~8 KB          |
+| `AddCommand`               | ~8.5 µs, 95 allocs, ~9.5 KB        |
+| `NewCommand`               | ~76 ns, 1 alloc, ~240 B            |
+| `Command.Validate`         | ~8 ns, 0 allocs                    |
+| `Execute` (help)           | ~919 µs (fang rendering dominates) |
+| `ParseFlagTags` (4 fields) | ~1.5 µs                            |
+| `Scope.Invoke`             | ~179 ns                            |
 
 ### Build Chain
 

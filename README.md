@@ -271,7 +271,7 @@ type Flags struct {
 ## Command Options
 
 | Option                          | Purpose                            |
-| ------------------------------- | ---------------------------------- |
+| ------------------------------- | ---------------------------------- | ------------------------------- |
 | `WithShort[T, F](short)`        | Short description                  |
 | `WithLong[T, F](long)`          | Long description                   |
 | `WithExample[T, F](example)`    | Example usage                      |
@@ -285,8 +285,8 @@ type Flags struct {
 | `WithExactArgs[T, F](n)`        | Require exactly n positional args  |
 | `WithMinimumArgs[T, F](n)`      | Require at least n positional args |
 | `WithMaximumArgs[T, F](n)`      | Allow at most n positional args    |
-|| `WithValidArgs[T, F](args...)`  | Restrict args to allowed values    |
-|| `WithSubcommands[T, F](cmds...)`| Attach child commands (parent)     |
+|                                 | `WithValidArgs[T, F](args...)`     | Restrict args to allowed values |
+|                                 | `WithSubcommands[T, F](cmds...)`   | Attach child commands (parent)  |
 | `WithRangeArgs[T, F](min, max)` | Require between min and max args   |
 | `WithNoArgs[T, F]()`            | Reject any positional args         |
 | `WithCompletion[T, F](fn)`      | Dynamic shell completion           |

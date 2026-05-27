@@ -7,14 +7,14 @@
 
 ## Summary
 
-| Framework | Stars | Cobra Integration | Struct Tags | Type Safety | DI | Typo Suggestions |
-| --- | --- | --- | --- | --- | --- | --- |
-| **cmdguard** | — | ✅ Native | ✅ | ✅ Compile-time | ✅ samber/do/v2 | ✅ |
-| **Kong** | ~2.4k | ❌ Separate framework | ✅ | ✅ Mapper interface | ❌ | ❌ |
-| **sflags** | ~167 | ✅ Native | ✅ | ❌ Runtime | ❌ | ❌ |
-| **go-flags** | ~2.6k | ❌ Separate framework | ✅ | ❌ Runtime | ❌ | ❌ |
-| **structcli** | ~8 | ✅ Native | ✅ | ❌ Runtime | ❌ | ❌ |
-| **urfave/cli** | ~22k | ❌ Separate framework | ❌ | ❌ Runtime | ❌ | ❌ |
+| Framework      | Stars | Cobra Integration     | Struct Tags | Type Safety         | DI              | Typo Suggestions |
+| -------------- | ----- | --------------------- | ----------- | ------------------- | --------------- | ---------------- |
+| **cmdguard**   | —     | ✅ Native             | ✅          | ✅ Compile-time     | ✅ samber/do/v2 | ✅               |
+| **Kong**       | ~2.4k | ❌ Separate framework | ✅          | ✅ Mapper interface | ❌              | ❌               |
+| **sflags**     | ~167  | ✅ Native             | ✅          | ❌ Runtime          | ❌              | ❌               |
+| **go-flags**   | ~2.6k | ❌ Separate framework | ✅          | ❌ Runtime          | ❌              | ❌               |
+| **structcli**  | ~8    | ✅ Native             | ✅          | ❌ Runtime          | ❌              | ❌               |
+| **urfave/cli** | ~22k  | ❌ Separate framework | ❌          | ❌ Runtime          | ❌              | ❌               |
 
 ---
 
@@ -86,23 +86,23 @@
 
 ## Feature Matrix
 
-| Feature | cmdguard | Kong | sflags | go-flags | urfave/cli |
-| --- | --- | --- | --- | --- | --- |
-| **Struct tags for flags** | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **Cobra integration** | ✅ Native | ❌ | ✅ Native | ❌ | ❌ |
-| **Compile-time type safety** | ✅ Generics | ⚠️ Mappers | ❌ | ❌ | ❌ |
-| **Required validation** | ✅ `required:"true"` | ✅ | ✅ | ✅ | ✅ |
-| **Typo suggestions** | ✅ Levenshtein | ❌ | ❌ | ❌ | ❌ |
-| **Custom types** | ✅ Enum, Duration, etc. | ✅ Mappers | ❌ | ⚠️ Limited | ❌ |
-| **Dependency injection** | ✅ samber/do/v2 | ❌ | ❌ | ❌ | ❌ |
-| **Environment variables** | ✅ `env:"VAR"` | ✅ | ✅ | ✅ | ✅ |
-| **Config files** | ✅ JSON/YAML/TOML | ✅ | ❌ | ❌ | ❌ |
-| **Shell completion** | ✅ | ✅ | ❌ | ❌ | ✅ |
-| **Middleware** | ✅ | ✅ | ❌ | ❌ | ✅ |
-| **Man page generation** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Zero panics** | ✅ | ✅ | N/A | N/A | N/A |
-| **Counting flags** | ✅ `-v`/`-vv`/`-vvv` | ❌ | ❌ | ❌ | ❌ |
-| **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅ | ❌ | ✅ | ✅ |
+| Feature                        | cmdguard                 | Kong       | sflags    | go-flags   | urfave/cli |
+| ------------------------------ | ------------------------ | ---------- | --------- | ---------- | ---------- |
+| **Struct tags for flags**      | ✅                       | ✅         | ✅        | ✅         | ❌         |
+| **Cobra integration**          | ✅ Native                | ❌         | ✅ Native | ❌         | ❌         |
+| **Compile-time type safety**   | ✅ Generics              | ⚠️ Mappers | ❌        | ❌         | ❌         |
+| **Required validation**        | ✅ `required:"true"`     | ✅         | ✅        | ✅         | ✅         |
+| **Typo suggestions**           | ✅ Levenshtein           | ❌         | ❌        | ❌         | ❌         |
+| **Custom types**               | ✅ Enum, Duration, etc.  | ✅ Mappers | ❌        | ⚠️ Limited | ❌         |
+| **Dependency injection**       | ✅ samber/do/v2          | ❌         | ❌        | ❌         | ❌         |
+| **Environment variables**      | ✅ `env:"VAR"`           | ✅         | ✅        | ✅         | ✅         |
+| **Config files**               | ✅ JSON/YAML/TOML        | ✅         | ❌        | ❌         | ❌         |
+| **Shell completion**           | ✅                       | ✅         | ❌        | ❌         | ✅         |
+| **Middleware**                 | ✅                       | ✅         | ❌        | ❌         | ✅         |
+| **Man page generation**        | ✅                       | ❌         | ❌        | ❌         | ❌         |
+| **Zero panics**                | ✅                       | ✅         | N/A       | N/A        | N/A        |
+| **Counting flags**             | ✅ `-v`/`-vv`/`-vvv`     | ❌         | ❌        | ❌         | ❌         |
+| **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅         | ❌        | ✅         | ✅         |
 
 ---
 
@@ -175,6 +175,7 @@ app := &cli.App{
 ## When to Choose Each
 
 **Choose cmdguard when:**
+
 - You're already using Cobra and want incremental improvements
 - You want compile-time type safety for flags
 - You need built-in dependency injection
@@ -182,16 +183,19 @@ app := &cli.App{
 - You're building a complex CLI with config files, middleware, and lifecycle management
 
 **Choose Kong when:**
+
 - You're starting a new project and don't mind adopting a full framework
 - You want a declarative, tag-driven API without Cobra
 - You need a plugin system for extensibility
 
 **Choose sflags when:**
+
 - You just want struct-tag flag generation for Cobra
 - You don't need DI, custom types, or typo suggestions
 - You want to stay close to raw Cobra
 
 **Choose urfave/cli when:**
+
 - You're building a simple CLI without many subcommands
 - You prefer an imperative API over struct tags
 - You value a large community and extensive examples
@@ -200,11 +204,11 @@ app := &cli.App{
 
 ## Migration Paths
 
-| From | To cmdguard | Effort |
-| --- | --- | --- |
-| Plain Cobra | Wrap root CLI, migrate commands one at a time | Low |
-| sflags | Replace flag definitions with cmdguard structs | Low |
-| Kong | Rewrite — different architecture | High |
-| urfave/cli | Rewrite — different architecture | High |
+| From        | To cmdguard                                    | Effort |
+| ----------- | ---------------------------------------------- | ------ |
+| Plain Cobra | Wrap root CLI, migrate commands one at a time  | Low    |
+| sflags      | Replace flag definitions with cmdguard structs | Low    |
+| Kong        | Rewrite — different architecture               | High   |
+| urfave/cli  | Rewrite — different architecture               | High   |
 
 See [MIGRATION_FROM_COBRA.md](MIGRATION_FROM_COBRA.md) for a step-by-step guide.

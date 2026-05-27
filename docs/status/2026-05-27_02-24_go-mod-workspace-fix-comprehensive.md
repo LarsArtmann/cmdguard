@@ -16,9 +16,11 @@
 ### This Session (Immediate Fix)
 
 - **Fixed `go mod tidy` failure** — `go mod tidy` was failing with:
+
   ```
   github.com/larsartmann/go-output/testhelpers/graphtest: reading .../go.mod at revision testhelpers/graphtest/v0.0.0: unknown revision
   ```
+
   Root cause: `go-output/serialization` has a test dependency on `go-output/testhelpers/graphtest`, which only exists as a local workspace module (not published to GitHub with a tag). `go mod tidy` tried to resolve it from the remote and failed.
 
 - **Added 11 `replace` directives to `go.mod`** — All `github.com/larsartmann/go-output/*` modules redirected to local relative paths (`../go-output/...`):
@@ -116,6 +118,7 @@ From TODO_LIST.md and broader backlog:
 The 11 `replace` directives in `go.mod` tie `cmdguard` to a very specific local filesystem layout. If you clone `cmdguard` without also having `go-output` at `../go-output` with the exact same commit state, the build fails.
 
 **Impact:**
+
 - GitHub Actions CI will fail on `go mod download`
 - External contributors cannot `go get` or `go install` this module
 - `go.work` at parent level partially mitigates this, but only for developers with the exact same monorepo layout
@@ -167,33 +170,33 @@ The 11 `replace` directives in `go.mod` tie `cmdguard` to a very specific local 
 
 ## f) Top #25 Things We Should Get Done Next
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | **Fix replace directive / external build** | CRITICAL | 1-2h | Dependencies |
-| 2 | Add tests for configload YAML/TOML loaders | High | 20m | Quality |
-| 3 | Auto-detect format in `WithConfigFile` by extension | High | 15m | UX |
-| 4 | Error on missing file when `--config` explicitly passed | High | 10m | UX |
-| 5 | Interactive prompts (`huh` integration) | Very High | 4h | Feature |
-| 6 | Fix `resolveConfigFlag` to use cobra flag parsing | High | 2h | Architecture |
-| 7 | Spinner/progress middleware (`bubbles`) | Medium | 2h | Feature |
-| 8 | Glamour markdown help rendering | Medium | 1h | Feature |
-| 9 | Telemetry middleware (OpenTelemetry) | Medium | 3h | Feature |
-| 10 | Plugin system for validators/type handlers | High | 6h | Architecture |
-| 11 | Config file `.env` support | Medium | 30m | Feature |
-| 12 | Nested struct config file support | Medium | 2h | Feature |
-| 13 | Config file write-back / save | Medium | 1h | Feature |
-| 14 | Config watching / hot-reload | Low | 3h | Feature |
-| 15 | CLI construction benchmark | Medium | 30m | Performance |
-| 16 | Flag parsing benchmark | Medium | 30m | Performance |
-| 17 | Command execution benchmark | Medium | 30m | Performance |
-| 18 | Benchmark regression detection in CI | Medium | 1h | CI/CD |
-| 19 | Codecov integration | Medium | 30m | CI/CD |
-| 20 | v2.3.0 release tag and notes | High | 30m | Release |
-| 21 | Release automation | Medium | 2h | CI/CD |
-| 22 | Consolidate 5 error types into `labeledError` | Medium | 1h | Architecture |
-| 23 | Split `type_handler.go` into 3 files | Low | 30m | Cleanup |
-| 24 | Split `command.go` — extract args options | Low | 30m | Cleanup |
-| 25 | Add `ConfigSource` enum for value tracking | Low | 1h | Architecture |
+| #   | Task                                                    | Impact    | Effort | Category     |
+| --- | ------------------------------------------------------- | --------- | ------ | ------------ |
+| 1   | **Fix replace directive / external build**              | CRITICAL  | 1-2h   | Dependencies |
+| 2   | Add tests for configload YAML/TOML loaders              | High      | 20m    | Quality      |
+| 3   | Auto-detect format in `WithConfigFile` by extension     | High      | 15m    | UX           |
+| 4   | Error on missing file when `--config` explicitly passed | High      | 10m    | UX           |
+| 5   | Interactive prompts (`huh` integration)                 | Very High | 4h     | Feature      |
+| 6   | Fix `resolveConfigFlag` to use cobra flag parsing       | High      | 2h     | Architecture |
+| 7   | Spinner/progress middleware (`bubbles`)                 | Medium    | 2h     | Feature      |
+| 8   | Glamour markdown help rendering                         | Medium    | 1h     | Feature      |
+| 9   | Telemetry middleware (OpenTelemetry)                    | Medium    | 3h     | Feature      |
+| 10  | Plugin system for validators/type handlers              | High      | 6h     | Architecture |
+| 11  | Config file `.env` support                              | Medium    | 30m    | Feature      |
+| 12  | Nested struct config file support                       | Medium    | 2h     | Feature      |
+| 13  | Config file write-back / save                           | Medium    | 1h     | Feature      |
+| 14  | Config watching / hot-reload                            | Low       | 3h     | Feature      |
+| 15  | CLI construction benchmark                              | Medium    | 30m    | Performance  |
+| 16  | Flag parsing benchmark                                  | Medium    | 30m    | Performance  |
+| 17  | Command execution benchmark                             | Medium    | 30m    | Performance  |
+| 18  | Benchmark regression detection in CI                    | Medium    | 1h     | CI/CD        |
+| 19  | Codecov integration                                     | Medium    | 30m    | CI/CD        |
+| 20  | v2.3.0 release tag and notes                            | High      | 30m    | Release      |
+| 21  | Release automation                                      | Medium    | 2h     | CI/CD        |
+| 22  | Consolidate 5 error types into `labeledError`           | Medium    | 1h     | Architecture |
+| 23  | Split `type_handler.go` into 3 files                    | Low       | 30m    | Cleanup      |
+| 24  | Split `command.go` — extract args options               | Low       | 30m    | Cleanup      |
+| 25  | Add `ConfigSource` enum for value tracking              | Low       | 1h     | Architecture |
 
 ---
 
@@ -217,22 +220,22 @@ The `replace` directives fix the immediate build but create a worse long-term pr
 
 ## Appendix: Raw Metrics
 
-| Metric | Value |
-|--------|-------|
-| Go version | 1.26.3 |
-| Total test runs | 932 |
-| v2 package coverage | 84.0% |
-| Lint issues | 0 |
-| Race conditions | 0 |
-| Build status | PASS |
-| `go.mod` direct deps | 13 |
-| `go.mod` indirect deps | 32 |
-| Replace directives | 11 |
-| Source files in `pkg/` | 111 |
-| Test files in `pkg/` | 68 |
-| Example directories | 14 |
-| Lines of code (`pkg/`) | ~19,125 |
-| Sentinel errors | 40+ |
-| Output formats | 12 |
-| Value types | 9 |
-| Middleware types | 2 built-in + custom |
+| Metric                 | Value               |
+| ---------------------- | ------------------- |
+| Go version             | 1.26.3              |
+| Total test runs        | 932                 |
+| v2 package coverage    | 84.0%               |
+| Lint issues            | 0                   |
+| Race conditions        | 0                   |
+| Build status           | PASS                |
+| `go.mod` direct deps   | 13                  |
+| `go.mod` indirect deps | 32                  |
+| Replace directives     | 11                  |
+| Source files in `pkg/` | 111                 |
+| Test files in `pkg/`   | 68                  |
+| Example directories    | 14                  |
+| Lines of code (`pkg/`) | ~19,125             |
+| Sentinel errors        | 40+                 |
+| Output formats         | 12                  |
+| Value types            | 9                   |
+| Middleware types       | 2 built-in + custom |

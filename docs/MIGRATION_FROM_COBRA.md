@@ -7,14 +7,14 @@
 
 ## Why Migrate?
 
-| Pain Point (Cobra) | cmdguard Solution |
-| --- | --- |
+| Pain Point (Cobra)                                                  | cmdguard Solution                                               |
+| ------------------------------------------------------------------- | --------------------------------------------------------------- |
 | `cmd.Flags().GetString("name")` — runtime lookups, easy to misspell | Struct tags: `Name string \`flag:"name"\`` — compile-time typed |
-| Flags defined far from where they're used | Flags live in a typed struct next to the handler |
-| Manual validation boilerplate | `required:"true"`, custom types, `WithPreRunE` hooks |
-| No built-in DI | `Provide`/`Invoke` with samber/do/v2 |
-| Missing flags fail at runtime | Missing flags fail at `AddCommand` time |
-| No typo suggestions for users | "did you mean?" for flags and subcommands |
+| Flags defined far from where they're used                           | Flags live in a typed struct next to the handler                |
+| Manual validation boilerplate                                       | `required:"true"`, custom types, `WithPreRunE` hooks            |
+| No built-in DI                                                      | `Provide`/`Invoke` with samber/do/v2                            |
+| Missing flags fail at runtime                                       | Missing flags fail at `AddCommand` time                         |
+| No typo suggestions for users                                       | "did you mean?" for flags and subcommands                       |
 
 ---
 
@@ -115,6 +115,7 @@ func main() {
 ```
 
 **What you get immediately:**
+
 - Type-safe root config (`AppConfig`)
 - Environment variable support (`env:"VERBOSE"`)
 - Optional DI scope for new services
@@ -197,6 +198,7 @@ func main() {
 ```
 
 **What changed:**
+
 - Flags moved from `init()` + `Flags().Get*` to a typed struct
 - `required:"true"` replaces `MarkFlagRequired`
 - Handler receives typed `*DeployFlags` instead of querying cobra flags
@@ -304,18 +306,18 @@ func main() {
 
 ## Side-by-Side Comparison
 
-| Task | Plain Cobra | cmdguard |
-| --- | --- | --- |
-| **Define a flag** | `cmd.Flags().StringP("name", "n", "World", "Name")` | `Name string \`flag:"name" short:"n" default:"World" help:"Name"\`` |
-| **Read a flag** | `cmd.Flags().GetString("name")` | `flags.Name` (typed) |
-| **Required flag** | `cmd.MarkFlagRequired("name")` | `required:"true"` struct tag |
-| **Add subcommand** | `parent.AddCommand(child)` | `NewParentCommand(..., []Command{child})` |
-| **Pre-run validation** | `PreRunE` func | `WithPreRunE[T, F](fn)` |
-| **Shared services** | Manual globals / closures | `Provide`/`Invoke` in DI scope |
-| **Env vars** | Manual `os.Getenv` | `env:"VAR_NAME"` struct tag |
-| **User typos** | "unknown flag" | "unknown flag: did you mean --name?" |
-| **Version command** | Write your own | `MustVersionCommand(cli)` |
-| **Exit codes** | `os.Exit(1)` | `NewExitError(code, err)` |
+| Task                   | Plain Cobra                                         | cmdguard                                                            |
+| ---------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| **Define a flag**      | `cmd.Flags().StringP("name", "n", "World", "Name")` | `Name string \`flag:"name" short:"n" default:"World" help:"Name"\`` |
+| **Read a flag**        | `cmd.Flags().GetString("name")`                     | `flags.Name` (typed)                                                |
+| **Required flag**      | `cmd.MarkFlagRequired("name")`                      | `required:"true"` struct tag                                        |
+| **Add subcommand**     | `parent.AddCommand(child)`                          | `NewParentCommand(..., []Command{child})`                           |
+| **Pre-run validation** | `PreRunE` func                                      | `WithPreRunE[T, F](fn)`                                             |
+| **Shared services**    | Manual globals / closures                           | `Provide`/`Invoke` in DI scope                                      |
+| **Env vars**           | Manual `os.Getenv`                                  | `env:"VAR_NAME"` struct tag                                         |
+| **User typos**         | "unknown flag"                                      | "unknown flag: did you mean --name?"                                |
+| **Version command**    | Write your own                                      | `MustVersionCommand(cli)`                                           |
+| **Exit codes**         | `os.Exit(1)`                                        | `NewExitError(code, err)`                                           |
 
 ---
 
@@ -343,12 +345,12 @@ This lets you migrate command-by-command without a big-bang rewrite.
 
 cmdguard commands support the same lifecycle hooks as Cobra:
 
-| Cobra Hook | cmdguard Equivalent |
-| --- | --- |
-| `PreRunE` | `WithPreRunE[T, F](fn)` |
-| `PostRunE` | `WithPostRunE[T, F](fn)` |
+| Cobra Hook          | cmdguard Equivalent                |
+| ------------------- | ---------------------------------- |
+| `PreRunE`           | `WithPreRunE[T, F](fn)`            |
+| `PostRunE`          | `WithPostRunE[T, F](fn)`           |
 | `PersistentPreRunE` | Use middleware or register on root |
-| `RunE` | Handler passed to `NewCommand` |
+| `RunE`              | Handler passed to `NewCommand`     |
 
 ### Converting Global/Persistent Flags
 
