@@ -269,8 +269,14 @@ linters:
         linters:
           - funlen
           - cyclop
+          - gocognit
+          - maintidx
           - err113
           - mnd
+          - nlreturn
+          - nonamedreturns
+          - perfsprint
+          - wsl_v5
           - wrapcheck
           - forbidigo
       - path: benchmarks/
@@ -398,6 +404,7 @@ linters:
           - gochecknoglobals
           - varnamelen
           - ireturn
+          - maintidx
       - path: benchmarks/
         linters:
           - gochecknoglobals

@@ -30,6 +30,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -56,8 +57,8 @@ type ListFlags struct {
 }
 
 type AddFlags struct {
-	Title    string `flag:"title"    short:"t" required:"true"  help:"Task title"`
-	Priority string `flag:"priority" short:"p" default:"medium" help:"Task priority (low, medium, high)"`
+	Title    string `flag:"title"    short:"t" required:"true" help:"Task title"`
+	Priority string `flag:"priority" short:"p"                 help:"Task priority (low, medium, high)" default:"medium"`
 }
 
 type DoneFlags struct {
@@ -94,7 +95,7 @@ func (t Task) Row() []string {
 	}
 
 	return []string{
-		fmt.Sprintf("%d", t.ID),
+		strconv.FormatUint(uint64(t.ID), 10),
 		t.Title,
 		string(t.Priority),
 		status,
@@ -117,7 +118,6 @@ var (
 
 func NewTaskStore(i do.Injector) (*TaskStore, error) {
 	scope, err := v2.NewScopeFromInjector(i, "provider")
-
 	if err != nil {
 		return nil, fmt.Errorf("create scope: %w", err)
 	}
@@ -189,11 +189,10 @@ func (s *TaskStore) List(filterPriority string, showAll bool) []Task {
 	return result
 }
 
-func (s *TaskStore) Stats() (total, pending, done int, byPriority map[Priority]int) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *TaskStore) Stats() (int, int, int, map[Priority]int) {
+	var total, pending, done int
 
-	byPriority = map[Priority]int{}
+	byPriority := map[Priority]int{}
 
 	for _, t := range s.tasks {
 		total++
@@ -380,6 +379,7 @@ func main() {
 			task, err := store.Done(flags.ID)
 			if err != nil {
 				exitErr, _ := v2.NewExitError(2, v2.NewCommandError("done", err))
+
 				return exitErr
 			}
 
@@ -425,12 +425,12 @@ func main() {
 			headers := []string{"Metric", "Value"}
 
 			rows := [][]string{
-				{"Total", fmt.Sprintf("%d", total)},
-				{"Pending", fmt.Sprintf("%d", pending)},
-				{"Done", fmt.Sprintf("%d", done)},
-				{"High Priority", fmt.Sprintf("%d", byPriority[PriorityHigh])},
-				{"Medium Priority", fmt.Sprintf("%d", byPriority[PriorityMedium])},
-				{"Low Priority", fmt.Sprintf("%d", byPriority[PriorityLow])},
+				{"Total", strconv.Itoa(total)},
+				{"Pending", strconv.Itoa(pending)},
+				{"Done", strconv.Itoa(done)},
+				{"High Priority", strconv.Itoa(byPriority[PriorityHigh])},
+				{"Medium Priority", strconv.Itoa(byPriority[PriorityMedium])},
+				{"Low Priority", strconv.Itoa(byPriority[PriorityLow])},
 			}
 
 			return v2.OutputTable(format, headers, rows)
