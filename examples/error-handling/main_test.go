@@ -17,7 +17,8 @@ func TestErrorHandlingExample_Creation(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[AppConfig, *FetchFlags]("fetch",
+	cmd, err := v2.NewCommand[AppConfig, *FetchFlags](
+		"fetch",
 		func(_ context.Context, _ *AppConfig, _ *FetchFlags) error { return nil },
 		v2.WithShort[AppConfig, *FetchFlags]("Fetch a URL"),
 		v2.WithFlags[AppConfig, *FetchFlags](&FetchFlags{}),

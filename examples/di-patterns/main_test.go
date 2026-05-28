@@ -17,7 +17,8 @@ func TestDIPatternsExample_Creation(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("list",
+	cmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"list",
 		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error { return nil },
 		v2.WithShort[AppConfig, v2.NoFlags]("List items"),
 	)

@@ -99,6 +99,7 @@ if err := v2.AddCommand(cli, addCmd); err != nil {
 ```
 
 **Key points:**
+
 - `Command[AppConfig, *AddFlags]` — first type param is the shared config, second is per-command flags
 - `required:"true"` makes the flag mandatory — cmdguard enforces this automatically
 - Flags are defined as struct tags, not string lookups

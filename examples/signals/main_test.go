@@ -17,7 +17,8 @@ func TestSignalsExample_Creation(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[AppConfig, *ServeFlags]("serve",
+	cmd, err := v2.NewCommand[AppConfig, *ServeFlags](
+		"serve",
 		func(_ context.Context, _ *AppConfig, _ *ServeFlags) error { return nil },
 		v2.WithShort[AppConfig, *ServeFlags]("Start server"),
 		v2.WithFlags[AppConfig, *ServeFlags](&ServeFlags{}),

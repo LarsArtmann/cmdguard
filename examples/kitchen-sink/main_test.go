@@ -18,7 +18,8 @@ func TestKitchenSinkExample_Creation(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[AppConfig, *ListFlags]("list",
+	cmd, err := v2.NewCommand[AppConfig, *ListFlags](
+		"list",
 		func(_ context.Context, _ *AppConfig, _ *ListFlags) error { return nil },
 		v2.WithShort[AppConfig, *ListFlags]("List tasks"),
 		v2.WithFlags[AppConfig, *ListFlags](&ListFlags{}),

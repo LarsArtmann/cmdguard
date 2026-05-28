@@ -23,7 +23,8 @@ func TestCountingExample_Creation(t *testing.T) {
 
 	cli := newTestCLI(t)
 
-	cmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+	cmd, err := v2.NewCommand[AppConfig, *GreetFlags](
+		"greet",
 		func(_ context.Context, _ *AppConfig, _ *GreetFlags) error { return nil },
 		v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
 		v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),

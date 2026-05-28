@@ -17,7 +17,8 @@ func TestOutputExample_Creation(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[AppConfig, *ListFlags]("users",
+	cmd, err := v2.NewCommand[AppConfig, *ListFlags](
+		"users",
 		func(_ context.Context, _ *AppConfig, _ *ListFlags) error { return nil },
 		v2.WithShort[AppConfig, *ListFlags]("List users"),
 		v2.WithFlags[AppConfig, *ListFlags](&ListFlags{}),

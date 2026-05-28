@@ -18,7 +18,8 @@ func TestEnvTagsExample_Creation(t *testing.T) {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	cmd, err := v2.NewCommand[AppConfig, *DBFlags]("show",
+	cmd, err := v2.NewCommand[AppConfig, *DBFlags](
+		"show",
 		func(_ context.Context, _ *AppConfig, _ *DBFlags) error { return nil },
 		v2.WithShort[AppConfig, *DBFlags]("Show DB config"),
 		v2.WithFlags[AppConfig, *DBFlags](&DBFlags{}),

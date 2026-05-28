@@ -307,22 +307,22 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 )
 ```
 
-| Option                         | Purpose                                         |
-| ------------------------------ | ----------------------------------------------- |
-| `WithCLIVersion[T](v)`         | Version string                                  |
-| `WithCLILong[T](desc)`         | Long description                                |
-| `WithSilenceErrors[T]()`       | Suppress error printing                         |
-| `WithSilenceUsage[T]()`        | Suppress usage on error                         |
-| `WithFang[T](bool)`            | Styled help output                              |
-| `WithEnvPrefix[T](prefix)`     | Prefix for env vars                             |
-| `WithSignalHandling[T]()`      | Cancel context on SIGINT/SIGTERM                |
-| `WithMiddleware[T](mw...)`     | Middleware for all commands                     |
-| `WithGroup[T](id, title)`      | Help group on root                              |
-| `WithConfigValidation[T](fn)`  | Validate config after flag parsing              |
-| `WithStrictValidation[T]()`    | Require `WithShort` on all commands             |
-| `WithDraconianValidation[T]()` | Strict + require `WithExample` on leaf commands |
-| `WithConfigFile[T](paths...)` | Auto-load JSON config from first found path  |
-| `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML) |
+| Option                                 | Purpose                                         |
+| -------------------------------------- | ----------------------------------------------- |
+| `WithCLIVersion[T](v)`                 | Version string                                  |
+| `WithCLILong[T](desc)`                 | Long description                                |
+| `WithSilenceErrors[T]()`               | Suppress error printing                         |
+| `WithSilenceUsage[T]()`                | Suppress usage on error                         |
+| `WithFang[T](bool)`                    | Styled help output                              |
+| `WithEnvPrefix[T](prefix)`             | Prefix for env vars                             |
+| `WithSignalHandling[T]()`              | Cancel context on SIGINT/SIGTERM                |
+| `WithMiddleware[T](mw...)`             | Middleware for all commands                     |
+| `WithGroup[T](id, title)`              | Help group on root                              |
+| `WithConfigValidation[T](fn)`          | Validate config after flag parsing              |
+| `WithStrictValidation[T]()`            | Require `WithShort` on all commands             |
+| `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands |
+| `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path     |
+| `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML)      |
 
 ---
 

@@ -279,7 +279,8 @@ func main() {
 	scope := cli.Scope()
 
 	// list — shows tasks in multiple output formats
-	listCmd, err := v2.NewCommand[AppConfig, *ListFlags]("list",
+	listCmd, err := v2.NewCommand[AppConfig, *ListFlags](
+		"list",
 		func(_ context.Context, _ *AppConfig, flags *ListFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -324,7 +325,8 @@ func main() {
 	}
 
 	// add — with PreRunE validation
-	addCmd, err := v2.NewCommand[AppConfig, *AddFlags]("add",
+	addCmd, err := v2.NewCommand[AppConfig, *AddFlags](
+		"add",
 		func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -369,7 +371,8 @@ func main() {
 	}
 
 	// done — with exit codes and PostRunE cleanup
-	doneCmd, err := v2.NewCommand[AppConfig, *DoneFlags]("done",
+	doneCmd, err := v2.NewCommand[AppConfig, *DoneFlags](
+		"done",
 		func(_ context.Context, _ *AppConfig, flags *DoneFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -408,7 +411,8 @@ func main() {
 	}
 
 	// stats — statistics with multi-format output
-	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags]("stats",
+	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags](
+		"stats",
 		func(_ context.Context, _ *AppConfig, flags *StatsFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -448,7 +452,8 @@ func main() {
 	}
 
 	// health — system command with health check
-	healthCmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("health",
+	healthCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+		"health",
 		func(ctx context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			if err := cli.HealthCheckWithContext(ctx); err != nil {
 				fmt.Printf("UNHEALTHY: %v\n", err)
