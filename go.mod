@@ -5,13 +5,13 @@ go 1.26.3
 require (
 	charm.land/fang/v2 v2.0.1
 	github.com/larsartmann/go-branded-id v0.3.0
-	github.com/larsartmann/go-output v0.6.0
-	github.com/larsartmann/go-output/d2 v0.0.0
-	github.com/larsartmann/go-output/delimited v0.0.0
-	github.com/larsartmann/go-output/graph v0.0.0
-	github.com/larsartmann/go-output/markup v0.0.0
-	github.com/larsartmann/go-output/serialization v0.0.0
-	github.com/larsartmann/go-output/table v0.0.0
+	github.com/larsartmann/go-output v0.6.1
+	github.com/larsartmann/go-output/d2 v0.6.1
+	github.com/larsartmann/go-output/delimited v0.6.1
+	github.com/larsartmann/go-output/graph v0.6.1
+	github.com/larsartmann/go-output/markup v0.6.1
+	github.com/larsartmann/go-output/serialization v0.6.1
+	github.com/larsartmann/go-output/table v0.6.1
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -38,10 +38,10 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
-	github.com/larsartmann/go-output/enum v0.0.0 // indirect
-	github.com/larsartmann/go-output/escape v0.0.0 // indirect
+	github.com/larsartmann/go-output/enum v0.6.1 // indirect
+	github.com/larsartmann/go-output/escape v0.6.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
-	github.com/mattn/go-runewidth v0.0.23 // indirect
+	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
