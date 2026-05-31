@@ -59,4 +59,4 @@ Copy/paste detection report
 config-file
 /kitchen-sink
 # Nix build output
-/result
+/result/taskctl
