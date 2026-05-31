@@ -55,9 +55,9 @@ func TestExitError(t *testing.T) {
 		err, _ := NewExitError(5, errors.New("wrapped"))
 		wrapped := fmt.Errorf("outer: %w", err)
 
-		var exitCoder ExitCoder
-		if !errors.As(wrapped, &exitCoder) {
-			t.Fatal("expected errors.As to find ExitCoder")
+		exitCoder, ok := errors.AsType[ExitCoder](wrapped)
+		if !ok {
+			t.Fatal("expected errors.AsType to find ExitCoder")
 		}
 
 		testutil.AssertFieldEq(t, exitCoder.ExitCode(), 5, "ExitCode()")
@@ -86,8 +86,7 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 		err = cli.ExecuteWithArgs(context.Background(), []string{"fail"})
 		testutil.AssertExpectedError(t, err)
 
-		var exitCoder ExitCoder
-		if errors.As(err, &exitCoder) {
+		if _, ok := errors.AsType[ExitCoder](err); ok {
 			t.Error("plain error should not implement ExitCoder")
 		}
 	})
@@ -112,8 +111,8 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 		err = cli.ExecuteWithArgs(context.Background(), []string{"fail-custom"})
 		testutil.AssertExpectedError(t, err)
 
-		var exitCoder ExitCoder
-		if !errors.As(err, &exitCoder) {
+		exitCoder, ok := errors.AsType[ExitCoder](err)
+		if !ok {
 			t.Fatal("expected error to implement ExitCoder")
 		}
 

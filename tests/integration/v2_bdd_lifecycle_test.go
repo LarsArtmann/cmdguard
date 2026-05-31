@@ -519,9 +519,9 @@ func TestCLI_ErrorChains(t *testing.T) {
 				t.Fatal("expected error")
 			}
 
-			var exitCoder v2.ExitCoder
-			if !errors.As(err, &exitCoder) {
-				t.Fatal("expected errors.As to find ExitCoder")
+			exitCoder, ok := errors.AsType[v2.ExitCoder](err)
+			if !ok {
+				t.Fatal("expected errors.AsType to find ExitCoder")
 			}
 
 			if exitCoder.ExitCode() != 42 {

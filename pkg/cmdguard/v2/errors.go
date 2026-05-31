@@ -334,6 +334,7 @@ func NewServiceError(serviceType string, err error) *ServiceError {
 // When ExecuteAndExit encounters an error implementing ExitCoder, it uses the returned
 // code instead of the default 1.
 type ExitCoder interface {
+	error
 	ExitCode() int
 }
 

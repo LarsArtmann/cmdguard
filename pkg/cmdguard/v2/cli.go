@@ -234,9 +234,7 @@ func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 	if err != nil {
 		code := 1
 
-		var exitCoder ExitCoder
-
-		if errors.As(err, &exitCoder) {
+		if exitCoder, ok := errors.AsType[ExitCoder](err); ok {
 			code = exitCoder.ExitCode()
 		}
 

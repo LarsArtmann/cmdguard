@@ -132,8 +132,7 @@
 //
 // Check for custom exit codes with the ExitCoder interface:
 //
-//	var exitCoder v2.ExitCoder
-//	if errors.As(err, &exitCoder) {
+//	if exitCoder, ok := errors.AsType[v2.ExitCoder](err); ok {
 //	    fmt.Println("Exit code:", exitCoder.ExitCode())
 //	}
 //

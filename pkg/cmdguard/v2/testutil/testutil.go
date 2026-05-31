@@ -26,8 +26,7 @@ func (r *TestResult) ExitCode() int {
 		return 0
 	}
 
-	var exitCoder v2.ExitCoder
-	if errors.As(r.Error, &exitCoder) {
+	if exitCoder, ok := errors.AsType[v2.ExitCoder](r.Error); ok {
 		return exitCoder.ExitCode()
 	}
 

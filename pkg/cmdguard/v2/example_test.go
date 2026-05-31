@@ -168,7 +168,7 @@ func ExampleOutputTable() {
 
 	fmt.Println("output rendered")
 	// Output:
-	// {"Headers":["Name","Age"],"Rows":[["Alice","30"],["Bob","25"]]}
+	// {"Headers":["Name","Age"],"Rows":[["Alice","30"],["Bob","25"]],"Footer":null}
 	// output rendered
 }
 
@@ -197,8 +197,7 @@ func ExampleNewExitError() {
 		return
 	}
 
-	var exitCoder v2.ExitCoder
-	if errors.As(exitErr, &exitCoder) {
+	if exitCoder, ok := errors.AsType[v2.ExitCoder](exitErr); ok {
 		fmt.Println("exit code:", exitCoder.ExitCode())
 	}
 	// Output: exit code: 2
