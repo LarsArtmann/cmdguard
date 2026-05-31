@@ -135,6 +135,9 @@ cmdguard/
 | `github.com/samber/do/v2`          | Dependency injection | v2.0.0  |
 | `github.com/spf13/pflag`           | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`               | Cobra styling        | v2.0.1  |
+| `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
+| `github.com/charmbracelet/glamour` | Markdown rendering   | v1.0.0  |
+| `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
 | `github.com/larsartmann/go-output` | Rich output formats  | latest  |
 
 ---
@@ -512,6 +515,9 @@ go build ./...                                   # Verify build
 13. **ValidationMode enum** - `Lenient`/`Strict`/`Draconian` spectrum, `>=` comparison
 14. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
 15. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
+16. **Spinner middleware** — `SpinnerMiddleware[T](title)` shows a lipgloss-styled spinner on stderr; skips when not a terminal
+17. **Glamour help** — `WithGlamourHelp[T]()` renders command `Long` and `Example` fields via glamour markdown; applied recursively to all commands at registration time
+18. **Telemetry middleware** — `TelemetryMiddleware[T](tracer)` creates an OpenTelemetry span per command; requires `go.opentelemetry.io/otel/trace.Tracer`; `WithTelemetry[T](tracer)` is the convenience CLI option
 
 ### Key Gotchas
 
@@ -534,6 +540,10 @@ go build ./...                                   # Verify build
 16. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
 17. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
 18. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
+19. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
+20. **Glamour auto theme** — `WithGlamourHelp` uses glamour's "auto" theme which detects terminal capabilities; in non-TTY environments markdown syntax may be preserved with padding
+21. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
+22. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
 19. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
 20. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
 21. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
