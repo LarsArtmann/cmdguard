@@ -9,7 +9,7 @@ import (
 
 // WithGlamourHelp enables markdown rendering for command help text.
 // When enabled, the Long and Example fields of all commands are passed
-// through glamour for styled terminal output.
+// through glamour for styled terminal output using the "auto" theme.
 //
 // Usage:
 //
@@ -19,28 +19,45 @@ import (
 func WithGlamourHelp[T any]() CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.glamourHelp = true
+		cli.glamourTheme = "auto"
+	}
+}
+
+// WithGlamourHelpTheme enables markdown rendering with a specific glamour theme.
+// Supported themes: "ascii", "auto", "dark", "dracula", "light", "notty",
+// "pink", "tokyo-night".
+//
+// Usage:
+//
+//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+//	    v2.WithGlamourHelpTheme[Config]("dark"),
+//	)
+func WithGlamourHelpTheme[T any](theme string) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.glamourHelp = true
+		cli.glamourTheme = theme
 	}
 }
 
 // applyGlamourHelp recursively renders command Long and Example descriptions
 // with glamour. It mutates the cobra command fields in place.
-func applyGlamourHelp(cmd *cobra.Command) {
+func applyGlamourHelp(cmd *cobra.Command, theme string) {
 	if cmd.Long != "" {
-		rendered, err := glamour.Render(cmd.Long, "auto")
+		rendered, err := glamour.Render(cmd.Long, theme)
 		if err == nil {
 			cmd.Long = rendered
 		}
 	}
 
 	if cmd.Example != "" {
-		rendered, err := glamour.Render(cmd.Example, "auto")
+		rendered, err := glamour.Render(cmd.Example, theme)
 		if err == nil {
 			cmd.Example = rendered
 		}
 	}
 
 	for _, sub := range cmd.Commands() {
-		applyGlamourHelp(sub)
+		applyGlamourHelp(sub, theme)
 	}
 }
 

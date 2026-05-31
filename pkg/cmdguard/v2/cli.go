@@ -38,6 +38,7 @@ type CLI[T any] struct {
 	configFilePaths  []string
 	configFileLoader ConfigFileLoader
 	glamourHelp      bool
+	glamourTheme     string
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -144,9 +145,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		return cli.parseOutputFlag(c)
 	}
 
-	if cli.glamourHelp {
-		applyGlamourHelp(cli.rootCmd)
-	}
+
 
 	return nil
 }
@@ -170,9 +169,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 
 	cli.rootCmd.AddCommand(cobraCmd)
 
-	if cli.glamourHelp {
-		applyGlamourHelp(cobraCmd)
-	}
+
 
 	return nil
 }

@@ -66,6 +66,33 @@ func TestWithGlamourHelp(t *testing.T) {
 	if !cli.glamourHelp {
 		t.Error("glamourHelp should be true")
 	}
+
+	if cli.glamourTheme != "auto" {
+		t.Errorf("expected theme %q, got %q", "auto", cli.glamourTheme)
+	}
+}
+
+func TestWithGlamourHelpTheme(t *testing.T) {
+	t.Parallel()
+
+	type testConfig struct{}
+
+	cli, err := NewCLI[testConfig](
+		"test", "Test CLI", testConfig{},
+		WithGlamourHelpTheme[testConfig]("dark"),
+		WithFang[testConfig](false),
+	)
+	if err != nil {
+		t.Fatalf("NewCLI failed: %v", err)
+	}
+
+	if !cli.glamourHelp {
+		t.Error("glamourHelp should be true")
+	}
+
+	if cli.glamourTheme != "dark" {
+		t.Errorf("expected theme %q, got %q", "dark", cli.glamourTheme)
+	}
 }
 
 func TestApplyGlamourHelp(t *testing.T) {
@@ -78,7 +105,7 @@ func TestApplyGlamourHelp(t *testing.T) {
 		Long:  original,
 	}
 
-	applyGlamourHelp(cmd)
+	applyGlamourHelp(cmd, "auto")
 
 	if cmd.Long == "" {
 		t.Error("Long should not be empty after glamour")
@@ -99,7 +126,7 @@ func TestApplyGlamourHelp_Example(t *testing.T) {
 		Example: original,
 	}
 
-	applyGlamourHelp(cmd)
+	applyGlamourHelp(cmd, "auto")
 
 	if cmd.Example == "" {
 		t.Error("Example should not be empty after glamour")
@@ -127,7 +154,7 @@ func TestApplyGlamourHelp_Subcommands(t *testing.T) {
 
 	parent.AddCommand(child)
 
-	applyGlamourHelp(parent)
+	applyGlamourHelp(parent, "auto")
 
 	if child.Long == "" {
 		t.Error("child Long should not be empty after glamour")
