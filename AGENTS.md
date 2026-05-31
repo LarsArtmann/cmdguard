@@ -361,6 +361,34 @@ cmd, err := v2.NewCommand[AppConfig, *Flags]("example", runHandler,
 )
 ```
 
+### Middleware
+
+```go
+// Timing middleware — logs execution duration
+cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+    v2.WithMiddleware(v2.TimingMiddleware[Config](func(name string, d time.Duration) {
+        log.Printf("%s took %v", name, d)
+    })),
+)
+
+// Recovery middleware — catches panics
+cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+    v2.WithMiddleware(v2.RecoveryMiddleware[Config]()),
+)
+
+// Spinner middleware — shows terminal spinner
+cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+    v2.WithMiddleware(v2.SpinnerMiddleware[Config]("Loading...")),
+)
+
+// Telemetry middleware — OpenTelemetry spans
+import "go.opentelemetry.io/otel"
+tracer := otel.Tracer("myapp")
+cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+    v2.WithTelemetry[Config](tracer), // or WithMiddleware(TelemetryMiddleware[Config](tracer))
+)
+```
+
 ### BranchingFlowContext
 
 Automatically created on `Execute`. Access via `GetBranchingFlowContext(ctx)` in handlers.
@@ -403,6 +431,15 @@ cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
     v2.WithCLIVersion[Config]("1.0.0"),
 )
 v2.AddCommand(cli, v2.MustVersionCommand[Config](cli))
+```
+
+### Markdown Help (glamour)
+
+```go
+cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
+    v2.WithGlamourHelp[Config](),
+)
+// Command Long and Example fields are rendered as markdown in terminal help
 ```
 
 ### Strict Validation
