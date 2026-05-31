@@ -84,7 +84,7 @@ examples/taskctl/
 ├── main.go        # CLI construction, DI setup, all CLI options
 ├── commands.go    # All command definitions with options
 ├── types.go       # Config, flags, domain types, TaskStore service
-├── main_test.go   # Comprehensive integration tests (~65 tests)
+├── main_test.go   # Comprehensive integration tests (~66 tests)
 └── README.md      # This file
 ```
 

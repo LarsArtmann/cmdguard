@@ -1,18 +1,17 @@
 // Package main demonstrates every major cmdguard feature in a production-grade task manager.
 //
 // Features shown:
-//   - Type-safe config with env var bindings and counting flags
+//   - Type-safe config with env var bindings, counting flags, and validated types (Email, URL, LogLevel, Duration, Port)
 //   - Dependency injection with lifecycle hooks (HealthCheck, Shutdown)
-//   - Per-command typed flags with prompt, required, and validate tags
+//   - Per-command typed flags with prompt, required, validate, and values tags
 //   - PreRunE validation and PostRunE cleanup
 //   - Middleware (timing + recovery)
-//   - Rich output in multiple formats (OutputTable)
+//   - Rich output in multiple formats (OutputTable, OutputStyledTable)
 //   - Command groups (WithGroup)
 //   - Subcommands via NewParentCommand
 //   - Error handling with typed errors and exit codes
 //   - Signal handling for graceful shutdown
 //   - Config file loading (JSON)
-//   - Interactive prompts via WithPromptOnMissing
 //   - Shell completion via WithCompletion
 //   - Hidden and deprecated commands
 //   - Command aliases
