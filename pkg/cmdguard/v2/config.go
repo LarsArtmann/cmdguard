@@ -28,6 +28,7 @@ type FlagTag struct {
 	Validate string // Raw validate tag value (e.g., "min=1,max=100")
 	Env      string // Environment variable name (e.g., "DB_HOST")
 	Count    bool   // Counting flag: -vvv → 3
+	Prompt   string // Interactive prompt title when flag is missing
 }
 
 // ValidateConfig validates a config struct.

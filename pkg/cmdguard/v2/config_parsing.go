@@ -130,6 +130,11 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		tag.Count = count
 	}
 
+	// Parse prompt tag (interactive prompt when flag is missing)
+	if prompt := field.Tag.Get("prompt"); prompt != "" {
+		tag.Prompt = prompt
+	}
+
 	return tag, true, nil
 }
 

@@ -114,7 +114,7 @@
 ### 🔮 Future (v3.0+)
 
 - [x] Config file auto-loading (YAML/TOML/JSON) — custom implementation, no koanf needed
-- [ ] Interactive prompts (huh integration) with `WithPromptOnMissing`
+- [x] Interactive prompts (huh integration) with `WithPromptOnMissing`
 - [ ] Spinner/progress middleware (bubbles)
 - [ ] Glamour markdown help rendering
 - [ ] Telemetry middleware (OpenTelemetry spans)

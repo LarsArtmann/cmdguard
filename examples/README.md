@@ -26,28 +26,30 @@ go run examples/basic/main.go hello
 | **signals**        | Signal handling, graceful shutdown              | `go run examples/signals/main.go serve`                           |
 | **subcommands**    | NewParentCommand, command groups                | `go run examples/subcommands/main.go migrate up --env=production` |
 | **kitchen-sink**   | Full task manager (all features combined)       | `go run examples/kitchen-sink/main.go list`                       |
+| **prompts**        | Interactive prompts with `WithPromptOnMissing`  | `go run examples/prompts/main.go deploy`                         |
 
 ## Feature Matrix
 
-| Feature             | basic | typed | di  | di-patterns | advanced-flags | validation | env-tags | output | counting | error-handling | signals | subcommands | kitchen-sink |
+| Feature             | basic | typed | di  | di-patterns | advanced-flags | validation | env-tags | output | counting | error-handling | signals | subcommands | kitchen-sink | prompts |
 | ------------------- | ----- | ----- | --- | ----------- | -------------- | ---------- | -------- | ------ | -------- | -------------- | ------- | ----------- | ------------ |
-| NewCLI              | x     | x     | x   | x           | x              | x          | x        | x      | x        | x              | x       | x           | x            |
-| NewCommand          | x     | x     | x   | x           | x              | x          | x        | x      | x        | x              | x       | x           | x            |
-| WithFlags           |       | x     |     | x           | x              | x          | x        | x      | x        | x              | x       | x           | x            |
-| PreRunE             |       |       |     |             | x              | x          |          |        |          | x              |         |             | x            |
-| PostRunE            |       |       |     |             |                |            |          |        |          |                |         |             | x            |
-| DI (Provide/Invoke) |       | x     | x   | x           |                |            |          |        |          |                |         |             | x            |
-| env tags            |       |       |     |             |                |            | x        |        |          |                |         |             | x            |
-| WithEnvPrefix       |       |       |     |             |                |            | x        |        |          |                |         |             | x            |
-| count:"true"        |       |       |     |             |                |            |          |        | x        |                |         |             |              |
-| OutputTable         |       |       |     |             |                |            |          | x      |          |                |         |             | x            |
-| Signal handling     |       |       |     |             |                |            |          |        |          |                | x       |             | x            |
-| Error wrapping      |       |       |     |             |                |            |          |        |          | x              |         |             | x            |
-| NewParentCommand    |       |       |     |             |                |            |          |        |          |                |         | x           |              |
-| Middleware          |       |       |     |             |                |            |          |        |          |                |         |             | x            |
-| Version command     |       |       |     |             |                |            |          |        |          |                |         |             | x            |
-| Command groups      |       |       |     |             |                |            |          |        |          |                |         | x           | x            |
-| MustNewCommand      |       |       |     |             |                |            |          |        |          |                |         |             | x            |
+| NewCLI              | x     | x     | x   | x           | x              | x          | x        | x      | x        | x              | x       | x           | x            | x       |
+| NewCommand          | x     | x     | x   | x           | x              | x          | x        | x      | x        | x              | x       | x           | x            | x       |
+| WithFlags           |       | x     |     | x           | x              | x          | x        | x      | x        | x              | x       | x           | x            | x       |
+| PreRunE             |       |       |     |             | x              | x          |          |        |          | x              |         |             | x            |         |
+| PostRunE            |       |       |     |             |                |            |          |        |          |                |         |             | x            |         |
+| DI (Provide/Invoke) |       | x     | x   | x           |                |            |          |        |          |                |         |             | x            |         |
+| env tags            |       |       |     |             |                |            | x        |        |          |                |         |             | x            |         |
+| WithEnvPrefix       |       |       |     |             |                |            | x        |        |          |                |         |             | x            |         |
+| count:"true"        |       |       |     |             |                |            |          |        | x        |                |         |             |              |         |
+| OutputTable         |       |       |     |             |                |            |          | x      |          |                |         |             | x            |         |
+| Signal handling     |       |       |     |             |                |            |          |        |          |                | x       |             | x            |         |
+| Error wrapping      |       |       |     |             |                |            |          |        |          | x              |         |             | x            |         |
+| NewParentCommand    |       |       |     |             |                |            |          |        |          |                |         | x           |              |         |
+| Middleware          |       |       |     |             |                |            |          |        |          |                |         |             | x            |         |
+| Version command     |       |       |     |             |                |            |          |        |          |                |         |             | x            |         |
+| Command groups      |       |       |     |             |                |            |          |        |          |                |         | x           | x            |         |
+| MustNewCommand      |       |       |     |             |                |            |          |        |          |                |         |             | x            |         |
+| WithPromptOnMissing |       |       |     |             |                |            |          |        |          |                |         |             |              | x       |
 
 ## Adding a New Example
 

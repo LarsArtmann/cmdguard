@@ -15,25 +15,26 @@ type NoFlags = struct{}
 // Fields are unexported to enforce construction through NewCommand or NewParentCommand,
 // making invalid states unrepresentable at compile time.
 type Command[T any, F any] struct {
-	use           string
-	short         string
-	long          string
-	aliases       []string
-	example       string
-	flags         F
-	runE          func(ctx context.Context, cfg *T, flags F) error
-	preRunE       func(ctx context.Context, cfg *T, flags F) error
-	postRunE      func(ctx context.Context, cfg *T, flags F) error
-	commands      []Command[T, F]
-	hidden        bool
-	deprecated    string
-	version       string
-	silenceErrors bool
-	silenceUsage  bool
-	group         string
-	completionFn  CompletionFunc
-	validArgs     []string
-	args          cobra.PositionalArgs
+	use             string
+	short           string
+	long            string
+	aliases         []string
+	example         string
+	flags           F
+	runE            func(ctx context.Context, cfg *T, flags F) error
+	preRunE         func(ctx context.Context, cfg *T, flags F) error
+	postRunE        func(ctx context.Context, cfg *T, flags F) error
+	commands        []Command[T, F]
+	hidden          bool
+	deprecated      string
+	version         string
+	silenceErrors   bool
+	silenceUsage    bool
+	group           string
+	completionFn    CompletionFunc
+	validArgs       []string
+	args            cobra.PositionalArgs
+	promptOnMissing bool
 }
 
 // Use returns the command name and usage string.

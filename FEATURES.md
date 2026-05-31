@@ -149,6 +149,18 @@
 | `WithNoArgs[T, F]()`            | ✅ FULLY_FUNCTIONAL | Reject any positional args        |
 | `WithArgs[T, F](fn)`            | ✅ FULLY_FUNCTIONAL | Custom cobra.PositionalArgs       |
 
+### Interactive Prompts (huh)
+
+| Feature                              | Status              | Notes                                    |
+| ------------------------------------ | ------------------- | ---------------------------------------- |
+| `WithPromptOnMissing[T, F]()`        | ✅ FULLY_FUNCTIONAL | Prompt for missing `prompt`-tagged flags |
+| `prompt:"Question?"` struct tag     | ✅ FULLY_FUNCTIONAL | Marks field for interactive prompting    |
+| `PromptString(title, default)`       | ✅ FULLY_FUNCTIONAL | Text input via huh.NewInput              |
+| `PromptSelect(title, options)`       | ✅ FULLY_FUNCTIONAL | Selection via huh.NewSelect              |
+| `PromptConfirm(title)`               | ✅ FULLY_FUNCTIONAL | Yes/no via huh.NewConfirm                |
+| Bool fields → confirm prompt         | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
+| Enum fields → select prompt          | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
+
 ### Version Command
 
 | Feature                        | Status              | Notes                                |
@@ -187,6 +199,7 @@
 | `github.com/samber/do/v2`          | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection |
 | `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing         |
 | `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
+| `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts  |
 | `github.com/larsartmann/go-output` | latest  | ✅ FULLY_FUNCTIONAL | Rich output formats  |
 
 ---

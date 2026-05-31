@@ -192,6 +192,7 @@ func MustNewParentCommand[T, F any](...) Command[T, F]
 | `WithRangeArgs[T, F](min, max)`  | Require between min and max args       |
 | `WithNoArgs[T, F]()`             | Reject any positional args             |
 | `WithArgs[T, F](fn)`             | Custom cobra.PositionalArgs validator  |
+| `WithPromptOnMissing[T, F]()`    | Interactive prompt for missing `prompt`-tagged flags |
 
 ### CLI[T] Constructor
 
@@ -482,7 +483,8 @@ go build ./...                                   # Verify build
 5. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
 6. **envPrefix propagation** — `WithEnvPrefix` sets prefix on root AND command-level flags (fixed in v2.2)
 7. **Counting flags** — must use `int` type with `count:"true"` tag; don't reuse flag names from root config
-8. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
+8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
+9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 9. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
 10. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
 11. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly

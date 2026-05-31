@@ -163,3 +163,18 @@ func WithNoArgs[T, F any]() CommandOption[T, F] {
 		c.args = cobra.NoArgs
 	}
 }
+
+// WithPromptOnMissing enables interactive prompting for flags that have a
+// `prompt:"Question?"` struct tag and were not provided via CLI arguments or
+// environment variables. When a matching flag is missing, the user is prompted
+// interactively using the huh TUI library.
+//
+// Supported field types:
+//   - string, int, uint, float: text input prompt
+//   - bool: yes/no confirmation prompt
+//   - enum (values tag): selection prompt
+func WithPromptOnMissing[T, F any]() CommandOption[T, F] {
+	return func(c *Command[T, F]) {
+		c.promptOnMissing = true
+	}
+}

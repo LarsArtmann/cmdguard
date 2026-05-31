@@ -106,6 +106,7 @@ func wireAllHandlers[T, F any](
 		target: &cobraCmd.RunE, handler: cmd.runE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
 		phase: "command " + cmd.use, info: info, middlewares: middlewares,
+		promptOnMissing: cmd.promptOnMissing,
 	})
 
 	preInfo := info
@@ -115,6 +116,7 @@ func wireAllHandlers[T, F any](
 		target: &cobraCmd.PreRunE, handler: cmd.preRunE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
 		phase: "pre-run of command " + cmd.use, info: preInfo, middlewares: middlewares,
+		promptOnMissing: cmd.promptOnMissing,
 	})
 
 	postInfo := info
@@ -124,6 +126,7 @@ func wireAllHandlers[T, F any](
 		target: &cobraCmd.PostRunE, handler: cmd.postRunE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
 		phase: "post-run of command " + cmd.use, info: postInfo, middlewares: middlewares,
+		promptOnMissing: cmd.promptOnMissing,
 	})
 }
 
@@ -166,14 +169,15 @@ func initCommandFlags[F any](
 }
 
 type handlerConfig[T, F any] struct {
-	target      *func(*cobra.Command, []string) error
-	handler     func(context.Context, *T, F) error
-	config      *T
-	flags       F
-	registry    *FlagRegistry
-	phase       string
-	info        CommandInfo
-	middlewares []Middleware[T]
+	target          *func(*cobra.Command, []string) error
+	handler         func(context.Context, *T, F) error
+	config          *T
+	flags           F
+	registry        *FlagRegistry
+	phase           string
+	info            CommandInfo
+	middlewares     []Middleware[T]
+	promptOnMissing bool
 }
 
 func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
@@ -183,6 +187,12 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 
 	h := cfg.handler
 	*cfg.target = func(c *cobra.Command, args []string) error {
+		if cfg.promptOnMissing && cfg.info.Phase == PhaseRun {
+			if err := promptMissingCommandFlags(c, cfg.registry); err != nil {
+				return err
+			}
+		}
+
 		ctx, parsed, err := prepareRunContext(c, cfg.flags, cfg.registry, cfg.phase)
 		if err != nil {
 			return err
