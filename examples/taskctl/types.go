@@ -15,13 +15,13 @@ import (
 // --- Config ---
 
 type AppConfig struct {
-	LogLevel v2.LogLevel `flag:"log-level" short:"l" default:"info"            help:"Log level (debug, info, warn, error)" env:"TASK_LOG_LEVEL"`
-	DataDir  string      `flag:"data-dir"  short:"d" default:"./data"          help:"Directory for task storage"           env:"TASK_DATA_DIR"`
-	Timeout  v2.Duration `flag:"timeout"             default:"30s"             help:"Default operation timeout"`
-	Port     v2.Port     `flag:"port"                default:"8080"            help:"API port"`
-	AdminEmail v2.Email  `flag:"admin-email"         default:"admin@example.com" help:"Admin contact email"`
-	APIUrl     v2.URL    `flag:"api-url"             default:"http://localhost:8080" help:"API base URL"`
-	Verbose  int         `flag:"verbose"   short:"v" default:"0"              help:"Verbosity (-v, -vv, -vvv)"                                 count:"true"`
+	LogLevel   v2.LogLevel `flag:"log-level"   short:"l" default:"info"                  help:"Log level (debug, info, warn, error)" env:"TASK_LOG_LEVEL"`
+	DataDir    string      `flag:"data-dir"    short:"d" default:"./data"                help:"Directory for task storage"           env:"TASK_DATA_DIR"`
+	Timeout    v2.Duration `flag:"timeout"               default:"30s"                   help:"Default operation timeout"`
+	Port       v2.Port     `flag:"port"                  default:"8080"                  help:"API port"`
+	AdminEmail v2.Email    `flag:"admin-email"           default:"admin@example.com"     help:"Admin contact email"`
+	APIUrl     v2.URL      `flag:"api-url"               default:"http://localhost:8080" help:"API base URL"`
+	Verbose    int         `flag:"verbose"     short:"v" default:"0"                     help:"Verbosity (-v, -vv, -vvv)"                                 count:"true"`
 }
 
 // --- Priority via v2.Enum ---
@@ -72,8 +72,8 @@ type ListFlags struct {
 }
 
 type AddFlags struct {
-	Title    string `flag:"title"    short:"t" required:"true" help:"Task title"   prompt:"Task title?" validate:"min=3"`
-	Priority string `flag:"priority" short:"P"                     help:"Priority"   default:"medium" values:"low,medium,high"`
+	Title    string `flag:"title"    short:"t" required:"true" help:"Task title" prompt:"Task title?" validate:"min=3"`
+	Priority string `flag:"priority" short:"P"                 help:"Priority"                                         default:"medium" values:"low,medium,high"`
 }
 
 type DoneFlags struct {
