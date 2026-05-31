@@ -221,6 +221,8 @@ Functional options:
 | `WithDraconianValidation[T]()` | Strict + examples on leaf commands          |
 | `WithConfigFile[T](paths...)`  | Load JSON config file before flags          |
 | `WithConfigFileLoader[T](l,p)` | Load config with custom loader (YAML/TOML)  |
+| `WithGlamourHelp[T]()`          | Render markdown in command help text        |
+| `WithTelemetry[T](tracer)`      | OpenTelemetry spans for all commands          |
 
 ### CLI[T] Methods
 

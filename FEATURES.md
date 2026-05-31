@@ -142,6 +142,14 @@
 | `cli.WriteManPage(w, section)`   | ✅ FULLY_FUNCTIONAL | Write man page to io.Writer |
 | `GenerateManPageCommand[T](cli)` | ✅ FULLY_FUNCTIONAL | Create `man` subcommand     |
 
+### Markdown Help (glamour)
+
+| Feature                              | Status              | Notes                                   |
+| ------------------------------------ | ------------------- | --------------------------------------- |
+| `WithGlamourHelp[T]()`               | ✅ FULLY_FUNCTIONAL | Render command Long/Example as markdown |
+| `RenderMarkdown(md)`               | ✅ FULLY_FUNCTIONAL | Render markdown with auto theme         |
+| `RenderMarkdownWithTheme(md, theme)` | ✅ FULLY_FUNCTIONAL | Render with specific glamour theme      |
+
 ### Positional Arguments
 
 | Feature                         | Status              | Notes                             |
@@ -203,8 +211,10 @@
 | `github.com/samber/do/v2`          | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection |
 | `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing         |
 | `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
-| `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts  |
-| `github.com/larsartmann/go-output` | latest  | ✅ FULLY_FUNCTIONAL | Rich output formats  |
+| `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts   |
+| `github.com/charmbracelet/glamour` | v1.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering     |
+| `go.opentelemetry.io/otel/trace`   | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing  |
+| `github.com/larsartmann/go-output` | latest  | ✅ FULLY_FUNCTIONAL | Rich output formats    |
 
 ---
 
