@@ -98,7 +98,7 @@ func (f LogFormat) IsEmpty() bool {
 
 // MarshalText implements encoding.TextMarshaler for LogLevel.
 func (l LogLevel) MarshalText() ([]byte, error) {
-	return textMarshal(l, func(l LogLevel) string { return l.value })
+	return textMarshal(l, LogLevel.String)
 }
 
 func (l *LogLevel) UnmarshalText(text []byte) error {
@@ -107,7 +107,7 @@ func (l *LogLevel) UnmarshalText(text []byte) error {
 
 // MarshalText implements encoding.TextMarshaler for LogFormat.
 func (f LogFormat) MarshalText() ([]byte, error) {
-	return textMarshal(f, func(f LogFormat) string { return f.value })
+	return textMarshal(f, LogFormat.String)
 }
 
 func (f *LogFormat) UnmarshalText(text []byte) error {

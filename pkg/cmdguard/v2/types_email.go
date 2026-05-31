@@ -75,7 +75,7 @@ func (e Email) emailPart(index int) string {
 
 // MarshalText implements encoding.TextMarshaler for Email.
 func (e Email) MarshalText() ([]byte, error) {
-	return textMarshal(e, func(e Email) string { return e.address })
+	return textMarshal(e, Email.String)
 }
 
 func (e *Email) UnmarshalText(text []byte) error {

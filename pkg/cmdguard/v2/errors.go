@@ -185,6 +185,11 @@ var (
 	ErrConfigFileNotFound = errors.New("config file not found")
 )
 
+// labeledError formats an error with a labeled context for consistent error messages.
+func labeledError(label, value string, err error) string {
+	return fmt.Sprintf("%s %q: %v", label, value, err)
+}
+
 // CommandError wraps an error with command context.
 type CommandError struct {
 	CommandName string
@@ -192,7 +197,7 @@ type CommandError struct {
 }
 
 func (e *CommandError) Error() string {
-	return fmt.Sprintf("command %q: %v", e.CommandName, e.Err)
+	return labeledError("command", e.CommandName, e.Err)
 }
 
 func (e *CommandError) Unwrap() error {
@@ -215,7 +220,7 @@ type FlagError struct {
 }
 
 func (e *FlagError) Error() string {
-	msg := fmt.Sprintf("flag %q: %v", e.FlagName, e.Err)
+	msg := labeledError("flag", e.FlagName, e.Err)
 	if e.Suggestion != "" {
 		msg += fmt.Sprintf(" (did you mean --%s?)", e.Suggestion)
 	}
@@ -251,7 +256,7 @@ type ConfigError struct {
 }
 
 func (e *ConfigError) Error() string {
-	return fmt.Sprintf("config field %q: %v", e.Field, e.Err)
+	return labeledError("config field", e.Field, e.Err)
 }
 
 func (e *ConfigError) Unwrap() error {
@@ -295,7 +300,7 @@ type DurationError struct {
 }
 
 func (e *DurationError) Error() string {
-	return fmt.Sprintf("invalid duration %q: %v", e.Value, e.Err)
+	return labeledError("invalid duration", e.Value, e.Err)
 }
 
 func (e *DurationError) Unwrap() error {
@@ -318,7 +323,7 @@ type ServiceError struct {
 }
 
 func (e *ServiceError) Error() string {
-	return fmt.Sprintf("service %q: %v", e.ServiceType, e.Err)
+	return labeledError("service", e.ServiceType, e.Err)
 }
 
 func (e *ServiceError) Unwrap() error {

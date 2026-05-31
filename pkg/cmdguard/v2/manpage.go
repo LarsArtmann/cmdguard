@@ -29,8 +29,11 @@ func (cli *CLI[T]) WriteManPage(w io.Writer, section uint) error {
 	}
 
 	_, err = fmt.Fprint(w, content)
+	if err != nil {
+		return fmt.Errorf("writing man page: %w", err)
+	}
 
-	return err
+	return nil
 }
 
 // GenerateManPageCommand creates a cobra command that generates man pages.

@@ -32,12 +32,12 @@ type CLI[T any] struct {
 	middleware       []Middleware[T]
 	envPrefix        string
 	signalHandling   bool
-	outputEnabled    bool
 	outputFormat     OutputFormat
 	validationMode   ValidationMode
 	configValidate   func(*T) error
 	configFilePaths  []string
 	configFileLoader ConfigFileLoader
+	glamourHelp      bool
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -132,7 +132,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
 		if err := registry.ParseFlags(c, cli.config); err != nil {
-			return err
+			return fmt.Errorf("parsing global flags: %w", err)
 		}
 
 		if cli.configValidate != nil {
@@ -142,6 +142,10 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		}
 
 		return cli.parseOutputFlag(c)
+	}
+
+	if cli.glamourHelp {
+		applyGlamourHelp(cli.rootCmd)
 	}
 
 	return nil
@@ -165,6 +169,10 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	}
 
 	cli.rootCmd.AddCommand(cobraCmd)
+
+	if cli.glamourHelp {
+		applyGlamourHelp(cobraCmd)
+	}
 
 	return nil
 }

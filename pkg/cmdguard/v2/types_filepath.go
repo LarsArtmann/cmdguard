@@ -149,7 +149,7 @@ func (fp FilePath) Join(elem ...string) FilePath {
 
 // MarshalText implements encoding.TextMarshaler for FilePath.
 func (fp FilePath) MarshalText() ([]byte, error) {
-	return textMarshal(fp, func(fp FilePath) string { return fp.path })
+	return textMarshal(fp, FilePath.String)
 }
 
 func (fp *FilePath) UnmarshalText(text []byte) error {

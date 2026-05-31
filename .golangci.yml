@@ -168,6 +168,8 @@ linters:
             - $gostd
             - charm.land/fang/v2
             - charm.land/huh/v2
+            - charm.land/lipgloss/v2
+            - github.com/charmbracelet/glamour
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
             - github.com/larsartmann/go-output/table
@@ -178,6 +180,10 @@ linters:
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
+            - go.opentelemetry.io/otel/attribute
+            - go.opentelemetry.io/otel/codes
+            - go.opentelemetry.io/otel/trace
+            - golang.org/x/term
             - gopkg.in/yaml.v3
           files:
             - $all
@@ -196,6 +202,10 @@ linters:
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
+            - go.opentelemetry.io/otel/attribute
+            - go.opentelemetry.io/otel/codes
+            - go.opentelemetry.io/otel/trace
+            - go.opentelemetry.io/otel/trace/embedded
           files:
             - $test
           list-mode: strict

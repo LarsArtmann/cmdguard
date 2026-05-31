@@ -20,14 +20,13 @@ import (
 func WithOutputFormat[T any](defaultFormat OutputFormat) CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.outputFormat = defaultFormat
-		cli.outputEnabled = true
 	}
 }
 
 // OutputFormat returns the resolved output format from the --output flag.
 // If WithOutputFormat was not used, returns FormatTable.
 func (cli *CLI[T]) OutputFormat() OutputFormat {
-	if !cli.outputEnabled {
+	if cli.outputFormat == "" {
 		return FormatTable
 	}
 
@@ -41,7 +40,7 @@ func (cli *CLI[T]) SetOutputFormat(format OutputFormat) {
 
 // initOutputFlag sets up the --output flag and hooks into flag parsing.
 func (cli *CLI[T]) initOutputFlag() {
-	if !cli.outputEnabled {
+	if cli.outputFormat == "" {
 		return
 	}
 
@@ -51,7 +50,7 @@ func (cli *CLI[T]) initOutputFlag() {
 
 // parseOutputFlag resolves the --output flag value after cobra parses flags.
 func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
-	if !cli.outputEnabled {
+	if cli.outputFormat == "" {
 		return nil
 	}
 

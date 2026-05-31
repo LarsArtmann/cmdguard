@@ -53,6 +53,8 @@
 | `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
 | `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands       |
+| `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text         |
+| `WithTelemetry[T](tracer)`     | ✅ FULLY_FUNCTIONAL | OpenTelemetry spans for all commands     |
 
 ### Command[T, F]
 
@@ -118,9 +120,11 @@
 
 | Feature              | Status              | Notes                              |
 | -------------------- | ------------------- | ---------------------------------- |
-| `TimingMiddleware`   | ✅ FULLY_FUNCTIONAL | Log command execution duration     |
-| `RecoveryMiddleware` | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers    |
-| Custom middleware    | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
+| `TimingMiddleware`    | ✅ FULLY_FUNCTIONAL | Log command execution duration        |
+| `RecoveryMiddleware`  | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers       |
+| `SpinnerMiddleware`   | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution     |
+| `TelemetryMiddleware` | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command        |
+| Custom middleware     | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error`    |
 
 ### Shell Completion
 

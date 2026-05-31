@@ -1,7 +1,7 @@
 # TODO List
 
-**Updated:** 2026-05-16
-**Status:** v2.3.0-dev — 264 tests (227 in v2), 81.2% coverage, 0 lint issues, 0 race conditions
+**Updated:** 2026-05-31
+**Status:** v2.3.0-dev — all Phase 9 items complete
 
 ## Completed ✅
 
@@ -85,16 +85,16 @@
 
 ### Phase 9: Architecture Hardening (v2.3)
 
-- [ ] Fix gopls hint: `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26 idiom)
-- [ ] Extract `handlerConfig[T,F]` struct from 8-param `wireHandlerWithMiddleware`
-- [ ] Add `Phase` typed enum to replace `CommandInfo.Phase string`
-- [ ] Fix 7 unwrapped error returns (add `fmt.Errorf` context)
-- [ ] Consolidate 5 error types into internal `labeledError`
-- [ ] Split `type_handler.go` (481 lines) into 3 files
-- [ ] Split `command.go` (403 lines) — extract args options
-- [ ] Split `flow_context.go` (396 lines) — extract options
-- [ ] Fix `outputFormat`/`outputState.format` split brain
-- [ ] Consolidate value type MarshalText/UnmarshalText patterns
+- [x] Fix gopls hint: `errors.As` → `errors.AsType[ExitCoder]` (Go 1.26 idiom)
+- [x] Extract `handlerConfig[T,F]` struct from 8-param `wireHandlerWithMiddleware`
+- [x] Add `Phase` typed enum to replace `CommandInfo.Phase string`
+- [x] Fix 7 unwrapped error returns (add `fmt.Errorf` context)
+- [x] Consolidate 5 error types into internal `labeledError`
+- [x] Split `type_handler.go` (481 lines) into 3 files
+- [x] Split `command.go` (403 lines) — extract args options
+- [x] Split `flow_context.go` (396 lines) — extract options
+- [x] Fix `outputFormat`/`outputState.format` split brain
+- [x] Consolidate value type MarshalText/UnmarshalText patterns
 
 ## Remaining Work
 
@@ -115,9 +115,9 @@
 
 - [x] Config file auto-loading (YAML/TOML/JSON) — custom implementation, no koanf needed
 - [x] Interactive prompts (huh integration) with `WithPromptOnMissing`
-- [ ] Spinner/progress middleware (bubbles)
-- [ ] Glamour markdown help rendering
-- [ ] Telemetry middleware (OpenTelemetry spans)
+- [x] Spinner/progress middleware (bubbles)
+- [x] Glamour markdown help rendering
+- [x] Telemetry middleware (OpenTelemetry spans)
 - [ ] Plugin system for custom validators and type handlers
 
 ### 🧹 Future Cleanup (API-breaking, defer to v3.0)

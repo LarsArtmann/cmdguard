@@ -189,13 +189,13 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 	*cfg.target = func(c *cobra.Command, args []string) error {
 		if cfg.promptOnMissing && cfg.info.Phase == PhaseRun {
 			if err := promptMissingCommandFlags(c, cfg.registry); err != nil {
-				return err
+				return fmt.Errorf("prompting for missing command flags: %w", err)
 			}
 		}
 
 		ctx, parsed, err := prepareRunContext(c, cfg.flags, cfg.registry, cfg.phase)
 		if err != nil {
-			return err
+			return fmt.Errorf("preparing run context: %w", err)
 		}
 
 		ctx = context.WithValue(ctx, argsKey, args)

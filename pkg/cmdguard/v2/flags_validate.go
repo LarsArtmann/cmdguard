@@ -93,12 +93,12 @@ func lookupValidator(name string) (FlagValidator, bool) {
 func runValidateTag(tag, value string) error {
 	rules, err := parseValidateRules(tag)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing validation rules: %w", err)
 	}
 
 	for _, rule := range rules {
 		if err := rule.Validate(value); err != nil {
-			return err
+			return fmt.Errorf("validation rule %q failed: %w", rule.Name, err)
 		}
 	}
 

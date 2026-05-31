@@ -126,7 +126,7 @@ func (r *FlagRegistry) validateTag(cmd *cobra.Command, tag FlagTag) error {
 
 	err = r.validateEnumValue(cmd, tag)
 	if err != nil {
-		return err
+		return fmt.Errorf("validating enum value for flag %q: %w", tag.Name, err)
 	}
 
 	return r.validateTagRules(cmd, tag)
