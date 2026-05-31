@@ -299,10 +299,12 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 		func(_ context.Context, cfg *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("Current configuration:")
 			fmt.Printf("  LogLevel:  %s\n", cfg.LogLevel)
-			fmt.Printf("  DataDir:   %s\n", cfg.DataDir)
-			fmt.Printf("  Timeout:   %s\n", cfg.Timeout)
-			fmt.Printf("  Port:      %s\n", cfg.Port)
-			fmt.Printf("  Verbose:   %d\n", cfg.Verbose)
+			fmt.Printf("  DataDir:     %s\n", cfg.DataDir)
+			fmt.Printf("  Timeout:     %s\n", cfg.Timeout)
+			fmt.Printf("  Port:        %s\n", cfg.Port)
+			fmt.Printf("  AdminEmail:  %s\n", cfg.AdminEmail)
+			fmt.Printf("  APIUrl:      %s\n", cfg.APIUrl)
+			fmt.Printf("  Verbose:     %d\n", cfg.Verbose)
 			return nil
 		},
 		v2.WithShort[AppConfig, v2.NoFlags]("Show resolved configuration"),

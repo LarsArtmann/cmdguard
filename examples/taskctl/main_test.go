@@ -86,8 +86,14 @@ func TestCLI_ConfigDefaults(t *testing.T) {
 	}
 
 	cfg := cli.Config()
-	// Defaults are applied from struct tags when parsed, not at construction
-	_ = cfg
+	// Defaults from struct tags are applied during flag parsing, not at construction.
+	// At construction time, config has Go zero values.
+	if cfg.DataDir != "" {
+		t.Errorf("DataDir = %q at construction, want empty (zero value)", cfg.DataDir)
+	}
+	if cfg.Verbose != 0 {
+		t.Errorf("Verbose = %d at construction, want 0", cfg.Verbose)
+	}
 }
 
 // --- DI Services ---
