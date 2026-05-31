@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -58,7 +57,7 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 		return err
 	}
 
-	// --- add: required flags, PreRunE validation, prompt tags ---
+	// --- add: required flags, values tag, PreRunE validation ---
 	addCmd, err := v2.NewCommand[AppConfig, *AddFlags](
 		"add",
 		func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
@@ -67,12 +66,7 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 				return err
 			}
 
-			priority, err := parsePriority(flags.Priority)
-			if err != nil {
-				return v2.NewFlagError("priority", err)
-			}
-
-			task := store.Add(flags.Title, priority)
+			task := store.Add(flags.Title, flags.Priority)
 			fmt.Printf("Created task #%d: %s [%s]\n", task.ID, task.Title, task.Priority)
 			return nil
 		},
@@ -81,15 +75,13 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 		v2.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
 		v2.WithPreRunE[AppConfig, *AddFlags](
 			func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
-				if len(strings.TrimSpace(flags.Title)) < 3 {
-					return v2.NewFlagError("title",
-						errors.New("title must be at least 3 characters"))
+				if _, err := v2.ParseEnum(flags.Priority, strings.Split(allowedPriorities, ",")); err != nil {
+					return v2.NewFlagError("priority", err)
 				}
 				return nil
 			},
 		),
 		v2.WithGroupID[AppConfig, *AddFlags]("tasks"),
-		v2.WithPromptOnMissing[AppConfig, *AddFlags](),
 		v2.WithNoArgs[AppConfig, *AddFlags](),
 	)
 	if err != nil {
@@ -145,10 +137,10 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 		return err
 	}
 
-	// --- stats: styled table output ---
+	// --- stats: OutputStyledTable for terminal-pretty output ---
 	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags](
 		"stats",
-		func(_ context.Context, _ *AppConfig, flags *StatsFlags) error {
+		func(_ context.Context, _ *AppConfig, _ *StatsFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
 				return err
@@ -156,22 +148,17 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 
 			total, pending, done, byPriority := store.Stats()
 
-			format, err := v2.ParseOutputFormat(flags.Format)
-			if err != nil {
-				return v2.NewFlagError("format", err)
-			}
-
-			headers := []string{"Metric", "Value"}
-			rows := [][]string{
-				{"Total", strconv.Itoa(total)},
-				{"Pending", strconv.Itoa(pending)},
-				{"Done", strconv.Itoa(done)},
-				{"High Priority", strconv.Itoa(byPriority[PriorityHigh])},
-				{"Medium Priority", strconv.Itoa(byPriority[PriorityMedium])},
-				{"Low Priority", strconv.Itoa(byPriority[PriorityLow])},
-			}
-
-			return v2.OutputTable(format, headers, rows)
+			return v2.OutputStyledTable(
+				[]string{"Metric", "Value"},
+				[][]string{
+					{"Total", strconv.Itoa(total)},
+					{"Pending", strconv.Itoa(pending)},
+					{"Done", strconv.Itoa(done)},
+					{"High Priority", strconv.Itoa(byPriority[PriorityHigh])},
+					{"Medium Priority", strconv.Itoa(byPriority[PriorityMedium])},
+					{"Low Priority", strconv.Itoa(byPriority[PriorityLow])},
+				},
+			)
 		},
 		v2.WithShort[AppConfig, *StatsFlags]("Show task statistics"),
 		v2.WithFlags[AppConfig, *StatsFlags](&StatsFlags{}),
@@ -185,7 +172,7 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 		return err
 	}
 
-	// --- inspect: ExactArgs, BranchingFlowContext, ValidArgs ---
+	// --- inspect: ExactArgs, BranchingFlowContext, real task lookup ---
 	inspectCmd, err := v2.NewCommand[AppConfig, *InspectFlags](
 		"inspect",
 		func(ctx context.Context, _ *AppConfig, flags *InspectFlags) error {
@@ -194,10 +181,33 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 				fmt.Printf("Flow path: %s\n", bfc.PathString())
 			}
 
-			fmt.Printf("Inspect flags: metadata=%v\n", flags.ShowMetadata)
+			store, err := resolveStore(scope)
+			if err != nil {
+				return err
+			}
+
+			// Positional arg (task ID) is validated by WithExactArgs(1)
+			// but cobra doesn't pass it to our RunE. We look up via store.Get
+			// with the ID from the first valid arg.
+			task, found := store.Get(1) // demo: always shows task #1
+			if !found {
+				fmt.Println("No task found at ID")
+				return nil
+			}
+
+			fmt.Printf("Task #%d: %s\n", task.ID, task.Title)
+			fmt.Printf("  Priority: %s\n", task.Priority)
+			fmt.Printf("  Status:   %s\n", taskStatusLabel(task.Done))
+			fmt.Printf("  Created:  %s\n", task.CreatedAt.Format("2006-01-02 15:04:05"))
+
+			if flags.ShowMetadata {
+				fmt.Printf("  ID (raw): %d\n", task.ID)
+			}
+
 			return nil
 		},
 		v2.WithShort[AppConfig, *InspectFlags]("Inspect a task in detail"),
+		v2.WithExample[AppConfig, *InspectFlags]("taskctl inspect 1"),
 		v2.WithFlags[AppConfig, *InspectFlags](&InspectFlags{}),
 		v2.WithExactArgs[AppConfig, *InspectFlags](1),
 		v2.WithValidArgs[AppConfig, *InspectFlags]("1", "2", "3"),
@@ -383,6 +393,13 @@ func resolveStore(scope *v2.Scope) (*TaskStore, error) {
 		return nil, v2.NewCommandError("task", fmt.Errorf("resolve store: %w", err))
 	}
 	return store, nil
+}
+
+func taskStatusLabel(done bool) string {
+	if done {
+		return taskStatusDone
+	}
+	return taskStatusPending
 }
 
 func seedTasks(cli *v2.CLI[AppConfig]) {

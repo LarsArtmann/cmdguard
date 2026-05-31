@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
+	"sync"
 	"time"
 
 	"github.com/samber/do/v2"
@@ -22,28 +22,15 @@ type AppConfig struct {
 	Verbose  int         `flag:"verbose"   short:"v" default:"0"      help:"Verbosity (-v, -vv, -vvv)"                                 count:"true"`
 }
 
-// --- Priority Enum ---
+// --- Priority via v2.Enum ---
 
-type Priority string
+const allowedPriorities = "low,medium,high"
 
 const (
-	PriorityLow    Priority = "low"
-	PriorityMedium Priority = "medium"
-	PriorityHigh   Priority = "high"
+	PriorityLow    = "low"
+	PriorityMedium = "medium"
+	PriorityHigh   = "high"
 )
-
-func parsePriority(s string) (Priority, error) {
-	switch strings.ToLower(s) {
-	case string(PriorityLow):
-		return PriorityLow, nil
-	case string(PriorityMedium), "":
-		return PriorityMedium, nil
-	case string(PriorityHigh):
-		return PriorityHigh, nil
-	default:
-		return "", fmt.Errorf("invalid priority %q: use low, medium, or high", s)
-	}
-}
 
 // --- Domain ---
 
@@ -55,7 +42,7 @@ const (
 type Task struct {
 	ID        uint
 	Title     string
-	Priority  Priority
+	Priority  string
 	Done      bool
 	CreatedAt time.Time
 }
@@ -68,7 +55,7 @@ func (t Task) Row() []string {
 	return []string{
 		strconv.FormatUint(uint64(t.ID), 10),
 		t.Title,
-		string(t.Priority),
+		t.Priority,
 		status,
 		t.CreatedAt.Format("2006-01-02"),
 	}
@@ -83,8 +70,8 @@ type ListFlags struct {
 }
 
 type AddFlags struct {
-	Title    string `flag:"title"    short:"t" required:"true" help:"Task title"                   prompt:"Task title?"`
-	Priority string `flag:"priority" short:"P"                 help:"Priority (low, medium, high)"                      default:"medium"`
+	Title    string `flag:"title"    short:"t" required:"true" help:"Task title"   prompt:"Task title?" validate:"min=3"`
+	Priority string `flag:"priority" short:"P"                     help:"Priority"   default:"medium" values:"low,medium,high"`
 }
 
 type DoneFlags struct {
@@ -107,7 +94,7 @@ type InspectFlags struct {
 // --- TaskStore (DI Service) ---
 
 type TaskStore struct {
-	mu    chan struct{}
+	mu    sync.Mutex
 	tasks []Task
 	next  uint
 }
@@ -131,18 +118,14 @@ func NewTaskStore(i do.Injector) (*TaskStore, error) {
 	fmt.Printf("[store] initialized with data-dir=%s\n", cfg.DataDir)
 
 	return &TaskStore{
-		mu:    make(chan struct{}, 1),
 		tasks: []Task{},
 		next:  1,
 	}, nil
 }
 
-func (s *TaskStore) lock()   { s.mu <- struct{}{} }
-func (s *TaskStore) unlock() { <-s.mu }
-
-func (s *TaskStore) Add(title string, priority Priority) Task {
-	s.lock()
-	defer s.unlock()
+func (s *TaskStore) Add(title string, priority string) Task {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	t := Task{ID: s.next, Title: title, Priority: priority, Done: false, CreatedAt: time.Now()}
 	s.tasks = append(s.tasks, t)
@@ -151,8 +134,8 @@ func (s *TaskStore) Add(title string, priority Priority) Task {
 }
 
 func (s *TaskStore) Done(id uint) (Task, error) {
-	s.lock()
-	defer s.unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	for i := range s.tasks {
 		if s.tasks[i].ID == id {
@@ -164,15 +147,15 @@ func (s *TaskStore) Done(id uint) (Task, error) {
 }
 
 func (s *TaskStore) List(filterPriority string, showAll bool) []Task {
-	s.lock()
-	defer s.unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	var result []Task
 	for _, t := range s.tasks {
 		if !showAll && t.Done {
 			continue
 		}
-		if filterPriority != "" && string(t.Priority) != filterPriority {
+		if filterPriority != "" && t.Priority != filterPriority {
 			continue
 		}
 		result = append(result, t)
@@ -181,8 +164,8 @@ func (s *TaskStore) List(filterPriority string, showAll bool) []Task {
 }
 
 func (s *TaskStore) Get(id uint) (Task, bool) {
-	s.lock()
-	defer s.unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	for _, t := range s.tasks {
 		if t.ID == id {
@@ -193,8 +176,8 @@ func (s *TaskStore) Get(id uint) (Task, bool) {
 }
 
 func (s *TaskStore) IDs() []string {
-	s.lock()
-	defer s.unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	ids := make([]string, len(s.tasks))
 	for i, t := range s.tasks {
@@ -203,8 +186,8 @@ func (s *TaskStore) IDs() []string {
 	return ids
 }
 
-func (s *TaskStore) Stats() (total, pending, done int, byPriority map[Priority]int) {
-	byPriority = map[Priority]int{}
+func (s *TaskStore) Stats() (total, pending, done int, byPriority map[string]int) {
+	byPriority = map[string]int{}
 	for _, t := range s.tasks {
 		total++
 		if t.Done {

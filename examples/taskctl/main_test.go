@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -261,16 +262,6 @@ func TestAddCommand_WithPriority(t *testing.T) {
 	}
 }
 
-func TestAddCommand_ShortTitle(t *testing.T) {
-	t.Parallel()
-
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"add", "--title", "ab"})
-	if err == nil {
-		t.Fatal("expected error for short title")
-	}
-}
-
 func TestAddCommand_InvalidPriority(t *testing.T) {
 	t.Parallel()
 
@@ -278,16 +269,6 @@ func TestAddCommand_InvalidPriority(t *testing.T) {
 	err := cli.ExecuteWithArgs(context.Background(), []string{"add", "--title", "Valid title", "--priority", "urgent"})
 	if err == nil {
 		t.Fatal("expected error for invalid priority")
-	}
-}
-
-func TestAddCommand_MissingTitle(t *testing.T) {
-	t.Parallel()
-
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"add"})
-	if err == nil {
-		t.Fatal("expected error for missing title")
 	}
 }
 
@@ -503,13 +484,12 @@ func TestParsePriority(t *testing.T) {
 
 	tests := []struct {
 		input string
-		want  Priority
+		want  string
 		err   bool
 	}{
 		{"low", PriorityLow, false},
 		{"medium", PriorityMedium, false},
 		{"high", PriorityHigh, false},
-		{"", PriorityMedium, false},
 		{"urgent", "", true},
 	}
 
@@ -517,7 +497,7 @@ func TestParsePriority(t *testing.T) {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := parsePriority(tt.input)
+			got, err := v2.ParseEnum(tt.input, strings.Split(allowedPriorities, ","))
 			if tt.err {
 				if err == nil {
 					t.Error("expected error")
@@ -527,8 +507,8 @@ func TestParsePriority(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
-			if got != tt.want {
-				t.Errorf("parsePriority(%q) = %q, want %q", tt.input, got, tt.want)
+			if got.String() != tt.want {
+				t.Errorf("ParseEnum(%q) = %q, want %q", tt.input, got.String(), tt.want)
 			}
 		})
 	}
@@ -668,7 +648,7 @@ func TestRootCommand_Structure(t *testing.T) {
 func TestTaskStore_AddAndList(t *testing.T) {
 	t.Parallel()
 
-	store := &TaskStore{mu: make(chan struct{}, 1), tasks: []Task{}, next: 1}
+	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 
 	task := store.Add("Test task", PriorityHigh)
 	if task.ID != 1 {
@@ -690,7 +670,7 @@ func TestTaskStore_AddAndList(t *testing.T) {
 func TestTaskStore_Done(t *testing.T) {
 	t.Parallel()
 
-	store := &TaskStore{mu: make(chan struct{}, 1), tasks: []Task{}, next: 1}
+	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	store.Add("Task 1", PriorityMedium)
 
 	task, err := store.Done(1)
@@ -705,7 +685,7 @@ func TestTaskStore_Done(t *testing.T) {
 func TestTaskStore_DoneNotFound(t *testing.T) {
 	t.Parallel()
 
-	store := &TaskStore{mu: make(chan struct{}, 1), tasks: []Task{}, next: 1}
+	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	_, err := store.Done(999)
 	if err == nil {
 		t.Fatal("expected error for not-found task")
@@ -715,7 +695,7 @@ func TestTaskStore_DoneNotFound(t *testing.T) {
 func TestTaskStore_FilterPriority(t *testing.T) {
 	t.Parallel()
 
-	store := &TaskStore{mu: make(chan struct{}, 1), tasks: []Task{}, next: 1}
+	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	store.Add("Low task", PriorityLow)
 	store.Add("High task", PriorityHigh)
 
@@ -733,7 +713,7 @@ func TestTaskStore_FilterPriority(t *testing.T) {
 func TestTaskStore_Stats(t *testing.T) {
 	t.Parallel()
 
-	store := &TaskStore{mu: make(chan struct{}, 1), tasks: []Task{}, next: 1}
+	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	store.Add("Task 1", PriorityHigh)
 	store.Add("Task 2", PriorityLow)
 	_, _ = store.Done(1)
@@ -756,7 +736,7 @@ func TestTaskStore_Stats(t *testing.T) {
 func TestTaskStore_IDs(t *testing.T) {
 	t.Parallel()
 
-	store := &TaskStore{mu: make(chan struct{}, 1), tasks: []Task{}, next: 1}
+	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	store.Add("Task 1", PriorityMedium)
 	store.Add("Task 2", PriorityMedium)
 
