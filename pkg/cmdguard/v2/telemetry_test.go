@@ -93,8 +93,8 @@ func TestTelemetryMiddleware(t *testing.T) {
 
 	span := tracer.spans[0]
 
-	if span.name != "deploy" {
-		t.Errorf("expected span name %q, got %q", "deploy", span.name)
+	if span.name != "deploy run" {
+		t.Errorf("expected span name %q, got %q", "deploy run", span.name)
 	}
 
 	if !span.ended {

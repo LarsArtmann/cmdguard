@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -12,6 +13,9 @@ import (
 // for each command execution. The span captures the command name, phase, and
 // any error returned by the handler.
 //
+// Each phase (pre-run, run, post-run) gets a uniquely-named span so traces
+// are unambiguous: "deploy pre-run", "deploy run", "deploy post-run".
+//
 // Usage:
 //
 //	tracer := otel.Tracer("myapp")
@@ -20,7 +24,9 @@ import (
 //	)
 func TelemetryMiddleware[T any](tracer trace.Tracer) Middleware[T] {
 	return func(ctx context.Context, _ *T, info CommandInfo, next func() error) error {
-		_, span := tracer.Start(ctx, info.Name)
+		spanName := fmt.Sprintf("%s %s", info.Name, info.Phase)
+
+		_, span := tracer.Start(ctx, spanName, trace.WithSpanKind(trace.SpanKindServer))
 		defer span.End()
 
 		span.SetAttributes(
