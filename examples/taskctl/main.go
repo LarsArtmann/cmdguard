@@ -5,7 +5,8 @@
 //   - Dependency injection with lifecycle hooks (HealthCheck, Shutdown)
 //   - Per-command typed flags with prompt, required, validate, and values tags
 //   - PreRunE validation and PostRunE cleanup
-//   - Middleware (timing + recovery)
+//   - Middleware (spinner + timing + recovery)
+//   - Glamour markdown help rendering (WithGlamourHelpTheme)
 //   - Rich output in multiple formats (OutputTable, OutputStyledTable)
 //   - Command groups (WithGroup)
 //   - Subcommands via NewParentCommand
@@ -57,11 +58,13 @@ func main() {
 		v2.WithSignalHandling[AppConfig](),
 		v2.WithStrictValidation[AppConfig](),
 		v2.WithMiddleware[AppConfig](
+			v2.SpinnerMiddleware[AppConfig]("Working..."),
 			v2.TimingMiddleware[AppConfig](func(name string, d time.Duration) {
 				fmt.Fprintf(os.Stderr, "[timing] %s took %v\n", name, d)
 			}),
 			v2.RecoveryMiddleware[AppConfig](),
 		),
+		v2.WithGlamourHelpTheme[AppConfig]("dark"),
 		v2.WithGroup[AppConfig]("tasks", "Task Management"),
 		v2.WithGroup[AppConfig]("system", "System"),
 	)

@@ -44,6 +44,16 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 			return v2.OutputTable(format, headers, rows)
 		},
 		v2.WithShort[AppConfig, *ListFlags]("List tasks"),
+		v2.WithLong[AppConfig, *ListFlags](`# List Tasks
+
+Display all tasks with optional filtering by priority and completion status.
+
+Supports multiple **output formats** for scripting and automation:
+
+- `+"`table`"+` (default) — human-readable columnar output
+- `+"`json`"+` — structured JSON for piping into `+"`jq`"+`
+- `+"`csv`"+` — comma-separated for spreadsheet import
+- `+"`yaml`"+` — structured YAML for config files`),
 		v2.WithExample[AppConfig, *ListFlags]("taskctl list --format json --all"),
 		v2.WithAliases[AppConfig, *ListFlags]("ls"),
 		v2.WithFlags[AppConfig, *ListFlags](&ListFlags{}),
@@ -71,6 +81,13 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 			return nil
 		},
 		v2.WithShort[AppConfig, *AddFlags]("Add a new task"),
+		v2.WithLong[AppConfig, *AddFlags](`# Add Task
+
+Create a new task with a **title** and *priority*.
+
+The `+"`--title`"+` flag is **required** and will prompt interactively if omitted.
+
+Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"`medium`"+`).`),
 		v2.WithExample[AppConfig, *AddFlags]("taskctl add --title \"Fix bug\" --priority high"),
 		v2.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
 		v2.WithPreRunE[AppConfig, *AddFlags](
@@ -228,6 +245,11 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 			return nil
 		},
 		v2.WithShort[AppConfig, *DBFlags]("Run database migrations"),
+		v2.WithLong[AppConfig, *DBFlags](`# Database Migrations
+
+Run pending database migrations against the configured environment.
+
+Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		v2.WithFlags[AppConfig, *DBFlags](&DBFlags{}),
 	)
 	if err != nil {
