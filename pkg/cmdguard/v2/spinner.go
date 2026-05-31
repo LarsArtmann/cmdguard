@@ -51,8 +51,29 @@ func DefaultSpinnerConfig(title string) SpinnerConfig {
 //	    v2.WithMiddleware(v2.SpinnerMiddleware[Config]("Loading...")),
 //	)
 func SpinnerMiddleware[T any](title string) Middleware[T] {
+	return SpinnerMiddlewareWithConfig[T](DefaultSpinnerConfig(title))
+}
+
+// SpinnerMiddlewareWithConfig returns a middleware that displays a terminal
+// spinner using the provided configuration. This is the advanced variant of
+// SpinnerMiddleware for full control over frames, interval, color, and output
+// destination.
+//
+// If the configured Writer is not a terminal, the spinner is silently skipped.
+//
+// Usage:
+//
+//	cfg := v2.SpinnerConfig{
+//	    Title:    "Deploying...",
+//	    Writer:   os.Stderr,
+//	    Frames:   []string{".", "o", "O", "o"},
+//	    Interval: 200 * time.Millisecond,
+//	}
+//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+//	    v2.WithMiddleware(v2.SpinnerMiddlewareWithConfig[Config](cfg)),
+//	)
+func SpinnerMiddlewareWithConfig[T any](cfg SpinnerConfig) Middleware[T] {
 	return func(_ context.Context, _ *T, _ CommandInfo, next func() error) error {
-		cfg := DefaultSpinnerConfig(title)
 		if !isTerminal(cfg.Writer) {
 			return next()
 		}

@@ -303,7 +303,8 @@ func TestWithPromptOnMissing_Integration(t *testing.T) {
 			t.Fatalf("creating CLI: %v", err)
 		}
 
-		cmd, err := NewCommand[testAppConfig, *Flags]("greet",
+		cmd, err := NewCommand[testAppConfig, *Flags](
+			"greet",
 			func(_ context.Context, _ *testAppConfig, flags *Flags) error {
 				gotName = flags.Name
 
@@ -348,7 +349,8 @@ func TestWithPromptOnMissing_Integration(t *testing.T) {
 			t.Fatalf("creating CLI: %v", err)
 		}
 
-		cmd, err := NewCommand[testAppConfig, *Flags]("greet",
+		cmd, err := NewCommand[testAppConfig, *Flags](
+			"greet",
 			func(_ context.Context, _ *testAppConfig, flags *Flags) error {
 				gotName = flags.Name
 

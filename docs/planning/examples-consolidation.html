@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard Examples Consolidation Plan</title>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --text-muted: #8b949e;
+        --accent: #58a6ff;
+        --green: #3fb950;
+        --red: #f85149;
+        --orange: #d29922;
+        --purple: #bc8cff;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        padding: 2rem max(2rem, calc((100vw - 900px) / 2));
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2rem 0 1rem;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 1.5rem 0 0.75rem;
+        color: var(--purple);
+      }
+      p {
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+      }
+      strong {
+        color: var(--text);
+      }
+      code {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.15em 0.4em;
+        font-size: 0.9em;
+        font-family: "SF Mono", "Fira Code", monospace;
+      }
+      pre {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        margin: 0.75rem 0 1.5rem;
+        font-size: 0.85rem;
+        font-family: "SF Mono", "Fira Code", monospace;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        padding: 0.6rem 0.8rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      tr:hover {
+        background: var(--surface);
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.15em 0.5em;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-green {
+        background: rgba(63, 185, 80, 0.15);
+        color: var(--green);
+      }
+      .badge-red {
+        background: rgba(248, 81, 73, 0.15);
+        color: var(--red);
+      }
+      .badge-orange {
+        background: rgba(210, 153, 34, 0.15);
+        color: var(--orange);
+      }
+      .badge-purple {
+        background: rgba(188, 140, 255, 0.15);
+        color: var(--purple);
+      }
+      .badge-blue {
+        background: rgba(88, 166, 255, 0.15);
+        color: var(--accent);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin: 0.75rem 0;
+      }
+      .card-header {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .del {
+        text-decoration: line-through;
+        opacity: 0.5;
+      }
+      .check {
+        color: var(--green);
+      }
+      .cross {
+        color: var(--red);
+      }
+      .phase {
+        border-left: 3px solid var(--accent);
+        padding-left: 1rem;
+        margin: 1rem 0 2rem;
+      }
+      .summary-box {
+        background: linear-gradient(135deg, rgba(88, 166, 255, 0.08), rgba(188, 140, 255, 0.08));
+        border: 1px solid var(--accent);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+      }
+      .summary-box h3 {
+        color: var(--accent);
+        margin-top: 0;
+      }
+      ul {
+        margin: 0.5rem 0 1rem 1.5rem;
+        color: var(--text-muted);
+      }
+      ul li {
+        margin-bottom: 0.3rem;
+      }
+      ul li strong {
+        color: var(--text);
+      }
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 700px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>cmdguard Examples Consolidation Plan</h1>
+    <p><strong>Date:</strong> 2026-05-31 &middot; <strong>Status:</strong> Ready to Execute</p>
+
+    <div class="summary-box">
+      <h3>The Goal</h3>
+      <p>
+        Replace <strong>15 scattered, shallow examples</strong> with
+        <strong>ONE superb example</strong> — a production-grade task manager CLI that demonstrates
+        <em>every single cmdguard feature</em> in a cohesive, realistic application.
+      </p>
+    </div>
+
+    <h2>Current State: Why This Needs Fixing</h2>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <span class="cross">&cross;</span> Problems with Current Examples
+        </div>
+        <ul>
+          <li>
+            <strong>15 directories</strong> — cognitive overload, users don't know where to start
+          </li>
+          <li>
+            Most examples are <strong>trivial toys</strong> (basic, counting, env-tags print one
+            line)
+          </li>
+          <li>
+            Heavy <strong>duplication</strong>: 5+ examples show NewCLI+NewCommand identically
+          </li>
+          <li>
+            <strong>Inconsistent patterns</strong>: some use internal.Execute, some use
+            cli.ExecuteAndExit, some use panic
+          </li>
+          <li>Tests are <strong>shallow</strong> — most only test creation or --help output</li>
+          <li>kitchen-sink is the closest to "good" but still named poorly and misses features</li>
+          <li>Each example requires its own go package, README, test boilerplate</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="check">&check;</span> What a Single Superb Example Achieves
+        </div>
+        <ul>
+          <li><strong>One entry point</strong> — zero decision paralysis</li>
+          <li>Users see a <strong>real-world CLI pattern</strong> they can copy-paste-adapt</li>
+          <li>Every feature demonstrated in <strong>context</strong>, not isolation</li>
+          <li>Comprehensive tests that serve as <strong>executable documentation</strong></li>
+          <li>Maintenance burden: <strong>1 package</strong> instead of 15</li>
+          <li>Feature coverage is auditable via feature matrix in README</li>
+          <li>Better first impression for new users evaluating the library</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Feature Coverage Audit</h2>
+
+    <p>Every cmdguard feature that must be demonstrated in the single example:</p>
+
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>Current Best Example</th>
+        <th>Coverage Quality</th>
+      </tr>
+      <tr>
+        <td>NewCLI + CLI options</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>AddCommand (standalone function)</td>
+        <td>typed</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>NewCommand / MustNewCommand</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>NewParentCommand (subcommands)</td>
+        <td>subcommands</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithFlags (typed flag structs)</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithShort / WithLong / WithExample</td>
+        <td>typed</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>PreRunE validation</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>PostRunE cleanup</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithHidden / WithDeprecated</td>
+        <td>typed</td>
+        <td><span class="badge badge-orange">OK</span></td>
+      </tr>
+      <tr>
+        <td>WithAliases</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>WithExactArgs / WithNoArgs / arg validators</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>WithGroupID / WithGroup</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithCLIVersion</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>MustVersionCommand</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>DI: Provide / Invoke</td>
+        <td>di + di-patterns + kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>DI: ProvideValue</td>
+        <td>typed</td>
+        <td><span class="badge badge-orange">OK</span></td>
+      </tr>
+      <tr>
+        <td>DI: Shutdowner / HealthcheckerWithContext</td>
+        <td>di</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>DI: NewScopeFromInjector</td>
+        <td>di + di-patterns</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>env:"VAR" struct tags</td>
+        <td>env-tags + kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithEnvPrefix</td>
+        <td>env-tags + kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>count:"true" (counting flags)</td>
+        <td>counting</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>required:"true"</td>
+        <td>advanced-flags + di-patterns</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>validate:"email,min=5" tag</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>Custom type handlers (Duration, LogLevel, etc.)</td>
+        <td>advanced-flags</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>Flag typo suggestions</td>
+        <td><em>none (mentioned but not shown)</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>WithMiddleware (Timing + Recovery)</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithSignalHandling</td>
+        <td>signals + kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>OutputTable / OutputResult / ParseOutputFormat</td>
+        <td>output + kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>OutputStyledTable</td>
+        <td>output</td>
+        <td><span class="badge badge-orange">OK</span></td>
+      </tr>
+      <tr>
+        <td>Error wrapping: NewCommandError / NewFlagError / NewServiceError</td>
+        <td>error-handling + kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>Exit codes: NewExitError / ExitCoder</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>Sentinel errors: errors.Is()</td>
+        <td>error-handling</td>
+        <td><span class="badge badge-orange">OK</span></td>
+      </tr>
+      <tr>
+        <td>WithStrictValidation</td>
+        <td>kitchen-sink</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithConfigValidation</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>WithConfigFile</td>
+        <td>config-file</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>WithPromptOnMissing / prompt:"..." tag</td>
+        <td>prompts</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+      <tr>
+        <td>AddGlobalFlag / AddGlobalBoolFlag</td>
+        <td>typed</td>
+        <td><span class="badge badge-orange">OK</span></td>
+      </tr>
+      <tr>
+        <td>BranchingFlowContext</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>EditInEditor</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>WithCompletion / shell completion</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>ManPage generation</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>Ptr[T] / ValueOrDefault helpers</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>Enum[T] value type</td>
+        <td><em>none</em></td>
+        <td><span class="badge badge-red">MISSING</span></td>
+      </tr>
+      <tr>
+        <td>NoFlags type</td>
+        <td>most examples</td>
+        <td><span class="badge badge-green">GOOD</span></td>
+      </tr>
+    </table>
+
+    <h2>The Plan: One Superb Example</h2>
+
+    <div class="summary-box">
+      <h3>Design: "taskctl" — A Production Task Manager</h3>
+      <p>
+        A realistic CLI application that a developer would actually build. Every cmdguard feature is
+        woven in naturally, not bolted on. The domain is simple enough to understand instantly but
+        rich enough to demonstrate everything.
+      </p>
+    </div>
+
+    <h3>Architecture</h3>
+
+    <pre>
+examples/taskctl/
+├── main.go              # Entry point: CLI construction, DI setup, command wiring
+├── commands.go          # All command definitions (list, add, done, stats, config, inspect)
+├── service.go           # TaskStore DI service with lifecycle hooks
+├── types.go             # Domain types (Priority enum, Task, flags structs)
+├── main_test.go         # Comprehensive integration tests
+└── README.md            # Self-documenting: feature matrix, usage examples
+</pre
+    >
+
+    <h3>Command Tree</h3>
+
+    <pre>
+taskctl                        # Root: config with env tags, signal handling, middleware
+├── list                       # List tasks (OutputTable, multi-format, --format json/csv/yaml)
+├── add                        # Add task (required flags, PreRunE validation, prompt tags)
+├── done                       # Complete task (exit codes, PostRunE cleanup)
+├── stats                      # Task statistics (OutputStyledTable, format flag)
+├── inspect                    # Deep inspect a task (BranchingFlowContext, EditInEditor)
+├── version                    # MustVersionCommand
+├── health                     # HealthCheckWithContext, DI service verification
+├── config                     # Show resolved config (env vars, config file, defaults)
+│   └── edit                   # Edit config in $EDITOR
+├── db                         # NewParentCommand — grouped subcommands
+│   ├── migrate                # With DBFlags (env, force)
+│   ├── seed                   # With DBFlags (shared flags via parent)
+│   └── status                 # With DBFlags
+└── _hidden                    # Hidden command (WithHidden)
+    └── _deprecated            # Deprecated command (WithDeprecated)
+</pre
+    >
+
+    <h3>Feature-to-Command Mapping</h3>
+
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>Where Demonstrated</th>
+        <th>How</th>
+      </tr>
+      <tr>
+        <td><code>NewCLI</code> with options</td>
+        <td>main.go</td>
+        <td>
+          Version, env prefix, signal handling, strict validation, config validation, middleware,
+          groups
+        </td>
+      </tr>
+      <tr>
+        <td><code>WithCLIVersion</code></td>
+        <td>main.go</td>
+        <td>"1.0.0"</td>
+      </tr>
+      <tr>
+        <td><code>WithEnvPrefix</code></td>
+        <td>main.go</td>
+        <td>TASKCTL_ prefix</td>
+      </tr>
+      <tr>
+        <td><code>WithSignalHandling</code></td>
+        <td>main.go</td>
+        <td>Graceful shutdown on SIGINT</td>
+      </tr>
+      <tr>
+        <td><code>WithStrictValidation</code></td>
+        <td>main.go</td>
+        <td>All commands have WithShort</td>
+      </tr>
+      <tr>
+        <td><code>WithConfigValidation</code></td>
+        <td>main.go</td>
+        <td>Validate DataDir exists</td>
+      </tr>
+      <tr>
+        <td><code>WithMiddleware</code></td>
+        <td>main.go</td>
+        <td>TimingMiddleware + RecoveryMiddleware</td>
+      </tr>
+      <tr>
+        <td><code>WithGroup</code></td>
+        <td>main.go</td>
+        <td>"tasks" + "system" groups</td>
+      </tr>
+      <tr>
+        <td><code>WithConfigFile</code></td>
+        <td>main.go</td>
+        <td>JSON config from ~/.config/taskctl/config.json</td>
+      </tr>
+      <tr>
+        <td><code>AddGlobalBoolFlag</code></td>
+        <td>main.go</td>
+        <td>--debug global flag</td>
+      </tr>
+      <tr>
+        <td><code>env:"VAR"</code> tags</td>
+        <td>types.go AppConfig</td>
+        <td>TASK_LOG_LEVEL, TASK_DATA_DIR</td>
+      </tr>
+      <tr>
+        <td><code>count:"true"</code></td>
+        <td>types.go</td>
+        <td>verbosity -v/-vv/-vvv in AppConfig</td>
+      </tr>
+      <tr>
+        <td><code>required:"true"</code></td>
+        <td>types.go</td>
+        <td>add --title, done --id</td>
+      </tr>
+      <tr>
+        <td><code>validate:"..."</code> tag</td>
+        <td>types.go</td>
+        <td>validate:"email" on notify-email flag</td>
+      </tr>
+      <tr>
+        <td><code>prompt:"..."</code> tag</td>
+        <td>types.go</td>
+        <td>prompt on add --title when missing</td>
+      </tr>
+      <tr>
+        <td><code>Enum[T]</code> value type</td>
+        <td>types.go</td>
+        <td>Priority enum (low/medium/high)</td>
+      </tr>
+      <tr>
+        <td><code>Duration</code> type</td>
+        <td>types.go</td>
+        <td>Config timeout</td>
+      </tr>
+      <tr>
+        <td><code>LogLevel</code> type</td>
+        <td>types.go</td>
+        <td>Config log-level</td>
+      </tr>
+      <tr>
+        <td><code>Port</code> type</td>
+        <td>types.go</td>
+        <td>Config port</td>
+      </tr>
+      <tr>
+        <td><code>Provide / Invoke</code></td>
+        <td>service.go</td>
+        <td>TaskStore service with DI</td>
+      </tr>
+      <tr>
+        <td><code>Shutdowner</code> / <code>HealthcheckerWithContext</code></td>
+        <td>service.go</td>
+        <td>TaskStore implements both</td>
+      </tr>
+      <tr>
+        <td><code>NewScopeFromInjector</code></td>
+        <td>service.go</td>
+        <td>In NewTaskStore provider</td>
+      </tr>
+      <tr>
+        <td><code>NewCommand</code></td>
+        <td>commands.go</td>
+        <td>list, add, done, stats, etc.</td>
+      </tr>
+      <tr>
+        <td><code>MustNewCommand</code></td>
+        <td>commands.go</td>
+        <td>health command</td>
+      </tr>
+      <tr>
+        <td><code>NewParentCommand</code></td>
+        <td>commands.go</td>
+        <td>db command group</td>
+      </tr>
+      <tr>
+        <td><code>PreRunE</code></td>
+        <td>commands.go</td>
+        <td>add validates title length</td>
+      </tr>
+      <tr>
+        <td><code>PostRunE</code></td>
+        <td>commands.go</td>
+        <td>done triggers state sync</td>
+      </tr>
+      <tr>
+        <td><code>WithHidden</code></td>
+        <td>commands.go</td>
+        <td>secret admin command</td>
+      </tr>
+      <tr>
+        <td><code>WithDeprecated</code></td>
+        <td>commands.go</td>
+        <td>old "complete" alias for "done"</td>
+      </tr>
+      <tr>
+        <td><code>WithAliases</code></td>
+        <td>commands.go</td>
+        <td>"ls" alias for "list"</td>
+      </tr>
+      <tr>
+        <td><code>WithExactArgs</code></td>
+        <td>commands.go</td>
+        <td>inspect requires exactly 1 arg</td>
+      </tr>
+      <tr>
+        <td><code>WithNoArgs</code></td>
+        <td>commands.go</td>
+        <td>stats takes no args</td>
+      </tr>
+      <tr>
+        <td><code>WithGroupID</code></td>
+        <td>commands.go</td>
+        <td>tasks vs system grouping</td>
+      </tr>
+      <tr>
+        <td><code>OutputTable</code></td>
+        <td>commands.go</td>
+        <td>list with --format flag</td>
+      </tr>
+      <tr>
+        <td><code>OutputStyledTable</code></td>
+        <td>commands.go</td>
+        <td>stats command</td>
+      </tr>
+      <tr>
+        <td><code>ParseOutputFormat</code></td>
+        <td>commands.go</td>
+        <td>list --format json</td>
+      </tr>
+      <tr>
+        <td><code>NewCommandError / NewFlagError / NewServiceError</code></td>
+        <td>commands.go</td>
+        <td>Error wrapping throughout</td>
+      </tr>
+      <tr>
+        <td><code>NewExitError / ExitCoder</code></td>
+        <td>commands.go</td>
+        <td>done returns exit code 2 on not-found</td>
+      </tr>
+      <tr>
+        <td><code>Sentinel errors</code> with <code>errors.Is</code></td>
+        <td>main_test.go</td>
+        <td>Test error chain</td>
+      </tr>
+      <tr>
+        <td><code>errors.AsType</code></td>
+        <td>main_test.go</td>
+        <td>Test typed error extraction</td>
+      </tr>
+      <tr>
+        <td><code>MustVersionCommand</code></td>
+        <td>main.go</td>
+        <td>Auto version subcommand</td>
+      </tr>
+      <tr>
+        <td><code>BranchingFlowContext</code></td>
+        <td>commands.go</td>
+        <td>inspect command reads flow path</td>
+      </tr>
+      <tr>
+        <td><code>EditInEditor</code></td>
+        <td>commands.go</td>
+        <td>config edit opens $EDITOR</td>
+      </tr>
+      <tr>
+        <td><code>Ptr[T]</code> / <code>ValueOrDefault</code></td>
+        <td>service.go</td>
+        <td>Utility usage in service</td>
+      </tr>
+      <tr>
+        <td><code>WithPromptOnMissing</code></td>
+        <td>commands.go</td>
+        <td>add command prompts for title</td>
+      </tr>
+      <tr>
+        <td><code>WithCompletion</code></td>
+        <td>commands.go</td>
+        <td>done --id has dynamic completion</td>
+      </tr>
+      <tr>
+        <td><code>WithValidArgs</code></td>
+        <td>commands.go</td>
+        <td>Static valid args for inspect</td>
+      </tr>
+    </table>
+
+    <h2>Execution Phases</h2>
+
+    <div class="phase">
+      <h3>Phase 1: Create the superb example <span class="badge badge-blue">BUILD</span></h3>
+      <ol>
+        <li>Create <code>examples/taskctl/</code> directory</li>
+        <li>
+          Write <code>types.go</code> — domain types, config, all flag structs with rich struct tags
+        </li>
+        <li>Write <code>service.go</code> — TaskStore with DI lifecycle (Shutdown, HealthCheck)</li>
+        <li>Write <code>commands.go</code> — all command definitions, every option exercised</li>
+        <li>
+          Write <code>main.go</code> — CLI construction with all options, DI registration, command
+          wiring
+        </li>
+        <li>
+          Write <code>main_test.go</code> — comprehensive integration tests (every command, every
+          error path)
+        </li>
+        <li>Write <code>README.md</code> — feature matrix, usage examples, architecture diagram</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h3>Phase 2: Delete old examples <span class="badge badge-red">CLEANUP</span></h3>
+      <ol>
+        <li>Delete <code>examples/basic/</code></li>
+        <li>Delete <code>examples/typed/</code></li>
+        <li>Delete <code>examples/di/</code></li>
+        <li>Delete <code>examples/di-patterns/</code></li>
+        <li>Delete <code>examples/config-file/</code></li>
+        <li>Delete <code>examples/env-tags/</code></li>
+        <li>Delete <code>examples/counting/</code></li>
+        <li>Delete <code>examples/error-handling/</code></li>
+        <li>Delete <code>examples/subcommands/</code></li>
+        <li>Delete <code>examples/advanced-flags/</code></li>
+        <li>Delete <code>examples/prompts/</code></li>
+        <li>Delete <code>examples/signals/</code></li>
+        <li>Delete <code>examples/output/</code></li>
+        <li>Delete <code>examples/kitchen-sink/</code></li>
+        <li>Delete <code>examples/validation/</code></li>
+        <li>Delete <code>examples/internal/</code> — no longer needed</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h3>Phase 3: Update project documentation <span class="badge badge-purple">DOCS</span></h3>
+      <ol>
+        <li>Update <code>examples/README.md</code> — single entry pointing to taskctl</li>
+        <li>Update <code>AGENTS.md</code> — reflect new example structure</li>
+        <li>Update <code>TODO_LIST.md</code> — mark consolidation as done</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h3>Phase 4: Verify everything <span class="badge badge-green">VERIFY</span></h3>
+      <ol>
+        <li><code>go build ./...</code> — builds clean</li>
+        <li><code>go test ./examples/taskctl/... -count=1 -race</code> — all tests pass</li>
+        <li><code>golangci-lint run ./examples/...</code> — zero lint issues</li>
+        <li><code>go test ./... -count=1 -race</code> — full project still green</li>
+        <li>Manual smoke test: <code>go run examples/taskctl/main.go --help</code></li>
+      </ol>
+    </div>
+
+    <h2>Test Strategy</h2>
+
+    <p>The single example will have comprehensive tests organized by concern:</p>
+
+    <table>
+      <tr>
+        <th>Test Area</th>
+        <th>What's Tested</th>
+        <th>Count (est.)</th>
+      </tr>
+      <tr>
+        <td>CLI construction</td>
+        <td>NewCLI with all options, config defaults</td>
+        <td>3-5</td>
+      </tr>
+      <tr>
+        <td>DI services</td>
+        <td>Provide, Invoke, HealthCheck, Shutdown</td>
+        <td>4-6</td>
+      </tr>
+      <tr>
+        <td>list command</td>
+        <td>Default, --format json/csv/yaml, --all, --priority filter, empty list</td>
+        <td>5-7</td>
+      </tr>
+      <tr>
+        <td>add command</td>
+        <td>Valid add, missing title, title too short, prompt tag</td>
+        <td>4-5</td>
+      </tr>
+      <tr>
+        <td>done command</td>
+        <td>Valid, not-found (exit code 2), PostRunE runs</td>
+        <td>3-4</td>
+      </tr>
+      <tr>
+        <td>stats command</td>
+        <td>Output, format flag, WithNoArgs</td>
+        <td>2-3</td>
+      </tr>
+      <tr>
+        <td>inspect command</td>
+        <td>Valid, WithExactArgs enforcement, BranchingFlowContext</td>
+        <td>3-4</td>
+      </tr>
+      <tr>
+        <td>db subcommands</td>
+        <td>migrate/seed/status with shared flags, NewParentCommand</td>
+        <td>3-4</td>
+      </tr>
+      <tr>
+        <td>health command</td>
+        <td>Healthy, unhealthy service</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>config command</td>
+        <td>Show config, env var resolution</td>
+        <td>2-3</td>
+      </tr>
+      <tr>
+        <td>version command</td>
+        <td>Output contains version</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>Error handling</td>
+        <td>errors.Is sentinel, errors.AsType typed, NewFlagError suggestion</td>
+        <td>3-4</td>
+      </tr>
+      <tr>
+        <td>Edge cases</td>
+        <td>Unknown command suggestion, typo suggestion, deprecated warning</td>
+        <td>2-3</td>
+      </tr>
+    </table>
+
+    <p>
+      <strong>Estimated total: ~35-50 tests</strong> (vs. current ~25 shallow tests across 15
+      packages)
+    </p>
+
+    <h2>Success Criteria</h2>
+
+    <ul>
+      <li>
+        <span class="check">&check;</span> Every cmdguard feature from FEATURES.md demonstrated at
+        least once
+      </li>
+      <li>
+        <span class="check">&check;</span> <code>go build ./examples/taskctl/</code> compiles clean
+      </li>
+      <li>
+        <span class="check">&check;</span> <code>go test ./examples/taskctl/... -race</code> passes
+      </li>
+      <li>
+        <span class="check">&check;</span>
+        <code>golangci-lint run ./examples/taskctl/...</code> zero issues
+      </li>
+      <li>
+        <span class="check">&check;</span> All other project tests still pass (<code
+          >go test ./... -race</code
+        >)
+      </li>
+      <li><span class="check">&check;</span> README.md has feature matrix showing 100% coverage</li>
+      <li>
+        <span class="check">&check;</span> New user can understand the example in &lt; 5 minutes
+      </li>
+      <li>
+        <span class="check">&check;</span> Only 1 example package exists in <code>examples/</code>
+      </li>
+    </ul>
+  </body>
+</html>

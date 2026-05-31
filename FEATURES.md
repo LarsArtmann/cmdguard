@@ -118,13 +118,13 @@
 
 ### Middleware
 
-| Feature              | Status              | Notes                              |
-| -------------------- | ------------------- | ---------------------------------- |
-| `TimingMiddleware`    | ✅ FULLY_FUNCTIONAL | Log command execution duration        |
-| `RecoveryMiddleware`  | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers       |
-| `SpinnerMiddleware`   | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution     |
-| `TelemetryMiddleware` | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command        |
-| Custom middleware     | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error`    |
+| Feature               | Status              | Notes                              |
+| --------------------- | ------------------- | ---------------------------------- |
+| `TimingMiddleware`    | ✅ FULLY_FUNCTIONAL | Log command execution duration     |
+| `RecoveryMiddleware`  | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers    |
+| `SpinnerMiddleware`   | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution  |
+| `TelemetryMiddleware` | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command     |
+| Custom middleware     | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
 
 ### Shell Completion
 
@@ -147,7 +147,7 @@
 | Feature                              | Status              | Notes                                   |
 | ------------------------------------ | ------------------- | --------------------------------------- |
 | `WithGlamourHelp[T]()`               | ✅ FULLY_FUNCTIONAL | Render command Long/Example as markdown |
-| `RenderMarkdown(md)`               | ✅ FULLY_FUNCTIONAL | Render markdown with auto theme         |
+| `RenderMarkdown(md)`                 | ✅ FULLY_FUNCTIONAL | Render markdown with auto theme         |
 | `RenderMarkdownWithTheme(md, theme)` | ✅ FULLY_FUNCTIONAL | Render with specific glamour theme      |
 
 ### Positional Arguments
@@ -163,15 +163,15 @@
 
 ### Interactive Prompts (huh)
 
-| Feature                              | Status              | Notes                                    |
-| ------------------------------------ | ------------------- | ---------------------------------------- |
-| `WithPromptOnMissing[T, F]()`        | ✅ FULLY_FUNCTIONAL | Prompt for missing `prompt`-tagged flags |
-| `prompt:"Question?"` struct tag     | ✅ FULLY_FUNCTIONAL | Marks field for interactive prompting    |
-| `PromptString(title, default)`       | ✅ FULLY_FUNCTIONAL | Text input via huh.NewInput              |
-| `PromptSelect(title, options)`       | ✅ FULLY_FUNCTIONAL | Selection via huh.NewSelect              |
-| `PromptConfirm(title)`               | ✅ FULLY_FUNCTIONAL | Yes/no via huh.NewConfirm                |
-| Bool fields → confirm prompt         | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
-| Enum fields → select prompt          | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
+| Feature                         | Status              | Notes                                    |
+| ------------------------------- | ------------------- | ---------------------------------------- |
+| `WithPromptOnMissing[T, F]()`   | ✅ FULLY_FUNCTIONAL | Prompt for missing `prompt`-tagged flags |
+| `prompt:"Question?"` struct tag | ✅ FULLY_FUNCTIONAL | Marks field for interactive prompting    |
+| `PromptString(title, default)`  | ✅ FULLY_FUNCTIONAL | Text input via huh.NewInput              |
+| `PromptSelect(title, options)`  | ✅ FULLY_FUNCTIONAL | Selection via huh.NewSelect              |
+| `PromptConfirm(title)`          | ✅ FULLY_FUNCTIONAL | Yes/no via huh.NewConfirm                |
+| Bool fields → confirm prompt    | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
+| Enum fields → select prompt     | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
 
 ### Version Command
 
@@ -205,16 +205,16 @@
 
 ## Dependencies
 
-| Dependency                         | Version | Status              | Purpose              |
-| ---------------------------------- | ------- | ------------------- | -------------------- |
-| `github.com/spf13/cobra`           | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework        |
-| `github.com/samber/do/v2`          | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection |
-| `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing         |
-| `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling        |
+| Dependency                         | Version | Status              | Purpose               |
+| ---------------------------------- | ------- | ------------------- | --------------------- |
+| `github.com/spf13/cobra`           | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework         |
+| `github.com/samber/do/v2`          | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection  |
+| `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing          |
+| `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling         |
 | `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts   |
-| `github.com/charmbracelet/glamour` | v1.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering     |
-| `go.opentelemetry.io/otel/trace`   | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing  |
-| `github.com/larsartmann/go-output` | latest  | ✅ FULLY_FUNCTIONAL | Rich output formats    |
+| `github.com/charmbracelet/glamour` | v1.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering    |
+| `go.opentelemetry.io/otel/trace`   | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing |
+| `github.com/larsartmann/go-output` | latest  | ✅ FULLY_FUNCTIONAL | Rich output formats   |
 
 ---
 

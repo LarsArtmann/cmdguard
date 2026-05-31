@@ -145,8 +145,6 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		return cli.parseOutputFlag(c)
 	}
 
-
-
 	return nil
 }
 
@@ -168,8 +166,6 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	}
 
 	cli.rootCmd.AddCommand(cobraCmd)
-
-
 
 	return nil
 }

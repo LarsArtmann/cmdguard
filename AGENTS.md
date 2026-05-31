@@ -93,19 +93,12 @@ cmdguard/
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
-│   ├── basic/                    # Simple v2 demo
-│   ├── config-file/               # Config file loading
-│   ├── counting/                  # Counting flags (-v/-vv/-vvv)
-│   ├── di/                        # DI-focused example
-│   ├── di-patterns/               # DI service patterns
-│   ├── env-tags/                  # Environment variable tags
-│   ├── error-handling/            # Error handling patterns
-│   ├── advanced-flags/            # Advanced flag types
-│   ├── output/                    # Rich output formatting
-│   ├── signals/                   # Signal handling
-│   ├── typed/                     # v2 API demo with DI and lifecycle
-│   ├── validation/                # Validation patterns example
-│   └── internal/                  # Shared example helpers
+│   └── taskctl/                   # Single superb example: production task manager CLI
+│       ├── main.go                # CLI construction, DI setup, all CLI options
+│       ├── commands.go            # All command definitions with options
+│       ├── types.go               # Config, flags, domain types, TaskStore service
+│       ├── main_test.go           # Comprehensive integration tests (~65 tests)
+│       └── README.md              # Feature matrix and usage guide
 ├── benchmarks/                   # Performance benchmarks
 ├── tests/integration/            # Integration tests
 ├── docs/                         # Documentation
@@ -175,26 +168,26 @@ func MustNewParentCommand[T, F any](...) Command[T, F]
 
 ### Command Options
 
-| Option                           | Purpose                                |
-| -------------------------------- | -------------------------------------- |
-| `WithShort[T, F](short)`         | Short description                      |
-| `WithLong[T, F](long)`           | Long description                       |
-| `WithAliases[T, F](aliases...)`  | Alternative names                      |
-| `WithExample[T, F](example)`     | Example usage                          |
-| `WithFlags[T, F](flags)`         | Typed flags struct                     |
-| `WithRunE[T, F](runE)`           | Main handler (required for NewCommand) |
-| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook                    |
-| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook              |
-| `WithSubcommands[T, F](cmds...)` | Child commands                         |
-| `WithHidden[T, F](hidden)`       | Hide from help                         |
-| `WithDeprecated[T, F](msg)`      | Deprecation message                    |
-| `WithGroupID[T, F](group)`       | Help group name                        |
-| `WithExactArgs[T, F](n)`         | Require exactly n positional args      |
-| `WithMinimumArgs[T, F](n)`       | Require at least n positional args     |
-| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args        |
-| `WithRangeArgs[T, F](min, max)`  | Require between min and max args       |
-| `WithNoArgs[T, F]()`             | Reject any positional args             |
-| `WithArgs[T, F](fn)`             | Custom cobra.PositionalArgs validator  |
+| Option                           | Purpose                                              |
+| -------------------------------- | ---------------------------------------------------- |
+| `WithShort[T, F](short)`         | Short description                                    |
+| `WithLong[T, F](long)`           | Long description                                     |
+| `WithAliases[T, F](aliases...)`  | Alternative names                                    |
+| `WithExample[T, F](example)`     | Example usage                                        |
+| `WithFlags[T, F](flags)`         | Typed flags struct                                   |
+| `WithRunE[T, F](runE)`           | Main handler (required for NewCommand)               |
+| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook                                  |
+| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook                            |
+| `WithSubcommands[T, F](cmds...)` | Child commands                                       |
+| `WithHidden[T, F](hidden)`       | Hide from help                                       |
+| `WithDeprecated[T, F](msg)`      | Deprecation message                                  |
+| `WithGroupID[T, F](group)`       | Help group name                                      |
+| `WithExactArgs[T, F](n)`         | Require exactly n positional args                    |
+| `WithMinimumArgs[T, F](n)`       | Require at least n positional args                   |
+| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args                      |
+| `WithRangeArgs[T, F](min, max)`  | Require between min and max args                     |
+| `WithNoArgs[T, F]()`             | Reject any positional args                           |
+| `WithArgs[T, F](fn)`             | Custom cobra.PositionalArgs validator                |
 | `WithPromptOnMissing[T, F]()`    | Interactive prompt for missing `prompt`-tagged flags |
 
 ### CLI[T] Constructor
@@ -224,8 +217,8 @@ Functional options:
 | `WithDraconianValidation[T]()` | Strict + examples on leaf commands          |
 | `WithConfigFile[T](paths...)`  | Load JSON config file before flags          |
 | `WithConfigFileLoader[T](l,p)` | Load config with custom loader (YAML/TOML)  |
-| `WithGlamourHelp[T]()`          | Render markdown in command help text        |
-| `WithTelemetry[T](tracer)`      | OpenTelemetry spans for all commands          |
+| `WithGlamourHelp[T]()`         | Render markdown in command help text        |
+| `WithTelemetry[T](tracer)`     | OpenTelemetry spans for all commands        |
 
 ### CLI[T] Methods
 
@@ -530,28 +523,28 @@ go build ./...                                   # Verify build
 7. **Counting flags** — must use `int` type with `count:"true"` tag; don't reuse flag names from root config
 8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
-9. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
-10. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
-11. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly
-12. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
-13. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
-14. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
-15. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
-16. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
-17. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
-18. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
-19. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
-20. **Glamour auto theme** — `WithGlamourHelp` uses glamour's "auto" theme which detects terminal capabilities; in non-TTY environments markdown syntax may be preserved with padding
-21. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
-22. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
-19. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
-20. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
-21. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
-22. **Config file precedence** — `WithConfigFile[T](paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
-23. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
-24. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
-25. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
-26. **Nix sandbox vs local replace** — `go.mod` has `replace` directives pointing to `../go-output`; Nix sandboxed checks (`buildGoModule`, `go build` in derivations) cannot resolve these, so `flake.nix` only provides devShell + formatter + format check (no build/vet checks)
+10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
+11. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
+12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly
+13. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
+14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
+15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
+16. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
+17. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
+18. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
+19. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
+20. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
+21. **Glamour auto theme** — `WithGlamourHelp` uses glamour's "auto" theme which detects terminal capabilities; in non-TTY environments markdown syntax may be preserved with padding
+22. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
+23. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
+24. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
+25. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
+26. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
+27. **Config file precedence** — `WithConfigFile[T](paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
+28. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
+29. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
+30. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
+31. **Nix sandbox vs local replace** — `go.mod` has `replace` directives pointing to `../go-output`; Nix sandboxed checks (`buildGoModule`, `go build` in derivations) cannot resolve these, so `flake.nix` only provides devShell + formatter + format check (no build/vet checks)
 
 ---
 

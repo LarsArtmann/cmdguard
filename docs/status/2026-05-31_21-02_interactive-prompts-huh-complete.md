@@ -137,33 +137,33 @@ output rendered
 
 ## f) Top #25 Things We Should Get Done Next
 
-| # | Task | Category | Est | Impact |
-|---|------|----------|-----|--------|
-| 1 | Fix `ExampleOutputTable` expected output | Bug | 5m | Unblocks CI |
-| 2 | Run full suite with `-race`, fix any new issues | Quality | 30m | Confidence |
-| 3 | Fix gopls `errors.As` → `errors.AsType[ExitCoder]` hints | Cleanup | 15m | Modern Go |
-| 4 | Extract `handlerConfig` from `wireHandlerWithMiddleware` | Refactor | 30m | Readability |
-| 5 | Add `Phase` typed enum | Type Safety | 20m | Compiler help |
-| 6 | Fix 7 unwrapped error returns | Quality | 20m | Error chains |
-| 7 | Split `type_handler.go` (481 lines) | Refactor | 45m | Navigation |
-| 8 | Split `command.go` — extract args options | Refactor | 30m | Navigation |
-| 9 | Split `flow_context.go` — extract options | Refactor | 30m | Navigation |
-| 10 | Fix `outputFormat`/`outputState.format` split brain | Bug | 30m | Consistency |
-| 11 | Consolidate MarshalText/UnmarshalText patterns | DRY | 45m | Maintainability |
-| 12 | Consolidate 5 error types into `labeledError` | Refactor | 60m | DRY |
-| 13 | Add CLI construction benchmark | Performance | 20m | Baseline |
-| 14 | Add flag parsing benchmark | Performance | 20m | Baseline |
-| 15 | Add command execution benchmark | Performance | 20m | Baseline |
-| 16 | Add prompt edge-case tests (env skip, required interaction) | Tests | 30m | Coverage |
-| 17 | Document prompts in TUTORIAL.md | Docs | 20m | User onboarding |
-| 18 | Add prompt integration to kitchen-sink example | Example | 15m | Demo |
-| 19 | Remove go-output `replace` directives or fix Nix build | Build | 60m | CI/CD |
-| 20 | Create v2.3.0 release tag and notes | Release | 30m | Ship it |
-| 21 | Set up release automation (GitHub Actions) | CI/CD | 60m | Maintainability |
-| 22 | Add codecov integration | CI/CD | 30m | Visibility |
-| 23 | Spinner/progress middleware (bubbles) | Feature | 90m | UX |
-| 24 | Glamour markdown help rendering | Feature | 60m | UX |
-| 25 | Telemetry middleware (OpenTelemetry spans) | Feature | 120m | Observability |
+| #   | Task                                                        | Category    | Est  | Impact          |
+| --- | ----------------------------------------------------------- | ----------- | ---- | --------------- |
+| 1   | Fix `ExampleOutputTable` expected output                    | Bug         | 5m   | Unblocks CI     |
+| 2   | Run full suite with `-race`, fix any new issues             | Quality     | 30m  | Confidence      |
+| 3   | Fix gopls `errors.As` → `errors.AsType[ExitCoder]` hints    | Cleanup     | 15m  | Modern Go       |
+| 4   | Extract `handlerConfig` from `wireHandlerWithMiddleware`    | Refactor    | 30m  | Readability     |
+| 5   | Add `Phase` typed enum                                      | Type Safety | 20m  | Compiler help   |
+| 6   | Fix 7 unwrapped error returns                               | Quality     | 20m  | Error chains    |
+| 7   | Split `type_handler.go` (481 lines)                         | Refactor    | 45m  | Navigation      |
+| 8   | Split `command.go` — extract args options                   | Refactor    | 30m  | Navigation      |
+| 9   | Split `flow_context.go` — extract options                   | Refactor    | 30m  | Navigation      |
+| 10  | Fix `outputFormat`/`outputState.format` split brain         | Bug         | 30m  | Consistency     |
+| 11  | Consolidate MarshalText/UnmarshalText patterns              | DRY         | 45m  | Maintainability |
+| 12  | Consolidate 5 error types into `labeledError`               | Refactor    | 60m  | DRY             |
+| 13  | Add CLI construction benchmark                              | Performance | 20m  | Baseline        |
+| 14  | Add flag parsing benchmark                                  | Performance | 20m  | Baseline        |
+| 15  | Add command execution benchmark                             | Performance | 20m  | Baseline        |
+| 16  | Add prompt edge-case tests (env skip, required interaction) | Tests       | 30m  | Coverage        |
+| 17  | Document prompts in TUTORIAL.md                             | Docs        | 20m  | User onboarding |
+| 18  | Add prompt integration to kitchen-sink example              | Example     | 15m  | Demo            |
+| 19  | Remove go-output `replace` directives or fix Nix build      | Build       | 60m  | CI/CD           |
+| 20  | Create v2.3.0 release tag and notes                         | Release     | 30m  | Ship it         |
+| 21  | Set up release automation (GitHub Actions)                  | CI/CD       | 60m  | Maintainability |
+| 22  | Add codecov integration                                     | CI/CD       | 30m  | Visibility      |
+| 23  | Spinner/progress middleware (bubbles)                       | Feature     | 90m  | UX              |
+| 24  | Glamour markdown help rendering                             | Feature     | 60m  | UX              |
+| 25  | Telemetry middleware (OpenTelemetry spans)                  | Feature     | 120m | Observability   |
 
 ---
 
@@ -174,10 +174,12 @@ output rendered
 > Right now, `WithPromptOnMissing` is a **command option** and only applies to command-level flags (`cmd.flags`). Root-level config flags (`cli.config`) are registered on the root cobra command and parsed in `PersistentPreRunE`. If a root config flag has a `prompt` tag and is missing, the user gets NO prompt — just the default value or an error if required.
 >
 > **Arguments for root-level prompting:**
+>
 > - Consistency: if I mark a field with `prompt:"Database host?"`, I expect it to prompt regardless of whether it's on the root config or a command's flags
 > - User-friendly: if the app needs a database host to do anything, prompting at the root level makes sense
 >
 > **Arguments against root-level prompting:**
+>
 > - Root flags are often global/infrastructure (verbose, log-level, config-file path). Prompting for these would be annoying.
 > - If multiple commands run, root-level prompting would fire on EVERY command (since PersistentPreRunE runs for all). That would be terrible UX.
 > - The current design is explicit: you opt-in per-command with `WithPromptOnMissing`. This is a feature, not a bug.
@@ -190,18 +192,18 @@ output rendered
 
 ## Metrics Snapshot
 
-| Metric | Value |
-|--------|-------|
-| Go version | 1.26.3 |
-| Tests (prompt suite) | 11 / 11 passing |
-| Tests (full v2 suite) | 1 pre-existing failure (ExampleOutputTable) |
-| Coverage (pkg/cmdguard/v2) | 83.0% |
-| Lint issues | 0 |
-| Build | ✅ Pass |
-| New files | 3 (prompts.go, prompts_test.go, examples/prompts/*) |
-| Modified files | 12 tracked |
-| Untracked files | 0 (all new files staged or committed) |
-| Race conditions | Not verified (blocked by ExampleOutputTable) |
+| Metric                     | Value                                                |
+| -------------------------- | ---------------------------------------------------- |
+| Go version                 | 1.26.3                                               |
+| Tests (prompt suite)       | 11 / 11 passing                                      |
+| Tests (full v2 suite)      | 1 pre-existing failure (ExampleOutputTable)          |
+| Coverage (pkg/cmdguard/v2) | 83.0%                                                |
+| Lint issues                | 0                                                    |
+| Build                      | ✅ Pass                                              |
+| New files                  | 3 (prompts.go, prompts_test.go, examples/prompts/\*) |
+| Modified files             | 12 tracked                                           |
+| Untracked files            | 0 (all new files staged or committed)                |
+| Race conditions            | Not verified (blocked by ExampleOutputTable)         |
 
 ---
 

@@ -7,7 +7,6 @@ require (
 	charm.land/huh/v2 v2.0.3
 	charm.land/lipgloss/v2 v2.0.3
 	github.com/charmbracelet/glamour v0.8.0
-	github.com/larsartmann/go-branded-id v0.3.0
 	github.com/larsartmann/go-output v0.6.1
 	github.com/larsartmann/go-output/d2 v0.6.1
 	github.com/larsartmann/go-output/delimited v0.6.1
@@ -57,6 +56,7 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
+	github.com/larsartmann/go-branded-id v0.3.0 // indirect
 	github.com/larsartmann/go-output/enum v0.6.1 // indirect
 	github.com/larsartmann/go-output/escape v0.6.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
