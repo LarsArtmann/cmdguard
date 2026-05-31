@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -74,9 +75,100 @@ func TestSpinnerMiddleware_WritesToBuffer(t *testing.T) {
 	time.Sleep(25 * time.Millisecond)
 	s.Stop()
 
-	if buf.Len() == 0 {
+	output := buf.String()
+
+	if output == "" {
 		t.Error("spinner should write to buffer")
 	}
+
+	if !strings.Contains(output, "Testing") {
+		t.Errorf("output should contain title %q, got %q", "Testing", output)
+	}
+
+	frameCount := 0
+
+	for _, frame := range cfg.Frames {
+		if strings.Contains(output, frame) {
+			frameCount++
+		}
+	}
+
+	if frameCount == 0 {
+		t.Errorf("output should contain at least one frame from %v, got %q", cfg.Frames, output)
+	}
+
+	if !strings.Contains(output, "\r") {
+		t.Error("output should contain carriage return for line clearing")
+	}
+
+	clearSeq := "\r\033[K"
+	if !strings.Contains(output, clearSeq) {
+		t.Error("output should contain ANSI clear sequence from Stop()")
+	}
+}
+
+func TestSpinnerMiddlewareWithConfig_SkipsNonTerminal(t *testing.T) {
+	t.Parallel()
+
+	type testConfig struct{}
+
+	buf := &bytes.Buffer{}
+	called := false
+
+	cfg := SpinnerConfig{
+		Title:    "Custom",
+		Writer:   buf,
+		Frames:   []string{"1", "2", "3"},
+		Interval: 10 * time.Millisecond,
+	}
+
+	mw := SpinnerMiddlewareWithConfig[testConfig](cfg)
+	err := mw(
+		context.Background(),
+		&testConfig{},
+		CommandInfo{Name: "test"},
+		func() error {
+			called = true
+
+			return nil
+		},
+	)
+
+	testutil.AssertNoError(t, err)
+
+	if !called {
+		t.Error("handler should be called when spinner skips non-terminal")
+	}
+
+	if buf.Len() > 0 {
+		t.Error("nothing should be written to non-terminal buffer")
+	}
+}
+
+func TestSpinnerMiddlewareWithConfig_ReturnsError(t *testing.T) {
+	t.Parallel()
+
+	type testConfig struct{}
+
+	buf := &bytes.Buffer{}
+	expectedErr := errors.New("handler failed")
+
+	cfg := SpinnerConfig{
+		Title:    "Custom",
+		Writer:   buf,
+		Frames:   []string{">"},
+		Interval: 10 * time.Millisecond,
+	}
+
+	mw := SpinnerMiddlewareWithConfig[testConfig](cfg)
+	err := mw(
+		context.Background(),
+		&testConfig{},
+		CommandInfo{Name: "test"},
+		func() error { return expectedErr },
+	)
+
+	testutil.AssertErrorIs(t, err, expectedErr)
 }
 
 func TestDefaultSpinnerConfig(t *testing.T) {

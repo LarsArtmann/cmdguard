@@ -14,16 +14,16 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ### Health Dashboard
 
-| Metric              | Value    | Status |
-| ------------------- | -------- | ------ |
-| Total tests         | 1,073    | GREEN  |
-| Race conditions     | 0        | GREEN  |
-| Lint issues         | 0        | GREEN  |
-| Build errors        | 0        | GREEN  |
-| Core lib coverage   | 83.1%    | GREEN  |
-| Example coverage    | 71.1%    | YELLOW |
-| configload coverage | 0.0%     | RED    |
-| Open bugs           | 0 known  | GREEN  |
+| Metric              | Value   | Status |
+| ------------------- | ------- | ------ |
+| Total tests         | 1,073   | GREEN  |
+| Race conditions     | 0       | GREEN  |
+| Lint issues         | 0       | GREEN  |
+| Build errors        | 0       | GREEN  |
+| Core lib coverage   | 83.1%   | GREEN  |
+| Example coverage    | 71.1%   | YELLOW |
+| configload coverage | 0.0%    | RED    |
+| Open bugs           | 0 known | GREEN  |
 
 ---
 
@@ -31,26 +31,26 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 ### Core Library (pkg/cmdguard/v2) — 116 source files, 20,268 lines
 
-| Category                   | Details                                                              |
-| -------------------------- | -------------------------------------------------------------------- |
-| **CLI[T] construction**    | NewCLI, AddCommand, Execute, ExecuteWithArgs, ExecuteAndExit         |
-| **Command[T,F] system**    | NewCommand, NewParentCommand, MustNewCommand, 21 command options     |
-| **Flag system**            | Struct tags (flag, short, default, help, env, count, required, validate, prompt, values) |
-| **Value types (9)**        | Duration, Enum, LogLevel, LogFormat, URL, Email, Port, FilePath, HostPort |
-| **DI system**              | Scope, Provide, Invoke, Child scopes, lifecycle (Shutdown, HealthCheck) |
-| **Rich output (12 formats)** | table, json, csv, tsv, md, xml, d2, yaml, html, tree, mermaid, dot |
-| **Middleware (4 built-in)** | Timing, Recovery, Spinner, Telemetry (OpenTelemetry)               |
-| **Error handling**         | 35+ sentinel errors, 7 typed error types, ExitCoder/ExitError       |
-| **Shell completion**       | WithCompletion, WithValidArgs, CompletionFunc                        |
-| **Man page generation**    | ManPage(), WriteManPage(), GenerateManPageCommand()                  |
-| **Markdown help**          | WithGlamourHelp, RenderMarkdown, RenderMarkdownWithTheme             |
-| **Interactive prompts**    | WithPromptOnMissing, prompt tag, PromptString/Select/Confirm         |
-| **Config file loading**    | JSON built-in, YAML/TOML via configload sub-package                  |
-| **Arg validators**         | WithExactArgs, WithMinimumArgs, WithMaximumArgs, WithRangeArgs, WithNoArgs |
-| **Version command**        | VersionCommand, MustVersionCommand, GenerateVersionCommand           |
-| **Validation modes**       | Lenient, Strict, Draconian                                           |
-| **Flow context**           | BranchingFlowContext with typed timeout/deadline alternatives        |
-| **Helpers**                | EditInEditor, Ptr, ValueOrDefault, MustParse, MergeConfigs, EnsureValid |
+| Category                     | Details                                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| **CLI[T] construction**      | NewCLI, AddCommand, Execute, ExecuteWithArgs, ExecuteAndExit                             |
+| **Command[T,F] system**      | NewCommand, NewParentCommand, MustNewCommand, 21 command options                         |
+| **Flag system**              | Struct tags (flag, short, default, help, env, count, required, validate, prompt, values) |
+| **Value types (9)**          | Duration, Enum, LogLevel, LogFormat, URL, Email, Port, FilePath, HostPort                |
+| **DI system**                | Scope, Provide, Invoke, Child scopes, lifecycle (Shutdown, HealthCheck)                  |
+| **Rich output (12 formats)** | table, json, csv, tsv, md, xml, d2, yaml, html, tree, mermaid, dot                       |
+| **Middleware (4 built-in)**  | Timing, Recovery, Spinner, Telemetry (OpenTelemetry)                                     |
+| **Error handling**           | 35+ sentinel errors, 7 typed error types, ExitCoder/ExitError                            |
+| **Shell completion**         | WithCompletion, WithValidArgs, CompletionFunc                                            |
+| **Man page generation**      | ManPage(), WriteManPage(), GenerateManPageCommand()                                      |
+| **Markdown help**            | WithGlamourHelp, RenderMarkdown, RenderMarkdownWithTheme                                 |
+| **Interactive prompts**      | WithPromptOnMissing, prompt tag, PromptString/Select/Confirm                             |
+| **Config file loading**      | JSON built-in, YAML/TOML via configload sub-package                                      |
+| **Arg validators**           | WithExactArgs, WithMinimumArgs, WithMaximumArgs, WithRangeArgs, WithNoArgs               |
+| **Version command**          | VersionCommand, MustVersionCommand, GenerateVersionCommand                               |
+| **Validation modes**         | Lenient, Strict, Draconian                                                               |
+| **Flow context**             | BranchingFlowContext with typed timeout/deadline alternatives                            |
+| **Helpers**                  | EditInEditor, Ptr, ValueOrDefault, MustParse, MergeConfigs, EnsureValid                  |
 
 ### Infrastructure
 
@@ -165,33 +165,33 @@ cmdguard is a Go library for building validated Cobra CLI applications with type
 
 Sorted by impact × effort (high impact first):
 
-| #  | Task                                                    | Impact | Effort | Type         |
-| -- | ------------------------------------------------------- | ------ | ------ | ------------ |
-| 1  | Auto-call `ValidateFlags()` during command execution    | HIGH   | M      | Architecture |
-| 2  | Add positional args access in RunE handler              | HIGH   | M      | Architecture |
-| 3  | Add configload test coverage (YAML/TOML)                | HIGH   | S      | Quality      |
-| 4  | Create v2.3.0 release tag and release notes             | HIGH   | S      | Release      |
-| 5  | Eliminate go-output replace directive                   | HIGH   | M      | Infra        |
-| 6  | Add CLI construction benchmark                          | MED    | S      | Performance  |
-| 7  | Add flag parsing benchmark                              | MED    | S      | Performance  |
-| 8  | Add command execution benchmark                         | MED    | S      | Performance  |
-| 9  | Fix pre-commit hooks                                    | MED    | S      | Infra        |
-| 10 | Add codecov integration                                 | MED    | S      | CI           |
-| 11 | Clean up `docs/planning/` — archive or remove old plans | MED    | S      | Housekeeping |
-| 12 | Update FEATURES.md last-updated date                    | LOW    | XS     | Docs         |
-| 13 | Update AGENTS.md status header (test count, coverage)   | LOW    | XS     | Docs         |
-| 14 | Add prompt mock for testability of WithPromptOnMissing  | MED    | M      | Architecture |
-| 15 | Set up release automation (goreleaser)                  | MED    | M      | CI           |
-| 16 | Add benchmark regression to CI                          | MED    | M      | Performance  |
-| 17 | v3.0: Make NoFlags a distinct named type                | LOW    | S      | API break    |
-| 18 | v3.0: Add error to TimingMiddleware callback            | LOW    | XS     | API break    |
-| 19 | v3.0: Remove string-based BranchWithTimeout/Deadline    | LOW    | XS     | API break    |
-| 20 | v3.0: Remove FlowContextAccessor                        | LOW    | XS     | API break    |
-| 21 | v3.0: Rename Get[T]/MustGet[T]                          | LOW    | S      | API break    |
-| 22 | v3.0: Plugin system for validators/type handlers        | LOW    | L      | Feature      |
-| 23 | Add more fuzz tests for edge cases                      | MED    | M      | Quality      |
-| 24 | Document `ValidateFlags` auto-call gap in README        | LOW    | XS     | Docs         |
-| 25 | Update README.md to reflect single example structure    | LOW    | XS     | Docs         |
+| #   | Task                                                    | Impact | Effort | Type         |
+| --- | ------------------------------------------------------- | ------ | ------ | ------------ |
+| 1   | Auto-call `ValidateFlags()` during command execution    | HIGH   | M      | Architecture |
+| 2   | Add positional args access in RunE handler              | HIGH   | M      | Architecture |
+| 3   | Add configload test coverage (YAML/TOML)                | HIGH   | S      | Quality      |
+| 4   | Create v2.3.0 release tag and release notes             | HIGH   | S      | Release      |
+| 5   | Eliminate go-output replace directive                   | HIGH   | M      | Infra        |
+| 6   | Add CLI construction benchmark                          | MED    | S      | Performance  |
+| 7   | Add flag parsing benchmark                              | MED    | S      | Performance  |
+| 8   | Add command execution benchmark                         | MED    | S      | Performance  |
+| 9   | Fix pre-commit hooks                                    | MED    | S      | Infra        |
+| 10  | Add codecov integration                                 | MED    | S      | CI           |
+| 11  | Clean up `docs/planning/` — archive or remove old plans | MED    | S      | Housekeeping |
+| 12  | Update FEATURES.md last-updated date                    | LOW    | XS     | Docs         |
+| 13  | Update AGENTS.md status header (test count, coverage)   | LOW    | XS     | Docs         |
+| 14  | Add prompt mock for testability of WithPromptOnMissing  | MED    | M      | Architecture |
+| 15  | Set up release automation (goreleaser)                  | MED    | M      | CI           |
+| 16  | Add benchmark regression to CI                          | MED    | M      | Performance  |
+| 17  | v3.0: Make NoFlags a distinct named type                | LOW    | S      | API break    |
+| 18  | v3.0: Add error to TimingMiddleware callback            | LOW    | XS     | API break    |
+| 19  | v3.0: Remove string-based BranchWithTimeout/Deadline    | LOW    | XS     | API break    |
+| 20  | v3.0: Remove FlowContextAccessor                        | LOW    | XS     | API break    |
+| 21  | v3.0: Rename Get[T]/MustGet[T]                          | LOW    | S      | API break    |
+| 22  | v3.0: Plugin system for validators/type handlers        | LOW    | L      | Feature      |
+| 23  | Add more fuzz tests for edge cases                      | MED    | M      | Quality      |
+| 24  | Document `ValidateFlags` auto-call gap in README        | LOW    | XS     | Docs         |
+| 25  | Update README.md to reflect single example structure    | LOW    | XS     | Docs         |
 
 ---
 
@@ -208,6 +208,7 @@ The library parses `required`, `validate`, and `values` struct tags and stores t
 The taskctl example works around this with `PreRunE` + `ParseEnum`. But this feels like a design gap — users would reasonably expect these tags to auto-enforce.
 
 **Options:**
+
 1. Auto-call `ValidateFlags()` in `prepareRunContext` (behavior change, could break existing users who rely on loose parsing)
 2. Add `WithAutoValidation[T,F]()` option to opt-in
 3. Document the current behavior more prominently and leave it as-is
@@ -235,27 +236,27 @@ c3705e6 docs(AGENTS.md): update test count in project structure
 
 ## Test Breakdown
 
-| Package                                     | Tests | Coverage |
-| ------------------------------------------- | ----- | -------- |
-| `pkg/cmdguard/v2`                           | 970   | 83.1%    |
-| `pkg/cmdguard/v2/testutil`                  | ~3    | 87.5%    |
-| `examples/taskctl`                          | 66    | 71.1%    |
-| `tests/integration`                         | ~34   | n/a      |
-| `pkg/cmdguard/v2/configload`                | 0     | 0.0%     |
-| **Total**                                   | ~1,073| —        |
+| Package                      | Tests  | Coverage |
+| ---------------------------- | ------ | -------- |
+| `pkg/cmdguard/v2`            | 970    | 83.1%    |
+| `pkg/cmdguard/v2/testutil`   | ~3     | 87.5%    |
+| `examples/taskctl`           | 66     | 71.1%    |
+| `tests/integration`          | ~34    | n/a      |
+| `pkg/cmdguard/v2/configload` | 0      | 0.0%     |
+| **Total**                    | ~1,073 | —        |
 
 ---
 
 ## Dependency Highlights
 
-| Dependency                     | Version  | Purpose              |
-| ------------------------------ | -------- | -------------------- |
-| spf13/cobra                    | v1.10.2  | CLI framework        |
-| samber/do/v2                   | v2.0.0   | Dependency injection |
-| charm.land/fang/v2             | v2.0.1   | Cobra styling        |
-| charm.land/huh/v2              | v2.0.3   | Interactive prompts  |
-| charm.land/bubbletea/v2        | v2.0.6   | TUI framework        |
-| charm.land/lipgloss/v2         | v2.0.3   | Terminal styling     |
-| charm.land/bubbles/v2          | v2.1.0   | TUI components       |
-| github.com/larsartmann/go-output | v0.6.1 | Rich output formats  |
-| spf13/pflag                    | v1.0.10  | Flag parsing         |
+| Dependency                       | Version | Purpose              |
+| -------------------------------- | ------- | -------------------- |
+| spf13/cobra                      | v1.10.2 | CLI framework        |
+| samber/do/v2                     | v2.0.0  | Dependency injection |
+| charm.land/fang/v2               | v2.0.1  | Cobra styling        |
+| charm.land/huh/v2                | v2.0.3  | Interactive prompts  |
+| charm.land/bubbletea/v2          | v2.0.6  | TUI framework        |
+| charm.land/lipgloss/v2           | v2.0.3  | Terminal styling     |
+| charm.land/bubbles/v2            | v2.1.0  | TUI components       |
+| github.com/larsartmann/go-output | v0.6.1  | Rich output formats  |
+| spf13/pflag                      | v1.0.10 | Flag parsing         |

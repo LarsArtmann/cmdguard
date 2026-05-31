@@ -38,9 +38,10 @@ const (
 
 // CommandInfo provides command metadata to middleware.
 type CommandInfo struct {
-	Name    string
-	Phase   Phase
-	HasRunE bool
+	Name     string
+	FullPath string
+	Phase    Phase
+	HasRunE  bool
 }
 
 // buildChain builds a single handler from a slice of middleware.

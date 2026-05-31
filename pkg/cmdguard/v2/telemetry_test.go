@@ -176,3 +176,44 @@ func TestWithTelemetry(t *testing.T) {
 		t.Fatalf("expected 1 middleware, got %d", len(cli.middleware))
 	}
 }
+
+func TestTelemetryMiddleware_UsesFullPath(t *testing.T) {
+	t.Parallel()
+
+	type testConfig struct{}
+
+	tracer := &mockTracer{}
+
+	mw := TelemetryMiddleware[testConfig](tracer)
+	err := mw(
+		context.Background(),
+		&testConfig{},
+		CommandInfo{Name: "migrate", FullPath: "myapp database migrate", Phase: PhaseRun, HasRunE: true},
+		func() error { return nil },
+	)
+
+	testutil.AssertNoError(t, err)
+
+	if len(tracer.spans) != 1 {
+		t.Fatalf("expected 1 span, got %d", len(tracer.spans))
+	}
+
+	span := tracer.spans[0]
+
+	if span.name != "myapp database migrate run" {
+		t.Errorf("expected span name %q, got %q", "myapp database migrate run", span.name)
+	}
+
+	attrMap := make(map[string]attribute.Value)
+	for _, a := range span.attributes {
+		attrMap[string(a.Key)] = a.Value
+	}
+
+	if attrMap["command.fullpath"].AsString() != "myapp database migrate" {
+		t.Errorf(
+			"expected command.fullpath %q, got %q",
+			"myapp database migrate",
+			attrMap["command.fullpath"].AsString(),
+		)
+	}
+}

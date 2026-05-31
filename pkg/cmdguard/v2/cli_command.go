@@ -186,7 +186,11 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 	}
 
 	h := cfg.handler
+	info := cfg.info
+
 	*cfg.target = func(c *cobra.Command, args []string) error {
+		info.FullPath = c.CommandPath()
+
 		if cfg.promptOnMissing && cfg.info.Phase == PhaseRun {
 			if err := promptMissingCommandFlags(c, cfg.registry); err != nil {
 				return fmt.Errorf("prompting for missing command flags: %w", err)
@@ -204,7 +208,7 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 			return h(ctx, cfg.config, parsed)
 		}
 
-		chain := buildChain(ctx, cfg.config, cfg.info, cfg.middlewares, func() error {
+		chain := buildChain(ctx, cfg.config, info, cfg.middlewares, func() error {
 			return h(ctx, cfg.config, parsed)
 		})
 

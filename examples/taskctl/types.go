@@ -125,7 +125,7 @@ func NewTaskStore(i do.Injector) (*TaskStore, error) {
 	}, nil
 }
 
-func (s *TaskStore) Add(title string, priority string) Task {
+func (s *TaskStore) Add(title, priority string) Task {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"bytes"
+	"context"
 	"strings"
 	"testing"
 
@@ -158,5 +160,63 @@ func TestApplyGlamourHelp_Subcommands(t *testing.T) {
 
 	if child.Long == "" {
 		t.Error("child Long should not be empty after glamour")
+	}
+}
+
+//nolint:paralleltest // captures os.Stdout
+func TestGlamourHelp_E2ERendering(t *testing.T) {
+	type testConfig struct{}
+
+	markdownLong := "# Overview\n\nThis is **bold** and *italic* text.\n\n## Details\n\n- Item 1\n- Item 2"
+
+	cli, err := NewCLI[testConfig](
+		"testapp", "Test Application", testConfig{},
+		WithGlamourHelpTheme[testConfig]("dark"),
+		WithFang[testConfig](false),
+	)
+	if err != nil {
+		t.Fatalf("NewCLI failed: %v", err)
+	}
+
+	cmd, err := NewCommand[testConfig, NoFlags](
+		"greet",
+		func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		WithShort[testConfig, NoFlags]("Greet someone"),
+		WithLong[testConfig, NoFlags](markdownLong),
+	)
+	if err != nil {
+		t.Fatalf("NewCommand failed: %v", err)
+	}
+
+	if err := AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand failed: %v", err)
+	}
+
+	var buf bytes.Buffer
+	cli.rootCmd.SetOut(&buf)
+	cli.rootCmd.SetArgs([]string{"greet", "--help"})
+
+	_ = cli.Execute(context.Background())
+
+	output := buf.String()
+
+	if output == "" {
+		t.Fatal("help output should not be empty")
+	}
+
+	if strings.Contains(output, "# Overview") {
+		t.Error("raw markdown heading should be rendered, not kept verbatim")
+	}
+
+	if strings.Contains(output, "**bold**") {
+		t.Error("raw bold markdown syntax should be rendered, not kept verbatim")
+	}
+
+	if !strings.Contains(output, "bold") {
+		t.Error("rendered output should contain the word 'bold'")
+	}
+
+	if !strings.Contains(output, "italic") {
+		t.Error("rendered output should contain the word 'italic'")
 	}
 }

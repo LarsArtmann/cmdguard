@@ -189,10 +189,19 @@ func MustNewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) *CL
 	return cli
 }
 
+func (cli *CLI[T]) applyGlamourIfEnabled() {
+	if cli.glamourHelp {
+		applyGlamourHelp(cli.rootCmd, cli.glamourTheme)
+		cli.glamourHelp = false
+	}
+}
+
 // Execute runs the CLI application.
 // The context is wrapped with a BranchingFlowContext for command path tracking.
 // If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
+	cli.applyGlamourIfEnabled()
+
 	if cli.signalHandling {
 		var cancel context.CancelFunc
 

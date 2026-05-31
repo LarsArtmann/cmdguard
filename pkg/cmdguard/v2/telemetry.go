@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -24,16 +23,25 @@ import (
 //	)
 func TelemetryMiddleware[T any](tracer trace.Tracer) Middleware[T] {
 	return func(ctx context.Context, _ *T, info CommandInfo, next func() error) error {
-		spanName := fmt.Sprintf("%s %s", info.Name, info.Phase)
+		spanName := info.Name + " " + string(info.Phase)
+		if info.FullPath != "" {
+			spanName = info.FullPath + " " + string(info.Phase)
+		}
 
 		_, span := tracer.Start(ctx, spanName, trace.WithSpanKind(trace.SpanKindServer))
 		defer span.End()
 
-		span.SetAttributes(
+		attrs := []attribute.KeyValue{
 			attribute.String("command.name", info.Name),
 			attribute.String("command.phase", string(info.Phase)),
 			attribute.Bool("command.has_handler", info.HasRunE),
-		)
+		}
+
+		if info.FullPath != "" {
+			attrs = append(attrs, attribute.String("command.fullpath", info.FullPath))
+		}
+
+		span.SetAttributes(attrs...)
 
 		err := next()
 		if err != nil {

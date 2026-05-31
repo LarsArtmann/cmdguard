@@ -60,3 +60,5 @@ config-file
 /kitchen-sink
 # Nix build output
 /result/taskctl
+# Nix build output
+/result
