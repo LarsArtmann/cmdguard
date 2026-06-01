@@ -30,7 +30,7 @@
 - [ ] Make NoFlags a distinct named type (not type alias)
 - [ ] Change TimingMiddleware callback to include error
 - [ ] Remove string-based BranchWithTimeout/BranchWithDeadline (replaced by typed alternatives)
-- [ ] Remove FlowContextAccessor (thin wrapper with no added value)
+- [x] Remove FlowContextAccessor (thin wrapper with no added value)
 - [ ] Rename Get[T]/MustGet[T] to more specific names
 - [ ] Make RegisterInScope generic instead of `...any`
 - [ ] Remove or redesign Package() for error-safe DI integration

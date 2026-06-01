@@ -63,35 +63,6 @@ func RequireBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
 	return bfc
 }
 
-// FlowContextAccessor provides convenient access to flow context values.
-//
-// Deprecated: Use BranchingFlowContext methods directly. Will be removed in v3.
-type FlowContextAccessor struct {
-	bfc *BranchingFlowContext
-}
-
-// NewFlowContextAccessor creates an accessor for the branching flow context.
-//
-// Deprecated: Use BranchingFlowContext directly. Will be removed in v3.
-func NewFlowContextAccessor(bfc *BranchingFlowContext) *FlowContextAccessor {
-	return &FlowContextAccessor{bfc: bfc}
-}
-
-// Path returns the command path.
-func (a *FlowContextAccessor) Path() []string {
-	return a.bfc.Path()
-}
-
-// PathString returns the command path as a string.
-func (a *FlowContextAccessor) PathString() string {
-	return a.bfc.PathString()
-}
-
-// Depth returns the context depth.
-func (a *FlowContextAccessor) Depth() int {
-	return a.bfc.Depth()
-}
-
 // Get retrieves a typed value from the flow context.
 func Get[T any](ctx context.Context, key any) (T, bool) {
 	bfc, ok := GetBranchingFlowContext(ctx)

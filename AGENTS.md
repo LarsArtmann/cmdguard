@@ -525,7 +525,7 @@ go build ./...                                   # Verify build
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
 11. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
-12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`, `FlowContextAccessor`/`NewFlowContextAccessor` → use `GetBranchingFlowContext(ctx)` directly
+12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
