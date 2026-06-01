@@ -34,13 +34,12 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", ErrConfigFileParse, err)
 	}
 
-	setFields := make([]string, 0, len(raw))
-
-	for _, tag := range tags {
-		if _, ok := raw[tag.Name]; ok {
-			setFields = append(setFields, tag.Field)
-		}
+	present := make(map[string]bool, len(raw))
+	for k := range raw {
+		present[k] = true
 	}
+
+	setFields := FilterSetFields(tags, present)
 
 	if err := json.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
@@ -87,6 +86,18 @@ func expandConfigPath(path string) string {
 	}
 
 	return path
+}
+
+// FilterSetFields returns the field names from tags whose flag name is present.
+func FilterSetFields(tags []FlagTag, present map[string]bool) []string {
+	setFields := make([]string, 0, len(present))
+	for _, tag := range tags {
+		if present[tag.Name] {
+			setFields = append(setFields, tag.Field)
+		}
+	}
+
+	return setFields
 }
 
 // fieldValueToString converts a reflect.Value to its string representation.

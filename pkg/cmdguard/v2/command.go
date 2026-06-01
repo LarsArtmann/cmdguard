@@ -190,6 +190,15 @@ func (c Command[T, F]) validate(mode ValidationMode) error {
 	return nil
 }
 
+// requireUse returns an error if use is empty.
+func requireUse(use string) error {
+	if use == "" {
+		return fmt.Errorf("%w: use is required", ErrMissingName)
+	}
+
+	return nil
+}
+
 // NewCommand creates a new executable command with the given options.
 // The runE parameter is required and cannot be nil.
 // Use NewParentCommand for commands with subcommands.
@@ -198,8 +207,8 @@ func NewCommand[T, F any](
 	runE func(ctx context.Context, cfg *T, flags F) error,
 	opts ...CommandOption[T, F],
 ) (Command[T, F], error) {
-	if use == "" {
-		return Command[T, F]{}, fmt.Errorf("%w: use is required", ErrMissingName)
+	if err := requireUse(use); err != nil {
+		return Command[T, F]{}, err
 	}
 
 	if runE == nil {
@@ -232,8 +241,8 @@ func NewParentCommand[T, F any](
 	subcommands []Command[T, F],
 	opts ...CommandOption[T, F],
 ) (Command[T, F], error) {
-	if use == "" {
-		return Command[T, F]{}, fmt.Errorf("%w: use is required", ErrMissingName)
+	if err := requireUse(use); err != nil {
+		return Command[T, F]{}, err
 	}
 
 	if long == "" {

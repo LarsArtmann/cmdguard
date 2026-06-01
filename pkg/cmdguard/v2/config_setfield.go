@@ -115,6 +115,11 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 	return field, nil
 }
 
+// setStringFieldError wraps an error with field and string context.
+func setStringFieldError(field reflect.Value, str string, err error) error {
+	return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+}
+
 // setStringField handles string to custom type conversions via the TypeHandler registry.
 func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 	// Special handling for Enum (needs current allowed values from the field)
@@ -137,7 +142,7 @@ func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 
 		parsed, err := ParseEnum(str, allowed)
 		if err != nil {
-			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+			return setStringFieldError(field, str, err)
 		}
 
 		field.Set(reflect.ValueOf(parsed))
@@ -149,7 +154,7 @@ func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 	if handledByTypeRegistry(tr, field.Type()) {
 		parsed, err := dispatchParse(tr, str, FlagTag{Type: field.Type()})
 		if err != nil {
-			return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
+			return setStringFieldError(field, str, err)
 		}
 
 		parsedVal := reflect.ValueOf(parsed)

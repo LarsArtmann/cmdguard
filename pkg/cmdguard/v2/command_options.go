@@ -98,6 +98,13 @@ func WithGroupID[T, F any](group string) CommandOption[T, F] {
 	}
 }
 
+// mustNonNegative panics if n is negative.
+func mustNonNegative(name string, n int) {
+	if n < 0 {
+		panic(fmt.Sprintf("%s: %v: n=%d", name, ErrNegativeArgCount, n))
+	}
+}
+
 // WithArgs sets a custom positional arguments validator.
 func WithArgs[T, F any](args cobra.PositionalArgs) CommandOption[T, F] {
 	return func(c *Command[T, F]) {
@@ -108,9 +115,7 @@ func WithArgs[T, F any](args cobra.PositionalArgs) CommandOption[T, F] {
 // WithExactArgs requires exactly n positional arguments.
 // Panics if n is negative.
 func WithExactArgs[T, F any](n int) CommandOption[T, F] {
-	if n < 0 {
-		panic(fmt.Sprintf("WithExactArgs: %v: n=%d", ErrNegativeArgCount, n))
-	}
+	mustNonNegative("WithExactArgs", n)
 
 	return func(c *Command[T, F]) {
 		c.args = cobra.ExactArgs(n)
@@ -120,9 +125,7 @@ func WithExactArgs[T, F any](n int) CommandOption[T, F] {
 // WithMinimumArgs requires at least n positional arguments.
 // Panics if n is negative.
 func WithMinimumArgs[T, F any](n int) CommandOption[T, F] {
-	if n < 0 {
-		panic(fmt.Sprintf("WithMinimumArgs: %v: n=%d", ErrNegativeArgCount, n))
-	}
+	mustNonNegative("WithMinimumArgs", n)
 
 	return func(c *Command[T, F]) {
 		c.args = cobra.MinimumNArgs(n)
@@ -132,9 +135,7 @@ func WithMinimumArgs[T, F any](n int) CommandOption[T, F] {
 // WithMaximumArgs allows at most n positional arguments.
 // Panics if n is negative.
 func WithMaximumArgs[T, F any](n int) CommandOption[T, F] {
-	if n < 0 {
-		panic(fmt.Sprintf("WithMaximumArgs: %v: n=%d", ErrNegativeArgCount, n))
-	}
+	mustNonNegative("WithMaximumArgs", n)
 
 	return func(c *Command[T, F]) {
 		c.args = cobra.MaximumNArgs(n)

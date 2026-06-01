@@ -35,12 +35,12 @@ func (l *yamlLoader) Load(data []byte, cfg any) ([]string, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", v2.ErrConfigFileParse, err)
 	}
 
-	setFields := make([]string, 0, len(raw))
-	for _, tag := range tags {
-		if _, ok := raw[tag.Name]; ok {
-			setFields = append(setFields, tag.Field)
-		}
+	present := make(map[string]bool, len(raw))
+	for k := range raw {
+		present[k] = true
 	}
+
+	setFields := v2.FilterSetFields(tags, present)
 
 	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
@@ -68,12 +68,12 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", v2.ErrConfigFileParse, err)
 	}
 
-	setFields := make([]string, 0, len(raw))
-	for _, tag := range tags {
-		if _, ok := raw[tag.Name]; ok {
-			setFields = append(setFields, tag.Field)
-		}
+	present := make(map[string]bool, len(raw))
+	for k := range raw {
+		present[k] = true
 	}
+
+	setFields := v2.FilterSetFields(tags, present)
 
 	if err := json.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)

@@ -16,6 +16,15 @@ const (
 	portSMTP  = 25
 )
 
+// validatePortRange returns an error if port is outside 1-65535.
+func validatePortRange(port int) error {
+	if port < 1 || port > 65535 {
+		return fmt.Errorf("%w: port %d is out of range (1-65535)", ErrInvalidPort, port)
+	}
+
+	return nil
+}
+
 // Port represents a valid network port number (1-65535).
 // Use this for config fields that specify TCP/UDP ports.
 //
@@ -54,8 +63,8 @@ func ParsePort(s string) (Port, error) {
 		return Port{}, fmt.Errorf("%w: %q is not a valid port number", ErrInvalidPort, s)
 	}
 
-	if port < 1 || port > 65535 {
-		return Port{}, fmt.Errorf("%w: port %d is out of range (1-65535)", ErrInvalidPort, port)
+	if err := validatePortRange(port); err != nil {
+		return Port{}, err
 	}
 
 	return Port{port: port}, nil
@@ -70,8 +79,8 @@ func MustParsePort(s string) Port {
 // PortFromInt creates a Port from an int.
 // Returns an error if the port is out of valid range.
 func PortFromInt(port int) (Port, error) {
-	if port < 1 || port > 65535 {
-		return Port{}, fmt.Errorf("%w: port %d is out of range (1-65535)", ErrInvalidPort, port)
+	if err := validatePortRange(port); err != nil {
+		return Port{}, err
 	}
 
 	return Port{port: port}, nil

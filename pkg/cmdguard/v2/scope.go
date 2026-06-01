@@ -195,6 +195,22 @@ func (s *Scope) ShutdownAll(ctx context.Context) error {
 	return nil
 }
 
+// firstHealthCheckError returns the first error from results, or nil.
+func firstHealthCheckError(results map[string]error, scopeName string) error {
+	for _, err := range results {
+		if err != nil {
+			return fmt.Errorf(
+				"%w: health check in scope %q: %w",
+				ErrServiceConstruction,
+				scopeName,
+				err,
+			)
+		}
+	}
+
+	return nil
+}
+
 // HealthCheck runs health checks on all services in this scope.
 func (s *Scope) HealthCheck() error {
 	if s.injector == nil {
@@ -202,18 +218,8 @@ func (s *Scope) HealthCheck() error {
 	}
 
 	results := s.injector.HealthCheck()
-	for _, err := range results {
-		if err != nil {
-			return fmt.Errorf(
-				"%w: health check in scope %q: %w",
-				ErrServiceConstruction,
-				s.name,
-				err,
-			)
-		}
-	}
 
-	return nil
+	return firstHealthCheckError(results, s.name)
 }
 
 // HealthCheckWithContext runs health checks with context on all services.
@@ -224,18 +230,8 @@ func (s *Scope) HealthCheckWithContext(ctx context.Context) error {
 	}
 
 	results := s.injector.HealthCheckWithContext(ctx)
-	for _, err := range results {
-		if err != nil {
-			return fmt.Errorf(
-				"%w: health check in scope %q: %w",
-				ErrServiceConstruction,
-				s.name,
-				err,
-			)
-		}
-	}
 
-	return nil
+	return firstHealthCheckError(results, s.name)
 }
 
 // ScopedProvider creates a provider that runs within a named child scope.
