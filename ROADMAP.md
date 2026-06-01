@@ -1,7 +1,7 @@
 # ROADMAP
 
 **Generated:** 2026-04-05
-**Updated:** 2026-05-27
+**Updated:** 2026-06-01
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
@@ -115,6 +115,38 @@
 
 - [ ] Create `github.com/larsartmann/flagtags` repository
 - [ ] Extract flag-related code to standalone library
+
+---
+
+## go-output Dependency Architecture
+
+> **Status:** Integrated in v2.3.0 via `pkg/cmdguard/v2/output.go` (re-export wrapper).  
+> **Question:** Should output rendering be optional or mandatory?
+
+### Current State
+
+`go-output` is a published dependency (v0.6.1) providing 12 output formats (table, json, csv,
+yaml, markdown, xml, html, d2, mermaid, dot, tree, tsv). cmdguard wraps it in `output.go` to
+provide `OutputResult`, `OutputTable`, `OutputStyledTable`, and the `--output` global flag
+(`WithOutputFormat`).
+
+**Dependency weight:** 11 go-output sub-modules + 99 transitive edges in cmdguard's mod graph.
+Every consumer pays this cost whether they use `--output` or not.
+
+### Options for v3.0
+
+| Approach | Pros | Cons | Effort |
+|----------|------|------|--------|
+| **Keep as-is** | Zero code churn; `go install` works | Heavy dep tree for simple CLIs | None |
+| **Extract to sub-package** (`pkg/cmdguard/v2/output`) | Consumers who don't need `--output` avoid import | `CLI[T].OutputFormat()` moves; breaking | M |
+| **Split go-output into interface + backends** | Interface in core, heavy backends optional | Requires go-output redesign first | L |
+| **Use stdlib `encoding/*` as fallback** | Zero external deps for json/csv/yaml | Loses styled tables, d2, mermaid | M |
+
+### Recommendation
+
+Keep as-is for v2.x. For v3.0, evaluate extracting `output.go` and `cli_output.go` into a
+separate sub-package so `CLI[T]` doesn't carry the dependency unless the consumer imports the
+output package explicitly.
 
 ---
 
