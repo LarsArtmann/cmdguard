@@ -180,7 +180,7 @@ output package explicitly.
 ## Future Ideas
 
 - [ ] Add structured JSON error output for `--output=json`
-- [ ] Add `--no-color` flag + NO_COLOR support
+- [x] Add `--no-color` flag + NO_COLOR support
 - [ ] Add issue/PR templates
 - [ ] Test all examples in CI
 - [ ] Metrics/telemetry integration

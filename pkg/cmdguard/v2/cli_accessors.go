@@ -102,3 +102,11 @@ func (cli *CLI[T]) AddGlobalFlag(name, shorthand, defaultValue, help string) {
 func (cli *CLI[T]) AddGlobalBoolFlag(name, shorthand string, defaultValue bool, help string) {
 	cli.rootCmd.PersistentFlags().BoolP(name, shorthand, defaultValue, help)
 }
+
+// NoColor returns true if --no-color was explicitly passed by the user.
+func (cli *CLI[T]) NoColor() bool {
+	if cli.noColorFlag == nil {
+		return false
+	}
+	return *cli.noColorFlag
+}

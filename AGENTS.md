@@ -240,6 +240,7 @@ Functional options:
 | `FlowContext()`               | `*BranchingFlowContext` | Path tracking (nil until Execute)    |
 | `AddGlobalFlag(...)`          |                         | Persistent string flag               |
 | `AddGlobalBoolFlag(...)`      |                         | Persistent bool flag                 |
+| `NoColor()`                    | `bool`                  | True if `--no-color` was passed      |
 
 ### Basic Usage
 
@@ -517,7 +518,7 @@ go build ./...                                   # Verify build
 1. `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 2. `PostRunE` is NOT called when `RunE` errors (Cobra behavior)
 3. `NoFlags` is `type NoFlags = struct{}` — use `(NoFlags{})` with parens for comparisons
-4. fang provides styled output by default; `WithFang(false)` falls back to plain cobra
+4. fang provides styled output by default; `--no-color` flag or `NO_COLOR` env var disables color (fang respects NO_COLOR automatically via colorprofile; `--no-color` sets `NO_COLOR=1` for fang to pick up)
 5. `AddCommand` calls `cmd.Validate()` as defense-in-depth even though constructors already validate
 6. **envPrefix propagation** — `WithEnvPrefix` sets prefix on root AND command-level flags (fixed in v2.2)
 7. **Counting flags** — must use `int` type with `count:"true"` tag; don't reuse flag names from root config
@@ -529,6 +530,7 @@ go build ./...                                   # Verify build
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
+16. **`--no-color` + NO_COLOR** — `--no-color` persistent flag is registered by default; `cli.NoColor()` returns true if passed; `Execute()` sets `NO_COLOR=1` for fang to pick up. `NO_COLOR` env var is also respected automatically by fang's colorprofile.
 16. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
 17. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
 18. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error

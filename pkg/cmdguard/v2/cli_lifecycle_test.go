@@ -299,3 +299,84 @@ func TestCLIExecuteAndExit(t *testing.T) {
 		cli.ExecuteAndExit(t.Context())
 	})
 }
+
+func TestCLINoColor(t *testing.T) {
+	t.Run("--no-color flag is registered", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		flag := cli.RootCommand().PersistentFlags().Lookup("no-color")
+		if flag == nil {
+			t.Fatal("no-color flag not registered")
+		}
+
+		if flag.DefValue != "false" {
+			t.Errorf("DefValue = %q, want %q", flag.DefValue, "false")
+		}
+
+		if flag.Usage == "" {
+			t.Error("Usage should not be empty")
+		}
+	})
+
+	t.Run("NoColor returns false by default", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		if cli.NoColor() {
+			t.Error("NoColor() should return false when --no-color is not set")
+		}
+	})
+
+	t.Run("NoColor returns true after --no-color is parsed", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+			v2.WithFang[testCLIConfig](false))
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cmd := newTestCLICommand[testCLIConfig]("run")
+		if err := v2.AddCommand(cli, cmd); err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(t.Context(), []string{"run", "--no-color"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+
+		if !cli.NoColor() {
+			t.Error("NoColor() should return true after --no-color is parsed")
+		}
+	})
+
+	t.Run("NO_COLOR env var is respected", func(t *testing.T) {
+		t.Setenv("NO_COLOR", "1")
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+			v2.WithFang[testCLIConfig](false))
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cmd := newTestCLICommand[testCLIConfig]("run")
+		if err := v2.AddCommand(cli, cmd); err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(t.Context(), []string{"run"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+	})
+}

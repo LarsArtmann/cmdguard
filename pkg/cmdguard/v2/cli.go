@@ -39,6 +39,7 @@ type CLI[T any] struct {
 	configFileLoader ConfigFileLoader
 	glamourHelp      bool
 	glamourTheme     string
+	noColorFlag      *bool
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -59,6 +60,7 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 		registry:       nil,
 		registeredCmds: make(map[string]struct{}),
 		useFang:        true,
+		noColorFlag:    new(bool),
 	}
 
 	for _, opt := range opts {
@@ -120,6 +122,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	}
 
 	cli.initOutputFlag()
+	cli.initNoColorFlag()
 
 	err = registry.RegisterPersistentFlags(cli.rootCmd)
 	if err != nil {
@@ -196,11 +199,20 @@ func (cli *CLI[T]) applyGlamourIfEnabled() {
 	}
 }
 
+// applyNoColorIfSet sets the NO_COLOR env var if --no-color was passed.
+// This must be called after cobra parses flags but before fang reads color capabilities.
+func (cli *CLI[T]) applyNoColorIfSet() {
+	if cli.useFang && cli.noColorFlag != nil && *cli.noColorFlag {
+		_ = os.Setenv("NO_COLOR", "1")
+	}
+}
+
 // Execute runs the CLI application.
 // The context is wrapped with a BranchingFlowContext for command path tracking.
 // If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	cli.applyGlamourIfEnabled()
+	cli.applyNoColorIfSet()
 
 	if cli.signalHandling {
 		var cancel context.CancelFunc

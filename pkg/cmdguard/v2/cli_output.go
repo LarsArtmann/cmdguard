@@ -48,6 +48,12 @@ func (cli *CLI[T]) initOutputFlag() {
 		"Output format (table, json, csv, yaml, markdown, xml)")
 }
 
+// initNoColorFlag registers the --no-color persistent flag.
+func (cli *CLI[T]) initNoColorFlag() {
+	cli.rootCmd.PersistentFlags().BoolVar(cli.noColorFlag, "no-color", false,
+		"Disable colored output (also respected via NO_COLOR env var)")
+}
+
 // parseOutputFlag resolves the --output flag value after cobra parses flags.
 func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
 	if cli.outputFormat == "" {
