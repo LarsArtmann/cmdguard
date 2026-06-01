@@ -5,7 +5,7 @@
 **Last Updated:** 2026-05-31
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.3.0-dev - 237 tests, 84.5% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.3.0-dev - 272 tests, 83.3% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.3.0-dev. 224 tests passing, 84.5% coverage, 0 build errors.
+**Current Status:** v2.3.0-dev. 272 tests passing, 83.3% coverage, 0 build errors.
 
 ---
 
