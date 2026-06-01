@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-05-17
+**Last Updated:** 2026-05-31
 **Version:** 2.3.0-dev
 **Go Version:** 1.26
 
@@ -53,8 +53,9 @@
 | `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
 | `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands       |
-| `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text         |
-| `WithTelemetry[T](tracer)`     | ✅ FULLY_FUNCTIONAL | OpenTelemetry spans for all commands     |
+| `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text (auto theme) |
+| `WithGlamourHelpTheme[T](t)`   | ✅ FULLY_FUNCTIONAL | Markdown rendering with specific theme        |
+| `WithTelemetry[T](tracer)`     | ✅ FULLY_FUNCTIONAL | OpenTelemetry spans for all commands          |
 
 ### Command[T, F]
 
@@ -120,11 +121,13 @@
 
 | Feature               | Status              | Notes                              |
 | --------------------- | ------------------- | ---------------------------------- |
-| `TimingMiddleware`    | ✅ FULLY_FUNCTIONAL | Log command execution duration     |
-| `RecoveryMiddleware`  | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers    |
-| `SpinnerMiddleware`   | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution  |
-| `TelemetryMiddleware` | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command     |
-| Custom middleware     | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
+| `TimingMiddleware`              | ✅ FULLY_FUNCTIONAL | Log command execution duration     |
+| `RecoveryMiddleware`           | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers    |
+| `SpinnerMiddleware`            | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution  |
+| `SpinnerMiddlewareWithConfig`  | ✅ FULLY_FUNCTIONAL | Configurable spinner (frames/speed)|
+| `TelemetryMiddleware`          | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command     |
+| `CommandInfo.FullPath`         | ✅ FULLY_FUNCTIONAL | Full command path for middleware   |
+| Custom middleware               | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
 
 ### Shell Completion
 
