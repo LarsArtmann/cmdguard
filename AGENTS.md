@@ -536,9 +536,11 @@ go build ./...                                   # Verify build
 20. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
 21. **Glamour auto theme** — `WithGlamourHelp` uses glamour's "auto" theme which detects terminal capabilities; in non-TTY environments markdown syntax may be preserved with padding
 22. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
-23. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
-24. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
-25. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
+23. **FullPath populated at execution time** — `CommandInfo.FullPath` is set via `cobra.CommandPath()` inside the handler closure, NOT at command registration; it's empty in unit tests unless you call the handler through a cobra execution
+24. **Glamour idempotent** — `applyGlamourIfEnabled` resets `glamourHelp=false` after applying to prevent double-rendering (which would wrap ANSI codes inside ANSI codes); calling Execute twice is safe
+25. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
+26. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
+27. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
 26. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
 27. **Config file precedence** — `WithConfigFile[T](paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
 28. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
