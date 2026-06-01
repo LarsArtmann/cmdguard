@@ -69,8 +69,8 @@ func TestWithGlamourHelp(t *testing.T) {
 		t.Error("glamourHelp should be true")
 	}
 
-	if cli.glamourTheme != "auto" {
-		t.Errorf("expected theme %q, got %q", "auto", cli.glamourTheme)
+	if cli.glamourTheme != "" {
+		t.Errorf("expected theme %q, got %q", "", cli.glamourTheme)
 	}
 }
 
@@ -107,7 +107,7 @@ func TestApplyGlamourHelp(t *testing.T) {
 		Long:  original,
 	}
 
-	applyGlamourHelp(cmd, "auto")
+	applyGlamourHelp(cmd, "")
 
 	if cmd.Long == "" {
 		t.Error("Long should not be empty after glamour")
@@ -128,7 +128,7 @@ func TestApplyGlamourHelp_Example(t *testing.T) {
 		Example: original,
 	}
 
-	applyGlamourHelp(cmd, "auto")
+	applyGlamourHelp(cmd, "")
 
 	if cmd.Example == "" {
 		t.Error("Example should not be empty after glamour")
@@ -156,7 +156,7 @@ func TestApplyGlamourHelp_Subcommands(t *testing.T) {
 
 	parent.AddCommand(child)
 
-	applyGlamourHelp(parent, "auto")
+	applyGlamourHelp(parent, "")
 
 	if child.Long == "" {
 		t.Error("child Long should not be empty after glamour")

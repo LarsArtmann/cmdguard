@@ -169,7 +169,7 @@ linters:
             - charm.land/fang/v2
             - charm.land/huh/v2
             - charm.land/lipgloss/v2
-            - github.com/charmbracelet/glamour
+            - charm.land/glamour/v2
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
             - github.com/larsartmann/go-output/table

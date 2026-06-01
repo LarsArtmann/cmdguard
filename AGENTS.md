@@ -129,7 +129,7 @@ cmdguard/
 | `github.com/spf13/pflag`           | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`               | Cobra styling        | v2.0.1  |
 | `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
-| `github.com/charmbracelet/glamour` | Markdown rendering   | v1.0.0  |
+| `charm.land/glamour/v2`             | Markdown rendering   | v2.0.0  |
 | `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
 | `github.com/larsartmann/go-output` | Rich output formats  | latest  |
 
@@ -509,7 +509,7 @@ go build ./...                                   # Verify build
 14. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
 15. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
 16. **Spinner middleware** — `SpinnerMiddleware[T](title)` shows a lipgloss-styled spinner on stderr; skips when not a terminal
-17. **Glamour help** — `WithGlamourHelp[T]()` renders command `Long` and `Example` fields via glamour markdown; applied recursively to all commands at registration time
+17. **Glamour help** — `WithGlamourHelp[T]()` renders command `Long` and `Example` fields via `charm.land/glamour/v2` markdown; uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`); applied recursively to all commands at registration time
 18. **Telemetry middleware** — `TelemetryMiddleware[T](tracer)` creates an OpenTelemetry span per command; requires `go.opentelemetry.io/otel/trace.Tracer`; `WithTelemetry[T](tracer)` is the convenience CLI option
 
 ### Key Gotchas
@@ -534,7 +534,7 @@ go build ./...                                   # Verify build
 18. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
 19. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
 20. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
-21. **Glamour auto theme** — `WithGlamourHelp` uses glamour's "auto" theme which detects terminal capabilities; in non-TTY environments markdown syntax may be preserved with padding
+21. **Glamour v2 env-based theme** — `WithGlamourHelp[T]()` now uses `RenderWithEnvironmentConfig` which checks `GLAMOUR_STYLE` env var, defaulting to "dark"; the string `"auto"` is no longer a valid glamour theme name in v2
 22. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
 23. **FullPath populated at execution time** — `CommandInfo.FullPath` is set via `cobra.CommandPath()` inside the handler closure, NOT at command registration; it's empty in unit tests unless you call the handler through a cobra execution
 24. **Glamour idempotent** — `applyGlamourIfEnabled` resets `glamourHelp=false` after applying to prevent double-rendering (which would wrap ANSI codes inside ANSI codes); calling Execute twice is safe
@@ -547,6 +547,7 @@ go build ./...                                   # Verify build
 29. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
 30. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
 31. **Nix sandbox vs local replace** — `go.mod` has `replace` directives pointing to `../go-output`; Nix sandboxed checks (`buildGoModule`, `go build` in derivations) cannot resolve these, so `flake.nix` only provides devShell + formatter + format check (no build/vet checks)
+32. **Glamour v2 no `"auto"` theme** — `charm.land/glamour/v2` removed the `"auto"` theme; use empty string (env-based via `GLAMOUR_STYLE`) or explicit theme like `"dark"`; `WithGlamourHelp` now sets theme to `""` for env-based detection
 
 ---
 
