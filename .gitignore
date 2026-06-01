@@ -1,6 +1,4 @@
 # Binaries
-/cmdguard
-/typed
 *.exe
 *.dll
 *.so
@@ -8,18 +6,7 @@
 
 # Example binaries
 /examples/*/typed_example
-/examples/*/di_example
-/examples/*/advanced_flags_example
-/examples/*/basic_example
-/examples/*/validation_example
-/advanced-flags
-/di
-/env-tags
-/subcommands
-/signals
-/output
-/counting
-/error-handling
+/taskctl
 
 # Test binaries
 *.test
@@ -27,6 +14,7 @@
 # Output of go coverage
 coverage.out
 *.cover
+/coverage
 
 # Go vendor directory
 vendor/
@@ -45,20 +33,15 @@ Thumbs.db
 # Config files (example)
 config.yaml
 
-# Dependencies
-node_modules/
-
 # Backup files
 *.backup
-# Test coverage
-/coverage
+
 # Sensitive files
 *.db
-Copy/paste detection report
+
+# Copy/paste detection report
 /report/jscpd-report.json
-config-file
-/kitchen-sink
-# Nix build output
-/result/taskctl
-# Nix build output
+
+# Nix
 /result
+.direnv/

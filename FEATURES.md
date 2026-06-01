@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-05-31
+**Last Updated:** 2026-06-01
 **Version:** 2.3.0-dev
 **Go Version:** 1.26
 
@@ -267,4 +267,4 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ---
 
-**Last updated 2026-05-17.**
+**Last updated 2026-06-01.**

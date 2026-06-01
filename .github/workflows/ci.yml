@@ -34,7 +34,15 @@ jobs:
         run: go test ./... -count=1 -timeout 120s -race
 
       - name: Coverage
-        run: go test ./... -count=1 -timeout 120s -cover
+        run: |
+          go test ./... -count=1 -timeout 120s -coverprofile=coverage.out -covermode=atomic
+          go tool cover -func=coverage.out
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
 
   lint:
     runs-on: ubuntu-latest
@@ -49,5 +57,32 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v2.12.2
           args: run ./...
+
+  nix-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminantSystems/nix-installer-action@main
+
+      - name: Magic Nix Cache
+        uses: DeterminantSystems/magic-nix-cache-action@main
+
+      - name: Check flake
+        run: nix flake check -L
+
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Run benchmarks
+        run: go test ./benchmarks/ -bench=. -benchmem -count=1 -timeout 120s

@@ -123,7 +123,7 @@ HELLO, CMDGUARD!
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                 |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                     |
 | **Zero panics**            | Every v2 API function returns errors — never panics in library code                              |
-| **220+ tests**             | ~82% coverage, race-detected, fuzz-tested                                                        |
+| **333 tests** (1084 cases) | 83.6% coverage, race-detected, fuzz-tested                                                        |
 
 ---
 
@@ -490,21 +490,30 @@ result.AssertOutputContains("Hello, Alice!")
 
 ## Examples
 
-See the [`examples/`](examples/) directory:
+See [`examples/taskctl/`](examples/taskctl/) — a production-grade task manager CLI demonstrating all features: DI, typed flags, middleware, subcommands, config files, rich output, and more.
 
-- [`basic/`](examples/basic/) — Minimal v2 demo
-- [`typed/`](examples/typed/) — Full DI, lifecycle hooks, typed flags, nested commands
-- [`di/`](examples/di/) — Dependency injection patterns
-- [`di-patterns/`](examples/di-patterns/) — Service registration patterns
-- [`env-tags/`](examples/env-tags/) — Environment variable bindings
-- [`counting/`](examples/counting/) — Counting flags (`-v`/`-vv`/`-vvv`)
-- [`error-handling/`](examples/error-handling/) — Error handling patterns
-- [`output/`](examples/output/) — Rich output formatting
-- [`advanced-flags/`](examples/advanced-flags/) — Custom flag types
-- [`validation/`](examples/validation/) — Validation patterns
-- [`signals/`](examples/signals/) — Signal handling
-- [`config-file/`](examples/config-file/) — Config file loading
-- [`kitchen-sink/`](examples/kitchen-sink/) — Full task manager CLI demo (all features)
+---
+
+## Development
+
+```bash
+# Enter dev shell (Go 1.26, gopls, golangci-lint)
+nix develop
+
+# Run tests
+go test ./... -count=1 -timeout 120s -race
+
+# Lint
+golangci-lint run ./...
+
+# Format (Nix + Go via treefmt)
+nix fmt
+
+# Check everything
+nix flake check
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 
 ---
 

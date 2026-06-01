@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-05-31
+**Last Updated:** 2026-06-01
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.3.0-dev - 272 tests, 83.3% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.3.0-dev - 333 tests (1084 cases), 83.6% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -115,7 +115,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~82%     |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~84%     |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
