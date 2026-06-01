@@ -65,13 +65,13 @@ func buildChain[T any](
 }
 
 // TimingMiddleware returns a middleware that logs command execution duration.
-// The log function receives the command name and duration.
-func TimingMiddleware[T any](log func(commandName string, d time.Duration)) Middleware[T] {
+// The log function receives the command name, duration, and any error from execution.
+func TimingMiddleware[T any](log func(commandName string, d time.Duration, err error)) Middleware[T] {
 	return func(_ context.Context, _ *T, info CommandInfo, next func() error) error {
 		start := time.Now()
 		err := next()
 
-		log(info.Name, time.Since(start))
+		log(info.Name, time.Since(start), err)
 
 		return err
 	}

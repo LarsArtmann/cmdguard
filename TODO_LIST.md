@@ -28,8 +28,8 @@
 ### Future Cleanup (API-breaking, defer to v3.0)
 
 - [ ] Make NoFlags a distinct named type (not type alias)
-- [ ] Change TimingMiddleware callback to include error
-- [ ] Remove string-based BranchWithTimeout/BranchWithDeadline (replaced by typed alternatives)
+- [x] Change TimingMiddleware callback to include error
+- [x] Remove string-based BranchWithTimeout/BranchWithDeadline (replaced by typed alternatives)
 - [x] Remove FlowContextAccessor (thin wrapper with no added value)
 - [ ] Rename Get[T]/MustGet[T] to more specific names
 - [ ] Make RegisterInScope generic instead of `...any`

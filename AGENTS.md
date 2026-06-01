@@ -362,8 +362,8 @@ cmd, err := v2.NewCommand[AppConfig, *Flags]("example", runHandler,
 ```go
 // Timing middleware — logs execution duration
 cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
-    v2.WithMiddleware(v2.TimingMiddleware[Config](func(name string, d time.Duration) {
-        log.Printf("%s took %v", name, d)
+    v2.WithMiddleware(v2.TimingMiddleware[Config](func(name string, d time.Duration, err error) {
+        log.Printf("%s took %v (err=%v)", name, d, err)
     })),
 )
 
@@ -526,7 +526,7 @@ go build ./...                                   # Verify build
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
 11. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
 12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
-13. **Typed branching alternatives** — prefer `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` over string-based `BranchWithTimeout`/`BranchWithDeadline`
+13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
 16. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time

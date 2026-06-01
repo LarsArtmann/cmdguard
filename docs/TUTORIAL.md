@@ -252,8 +252,8 @@ Middleware wraps every command handler:
 ```go
 cli, _ := v2.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
     v2.WithMiddleware[AppConfig](
-        v2.TimingMiddleware[AppConfig](func(name string, d time.Duration) {
-            fmt.Fprintf(os.Stderr, "[timing] %s took %v\n", name, d)
+        v2.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+            fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
         }),
         v2.RecoveryMiddleware[AppConfig](),
     ),

@@ -331,7 +331,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 			var gotDuration bool
 
 			timingMW := v2.TimingMiddleware[lifecycleConfig](
-				func(name string, d time.Duration) {
+				func(name string, d time.Duration, err error) {
 					timedCommand = name
 					gotDuration = d > 0
 				},

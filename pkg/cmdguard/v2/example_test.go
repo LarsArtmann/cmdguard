@@ -178,8 +178,8 @@ func ExampleTimingMiddleware() {
 
 	cli, _ := v2.NewCLI[config](
 		"myapp", "My application", config{},
-		v2.WithMiddleware[config](v2.TimingMiddleware[config](func(name string, d time.Duration) {
-			fmt.Printf("%s took %v\n", name, d)
+		v2.WithMiddleware[config](v2.TimingMiddleware[config](func(name string, d time.Duration, err error) {
+			fmt.Printf("%s took %v (err=%v)\n", name, d, err)
 		})),
 	)
 

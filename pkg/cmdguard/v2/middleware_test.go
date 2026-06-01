@@ -194,7 +194,7 @@ func TestTimingMiddleware(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithMiddleware(TimingMiddleware[testConfig](func(name string, d time.Duration) {
+		WithMiddleware(TimingMiddleware[testConfig](func(name string, d time.Duration, err error) {
 			capturedName = name
 			capturedDuration = d
 		})),

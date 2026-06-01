@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"maps"
 	"slices"
 	"strings"
@@ -69,43 +68,6 @@ func (b *BranchingFlowContext) Branch(
 	branchCtx, cancel := context.WithCancel(b.Context)
 
 	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel
-}
-
-// BranchWithTimeout creates a child context with a timeout for a subcommand.
-func (b *BranchingFlowContext) BranchWithTimeout(
-	commandName string,
-	timeout string,
-	opts ...FlowContextOption,
-) (*BranchingFlowContext, func(), error) {
-	d, err := time.ParseDuration(timeout)
-	if err != nil {
-		return nil, nil, fmt.Errorf("command=%q, invalid timeout %q: %w", commandName, timeout, err)
-	}
-
-	branchCtx, cancel := context.WithTimeout(b.Context, d)
-
-	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel, nil
-}
-
-// BranchWithDeadline creates a child context with a deadline for a subcommand.
-func (b *BranchingFlowContext) BranchWithDeadline(
-	commandName string,
-	deadline string,
-	opts ...FlowContextOption,
-) (*BranchingFlowContext, func(), error) {
-	t, err := time.Parse(time.RFC3339, deadline)
-	if err != nil {
-		return nil, nil, fmt.Errorf(
-			"command=%q, invalid deadline %q: %w",
-			commandName,
-			deadline,
-			err,
-		)
-	}
-
-	branchCtx, cancel := context.WithDeadline(b.Context, t)
-
-	return b.branchWithCtx(branchCtx, cancel, commandName, opts), cancel, nil
 }
 
 // BranchWithDuration creates a child context with a timeout for a subcommand.

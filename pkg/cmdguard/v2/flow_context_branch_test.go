@@ -75,69 +75,68 @@ func TestBranchingFlowContext_Branch(t *testing.T) {
 	})
 }
 
-func TestBranchingFlowContext_BranchWithTimeout(t *testing.T) {
+func TestBranchingFlowContext_BranchWithDuration(t *testing.T) {
 	t.Parallel()
-	t.Run("valid timeout", func(t *testing.T) {
+	t.Run("valid duration", func(t *testing.T) {
 		t.Parallel()
 
 		root := NewBranchingFlowContext(context.Background())
 
-		child, cancel, err := root.BranchWithTimeout("cmd", "100ms")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		child, cancel := root.BranchWithDuration("cmd", 100*time.Millisecond)
+		defer cancel()
 
 		if child == nil {
 			t.Fatal("expected non-nil child context")
 		}
-
-		defer cancel()
 
 		if child.PathString() != "cmd" {
 			t.Errorf("expected 'cmd', got %q", child.PathString())
 		}
 	})
 
-	t.Run("invalid timeout", func(t *testing.T) {
+	t.Run("context expires", func(t *testing.T) {
 		t.Parallel()
 
 		root := NewBranchingFlowContext(context.Background())
 
-		_, _, err := root.BranchWithTimeout("cmd", "invalid")
-		if err == nil {
-			t.Fatal("expected error for invalid timeout")
+		child, cancel := root.BranchWithDuration("cmd", 1*time.Nanosecond)
+		defer cancel()
+
+		time.Sleep(10 * time.Millisecond)
+
+		if child.Err() == nil {
+			t.Error("expected context to be expired")
 		}
 	})
 }
 
-func TestBranchingFlowContext_BranchWithDeadline(t *testing.T) {
+func TestBranchingFlowContext_BranchWithDeadlineTime(t *testing.T) {
 	t.Parallel()
 	t.Run("valid deadline", func(t *testing.T) {
 		t.Parallel()
 
 		root := NewBranchingFlowContext(context.Background())
-		future := time.Now().Add(time.Hour).Format(time.RFC3339)
+		deadline := time.Now().Add(time.Hour)
 
-		child, cancel, err := root.BranchWithDeadline("cmd", future)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
+		child, cancel := root.BranchWithDeadlineTime("cmd", deadline)
+		defer cancel()
 
 		if child == nil {
 			t.Fatal("expected non-nil child context")
 		}
-
-		defer cancel()
 	})
 
-	t.Run("invalid deadline", func(t *testing.T) {
+	t.Run("past deadline expires immediately", func(t *testing.T) {
 		t.Parallel()
 
 		root := NewBranchingFlowContext(context.Background())
+		past := time.Now().Add(-time.Hour)
 
-		_, _, err := root.BranchWithDeadline("cmd", "invalid")
-		if err == nil {
-			t.Fatal("expected error for invalid deadline")
+		child, cancel := root.BranchWithDeadlineTime("cmd", past)
+		defer cancel()
+
+		if child.Err() == nil {
+			t.Error("expected context to be expired with past deadline")
 		}
 	})
 }
