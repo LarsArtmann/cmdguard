@@ -15,10 +15,10 @@ import (
 // defaultSpinnerInterval is the default delay between spinner frames.
 const defaultSpinnerInterval = 100 * time.Millisecond
 
-// spinnerFrames returns the default braille pattern frames for the spinner.
-func spinnerFrames() []string {
-	return []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-}
+// defaultSpinnerFrames contains the default braille pattern frames for the spinner.
+//
+//nolint:gochecknoglobals // Immutable constant, avoids per-call allocation
+var defaultSpinnerFrames = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 
 // SpinnerConfig configures the visual appearance of the spinner middleware.
 type SpinnerConfig struct {
@@ -33,7 +33,7 @@ func DefaultSpinnerConfig(title string) SpinnerConfig {
 	return SpinnerConfig{
 		Title:    title,
 		Writer:   os.Stderr,
-		Frames:   spinnerFrames(),
+		Frames:   defaultSpinnerFrames,
 		Interval: defaultSpinnerInterval,
 	}
 }
@@ -127,7 +127,7 @@ func (s *textSpinner) run() {
 
 	frames := s.cfg.Frames
 	if len(frames) == 0 {
-		frames = spinnerFrames()
+		frames = defaultSpinnerFrames
 	}
 
 	for {
