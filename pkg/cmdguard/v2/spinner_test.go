@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -186,5 +187,83 @@ func TestDefaultSpinnerConfig(t *testing.T) {
 
 	if cfg.Interval == 0 {
 		t.Error("default interval should not be zero")
+	}
+
+	testutil.AssertNoError(t, cfg.Validate())
+}
+
+func TestSpinnerConfig_Validate(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		cfg     SpinnerConfig
+		wantErr error
+	}{
+		{
+			name:    "nil writer",
+			cfg:     SpinnerConfig{Writer: nil, Frames: defaultSpinnerFrames, Interval: 100 * time.Millisecond},
+			wantErr: ErrNilValue,
+		},
+		{
+			name:    "zero interval",
+			cfg:     SpinnerConfig{Writer: os.Stderr, Frames: defaultSpinnerFrames, Interval: 0},
+			wantErr: ErrValueTooSmall,
+		},
+		{
+			name:    "negative interval",
+			cfg:     SpinnerConfig{Writer: os.Stderr, Frames: defaultSpinnerFrames, Interval: -1 * time.Millisecond},
+			wantErr: ErrValueTooSmall,
+		},
+		{
+			name:    "empty frames",
+			cfg:     SpinnerConfig{Writer: os.Stderr, Frames: []string{}, Interval: 100 * time.Millisecond},
+			wantErr: ErrValueEmpty,
+		},
+		{
+			name:    "valid config",
+			cfg:     SpinnerConfig{Writer: os.Stderr, Frames: defaultSpinnerFrames, Interval: 100 * time.Millisecond},
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := tt.cfg.Validate()
+			if tt.wantErr == nil {
+				testutil.AssertNoError(t, err)
+			} else {
+				testutil.AssertErrorIs(t, err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestSpinnerMiddlewareWithConfig_SkipsInvalidConfig(t *testing.T) {
+	t.Parallel()
+
+	type testConfig struct{}
+
+	called := false
+
+	cfg := SpinnerConfig{Writer: nil, Frames: nil, Interval: 0}
+	mw := SpinnerMiddlewareWithConfig[testConfig](cfg)
+	err := mw(
+		context.Background(),
+		&testConfig{},
+		CommandInfo{Name: "test"},
+		func() error {
+			called = true
+
+			return nil
+		},
+	)
+
+	testutil.AssertNoError(t, err)
+
+	if !called {
+		t.Error("handler should be called when spinner skips invalid config")
 	}
 }

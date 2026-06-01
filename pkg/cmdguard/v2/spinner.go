@@ -38,6 +38,24 @@ func DefaultSpinnerConfig(title string) SpinnerConfig {
 	}
 }
 
+// Validate checks the SpinnerConfig for errors. Returns an error if the
+// writer is nil, the interval is non-positive, or the frames slice is empty.
+func (c SpinnerConfig) Validate() error {
+	if c.Writer == nil {
+		return fmt.Errorf("%w: spinner writer must not be nil", ErrNilValue)
+	}
+
+	if c.Interval <= 0 {
+		return fmt.Errorf("%w: spinner interval must be positive, got %v", ErrValueTooSmall, c.Interval)
+	}
+
+	if len(c.Frames) == 0 {
+		return fmt.Errorf("%w: spinner frames must not be empty", ErrValueEmpty)
+	}
+
+	return nil
+}
+
 // SpinnerMiddleware returns a middleware that displays a terminal spinner
 // while the command handler runs. The spinner writes to stderr and is
 // automatically cleared when the command completes.
@@ -74,6 +92,10 @@ func SpinnerMiddleware[T any](title string) Middleware[T] {
 //	)
 func SpinnerMiddlewareWithConfig[T any](cfg SpinnerConfig) Middleware[T] {
 	return func(_ context.Context, _ *T, _ CommandInfo, next func() error) error {
+		if err := cfg.Validate(); err != nil {
+			return next()
+		}
+
 		if !isTerminal(cfg.Writer) {
 			return next()
 		}
