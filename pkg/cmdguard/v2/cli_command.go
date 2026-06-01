@@ -186,9 +186,9 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 	}
 
 	h := cfg.handler
-	info := cfg.info
 
 	*cfg.target = func(c *cobra.Command, args []string) error {
+		info := cfg.info
 		info.FullPath = c.CommandPath()
 
 		if cfg.promptOnMissing && cfg.info.Phase == PhaseRun {
