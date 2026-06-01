@@ -45,3 +45,5 @@ config.yaml
 # Nix
 /result
 .direnv/
+# Build artifacts
+/cmdguard
