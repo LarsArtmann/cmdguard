@@ -183,9 +183,9 @@ linters:
             - go.opentelemetry.io/otel/attribute
             - go.opentelemetry.io/otel/codes
             - go.opentelemetry.io/otel/trace
+            - github.com/go-faster/yaml
             - golang.org/x/term
-            - gopkg.in/yaml.v3
-          files:
+            - go.opentelemetry.io/otel/attribute
             - $all
             - "!$test"
             - "!**/examples/**"
