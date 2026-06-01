@@ -164,7 +164,7 @@ output package explicitly.
 
 ## Code Review Items
 
-- [ ] Review all `any` usages in package
+- [x] Review all `any` usages in package
 - [ ] Document DI patterns
 - [ ] Document DI scope pattern in docs/
 - [ ] Document error handling strategy
