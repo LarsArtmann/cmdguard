@@ -108,5 +108,6 @@ func (cli *CLI[T]) NoColor() bool {
 	if cli.noColorFlag == nil {
 		return false
 	}
+
 	return *cli.noColorFlag
 }
