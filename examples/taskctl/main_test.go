@@ -439,8 +439,6 @@ func TestDeprecatedCommand(t *testing.T) {
 func TestErrorHandling_FlagError(t *testing.T) {
 	t.Parallel()
 
-	var flagErr *v2.FlagError
-
 	cli := newTestCLI(t)
 	err := cli.ExecuteWithArgs(context.Background(), []string{"list", "--format", "invalid"})
 
@@ -448,7 +446,7 @@ func TestErrorHandling_FlagError(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if errors.As(err, &flagErr) {
+	if flagErr, ok := errors.AsType[*v2.FlagError](err); ok {
 		if flagErr.FlagName != "format" {
 			t.Errorf("FlagName = %q, want %q", flagErr.FlagName, "format")
 		}
@@ -464,8 +462,7 @@ func TestErrorHandling_ExitCode(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	var exitCoder *v2.ExitError
-	if errors.As(err, &exitCoder) {
+	if exitCoder, ok := errors.AsType[*v2.ExitError](err); ok {
 		if exitCoder.Code != 2 {
 			t.Errorf("ExitCode = %d, want 2", exitCoder.Code)
 		}
