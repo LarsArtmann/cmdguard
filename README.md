@@ -118,12 +118,15 @@ HELLO, CMDGUARD!
 | **Config files**           | `WithConfigFile[T](paths...)` — JSON/YAML/TOML auto-loading with flag override                   |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                          |
 | **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                   |
-| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own                                      |
+| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`, or write your own |
+|| **Interactive prompts**    | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh                              |
+|| **Markdown help**          | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour                      |
+|| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                |
 | **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                |
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                 |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                     |
 | **Zero panics**            | Every v2 API function returns errors — never panics in library code                              |
-| **333 tests** (1084 cases) | 83.6% coverage, race-detected, fuzz-tested                                                        |
+| **356 tests** (706 cases) | 82.8% coverage, race-detected, fuzz-tested                                                        |
 
 ---
 
@@ -323,6 +326,8 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands |
 | `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path     |
 | `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML)      |
+| `WithGlamourHelp[T]()`           | Render markdown in command help text             |
+| `WithTelemetry[T](tracer)`       | OpenTelemetry spans for all commands             |
 
 ---
 
@@ -434,7 +439,14 @@ func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
 
 ## Color Output
 
-cmdguard uses [fang](https://github.com/charmbracelet/fang) for styled help output via [lipgloss](https://github.com/charmbracelet/lipgloss). Lipgloss respects the [`NO_COLOR`](https://no-color.org/) environment variable automatically — set `NO_COLOR=1` to disable colored output.
+cmdguard uses [fang](https://github.com/charmbracelet/fang) for styled help output via [lipgloss](https://github.com/charmbracelet/lipgloss). A `--no-color` flag is registered by default — pass it to disable color output. Lipgloss also respects the [`NO_COLOR`](https://no-color.org/) environment variable automatically.
+
+```go
+// Check if color is disabled
+if cli.NoColor() {
+    // use plain output
+}
+```
 
 ```go
 cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
