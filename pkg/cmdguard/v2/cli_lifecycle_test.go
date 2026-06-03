@@ -301,6 +301,8 @@ func TestCLIExecuteAndExit(t *testing.T) {
 }
 
 func TestCLINoColor(t *testing.T) {
+	t.Parallel()
+
 	t.Run("--no-color flag is registered", func(t *testing.T) {
 		t.Parallel()
 
@@ -359,24 +361,24 @@ func TestCLINoColor(t *testing.T) {
 			t.Error("NoColor() should return true after --no-color is parsed")
 		}
 	})
+}
 
-	t.Run("NO_COLOR env var is respected", func(t *testing.T) {
-		t.Setenv("NO_COLOR", "1")
+func TestCLINoColorEnvVar(t *testing.T) {
+	t.Setenv("NO_COLOR", "1")
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
-			v2.WithFang[testCLIConfig](false))
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+	cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		v2.WithFang[testCLIConfig](false))
+	if err != nil {
+		t.Fatalf("NewCLI failed: %v", err)
+	}
 
-		cmd := newTestCLICommand[testCLIConfig]("run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand failed: %v", err)
-		}
+	cmd := newTestCLICommand[testCLIConfig]("run")
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand failed: %v", err)
+	}
 
-		err = cli.ExecuteWithArgs(t.Context(), []string{"run"})
-		if err != nil {
-			t.Fatalf("ExecuteWithArgs failed: %v", err)
-		}
-	})
+	err = cli.ExecuteWithArgs(t.Context(), []string{"run"})
+	if err != nil {
+		t.Fatalf("ExecuteWithArgs failed: %v", err)
+	}
 }
