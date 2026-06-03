@@ -1,11 +1,11 @@
 # TODO List
 
-**Updated:** 2026-06-01
-**Status:** v2.3.0-dev — release-ready
+**Updated:** 2026-06-03
+**Status:** v2.4.0-dev — release-ready
 
 ## Completed
 
-### Phase 1–9: All Complete (see CHANGELOG.md for v2.2.0 and v2.3.0 details)
+### Phase 1–9: All Complete
 
 - [x] All core features implemented and tested
 - [x] All architecture hardening complete
@@ -13,7 +13,7 @@
 - [x] Nix flake with devShell, formatter, and format check
 - [x] CI with pinned golangci-lint, codecov, Nix check, benchmarks
 - [x] Release automation workflow
-- [x] 333 tests (1084 cases), 83.6% coverage, 0 lint issues, 0 race conditions
+- [x] 356 tests (706 cases), 82.8% coverage, 0 lint issues, 0 race conditions
 
 ## Remaining Work
 
@@ -24,13 +24,11 @@
 ### Future (v3.0+)
 
 - [ ] Plugin system for custom validators and type handlers
+- [ ] Config file nested struct support
 
 ### Future Cleanup (API-breaking, defer to v3.0)
 
 - [ ] Make NoFlags a distinct named type (not type alias)
-- [x] Change TimingMiddleware callback to include error
-- [x] Remove string-based BranchWithTimeout/BranchWithDeadline (replaced by typed alternatives)
-- [x] Remove FlowContextAccessor (thin wrapper with no added value)
 - [ ] Rename Get[T]/MustGet[T] to more specific names
 - [ ] Make RegisterInScope generic instead of `...any`
 - [ ] Remove or redesign Package() for error-safe DI integration
