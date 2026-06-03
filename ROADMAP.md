@@ -1,40 +1,16 @@
 # ROADMAP
 
-**Generated:** 2026-04-05
-**Updated:** 2026-06-01
+**Updated:** 2026-06-03
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
 
-## v3.0 Major Redesign
-
-> See `v3.0-major-redesign-plan.md` for details
-
-- [ ] Create v3.0 API design document
-- [ ] Create `pkg/cmdguard/v3/` directory
-- [ ] Implement `errors.go` for v3
-- [ ] Implement `types.go` for v3
-- [ ] Implement `cli.go` for v3
-- [ ] Implement `command.go` for v3
-- [ ] Implement `options.go` for v3
-- [ ] Implement `flags.go` for v3
-- [ ] Implement `flags_parse.go` for v3
-- [ ] Implement `flags_validate.go` for v3
-- [ ] Implement `scope.go` for v3
-- [ ] Implement `scope_provide.go` for v3
-- [ ] Implement `cli_exec.go` for v3
-- [ ] Write tests for v3 implementation
-- [ ] Create v3 examples
-- [ ] Write MIGRATION_V2_TO_V3.md
-
----
-
-## Completed (v2.2–v2.3)
+## Completed (v2.2–v2.4)
 
 - [x] Add GitHub Actions workflow
 - [x] Add badge to README
 - [x] Add more custom types: URL, Email, Port, FilePath, HostPort
-- [x] Add middleware support (`TimingMiddleware`, `RecoveryMiddleware`)
+- [x] Add middleware support (`TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`)
 - [x] Create command groups feature (`WithGroup`, `WithGroupID`)
 - [x] Environment Variable Binding with `env` struct tags
 - [x] Config file support JSON/YAML/TOML
@@ -50,26 +26,52 @@
 - [x] Consumer test harness (`pkg/testutil`)
 - [x] Cobra migration guide (`docs/MIGRATION_FROM_COBRA.md`)
 - [x] Framework comparison (`docs/COMPARISON.md`)
+- [x] Interactive prompts via `huh` (`WithPromptOnMissing`, `prompt` tag)
+- [x] Markdown help rendering via `glamour` (`WithGlamourHelp`)
+- [x] Terminal spinner (`SpinnerMiddleware`)
+- [x] OpenTelemetry integration (`WithTelemetry`, `TelemetryMiddleware`)
+- [x] `--no-color` flag + `NO_COLOR` support
+- [x] Rich output with 12+ formats via `go-output`
+- [x] Review all `any` usages in package
+- [x] Remove string-based `BranchWithTimeout`/`BranchWithDeadline`
+- [x] Remove deprecated `FlowContextAccessor` API
+
+---
+
+## v3.0 Major Redesign
+
+- [ ] Create v3.0 API design document
+- [ ] Create `pkg/cmdguard/v3/` directory
+- [ ] Implement core types, CLI, commands, flags, scope, options for v3
+- [ ] Write tests for v3 implementation
+- [ ] Create v3 examples
+- [ ] Write `MIGRATION_V2_TO_V3.md`
+
+### v3.0 API-Breaking Cleanup
+
+- [ ] Make `NoFlags` a distinct named type (not `type NoFlags = struct{}`)
+- [ ] Rename `Get[T]`/`MustGet[T]` to more specific names
+- [ ] Make `RegisterInScope` generic instead of `...any`
+- [ ] Remove or redesign `Package()` for error-safe DI integration
+- [ ] Make `NoFlags` a distinct named type (not type alias)
 
 ---
 
 ## Advanced Types
 
-- [ ] Add Result[T] type for error handling
-- [ ] Add Validated[T] wrapper with validation functions
+- [ ] Add `Result[T]` type for error handling
+- [ ] Add `Validated[T]` wrapper with validation functions
 - [ ] Create example application for branded IDs
 
 ---
 
 ## Documentation Generation
 
-- [ ] Create examples/docs-generator/main.go
-- [ ] Define FlagDoc struct
-- [ ] Add GenerateDocs() method to CLI
+- [ ] Create `examples/docs-generator/main.go`
+- [ ] Define `FlagDoc` struct
+- [ ] Add `GenerateDocs()` method to CLI
 - [ ] Implement markdown documentation generator
-- [ ] Add GenerateDocsToFile() helper
 - [ ] Add API examples to godoc
-- [ ] Add flag validation examples
 
 ---
 
@@ -77,14 +79,14 @@
 
 - [ ] Implement plugin system for custom validators
 - [ ] Add validation interface abstraction
-- [ ] Add FlagRegistry interface
+- [ ] Add `FlagRegistry` interface
 - [ ] Custom validation hooks
 
 ---
 
 ## CLI Enhancements
 
-- [ ] Add Progress/Spinner Type using charmbracelet/bubbles
+- [x] Add Progress/Spinner Type using charmbracelet/bubbles
 - [ ] Add enhanced flag validation enums
 
 ---
@@ -92,96 +94,47 @@
 ## Configuration
 
 - [ ] Config File Auto-Loading integration with koanf
-- [ ] Replace `internal/config` with koanf
+- [ ] Config file nested struct support
 - [ ] Replace `internal/logging` with charmbracelet/log
 
 ---
 
 ## Fuzz Testing
 
-- [ ] Add fuzz tests to flags_parse.go
-- [ ] Add fuzz tests to config_parsing.go
-- [ ] Add fuzz test corpus in testdata/fuzz/ directories
+- [ ] Add fuzz tests to `flags_parse.go`
+- [ ] Add fuzz tests to `config_parsing.go`
+- [ ] Add fuzz test corpus in `testdata/fuzz/` directories
 
 ---
 
 ## Metrics & Observability
 
-- [ ] Metrics/telemetry integration
-
----
-
-## Standalone Library
-
-- [ ] Create `github.com/larsartmann/flagtags` repository
-- [ ] Extract flag-related code to standalone library
+- [x] Telemetry integration (OpenTelemetry)
+- [ ] Metrics/hooks for custom observability
 
 ---
 
 ## go-output Dependency Architecture
 
-> **Status:** Integrated in v2.3.0 via `pkg/cmdguard/v2/output.go` (re-export wrapper).  
-> **Question:** Should output rendering be optional or mandatory?
+> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.6.2.
 
-### Current State
-
-`go-output` is a published dependency (v0.6.1) providing 12 output formats (table, json, csv,
-yaml, markdown, xml, html, d2, mermaid, dot, tree, tsv). cmdguard wraps it in `output.go` to
-provide `OutputResult`, `OutputTable`, `OutputStyledTable`, and the `--output` global flag
-(`WithOutputFormat`).
-
-**Dependency weight:** 11 go-output sub-modules + 99 transitive edges in cmdguard's mod graph.
-Every consumer pays this cost whether they use `--output` or not.
-
-### Options for v3.0
-
-| Approach | Pros | Cons | Effort |
-|----------|------|------|--------|
-| **Keep as-is** | Zero code churn; `go install` works | Heavy dep tree for simple CLIs | None |
-| **Extract to sub-package** (`pkg/cmdguard/v2/output`) | Consumers who don't need `--output` avoid import | `CLI[T].OutputFormat()` moves; breaking | M |
-| **Split go-output into interface + backends** | Interface in core, heavy backends optional | Requires go-output redesign first | L |
-| **Use stdlib `encoding/*` as fallback** | Zero external deps for json/csv/yaml | Loses styled tables, d2, mermaid | M |
-
-### Recommendation
-
-Keep as-is for v2.x. For v3.0, evaluate extracting `output.go` and `cli_output.go` into a
-separate sub-package so `CLI[T]` doesn't carry the dependency unless the consumer imports the
-output package explicitly.
+`go-output` provides 12 output formats. Consider extracting to a sub-package in v3.0 so consumers only pay the dependency cost when they use `--output`.
 
 ---
 
 ## CI/CD & Release
 
-- [ ] Set up release automation
-- [ ] Add codecov integration
-- [ ] Set up CI/CD pipeline
-- [ ] Add pre-commit hooks
+- [x] Set up release automation
+- [ ] Add codecov integration (needs `CODECOV_TOKEN` secret)
+- [x] Set up CI/CD pipeline
 - [ ] Create contribution guide
 - [ ] Deprecate v1 API timeline
-- [ ] Remove testify/ginkgo completely
-
----
-
-## Code Review Items
-
-- [x] Review all `any` usages in package
-- [ ] Document DI patterns
-- [ ] Document DI scope pattern in docs/
-- [ ] Document error handling strategy
-- [ ] Review gochecknoglobals
-- [ ] Review recvcheck
-- [ ] Review unparam
-- [ ] Review other examples for duplicate code
-- [ ] Configure exhaustruct for external structs
-- [ ] Rename test packages to use `_test` suffix
 
 ---
 
 ## Future Ideas
 
 - [ ] Add structured JSON error output for `--output=json`
-- [x] Add `--no-color` flag + NO_COLOR support
 - [ ] Add issue/PR templates
 - [ ] Test all examples in CI
-- [ ] Metrics/telemetry integration
-- [ ] Custom validation hooks
+- [ ] Extract flag-related code to standalone `flagtags` library
