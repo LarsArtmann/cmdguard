@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-01
+**Last Updated:** 2026-06-03
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.3.0-dev - 333 tests (1084 cases), 83.6% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.4.0-dev - 356 tests (706 cases), 82.8% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.3.0-dev. 272 tests passing, 83.3% coverage, 0 build errors.
+**Current Status:** v2.4.0-dev. 356 tests passing, 82.8% coverage, 0 build errors.
 
 ---
 
@@ -525,7 +525,7 @@ go build ./...                                   # Verify build
 8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
-11. **go-output local replace** — uses absolute local path in go.mod, blocks CI/other developers
+31. **go-output published** — `github.com/larsartmann/go-output` is published at v0.6.2, no local replace needed
 12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
@@ -548,7 +548,7 @@ go build ./...                                   # Verify build
 28. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
 29. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
 30. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
-31. **Nix sandbox vs local replace** — `go.mod` has `replace` directives pointing to `../go-output`; Nix sandboxed checks (`buildGoModule`, `go build` in derivations) cannot resolve these, so `flake.nix` only provides devShell + formatter + format check (no build/vet checks)
+31. **Nix flake limited** — `flake.nix` only provides devShell + formatter + format check (no `buildGoModule` or vet checks); could be extended now that go-output is published
 32. **Glamour v2 no `"auto"` theme** — `charm.land/glamour/v2` removed the `"auto"` theme; use empty string (env-based via `GLAMOUR_STYLE`) or explicit theme like `"dark"`; `WithGlamourHelp` now sets theme to `""` for env-based detection
 
 ---
