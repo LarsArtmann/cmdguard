@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-06-03
-**Status:** v2.4.0-dev — release-ready
+**Status:** v2.4.0 — release-ready
 
 ## Completed
 

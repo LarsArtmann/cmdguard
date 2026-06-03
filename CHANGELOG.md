@@ -7,7 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
 
+---
+
+## [2.4.0] - 2026-06-03
+
+### Added
+
+- **`--no-color` flag + `NO_COLOR` support** - `cli.NoColor()` returns true when `--no-color` passed or `NO_COLOR=1` env var is set
+
+### Changed
+
+- **Removed `FlowContextAccessor`** - Dead API with zero consumers; use `GetBranchingFlowContext(ctx)` directly
+- **Removed string-based `BranchWithTimeout`/`BranchWithDeadline`** - Use typed `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` instead
+- **`TimingMiddleware` callback signature** - Now includes `error` parameter to distinguish success vs failure timing
+- **Migrated to `charm.land` vanity imports** - `charmbracelet/glamour` → `charm.land/glamour/v2`
+- **Replaced `gopkg.in/yaml.v3`** with `github.com/go-faster/yaml` for YAML config loading
+- **Modernized to Go 1.26** - `errors.As` → `errors.AsType` in examples
+
+### Fixed
+
+- Resolved `tparallel` lint issue in `TestCLINoColor` by extracting `t.Setenv` subtest
+
+---
+
+## [2.3.0] - 2026-06-01
 
 ### Added
 

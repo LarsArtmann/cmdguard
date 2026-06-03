@@ -1,7 +1,7 @@
 # cmdguard Features
 
 **Updated:** 2026-06-03
-**Status:** v2.4.0-dev — 0 lint issues, 0 race conditions
+**Status:** v2.4.0 — 0 lint issues, 0 race conditions
 
 ---
 
