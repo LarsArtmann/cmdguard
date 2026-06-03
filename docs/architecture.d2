@@ -22,8 +22,8 @@ external: {
 
   fang: {
     label: |go
-      charmbracelet/fang
-      Styling
+      charm.land/fang/v2
+      Styled help
     |
     shape: rectangle
   }
@@ -32,6 +32,38 @@ external: {
     label: |go
       samber/do/v2
       Dependency Injection
+    |
+    shape: rectangle
+  }
+
+  huh: {
+    label: |go
+      charm.land/huh/v2
+      Interactive prompts
+    |
+    shape: rectangle
+  }
+
+  glamour: {
+    label: |go
+      charm.land/glamour/v2
+      Markdown rendering
+    |
+    shape: rectangle
+  }
+
+  otel: {
+    label: |go
+      OpenTelemetry
+      Tracing spans
+    |
+    shape: rectangle
+  }
+
+  gooutput: {
+    label: |go
+      go-output
+      12 output formats
     |
     shape: rectangle
   }
@@ -45,17 +77,16 @@ public: {
     stroke: "#388e3c"
   }
 
-  guarded: {
+  cli: {
     label: |go
-      pkg/cmdguard/v2
-      guard.go
-
-      GuardedCommand[T, F]
-      - New[T, F]()
+      cli.go, cli_options.go
+      CLI[T]
+      - NewCLI[T]()
       - AddCommand()
       - Execute()
       - Scope()
       - Config()
+      - NoColor()
     |
     shape: rectangle
     style: {
@@ -66,13 +97,12 @@ public: {
 
   command: {
     label: |go
-      command.go
+      command.go, command_options.go
 
       Command[T, F]
-      - Use, Short, Long
-      - Flags F
-      - RunE, PreRunE, PostRunE
-      - Validate()
+      - NewCommand[T, F]()
+      - NewParentCommand[T, F]()
+      - 21 functional options
     |
     shape: rectangle
     style: {
@@ -89,7 +119,6 @@ public: {
       - Provide()
       - ProvideValue()
       - Invoke[T]()
-      - Child()
       - HealthCheck()
       - Shutdown()
     |
@@ -102,12 +131,30 @@ public: {
 
   flags: {
     label: |go
-      flags.go
+      flags.go, flags_parse.go
 
       FlagRegistry
-      - RegisterFlags()
-      - ParseFlags()
-      - ValidateFlags()
+      - Struct tag parsing
+      - Type handlers
+      - Validation
+      - Typo suggestions
+    |
+    shape: rectangle
+    style: {
+      fill: "#c8e6c9"
+      stroke: "#388e3c"
+    }
+  }
+
+  middleware: {
+    label: |go
+      middleware.go
+
+      Middleware Chain
+      - TimingMiddleware
+      - RecoveryMiddleware
+      - SpinnerMiddleware
+      - TelemetryMiddleware
     |
     shape: rectangle
     style: {
@@ -118,12 +165,12 @@ public: {
 
   types: {
     label: |go
-      types.go
+      types_*.go
 
       Custom Types
-      - LogLevel
-      - LogFormat
-      - Duration
+      - Email, URL, Port
+      - FilePath, HostPort
+      - Duration, LogLevel
       - Enum[T]
       - NoFlags
     |
@@ -139,10 +186,11 @@ public: {
       errors.go
 
       Error Types
-      - *CommandError
-      - *FlagError
-      - *ServiceError
-      - *ConfigError
+      - 40+ sentinels
+      - CommandError
+      - FlagError
+      - ServiceError
+      - ExitError
     |
     shape: rectangle
     style: {
@@ -152,21 +200,22 @@ public: {
   }
 }
 
-# Internal Layer
-internal: {
-  label: Internal Packages
+# Configuration Layer
+config: {
+  label: Config & Prompts
   style: {
     fill: "#fff3e0"
     stroke: "#f57c00"
   }
 
-  config: {
+  configfile: {
     label: |go
-      internal/config/
+      config_file.go, configload/
 
-      Config Provider
-      - Environment variables
-      - CMDGUARD_* prefix
+      Config File Loading
+      - JSON (built-in)
+      - YAML (go-faster/yaml)
+      - TOML (pelletier/go-toml)
     |
     shape: rectangle
     style: {
@@ -175,13 +224,14 @@ internal: {
     }
   }
 
-  logging: {
+  prompts: {
     label: |go
-      internal/logging/
+      prompts.go
 
-      Logger
-      - Structured logging (slog)
-      - Log level management
+      Interactive Prompts
+      - Input, Select, Confirm
+      - prompt:"?" struct tag
+      - WithPromptOnMissing
     |
     shape: rectangle
     style: {
@@ -191,61 +241,41 @@ internal: {
   }
 }
 
-# Examples Layer
+# Example
 examples: {
-  label: Examples
+  label: Example
   style: {
     fill: "#e1f5fe"
     stroke: "#0288d1"
   }
 
-  basic: {
-    label: examples/basic/
+  taskctl: {
+    label: |go
+      examples/taskctl/
+      Production task manager CLI
+      - All features demonstrated
+      - ~66 integration tests
+    |
     shape: rectangle
-    style: {fill: "#b3e5fc"}
-  }
-
-  typed: {
-    label: examples/typed/
-    shape: rectangle
-    style: {fill: "#b3e5fc"}
-  }
-
-  di: {
-    label: examples/di/
-    shape: rectangle
-    style: {fill: "#b3e5fc"}
-  }
-
-  middleware: {
-    label: examples/middleware/
-    shape: rectangle
-    style: {fill: "#b3e5fc"}
+    style: {
+      fill: "#b3e5fc"
+      stroke: "#0288d1"
+    }
   }
 }
 
 # Relationships
-public.guarded -> public.command: uses
-public.guarded -> public.scope: contains
-public.guarded -> public.flags: uses
-public.guarded -> public.errors: returns
-
-public.command -> public.types: uses
-public.flags -> public.types: uses
-public.scope -> public.errors: returns
-
-# External Dependencies
-public.guarded -> external.cobra: wraps
-public.scope -> external.samberdo: uses
-public.flags -> external.cobra: registers
-
-# Internal Usage
-public.guarded -> internal.config: reads
-public.guarded -> internal.logging: uses
-
-# Examples Usage
-examples.basic -> public.guarded: demonstrates
-examples.typed -> public.guarded: demonstrates
-examples.typed -> public.command: demonstrates
-examples.di -> public.scope: demonstrates
-examples.middleware -> public.command: demonstrates
+public.cli -> public.command: AddCommand
+public.cli -> public.scope: Scope()
+public.cli -> public.flags: flag registration
+public.cli -> public.middleware: WithMiddleware
+public.cli -> external.cobra: wraps
+public.cli -> external.fang: styled help
+public.scope -> external.samberdo: wraps
+public.command -> public.flags: WithFlags
+public.command -> public.errors: validation
+public.config.configfile -> public.flags: defaults
+public.config.prompts -> external.huh: TUI prompts
+public.middleware -> external.otel: spans
+public.cli -> external.gooutput: output formats
+public.cli -> external.glamour: markdown help
