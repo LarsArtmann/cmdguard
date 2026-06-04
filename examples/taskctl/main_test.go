@@ -39,6 +39,16 @@ func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 	return cli
 }
 
+// mustExec creates a test CLI and executes the given args, failing on error.
+func mustExec(t *testing.T, args ...string) {
+	t.Helper()
+
+	cli := newTestCLI(t)
+	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
+		t.Fatalf("%s: %v", args[0], err)
+	}
+}
+
 // --- CLI Construction ---
 
 func TestCLI_Construction(t *testing.T) {
@@ -150,61 +160,37 @@ func TestDI_Shutdown(t *testing.T) {
 func TestListCommand_Default(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"list"})
-	if err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	mustExec(t, "list")
 }
 
 func TestListCommand_JSON(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"list", "--format", "json"})
-	if err != nil {
-		t.Fatalf("list --format json: %v", err)
-	}
+	mustExec(t, "list", "--format", "json")
 }
 
 func TestListCommand_CSV(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"list", "--format", "csv"})
-	if err != nil {
-		t.Fatalf("list --format csv: %v", err)
-	}
+	mustExec(t, "list", "--format", "csv")
 }
 
 func TestListCommand_YAML(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"list", "--format", "yaml"})
-	if err != nil {
-		t.Fatalf("list --format yaml: %v", err)
-	}
+	mustExec(t, "list", "--format", "yaml")
 }
 
 func TestListCommand_All(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"list", "--all"})
-	if err != nil {
-		t.Fatalf("list --all: %v", err)
-	}
+	mustExec(t, "list", "--all")
 }
 
 func TestListCommand_FilterPriority(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"list", "--priority", "high"})
-	if err != nil {
-		t.Fatalf("list --priority high: %v", err)
-	}
+	mustExec(t, "list", "--priority", "high")
 }
 
 func TestListCommand_InvalidFormat(t *testing.T) {
@@ -220,11 +206,7 @@ func TestListCommand_InvalidFormat(t *testing.T) {
 func TestListCommand_AliasLS(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"ls"})
-	if err != nil {
-		t.Fatalf("ls alias: %v", err)
-	}
+	mustExec(t, "ls")
 }
 
 func TestListCommand_Empty(t *testing.T) {
@@ -251,21 +233,13 @@ func TestListCommand_Empty(t *testing.T) {
 func TestAddCommand_Valid(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"add", "--title", "Write tests"})
-	if err != nil {
-		t.Fatalf("add: %v", err)
-	}
+	mustExec(t, "add", "--title", "Write tests")
 }
 
 func TestAddCommand_WithPriority(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"add", "--title", "Fix bug", "--priority", "high"})
-	if err != nil {
-		t.Fatalf("add with priority: %v", err)
-	}
+	mustExec(t, "add", "--title", "Fix bug", "--priority", "high")
 }
 
 func TestAddCommand_InvalidPriority(t *testing.T) {
@@ -283,11 +257,7 @@ func TestAddCommand_InvalidPriority(t *testing.T) {
 func TestDoneCommand_Valid(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"done", "--id", "1"})
-	if err != nil {
-		t.Fatalf("done: %v", err)
-	}
+	mustExec(t, "done", "--id", "1")
 }
 
 func TestDoneCommand_NotFound(t *testing.T) {
@@ -315,21 +285,13 @@ func TestDoneCommand_MissingID(t *testing.T) {
 func TestStatsCommand_Default(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"stats"})
-	if err != nil {
-		t.Fatalf("stats: %v", err)
-	}
+	mustExec(t, "stats")
 }
 
 func TestStatsCommand_JSON(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"stats", "--format", "json"})
-	if err != nil {
-		t.Fatalf("stats --format json: %v", err)
-	}
+	mustExec(t, "stats", "--format", "json")
 }
 
 // --- DB Subcommands (NewParentCommand) ---
@@ -337,31 +299,19 @@ func TestStatsCommand_JSON(t *testing.T) {
 func TestDBCommand_Migrate(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"db", "migrate", "--env", "production"})
-	if err != nil {
-		t.Fatalf("db migrate: %v", err)
-	}
+	mustExec(t, "db", "migrate", "--env", "production")
 }
 
 func TestDBCommand_Seed(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"db", "seed"})
-	if err != nil {
-		t.Fatalf("db seed: %v", err)
-	}
+	mustExec(t, "db", "seed")
 }
 
 func TestDBCommand_Status(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"db", "status"})
-	if err != nil {
-		t.Fatalf("db status: %v", err)
-	}
+	mustExec(t, "db", "status")
 }
 
 // --- Health Command (MustNewCommand) ---
@@ -369,11 +319,7 @@ func TestDBCommand_Status(t *testing.T) {
 func TestHealthCommand(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"health"})
-	if err != nil {
-		t.Fatalf("health: %v", err)
-	}
+	mustExec(t, "health")
 }
 
 // --- Version Command ---
@@ -381,11 +327,7 @@ func TestHealthCommand(t *testing.T) {
 func TestVersionCommand(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"version"})
-	if err != nil {
-		t.Fatalf("version: %v", err)
-	}
+	mustExec(t, "version")
 }
 
 // --- Config Command ---
@@ -393,11 +335,7 @@ func TestVersionCommand(t *testing.T) {
 func TestConfigShowCommand(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"config", "show"})
-	if err != nil {
-		t.Fatalf("config show: %v", err)
-	}
+	mustExec(t, "config", "show")
 }
 
 // --- Hidden Command ---
@@ -427,11 +365,7 @@ func TestHiddenCommand(t *testing.T) {
 func TestDeprecatedCommand(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"complete"})
-	if err != nil {
-		t.Fatalf("complete: %v", err)
-	}
+	mustExec(t, "complete")
 }
 
 // --- Error Handling ---
@@ -586,11 +520,7 @@ func TestIntegration_FullWorkflow(t *testing.T) {
 func TestInspectCommand(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"inspect", "1"})
-	if err != nil {
-		t.Fatalf("inspect 1: %v", err)
-	}
+	mustExec(t, "inspect", "1")
 }
 
 func TestInspectCommand_NoArgs(t *testing.T) {
@@ -833,11 +763,7 @@ func TestPortType(t *testing.T) {
 func TestBranchingFlowContext(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"inspect", "1"})
-	if err != nil {
-		t.Fatalf("inspect: %v", err)
-	}
+	mustExec(t, "inspect", "1")
 }
 
 // --- NewCommandError / NewServiceError ---

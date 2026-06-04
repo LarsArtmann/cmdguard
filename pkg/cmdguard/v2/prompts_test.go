@@ -285,97 +285,73 @@ func TestPromptMissingCommandFlags_NilRegistry(t *testing.T) {
 
 //nolint:paralleltest // modifies package-level defaultPromptRunner
 func TestWithPromptOnMissing_Integration(t *testing.T) {
-	t.Run("prompts for missing flag during command execution", func(t *testing.T) {
-		type Flags struct {
-			Name string `flag:"name" prompt:"What is your name?"`
-		}
+	type promptTestCase struct {
+		name       string
+		fakeResult string
+		args       []string
+		wantName   string
+	}
 
-		setFakePromptRunner(t, &fakePromptRunner{
-			stringResults: map[string]string{
-				"What is your name?": "Charlie",
-			},
+	for _, tc := range []promptTestCase{
+		{
+			name:       "prompts for missing flag during command execution",
+			fakeResult: "Charlie",
+			args:       []string{"greet"},
+			wantName:   "Charlie",
+		},
+		{
+			name:       "skips prompt when flag explicitly provided",
+			fakeResult: "ShouldNotBeUsed",
+			args:       []string{"greet", "--name", "David"},
+			wantName:   "David",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			type Flags struct {
+				Name string `flag:"name" prompt:"What is your name?"`
+			}
+
+			setFakePromptRunner(t, &fakePromptRunner{
+				stringResults: map[string]string{
+					"What is your name?": tc.fakeResult,
+				},
+			})
+
+			var gotName string
+
+			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+			if err != nil {
+				t.Fatalf("creating CLI: %v", err)
+			}
+
+			cmd, err := NewCommand[testAppConfig, *Flags](
+				"greet",
+				func(_ context.Context, _ *testAppConfig, flags *Flags) error {
+					gotName = flags.Name
+
+					return nil
+				},
+				WithShort[testAppConfig, *Flags]("Greet someone"),
+				WithFlags[testAppConfig, *Flags](&Flags{}),
+				WithPromptOnMissing[testAppConfig, *Flags](),
+			)
+			if err != nil {
+				t.Fatalf("creating command: %v", err)
+			}
+
+			if err := AddCommand(cli, cmd); err != nil {
+				t.Fatalf("adding command: %v", err)
+			}
+
+			if err := cli.ExecuteWithArgs(t.Context(), tc.args); err != nil {
+				t.Fatalf("executing: %v", err)
+			}
+
+			if gotName != tc.wantName {
+				t.Errorf("name = %q, want %q", gotName, tc.wantName)
+			}
 		})
-
-		var gotName string
-
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
-		if err != nil {
-			t.Fatalf("creating CLI: %v", err)
-		}
-
-		cmd, err := NewCommand[testAppConfig, *Flags](
-			"greet",
-			func(_ context.Context, _ *testAppConfig, flags *Flags) error {
-				gotName = flags.Name
-
-				return nil
-			},
-			WithShort[testAppConfig, *Flags]("Greet someone"),
-			WithFlags[testAppConfig, *Flags](&Flags{}),
-			WithPromptOnMissing[testAppConfig, *Flags](),
-		)
-		if err != nil {
-			t.Fatalf("creating command: %v", err)
-		}
-
-		if err := AddCommand(cli, cmd); err != nil {
-			t.Fatalf("adding command: %v", err)
-		}
-
-		if err := cli.ExecuteWithArgs(t.Context(), []string{"greet"}); err != nil {
-			t.Fatalf("executing: %v", err)
-		}
-
-		if gotName != "Charlie" {
-			t.Errorf("name = %q, want %q", gotName, "Charlie")
-		}
-	})
-
-	t.Run("skips prompt when flag explicitly provided", func(t *testing.T) {
-		type Flags struct {
-			Name string `flag:"name" prompt:"What is your name?"`
-		}
-
-		setFakePromptRunner(t, &fakePromptRunner{
-			stringResults: map[string]string{
-				"What is your name?": "ShouldNotBeUsed",
-			},
-		})
-
-		var gotName string
-
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
-		if err != nil {
-			t.Fatalf("creating CLI: %v", err)
-		}
-
-		cmd, err := NewCommand[testAppConfig, *Flags](
-			"greet",
-			func(_ context.Context, _ *testAppConfig, flags *Flags) error {
-				gotName = flags.Name
-
-				return nil
-			},
-			WithShort[testAppConfig, *Flags]("Greet someone"),
-			WithFlags[testAppConfig, *Flags](&Flags{}),
-			WithPromptOnMissing[testAppConfig, *Flags](),
-		)
-		if err != nil {
-			t.Fatalf("creating command: %v", err)
-		}
-
-		if err := AddCommand(cli, cmd); err != nil {
-			t.Fatalf("adding command: %v", err)
-		}
-
-		if err := cli.ExecuteWithArgs(t.Context(), []string{"greet", "--name", "David"}); err != nil {
-			t.Fatalf("executing: %v", err)
-		}
-
-		if gotName != "David" {
-			t.Errorf("name = %q, want %q", gotName, "David")
-		}
-	})
+	}
 }
 
 func TestPromptTag_Parse(t *testing.T) {

@@ -10,17 +10,25 @@ import (
 	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
 )
 
+func writeTestConfigFile(t *testing.T) string {
+	t.Helper()
+
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	if err := os.WriteFile(configPath, []byte(`{"name": "file"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	return configPath
+}
+
 func TestConfigFilePrecedence(t *testing.T) {
 	// Not parallel because some subtests use t.Setenv
 
 	t.Run("config file overrides tag default", func(t *testing.T) {
 		t.Parallel()
 
-		tmpDir := t.TempDir()
-		configPath := filepath.Join(tmpDir, "config.json")
-		if err := os.WriteFile(configPath, []byte(`{"name": "file"}`), 0o600); err != nil {
-			t.Fatal(err)
-		}
+		configPath := writeTestConfigFile(t)
 
 		type Config struct {
 			Name string `flag:"name" default:"default"`
@@ -65,11 +73,7 @@ func TestConfigFilePrecedence(t *testing.T) {
 	t.Run("flag overrides config file", func(t *testing.T) {
 		t.Parallel()
 
-		tmpDir := t.TempDir()
-		configPath := filepath.Join(tmpDir, "config.json")
-		if err := os.WriteFile(configPath, []byte(`{"name": "file"}`), 0o600); err != nil {
-			t.Fatal(err)
-		}
+		configPath := writeTestConfigFile(t)
 
 		type Config struct {
 			Name string `flag:"name" default:"default"`
@@ -112,11 +116,7 @@ func TestConfigFilePrecedence(t *testing.T) {
 	})
 
 	t.Run("env overrides config file", func(t *testing.T) {
-		tmpDir := t.TempDir()
-		configPath := filepath.Join(tmpDir, "config.json")
-		if err := os.WriteFile(configPath, []byte(`{"name": "file"}`), 0o600); err != nil {
-			t.Fatal(err)
-		}
+		configPath := writeTestConfigFile(t)
 
 		type Config struct {
 			Name string `flag:"name" default:"default" env:"TEST_NAME"`
@@ -161,11 +161,7 @@ func TestConfigFilePrecedence(t *testing.T) {
 	})
 
 	t.Run("flag overrides env and config file", func(t *testing.T) {
-		tmpDir := t.TempDir()
-		configPath := filepath.Join(tmpDir, "config.json")
-		if err := os.WriteFile(configPath, []byte(`{"name": "file"}`), 0o600); err != nil {
-			t.Fatal(err)
-		}
+		configPath := writeTestConfigFile(t)
 
 		type Config struct {
 			Name string `flag:"name" default:"default" env:"TEST_NAME2"`

@@ -10,6 +10,24 @@ import (
 	"github.com/larsartmann/cmdguard/pkg/testutil"
 )
 
+// newTestCLIWithNoOpCmd creates a CLI with a no-op "cmd" command using the given options.
+func newTestCLIWithNoOpCmd(t *testing.T, opts ...CommandOption[testConfig, NoFlags]) *CLI[testConfig] {
+	t.Helper()
+
+	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
+	testutil.AssertNoError(t, err)
+
+	cmd, err := NewCommand[testConfig, NoFlags](
+		"cmd",
+		func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
+		opts...,
+	)
+	testutil.AssertNoError(t, err)
+	testutil.AssertNoError(t, AddCommand(cli, cmd))
+
+	return cli
+}
+
 func TestExitError(t *testing.T) {
 	t.Parallel()
 
@@ -520,18 +538,9 @@ func TestWithExactArgs(t *testing.T) {
 	t.Run("exact args - wrong count fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithExactArgs[testConfig, NoFlags](2))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithExactArgs[testConfig, NoFlags](2),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "only-one"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "only-one"})
 		testutil.AssertExpectedError(t, err)
 		assertErrorContains(t, err, "accepts 2 arg(s)", "received 1")
 	})
@@ -543,36 +552,18 @@ func TestWithMinimumArgs(t *testing.T) {
 	t.Run("minimum args - enough args passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithMinimumArgs[testConfig, NoFlags](1))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithMinimumArgs[testConfig, NoFlags](1),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "arg1", "arg2"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "arg1", "arg2"})
 		testutil.AssertNoError(t, err)
 	})
 
 	t.Run("minimum args - too few fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithMinimumArgs[testConfig, NoFlags](2))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithMinimumArgs[testConfig, NoFlags](2),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "one"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "one"})
 		testutil.AssertExpectedError(t, err)
 		assertErrorContains(t, err, "requires at least 2 arg(s)")
 	})
@@ -584,36 +575,18 @@ func TestWithMaximumArgs(t *testing.T) {
 	t.Run("maximum args - within limit passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithMaximumArgs[testConfig, NoFlags](2))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithMaximumArgs[testConfig, NoFlags](2),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd"})
 		testutil.AssertNoError(t, err)
 	})
 
 	t.Run("maximum args - exceeds limit fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithMaximumArgs[testConfig, NoFlags](1))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithMaximumArgs[testConfig, NoFlags](1),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "a", "b"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "a", "b"})
 		testutil.AssertExpectedError(t, err)
 		assertErrorContains(t, err, "accepts at most 1 arg(s)")
 	})
@@ -625,36 +598,18 @@ func TestWithNoArgs(t *testing.T) {
 	t.Run("no args - zero args passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithNoArgs[testConfig, NoFlags]())
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithNoArgs[testConfig, NoFlags](),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd"})
 		testutil.AssertNoError(t, err)
 	})
 
 	t.Run("no args - any args fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithNoArgs[testConfig, NoFlags]())
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithNoArgs[testConfig, NoFlags](),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "--", "unexpected"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "--", "unexpected"})
 		testutil.AssertExpectedError(t, err)
 
 		// Cobra treats unknown positional args as unknown commands before
@@ -674,36 +629,18 @@ func TestWithRangeArgs(t *testing.T) {
 	t.Run("within range passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithRangeArgs[testConfig, NoFlags](1, 3))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithRangeArgs[testConfig, NoFlags](1, 3),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "a", "b"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "a", "b"})
 		testutil.AssertNoError(t, err)
 	})
 
 	t.Run("below range fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
-		testutil.AssertNoError(t, err)
+		cli := newTestCLIWithNoOpCmd(t, WithRangeArgs[testConfig, NoFlags](2, 4))
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"cmd",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithRangeArgs[testConfig, NoFlags](2, 4),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		err = cli.ExecuteWithArgs(context.Background(), []string{"cmd", "only-one"})
+		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "only-one"})
 		testutil.AssertExpectedError(t, err)
 		assertErrorContains(t, err, "accepts between 2 and 4 arg(s)")
 	})

@@ -30,11 +30,7 @@ func (r *typeRegistry) registerKinds() {
 	r.countHandler = countHandler
 
 	r.byKind[reflect.String] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
+		RegisterFunc: registerStringFlagFromTag,
 		ParseFunc: func(value string, _ FlagTag) (any, error) {
 			return value, nil
 		},

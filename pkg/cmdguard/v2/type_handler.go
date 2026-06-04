@@ -24,6 +24,13 @@ func registerStringFlag(flags *pflag.FlagSet, name, short, value, usage string) 
 	}
 }
 
+// registerStringFlagFromTag registers a string flag using FlagTag fields and returns nil.
+func registerStringFlagFromTag(flags *pflag.FlagSet, tag FlagTag) error {
+	registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
+
+	return nil
+}
+
 // TypeHandlerFunc is a functional adapter for TypeHandler where Register is not needed.
 type TypeHandlerFunc struct {
 	ParseFunc    func(value string, tag FlagTag) (any, error)

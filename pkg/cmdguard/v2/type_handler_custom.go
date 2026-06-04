@@ -19,11 +19,7 @@ func (r *typeRegistry) registerCustomTypes() {
 	}
 
 	r.byType[reflect.TypeFor[Duration]()] = TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-			return nil
-		},
+		RegisterFunc: registerStringFlagFromTag,
 		ParseFunc: func(value string, _ FlagTag) (any, error) {
 			return ParseDuration(value)
 		},
@@ -104,11 +100,7 @@ func (r *typeRegistry) registerCustomTypes() {
 		parseFn := entry.parseFunc
 
 		r.byType[entry.typ] = TypeHandlerFunc{
-			RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-				registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
-
-				return nil
-			},
+			RegisterFunc: registerStringFlagFromTag,
 			ParseFunc: func(value string, _ FlagTag) (any, error) {
 				return parseFn(value)
 			},
