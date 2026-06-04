@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestNewFlagRegistry(t *testing.T) {

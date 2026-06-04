@@ -251,7 +251,7 @@ import (
     "context"
     "fmt"
 
-    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+    "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 type AppConfig struct {

@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 // TestResult holds the outcome of executing a CLI command in tests.

@@ -13,7 +13,7 @@ import (
 
 	"github.com/go-faster/yaml"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 // YAML returns a ConfigFileLoader for YAML files.

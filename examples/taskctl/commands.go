@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 //nolint:gocyclo // example file: linear command registration reads best as a single function

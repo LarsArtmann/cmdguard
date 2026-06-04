@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 type countTestConfig struct {

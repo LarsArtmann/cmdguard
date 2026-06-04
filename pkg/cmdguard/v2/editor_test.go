@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestEditInEditor(t *testing.T) {

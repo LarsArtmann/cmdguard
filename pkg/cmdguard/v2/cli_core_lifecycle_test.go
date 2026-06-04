@@ -3,7 +3,7 @@ package v2_test
 import (
 	"testing"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 func TestCLISetConfig(t *testing.T) {

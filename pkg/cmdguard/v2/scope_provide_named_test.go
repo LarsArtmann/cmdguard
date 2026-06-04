@@ -5,7 +5,7 @@ import (
 
 	"github.com/samber/do/v2"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 // provideTestNamed is a helper that reduces boilerplate in tests by wrapping

@@ -5,7 +5,7 @@ import (
 
 	"github.com/pelletier/go-toml/v2"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 // TOML returns a ConfigFileLoader for TOML files.

@@ -3,7 +3,7 @@ package v2
 import (
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestCommandOptions(t *testing.T) {

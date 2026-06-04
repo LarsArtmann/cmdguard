@@ -25,7 +25,7 @@ cmdguard is a **library**, not an executable. You use it to build your own CLI t
 // This is what YOU build with cmdguard
 package main
 
-import "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+import "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 
 func main() {
     cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})

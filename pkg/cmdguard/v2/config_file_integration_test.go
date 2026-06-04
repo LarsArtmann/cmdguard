@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 func writeTestConfigFile(t *testing.T) string {

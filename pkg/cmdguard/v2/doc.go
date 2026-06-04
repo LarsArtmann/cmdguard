@@ -12,7 +12,7 @@
 //	    "context"
 //	    "fmt"
 //
-//	    v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+//	    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 //	)
 //
 //	type AppConfig struct {
@@ -193,5 +193,5 @@
 // # Further Reading
 //
 // See the examples/ directory for working demonstrations of each feature.
-// Visit https://pkg.go.dev/github.com/larsartmann/cmdguard/pkg/cmdguard/v2 for the full API reference.
+// Visit https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2 for the full API reference.
 package v2

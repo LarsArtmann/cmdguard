@@ -25,7 +25,7 @@ Create a new Go module:
 ```bash
 mkdir taskctl && cd taskctl
 go mod init taskctl
-go get github.com/larsartmann/cmdguard
+go get github.com/larsartmann/cmdguard/v2
 ```
 
 Create `main.go`:
@@ -38,7 +38,7 @@ import (
     "fmt"
     "os"
 
-    v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 type AppConfig struct {
@@ -339,7 +339,7 @@ See [`examples/kitchen-sink/`](../examples/kitchen-sink/) for a fully working pr
 
 ## Next Steps
 
-- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/pkg/cmdguard/v2) for the full API
+- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2) for the full API
 - See the [Quick Start Guide](QUICKSTART.md) for a complete feature tour
 - Check [MIGRATION_FROM_COBRA.md](MIGRATION_FROM_COBRA.md) if you're migrating an existing Cobra app
 - Browse [examples/](../examples/) for more working demos

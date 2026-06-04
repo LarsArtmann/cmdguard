@@ -9,7 +9,7 @@ cmdguard is a Go library for building validated CLI applications with type-safe 
 ## Installation
 
 ```bash
-go get github.com/larsartmann/cmdguard
+go get github.com/larsartmann/cmdguard/v2
 ```
 
 ---
@@ -26,7 +26,7 @@ import (
     "fmt"
     "os"
 
-    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+    "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 type AppConfig struct{}

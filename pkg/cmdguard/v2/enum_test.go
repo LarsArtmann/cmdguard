@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestParseEnum(t *testing.T) {

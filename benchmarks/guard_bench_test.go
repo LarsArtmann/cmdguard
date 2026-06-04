@@ -7,7 +7,7 @@ import (
 
 	"github.com/samber/do/v2"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 type BenchConfig struct {

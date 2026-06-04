@@ -1,7 +1,7 @@
 # cmdguard
 
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/pkg/cmdguard/v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v2.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -40,7 +40,7 @@ type GreetFlags struct {
 ## Quick Start
 
 ```bash
-go get github.com/larsartmann/cmdguard
+go get github.com/larsartmann/cmdguard/v2
 ```
 
 ```go
@@ -52,7 +52,7 @@ import (
     "os"
     "strings"
 
-    "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+    "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 type AppConfig struct {
@@ -390,7 +390,7 @@ Paths are tried in order; missing files are silently skipped. Supports `$ENV` an
 ### YAML / TOML (custom loaders)
 
 ```go
-import "github.com/larsartmann/cmdguard/pkg/cmdguard/v2/configload"
+import "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/configload"
 
 cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     v2.WithConfigFileLoader[AppConfig](configload.YAML(), "config.yaml"),
@@ -490,7 +490,7 @@ v2.AddCommand(cli, versionCmd)
 The `testutil` subpackage provides a harness for testing cmdguard CLIs:
 
 ```go
-import "github.com/larsartmann/cmdguard/pkg/cmdguard/v2/testutil"
+import "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/testutil"
 
 result := testutil.TestCLI(t, cli, []string{"greet", "--name", "Alice"})
 result.AssertNoError()
@@ -537,7 +537,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 - [Framework Comparison](docs/COMPARISON.md) — vs Kong, sflags, go-flags, urfave/cli
 - [Performance](docs/PERFORMANCE.md) — Benchmark results and overhead analysis
 - [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) — Design guidelines
-- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/pkg/cmdguard/v2) — Full API docs on pkg.go.dev
+- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2) — Full API docs on pkg.go.dev
 
 ---
 

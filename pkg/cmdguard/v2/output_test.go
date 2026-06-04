@@ -7,7 +7,7 @@ import (
 
 	output "github.com/larsartmann/go-output"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestParseOutputFormat(t *testing.T) {

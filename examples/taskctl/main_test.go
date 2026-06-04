@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {

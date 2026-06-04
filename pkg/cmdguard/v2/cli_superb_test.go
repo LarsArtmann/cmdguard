@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 // newTestCLIWithNoOpCmd creates a CLI with a no-op "cmd" command using the given options.

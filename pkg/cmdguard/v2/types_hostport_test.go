@@ -3,8 +3,8 @@ package v2_test
 import (
 	"testing"
 
-	v2 "github.com/larsartmann/cmdguard/pkg/cmdguard/v2"
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestHostPort(t *testing.T) {

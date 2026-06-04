@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/larsartmann/cmdguard/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func makeMiddlewareCommand[T any](name, desc string, handlerCalled *bool) Command[T, NoFlags] {
