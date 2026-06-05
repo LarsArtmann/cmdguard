@@ -35,24 +35,24 @@
 
 ### CLI Options
 
-| Option                         | Status              | Notes                                    |
-| ------------------------------ | ------------------- | ---------------------------------------- |
-| `WithCLIVersion[T](v)`         | ✅ FULLY_FUNCTIONAL | Set version string                       |
-| `WithCLILong[T](desc)`         | ✅ FULLY_FUNCTIONAL | Set long description                     |
-| `WithCLIScope[T](scope)`       | ✅ FULLY_FUNCTIONAL | Custom DI scope                          |
-| `WithSilenceErrors[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing            |
-| `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error                  |
-| `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling              |
-| `WithColor[T](bool)`           | 🗑️ DEPRECATED       | Use WithFang instead                     |
-| `WithFangOptions[T]()`         | ✅ FULLY_FUNCTIONAL | Pass fang options                        |
-| `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                   |
-| `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                   |
-| `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups               |
-| `WithSignalHandling[T]()`      | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation     |
-| `WithOutputFormat[T]()`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection |
-| `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing       |
-| `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands       |
-| `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands       |
+| Option                         | Status              | Notes                                         |
+| ------------------------------ | ------------------- | --------------------------------------------- |
+| `WithCLIVersion[T](v)`         | ✅ FULLY_FUNCTIONAL | Set version string                            |
+| `WithCLILong[T](desc)`         | ✅ FULLY_FUNCTIONAL | Set long description                          |
+| `WithCLIScope[T](scope)`       | ✅ FULLY_FUNCTIONAL | Custom DI scope                               |
+| `WithSilenceErrors[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing                 |
+| `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error                       |
+| `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling                   |
+| `WithColor[T](bool)`           | 🗑️ DEPRECATED       | Use WithFang instead                          |
+| `WithFangOptions[T]()`         | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
+| `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                        |
+| `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                        |
+| `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups                    |
+| `WithSignalHandling[T]()`      | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation          |
+| `WithOutputFormat[T]()`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection      |
+| `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing            |
+| `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
+| `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands            |
 | `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text (auto theme) |
 | `WithGlamourHelpTheme[T](t)`   | ✅ FULLY_FUNCTIONAL | Markdown rendering with specific theme        |
 | `WithTelemetry[T](tracer)`     | ✅ FULLY_FUNCTIONAL | OpenTelemetry spans for all commands          |
@@ -119,15 +119,15 @@
 
 ### Middleware
 
-| Feature               | Status              | Notes                              |
-| --------------------- | ------------------- | ---------------------------------- |
-| `TimingMiddleware`              | ✅ FULLY_FUNCTIONAL | Log command execution duration     |
-| `RecoveryMiddleware`           | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers    |
-| `SpinnerMiddleware`            | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution  |
-| `SpinnerMiddlewareWithConfig`  | ✅ FULLY_FUNCTIONAL | Configurable spinner (frames/speed)|
-| `TelemetryMiddleware`          | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command     |
-| `CommandInfo.FullPath`         | ✅ FULLY_FUNCTIONAL | Full command path for middleware   |
-| Custom middleware               | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error` |
+| Feature                       | Status              | Notes                               |
+| ----------------------------- | ------------------- | ----------------------------------- |
+| `TimingMiddleware`            | ✅ FULLY_FUNCTIONAL | Log command execution duration      |
+| `RecoveryMiddleware`          | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers     |
+| `SpinnerMiddleware`           | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution   |
+| `SpinnerMiddlewareWithConfig` | ✅ FULLY_FUNCTIONAL | Configurable spinner (frames/speed) |
+| `TelemetryMiddleware`         | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command      |
+| `CommandInfo.FullPath`        | ✅ FULLY_FUNCTIONAL | Full command path for middleware    |
+| Custom middleware             | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error`  |
 
 ### Shell Completion
 

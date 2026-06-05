@@ -47,3 +47,5 @@ config.yaml
 .direnv/
 # Build artifacts
 /cmdguard
+# Build artifacts
+/v2

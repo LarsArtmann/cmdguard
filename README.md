@@ -103,30 +103,30 @@ HELLO, CMDGUARD!
 
 ## Features
 
-| Category                   | Highlights                                                                                       |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups |
-| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                         |
-| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks  |
-| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                |
-| **12 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, and more                               |
-| **Signal handling**        | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers                               |
-| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                 |
-| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                   |
-| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                    |
-| **Editor support**         | `EditInEditor()` — open `$EDITOR` for user input                                                 |
-| **Config files**           | `WithConfigFile[T](paths...)` — JSON/YAML/TOML auto-loading with flag override                   |
-| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                          |
-| **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                   |
+| Category                   | Highlights                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups        |
+| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                |
+| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks         |
+| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                       |
+| **12 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, and more                                      |
+| **Signal handling**        | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers                                      |
+| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                        |
+| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                          |
+| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                           |
+| **Editor support**         | `EditInEditor()` — open `$EDITOR` for user input                                                        |
+| **Config files**           | `WithConfigFile[T](paths...)` — JSON/YAML/TOML auto-loading with flag override                          |
+| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                 |
+| **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                          |
 | **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`, or write your own |
-|| **Interactive prompts**    | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh                              |
-|| **Markdown help**          | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour                      |
-|| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                |
-| **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                |
-| **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                 |
-| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                     |
-| **Zero panics**            | Every v2 API function returns errors — never panics in library code                              |
-| **356 tests** (706 cases) | 82.8% coverage, race-detected, fuzz-tested                                                        |
+|                            | **Interactive prompts**                                                                                 | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh         |
+|                            | **Markdown help**                                                                                       | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour |
+|                            | **Color control**                                                                                       | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor          |
+| **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                       |
+| **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
+| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
+| **Zero panics**            | Every v2 API function returns errors — never panics in library code                                     |
+| **356 tests** (706 cases)  | 82.8% coverage, race-detected, fuzz-tested                                                              |
 
 ---
 
@@ -326,8 +326,8 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands |
 | `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path     |
 | `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML)      |
-| `WithGlamourHelp[T]()`           | Render markdown in command help text             |
-| `WithTelemetry[T](tracer)`       | OpenTelemetry spans for all commands             |
+| `WithGlamourHelp[T]()`                 | Render markdown in command help text            |
+| `WithTelemetry[T](tracer)`             | OpenTelemetry spans for all commands            |
 
 ---
 

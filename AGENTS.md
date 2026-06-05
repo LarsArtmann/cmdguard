@@ -129,7 +129,7 @@ cmdguard/
 | `github.com/spf13/pflag`           | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`               | Cobra styling        | v2.0.1  |
 | `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
-| `charm.land/glamour/v2`             | Markdown rendering   | v2.0.0  |
+| `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0  |
 | `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
 | `github.com/larsartmann/go-output` | Rich output formats  | latest  |
 
@@ -240,7 +240,7 @@ Functional options:
 | `FlowContext()`               | `*BranchingFlowContext` | Path tracking (nil until Execute)    |
 | `AddGlobalFlag(...)`          |                         | Persistent string flag               |
 | `AddGlobalBoolFlag(...)`      |                         | Persistent bool flag                 |
-| `NoColor()`                    | `bool`                  | True if `--no-color` was passed      |
+| `NoColor()`                   | `bool`                  | True if `--no-color` was passed      |
 
 ### Basic Usage
 
@@ -525,31 +525,31 @@ go build ./...                                   # Verify build
 8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
-31. **go-output published** — `github.com/larsartmann/go-output` is published at v0.6.2, no local replace needed
+11. **go-output published** — `github.com/larsartmann/go-output` is published at v0.6.2, no local replace needed
 12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
 16. **`--no-color` + NO_COLOR** — `--no-color` persistent flag is registered by default; `cli.NoColor()` returns true if passed; `Execute()` sets `NO_COLOR=1` for fang to pick up. `NO_COLOR` env var is also respected automatically by fang's colorprofile.
-16. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
-17. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
-18. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
-19. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
-20. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
-21. **Glamour v2 env-based theme** — `WithGlamourHelp[T]()` now uses `RenderWithEnvironmentConfig` which checks `GLAMOUR_STYLE` env var, defaulting to "dark"; the string `"auto"` is no longer a valid glamour theme name in v2
-22. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
-23. **FullPath populated at execution time** — `CommandInfo.FullPath` is set via `cobra.CommandPath()` inside the handler closure, NOT at command registration; it's empty in unit tests unless you call the handler through a cobra execution
-24. **Glamour idempotent** — `applyGlamourIfEnabled` resets `glamourHelp=false` after applying to prevent double-rendering (which would wrap ANSI codes inside ANSI codes); calling Execute twice is safe
-25. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
-26. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
-27. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
-26. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
-27. **Config file precedence** — `WithConfigFile[T](paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
-28. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
-29. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
-30. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
-31. **Nix flake limited** — `flake.nix` only provides devShell + formatter + format check (no `buildGoModule` or vet checks); could be extended now that go-output is published
-32. **Glamour v2 no `"auto"` theme** — `charm.land/glamour/v2` removed the `"auto"` theme; use empty string (env-based via `GLAMOUR_STYLE`) or explicit theme like `"dark"`; `WithGlamourHelp` now sets theme to `""` for env-based detection
+17. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
+18. **Draconian validation** — `WithDraconianValidation[T]()` is superset of strict + requires `WithExample` on leaf commands; parent commands are exempt
+19. **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error
+20. **Args validation** — `WithExactArgs`/`WithMinimumArgs`/etc. use cobra's built-in arg validators; runs during command execution, not at registration
+21. **Spinner non-TTY** — `SpinnerMiddleware` auto-skips when `os.Stderr` is not a terminal; use `SpinnerConfig{Writer: ...}` to override
+22. **Glamour v2 env-based theme** — `WithGlamourHelp[T]()` now uses `RenderWithEnvironmentConfig` which checks `GLAMOUR_STYLE` env var, defaulting to "dark"; the string `"auto"` is no longer a valid glamour theme name in v2
+23. **Telemetry context propagation** — `TelemetryMiddleware` starts a span but cannot propagate the new context to the handler due to the `next func() error` middleware API signature; child spans must use the original context passed to the handler
+24. **FullPath populated at execution time** — `CommandInfo.FullPath` is set via `cobra.CommandPath()` inside the handler closure, NOT at command registration; it's empty in unit tests unless you call the handler through a cobra execution
+25. **Glamour idempotent** — `applyGlamourIfEnabled` resets `glamourHelp=false` after applying to prevent double-rendering (which would wrap ANSI codes inside ANSI codes); calling Execute twice is safe
+26. **outputEnabled removed** — The unused `outputEnabled` field was removed from `CLI[T]`; use `outputFormat != ""` to detect if output formatting is configured
+27. **NewExitError returns (\***ExitError**, **error\**) — validates 0-255 range; breaking change from `*ExitError`
+28. **NewScopeFromInjector returns (\***Scope**, **error\*\*) — nil injector returns error; breaking change from nil dereference
+29. **Sentinel wrapping** — All 40+ errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability
+30. **Config file precedence** — `WithConfigFile[T](paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
+31. **Config file paths** — supports `$ENV` expansion and `~` expansion; missing files are silently skipped
+32. **Config file `--config` override** — if the config struct has a `config` flag, its value overrides the default search paths from `WithConfigFile`
+33. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
+34. **Nix flake limited** — `flake.nix` only provides devShell + formatter + format check (no `buildGoModule` or vet checks); could be extended now that go-output is published
+35. **Glamour v2 no `"auto"` theme** — `charm.land/glamour/v2` removed the `"auto"` theme; use empty string (env-based via `GLAMOUR_STYLE`) or explicit theme like `"dark"`; `WithGlamourHelp` now sets theme to `""` for env-based detection
 
 ---
 

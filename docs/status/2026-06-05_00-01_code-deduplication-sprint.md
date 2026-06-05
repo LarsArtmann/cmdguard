@@ -17,31 +17,31 @@ Ran `art-dupl --semantic` at threshold 30 and 50, analyzed all 16 clone groups, 
 
 ### Deduplication Refactoring (7 files, 7 clone groups eliminated)
 
-| File | Change | Clones Eliminated |
-|---|---|---|
-| `pkg/cmdguard/v2/type_handler.go` | Extracted `registerStringFlagFromTag()` helper | 3 production-code clones |
-| `pkg/cmdguard/v2/type_handler_custom.go` | Used new helper for Duration + stringParseTypes loop | - |
-| `pkg/cmdguard/v2/type_handler_kinds.go` | Used new helper for String kind handler | - |
-| `pkg/cmdguard/v2/prompts_test.go` | Table-driven `TestWithPromptOnMissing_Integration` | 1 t50 clone group |
-| `pkg/cmdguard/v2/config_file_integration_test.go` | Extracted `writeTestConfigFile()` helper | Reduced clone footprint |
-| `examples/taskctl/main_test.go` | Extracted `mustExec()` helper, simplified 21 tests | 2 large clone groups (13 clones) |
-| `pkg/cmdguard/v2/cli_superb_test.go` | Extracted `newTestCLIWithNoOpCmd()`, simplified 10+ args tests | 4 clone groups |
+| File                                              | Change                                                         | Clones Eliminated                |
+| ------------------------------------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `pkg/cmdguard/v2/type_handler.go`                 | Extracted `registerStringFlagFromTag()` helper                 | 3 production-code clones         |
+| `pkg/cmdguard/v2/type_handler_custom.go`          | Used new helper for Duration + stringParseTypes loop           | -                                |
+| `pkg/cmdguard/v2/type_handler_kinds.go`           | Used new helper for String kind handler                        | -                                |
+| `pkg/cmdguard/v2/prompts_test.go`                 | Table-driven `TestWithPromptOnMissing_Integration`             | 1 t50 clone group                |
+| `pkg/cmdguard/v2/config_file_integration_test.go` | Extracted `writeTestConfigFile()` helper                       | Reduced clone footprint          |
+| `examples/taskctl/main_test.go`                   | Extracted `mustExec()` helper, simplified 21 tests             | 2 large clone groups (13 clones) |
+| `pkg/cmdguard/v2/cli_superb_test.go`              | Extracted `newTestCLIWithNoOpCmd()`, simplified 10+ args tests | 4 clone groups                   |
 
 ### Quality Gates — ALL PASSING
 
-| Metric | Value | Status |
-|---|---|---|
-| Build | `go build ./...` | ✅ 0 errors |
-| Tests | `go test ./... -race` | ✅ ALL PASS |
-| Test cases (v2) | 273 | ✅ Unchanged |
-| Test cases (taskctl) | 62 | ✅ Unchanged |
-| Test cases (integration) | 17 | ✅ Unchanged |
-| Coverage (v2) | 82.8% | ✅ Unchanged |
-| Coverage (taskctl) | 71.1% | ✅ Unchanged |
-| Lint | `golangci-lint run ./...` | ✅ 0 issues |
-| Race conditions | `-race` flag | ✅ 0 detected |
-| Clone groups (t50) | 1 (was 2) | ✅ 50% reduction |
-| Clone groups (t30) | 9 (was 16) | ✅ 44% reduction |
+| Metric                   | Value                     | Status           |
+| ------------------------ | ------------------------- | ---------------- |
+| Build                    | `go build ./...`          | ✅ 0 errors      |
+| Tests                    | `go test ./... -race`     | ✅ ALL PASS      |
+| Test cases (v2)          | 273                       | ✅ Unchanged     |
+| Test cases (taskctl)     | 62                        | ✅ Unchanged     |
+| Test cases (integration) | 17                        | ✅ Unchanged     |
+| Coverage (v2)            | 82.8%                     | ✅ Unchanged     |
+| Coverage (taskctl)       | 71.1%                     | ✅ Unchanged     |
+| Lint                     | `golangci-lint run ./...` | ✅ 0 issues      |
+| Race conditions          | `-race` flag              | ✅ 0 detected    |
+| Clone groups (t50)       | 1 (was 2)                 | ✅ 50% reduction |
+| Clone groups (t30)       | 9 (was 16)                | ✅ 44% reduction |
 
 ---
 
@@ -60,17 +60,17 @@ Ran `art-dupl --semantic` at threshold 30 and 50, analyzed all 16 clone groups, 
 
 Items from TODO_LIST.md and ROADMAP.md that were NOT in scope for this session:
 
-| Item | Source | Priority |
-|---|---|---|
-| Add `CODECOV_TOKEN` secret to GitHub | TODO_LIST | Low (CI config) |
-| Plugin system for custom validators | TODO_LIST | v3.0 |
-| Config file nested struct support | TODO_LIST | v3.0 |
-| v3.0 API-breaking cleanup (4 items) | TODO_LIST/ROADMAP | v3.0 |
-| Fuzz testing (flags_parse, config_parsing) | ROADMAP | Medium |
-| Documentation generator | ROADMAP | Low |
-| koanf integration for config auto-loading | ROADMAP | Low |
-| Structured JSON error output | ROADMAP | Low |
-| Contribution guide | ROADMAP | Low |
+| Item                                       | Source            | Priority        |
+| ------------------------------------------ | ----------------- | --------------- |
+| Add `CODECOV_TOKEN` secret to GitHub       | TODO_LIST         | Low (CI config) |
+| Plugin system for custom validators        | TODO_LIST         | v3.0            |
+| Config file nested struct support          | TODO_LIST         | v3.0            |
+| v3.0 API-breaking cleanup (4 items)        | TODO_LIST/ROADMAP | v3.0            |
+| Fuzz testing (flags_parse, config_parsing) | ROADMAP           | Medium          |
+| Documentation generator                    | ROADMAP           | Low             |
+| koanf integration for config auto-loading  | ROADMAP           | Low             |
+| Structured JSON error output               | ROADMAP           | Low             |
+| Contribution guide                         | ROADMAP           | Low             |
 
 ---
 

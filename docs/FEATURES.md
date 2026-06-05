@@ -48,7 +48,7 @@ cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("version", handler,
 
 Define flags declaratively using struct tags:
 
-| Tag       | Required | Description           | Example                 |
+| Tag       | Required | Description          | Example                 |
 | --------- | -------- | -------------------- | ----------------------- |
 | `flag`    | Yes      | Flag name            | `flag:"verbose"`        |
 | `short`   | No       | Short flag (-v)      | `short:"v"`             |
@@ -128,12 +128,12 @@ cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
 )
 ```
 
-| Middleware                | Purpose                                      |
-| ------------------------ | -------------------------------------------- |
-| `TimingMiddleware[T]`    | Logs execution duration with error context   |
-| `RecoveryMiddleware[T]`  | Catches panics, returns error                |
-| `SpinnerMiddleware[T]`   | Terminal spinner (auto-skips non-TTY)        |
-| `TelemetryMiddleware[T]` | OpenTelemetry span per command               |
+| Middleware               | Purpose                                    |
+| ------------------------ | ------------------------------------------ |
+| `TimingMiddleware[T]`    | Logs execution duration with error context |
+| `RecoveryMiddleware[T]`  | Catches panics, returns error              |
+| `SpinnerMiddleware[T]`   | Terminal spinner (auto-skips non-TTY)      |
+| `TelemetryMiddleware[T]` | OpenTelemetry span per command             |
 
 ### Interactive Prompts
 
@@ -188,16 +188,16 @@ if cli.NoColor() {
 
 9 built-in validated types:
 
-| Type         | File                 | Validation             |
-| ------------ | -------------------- | ---------------------- |
-| `Duration`   | `types_duration.go`  | Valid time.Duration    |
-| `Email`      | `types_email.go`     | RFC 5322 email format  |
-| `Enum[T]`    | `types_enum.go`      | Allowed values         |
-| `FilePath`   | `types_filepath.go`  | Path validation        |
-| `HostPort`   | `types_hostport.go`  | host:port format       |
-| `LogLevel`   | `types_log.go`       | Standard log levels    |
-| `Port`       | `types_port.go`      | 1–65535 range          |
-| `URL`        | `types_url.go`       | Valid URL              |
+| Type       | File                | Validation            |
+| ---------- | ------------------- | --------------------- |
+| `Duration` | `types_duration.go` | Valid time.Duration   |
+| `Email`    | `types_email.go`    | RFC 5322 email format |
+| `Enum[T]`  | `types_enum.go`     | Allowed values        |
+| `FilePath` | `types_filepath.go` | Path validation       |
+| `HostPort` | `types_hostport.go` | host:port format      |
+| `LogLevel` | `types_log.go`      | Standard log levels   |
+| `Port`     | `types_port.go`     | 1–65535 range         |
+| `URL`      | `types_url.go`      | Valid URL             |
 
 ### Branching Flow Context
 
@@ -213,11 +213,11 @@ bfc.BranchWithDuration("slow-op", 5*time.Second)
 
 ### Command Validation
 
-| Mode        | CLI Option                     | Enforces                               |
-| ----------- | ------------------------------ | -------------------------------------- |
-| Lenient     | (default)                      | Basic validation                       |
-| Strict      | `WithStrictValidation[T]()`    | `WithShort` on all commands            |
-| Draconian   | `WithDraconianValidation[T]()` | Strict + `WithExample` on leaf commands |
+| Mode      | CLI Option                     | Enforces                                |
+| --------- | ------------------------------ | --------------------------------------- |
+| Lenient   | (default)                      | Basic validation                        |
+| Strict    | `WithStrictValidation[T]()`    | `WithShort` on all commands             |
+| Draconian | `WithDraconianValidation[T]()` | Strict + `WithExample` on leaf commands |
 
 ### Error Handling
 
@@ -272,50 +272,50 @@ content, err := v2.EditInEditor(ctx, []byte("template"))
 
 ## CLI Options Reference
 
-| Option                         | Purpose                                     |
-| ------------------------------ | ------------------------------------------- |
-| `WithCLIVersion[T](v)`         | Set version string                          |
-| `WithCLILong[T](desc)`         | Set long description                        |
-| `WithCLIScope[T](scope)`       | Set custom DI scope                         |
-| `WithSilenceErrors[T]()`       | Suppress cobra error printing               |
-| `WithSilenceUsage[T]()`        | Suppress usage on error                     |
-| `WithFang[T](bool)`            | Enable/disable fang styling                 |
-| `WithMiddleware[T](mw...)`     | Middleware wrapping every handler           |
-| `WithGroup[T](id, title)`      | Register command group on root              |
-| `WithEnvPrefix[T](prefix)`     | Prefix for env var lookups                  |
-| `WithSignalHandling[T]()`      | Cancel context on SIGINT/SIGTERM            |
-| `WithConfigValidation[T](fn)`  | Validate config after flag parsing          |
-| `WithStrictValidation[T]()`    | Require short descriptions on all commands  |
-| `WithDraconianValidation[T]()` | Strict + examples on leaf commands          |
-| `WithConfigFile[T](paths...)`  | Load JSON config file before flags          |
-| `WithConfigFileLoader[T](l,p)` | Load config with custom loader (YAML/TOML)  |
-| `WithGlamourHelp[T]()`         | Render markdown in command help text        |
-| `WithTelemetry[T](tracer)`     | OpenTelemetry spans for all commands        |
+| Option                         | Purpose                                    |
+| ------------------------------ | ------------------------------------------ |
+| `WithCLIVersion[T](v)`         | Set version string                         |
+| `WithCLILong[T](desc)`         | Set long description                       |
+| `WithCLIScope[T](scope)`       | Set custom DI scope                        |
+| `WithSilenceErrors[T]()`       | Suppress cobra error printing              |
+| `WithSilenceUsage[T]()`        | Suppress usage on error                    |
+| `WithFang[T](bool)`            | Enable/disable fang styling                |
+| `WithMiddleware[T](mw...)`     | Middleware wrapping every handler          |
+| `WithGroup[T](id, title)`      | Register command group on root             |
+| `WithEnvPrefix[T](prefix)`     | Prefix for env var lookups                 |
+| `WithSignalHandling[T]()`      | Cancel context on SIGINT/SIGTERM           |
+| `WithConfigValidation[T](fn)`  | Validate config after flag parsing         |
+| `WithStrictValidation[T]()`    | Require short descriptions on all commands |
+| `WithDraconianValidation[T]()` | Strict + examples on leaf commands         |
+| `WithConfigFile[T](paths...)`  | Load JSON config file before flags         |
+| `WithConfigFileLoader[T](l,p)` | Load config with custom loader (YAML/TOML) |
+| `WithGlamourHelp[T]()`         | Render markdown in command help text       |
+| `WithTelemetry[T](tracer)`     | OpenTelemetry spans for all commands       |
 
 ---
 
 ## Command Options Reference
 
-| Option                           | Purpose                           |
-| -------------------------------- | --------------------------------- |
-| `WithShort[T, F](short)`         | Short description                 |
-| `WithLong[T, F](long)`           | Long description                  |
-| `WithAliases[T, F](aliases...)`  | Alternative names                 |
-| `WithExample[T, F](example)`     | Example usage                     |
-| `WithFlags[T, F](flags)`         | Typed flags struct                |
-| `WithRunE[T, F](runE)`           | Main handler                      |
-| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook               |
-| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook         |
-| `WithSubcommands[T, F](cmds...)` | Child commands                    |
-| `WithHidden[T, F](hidden)`       | Hide from help                    |
-| `WithDeprecated[T, F](msg)`      | Deprecation message               |
-| `WithGroupID[T, F](group)`       | Help group name                   |
-| `WithExactArgs[T, F](n)`         | Require exactly n positional args |
-| `WithMinimumArgs[T, F](n)`       | Require at least n positional args|
-| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args   |
-| `WithRangeArgs[T, F](min, max)`  | Require between min and max args  |
-| `WithNoArgs[T, F]()`             | Reject any positional args        |
-| `WithArgs[T, F](fn)`             | Custom positional args validator  |
+| Option                           | Purpose                              |
+| -------------------------------- | ------------------------------------ |
+| `WithShort[T, F](short)`         | Short description                    |
+| `WithLong[T, F](long)`           | Long description                     |
+| `WithAliases[T, F](aliases...)`  | Alternative names                    |
+| `WithExample[T, F](example)`     | Example usage                        |
+| `WithFlags[T, F](flags)`         | Typed flags struct                   |
+| `WithRunE[T, F](runE)`           | Main handler                         |
+| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook                  |
+| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook            |
+| `WithSubcommands[T, F](cmds...)` | Child commands                       |
+| `WithHidden[T, F](hidden)`       | Hide from help                       |
+| `WithDeprecated[T, F](msg)`      | Deprecation message                  |
+| `WithGroupID[T, F](group)`       | Help group name                      |
+| `WithExactArgs[T, F](n)`         | Require exactly n positional args    |
+| `WithMinimumArgs[T, F](n)`       | Require at least n positional args   |
+| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args      |
+| `WithRangeArgs[T, F](min, max)`  | Require between min and max args     |
+| `WithNoArgs[T, F]()`             | Reject any positional args           |
+| `WithArgs[T, F](fn)`             | Custom positional args validator     |
 | `WithPromptOnMissing[T, F]()`    | Interactive prompt for missing flags |
 
 ---
@@ -332,7 +332,7 @@ content, err := v2.EditInEditor(ctx, []byte("template"))
 | Lifecycle hooks           | Basic     | Full (Pre/Post)  |
 | Health checks             | No        | Yes              |
 | Graceful shutdown         | Manual    | Yes              |
-| Middleware                 | No        | Yes              |
+| Middleware                | No        | Yes              |
 | Interactive prompts       | No        | Yes              |
 | Config file loading       | Manual    | Built-in         |
 | Output formatting         | Manual    | 12+ formats      |
@@ -373,12 +373,12 @@ pkg/cmdguard/v2/
 
 ## Dependencies
 
-| Library                            | Purpose              | Version  |
-| ---------------------------------- | -------------------- | -------- |
-| `github.com/spf13/cobra`           | CLI framework        | v1.10.2  |
-| `github.com/samber/do/v2`          | Dependency injection | v2.0.0   |
-| `charm.land/fang/v2`               | CLI styling          | v2.0.1   |
-| `charm.land/huh/v2`                | Interactive prompts  | v2.0.3   |
-| `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0   |
-| `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0  |
-| `github.com/larsartmann/go-output` | Rich output formats  | v0.6.2   |
+| Library                            | Purpose              | Version |
+| ---------------------------------- | -------------------- | ------- |
+| `github.com/spf13/cobra`           | CLI framework        | v1.10.2 |
+| `github.com/samber/do/v2`          | Dependency injection | v2.0.0  |
+| `charm.land/fang/v2`               | CLI styling          | v2.0.1  |
+| `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
+| `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0  |
+| `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
+| `github.com/larsartmann/go-output` | Rich output formats  | v0.6.2  |
