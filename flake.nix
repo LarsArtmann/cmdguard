@@ -34,18 +34,29 @@
             };
           };
 
-          devShells.default = pkgs.mkShellNoCC {
-            packages = [
-              goPkg
-              pkgs.gopls
-              pkgs.golangci-lint
-            ];
+          devShells = {
+            default = pkgs.mkShellNoCC {
+              packages = [
+                goPkg
+                pkgs.gopls
+                pkgs.golangci-lint
+              ];
 
-            GOWORK = "off";
+              GOWORK = "off";
 
-            shellHook = ''
-              echo "cmdguard dev shell — Go $(go version | awk '{print $3}')"
-            '';
+              shellHook = ''
+                echo "cmdguard dev shell — Go $(go version | awk '{print $3}')"
+              '';
+            };
+
+            ci = pkgs.mkShellNoCC {
+              packages = [
+                goPkg
+                pkgs.golangci-lint
+              ];
+
+              GOWORK = "off";
+            };
           };
 
           checks.format = config.treefmt.build.check self;
