@@ -1,7 +1,7 @@
 # TODO List
 
-**Updated:** 2026-06-03
-**Status:** v2.4.0 — release-ready
+**Updated:** 2026-06-08
+**Status:** v2.4.0 — post-release maintenance
 
 ## Completed
 
@@ -13,7 +13,21 @@
 - [x] Nix flake with devShell, formatter, and format check
 - [x] CI with pinned golangci-lint, codecov, Nix check, benchmarks
 - [x] Release automation workflow
-- [x] 357 tests, 82.8% coverage, 0 lint issues, 0 race conditions
+
+### Phase 10: Post-Release Maintenance (2026-06-08)
+
+- [x] Fix `flake.nix` infinite recursion (`goPkg = goPkg` → `pkgs.go_1_26`)
+- [x] Update FEATURES.md version from v2.3.0-dev to v2.4.0
+- [x] Fix test count metrics (357, not 356)
+- [x] Add gofumpt and goimports to flake.nix treefmt
+- [x] Add `Scope.HealthCheckResults()` / `HealthCheckResultsWithContext()`
+- [x] Add `CLI.HealthCheckResults()` / `HealthCheckResultsWithContext()`
+- [x] Add `DoctorCommand[T]` / `MustDoctorCommand[T]` convenience helper
+- [x] DRY configload: extract `genericLoader` (3 files → 1)
+- [x] Add configload tests: YAML, TOML, JSON, Auto, LoaderForPath (22 tests)
+- [x] Consolidate `command_suggest.go` into `flags_suggest.go`
+- [x] Update taskctl example: manual health → DoctorCommand
+- [x] Update docs: FEATURES.md, TODO_LIST.md, AGENTS.md
 
 ## Remaining Work
 

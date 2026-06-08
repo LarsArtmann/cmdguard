@@ -233,8 +233,10 @@ Functional options:
 | `SetConfig(cfg)`              |                         | Update config                        |
 | `RootCommand()`               | `*cobra.Command`        | Underlying cobra command             |
 | `Shutdown(ctx)`               | `error`                 | Graceful shutdown                    |
-| `HealthCheck()`               | `error`                 | Run health checks                    |
-| `HealthCheckWithContext(ctx)` | `error`                 | Health checks with context           |
+| `HealthCheck()`                   | `error`                 | Run health checks                    |
+| `HealthCheckWithContext(ctx)`     | `error`                 | Health checks with context           |
+| `HealthCheckResults()`           | `map[string]error`      | Per-service health map               |
+| `HealthCheckResultsWithContext(ctx)` | `map[string]error`  | Per-service health map with context  |
 | `SetVersion(v)`               |                         | Set version at runtime               |
 | `SetLong(desc)`               |                         | Set long description                 |
 | `FlowContext()`               | `*BranchingFlowContext` | Path tracking (nil until Execute)    |
@@ -430,6 +432,27 @@ cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
 v2.AddCommand(cli, v2.MustVersionCommand[Config](cli))
 ```
 
+### Doctor Command
+
+```go
+// Simple — just DI health checks
+v2.AddCommand(cli, v2.MustDoctorCommand[Config](cli))
+
+// With custom diagnostic checks and group
+v2.AddCommand(cli, v2.MustDoctorCommand[Config](cli,
+    v2.WithDoctorCheck[Config]("database", func(ctx context.Context) error {
+        return db.Ping(ctx)
+    }),
+    v2.WithDoctorGroupID[Config]("system"),
+))
+
+// Per-service results programmatically
+results := cli.HealthCheckResultsWithContext(ctx)
+for name, err := range results {
+    if err != nil { fmt.Printf("✗ %s: %v\n", name, err) }
+}
+```
+
 ### Markdown Help (glamour)
 
 ```go
@@ -550,6 +573,8 @@ go build ./...                                   # Verify build
 33. **Config file flat only (v1)** — JSON/YAML/TOML loaders detect top-level keys matching `flag` tag names; nested structs in config files are not yet supported
 34. **Nix flake limited** — `flake.nix` only provides devShell + formatter + format check (no `buildGoModule` or vet checks); could be extended now that go-output is published
 35. **Glamour v2 no `"auto"` theme** — `charm.land/glamour/v2` removed the `"auto"` theme; use empty string (env-based via `GLAMOUR_STYLE`) or explicit theme like `"dark"`; `WithGlamourHelp` now sets theme to `""` for env-based detection
+36. **DoctorCommand uses HealthCheckResults** — `DoctorCommand[T]` calls `HealthCheckResultsWithContext(ctx)` which returns `map[string]error`; DI services with `do.HealthcheckerWithContext` are included automatically; custom checks via `WithDoctorCheck` run after DI checks
+37. **configload single file** — YAML/TOML/JSON/Auto loaders consolidated into `configload/loader.go`; uses `genericLoader` with pluggable `unmarshalFunc`; TOML import aliased as `toml` to avoid conflict with local `cmdguard` import alias
 
 ---
 
