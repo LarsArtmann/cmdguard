@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sort"
 )
@@ -53,9 +52,6 @@ func WithDoctorCheck[T any](name string, run func(ctx context.Context) error) Do
 		cfg.checks = append(cfg.checks, DoctorCheck{Name: name, Run: run})
 	}
 }
-
-// ErrDoctorFailed indicates one or more doctor checks failed.
-var ErrDoctorFailed = errors.New("doctor checks failed")
 
 // DoctorCommand creates a typed "doctor" subcommand that runs health checks
 // on all DI services and any custom diagnostic checks, reporting per-check status.
