@@ -243,11 +243,12 @@
 
 ## Testing
 
-| Package           | Coverage  | Status  |
-| ----------------- | --------- | ------- |
-| `pkg/cmdguard/v2` | ~82%      | ✅ Good |
-| Benchmarks        | 22 total  | ✅ Good |
-| Fuzz tests        | 7 targets | ✅ Good |
+| Package                         | Coverage  | Status  |
+| ------------------------------- | --------- | ------- |
+| `pkg/cmdguard/v2`               | ~83%      | ✅ Good |
+| `pkg/cmdguard/v2/configload`    | ~88%      | ✅ Good |
+| Benchmarks                      | 22 total  | ✅ Good |
+| Fuzz tests                      | 7 targets | ✅ Good |
 
 ---
 
