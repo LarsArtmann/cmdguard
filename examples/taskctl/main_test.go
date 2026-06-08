@@ -314,12 +314,12 @@ func TestDBCommand_Status(t *testing.T) {
 	mustExec(t, "db", "status")
 }
 
-// --- Health Command (MustNewCommand) ---
+// --- Doctor Command (MustDoctorCommand) ---
 
-func TestHealthCommand(t *testing.T) {
+func TestDoctorCommand(t *testing.T) {
 	t.Parallel()
 
-	mustExec(t, "health")
+	mustExec(t, "doctor")
 }
 
 // --- Version Command ---
@@ -509,9 +509,9 @@ func TestIntegration_FullWorkflow(t *testing.T) {
 		t.Fatalf("stats: %v", err)
 	}
 
-	// Health check
-	if err := cli.ExecuteWithArgs(context.Background(), []string{"health"}); err != nil {
-		t.Fatalf("health: %v", err)
+	// Doctor check
+	if err := cli.ExecuteWithArgs(context.Background(), []string{"doctor"}); err != nil {
+		t.Fatalf("doctor: %v", err)
 	}
 }
 
@@ -563,7 +563,7 @@ func TestRootCommand_Structure(t *testing.T) {
 		"stats",
 		"inspect",
 		"db",
-		"health",
+		"doctor",
 		"config",
 		"version",
 		"secret",

@@ -8,8 +8,8 @@ import (
 )
 
 type config struct {
-	Name    string `flag:"name" default:"" help:"Name"`
-	Port    int    `flag:"port" default:"8080" help:"Port"`
+	Name    string `flag:"name"    default:""      help:"Name"`
+	Port    int    `flag:"port"    default:"8080"  help:"Port"`
 	Verbose bool   `flag:"verbose" default:"false" help:"Verbose"`
 }
 

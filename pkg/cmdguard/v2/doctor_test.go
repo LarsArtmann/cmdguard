@@ -2,9 +2,11 @@ package v2
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 	"testing"
+
+	"github.com/samber/do/v2"
 
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
@@ -45,7 +47,7 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		ProvideValue(cli.Scope(), &doctorHealthyService{})
+		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
 		cmd := MustDoctorCommand[testConfig](cli)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -61,6 +63,7 @@ func TestDoctorCommand(t *testing.T) {
 		if !strings.Contains(output, "✓") {
 			t.Errorf("expected checkmark, got: %s", output)
 		}
+
 		if !strings.Contains(output, "passed") {
 			t.Errorf("expected 'passed', got: %s", output)
 		}
@@ -70,7 +73,7 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		ProvideValue(cli.Scope(), &doctorUnhealthyService{})
+		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorUnhealthyService{}))
 
 		cmd := MustDoctorCommand[testConfig](cli)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -88,6 +91,7 @@ func TestDoctorCommand(t *testing.T) {
 		if !strings.Contains(output, "✗") {
 			t.Errorf("expected cross mark, got: %s", output)
 		}
+
 		if !strings.Contains(output, "failed") {
 			t.Errorf("expected failed count, got: %s", output)
 		}
@@ -102,6 +106,7 @@ func TestDoctorCommand(t *testing.T) {
 		cmd := MustDoctorCommand[testConfig](cli,
 			WithDoctorCheck[testConfig]("custom", func(ctx context.Context) error {
 				customCheckCalled = true
+
 				return nil
 			}),
 		)
@@ -130,7 +135,7 @@ func TestDoctorCommand(t *testing.T) {
 
 		cmd := MustDoctorCommand[testConfig](cli,
 			WithDoctorCheck[testConfig]("failing", func(ctx context.Context) error {
-				return fmt.Errorf("connection refused")
+				return errors.New("connection refused")
 			}),
 		)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -148,6 +153,7 @@ func TestDoctorCommand(t *testing.T) {
 		if !strings.Contains(output, "✗ failing") {
 			t.Errorf("expected failing check output, got: %s", output)
 		}
+
 		if !strings.Contains(output, "connection refused") {
 			t.Errorf("expected error message in output, got: %s", output)
 		}
@@ -178,6 +184,7 @@ func TestDoctorCommand(t *testing.T) {
 		output := out.String()
 		alphaIdx := strings.Index(output, "alpha")
 		zebraIdx := strings.Index(output, "zebra")
+
 		if alphaIdx > zebraIdx {
 			t.Errorf("expected alpha before zebra, got: %s", output)
 		}
@@ -209,11 +216,11 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		ProvideValue(cli.Scope(), &doctorHealthyService{})
+		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
 		cmd := MustDoctorCommand[testConfig](cli,
 			WithDoctorCheck[testConfig]("db", func(ctx context.Context) error {
-				return fmt.Errorf("timeout")
+				return errors.New("timeout")
 			}),
 		)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -234,6 +241,11 @@ func TestDoctorCommand(t *testing.T) {
 	})
 }
 
+var (
+	_ do.HealthcheckerWithContext = (*doctorHealthyService)(nil)
+	_ do.HealthcheckerWithContext = (*doctorUnhealthyService)(nil)
+)
+
 type doctorHealthyService struct{}
 
 func (h *doctorHealthyService) HealthCheck(_ context.Context) error { return nil }
@@ -241,5 +253,5 @@ func (h *doctorHealthyService) HealthCheck(_ context.Context) error { return nil
 type doctorUnhealthyService struct{}
 
 func (u *doctorUnhealthyService) HealthCheck(_ context.Context) error {
-	return fmt.Errorf("service is broken")
+	return errors.New("service is broken")
 }

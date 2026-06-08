@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 )
@@ -14,10 +15,10 @@ type DoctorCheck struct {
 
 // doctorConfig holds the configuration for the doctor command.
 type doctorConfig[T any] struct {
-	short     string
-	long      string
-	groupID   string
-	checks    []DoctorCheck
+	short   string
+	long    string
+	groupID string
+	checks  []DoctorCheck
 }
 
 // DoctorOption configures the doctor command.
@@ -53,6 +54,9 @@ func WithDoctorCheck[T any](name string, run func(ctx context.Context) error) Do
 	}
 }
 
+// ErrDoctorFailed indicates one or more doctor checks failed.
+var ErrDoctorFailed = errors.New("doctor checks failed")
+
 // DoctorCommand creates a typed "doctor" subcommand that runs health checks
 // on all DI services and any custom diagnostic checks, reporting per-check status.
 //
@@ -75,6 +79,7 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 		short: "Check system health",
 		long:  "Run health checks on all services and report diagnostic status.",
 	}
+
 	for _, opt := range opts {
 		opt(&cfg)
 	}
@@ -98,9 +103,11 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 			}
 
 			names := make([]string, 0, len(results))
+
 			for name := range results {
 				names = append(names, name)
 			}
+
 			sort.Strings(names)
 
 			passed := 0
@@ -110,9 +117,11 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 				err := results[name]
 				if err != nil {
 					fmt.Fprintf(w, "✗ %s\t%s\n", name, err)
+
 					failed++
 				} else {
 					fmt.Fprintf(w, "✓ %s\tok\n", name)
+
 					passed++
 				}
 			}
@@ -120,11 +129,14 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 			fmt.Fprintf(w, "\n%d passed, %d failed\n", passed, failed)
 
 			if failed > 0 {
-				exitErr, _ := NewExitError(1, fmt.Errorf(
-					"%s doctor: %d check(s) failed",
+				doctorErr := fmt.Errorf(
+					"%w: %s: %d check(s) failed",
+					ErrDoctorFailed,
 					appName,
 					failed,
-				))
+				)
+				exitErr, _ := NewExitError(1, doctorErr)
+
 				return exitErr
 			}
 

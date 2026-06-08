@@ -296,22 +296,11 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		return err
 	}
 
-	// --- health: HealthCheckWithContext, MustNewCommand ---
-	healthCmd := v2.MustNewCommand[AppConfig, v2.NoFlags](
-		"health",
-		func(ctx context.Context, _ *AppConfig, _ v2.NoFlags) error {
-			if err := cli.HealthCheckWithContext(ctx); err != nil {
-				fmt.Printf("UNHEALTHY: %v\n", err)
-				exitErr, _ := v2.NewExitError(1, err)
-				return exitErr
-			}
-			fmt.Println("All systems healthy")
-			return nil
-		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Check system health"),
-		v2.WithGroupID[AppConfig, v2.NoFlags]("system"),
+	// --- doctor: DoctorCommand, HealthCheckResultsWithContext ---
+	doctorCmd := v2.MustDoctorCommand[AppConfig](cli,
+		v2.WithDoctorGroupID[AppConfig]("system"),
 	)
-	if err := v2.AddCommand(cli, healthCmd); err != nil {
+	if err := v2.AddCommand(cli, doctorCmd); err != nil {
 		return err
 	}
 

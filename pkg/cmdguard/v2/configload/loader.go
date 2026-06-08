@@ -1,9 +1,9 @@
 // Package configload provides optional config file loaders for YAML and TOML.
 //
-// Use these with v2.WithConfigFileLoader[T]():
+// Use these with cmdguard.WithConfigFileLoader[T]():
 //
-//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
-//	    v2.WithConfigFileLoader[Config](configload.YAML(), "$HOME/.config/app/config.yaml"),
+//	cli, _ := cmdguard.NewCLI[Config]("app", "My app", Config{},
+//	    cmdguard.WithConfigFileLoader[Config](configload.YAML(), "$HOME/.config/app/config.yaml"),
 //	)
 package configload
 
@@ -14,9 +14,9 @@ import (
 	"strings"
 
 	"github.com/go-faster/yaml"
-	"github.com/pelletier/go-toml/v2"
+	toml "github.com/pelletier/go-toml/v2"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	cmdguard "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 // unmarshalFunc parses bytes into a target value.
@@ -30,12 +30,12 @@ type genericLoader struct {
 func (l *genericLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]any
 	if err := l.unmarshal(data, &raw); err != nil {
-		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
+		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
-	tags, err := v2.ParseFlagTags(cfg)
+	tags, err := cmdguard.ParseFlagTags(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("%w: parsing flag tags: %w", v2.ErrConfigFileParse, err)
+		return nil, fmt.Errorf("%w: parsing flag tags: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
 	present := make(map[string]bool, len(raw))
@@ -43,10 +43,10 @@ func (l *genericLoader) Load(data []byte, cfg any) ([]string, error) {
 		present[k] = true
 	}
 
-	setFields := v2.FilterSetFields(tags, present)
+	setFields := cmdguard.FilterSetFields(tags, present)
 
 	if err := l.unmarshal(data, cfg); err != nil {
-		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
+		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
 	return setFields, nil
@@ -54,19 +54,19 @@ func (l *genericLoader) Load(data []byte, cfg any) ([]string, error) {
 
 // YAML returns a ConfigFileLoader for YAML files.
 // Supports flat key-value objects where keys match flag tag names.
-func YAML() v2.ConfigFileLoader {
+func YAML() cmdguard.ConfigFileLoader {
 	return &genericLoader{unmarshal: yaml.Unmarshal}
 }
 
 // TOML returns a ConfigFileLoader for TOML files.
 // Supports flat key-value objects where keys match flag tag names.
-func TOML() v2.ConfigFileLoader {
+func TOML() cmdguard.ConfigFileLoader {
 	return &genericLoader{unmarshal: toml.Unmarshal}
 }
 
 // JSON returns a ConfigFileLoader for JSON files.
 // This is identical to the core package's built-in JSON loader.
-func JSON() v2.ConfigFileLoader {
+func JSON() cmdguard.ConfigFileLoader {
 	return &jsonLoader{}
 }
 
@@ -75,12 +75,12 @@ type jsonLoader struct{}
 func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
-		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
+		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
-	tags, err := v2.ParseFlagTags(cfg)
+	tags, err := cmdguard.ParseFlagTags(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("%w: parsing flag tags: %w", v2.ErrConfigFileParse, err)
+		return nil, fmt.Errorf("%w: parsing flag tags: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
 	present := make(map[string]bool, len(raw))
@@ -88,10 +88,10 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 		present[k] = true
 	}
 
-	setFields := v2.FilterSetFields(tags, present)
+	setFields := cmdguard.FilterSetFields(tags, present)
 
 	if err := json.Unmarshal(data, cfg); err != nil {
-		return nil, fmt.Errorf("%w: %w", v2.ErrConfigFileParse, err)
+		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
 	return setFields, nil
@@ -103,13 +103,13 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 //
 // This is useful when you don't know the file format at compile time:
 //
-//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
-//	    v2.WithConfigFileLoader[Config](configload.Auto(),
+//	cli, _ := cmdguard.NewCLI[Config]("app", "My app", Config{},
+//	    cmdguard.WithConfigFileLoader[Config](configload.Auto(),
 //	        "$HOME/.config/app/config.yaml",
 //	        "$HOME/.config/app/config.json",
 //	    ),
 //	)
-func Auto() v2.ConfigFileLoader {
+func Auto() cmdguard.ConfigFileLoader {
 	return &autoLoader{}
 }
 
@@ -126,7 +126,7 @@ func (l *autoLoader) Load(data []byte, cfg any) ([]string, error) {
 
 // LoaderForPath returns the appropriate loader for a file path based on its extension.
 // Returns JSON loader for unknown extensions.
-func LoaderForPath(path string) v2.ConfigFileLoader {
+func LoaderForPath(path string) cmdguard.ConfigFileLoader {
 	ext := strings.ToLower(filepath.Ext(path))
 
 	switch ext {
