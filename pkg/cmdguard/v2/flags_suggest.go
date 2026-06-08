@@ -30,6 +30,16 @@ func SuggestFlag(validNames []string, input string) (string, bool) {
 	return "", false
 }
 
+// SuggestCommand returns the best matching command name for a potentially misspelled input.
+// Returns the best match and true if a good match is found, or empty string and false otherwise.
+func SuggestCommand(validCommands []string, input string) (string, bool) {
+	if len(validCommands) == 0 {
+		return "", false
+	}
+
+	return SuggestFlag(validCommands, input)
+}
+
 // editDistance computes the Levenshtein distance between two strings.
 func editDistance(a, b string) int {
 	aLen, bLen := len(a), len(b)
