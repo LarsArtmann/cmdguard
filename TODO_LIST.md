@@ -13,7 +13,7 @@
 - [x] Nix flake with devShell, formatter, and format check
 - [x] CI with pinned golangci-lint, codecov, Nix check, benchmarks
 - [x] Release automation workflow
-- [x] 356 tests (706 cases), 82.8% coverage, 0 lint issues, 0 race conditions
+- [x] 357 tests, 82.8% coverage, 0 lint issues, 0 race conditions
 
 ## Remaining Work
 

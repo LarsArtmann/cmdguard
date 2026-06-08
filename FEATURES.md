@@ -1,7 +1,7 @@
 # cmdguard Features
 
-**Last Updated:** 2026-06-01
-**Version:** 2.3.0-dev
+**Last Updated:** 2026-06-08
+**Version:** 2.4.0
 **Go Version:** 1.26
 
 ---
