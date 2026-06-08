@@ -47,9 +47,19 @@ func (cli *CLI[T]) HealthCheck() error {
 	return cli.scope.HealthCheck()
 }
 
+// HealthCheckResults runs health checks and returns per-service results.
+func (cli *CLI[T]) HealthCheckResults() map[string]error {
+	return cli.scope.HealthCheckResults()
+}
+
 // HealthCheckWithContext runs health checks with context.
 func (cli *CLI[T]) HealthCheckWithContext(ctx context.Context) error {
 	return cli.scope.HealthCheckWithContext(ctx)
+}
+
+// HealthCheckResultsWithContext runs health checks with context and returns per-service results.
+func (cli *CLI[T]) HealthCheckResultsWithContext(ctx context.Context) map[string]error {
+	return cli.scope.HealthCheckResultsWithContext(ctx)
 }
 
 // Name returns the CLI application name.

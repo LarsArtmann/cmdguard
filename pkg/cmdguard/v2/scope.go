@@ -212,6 +212,8 @@ func firstHealthCheckError(results map[string]error, scopeName string) error {
 }
 
 // HealthCheck runs health checks on all services in this scope.
+// Returns the first error found, or nil if all services are healthy.
+// For per-service results, use HealthCheckResults instead.
 func (s *Scope) HealthCheck() error {
 	if s.injector == nil {
 		return nil
@@ -222,8 +224,20 @@ func (s *Scope) HealthCheck() error {
 	return firstHealthCheckError(results, s.name)
 }
 
+// HealthCheckResults runs health checks and returns per-service results.
+// The returned map keys are service names and values are their errors (nil = healthy).
+func (s *Scope) HealthCheckResults() map[string]error {
+	if s.injector == nil {
+		return map[string]error{}
+	}
+
+	return s.injector.HealthCheck()
+}
+
 // HealthCheckWithContext runs health checks with context on all services.
 // Services implementing HealthcheckerWithContext will use the provided context.
+// Returns the first error found, or nil if all services are healthy.
+// For per-service results, use HealthCheckResultsWithContext instead.
 func (s *Scope) HealthCheckWithContext(ctx context.Context) error {
 	if s.injector == nil {
 		return nil
@@ -232,6 +246,17 @@ func (s *Scope) HealthCheckWithContext(ctx context.Context) error {
 	results := s.injector.HealthCheckWithContext(ctx)
 
 	return firstHealthCheckError(results, s.name)
+}
+
+// HealthCheckResultsWithContext runs health checks with context and returns
+// per-service results. The returned map keys are service names and values
+// are their errors (nil = healthy).
+func (s *Scope) HealthCheckResultsWithContext(ctx context.Context) map[string]error {
+	if s.injector == nil {
+		return map[string]error{}
+	}
+
+	return s.injector.HealthCheckWithContext(ctx)
 }
 
 // ScopedProvider creates a provider that runs within a named child scope.
