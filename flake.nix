@@ -31,6 +31,8 @@
             programs = {
               nixfmt.enable = true;
               gofmt.enable = true;
+              gofumpt.enable = true;
+              goimports.enable = true;
             };
           };
 
