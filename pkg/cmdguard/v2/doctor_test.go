@@ -103,7 +103,8 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		customCheckCalled := false
 
-		cmd := MustDoctorCommand[testConfig](cli,
+		cmd := MustDoctorCommand[testConfig](
+			cli,
 			WithDoctorCheck[testConfig]("custom", func(ctx context.Context) error {
 				customCheckCalled = true
 
@@ -133,7 +134,8 @@ func TestDoctorCommand(t *testing.T) {
 
 		cli := newDoctorCLI(t)
 
-		cmd := MustDoctorCommand[testConfig](cli,
+		cmd := MustDoctorCommand[testConfig](
+			cli,
 			WithDoctorCheck[testConfig]("failing", func(ctx context.Context) error {
 				return errors.New("connection refused")
 			}),
@@ -164,7 +166,8 @@ func TestDoctorCommand(t *testing.T) {
 
 		cli := newDoctorCLI(t)
 
-		cmd := MustDoctorCommand[testConfig](cli,
+		cmd := MustDoctorCommand[testConfig](
+			cli,
 			WithDoctorCheck[testConfig]("zebra", func(ctx context.Context) error {
 				return nil
 			}),
@@ -194,7 +197,8 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd := MustDoctorCommand[testConfig](cli,
+		cmd := MustDoctorCommand[testConfig](
+			cli,
 			WithDoctorShort[testConfig]("Run diagnostics"),
 		)
 		if cmd.Short() != "Run diagnostics" {
@@ -206,7 +210,8 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd := MustDoctorCommand[testConfig](cli,
+		cmd := MustDoctorCommand[testConfig](
+			cli,
 			WithDoctorGroupID[testConfig]("system"),
 		)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -218,7 +223,8 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
-		cmd := MustDoctorCommand[testConfig](cli,
+		cmd := MustDoctorCommand[testConfig](
+			cli,
 			WithDoctorCheck[testConfig]("db", func(ctx context.Context) error {
 				return errors.New("timeout")
 			}),

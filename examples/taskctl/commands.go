@@ -297,7 +297,8 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	}
 
 	// --- doctor: DoctorCommand, HealthCheckResultsWithContext ---
-	doctorCmd := v2.MustDoctorCommand[AppConfig](cli,
+	doctorCmd := v2.MustDoctorCommand[AppConfig](
+		cli,
 		v2.WithDoctorGroupID[AppConfig]("system"),
 	)
 	if err := v2.AddCommand(cli, doctorCmd); err != nil {
