@@ -1,2 +1,4 @@
 # Documentation files in docs/status/ should not count toward language statistics
 docs/status/*.md linguist-documentation
+# Exclude from language statistics
+reports/** linguist-generated
