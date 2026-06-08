@@ -178,23 +178,23 @@
 
 ### Doctor Command
 
-| Feature | Status | Notes |
-| --- | --- | --- |
-| `DoctorCommand[T](cli, opts...)` | ✅ FULLY_FUNCTIONAL | Typed doctor subcommand |
-| `MustDoctorCommand[T](cli, opts...)` | ✅ FULLY_FUNCTIONAL | Panic variant |
-| `WithDoctorCheck[T](name, run)` | ✅ FULLY_FUNCTIONAL | Add custom diagnostic check |
-| `WithDoctorShort[T](desc)` | ✅ FULLY_FUNCTIONAL | Custom short description |
-| `WithDoctorLong[T](desc)` | ✅ FULLY_FUNCTIONAL | Custom long description |
-| `WithDoctorGroupID[T](id)` | ✅ FULLY_FUNCTIONAL | Command group ID |
+| Feature                              | Status              | Notes                       |
+| ------------------------------------ | ------------------- | --------------------------- |
+| `DoctorCommand[T](cli, opts...)`     | ✅ FULLY_FUNCTIONAL | Typed doctor subcommand     |
+| `MustDoctorCommand[T](cli, opts...)` | ✅ FULLY_FUNCTIONAL | Panic variant               |
+| `WithDoctorCheck[T](name, run)`      | ✅ FULLY_FUNCTIONAL | Add custom diagnostic check |
+| `WithDoctorShort[T](desc)`           | ✅ FULLY_FUNCTIONAL | Custom short description    |
+| `WithDoctorLong[T](desc)`            | ✅ FULLY_FUNCTIONAL | Custom long description     |
+| `WithDoctorGroupID[T](id)`           | ✅ FULLY_FUNCTIONAL | Command group ID            |
 
 ### Health Check Results
 
-| Feature | Status | Notes |
-| --- | --- | --- |
-| `Scope.HealthCheckResults()` | ✅ FULLY_FUNCTIONAL | Per-service health map |
+| Feature                                    | Status              | Notes                               |
+| ------------------------------------------ | ------------------- | ----------------------------------- |
+| `Scope.HealthCheckResults()`               | ✅ FULLY_FUNCTIONAL | Per-service health map              |
 | `Scope.HealthCheckResultsWithContext(ctx)` | ✅ FULLY_FUNCTIONAL | Per-service health map with context |
-| `CLI.HealthCheckResults()` | ✅ FULLY_FUNCTIONAL | Delegates to Scope |
-| `CLI.HealthCheckResultsWithContext(ctx)` | ✅ FULLY_FUNCTIONAL | Delegates to Scope |
+| `CLI.HealthCheckResults()`                 | ✅ FULLY_FUNCTIONAL | Delegates to Scope                  |
+| `CLI.HealthCheckResultsWithContext(ctx)`   | ✅ FULLY_FUNCTIONAL | Delegates to Scope                  |
 
 ### Version Command
 
@@ -243,12 +243,12 @@
 
 ## Testing
 
-| Package                         | Coverage  | Status  |
-| ------------------------------- | --------- | ------- |
-| `pkg/cmdguard/v2`               | ~83%      | ✅ Good |
-| `pkg/cmdguard/v2/configload`    | ~88%      | ✅ Good |
-| Benchmarks                      | 22 total  | ✅ Good |
-| Fuzz tests                      | 7 targets | ✅ Good |
+| Package                      | Coverage  | Status  |
+| ---------------------------- | --------- | ------- |
+| `pkg/cmdguard/v2`            | ~83%      | ✅ Good |
+| `pkg/cmdguard/v2/configload` | ~88%      | ✅ Good |
+| Benchmarks                   | 22 total  | ✅ Good |
+| Fuzz tests                   | 7 targets | ✅ Good |
 
 ---
 

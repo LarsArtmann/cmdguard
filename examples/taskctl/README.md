@@ -42,7 +42,7 @@ Every cmdguard feature is demonstrated in this example:
 | **LogLevel type**            | types.go            | Config log-level                                                                                                          |
 | **Port type**                | types.go            | Config port                                                                                                               |
 | `NewCommand`                 | commands.go         | list, add, done, stats, inspect                                                                                           |
-| `MustDoctorCommand`         | commands.go         | Doctor command with DI health + custom checks              |
+| `MustDoctorCommand`          | commands.go         | Doctor command with DI health + custom checks                                                                             |
 | `NewParentCommand`           | commands.go         | db, config command groups                                                                                                 |
 | `WithFlags`                  | commands.go         | All task commands                                                                                                         |
 | `WithShort`                  | commands.go         | All commands                                                                                                              |

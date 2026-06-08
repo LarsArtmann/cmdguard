@@ -223,27 +223,27 @@ Functional options:
 
 ### CLI[T] Methods
 
-| Method                        | Returns                 | Purpose                              |
-| ----------------------------- | ----------------------- | ------------------------------------ |
-| `Execute(ctx)`                | `error`                 | Run CLI with context                 |
-| `ExecuteWithArgs(ctx, args)`  | `error`                 | Run with specific args               |
-| `ExecuteAndExit(ctx)`         |                         | Run and os.Exit (respects ExitCoder) |
-| `Scope()`                     | `*Scope`                | DI scope                             |
-| `Injector()`                  | `do.Injector`           | Raw samber/do injector               |
-| `Config()`                    | `*T`                    | Typed config                         |
-| `SetConfig(cfg)`              |                         | Update config                        |
-| `RootCommand()`               | `*cobra.Command`        | Underlying cobra command             |
-| `Shutdown(ctx)`               | `error`                 | Graceful shutdown                    |
-| `HealthCheck()`                   | `error`                 | Run health checks                    |
-| `HealthCheckWithContext(ctx)`     | `error`                 | Health checks with context           |
-| `HealthCheckResults()`           | `map[string]error`      | Per-service health map               |
-| `HealthCheckResultsWithContext(ctx)` | `map[string]error`  | Per-service health map with context  |
-| `SetVersion(v)`               |                         | Set version at runtime               |
-| `SetLong(desc)`               |                         | Set long description                 |
-| `FlowContext()`               | `*BranchingFlowContext` | Path tracking (nil until Execute)    |
-| `AddGlobalFlag(...)`          |                         | Persistent string flag               |
-| `AddGlobalBoolFlag(...)`      |                         | Persistent bool flag                 |
-| `NoColor()`                   | `bool`                  | True if `--no-color` was passed      |
+| Method                               | Returns                 | Purpose                              |
+| ------------------------------------ | ----------------------- | ------------------------------------ |
+| `Execute(ctx)`                       | `error`                 | Run CLI with context                 |
+| `ExecuteWithArgs(ctx, args)`         | `error`                 | Run with specific args               |
+| `ExecuteAndExit(ctx)`                |                         | Run and os.Exit (respects ExitCoder) |
+| `Scope()`                            | `*Scope`                | DI scope                             |
+| `Injector()`                         | `do.Injector`           | Raw samber/do injector               |
+| `Config()`                           | `*T`                    | Typed config                         |
+| `SetConfig(cfg)`                     |                         | Update config                        |
+| `RootCommand()`                      | `*cobra.Command`        | Underlying cobra command             |
+| `Shutdown(ctx)`                      | `error`                 | Graceful shutdown                    |
+| `HealthCheck()`                      | `error`                 | Run health checks                    |
+| `HealthCheckWithContext(ctx)`        | `error`                 | Health checks with context           |
+| `HealthCheckResults()`               | `map[string]error`      | Per-service health map               |
+| `HealthCheckResultsWithContext(ctx)` | `map[string]error`      | Per-service health map with context  |
+| `SetVersion(v)`                      |                         | Set version at runtime               |
+| `SetLong(desc)`                      |                         | Set long description                 |
+| `FlowContext()`                      | `*BranchingFlowContext` | Path tracking (nil until Execute)    |
+| `AddGlobalFlag(...)`                 |                         | Persistent string flag               |
+| `AddGlobalBoolFlag(...)`             |                         | Persistent bool flag                 |
+| `NoColor()`                          | `bool`                  | True if `--no-color` was passed      |
 
 ### Basic Usage
 
