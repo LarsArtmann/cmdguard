@@ -23,7 +23,7 @@
       perSystem =
         { config, pkgs, ... }:
         let
-          goPkg = goPkg;
+          goPkg = pkgs.go_1_26;
         in
         {
           treefmt = {
