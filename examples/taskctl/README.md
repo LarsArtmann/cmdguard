@@ -13,7 +13,7 @@ go run examples/taskctl/main.go add --title "Fix bug" --priority high
 go run examples/taskctl/main.go done --id 1
 go run examples/taskctl/main.go stats
 go run examples/taskctl/main.go version
-go run examples/taskctl/main.go health
+go run examples/taskctl/main.go doctor
 go run examples/taskctl/main.go config show
 go run examples/taskctl/main.go db migrate --env production
 ```
@@ -42,7 +42,7 @@ Every cmdguard feature is demonstrated in this example:
 | **LogLevel type**            | types.go            | Config log-level                                                                                                          |
 | **Port type**                | types.go            | Config port                                                                                                               |
 | `NewCommand`                 | commands.go         | list, add, done, stats, inspect                                                                                           |
-| `MustNewCommand`             | commands.go         | health command                                                                                                            |
+| `MustDoctorCommand`         | commands.go         | Doctor command with DI health + custom checks              |
 | `NewParentCommand`           | commands.go         | db, config command groups                                                                                                 |
 | `WithFlags`                  | commands.go         | All task commands                                                                                                         |
 | `WithShort`                  | commands.go         | All commands                                                                                                              |
@@ -75,7 +75,7 @@ Every cmdguard feature is demonstrated in this example:
 | `ValueOrDefault`             | main_test.go        | Helper usage in tests                                                                                                     |
 | `EnsureValid`                | main_test.go        | Helper usage in tests                                                                                                     |
 | `MustParse`                  | main_test.go        | Duration parsing test                                                                                                     |
-| **NoFlags type**             | commands.go         | health, version, hidden, deprecated                                                                                       |
+| **NoFlags type**             | commands.go         | doctor, version, hidden, deprecated                                                                                       |
 
 ## Architecture
 

@@ -28,7 +28,7 @@
 //	go run examples/taskctl/main.go add --title "Buy groceries" --priority high
 //	go run examples/taskctl/main.go done --id 1
 //	go run examples/taskctl/main.go stats
-//	go run examples/taskctl/main.go health
+//	go run examples/taskctl/main.go doctor
 //	go run examples/taskctl/main.go version
 package main
 
