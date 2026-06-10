@@ -215,6 +215,7 @@ func (cli *CLI[T]) applyNoColorIfSet() func() {
 // If WithGracefulShutdown was set, DI services are shut down on signal after command completes.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	cli.applyGlamourIfEnabled()
+
 	restoreNoColor := cli.applyNoColorIfSet()
 	defer restoreNoColor()
 
