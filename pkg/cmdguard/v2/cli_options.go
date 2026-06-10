@@ -92,6 +92,7 @@ func WithEnvPrefix[T any](prefix string) CLIOption[T] {
 
 // WithSignalHandling adds automatic context cancellation on SIGINT/SIGTERM.
 // When a signal is received, the context passed to handlers is cancelled.
+// This does NOT trigger DI service shutdown — use WithGracefulShutdown for that.
 func WithSignalHandling[T any]() CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.signalHandling = true
@@ -115,6 +116,26 @@ func WithConfigValidation[T any](validate func(*T) error) CLIOption[T] {
 func WithStrictValidation[T any]() CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.validationMode = Strict
+	}
+}
+
+// WithGracefulShutdown enables graceful DI shutdown on SIGINT/SIGTERM.
+// When a signal is received, all services implementing do.ShutdownerWithError
+// or do.ShutdownerWithContextAndError are shut down in reverse invocation order.
+// This also enables signal-based context cancellation (implies WithSignalHandling).
+func WithGracefulShutdown[T any]() CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.signalHandling = true
+		cli.gracefulShutdown = true
+	}
+}
+
+// WithDILogging enables internal logging for the DI container.
+// The provided function receives formatted log messages from samber/do
+// for service registration, invocation, and lifecycle events.
+func WithDILogging[T any](logf func(format string, args ...any)) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.diLogf = logf
 	}
 }
 

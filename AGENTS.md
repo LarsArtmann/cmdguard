@@ -359,7 +359,29 @@ v2.ProvideValue(scope, &Logger{Level: "info"})
 
 // Invoke in command handlers
 db, err := v2.Invoke[*Database](cli.Scope())
+
+// Testing — clone scope and override services
+cloned := v2.CloneScope(scope)
+v2.OverrideValue(cloned, &MockDatabase{})
+mockDB, _ := v2.Invoke[*Database](cloned) // returns mock
 ```
+
+#### DI Scope Functions
+
+| Function                          | Purpose                                              |
+| --------------------------------- | ---------------------------------------------------- |
+| `Provide[T](scope, provider)`     | Lazy singleton registration                          |
+| `ProvideNamed[T](scope, name, fn)`| Named service registration                           |
+| `ProvideValue[T](scope, value)`   | Eager value registration                             |
+| `Invoke[T](scope)`                | Retrieve singleton service                           |
+| `InvokeNamed[T](scope, name)`     | Retrieve named service                               |
+| `Override[T](scope, provider)`    | Replace service provider (testing)                   |
+| `OverrideValue[T](scope, value)`  | Replace pre-constructed value (testing)              |
+| `CloneScope(scope)`               | Clone scope for test isolation                       |
+| `NewScopeWithOpts(name, opts)`    | Create scope with custom InjectorOpts                |
+| `Scope.Child(name)`               | Create child scope                                   |
+| `Scope.Shutdown(ctx)`             | Graceful shutdown of scope services                  |
+| `Scope.ShutdownAll(ctx)`          | Shutdown scope + all parents                         |
 
 ### Lifecycle Hooks
 
@@ -602,6 +624,9 @@ go build ./...                                   # Verify build
 36. **DoctorCommand uses HealthCheckResults** — `DoctorCommand[T]` calls `HealthCheckResultsWithContext(ctx)` which returns `map[string]error`; DI services with `do.HealthcheckerWithContext` are included automatically; custom checks via `WithDoctorCheck` run after DI checks
 37. **configload single file** — YAML/TOML/JSON/Auto loaders consolidated into `configload/loader.go`; uses `genericLoader` with pluggable `unmarshalFunc`; TOML import aliased as `toml` to avoid conflict with local `cmdguard` import alias
 38. **Zero panics** — All Must* functions removed in v2.5.0. Every function returns errors. No `MustNewCommand`, `MustInvoke`, `MustParse*`, etc.
+39. **WithGracefulShutdown** — `WithGracefulShutdown[T]()` enables graceful DI shutdown on SIGINT/SIGTERM. Implies `WithSignalHandling`. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order. `WithSignalHandling` only cancels context and does NOT trigger DI shutdown
+40. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke
+41. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option
 39. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
 40. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
 41. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use

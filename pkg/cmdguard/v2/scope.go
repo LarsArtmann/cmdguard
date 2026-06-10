@@ -25,6 +25,16 @@ func NewScope(name string) *Scope {
 	}
 }
 
+// NewScopeWithOpts creates a new root scope with custom injector options.
+// Use this for DI logging, lifecycle hooks, health check timeouts, etc.
+func NewScopeWithOpts(name string, opts *do.InjectorOpts) *Scope {
+	return &Scope{
+		injector: do.NewWithOpts(opts),
+		name:     name,
+		parent:   nil,
+	}
+}
+
 // NewScopeFromInjector creates a Scope from an existing injector.
 // Returns an error if injector is nil.
 func NewScopeFromInjector(injector do.Injector, name string) (*Scope, error) {
@@ -230,6 +240,45 @@ func (s *Scope) HealthCheckResultsWithContext(ctx context.Context) map[string]er
 	}
 
 	return s.injector.HealthCheckWithContext(ctx)
+}
+
+// Override replaces a service provider in this scope.
+// Useful for testing — replace real services with mocks in a cloned scope.
+// Returns an error only if scope is nil.
+func Override[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
+	if scope == nil {
+		return fmt.Errorf("%w: scope is nil, provider=%T", ErrInvalidScope, provider)
+	}
+
+	do.Override(scope.injector, provider)
+
+	return nil
+}
+
+// OverrideValue replaces a pre-constructed value in this scope.
+// Useful for testing — inject config or mock values into a cloned scope.
+// Returns an error only if scope is nil.
+func OverrideValue[T any](scope *Scope, value T) error {
+	if scope == nil {
+		return fmt.Errorf("%w: scope is nil, value type=%T", ErrInvalidScope, value)
+	}
+
+	do.OverrideValue(scope.injector, value)
+
+	return nil
+}
+
+// CloneScope creates a copy of the scope with the same service registrations
+// but without the invoked service state. Use with Override/OverrideValue
+// for test isolation.
+func CloneScope(scope *Scope) *Scope {
+	cloned := scope.injector.RootScope().Clone()
+
+	return &Scope{
+		injector: cloned,
+		name:     scope.name,
+		parent:   nil,
+	}
 }
 
 // ScopedProvider creates a provider that runs within a named child scope.

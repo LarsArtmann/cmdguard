@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cmdguard × samber/do v2 — Max Utilization Research</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-card-hover: #1f2b3d;
+            --bg-code: #0d1320;
+            --border: #2a3a50;
+            --border-accent: #3b82f6;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-orange: #f97316;
+            --gradient-blue: linear-gradient(135deg, #3b82f6, #06b6d4);
+            --gradient-green: linear-gradient(135deg, #10b981, #06b6d4);
+            --gradient-red: linear-gradient(135deg, #ef4444, #f97316);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6, #ec4899);
+            --gradient-orange: linear-gradient(135deg, #f97316, #f59e0b);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 80px 0 60px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            margin-bottom: 24px;
+            letter-spacing: 0.03em;
+        }
+
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 .gradient {
+            background: var(--gradient-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 32px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .hero-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hero-meta-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .hero-meta-item .value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Score Overview */
+        .score-section {
+            margin: 40px 0;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .score-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .score-card:hover {
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow);
+        }
+
+        .score-card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .score-card .card-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+        }
+
+        .score-card .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .score-card .score-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+        }
+
+        .score-card .score-detail {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .score-used { color: var(--accent-green); }
+        .score-partial { color: var(--accent-yellow); }
+        .score-unused { color: var(--accent-red); }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        /* Section Headers */
+        .section {
+            margin: 60px 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .section-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            margin-top: -16px;
+            margin-left: 52px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        /* Feature Matrix */
+        .feature-matrix {
+            display: grid;
+            gap: 12px;
+        }
+
+        .feature-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-row:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-row.header {
+            background: transparent;
+            border: none;
+            padding: 8px 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .feature-row.header:hover {
+            background: transparent;
+            border-color: transparent;
+        }
+
+        .feature-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-name code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: var(--accent-cyan);
+        }
+
+        .feature-name .desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-used {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-partial {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-unused {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge-exposed {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Priority Tags */
+        .priority {
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .priority-high {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+        }
+
+        .priority-medium {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-yellow);
+        }
+
+        .priority-low {
+            background: rgba(100, 116, 139, 0.12);
+            color: var(--text-muted);
+        }
+
+        /* Opportunity Cards */
+        .opportunity-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .opportunity-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .opportunity-card:hover {
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow);
+        }
+
+        .opp-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .opp-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .opp-body {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+
+        .opp-body p {
+            margin-bottom: 12px;
+        }
+
+        .opp-code {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .opp-code code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .opp-impact {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .impact-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+
+        .timeline-item.phase-1::before { border-color: var(--accent-red); background: rgba(239, 68, 68, 0.2); }
+        .timeline-item.phase-2::before { border-color: var(--accent-yellow); background: rgba(245, 158, 11, 0.2); }
+        .timeline-item.phase-3::before { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.2); }
+
+        .timeline-phase {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .phase-1 .timeline-phase { color: var(--accent-red); }
+        .phase-2 .timeline-phase { color: var(--accent-yellow); }
+        .phase-3 .timeline-phase { color: var(--accent-green); }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .timeline-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .timeline-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .timeline-tag {
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+
+        .summary-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .summary-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(42, 58, 80, 0.4);
+        }
+
+        .summary-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Architecture Diagram */
+        .arch-diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 20px 0;
+        }
+
+        .arch-layer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .arch-layer-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .arch-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .arch-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
+        .arch-box.exposed { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green); }
+        .arch-box.missing { background: rgba(239, 68, 68, 0.08); border: 1px dashed rgba(239, 68, 68, 0.4); color: var(--accent-red); }
+        .arch-box.partial { background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); color: var(--accent-yellow); }
+
+        .arch-arrow {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 8px 0;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 80px;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero-meta { flex-direction: column; gap: 16px; }
+            .feature-row { grid-template-columns: 1fr; gap: 8px; }
+            .feature-row.header { display: none; }
+            .score-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Print */
+        @media print {
+            body { background: white; color: #1a1a1a; }
+            .hero::before { display: none; }
+            .score-card, .opportunity-card, .feature-row, .arch-diagram {
+                background: #f8f8f8;
+                border-color: #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Deep Research Report — June 2026
+        </div>
+        <h1>Are we using <span class="gradient">samber/do v2</span><br>to the max?</h1>
+        <p class="subtitle">
+            A comprehensive audit of cmdguard's DI integration — what's used, what's missing,
+            and what opportunities remain untapped. Every API surface analyzed, every gap quantified.
+        </p>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <span class="label">Library</span>
+                <span class="value">samber/do v2.0.0</span>
+            </div>
+            <div class="hero-meta-item">
+                <span class="label">API Surface</span>
+                <span class="value">54 public symbols</span>
+            </div>
+            <div class="hero-meta-item">
+                <span class="label">Currently Used</span>
+                <span class="value">13 (24%)</span>
+            </div>
+            <div class="hero-meta-item">
+                <span class="label">Verdict</span>
+                <span class="value" style="color: var(--accent-yellow);">Moderate — Room to Grow</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Score Overview -->
+<section class="score-section">
+    <div class="container">
+        <div class="score-grid">
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Registration</span>
+                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">✓</div>
+                </div>
+                <div class="score-value score-used">3 / 8</div>
+                <div class="score-detail">Provide, ProvideNamed, ProvideValue</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 37.5%; background: var(--gradient-green);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Invocation</span>
+                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--accent-yellow);">◐</div>
+                </div>
+                <div class="score-value score-partial">2 / 8</div>
+                <div class="score-detail">Invoke, InvokeNamed</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 25%; background: var(--gradient-orange);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Lifecycle</span>
+                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">✓</div>
+                </div>
+                <div class="score-value score-used">4 / 8</div>
+                <div class="score-detail">Shutdown, HealthCheck + WithContext variants</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%; background: var(--gradient-green);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Advanced</span>
+                    <div class="card-icon" style="background: rgba(239, 68, 68, 0.12); color: var(--accent-red);">✗</div>
+                </div>
+                <div class="score-value score-unused">0 / 12</div>
+                <div class="score-detail">Hooks, Aliasing, Transient, Override, Clone, StructTag</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%; background: var(--gradient-red);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Scope Tree</span>
+                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">✓</div>
+                </div>
+                <div class="score-value score-used">3 / 4</div>
+                <div class="score-detail">NewScope, Child, Scope(name)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%; background: var(--gradient-green);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Debug / Introspection</span>
+                    <div class="card-icon" style="background: rgba(239, 68, 68, 0.12); color: var(--accent-red);">✗</div>
+                </div>
+                <div class="score-value score-unused">0 / 6</div>
+                <div class="score-detail">ExplainInjector, ExplainService, Web UI, ListServices</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%; background: var(--gradient-red);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 1: Full Feature Matrix -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-number" style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue);">01</div>
+            <h2>Complete Feature Matrix</h2>
+        </div>
+        <p class="section-desc">Every samber/do v2 API symbol mapped against cmdguard's current usage.</p>
+
+        <div class="feature-matrix">
+            <!-- Header -->
+            <div class="feature-row header">
+                <div>Feature</div>
+                <div>Status</div>
+                <div>Exposed to Users</div>
+                <div>Priority</div>
+            </div>
+
+            <!-- Registration -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.Provide[T]</code>
+                        <div class="desc">Lazy singleton service registration</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ProvideNamed[T]</code>
+                        <div class="desc">Named service for multi-implementation</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ProvideValue[T]</code>
+                        <div class="desc">Eager registration of pre-constructed values</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ProvideNamedValue[T]</code>
+                        <div class="desc">Named eager value registration</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ProvideTransient[T]</code>
+                        <div class="desc">New instance on every invocation (factory)</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ProvideNamedTransient[T]</code>
+                        <div class="desc">Named transient factory registration</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+
+            <!-- Invocation -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.Invoke[T]</code>
+                        <div class="desc">Retrieve singleton service</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.InvokeNamed[T]</code>
+                        <div class="desc">Retrieve named service</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.InvokeAs[T]</code>
+                        <div class="desc">Invoke by interface type (implicit alias)</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.InvokeStruct[T]</code>
+                        <div class="desc">Auto-inject via struct tags (do:"name")</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <!-- Aliasing -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.As[Struct, Interface]</code>
+                        <div class="desc">Explicit interface binding for service</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.AsNamed[Struct, Interface]</code>
+                        <div class="desc">Named explicit interface binding</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+
+            <!-- Override -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.Override[T]</code>
+                        <div class="desc">Replace service at runtime (testing)</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-high">High</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.OverrideValue[T]</code>
+                        <div class="desc">Replace pre-constructed value at runtime</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-high">High</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.OverrideNamed[T]</code> / <code>OverrideTransient[T]</code>
+                        <div class="desc">Named and transient override variants</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <!-- Lifecycle -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.ShutdownWithContext()</code>
+                        <div class="desc">Graceful shutdown with context</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.HealthCheck()</code>
+                        <div class="desc">Run all service health checks</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.ShutdownOnSignals()</code>
+                        <div class="desc">Auto-shutdown on SIGTERM / SIGINT</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-high">High</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.Shutdown[T]</code> / <code>ShutdownNamed()</code>
+                        <div class="desc">Shutdown individual service by type or name</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.HealthCheck[T]</code> / <code>HealthCheckNamed()</code>
+                        <div class="desc">Health check individual service by type or name</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <!-- Hooks -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>InjectorOpts.Hook*</code> (6 hooks)
+                        <div class="desc">Before/After Registration, Invocation, Shutdown hooks</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-high">High</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>InjectorOpts.HealthCheck*</code>
+                        <div class="desc">Parallelism, global timeout, per-service timeout</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>InjectorOpts.Logf</code>
+                        <div class="desc">Custom logging for DI container internals</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <!-- Scope -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.Scope(name)</code>
+                        <div class="desc">Create child scope from injector</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-used">✓ Used</span></div>
+                <div><span class="badge badge-exposed">Exposed</span></div>
+                <div><span class="priority priority-low">—</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.RootScope()</code>
+                        <div class="desc">Navigate to root scope from any scope</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.Children()</code> / <code>Ancestors()</code>
+                        <div class="desc">Scope tree introspection</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+
+            <!-- Introspection -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ExplainInjector()</code>
+                        <div class="desc">Full DI graph explanation for debugging</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.ExplainService[T]</code>
+                        <div class="desc">Single service dependency explanation</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.ListProvidedServices()</code>
+                        <div class="desc">List all registered services</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.ListInvokedServices()</code>
+                        <div class="desc">List all instantiated services</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <!-- Clone -->
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>injector.Clone()</code> / <code>CloneWithOpts()</code>
+                        <div class="desc">Clone container for testing with service overrides</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-medium">Medium</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>InjectorOpts.StructTagKey</code>
+                        <div class="desc">Custom struct tag key for InvokeStruct</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-name">
+                    <div>
+                        <code>do.NameOf[T]()</code>
+                        <div class="desc">Get the internal service name for a type</div>
+                    </div>
+                </div>
+                <div><span class="badge badge-unused">✗ Unused</span></div>
+                <div><span class="badge badge-unused">Not exposed</span></div>
+                <div><span class="priority priority-low">Low</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 2: Current Integration Architecture -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-number" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">02</div>
+            <h2>Current Integration Architecture</h2>
+        </div>
+        <p class="section-desc">What cmdguard wraps and exposes today from samber/do v2.</p>
+
+        <div class="arch-diagram">
+            <div class="arch-layer">
+                <div class="arch-layer-label">cmdguard Scope API (exposed to users)</div>
+                <div class="arch-boxes">
+                    <div class="arch-box exposed">Provide[T]</div>
+                    <div class="arch-box exposed">ProvideNamed[T]</div>
+                    <div class="arch-box exposed">ProvideValue[T]</div>
+                    <div class="arch-box exposed">Invoke[T]</div>
+                    <div class="arch-box exposed">InvokeNamed[T]</div>
+                    <div class="arch-box exposed">Shutdown(ctx)</div>
+                    <div class="arch-box exposed">ShutdownAll(ctx)</div>
+                    <div class="arch-box exposed">HealthCheck()</div>
+                    <div class="arch-box exposed">HealthCheckResults()</div>
+                    <div class="arch-box exposed">Child(name)</div>
+                    <div class="arch-box exposed">ScopedProvider[T]</div>
+                    <div class="arch-box exposed">RegisterInScope</div>
+                    <div class="arch-box exposed">Package[T]</div>
+                </div>
+            </div>
+
+            <div class="arch-arrow">↕ wraps</div>
+
+            <div class="arch-layer">
+                <div class="arch-layer-label">samber/do v2 — Used</div>
+                <div class="arch-boxes">
+                    <div class="arch-box exposed">do.New()</div>
+                    <div class="arch-box exposed">do.Provide()</div>
+                    <div class="arch-box exposed">do.ProvideNamed()</div>
+                    <div class="arch-box exposed">do.ProvideValue()</div>
+                    <div class="arch-box exposed">do.Invoke[T]()</div>
+                    <div class="arch-box exposed">do.InvokeNamed[T]()</div>
+                    <div class="arch-box exposed">injector.Scope()</div>
+                    <div class="arch-box exposed">injector.ShutdownWithContext()</div>
+                    <div class="arch-box exposed">injector.HealthCheck()</div>
+                    <div class="arch-box exposed">injector.HealthCheckWithContext()</div>
+                </div>
+            </div>
+
+            <div class="arch-arrow">✗ not wrapped</div>
+
+            <div class="arch-layer">
+                <div class="arch-layer-label">samber/do v2 — NOT Used</div>
+                <div class="arch-boxes">
+                    <div class="arch-box missing">ProvideTransient[T]</div>
+                    <div class="arch-box missing">ProvideNamedValue[T]</div>
+                    <div class="arch-box missing">InvokeAs[T]</div>
+                    <div class="arch-box missing">InvokeStruct[T]</div>
+                    <div class="arch-box missing">As[Struct, Interface]</div>
+                    <div class="arch-box missing">Override[T]</div>
+                    <div class="arch-box missing">OverrideValue[T]</div>
+                    <div class="arch-box missing">ShutdownOnSignals()</div>
+                    <div class="arch-box missing">Shutdown[T]</div>
+                    <div class="arch-box missing">HealthCheck[T]</div>
+                    <div class="arch-box missing">ExplainInjector()</div>
+                    <div class="arch-box missing">ExplainService[T]</div>
+                    <div class="arch-box missing">ListProvidedServices()</div>
+                    <div class="arch-box missing">Clone()</div>
+                    <div class="arch-box missing">InjectorOpts (hooks, logging, timeouts)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: High-Impact Opportunities -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-number" style="background: rgba(239, 68, 68, 0.12); color: var(--accent-red);">03</div>
+            <h2>High-Impact Opportunities</h2>
+        </div>
+        <p class="section-desc">The features that would transform cmdguard's DI story from "basic wrapper" to "best-in-class CLI DI experience."</p>
+
+        <div class="opportunity-grid">
+
+            <!-- Opportunity 1: Lifecycle Hooks -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-red);">
+                <div class="opp-header">
+                    <div class="opp-title">1. Lifecycle Hooks via InjectorOpts</div>
+                    <span class="priority priority-high">HIGH IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        samber/do v2 provides <strong>6 lifecycle hooks</strong> in <code>InjectorOpts</code> that fire
+                        at every stage: before/after registration, invocation, and shutdown. cmdguard currently
+                        creates its injector via <code>do.New()</code> which uses zero options.
+                    </p>
+                    <p>
+                        <strong>Why it matters:</strong> These hooks enable structured logging, metrics, and observability
+                        for the entire DI lifecycle — without any middleware. Every service registration, instantiation,
+                        and shutdown becomes observable.
+                    </p>
+                    <div class="opp-code"><code>InjectorOpts{
+    HookBeforeRegistration: []func(*Scope, string){ ... },  // validate, log
+    HookAfterRegistration:  []func(*Scope, string){ ... },  // metrics
+    HookBeforeInvocation:   []func(*Scope, string){ ... },  // tracing start
+    HookAfterInvocation:    []func(*Scope, string, error){ ... },  // tracing end
+    HookBeforeShutdown:     []func(*Scope, string){ ... },  // log
+    HookAfterShutdown:      []func(*Scope, string, error){ ... },  // audit
+    Logf: func(format string, args ...any) { slog.Info(fmt.Sprintf(format, args...)) },
+}</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Add <code>WithDILogging[T](fn)</code> and <code>WithDIHooks[T](opts)</code>
+                        CLI options. Pass hooks to <code>do.NewWithOpts()</code> instead of <code>do.New()</code> in <code>NewScope()</code>.
+                        Optionally expose per-hook CLI options like <code>WithDIInvocationHook[T](fn)</code>.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">📊 Observability</div>
+                        <div class="impact-tag">🔍 Debugging</div>
+                        <div class="impact-tag">⚡ Zero-cost when unused</div>
+                        <div class="impact-tag">🏗️ NewWithOpts instead of New</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 2: ShutdownOnSignals -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-red);">
+                <div class="opp-header">
+                    <div class="opp-title">2. ShutdownOnSignals — Graceful OS Signal Handling</div>
+                    <span class="priority priority-high">HIGH IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        cmdguard has <code>WithSignalHandling[T]()</code> which sets up a context cancelled on SIGINT/SIGTERM —
+                        but it <strong>does NOT trigger DI shutdown</strong>. The scope's services (implementing <code>ShutdownerWithError</code>)
+                        are never notified when the process receives a signal.
+                    </p>
+                    <p>
+                        samber/do provides <code>injector.ShutdownOnSignals(syscall.SIGTERM, os.Interrupt)</code> which
+                        blocks until a signal arrives, then performs <strong>dependency-aware parallel shutdown</strong>
+                        in reverse invocation order. This is a one-liner integration.
+                    </p>
+                    <div class="opp-code"><code>// Instead of just cancelling context:
+injector.ShutdownOnSignals(syscall.SIGTERM, os.Interrupt)
+// This handles: signal → parallel shutdown → clean exit</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Merge with existing <code>WithSignalHandling</code>. When signal handling
+                        is enabled, call <code>scope.Injector().RootScope().ShutdownOnSignals()</code> in a goroutine alongside
+                        <code>cli.Execute()</code>. On signal, the DI container gracefully shuts down all services, then the
+                        cancelled context terminates the active command.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">🛡️ Production safety</div>
+                        <div class="impact-tag">🔄 Graceful degradation</div>
+                        <div class="impact-tag">⚡ Dependency-aware parallel</div>
+                        <div class="impact-tag">🔗 Complements existing signal handling</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 3: Override for Testing -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-red);">
+                <div class="opp-header">
+                    <div class="opp-title">3. Override[T] — First-Class Testing Support</div>
+                    <span class="priority priority-high">HIGH IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        samber/do's <code>Override[T]</code> and <code>OverrideValue[T]</code> let you replace services
+                        in a cloned injector — the standard testing pattern. Combined with <code>injector.Clone()</code>,
+                        this enables per-test DI isolation without touching global state.
+                    </p>
+                    <div class="opp-code"><code>// In test setup:
+testScope := scope.Injector().RootScope().Clone()
+do.Override[*Database](testScope, func(i do.Injector) (*Database, error) {
+    return &MockDatabase{}, nil
+})
+testCLI := v2.NewCLIWithScope("test", "test", Config{}, testScope)</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Add <code>Override[T](scope, provider)</code> and <code>OverrideValue[T](scope, value)</code>
+                        as cmdguard wrapper functions. Add <code>CloneScope(scope)</code> to clone the DI container for test isolation.
+                        Document the testing pattern in examples.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">🧪 Testability</div>
+                        <div class="impact-tag">🔒 Isolation</div>
+                        <div class="impact-tag">📋 Pattern documentation</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 4: Transient Services -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow);">
+                <div class="opp-header">
+                    <div class="opp-title">4. ProvideTransient[T] — Factory Pattern</div>
+                    <span class="priority priority-medium">MEDIUM IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        CLI commands often need fresh instances — request contexts, temporary resources, per-command handlers.
+                        <code>ProvideTransient[T]</code> creates a new instance on every <code>Invoke[T]</code> call,
+                        acting as a type-safe factory registry.
+                    </p>
+                    <div class="opp-code"><code>// Register a factory for per-command contexts
+v2.ProvideTransient[AppConfig](scope, func(i do.Injector) (AppConfig, error) {
+    return AppConfig{RequestID: uuid.New().String()}, nil
+})
+// Every Invoke gets a fresh instance
+cfg := v2.Invoke[AppConfig](scope) // unique request ID each time</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Add <code>ProvideTransient[T](scope, provider)</code> and
+                        <code>ProvideNamedTransient[T](scope, name, provider)</code> wrappers in scope.go.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">🏭 Factory pattern</div>
+                        <div class="impact-tag">🔀 Per-command isolation</div>
+                        <div class="impact-tag">📐 Type-safe</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 5: Service Aliasing -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow);">
+                <div class="opp-header">
+                    <div class="opp-title">5. Service Aliasing — Accept Interfaces, Return Structs</div>
+                    <span class="priority priority-medium">MEDIUM IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        Go's best practice is "accept interfaces, return structs." samber/do v2 has first-class support:
+                        <code>do.As[Concrete, Interface]()</code> for explicit binding, and <code>do.InvokeAs[Interface]()</code>
+                        for implicit resolution. This enables proper SOLID DI without coupling consumers to implementations.
+                    </p>
+                    <div class="opp-code"><code>// Register concrete implementation
+v2.Provide(scope, NewPostgresStore)
+
+// Bind to interface
+v2.As[*PostgresStore, TaskRepository](scope)
+
+// Consumers only know about the interface
+repo := v2.Invoke[TaskRepository](scope) // ← interface, not concrete</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Add <code>As[Concrete, Interface](scope)</code>,
+                        <code>InvokeAs[Interface](scope)</code>, and <code>AsNamed</code> wrappers.
+                        This would make cmdguard the first Go CLI framework with SOLID DI support.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">🏗️ SOLID principles</div>
+                        <div class="impact-tag">🔌 Decoupling</div>
+                        <div class="impact-tag">🎯 Interface-driven design</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 6: Debug / Introspection -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow);">
+                <div class="opp-header">
+                    <div class="opp-title">6. Debug & Introspection API</div>
+                    <span class="priority priority-medium">MEDIUM IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        samber/do provides rich introspection: <code>ExplainInjector()</code> shows the full scope tree
+                        and service graph, <code>ExplainService[T]()</code> shows dependencies for a single service,
+                        and <code>ListProvidedServices()</code> / <code>ListInvokedServices()</code> enumerate all services.
+                    </p>
+                    <div class="opp-code"><code>// cmdguard could add a built-in "di" debug command:
+// $ myapp di list          → shows all registered services
+// $ myapp di graph         → shows dependency graph
+// $ myapp di explain TaskStore → shows service dependencies
+// $ myapp di scopes        → shows scope tree</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Add a <code>DIDebugCommand[T](cli)</code> that exposes
+                        subcommands: <code>list</code>, <code>graph</code>, <code>explain &lt;service&gt;</code>,
+                        <code>scopes</code>. Wire to <code>ExplainInjector()</code>, <code>ExplainService[T]()</code>,
+                        <code>ListProvidedServices()</code>, <code>ListInvokedServices()</code>.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">🔍 Debugging</div>
+                        <div class="impact-tag">📊 Visualization</div>
+                        <div class="impact-tag">🏗️ Developer experience</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 7: Individual Service Lifecycle -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow);">
+                <div class="opp-header">
+                    <div class="opp-title">7. Individual Service Lifecycle Operations</div>
+                    <span class="priority priority-medium">MEDIUM IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        Currently cmdguard only exposes whole-scope health check and shutdown. samber/do supports
+                        per-service operations: <code>do.Shutdown[T]()</code>, <code>do.HealthCheck[T]()</code>,
+                        and their named variants. This enables fine-grained service management.
+                    </p>
+                    <div class="opp-code"><code>// Health check a single service
+err := v2.HealthCheckService[*Database](scope)
+
+// Gracefully shutdown a single service
+err := v2.ShutdownService[*Cache](scope)
+
+// Named variants for multi-implementation
+err := v2.HealthCheckServiceNamed(scope, "cache-redis")</code></div>
+                    <div class="opp-impact">
+                        <div class="impact-tag">🎯 Fine-grained control</div>
+                        <div class="impact-tag">🏥 Targeted health checks</div>
+                        <div class="impact-tag">🔄 Selective restart</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 8: InvokeStruct -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-orange);">
+                <div class="opp-header">
+                    <div class="opp-title">8. InvokeStruct[T] — Tag-Based Auto-Injection</div>
+                    <span class="priority priority-low">LOWER IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        <code>do.InvokeStruct[T]</code> auto-injects dependencies into struct fields using <code>do:"service-name"</code>
+                        tags. While powerful, it relies on reflection and may not fit cmdguard's explicit, type-safe philosophy.
+                        Worth considering for ergonomics but lower priority.
+                    </p>
+                    <div class="opp-code"><code>type Handler struct {
+    DB   *Database  `do:""`           // auto-resolve by type
+    Port int        `do:"config.port"` // resolve by name
+}
+handler := do.InvokeStruct[Handler](injector) // auto-filled</code></div>
+                    <div class="opp-impact">
+                        <div class="impact-tag">⚡ Ergonomics</div>
+                        <div class="impact-tag">⚠️ Reflection-based</div>
+                        <div class="impact-tag">🤔 Philosophical question</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity 9: HealthCheck Options -->
+            <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow);">
+                <div class="opp-header">
+                    <div class="opp-title">9. HealthCheck Parallelism & Timeouts</div>
+                    <span class="priority priority-medium">MEDIUM IMPACT</span>
+                </div>
+                <div class="opp-body">
+                    <p>
+                        samber/do supports <code>HealthCheckParallelism</code>, <code>HealthCheckGlobalTimeout</code>,
+                        and <code>HealthCheckTimeout</code> in <code>InjectorOpts</code>. Currently cmdguard uses
+                        <code>do.New()</code> which runs all health checks in parallel with no timeouts.
+                    </p>
+                    <div class="opp-code"><code>do.NewWithOpts(&do.InjectorOpts{
+    HealthCheckParallelism:   5,       // max 5 concurrent checks
+    HealthCheckGlobalTimeout: 10 * time.Second,
+    HealthCheckTimeout:       2 * time.Second,
+})</code></div>
+                    <p>
+                        <strong>How to integrate:</strong> Add <code>WithHealthCheckTimeout[T](d)</code> and
+                        <code>WithHealthCheckParallelism[T](n)</code> CLI options. Switch from <code>do.New()</code>
+                        to <code>do.NewWithOpts()</code> in <code>NewScope()</code>.
+                    </p>
+                    <div class="opp-impact">
+                        <div class="impact-tag">⏱️ Timeout control</div>
+                        <div class="impact-tag">🚦 Concurrency limit</div>
+                        <div class="impact-tag">🛡️ Production safety</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Section 4: What's Already Done Well -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-number" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">04</div>
+            <h2>What's Already Done Well</h2>
+        </div>
+        <p class="section-desc">These integrations are solid and don't need changes.</p>
+
+        <div class="arch-diagram">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Implementation</th>
+                        <th>Quality</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Scope</code> wrapping</td>
+                        <td>Clean abstraction with name, parent tracking, path resolution</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>Provide[T]</code> / <code>ProvideNamed[T]</code> / <code>ProvideValue[T]</code></td>
+                        <td>Generic wrappers with nil-safety checks and error wrapping</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>Invoke[T]</code> / <code>InvokeNamed[T]</code></td>
+                        <td>Generic wrappers with nil-safety, zero-value returns</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>Child scope</code> creation</td>
+                        <td>Parent tracking, path resolution, scope tree navigation</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>Shutdown</code> + <code>ShutdownAll</code></td>
+                        <td>Child→parent cascade with error collection via errors.Join</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>HealthCheck</code> variants (4 methods)</td>
+                        <td>WithContext variants, per-service results, first-error helpers</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>Package[T]</code></td>
+                        <td>CLI + Scope + DI registration in one call — great DX</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>ScopedProvider[T]</code></td>
+                        <td>Per-scope service isolation for plugins</td>
+                        <td><span class="badge badge-used">Good</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>DoctorCommand</code></td>
+                        <td>Integrates DI health checks into CLI command — unique feature</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>CLI → Scope → Injector</code> access</td>
+                        <td>Full chain: cli.Scope().Injector() for raw samber/do access</td>
+                        <td><span class="badge badge-used">Excellent</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Section 5: Implementation Roadmap -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-number" style="background: rgba(139, 92, 246, 0.12); color: var(--accent-purple);">05</div>
+            <h2>Implementation Roadmap</h2>
+        </div>
+        <p class="section-desc">Phased plan to maximize samber/do v2 utilization.</p>
+
+        <div class="timeline">
+            <div class="timeline-item phase-1">
+                <div class="timeline-phase">Phase 1 — Foundation (High Impact, Low Effort)</div>
+                <div class="timeline-title">Switch to NewWithOpts + Lifecycle Hooks</div>
+                <div class="timeline-desc">
+                    Change <code>NewScope()</code> from <code>do.New()</code> to <code>do.NewWithOpts()</code>.
+                    Add <code>WithDIHooks[T](...)</code> and <code>WithDILogging[T](fn)</code> CLI options.
+                    Wire lifecycle hooks for observability. Integrate ShutdownOnSignals with existing signal handling.
+                </div>
+                <div class="timeline-items">
+                    <span class="timeline-tag">NewWithOpts</span>
+                    <span class="timeline-tag">InjectorOpts</span>
+                    <span class="timeline-tag">HookBeforeInvocation</span>
+                    <span class="timeline-tag">HookAfterInvocation</span>
+                    <span class="timeline-tag">ShutdownOnSignals</span>
+                    <span class="timeline-tag">Logf</span>
+                </div>
+            </div>
+
+            <div class="timeline-item phase-1">
+                <div class="timeline-phase">Phase 1 — Testing Support</div>
+                <div class="timeline-title">Override + Clone for Test Isolation</div>
+                <div class="timeline-desc">
+                    Add <code>Override[T]</code>, <code>OverrideValue[T]</code>, <code>CloneScope()</code> wrappers.
+                    Document the pattern in examples/taskctl and AGENTS.md.
+                </div>
+                <div class="timeline-items">
+                    <span class="timeline-tag">Override[T]</span>
+                    <span class="timeline-tag">OverrideValue[T]</span>
+                    <span class="timeline-tag">injector.Clone()</span>
+                    <span class="timeline-tag">Test pattern docs</span>
+                </div>
+            </div>
+
+            <div class="timeline-item phase-2">
+                <div class="timeline-phase">Phase 2 — API Completeness</div>
+                <div class="timeline-title">Transient, Aliasing, Per-Service Lifecycle</div>
+                <div class="timeline-desc">
+                    Add wrappers for <code>ProvideTransient[T]</code>, <code>As[T, Interface]</code>,
+                    <code>InvokeAs[T]</code>, <code>HealthCheckService[T]</code>, <code>ShutdownService[T]</code>.
+                    These complete the DI API surface.
+                </div>
+                <div class="timeline-items">
+                    <span class="timeline-tag">ProvideTransient[T]</span>
+                    <span class="timeline-tag">As[T, Interface]</span>
+                    <span class="timeline-tag">InvokeAs[T]</span>
+                    <span class="timeline-tag">HealthCheckService[T]</span>
+                    <span class="timeline-tag">ShutdownService[T]</span>
+                    <span class="timeline-tag">HealthCheckTimeout opts</span>
+                </div>
+            </div>
+
+            <div class="timeline-item phase-3">
+                <div class="timeline-phase">Phase 3 — Developer Experience</div>
+                <div class="timeline-title">Debug Command + Introspection</div>
+                <div class="timeline-desc">
+                    Add <code>DIDebugCommand[T](cli)</code> with <code>list</code>, <code>graph</code>,
+                    <code>explain</code>, <code>scopes</code> subcommands. Expose <code>ListProvidedServices()</code>,
+                    <code>ExplainInjector()</code>, <code>ExplainService[T]()</code>.
+                </div>
+                <div class="timeline-items">
+                    <span class="timeline-tag">ExplainInjector()</span>
+                    <span class="timeline-tag">ExplainService[T]()</span>
+                    <span class="timeline-tag">ListProvidedServices()</span>
+                    <span class="timeline-tag">DIDebugCommand</span>
+                    <span class="timeline-tag">Scope tree visualization</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 6: Summary Scorecard -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-number" style="background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan);">06</div>
+            <h2>Summary Scorecard</h2>
+        </div>
+
+        <div class="score-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">Overall Utilization</span>
+                </div>
+                <div class="score-value" style="color: var(--accent-yellow);">24%</div>
+                <div class="score-detail">13 of 54 API symbols used</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 24%; background: var(--gradient-orange);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">After Phase 1</span>
+                </div>
+                <div class="score-value" style="color: var(--accent-green);">43%</div>
+                <div class="score-detail">23 of 54 — hooks, override, clone, signals, logging</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 43%; background: var(--gradient-green);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">After Phase 2</span>
+                </div>
+                <div class="score-value" style="color: var(--accent-green);">59%</div>
+                <div class="score-detail">32 of 54 — complete DI API surface</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 59%; background: var(--gradient-green);"></div>
+                </div>
+            </div>
+            <div class="score-card">
+                <div class="card-header">
+                    <span class="card-title">After Phase 3</span>
+                </div>
+                <div class="score-value" style="color: var(--accent-cyan);">72%</div>
+                <div class="score-detail">39 of 54 — full lifecycle + debug + introspection</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 72%; background: var(--gradient-blue);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arch-diagram" style="margin-top: 32px;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">Verdict</h3>
+            <p style="color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem;">
+                cmdguard uses the <strong>core DI primitives well</strong> — service registration, invocation, scope management,
+                health checks, and shutdown are all solid. The integration quality is high: generic wrappers with nil-safety,
+                error wrapping, and clean abstractions.
+            </p>
+            <p style="color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem; margin-top: 12px;">
+                The gaps are in <strong style="color: var(--accent-red);">observability</strong> (lifecycle hooks, logging),
+                <strong style="color: var(--accent-red);">production safety</strong> (ShutdownOnSignals, health check timeouts),
+                <strong style="color: var(--accent-yellow);">testing</strong> (Override, Clone), and
+                <strong style="color: var(--accent-yellow);">advanced patterns</strong> (transient, aliasing, introspection).
+            </p>
+            <p style="color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem; margin-top: 12px;">
+                The biggest ROI comes from Phase 1: switching <code>do.New()</code> → <code>do.NewWithOpts()</code> unlocks
+                6 lifecycle hooks, custom logging, and health check timeouts with a single-line change. Adding <code>ShutdownOnSignals</code>
+                turns the existing signal handling from "context cancellation" into true graceful shutdown.
+                These are <strong>high-impact, low-effort</strong> wins that would bring cmdguard to the next level.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>cmdguard × samber/do v2 Research Report — June 2026</p>
+        <p style="margin-top: 8px;">Generated from source code analysis of <code>samber/do v2.0.0</code> (54 public API symbols) against <code>cmdguard v2.5.0</code></p>
+    </div>
+</footer>
+
+</body>
+</html>

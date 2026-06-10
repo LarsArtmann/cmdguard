@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"charm.land/fang/v2"
+	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -40,6 +41,8 @@ type CLI[T any] struct {
 	glamourHelp      bool
 	glamourTheme     string
 	noColorFlag      *bool
+	gracefulShutdown bool
+	diLogf           func(string, ...any)
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -77,7 +80,13 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 
 func (cli *CLI[T]) initialize(defaults T) error {
 	if cli.scope == nil {
-		cli.scope = NewScope(cli.name)
+		if cli.diLogf != nil {
+			cli.scope = NewScopeWithOpts(cli.name, &do.InjectorOpts{
+				Logf: cli.diLogf,
+			})
+		} else {
+			cli.scope = NewScope(cli.name)
+		}
 	}
 
 	cfg := defaults
@@ -191,6 +200,7 @@ func (cli *CLI[T]) applyNoColorIfSet() {
 // Execute runs the CLI application.
 // The context is wrapped with a BranchingFlowContext for command path tracking.
 // If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
+// If WithGracefulShutdown was set, DI services are shut down on signal after command completes.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	cli.applyGlamourIfEnabled()
 	cli.applyNoColorIfSet()
@@ -200,6 +210,10 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 
 		ctx, cancel = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 		defer cancel()
+
+		if cli.gracefulShutdown {
+			defer cli.scope.Shutdown(context.Background())
+		}
 	}
 
 	if cli.flowCtx == nil {
