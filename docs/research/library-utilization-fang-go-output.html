@@ -64,16 +64,16 @@
 
     <div class="summary">
       <div class="summary-item">
-        <div class="number" style="color: var(--accent-green);">6</div>
-        <div class="label">Public Options</div>
+        <div class="number" style="color: var(--accent-green);">8</div>
+        <div class="label">Public Symbols</div>
       </div>
       <div class="summary-item">
-        <div class="number" style="color: var(--accent-green);">2</div>
-        <div class="label">Used by cmdguard</div>
+        <div class="number" style="color: var(--accent-green);">4</div>
+        <div class="label">Integrated</div>
       </div>
       <div class="summary-item">
-        <div class="number" style="color: var(--accent-yellow);">4</div>
-        <div class="label">Not surfaced</div>
+        <div class="number" style="color: var(--accent-yellow);">3</div>
+        <div class="label">Remaining gaps</div>
       </div>
     </div>
 
@@ -86,27 +86,27 @@
         <tr>
           <td><code>fang.Execute(ctx, cmd, opts...)</code></td>
           <td>Core entry point — styled help, errors, version</td>
-          <td><span class="tag tag-used">USED</span> via <code>WithFang</code> option</td>
+          <td><span class="tag tag-used">INTEGRATED</span> via <code>WithFang</code> option</td>
         </tr>
         <tr>
           <td><code>fang.WithVersion(v)</code></td>
           <td>Semantic version string for <code>--version</code></td>
-          <td><span class="tag tag-unused">NOT SURFACED</span> cmdguard has its own <code>VersionCommand</code></td>
+          <td><span class="tag tag-used">INTEGRATED</span> auto-piped via <code>WithCLIVersion</code></td>
         </tr>
         <tr>
           <td><code>fang.WithCommit(c)</code></td>
           <td>Git commit hash appended to version</td>
-          <td><span class="tag tag-unused">NOT SURFACED</span> could add to <code>WithCLIVersion</code></td>
+          <td><span class="tag tag-used">INTEGRATED</span> auto-piped via <code>WithCLICommit</code></td>
         </tr>
         <tr>
           <td><code>fang.WithNotifySignal(sig...)</code></td>
           <td>Graceful shutdown on OS signals</td>
-          <td><span class="tag tag-gap">OVERLAP</span> cmdguard has own <code>WithSignalHandling</code>/<code>WithGracefulShutdown</code></td>
+          <td><span class="tag tag-low">INTENTIONAL SKIP</span> cmdguard has own <code>WithSignalHandling</code>/<code>WithGracefulShutdown</code> with DI-aware shutdown</td>
         </tr>
         <tr>
           <td><code>fang.WithoutManpage()</code></td>
           <td>Disable auto man page subcommand</td>
-          <td><span class="tag tag-unused">NOT SURFACED</span> cmdguard has its own <code>ManPage()</code></td>
+          <td><span class="tag tag-low">INTENTIONAL SKIP</span> cmdguard has its own <code>ManPage()</code> helper</td>
         </tr>
         <tr>
           <td><code>fang.WithErrorHandler(fn)</code></td>
@@ -126,10 +126,11 @@
       </tbody>
     </table>
 
-    <h3>How cmdguard Uses fang</h3>
+    <h3>How cmdguard Integrates with fang</h3>
     <div class="card">
       <p><strong>Integration point:</strong> <code>cli.go</code> — <code>fang.Execute(flowCtx, cli.rootCmd, cli.fangOpts...)</code></p>
-      <p><strong>Control:</strong> <code>WithFang(true/false)</code> enables/disables; <code>WithFangOptions(opts...)</code> passes through fang options</p>
+      <p><strong>Control:</strong> <code>WithFang(true/false)</code> enables/disables; <code>WithFangOptions(opts...)</code> passes through raw fang options</p>
+      <p><strong>Version/Commit:</strong> <code>WithCLIVersion</code> auto-appends <code>fang.WithVersion</code>; <code>WithCLICommit</code> auto-appends <code>fang.WithCommit</code> — single option controls both cmdguard and fang</p>
       <p><strong>NO_COLOR:</strong> <code>applyNoColorIfSet()</code> sets <code>NO_COLOR=1</code> before fang execution when <code>--no-color</code> flag is set; fang's colorprofile picks it up automatically</p>
     </div>
 
@@ -144,16 +145,6 @@
     <div class="rec-box priority-low">
       <p><strong>LOW — Expose <code>WithColorSchemeFunc</code></strong></p>
       <p>Allow custom color themes. Niche — most CLIs are fine with fang defaults. Could be exposed as <code>WithFangColorScheme[T](fn)</code>.</p>
-    </div>
-
-    <div class="rec-box priority-low">
-      <p><strong>LOW — Expose <code>WithVersion</code>+<code>WithCommit</code></strong></p>
-      <p>These overlap with cmdguard's own <code>WithCLIVersion</code> and <code>VersionCommand</code>. fang's version flag is simpler (just prints string); cmdguard's is richer (separate subcommand). Keep cmdguard's approach.</p>
-    </div>
-
-    <div class="rec-box priority-low">
-      <p><strong>LOW — <code>WithNotifySignal</code> overlap</strong></p>
-      <p>cmdguard has its own signal handling (<code>WithSignalHandling</code>, <code>WithGracefulShutdown</code>) via context cancellation. fang's approach is similar but less DI-aware. Keep cmdguard's approach — it integrates with samber/do shutdown.</p>
     </div>
 
     <!-- ============================================================ -->
@@ -264,8 +255,8 @@
         <tbody>
           <tr>
             <td>fang/v2</td>
-            <td>2/6 options used, core execution used</td>
-            <td style="color: var(--accent-green);">B+</td>
+            <td>4/8 symbols integrated (Execute, WithVersion, WithCommit + passthrough)</td>
+            <td style="color: var(--accent-green);">A</td>
             <td>Custom error handler not exposed</td>
           </tr>
           <tr>
@@ -297,6 +288,7 @@
 
     <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 3rem;">
       Research conducted June 2026 · cmdguard v2.5.0 · fang v2.0.1 · go-output v0.8.0
+      <br/>Updated after fang integration: <code>WithCLIVersion</code> → <code>fang.WithVersion</code>, <code>WithCLICommit</code> → <code>fang.WithCommit</code>
     </p>
   </body>
 </html>
