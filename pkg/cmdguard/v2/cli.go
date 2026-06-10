@@ -189,11 +189,23 @@ func (cli *CLI[T]) applyGlamourIfEnabled() {
 	}
 }
 
-// applyNoColorIfSet sets the NO_COLOR env var if --no-color was passed.
-// This must be called after cobra parses flags but before fang reads color capabilities.
-func (cli *CLI[T]) applyNoColorIfSet() {
-	if cli.useFang && cli.noColorFlag != nil && *cli.noColorFlag {
-		_ = os.Setenv("NO_COLOR", "1")
+// applyNoColorIfSet temporarily sets NO_COLOR=1 around fang execution
+// if --no-color was passed. The original value is restored after execution
+// to avoid process-wide env mutation.
+func (cli *CLI[T]) applyNoColorIfSet() func() {
+	if !cli.useFang || cli.noColorFlag == nil || !*cli.noColorFlag {
+		return func() {}
+	}
+
+	previous := os.Getenv("NO_COLOR")
+	_ = os.Setenv("NO_COLOR", "1")
+
+	return func() {
+		if previous == "" {
+			_ = os.Unsetenv("NO_COLOR")
+		} else {
+			_ = os.Setenv("NO_COLOR", previous)
+		}
 	}
 }
 
@@ -203,7 +215,8 @@ func (cli *CLI[T]) applyNoColorIfSet() {
 // If WithGracefulShutdown was set, DI services are shut down on signal after command completes.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	cli.applyGlamourIfEnabled()
-	cli.applyNoColorIfSet()
+	restoreNoColor := cli.applyNoColorIfSet()
+	defer restoreNoColor()
 
 	if cli.signalHandling {
 		var cancel context.CancelFunc

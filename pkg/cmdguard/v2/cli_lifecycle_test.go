@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
@@ -381,4 +382,57 @@ func TestCLINoColorEnvVar(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ExecuteWithArgs failed: %v", err)
 	}
+}
+
+func TestCLINoColorRestoresEnvVar(t *testing.T) {
+	//nolint:paralleltest // mutates process-wide env var
+	t.Run("restores NO_COLOR after execution", func(t *testing.T) {
+		os.Unsetenv("NO_COLOR")
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+			v2.WithFang[testCLIConfig](false))
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
+		if err := v2.AddCommand(cli, cmd); err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(t.Context(), []string{"--no-color", "run"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+
+		_, set := os.LookupEnv("NO_COLOR")
+		if set {
+			t.Error("NO_COLOR should be unset after execution (was not set before)")
+		}
+	})
+
+	t.Run("restores previous NO_COLOR value", func(t *testing.T) {
+		t.Setenv("NO_COLOR", "0")
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+			v2.WithFang[testCLIConfig](false))
+		if err != nil {
+			t.Fatalf("NewCLI failed: %v", err)
+		}
+
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
+		if err := v2.AddCommand(cli, cmd); err != nil {
+			t.Fatalf("AddCommand failed: %v", err)
+		}
+
+		err = cli.ExecuteWithArgs(t.Context(), []string{"--no-color", "run"})
+		if err != nil {
+			t.Fatalf("ExecuteWithArgs failed: %v", err)
+		}
+
+		got := os.Getenv("NO_COLOR")
+		if got != "0" {
+			t.Errorf("NO_COLOR = %q, want %q", got, "0")
+		}
+	})
 }
