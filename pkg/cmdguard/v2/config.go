@@ -43,11 +43,11 @@ func ValidateConfig(cfg any) error {
 		return fmt.Errorf("%w: dereferencing config %T: %w", ErrConfigNotPointer, cfg, err)
 	}
 
-	return validateStruct(v, cfg)
+	return validateStructWithRegistry(v, cfg, globalValidators)
 }
 
-// validateStruct validates all fields of a struct.
-func validateStruct(v reflect.Value, cfg any) error {
+// validateStructWithRegistry validates all fields of a struct using the given validator registry.
+func validateStructWithRegistry(v reflect.Value, cfg any, vr *validatorRegistry) error {
 	var errs []error
 
 	tags, err := ParseFlagTags(cfg)
@@ -56,7 +56,7 @@ func validateStruct(v reflect.Value, cfg any) error {
 	}
 
 	for _, tag := range tags {
-		err := validateTag(v, tag)
+		err := validateTagWithRegistry(v, tag, vr)
 		if err != nil {
 			errs = append(errs, err)
 		}
@@ -69,8 +69,8 @@ func validateStruct(v reflect.Value, cfg any) error {
 	return nil
 }
 
-// validateTag validates a single flag tag against its field.
-func validateTag(v reflect.Value, tag FlagTag) error {
+// validateTagWithRegistry validates a single flag tag using the given validator registry.
+func validateTagWithRegistry(v reflect.Value, tag FlagTag, vr *validatorRegistry) error {
 	field := v.FieldByName(tag.Field)
 	if !field.IsValid() {
 		return nil
@@ -88,7 +88,7 @@ func validateTag(v reflect.Value, tag FlagTag) error {
 	}
 
 	if tag.Validate != "" {
-		err := validateFieldByKind(field, tag)
+		err := validateFieldByKind(field, tag, vr)
 		if err != nil {
 			return NewConfigError(tag.Field, err)
 		}

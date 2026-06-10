@@ -87,24 +87,6 @@ func lookupValidator(name string) (FlagValidator, bool) {
 	return globalValidators.lookup(name)
 }
 
-// runValidateTag runs all validators specified in a validate tag.
-// The tag format is a comma-separated list: "email,min=5,max=100".
-// Returns the first validation error encountered.
-func runValidateTag(tag, value string) error {
-	rules, err := parseValidateRules(tag)
-	if err != nil {
-		return fmt.Errorf("parsing validation rules: %w", err)
-	}
-
-	for _, rule := range rules {
-		if err := rule.Validate(value); err != nil {
-			return fmt.Errorf("validation rule %q failed: %w", rule.Name, err)
-		}
-	}
-
-	return nil
-}
-
 // validateRule is a parsed validator rule with its parameter.
 type validateRule struct {
 	Name      string
@@ -324,12 +306,28 @@ func validateNonEmpty(value string) error {
 }
 
 // validateFieldByKind runs type-appropriate validation for a reflected field value.
-func validateFieldByKind(field reflect.Value, tag FlagTag) error {
+func validateFieldByKind(field reflect.Value, tag FlagTag, vr *validatorRegistry) error {
 	if tag.Validate == "" {
 		return nil
 	}
 
 	strValue := formatFieldValue(field)
 
-	return runValidateTag(tag.Validate, strValue)
+	return runValidateTagWithRegistry(tag.Validate, strValue, vr)
+}
+
+// runValidateTagWithRegistry runs all validators specified in a validate tag using the given registry.
+func runValidateTagWithRegistry(tag, value string, vr *validatorRegistry) error {
+	rules, err := parseValidateRulesWithRegistry(tag, vr)
+	if err != nil {
+		return fmt.Errorf("parsing validation rules: %w", err)
+	}
+
+	for _, rule := range rules {
+		if err := rule.Validate(value); err != nil {
+			return fmt.Errorf("validation rule %q failed: %w", rule.Name, err)
+		}
+	}
+
+	return nil
 }
