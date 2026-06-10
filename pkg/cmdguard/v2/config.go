@@ -77,8 +77,8 @@ func validateTagWithRegistry(v reflect.Value, tag FlagTag, vr *validatorRegistry
 	}
 
 	if len(tag.Values) > 0 {
-		value, ok := getFieldValue(field)
-		if !ok {
+		value := formatFieldValue(field)
+		if value == "" {
 			return nil
 		}
 
@@ -95,25 +95,6 @@ func validateTagWithRegistry(v reflect.Value, tag FlagTag, vr *validatorRegistry
 	}
 
 	return nil
-}
-
-// getFieldValue extracts the string value from a field.
-func getFieldValue(field reflect.Value) (string, bool) {
-	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
-	case reflect.String:
-		return field.String(), true
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
-		reflect.Float32, reflect.Float64,
-		reflect.Bool, reflect.Complex64, reflect.Complex128:
-		if s, ok := field.Interface().(fmt.Stringer); ok {
-			return s.String(), true
-		}
-
-		return "", false
-	default:
-		return "", false
-	}
 }
 
 // MergeConfigs merges multiple config sources.
