@@ -81,6 +81,12 @@
 //
 // Services can implement HealthCheck and Shutdown for lifecycle management.
 //
+// For testing, clone the scope and override services with mocks:
+//
+//	cloned := v2.CloneScope(scope)
+//	v2.OverrideValue(cloned, &MockDatabase{})
+//	mockDB, _ := v2.Invoke[*Database](cloned)
+//
 // # Command Options
 //
 // Commands are created via constructors and configured with functional options:
@@ -107,14 +113,16 @@
 //
 // Configure the root CLI with options passed to NewCLI:
 //
-//	WithCLIVersion[T](v)          // Version string
-//	WithEnvPrefix[T](prefix)      // Prefix for env var lookups
-//	WithSignalHandling[T]()       // Cancel context on SIGINT/SIGTERM
-//	WithMiddleware[T](mw...)      // Wrap all command handlers
-//	WithStrictValidation[T]()     // Require WithShort on all commands
-//	WithConfigValidation[T](fn)   // Validate config after flag parsing
-//	WithConfigFile[T](paths...)   // Load JSON config before flags
-//	WithFang[T](bool)             // Styled help output
+//	WithCLIVersion[T](v)              // Version string
+//	WithEnvPrefix[T](prefix)          // Prefix for env var lookups
+//	WithSignalHandling[T]()           // Cancel context on SIGINT/SIGTERM
+//	WithGracefulShutdown[T]()         // Graceful DI shutdown on SIGINT/SIGTERM
+//	WithDILogging[T](logf)            // Internal DI container logging
+//	WithMiddleware[T](mw...)          // Wrap all command handlers
+//	WithStrictValidation[T]()         // Require WithShort on all commands
+//	WithConfigValidation[T](fn)       // Validate config after flag parsing
+//	WithConfigFile[T](paths...)       // Load JSON config before flags
+//	WithFang[T](bool)                 // Styled help output
 //
 // # Error Handling
 //

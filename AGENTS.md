@@ -626,13 +626,16 @@ go build ./...                                   # Verify build
 38. **Zero panics** — All Must* functions removed in v2.5.0. Every function returns errors. No `MustNewCommand`, `MustInvoke`, `MustParse*`, etc.
 39. **WithGracefulShutdown** — `WithGracefulShutdown[T]()` enables graceful DI shutdown on SIGINT/SIGTERM. Implies `WithSignalHandling`. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order. `WithSignalHandling` only cancels context and does NOT trigger DI shutdown
 40. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke
-41. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option
+38. **Zero panics** — All Must* functions removed in v2.5.0. Every function returns errors. No `MustNewCommand`, `MustInvoke`, `MustParse*`, etc.
 39. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
 40. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
 41. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use
 42. **configload.Auto()** — tries YAML → TOML → JSON sequentially (not file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first; use `LoaderForPath()` for precise format detection when the file extension is known
 43. **ShutdownAll error chain** — `Shutdown()` wraps with `ErrServiceConstruction` once; `ShutdownAll` collects these without additional wrapping (fixed double-wrap in v2.4.0)
 44. **Arg validators return errors** — `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs` now set an error on the command if given invalid args (negative n, min > max) instead of panicking. The error is surfaced by `NewCommand`/`NewParentCommand`.
+45. **WithGracefulShutdown** — `WithGracefulShutdown[T]()` enables graceful DI shutdown on SIGINT/SIGTERM. Implies `WithSignalHandling`. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order. `WithSignalHandling` only cancels context and does NOT trigger DI shutdown.
+46. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke.
+47. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option.
 
 ---
 

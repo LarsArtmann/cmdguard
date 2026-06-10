@@ -11,7 +11,7 @@
 //   - Command groups (WithGroup)
 //   - Subcommands via NewParentCommand
 //   - Error handling with typed errors and exit codes
-//   - Signal handling for graceful shutdown
+//   - Graceful shutdown with DI service cleanup (WithGracefulShutdown)
 //   - Config file loading (JSON)
 //   - Shell completion via WithCompletion
 //   - Hidden and deprecated commands
@@ -55,7 +55,7 @@ func main() {
 			}
 			return nil
 		}),
-		v2.WithSignalHandling[AppConfig](),
+		v2.WithGracefulShutdown[AppConfig](),
 		v2.WithStrictValidation[AppConfig](),
 		v2.WithMiddleware[AppConfig](
 			v2.SpinnerMiddleware[AppConfig]("Working..."),

@@ -212,7 +212,8 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		defer cancel()
 
 		if cli.gracefulShutdown {
-			defer cli.scope.Shutdown(context.Background())
+			shutdownCtx := context.WithoutCancel(ctx)
+			defer func() { _ = cli.scope.Shutdown(shutdownCtx) }()
 		}
 	}
 

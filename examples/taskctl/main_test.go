@@ -836,3 +836,37 @@ func TestFlagError_WithSuggestion(t *testing.T) {
 		t.Errorf("FlagError should contain flag name: %v", flagErr)
 	}
 }
+
+func TestCloneAndOverride(t *testing.T) {
+	t.Parallel()
+
+	t.Run("cloned CLI uses overridden TaskStore", func(t *testing.T) {
+		t.Parallel()
+
+		cli := newTestCLI(t)
+
+		clonedScope := v2.CloneScope(cli.Scope())
+
+		overrideStore := &TaskStore{tasks: []Task{
+			{ID: 99, Title: "mocked task", Priority: "high", Done: true, CreatedAt: time.Now()},
+		}, next: 100}
+
+		if err := v2.OverrideValue(clonedScope, overrideStore); err != nil {
+			t.Fatalf("OverrideValue failed: %v", err)
+		}
+
+		store, err := v2.Invoke[*TaskStore](clonedScope)
+		if err != nil {
+			t.Fatalf("Invoke on cloned scope failed: %v", err)
+		}
+
+		tasks := store.List("", true)
+		if len(tasks) != 1 {
+			t.Fatalf("expected 1 task from overridden store, got %d", len(tasks))
+		}
+
+		if tasks[0].Title != "mocked task" {
+			t.Errorf("Title = %q, want %q", tasks[0].Title, "mocked task")
+		}
+	})
+}

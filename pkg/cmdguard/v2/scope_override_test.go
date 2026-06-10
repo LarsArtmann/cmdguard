@@ -9,8 +9,12 @@ import (
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
-type realService struct{ Name string }
-type mockService struct{ Name string }
+type realService struct {
+	Name string
+}
+type mockService struct {
+	Name string
+}
 
 func TestOverride(t *testing.T) {
 	t.Parallel()
