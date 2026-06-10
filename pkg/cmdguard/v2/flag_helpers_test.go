@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -310,6 +311,141 @@ func TestCloneAndParseFlags(t *testing.T) {
 
 		if result != (NoFlags{}) {
 			t.Error("expected zero NoFlags")
+		}
+	})
+}
+
+func TestFormatFieldValue(t *testing.T) {
+	t.Parallel()
+
+	t.Run("invalid value returns empty", func(t *testing.T) {
+		t.Parallel()
+
+		result := formatFieldValue(reflect.Value{})
+		if result != "" {
+			t.Errorf("expected empty string, got %q", result)
+		}
+	})
+
+	t.Run("string kind", func(t *testing.T) {
+		t.Parallel()
+
+		v := reflect.ValueOf("hello")
+		if got := formatFieldValue(v); got != "hello" {
+			t.Errorf("got %q, want %q", got, "hello")
+		}
+	})
+
+	t.Run("int kinds", func(t *testing.T) {
+		t.Parallel()
+
+		tests := []struct {
+			name  string
+			value any
+			want  string
+		}{
+			{"int", int(42), "42"},
+			{"int8", int8(8), "8"},
+			{"int16", int16(16), "16"},
+			{"int32", int32(32), "32"},
+			{"int64", int64(64), "64"},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+
+				got := formatFieldValue(reflect.ValueOf(tt.value))
+				if got != tt.want {
+					t.Errorf("got %q, want %q", got, tt.want)
+				}
+			})
+		}
+	})
+
+	t.Run("uint kinds", func(t *testing.T) {
+		t.Parallel()
+
+		tests := []struct {
+			name  string
+			value any
+			want  string
+		}{
+			{"uint", uint(42), "42"},
+			{"uint8", uint8(8), "8"},
+			{"uint16", uint16(16), "16"},
+			{"uint32", uint32(32), "32"},
+			{"uint64", uint64(64), "64"},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+
+				got := formatFieldValue(reflect.ValueOf(tt.value))
+				if got != tt.want {
+					t.Errorf("got %q, want %q", got, tt.want)
+				}
+			})
+		}
+	})
+
+	t.Run("float kind", func(t *testing.T) {
+		t.Parallel()
+
+		got := formatFieldValue(reflect.ValueOf(float64(3.14)))
+		if got != "3.14" {
+			t.Errorf("got %q, want %q", got, "3.14")
+		}
+	})
+
+	t.Run("bool kind", func(t *testing.T) {
+		t.Parallel()
+
+		got := formatFieldValue(reflect.ValueOf(true))
+		if got != "true" {
+			t.Errorf("got %q, want %q", got, "true")
+		}
+	})
+
+	t.Run("pointer dereferences", func(t *testing.T) {
+		t.Parallel()
+
+		s := "pointed"
+		got := formatFieldValue(reflect.ValueOf(&s))
+		if got != "pointed" {
+			t.Errorf("got %q, want %q", got, "pointed")
+		}
+	})
+
+	t.Run("nil pointer returns empty", func(t *testing.T) {
+		t.Parallel()
+
+		var s *string
+		got := formatFieldValue(reflect.ValueOf(s))
+		if got != "" {
+			t.Errorf("expected empty for nil pointer, got %q", got)
+		}
+	})
+
+	t.Run("fmt.Stringer", func(t *testing.T) {
+		t.Parallel()
+
+		s := Duration{duration: 5e9}
+		got := formatFieldValue(reflect.ValueOf(s))
+		if got != "5s" {
+			t.Errorf("got %q, want %q", got, "5s")
+		}
+	})
+
+	t.Run("struct falls through to Sprintf", func(t *testing.T) {
+		t.Parallel()
+
+		type plain struct{ X int }
+
+		got := formatFieldValue(reflect.ValueOf(plain{X: 7}))
+		if got != "{7}" {
+			t.Errorf("got %q, want %q", got, "{7}")
 		}
 	})
 }
