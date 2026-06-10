@@ -179,10 +179,7 @@ func (s *Scope) ShutdownAll(ctx context.Context) error {
 	for current != nil {
 		err := current.Shutdown(ctx)
 		if err != nil {
-			errs = append(
-				errs,
-				fmt.Errorf("%w: scope %q: %w", ErrServiceConstruction, current.name, err),
-			)
+			errs = append(errs, err)
 		}
 
 		current = current.parent
