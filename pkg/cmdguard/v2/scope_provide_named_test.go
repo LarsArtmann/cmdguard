@@ -111,7 +111,7 @@ func TestInvokeNamed(t *testing.T) {
 	})
 }
 
-func TestMustInvoke(t *testing.T) {
+func TestInvokeWithProvidedNamed(t *testing.T) {
 	t.Parallel()
 	t.Run("returns registered service", func(t *testing.T) {
 		t.Parallel()
@@ -146,7 +146,7 @@ func TestMustInvoke(t *testing.T) {
 	})
 }
 
-func TestMustInvokeNamed(t *testing.T) {
+func TestInvokeNamedFromProvidedNamed(t *testing.T) {
 	t.Parallel()
 	t.Run("returns named service", func(t *testing.T) {
 		t.Parallel()
