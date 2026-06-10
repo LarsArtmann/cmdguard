@@ -119,14 +119,14 @@ HELLO, CMDGUARD!
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                 |
 | **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                          |
 | **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`, or write your own |
-| **Interactive prompts**   | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh         |
-| **Markdown help**         | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour |
-| **Color control**         | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor          |
+| **Interactive prompts**    | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh                                      |
+| **Markdown help**          | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour                              |
+| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                       |
 | **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                       |
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
-| **Zero panics**           | All functions return errors; no Must* panic variants                                                 |
-| **368 tests**             | 83.5% coverage, race-detected, fuzz-tested                                                            |
+| **Zero panics**            | All functions return errors; no Must\* panic variants                                                   |
+| **368 tests**              | 83.5% coverage, race-detected, fuzz-tested                                                              |
 
 ---
 
@@ -273,26 +273,26 @@ type Flags struct {
 
 ## Command Options
 
-| Option                          | Purpose                            |
-| ------------------------------- | ---------------------------------- |
-| `WithShort[T, F](short)`        | Short description                  |
-| `WithLong[T, F](long)`          | Long description                   |
-| `WithExample[T, F](example)`    | Example usage                      |
-| `WithAliases[T, F](aliases...)` | Alternative names                  |
-| `WithFlags[T, F](flags)`        | Typed flags struct                 |
-| `WithPreRunE[T, F](fn)`         | Pre-validation hook                |
-| `WithPostRunE[T, F](fn)`        | Post-success cleanup               |
-| `WithHidden[T, F](bool)`        | Hide from help                     |
-| `WithDeprecated[T, F](msg)`     | Deprecation message                |
-| `WithGroupID[T, F](id)`         | Help group name                    |
-| `WithExactArgs[T, F](n)`        | Require exactly n positional args  |
-| `WithMinimumArgs[T, F](n)`      | Require at least n positional args |
-| `WithMaximumArgs[T, F](n)`      | Allow at most n positional args    |
+| Option                           | Purpose                            |
+| -------------------------------- | ---------------------------------- |
+| `WithShort[T, F](short)`         | Short description                  |
+| `WithLong[T, F](long)`           | Long description                   |
+| `WithExample[T, F](example)`     | Example usage                      |
+| `WithAliases[T, F](aliases...)`  | Alternative names                  |
+| `WithFlags[T, F](flags)`         | Typed flags struct                 |
+| `WithPreRunE[T, F](fn)`          | Pre-validation hook                |
+| `WithPostRunE[T, F](fn)`         | Post-success cleanup               |
+| `WithHidden[T, F](bool)`         | Hide from help                     |
+| `WithDeprecated[T, F](msg)`      | Deprecation message                |
+| `WithGroupID[T, F](id)`          | Help group name                    |
+| `WithExactArgs[T, F](n)`         | Require exactly n positional args  |
+| `WithMinimumArgs[T, F](n)`       | Require at least n positional args |
+| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args    |
 | `WithValidArgs[T, F](args...)`   | Restrict args to allowed values    |
 | `WithSubcommands[T, F](cmds...)` | Attach child commands (parent)     |
-| `WithRangeArgs[T, F](min, max)` | Require between min and max args   |
-| `WithNoArgs[T, F]()`            | Reject any positional args         |
-| `WithCompletion[T, F](fn)`      | Dynamic shell completion           |
+| `WithRangeArgs[T, F](min, max)`  | Require between min and max args   |
+| `WithNoArgs[T, F]()`             | Reject any positional args         |
+| `WithCompletion[T, F](fn)`       | Dynamic shell completion           |
 
 ---
 

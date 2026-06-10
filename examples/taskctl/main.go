@@ -20,6 +20,7 @@
 //   - BranchingFlowContext for path tracking
 //   - EditInEditor for config editing
 //   - Version command
+//   - DI audit logging via samber-do-auditlog (WithAuditLog + AuditLogCommand)
 //
 // Usage:
 //
@@ -38,16 +39,26 @@ import (
 	"os"
 	"time"
 
+	auditlog "github.com/larsartmann/samber-do-auditlog"
+
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
 func main() {
 	ctx := context.Background()
 
+	// Audit logging — captures DI lifecycle events for observability
+	// Set DO_AUDITLOG_ENABLED=true to enable without changing code.
+	auditPlugin := auditlog.New(auditlog.Config{
+		Enabled:     true,
+		ContainerID: "taskctl",
+	})
+
 	cli, err := v2.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
 		v2.WithCLIVersion[AppConfig]("1.0.0"),
 		v2.WithEnvPrefix[AppConfig]("TASKCTL_"),
+		v2.WithAuditLog[AppConfig](auditPlugin),
 		v2.WithConfigFile[AppConfig]("$HOME/.config/taskctl/config.json"),
 		v2.WithConfigValidation[AppConfig](func(cfg *AppConfig) error {
 			if cfg.DataDir == "" {

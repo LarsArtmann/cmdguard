@@ -30,7 +30,8 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 
 		svc := &gracefulShutdownService{}
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithGracefulShutdown[testCLIConfig](),
 			v2.WithFang[testCLIConfig](false),
 		)
@@ -68,7 +69,8 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 	t.Run("works without Shutdowner services", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithGracefulShutdown[testCLIConfig](),
 			v2.WithFang[testCLIConfig](false),
 		)
@@ -94,7 +96,8 @@ func TestGracefulShutdown_ImpliesSignalHandling(t *testing.T) {
 	t.Run("WithGracefulShutdown enables gracefulShutdown flag", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithGracefulShutdown[testCLIConfig](),
 		)
 		if err != nil {

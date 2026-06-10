@@ -2,6 +2,7 @@ package v2
 
 import (
 	"charm.land/fang/v2"
+	auditlog "github.com/larsartmann/samber-do-auditlog"
 	"github.com/spf13/cobra"
 )
 
@@ -138,5 +139,17 @@ func WithDILogging[T any](logf func(format string, args ...any)) CLIOption[T] {
 func WithDraconianValidation[T any]() CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.validationMode = Draconian
+	}
+}
+
+// WithAuditLog enables DI audit logging via samber-do-auditlog.
+// The plugin captures service registration, invocation, shutdown, and health check events.
+// Use cli.AuditLog() to access the plugin for reports, exports, and HTML visualization.
+//
+// When Config.Enabled is false (the zero value), the plugin checks DO_AUDITLOG_ENABLED.
+// Set it to "true", "1", or "yes" to enable audit logging without changing code.
+func WithAuditLog[T any](plugin *auditlog.Plugin) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.auditLog = plugin
 	}
 }

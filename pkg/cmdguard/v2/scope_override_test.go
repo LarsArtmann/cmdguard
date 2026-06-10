@@ -12,9 +12,6 @@ import (
 type realService struct {
 	Name string
 }
-type mockService struct {
-	Name string
-}
 
 func TestOverride(t *testing.T) {
 	t.Parallel()

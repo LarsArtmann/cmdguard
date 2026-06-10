@@ -395,3 +395,51 @@ func BenchmarkScopeInvoke(b *testing.B) {
 		_ = svc
 	}
 }
+
+// BenchmarkScopeCreationWithOpts measures DI scope creation with InjectorOpts.
+func BenchmarkScopeCreationWithOpts(b *testing.B) {
+	for b.Loop() {
+		scope := v2.NewScopeWithOpts("bench", nil)
+		_ = scope
+	}
+}
+
+// BenchmarkCloneScope measures scope cloning for test isolation.
+func BenchmarkCloneScope(b *testing.B) {
+	scope := v2.NewScope("bench")
+	err := provideBenchService(scope)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	_, err = v2.Invoke[benchService](scope)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	for b.Loop() {
+		cloned := v2.CloneScope(scope)
+		_, err := v2.Invoke[benchService](cloned)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkScopeProvideInvokeCycle measures full register-then-retrieve cycle.
+func BenchmarkScopeProvideInvokeCycle(b *testing.B) {
+	for b.Loop() {
+		scope := v2.NewScope("bench")
+		err := v2.Provide[benchService](scope, func(i do.Injector) (benchService, error) {
+			return benchService{Name: "cycle"}, nil
+		})
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		_, err = v2.Invoke[benchService](scope)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}

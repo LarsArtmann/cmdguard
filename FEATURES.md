@@ -3,6 +3,7 @@
 **Last Updated:** 2026-06-10
 **Version:** 2.5.0
 **Go Version:** 1.26
+**Tests:** 385+ passing, 84.8% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -22,7 +23,7 @@
 
 | Feature                                     | Status              | Notes                                |
 | ------------------------------------------- | ------------------- | ------------------------------------ |
-| `NewCLI[T](name, short, defaults, opts...)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, returns errors     |
+| `NewCLI[T](name, short, defaults, opts...)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, returns errors    |
 | `AddCommand(cli, cmd)`                      | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
 | `Execute(ctx)`                              | ✅ FULLY_FUNCTIONAL | Runs command with context            |
 | `ExecuteWithArgs(ctx, args)`                | ✅ FULLY_FUNCTIONAL | For testing                          |
@@ -48,6 +49,8 @@
 | `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                        |
 | `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups                    |
 | `WithSignalHandling[T]()`      | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation          |
+| `WithGracefulShutdown[T]()`    | ✅ FULLY_FUNCTIONAL | Graceful DI service shutdown on signals        |
+| `WithDILogging[T](logf)`       | ✅ FULLY_FUNCTIONAL | Internal DI container logging                  |
 | `WithOutputFormat[T]()`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection      |
 | `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing            |
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
@@ -58,12 +61,12 @@
 
 ### Command[T, F]
 
-| Feature                                   | Status              | Notes                                                    |
-| ----------------------------------------- | ------------------- | -------------------------------------------------------- |
-| `NewCommand` / `NewParentCommand`         | ✅ FULLY_FUNCTIONAL | Constructors with validation, zero panics                 |
-| `RunE`, `PreRunE`, `PostRunE`             | ✅ FULLY_FUNCTIONAL | Type-safe handlers                                       |
-| `Validate()`                              | ✅ FULLY_FUNCTIONAL | Called by constructors                                   |
-| Command options (21 total)                | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, args validators, etc. |
+| Feature                           | Status              | Notes                                                    |
+| --------------------------------- | ------------------- | -------------------------------------------------------- |
+| `NewCommand` / `NewParentCommand` | ✅ FULLY_FUNCTIONAL | Constructors with validation, zero panics                |
+| `RunE`, `PreRunE`, `PostRunE`     | ✅ FULLY_FUNCTIONAL | Type-safe handlers                                       |
+| `Validate()`                      | ✅ FULLY_FUNCTIONAL | Called by constructors                                   |
+| Command options (21 total)        | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, args validators, etc. |
 
 ### Flag System
 
@@ -97,13 +100,18 @@
 
 ### Dependency Injection
 
-| Feature                      | Status              | Notes                |
-| ---------------------------- | ------------------- | -------------------- |
-| `NewScope(name)`             | ✅ FULLY_FUNCTIONAL | Creates DI scope     |
-| `Provide[T]`, `ProvideValue` | ✅ FULLY_FUNCTIONAL | Register services    |
-| `Invoke[T]`                  | ✅ FULLY_FUNCTIONAL | Get services         |
-| `Child(name)`                | ✅ FULLY_FUNCTIONAL | Hierarchical scopes  |
-| `Shutdown`, `HealthCheck`    | ✅ FULLY_FUNCTIONAL | Lifecycle management |
+| Feature                                 | Status              | Notes                                         |
+| --------------------------------------- | ------------------- | --------------------------------------------- |
+| `NewScope(name)`                        | ✅ FULLY_FUNCTIONAL | Creates DI scope                              |
+| `NewScopeWithOpts(name, opts)`          | ✅ FULLY_FUNCTIONAL | Scope with custom InjectorOpts (logging, etc) |
+| `Provide[T]`, `ProvideValue[T]`         | ✅ FULLY_FUNCTIONAL | Register services                             |
+| `Invoke[T]`, `InvokeNamed[T]`           | ✅ FULLY_FUNCTIONAL | Get services                                  |
+| `Override[T]`, `OverrideValue[T]`       | ✅ FULLY_FUNCTIONAL | Replace services for testing                  |
+| `CloneScope(scope)`                     | ✅ FULLY_FUNCTIONAL | Clone scope for test isolation                |
+| `Child(name)`                           | ✅ FULLY_FUNCTIONAL | Hierarchical scopes                           |
+| `RootScope()`                           | ✅ FULLY_FUNCTIONAL | Navigate to root from any child               |
+| `Shutdown`, `ShutdownAll`               | ✅ FULLY_FUNCTIONAL | Graceful service shutdown                     |
+| `HealthCheck`, `HealthCheckWithContext` | ✅ FULLY_FUNCTIONAL | Lifecycle management                          |
 
 ### Rich Output (go-output)
 
@@ -176,13 +184,13 @@
 
 ### Doctor Command
 
-| Feature                              | Status              | Notes                       |
-| ------------------------------------ | ------------------- | --------------------------- |
-| `DoctorCommand[T](cli, opts...)`     | ✅ FULLY_FUNCTIONAL | Typed doctor subcommand     |
-| `WithDoctorCheck[T](name, run)`      | ✅ FULLY_FUNCTIONAL | Add custom diagnostic check |
-| `WithDoctorShort[T](desc)`           | ✅ FULLY_FUNCTIONAL | Custom short description    |
-| `WithDoctorLong[T](desc)`            | ✅ FULLY_FUNCTIONAL | Custom long description     |
-| `WithDoctorGroupID[T](id)`           | ✅ FULLY_FUNCTIONAL | Command group ID            |
+| Feature                          | Status              | Notes                       |
+| -------------------------------- | ------------------- | --------------------------- |
+| `DoctorCommand[T](cli, opts...)` | ✅ FULLY_FUNCTIONAL | Typed doctor subcommand     |
+| `WithDoctorCheck[T](name, run)`  | ✅ FULLY_FUNCTIONAL | Add custom diagnostic check |
+| `WithDoctorShort[T](desc)`       | ✅ FULLY_FUNCTIONAL | Custom short description    |
+| `WithDoctorLong[T](desc)`        | ✅ FULLY_FUNCTIONAL | Custom long description     |
+| `WithDoctorGroupID[T](id)`       | ✅ FULLY_FUNCTIONAL | Command group ID            |
 
 ### Health Check Results
 
@@ -195,28 +203,28 @@
 
 ### Version Command
 
-| Feature                        | Status              | Notes                                |
-| ------------------------------ | ------------------- | ------------------------------------ |
-| `VersionCommand[T](cli)`       | ✅ FULLY_FUNCTIONAL | Typed version subcommand             |
+| Feature                             | Status              | Notes                                |
+| ----------------------------------- | ------------------- | ------------------------------------ |
+| `VersionCommand[T](cli)`            | ✅ FULLY_FUNCTIONAL | Typed version subcommand             |
 | `GenerateVersionCommand[T](cli, w)` | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
 
 ### Helpers
 
-| Feature          | Status              | Notes                       |
-| ---------------- | ------------------- | --------------------------- |
-| `EditInEditor`   | ✅ FULLY_FUNCTIONAL | Open content in $EDITOR     |
-| `ValueOrDefault` | ✅ FULLY_FUNCTIONAL | Nil-safe value access       |
-| `MergeConfigs`   | ✅ FULLY_FUNCTIONAL | Deep merge config structs   |
+| Feature          | Status              | Notes                     |
+| ---------------- | ------------------- | ------------------------- |
+| `EditInEditor`   | ✅ FULLY_FUNCTIONAL | Open content in $EDITOR   |
+| `ValueOrDefault` | ✅ FULLY_FUNCTIONAL | Nil-safe value access     |
+| `MergeConfigs`   | ✅ FULLY_FUNCTIONAL | Deep merge config structs |
 
 ### Error Handling
 
-| Feature                   | Status              | Notes                                       |
-| ------------------------- | ------------------- | ------------------------------------------- |
-| 60 sentinel errors            | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
-| Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
-| `ExitCoder` / `ExitError` | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
-| FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
-| No panics (all functions return errors) | ✅ FULLY_FUNCTIONAL | Zero panics in library code      |
+| Feature                                 | Status              | Notes                                       |
+| --------------------------------------- | ------------------- | ------------------------------------------- |
+| 60 sentinel errors                      | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
+| Typed errors                            | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
+| `ExitCoder` / `ExitError`               | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
+| FlagError with suggestion               | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
+| No panics (all functions return errors) | ✅ FULLY_FUNCTIONAL | Zero panics in library code                 |
 
 ---
 
@@ -229,7 +237,7 @@
 | `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing          |
 | `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling         |
 | `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts   |
-| `charm.land/glamour/v2`               | v2.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering    |
+| `charm.land/glamour/v2`            | v2.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering    |
 | `go.opentelemetry.io/otel/trace`   | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing |
 | `github.com/larsartmann/go-output` | v0.7.2  | ✅ FULLY_FUNCTIONAL | Rich output formats   |
 

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard — Library Utilization Research: fang/v2 &amp; go-output</title>
+    <style>
+      :root {
+        --bg-primary: #0a0e17;
+        --bg-secondary: #111827;
+        --bg-card: #1a2332;
+        --border: #2a3a50;
+        --border-accent: #3b82f6;
+        --text-primary: #e2e8f0;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --accent-blue: #3b82f6;
+        --accent-green: #10b981;
+        --accent-yellow: #f59e0b;
+        --accent-red: #ef4444;
+        --accent-purple: #8b5cf6;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.7;
+        padding: 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+      h2 { font-size: 1.3rem; color: var(--accent-blue); margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+      h3 { font-size: 1.1rem; color: var(--accent-cyan, #06b6d4); margin: 1.5rem 0 0.5rem; }
+      p { color: var(--text-secondary); margin-bottom: 1rem; }
+      code { background: var(--bg-card); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+      .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1rem 0; }
+      .tag { display: inline-block; padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+      .tag-used { background: #10b98122; color: var(--accent-green); border: 1px solid #10b98144; }
+      .tag-unused { background: #64748b22; color: var(--text-muted); border: 1px solid #64748b44; }
+      .tag-gap { background: #f59e0b22; color: var(--accent-yellow); border: 1px solid #f59e0b44; }
+      .tag-low { background: #64748b22; color: var(--text-muted); border: 1px solid #64748b44; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+      th, td { text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+      th { color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; }
+      .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+      .summary-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; text-align: center; }
+      .summary-item .number { font-size: 2rem; font-weight: 700; }
+      .summary-item .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem; }
+      .rec-box { border-left: 3px solid var(--accent-blue); padding-left: 1rem; margin: 0.5rem 0; }
+      .priority-high { border-left-color: var(--accent-green); }
+      .priority-medium { border-left-color: var(--accent-yellow); }
+      .priority-low { border-left-color: var(--text-muted); }
+      .section-meta { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Library Utilization Research: fang/v2 &amp; go-output</h1>
+    <p class="section-meta">cmdguard v2.5.0 · June 2026 · Post-sprint cleanup</p>
+
+    <!-- ============================================================ -->
+    <h2>1. charm.land/fang/v2 — Styled Cobra Execution</h2>
+
+    <div class="summary">
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green);">6</div>
+        <div class="label">Public Options</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green);">2</div>
+        <div class="label">Used by cmdguard</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-yellow);">4</div>
+        <div class="label">Not surfaced</div>
+      </div>
+    </div>
+
+    <h3>fang/v2 API Surface</h3>
+    <table>
+      <thead>
+        <tr><th>Option</th><th>Purpose</th><th>cmdguard Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>fang.Execute(ctx, cmd, opts...)</code></td>
+          <td>Core entry point — styled help, errors, version</td>
+          <td><span class="tag tag-used">USED</span> via <code>WithFang</code> option</td>
+        </tr>
+        <tr>
+          <td><code>fang.WithVersion(v)</code></td>
+          <td>Semantic version string for <code>--version</code></td>
+          <td><span class="tag tag-unused">NOT SURFACED</span> cmdguard has its own <code>VersionCommand</code></td>
+        </tr>
+        <tr>
+          <td><code>fang.WithCommit(c)</code></td>
+          <td>Git commit hash appended to version</td>
+          <td><span class="tag tag-unused">NOT SURFACED</span> could add to <code>WithCLIVersion</code></td>
+        </tr>
+        <tr>
+          <td><code>fang.WithNotifySignal(sig...)</code></td>
+          <td>Graceful shutdown on OS signals</td>
+          <td><span class="tag tag-gap">OVERLAP</span> cmdguard has own <code>WithSignalHandling</code>/<code>WithGracefulShutdown</code></td>
+        </tr>
+        <tr>
+          <td><code>fang.WithoutManpage()</code></td>
+          <td>Disable auto man page subcommand</td>
+          <td><span class="tag tag-unused">NOT SURFACED</span> cmdguard has its own <code>ManPage()</code></td>
+        </tr>
+        <tr>
+          <td><code>fang.WithErrorHandler(fn)</code></td>
+          <td>Custom error display (writer + styles + error)</td>
+          <td><span class="tag tag-gap">GAP</span> users cannot customize error formatting</td>
+        </tr>
+        <tr>
+          <td><code>fang.WithColorSchemeFunc(fn)</code></td>
+          <td>Custom color scheme for fang output</td>
+          <td><span class="tag tag-gap">GAP</span> no theme customization exposed</td>
+        </tr>
+        <tr>
+          <td><code>fang.Styles</code> type</td>
+          <td>Lipgloss styles for help/error rendering</td>
+          <td><span class="tag tag-low">INTERNAL</span> used internally via <code>WithErrorHandler</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>How cmdguard Uses fang</h3>
+    <div class="card">
+      <p><strong>Integration point:</strong> <code>cli.go</code> — <code>fang.Execute(flowCtx, cli.rootCmd, cli.fangOpts...)</code></p>
+      <p><strong>Control:</strong> <code>WithFang(true/false)</code> enables/disables; <code>WithFangOptions(opts...)</code> passes through fang options</p>
+      <p><strong>NO_COLOR:</strong> <code>applyNoColorIfSet()</code> sets <code>NO_COLOR=1</code> before fang execution when <code>--no-color</code> flag is set; fang's colorprofile picks it up automatically</p>
+    </div>
+
+    <h3>Recommendations</h3>
+
+    <div class="rec-box priority-medium">
+      <p><strong>MEDIUM — Expose <code>WithErrorHandler</code></strong></p>
+      <p>Add <code>WithFangErrorHandler[T](fn)</code> CLI option so users can customize error formatting. Currently errors always use fang's default styled output. Power users may want structured error output or custom branding.</p>
+      <p><em>Effort:</em> ~15 lines in <code>cli_options.go</code>, just appends to <code>cli.fangOpts</code>.</p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <p><strong>LOW — Expose <code>WithColorSchemeFunc</code></strong></p>
+      <p>Allow custom color themes. Niche — most CLIs are fine with fang defaults. Could be exposed as <code>WithFangColorScheme[T](fn)</code>.</p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <p><strong>LOW — Expose <code>WithVersion</code>+<code>WithCommit</code></strong></p>
+      <p>These overlap with cmdguard's own <code>WithCLIVersion</code> and <code>VersionCommand</code>. fang's version flag is simpler (just prints string); cmdguard's is richer (separate subcommand). Keep cmdguard's approach.</p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <p><strong>LOW — <code>WithNotifySignal</code> overlap</strong></p>
+      <p>cmdguard has its own signal handling (<code>WithSignalHandling</code>, <code>WithGracefulShutdown</code>) via context cancellation. fang's approach is similar but less DI-aware. Keep cmdguard's approach — it integrates with samber/do shutdown.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2>2. go-output v0.8.0 — Rich Output Formats</h2>
+
+    <div class="summary">
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green);">16</div>
+        <div class="label">Formats Available</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green);">12</div>
+        <div class="label">Exposed by cmdguard</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-yellow);">4</div>
+        <div class="label">Missing</div>
+      </div>
+    </div>
+
+    <h3>Format Coverage</h3>
+    <table>
+      <thead>
+        <tr><th>Format</th><th>Constant</th><th>Shape</th><th>cmdguard Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Table</td><td><code>FormatTable</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>JSON</td><td><code>FormatJSON</code></td><td>Table, Any</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>CSV</td><td><code>FormatCSV</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>TSV</td><td><code>FormatTSV</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>Markdown</td><td><code>FormatMarkdown</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>XML</td><td><code>FormatXML</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>D2</td><td><code>FormatD2</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>YAML</td><td><code>FormatYAML</code></td><td>Table, Any</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>HTML</td><td><code>FormatHTML</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>Tree</td><td><code>FormatTree</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>Mermaid</td><td><code>FormatMermaid</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>DOT</td><td><code>FormatDOT</code></td><td>Table</td><td><span class="tag tag-used">EXPOSED</span></td></tr>
+        <tr><td>JSONL</td><td><code>FormatJSONL</code></td><td>Table</td><td><span class="tag tag-gap">MISSING</span></td></tr>
+        <tr><td>AsciiDoc</td><td><code>FormatAsciiDoc</code></td><td>Table</td><td><span class="tag tag-gap">MISSING</span></td></tr>
+        <tr><td>TOML</td><td><code>FormatTOML</code></td><td>Table, Tree, Graph</td><td><span class="tag tag-gap">MISSING</span></td></tr>
+        <tr><td>PlantUML</td><td><code>FormatPlantUML</code></td><td>Table, Tree, Graph</td><td><span class="tag tag-gap">MISSING</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>How cmdguard Uses go-output</h3>
+    <div class="card">
+      <p><strong>Integration file:</strong> <code>output.go</code> — re-exports format constants, provides <code>OutputResult</code>, <code>OutputTable</code>, <code>OutputStyledTable</code></p>
+      <p><strong>Rendering architecture:</strong> Two registries — <code>tableFormatRegistry</code> (12 renderers for <code>*TableData</code>) and <code>anyFormatRegistry</code> (2 renderers for arbitrary data: JSON + YAML)</p>
+      <p><strong>CLI flag:</strong> <code>--output</code> / <code>-o</code> registered via <code>cli_output.go</code>, parsed via <code>ParseOutputFormat</code></p>
+      <p><strong>Sub-packages used:</strong> <code>d2</code>, <code>delimited</code>, <code>graph</code>, <code>markup</code>, <code>serialization</code>, <code>table</code></p>
+    </div>
+
+    <h3>Missing Formats — Details</h3>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">JSONL (JSON Lines)</h3>
+      <p><strong>go-output provides:</strong> <code>JSONLTableRenderer</code> and streaming <code>JSONLWriter</code>. Useful for streaming/piped output.</p>
+      <p><strong>cmdguard gap:</strong> Not in format constants or registries. High value — JSONL is standard for log processing pipelines.</p>
+      <p><strong>Effort:</strong> Add constant re-export + table renderer entry. ~5 lines.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">AsciiDoc</h3>
+      <p><strong>go-output provides:</strong> AsciiDoc table rendering. Useful for documentation generation.</p>
+      <p><strong>cmdguard gap:</strong> Not exposed. Medium value — nice for CLI tools that generate docs.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">TOML</h3>
+      <p><strong>go-output provides:</strong> Full support (Table, Tree, Graph). Uses <code>go-toml/v2</code>.</p>
+      <p><strong>cmdguard gap:</strong> Not exposed. Medium value — TOML is common in config-heavy CLIs.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">PlantUML</h3>
+      <p><strong>go-output provides:</strong> Component diagrams via <code>PlantUMLDiagram</code>. Table, Tree, and Graph shapes.</p>
+      <p><strong>cmdguard gap:</strong> Not exposed. Low value — niche format for architecture visualization.</p>
+    </div>
+
+    <h3>Recommendations</h3>
+
+    <div class="rec-box priority-high">
+      <p><strong>HIGH — Add JSONL support</strong></p>
+      <p>JSONL is the de facto standard for streaming structured data. Many CLI tools output JSONL for pipe compatibility. Missing this format limits cmdguard's utility in data pipeline contexts.</p>
+      <p><em>Effort:</em> Add <code>FormatJSONL</code> constant re-export + table registry entry using <code>serialization</code> or <code>go-output/enum</code>. ~8 lines total.</p>
+    </div>
+
+    <div class="rec-box priority-medium">
+      <p><strong>MEDIUM — Add TOML support</strong></p>
+      <p>TOML is widely used in Go config files. Exposing it makes cmdguard a one-stop output solution. go-output already handles all shapes.</p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <p><strong>LOW — Add AsciiDoc and PlantUML</strong></p>
+      <p>Niche formats. Add when users request them, or when go-output adds more capabilities. Low urgency.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2>3. Summary</h2>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">Overall Assessment</h3>
+      <table>
+        <thead>
+          <tr><th>Library</th><th>Utilization</th><th>Grade</th><th>Key Gap</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>fang/v2</td>
+            <td>2/6 options used, core execution used</td>
+            <td style="color: var(--accent-green);">B+</td>
+            <td>Custom error handler not exposed</td>
+          </tr>
+          <tr>
+            <td>go-output v0.8.0</td>
+            <td>12/16 formats exposed</td>
+            <td style="color: var(--accent-green);">A-</td>
+            <td>Missing JSONL, TOML, AsciiDoc, PlantUML</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">Priority Action Items</h3>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Action</th><th>Priority</th><th>Effort</th><th>Impact</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Add JSONL output format</td><td>HIGH</td><td>~8 lines</td><td>Pipeline compatibility</td></tr>
+          <tr><td>2</td><td>Expose fang <code>WithErrorHandler</code></td><td>MEDIUM</td><td>~15 lines</td><td>Custom error branding</td></tr>
+          <tr><td>3</td><td>Add TOML output format</td><td>MEDIUM</td><td>~8 lines</td><td>Config-heavy CLIs</td></tr>
+          <tr><td>4</td><td>Add AsciiDoc output format</td><td>LOW</td><td>~8 lines</td><td>Doc generation</td></tr>
+          <tr><td>5</td><td>Add PlantUML output format</td><td>LOW</td><td>~8 lines</td><td>Architecture viz</td></tr>
+          <tr><td>6</td><td>Expose fang <code>WithColorSchemeFunc</code></td><td>LOW</td><td>~15 lines</td><td>Theme customization</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 3rem;">
+      Research conducted June 2026 · cmdguard v2.5.0 · fang v2.0.1 · go-output v0.8.0
+    </p>
+  </body>
+</html>

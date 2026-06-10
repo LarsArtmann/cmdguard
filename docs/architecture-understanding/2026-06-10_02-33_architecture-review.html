@@ -1,249 +1,390 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>cmdguard Architecture Review — 2026-06-10</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<style>
-  body { font-family: system-ui, sans-serif; }
-  .layer { border-left: 4px solid; padding-left: 1rem; margin-bottom: 1rem; }
-  .layer-0 { border-color: #6366f1; }
-  .layer-1 { border-color: #8b5cf6; }
-  .layer-2 { border-color: #a855f7; }
-  .layer-3 { border-color: #c084fc; }
-  .layer-4 { border-color: #d8b4fe; }
-  .layer-5 { border-color: #e9d5ff; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
-  .badge-strong { background: #22c55e; color: white; }
-  .badge-moderate { background: #f59e0b; color: white; }
-  .badge-weak { background: #ef4444; color: white; }
-  .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; background: white; }
-  details summary { cursor: pointer; font-weight: 600; }
-</style>
-</head>
-<body class="bg-gray-50 text-gray-900">
-<div class="max-w-6xl mx-auto px-4 py-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard Architecture Review — 2026-06-10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+      }
+      .layer {
+        border-left: 4px solid;
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+      }
+      .layer-0 {
+        border-color: #6366f1;
+      }
+      .layer-1 {
+        border-color: #8b5cf6;
+      }
+      .layer-2 {
+        border-color: #a855f7;
+      }
+      .layer-3 {
+        border-color: #c084fc;
+      }
+      .layer-4 {
+        border-color: #d8b4fe;
+      }
+      .layer-5 {
+        border-color: #e9d5ff;
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-strong {
+        background: #22c55e;
+        color: white;
+      }
+      .badge-moderate {
+        background: #f59e0b;
+        color: white;
+      }
+      .badge-weak {
+        background: #ef4444;
+        color: white;
+      }
+      .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: white;
+      }
+      details summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-900">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">cmdguard — Architecture Review</h1>
+        <p class="text-gray-500">2026-06-10 • v2.4.0 • 50 source files • 8,463 lines</p>
+      </header>
 
-<header class="mb-8">
-  <h1 class="text-3xl font-bold text-gray-900 mb-2">cmdguard — Architecture Review</h1>
-  <p class="text-gray-500">2026-06-10 • v2.4.0 • 50 source files • 8,463 lines</p>
-</header>
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Executive Summary</h2>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="card text-center">
+            <div class="text-3xl font-bold text-green-600">8.5/10</div>
+            <div class="text-sm text-gray-500">Modularity</div>
+          </div>
+          <div class="card text-center">
+            <div class="text-3xl font-bold text-green-600">9/10</div>
+            <div class="text-sm text-gray-500">Scalability</div>
+          </div>
+          <div class="card text-center">
+            <div class="text-3xl font-bold text-yellow-600">7/10</div>
+            <div class="text-sm text-gray-500">Composability</div>
+          </div>
+        </div>
+        <p class="text-gray-700 leading-relaxed">
+          cmdguard exhibits a <strong>well-layered architecture</strong> with clear separation
+          between foundation types, registries, flag system, CLI core, and feature extensions. The
+          single-package design (all in <code>v2</code>) keeps coupling manageable for a library of
+          this size. The main architectural concerns are: (1) <code>CLI[T]</code> acts as a
+          god-struct with 17 fields spanning 6 concerns, (2) the type handler system erases generics
+          to <code>any</code> at the internal boundary, losing compile-time safety, and (3) global
+          mutable singletons (<code>globalTypeRegistry</code>, <code>globalValidators</code>,
+          <code>regexCache</code>) limit test isolation.
+        </p>
+      </section>
 
-<section class="mb-8">
-  <h2 class="text-2xl font-bold mb-4">Executive Summary</h2>
-  <div class="grid grid-cols-3 gap-4 mb-6">
-    <div class="card text-center">
-      <div class="text-3xl font-bold text-green-600">8.5/10</div>
-      <div class="text-sm text-gray-500">Modularity</div>
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Layered Architecture</h2>
+        <div class="mermaid bg-white p-4 rounded-lg border">
+          graph TD subgraph "Layer 0 — Foundation" E[errors.go<br />51 sentinels, 6 error types]
+          TH[type_helpers.go<br />ValueOrDefault, EnsureValid, MustParse] VT[types_*.go<br />Duration,
+          Enum, URL, Email,<br />Port, FilePath, HostPort, LogLevel] end subgraph "Layer 1 — Core
+          Types" CFG[config.go<br />FlagTag, Config, MergeConfigs] CMD[command.go<br />Command{T,F},
+          NoFlags, ValidationMode] SCO[scope.go<br />Scope, DI: Provide, Invoke, Shutdown]
+          OUT[output.go<br />OutputFormat, OutputResult] FC[flow_context.go<br />BranchingFlowContext]
+          MW[middleware.go<br />Middleware{T}, buildChain] end subgraph "Layer 2 — Registries"
+          CP[config_parsing.go<br />ParseFlagTags, DefaultValue] THR[type_handler.go<br />TypeHandler,
+          typeRegistry] THK[type_handler_kinds.go<br />string/bool/int/uint/float/slice]
+          THC[type_handler_custom.go<br />Duration/Enum/URL/Email/Port handlers]
+          FV[flags_validate.go<br />validatorRegistry, builtins] FS[flags_suggest.go<br />Levenshtein
+          suggestions] end subgraph "Layer 3 — Flag System" F[flags.go<br />FlagRegistry,
+          RegisterFlags, ValidateFlags] CSF[config_setfield.go<br />SetField, setStringField]
+          CF[config_file.go<br />ConfigFileLoader, JSON loader] FH[flag_helpers.go<br />FlagTypeConstraint,
+          cloneFlags] FP[flags_parse.go<br />ParseFlags, priority: CLI>env>default] end subgraph
+          "Layer 4 — CLI Core" CLI[cli.go<br />CLI{T}, NewCLI, AddCommand, Execute]
+          CC[cli_command.go<br />cliToCobraCommand, wireAllHandlers] CO[cli_options.go<br />CLIOption,
+          With* options] COU[cli_output.go<br />--output flag, format parsing]
+          CA[cli_accessors.go<br />Scope, Config, HealthCheck, Shutdown] end subgraph "Layer 5 —
+          Features" CMDOP[command_options.go<br />CommandOption, WithShort/Long/Flags]
+          PR[prompts.go<br />huh-based interactive prompts] DOC[doctor.go<br />health check command]
+          VER[version.go<br />version command] TEL[telemetry.go<br />OTel middleware]
+          SPN[spinner.go<br />terminal spinner middleware] GLA[glamour.go<br />markdown help
+          rendering] ED[editor.go<br />$EDITOR support] CMP[completion.go<br />shell completion]
+          MAN[manpage.go<br />man page generation] end E --> CFG & CMD & SCO & OUT & MW VT --> VT
+          CFG --> CP & CSF & CF CMD --> CC & CMDOP THR --> THK & THC FV --> F F --> CC & CLI CP -->
+          F CLI --> CC & CO & COU & CA CC --> PR & FH CMDOP --> DOC & VER & CMP MW --> TEL & SPN
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Coupling Hotspots</h2>
+
+        <div class="card">
+          <h3 class="text-lg font-bold mb-2">🔴 CLI[T] — God Struct</h3>
+          <p class="text-gray-700 mb-2">
+            <code>CLI[T]</code> in <code>cli.go</code> has <strong>17 fields</strong> spanning 6
+            distinct concerns:
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+            <div><strong>CLI Identity:</strong> name, version, long, rootCmd</div>
+            <div><strong>Config:</strong> cfg, flagRegistry, configPath</div>
+            <div><strong>DI:</strong> scope</div>
+            <div><strong>Middleware:</strong> middlewares</div>
+            <div><strong>Features:</strong> outputFormat, glamourHelp, configFileLoader</div>
+            <div><strong>Runtime:</strong> flowCtx, validationMode, envPrefix</div>
+          </div>
+          <p class="text-gray-600 text-sm">
+            Fan-out: depends on 10+ internal files directly. Every feature addition requires
+            modifying <code>CLI[T]</code>.
+          </p>
+          <div class="mt-2"><span class="badge badge-weak">High Coupling</span></div>
+        </div>
+
+        <div class="card">
+          <h3 class="text-lg font-bold mb-2">🟡 cli_command.go — Deep Wiring</h3>
+          <p class="text-gray-700 mb-2">
+            Orchestrates Command + FlagRegistry + Middleware + Prompts + clone/parse in a single
+            <code>cliToCobraCommand()</code> function. 218 lines doing 5 distinct jobs.
+          </p>
+          <div class="mt-2"><span class="badge badge-moderate">Moderate Coupling</span></div>
+        </div>
+
+        <div class="card">
+          <h3 class="text-lg font-bold mb-2">🟡 Global Singletons</h3>
+          <p class="text-gray-700 mb-2">
+            Three mutable package-level registries: <code>globalTypeRegistry</code>,
+            <code>globalValidators</code>, <code>regexCache</code>. Each CLI instance clones from
+            the globals, but the clone-once pattern means updates to globals don't propagate to
+            existing instances.
+          </p>
+          <div class="mt-2"><span class="badge badge-moderate">Test Isolation Risk</span></div>
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Service Orientation Assessment</h2>
+
+        <h3 class="text-lg font-semibold mb-2">Current State</h3>
+        <p class="text-gray-700 mb-4">
+          The codebase is a <strong>well-structured library</strong> with clear extension points via
+          functional options and the type handler registry. It is NOT service-oriented in the
+          microservice sense — nor should it be. It's a CLI framework library. The appropriate SOA
+          question is: <em>can consumers compose cmdguard features independently?</em>
+        </p>
+
+        <table class="w-full border-collapse bg-white rounded-lg overflow-hidden">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-3 text-left">Aspect</th>
+              <th class="p-3 text-left">Score</th>
+              <th class="p-3 text-left">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t">
+              <td class="p-3">Feature composability</td>
+              <td class="p-3"><span class="badge badge-strong">Strong</span></td>
+              <td class="p-3 text-sm">
+                Functional options allow independent feature selection. WithMiddleware,
+                WithOutputFormat, WithGlamourHelp etc. are orthogonal.
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-3">Type extensibility</td>
+              <td class="p-3"><span class="badge badge-strong">Strong</span></td>
+              <td class="p-3 text-sm">
+                TypeHandler registry allows adding custom types without modifying the core.
+                Enum/Port/Email etc. are all registered this way.
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-3">DI composability</td>
+              <td class="p-3"><span class="badge badge-strong">Strong</span></td>
+              <td class="p-3 text-sm">
+                samber/do/v2 scope with Provide/Invoke/Shutdown. Child scopes for subcommand
+                isolation. Health checks built-in.
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-3">Middleware composability</td>
+              <td class="p-3"><span class="badge badge-moderate">Moderate</span></td>
+              <td class="p-3 text-sm">
+                Chain works well, but middleware only receives config, not command-specific flags.
+                Limits per-command behavior.
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-3">Output composability</td>
+              <td class="p-3"><span class="badge badge-strong">Strong</span></td>
+              <td class="p-3 text-sm">
+                12 output formats via go-output. Custom format registration possible.
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-3">Test composability</td>
+              <td class="p-3"><span class="badge badge-moderate">Moderate</span></td>
+              <td class="p-3 text-sm">
+                testutil package provides TestCLI wrapper. But global singletons make parallel
+                testing of different configs fragile.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Recommendations</h2>
+
+        <div class="space-y-4">
+          <div class="card">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-bold">1. Split CLI[T] into focused components</h3>
+              <span class="badge badge-strong">Strong</span>
+            </div>
+            <p class="text-gray-700 mt-2">
+              Extract concerns from <code>CLI[T]</code> into focused structs:
+              <code>CLIConfig</code>, <code>CLIFeatures</code>, <code>CLIRuntime</code>. Keep
+              <code>CLI[T]</code> as a facade that delegates. This reduces the fan-out from 10+ to
+              ~3 per component.
+            </p>
+            <p class="text-gray-500 text-sm mt-1">
+              Impact: Medium | Effort: High | Priority: Long-term
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-bold">2. Eliminate global mutable singletons</h3>
+              <span class="badge badge-strong">Strong</span>
+            </div>
+            <p class="text-gray-700 mt-2">
+              Replace <code>globalTypeRegistry</code>, <code>globalValidators</code>,
+              <code>regexCache</code> with instance-scoped registries initialized in
+              <code>NewCLI</code>. Use a <code>RegistryDefaults</code> struct that can be shared
+              explicitly rather than implicitly.
+            </p>
+            <p class="text-gray-500 text-sm mt-1">
+              Impact: High (test isolation) | Effort: Medium | Priority: Near-term
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-bold">3. Bridge the <code>any</code> gap in TypeHandler</h3>
+              <span class="badge badge-strong">Strong</span>
+            </div>
+            <p class="text-gray-700 mt-2">
+              Add runtime type guards at the <code>TypeHandler</code> boundary: verify
+              <code>Parse()</code> return type matches the target field type before setting. This
+              catches tag typos at registration time instead of runtime panics.
+            </p>
+            <p class="text-gray-500 text-sm mt-1">
+              Impact: High (type safety) | Effort: Low | Priority: Immediate
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-bold">4. Unify field-value-to-string conversion</h3>
+              <span class="badge badge-moderate">Worth Exploring</span>
+            </div>
+            <p class="text-gray-700 mt-2">
+              Merge <code>fieldValueToString</code> (config_file.go) and
+              <code>formatFieldValue</code> (flags_validate.go) into a single canonical
+              implementation in <code>flag_helpers.go</code>.
+            </p>
+            <p class="text-gray-500 text-sm mt-1">
+              Impact: Low (DRY) | Effort: Low | Priority: Quick win
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-bold">5. Add typed flag access to middleware</h3>
+              <span class="badge badge-moderate">Worth Exploring</span>
+            </div>
+            <p class="text-gray-700 mt-2">
+              Middleware currently receives only <code>*T</code> (config) but not command-specific
+              flags. Add a <code>FlagAccessor</code> to <code>CommandInfo</code> so middleware can
+              inspect flags per-command.
+            </p>
+            <p class="text-gray-500 text-sm mt-1">
+              Impact: Medium | Effort: Medium | Priority: Medium-term
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">File Size Distribution</h2>
+        <table class="w-full border-collapse bg-white rounded-lg overflow-hidden text-sm">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-2 text-left">Range</th>
+              <th class="p-2 text-left">Count</th>
+              <th class="p-2 text-left">Files</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t">
+              <td class="p-2">&gt; 350 lines</td>
+              <td class="p-2 font-bold text-red-600">4</td>
+              <td class="p-2">
+                scope.go (382), errors.go (376), flags_validate.go (361), command.go (309)
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-2">200-350 lines</td>
+              <td class="p-2">7</td>
+              <td class="p-2">
+                cli.go, config.go, config_file.go, flow_context.go, flags.go, output.go,
+                flag_helpers.go
+              </td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-2">100-200 lines</td>
+              <td class="p-2">13</td>
+              <td class="p-2">cli_command.go, cli_options.go, config_parsing.go, etc.</td>
+            </tr>
+            <tr class="border-t">
+              <td class="p-2">&lt; 100 lines</td>
+              <td class="p-2">26</td>
+              <td class="p-2">types_*.go, editor.go, completion.go, telemetry.go, etc.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </div>
-    <div class="card text-center">
-      <div class="text-3xl font-bold text-green-600">9/10</div>
-      <div class="text-sm text-gray-500">Scalability</div>
-    </div>
-    <div class="card text-center">
-      <div class="text-3xl font-bold text-yellow-600">7/10</div>
-      <div class="text-sm text-gray-500">Composability</div>
-    </div>
-  </div>
-  <p class="text-gray-700 leading-relaxed">
-    cmdguard exhibits a <strong>well-layered architecture</strong> with clear separation between foundation types, registries, flag system, CLI core, and feature extensions. The single-package design (all in <code>v2</code>) keeps coupling manageable for a library of this size. The main architectural concerns are: (1) <code>CLI[T]</code> acts as a god-struct with 17 fields spanning 6 concerns, (2) the type handler system erases generics to <code>any</code> at the internal boundary, losing compile-time safety, and (3) global mutable singletons (<code>globalTypeRegistry</code>, <code>globalValidators</code>, <code>regexCache</code>) limit test isolation.
-  </p>
-</section>
 
-<section class="mb-8">
-  <h2 class="text-2xl font-bold mb-4">Layered Architecture</h2>
-  <div class="mermaid bg-white p-4 rounded-lg border">
-graph TD
-    subgraph "Layer 0 — Foundation"
-        E[errors.go<br/>51 sentinels, 6 error types]
-        TH[type_helpers.go<br/>ValueOrDefault, EnsureValid, MustParse]
-        VT[types_*.go<br/>Duration, Enum, URL, Email,<br/>Port, FilePath, HostPort, LogLevel]
-    end
-
-    subgraph "Layer 1 — Core Types"
-        CFG[config.go<br/>FlagTag, Config, MergeConfigs]
-        CMD[command.go<br/>Command{T,F}, NoFlags, ValidationMode]
-        SCO[scope.go<br/>Scope, DI: Provide, Invoke, Shutdown]
-        OUT[output.go<br/>OutputFormat, OutputResult]
-        FC[flow_context.go<br/>BranchingFlowContext]
-        MW[middleware.go<br/>Middleware{T}, buildChain]
-    end
-
-    subgraph "Layer 2 — Registries"
-        CP[config_parsing.go<br/>ParseFlagTags, DefaultValue]
-        THR[type_handler.go<br/>TypeHandler, typeRegistry]
-        THK[type_handler_kinds.go<br/>string/bool/int/uint/float/slice]
-        THC[type_handler_custom.go<br/>Duration/Enum/URL/Email/Port handlers]
-        FV[flags_validate.go<br/>validatorRegistry, builtins]
-        FS[flags_suggest.go<br/>Levenshtein suggestions]
-    end
-
-    subgraph "Layer 3 — Flag System"
-        F[flags.go<br/>FlagRegistry, RegisterFlags, ValidateFlags]
-        CSF[config_setfield.go<br/>SetField, setStringField]
-        CF[config_file.go<br/>ConfigFileLoader, JSON loader]
-        FH[flag_helpers.go<br/>FlagTypeConstraint, cloneFlags]
-        FP[flags_parse.go<br/>ParseFlags, priority: CLI>env>default]
-    end
-
-    subgraph "Layer 4 — CLI Core"
-        CLI[cli.go<br/>CLI{T}, NewCLI, AddCommand, Execute]
-        CC[cli_command.go<br/>cliToCobraCommand, wireAllHandlers]
-        CO[cli_options.go<br/>CLIOption, With* options]
-        COU[cli_output.go<br/>--output flag, format parsing]
-        CA[cli_accessors.go<br/>Scope, Config, HealthCheck, Shutdown]
-    end
-
-    subgraph "Layer 5 — Features"
-        CMDOP[command_options.go<br/>CommandOption, WithShort/Long/Flags]
-        PR[prompts.go<br/>huh-based interactive prompts]
-        DOC[doctor.go<br/>health check command]
-        VER[version.go<br/>version command]
-        TEL[telemetry.go<br/>OTel middleware]
-        SPN[spinner.go<br/>terminal spinner middleware]
-        GLA[glamour.go<br/>markdown help rendering]
-        ED[editor.go<br/>$EDITOR support]
-        CMP[completion.go<br/>shell completion]
-        MAN[manpage.go<br/>man page generation]
-    end
-
-    E --> CFG & CMD & SCO & OUT & MW
-    VT --> VT
-    CFG --> CP & CSF & CF
-    CMD --> CC & CMDOP
-    THR --> THK & THC
-    FV --> F
-    F --> CC & CLI
-    CP --> F
-    CLI --> CC & CO & COU & CA
-    CC --> PR & FH
-    CMDOP --> DOC & VER & CMP
-    MW --> TEL & SPN
-  </div>
-</section>
-
-<section class="mb-8">
-  <h2 class="text-2xl font-bold mb-4">Coupling Hotspots</h2>
-
-  <div class="card">
-    <h3 class="text-lg font-bold mb-2">🔴 CLI[T] — God Struct</h3>
-    <p class="text-gray-700 mb-2"><code>CLI[T]</code> in <code>cli.go</code> has <strong>17 fields</strong> spanning 6 distinct concerns:</p>
-    <div class="grid grid-cols-2 gap-2 text-sm mb-3">
-      <div><strong>CLI Identity:</strong> name, version, long, rootCmd</div>
-      <div><strong>Config:</strong> cfg, flagRegistry, configPath</div>
-      <div><strong>DI:</strong> scope</div>
-      <div><strong>Middleware:</strong> middlewares</div>
-      <div><strong>Features:</strong> outputFormat, glamourHelp, configFileLoader</div>
-      <div><strong>Runtime:</strong> flowCtx, validationMode, envPrefix</div>
-    </div>
-    <p class="text-gray-600 text-sm">Fan-out: depends on 10+ internal files directly. Every feature addition requires modifying <code>CLI[T]</code>.</p>
-    <div class="mt-2"><span class="badge badge-weak">High Coupling</span></div>
-  </div>
-
-  <div class="card">
-    <h3 class="text-lg font-bold mb-2">🟡 cli_command.go — Deep Wiring</h3>
-    <p class="text-gray-700 mb-2">Orchestrates Command + FlagRegistry + Middleware + Prompts + clone/parse in a single <code>cliToCobraCommand()</code> function. 218 lines doing 5 distinct jobs.</p>
-    <div class="mt-2"><span class="badge badge-moderate">Moderate Coupling</span></div>
-  </div>
-
-  <div class="card">
-    <h3 class="text-lg font-bold mb-2">🟡 Global Singletons</h3>
-    <p class="text-gray-700 mb-2">Three mutable package-level registries: <code>globalTypeRegistry</code>, <code>globalValidators</code>, <code>regexCache</code>. Each CLI instance clones from the globals, but the clone-once pattern means updates to globals don't propagate to existing instances.</p>
-    <div class="mt-2"><span class="badge badge-moderate">Test Isolation Risk</span></div>
-  </div>
-</section>
-
-<section class="mb-8">
-  <h2 class="text-2xl font-bold mb-4">Service Orientation Assessment</h2>
-
-  <h3 class="text-lg font-semibold mb-2">Current State</h3>
-  <p class="text-gray-700 mb-4">The codebase is a <strong>well-structured library</strong> with clear extension points via functional options and the type handler registry. It is NOT service-oriented in the microservice sense — nor should it be. It's a CLI framework library. The appropriate SOA question is: <em>can consumers compose cmdguard features independently?</em></p>
-
-  <table class="w-full border-collapse bg-white rounded-lg overflow-hidden">
-    <thead class="bg-gray-100">
-      <tr><th class="p-3 text-left">Aspect</th><th class="p-3 text-left">Score</th><th class="p-3 text-left">Notes</th></tr>
-    </thead>
-    <tbody>
-      <tr class="border-t"><td class="p-3">Feature composability</td><td class="p-3"><span class="badge badge-strong">Strong</span></td><td class="p-3 text-sm">Functional options allow independent feature selection. WithMiddleware, WithOutputFormat, WithGlamourHelp etc. are orthogonal.</td></tr>
-      <tr class="border-t"><td class="p-3">Type extensibility</td><td class="p-3"><span class="badge badge-strong">Strong</span></td><td class="p-3 text-sm">TypeHandler registry allows adding custom types without modifying the core. Enum/Port/Email etc. are all registered this way.</td></tr>
-      <tr class="border-t"><td class="p-3">DI composability</td><td class="p-3"><span class="badge badge-strong">Strong</span></td><td class="p-3 text-sm">samber/do/v2 scope with Provide/Invoke/Shutdown. Child scopes for subcommand isolation. Health checks built-in.</td></tr>
-      <tr class="border-t"><td class="p-3">Middleware composability</td><td class="p-3"><span class="badge badge-moderate">Moderate</span></td><td class="p-3 text-sm">Chain works well, but middleware only receives config, not command-specific flags. Limits per-command behavior.</td></tr>
-      <tr class="border-t"><td class="p-3">Output composability</td><td class="p-3"><span class="badge badge-strong">Strong</span></td><td class="p-3 text-sm">12 output formats via go-output. Custom format registration possible.</td></tr>
-      <tr class="border-t"><td class="p-3">Test composability</td><td class="p-3"><span class="badge badge-moderate">Moderate</span></td><td class="p-3 text-sm">testutil package provides TestCLI wrapper. But global singletons make parallel testing of different configs fragile.</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<section class="mb-8">
-  <h2 class="text-2xl font-bold mb-4">Recommendations</h2>
-
-  <div class="space-y-4">
-    <div class="card">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold">1. Split CLI[T] into focused components</h3>
-        <span class="badge badge-strong">Strong</span>
-      </div>
-      <p class="text-gray-700 mt-2">Extract concerns from <code>CLI[T]</code> into focused structs: <code>CLIConfig</code>, <code>CLIFeatures</code>, <code>CLIRuntime</code>. Keep <code>CLI[T]</code> as a facade that delegates. This reduces the fan-out from 10+ to ~3 per component.</p>
-      <p class="text-gray-500 text-sm mt-1">Impact: Medium | Effort: High | Priority: Long-term</p>
-    </div>
-
-    <div class="card">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold">2. Eliminate global mutable singletons</h3>
-        <span class="badge badge-strong">Strong</span>
-      </div>
-      <p class="text-gray-700 mt-2">Replace <code>globalTypeRegistry</code>, <code>globalValidators</code>, <code>regexCache</code> with instance-scoped registries initialized in <code>NewCLI</code>. Use a <code>RegistryDefaults</code> struct that can be shared explicitly rather than implicitly.</p>
-      <p class="text-gray-500 text-sm mt-1">Impact: High (test isolation) | Effort: Medium | Priority: Near-term</p>
-    </div>
-
-    <div class="card">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold">3. Bridge the <code>any</code> gap in TypeHandler</h3>
-        <span class="badge badge-strong">Strong</span>
-      </div>
-      <p class="text-gray-700 mt-2">Add runtime type guards at the <code>TypeHandler</code> boundary: verify <code>Parse()</code> return type matches the target field type before setting. This catches tag typos at registration time instead of runtime panics.</p>
-      <p class="text-gray-500 text-sm mt-1">Impact: High (type safety) | Effort: Low | Priority: Immediate</p>
-    </div>
-
-    <div class="card">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold">4. Unify field-value-to-string conversion</h3>
-        <span class="badge badge-moderate">Worth Exploring</span>
-      </div>
-      <p class="text-gray-700 mt-2">Merge <code>fieldValueToString</code> (config_file.go) and <code>formatFieldValue</code> (flags_validate.go) into a single canonical implementation in <code>flag_helpers.go</code>.</p>
-      <p class="text-gray-500 text-sm mt-1">Impact: Low (DRY) | Effort: Low | Priority: Quick win</p>
-    </div>
-
-    <div class="card">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold">5. Add typed flag access to middleware</h3>
-        <span class="badge badge-moderate">Worth Exploring</span>
-      </div>
-      <p class="text-gray-700 mt-2">Middleware currently receives only <code>*T</code> (config) but not command-specific flags. Add a <code>FlagAccessor</code> to <code>CommandInfo</code> so middleware can inspect flags per-command.</p>
-      <p class="text-gray-500 text-sm mt-1">Impact: Medium | Effort: Medium | Priority: Medium-term</p>
-    </div>
-  </div>
-</section>
-
-<section class="mb-8">
-  <h2 class="text-2xl font-bold mb-4">File Size Distribution</h2>
-  <table class="w-full border-collapse bg-white rounded-lg overflow-hidden text-sm">
-    <thead class="bg-gray-100">
-      <tr><th class="p-2 text-left">Range</th><th class="p-2 text-left">Count</th><th class="p-2 text-left">Files</th></tr>
-    </thead>
-    <tbody>
-      <tr class="border-t"><td class="p-2">&gt; 350 lines</td><td class="p-2 font-bold text-red-600">4</td><td class="p-2">scope.go (382), errors.go (376), flags_validate.go (361), command.go (309)</td></tr>
-      <tr class="border-t"><td class="p-2">200-350 lines</td><td class="p-2">7</td><td class="p-2">cli.go, config.go, config_file.go, flow_context.go, flags.go, output.go, flag_helpers.go</td></tr>
-      <tr class="border-t"><td class="p-2">100-200 lines</td><td class="p-2">13</td><td class="p-2">cli_command.go, cli_options.go, config_parsing.go, etc.</td></tr>
-      <tr class="border-t"><td class="p-2">&lt; 100 lines</td><td class="p-2">26</td><td class="p-2">types_*.go, editor.go, completion.go, telemetry.go, etc.</td></tr>
-    </tbody>
-  </table>
-</section>
-
-</div>
-
-<script>mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{primaryColor:'#e0e7ff',primaryTextColor:'#1e1b4b',primaryBorderColor:'#6366f1',lineColor:'#6366f1',secondaryColor:'#f0fdf4'}});</script>
-</body>
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#e0e7ff",
+          primaryTextColor: "#1e1b4b",
+          primaryBorderColor: "#6366f1",
+          lineColor: "#6366f1",
+          secondaryColor: "#f0fdf4",
+        },
+      });
+    </script>
+  </body>
 </html>

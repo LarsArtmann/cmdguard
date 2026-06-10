@@ -219,3 +219,40 @@ func assertChildInheritsParent(t *testing.T) {
 		t.Errorf("expected value 'parent-value', got %q", value)
 	}
 }
+
+func TestScope_RootScope(t *testing.T) {
+	t.Parallel()
+
+	t.Run("returns self for root scope", func(t *testing.T) {
+		t.Parallel()
+
+		root := NewScope("root")
+
+		if root.RootScope() != root {
+			t.Error("RootScope() should return itself for root scope")
+		}
+	})
+
+	t.Run("navigates to root from child", func(t *testing.T) {
+		t.Parallel()
+
+		root := NewScope("root")
+		child := root.Child("child")
+
+		if child.RootScope() != root {
+			t.Error("RootScope() should return root from child")
+		}
+	})
+
+	t.Run("navigates to root from grandchild", func(t *testing.T) {
+		t.Parallel()
+
+		root := NewScope("root")
+		child := root.Child("child")
+		grandchild := child.Child("grandchild")
+
+		if grandchild.RootScope() != root {
+			t.Error("RootScope() should return root from grandchild")
+		}
+	})
+}

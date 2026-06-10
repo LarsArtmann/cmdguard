@@ -7,7 +7,7 @@
 
 ## Completed (v2.2–v2.5)
 
-- [x] **Zero panics** — All Must* functions removed in v2.5.0; every function returns errors
+- [x] **Zero panics** — All Must\* functions removed in v2.5.0; every function returns errors
 - [x] Remove all panic-inducing functions (16 deleted: MustNewCommand, MustNewParentCommand, MustNewCLI, MustAddCommand, MustVersionCommand, MustDoctorCommand, MustInvoke, MustInvokeNamed, MustGet, RequireBranchingFlowContext, MustParse, MustParseDuration, MustParseLogLevel, MustParseLogFormat, MustParseEnum, MustParseURL, MustParseEmail, MustParsePort, MustParseFilePath, MustParseHostPort)
 - [x] Deep codebase review and improvement sprint (11 phases)
 - [x] Error system overhaul: 60+ sentinels, domain-specific error files

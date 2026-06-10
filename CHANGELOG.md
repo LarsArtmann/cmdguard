@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Removed all Must* panic-inducing functions** — Zero panics in library code. Every function returns errors:
+- **Removed all Must\* panic-inducing functions** — Zero panics in library code. Every function returns errors:
   - `MustNewCommand`, `MustNewParentCommand` (use `NewCommand`, `NewParentCommand`)
   - `MustNewCLI`, `MustAddCommand` (use `NewCLI`, `AddCommand`)
   - `MustVersionCommand` (use `VersionCommand`)
@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `MustParseURL`, `MustParseEmail`, `MustParsePort`, `MustParseFilePath`, `MustParseHostPort`
 - **Split `errors.go` into domain-specific files** — `errors_command.go`, `errors_flags.go`, `errors_config.go`, `errors_di.go`
 - **Unified `fieldValueToString`/`formatFieldValue`** — Single canonical `formatFieldValue()` in `flag_helpers.go`
-- **`doc.go` "never panics" claim now truthful** — No Must* functions remain
+- **`doc.go` "never panics" claim now truthful** — No Must\* functions remain
 - **Consolidated `command_suggest.go` into `flags_suggest.go`** — Single file for all typo suggestions
 
 ### Fixed
@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- All 16+ Must* panic variants (see "Changed" section above)
+- All 16+ Must\* panic variants (see "Changed" section above)
 
 ---
 

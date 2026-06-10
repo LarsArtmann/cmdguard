@@ -1,7 +1,6 @@
 package v2_test
 
 import (
-	"strings"
 	"sync"
 	"testing"
 
@@ -17,7 +16,8 @@ func TestWithDILogging(t *testing.T) {
 		var mu sync.Mutex
 		var logs []string
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithDILogging[testCLIConfig](func(format string, args ...any) {
 				mu.Lock()
 				logs = append(logs, format)
@@ -63,8 +63,6 @@ func TestNewScopeWithOpts(t *testing.T) {
 	t.Run("creates scope with custom opts", func(t *testing.T) {
 		t.Parallel()
 
-		var buf strings.Builder
-
 		scope := v2.NewScopeWithOpts("test", nil)
 		if scope == nil {
 			t.Fatal("NewScopeWithOpts returned nil")
@@ -73,7 +71,5 @@ func TestNewScopeWithOpts(t *testing.T) {
 		if scope.Name() != "test" {
 			t.Errorf("Name = %q, want %q", scope.Name(), "test")
 		}
-
-		_ = buf
 	})
 }

@@ -1,103 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>cmdguard — Architecture Deepening Opportunities</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
-  .badge-strong { background: #22c55e; color: white; }
-  .badge-worth { background: #f59e0b; color: white; }
-  .badge-speculative { background: #94a3b8; color: white; }
-  .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .before { border: 2px dashed #ef4444; border-radius: 8px; padding: 1rem; background: #fef2f2; }
-  .after { border: 2px solid #22c55e; border-radius: 8px; padding: 1rem; background: #f0fdf4; }
-</style>
-</head>
-<body class="bg-gray-50 text-gray-900">
-<div class="max-w-5xl mx-auto px-4 py-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard — Architecture Deepening Opportunities</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-strong {
+        background: #22c55e;
+        color: white;
+      }
+      .badge-worth {
+        background: #f59e0b;
+        color: white;
+      }
+      .badge-speculative {
+        background: #94a3b8;
+        color: white;
+      }
+      .before-after {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .before {
+        border: 2px dashed #ef4444;
+        border-radius: 8px;
+        padding: 1rem;
+        background: #fef2f2;
+      }
+      .after {
+        border: 2px solid #22c55e;
+        border-radius: 8px;
+        padding: 1rem;
+        background: #f0fdf4;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-900">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold">cmdguard — Architecture Deepening Opportunities</h1>
+        <p class="text-gray-500 mt-2">2026-06-10 &bull; 6 candidates identified</p>
+      </header>
 
-<header class="mb-8">
-  <h1 class="text-3xl font-bold">cmdguard — Architecture Deepening Opportunities</h1>
-  <p class="text-gray-500 mt-2">2026-06-10 &bull; 6 candidates identified</p>
-</header>
-
-<div class="card">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="text-xl font-bold">1. Deepen TypeHandler with Runtime Type Guards</h2>
-    <span class="badge badge-strong">Strong</span>
-  </div>
-  <p class="text-sm text-gray-500 mb-3">Files: type_handler.go, type_handler_kinds.go, type_handler_custom.go, config_setfield.go</p>
-  <p class="mb-3"><strong>Problem:</strong> The TypeHandler interface erases all type information to <code>any</code> at the Parse/Default boundary. A tag typo produces a runtime panic instead of a registration-time error. DefaultFunc in all kind handlers silently returns zero on invalid defaults.</p>
-  <p class="mb-3"><strong>Solution:</strong> Add <code>TargetType() reflect.Type</code> to TypeHandler. Verify return type matches before returning. Return errors in DefaultFunc instead of swallowing.</p>
-  <p class="mb-3"><strong>Benefits:</strong> Catches misconfiguration at registration-time, not runtime. Locality: type safety logic concentrated in one seam.</p>
-  <div class="before-after">
-    <div class="before"><strong>Before</strong><pre class="text-xs mt-2">dispatchParse(tag, value) -&gt; any
+      <div class="card">
+        <div class="flex justify-between items-start mb-3">
+          <h2 class="text-xl font-bold">1. Deepen TypeHandler with Runtime Type Guards</h2>
+          <span class="badge badge-strong">Strong</span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">
+          Files: type_handler.go, type_handler_kinds.go, type_handler_custom.go, config_setfield.go
+        </p>
+        <p class="mb-3">
+          <strong>Problem:</strong> The TypeHandler interface erases all type information to
+          <code>any</code> at the Parse/Default boundary. A tag typo produces a runtime panic
+          instead of a registration-time error. DefaultFunc in all kind handlers silently returns
+          zero on invalid defaults.
+        </p>
+        <p class="mb-3">
+          <strong>Solution:</strong> Add <code>TargetType() reflect.Type</code> to TypeHandler.
+          Verify return type matches before returning. Return errors in DefaultFunc instead of
+          swallowing.
+        </p>
+        <p class="mb-3">
+          <strong>Benefits:</strong> Catches misconfiguration at registration-time, not runtime.
+          Locality: type safety logic concentrated in one seam.
+        </p>
+        <div class="before-after">
+          <div class="before">
+            <strong>Before</strong>
+            <pre class="text-xs mt-2">
+dispatchParse(tag, value) -&gt; any
   | (no type check)
-setField(cfg, fieldName, any) -&gt; panic</pre></div>
-    <div class="after"><strong>After</strong><pre class="text-xs mt-2">dispatchParse(tag, value) -&gt; (any, error)
+setField(cfg, fieldName, any) -&gt; panic</pre
+            >
+          </div>
+          <div class="after">
+            <strong>After</strong>
+            <pre class="text-xs mt-2">
+dispatchParse(tag, value) -&gt; (any, error)
   | verify result.Type() == handler.TargetType()
-setField(cfg, fieldName, typed) -&gt; clean error</pre></div>
-  </div>
-</div>
+setField(cfg, fieldName, typed) -&gt; clean error</pre
+            >
+          </div>
+        </div>
+      </div>
 
-<div class="card">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="text-xl font-bold">2. Deepen MergeConfigs: Replace IsZero Sentinel</h2>
-    <span class="badge badge-strong">Strong</span>
-  </div>
-  <p class="text-sm text-gray-500 mb-3">Files: config.go</p>
-  <p class="mb-3"><strong>Problem:</strong> MergeConfigs uses IsZero() as "field not set" sentinel. Legitimate zero values (false, 0, 0s) are silently overwritten &mdash; data loss for a config library.</p>
-  <p class="mb-3"><strong>Solution:</strong> Track explicitly-set fields via a map built during flag parsing. Only merge fields the user explicitly set.</p>
-</div>
+      <div class="card">
+        <div class="flex justify-between items-start mb-3">
+          <h2 class="text-xl font-bold">2. Deepen MergeConfigs: Replace IsZero Sentinel</h2>
+          <span class="badge badge-strong">Strong</span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">Files: config.go</p>
+        <p class="mb-3">
+          <strong>Problem:</strong> MergeConfigs uses IsZero() as "field not set" sentinel.
+          Legitimate zero values (false, 0, 0s) are silently overwritten &mdash; data loss for a
+          config library.
+        </p>
+        <p class="mb-3">
+          <strong>Solution:</strong> Track explicitly-set fields via a map built during flag
+          parsing. Only merge fields the user explicitly set.
+        </p>
+      </div>
 
-<div class="card">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="text-xl font-bold">3. Extract Flag System into Deep Module</h2>
-    <span class="badge badge-worth">Worth Exploring</span>
-  </div>
-  <p class="text-sm text-gray-500 mb-3">Files: flags.go, flags_parse.go, flags_validate.go, flag_helpers.go, config_parsing.go, config_setfield.go, config_file.go, type_handler*.go</p>
-  <p class="mb-3"><strong>Problem:</strong> Flag system spread across 10 files in flat package. CLI[T] must know about FlagRegistry, FlagTag, TypeHandler, ConfigFileLoader, and setField separately.</p>
-  <p class="mb-3"><strong>Solution:</strong> Create FlagSystem facade: RegisterFlags(cfg), ParseFlags(cmd, args), ValidateFlags(cmd). CLI[T] only talks to FlagSystem.</p>
-</div>
+      <div class="card">
+        <div class="flex justify-between items-start mb-3">
+          <h2 class="text-xl font-bold">3. Extract Flag System into Deep Module</h2>
+          <span class="badge badge-worth">Worth Exploring</span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">
+          Files: flags.go, flags_parse.go, flags_validate.go, flag_helpers.go, config_parsing.go,
+          config_setfield.go, config_file.go, type_handler*.go
+        </p>
+        <p class="mb-3">
+          <strong>Problem:</strong> Flag system spread across 10 files in flat package. CLI[T] must
+          know about FlagRegistry, FlagTag, TypeHandler, ConfigFileLoader, and setField separately.
+        </p>
+        <p class="mb-3">
+          <strong>Solution:</strong> Create FlagSystem facade: RegisterFlags(cfg), ParseFlags(cmd,
+          args), ValidateFlags(cmd). CLI[T] only talks to FlagSystem.
+        </p>
+      </div>
 
-<div class="card">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="text-xl font-bold">4. Eliminate Global Singletons</h2>
-    <span class="badge badge-strong">Strong</span>
-  </div>
-  <p class="text-sm text-gray-500 mb-3">Files: type_handler.go, flags_validate.go</p>
-  <p class="mb-3"><strong>Problem:</strong> Three mutable package-level singletons. Clone-once semantics are confusing. Tests that modify globals pollute other tests.</p>
-  <p class="mb-3"><strong>Solution:</strong> Make NewFlagRegistry accept RegistryConfig. Remove package-level RegisterTypeHandler()/RegisterValidator(). Provide DefaultRegistryConfig() function.</p>
-</div>
+      <div class="card">
+        <div class="flex justify-between items-start mb-3">
+          <h2 class="text-xl font-bold">4. Eliminate Global Singletons</h2>
+          <span class="badge badge-strong">Strong</span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">Files: type_handler.go, flags_validate.go</p>
+        <p class="mb-3">
+          <strong>Problem:</strong> Three mutable package-level singletons. Clone-once semantics are
+          confusing. Tests that modify globals pollute other tests.
+        </p>
+        <p class="mb-3">
+          <strong>Solution:</strong> Make NewFlagRegistry accept RegistryConfig. Remove
+          package-level RegisterTypeHandler()/RegisterValidator(). Provide DefaultRegistryConfig()
+          function.
+        </p>
+      </div>
 
-<div class="card">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="text-xl font-bold">5. Split errors.go into Domain-Specific Files</h2>
-    <span class="badge badge-worth">Worth Exploring</span>
-  </div>
-  <p class="text-sm text-gray-500 mb-3">Files: errors.go (376 lines, 51 sentinels)</p>
-  <p class="mb-3"><strong>Problem:</strong> 51 sentinels in one var block is a god-object. Finding the right error requires scrolling 190 lines.</p>
-  <p class="mb-3"><strong>Solution:</strong> Split into errors_command.go, errors_flags.go, errors_config.go, errors_di.go, errors_output.go. Keep shared types in errors.go.</p>
-</div>
+      <div class="card">
+        <div class="flex justify-between items-start mb-3">
+          <h2 class="text-xl font-bold">5. Split errors.go into Domain-Specific Files</h2>
+          <span class="badge badge-worth">Worth Exploring</span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">Files: errors.go (376 lines, 51 sentinels)</p>
+        <p class="mb-3">
+          <strong>Problem:</strong> 51 sentinels in one var block is a god-object. Finding the right
+          error requires scrolling 190 lines.
+        </p>
+        <p class="mb-3">
+          <strong>Solution:</strong> Split into errors_command.go, errors_flags.go,
+          errors_config.go, errors_di.go, errors_output.go. Keep shared types in errors.go.
+        </p>
+      </div>
 
-<div class="card">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="text-xl font-bold">6. Unify Field Value Formatting</h2>
-    <span class="badge badge-worth">Worth Exploring</span>
-  </div>
-  <p class="text-sm text-gray-500 mb-3">Files: config_file.go, flags_validate.go</p>
-  <p class="mb-3"><strong>Problem:</strong> Two near-identical reflection-to-string converters with subtly different behavior. DRY violation causing split-brain formatting.</p>
-  <p class="mb-3"><strong>Solution:</strong> Extract single formatFieldValue into flag_helpers.go. Both callers use it.</p>
-</div>
+      <div class="card">
+        <div class="flex justify-between items-start mb-3">
+          <h2 class="text-xl font-bold">6. Unify Field Value Formatting</h2>
+          <span class="badge badge-worth">Worth Exploring</span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">Files: config_file.go, flags_validate.go</p>
+        <p class="mb-3">
+          <strong>Problem:</strong> Two near-identical reflection-to-string converters with subtly
+          different behavior. DRY violation causing split-brain formatting.
+        </p>
+        <p class="mb-3">
+          <strong>Solution:</strong> Extract single formatFieldValue into flag_helpers.go. Both
+          callers use it.
+        </p>
+      </div>
 
-<section class="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
-  <h2 class="text-xl font-bold text-green-800 mb-2">Top Recommendation</h2>
-  <p class="text-green-900">Start with <strong>Candidate 1 (TypeHandler type guards)</strong> &mdash; highest impact, lowest effort. Follow with <strong>Candidate 4 (eliminate global singletons)</strong> for test isolation, then <strong>Candidate 2 (MergeConfigs fix)</strong> for data correctness.</p>
-</section>
-
-</div>
-</body>
+      <section class="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
+        <h2 class="text-xl font-bold text-green-800 mb-2">Top Recommendation</h2>
+        <p class="text-green-900">
+          Start with <strong>Candidate 1 (TypeHandler type guards)</strong> &mdash; highest impact,
+          lowest effort. Follow with <strong>Candidate 4 (eliminate global singletons)</strong> for
+          test isolation, then <strong>Candidate 2 (MergeConfigs fix)</strong> for data correctness.
+        </p>
+      </section>
+    </div>
+  </body>
 </html>

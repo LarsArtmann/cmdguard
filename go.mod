@@ -8,13 +8,14 @@ require (
 	charm.land/huh/v2 v2.0.3
 	charm.land/lipgloss/v2 v2.0.3
 	github.com/go-faster/yaml v0.4.6
-	github.com/larsartmann/go-output v0.7.2
+	github.com/larsartmann/go-output v0.8.0
 	github.com/larsartmann/go-output/d2 v0.7.0
 	github.com/larsartmann/go-output/delimited v0.7.0
 	github.com/larsartmann/go-output/graph v0.7.0
 	github.com/larsartmann/go-output/markup v0.7.0
 	github.com/larsartmann/go-output/serialization v0.7.0
 	github.com/larsartmann/go-output/table v0.7.0
+	github.com/larsartmann/samber-do-auditlog v0.0.1
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -30,6 +31,7 @@ require (
 require (
 	charm.land/bubbles/v2 v2.1.0 // indirect
 	charm.land/bubbletea/v2 v2.0.7 // indirect
+	github.com/a-h/templ v0.3.1020 // indirect
 	github.com/alecthomas/chroma/v2 v2.26.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
@@ -69,8 +71,10 @@ require (
 	github.com/yuin/goldmark v1.8.2 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 )
+
+replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog

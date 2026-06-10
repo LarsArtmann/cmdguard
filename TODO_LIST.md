@@ -1,8 +1,8 @@
 # TODO List
 
 **Updated:** 2026-06-10
-**Status:** v2.5.0 — zero panics achieved
-**Tests:** 368 passing, 83.5% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.5.0 — zero panics, 84.8% coverage, 0 lint issues, 0 race conditions
+**Tests:** 385+ passing, 0 build errors
 
 ## Completed
 
@@ -23,7 +23,7 @@
 - [x] Add gofumpt and goimports to flake.nix treefmt
 - [x] Add `Scope.HealthCheckResults()` / `HealthCheckResultsWithContext()`
 - [x] Add `CLI.HealthCheckResults()` / `HealthCheckResultsWithContext()`
-- [x] Add `DoctorCommand[T]` / `MustDoctorCommand[T]` convenience helper
+- [x] Add `DoctorCommand[T]` convenience helper
 - [x] DRY configload: extract `genericLoader` (3 files → 1)
 - [x] Add configload tests: YAML, TOML, JSON, Auto, LoaderForPath (22 tests)
 - [x] Consolidate `command_suggest.go` into `flags_suggest.go`
@@ -50,74 +50,59 @@
 - [x] Update README.md: remove Must* examples, update tagline
 - [x] Update all docs for zero-panics guarantee
 
+### Phase 13: samber/do v2 Utilization Sprint (2026-06-10)
+
+- [x] Research: full samber/do v2 API surface audit (54 public symbols)
+- [x] Add `WithGracefulShutdown[T]()` — graceful DI shutdown on SIGINT/SIGTERM
+- [x] Add `Override[T]` / `OverrideValue[T]` — replace services for testing
+- [x] Add `CloneScope(scope)` — clone DI scope for test isolation
+- [x] Add `NewScopeWithOpts(name, opts)` — create scope with custom InjectorOpts
+- [x] Add `WithDILogging[T](logf)` — DI container internal logging
+- [x] Update `WithSignalHandling` doc to clarify context-only behavior
+- [x] Add research report: `docs/research/samber-do-v2-utilization.html`
+- [x] Update taskctl example: `WithSignalHandling` → `WithGracefulShutdown`
+- [x] Add Clone+Override test example in taskctl
+- [x] samber/do utilization: 24% → 43% (13 → 23 of 54 API symbols)
+
+### Phase 14: Post-Sprint Cleanup (2026-06-10)
+
+- [x] Make `NoFlags` a distinct named type (not struct{} alias) — P6 #29
+- [x] Remove deprecated `WithColor` option — use `WithFang` instead — P6 #34
+- [x] Fix `NO_COLOR` env var restored after execution instead of permanently mutated — P6 #35
+- [x] Extract API reference from AGENTS.md to docs/API.md
+- [x] Add comprehensive error reference (62 sentinels) to docs/ERROR_REFERENCE.md
+- [x] Consolidate type handler registration with helper function
+- [x] Add tests for 6 previously 0%-covered functions
+- [x] Add `Scope.RootScope()` accessor
+- [x] Add DI benchmarks: NewScopeWithOpts, CloneScope, ProvideInvokeCycle
+- [x] Clean up unused types and imports in test files
+
 ## Remaining Work — Priority Sorted
 
-### P0: Bugs & Data Correctness
+### P0: Open
 
-| # | Task | Files | Effort |
-|---|------|-------|--------|
-| 1 | ~~Fix `MergeConfigs` zero-value sentinel~~ → Investigated: IsZero() skip is intentional for flag merging; documented behavior | config.go | ✅ Done |
-| 2 | ~~Fix `Enum.UnmarshalText` validation bypass~~ → Investigated: zero-value Enum bootstrap is intentional design | types_enum.go | ✅ Done |
-| 3 | Fix `setStringField` panic on type mismatch: add AssignableTo guard before `field.Set` | config_setfield.go | ✅ Done |
-| 4 | Fix `ExitError.Error()` nil panic: add nil guard for `e.Err` | errors.go | ✅ Done |
+| #  | Task                                                   | Files           | Effort |
+| --- | ------------------------------------------------------ | --------------- | ------ |
+| 20 | Add `CODECOV_TOKEN` secret to GitHub repo settings     | GitHub settings | 5m     |
 
-### P1: Type Safety Improvements
+### P1: Future (v3.0+)
 
-| # | Task | Files | Effort |
-|---|------|-------|--------|
-| 5 | Add runtime type guards in `dispatchParse`: verify return type matches handler target | type_handler.go | ✅ Done |
-| 6 | ~~Fix DefaultFunc error suppression~~ → Investigated: RegisterFunc validates at registration time; safe by design | type_handler_kinds.go | ✅ Done |
-| 7 | Validate `short` tag length (must be 1 char) at registration time | config_parsing.go | ✅ Done |
-| 8 | Add nil check to `tracer` in `TelemetryMiddleware` | telemetry.go | ✅ Done |
+| #  | Task                                                        | Category |
+| --- | ----------------------------------------------------------- | -------- |
+| 21  | Plugin system for custom validators and type handlers       | Feature  |
+| 22  | Config file nested struct support                           | Feature  |
+| 23  | Documentation generation (GenerateDocs, markdown, API docs) | Feature  |
+| 24  | Advanced types: Result[T], Validated[T], branded IDs        | Feature  |
+| 25  | Config auto-loading with koanf integration                  | Feature  |
+| 26  | Structured JSON error output for `--output=json`            | Feature  |
+| 27  | Extract flag-related code to standalone `flagtags` library  | Refactor |
+| 28  | Consider extracting `go-output` to sub-package             | Refactor |
 
-### P2: Architecture Cleanup
+### P2: Future Cleanup (API-breaking, defer to v3.0)
 
-| # | Task | Files | Effort |
-|---|------|-------|--------|
-| 9 | ~~Eliminate global singletons~~ → Investigated: global registries are template pattern, already cloned per-FlagRegistry; documented as intentional | type_handler.go, flags_validate.go | ✅ Done |
-| 10 | Unify `fieldValueToString` and `formatFieldValue` into canonical `formatFieldValue()` in flag_helpers.go | flag_helpers.go, config_file.go, flags_validate.go | ✅ Done |
-| 11 | Split `errors.go` into domain-specific files: errors_command.go, errors_flags.go, errors_config.go, errors_di.go | errors.go | ✅ Done |
-| 12 | Fix `BranchingFlowContext.SetValue` overwriting child local values: skip children with local key set | flow_context.go | ✅ Done |
-| 13 | Fix `Tags()` and `Path()` returning internal mutable slices: return `slices.Clone()` | flags.go, flow_context.go | ✅ Done |
-
-### P3: Documentation & Consistency
-
-| # | Task | Files | Effort |
-|---|------|-------|--------|
-| 14 | Fix `doc.go` "never panics" — Must* functions do panic | doc.go | ✅ Done |
-| 15 | Align flag precedence chain across all docs: explicit flag → env → config file → default | README.md, docs/FEATURES.md | ✅ Done |
-| 16 | Update `ROADMAP.md`: check off completed fuzz tests, CONTRIBUTING.md, issue/PR templates | ROADMAP.md | ✅ Done |
-| 17 | Fix `WHAT_THIS_PROJECT_IS_NOT.md` line 75: config file loading IS provided | WHAT_THIS_PROJECT_IS_NOT.md | ✅ Done |
-| 18 | Fix `docs/FEATURES.md`: updated API (YAML() not YAMLLoader{}), added LogFormat type, updated error file split, fixed go-output version | docs/FEATURES.md | ✅ Done |
-| 19 | Update `AGENTS.md` v2.3 Design Principles title → v2 Design Principles | AGENTS.md | ✅ Done |
-
-### P4: CI/CD
-
-| # | Task | Files | Effort |
-|---|------|-------|--------|
-| 20 | Add `CODECOV_TOKEN` secret to GitHub repo settings | GitHub settings | 5m |
-
-### P5: Future (v3.0+)
-
-| # | Task | Category |
-|---|------|----------|
-| 21 | Plugin system for custom validators and type handlers | Feature |
-| 22 | Config file nested struct support | Feature |
-| 23 | Documentation generation (GenerateDocs, markdown, API docs) | Feature |
-| 24 | Advanced types: Result[T], Validated[T], branded IDs | Feature |
-| 25 | Config auto-loading with koanf integration | Feature |
-| 26 | Structured JSON error output for `--output=json` | Feature |
-| 27 | Extract flag-related code to standalone `flagtags` library | Refactor |
-| 28 | Consider extracting `go-output` to sub-package (pay-per-use) | Refactor |
-
-### P6: Future Cleanup (API-breaking, defer to v3.0)
-
-| # | Task |
-|---|------|
-| 29 | Make `NoFlags` a distinct named type (not type alias) |
-| 30 | Rename `Get[T]`/`MustGet[T]` to more specific names |
-| 31 | Make `RegisterInScope` generic instead of `...any` |
-| 32 | Remove or redesign `Package()` for error-safe DI integration |
-| 33 | Remove `SetConfig` or make it safe (reinitialize FlagRegistry) |
-| 34 | Remove deprecated `WithColor` option |
-| 35 | Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation in `Execute` |
+| #  | Task                                                          |
+| --- | ------------------------------------------------------------- |
+| 30  | Rename `Get[T]`/`MustGet[T]` to more specific names          |
+| 31  | Make `RegisterInScope` generic instead of `...any`            |
+| 32  | Remove or redesign `Package()` for error-safe DI integration |
+| 33  | Remove `SetConfig` or make it safe (reinitialize FlagRegistry) |

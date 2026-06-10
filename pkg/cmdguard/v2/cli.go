@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"charm.land/fang/v2"
+	auditlog "github.com/larsartmann/samber-do-auditlog"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )
@@ -43,6 +44,7 @@ type CLI[T any] struct {
 	noColorFlag      *bool
 	gracefulShutdown bool
 	diLogf           func(string, ...any)
+	auditLog         *auditlog.Plugin
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -80,10 +82,10 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 
 func (cli *CLI[T]) initialize(defaults T) error {
 	if cli.scope == nil {
-		if cli.diLogf != nil {
-			cli.scope = NewScopeWithOpts(cli.name, &do.InjectorOpts{
-				Logf: cli.diLogf,
-			})
+		opts := cli.buildInjectorOpts()
+
+		if opts != nil {
+			cli.scope = NewScopeWithOpts(cli.name, opts)
 		} else {
 			cli.scope = NewScope(cli.name)
 		}
@@ -158,6 +160,33 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	}
 
 	return nil
+}
+
+// buildInjectorOpts merges DI logging and audit log hooks into a single InjectorOpts.
+// Returns nil when neither is configured, so the default injector is used.
+func (cli *CLI[T]) buildInjectorOpts() *do.InjectorOpts {
+	if cli.diLogf == nil && cli.auditLog == nil {
+		return nil
+	}
+
+	opts := &do.InjectorOpts{}
+
+	if cli.diLogf != nil {
+		opts.Logf = cli.diLogf
+	}
+
+	if cli.auditLog != nil {
+		auditOpts := cli.auditLog.Opts()
+
+		opts.HookBeforeRegistration = append(opts.HookBeforeRegistration, auditOpts.HookBeforeRegistration...)
+		opts.HookAfterRegistration = append(opts.HookAfterRegistration, auditOpts.HookAfterRegistration...)
+		opts.HookBeforeInvocation = append(opts.HookBeforeInvocation, auditOpts.HookBeforeInvocation...)
+		opts.HookAfterInvocation = append(opts.HookAfterInvocation, auditOpts.HookAfterInvocation...)
+		opts.HookBeforeShutdown = append(opts.HookBeforeShutdown, auditOpts.HookBeforeShutdown...)
+		opts.HookAfterShutdown = append(opts.HookAfterShutdown, auditOpts.HookAfterShutdown...)
+	}
+
+	return opts
 }
 
 // AddCommand adds a subcommand to the CLI with any flags type.

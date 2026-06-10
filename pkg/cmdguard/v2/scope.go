@@ -75,6 +75,17 @@ func (s *Scope) Injector() do.Injector {
 	return s.injector
 }
 
+// RootScope returns the root scope by navigating up the parent chain.
+// For a root scope, returns itself.
+func (s *Scope) RootScope() *Scope {
+	current := s
+	for current.parent != nil {
+		current = current.parent
+	}
+
+	return current
+}
+
 // Provide registers a service provider in this scope.
 // The provider is invoked lazily on first Invoke call.
 // Returns an error only if scope is nil.

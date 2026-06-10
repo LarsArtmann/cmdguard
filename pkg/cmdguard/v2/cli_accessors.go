@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 
+	auditlog "github.com/larsartmann/samber-do-auditlog"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )
@@ -120,4 +121,33 @@ func (cli *CLI[T]) NoColor() bool {
 	}
 
 	return *cli.noColorFlag
+}
+
+// AuditLog returns the audit log plugin, or nil if audit logging is not enabled.
+// Use this to access reports, exports, and HTML visualization after commands execute.
+func (cli *CLI[T]) AuditLog() *auditlog.Plugin {
+	return cli.auditLog
+}
+
+// AuditLogReport returns a consolidated audit report snapshot.
+// Returns nil if audit logging is not enabled.
+func (cli *CLI[T]) AuditLogReport() *auditlog.Report {
+	if cli.auditLog == nil {
+		return nil
+	}
+
+	report := cli.auditLog.Report()
+
+	return &report
+}
+
+// RecordAuditHealthCheck runs health checks on all DI services and records
+// the results as audit events. Returns the per-service results map.
+// Returns nil if audit logging is not enabled.
+func (cli *CLI[T]) RecordAuditHealthCheck(ctx context.Context) map[string]error {
+	if cli.auditLog == nil {
+		return nil
+	}
+
+	return cli.auditLog.RecordHealthCheckWithContext(ctx, cli.scope.Injector())
 }

@@ -5,7 +5,7 @@
 **Last Updated:** 2026-06-10
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.5.0 - zero panics, 83.5% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.5.0 - zero panics, 84.8% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.5.0. 368 tests passing, 83.5% coverage, 0 build errors.
+**Current Status:** v2.5.0. 385+ tests passing, 84.8% coverage, 0 build errors.
 
 ---
 
@@ -60,6 +60,7 @@ cmdguard/
 │   │   ├── cli_accessors.go      # CLI accessor methods (Config, Scope, etc.)
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
 │   │   ├── cli_options.go        # CLI functional options (WithCLIVersion, etc.)
+│   │   ├── auditlog.go            # AuditLogCommand, WithAuditLog convenience helpers
 │   │   ├── cli_output.go          # Output format flag registration and parsing
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
 │   │   ├── command_options.go    # All 19 CommandOption functions (WithShort, WithFlags, etc.)
@@ -133,7 +134,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~84%     |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~85%     |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -150,6 +151,7 @@ cmdguard/
 | `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0  |
 | `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
 | `github.com/larsartmann/go-output` | Rich output formats  | v0.7.2  |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging | v0.0.1   |
 
 ---
 
@@ -213,6 +215,7 @@ go build ./...                                   # Verify build
 16. **Spinner middleware** — `SpinnerMiddleware[T](title)` shows a lipgloss-styled spinner on stderr; skips when not a terminal
 17. **Glamour help** — `WithGlamourHelp[T]()` renders command `Long` and `Example` fields via `charm.land/glamour/v2` markdown; uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`); applied recursively to all commands at registration time
 18. **Telemetry middleware** — `TelemetryMiddleware[T](tracer)` creates an OpenTelemetry span per command; requires `go.opentelemetry.io/otel/trace.Tracer`; `WithTelemetry[T](tracer)` is the convenience CLI option
+19. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` into the DI injector; `AuditLogCommand[T](cli)` provides an `audit-log` subcommand with HTML/JSON/NDJSON/Mermaid export; `cli.AuditLog()` for programmatic access
 
 ### Key Gotchas
 
@@ -256,16 +259,19 @@ go build ./...                                   # Verify build
 38. **Zero panics** — All Must* functions removed in v2.5.0. Every function returns errors. No `MustNewCommand`, `MustInvoke`, `MustParse*`, etc.
 39. **WithGracefulShutdown** — `WithGracefulShutdown[T]()` enables graceful DI shutdown on SIGINT/SIGTERM. Implies `WithSignalHandling`. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order. `WithSignalHandling` only cancels context and does NOT trigger DI shutdown
 40. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke
-38. **Zero panics** — All Must* functions removed in v2.5.0. Every function returns errors. No `MustNewCommand`, `MustInvoke`, `MustParse*`, etc.
-39. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
-40. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
-41. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use
-42. **configload.Auto()** — tries YAML → TOML → JSON sequentially (not file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first; use `LoaderForPath()` for precise format detection when the file extension is known
-43. **ShutdownAll error chain** — `Shutdown()` wraps with `ErrServiceConstruction` once; `ShutdownAll` collects these without additional wrapping (fixed double-wrap in v2.4.0)
-44. **Arg validators return errors** — `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs` now set an error on the command if given invalid args (negative n, min > max) instead of panicking. The error is surfaced by `NewCommand`/`NewParentCommand`.
-45. **WithGracefulShutdown** — `WithGracefulShutdown[T]()` enables graceful DI shutdown on SIGINT/SIGTERM. Implies `WithSignalHandling`. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order. `WithSignalHandling` only cancels context and does NOT trigger DI shutdown.
-46. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke.
-47. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option.
+41. **Zero panics** — All Must* functions removed in v2.5.0. Every function returns errors. No `MustNewCommand`, `MustInvoke`, `MustParse*`, etc.
+42. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
+43. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
+44. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use
+45. **configload.Auto()** — tries YAML → TOML → JSON sequentially (not file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first; use `LoaderForPath()` for precise format detection when the file extension is known
+46. **ShutdownAll error chain** — `Shutdown()` wraps with `ErrServiceConstruction` once; `ShutdownAll` collects these without additional wrapping (fixed double-wrap in v2.4.0)
+47. **Arg validators return errors** — `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs` now set an error on the command if given invalid args (negative n, min > max) instead of panicking. The error is surfaced by `NewCommand`/`NewParentCommand`.
+48. **WithGracefulShutdown** — `WithGracefulShutdown[T]()` enables graceful DI shutdown on SIGINT/SIGTERM. Implies `WithSignalHandling`. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order. `WithSignalHandling` only cancels context and does NOT trigger DI shutdown.
+49. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke.
+50. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option.
+51. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` hooks into the CLI's injector via `buildInjectorOpts()`, which merges DILogging and audit hooks. `AuditLogCommand[T](cli)` creates an `audit-log` subcommand supporting 4 formats (html, json, ndjson, mermaid). Returns `ErrAuditLogNotEnabled` when plugin is nil — callers should check with `errors.Is`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogCommand` gracefully degrades in tests without the plugin.
+52. **buildInjectorOpts** — Merges `diLogf` and `auditLog` into a single `*do.InjectorOpts`. Returns nil when neither is configured (uses default injector). This replaced the old inline `NewScopeWithOpts` call in `cli.initialize()`.
+53. **go mod replace for auditlog** — `samber-do-auditlog v0.0.1` is missing `html_templ.go` in the published tag (gitignored `*_templ.go`). A local replace directive is needed until `html_templ.go` is committed and v0.0.2 is tagged.
 
 ---
 

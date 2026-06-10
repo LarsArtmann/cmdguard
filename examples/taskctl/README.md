@@ -42,7 +42,7 @@ Every cmdguard feature is demonstrated in this example:
 | **LogLevel type**            | types.go            | Config log-level                                                                                                          |
 | **Port type**                | types.go            | Config port                                                                                                               |
 | `NewCommand`                 | commands.go         | list, add, done, stats, inspect                                                                                           |
-| `DoctorCommand`             | commands.go         | Doctor command with DI health + custom checks                                                                             |
+| `DoctorCommand`              | commands.go         | Doctor command with DI health + custom checks                                                                             |
 | `NewParentCommand`           | commands.go         | db, config command groups                                                                                                 |
 | `WithFlags`                  | commands.go         | All task commands                                                                                                         |
 | `WithShort`                  | commands.go         | All commands                                                                                                              |
@@ -69,12 +69,12 @@ Every cmdguard feature is demonstrated in this example:
 | `NewFlagError`               | commands.go         | Invalid format/priority                                                                                                   |
 | `NewServiceError`            | commands.go         | Store resolution                                                                                                          |
 | `NewExitError`               | commands.go         | done returns code 2 on not-found                                                                                          |
-| `VersionCommand`            | commands.go         | Auto version subcommand                                                                                                   |
+| `VersionCommand`             | commands.go         | Auto version subcommand                                                                                                   |
 | **BranchingFlowContext**     | commands.go         | inspect reads flow path                                                                                                   |
 | `EditInEditor`               | commands.go         | config edit opens $EDITOR                                                                                                 |
 | `ValueOrDefault`             | main_test.go        | Helper usage in tests                                                                                                     |
 | `EnsureValid`                | main_test.go        | Helper usage in tests                                                                                                     |
-| `ParseDuration`             | main_test.go        | Duration parsing test                                                                                                     |
+| `ParseDuration`              | main_test.go        | Duration parsing test                                                                                                     |
 | **NoFlags type**             | commands.go         | doctor, version, hidden, deprecated                                                                                       |
 
 ## Architecture

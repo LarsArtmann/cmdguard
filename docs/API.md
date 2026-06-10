@@ -217,20 +217,20 @@ mockDB, _ := v2.Invoke[*Database](cloned) // returns mock
 
 #### DI Scope Functions
 
-| Function                          | Purpose                                              |
-| --------------------------------- | ---------------------------------------------------- |
-| `Provide[T](scope, provider)`     | Lazy singleton registration                          |
-| `ProvideNamed[T](scope, name, fn)`| Named service registration                           |
-| `ProvideValue[T](scope, value)`   | Eager value registration                             |
-| `Invoke[T](scope)`                | Retrieve singleton service                           |
-| `InvokeNamed[T](scope, name)`     | Retrieve named service                               |
-| `Override[T](scope, provider)`    | Replace service provider (testing)                   |
-| `OverrideValue[T](scope, value)`  | Replace pre-constructed value (testing)              |
-| `CloneScope(scope)`               | Clone scope for test isolation                       |
-| `NewScopeWithOpts(name, opts)`    | Create scope with custom InjectorOpts                |
-| `Scope.Child(name)`               | Create child scope                                   |
-| `Scope.Shutdown(ctx)`             | Graceful shutdown of scope services                  |
-| `Scope.ShutdownAll(ctx)`          | Shutdown scope + all parents                         |
+| Function                           | Purpose                                 |
+| ---------------------------------- | --------------------------------------- |
+| `Provide[T](scope, provider)`      | Lazy singleton registration             |
+| `ProvideNamed[T](scope, name, fn)` | Named service registration              |
+| `ProvideValue[T](scope, value)`    | Eager value registration                |
+| `Invoke[T](scope)`                 | Retrieve singleton service              |
+| `InvokeNamed[T](scope, name)`      | Retrieve named service                  |
+| `Override[T](scope, provider)`     | Replace service provider (testing)      |
+| `OverrideValue[T](scope, value)`   | Replace pre-constructed value (testing) |
+| `CloneScope(scope)`                | Clone scope for test isolation          |
+| `NewScopeWithOpts(name, opts)`     | Create scope with custom InjectorOpts   |
+| `Scope.Child(name)`                | Create child scope                      |
+| `Scope.Shutdown(ctx)`              | Graceful shutdown of scope services     |
+| `Scope.ShutdownAll(ctx)`           | Shutdown scope + all parents            |
 
 ### Lifecycle Hooks
 

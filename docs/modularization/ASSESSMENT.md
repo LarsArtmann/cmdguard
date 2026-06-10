@@ -5,22 +5,22 @@
 
 ## 1. Current State
 
-| Property | Value |
-|----------|-------|
-| go.mod files | 1 (root) |
-| go.work | None |
-| Packages | 7 |
+| Property     | Value                |
+| ------------ | -------------------- |
+| go.mod files | 1 (root)             |
+| go.work      | None                 |
+| Packages     | 7                    |
 | Source files | 50 non-test, 80 test |
-| Total lines | 8,463 |
+| Total lines  | 8,463                |
 
 ## 2. Should This Project Modularize?
 
-| Signal | Weight | Present? | Notes |
-|--------|--------|----------|-------|
-| Small project | High | **Yes** | 7 packages, single domain |
-| No external consumers | Medium | **No** | Published library at github.com/larsartmann/cmdguard |
-| Prototype/spike | High | No | v2.4.0, stable API |
-| All packages change together | High | **Yes** | Single package `v2` contains 90% of code |
+| Signal                       | Weight | Present? | Notes                                                |
+| ---------------------------- | ------ | -------- | ---------------------------------------------------- |
+| Small project                | High   | **Yes**  | 7 packages, single domain                            |
+| No external consumers        | Medium | **No**   | Published library at github.com/larsartmann/cmdguard |
+| Prototype/spike              | High   | No       | v2.4.0, stable API                                   |
+| All packages change together | High   | **Yes**  | Single package `v2` contains 90% of code             |
 
 **Score: 2 High signals** → Per the go-modularize skill: "Consider partial modularization — extract only the core/domain module to establish a clean API surface."
 
@@ -45,6 +45,7 @@ tests/integration/         ← Integration tests (imports v2)
 The project is a **single-purpose library** with 7 packages in a clean hierarchy. All packages change together because they're all part of one library's API. The internal coupling is managed by Go's package system.
 
 **Rationale:**
+
 - Under 10 source packages
 - Single domain (CLI framework)
 - All packages change together
@@ -78,6 +79,7 @@ Splitting into 5+ modules (core, flags, types, middleware, output) would be over
 **Do NOT modularize now.** The project is too small and too tightly coupled to benefit. The single-package design (`v2`) is actually a strength — it keeps the API surface simple for consumers.
 
 Revisit when:
+
 - Package count exceeds 15
 - Clear independent consumers emerge (e.g., someone only wants the type validation without cobra)
 - The library exceeds 15,000 lines

@@ -100,7 +100,7 @@
 | **Shell completion**           | ✅                       | ✅         | ❌        | ❌         | ✅         |
 | **Middleware**                 | ✅                       | ✅         | ❌        | ❌         | ✅         |
 | **Man page generation**        | ✅                       | ❌         | ❌        | ❌         | ❌         |
-| **Minimal panics**            | ✅                       | ✅         | N/A       | N/A        | N/A        |
+| **Minimal panics**             | ✅                       | ✅         | N/A       | N/A        | N/A        |
 | **Counting flags**             | ✅ `-v`/`-vv`/`-vvv`     | ❌         | ❌        | ❌         | ❌         |
 | **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅         | ❌        | ✅         | ✅         |
 

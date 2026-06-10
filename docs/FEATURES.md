@@ -188,17 +188,17 @@ if cli.NoColor() {
 
 9 built-in validated types:
 
-| Type       | File                | Validation            |
-| ---------- | ------------------- | --------------------- |
-| `Duration` | `types_duration.go` | Valid time.Duration   |
-| `Email`    | `types_email.go`    | RFC 5322 email format |
-| `Enum[T]`  | `types_enum.go`     | Allowed values        |
-| `FilePath` | `types_filepath.go` | Path validation       |
-| `HostPort` | `types_hostport.go` | host:port format      |
-| `LogFormat`| `types_log.go`      | text/json format      |
-| `LogLevel` | `types_log.go`      | Standard log levels   |
-| `Port`     | `types_port.go`     | 1–65535 range         |
-| `URL`      | `types_url.go`      | Valid URL             |
+| Type        | File                | Validation            |
+| ----------- | ------------------- | --------------------- |
+| `Duration`  | `types_duration.go` | Valid time.Duration   |
+| `Email`     | `types_email.go`    | RFC 5322 email format |
+| `Enum[T]`   | `types_enum.go`     | Allowed values        |
+| `FilePath`  | `types_filepath.go` | Path validation       |
+| `HostPort`  | `types_hostport.go` | host:port format      |
+| `LogFormat` | `types_log.go`      | text/json format      |
+| `LogLevel`  | `types_log.go`      | Standard log levels   |
+| `Port`      | `types_port.go`     | 1–65535 range         |
+| `URL`       | `types_url.go`      | Valid URL             |
 
 ### Branching Flow Context
 

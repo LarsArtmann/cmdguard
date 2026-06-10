@@ -148,6 +148,7 @@ linters:
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
             - github.com/larsartmann/go-output/table
+            - github.com/larsartmann/samber-do-auditlog
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
@@ -173,6 +174,7 @@ linters:
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
             - github.com/larsartmann/go-output/table
+            - github.com/larsartmann/samber-do-auditlog
             - github.com/muesli/mango
             - github.com/muesli/mango-cobra
             - github.com/muesli/roff
@@ -199,6 +201,7 @@ linters:
             - charm.land/huh/v2
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
+            - github.com/larsartmann/samber-do-auditlog
             - github.com/samber/do/v2
             - github.com/spf13/cobra
             - github.com/spf13/pflag
@@ -342,6 +345,9 @@ linters:
         linters:
           - paralleltest
       - path: pkg/cmdguard/v2/type_handler_test.go$
+        linters:
+          - paralleltest
+      - path: pkg/cmdguard/v2/cli_auditlog_test.go$
         linters:
           - paralleltest
       - path: pkg/cmdguard/v2/example_test.go$

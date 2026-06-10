@@ -388,6 +388,51 @@ Raw `*cobra.Command` added via `cli.RootCommand().AddCommand()` don't receive cm
 
 ---
 
+## Graceful Shutdown (WithGracefulShutdown)
+
+Cobra has no built-in graceful shutdown. In cmdguard, services implementing `do.ShutdownerWithError` are automatically cleaned up when the process receives SIGINT/SIGTERM:
+
+```go
+// In Cobra: you'd manually handle signals + cleanup
+// In cmdguard: one option
+
+cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
+    v2.WithGracefulShutdown[Config](),
+)
+
+// Services are shut down in reverse invocation order on signal
+type Database struct { DSN string }
+func (db *Database) Shutdown() error { /* flush and close */ return nil }
+```
+
+`WithGracefulShutdown` implies `WithSignalHandling` (context cancellation). You only need one or the other.
+
+---
+
+## Testing with Clone + Override
+
+cmdguard provides first-class test isolation through scope cloning and service overriding:
+
+```go
+func TestWithMockDB(t *testing.T) {
+    // Create production CLI
+    cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{})
+    v2.Provide(cli.Scope(), NewDatabase) // real DB
+
+    // Clone scope and override with mock
+    cloned := v2.CloneScope(cli.Scope())
+    v2.OverrideValue(cloned, &MockDatabase{})
+
+    // Invoked services use the mock
+    db, _ := v2.Invoke[*Database](cloned) // returns MockDatabase
+
+    // Original scope is unaffected
+    realDB, _ := v2.Invoke[*Database](cli.Scope()) // returns real Database
+}
+```
+
+---
+
 ## Next Steps
 
 - Explore the [`examples/`](../examples/) directory for complete working programs
