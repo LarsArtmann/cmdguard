@@ -15,6 +15,36 @@ import (
 func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 	t.Helper()
 
+	cli := newEmptyTestCLI(t)
+	seedTasks(cli)
+
+	return cli
+}
+
+// mustExec creates a test CLI and executes the given args, failing on error.
+func mustExec(t *testing.T, args ...string) {
+	t.Helper()
+
+	cli := newTestCLI(t)
+	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
+		t.Fatalf("%s: %v", args[0], err)
+	}
+}
+
+// expectError executes the given args and fails the test if no error is returned.
+func expectError(t *testing.T, args ...string) {
+	t.Helper()
+
+	cli := newTestCLI(t)
+	if err := cli.ExecuteWithArgs(context.Background(), args); err == nil {
+		t.Fatalf("expected error for %v, got nil", args)
+	}
+}
+
+// newEmptyTestCLI creates a CLI without seed tasks, for tests that need a clean store.
+func newEmptyTestCLI(t *testing.T) *v2.CLI[AppConfig] {
+	t.Helper()
+
 	cli, err := v2.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
 		v2.WithCLIVersion[AppConfig]("1.0.0"),
@@ -34,19 +64,7 @@ func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 		t.Fatalf("failed to build commands: %v", err)
 	}
 
-	seedTasks(cli)
-
 	return cli
-}
-
-// mustExec creates a test CLI and executes the given args, failing on error.
-func mustExec(t *testing.T, args ...string) {
-	t.Helper()
-
-	cli := newTestCLI(t)
-	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
-		t.Fatalf("%s: %v", args[0], err)
-	}
 }
 
 // --- CLI Construction ---
@@ -212,15 +230,7 @@ func TestListCommand_AliasLS(t *testing.T) {
 func TestListCommand_Empty(t *testing.T) {
 	t.Parallel()
 
-	cli, _ := v2.NewCLI[AppConfig](
-		"taskctl", "test", AppConfig{},
-		v2.WithCLIVersion[AppConfig]("1.0.0"),
-		v2.WithStrictValidation[AppConfig](),
-		v2.WithGroup[AppConfig]("tasks", "Task Management"),
-		v2.WithGroup[AppConfig]("system", "System"),
-	)
-	_ = v2.Provide(cli.Scope(), NewTaskStore)
-	_ = buildCommands(cli)
+	cli := newEmptyTestCLI(t)
 
 	err := cli.ExecuteWithArgs(context.Background(), []string{"list"})
 	if err != nil {
@@ -273,11 +283,7 @@ func TestDoneCommand_NotFound(t *testing.T) {
 func TestDoneCommand_MissingID(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"done"})
-	if err == nil {
-		t.Fatal("expected error for missing id")
-	}
+	expectError(t, "done")
 }
 
 // --- Stats Command ---
@@ -526,11 +532,7 @@ func TestInspectCommand(t *testing.T) {
 func TestInspectCommand_NoArgs(t *testing.T) {
 	t.Parallel()
 
-	cli := newTestCLI(t)
-	err := cli.ExecuteWithArgs(context.Background(), []string{"inspect"})
-	if err == nil {
-		t.Fatal("expected error for inspect without args")
-	}
+	expectError(t, "inspect")
 }
 
 func TestInspectCommand_TooManyArgs(t *testing.T) {

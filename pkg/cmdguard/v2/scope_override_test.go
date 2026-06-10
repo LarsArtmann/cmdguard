@@ -13,6 +13,19 @@ type realService struct {
 	Name string
 }
 
+// provideRealService registers a realService factory that constructs an instance
+// with the given name. Used by override and clone-scope tests.
+func provideRealService(t *testing.T, scope *v2.Scope, name string) {
+	t.Helper()
+
+	err := v2.Provide(scope, func(i do.Injector) (*realService, error) {
+		return &realService{Name: name}, nil
+	})
+	if err != nil {
+		t.Fatalf("Provide failed: %v", err)
+	}
+}
+
 func TestOverride(t *testing.T) {
 	t.Parallel()
 
@@ -21,14 +34,9 @@ func TestOverride(t *testing.T) {
 
 		scope := v2.NewScope("test")
 
-		err := v2.Provide(scope, func(i do.Injector) (*realService, error) {
-			return &realService{Name: "real"}, nil
-		})
-		if err != nil {
-			t.Fatalf("Provide failed: %v", err)
-		}
+		provideRealService(t, scope, "real")
 
-		err = v2.Override(scope, func(i do.Injector) (*realService, error) {
+		err := v2.Override(scope, func(i do.Injector) (*realService, error) {
 			return &realService{Name: "mock"}, nil
 		})
 		if err != nil {
@@ -161,12 +169,7 @@ func TestCloneScope(t *testing.T) {
 
 		scope := v2.NewScope("test")
 
-		err := v2.Provide(scope, func(i do.Injector) (*realService, error) {
-			return &realService{Name: "lazy-original"}, nil
-		})
-		if err != nil {
-			t.Fatalf("Provide failed: %v", err)
-		}
+		provideRealService(t, scope, "lazy-original")
 
 		cloned := v2.CloneScope(scope)
 

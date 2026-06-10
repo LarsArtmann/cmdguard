@@ -23,6 +23,21 @@ func TestDoctorCommand(t *testing.T) {
 		return cli
 	}
 
+	// newFailingDoctor builds a doctor command whose only check returns the given error.
+	// The command is also registered against the CLI for execution in tests.
+	newFailingDoctor := func(t *testing.T, cli *CLI[testConfig], name, errMsg string) {
+		t.Helper()
+
+		cmd, err := DoctorCommand[testConfig](
+			cli,
+			WithDoctorCheck[testConfig](name, func(_ context.Context) error {
+				return errors.New(errMsg)
+			}),
+		)
+		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, AddCommand(cli, cmd))
+	}
+
 	t.Run("reports no custom checks as healthy", func(t *testing.T) {
 		t.Parallel()
 
@@ -135,20 +150,13 @@ func TestDoctorCommand(t *testing.T) {
 
 		cli := newDoctorCLI(t)
 
-		cmd, err := DoctorCommand[testConfig](
-			cli,
-			WithDoctorCheck[testConfig]("failing", func(ctx context.Context) error {
-				return errors.New("connection refused")
-			}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		newFailingDoctor(t, cli, "failing", "connection refused")
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err = cli.Execute(context.Background())
+		err := cli.Execute(context.Background())
 		if err == nil {
 			t.Fatal("expected error for failing check")
 		}
@@ -227,20 +235,13 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
-		cmd, err := DoctorCommand[testConfig](
-			cli,
-			WithDoctorCheck[testConfig]("db", func(ctx context.Context) error {
-				return errors.New("timeout")
-			}),
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		newFailingDoctor(t, cli, "db", "timeout")
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err = cli.Execute(context.Background())
+		err := cli.Execute(context.Background())
 		if err == nil {
 			t.Fatal("expected error")
 		}

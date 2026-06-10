@@ -160,16 +160,7 @@ func TestWithConfigValidation(t *testing.T) {
 		testutil.AssertNoError(t, err)
 
 		executed := false
-		cmd, err := NewCommand[config, NoFlags](
-			"run",
-			func(_ context.Context, _ *config, _ NoFlags) error {
-				executed = true
-
-				return nil
-			},
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		runFlagCommand(t, cli, &executed)
 
 		err = cli.ExecuteWithArgs(context.Background(), []string{"run"})
 		testutil.AssertNoError(t, err)
@@ -197,16 +188,7 @@ func TestWithConfigValidation(t *testing.T) {
 		testutil.AssertNoError(t, err)
 
 		executed := false
-		cmd, err := NewCommand[config, NoFlags](
-			"run",
-			func(_ context.Context, _ *config, _ NoFlags) error {
-				executed = true
-
-				return nil
-			},
-		)
-		testutil.AssertNoError(t, err)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		runFlagCommand(t, cli, &executed)
 
 		err = cli.ExecuteWithArgs(context.Background(), []string{"run"})
 		testutil.AssertExpectedError(t, err)
@@ -227,11 +209,7 @@ func TestWithStrictValidation(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"noshort",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-		)
-		testutil.AssertNoError(t, err)
+		cmd := noShortCommand(t)
 
 		err = AddCommand(cli, cmd)
 		testutil.AssertExpectedError(t, err)
@@ -252,11 +230,7 @@ func TestWithStrictValidation(t *testing.T) {
 		cli, err := NewCLI[testConfig]("test", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"noshort",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-		)
-		testutil.AssertNoError(t, err)
+		cmd := noShortCommand(t)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 	})
 
@@ -326,13 +300,7 @@ func TestWithDraconianValidation(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"good",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithShort[testConfig, NoFlags]("Good command"),
-			WithExample[testConfig, NoFlags]("test good"),
-		)
-		testutil.AssertNoError(t, err)
+		cmd := goodCommand(t, "good", "Good command", "test good")
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 	})
 
@@ -345,13 +313,7 @@ func TestWithDraconianValidation(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		childCmd, err := NewCommand[testConfig, NoFlags](
-			"child",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithShort[testConfig, NoFlags]("Child"),
-			WithExample[testConfig, NoFlags]("test parent child"),
-		)
-		testutil.AssertNoError(t, err)
+		childCmd := goodCommand(t, "child", "Child", "test parent child")
 
 		parentCmd, err := NewParentCommand[testConfig, NoFlags](
 			"parent",
@@ -371,11 +333,7 @@ func TestWithDraconianValidation(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
-			"noshort",
-			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-		)
-		testutil.AssertNoError(t, err)
+		cmd := noShortCommand(t)
 
 		err = AddCommand(cli, cmd)
 		testutil.AssertExpectedError(t, err)

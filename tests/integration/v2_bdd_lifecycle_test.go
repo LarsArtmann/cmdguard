@@ -35,6 +35,37 @@ func newLifecycleCmd(t *testing.T, use, short string) v2.Command[lifecycleConfig
 	return cmd
 }
 
+func newLifecycleParentCmd(
+	t *testing.T,
+	child v2.Command[lifecycleConfig, v2.NoFlags],
+	short string,
+) v2.Command[lifecycleConfig, v2.NoFlags] {
+	t.Helper()
+
+	parent, err := v2.NewParentCommand[lifecycleConfig, v2.NoFlags](
+		"parent", "Parent description",
+		[]v2.Command[lifecycleConfig, v2.NoFlags]{child},
+		v2.WithShort[lifecycleConfig, v2.NoFlags](short),
+	)
+	if err != nil {
+		t.Fatalf("NewParentCommand: %v", err)
+	}
+
+	return parent
+}
+
+// newLifecyclePostRunFlag returns a WithPostRunE option that sets *flag to true.
+// Used to verify post-run is (or is not) called from lifecycle tests.
+func newLifecyclePostRunFlag(flag *bool) v2.CommandOption[lifecycleConfig, v2.NoFlags] {
+	return v2.WithPostRunE[lifecycleConfig, v2.NoFlags](
+		func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
+			*flag = true
+
+			return nil
+		},
+	)
+}
+
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 	t.Parallel()
 
@@ -123,13 +154,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 					return errors.New("command failed")
 				},
 				v2.WithShort[lifecycleConfig, v2.NoFlags]("Fail"),
-				v2.WithPostRunE[lifecycleConfig, v2.NoFlags](
-					func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-						postRunCalled = true
-
-						return nil
-					},
-				),
+				newLifecyclePostRunFlag(&postRunCalled),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -179,13 +204,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 						return errors.New("pre-run rejected")
 					},
 				),
-				v2.WithPostRunE[lifecycleConfig, v2.NoFlags](
-					func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-						postRunCalled = true
-
-						return nil
-					},
-				),
+				newLifecyclePostRunFlag(&postRunCalled),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -699,15 +718,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 
 			child := newLifecycleCmd(t, "child", "Child command")
 
-			parent, err := v2.NewParentCommand[lifecycleConfig, v2.NoFlags](
-				"parent",
-				"Parent description",
-				[]v2.Command[lifecycleConfig, v2.NoFlags]{child},
-				v2.WithShort[lifecycleConfig, v2.NoFlags]("Parent command"),
-			)
-			if err != nil {
-				t.Fatalf("NewParentCommand: %v", err)
-			}
+			parent := newLifecycleParentCmd(t, child, "Parent command")
 
 			if err := v2.AddCommand(cli, parent); err != nil {
 				t.Fatalf("AddCommand: %v", err)
@@ -745,15 +756,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			parent, err := v2.NewParentCommand[lifecycleConfig, v2.NoFlags](
-				"parent",
-				"Parent description",
-				[]v2.Command[lifecycleConfig, v2.NoFlags]{child},
-				v2.WithShort[lifecycleConfig, v2.NoFlags]("Parent"),
-			)
-			if err != nil {
-				t.Fatalf("NewParentCommand: %v", err)
-			}
+			parent := newLifecycleParentCmd(t, child, "Parent")
 
 			err = v2.AddCommand(cli, parent)
 			if err == nil {

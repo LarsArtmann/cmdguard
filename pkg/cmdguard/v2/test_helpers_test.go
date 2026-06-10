@@ -206,3 +206,50 @@ func addShortCommandToStrictCLI(
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))
 }
+
+// noShortCommand builds a minimal test command that omits a short description.
+// Used to exercise strict/draconian validation rules that require WithShort.
+func noShortCommand(t *testing.T) Command[testConfig, NoFlags] {
+	t.Helper()
+
+	cmd, err := NewCommand[testConfig, NoFlags](
+		"noshort",
+		noOpHandler(),
+	)
+	testutil.AssertNoError(t, err)
+
+	return cmd
+}
+
+// goodCommand builds a test command that is fully described (short + example).
+// Used to verify that strict and draconian validation accept a complete command.
+func goodCommand(t *testing.T, use, short, example string) Command[testConfig, NoFlags] {
+	t.Helper()
+
+	cmd, err := NewCommand[testConfig, NoFlags](
+		use,
+		noOpHandler(),
+		WithShort[testConfig, NoFlags](short),
+		WithExample[testConfig, NoFlags](example),
+	)
+	testutil.AssertNoError(t, err)
+
+	return cmd
+}
+
+// runFlagCommand adds a "run" command that flips *executed when invoked.
+// Used by config-validation tests to assert whether the handler ran.
+func runFlagCommand[T any](t *testing.T, cli *CLI[T], executed *bool) {
+	t.Helper()
+
+	cmd, err := NewCommand[T, NoFlags](
+		"run",
+		func(_ context.Context, _ *T, _ NoFlags) error {
+			*executed = true
+
+			return nil
+		},
+	)
+	testutil.AssertNoError(t, err)
+	testutil.AssertNoError(t, AddCommand(cli, cmd))
+}

@@ -14,6 +14,15 @@ import (
 
 //nolint:gocyclo // example file: linear command registration reads best as a single function
 func buildCommands(cli *v2.CLI[AppConfig]) error {
+	// dbActionHandler returns a handler that prints a one-line DB action summary
+	// including the target environment and --force flag.
+	dbActionHandler := func(verb string) func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
+		return func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
+			fmt.Printf("%s %s (force=%v)\n", verb, flags.Env, flags.Force)
+
+			return nil
+		}
+	}
 	scope := cli.Scope()
 
 	// --- list: multi-format output, aliases, filter flags ---
@@ -241,10 +250,7 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 	// --- db: NewParentCommand with shared DBFlags ---
 	migrateCmd, err := v2.NewCommand[AppConfig, *DBFlags](
 		"migrate",
-		func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
-			fmt.Printf("Running migrations on %s (force=%v)\n", flags.Env, flags.Force)
-			return nil
-		},
+		dbActionHandler("Running migrations on"),
 		v2.WithShort[AppConfig, *DBFlags]("Run database migrations"),
 		v2.WithLong[AppConfig, *DBFlags](`# Database Migrations
 
@@ -259,10 +265,7 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 
 	seedCmd, err := v2.NewCommand[AppConfig, *DBFlags](
 		"seed",
-		func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
-			fmt.Printf("Seeding %s (force=%v)\n", flags.Env, flags.Force)
-			return nil
-		},
+		dbActionHandler("Seeding"),
 		v2.WithShort[AppConfig, *DBFlags]("Seed the database"),
 		v2.WithFlags[AppConfig, *DBFlags](&DBFlags{}),
 	)
