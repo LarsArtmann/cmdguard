@@ -101,9 +101,3 @@ func ExampleParseLogLevel() {
 	fmt.Println(l.String())
 	// Output: debug
 }
-
-func ExampleMustParse() {
-	p := v2.MustParse("MustParsePort", "8080", v2.ParsePort)
-	fmt.Println(p.Int())
-	// Output: 8080
-}

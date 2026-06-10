@@ -5,17 +5,22 @@ import (
 	"testing"
 )
 
-func TestMustVersionCommandSuccess(t *testing.T) {
+func TestVersionCommandSuccess(t *testing.T) {
 	t.Parallel()
 
-	cli, err := NewCLI[Config]("myapp", "My app", Config{},
+	cli, err := NewCLI[Config](
+		"myapp", "My app", Config{},
 		WithCLIVersion[Config]("2.0.0"),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cmd := MustVersionCommand[Config](cli)
+	cmd, err := VersionCommand[Config](cli)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if cmd.Use() != "version" {
 		t.Errorf("got Use %q, want %q", cmd.Use(), "version")
 	}
@@ -27,7 +32,8 @@ func TestGenerateVersionCommand(t *testing.T) {
 	t.Run("writes version to custom writer", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[Config]("myapp", "My app", Config{},
+		cli, err := NewCLI[Config](
+			"myapp", "My app", Config{},
 			WithCLIVersion[Config]("3.0.0"),
 		)
 		if err != nil {

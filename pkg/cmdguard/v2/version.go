@@ -9,7 +9,7 @@ import (
 )
 
 // VersionCommand creates a typed "version" subcommand that prints the CLI version.
-// Panics if the CLI has no version set (use WithCLIVersion first).
+// Returns an error if the CLI has no version set (use WithCLIVersion first).
 //
 // Usage:
 //
@@ -41,16 +41,6 @@ func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 		WithShort[T, NoFlags]("Print version information"),
 		WithLong[T, NoFlags](fmt.Sprintf("Print the version of %s.", appName)),
 	)
-}
-
-// MustVersionCommand creates a version subcommand or panics.
-func MustVersionCommand[T any](cli *CLI[T]) Command[T, NoFlags] {
-	cmd, err := VersionCommand[T](cli)
-	if err != nil {
-		panic(fmt.Sprintf("MustVersionCommand: %v", err))
-	}
-
-	return cmd
 }
 
 // GenerateVersionCommand creates a raw cobra version command with custom formatting.

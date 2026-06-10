@@ -116,9 +116,8 @@
 //
 // # Error Handling
 //
-// All v2 constructors return errors. Must-prefixed functions (MustNewCommand,
-// MustInvoke, etc.) panic on failure. All other functions return errors.
-// support errors.Is() for identification:
+// All v2 constructors return errors. Functions never panic — every function
+// returns errors. Sentinel errors support errors.Is() for identification:
 //
 //	errors.Is(err, v2.ErrInvalidCommand)
 //	errors.Is(err, v2.ErrMissingHandler)
@@ -178,7 +177,11 @@
 //
 // Add a built-in version command:
 //
-//	v2.AddCommand(cli, v2.MustVersionCommand[AppConfig](cli))
+//	cmd, err := v2.VersionCommand[AppConfig](cli)
+//	if err != nil {
+//	    panic(err)
+//	}
+//	v2.AddCommand(cli, cmd)
 //
 // # Custom Types
 //

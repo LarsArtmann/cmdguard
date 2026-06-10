@@ -64,8 +64,9 @@ func TestInitializeErrorPaths(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		childCmd := newTestCLICommandWithShort[testCLIConfig]("child", "Child command")
+		childCmd := newTestCLICommandWithShort[testCLIConfig](t, "child", "Child command")
 		parentCmd := newTestParentCommand[testCLIConfig](
+			t,
 			"parent",
 			"Parent command",
 			"Parent command long description",

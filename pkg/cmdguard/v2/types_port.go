@@ -70,12 +70,6 @@ func ParsePort(s string) (Port, error) {
 	return Port{port: port}, nil
 }
 
-// MustParsePort creates a Port from a string, panicking if invalid.
-// Use only when you know the port is valid (e.g., for constants).
-func MustParsePort(s string) Port {
-	return MustParse("MustParsePort", s, ParsePort)
-}
-
 // PortFromInt creates a Port from an int.
 // Returns an error if the port is out of valid range.
 func PortFromInt(port int) (Port, error) {

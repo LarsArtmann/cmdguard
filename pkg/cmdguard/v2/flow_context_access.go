@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"maps"
 )
 
@@ -53,16 +52,6 @@ func GetBranchingFlowContext(ctx context.Context) (*BranchingFlowContext, bool) 
 	return bfc, ok
 }
 
-// RequireBranchingFlowContext retrieves the branching flow context or panics.
-func RequireBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
-	bfc, ok := GetBranchingFlowContext(ctx)
-	if !ok {
-		panic("RequireBranchingFlowContext: no branching flow context in context")
-	}
-
-	return bfc
-}
-
 // Get retrieves a typed value from the flow context.
 func Get[T any](ctx context.Context, key any) (T, bool) {
 	bfc, ok := GetBranchingFlowContext(ctx)
@@ -82,14 +71,4 @@ func Get[T any](ctx context.Context, key any) (T, bool) {
 	typed, ok := val.(T)
 
 	return typed, ok
-}
-
-// MustGet retrieves a typed value from the flow context, panicking if not found.
-func MustGet[T any](ctx context.Context, key any) T {
-	val, ok := Get[T](ctx, key)
-	if !ok {
-		panic(fmt.Sprintf("MustGet: key %v not found in flow context", key))
-	}
-
-	return val
 }

@@ -34,11 +34,6 @@ func ParseHostPort(s string) (HostPort, error) {
 	return HostPort{host: host, port: port}, nil
 }
 
-// MustParseHostPort creates a HostPort from a string, panicking if invalid.
-func MustParseHostPort(s string) HostPort {
-	return MustParse("MustParseHostPort", s, ParseHostPort)
-}
-
 // NewHostPort creates a HostPort from host and port strings.
 func NewHostPort(host, portStr string) (HostPort, error) {
 	port, err := ParsePort(portStr)

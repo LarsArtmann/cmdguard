@@ -65,14 +65,6 @@ func ParseFilePath(s string, checkExists bool) (FilePath, error) {
 	return fp, nil
 }
 
-// MustParseFilePath creates a FilePath from a string, panicking if invalid.
-// Use only when you know the path is valid (e.g., for constants).
-func MustParseFilePath(s string, checkExists bool) FilePath {
-	return MustParse("MustParseFilePath", s, func(v string) (FilePath, error) {
-		return ParseFilePath(v, checkExists)
-	})
-}
-
 // String returns the original (cleaned) path.
 func (fp FilePath) String() string {
 	return fp.path

@@ -131,30 +131,6 @@ func InvokeNamed[T any](scope *Scope, name string) (T, error) {
 	return do.InvokeNamed[T](scope.injector, name)
 }
 
-// MustInvoke retrieves a service from the scope, panicking on error.
-// Use this in constructors where the service is guaranteed to exist.
-// For safer error handling, use Invoke instead.
-func MustInvoke[T any](scope *Scope) T {
-	service, err := Invoke[T](scope)
-	if err != nil {
-		panic(fmt.Sprintf("MustInvoke: failed to get service: %v", err))
-	}
-
-	return service
-}
-
-// MustInvokeNamed retrieves a named service from the scope, panicking on error.
-// Use this in constructors where the service is guaranteed to exist.
-// For safer error handling, use InvokeNamed instead.
-func MustInvokeNamed[T any](scope *Scope, name string) T {
-	service, err := InvokeNamed[T](scope, name)
-	if err != nil {
-		panic(fmt.Sprintf("MustInvokeNamed: failed to get service %q: %v", name, err))
-	}
-
-	return service
-}
-
 // Shutdown gracefully shuts down all services in this scope.
 // Services implementing the Shutdowner interface will be notified.
 func (s *Scope) Shutdown(ctx context.Context) error {
@@ -326,53 +302,28 @@ func (s *Scope) Path() []string {
 	return names
 }
 
-// Package returns a samber/do package function for DI integration.
-// This follows samber/do best practices for library integration.
+// Package creates a CLI and registers it in a new DI scope.
+// Returns the CLI and scope for direct use.
 //
-// Note: CLI initialization errors cannot be returned from Package() because
-// do.Package expects a void function. Applications should call NewCLI()
-// separately and handle errors, or use WithCLIScope() option for CLI-managed DI.
+// Usage:
 //
-// Usage pattern 1 (recommended - let CLI manage DI):
-//
-//	cli, err := v2.NewCLI[Config]("app", "My app", Config{})
+//	cli, err := v2.Package[Config]("app", "My app", Config{})
 //	if err != nil {
-//	    return err
+//	    log.Fatal(err)
 //	}
-//	v2.ProvideValue(cli.Scope(), cli)
-//
-// Usage pattern 2 (inject existing scope):
-//
-//	injector := do.New()
-//	cli, err := v2.NewCLI[Config]("app", "My app", Config{})
-//	if err != nil {
-//	    return err
-//	}
-//	do.ProvideValue(injector, cli.Scope())
-//
-// Usage pattern 3 (full package integration):
-//
-//	injector := do.New(
-//	    v2.Package[Config]("app", "My app", Config{}),
-//	)
-func Package[T any](name, short string, defaults T, opts ...CLIOption[T]) func(do.Injector) {
-	return func(_ do.Injector) {
-		// Create a new scope for the CLI
-		scope := NewScope(name)
+func Package[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
+	scope := NewScope(name)
 
-		// Create the CLI with the scope
-		cliOpts := make([]CLIOption[T], 0, 1+len(opts))
-		cliOpts = append(cliOpts, WithCLIScope[T](scope))
-		cliOpts = append(cliOpts, opts...)
+	cliOpts := make([]CLIOption[T], 0, 1+len(opts))
+	cliOpts = append(cliOpts, WithCLIScope[T](scope))
+	cliOpts = append(cliOpts, opts...)
 
-		cli, err := NewCLI(name, short, defaults, cliOpts...)
-		if err != nil {
-			// Cannot return error from do.Package, panic with context
-			panic(fmt.Sprintf("v2.Package: failed to create CLI %q: %v", name, err))
-		}
-
-		// Register the CLI in its scope for DI retrieval
-		// Note: cli.config is already registered by NewCLI/initialize
-		do.ProvideValue(cli.scope.injector, cli)
+	cli, err := NewCLI(name, short, defaults, cliOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("Package(%q): %w", name, err)
 	}
+
+	do.ProvideValue(cli.scope.injector, cli)
+
+	return cli, nil
 }

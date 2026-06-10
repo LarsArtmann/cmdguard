@@ -152,13 +152,3 @@ func withDoctorGroupID[T any](groupID string) CommandOption[T, NoFlags] {
 		}
 	}
 }
-
-// MustDoctorCommand creates a doctor subcommand or panics.
-func MustDoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) Command[T, NoFlags] {
-	cmd, err := DoctorCommand[T](cli, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("MustDoctorCommand: %v", err))
-	}
-
-	return cmd
-}

@@ -60,18 +60,16 @@ func TestURL(t *testing.T) {
 		}
 	})
 
-	t.Run("MustParseURL valid", func(t *testing.T) {
+	t.Run("ParseURL valid", func(t *testing.T) {
 		t.Parallel()
 
-		u := v2.MustParseURL("https://example.com")
-		if u.String() != "https://example.com" {
-			t.Errorf("String() = %q, want %q", u.String(), "https://example.com")
+		u, err := v2.ParseURL("https://example.com")
+		if err != nil {
+			t.Fatal(err)
 		}
-	})
-
-	t.Run("MustParseURL panic", func(t *testing.T) {
-		t.Parallel()
-		testMustParsePanics(t, v2.MustParseURL, "URL")
+		if u.Host() != "example.com" {
+			t.Errorf("got %q, want %q", u.Host(), "example.com")
+		}
 	})
 
 	t.Run("URL IsEmpty", func(t *testing.T) {

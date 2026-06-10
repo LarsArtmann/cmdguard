@@ -9,37 +9,33 @@ import (
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
-func TestMustNewCLI(t *testing.T) {
+func TestNewCLI(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success returns CLI", func(t *testing.T) {
 		t.Parallel()
 
-		cli := MustNewCLI[struct{}]("test", "test app", struct{}{})
+		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
+		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
 
-	t.Run("empty name panics", func(t *testing.T) {
+	t.Run("empty name returns error", func(t *testing.T) {
 		t.Parallel()
 
-		defer func() {
-			r := recover()
-			if r == nil {
-				t.Error("expected panic for empty name")
-			}
-		}()
-
-		MustNewCLI[struct{}]("", "test", struct{}{})
+		_, err := NewCLI[struct{}]("", "test", struct{}{})
+		testutil.AssertExpectedError(t, err)
 	})
 }
 
-func TestMustAddCommand(t *testing.T) {
+func TestAddCommand(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success adds command", func(t *testing.T) {
 		t.Parallel()
 
-		cli := MustNewCLI[struct{}]("test", "test app", struct{}{})
+		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
+		testutil.AssertNoError(t, err)
 		cmd, err := NewCommand[struct{}, NoFlags](
 			"hello",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
@@ -47,33 +43,28 @@ func TestMustAddCommand(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		MustAddCommand(cli, cmd)
+		testutil.AssertNoError(t, AddCommand(cli, cmd))
 	})
 
-	t.Run("duplicate command panics", func(t *testing.T) {
+	t.Run("duplicate command returns error", func(t *testing.T) {
 		t.Parallel()
 
-		cli := MustNewCLI[struct{}]("test", "test app", struct{}{})
+		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
+		testutil.AssertNoError(t, err)
 		cmd, err := NewCommand[struct{}, NoFlags](
 			"hello",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 		)
 		testutil.AssertNoError(t, err)
 
-		MustAddCommand(cli, cmd)
-
-		defer func() {
-			r := recover()
-			if r == nil {
-				t.Error("expected panic for duplicate command")
-			}
-		}()
+		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		cmd2, _ := NewCommand[struct{}, NoFlags](
 			"hello",
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 		)
-		MustAddCommand(cli, cmd2)
+		err = AddCommand(cli, cmd2)
+		testutil.AssertExpectedError(t, err)
 	})
 }
 
@@ -248,7 +239,8 @@ func TestFilePath_Exists(t *testing.T) {
 	t.Run("existing file returns true", func(t *testing.T) {
 		t.Parallel()
 
-		fp := MustParseFilePath("/etc/passwd", true)
+		fp, err := ParseFilePath("/etc/passwd", true)
+		testutil.AssertNoError(t, err)
 		testutil.AssertBoolTrue(t, fp.Exists(), "/etc/passwd should exist")
 	})
 
@@ -275,7 +267,8 @@ func TestFilePath_IsDir(t *testing.T) {
 	t.Run("file returns false", func(t *testing.T) {
 		t.Parallel()
 
-		fp := MustParseFilePath("/etc/passwd", true)
+		fp, err := ParseFilePath("/etc/passwd", true)
+		testutil.AssertNoError(t, err)
 		testutil.AssertBoolTrue(t, !fp.IsDir(), "file should not be a dir")
 	})
 }
@@ -286,7 +279,8 @@ func TestFilePath_IsFile(t *testing.T) {
 	t.Run("regular file returns true", func(t *testing.T) {
 		t.Parallel()
 
-		fp := MustParseFilePath("/etc/passwd", true)
+		fp, err := ParseFilePath("/etc/passwd", true)
+		testutil.AssertNoError(t, err)
 		testutil.AssertBoolTrue(t, fp.IsFile(), "/etc/passwd should be a file")
 	})
 

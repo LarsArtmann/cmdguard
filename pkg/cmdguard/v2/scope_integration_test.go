@@ -94,17 +94,13 @@ func TestScope_Integration(t *testing.T) {
 			Name string
 		}
 
-		pkg := Package("test-app", "Test Application", config{Name: "test"})
-
-		// Package should return a valid function
-		if pkg == nil {
-			t.Fatal("Package returned nil function")
+		cli, err := Package("test-app", "Test Application", config{Name: "test"})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
 		}
-
-		// Should not panic when called
-		assertNotPanic(t, func() {
-			pkg(nil)
-		})
+		if cli == nil {
+			t.Fatal("Package returned nil CLI")
+		}
 	})
 
 	t.Run("Package function with options", func(t *testing.T) {
@@ -114,16 +110,18 @@ func TestScope_Integration(t *testing.T) {
 			Version string
 		}
 
-		pkg := Package(
+		cli, err := Package(
 			"test-app",
 			"Test Application",
 			config{Version: "1.0.0"},
 			WithCLIVersion[config]("1.0.0"),
 		)
-
-		assertNotPanic(t, func() {
-			pkg(nil)
-		})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if cli == nil {
+			t.Fatal("Package returned nil CLI")
+		}
 	})
 }
 

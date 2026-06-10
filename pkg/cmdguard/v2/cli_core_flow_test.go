@@ -30,7 +30,7 @@ func TestCLIFlowContext(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig]("run")
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -55,7 +55,7 @@ func TestCLIFlowContext(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig]("run")
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -127,7 +127,7 @@ func TestCLIFlowContextIntegration(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig]("run")
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {

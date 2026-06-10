@@ -489,20 +489,16 @@ func TestVersionCommand(t *testing.T) {
 		}
 	})
 
-	t.Run("MustVersionCommand panics without version", func(t *testing.T) {
+	t.Run("VersionCommand returns error without version", func(t *testing.T) {
 		t.Parallel()
 
 		cli, err := NewCLI[testConfig]("myapp", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
-		defer func() {
-			r := recover()
-			if r == nil {
-				t.Fatal("expected panic")
-			}
-		}()
-
-		MustVersionCommand[testConfig](cli)
+		_, err = VersionCommand[testConfig](cli)
+		if err == nil {
+			t.Fatal("expected error when no version set")
+		}
 	})
 }
 

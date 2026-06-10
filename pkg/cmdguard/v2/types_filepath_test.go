@@ -70,25 +70,16 @@ func TestFilePath(t *testing.T) {
 		}
 	})
 
-	t.Run("MustParseFilePath valid", func(t *testing.T) {
+	t.Run("ParseFilePath valid", func(t *testing.T) {
 		t.Parallel()
 
-		fp := v2.MustParseFilePath("/tmp/test.txt", false)
-		if fp.Base() != "test.txt" {
-			t.Errorf("Base() = %q, want %q", fp.Base(), "test.txt")
+		fp, err := v2.ParseFilePath("/tmp/test.txt", false)
+		if err != nil {
+			t.Fatal(err)
 		}
-	})
-
-	t.Run("MustParseFilePath panic", func(t *testing.T) {
-		t.Parallel()
-
-		defer func() {
-			if r := recover(); r == nil {
-				t.Fatal("expected panic for empty path")
-			}
-		}()
-
-		v2.MustParseFilePath("", false)
+		if fp.String() == "" {
+			t.Error("expected non-empty path")
+		}
 	})
 
 	t.Run("FilePath MarshalText", func(t *testing.T) {

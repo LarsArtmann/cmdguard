@@ -26,12 +26,19 @@ func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
 }
 
 // newBenchCommand creates a command with standard benchmark configuration.
-func newBenchCommand(use, short string) v2.Command[BenchConfig, v2.NoFlags] {
-	return v2.MustNewCommand[BenchConfig, v2.NoFlags](
+func newBenchCommand(b *testing.B, use, short string) v2.Command[BenchConfig, v2.NoFlags] {
+	b.Helper()
+
+	cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
 		use,
 		noOpRunE[BenchConfig, v2.NoFlags],
 		v2.WithShort[BenchConfig, v2.NoFlags](short),
 	)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	return cmd
 }
 
 // BenchmarkNew measures CLI creation performance.
@@ -78,7 +85,7 @@ func BenchmarkAddCommand(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		err = v2.AddCommand(testCli, newBenchCommand("greet", "Greet someone"))
+		err = v2.AddCommand(testCli, newBenchCommand(b, "greet", "Greet someone"))
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -94,7 +101,7 @@ func BenchmarkExecute(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	if err := v2.AddCommand(cli, newBenchCommand("hello", "Say hello")); err != nil {
+	if err := v2.AddCommand(cli, newBenchCommand(b, "hello", "Say hello")); err != nil {
 		b.Fatal(err)
 	}
 
@@ -177,7 +184,7 @@ func BenchmarkFlagRegistryCreation(b *testing.B) {
 
 // BenchmarkCommandValidate measures command validation.
 func BenchmarkCommandValidate(b *testing.B) {
-	cmd := newBenchCommand("test", "Test command")
+	cmd := newBenchCommand(b, "test", "Test command")
 
 	for b.Loop() {
 		err := cmd.Validate()

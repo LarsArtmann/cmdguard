@@ -35,6 +35,7 @@ type Command[T any, F any] struct {
 	validArgs       []string
 	args            cobra.PositionalArgs
 	promptOnMissing bool
+	optionErr       error
 }
 
 // Use returns the command name and usage string.
@@ -229,6 +230,10 @@ func NewCommand[T, F any](
 		return Command[T, F]{}, err
 	}
 
+	if cmd.optionErr != nil {
+		return Command[T, F]{}, cmd.optionErr
+	}
+
 	return cmd, nil
 }
 
@@ -273,36 +278,9 @@ func NewParentCommand[T, F any](
 		return Command[T, F]{}, fmt.Errorf("long=%q: %w", long, err)
 	}
 
+	if cmd.optionErr != nil {
+		return Command[T, F]{}, cmd.optionErr
+	}
+
 	return cmd, nil
-}
-
-// MustNewCommand creates a leaf command or panics.
-// Use this when the command configuration is known at compile time.
-func MustNewCommand[T, F any](
-	use string,
-	runE func(ctx context.Context, cfg *T, flags F) error,
-	opts ...CommandOption[T, F],
-) Command[T, F] {
-	cmd, err := NewCommand(use, runE, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("MustNewCommand(%q): %v", use, err))
-	}
-
-	return cmd
-}
-
-// MustNewParentCommand creates a parent command or panics.
-// Use this when the command configuration is known at compile time.
-func MustNewParentCommand[T, F any](
-	use string,
-	long string,
-	subcommands []Command[T, F],
-	opts ...CommandOption[T, F],
-) Command[T, F] {
-	cmd, err := NewParentCommand(use, long, subcommands, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("MustNewParentCommand(%q): %v", use, err))
-	}
-
-	return cmd
 }

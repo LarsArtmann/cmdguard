@@ -173,25 +173,6 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	return nil
 }
 
-// MustAddCommand adds a subcommand to the CLI or panics.
-// Use this when the command configuration is known at compile time.
-func MustAddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) {
-	err := AddCommand(cli, cmd)
-	if err != nil {
-		panic(fmt.Sprintf("MustAddCommand(%q): %v", cmd.use, err))
-	}
-}
-
-// MustNewCLI creates a new CLI application or panics.
-func MustNewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) *CLI[T] {
-	cli, err := NewCLI(name, short, defaults, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("MustNewCLI(%q): %v", name, err))
-	}
-
-	return cli
-}
-
 func (cli *CLI[T]) applyGlamourIfEnabled() {
 	if cli.glamourHelp {
 		applyGlamourHelp(cli.rootCmd, cli.glamourTheme)

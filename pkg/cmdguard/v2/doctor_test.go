@@ -27,15 +27,15 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd := MustDoctorCommand[testConfig](cli)
+		cmd, err := DoctorCommand[testConfig](cli)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
-		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, cli.Execute(context.Background()))
 
 		output := out.String()
 		if !strings.Contains(output, "passed") || !strings.Contains(output, "0 failed") {
@@ -49,15 +49,15 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
-		cmd := MustDoctorCommand[testConfig](cli)
+		cmd, err := DoctorCommand[testConfig](cli)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
-		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, cli.Execute(context.Background()))
 
 		output := out.String()
 		if !strings.Contains(output, "✓") {
@@ -75,14 +75,15 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorUnhealthyService{}))
 
-		cmd := MustDoctorCommand[testConfig](cli)
+		cmd, err := DoctorCommand[testConfig](cli)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
+		err = cli.Execute(context.Background())
 		if err == nil {
 			t.Fatal("expected error for unhealthy service")
 		}
@@ -103,7 +104,7 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		customCheckCalled := false
 
-		cmd := MustDoctorCommand[testConfig](
+		cmd, err := DoctorCommand[testConfig](
 			cli,
 			WithDoctorCheck[testConfig]("custom", func(ctx context.Context) error {
 				customCheckCalled = true
@@ -111,14 +112,14 @@ func TestDoctorCommand(t *testing.T) {
 				return nil
 			}),
 		)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
-		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, cli.Execute(context.Background()))
 
 		if !customCheckCalled {
 			t.Error("expected custom check to be called")
@@ -134,19 +135,20 @@ func TestDoctorCommand(t *testing.T) {
 
 		cli := newDoctorCLI(t)
 
-		cmd := MustDoctorCommand[testConfig](
+		cmd, err := DoctorCommand[testConfig](
 			cli,
 			WithDoctorCheck[testConfig]("failing", func(ctx context.Context) error {
 				return errors.New("connection refused")
 			}),
 		)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
+		err = cli.Execute(context.Background())
 		if err == nil {
 			t.Fatal("expected error for failing check")
 		}
@@ -166,7 +168,7 @@ func TestDoctorCommand(t *testing.T) {
 
 		cli := newDoctorCLI(t)
 
-		cmd := MustDoctorCommand[testConfig](
+		cmd, err := DoctorCommand[testConfig](
 			cli,
 			WithDoctorCheck[testConfig]("zebra", func(ctx context.Context) error {
 				return nil
@@ -175,14 +177,14 @@ func TestDoctorCommand(t *testing.T) {
 				return nil
 			}),
 		)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
-		testutil.AssertNoError(t, err)
+		testutil.AssertNoError(t, cli.Execute(context.Background()))
 
 		output := out.String()
 		alphaIdx := strings.Index(output, "alpha")
@@ -197,10 +199,11 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd := MustDoctorCommand[testConfig](
+		cmd, err := DoctorCommand[testConfig](
 			cli,
 			WithDoctorShort[testConfig]("Run diagnostics"),
 		)
+		testutil.AssertNoError(t, err)
 		if cmd.Short() != "Run diagnostics" {
 			t.Errorf("expected short 'Run diagnostics', got %q", cmd.Short())
 		}
@@ -210,10 +213,11 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd := MustDoctorCommand[testConfig](
+		cmd, err := DoctorCommand[testConfig](
 			cli,
 			WithDoctorGroupID[testConfig]("system"),
 		)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 	})
 
@@ -223,19 +227,20 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
-		cmd := MustDoctorCommand[testConfig](
+		cmd, err := DoctorCommand[testConfig](
 			cli,
 			WithDoctorCheck[testConfig]("db", func(ctx context.Context) error {
 				return errors.New("timeout")
 			}),
 		)
+		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
 		var out strings.Builder
 		cli.rootCmd.SetOut(&out)
 		cli.rootCmd.SetArgs([]string{"doctor"})
 
-		err := cli.Execute(context.Background())
+		err = cli.Execute(context.Background())
 		if err == nil {
 			t.Fatal("expected error")
 		}

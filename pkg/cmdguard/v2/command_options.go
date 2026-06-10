@@ -98,11 +98,13 @@ func WithGroupID[T, F any](group string) CommandOption[T, F] {
 	}
 }
 
-// mustNonNegative panics if n is negative.
-func mustNonNegative(name string, n int) {
+// nonNegativeErr returns an error if n is negative.
+func nonNegativeErr(name string, n int) error {
 	if n < 0 {
-		panic(fmt.Sprintf("%s: %v: n=%d", name, ErrNegativeArgCount, n))
+		return fmt.Errorf("%s: %w: n=%d", name, ErrNegativeArgCount, n)
 	}
+
+	return nil
 }
 
 // WithArgs sets a custom positional arguments validator.
@@ -113,47 +115,63 @@ func WithArgs[T, F any](args cobra.PositionalArgs) CommandOption[T, F] {
 }
 
 // WithExactArgs requires exactly n positional arguments.
-// Panics if n is negative.
+// Returns an option that sets an error if n is negative.
 func WithExactArgs[T, F any](n int) CommandOption[T, F] {
-	mustNonNegative("WithExactArgs", n)
-
 	return func(c *Command[T, F]) {
+		if err := nonNegativeErr("WithExactArgs", n); err != nil {
+			c.optionErr = err
+
+			return
+		}
+
 		c.args = cobra.ExactArgs(n)
 	}
 }
 
 // WithMinimumArgs requires at least n positional arguments.
-// Panics if n is negative.
+// Returns an option that sets an error if n is negative.
 func WithMinimumArgs[T, F any](n int) CommandOption[T, F] {
-	mustNonNegative("WithMinimumArgs", n)
-
 	return func(c *Command[T, F]) {
+		if err := nonNegativeErr("WithMinimumArgs", n); err != nil {
+			c.optionErr = err
+
+			return
+		}
+
 		c.args = cobra.MinimumNArgs(n)
 	}
 }
 
 // WithMaximumArgs allows at most n positional arguments.
-// Panics if n is negative.
+// Returns an option that sets an error if n is negative.
 func WithMaximumArgs[T, F any](n int) CommandOption[T, F] {
-	mustNonNegative("WithMaximumArgs", n)
-
 	return func(c *Command[T, F]) {
+		if err := nonNegativeErr("WithMaximumArgs", n); err != nil {
+			c.optionErr = err
+
+			return
+		}
+
 		c.args = cobra.MaximumNArgs(n)
 	}
 }
 
 // WithRangeArgs requires between minArgs and maxArgs positional arguments (inclusive).
-// Panics if minArgs is negative or minArgs > maxArgs.
+// Returns an option that sets an error if minArgs is negative or minArgs > maxArgs.
 func WithRangeArgs[T, F any](minArgs, maxArgs int) CommandOption[T, F] {
-	if minArgs < 0 {
-		panic(fmt.Sprintf("WithRangeArgs: %v: min=%d", ErrNegativeArgCount, minArgs))
-	}
-
-	if minArgs > maxArgs {
-		panic(fmt.Sprintf("WithRangeArgs: %v: min=%d max=%d", ErrInvalidArgRange, minArgs, maxArgs))
-	}
-
 	return func(c *Command[T, F]) {
+		if minArgs < 0 {
+			c.optionErr = fmt.Errorf("WithRangeArgs: %w: min=%d", ErrNegativeArgCount, minArgs)
+
+			return
+		}
+
+		if minArgs > maxArgs {
+			c.optionErr = fmt.Errorf("WithRangeArgs: %w: min=%d max=%d", ErrInvalidArgRange, minArgs, maxArgs)
+
+			return
+		}
+
 		c.args = cobra.RangeArgs(minArgs, maxArgs)
 	}
 }

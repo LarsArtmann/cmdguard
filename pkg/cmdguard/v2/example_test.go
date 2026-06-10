@@ -88,11 +88,11 @@ func ExampleNewParentCommand() {
 	// Output: parent created: items
 }
 
-// ExampleMustNewCommand demonstrates the panic variant for compile-time-known config.
-func ExampleMustNewCommand() {
+// ExampleNewCommand_minimal demonstrates minimal command creation with error handling.
+func ExampleNewCommand_minimal() {
 	type config struct{}
 
-	cmd := v2.MustNewCommand[config, v2.NoFlags](
+	cmd, err := v2.NewCommand[config, v2.NoFlags](
 		"version",
 		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
 			fmt.Println("v1.0.0")
@@ -101,6 +101,11 @@ func ExampleMustNewCommand() {
 		},
 		v2.WithShort[config, v2.NoFlags]("Print version"),
 	)
+	if err != nil {
+		fmt.Println("error:", err)
+
+		return
+	}
 
 	fmt.Println("command:", cmd.Use())
 	// Output: command: version

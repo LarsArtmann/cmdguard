@@ -682,14 +682,17 @@ func TestTaskStore_IDs(t *testing.T) {
 	}
 }
 
-// --- MustParse helper ---
+// --- Parse helper ---
 
-func TestMustParse(t *testing.T) {
+func TestParseDuration(t *testing.T) {
 	t.Parallel()
 
-	got := v2.MustParse("duration", "5s", v2.ParseDuration)
+	got, err := v2.ParseDuration("5s")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if got.Duration().String() != "5s" {
-		t.Errorf("MustParse duration = %v, want 5s", got)
+		t.Errorf("ParseDuration(5s) = %v, want 5s", got)
 	}
 }
 

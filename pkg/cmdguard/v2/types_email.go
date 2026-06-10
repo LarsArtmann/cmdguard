@@ -32,12 +32,6 @@ func ParseEmail(s string) (Email, error) {
 	return Email{address: addr.Address}, nil
 }
 
-// MustParseEmail creates an Email from a string, panicking if invalid.
-// Use only when you know the email is valid (e.g., for constants).
-func MustParseEmail(s string) Email {
-	return MustParse("MustParseEmail", s, ParseEmail)
-}
-
 // String returns the email address as a string.
 func (e Email) String() string {
 	return e.address

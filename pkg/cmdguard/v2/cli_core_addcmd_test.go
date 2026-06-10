@@ -47,7 +47,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommandWithShort[testCLIConfig]("version", "Show version")
+		cmd := newTestCLICommandWithShort[testCLIConfig](t, "version", "Show version")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -63,7 +63,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommandWithShort[testCLIConfig]("test", "Test command")
+		cmd := newTestCLICommandWithShort[testCLIConfig](t, "test", "Test command")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {

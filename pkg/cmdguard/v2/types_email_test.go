@@ -55,16 +55,16 @@ func TestEmail(t *testing.T) {
 		}
 	})
 
-	t.Run("MustParseEmail valid", func(t *testing.T) {
+	t.Run("ParseEmail valid", func(t *testing.T) {
 		t.Parallel()
 
-		e := v2.MustParseEmail("test@test.com")
-		testutil.AssertStringerEq(t, e, "test@test.com")
-	})
-
-	t.Run("MustParseEmail panic", func(t *testing.T) {
-		t.Parallel()
-		testMustParsePanics(t, v2.MustParseEmail, "email")
+		e, err := v2.ParseEmail("test@test.com")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if e.String() != "test@test.com" {
+			t.Errorf("got %q, want %q", e.String(), "test@test.com")
+		}
 	})
 
 	t.Run("Email IsEmpty", func(t *testing.T) {

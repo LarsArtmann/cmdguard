@@ -90,32 +90,6 @@ func TestParseEnum_ErrorCases(t *testing.T) {
 	})
 }
 
-func TestMustParseEnum(t *testing.T) {
-	t.Parallel()
-
-	t.Run("valid", func(t *testing.T) {
-		t.Parallel()
-
-		e := MustParseEnum("fast", []string{"slow", "fast"})
-		if e.String() != "fast" {
-			t.Errorf("MustParseEnum(fast) = %q, want %q", e.String(), "fast")
-		}
-	})
-
-	t.Run("invalid panics", func(t *testing.T) {
-		t.Parallel()
-
-		defer func() {
-			r := recover()
-			if r == nil {
-				t.Fatal("expected panic, got nil")
-			}
-		}()
-
-		MustParseEnum("invalid", []string{"valid"})
-	})
-}
-
 func TestEnum_Methods(t *testing.T) {
 	t.Parallel()
 

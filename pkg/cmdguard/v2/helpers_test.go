@@ -98,58 +98,6 @@ func TestLogLevel(t *testing.T) {
 	})
 }
 
-func TestMustParseLogLevel(t *testing.T) {
-	t.Parallel()
-
-	t.Run("valid", func(t *testing.T) {
-		t.Parallel()
-
-		l := MustParseLogLevel("info")
-		if l.String() != "info" {
-			t.Errorf("MustParseLogLevel(info) = %q, want %q", l.String(), "info")
-		}
-	})
-
-	t.Run("invalid panics", func(t *testing.T) {
-		t.Parallel()
-
-		defer func() {
-			r := recover()
-			if r == nil {
-				t.Fatal("expected panic, got nil")
-			}
-		}()
-
-		MustParseLogLevel("invalid")
-	})
-}
-
-func TestMustParseLogFormat(t *testing.T) {
-	t.Parallel()
-
-	t.Run("valid", func(t *testing.T) {
-		t.Parallel()
-
-		f := MustParseLogFormat("json")
-		if f.String() != "json" {
-			t.Errorf("MustParseLogFormat(json) = %q, want %q", f.String(), "json")
-		}
-	})
-
-	t.Run("invalid panics", func(t *testing.T) {
-		t.Parallel()
-
-		defer func() {
-			r := recover()
-			if r == nil {
-				t.Fatal("expected panic, got nil")
-			}
-		}()
-
-		MustParseLogFormat("xml")
-	})
-}
-
 func TestLogFormat(t *testing.T) {
 	t.Parallel()
 	t.Run("constants", func(t *testing.T) {

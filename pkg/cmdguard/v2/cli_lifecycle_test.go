@@ -289,7 +289,7 @@ func TestCLIExecuteAndExit(t *testing.T) {
 
 		cli, _ := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
 
-		cmd := newTestCLICommand[testCLIConfig]("run")
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
 
 		err := v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -347,7 +347,7 @@ func TestCLINoColor(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig]("run")
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
 		if err := v2.AddCommand(cli, cmd); err != nil {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
@@ -372,7 +372,7 @@ func TestCLINoColorEnvVar(t *testing.T) {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
 
-	cmd := newTestCLICommand[testCLIConfig]("run")
+	cmd := newTestCLICommand[testCLIConfig](t, "run")
 	if err := v2.AddCommand(cli, cmd); err != nil {
 		t.Fatalf("AddCommand failed: %v", err)
 	}

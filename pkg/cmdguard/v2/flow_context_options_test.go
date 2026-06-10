@@ -3,8 +3,6 @@ package v2
 import (
 	"context"
 	"testing"
-
-	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestWithFlowContextValue(t *testing.T) {
@@ -71,29 +69,4 @@ func TestGetBranchingFlowContext_NotFound(t *testing.T) {
 	if ok {
 		t.Error("expected ok to be false when no branching flow context")
 	}
-}
-
-func TestRequireBranchingFlowContext(t *testing.T) {
-	t.Parallel()
-	t.Run("found", func(t *testing.T) {
-		t.Parallel()
-
-		ctx := context.Background()
-		bfc := NewBranchingFlowContext(ctx)
-		wrapped := WithBranchingFlowContext(ctx, bfc)
-
-		retrieved := RequireBranchingFlowContext(wrapped)
-		if retrieved != bfc {
-			t.Error("expected retrieved context to match original")
-		}
-	})
-
-	t.Run("not found panics", func(t *testing.T) {
-		t.Parallel()
-
-		testutil.AssertPanics(t, func() {
-			ctx := context.Background()
-			RequireBranchingFlowContext(ctx)
-		})
-	})
 }

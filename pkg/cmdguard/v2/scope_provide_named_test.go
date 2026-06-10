@@ -120,28 +120,29 @@ func TestMustInvoke(t *testing.T) {
 
 		mustProvideValue(t, scope, "hello")
 
-		value := MustInvoke[string](scope)
+		value, err := Invoke[string](scope)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		if value != "hello" {
 			t.Errorf("expected value 'hello', got %q", value)
 		}
 	})
 
-	t.Run("panics for nil scope", func(t *testing.T) {
+	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		testutil.AssertPanics(t, func() {
-			MustInvoke[string](nil)
-		})
+		_, err := Invoke[string](nil)
+		testutil.AssertExpectedError(t, err)
 	})
 
-	t.Run("panics for unregistered service", func(t *testing.T) {
+	t.Run("returns error for unregistered service", func(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
 
-		testutil.AssertPanics(t, func() {
-			MustInvoke[string](scope)
-		})
+		_, err := Invoke[string](scope)
+		testutil.AssertExpectedError(t, err)
 	})
 }
 
@@ -157,27 +158,28 @@ func TestMustInvokeNamed(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		value := MustInvokeNamed[int](scope, "my-service")
+		value, err := InvokeNamed[int](scope, "my-service")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		if value != 99 {
 			t.Errorf("expected value 99, got %d", value)
 		}
 	})
 
-	t.Run("panics for nil scope", func(t *testing.T) {
+	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		testutil.AssertPanics(t, func() {
-			MustInvokeNamed[string](nil, "name")
-		})
+		_, err := InvokeNamed[string](nil, "name")
+		testutil.AssertExpectedError(t, err)
 	})
 
-	t.Run("panics for unregistered named service", func(t *testing.T) {
+	t.Run("returns error for unregistered named service", func(t *testing.T) {
 		t.Parallel()
 
 		scope := NewScope("test")
 
-		testutil.AssertPanics(t, func() {
-			MustInvokeNamed[string](scope, "nonexistent")
-		})
+		_, err := InvokeNamed[string](scope, "nonexistent")
+		testutil.AssertExpectedError(t, err)
 	})
 }

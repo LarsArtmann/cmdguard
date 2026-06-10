@@ -132,18 +132,16 @@ func TestPort(t *testing.T) {
 		}
 	})
 
-	t.Run("MustParsePort valid", func(t *testing.T) {
+	t.Run("ParsePort valid", func(t *testing.T) {
 		t.Parallel()
 
-		p := v2.MustParsePort("443")
-		if p.Int() != 443 {
-			t.Errorf("Int() = %d, want %d", p.Int(), 443)
+		p, err := v2.ParsePort("443")
+		if err != nil {
+			t.Fatal(err)
 		}
-	})
-
-	t.Run("MustParsePort panic", func(t *testing.T) {
-		t.Parallel()
-		testMustParsePanics(t, v2.MustParsePort, "port")
+		if p.Int() != 443 {
+			t.Errorf("got %d, want %d", p.Int(), 443)
+		}
 	})
 
 	t.Run("Port MarshalText", func(t *testing.T) {

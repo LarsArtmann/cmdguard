@@ -297,10 +297,13 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	}
 
 	// --- doctor: DoctorCommand, HealthCheckResultsWithContext ---
-	doctorCmd := v2.MustDoctorCommand[AppConfig](
+	doctorCmd, err := v2.DoctorCommand[AppConfig](
 		cli,
 		v2.WithDoctorGroupID[AppConfig]("system"),
 	)
+	if err != nil {
+		return err
+	}
 	if err := v2.AddCommand(cli, doctorCmd); err != nil {
 		return err
 	}
@@ -358,8 +361,11 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		return err
 	}
 
-	// --- version: MustVersionCommand ---
-	versionCmd := v2.MustVersionCommand[AppConfig](cli)
+	// --- version: VersionCommand ---
+	versionCmd, err := v2.VersionCommand[AppConfig](cli)
+	if err != nil {
+		return err
+	}
 	if err := v2.AddCommand(cli, versionCmd); err != nil {
 		return err
 	}
