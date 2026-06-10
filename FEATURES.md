@@ -44,7 +44,7 @@
 | `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error                       |
 | `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling                   |
 | `WithColor[T](bool)`           | 🗑️ DEPRECATED       | Use WithFang instead                          |
-| `WithFangOptions[T]()`         | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
+| `WithFangOptions[T](opts...)`  | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
 | `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                        |
 | `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                        |
 | `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups                    |
@@ -202,7 +202,7 @@
 | ------------------------------ | ------------------- | ------------------------------------ |
 | `VersionCommand[T](cli)`       | ✅ FULLY_FUNCTIONAL | Typed version subcommand             |
 | `MustVersionCommand[T](cli)`   | ✅ FULLY_FUNCTIONAL | Panic variant                        |
-| `GenerateVersionCommand[T](w)` | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
+| `GenerateVersionCommand[T](cli, w)` | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
 
 ### Helpers
 
@@ -217,7 +217,7 @@
 
 | Feature                   | Status              | Notes                                       |
 | ------------------------- | ------------------- | ------------------------------------------- |
-| 35+ sentinel errors       | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
+| 60 sentinel errors            | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
 | Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
 | `ExitCoder` / `ExitError` | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
 | FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |

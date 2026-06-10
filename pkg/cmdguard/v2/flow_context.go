@@ -22,6 +22,7 @@ type BranchingFlowContext struct {
 
 	path       []string
 	values     map[any]any
+	localKeys  map[any]struct{}
 	selfCancel context.CancelFunc
 	parent     *BranchingFlowContext
 	children   []*BranchingFlowContext
@@ -36,11 +37,12 @@ func NewBranchingFlowContext(ctx context.Context) *BranchingFlowContext {
 	}
 
 	return &BranchingFlowContext{
-		Context:  ctx,
-		path:     []string{},
-		values:   make(map[any]any),
-		parent:   nil,
-		children: nil,
+		Context:   ctx,
+		path:      []string{},
+		values:    make(map[any]any),
+		localKeys: make(map[any]struct{}),
+		parent:    nil,
+		children:  nil,
 	}
 }
 
@@ -102,11 +104,12 @@ func (b *BranchingFlowContext) newChild(
 	commandName string,
 ) *BranchingFlowContext {
 	return &BranchingFlowContext{
-		Context:  ctx,
-		path:     append(slices.Clone(b.path), commandName),
-		values:   maps.Clone(b.values),
-		parent:   b,
-		children: nil,
+		Context:   ctx,
+		path:      append(slices.Clone(b.path), commandName),
+		values:    maps.Clone(b.values),
+		localKeys: make(map[any]struct{}),
+		parent:    b,
+		children:  nil,
 	}
 }
 
@@ -168,7 +171,7 @@ func (b *BranchingFlowContext) SetValue(key, value any) {
 	b.values[key] = value
 
 	for _, child := range b.children {
-		if _, hasLocal := child.values[key]; hasLocal {
+		if _, isLocal := child.localKeys[key]; isLocal {
 			continue
 		}
 
@@ -179,6 +182,7 @@ func (b *BranchingFlowContext) SetValue(key, value any) {
 // SetValueLocal sets a value only in this context (not propagated to children).
 func (b *BranchingFlowContext) SetValueLocal(key, value any) {
 	b.values[key] = value
+	b.localKeys[key] = struct{}{}
 }
 
 // GetValue retrieves a value from this context or any ancestor.

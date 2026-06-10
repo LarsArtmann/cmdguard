@@ -53,7 +53,6 @@
 - [ ] Rename `Get[T]`/`MustGet[T]` to more specific names
 - [ ] Make `RegisterInScope` generic instead of `...any`
 - [ ] Remove or redesign `Package()` for error-safe DI integration
-- [ ] Make `NoFlags` a distinct named type (not type alias)
 
 ---
 
@@ -116,7 +115,7 @@
 
 ## go-output Dependency Architecture
 
-> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.6.2.
+> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.7.2.
 
 `go-output` provides 12 output formats. Consider extracting to a sub-package in v3.0 so consumers only pay the dependency cost when they use `--output`.
 

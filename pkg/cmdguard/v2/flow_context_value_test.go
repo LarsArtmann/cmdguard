@@ -63,6 +63,77 @@ func TestBranchingFlowContext_ChildValueIsolation(t *testing.T) {
 	assertFlowValue(t, child, "shared", "child-val", "child should see its own local value")
 }
 
+func TestBranchingFlowContext_SetValueLocal_PreventsParentOverwrite(t *testing.T) {
+	t.Parallel()
+
+	root := NewBranchingFlowContext(context.Background())
+
+	child, cancel := root.Branch("child")
+	defer cancel()
+
+	child.SetValueLocal("key", "child-original")
+	root.SetValue("key", "parent-update")
+
+	assertFlowValue(t, root, "key", "parent-update", "root should have updated value")
+
+	assertFlowValue(
+		t,
+		child,
+		"key",
+		"child-original",
+		"child's local value should not be overwritten by parent SetValue",
+	)
+}
+
+func TestBranchingFlowContext_SetValue_UpdatesInheritedChild(t *testing.T) {
+	t.Parallel()
+
+	root := NewBranchingFlowContext(context.Background())
+
+	root.SetValue("key", "initial")
+
+	child, cancel := root.Branch("child")
+	defer cancel()
+
+	assertFlowValue(t, child, "key", "initial", "child should inherit initial value")
+
+	root.SetValue("key", "updated")
+
+	assertFlowValue(t, child, "key", "updated", "child should receive parent update for inherited key")
+}
+
+func TestBranchingFlowContext_SetValue_MixedLocalAndInheritedSiblings(t *testing.T) {
+	t.Parallel()
+
+	root := NewBranchingFlowContext(context.Background())
+
+	child1, cancel1 := root.Branch("child1")
+	defer cancel1()
+
+	child2, cancel2 := root.Branch("child2")
+	defer cancel2()
+
+	child1.SetValueLocal("key", "child1-local")
+
+	root.SetValue("key", "parent-value")
+
+	assertFlowValue(
+		t,
+		child1,
+		"key",
+		"child1-local",
+		"child1 local value should not be overwritten",
+	)
+
+	assertFlowValue(
+		t,
+		child2,
+		"key",
+		"parent-value",
+		"child2 should receive parent value (no local override)",
+	)
+}
+
 func TestBranchingFlowContext_GetValue(t *testing.T) {
 	t.Parallel()
 

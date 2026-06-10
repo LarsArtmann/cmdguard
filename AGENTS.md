@@ -60,8 +60,9 @@ cmdguard/
 │   │   ├── cli_accessors.go      # CLI accessor methods (Config, Scope, etc.)
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
 │   │   ├── cli_options.go        # CLI functional options (WithCLIVersion, etc.)
-│   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
 │   │   ├── cli_output.go          # Output format flag registration and parsing
+│   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
+│   │   ├── command_options.go    # All 19 CommandOption functions (WithShort, WithFlags, etc.)
 │   │   ├── command_suggest.go    # (removed — consolidated into flags_suggest.go)
 │   │   ├── config.go             # Config type constraint
 │   │   ├── config_file.go        # ConfigFileLoader, JSON loader, WithConfigFile
@@ -87,6 +88,7 @@ cmdguard/
 │   │   ├── glamour.go            # Markdown help rendering via glamour/v2
 │   │   ├── manpage.go            # Man page generation via mango
 │   │   ├── middleware.go         # Middleware chain pattern
+│   │   ├── output.go             # Rich output (OutputTable, OutputResult, 12+ formats)
 │   │   ├── prompts.go            # Interactive prompts via huh/v2
 │   │   ├── scope.go              # DI scope wrapping samber/do/v2
 │   │   ├── spinner.go            # Terminal spinner middleware
@@ -147,7 +149,7 @@ cmdguard/
 | `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
 | `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0  |
 | `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output` | Rich output formats  | latest  |
+| `github.com/larsartmann/go-output` | Rich output formats  | v0.7.2  |
 
 ---
 

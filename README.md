@@ -119,9 +119,9 @@ HELLO, CMDGUARD!
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                 |
 | **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                          |
 | **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`, or write your own |
-|                            | **Interactive prompts**                                                                                 | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh         |
-|                            | **Markdown help**                                                                                       | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour |
-|                            | **Color control**                                                                                       | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor          |
+| **Interactive prompts**   | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh         |
+| **Markdown help**         | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour |
+| **Color control**         | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor          |
 | **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                       |
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |

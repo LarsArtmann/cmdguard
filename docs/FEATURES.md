@@ -1,6 +1,6 @@
 # cmdguard Features
 
-**Updated:** 2026-06-03
+**Updated:** 2026-06-10
 **Status:** v2.4.0 — 0 lint issues, 0 race conditions
 
 ---
@@ -222,7 +222,7 @@ bfc.BranchWithDuration("slow-op", 5*time.Second)
 
 ### Error Handling
 
-40+ sentinel errors for `errors.Is()` chainability:
+60 sentinel errors for `errors.Is()` chainability:
 
 ```go
 errors.Is(err, v2.ErrInvalidCommand)
@@ -246,7 +246,11 @@ Built-in shell completion for bash, zsh, fish, and PowerShell.
 Generate man pages from command definitions:
 
 ```go
-v2.AddCommand(cli, v2.MustGenerateManPageCommand[Config](cli))
+cmd, err := v2.GenerateManPageCommand[Config](cli)
+if err != nil {
+    panic(err)
+}
+v2.AddCommand(cli, cmd)
 ```
 
 ### Health Checks & Graceful Shutdown
