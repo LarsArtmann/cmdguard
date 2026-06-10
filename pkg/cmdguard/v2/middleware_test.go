@@ -49,7 +49,7 @@ func TestMiddleware_BasicChaining(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(mw1, mw2),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -91,7 +91,7 @@ func TestMiddleware_ErrorPropagation(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -127,7 +127,7 @@ func TestMiddleware_ShortCircuit(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(blockingMiddleware),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -160,7 +160,7 @@ func TestMiddleware_CommandInfo(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(captureMiddleware),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -198,7 +198,7 @@ func TestTimingMiddleware(t *testing.T) {
 			capturedName = name
 			capturedDuration = d
 		})),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -232,7 +232,7 @@ func TestRecoveryMiddleware(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(RecoveryMiddleware[testConfig]()),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -261,7 +261,7 @@ func TestMiddleware_NoMiddleware(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -295,7 +295,7 @@ func TestMiddleware_Subcommands(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(trackingMiddleware),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -420,7 +420,7 @@ func TestMiddleware_WithFlags(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(inspectMiddleware),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 

@@ -18,7 +18,7 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 		"test", "Test CLI", testConfig{},
 		WithGroup[testConfig]("core", "Core Commands:"),
 		WithGroup[testConfig]("utils", "Utilities:"),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 		WithSilenceUsage[testConfig](),
 		WithSilenceErrors[testConfig](),
 	)
@@ -90,7 +90,7 @@ func TestCommandGroups_NoGroup(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithGroup[testConfig]("core", "Core Commands:"),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 		WithSilenceUsage[testConfig](),
 		WithSilenceErrors[testConfig](),
 	)
@@ -119,7 +119,7 @@ func TestCommandGroups_CommandExecutionStillWorks(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithGroup[testConfig]("main", "Main Commands:"),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -154,7 +154,7 @@ func TestCommandGroups_SubcommandsInheritFromParent(t *testing.T) {
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
 		WithGroup[testConfig]("core", "Core Commands:"),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -195,7 +195,7 @@ func TestWithGroup_RegistersMultipleGroups(t *testing.T) {
 		WithGroup[testConfig]("alpha", "Alpha Group:"),
 		WithGroup[testConfig]("beta", "Beta Group:"),
 		WithGroup[testConfig]("gamma", "Gamma Group:"),
-		WithColor[testConfig](false),
+		WithFang[testConfig](false),
 		WithSilenceUsage[testConfig](),
 		WithSilenceErrors[testConfig](),
 	)

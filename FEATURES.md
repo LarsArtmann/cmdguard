@@ -43,7 +43,6 @@
 | `WithSilenceErrors[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing                 |
 | `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error                       |
 | `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling                   |
-| `WithColor[T](bool)`           | 🗑️ DEPRECATED       | Use WithFang instead                          |
 | `WithFangOptions[T](opts...)`  | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
 | `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                        |
 | `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                        |

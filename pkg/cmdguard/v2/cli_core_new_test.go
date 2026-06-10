@@ -83,23 +83,23 @@ func TestNewCLI(t *testing.T) {
 		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceUsage, "SilenceUsage")
 	})
 
-	t.Run("WithColor false disables fang", func(t *testing.T) {
+	t.Run("WithFang false disables fang", func(t *testing.T) {
 		t.Parallel()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithColor[testCLIConfig](false),
+			v2.WithFang[testCLIConfig](false),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
 
-	t.Run("WithColor true keeps fang enabled", func(t *testing.T) {
+	t.Run("WithFang true keeps fang enabled", func(t *testing.T) {
 		t.Parallel()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithColor[testCLIConfig](true),
+			v2.WithFang[testCLIConfig](true),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
