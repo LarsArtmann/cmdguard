@@ -125,7 +125,7 @@ HELLO, CMDGUARD!
 | **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                       |
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
-| **Zero panics**            | Every v2 API function returns errors — never panics in library code                                     |
+| **Minimal panics**        | All non-Must functions return errors; Must-prefixed variants panic for compile-time-known config                                     |
 | **364 tests**              | 82.9% coverage, race-detected, fuzz-tested                                                              |
 
 ---
@@ -274,7 +274,7 @@ type Flags struct {
 ## Command Options
 
 | Option                          | Purpose                            |
-| ------------------------------- | ---------------------------------- | ------------------------------- |
+| ------------------------------- | ---------------------------------- |
 | `WithShort[T, F](short)`        | Short description                  |
 | `WithLong[T, F](long)`          | Long description                   |
 | `WithExample[T, F](example)`    | Example usage                      |
@@ -288,8 +288,8 @@ type Flags struct {
 | `WithExactArgs[T, F](n)`        | Require exactly n positional args  |
 | `WithMinimumArgs[T, F](n)`      | Require at least n positional args |
 | `WithMaximumArgs[T, F](n)`      | Allow at most n positional args    |
-|                                 | `WithValidArgs[T, F](args...)`     | Restrict args to allowed values |
-|                                 | `WithSubcommands[T, F](cmds...)`   | Attach child commands (parent)  |
+| `WithValidArgs[T, F](args...)`   | Restrict args to allowed values    |
+| `WithSubcommands[T, F](cmds...)` | Attach child commands (parent)     |
 | `WithRangeArgs[T, F](min, max)` | Require between min and max args   |
 | `WithNoArgs[T, F]()`            | Reject any positional args         |
 | `WithCompletion[T, F](fn)`      | Dynamic shell completion           |

@@ -22,7 +22,7 @@
 
 | Feature                                     | Status              | Notes                                |
 | ------------------------------------------- | ------------------- | ------------------------------------ |
-| `NewCLI[T](name, short, defaults, opts...)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, never panics      |
+| `NewCLI[T](name, short, defaults, opts...)` | ✅ FULLY_FUNCTIONAL | Creates typed CLI, returns errors     |
 | `AddCommand(cli, cmd)`                      | ✅ FULLY_FUNCTIONAL | Adds typed subcommand, returns error |
 | `Execute(ctx)`                              | ✅ FULLY_FUNCTIONAL | Runs command with context            |
 | `ExecuteWithArgs(ctx, args)`                | ✅ FULLY_FUNCTIONAL | For testing                          |
@@ -221,7 +221,7 @@
 | Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
 | `ExitCoder` / `ExitError` | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
 | FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
-| No panics (library API)   | ✅ FULLY_FUNCTIONAL | All operations return errors                |
+| No panics (non-Must API)  | ✅ FULLY_FUNCTIONAL | All non-Must functions return errors        |
 
 ---
 

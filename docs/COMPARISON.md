@@ -29,7 +29,7 @@
 - ✅ **Built-in DI** — samber/do/v2 with `Provide`/`Invoke` and lifecycle hooks
 - ✅ **Typo suggestions** — "did you mean?" for flags and subcommands
 - ✅ **Constructor validation** — invalid commands caught at registration time
-- ✅ **Zero panics** — all APIs return errors
+- ✅ **Minimal panics** — all non-Must APIs return errors; Must variants panic for compile-time config
 - ✅ **Rich output** — 12+ formats (JSON, CSV, YAML, table, etc.)
 - ✅ **Config file support** — JSON/YAML/TOML with flag/env override
 - ⚠️ **Newer project** — smaller community than Kong or urfave/cli
@@ -100,7 +100,7 @@
 | **Shell completion**           | ✅                       | ✅         | ❌        | ❌         | ✅         |
 | **Middleware**                 | ✅                       | ✅         | ❌        | ❌         | ✅         |
 | **Man page generation**        | ✅                       | ❌         | ❌        | ❌         | ❌         |
-| **Zero panics**                | ✅                       | ✅         | N/A       | N/A        | N/A        |
+| **Minimal panics**            | ✅                       | ✅         | N/A       | N/A        | N/A        |
 | **Counting flags**             | ✅ `-v`/`-vv`/`-vvv`     | ❌         | ❌        | ❌         | ❌         |
 | **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅         | ❌        | ✅         | ✅         |
 
