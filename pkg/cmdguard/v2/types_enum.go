@@ -56,12 +56,14 @@ func (e Enum) IsEmpty() bool {
 }
 
 // MarshalText implements encoding.TextMarshaler for Enum.
+// Hand-written instead of using textMarshal because Enum.String() is simple enough.
 func (e Enum) MarshalText() ([]byte, error) {
 	return []byte(e.value), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler for Enum.
-// If no allowed values are defined, accepts any value and sets allowed to contain it.
+// Hand-written because textUnmarshal can't handle the bootstrap behavior
+// (accepting any value when allowed list is empty).
 func (e *Enum) UnmarshalText(text []byte) error {
 	value := string(text)
 	if slices.Contains(e.allowed, value) {
