@@ -18,21 +18,6 @@ func (r *typeRegistry) registerCustomTypes() {
 		return tag.Help
 	}
 
-	r.byType[reflect.TypeFor[Duration]()] = TypeHandlerFunc{
-		RegisterFunc: registerStringFlagFromTag,
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return ParseDuration(value)
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			d, err := ParseDuration(tag.Default)
-			if err != nil {
-				return Duration{}
-			}
-
-			return d
-		},
-	}
-
 	enumHandler := TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, enumHelp(tag))
@@ -82,33 +67,47 @@ func (r *typeRegistry) registerCustomTypes() {
 		logFormatAllowed,
 	)
 
+	registerStringParseType := func(
+		typ reflect.Type,
+		parseFunc func(string) (any, error),
+		defaultFunc func(FlagTag) any,
+	) {
+		r.byType[typ] = TypeHandlerFunc{
+			RegisterFunc: registerStringFlagFromTag,
+			ParseFunc: func(value string, _ FlagTag) (any, error) {
+				return parseFunc(value)
+			},
+			DefaultFunc: defaultFunc,
+		}
+	}
+
 	stringParseTypes := []struct {
-		typ       reflect.Type
-		parseFunc func(string) (any, error)
+		typ         reflect.Type
+		parseFunc   func(string) (any, error)
+		defaultFunc func(FlagTag) any
 	}{
-		{reflect.TypeFor[URL](), func(v string) (any, error) { return ParseURL(v) }},
-		{reflect.TypeFor[Email](), func(v string) (any, error) { return ParseEmail(v) }},
-		{reflect.TypeFor[Port](), func(v string) (any, error) { return ParsePort(v) }},
-		{
-			reflect.TypeFor[FilePath](),
-			func(v string) (any, error) { return ParseFilePath(v, false) },
-		},
-		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }},
+		{reflect.TypeFor[Duration](), func(v string) (any, error) { return ParseDuration(v) }, func(tag FlagTag) any {
+			d, err := ParseDuration(tag.Default)
+			if err != nil {
+				return Duration{}
+			}
+
+			return d
+		}},
+		{reflect.TypeFor[URL](), func(v string) (any, error) { return ParseURL(v) }, stringDefault},
+		{reflect.TypeFor[Email](), func(v string) (any, error) { return ParseEmail(v) }, stringDefault},
+		{reflect.TypeFor[Port](), func(v string) (any, error) { return ParsePort(v) }, stringDefault},
+		{reflect.TypeFor[FilePath](), func(v string) (any, error) { return ParseFilePath(v, false) }, stringDefault},
+		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }, stringDefault},
 	}
 
 	for _, entry := range stringParseTypes {
-		parseFn := entry.parseFunc
-
-		r.byType[entry.typ] = TypeHandlerFunc{
-			RegisterFunc: registerStringFlagFromTag,
-			ParseFunc: func(value string, _ FlagTag) (any, error) {
-				return parseFn(value)
-			},
-			DefaultFunc: func(tag FlagTag) any {
-				return tag.Default
-			},
-		}
+		registerStringParseType(entry.typ, entry.parseFunc, entry.defaultFunc)
 	}
+}
+
+func stringDefault(tag FlagTag) any {
+	return tag.Default
 }
 
 // RegisterGoDurationHandler registers a TypeHandler for time.Duration fields
