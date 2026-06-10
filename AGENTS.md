@@ -141,17 +141,17 @@ cmdguard/
 
 ## Key Dependencies
 
-| Library                            | Purpose              | Version |
-| ---------------------------------- | -------------------- | ------- |
-| `github.com/spf13/cobra`           | CLI framework        | v1.10.2 |
-| `github.com/samber/do/v2`          | Dependency injection | v2.0.0  |
-| `github.com/spf13/pflag`           | Flag parsing         | v1.0.10 |
-| `charm.land/fang/v2`               | Cobra styling        | v2.0.1  |
-| `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
-| `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0  |
-| `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output` | Rich output formats  | v0.7.2  |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging | v0.0.1   |
+| Library                                     | Purpose              | Version |
+| ------------------------------------------- | -------------------- | ------- |
+| `github.com/spf13/cobra`                    | CLI framework        | v1.10.2 |
+| `github.com/samber/do/v2`                   | Dependency injection | v2.0.0  |
+| `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
+| `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
+| `charm.land/huh/v2`                         | Interactive prompts  | v2.0.3  |
+| `charm.land/glamour/v2`                     | Markdown rendering   | v2.0.0  |
+| `go.opentelemetry.io/otel/trace`            | OpenTelemetry spans  | v1.44.0 |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.7.2  |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.0.1  |
 
 ---
 

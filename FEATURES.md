@@ -49,11 +49,11 @@
 | `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                        |
 | `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups                    |
 | `WithSignalHandling[T]()`      | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation          |
-| `WithGracefulShutdown[T]()`    | ✅ FULLY_FUNCTIONAL | Graceful DI service shutdown on signals        |
-| `WithDILogging[T](logf)`       | ✅ FULLY_FUNCTIONAL | Internal DI container logging                  |
-| `WithCLICommit[T](c)`         | ✅ FULLY_FUNCTIONAL | Git commit hash (auto-piped to fang)           |
-| `WithFangErrorHandler[T](fn)` | ✅ FULLY_FUNCTIONAL | Custom fang error display                      |
-| `WithFangColorScheme[T](fn)`  | ✅ FULLY_FUNCTIONAL | Custom fang color theme                        |
+| `WithGracefulShutdown[T]()`    | ✅ FULLY_FUNCTIONAL | Graceful DI service shutdown on signals       |
+| `WithDILogging[T](logf)`       | ✅ FULLY_FUNCTIONAL | Internal DI container logging                 |
+| `WithCLICommit[T](c)`          | ✅ FULLY_FUNCTIONAL | Git commit hash (auto-piped to fang)          |
+| `WithFangErrorHandler[T](fn)`  | ✅ FULLY_FUNCTIONAL | Custom fang error display                     |
+| `WithFangColorScheme[T](fn)`   | ✅ FULLY_FUNCTIONAL | Custom fang color theme                       |
 | `WithOutputFormat[T]()`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection      |
 | `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing            |
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
@@ -118,12 +118,12 @@
 
 ### Rich Output (go-output)
 
-| Feature               | Status              | Notes                                                   |
-| --------------------- | ------------------- | ------------------------------------------------------- |
-| `OutputResult()`      | ✅ FULLY_FUNCTIONAL | Render data in configured format                        |
-| `OutputTable()`       | ✅ FULLY_FUNCTIONAL | Convenience for table data                              |
-| `OutputStyledTable()` | ✅ FULLY_FUNCTIONAL | Lipgloss-styled terminal tables                         |
-| `ParseOutputFormat()` | ✅ FULLY_FUNCTIONAL | String → Format conversion                              |
+| Feature               | Status              | Notes                                                                                |
+| --------------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| `OutputResult()`      | ✅ FULLY_FUNCTIONAL | Render data in configured format                                                     |
+| `OutputTable()`       | ✅ FULLY_FUNCTIONAL | Convenience for table data                                                           |
+| `OutputStyledTable()` | ✅ FULLY_FUNCTIONAL | Lipgloss-styled terminal tables                                                      |
+| `ParseOutputFormat()` | ✅ FULLY_FUNCTIONAL | String → Format conversion                                                           |
 | 16 output formats     | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
 
 ### Middleware

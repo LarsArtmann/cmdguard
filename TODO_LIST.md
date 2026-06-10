@@ -45,9 +45,9 @@
 
 ### Phase 12: Zero Panics (2026-06-10)
 
-- [x] Remove all Must* panic-inducing functions (16 functions deleted)
-- [x] Update FEATURES.md: remove Must* entries, update metrics
-- [x] Update README.md: remove Must* examples, update tagline
+- [x] Remove all Must\* panic-inducing functions (16 functions deleted)
+- [x] Update FEATURES.md: remove Must\* entries, update metrics
+- [x] Update README.md: remove Must\* examples, update tagline
 - [x] Update all docs for zero-panics guarantee
 
 ### Phase 13: samber/do v2 Utilization Sprint (2026-06-10)
@@ -92,13 +92,13 @@
 
 ### P0: Open
 
-| #  | Task                                                   | Files           | Effort |
-| --- | ------------------------------------------------------ | --------------- | ------ |
-| 20 | Add `CODECOV_TOKEN` secret to GitHub repo settings     | GitHub settings | 5m     |
+| #   | Task                                               | Files           | Effort |
+| --- | -------------------------------------------------- | --------------- | ------ |
+| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings | GitHub settings | 5m     |
 
 ### P1: Future (v3.0+)
 
-| #  | Task                                                        | Category |
+| #   | Task                                                        | Category |
 | --- | ----------------------------------------------------------- | -------- |
 | 21  | Plugin system for custom validators and type handlers       | Feature  |
 | 22  | Config file nested struct support                           | Feature  |
@@ -107,13 +107,13 @@
 | 25  | Config auto-loading with koanf integration                  | Feature  |
 | 26  | Structured JSON error output for `--output=json`            | Feature  |
 | 27  | Extract flag-related code to standalone `flagtags` library  | Refactor |
-| 28  | Consider extracting `go-output` to sub-package             | Refactor |
+| 28  | Consider extracting `go-output` to sub-package              | Refactor |
 
 ### P2: Future Cleanup (API-breaking, defer to v3.0)
 
-| #  | Task                                                          |
-| --- | ------------------------------------------------------------- |
-| 30  | Rename `Get[T]`/`MustGet[T]` to more specific names          |
-| 31  | Make `RegisterInScope` generic instead of `...any`            |
-| 32  | Remove or redesign `Package()` for error-safe DI integration |
+| #   | Task                                                           |
+| --- | -------------------------------------------------------------- |
+| 30  | Rename `Get[T]`/`MustGet[T]` to more specific names            |
+| 31  | Make `RegisterInScope` generic instead of `...any`             |
+| 32  | Remove or redesign `Package()` for error-safe DI integration   |
 | 33  | Remove `SetConfig` or make it safe (reinitialize FlagRegistry) |

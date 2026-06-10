@@ -22,7 +22,8 @@ func TestWithAuditLog(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -59,7 +60,8 @@ func TestWithAuditLog(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -102,7 +104,8 @@ func TestWithAuditLog(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -145,7 +148,8 @@ func TestWithAuditLog(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 			v2.WithDILogging[testCLIConfig](func(format string, args ...any) {
 				logs = append(logs, format)
@@ -196,7 +200,8 @@ func TestAuditLogCommand(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -239,7 +244,8 @@ func TestAuditLogCommand(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -283,7 +289,8 @@ func TestAuditLogCommand(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -320,7 +327,8 @@ func TestAuditLogCommand(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 			v2.WithFang[testCLIConfig](false),
 		)
@@ -363,7 +371,8 @@ func TestAuditLogCommand(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
@@ -394,14 +403,16 @@ func TestAuditLogCommand(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		auditCmd, err := v2.AuditLogCommand[testCLIConfig](cli,
+		auditCmd, err := v2.AuditLogCommand[testCLIConfig](
+			cli,
 			v2.WithAuditLogShort[testCLIConfig]("Custom short"),
 			v2.WithAuditLogLong[testCLIConfig]("Custom long description"),
 		)
@@ -454,7 +465,8 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 			ContainerID: "test",
 		})
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v2.NewCLI[testCLIConfig](
+			"test", "Test", testCLIConfig{},
 			v2.WithAuditLog[testCLIConfig](plugin),
 		)
 		if err != nil {

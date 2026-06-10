@@ -11,8 +11,8 @@ import (
 
 // auditLogFlags holds the flags for the audit-log command.
 type auditLogFlags struct {
-	Format string `flag:"format" short:"f" default:"html" help:"Output format" values:"html,json,ndjson,mermaid"` //nolint:golines
-	Output string `flag:"output" short:"o" default:"" help:"Output file path (defaults to stdout)"`
+	Format string `flag:"format" short:"f" default:"html" help:"Output format"                         values:"html,json,ndjson,mermaid"`
+	Output string `flag:"output" short:"o" default:""     help:"Output file path (defaults to stdout)"`
 }
 
 // auditLogConfig holds the configuration for the audit-log command.

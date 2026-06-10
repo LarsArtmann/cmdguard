@@ -109,7 +109,7 @@ HELLO, CMDGUARD!
 | **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                |
 | **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks         |
 | **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                       |
-| **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more                                      |
+| **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more               |
 | **Signal handling**        | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers                                      |
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                        |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                          |

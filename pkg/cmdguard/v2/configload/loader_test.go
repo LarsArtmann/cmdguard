@@ -172,53 +172,33 @@ func TestJSONLoader(t *testing.T) {
 func TestAutoLoader(t *testing.T) {
 	t.Parallel()
 
-	t.Run("detects YAML", func(t *testing.T) {
+	t.Run("detects format automatically", func(t *testing.T) {
 		t.Parallel()
 
-		data := []byte("name: auto-yaml\n")
-		cfg := config{}
-
-		setFields, err := configload.Auto().Load(data, &cfg)
-		testutil.AssertNoError(t, err)
-
-		if cfg.Name != "auto-yaml" {
-			t.Errorf("expected name 'auto-yaml', got %q", cfg.Name)
+		tests := []struct {
+			name   string
+			data   string
+			expect string
+		}{
+			{"yaml", "name: auto-yaml\n", "auto-yaml"},
+			{"json", `{"name":"auto-json"}`, "auto-json"},
 		}
 
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
-		}
-	})
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
 
-	t.Run("detects TOML", func(t *testing.T) {
-		t.Parallel()
+				cfg := config{}
+				setFields, err := configload.Auto().Load([]byte(tt.data), &cfg)
+				testutil.AssertNoError(t, err)
 
-		data := []byte(`name = "auto-toml"`)
-		cfg := config{}
-
-		_, err := configload.Auto().Load(data, &cfg)
-		testutil.AssertNoError(t, err)
-
-		if cfg.Name != "auto-toml" {
-			t.Errorf("expected name 'auto-toml', got %q", cfg.Name)
-		}
-	})
-
-	t.Run("detects JSON", func(t *testing.T) {
-		t.Parallel()
-
-		data := []byte(`{"name":"auto-json"}`)
-		cfg := config{}
-
-		setFields, err := configload.Auto().Load(data, &cfg)
-		testutil.AssertNoError(t, err)
-
-		if cfg.Name != "auto-json" {
-			t.Errorf("expected name 'auto-json', got %q", cfg.Name)
-		}
-
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
+				if cfg.Name != tt.expect {
+					t.Errorf("expected name %q, got %q", tt.expect, cfg.Name)
+				}
+				if len(setFields) != 1 {
+					t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
+				}
+			})
 		}
 	})
 
@@ -259,59 +239,36 @@ func TestLoaderForPath(t *testing.T) {
 func TestLoaderForPathLoadsCorrectly(t *testing.T) {
 	t.Parallel()
 
-	t.Run("yaml via LoaderForPath", func(t *testing.T) {
-		t.Parallel()
+	tests := []struct {
+		name   string
+		path   string
+		data   string
+		expect string
+	}{
+		{"yaml via LoaderForPath", "config.yaml", "name: path-test\n", "path-test"},
+		{"toml via LoaderForPath", "config.toml", "name = \"path-test\"\n", "path-test"},
+		{"json via LoaderForPath", "config.json", `{"name":"path-test"}`, "path-test"},
+	}
 
-		loader := configload.LoaderForPath("config.yaml")
-		data := []byte("name: path-test\n")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-		cfg := config{}
-		setFields, err := loader.Load(data, &cfg)
-		testutil.AssertNoError(t, err)
+			loader := configload.LoaderForPath(tt.path)
+			data := []byte(tt.data)
 
-		if cfg.Name != "path-test" {
-			t.Errorf("expected name 'path-test', got %q", cfg.Name)
-		}
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d", len(setFields))
-		}
-	})
+			cfg := config{}
+			setFields, err := loader.Load(data, &cfg)
+			testutil.AssertNoError(t, err)
 
-	t.Run("toml via LoaderForPath", func(t *testing.T) {
-		t.Parallel()
-
-		loader := configload.LoaderForPath("config.toml")
-		data := []byte("name = \"path-test\"\n")
-
-		cfg := config{}
-		setFields, err := loader.Load(data, &cfg)
-		testutil.AssertNoError(t, err)
-
-		if cfg.Name != "path-test" {
-			t.Errorf("expected name 'path-test', got %q", cfg.Name)
-		}
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d", len(setFields))
-		}
-	})
-
-	t.Run("json via LoaderForPath", func(t *testing.T) {
-		t.Parallel()
-
-		loader := configload.LoaderForPath("config.json")
-		data := []byte(`{"name":"path-test"}`)
-
-		cfg := config{}
-		setFields, err := loader.Load(data, &cfg)
-		testutil.AssertNoError(t, err)
-
-		if cfg.Name != "path-test" {
-			t.Errorf("expected name 'path-test', got %q", cfg.Name)
-		}
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d", len(setFields))
-		}
-	})
+			if cfg.Name != tt.expect {
+				t.Errorf("expected name %q, got %q", tt.expect, cfg.Name)
+			}
+			if len(setFields) != 1 {
+				t.Errorf("expected 1 set field, got %d", len(setFields))
+			}
+		})
+	}
 
 	t.Run("unknown extension falls back to JSON", func(t *testing.T) {
 		t.Parallel()

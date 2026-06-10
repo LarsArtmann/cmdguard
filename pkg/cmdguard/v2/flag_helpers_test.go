@@ -336,7 +336,7 @@ func TestFormatFieldValue(t *testing.T) {
 		}
 	})
 
-	t.Run("int kinds", func(t *testing.T) {
+	t.Run("integer kinds", func(t *testing.T) {
 		t.Parallel()
 
 		tests := []struct {
@@ -349,28 +349,6 @@ func TestFormatFieldValue(t *testing.T) {
 			{"int16", int16(16), "16"},
 			{"int32", int32(32), "32"},
 			{"int64", int64(64), "64"},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				t.Parallel()
-
-				got := formatFieldValue(reflect.ValueOf(tt.value))
-				if got != tt.want {
-					t.Errorf("got %q, want %q", got, tt.want)
-				}
-			})
-		}
-	})
-
-	t.Run("uint kinds", func(t *testing.T) {
-		t.Parallel()
-
-		tests := []struct {
-			name  string
-			value any
-			want  string
-		}{
 			{"uint", uint(42), "42"},
 			{"uint8", uint8(8), "8"},
 			{"uint16", uint16(16), "16"},
