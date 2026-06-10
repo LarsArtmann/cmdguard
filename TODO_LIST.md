@@ -1,8 +1,8 @@
 # TODO List
 
 **Updated:** 2026-06-10
-**Status:** v2.5.0 — zero panics, 84.8% coverage, 0 lint issues, 0 race conditions
-**Tests:** 385+ passing, 0 build errors
+**Status:** v2.5.0 — zero panics, 85.4% coverage, 0 lint issues, 0 race conditions, 16 output formats
+**Tests:** 395+ passing, 0 build errors
 
 ## Completed
 
@@ -76,6 +76,17 @@
 - [x] Add `Scope.RootScope()` accessor
 - [x] Add DI benchmarks: NewScopeWithOpts, CloneScope, ProvideInvokeCycle
 - [x] Clean up unused types and imports in test files
+
+### Phase 15: Library Integration Sprint (2026-06-10)
+
+- [x] Add `WithCLICommit[T](commit)` — auto-pipes to fang
+- [x] Add `WithFangErrorHandler[T](handler)` and `WithFangColorScheme[T](cs)`
+- [x] Add 4 new output formats: JSONL, AsciiDoc, TOML, PlantUML (16 total)
+- [x] Document new APIs in doc.go and docs/API.md
+- [x] Deduplicate `validateEmail`/`validateURL` — delegate to `ParseEmail`/`ParseURL`
+- [x] Fix `HostPort.IsEmpty()` coupling — use `hp.port.IsEmpty()` instead of `hp.port.port`
+- [x] Add IsEmpty() tests for Duration, LogLevel, LogFormat, Port
+- [x] Add ADR-001 for fang integration strategy
 
 ## Remaining Work — Priority Sorted
 

@@ -120,6 +120,19 @@ func TestDuration_Methods(t *testing.T) {
 		}
 	})
 
+	t.Run("IsEmpty", func(t *testing.T) {
+		t.Parallel()
+
+		if d.IsEmpty() {
+			t.Error("IsEmpty() = true, want false for non-zero duration")
+		}
+
+		var zero Duration
+		if !zero.IsEmpty() {
+			t.Error("zero.IsEmpty() = false, want true")
+		}
+	})
+
 	t.Run("Milliseconds", func(t *testing.T) {
 		t.Parallel()
 

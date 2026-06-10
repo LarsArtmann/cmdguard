@@ -91,6 +91,20 @@ func TestPort(t *testing.T) {
 		testParseError(t, func() (v2.Port, error) { return v2.PortFromInt(70000) }, "port")
 	})
 
+	t.Run("Port IsEmpty", func(t *testing.T) {
+		t.Parallel()
+
+		p, _ := v2.ParsePort("8080")
+		if p.IsEmpty() {
+			t.Error("IsEmpty() = true, want false for parsed port")
+		}
+
+		var zero v2.Port
+		if !zero.IsEmpty() {
+			t.Error("zero Port IsEmpty() = false, want true")
+		}
+	})
+
 	t.Run("Port IsValid", func(t *testing.T) {
 		t.Parallel()
 

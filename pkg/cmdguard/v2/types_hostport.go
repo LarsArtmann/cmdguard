@@ -65,7 +65,7 @@ func (hp HostPort) Port() Port {
 
 // IsEmpty returns true if both host and port are empty.
 func (hp HostPort) IsEmpty() bool {
-	return hp.host == "" && hp.port.port == 0
+	return hp.host == "" && hp.port.IsEmpty()
 }
 
 // IsAnyHost returns true if the host is empty (meaning "any" or "all interfaces").

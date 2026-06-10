@@ -61,6 +61,19 @@ func TestLogLevel(t *testing.T) {
 		}
 	})
 
+	t.Run("LogLevel IsEmpty", func(t *testing.T) {
+		t.Parallel()
+
+		if LogLevelInfo.IsEmpty() {
+			t.Error("LogLevelInfo.IsEmpty() = true, want false")
+		}
+
+		var empty LogLevel
+		if !empty.IsEmpty() {
+			t.Error("empty LogLevel IsEmpty() = false, want true")
+		}
+	})
+
 	t.Run("SlogLevel conversion", func(t *testing.T) {
 		t.Parallel()
 
@@ -131,6 +144,19 @@ func TestLogFormat(t *testing.T) {
 			testutil.AssertNoError(t, err)
 
 			testutil.AssertFieldEqString(t, f.String(), v, "ParseLogFormat().String()")
+		}
+	})
+
+	t.Run("LogFormat IsEmpty", func(t *testing.T) {
+		t.Parallel()
+
+		if LogFormatText.IsEmpty() {
+			t.Error("LogFormatText.IsEmpty() = true, want false")
+		}
+
+		var empty LogFormat
+		if !empty.IsEmpty() {
+			t.Error("empty LogFormat IsEmpty() = false, want true")
 		}
 	})
 

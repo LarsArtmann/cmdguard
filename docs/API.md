@@ -63,25 +63,29 @@ Functional options:
 
 | Option                         | Purpose                                     |
 | ------------------------------ | ------------------------------------------- |
-| `WithCLIVersion[T](v)`         | Set version string                          |
-| `WithCLILong[T](desc)`         | Set long description                        |
-| `WithCLIScope[T](scope)`       | Set custom DI scope                         |
-| `WithSilenceErrors[T]()`       | Suppress cobra error printing               |
-| `WithSilenceUsage[T]()`        | Suppress usage on error                     |
-| `WithColor[T](bool)`           | Enable/disable fang styling (default: true) |
-| `WithFang[T](bool)`            | Enable/disable fang styling (preferred)     |
-| `WithFangOptions[T](opts...)`  | Custom fang options                         |
-| `WithMiddleware[T](mw...)`     | Middleware wrapping every handler           |
-| `WithGroup[T](id, title)`      | Register command group on root              |
-| `WithEnvPrefix[T](prefix)`     | Prefix for env var lookups                  |
-| `WithSignalHandling[T]()`      | Cancel context on SIGINT/SIGTERM            |
-| `WithConfigValidation[T](fn)`  | Validate config after flag parsing          |
-| `WithStrictValidation[T]()`    | Require short descriptions on all commands  |
-| `WithDraconianValidation[T]()` | Strict + examples on leaf commands          |
-| `WithConfigFile[T](paths...)`  | Load JSON config file before flags          |
-| `WithConfigFileLoader[T](l,p)` | Load config with custom loader (YAML/TOML)  |
-| `WithGlamourHelp[T]()`         | Render markdown in command help text        |
-| `WithTelemetry[T](tracer)`     | OpenTelemetry spans for all commands        |
+| `WithCLIVersion[T](v)`            | Set version string (auto-pipes to fang)      |
+| `WithCLICommit[T](commit)`        | Set git commit hash (auto-pipes to fang)     |
+| `WithCLILong[T](desc)`            | Set long description                         |
+| `WithCLIScope[T](scope)`          | Set custom DI scope                          |
+| `WithSilenceErrors[T]()`          | Suppress cobra error printing                |
+| `WithSilenceUsage[T]()`           | Suppress usage on error                      |
+| `WithFang[T](bool)`               | Enable/disable fang styling (preferred)      |
+| `WithFangOptions[T](opts...)`     | Custom fang options                          |
+| `WithFangErrorHandler[T](handler)` | Custom fang error handler                   |
+| `WithFangColorScheme[T](cs)`      | Custom fang color scheme                     |
+| `WithMiddleware[T](mw...)`        | Middleware wrapping every handler            |
+| `WithGroup[T](id, title)`         | Register command group on root               |
+| `WithEnvPrefix[T](prefix)`        | Prefix for env var lookups                   |
+| `WithSignalHandling[T]()`         | Cancel context on SIGINT/SIGTERM             |
+| `WithGracefulShutdown[T]()`       | Graceful DI shutdown on SIGINT/SIGTERM       |
+| `WithDILogging[T](logf)`          | Internal DI container logging                |
+| `WithConfigValidation[T](fn)`     | Validate config after flag parsing           |
+| `WithStrictValidation[T]()`       | Require short descriptions on all commands   |
+| `WithDraconianValidation[T]()`    | Strict + examples on leaf commands           |
+| `WithConfigFile[T](paths...)`     | Load JSON config file before flags           |
+| `WithConfigFileLoader[T](l,p)`    | Load config with custom loader (YAML/TOML)   |
+| `WithGlamourHelp[T]()`            | Render markdown in command help text         |
+| `WithTelemetry[T](tracer)`        | OpenTelemetry spans for all commands         |
 
 ### CLI[T] Methods
 

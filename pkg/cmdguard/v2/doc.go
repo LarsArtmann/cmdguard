@@ -113,7 +113,8 @@
 //
 // Configure the root CLI with options passed to NewCLI:
 //
-//	WithCLIVersion[T](v)              // Version string
+//	WithCLIVersion[T](v)              // Version string (auto-pipes to fang)
+//	WithCLICommit[T](commit)          // Git commit hash (auto-pipes to fang)
 //	WithEnvPrefix[T](prefix)          // Prefix for env var lookups
 //	WithSignalHandling[T]()           // Cancel context on SIGINT/SIGTERM
 //	WithGracefulShutdown[T]()         // Graceful DI shutdown on SIGINT/SIGTERM
@@ -123,6 +124,9 @@
 //	WithConfigValidation[T](fn)       // Validate config after flag parsing
 //	WithConfigFile[T](paths...)       // Load JSON config before flags
 //	WithFang[T](bool)                 // Styled help output
+//	WithFangOptions[T](opts...)       // Custom fang options
+//	WithFangErrorHandler[T](handler)  // Custom fang error handler
+//	WithFangColorScheme[T](cs)        // Custom fang color scheme
 //
 // # Error Handling
 //
@@ -161,11 +165,17 @@
 //
 // # Output Formats
 //
-// Render structured data in 12+ formats:
+// Render structured data in 16 formats:
 //
 //	v2.OutputTable(v2.FormatJSON, headers, rows)
 //	v2.OutputTable(v2.FormatCSV, headers, rows)
 //	v2.OutputTable(v2.FormatYAML, headers, rows)
+//
+// Available: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree,
+// mermaid, dot, jsonl, asciidoc, toml, plantuml.
+//
+// WithCLIVersion and WithCLICommit automatically pipe version/commit info to fang.
+// Do NOT also pass these via WithFangOptions or you will get duplicates.
 //
 // # BranchingFlowContext
 //

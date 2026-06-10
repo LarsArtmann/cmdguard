@@ -3,8 +3,6 @@ package v2
 import (
 	"fmt"
 	"maps"
-	"net/mail"
-	"net/url"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -157,8 +155,7 @@ func validateEmail(value string) error {
 		return nil
 	}
 
-	_, err := mail.ParseAddress(value)
-	if err != nil {
+	if _, err := ParseEmail(value); err != nil {
 		return fmt.Errorf("%w: %q is not a valid email", ErrInvalidEmail, value)
 	}
 
@@ -170,13 +167,8 @@ func validateURL(value string) error {
 		return nil
 	}
 
-	parsed, err := url.Parse(value)
-	if err != nil {
+	if _, err := ParseURL(value); err != nil {
 		return fmt.Errorf("%w: %q is not a valid URL", ErrInvalidURL, value)
-	}
-
-	if parsed.Scheme == "" || parsed.Host == "" {
-		return fmt.Errorf("%w: %q must include scheme and host", ErrInvalidURL, value)
 	}
 
 	return nil
