@@ -97,18 +97,10 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	return setFields, nil
 }
 
-// Auto returns a ConfigFileLoader that selects the appropriate loader
-// based on the file extension of the first existing path.
-// Falls back to JSON if the extension is unknown.
-//
-// This is useful when you don't know the file format at compile time:
-//
-//	cli, _ := cmdguard.NewCLI[Config]("app", "My app", Config{},
-//	    cmdguard.WithConfigFileLoader[Config](configload.Auto(),
-//	        "$HOME/.config/app/config.yaml",
-//	        "$HOME/.config/app/config.json",
-//	    ),
-//	)
+// Auto returns a ConfigFileLoader that tries to parse data as YAML, then TOML,
+// then JSON, returning the first successful parse result.
+// Since JSON is valid YAML, JSON data is handled by the YAML parser first.
+// Use LoaderForPath when the file extension is known for precise format selection.
 func Auto() cmdguard.ConfigFileLoader {
 	return &autoLoader{}
 }
@@ -116,12 +108,14 @@ func Auto() cmdguard.ConfigFileLoader {
 type autoLoader struct{}
 
 func (l *autoLoader) Load(data []byte, cfg any) ([]string, error) {
-	setFields, err := JSON().Load(data, cfg)
-	if err != nil {
-		return nil, fmt.Errorf("auto-detect fallback to JSON: %w", err)
+	for _, attempt := range []cmdguard.ConfigFileLoader{YAML(), TOML(), JSON()} {
+		setFields, err := attempt.Load(data, cfg)
+		if err == nil {
+			return setFields, nil
+		}
 	}
 
-	return setFields, nil
+	return nil, fmt.Errorf("%w: auto-detect failed: tried YAML, TOML, JSON", cmdguard.ErrConfigFileParse)
 }
 
 // LoaderForPath returns the appropriate loader for a file path based on its extension.

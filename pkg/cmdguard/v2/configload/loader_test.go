@@ -172,21 +172,64 @@ func TestJSONLoader(t *testing.T) {
 func TestAutoLoader(t *testing.T) {
 	t.Parallel()
 
-	t.Run("falls back to JSON", func(t *testing.T) {
+	t.Run("detects YAML", func(t *testing.T) {
 		t.Parallel()
 
-		data := []byte(`{"name":"auto-test"}`)
+		data := []byte("name: auto-yaml\n")
 		cfg := config{}
 
 		setFields, err := configload.Auto().Load(data, &cfg)
 		testutil.AssertNoError(t, err)
 
-		if cfg.Name != "auto-test" {
-			t.Errorf("expected name 'auto-test', got %q", cfg.Name)
+		if cfg.Name != "auto-yaml" {
+			t.Errorf("expected name 'auto-yaml', got %q", cfg.Name)
 		}
+
 		if len(setFields) != 1 {
 			t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
 		}
+	})
+
+	t.Run("detects TOML", func(t *testing.T) {
+		t.Parallel()
+
+		data := []byte(`name = "auto-toml"`)
+		cfg := config{}
+
+		_, err := configload.Auto().Load(data, &cfg)
+		testutil.AssertNoError(t, err)
+
+		if cfg.Name != "auto-toml" {
+			t.Errorf("expected name 'auto-toml', got %q", cfg.Name)
+		}
+	})
+
+	t.Run("detects JSON", func(t *testing.T) {
+		t.Parallel()
+
+		data := []byte(`{"name":"auto-json"}`)
+		cfg := config{}
+
+		setFields, err := configload.Auto().Load(data, &cfg)
+		testutil.AssertNoError(t, err)
+
+		if cfg.Name != "auto-json" {
+			t.Errorf("expected name 'auto-json', got %q", cfg.Name)
+		}
+
+		if len(setFields) != 1 {
+			t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
+		}
+	})
+
+	t.Run("invalid data returns error", func(t *testing.T) {
+		t.Parallel()
+
+		data := []byte("not valid yaml toml or json [[[")
+		cfg := config{}
+
+		_, err := configload.Auto().Load(data, &cfg)
+		testutil.AssertExpectedError(t, err)
 	})
 }
 
