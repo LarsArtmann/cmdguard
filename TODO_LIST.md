@@ -1,8 +1,8 @@
 # TODO List
 
 **Updated:** 2026-06-10
-**Status:** v2.4.0 — post-release maintenance
-**Tests:** 373 passing, 84.0% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.5.0 — zero panics achieved
+**Tests:** 368 passing, 83.5% coverage, 0 lint issues, 0 race conditions
 
 ## Completed
 
@@ -42,6 +42,13 @@
 - [x] Go modularization assessment: NOT recommended (project too small)
 - [x] Features audit: all features verified against code
 - [x] TODO list rebuilt from all .md sources
+
+### Phase 12: Zero Panics (2026-06-10)
+
+- [x] Remove all Must* panic-inducing functions (16 functions deleted)
+- [x] Update FEATURES.md: remove Must* entries, update metrics
+- [x] Update README.md: remove Must* examples, update tagline
+- [x] Update all docs for zero-panics guarantee
 
 ## Remaining Work — Priority Sorted
 

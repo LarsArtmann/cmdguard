@@ -276,7 +276,12 @@ func main() {
     }
 
     // Add a version command.
-    v2.AddCommand(cli, v2.MustVersionCommand[AppConfig](cli))
+    versionCmd, err := v2.VersionCommand[AppConfig](cli)
+    if err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1)
+    }
+    v2.AddCommand(cli, versionCmd)
 
     // Parent command with subcommands.
     listCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("list", listHandler,
@@ -316,7 +321,7 @@ func main() {
 | **Shared services**    | Manual globals / closures                           | `Provide`/`Invoke` in DI scope                                      |
 | **Env vars**           | Manual `os.Getenv`                                  | `env:"VAR_NAME"` struct tag                                         |
 | **User typos**         | "unknown flag"                                      | "unknown flag: did you mean --name?"                                |
-| **Version command**    | Write your own                                      | `MustVersionCommand(cli)`                                           |
+| **Version command**    | Write your own                                      | `VersionCommand(cli)`                                               |
 | **Exit codes**         | `os.Exit(1)`                                        | `NewExitError(code, err)`                                           |
 
 ---

@@ -1,7 +1,7 @@
 # cmdguard Features
 
-**Last Updated:** 2026-06-08
-**Version:** 2.4.0
+**Last Updated:** 2026-06-10
+**Version:** 2.5.0
 **Go Version:** 1.26
 
 ---
@@ -61,8 +61,7 @@
 
 | Feature                                   | Status              | Notes                                                    |
 | ----------------------------------------- | ------------------- | -------------------------------------------------------- |
-| `NewCommand` / `NewParentCommand`         | ✅ FULLY_FUNCTIONAL | Constructors with validation                             |
-| `MustNewCommand` / `MustNewParentCommand` | ✅ FULLY_FUNCTIONAL | Panic variants                                           |
+| `NewCommand` / `NewParentCommand`         | ✅ FULLY_FUNCTIONAL | Constructors with validation, zero panics                 |
 | `RunE`, `PreRunE`, `PostRunE`             | ✅ FULLY_FUNCTIONAL | Type-safe handlers                                       |
 | `Validate()`                              | ✅ FULLY_FUNCTIONAL | Called by constructors                                   |
 | Command options (21 total)                | ✅ FULLY_FUNCTIONAL | WithShort, WithFlags, WithPreRunE, args validators, etc. |
@@ -181,7 +180,6 @@
 | Feature                              | Status              | Notes                       |
 | ------------------------------------ | ------------------- | --------------------------- |
 | `DoctorCommand[T](cli, opts...)`     | ✅ FULLY_FUNCTIONAL | Typed doctor subcommand     |
-| `MustDoctorCommand[T](cli, opts...)` | ✅ FULLY_FUNCTIONAL | Panic variant               |
 | `WithDoctorCheck[T](name, run)`      | ✅ FULLY_FUNCTIONAL | Add custom diagnostic check |
 | `WithDoctorShort[T](desc)`           | ✅ FULLY_FUNCTIONAL | Custom short description    |
 | `WithDoctorLong[T](desc)`            | ✅ FULLY_FUNCTIONAL | Custom long description     |
@@ -201,7 +199,6 @@
 | Feature                        | Status              | Notes                                |
 | ------------------------------ | ------------------- | ------------------------------------ |
 | `VersionCommand[T](cli)`       | ✅ FULLY_FUNCTIONAL | Typed version subcommand             |
-| `MustVersionCommand[T](cli)`   | ✅ FULLY_FUNCTIONAL | Panic variant                        |
 | `GenerateVersionCommand[T](cli, w)` | ✅ FULLY_FUNCTIONAL | Raw cobra command with custom writer |
 
 ### Helpers
@@ -210,7 +207,6 @@
 | ---------------- | ------------------- | --------------------------- |
 | `EditInEditor`   | ✅ FULLY_FUNCTIONAL | Open content in $EDITOR     |
 | `ValueOrDefault` | ✅ FULLY_FUNCTIONAL | Nil-safe value access       |
-| `MustParse[T]`   | ✅ FULLY_FUNCTIONAL | Panic-on-fail for constants |
 | `MergeConfigs`   | ✅ FULLY_FUNCTIONAL | Deep merge config structs   |
 
 ### Error Handling
@@ -221,7 +217,7 @@
 | Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
 | `ExitCoder` / `ExitError` | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
 | FlagError with suggestion | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
-| No panics (non-Must API)  | ✅ FULLY_FUNCTIONAL | All non-Must functions return errors        |
+| No panics (all functions return errors) | ✅ FULLY_FUNCTIONAL | Zero panics in library code      |
 
 ---
 
@@ -287,4 +283,4 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ---
 
-**Last updated 2026-06-01.**
+**Last updated 2026-06-10.**

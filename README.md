@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Build production Go CLIs with type-safe flags, dependency injection, and minimal panics.**
+**Build production Go CLIs with type-safe flags, dependency injection, and zero panics.**
 
 cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type safety, struct-tag-driven flags, and built-in dependency injection via [samber/do/v2](https://github.com/samber/do). Your flags are typed structs — no more stringly-typed `Flags().GetString("name")` calls that fail at runtime.
 
@@ -125,8 +125,8 @@ HELLO, CMDGUARD!
 | **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                       |
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
-| **Minimal panics**        | All non-Must functions return errors; Must-prefixed variants panic for compile-time-known config                                     |
-| **367 tests**              | 82.9% coverage, race-detected, fuzz-tested                                                              |
+| **Zero panics**           | All functions return errors; no Must* panic variants                                                 |
+| **368 tests**             | 83.5% coverage, race-detected, fuzz-tested                                                            |
 
 ---
 
@@ -334,7 +334,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 ## Error Handling
 
 ```go
-// All non-Must v2 functions return errors; Must* variants panic on failure
+// All v2 functions return errors — zero panics in library code
 cli, err := v2.NewCLI[Config]("app", "...", Config{})
 cmd, err := v2.NewCommand[Config, NoFlags]("test", handler)
 
@@ -353,24 +353,6 @@ v2.NewExitError(code, err)                            // custom exit code
 var exitCoder v2.ExitCoder
 errors.As(err, &exitCoder)
 exitCoder.ExitCode() // returns custom exit code
-```
-
----
-
-### Must Constructors
-
-`MustNewCommand` and `MustNewParentCommand` panic on error — use when configuration is known at compile time:
-
-```go
-greetCmd := v2.MustNewCommand[AppConfig, *GreetFlags]("greet", greetHandler,
-    v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-    v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
-)
-
-parentCmd := v2.MustNewParentCommand[AppConfig, v2.NoFlags]("user",
-    "User management", []v2.Command[AppConfig, v2.NoFlags]{listCmd, createCmd},
-    v2.WithShort[AppConfig, v2.NoFlags]("User management"),
-)
 ```
 
 ---
@@ -478,7 +460,10 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     v2.WithCLIVersion[AppConfig]("1.0.0"),
 )
 
-versionCmd := v2.MustVersionCommand[AppConfig](cli)
+versionCmd, err := v2.VersionCommand[AppConfig](cli)
+if err != nil {
+    log.Fatal(err)
+}
 v2.AddCommand(cli, versionCmd)
 // $ myapp version
 ```

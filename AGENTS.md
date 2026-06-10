@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.4.0. 374 tests passing, 84.0% coverage, 0 build errors.
+**Current Status:** v2.5.0. 368 tests passing, 83.5% coverage, 0 build errors.
 
 ---
 

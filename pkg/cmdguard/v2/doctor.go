@@ -61,11 +61,15 @@ func WithDoctorCheck[T any](name string, run func(ctx context.Context) error) Do
 //	cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
 //	    v2.WithCLIVersion[Config]("1.0.0"),
 //	)
-//	v2.AddCommand(cli, v2.MustDoctorCommand[Config](cli))
+//	docCmd, err := v2.DoctorCommand[Config](cli)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	v2.AddCommand(cli, docCmd)
 //
 // With custom checks:
 //
-//	v2.MustDoctorCommand[Config](cli,
+//	docCmd, err := v2.DoctorCommand[Config](cli,
 //	    v2.WithDoctorCheck[Config]("database", func(ctx context.Context) error {
 //	        return db.Ping(ctx)
 //	    }),

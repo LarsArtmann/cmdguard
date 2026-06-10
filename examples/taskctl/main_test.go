@@ -314,7 +314,7 @@ func TestDBCommand_Status(t *testing.T) {
 	mustExec(t, "db", "status")
 }
 
-// --- Doctor Command (MustDoctorCommand) ---
+// --- Doctor Command (DoctorCommand) ---
 
 func TestDoctorCommand(t *testing.T) {
 	t.Parallel()

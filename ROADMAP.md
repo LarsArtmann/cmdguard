@@ -1,12 +1,22 @@
 # ROADMAP
 
-**Updated:** 2026-06-03
+**Updated:** 2026-06-10
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
 
-## Completed (v2.2–v2.4)
+## Completed (v2.2–v2.5)
 
+- [x] **Zero panics** — All Must* functions removed in v2.5.0; every function returns errors
+- [x] Remove all panic-inducing functions (16 deleted: MustNewCommand, MustNewParentCommand, MustNewCLI, MustAddCommand, MustVersionCommand, MustDoctorCommand, MustInvoke, MustInvokeNamed, MustGet, RequireBranchingFlowContext, MustParse, MustParseDuration, MustParseLogLevel, MustParseLogFormat, MustParseEnum, MustParseURL, MustParseEmail, MustParsePort, MustParseFilePath, MustParseHostPort)
+- [x] Deep codebase review and improvement sprint (11 phases)
+- [x] Error system overhaul: 60+ sentinels, domain-specific error files
+- [x] Runtime type guards in dispatchParse
+- [x] Short tag length validation
+- [x] Nil tracer guard in TelemetryMiddleware
+- [x] BranchingFlowContext.SetValue child safety
+- [x] Mutable slice protection (Tags/Path return clones)
+- [x] Arg validator error returns instead of panics
 - [x] Add GitHub Actions workflow
 - [x] Add badge to README
 - [x] Add more custom types: URL, Email, Port, FilePath, HostPort
@@ -127,6 +137,7 @@
 - [ ] Add codecov integration (needs `CODECOV_TOKEN` secret)
 - [x] Set up CI/CD pipeline
 - [x] Create contribution guide
+- [x] Create issue/PR templates
 - [ ] Deprecate v1 API timeline
 
 ---

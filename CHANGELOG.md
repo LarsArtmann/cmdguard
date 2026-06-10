@@ -11,6 +11,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.5.0] - 2026-06-10
+
+### Added
+
+- **Runtime type guards in `dispatchParse`** — Verifies return type matches handler target
+- **Short tag validation** — `short` tag must be exactly 1 character; returns error at registration
+- **Nil tracer guard in `TelemetryMiddleware`** — Returns error instead of nil dereference
+- **`BranchingFlowContext.SetValue` child safety** — Skips children that have local key set
+- **Mutable slice protection** — `Tags()` and `Path()` return cloned slices
+- **Arg validator error returns** — `WithExactArgs`, `WithMinimumArgs`, etc. return errors instead of panicking for invalid args
+
+### Changed
+
+- **Removed all Must* panic-inducing functions** — Zero panics in library code. Every function returns errors:
+  - `MustNewCommand`, `MustNewParentCommand` (use `NewCommand`, `NewParentCommand`)
+  - `MustNewCLI`, `MustAddCommand` (use `NewCLI`, `AddCommand`)
+  - `MustVersionCommand` (use `VersionCommand`)
+  - `MustDoctorCommand` (use `DoctorCommand`)
+  - `MustInvoke[T]`, `MustInvokeNamed[T]` (use `Invoke[T]`)
+  - `MustGet[T]`, `RequireBranchingFlowContext` (use `GetBranchingFlowContext`)
+  - `MustParse[T]`, `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat`, `MustParseEnum`
+  - `MustParseURL`, `MustParseEmail`, `MustParsePort`, `MustParseFilePath`, `MustParseHostPort`
+- **Split `errors.go` into domain-specific files** — `errors_command.go`, `errors_flags.go`, `errors_config.go`, `errors_di.go`
+- **Unified `fieldValueToString`/`formatFieldValue`** — Single canonical `formatFieldValue()` in `flag_helpers.go`
+- **`doc.go` "never panics" claim now truthful** — No Must* functions remain
+- **Consolidated `command_suggest.go` into `flags_suggest.go`** — Single file for all typo suggestions
+
+### Fixed
+
+- **`setStringField` panic on type mismatch** — Added `AssignableTo` guard before `field.Set`
+- **`ExitError.Error()` nil panic** — Added nil guard for `e.Err`
+- **Double-wrapping of `ErrServiceConstruction` in `ShutdownAll`** — Fixed in v2.4.0
+
+### Removed
+
+- All 16+ Must* panic variants (see "Changed" section above)
+
+---
+
 ## [2.4.0] - 2026-06-03
 
 ### Added
