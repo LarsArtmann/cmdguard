@@ -5,7 +5,7 @@
 **Last Updated:** 2026-06-10
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.4.0 - 373 tests, 84.0% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.4.0 - 374 tests, 84.0% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.4.0. 373 tests passing, 84.0% coverage, 0 build errors.
+**Current Status:** v2.4.0. 374 tests passing, 84.0% coverage, 0 build errors.
 
 ---
 
@@ -597,6 +597,9 @@ go build ./...                                   # Verify build
 39. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
 40. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
 41. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use
+42. **configload.Auto()** — tries YAML → TOML → JSON sequentially (not file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first; use `LoaderForPath()` for precise format detection when the file extension is known
+43. **ShutdownAll error chain** — `Shutdown()` wraps with `ErrServiceConstruction` once; `ShutdownAll` collects these without additional wrapping (fixed double-wrap in v2.4.0)
+44. **MustParseEnum signature** — `MustParseEnum(value, allowed)` takes two args unlike other MustParse* functions because `ParseEnum` requires both value and allowed list
 
 ---
 
