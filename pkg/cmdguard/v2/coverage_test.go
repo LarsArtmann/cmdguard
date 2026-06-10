@@ -82,6 +82,20 @@ func TestWithSignalHandling(t *testing.T) {
 	})
 }
 
+func TestWithCLICommit(t *testing.T) {
+	t.Parallel()
+
+	t.Run("sets commit via fang option", func(t *testing.T) {
+		t.Parallel()
+
+		type cfg struct{}
+
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithCLICommit[cfg]("abc123"))
+		testutil.AssertNoError(t, err)
+		testutil.AssertNotNil(t, cli)
+	})
+}
+
 func TestWithFangOptions(t *testing.T) {
 	t.Parallel()
 

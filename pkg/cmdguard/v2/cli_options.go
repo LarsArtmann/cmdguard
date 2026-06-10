@@ -10,9 +10,20 @@ import (
 type CLIOption[T any] func(*CLI[T])
 
 // WithCLIVersion sets the version string.
+// When fang is enabled, the version is automatically passed to fang.WithVersion
+// for styled version output alongside cmdguard's own version subcommand.
 func WithCLIVersion[T any](version string) CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.setVersion(version)
+		cli.fangOpts = append(cli.fangOpts, fang.WithVersion(version))
+	}
+}
+
+// WithCLICommit sets the git commit hash appended to the version string.
+// When fang is enabled, the commit is automatically passed to fang.WithCommit.
+func WithCLICommit[T any](commit string) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.fangOpts = append(cli.fangOpts, fang.WithCommit(commit))
 	}
 }
 
