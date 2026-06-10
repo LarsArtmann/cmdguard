@@ -35,7 +35,7 @@ type FlagTag struct {
 // Returns all validation errors found.
 func ValidateConfig(cfg any) error {
 	if cfg == nil {
-		return ErrConfigNil
+		return fmt.Errorf("%w: config is nil", ErrConfigNil)
 	}
 
 	v, err := derefPointerToStruct(cfg)

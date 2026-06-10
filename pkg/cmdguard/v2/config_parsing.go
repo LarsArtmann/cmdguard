@@ -26,7 +26,7 @@ func derefPointerToStruct(cfg any) (reflect.Value, error) {
 // The struct must have `flag` tags on its fields.
 func ParseFlagTags(cfg any) ([]FlagTag, error) {
 	if cfg == nil {
-		return nil, ErrConfigNil
+		return nil, fmt.Errorf("%w: config is nil", ErrConfigNil)
 	}
 
 	v, err := derefPointerToStruct(cfg)

@@ -71,7 +71,7 @@ func loadConfigFile(paths []string, loader ConfigFileLoader, cfg any) ([]string,
 		return setFields, nil
 	}
 
-	return nil, ErrConfigFileNotFound
+	return nil, fmt.Errorf("%w: none of %v found", ErrConfigFileNotFound, paths)
 }
 
 // expandConfigPath expands environment variables and the leading ~ in a path.

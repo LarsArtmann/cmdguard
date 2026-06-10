@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"testing"
 
@@ -50,6 +51,14 @@ func TestLogLevel(t *testing.T) {
 
 		_, err := ParseLogLevel("invalid")
 		testutil.AssertExpectedError(t, err)
+
+		if !errors.Is(err, ErrLogLevel) {
+			t.Error("expected error to match ErrLogLevel via errors.Is")
+		}
+
+		if !errors.Is(err, ErrInvalidEnum) {
+			t.Error("expected error to match ErrInvalidEnum via errors.Is")
+		}
 	})
 
 	t.Run("SlogLevel conversion", func(t *testing.T) {
@@ -182,6 +191,14 @@ func TestLogFormat(t *testing.T) {
 
 		_, err := ParseLogFormat("xml")
 		testutil.AssertExpectedError(t, err)
+
+		if !errors.Is(err, ErrLogFormat) {
+			t.Error("expected error to match ErrLogFormat via errors.Is")
+		}
+
+		if !errors.Is(err, ErrInvalidEnum) {
+			t.Error("expected error to match ErrInvalidEnum via errors.Is")
+		}
 	})
 }
 

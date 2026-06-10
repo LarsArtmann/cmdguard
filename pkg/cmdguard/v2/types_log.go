@@ -1,6 +1,9 @@
 package v2
 
-import "log/slog"
+import (
+	"fmt"
+	"log/slog"
+)
 
 // logLevelAllowed is the set of valid log levels.
 //
@@ -31,7 +34,7 @@ var (
 func ParseLogLevel(s string) (LogLevel, error) {
 	e, err := ParseEnum(s, logLevelAllowed)
 	if err != nil {
-		return LogLevel{}, err
+		return LogLevel{}, fmt.Errorf("%w: %w", ErrLogLevel, err)
 	}
 
 	return LogLevel(e), nil
@@ -86,7 +89,7 @@ var (
 func ParseLogFormat(s string) (LogFormat, error) {
 	e, err := ParseEnum(s, logFormatAllowed)
 	if err != nil {
-		return LogFormat{}, err
+		return LogFormat{}, fmt.Errorf("%w: %w", ErrLogFormat, err)
 	}
 
 	return LogFormat(e), nil
