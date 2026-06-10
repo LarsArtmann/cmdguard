@@ -2,9 +2,12 @@ package v2
 
 import (
 	"context"
+	"io"
 	"reflect"
 	"testing"
 	"time"
+
+	"charm.land/fang/v2"
 
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
@@ -105,6 +108,36 @@ func TestWithFangOptions(t *testing.T) {
 		type cfg struct{}
 
 		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangOptions[cfg]())
+		testutil.AssertNoError(t, err)
+		testutil.AssertNotNil(t, cli)
+	})
+}
+
+func TestWithFangErrorHandler(t *testing.T) {
+	t.Parallel()
+
+	t.Run("sets custom error handler", func(t *testing.T) {
+		t.Parallel()
+
+		type cfg struct{}
+
+		handler := func(w io.Writer, styles fang.Styles, err error) {}
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangErrorHandler[cfg](handler))
+		testutil.AssertNoError(t, err)
+		testutil.AssertNotNil(t, cli)
+	})
+}
+
+func TestWithFangColorScheme(t *testing.T) {
+	t.Parallel()
+
+	t.Run("sets custom color scheme", func(t *testing.T) {
+		t.Parallel()
+
+		type cfg struct{}
+
+		cs := fang.DefaultColorScheme
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangColorScheme[cfg](cs))
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})

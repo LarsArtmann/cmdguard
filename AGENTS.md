@@ -89,7 +89,7 @@ cmdguard/
 │   │   ├── glamour.go            # Markdown help rendering via glamour/v2
 │   │   ├── manpage.go            # Man page generation via mango
 │   │   ├── middleware.go         # Middleware chain pattern
-│   │   ├── output.go             # Rich output (OutputTable, OutputResult, 12+ formats)
+│   │   ├── output.go             # Rich output (OutputTable, OutputResult, 16 formats)
 │   │   ├── prompts.go            # Interactive prompts via huh/v2
 │   │   ├── scope.go              # DI scope wrapping samber/do/v2
 │   │   ├── spinner.go            # Terminal spinner middleware
@@ -272,6 +272,8 @@ go build ./...                                   # Verify build
 51. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` hooks into the CLI's injector via `buildInjectorOpts()`, which merges DILogging and audit hooks. `AuditLogCommand[T](cli)` creates an `audit-log` subcommand supporting 4 formats (html, json, ndjson, mermaid). Returns `ErrAuditLogNotEnabled` when plugin is nil — callers should check with `errors.Is`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogCommand` gracefully degrades in tests without the plugin.
 52. **buildInjectorOpts** — Merges `diLogf` and `auditLog` into a single `*do.InjectorOpts`. Returns nil when neither is configured (uses default injector). This replaced the old inline `NewScopeWithOpts` call in `cli.initialize()`.
 53. **go mod replace for auditlog** — `samber-do-auditlog v0.0.1` is missing `html_templ.go` in the published tag (gitignored `*_templ.go`). A local replace directive is needed until `html_templ.go` is committed and v0.0.2 is tagged.
+54. **Fang integration (ADR-001)** — `WithCLIVersion` auto-pipes to `fang.WithVersion`; `WithCLICommit` auto-pipes to `fang.WithCommit`. Users should NOT use `WithFangOptions(fang.WithVersion(...))` alongside `WithCLIVersion` — this would create duplicate fang version opts. `fang.WithNotifySignal` is intentionally skipped because cmdguard's `WithSignalHandling`/`WithGracefulShutdown` provides DI-aware signal handling that fang cannot (see `docs/adr/001-fang-integration-strategy.md`).
+55. **16 output formats** — go-output v0.8.0 provides 16 formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml. All are exposed via `output.go` registries. TOML also supports arbitrary data via `anyFormatRegistry`. PlantUML uses the `plantuml` sub-package (separate go.mod dependency from other sub-packages).
 
 ---
 

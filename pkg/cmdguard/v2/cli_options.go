@@ -1,7 +1,10 @@
 package v2
 
 import (
+	"io"
+
 	"charm.land/fang/v2"
+	"charm.land/lipgloss/v2"
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 	"github.com/spf13/cobra"
 )
@@ -67,6 +70,24 @@ func WithFang[T any](enabled bool) CLIOption[T] {
 func WithFangOptions[T any](opts ...fang.Option) CLIOption[T] {
 	return func(cli *CLI[T]) {
 		cli.fangOpts = append(cli.fangOpts, opts...)
+	}
+}
+
+// WithFangErrorHandler sets a custom error display function for fang's styled output.
+// The function receives the writer, fang styles, and the error to display.
+// Only effective when fang is enabled (default).
+func WithFangErrorHandler[T any](handler func(w io.Writer, styles fang.Styles, err error)) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.fangOpts = append(cli.fangOpts, fang.WithErrorHandler(handler))
+	}
+}
+
+// WithFangColorScheme sets a custom color scheme for fang's styled help and error output.
+// The function receives a lipgloss.LightDarkFunc and returns a fang.ColorScheme.
+// Only effective when fang is enabled (default).
+func WithFangColorScheme[T any](cs func(lightDark lipgloss.LightDarkFunc) fang.ColorScheme) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.fangOpts = append(cli.fangOpts, fang.WithColorSchemeFunc(cs))
 	}
 }
 

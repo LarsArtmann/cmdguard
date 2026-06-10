@@ -30,7 +30,7 @@
 - ✅ **Typo suggestions** — "did you mean?" for flags and subcommands
 - ✅ **Constructor validation** — invalid commands caught at registration time
 - ✅ **Minimal panics** — all non-Must APIs return errors; Must variants panic for compile-time config
-- ✅ **Rich output** — 12+ formats (JSON, CSV, YAML, table, etc.)
+- ✅ **Rich output** — 16 formats (JSON, CSV, YAML, table, JSONL, TOML, PlantUML, etc.)
 - ✅ **Config file support** — JSON/YAML/TOML with flag/env override
 - ⚠️ **Newer project** — smaller community than Kong or urfave/cli
 - ⚠️ **Cobra required** — not a standalone framework

@@ -41,7 +41,7 @@
 - [x] Terminal spinner (`SpinnerMiddleware`)
 - [x] OpenTelemetry integration (`WithTelemetry`, `TelemetryMiddleware`)
 - [x] `--no-color` flag + `NO_COLOR` support
-- [x] Rich output with 12+ formats via `go-output`
+- [x] Rich output with 16 formats via `go-output`
 - [x] Review all `any` usages in package
 - [x] Remove string-based `BranchWithTimeout`/`BranchWithDeadline`
 - [x] Remove deprecated `FlowContextAccessor` API
@@ -59,7 +59,7 @@
 
 ### v3.0 API-Breaking Cleanup
 
-- [ ] Make `NoFlags` a distinct named type (not `type NoFlags = struct{}`)
+- [x] Make `NoFlags` a distinct named type (not `type NoFlags = struct{}`)
 - [ ] Rename `Get[T]`/`MustGet[T]` to more specific names
 - [ ] Make `RegisterInScope` generic instead of `...any`
 - [ ] Remove or redesign `Package()` for error-safe DI integration
@@ -127,7 +127,7 @@
 
 > **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.7.2.
 
-`go-output` provides 12 output formats. Consider extracting to a sub-package in v3.0 so consumers only pay the dependency cost when they use `--output`.
+`go-output` provides 16 output formats. Consider extracting to a sub-package in v3.0 so consumers only pay the dependency cost when they use `--output`.
 
 ---
 

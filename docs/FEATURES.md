@@ -154,7 +154,7 @@ cmd, _ := v2.NewCommand[Config, *Flags]("setup", handler,
 
 ### Rich Output
 
-Output tables and results in 12+ formats:
+Output tables and results in 16 formats:
 
 ```go
 headers := []string{"Name", "Status"}
@@ -369,7 +369,7 @@ pkg/cmdguard/v2/
 ├── flow_context.go        # BranchingFlowContext
 ├── glamour.go             # Markdown help rendering
 ├── middleware.go           # Middleware chain (Timing, Recovery, Spinner, Telemetry)
-├── output.go              # Rich output (12 formats)
+├── output.go              # Rich output (16 formats)
 ├── prompts.go             # Interactive prompts (huh)
 ├── scope.go               # DI scope wrapping samber/do/v2
 ├── spinner.go             # Terminal spinner

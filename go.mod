@@ -13,6 +13,7 @@ require (
 	github.com/larsartmann/go-output/delimited v0.7.0
 	github.com/larsartmann/go-output/graph v0.7.0
 	github.com/larsartmann/go-output/markup v0.7.0
+	github.com/larsartmann/go-output/plantuml v0.7.0
 	github.com/larsartmann/go-output/serialization v0.7.0
 	github.com/larsartmann/go-output/table v0.7.0
 	github.com/larsartmann/samber-do-auditlog v0.0.1

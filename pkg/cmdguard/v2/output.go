@@ -10,12 +10,13 @@ import (
 	"github.com/larsartmann/go-output/delimited"
 	"github.com/larsartmann/go-output/graph"
 	"github.com/larsartmann/go-output/markup"
+	"github.com/larsartmann/go-output/plantuml"
 	"github.com/larsartmann/go-output/serialization"
 	"github.com/larsartmann/go-output/table"
 )
 
 // OutputFormat is a type-safe output format enum.
-// Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot.
+// Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml.
 type OutputFormat = output.Format
 
 // Output format constants re-exported from go-output for convenience.
@@ -32,6 +33,10 @@ var (
 	FormatTree     = output.FormatTree
 	FormatMermaid  = output.FormatMermaid
 	FormatDOT      = output.FormatDOT
+	FormatJSONL    = output.FormatJSONL
+	FormatAsciiDoc = output.FormatAsciiDoc
+	FormatTOML     = output.FormatTOML
+	FormatPlantUML = output.FormatPlantUML
 )
 
 // ParseOutputFormat parses a string into an OutputFormat.
@@ -190,6 +195,32 @@ var tableFormatRegistry = map[OutputFormat]tableRenderer{
 			return graph.DOTFromTableData(d).Render()
 		})
 	},
+	output.FormatJSONL: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "JSONL", data, func(d *output.TableData) (string, error) {
+			b, err := serialization.MarshalJSONLFromTableData(d)
+
+			return string(b), err
+		})
+	},
+	output.FormatAsciiDoc: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "AsciiDoc", data, func(d *output.TableData) (string, error) {
+			b, err := markup.MarshalAsciiDocFromTableData(d)
+
+			return string(b), err
+		})
+	},
+	output.FormatTOML: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "TOML", data, func(d *output.TableData) (string, error) {
+			b, err := serialization.MarshalTOMLFromTableData(d)
+
+			return string(b), err
+		})
+	},
+	output.FormatPlantUML: func(w io.Writer, data *output.TableData) error {
+		return renderAndWrite(w, "PlantUML", data, func(d *output.TableData) (string, error) {
+			return plantuml.PlantUMLFromTableData(d).Render()
+		})
+	},
 }
 
 // anyRenderer renders arbitrary data to a writer.
@@ -204,6 +235,9 @@ var anyFormatRegistry = map[OutputFormat]anyRenderer{
 	},
 	output.FormatYAML: func(w io.Writer, data any) error {
 		return marshalAndWrite(w, "YAML", data, serialization.MarshalYAML)
+	},
+	output.FormatTOML: func(w io.Writer, data any) error {
+		return marshalAndWrite(w, "TOML", data, serialization.MarshalTOML)
 	},
 }
 
