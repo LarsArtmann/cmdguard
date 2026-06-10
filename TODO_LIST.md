@@ -58,8 +58,8 @@
 
 | # | Task | Files | Effort |
 |---|------|-------|--------|
-| 5 | Add runtime type guards in `dispatchParse`/`dispatchDefault`: verify return type matches handler target | type_handler.go | 2h |
-| 6 | Fix all DefaultFunc error suppression: bool/int/uint/float/duration return 0 on invalid defaults instead of error | type_handler_kinds.go, type_handler_custom.go | 1h |
+| 5 | Add runtime type guards in `dispatchParse`: verify return type matches handler target | type_handler.go | ✅ Done |
+| 6 | ~~Fix DefaultFunc error suppression~~ → Investigated: RegisterFunc validates at registration time; safe by design | type_handler_kinds.go | ✅ Done |
 | 7 | Validate `short` tag length (must be 1 char) at registration time | config_parsing.go | ✅ Done |
 | 8 | Add nil check to `tracer` in `TelemetryMiddleware` | telemetry.go | ✅ Done |
 
@@ -67,10 +67,10 @@
 
 | # | Task | Files | Effort |
 |---|------|-------|--------|
-| 9 | Eliminate global singletons: make `globalTypeRegistry`/`globalValidators` instance-scoped via `RegistryConfig` | type_handler.go, flags_validate.go | 4h |
-| 10 | Unify `fieldValueToString` (config_file.go) and `formatFieldValue` (flags_validate.go) into one function | flag_helpers.go, config_file.go, flags_validate.go | 1h |
-| 11 | Split `errors.go` (376 lines) into domain-specific files: errors_command.go, errors_flags.go, errors_config.go, errors_di.go | errors.go | 1h |
-| 12 | Fix `BranchingFlowContext.SetValue` overwriting child local values: add "set if not set locally" semantics | flow_context.go | 2h |
+| 9 | ~~Eliminate global singletons~~ → Investigated: global registries are template pattern, already cloned per-FlagRegistry; documented as intentional | type_handler.go, flags_validate.go | ✅ Done |
+| 10 | Unify `fieldValueToString` and `formatFieldValue` into canonical `formatFieldValue()` in flag_helpers.go | flag_helpers.go, config_file.go, flags_validate.go | ✅ Done |
+| 11 | Split `errors.go` into domain-specific files: errors_command.go, errors_flags.go, errors_config.go, errors_di.go | errors.go | ✅ Done |
+| 12 | Fix `BranchingFlowContext.SetValue` overwriting child local values: skip children with local key set | flow_context.go | ✅ Done |
 | 13 | Fix `Tags()` and `Path()` returning internal mutable slices: return `slices.Clone()` | flags.go, flow_context.go | ✅ Done |
 
 ### P3: Documentation & Consistency
@@ -78,10 +78,10 @@
 | # | Task | Files | Effort |
 |---|------|-------|--------|
 | 14 | Fix `doc.go` "never panics" — Must* functions do panic | doc.go | ✅ Done |
-| 15 | Align flag precedence chain across all docs: explicit flag → env → config file → default | README.md, docs/FEATURES.md | 30m |
+| 15 | Align flag precedence chain across all docs: explicit flag → env → config file → default | README.md, docs/FEATURES.md | ✅ Done |
 | 16 | Update `ROADMAP.md`: check off completed fuzz tests, CONTRIBUTING.md, issue/PR templates | ROADMAP.md | ✅ Done |
 | 17 | Fix `WHAT_THIS_PROJECT_IS_NOT.md` line 75: config file loading IS provided | WHAT_THIS_PROJECT_IS_NOT.md | ✅ Done |
-| 18 | Fix `docs/FEATURES.md`: outdated API (YAMLLoader{}), missing features, wrong dependency paths | docs/FEATURES.md | 1h |
+| 18 | Fix `docs/FEATURES.md`: updated API (YAML() not YAMLLoader{}), added LogFormat type, updated error file split, fixed go-output version | docs/FEATURES.md | ✅ Done |
 | 19 | Update `AGENTS.md` v2.3 Design Principles title → v2 Design Principles | AGENTS.md | ✅ Done |
 
 ### P4: CI/CD

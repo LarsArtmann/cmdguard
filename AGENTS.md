@@ -70,7 +70,11 @@ cmdguard/
 │   │   ├── configload/           # Optional YAML/TOML loaders
 │   │   ├── counting_flag.go      # (removed — logic in type_handler_kinds.go)
 │   │   ├── editor.go             # EditInEditor ($EDITOR support)
-│   │   ├── errors.go             # Sentinel errors and error types
+│   │   ├── errors.go             # Error types (CommandError, FlagError, etc.) and remaining sentinels
+│   │   ├── errors_command.go     # Command-related sentinel errors
+│   │   ├── errors_config.go      # Config-related sentinel errors
+│   │   ├── errors_di.go          # DI-related sentinel errors
+│   │   ├── errors_flags.go       # Flag-related sentinel errors
 │   │   ├── flags.go              # FlagRegistry with struct tags
 │   │   ├── flags_parse.go        # Flag parsing logic
 │   │   ├── flags_suggest.go      # Typo suggestions (Levenshtein)

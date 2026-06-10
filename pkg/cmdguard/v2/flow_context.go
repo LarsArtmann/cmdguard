@@ -162,12 +162,16 @@ func (b *BranchingFlowContext) Root() *BranchingFlowContext {
 	return current
 }
 
-// SetValue sets a value in this context and all descendants.
-// Use this to propagate values down the command tree.
+// SetValue sets a value in this context and propagates to descendants.
+// Children that have already set the key locally (via SetValueLocal) are not overwritten.
 func (b *BranchingFlowContext) SetValue(key, value any) {
 	b.values[key] = value
 
 	for _, child := range b.children {
+		if _, hasLocal := child.values[key]; hasLocal {
+			continue
+		}
+
 		child.SetValue(key, value)
 	}
 }

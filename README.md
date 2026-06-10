@@ -170,7 +170,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 )
 ```
 
-Priority chain: **explicit flag → env var → default value**.
+Priority chain: **explicit flag → env var → config file → default value**.
 
 ---
 
@@ -399,7 +399,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 
 `configload.YAML()` and `configload.TOML()` return `ConfigFileLoader` implementations. See [`pkg/cmdguard/v2/configload/`](pkg/cmdguard/v2/configload/) for available loaders.
 
-**Precedence:** config file → environment variables → explicit flags → defaults.
+**Precedence:** explicit flag → env var → config file → default value (highest to lowest priority).
 
 ---
 

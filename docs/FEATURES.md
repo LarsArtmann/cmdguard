@@ -80,11 +80,11 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 
 // Or use YAML/TOML with custom loader
 cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v2.WithConfigFileLoader[AppConfig](configload.YAMLLoader{}, "config.yaml"),
+    v2.WithConfigFileLoader[AppConfig](configload.YAML(), "config.yaml"),
 )
 ```
 
-**Precedence:** Config file → Environment variables → Command-line flags (flags always win).
+**Precedence:** explicit flag → env var → config file → default value (highest to lowest priority).
 
 ### Dependency Injection
 
@@ -195,6 +195,7 @@ if cli.NoColor() {
 | `Enum[T]`  | `types_enum.go`     | Allowed values        |
 | `FilePath` | `types_filepath.go` | Path validation       |
 | `HostPort` | `types_hostport.go` | host:port format      |
+| `LogFormat`| `types_log.go`      | text/json format      |
 | `LogLevel` | `types_log.go`      | Standard log levels   |
 | `Port`     | `types_port.go`     | 1–65535 range         |
 | `URL`      | `types_url.go`      | Valid URL             |
@@ -355,7 +356,11 @@ pkg/cmdguard/v2/
 ├── config.go              # Config type constraint
 ├── config_file.go         # ConfigFileLoader, JSON loader
 ├── configload/            # Optional YAML/TOML loaders
-├── errors.go              # Sentinel errors and error types
+├── errors.go              # Error types (CommandError, FlagError, etc.)
+├── errors_command.go      # Command sentinel errors
+├── errors_config.go       # Config sentinel errors
+├── errors_di.go           # DI sentinel errors
+├── errors_flags.go        # Flag sentinel errors
 ├── flags.go               # FlagRegistry with struct tags
 ├── flow_context.go        # BranchingFlowContext
 ├── glamour.go             # Markdown help rendering
@@ -381,4 +386,4 @@ pkg/cmdguard/v2/
 | `charm.land/huh/v2`                | Interactive prompts  | v2.0.3  |
 | `charm.land/glamour/v2`            | Markdown rendering   | v2.0.0  |
 | `go.opentelemetry.io/otel/trace`   | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output` | Rich output formats  | v0.6.2  |
+| `github.com/larsartmann/go-output` | Rich output formats  | v0.7.2  |

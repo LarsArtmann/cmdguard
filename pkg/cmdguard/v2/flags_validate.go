@@ -333,29 +333,3 @@ func validateFieldByKind(field reflect.Value, tag FlagTag) error {
 
 	return runValidateTag(tag.Validate, strValue)
 }
-
-// formatFieldValue converts a reflect.Value to its string representation for validation.
-func formatFieldValue(field reflect.Value) string {
-	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
-	case reflect.String:
-		return field.String()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return strconv.FormatInt(field.Int(), 10)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return strconv.FormatUint(field.Uint(), 10)
-	case reflect.Float32, reflect.Float64:
-		return strconv.FormatFloat(field.Float(), 'f', -1, 64)
-	case reflect.Bool:
-		return strconv.FormatBool(field.Bool())
-	case reflect.Pointer, reflect.Interface:
-		if field.Elem().IsValid() {
-			return formatFieldValue(field.Elem())
-		}
-
-		return ""
-	case reflect.Invalid:
-		return ""
-	default:
-		return fmt.Sprintf("%v", field.Interface())
-	}
-}

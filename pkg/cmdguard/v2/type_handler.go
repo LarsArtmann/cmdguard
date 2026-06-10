@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"fmt"
 	"maps"
 	"reflect"
 	"sync"
@@ -152,13 +153,26 @@ func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error
 }
 
 // dispatchParse dispatches value parsing to the TypeHandler registry.
+// Returns an error if the parsed value type doesn't match the target field type.
 func dispatchParse(tr *typeRegistry, value string, tag FlagTag) (any, error) {
 	h, ok := tr.lookupHandler(tag.Type)
 	if !ok {
 		return value, nil
 	}
 
-	return h.Parse(value, tag)
+	parsed, err := h.Parse(value, tag)
+	if err != nil {
+		return nil, err
+	}
+
+	parsedVal := reflect.ValueOf(parsed)
+	if parsedVal.IsValid() && !parsedVal.Type().AssignableTo(tag.Type) &&
+		!parsedVal.Type().ConvertibleTo(tag.Type) {
+		return nil, fmt.Errorf("dispatchParse: type handler returned %s, field %q requires %s: %w",
+			parsedVal.Type(), tag.Field, tag.Type, ErrUnsupportedConversion)
+	}
+
+	return parsed, nil
 }
 
 // dispatchDefault dispatches default value computation to the TypeHandler registry.

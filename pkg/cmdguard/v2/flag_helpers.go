@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -253,4 +254,39 @@ func cloneAndParseFlags[F any](c *cobra.Command, flags F, registry *FlagRegistry
 	}
 
 	return parseAndSyncFlags(c, flagsCopy, flagsPtr, registry)
+}
+
+// formatFieldValue converts a reflect.Value to its string representation.
+// Handles primitives, pointers, interfaces, and types implementing fmt.Stringer.
+func formatFieldValue(field reflect.Value) string {
+	if !field.IsValid() {
+		return ""
+	}
+
+	if field.Kind() == reflect.Pointer || field.Kind() == reflect.Interface {
+		if field.Elem().IsValid() {
+			return formatFieldValue(field.Elem())
+		}
+
+		return ""
+	}
+
+	if s, ok := field.Interface().(fmt.Stringer); ok {
+		return s.String()
+	}
+
+	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
+	case reflect.String:
+		return field.String()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return strconv.FormatInt(field.Int(), 10)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return strconv.FormatUint(field.Uint(), 10)
+	case reflect.Float32, reflect.Float64:
+		return strconv.FormatFloat(field.Float(), 'f', -1, 64)
+	case reflect.Bool:
+		return strconv.FormatBool(field.Bool())
+	default:
+		return fmt.Sprintf("%v", field.Interface())
+	}
 }

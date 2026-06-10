@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strconv"
 	"strings"
 )
 
@@ -101,26 +100,15 @@ func FilterSetFields(tags []FlagTag, present map[string]bool) []string {
 }
 
 // fieldValueToString converts a reflect.Value to its string representation.
-// Handles primitives and types implementing fmt.Stringer.
+// Delegates to the unified formatFieldValue in flag_helpers.go.
 func fieldValueToString(field reflect.Value) (string, bool) {
-	if s, ok := field.Interface().(fmt.Stringer); ok {
-		return s.String(), true
-	}
-
-	switch field.Kind() { //nolint:exhaustive // default handles remaining kinds
-	case reflect.String:
-		return field.String(), true
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return strconv.FormatInt(field.Int(), 10), true
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return strconv.FormatUint(field.Uint(), 10), true
-	case reflect.Float32, reflect.Float64:
-		return strconv.FormatFloat(field.Float(), 'f', -1, 64), true
-	case reflect.Bool:
-		return strconv.FormatBool(field.Bool()), true
-	default:
+	if !field.IsValid() {
 		return "", false
 	}
+
+	result := formatFieldValue(field)
+
+	return result, result != ""
 }
 
 // resolveConfigFlag scans args for a --config flag override.
