@@ -61,28 +61,39 @@ cmdguard/
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
 │   │   ├── cli_options.go        # CLI functional options (WithCLIVersion, etc.)
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
-│   │   ├── command_suggest.go    # Command typo suggestions
+│   │   ├── cli_output.go          # Output format flag registration and parsing
+│   │   ├── command_suggest.go    # (removed — consolidated into flags_suggest.go)
 │   │   ├── config.go             # Config type constraint
 │   │   ├── config_file.go        # ConfigFileLoader, JSON loader, WithConfigFile
 │   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue
 │   │   ├── config_setfield.go    # SetField for config structs
 │   │   ├── configload/           # Optional YAML/TOML loaders
-│   │   ├── counting_flag.go      # Counting flag support (count:"true")
+│   │   ├── counting_flag.go      # (removed — logic in type_handler_kinds.go)
 │   │   ├── editor.go             # EditInEditor ($EDITOR support)
 │   │   ├── errors.go             # Sentinel errors and error types
 │   │   ├── flags.go              # FlagRegistry with struct tags
 │   │   ├── flags_parse.go        # Flag parsing logic
 │   │   ├── flags_suggest.go      # Typo suggestions (Levenshtein)
 │   │   ├── flags_validate.go     # Flag validation
+│   │   ├── completion.go         # Shell completion support
+│   │   ├── doc.go                # Package documentation
 │   │   ├── flag_helpers.go       # Flag type constraints, cloning, parsing helpers
 │   │   ├── flow_context.go       # BranchingFlowContext for command path tracking
+│   │   ├── flow_context_access.go # Flow context helpers (typed value access)
+│   │   ├── glamour.go            # Markdown help rendering via glamour/v2
+│   │   ├── manpage.go            # Man page generation via mango
 │   │   ├── middleware.go         # Middleware chain pattern
+│   │   ├── prompts.go            # Interactive prompts via huh/v2
 │   │   ├── scope.go              # DI scope wrapping samber/do/v2
-│   │   ├── output.go             # Rich output (table/json/csv/yaml)
+│   │   ├── spinner.go            # Terminal spinner middleware
+│   │   ├── telemetry.go          # OpenTelemetry middleware
 │   │   ├── type_handler.go       # Extensible type registry
+│   │   ├── type_handler_kinds.go # Primitive kind handlers (string/bool/int/uint/float/slice)
+│   │   ├── type_handler_custom.go # Custom type handlers (Duration/Enum/URL/Email/Port)
 │   │   ├── type_helpers.go       # Generic type helpers
+│   │   ├── testutil/             # Test harness utilities
 │   │   ├── version.go            # VersionCommand helper
-│   │   ├── doctor.go              # DoctorCommand helper
+│   │   ├── doctor.go             # DoctorCommand helper
 │   │   ├── types_duration.go     # Duration type
 │   │   ├── types_email.go        # Email type
 │   │   ├── types_enum.go         # Enum[T] type
@@ -549,7 +560,7 @@ go build ./...                                   # Verify build
 8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
-11. **go-output published** — `github.com/larsartmann/go-output` is published at v0.6.2, no local replace needed
+11. **go-output published** — `github.com/larsartmann/go-output` is published at v0.7.2, no local replace needed
 12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel

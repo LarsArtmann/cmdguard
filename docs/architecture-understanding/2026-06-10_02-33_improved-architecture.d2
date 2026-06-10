@@ -1,0 +1,121 @@
+direction: down
+
+title: {
+  label: cmdguard v2 — Target Architecture (Deepened Modules)
+  near: top-center
+  shape: text
+  style: { font-size: 24; bold: true }
+}
+
+# Target: Split CLI[T] into focused components and extract registries
+
+foundation: {
+  label: Foundation Layer
+  shape: rectangle
+  style: { fill: "#e0e7ff"; stroke: "#6366f1" }
+
+  errors: { label: "errors/\nDomain-specific error files\nerrors_flags, errors_config\nerrors_di, errors_command"; shape: package }
+  types: { label: "types/\nDuration, Enum, URL, Email\nPort, FilePath, HostPort\nLogLevel, LogFormat"; shape: package }
+  generics: { label: "generics.go\nValueOrDefault, EnsureValid\nMustParse, textMarshal"; shape: package }
+}
+
+registries: {
+  label: Registry Layer (Instance-Scoped)
+  shape: rectangle
+  style: { fill: "#ede9fe"; stroke: "#8b5cf6" }
+
+  type_registry: {
+    label: "TypeRegistry\nNo global singletons\nInstance-scoped defaults"
+    shape: package
+    style: { fill: "#dcfce7" }
+  }
+  validator_registry: {
+    label: "ValidatorRegistry\nPer-instance validators\nBuilt-ins pre-registered"
+    shape: package
+    style: { fill: "#dcfce7" }
+  }
+}
+
+flags: {
+  label: Flag System (Deep Module)
+  shape: rectangle
+  style: { fill: "#fae8ff"; stroke: "#a855f7" }
+
+  flag_system: {
+    label: "flags/\nFlagRegistry (deep module)\nParsing: CLI > env > default\nTypeHandler dispatch\nTag parsing, Validation\nConfig file loading\nSetField (typed)"
+    shape: package
+    style: { fill: "#fef9c3" }
+  }
+}
+
+cli_core: {
+  label: CLI Core (Facade)
+  shape: rectangle
+  style: { fill: "#fef3c7"; stroke: "#f59e0b" }
+
+  cli_facade: {
+    label: "CLI (Facade)\nDelegates to:\n  CLIConfig\n  CLIFeatures\n  CLIRuntime"
+    shape: package
+    style: { fill: "#fef2f2"; stroke-dash: 0 }
+  }
+
+  cli_config: {
+    label: "CLIConfig\nname, version\nenvPrefix, configPath"
+    shape: package
+  }
+
+  cli_features: {
+    label: "CLIFeatures\noutputFormat\nglamour, spinner\ntelemetry, configFile"
+    shape: package
+  }
+
+  cli_runtime: {
+    label: "CLIRuntime\nscope, flowCtx\nmiddlewares\nvalidationMode"
+    shape: package
+  }
+
+  cli_config -> cli_facade: { label: "delegates"; style: { stroke-dash: 3 } }
+  cli_features -> cli_facade: { label: "delegates"; style: { stroke-dash: 3 } }
+  cli_runtime -> cli_facade: { label: "delegates"; style: { stroke-dash: 3 } }
+}
+
+command: {
+  label: Command System
+  shape: rectangle
+  style: { fill: "#f0fdf4"; stroke: "#22c55e" }
+
+  cmd: { label: "Command with typed flags\nPre/Post hooks\nArg validation"; shape: package }
+  cmd_options: { label: "Functional options\nWithShort/Long/Flags\nWithRunE/PreRunE"; shape: package }
+  wiring: { label: "Cobra wiring\ncliToCobraCommand\nMiddleware chain"; shape: package }
+}
+
+features: {
+  label: Feature Extensions
+  shape: rectangle
+  style: { fill: "#f0fdf4"; stroke: "#22c55e" }
+
+  builtin_cmds: { label: "Built-in Commands\nVersion, Doctor\nCompletion, Manpage"; shape: package }
+  middleware_impls: { label: "Middleware Impls\nTiming, Recovery\nSpinner, Telemetry"; shape: package }
+  ui: { label: "UI Features\nGlamour help\nInteractive prompts\nEDITOR support"; shape: package }
+}
+
+di: {
+  label: Dependency Injection
+  shape: rectangle
+  style: { fill: "#ecfeff"; stroke: "#06b6d4" }
+
+  scope: { label: "Scope\nProvide, Invoke\nShutdown, HealthCheck\nChild scopes"; shape: package }
+}
+
+# Connections
+foundation.errors -> registries.type_registry: { label: "sentinels" }
+foundation.types -> flags.flag_system: { label: "value types" }
+registries.type_registry -> flags.flag_system: { label: "handlers" }
+registries.validator_registry -> flags.flag_system: { label: "validators" }
+flags.flag_system -> cli_core.cli_facade: { label: "register/parse" }
+command.cmd -> cli_core.cli_facade: { label: "AddCommand" }
+command.wiring -> cli_core.cli_facade: { label: "Execute" }
+di.scope -> cli_core.cli_runtime: { label: "DI" }
+cli_core.cli_facade -> features.builtin_cmds: { label: "construct" }
+cli_core.cli_runtime -> features.middleware_impls: { label: "chain" }
+cli_core.cli_features -> features.ui: { label: "configure" }

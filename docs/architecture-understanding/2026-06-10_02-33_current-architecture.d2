@@ -1,0 +1,120 @@
+direction: down
+
+title: {
+  label: cmdguard v2 — Current Architecture
+  near: top-center
+  shape: text
+  style: { font-size: 24; bold: true }
+}
+
+layer0: {
+  label: Layer 0 — Foundation
+  shape: rectangle
+  style: { fill: "#e0e7ff"; stroke: "#6366f1" }
+
+  errors: { label: "errors.go\n51 sentinels\n6 error types"; shape: package }
+  type_helpers: { label: "type_helpers.go\nGenerics: ValueOrDefault\nEnsureValid, MustParse"; shape: package }
+  value_types: { label: "types_*.go (7 files)\nDuration, Enum, URL\nEmail, Port, FilePath\nHostPort, LogLevel"; shape: package }
+}
+
+layer1: {
+  label: Layer 1 — Core Types
+  shape: rectangle
+  style: { fill: "#ede9fe"; stroke: "#8b5cf6" }
+
+  config: { label: "config.go\nFlagTag, Config\nMergeConfigs, deepCopy"; shape: package }
+  command: { label: "command.go\nCommand{T,F}\nNoFlags, ValidationMode"; shape: package }
+  scope: { label: "scope.go\nDI Scope\nProvide, Invoke, Shutdown"; shape: package }
+  output: { label: "output.go\n12 output formats\nOutputResult"; shape: package }
+  flow_ctx: { label: "flow_context.go\nBranchingFlowContext\nTree-structured ctx"; shape: package }
+  middleware: { label: "middleware.go\nMiddleware{T}\nChain, Timing, Recovery"; shape: package }
+}
+
+layer2: {
+  label: Layer 2 — Registries
+  shape: rectangle
+  style: { fill: "#fae8ff"; stroke: "#a855f7" }
+
+  config_parsing: { label: "config_parsing.go\nParseFlagTags\nDefaultValue"; shape: package }
+  type_handler: { label: "type_handler.go\nTypeHandler interface\ntypeRegistry"; shape: package }
+  handler_kinds: { label: "type_handler_kinds.go\nstring/bool/int\nuint/float/slice"; shape: package }
+  handler_custom: { label: "type_handler_custom.go\nDuration/Enum/URL\nEmail/Port handlers"; shape: package }
+  flags_validate: { label: "flags_validate.go\nvalidatorRegistry\nemail/url/min/max/regex"; shape: package }
+  flags_suggest: { label: "flags_suggest.go\nLevenshtein distance\nGenerateHelp"; shape: package }
+}
+
+layer3: {
+  label: Layer 3 — Flag System
+  shape: rectangle
+  style: { fill: "#fce7f3"; stroke: "#c084fc" }
+
+  flags: { label: "flags.go\nFlagRegistry\nRegisterFlags\nValidateFlags"; shape: package }
+  config_setfield: { label: "config_setfield.go\nSetField\nsetStringField"; shape: package }
+  config_file: { label: "config_file.go\nConfigFileLoader\nJSON loader"; shape: package }
+  flag_helpers: { label: "flag_helpers.go\nFlagTypeConstraint\ncloneFlags"; shape: package }
+  flags_parse: { label: "flags_parse.go\nCLI > env > default"; shape: package }
+}
+
+layer4: {
+  label: Layer 4 — CLI Core
+  shape: rectangle
+  style: { fill: "#fef3c7"; stroke: "#f59e0b" }
+
+  cli: {
+    label: "cli.go\nCLI{T} — 17 fields\nNewCLI, AddCommand\nExecute"
+    shape: package
+    style: { stroke-dash: 3; stroke: "#ef4444"; fill: "#fef2f2" }
+  }
+  cli_command: { label: "cli_command.go\ncliToCobraCommand\nwireAllHandlers"; shape: package }
+  cli_options: { label: "cli_options.go\nCLIOption{T}\nWith* options"; shape: package }
+  cli_output: { label: "cli_output.go\n--output flag\nformat parsing"; shape: package }
+  cli_accessors: { label: "cli_accessors.go\nScope, Config\nHealthCheck, Shutdown"; shape: package }
+}
+
+layer5: {
+  label: Layer 5 — Features
+  shape: rectangle
+  style: { fill: "#f0fdf4"; stroke: "#22c55e" }
+
+  cmd_options: { label: "command_options.go\nCommandOption{T,F}\nWithShort/Long/Flags"; shape: package }
+  prompts: { label: "prompts.go\nhuh interactive\nprompts"; shape: package }
+  doctor: { label: "doctor.go\nHealth check cmd"; shape: package }
+  version: { label: "version.go\nVersion cmd"; shape: package }
+  telemetry: { label: "telemetry.go\nOTel spans"; shape: package }
+  spinner: { label: "spinner.go\nTerminal spinner"; shape: package }
+  glamour: { label: "glamour.go\nMarkdown help"; shape: package }
+  editor: { label: "editor.go\nEDITOR support"; shape: package }
+  completion: { label: "completion.go\nShell completion"; shape: package }
+  manpage: { label: "manpage.go\nMan pages"; shape: package }
+}
+
+# Cross-layer dependencies
+layer0.errors -> layer1.config: { label: "sentinels" }
+layer0.errors -> layer1.command: { label: "sentinels" }
+layer0.errors -> layer1.scope: { label: "sentinels" }
+layer0.value_types -> layer2.handler_custom: { label: "parse types" }
+
+layer1.config -> layer2.config_parsing: { label: "FlagTag" }
+layer1.config -> layer3.flags: { label: "FlagTag" }
+layer1.config -> layer3.config_setfield: { label: "reflect" }
+layer1.config -> layer3.config_file: { label: "merge" }
+layer1.command -> layer4.cli: { label: "register" }
+layer1.scope -> layer4.cli: { label: "DI" }
+layer1.middleware -> layer4.cli: { label: "chain" }
+layer1.flow_ctx -> layer4.cli: { label: "tracking" }
+
+layer2.type_handler -> layer2.handler_kinds: { label: "register" }
+layer2.type_handler -> layer2.handler_custom: { label: "register" }
+layer2.flags_validate -> layer3.flags: { label: "validate" }
+
+layer3.flags -> layer4.cli_command: { label: "register" }
+layer3.flag_helpers -> layer4.cli_command: { label: "clone" }
+layer3.flags_parse -> layer4.cli_command: { label: "parse" }
+
+layer4.cli -> layer5.cmd_options: { label: "construct" }
+layer4.cli_command -> layer5.prompts: { label: "prompt" }
+layer4.cli_options -> layer5.telemetry: { label: "option" }
+layer4.cli_options -> layer5.spinner: { label: "option" }
+layer4.cli_options -> layer5.glamour: { label: "option" }
+layer5.cmd_options -> layer5.doctor: { label: "construct" }
+layer5.cmd_options -> layer5.version: { label: "construct" }

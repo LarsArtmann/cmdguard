@@ -209,7 +209,6 @@
 | Feature          | Status              | Notes                       |
 | ---------------- | ------------------- | --------------------------- |
 | `EditInEditor`   | ✅ FULLY_FUNCTIONAL | Open content in $EDITOR     |
-| `Ptr[T]`         | ✅ FULLY_FUNCTIONAL | Pointer helper              |
 | `ValueOrDefault` | ✅ FULLY_FUNCTIONAL | Nil-safe value access       |
 | `MustParse[T]`   | ✅ FULLY_FUNCTIONAL | Panic-on-fail for constants |
 | `MergeConfigs`   | ✅ FULLY_FUNCTIONAL | Deep merge config structs   |
@@ -235,9 +234,9 @@
 | `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing          |
 | `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling         |
 | `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts   |
-| `github.com/charmbracelet/glamour` | v1.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering    |
+| `charm.land/glamour/v2`               | v2.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering    |
 | `go.opentelemetry.io/otel/trace`   | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing |
-| `github.com/larsartmann/go-output` | latest  | ✅ FULLY_FUNCTIONAL | Rich output formats   |
+| `github.com/larsartmann/go-output` | v0.7.2  | ✅ FULLY_FUNCTIONAL | Rich output formats   |
 
 ---
 
