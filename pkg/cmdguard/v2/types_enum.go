@@ -1,6 +1,9 @@
 package v2
 
-import "slices"
+import (
+	"fmt"
+	"slices"
+)
 
 // Enum provides type-safe enum values with validation.
 // Use this for config fields that must be one of a set of allowed values.
@@ -19,6 +22,17 @@ func ParseEnum(value string, allowed []string) (Enum, error) {
 	}
 
 	return Enum{}, NewEnumError(value, allowed)
+}
+
+// MustParseEnum creates an Enum from a string, panicking if invalid.
+// Use only when you know the value is valid (e.g., for constants).
+func MustParseEnum(value string, allowed []string) Enum {
+	v, err := ParseEnum(value, allowed)
+	if err != nil {
+		panic(fmt.Sprintf("MustParseEnum(%q, %v): %v", value, allowed, err))
+	}
+
+	return v
 }
 
 // String returns the enum value as a string.
