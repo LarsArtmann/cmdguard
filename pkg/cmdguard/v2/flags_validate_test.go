@@ -184,43 +184,25 @@ func TestParseValidateRules_UnknownValidator(t *testing.T) {
 func TestValidatorErrors_InvalidParams(t *testing.T) {
 	t.Parallel()
 
-	t.Run("minlen with non-integer param", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "minlen", validateMinLen, "abc:hello")
-	})
+	tests := []struct {
+		name      string
+		validator func(string) error
+		param     string
+	}{
+		{name: "minlen with non-integer param", validator: validateMinLen, param: "abc:hello"},
+		{name: "maxlen with non-integer param", validator: validateMaxLen, param: "abc:hello"},
+		{name: "min with non-number param", validator: validateMin, param: "abc:10"},
+		{name: "max with non-number param", validator: validateMax, param: "abc:10"},
+		{name: "regex with invalid pattern", validator: validateRegex, param: "[invalid:hello"},
+		{name: "minlen missing separator", validator: validateMinLen, param: "5"},
+		{name: "min missing separator", validator: validateMin, param: "5"},
+		{name: "regex missing separator", validator: validateRegex, param: "[a-z]+"},
+	}
 
-	t.Run("maxlen with non-integer param", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "maxlen", validateMaxLen, "abc:hello")
-	})
-
-	t.Run("min with non-number param", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "min", validateMin, "abc:10")
-	})
-
-	t.Run("max with non-number param", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "max", validateMax, "abc:10")
-	})
-
-	t.Run("regex with invalid pattern", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "regex", validateRegex, "[invalid:hello")
-	})
-
-	t.Run("minlen missing separator", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "minlen", validateMinLen, "5")
-	})
-
-	t.Run("min missing separator", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "min", validateMin, "5")
-	})
-
-	t.Run("regex missing separator", func(t *testing.T) {
-		t.Parallel()
-		assertValidatorError(t, "regex", validateRegex, "[a-z]+")
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assertValidatorError(t, tt.name, tt.validator, tt.param)
+		})
+	}
 }

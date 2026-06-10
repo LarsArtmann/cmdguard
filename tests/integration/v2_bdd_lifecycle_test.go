@@ -66,6 +66,18 @@ func newLifecyclePostRunFlag(flag *bool) v2.CommandOption[lifecycleConfig, v2.No
 	)
 }
 
+// recordLifecycleStep returns a RunE/PreRunE/PostRunE handler that appends step
+// to *order, then returns nil. Used by lifecycle tests to keep handler bodies terse.
+func recordLifecycleStep(order *[]string, step string) func(
+	_ context.Context, _ *lifecycleConfig, _ v2.NoFlags,
+) error {
+	return func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
+		*order = append(*order, step)
+
+		return nil
+	}
+}
+
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 	t.Parallel()
 
@@ -87,25 +99,13 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				cmdRun,
-				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					order = append(order, cmdRun)
-
-					return nil
-				},
+				recordLifecycleStep(&order, cmdRun),
 				v2.WithShort[lifecycleConfig, v2.NoFlags]("Run"),
 				v2.WithPreRunE[lifecycleConfig, v2.NoFlags](
-					func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-						order = append(order, "pre-run")
-
-						return nil
-					},
+					recordLifecycleStep(&order, "pre-run"),
 				),
 				v2.WithPostRunE[lifecycleConfig, v2.NoFlags](
-					func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-						order = append(order, "post-run")
-
-						return nil
-					},
+					recordLifecycleStep(&order, "post-run"),
 				),
 			)
 			if err != nil {
@@ -264,11 +264,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"run",
-				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					order = append(order, "handler")
-
-					return nil
-				},
+				recordLifecycleStep(&order, "handler"),
 				v2.WithShort[lifecycleConfig, v2.NoFlags]("Run"),
 			)
 			if err != nil {

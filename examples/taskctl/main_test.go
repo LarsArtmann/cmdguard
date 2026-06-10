@@ -31,6 +31,16 @@ func mustExec(t *testing.T, args ...string) {
 	}
 }
 
+// mustExecOnCLI executes args on an existing CLI, failing on error.
+// Use this when tests need to share state (e.g. tasks added in earlier steps).
+func mustExecOnCLI(t *testing.T, cli *v2.CLI[AppConfig], args ...string) {
+	t.Helper()
+
+	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
+		t.Fatalf("%s: %v", args[0], err)
+	}
+}
+
 // expectError executes the given args and fails the test if no error is returned.
 func expectError(t *testing.T, args ...string) {
 	t.Helper()
@@ -493,32 +503,19 @@ func TestIntegration_FullWorkflow(t *testing.T) {
 	cli := newTestCLI(t)
 
 	// List seeded tasks
-	if err := cli.ExecuteWithArgs(context.Background(), []string{"list"}); err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	mustExecOnCLI(t, cli, "list")
 
 	// Add a new task
-	if err := cli.ExecuteWithArgs(
-		context.Background(),
-		[]string{"add", "--title", "Integration test task"},
-	); err != nil {
-		t.Fatalf("add: %v", err)
-	}
+	mustExecOnCLI(t, cli, "add", "--title", "Integration test task")
 
 	// Complete task #1
-	if err := cli.ExecuteWithArgs(context.Background(), []string{"done", "--id", "1"}); err != nil {
-		t.Fatalf("done: %v", err)
-	}
+	mustExecOnCLI(t, cli, "done", "--id", "1")
 
 	// Stats
-	if err := cli.ExecuteWithArgs(context.Background(), []string{"stats"}); err != nil {
-		t.Fatalf("stats: %v", err)
-	}
+	mustExecOnCLI(t, cli, "stats")
 
 	// Doctor check
-	if err := cli.ExecuteWithArgs(context.Background(), []string{"doctor"}); err != nil {
-		t.Fatalf("doctor: %v", err)
-	}
+	mustExecOnCLI(t, cli, "doctor")
 }
 
 // --- Inspect Command ---

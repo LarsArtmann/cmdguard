@@ -24,11 +24,7 @@ func TestSpinnerMiddleware_SkipsNonTerminal(t *testing.T) {
 		context.Background(),
 		&testConfig{},
 		CommandInfo{Name: "test"},
-		func() error {
-			called = true
-
-			return nil
-		},
+		recordHandlerCall(&called),
 	)
 
 	testutil.AssertNoError(t, err)
@@ -128,11 +124,7 @@ func TestSpinnerMiddlewareWithConfig_SkipsNonTerminal(t *testing.T) {
 		context.Background(),
 		&testConfig{},
 		CommandInfo{Name: "test"},
-		func() error {
-			called = true
-
-			return nil
-		},
+		recordHandlerCall(&called),
 	)
 
 	testutil.AssertNoError(t, err)
@@ -254,11 +246,7 @@ func TestSpinnerMiddlewareWithConfig_SkipsInvalidConfig(t *testing.T) {
 		context.Background(),
 		&testConfig{},
 		CommandInfo{Name: "test"},
-		func() error {
-			called = true
-
-			return nil
-		},
+		recordHandlerCall(&called),
 	)
 
 	testutil.AssertNoError(t, err)

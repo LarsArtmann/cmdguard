@@ -24,32 +24,9 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "serve",
-		short: "Start the server",
-		long:  "Start the server",
-		group: "core",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
-
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "migrate",
-		short: "Run migrations",
-		long:  "Run migrations",
-		group: "core",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
-
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "version",
-		short: "Print version",
-		long:  "Print version",
-		group: "utils",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
+	addGroupedCommand(t, cli, "serve", "Start the server", "core")
+	addGroupedCommand(t, cli, "migrate", "Run migrations", "core")
+	addGroupedCommand(t, cli, "version", "Print version", "utils")
 
 	rootCmd := cli.RootCommand()
 
@@ -96,14 +73,7 @@ func TestCommandGroups_NoGroup(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "ungrouped",
-		short: "No group assigned",
-		long:  "No group assigned",
-		group: "",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
+	addGroupedCommand(t, cli, "ungrouped", "No group assigned", "")
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"ungrouped"})
 	testutil.AssertNoError(t, err)
@@ -201,26 +171,9 @@ func TestWithGroup_RegistersMultipleGroups(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use: "a", short: "A", long: "A",
-		group: "alpha",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
-
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use: "b", short: "B", long: "B",
-		group: "beta",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
-
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use: "c", short: "C", long: "C",
-		group: "gamma",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
+	addGroupedCommand(t, cli, "a", "A", "alpha")
+	addGroupedCommand(t, cli, "b", "B", "beta")
+	addGroupedCommand(t, cli, "c", "C", "gamma")
 
 	rootCmd := cli.RootCommand()
 

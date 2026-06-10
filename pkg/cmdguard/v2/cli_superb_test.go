@@ -218,11 +218,7 @@ func TestWithStrictValidation(t *testing.T) {
 		}
 	})
 
-	t.Run("command with short passes in strict mode", func(t *testing.T) {
-		t.Parallel()
-
-		addShortCommandToStrictCLI(t, WithStrictValidation[testConfig]())
-	})
+	t.Run("command with short passes in strict mode", assertShortCommandAcceptedOnStrictCLI)
 
 	t.Run("command without short passes without strict mode", func(t *testing.T) {
 		t.Parallel()
@@ -342,11 +338,7 @@ func TestWithDraconianValidation(t *testing.T) {
 		}
 	})
 
-	t.Run("leaf without example passes in strict mode", func(t *testing.T) {
-		t.Parallel()
-
-		addShortCommandToStrictCLI(t, WithStrictValidation[testConfig]())
-	})
+	t.Run("leaf without example passes in strict mode", assertShortCommandAcceptedOnStrictCLI)
 }
 
 func TestCommand_ValidateStrict(t *testing.T) {

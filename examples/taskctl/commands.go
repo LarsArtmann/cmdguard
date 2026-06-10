@@ -23,6 +23,15 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 			return nil
 		}
 	}
+	// printAndNil returns a RunE handler that prints msg and returns nil.
+	// Used by placeholder commands (secret/deprecated) where the body is informational.
+	printAndNil := func(msg string) func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
+		return func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
+			fmt.Println(msg)
+
+			return nil
+		}
+	}
 	scope := cli.Scope()
 
 	// --- list: multi-format output, aliases, filter flags ---
@@ -392,10 +401,7 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	// --- hidden command ---
 	hiddenCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
 		"secret",
-		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
-			fmt.Println("You found the secret command!")
-			return nil
-		},
+		printAndNil("You found the secret command!"),
 		v2.WithShort[AppConfig, v2.NoFlags]("Secret command"),
 		v2.WithHidden[AppConfig, v2.NoFlags](true),
 	)
@@ -409,10 +415,7 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	// --- deprecated command ---
 	deprecatedCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
 		"complete",
-		func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
-			fmt.Println("Use 'done' instead.")
-			return nil
-		},
+		printAndNil("Use 'done' instead."),
 		v2.WithShort[AppConfig, v2.NoFlags]("Deprecated: use done"),
 		v2.WithDeprecated[AppConfig, v2.NoFlags]("Use 'done' instead"),
 	)

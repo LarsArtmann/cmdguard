@@ -140,6 +140,33 @@ func addCommand[T, F any](t *testing.T, cli *CLI[T], cmd Command[T, F]) {
 	}
 }
 
+// addGroupedCommand builds a no-op Command[T, NoFlags] with use/short/long/group
+// and registers it on the CLI. Used by command-grouping tests to reduce struct-literal boilerplate.
+func addGroupedCommand[T any](t *testing.T, cli *CLI[T], use, short, group string) {
+	t.Helper()
+
+	err := AddCommand(cli, Command[T, NoFlags]{
+		use:   use,
+		short: short,
+		long:  short,
+		group: group,
+		runE:  noOpRunE[T, NoFlags],
+	})
+	if err != nil {
+		t.Fatalf("AddCommand failed: %v", err)
+	}
+}
+
+// recordHandlerCall returns a `next` callback that sets *called to true and returns nil.
+// Used by middleware tests to assert the handler was invoked.
+func recordHandlerCall(called *bool) func() error {
+	return func() error {
+		*called = true
+
+		return nil
+	}
+}
+
 func assertFlowValue(t *testing.T, bfc *BranchingFlowContext, key, expected any, msg string) {
 	t.Helper()
 
@@ -205,6 +232,15 @@ func addShortCommandToStrictCLI(
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))
+}
+
+// assertShortCommandAcceptedOnStrictCLI is a t.Run body that asserts a command
+// with a short description is accepted under strict validation. It exists so
+// tests that only need this assertion can use it without rewriting the
+// t.Run/t.Parallel/helper boilerplate per subtest.
+func assertShortCommandAcceptedOnStrictCLI(t *testing.T) {
+	t.Parallel()
+	addShortCommandToStrictCLI(t, WithStrictValidation[testConfig]())
 }
 
 // noShortCommand builds a minimal test command that omits a short description.

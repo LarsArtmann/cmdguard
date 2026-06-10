@@ -359,10 +359,10 @@ type benchService struct {
 	Name string
 }
 
-// provideBenchService is a helper that provides a benchService to a scope.
-func provideBenchService(scope *v2.Scope) error {
+// provideBenchService is a helper that provides a benchService with the given name to a scope.
+func provideBenchService(scope *v2.Scope, name string) error {
 	return v2.Provide[benchService](scope, func(i do.Injector) (benchService, error) {
-		return benchService{Name: "test"}, nil
+		return benchService{Name: name}, nil
 	})
 }
 
@@ -370,7 +370,7 @@ func provideBenchService(scope *v2.Scope) error {
 func BenchmarkScopeProvide(b *testing.B) {
 	for b.Loop() {
 		scope := v2.NewScope("bench")
-		err := provideBenchService(scope)
+		err := provideBenchService(scope, "test")
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -381,7 +381,7 @@ func BenchmarkScopeProvide(b *testing.B) {
 func BenchmarkScopeInvoke(b *testing.B) {
 	scope := v2.NewScope("bench")
 
-	err := provideBenchService(scope)
+	err := provideBenchService(scope, "test")
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -407,7 +407,7 @@ func BenchmarkScopeCreationWithOpts(b *testing.B) {
 // BenchmarkCloneScope measures scope cloning for test isolation.
 func BenchmarkCloneScope(b *testing.B) {
 	scope := v2.NewScope("bench")
-	err := provideBenchService(scope)
+	err := provideBenchService(scope, "test")
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -430,9 +430,7 @@ func BenchmarkCloneScope(b *testing.B) {
 func BenchmarkScopeProvideInvokeCycle(b *testing.B) {
 	for b.Loop() {
 		scope := v2.NewScope("bench")
-		err := v2.Provide[benchService](scope, func(i do.Injector) (benchService, error) {
-			return benchService{Name: "cycle"}, nil
-		})
+		err := provideBenchService(scope, "cycle")
 		if err != nil {
 			b.Fatal(err)
 		}
