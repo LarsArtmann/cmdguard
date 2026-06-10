@@ -20,6 +20,12 @@ func ParseDuration(s string) (Duration, error) {
 	return Duration{duration: d}, nil
 }
 
+// MustParseDuration creates a Duration from a string, panicking if invalid.
+// Use only when you know the duration is valid (e.g., for constants).
+func MustParseDuration(s string) Duration {
+	return MustParse("MustParseDuration", s, ParseDuration)
+}
+
 // FromDuration creates a Duration from a time.Duration.
 func FromDuration(d time.Duration) Duration {
 	return Duration{duration: d}

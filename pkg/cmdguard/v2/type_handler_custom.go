@@ -126,7 +126,11 @@ func (r *FlagRegistry) RegisterGoDurationHandler() {
 func (r *typeRegistry) registerGoDurationHandler() {
 	r.register(reflect.TypeFor[time.Duration](), TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, _ := time.ParseDuration(tag.Default)
+			def, err := time.ParseDuration(tag.Default)
+			if err != nil && tag.Default != "" {
+				return fmt.Errorf("invalid duration default for flag %q: %w", tag.Name, err)
+			}
+
 			if tag.Short != "" {
 				flags.DurationP(tag.Name, tag.Short, def, tag.Help)
 			} else {

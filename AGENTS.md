@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-03
+**Last Updated:** 2026-06-10
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.4.0 - 367 tests, 82.9% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.4.0 - 373 tests, 84.0% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.4.0. 367 tests passing, 82.9% coverage, 0 build errors.
+**Current Status:** v2.4.0. 373 tests passing, 84.0% coverage, 0 build errors.
 
 ---
 
@@ -593,6 +593,8 @@ go build ./...                                   # Verify build
 35. **Glamour v2 no `"auto"` theme** — `charm.land/glamour/v2` removed the `"auto"` theme; use empty string (env-based via `GLAMOUR_STYLE`) or explicit theme like `"dark"`; `WithGlamourHelp` now sets theme to `""` for env-based detection
 36. **DoctorCommand uses HealthCheckResults** — `DoctorCommand[T]` calls `HealthCheckResultsWithContext(ctx)` which returns `map[string]error`; DI services with `do.HealthcheckerWithContext` are included automatically; custom checks via `WithDoctorCheck` run after DI checks
 37. **configload single file** — YAML/TOML/JSON/Auto loaders consolidated into `configload/loader.go`; uses `genericLoader` with pluggable `unmarshalFunc`; TOML import aliased as `toml` to avoid conflict with local `cmdguard` import alias
+38. **MustParse for all value types** — `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat` added alongside existing `MustParseURL`, `MustParsePort`, etc. All delegate to the generic `MustParse[T]` helper. `MustParseEnum` does not exist because `ParseEnum` takes two args (value + allowed), not matching the `func(string) (T, error)` signature
+39. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
 
 ---
 

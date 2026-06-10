@@ -37,6 +37,12 @@ func ParseLogLevel(s string) (LogLevel, error) {
 	return LogLevel(e), nil
 }
 
+// MustParseLogLevel creates a LogLevel from a string, panicking if invalid.
+// Use only when you know the level is valid (e.g., for constants).
+func MustParseLogLevel(s string) LogLevel {
+	return MustParse("MustParseLogLevel", s, ParseLogLevel)
+}
+
 // String returns the log level as a string.
 func (l LogLevel) String() string {
 	return l.value
@@ -84,6 +90,12 @@ func ParseLogFormat(s string) (LogFormat, error) {
 	}
 
 	return LogFormat(e), nil
+}
+
+// MustParseLogFormat creates a LogFormat from a string, panicking if invalid.
+// Use only when you know the format is valid (e.g., for constants).
+func MustParseLogFormat(s string) LogFormat {
+	return MustParse("MustParseLogFormat", s, ParseLogFormat)
 }
 
 // String returns the log format as a string.

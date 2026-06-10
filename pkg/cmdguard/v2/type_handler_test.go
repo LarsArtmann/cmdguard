@@ -748,4 +748,11 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 			t.Error("flag 'timeout' should be registered")
 		}
 	})
+
+	t.Run("time.Duration invalid default returns error", func(t *testing.T) {
+		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
+		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
+		err := h.Register(fs, FlagTag{Name: "bad", Default: "not-a-duration", Help: "bad duration"})
+		testutil.AssertExpectedError(t, err)
+	})
 }

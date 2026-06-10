@@ -182,3 +182,29 @@ func TestDuration_MarshalUnmarshal(t *testing.T) {
 
 	runUnmarshalErrorTest[config](t, "unmarshal invalid", `{"timeout":"invalid"}`)
 }
+
+func TestMustParseDuration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("valid", func(t *testing.T) {
+		t.Parallel()
+
+		d := MustParseDuration("30s")
+		if d.Duration() != 30*time.Second {
+			t.Errorf("MustParseDuration(30s) = %v, want 30s", d.Duration())
+		}
+	})
+
+	t.Run("invalid panics", func(t *testing.T) {
+		t.Parallel()
+
+		defer func() {
+			r := recover()
+			if r == nil {
+				t.Fatal("expected panic, got nil")
+			}
+		}()
+
+		MustParseDuration("not-a-duration")
+	})
+}
