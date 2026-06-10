@@ -527,7 +527,7 @@ go build ./...                                   # Verify build
 
 ## Architecture Decisions
 
-### v2.3 Design Principles
+### v2 Design Principles
 
 1. **Single type parameter** - `CLI[T]` only parameterizes on config; each command has its own flags type
 2. **No Panics** - All operations return errors

@@ -101,8 +101,8 @@
 
 ## Fuzz Testing
 
-- [ ] Add fuzz tests to `flags_parse.go`
-- [ ] Add fuzz tests to `config_parsing.go`
+- [x] Add fuzz tests to `flags_parse.go`
+- [x] Add fuzz tests to `config_parsing.go`
 - [ ] Add fuzz test corpus in `testdata/fuzz/` directories
 
 ---
@@ -127,7 +127,7 @@
 - [x] Set up release automation
 - [ ] Add codecov integration (needs `CODECOV_TOKEN` secret)
 - [x] Set up CI/CD pipeline
-- [ ] Create contribution guide
+- [x] Create contribution guide
 - [ ] Deprecate v1 API timeline
 
 ---
@@ -135,6 +135,6 @@
 ## Future Ideas
 
 - [ ] Add structured JSON error output for `--output=json`
-- [ ] Add issue/PR templates
+- [x] Add issue/PR templates
 - [ ] Test all examples in CI
 - [ ] Extract flag-related code to standalone `flagtags` library

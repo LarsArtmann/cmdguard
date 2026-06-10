@@ -72,7 +72,7 @@ type MyFlags struct {
 
 cmdguard doesn't provide:
 
-- Built-in config file loading (use [knadh/koanf](https://github.com/knadh/koanf) separately)
+- Advanced config file loading (JSON built-in via WithConfigFile; for YAML/TOML use [configload](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/configload) or [knadh/koanf](https://github.com/knadh/koanf) for nested structs)
 - Built-in logging (use your preferred logger)
 - Database ORMs
 - Web servers

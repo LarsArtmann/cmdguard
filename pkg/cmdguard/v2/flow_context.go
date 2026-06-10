@@ -117,9 +117,9 @@ func applyOptions(child *BranchingFlowContext, opts []FlowContextOption) {
 	}
 }
 
-// Path returns the command path from root to this context.
+// Path returns a defensive copy of the command path from root to this context.
 func (b *BranchingFlowContext) Path() []string {
-	return b.path
+	return slices.Clone(b.path)
 }
 
 // PathString returns the command path as a dot-separated string.
@@ -147,9 +147,9 @@ func (b *BranchingFlowContext) Parent() *BranchingFlowContext {
 	return b.parent
 }
 
-// Children returns the child contexts.
+// Children returns a defensive copy of the child contexts.
 func (b *BranchingFlowContext) Children() []*BranchingFlowContext {
-	return b.children
+	return slices.Clone(b.children)
 }
 
 // Root returns the root context of this tree.

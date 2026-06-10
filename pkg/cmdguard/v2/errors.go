@@ -353,6 +353,10 @@ type ExitError struct {
 }
 
 func (e *ExitError) Error() string {
+	if e.Err == nil {
+		return fmt.Sprintf("exit code %d", e.Code)
+	}
+
 	return e.Err.Error()
 }
 

@@ -164,6 +164,11 @@ func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 			return nil
 		}
 
+		if !parsedVal.Type().AssignableTo(field.Type()) {
+			return fmt.Errorf("setStringField: field=%s, str=%q, parsed=%s: %w",
+				field.Type(), str, parsedVal.Type(), ErrUnsupportedConversion)
+		}
+
 		field.Set(parsedVal)
 
 		return nil

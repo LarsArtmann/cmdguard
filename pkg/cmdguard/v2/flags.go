@@ -19,9 +19,9 @@ type FlagRegistry struct {
 	types      *typeRegistry
 }
 
-// Tags returns all parsed flag tags.
+// Tags returns a defensive copy of all parsed flag tags.
 func (r *FlagRegistry) Tags() []FlagTag {
-	return r.tags
+	return slices.Clone(r.tags)
 }
 
 // SetEnvPrefix sets the environment variable prefix for this registry.

@@ -206,6 +206,10 @@ func deepCopyValue(dst, src reflect.Value) {
 }
 
 // mergeStruct merges non-zero fields from src into dst.
+// Zero values are skipped — this means false/0/"" in the override config
+// will NOT overwrite non-zero values in the base config.
+// This is intentional for flag/config merging where zero means "not set by user".
+// For explicit zero-value overrides, set the field directly instead of using MergeConfigs.
 func mergeStruct(dst, src reflect.Value) {
 	for i := range dst.NumField() {
 		dstField := dst.Field(i)

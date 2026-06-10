@@ -74,6 +74,13 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 
 	// Parse short form
 	if short := field.Tag.Get("short"); short != "" {
+		if len(short) != 1 {
+			return FlagTag{}, false, fmt.Errorf(
+				"field %q: short tag must be a single character, got %q: %w",
+				field.Name, short, ErrInvalidFlagType,
+			)
+		}
+
 		tag.Short = short
 	}
 

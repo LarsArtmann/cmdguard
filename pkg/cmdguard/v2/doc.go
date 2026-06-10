@@ -116,7 +116,8 @@
 //
 // # Error Handling
 //
-// All v2 functions return errors — the library never panics. Sentinel errors
+// All v2 constructors return errors. Must-prefixed functions (MustNewCommand,
+// MustInvoke, etc.) panic on failure. All other functions return errors.
 // support errors.Is() for identification:
 //
 //	errors.Is(err, v2.ErrInvalidCommand)

@@ -23,6 +23,10 @@ import (
 //	)
 func TelemetryMiddleware[T any](tracer trace.Tracer) Middleware[T] {
 	return func(ctx context.Context, _ *T, info CommandInfo, next func() error) error {
+		if tracer == nil {
+			return next()
+		}
+
 		spanName := info.Name + " " + string(info.Phase)
 		if info.FullPath != "" {
 			spanName = info.FullPath + " " + string(info.Phase)
