@@ -2,7 +2,7 @@
 
 **Updated:** 2026-06-10
 **Status:** v2.4.0 — post-release maintenance
-**Tests:** 364+ passing, 82.9% coverage, 0 lint issues, 0 race conditions
+**Tests:** 367+ passing, 82.9% coverage, 0 lint issues, 0 race conditions
 
 ## Completed
 

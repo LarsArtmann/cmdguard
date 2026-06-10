@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Build production Go CLIs with type-safe flags, dependency injection, and zero panics.**
+**Build production Go CLIs with type-safe flags, dependency injection, and minimal panics.**
 
 cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type safety, struct-tag-driven flags, and built-in dependency injection via [samber/do/v2](https://github.com/samber/do). Your flags are typed structs — no more stringly-typed `Flags().GetString("name")` calls that fail at runtime.
 
@@ -104,7 +104,7 @@ HELLO, CMDGUARD!
 ## Features
 
 | Category                   | Highlights                                                                                              |
-| -------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| -------------------------- | ------------------------------------------------------------------------------------------------------- |
 | **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups        |
 | **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                |
 | **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks         |
@@ -126,7 +126,7 @@ HELLO, CMDGUARD!
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
 | **Minimal panics**        | All non-Must functions return errors; Must-prefixed variants panic for compile-time-known config                                     |
-| **364 tests**              | 82.9% coverage, race-detected, fuzz-tested                                                              |
+| **367 tests**              | 82.9% coverage, race-detected, fuzz-tested                                                              |
 
 ---
 
@@ -334,7 +334,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 ## Error Handling
 
 ```go
-// All v2 functions return errors — no panics
+// All non-Must v2 functions return errors; Must* variants panic on failure
 cli, err := v2.NewCLI[Config]("app", "...", Config{})
 cmd, err := v2.NewCommand[Config, NoFlags]("test", handler)
 
