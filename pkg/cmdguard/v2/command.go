@@ -9,7 +9,7 @@ import (
 
 // NoFlags is a convenience type for commands without command-specific flags.
 // Use it as the F type parameter: Command[MyConfig, NoFlags].
-type NoFlags = struct{}
+type NoFlags struct{}
 
 // Command represents a type-safe CLI command with typed flags and config.
 // Fields are unexported to enforce construction through NewCommand or NewParentCommand,
