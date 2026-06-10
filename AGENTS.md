@@ -595,6 +595,8 @@ go build ./...                                   # Verify build
 37. **configload single file** — YAML/TOML/JSON/Auto loaders consolidated into `configload/loader.go`; uses `genericLoader` with pluggable `unmarshalFunc`; TOML import aliased as `toml` to avoid conflict with local `cmdguard` import alias
 38. **MustParse for all value types** — `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat` added alongside existing `MustParseURL`, `MustParsePort`, etc. All delegate to the generic `MustParse[T]` helper. `MustParseEnum` does not exist because `ParseEnum` takes two args (value + allowed), not matching the `func(string) (T, error)` signature
 39. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
+40. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
+41. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use
 
 ---
 
