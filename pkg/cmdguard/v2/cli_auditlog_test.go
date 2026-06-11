@@ -11,16 +11,23 @@ import (
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
+// newTestPlugin returns a fresh auditlog.Plugin with the same config every
+// test case in this file uses (Enabled, ContainerID="test"). Centralised so a
+// future Config field change updates 11 call sites in one place.
+func newTestPlugin() *auditlog.Plugin {
+	return auditlog.New(auditlog.Config{
+		Enabled:     true,
+		ContainerID: "test",
+	})
+}
+
 func TestWithAuditLog(t *testing.T) {
 	t.Parallel()
 
 	t.Run("auditlog plugin is accessible via accessor", func(t *testing.T) {
 		t.Parallel()
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -55,10 +62,7 @@ func TestWithAuditLog(t *testing.T) {
 	t.Run("auditlog captures service events", func(t *testing.T) {
 		t.Parallel()
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -99,10 +103,7 @@ func TestWithAuditLog(t *testing.T) {
 	t.Run("AuditLogReport returns report when enabled", func(t *testing.T) {
 		t.Parallel()
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -143,10 +144,7 @@ func TestWithAuditLog(t *testing.T) {
 
 		var logs []string
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -195,10 +193,7 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("exports JSON to stdout", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -239,10 +234,7 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("exports NDJSON to stdout", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -284,10 +276,7 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("exports Mermaid to stdout", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -322,10 +311,7 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("exports HTML to stdout", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -366,10 +352,7 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("rejects invalid format", func(t *testing.T) {
 		t.Parallel()
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -398,10 +381,7 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("accepts custom descriptions", func(t *testing.T) {
 		t.Parallel()
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
@@ -460,10 +440,7 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 	t.Run("AuditLogServiceByName returns service when enabled", func(t *testing.T) {
 		t.Parallel()
 
-		plugin := auditlog.New(auditlog.Config{
-			Enabled:     true,
-			ContainerID: "test",
-		})
+		plugin := newTestPlugin()
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
