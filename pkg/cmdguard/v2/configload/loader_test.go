@@ -180,9 +180,7 @@ func TestAutoLoader(t *testing.T) {
 				setFields, err := configload.Auto().Load([]byte(tt.data), &cfg)
 				testutil.AssertNoError(t, err)
 
-				if cfg.Name != tt.expect {
-					t.Errorf("expected name %q, got %q", tt.expect, cfg.Name)
-				}
+				testutil.AssertFieldEqString(t, cfg.Name, tt.expect, "name")
 				testutil.AssertFieldLen(t, setFields, 1, "setFields")
 			})
 		}
@@ -247,9 +245,7 @@ func TestLoaderForPathLoadsCorrectly(t *testing.T) {
 			setFields, err := loader.Load(data, &cfg)
 			testutil.AssertNoError(t, err)
 
-			if cfg.Name != tt.expect {
-				t.Errorf("expected name %q, got %q", tt.expect, cfg.Name)
-			}
+			testutil.AssertFieldEqString(t, cfg.Name, tt.expect, "name")
 			if len(setFields) != 1 {
 				t.Errorf("expected 1 set field, got %d", len(setFields))
 			}
