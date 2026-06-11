@@ -2,6 +2,7 @@
 package testutil
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"slices"
@@ -120,6 +121,12 @@ func NoOpCobraRun() func(*cobra.Command, []string) {
 // NoOpCobraRunE returns a no-op RunE function for cobra.Command.
 func NoOpCobraRunE() func(*cobra.Command, []string) error {
 	return func(*cobra.Command, []string) error { return nil }
+}
+
+// NoOpRunE returns a no-op RunE handler matching cmdguard's generic handler
+// signature. Useful in tests and benchmarks that need a benign command body.
+func NoOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
+	return nil
 }
 
 // doPanicTest runs fn and returns true if it panicked.

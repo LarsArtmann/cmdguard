@@ -2,12 +2,12 @@
 package benchmarks
 
 import (
-	"context"
 	"testing"
 
 	"github.com/samber/do/v2"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 type BenchConfig struct {
@@ -20,18 +20,13 @@ type BenchFlags struct {
 	Count int    `default:"1"     flag:"count" short:"c"`
 }
 
-// noOpRunE is a shared no-op RunE function to reduce duplication.
-func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
-	return nil
-}
-
 // newBenchCommand creates a command with standard benchmark configuration.
 func newBenchCommand(b *testing.B, use, short string) v2.Command[BenchConfig, v2.NoFlags] {
 	b.Helper()
 
 	cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
 		use,
-		noOpRunE[BenchConfig, v2.NoFlags],
+		testutil.NoOpRunE[BenchConfig, v2.NoFlags],
 		v2.WithShort[BenchConfig, v2.NoFlags](short),
 	)
 	if err != nil {
@@ -123,7 +118,7 @@ func BenchmarkNewCommand(b *testing.B) {
 	for b.Loop() {
 		cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
 			"greet",
-			noOpRunE[BenchConfig, v2.NoFlags],
+			testutil.NoOpRunE[BenchConfig, v2.NoFlags],
 			v2.WithShort[BenchConfig, v2.NoFlags]("Greet someone"),
 		)
 		if err != nil {

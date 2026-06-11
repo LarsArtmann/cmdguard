@@ -22,6 +22,23 @@ func (s *gracefulShutdownService) Shutdown() error {
 	return nil
 }
 
+// newGracefulShutdownTestCLI builds a CLI configured for graceful shutdown tests.
+// Centralizes the NewCLI call so individual tests stay terse.
+func newGracefulShutdownTestCLI(t *testing.T) *v2.CLI[testCLIConfig] {
+	t.Helper()
+
+	cli, err := v2.NewCLI[testCLIConfig](
+		"test", "Test", testCLIConfig{},
+		v2.WithGracefulShutdown[testCLIConfig](),
+		v2.WithFang[testCLIConfig](false),
+	)
+	if err != nil {
+		t.Fatalf("NewCLI failed: %v", err)
+	}
+
+	return cli
+}
+
 func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 	t.Parallel()
 
@@ -30,16 +47,9 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 
 		svc := &gracefulShutdownService{}
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithGracefulShutdown[testCLIConfig](),
-			v2.WithFang[testCLIConfig](false),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newGracefulShutdownTestCLI(t)
 
-		err = v2.Provide(cli.Scope(), func(i do.Injector) (*gracefulShutdownService, error) {
+		err := v2.Provide(cli.Scope(), func(i do.Injector) (*gracefulShutdownService, error) {
 			return svc, nil
 		})
 		if err != nil {
@@ -69,21 +79,14 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 	t.Run("works without Shutdowner services", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithGracefulShutdown[testCLIConfig](),
-			v2.WithFang[testCLIConfig](false),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newGracefulShutdownTestCLI(t)
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
 		if err := v2.AddCommand(cli, cmd); err != nil {
 			t.Fatalf("AddCommand failed: %v", err)
 		}
 
-		err = cli.Shutdown(context.Background())
+		err := cli.Shutdown(context.Background())
 		if err != nil {
 			t.Fatalf("Shutdown failed: %v", err)
 		}

@@ -92,16 +92,18 @@ func registerAndParseFlags(
 	}
 }
 
-func noOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
-	return nil
-}
-
 func noOpHandler() func(context.Context, *testConfig, NoFlags) error {
-	return noOpRunE[testConfig, NoFlags]
+	return testutil.NoOpRunE[testConfig, NoFlags]
 }
 
 func noOpHandlerForTestAppConfig() func(context.Context, *testAppConfig, NoFlags) error {
-	return noOpRunE[testAppConfig, NoFlags]
+	return testutil.NoOpRunE[testAppConfig, NoFlags]
+}
+
+// noOpRunE wraps testutil.NoOpRunE as a regular function for use in struct fields
+// where generic type parameters would be unwieldy.
+func noOpRunE[T, F any](ctx context.Context, cfg *T, flags F) error {
+	return testutil.NoOpRunE[T, F](ctx, cfg, flags)
 }
 
 // makeHookRunE creates a RunE function that records execution order.
@@ -150,7 +152,7 @@ func addGroupedCommand[T any](t *testing.T, cli *CLI[T], use, short, group strin
 		short: short,
 		long:  short,
 		group: group,
-		runE:  noOpRunE[T, NoFlags],
+		runE:  testutil.NoOpRunE[T, NoFlags],
 	})
 	if err != nil {
 		t.Fatalf("AddCommand failed: %v", err)

@@ -256,12 +256,12 @@ func (s *Scope) HealthCheckResultsWithContext(ctx context.Context) map[string]er
 // Override replaces a service provider in this scope.
 // Useful for testing — replace real services with mocks in a cloned scope.
 // Returns an error only if scope is nil.
-func Override[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
+func Override[T any](scope *Scope, replacement func(do.Injector) (T, error)) error {
 	if scope == nil {
-		return fmt.Errorf("%w: scope is nil, provider=%T", ErrInvalidScope, provider)
+		return fmt.Errorf("%w: scope is nil, replacement=%T", ErrInvalidScope, replacement)
 	}
 
-	do.Override(scope.injector, provider)
+	do.Override(scope.injector, replacement)
 
 	return nil
 }
@@ -362,21 +362,18 @@ func (s *Scope) Path() []string {
 	return names
 }
 
-// Package creates a CLI and registers it in a new DI scope.
-// Returns the CLI and scope for direct use.
+// Package creates a CLI bound to a pre-existing DI scope and registers the
+// CLI itself as a service in that scope for self-injection.
 //
 // Usage:
 //
-//	cli, err := v2.Package[Config]("app", "My app", Config{})
+//	scope := v2.NewScope("app")
+//	cli, err := v2.Package(scope, "app", "My app", Config{})
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func Package[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
-	scope := NewScope(name)
-
-	cliOpts := make([]CLIOption[T], 0, 1+len(opts))
-	cliOpts = append(cliOpts, WithCLIScope[T](scope))
-	cliOpts = append(cliOpts, opts...)
+func Package[T any](scope *Scope, name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
+	cliOpts := append([]CLIOption[T]{WithCLIScope[T](scope)}, opts...)
 
 	cli, err := NewCLI(name, short, defaults, cliOpts...)
 	if err != nil {

@@ -78,6 +78,43 @@ func recordLifecycleStep(order *[]string, step string) func(
 	}
 }
 
+// lifecycleErrHandler returns a RunE handler that always returns err.
+// Used by lifecycle tests to assert error propagation through hooks.
+func lifecycleErrHandler(err error) func(
+	_ context.Context, _ *lifecycleConfig, _ v2.NoFlags,
+) error {
+	return func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
+		return err
+	}
+}
+
+// newLifecycleStrictCLI builds a CLI configured for strict validation tests.
+// Centralizes the NewCLI call so individual tests stay terse.
+func newLifecycleStrictCLI(t *testing.T) *v2.CLI[lifecycleConfig] {
+	t.Helper()
+
+	cli, err := v2.NewCLI[lifecycleConfig](
+		"strict", "Test", lifecycleConfig{},
+		v2.WithFang[lifecycleConfig](false),
+		v2.WithStrictValidation[lifecycleConfig](),
+	)
+	if err != nil {
+		t.Fatalf("NewCLI: %v", err)
+	}
+
+	return cli
+}
+
+// execLifecycle runs the CLI with the given args and fails the test on error.
+// Centralizes the standard "execute and check err" pattern.
+func execLifecycle(t *testing.T, cli *v2.CLI[lifecycleConfig], args ...string) {
+	t.Helper()
+
+	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
+		t.Fatalf("Execute: %v", err)
+	}
+}
+
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 	t.Parallel()
 
@@ -150,9 +187,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"fail",
-				func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-					return errors.New("command failed")
-				},
+				lifecycleErrHandler(errors.New("command failed")),
 				v2.WithShort[lifecycleConfig, v2.NoFlags]("Fail"),
 				newLifecyclePostRunFlag(&postRunCalled),
 			)
@@ -200,9 +235,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 				},
 				v2.WithShort[lifecycleConfig, v2.NoFlags]("Pre-fail"),
 				v2.WithPreRunE[lifecycleConfig, v2.NoFlags](
-					func(_ context.Context, _ *lifecycleConfig, _ v2.NoFlags) error {
-						return errors.New("pre-run rejected")
-					},
+					lifecycleErrHandler(errors.New("pre-run rejected")),
 				),
 				newLifecyclePostRunFlag(&postRunCalled),
 			)
@@ -275,9 +308,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				t.Fatalf("AddCommand: %v", err)
 			}
 
-			if err := cli.ExecuteWithArgs(context.Background(), []string{"run"}); err != nil {
-				t.Fatalf("Execute: %v", err)
-			}
+			execLifecycle(t, cli, "run")
 
 			expected := []string{"mw1-before", "mw2-before", "handler", "mw2-after", "mw1-after"}
 			if len(order) != len(expected) {
@@ -367,9 +398,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				t.Fatalf("AddCommand: %v", err)
 			}
 
-			if err := cli.ExecuteWithArgs(context.Background(), []string{"timed"}); err != nil {
-				t.Fatalf("Execute: %v", err)
-			}
+			execLifecycle(t, cli, "timed")
 
 			if timedCommand != "timed" {
 				t.Errorf("timedCommand = %q, want %q", timedCommand, "timed")
@@ -434,9 +463,7 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 				t.Fatalf("AddCommand: %v", err)
 			}
 
-			if err := cli.ExecuteWithArgs(context.Background(), []string{"query"}); err != nil {
-				t.Fatalf("Execute: %v", err)
-			}
+			execLifecycle(t, cli, "query")
 
 			if resolvedDSN != "postgres://localhost:5432" {
 				t.Errorf("resolvedDSN = %q, want %q", resolvedDSN, "postgres://localhost:5432")
@@ -703,14 +730,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"strict", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-				v2.WithStrictValidation[lifecycleConfig](),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleStrictCLI(t)
 
 			child := newLifecycleCmd(t, "child", "Child command")
 
@@ -720,10 +740,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 				t.Fatalf("AddCommand: %v", err)
 			}
 
-			err = cli.ExecuteWithArgs(context.Background(), []string{"parent", "child"})
-			if err != nil {
-				t.Fatalf("Execute: %v", err)
-			}
+			execLifecycle(t, cli, "parent", "child")
 		},
 	)
 
@@ -733,14 +750,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"strict", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-				v2.WithStrictValidation[lifecycleConfig](),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleStrictCLI(t)
 
 			child, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"child",
@@ -796,9 +806,7 @@ func TestCLI_VersionCommand_Integration(t *testing.T) {
 			var buf strings.Builder
 			cli.RootCommand().SetOut(&buf)
 
-			if err := cli.ExecuteWithArgs(context.Background(), []string{"version"}); err != nil {
-				t.Fatalf("Execute: %v", err)
-			}
+			execLifecycle(t, cli, "version")
 
 			output := buf.String()
 			if !strings.Contains(output, "myapp 3.14.0") {
@@ -845,9 +853,7 @@ func TestCLI_FlowContext_Integration(t *testing.T) {
 				t.Fatalf("AddCommand: %v", err)
 			}
 
-			if err := cli.ExecuteWithArgs(context.Background(), []string{"run"}); err != nil {
-				t.Fatalf("Execute: %v", err)
-			}
+			execLifecycle(t, cli, "run")
 
 			if !flowCtxPresent {
 				t.Error("flow context should be present in handler")

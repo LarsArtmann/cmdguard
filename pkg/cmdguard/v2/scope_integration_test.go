@@ -94,7 +94,7 @@ func TestScope_Integration(t *testing.T) {
 			Name string
 		}
 
-		cli, err := Package("test-app", "Test Application", config{Name: "test"})
+		cli, err := Package(NewScope("test-app"), "test-app", "Test Application", config{Name: "test"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -111,6 +111,7 @@ func TestScope_Integration(t *testing.T) {
 		}
 
 		cli, err := Package(
+			NewScope("test-app"),
 			"test-app",
 			"Test Application",
 			config{Version: "1.0.0"},

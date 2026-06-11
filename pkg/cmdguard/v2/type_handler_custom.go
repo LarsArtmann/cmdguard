@@ -67,24 +67,10 @@ func (r *typeRegistry) registerCustomTypes() {
 		logFormatAllowed,
 	)
 
-	registerStringParseType := func(
-		typ reflect.Type,
-		parseFunc func(string) (any, error),
-		defaultFunc func(FlagTag) any,
-	) {
-		r.byType[typ] = TypeHandlerFunc{
-			RegisterFunc: registerStringFlagFromTag,
-			ParseFunc: func(value string, _ FlagTag) (any, error) {
-				return parseFunc(value)
-			},
-			DefaultFunc: defaultFunc,
-		}
-	}
-
-	stringParseTypes := []struct {
+	for _, entry := range []struct {
 		typ         reflect.Type
-		parseFunc   func(string) (any, error)
-		defaultFunc func(FlagTag) any
+		parse       func(string) (any, error)
+		defaultVal  func(FlagTag) any
 	}{
 		{reflect.TypeFor[Duration](), func(v string) (any, error) { return ParseDuration(v) }, func(tag FlagTag) any {
 			d, err := ParseDuration(tag.Default)
@@ -99,10 +85,15 @@ func (r *typeRegistry) registerCustomTypes() {
 		{reflect.TypeFor[Port](), func(v string) (any, error) { return ParsePort(v) }, stringDefault},
 		{reflect.TypeFor[FilePath](), func(v string) (any, error) { return ParseFilePath(v, false) }, stringDefault},
 		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }, stringDefault},
-	}
-
-	for _, entry := range stringParseTypes {
-		registerStringParseType(entry.typ, entry.parseFunc, entry.defaultFunc)
+	} {
+		typ, parse, def := entry.typ, entry.parse, entry.defaultVal
+		r.byType[typ] = TypeHandlerFunc{
+			RegisterFunc: registerStringFlagFromTag,
+			ParseFunc: func(value string, _ FlagTag) (any, error) {
+				return parse(value)
+			},
+			DefaultFunc: def,
+		}
 	}
 }
 

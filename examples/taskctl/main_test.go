@@ -25,15 +25,20 @@ func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 func mustExec(t *testing.T, args ...string) {
 	t.Helper()
 
-	cli := newTestCLI(t)
-	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
-		t.Fatalf("%s: %v", args[0], err)
-	}
+	runAndFailOnError(t, newTestCLI(t), args...)
 }
 
 // mustExecOnCLI executes args on an existing CLI, failing on error.
 // Use this when tests need to share state (e.g. tasks added in earlier steps).
 func mustExecOnCLI(t *testing.T, cli *v2.CLI[AppConfig], args ...string) {
+	t.Helper()
+
+	runAndFailOnError(t, cli, args...)
+}
+
+// runAndFailOnError executes args on cli and fails the test if any error occurs.
+// Shared body for mustExec and mustExecOnCLI.
+func runAndFailOnError(t *testing.T, cli *v2.CLI[AppConfig], args ...string) {
 	t.Helper()
 
 	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
