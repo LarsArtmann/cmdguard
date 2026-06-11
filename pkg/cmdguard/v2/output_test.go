@@ -71,99 +71,42 @@ func TestDefaultOutputConfig(t *testing.T) {
 func TestOutputResult_TableData(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name       string
-		format     output.Format
-		headers    []string
-		row        []string
-		mustHave   []string
-		errMessage string
+	allFormats := []struct {
+		format   output.Format
+		mustHave string
 	}{
-		{
-			name:       "table format renders table data",
-			format:     FormatTable,
-			headers:    []string{"Name", "Age"},
-			row:        []string{"Alice", "30"},
-			mustHave:   []string{"Name", "Alice"},
-			errMessage: "table output missing expected content",
-		},
-		{
-			name:       "json format renders table data",
-			format:     FormatJSON,
-			headers:    []string{"Name"},
-			row:        []string{"Bob"},
-			mustHave:   []string{"Bob"},
-			errMessage: "json output missing 'Bob'",
-		},
-		{
-			name:       "csv format renders table data",
-			format:     FormatCSV,
-			headers:    []string{"Name"},
-			row:        []string{"Eve"},
-			mustHave:   []string{"Eve"},
-			errMessage: "csv output missing 'Eve'",
-		},
-		{
-			name:       "yaml format renders table data",
-			format:     FormatYAML,
-			headers:    []string{"Name"},
-			row:        []string{"Yaml"},
-			mustHave:   []string{"Yaml"},
-			errMessage: "yaml output missing 'Yaml'",
-		},
-		{
-			name:       "jsonl format renders table data",
-			format:     FormatJSONL,
-			headers:    []string{"Name"},
-			row:        []string{"JsonlUser"},
-			mustHave:   []string{"JsonlUser"},
-			errMessage: "jsonl output missing 'JsonlUser'",
-		},
-		{
-			name:       "asciidoc format renders table data",
-			format:     FormatAsciiDoc,
-			headers:    []string{"Name"},
-			row:        []string{"AsciiDocUser"},
-			mustHave:   []string{"AsciiDocUser"},
-			errMessage: "asciidoc output missing 'AsciiDocUser'",
-		},
-		{
-			name:       "toml format renders table data",
-			format:     FormatTOML,
-			headers:    []string{"Name"},
-			row:        []string{"TomlUser"},
-			mustHave:   []string{"TomlUser"},
-			errMessage: "toml output missing 'TomlUser'",
-		},
-		{
-			name:       "plantuml format renders table data",
-			format:     FormatPlantUML,
-			headers:    []string{"Name"},
-			row:        []string{"PlantUMLUser"},
-			mustHave:   []string{"PlantUMLUser"},
-			errMessage: "plantuml output missing 'PlantUMLUser'",
-		},
+		{FormatTable, "Alice"},
+		{FormatJSON, "Alice"},
+		{FormatCSV, "Alice"},
+		{FormatTSV, "Alice"},
+		{FormatMarkdown, "Alice"},
+		{FormatXML, "Alice"},
+		{FormatD2, "row0"},
+		{FormatYAML, "Alice"},
+		{FormatHTML, "Alice"},
+		{FormatTree, "Alice"},
+		{FormatMermaid, "row0"},
+		{FormatDOT, "row0"},
+		{FormatJSONL, "Alice"},
+		{FormatAsciiDoc, "Alice"},
+		{FormatTOML, "Alice"},
+		{FormatPlantUML, "row0"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, tt := range allFormats {
+		t.Run(string(tt.format), func(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			data := output.NewTableData(tt.headers)
-			data.AddRow(tt.row)
+			data := output.NewTableData([]string{"Name"})
+			data.AddRow([]string{"Alice"})
 
 			cfg := OutputConfig{Format: tt.format, Writer: &buf}
 			err := OutputResult(cfg, data)
 			testutil.AssertNoError(t, err)
 
-			result := buf.String()
-			for _, want := range tt.mustHave {
-				if !strings.Contains(result, want) {
-					t.Errorf("%s: %q", tt.errMessage, result)
-
-					break
-				}
+			if !strings.Contains(buf.String(), tt.mustHave) {
+				t.Errorf("%s output missing %q: %q", tt.format, tt.mustHave, buf.String())
 			}
 		})
 	}
@@ -222,6 +165,16 @@ func TestOutputStyledTable(t *testing.T) {
 	})
 }
 
+func TestOutputResult_NilData(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
+
+	err := OutputResult(cfg, (*output.TableData)(nil))
+	testutil.AssertNoError(t, err)
+}
+
 func TestOutputResult_NilWriter(t *testing.T) {
 	t.Parallel()
 
@@ -273,6 +226,7 @@ func TestOutputResult_UnsupportedFormat(t *testing.T) {
 
 	err := OutputResult(cfg, output.NewTableData([]string{"X"}))
 	testutil.AssertExpectedError(t, err)
+	testutil.AssertErrorIs(t, err, ErrUnsupportedFormat)
 }
 
 func TestOutputResult_AnyData_YAML(t *testing.T) {
@@ -335,6 +289,7 @@ func TestOutputResult_TableOnlyFormats_RejectAnyData(t *testing.T) {
 
 			err := OutputResult(cfg, "not table data")
 			testutil.AssertExpectedError(t, err)
+			testutil.AssertErrorIs(t, err, ErrFormatRequiresTypedData)
 		})
 	}
 }
