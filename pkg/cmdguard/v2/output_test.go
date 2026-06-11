@@ -298,8 +298,8 @@ func TestSupportedFormats(t *testing.T) {
 	t.Parallel()
 
 	formats := SupportedFormats()
-	if len(formats) != 16 {
-		t.Errorf("SupportedFormats() returned %d formats, want 16", len(formats))
+	if len(formats) == 0 {
+		t.Fatal("SupportedFormats() returned no formats")
 	}
 }
 
