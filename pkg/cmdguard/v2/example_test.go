@@ -160,21 +160,19 @@ func ExampleProvide() {
 	// Output: dsn: postgres://localhost
 }
 
-// ExampleOutputTable demonstrates rendering data in multiple formats.
-func ExampleOutputTable() {
-	headers := []string{"Name", "Age"}
-	rows := [][]string{
-		{"Alice", "30"},
-		{"Bob", "25"},
+// ExampleOutputResult demonstrates rendering arbitrary data.
+func ExampleOutputResult() {
+	type Person struct {
+		Name string `json:"name"`
 	}
 
-	// Output as JSON.
-	_ = v2.OutputTable(v2.FormatJSON, headers, rows)
+	cfg := v2.OutputConfig{Format: v2.FormatJSON}
+	_ = v2.OutputResult(cfg, Person{Name: "Alice"})
 
-	fmt.Println("output rendered")
 	// Output:
-	// {"Headers":["Name","Age"],"Rows":[["Alice","30"],["Bob","25"]],"Footer":null}
-	// output rendered
+	// {
+	//   "name": "Alice"
+	// }
 }
 
 // ExampleTimingMiddleware demonstrates adding timing middleware to a CLI.

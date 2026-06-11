@@ -78,4 +78,14 @@ require (
 	golang.org/x/text v0.38.0 // indirect
 )
 
-replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog
+replace (
+	github.com/larsartmann/go-output => ../go-output
+	github.com/larsartmann/go-output/d2 => ../go-output/d2
+	github.com/larsartmann/go-output/delimited => ../go-output/delimited
+	github.com/larsartmann/go-output/graph => ../go-output/graph
+	github.com/larsartmann/go-output/markup => ../go-output/markup
+	github.com/larsartmann/go-output/plantuml => ../go-output/plantuml
+	github.com/larsartmann/go-output/serialization => ../go-output/serialization
+	github.com/larsartmann/go-output/table => ../go-output/table
+	github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog
+)
