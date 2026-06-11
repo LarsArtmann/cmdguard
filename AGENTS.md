@@ -2,7 +2,7 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-10
+**Last Updated:** 2026-06-11
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
 **Status:** v2.5.0 - zero panics, 84.8% coverage, 0 lint issues, 0 race conditions
@@ -150,7 +150,7 @@ cmdguard/
 | `charm.land/huh/v2`                         | Interactive prompts  | v2.0.3  |
 | `charm.land/glamour/v2`                     | Markdown rendering   | v2.0.0  |
 | `go.opentelemetry.io/otel/trace`            | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.7.2  |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.8.0  |
 | `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.0.1  |
 
 ---
@@ -205,7 +205,7 @@ go build ./...                                   # Verify build
 6. **Env tags** - `env:"VAR_NAME"` struct tag reads from environment
 7. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
 8. **Signal handling** - `WithSignalHandling[T]()` for graceful shutdown
-9. **Rich output** - OutputTable/OutputResult with 12+ formats
+9. **Rich output** - OutputTable/OutputResult with 16 formats via go-output registries
 10. **Instance-scoped registries** — Each `FlagRegistry` clones from package-level defaults; `RegisterTypeHandler()`/`RegisterValidator()` write to global template; `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` write to instance
 11. **$EDITOR support** - `EditInEditor()` for user input editing
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
@@ -229,7 +229,7 @@ go build ./...                                   # Verify build
 8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
-11. **go-output published** — `github.com/larsartmann/go-output` is published at v0.7.2, no local replace needed
+11. **go-output v0.8.0+ with registries** — `github.com/larsartmann/go-output` provides `RenderTableData` (all 16 formats) and `RenderAnyData` (JSON, YAML, TOML) registries. Sub-modules register via `init()`. cmdguard's `output.go` delegates to these registries via blank imports. Local replace directive needed until v0.9.0 is tagged with the new APIs.
 12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
@@ -271,8 +271,8 @@ go build ./...                                   # Verify build
 50. **buildInjectorOpts** — Merges `diLogf` and `auditLog` into a single `*do.InjectorOpts`. Returns nil when neither is configured (uses default injector). This replaced the old inline `NewScopeWithOpts` call in `cli.initialize()`.
 51. **go mod replace for auditlog** — `samber-do-auditlog v0.0.1` is missing `html_templ.go` in the published tag (gitignored `*_templ.go`). A local replace directive is needed until `html_templ.go` is committed and v0.0.2 is tagged.
 52. **Fang integration (ADR-001)** — `WithCLIVersion` auto-pipes to `fang.WithVersion`; `WithCLICommit` auto-pipes to `fang.WithCommit`. Users should NOT use `WithFangOptions(fang.WithVersion(...))` alongside `WithCLIVersion` — this would create duplicate fang version opts. `fang.WithNotifySignal` is intentionally skipped because cmdguard's `WithSignalHandling`/`WithGracefulShutdown` provides DI-aware signal handling that fang cannot (see `docs/adr/001-fang-integration-strategy.md`).
-53. **16 output formats** — go-output v0.8.0 provides 16 formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml. All are exposed via `output.go` registries. TOML also supports arbitrary data via `anyFormatRegistry`. PlantUML uses the `plantuml` sub-package (separate go.mod dependency from other sub-packages).
-54. **Deduplicated validators** — `validateEmail` and `validateURL` in `flags_validate.go` delegate to `ParseEmail()` and `ParseURL()` respectively, eliminating duplicate parsing logic. The wrapper functions preserve the original error wrapping format for backward compatibility.
+53. **16 output formats via upstream registries** — go-output v0.8.0+ provides `RenderTableData` (all 16 formats registered by sub-modules) and `RenderAnyData` (JSON, YAML, TOML). cmdguard's `output.go` delegates to these registries; no custom strategy types needed. Blank imports in `output.go` trigger sub-module `init()` registrations. `OutputStyledTable` is deprecated; use `OutputTable(FormatTable, ...)` instead. `SupportedFormats()` returns all 16 formats; `IsFormatSupported(f)` checks validity.
+54. **Deduplicated validators** — `validateEmail` and `validateURL` in `flags_validate.go` delegate to `ParseEmail()` and `ParseURL()` respectively, eliminating duplicate parsing logic.
 
 ---
 
