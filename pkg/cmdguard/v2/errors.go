@@ -59,7 +59,6 @@ var (
 
 	// ErrDoctorFailed indicates one or more doctor checks failed.
 	ErrDoctorFailed = errors.New("doctor checks failed")
-
 )
 
 // labeledError formats an error with a labeled context for consistent error messages.

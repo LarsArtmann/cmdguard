@@ -184,7 +184,8 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 
 			total, pending, done, byPriority := store.Stats()
 
-			return v2.OutputTable(v2.FormatTable,
+			return v2.OutputTable(
+				v2.FormatTable,
 				[]string{"Metric", "Value"},
 				[][]string{
 					{"Total", strconv.Itoa(total)},
