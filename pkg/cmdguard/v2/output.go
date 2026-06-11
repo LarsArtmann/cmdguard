@@ -76,9 +76,7 @@ func OutputResult(cfg OutputConfig, data any) error {
 
 	if td := unwrapTableData(data); td != nil {
 		err := output.RenderTableData(td, cfg.Format, opts)
-
-		var unsupported *output.UnsupportedFormatError
-		if errors.As(err, &unsupported) {
+		if _, ok := errors.AsType[*output.UnsupportedFormatError](err); ok {
 			return fmt.Errorf("%w: %s", ErrUnsupportedFormat, cfg.Format)
 		}
 
@@ -86,9 +84,7 @@ func OutputResult(cfg OutputConfig, data any) error {
 	}
 
 	err := output.RenderAnyData(data, cfg.Format, opts)
-
-	var unsupported *output.UnsupportedFormatError
-	if errors.As(err, &unsupported) {
+	if _, ok := errors.AsType[*output.UnsupportedFormatError](err); ok {
 		return fmt.Errorf("%w: %s", ErrFormatRequiresTypedData, cfg.Format)
 	}
 
