@@ -60,11 +60,6 @@ var (
 	// ErrDoctorFailed indicates one or more doctor checks failed.
 	ErrDoctorFailed = errors.New("doctor checks failed")
 
-	// ErrAuditLogNotEnabled indicates an audit-log command was requested but audit logging is not enabled.
-	ErrAuditLogNotEnabled = errors.New("audit log not enabled")
-
-	// ErrInvalidOutputFormat indicates an unsupported audit-log output format was requested.
-	ErrInvalidOutputFormat = errors.New("invalid output format")
 )
 
 // labeledError formats an error with a labeled context for consistent error messages.
