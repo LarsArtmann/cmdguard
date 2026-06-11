@@ -96,9 +96,7 @@ func TestPromptMissingCommandFlags_StringPrompt(t *testing.T) {
 		t.Fatal("flag 'name' not found")
 	}
 
-	if flag.Value.String() != "Alice" {
-		t.Errorf("flag value = %q, want %q", flag.Value.String(), "Alice")
-	}
+	testutil.AssertFieldEqString(t, flag.Value.String(), "Alice", "flag value")
 }
 
 func TestPromptMissingCommandFlags_SelectPrompt(t *testing.T) {
@@ -129,9 +127,7 @@ func TestPromptMissingCommandFlags_SelectPrompt(t *testing.T) {
 		t.Fatal("flag 'color' not found")
 	}
 
-	if flag.Value.String() != "blue" {
-		t.Errorf("flag value = %q, want %q", flag.Value.String(), "blue")
-	}
+	testutil.AssertFieldEqString(t, flag.Value.String(), "blue", "flag value")
 }
 
 func TestPromptMissingCommandFlags_ConfirmPrompt(t *testing.T) {
@@ -162,9 +158,7 @@ func TestPromptMissingCommandFlags_ConfirmPrompt(t *testing.T) {
 		t.Fatal("flag 'verbose' not found")
 	}
 
-	if flag.Value.String() != "true" {
-		t.Errorf("flag value = %q, want %q", flag.Value.String(), "true")
-	}
+	testutil.AssertFieldEqString(t, flag.Value.String(), "true", "flag value")
 }
 
 func TestPromptMissingCommandFlags_SkipsWhenFlagChanged(t *testing.T) {
@@ -195,9 +189,7 @@ func TestPromptMissingCommandFlags_SkipsWhenFlagChanged(t *testing.T) {
 	}
 
 	flag := cmd.Flags().Lookup("name")
-	if flag.Value.String() != "Bob" {
-		t.Errorf("flag value = %q, want %q", flag.Value.String(), "Bob")
-	}
+	testutil.AssertFieldEqString(t, flag.Value.String(), "Bob", "flag value")
 }
 
 func TestPromptMissingCommandFlags_SkipsNoPromptTag(t *testing.T) {

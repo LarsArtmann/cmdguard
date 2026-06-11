@@ -8,6 +8,20 @@ import (
 	"testing"
 )
 
+// writeJSONConfigFile writes body as a JSON config file inside dir and returns the
+// absolute path. Fails the test on write error. Centralizes the temp-dir + write
+// pattern shared by config_file subtests that load JSON from disk.
+func writeJSONConfigFile(t *testing.T, dir, body string) string {
+	t.Helper()
+
+	path := filepath.Join(dir, "config.json")
+	if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	return path
+}
+
 func TestExpandConfigPath(t *testing.T) {
 	t.Parallel()
 
@@ -130,11 +144,7 @@ func TestLoadConfigFile(t *testing.T) {
 	t.Run("loads existing file", func(t *testing.T) {
 		t.Parallel()
 
-		tmpDir := t.TempDir()
-		path := filepath.Join(tmpDir, "config.json")
-		if err := os.WriteFile(path, []byte(`{"name": "file"}`), 0o600); err != nil {
-			t.Fatal(err)
-		}
+		path := writeJSONConfigFile(t, t.TempDir(), `{"name": "file"}`)
 
 		type Config struct {
 			Name string `flag:"name"`
@@ -157,11 +167,7 @@ func TestLoadConfigFile(t *testing.T) {
 	t.Run("skips missing files and tries next", func(t *testing.T) {
 		t.Parallel()
 
-		tmpDir := t.TempDir()
-		path := filepath.Join(tmpDir, "config.json")
-		if err := os.WriteFile(path, []byte(`{"name": "found"}`), 0o600); err != nil {
-			t.Fatal(err)
-		}
+		path := writeJSONConfigFile(t, t.TempDir(), `{"name": "found"}`)
 
 		type Config struct {
 			Name string `flag:"name"`

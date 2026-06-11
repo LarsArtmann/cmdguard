@@ -217,6 +217,24 @@ func AssertBoolFalse(t *testing.T, field bool, fieldName string) {
 	}
 }
 
+// AssertStringSlicesEqual fails the test if got and want have different lengths
+// or differ at any index. The context label appears in the length-mismatch message.
+func AssertStringSlicesEqual(t *testing.T, got, want []string, context string) {
+	t.Helper()
+
+	if len(got) != len(want) {
+		t.Fatalf("%s: got %v, want %v", context, got, want)
+
+		return
+	}
+
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("%s[%d]: got %q, want %q", context, i, got[i], want[i])
+		}
+	}
+}
+
 // assertFlagRegistered is the internal helper for flag registration checks.
 func assertFlagRegistered(t *testing.T, cmd *cobra.Command, flagName string, shouldExist bool) {
 	t.Helper()

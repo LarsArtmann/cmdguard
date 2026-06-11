@@ -371,11 +371,7 @@ func TestChainMiddleware(t *testing.T) {
 		t.Fatalf("expected %d entries, got %d: %v", len(expected), len(order), order)
 	}
 
-	for i, v := range expected {
-		if order[i] != v {
-			t.Errorf("entry[%d]: expected %q, got %q", i, v, order[i])
-		}
-	}
+	testutil.AssertStringSlicesEqual(t, order, expected, "entry")
 }
 
 func TestChainMiddleware_Empty(t *testing.T) {

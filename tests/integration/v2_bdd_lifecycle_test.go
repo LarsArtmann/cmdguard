@@ -169,15 +169,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 			}
 
 			expected := []string{"pre-run", cmdRun, "post-run"}
-			if len(order) != len(expected) {
-				t.Fatalf("execution order: got %v, want %v", order, expected)
-			}
-
-			for i, step := range expected {
-				if order[i] != step {
-					t.Errorf("order[%d]: got %q, want %q", i, order[i], step)
-				}
-			}
+			testutil.AssertStringSlicesEqual(t, order, expected, "execution order")
 		},
 	)
 
@@ -297,15 +289,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 			execLifecycle(t, cli, "run")
 
 			expected := []string{"mw1-before", "mw2-before", "handler", "mw2-after", "mw1-after"}
-			if len(order) != len(expected) {
-				t.Fatalf("middleware order: got %v, want %v", order, expected)
-			}
-
-			for i, step := range expected {
-				if order[i] != step {
-					t.Errorf("order[%d]: got %q, want %q", i, order[i], step)
-				}
-			}
+			testutil.AssertStringSlicesEqual(t, order, expected, "middleware order")
 		},
 	)
 
