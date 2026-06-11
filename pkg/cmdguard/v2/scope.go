@@ -377,7 +377,7 @@ func Package[T any](scope *Scope, name, short string, defaults T, opts ...CLIOpt
 
 	cli, err := NewCLI(name, short, defaults, cliOpts...)
 	if err != nil {
-		return nil, fmt.Errorf("Package(%q): %w", name, err)
+		return nil, fmt.Errorf("Package(name=%q, short=%q): %w", name, short, err)
 	}
 
 	do.ProvideValue(cli.scope.injector, cli)

@@ -194,7 +194,7 @@ func (c Command[T, F]) validate(mode ValidationMode) error {
 // requireUse returns an error if use is empty.
 func requireUse(use string) error {
 	if use == "" {
-		return fmt.Errorf("%w: use is required", ErrMissingName)
+		return fmt.Errorf("use=%q: %w: use is required", use, ErrMissingName)
 	}
 
 	return nil

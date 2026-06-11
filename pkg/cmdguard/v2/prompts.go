@@ -28,7 +28,7 @@ func (h *huhPromptRunner) PromptString(title, defaultValue string) (string, erro
 		Value(&result).
 		Run()
 	if err != nil {
-		return "", fmt.Errorf("running string prompt: %w", err)
+		return "", fmt.Errorf("title=%q, defaultValue=%q: running string prompt: %w", title, defaultValue, err)
 	}
 
 	return result, nil
@@ -48,7 +48,7 @@ func (h *huhPromptRunner) PromptSelect(title string, options []string) (string, 
 		Value(&result).
 		Run()
 	if err != nil {
-		return "", fmt.Errorf("running select prompt: %w", err)
+		return "", fmt.Errorf("title=%q, options=%v: running select prompt: %w", title, options, err)
 	}
 
 	return result, nil
@@ -62,7 +62,7 @@ func (h *huhPromptRunner) PromptConfirm(title string) (bool, error) {
 		Value(&result).
 		Run()
 	if err != nil {
-		return false, fmt.Errorf("running confirm prompt: %w", err)
+		return false, fmt.Errorf("title=%q: running confirm prompt: %w", title, err)
 	}
 
 	return result, nil
@@ -78,7 +78,7 @@ var defaultPromptRunner PromptRunner = &huhPromptRunner{}
 func PromptString(title, defaultValue string) (string, error) {
 	result, err := defaultPromptRunner.PromptString(title, defaultValue)
 	if err != nil {
-		return "", fmt.Errorf("prompting for string: %w", err)
+		return "", fmt.Errorf("title=%q, defaultValue=%q: prompting for string: %w", title, defaultValue, err)
 	}
 
 	return result, nil
@@ -88,7 +88,7 @@ func PromptString(title, defaultValue string) (string, error) {
 func PromptSelect(title string, options []string) (string, error) {
 	result, err := defaultPromptRunner.PromptSelect(title, options)
 	if err != nil {
-		return "", fmt.Errorf("prompting for selection: %w", err)
+		return "", fmt.Errorf("title=%q, options=%v: prompting for selection: %w", title, options, err)
 	}
 
 	return result, nil
@@ -98,7 +98,7 @@ func PromptSelect(title string, options []string) (string, error) {
 func PromptConfirm(title string) (bool, error) {
 	result, err := defaultPromptRunner.PromptConfirm(title)
 	if err != nil {
-		return false, fmt.Errorf("prompting for confirmation: %w", err)
+		return false, fmt.Errorf("title=%q: prompting for confirmation: %w", title, err)
 	}
 
 	return result, nil
@@ -137,28 +137,34 @@ func promptMissingCommandFlags(c *cobra.Command, registry *FlagRegistry) error {
 		case len(tag.Values) > 0:
 			selected, err := PromptSelect(tag.Prompt, tag.Values)
 			if err != nil {
-				return fmt.Errorf("prompting for flag %q: %w", tag.Name, err)
+				return fmt.Errorf("flag=%q, value=%q: prompting for flag %q: %w", tag.Name, tag.Default, tag.Name, err)
 			}
 
 			value = selected
 		case tag.Type.Kind() == reflect.Bool:
 			confirmed, err := PromptConfirm(tag.Prompt)
 			if err != nil {
-				return fmt.Errorf("prompting for flag %q: %w", tag.Name, err)
+				return fmt.Errorf("flag=%q, value=%q: prompting for flag %q: %w", tag.Name, tag.Default, tag.Name, err)
 			}
 
 			value = strconv.FormatBool(confirmed)
 		default:
 			result, err := PromptString(tag.Prompt, tag.Default)
 			if err != nil {
-				return fmt.Errorf("prompting for flag %q: %w", tag.Name, err)
+				return fmt.Errorf("flag=%q, value=%q: prompting for flag %q: %w", tag.Name, tag.Default, tag.Name, err)
 			}
 
 			value = result
 		}
 
 		if err := c.Flags().Set(tag.Name, value); err != nil {
-			return fmt.Errorf("setting prompted value for flag %q: %w", tag.Name, err)
+			return fmt.Errorf(
+				"flag=%q, value=%q: setting prompted value for flag %q: %w",
+				tag.Name,
+				value,
+				tag.Name,
+				err,
+			)
 		}
 	}
 

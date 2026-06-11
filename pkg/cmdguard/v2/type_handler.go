@@ -162,14 +162,14 @@ func dispatchParse(tr *typeRegistry, value string, tag FlagTag) (any, error) {
 
 	parsed, err := h.Parse(value, tag)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("value=%q, field=%q: %w", value, tag.Field, err)
 	}
 
 	parsedVal := reflect.ValueOf(parsed)
 	if parsedVal.IsValid() && !parsedVal.Type().AssignableTo(tag.Type) &&
 		!parsedVal.Type().ConvertibleTo(tag.Type) {
-		return nil, fmt.Errorf("dispatchParse: type handler returned %s, field %q requires %s: %w",
-			parsedVal.Type(), tag.Field, tag.Type, ErrUnsupportedConversion)
+		return nil, fmt.Errorf("value=%q: dispatchParse: type handler returned %s, field %q requires %s: %w",
+			value, parsedVal.Type(), tag.Field, tag.Type, ErrUnsupportedConversion)
 	}
 
 	return parsed, nil

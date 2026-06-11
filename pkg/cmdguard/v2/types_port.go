@@ -74,7 +74,7 @@ func ParsePort(s string) (Port, error) {
 // Returns an error if the port is out of valid range.
 func PortFromInt(port int) (Port, error) {
 	if err := validatePortRange(port); err != nil {
-		return Port{}, err
+		return Port{}, fmt.Errorf("port=%d: %w", port, err)
 	}
 
 	return Port{port: port}, nil

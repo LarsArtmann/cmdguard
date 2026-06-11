@@ -291,7 +291,7 @@ func validateRegex(value string) error {
 
 func validateNonEmpty(value string) error {
 	if value == "" {
-		return fmt.Errorf("%w: value must not be empty", ErrValueEmpty)
+		return fmt.Errorf("value=%q: %w: value must not be empty", value, ErrValueEmpty)
 	}
 
 	return nil
@@ -312,12 +312,12 @@ func validateFieldByKind(field reflect.Value, tag FlagTag, vr *validatorRegistry
 func runValidateTagWithRegistry(tag, value string, vr *validatorRegistry) error {
 	rules, err := parseValidateRulesWithRegistry(tag, vr)
 	if err != nil {
-		return fmt.Errorf("parsing validation rules: %w", err)
+		return fmt.Errorf("tag=%q, value=%q: parsing validation rules: %w", tag, value, err)
 	}
 
 	for _, rule := range rules {
 		if err := rule.Validate(value); err != nil {
-			return fmt.Errorf("validation rule %q failed: %w", rule.Name, err)
+			return fmt.Errorf("value=%q: validation rule %q failed: %w", value, rule.Name, err)
 		}
 	}
 
