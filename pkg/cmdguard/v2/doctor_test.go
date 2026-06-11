@@ -75,9 +75,7 @@ func TestDoctorCommand(t *testing.T) {
 		testutil.AssertNoError(t, cli.Execute(context.Background()))
 
 		output := out.String()
-		if !strings.Contains(output, "✓") {
-			t.Errorf("expected checkmark, got: %s", output)
-		}
+		testutil.AssertOutputContains(t, output, "✓")
 
 		if !strings.Contains(output, "passed") {
 			t.Errorf("expected 'passed', got: %s", output)
@@ -104,9 +102,7 @@ func TestDoctorCommand(t *testing.T) {
 		}
 
 		output := out.String()
-		if !strings.Contains(output, "✗") {
-			t.Errorf("expected cross mark, got: %s", output)
-		}
+		testutil.AssertOutputContains(t, output, "✗")
 
 		if !strings.Contains(output, "failed") {
 			t.Errorf("expected failed count, got: %s", output)
@@ -162,13 +158,9 @@ func TestDoctorCommand(t *testing.T) {
 		}
 
 		output := out.String()
-		if !strings.Contains(output, "✗ failing") {
-			t.Errorf("expected failing check output, got: %s", output)
-		}
+		testutil.AssertOutputContains(t, output, "✗ failing")
 
-		if !strings.Contains(output, "connection refused") {
-			t.Errorf("expected error message in output, got: %s", output)
-		}
+		testutil.AssertOutputContains(t, output, "connection refused")
 	})
 
 	t.Run("sorts results alphabetically", func(t *testing.T) {

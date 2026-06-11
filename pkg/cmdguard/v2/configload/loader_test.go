@@ -31,9 +31,7 @@ func TestYAMLLoader(t *testing.T) {
 		if cfg.Port != 9090 {
 			t.Errorf("expected port 9090, got %d", cfg.Port)
 		}
-		if len(setFields) != 2 {
-			t.Errorf("expected 2 set fields, got %d: %v", len(setFields), setFields)
-		}
+		testutil.AssertFieldLen(t, setFields, 2, "setFields")
 	})
 
 	t.Run("returns only present keys", func(t *testing.T) {
@@ -45,9 +43,7 @@ func TestYAMLLoader(t *testing.T) {
 		setFields, err := configload.YAML().Load(data, &cfg)
 		testutil.AssertNoError(t, err)
 
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
-		}
+		testutil.AssertFieldLen(t, setFields, 1, "setFields")
 		if cfg.Name != "only-name" {
 			t.Errorf("expected name 'only-name', got %q", cfg.Name)
 		}
@@ -74,9 +70,7 @@ func TestYAMLLoader(t *testing.T) {
 		setFields, err := configload.YAML().Load(data, &cfg)
 		testutil.AssertNoError(t, err)
 
-		if len(setFields) != 0 {
-			t.Errorf("expected 0 set fields, got %d: %v", len(setFields), setFields)
-		}
+		testutil.AssertFieldLen(t, setFields, 0, "setFields")
 	})
 }
 
@@ -98,9 +92,7 @@ func TestTOMLLoader(t *testing.T) {
 		if cfg.Port != 9090 {
 			t.Errorf("expected port 9090, got %d", cfg.Port)
 		}
-		if len(setFields) != 2 {
-			t.Errorf("expected 2 set fields, got %d: %v", len(setFields), setFields)
-		}
+		testutil.AssertFieldLen(t, setFields, 2, "setFields")
 	})
 
 	t.Run("returns only present keys", func(t *testing.T) {
@@ -112,9 +104,7 @@ func TestTOMLLoader(t *testing.T) {
 		setFields, err := configload.TOML().Load(data, &cfg)
 		testutil.AssertNoError(t, err)
 
-		if len(setFields) != 1 {
-			t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
-		}
+		testutil.AssertFieldLen(t, setFields, 1, "setFields")
 		if !cfg.Verbose {
 			t.Error("expected verbose=true")
 		}
@@ -151,9 +141,7 @@ func TestJSONLoader(t *testing.T) {
 		if cfg.Port != 9090 {
 			t.Errorf("expected port 9090, got %d", cfg.Port)
 		}
-		if len(setFields) != 2 {
-			t.Errorf("expected 2 set fields, got %d: %v", len(setFields), setFields)
-		}
+		testutil.AssertFieldLen(t, setFields, 2, "setFields")
 	})
 
 	t.Run("invalid json returns error", func(t *testing.T) {
@@ -195,9 +183,7 @@ func TestAutoLoader(t *testing.T) {
 				if cfg.Name != tt.expect {
 					t.Errorf("expected name %q, got %q", tt.expect, cfg.Name)
 				}
-				if len(setFields) != 1 {
-					t.Errorf("expected 1 set field, got %d: %v", len(setFields), setFields)
-				}
+				testutil.AssertFieldLen(t, setFields, 1, "setFields")
 			})
 		}
 	})

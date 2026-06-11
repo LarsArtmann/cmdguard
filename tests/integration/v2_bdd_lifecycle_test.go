@@ -744,9 +744,7 @@ func TestCLI_VersionCommand_Integration(t *testing.T) {
 			execLifecycle(t, cli, "version")
 
 			output := buf.String()
-			if !strings.Contains(output, "myapp 3.14.0") {
-				t.Errorf("output should contain 'myapp 3.14.0', got: %q", output)
-			}
+			testutil.AssertOutputContains(t, output, "myapp 3.14.0")
 		},
 	)
 }

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
@@ -94,5 +95,15 @@ func AddCommand[T, F any](t *testing.T, cli *v2.CLI[T], cmd v2.Command[T, F]) {
 
 	if err := v2.AddCommand(cli, cmd); err != nil {
 		t.Fatalf("failed to add command: %v", err)
+	}
+}
+
+// AssertOutputContains fails the test if output does not contain substring.
+// Use for captured CLI command output buffers.
+func AssertOutputContains(t *testing.T, output, substr string) {
+	t.Helper()
+
+	if !strings.Contains(output, substr) {
+		t.Errorf("output should contain %q, got: %s", substr, output)
 	}
 }

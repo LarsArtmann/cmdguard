@@ -434,9 +434,7 @@ func TestVersionCommand(t *testing.T) {
 		testutil.AssertNoError(t, err)
 
 		output := buf.String()
-		if !strings.Contains(output, "myapp 2.0.0") {
-			t.Errorf("expected output to contain 'myapp 2.0.0', got %q", output)
-		}
+		testutil.AssertOutputContains(t, output, "myapp 2.0.0")
 	})
 
 	t.Run("VersionCommand returns error without version", func(t *testing.T) {

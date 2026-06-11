@@ -3,6 +3,8 @@ package v2
 import (
 	"slices"
 	"testing"
+
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 func TestParseFlagTags(t *testing.T) {
@@ -21,9 +23,7 @@ func TestParseFlagTags(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if len(tags) != 3 {
-			t.Fatalf("expected 3 tags, got %d", len(tags))
-		}
+		testutil.AssertFieldLen(t, tags, 3, "tags")
 
 		// Check first field
 		if tags[0].Field != "Name" {
@@ -59,9 +59,7 @@ func TestParseFlagTags(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if len(tags) != 1 {
-			t.Fatalf("expected 1 tag, got %d", len(tags))
-		}
+		testutil.AssertFieldLen(t, tags, 1, "tags")
 
 		if tags[0].Name != "field" {
 			t.Errorf("expected Name 'field', got %q", tags[0].Name)
@@ -82,9 +80,7 @@ func TestParseFlagTags(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if len(tags) != 1 {
-			t.Fatalf("expected 1 tag, got %d", len(tags))
-		}
+		testutil.AssertFieldLen(t, tags, 1, "tags")
 
 		if tags[0].Field != "Tagged" {
 			t.Errorf("expected Field 'Tagged', got %q", tags[0].Field)
@@ -133,9 +129,7 @@ func TestParseFlagTags(t *testing.T) {
 			t.Fatalf("expected no error, got: %v", err)
 		}
 
-		if len(tags) != 1 {
-			t.Fatalf("expected 1 tag, got %d", len(tags))
-		}
+		testutil.AssertFieldLen(t, tags, 1, "tags")
 
 		expected := []string{"debug", "info", "warn", "error"}
 		if !slices.Equal(tags[0].Values, expected) {

@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 type fakePromptRunner struct {
@@ -352,9 +354,7 @@ func TestPromptTag_Parse(t *testing.T) {
 		t.Fatalf("parsing tags: %v", err)
 	}
 
-	if len(tags) != 1 {
-		t.Fatalf("expected 1 tag, got %d", len(tags))
-	}
+	testutil.AssertFieldLen(t, tags, 1, "tags")
 
 	if tags[0].Prompt != "What is your name?" {
 		t.Errorf("prompt = %q, want %q", tags[0].Prompt, "What is your name?")

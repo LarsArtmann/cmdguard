@@ -250,6 +250,16 @@ func AssertStringFieldContains(t *testing.T, field, substr, fieldName string) {
 	}
 }
 
+// AssertOutputContains fails the test if output does not contain substring.
+// Use for captured CLI command output buffers.
+func AssertOutputContains(t *testing.T, output, substr string) {
+	t.Helper()
+
+	if !strings.Contains(output, substr) {
+		t.Errorf("output should contain %q, got: %s", substr, output)
+	}
+}
+
 // assertFieldLen is the internal helper for length assertions.
 func assertFieldLen[T any](t *testing.T, slice []T, expected int, msg string) {
 	t.Helper()
