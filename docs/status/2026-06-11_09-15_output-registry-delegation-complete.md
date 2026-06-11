@@ -14,45 +14,45 @@ Replaced cmdguard's custom FormatStrategy registry (5 types, 16 entries, 2 free 
 
 ### go-output (upstream)
 
-| File | Change |
-|------|--------|
-| `render_tabledata.go` | Added `AnyDataMarshaler`, `RegisterAnyDataMarshaler`, `RenderAnyData`, `RegisteredTableDataFormats`, `RegisteredAnyDataFormats` |
-| `d2/d2_convert.go` | Register FormatD2 TableDataMarshaler |
-| `graph/mermaid.go` | Register FormatMermaid TableDataMarshaler |
-| `graph/dot.go` | Register FormatDOT TableDataMarshaler |
-| `plantuml/convert.go` | Register FormatPlantUML TableDataMarshaler |
-| `table/table.go` | Register FormatTable TableDataMarshaler |
-| `serialization/json.go` | Register FormatJSON AnyDataMarshaler |
-| `serialization/yaml.go` | Register FormatYAML AnyDataMarshaler |
-| `serialization/toml.go` | Register FormatTOML AnyDataMarshaler |
-| `integration/error_test.go` | Update test: D2/Mermaid/DOT/Table now supported |
+| File                        | Change                                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `render_tabledata.go`       | Added `AnyDataMarshaler`, `RegisterAnyDataMarshaler`, `RenderAnyData`, `RegisteredTableDataFormats`, `RegisteredAnyDataFormats` |
+| `d2/d2_convert.go`          | Register FormatD2 TableDataMarshaler                                                                                            |
+| `graph/mermaid.go`          | Register FormatMermaid TableDataMarshaler                                                                                       |
+| `graph/dot.go`              | Register FormatDOT TableDataMarshaler                                                                                           |
+| `plantuml/convert.go`       | Register FormatPlantUML TableDataMarshaler                                                                                      |
+| `table/table.go`            | Register FormatTable TableDataMarshaler                                                                                         |
+| `serialization/json.go`     | Register FormatJSON AnyDataMarshaler                                                                                            |
+| `serialization/yaml.go`     | Register FormatYAML AnyDataMarshaler                                                                                            |
+| `serialization/toml.go`     | Register FormatTOML AnyDataMarshaler                                                                                            |
+| `integration/error_test.go` | Update test: D2/Mermaid/DOT/Table now supported                                                                                 |
 
 ### cmdguard
 
-| File | Change |
-|------|--------|
-| `output.go` | 309→143 lines (54% reduction). Delegates to go-output registries. Blank imports for all sub-modules. |
-| `output_test.go` | Simplified: removed 13 internal strategy tests, kept all public API tests |
-| `example_test.go` | Fixed for new JSON output format, added ExampleOutputResult |
-| `go.mod` | Added replace directives for local go-output development |
-| `examples/taskctl/commands.go` | Use OutputTable instead of deprecated OutputStyledTable |
-| `AGENTS.md` | Updated output architecture docs |
+| File                           | Change                                                                                               |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `output.go`                    | 309→143 lines (54% reduction). Delegates to go-output registries. Blank imports for all sub-modules. |
+| `output_test.go`               | Simplified: removed 13 internal strategy tests, kept all public API tests                            |
+| `example_test.go`              | Fixed for new JSON output format, added ExampleOutputResult                                          |
+| `go.mod`                       | Added replace directives for local go-output development                                             |
+| `examples/taskctl/commands.go` | Use OutputTable instead of deprecated OutputStyledTable                                              |
+| `AGENTS.md`                    | Updated output architecture docs                                                                     |
 
 ## Metrics
 
-| Metric | Before | After |
-|--------|--------|-------|
-| output.go lines | 309 | 143 |
-| output_test.go lines | 485 | 276 |
-| Custom strategy types | 5 | 0 |
-| Registry entries (cmdguard) | 16 | 0 (delegated) |
-| go-output registered formats | 2 (markdown, tree) | 16 (all) |
-| go-output any-data formats | 0 | 3 (JSON, YAML, TOML) |
-| Total net lines removed | — | 375 |
-| Tests passing | 410+ | 400+ |
-| Coverage | 85.5% | 85.5% |
-| Lint issues | 0 | 0 |
-| Race conditions | 0 | 0 |
+| Metric                       | Before             | After                |
+| ---------------------------- | ------------------ | -------------------- |
+| output.go lines              | 309                | 143                  |
+| output_test.go lines         | 485                | 276                  |
+| Custom strategy types        | 5                  | 0                    |
+| Registry entries (cmdguard)  | 16                 | 0 (delegated)        |
+| go-output registered formats | 2 (markdown, tree) | 16 (all)             |
+| go-output any-data formats   | 0                  | 3 (JSON, YAML, TOML) |
+| Total net lines removed      | —                  | 375                  |
+| Tests passing                | 410+               | 400+                 |
+| Coverage                     | 85.5%              | 85.5%                |
+| Lint issues                  | 0                  | 0                    |
+| Race conditions              | 0                  | 0                    |
 
 ## New Public APIs
 

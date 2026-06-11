@@ -142,7 +142,8 @@ func TestJSONErrorIntegration(t *testing.T) {
 		cli, err := NewCLI[jsonErrConfig]("test", "test", jsonErrConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags]("fail",
+		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
+			"fail",
 			func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
 				return errors.New("plain error")
 			},
@@ -180,12 +181,14 @@ func TestJSONErrorIntegration(t *testing.T) {
 	})
 
 	t.Run("silences cobra errors when JSON output is active", func(t *testing.T) {
-		cli, err := NewCLI[jsonErrConfig]("test", "test", jsonErrConfig{},
+		cli, err := NewCLI[jsonErrConfig](
+			"test", "test", jsonErrConfig{},
 			WithOutputFormat[jsonErrConfig](FormatJSON),
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags]("fail",
+		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
+			"fail",
 			func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
 				return errors.New("plain error")
 			},
@@ -222,12 +225,14 @@ func TestJSONErrorIntegration(t *testing.T) {
 	})
 
 	t.Run("YAML output also triggers structured errors", func(t *testing.T) {
-		cli, err := NewCLI[jsonErrConfig]("test", "test", jsonErrConfig{},
+		cli, err := NewCLI[jsonErrConfig](
+			"test", "test", jsonErrConfig{},
 			WithOutputFormat[jsonErrConfig](FormatYAML),
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags]("fail",
+		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
+			"fail",
 			func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
 				return fmt.Errorf("%w: missing", ErrConfigValidation)
 			},

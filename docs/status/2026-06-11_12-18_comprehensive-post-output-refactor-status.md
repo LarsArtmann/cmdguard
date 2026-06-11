@@ -20,60 +20,60 @@ cmdguard is in **excellent shape**. The library is production-ready with 404 pas
 
 ### Core Library (v2.5.0)
 
-| Feature | Status | Details |
-|---------|--------|---------|
-| CLI[T] + NewCLI | ✅ | Type-safe CLI construction, all options |
-| Command[T,F] + NewCommand | ✅ | 21 command options, zero panics |
-| Flag system (struct tags) | ✅ | flag/short/default/help/env/count/prompt/validate/values tags |
-| TypeHandler registry | ✅ | 9 built-in kinds + 9 custom types, extensible |
-| DI scope (samber/do/v2) | ✅ | Provide/Invoke/Override/Clone/Shutdown/HealthCheck |
-| Rich output (16 formats) | ✅ | Delegated to go-output registries via blank imports |
-| Middleware chain | ✅ | Timing, Recovery, Spinner, Telemetry + custom |
-| Shell completion | ✅ | Dynamic + static, cobra-compatible |
-| Man page generation | ✅ | Via mango + roff |
-| Markdown help (glamour) | ✅ | Auto theme detection, GLAMOUR_STYLE support |
-| Interactive prompts (huh) | ✅ | Text, select, confirm with auto-type detection |
-| Config file loading | ✅ | JSON (core) + YAML/TOML/Auto (configload sub-package) |
-| Error handling | ✅ | 60+ sentinels, typed errors, full errors.Is chains |
-| Doctor command | ✅ | DI health checks + custom checks |
-| Version command | ✅ | Typed subcommand |
-| Audit log command | ✅ | HTML/JSON/NDJSON/Mermaid export |
-| Zero panics guarantee | ✅ | All Must* removed, all functions return errors |
+| Feature                   | Status | Details                                                       |
+| ------------------------- | ------ | ------------------------------------------------------------- |
+| CLI[T] + NewCLI           | ✅     | Type-safe CLI construction, all options                       |
+| Command[T,F] + NewCommand | ✅     | 21 command options, zero panics                               |
+| Flag system (struct tags) | ✅     | flag/short/default/help/env/count/prompt/validate/values tags |
+| TypeHandler registry      | ✅     | 9 built-in kinds + 9 custom types, extensible                 |
+| DI scope (samber/do/v2)   | ✅     | Provide/Invoke/Override/Clone/Shutdown/HealthCheck            |
+| Rich output (16 formats)  | ✅     | Delegated to go-output registries via blank imports           |
+| Middleware chain          | ✅     | Timing, Recovery, Spinner, Telemetry + custom                 |
+| Shell completion          | ✅     | Dynamic + static, cobra-compatible                            |
+| Man page generation       | ✅     | Via mango + roff                                              |
+| Markdown help (glamour)   | ✅     | Auto theme detection, GLAMOUR_STYLE support                   |
+| Interactive prompts (huh) | ✅     | Text, select, confirm with auto-type detection                |
+| Config file loading       | ✅     | JSON (core) + YAML/TOML/Auto (configload sub-package)         |
+| Error handling            | ✅     | 60+ sentinels, typed errors, full errors.Is chains            |
+| Doctor command            | ✅     | DI health checks + custom checks                              |
+| Version command           | ✅     | Typed subcommand                                              |
+| Audit log command         | ✅     | HTML/JSON/NDJSON/Mermaid export                               |
+| Zero panics guarantee     | ✅     | All Must\* removed, all functions return errors               |
 
 ### Infrastructure
 
-| Item | Status |
-|------|--------|
-| Nix flake (devShell, formatter, format check) | ✅ |
-| CI (golangci-lint, codecov, nix check) | ✅ |
-| Release automation workflow | ✅ |
-| 89 golangci-lint linters enabled | ✅ |
-| Benchmark suite (22 benchmarks) | ✅ |
-| Fuzz test targets (7 targets) | ✅ |
+| Item                                          | Status |
+| --------------------------------------------- | ------ |
+| Nix flake (devShell, formatter, format check) | ✅     |
+| CI (golangci-lint, codecov, nix check)        | ✅     |
+| Release automation workflow                   | ✅     |
+| 89 golangci-lint linters enabled              | ✅     |
+| Benchmark suite (22 benchmarks)               | ✅     |
+| Fuzz test targets (7 targets)                 | ✅     |
 
 ### Documentation
 
-| File | Status |
-|------|--------|
-| AGENTS.md (57 gotchas) | ✅ Current |
-| FEATURES.md (all features verified) | ✅ Current |
-| TODO_LIST.md (phases 1-15 complete) | ✅ Current |
-| README.md | ✅ Current |
-| docs/API.md | ✅ Current |
-| docs/ERROR_REFERENCE.md (62 sentinels) | ✅ Current |
-| docs/CLI_DESIGN_PRINCIPLES.md | ✅ Current |
-| docs/adr/001-fang-integration-strategy.md | ✅ Current |
+| File                                       | Status            |
+| ------------------------------------------ | ----------------- |
+| AGENTS.md (57 gotchas)                     | ✅ Current        |
+| FEATURES.md (all features verified)        | ✅ Current        |
+| TODO_LIST.md (phases 1-15 complete)        | ✅ Current        |
+| README.md                                  | ✅ Current        |
+| docs/API.md                                | ✅ Current        |
+| docs/ERROR_REFERENCE.md (62 sentinels)     | ✅ Current        |
+| docs/CLI_DESIGN_PRINCIPLES.md              | ✅ Current        |
+| docs/adr/001-fang-integration-strategy.md  | ✅ Current        |
 | examples/taskctl/ (production example CLI) | ✅ 70.5% coverage |
 
 ### Session Work (2026-06-11)
 
-| Commit | What | Impact |
-|--------|------|--------|
-| `4b5bb7c` | Adopt `errors.AsType` in output.go | Eliminated 2 gopls hints, Go 1.26 consistency |
-| `17d20ac` | Extract audit-log sentinels to errors_audit.go | Per-domain file split pattern |
-| `f296106` | Use `errors.Join` in ValidateConfig | Preserves errors.Is chain for individual validation errors |
-| `a3fa206` | Replace hard-coded format count | Future-proof against go-output format additions |
-| `4ea803d` | Update AGENTS.md with gotchas #55-57 | Documentation current |
+| Commit    | What                                           | Impact                                                     |
+| --------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| `4b5bb7c` | Adopt `errors.AsType` in output.go             | Eliminated 2 gopls hints, Go 1.26 consistency              |
+| `17d20ac` | Extract audit-log sentinels to errors_audit.go | Per-domain file split pattern                              |
+| `f296106` | Use `errors.Join` in ValidateConfig            | Preserves errors.Is chain for individual validation errors |
+| `a3fa206` | Replace hard-coded format count                | Future-proof against go-output format additions            |
+| `4ea803d` | Update AGENTS.md with gotchas #55-57           | Documentation current                                      |
 
 ---
 
@@ -83,37 +83,37 @@ cmdguard is in **excellent shape**. The library is production-ready with 404 pas
 
 **13 functions at 0% coverage:**
 
-| Function | File | Why | Effort |
-|----------|------|-----|--------|
-| `PromptString` | prompts.go:23 | Requires terminal TTY mock | Medium |
-| `PromptSelect` | prompts.go:37 | Requires terminal TTY mock | Medium |
-| `PromptConfirm` | prompts.go:57 | Requires terminal TTY mock | Medium |
-| `NewManPage` | manpage.go:63 | Manual section constructor | Easy |
-| `WithConfigFileLoader` | config_file.go:178 | Custom loader registration | Easy |
-| `WithDoctorLong` | doctor.go:34 | Simple option, trivial | Easy |
-| `WithAuditLogGroupID` | auditlog.go:43 | Simple option, trivial | Easy |
-| `RegisterValidator` | flags_validate.go:79 | Global validator registration | Easy |
-| `validateEmail` | flags_validate.go:153 | Delegates to ParseEmail | Easy |
-| `validateURL` | flags_validate.go:165 | Delegates to ParseURL | Easy |
-| `validateNonEmpty` | flags_validate.go:292 | String non-empty validator | Easy |
-| `validateFieldByKind` | flags_validate.go:301 | Kind-dispatched validation | Easy |
-| `runValidateTagWithRegistry` | flags_validate.go:312 | Tag validation runner | Easy |
+| Function                     | File                  | Why                           | Effort |
+| ---------------------------- | --------------------- | ----------------------------- | ------ |
+| `PromptString`               | prompts.go:23         | Requires terminal TTY mock    | Medium |
+| `PromptSelect`               | prompts.go:37         | Requires terminal TTY mock    | Medium |
+| `PromptConfirm`              | prompts.go:57         | Requires terminal TTY mock    | Medium |
+| `NewManPage`                 | manpage.go:63         | Manual section constructor    | Easy   |
+| `WithConfigFileLoader`       | config_file.go:178    | Custom loader registration    | Easy   |
+| `WithDoctorLong`             | doctor.go:34          | Simple option, trivial        | Easy   |
+| `WithAuditLogGroupID`        | auditlog.go:43        | Simple option, trivial        | Easy   |
+| `RegisterValidator`          | flags_validate.go:79  | Global validator registration | Easy   |
+| `validateEmail`              | flags_validate.go:153 | Delegates to ParseEmail       | Easy   |
+| `validateURL`                | flags_validate.go:165 | Delegates to ParseURL         | Easy   |
+| `validateNonEmpty`           | flags_validate.go:292 | String non-empty validator    | Easy   |
+| `validateFieldByKind`        | flags_validate.go:301 | Kind-dispatched validation    | Easy   |
+| `runValidateTagWithRegistry` | flags_validate.go:312 | Tag validation runner         | Easy   |
 
 **11 functions at 1-59% coverage:**
 
-| Function | Coverage | File |
-|----------|----------|------|
-| `validateTagRules` | 16.7% | flags.go:195 |
-| `GenerateManPageCommand` | 14.3% | manpage.go:41 |
-| `applyNoColorIfSet` | 25.0% | cli.go:224 |
-| `isEnvSet` | 28.6% | prompts.go:174 |
-| `writeAuditMermaid` | 35.7% | auditlog.go:147 |
-| `validateMax` | 41.7% | flags_validate.go:236 |
-| `writeAuditToFileOrWriter` | 44.4% | auditlog.go:124 |
-| `WithRangeArgs` | 50.0% | command_options.go:161 |
-| `SpinnerMiddlewareWithConfig` | 50.0% | spinner.go:93 |
-| `validateMin` | 50.0% | flags_validate.go:213 |
-| `validateMaxLen` | 55.6% | flags_validate.go:195 |
+| Function                      | Coverage | File                   |
+| ----------------------------- | -------- | ---------------------- |
+| `validateTagRules`            | 16.7%    | flags.go:195           |
+| `GenerateManPageCommand`      | 14.3%    | manpage.go:41          |
+| `applyNoColorIfSet`           | 25.0%    | cli.go:224             |
+| `isEnvSet`                    | 28.6%    | prompts.go:174         |
+| `writeAuditMermaid`           | 35.7%    | auditlog.go:147        |
+| `validateMax`                 | 41.7%    | flags_validate.go:236  |
+| `writeAuditToFileOrWriter`    | 44.4%    | auditlog.go:124        |
+| `WithRangeArgs`               | 50.0%    | command_options.go:161 |
+| `SpinnerMiddlewareWithConfig` | 50.0%    | spinner.go:93          |
+| `validateMin`                 | 50.0%    | flags_validate.go:213  |
+| `validateMaxLen`              | 55.6%    | flags_validate.go:195  |
 
 ### go.mod Replace Directives
 
@@ -123,28 +123,28 @@ cmdguard is in **excellent shape**. The library is production-ready with 404 pas
 
 ## c) NOT STARTED
 
-| # | Task | Category | Priority | Effort |
-|---|------|----------|----------|--------|
-| 1 | Tag go-output v0.9.0 and remove replace directives | Release | P0 | 30m |
-| 2 | Tag samber-do-auditlog v0.0.2 (commit html_templ.go) | Release | P0 | 15m |
-| 3 | Remove deprecated `OutputStyledTable` | Cleanup | P2 | 10m |
-| 4 | Fix prompt test coverage (0% → 80%+) | Testing | P1 | 2h |
-| 5 | Fix manpage test coverage (14% → 80%+) | Testing | P1 | 1h |
-| 6 | Fix auditlog write coverage (35-44% → 80%+) | Testing | P1 | 1h |
-| 7 | Duplicate `jsonLoader` unification | Refactor | P1 | 30m |
-| 8 | `RegisterTypeHandler`/`RegisterValidator` return errors instead of panic risk | Architecture | P2 | 1h |
-| 9 | Move `initNoColorFlag` out of cli_output.go | Cleanup | P3 | 5m |
-| 10 | Per-command middleware support | Feature | P1 | 2h |
-| 11 | Structured JSON error output for `--output=json` | Feature | P1 | 1h |
-| 12 | Plugin system for custom validators/type handlers | Feature | P3 | 4h |
-| 13 | Config file nested struct support | Feature | P3 | 4h |
-| 14 | Config auto-loading with koanf | Feature | P3 | 3h |
-| 15 | Advanced types: Result[T], Validated[T], branded IDs | Feature | P3 | 6h |
-| 16 | Extract flag-related code to `flagtags` library | Refactor | P3 | 4h |
-| 17 | Documentation generation command | Feature | P3 | 4h |
-| 18 | `MergeConfigs` zero-value blind spot (false/0/"" never override) | Fix | P2 | 1h |
-| 19 | Wrap `do.Provide` calls in recover() for no-panic guarantee | Architecture | P2 | 30m |
-| 20 | Remove unused sentinels in v3 (`ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs`) | Cleanup | P3 | 5m |
+| #   | Task                                                                            | Category     | Priority | Effort |
+| --- | ------------------------------------------------------------------------------- | ------------ | -------- | ------ |
+| 1   | Tag go-output v0.9.0 and remove replace directives                              | Release      | P0       | 30m    |
+| 2   | Tag samber-do-auditlog v0.0.2 (commit html_templ.go)                            | Release      | P0       | 15m    |
+| 3   | Remove deprecated `OutputStyledTable`                                           | Cleanup      | P2       | 10m    |
+| 4   | Fix prompt test coverage (0% → 80%+)                                            | Testing      | P1       | 2h     |
+| 5   | Fix manpage test coverage (14% → 80%+)                                          | Testing      | P1       | 1h     |
+| 6   | Fix auditlog write coverage (35-44% → 80%+)                                     | Testing      | P1       | 1h     |
+| 7   | Duplicate `jsonLoader` unification                                              | Refactor     | P1       | 30m    |
+| 8   | `RegisterTypeHandler`/`RegisterValidator` return errors instead of panic risk   | Architecture | P2       | 1h     |
+| 9   | Move `initNoColorFlag` out of cli_output.go                                     | Cleanup      | P3       | 5m     |
+| 10  | Per-command middleware support                                                  | Feature      | P1       | 2h     |
+| 11  | Structured JSON error output for `--output=json`                                | Feature      | P1       | 1h     |
+| 12  | Plugin system for custom validators/type handlers                               | Feature      | P3       | 4h     |
+| 13  | Config file nested struct support                                               | Feature      | P3       | 4h     |
+| 14  | Config auto-loading with koanf                                                  | Feature      | P3       | 3h     |
+| 15  | Advanced types: Result[T], Validated[T], branded IDs                            | Feature      | P3       | 6h     |
+| 16  | Extract flag-related code to `flagtags` library                                 | Refactor     | P3       | 4h     |
+| 17  | Documentation generation command                                                | Feature      | P3       | 4h     |
+| 18  | `MergeConfigs` zero-value blind spot (false/0/"" never override)                | Fix          | P2       | 1h     |
+| 19  | Wrap `do.Provide` calls in recover() for no-panic guarantee                     | Architecture | P2       | 30m    |
+| 20  | Remove unused sentinels in v3 (`ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs`) | Cleanup      | P3       | 5m     |
 
 ---
 
@@ -152,13 +152,13 @@ cmdguard is in **excellent shape**. The library is production-ready with 404 pas
 
 ### Nothing is "totally fucked up" — this is the honest assessment:
 
-| Issue | Severity | Details |
-|-------|----------|---------|
-| go.mod replace directives | **HIGH** | External consumers **cannot build** without local go-output/auditlog repos. Must tag upstream and remove before any release. |
-| Prompt functions untested | **MEDIUM** | `PromptString`, `PromptSelect`, `PromptConfirm` all at 0%. These interact with TTY via huh — need proper mocking strategy. |
-| `RegisterTypeHandler` panic risk | **LOW** | Global registry functions can panic (from `do.Provide` internally). Violates "zero panics" guarantee if called incorrectly. |
-| `validateEmail`/`validateURL` at 0% | **LOW** | Functions delegate to `ParseEmail()`/`ParseURL()` (which ARE tested), but the wrapper functions themselves have zero test coverage. Easy fix. |
-| Duplicate `jsonLoader` | **LOW** | Same struct+method in two packages (`config_file.go` and `configload/loader.go`). Dumb but harmless. |
+| Issue                               | Severity   | Details                                                                                                                                       |
+| ----------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| go.mod replace directives           | **HIGH**   | External consumers **cannot build** without local go-output/auditlog repos. Must tag upstream and remove before any release.                  |
+| Prompt functions untested           | **MEDIUM** | `PromptString`, `PromptSelect`, `PromptConfirm` all at 0%. These interact with TTY via huh — need proper mocking strategy.                    |
+| `RegisterTypeHandler` panic risk    | **LOW**    | Global registry functions can panic (from `do.Provide` internally). Violates "zero panics" guarantee if called incorrectly.                   |
+| `validateEmail`/`validateURL` at 0% | **LOW**    | Functions delegate to `ParseEmail()`/`ParseURL()` (which ARE tested), but the wrapper functions themselves have zero test coverage. Easy fix. |
+| Duplicate `jsonLoader`              | **LOW**    | Same struct+method in two packages (`config_file.go` and `configload/loader.go`). Dumb but harmless.                                          |
 
 ---
 
@@ -196,33 +196,33 @@ cmdguard is in **excellent shape**. The library is production-ready with 404 pas
 
 Sorted by **impact × effort** (highest first):
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | **Tag go-output v0.9.0, remove replace directives** | CRITICAL | 30m | Release |
-| 2 | **Tag samber-do-auditlog v0.0.2** | HIGH | 15m | Release |
-| 3 | **Cover 13 zero-coverage functions** (validators, options) | HIGH | 2h | Testing |
-| 4 | **Fix validateEmail/validateURL coverage** | HIGH | 30m | Testing |
-| 5 | **Fix prompt function coverage** (mock huh) | HIGH | 2h | Testing |
-| 6 | **Fix manpage coverage** (NewManPage, GenerateManPageCommand) | MEDIUM | 1h | Testing |
-| 7 | **Fix auditlog write coverage** (writeAuditToFileOrWriter, writeAuditMermaid) | MEDIUM | 1h | Testing |
-| 8 | **Unify duplicate jsonLoader** | MEDIUM | 30m | Refactor |
-| 9 | **Remove OutputStyledTable** (update taskctl first) | MEDIUM | 15m | Cleanup |
-| 10 | **Structured JSON error output** for `--output=json` | HIGH | 1h | Feature |
-| 11 | **Move initNoColorFlag** out of cli_output.go | LOW | 5m | Cleanup |
-| 12 | **Per-command middleware** support | HIGH | 2h | Feature |
-| 13 | **RenderOptions passthrough** (Title, GraphID, ColorMode) | MEDIUM | 1h | Feature |
-| 14 | **Wrap do.Provide in recover()** for no-panic guarantee | MEDIUM | 30m | Architecture |
-| 15 | **MergeConfigs zero-value fix** (false/0/"" never override) | MEDIUM | 1h | Fix |
-| 16 | **Consolidate testutil packages** | LOW | 1h | Cleanup |
-| 17 | **Fix applyNoColorIfSet coverage** (25%) | LOW | 30m | Testing |
-| 18 | **Fix validateTagRules coverage** (16.7%) | LOW | 30m | Testing |
-| 19 | **Fix WithRangeArgs coverage** (50%) | LOW | 15m | Testing |
-| 20 | **Fix SpinnerMiddlewareWithConfig coverage** (50%) | LOW | 30m | Testing |
-| 21 | **Plugin system for custom validators/type handlers** | HIGH | 4h | Feature |
-| 22 | **Config file nested struct support** | HIGH | 4h | Feature |
-| 23 | **Extract flagtags library** | MEDIUM | 4h | Refactor |
-| 24 | **Advanced types** (Result[T], Validated[T]) | MEDIUM | 6h | Feature |
-| 25 | **Documentation generation command** | LOW | 4h | Feature |
+| #   | Task                                                                          | Impact   | Effort | Category     |
+| --- | ----------------------------------------------------------------------------- | -------- | ------ | ------------ |
+| 1   | **Tag go-output v0.9.0, remove replace directives**                           | CRITICAL | 30m    | Release      |
+| 2   | **Tag samber-do-auditlog v0.0.2**                                             | HIGH     | 15m    | Release      |
+| 3   | **Cover 13 zero-coverage functions** (validators, options)                    | HIGH     | 2h     | Testing      |
+| 4   | **Fix validateEmail/validateURL coverage**                                    | HIGH     | 30m    | Testing      |
+| 5   | **Fix prompt function coverage** (mock huh)                                   | HIGH     | 2h     | Testing      |
+| 6   | **Fix manpage coverage** (NewManPage, GenerateManPageCommand)                 | MEDIUM   | 1h     | Testing      |
+| 7   | **Fix auditlog write coverage** (writeAuditToFileOrWriter, writeAuditMermaid) | MEDIUM   | 1h     | Testing      |
+| 8   | **Unify duplicate jsonLoader**                                                | MEDIUM   | 30m    | Refactor     |
+| 9   | **Remove OutputStyledTable** (update taskctl first)                           | MEDIUM   | 15m    | Cleanup      |
+| 10  | **Structured JSON error output** for `--output=json`                          | HIGH     | 1h     | Feature      |
+| 11  | **Move initNoColorFlag** out of cli_output.go                                 | LOW      | 5m     | Cleanup      |
+| 12  | **Per-command middleware** support                                            | HIGH     | 2h     | Feature      |
+| 13  | **RenderOptions passthrough** (Title, GraphID, ColorMode)                     | MEDIUM   | 1h     | Feature      |
+| 14  | **Wrap do.Provide in recover()** for no-panic guarantee                       | MEDIUM   | 30m    | Architecture |
+| 15  | **MergeConfigs zero-value fix** (false/0/"" never override)                   | MEDIUM   | 1h     | Fix          |
+| 16  | **Consolidate testutil packages**                                             | LOW      | 1h     | Cleanup      |
+| 17  | **Fix applyNoColorIfSet coverage** (25%)                                      | LOW      | 30m    | Testing      |
+| 18  | **Fix validateTagRules coverage** (16.7%)                                     | LOW      | 30m    | Testing      |
+| 19  | **Fix WithRangeArgs coverage** (50%)                                          | LOW      | 15m    | Testing      |
+| 20  | **Fix SpinnerMiddlewareWithConfig coverage** (50%)                            | LOW      | 30m    | Testing      |
+| 21  | **Plugin system for custom validators/type handlers**                         | HIGH     | 4h     | Feature      |
+| 22  | **Config file nested struct support**                                         | HIGH     | 4h     | Feature      |
+| 23  | **Extract flagtags library**                                                  | MEDIUM   | 4h     | Refactor     |
+| 24  | **Advanced types** (Result[T], Validated[T])                                  | MEDIUM   | 6h     | Feature      |
+| 25  | **Documentation generation command**                                          | LOW      | 4h     | Feature      |
 
 ---
 
@@ -233,6 +233,7 @@ Sorted by **impact × effort** (highest first):
 The go-output repo at `/home/lars/projects/go-output/` has all the new `TableDataMarshaler`, `AnyDataMarshaler`, `RenderTableData`, `RenderAnyData` APIs and sub-module `init()` registrations that cmdguard depends on. The samber-do-auditlog repo at `/home/lars/projects/samber-do-auditlog/` needs `html_templ.go` committed to the repo (currently gitignored).
 
 Without these tags:
+
 - cmdguard's `go.mod` has 10 local `replace` directives
 - No external consumer can build cmdguard
 - CI on GitHub will fail (no access to local paths)
@@ -243,38 +244,38 @@ This is the **single biggest blocker** for any public-facing work. I can prepare
 
 ## Metrics Dashboard
 
-| Metric | Value | Trend |
-|--------|-------|-------|
-| **Version** | v2.5.0 | — |
-| **Total tests** | 404 passing | ↑ from 385 |
-| **Coverage** | 85.9% | ↓ from 86.0% (new errors_audit.go untested) |
-| **Lint issues** | 0 | — |
-| **Race conditions** | 0 | — |
-| **Panics in library** | 0 | — |
-| **Production source lines** | ~8,800 | ↓ from ~9,000 |
-| **Test source lines** | ~13,800 | — |
-| **Source files** | 50 | +1 (errors_audit.go) |
-| **Exported functions** | ~120 | — |
-| **Sentinel errors** | 62 | — |
-| **Output formats** | 16 | — |
-| **Dependencies** | 14 direct | — |
-| **Replace directives** | 10 (blocking) | — |
-| **0% coverage functions** | 13 | — |
-| **Packages** | 6 | — |
+| Metric                      | Value         | Trend                                       |
+| --------------------------- | ------------- | ------------------------------------------- |
+| **Version**                 | v2.5.0        | —                                           |
+| **Total tests**             | 404 passing   | ↑ from 385                                  |
+| **Coverage**                | 85.9%         | ↓ from 86.0% (new errors_audit.go untested) |
+| **Lint issues**             | 0             | —                                           |
+| **Race conditions**         | 0             | —                                           |
+| **Panics in library**       | 0             | —                                           |
+| **Production source lines** | ~8,800        | ↓ from ~9,000                               |
+| **Test source lines**       | ~13,800       | —                                           |
+| **Source files**            | 50            | +1 (errors_audit.go)                        |
+| **Exported functions**      | ~120          | —                                           |
+| **Sentinel errors**         | 62            | —                                           |
+| **Output formats**          | 16            | —                                           |
+| **Dependencies**            | 14 direct     | —                                           |
+| **Replace directives**      | 10 (blocking) | —                                           |
+| **0% coverage functions**   | 13            | —                                           |
+| **Packages**                | 6             | —                                           |
 
 ---
 
 ## Coverage Heat Map (by package)
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| `pkg/cmdguard/v2` | 85.9% | Target: 90% |
-| `pkg/cmdguard/v2/configload` | 90.2% | ✅ |
-| `pkg/cmdguard/v2/testutil` | 55.2% | ⚠️ (helpers, low priority) |
-| `examples/taskctl` | 70.5% | ✅ (integration example) |
-| `pkg/testutil` | 0.0% | ⚠️ (shared panic helpers) |
-| `benchmarks` | — | N/A |
-| `tests/integration` | — | N/A |
+| Package                      | Coverage | Status                     |
+| ---------------------------- | -------- | -------------------------- |
+| `pkg/cmdguard/v2`            | 85.9%    | Target: 90%                |
+| `pkg/cmdguard/v2/configload` | 90.2%    | ✅                         |
+| `pkg/cmdguard/v2/testutil`   | 55.2%    | ⚠️ (helpers, low priority) |
+| `examples/taskctl`           | 70.5%    | ✅ (integration example)   |
+| `pkg/testutil`               | 0.0%     | ⚠️ (shared panic helpers)  |
+| `benchmarks`                 | —        | N/A                        |
+| `tests/integration`          | —        | N/A                        |
 
 ---
 
@@ -298,3 +299,119 @@ d0dee06 chore: improve error messages with structured context fields
 ---
 
 _Waiting for further instructions._
+
+---
+
+## Appendix A — Session 2026-06-11 (afternoon)
+
+**Date:** 2026-06-11 ~13:30  
+**Trigger:** Resumed interrupted session — Tasks 9, 10, 11, 14, 15, 16, 17
+
+### Tasks Completed
+
+| #   | Task                                             | Category     | Status  | Details                                                                                                   |
+| --- | ------------------------------------------------ | ------------ | ------- | --------------------------------------------------------------------------------------------------------- |
+| 9   | Structured JSON error output for `--output=json` | Feature      | ✅ DONE | `cli_errors_json.go` — typed JSON errors, Fang no-op handler, `--no-color` integration                    |
+| 10  | Per-command middleware support                   | Feature      | ✅ DONE | `WithCommandMiddleware[T,F]` option on commands                                                           |
+| 11  | Move `initNoColorFlag` out of cli_output.go      | Cleanup      | ✅ DONE | Moved to `cli.go`                                                                                         |
+| 14  | Config auto-loading with koanf                   | Feature      | ✅ DONE | `configload.NewKoanfLoader()` — YAML/JSON, nested struct flattening via `FlatPaths: true` + `Tag: "flag"` |
+| 15  | Wrap `do.Provide` in recover()                   | Architecture | ✅ DONE | `safeProvide()` helper converts panics → `ErrServiceRegistration` errors                                  |
+| 16  | MergeConfigs zero-value fix                      | Fix          | ✅ DONE | Removed `IsZero()` skip — false/0/"" now correctly override                                               |
+| 17  | Consolidate testutil packages                    | Cleanup      | ✅ DONE | Deleted `pkg/cmdguard/v2/testutil/`, inlined helpers into 2 importers                                     |
+
+### Key Changes by File
+
+| File                                          | Change                                                                       |
+| --------------------------------------------- | ---------------------------------------------------------------------------- |
+| `pkg/cmdguard/v2/cli_errors_json.go`          | **NEW** — Structured JSON error output when `--output=json`                  |
+| `pkg/cmdguard/v2/cli_errors_json_test.go`     | **NEW** — 18 tests for JSON error output                                     |
+| `pkg/cmdguard/v2/configload/koanf.go`         | **NEW** — KoanfLoader with nested config flattening                          |
+| `pkg/cmdguard/v2/configload/koanf_test.go`    | **NEW** — 15 tests covering YAML/JSON/nested/multi-path/expansion            |
+| `pkg/cmdguard/v2/scope.go`                    | Added `safeProvide()` — panic recovery for Provide/ProvideNamed/ProvideValue |
+| `pkg/cmdguard/v2/scope_provide_basic_test.go` | 3 tests for duplicate registration → error, not panic                        |
+| `pkg/cmdguard/v2/config.go`                   | Removed `IsZero()` skip in `mergeStruct()`                                   |
+| `pkg/cmdguard/v2/config_merge_test.go`        | Updated tests for zero-value override behavior                               |
+| `pkg/cmdguard/v2/testutil/`                   | **DELETED** — Consolidated into `pkg/testutil/`                              |
+| `pkg/cmdguard/v2/testhelpers_test.go`         | Inlined AddCommand (was delegating to deleted testutil)                      |
+| `tests/integration/v2_bdd_lifecycle_test.go`  | Inlined AddCommand                                                           |
+| `pkg/cmdguard/v2/cli.go`                      | Moved `initNoColorFlag` from cli_output.go; added command middleware wiring  |
+| `pkg/cmdguard/v2/cli_output.go`               | Removed `initNoColorFlag` (moved to cli.go)                                  |
+| `pkg/cmdguard/v2/output.go`                   | Removed unused code (from earlier session)                                   |
+| `.golangci.yml`                               | Added koanf dependencies to depguard allow list                              |
+| `go.mod` / `go.sum`                           | Added koanf v2.3.5 + parsers/file providers                                  |
+
+### Updated Metrics
+
+| Metric                    | Before | After | Change                                                          |
+| ------------------------- | ------ | ----- | --------------------------------------------------------------- |
+| **Total tests**           | 404    | 410   | +6 (koanf tests in configload; net after testutil deletion)     |
+| **Coverage (v2)**         | 85.9%  | 86.0% | +0.1%                                                           |
+| **Coverage (configload)** | 90.2%  | 87.5% | ↓ (koanf.go added, tests cover core paths but not all branches) |
+| **Lint issues**           | 0      | 0     | —                                                               |
+| **Race conditions**       | 0      | 0     | —                                                               |
+| **Panics in library**     | 0      | 0     | — (now includes Provide recovery)                               |
+| **Source files**          | 50     | 52    | +2 (koanf.go, cli_errors_json.go)                               |
+| **Dependencies**          | 14     | 17    | +3 (koanf/v2, koanf parsers/yaml, koanf parsers/json)           |
+| **Replace directives**    | 10     | 10    | — (unchanged)                                                   |
+
+### Updated NOT STARTED List
+
+Tasks completed this session removed from the list:
+
+| #   | Task                           | Old Status  | New Status |
+| --- | ------------------------------ | ----------- | ---------- |
+| 9   | Move `initNoColorFlag`         | NOT STARTED | ✅ DONE    |
+| 10  | Per-command middleware         | NOT STARTED | ✅ DONE    |
+| 11  | Structured JSON error output   | NOT STARTED | ✅ DONE    |
+| 14  | Config auto-loading with koanf | NOT STARTED | ✅ DONE    |
+| 15  | Wrap do.Provide in recover()   | NOT STARTED | ✅ DONE    |
+| 18  | MergeConfigs zero-value fix    | NOT STARTED | ✅ DONE    |
+| 19  | Consolidate testutil packages  | NOT STARTED | ✅ DONE    |
+
+Remaining NOT STARTED tasks (renumbered):
+
+| #   | Task                                                    | Category     | Priority | Effort |
+| --- | ------------------------------------------------------- | ------------ | -------- | ------ |
+| 1   | Tag go-output v0.9.0 and remove replace directives      | Release      | P0       | 30m    |
+| 2   | Tag samber-do-auditlog v0.0.2 (commit html_templ.go)    | Release      | P0       | 15m    |
+| 3   | Remove deprecated `OutputStyledTable`                   | Cleanup      | P2       | 10m    |
+| 4   | Fix prompt test coverage (0% → 80%+)                    | Testing      | P1       | 2h     |
+| 5   | Fix manpage test coverage (14% → 80%+)                  | Testing      | P1       | 1h     |
+| 6   | Fix auditlog write coverage (35-44% → 80%+)             | Testing      | P1       | 1h     |
+| 7   | Duplicate `jsonLoader` unification                      | Refactor     | P1       | 30m    |
+| 8   | `RegisterTypeHandler`/`RegisterValidator` return errors | Architecture | P2       | 1h     |
+| 9   | Plugin system for custom validators/type handlers       | Feature      | P3       | 4h     |
+| 10  | Extract flag-related code to `flagtags` library         | Refactor     | P3       | 4h     |
+| 11  | Documentation generation command                        | Feature      | P3       | 4h     |
+| 12  | Advanced types: Result[T], Validated[T], branded IDs    | Feature      | P3       | 6h     |
+| 13  | Remove unused sentinels in v3                           | Cleanup      | P3       | 5m     |
+
+### Updated "d) TOTALLY FUCKED UP"
+
+| Issue                               | Severity             | Change                               |
+| ----------------------------------- | -------------------- | ------------------------------------ |
+| go.mod replace directives           | **HIGH**             | Unchanged — still the #1 blocker     |
+| Prompt functions untested           | **MEDIUM**           | Unchanged                            |
+| `RegisterTypeHandler` panic risk    | ~~LOW~~ **RESOLVED** | Task 15 wrapped Provide in recover() |
+| `validateEmail`/`validateURL` at 0% | **LOW**              | Unchanged                            |
+| Duplicate `jsonLoader`              | **LOW**              | Unchanged                            |
+
+### Updated "e) WHAT WE SHOULD IMPROVE"
+
+Completed this session (removed from list):
+
+- ~~Per-command middleware~~ → ✅ DONE (Task 10)
+- ~~Structured error output~~ → ✅ DONE (Task 11)
+- ~~Testutil consolidation~~ → ✅ DONE (Task 17)
+- ~~Wrap do.Provide in recover()~~ → ✅ DONE (Task 15)
+- ~~MergeConfigs zero-value fix~~ → ✅ DONE (Task 16)
+
+### Uncommitted Changes
+
+All changes are in the working tree, ready to commit:
+
+```
+21 files changed, 1114 insertions(+), 372 deletions(-)
+```
+
+**Verification:** `go build ./...` ✅ · `go test ./... -race` ✅ (410 tests) · `golangci-lint run ./...` ✅ (0 issues) · `go mod tidy` ✅
