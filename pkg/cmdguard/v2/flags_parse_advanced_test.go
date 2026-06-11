@@ -43,9 +43,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
+		registerFlags(t, registry, cmd)
 
 		setFlag(t, cmd, "level", "invalid")
 
@@ -72,9 +70,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
+		registerFlags(t, registry, cmd)
 
 		setFlag(t, cmd, "mode", "invalid")
 
@@ -119,9 +115,7 @@ func TestFlagRegistry_ParseFlags_Advanced(t *testing.T) {
 		}
 
 		cmd := &cobra.Command{Use: "test"}
-		if err := registry.RegisterFlags(cmd); err != nil {
-			t.Fatalf("expected no error registering flags, got: %v", err)
-		}
+		registerFlags(t, registry, cmd)
 
 		setFlag(t, cmd, "format", "invalid")
 

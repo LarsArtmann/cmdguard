@@ -77,9 +77,7 @@ func TestPromptMissingCommandFlags_StringPrompt(t *testing.T) {
 		t.Fatalf("creating registry: %v", err)
 	}
 
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("registering flags: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	setFakePromptRunner(t, &fakePromptRunner{
 		stringResults: map[string]string{
@@ -112,9 +110,7 @@ func TestPromptMissingCommandFlags_SelectPrompt(t *testing.T) {
 		t.Fatalf("creating registry: %v", err)
 	}
 
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("registering flags: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	setFakePromptRunner(t, &fakePromptRunner{
 		selectResults: map[string]string{
@@ -147,9 +143,7 @@ func TestPromptMissingCommandFlags_ConfirmPrompt(t *testing.T) {
 		t.Fatalf("creating registry: %v", err)
 	}
 
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("registering flags: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	setFakePromptRunner(t, &fakePromptRunner{
 		confirmResults: map[string]bool{
@@ -182,9 +176,7 @@ func TestPromptMissingCommandFlags_SkipsWhenFlagChanged(t *testing.T) {
 		t.Fatalf("creating registry: %v", err)
 	}
 
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("registering flags: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	if err := cmd.Flags().Set("name", "Bob"); err != nil {
 		t.Fatalf("setting flag: %v", err)
@@ -218,9 +210,7 @@ func TestPromptMissingCommandFlags_SkipsNoPromptTag(t *testing.T) {
 		t.Fatalf("creating registry: %v", err)
 	}
 
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("registering flags: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	setFakePromptRunner(t, &fakePromptRunner{
 		stringResults: map[string]string{
@@ -254,9 +244,7 @@ func TestPromptMissingCommandFlags_ReturnsErrorOnPromptFailure(t *testing.T) {
 		t.Fatalf("creating registry: %v", err)
 	}
 
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("registering flags: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	promptErr := errors.New("user cancelled")
 	setFakePromptRunner(t, &fakePromptRunner{

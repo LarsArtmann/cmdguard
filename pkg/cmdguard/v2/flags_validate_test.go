@@ -15,9 +15,7 @@ func setupFlagTest[T any](t *testing.T, config T) (*FlagRegistry, *cobra.Command
 	}
 
 	cmd := &cobra.Command{Use: "test"}
-	if err := registry.RegisterFlags(cmd); err != nil {
-		t.Fatalf("expected no error registering flags, got: %v", err)
-	}
+	registerFlags(t, registry, cmd)
 
 	return registry, cmd
 }

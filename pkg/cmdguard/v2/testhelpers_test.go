@@ -4,7 +4,10 @@ import (
 	"context"
 	"testing"
 
+	auditlog "github.com/larsartmann/samber-do-auditlog"
+
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/testutil"
 )
 
 func newTestCLICommand[C any](t *testing.T, use string) v2.Command[C, v2.NoFlags] {
@@ -86,11 +89,42 @@ func testHostPortPortInt(t *testing.T, hp v2.HostPort, expected int) {
 }
 
 // addCommand registers a Command on a CLI and fails the test on error.
-// Centralizes the AddCommand fatal pattern used across v2_test files.
+// Delegates to testutil.AddCommand to keep the canonical helper in one place.
 func addCommand[T, F any](t *testing.T, cli *v2.CLI[T], cmd v2.Command[T, F]) {
 	t.Helper()
+	testutil.AddCommand(t, cli, cmd)
+}
 
-	if err := v2.AddCommand(cli, cmd); err != nil {
-		t.Fatalf("AddCommand failed: %v", err)
+// newTestCLI builds a CLI[testCLIConfig] with no options. Centralizes the
+// trivial "test", "Test", testCLIConfig{} + t.Fatalf pattern used across
+// cli_auditlog_test.go.
+func newTestCLI(t *testing.T) *v2.CLI[testCLIConfig] {
+	t.Helper()
+
+	cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+	if err != nil {
+		t.Fatalf("NewCLI failed: %v", err)
 	}
+
+	return cli
+}
+
+// newTestCLIWithAuditLog builds a CLI[testCLIConfig] with WithAuditLog(plugin).
+// Centralizes the NewCLI + WithAuditLog + t.Fatalf pattern used across
+// cli_auditlog_test.go.
+func newTestCLIWithAuditLog(
+	t *testing.T,
+	plugin *auditlog.Plugin,
+) *v2.CLI[testCLIConfig] {
+	t.Helper()
+
+	cli, err := v2.NewCLI[testCLIConfig](
+		"test", "Test", testCLIConfig{},
+		v2.WithAuditLog[testCLIConfig](plugin),
+	)
+	if err != nil {
+		t.Fatalf("NewCLI failed: %v", err)
+	}
+
+	return cli
 }

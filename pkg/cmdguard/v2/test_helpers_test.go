@@ -105,6 +105,16 @@ func registerAndParseFlags(
 	}
 }
 
+// registerFlags registers all flags in registry on cmd and fails the test on error.
+// Centralizes the RegisterFlags + t.Fatalf pattern for tests that don't set a flag value.
+func registerFlags(t *testing.T, registry *FlagRegistry, cmd *cobra.Command) {
+	t.Helper()
+
+	if err := registry.RegisterFlags(cmd); err != nil {
+		t.Fatalf("expected no error registering flags, got: %v", err)
+	}
+}
+
 func noOpHandler() func(context.Context, *testConfig, NoFlags) error {
 	return testutil.NoOpRunE[testConfig, NoFlags]
 }

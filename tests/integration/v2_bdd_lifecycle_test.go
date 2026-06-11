@@ -10,6 +10,7 @@ import (
 	"github.com/samber/do/v2"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	"github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/testutil"
 )
 
 const cmdRun = "run"
@@ -116,17 +117,14 @@ func execLifecycle(t *testing.T, cli *v2.CLI[lifecycleConfig], args ...string) {
 }
 
 // registerCommand adds a Command to a CLI and fails the test on error.
-// Centralizes the AddCommand fatal pattern used across the lifecycle BDD tests.
+// Delegates to testutil.AddCommand to keep the canonical helper in one place.
 func registerCommand[T, F any](
 	t *testing.T,
 	cli *v2.CLI[T],
 	cmd v2.Command[T, F],
 ) {
 	t.Helper()
-
-	if err := v2.AddCommand(cli, cmd); err != nil {
-		t.Fatalf("AddCommand: %v", err)
-	}
+	testutil.AddCommand(t, cli, cmd)
 }
 
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
@@ -163,9 +161,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			if err := cli.ExecuteWithArgs(context.Background(), []string{cmdRun}); err != nil {
 				t.Fatalf("Execute: %v", err)
@@ -209,9 +205,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			err = cli.ExecuteWithArgs(context.Background(), []string{"fail"})
 			if err == nil {
@@ -257,9 +251,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			err = cli.ExecuteWithArgs(context.Background(), []string{"prefail"})
 			if err == nil {
@@ -318,9 +310,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			execLifecycle(t, cli, "run")
 
@@ -363,9 +353,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			err = cli.ExecuteWithArgs(context.Background(), []string{"panic"})
 			if err == nil {
@@ -408,9 +396,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 
 			cmd := newLifecycleCmd(t, "timed", "Timed")
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			execLifecycle(t, cli, "timed")
 
@@ -473,9 +459,7 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			execLifecycle(t, cli, "query")
 
@@ -566,9 +550,7 @@ func TestCLI_ErrorChains(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			err = cli.ExecuteWithArgs(context.Background(), []string{"die"})
 			if err == nil {
@@ -748,9 +730,7 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 
 			parent := newLifecycleParentCmd(t, child, "Parent command")
 
-			if err := v2.AddCommand(cli, parent); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, parent)
 
 			execLifecycle(t, cli, "parent", "child")
 		},
@@ -811,9 +791,7 @@ func TestCLI_VersionCommand_Integration(t *testing.T) {
 				t.Fatalf("VersionCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, vCmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, vCmd)
 
 			var buf strings.Builder
 			cli.RootCommand().SetOut(&buf)
@@ -861,9 +839,7 @@ func TestCLI_FlowContext_Integration(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			execLifecycle(t, cli, "run")
 
@@ -934,9 +910,7 @@ func TestCLI_FlagTypes_Integration(t *testing.T) {
 				t.Fatalf("NewCommand: %v", err)
 			}
 
-			if err := v2.AddCommand(cli, cmd); err != nil {
-				t.Fatalf("AddCommand: %v", err)
-			}
+			registerCommand(t, cli, cmd)
 
 			err = cli.ExecuteWithArgs(context.Background(), []string{
 				"check",

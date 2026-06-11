@@ -29,13 +29,7 @@ func TestWithAuditLog(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		if cli.AuditLog() == nil {
 			t.Fatal("AuditLog() returned nil, expected the plugin")
@@ -49,10 +43,7 @@ func TestWithAuditLog(t *testing.T) {
 	t.Run("nil plugin leaves AuditLog nil", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLI(t)
 
 		if cli.AuditLog() != nil {
 			t.Error("AuditLog() should be nil when not configured")
@@ -64,15 +55,9 @@ func TestWithAuditLog(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
-		err = cli.ExecuteWithArgs(t.Context(), []string{})
+		err := cli.ExecuteWithArgs(t.Context(), []string{})
 		if err != nil {
 			t.Fatalf("Execute failed: %v", err)
 		}
@@ -90,10 +75,7 @@ func TestWithAuditLog(t *testing.T) {
 	t.Run("AuditLogReport returns nil when not enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLI(t)
 
 		if cli.AuditLogReport() != nil {
 			t.Error("AuditLogReport() should be nil when audit logging is not enabled")
@@ -105,13 +87,7 @@ func TestWithAuditLog(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		_ = cli.ExecuteWithArgs(t.Context(), []string{})
 
@@ -128,10 +104,7 @@ func TestWithAuditLog(t *testing.T) {
 	t.Run("RecordAuditHealthCheck returns nil when not enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLI(t)
 
 		results := cli.RecordAuditHealthCheck(t.Context())
 		if results != nil {
@@ -179,12 +152,9 @@ func TestAuditLogCommand(t *testing.T) {
 	t.Run("returns error when audit logging not enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLI(t)
 
-		_, err = v2.AuditLogCommand[testCLIConfig](cli)
+		_, err := v2.AuditLogCommand[testCLIConfig](cli)
 		if err == nil {
 			t.Fatal("expected error when audit logging not enabled")
 		}
@@ -195,13 +165,7 @@ func TestAuditLogCommand(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		auditCmd, err := v2.AuditLogCommand[testCLIConfig](cli)
 		if err != nil {
@@ -236,13 +200,7 @@ func TestAuditLogCommand(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		auditCmd, err := v2.AuditLogCommand[testCLIConfig](cli)
 		if err != nil {
@@ -278,13 +236,7 @@ func TestAuditLogCommand(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		auditCmd, err := v2.AuditLogCommand[testCLIConfig](cli)
 		if err != nil {
@@ -354,13 +306,7 @@ func TestAuditLogCommand(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		auditCmd, err := v2.AuditLogCommand[testCLIConfig](cli)
 		if err != nil {
@@ -383,13 +329,7 @@ func TestAuditLogCommand(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		auditCmd, err := v2.AuditLogCommand[testCLIConfig](
 			cli,
@@ -412,10 +352,7 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 	t.Run("AuditLogServiceByName returns nil when not enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLI(t)
 
 		svc := v2.AuditLogServiceByName(cli, "anything")
 		if svc != nil {
@@ -426,10 +363,7 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 	t.Run("AuditLogFailedServices returns nil when not enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLI(t)
 
 		failed := v2.AuditLogFailedServices(cli)
 		if failed != nil {
@@ -442,13 +376,7 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 
 		plugin := newTestPlugin()
 
-		cli, err := v2.NewCLI[testCLIConfig](
-			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-		)
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
+		cli := newTestCLIWithAuditLog(t, plugin)
 
 		_ = cli.ExecuteWithArgs(t.Context(), []string{})
 
