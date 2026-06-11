@@ -20,7 +20,7 @@ require (
 	github.com/larsartmann/go-output/plantuml v0.7.0
 	github.com/larsartmann/go-output/serialization v0.7.0
 	github.com/larsartmann/go-output/table v0.7.0
-	github.com/larsartmann/samber-do-auditlog v0.0.1
+	github.com/larsartmann/samber-do-auditlog v0.0.2
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
