@@ -241,3 +241,245 @@ func TestOutputResult_NilWriter(t *testing.T) {
 		testutil.AssertNoError(t, err)
 	})
 }
+
+func TestUnwrapTableData(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		data any
+		want bool
+	}{
+		{"pointer table data", output.NewTableData([]string{"X"}), true},
+		{"value table data", *output.NewTableData([]string{"X"}), true},
+		{"string", "hello", false},
+		{"nil", nil, false},
+		{"int", 42, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := unwrapTableData(tt.data)
+			if (result != nil) != tt.want {
+				t.Errorf("unwrapTableData(%T) returned nil=%v, want non-nil=%v", tt.data, result == nil, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatRegistry_Completeness(t *testing.T) {
+	t.Parallel()
+
+	expected := []OutputFormat{
+		FormatTable, FormatJSON, FormatCSV, FormatTSV, FormatMarkdown,
+		FormatXML, FormatD2, FormatYAML, FormatHTML, FormatTree,
+		FormatMermaid, FormatDOT, FormatJSONL, FormatAsciiDoc, FormatTOML,
+		FormatPlantUML,
+	}
+
+	for _, f := range expected {
+		t.Run(string(f), func(t *testing.T) {
+			t.Parallel()
+
+			_, ok := formatRegistry[f]
+			if !ok {
+				t.Errorf("formatRegistry missing entry for %q", f)
+			}
+		})
+	}
+}
+
+func TestTableRenderStrategy_RejectsNonTableData(t *testing.T) {
+	t.Parallel()
+
+	s := &tableRenderStrategy{label: "test", render: func(_ *output.TableData) (string, error) {
+		return "", nil
+	}}
+
+	var buf bytes.Buffer
+	err := s.Render(&buf, "not table data")
+	testutil.AssertExpectedError(t, err)
+	testutil.AssertErrorIs(t, err, ErrFormatRequiresTypedData)
+}
+
+func TestMarshalStrategy_RendersAnyData(t *testing.T) {
+	t.Parallel()
+
+	s := &marshalStrategy{label: "test", marshal: func(v any) ([]byte, error) {
+		return []byte(`{"ok":true}`), nil
+	}}
+
+	var buf bytes.Buffer
+	err := s.Render(&buf, struct{ X int }{X: 1})
+	testutil.AssertNoError(t, err)
+	testutil.AssertOutputContains(t, buf.String(), `"ok"`)
+}
+
+func TestMarshalStrategy_RendersTableData(t *testing.T) {
+	t.Parallel()
+
+	s := &marshalStrategy{label: "test", marshal: func(v any) ([]byte, error) {
+		return []byte(`marshaled`), nil
+	}}
+
+	var buf bytes.Buffer
+	data := output.NewTableData([]string{"H"})
+	data.AddRow([]string{"V"})
+
+	err := s.Render(&buf, data)
+	testutil.AssertNoError(t, err)
+	testutil.AssertOutputContains(t, buf.String(), "marshaled")
+}
+
+func TestDualStrategy_DelegatesToTable(t *testing.T) {
+	t.Parallel()
+
+	var tableCalled bool
+	tableStrategy := &tableRenderStrategy{label: "inner", render: func(_ *output.TableData) (string, error) {
+		tableCalled = true
+
+		return "table output", nil
+	}}
+	anyStrategy := &marshalStrategy{label: "inner", marshal: func(_ any) ([]byte, error) {
+		return []byte("any output"), nil
+	}}
+
+	s := &dualStrategy{table: tableStrategy, any: anyStrategy}
+	var buf bytes.Buffer
+	data := output.NewTableData([]string{"H"})
+
+	err := s.Render(&buf, data)
+	testutil.AssertNoError(t, err)
+	testutil.AssertBoolTrue(t, tableCalled, "tableCalled")
+}
+
+func TestDualStrategy_DelegatesToAny(t *testing.T) {
+	t.Parallel()
+
+	var anyCalled bool
+	tableStrategy := &tableRenderStrategy{label: "inner", render: func(_ *output.TableData) (string, error) {
+		return "table output", nil
+	}}
+	anyStrategy := &marshalStrategy{label: "inner", marshal: func(_ any) ([]byte, error) {
+		anyCalled = true
+
+		return []byte("any output"), nil
+	}}
+
+	s := &dualStrategy{table: tableStrategy, any: anyStrategy}
+	var buf bytes.Buffer
+
+	err := s.Render(&buf, "arbitrary data")
+	testutil.AssertNoError(t, err)
+	testutil.AssertBoolTrue(t, anyCalled, "anyCalled")
+}
+
+func TestStyledTableStrategy_RejectsNonTableData(t *testing.T) {
+	t.Parallel()
+
+	s := &styledTableStrategy{}
+	var buf bytes.Buffer
+
+	err := s.Render(&buf, "not table data")
+	testutil.AssertExpectedError(t, err)
+	testutil.AssertErrorIs(t, err, ErrFormatRequiresTypedData)
+}
+
+func TestCSVStrategy_RejectsNonTableData(t *testing.T) {
+	t.Parallel()
+
+	s := &csvStrategy{}
+	var buf bytes.Buffer
+
+	err := s.Render(&buf, 42)
+	testutil.AssertExpectedError(t, err)
+	testutil.AssertErrorIs(t, err, ErrFormatRequiresTypedData)
+}
+
+func TestOutputResult_UnsupportedFormat(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	cfg := OutputConfig{Format: OutputFormat("nonexistent"), Writer: &buf}
+
+	err := OutputResult(cfg, output.NewTableData([]string{"X"}))
+	testutil.AssertExpectedError(t, err)
+	testutil.AssertErrorIs(t, err, ErrUnsupportedFormat)
+}
+
+func TestOutputResult_AnyData_YAML(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	type Item struct {
+		Name string `yaml:"name"`
+	}
+
+	cfg := OutputConfig{Format: FormatYAML, Writer: &buf}
+	err := OutputResult(cfg, Item{Name: "YamlAny"})
+	testutil.AssertNoError(t, err)
+	testutil.AssertOutputContains(t, buf.String(), "YamlAny")
+}
+
+func TestOutputResult_AnyData_TOML(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	type Item struct {
+		Name string `toml:"name"`
+	}
+
+	cfg := OutputConfig{Format: FormatTOML, Writer: &buf}
+	err := OutputResult(cfg, Item{Name: "TomlAny"})
+	testutil.AssertNoError(t, err)
+	testutil.AssertOutputContains(t, buf.String(), "TomlAny")
+}
+
+func TestOutputResult_AnyData_JSON(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	type Item struct {
+		Name string `json:"name"`
+	}
+
+	cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
+	err := OutputResult(cfg, Item{Name: "JsonAny"})
+	testutil.AssertNoError(t, err)
+	testutil.AssertOutputContains(t, buf.String(), "JsonAny")
+}
+
+func TestOutputResult_TableOnlyFormats_RejectAnyData(t *testing.T) {
+	t.Parallel()
+
+	tableOnlyFormats := []OutputFormat{
+		FormatTable, FormatCSV, FormatTSV, FormatXML, FormatMarkdown,
+		FormatHTML, FormatTree, FormatD2, FormatMermaid, FormatDOT,
+		FormatJSONL, FormatAsciiDoc, FormatPlantUML,
+	}
+
+	for _, f := range tableOnlyFormats {
+		t.Run(string(f), func(t *testing.T) {
+			t.Parallel()
+
+			var buf bytes.Buffer
+			cfg := OutputConfig{Format: f, Writer: &buf}
+
+			err := OutputResult(cfg, "not table data")
+			testutil.AssertExpectedError(t, err)
+			testutil.AssertErrorIs(t, err, ErrFormatRequiresTypedData)
+		})
+	}
+}
+
+func TestFormatStrategy_Interface(t *testing.T) {
+	t.Parallel()
+
+	var _ FormatStrategy = &tableRenderStrategy{}
+	var _ FormatStrategy = &marshalStrategy{}
+	var _ FormatStrategy = &dualStrategy{}
+	var _ FormatStrategy = &styledTableStrategy{}
+	var _ FormatStrategy = &csvStrategy{}
+}

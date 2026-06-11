@@ -69,14 +69,12 @@ func OutputResult(cfg OutputConfig, data any) error {
 		cfg.Writer = os.Stdout
 	}
 
-	switch d := data.(type) {
-	case *output.TableData:
-		return renderTableData(cfg, d)
-	case output.TableData:
-		return renderTableData(cfg, &d)
-	default:
-		return renderAny(cfg, data)
+	strategy, ok := formatRegistry[cfg.Format]
+	if !ok {
+		return fmt.Errorf("%w: %s", ErrUnsupportedFormat, cfg.Format)
 	}
+
+	return strategy.Render(cfg.Writer, data)
 }
 
 // OutputTable is a convenience function to output table data with headers and rows.
@@ -109,20 +107,40 @@ func OutputStyledTable(headers []string, rows [][]string) error {
 	return nil
 }
 
-// tableRenderer renders a TableData to a writer.
-type tableRenderer func(w io.Writer, data *output.TableData) error
+// FormatStrategy renders data to a writer in a specific output format.
+type FormatStrategy interface {
+	Render(w io.Writer, data any) error
+}
 
-// renderMarshalFunc produces a string from any data (e.g., JSON, YAML, XML, TSV).
-type renderMarshalFunc func(data any) ([]byte, error)
+// unwrapTableData extracts *output.TableData from any, handling both pointer and value types.
+// Returns nil if data is not a TableData.
+func unwrapTableData(data any) *output.TableData {
+	switch d := data.(type) {
+	case *output.TableData:
+		return d
+	case output.TableData:
+		return &d
+	default:
+		return nil
+	}
+}
 
-// renderStringFunc produces a rendered string from TableData (e.g., via .Render()).
-type renderStringFunc func(data *output.TableData) (string, error)
+// tableRenderStrategy renders TableData to a writer via a string-producing function.
+// Returns ErrFormatRequiresTypedData for non-TableData input.
+type tableRenderStrategy struct {
+	label  string
+	render func(*output.TableData) (string, error)
+}
 
-// renderAndWrite calls fn to produce a string, then writes it to w.
-func renderAndWrite(w io.Writer, label string, data *output.TableData, fn renderStringFunc) error {
-	result, err := fn(data)
+func (s *tableRenderStrategy) Render(w io.Writer, data any) error {
+	td := unwrapTableData(data)
+	if td == nil {
+		return fmt.Errorf("%w: %s", ErrFormatRequiresTypedData, s.label)
+	}
+
+	result, err := s.render(td)
 	if err != nil {
-		return fmt.Errorf("rendering %s: %w", label, err)
+		return fmt.Errorf("rendering %s: %w", s.label, err)
 	}
 
 	fmt.Fprintln(w, result)
@@ -130,11 +148,16 @@ func renderAndWrite(w io.Writer, label string, data *output.TableData, fn render
 	return nil
 }
 
-// marshalAndWrite calls fn to produce bytes from data, then writes them to w.
-func marshalAndWrite(w io.Writer, label string, data any, fn renderMarshalFunc) error {
-	result, err := fn(data)
+// marshalStrategy renders any data (including TableData) to a writer via a marshal function.
+type marshalStrategy struct {
+	label   string
+	marshal func(any) ([]byte, error)
+}
+
+func (s *marshalStrategy) Render(w io.Writer, data any) error {
+	result, err := s.marshal(data)
 	if err != nil {
-		return fmt.Errorf("marshaling %s: %w", label, err)
+		return fmt.Errorf("marshaling %s: %w", s.label, err)
 	}
 
 	fmt.Fprintln(w, string(result))
@@ -142,121 +165,111 @@ func marshalAndWrite(w io.Writer, label string, data any, fn renderMarshalFunc) 
 	return nil
 }
 
-// tableFormatRegistry maps OutputFormat to rendering functions.
-var tableFormatRegistry = map[OutputFormat]tableRenderer{
-	output.FormatTable: renderTableStyled,
-	output.FormatCSV:   renderTableCSV,
-	output.FormatJSON: func(w io.Writer, data *output.TableData) error {
-		return marshalAndWrite(w, "JSON", data, serialization.MarshalJSON)
-	},
-	output.FormatTSV: func(w io.Writer, data *output.TableData) error {
-		return marshalAndWrite(w, "TSV", data, delimited.MarshalTSV)
-	},
-	output.FormatYAML: func(w io.Writer, data *output.TableData) error {
-		return marshalAndWrite(w, "YAML", data, serialization.MarshalYAML)
-	},
-	output.FormatXML: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "XML", data, func(d *output.TableData) (string, error) {
-			b, err := markup.MarshalXMLFromTableData(d)
+// dualStrategy delegates to different strategies for TableData vs arbitrary data.
+type dualStrategy struct {
+	table FormatStrategy
+	any   FormatStrategy
+}
+
+func (s *dualStrategy) Render(w io.Writer, data any) error {
+	if unwrapTableData(data) != nil {
+		return s.table.Render(w, data)
+	}
+
+	return s.any.Render(w, data)
+}
+
+// styledTableStrategy renders TableData as a styled terminal table via go-output/table.
+type styledTableStrategy struct{}
+
+func (s *styledTableStrategy) Render(w io.Writer, data any) error {
+	td := unwrapTableData(data)
+	if td == nil {
+		return fmt.Errorf("%w: table", ErrFormatRequiresTypedData)
+	}
+
+	return renderTableStyled(w, td)
+}
+
+// csvStrategy renders TableData as CSV via streaming writer.
+type csvStrategy struct{}
+
+func (s *csvStrategy) Render(w io.Writer, data any) error {
+	td := unwrapTableData(data)
+	if td == nil {
+		return fmt.Errorf("%w: csv", ErrFormatRequiresTypedData)
+	}
+
+	return renderTableCSV(w, td)
+}
+
+// formatRegistry maps OutputFormat to FormatStrategy implementations.
+var formatRegistry = map[OutputFormat]FormatStrategy{
+	output.FormatTable: &styledTableStrategy{},
+	output.FormatCSV:   &csvStrategy{},
+	output.FormatJSON: &dualStrategy{
+		table: &tableRenderStrategy{label: "JSON", render: func(d *output.TableData) (string, error) {
+			b, err := serialization.MarshalJSON(d)
 
 			return string(b), err
-		})
+		}},
+		any: &marshalStrategy{label: "JSON", marshal: func(v any) ([]byte, error) {
+			return output.MarshalJSONIndent(v, "", "  ")
+		}},
 	},
-	output.FormatMarkdown: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "markdown", data, func(d *output.TableData) (string, error) {
-			return output.NewMarkdownTableFromData(d).Render()
-		})
-	},
-	output.FormatHTML: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "HTML", data, func(d *output.TableData) (string, error) {
-			r := markup.NewHTMLRenderer()
-			r.SetData(d)
+	output.FormatTSV: &tableRenderStrategy{label: "TSV", render: func(d *output.TableData) (string, error) {
+		b, err := delimited.MarshalTSV(d)
 
-			return r.Render()
-		})
-	},
-	output.FormatTree: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "tree", data, func(d *output.TableData) (string, error) {
-			return output.TreeRendererFromTableData(d).Render()
-		})
-	},
-	output.FormatD2: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "D2", data, func(d *output.TableData) (string, error) {
-			return d2.D2FromTableData(d).Render()
-		})
-	},
-	output.FormatMermaid: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "Mermaid", data, func(d *output.TableData) (string, error) {
-			return graph.MermaidFromTableData(d).Render()
-		})
-	},
-	output.FormatDOT: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "DOT", data, func(d *output.TableData) (string, error) {
-			return graph.DOTFromTableData(d).Render()
-		})
-	},
-	output.FormatJSONL: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "JSONL", data, func(d *output.TableData) (string, error) {
-			b, err := serialization.MarshalJSONLFromTableData(d)
+		return string(b), err
+	}},
+	output.FormatYAML: &marshalStrategy{label: "YAML", marshal: serialization.MarshalYAML},
+	output.FormatXML: &tableRenderStrategy{label: "XML", render: func(d *output.TableData) (string, error) {
+		b, err := markup.MarshalXMLFromTableData(d)
 
-			return string(b), err
-		})
-	},
-	output.FormatAsciiDoc: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "AsciiDoc", data, func(d *output.TableData) (string, error) {
-			b, err := markup.MarshalAsciiDocFromTableData(d)
+		return string(b), err
+	}},
+	output.FormatMarkdown: &tableRenderStrategy{label: "markdown", render: func(d *output.TableData) (string, error) {
+		return output.NewMarkdownTableFromData(d).Render()
+	}},
+	output.FormatHTML: &tableRenderStrategy{label: "HTML", render: func(d *output.TableData) (string, error) {
+		r := markup.NewHTMLRenderer()
+		r.SetData(d)
 
-			return string(b), err
-		})
-	},
-	output.FormatTOML: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "TOML", data, func(d *output.TableData) (string, error) {
+		return r.Render()
+	}},
+	output.FormatTree: &tableRenderStrategy{label: "tree", render: func(d *output.TableData) (string, error) {
+		return output.TreeRendererFromTableData(d).Render()
+	}},
+	output.FormatD2: &tableRenderStrategy{label: "D2", render: func(d *output.TableData) (string, error) {
+		return d2.D2FromTableData(d).Render()
+	}},
+	output.FormatMermaid: &tableRenderStrategy{label: "Mermaid", render: func(d *output.TableData) (string, error) {
+		return graph.MermaidFromTableData(d).Render()
+	}},
+	output.FormatDOT: &tableRenderStrategy{label: "DOT", render: func(d *output.TableData) (string, error) {
+		return graph.DOTFromTableData(d).Render()
+	}},
+	output.FormatJSONL: &tableRenderStrategy{label: "JSONL", render: func(d *output.TableData) (string, error) {
+		b, err := serialization.MarshalJSONLFromTableData(d)
+
+		return string(b), err
+	}},
+	output.FormatAsciiDoc: &tableRenderStrategy{label: "AsciiDoc", render: func(d *output.TableData) (string, error) {
+		b, err := markup.MarshalAsciiDocFromTableData(d)
+
+		return string(b), err
+	}},
+	output.FormatTOML: &dualStrategy{
+		table: &tableRenderStrategy{label: "TOML", render: func(d *output.TableData) (string, error) {
 			b, err := serialization.MarshalTOMLFromTableData(d)
 
 			return string(b), err
-		})
+		}},
+		any: &marshalStrategy{label: "TOML", marshal: serialization.MarshalTOML},
 	},
-	output.FormatPlantUML: func(w io.Writer, data *output.TableData) error {
-		return renderAndWrite(w, "PlantUML", data, func(d *output.TableData) (string, error) {
-			return plantuml.PlantUMLFromTableData(d).Render()
-		})
-	},
-}
-
-// anyRenderer renders arbitrary data to a writer.
-type anyRenderer func(w io.Writer, data any) error
-
-// anyFormatRegistry maps OutputFormat to generic rendering functions.
-var anyFormatRegistry = map[OutputFormat]anyRenderer{
-	output.FormatJSON: func(w io.Writer, data any) error {
-		return marshalAndWrite(w, "JSON", data, func(v any) ([]byte, error) {
-			return output.MarshalJSONIndent(v, "", "  ")
-		})
-	},
-	output.FormatYAML: func(w io.Writer, data any) error {
-		return marshalAndWrite(w, "YAML", data, serialization.MarshalYAML)
-	},
-	output.FormatTOML: func(w io.Writer, data any) error {
-		return marshalAndWrite(w, "TOML", data, serialization.MarshalTOML)
-	},
-}
-
-func renderTableData(cfg OutputConfig, data *output.TableData) error {
-	renderer, ok := tableFormatRegistry[cfg.Format]
-	if !ok {
-		return fmt.Errorf("%w: %s", ErrUnsupportedFormat, cfg.Format)
-	}
-
-	return renderer(cfg.Writer, data)
-}
-
-func renderAny(cfg OutputConfig, data any) error {
-	renderer, ok := anyFormatRegistry[cfg.Format]
-	if !ok {
-		return fmt.Errorf("%w: %s", ErrFormatRequiresTypedData, cfg.Format)
-	}
-
-	return renderer(cfg.Writer, data)
+	output.FormatPlantUML: &tableRenderStrategy{label: "PlantUML", render: func(d *output.TableData) (string, error) {
+		return plantuml.PlantUMLFromTableData(d).Render()
+	}},
 }
 
 func renderTableStyled(w io.Writer, data *output.TableData) error {
