@@ -7,7 +7,6 @@ import (
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
-	"github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/testutil"
 )
 
 func newTestCLICommand[C any](t *testing.T, use string) v2.Command[C, v2.NoFlags] {
@@ -92,7 +91,10 @@ func testHostPortPortInt(t *testing.T, hp v2.HostPort, expected int) {
 // Delegates to testutil.AddCommand to keep the canonical helper in one place.
 func addCommand[T, F any](t *testing.T, cli *v2.CLI[T], cmd v2.Command[T, F]) {
 	t.Helper()
-	testutil.AddCommand(t, cli, cmd)
+
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand: %v", err)
+	}
 }
 
 // newTestCLI builds a CLI[testCLIConfig] with no options. Centralizes the

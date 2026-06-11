@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
@@ -218,6 +219,11 @@ func (cli *CLI[T]) applyGlamourIfEnabled() {
 	}
 }
 
+func (cli *CLI[T]) initNoColorFlag() {
+	cli.rootCmd.PersistentFlags().BoolVar(cli.noColorFlag, "no-color", false,
+		"Disable colored output (also respected via NO_COLOR env var)")
+}
+
 // applyNoColorIfSet temporarily sets NO_COLOR=1 around fang execution
 // if --no-color was passed. The original value is restored after execution
 // to avoid process-wide env mutation.
@@ -248,6 +254,19 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 	restoreNoColor := cli.applyNoColorIfSet()
 	defer restoreNoColor()
 
+	jsonErrors := cli.outputFormat != "" &&
+		(cli.outputFormat == FormatJSON || cli.outputFormat == FormatJSONL ||
+			cli.outputFormat == FormatYAML || cli.outputFormat == FormatTOML)
+
+	if jsonErrors {
+		cli.rootCmd.SilenceErrors = true
+		cli.rootCmd.SilenceUsage = true
+
+		if cli.useFang {
+			cli.fangOpts = append(cli.fangOpts, fang.WithErrorHandler(func(_ io.Writer, _ fang.Styles, _ error) {}))
+		}
+	}
+
 	if cli.signalHandling {
 		var cancel context.CancelFunc
 
@@ -275,6 +294,10 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 	}
 
 	if execErr != nil {
+		if cli.writeFormattedError(execErr) {
+			return fmt.Errorf("failed to execute CLI: %w", execErr)
+		}
+
 		return fmt.Errorf("failed to execute CLI: %w", execErr)
 	}
 

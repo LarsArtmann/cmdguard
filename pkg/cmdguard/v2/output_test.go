@@ -154,17 +154,6 @@ func TestOutputTable(t *testing.T) {
 	})
 }
 
-func TestOutputStyledTable(t *testing.T) {
-	t.Parallel()
-
-	t.Run("renders styled table", func(t *testing.T) {
-		t.Parallel()
-
-		err := OutputStyledTable([]string{"Col1"}, [][]string{{"data"}})
-		testutil.AssertNoError(t, err)
-	})
-}
-
 func TestOutputResult_NilData(t *testing.T) {
 	t.Parallel()
 

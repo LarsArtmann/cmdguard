@@ -7,7 +7,7 @@
 //   - PreRunE validation and PostRunE cleanup
 //   - Middleware (spinner + timing + recovery)
 //   - Glamour markdown help rendering (WithGlamourHelpTheme)
-//   - Rich output in multiple formats (OutputTable, OutputStyledTable)
+//   - Rich output in multiple formats (OutputTable, OutputResult)
 //   - Command groups (WithGroup)
 //   - Subcommands via NewParentCommand
 //   - Error handling with typed errors and exit codes

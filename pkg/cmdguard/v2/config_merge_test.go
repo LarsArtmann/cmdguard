@@ -39,13 +39,13 @@ func TestMergeConfigs(t *testing.T) {
 		}
 
 		base := &TestConfig{Name: "base", Count: 10}
-		override := &TestConfig{Name: "override", Count: 0} // Zero value won't override
+		override := &TestConfig{Name: "override", Count: 0}
 
 		result := MergeConfigs(base, override)
 		testutil.AssertNotNil(t, result)
 
 		testutil.AssertFieldEqString(t, result.Name, "override", "Name")
-		testutil.AssertFieldEq(t, result.Count, 10, "Count")
+		testutil.AssertFieldEq(t, result.Count, 0, "Count")
 	})
 
 	t.Run("nil base config", func(t *testing.T) {
@@ -97,10 +97,10 @@ func TestMergeConfigs(t *testing.T) {
 		testutil.AssertNotNil(t, result)
 
 		testutil.AssertFieldEqString(t, result.Inner.Value, "override-inner", "Inner.Value")
-		testutil.AssertFieldEqString(t, result.Name, "base", "Name")
+		testutil.AssertFieldEqString(t, result.Name, "", "Name")
 	})
 
-	t.Run("multiple configs", func(t *testing.T) {
+	t.Run("multiple configs — later overrides earlier", func(t *testing.T) {
 		t.Parallel()
 
 		type TestConfig struct {
@@ -109,15 +109,15 @@ func TestMergeConfigs(t *testing.T) {
 			C string
 		}
 
-		first := &TestConfig{A: "a1"}
-		second := &TestConfig{B: "b2"}
-		third := &TestConfig{C: "c3"}
+		first := &TestConfig{A: "a1", B: "b1", C: "c1"}
+		second := &TestConfig{A: "a2", B: "b2", C: ""}
+		third := &TestConfig{A: "a3", B: "", C: "c3"}
 
 		result := MergeConfigs(first, second, third)
 		testutil.AssertNotNil(t, result)
 
-		testutil.AssertFieldEqString(t, result.A, "a1", "A")
-		testutil.AssertFieldEqString(t, result.B, "b2", "B")
+		testutil.AssertFieldEqString(t, result.A, "a3", "A")
+		testutil.AssertFieldEqString(t, result.B, "", "B")
 		testutil.AssertFieldEqString(t, result.C, "c3", "C")
 	})
 
@@ -209,5 +209,69 @@ func TestMergeConfigs(t *testing.T) {
 			"original",
 			"base pointer target should not be mutated",
 		)
+	})
+}
+
+func TestMergeConfigs_ZeroValueOverride(t *testing.T) {
+	t.Parallel()
+
+	t.Run("false overrides true", func(t *testing.T) {
+		t.Parallel()
+
+		type Cfg struct {
+			Enabled bool
+		}
+
+		base := &Cfg{Enabled: true}
+		override := &Cfg{Enabled: false}
+
+		result := MergeConfigs(base, override)
+
+		testutil.AssertFieldEq(t, result.Enabled, false, "Enabled")
+	})
+
+	t.Run("0 overrides non-zero int", func(t *testing.T) {
+		t.Parallel()
+
+		type Cfg struct {
+			Port int
+		}
+
+		base := &Cfg{Port: 8080}
+		override := &Cfg{Port: 0}
+
+		result := MergeConfigs(base, override)
+
+		testutil.AssertFieldEq(t, result.Port, 0, "Port")
+	})
+
+	t.Run("empty string overrides non-empty", func(t *testing.T) {
+		t.Parallel()
+
+		type Cfg struct {
+			Name string
+		}
+
+		base := &Cfg{Name: "production"}
+		override := &Cfg{Name: ""}
+
+		result := MergeConfigs(base, override)
+
+		testutil.AssertFieldEqString(t, result.Name, "", "Name")
+	})
+
+	t.Run("zero float overrides non-zero", func(t *testing.T) {
+		t.Parallel()
+
+		type Cfg struct {
+			Rate float64
+		}
+
+		base := &Cfg{Rate: 3.14}
+		override := &Cfg{Rate: 0.0}
+
+		result := MergeConfigs(base, override)
+
+		testutil.AssertFieldEq(t, result.Rate, 0.0, "Rate")
 	})
 }

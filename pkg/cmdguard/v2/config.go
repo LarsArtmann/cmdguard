@@ -105,8 +105,8 @@ func validateTagWithRegistry(v reflect.Value, tag FlagTag, vr *validatorRegistry
 }
 
 // MergeConfigs merges multiple config sources.
-// Later configs override earlier ones.
-// The returned config is a deep copy; input configs are not mutated.
+// Later configs override earlier ones, including zero-valued fields
+// (false, 0, ""). The returned config is a deep copy; input configs are not mutated.
 func MergeConfigs[T any](configs ...*T) *T {
 	if len(configs) == 0 {
 		return nil
@@ -193,21 +193,16 @@ func deepCopyValue(dst, src reflect.Value) {
 	}
 }
 
-// mergeStruct merges non-zero fields from src into dst.
-// Zero values are skipped — this means false/0/"" in the override config
-// will NOT overwrite non-zero values in the base config.
-// This is intentional for flag/config merging where zero means "not set by user".
-// For explicit zero-value overrides, set the field directly instead of using MergeConfigs.
+// mergeStruct merges all fields from src into dst.
+// Zero values (false, 0, "") in src override dst values, because
+// in config merging an explicit zero is intentional.
+// Nested structs are merged recursively.
 func mergeStruct(dst, src reflect.Value) {
 	for i := range dst.NumField() {
 		dstField := dst.Field(i)
 		srcField := src.Field(i)
 
 		if !dstField.CanSet() {
-			continue
-		}
-
-		if srcField.IsZero() {
 			continue
 		}
 

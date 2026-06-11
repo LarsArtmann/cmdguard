@@ -10,7 +10,7 @@ import (
 	"github.com/samber/do/v2"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
-	"github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/testutil"
+	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
 const cmdRun = "run"
@@ -124,14 +124,16 @@ func execLifecycle(t *testing.T, cli *v2.CLI[lifecycleConfig], args ...string) {
 }
 
 // registerCommand adds a Command to a CLI and fails the test on error.
-// Delegates to testutil.AddCommand to keep the canonical helper in one place.
 func registerCommand[T, F any](
 	t *testing.T,
 	cli *v2.CLI[T],
 	cmd v2.Command[T, F],
 ) {
 	t.Helper()
-	testutil.AddCommand(t, cli, cmd)
+
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand: %v", err)
+	}
 }
 
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {

@@ -86,43 +86,61 @@ func (s *Scope) RootScope() *Scope {
 	return current
 }
 
+// safeProvide calls fn with panic recovery, returning an error on panic.
+// This ensures the zero-panic guarantee holds even when samber/do panics
+// on duplicate registrations.
+func safeProvide(fn func(), context string) error {
+	var panicVal any
+
+	func() {
+		defer func() {
+			panicVal = recover()
+		}()
+
+		fn()
+	}()
+
+	if panicVal == nil {
+		return nil
+	}
+
+	return fmt.Errorf("%w: %s: %v", ErrServiceRegistration, context, panicVal)
+}
+
 // Provide registers a service provider in this scope.
 // The provider is invoked lazily on first Invoke call.
-// Returns an error only if scope is nil.
+// Returns an error if scope is nil or if registration panics (e.g. duplicate service).
 func Provide[T any](scope *Scope, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil, provider=%T", ErrInvalidScope, provider)
 	}
 
-	do.Provide(scope.injector, provider)
-
-	return nil
+	return safeProvide(func() { do.Provide(scope.injector, provider) },
+		fmt.Sprintf("Provide[%T]", provider))
 }
 
 // ProvideNamed registers a named service provider in this scope.
 // Use this when you need to register multiple implementations of the same interface.
-// Returns an error only if scope is nil.
+// Returns an error if scope is nil or if registration panics (e.g. duplicate service).
 func ProvideNamed[T any](scope *Scope, name string, provider func(do.Injector) (T, error)) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil, name=%q, provider=%T", ErrInvalidScope, name, provider)
 	}
 
-	do.ProvideNamed(scope.injector, name, provider)
-
-	return nil
+	return safeProvide(func() { do.ProvideNamed(scope.injector, name, provider) },
+		fmt.Sprintf("ProvideNamed[%T](%q)", provider, name))
 }
 
 // ProvideValue registers a value directly in this scope.
 // Useful for registering already-constructed services.
-// Returns an error only if scope is nil.
+// Returns an error if scope is nil or if registration panics (e.g. duplicate service).
 func ProvideValue[T any](scope *Scope, value T) error {
 	if scope == nil {
 		return fmt.Errorf("%w: scope is nil, value type=%T", ErrInvalidScope, value)
 	}
 
-	do.ProvideValue(scope.injector, value)
-
-	return nil
+	return safeProvide(func() { do.ProvideValue(scope.injector, value) },
+		fmt.Sprintf("ProvideValue[%T]", value))
 }
 
 // Invoke retrieves a service from the scope.

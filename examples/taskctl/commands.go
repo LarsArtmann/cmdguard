@@ -173,7 +173,7 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		return err
 	}
 
-	// --- stats: OutputStyledTable for terminal-pretty output ---
+	// --- stats: OutputTable for terminal output ---
 	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags](
 		"stats",
 		func(_ context.Context, _ *AppConfig, _ *StatsFlags) error {

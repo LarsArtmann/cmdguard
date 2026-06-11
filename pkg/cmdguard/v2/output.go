@@ -13,7 +13,7 @@ import (
 	_ "github.com/larsartmann/go-output/markup"
 	_ "github.com/larsartmann/go-output/plantuml"
 	_ "github.com/larsartmann/go-output/serialization"
-	"github.com/larsartmann/go-output/table"
+	_ "github.com/larsartmann/go-output/table"
 )
 
 // OutputFormat is a type-safe output format enum.
@@ -113,27 +113,6 @@ func OutputTable(format OutputFormat, headers []string, rows [][]string) error {
 	}
 
 	return OutputResult(OutputConfig{Format: format}, data)
-}
-
-// OutputStyledTable renders a styled terminal table using lipgloss.
-//
-// Deprecated: use OutputResult(OutputConfig{Format: FormatTable}, data) instead.
-func OutputStyledTable(headers []string, rows [][]string) error {
-	t := table.New()
-	t.SetHeaders(headers...)
-
-	for _, row := range rows {
-		t.AddRow(row...)
-	}
-
-	result, err := t.Render()
-	if err != nil {
-		return fmt.Errorf("rendering styled table: %w", err)
-	}
-
-	fmt.Fprintln(os.Stdout, result)
-
-	return nil
 }
 
 // SupportedFormats returns all output formats supported by the current configuration.

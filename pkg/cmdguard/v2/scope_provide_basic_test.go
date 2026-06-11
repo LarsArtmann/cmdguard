@@ -191,3 +191,63 @@ func TestInvoke(t *testing.T) {
 		}
 	})
 }
+
+func TestProvide_NoPanicOnDuplicate(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Provide returns error instead of panicking on duplicate", func(t *testing.T) {
+		t.Parallel()
+
+		scope := NewScope("test")
+
+		err := Provide(scope, func(_ do.Injector) (string, error) {
+			return "first", nil
+		})
+		testutil.AssertNoError(t, err)
+
+		err = Provide(scope, func(_ do.Injector) (string, error) {
+			return "second", nil
+		})
+		if err == nil {
+			t.Fatal("expected error for duplicate Provide, got nil")
+		}
+
+		assertErrorContains(t, err, "service registration failed")
+	})
+
+	t.Run("ProvideNamed returns error instead of panicking on duplicate", func(t *testing.T) {
+		t.Parallel()
+
+		scope := NewScope("test")
+
+		err := ProvideNamed(scope, "svc", func(_ do.Injector) (string, error) {
+			return "first", nil
+		})
+		testutil.AssertNoError(t, err)
+
+		err = ProvideNamed(scope, "svc", func(_ do.Injector) (string, error) {
+			return "second", nil
+		})
+		if err == nil {
+			t.Fatal("expected error for duplicate ProvideNamed, got nil")
+		}
+
+		assertErrorContains(t, err, "service registration failed")
+	})
+
+	t.Run("ProvideValue returns error instead of panicking on duplicate", func(t *testing.T) {
+		t.Parallel()
+
+		scope := NewScope("test")
+
+		err := ProvideValue(scope, 42)
+		testutil.AssertNoError(t, err)
+
+		err = ProvideValue(scope, 99)
+		if err == nil {
+			t.Fatal("expected error for duplicate ProvideValue, got nil")
+		}
+
+		assertErrorContains(t, err, "service registration failed")
+	})
+}

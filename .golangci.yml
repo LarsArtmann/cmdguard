@@ -186,6 +186,10 @@ linters:
             - go.opentelemetry.io/otel/codes
             - go.opentelemetry.io/otel/trace
             - github.com/go-faster/yaml
+            - github.com/knadh/koanf/v2
+            - github.com/knadh/koanf/parsers/json
+            - github.com/knadh/koanf/parsers/yaml
+            - github.com/knadh/koanf/providers/file
             - golang.org/x/term
             - go.opentelemetry.io/otel/attribute
             - $all
