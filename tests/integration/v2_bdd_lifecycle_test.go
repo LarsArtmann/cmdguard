@@ -94,10 +94,17 @@ func lifecycleErrHandler(err error) func(
 func newLifecycleStrictCLI(t *testing.T) *v2.CLI[lifecycleConfig] {
 	t.Helper()
 
+	return newLifecycleCLI(t, "strict", v2.WithStrictValidation[lifecycleConfig]())
+}
+
+// newLifecycleCLI builds a basic CLI with the given name and options.
+// Centralizes the standard "NewCLI + WithFang(false)" boilerplate.
+func newLifecycleCLI(t *testing.T, name string, opts ...v2.CLIOption[lifecycleConfig]) *v2.CLI[lifecycleConfig] {
+	t.Helper()
+
 	cli, err := v2.NewCLI[lifecycleConfig](
-		"strict", "Test", lifecycleConfig{},
-		v2.WithFang[lifecycleConfig](false),
-		v2.WithStrictValidation[lifecycleConfig](),
+		name, "Test", lifecycleConfig{},
+		append([]v2.CLIOption[lifecycleConfig]{v2.WithFang[lifecycleConfig](false)}, opts...)...,
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
@@ -138,13 +145,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			var order []string
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"lifecycle", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "lifecycle")
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				cmdRun,
@@ -187,13 +188,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			var postRunCalled bool
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"lifecycle", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "lifecycle")
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"fail",
@@ -226,13 +221,7 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			var handlerCalled, postRunCalled bool
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"lifecycle", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "lifecycle")
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"prefail",
@@ -292,14 +281,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				}
 			}
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"mw", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-				v2.WithMiddleware[lifecycleConfig](trackingMW("mw1"), trackingMW("mw2")),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "mw", v2.WithMiddleware[lifecycleConfig](trackingMW("mw1"), trackingMW("mw2")))
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"run",
@@ -333,14 +315,11 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"recover", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
+			cli := newLifecycleCLI(
+				t,
+				"recover",
 				v2.WithMiddleware[lifecycleConfig](v2.RecoveryMiddleware[lifecycleConfig]()),
 			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"panic",
@@ -385,14 +364,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				},
 			)
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"timing", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-				v2.WithMiddleware[lifecycleConfig](timingMW),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "timing", v2.WithMiddleware[lifecycleConfig](timingMW))
 
 			cmd := newLifecycleCmd(t, "timed", "Timed")
 
@@ -424,18 +396,11 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 				DSN string
 			}
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"di", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "di")
 
-			err = v2.Provide(cli.Scope(), func(_ do.Injector) (*Database, error) {
+			if err := v2.Provide(cli.Scope(), func(_ do.Injector) (*Database, error) {
 				return &Database{DSN: "postgres://localhost:5432"}, nil
-			})
-			if err != nil {
+			}); err != nil {
 				t.Fatalf("Provide: %v", err)
 			}
 
@@ -475,18 +440,11 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"di-child", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "di-child")
 
 			childScope := cli.Scope().Child("plugin")
 
-			err = v2.ProvideValue(childScope, "child-service-value")
-			if err != nil {
+			if err := v2.ProvideValue(childScope, "child-service-value"); err != nil {
 				t.Fatalf("ProvideValue: %v", err)
 			}
 
@@ -529,13 +487,7 @@ func TestCLI_ErrorChains(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"exit", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "exit")
 
 			cmd, err := v2.NewCommand[lifecycleConfig, v2.NoFlags](
 				"die",
@@ -777,14 +729,7 @@ func TestCLI_VersionCommand_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"myapp", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-				v2.WithCLIVersion[lifecycleConfig]("3.14.0"),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "myapp", v2.WithCLIVersion[lifecycleConfig]("3.14.0"))
 
 			vCmd, err := v2.VersionCommand[lifecycleConfig](cli)
 			if err != nil {
@@ -815,13 +760,7 @@ func TestCLI_FlowContext_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"flow", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "flow")
 
 			var flowCtxPresent bool
 
@@ -886,13 +825,7 @@ func TestCLI_FlagTypes_Integration(t *testing.T) {
 				Enabled bool    `flag:"enabled" default:"false" help:"Enabled"`
 			}
 
-			cli, err := v2.NewCLI[lifecycleConfig](
-				"flags", "Test", lifecycleConfig{},
-				v2.WithFang[lifecycleConfig](false),
-			)
-			if err != nil {
-				t.Fatalf("NewCLI: %v", err)
-			}
+			cli := newLifecycleCLI(t, "flags")
 
 			var parsedFlags *allTypesFlags
 

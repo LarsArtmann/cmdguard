@@ -71,141 +71,102 @@ func TestDefaultOutputConfig(t *testing.T) {
 func TestOutputResult_TableData(t *testing.T) {
 	t.Parallel()
 
-	t.Run("table format renders table data", func(t *testing.T) {
-		t.Parallel()
+	tests := []struct {
+		name       string
+		format     output.Format
+		headers    []string
+		row        []string
+		mustHave   []string
+		errMessage string
+	}{
+		{
+			name:       "table format renders table data",
+			format:     FormatTable,
+			headers:    []string{"Name", "Age"},
+			row:        []string{"Alice", "30"},
+			mustHave:   []string{"Name", "Alice"},
+			errMessage: "table output missing expected content",
+		},
+		{
+			name:       "json format renders table data",
+			format:     FormatJSON,
+			headers:    []string{"Name"},
+			row:        []string{"Bob"},
+			mustHave:   []string{"Bob"},
+			errMessage: "json output missing 'Bob'",
+		},
+		{
+			name:       "csv format renders table data",
+			format:     FormatCSV,
+			headers:    []string{"Name"},
+			row:        []string{"Eve"},
+			mustHave:   []string{"Eve"},
+			errMessage: "csv output missing 'Eve'",
+		},
+		{
+			name:       "yaml format renders table data",
+			format:     FormatYAML,
+			headers:    []string{"Name"},
+			row:        []string{"Yaml"},
+			mustHave:   []string{"Yaml"},
+			errMessage: "yaml output missing 'Yaml'",
+		},
+		{
+			name:       "jsonl format renders table data",
+			format:     FormatJSONL,
+			headers:    []string{"Name"},
+			row:        []string{"JsonlUser"},
+			mustHave:   []string{"JsonlUser"},
+			errMessage: "jsonl output missing 'JsonlUser'",
+		},
+		{
+			name:       "asciidoc format renders table data",
+			format:     FormatAsciiDoc,
+			headers:    []string{"Name"},
+			row:        []string{"AsciiDocUser"},
+			mustHave:   []string{"AsciiDocUser"},
+			errMessage: "asciidoc output missing 'AsciiDocUser'",
+		},
+		{
+			name:       "toml format renders table data",
+			format:     FormatTOML,
+			headers:    []string{"Name"},
+			row:        []string{"TomlUser"},
+			mustHave:   []string{"TomlUser"},
+			errMessage: "toml output missing 'TomlUser'",
+		},
+		{
+			name:       "plantuml format renders table data",
+			format:     FormatPlantUML,
+			headers:    []string{"Name"},
+			row:        []string{"PlantUMLUser"},
+			mustHave:   []string{"PlantUMLUser"},
+			errMessage: "plantuml output missing 'PlantUMLUser'",
+		},
+	}
 
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name", "Age"})
-		data.AddRow([]string{"Alice", "30"})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-		cfg := OutputConfig{Format: FormatTable, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
+			var buf bytes.Buffer
+			data := output.NewTableData(tt.headers)
+			data.AddRow(tt.row)
 
-		result := buf.String()
-		if !strings.Contains(result, "Name") || !strings.Contains(result, "Alice") {
-			t.Errorf("table output missing expected content: %q", result)
-		}
-	})
+			cfg := OutputConfig{Format: tt.format, Writer: &buf}
+			err := OutputResult(cfg, data)
+			testutil.AssertNoError(t, err)
 
-	t.Run("json format renders table data", func(t *testing.T) {
-		t.Parallel()
+			result := buf.String()
+			for _, want := range tt.mustHave {
+				if !strings.Contains(result, want) {
+					t.Errorf("%s: %q", tt.errMessage, result)
 
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"Bob"})
-
-		cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "Bob") {
-			t.Errorf("json output missing 'Bob': %q", result)
-		}
-	})
-
-	t.Run("csv format renders table data", func(t *testing.T) {
-		t.Parallel()
-
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"Eve"})
-
-		cfg := OutputConfig{Format: FormatCSV, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "Eve") {
-			t.Errorf("csv output missing 'Eve': %q", result)
-		}
-	})
-
-	t.Run("yaml format renders table data", func(t *testing.T) {
-		t.Parallel()
-
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"Yaml"})
-
-		cfg := OutputConfig{Format: FormatYAML, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "Yaml") {
-			t.Errorf("yaml output missing 'Yaml': %q", result)
-		}
-	})
-
-	t.Run("jsonl format renders table data", func(t *testing.T) {
-		t.Parallel()
-
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"JsonlUser"})
-
-		cfg := OutputConfig{Format: FormatJSONL, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "JsonlUser") {
-			t.Errorf("jsonl output missing 'JsonlUser': %q", result)
-		}
-	})
-
-	t.Run("asciidoc format renders table data", func(t *testing.T) {
-		t.Parallel()
-
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"AsciiDocUser"})
-
-		cfg := OutputConfig{Format: FormatAsciiDoc, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "AsciiDocUser") {
-			t.Errorf("asciidoc output missing 'AsciiDocUser': %q", result)
-		}
-	})
-
-	t.Run("toml format renders table data", func(t *testing.T) {
-		t.Parallel()
-
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"TomlUser"})
-
-		cfg := OutputConfig{Format: FormatTOML, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "TomlUser") {
-			t.Errorf("toml output missing 'TomlUser': %q", result)
-		}
-	})
-
-	t.Run("plantuml format renders table data", func(t *testing.T) {
-		t.Parallel()
-
-		var buf bytes.Buffer
-		data := output.NewTableData([]string{"Name"})
-		data.AddRow([]string{"PlantUMLUser"})
-
-		cfg := OutputConfig{Format: FormatPlantUML, Writer: &buf}
-		err := OutputResult(cfg, data)
-		testutil.AssertNoError(t, err)
-
-		result := buf.String()
-		if !strings.Contains(result, "PlantUMLUser") {
-			t.Errorf("plantuml output missing 'PlantUMLUser': %q", result)
-		}
-	})
+					break
+				}
+			}
+		})
+	}
 }
 
 func TestOutputResult_AnyData(t *testing.T) {
