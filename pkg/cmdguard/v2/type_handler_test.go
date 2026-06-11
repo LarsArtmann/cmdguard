@@ -10,6 +10,54 @@ import (
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
+// newCountFlagTag builds a FlagTag for the verbose int-count flag used by
+// type-handler tests. Pass short="" to omit the short alias.
+func newCountFlagTag(short, help string) FlagTag {
+	return FlagTag{
+		Name: "verbose", Short: short, Help: help,
+		Type: reflect.TypeFor[int](), Count: true,
+	}
+}
+
+// registerCountFlagAndAssert builds a count flag in a fresh flag set, registers
+// it via the given register function, and asserts the lookup succeeded.
+// Used by Register/Dispatch test pairs that only differ in the registration entry point.
+func registerCountFlagAndAssert(t *testing.T, register func(fs *pflag.FlagSet, tag FlagTag) error, short, help string) {
+	t.Helper()
+
+	fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
+	tag := newCountFlagTag(short, help)
+
+	testutil.AssertNoError(t, register(fs, tag))
+
+	if f := fs.Lookup("verbose"); f == nil {
+		t.Error("flag 'verbose' should be registered")
+	}
+}
+
+// countFlagTestCases runs the with-short and without-short count-flag subtests
+// sharing a single help string. It exists so callers don't rewrite the same
+// t.Run pair (with/without short) per registration entry point.
+func countFlagTestCases(t *testing.T, body func(short, help string), help string) {
+	t.Helper()
+
+	cases := []struct {
+		name  string
+		short string
+	}{
+		{"with short", "v"},
+		{"without short", ""},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			body(tc.short, help)
+		})
+	}
+}
+
 func TestTypeHandler_RegisterCustomTypes(t *testing.T) {
 	t.Parallel()
 
@@ -276,41 +324,17 @@ func TestTypeHandler_RegisterCountHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("count handler registers CountP flag", func(t *testing.T) {
-		t.Parallel()
+	countFlagTestCases(t, func(short, help string) {
+		t.Helper()
 
-		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{
-			Name: "verbose", Short: "v", Help: "verbosity level",
-			Type: reflect.TypeFor[int](), Count: true,
-		}
-
-		err := globalTypeRegistry.countHandler.Register(fs, tag)
-		testutil.AssertNoError(t, err)
-
-		f := fs.Lookup("verbose")
-		if f == nil {
-			t.Error("flag 'verbose' should be registered")
-		}
-	})
-
-	t.Run("count handler without short", func(t *testing.T) {
-		t.Parallel()
-
-		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{
-			Name: "verbose", Help: "verbosity level",
-			Type: reflect.TypeFor[int](), Count: true,
-		}
-
-		err := globalTypeRegistry.countHandler.Register(fs, tag)
-		testutil.AssertNoError(t, err)
-
-		f := fs.Lookup("verbose")
-		if f == nil {
-			t.Error("flag 'verbose' should be registered")
-		}
-	})
+		registerCountFlagAndAssert(
+			t,
+			func(fs *pflag.FlagSet, tag FlagTag) error {
+				return globalTypeRegistry.countHandler.Register(fs, tag)
+			},
+			short, help,
+		)
+	}, "verbosity level")
 
 	t.Run("count handler parses integer value", func(t *testing.T) {
 		t.Parallel()
@@ -337,41 +361,17 @@ func TestTypeHandler_RegisterCountHandler(t *testing.T) {
 func TestTypeHandler_DispatchRegister_WithCount(t *testing.T) {
 	t.Parallel()
 
-	t.Run("count flag dispatches to count handler", func(t *testing.T) {
-		t.Parallel()
+	countFlagTestCases(t, func(short, help string) {
+		t.Helper()
 
-		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{
-			Name: "verbose", Short: "v", Help: "verbosity",
-			Type: reflect.TypeFor[int](), Count: true,
-		}
-
-		err := dispatchRegister(globalTypeRegistry, fs, tag)
-		testutil.AssertNoError(t, err)
-
-		f := fs.Lookup("verbose")
-		if f == nil {
-			t.Error("flag 'verbose' should be registered")
-		}
-	})
-
-	t.Run("count flag without short", func(t *testing.T) {
-		t.Parallel()
-
-		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		tag := FlagTag{
-			Name: "verbose", Help: "verbosity",
-			Type: reflect.TypeFor[int](), Count: true,
-		}
-
-		err := dispatchRegister(globalTypeRegistry, fs, tag)
-		testutil.AssertNoError(t, err)
-
-		f := fs.Lookup("verbose")
-		if f == nil {
-			t.Error("flag 'verbose' should be registered")
-		}
-	})
+		registerCountFlagAndAssert(
+			t,
+			func(fs *pflag.FlagSet, tag FlagTag) error {
+				return dispatchRegister(globalTypeRegistry, fs, tag)
+			},
+			short, help,
+		)
+	}, "verbosity")
 }
 
 func TestTypeHandler_LookupHandler_Fallback(t *testing.T) {

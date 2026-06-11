@@ -23,6 +23,54 @@ func makeMiddlewareCommand[T any](name, desc string, handlerCalled *bool) Comman
 	}
 }
 
+// addNoOpCommand builds a NoFlags command with use/short/long and no-op runE, then registers it.
+func addNoOpCommand[T any](t *testing.T, cli *CLI[T], use, short string) {
+	t.Helper()
+
+	err := AddCommand(cli, Command[T, NoFlags]{
+		use:   use,
+		short: short,
+		long:  short,
+		runE:  noOpRunE[T, NoFlags],
+	})
+	testutil.AssertNoError(t, err)
+}
+
+// beforeAfterMiddleware returns a Middleware[T] that records "<name>-before" before
+// invoking next() and "<name>-after" after, appending both to order. Used to verify
+// middleware chain ordering in tests.
+func beforeAfterMiddleware[T any](order *[]string, name string) Middleware[T] {
+	return func(_ context.Context, _ *T, _ CommandInfo, next func() error) error {
+		*order = append(*order, name+"-before")
+
+		err := next()
+
+		*order = append(*order, name+"-after")
+
+		return err
+	}
+}
+
+// captureInfoMiddleware returns a Middleware[T] that captures the incoming CommandInfo
+// into *captured before delegating to next(). Used to assert the info passed to middleware.
+func captureInfoMiddleware[T any](captured *CommandInfo) Middleware[T] {
+	return func(_ context.Context, _ *T, info CommandInfo, next func() error) error {
+		*captured = info
+
+		return next()
+	}
+}
+
+// captureNameMiddleware returns a Middleware[T] that appends info.Name to *names
+// before delegating to next(). Used to verify which commands the chain visited.
+func captureNameMiddleware[T any](names *[]string) Middleware[T] {
+	return func(_ context.Context, _ *T, info CommandInfo, next func() error) error {
+		*names = append(*names, info.Name)
+
+		return next()
+	}
+}
+
 func TestMiddleware_BasicChaining(t *testing.T) {
 	t.Parallel()
 
@@ -32,19 +80,8 @@ func TestMiddleware_BasicChaining(t *testing.T) {
 
 	var callOrder []string
 
-	makeMiddleware := func(name string) func(context.Context, *testConfig, CommandInfo, func() error) error {
-		return func(_ context.Context, _ *testConfig, _ CommandInfo, next func() error) error {
-			callOrder = append(callOrder, name+"-before")
-			err := next()
-
-			callOrder = append(callOrder, name+"-after")
-
-			return err
-		}
-	}
-
-	mw1 := makeMiddleware("mw1")
-	mw2 := makeMiddleware("mw2")
+	mw1 := beforeAfterMiddleware[testConfig](&callOrder, "mw1")
+	mw2 := beforeAfterMiddleware[testConfig](&callOrder, "mw2")
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
@@ -151,26 +188,14 @@ func TestMiddleware_CommandInfo(t *testing.T) {
 
 	var capturedInfo CommandInfo
 
-	captureMiddleware := func(_ context.Context, _ *testConfig, info CommandInfo, next func() error) error {
-		capturedInfo = info
-
-		return next()
-	}
-
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithMiddleware(captureMiddleware),
+		WithMiddleware(captureInfoMiddleware[testConfig](&capturedInfo)),
 		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "mycommand",
-		short: "My command",
-		long:  "My command",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
+	addNoOpCommand(t, cli, "mycommand", "My command")
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"mycommand"})
 	testutil.AssertNoError(t, err)
@@ -202,13 +227,7 @@ func TestTimingMiddleware(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 
-	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "timed",
-		short: "Timed command",
-		long:  "Timed command",
-		runE:  noOpRunE[testConfig, NoFlags],
-	})
-	testutil.AssertNoError(t, err)
+	addNoOpCommand(t, cli, "timed", "Timed command")
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"timed"})
 	testutil.AssertNoError(t, err)
@@ -286,15 +305,9 @@ func TestMiddleware_Subcommands(t *testing.T) {
 
 	var commandNames []string
 
-	trackingMiddleware := func(_ context.Context, _ *testConfig, info CommandInfo, next func() error) error {
-		commandNames = append(commandNames, info.Name)
-
-		return next()
-	}
-
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithMiddleware(trackingMiddleware),
+		WithMiddleware(captureNameMiddleware[testConfig](&commandNames)),
 		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
@@ -328,21 +341,13 @@ func TestChainMiddleware(t *testing.T) {
 
 	var order []string
 
-	mw := func(name string) Middleware[testConfig] {
-		return func(_ context.Context, _ *testConfig, _ CommandInfo, next func() error) error {
-			order = append(order, name+"-before")
-
-			err := next()
-
-			order = append(order, name+"-after")
-
-			return err
-		}
-	}
-
 	chain := buildChain(
 		context.Background(), &testConfig{}, CommandInfo{Name: "test"},
-		[]Middleware[testConfig]{mw("a"), mw("b"), mw("c")},
+		[]Middleware[testConfig]{
+			beforeAfterMiddleware[testConfig](&order, "a"),
+			beforeAfterMiddleware[testConfig](&order, "b"),
+			beforeAfterMiddleware[testConfig](&order, "c"),
+		},
 		func() error {
 			order = append(order, "handler")
 
@@ -409,17 +414,11 @@ func TestMiddleware_WithFlags(t *testing.T) {
 		Name string `default:"World" flag:"name" help:"Name" short:"n"`
 	}
 
-	var capturedName string
-
-	inspectMiddleware := func(_ context.Context, _ *testConfig, info CommandInfo, next func() error) error {
-		capturedName = info.Name
-
-		return next()
-	}
+	var capturedNames []string
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithMiddleware(inspectMiddleware),
+		WithMiddleware(captureNameMiddleware[testConfig](&capturedNames)),
 		WithFang[testConfig](false),
 	)
 	testutil.AssertNoError(t, err)
@@ -437,5 +436,5 @@ func TestMiddleware_WithFlags(t *testing.T) {
 
 	err = cli.ExecuteWithArgs(context.Background(), []string{"greet", "-n", "Middleware"})
 	testutil.AssertNoError(t, err)
-	testutil.AssertFieldEqString(t, capturedName, "greet", "command name in middleware")
+	testutil.AssertFieldEqString(t, capturedNames[0], "greet", "command name in middleware")
 }

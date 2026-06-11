@@ -53,7 +53,7 @@ func TestDoctorCommand(t *testing.T) {
 		testutil.AssertNoError(t, cli.Execute(context.Background()))
 
 		output := out.String()
-		if !strings.Contains(output, "passed") || !strings.Contains(output, "0 failed") {
+		if !containsAll(output, "passed", "0 failed") {
 			t.Errorf("expected all passed, got: %s", output)
 		}
 	})
@@ -247,7 +247,7 @@ func TestDoctorCommand(t *testing.T) {
 		}
 
 		output := out.String()
-		if !strings.Contains(output, "✓") || !strings.Contains(output, "✗") {
+		if !containsAll(output, "✓", "✗") {
 			t.Errorf("expected both checkmark and cross, got: %s", output)
 		}
 	})

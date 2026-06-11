@@ -27,6 +27,19 @@ func assertStderrContains(t *testing.T, stderr string, substrings ...string) {
 	testutil.AssertStderrContains(t, stderr, substrings...)
 }
 
+// containsAll reports whether s contains every one of the given substrings.
+// It is the conjunction of strings.Contains across all substrings, written as
+// a function so callers can use it in a single if-condition.
+func containsAll(s string, substrings ...string) bool {
+	for _, sub := range substrings {
+		if !strings.Contains(s, sub) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func assertStringContains(t *testing.T, s string, substrings ...string) {
 	t.Helper()
 

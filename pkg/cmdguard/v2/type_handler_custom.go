@@ -68,9 +68,9 @@ func (r *typeRegistry) registerCustomTypes() {
 	)
 
 	for _, entry := range []struct {
-		typ         reflect.Type
-		parse       func(string) (any, error)
-		defaultVal  func(FlagTag) any
+		typ        reflect.Type
+		parse      func(string) (any, error)
+		defaultVal func(FlagTag) any
 	}{
 		{reflect.TypeFor[Duration](), func(v string) (any, error) { return ParseDuration(v) }, func(tag FlagTag) any {
 			d, err := ParseDuration(tag.Default)

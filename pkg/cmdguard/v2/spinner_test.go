@@ -42,16 +42,35 @@ func TestSpinnerMiddleware_ReturnsError(t *testing.T) {
 	expectedErr := errors.New("handler failed")
 
 	mw := SpinnerMiddleware[testConfig]("Loading...")
-	err := mw(
-		context.Background(),
-		&testConfig{},
-		CommandInfo{Name: "test"},
-		func() error {
-			return expectedErr
-		},
-	)
+	err := invokeFailingMiddleware(mw, expectedErr)
 
 	testutil.AssertErrorIs(t, err, expectedErr)
+}
+
+// invokeFailingMiddleware runs a Middleware[T] with a handler that returns
+// the given error, returning whatever the middleware propagates. Used to
+// assert error propagation without rewriting the same handler boilerplate.
+func invokeFailingMiddleware[T any](mw Middleware[T], wantErr error) error {
+	return mw(
+		context.Background(),
+		new(T),
+		CommandInfo{Name: "test"},
+		func() error { return wantErr },
+	)
+}
+
+// newTestSpinnerConfig builds a SpinnerConfig with the given title and frames, a
+// fresh bytes.Buffer as writer, and a 10ms interval — the common test setup
+// for spinner middleware tests.
+func newTestSpinnerConfig(title string, frames []string) (*bytes.Buffer, SpinnerConfig) {
+	buf := &bytes.Buffer{}
+
+	return buf, SpinnerConfig{
+		Title:    title,
+		Writer:   buf,
+		Frames:   frames,
+		Interval: 10 * time.Millisecond,
+	}
 }
 
 func TestSpinnerMiddleware_WritesToBuffer(t *testing.T) {
@@ -59,13 +78,7 @@ func TestSpinnerMiddleware_WritesToBuffer(t *testing.T) {
 
 	type testConfig struct{}
 
-	buf := &bytes.Buffer{}
-	cfg := SpinnerConfig{
-		Title:    "Testing",
-		Writer:   buf,
-		Frames:   []string{".", "o", "O"},
-		Interval: 10 * time.Millisecond,
-	}
+	buf, cfg := newTestSpinnerConfig("Testing", []string{".", "o", "O"})
 
 	s := newTextSpinner(cfg)
 	s.Start()
@@ -109,15 +122,9 @@ func TestSpinnerMiddlewareWithConfig_SkipsNonTerminal(t *testing.T) {
 
 	type testConfig struct{}
 
-	buf := &bytes.Buffer{}
 	called := false
 
-	cfg := SpinnerConfig{
-		Title:    "Custom",
-		Writer:   buf,
-		Frames:   []string{"1", "2", "3"},
-		Interval: 10 * time.Millisecond,
-	}
+	buf, cfg := newTestSpinnerConfig("Custom", []string{"1", "2", "3"})
 
 	mw := SpinnerMiddlewareWithConfig[testConfig](cfg)
 	err := mw(
@@ -143,23 +150,12 @@ func TestSpinnerMiddlewareWithConfig_ReturnsError(t *testing.T) {
 
 	type testConfig struct{}
 
-	buf := &bytes.Buffer{}
 	expectedErr := errors.New("handler failed")
 
-	cfg := SpinnerConfig{
-		Title:    "Custom",
-		Writer:   buf,
-		Frames:   []string{">"},
-		Interval: 10 * time.Millisecond,
-	}
+	_, cfg := newTestSpinnerConfig("Custom", []string{">"})
 
 	mw := SpinnerMiddlewareWithConfig[testConfig](cfg)
-	err := mw(
-		context.Background(),
-		&testConfig{},
-		CommandInfo{Name: "test"},
-		func() error { return expectedErr },
-	)
+	err := invokeFailingMiddleware(mw, expectedErr)
 
 	testutil.AssertErrorIs(t, err, expectedErr)
 }

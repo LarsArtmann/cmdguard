@@ -147,19 +147,17 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 
 	testCases := []struct {
 		name     string
-		getter   func() (any, bool)
+		key      string
 		expected any
 	}{
 		{
-			name: "inherited value",
-			getter: func() (any, bool) {
-				return child.GetValue("inherited")
-			},
+			name:     "inherited value",
+			key:      "inherited",
 			expected: "from-root",
 		},
 		{
 			name:     "local value",
-			getter:   func() (any, bool) { return child.GetValue("local") },
+			key:      "local",
 			expected: "child-only",
 		},
 	}
@@ -168,7 +166,7 @@ func TestBranchingFlowContext_GetValue(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			val, ok := tc.getter()
+			val, ok := child.GetValue(tc.key)
 			if !ok {
 				t.Error("expected to find value")
 			}

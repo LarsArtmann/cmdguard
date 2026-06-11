@@ -7,6 +7,19 @@ import (
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
+// enumModeConfig is a small test config with a single Mode field for SetField tests.
+type enumModeConfig struct {
+	Mode Enum
+}
+
+// enumDevStagingProdConfig returns a fresh enumModeConfig with a Mode preloaded
+// with the dev/staging/prod allowed set. Used by string-to-Enum SetField tests.
+func enumDevStagingProdConfig() *enumModeConfig {
+	return &enumModeConfig{
+		Mode: Enum{value: "dev", allowed: []string{"dev", "staging", "prod"}},
+	}
+}
+
 func TestSetField(t *testing.T) {
 	t.Parallel()
 	t.Run("set string field", func(t *testing.T) {
@@ -171,11 +184,7 @@ func TestSetField(t *testing.T) {
 	t.Run("string to Enum with allowed values", func(t *testing.T) {
 		t.Parallel()
 
-		cfg := &struct {
-			Mode Enum
-		}{
-			Mode: Enum{value: "dev", allowed: []string{"dev", "staging", "prod"}},
-		}
+		cfg := enumDevStagingProdConfig()
 
 		err := SetField(cfg, "Mode", "prod")
 		testutil.AssertNoError(t, err)
@@ -185,11 +194,7 @@ func TestSetField(t *testing.T) {
 	t.Run("string to Enum with invalid value rejects", func(t *testing.T) {
 		t.Parallel()
 
-		cfg := &struct {
-			Mode Enum
-		}{
-			Mode: Enum{value: "dev", allowed: []string{"dev", "staging", "prod"}},
-		}
+		cfg := enumDevStagingProdConfig()
 
 		err := SetField(cfg, "Mode", "invalid")
 		testutil.AssertExpectedError(t, err)
