@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"slices"
@@ -63,7 +64,13 @@ func validateStructWithRegistry(v reflect.Value, cfg any, vr *validatorRegistry)
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("validating config %T: %w: %v", cfg, ErrConfigValidation, errs)
+		allErrors := append([]error{ErrConfigValidation}, errs...)
+
+		return fmt.Errorf(
+			"validating config %T: %w",
+			cfg,
+			errors.Join(allErrors...),
+		)
 	}
 
 	return nil
