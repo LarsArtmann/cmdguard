@@ -5,7 +5,7 @@
 **Last Updated:** 2026-06-11
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.5.0 - zero panics, 84.8% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.5.0 - zero panics, 85.9% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.5.0. 385+ tests passing, 84.8% coverage, 0 build errors.
+**Current Status:** v2.5.0. 395+ tests passing, 85.9% coverage, 0 build errors.
 
 ---
 
@@ -77,6 +77,7 @@ cmdguard/
 │   │   ├── errors_config.go      # Config-related sentinel errors
 │   │   ├── errors_di.go          # DI-related sentinel errors
 │   │   ├── errors_flags.go       # Flag-related sentinel errors
+│   │   ├── errors_audit.go       # Audit-log-related sentinel errors
 │   │   ├── flags.go              # FlagRegistry with struct tags
 │   │   ├── flags_parse.go        # Flag parsing logic
 │   │   ├── flags_suggest.go      # Typo suggestions (Levenshtein)
@@ -273,6 +274,9 @@ go build ./...                                   # Verify build
 52. **Fang integration (ADR-001)** — `WithCLIVersion` auto-pipes to `fang.WithVersion`; `WithCLICommit` auto-pipes to `fang.WithCommit`. Users should NOT use `WithFangOptions(fang.WithVersion(...))` alongside `WithCLIVersion` — this would create duplicate fang version opts. `fang.WithNotifySignal` is intentionally skipped because cmdguard's `WithSignalHandling`/`WithGracefulShutdown` provides DI-aware signal handling that fang cannot (see `docs/adr/001-fang-integration-strategy.md`).
 53. **16 output formats via upstream registries** — go-output v0.8.0+ provides `RenderTableData` (all 16 formats registered by sub-modules) and `RenderAnyData` (JSON, YAML, TOML). cmdguard's `output.go` delegates to these registries; no custom strategy types needed. Blank imports in `output.go` trigger sub-module `init()` registrations. `OutputStyledTable` is deprecated; use `OutputTable(FormatTable, ...)` instead. `SupportedFormats()` returns all 16 formats; `IsFormatSupported(f)` checks validity.
 54. **Deduplicated validators** — `validateEmail` and `validateURL` in `flags_validate.go` delegate to `ParseEmail()` and `ParseURL()` respectively, eliminating duplicate parsing logic.
+55. **errors.AsType (Go 1.26)** — `output.go` uses `errors.AsType[*T]` instead of `errors.As(err, &v)` for consistency with `cli.go:298`. All new code should use `errors.AsType`.
+56. **Validation error aggregation** — `ValidateConfig` uses `errors.Join(append([]error{ErrConfigValidation}, errs...)...)` so individual validation errors are reachable via `errors.Is`. Previous `%v` formatting lost the chain.
+57. **errors_audit.go** — `ErrAuditLogNotEnabled` and `ErrInvalidOutputFormat` moved from `errors.go` to `errors_audit.go`, matching the per-domain split pattern (command/config/di/flags/audit).
 
 ---
 
