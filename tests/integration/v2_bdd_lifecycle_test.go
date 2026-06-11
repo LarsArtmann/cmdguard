@@ -115,6 +115,20 @@ func execLifecycle(t *testing.T, cli *v2.CLI[lifecycleConfig], args ...string) {
 	}
 }
 
+// registerCommand adds a Command to a CLI and fails the test on error.
+// Centralizes the AddCommand fatal pattern used across the lifecycle BDD tests.
+func registerCommand[T, F any](
+	t *testing.T,
+	cli *v2.CLI[T],
+	cmd v2.Command[T, F],
+) {
+	t.Helper()
+
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand: %v", err)
+	}
+}
+
 func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 	t.Parallel()
 
@@ -665,9 +679,7 @@ func TestCLI_ConfigValidation_Integration(t *testing.T) {
 			t.Fatalf("NewCommand: %v", err)
 		}
 
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand: %v", err)
-		}
+		registerCommand(t, cli, cmd)
 	}
 
 	t.Run(

@@ -349,9 +349,7 @@ func TestCLINoColor(t *testing.T) {
 		}
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand failed: %v", err)
-		}
+		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"run", "--no-color"})
 		if err != nil {
@@ -374,9 +372,7 @@ func TestCLINoColorEnvVar(t *testing.T) {
 	}
 
 	cmd := newTestCLICommand[testCLIConfig](t, "run")
-	if err := v2.AddCommand(cli, cmd); err != nil {
-		t.Fatalf("AddCommand failed: %v", err)
-	}
+	addCommand(t, cli, cmd)
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{"run"})
 	if err != nil {
@@ -396,9 +392,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 		}
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand failed: %v", err)
-		}
+		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"--no-color", "run"})
 		if err != nil {
@@ -421,9 +415,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 		}
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand failed: %v", err)
-		}
+		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"--no-color", "run"})
 		if err != nil {

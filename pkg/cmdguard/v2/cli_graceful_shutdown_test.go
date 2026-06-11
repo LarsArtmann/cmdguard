@@ -57,9 +57,7 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 		}
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand failed: %v", err)
-		}
+		addCommand(t, cli, cmd)
 
 		_, err = v2.Invoke[*gracefulShutdownService](cli.Scope())
 		if err != nil {
@@ -82,9 +80,7 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 		cli := newGracefulShutdownTestCLI(t)
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
-		if err := v2.AddCommand(cli, cmd); err != nil {
-			t.Fatalf("AddCommand failed: %v", err)
-		}
+		addCommand(t, cli, cmd)
 
 		err := cli.Shutdown(context.Background())
 		if err != nil {

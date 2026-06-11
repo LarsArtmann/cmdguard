@@ -84,3 +84,13 @@ func testHostPortPortInt(t *testing.T, hp v2.HostPort, expected int) {
 		t.Errorf("Port().Int() = %d, want %d", hp.Port().Int(), expected)
 	}
 }
+
+// addCommand registers a Command on a CLI and fails the test on error.
+// Centralizes the AddCommand fatal pattern used across v2_test files.
+func addCommand[T, F any](t *testing.T, cli *v2.CLI[T], cmd v2.Command[T, F]) {
+	t.Helper()
+
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("AddCommand failed: %v", err)
+	}
+}

@@ -49,9 +49,7 @@ func TestTestCLI_ExecuteWithArgs(t *testing.T) {
 		t.Fatalf("failed to create command: %v", err)
 	}
 
-	if err := v2.AddCommand(cli, cmd); err != nil {
-		t.Fatalf("failed to add command: %v", err)
-	}
+	AddCommand(t, cli, cmd)
 
 	tc := NewTestCLI(cli)
 	result := tc.ExecuteWithArgs(context.Background(), []string{"hello"})
@@ -80,9 +78,7 @@ func TestTestCLI_ExecuteWithArgs_Error(t *testing.T) {
 		t.Fatalf("failed to create command: %v", err)
 	}
 
-	if err := v2.AddCommand(cli, cmd); err != nil {
-		t.Fatalf("failed to add command: %v", err)
-	}
+	AddCommand(t, cli, cmd)
 
 	tc := NewTestCLI(cli)
 	result := tc.ExecuteWithArgs(context.Background(), []string{"fail"})
@@ -140,9 +136,7 @@ func TestTestCLI_HelpCapture(t *testing.T) {
 		t.Fatalf("failed to create command: %v", err)
 	}
 
-	if err := v2.AddCommand(cli, cmd); err != nil {
-		t.Fatalf("failed to add command: %v", err)
-	}
+	AddCommand(t, cli, cmd)
 
 	tc := NewTestCLI(cli)
 	result := tc.ExecuteWithArgs(context.Background(), []string{"--help"})

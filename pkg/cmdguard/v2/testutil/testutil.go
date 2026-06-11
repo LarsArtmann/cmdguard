@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"testing"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
@@ -83,5 +84,15 @@ func (tc *TestCLI[T]) ExecuteWithArgs(ctx context.Context, args []string) *TestR
 		Stdout: tc.stdout.String(),
 		Stderr: tc.stderr.String(),
 		Error:  err,
+	}
+}
+
+// AddCommand registers a Command on a CLI and fails the test on error.
+// Centralizes the AddCommand fatal pattern used across test files.
+func AddCommand[T, F any](t *testing.T, cli *v2.CLI[T], cmd v2.Command[T, F]) {
+	t.Helper()
+
+	if err := v2.AddCommand(cli, cmd); err != nil {
+		t.Fatalf("failed to add command: %v", err)
 	}
 }
