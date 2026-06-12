@@ -34,8 +34,8 @@ require (
 )
 
 require (
-	github.com/larsartmann/go-output/enum v0.7.0 // indirect
-	github.com/larsartmann/go-output/escape v0.7.0 // indirect
+	github.com/larsartmann/go-output/enum v0.9.0 // indirect
+	github.com/larsartmann/go-output/escape v0.9.0 // indirect
 )
 
 require (
@@ -61,10 +61,10 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/go-faster/jx v1.2.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
