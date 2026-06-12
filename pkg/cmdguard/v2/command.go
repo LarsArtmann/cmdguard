@@ -289,6 +289,7 @@ func MustNewCommand[T, F any](
 	if err != nil {
 		panic(fmt.Sprintf("MustNewCommand(%q): %v", use, err))
 	}
+
 	return cmd
 }
 
@@ -303,5 +304,6 @@ func MustNewParentCommand[T, F any](
 	if err != nil {
 		panic(fmt.Sprintf("MustNewParentCommand(%q): %v", use, err))
 	}
+
 	return cmd
 }
