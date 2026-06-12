@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-06-10
-**Status:** v2.5.0 — zero panics, 85.4% coverage, 0 lint issues, 0 race conditions, 16 output formats
-**Tests:** 395+ passing, 0 build errors
+**Updated:** 2026-06-12
+**Status:** v2.6.0 — zero panics, 85.9% coverage, 0 lint issues, 0 race conditions, 16 output formats
+**Tests:** 407+ passing, 0 build errors
 
 ## Completed
 

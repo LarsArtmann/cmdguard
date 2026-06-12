@@ -1,9 +1,9 @@
 # cmdguard Features
 
-**Last Updated:** 2026-06-10
-**Version:** 2.5.0
+**Last Updated:** 2026-06-12
+**Version:** 2.6.0
 **Go Version:** 1.26
-**Tests:** 385+ passing, 84.8% coverage, 0 lint issues, 0 race conditions
+**Tests:** 407+ passing, 85.9% coverage, 0 lint issues, 0 race conditions
 
 ---
 
