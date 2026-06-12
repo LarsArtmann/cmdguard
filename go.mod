@@ -12,14 +12,14 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/larsartmann/go-output v0.8.0
-	github.com/larsartmann/go-output/d2 v0.7.0
-	github.com/larsartmann/go-output/delimited v0.7.0
-	github.com/larsartmann/go-output/graph v0.7.0
-	github.com/larsartmann/go-output/markup v0.7.0
-	github.com/larsartmann/go-output/plantuml v0.7.0
-	github.com/larsartmann/go-output/serialization v0.7.0
-	github.com/larsartmann/go-output/table v0.7.0
+	github.com/larsartmann/go-output v0.9.0
+	github.com/larsartmann/go-output/d2 v0.9.0
+	github.com/larsartmann/go-output/delimited v0.9.0
+	github.com/larsartmann/go-output/graph v0.9.0
+	github.com/larsartmann/go-output/markup v0.9.0
+	github.com/larsartmann/go-output/plantuml v0.9.0
+	github.com/larsartmann/go-output/serialization v0.9.0
+	github.com/larsartmann/go-output/table v0.9.0
 	github.com/larsartmann/samber-do-auditlog v0.0.2
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
@@ -31,6 +31,11 @@ require (
 	go.opentelemetry.io/otel v1.44.0
 	go.opentelemetry.io/otel/trace v1.44.0
 	golang.org/x/term v0.44.0
+)
+
+require (
+	github.com/larsartmann/go-output/enum v0.7.0 // indirect
+	github.com/larsartmann/go-output/escape v0.7.0 // indirect
 )
 
 require (
@@ -64,8 +69,6 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/larsartmann/go-branded-id v0.3.0 // indirect
-	github.com/larsartmann/go-output/enum v0.7.0 // indirect
-	github.com/larsartmann/go-output/escape v0.7.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
@@ -86,16 +89,4 @@ require (
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
-)
-
-replace (
-	github.com/larsartmann/go-output => ../go-output
-	github.com/larsartmann/go-output/d2 => ../go-output/d2
-	github.com/larsartmann/go-output/delimited => ../go-output/delimited
-	github.com/larsartmann/go-output/graph => ../go-output/graph
-	github.com/larsartmann/go-output/markup => ../go-output/markup
-	github.com/larsartmann/go-output/plantuml => ../go-output/plantuml
-	github.com/larsartmann/go-output/serialization => ../go-output/serialization
-	github.com/larsartmann/go-output/table => ../go-output/table
-	github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog
 )
