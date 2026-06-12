@@ -16,9 +16,6 @@ var (
 	// ErrRequiredFlag indicates a required flag was not set.
 	ErrRequiredFlag = errors.New("required flag not set")
 
-	// ErrNoFlags indicates the command has no flags to register.
-	ErrNoFlags = errors.New("no flags to register")
-
 	// ErrFlagInstance indicates a flag struct instance could not be created.
 	ErrFlagInstance = errors.New("failed to create flag instance")
 

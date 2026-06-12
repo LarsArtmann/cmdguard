@@ -102,13 +102,6 @@ func (c Command[T, F]) HasHandler() bool {
 	return c.runE != nil
 }
 
-// IsExecutable returns true if this command can be executed directly.
-//
-// Deprecated: Use HasHandler() instead. Will be removed in v3.
-func (c Command[T, F]) IsExecutable() bool {
-	return c.HasHandler()
-}
-
 // ValidationMode controls how strictly commands are validated.
 type ValidationMode int
 

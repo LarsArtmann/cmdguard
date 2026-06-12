@@ -28,12 +28,6 @@ var (
 	// ErrMissingExample indicates a leaf command has no example in draconian mode.
 	ErrMissingExample = errors.New("command has no example")
 
-	// ErrTooFewArgs indicates a command received fewer positional arguments than required.
-	ErrTooFewArgs = errors.New("too few arguments")
-
-	// ErrTooManyArgs indicates a command received more positional arguments than allowed.
-	ErrTooManyArgs = errors.New("too many arguments")
-
 	// ErrNegativeArgCount indicates a negative argument count was provided.
 	ErrNegativeArgCount = errors.New("argument count must not be negative")
 

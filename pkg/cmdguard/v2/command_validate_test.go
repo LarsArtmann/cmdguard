@@ -233,26 +233,3 @@ func TestCommand_HasHandler(t *testing.T) {
 		}
 	})
 }
-
-func TestCommand_IsExecutable(t *testing.T) {
-	t.Parallel()
-	t.Run("returns true with RunE and no subcommands", func(t *testing.T) {
-		t.Parallel()
-
-		cmd := newTestCommand()
-		if !cmd.IsExecutable() {
-			t.Error("IsExecutable() = false, want true")
-		}
-	})
-
-	t.Run("returns false without RunE", func(t *testing.T) {
-		t.Parallel()
-
-		cmd := Command[testConfig, NoFlags]{
-			use: "test",
-		}
-		if cmd.IsExecutable() {
-			t.Error("IsExecutable() = true, want false")
-		}
-	})
-}
