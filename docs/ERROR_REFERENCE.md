@@ -59,7 +59,6 @@ All typed errors implement `Unwrap()` for `errors.Is()`/`errors.As()` chaining.
 | `ErrInvalidFlagType`       | `"invalid flag type"`              | errors_flags.go |
 | `ErrUnknownValidator`      | `"unknown validator"`              | errors_flags.go |
 | `ErrInvalidValidatorParam` | `"invalid validator parameter"`    | errors_flags.go |
-| `ErrNoFlags`               | `"no flags to register"`           | errors_flags.go |
 
 ### Config Errors
 
@@ -137,10 +136,8 @@ All typed errors implement `Unwrap()` for `errors.Is()`/`errors.As()` chaining.
 
 ### Unused (reserved for future use)
 
-| Sentinel         | Message                | Source File       |
-| ---------------- | ---------------------- | ----------------- |
-| `ErrTooFewArgs`  | `"too few arguments"`  | errors_command.go |
-| `ErrTooManyArgs` | `"too many arguments"` | errors_command.go |
+| Sentinel | Message | Source File |
+| -------- | ------- | ----------- |
 
 ---
 

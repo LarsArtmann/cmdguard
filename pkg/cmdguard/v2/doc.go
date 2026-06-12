@@ -165,11 +165,11 @@
 //
 // # Output Formats
 //
-// Render structured data in 16 formats:
+// Render structured data in 16 formats using go-output directly:
 //
-//	v2.OutputTable(v2.FormatJSON, headers, rows)
-//	v2.OutputTable(v2.FormatCSV, headers, rows)
-//	v2.OutputTable(v2.FormatYAML, headers, rows)
+//	v2.OutputTable(output.FormatJSON, headers, rows)
+//	v2.OutputTable(output.FormatCSV, headers, rows)
+//	v2.OutputTable(output.FormatYAML, headers, rows)
 //
 // Available: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree,
 // mermaid, dot, jsonl, asciidoc, toml, plantuml.

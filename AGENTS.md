@@ -61,7 +61,7 @@ cmdguard/
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
 │   │   ├── cli_options.go        # CLI functional options (WithCLIVersion, etc.)
 │   │   ├── auditlog.go            # AuditLogCommand, WithAuditLog convenience helpers
-│   │   ├── cli_output.go          # Output format flag registration and parsing
+│   │   ├── cli_output.go          # Output format flag registration and parsing, dynamic help from registry
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
 │   │   ├── command_options.go    # All 19 CommandOption functions (WithShort, WithFlags, etc.)
 │   │   ├── command_suggest.go    # (removed — consolidated into flags_suggest.go)
@@ -90,7 +90,7 @@ cmdguard/
 │   │   ├── glamour.go            # Markdown help rendering via glamour/v2
 │   │   ├── manpage.go            # Man page generation via mango
 │   │   ├── middleware.go         # Middleware chain pattern
-│   │   ├── output.go             # Rich output (OutputTable, OutputResult, 16 formats)
+│   │   ├── output.go             # Rich output (OutputTable, OutputResult, shape-aware errors, dynamic format help)
 │   │   ├── prompts.go            # Interactive prompts via huh/v2
 │   │   ├── scope.go              # DI scope wrapping samber/do/v2
 │   │   ├── spinner.go            # Terminal spinner middleware
@@ -210,13 +210,12 @@ go build ./...                                   # Verify build
 10. **Instance-scoped registries** — Each `FlagRegistry` clones from package-level defaults; `RegisterTypeHandler()`/`RegisterValidator()` write to global template; `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` write to instance
 11. **$EDITOR support** - `EditInEditor()` for user input editing
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
-13. **ValidationMode enum** - `Lenient`/`Strict`/`Draconian` spectrum, `>=` comparison
-14. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
-15. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
-16. **Spinner middleware** — `SpinnerMiddleware[T](title)` shows a lipgloss-styled spinner on stderr; skips when not a terminal
-17. **Glamour help** — `WithGlamourHelp[T]()` renders command `Long` and `Example` fields via `charm.land/glamour/v2` markdown; uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`); applied recursively to all commands at registration time
-18. **Telemetry middleware** — `TelemetryMiddleware[T](tracer)` creates an OpenTelemetry span per command; requires `go.opentelemetry.io/otel/trace.Tracer`; `WithTelemetry[T](tracer)` is the convenience CLI option
-19. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` into the DI injector; `AuditLogCommand[T](cli)` provides an `audit-log` subcommand with HTML/JSON/NDJSON/Mermaid export; `cli.AuditLog()` for programmatic access
+13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
+14. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
+15. **Spinner middleware** `SpinnerMiddleware[T](title)` shows a lipgloss-styled spinner on stderr; skips when not a terminal
+16. **Glamour help** — `WithGlamourHelp[T]()` renders command `Long` and `Example` fields via `charm.land/glamour/v2` markdown; uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`); applied recursively to all commands at registration time
+17. **Telemetry middleware** — `TelemetryMiddleware[T](tracer)` creates an OpenTelemetry span per command; requires `go.opentelemetry.io/otel/trace.Tracer`; `WithTelemetry[T](tracer)` is the convenience CLI option
+18. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` into the DI injector; `AuditLogCommand[T](cli)` provides an `audit-log` subcommand with HTML/JSON/NDJSON/Mermaid export; `cli.AuditLog()` for programmatic access
 
 ### Key Gotchas
 
@@ -230,8 +229,8 @@ go build ./...                                   # Verify build
 8. **Prompt tag** — `prompt:"Question?"` on a struct field enables interactive prompting when the flag is missing and `WithPromptOnMissing` is set on the command. Bool fields use `huh.NewConfirm`, enum fields (with `values` tag) use `huh.NewSelect`, all others use `huh.NewInput`
 9. **SuggestFlag API** — returns `(string, bool)` since v2.2 (breaking change from string-only)
 10. **Instance-scoped registries** — `FlagRegistry` clones `typeRegistry` and `validatorRegistry` from globals at creation time; package-level `RegisterTypeHandler()`/`RegisterValidator()` write to the global defaults template, not to existing instances. Use `FlagRegistry.RegisterTypeHandler()` for per-instance customization.
-11. **go-output v0.9.0+ with generic registries** — `github.com/larsartmann/go-output` provides `RenderTableData` (all 16 formats) and `RenderAnyData` (JSON, YAML, TOML) registries via thread-safe generic `formatRegistry[T]`. Sub-modules register via `init()`. cmdguard's `output.go` delegates to these registries via blank imports. No local replace directives needed.
-12. **Deprecated APIs (remove in v3)** — `IsExecutable()` → use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
+11. **Direct go-output usage** — Users use `output.FormatTable`, `output.FormatJSON`, etc. directly from `github.com/larsartmann/go-output`; cmdguard only re-exports the `OutputFormat = output.Format` type alias for convenience. No `ParseOutputFormat`, `SupportedFormats`, `IsFormatSupported`, or `Format*` constant re-exports.
+12. **Deprecated APIs (removed)** — `IsExecutable()` removed; use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
 14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
 15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
@@ -263,20 +262,21 @@ go build ./...                                   # Verify build
 41. **Override + CloneScope** — `Override[T](scope, provider)` and `OverrideValue[T](scope, value)` replace services in a scope for testing. `CloneScope(scope)` creates a copy with same registrations but no invoked state. Standard pattern: clone → override → invoke
 42. **GoDuration default validation** — `RegisterGoDurationHandler()` now validates the default value at registration time (returns error for non-empty invalid defaults), consistent with bool/int/uint/float handlers; empty defaults are allowed (zero value)
 43. **ErrLogLevel/ErrLogFormat error chain** — `ParseLogLevel`/`ParseLogFormat` now wrap errors with their respective sentinels (`ErrLogLevel`/`ErrLogFormat`), so `errors.Is(err, v2.ErrLogLevel)` works; the chain is `ErrLogLevel → EnumError → ErrInvalidEnum`
-44. **Unused sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` are declared but not used in any code path; kept as exported API for potential future use
-45. **configload.Auto()** — tries YAML → TOML → JSON sequentially (not file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first; use `LoaderForPath()` for precise format detection when the file extension is known
-46. **ShutdownAll error chain** — `Shutdown()` wraps with `ErrServiceConstruction` once; `ShutdownAll` collects these without additional wrapping (fixed double-wrap in v2.4.0)
-47. **Arg validators return errors** — `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs` now set an error on the command if given invalid args (negative n, min > max) instead of panicking. The error is surfaced by `NewCommand`/`NewParentCommand`.
-48. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option.
-49. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` hooks into the CLI's injector via `buildInjectorOpts()`, which merges DILogging and audit hooks. `AuditLogCommand[T](cli)` creates an `audit-log` subcommand supporting 4 formats (html, json, ndjson, mermaid). Returns `ErrAuditLogNotEnabled` when plugin is nil — callers should check with `errors.Is`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogCommand` gracefully degrades in tests without the plugin.
-50. **buildInjectorOpts** — Merges `diLogf` and `auditLog` into a single `*do.InjectorOpts`. Returns nil when neither is configured (uses default injector). This replaced the old inline `NewScopeWithOpts` call in `cli.initialize()`.
-51. **go mod replace directives removed** — go-output v0.9.0 and samber-do-auditlog v0.0.2 are fully published; no local replace directives needed.
-52. **Fang integration (ADR-001)** — `WithCLIVersion` auto-pipes to `fang.WithVersion`; `WithCLICommit` auto-pipes to `fang.WithCommit`. Users should NOT use `WithFangOptions(fang.WithVersion(...))` alongside `WithCLIVersion` — this would create duplicate fang version opts. `fang.WithNotifySignal` is intentionally skipped because cmdguard's `WithSignalHandling`/`WithGracefulShutdown` provides DI-aware signal handling that fang cannot (see `docs/adr/001-fang-integration-strategy.md`).
-53. **16 output formats via upstream registries** — go-output v0.9.0+ provides `RenderTableData` (all 16 formats registered by sub-modules) and `RenderAnyData` (JSON, YAML, TOML). cmdguard's `output.go` delegates to these registries; no custom strategy types needed. Blank imports in `output.go` trigger sub-module `init()` registrations. `OutputStyledTable` is deprecated; use `OutputTable(FormatTable, ...)` instead. `SupportedFormats()` returns all 16 formats; `IsFormatSupported(f)` checks validity. No local replace directives needed.
-54. **Deduplicated validators** — `validateEmail` and `validateURL` in `flags_validate.go` delegate to `ParseEmail()` and `ParseURL()` respectively, eliminating duplicate parsing logic.
-55. **errors.AsType (Go 1.26)** — `output.go` uses `errors.AsType[*T]` instead of `errors.As(err, &v)` for consistency with `cli.go:298`. All new code should use `errors.AsType`.
-56. **Validation error aggregation** — `ValidateConfig` uses `errors.Join(append([]error{ErrConfigValidation}, errs...)...)` so individual validation errors are reachable via `errors.Is`. Previous `%v` formatting lost the chain.
-57. **errors_audit.go** — `ErrAuditLogNotEnabled` and `ErrInvalidOutputFormat` moved from `errors.go` to `errors_audit.go`, matching the per-domain split pattern (command/config/di/flags/audit).
+44. **Removed sentinels** — `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs` were declared but never used in any code path; removed to reduce API surface.
+45. **Removed re-exports** — `ParseOutputFormat()`, `SupportedFormats()`, `IsFormatSupported()`, and 16 `Format*` constant re-exports removed; users import `output.Format*` directly from go-output. `IsExecutable()` removed; use `HasHandler()`.
+46. **configload.Auto()** — tries YAML → TOML → JSON sequentially (not file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first; use `LoaderForPath()` for precise format detection when the file extension is known
+47. **ShutdownAll error chain** — `Shutdown()` wraps with `ErrServiceConstruction` once; `ShutdownAll` collects these without additional wrapping (fixed double-wrap in v2.4.0)
+48. **Arg validators return errors** — `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs` now set an error on the command if given invalid args (negative n, min > max) instead of panicking. The error is surfaced by `NewCommand`/`NewParentCommand`.
+49. **NewScopeWithOpts** — `NewScopeWithOpts(name, opts)` creates scope with `do.InjectorOpts` for custom logging, lifecycle hooks, health check timeouts. `WithDILogging[T](logf)` is the CLI convenience option.
+50. **Audit log integration** — `WithAuditLog[T](plugin)` wires `samber-do-auditlog` hooks into the CLI's injector via `buildInjectorOpts()`, which merges DILogging and audit hooks. `AuditLogCommand[T](cli)` creates an `audit-log` subcommand supporting 4 formats (html, json, ndjson, mermaid). Returns `ErrAuditLogNotEnabled` when plugin is nil — callers should check with `errors.Is`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogCommand` gracefully degrades in tests without the plugin.
+51. **buildInjectorOpts** — Merges `diLogf` and `auditLog` into a single `*do.InjectorOpts`. Returns nil when neither is configured (uses default injector). This replaced the old inline `NewScopeWithOpts` call in `cli.initialize()`.
+52. **No replace directives** — go-output v0.9.0 and samber-do-auditlog v0.0.2 are fully published; no local replace directives needed.
+53. **Fang integration (ADR-001)** — `WithCLIVersion` auto-pipes to `fang.WithVersion`; `WithCLICommit` auto-pipes to `fang.WithCommit`. Users should NOT use `WithFangOptions(fang.WithVersion(...))` alongside `WithCLIVersion` — this would create duplicate fang version opts. `fang.WithNotifySignal` is intentionally skipped because cmdguard's `WithSignalHandling`/`WithGracefulShutdown` provides DI-aware signal handling that fang cannot (see `docs/adr/001-fang-integration-strategy.md`).
+54. **16 output formats via go-output v0.9.0 registries** — `RenderTableData` (all 16 formats) and `RenderAnyData` (JSON, YAML, TOML) via thread-safe `formatRegistry[T]`. Users import `output.FormatTable` etc. directly; cmdguard only re-exports `OutputFormat` type alias. `OutputResult()` provides shape-aware error messages. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`. `RegisteredFormats()` exposes registered formats for callers.
+55. **Deduplicated validators** — `validateEmail` and `validateURL` in `flags_validate.go` delegate to `ParseEmail()` and `ParseURL()` respectively, eliminating duplicate parsing logic.
+56. **errors.AsType (Go 1.26)** — `output.go` uses `errors.AsType[*T]` instead of `errors.As(err, &v)` for consistency with `cli.go:298`. All new code should use `errors.AsType`.
+57. **Validation error aggregation** — `ValidateConfig` uses `errors.Join(append([]error{ErrConfigValidation}, errs...)...)` so individual validation errors are reachable via `errors.Is`. Previous `%v` formatting lost the chain.
+58. **errors_audit.go** — `ErrAuditLogNotEnabled` and `ErrInvalidOutputFormat` moved from `errors.go` to `errors_audit.go`, matching the per-domain split pattern (command/config/di/flags/audit).
 
 ---
 

@@ -177,11 +177,13 @@ Priority chain: **explicit flag → env var → config file → default value**.
 ## Rich Output
 
 ```go
-v2.OutputTable(v2.FormatTable, headers, rows)  // Aligned terminal table
-v2.OutputTable(v2.FormatJSON, headers, rows)    // JSON array
-v2.OutputTable(v2.FormatYAML, headers, rows)    // YAML
+output "github.com/larsartmann/go-output"
 
-format, _ := v2.ParseOutputFormat("csv")
+v2.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
+v2.OutputTable(output.FormatJSON, headers, rows)    // JSON array
+v2.OutputTable(output.FormatYAML, headers, rows)    // YAML
+
+format, _ := output.ParseFormat("csv")
 v2.OutputTable(format, headers, rows)
 ```
 

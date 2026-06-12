@@ -234,22 +234,24 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 
 ---
 
-## Rich Output (12 Formats)
+## Rich Output (16 Formats)
 
 ```go
+output "github.com/larsartmann/go-output"
+
 data := v2.DefaultOutputConfig()
-data.Format = v2.FormatJSON
+data.Format = output.FormatJSON
 
 // Or parse from string:
-format, _ := v2.ParseOutputFormat("yaml")
+format, _ := output.ParseFormat("yaml")
 
 // Render table data
 headers := []string{"Name", "Age"}
 rows := [][]string{{"Alice", "30"}, {"Bob", "25"}}
-v2.OutputTable(v2.FormatTable, headers, rows)
+v2.OutputTable(output.FormatTable, headers, rows)
 ```
 
-Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot.
+Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml.
 
 ---
 

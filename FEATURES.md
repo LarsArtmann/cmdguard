@@ -118,13 +118,13 @@
 
 ### Rich Output (go-output)
 
-| Feature               | Status              | Notes                                                                                |
-| --------------------- | ------------------- | ------------------------------------------------------------------------------------ |
-| `OutputResult()`      | ✅ FULLY_FUNCTIONAL | Render data in configured format                                                     |
-| `OutputTable()`       | ✅ FULLY_FUNCTIONAL | Convenience for table data                                                           |
-| `OutputStyledTable()` | ✅ FULLY_FUNCTIONAL | Lipgloss-styled terminal tables                                                      |
-| `ParseOutputFormat()` | ✅ FULLY_FUNCTIONAL | String → Format conversion                                                           |
-| 16 output formats     | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
+| Feature                 | Status              | Notes                                                                                |
+| ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.9.0 registries                               |
+| `OutputTable()`         | ✅ FULLY_FUNCTIONAL | Convenience for table data with AddRowChecked validation                             |
+| `RegisteredFormats()`   | ✅ FULLY_FUNCTIONAL | Dynamic format discovery from registered marshalers                                  |
+| 16 output formats       | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
+| Dynamic `--output` help | ✅ FULLY_FUNCTIONAL | Auto-generated from RegisteredTableDataFormats()                                     |
 
 ### Middleware
 
