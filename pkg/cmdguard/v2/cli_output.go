@@ -2,7 +2,9 @@ package v2
 
 import (
 	"fmt"
+	"strings"
 
+	output "github.com/larsartmann/go-output"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +15,7 @@ import (
 // Usage:
 //
 //	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
-//	    v2.WithOutputFormat[Config](v2.FormatTable),
+//	    v2.WithOutputFormat[Config](output.FormatTable),
 //	)
 //	// CLI now has --output/-o flag
 //	// In handlers: format := cli.OutputFormat()
@@ -27,7 +29,7 @@ func WithOutputFormat[T any](defaultFormat OutputFormat) CLIOption[T] {
 // If WithOutputFormat was not used, returns FormatTable.
 func (cli *CLI[T]) OutputFormat() OutputFormat {
 	if cli.outputFormat == "" {
-		return FormatTable
+		return output.FormatTable
 	}
 
 	return cli.outputFormat
@@ -38,14 +40,21 @@ func (cli *CLI[T]) SetOutputFormat(format OutputFormat) {
 	cli.outputFormat = format
 }
 
-// initOutputFlag sets up the --output flag and hooks into flag parsing.
+// initOutputFlag sets up the --output flag with dynamic help from registered formats.
 func (cli *CLI[T]) initOutputFlag() {
 	if cli.outputFormat == "" {
 		return
 	}
 
-	cli.AddGlobalFlag("output", "o", string(cli.outputFormat),
-		"Output format (table, json, csv, yaml, markdown, xml)")
+	formats := output.RegisteredTableDataFormats()
+
+	names := make([]string, len(formats))
+	for i, f := range formats {
+		names[i] = string(f)
+	}
+
+	help := fmt.Sprintf("Output format (%s)", strings.Join(names, ", "))
+	cli.AddGlobalFlag("output", "o", string(cli.outputFormat), help)
 }
 
 // parseOutputFlag resolves the --output flag value after cobra parses flags.
@@ -60,7 +69,7 @@ func (cli *CLI[T]) parseOutputFlag(c *cobra.Command) error {
 		return nil
 	}
 
-	format, err := ParseOutputFormat(formatStr)
+	format, err := output.ParseFormat(formatStr)
 	if err != nil {
 		return fmt.Errorf("%w: %q is not a valid output format", ErrUnsupportedFormat, formatStr)
 	}

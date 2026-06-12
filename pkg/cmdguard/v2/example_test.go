@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	output "github.com/larsartmann/go-output"
 	"github.com/samber/do/v2"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
@@ -166,7 +167,7 @@ func ExampleOutputResult() {
 		Name string `json:"name"`
 	}
 
-	cfg := v2.OutputConfig{Format: v2.FormatJSON}
+	cfg := v2.OutputConfig{Format: output.FormatJSON}
 	_ = v2.OutputResult(cfg, Person{Name: "Alice"})
 
 	// Output:

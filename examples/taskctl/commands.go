@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	output "github.com/larsartmann/go-output"
 	"github.com/spf13/cobra"
 
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
@@ -49,7 +50,7 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 				return nil
 			}
 
-			format, err := v2.ParseOutputFormat(flags.Format)
+			format, err := output.ParseFormat(flags.Format)
 			if err != nil {
 				return v2.NewFlagError("format", err)
 			}
@@ -185,7 +186,7 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 			total, pending, done, byPriority := store.Stats()
 
 			return v2.OutputTable(
-				v2.FormatTable,
+				output.FormatTable,
 				[]string{"Metric", "Value"},
 				[][]string{
 					{"Total", strconv.Itoa(total)},

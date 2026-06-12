@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	output "github.com/larsartmann/go-output"
 	_ "github.com/larsartmann/go-output/d2"
@@ -16,39 +17,9 @@ import (
 	_ "github.com/larsartmann/go-output/table"
 )
 
-// OutputFormat is a type-safe output format enum.
-// Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml.
+// OutputFormat is a type-safe output format enum, aliased from go-output.
+// Use output.FormatTable, output.FormatJSON, etc. for format values.
 type OutputFormat = output.Format
-
-// Output format constants re-exported from go-output for convenience.
-var (
-	FormatTable    = output.FormatTable
-	FormatJSON     = output.FormatJSON
-	FormatCSV      = output.FormatCSV
-	FormatTSV      = output.FormatTSV
-	FormatMarkdown = output.FormatMarkdown
-	FormatXML      = output.FormatXML
-	FormatD2       = output.FormatD2
-	FormatYAML     = output.FormatYAML
-	FormatHTML     = output.FormatHTML
-	FormatTree     = output.FormatTree
-	FormatMermaid  = output.FormatMermaid
-	FormatDOT      = output.FormatDOT
-	FormatJSONL    = output.FormatJSONL
-	FormatAsciiDoc = output.FormatAsciiDoc
-	FormatTOML     = output.FormatTOML
-	FormatPlantUML = output.FormatPlantUML
-)
-
-// ParseOutputFormat parses a string into an OutputFormat.
-func ParseOutputFormat(s string) (OutputFormat, error) {
-	f, err := output.ParseFormat(s)
-	if err != nil {
-		return f, fmt.Errorf("parsing output format %q: %w", s, err)
-	}
-
-	return f, nil
-}
 
 // OutputConfig holds the output formatting configuration.
 type OutputConfig struct {
@@ -65,8 +36,9 @@ func DefaultOutputConfig() OutputConfig {
 }
 
 // OutputResult renders data in the configured output format.
-// For TableData, delegates to go-output's RenderTableData registry.
+// For *TableData, delegates to go-output's RenderTableData registry.
 // For arbitrary data, delegates to go-output's RenderAnyData registry (JSON, YAML, TOML).
+// Returns shape-aware errors when a format does not support the provided data type.
 func OutputResult(cfg OutputConfig, data any) error {
 	if cfg.Writer == nil {
 		cfg.Writer = os.Stdout
@@ -74,53 +46,56 @@ func OutputResult(cfg OutputConfig, data any) error {
 
 	opts := output.RenderOptions{Writer: cfg.Writer}
 
-	if td := unwrapTableData(data); td != nil {
+	if td, ok := data.(*output.TableData); ok {
 		err := output.RenderTableData(td, cfg.Format, opts)
-		if _, ok := errors.AsType[*output.UnsupportedFormatError](err); ok {
-			return fmt.Errorf("%w: %s", ErrUnsupportedFormat, cfg.Format)
+		if _, unsupported := errors.AsType[*output.UnsupportedFormatError](err); unsupported {
+			return fmt.Errorf("%w: %s (format supports %s, not table data)",
+				ErrUnsupportedFormat, cfg.Format, formatShapes(cfg.Format))
 		}
 
 		return err
 	}
 
 	err := output.RenderAnyData(data, cfg.Format, opts)
-	if _, ok := errors.AsType[*output.UnsupportedFormatError](err); ok {
-		return fmt.Errorf("%w: %s", ErrFormatRequiresTypedData, cfg.Format)
+	if _, unsupported := errors.AsType[*output.UnsupportedFormatError](err); unsupported {
+		return fmt.Errorf("%w: %s (format does not support arbitrary data)",
+			ErrFormatRequiresTypedData, cfg.Format)
 	}
 
 	return err
 }
 
-// unwrapTableData extracts *output.TableData from any, handling both pointer and value types.
-// Returns nil if data is not a TableData.
-func unwrapTableData(data any) *output.TableData {
-	switch d := data.(type) {
-	case *output.TableData:
-		return d
-	case output.TableData:
-		return &d
-	default:
-		return nil
-	}
-}
-
 // OutputTable is a convenience function to output table data with headers and rows.
+// Uses AddRowChecked for fail-fast row validation.
 func OutputTable(format OutputFormat, headers []string, rows [][]string) error {
 	data := output.NewTableData(headers)
 
 	for _, row := range rows {
-		data.AddRow(row)
+		if err := data.AddRowChecked(row); err != nil {
+			return err
+		}
 	}
 
 	return OutputResult(OutputConfig{Format: format}, data)
 }
 
-// SupportedFormats returns all output formats supported by the current configuration.
-func SupportedFormats() []OutputFormat {
-	return output.AllFormats
+// RegisteredFormats returns all output formats with registered TableData marshalers.
+// Use this to dynamically discover available formats based on imported sub-modules.
+func RegisteredFormats() []OutputFormat {
+	return output.RegisteredTableDataFormats()
 }
 
-// IsFormatSupported returns true if the format is a valid, registered output format.
-func IsFormatSupported(f OutputFormat) bool {
-	return f.IsValid()
+// formatShapes returns a human-readable description of what shapes a format supports.
+func formatShapes(f output.Format) string {
+	shapes := f.Shapes()
+	if len(shapes) > 0 {
+		names := make([]string, len(shapes))
+		for i, s := range shapes {
+			names[i] = string(s)
+		}
+
+		return strings.Join(names, ", ")
+	}
+
+	return "unknown"
 }

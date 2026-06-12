@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	output "github.com/larsartmann/go-output"
 )
 
 type jsonErrorEnvelope struct {
@@ -103,7 +105,7 @@ func (cli *CLI[T]) writeFormattedError(err error) bool {
 	}
 
 	switch cli.outputFormat {
-	case FormatJSON, FormatJSONL, FormatYAML, FormatTOML:
+	case output.FormatJSON, output.FormatJSONL, output.FormatYAML, output.FormatTOML:
 		writeErr := writeJSONError(os.Stderr, err)
 		if writeErr != nil {
 			_, _ = fmt.Fprintln(os.Stderr, err.Error())

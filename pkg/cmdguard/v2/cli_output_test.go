@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	output "github.com/larsartmann/go-output"
+
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
@@ -21,7 +23,7 @@ func TestWithOutputFormat(t *testing.T) {
 		testutil.AssertNoError(t, err)
 
 		format := cli.OutputFormat()
-		testutil.AssertEqual(t, FormatTable, format)
+		testutil.AssertEqual(t, output.FormatTable, format)
 	})
 
 	t.Run("default_format_from_option", func(t *testing.T) {
@@ -29,12 +31,12 @@ func TestWithOutputFormat(t *testing.T) {
 
 		cli, err := NewCLI[outputTestConfig](
 			"test", "test", outputTestConfig{},
-			WithOutputFormat[outputTestConfig](FormatJSON),
+			WithOutputFormat[outputTestConfig](output.FormatJSON),
 		)
 		testutil.AssertNoError(t, err)
 
 		format := cli.OutputFormat()
-		testutil.AssertEqual(t, FormatJSON, format)
+		testutil.AssertEqual(t, output.FormatJSON, format)
 	})
 
 	t.Run("set_format_at_runtime", func(t *testing.T) {
@@ -42,14 +44,14 @@ func TestWithOutputFormat(t *testing.T) {
 
 		cli, err := NewCLI[outputTestConfig](
 			"test", "test", outputTestConfig{},
-			WithOutputFormat[outputTestConfig](FormatTable),
+			WithOutputFormat[outputTestConfig](output.FormatTable),
 		)
 		testutil.AssertNoError(t, err)
 
-		cli.SetOutputFormat(FormatCSV)
+		cli.SetOutputFormat(output.FormatCSV)
 
 		format := cli.OutputFormat()
-		testutil.AssertEqual(t, FormatCSV, format)
+		testutil.AssertEqual(t, output.FormatCSV, format)
 	})
 
 	t.Run("output_flag_parsed_from_args", func(t *testing.T) {
@@ -57,7 +59,7 @@ func TestWithOutputFormat(t *testing.T) {
 
 		cli, err := NewCLI[outputTestConfig](
 			"test", "test", outputTestConfig{},
-			WithOutputFormat[outputTestConfig](FormatTable),
+			WithOutputFormat[outputTestConfig](output.FormatTable),
 		)
 		testutil.AssertNoError(t, err)
 

@@ -10,57 +10,11 @@ import (
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
-func TestParseOutputFormat(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name    string
-		input   string
-		want    OutputFormat
-		wantErr bool
-	}{
-		{"table", "table", FormatTable, false},
-		{"json", "json", FormatJSON, false},
-		{"csv", "csv", FormatCSV, false},
-		{"tsv", "tsv", FormatTSV, false},
-		{"markdown", "markdown", FormatMarkdown, false},
-		{"xml", "xml", FormatXML, false},
-		{"d2", "d2", FormatD2, false},
-		{"yaml", "yaml", FormatYAML, false},
-		{"html", "html", FormatHTML, false},
-		{"tree", "tree", FormatTree, false},
-		{"mermaid", "mermaid", FormatMermaid, false},
-		{"dot", "dot", FormatDOT, false},
-		{"jsonl", "jsonl", FormatJSONL, false},
-		{"asciidoc", "asciidoc", FormatAsciiDoc, false},
-		{"toml", "toml", FormatTOML, false},
-		{"plantuml", "plantuml", FormatPlantUML, false},
-		{"empty string", "", FormatTable, true},
-		{"invalid format", "invalid", "", true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			result, err := ParseOutputFormat(tt.input)
-			if tt.wantErr {
-				testutil.AssertExpectedError(t, err)
-			} else {
-				testutil.AssertNoError(t, err)
-				if result != tt.want {
-					t.Errorf("ParseOutputFormat(%q) = %q, want %q", tt.input, result, tt.want)
-				}
-			}
-		})
-	}
-}
-
 func TestDefaultOutputConfig(t *testing.T) {
 	t.Parallel()
 
 	cfg := DefaultOutputConfig()
-	if cfg.Format != FormatTable {
+	if cfg.Format != output.FormatTable {
 		t.Errorf("Default format = %v, want table", cfg.Format)
 	}
 	if cfg.Writer == nil {
@@ -75,22 +29,22 @@ func TestOutputResult_TableData(t *testing.T) {
 		format   output.Format
 		mustHave string
 	}{
-		{FormatTable, "Alice"},
-		{FormatJSON, "Alice"},
-		{FormatCSV, "Alice"},
-		{FormatTSV, "Alice"},
-		{FormatMarkdown, "Alice"},
-		{FormatXML, "Alice"},
-		{FormatD2, "row0"},
-		{FormatYAML, "Alice"},
-		{FormatHTML, "Alice"},
-		{FormatTree, "Alice"},
-		{FormatMermaid, "row0"},
-		{FormatDOT, "row0"},
-		{FormatJSONL, "Alice"},
-		{FormatAsciiDoc, "Alice"},
-		{FormatTOML, "Alice"},
-		{FormatPlantUML, "row0"},
+		{output.FormatTable, "Alice"},
+		{output.FormatJSON, "Alice"},
+		{output.FormatCSV, "Alice"},
+		{output.FormatTSV, "Alice"},
+		{output.FormatMarkdown, "Alice"},
+		{output.FormatXML, "Alice"},
+		{output.FormatD2, "row0"},
+		{output.FormatYAML, "Alice"},
+		{output.FormatHTML, "Alice"},
+		{output.FormatTree, "Alice"},
+		{output.FormatMermaid, "row0"},
+		{output.FormatDOT, "row0"},
+		{output.FormatJSONL, "Alice"},
+		{output.FormatAsciiDoc, "Alice"},
+		{output.FormatTOML, "Alice"},
+		{output.FormatPlantUML, "row0"},
 	}
 
 	for _, tt := range allFormats {
@@ -123,7 +77,7 @@ func TestOutputResult_AnyData(t *testing.T) {
 			Name string `json:"name"`
 		}
 
-		cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
+		cfg := OutputConfig{Format: output.FormatJSON, Writer: &buf}
 		err := OutputResult(cfg, Person{Name: "Test"})
 		testutil.AssertNoError(t, err)
 
@@ -137,7 +91,7 @@ func TestOutputResult_AnyData(t *testing.T) {
 		t.Parallel()
 
 		var buf bytes.Buffer
-		cfg := OutputConfig{Format: FormatTable, Writer: &buf}
+		cfg := OutputConfig{Format: output.FormatTable, Writer: &buf}
 		err := OutputResult(cfg, "just a string")
 		testutil.AssertExpectedError(t, err)
 	})
@@ -149,8 +103,15 @@ func TestOutputTable(t *testing.T) {
 	t.Run("renders table with headers and rows", func(t *testing.T) {
 		t.Parallel()
 
-		err := OutputTable(FormatTable, []string{"Name", "Value"}, [][]string{{"key", "val"}})
+		err := OutputTable(output.FormatTable, []string{"Name", "Value"}, [][]string{{"key", "val"}})
 		testutil.AssertNoError(t, err)
+	})
+
+	t.Run("rejects mismatched row length", func(t *testing.T) {
+		t.Parallel()
+
+		err := OutputTable(output.FormatTable, []string{"Name", "Value"}, [][]string{{"only-one"}})
+		testutil.AssertExpectedError(t, err)
 	})
 }
 
@@ -158,7 +119,7 @@ func TestOutputResult_NilData(t *testing.T) {
 	t.Parallel()
 
 	var buf bytes.Buffer
-	cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
+	cfg := OutputConfig{Format: output.FormatJSON, Writer: &buf}
 
 	err := OutputResult(cfg, (*output.TableData)(nil))
 	testutil.AssertNoError(t, err)
@@ -171,40 +132,13 @@ func TestOutputResult_NilWriter(t *testing.T) {
 		t.Parallel()
 
 		var buf bytes.Buffer
-		cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
+		cfg := OutputConfig{Format: output.FormatJSON, Writer: &buf}
 		data := output.NewTableData([]string{"X"})
 		data.AddRow([]string{"1"})
 
 		err := OutputResult(cfg, data)
 		testutil.AssertNoError(t, err)
 	})
-}
-
-func TestUnwrapTableData(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name string
-		data any
-		want bool
-	}{
-		{"pointer table data", output.NewTableData([]string{"X"}), true},
-		{"value table data", *output.NewTableData([]string{"X"}), true},
-		{"string", "hello", false},
-		{"nil", nil, false},
-		{"int", 42, false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			result := unwrapTableData(tt.data)
-			if (result != nil) != tt.want {
-				t.Errorf("unwrapTableData(%T) returned nil=%v, want non-nil=%v", tt.data, result == nil, tt.want)
-			}
-		})
-	}
 }
 
 func TestOutputResult_UnsupportedFormat(t *testing.T) {
@@ -226,7 +160,7 @@ func TestOutputResult_AnyData_YAML(t *testing.T) {
 		Name string `yaml:"name"`
 	}
 
-	cfg := OutputConfig{Format: FormatYAML, Writer: &buf}
+	cfg := OutputConfig{Format: output.FormatYAML, Writer: &buf}
 	err := OutputResult(cfg, Item{Name: "YamlAny"})
 	testutil.AssertNoError(t, err)
 	testutil.AssertOutputContains(t, buf.String(), "YamlAny")
@@ -240,7 +174,7 @@ func TestOutputResult_AnyData_TOML(t *testing.T) {
 		Name string `toml:"name"`
 	}
 
-	cfg := OutputConfig{Format: FormatTOML, Writer: &buf}
+	cfg := OutputConfig{Format: output.FormatTOML, Writer: &buf}
 	err := OutputResult(cfg, Item{Name: "TomlAny"})
 	testutil.AssertNoError(t, err)
 	testutil.AssertOutputContains(t, buf.String(), "TomlAny")
@@ -254,7 +188,7 @@ func TestOutputResult_AnyData_JSON(t *testing.T) {
 		Name string `json:"name"`
 	}
 
-	cfg := OutputConfig{Format: FormatJSON, Writer: &buf}
+	cfg := OutputConfig{Format: output.FormatJSON, Writer: &buf}
 	err := OutputResult(cfg, Item{Name: "JsonAny"})
 	testutil.AssertNoError(t, err)
 	testutil.AssertOutputContains(t, buf.String(), "JsonAny")
@@ -264,9 +198,9 @@ func TestOutputResult_TableOnlyFormats_RejectAnyData(t *testing.T) {
 	t.Parallel()
 
 	tableOnlyFormats := []OutputFormat{
-		FormatTable, FormatCSV, FormatTSV, FormatXML, FormatMarkdown,
-		FormatHTML, FormatTree, FormatD2, FormatMermaid, FormatDOT,
-		FormatJSONL, FormatAsciiDoc, FormatPlantUML,
+		output.FormatTable, output.FormatCSV, output.FormatTSV, output.FormatXML, output.FormatMarkdown,
+		output.FormatHTML, output.FormatTree, output.FormatD2, output.FormatMermaid, output.FormatDOT,
+		output.FormatJSONL, output.FormatAsciiDoc, output.FormatPlantUML,
 	}
 
 	for _, f := range tableOnlyFormats {
@@ -283,36 +217,36 @@ func TestOutputResult_TableOnlyFormats_RejectAnyData(t *testing.T) {
 	}
 }
 
-func TestSupportedFormats(t *testing.T) {
+func TestRegisteredFormats(t *testing.T) {
 	t.Parallel()
 
-	formats := SupportedFormats()
+	formats := RegisteredFormats()
 	if len(formats) == 0 {
-		t.Fatal("SupportedFormats() returned no formats")
+		t.Fatal("RegisteredFormats() returned no formats")
+	}
+
+	hasTable := false
+	for _, f := range formats {
+		if f == output.FormatTable {
+			hasTable = true
+		}
+	}
+	if !hasTable {
+		t.Error("RegisteredFormats() missing table format")
 	}
 }
 
-func TestIsFormatSupported(t *testing.T) {
+func TestOutputResult_ShapeAwareError(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name   string
-		format OutputFormat
-		want   bool
-	}{
-		{"table", FormatTable, true},
-		{"json", FormatJSON, true},
-		{"invalid", OutputFormat("nonexistent"), false},
-	}
+	var buf bytes.Buffer
+	cfg := OutputConfig{Format: OutputFormat("nonexistent"), Writer: &buf}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+	err := OutputResult(cfg, output.NewTableData([]string{"X"}))
+	testutil.AssertExpectedError(t, err)
 
-			got := IsFormatSupported(tt.format)
-			if got != tt.want {
-				t.Errorf("IsFormatSupported(%q) = %v, want %v", tt.format, got, tt.want)
-			}
-		})
+	errMsg := err.Error()
+	if !strings.Contains(errMsg, "unsupported output format") {
+		t.Errorf("error should mention unsupported format: %q", errMsg)
 	}
 }

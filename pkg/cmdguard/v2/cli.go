@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"charm.land/fang/v2"
+	output "github.com/larsartmann/go-output"
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
@@ -255,8 +256,8 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 	defer restoreNoColor()
 
 	jsonErrors := cli.outputFormat != "" &&
-		(cli.outputFormat == FormatJSON || cli.outputFormat == FormatJSONL ||
-			cli.outputFormat == FormatYAML || cli.outputFormat == FormatTOML)
+		(cli.outputFormat == output.FormatJSON || cli.outputFormat == output.FormatJSONL ||
+			cli.outputFormat == output.FormatYAML || cli.outputFormat == output.FormatTOML)
 
 	if jsonErrors {
 		cli.rootCmd.SilenceErrors = true

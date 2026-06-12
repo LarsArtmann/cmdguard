@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	output "github.com/larsartmann/go-output"
+
 	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
 )
 
@@ -183,7 +185,7 @@ func TestJSONErrorIntegration(t *testing.T) {
 	t.Run("silences cobra errors when JSON output is active", func(t *testing.T) {
 		cli, err := NewCLI[jsonErrConfig](
 			"test", "test", jsonErrConfig{},
-			WithOutputFormat[jsonErrConfig](FormatJSON),
+			WithOutputFormat[jsonErrConfig](output.FormatJSON),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -227,7 +229,7 @@ func TestJSONErrorIntegration(t *testing.T) {
 	t.Run("YAML output also triggers structured errors", func(t *testing.T) {
 		cli, err := NewCLI[jsonErrConfig](
 			"test", "test", jsonErrConfig{},
-			WithOutputFormat[jsonErrConfig](FormatYAML),
+			WithOutputFormat[jsonErrConfig](output.FormatYAML),
 		)
 		testutil.AssertNoError(t, err)
 
