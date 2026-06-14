@@ -13,7 +13,7 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
 	github.com/larsartmann/go-output v0.10.1
-	github.com/larsartmann/go-output/d2 v0.9.0
+	github.com/larsartmann/go-output/d2 v0.10.1
 	github.com/larsartmann/go-output/delimited v0.10.1
 	github.com/larsartmann/go-output/graph v0.10.1
 	github.com/larsartmann/go-output/markup v0.10.1

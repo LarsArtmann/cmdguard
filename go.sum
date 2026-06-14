@@ -111,8 +111,8 @@ github.com/larsartmann/go-branded-id v0.3.0 h1:3uE01+ymNTfsvtLMRSiux+6TjPZX5+frq
 github.com/larsartmann/go-branded-id v0.3.0/go.mod h1:O9fhyzY3DxtLsswpR7XaI+VbCM9182ZbZQLjfFFanLk=
 github.com/larsartmann/go-output v0.10.1 h1:KRhdtjBq6MFih9es6IdLRitUZwND63IDSiV8jN9SHXc=
 github.com/larsartmann/go-output v0.10.1/go.mod h1:bcFgV60oycdPalf0rGncTpBweJP8Jt4uQsQOxsUuhS4=
-github.com/larsartmann/go-output/d2 v0.9.0 h1:kqWh28/Y69QeHHoWw5zTZ/wxj5R6NnGsCHIiswW67Hc=
-github.com/larsartmann/go-output/d2 v0.9.0/go.mod h1:iWsl4t2sgjVe4B0rK9DGN12EirZSFEMHZnEUTNhY5LI=
+github.com/larsartmann/go-output/d2 v0.10.1 h1:oB7ePJuiCU/108IJS+nx+FxTRMFHLyG8LToZcnJb4o8=
+github.com/larsartmann/go-output/d2 v0.10.1/go.mod h1:iWsl4t2sgjVe4B0rK9DGN12EirZSFEMHZnEUTNhY5LI=
 github.com/larsartmann/go-output/delimited v0.10.1 h1:eCuYVLISnK4D7Iru01Gf4rh2fQzs8SNM5DVetMmScvs=
 github.com/larsartmann/go-output/delimited v0.10.1/go.mod h1:wDeYwF54csuQfa7Rs7C/hVgBNFK5mfxkd1sh60eTApM=
 github.com/larsartmann/go-output/enum v0.10.1 h1:HZB9Qi/Q6ILI4M6jgZULkkkrXhTkBiACIFPun14pXnI=
