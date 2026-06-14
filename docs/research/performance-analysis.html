@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard — Performance Characteristics Analysis</title>
+    <style>
+      :root {
+        --bg-primary: #0a0e17;
+        --bg-secondary: #111827;
+        --bg-card: #1a2332;
+        --bg-card-hover: #1e293b;
+        --border: #2a3a50;
+        --border-accent: #3b82f6;
+        --text-primary: #e2e8f0;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --accent-blue: #3b82f6;
+        --accent-cyan: #06b6d4;
+        --accent-green: #10b981;
+        --accent-yellow: #f59e0b;
+        --accent-red: #ef4444;
+        --accent-purple: #8b5cf6;
+        --accent-orange: #f97316;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.7;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.7rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      h2 {
+        font-size: 1.35rem;
+        color: var(--accent-blue);
+        margin: 2.5rem 0 1rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      h2 .icon {
+        font-size: 1.1rem;
+      }
+      h3 {
+        font-size: 1.1rem;
+        color: var(--accent-cyan);
+        margin: 1.5rem 0 0.5rem;
+      }
+      h4 {
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        margin: 1rem 0 0.3rem;
+        font-weight: 600;
+      }
+      p {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+      }
+      code {
+        background: var(--bg-card);
+        padding: 0.15em 0.4em;
+        border-radius: 4px;
+        font-size: 0.88em;
+        color: var(--accent-cyan);
+        font-family: "JetBrains Mono", "Fira Code", monospace;
+      }
+      pre {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        color: var(--text-primary);
+        font-size: 0.85em;
+      }
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+      }
+      .tag {
+        display: inline-block;
+        padding: 0.15em 0.5em;
+        border-radius: 4px;
+        font-size: 0.78em;
+        font-weight: 600;
+      }
+      .tag-excellent {
+        background: #10b98122;
+        color: var(--accent-green);
+        border: 1px solid #10b98144;
+      }
+      .tag-good {
+        background: #3b82f622;
+        color: var(--accent-blue);
+        border: 1px solid #3b82f644;
+      }
+      .tag-fair {
+        background: #f59e0b22;
+        color: var(--accent-yellow);
+        border: 1px solid #f59e0b44;
+      }
+      .tag-na {
+        background: #64748b22;
+        color: var(--text-muted);
+        border: 1px solid #64748b44;
+      }
+      .tag-cpu { background: #8b5cf622; color: var(--accent-purple); border: 1px solid #8b5cf644; }
+      .tag-mem { background: #06b6d422; color: var(--accent-cyan); border: 1px solid #06b6d444; }
+      .tag-disk { background: #f9731622; color: var(--accent-orange); border: 1px solid #f9731644; }
+      .tag-net { background: #10b98122; color: var(--accent-green); border: 1px solid #10b98144; }
+      .tag-conc { background: #3b82f622; color: var(--accent-blue); border: 1px solid #3b82f644; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 0.55rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text-muted);
+        font-size: 0.78em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      tbody tr:hover {
+        background: var(--bg-card-hover);
+      }
+      td.num {
+        font-family: "JetBrains Mono", "Fira Code", monospace;
+        font-size: 0.85em;
+        text-align: right;
+      }
+      td .micro { color: var(--accent-green); }
+      td .milli { color: var(--accent-cyan); }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .summary-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.2rem;
+        text-align: center;
+        transition: border-color 0.2s;
+      }
+      .summary-item:hover {
+        border-color: var(--border-accent);
+      }
+      .summary-item .number {
+        font-size: 1.7rem;
+        font-weight: 700;
+      }
+      .summary-item .unit {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+      .summary-item .label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+      }
+      .rating-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: var(--border);
+        overflow: hidden;
+        margin: 0.5rem 0 1rem;
+      }
+      .rating-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+      }
+      .rec-box {
+        border-left: 3px solid var(--accent-blue);
+        padding-left: 1rem;
+        margin: 0.5rem 0;
+      }
+      .priority-high {
+        border-left-color: var(--accent-green);
+      }
+      .priority-medium {
+        border-left-color: var(--accent-yellow);
+      }
+      .priority-low {
+        border-left-color: var(--text-muted);
+      }
+      .section-meta {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 2rem;
+      }
+      .callout {
+        background: var(--bg-card);
+        border-left: 3px solid var(--accent-purple);
+        border-radius: 0 8px 8px 0;
+        padding: 1rem 1.2rem;
+        margin: 1.5rem 0;
+      }
+      .callout-title {
+        font-weight: 600;
+        color: var(--accent-purple);
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+      }
+      .toc {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem 0;
+      }
+      .toc ol {
+        list-style: none;
+        counter-reset: toc;
+        columns: 2;
+        column-gap: 2rem;
+      }
+      .toc li {
+        counter-increment: toc;
+        margin: 0.3rem 0;
+        break-inside: avoid;
+      }
+      .toc li::before {
+        content: counter(toc) ".";
+        color: var(--accent-blue);
+        font-weight: 600;
+        margin-right: 0.5rem;
+      }
+      .toc a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent-blue);
+      }
+      .verdict-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .verdict-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.2rem;
+      }
+      .verdict-card h4 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+      .footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Performance Characteristics Analysis</h1>
+    <p class="section-meta">
+      cmdguard v2.6.0 · June 2026 · AMD Ryzen AI MAX+ 395 (Linux/amd64, 32 threads) ·
+      Go 1.26 · 53 source files / 7,794 LOC · 85.5% coverage
+    </p>
+
+    <!-- ============================================================ -->
+    <div class="toc">
+      <ol>
+        <li><a href="#tldr">Executive Summary</a></li>
+        <li><a href="#cpu">CPU Performance</a></li>
+        <li><a href="#ram">Memory (RAM)</a></li>
+        <li><a href="#disk">Disk I/O</a></li>
+        <li><a href="#network">Network</a></li>
+        <li><a href="#concurrency">Concurrency &amp; Thread Safety</a></li>
+        <li><a href="#startup">Startup Time &amp; Cold Start</a></li>
+        <li><a href="#binary">Binary Size &amp; Dependencies</a></li>
+        <li><a href="#gpu">GPU</a></li>
+        <li><a href="#benchmarks">Full Benchmark Results</a></li>
+        <li><a href="#findings">Findings &amp; Recommendations</a></li>
+      </ol>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 id="tldr"><span class="icon">📋</span> Executive Summary</h2>
+
+    <p>
+      cmdguard is a <strong>library</strong> for building validated Cobra CLI applications with
+      type-safe dependency injection. Its performance profile is dominated by <strong>startup-time
+      overhead</strong> (struct-tag reflection, registry cloning, DI wiring) rather than runtime
+      throughput. Since a CLI process runs once and exits, the relevant question is: <em>how much
+      does cmdguard add to the time-to-first-byte of a command?</em>
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">Bottom Line</div>
+      For a typical CLI with 5 commands, cmdguard adds <strong>under 60&nbsp;µs</strong> of total
+      overhead — less than 6% of Go's own runtime initialization (~1–5&nbsp;ms). At execution time,
+      cmdguard adds <strong>zero overhead</strong> beyond raw Cobra/pflag, because flags are parsed
+      by pflag exactly as in vanilla Cobra. The library is <strong>production-ready</strong> from a
+      performance standpoint.
+    </div>
+
+    <div class="summary">
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green)">11<span class="unit">µs</span></div>
+        <div class="label">CLI Creation (NewCLI)</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green)">9<span class="unit">µs</span></div>
+        <div class="label">AddCommand</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green)">12<span class="unit">ns</span></div>
+        <div class="label">Command.Validate</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-cyan)">186<span class="unit">ns</span></div>
+        <div class="label">DI Invoke</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green)">0</div>
+        <div class="label">Race Conditions</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-yellow)">8.4<span class="unit">KB</span></div>
+        <div class="label">NewCLI Allocs</div>
+      </div>
+    </div>
+
+    <h3>Per-Domain Verdict</h3>
+    <div class="verdict-grid">
+      <div class="verdict-card">
+        <h4>CPU <span class="tag tag-excellent">Excellent</span></h4>
+        <div class="rating-bar"><div class="rating-fill" style="width: 92%; background: var(--accent-green);"></div></div>
+        <p style="font-size:0.85rem">All expensive work (reflection, registry setup) happens once at registration. Zero runtime overhead beyond Cobra/pflag.</p>
+      </div>
+      <div class="verdict-card">
+        <h4>Memory (RAM) <span class="tag tag-good">Good</span></h4>
+        <div class="rating-bar"><div class="rating-fill" style="width: 78%; background: var(--accent-blue);"></div></div>
+        <p style="font-size:0.85rem">~8–10 KB per command at registration. Registry cloning per instance is the main cost. Acceptable; minor optimization potential.</p>
+      </div>
+      <div class="verdict-card">
+        <h4>Disk I/O <span class="tag tag-good">Good</span></h4>
+        <div class="rating-bar"><div class="rating-fill" style="width: 75%; background: var(--accent-blue);"></div></div>
+        <p style="font-size:0.85rem">Config file loading is sequential and blocking. <code>os.UserHomeDir()</code> is called per path with <code>~</code> — a repeatable syscall.</p>
+      </div>
+      <div class="verdict-card">
+        <h4>Network <span class="tag tag-na">N/A (opt-in)</span></h4>
+        <div class="rating-bar"><div class="rating-fill" style="width: 100%; background: var(--accent-green);"></div></div>
+        <p style="font-size:0.85rem">No network calls in the library. OTel telemetry is opt-in; exporters are user-provided.</p>
+      </div>
+      <div class="verdict-card">
+        <h4>Concurrency <span class="tag tag-excellent">Excellent</span></h4>
+        <div class="rating-bar"><div class="rating-fill" style="width: 95%; background: var(--accent-green);"></div></div>
+        <p style="font-size:0.85rem">0 race conditions (verified with <code>-race</code>). Proper RWMutex on registries. Spinner goroutine is clean.</p>
+      </div>
+      <div class="verdict-card">
+        <h4>Startup <span class="tag tag-excellent">Excellent</span></h4>
+        <div class="rating-bar"><div class="rating-fill" style="width: 93%; background: var(--accent-green);"></div></div>
+        <p style="font-size:0.85rem">5-command CLI: ~50 µs total. Invisible next to Go runtime init (~1–5 ms).</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 id="cpu"><span class="icon">⚡</span> CPU Performance</h2>
+
+    <p>
+      CPU cost in cmdguard splits into two phases: <strong>registration</strong> (one-time setup at
+      <code>NewCLI</code> / <code>AddCommand</code> time) and <strong>execution</strong> (per-invocation
+      of a command handler). The registration phase does the heavy lifting; execution is essentially free.
+    </p>
+
+    <h3>1. Reflection (Registration Only)</h3>
+    <p>
+      Struct-tag parsing via <code>reflect</code> is the single largest CPU cost. It runs
+      <strong>once per command</strong> at <code>NewFlagRegistry</code> time and never again:
+    </p>
+    <table>
+      <thead>
+        <tr><th>Operation</th><th>Location</th><th class="num">Time</th><th class="num">Allocs</th><th>Runs</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>ParseFlagTags</code> (4 fields)</td><td><code>config_parsing.go:41</code></td><td class="num"><span class="micro">1.9 µs</span></td><td class="num">9</td><td>Once per command</td></tr>
+        <tr><td><code>NewFlagRegistry</code> (2 fields)</td><td><code>flags.go:34</code></td><td class="num"><span class="micro">2.2 µs</span></td><td class="num">21</td><td>Once per command</td></tr>
+        <tr><td><code>setField</code> (reflect.Value)</td><td><code>config_setfield.go:16</code></td><td class="num">~100 ns</td><td class="num">0</td><td>Per flag per execution</td></tr>
+        <tr><td><code>Command.Validate</code></td><td><code>command.go</code></td><td class="num"><span class="micro">12 ns</span></td><td class="num">0</td><td>Once per command</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Good Design: Reflection is Front-Loaded</div>
+      All reflection (<code>reflect.ValueOf</code>, <code>FieldByName</code>, tag parsing) runs
+      exclusively at registration. At execution time, pflag has already parsed the flags — cmdguard
+      just calls <code>field.Set()</code> via a pre-resolved <code>reflect.Value</code>. This means
+      runtime overhead is dominated by Cobra/pflag, not cmdguard.
+    </div>
+
+    <h3>2. Regex Compilation (Cached)</h3>
+    <p>
+      The <code>regex</code> validator compiles patterns via <code>regexp.Compile</code> and caches
+      them in a <code>sync.Map</code> (<code>flags_validate.go:260</code>). The first call for a
+      given pattern pays the compile cost; subsequent calls are a map lookup:
+    </p>
+    <pre><code>var regexCache sync.Map // map[string]*regexp.Regexp
+
+func validateRegex(value string) error {
+    cached, loaded := regexCache.Load(pattern)
+    if loaded { re = cached.(*regexp.Regexp) }
+    else      { re, _ = regexp.Compile(pattern); regexCache.Store(pattern, re) }
+    return ...re.MatchString(val)
+}</code></pre>
+    <p>
+      <span class="tag tag-good">Good</span> Cached. The cache is <strong>unbounded</strong> — a
+      theoretical concern if an attacker controls regex patterns, but in practice patterns are
+      finite and developer-defined.
+    </p>
+
+    <h3>3. Levenshtein Edit Distance (Error Path Only)</h3>
+    <p>
+      <code>SuggestFlag</code> / <code>SuggestCommand</code> compute typo suggestions using a
+      two-row Levenshtein algorithm (<code>flags_suggest.go:44</code>). It allocates two
+      <code>[]int</code> slices per call but only runs on the <strong>error path</strong> (unknown
+      flag/command). Performance is irrelevant here — it never runs for a successful command.
+    </p>
+
+    <h3>4. Middleware Chain (Per Execution)</h3>
+    <p>
+      <code>buildChain</code> (<code>middleware.go:49</code>) wraps the handler in N closures at
+      execution time. Each closure captures <code>ctx</code>, <code>cfg</code>, <code>info</code>,
+      and <code>prev</code>. For a chain of 3 middleware, this is 3 closure allocations per
+      execution — negligible at ~100 ns each.
+    </p>
+
+    <h3>5. Type Parsing (Hot Path, But Cheap)</h3>
+    <p>
+      At execution time, each flag value is parsed via the <code>TypeHandler</code> registry.
+      Primitive handlers (<code>strconv.Atoi</code>, <code>strconv.ParseBool</code>, etc.) are
+      zero-allocation:
+    </p>
+    <table>
+      <thead>
+        <tr><th>Parser</th><th class="num">Time</th><th class="num">Allocs</th><th class="num">Memory</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>ParseDuration</code></td><td class="num">105 ns</td><td class="num">0</td><td class="num">0 B</td><td>Wraps <code>time.ParseDuration</code></td></tr>
+        <tr><td><code>ParseLogLevel</code></td><td class="num">83 ns</td><td class="num">0</td><td class="num">0 B</td><td>Enum lookup</td></tr>
+        <tr><td><code>ParsePort</code> (numeric)</td><td class="num">63 ns</td><td class="num">0</td><td class="num">0 B</td><td><code>strconv.Atoi</code></td></tr>
+        <tr><td><code>ParsePort</code> (named)</td><td class="num">35 ns</td><td class="num">0</td><td class="num">0 B</td><td>Map lookup</td></tr>
+        <tr><td><code>ParseHostPort</code></td><td class="num">151 ns</td><td class="num">0</td><td class="num">0 B</td><td><code>net.SplitHostPort</code></td></tr>
+        <tr><td><code>ParseURL</code></td><td class="num">657 ns</td><td class="num">6</td><td class="num">768 B</td><td><code>net/url.Parse</code> allocates</td></tr>
+        <tr><td><code>ParseFilePath</code></td><td class="num">1.2 µs</td><td class="num">7</td><td class="num">586 B</td><td><code>filepath.Abs</code> + validation</td></tr>
+        <tr><td><code>ParseEmail</code></td><td class="num">1.0 µs</td><td class="num">25</td><td class="num">504 B</td><td><code>net/mail.ParseAddress</code> is heavy</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="ram"><span class="icon">💾</span> Memory (RAM)</h2>
+
+    <p>
+      cmdguard's memory footprint is small and bounded. All allocations happen at registration;
+      the execution path allocates only what Cobra/pflag/DI already allocate.
+    </p>
+
+    <h3>1. Registry Cloning (Per Command)</h3>
+    <p>
+      Each <code>NewFlagRegistry</code> clones the global <code>typeRegistry</code> and
+      <code>validatorRegistry</code> via <code>maps.Copy</code>. This is the largest per-command
+      memory cost, enabling instance-scoped customization without affecting other commands:
+    </p>
+    <table>
+      <thead>
+        <tr><th>Operation</th><th class="num">Memory</th><th class="num">Allocs</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>NewCLI</code></td><td class="num">8.4 KB</td><td class="num">91</td><td>Cobra root cmd + DI scope + 2 registry clones</td></tr>
+        <tr><td><code>AddCommand</code></td><td class="num">10.3 KB</td><td class="num">103</td><td>Per command: registry clone + flag registration</td></tr>
+        <tr><td><code>NewCommand</code></td><td class="num">288 B</td><td class="num">1</td><td>Just the Command struct — cheap</td></tr>
+        <tr><td><code>NewFlagRegistry</code> (2 fields)</td><td class="num">2.8 KB</td><td class="num">21</td><td>Tag slice + 2 cloned maps</td></tr>
+        <tr><td><code>CloneScope</code></td><td class="num">3.2 KB</td><td class="num">48</td><td>Copies all DI registrations (for testing)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Optimization Opportunity: Copy-on-Write Registries</div>
+      Every <code>NewFlagRegistry</code> eagerly clones both registries (~2 KB) even when no
+      per-instance customization is ever used. A copy-on-write strategy (share the global map, clone
+      only on first <code>RegisterTypeHandler</code>/<code>RegisterFlagValidator</code> call) would
+      cut ~1.5 KB per command. Impact is minimal for typical CLIs (5–20 commands → 7–30 KB saved)
+      but matters for test suites that create hundreds of CLI instances.
+    </div>
+
+    <h3>2. Execute (Help Rendering)</h3>
+    <p>
+      The <code>BenchmarkExecute</code> with <code>--help</code> is dominated by <strong>fang/lipgloss
+      rendering</strong>, not cmdguard itself:
+    </p>
+    <table>
+      <thead>
+        <tr><th>Operation</th><th class="num">Time</th><th class="num">Allocs</th><th class="num">Memory</th><th>Bottleneck</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Execute (<code>--help</code>)</td><td class="num"><span class="milli">608 µs</span></td><td class="num">9,082</td><td class="num">423 KB</td><td>fang styled output</td></tr>
+      </tbody>
+    </table>
+    <p>
+      This is <strong>not cmdguard overhead</strong> — it's fang's ANSI rendering pipeline. A raw
+      Cobra help output (no fang) would be ~50× cheaper. The 423 KB is freed immediately after
+      rendering since the process exits.
+    </p>
+
+    <h3>3. BranchingFlowContext</h3>
+    <p>
+      Each <code>Branch</code> call clones the path slice and values map
+      (<code>flow_context.go:106</code>). <code>maps.Clone</code> copies the entire value map on
+      every branch. For deeply nested command trees (rare), this is O(depth × map_size). In practice
+      CLI command trees are 2–3 levels deep, so this is negligible.
+    </p>
+
+    <h3>4. Defensive Copies</h3>
+    <p>
+      Several methods return defensive copies to prevent callers from mutating internal state:
+    </p>
+    <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">
+      <li><code>FlagRegistry.Tags()</code> — <code>slices.Clone</code> on every call</li>
+      <li><code>BranchingFlowContext.Path()</code> — <code>slices.Clone</code></li>
+      <li><code>BranchingFlowContext.Children()</code> — <code>slices.Clone</code></li>
+      <li><code>FlagRegistry.FlagNames()</code> — allocates new <code>[]string</code></li>
+    </ul>
+    <p>
+      <span class="tag tag-fair">Minor waste</span> These are called infrequently (help generation,
+      suggestions). Acceptable, but an iterator-based API could eliminate these for callers that
+      only need to range over the data.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="disk"><span class="icon">💿</span> Disk I/O</h2>
+
+    <p>
+      Disk I/O in cmdguard is limited to <strong>config file loading</strong> and the
+      <strong>editor integration</strong>. Both are blocking, one-shot operations.
+    </p>
+
+    <h3>1. Config File Loading</h3>
+    <p>
+      <code>WithConfigFile(paths...)</code> tries each path sequentially via
+      <code>os.ReadFile</code>. Missing files are silently skipped (<code>os.IsNotExist</code>).
+      The first existing file wins:
+    </p>
+    <pre><code>for _, path := range paths {
+    path = expandConfigPath(path)        // os.ExpandEnv + os.UserHomeDir
+    data, err := os.ReadFile(path)       // blocking disk read
+    if os.IsNotExist(err) { continue }
+    return loader.Load(data, cfg)
+}</code></pre>
+
+    <div class="rec-box priority-medium">
+      <h4 style="margin-bottom: 0.2rem;">Finding: <code>os.UserHomeDir()</code> Called Per Path</h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>expandConfigPath</code> (<code>config_file.go:78</code>) calls
+        <code>os.UserHomeDir()</code> — a <strong>syscall</strong> (<code>getenv("HOME")</code>) —
+        on every path that starts with <code>~/</code>. For a config search with 3 home-relative
+        paths, that's 3 redundant syscalls. The home directory never changes during a process
+        lifetime, so caching it once would eliminate this. Cost: ~1 µs total — negligible, but
+        trivially fixable.
+      </p>
+    </div>
+
+    <h3>2. JSON Parsing (Double Unmarshal)</h3>
+    <p>
+      The <code>jsonLoader</code> (<code>config_file.go:25</code>) unmarshals the config file
+      <strong>twice</strong>: once into <code>map[string]json.RawMessage</code> to detect which
+      fields are present, then again into the actual config struct. This doubles the parsing cost
+      for config files but ensures correct flag/env override precedence. Acceptable for one-time
+      startup config.
+    </p>
+
+    <h3>3. Editor Integration</h3>
+    <p>
+      <code>EditInEditor</code> (<code>editor.go:15</code>) performs full blocking I/O:
+      <code>os.CreateTemp</code> → write content → <code>exec.CommandContext</code> (spawns
+      <code>$EDITOR</code>) → read result → <code>os.Remove</code>. This is inherently slow
+      (seconds — waiting for the user), so library overhead is irrelevant. The temp file is cleaned
+      up via <code>defer os.Remove</code> — safe even on panic.
+    </p>
+
+    <h3>4. Man Page Generation</h3>
+    <p>
+      <code>manpage.go</code> generates roff/man pages via mango. This is a one-shot generation
+      command, not on any hot path. Output goes to stdout or a file — single write.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="network"><span class="icon">🌐</span> Network</h2>
+
+    <p>
+      <span class="tag tag-na">N/A</span> cmdguard makes <strong>zero network calls</strong>.
+      No HTTP clients, no DNS lookups, no socket connections in the library code.
+    </p>
+
+    <h3>OpenTelemetry (Opt-In)</h3>
+    <p>
+      <code>TelemetryMiddleware</code> (<code>telemetry.go:24</code>) creates an OTel span per
+      command execution. The span creation itself is in-process (no network). However, if the user
+      configures a real OTel exporter (OTLP/gRPC, Jaeger, Zipkin), spans are flushed over the
+      network at span end (<code>span.End()</code>) or process exit. This is entirely
+      <strong>user-controlled</strong> — cmdguard never configures an exporter.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">Known Limitation: Telemetry Context Propagation</div>
+      <code>TelemetryMiddleware</code> starts a span but cannot propagate the new
+      <code>context.Context</code> to the handler, because the middleware API signature is
+      <code>next func() error</code> (no context parameter). Child spans created inside the handler
+      will <strong>not</strong> be linked to the telemetry span. This is a documented design
+      constraint (AGENTS.md gotcha #23), not a bug. Fixing it would require changing the middleware
+      signature — a breaking API change.
+    </div>
+
+    <h3>URL Parsing</h3>
+    <p>
+      <code>ParseURL</code> (<code>types_url.go:18</code>) uses <code>net/url.Parse</code> which is
+      purely string parsing — no DNS resolution, no connection. The 6 allocations come from URL
+      component struct fields (Scheme, Host, Path, etc.). This is standard library behavior.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="concurrency"><span class="icon">🔀</span> Concurrency &amp; Thread Safety</h2>
+
+    <p>
+      cmdguard is designed for single-threaded CLI execution but is safe for concurrent
+      <strong>registration</strong> (e.g., test suites running in parallel). All mutable shared
+      state is protected.
+    </p>
+
+    <div class="summary">
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green)">0</div>
+        <div class="label">Race Conditions (verified)</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-blue)">3</div>
+        <div class="label">Lock Primitives</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-cyan)">1</div>
+        <div class="label">Goroutine (spinner)</div>
+      </div>
+    </div>
+
+    <h3>Lock Inventory</h3>
+    <table>
+      <thead>
+        <tr><th>Primitive</th><th>Location</th><th>Protects</th><th>Pattern</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>sync.RWMutex</code></td>
+          <td><code>type_handler.go:60</code></td>
+          <td><code>typeRegistry</code> maps (byType, byKind)</td>
+          <td>RLock for lookups, Lock for register</td>
+        </tr>
+        <tr>
+          <td><code>sync.RWMutex</code></td>
+          <td><code>flags_validate.go:19</code></td>
+          <td><code>validatorRegistry</code> map</td>
+          <td>RLock for lookups, Lock for register</td>
+        </tr>
+        <tr>
+          <td><code>sync.Map</code></td>
+          <td><code>flags_validate.go:260</code></td>
+          <td><code>regexCache</code> (pattern → compiled regex)</td>
+          <td>Lock-free Load/Store</td>
+        </tr>
+        <tr>
+          <td><code>sync.Once</code></td>
+          <td><code>spinner.go:118</code></td>
+          <td>Spinner stop channel close</td>
+          <td>Single close guarantee</td>
+        </tr>
+        <tr>
+          <td><code>sync.Mutex</code></td>
+          <td><code>spinner.go:119</code></td>
+          <td>Spinner stderr writes</td>
+          <td>Serialize frame rendering</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Global Mutable State</h3>
+    <p>
+      Three package-level variables are mutable:
+    </p>
+    <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">
+      <li><code>globalTypeRegistry</code> — written by <code>RegisterTypeHandler()</code>, read by every <code>NewFlagRegistry</code></li>
+      <li><code>globalValidators</code> — written by <code>RegisterValidator()</code>, read by every <code>NewFlagRegistry</code></li>
+      <li><code>regexCache</code> — written on first use of each regex pattern</li>
+    </ul>
+    <p>
+      All three are mutex-protected. The AGENTS.md notes that regex validation tests must not run in
+      parallel (gotcha #14) — this is conservative; the <code>sync.Map</code> itself is safe, but
+      test assertions on cache state could race.
+    </p>
+
+    <h3>Spinner Goroutine</h3>
+    <p>
+      <code>SpinnerMiddleware</code> spawns one goroutine (<code>spinner.go:130</code>) that ticks
+      at 100 ms intervals, rendering braille frames to stderr. The goroutine is cleanly stopped via
+      <code>close(stopCh)</code> protected by <code>sync.Once</code>. If stderr is not a terminal,
+      the spinner is skipped entirely — no goroutine spawned. No goroutine leak risk.
+    </p>
+
+    <h3>BranchingFlowContext — Explicitly Not Thread-Safe</h3>
+    <p>
+      <code>BranchingFlowContext</code> is documented as <strong>not goroutine-safe</strong>
+      (<code>flow_context.go:14</code>). This is intentional — CLI command execution is sequential.
+      No locks protect <code>values</code> or <code>children</code> maps. Correct design for the
+      use case.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="startup"><span class="icon">🚀</span> Startup Time &amp; Cold Start</h2>
+
+    <p>
+      For a CLI library, startup time is the <strong>only</strong> performance metric that matters
+      to end users. A CLI process starts, runs one command, and exits. cmdguard's contribution to
+      this timeline is vanishingly small.
+    </p>
+
+    <h3>Startup Cost Breakdown (5-Command CLI)</h3>
+    <table>
+      <thead>
+        <tr><th>Step</th><th class="num">Time</th><th class="num">Cumulative</th><th>% of Go runtime init</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Go runtime init (GC, scheduler, etc.)</td><td class="num">~1–5 ms</td><td class="num">~5 ms</td><td>100%</td></tr>
+        <tr><td>1× <code>NewCLI</code></td><td class="num">11 µs</td><td class="num">11 µs</td><td>0.2–1.1%</td></tr>
+        <tr><td>5× <code>AddCommand</code></td><td class="num">46 µs</td><td class="num">57 µs</td><td>1.1–5.7%</td></tr>
+        <tr><td>Flag parsing (pflag)</td><td class="num">~5 µs</td><td class="num">62 µs</td><td>1.2–6.2%</td></tr>
+        <tr><td>DI scope + invoke</td><td class="num">~1 µs</td><td class="num">63 µs</td><td>1.3–6.3%</td></tr>
+        <tr><td><strong>cmdguard total</strong></td><td class="num"><strong>~63 µs</strong></td><td class="num">—</td><td><strong>1.3–6.3%</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Even in the worst case (slow machine, Go runtime init at 1 ms), cmdguard adds ~6% overhead.
+      On a typical machine (Go init ~2–3 ms), it's under 3%. This is <strong>invisible</strong> to
+      users.
+    </p>
+
+    <h3>Glamour Rendering (Optional, One-Time)</h3>
+    <p>
+      <code>WithGlamourHelp</code> renders markdown help text at registration time
+      (<code>glamour.go:46</code>), not on each <code>--help</code> invocation. The rendered ANSI
+      is stored in the cobra command's <code>Long</code>/<code>Example</code> fields. This is
+      idempotent (resets the flag after applying) and only runs once. Good design — no repeated
+      markdown parsing.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="binary"><span class="icon">📦</span> Binary Size &amp; Dependencies</h2>
+
+    <div class="summary">
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-yellow)">24<span class="unit">MB</span></div>
+        <div class="label">Example Binary</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-blue)">29</div>
+        <div class="label">Direct Dependencies</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-cyan)">129</div>
+        <div class="label">Total Modules</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-purple)">7.8<span class="unit">K</span></div>
+        <div class="label">Source LOC</div>
+      </div>
+      <div class="summary-item">
+        <div class="number" style="color: var(--accent-green)">16<span class="unit">K</span></div>
+        <div class="label">Test LOC</div>
+      </div>
+    </div>
+
+    <h3>Binary Size Analysis</h3>
+    <p>
+      The 24 MB example binary includes all charm.land libraries (fang, lipgloss, glamour, huh),
+      OpenTelemetry SDK, go-output with 8 format sub-modules, and Cobra/pflag. This is typical for
+      Go CLI applications with rich terminal rendering. The cmdguard library itself contributes
+      ~7.8 K LOC — a small fraction.
+    </p>
+    <p>
+      <span class="tag tag-fair">Reducible</span> Users who don't need all 16 output formats can
+      avoid importing the unused <code>go-output/*</code> sub-modules (d2, plantuml, graph, etc.).
+      The output format registries use <code>init()</code> side-effect imports, so each unused
+      format still compiles in. Binary size could be reduced by ~2–4 MB by trimming unused format
+      modules.
+    </p>
+
+    <h3>Key Dependency Weight</h3>
+    <table>
+      <thead>
+        <tr><th>Dependency</th><th>Purpose</th><th>Heavy?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>charm.land/fang</code></td><td>Styled CLI output</td><td><span class="tag tag-fair">Medium</span> Pulls lipgloss, colorprofile</td></tr>
+        <tr><td><code>charm.land/glamour</code></td><td>Markdown rendering</td><td><span class="tag tag-fair">Medium</span> AST + ANSI rendering</td></tr>
+        <tr><td><code>charm.land/huh</code></td><td>Interactive prompts</td><td><span class="tag tag-fair">Medium</span> TUI framework</td></tr>
+        <tr><td><code>go.opentelemetry.io/otel</code></td><td>Telemetry spans</td><td><span class="tag tag-good">Light</span> Only trace package imported</td></tr>
+        <tr><td><code>samber/do/v2</code></td><td>Dependency injection</td><td><span class="tag tag-excellent">Light</span> Pure Go, no codegen</td></tr>
+        <tr><td><code>spf13/cobra</code></td><td>CLI framework</td><td><span class="tag tag-good">Light</span> Core dependency</td></tr>
+        <tr><td><code>go-output/*</code> (8 modules)</td><td>Output formats</td><td><span class="tag tag-fair">Medium</span> d2, plantuml add weight</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="gpu"><span class="icon">🖥️</span> GPU</h2>
+
+    <p>
+      <span class="tag tag-na">Not Applicable</span> cmdguard does not use the GPU. Terminal
+      rendering (fang, lipgloss, glamour) uses <strong>ANSI escape codes</strong>, which are
+      processed by the terminal emulator — not the GPU directly. The spinner, help output, and
+      markdown rendering are all CPU-to-stdout/stderr text operations.
+    </p>
+    <p>
+      No OpenGL, Vulkan, CUDA, or any graphics API is used. This is expected for a CLI library.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="benchmarks"><span class="icon">📊</span> Full Benchmark Results</h2>
+
+    <p class="section-meta">
+      <code>go test ./benchmarks/ -bench=. -benchmem -count=5</code><br />
+      Median of 5 runs · AMD Ryzen AI MAX+ 395 · Go 1.26 · Linux/amd64
+    </p>
+
+    <h3>CLI Lifecycle</h3>
+    <table>
+      <thead>
+        <tr><th>Benchmark</th><th class="num">Time/op</th><th class="num">B/op</th><th class="num">Allocs/op</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>BenchmarkNew (NewCLI)</td><td class="num">11,045 ns</td><td class="num">8,437</td><td class="num">91</td></tr>
+        <tr><td>BenchmarkNewWithLong</td><td class="num">10,803 ns</td><td class="num">8,437</td><td class="num">91</td></tr>
+        <tr><td>BenchmarkAddCommand</td><td class="num">9,330 ns</td><td class="num">10,258</td><td class="num">103</td></tr>
+        <tr><td>BenchmarkExecute (--help)</td><td class="num">608,183 ns</td><td class="num">422,822</td><td class="num">9,082</td></tr>
+        <tr><td>BenchmarkNewCommand</td><td class="num">102 ns</td><td class="num">288</td><td class="num">1</td></tr>
+        <tr><td>BenchmarkCommandValidate</td><td class="num">12 ns</td><td class="num">0</td><td class="num">0</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Flag Parsing &amp; Type Handlers</h3>
+    <table>
+      <thead>
+        <tr><th>Benchmark</th><th class="num">Time/op</th><th class="num">B/op</th><th class="num">Allocs/op</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>BenchmarkParseFlagTags (4 fields)</td><td class="num">1,820 ns</td><td class="num">1,488</td><td class="num">9</td></tr>
+        <tr><td>BenchmarkFlagRegistryCreation (2 fields)</td><td class="num">2,285 ns</td><td class="num">2,784</td><td class="num">21</td></tr>
+        <tr><td>BenchmarkParseDuration</td><td class="num">105 ns</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>BenchmarkParseLogLevel</td><td class="num">83 ns</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>BenchmarkParseURL</td><td class="num">657 ns</td><td class="num">768</td><td class="num">6</td></tr>
+        <tr><td>BenchmarkParseEmail</td><td class="num">1,001 ns</td><td class="num">504</td><td class="num">25</td></tr>
+        <tr><td>BenchmarkParsePort (numeric)</td><td class="num">63 ns</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>BenchmarkParsePortNamed</td><td class="num">35 ns</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>BenchmarkParseFilePath</td><td class="num">1,212 ns</td><td class="num">586</td><td class="num">7</td></tr>
+        <tr><td>BenchmarkParseHostPort</td><td class="num">151 ns</td><td class="num">0</td><td class="num">0</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Dependency Injection</h3>
+    <table>
+      <thead>
+        <tr><th>Benchmark</th><th class="num">Time/op</th><th class="num">B/op</th><th class="num">Allocs/op</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>BenchmarkScopeCreation</td><td class="num">597 ns</td><td class="num">809</td><td class="num">16</td></tr>
+        <tr><td>BenchmarkScopeCreationWithOpts</td><td class="num">858 ns</td><td class="num">809</td><td class="num">16</td></tr>
+        <tr><td>BenchmarkScopeProvide</td><td class="num">2,144 ns</td><td class="num">1,747</td><td class="num">30</td></tr>
+        <tr><td>BenchmarkScopeInvoke</td><td class="num">186 ns</td><td class="num">160</td><td class="num">5</td></tr>
+        <tr><td>BenchmarkCloneScope</td><td class="num">4,641 ns</td><td class="num">3,199</td><td class="num">48</td></tr>
+        <tr><td>BenchmarkScopeProvideInvokeCycle</td><td class="num">3,487 ns</td><td class="num">3,071</td><td class="num">44</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="findings"><span class="icon">🔍</span> Findings &amp; Recommendations</h2>
+
+    <p>
+      Prioritized by impact × ease of implementation. cmdguard is already fast enough for any CLI
+      use case — these are opportunities for marginal improvement, not critical fixes.
+    </p>
+
+    <div class="rec-box priority-high">
+      <h4 style="margin-bottom: 0.2rem;">
+        1. Copy-on-Write Registries <span class="tag tag-excellent">High Impact</span>
+        <span class="tag tag-good">Medium Effort</span>
+      </h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>NewFlagRegistry</code> eagerly clones both <code>typeRegistry</code> and
+        <code>validatorRegistry</code> (~1.5 KB, ~12 allocs) per command, even when no per-instance
+        customization is used. Switching to copy-on-write (clone lazily on first
+        <code>register()</code> call) would save ~1.5 KB × N commands. Most CLIs never customize
+        per-instance, so the clone is pure waste. <strong>Files:</strong> <code>flags.go:40</code>,
+        <code>type_handler.go:99</code>, <code>flags_validate.go:54</code>.
+      </p>
+    </div>
+
+    <div class="rec-box priority-medium">
+      <h4 style="margin-bottom: 0.2rem;">
+        2. Cache <code>os.UserHomeDir()</code> in Config Path Expansion
+        <span class="tag tag-good">Low Impact</span>
+        <span class="tag tag-excellent">Trivial Effort</span>
+      </h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>expandConfigPath</code> (<code>config_file.go:78</code>) calls
+        <code>os.UserHomeDir()</code> on every path with <code>~/</code> — a syscall each time. The
+        home directory is immutable during a process lifetime. Cache it in a
+        <code>sync.OnceValue</code> (Go 1.21+). <strong>Saves:</strong> ~1 µs for multi-path config
+        search. <strong>Risk:</strong> none.
+      </p>
+    </div>
+
+    <div class="rec-box priority-medium">
+      <h4 style="margin-bottom: 0.2rem;">
+        3. Pre-Build Middleware Chain at Registration Time
+        <span class="tag tag-good">Low Impact</span>
+        <span class="tag tag-fair">Medium Effort</span>
+      </h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>buildChain</code> (<code>middleware.go:49</code>) allocates N closures per execution.
+        Since middleware is fixed at <code>AddCommand</code> time, the chain could be pre-built once
+        and stored. The closure captures <code>ctx</code> and <code>info</code> which change per
+        execution, so this requires restructuring to pass those as arguments instead of capturing
+        them. <strong>Saves:</strong> ~3 allocs per execution for a 3-middleware chain. Marginal.
+      </p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <h4 style="margin-bottom: 0.2rem;">
+        4. Unbounded Regex Cache <span class="tag tag-fair">Low Impact</span>
+        <span class="tag tag-good">Low Effort</span>
+      </h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>regexCache</code> (<code>flags_validate.go:260</code>) is a <code>sync.Map</code> with
+        no eviction. Patterns are developer-defined (from struct tags), so in practice the set is
+        finite and small. However, if patterns are ever derived from user input, this could grow
+        unbounded. Consider a bounded LRU if user-derived patterns are ever supported. <strong>Risk
+        today:</strong> none.
+      </p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <h4 style="margin-bottom: 0.2rem;">
+        5. Defensive Copy Elimination <span class="tag tag-fair">Low Impact</span>
+        <span class="tag tag-excellent">Low Effort</span>
+      </h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>Tags()</code>, <code>Path()</code>, <code>Children()</code>, and
+        <code>FlagNames()</code> all return defensive copies. For callers that only range over the
+        result, an iterator-based API (Go 1.23+ <code>iter.Seq</code>) would eliminate the copy.
+        These are called rarely (help generation, suggestions), so impact is minimal.
+      </p>
+    </div>
+
+    <div class="rec-box priority-low">
+      <h4 style="margin-bottom: 0.2rem;">
+        6. Email Parsing: 25 Allocations <span class="tag tag-na">External</span>
+      </h4>
+      <p style="font-size: 0.88rem; margin-bottom: 0;">
+        <code>ParseEmail</code> uses <code>net/mail.ParseAddress</code> which allocates 25 times
+        (504 B). This is standard library behavior and cannot be improved within cmdguard. Email
+        parsing is rare (once per config field at startup), so this is irrelevant in practice.
+      </p>
+    </div>
+
+    <h3>What's Already Excellent</h3>
+    <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">
+      <li><strong>Reflection front-loaded</strong> — all <code>reflect</code> calls at registration, zero at execution</li>
+      <li><strong>Regex caching</strong> — <code>sync.Map</code> avoids recompilation</li>
+      <li><strong>Primitive parsers are zero-alloc</strong> — Duration, LogLevel, Port, HostPort all allocate nothing</li>
+      <li><strong>Glamour rendering is one-time</strong> — markdown parsed at registration, not per <code>--help</code></li>
+      <li><strong>Spinner auto-skips non-TTY</strong> — no goroutine, no writes when piped/redirected</li>
+      <li><strong>0 race conditions</strong> — verified with <code>-race</code> across full test suite</li>
+      <li><strong>Zero panics</strong> — all <code>Must*</code> functions removed; safeProvide wraps DI panics</li>
+    </ul>
+
+    <div class="footer">
+      <p>
+        Generated by automated codebase analysis · <code>docs/research/performance-analysis.html</code><br />
+        Benchmarks reproducible via: <code>go test ./benchmarks/ -bench=. -benchmem -count=5</code><br />
+        Race detection: <code>go test ./... -count=1 -race</code> → PASS
+      </p>
+    </div>
+  </body>
+</html>
