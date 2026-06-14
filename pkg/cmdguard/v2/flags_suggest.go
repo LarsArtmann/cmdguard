@@ -105,6 +105,7 @@ func (r *FlagRegistry) GenerateHelp() string {
 }
 
 // FlagNames returns all registered flag names for suggestion purposes.
+// For zero-allocation iteration, prefer FlagNamesSeq().
 func (r *FlagRegistry) FlagNames() []string {
 	names := make([]string, len(r.tags))
 	for i, tag := range r.tags {

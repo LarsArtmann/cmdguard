@@ -65,6 +65,25 @@ func containsHelper(s, substr string) bool {
 	return false
 }
 
+func TestCachedHomeDir_MatchesOS(t *testing.T) {
+	t.Parallel()
+
+	osHome, err := os.UserHomeDir()
+	if err != nil {
+		t.Skip("cannot get user home dir:", err)
+	}
+
+	cached := cachedHomeDir()
+	if cached != osHome {
+		t.Errorf("cachedHomeDir() = %q, want %q", cached, osHome)
+	}
+
+	again := cachedHomeDir()
+	if again != cached {
+		t.Errorf("cachedHomeDir() not stable: first=%q, second=%q", cached, again)
+	}
+}
+
 func TestJSONLoader_Load(t *testing.T) {
 	t.Parallel()
 

@@ -22,6 +22,7 @@ type FlagRegistry struct {
 }
 
 // Tags returns a defensive copy of all parsed flag tags.
+// For zero-allocation iteration, prefer TagsSeq().
 func (r *FlagRegistry) Tags() []FlagTag {
 	return slices.Clone(r.tags)
 }

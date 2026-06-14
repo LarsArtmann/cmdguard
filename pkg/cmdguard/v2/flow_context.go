@@ -122,6 +122,7 @@ func applyOptions(child *BranchingFlowContext, opts []FlowContextOption) {
 }
 
 // Path returns a defensive copy of the command path from root to this context.
+// For zero-allocation iteration, prefer PathSeq().
 func (b *BranchingFlowContext) Path() []string {
 	return slices.Clone(b.path)
 }
@@ -158,6 +159,7 @@ func (b *BranchingFlowContext) Parent() *BranchingFlowContext {
 }
 
 // Children returns a defensive copy of the child contexts.
+// For zero-allocation iteration, prefer ChildrenSeq().
 func (b *BranchingFlowContext) Children() []*BranchingFlowContext {
 	return slices.Clone(b.children)
 }
