@@ -1,7 +1,7 @@
 # cmdguard Features
 
-**Last Updated:** 2026-06-12
-**Version:** 2.6.0
+**Last Updated:** 2026-06-14
+**Version:** 2.7.0-dev
 **Go Version:** 1.26
 **Tests:** 407+ passing, 85.9% coverage, 0 lint issues, 0 race conditions
 
@@ -83,9 +83,10 @@
 | `validate:"email,min=5"` tag | ✅ FULLY_FUNCTIONAL | Built-in + custom validators                      |
 | Flag typo suggestions        | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based                        |
 | Subcommand typo suggestions  | ✅ FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands           |
-| Instance-scoped validators   | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator()              |
-| TypeHandler registry         | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system                   |
+| Instance-scoped validators   | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator() (COW)        |
+| TypeHandler registry         | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system (COW)             |
 | `RegisterTypeHandler()`      | ✅ FULLY_FUNCTIONAL | Register custom flag types                        |
+| Iterator methods (`iter.Seq`) | ✅ FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq       |
 
 ### Value Types
 

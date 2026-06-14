@@ -2,7 +2,7 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-12
+**Last Updated:** 2026-06-14
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
 **Status:** v2.6.0 - zero panics, 85.9% coverage, 0 lint issues, 0 race conditions
@@ -207,7 +207,7 @@ go build ./...                                   # Verify build
 7. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
 8. **Signal handling** - `WithSignalHandling[T]()` for graceful shutdown
 9. **Rich output** - OutputTable/OutputResult with 16 formats via go-output registries
-10. **Instance-scoped registries** — Each `FlagRegistry` clones from package-level defaults; `RegisterTypeHandler()`/`RegisterValidator()` write to global template; `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` write to instance
+10. **Copy-on-write registries** (v2.7.0+) — `FlagRegistry` shares global type/validator registries via copy-on-write; reads use the shared maps, writes trigger a lazy clone. `RegisterTypeHandler()`/`RegisterValidator()` write to global defaults (visible to instances that haven't cloned); `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` trigger COW clone and write to instance-local maps
 11. **$EDITOR support** - `EditInEditor()` for user input editing
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
@@ -277,6 +277,9 @@ go build ./...                                   # Verify build
 56. **errors.AsType (Go 1.26)** — `output.go` uses `errors.AsType[*T]` instead of `errors.As(err, &v)` for consistency with `cli.go:298`. All new code should use `errors.AsType`.
 57. **Validation error aggregation** — `ValidateConfig` uses `errors.Join(append([]error{ErrConfigValidation}, errs...)...)` so individual validation errors are reachable via `errors.Is`. Previous `%v` formatting lost the chain.
 58. **errors_audit.go** — `ErrAuditLogNotEnabled` and `ErrInvalidOutputFormat` moved from `errors.go` to `errors_audit.go`, matching the per-domain split pattern (command/config/di/flags/audit).
+59. **Copy-on-write registries (v2.7.0)** — `FlagRegistry` no longer eagerly clones `typeRegistry`/`validatorRegistry`. Instead it shares the global maps via `share()` and clones lazily on first write via `register()`. This reduces NewCLI by 48% (5.8µs vs 11µs) and saves 10 allocs per command. The `owned bool` and `parent *typeRegistry` fields control the COW state. Behavioral change: global registrations via `RegisterTypeHandler()`/`RegisterValidator()` are now visible to instances created before the registration (as long as they haven't triggered a lazy clone).
+60. **Cached os.UserHomeDir()** — `config_file.go` caches the home directory via `sync.OnceValue` (`cachedHomeDir`). The home directory is immutable during a process lifetime, so this eliminates redundant syscalls when multiple config paths use `~/` expansion.
+61. **Iterator methods (iter.Seq)** — `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` provide zero-allocation alternatives to `Tags()`, `FlagNames()`, `Path()`, `Children()`. The old methods still return defensive copies for backward compatibility. Use the `iter.Seq` variants when you only need to range over the data.
 
 ---
 

@@ -2,6 +2,7 @@
 package benchmarks
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/samber/do/v2"
@@ -433,6 +434,85 @@ func BenchmarkScopeProvideInvokeCycle(b *testing.B) {
 		_, err = v2.Invoke[benchService](scope)
 		if err != nil {
 			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkFlagRegistryCOW measures FlagRegistry creation with copy-on-write
+// (no per-instance customization — should be cheaper than eager clone).
+func BenchmarkFlagRegistryCOW(b *testing.B) {
+	type TestConfig struct {
+		Name    string `default:"test"  flag:"name"    help:"Name"`
+		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
+	}
+
+	cfg := &TestConfig{}
+
+	for b.Loop() {
+		registry, err := v2.NewFlagRegistry(cfg)
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		_ = registry
+	}
+}
+
+// BenchmarkFlagRegistryCOWWithWrite measures FlagRegistry creation followed by
+// a per-instance write (triggers lazy clone).
+func BenchmarkFlagRegistryCOWWithWrite(b *testing.B) {
+	type TestConfig struct {
+		Name string `default:"test" flag:"name" help:"Name"`
+	}
+
+	cfg := &TestConfig{}
+
+	for b.Loop() {
+		registry, err := v2.NewFlagRegistry(cfg)
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		registry.RegisterTypeHandler(reflect.TypeFor[string](), v2.TypeHandlerFunc{
+			ParseFunc:   func(value string, _ v2.FlagTag) (any, error) { return value, nil },
+			DefaultFunc: func(_ v2.FlagTag) any { return "" },
+		})
+	}
+}
+
+// BenchmarkTagsSeq measures iterator-based tag traversal (zero alloc).
+func BenchmarkTagsSeq(b *testing.B) {
+	type TestConfig struct {
+		Name    string `default:"test"  flag:"name"    help:"Name"`
+		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
+	}
+
+	registry, err := v2.NewFlagRegistry(&TestConfig{})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	for b.Loop() {
+		for range registry.TagsSeq() {
+		}
+	}
+}
+
+// BenchmarkTagsSlice measures slice-based tag traversal (allocates).
+func BenchmarkTagsSlice(b *testing.B) {
+	type TestConfig struct {
+		Name    string `default:"test"  flag:"name"    help:"Name"`
+		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
+	}
+
+	registry, err := v2.NewFlagRegistry(&TestConfig{})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	for b.Loop() {
+		tags := registry.Tags()
+		for range tags {
 		}
 	}
 }

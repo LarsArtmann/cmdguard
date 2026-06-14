@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"iter"
 	"reflect"
 	"slices"
 
@@ -10,8 +11,9 @@ import (
 )
 
 // FlagRegistry manages flag registration and parsing.
-// Each instance has its own type and validator registries, cloned from
-// package-level defaults at creation time.
+// Each instance shares type and validator registries from package-level defaults
+// via copy-on-write: reads use the shared global maps, writes trigger a lazy clone.
+// This avoids the clone cost when no per-instance customization is used.
 type FlagRegistry struct {
 	tags       []FlagTag
 	envPrefix  string
@@ -22,6 +24,12 @@ type FlagRegistry struct {
 // Tags returns a defensive copy of all parsed flag tags.
 func (r *FlagRegistry) Tags() []FlagTag {
 	return slices.Clone(r.tags)
+}
+
+// TagsSeq returns an iterator over all parsed flag tags without allocating a slice.
+// Prefer this over Tags() when you only need to range over the tags.
+func (r *FlagRegistry) TagsSeq() iter.Seq[FlagTag] {
+	return slices.Values(r.tags)
 }
 
 // SetEnvPrefix sets the environment variable prefix for this registry.
@@ -39,8 +47,8 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 
 	return &FlagRegistry{
 		tags:       tags,
-		validators: globalValidators.clone(),
-		types:      globalTypeRegistry.clone(),
+		validators: globalValidators.share(),
+		types:      globalTypeRegistry.share(),
 	}, nil
 }
 

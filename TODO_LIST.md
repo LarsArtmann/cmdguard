@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-06-12
-**Status:** v2.6.0 — zero panics, 85.9% coverage, 0 lint issues, 0 race conditions, 16 output formats
-**Tests:** 407+ passing, 0 build errors
+**Updated:** 2026-06-14
+**Status:** v2.7.0-dev — zero panics, 85.5% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries
+**Tests:** 413+ passing, 0 build errors
 
 ## Completed
 
@@ -87,6 +87,19 @@
 - [x] Fix `HostPort.IsEmpty()` coupling — use `hp.port.IsEmpty()` instead of `hp.port.port`
 - [x] Add IsEmpty() tests for Duration, LogLevel, LogFormat, Port
 - [x] Add ADR-001 for fang integration strategy
+
+### Phase 16: Performance Optimization Sprint (2026-06-14)
+
+- [x] Performance analysis: comprehensive HTML report at `docs/research/performance-analysis.html`
+- [x] Copy-on-write typeRegistry — eliminates 10 allocs/command, 48% faster NewCLI
+- [x] Copy-on-write validatorRegistry — same COW pattern
+- [x] Cache `os.UserHomeDir()` via `sync.OnceValue` — eliminates redundant syscalls
+- [x] Iterator methods: `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` — zero-allocation traversal
+- [x] Document regex cache safety bounds
+- [x] Add COW isolation tests (6 tests)
+- [x] Add benchmarks: FlagRegistryCOW, FlagRegistryCOWWithWrite, TagsSeq, TagsSlice
+- [x] Update PERFORMANCE.md with post-optimization numbers
+- [x] Update AGENTS.md gotchas (#59-61: COW, cached home dir, iterators)
 
 ## Remaining Work — Priority Sorted
 

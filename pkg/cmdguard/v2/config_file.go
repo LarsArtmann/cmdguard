@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 // ConfigFileLoader loads configuration from a file.
@@ -74,12 +75,27 @@ func loadConfigFile(paths []string, loader ConfigFileLoader, cfg any) ([]string,
 	return nil, fmt.Errorf("%w: none of %v found", ErrConfigFileNotFound, paths)
 }
 
+// cachedHomeDir caches the user's home directory for the process lifetime.
+// os.UserHomeDir() performs a syscall (getenv) on every call; the result never
+// changes during a process lifetime, so caching avoids redundant syscalls when
+// multiple config paths use ~/ expansion.
+//
+//nolint:gochecknoglobals // Process-lifetime cache, idiomatic sync.OnceValue usage
+var cachedHomeDir = sync.OnceValue(func() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+
+	return home
+})
+
 // expandConfigPath expands environment variables and the leading ~ in a path.
 func expandConfigPath(path string) string {
 	path = os.ExpandEnv(path)
 
 	if strings.HasPrefix(path, "~/") {
-		if home, err := os.UserHomeDir(); err == nil {
+		if home := cachedHomeDir(); home != "" {
 			path = filepath.Join(home, path[2:])
 		}
 	}

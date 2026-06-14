@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"iter"
 	"maps"
 	"slices"
 	"strings"
@@ -125,6 +126,12 @@ func (b *BranchingFlowContext) Path() []string {
 	return slices.Clone(b.path)
 }
 
+// PathSeq returns an iterator over the command path without allocating a slice.
+// Prefer this over Path() when you only need to range over the path elements.
+func (b *BranchingFlowContext) PathSeq() iter.Seq[string] {
+	return slices.Values(b.path)
+}
+
 // PathString returns the command path as a dot-separated string.
 func (b *BranchingFlowContext) PathString() string {
 	return strings.Join(b.path, ".")
@@ -153,6 +160,12 @@ func (b *BranchingFlowContext) Parent() *BranchingFlowContext {
 // Children returns a defensive copy of the child contexts.
 func (b *BranchingFlowContext) Children() []*BranchingFlowContext {
 	return slices.Clone(b.children)
+}
+
+// ChildrenSeq returns an iterator over child contexts without allocating a slice.
+// Prefer this over Children() when you only need to range over the children.
+func (b *BranchingFlowContext) ChildrenSeq() iter.Seq[*BranchingFlowContext] {
+	return slices.Values(b.children)
 }
 
 // Root returns the root context of this tree.

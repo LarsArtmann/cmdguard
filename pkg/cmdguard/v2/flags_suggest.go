@@ -1,6 +1,9 @@
 package v2
 
-import "strings"
+import (
+	"iter"
+	"strings"
+)
 
 // maxEditDistance is the threshold for flag name suggestions.
 const maxEditDistance = 3
@@ -109,4 +112,16 @@ func (r *FlagRegistry) FlagNames() []string {
 	}
 
 	return names
+}
+
+// FlagNamesSeq returns an iterator over all registered flag names without allocating a slice.
+// Prefer this over FlagNames() when you only need to range over the names.
+func (r *FlagRegistry) FlagNamesSeq() iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for _, tag := range r.tags {
+			if !yield(tag.Name) {
+				return
+			}
+		}
+	}
 }

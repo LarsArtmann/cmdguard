@@ -61,6 +61,8 @@ type typeRegistry struct {
 	byType       map[reflect.Type]TypeHandler
 	byKind       map[reflect.Kind]TypeHandler
 	countHandler TypeHandler
+	owned        bool          // true if this instance owns its maps (can mutate)
+	parent       *typeRegistry // nil when owned; shared source for COW reads
 }
 
 // globalTypeRegistry is the default registry with all built-in types.
@@ -70,6 +72,7 @@ func newTypeRegistry() *typeRegistry {
 	r := &typeRegistry{
 		byType: make(map[reflect.Type]TypeHandler),
 		byKind: make(map[reflect.Kind]TypeHandler),
+		owned:  true,
 	}
 
 	r.registerKinds()
@@ -79,43 +82,64 @@ func newTypeRegistry() *typeRegistry {
 }
 
 // lookupHandler finds the TypeHandler for a given reflect.Type.
+// For copy-on-write instances (owned=false), delegates to the parent registry.
 func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
 	r.mu.RLock()
-	defer r.mu.RUnlock()
 
-	if h, ok := r.byType[typ]; ok {
-		return h, true
+	if r.owned {
+		defer r.mu.RUnlock()
+
+		if h, ok := r.byType[typ]; ok {
+			return h, true
+		}
+
+		if h, ok := r.byKind[typ.Kind()]; ok {
+			return h, true
+		}
+
+		return nil, false
 	}
 
-	if h, ok := r.byKind[typ.Kind()]; ok {
-		return h, true
-	}
+	parent := r.parent
+	r.mu.RUnlock()
 
-	return nil, false
+	return parent.lookupHandler(typ)
 }
 
-// clone returns an independent copy of the typeRegistry.
-// The maps are shallow-copied; TypeHandler values are shared (they are stateless).
-func (r *typeRegistry) clone() *typeRegistry {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	c := &typeRegistry{
-		byType:       make(map[reflect.Type]TypeHandler, len(r.byType)),
-		byKind:       make(map[reflect.Kind]TypeHandler, len(r.byKind)),
-		countHandler: r.countHandler,
+// share returns a copy-on-write view of this registry.
+// The returned instance reads from this registry's maps until the first write,
+// at which point it clones lazily. This avoids the clone cost for the common
+// case where no per-instance customization is used.
+func (r *typeRegistry) share() *typeRegistry {
+	root := r
+	if !r.owned && r.parent != nil {
+		root = r.parent
 	}
 
-	maps.Copy(c.byType, r.byType)
-	maps.Copy(c.byKind, r.byKind)
+	root.mu.RLock()
+	defer root.mu.RUnlock()
 
-	return c
+	return &typeRegistry{
+		countHandler: root.countHandler,
+		owned:        false,
+		parent:       root,
+	}
 }
 
 // register adds or replaces a TypeHandler for a specific reflect.Type.
+// For copy-on-write instances, triggers a lazy clone on first write.
 func (r *typeRegistry) register(typ reflect.Type, handler TypeHandler) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	if !r.owned && r.parent != nil {
+		r.parent.mu.RLock()
+		r.byType = maps.Clone(r.parent.byType)
+		r.byKind = maps.Clone(r.parent.byKind)
+		r.parent.mu.RUnlock()
+		r.parent = nil
+		r.owned = true
+	}
 
 	r.byType[typ] = handler
 }

@@ -18,6 +18,8 @@ type FlagValidator func(value string) error
 type validatorRegistry struct {
 	mu         sync.RWMutex
 	validators map[string]FlagValidator
+	owned      bool               // true if this instance owns its map (can mutate)
+	parent     *validatorRegistry // nil when owned; shared source for COW reads
 }
 
 // globalValidators is the package-level validator registry.
@@ -26,6 +28,7 @@ var globalValidators = newValidatorRegistry()
 func newValidatorRegistry() *validatorRegistry {
 	registry := &validatorRegistry{
 		validators: make(map[string]FlagValidator),
+		owned:      true,
 	}
 
 	registry.registerBuiltins()
@@ -48,29 +51,51 @@ func (r *validatorRegistry) register(name string, validator FlagValidator) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	if !r.owned && r.parent != nil {
+		r.parent.mu.RLock()
+		r.validators = maps.Clone(r.parent.validators)
+		r.parent.mu.RUnlock()
+		r.parent = nil
+		r.owned = true
+	}
+
 	r.validators[name] = validator
 }
 
-func (r *validatorRegistry) clone() *validatorRegistry {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	c := &validatorRegistry{
-		validators: make(map[string]FlagValidator, len(r.validators)),
+// share returns a copy-on-write view of this registry.
+// The returned instance reads from this registry's map until the first write,
+// at which point it clones lazily. This avoids the clone cost for the common
+// case where no per-instance customization is used.
+func (r *validatorRegistry) share() *validatorRegistry {
+	root := r
+	if !r.owned && r.parent != nil {
+		root = r.parent
 	}
 
-	maps.Copy(c.validators, r.validators)
+	root.mu.RLock()
+	defer root.mu.RUnlock()
 
-	return c
+	return &validatorRegistry{
+		owned:  false,
+		parent: root,
+	}
 }
 
 func (r *validatorRegistry) lookup(name string) (FlagValidator, bool) {
 	r.mu.RLock()
-	defer r.mu.RUnlock()
 
-	v, ok := r.validators[name]
+	if r.owned {
+		defer r.mu.RUnlock()
 
-	return v, ok
+		v, ok := r.validators[name]
+
+		return v, ok
+	}
+
+	parent := r.parent
+	r.mu.RUnlock()
+
+	return parent.lookup(name)
 }
 
 // RegisterValidator adds a named validator to the global defaults template.
@@ -257,6 +282,9 @@ func validateMax(value string) error {
 }
 
 // regexCache caches compiled regex patterns to avoid recompilation on every validate call.
+// The cache is unbounded; in practice the set of patterns is finite and developer-defined
+// (from struct tags), so it does not grow indefinitely. If user-derived patterns are ever
+// supported, this should be replaced with a bounded LRU cache.
 var regexCache sync.Map // map[string]*regexp.Regexp
 
 func validateRegex(value string) error {
