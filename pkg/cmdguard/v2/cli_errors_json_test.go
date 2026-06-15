@@ -140,136 +140,93 @@ func TestExtractExitCode(t *testing.T) {
 
 //nolint:paralleltest // os.Stderr manipulation
 func TestJSONErrorIntegration(t *testing.T) {
-	t.Run("no JSON output when output format not set", func(t *testing.T) {
-		cli, err := NewCLI[jsonErrConfig]("test", "test", jsonErrConfig{})
-		testutil.AssertNoError(t, err)
-
-		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
-			"fail",
-			func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
-				return errors.New("plain error")
+	tests := []struct {
+		name           string
+		cliOpts        []CLIOption[jsonErrConfig]
+		handlerErr     error
+		assertEnvelope func(t *testing.T, stderrOutput string, execErr error)
+	}{
+		{
+			name:       "no JSON output when output format not set",
+			cliOpts:    nil,
+			handlerErr: errors.New("plain error"),
+			assertEnvelope: func(t *testing.T, stderrOutput string, execErr error) {
+				t.Helper()
+				if execErr == nil {
+					t.Fatal("expected error from failing command")
+				}
+				var envelope jsonErrorEnvelope
+				if decodeErr := json.Unmarshal([]byte(stderrOutput), &envelope); decodeErr == nil {
+					t.Error("expected no JSON envelope when output format is not set, but got valid JSON")
+				}
 			},
-			WithShort[jsonErrConfig, *NoFlags]("fails"),
-		)
-		testutil.AssertNoError(t, cmdErr)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		oldStderr := os.Stderr
-		r, w, pipeErr := os.Pipe()
-		if pipeErr != nil {
-			t.Fatalf("pipe: %v", pipeErr)
-		}
-
-		os.Stderr = w
-
-		execErr := cli.ExecuteWithArgs(context.Background(), []string{"fail"})
-
-		w.Close()
-		os.Stderr = oldStderr
-
-		var buf bytes.Buffer
-		_, _ = buf.ReadFrom(r)
-		stderrOutput := buf.String()
-
-		if execErr == nil {
-			t.Fatal("expected error from failing command")
-		}
-
-		var envelope jsonErrorEnvelope
-		decodeErr := json.Unmarshal([]byte(stderrOutput), &envelope)
-		if decodeErr == nil {
-			t.Error("expected no JSON envelope when output format is not set, but got valid JSON")
-		}
-	})
-
-	t.Run("silences cobra errors when JSON output is active", func(t *testing.T) {
-		cli, err := NewCLI[jsonErrConfig](
-			"test", "test", jsonErrConfig{},
-			WithOutputFormat[jsonErrConfig](output.FormatJSON),
-		)
-		testutil.AssertNoError(t, err)
-
-		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
-			"fail",
-			func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
-				return errors.New("plain error")
+		},
+		{
+			name:       "silences cobra errors when JSON output is active",
+			cliOpts:    []CLIOption[jsonErrConfig]{WithOutputFormat[jsonErrConfig](output.FormatJSON)},
+			handlerErr: errors.New("plain error"),
+			assertEnvelope: func(t *testing.T, stderrOutput string, execErr error) {
+				t.Helper()
+				if execErr == nil {
+					t.Fatal("expected error from failing command")
+				}
+				var envelope jsonErrorEnvelope
+				decodeErr := json.Unmarshal([]byte(stderrOutput), &envelope)
+				testutil.AssertNoError(t, decodeErr)
+				testutil.AssertBoolTrue(t, envelope.Error.Code == 1, "exit code should be 1")
 			},
-			WithShort[jsonErrConfig, *NoFlags]("fails"),
-		)
-		testutil.AssertNoError(t, cmdErr)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-		oldStderr := os.Stderr
-		r, w, pipeErr := os.Pipe()
-		if pipeErr != nil {
-			t.Fatalf("pipe: %v", pipeErr)
-		}
-
-		os.Stderr = w
-
-		execErr := cli.ExecuteWithArgs(context.Background(), []string{"fail"})
-
-		w.Close()
-		os.Stderr = oldStderr
-
-		var buf bytes.Buffer
-		_, _ = buf.ReadFrom(r)
-		stderrOutput := buf.String()
-
-		if execErr == nil {
-			t.Fatal("expected error from failing command")
-		}
-
-		var envelope jsonErrorEnvelope
-		decodeErr := json.Unmarshal([]byte(stderrOutput), &envelope)
-		testutil.AssertNoError(t, decodeErr)
-		testutil.AssertBoolTrue(t, envelope.Error.Code == 1, "exit code should be 1")
-	})
-
-	t.Run("YAML output also triggers structured errors", func(t *testing.T) {
-		cli, err := NewCLI[jsonErrConfig](
-			"test", "test", jsonErrConfig{},
-			WithOutputFormat[jsonErrConfig](output.FormatYAML),
-		)
-		testutil.AssertNoError(t, err)
-
-		cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
-			"fail",
-			func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
-				return fmt.Errorf("%w: missing", ErrConfigValidation)
+		},
+		{
+			name:       "YAML output also triggers structured errors",
+			cliOpts:    []CLIOption[jsonErrConfig]{WithOutputFormat[jsonErrConfig](output.FormatYAML)},
+			handlerErr: fmt.Errorf("%w: missing", ErrConfigValidation),
+			assertEnvelope: func(t *testing.T, stderrOutput string, execErr error) {
+				t.Helper()
+				if execErr == nil {
+					t.Fatal("expected error from failing command")
+				}
+				var envelope jsonErrorEnvelope
+				decodeErr := json.Unmarshal([]byte(stderrOutput), &envelope)
+				testutil.AssertNoError(t, decodeErr)
+				if envelope.Error.Type != "config" {
+					t.Errorf("Error.Type = %q, want %q", envelope.Error.Type, "config")
+				}
 			},
-			WithShort[jsonErrConfig, *NoFlags]("fails"),
-		)
-		testutil.AssertNoError(t, cmdErr)
-		testutil.AssertNoError(t, AddCommand(cli, cmd))
+		},
+	}
 
-		oldStderr := os.Stderr
-		r, w, pipeErr := os.Pipe()
-		if pipeErr != nil {
-			t.Fatalf("pipe: %v", pipeErr)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cli, cliErr := NewCLI[jsonErrConfig]("test", "test", jsonErrConfig{}, tt.cliOpts...)
+			testutil.AssertNoError(t, cliErr)
 
-		os.Stderr = w
+			cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
+				"fail",
+				func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
+					return tt.handlerErr
+				},
+				WithShort[jsonErrConfig, *NoFlags]("fails"),
+			)
+			testutil.AssertNoError(t, cmdErr)
+			testutil.AssertNoError(t, AddCommand(cli, cmd))
 
-		execErr := cli.ExecuteWithArgs(context.Background(), []string{"fail"})
+			oldStderr := os.Stderr
+			r, w, pipeErr := os.Pipe()
+			if pipeErr != nil {
+				t.Fatalf("pipe: %v", pipeErr)
+			}
 
-		w.Close()
-		os.Stderr = oldStderr
+			os.Stderr = w
 
-		var buf bytes.Buffer
-		_, _ = buf.ReadFrom(r)
-		stderrOutput := buf.String()
+			execErr := cli.ExecuteWithArgs(context.Background(), []string{"fail"})
 
-		if execErr == nil {
-			t.Fatal("expected error from failing command")
-		}
+			w.Close()
+			os.Stderr = oldStderr
 
-		var envelope jsonErrorEnvelope
-		decodeErr := json.Unmarshal([]byte(stderrOutput), &envelope)
-		testutil.AssertNoError(t, decodeErr)
+			var buf bytes.Buffer
+			_, _ = buf.ReadFrom(r)
 
-		if envelope.Error.Type != "config" {
-			t.Errorf("Error.Type = %q, want %q", envelope.Error.Type, "config")
-		}
-	})
+			tt.assertEnvelope(t, buf.String(), execErr)
+		})
+	}
 }

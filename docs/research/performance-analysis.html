@@ -332,13 +332,14 @@
       source files / 7,794 LOC · 85.5% coverage
     </p>
 
-    <div class="callout" style="border-left-color: var(--accent-green);">
-      <div class="callout-title" style="color: var(--accent-green);">✅ Optimizations Implemented (v2.7.0-dev)</div>
-      Recommendations #1 (COW registries), #2 (cached home dir), #4 (regex cache doc),
-      and #5 (iterator methods) have been implemented. Results in
-      <code>PERFORMANCE.md</code>.
-      Key improvement: <strong>NewCLI 48% faster</strong> (5.8µs vs 11µs),
-      <strong>10 fewer allocs per command</strong>,
+    <div class="callout" style="border-left-color: var(--accent-green)">
+      <div class="callout-title" style="color: var(--accent-green)">
+        ✅ Optimizations Implemented (v2.7.0-dev)
+      </div>
+      Recommendations #1 (COW registries), #2 (cached home dir), #4 (regex cache doc), and #5
+      (iterator methods) have been implemented. Results in
+      <code>PERFORMANCE.md</code>. Key improvement: <strong>NewCLI 48% faster</strong> (5.8µs vs
+      11µs), <strong>10 fewer allocs per command</strong>,
       <strong>TagsSeq zero-allocation iterators</strong> (12ns vs 101ns).
     </div>
 

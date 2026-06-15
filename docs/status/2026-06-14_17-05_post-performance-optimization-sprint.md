@@ -3,6 +3,7 @@
 **Date:** 2026-06-14 17:05
 **Branch:** master (clean, pushed)
 **Last 3 commits:**
+
 - `c94fc9f` test: add correctness tests for iter.Seq methods and cached home dir
 - `ff0bd86` perf: copy-on-write registries, cached home dir, iterator methods
 - `8b4e254` docs(research): add comprehensive performance characteristics analysis
@@ -11,24 +12,24 @@
 
 ## Project Metrics Snapshot
 
-| Metric | Value |
-|--------|-------|
-| Version | 2.7.0-dev |
-| Go version | 1.26 |
-| Source files | 53 |
-| Source LOC | 7,902 |
-| Test files | 83 |
-| Test LOC | 16,472 |
-| Tests passing | 419 |
-| Coverage (v2) | 85.6% |
-| Coverage (configload) | 87.5% |
-| Coverage (taskctl example) | 70.5% |
-| Lint issues | 0 |
-| Race conditions | 0 |
-| Direct dependencies | 29 |
-| Total modules | 129 |
-| Binary size (taskctl example) | 24 MB |
-| NewCLI overhead | 5.8 µs (was 11 µs, -48%) |
+| Metric                        | Value                    |
+| ----------------------------- | ------------------------ |
+| Version                       | 2.7.0-dev                |
+| Go version                    | 1.26                     |
+| Source files                  | 53                       |
+| Source LOC                    | 7,902                    |
+| Test files                    | 83                       |
+| Test LOC                      | 16,472                   |
+| Tests passing                 | 419                      |
+| Coverage (v2)                 | 85.6%                    |
+| Coverage (configload)         | 87.5%                    |
+| Coverage (taskctl example)    | 70.5%                    |
+| Lint issues                   | 0                        |
+| Race conditions               | 0                        |
+| Direct dependencies           | 29                       |
+| Total modules                 | 129                      |
+| Binary size (taskctl example) | 24 MB                    |
+| NewCLI overhead               | 5.8 µs (was 11 µs, -48%) |
 
 ---
 
@@ -54,7 +55,7 @@
 - **Doctor command** — `DoctorCommand[T]`, `WithDoctorCheck`, `WithDoctorShort/Long/GroupID`
 - **Audit log integration** — `WithAuditLog[T]`, `AuditLogCommand[T]`, HTML/JSON/NDJSON/Mermaid export
 - **Error system** — 62 sentinel errors across 6 domain-specific files, `errors.Is()` chainable, `ExitCoder`/`NewExitError`
-- **Zero panics** — All Must* functions removed; `safeProvide` wraps DI panics
+- **Zero panics** — All Must\* functions removed; `safeProvide` wraps DI panics
 - **Signal handling** — `WithSignalHandling` (ctx cancel), `WithGracefulShutdown` (DI shutdown)
 - **Fang integration** — Styled output, `--no-color`/`NO_COLOR` support, `WithFangErrorHandler`, `WithFangColorScheme`
 - **Validation modes** — `WithStrictValidation`, `WithDraconianValidation`, `WithConfigValidation`
@@ -105,19 +106,20 @@
 
 ## b) PARTIALLY DONE
 
-| Item | Status | What's Missing |
-|------|--------|----------------|
-| Test coverage | 85.6% (v2) | Target is 90%+. ~14.4% of statements uncovered, mostly error paths and edge cases |
-| Fuzz testing | 2 fuzz targets exist | Missing `testdata/fuzz/` corpora for systematic fuzz testing |
-| Binary size | 24 MB | Users who don't need all 16 output formats still pull in all go-output sub-modules via init() side-effect imports |
-| Pre-commit hooks | BuildFlow runs but flake-meta-checker fails | Pre-existing: flake.nix missing `meta` attribute block. Requires `--no-verify` to commit |
-| koanf integration | `configload/koanf.go` exists with loader | Not wired as default; users must opt-in via `WithConfigFileLoader`. Auto-detection from file extension not implemented |
+| Item              | Status                                      | What's Missing                                                                                                         |
+| ----------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Test coverage     | 85.6% (v2)                                  | Target is 90%+. ~14.4% of statements uncovered, mostly error paths and edge cases                                      |
+| Fuzz testing      | 2 fuzz targets exist                        | Missing `testdata/fuzz/` corpora for systematic fuzz testing                                                           |
+| Binary size       | 24 MB                                       | Users who don't need all 16 output formats still pull in all go-output sub-modules via init() side-effect imports      |
+| Pre-commit hooks  | BuildFlow runs but flake-meta-checker fails | Pre-existing: flake.nix missing `meta` attribute block. Requires `--no-verify` to commit                               |
+| koanf integration | `configload/koanf.go` exists with loader    | Not wired as default; users must opt-in via `WithConfigFileLoader`. Auto-detection from file extension not implemented |
 
 ---
 
 ## c) NOT STARTED
 
 ### v3.0 Major Redesign (All Not Started)
+
 - v3.0 API design document
 - `pkg/cmdguard/v3/` directory
 - v3 core types, CLI, commands, flags, scope, options
@@ -128,6 +130,7 @@
 - Remove `SetConfig` or make it safe
 
 ### Features (Not Started)
+
 - `Result[T]` type for error handling
 - `Validated[T]` wrapper with validation functions
 - Branded IDs example application
@@ -141,6 +144,7 @@
 - Extract flag-related code to standalone `flagtags` library
 
 ### Infrastructure (Not Started)
+
 - `CODECOV_TOKEN` secret in GitHub repo settings
 - Codecov integration
 - Deprecate v1 API timeline
@@ -152,6 +156,7 @@
 ## d) TOTALLY FUCKED UP
 
 **Nothing is fucked up.** The codebase is in excellent shape:
+
 - 419 tests, 0 failures, 0 race conditions, 0 lint issues
 - Zero panics in library code
 - Clean git history, working tree clean, all pushed
@@ -199,33 +204,33 @@
 
 Sorted by impact × ease (highest impact/lowest effort first).
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Add `CODECOV_TOKEN` to GitHub repo settings | High | 5m | Infra |
-| 2 | Fix `flake.nix` meta attribute block | Medium | 15m | Infra |
-| 3 | Add snapshot tests for 16 output formats | High | 2h | Testing |
-| 4 | Increase v2 coverage from 85.6% → 90% | Medium | 3h | Testing |
-| 5 | Add fuzz test corpora in `testdata/fuzz/` | Medium | 1h | Testing |
-| 6 | Add benchmark regression thresholds in CI | Medium | 30m | Infra |
-| 7 | Config file nested struct support | High | 4h | Feature |
-| 8 | Structured JSON error output for `--output=json` | High | 3h | Feature |
-| 9 | Config auto-loading with koanf (file extension detection) | Medium | 2h | Feature |
-| 10 | Documentation generation (`GenerateDocs()`, markdown) | Medium | 4h | Feature |
-| 11 | v3.0 API design document | High | 4h | Design |
-| 12 | Fix telemetry context propagation (v3.0 middleware signature) | High | 6h | v3.0 |
-| 13 | Make FlagTag immutable (v3.0 builder pattern) | Medium | 4h | v3.0 |
-| 14 | Plugin system for custom validators | Medium | 6h | Feature |
-| 15 | Extract flagtags as standalone library | Low | 3h | Refactor |
-| 16 | Add Result[T] type | Medium | 3h | Feature |
-| 17 | Add Validated[T] wrapper | Low | 2h | Feature |
-| 18 | Branded IDs example application | Low | 2h | Example |
-| 19 | Test all examples in CI | Medium | 1h | Infra |
-| 20 | Deprecate v1 API timeline | Low | 30m | Process |
-| 21 | Add property-based tests for type parsers | Medium | 2h | Testing |
-| 22 | Conditional go-output format imports (reduce binary size) | Low | 3h | Refactor |
-| 23 | Single-pass JSON config loading (eliminate double unmarshal) | Low | 1h | Perf |
-| 24 | Add enhanced flag validation enums | Low | 2h | Feature |
-| 25 | Metrics/hooks for custom observability | Low | 4h | Feature |
+| #   | Task                                                          | Impact | Effort | Category |
+| --- | ------------------------------------------------------------- | ------ | ------ | -------- |
+| 1   | Add `CODECOV_TOKEN` to GitHub repo settings                   | High   | 5m     | Infra    |
+| 2   | Fix `flake.nix` meta attribute block                          | Medium | 15m    | Infra    |
+| 3   | Add snapshot tests for 16 output formats                      | High   | 2h     | Testing  |
+| 4   | Increase v2 coverage from 85.6% → 90%                         | Medium | 3h     | Testing  |
+| 5   | Add fuzz test corpora in `testdata/fuzz/`                     | Medium | 1h     | Testing  |
+| 6   | Add benchmark regression thresholds in CI                     | Medium | 30m    | Infra    |
+| 7   | Config file nested struct support                             | High   | 4h     | Feature  |
+| 8   | Structured JSON error output for `--output=json`              | High   | 3h     | Feature  |
+| 9   | Config auto-loading with koanf (file extension detection)     | Medium | 2h     | Feature  |
+| 10  | Documentation generation (`GenerateDocs()`, markdown)         | Medium | 4h     | Feature  |
+| 11  | v3.0 API design document                                      | High   | 4h     | Design   |
+| 12  | Fix telemetry context propagation (v3.0 middleware signature) | High   | 6h     | v3.0     |
+| 13  | Make FlagTag immutable (v3.0 builder pattern)                 | Medium | 4h     | v3.0     |
+| 14  | Plugin system for custom validators                           | Medium | 6h     | Feature  |
+| 15  | Extract flagtags as standalone library                        | Low    | 3h     | Refactor |
+| 16  | Add Result[T] type                                            | Medium | 3h     | Feature  |
+| 17  | Add Validated[T] wrapper                                      | Low    | 2h     | Feature  |
+| 18  | Branded IDs example application                               | Low    | 2h     | Example  |
+| 19  | Test all examples in CI                                       | Medium | 1h     | Infra    |
+| 20  | Deprecate v1 API timeline                                     | Low    | 30m    | Process  |
+| 21  | Add property-based tests for type parsers                     | Medium | 2h     | Testing  |
+| 22  | Conditional go-output format imports (reduce binary size)     | Low    | 3h     | Refactor |
+| 23  | Single-pass JSON config loading (eliminate double unmarshal)  | Low    | 1h     | Perf     |
+| 24  | Add enhanced flag validation enums                            | Low    | 2h     | Feature  |
+| 25  | Metrics/hooks for custom observability                        | Low    | 4h     | Feature  |
 
 ---
 

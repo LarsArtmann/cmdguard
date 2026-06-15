@@ -159,8 +159,10 @@ func BenchmarkParseFlagTags(b *testing.B) {
 	}
 }
 
-// BenchmarkFlagRegistryCreation measures FlagRegistry creation.
-func BenchmarkFlagRegistryCreation(b *testing.B) {
+// runFlagRegistryBench is the shared body for the FlagRegistry creation
+// benchmarks. Kept as a function (not a sub-benchmark) so each variant shows
+// up as a distinct row in `go test -bench` output for comparison.
+func runFlagRegistryBench(b *testing.B) {
 	type TestConfig struct {
 		Name    string `default:"test"  flag:"name"    help:"Name"`
 		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
@@ -176,6 +178,17 @@ func BenchmarkFlagRegistryCreation(b *testing.B) {
 
 		_ = registry
 	}
+}
+
+// BenchmarkFlagRegistryCreation measures FlagRegistry creation.
+func BenchmarkFlagRegistryCreation(b *testing.B) {
+	runFlagRegistryBench(b)
+}
+
+// BenchmarkFlagRegistryCOW measures FlagRegistry creation with copy-on-write
+// (no per-instance customization — should be cheaper than eager clone).
+func BenchmarkFlagRegistryCOW(b *testing.B) {
+	runFlagRegistryBench(b)
 }
 
 // BenchmarkCommandValidate measures command validation.
@@ -435,26 +448,6 @@ func BenchmarkScopeProvideInvokeCycle(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
-	}
-}
-
-// BenchmarkFlagRegistryCOW measures FlagRegistry creation with copy-on-write
-// (no per-instance customization — should be cheaper than eager clone).
-func BenchmarkFlagRegistryCOW(b *testing.B) {
-	type TestConfig struct {
-		Name    string `default:"test"  flag:"name"    help:"Name"`
-		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
-	}
-
-	cfg := &TestConfig{}
-
-	for b.Loop() {
-		registry, err := v2.NewFlagRegistry(cfg)
-		if err != nil {
-			b.Fatal(err)
-		}
-
-		_ = registry
 	}
 }
 

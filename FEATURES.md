@@ -73,19 +73,19 @@
 
 ### Flag System
 
-| Feature                      | Status              | Notes                                             |
-| ---------------------------- | ------------------- | ------------------------------------------------- |
-| Struct tag flags             | ✅ FULLY_FUNCTIONAL | `flag:"name" short:"n" default:"val" help:"desc"` |
-| `env:"VAR"` struct tag       | ✅ FULLY_FUNCTIONAL | Environment variable binding                      |
-| `count:"true"` struct tag    | ✅ FULLY_FUNCTIONAL | Counting flags: -vvv → 3                          |
-| Short flags                  | ✅ FULLY_FUNCTIONAL | `short:"n"` for `-n`                              |
-| Required flags               | ✅ FULLY_FUNCTIONAL | `required:"true"` tag                             |
-| `validate:"email,min=5"` tag | ✅ FULLY_FUNCTIONAL | Built-in + custom validators                      |
-| Flag typo suggestions        | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based                        |
-| Subcommand typo suggestions  | ✅ FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands           |
-| Instance-scoped validators   | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator() (COW)        |
-| TypeHandler registry         | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system (COW)             |
-| `RegisterTypeHandler()`      | ✅ FULLY_FUNCTIONAL | Register custom flag types                        |
+| Feature                       | Status              | Notes                                             |
+| ----------------------------- | ------------------- | ------------------------------------------------- |
+| Struct tag flags              | ✅ FULLY_FUNCTIONAL | `flag:"name" short:"n" default:"val" help:"desc"` |
+| `env:"VAR"` struct tag        | ✅ FULLY_FUNCTIONAL | Environment variable binding                      |
+| `count:"true"` struct tag     | ✅ FULLY_FUNCTIONAL | Counting flags: -vvv → 3                          |
+| Short flags                   | ✅ FULLY_FUNCTIONAL | `short:"n"` for `-n`                              |
+| Required flags                | ✅ FULLY_FUNCTIONAL | `required:"true"` tag                             |
+| `validate:"email,min=5"` tag  | ✅ FULLY_FUNCTIONAL | Built-in + custom validators                      |
+| Flag typo suggestions         | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based                        |
+| Subcommand typo suggestions   | ✅ FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands           |
+| Instance-scoped validators    | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator() (COW)        |
+| TypeHandler registry          | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system (COW)             |
+| `RegisterTypeHandler()`       | ✅ FULLY_FUNCTIONAL | Register custom flag types                        |
 | Iterator methods (`iter.Seq`) | ✅ FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq       |
 
 ### Value Types

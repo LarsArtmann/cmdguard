@@ -4,9 +4,9 @@ go 1.26.3
 
 require (
 	charm.land/fang/v2 v2.0.1
-	charm.land/glamour/v2 v2.0.0
+	charm.land/glamour/v2 v2.0.1
 	charm.land/huh/v2 v2.0.3
-	charm.land/lipgloss/v2 v2.0.3
+	charm.land/lipgloss/v2 v2.0.4
 	github.com/go-faster/yaml v0.4.6
 	github.com/knadh/koanf/parsers/json v1.0.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -50,9 +50,9 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260608091853-35bcb7319efa // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260608090822-c3ad58c6c9e5 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260614010340-86573f9427fd // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
-	github.com/charmbracelet/x/exp/slice v0.0.0-20260608090822-c3ad58c6c9e5 // indirect
+	github.com/charmbracelet/x/exp/slice v0.0.0-20260614010340-86573f9427fd // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect

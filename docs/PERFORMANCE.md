@@ -15,12 +15,12 @@ Copy-on-write registries (v2.7.0+) reduce per-command allocations by **48%** and
 
 ## Optimizations Applied (v2.7.0)
 
-| Optimization | Effect | Files |
-| --- | --- | --- |
-| Copy-on-write registries | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI | `type_handler.go`, `flags_validate.go`, `flags.go` |
-| Cached `os.UserHomeDir()` | Eliminates redundant syscalls for `~/` path expansion | `config_file.go` |
-| Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies | `flags.go`, `flags_suggest.go`, `flow_context.go` |
-| Regex cache safety documentation | Documents bounded usage of `sync.Map` regex cache | `flags_validate.go` |
+| Optimization                          | Effect                                                  | Files                                              |
+| ------------------------------------- | ------------------------------------------------------- | -------------------------------------------------- |
+| Copy-on-write registries              | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI | `type_handler.go`, `flags_validate.go`, `flags.go` |
+| Cached `os.UserHomeDir()`             | Eliminates redundant syscalls for `~/` path expansion   | `config_file.go`                                   |
+| Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies         | `flags.go`, `flags_suggest.go`, `flow_context.go`  |
+| Regex cache safety documentation      | Documents bounded usage of `sync.Map` regex cache       | `flags_validate.go`                                |
 
 ---
 
@@ -56,12 +56,12 @@ _Note: `Execute` with help is slower because fang renders styled output. Actual 
 
 ### Copy-on-Write Registry
 
-| Operation                         | Time    | Allocations | Memory  | Notes |
-| --------------------------------- | ------- | ----------- | ------- | ----- |
-| `NewFlagRegistry` (COW, no write) | ~0.8 µs | 11          | ~912 B  | Shares global maps |
-| `NewFlagRegistry` + 1 write       | ~0.9 µs | 19          | ~2.2 KB | Triggers lazy clone |
+| Operation                         | Time    | Allocations | Memory  | Notes                     |
+| --------------------------------- | ------- | ----------- | ------- | ------------------------- |
+| `NewFlagRegistry` (COW, no write) | ~0.8 µs | 11          | ~912 B  | Shares global maps        |
+| `NewFlagRegistry` + 1 write       | ~0.9 µs | 19          | ~2.2 KB | Triggers lazy clone       |
 | `TagsSeq()` (iterator)            | ~12 ns  | 0           | 0 B     | Zero-allocation traversal |
-| `Tags()` (defensive copy)         | ~101 ns | 1           | ~384 B  | Legacy API |
+| `Tags()` (defensive copy)         | ~101 ns | 1           | ~384 B  | Legacy API                |
 
 ### Dependency Injection
 
@@ -116,6 +116,7 @@ Starting in v2.7.0, `FlagRegistry` uses copy-on-write for its `typeRegistry` and
 on the first write (`RegisterTypeHandler` / `RegisterFlagValidator`).
 
 **Benefits:**
+
 - 48% faster `NewCLI` (5.8 µs vs 11.0 µs)
 - 10 fewer allocations per command
 - 22% less memory per command
