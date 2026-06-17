@@ -4,7 +4,7 @@
 // provides compile-time type safety for commands and flags, and integrates samber/do/v2
 // for dependency injection — all without panics in library code.
 //
-// Version: 2.7.0-dev
+// Version: 2.7.0
 //
 // # Quick Start
 //

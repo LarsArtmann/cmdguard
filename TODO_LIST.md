@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-06-14
-**Status:** v2.7.0-dev — zero panics, 85.5% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries
-**Tests:** 413+ passing, 0 build errors
+**Updated:** 2026-06-17
+**Status:** v2.7.0 — zero panics, 85.6% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries
+**Tests:** 396+ passing, 0 build errors
 
 ## Completed
 

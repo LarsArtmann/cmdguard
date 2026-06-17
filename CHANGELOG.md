@@ -11,6 +11,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.7.0] - 2026-06-17
+
+### Added
+
+- **Copy-on-write registries** — `FlagRegistry` shares global type/validator registries lazily; clones only on first write. Reduces `NewCLI` by 48% (~5.8µs vs 11µs) and saves 10 allocations per command
+- **Cached `os.UserHomeDir()`** — `sync.OnceValue` eliminates redundant syscalls during config path `~/` expansion
+- **Iterator methods (`iter.Seq`)** — `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` provide zero-allocation traversal alternatives to slice-returning variants
+- **COW isolation tests and benchmarks** — 6 correctness tests and dedicated benchmarks for copy-on-write behavior
+- **Performance analysis report** — Comprehensive HTML report at `docs/research/performance-analysis.html`
+
+### Changed
+
+- **Dependency updates** — `go-output` v0.9.0 → v0.11.0, `samber-do-auditlog` v0.0.2 → v0.0.4, `go-toml/v2` v2.2.0 → v2.4.0, `chroma/v2` v2.14.0 → v2.27.0
+
+---
+
+## [2.6.1] - 2026-06-14
+
+### Added
+
+- **Restored `MustNewCommand` and `MustNewParentCommand`** — Convenience wrappers for quick prototyping (callers who need zero-panics should use `NewCommand`/`NewParentCommand`)
+
+### Changed
+
+- **Dependency updates** — Updated transitive dependency pins in `go.mod` and `go.sum`
+
+---
+
+## [2.6.0] - 2026-06-12
+
+### Added
+
+- **go-output v0.9.0 integration** — Delegated `RenderTableData` and `RenderAnyData` to go-output registries; removed 167 lines of duplicated formatting logic
+- **4 new output formats** — JSONL, AsciiDoc, TOML, PlantUML (16 total formats)
+- **fang integration** — `WithCLIVersion`/`WithCLICommit` auto-pipe to fang; `WithFangErrorHandler` and `WithFangColorScheme` exposed
+- **koanf-based config loader** — `configload` sub-package with JSON, YAML, and TOML support via `LoaderForPath()` and `Auto()`
+- **Graceful shutdown** — `WithGracefulShutdown[T]()` triggers DI service shutdown on SIGINT/SIGTERM via `do.ShutdownerWithError`
+- **DI test helpers** — `Override[T]`, `OverrideValue[T]`, `CloneScope()` for test isolation
+- **DI logging** — `WithDILogging[T](logf)` and `NewScopeWithOpts(name, opts)` for custom injector configuration
+- **Doctor command** — `DoctorCommand[T](cli)` with `HealthCheckResults` and custom `WithDoctorCheck` diagnostics
+- **MustParse value type helpers** — `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat`, `MustParseEnum` for API consistency
+- **ADR-001** — Documented fang integration strategy in `docs/adr/001-fang-integration-strategy.md`
+- **Comprehensive error reference** — `docs/ERROR_REFERENCE.md` with 62 sentinels
+
+### Changed
+
+- **Zero panics guarantee** — Removed all 16+ `Must*` panic-inducing functions from library code; every function returns errors
+- **`NoFlags` distinct type** — Changed from `struct{}` alias to proper named type
+- **Removed `WithColor`** — Deprecated option removed; use `WithFang` instead
+- **`IsExecutable()` removed** — Use `HasHandler()` instead
+- **Error file split** — `errors.go` → `errors_command.go`, `errors_flags.go`, `errors_config.go`, `errors_di.go`, `errors_audit.go`
+- **API reference extracted** — Moved from `AGENTS.md` (649 lines) to dedicated `docs/API.md`
+- **Go 1.26 modernization** — `errors.As` → `errors.AsType` throughout codebase
+- **Test infrastructure deduplicated** — Zero semantic clone groups remaining at threshold 30
+
+### Fixed
+
+- **`ShutdownAll` double-wrapping** — `ErrServiceConstruction` no longer wrapped twice
+- **`NO_COLOR` restoration** — Environment variable restored after execution instead of permanently mutated
+- **`flow_context.SetValue` child safety** — Skips children with locally-set keys
+- **Config `Auto()` format detection** — Tries YAML → TOML → JSON instead of only JSON
+- **`ErrLogLevel`/`ErrLogFormat` error chain** — Parse errors now properly chain to their sentinels
+
+---
+
 ## [2.5.0] - 2026-06-10
 
 ### Added
