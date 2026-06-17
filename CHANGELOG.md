@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ExportAuditLog[T]` helper** — Reusable function that writes the audit log snapshot in HTML/JSON/NDJSON/Mermaid format to a file or `io.Writer`. Consumers no longer need to implement the format switch themselves
+- **`AuditLogFormat` strong type** — Validated enum (`html`, `json`, `ndjson`, `mermaid`) with `ParseAuditLogFormat()` constructor and `Valid()` method. Replaces raw string format selection
+- **`ErrUnsupportedAuditLogFormat`** — Sentinel error for invalid format values, classified as `"audit"` in the JSON error system
+
+### Removed
+
+- **`AuditLogCommand[T]`** — Built-in `audit-log` subcommand removed. Consumers implement their own export via flags/env + `ExportAuditLog[T]` (see BuildFlow for reference)
+- **`AuditLogOption`, `WithAuditLogShort`, `WithAuditLogLong`, `WithAuditLogGroupID`** — Command-specific options removed with the subcommand
+- **`ErrAuditLogNotEnabled`, `ErrInvalidOutputFormat`** — Sentinel errors removed with the subcommand
+- **`errors_audit.go`** — File removed; audit format errors now in `auditlog.go`
+
 ### Changed
 
 - **Dependency updates** — `go-output` v0.11.0 → v0.12.0 (8 sub-modules), `rogpeppe/go-internal` v1.14.1 → v1.15.0, pinned latest transitive deps (`charmbracelet/x/conpty`, `charmbracelet/x/exp/golden`, `go-output/testhelpers/graphtest`). All direct dependencies verified at latest published versions.
