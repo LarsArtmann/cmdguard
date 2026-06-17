@@ -210,9 +210,9 @@ func TestParseAuditLogFormat(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		input    string
-		want     v2.AuditLogFormat
-		wantErr  bool
+		input   string
+		want    v2.AuditLogFormat
+		wantErr bool
 	}{
 		{"", v2.AuditLogFormatHTML, false},
 		{"html", v2.AuditLogFormatHTML, false},
@@ -235,6 +235,7 @@ func TestParseAuditLogFormat(t *testing.T) {
 				if !errors.Is(err, v2.ErrUnsupportedAuditLogFormat) {
 					t.Errorf("error = %v, want ErrUnsupportedAuditLogFormat", err)
 				}
+
 				return
 			}
 			if err != nil {
@@ -318,7 +319,7 @@ func TestExportAuditLog(t *testing.T) {
 			_ = cli.ExecuteWithArgs(t.Context(), []string{})
 
 			tmpDir := t.TempDir()
-		path := filepath.Join(tmpDir, "audit-"+format.String()+".txt")
+			path := filepath.Join(tmpDir, "audit-"+format.String()+".txt")
 
 			err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
 				Format: format,

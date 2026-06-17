@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
@@ -33,13 +34,7 @@ var supportedAuditLogFormats = []AuditLogFormat{
 
 // Valid returns true if the format is one of the supported values.
 func (f AuditLogFormat) Valid() bool {
-	for _, s := range supportedAuditLogFormats {
-		if f == s {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(supportedAuditLogFormats, f)
 }
 
 // String implements fmt.Stringer.
