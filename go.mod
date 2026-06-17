@@ -12,14 +12,14 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/larsartmann/go-output v0.11.0
-	github.com/larsartmann/go-output/d2 v0.11.0
-	github.com/larsartmann/go-output/delimited v0.11.0
-	github.com/larsartmann/go-output/graph v0.11.0
-	github.com/larsartmann/go-output/markup v0.11.0
-	github.com/larsartmann/go-output/plantuml v0.11.0
-	github.com/larsartmann/go-output/serialization v0.11.0
-	github.com/larsartmann/go-output/table v0.11.0
+	github.com/larsartmann/go-output v0.12.0
+	github.com/larsartmann/go-output/d2 v0.12.0
+	github.com/larsartmann/go-output/delimited v0.12.0
+	github.com/larsartmann/go-output/graph v0.12.0
+	github.com/larsartmann/go-output/markup v0.12.0
+	github.com/larsartmann/go-output/plantuml v0.12.0
+	github.com/larsartmann/go-output/serialization v0.12.0
+	github.com/larsartmann/go-output/table v0.12.0
 	github.com/larsartmann/samber-do-auditlog v0.0.4
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
@@ -34,8 +34,8 @@ require (
 )
 
 require (
-	github.com/larsartmann/go-output/enum v0.11.0 // indirect
-	github.com/larsartmann/go-output/escape v0.11.0 // indirect
+	github.com/larsartmann/go-output/enum v0.12.0 // indirect
+	github.com/larsartmann/go-output/escape v0.12.0 // indirect
 )
 
 require (
@@ -59,6 +59,7 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dlclark/regexp2/v2 v2.2.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
@@ -78,6 +79,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
