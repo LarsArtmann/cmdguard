@@ -126,7 +126,7 @@ HELLO, CMDGUARD!
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
 | **Zero panics**            | All functions return errors; no Must\* panic variants                                                   |
-| **368 tests**              | 83.5% coverage, race-detected, fuzz-tested                                                              |
+| **396+ tests**             | 85.6% coverage, race-detected, fuzz-tested                                                              |
 
 ---
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -320,21 +319,6 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		return err
 	}
 	if err := v2.AddCommand(cli, doctorCmd); err != nil {
-		return err
-	}
-
-	// --- audit-log: AuditLogCommand, DI observability ---
-	auditLogCmd, err := v2.AuditLogCommand[AppConfig](
-		cli,
-		v2.WithAuditLogGroupID[AppConfig]("system"),
-	)
-	if err != nil {
-		// AuditLogCommand returns ErrAuditLogNotEnabled when the plugin is nil.
-		// This is expected in tests that don't configure the auditlog plugin.
-		if !errors.Is(err, v2.ErrAuditLogNotEnabled) {
-			return err
-		}
-	} else if err := v2.AddCommand(cli, auditLogCmd); err != nil {
 		return err
 	}
 

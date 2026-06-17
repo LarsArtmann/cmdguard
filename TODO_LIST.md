@@ -101,6 +101,13 @@
 - [x] Update PERFORMANCE.md with post-optimization numbers
 - [x] Update AGENTS.md gotchas (#59-61: COW, cached home dir, iterators)
 
+### Phase 17: Dependency Maximization & Doc Sync (2026-06-17)
+
+- [x] Verify all direct dependencies at latest published versions
+- [x] Upgrade indirect deps: `rogpeppe/go-internal` v1.15.0, `charmbracelet/x/conpty`, `charmbracelet/x/exp/golden`, `go-output/testhelpers/graphtest`
+- [x] Mark koanf config loading as completed (was already integrated, stale in remaining work)
+- [x] Sync stale version references across FEATURES.md, README.md, ROADMAP.md, AGENTS.md
+
 ## Remaining Work — Priority Sorted
 
 ### P0: Open
@@ -117,10 +124,9 @@
 | 22  | Config file nested struct support                           | Feature  |
 | 23  | Documentation generation (GenerateDocs, markdown, API docs) | Feature  |
 | 24  | Advanced types: Result[T], Validated[T], branded IDs        | Feature  |
-| 25  | Config auto-loading with koanf integration                  | Feature  |
-| 26  | Structured JSON error output for `--output=json`            | Feature  |
-| 27  | Extract flag-related code to standalone `flagtags` library  | Refactor |
-| 28  | Consider extracting `go-output` to sub-package              | Refactor |
+| 25  | Structured JSON error output for `--output=json`            | Feature  |
+| 26  | Extract flag-related code to standalone `flagtags` library  | Refactor |
+| 27  | Consider extracting `go-output` to sub-package              | Refactor |
 
 ### P2: Future Cleanup (API-breaking, defer to v3.0)
 

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Dependency updates** — `go-output` v0.11.0 → v0.12.0 (8 sub-modules), `rogpeppe/go-internal` v1.14.1 → v1.15.0, pinned latest transitive deps (`charmbracelet/x/conpty`, `charmbracelet/x/exp/golden`, `go-output/testhelpers/graphtest`). All direct dependencies verified at latest published versions.
+
 ---
 
 ## [2.7.0] - 2026-06-17
@@ -23,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Dependency updates** — `go-output` v0.9.0 → v0.11.0, `samber-do-auditlog` v0.0.2 → v0.0.4, `go-toml/v2` v2.2.0 → v2.4.0, `chroma/v2` v2.14.0 → v2.27.0
+- **Dependency updates** — `samber-do-auditlog` v0.0.2 → v0.0.4, `go-toml/v2` v2.2.0 → v2.4.0, `chroma/v2` v2.14.0 → v2.27.0
 
 ---
 

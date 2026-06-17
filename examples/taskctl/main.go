@@ -20,7 +20,7 @@
 //   - BranchingFlowContext for path tracking
 //   - EditInEditor for config editing
 //   - Version command
-//   - DI audit logging via samber-do-auditlog (WithAuditLog + AuditLogCommand)
+//   - DI audit logging via samber-do-auditlog (WithAuditLog + plugin accessor pattern)
 //
 // Usage:
 //

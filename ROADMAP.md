@@ -1,6 +1,6 @@
 # ROADMAP
 
-**Updated:** 2026-06-10
+**Updated:** 2026-06-17
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
@@ -102,9 +102,8 @@
 
 ## Configuration
 
-- [ ] Config File Auto-Loading integration with koanf
+- [x] Config File Auto-Loading integration with koanf
 - [ ] Config file nested struct support
-- [ ] Replace `internal/logging` with charmbracelet/log
 
 ---
 
@@ -125,7 +124,7 @@
 
 ## go-output Dependency Architecture
 
-> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.7.2.
+> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.12.0.
 
 `go-output` provides 16 output formats. Consider extracting to a sub-package in v3.0 so consumers only pay the dependency cost when they use `--output`.
 

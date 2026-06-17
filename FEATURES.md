@@ -121,7 +121,7 @@
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
-| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.9.0 registries                               |
+| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.12.0 registries                              |
 | `OutputTable()`         | ✅ FULLY_FUNCTIONAL | Convenience for table data with AddRowChecked validation                             |
 | `RegisteredFormats()`   | ✅ FULLY_FUNCTIONAL | Dynamic format discovery from registered marshalers                                  |
 | 16 output formats       | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
@@ -234,16 +234,19 @@
 
 ## Dependencies
 
-| Dependency                         | Version | Status              | Purpose               |
-| ---------------------------------- | ------- | ------------------- | --------------------- |
-| `github.com/spf13/cobra`           | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework         |
-| `github.com/samber/do/v2`          | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection  |
-| `github.com/spf13/pflag`           | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing          |
-| `charm.land/fang/v2`               | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling         |
-| `charm.land/huh/v2`                | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts   |
-| `charm.land/glamour/v2`            | v2.0.0  | ✅ FULLY_FUNCTIONAL | Markdown rendering    |
-| `go.opentelemetry.io/otel/trace`   | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing |
-| `github.com/larsartmann/go-output` | v0.7.2  | ✅ FULLY_FUNCTIONAL | Rich output formats   |
+| Dependency                                  | Version | Status              | Purpose                  |
+| ------------------------------------------- | ------- | ------------------- | ------------------------ |
+| `github.com/spf13/cobra`                    | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework            |
+| `github.com/samber/do/v2`                   | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection     |
+| `github.com/spf13/pflag`                    | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing             |
+| `charm.land/fang/v2`                        | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling            |
+| `charm.land/huh/v2`                         | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts      |
+| `charm.land/glamour/v2`                     | v2.0.1  | ✅ FULLY_FUNCTIONAL | Markdown rendering       |
+| `charm.land/lipgloss/v2`                    | v2.0.4  | ✅ FULLY_FUNCTIONAL | Terminal styling         |
+| `go.opentelemetry.io/otel/trace`            | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing    |
+| `github.com/larsartmann/go-output`          | v0.12.0 | ✅ FULLY_FUNCTIONAL | Rich output (16 formats) |
+| `github.com/larsartmann/samber-do-auditlog` | v0.0.4  | ✅ FULLY_FUNCTIONAL | DI audit logging         |
+| `github.com/knadh/koanf/v2`                 | v2.3.5  | ✅ FULLY_FUNCTIONAL | Config file loading      |
 
 ---
 
@@ -251,8 +254,8 @@
 
 | Package                      | Coverage  | Status  |
 | ---------------------------- | --------- | ------- |
-| `pkg/cmdguard/v2`            | ~83%      | ✅ Good |
-| `pkg/cmdguard/v2/configload` | ~88%      | ✅ Good |
+| `pkg/cmdguard/v2`            | ~85.6%    | ✅ Good |
+| `pkg/cmdguard/v2/configload` | ~87.5%    | ✅ Good |
 | Benchmarks                   | 22 total  | ✅ Good |
 | Fuzz tests                   | 7 targets | ✅ Good |
 
@@ -294,4 +297,4 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ---
 
-**Last updated 2026-06-10.**
+**Last updated 2026-06-17.**
