@@ -69,7 +69,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
-	github.com/larsartmann/go-branded-id v0.3.0 // indirect
+	github.com/larsartmann/go-branded-id v0.3.1 // indirect
 	github.com/larsartmann/go-output/testhelpers v0.10.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
