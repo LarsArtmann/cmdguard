@@ -133,8 +133,7 @@ github.com/larsartmann/go-output/testhelpers v0.10.1 h1:3Qq/ZaV8QGZlqxwOCXKOAh6O
 github.com/larsartmann/go-output/testhelpers v0.10.1/go.mod h1:HXirIrpJiVpIJ1CaI9MbmOUP26eC4JKApaFqAAe5+s8=
 github.com/larsartmann/go-output/testhelpers/graphtest v0.6.3 h1:gJDnyo5Qos9VQsLsuH/9kQu/8+T0/F/ExLZ3X+/ueRI=
 github.com/larsartmann/go-output/testhelpers/graphtest v0.6.3/go.mod h1:u7b3tZo4D63Wt1mtMuvKOO9LLRk4H7kBe5htBK9kSDA=
-github.com/larsartmann/samber-do-auditlog v0.0.2 h1:ks15cJY1brc6kxN187JmJqJXwN+/c/WW4qNKJDRO92o=
-github.com/larsartmann/samber-do-auditlog v0.0.2/go.mod h1:3QMi0iOc4EvqZde7W0hOWQqqDrem+UFiSk9WtvzUZ34=
+github.com/larsartmann/samber-do-auditlog v0.0.3 h1:R6sY6fnjFAieasH91bDR6hun0CakS3f0DuNrc3SN9f4=
 github.com/lucasb-eyer/go-colorful v1.4.0 h1:UtrWVfLdarDgc44HcS7pYloGHJUjHV/4FwW4TvVgFr4=
 github.com/lucasb-eyer/go-colorful v1.4.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-runewidth v0.0.24 h1:cpokDiIn0MGnhdHwuWnJBITySJ20QyNGnY2kR/ay2DU=
