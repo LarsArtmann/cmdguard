@@ -106,5 +106,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli.ExecuteAndExit(ctx)
+	if err := cli.Execute(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+	}
+
+	if plugin := cli.AuditLog(); plugin != nil && plugin.EventsCount() > 0 {
+		if err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+			Format: v2.AuditLogFormatHTML,
+			Path:   "taskctl-audit.html",
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "audit-log export failed: %v\n", err)
+		} else {
+			fmt.Fprintln(os.Stderr, "audit-log written to taskctl-audit.html")
+		}
+	}
+
+	os.Exit(0)
 }
