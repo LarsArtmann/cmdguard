@@ -12,15 +12,15 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/larsartmann/go-output v0.10.1
-	github.com/larsartmann/go-output/d2 v0.10.1
-	github.com/larsartmann/go-output/delimited v0.10.1
-	github.com/larsartmann/go-output/graph v0.10.1
-	github.com/larsartmann/go-output/markup v0.10.1
-	github.com/larsartmann/go-output/plantuml v0.10.1
-	github.com/larsartmann/go-output/serialization v0.10.1
-	github.com/larsartmann/go-output/table v0.10.1
-	github.com/larsartmann/samber-do-auditlog v0.0.3
+	github.com/larsartmann/go-output v0.11.0
+	github.com/larsartmann/go-output/d2 v0.11.0
+	github.com/larsartmann/go-output/delimited v0.11.0
+	github.com/larsartmann/go-output/graph v0.11.0
+	github.com/larsartmann/go-output/markup v0.11.0
+	github.com/larsartmann/go-output/plantuml v0.11.0
+	github.com/larsartmann/go-output/serialization v0.11.0
+	github.com/larsartmann/go-output/table v0.11.0
+	github.com/larsartmann/samber-do-auditlog v0.0.4
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -34,8 +34,8 @@ require (
 )
 
 require (
-	github.com/larsartmann/go-output/enum v0.10.1 // indirect
-	github.com/larsartmann/go-output/escape v0.10.1 // indirect
+	github.com/larsartmann/go-output/enum v0.11.0 // indirect
+	github.com/larsartmann/go-output/escape v0.11.0 // indirect
 )
 
 require (
@@ -70,7 +70,6 @@ require (
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/larsartmann/go-branded-id v0.3.1 // indirect
-	github.com/larsartmann/go-output/testhelpers v0.10.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
@@ -88,10 +87,13 @@ require (
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/exp v0.0.0-20260611194520-c48552f49976 // indirect
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
+
+// Local development: resolve samber-do-auditlog from the sibling repo so
+// cmdguard picks up unpublished changes immediately.
+replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog

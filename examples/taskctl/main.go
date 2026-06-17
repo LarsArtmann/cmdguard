@@ -49,10 +49,14 @@ func main() {
 
 	// Audit logging — captures DI lifecycle events for observability
 	// Set DO_AUDITLOG_ENABLED=true to enable without changing code.
-	auditPlugin := auditlog.New(auditlog.Config{
+	auditPlugin, err := auditlog.New(auditlog.Config{
 		Enabled:     true,
 		ContainerID: "taskctl",
 	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating audit log plugin: %v\n", err)
+		os.Exit(1)
+	}
 
 	cli, err := v2.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
