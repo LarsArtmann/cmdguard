@@ -56,6 +56,7 @@ func errorTypeNames() []errorTypeEntry {
 		{ErrInvalidScope, "service"},
 		{ErrUnsupportedFormat, "output"},
 		{ErrFormatRequiresTypedData, "output"},
+		{ErrUnsupportedAuditLogFormat, "audit"},
 		{ErrInvalidExitCode, "exit_code"},
 	}
 }

@@ -1,6 +1,11 @@
 package v2_test
 
 import (
+	"bytes"
+	"errors"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
@@ -197,6 +202,188 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 
 		if svc.Status != "registered" && svc.Status != "active" {
 			t.Errorf("Status = %q, want registered or active", svc.Status)
+		}
+	})
+}
+
+func TestParseAuditLogFormat(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		want     v2.AuditLogFormat
+		wantErr  bool
+	}{
+		{"", v2.AuditLogFormatHTML, false},
+		{"html", v2.AuditLogFormatHTML, false},
+		{"json", v2.AuditLogFormatJSON, false},
+		{"ndjson", v2.AuditLogFormatNDJSON, false},
+		{"mermaid", v2.AuditLogFormatMermaid, false},
+		{"xml", "", true},
+		{"HTML", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := v2.ParseAuditLogFormat(tt.input)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error")
+				}
+				if !errors.Is(err, v2.ErrUnsupportedAuditLogFormat) {
+					t.Errorf("error = %v, want ErrUnsupportedAuditLogFormat", err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("ParseAuditLogFormat(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExportAuditLog(t *testing.T) {
+	t.Parallel()
+
+	t.Run("noop when audit log not enabled", func(t *testing.T) {
+		t.Parallel()
+
+		cli := newTestCLI(t)
+
+		err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+			Format: v2.AuditLogFormatHTML,
+		})
+		if err != nil {
+			t.Fatalf("ExportAuditLog returned error: %v", err)
+		}
+	})
+
+	t.Run("noop when no events captured", func(t *testing.T) {
+		t.Parallel()
+
+		plugin := newTestPlugin(t)
+
+		cli := newTestCLIWithAuditLog(t, plugin)
+
+		// Don't execute the CLI, so no events are captured
+		err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+			Format: v2.AuditLogFormatHTML,
+		})
+		if err != nil {
+			t.Fatalf("ExportAuditLog returned error: %v", err)
+		}
+	})
+
+	formats := []v2.AuditLogFormat{
+		v2.AuditLogFormatJSON,
+		v2.AuditLogFormatNDJSON,
+		v2.AuditLogFormatMermaid,
+	}
+
+	for _, format := range formats {
+		t.Run("writer/"+format.String(), func(t *testing.T) {
+			t.Parallel()
+
+			plugin := newTestPlugin(t)
+			cli := newTestCLIWithAuditLog(t, plugin)
+
+			_ = cli.ExecuteWithArgs(t.Context(), []string{})
+
+			var buf bytes.Buffer
+
+			err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+				Format: format,
+				Writer: &buf,
+			})
+			if err != nil {
+				t.Fatalf("ExportAuditLog(%s) returned error: %v", format, err)
+			}
+
+			if buf.Len() == 0 {
+				t.Errorf("expected non-empty %s output", format)
+			}
+		})
+
+		t.Run("file/"+format.String(), func(t *testing.T) {
+			t.Parallel()
+
+			plugin := newTestPlugin(t)
+			cli := newTestCLIWithAuditLog(t, plugin)
+
+			_ = cli.ExecuteWithArgs(t.Context(), []string{})
+
+			tmpDir := t.TempDir()
+		path := filepath.Join(tmpDir, "audit-"+format.String()+".txt")
+
+			err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+				Format: format,
+				Path:   path,
+			})
+			if err != nil {
+				t.Fatalf("ExportAuditLog(%s, file) returned error: %v", format, err)
+			}
+
+			info, err := os.Stat(path)
+			if err != nil {
+				t.Fatalf("output file not created: %v", err)
+			}
+			if info.Size() == 0 {
+				t.Errorf("output file %s is empty", path)
+			}
+		})
+	}
+
+	t.Run("HTML file export produces valid document", func(t *testing.T) {
+		t.Parallel()
+
+		plugin := newTestPlugin(t)
+		cli := newTestCLIWithAuditLog(t, plugin)
+
+		_ = cli.ExecuteWithArgs(t.Context(), []string{})
+
+		tmpDir := t.TempDir()
+		path := filepath.Join(tmpDir, "audit.html")
+
+		err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+			Format: v2.AuditLogFormatHTML,
+			Path:   path,
+		})
+		if err != nil {
+			t.Fatalf("ExportAuditLog(html, file) returned error: %v", err)
+		}
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("reading output file: %v", err)
+		}
+		content := string(data)
+		if !strings.Contains(content, "<html") && !strings.Contains(content, "<!DOCTYPE") {
+			t.Errorf("expected HTML document, got: %s", content[:min(len(content), 200)])
+		}
+	})
+
+	t.Run("rejects unsupported format", func(t *testing.T) {
+		t.Parallel()
+
+		plugin := newTestPlugin(t)
+		cli := newTestCLIWithAuditLog(t, plugin)
+
+		_ = cli.ExecuteWithArgs(t.Context(), []string{})
+
+		err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+			Format: v2.AuditLogFormat("xml"),
+			Writer: &bytes.Buffer{},
+		})
+		if err == nil {
+			t.Fatal("expected error for unsupported format")
+		}
+		if !errors.Is(err, v2.ErrUnsupportedAuditLogFormat) {
+			t.Errorf("error = %v, want ErrUnsupportedAuditLogFormat", err)
 		}
 	})
 }
