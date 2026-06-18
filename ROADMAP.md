@@ -59,17 +59,43 @@
 
 ### v3.0 API-Breaking Cleanup
 
+These changes are deferred to v3.0 because they break the public API and would
+semver-violate a v2.x release. Each is documented here so the design intent is
+not lost.
+
 - [x] Make `NoFlags` a distinct named type (not `type NoFlags = struct{}`)
-- [ ] Rename `Get[T]`/`MustGet[T]` to more specific names
-- [ ] Make `RegisterInScope` generic instead of `...any`
-- [ ] Remove or redesign `Package()` for error-safe DI integration
+- [ ] **Rename `Get[T]`/`MustGet[T]`** — `Get` is too generic; should be
+  `GetService[T]` or similar. Breaking: every consumer's import surface changes.
+- [ ] **Make `RegisterInScope` generic** — currently takes `...any`; should be
+  `RegisterInScope[T](scope, provider)`. Breaking: signature change.
+- [ ] **Remove or redesign `Package()`** — takes a pre-existing `*Scope` which is
+  an unusual API shape; should be reworked for error-safe DI. Breaking.
+- [ ] **Remove `SetConfig`** — mutating a CLI's config after construction is
+  unsafe (FlagRegistry isn't re-initialized). Breaking but removes a footgun.
+
+### v3.0 Extraction: `flagtags` Library
+
+- [ ] **Extract flag-tag parsing to `github.com/larsartmann/flagtags`**
+
+  **Rationale:** The struct-tag parsing, validation, and type-handler registry
+  are ~2000 lines of self-contained, reusable code with zero cmdguard-specific
+  dependencies. Extracting it would:
+  - Enable reuse in non-CLI contexts (HTTP handlers, config loaders)
+  - Reduce cmdguard's compile surface
+  - Allow independent versioning of the tag-parsing layer
+
+  **Design:** `flagtags.Parse(v any) ([]Tag, error)`, `flagtags.RegisterHandler()`,
+  `flagtags.RegisterValidator()`. cmdguard would re-export or wrap these.
+
+  **Risk:** Medium — requires careful API stabilization before extraction.
+  Defer until the tag format is frozen at v3.0.
 
 ---
 
 ## Advanced Types
 
-- [ ] Add `Result[T]` type for error handling
-- [ ] Add `Validated[T]` wrapper with validation functions
+- [x] Add `Result[T]` type for error handling (v2.8)
+- [x] Add `Validated[T]` wrapper with validation functions (v2.8)
 - [ ] Create example application for branded IDs
 
 ---
@@ -86,9 +112,9 @@
 
 ## Plugin System
 
-- [ ] Implement plugin system for custom validators
-- [ ] Add validation interface abstraction
-- [ ] Add `FlagRegistry` interface
+- [x] Implement plugin system for custom validators and type handlers (v2.8)
+- [x] Add `Plugin` interface + `PluginRegistrar` + `RegisterPlugin` / `WithPlugin`
+- [ ] Add `FlagRegistry` interface abstraction
 - [ ] Custom validation hooks
 
 ---
@@ -103,7 +129,7 @@
 ## Configuration
 
 - [x] Config File Auto-Loading integration with koanf
-- [ ] Config file nested struct support
+- [x] Config file nested struct support (v2.8 — ParseFlagTags recurses into nested structs)
 
 ---
 
