@@ -13,6 +13,7 @@
 //	import (
 //	    "context"
 //	    "fmt"
+//	    "log"
 //
 //	    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 //	)
@@ -24,7 +25,7 @@
 //	func main() {
 //	    cli, err := v2.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
 //	    if err != nil {
-//	        panic(err)
+//	        log.Fatal(err)
 //	    }
 //
 //	    cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("hello",
@@ -35,11 +36,11 @@
 //	        v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
 //	    )
 //	    if err != nil {
-//	        panic(err)
+//	        log.Fatal(err)
 //	    }
 //
 //	    if err := v2.AddCommand(cli, cmd); err != nil {
-//	        panic(err)
+//	        log.Fatal(err)
 //	    }
 //
 //	    if err := cli.Execute(context.Background()); err != nil {

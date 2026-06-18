@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 )
 
 // FlagValidator validates a flag value and returns an error if invalid.
@@ -210,7 +211,7 @@ func validateMinLen(value string) error {
 		return fmt.Errorf("%w: minlen: invalid integer %q", ErrInvalidValidatorParam, minStr)
 	}
 
-	if len(val) < minLen {
+	if utf8.RuneCountInString(val) < minLen {
 		return fmt.Errorf("%w: %q must be at least %d characters", ErrValueTooShort, val, minLen)
 	}
 
@@ -228,7 +229,7 @@ func validateMaxLen(value string) error {
 		return fmt.Errorf("%w: maxlen: invalid integer %q", ErrInvalidValidatorParam, maxStr)
 	}
 
-	if len(val) > maxLen {
+	if utf8.RuneCountInString(val) > maxLen {
 		return fmt.Errorf("%w: %q must be at most %d characters", ErrValueTooLong, val, maxLen)
 	}
 

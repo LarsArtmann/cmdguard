@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -295,9 +294,10 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 	}
 
 	if execErr != nil {
-		if cli.writeFormattedError(execErr) {
-			return fmt.Errorf("failed to execute CLI: %w", execErr)
-		}
+		// writeFormattedError emits a structured JSON/YAML error to stderr when a
+		// machine-readable output format is selected (and fang is silenced above).
+		// The error is always returned so ExecuteAndExit can map it to an exit code.
+		cli.writeFormattedError(execErr)
 
 		return fmt.Errorf("failed to execute CLI: %w", execErr)
 	}
@@ -317,13 +317,7 @@ func (cli *CLI[T]) ExecuteWithArgs(ctx context.Context, args []string) error {
 func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 	err := cli.Execute(ctx)
 	if err != nil {
-		code := 1
-
-		if exitCoder, ok := errors.AsType[ExitCoder](err); ok {
-			code = exitCoder.ExitCode()
-		}
-
-		os.Exit(code)
+		os.Exit(extractExitCode(err))
 	}
 }
 

@@ -10,7 +10,7 @@ import (
 
 // FlagTypeConstraint validates that F is a valid flag type at initialization time.
 // Valid types are: struct{} (NoFlags), any struct, or pointer to struct.
-// This enforces type safety for the F type parameter in GuardedCommand and Command.
+// This enforces type safety for the F type parameter in Command.
 // Returns an error if F is an invalid type (e.g., int, string, slice, map).
 func FlagTypeConstraint[F any]() error {
 	var zero F

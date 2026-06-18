@@ -277,33 +277,3 @@ func NewParentCommand[T, F any](
 
 	return cmd, nil
 }
-
-// MustNewCommand is like NewCommand but panics on error.
-// Useful for package-level command definitions where errors are impossible at runtime.
-func MustNewCommand[T, F any](
-	use string,
-	runE func(ctx context.Context, cfg *T, flags F) error,
-	opts ...CommandOption[T, F],
-) Command[T, F] {
-	cmd, err := NewCommand(use, runE, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("MustNewCommand(%q): %v", use, err))
-	}
-
-	return cmd
-}
-
-// MustNewParentCommand is like NewParentCommand but panics on error.
-func MustNewParentCommand[T, F any](
-	use string,
-	long string,
-	subcommands []Command[T, F],
-	opts ...CommandOption[T, F],
-) Command[T, F] {
-	cmd, err := NewParentCommand(use, long, subcommands, opts...)
-	if err != nil {
-		panic(fmt.Sprintf("MustNewParentCommand(%q): %v", use, err))
-	}
-
-	return cmd
-}

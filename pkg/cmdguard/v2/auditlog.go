@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"slices"
 	"strings"
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
@@ -25,21 +24,30 @@ const (
 	AuditLogFormatMermaid AuditLogFormat = "mermaid"
 )
 
-var supportedAuditLogFormats = []AuditLogFormat{
-	AuditLogFormatHTML,
-	AuditLogFormatJSON,
-	AuditLogFormatNDJSON,
-	AuditLogFormatMermaid,
-}
-
 // Valid returns true if the format is one of the supported values.
 func (f AuditLogFormat) Valid() bool {
-	return slices.Contains(supportedAuditLogFormats, f)
+	switch f {
+	case AuditLogFormatHTML, AuditLogFormatJSON, AuditLogFormatNDJSON, AuditLogFormatMermaid:
+		return true
+	}
+
+	return false
 }
 
 // String implements fmt.Stringer.
 func (f AuditLogFormat) String() string {
 	return string(f)
+}
+
+// supportedAuditLogFormatNames returns the names of all supported formats for
+// error messages. Kept as a function (not a global var) to satisfy gochecknoglobals.
+func supportedAuditLogFormatNames() []string {
+	return []string{
+		string(AuditLogFormatHTML),
+		string(AuditLogFormatJSON),
+		string(AuditLogFormatNDJSON),
+		string(AuditLogFormatMermaid),
+	}
 }
 
 // ParseAuditLogFormat converts a string to an AuditLogFormat.
@@ -51,12 +59,9 @@ func ParseAuditLogFormat(s string) (AuditLogFormat, error) {
 
 	format := AuditLogFormat(s)
 	if !format.Valid() {
-		names := make([]string, len(supportedAuditLogFormats))
-		for i, f := range supportedAuditLogFormats {
-			names[i] = f.String()
-		}
+		allowed := strings.Join(supportedAuditLogFormatNames(), ", ")
 
-		return "", fmt.Errorf("%w: %q (use %s)", ErrUnsupportedAuditLogFormat, s, strings.Join(names, ", "))
+		return "", fmt.Errorf("%w: %q (use %s)", ErrUnsupportedAuditLogFormat, s, allowed)
 	}
 
 	return format, nil

@@ -98,9 +98,9 @@ func writeJSONError(w io.Writer, err error) error {
 	return nil
 }
 
-func (cli *CLI[T]) writeFormattedError(err error) bool {
+func (cli *CLI[T]) writeFormattedError(err error) {
 	if cli.outputFormat == "" {
-		return false
+		return
 	}
 
 	switch cli.outputFormat {
@@ -109,9 +109,5 @@ func (cli *CLI[T]) writeFormattedError(err error) bool {
 		if writeErr != nil {
 			_, _ = fmt.Fprintln(os.Stderr, err.Error())
 		}
-
-		return true
-	default:
-		return false
 	}
 }

@@ -22,12 +22,6 @@ func WithFlowContextValues(values map[any]any) FlowContextOption {
 	}
 }
 
-// FlowContext is an interface for context-aware DI scopes.
-type FlowContext interface {
-	FlowContext() *BranchingFlowContext
-	Branch(commandName string) (*Scope, *BranchingFlowContext, func())
-}
-
 // flowContextKey is the context key for branching flow context.
 type flowContextKey struct{}
 

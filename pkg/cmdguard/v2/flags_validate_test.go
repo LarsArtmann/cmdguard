@@ -204,3 +204,37 @@ func TestValidatorErrors_InvalidParams(t *testing.T) {
 		})
 	}
 }
+
+// TestValidatorLength_RuneCount verifies that minlen/maxlen count Unicode
+// characters (runes), not bytes. " café" is 5 runes but 6 bytes.
+func TestValidatorLength_RuneCount(t *testing.T) {
+	t.Parallel()
+
+	t.Run("minlen counts runes not bytes", func(t *testing.T) {
+		t.Parallel()
+
+		// " café" = 5 runes, 6 bytes; minlen=5 must pass (would fail under byte counting only if min=6)
+		if err := validateMinLen("5: café"); err != nil {
+			t.Errorf("expected 5-rune string to pass minlen=5, got: %v", err)
+		}
+
+		// " café" (5 runes) must fail minlen=6.
+		if err := validateMinLen("6: café"); err == nil {
+			t.Error("expected 5-rune string to fail minlen=6, got nil")
+		}
+	})
+
+	t.Run("maxlen counts runes not bytes", func(t *testing.T) {
+		t.Parallel()
+
+		// " café" = 5 runes, 6 bytes; maxlen=5 must pass.
+		if err := validateMaxLen("5: café"); err != nil {
+			t.Errorf("expected 5-rune string to pass maxlen=5, got: %v", err)
+		}
+
+		// " caféé" = 6 runes, 8 bytes; maxlen=5 must fail.
+		if err := validateMaxLen("5: caféé"); err == nil {
+			t.Error("expected 6-rune string to fail maxlen=5, got nil")
+		}
+	})
+}

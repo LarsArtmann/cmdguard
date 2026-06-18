@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/samber/do/v2"
 )
@@ -372,10 +373,7 @@ func (s *Scope) Path() []string {
 		current = current.parent
 	}
 
-	// Reverse to get root-first order
-	for i, j := 0, len(names)-1; i < j; i, j = i+1, j-1 {
-		names[i], names[j] = names[j], names[i]
-	}
+	slices.Reverse(names)
 
 	return names
 }

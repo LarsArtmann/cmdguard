@@ -3,7 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
-	"sort"
+	"slices"
 )
 
 // DoctorCheck is a named diagnostic check that can be added to the doctor command.
@@ -108,7 +108,7 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 				names = append(names, name)
 			}
 
-			sort.Strings(names)
+			slices.Sort(names)
 
 			passed := 0
 			failed := 0
