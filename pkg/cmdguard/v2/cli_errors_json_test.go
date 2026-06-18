@@ -33,6 +33,7 @@ func TestClassifyError(t *testing.T) {
 		{"config file load", fmt.Errorf("%w: file not found", ErrConfigFileLoad), "config"},
 		{"invalid command", fmt.Errorf("%w: bad cmd", ErrInvalidCommand), "command"},
 		{"service not found", fmt.Errorf("%w: missing svc", ErrServiceNotFound), "service"},
+		{"value out of range", fmt.Errorf("%w: 999 into int8", ErrValueOutOfRange), "flag"},
 		{"unsupported format", fmt.Errorf("%w: xml", ErrUnsupportedFormat), "output"},
 		{"unknown error", errors.New("something unexpected"), "unknown"},
 	}

@@ -64,64 +64,18 @@ func (r *typeRegistry) registerKinds() {
 		},
 	}
 
-	intHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, err := parseIntDefault(tag.Default)
-			if err != nil {
-				return fmt.Errorf("invalid int default for flag %q: %w", tag.Name, err)
-			}
-
-			if tag.Short != "" {
-				flags.IntP(tag.Name, tag.Short, int(def), tag.Help)
-			} else {
-				flags.Int(tag.Name, int(def), tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			parsed, err := strconv.ParseInt(value, 10, 64)
-
-			return parsed, err
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			v, _ := parseIntDefault(tag.Default)
-
-			return v
-		},
-	}
+	// Integer handlers are built per-kind so that flag values are validated
+	// against the field's actual bit-width. Previously every signed kind shared
+	// one handler that parsed with bitSize 64, so a value like 999 written into
+	// an int8 silently wrapped to -25. strconv.ParseInt with the matching
+	// bitSize now rejects out-of-range values, and the width-specific pflag
+	// registration enforces the same constraint at the flag layer.
 	for _, k := range []reflect.Kind{reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64} {
-		r.byKind[k] = intHandler
+		r.byKind[k] = makeIntKindHandler(intBitSize(k))
 	}
 
-	uintHandler := TypeHandlerFunc{
-		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
-			def, err := parseUintDefault(tag.Default)
-			if err != nil {
-				return fmt.Errorf("invalid uint default for flag %q: %w", tag.Name, err)
-			}
-
-			if tag.Short != "" {
-				flags.UintP(tag.Name, tag.Short, uint(def), tag.Help)
-			} else {
-				flags.Uint(tag.Name, uint(def), tag.Help)
-			}
-
-			return nil
-		},
-		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			parsed, err := strconv.ParseUint(value, 10, 64)
-
-			return parsed, err
-		},
-		DefaultFunc: func(tag FlagTag) any {
-			v, _ := parseUintDefault(tag.Default)
-
-			return v
-		},
-	}
 	for _, k := range []reflect.Kind{reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr} {
-		r.byKind[k] = uintHandler
+		r.byKind[k] = makeUintKindHandler(uintBitSize(k))
 	}
 
 	floatHandler := TypeHandlerFunc{

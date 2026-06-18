@@ -36,6 +36,7 @@ func errorTypeNames() []errorTypeEntry {
 		{ErrValueTooLong, "flag"},
 		{ErrValueTooSmall, "flag"},
 		{ErrValueTooLarge, "flag"},
+		{ErrValueOutOfRange, "flag"},
 		{ErrValuePatternMismatch, "flag"},
 		{ErrValueEmpty, "flag"},
 		{ErrConfigValidation, "config"},

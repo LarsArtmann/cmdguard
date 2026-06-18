@@ -86,5 +86,5 @@ func (r *FlagRegistry) parseAndSetValue(cfg any, tag FlagTag, value string) erro
 		return fmt.Errorf("parsing flag %q with value %q: %w", tag.Name, value, err)
 	}
 
-	return setField(cfg, tag.Field, parsed, r.types)
+	return setFieldByTag(cfg, tag, parsed, r.types)
 }

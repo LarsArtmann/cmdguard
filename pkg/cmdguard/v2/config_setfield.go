@@ -25,6 +25,40 @@ func setField(cfg any, fieldName string, value any, tr *typeRegistry) error {
 		)
 	}
 
+	return applyFieldValue(field, value, tr)
+}
+
+// setFieldByIndex sets a field resolved via its reflect index path (nested structs).
+func setFieldByIndex(cfg any, index []int, value any, tr *typeRegistry) error {
+	field, err := getFieldByIndex(cfg, index)
+	if err != nil {
+		return fmt.Errorf("SetField: cfg=%T, index=%v, value=%T: %w", cfg, index, value, err)
+	}
+
+	return applyFieldValue(field, value, tr)
+}
+
+// setFieldByTag resolves the field via tag.Index (nested) or tag.Field (flat) and sets it.
+func setFieldByTag(cfg any, tag FlagTag, value any, tr *typeRegistry) error {
+	if len(tag.Index) > 0 {
+		return setFieldByIndex(cfg, tag.Index, value, tr)
+	}
+
+	return setField(cfg, tag.Field, value, tr)
+}
+
+// fieldByTag resolves a reflect.Value for the field described by tag.
+// Uses Index (nested path) when available, falling back to FieldByName.
+func fieldByTag(v reflect.Value, tag FlagTag) reflect.Value {
+	if len(tag.Index) > 0 {
+		return v.FieldByIndex(tag.Index)
+	}
+
+	return v.FieldByName(tag.Field)
+}
+
+// applyFieldValue performs the type-conversion logic to set value onto field.
+func applyFieldValue(field reflect.Value, value any, tr *typeRegistry) error {
 	val := reflect.ValueOf(value)
 
 	// Handle type conversions
@@ -39,10 +73,9 @@ func setField(cfg any, fieldName string, value any, tr *typeRegistry) error {
 		err := setStringField(field, val.String(), tr)
 		if err != nil {
 			return fmt.Errorf(
-				"SetField: cfg=%T, fieldName=%q, value=%q: %w",
-				cfg,
-				fieldName,
+				"SetField: value=%q, field=%s: %w",
 				value,
+				field.Type(),
 				err,
 			)
 		}
@@ -56,10 +89,9 @@ func setField(cfg any, fieldName string, value any, tr *typeRegistry) error {
 		duration, ok := val.Interface().(time.Duration)
 		if !ok {
 			return fmt.Errorf(
-				"SetField: type assertion failed for time.Duration, cfg=%T, fieldName=%q, value=%v: %w",
-				cfg,
-				fieldName,
+				"SetField: type assertion failed for time.Duration, value=%v, field=%s: %w",
 				value,
+				field.Type(),
 				ErrTypeConversion,
 			)
 		}
@@ -70,9 +102,7 @@ func setField(cfg any, fieldName string, value any, tr *typeRegistry) error {
 	}
 
 	return fmt.Errorf(
-		"SetField: cannot convert cfg=%T, fieldName=%q, value=%T to %s: %w",
-		cfg,
-		fieldName,
+		"SetField: cannot convert value=%T to %s: %w",
 		value,
 		field.Type(),
 		ErrTypeConversion,
@@ -108,6 +138,31 @@ func getField(cfg any, fieldName string) (reflect.Value, error) {
 			"getField: cfg=%T, fieldName=%q: %w",
 			cfg,
 			fieldName,
+			ErrFieldNotSettable,
+		)
+	}
+
+	return field, nil
+}
+
+// getFieldByIndex resolves a field via its reflect index path (supports nested structs).
+func getFieldByIndex(cfg any, index []int) (reflect.Value, error) {
+	v := reflect.ValueOf(cfg)
+	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
+		return reflect.Value{}, fmt.Errorf(
+			"getFieldByIndex: cfg=%T, index=%v: %w",
+			cfg,
+			index,
+			ErrConfigNotPointer,
+		)
+	}
+
+	field := v.Elem().FieldByIndex(index)
+	if !field.CanSet() {
+		return reflect.Value{}, fmt.Errorf(
+			"getFieldByIndex: cfg=%T, index=%v: %w",
+			cfg,
+			index,
 			ErrFieldNotSettable,
 		)
 	}

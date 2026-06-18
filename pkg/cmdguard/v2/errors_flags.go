@@ -34,6 +34,10 @@ var (
 	// ErrValueTooLarge indicates a numeric value is larger than maximum.
 	ErrValueTooLarge = errors.New("value too large")
 
+	// ErrValueOutOfRange indicates a numeric value does not fit the field's
+	// integer bit-width (e.g. 999 written into an int8).
+	ErrValueOutOfRange = errors.New("value out of range")
+
 	// ErrValuePatternMismatch indicates a value does not match the required pattern.
 	ErrValuePatternMismatch = errors.New("value does not match pattern")
 

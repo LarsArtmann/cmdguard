@@ -35,9 +35,7 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	}
 
 	present := make(map[string]bool, len(raw))
-	for k := range raw {
-		present[k] = true
-	}
+	collectKeysRecursive(raw, present)
 
 	setFields := FilterSetFields(tags, present)
 
@@ -115,6 +113,20 @@ func FilterSetFields(tags []FlagTag, present map[string]bool) []string {
 	return setFields
 }
 
+// collectKeysRecursive walks a JSON raw-message map, recording every key at
+// every nesting level. This lets FilterSetFields detect leaf-level flag names
+// that appear inside nested config-file objects (e.g. {"db":{"host":"x"}} → "host").
+func collectKeysRecursive(raw map[string]json.RawMessage, keys map[string]bool) {
+	for k, v := range raw {
+		keys[k] = true
+
+		var nested map[string]json.RawMessage
+		if json.Unmarshal(v, &nested) == nil {
+			collectKeysRecursive(nested, keys)
+		}
+	}
+}
+
 // fieldValueToString converts a reflect.Value to its string representation.
 // Delegates to the unified formatFieldValue in flag_helpers.go.
 func fieldValueToString(field reflect.Value) (string, bool) {
@@ -166,7 +178,7 @@ func (r *FlagRegistry) updateTagDefaultsFromConfig(cfg any, setFields []string) 
 			continue
 		}
 
-		field := v.FieldByName(r.tags[i].Field)
+		field := fieldByTag(v, r.tags[i])
 		if !field.IsValid() {
 			continue
 		}

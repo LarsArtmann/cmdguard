@@ -146,17 +146,26 @@ func ProvideValue[T any](scope *Scope, value T) error {
 
 // Invoke retrieves a service from the scope.
 // Returns an error if the service is not found or construction fails.
+// When the service is missing, the error chain includes ErrServiceNotFound so
+// callers can distinguish not-found from construction failures via errors.Is.
 func Invoke[T any](scope *Scope) (T, error) {
 	var zero T
 	if scope == nil {
 		return zero, fmt.Errorf("%w: scope is nil, result type=%T", ErrInvalidScope, zero)
 	}
 
-	return do.Invoke[T](scope.injector)
+	v, err := do.Invoke[T](scope.injector)
+	if err != nil && errors.Is(err, do.ErrServiceNotFound) {
+		return zero, fmt.Errorf("%w: type=%T, detail: %w", ErrServiceNotFound, zero, err)
+	}
+
+	return v, err
 }
 
 // InvokeNamed retrieves a named service from the scope.
 // Returns an error if the service is not found or construction fails.
+// When the service is missing, the error chain includes ErrServiceNotFound so
+// callers can distinguish not-found from construction failures via errors.Is.
 func InvokeNamed[T any](scope *Scope, name string) (T, error) {
 	var zero T
 	if scope == nil {
@@ -168,7 +177,12 @@ func InvokeNamed[T any](scope *Scope, name string) (T, error) {
 		)
 	}
 
-	return do.InvokeNamed[T](scope.injector, name)
+	v, err := do.InvokeNamed[T](scope.injector, name)
+	if err != nil && errors.Is(err, do.ErrServiceNotFound) {
+		return zero, fmt.Errorf("%w: name=%q, type=%T, detail: %w", ErrServiceNotFound, name, zero, err)
+	}
+
+	return v, err
 }
 
 // Shutdown gracefully shuts down all services in this scope.

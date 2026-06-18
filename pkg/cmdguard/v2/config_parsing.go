@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // derefPointerToStruct dereferences a pointer to a struct and returns its value.
@@ -37,22 +38,83 @@ func ParseFlagTags(cfg any) ([]FlagTag, error) {
 	return parseStructTags(v.Type())
 }
 
-// parseStructTags parses all flag tags from a struct type.
+// parseStructTags parses all flag tags from a struct type, recursing into
+// nested struct fields that do not carry their own flag tag. This lets users
+// organize config into nested groups while keeping flat CLI flag names.
 func parseStructTags(t reflect.Type) ([]FlagTag, error) {
+	return parseStructTagsAtPath(t, nil)
+}
+
+// parseStructTagsAtPath walks a struct type at the given reflect index path,
+// collecting flag tags from both top-level and nested struct fields.
+func parseStructTagsAtPath(t reflect.Type, parentIndex []int) ([]FlagTag, error) {
 	var tags []FlagTag
 
-	for field := range t.Fields() {
+	for i := range t.NumField() {
+		field := t.Field(i)
+		if !field.IsExported() {
+			continue
+		}
+
 		tag, ok, err := parseFieldFlag(field)
 		if err != nil {
 			return nil, err
 		}
 
 		if ok {
+			tag.Index = appendIndex(parentIndex, i)
 			tags = append(tags, tag)
+
+			continue
+		}
+
+		// Recurse into nested struct fields without their own flag tag so that
+		// flag-bearing fields inside nested config groups are discovered.
+		ft := field.Type
+		for ft.Kind() == reflect.Pointer {
+			ft = ft.Elem()
+		}
+
+		if ft.Kind() == reflect.Struct && shouldRecurseInto(ft) {
+			nested, err := parseStructTagsAtPath(ft, appendIndex(parentIndex, i))
+			if err != nil {
+				return nil, err
+			}
+
+			tags = append(tags, nested...)
 		}
 	}
 
 	return tags, nil
+}
+
+// appendIndex returns a new slice with i appended to parentIndex (non-destructive).
+func appendIndex(parentIndex []int, i int) []int {
+	result := make([]int, 0, len(parentIndex)+1)
+	result = append(result, parentIndex...)
+	result = append(result, i)
+
+	return result
+}
+
+// shouldRecurseInto reports whether a struct type is a nested config group (to
+// recurse into) rather than an opaque value type handled by the type registry.
+func shouldRecurseInto(t reflect.Type) bool {
+	switch t {
+	case reflect.TypeFor[Duration](),
+		reflect.TypeFor[Port](),
+		reflect.TypeFor[Email](),
+		reflect.TypeFor[URL](),
+		reflect.TypeFor[HostPort](),
+		reflect.TypeFor[Enum](),
+		reflect.TypeFor[FilePath](),
+		reflect.TypeFor[LogLevel](),
+		reflect.TypeFor[time.Duration](),
+		reflect.TypeFor[time.Time]():
+		return false
+	}
+
+	return true
 }
 
 // parseFieldFlag parses flag tags from a single struct field.

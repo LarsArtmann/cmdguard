@@ -26,6 +26,7 @@ type FlagTag struct {
 	Required bool
 	Field    string
 	Type     reflect.Type
+	Index    []int  // path of reflect field indices from the root struct (enables nested-struct config)
 	Validate string // Raw validate tag value (e.g., "min=1,max=100")
 	Env      string // Environment variable name (e.g., "DB_HOST")
 	Count    bool   // Counting flag: -vvv → 3
@@ -78,7 +79,7 @@ func validateStructWithRegistry(v reflect.Value, cfg any, vr *validatorRegistry)
 
 // validateTagWithRegistry validates a single flag tag using the given validator registry.
 func validateTagWithRegistry(v reflect.Value, tag FlagTag, vr *validatorRegistry) error {
-	field := v.FieldByName(tag.Field)
+	field := fieldByTag(v, tag)
 	if !field.IsValid() {
 		return nil
 	}
