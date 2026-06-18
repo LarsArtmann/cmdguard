@@ -74,17 +74,17 @@ func TestResult_Map(t *testing.T) {
 func TestResult_AndThen(t *testing.T) {
 	t.Parallel()
 
-	parseResult := Ok("42").AndThen(func(s string) Result[int] {
-		return Ok(len(s))
+	exclaim := Ok("hello").AndThen(func(s string) Result[string] {
+		return Ok(s + "!")
 	})
 
-	if v, _ := parseResult.Value(); v != 2 {
-		t.Errorf("expected AndThen to produce 2, got %d", v)
+	if v, _ := exclaim.Value(); v != "hello!" {
+		t.Errorf("expected AndThen to produce 'hello!', got %q", v)
 	}
 
 	errSentinel := errors.New("boom")
-	chained := Err[string](errSentinel).AndThen(func(s string) Result[int] {
-		return Ok(len(s))
+	chained := Err[string](errSentinel).AndThen(func(s string) Result[string] {
+		return Ok(s + "!")
 	})
 
 	testutil.AssertErrorIs(t, chained.ErrValue(), errSentinel)

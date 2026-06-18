@@ -45,10 +45,14 @@ func RegisterPlugin(plugin Plugin) error {
 		return fmt.Errorf("%w: plugin is nil", ErrServiceRegistration)
 	}
 
-	return plugin.Register(PluginRegistrar{
+	if err := plugin.Register(PluginRegistrar{
 		types:      globalTypeRegistry,
 		validators: globalValidators,
-	})
+	}); err != nil {
+		return fmt.Errorf("plugin %q registration: %w", plugin.Name(), err)
+	}
+
+	return nil
 }
 
 // WithPlugin registers a plugin during CLI construction.
