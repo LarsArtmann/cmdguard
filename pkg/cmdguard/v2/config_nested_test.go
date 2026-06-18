@@ -41,16 +41,20 @@ func TestParseFlagTags_NestedFieldIndex(t *testing.T) {
 	tags, err := ParseFlagTags(&nestedRootConfig{})
 	testutil.AssertNoError(t, err)
 
+	found := false
+
 	for _, tag := range tags {
 		if tag.Name == "host" {
+			found = true
 			if len(tag.Index) < 2 {
 				t.Errorf("expected nested Index path for 'host', got %v", tag.Index)
 			}
-			return
 		}
 	}
 
-	t.Error("did not find 'host' tag")
+	if !found {
+		t.Error("did not find 'host' tag")
+	}
 }
 
 func TestNestedConfig_SetFieldByIndex(t *testing.T) {
@@ -60,18 +64,24 @@ func TestNestedConfig_SetFieldByIndex(t *testing.T) {
 	tags, err := ParseFlagTags(cfg)
 	testutil.AssertNoError(t, err)
 
+	found := false
+
 	for _, tag := range tags {
-		if tag.Name == "host" {
-			err := setFieldByTag(cfg, tag, "db.example.com", globalTypeRegistry)
-			testutil.AssertNoError(t, err)
-			if cfg.DB.Host != "db.example.com" {
-				t.Errorf("expected DB.Host='db.example.com', got %q", cfg.DB.Host)
-			}
-			return
+		if tag.Name != "host" {
+			continue
+		}
+
+		found = true
+		err := setFieldByTag(cfg, tag, "db.example.com", globalTypeRegistry)
+		testutil.AssertNoError(t, err)
+		if cfg.DB.Host != "db.example.com" {
+			t.Errorf("expected DB.Host='db.example.com', got %q", cfg.DB.Host)
 		}
 	}
 
-	t.Error("did not find 'host' tag")
+	if !found {
+		t.Error("did not find 'host' tag")
+	}
 }
 
 func TestNestedConfig_DoesNotRecurseIntoDuration(t *testing.T) {
@@ -115,13 +125,14 @@ func TestNestedConfig_JSONFile(t *testing.T) {
 		t.Errorf("expected DB.Port=9999, got %d", cfg.DB.Port)
 	}
 
-	// setFields should include the nested field names
 	foundHost := false
+
 	for _, f := range setFields {
 		if f == "Host" {
 			foundHost = true
 		}
 	}
+
 	if !foundHost {
 		t.Errorf("expected 'Host' in setFields, got %v", setFields)
 	}
@@ -130,12 +141,10 @@ func TestNestedConfig_JSONFile(t *testing.T) {
 func TestNestedConfig_CLIIntegration(t *testing.T) {
 	t.Parallel()
 
-	cli, err := NewCLI[nestedRootConfig]("test", "1.0", nestedRootConfig{})
+	cli, err := NewCLI("test", "1.0", nestedRootConfig{})
 	testutil.AssertNoError(t, err)
 
-	var capturedHost string
-
-	cmd, err := NewCommand[nestedRootConfig, NoFlags](
+	cmd, err := NewCommand(
 		"run",
 		func(_ context.Context, _ *nestedRootConfig, _ NoFlags) error {
 			return nil
@@ -144,8 +153,6 @@ func TestNestedConfig_CLIIntegration(t *testing.T) {
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))
-
-	_ = capturedHost
 
 	execErr := cli.ExecuteWithArgs(context.Background(), []string{"run", "--host", "cli.db", "--port", "8080"})
 	testutil.AssertNoError(t, execErr)
