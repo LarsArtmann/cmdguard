@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-06-17
-**Status:** v2.7.0 — zero panics, 85.6% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries
-**Tests:** 396+ passing, 0 build errors
+**Updated:** 2026-06-18
+**Status:** v2.8.0-dev — zero panics, 86.3% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs
+**Tests:** 430+ passing, 0 build errors
 
 ## Completed
 
@@ -120,13 +120,13 @@
 
 | #   | Task                                                        | Category |
 | --- | ----------------------------------------------------------- | -------- |
-| 21  | Plugin system for custom validators and type handlers       | Feature  |
-| 22  | Config file nested struct support                           | Feature  |
-| 23  | Documentation generation (GenerateDocs, markdown, API docs) | Feature  |
-| 24  | Advanced types: Result[T], Validated[T], branded IDs        | Feature  |
-| 25  | Structured JSON error output for `--output=json`            | Feature  |
-| 26  | Extract flag-related code to standalone `flagtags` library  | Refactor |
-| 27  | Consider extracting `go-output` to sub-package              | Refactor |
+| 21  | ~~Plugin system for custom validators and type handlers~~ ✅ DONE (v2.8) |
+| 22  | ~~Config file nested struct support~~ ✅ DONE (v2.8) |
+| 23  | ~~Documentation generation (GenerateDocs, markdown)~~ ✅ DONE (v2.8) |
+| 24  | ~~Advanced types: Result[T], Validated[T]~~ ✅ DONE (v2.8) |
+| 25  | ~~Structured JSON error output for `--output=json`~~ ✅ DONE (v2.7) |
+| 26  | Extract flag-related code to standalone `flagtags` library       | Refactor |
+| 27  | ~~Consider extracting `go-output` to sub-package~~ ✅ DONE (already external at v0.12.0) |
 
 ### P2: Future Cleanup (API-breaking, defer to v3.0)
 

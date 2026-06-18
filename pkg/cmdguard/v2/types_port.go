@@ -14,12 +14,18 @@ const (
 	portFTP   = 21
 	portDNS   = 53
 	portSMTP  = 25
+
+	portMaxValue      = 65535
+	portWellKnownMax  = 1023
+	portRegisteredMin = 1024
+	portRegisteredMax = 49151
+	portDynamicMin    = 49152
 )
 
 // validatePortRange returns an error if port is outside 1-65535.
 func validatePortRange(port int) error {
-	if port < 1 || port > 65535 {
-		return fmt.Errorf("%w: port %d is out of range (1-65535)", ErrInvalidPort, port)
+	if port < 1 || port > portMaxValue {
+		return fmt.Errorf("%w: port %d is out of range (1-%d)", ErrInvalidPort, port, portMaxValue)
 	}
 
 	return nil
@@ -30,7 +36,7 @@ func validatePortRange(port int) error {
 //
 //nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
 type Port struct {
-	port int
+	port uint16
 }
 
 // ParsePort creates a new Port from a string.
@@ -67,7 +73,7 @@ func ParsePort(s string) (Port, error) {
 		return Port{}, err
 	}
 
-	return Port{port: port}, nil
+	return Port{port: uint16(port)}, nil //nolint:gosec // range validated by validatePortRange
 }
 
 // PortFromInt creates a Port from an int.
@@ -77,22 +83,22 @@ func PortFromInt(port int) (Port, error) {
 		return Port{}, fmt.Errorf("port=%d: %w", port, err)
 	}
 
-	return Port{port: port}, nil
+	return Port{port: uint16(port)}, nil //nolint:gosec // range validated by validatePortRange
 }
 
 // Int returns the port as an int.
 func (p Port) Int() int {
-	return p.port
+	return int(p.port)
 }
 
 // String returns the port as a string.
 func (p Port) String() string {
-	return strconv.Itoa(p.port)
+	return strconv.Itoa(int(p.port))
 }
 
 // IsValid returns true if the port is in the valid range.
 func (p Port) IsValid() bool {
-	return p.port >= 1 && p.port <= 65535
+	return p.port >= 1
 }
 
 // IsEmpty returns true if the port is zero (unset).
@@ -102,17 +108,17 @@ func (p Port) IsEmpty() bool {
 
 // IsWellKnown returns true if the port is in the well-known range (1-1023).
 func (p Port) IsWellKnown() bool {
-	return p.port >= 1 && p.port <= 1023
+	return p.port >= 1 && p.port <= portWellKnownMax
 }
 
 // IsRegistered returns true if the port is in the registered range (1024-49151).
 func (p Port) IsRegistered() bool {
-	return p.port >= 1024 && p.port <= 49151
+	return p.port >= portRegisteredMin && p.port <= portRegisteredMax
 }
 
 // IsDynamic returns true if the port is in the dynamic/private range (49152-65535).
 func (p Port) IsDynamic() bool {
-	return p.port >= 49152 && p.port <= 65535
+	return p.port >= portDynamicMin
 }
 
 // MarshalText implements encoding.TextMarshaler for Port.

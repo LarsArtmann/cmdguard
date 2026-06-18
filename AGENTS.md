@@ -231,7 +231,7 @@ go build ./...                                   # Verify build
 11. **Direct go-output usage** — Users use `output.FormatTable`, `output.FormatJSON`, etc. directly from `github.com/larsartmann/go-output`; cmdguard only re-exports the `OutputFormat = output.Format` type alias for convenience. No `ParseOutputFormat`, `SupportedFormats`, `IsFormatSupported`, or `Format*` constant re-exports.
 12. **Deprecated APIs (removed)** — `IsExecutable()` removed; use `HasHandler()`. `FlowContextAccessor` was removed in v2.3.0 — use `GetBranchingFlowContext(ctx)` directly
 13. **Typed branching** — `BranchWithDuration(name, time.Duration)` and `BranchWithDeadlineTime(name, time.Time)` are the only branching methods (string-based `BranchWithTimeout`/`BranchWithDeadline` removed in v2.3.0)
-14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; global state, tests must not run in parallel
+14. **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map`; `sync.Map` is concurrency-safe so tests may run in parallel
 15. **Exit codes** — `ExecuteAndExit` checks for `ExitCoder` interface; use `NewExitError(code, err)` for custom exit codes
 16. **`--no-color` + NO_COLOR** — `--no-color` persistent flag is registered by default; `cli.NoColor()` returns true if passed; `Execute()` sets `NO_COLOR=1` for fang to pick up. `NO_COLOR` env var is also respected automatically by fang's colorprofile.
 17. **Strict validation** — `WithStrictValidation[T]()` requires `WithShort` on all commands; enforced at `AddCommand` time
