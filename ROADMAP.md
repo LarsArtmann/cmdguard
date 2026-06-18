@@ -65,13 +65,13 @@ not lost.
 
 - [x] Make `NoFlags` a distinct named type (not `type NoFlags = struct{}`)
 - [ ] **Rename `Get[T]`/`MustGet[T]`** — `Get` is too generic; should be
-  `GetService[T]` or similar. Breaking: every consumer's import surface changes.
+      `GetService[T]` or similar. Breaking: every consumer's import surface changes.
 - [ ] **Make `RegisterInScope` generic** — currently takes `...any`; should be
-  `RegisterInScope[T](scope, provider)`. Breaking: signature change.
+      `RegisterInScope[T](scope, provider)`. Breaking: signature change.
 - [ ] **Remove or redesign `Package()`** — takes a pre-existing `*Scope` which is
-  an unusual API shape; should be reworked for error-safe DI. Breaking.
+      an unusual API shape; should be reworked for error-safe DI. Breaking.
 - [ ] **Remove `SetConfig`** — mutating a CLI's config after construction is
-  unsafe (FlagRegistry isn't re-initialized). Breaking but removes a footgun.
+      unsafe (FlagRegistry isn't re-initialized). Breaking but removes a footgun.
 
 ### v3.0 Extraction: `flagtags` Library
 

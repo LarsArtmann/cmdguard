@@ -118,14 +118,14 @@
 
 ### P1: Future (v3.0+)
 
-| #   | Task                                                        | Category |
-| --- | ----------------------------------------------------------- | -------- |
-| 21  | ~~Plugin system for custom validators and type handlers~~ ✅ DONE (v2.8) |
-| 22  | ~~Config file nested struct support~~ ✅ DONE (v2.8) |
-| 23  | ~~Documentation generation (GenerateDocs, markdown)~~ ✅ DONE (v2.8) |
-| 24  | ~~Advanced types: Result[T], Validated[T]~~ ✅ DONE (v2.8) |
-| 25  | ~~Structured JSON error output for `--output=json`~~ ✅ DONE (v2.7) |
-| 26  | Extract flag-related code to standalone `flagtags` library       | Refactor |
+| #   | Task                                                                                     | Category |
+| --- | ---------------------------------------------------------------------------------------- | -------- |
+| 21  | ~~Plugin system for custom validators and type handlers~~ ✅ DONE (v2.8)                 |
+| 22  | ~~Config file nested struct support~~ ✅ DONE (v2.8)                                     |
+| 23  | ~~Documentation generation (GenerateDocs, markdown)~~ ✅ DONE (v2.8)                     |
+| 24  | ~~Advanced types: Result[T], Validated[T]~~ ✅ DONE (v2.8)                               |
+| 25  | ~~Structured JSON error output for `--output=json`~~ ✅ DONE (v2.7)                      |
+| 26  | Extract flag-related code to standalone `flagtags` library                               | Refactor |
 | 27  | ~~Consider extracting `go-output` to sub-package~~ ✅ DONE (already external at v0.12.0) |
 
 ### P2: Future Cleanup (API-breaking, defer to v3.0)
