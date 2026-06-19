@@ -20,7 +20,7 @@ require (
 	github.com/larsartmann/go-output/plantuml v0.12.0
 	github.com/larsartmann/go-output/serialization v0.12.0
 	github.com/larsartmann/go-output/table v0.12.0
-	github.com/larsartmann/samber-do-auditlog v0.0.4
+	github.com/larsartmann/samber-do-auditlog v0.1.0
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -61,7 +61,6 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dlclark/regexp2/v2 v2.2.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
@@ -82,7 +81,6 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.15.0 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
@@ -98,7 +96,3 @@ require (
 	golang.org/x/text v0.38.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
-
-// Local development: resolve samber-do-auditlog from the sibling repo so
-// cmdguard picks up unpublished changes immediately.
-replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog

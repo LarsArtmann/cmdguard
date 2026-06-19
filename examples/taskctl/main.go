@@ -111,13 +111,21 @@ func main() {
 	}
 
 	if plugin := cli.AuditLog(); plugin != nil && plugin.EventsCount() > 0 {
-		if err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
-			Format: v2.AuditLogFormatHTML,
-			Path:   "taskctl-audit.html",
-		}); err != nil {
-			fmt.Fprintf(os.Stderr, "audit-log export failed: %v\n", err)
+		// AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
+		// csv, tsv, mermaid, or dot. Defaults to html.
+		format, err := v2.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)
 		} else {
-			fmt.Fprintln(os.Stderr, "audit-log written to taskctl-audit.html")
+			path := "taskctl-audit." + format.String()
+			if err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+				Format: format,
+				Path:   path,
+			}); err != nil {
+				fmt.Fprintf(os.Stderr, "audit-log export failed: %v\n", err)
+			} else {
+				fmt.Fprintf(os.Stderr, "audit-log written to %s\n", path)
+			}
 		}
 	}
 

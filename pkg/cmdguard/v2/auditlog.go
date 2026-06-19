@@ -22,12 +22,16 @@ const (
 	AuditLogFormatJSON    AuditLogFormat = "json"
 	AuditLogFormatNDJSON  AuditLogFormat = "ndjson"
 	AuditLogFormatMermaid AuditLogFormat = "mermaid"
+	AuditLogFormatCSV     AuditLogFormat = "csv"
+	AuditLogFormatTSV     AuditLogFormat = "tsv"
+	AuditLogFormatDOT     AuditLogFormat = "dot"
 )
 
 // Valid returns true if the format is one of the supported values.
 func (f AuditLogFormat) Valid() bool {
 	switch f {
-	case AuditLogFormatHTML, AuditLogFormatJSON, AuditLogFormatNDJSON, AuditLogFormatMermaid:
+	case AuditLogFormatHTML, AuditLogFormatJSON, AuditLogFormatNDJSON,
+		AuditLogFormatMermaid, AuditLogFormatCSV, AuditLogFormatTSV, AuditLogFormatDOT:
 		return true
 	}
 
@@ -47,6 +51,9 @@ func supportedAuditLogFormatNames() []string {
 		string(AuditLogFormatJSON),
 		string(AuditLogFormatNDJSON),
 		string(AuditLogFormatMermaid),
+		string(AuditLogFormatCSV),
+		string(AuditLogFormatTSV),
+		string(AuditLogFormatDOT),
 	}
 }
 
@@ -100,69 +107,91 @@ func ExportAuditLog[T any](cli *CLI[T], cfg AuditLogExportConfig) error {
 }
 
 func exportAuditLogToFile(plugin *auditlog.Plugin, format AuditLogFormat, path string) error {
-	switch format {
-	case AuditLogFormatHTML:
-		if err := plugin.ExportToHTML(path); err != nil {
-			return fmt.Errorf("exporting HTML audit log to %q: %w", path, err)
-		}
-	case AuditLogFormatJSON:
-		if err := plugin.ExportToFile(path); err != nil {
-			return fmt.Errorf("exporting JSON audit log to %q: %w", path, err)
-		}
-	case AuditLogFormatNDJSON:
-		if err := plugin.ExportEventsToNDJSON(path); err != nil {
-			return fmt.Errorf("exporting NDJSON audit log to %q: %w", path, err)
-		}
-	case AuditLogFormatMermaid:
-		if err := exportMermaidToFile(plugin, path); err != nil {
-			return fmt.Errorf("exporting mermaid audit log to %q: %w", path, err)
-		}
-	default:
+	exporters := map[AuditLogFormat]func(*auditlog.Plugin, string) error{
+		AuditLogFormatHTML:    (*auditlog.Plugin).ExportToHTML,
+		AuditLogFormatJSON:    (*auditlog.Plugin).ExportToFile,
+		AuditLogFormatNDJSON:  (*auditlog.Plugin).ExportEventsToNDJSON,
+		AuditLogFormatCSV:     (*auditlog.Plugin).ExportToCSV,
+		AuditLogFormatTSV:     (*auditlog.Plugin).ExportToTSV,
+		AuditLogFormatMermaid: exportMermaidReportToFile,
+		AuditLogFormatDOT:     exportDOTReportToFile,
+	}
+
+	exporter, ok := exporters[format]
+	if !ok {
 		return fmt.Errorf("%w: %s", ErrUnsupportedAuditLogFormat, format)
+	}
+
+	if err := exporter(plugin, path); err != nil {
+		return fmt.Errorf("exporting %s audit log to %q: %w", format, path, err)
 	}
 
 	return nil
 }
 
 func exportAuditLogToWriter(plugin *auditlog.Plugin, format AuditLogFormat, w io.Writer) error {
-	switch format {
-	case AuditLogFormatHTML:
-		if err := plugin.WriteHTML(w); err != nil {
-			return fmt.Errorf("writing HTML audit log: %w", err)
-		}
-	case AuditLogFormatJSON:
-		if err := plugin.WriteReportJSON(w); err != nil {
-			return fmt.Errorf("writing JSON audit log: %w", err)
-		}
-	case AuditLogFormatNDJSON:
-		if err := plugin.WriteEventsNDJSON(w); err != nil {
-			return fmt.Errorf("writing NDJSON audit log: %w", err)
-		}
-	case AuditLogFormatMermaid:
-		if err := plugin.Report().WriteMermaid(w); err != nil {
-			return fmt.Errorf("writing mermaid audit log: %w", err)
-		}
-	default:
+	exporters := map[AuditLogFormat]func(*auditlog.Plugin, io.Writer) error{
+		AuditLogFormatHTML:    (*auditlog.Plugin).WriteHTML,
+		AuditLogFormatJSON:    (*auditlog.Plugin).WriteReportJSON,
+		AuditLogFormatNDJSON:  (*auditlog.Plugin).WriteEventsNDJSON,
+		AuditLogFormatCSV:     (*auditlog.Plugin).WriteReportCSV,
+		AuditLogFormatTSV:     (*auditlog.Plugin).WriteReportTSV,
+		AuditLogFormatMermaid: writeMermaidReport,
+		AuditLogFormatDOT:     writeDOTReport,
+	}
+
+	exporter, ok := exporters[format]
+	if !ok {
 		return fmt.Errorf("%w: %s", ErrUnsupportedAuditLogFormat, format)
+	}
+
+	if err := exporter(plugin, w); err != nil {
+		return fmt.Errorf("writing %s audit log: %w", format, err)
 	}
 
 	return nil
 }
 
-func exportMermaidToFile(plugin *auditlog.Plugin, path string) error {
-	report := plugin.Report()
+// exportMermaidReportToFile and exportDOTReportToFile adapt Report-level WriteX
+// methods to the file-exporter signature for formats lacking Plugin.ExportToX.
+func exportMermaidReportToFile(plugin *auditlog.Plugin, path string) error {
+	return writeReportToFile(path, plugin.Report().WriteMermaid)
+}
 
+func exportDOTReportToFile(plugin *auditlog.Plugin, path string) error {
+	return writeReportToFile(path, plugin.Report().WriteDOT)
+}
+
+func writeMermaidReport(plugin *auditlog.Plugin, w io.Writer) error {
+	if err := plugin.Report().WriteMermaid(w); err != nil {
+		return fmt.Errorf("mermaid report: %w", err)
+	}
+
+	return nil
+}
+
+func writeDOTReport(plugin *auditlog.Plugin, w io.Writer) error {
+	if err := plugin.Report().WriteDOT(w); err != nil {
+		return fmt.Errorf("DOT report: %w", err)
+	}
+
+	return nil
+}
+
+// writeReportToFile creates path, invokes write on the file, then closes it.
+// Used for report formats (mermaid, dot) that lack a Plugin-level ExportToX method.
+func writeReportToFile(path string, write func(io.Writer) error) error {
 	file, err := os.Create(path)
 	if err != nil {
-		return fmt.Errorf("creating mermaid file %q: %w", path, err)
+		return fmt.Errorf("creating file %q: %w", path, err)
 	}
 
 	defer func() {
 		_ = file.Close()
 	}()
 
-	if err := report.WriteMermaid(file); err != nil {
-		return fmt.Errorf("writing mermaid content: %w", err)
+	if err := write(file); err != nil {
+		return fmt.Errorf("writing report content: %w", err)
 	}
 
 	return nil

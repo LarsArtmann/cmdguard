@@ -11,9 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`ExportAuditLog[T]` helper** — Reusable function that writes the audit log snapshot in HTML/JSON/NDJSON/Mermaid format to a file or `io.Writer`. Consumers no longer need to implement the format switch themselves
-- **`AuditLogFormat` strong type** — Validated enum (`html`, `json`, `ndjson`, `mermaid`) with `ParseAuditLogFormat()` constructor and `Valid()` method. Replaces raw string format selection
+- **`ExportAuditLog[T]` helper** — Reusable function that writes the audit log snapshot in HTML/JSON/NDJSON/Mermaid/CSV/TSV/DOT format to a file or `io.Writer`. Consumers no longer need to implement the format switch themselves
+- **`AuditLogFormat` strong type** — Validated enum (`html`, `json`, `ndjson`, `mermaid`, `csv`, `tsv`, `dot`) with `ParseAuditLogFormat()` constructor and `Valid()` method. Replaces raw string format selection
 - **`ErrUnsupportedAuditLogFormat`** — Sentinel error for invalid format values, classified as `"audit"` in the JSON error system
+
+### Changed
+
+- **`samber-do-auditlog` v0.0.4 → v0.1.0** — Consumed from the Go module proxy; local `replace` directive removed. v0.1.0 is API-compatible (all surfaces cmdguard uses are in the stable set). Adds CSV/TSV/DOT export wired through the new map-dispatch registry
+- **Audit export dispatch** — `exportAuditLogToFile`/`exportAuditLogToWriter` refactored from per-format switch statements to a single map-of-exporters per direction, dropping cyclomatic complexity below the lint threshold and making new formats a one-line addition
 
 ### Removed
 
