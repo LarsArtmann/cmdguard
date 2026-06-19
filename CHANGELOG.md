@@ -9,16 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-06-19
+
 ### Added
 
+- **`Result[T]` and `Validated[T]` sum types** — Explicit error-handling types inspired by Rust's `Result<T, E>`. `Ok(value)` / `Err(err)` constructors, `IsOk()`/`IsErr()` predicates, `Value()`/`Expect()`/`UnwrapOr()` accessors. Zero panics. `Validated[T]` wraps a value plus a slice of validation errors (partial success pattern)
+- **`Plugin` system** — `Plugin` interface for bundling custom type handlers and validators. `PluginRegistrar` exposes scoped `TypeHandler()`/`Validator()` registration. `RegisterPlugin()` applies to global registries; `FlagRegistry.RegisterPlugin()` applies per-instance
+- **`GenerateDocs()`** — `cli.GenerateDocs(w)` writes markdown documentation for the full command tree (synopsis, usage, flags, examples) to any `io.Writer`
 - **`ExportAuditLog[T]` helper** — Reusable function that writes the audit log snapshot in HTML/JSON/NDJSON/Mermaid/CSV/TSV/DOT format to a file or `io.Writer`. Consumers no longer need to implement the format switch themselves
 - **`AuditLogFormat` strong type** — Validated enum (`html`, `json`, `ndjson`, `mermaid`, `csv`, `tsv`, `dot`) with `ParseAuditLogFormat()` constructor and `Valid()` method. Replaces raw string format selection
 - **`ErrUnsupportedAuditLogFormat`** — Sentinel error for invalid format values, classified as `"audit"` in the JSON error system
+- **Integer overflow validation** — `int8`/`int16`/`int32`/`uint8`/`uint16` flag values are range-checked at parse time; returns `ErrIntegerOverflow` instead of silently wrapping
+- **Nested struct config support** — Config structs can contain nested structs; inner fields are discovered and flattened for flag registration and config-file loading. `Index` field on `FieldTag` tracks the reflect path
+- **Koanf-based config loader** — `configload.KoanfLoader()` handles nested config objects (e.g. `{"db":{"host":"x"}}` → `--db-host`) via `github.com/knadh/koanf`
 
 ### Changed
 
 - **`samber-do-auditlog` v0.0.4 → v0.1.0** — Consumed from the Go module proxy; local `replace` directive removed. v0.1.0 is API-compatible (all surfaces cmdguard uses are in the stable set). Adds CSV/TSV/DOT export wired through the new map-dispatch registry
 - **Audit export dispatch** — `exportAuditLogToFile`/`exportAuditLogToWriter` refactored from per-format switch statements to a single map-of-exporters per direction, dropping cyclomatic complexity below the lint threshold and making new formats a one-line addition
+- **`go-output` v0.12.0 → v0.13.0** — All 15 sub-modules updated. `markdown/` and `tree/` extracted into standalone sub-modules; `output.go` imports them explicitly to preserve `FormatMarkdown` and `FormatTree` availability
 
 ### Removed
 
@@ -27,9 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`ErrAuditLogNotEnabled`, `ErrInvalidOutputFormat`** — Sentinel errors removed with the subcommand
 - **`errors_audit.go`** — File removed; audit format errors now in `auditlog.go`
 
-### Changed
+### Fixed
 
-- **Dependency updates** — `go-output` v0.11.0 → v0.12.0 (8 sub-modules), `rogpeppe/go-internal` v1.14.1 → v1.15.0, pinned latest transitive deps (`charmbracelet/x/conpty`, `charmbracelet/x/exp/golden`, `go-output/testhelpers/graphtest`). All direct dependencies verified at latest published versions.
+- **Type-registry data race** — `RegisterTypeHandler()`/`RegisterValidator()` now use a locked accessor instead of direct map mutation, eliminating the race detected under `-race` during concurrent test runs
 
 ---
 

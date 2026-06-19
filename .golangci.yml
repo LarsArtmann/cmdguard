@@ -148,6 +148,8 @@ linters:
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
             - github.com/larsartmann/go-output/table
+            - github.com/larsartmann/go-output/markdown
+            - github.com/larsartmann/go-output/tree
             - github.com/larsartmann/samber-do-auditlog
             - github.com/samber/do/v2
             - github.com/spf13/cobra
@@ -173,7 +175,15 @@ linters:
             - charm.land/glamour/v2
             - github.com/larsartmann/cmdguard
             - github.com/larsartmann/go-output
+            - github.com/larsartmann/go-output/d2
+            - github.com/larsartmann/go-output/delimited
+            - github.com/larsartmann/go-output/graph
+            - github.com/larsartmann/go-output/markdown
+            - github.com/larsartmann/go-output/markup
+            - github.com/larsartmann/go-output/plantuml
+            - github.com/larsartmann/go-output/serialization
             - github.com/larsartmann/go-output/table
+            - github.com/larsartmann/go-output/tree
             - github.com/larsartmann/samber-do-auditlog
             - github.com/muesli/mango
             - github.com/muesli/mango-cobra
