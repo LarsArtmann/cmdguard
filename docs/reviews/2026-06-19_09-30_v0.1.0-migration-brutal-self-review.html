@@ -1,0 +1,1242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brutal Self-Review — v0.1.0 Auditlog Migration</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS DARK — Dashboard template
+         Design language: form follows function. Primary colors on graphite.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Dark) --- */
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+
+        /* --- Semantic layer (shared vocabulary with editorial template) --- */
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 15%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 20%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px; /* Bauhaus default: sharp corners */
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
+          monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Sticky-header offset for anchor jumps */
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges (used inside issue cards) --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges (used in tables) --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
+
+      /* --- Callouts (used inside issues or standalone) --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+
+      /* --- Stat cards / scorecards (aliased vocabulary) --- */
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card,
+      .score-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before,
+      .score-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-bad,
+      .score-bad {
+        /* default top bar already set */
+      }
+      .stat-bad::before,
+      .score-bad::before {
+        background: var(--problem);
+      }
+      .stat-good::before,
+      .score-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before,
+      .score-warn::before {
+        background: var(--warning);
+      }
+      .stat-value,
+      .score {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-bad .stat-value,
+      .score-bad .score {
+        color: var(--problem);
+      }
+      .stat-good .stat-value,
+      .score-good .score {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value,
+      .score-warn .score {
+        color: var(--warning);
+      }
+      .stat-label,
+      .score-card .label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+
+      /* --- Strengths list --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--solution);
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* --- Tables --- */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      .tok-keyword {
+        color: var(--accent);
+      } /* func, type, struct, if, return */
+      .tok-type {
+        color: var(--warning);
+      } /* int, string, bool, error */
+      .tok-string {
+        color: var(--solution);
+      } /* "quoted strings" */
+      .tok-comment {
+        color: var(--text-faint);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #74a9ff;
+      } /* function names */
+      .tok-number {
+        color: var(--accent);
+      } /* 42, 3.14 */
+      .tok-generic {
+        color: var(--problem);
+      } /* T, ID in generics */
+      .tok-builtin {
+        color: #4dd9ff;
+      } /* make, len, append */
+      .tok-punct {
+        color: var(--text-muted);
+      } /* { } ( ) ; = : */
+      .tok-attr {
+        color: var(--accent);
+      } /* Nix attribute names */
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--surface-sunken);
+        border: 1px solid var(--border-strong);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+        border-color: var(--accent);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+        border-color: var(--problem);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+        border-color: var(--solution);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids (responsive) --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC (alternative to sidebar) --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .stat-grid,
+        .scorecard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Full-bleed top bar -->
+    <div class="top-bar">
+      <span>BRUTAL SELF-REVIEW</span>
+      <span>2026-06-19</span>
+      <span>v0.1.0 AUDITLOG MIGRATION</span>
+    </div>
+
+    <div class="layout">
+      <!-- Sidebar TOC -->
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#questions">The 11 Questions</a>
+          <a href="#issues">Findings</a>
+          <a href="#strengths">Strengths</a>
+          <a href="#plan">Prioritized Plan</a>
+          <a href="#types">Types &amp; Libs</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="hero-badge">Self-Review</div>
+          <h1>samber-do-auditlog v0.1.0 Migration</h1>
+          <p class="hero-subtitle">
+            Brutally honest reflection on the dependency upgrade and the CSV/TSV/DOT export work
+            that shipped with it &mdash; what landed clean, what was missed, and what still sucks.
+          </p>
+        </div>
+
+        <!-- Inline TOC -->
+        <nav class="toc">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#summary">Summary</a></li>
+            <li><a href="#questions">The 11 Questions</a></li>
+            <li><a href="#issues">Findings</a></li>
+            <li><a href="#strengths">Strengths</a></li>
+            <li><a href="#plan">Prioritized Plan</a></li>
+            <li><a href="#types">Types &amp; Libs Reflection</a></li>
+          </ul>
+        </nav>
+
+        <!-- Stats Dashboard -->
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <div class="stat-grid">
+          <div class="stat-card stat-good">
+            <div class="stat-value">11</div>
+            <div class="stat-label">Questions Answered</div>
+          </div>
+          <div class="stat-card stat-bad">
+            <div class="stat-value">1</div>
+            <div class="stat-label">Critical (Race)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">4</div>
+            <div class="stat-label">Important</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Ghost Systems</div>
+          </div>
+        </div>
+
+        <p style="margin-top:1.2rem; color:var(--text-muted);">
+          The migration itself was technically correct &mdash; v0.0.4&rarr;v0.1.0 compiled clean, the
+          removed APIs were never used, and 3 new export formats shipped with full test coverage and
+          a map-dispatch refactor that dropped cyclomatic complexity below the lint threshold. But
+          the surrounding <strong>documentation hygiene was sloppy</strong> and a
+          <strong>pre-existing test race</strong> was discovered and then quietly deferred instead of
+          fixed on sight. This review corrects both.
+        </p>
+
+        <!-- The 11 Questions -->
+        <h2 id="questions"><span class="num">01</span>The 11 Questions, Answered Honestly</h2>
+
+        <div class="card card-problem">
+          <h4>1. What did you forget?</h4>
+          <p>
+            <strong>Documentation hygiene, across the board.</strong> I bumped the dependency in
+            <code>go.mod</code> and updated <code>AGENTS.md</code>, but left
+            <code>FEATURES.md</code> stating <code>v0.0.4</code> (the doc was lying about the
+            version) and wrote zero <code>CHANGELOG.md</code> entry. The audit-log API surface is
+            also entirely absent from <code>docs/API.md</code> (0 mentions) and the audit feature has
+            no rows in the <code>FEATURES.md</code> feature tables &mdash; only a dependency-table
+            line. These are now fixed for the version drift; the deeper doc gaps are in the plan.
+          </p>
+        </div>
+
+        <div class="card card-problem">
+          <h4>2. What is something stupid that we do anyway?</h4>
+          <p>
+            Ship with a <strong>flaky race in the test suite</strong> while <code>AGENTS.md</code>
+            claims &ldquo;0 race conditions&rdquo;. That claim was already false on
+            <code>master</code> before this work. The root cause is tests reading
+            <code>globalTypeRegistry.byType[...]</code> directly, bypassing the locked
+            <code>lookupHandler()</code> accessor. I observed it, called it
+            &ldquo;pre-existing&rdquo;, and <em>deferred it</em>. That violates the project's own
+            &ldquo;fix issues on sight&rdquo; rule. Stupid. Fixed in the plan.
+          </p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>3. What could you have done better?</h4>
+          <p>
+            I committed the migration as one large blob instead of the user-requested
+            &ldquo;commit after each smallest self-contained change&rdquo;. The export-format
+            addition, the dep bump, and the example change are logically separable. I also created a
+            <strong>5-way enumeration of the format set</strong> (const block, <code>Valid()</code>
+            switch, <code>supportedAuditLogFormatNames()</code>, the to-file map, the to-writer map)
+            &mdash; adding a format now means editing five places. A single source-of-truth map is
+            cleaner.
+          </p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>4. What could you still improve?</h4>
+          <p>
+            Collapse the 5-way format enumeration into one registry (see plan). Document the audit
+            API in <code>docs/API.md</code>. Make the race-fix permanent so the &ldquo;0 race
+            conditions&rdquo; status line becomes <em>true</em> rather than aspirational.
+          </p>
+        </div>
+
+        <div class="card card-solution">
+          <h4>5. Did you lie to you?</h4>
+          <p>
+            Not deliberately, but I <strong>inherited and repeated a lie</strong>: the
+            &ldquo;0 race conditions&rdquo; status in <code>AGENTS.md</code>. I even quoted it as
+            context without challenging it. One <code>-race</code> run disproves it. The honest
+            status was &ldquo;flaky race, undiagnosed&rdquo; until now.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>6. How can we be less stupid?</h4>
+          <p>
+            Treat the <code>-race</code> suite as a hard gate, not a coin-flip. When the detector
+            fires, root-cause it the same session &mdash; do not label it &ldquo;pre-existing&rdquo;
+            and move on. A flaky test is a broken test.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>7. Ghost systems?</h4>
+          <p>
+            <strong>None.</strong> Every function added (<code>writeReportToFile</code>, the four
+            adapter funcs, the two dispatchers) is called by tests. No dead code, no orphaned
+            integrations. The <code>samber-do-auditlog</code> CLI tool (<code>cmd/auditlog</code>)
+            added in v0.1.0 is intentionally not re-exported &mdash; that's correct scoping, not a
+            ghost.
+          </p>
+        </div>
+
+        <div class="card card-solution">
+          <h4>8. Scope creep trap?</h4>
+          <p>
+            Resisted it well. v0.1.0 added <code>ReplayEvents</code>, <code>MergeReports</code>,
+            <code>JSONSchema()</code>, <code>Report.Diff</code>, <code>LoadReport</code> variants.
+            I deliberately did <em>not</em> wrap these &mdash; cmdguard's job is export + query, and
+            users can reach for the auditlog library directly for advanced ops. Exposing them would
+            be feature creep without demonstrated demand. Good discipline; keep it.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>9. Did we remove something useful?</h4>
+          <p>
+            No. The removed v0.1.0 APIs (<code>LoadReportFromJSON</code>,
+            <code>LoadReportFromNDJSON</code>) were never referenced here. The local
+            <code>replace</code> directive removal is intentional &mdash; the published tag exists.
+          </p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>10. Split brains?</h4>
+          <p>
+            <strong>Yes &mdash; one mild one.</strong> The supported format set is enumerated in
+            <em>five</em> places (see Q3). If someone adds a format to the <code>const</code> block
+            but forgets <code>Valid()</code>, <code>ParseAuditLogFormat</code> will reject it even
+            though it compiles. &ldquo;Make impossible states unrepresentable&rdquo; applies: a
+            single registry kills this class of bug.
+          </p>
+        </div>
+
+        <div class="card card-solution">
+          <h4>11. How are we doing on tests?</h4>
+          <p>
+            Coverage of the new code is solid: <code>TestParseAuditLogFormat</code> and
+            <code>TestExportAuditLog</code> exercise all 7 formats across both writer and file
+            paths. The gap is <strong>determinism</strong>: the global-registry race makes the
+            &ndash;race suite intermittent. Fixing the race (plan step 1) raises confidence from
+            &ldquo;usually passes&rdquo; to &ldquo;always passes&rdquo;.
+          </p>
+        </div>
+
+        <!-- Findings as Issue Cards -->
+        <h2 id="issues"><span class="num">02</span>Findings</h2>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Critical</span>
+          <h3>Test data race on the global type registry</h3>
+          <div class="where">pkg/cmdguard/v2/type_handler_test.go:696, 707, 717 &middot; plugin_test.go:49</div>
+          <p>
+            <code>TestRegisterGoDurationHandler</code> reads
+            <code>globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]</code> with
+            <strong>no lock</strong>, while <code>TestPlugin_RegisterTypeHandlerAndValidator</code>
+            (parallel) writes the same map via <code>register()</code>. The production
+            <code>lookupHandler()</code> is correctly <code>sync.RWMutex</code>-guarded &mdash; the
+            tests bypass it by reaching into the private field. Result: ~1-in-3
+            <code>-race</code> runs fail with <code>DATA RACE</code>.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong>
+            Replace every direct <code>globalTypeRegistry.byType[...]</code> read in tests with the
+            locked <code>globalTypeRegistry.lookupHandler(...)</code> accessor (returns
+            <code>(TypeHandler, bool)</code>). Pure test change, zero production risk.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Important</span>
+          <h3>5-way format enumeration (split brain)</h3>
+          <div class="where">pkg/cmdguard/v2/auditlog.go</div>
+          <p>
+            The 7 supported formats are listed in: the <code>const</code> block, the
+            <code>Valid()</code> switch, <code>supportedAuditLogFormatNames()</code>, the
+            to-file exporter map, and the to-writer exporter map. Adding a format = 5 edits.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong>
+            One <code>auditLogExporter{ toFile, toWriter }</code> struct + a single map;
+            <code>Valid()</code>, names, and both dispatchers derive from it. Collapses 5&rarr;1.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Important</span>
+          <h3>Audit API undocumented in FEATURES.md &amp; docs/API.md</h3>
+          <div class="where">FEATURES.md (feature tables) &middot; docs/API.md (0 audit mentions)</div>
+          <p>
+            <code>WithAuditLog</code>, <code>ExportAuditLog</code>, <code>AuditLogFormat</code>,
+            <code>AuditLogServiceByName</code>, <code>AuditLogFailedServices</code> have no feature
+            rows and no API.md section. The dependency table version drift (v0.0.4) was the visible
+            symptom and is already fixed.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Nice to have</span>
+          <h3>Example README silent on AUDIT_LOG_FORMAT</h3>
+          <div class="where">examples/taskctl/README.md</div>
+          <p>
+            The example now reads <code>AUDIT_LOG_FORMAT</code> to pick the export format, but the
+            README's feature matrix doesn't mention it. One row addition.
+          </p>
+        </div>
+
+        <!-- Strengths -->
+        <h2 id="strengths">Strengths</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Map-dispatch refactor</strong>
+              <span>Replaced two cyclomatic-16 switches with map lookups. Lint dropped to 0 issues and new formats are now a one-line map entry instead of a duplicated switch case.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Correct scope discipline</strong>
+              <span>v0.1.0 ships Replay/Merge/Diff/Schema/Load &mdash; none wrapped here. cmdguard stays an export+query adapter; advanced ops are the library's job.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Replace directive removed cleanly</strong>
+              <span>Tag was verified on origin before dropping the local replace, so the proxy fetch resolves. No downstream consumer was ever affected (replace in a library go.mod is ignored anyway).</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue Table -->
+        <h2>Findings at a Glance</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Severity</th>
+              <th>Issue</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><span class="badge badge-critical">Critical</span></td>
+              <td>Test race on global type registry</td>
+              <td><span class="badge badge-low">Open &rarr; fix now</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>5-way format enumeration split brain</td>
+              <td><span class="badge badge-low">Open &rarr; unify</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>Audit API missing from FEATURES.md / API.md</td>
+              <td><span class="badge badge-low">Open &rarr; document</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+              <td>FEATURES.md dep version drift (v0.0.4)</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+              <td>Missing CHANGELOG entry</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Types & Libs Reflection -->
+        <h2 id="types"><span class="num">03</span>Types &amp; Libs Reflection</h2>
+        <div class="card card-solution">
+          <h4>Type model: <code>AuditLogFormat</code> is sound, but over-enumerated</h4>
+          <p>
+            The string-enum + <code>Valid()</code> + <code>ParseAuditLogFormat</code> constructor is
+            idiomatic Go and matches the codebase pattern (<code>OutputFormat</code>,
+            <code>LogLevel</code>, etc.). The problem isn't the type <em>shape</em>, it's the
+            <strong>redundant enumeration</strong>. A single <code>map[AuditLogFormat]auditLogExporter</code>
+            becomes the source of truth; <code>Valid()</code> becomes a map-key check. No new types
+            needed &mdash; just consolidate.
+          </p>
+        </div>
+        <div class="card card-solution">
+          <h4>Libs: no wheel reinvented, no reuse missed</h4>
+          <p>
+            Considered reusing <code>go-output</code>'s format registry for audit formats &mdash;
+            rejected: audit formats (HTML report, Mermaid/DOT diagrams, NDJSON events) are a
+            different set handled by the auditlog library, not table marshalers. Considered
+            auditlog's own <code>Format</code> enum &mdash; rejected: it only covers
+            <em>load</em> formats (auto/json/ndjson), not export formats. The cmdguard enum is
+            genuinely a distinct concern. <code>sync.RWMutex</code> already guards the production
+            registry; the race is a test-layer bug, not a missing-dependency problem.
+          </p>
+        </div>
+
+        <!-- Numbered Steps -->
+        <h2 id="plan"><span class="num">04</span>Prioritized Plan (work &uarr; / impact &uarr;)</h2>
+        <p style="color:var(--text-muted); margin-bottom:1rem;">
+          Sorted best ROI first. Each step is a standalone commit.
+        </p>
+        <div class="migration-step">
+          <div class="migration-num">1</div>
+          <div class="migration-content">
+            <h4>Fix the test race &mdash; LOW work, HIGH impact</h4>
+            <p>
+              Swap direct <code>globalTypeRegistry.byType[...]</code> reads in
+              <code>type_handler_test.go</code> for the locked <code>lookupHandler()</code>. Run
+              <code>-race -count=5</code> to confirm determinism. Makes the &ldquo;0 race
+              conditions&rdquo; claim true.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">2</div>
+          <div class="migration-content">
+            <h4>Unify format enumeration &mdash; MED work, HIGH impact</h4>
+            <p>
+              Introduce <code>auditLogExporter{toFile, toWriter}</code> + single map. Derive
+              <code>Valid()</code> and <code>supportedAuditLogFormatNames()</code> from its keys.
+              Kills the split brain; adding a format becomes one entry.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">3</div>
+          <div class="migration-content">
+            <h4>Document the audit API &mdash; LOW work, MED impact</h4>
+            <p>
+              Add audit feature rows to <code>FEATURES.md</code> and an audit-log section to
+              <code>docs/API.md</code> covering <code>WithAuditLog</code>,
+              <code>ExportAuditLog</code>, <code>AuditLogFormat</code>, and the query helpers.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">4</div>
+          <div class="migration-content">
+            <h4>Example README row &mdash; LOW work, LOW impact</h4>
+            <p>
+              Document <code>AUDIT_LOG_FORMAT</code> in <code>examples/taskctl/README.md</code>
+              feature matrix.
+            </p>
+          </div>
+        </div>
+
+        <footer class="footer">
+          Generated 2026-06-19 &middot; Self-review of commit c79f7e9 &middot; All code claims verified against source
+        </footer>
+      </main>
+    </div>
+
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>
