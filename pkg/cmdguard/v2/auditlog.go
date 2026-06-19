@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
+	"slices"
 	"strings"
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
@@ -27,15 +29,35 @@ const (
 	AuditLogFormatDOT     AuditLogFormat = "dot"
 )
 
+// auditLogExporter binds a format to its file and writer export implementations.
+// The auditLogExporterRegistry map is the single source of truth for which
+// formats are supported; Valid(), ParseAuditLogFormat, and both export
+// directions all derive from it. Adding a format = one entry there.
+type auditLogExporter struct {
+	toFile   func(*auditlog.Plugin, string) error
+	toWriter func(*auditlog.Plugin, io.Writer) error
+}
+
+// auditLogExporterRegistry is the single source of truth for supported audit
+// log export formats. Kept as a function (not a package-level var) to satisfy
+// gochecknoglobals; the per-call allocation is negligible (export runs once).
+func auditLogExporterRegistry() map[AuditLogFormat]auditLogExporter {
+	return map[AuditLogFormat]auditLogExporter{
+		AuditLogFormatHTML:    {(*auditlog.Plugin).ExportToHTML, (*auditlog.Plugin).WriteHTML},
+		AuditLogFormatJSON:    {(*auditlog.Plugin).ExportToFile, (*auditlog.Plugin).WriteReportJSON},
+		AuditLogFormatNDJSON:  {(*auditlog.Plugin).ExportEventsToNDJSON, (*auditlog.Plugin).WriteEventsNDJSON},
+		AuditLogFormatCSV:     {(*auditlog.Plugin).ExportToCSV, (*auditlog.Plugin).WriteReportCSV},
+		AuditLogFormatTSV:     {(*auditlog.Plugin).ExportToTSV, (*auditlog.Plugin).WriteReportTSV},
+		AuditLogFormatMermaid: {exportMermaidReportToFile, writeMermaidReport},
+		AuditLogFormatDOT:     {exportDOTReportToFile, writeDOTReport},
+	}
+}
+
 // Valid returns true if the format is one of the supported values.
 func (f AuditLogFormat) Valid() bool {
-	switch f {
-	case AuditLogFormatHTML, AuditLogFormatJSON, AuditLogFormatNDJSON,
-		AuditLogFormatMermaid, AuditLogFormatCSV, AuditLogFormatTSV, AuditLogFormatDOT:
-		return true
-	}
+	_, ok := auditLogExporterRegistry()[f]
 
-	return false
+	return ok
 }
 
 // String implements fmt.Stringer.
@@ -44,17 +66,19 @@ func (f AuditLogFormat) String() string {
 }
 
 // supportedAuditLogFormatNames returns the names of all supported formats for
-// error messages. Kept as a function (not a global var) to satisfy gochecknoglobals.
+// error messages, derived from the single registry so it can never drift.
+// Sorted for deterministic output.
 func supportedAuditLogFormatNames() []string {
-	return []string{
-		string(AuditLogFormatHTML),
-		string(AuditLogFormatJSON),
-		string(AuditLogFormatNDJSON),
-		string(AuditLogFormatMermaid),
-		string(AuditLogFormatCSV),
-		string(AuditLogFormatTSV),
-		string(AuditLogFormatDOT),
+	keys := slices.SortedFunc(maps.Keys(auditLogExporterRegistry()), func(a, b AuditLogFormat) int {
+		return strings.Compare(string(a), string(b))
+	})
+
+	names := make([]string, len(keys))
+	for i, k := range keys {
+		names[i] = string(k)
 	}
+
+	return names
 }
 
 // ParseAuditLogFormat converts a string to an AuditLogFormat.
@@ -107,22 +131,12 @@ func ExportAuditLog[T any](cli *CLI[T], cfg AuditLogExportConfig) error {
 }
 
 func exportAuditLogToFile(plugin *auditlog.Plugin, format AuditLogFormat, path string) error {
-	exporters := map[AuditLogFormat]func(*auditlog.Plugin, string) error{
-		AuditLogFormatHTML:    (*auditlog.Plugin).ExportToHTML,
-		AuditLogFormatJSON:    (*auditlog.Plugin).ExportToFile,
-		AuditLogFormatNDJSON:  (*auditlog.Plugin).ExportEventsToNDJSON,
-		AuditLogFormatCSV:     (*auditlog.Plugin).ExportToCSV,
-		AuditLogFormatTSV:     (*auditlog.Plugin).ExportToTSV,
-		AuditLogFormatMermaid: exportMermaidReportToFile,
-		AuditLogFormatDOT:     exportDOTReportToFile,
-	}
-
-	exporter, ok := exporters[format]
+	exporter, ok := auditLogExporterRegistry()[format]
 	if !ok {
 		return fmt.Errorf("%w: %s", ErrUnsupportedAuditLogFormat, format)
 	}
 
-	if err := exporter(plugin, path); err != nil {
+	if err := exporter.toFile(plugin, path); err != nil {
 		return fmt.Errorf("exporting %s audit log to %q: %w", format, path, err)
 	}
 
@@ -130,22 +144,12 @@ func exportAuditLogToFile(plugin *auditlog.Plugin, format AuditLogFormat, path s
 }
 
 func exportAuditLogToWriter(plugin *auditlog.Plugin, format AuditLogFormat, w io.Writer) error {
-	exporters := map[AuditLogFormat]func(*auditlog.Plugin, io.Writer) error{
-		AuditLogFormatHTML:    (*auditlog.Plugin).WriteHTML,
-		AuditLogFormatJSON:    (*auditlog.Plugin).WriteReportJSON,
-		AuditLogFormatNDJSON:  (*auditlog.Plugin).WriteEventsNDJSON,
-		AuditLogFormatCSV:     (*auditlog.Plugin).WriteReportCSV,
-		AuditLogFormatTSV:     (*auditlog.Plugin).WriteReportTSV,
-		AuditLogFormatMermaid: writeMermaidReport,
-		AuditLogFormatDOT:     writeDOTReport,
-	}
-
-	exporter, ok := exporters[format]
+	exporter, ok := auditLogExporterRegistry()[format]
 	if !ok {
 		return fmt.Errorf("%w: %s", ErrUnsupportedAuditLogFormat, format)
 	}
 
-	if err := exporter(plugin, w); err != nil {
+	if err := exporter.toWriter(plugin, w); err != nil {
 		return fmt.Errorf("writing %s audit log: %w", format, err)
 	}
 
