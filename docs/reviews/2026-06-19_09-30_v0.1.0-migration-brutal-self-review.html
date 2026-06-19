@@ -854,13 +854,13 @@
           </div>
         </div>
 
-        <p style="margin-top:1.2rem; color:var(--text-muted);">
-          The migration itself was technically correct &mdash; v0.0.4&rarr;v0.1.0 compiled clean, the
-          removed APIs were never used, and 3 new export formats shipped with full test coverage and
-          a map-dispatch refactor that dropped cyclomatic complexity below the lint threshold. But
-          the surrounding <strong>documentation hygiene was sloppy</strong> and a
-          <strong>pre-existing test race</strong> was discovered and then quietly deferred instead of
-          fixed on sight. This review corrects both.
+        <p style="margin-top: 1.2rem; color: var(--text-muted)">
+          The migration itself was technically correct &mdash; v0.0.4&rarr;v0.1.0 compiled clean,
+          the removed APIs were never used, and 3 new export formats shipped with full test coverage
+          and a map-dispatch refactor that dropped cyclomatic complexity below the lint threshold.
+          But the surrounding <strong>documentation hygiene was sloppy</strong> and a
+          <strong>pre-existing test race</strong> was discovered and then quietly deferred instead
+          of fixed on sight. This review corrects both.
         </p>
 
         <!-- The 11 Questions -->
@@ -873,9 +873,10 @@
             <code>go.mod</code> and updated <code>AGENTS.md</code>, but left
             <code>FEATURES.md</code> stating <code>v0.0.4</code> (the doc was lying about the
             version) and wrote zero <code>CHANGELOG.md</code> entry. The audit-log API surface is
-            also entirely absent from <code>docs/API.md</code> (0 mentions) and the audit feature has
-            no rows in the <code>FEATURES.md</code> feature tables &mdash; only a dependency-table
-            line. These are now fixed for the version drift; the deeper doc gaps are in the plan.
+            also entirely absent from <code>docs/API.md</code> (0 mentions) and the audit feature
+            has no rows in the <code>FEATURES.md</code> feature tables &mdash; only a
+            dependency-table line. These are now fixed for the version drift; the deeper doc gaps
+            are in the plan.
           </p>
         </div>
 
@@ -895,13 +896,13 @@
         <div class="card card-warning">
           <h4>3. What could you have done better?</h4>
           <p>
-            I committed the migration as one large blob instead of the user-requested
-            &ldquo;commit after each smallest self-contained change&rdquo;. The export-format
-            addition, the dep bump, and the example change are logically separable. I also created a
-            <strong>5-way enumeration of the format set</strong> (const block, <code>Valid()</code>
-            switch, <code>supportedAuditLogFormatNames()</code>, the to-file map, the to-writer map)
-            &mdash; adding a format now means editing five places. A single source-of-truth map is
-            cleaner.
+            I committed the migration as one large blob instead of the user-requested &ldquo;commit
+            after each smallest self-contained change&rdquo;. The export-format addition, the dep
+            bump, and the example change are logically separable. I also created a
+            <strong>5-way enumeration of the format set</strong> (const block,
+            <code>Valid()</code> switch, <code>supportedAuditLogFormatNames()</code>, the to-file
+            map, the to-writer map) &mdash; adding a format now means editing five places. A single
+            source-of-truth map is cleaner.
           </p>
         </div>
 
@@ -917,10 +918,10 @@
         <div class="card card-solution">
           <h4>5. Did you lie to you?</h4>
           <p>
-            Not deliberately, but I <strong>inherited and repeated a lie</strong>: the
-            &ldquo;0 race conditions&rdquo; status in <code>AGENTS.md</code>. I even quoted it as
-            context without challenging it. One <code>-race</code> run disproves it. The honest
-            status was &ldquo;flaky race, undiagnosed&rdquo; until now.
+            Not deliberately, but I <strong>inherited and repeated a lie</strong>: the &ldquo;0 race
+            conditions&rdquo; status in <code>AGENTS.md</code>. I even quoted it as context without
+            challenging it. One <code>-race</code> run disproves it. The honest status was
+            &ldquo;flaky race, undiagnosed&rdquo; until now.
           </p>
         </div>
 
@@ -948,8 +949,8 @@
           <h4>8. Scope creep trap?</h4>
           <p>
             Resisted it well. v0.1.0 added <code>ReplayEvents</code>, <code>MergeReports</code>,
-            <code>JSONSchema()</code>, <code>Report.Diff</code>, <code>LoadReport</code> variants.
-            I deliberately did <em>not</em> wrap these &mdash; cmdguard's job is export + query, and
+            <code>JSONSchema()</code>, <code>Report.Diff</code>, <code>LoadReport</code> variants. I
+            deliberately did <em>not</em> wrap these &mdash; cmdguard's job is export + query, and
             users can reach for the auditlog library directly for advanced ops. Exposing them would
             be feature creep without demonstrated demand. Good discipline; keep it.
           </p>
@@ -992,15 +993,17 @@
         <div class="issue issue-critical">
           <span class="severity severity-critical">Critical</span>
           <h3>Test data race on the global type registry</h3>
-          <div class="where">pkg/cmdguard/v2/type_handler_test.go:696, 707, 717 &middot; plugin_test.go:49</div>
+          <div class="where">
+            pkg/cmdguard/v2/type_handler_test.go:696, 707, 717 &middot; plugin_test.go:49
+          </div>
           <p>
             <code>TestRegisterGoDurationHandler</code> reads
             <code>globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]</code> with
-            <strong>no lock</strong>, while <code>TestPlugin_RegisterTypeHandlerAndValidator</code>
-            (parallel) writes the same map via <code>register()</code>. The production
-            <code>lookupHandler()</code> is correctly <code>sync.RWMutex</code>-guarded &mdash; the
-            tests bypass it by reaching into the private field. Result: ~1-in-3
-            <code>-race</code> runs fail with <code>DATA RACE</code>.
+            <strong>no lock</strong>, while
+            <code>TestPlugin_RegisterTypeHandlerAndValidator</code> (parallel) writes the same map
+            via <code>register()</code>. The production <code>lookupHandler()</code> is correctly
+            <code>sync.RWMutex</code>-guarded &mdash; the tests bypass it by reaching into the
+            private field. Result: ~1-in-3 <code>-race</code> runs fail with <code>DATA RACE</code>.
           </p>
           <div class="callout callout-solution">
             <strong>Fix</strong>
@@ -1016,8 +1019,8 @@
           <div class="where">pkg/cmdguard/v2/auditlog.go</div>
           <p>
             The 7 supported formats are listed in: the <code>const</code> block, the
-            <code>Valid()</code> switch, <code>supportedAuditLogFormatNames()</code>, the
-            to-file exporter map, and the to-writer exporter map. Adding a format = 5 edits.
+            <code>Valid()</code> switch, <code>supportedAuditLogFormatNames()</code>, the to-file
+            exporter map, and the to-writer exporter map. Adding a format = 5 edits.
           </p>
           <div class="callout callout-solution">
             <strong>Fix</strong>
@@ -1029,7 +1032,9 @@
         <div class="issue issue-important">
           <span class="severity severity-important">Important</span>
           <h3>Audit API undocumented in FEATURES.md &amp; docs/API.md</h3>
-          <div class="where">FEATURES.md (feature tables) &middot; docs/API.md (0 audit mentions)</div>
+          <div class="where">
+            FEATURES.md (feature tables) &middot; docs/API.md (0 audit mentions)
+          </div>
           <p>
             <code>WithAuditLog</code>, <code>ExportAuditLog</code>, <code>AuditLogFormat</code>,
             <code>AuditLogServiceByName</code>, <code>AuditLogFailedServices</code> have no feature
@@ -1055,21 +1060,31 @@
             <div class="check">+</div>
             <div class="text">
               <strong>Map-dispatch refactor</strong>
-              <span>Replaced two cyclomatic-16 switches with map lookups. Lint dropped to 0 issues and new formats are now a one-line map entry instead of a duplicated switch case.</span>
+              <span
+                >Replaced two cyclomatic-16 switches with map lookups. Lint dropped to 0 issues and
+                new formats are now a one-line map entry instead of a duplicated switch case.</span
+              >
             </div>
           </div>
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
               <strong>Correct scope discipline</strong>
-              <span>v0.1.0 ships Replay/Merge/Diff/Schema/Load &mdash; none wrapped here. cmdguard stays an export+query adapter; advanced ops are the library's job.</span>
+              <span
+                >v0.1.0 ships Replay/Merge/Diff/Schema/Load &mdash; none wrapped here. cmdguard
+                stays an export+query adapter; advanced ops are the library's job.</span
+              >
             </div>
           </div>
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
               <strong>Replace directive removed cleanly</strong>
-              <span>Tag was verified on origin before dropping the local replace, so the proxy fetch resolves. No downstream consumer was ever affected (replace in a library go.mod is ignored anyway).</span>
+              <span
+                >Tag was verified on origin before dropping the local replace, so the proxy fetch
+                resolves. No downstream consumer was ever affected (replace in a library go.mod is
+                ignored anyway).</span
+              >
             </div>
           </div>
         </div>
@@ -1127,9 +1142,10 @@
             The string-enum + <code>Valid()</code> + <code>ParseAuditLogFormat</code> constructor is
             idiomatic Go and matches the codebase pattern (<code>OutputFormat</code>,
             <code>LogLevel</code>, etc.). The problem isn't the type <em>shape</em>, it's the
-            <strong>redundant enumeration</strong>. A single <code>map[AuditLogFormat]auditLogExporter</code>
-            becomes the source of truth; <code>Valid()</code> becomes a map-key check. No new types
-            needed &mdash; just consolidate.
+            <strong>redundant enumeration</strong>. A single
+            <code>map[AuditLogFormat]auditLogExporter</code> becomes the source of truth;
+            <code>Valid()</code> becomes a map-key check. No new types needed &mdash; just
+            consolidate.
           </p>
         </div>
         <div class="card card-solution">
@@ -1147,7 +1163,7 @@
 
         <!-- Numbered Steps -->
         <h2 id="plan"><span class="num">04</span>Prioritized Plan (work &uarr; / impact &uarr;)</h2>
-        <p style="color:var(--text-muted); margin-bottom:1rem;">
+        <p style="color: var(--text-muted); margin-bottom: 1rem">
           Sorted best ROI first. Each step is a standalone commit.
         </p>
         <div class="migration-step">
@@ -1196,11 +1212,11 @@
         </div>
 
         <footer class="footer">
-          Generated 2026-06-19 &middot; Self-review of commit c79f7e9 &middot; All code claims verified against source
+          Generated 2026-06-19 &middot; Self-review of commit c79f7e9 &middot; All code claims
+          verified against source
         </footer>
       </main>
     </div>
-
 
     <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
     <script>
