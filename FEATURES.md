@@ -1,9 +1,6 @@
 # cmdguard Features
 
-**Last Updated:** 2026-06-17
-**Version:** 2.7.0
-**Go Version:** 1.26
-**Tests:** 396+ passing, 85.6% coverage, 0 lint issues, 0 race conditions
+
 
 ---
 
@@ -59,8 +56,7 @@
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
 | `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands            |
 | `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text (auto theme) |
-| `WithGlamourHelpTheme[T](t)`   | ✅ FULLY_FUNCTIONAL | Markdown rendering with specific theme        |
-| `WithTelemetry[T](tracer)`     | ✅ FULLY_FUNCTIONAL | OpenTelemetry spans for all commands          |
+
 
 ### Command[T, F]
 
@@ -227,8 +223,7 @@
 | 60 sentinel errors                      | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
 | Typed errors                            | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
 | `ExitCoder` / `ExitError`               | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
-| FlagError with suggestion               | ✅ FULLY_FUNCTIONAL | Includes typo suggestion in error message   |
-| No panics (all functions return errors) | ✅ FULLY_FUNCTIONAL | Zero panics in library code                 |
+
 
 ---
 

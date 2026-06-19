@@ -383,3 +383,40 @@ cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
 ```
 
 ---
+
+### Audit Log (samber-do-auditlog)
+
+Wire DI audit logging into the CLI's injector, then export or query the captured snapshot.
+
+```go
+import auditlog "github.com/larsartmann/samber-do-auditlog"
+
+plugin, _ := auditlog.New(auditlog.Config{Enabled: true, ContainerID: "myapp"})
+
+cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
+    v2.WithAuditLog[Config](plugin),
+)
+
+// after Execute, export the snapshot
+format, _ := v2.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT")) // "" -> html
+_ = v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+    Format: format,            // html | json | ndjson | csv | tsv | mermaid | dot
+    Path:   "myapp-audit." + format.String(),
+})
+```
+
+Accessors and query helpers:
+
+```go
+cli.AuditLog()                 // *auditlog.Plugin (nil if not configured)
+cli.AuditLogReport()           // *auditlog.Report snapshot (nil if not configured)
+cli.RecordAuditHealthCheck(ctx) // map[string]error
+
+v2.AuditLogServiceByName[Config](cli, "taskStore")  // *auditlog.ServiceInfo
+v2.AuditLogFailedServices[Config](cli)              // []auditlog.ServiceInfo
+```
+
+`AuditLogFormat` is a validated enum &mdash; build it via `ParseAuditLogFormat` so an
+invalid value surfaces as `ErrUnsupportedAuditLogFormat` rather than a silent failure.
+
+---
