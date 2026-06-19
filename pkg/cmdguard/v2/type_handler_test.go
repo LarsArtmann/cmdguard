@@ -137,7 +137,7 @@ func TestTypeHandler_RegisterCustomTypes(t *testing.T) {
 			t.Parallel()
 
 			fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-			h, ok := globalTypeRegistry.byType[tt.tag.Type]
+			h, ok := globalTypeRegistry.lookupHandler(tt.tag.Type)
 			testutil.AssertBoolTrue(t, ok, "handler should be registered for "+tt.tag.Type.String())
 
 			err := h.Register(fs, tt.tag)
@@ -246,7 +246,7 @@ func TestTypeHandler_RegisterCustomTypes_Parse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			h, ok := globalTypeRegistry.byType[tt.tag.Type]
+			h, ok := globalTypeRegistry.lookupHandler(tt.tag.Type)
 			testutil.AssertBoolTrue(t, ok, "handler should exist")
 
 			_, err := h.Parse(tt.value, tt.tag)
@@ -303,7 +303,7 @@ func TestTypeHandler_RegisterCustomTypes_Default(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			h, ok := globalTypeRegistry.byType[tt.tag.Type]
+			h, ok := globalTypeRegistry.lookupHandler(tt.tag.Type)
 			testutil.AssertBoolTrue(t, ok, "handler should exist")
 
 			result := h.Default(tt.tag)
@@ -693,7 +693,7 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	RegisterGoDurationHandler()
 
 	t.Run("registers time.Duration handler", func(t *testing.T) {
-		h, ok := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
+		h, ok := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		testutil.AssertBoolTrue(t, ok, "time.Duration should be registered")
 
 		result, err := h.Parse("5s", FlagTag{})
@@ -704,7 +704,7 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	})
 
 	t.Run("time.Duration default", func(t *testing.T) {
-		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
+		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		result := h.Default(FlagTag{Default: "10m"})
 		if result != 10*time.Minute {
 			t.Errorf("Default(10m) = %v, want 10m", result)
@@ -714,7 +714,7 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	t.Run("time.Duration default table", func(t *testing.T) {
 		t.Parallel()
 
-		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
+		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 
 		tests := []struct {
 			name     string
@@ -739,7 +739,7 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 
 	t.Run("time.Duration register with short", func(t *testing.T) {
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
+		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		err := h.Register(fs, FlagTag{Name: "timeout", Short: "t", Default: "30s", Help: "timeout"})
 		testutil.AssertNoError(t, err)
 
@@ -751,7 +751,7 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 
 	t.Run("time.Duration invalid default returns error", func(t *testing.T) {
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
-		h := globalTypeRegistry.byType[reflect.TypeFor[time.Duration]()]
+		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		err := h.Register(fs, FlagTag{Name: "bad", Default: "not-a-duration", Help: "bad duration"})
 		testutil.AssertExpectedError(t, err)
 	})
