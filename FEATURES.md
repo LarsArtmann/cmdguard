@@ -236,7 +236,7 @@
 | `charm.land/lipgloss/v2`                    | v2.0.4  | ✅ FULLY_FUNCTIONAL | Terminal styling         |
 | `go.opentelemetry.io/otel/trace`            | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing    |
 | `github.com/larsartmann/go-output`          | v0.17.0 | ✅ FULLY_FUNCTIONAL | Rich output (16 formats) |
-| `github.com/larsartmann/samber-do-auditlog` | v0.1.0  | ✅ FULLY_FUNCTIONAL | DI audit logging         |
+| `github.com/larsartmann/samber-do-auditlog` | v0.3.0  | ✅ FULLY_FUNCTIONAL | DI audit logging         |
 | `github.com/knadh/koanf/v2`                 | v2.3.5  | ✅ FULLY_FUNCTIONAL | Config file loading      |
 
 ---

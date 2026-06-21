@@ -20,13 +20,17 @@ var ErrUnsupportedAuditLogFormat = errors.New("unsupported audit log format")
 type AuditLogFormat string
 
 const (
-	AuditLogFormatHTML    AuditLogFormat = "html"
-	AuditLogFormatJSON    AuditLogFormat = "json"
-	AuditLogFormatNDJSON  AuditLogFormat = "ndjson"
-	AuditLogFormatMermaid AuditLogFormat = "mermaid"
-	AuditLogFormatCSV     AuditLogFormat = "csv"
-	AuditLogFormatTSV     AuditLogFormat = "tsv"
-	AuditLogFormatDOT     AuditLogFormat = "dot"
+	AuditLogFormatCSV      AuditLogFormat = "csv"
+	AuditLogFormatD2       AuditLogFormat = "d2"
+	AuditLogFormatDOT      AuditLogFormat = "dot"
+	AuditLogFormatHTML     AuditLogFormat = "html"
+	AuditLogFormatHTMLTree AuditLogFormat = "htmltree"
+	AuditLogFormatJSON     AuditLogFormat = "json"
+	AuditLogFormatMermaid  AuditLogFormat = "mermaid"
+	AuditLogFormatNDJSON   AuditLogFormat = "ndjson"
+	AuditLogFormatPlantUML AuditLogFormat = "plantuml"
+	AuditLogFormatTree     AuditLogFormat = "tree"
+	AuditLogFormatTSV      AuditLogFormat = "tsv"
 )
 
 // auditLogExporter binds a format to its file and writer export implementations.
@@ -43,13 +47,17 @@ type auditLogExporter struct {
 // gochecknoglobals; the per-call allocation is negligible (export runs once).
 func auditLogExporterRegistry() map[AuditLogFormat]auditLogExporter {
 	return map[AuditLogFormat]auditLogExporter{
-		AuditLogFormatHTML:    {(*auditlog.Plugin).ExportToHTML, (*auditlog.Plugin).WriteHTML},
-		AuditLogFormatJSON:    {(*auditlog.Plugin).ExportToFile, (*auditlog.Plugin).WriteReportJSON},
-		AuditLogFormatNDJSON:  {(*auditlog.Plugin).ExportEventsToNDJSON, (*auditlog.Plugin).WriteEventsNDJSON},
-		AuditLogFormatCSV:     {(*auditlog.Plugin).ExportToCSV, (*auditlog.Plugin).WriteReportCSV},
-		AuditLogFormatTSV:     {(*auditlog.Plugin).ExportToTSV, (*auditlog.Plugin).WriteReportTSV},
-		AuditLogFormatMermaid: {exportMermaidReportToFile, writeMermaidReport},
-		AuditLogFormatDOT:     {exportDOTReportToFile, writeDOTReport},
+		AuditLogFormatHTML:     {(*auditlog.Plugin).ExportToHTML, (*auditlog.Plugin).WriteHTML},
+		AuditLogFormatJSON:     {(*auditlog.Plugin).ExportToFile, (*auditlog.Plugin).WriteReportJSON},
+		AuditLogFormatNDJSON:   {(*auditlog.Plugin).ExportEventsToNDJSON, (*auditlog.Plugin).WriteEventsNDJSON},
+		AuditLogFormatCSV:      {(*auditlog.Plugin).ExportToCSV, (*auditlog.Plugin).WriteReportCSV},
+		AuditLogFormatTSV:      {(*auditlog.Plugin).ExportToTSV, (*auditlog.Plugin).WriteReportTSV},
+		AuditLogFormatMermaid:  {(*auditlog.Plugin).ExportToMermaid, (*auditlog.Plugin).WriteMermaid},
+		AuditLogFormatDOT:      {(*auditlog.Plugin).ExportToDOT, (*auditlog.Plugin).WriteDOT},
+		AuditLogFormatD2:       {(*auditlog.Plugin).ExportToD2, (*auditlog.Plugin).WriteD2},
+		AuditLogFormatPlantUML: {(*auditlog.Plugin).ExportToPlantUML, (*auditlog.Plugin).WritePlantUML},
+		AuditLogFormatTree:     {(*auditlog.Plugin).ExportToTree, (*auditlog.Plugin).WriteTree},
+		AuditLogFormatHTMLTree: {(*auditlog.Plugin).ExportToHTMLTree, (*auditlog.Plugin).WriteHTMLTree},
 	}
 }
 
@@ -151,51 +159,6 @@ func exportAuditLogToWriter(plugin *auditlog.Plugin, format AuditLogFormat, w io
 
 	if err := exporter.toWriter(plugin, w); err != nil {
 		return fmt.Errorf("writing %s audit log: %w", format, err)
-	}
-
-	return nil
-}
-
-// exportMermaidReportToFile and exportDOTReportToFile adapt Report-level WriteX
-// methods to the file-exporter signature for formats lacking Plugin.ExportToX.
-func exportMermaidReportToFile(plugin *auditlog.Plugin, path string) error {
-	return writeReportToFile(path, plugin.Report().WriteMermaid)
-}
-
-func exportDOTReportToFile(plugin *auditlog.Plugin, path string) error {
-	return writeReportToFile(path, plugin.Report().WriteDOT)
-}
-
-func writeMermaidReport(plugin *auditlog.Plugin, w io.Writer) error {
-	if err := plugin.Report().WriteMermaid(w); err != nil {
-		return fmt.Errorf("mermaid report: %w", err)
-	}
-
-	return nil
-}
-
-func writeDOTReport(plugin *auditlog.Plugin, w io.Writer) error {
-	if err := plugin.Report().WriteDOT(w); err != nil {
-		return fmt.Errorf("DOT report: %w", err)
-	}
-
-	return nil
-}
-
-// writeReportToFile creates path, invokes write on the file, then closes it.
-// Used for report formats (mermaid, dot) that lack a Plugin-level ExportToX method.
-func writeReportToFile(path string, write func(io.Writer) error) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return fmt.Errorf("creating file %q: %w", path, err)
-	}
-
-	defer func() {
-		_ = file.Close()
-	}()
-
-	if err := write(file); err != nil {
-		return fmt.Errorf("writing report content: %w", err)
 	}
 
 	return nil

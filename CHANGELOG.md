@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`samber-do-auditlog` v0.1.0 → v0.3.0** — v0.2.0 added Plugin-level Mermaid/DOT/D2/PlantUML wrappers (eliminating cmdguard's local adapter functions and `writeReportToFile` helper); v0.3.0 added Tree/HTMLTree export formats. All upgrades are additive and non-breaking
+- **Transitive dependency refresh** — All indirect dependencies updated to latest via `go get -u all` + `go mod tidy`; `go.sum` resynced
+
+### Added
+
+- **4 new audit log export formats** — `d2`, `plantuml`, `tree`, `htmltree` join the existing 7 (html, json, ndjson, csv, tsv, mermaid, dot), bringing the total to 11. All use Plugin-level methods directly (no adapter functions needed since samber-do-auditlog v0.2.0)
+
+### Removed
+
+- **Audit log wrapper functions** — `exportMermaidReportToFile`, `writeMermaidReport`, `exportDOTReportToFile`, `writeDOTReport`, and `writeReportToFile` removed; superseded by Plugin-level `ExportToMermaid`/`WriteMermaid`/`ExportToDOT`/`WriteDOT` methods added in samber-do-auditlog v0.2.0
+
+### Security
+
+- **govulncheck identifies 3 stdlib vulnerabilities in Go 1.26.3** (GO-2026-5037, GO-2026-5038, GO-2026-5039), all fixed in Go 1.26.4. One (GO-2026-5037) is reachable via `ExitError.Error` → `crypto/x509`. Bumping `go.mod` to `go 1.26.4` is deferred until nixpkgs packages `go_1_26 >= 1.26.4`; currently the nix sandbox cannot auto-download the toolchain during `nix flake check`. Consumers building with Go 1.26.4+ are not affected
+
 ## [2.8.1] - 2026-06-21
 
 ### Changed

@@ -216,12 +216,16 @@ func TestParseAuditLogFormat(t *testing.T) {
 	}{
 		{"", v2.AuditLogFormatHTML, false},
 		{"html", v2.AuditLogFormatHTML, false},
+		{"htmltree", v2.AuditLogFormatHTMLTree, false},
 		{"json", v2.AuditLogFormatJSON, false},
 		{"ndjson", v2.AuditLogFormatNDJSON, false},
 		{"mermaid", v2.AuditLogFormatMermaid, false},
 		{"csv", v2.AuditLogFormatCSV, false},
 		{"tsv", v2.AuditLogFormatTSV, false},
 		{"dot", v2.AuditLogFormatDOT, false},
+		{"d2", v2.AuditLogFormatD2, false},
+		{"plantuml", v2.AuditLogFormatPlantUML, false},
+		{"tree", v2.AuditLogFormatTree, false},
 		{"xml", "", true},
 		{"HTML", "", true},
 	}
@@ -290,6 +294,10 @@ func TestExportAuditLog(t *testing.T) {
 		v2.AuditLogFormatCSV,
 		v2.AuditLogFormatTSV,
 		v2.AuditLogFormatDOT,
+		v2.AuditLogFormatD2,
+		v2.AuditLogFormatPlantUML,
+		v2.AuditLogFormatTree,
+		v2.AuditLogFormatHTMLTree,
 	}
 
 	for _, format := range formats {

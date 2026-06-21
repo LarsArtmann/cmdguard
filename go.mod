@@ -22,7 +22,7 @@ require (
 	github.com/larsartmann/go-output/serialization v0.17.0
 	github.com/larsartmann/go-output/table v0.17.0
 	github.com/larsartmann/go-output/tree v0.17.0
-	github.com/larsartmann/samber-do-auditlog v0.1.0
+	github.com/larsartmann/samber-do-auditlog v0.3.0
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -54,6 +54,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
 	github.com/charmbracelet/x/conpty v0.2.0 // indirect
 	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260621010513-945fab64fd3e // indirect
+	github.com/charmbracelet/x/exp/golden v0.0.0-20260621010513-945fab64fd3e // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/slice v0.0.0-20260621010513-945fab64fd3e // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
