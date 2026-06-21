@@ -112,7 +112,8 @@ func main() {
 
 	if plugin := cli.AuditLog(); plugin != nil && plugin.EventsCount() > 0 {
 		// AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
-		// csv, tsv, mermaid, or dot. Defaults to html.
+		// csv, tsv, mermaid, dot, d2, plantuml, tree, or htmltree.
+		// Defaults to html.
 		format, err := v2.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)

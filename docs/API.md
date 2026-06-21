@@ -400,7 +400,7 @@ cli, _ := v2.NewCLI[Config]("myapp", "My app", Config{},
 // after Execute, export the snapshot
 format, _ := v2.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT")) // "" -> html
 _ = v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
-    Format: format,            // html | json | ndjson | csv | tsv | mermaid | dot
+    Format: format,            // html | json | ndjson | csv | tsv | mermaid | dot | d2 | plantuml | tree | htmltree
     Path:   "myapp-audit." + format.String(),
 })
 ```
@@ -418,5 +418,12 @@ v2.AuditLogFailedServices[Config](cli)              // []auditlog.ServiceInfo
 
 `AuditLogFormat` is a validated enum &mdash; build it via `ParseAuditLogFormat` so an
 invalid value surfaces as `ErrUnsupportedAuditLogFormat` rather than a silent failure.
+
+For the full 16-format service summary table (table, json, csv, tsv, markdown, xml, d2,
+yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml), call the plugin directly:
+
+```go
+cli.AuditLog().ExportToTable(path, output.FormatCSV, output.RenderOptions{})
+```
 
 ---

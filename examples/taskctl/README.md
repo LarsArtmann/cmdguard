@@ -59,7 +59,7 @@ Every cmdguard feature is demonstrated in this example:
 | `WithGroupID`                | commands.go         | tasks vs system grouping                                                                                                    |
 | `WithPromptOnMissing`        | commands.go         | add prompts for missing title                                                                                               |
 | `WithCompletion`             | commands.go         | done --id dynamic completion                                                                                                |
-| `WithAuditLog`               | main.go             | DI audit logging via samber-do-auditlog; `AUDIT_LOG_FORMAT` picks export (html/json/ndjson/csv/tsv/mermaid/dot)             |
+| `WithAuditLog`               | main.go             | DI audit logging via samber-do-auditlog; `AUDIT_LOG_FORMAT` picks export (html/json/ndjson/csv/tsv/mermaid/dot/d2/plantuml/tree/htmltree)             |
 | `OutputTable`                | commands.go         | list, stats with --format                                                                                                   |
 | `output.ParseFormat`         | commands.go         | list --format json/csv/yaml                                                                                                 |
 | **DI: Provide/Invoke**       | types.go + main.go  | TaskStore with lifecycle                                                                                                    |
