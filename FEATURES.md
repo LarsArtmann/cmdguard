@@ -114,7 +114,7 @@
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
-| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.13.0 registries                              |
+| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.17.0 registries                              |
 | `OutputTable()`         | ✅ FULLY_FUNCTIONAL | Convenience for table data with AddRowChecked validation                             |
 | `RegisteredFormats()`   | ✅ FULLY_FUNCTIONAL | Dynamic format discovery from registered marshalers                                  |
 | 16 output formats       | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
@@ -235,7 +235,7 @@
 | `charm.land/glamour/v2`                     | v2.0.1  | ✅ FULLY_FUNCTIONAL | Markdown rendering       |
 | `charm.land/lipgloss/v2`                    | v2.0.4  | ✅ FULLY_FUNCTIONAL | Terminal styling         |
 | `go.opentelemetry.io/otel/trace`            | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing    |
-| `github.com/larsartmann/go-output`          | v0.13.0 | ✅ FULLY_FUNCTIONAL | Rich output (16 formats) |
+| `github.com/larsartmann/go-output`          | v0.17.0 | ✅ FULLY_FUNCTIONAL | Rich output (16 formats) |
 | `github.com/larsartmann/samber-do-auditlog` | v0.1.0  | ✅ FULLY_FUNCTIONAL | DI audit logging         |
 | `github.com/knadh/koanf/v2`                 | v2.3.5  | ✅ FULLY_FUNCTIONAL | Config file loading      |
 

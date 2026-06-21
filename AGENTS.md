@@ -2,7 +2,7 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-19
+**Last Updated:** 2026-06-21
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
 **Status:** v2.8.0 - zero panics, 86.5% coverage, 0 lint issues, 0 race conditions
@@ -150,7 +150,7 @@ cmdguard/
 | `charm.land/huh/v2`                         | Interactive prompts  | v2.0.3  |
 | `charm.land/glamour/v2`                     | Markdown rendering   | v2.0.1  |
 | `go.opentelemetry.io/otel/trace`            | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.13.0 |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.17.0 |
 | `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.1.0  |
 
 ---
@@ -271,14 +271,14 @@ go build ./...                                   # Verify build
 51. **buildInjectorOpts** — Merges `diLogf` and `auditLog` into a single `*do.InjectorOpts`. Returns nil when neither is configured (uses default injector). This replaced the old inline `NewScopeWithOpts` call in `cli.initialize()`.
 52. **samber-do-auditlog published v0.1.0** — Consumed from the Go module proxy (no local replace directive). v0.1.0 is API-compatible with cmdguard's usage (all surfaces used are in the stable API set). The sibling repo at `../samber-do-auditlog` exists for local development; to pick up unpublished changes, add `replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog` temporarily, but remember replace directives in a library's go.mod are **ignored by downstream consumers** — they only affect this module's own build/CI. To publish, tag the sibling repo and remove the replace.
 53. **Fang integration (ADR-001)** — `WithCLIVersion` auto-pipes to `fang.WithVersion`; `WithCLICommit` auto-pipes to `fang.WithCommit`. Users should NOT use `WithFangOptions(fang.WithVersion(...))` alongside `WithCLIVersion` — this would create duplicate fang version opts. `fang.WithNotifySignal` is intentionally skipped because cmdguard's `WithSignalHandling`/`WithGracefulShutdown` provides DI-aware signal handling that fang cannot (see `docs/adr/001-fang-integration-strategy.md`).
-54. **16 output formats via go-output v0.13.0 registries** — `RenderTableData` (all 16 formats) and `RenderAnyData` (JSON, YAML, TOML) via thread-safe `formatRegistry[T]`. Users import `output.FormatTable` etc. directly; cmdguard only re-exports `OutputFormat` type alias. `OutputResult()` provides shape-aware error messages. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`. `RegisteredFormats()` exposes registered formats for callers.
+54. **16 output formats via go-output v0.17.0 registries** — `RenderTableData` (all 16 formats) and `RenderAnyData` (JSON, YAML, TOML) via thread-safe `formatRegistry[T]`. Users import `output.FormatTable` etc. directly; cmdguard only re-exports `OutputFormat` type alias. `OutputResult()` provides shape-aware error messages. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`. `RegisteredFormats()` exposes registered formats for callers.
 55. **Deduplicated validators** — `validateEmail` and `validateURL` in `flags_validate.go` delegate to `ParseEmail()` and `ParseURL()` respectively, eliminating duplicate parsing logic.
 56. **errors.AsType (Go 1.26)** — `output.go` uses `errors.AsType[*T]` instead of `errors.As(err, &v)` for consistency with `cli.go:298`. All new code should use `errors.AsType`.
 57. **Validation error aggregation** — `ValidateConfig` uses `errors.Join(append([]error{ErrConfigValidation}, errs...)...)` so individual validation errors are reachable via `errors.Is`. Previous `%v` formatting lost the chain.
 58. **Audit-log errors removed** — `ErrAuditLogNotEnabled` and `ErrInvalidOutputFormat` (and `errors_audit.go`) were removed along with the `audit-log` subcommand. Audit-log failures now surface as plain wrapped errors from the consumer's own export logic
 59. **Copy-on-write registries (v2.7.0)** — `FlagRegistry` no longer eagerly clones `typeRegistry`/`validatorRegistry`. Instead it shares the global maps via `share()` and clones lazily on first write via `register()`. This reduces NewCLI by 48% (5.8µs vs 11µs) and saves 10 allocs per command. The `owned bool` and `parent *typeRegistry` fields control the COW state. Behavioral change: global registrations via `RegisterTypeHandler()`/`RegisterValidator()` are now visible to instances created before the registration (as long as they haven't triggered a lazy clone).
 60. **Cached os.UserHomeDir()** — `config_file.go` caches the home directory via `sync.OnceValue` (`cachedHomeDir`). The home directory is immutable during a process lifetime, so this eliminates redundant syscalls when multiple config paths use `~/` expansion.
-61. **go-output v0.13.0 sub-module extraction** — `markdown/` and `tree/` are now standalone sub-modules (like `d2/`, `table/`, etc.). `output.go` imports them explicitly so `FormatMarkdown` and `FormatTree` remain available. The root package no longer registers their renderers; shape metadata (`f.Shapes()`) still lives in root.
+61. **go-output sub-module extraction (since v0.13.0)** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.). `output.go` imports them explicitly so `FormatMarkdown` and `FormatTree` remain available. The root package no longer registers their renderers; shape metadata (`f.Shapes()`) still lives in root. All 13 go-output modules (root + 9 direct + 3 indirect) are pinned in lockstep at v0.17.0.
 62. **Iterator methods (iter.Seq)** — `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` provide zero-allocation alternatives to `Tags()`, `FlagNames()`, `Path()`, `Children()`. The old methods still return defensive copies for backward compatibility. Use the `iter.Seq` variants when you only need to range over the data.
 
 ---

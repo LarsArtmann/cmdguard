@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`go-output` v0.13.0 → v0.17.0** — All 13 modules (root + 9 direct sub-modules + 3 indirect) updated to v0.17.0 in lockstep. The v0.14–v0.17 renderer sub-modules (d2, delimited, graph, markdown, markup, plantuml, serialization, table, tree, enum, escape, envdetect) were missing from the Go proxy due to a go-output release tagging gap; tagged and pushed them to fix the gap. No cmdguard code changes required — all consumed APIs (`RenderTableData`, `RenderAnyData`, `TableData`, `ParseFormat`, `RegisteredTableDataFormats`, `Format`) are stable across the range
+
 ## [2.8.0] - 2026-06-19
 
 ### Added
