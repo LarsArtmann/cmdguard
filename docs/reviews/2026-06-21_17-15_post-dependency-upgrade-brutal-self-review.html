@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brutal Self-Review — Post Dependency Upgrade v0.3.0</title>
+    <style>
+      :root {
+        --color-paper: #f4f4f0;
+        --color-paper-2: #ffffff;
+        --color-paper-3: #e8e8e2;
+        --color-ink: #111111;
+        --color-red: #e63946;
+        --color-blue: #1d3557;
+        --color-yellow: #f4d35e;
+        --color-hairline: rgba(17, 17, 17, 0.14);
+        --color-hairline-strong: rgba(17, 17, 17, 0.3);
+        --surface: var(--color-paper);
+        --surface-raised: var(--color-paper-2);
+        --surface-sunken: var(--color-paper-3);
+        --text: var(--color-ink);
+        --text-muted: rgba(17, 17, 17, 0.72);
+        --text-faint: rgba(17, 17, 17, 0.5);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-red);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --emerald: var(--solution);
+        --amber: var(--warning);
+        --radius: 0px;
+        --radius-sm: 0px;
+        --font-heading: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas, monospace;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      section[id], [id] { scroll-margin-top: 60px; }
+      body { background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+      .top-bar { background: var(--text); color: var(--surface); padding: 0.6rem 2rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+      .layout { display: flex; gap: 2.5rem; padding: 2rem; }
+      .sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 1rem; align-self: flex-start; height: calc(100vh - 2rem); overflow-y: auto; display: none; }
+      .sidebar nav { display: flex; flex-direction: column; gap: 0; }
+      .sidebar .label { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--text); }
+      .sidebar a { font-size: 0.86rem; color: var(--text); text-decoration: none; padding: 0.5rem 0.75rem; border-left: 4px solid transparent; font-weight: 600; }
+      .sidebar a:hover { border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--accent); }
+      .main { flex: 1; min-width: 0; }
+      h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 900; letter-spacing: -0.02em; color: var(--text); }
+      h1 { font-size: clamp(1.9rem, 4.5vw, 2.8rem); line-height: 1.05; margin: 0 0 0.6rem; }
+      h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 3px solid var(--text); display: flex; align-items: baseline; gap: 0.7rem; }
+      h2 .num { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); font-weight: 700; }
+      h3 { font-size: 1.15rem; margin: 0 0 0.4rem; font-weight: 700; }
+      h4 { font-size: 1rem; margin: 0 0 0.3rem; font-weight: 700; }
+      p { margin: 0 0 1rem; }
+      .hero { padding: 1.5rem 0 2rem; margin-bottom: 1.5rem; border-bottom: 3px solid var(--text); }
+      .eyebrow { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--accent); margin-bottom: 0.9rem; }
+      .subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 70ch; margin: 0 0 1rem; }
+      .meta { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+      .tag { display: inline-block; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.6rem; background: var(--surface-sunken); color: var(--text); border: 1px solid var(--border-strong); }
+      .tag.amber { background: var(--warning); border-color: var(--warning); }
+      .tag.teal { background: var(--solution); border-color: var(--solution); color: var(--surface); }
+      .scorecard { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0; margin: 1.5rem 0 2rem; border: 3px solid var(--text); }
+      .score-card { padding: 1.3rem 1rem; text-align: center; border-right: 3px solid var(--text); background: var(--surface-raised); }
+      .score-card:last-child { border-right: none; }
+      .score-card.score-good { background: var(--solution); color: var(--surface); }
+      .score-card.score-warn { background: var(--warning); color: var(--text); }
+      .score-card.score-bad { background: var(--problem); color: var(--surface); }
+      .score { font-family: var(--font-heading); font-size: 2.6rem; font-weight: 900; line-height: 1; letter-spacing: -0.04em; }
+      .score-card .label { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.5rem; }
+      .issue { background: var(--surface-raised); border: 2px solid var(--text); padding: 1.2rem 1.4rem; margin-bottom: 1rem; border-left: 8px solid var(--border-strong); }
+      .issue-critical { border-left-color: var(--problem); }
+      .issue-important { border-left-color: var(--warning); }
+      .issue-nice { border-left-color: var(--solution); }
+      .issue h3 { margin-bottom: 0.3rem; }
+      .issue .where { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-faint); margin: 0.2rem 0 0.6rem; }
+      .severity { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.22rem 0.6rem; margin-bottom: 0.6rem; color: var(--surface); }
+      .severity-critical { background: var(--problem); }
+      .severity-important { background: var(--warning); color: var(--text); }
+      .severity-nice { background: var(--solution); }
+      .badge { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; padding: 0.2rem 0.55rem; border: 1px solid var(--text); color: var(--text); }
+      .badge-critical { background: var(--problem); color: var(--surface); }
+      .badge-high { background: var(--warning); }
+      .badge-fixed { background: var(--solution); color: var(--surface); }
+      .callout { margin: 0.8rem 0 0; padding: 0.8rem 1rem; border: 1px solid var(--border-strong); border-left: 4px solid var(--border-strong); background: var(--surface-sunken); font-size: 0.92rem; }
+      .callout strong { display: inline-block; margin-right: 0.4rem; }
+      .callout-solution { border-left-color: var(--solution); background: color-mix(in srgb, var(--solution) 10%, var(--surface-raised)); }
+      .callout-warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 18%, var(--surface-raised)); }
+      .callout-problem { border-left-color: var(--problem); background: color-mix(in srgb, var(--problem) 10%, var(--surface-raised)); }
+      .strengths { display: grid; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+      .strength { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem; padding: 0.75rem 0; border-bottom: 2px solid var(--border); }
+      .strength .check { font-family: var(--font-mono); font-weight: 900; color: var(--solution); font-size: 1.3rem; line-height: 1.3; }
+      .strength .text strong { display: block; margin-bottom: 0.15rem; }
+      .strength .text span { color: var(--text-muted); font-size: 0.92rem; }
+      .migration-step { display: grid; grid-template-columns: 56px 1fr; gap: 1rem; margin: 1rem 0; padding: 1.1rem; background: var(--surface-raised); border: 2px solid var(--text); border-left: 6px solid var(--accent); }
+      .migration-num { font-family: var(--font-mono); font-weight: 900; font-size: 1.8rem; color: var(--accent); line-height: 1; }
+      .migration-content h4 { margin-bottom: 0.2rem; }
+      .migration-content p { margin-bottom: 0; color: var(--text-muted); font-size: 0.94rem; }
+      .footer { margin-top: 2rem; padding-top: 1rem; border-top: 3px solid var(--text); font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono); }
+      @media (min-width: 1024px) { .sidebar { display: block; } }
+      @media (max-width: 768px) { .layout { flex-direction: column; padding: 1rem; } .scorecard { grid-template-columns: repeat(2, 1fr); } .migration-step { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <span>Brutal Self-Review</span>
+      <span>2026-06-21</span>
+      <span>Post Dependency Upgrade</span>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#scorecard">Scorecard</a>
+          <a href="#strengths">What Went Well</a>
+          <a href="#findings">Findings</a>
+          <a href="#plan">Improvement Plan</a>
+          <a href="#appendix">Appendix</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="hero">
+          <div class="eyebrow">Brutal Self-Review &middot; 2026-06-21</div>
+          <h1>Post Dependency Upgrade: What I Forgot</h1>
+          <p class="subtitle">
+            An honest review of the samber-do-auditlog v0.1.0 &rarr; v0.3.0 upgrade and full dependency refresh.
+            What was done well, what was missed, and what split brains were created and then fixed.
+          </p>
+          <div class="meta">
+            <span class="tag amber">Scope: dependency upgrade</span>
+            <span class="tag">Version: v2.8.1 &rarr; unreleased</span>
+            <span class="tag teal">Status: findings resolved</span>
+          </div>
+        </header>
+
+        <section id="scorecard" class="scorecard">
+          <div class="score-card score-good">
+            <div class="score">6</div>
+            <div class="label">Things done right</div>
+          </div>
+          <div class="score-card score-bad">
+            <div class="score">3</div>
+            <div class="label">Split brains created</div>
+          </div>
+          <div class="score-card score-warn">
+            <div class="score">1</div>
+            <div class="label">Security deferred</div>
+          </div>
+          <div class="score-card">
+            <div class="score">3</div>
+            <div class="label">Ghosts found</div>
+          </div>
+        </section>
+
+        <section id="summary">
+          <h2><span class="num">00</span>Summary</h2>
+          <p>
+            The dependency upgrade itself was well-executed: all tests pass, 0 lint issues, 86.6% coverage (up from 86.5%),
+            and the refactoring to use v0.3.0's Plugin-level methods eliminated 63 lines of redundant adapter code.
+            However, I created <strong>3 split brains</strong> by updating format lists in AGENTS.md and CHANGELOG.md
+            but missing docs/API.md, examples/taskctl/README.md, and examples/taskctl/main.go. These were caught and
+            fixed in a follow-up commit.
+          </p>
+          <div class="callout callout-warning">
+            <strong>The bottom line</strong>
+            The upgrade is solid and complete. All split brains have been resolved. One security item (Go 1.26.4 stdlib CVEs)
+            is genuinely blocked on nixpkgs packaging and is documented in CHANGELOG + TODO_LIST. No ghost systems remain.
+          </div>
+        </section>
+
+        <section id="strengths">
+          <h2><span class="num">&#9670;</span>What Went Well</h2>
+
+          <div class="strengths">
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Registry-driven format dispatch</strong>
+                <span>The <code>auditLogExporterRegistry()</code> map made adding 4 new formats a 4-line change each. The architecture designed for extensibility paid off immediately.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Parametric test coverage</strong>
+                <span>The existing test loop over formats meant all 11 formats (7 old + 4 new) got writer + file export tests automatically by adding entries to the slice.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Aggressive dead code removal</strong>
+                <span>Identified and removed 5 redundant wrapper functions the moment v0.3.0 made them unnecessary. Net -63 lines.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>govulncheck run</strong>
+                <span>Actually ran vulnerability scanning instead of assuming everything was fine. Found 3 stdlib CVEs.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>CHANGELOG documented the deferral honestly</strong>
+                <span>Didn't hide the Go 1.26.4 blocker. Documented it with a Security section explaining the nixpkgs constraint.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Full verification suite</strong>
+                <span>Build, test (race), lint (0 issues), nix flake check, govulncheck, go mod verify — all run and green.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="findings">
+          <h2><span class="num">01</span>Findings</h2>
+
+          <div class="issue issue-critical">
+            <span class="severity severity-critical">Critical &middot; Split Brain &middot; Fixed</span>
+            <h3>3 stale format lists created by the upgrade</h3>
+            <div class="where">docs/API.md:403, examples/taskctl/README.md:62, examples/taskctl/main.go:114-115</div>
+            <p>
+              After adding 4 new audit log formats (d2, plantuml, tree, htmltree), I updated AGENTS.md and CHANGELOG.md
+              to say "11 formats" but <strong>forgot to update 3 other files</strong> that enumerate the format list.
+              This created a split brain: the code and some docs said 11, but API.md and the example still said 7.
+            </p>
+            <p>
+              <strong>Root cause:</strong> I grepped for specific patterns ("7 formats", "v0.1.0") instead of grepping for
+              the actual format names ("html.*json.*ndjson"). The format lists were written differently in each file,
+              so my pattern missed them.
+            </p>
+            <div class="callout callout-solution">
+              <strong>Fixed</strong> All 3 files updated in commit <code>0cc99a9</code>. Also documented the v0.3.0
+              <code>ExportToTable</code> 16-sub-format option in API.md.
+            </div>
+          </div>
+
+          <div class="issue issue-important">
+            <span class="severity severity-important">Important &middot; Security &middot; Deferred</span>
+            <h3>3 stdlib CVEs in Go 1.26.3 (GO-2026-5037/5038/5039)</h3>
+            <div class="where">govulncheck output &middot; Fixed in Go 1.26.4 &middot; nixpkgs only has 1.26.3</div>
+            <p>
+              <strong>GO-2026-5037</strong> (inefficient hostname parsing in <code>crypto/x509</code>) is reachable via
+              <code>cmdguard.ExitError.Error</code>. The other two (<code>net/textproto</code>, <code>mime</code>) are
+              imported but not called by cmdguard code.
+            </p>
+            <p>
+              I initially bumped <code>go.mod</code> to <code>go 1.26.4</code> which triggered the GOTOOLCHAIN auto-download,
+              but this broke <code>nix flake check</code> because the nix sandbox cannot reach <code>proxy.golang.org</code>.
+              Even <code>nixpkgs-unstable</code> only packages Go 1.26.3. The bump is genuinely blocked.
+            </p>
+            <div class="callout callout-warning">
+              <strong>Status</strong> Documented in CHANGELOG with a Security section. Should be re-checked when nixpkgs
+              updates <code>go_1_26</code>. Consumers building with Go 1.26.4+ are not affected.
+            </div>
+          </div>
+
+          <div class="issue issue-nice">
+            <span class="severity severity-nice">Minor &middot; Ghost System &middot; Documented</span>
+            <h3>v0.3.0 Table export (16 sub-formats) not wired into AuditLogFormat enum</h3>
+            <div class="where">auditlog v0.3.0: Plugin.ExportToTable / Plugin.WriteTable</div>
+            <p>
+              The <code>table</code> export in auditlog v0.3.0 renders a service summary table in any of 16 go-output
+              formats (table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml).
+              This is a <strong>different view</strong> from the per-format exports (which produce full audit reports with events).
+            </p>
+            <p>
+              It's not a ghost system &mdash; users access it via <code>cli.AuditLog().ExportToTable(path, format, opts)</code>
+              since <code>cli.AuditLog()</code> returns the raw plugin. But it's not in the <code>AuditLogFormat</code> enum
+              because its signature (<code>format output.Format, opts output.RenderOptions</code>) doesn't fit the existing
+              <code>auditLogExporter</code> registry pattern.
+            </p>
+            <div class="callout callout-solution">
+              <strong>Resolved</strong> Documented the <code>ExportToTable</code> option in docs/API.md so users know it exists.
+              No code change needed &mdash; the plugin accessor already exposes it.
+            </div>
+          </div>
+
+          <div class="issue issue-nice">
+            <span class="severity severity-nice">Minor &middot; Pre-existing &middot; Not my scope</span>
+            <h3>122+ gopls infertypeargs warnings across test files</h3>
+            <div class="where">cli_*_test.go files throughout pkg/cmdguard/v2/</div>
+            <p>
+              These are pre-existing "unnecessary type arguments" warnings (e.g. <code>v2.NewCLI[testCLIConfig]</code> where
+              Go 1.26 can infer the type). They are cosmetic and predate this work. Not fixing them because the rules say
+              "Don't fix unrelated bugs" &mdash; but noting them here for visibility.
+            </p>
+          </div>
+
+          <div class="issue issue-nice">
+            <span class="severity severity-nice">Minor &middot; Pre-existing &middot; Not my scope</span>
+            <h3>auditLogExporterRegistry() allocates a map per call</h3>
+            <div class="where">pkg/cmdguard/v2/auditlog.go:48</div>
+            <p>
+              The registry function returns a new map on every call (to satisfy <code>gochecknoglobals</code>). The comment
+              says "per-call allocation is negligible (export runs once)". This is true but could be cached with
+              <code>sync.OnceValue</code> if it ever becomes hot. Not changing now &mdash; YAGNI.
+            </p>
+          </div>
+        </section>
+
+        <section id="plan">
+          <h2><span class="num">02</span>Improvement Plan (Pareto-sorted)</h2>
+          <p>
+            Sorted by impact vs work ratio. All critical items already resolved.
+          </p>
+
+          <div class="migration-step">
+            <div class="migration-num">1</div>
+            <div class="migration-content">
+              <h4>Fix stale format lists <span class="badge badge-fixed">DONE</span></h4>
+              <p>3 files updated: docs/API.md, examples/taskctl/README.md, examples/taskctl/main.go. Commit <code>0cc99a9</code>.</p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">2</div>
+            <div class="migration-content">
+              <h4>Document v0.3.0 table export <span class="badge badge-fixed">DONE</span></h4>
+              <p>Added <code>ExportToTable</code> documentation to docs/API.md so users discover the 16-sub-format option.</p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">3</div>
+            <div class="migration-content">
+              <h4>Write self-review report <span class="badge badge-fixed">DONE</span></h4>
+              <p>This document. Required by the brutal-self-review skill.</p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">4</div>
+            <div class="migration-content">
+              <h4>Bump Go to 1.26.4 when nixpkgs supports it <span class="badge badge-high">Deferred</span></h4>
+              <p>Re-run <code>nix eval nixpkgs#go_1_26.version</code> periodically. When it returns 1.26.4+, change <code>go.mod</code> and update <code>flake.lock</code>. This fixes 3 stdlib CVEs (GO-2026-5037/5038/5039).</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="appendix">
+          <h2><span class="num">03</span>Self-Review Answers</h2>
+
+          <h3>1. What did you forget?</h3>
+          <p>
+            I forgot to grep for the format name strings themselves. I searched for "7 formats" and "v0.1.0" but the stale
+            references used inline lists like <code>"html/json/ndjson/csv/tsv/mermaid/dot"</code>. After the self-review
+            prompt, I searched for <code>"html.*json.*ndjson"</code> and found all 3 split brains immediately.
+          </p>
+
+          <h3>2. What is something stupid that we do anyway?</h3>
+          <p>
+            The <code>taskctl</code> binary (24MB) sits in the repo root as a local build artifact. It's gitignored so it's
+            not tracked, but it clutters <code>ls</code>. Not a real problem &mdash; just noise.
+          </p>
+
+          <h3>3. What could you have done better?</h3>
+          <p>
+            After any change to a public API surface (adding enum values), I should grep for <strong>all</strong> places that
+            enumerate or list those values &mdash; not just the files I happen to know about. A regex like
+            <code>rg "html.*json.*ndjson"</code> would have caught all 3 stale references in one shot.
+          </p>
+
+          <h3>4. What could you still improve?</h3>
+          <p>
+            The <code>table</code> export from v0.3.0 is powerful but doesn't fit the current registry pattern. A future
+            enhancement could add a separate <code>ExportAuditLogTable[T](cli, path, format, opts)</code> function for the
+            16-sub-format service summary. But this is YAGNI until someone asks for it.
+          </p>
+
+          <h3>5. Did you lie to me?</h3>
+          <p>
+            No. I said "All green" after the initial upgrade, which was true for build/test/lint/format. But I hadn't checked
+            docs/API.md or examples/taskctl for stale format lists &mdash; so "all green" was incomplete. The split brains
+            existed for about 10 minutes before the self-review caught them.
+          </p>
+
+          <h3>6. How can we be less stupid?</h3>
+          <p>
+            Add a CI check that validates documentation consistency: if the code exports N format constants, grep the docs
+            and examples for format lists and verify they match. This would have caught the split brain automatically.
+          </p>
+
+          <h3>7. Ghost systems?</h3>
+          <p>
+            The <code>table</code> export (16 sub-formats) was initially a ghost &mdash; available in the dependency but not
+            discoverable from cmdguard's docs. Now documented in API.md. No code integration needed since <code>cli.AuditLog()</code>
+            already returns the raw plugin.
+          </p>
+
+          <h3>8. Scope creep?</h3>
+          <p>
+            No. The dependency upgrade was well-scoped. The refactoring (removing adapters, adding formats) was a direct
+            consequence of the upgrade, not scope creep.
+          </p>
+
+          <h3>9. Did we remove something useful?</h3>
+          <p>
+            No. The 5 removed wrapper functions (<code>exportMermaidReportToFile</code>, <code>writeMermaidReport</code>, etc.)
+            were genuinely redundant after v0.2.0 added Plugin-level methods. The removed code was strictly worse than the
+            upstream API.
+          </p>
+
+          <h3>10. Split brains?</h3>
+          <p>
+            Yes &mdash; 3 of them, all created by the upgrade, all now fixed:
+          </p>
+          <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li><strong>docs/API.md:403</strong> &mdash; format comment said 7, now says 11</li>
+            <li><strong>examples/taskctl/README.md:62</strong> &mdash; format list said 7, now says 11</li>
+            <li><strong>examples/taskctl/main.go:114-115</strong> &mdash; comment listed 7, now lists 11</li>
+          </ul>
+
+          <h3>11. How are we doing on tests?</h3>
+          <p>
+            Good. The parametric test loop (<code>TestExportAuditLog</code>) automatically covers all 11 formats for both
+            writer and file exports. Coverage went from 86.5% to 86.6%. All tests pass with race detection.
+            Could improve by adding content validation for diagram formats (e.g., verify d2 output contains <code>shape:</code>),
+            but the current "non-empty output" check is sufficient for CI.
+          </p>
+        </section>
+
+        <div class="footer">
+          Generated 2026-06-21 &middot; cmdguard v2.8.1+ (unreleased) &middot; Go 1.26.3 &middot; samber-do-auditlog v0.3.0
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
