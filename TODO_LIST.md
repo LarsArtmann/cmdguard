@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-06-18
-**Status:** v2.8.0-dev — zero panics, 86.3% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs
+**Status:** v2.8.1 — zero panics, 86.3% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs
 **Tests:** 430+ passing, 0 build errors
 
 ## Completed
