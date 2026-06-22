@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **`samber-do-auditlog` v0.1.0 → v0.3.0** — v0.2.0 added Plugin-level Mermaid/DOT/D2/PlantUML wrappers (eliminating cmdguard's local adapter functions and `writeReportToFile` helper); v0.3.0 added Tree/HTMLTree export formats. All upgrades are additive and non-breaking
+- **`go-output` v0.17.1 → v0.17.2** — All 10 direct sub-modules bumped in lockstep; the 3 indirect modules (`enum`, `escape`, `envdetect`) remain at v0.17.1 (latest tag available for each). Non-breaking
 - **Transitive dependency refresh** — All indirect dependencies updated to latest via `go get -u all` + `go mod tidy`; `go.sum` resynced
 
 ### Added

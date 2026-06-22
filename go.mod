@@ -12,16 +12,16 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/larsartmann/go-output v0.17.1
-	github.com/larsartmann/go-output/d2 v0.17.1
-	github.com/larsartmann/go-output/delimited v0.17.1
-	github.com/larsartmann/go-output/graph v0.17.1
-	github.com/larsartmann/go-output/markdown v0.17.1
-	github.com/larsartmann/go-output/markup v0.17.1
-	github.com/larsartmann/go-output/plantuml v0.17.1
-	github.com/larsartmann/go-output/serialization v0.17.1
-	github.com/larsartmann/go-output/table v0.17.1
-	github.com/larsartmann/go-output/tree v0.17.1
+	github.com/larsartmann/go-output v0.17.2
+	github.com/larsartmann/go-output/d2 v0.17.2
+	github.com/larsartmann/go-output/delimited v0.17.2
+	github.com/larsartmann/go-output/graph v0.17.2
+	github.com/larsartmann/go-output/markdown v0.17.2
+	github.com/larsartmann/go-output/markup v0.17.2
+	github.com/larsartmann/go-output/plantuml v0.17.2
+	github.com/larsartmann/go-output/serialization v0.17.2
+	github.com/larsartmann/go-output/table v0.17.2
+	github.com/larsartmann/go-output/tree v0.17.2
 	github.com/larsartmann/samber-do-auditlog v0.3.0
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0

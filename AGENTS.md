@@ -155,7 +155,7 @@ cmdguard/
 | `charm.land/huh/v2`                         | Interactive prompts  | v2.0.3  |
 | `charm.land/glamour/v2`                     | Markdown rendering   | v2.0.1  |
 | `go.opentelemetry.io/otel/trace`            | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.17.0 |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.17.2 |
 | `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.3.0  |
 
 ---
@@ -261,8 +261,8 @@ go build ./...                                   # Verify build
 
 #### Output & Styling
 
-- **16 output formats** via go-output `v0.17.0` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`.
-- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. All 13 go-output modules (root + 9 direct + 3 indirect) are pinned in lockstep at v0.17.0.
+- **16 output formats** via go-output `v0.17.2` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`.
+- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. The 10 direct go-output modules (root + 9 sub-modules) are pinned at v0.17.2; the 3 indirect modules (`enum`, `escape`, `envdetect`) follow at their latest available tags (v0.17.1) — the go-output repo releases sub-modules at staggered versions, so MVS selects the newest tag each module offers rather than a single lockstep version.
 - **fang styling** — styled output by default; `--no-color` persistent flag is registered by default and sets `NO_COLOR=1` for fang; `NO_COLOR` env var also respected automatically via fang's colorprofile. `cli.NoColor()` returns true if either is set.
 - **Glamour env-based theme** — `WithGlamourHelp[T]()` uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`). The string `"auto"` is NOT a valid glamour theme — `WithGlamourHelp` sets theme to `""` for env-based detection.
 - **Glamour idempotent** — `applyGlamourIfEnabled` resets `glamourHelp=false` after applying to prevent double-rendering (ANSI-inside-ANSI); calling Execute twice is safe
