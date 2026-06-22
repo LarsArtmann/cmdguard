@@ -120,10 +120,10 @@
 
 ### P0: Open
 
-| #   | Task                                               | Files           | Effort |
-| --- | -------------------------------------------------- | --------------- | ------ |
-| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings | GitHub settings | 5m     |
-| 28  | Bump `go.mod` to `go 1.26.4` when nixpkgs packages `go_1_26 >= 1.26.4` (fixes GO-2026-5037/5038/5039 stdlib CVEs) | go.mod, flake.lock | 5m |
+| #   | Task                                                                                                              | Files              | Effort |
+| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------ | ------ |
+| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings                                                                | GitHub settings    | 5m     |
+| 28  | Bump `go.mod` to `go 1.26.4` when nixpkgs packages `go_1_26 >= 1.26.4` (fixes GO-2026-5037/5038/5039 stdlib CVEs) | go.mod, flake.lock | 5m     |
 
 ### P1: Future (v3.0+)
 

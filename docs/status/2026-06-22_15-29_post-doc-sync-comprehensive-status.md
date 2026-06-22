@@ -8,24 +8,24 @@
 
 ## Executive Summary
 
-| Metric | Value |
-|---|---|
-| **Version** | v2.8.1 |
-| **Go version** | 1.26.3 (go.mod) / go_1_26 (flake.nix) |
-| **Build** | ✅ PASSING |
-| **Tests** | 430 test functions, 1393 runs (incl. subtests), 0 failures |
-| **Race detector** | ✅ CLEAN (0 races) |
-| **Coverage** | 86.6% (v2 pkg), 87.5% (configload) |
-| **Benchmarks** | 26 functions |
-| **Fuzz targets** | 7 |
-| **Lint** | ✅ 0 issues (golangci-lint v2.12.2) |
-| **go vet** | ✅ CLEAN |
-| **nix flake check** | ✅ PASSING |
-| **Source LOC** | 9,550 (60 files) |
-| **Test LOC** | 20,223 (95 files) |
-| **Test:Source ratio** | 2.1:1 |
-| **Direct deps** | 24 |
-| **Zero panics** | ✅ Every function returns errors |
+| Metric                | Value                                                      |
+| --------------------- | ---------------------------------------------------------- |
+| **Version**           | v2.8.1                                                     |
+| **Go version**        | 1.26.3 (go.mod) / go_1_26 (flake.nix)                      |
+| **Build**             | ✅ PASSING                                                 |
+| **Tests**             | 430 test functions, 1393 runs (incl. subtests), 0 failures |
+| **Race detector**     | ✅ CLEAN (0 races)                                         |
+| **Coverage**          | 86.6% (v2 pkg), 87.5% (configload)                         |
+| **Benchmarks**        | 26 functions                                               |
+| **Fuzz targets**      | 7                                                          |
+| **Lint**              | ✅ 0 issues (golangci-lint v2.12.2)                        |
+| **go vet**            | ✅ CLEAN                                                   |
+| **nix flake check**   | ✅ PASSING                                                 |
+| **Source LOC**        | 9,550 (60 files)                                           |
+| **Test LOC**          | 20,223 (95 files)                                          |
+| **Test:Source ratio** | 2.1:1                                                      |
+| **Direct deps**       | 24                                                         |
+| **Zero panics**       | ✅ Every function returns errors                           |
 
 ---
 
@@ -37,7 +37,7 @@
 - [x] **Command[T,F] system** — NewCommand, NewParentCommand, 19 command options
 - [x] **20 CLI options** — WithCLIVersion, WithEnvPrefix, WithMiddleware, WithFang, etc.
 - [x] **Typed struct-tag flags** — `flag`, `short`, `default`, `help`, `env`, `required`, `count`, `validate`, `prompt`
-- [x] **Zero panics guarantee** — every function returns errors; no Must* variants
+- [x] **Zero panics guarantee** — every function returns errors; no Must\* variants
 - [x] **Constructor validation** — missing handlers, duplicate names, invalid flags caught at AddCommand time
 
 ### Dependency Injection
@@ -113,38 +113,42 @@
 
 ### Coverage Gaps (86.6% — 15 functions at 0%)
 
-| Function | File | Impact |
-|---|---|---|
-| `WithConfigFileLoader` | config_file.go:206 | Public API, untested directly |
-| `WithDoctorLong` | doctor.go:34 | Doctor option, untested |
-| `RegisterValidator` | flags_validate.go:105 | Global validator registration |
-| `validateEmail` | flags_validate.go:179 | Delegates to ParseEmail (tested indirectly) |
-| `validateURL` | flags_validate.go:191 | Delegates to ParseURL (tested indirectly) |
-| `validateNonEmpty` | flags_validate.go:321 | Validator helper |
-| `validateFieldByKind` | flags_validate.go:330 | Validator dispatch |
-| `runValidateTagWithRegistry` | flags_validate.go:341 | Registry-based validation |
-| `NewManPage` | manpage.go:63 | Man page constructor |
-| `PluginRegistrar.TypeHandler` | plugin.go:25 | Plugin registration method |
-| `WithPlugin` | plugin.go:61 | CLI option for plugins |
-| `PromptString` | prompts.go:23 | Interactive prompt (hard to test — TUI) |
-| `PromptSelect` | prompts.go:37 | Interactive prompt (hard to test — TUI) |
-| `PromptConfirm` | prompts.go:57 | Interactive prompt (hard to test — TUI) |
-| `Result[T].MustValue` | result.go:44 | Panics on Err — intentionally untested? |
+| Function                      | File                  | Impact                                      |
+| ----------------------------- | --------------------- | ------------------------------------------- |
+| `WithConfigFileLoader`        | config_file.go:206    | Public API, untested directly               |
+| `WithDoctorLong`              | doctor.go:34          | Doctor option, untested                     |
+| `RegisterValidator`           | flags_validate.go:105 | Global validator registration               |
+| `validateEmail`               | flags_validate.go:179 | Delegates to ParseEmail (tested indirectly) |
+| `validateURL`                 | flags_validate.go:191 | Delegates to ParseURL (tested indirectly)   |
+| `validateNonEmpty`            | flags_validate.go:321 | Validator helper                            |
+| `validateFieldByKind`         | flags_validate.go:330 | Validator dispatch                          |
+| `runValidateTagWithRegistry`  | flags_validate.go:341 | Registry-based validation                   |
+| `NewManPage`                  | manpage.go:63         | Man page constructor                        |
+| `PluginRegistrar.TypeHandler` | plugin.go:25          | Plugin registration method                  |
+| `WithPlugin`                  | plugin.go:61          | CLI option for plugins                      |
+| `PromptString`                | prompts.go:23         | Interactive prompt (hard to test — TUI)     |
+| `PromptSelect`                | prompts.go:37         | Interactive prompt (hard to test — TUI)     |
+| `PromptConfirm`               | prompts.go:57         | Interactive prompt (hard to test — TUI)     |
+| `Result[T].MustValue`         | result.go:44          | Panics on Err — intentionally untested?     |
 
 ### Codecov Integration
+
 - CI workflow has `codecov-action@v5` configured
 - **Missing:** `CODECOV_TOKEN` secret in GitHub repo settings (upload silently fails with `fail_ci_if_error: false`)
 
 ### Fuzz Testing
+
 - 7 fuzz targets exist (flags_parse, config_parsing, value type parsers)
 - **Missing:** No corpus files in `testdata/fuzz/` directories — fuzz tests run but haven't discovered edge cases through accumulated corpus
 
 ### Examples
+
 - Single comprehensive example: `examples/taskctl/` (production task manager CLI)
 - **Missing:** Examples are NOT tested in CI (only `go build ./...` covers them)
 - taskctl test coverage: 67.4%
 
 ### testutil Package
+
 - `pkg/testutil/panic_test_helpers.go` — 372 lines, 0% coverage
 - This is a test helper package (imported by tests, not source), so 0% is structurally expected, but it means the helpers themselves are untested
 
@@ -189,19 +193,20 @@
 
 The git tags and CHANGELOG entries are **completely out of sync**:
 
-| Tags that exist | CHANGELOG entries that exist |
-|---|---|
-| v0.1.0 ✅ | [0.1.0] ✅ |
-| **v0.2.0** ⚠️ (no CHANGELOG entry!) | [2.0.0] (no tag!) |
-| **v1.0.0** ⚠️ (no CHANGELOG entry!) | [2.1.0] (no tag!) |
-| v2.5.0 ✅ | [2.2.0] (no tag!) |
-| v2.6.0 ✅ | [2.3.0] (no tag!) |
-| v2.6.1 ✅ | [2.4.0] (no tag!) |
-| v2.7.0 ✅ | |
-| v2.8.0 ✅ | |
-| v2.8.1 ✅ | |
+| Tags that exist                     | CHANGELOG entries that exist |
+| ----------------------------------- | ---------------------------- |
+| v0.1.0 ✅                           | [0.1.0] ✅                   |
+| **v0.2.0** ⚠️ (no CHANGELOG entry!) | [2.0.0] (no tag!)            |
+| **v1.0.0** ⚠️ (no CHANGELOG entry!) | [2.1.0] (no tag!)            |
+| v2.5.0 ✅                           | [2.2.0] (no tag!)            |
+| v2.6.0 ✅                           | [2.3.0] (no tag!)            |
+| v2.6.1 ✅                           | [2.4.0] (no tag!)            |
+| v2.7.0 ✅                           |                              |
+| v2.8.0 ✅                           |                              |
+| v2.8.1 ✅                           |                              |
 
 **Problems:**
+
 - **5 missing tags:** v2.0.0, v2.1.0, v2.2.0, v2.3.0, v2.4.0 have CHANGELOG entries but NO git tags. Were these versions ever released? Users can't `go get` at these versions.
 - **2 mystery tags:** v0.2.0 and v1.0.0 have git tags but NO CHANGELOG entries. What are these? Is there a v1 API that was never documented?
 - The module path is `github.com/larsartmann/cmdguard/v2` — but v0.2.0 and v1.0.0 tags suggest pre-v2 history that's invisible in the changelog.
@@ -260,33 +265,33 @@ The git tags and CHANGELOG entries are **completely out of sync**:
 
 Ranked by impact × effort ratio (highest first).
 
-| # | Task | Impact | Effort | Category |
-|---|---|---|---|---|
-| 1 | **Add `CODECOV_TOKEN` secret to GitHub repo settings** | High | 5m | CI |
-| 2 | **Bump `go.mod` to `go 1.26.4`** when nixpkgs packages it (fixes GO-2026-5037/5038/5039) | High | 5m | Security |
-| 3 | **Cover `WithPlugin[T]`** — public CLI option with 0% coverage | High | 30m | Testing |
-| 4 | **Cover `PluginRegistrar.TypeHandler`** — plugin registration with 0% coverage | High | 30m | Testing |
-| 5 | **Cover `RegisterValidator`** — global validator registration with 0% coverage | High | 20m | Testing |
-| 6 | **Cover the validator dispatch chain** (`validateEmail`, `validateURL`, `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`) | High | 1h | Testing |
-| 7 | **Cover `NewManPage`** — public constructor with 0% coverage | Medium | 20m | Testing |
-| 8 | **Cover `WithConfigFileLoader`** — public API with 0% coverage | Medium | 20m | Testing |
-| 9 | **Cover `WithDoctorLong`** — doctor option with 0% coverage | Low | 10m | Testing |
-| 10 | **Investigate and fix git tag history** — tag v2.0.0–v2.4.0 or document why untagged | High | 1h | Release |
-| 11 | **Remove or replace BuildFlow pre-commit hook** — every commit bypasses validation | Medium | 15m | Tooling |
-| 12 | **Add fuzz seed corpus** to `testdata/fuzz/` for the 7 fuzz targets | Medium | 2h | Testing |
-| 13 | **Write v3.0 API design document** — consolidate v2 warts into coherent v3 plan | High | 4h | Architecture |
-| 14 | **Test `pkg/testutil`** — 372 lines at 0% coverage | Medium | 1h | Testing |
-| 15 | **Add separate CI job for examples** — dedicated pass/fail signal for taskctl | Low | 30m | CI |
-| 16 | **Improve taskctl coverage** from 67.4% → 80%+ | Medium | 3h | Testing |
-| 17 | **Add minimal "hello world" example** — quick start for new users | Low | 1h | Docs |
-| 18 | **Write branded types example** — showcase Result[T]/Validated[T] | Low | 2h | Docs |
-| 19 | **Link DOMAIN_LANGUAGE.md from README** — discoverability | Low | 5m | Docs |
-| 20 | **Add `--version` flag auto-detection** — if WithCLIVersion is set, register a `--version` flag automatically (currently only subcommand) | Medium | 1h | Feature |
-| 21 | **Deprecate v1 API with timeline** — ROADMAP has no removal date | Low | 30m | Process |
-| 22 | **Extract `flagtags` library** (v3.0) — ~2000 lines of reusable tag parsing | High | 8h | Architecture |
-| 23 | **Rename `Get[T]` → `GetService[T]`** (v3.0) — current name is too generic | Medium | 2h | API |
-| 24 | **Add metrics/observability hooks** — beyond OpenTelemetry spans | Low | 4h | Feature |
-| 25 | **Add enhanced flag validation enums** — beyond current `validate:` tag | Low | 3h | Feature |
+| #   | Task                                                                                                                                             | Impact | Effort | Category     |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------ |
+| 1   | **Add `CODECOV_TOKEN` secret to GitHub repo settings**                                                                                           | High   | 5m     | CI           |
+| 2   | **Bump `go.mod` to `go 1.26.4`** when nixpkgs packages it (fixes GO-2026-5037/5038/5039)                                                         | High   | 5m     | Security     |
+| 3   | **Cover `WithPlugin[T]`** — public CLI option with 0% coverage                                                                                   | High   | 30m    | Testing      |
+| 4   | **Cover `PluginRegistrar.TypeHandler`** — plugin registration with 0% coverage                                                                   | High   | 30m    | Testing      |
+| 5   | **Cover `RegisterValidator`** — global validator registration with 0% coverage                                                                   | High   | 20m    | Testing      |
+| 6   | **Cover the validator dispatch chain** (`validateEmail`, `validateURL`, `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`) | High   | 1h     | Testing      |
+| 7   | **Cover `NewManPage`** — public constructor with 0% coverage                                                                                     | Medium | 20m    | Testing      |
+| 8   | **Cover `WithConfigFileLoader`** — public API with 0% coverage                                                                                   | Medium | 20m    | Testing      |
+| 9   | **Cover `WithDoctorLong`** — doctor option with 0% coverage                                                                                      | Low    | 10m    | Testing      |
+| 10  | **Investigate and fix git tag history** — tag v2.0.0–v2.4.0 or document why untagged                                                             | High   | 1h     | Release      |
+| 11  | **Remove or replace BuildFlow pre-commit hook** — every commit bypasses validation                                                               | Medium | 15m    | Tooling      |
+| 12  | **Add fuzz seed corpus** to `testdata/fuzz/` for the 7 fuzz targets                                                                              | Medium | 2h     | Testing      |
+| 13  | **Write v3.0 API design document** — consolidate v2 warts into coherent v3 plan                                                                  | High   | 4h     | Architecture |
+| 14  | **Test `pkg/testutil`** — 372 lines at 0% coverage                                                                                               | Medium | 1h     | Testing      |
+| 15  | **Add separate CI job for examples** — dedicated pass/fail signal for taskctl                                                                    | Low    | 30m    | CI           |
+| 16  | **Improve taskctl coverage** from 67.4% → 80%+                                                                                                   | Medium | 3h     | Testing      |
+| 17  | **Add minimal "hello world" example** — quick start for new users                                                                                | Low    | 1h     | Docs         |
+| 18  | **Write branded types example** — showcase Result[T]/Validated[T]                                                                                | Low    | 2h     | Docs         |
+| 19  | **Link DOMAIN_LANGUAGE.md from README** — discoverability                                                                                        | Low    | 5m     | Docs         |
+| 20  | **Add `--version` flag auto-detection** — if WithCLIVersion is set, register a `--version` flag automatically (currently only subcommand)        | Medium | 1h     | Feature      |
+| 21  | **Deprecate v1 API with timeline** — ROADMAP has no removal date                                                                                 | Low    | 30m    | Process      |
+| 22  | **Extract `flagtags` library** (v3.0) — ~2000 lines of reusable tag parsing                                                                      | High   | 8h     | Architecture |
+| 23  | **Rename `Get[T]` → `GetService[T]`** (v3.0) — current name is too generic                                                                       | Medium | 2h     | API          |
+| 24  | **Add metrics/observability hooks** — beyond OpenTelemetry spans                                                                                 | Low    | 4h     | Feature      |
+| 25  | **Add enhanced flag validation enums** — beyond current `validate:` tag                                                                          | Low    | 3h     | Feature      |
 
 ---
 
@@ -301,6 +306,7 @@ The git tags and CHANGELOG tell **two completely different stories**:
 **CHANGELOG says:** [0.1.0] → (gap) → [2.0.0] → [2.1.0] → [2.2.0] → [2.3.0] → [2.4.0] → [2.5.0] → ... → [2.8.1]
 
 I cannot resolve:
+
 1. **What are v0.2.0 and v1.0.0?** They have git tags but zero CHANGELOG entries. Was there a v1 API? Is the module path (`/v2`) wrong?
 2. **Were v2.0.0–v2.4.0 actually released?** They have detailed CHANGELOG entries but no git tags. Were these versions ever tagged, or were the CHANGELOG entries written retroactively during the v2.5.0 sprint?
 3. **Should I retroactively create the missing tags?** If the commits exist, I could tag them — but I don't know which commits correspond to which versions, and retroactive tagging on a public module could break consumers who cached `go.sum` entries.
@@ -311,21 +317,21 @@ I cannot resolve:
 
 ## Health Scorecard
 
-| Dimension | Score | Notes |
-|---|---|---|
-| **Build stability** | 🟢 10/10 | Build, vet, lint, tests all pass clean |
-| **Test coverage** | 🟡 8/10 | 86.6% is good; 15 functions at 0% needs attention |
-| **Race safety** | 🟢 10/10 | 0 races detected across all tests |
-| **Code quality** | 🟢 9/10 | 0 lint issues, clean vet, good structure |
-| **Documentation** | 🟢 9/10 | Comprehensive; just synced and de-changelogged |
-| **Security** | 🟡 7/10 | 3 stdlib CVEs (blocked on nixpkgs); no govulncheck in CI |
-| **Release hygiene** | 🔴 4/10 | Tags/CHANGELOG completely out of sync; mystery tags |
-| **CI/CD** | 🟡 7/10 | Good pipeline but codecov broken, no govulncheck, foreign pre-commit hook |
-| **API design** | 🟡 8/10 | Solid v2; known warts deferred to v3; no v3 design doc yet |
-| **Dependency health** | 🟢 9/10 | All deps at latest; go-output sub-modules pinned in lockstep |
+| Dimension             | Score    | Notes                                                                     |
+| --------------------- | -------- | ------------------------------------------------------------------------- |
+| **Build stability**   | 🟢 10/10 | Build, vet, lint, tests all pass clean                                    |
+| **Test coverage**     | 🟡 8/10  | 86.6% is good; 15 functions at 0% needs attention                         |
+| **Race safety**       | 🟢 10/10 | 0 races detected across all tests                                         |
+| **Code quality**      | 🟢 9/10  | 0 lint issues, clean vet, good structure                                  |
+| **Documentation**     | 🟢 9/10  | Comprehensive; just synced and de-changelogged                            |
+| **Security**          | 🟡 7/10  | 3 stdlib CVEs (blocked on nixpkgs); no govulncheck in CI                  |
+| **Release hygiene**   | 🔴 4/10  | Tags/CHANGELOG completely out of sync; mystery tags                       |
+| **CI/CD**             | 🟡 7/10  | Good pipeline but codecov broken, no govulncheck, foreign pre-commit hook |
+| **API design**        | 🟡 8/10  | Solid v2; known warts deferred to v3; no v3 design doc yet                |
+| **Dependency health** | 🟢 9/10  | All deps at latest; go-output sub-modules pinned in lockstep              |
 
 **Overall: 🟡 8.1/10** — Production-quality library with excellent code quality and testing, held back by release hygiene issues and a blocked security upgrade.
 
 ---
 
-*Generated 2026-06-22 15:29 — point-in-time snapshot.*
+_Generated 2026-06-22 15:29 — point-in-time snapshot._

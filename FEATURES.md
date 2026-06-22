@@ -66,21 +66,21 @@
 
 ### Flag System
 
-| Feature                       | Status              | Notes                                             |
-| ----------------------------- | ------------------- | ------------------------------------------------- |
-| Struct tag flags              | ✅ FULLY_FUNCTIONAL | `flag:"name" short:"n" default:"val" help:"desc"` |
-| `env:"VAR"` struct tag        | ✅ FULLY_FUNCTIONAL | Environment variable binding                      |
-| `count:"true"` struct tag     | ✅ FULLY_FUNCTIONAL | Counting flags: -vvv → 3                          |
-| Short flags                   | ✅ FULLY_FUNCTIONAL | `short:"n"` for `-n`                              |
-| Required flags                | ✅ FULLY_FUNCTIONAL | `required:"true"` tag                             |
-| `validate:"email,min=5"` tag  | ✅ FULLY_FUNCTIONAL | Built-in + custom validators                      |
-| Flag typo suggestions         | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based                        |
-| Subcommand typo suggestions   | ✅ FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands           |
-| Instance-scoped validators    | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator() (COW)        |
-| TypeHandler registry          | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system (COW)             |
-| `RegisterTypeHandler()`       | ✅ FULLY_FUNCTIONAL | Register custom flag types                        |
-| Iterator methods (`iter.Seq`) | ✅ FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq       |
-| Integer overflow validation | ✅ FULLY_FUNCTIONAL | int8/16/32, uint8/16 range-checked → ErrIntegerOverflow |
+| Feature                       | Status              | Notes                                                   |
+| ----------------------------- | ------------------- | ------------------------------------------------------- |
+| Struct tag flags              | ✅ FULLY_FUNCTIONAL | `flag:"name" short:"n" default:"val" help:"desc"`       |
+| `env:"VAR"` struct tag        | ✅ FULLY_FUNCTIONAL | Environment variable binding                            |
+| `count:"true"` struct tag     | ✅ FULLY_FUNCTIONAL | Counting flags: -vvv → 3                                |
+| Short flags                   | ✅ FULLY_FUNCTIONAL | `short:"n"` for `-n`                                    |
+| Required flags                | ✅ FULLY_FUNCTIONAL | `required:"true"` tag                                   |
+| `validate:"email,min=5"` tag  | ✅ FULLY_FUNCTIONAL | Built-in + custom validators                            |
+| Flag typo suggestions         | ✅ FULLY_FUNCTIONAL | Levenshtein distance-based                              |
+| Subcommand typo suggestions   | ✅ FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands                 |
+| Instance-scoped validators    | ✅ FULLY_FUNCTIONAL | FlagRegistry.RegisterFlagValidator() (COW)              |
+| TypeHandler registry          | ✅ FULLY_FUNCTIONAL | Extensible type dispatch system (COW)                   |
+| `RegisterTypeHandler()`       | ✅ FULLY_FUNCTIONAL | Register custom flag types                              |
+| Iterator methods (`iter.Seq`) | ✅ FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq             |
+| Integer overflow validation   | ✅ FULLY_FUNCTIONAL | int8/16/32, uint8/16 range-checked → ErrIntegerOverflow |
 
 ### Value Types
 
@@ -201,42 +201,42 @@
 
 ### Plugin System
 
-| Feature                         | Status              | Notes                                                       |
-| ------------------------------- | ------------------- | ----------------------------------------------------------- |
-| `Plugin` interface              | ✅ FULLY_FUNCTIONAL | Bundle custom type handlers + validators                    |
-| `PluginRegistrar`               | ✅ FULLY_FUNCTIONAL | Scoped `TypeHandler()`/`Validator()` registration           |
-| `RegisterPlugin(plugin)`        | ✅ FULLY_FUNCTIONAL | Apply to global registries                                  |
-| `WithPlugin[T](plugin)`         | ✅ FULLY_FUNCTIONAL | Apply per-instance (CLI option)                             |
-| `FlagRegistry.RegisterPlugin()` | ✅ FULLY_FUNCTIONAL | Apply per-FlagRegistry                                      |
+| Feature                         | Status              | Notes                                             |
+| ------------------------------- | ------------------- | ------------------------------------------------- |
+| `Plugin` interface              | ✅ FULLY_FUNCTIONAL | Bundle custom type handlers + validators          |
+| `PluginRegistrar`               | ✅ FULLY_FUNCTIONAL | Scoped `TypeHandler()`/`Validator()` registration |
+| `RegisterPlugin(plugin)`        | ✅ FULLY_FUNCTIONAL | Apply to global registries                        |
+| `WithPlugin[T](plugin)`         | ✅ FULLY_FUNCTIONAL | Apply per-instance (CLI option)                   |
+| `FlagRegistry.RegisterPlugin()` | ✅ FULLY_FUNCTIONAL | Apply per-FlagRegistry                            |
 
 ### Result[T] & Validated[T] (Sum Types)
 
-| Feature                  | Status              | Notes                                            |
-| ------------------------ | ------------------- | ------------------------------------------------ |
-| `Ok[T](value)`           | ✅ FULLY_FUNCTIONAL | Construct success result                         |
-| `Err[T](err)`            | ✅ FULLY_FUNCTIONAL | Construct error result                           |
-| `Result[T].Value/UnwrapOr/Map/AndThen` | ✅ FULLY_FUNCTIONAL | Accessors + monadic ops (zero panics) |
-| `Valid[T](value)`        | ✅ FULLY_FUNCTIONAL | Construct valid wrapper                          |
-| `Invalid[T](value, errs)` | ✅ FULLY_FUNCTIONAL | Partial-success wrapper (value + error slice)   |
-| `Validated[T].AddErr/Combine/ToResult` | ✅ FULLY_FUNCTIONAL | Accumulate + convert errors         |
+| Feature                                | Status              | Notes                                         |
+| -------------------------------------- | ------------------- | --------------------------------------------- |
+| `Ok[T](value)`                         | ✅ FULLY_FUNCTIONAL | Construct success result                      |
+| `Err[T](err)`                          | ✅ FULLY_FUNCTIONAL | Construct error result                        |
+| `Result[T].Value/UnwrapOr/Map/AndThen` | ✅ FULLY_FUNCTIONAL | Accessors + monadic ops (zero panics)         |
+| `Valid[T](value)`                      | ✅ FULLY_FUNCTIONAL | Construct valid wrapper                       |
+| `Invalid[T](value, errs)`              | ✅ FULLY_FUNCTIONAL | Partial-success wrapper (value + error slice) |
+| `Validated[T].AddErr/Combine/ToResult` | ✅ FULLY_FUNCTIONAL | Accumulate + convert errors                   |
 
 ### Documentation Generation
 
-| Feature              | Status              | Notes                                              |
-| -------------------- | ------------------- | -------------------------------------------------- |
-| `cli.GenerateDocs(w)` | ✅ FULLY_FUNCTIONAL | Markdown docs for full command tree to io.Writer  |
+| Feature               | Status              | Notes                                            |
+| --------------------- | ------------------- | ------------------------------------------------ |
+| `cli.GenerateDocs(w)` | ✅ FULLY_FUNCTIONAL | Markdown docs for full command tree to io.Writer |
 
 ### Audit Log Export
 
-| Feature                          | Status              | Notes                                                        |
-| -------------------------------- | ------------------- | ------------------------------------------------------------ |
-| `WithAuditLog[T](plugin)`        | ✅ FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                     |
-| `ExportAuditLog[T](cli, cfg)`    | ✅ FULLY_FUNCTIONAL | Write audit snapshot to file or io.Writer                    |
-| `AuditLogFormat` strong type     | ✅ FULLY_FUNCTIONAL | Validated enum with `ParseAuditLogFormat()` + `Valid()`      |
-| 11 export formats                | ✅ FULLY_FUNCTIONAL | html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree |
-| `AuditLogServiceByName[T](cli)`  | ✅ FULLY_FUNCTIONAL | Query a named service's audit info                          |
-| `AuditLogFailedServices[T](cli)` | ✅ FULLY_FUNCTIONAL | List services that failed to construct                      |
-| `cli.AuditLog()` / `AuditLogReport()` | ✅ FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot          |
+| Feature                               | Status              | Notes                                                                    |
+| ------------------------------------- | ------------------- | ------------------------------------------------------------------------ |
+| `WithAuditLog[T](plugin)`             | ✅ FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                 |
+| `ExportAuditLog[T](cli, cfg)`         | ✅ FULLY_FUNCTIONAL | Write audit snapshot to file or io.Writer                                |
+| `AuditLogFormat` strong type          | ✅ FULLY_FUNCTIONAL | Validated enum with `ParseAuditLogFormat()` + `Valid()`                  |
+| 11 export formats                     | ✅ FULLY_FUNCTIONAL | html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree |
+| `AuditLogServiceByName[T](cli)`       | ✅ FULLY_FUNCTIONAL | Query a named service's audit info                                       |
+| `AuditLogFailedServices[T](cli)`      | ✅ FULLY_FUNCTIONAL | List services that failed to construct                                   |
+| `cli.AuditLog()` / `AuditLogReport()` | ✅ FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot                             |
 
 ### Version Command
 
@@ -309,17 +309,17 @@ Custom types can be added via `RegisterTypeHandler(reflect.Type, TypeHandler)`.
 
 ### Config File Loading
 
-| Feature                                | Status              | Notes                                    |
-| -------------------------------------- | ------------------- | ---------------------------------------- |
-| `WithConfigFile[T](paths...)`          | ✅ FULLY_FUNCTIONAL | JSON loader, core package                |
-| `WithConfigFileLoader[T](loader, ...)` | ✅ FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload) |
-| `$ENV` and `~` expansion               | ✅ FULLY_FUNCTIONAL | Path expansion before loading            |
-| `--config` flag override               | ✅ FULLY_FUNCTIONAL | Overrides default search paths           |
-| Missing file = silent skip             | ✅ FULLY_FUNCTIONAL | Not an error when default path missing   |
-| `configload.YAML()`                    | ✅ FULLY_FUNCTIONAL | YAML loader sub-package                  |
-| `configload.TOML()`                    | ✅ FULLY_FUNCTIONAL | TOML loader sub-package                  |
-| `configload.Auto()`                    | ✅ FULLY_FUNCTIONAL | Sequential YAML→TOML→JSON (not extension-based) |
-| Nested struct config                   | ✅ FULLY_FUNCTIONAL | Inner structs flattened; FieldTag.Index tracks reflect path |
+| Feature                                | Status              | Notes                                                        |
+| -------------------------------------- | ------------------- | ------------------------------------------------------------ |
+| `WithConfigFile[T](paths...)`          | ✅ FULLY_FUNCTIONAL | JSON loader, core package                                    |
+| `WithConfigFileLoader[T](loader, ...)` | ✅ FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload)                     |
+| `$ENV` and `~` expansion               | ✅ FULLY_FUNCTIONAL | Path expansion before loading                                |
+| `--config` flag override               | ✅ FULLY_FUNCTIONAL | Overrides default search paths                               |
+| Missing file = silent skip             | ✅ FULLY_FUNCTIONAL | Not an error when default path missing                       |
+| `configload.YAML()`                    | ✅ FULLY_FUNCTIONAL | YAML loader sub-package                                      |
+| `configload.TOML()`                    | ✅ FULLY_FUNCTIONAL | TOML loader sub-package                                      |
+| `configload.Auto()`                    | ✅ FULLY_FUNCTIONAL | Sequential YAML→TOML→JSON (not extension-based)              |
+| Nested struct config                   | ✅ FULLY_FUNCTIONAL | Inner structs flattened; FieldTag.Index tracks reflect path  |
 | `configload.KoanfLoader()`             | ✅ FULLY_FUNCTIONAL | Nested config objects via koanf (e.g. `{"db":{"host":"x"}}`) |
 
 ### Flag Priority Chain
