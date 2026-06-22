@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-06-22
+
 ### Changed
 
 - **`samber-do-auditlog` v0.1.0 → v0.3.0** — v0.2.0 added Plugin-level Mermaid/DOT/D2/PlantUML wrappers (eliminating cmdguard's local adapter functions and `writeReportToFile` helper); v0.3.0 added Tree/HTMLTree export formats. All upgrades are additive and non-breaking
@@ -353,7 +355,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Flag binding with struct tags
 - Full Cobra integration
 
-[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v2.8.1...HEAD
+[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v2.9.0...HEAD
+[2.9.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.9.0
 [2.8.1]: https://github.com/larsartmann/cmdguard/releases/tag/v2.8.1
 [2.8.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.8.0
 [2.7.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.7.0
