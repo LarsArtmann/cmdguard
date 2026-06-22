@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-06-18
-**Status:** v2.8.1 — zero panics, 86.3% coverage, 0 lint issues, 0 race conditions, 16 output formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs
-**Tests:** 430+ passing, 0 build errors
+**Updated:** 2026-06-22
+**Status:** v2.8.1 — zero panics, 86.6% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs
+**Tests:** 430+ test functions (1393 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 0 build errors
 
 ## Completed
 
@@ -107,6 +107,14 @@
 - [x] Upgrade indirect deps: `rogpeppe/go-internal` v1.15.0, `charmbracelet/x/conpty`, `charmbracelet/x/exp/golden`, `go-output/testhelpers/graphtest`
 - [x] Mark koanf config loading as completed (was already integrated, stale in remaining work)
 - [x] Sync stale version references across FEATURES.md, README.md, ROADMAP.md, AGENTS.md
+
+### Phase 18: Audit Log Format Expansion & Doc Sync (2026-06-21)
+
+- [x] Upgrade `samber-do-auditlog` v0.1.0 → v0.3.0 (4 new export formats: d2, plantuml, tree, htmltree → 11 total)
+- [x] Remove local audit-log adapter functions (superseded by Plugin-level methods)
+- [x] Refresh all transitive dependencies via `go get -u all` + `go mod tidy`
+- [x] Fix stale audit log format lists in docs (7 → 11 formats)
+- [x] Brutal self-review report + Go 1.26.4 security TODO (govulncheck GO-2026-5037/5038/5039)
 
 ## Remaining Work — Priority Sorted
 

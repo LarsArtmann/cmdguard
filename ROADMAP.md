@@ -1,11 +1,11 @@
 # ROADMAP
 
-**Updated:** 2026-06-17
+**Updated:** 2026-06-22
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
 
-## Completed (v2.2–v2.5)
+## Completed (v2.2–v2.8)
 
 - [x] **Zero panics** — All Must\* functions removed in v2.5.0; every function returns errors
 - [x] Remove all panic-inducing functions (16 deleted: MustNewCommand, MustNewParentCommand, MustNewCLI, MustAddCommand, MustVersionCommand, MustDoctorCommand, MustInvoke, MustInvokeNamed, MustGet, RequireBranchingFlowContext, MustParse, MustParseDuration, MustParseLogLevel, MustParseLogFormat, MustParseEnum, MustParseURL, MustParseEmail, MustParsePort, MustParseFilePath, MustParseHostPort)
@@ -150,9 +150,9 @@ not lost.
 
 ## go-output Dependency Architecture
 
-> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.12.0.
+> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.17.0.
 
-`go-output` provides 16 output formats. Consider extracting to a sub-package in v3.0 so consumers only pay the dependency cost when they use `--output`.
+`go-output` provides 16 output formats as an independent module tree (root + 9 direct sub-modules + 3 indirect, all pinned in lockstep). Consumers already only pay the dependency cost when they use `--output`.
 
 ---
 
@@ -169,7 +169,7 @@ not lost.
 
 ## Future Ideas
 
-- [ ] Add structured JSON error output for `--output=json`
+- [x] Add structured JSON error output for `--output=json`
 - [x] Add issue/PR templates
 - [ ] Test all examples in CI
 - [ ] Extract flag-related code to standalone `flagtags` library
