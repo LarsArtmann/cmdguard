@@ -157,6 +157,12 @@ func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
 		return fmt.Errorf("%w: registering flag %q: %w", ErrFlagParseFailed, tag.Name, err)
 	}
 
+	if tag.Hidden {
+		if f := flags.Lookup(tag.Name); f != nil {
+			f.Hidden = true
+		}
+	}
+
 	return nil
 }
 

@@ -170,6 +170,7 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 	tag.Required = bools.Required
 	tag.Count = bools.Count
 	tag.Local = bools.Local
+	tag.Hidden = bools.Hidden
 
 	// Parse validate tag
 	if validate := field.Tag.Get("validate"); validate != "" {
@@ -194,6 +195,7 @@ type boolTagSet struct {
 	Required bool
 	Count    bool
 	Local    bool
+	Hidden   bool
 }
 
 // parseBoolTags parses the required, count, and local boolean struct tags.
@@ -209,6 +211,7 @@ func parseBoolTags(field reflect.StructField) (boolTagSet, error) {
 		{"required", &out.Required},
 		{"count", &out.Count},
 		{"local", &out.Local},
+		{"hidden", &out.Hidden},
 	} {
 		raw := field.Tag.Get(t.key)
 		if raw == "" {

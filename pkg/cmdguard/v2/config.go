@@ -32,6 +32,7 @@ type FlagTag struct {
 	Count    bool   // Counting flag: -vvv → 3
 	Prompt   string // Interactive prompt title when flag is missing
 	Local    bool   // Local: registered on the owning command only, not inherited by subcommands
+	Hidden   bool   // Hidden: excluded from --help output but fully functional
 }
 
 // ValidateConfig validates a config struct.
