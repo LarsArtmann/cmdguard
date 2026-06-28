@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-06-22
-**Status:** v2.9.0 — zero panics, 86.6% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs
-**Tests:** 430+ test functions (1362 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 0 build errors
+**Updated:** 2026-06-28
+**Status:** v2.10.0 — zero panics, 86.6% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs, cobra-correctness contract (SilenceUsage default, ExitCode, escape-hatch APIs)
+**Tests:** 473 test functions (1355 runs incl. subtests), 26 benchmarks, 1 fuzz file, 0 build errors
 
 ## Completed
 
@@ -116,14 +116,27 @@
 - [x] Fix stale audit log format lists in docs (7 → 11 formats)
 - [x] Brutal self-review report + Go 1.26.4 security TODO (govulncheck GO-2026-5037/5038/5039)
 
+### Phase 19: Cobra-Correctness Contract & Escape-Hatch APIs (2026-06-28)
+
+Mission pivot back to "make consumers use Cobra correctly," driven by auditing BuildFlow (the primary consumer) and replacing its four workarounds with first-class APIs.
+
+- [x] Close the cobra-correctness contract: `SilenceUsage=true` by default, public `ExitCode(err)` helper, flagship example no longer exits 0 on failure or double-prints errors
+- [x] Add scoped flags (`local:"true"` tag) — root-only flags not inherited by subcommands
+- [x] Add `hidden:"true"` flag tag — exclude from `--help`, stay functional
+- [x] Add `ConfigFromContext[T](ctx)` — type-safe config retrieval for raw cobra subcommands (the escape hatch)
+- [x] Add `WithPostFlagParse[T](fns ...)` — post-parse hook (DI init, session storage)
+- [x] Disable `makezero` linter (directly conflicts with staticcheck S1019)
+- [x] Bump `go.mod` → `go 1.26.4` (nixpkgs now ships it; fixes GO-2026-5037/5038/5039)
+- [x] Untrack stray `taskctl-audit.html` generated artifact + gitignore generated example HTML
+- [x] Update CHANGELOG.md, FEATURES.md, docs/API.md for all v2.10.0 changes
+
 ## Remaining Work — Priority Sorted
 
 ### P0: Open
 
 | #   | Task                                                                                                              | Files              | Effort |
 | --- | ----------------------------------------------------------------------------------------------------------------- | ------------------ | ------ |
-| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings                                                                | GitHub settings    | 5m     |
-| 28  | Bump `go.mod` to `go 1.26.4` when nixpkgs packages `go_1_26 >= 1.26.4` (fixes GO-2026-5037/5038/5039 stdlib CVEs) | go.mod, flake.lock | 5m     |
+| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings (requires repo owner — cannot be set programmatically)         | GitHub settings    | 5m     |
 
 ### P1: Future (v3.0+)
 
