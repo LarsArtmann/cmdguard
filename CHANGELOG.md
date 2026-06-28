@@ -38,6 +38,13 @@ failure or double-prints errors.
   config validation but before any command handler. Use for DI initialisation,
   session storage, logging setup. Replaces the manual "save + wrap cmdguard's
   `PersistentPreRunE`" workaround
+- **`WithCleanup[T](fns ...)`** — a hook that runs after a command's `RunE`
+  completes, including when `RunE` errors. Closes the Cobra gap where neither
+  `PostRunE` nor `PersistentPostRunE` fire on `RunE` error. The hook receives
+  the command, the resolved config, and the `RunE` error (nil on success); the
+  original error is never swallowed (cleanup errors are joined, so both stay
+  reachable via `errors.Is`). Covers both cmdguard-managed commands and raw
+  cobra subcommands (escape hatch) by wrapping `RunE` at execute time
 
 ### Changed
 

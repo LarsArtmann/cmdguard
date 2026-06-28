@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-06-28
-**Status:** v2.10.0 — zero panics, 86.6% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs, cobra-correctness contract (SilenceUsage default, ExitCode, escape-hatch APIs)
+**Status:** v2.10.0 — zero panics, 86.7% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs, cobra-correctness contract (SilenceUsage default, ExitCode, escape-hatch APIs)
 **Tests:** 473 test functions (1355 runs incl. subtests), 26 benchmarks, 1 fuzz file, 0 build errors
 
 ## Completed
@@ -125,6 +125,7 @@ Mission pivot back to "make consumers use Cobra correctly," driven by auditing B
 - [x] Add `hidden:"true"` flag tag — exclude from `--help`, stay functional
 - [x] Add `ConfigFromContext[T](ctx)` — type-safe config retrieval for raw cobra subcommands (the escape hatch)
 - [x] Add `WithPostFlagParse[T](fns ...)` — post-parse hook (DI init, session storage)
+- [x] Add `WithCleanup[T](fns ...)` — post-RunE cleanup that fires even when RunE errors (closes the PostRunE-doesn't-fire-on-error gap); covers both managed commands and raw cobra subcommands
 - [x] Disable `makezero` linter (directly conflicts with staticcheck S1019)
 - [x] Bump `go.mod` → `go 1.26.4` (nixpkgs now ships it; fixes GO-2026-5037/5038/5039)
 - [x] Untrack stray `taskctl-audit.html` generated artifact + gitignore generated example HTML

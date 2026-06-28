@@ -55,6 +55,7 @@
 | `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands            |
 | `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text (auto theme) |
 | `WithPostFlagParse[T](fns...)` | ✅ FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage      |
+| `WithCleanup[T](fns...)`       | ✅ FULLY_FUNCTIONAL | Post-RunE cleanup that fires on error too      |
 
 ### Cobra Escape Hatch (Raw Cobra Subcommands)
 

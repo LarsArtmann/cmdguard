@@ -154,6 +154,32 @@ func WithPostFlagParse[T any](fns ...func(cmd *cobra.Command, cfg *T) error) CLI
 	}
 }
 
+// WithCleanup registers hooks that run after a command's RunE completes —
+// including when RunE returns an error. This closes the gap left by Cobra,
+// whose PostRunE and PersistentPostRunE do not fire when RunE errors.
+//
+// The hook receives the cobra command, the resolved config (the same pointer
+// available via ConfigFromContext[T]; nil only when RunE is invoked without
+// going through Execute, e.g. in a unit test), and the error returned by RunE
+// (nil on success). The runErr parameter lets a hook branch on success versus
+// failure.
+//
+// Ordering and error semantics:
+//   - Hooks run in registration order, after EVERY command's RunE.
+//   - The original RunE error is never swallowed. If RunE failed, it stays the
+//     primary error; any cleanup errors are joined (errors.Join) so both stay
+//     reachable via errors.Is.
+//   - If RunE succeeded but a cleanup hook errors, that error is returned.
+//
+// Cleanup is wired by wrapping each command's RunE at Execute time, so it
+// covers both cmdguard-managed commands and raw *cobra.Command subcommands
+// added via cli.RootCommand().AddCommand (the escape hatch).
+func WithCleanup[T any](fns ...func(cmd *cobra.Command, cfg *T, runErr error) error) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.cleanupHooks = append(cli.cleanupHooks, fns...)
+	}
+}
+
 // WithStrictValidation enables strict command validation:
 //   - All commands must have a short description
 func WithStrictValidation[T any]() CLIOption[T] {

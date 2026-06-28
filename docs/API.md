@@ -87,6 +87,7 @@ Functional options:
 | `WithGlamourHelp[T]()`             | Render markdown in command help text       |
 | `WithTelemetry[T](tracer)`         | OpenTelemetry spans for all commands       |
 | `WithPostFlagParse[T](fns...)`     | Post-parse hook: DI init, session storage  |
+| `WithCleanup[T](fns...)`           | Post-RunE cleanup (fires on error too)     |
 
 ### CLI[T] Methods
 
@@ -278,6 +279,13 @@ root.AddCommand(&cobra.Command{
     },
 })
 ```
+
+`WithCleanup[T]` registers hooks that run after every command's `RunE` —
+including when `RunE` errors, which Cobra's `PostRunE`/`PersistentPostRunE`
+silently skip. The hook receives `(cmd, cfg, runErr)`, so a single hook can
+flush buffers or release resources on both success and failure. It wraps every
+`RunE` in the tree at execute time, so it covers raw cobra subcommands too.
+The original `RunE` error is never swallowed; cleanup errors are joined to it.
 
 Scoped flags (`local:"true"`) keep root-only flags out of subcommand `--help`. Use
 `cli.RegisterLocalCommandFlags(cmd)` to re-register a local flag group on a

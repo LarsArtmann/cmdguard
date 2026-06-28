@@ -412,6 +412,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithGroup[T](id, title)`              | Help group on root                                            |
 | `WithConfigValidation[T](fn)`          | Validate config after flag parsing                            |
 | `WithPostFlagParse[T](fn...)`          | Post-parse hook: DI init, session storage                     |
+| `WithCleanup[T](fn...)`               | Post-RunE cleanup that fires even when RunE errors            |
 | `WithStrictValidation[T]()`            | Require `WithShort` on all commands                           |
 | `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands               |
 | `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path                   |

@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-28
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.9.0 - zero panics, 86.6% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.10.0 - zero panics, 86.7% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.9.0. 430+ test functions (1362 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 86.6% coverage, 0 build errors.
+**Current Status:** v2.10.0. 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 86.7% coverage, 0 build errors.
 
 ---
 
@@ -139,7 +139,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~86.6%   |
+| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~86.7%   |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -294,6 +294,7 @@ go build ./...                                   # Verify build
 - `ExecuteAndExit` checks for `ExitCoder`; `NewExitError(code, err)` returns `(*ExitError, error)` and validates the 0–255 range
 - **Error/exit contract** — cmdguard owns error display: the error is printed exactly once (fang when enabled, cobra when disabled). `SilenceUsage` is **true by default** (kills the #1 cobra footgun: usage-on-error). The error returned by `Execute` is for exit-code mapping only — consumers must NOT re-print it (that double-prints). `ExecuteAndExit` is the blessed entry point; `ExitCode(err) int` (public) supports the post-execution-work case (flush/audit/teardown before exit). `ExitCode(nil)==0`.
 - **Cobra escape hatch** — `ConfigFromContext[T](ctx)` retrieves resolved config from any cobra command context (stored by PersistentPreRunE). `WithPostFlagParse[T](fns...)` registers hooks that run after flag parsing + config validation but before command handlers (replaces manual PersistentPreRunE wrapping). `RegisterLocalCommandFlags(cmd)` registers the root's `local:"true"` flags on a subcommand.
+- **`WithCleanup[T]`** — registers hooks that fire after EVERY command's `RunE`, including when `RunE` errors (Cobra's `PostRunE`/`PersistentPostRunE` do NOT fire on `RunE` error). Implemented as a tree-walk at `Execute` time (`applyCleanupHooks` in `cli.go`) that wraps each command's `RunE` — so it covers BOTH cmdguard-managed `Command[T,F]` and raw cobra subcommands (escape hatch). Hook signature `func(cmd, cfg, runErr) error`; the original `runErr` is never swallowed (cleanup errors joined via `errors.Join`). Idempotent (`cleanupWired` guard) so calling `Execute` twice doesn't double-wrap. No-op when no hooks registered.
 - **Scoped flags** — `local:"true"` tag: registered on owning command only, NOT inherited by subcommands. `hidden:"true"` tag: excluded from `--help` but fully functional. Both parsed via `parseBoolTags`.
 - `NewScopeFromInjector` returns `(*Scope, error)` — nil injector returns error
 - `SuggestFlag` returns `(string, bool)`

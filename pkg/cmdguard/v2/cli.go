@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -39,6 +40,8 @@ type CLI[T any] struct {
 	validationMode   ValidationMode
 	configValidate   func(*T) error
 	postFlagParse    []func(*cobra.Command, *T) error
+	cleanupHooks     []func(*cobra.Command, *T, error) error
+	cleanupWired     bool
 	configFilePaths  []string
 	configFileLoader ConfigFileLoader
 	glamourHelp      bool
@@ -265,6 +268,67 @@ func (cli *CLI[T]) applyNoColorIfSet() func() {
 	}
 }
 
+// applyCleanupHooks wraps every command's RunE — both cmdguard-managed
+// commands and raw *cobra.Command subcommands added via
+// RootCommand().AddCommand — so that cleanup hooks fire after RunE completes,
+// including when RunE returns an error.
+//
+// Cobra's PostRunE and PersistentPostRunE are NOT called when RunE errors, so
+// cleanup that must run on failure (flushing buffers, releasing resources,
+// emitting failure telemetry) has nowhere to live except the RunE wrapper
+// itself. This wires that wrapper once, uniformly, for the whole tree.
+//
+// It is a no-op when no cleanup hooks are registered, so CLIs that do not use
+// WithCleanup pay zero overhead. The wiring is idempotent so calling Execute
+// more than once does not double-wrap.
+func (cli *CLI[T]) applyCleanupHooks() {
+	if len(cli.cleanupHooks) == 0 || cli.cleanupWired {
+		return
+	}
+
+	cli.cleanupWired = true
+
+	var wrap func(cmd *cobra.Command)
+
+	wrap = func(cmd *cobra.Command) {
+		if cmd.RunE != nil {
+			original := cmd.RunE
+			cmd.RunE = func(c *cobra.Command, args []string) error {
+				runErr := original(c, args)
+
+				cfg, _ := ConfigFromContext[T](c.Context())
+
+				var cleanupErrs []error
+
+				for _, fn := range cli.cleanupHooks {
+					if cerr := fn(c, cfg, runErr); cerr != nil {
+						cleanupErrs = append(cleanupErrs, fmt.Errorf("cleanup hook: %w", cerr))
+					}
+				}
+
+				// The original RunE error is never swallowed. When the handler
+				// failed it stays the primary error; cleanup failures are joined
+				// so they remain reachable via errors.Is without hiding runErr.
+				if runErr != nil {
+					if len(cleanupErrs) == 0 {
+						return runErr
+					}
+
+					return errors.Join(append([]error{runErr}, cleanupErrs...)...)
+				}
+
+				return errors.Join(cleanupErrs...)
+			}
+		}
+
+		for _, sub := range cmd.Commands() {
+			wrap(sub)
+		}
+	}
+
+	wrap(cli.rootCmd)
+}
+
 // Execute runs the CLI application.
 // The context is wrapped with a BranchingFlowContext for command path tracking.
 // If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
@@ -305,6 +369,8 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 	}
 
 	flowCtx := WithBranchingFlowContext(ctx, cli.flowCtx)
+
+	cli.applyCleanupHooks()
 
 	var execErr error
 
