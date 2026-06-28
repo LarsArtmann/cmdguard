@@ -80,6 +80,30 @@ func extractExitCode(err error) int {
 	return 1
 }
 
+// ExitCode extracts the process exit code from an error returned by Execute.
+//
+// If the error (or any error in its chain) implements ExitCoder, its code is
+// used; otherwise the generic failure code 1 is returned. A nil error yields 0.
+//
+// cmdguard already prints the error exactly once (styled via fang when enabled,
+// plain via cobra when disabled). The value returned by Execute is therefore for
+// exit-code mapping and programmatic inspection only — do NOT print it again.
+//
+// Use ExecuteAndExit for the common case. Use ExitCode when you must run code
+// after execution (flush logs, export an audit log, tear down resources) before
+// the process exits:
+//
+//	err := cli.Execute(ctx)
+//	// ...flush / export audit log / teardown...
+//	os.Exit(v2.ExitCode(err))
+func ExitCode(err error) int {
+	if err == nil {
+		return 0
+	}
+
+	return extractExitCode(err)
+}
+
 func writeJSONError(w io.Writer, err error) error {
 	envelope := jsonErrorEnvelope{
 		Error: jsonErrorDetail{

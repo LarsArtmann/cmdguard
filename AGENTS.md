@@ -292,6 +292,7 @@ go build ./...                                   # Verify build
 #### Error Handling & Exit Codes
 
 - `ExecuteAndExit` checks for `ExitCoder`; `NewExitError(code, err)` returns `(*ExitError, error)` and validates the 0–255 range
+- **Error/exit contract** — cmdguard owns error display: the error is printed exactly once (fang when enabled, cobra when disabled). `SilenceUsage` is **true by default** (kills the #1 cobra footgun: usage-on-error). The error returned by `Execute` is for exit-code mapping only — consumers must NOT re-print it (that double-prints). `ExecuteAndExit` is the blessed entry point; `ExitCode(err) int` (public) supports the post-execution-work case (flush/audit/teardown before exit). `ExitCode(nil)==0`.
 - `NewScopeFromInjector` returns `(*Scope, error)` — nil injector returns error
 - `SuggestFlag` returns `(string, bool)`
 

@@ -67,8 +67,8 @@ Functional options:
 | `WithCLICommit[T](commit)`         | Set git commit hash (auto-pipes to fang)   |
 | `WithCLILong[T](desc)`             | Set long description                       |
 | `WithCLIScope[T](scope)`           | Set custom DI scope                        |
-| `WithSilenceErrors[T]()`           | Suppress cobra error printing              |
-| `WithSilenceUsage[T]()`            | Suppress usage on error                    |
+| `WithSilenceErrors[T]()`           | Suppress cobra error printing (advanced)   |
+| `WithSilenceUsage[T]()`            | Suppress usage on error (**default**)      |
 | `WithFang[T](bool)`                | Enable/disable fang styling (preferred)    |
 | `WithFangOptions[T](opts...)`      | Custom fang options                        |
 | `WithFangErrorHandler[T](handler)` | Custom fang error handler                  |

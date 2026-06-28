@@ -106,9 +106,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := cli.Execute(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-	}
+	// cmdguard prints command errors exactly once (via fang by default). The
+	// error returned by Execute is used only to map the process exit code —
+	// re-printing it would duplicate the error output on stderr.
+	execErr := cli.Execute(ctx)
 
 	if plugin := cli.AuditLog(); plugin != nil && plugin.EventsCount() > 0 {
 		// AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
@@ -130,5 +131,5 @@ func main() {
 		}
 	}
 
-	os.Exit(0)
+	os.Exit(v2.ExitCode(execErr))
 }

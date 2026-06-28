@@ -59,6 +59,15 @@ func TestNewCLI(t *testing.T) {
 		testutil.AssertExpectedError(t, err)
 	})
 
+	t.Run("defaults SilenceUsage to true (no usage-on-error footgun)", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := v2.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
+		testutil.AssertNoError(t, err)
+
+		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceUsage, "default SilenceUsage")
+	})
+
 	t.Run("WithSilenceErrors sets SilenceErrors", func(t *testing.T) {
 		t.Parallel()
 

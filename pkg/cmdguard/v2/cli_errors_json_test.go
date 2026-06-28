@@ -139,6 +139,37 @@ func TestExtractExitCode(t *testing.T) {
 	})
 }
 
+func TestExitCode(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil error returns 0 (success)", func(t *testing.T) {
+		t.Parallel()
+
+		if code := ExitCode(nil); code != 0 {
+			t.Errorf("ExitCode(nil) = %d, want 0", code)
+		}
+	})
+
+	t.Run("plain error returns generic failure code 1", func(t *testing.T) {
+		t.Parallel()
+
+		if code := ExitCode(errors.New("boom")); code != 1 {
+			t.Errorf("ExitCode(plain) = %d, want 1", code)
+		}
+	})
+
+	t.Run("ExitCoder error returns its code", func(t *testing.T) {
+		t.Parallel()
+
+		exitErr, err := NewExitError(42, errors.New("bad"))
+		testutil.AssertNoError(t, err)
+
+		if code := ExitCode(exitErr); code != 42 {
+			t.Errorf("ExitCode(ExitError) = %d, want 42", code)
+		}
+	})
+}
+
 //nolint:paralleltest // os.Stderr manipulation
 func TestJSONErrorIntegration(t *testing.T) {
 	tests := []struct {

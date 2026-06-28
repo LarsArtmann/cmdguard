@@ -15,6 +15,22 @@ cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type sa
 
 ## Why cmdguard?
 
+Raw Cobra is powerful but full of footguns that bite every new project. cmdguard
+makes the **correct behaviour the default** so consumers use Cobra properly
+without having to learn its traps the hard way.
+
+**What cmdguard fixes by default (the parts raw Cobra gets wrong):**
+
+| Raw Cobra footgun | cmdguard default |
+| --- | --- |
+| Prints the full usage block after *every* command error (`SilenceUsage: false`) | Usage-on-error is silenced; `--help` still works |
+| Errors print twice (Cobra prints *and* `main()` prints the returned error) | cmdguard prints the error exactly once — see [Error handling](#error-handling--exit-codes) |
+| Failed commands exit `0` (easy to forget `os.Exit` with the right code) | `ExecuteAndExit` / `ExitCode(err)` map errors to correct exit codes |
+| `Run` (panics) vs `RunE` (returns error) confusion | Only error-returning handlers exist — zero panics, by construction |
+| Missing handler / duplicate command / invalid name found at runtime | Caught at `NewCommand` / `AddCommand` time |
+
+**Plus: flags are typed structs, validated at construction — no stringly-typed lookups:**
+
 **Raw Cobra — flags are strings, validated at runtime:**
 
 ```go
@@ -34,6 +50,34 @@ type GreetFlags struct {
 }
 // Missing handler? Duplicate command? Invalid name? Caught at AddCommand time.
 ```
+
+---
+
+## Error handling & exit codes
+
+cmdguard owns the error-output contract so you can't get it wrong:
+
+- **The error is printed exactly once** — styled by [fang](https://github.com/charmbracelet/fang) when enabled (the default), or plain by Cobra when disabled.
+- **Usage is never printed on error** (`SilenceUsage: true` by default).
+- **The error returned by `Execute` is for exit-code mapping only — do not re-print it**, or you'll duplicate the output.
+
+**Recommended — one line, correct exit code:**
+
+```go
+cli.ExecuteAndExit(context.Background())
+```
+
+**When you need to run code before exiting** (flush logs, export an audit log, tear
+down resources), use `ExitCode` instead of `ExecuteAndExit`:
+
+```go
+err := cli.Execute(ctx)
+// ...flush / export audit log / teardown...
+os.Exit(v2.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
+```
+
+> Pitfall to avoid: `if err := cli.Execute(ctx); err != nil { fmt.Fprintln(os.Stderr, err) }`
+> re-prints the error that cmdguard already printed.
 
 ---
 
@@ -222,7 +266,8 @@ v2.NewCommand[AppConfig, *Flags]("deploy", runHandler,
 )
 ```
 
-`PostRunE` only fires on success — Cobra semantics.
+`PostRunE` only fires on success — Cobra semantics. For cleanup that must run
+ even on failure, put `defer` directly inside your `RunE` handler.
 
 ---
 
@@ -316,8 +361,8 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | -------------------------------------- | ----------------------------------------------- |
 | `WithCLIVersion[T](v)`                 | Version string                                  |
 | `WithCLILong[T](desc)`                 | Long description                                |
-| `WithSilenceErrors[T]()`               | Suppress error printing                         |
-| `WithSilenceUsage[T]()`                | Suppress usage on error                         |
+| `WithSilenceErrors[T]()`               | Suppress error printing (advanced; fang handles this) |
+| `WithSilenceUsage[T]()`                | Suppress usage on error (**default**; kept for compatibility) |
 | `WithFang[T](bool)`                    | Styled help output                              |
 | `WithEnvPrefix[T](prefix)`             | Prefix for env vars                             |
 | `WithSignalHandling[T]()`              | Cancel context on SIGINT/SIGTERM                |

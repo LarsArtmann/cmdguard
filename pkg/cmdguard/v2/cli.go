@@ -136,7 +136,15 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	cli.initOutputFlag()
 	cli.initNoColorFlag()
 
-	err = registry.RegisterPersistentFlags(cli.rootCmd)
+	// Silence usage-on-error by default. Raw Cobra prints the full usage block
+	// after every command error — the single most reported Cobra footgun. A CLI
+	// library that aims to make consumers "use Cobra correctly" must not expose
+	// that behaviour by default. Fang already forces this true when it executes;
+	// setting it here guarantees the same sane behaviour when fang is disabled.
+	// --help is unaffected (SilenceUsage only suppresses error usage).
+	cli.rootCmd.SilenceUsage = true
+
+	err = registry.RegisterScopedFlags(cli.rootCmd)
 	if err != nil {
 		return fmt.Errorf(
 			"%w: registering global flags for %T: %w",
@@ -317,7 +325,7 @@ func (cli *CLI[T]) ExecuteWithArgs(ctx context.Context, args []string) error {
 func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 	err := cli.Execute(ctx)
 	if err != nil {
-		os.Exit(extractExitCode(err))
+		os.Exit(ExitCode(err))
 	}
 }
 
