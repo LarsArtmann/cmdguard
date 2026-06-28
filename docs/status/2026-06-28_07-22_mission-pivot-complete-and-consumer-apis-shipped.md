@@ -12,12 +12,12 @@
 
 This session pivoted cmdguard from **breadth drift** (output formats, audit formats, perf) back to its **founding mission**: making consumers use Cobra correctly. The trigger was studying **BuildFlow** (the real, primary consumer, in `/home/lars/projects/BuildFlow/`) — which had built four workarounds around cmdguard's gaps:
 
-| BuildFlow workaround | Lines of glue | Now replaced by |
-|---|---|---|
-| `configFromCmd(cmd)` — hand-rolled context-key session system | 8 files, ~11 call sites | `v2.ConfigFromContext[T](ctx)` |
-| `hideAdvancedFlags(root)` — hardcoded list of 11 flag names | 1 function, 11 names | `hidden:"true"` struct tag |
-| Save + wrap cmdguard's `PersistentPreRunE` | 7 references in root.go | `v2.WithPostFlagParse[T](fn)` |
-| Manual flag-hiding on raw subcommands | scattered | `local:"true"` (scoped flags, committed `c60f690`) |
+| BuildFlow workaround                                          | Lines of glue           | Now replaced by                                    |
+| ------------------------------------------------------------- | ----------------------- | -------------------------------------------------- |
+| `configFromCmd(cmd)` — hand-rolled context-key session system | 8 files, ~11 call sites | `v2.ConfigFromContext[T](ctx)`                     |
+| `hideAdvancedFlags(root)` — hardcoded list of 11 flag names   | 1 function, 11 names    | `hidden:"true"` struct tag                         |
+| Save + wrap cmdguard's `PersistentPreRunE`                    | 7 references in root.go | `v2.WithPostFlagParse[T](fn)`                      |
+| Manual flag-hiding on raw subcommands                         | scattered               | `local:"true"` (scoped flags, committed `c60f690`) |
 
 Plus the foundational fix from earlier this session: `SilenceUsage=true` by default + public `ExitCode(err)` + the flagship example no longer exits 0 on failure or double-prints errors.
 
@@ -29,16 +29,16 @@ Plus the foundational fix from earlier this session: `SilenceUsage=true` by defa
 
 ### This session's deliverables (9 commits, `8db8275..2d50def`)
 
-| # | Commit | What | Consumer Impact |
-|---|--------|------|-----------------|
-| 1 | `03db723` | `SilenceUsage=true` by default + public `ExitCode(err)` + example fix | Kills Cobra's #1 footgun (usage-on-error); correct exit codes |
-| 2 | `80e6932` | Status report: cobra-correctness audit | Documentation |
-| 3 | `c60f690` | **Scoped flags** (`local:"true"`) — root-only flags not inherited by subcommands | BuildFlow's `RegisterLocalCommandFlags` pattern |
-| 4 | `b4c1788` | **`hidden:"true"` flag tag** — exclude from --help, stay functional | Replaces BuildFlow's 11-name `hideAdvancedFlags` list |
-| 5 | `753a784` | **`ConfigFromContext[T](ctx)`** — type-safe config retrieval for raw cobra subcommands | Replaces BuildFlow's `configFromCmd` session system |
-| 6 | `efbe729` | **`WithPostFlagParse[T](fn)`** — post-parse hook for DI init / session storage | Replaces BuildFlow's `PersistentPreRunE` wrapping |
-| 7 | `ae65f2c` + `106c516` | Linter conflict resolution (makezero vs staticcheck) + nil-context test fix | 0 lint issues |
-| 8 | `2d50def` | Documentation: README + AGENTS.md for all new features | Consumer-facing docs |
+| #   | Commit                | What                                                                                   | Consumer Impact                                               |
+| --- | --------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | `03db723`             | `SilenceUsage=true` by default + public `ExitCode(err)` + example fix                  | Kills Cobra's #1 footgun (usage-on-error); correct exit codes |
+| 2   | `80e6932`             | Status report: cobra-correctness audit                                                 | Documentation                                                 |
+| 3   | `c60f690`             | **Scoped flags** (`local:"true"`) — root-only flags not inherited by subcommands       | BuildFlow's `RegisterLocalCommandFlags` pattern               |
+| 4   | `b4c1788`             | **`hidden:"true"` flag tag** — exclude from --help, stay functional                    | Replaces BuildFlow's 11-name `hideAdvancedFlags` list         |
+| 5   | `753a784`             | **`ConfigFromContext[T](ctx)`** — type-safe config retrieval for raw cobra subcommands | Replaces BuildFlow's `configFromCmd` session system           |
+| 6   | `efbe729`             | **`WithPostFlagParse[T](fn)`** — post-parse hook for DI init / session storage         | Replaces BuildFlow's `PersistentPreRunE` wrapping             |
+| 7   | `ae65f2c` + `106c516` | Linter conflict resolution (makezero vs staticcheck) + nil-context test fix            | 0 lint issues                                                 |
+| 8   | `2d50def`             | Documentation: README + AGENTS.md for all new features                                 | Consumer-facing docs                                          |
 
 ### Shipped v2.0–v2.9.0 (pre-session, all stable)
 
@@ -53,18 +53,22 @@ Plus the foundational fix from earlier this session: `SilenceUsage=true` by defa
 ## b) PARTIALLY DONE 🟡
 
 ### BuildFlow migration — APIs exist, consumer hasn't migrated yet
+
 cmdguard now has the four APIs BuildFlow needs, but BuildFlow still uses its workarounds (it pins `v2.9.0` + a `replace ../cmdguard` directive). The migration is **BuildFlow's work**, not cmdguard's — but the cmdguard side is ready.
 
 ### Documentation freshness
+
 - `TODO_LIST.md` still says "v2.9.0, 430+ test functions" — now 473 tests and 4 new APIs not listed
 - `FEATURES.md` doesn't mention scoped flags, hidden flags, ConfigFromContext, WithPostFlagParse
 - `docs/API.md` CLI Options table missing `WithPostFlagParse`
 - `CHANGELOG.md` has no v2.10.0 entry for this session's features
 
 ### Go version
+
 `go.mod` says `go 1.26.3`; `go 1.26.4` fixes stdlib CVEs (GO-2026-5037/5038/5039) but nixpkgs hasn't packaged it yet (P0 blocker, deferred).
 
 ### Codecov
+
 CI wired but `CODECOV_TOKEN` secret still not set in GitHub (P0, 5-minute task, deferred).
 
 ---
@@ -88,15 +92,19 @@ CI wired but `CODECOV_TOKEN` secret still not set in GitHub (P0, 5-minute task, 
 > Nothing is catastrophically broken. The "fucked up" items are **process debt** — things that were true earlier this session and are now fixed, or things still lingering.
 
 ### 🔴 #1 — TODO_LIST.md and FEATURES.md are stale (STILL)
+
 Both still describe v2.9.0 with "430+ test functions" and no mention of scoped flags, hidden flags, ConfigFromContext, or WithPostFlagParse. A new contributor reading these would have **no idea** the mission pivot happened. This is the single most damaging doc-staleness in the repo right now.
 
 ### 🔴 #2 — No CHANGELOG entry for 4 new public APIs
+
 `CHANGELOG.md` stops at v2.9.0. The 4 new APIs (scoped flags, hidden tag, ConfigFromContext, WithPostFlagParse) + the SilenceUsage/ExitCode fix are **undocumented in the release history**. Consumers tracking changes have no record.
 
 ### 🔴 #3 — No v2.10.0 release
+
 The features are committed and pushed but **not tagged/released**. BuildFlow (and any other consumer) must use a `replace` directive to access them. Without a release, `go get` still pulls v2.9.0.
 
 ### Previously fucked up (NOW FIXED ✅)
+
 - ~~Flagship example exited 0 on failure + double-printed errors~~ → fixed `03db723`
 - ~~Usage-on-error was the default~~ → fixed `03db723`
 - ~~No public exit-code helper~~ → fixed `03db723`
@@ -120,33 +128,33 @@ The features are committed and pushed but **not tagged/released**. BuildFlow (an
 
 Sorted by **impact × readiness** (consumer value first, then mission, then hygiene, then roadmap).
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 1 | **Release v2.10.0** — tag + push; unblocks all consumers | 🔴 critical | 10m |
-| 2 | **Update CHANGELOG.md** for v2.10.0 (4 new APIs + SilenceUsage + ExitCode) | 🔴 critical | 10m |
-| 3 | **Update TODO_LIST.md** — test count, new APIs, completed items | 🔴 high | 10m |
-| 4 | **Update FEATURES.md** — scoped flags, hidden tag, escape hatch, ConfigFromContext | 🔴 high | 10m |
-| 5 | **Update docs/API.md** — add WithPostFlagParse, ConfigFromContext to tables | 🟡 medium | 10m |
-| 6 | **Migrate BuildFlow** — replace `configFromCmd` → `ConfigFromContext` | 🔴 high (proves API) | 30m |
-| 7 | **Migrate BuildFlow** — replace `hideAdvancedFlags` → `hidden:"true"` tags | 🔴 high | 15m |
-| 8 | **Migrate BuildFlow** — replace `PersistentPreRunE` wrap → `WithPostFlagParse` | 🔴 high | 20m |
-| 9 | **Add failure-cleanup hook** (`WithCleanup`/`OnRunError`) — PostRunE doesn't fire on error | 🔴 mission | 30m |
-| 10 | **Set CODECOV_TOKEN** in GitHub secrets | hygiene | 5m |
-| 11 | **Bump go.mod → go 1.26.4** when nixpkgs ships it (CVEs) | security | 5m |
-| 12 | **Own error display in fang-off mode** (make cmdguard the single owner) | mission | 30m |
-| 13 | **Add `examples/escape-hatch/`** — demonstrates raw cobra + ConfigFromContext + PostFlagParse | adoption | 30m |
-| 14 | **Second example app** (different domain — server/devtool) to validate contract | adoption | 60m |
-| 15 | **Reset-global-state audit** — ensure parallel tests don't pollute COW registries | reliability | 30m |
-| 16 | **Write `docs/COBRA_FOOTGUNS.md`** — explicit list of traps cmdguard closes | adoption | 20m |
-| 17 | **Add fuzz corpus** under `testdata/fuzz/` | robustness | 20m |
-| 18 | **FlagRegistry interface abstraction** (enables mocking) | extensibility | 40m |
-| 19 | **Custom per-flag validation hooks** (beyond `required`) | power | 30m |
-| 20 | **v3.0 API design document** (scope before code) | strategic | 60m |
-| 21 | **`flagtags` library extraction** (defer to v3) | strategic | 120m |
-| 22 | **Rename `Get[T]`→`GetService[T]`** (v3 breaking) | clarity | 30m |
-| 23 | **Generic `RegisterInScope[T]`** (v3 breaking) | type-safety | 30m |
-| 24 | **Remove `SetConfig` footgun** (v3 breaking) | safety | 15m |
-| 25 | **Deprecate v1 API timeline** | clarity | 10m |
+| #   | Task                                                                                          | Impact               | Effort |
+| --- | --------------------------------------------------------------------------------------------- | -------------------- | ------ |
+| 1   | **Release v2.10.0** — tag + push; unblocks all consumers                                      | 🔴 critical          | 10m    |
+| 2   | **Update CHANGELOG.md** for v2.10.0 (4 new APIs + SilenceUsage + ExitCode)                    | 🔴 critical          | 10m    |
+| 3   | **Update TODO_LIST.md** — test count, new APIs, completed items                               | 🔴 high              | 10m    |
+| 4   | **Update FEATURES.md** — scoped flags, hidden tag, escape hatch, ConfigFromContext            | 🔴 high              | 10m    |
+| 5   | **Update docs/API.md** — add WithPostFlagParse, ConfigFromContext to tables                   | 🟡 medium            | 10m    |
+| 6   | **Migrate BuildFlow** — replace `configFromCmd` → `ConfigFromContext`                         | 🔴 high (proves API) | 30m    |
+| 7   | **Migrate BuildFlow** — replace `hideAdvancedFlags` → `hidden:"true"` tags                    | 🔴 high              | 15m    |
+| 8   | **Migrate BuildFlow** — replace `PersistentPreRunE` wrap → `WithPostFlagParse`                | 🔴 high              | 20m    |
+| 9   | **Add failure-cleanup hook** (`WithCleanup`/`OnRunError`) — PostRunE doesn't fire on error    | 🔴 mission           | 30m    |
+| 10  | **Set CODECOV_TOKEN** in GitHub secrets                                                       | hygiene              | 5m     |
+| 11  | **Bump go.mod → go 1.26.4** when nixpkgs ships it (CVEs)                                      | security             | 5m     |
+| 12  | **Own error display in fang-off mode** (make cmdguard the single owner)                       | mission              | 30m    |
+| 13  | **Add `examples/escape-hatch/`** — demonstrates raw cobra + ConfigFromContext + PostFlagParse | adoption             | 30m    |
+| 14  | **Second example app** (different domain — server/devtool) to validate contract               | adoption             | 60m    |
+| 15  | **Reset-global-state audit** — ensure parallel tests don't pollute COW registries             | reliability          | 30m    |
+| 16  | **Write `docs/COBRA_FOOTGUNS.md`** — explicit list of traps cmdguard closes                   | adoption             | 20m    |
+| 17  | **Add fuzz corpus** under `testdata/fuzz/`                                                    | robustness           | 20m    |
+| 18  | **FlagRegistry interface abstraction** (enables mocking)                                      | extensibility        | 40m    |
+| 19  | **Custom per-flag validation hooks** (beyond `required`)                                      | power                | 30m    |
+| 20  | **v3.0 API design document** (scope before code)                                              | strategic            | 60m    |
+| 21  | **`flagtags` library extraction** (defer to v3)                                               | strategic            | 120m   |
+| 22  | **Rename `Get[T]`→`GetService[T]`** (v3 breaking)                                             | clarity              | 30m    |
+| 23  | **Generic `RegisterInScope[T]`** (v3 breaking)                                                | type-safety          | 30m    |
+| 24  | **Remove `SetConfig` footgun** (v3 breaking)                                                  | safety               | 15m    |
+| 25  | **Deprecate v1 API timeline**                                                                 | clarity              | 10m    |
 
 ---
 
@@ -156,7 +164,7 @@ Sorted by **impact × readiness** (consumer value first, then mission, then hygi
 >
 > Argument for **release now**: the APIs are tested, documented, and BuildFlow already consumes scoped flags via `replace`. Releasing lets other consumers benefit immediately.
 >
-> Argument for **migrate BuildFlow first**: unit tests prove correctness but not *fit*. If migrating BuildFlow reveals a design flaw in `ConfigFromContext` or `WithPostFlagParse` (wrong signature, missing parameter), fixing it post-release means a v2.10.1 or a v2.11.0 — semver churn for something preventable.
+> Argument for **migrate BuildFlow first**: unit tests prove correctness but not _fit_. If migrating BuildFlow reveals a design flaw in `ConfigFromContext` or `WithPostFlagParse` (wrong signature, missing parameter), fixing it post-release means a v2.10.1 or a v2.11.0 — semver churn for something preventable.
 >
 > I can't resolve this alone because it's a **risk tolerance** call: ship-fast-and-iterate vs prove-in-production-first. My instinct is **migrate BuildFlow first** (it's ~60 min and de-risks the release entirely), but if you want v2.10.0 tagged today I'll do that instead.
 
@@ -164,32 +172,32 @@ Sorted by **impact × readiness** (consumer value first, then mission, then hygi
 
 ## Health Metrics (ground truth, this session)
 
-| Metric | Value |
-|--------|-------|
-| Branch | `master` (clean, up to date with origin) |
-| Commits this session | 9 (`8db8275..2d50def`) |
-| Build | ✅ `go build ./...` clean |
-| Lint (`golangci-lint`) | ✅ 0 issues |
-| Tests (race) | ✅ all pass |
-| Test functions | 473 PASS, 0 FAIL |
-| Subtest runs | 1355 |
-| Benchmarks | 26 |
-| Fuzz files | 1 |
-| Coverage (v2) | 86.6% |
-| Coverage (configload) | 87.5% |
-| Go version | 1.26.3 (1.26.4 blocked on nixpkgs) |
-| Working tree | clean |
+| Metric                 | Value                                    |
+| ---------------------- | ---------------------------------------- |
+| Branch                 | `master` (clean, up to date with origin) |
+| Commits this session   | 9 (`8db8275..2d50def`)                   |
+| Build                  | ✅ `go build ./...` clean                |
+| Lint (`golangci-lint`) | ✅ 0 issues                              |
+| Tests (race)           | ✅ all pass                              |
+| Test functions         | 473 PASS, 0 FAIL                         |
+| Subtest runs           | 1355                                     |
+| Benchmarks             | 26                                       |
+| Fuzz files             | 1                                        |
+| Coverage (v2)          | 86.6%                                    |
+| Coverage (configload)  | 87.5%                                    |
+| Go version             | 1.26.3 (1.26.4 blocked on nixpkgs)       |
+| Working tree           | clean                                    |
 
 ## New Public API Surface Added This Session
 
-| API | File | Purpose |
-|-----|------|---------|
-| `ExitCode(err) int` | `cli_errors_json.go` | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |
-| `ConfigFromContext[T](ctx) (*T, bool)` | `cli_command.go` | Type-safe config retrieval for raw cobra subcommands |
-| `WithPostFlagParse[T](fns...)` | `cli_options.go` | Post-parse hook: DI init, session storage, side effects |
-| `RegisterLocalCommandFlags(cmd)` | `cli_accessors.go` | Register root's local flags on a subcommand |
-| `RegisterScopedFlags(cmd)` | `flags.go` | Register flags by scope (persistent vs local) |
-| `RegisterLocalFlags(cmd)` | `flags.go` | Register only local-scoped flags on a command |
-| `hidden:"true"` tag | `config.go` + `config_parsing.go` | Exclude flag from --help, keep functional |
-| `local:"true"` tag | `config.go` + `config_parsing.go` | Root-only flag, not inherited by subcommands |
-| `SilenceUsage = true` default | `cli.go` | Kills usage-on-error footgun by default |
+| API                                    | File                              | Purpose                                                  |
+| -------------------------------------- | --------------------------------- | -------------------------------------------------------- |
+| `ExitCode(err) int`                    | `cli_errors_json.go`              | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |
+| `ConfigFromContext[T](ctx) (*T, bool)` | `cli_command.go`                  | Type-safe config retrieval for raw cobra subcommands     |
+| `WithPostFlagParse[T](fns...)`         | `cli_options.go`                  | Post-parse hook: DI init, session storage, side effects  |
+| `RegisterLocalCommandFlags(cmd)`       | `cli_accessors.go`                | Register root's local flags on a subcommand              |
+| `RegisterScopedFlags(cmd)`             | `flags.go`                        | Register flags by scope (persistent vs local)            |
+| `RegisterLocalFlags(cmd)`              | `flags.go`                        | Register only local-scoped flags on a command            |
+| `hidden:"true"` tag                    | `config.go` + `config_parsing.go` | Exclude flag from --help, keep functional                |
+| `local:"true"` tag                     | `config.go` + `config_parsing.go` | Root-only flag, not inherited by subcommands             |
+| `SilenceUsage = true` default          | `cli.go`                          | Kills usage-on-error footgun by default                  |

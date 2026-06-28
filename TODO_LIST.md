@@ -135,9 +135,9 @@ Mission pivot back to "make consumers use Cobra correctly," driven by auditing B
 
 ### P0: Open
 
-| #   | Task                                                                                                              | Files              | Effort |
-| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------ | ------ |
-| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings (requires repo owner — cannot be set programmatically)         | GitHub settings    | 5m     |
+| #   | Task                                                                                                      | Files           | Effort |
+| --- | --------------------------------------------------------------------------------------------------------- | --------------- | ------ |
+| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings (requires repo owner — cannot be set programmatically) | GitHub settings | 5m     |
 
 ### P1: Future (v3.0+)
 
