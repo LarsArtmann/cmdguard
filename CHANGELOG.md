@@ -9,6 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-06-28
+
+This release refocuses cmdguard on its founding mission — "make consumers use
+Cobra correctly." The trigger was auditing BuildFlow, the primary consumer,
+which had built four workarounds around cmdguard's gaps. Each new API below
+replaces a specific workaround. The flagship example also no longer exits 0 on
+failure or double-prints errors.
+
+### Added
+
+- **`SilenceUsage = true` by default** — Cobra's #1 footgun (dumping full usage
+  after every command error) is now off by default. Fang already forced this
+  true; now fang-off mode matches. `--help` is unaffected. Closes the core
+  "use Cobra correctly" contract
+- **`ExitCode(err) int`** — public exit-code mapping (nil → 0, `ExitCoder` → its
+  code, else → 1). `ExecuteAndExit` now uses it; consumers can call it directly
+- **Scoped flags (`local:"true"` tag)** — root-only flags that are NOT inherited
+  by subcommands. Keeps subcommand `--help` focused. Replaces the manual
+  "register this flag group again on each subcommand" pattern
+- **`hidden:"true"` flag tag** — excludes a flag from `--help` while keeping it
+  fully functional. Replaces hardcoded `flag.Hidden = true` lists keyed by name
+- **`ConfigFromContext[T](ctx) (*T, bool)`** — type-safe retrieval of the
+  resolved config for raw `*cobra.Command` subcommands (the "escape hatch" added
+  via `cli.RootCommand().AddCommand`). Eliminates the hand-rolled context-key
+  session systems consumers previously needed
+- **`WithPostFlagParse[T](fns ...)`** — a hook that runs after flag parsing and
+  config validation but before any command handler. Use for DI initialisation,
+  session storage, logging setup. Replaces the manual "save + wrap cmdguard's
+  `PersistentPreRunE`" workaround
+
+### Changed
+
+- **`examples/taskctl`** — the flagship example now exits non-zero on command
+  failure (`v2.ExitCode(execErr)` instead of `os.Exit(0)`) and no longer
+  double-prints errors. It now models the correct contract it teaches
+- **`WithPostFlagParse` execution order** — parse flags → store config in
+  context → `configValidate` → `postFlagParse` hooks → command handler
+
+### Fixed
+
+- **Flagship example exit code** — `ExecuteAndExit` now respects `ExitCoder`;
+  the example previously exited 0 even on handler errors
+
+### Security
+
+- **Go directive bumped `1.26.3` → `1.26.4`** — fixes stdlib CVEs
+  GO-2026-5037, GO-2026-5038, GO-2026-5039 (one reachable via
+  `ExitError.Error` → `crypto/x509`). Unblocked now that nixpkgs ships
+  `go_1_26 >= 1.26.4`
+
+### Removed
+
+- **`makezero` linter disabled** in `.golangci.yml` — it directly conflicts with
+  staticcheck `S1019` (makezero wants `make([]T, 0, N)` + append; staticcheck
+  flags the equivalent `make([]T, N, N)` as redundant). Keeping both is impossible
+
 ## [2.9.0] - 2026-06-22
 
 ### Changed
