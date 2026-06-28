@@ -86,6 +86,7 @@ Functional options:
 | `WithConfigFileLoader[T](l,p)`     | Load config with custom loader (YAML/TOML) |
 | `WithGlamourHelp[T]()`             | Render markdown in command help text       |
 | `WithTelemetry[T](tracer)`         | OpenTelemetry spans for all commands       |
+| `WithPostFlagParse[T](fns...)`     | Post-parse hook: DI init, session storage  |
 
 ### CLI[T] Methods
 
@@ -248,6 +249,39 @@ cmd, err := v2.NewCommand[AppConfig, *Flags]("example", runHandler,
     }),
 )
 ```
+
+### Raw Cobra Subcommands (Escape Hatch)
+
+Consumers migrating from plain Cobra can register raw `*cobra.Command` subcommands
+via `cli.RootCommand().AddCommand(...)`. cmdguard stores the resolved config in the
+command context during `PersistentPreRunE`, so raw handlers retrieve it without a
+parallel context-key system:
+
+```go
+cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+    // Initialise DI / store session once flags are parsed
+    v2.WithPostFlagParse[Config](func(cmd *cobra.Command, cfg *Config) error {
+        return initDI(cfg) // runs after parsing + config validation
+    }),
+)
+
+root := cli.RootCommand()
+root.AddCommand(&cobra.Command{
+    Use: "raw",
+    RunE: func(cmd *cobra.Command, _ []string) error {
+        cfg, ok := v2.ConfigFromContext[Config](cmd.Context())
+        if !ok {
+            return errors.New("config not initialised")
+        }
+        // use cfg...
+        return nil
+    },
+})
+```
+
+Scoped flags (`local:"true"`) keep root-only flags out of subcommand `--help`. Use
+`cli.RegisterLocalCommandFlags(cmd)` to re-register a local flag group on a
+subcommand that needs it (e.g. one that re-runs the root pipeline).
 
 ### Middleware
 
