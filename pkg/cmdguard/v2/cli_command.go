@@ -11,6 +11,8 @@ type contextKeyType struct{}
 
 var argsKey = contextKeyType{}
 
+var configKey = contextKeyType{}
+
 // ArgsFromContext retrieves the positional arguments passed to the current command.
 // Use this in RunE handlers to access positional args, since cmdguard's RunE
 // signature does not include a []string args parameter.
@@ -24,6 +26,31 @@ func ArgsFromContext(ctx context.Context) []string {
 	}
 
 	return nil
+}
+
+// ConfigFromContext retrieves the typed config pointer stored by cmdguard's
+// PersistentPreRunE. This is the bridge for consumers that register raw
+// *cobra.Command subcommands (via cli.RootCommand().AddCommand) and need
+// access to the resolved config without building a parallel context-key system.
+//
+// Returns (*T, true) when the config was stored; (nil, false) when it was not
+// (e.g., in unit tests calling RunE directly without going through Execute).
+//
+// Usage with a raw cobra subcommand:
+//
+//	func(cmd *cobra.Command, _ []string) error {
+//	    cfg, ok := v2.ConfigFromContext[MyConfig](cmd.Context())
+//	    if !ok { return errors.New("config not initialized") }
+//	    // use cfg.Field...
+//	}
+func ConfigFromContext[T any](ctx context.Context) (*T, bool) {
+	if ctx == nil {
+		return nil, false
+	}
+
+	cfg, ok := ctx.Value(configKey).(*T)
+
+	return cfg, ok
 }
 
 // prepareRunContext extracts context from cobra, parses flags, and returns both.

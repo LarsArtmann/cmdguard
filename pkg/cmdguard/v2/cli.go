@@ -159,6 +159,12 @@ func (cli *CLI[T]) initialize(defaults T) error {
 			return fmt.Errorf("parsing global flags: %w", err)
 		}
 
+		// Store the resolved config in the command context so raw cobra
+		// subcommands (added via cli.RootCommand().AddCommand) can access it
+		// via ConfigFromContext[T](cmd.Context()) without a parallel
+		// context-key system.
+		c.SetContext(context.WithValue(c.Context(), configKey, cli.config))
+
 		if cli.configValidate != nil {
 			if err := cli.configValidate(cli.config); err != nil {
 				return fmt.Errorf("%w: %w", ErrConfigValidation, err)
