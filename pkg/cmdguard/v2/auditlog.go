@@ -81,7 +81,7 @@ func supportedAuditLogFormatNames() []string {
 		return strings.Compare(string(a), string(b))
 	})
 
-	names := make([]string, len(keys))
+	names := make([]string, len(keys), len(keys))
 	for i, k := range keys {
 		names[i] = string(k)
 	}

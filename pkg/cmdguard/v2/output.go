@@ -91,7 +91,7 @@ func RegisteredFormats() []OutputFormat {
 func formatShapes(f output.Format) string {
 	shapes := f.Shapes()
 	if len(shapes) > 0 {
-		names := make([]string, len(shapes))
+		names := make([]string, len(shapes), len(shapes))
 		for i, s := range shapes {
 			names[i] = string(s)
 		}

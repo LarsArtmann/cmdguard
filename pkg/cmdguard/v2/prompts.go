@@ -37,7 +37,7 @@ func (h *huhPromptRunner) PromptString(title, defaultValue string) (string, erro
 func (h *huhPromptRunner) PromptSelect(title string, options []string) (string, error) {
 	var result string
 
-	opts := make([]huh.Option[string], len(options))
+	opts := make([]huh.Option[string], len(options), len(options))
 	for i, o := range options {
 		opts[i] = huh.NewOption(o, o)
 	}
