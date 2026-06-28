@@ -161,20 +161,15 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		tag.Values = strings.Split(values, ",")
 	}
 
-	// Parse required tag
-	if req := field.Tag.Get("required"); req != "" {
-		required, err := strconv.ParseBool(req)
-		if err != nil {
-			return FlagTag{}, false, fmt.Errorf(
-				"field %q: invalid required tag %q: %w",
-				field.Name,
-				req,
-				err,
-			)
-		}
-
-		tag.Required = required
+	// Parse required, count, and local boolean tags in one pass.
+	bools, err := parseBoolTags(field)
+	if err != nil {
+		return FlagTag{}, false, err
 	}
+
+	tag.Required = bools.Required
+	tag.Count = bools.Count
+	tag.Local = bools.Local
 
 	// Parse validate tag
 	if validate := field.Tag.Get("validate"); validate != "" {
@@ -186,25 +181,52 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		tag.Env = env
 	}
 
-	// Parse count tag (for -vvv → 3 counting flags)
-	if cnt := field.Tag.Get("count"); cnt != "" {
-		count, err := strconv.ParseBool(cnt)
-		if err != nil {
-			return FlagTag{}, false, fmt.Errorf(
-				"field %q: invalid count tag %q: %w",
-				field.Name, cnt, err,
-			)
-		}
-
-		tag.Count = count
-	}
-
 	// Parse prompt tag (interactive prompt when flag is missing)
 	if prompt := field.Tag.Get("prompt"); prompt != "" {
 		tag.Prompt = prompt
 	}
 
 	return tag, true, nil
+}
+
+// boolTagSet holds the parsed boolean modifier struct tags.
+type boolTagSet struct {
+	Required bool
+	Count    bool
+	Local    bool
+}
+
+// parseBoolTags parses the required, count, and local boolean struct tags.
+// Absent tags keep their zero value (false). An invalid value returns an error
+// naming the offending tag key, matching the historical per-tag error messages.
+func parseBoolTags(field reflect.StructField) (boolTagSet, error) {
+	var out boolTagSet
+
+	for _, t := range []struct {
+		key  string
+		dest *bool
+	}{
+		{"required", &out.Required},
+		{"count", &out.Count},
+		{"local", &out.Local},
+	} {
+		raw := field.Tag.Get(t.key)
+		if raw == "" {
+			continue
+		}
+
+		value, err := strconv.ParseBool(raw)
+		if err != nil {
+			return boolTagSet{}, fmt.Errorf(
+				"field %q: invalid %s tag %q: %w",
+				field.Name, t.key, raw, err,
+			)
+		}
+
+		*t.dest = value
+	}
+
+	return out, nil
 }
 
 // parseBoolDefault parses a boolean default value.

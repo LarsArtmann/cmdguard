@@ -76,6 +76,64 @@ func (r *FlagRegistry) RegisterPersistentFlags(cmd *cobra.Command) error {
 	return r.registerAllFlags(cmd.PersistentFlags(), cmd)
 }
 
+// RegisterScopedFlags registers each flag according to its declared scope.
+// Persistent flags (the default) propagate to subcommands; local flags
+// (fields tagged local:"true") are registered on this command only and are NOT
+// inherited by subcommands. Use this on the root command when some root flags
+// are only meaningful for the root run and would otherwise pollute every
+// subcommand's --help.
+func (r *FlagRegistry) RegisterScopedFlags(cmd *cobra.Command) error {
+	for _, tag := range r.tags {
+		flagSet := cmd.PersistentFlags()
+		if tag.Local {
+			flagSet = cmd.Flags()
+		}
+
+		if err := r.registerFlag(flagSet, tag); err != nil {
+			return fmt.Errorf(
+				"%w: registering scoped flags on command %q: %w",
+				ErrFlagParseFailed,
+				cmd.Use,
+				err,
+			)
+		}
+	}
+
+	return nil
+}
+
+// RegisterLocalFlags registers only the local-scoped flags (local:"true") on the
+// command's own flag set. Use this on a subcommand that shares a group of
+// root-only flags (e.g. an execution subcommand) so those flags are accepted
+// and parsed without making them persistent across the whole command tree.
+//
+// Flags the subcommand already defines itself are skipped — the subcommand's
+// own definition wins (for example, a subcommand with its own --build-mode keeps
+// its distinct default and help). Has no effect when the config has no
+// local-scoped flags.
+func (r *FlagRegistry) RegisterLocalFlags(cmd *cobra.Command) error {
+	for _, tag := range r.tags {
+		if !tag.Local {
+			continue
+		}
+
+		if cmd.Flags().Lookup(tag.Name) != nil {
+			continue
+		}
+
+		if err := r.registerFlag(cmd.Flags(), tag); err != nil {
+			return fmt.Errorf(
+				"%w: registering local flags on command %q: %w",
+				ErrFlagParseFailed,
+				cmd.Use,
+				err,
+			)
+		}
+	}
+
+	return nil
+}
+
 // registerAllFlags registers all flags to the given flag set.
 func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Command) error {
 	for _, tag := range r.tags {
@@ -148,6 +206,13 @@ func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) err
 	}
 
 	flag := r.lookupFlagForValidation(cmd, tag.Name)
+
+	// A local flag is only present on the command it was registered on; it
+	// cannot be required on a command where it does not exist.
+	if flag == nil && tag.Local {
+		return nil
+	}
+
 	if flag == nil || !flag.Changed {
 		return fmt.Errorf(
 			"required flag %q not set on command %q: %w",

@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.3
+  go: 1.26.4
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -11,6 +11,7 @@ run:
   modules-download-mode: readonly
   allow-parallel-runners: true
   allow-serial-runners: true
+  issues-exit-code: 1
 output:
   formats: {}
 linters:
@@ -232,6 +233,9 @@ linters:
     funlen:
       lines: 80
       statements: 60
+    ginkgolinter:
+      forbid-focus-container: true
+      forbid-spec-pollution: true
     gocognit:
       min-complexity: 35
     gocritic:
@@ -246,6 +250,8 @@ linters:
         - anon
         - stdlib
         - generic
+    makezero:
+      always: true
     nestif:
       min-complexity: 6
     revive:
@@ -259,6 +265,10 @@ linters:
         rules:
           json: snake
           yaml: snake
+    testifylint:
+      disable:
+        - go-require
+      enable-all: true
     varnamelen:
       ignore-map-index-ok: true
       ignore-names:

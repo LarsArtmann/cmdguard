@@ -114,6 +114,20 @@ func (cli *CLI[T]) AddGlobalBoolFlag(name, shorthand string, defaultValue bool, 
 	cli.rootCmd.PersistentFlags().BoolP(name, shorthand, defaultValue, help)
 }
 
+// RegisterLocalCommandFlags registers the CLI's local-scoped flags (fields
+// tagged local:"true" on the root config) on the given subcommand's own flag
+// set. Use this for subcommands that share a group of root-only flags (for
+// example, execution subcommands) so those flags are accepted and parsed on the
+// subcommand without making them persistent across the whole command tree.
+// Returns nil if the CLI has no flag registry or no local-scoped flags.
+func (cli *CLI[T]) RegisterLocalCommandFlags(cmd *cobra.Command) error {
+	if cli.registry == nil {
+		return nil
+	}
+
+	return cli.registry.RegisterLocalFlags(cmd)
+}
+
 // NoColor returns true if --no-color was explicitly passed by the user.
 func (cli *CLI[T]) NoColor() bool {
 	if cli.noColorFlag == nil {

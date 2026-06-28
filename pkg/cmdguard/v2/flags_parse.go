@@ -22,18 +22,28 @@ func (r *FlagRegistry) ParseFlags(cmd *cobra.Command, cfg any) error {
 
 // parseFlag reads a flag value and sets it on the config struct.
 // Priority: explicit flag > environment variable > default value.
+//
+// Local-scoped flags (local:"true") exist only on the command they were
+// registered on. When the running command does not have such a flag, no
+// explicit value is possible, but the declared default (and env override, if
+// any) still applies — a default is a default regardless of which command runs.
 func (r *FlagRegistry) parseFlag(cmd *cobra.Command, cfg any, tag FlagTag) error {
 	flag, err := r.lookupFlag(cmd, tag)
 	if err != nil {
-		return fmt.Errorf("looking up flag %q on command %q: %w", tag.Name, cmd.Use, err)
+		if !tag.Local {
+			return fmt.Errorf("looking up flag %q on command %q: %w", tag.Name, cmd.Use, err)
+		}
+
+		// Local flag is legitimately absent on this command: no explicit value.
+		flag = nil
 	}
 
 	var value string
 
 	hasValue := false
 
-	// Priority 1: explicit flag value
-	if flag.Changed {
+	// Priority 1: explicit flag value (only when the flag exists and was set).
+	if flag != nil && flag.Changed {
 		value = flag.Value.String()
 		hasValue = true
 	}

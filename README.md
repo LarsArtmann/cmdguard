@@ -21,13 +21,13 @@ without having to learn its traps the hard way.
 
 **What cmdguard fixes by default (the parts raw Cobra gets wrong):**
 
-| Raw Cobra footgun | cmdguard default |
-| --- | --- |
-| Prints the full usage block after *every* command error (`SilenceUsage: false`) | Usage-on-error is silenced; `--help` still works |
-| Errors print twice (Cobra prints *and* `main()` prints the returned error) | cmdguard prints the error exactly once — see [Error handling](#error-handling--exit-codes) |
-| Failed commands exit `0` (easy to forget `os.Exit` with the right code) | `ExecuteAndExit` / `ExitCode(err)` map errors to correct exit codes |
-| `Run` (panics) vs `RunE` (returns error) confusion | Only error-returning handlers exist — zero panics, by construction |
-| Missing handler / duplicate command / invalid name found at runtime | Caught at `NewCommand` / `AddCommand` time |
+| Raw Cobra footgun                                                               | cmdguard default                                                                           |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Prints the full usage block after _every_ command error (`SilenceUsage: false`) | Usage-on-error is silenced; `--help` still works                                           |
+| Errors print twice (Cobra prints _and_ `main()` prints the returned error)      | cmdguard prints the error exactly once — see [Error handling](#error-handling--exit-codes) |
+| Failed commands exit `0` (easy to forget `os.Exit` with the right code)         | `ExecuteAndExit` / `ExitCode(err)` map errors to correct exit codes                        |
+| `Run` (panics) vs `RunE` (returns error) confusion                              | Only error-returning handlers exist — zero panics, by construction                         |
+| Missing handler / duplicate command / invalid name found at runtime             | Caught at `NewCommand` / `AddCommand` time                                                 |
 
 **Plus: flags are typed structs, validated at construction — no stringly-typed lookups:**
 
@@ -267,7 +267,7 @@ v2.NewCommand[AppConfig, *Flags]("deploy", runHandler,
 ```
 
 `PostRunE` only fires on success — Cobra semantics. For cleanup that must run
- even on failure, put `defer` directly inside your `RunE` handler.
+even on failure, put `defer` directly inside your `RunE` handler.
 
 ---
 
@@ -357,24 +357,24 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 )
 ```
 
-| Option                                 | Purpose                                         |
-| -------------------------------------- | ----------------------------------------------- |
-| `WithCLIVersion[T](v)`                 | Version string                                  |
-| `WithCLILong[T](desc)`                 | Long description                                |
-| `WithSilenceErrors[T]()`               | Suppress error printing (advanced; fang handles this) |
+| Option                                 | Purpose                                                       |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `WithCLIVersion[T](v)`                 | Version string                                                |
+| `WithCLILong[T](desc)`                 | Long description                                              |
+| `WithSilenceErrors[T]()`               | Suppress error printing (advanced; fang handles this)         |
 | `WithSilenceUsage[T]()`                | Suppress usage on error (**default**; kept for compatibility) |
-| `WithFang[T](bool)`                    | Styled help output                              |
-| `WithEnvPrefix[T](prefix)`             | Prefix for env vars                             |
-| `WithSignalHandling[T]()`              | Cancel context on SIGINT/SIGTERM                |
-| `WithMiddleware[T](mw...)`             | Middleware for all commands                     |
-| `WithGroup[T](id, title)`              | Help group on root                              |
-| `WithConfigValidation[T](fn)`          | Validate config after flag parsing              |
-| `WithStrictValidation[T]()`            | Require `WithShort` on all commands             |
-| `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands |
-| `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path     |
-| `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML)      |
-| `WithGlamourHelp[T]()`                 | Render markdown in command help text            |
-| `WithTelemetry[T](tracer)`             | OpenTelemetry spans for all commands            |
+| `WithFang[T](bool)`                    | Styled help output                                            |
+| `WithEnvPrefix[T](prefix)`             | Prefix for env vars                                           |
+| `WithSignalHandling[T]()`              | Cancel context on SIGINT/SIGTERM                              |
+| `WithMiddleware[T](mw...)`             | Middleware for all commands                                   |
+| `WithGroup[T](id, title)`              | Help group on root                                            |
+| `WithConfigValidation[T](fn)`          | Validate config after flag parsing                            |
+| `WithStrictValidation[T]()`            | Require `WithShort` on all commands                           |
+| `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands               |
+| `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path                   |
+| `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML)                    |
+| `WithGlamourHelp[T]()`                 | Render markdown in command help text                          |
+| `WithTelemetry[T](tracer)`             | OpenTelemetry spans for all commands                          |
 
 ---
 
