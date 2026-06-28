@@ -170,6 +170,9 @@ HELLO, CMDGUARD!
 | **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
 | **Zero panics**            | All functions return errors; no Must\* panic variants                                                   |
+| **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime |
+| **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                           |
+| **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                      |
 | **430+ tests**             | 86.6% coverage, race-detected, fuzz-tested                                                              |
 
 ---
@@ -271,6 +274,40 @@ even on failure, put `defer` directly inside your `RunE` handler.
 
 ---
 
+## Raw Cobra Subcommands (Escape Hatch)
+
+cmdguard's `Command[T,F]` is great for new commands, but real apps often mix
+raw `*cobra.Command` subcommands (gradual migration, third-party commands, or
+commands that don't fit the typed-flags pattern). cmdguard provides three APIs
+to bridge raw cobra commands with the cmdguard runtime:
+
+```go
+// 1. Register raw subcommands on cmdguard's root
+cli.RootCommand().AddCommand(myRawCmd)
+
+// 2. Access resolved config from any cobra command context
+func(cmd *cobra.Command, _ []string) error {
+    cfg, ok := v2.ConfigFromContext[AppConfig](cmd.Context())
+    if !ok { return errors.New("config not initialized") }
+    // use cfg.Field...
+}
+
+// 3. Run initialization (DI, logging, session) after flag parsing
+cli, _ := v2.NewCLI[AppConfig]("app", "...", AppConfig{},
+    v2.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
+        // Flags are parsed, config is resolved, context is stored.
+        // Initialize DI, set up logging, store session for subcommands.
+        return initDI(cfg)
+    }),
+)
+```
+
+**Scoped flags** (`local:"true"`) prevent root-only flags from polluting every
+subcommand's `--help`. Use `cli.RegisterLocalCommandFlags(cmd)` on subcommands
+that need the root's execution-flag group.
+
+---
+
 ## Built-in Value Types
 
 | Type       | Validation                         |
@@ -303,18 +340,22 @@ type Flags struct {
     Verbose int    `flag:"verbose" short:"v" help:"Verbosity" count:"true"`
     Host    string `flag:"host"             default:"localhost" env:"DB_HOST" help:"DB host"`
     Mode    string `flag:"mode"  required:"true"                help:"Required!"`
+    Build   string `flag:"build" local:"true"  default:"full"   help:"Root-only flag"`
+    Debug   string `flag:"debug" hidden:"true"                  help:"Hidden from --help"`
 }
 ```
 
-| Tag        | Purpose              | Example                |
-| ---------- | -------------------- | ---------------------- |
-| `flag`     | Flag name (required) | `flag:"name"`          |
-| `short`    | Short flag           | `short:"n"`            |
-| `default`  | Default value        | `default:"World"`      |
-| `help`     | Help text            | `help:"Name to greet"` |
-| `env`      | Environment variable | `env:"DB_HOST"`        |
-| `required` | Mark as required     | `required:"true"`      |
-| `count`    | Counting flag        | `count:"true"`         |
+| Tag        | Purpose                                  | Example                |
+| ---------- | ---------------------------------------- | ---------------------- |
+| `flag`     | Flag name (required)                     | `flag:"name"`          |
+| `short`    | Short flag                               | `short:"n"`            |
+| `default`  | Default value                            | `default:"World"`      |
+| `help`     | Help text                                | `help:"Name to greet"` |
+| `env`      | Environment variable                     | `env:"DB_HOST"`        |
+| `required` | Mark as required                         | `required:"true"`      |
+| `count`    | Counting flag                            | `count:"true"`         |
+| `local`    | Root-only, not inherited by subcommands  | `local:"true"`         |
+| `hidden`   | Exclude from --help but stay functional  | `hidden:"true"`        |
 
 ---
 
@@ -354,6 +395,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
     v2.WithMiddleware[AppConfig](myMiddleware),     // Wrap all handlers
     v2.WithStrictValidation[AppConfig](),           // Require WithShort on commands
     v2.WithConfigValidation[AppConfig](validateFn), // Validate config after parsing
+    v2.WithPostFlagParse[AppConfig](initFn),        // DI init / session storage after flags
 )
 ```
 
@@ -369,6 +411,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithMiddleware[T](mw...)`             | Middleware for all commands                                   |
 | `WithGroup[T](id, title)`              | Help group on root                                            |
 | `WithConfigValidation[T](fn)`          | Validate config after flag parsing                            |
+| `WithPostFlagParse[T](fn...)`          | Post-parse hook: DI init, session storage                     |
 | `WithStrictValidation[T]()`            | Require `WithShort` on all commands                           |
 | `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands               |
 | `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path                   |
