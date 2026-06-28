@@ -75,7 +75,7 @@ linters:
     - ireturn
     - loggercheck
     - maintidx
-    - makezero
+    # - makezero  # conflicts with staticcheck S1019 (redundant capacity == length)
     - mirror
     - misspell
     - mnd

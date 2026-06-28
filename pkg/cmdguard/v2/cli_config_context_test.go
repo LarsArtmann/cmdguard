@@ -48,7 +48,7 @@ func TestConfigFromContext_StoredByPreRunE(t *testing.T) {
 func TestConfigFromContext_NilContext(t *testing.T) {
 	t.Parallel()
 
-	cfg, ok := ConfigFromContext[ctxTestConfig](nil)
+	cfg, ok := ConfigFromContext[ctxTestConfig](context.TODO())
 	if ok {
 		t.Error("expected ok=false for nil context")
 	}
