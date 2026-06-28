@@ -137,6 +137,23 @@ func WithConfigValidation[T any](validate func(*T) error) CLIOption[T] {
 	}
 }
 
+// WithPostFlagParse adds a hook that runs after flag parsing, config storage in
+// context, and config validation — but before any command handler. Use this for
+// side effects that depend on the resolved config (initializing DI, setting up
+// logging, storing session data in the command context for raw cobra subcommands).
+//
+// The hook receives the cobra command (so you can call cmd.SetContext, cmd.Flags,
+// etc.) and a pointer to the resolved config. Multiple hooks run in registration
+// order; any error stops execution.
+//
+// This replaces the manual "save + wrap cmdguard's PersistentPreRunE" workaround
+// that consumers previously needed.
+func WithPostFlagParse[T any](fns ...func(cmd *cobra.Command, cfg *T) error) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.postFlagParse = append(cli.postFlagParse, fns...)
+	}
+}
+
 // WithStrictValidation enables strict command validation:
 //   - All commands must have a short description
 func WithStrictValidation[T any]() CLIOption[T] {

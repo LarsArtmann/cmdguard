@@ -38,6 +38,7 @@ type CLI[T any] struct {
 	outputFormat     OutputFormat
 	validationMode   ValidationMode
 	configValidate   func(*T) error
+	postFlagParse    []func(*cobra.Command, *T) error
 	configFilePaths  []string
 	configFileLoader ConfigFileLoader
 	glamourHelp      bool
@@ -168,6 +169,12 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		if cli.configValidate != nil {
 			if err := cli.configValidate(cli.config); err != nil {
 				return fmt.Errorf("%w: %w", ErrConfigValidation, err)
+			}
+		}
+
+		for _, fn := range cli.postFlagParse {
+			if err := fn(c, cli.config); err != nil {
+				return fmt.Errorf("post-flag-parse hook: %w", err)
 			}
 		}
 
