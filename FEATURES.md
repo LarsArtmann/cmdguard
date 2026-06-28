@@ -37,7 +37,7 @@
 | `WithCLILong[T](desc)`         | ✅ FULLY_FUNCTIONAL | Set long description                          |
 | `WithCLIScope[T](scope)`       | ✅ FULLY_FUNCTIONAL | Custom DI scope                               |
 | `WithSilenceErrors[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing                 |
-| `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error                       |
+| `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error (now the default)     |
 | `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling                   |
 | `WithFangOptions[T](opts...)`  | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
 | `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                        |
@@ -54,6 +54,21 @@
 | `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
 | `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands            |
 | `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text (auto theme) |
+| `WithPostFlagParse[T](fns...)` | ✅ FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage      |
+
+### Cobra Escape Hatch (Raw Cobra Subcommands)
+
+For consumers that register raw `*cobra.Command` subcommands via
+`cli.RootCommand().AddCommand` (gradual migration from plain Cobra). These APIs
+bridge the typed cmdguard world to raw cobra handlers.
+
+| Feature                                 | Status              | Notes                                                       |
+| --------------------------------------- | ------------------- | ----------------------------------------------------------- |
+| `ConfigFromContext[T](ctx)`             | ✅ FULLY_FUNCTIONAL | Type-safe config retrieval for raw cobra RunE handlers      |
+| `ArgsFromContext(ctx)`                  | ✅ FULLY_FUNCTIONAL | Positional args for RunE handlers                           |
+| `RegisterLocalCommandFlags(cmd)`        | ✅ FULLY_FUNCTIONAL | Register root's local-scoped flags on a subcommand          |
+| `RegisterScopedFlags(cmd)`              | ✅ FULLY_FUNCTIONAL | Register flags by scope (persistent vs local) on a command  |
+| `RegisterLocalFlags(cmd)`               | ✅ FULLY_FUNCTIONAL | Register only local-scoped flags on a command               |
 
 ### Command[T, F]
 
@@ -81,6 +96,8 @@
 | `RegisterTypeHandler()`       | ✅ FULLY_FUNCTIONAL | Register custom flag types                              |
 | Iterator methods (`iter.Seq`) | ✅ FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq             |
 | Integer overflow validation   | ✅ FULLY_FUNCTIONAL | int8/16/32, uint8/16 range-checked → ErrIntegerOverflow |
+| Scoped flags (`local:"true"`)  | ✅ FULLY_FUNCTIONAL | Root-only flags not inherited by subcommands                            |
+| Hidden flags (`hidden:"true"`) | ✅ FULLY_FUNCTIONAL | Exclude from --help, stay functional                                     |
 
 ### Value Types
 
@@ -260,6 +277,7 @@
 | 60 sentinel errors        | ✅ FULLY_FUNCTIONAL | ErrInvalidCommand, ErrMissingHandler, etc.  |
 | Typed errors              | ✅ FULLY_FUNCTIONAL | CommandError, FlagError, ServiceError, etc. |
 | `ExitCoder` / `ExitError` | ✅ FULLY_FUNCTIONAL | Custom exit codes for ExecuteAndExit        |
+| `ExitCode(err) int`       | ✅ FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |
 
 ---
 
