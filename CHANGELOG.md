@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.1] - 2026-07-02
+
+### Changed
+
+- Bump `go-output` from v0.17.2 to v0.23.0 (all 10 direct sub-modules updated)
+- Bump `go-toml/v2` from v2.4.0 to v2.4.2
+
+### Removed
+
+- Drop `go-output/enum` and `go-output/envdetect` indirect dependencies (absorbed into go-output core)
+
+### Docs
+
+- Normalize table column padding across all markdown files (FEATURES.md, README.md, TODO_LIST.md, docs/)
+- Update .gitignore and flake.lock
+
 ## [2.10.0] - 2026-06-28
 
 This release refocuses cmdguard on its founding mission — "make consumers use
