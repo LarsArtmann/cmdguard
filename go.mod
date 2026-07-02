@@ -12,16 +12,16 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/larsartmann/go-output v0.19.0
-	github.com/larsartmann/go-output/d2 v0.18.0
-	github.com/larsartmann/go-output/delimited v0.18.0
-	github.com/larsartmann/go-output/graph v0.18.0
-	github.com/larsartmann/go-output/markdown v0.18.0
-	github.com/larsartmann/go-output/markup v0.18.0
-	github.com/larsartmann/go-output/plantuml v0.18.0
-	github.com/larsartmann/go-output/serialization v0.18.0
-	github.com/larsartmann/go-output/table v0.18.0
-	github.com/larsartmann/go-output/tree v0.18.0
+	github.com/larsartmann/go-output v0.23.0
+	github.com/larsartmann/go-output/d2 v0.22.0
+	github.com/larsartmann/go-output/delimited v0.22.0
+	github.com/larsartmann/go-output/graph v0.22.0
+	github.com/larsartmann/go-output/markdown v0.22.0
+	github.com/larsartmann/go-output/markup v0.22.0
+	github.com/larsartmann/go-output/plantuml v0.22.0
+	github.com/larsartmann/go-output/serialization v0.22.0
+	github.com/larsartmann/go-output/table v0.22.0
+	github.com/larsartmann/go-output/tree v0.22.0
 	github.com/larsartmann/samber-do-auditlog v0.3.0
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
@@ -35,7 +35,7 @@ require (
 	golang.org/x/term v0.44.0
 )
 
-require github.com/larsartmann/go-output/escape v0.18.0 // indirect
+require github.com/larsartmann/go-output/escape v0.22.0 // indirect
 
 require (
 	charm.land/bubbles/v2 v2.1.0 // indirect
@@ -50,10 +50,9 @@ require (
 	github.com/charmbracelet/ultraviolet v0.0.0-20260622092850-f39628c8a989 // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
 	github.com/charmbracelet/x/conpty v0.2.0 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260628005914-6eb80f72a239 // indirect
-	github.com/charmbracelet/x/exp/golden v0.0.0-20260621010513-945fab64fd3e // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260629091435-9c70f75e26a4 // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
-	github.com/charmbracelet/x/exp/slice v0.0.0-20260628005914-6eb80f72a239 // indirect
+	github.com/charmbracelet/x/exp/slice v0.0.0-20260629091435-9c70f75e26a4 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect

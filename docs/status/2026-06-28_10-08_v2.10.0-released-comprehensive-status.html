@@ -1,370 +1,1026 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>cmdguard — v2.10.0 Released · Comprehensive Status · 2026-06-28</title>
-<style>
-  :root {
-    --color-graphite: #0e0e10;
-    --color-graphite-2: #18181d;
-    --color-graphite-3: #16161a;
-    --color-bone: #f4f4f0;
-    --color-red: #ff6b6b;
-    --color-blue: #6eb5ff;
-    --color-yellow: #f4d35e;
-    --color-amber: #ffb347;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard — v2.10.0 Released · Comprehensive Status · 2026-06-28</title>
+    <style>
+      :root {
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
 
-    --surface: var(--color-graphite);
-    --surface-raised: var(--color-graphite-2);
-    --surface-sunken: var(--color-graphite-3);
-    --text: var(--color-bone);
-    --text-muted: #a8a8a0;
-    --text-faint: #6b6b66;
-    --border: #2a2a30;
-    --border-strong: #3a3a44;
-    --accent: var(--color-amber);
-    --problem: var(--color-red);
-    --solution: var(--color-blue);
-    --warning: var(--color-yellow);
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: #a8a8a0;
+        --text-faint: #6b6b66;
+        --border: #2a2a30;
+        --border-strong: #3a3a44;
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
 
-    --radius: 0px;
-    --font-heading: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    background: var(--surface);
-    color: var(--text);
-    font-family: var(--font-body);
-    line-height: 1.6;
-    font-size: 15px;
-    -webkit-font-smoothing: antialiased;
-  }
-  .layout { display: flex; max-width: 1400px; margin: 0 auto; gap: 48px; padding: 0 24px; }
-  .sidebar {
-    position: sticky; top: 0; align-self: flex-start;
-    height: 100vh; width: 240px; flex-shrink: 0;
-    overflow-y: auto; padding: 32px 0;
-  }
-  .sidebar nav a {
-    display: block; padding: 7px 14px; margin-left: 2px;
-    border-left: 2px solid transparent; color: var(--text-muted);
-    text-decoration: none; font-size: 13.5px; border-radius: 0;
-    transition: color .15s, border-color .15s, background .15s;
-  }
-  .sidebar nav a:hover { color: var(--text); border-left-color: var(--accent); background: var(--surface-sunken); }
-  .sidebar .label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--text-faint); padding: 0 14px; margin: 18px 0 6px; font-weight: 700; }
-  .main { flex: 1; min-width: 0; padding: 40px 0 80px; }
+        --radius: 0px;
+        --font-heading: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        line-height: 1.6;
+        font-size: 15px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .layout {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+        gap: 48px;
+        padding: 0 24px;
+      }
+      .sidebar {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        height: 100vh;
+        width: 240px;
+        flex-shrink: 0;
+        overflow-y: auto;
+        padding: 32px 0;
+      }
+      .sidebar nav a {
+        display: block;
+        padding: 7px 14px;
+        margin-left: 2px;
+        border-left: 2px solid transparent;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 13.5px;
+        border-radius: 0;
+        transition:
+          color 0.15s,
+          border-color 0.15s,
+          background 0.15s;
+      }
+      .sidebar nav a:hover {
+        color: var(--text);
+        border-left-color: var(--accent);
+        background: var(--surface-sunken);
+      }
+      .sidebar .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-faint);
+        padding: 0 14px;
+        margin: 18px 0 6px;
+        font-weight: 700;
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+        padding: 40px 0 80px;
+      }
 
-  .hero { padding: 24px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
-  .hero-badge { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; padding: 4px 10px; background: var(--accent); color: #1a1306; margin-bottom: 16px; }
-  .hero h1 { font-size: 34px; font-weight: 900; letter-spacing: -.02em; margin: 0 0 10px; line-height: 1.1; }
-  .hero-subtitle { font-size: 16px; color: var(--text-muted); margin: 0; max-width: 720px; }
-  .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .tag { font-size: 12px; padding: 3px 9px; border: 1px solid var(--border-strong); color: var(--text-muted); font-family: var(--font-mono); }
-  .tag.amber { border-color: var(--accent); color: var(--accent); }
+      .hero {
+        padding: 24px 0 28px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 36px;
+      }
+      .hero-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        background: var(--accent);
+        color: #1a1306;
+        margin-bottom: 16px;
+      }
+      .hero h1 {
+        font-size: 34px;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        margin: 0 0 10px;
+        line-height: 1.1;
+      }
+      .hero-subtitle {
+        font-size: 16px;
+        color: var(--text-muted);
+        margin: 0;
+        max-width: 720px;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .tag {
+        font-size: 12px;
+        padding: 3px 9px;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+      .tag.amber {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
 
-  h2 { font-size: 23px; font-weight: 800; letter-spacing: -.015em; margin: 52px 0 18px; padding-top: 8px; border-top: 1px solid var(--border); display: flex; align-items: baseline; gap: 14px; }
-  h2 .num { font-family: var(--font-mono); font-size: 14px; color: var(--accent); font-weight: 700; }
-  h3 { font-size: 17px; font-weight: 700; margin: 24px 0 10px; }
-  h4 { font-size: 14.5px; font-weight: 700; margin: 0 0 4px; }
-  p { margin: 8px 0; }
-  code { font-family: var(--font-mono); font-size: 13px; background: var(--surface-sunken); padding: 1px 5px; border: 1px solid var(--border); }
-  a { color: var(--solution); }
-  ul { padding-left: 20px; margin: 8px 0; }
-  li { margin: 4px 0; }
-  strong { color: var(--text); font-weight: 700; }
-  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+      h2 {
+        font-size: 23px;
+        font-weight: 800;
+        letter-spacing: -0.015em;
+        margin: 52px 0 18px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      h3 {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 24px 0 10px;
+      }
+      h4 {
+        font-size: 14.5px;
+        font-weight: 700;
+        margin: 0 0 4px;
+      }
+      p {
+        margin: 8px 0;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background: var(--surface-sunken);
+        padding: 1px 5px;
+        border: 1px solid var(--border);
+      }
+      a {
+        color: var(--solution);
+      }
+      ul {
+        padding-left: 20px;
+        margin: 8px 0;
+      }
+      li {
+        margin: 4px 0;
+      }
+      strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 36px 0;
+      }
 
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0 4px; }
-  .stat-card { background: var(--surface-raised); border: 1px solid var(--border); padding: 18px 16px; border-left: 3px solid var(--text-faint); }
-  .stat-card.stat-good { border-left-color: var(--solution); }
-  .stat-card.stat-warn { border-left-color: var(--warning); }
-  .stat-card.stat-bad { border-left-color: var(--problem); }
-  .stat-value { font-size: 30px; font-weight: 900; line-height: 1; font-family: var(--font-mono); }
-  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 6px; letter-spacing: .02em; }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin: 20px 0 4px;
+      }
+      .stat-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 18px 16px;
+        border-left: 3px solid var(--text-faint);
+      }
+      .stat-card.stat-good {
+        border-left-color: var(--solution);
+      }
+      .stat-card.stat-warn {
+        border-left-color: var(--warning);
+      }
+      .stat-card.stat-bad {
+        border-left-color: var(--problem);
+      }
+      .stat-value {
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+        font-family: var(--font-mono);
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 6px;
+        letter-spacing: 0.02em;
+      }
 
-  .card { background: var(--surface-raised); border: 1px solid var(--border); padding: 16px 18px; margin: 12px 0; }
-  .card-problem { border-left: 3px solid var(--problem); }
-  .card-solution { border-left: 3px solid var(--solution); }
-  .card-warning { border-left: 3px solid var(--warning); }
-  .card h4 { margin-top: 0; }
-  .card .where { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); margin: 2px 0 8px; }
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 16px 18px;
+        margin: 12px 0;
+      }
+      .card-problem {
+        border-left: 3px solid var(--problem);
+      }
+      .card-solution {
+        border-left: 3px solid var(--solution);
+      }
+      .card-warning {
+        border-left: 3px solid var(--warning);
+      }
+      .card h4 {
+        margin-top: 0;
+      }
+      .card .where {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--text-faint);
+        margin: 2px 0 8px;
+      }
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      @media (max-width: 760px) {
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+      }
 
-  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
-  th { text-align: left; padding: 9px 10px; border-bottom: 2px solid var(--border-strong); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); font-weight: 700; }
-  td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  tr:hover td { background: var(--surface-sunken); }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 13.5px;
+      }
+      th {
+        text-align: left;
+        padding: 9px 10px;
+        border-bottom: 2px solid var(--border-strong);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-faint);
+        font-weight: 700;
+      }
+      td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      tr:hover td {
+        background: var(--surface-sunken);
+      }
 
-  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border: 1px solid; font-family: var(--font-mono); white-space: nowrap; }
-  .badge-critical { color: var(--problem); border-color: var(--problem); }
-  .badge-high { color: var(--warning); border-color: var(--warning); }
-  .badge-medium { color: var(--accent); border-color: var(--accent); }
-  .badge-low { color: var(--text-muted); border-color: var(--text-muted); }
-  .badge-fixed { color: var(--solution); border-color: var(--solution); }
+      .badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border: 1px solid;
+        font-family: var(--font-mono);
+        white-space: nowrap;
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+        border-color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
 
-  .callout { padding: 14px 16px; border: 1px solid var(--border); border-left-width: 3px; margin: 14px 0; }
-  .callout-solution { border-left-color: var(--solution); }
-  .callout-warning { border-left-color: var(--warning); }
-  .callout-problem { border-left-color: var(--problem); }
+      .callout {
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-left-width: 3px;
+        margin: 14px 0;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+      }
+      .callout-problem {
+        border-left-color: var(--problem);
+      }
 
-  .question-box { background: var(--surface-sunken); border: 2px solid var(--accent); padding: 24px 26px; margin: 24px 0; }
-  .question-box .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+      .question-box {
+        background: var(--surface-sunken);
+        border: 2px solid var(--accent);
+        padding: 24px 26px;
+        margin: 24px 0;
+      }
+      .question-box .eyebrow {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 8px;
+      }
 
-  .footer { margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 12.5px; font-family: var(--font-mono); }
+      .footer {
+        margin-top: 60px;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
+        color: var(--text-faint);
+        font-size: 12.5px;
+        font-family: var(--font-mono);
+      }
 
-  .commit-hash { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+      .commit-hash {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--text-faint);
+      }
 
-  @media (max-width: 1100px) {
-    .layout { display: block; padding: 0 18px; }
-    .sidebar { position: static; height: auto; width: auto; padding: 18px 0; border-bottom: 1px solid var(--border); }
-    .sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
-    .sidebar nav a { border-left: none; border-bottom: 2px solid transparent; padding: 6px 10px; }
-    .sidebar .label { display: none; }
-  }
-</style>
-</head>
-<body>
-<div class="layout">
+      @media (max-width: 1100px) {
+        .layout {
+          display: block;
+          padding: 0 18px;
+        }
+        .sidebar {
+          position: static;
+          height: auto;
+          width: auto;
+          padding: 18px 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .sidebar nav {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+        .sidebar nav a {
+          border-left: none;
+          border-bottom: 2px solid transparent;
+          padding: 6px 10px;
+        }
+        .sidebar .label {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#done">a) Fully Done</a>
+          <a href="#partial">b) Partially Done</a>
+          <a href="#notstarted">c) Not Started</a>
+          <a href="#fuckedup">d) Totally Fucked Up</a>
+          <a href="#improve">e) What To Improve</a>
+          <a href="#next25">f) Top 25 Next</a>
+          <a href="#question">g) Top Question</a>
+        </nav>
+      </aside>
 
-<aside class="sidebar">
-  <nav>
-    <div class="label">Contents</div>
-    <a href="#summary">Summary</a>
-    <a href="#done">a) Fully Done</a>
-    <a href="#partial">b) Partially Done</a>
-    <a href="#notstarted">c) Not Started</a>
-    <a href="#fuckedup">d) Totally Fucked Up</a>
-    <a href="#improve">e) What To Improve</a>
-    <a href="#next25">f) Top 25 Next</a>
-    <a href="#question">g) Top Question</a>
-  </nav>
-</aside>
+      <main class="main">
+        <div class="hero">
+          <div class="hero-badge">Status Report · v2.10.0 Shipped</div>
+          <h1>cmdguard v2.10.0 — Cobra-Correctness Mission, Released</h1>
+          <p class="hero-subtitle">
+            Full-cycle close-out: the cobra-correctness contract, the three escape-hatch APIs proven
+            in BuildFlow, the new <code>WithCleanup[T]</code>, and an honest reckoning of what
+            shipped, what's half-done, and what's genuinely broken.
+          </p>
+          <div class="hero-meta">
+            <span class="tag amber">cmdguard HEAD: 72059b2</span>
+            <span class="tag">BuildFlow HEAD: 59727199</span>
+            <span class="tag">18 commits since v2.9.0</span>
+            <span class="tag">2026-06-28 10:08 CEST</span>
+          </div>
+        </div>
 
-<main class="main">
+        <div class="stat-grid">
+          <div class="stat-card stat-good">
+            <div class="stat-value">86.7%</div>
+            <div class="stat-label">Test coverage</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">457</div>
+            <div class="stat-label">Test functions</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">1430</div>
+            <div class="stat-label">Total runs</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Lint issues</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Race conditions</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">7</div>
+            <div class="stat-label">APIs shipped</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">3/3</div>
+            <div class="stat-label">BuildFlow APIs proven</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">17</div>
+            <div class="stat-label">gopls warnings (examples)</div>
+          </div>
+        </div>
 
-<div class="hero">
-  <div class="hero-badge">Status Report · v2.10.0 Shipped</div>
-  <h1>cmdguard v2.10.0 — Cobra-Correctness Mission, Released</h1>
-  <p class="hero-subtitle">Full-cycle close-out: the cobra-correctness contract, the three escape-hatch APIs proven in BuildFlow, the new <code>WithCleanup[T]</code>, and an honest reckoning of what shipped, what's half-done, and what's genuinely broken.</p>
-  <div class="hero-meta">
-    <span class="tag amber">cmdguard HEAD: 72059b2</span>
-    <span class="tag">BuildFlow HEAD: 59727199</span>
-    <span class="tag">18 commits since v2.9.0</span>
-    <span class="tag">2026-06-28 10:08 CEST</span>
-  </div>
-</div>
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <p>
+          <strong
+            >Verdict: 🟢 v2.10.0 is shipped, tagged, and pushed. Every API in this release is
+            consumer-proven.</strong
+          >
+          The mission pivot — "make consumers use Cobra correctly" — landed in full. BuildFlow, the
+          primary consumer, had four workarounds around cmdguard's gaps; all four now have
+          first-class APIs, and all three testable migrations are done and green across BuildFlow's
+          26-module workspace.
+        </p>
+        <p>
+          The one net-new feature this session (<code>WithCleanup[T]</code>) closes the last Cobra
+          footgun that had no escape: <code>PostRunE</code> silently does not fire when
+          <code>RunE</code> errors. It has 8 passing tests but
+          <strong>no real consumer yet</strong> — the honest gap below.
+        </p>
 
-<div class="stat-grid">
-  <div class="stat-card stat-good"><div class="stat-value">86.7%</div><div class="stat-label">Test coverage</div></div>
-  <div class="stat-card stat-good"><div class="stat-value">457</div><div class="stat-label">Test functions</div></div>
-  <div class="stat-card stat-good"><div class="stat-value">1430</div><div class="stat-label">Total runs</div></div>
-  <div class="stat-card stat-good"><div class="stat-value">0</div><div class="stat-label">Lint issues</div></div>
-  <div class="stat-card stat-good"><div class="stat-value">0</div><div class="stat-label">Race conditions</div></div>
-  <div class="stat-card stat-good"><div class="stat-value">7</div><div class="stat-label">APIs shipped</div></div>
-  <div class="stat-card stat-warn"><div class="stat-value">3/3</div><div class="stat-label">BuildFlow APIs proven</div></div>
-  <div class="stat-card stat-warn"><div class="stat-value">17</div><div class="stat-label">gopls warnings (examples)</div></div>
-</div>
+        <h2 id="done"><span class="num">a</span>Fully Done</h2>
 
-<h2 id="summary"><span class="num">00</span>Summary</h2>
-<p><strong>Verdict: 🟢 v2.10.0 is shipped, tagged, and pushed. Every API in this release is consumer-proven.</strong> The mission pivot — "make consumers use Cobra correctly" — landed in full. BuildFlow, the primary consumer, had four workarounds around cmdguard's gaps; all four now have first-class APIs, and all three testable migrations are done and green across BuildFlow's 26-module workspace.</p>
-<p>The one net-new feature this session (<code>WithCleanup[T]</code>) closes the last Cobra footgun that had no escape: <code>PostRunE</code> silently does not fire when <code>RunE</code> errors. It has 8 passing tests but <strong>no real consumer yet</strong> — the honest gap below.</p>
+        <h3>This Session (2026-06-28 morning)</h3>
+        <div class="card card-solution">
+          <h4>WithCleanup[T] — post-RunE cleanup that fires on error</h4>
+          <div class="where">
+            pkg/cmdguard/v2/cli_options.go:171 · cli.go:281 applyCleanupHooks · cli_cleanup_test.go
+            · commit 72059b2
+          </div>
+          <p>
+            Wraps every command's <code>RunE</code> once at <code>Execute</code> time via a
+            tree-walk, so it covers both cmdguard-managed <code>Command[T,F]</code> and raw cobra
+            subcommands (the escape hatch). Hook signature
+            <code>func(cmd, cfg, runErr) error</code>; original <code>runErr</code> never swallowed
+            (cleanup errors joined via <code>errors.Join</code>). Idempotent (<code
+              >cleanupWired</code
+            >
+            guard) — calling <code>Execute</code> twice does not double-wrap. No-op when no hooks
+            registered. 8 tests: success, error, ordering, config passthrough,
+            cleanup-error-on-success, runErr-not-swallowed, double-Execute idempotency, no-hooks
+            no-op.
+          </p>
+        </div>
+        <div class="card card-solution">
+          <h4>BuildFlow migration #3 — PersistentPreRunE → WithPostFlagParse[T]</h4>
+          <div class="where">
+            BuildFlow internal/cli/root.go · commit 9817a0b7 (on origin/master) · −36/+19 LOC
+          </div>
+          <p>
+            The hardest, most API-validating migration. The 30-line "save + wrap cmdguard's
+            PersistentPreRunE" block collapsed into a single
+            <code>WithPostFlagParse[BuildFlowConfig]</code> hook. <code>validateBuildMode</code> +
+            <code>initSharedDI</code> + <code>storeSession</code> now run after cmdguard parses
+            flags, stores config, and validates it. All 26 BuildFlow workspace modules pass via
+            <code>scripts/test-workspace.sh</code>.
+          </p>
+        </div>
+        <div class="card card-solution">
+          <h4>Docs & version refresh for the release</h4>
+          <div class="where">
+            CHANGELOG · FEATURES · API.md · README · AGENTS · TODO_LIST · commit 72059b2
+          </div>
+          <p>
+            <code>WithCleanup</code> documented in all five doc surfaces; stale test/coverage counts
+            corrected across AGENTS + TODO_LIST (457 tests / 1430 runs / 86.7%); Phase 19 section
+            marked complete. Two <code>wsl_v5</code> whitespace lint issues found and fixed during
+            verification.
+          </p>
+        </div>
 
-<h2 id="done"><span class="num">a</span>Fully Done</h2>
+        <h3>Earlier in the cycle (prior session, all pushed)</h3>
+        <ul>
+          <li>
+            <strong><code>SilenceUsage = true</code> by default</strong> — kills Cobra's #1 footgun
+            (full usage dump after every command error). <code>--help</code> unaffected.
+          </li>
+          <li>
+            <strong><code>ExitCode(err) int</code></strong> — public exit-code mapping (nil→0,
+            <code>ExitCoder</code>→its code, else→1). <code>ExecuteAndExit</code> now uses it.
+          </li>
+          <li>
+            <strong>Scoped flags (<code>local:"true"</code>)</strong> — root-only flags NOT
+            inherited by subcommands.
+          </li>
+          <li>
+            <strong><code>hidden:"true"</code> flag tag</strong> — excluded from
+            <code>--help</code>, fully functional.
+          </li>
+          <li>
+            <strong><code>ConfigFromContext[T](ctx) (*T, bool)</code></strong> — type-safe config
+            retrieval for raw cobra subcommands.
+          </li>
+          <li>
+            <strong><code>WithPostFlagParse[T](fns ...)</code></strong> — post-parse hook for DI
+            init / session storage.
+          </li>
+          <li>
+            <strong>BuildFlow migrations #1 & #2</strong> — <code>configFromCmd</code> →
+            <code>ConfigFromContext</code> (f50df49b); <code>hideAdvancedFlags</code> →
+            <code>hidden:"true"</code> tags on 11 fields (93ac6f5f).
+          </li>
+          <li>
+            <strong>Flagship example fixed</strong> — exits non-zero on failure, no double-printed
+            errors.
+          </li>
+          <li>
+            <strong><code>makezero</code> disabled</strong> — directly conflicts with staticcheck
+            <code>S1019</code>.
+          </li>
+          <li>
+            <strong>Go 1.26.3 → 1.26.4</strong> — fixes CVEs GO-2026-5037/5038/5039 (one reachable
+            via <code>ExitError.Error</code> → <code>crypto/x509</code>).
+          </li>
+          <li>
+            <strong>Stray artifact untracked</strong> —
+            <code>examples/taskctl/taskctl-audit.html</code> (2561 lines) removed from VCS +
+            gitignored.
+          </li>
+        </ul>
 
-<h3>This Session (2026-06-28 morning)</h3>
-<div class="card card-solution">
-  <h4>WithCleanup[T] — post-RunE cleanup that fires on error</h4>
-  <div class="where">pkg/cmdguard/v2/cli_options.go:171 · cli.go:281 applyCleanupHooks · cli_cleanup_test.go · commit 72059b2</div>
-  <p>Wraps every command's <code>RunE</code> once at <code>Execute</code> time via a tree-walk, so it covers both cmdguard-managed <code>Command[T,F]</code> and raw cobra subcommands (the escape hatch). Hook signature <code>func(cmd, cfg, runErr) error</code>; original <code>runErr</code> never swallowed (cleanup errors joined via <code>errors.Join</code>). Idempotent (<code>cleanupWired</code> guard) — calling <code>Execute</code> twice does not double-wrap. No-op when no hooks registered. 8 tests: success, error, ordering, config passthrough, cleanup-error-on-success, runErr-not-swallowed, double-Execute idempotency, no-hooks no-op.</p>
-</div>
-<div class="card card-solution">
-  <h4>BuildFlow migration #3 — PersistentPreRunE → WithPostFlagParse[T]</h4>
-  <div class="where">BuildFlow internal/cli/root.go · commit 9817a0b7 (on origin/master) · −36/+19 LOC</div>
-  <p>The hardest, most API-validating migration. The 30-line "save + wrap cmdguard's PersistentPreRunE" block collapsed into a single <code>WithPostFlagParse[BuildFlowConfig]</code> hook. <code>validateBuildMode</code> + <code>initSharedDI</code> + <code>storeSession</code> now run after cmdguard parses flags, stores config, and validates it. All 26 BuildFlow workspace modules pass via <code>scripts/test-workspace.sh</code>.</p>
-</div>
-<div class="card card-solution">
-  <h4>Docs & version refresh for the release</h4>
-  <div class="where">CHANGELOG · FEATURES · API.md · README · AGENTS · TODO_LIST · commit 72059b2</div>
-  <p><code>WithCleanup</code> documented in all five doc surfaces; stale test/coverage counts corrected across AGENTS + TODO_LIST (457 tests / 1430 runs / 86.7%); Phase 19 section marked complete. Two <code>wsl_v5</code> whitespace lint issues found and fixed during verification.</p>
-</div>
+        <div class="callout callout-solution">
+          <strong>Release integrity:</strong> v2.10.0 tag <code>facb706</code> → commit
+          <code>72059b2</code>, verified on <code>origin</code>. cmdguard tree clean. BuildFlow
+          migration commit <code>9817a0b7</code> confirmed on <code>origin/master</code>.
+        </div>
 
-<h3>Earlier in the cycle (prior session, all pushed)</h3>
-<ul>
-  <li><strong><code>SilenceUsage = true</code> by default</strong> — kills Cobra's #1 footgun (full usage dump after every command error). <code>--help</code> unaffected.</li>
-  <li><strong><code>ExitCode(err) int</code></strong> — public exit-code mapping (nil→0, <code>ExitCoder</code>→its code, else→1). <code>ExecuteAndExit</code> now uses it.</li>
-  <li><strong>Scoped flags (<code>local:"true"</code>)</strong> — root-only flags NOT inherited by subcommands.</li>
-  <li><strong><code>hidden:"true"</code> flag tag</strong> — excluded from <code>--help</code>, fully functional.</li>
-  <li><strong><code>ConfigFromContext[T](ctx) (*T, bool)</code></strong> — type-safe config retrieval for raw cobra subcommands.</li>
-  <li><strong><code>WithPostFlagParse[T](fns ...)</code></strong> — post-parse hook for DI init / session storage.</li>
-  <li><strong>BuildFlow migrations #1 & #2</strong> — <code>configFromCmd</code> → <code>ConfigFromContext</code> (f50df49b); <code>hideAdvancedFlags</code> → <code>hidden:"true"</code> tags on 11 fields (93ac6f5f).</li>
-  <li><strong>Flagship example fixed</strong> — exits non-zero on failure, no double-printed errors.</li>
-  <li><strong><code>makezero</code> disabled</code></strong> — directly conflicts with staticcheck <code>S1019</code>.</li>
-  <li><strong>Go 1.26.3 → 1.26.4</strong> — fixes CVEs GO-2026-5037/5038/5039 (one reachable via <code>ExitError.Error</code> → <code>crypto/x509</code>).</li>
-  <li><strong>Stray artifact untracked</strong> — <code>examples/taskctl/taskctl-audit.html</code> (2561 lines) removed from VCS + gitignored.</li>
-</ul>
+        <h2 id="partial"><span class="num">b</span>Partially Done</h2>
 
-<div class="callout callout-solution">
-  <strong>Release integrity:</strong> v2.10.0 tag <code>facb706</code> → commit <code>72059b2</code>, verified on <code>origin</code>. cmdguard tree clean. BuildFlow migration commit <code>9817a0b7</code> confirmed on <code>origin/master</code>.
-</div>
+        <div class="card card-warning">
+          <h4>WithCleanup[T] — proven by unit tests, NOT yet by a consumer</h4>
+          <div class="where">cli_cleanup_test.go (8 tests pass) · no consumer call site exists</div>
+          <p>
+            The other six v2.10.0 APIs were each reverse-engineered from a specific BuildFlow
+            workaround and proven by migrating BuildFlow. <code>WithCleanup</code> breaks that
+            pattern: it was built from the Cobra semantics gap, not from a live BuildFlow pain
+            point. It is correct and tested, but it has not yet proven its <em>fit</em> the way the
+            others have. BuildFlow <em>does</em> have cleanup code (<code>diCtx.Close()</code> at
+            <code>root.go:173</code>) that this could replace, but that migration was not done this
+            session.
+          </p>
+        </div>
 
-<h2 id="partial"><span class="num">b</span>Partially Done</h2>
+        <div class="card card-warning">
+          <h4>BuildFlow: escape hatch is the PRIMARY pattern, not the edge case</h4>
+          <div class="where">
+            BuildFlow internal/cli · 27 raw cobra RunE handlers, ZERO Command[T,F] usages
+          </div>
+          <p>
+            The "gradual migration from plain Cobra" comment in <code>root.go</code> is still
+            aspirational. BuildFlow registers every subcommand as a raw
+            <code>*cobra.Command</code> and uses the escape-hatch APIs
+            (<code>ConfigFromContext</code>, <code>WithPostFlagParse</code>) exclusively. cmdguard's
+            first-class <code>Command[T,F]</code> / <code>AddCommand</code> API is exercised only in
+            <code>examples/taskctl</code>, not in the real consumer. This is not broken, but it
+            means the primary API surface is validated by an example, while the escape hatch is
+            validated by production.
+          </p>
+        </div>
 
-<div class="card card-warning">
-  <h4>WithCleanup[T] — proven by unit tests, NOT yet by a consumer</h4>
-  <div class="where">cli_cleanup_test.go (8 tests pass) · no consumer call site exists</div>
-  <p>The other six v2.10.0 APIs were each reverse-engineered from a specific BuildFlow workaround and proven by migrating BuildFlow. <code>WithCleanup</code> breaks that pattern: it was built from the Cobra semantics gap, not from a live BuildFlow pain point. It is correct and tested, but it has not yet proven its <em>fit</em> the way the others have. BuildFlow <em>does</em> have cleanup code (<code>diCtx.Close()</code> at <code>root.go:173</code>) that this could replace, but that migration was not done this session.</p>
-</div>
+        <div class="card card-warning">
+          <h4>Test coverage at 86.7% — below the 90%+ target</h4>
+          <div class="where">go test ./... -cover</div>
+          <p>
+            Coverage rose from 86.6% → 86.7% with the new tests. The library mandates 80% minimum;
+            the aspirational bar is 90%. No specific gap analysis has been done on what the
+            uncovered 13.3% is.
+          </p>
+        </div>
 
-<div class="card card-warning">
-  <h4>BuildFlow: escape hatch is the PRIMARY pattern, not the edge case</h4>
-  <div class="where">BuildFlow internal/cli · 27 raw cobra RunE handlers, ZERO Command[T,F] usages</div>
-  <p>The "gradual migration from plain Cobra" comment in <code>root.go</code> is still aspirational. BuildFlow registers every subcommand as a raw <code>*cobra.Command</code> and uses the escape-hatch APIs (<code>ConfigFromContext</code>, <code>WithPostFlagParse</code>) exclusively. cmdguard's first-class <code>Command[T,F]</code> / <code>AddCommand</code> API is exercised only in <code>examples/taskctl</code>, not in the real consumer. This is not broken, but it means the primary API surface is validated by an example, while the escape hatch is validated by production.</p>
-</div>
+        <h2 id="notstarted"><span class="num">c</span>Not Started</h2>
 
-<div class="card card-warning">
-  <h4>Test coverage at 86.7% — below the 90%+ target</h4>
-  <div class="where">go test ./... -cover</div>
-  <p>Coverage rose from 86.6% → 86.7% with the new tests. The library mandates 80% minimum; the aspirational bar is 90%. No specific gap analysis has been done on what the uncovered 13.3% is.</p>
-</div>
+        <div class="card">
+          <h4>CODECOV_TOKEN secret for GitHub CI</h4>
+          <div class="where">
+            TODO_LIST #20 · P0 · requires repo owner — cannot be set programmatically
+          </div>
+          <p>
+            The only open P0. Coverage reporting to a dashboard is blocked on a manual secret the
+            agent cannot create.
+          </p>
+        </div>
+        <div class="card">
+          <h4>BuildFlow consumer of WithCleanup[T]</h4>
+          <div class="where">BuildFlow root.go:173 diCtx.Close() is the candidate</div>
+          <p>
+            The natural fit exists but was not migrated this session. Would prove the API
+            end-to-end.
+          </p>
+        </div>
+        <div class="card">
+          <h4>WithCleanup in examples/taskctl</h4>
+          <div class="where">examples/taskctl/commands.go</div>
+          <p>
+            The flagship example doesn't yet demonstrate <code>WithCleanup</code>, so the pattern it
+            teaches is incomplete.
+          </p>
+        </div>
+        <div class="card">
+          <h4>v3.0 API cleanup (P2 #30–33)</h4>
+          <div class="where">
+            TODO_LIST P2: rename Get/MustGet, generic RegisterInScope, Package() redesign, SetConfig
+            safety
+          </div>
+          <p>
+            Four API-breaking improvements explicitly deferred to v3.0. None started; none blocking
+            v2.x.
+          </p>
+        </div>
 
-<h2 id="notstarted"><span class="num">c</span>Not Started</h2>
+        <h2 id="fuckedup"><span class="num">d</span>Totally Fucked Up</h2>
 
-<div class="card">
-  <h4>CODECOV_TOKEN secret for GitHub CI</h4>
-  <div class="where">TODO_LIST #20 · P0 · requires repo owner — cannot be set programmatically</div>
-  <p>The only open P0. Coverage reporting to a dashboard is blocked on a manual secret the agent cannot create.</p>
-</div>
-<div class="card">
-  <h4>BuildFlow consumer of WithCleanup[T]</h4>
-  <div class="where">BuildFlow root.go:173 diCtx.Close() is the candidate</div>
-  <p>The natural fit exists but was not migrated this session. Would prove the API end-to-end.</p>
-</div>
-<div class="card">
-  <h4>WithCleanup in examples/taskctl</h4>
-  <div class="where">examples/taskctl/commands.go</div>
-  <p>The flagship example doesn't yet demonstrate <code>WithCleanup</code>, so the pattern it teaches is incomplete.</p>
-</div>
-<div class="card">
-  <h4>v3.0 API cleanup (P2 #30–33)</h4>
-  <div class="where">TODO_LIST P2: rename Get/MustGet, generic RegisterInScope, Package() redesign, SetConfig safety</div>
-  <p>Four API-breaking improvements explicitly deferred to v3.0. None started; none blocking v2.x.</p>
-</div>
+        <div class="callout callout-warning">
+          <strong>Scoping note:</strong> nothing shipped in v2.10.0 is broken — build, 457 tests,
+          race, and lint are all clean. The "fucked up" items below are process and hygiene
+          failures, not defects in the release.
+        </div>
 
-<h2 id="fuckedup"><span class="num">d</span>Totally Fucked Up</h2>
+        <div class="card card-problem">
+          <h4>Commit f50df49b bundled another agent's work</h4>
+          <div class="where">BuildFlow commit f50df49b (prior session, already in history)</div>
+          <p>
+            The first BuildFlow migration commit bundled a concurrent session's −1268 LOC refactor
+            because <code>git commit</code> ran with no explicit pathspec while another agent had
+            work staged. This is a real history-entanglement failure. The fix (always use explicit
+            pathspec + <code>git status</code> first) was adopted for all subsequent commits, but
+            the entangled commit is permanent. Lesson is recorded but the damage is done.
+          </p>
+        </div>
 
-<div class="callout callout-warning">
-  <strong>Scoping note:</strong> nothing shipped in v2.10.0 is broken — build, 457 tests, race, and lint are all clean. The "fucked up" items below are process and hygiene failures, not defects in the release.
-</div>
+        <div class="card card-problem">
+          <h4>Wrong test command used for BuildFlow verification (prior session)</h4>
+          <div class="where">
+            go test ./... in BuildFlow · AGENTS.md explicitly warns against this
+          </div>
+          <p>
+            <code>go test ./...</code> in BuildFlow only covers 5 root packages and silently misses
+            25 workspace sub-modules. The prior session used it for "verification" — a
+            false-positive green. BuildFlow's own AGENTS.md mandates <code>nix run .#test</code> /
+            <code>scripts/test-workspace.sh</code>. This session corrected it (ran the full
+            26-module workspace suite), but the process failure happened and produced a misleading
+            confidence signal at the time.
+          </p>
+        </div>
 
-<div class="card card-problem">
-  <h4>Commit f50df49b bundled another agent's work</h4>
-  <div class="where">BuildFlow commit f50df49b (prior session, already in history)</div>
-  <p>The first BuildFlow migration commit bundled a concurrent session's −1268 LOC refactor because <code>git commit</code> ran with no explicit pathspec while another agent had work staged. This is a real history-entanglement failure. The fix (always use explicit pathspec + <code>git status</code> first) was adopted for all subsequent commits, but the entangled commit is permanent. Lesson is recorded but the damage is done.</p>
-</div>
+        <div class="card card-problem">
+          <h4>17 gopls infertypeargs warnings unfixed</h4>
+          <div class="where">examples/taskctl/commands.go (10+ sites) + 250+ project-wide</div>
+          <p>
+            Go 1.26's type inference makes explicit type arguments redundant. gopls flags ~260 of
+            these across the project (notably <code>NewCommand[Config, NoFlags](...)</code> →
+            <code>NewCommand(...)</code>). They're style noise, not errors, and they predate this
+            session — but they make the diagnostics panel loud and mask real issues. None fixed this
+            cycle.
+          </p>
+        </div>
 
-<div class="card card-problem">
-  <h4>Wrong test command used for BuildFlow verification (prior session)</h4>
-  <div class="where">go test ./... in BuildFlow · AGENTS.md explicitly warns against this</div>
-  <p><code>go test ./...</code> in BuildFlow only covers 5 root packages and silently misses 25 workspace sub-modules. The prior session used it for "verification" — a false-positive green. BuildFlow's own AGENTS.md mandates <code>nix run .#test</code> / <code>scripts/test-workspace.sh</code>. This session corrected it (ran the full 26-module workspace suite), but the process failure happened and produced a misleading confidence signal at the time.</p>
-</div>
+        <h2 id="improve"><span class="num">e</span>What We Should Improve</h2>
 
-<div class="card card-problem">
-  <h4>17 gopls infertypeargs warnings unfixed</h4>
-  <div class="where">examples/taskctl/commands.go (10+ sites) + 250+ project-wide</div>
-  <p>Go 1.26's type inference makes explicit type arguments redundant. gopls flags ~260 of these across the project (notably <code>NewCommand[Config, NoFlags](...)</code> → <code>NewCommand(...)</code>). They're style noise, not errors, and they predate this session — but they make the diagnostics panel loud and mask real issues. None fixed this cycle.</p>
-</div>
+        <div class="grid-2">
+          <div class="card card-solution">
+            <h4>Close the WithClosure consumer loop</h4>
+            <p>
+              Every other v2.10.0 API was reverse-engineered from BuildFlow. WithCleanup was built
+              from theory. Migrating BuildFlow's <code>diCtx.Close()</code> into a
+              <code>WithCleanup</code> hook would make it the seventh consumer-proven API and close
+              the consistency gap.
+            </p>
+          </div>
+          <div class="card card-solution">
+            <h4>Decide the escape-hatch vs Command[T,F] question</h4>
+            <p>
+              BuildFlow lives entirely in the escape hatch. Either commit to it as a first-class
+              supported pattern (more docs, more tests around raw cobra), or start migrating
+              BuildFlow handlers to <code>Command[T,F]</code>. The current ambiguity is the single
+              biggest strategic decision.
+            </p>
+          </div>
+          <div class="card card-solution">
+            <h4>Fix the infertypeargs noise</h4>
+            <p>
+              A mechanical <code>gopls</code> fix-up pass removes ~260 redundant type arguments. Low
+              effort, high signal-to-noise win. <code>examples/taskctl</code> alone has 10+ sites.
+            </p>
+          </div>
+          <div class="card card-solution">
+            <h4>Coverage gap analysis</h4>
+            <p>
+              86.7% is fine but unexamined. A <code>go test -coverprofile</code> + per-file review
+              would show whether the uncovered 13.3% is trivial error formatting or a real untested
+              code path.
+            </p>
+          </div>
+          <div class="card card-solution">
+            <h4>Standardize status-report format</h4>
+            <p>
+              This session produced 3 Markdown status reports; the skill mandates HTML (this
+              report). Pick one — HTML is correct for snapshot reports, Markdown for living docs.
+              The split-brain should end here.
+            </p>
+          </div>
+          <div class="card card-solution">
+            <h4>Make the consumer-prove discipline a release gate</h4>
+            <p>
+              The "prove every new API in BuildFlow before release" rule worked — it caught nothing
+              broken but de-risked everything. Codify it: no new public API ships without a
+              BuildFlow (or example) call site in the same release.
+            </p>
+          </div>
+        </div>
 
-<h2 id="improve"><span class="num">e</span>What We Should Improve</h2>
+        <h2 id="next25"><span class="num">f</span>Top 25 Things To Get Done Next</h2>
+        <p>Sorted by impact (mission fit, de-risking, consumer value) then effort.</p>
 
-<div class="grid-2">
-  <div class="card card-solution">
-    <h4>Close the WithClosure consumer loop</h4>
-    <p>Every other v2.10.0 API was reverse-engineered from BuildFlow. WithCleanup was built from theory. Migrating BuildFlow's <code>diCtx.Close()</code> into a <code>WithCleanup</code> hook would make it the seventh consumer-proven API and close the consistency gap.</p>
-  </div>
-  <div class="card card-solution">
-    <h4>Decide the escape-hatch vs Command[T,F] question</h4>
-    <p>BuildFlow lives entirely in the escape hatch. Either commit to it as a first-class supported pattern (more docs, more tests around raw cobra), or start migrating BuildFlow handlers to <code>Command[T,F]</code>. The current ambiguity is the single biggest strategic decision.</p>
-  </div>
-  <div class="card card-solution">
-    <h4>Fix the infertypeargs noise</h4>
-    <p>A mechanical <code>gopls</code> fix-up pass removes ~260 redundant type arguments. Low effort, high signal-to-noise win. <code>examples/taskctl</code> alone has 10+ sites.</p>
-  </div>
-  <div class="card card-solution">
-    <h4>Coverage gap analysis</h4>
-    <p>86.7% is fine but unexamined. A <code>go test -coverprofile</code> + per-file review would show whether the uncovered 13.3% is trivial error formatting or a real untested code path.</p>
-  </div>
-  <div class="card card-solution">
-    <h4>Standardize status-report format</h4>
-    <p>This session produced 3 Markdown status reports; the skill mandates HTML (this report). Pick one — HTML is correct for snapshot reports, Markdown for living docs. The split-brain should end here.</p>
-  </div>
-  <div class="card card-solution">
-    <h4>Make the consumer-prove discipline a release gate</h4>
-    <p>The "prove every new API in BuildFlow before release" rule worked — it caught nothing broken but de-risked everything. Codify it: no new public API ships without a BuildFlow (or example) call site in the same release.</p>
-  </div>
-</div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Why it matters</th>
+              <th>Severity</th>
+              <th>Effort</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>Decide escape-hatch vs Command[T,F] direction</strong> (see Question)</td>
+              <td>Sets the entire API investment direction for v3.0</td>
+              <td><span class="badge badge-critical">Critical</span></td>
+              <td>0m (decision)</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Migrate BuildFlow <code>diCtx.Close()</code> → <code>WithCleanup[T]</code></td>
+              <td>Seventh consumer-proven API; closes the one consistency gap</td>
+              <td><span class="badge badge-critical">Critical</span></td>
+              <td>12m</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Tag BuildFlow release consuming v2.10.0 (drop the <code>replace</code>?)</td>
+              <td>Real downstream validation of the published tag, not a local path</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>20m</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Add <code>CODECOV_TOKEN</code> to GitHub settings (P0 #20)</td>
+              <td>Only open P0; unblocks coverage dashboard</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>5m</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Fix 260 <code>infertypeargs</code> warnings (mechanical gopls pass)</td>
+              <td>Kills the diagnostics noise; unblocks real-issue visibility</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Demonstrate <code>WithCleanup</code> in <code>examples/taskctl</code></td>
+              <td>The flagship example should teach every shipped API</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>15m</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Coverage gap analysis (<code>-coverprofile</code> + per-file review)</td>
+              <td>Is the uncovered 13.3% trivial or risky? Unknown until checked</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>40m</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>
+                Migrate first BuildFlow handler to <code>Command[T,F]</code> (if escape-hatch is NOT
+                the answer)
+              </td>
+              <td>Proves the primary API in production, not just the example</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>1h</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Document the escape hatch as first-class (if it IS the answer)</td>
+              <td>README/AGENTS frame it as "gradual migration"; if it's permanent, reframe</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>
+                Run <code>gosec</code> + <code>govulncheck</code> in CI (how-to-golang mandate)
+              </td>
+              <td>Security gate required by project policy; not currently enforced</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>BDD tests for the three escape-hatch APIs (ginkgo)</td>
+              <td>They're the production-used surface but only unit-tested</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>1h</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>Fuzz the cleanup error-join semantics</td>
+              <td>
+                <code>errors.Join</code> ordering on nil/non-nil is subtle; 1 fuzz file exists, add
+                a target
+              </td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td>Standardize status-report format (HTML vs MD)</td>
+              <td>Ends the split-brain; this is the first HTML report</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>0m (decision)</td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td>Benchmark <code>applyCleanupHooks</code> tree-walk overhead</td>
+              <td>Wraps every RunE at Execute; confirm no measurable cost when 0 hooks</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>20m</td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td>Test <code>WithCleanup</code> with nested subcommands 3+ deep</td>
+              <td>Tree-walk recursion is covered 1 level deep; deeper nesting untested</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>15m</td>
+            </tr>
+            <tr>
+              <td>16</td>
+              <td>Audit doc claims vs code (doc-freshness-check skill)</td>
+              <td>5 doc surfaces edited by hand this session; drift risk is real</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>17</td>
+              <td>Add <code>--no-color</code> + <code>WithCleanup</code> interaction test</td>
+              <td>Cleanup reads config from context; verify it survives output-flag parsing</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>15m</td>
+            </tr>
+            <tr>
+              <td>18</td>
+              <td>Extract flag-tag parsing to standalone <code>flagtags</code> lib (P1 #26)</td>
+              <td>Long-standing refactor TODO; reduces cmdguard surface</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>2h</td>
+            </tr>
+            <tr>
+              <td>19</td>
+              <td>Rename <code>Get[T]</code>/<code>MustGet[T]</code> (P2 #30, v3.0)</td>
+              <td>API-breaking; deferred but should be planned</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>v3.0</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>Generic <code>RegisterInScope</code> (P2 #31, v3.0)</td>
+              <td>Removes <code>...any</code> from DI surface</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>v3.0</td>
+            </tr>
+            <tr>
+              <td>21</td>
+              <td>Redesign/remove <code>Package()</code> (P2 #32, v3.0)</td>
+              <td>Error-safe DI integration concern</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>v3.0</td>
+            </tr>
+            <tr>
+              <td>22</td>
+              <td>Make <code>SetConfig</code> safe or remove (P2 #33, v3.0)</td>
+              <td>Currently reinitializes FlagRegistry unsafely</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>v3.0</td>
+            </tr>
+            <tr>
+              <td>23</td>
+              <td>Review <code>examples/taskctl</code> for more footguns to eliminate</td>
+              <td>The example taught the exit-code fix; audit it for the next API to extract</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>45m</td>
+            </tr>
+            <tr>
+              <td>24</td>
+              <td>Add <code>CHANGELOG</code> link from v2.10.0 → the diff/release notes</td>
+              <td>Consumers tracking changes want a 1-click path to what changed</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>10m</td>
+            </tr>
+            <tr>
+              <td>25</td>
+              <td>Bump minimum Go version check in CI to enforce 1.26.4</td>
+              <td>go.mod says 1.26.4; ensure CI rejects older toolchains</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>15m</td>
+            </tr>
+          </tbody>
+        </table>
 
-<h2 id="next25"><span class="num">f</span>Top 25 Things To Get Done Next</h2>
-<p>Sorted by impact (mission fit, de-risking, consumer value) then effort.</p>
+        <h2 id="question"><span class="num">g</span>Top Question I Cannot Answer Myself</h2>
 
-<table>
-<thead>
-<tr><th>#</th><th>Task</th><th>Why it matters</th><th>Severity</th><th>Effort</th></tr>
-</thead>
-<tbody>
-<tr><td>1</td><td><strong>Decide escape-hatch vs Command[T,F] direction</strong> (see Question)</td><td>Sets the entire API investment direction for v3.0</td><td><span class="badge badge-critical">Critical</span></td><td>0m (decision)</td></tr>
-<tr><td>2</td><td>Migrate BuildFlow <code>diCtx.Close()</code> → <code>WithCleanup[T]</code></td><td>Seventh consumer-proven API; closes the one consistency gap</td><td><span class="badge badge-critical">Critical</span></td><td>12m</td></tr>
-<tr><td>3</td><td>Tag BuildFlow release consuming v2.10.0 (drop the <code>replace</code>?)</td><td>Real downstream validation of the published tag, not a local path</td><td><span class="badge badge-high">High</span></td><td>20m</td></tr>
-<tr><td>4</td><td>Add <code>CODECOV_TOKEN</code> to GitHub settings (P0 #20)</td><td>Only open P0; unblocks coverage dashboard</td><td><span class="badge badge-high">High</span></td><td>5m</td></tr>
-<tr><td>5</td><td>Fix 260 <code>infertypeargs</code> warnings (mechanical gopls pass)</td><td>Kills the diagnostics noise; unblocks real-issue visibility</td><td><span class="badge badge-high">High</span></td><td>30m</td></tr>
-<tr><td>6</td><td>Demonstrate <code>WithCleanup</code> in <code>examples/taskctl</code></td><td>The flagship example should teach every shipped API</td><td><span class="badge badge-high">High</span></td><td>15m</td></tr>
-<tr><td>7</td><td>Coverage gap analysis (<code>-coverprofile</code> + per-file review)</td><td>Is the uncovered 13.3% trivial or risky? Unknown until checked</td><td><span class="badge badge-medium">Medium</span></td><td>40m</td></tr>
-<tr><td>8</td><td>Migrate first BuildFlow handler to <code>Command[T,F]</code> (if escape-hatch is NOT the answer)</td><td>Proves the primary API in production, not just the example</td><td><span class="badge badge-medium">Medium</span></td><td>1h</td></tr>
-<tr><td>9</td><td>Document the escape hatch as first-class (if it IS the answer)</td><td>README/AGENTS frame it as "gradual migration"; if it's permanent, reframe</td><td><span class="badge badge-medium">Medium</span></td><td>30m</td></tr>
-<tr><td>10</td><td>Run <code>gosec</code> + <code>govulncheck</code> in CI (how-to-golang mandate)</td><td>Security gate required by project policy; not currently enforced</td><td><span class="badge badge-medium">Medium</span></td><td>30m</td></tr>
-<tr><td>11</td><td>BDD tests for the three escape-hatch APIs (ginkgo)</td><td>They're the production-used surface but only unit-tested</td><td><span class="badge badge-medium">Medium</span></td><td>1h</td></tr>
-<tr><td>12</td><td>Fuzz the cleanup error-join semantics</td><td><code>errors.Join</code> ordering on nil/non-nil is subtle; 1 fuzz file exists, add a target</td><td><span class="badge badge-medium">Medium</span></td><td>30m</td></tr>
-<tr><td>13</td><td>Standardize status-report format (HTML vs MD)</td><td>Ends the split-brain; this is the first HTML report</td><td><span class="badge badge-low">Low</span></td><td>0m (decision)</td></tr>
-<tr><td>14</td><td>Benchmark <code>applyCleanupHooks</code> tree-walk overhead</td><td>Wraps every RunE at Execute; confirm no measurable cost when 0 hooks</td><td><span class="badge badge-low">Low</span></td><td>20m</td></tr>
-<tr><td>15</td><td>Test <code>WithCleanup</code> with nested subcommands 3+ deep</td><td>Tree-walk recursion is covered 1 level deep; deeper nesting untested</td><td><span class="badge badge-low">Low</span></td><td>15m</td></tr>
-<tr><td>16</td><td>Audit doc claims vs code (doc-freshness-check skill)</td><td>5 doc surfaces edited by hand this session; drift risk is real</td><td><span class="badge badge-low">Low</span></td><td>30m</td></tr>
-<tr><td>17</td><td>Add <code>--no-color</code> + <code>WithCleanup</code> interaction test</td><td>Cleanup reads config from context; verify it survives output-flag parsing</td><td><span class="badge badge-low">Low</span></td><td>15m</td></tr>
-<tr><td>18</td><td>Extract flag-tag parsing to standalone <code>flagtags</code> lib (P1 #26)</td><td>Long-standing refactor TODO; reduces cmdguard surface</td><td><span class="badge badge-low">Low</span></td><td>2h</td></tr>
-<tr><td>19</td><td>Rename <code>Get[T]</code>/<code>MustGet[T]</code> (P2 #30, v3.0)</td><td>API-breaking; deferred but should be planned</td><td><span class="badge badge-low">Low</span></td><td>v3.0</td></tr>
-<tr><td>20</td><td>Generic <code>RegisterInScope</code> (P2 #31, v3.0)</td><td>Removes <code>...any</code> from DI surface</td><td><span class="badge badge-low">Low</span></td><td>v3.0</td></tr>
-<tr><td>21</td><td>Redesign/remove <code>Package()</code> (P2 #32, v3.0)</td><td>Error-safe DI integration concern</td><td><span class="badge badge-low">Low</span></td><td>v3.0</td></tr>
-<tr><td>22</td><td>Make <code>SetConfig</code> safe or remove (P2 #33, v3.0)</td><td>Currently reinitializes FlagRegistry unsafely</td><td><span class="badge badge-low">Low</span></td><td>v3.0</td></tr>
-<tr><td>23</td><td>Review <code>examples/taskctl</code> for more footguns to eliminate</td><td>The example taught the exit-code fix; audit it for the next API to extract</td><td><span class="badge badge-low">Low</span></td><td>45m</td></tr>
-<tr><td>24</td><td>Add <code>CHANGELOG</code> link from v2.10.0 → the diff/release notes</td><td>Consumers tracking changes want a 1-click path to what changed</td><td><span class="badge badge-low">Low</span></td><td>10m</td></tr>
-<tr><td>25</td><td>Bump minimum Go version check in CI to enforce 1.26.4</td><td>go.mod says 1.26.4; ensure CI rejects older toolchains</td><td><span class="badge badge-low">Low</span></td><td>15m</td></tr>
-</tbody>
-</table>
+        <div class="question-box">
+          <div class="eyebrow">The strategic fork</div>
+          <h3 style="margin-top: 0">
+            Is the "raw cobra escape hatch" BuildFlow's intended permanent pattern — or a
+            transitional state that should migrate to <code>Command[T,F]</code>?
+          </h3>
+          <p style="margin-top: 12px">
+            <strong>Why I can't resolve this:</strong> it's a product-direction question, not a
+            technical one. The evidence cuts both ways:
+          </p>
+          <ul>
+            <li>
+              <strong>For "permanent":</strong> BuildFlow has <strong>zero</strong>
+              <code>Command[T,F]</code> usages across 27 handlers. It migrated to every escape-hatch
+              API (<code>ConfigFromContext</code>, <code>WithPostFlagParse</code>,
+              <code>hidden:"true"</code>) cleanly and shipped faster for it. Real consumers with
+              large existing cobra apps cannot rewrite every handler — the escape hatch may BE the
+              product.
+            </li>
+            <li>
+              <strong>For "transitional":</strong> the code comment says "gradual migration."
+              <code>Command[T,F]</code> is the type-safe, footgun-free API the library exists to
+              provide. If the primary consumer never uses it, the flagship example is the only proof
+              it works in anger, and v3.0 API cleanups (P2 #30–33) optimize a surface no consumer
+              exercises.
+            </li>
+          </ul>
+          <p>
+            <strong>Why it matters:</strong> the answer decides whether the next sprint invests in
+            (A) hardening the escape hatch as first-class — more docs, BDD tests, a migration guide
+            — or (B) migrating BuildFlow handlers to <code>Command[T,F]</code> and treating the
+            escape hatch as legacy. These are opposite work streams. Every item #1–#11 above leans
+            one way or the other depending on this answer.
+          </p>
+        </div>
 
-<h2 id="question"><span class="num">g</span>Top Question I Cannot Answer Myself</h2>
-
-<div class="question-box">
-  <div class="eyebrow">The strategic fork</div>
-  <h3 style="margin-top:0">Is the "raw cobra escape hatch" BuildFlow's intended permanent pattern — or a transitional state that should migrate to <code>Command[T,F]</code>?</h3>
-  <p style="margin-top:12px"><strong>Why I can't resolve this:</strong> it's a product-direction question, not a technical one. The evidence cuts both ways:</p>
-  <ul>
-    <li><strong>For "permanent":</strong> BuildFlow has <strong>zero</strong> <code>Command[T,F]</code> usages across 27 handlers. It migrated to every escape-hatch API (<code>ConfigFromContext</code>, <code>WithPostFlagParse</code>, <code>hidden:"true"</code>) cleanly and shipped faster for it. Real consumers with large existing cobra apps cannot rewrite every handler — the escape hatch may BE the product.</li>
-    <li><strong>For "transitional":</strong> the code comment says "gradual migration." <code>Command[T,F]</code> is the type-safe, footgun-free API the library exists to provide. If the primary consumer never uses it, the flagship example is the only proof it works in anger, and v3.0 API cleanups (P2 #30–33) optimize a surface no consumer exercises.</li>
-  </ul>
-  <p><strong>Why it matters:</strong> the answer decides whether the next sprint invests in (A) hardening the escape hatch as first-class — more docs, BDD tests, a migration guide — or (B) migrating BuildFlow handlers to <code>Command[T,F]</code> and treating the escape hatch as legacy. These are opposite work streams. Every item #1–#11 above leans one way or the other depending on this answer.</p>
-</div>
-
-<div class="footer">
-  Generated 2026-06-28 10:08 CEST · cmdguard HEAD 72059b2 · v2.10.0 tag facb706 · Bauhaus dark dashboard
-</div>
-
-</main>
-</div>
-</body>
+        <div class="footer">
+          Generated 2026-06-28 10:08 CEST · cmdguard HEAD 72059b2 · v2.10.0 tag facb706 · Bauhaus
+          dark dashboard
+        </div>
+      </main>
+    </div>
+  </body>
 </html>

@@ -52,3 +52,46 @@ config.yaml
 /cmdguard
 # Build artifacts
 /v2
+
+# >>> buildflow-managed (.gitignore) >>>
+# Auto-managed by buildflow. Edit outside these markers; this block is regenerated on `buildflow --fix`.
+
+## Secrets and environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+## Databases
+*.db-shm
+*.db-wal
+
+## Operating systems
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+## Logs and temporaries
+*.log
+*.tmp
+*.temp
+
+## Buildflow artifacts
+audit-log.*
+workflow-audit-log.*
+.buildflow-workflow-baseline.json
+
+## Reports and coverage
+reports/
+
+## Go
+*.out
+go.work
+go.work.sum
+
+## Nix
+result-*
+.envrc
+# <<< buildflow-managed (.gitignore) <<<
