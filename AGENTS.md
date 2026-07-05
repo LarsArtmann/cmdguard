@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-06-28
+**Last Updated:** 2026-07-05
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.10.0 - zero panics, 86.7% coverage, 0 lint issues, 0 race conditions
+**Status:** v2.10.2 - zero panics, 86.7% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -46,7 +46,7 @@ nix flake check
 | --- | ----------------- | -------------------------------- |
 | v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.10.0. 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 86.7% coverage, 0 build errors.
+**Current Status:** v2.10.2. 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 86.7% coverage, 0 build errors.
 
 ---
 
@@ -155,8 +155,8 @@ cmdguard/
 | `charm.land/huh/v2`                         | Interactive prompts  | v2.0.3  |
 | `charm.land/glamour/v2`                     | Markdown rendering   | v2.0.1  |
 | `go.opentelemetry.io/otel/trace`            | OpenTelemetry spans  | v1.44.0 |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.17.2 |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.3.0  |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.23.3 |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.3.1  |
 
 ---
 
@@ -261,8 +261,8 @@ go build ./...                                   # Verify build
 
 #### Output & Styling
 
-- **16 output formats** via go-output `v0.17.2` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`.
-- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. The 10 direct go-output modules (root + 9 sub-modules) are pinned at v0.17.2; the 3 indirect modules (`enum`, `escape`, `envdetect`) follow at their latest available tags (v0.17.1) — the go-output repo releases sub-modules at staggered versions, so MVS selects the newest tag each module offers rather than a single lockstep version.
+- **16 output formats** via go-output `v0.23.3` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`.
+- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. The 10 direct go-output modules (root + 9 sub-modules) and 2 indirect modules (`escape`, `daghtml`) are all pinned at v0.23.3. The `enum` and `envdetect` sub-modules were absorbed into go-output core.
 - **fang styling** — styled output by default; `--no-color` persistent flag is registered by default and sets `NO_COLOR=1` for fang; `NO_COLOR` env var also respected automatically via fang's colorprofile. `cli.NoColor()` returns true if either is set.
 - **Glamour env-based theme** — `WithGlamourHelp[T]()` uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`). The string `"auto"` is NOT a valid glamour theme — `WithGlamourHelp` sets theme to `""` for env-based detection.
 - **Glamour idempotent** — `applyGlamourIfEnabled` resets `glamourHelp=false` after applying to prevent double-rendering (ANSI-inside-ANSI); calling Execute twice is safe
@@ -308,7 +308,7 @@ go build ./...                                   # Verify build
 
 - `WithAuditLog[T](plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.
-- `samber-do-auditlog` is consumed from the Go module proxy (`v0.3.0`). The sibling repo at `../samber-do-auditlog` is for local dev only — a `replace` directive works for local builds but is **ignored by downstream consumers** (replace directives in a library's go.mod only affect the module's own build/CI).
+- `samber-do-auditlog` is consumed from the Go module proxy (`v0.3.1`). The sibling repo at `../samber-do-auditlog` is for local dev only — a `replace` directive works for local builds but is **ignored by downstream consumers** (replace directives in a library's go.mod only affect the module's own build/CI).
 
 #### Fang Integration (ADR-001)
 

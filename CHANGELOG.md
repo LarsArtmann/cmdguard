@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.2] - 2026-07-05
+
+### Changed
+
+- Bump `go-output` from v0.23.0 to v0.23.3 (all 10 direct sub-modules + 2 indirect: `escape`, `daghtml`)
+- Bump `samber-do-auditlog` from v0.3.0 to v0.3.1
+- Bump `go-toml/v2` from v2.4.2 to v2.4.3
+- Bump `lipgloss/v2` from v2.0.4 to v2.0.5
+- Bump `bubbles/v2` from v2.1.0 to v2.1.1
+- Bump `bubbletea/v2` from v2.0.7 to v2.0.8
+
+### Docs
+
+- Sync AGENTS.md and FEATURES.md dependency tables to actual go.mod versions (go-output v0.17.2→v0.23.3, samber-do-auditlog v0.3.0→v0.3.1)
+- Fix stale `Version: 2.8.1` in package doc comment
+- Update go-output sub-modules note: `enum`/`envdetect` absorbed into core; indirect set is now `escape` + `daghtml`
+
 ## [2.10.1] - 2026-07-02
 
 ### Changed
@@ -434,7 +451,10 @@ failure or double-prints errors.
 - Flag binding with struct tags
 - Full Cobra integration
 
-[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v2.10.2...HEAD
+[2.10.2]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.2
+[2.10.1]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.1
+[2.10.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.0
 [2.9.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.9.0
 [2.8.1]: https://github.com/larsartmann/cmdguard/releases/tag/v2.8.1
 [2.8.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.8.0
