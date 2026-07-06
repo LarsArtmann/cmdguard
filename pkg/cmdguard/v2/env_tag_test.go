@@ -66,15 +66,15 @@ func TestEnvTag_Integration(t *testing.T) {
 			cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{}, tt.cliOptions...)
 			testutil.AssertNoError(t, err)
 
-			cmd, err := NewCommand[envTestConfig, *flags](
+			cmd, err := NewCommand(
 				"connect",
+				&flags{},
 				func(_ context.Context, _ *envTestConfig, f *flags) error {
 					result = f.Host
 
 					return nil
 				},
-				WithShort[envTestConfig, *flags]("Connect"),
-				WithFlags[envTestConfig, *flags](&flags{}),
+				WithShort("Connect"),
 			)
 			testutil.AssertNoError(t, err)
 			testutil.AssertNoError(t, AddCommand(cli, cmd))

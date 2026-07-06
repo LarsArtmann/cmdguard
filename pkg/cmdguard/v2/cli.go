@@ -216,19 +216,19 @@ func (cli *CLI[T]) buildInjectorOpts() *do.InjectorOpts {
 
 // AddCommand adds a subcommand to the CLI with any flags type.
 func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
-	if _, exists := cli.registeredCmds[cmd.use]; exists {
-		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.use)
+	if _, exists := cli.registeredCmds[cmd.spec.use]; exists {
+		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.spec.use)
 	}
 
 	if err := cmd.validate(cli.validationMode); err != nil {
-		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.use, cli.name, err)
+		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.spec.use, cli.name, err)
 	}
 
-	cli.registeredCmds[cmd.use] = struct{}{}
+	cli.registeredCmds[cmd.spec.use] = struct{}{}
 
 	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware, cli.envPrefix)
 	if err != nil {
-		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.use, cli.name, err)
+		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.name, err)
 	}
 
 	cli.rootCmd.AddCommand(cobraCmd)

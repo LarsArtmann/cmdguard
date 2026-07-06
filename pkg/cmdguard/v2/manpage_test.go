@@ -16,10 +16,11 @@ func TestManPage(t *testing.T) {
 	cli, err := NewCLI[manTestConfig]("testcli", "A test CLI for man pages", manTestConfig{})
 	testutil.AssertNoError(t, err)
 
-	cmd, err := NewCommand[manTestConfig, NoFlags](
+	cmd, err := NewCommand(
 		"hello",
+		NoFlags{},
 		func(_ context.Context, _ *manTestConfig, _ NoFlags) error { return nil },
-		WithShort[manTestConfig, NoFlags]("Say hello"),
+		WithShort("Say hello"),
 	)
 	testutil.AssertNoError(t, err)
 

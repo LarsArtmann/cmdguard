@@ -178,11 +178,12 @@ func TestGlamourHelp_E2ERendering(t *testing.T) {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
 
-	cmd, err := NewCommand[testConfig, NoFlags](
+	cmd, err := NewCommand(
 		"greet",
+		NoFlags{},
 		func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-		WithShort[testConfig, NoFlags]("Greet someone"),
-		WithLong[testConfig, NoFlags](markdownLong),
+		WithShort("Greet someone"),
+		WithLong(markdownLong),
 	)
 	if err != nil {
 		t.Fatalf("NewCommand failed: %v", err)

@@ -20,11 +20,12 @@ func TestGenerateDocs_ProducesMarkdown(t *testing.T) {
 
 	cmd, err := NewCommand(
 		"greet",
+		NoFlags{},
 		func(_ context.Context, _ *cfg, _ NoFlags) error {
 			return nil
 		},
-		WithShort[cfg, NoFlags]("greets someone"),
-		WithLong[cfg, NoFlags]("A longer description of the greet command that spans a sentence."),
+		WithShort("greets someone"),
+		WithLong("A longer description of the greet command that spans a sentence."),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -67,21 +68,23 @@ func TestGenerateDocs_HiddenCommandSkipped(t *testing.T) {
 
 	visible, err := NewCommand(
 		"visible",
+		NoFlags{},
 		func(_ context.Context, _ *cfg, _ NoFlags) error {
 			return nil
 		},
-		WithShort[cfg, NoFlags]("visible command"),
+		WithShort("visible command"),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, visible))
 
 	hidden, err := NewCommand(
 		"secret",
+		NoFlags{},
 		func(_ context.Context, _ *cfg, _ NoFlags) error {
 			return nil
 		},
-		WithShort[cfg, NoFlags]("hidden command"),
-		WithHidden[cfg, NoFlags](true),
+		WithShort("hidden command"),
+		WithHidden(true),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, hidden))

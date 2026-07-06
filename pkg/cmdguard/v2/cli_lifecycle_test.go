@@ -180,7 +180,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 
 		var receivedName string
 
-		cmd, err := v2.NewCommand[testCLIConfig, testFlags](
+		cmd, err := v2.NewCommand(
 			"test",
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
 			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
@@ -228,7 +228,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 
 		var receivedValue string
 
-		cmd, err := v2.NewCommand[testCLIConfig, testFlags](
+		cmd, err := v2.NewCommand(
 			"test",
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
 			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),

@@ -62,7 +62,7 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 	}
 
 	return Command[testAppConfig, NoFlags]{
-		use: use,
+		spec: commandSpec{use: use},
 		runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			return runErr
 		},
@@ -171,11 +171,8 @@ func addGroupedCommand[T any](t *testing.T, cli *CLI[T], use, short, group strin
 	t.Helper()
 
 	err := AddCommand(cli, Command[T, NoFlags]{
-		use:   use,
-		short: short,
-		long:  short,
-		group: group,
-		runE:  testutil.NoOpRunE[T, NoFlags],
+		spec: commandSpec{use: use, short: short, long: short, group: group},
+		runE: testutil.NoOpRunE[T, NoFlags],
 	})
 	if err != nil {
 		t.Fatalf("AddCommand failed: %v", err)
@@ -250,10 +247,11 @@ func addShortCommandToStrictCLI(
 	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, opts...)
 	testutil.AssertNoError(t, err)
 
-	cmd, err := NewCommand[testConfig, NoFlags](
+	cmd, err := NewCommand(
 		"good",
+		NoFlags{},
 		noOpHandler(),
-		WithShort[testConfig, NoFlags]("A good command"),
+		WithShort("A good command"),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -273,8 +271,9 @@ func assertShortCommandAcceptedOnStrictCLI(t *testing.T) {
 func noShortCommand(t *testing.T) Command[testConfig, NoFlags] {
 	t.Helper()
 
-	cmd, err := NewCommand[testConfig, NoFlags](
+	cmd, err := NewCommand(
 		"noshort",
+		NoFlags{},
 		noOpHandler(),
 	)
 	testutil.AssertNoError(t, err)
@@ -287,11 +286,12 @@ func noShortCommand(t *testing.T) Command[testConfig, NoFlags] {
 func goodCommand(t *testing.T, use, short, example string) Command[testConfig, NoFlags] {
 	t.Helper()
 
-	cmd, err := NewCommand[testConfig, NoFlags](
+	cmd, err := NewCommand(
 		use,
+		NoFlags{},
 		noOpHandler(),
-		WithShort[testConfig, NoFlags](short),
-		WithExample[testConfig, NoFlags](example),
+		WithShort(short),
+		WithExample(example),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -303,8 +303,9 @@ func goodCommand(t *testing.T, use, short, example string) Command[testConfig, N
 func runFlagCommand[T any](t *testing.T, cli *CLI[T], executed *bool) {
 	t.Helper()
 
-	cmd, err := NewCommand[T, NoFlags](
+	cmd, err := NewCommand(
 		"run",
+		NoFlags{},
 		func(_ context.Context, _ *T, _ NoFlags) error {
 			*executed = true
 

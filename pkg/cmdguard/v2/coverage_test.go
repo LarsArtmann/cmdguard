@@ -39,10 +39,11 @@ func TestAddCommand(t *testing.T) {
 
 		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
 		testutil.AssertNoError(t, err)
-		cmd, err := NewCommand[struct{}, NoFlags](
+		cmd, err := NewCommand(
 			"hello",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
-			WithShort[struct{}, NoFlags]("Say hello"),
+			WithShort("Say hello"),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -54,16 +55,18 @@ func TestAddCommand(t *testing.T) {
 
 		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
 		testutil.AssertNoError(t, err)
-		cmd, err := NewCommand[struct{}, NoFlags](
+		cmd, err := NewCommand(
 			"hello",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 		)
 		testutil.AssertNoError(t, err)
 
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
-		cmd2, _ := NewCommand[struct{}, NoFlags](
+		cmd2, _ := NewCommand(
 			"hello",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
 		)
 		err = AddCommand(cli, cmd2)
@@ -149,10 +152,11 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("Version returns version", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags](
+		cmd, err := NewCommand(
 			"test",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
-			func(c *Command[struct{}, NoFlags]) { c.version = "1.2.3" },
+			func(s *commandSpec) { s.version = "1.2.3" },
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertEqual(t, "1.2.3", cmd.Version())
@@ -161,10 +165,11 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("SilenceErrors returns silenceErrors", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags](
+		cmd, err := NewCommand(
 			"test",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
-			func(c *Command[struct{}, NoFlags]) { c.silenceErrors = true },
+			func(s *commandSpec) { s.silenceErrors = true },
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertBoolTrue(t, cmd.SilenceErrors(), "should be true")
@@ -173,10 +178,11 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("SilenceUsage returns silenceUsage", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags](
+		cmd, err := NewCommand(
 			"test",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
-			func(c *Command[struct{}, NoFlags]) { c.silenceUsage = true },
+			func(s *commandSpec) { s.silenceUsage = true },
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertBoolTrue(t, cmd.SilenceUsage(), "should be true")
@@ -185,10 +191,11 @@ func TestCommandAccessors(t *testing.T) {
 	t.Run("Group returns group", func(t *testing.T) {
 		t.Parallel()
 
-		cmd, err := NewCommand[struct{}, NoFlags](
+		cmd, err := NewCommand(
 			"test",
+			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
-			WithGroupID[struct{}, NoFlags]("mygroup"),
+			WithGroupID("mygroup"),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertEqual(t, "mygroup", cmd.Group())

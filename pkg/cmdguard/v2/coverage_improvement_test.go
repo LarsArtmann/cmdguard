@@ -142,14 +142,14 @@ func TestWithArgs_SetsCustomValidator(t *testing.T) {
 			return nil
 		}
 
-		cmd := Command[testConfig, NoFlags]{use: "test"}
-		WithArgs[testConfig, NoFlags](validator)(&cmd)
+		cmd := Command[testConfig, NoFlags]{spec: commandSpec{use: "test"}}
+		WithArgs(validator)(&cmd.spec)
 
-		if cmd.args == nil {
+		if cmd.spec.args == nil {
 			t.Fatal("expected args to be set")
 		}
 
-		if err := cmd.args(&cobra.Command{}, []string{}); err != nil {
+		if err := cmd.spec.args(&cobra.Command{}, []string{}); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
@@ -169,14 +169,14 @@ func TestWithCompletion_SetsCompletionFunc(t *testing.T) {
 			return []string{"apple", "banana"}, cobra.ShellCompDirectiveNoFileComp
 		}
 
-		cmd := Command[testConfig, NoFlags]{use: "test"}
-		WithCompletion[testConfig, NoFlags](fn)(&cmd)
+		cmd := Command[testConfig, NoFlags]{spec: commandSpec{use: "test"}}
+		WithCompletion(fn)(&cmd.spec)
 
-		if cmd.completionFn == nil {
+		if cmd.spec.completionFn == nil {
 			t.Fatal("expected completionFn to be set")
 		}
 
-		results, directive := cmd.completionFn(&cobra.Command{}, nil, "")
+		results, directive := cmd.spec.completionFn(&cobra.Command{}, nil, "")
 		if len(results) != 2 {
 			t.Errorf("expected 2 results, got %d", len(results))
 		}
@@ -193,26 +193,26 @@ func TestWithValidArgs_SetsStaticArgs(t *testing.T) {
 	t.Run("sets valid args on command", func(t *testing.T) {
 		t.Parallel()
 
-		cmd := Command[testConfig, NoFlags]{use: "test"}
-		WithValidArgs[testConfig, NoFlags]("one", "two", "three")(&cmd)
+		cmd := Command[testConfig, NoFlags]{spec: commandSpec{use: "test"}}
+		WithValidArgs("one", "two", "three")(&cmd.spec)
 
-		if len(cmd.validArgs) != 3 {
-			t.Fatalf("expected 3 valid args, got %d", len(cmd.validArgs))
+		if len(cmd.spec.validArgs) != 3 {
+			t.Fatalf("expected 3 valid args, got %d", len(cmd.spec.validArgs))
 		}
 
-		testutil.AssertFieldEqString(t, cmd.validArgs[0], "one", "validArgs[0]")
-		testutil.AssertFieldEqString(t, cmd.validArgs[1], "two", "validArgs[1]")
-		testutil.AssertFieldEqString(t, cmd.validArgs[2], "three", "validArgs[2]")
+		testutil.AssertFieldEqString(t, cmd.spec.validArgs[0], "one", "validArgs[0]")
+		testutil.AssertFieldEqString(t, cmd.spec.validArgs[1], "two", "validArgs[1]")
+		testutil.AssertFieldEqString(t, cmd.spec.validArgs[2], "three", "validArgs[2]")
 	})
 
 	t.Run("sets empty valid args", func(t *testing.T) {
 		t.Parallel()
 
-		cmd := Command[testConfig, NoFlags]{use: "test"}
-		WithValidArgs[testConfig, NoFlags]()(&cmd)
+		cmd := Command[testConfig, NoFlags]{spec: commandSpec{use: "test"}}
+		WithValidArgs()(&cmd.spec)
 
-		if cmd.validArgs != nil {
-			t.Errorf("expected nil validArgs, got %v", cmd.validArgs)
+		if cmd.spec.validArgs != nil {
+			t.Errorf("expected nil validArgs, got %v", cmd.spec.validArgs)
 		}
 	})
 }

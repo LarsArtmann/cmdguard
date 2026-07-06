@@ -65,14 +65,15 @@ func TestWithOutputFormat(t *testing.T) {
 
 		resolved := ""
 
-		cmd, err := NewCommand[outputTestConfig, NoFlags](
+		cmd, err := NewCommand(
 			"show",
+			NoFlags{},
 			func(_ context.Context, _ *outputTestConfig, _ NoFlags) error {
 				resolved = string(cli.OutputFormat())
 
 				return nil
 			},
-			WithShort[outputTestConfig, NoFlags]("show something"),
+			WithShort("show something"),
 		)
 		testutil.AssertNoError(t, err)
 

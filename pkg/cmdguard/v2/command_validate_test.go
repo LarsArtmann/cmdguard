@@ -12,14 +12,14 @@ type testConfig struct {
 
 func newTestCommand() Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		use:  "test",
+		spec: commandSpec{use: "test"},
 		runE: noOpHandler(),
 	}
 }
 
 func newTestSubcommand(use string) Command[testConfig, NoFlags] {
 	return Command[testConfig, NoFlags]{
-		use:  use,
+		spec: commandSpec{use: use},
 		runE: noOpHandler(),
 	}
 }
@@ -41,8 +41,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:  "root",
-			long: "Root command with subcommands",
+			spec: commandSpec{use: "root", long: "Root command with subcommands"},
 			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("sub"),
 			},
@@ -77,7 +76,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use: "test",
+			spec: commandSpec{use: "test"},
 		}
 
 		err := cmd.Validate()
@@ -96,11 +95,10 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:  "root",
-			long: "Root command",
+			spec: commandSpec{use: "root", long: "Root command"},
 			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("valid-sub"),
-				{use: "invalid-sub"},
+				{spec: commandSpec{use: "invalid-sub"}},
 			},
 		}
 
@@ -116,8 +114,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:  "root",
-			long: "Root command",
+			spec: commandSpec{use: "root", long: "Root command"},
 			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("duplicate"),
 				newTestSubcommand("duplicate"),
@@ -140,7 +137,7 @@ func TestCommand_Validate(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use: "parent",
+			spec: commandSpec{use: "parent"},
 			commands: []Command[testConfig, NoFlags]{
 				newTestSubcommand("child"),
 			},
@@ -170,7 +167,7 @@ func TestCommand_Validate(t *testing.T) {
 		}
 
 		cmd := Command[testConfig, *flags]{
-			use:   "test",
+			spec:  commandSpec{use: "test"},
 			flags: &flags{},
 			runE:  noOpRunE,
 		}
@@ -188,11 +185,10 @@ func TestCommand_HasSubcommands(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:  "root",
-			long: "Root command",
+			spec: commandSpec{use: "root", long: "Root command"},
 			commands: []Command[testConfig, NoFlags]{
-				{use: "sub1", runE: noOpHandler()},
-				{use: "sub2", runE: noOpHandler()},
+				{spec: commandSpec{use: "sub1"}, runE: noOpHandler()},
+				{spec: commandSpec{use: "sub2"}, runE: noOpHandler()},
 			},
 		}
 
@@ -205,6 +201,7 @@ func TestCommand_HasSubcommands(t *testing.T) {
 		t.Parallel()
 
 		cmd := newTestCommand()
+
 		if cmd.HasSubcommands() {
 			t.Error("HasSubcommands() = true, want false")
 		}
@@ -213,21 +210,23 @@ func TestCommand_HasSubcommands(t *testing.T) {
 
 func TestCommand_HasHandler(t *testing.T) {
 	t.Parallel()
-	t.Run("returns true with RunE", func(t *testing.T) {
+	t.Run("returns true with handler", func(t *testing.T) {
 		t.Parallel()
 
 		cmd := newTestCommand()
+
 		if !cmd.HasHandler() {
 			t.Error("HasHandler() = false, want true")
 		}
 	})
 
-	t.Run("returns false without RunE", func(t *testing.T) {
+	t.Run("returns false without handler", func(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use: "test",
+			spec: commandSpec{use: "test"},
 		}
+
 		if cmd.HasHandler() {
 			t.Error("HasHandler() = true, want false")
 		}

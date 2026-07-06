@@ -232,12 +232,13 @@ func TestJSONErrorIntegration(t *testing.T) {
 			cli, cliErr := NewCLI[jsonErrConfig]("test", "test", jsonErrConfig{}, tt.cliOpts...)
 			testutil.AssertNoError(t, cliErr)
 
-			cmd, cmdErr := NewCommand[jsonErrConfig, *NoFlags](
+			cmd, cmdErr := NewCommand(
 				"fail",
-				func(_ context.Context, _ *jsonErrConfig, _ *NoFlags) error {
+				NoFlags{},
+				func(_ context.Context, _ *jsonErrConfig, _ NoFlags) error {
 					return tt.handlerErr
 				},
-				WithShort[jsonErrConfig, *NoFlags]("fails"),
+				WithShort("fails"),
 			)
 			testutil.AssertNoError(t, cmdErr)
 			testutil.AssertNoError(t, AddCommand(cli, cmd))

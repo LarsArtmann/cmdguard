@@ -12,7 +12,7 @@ import (
 func newTestCLICommand[C any](t *testing.T, use string) v2.Command[C, v2.NoFlags] {
 	t.Helper()
 
-	cmd, err := v2.NewCommand[C, v2.NoFlags](use, noOpRunE[C])
+	cmd, err := v2.NewCommand(use, v2.NoFlags{}, noOpRunE[C])
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -20,12 +20,12 @@ func newTestCLICommand[C any](t *testing.T, use string) v2.Command[C, v2.NoFlags
 	return cmd
 }
 
-func newTestCLICommandWithShort[C any](t *testing.T, use, short string) v2.Command[C, v2.NoFlags] {
+func newTestCLICommandWithShort(t *testing.T, use, short string) v2.Command[C, v2.NoFlags] {
 	t.Helper()
 
-	cmd, err := v2.NewCommand[C, v2.NoFlags](
-		use, noOpRunE[C],
-		v2.WithShort[C, v2.NoFlags](short),
+	cmd, err := v2.NewCommand(
+		use, v2.NoFlags{}, noOpRunE[C],
+		v2.WithShort(short),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -41,9 +41,10 @@ func newTestParentCommand[C any](
 ) v2.Command[C, v2.NoFlags] {
 	t.Helper()
 
-	cmd, err := v2.NewParentCommand[C, v2.NoFlags](
-		use, long, children,
-		v2.WithShort[C, v2.NoFlags](short),
+	cmd, err := v2.NewParentCommand(
+		use, long, v2.NoFlags{},
+		v2.WithSubcommands(children...),
+		v2.WithShort(short),
 	)
 	if err != nil {
 		t.Fatal(err)

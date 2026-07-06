@@ -28,8 +28,9 @@ func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 	appName := cli.name
 	appVersion := cli.version
 
-	return NewCommand[T, NoFlags](
+	return NewCommand(
 		"version",
+		NoFlags{},
 		func(ctx context.Context, cfg *T, _ NoFlags) error {
 			_, err := fmt.Fprintf(cli.rootCmd.OutOrStdout(), "%s %s\n", appName, appVersion)
 			if err != nil {
@@ -38,8 +39,8 @@ func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 
 			return nil
 		},
-		WithShort[T, NoFlags]("Print version information"),
-		WithLong[T, NoFlags](fmt.Sprintf("Print the version of %s.", appName)),
+		WithShort("Print version information"),
+		WithLong(fmt.Sprintf("Print the version of %s.", appName)),
 	)
 }
 

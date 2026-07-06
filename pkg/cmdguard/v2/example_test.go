@@ -49,14 +49,14 @@ func ExampleNewCommand_withFlags() {
 		Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
 	}
 
-	_, err := v2.NewCommand[config, *greetFlags](
+	_, err := v2.NewCommand(
 		"greet",
 		func(ctx context.Context, cfg *config, flags *greetFlags) error {
 			fmt.Printf("Hello, %s!", flags.Name)
 
 			return nil
 		},
-		v2.WithShort[config, *greetFlags]("Greet someone"),
+		v2.WithShort("Greet someone"),
 		v2.WithFlags[config, *greetFlags](&greetFlags{}),
 	)
 	if err != nil {

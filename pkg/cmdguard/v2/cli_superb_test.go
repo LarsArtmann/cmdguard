@@ -11,14 +11,15 @@ import (
 )
 
 // newTestCLIWithNoOpCmd creates a CLI with a no-op "cmd" command using the given options.
-func newTestCLIWithNoOpCmd(t *testing.T, opts ...CommandOption[testConfig, NoFlags]) *CLI[testConfig] {
+func newTestCLIWithNoOpCmd(t *testing.T, opts ...CommandOption) *CLI[testConfig] {
 	t.Helper()
 
 	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
 	testutil.AssertNoError(t, err)
 
-	cmd, err := NewCommand[testConfig, NoFlags](
+	cmd, err := NewCommand(
 		"cmd",
+		NoFlags{},
 		func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
 		opts...,
 	)
@@ -91,8 +92,9 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 		cli, err := NewCLI[testConfig]("test", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand(
 			"fail",
+			NoFlags{},
 			func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				return errors.New("always fails")
 			},
@@ -115,8 +117,9 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 		cli, err := NewCLI[testConfig]("test", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand(
 			"fail-custom",
+			NoFlags{},
 			func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				exitErr, _ := NewExitError(42, errors.New("custom failure"))
 
@@ -239,17 +242,18 @@ func TestWithStrictValidation(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		childCmd, err := NewCommand[testConfig, NoFlags](
+		childCmd, err := NewCommand(
 			"child-no-short",
+			NoFlags{},
 			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
 		)
 		testutil.AssertNoError(t, err)
 
-		parentCmd, err := NewParentCommand[testConfig, NoFlags](
+		parentCmd, err := NewParentCommand[testConfig](
 			"parent",
 			"Parent description",
 			[]Command[testConfig, NoFlags]{childCmd},
-			WithShort[testConfig, NoFlags]("Parent"),
+			WithShort("Parent"),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -273,10 +277,11 @@ func TestWithDraconianValidation(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand(
 			"noexample",
+			NoFlags{},
 			func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-			WithShort[testConfig, NoFlags]("Has short but no example"),
+			WithShort("Has short but no example"),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -311,10 +316,10 @@ func TestWithDraconianValidation(t *testing.T) {
 
 		childCmd := goodCommand(t, "child", "Child", "test parent child")
 
-		parentCmd, err := NewParentCommand[testConfig, NoFlags](
+		parentCmd, err := NewParentCommand[testConfig](
 			"parent",
 			"Parent description", []Command[testConfig, NoFlags]{childCmd},
-			WithShort[testConfig, NoFlags]("Parent"),
+			WithShort("Parent"),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, parentCmd))
@@ -348,7 +353,7 @@ func TestCommand_ValidateStrict(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:  "test",
+			spec: commandSpec{use: "test"},
 			runE: noOpHandler(),
 		}
 
@@ -363,7 +368,7 @@ func TestCommand_ValidateStrict(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:  "test",
+			spec: commandSpec{use: "test"},
 			runE: noOpHandler(),
 		}
 
@@ -375,9 +380,8 @@ func TestCommand_ValidateStrict(t *testing.T) {
 		t.Parallel()
 
 		cmd := Command[testConfig, NoFlags]{
-			use:   "test",
-			short: "Test command",
-			runE:  noOpHandler(),
+			spec: commandSpec{use: "test", short: "Test command"},
+			runE: noOpHandler(),
 		}
 
 		err := cmd.ValidateStrict()
@@ -460,14 +464,15 @@ func TestWithExactArgs(t *testing.T) {
 		testutil.AssertNoError(t, err)
 
 		var received []string
-		cmd, err := NewCommand[testConfig, NoFlags](
+		cmd, err := NewCommand(
 			"cmd",
+			NoFlags{},
 			func(ctx context.Context, _ *testConfig, _ NoFlags) error {
 				received = ArgsFromContext(ctx)
 
 				return nil
 			},
-			WithExactArgs[testConfig, NoFlags](2),
+			WithExactArgs(2),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -482,7 +487,7 @@ func TestWithExactArgs(t *testing.T) {
 	t.Run("exact args - wrong count fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithExactArgs[testConfig, NoFlags](2))
+		cli := newTestCLIWithNoOpCmd(t, WithExactArgs(2))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "only-one"})
 		testutil.AssertExpectedError(t, err)
@@ -496,7 +501,7 @@ func TestWithMinimumArgs(t *testing.T) {
 	t.Run("minimum args - enough args passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithMinimumArgs[testConfig, NoFlags](1))
+		cli := newTestCLIWithNoOpCmd(t, WithMinimumArgs(1))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "arg1", "arg2"})
 		testutil.AssertNoError(t, err)
@@ -505,7 +510,7 @@ func TestWithMinimumArgs(t *testing.T) {
 	t.Run("minimum args - too few fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithMinimumArgs[testConfig, NoFlags](2))
+		cli := newTestCLIWithNoOpCmd(t, WithMinimumArgs(2))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "one"})
 		testutil.AssertExpectedError(t, err)
@@ -519,7 +524,7 @@ func TestWithMaximumArgs(t *testing.T) {
 	t.Run("maximum args - within limit passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithMaximumArgs[testConfig, NoFlags](2))
+		cli := newTestCLIWithNoOpCmd(t, WithMaximumArgs(2))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd"})
 		testutil.AssertNoError(t, err)
@@ -528,7 +533,7 @@ func TestWithMaximumArgs(t *testing.T) {
 	t.Run("maximum args - exceeds limit fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithMaximumArgs[testConfig, NoFlags](1))
+		cli := newTestCLIWithNoOpCmd(t, WithMaximumArgs(1))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "a", "b"})
 		testutil.AssertExpectedError(t, err)
@@ -542,7 +547,7 @@ func TestWithNoArgs(t *testing.T) {
 	t.Run("no args - zero args passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithNoArgs[testConfig, NoFlags]())
+		cli := newTestCLIWithNoOpCmd(t, WithNoArgs())
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd"})
 		testutil.AssertNoError(t, err)
@@ -551,7 +556,7 @@ func TestWithNoArgs(t *testing.T) {
 	t.Run("no args - any args fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithNoArgs[testConfig, NoFlags]())
+		cli := newTestCLIWithNoOpCmd(t, WithNoArgs())
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "--", "unexpected"})
 		testutil.AssertExpectedError(t, err)
@@ -573,7 +578,7 @@ func TestWithRangeArgs(t *testing.T) {
 	t.Run("within range passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithRangeArgs[testConfig, NoFlags](1, 3))
+		cli := newTestCLIWithNoOpCmd(t, WithRangeArgs(1, 3))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "a", "b"})
 		testutil.AssertNoError(t, err)
@@ -582,7 +587,7 @@ func TestWithRangeArgs(t *testing.T) {
 	t.Run("below range fails", func(t *testing.T) {
 		t.Parallel()
 
-		cli := newTestCLIWithNoOpCmd(t, WithRangeArgs[testConfig, NoFlags](2, 4))
+		cli := newTestCLIWithNoOpCmd(t, WithRangeArgs(2, 4))
 
 		err := cli.ExecuteWithArgs(context.Background(), []string{"cmd", "only-one"})
 		testutil.AssertExpectedError(t, err)

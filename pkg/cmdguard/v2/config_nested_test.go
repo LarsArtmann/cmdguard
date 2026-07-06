@@ -146,10 +146,11 @@ func TestNestedConfig_CLIIntegration(t *testing.T) {
 
 	cmd, err := NewCommand(
 		"run",
+		NoFlags{},
 		func(_ context.Context, _ *nestedRootConfig, _ NoFlags) error {
 			return nil
 		},
-		WithShort[nestedRootConfig, NoFlags]("run"),
+		WithShort("run"),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))

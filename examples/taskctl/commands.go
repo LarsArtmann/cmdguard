@@ -14,8 +14,6 @@ import (
 
 //nolint:gocyclo // example file: linear command registration reads best as a single function
 func buildCommands(cli *v2.CLI[AppConfig]) error {
-	// dbActionHandler returns a handler that prints a one-line DB action summary
-	// including the target environment and --force flag.
 	dbActionHandler := func(verb string) func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 		return func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 			fmt.Printf("%s %s (force=%v)\n", verb, flags.Env, flags.Force)
@@ -23,8 +21,6 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 			return nil
 		}
 	}
-	// printAndNil returns a RunE handler that prints msg and returns nil.
-	// Used by placeholder commands (secret/deprecated) where the body is informational.
 	printAndNil := func(msg string) func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 		return func(_ context.Context, _ *AppConfig, _ v2.NoFlags) error {
 			fmt.Println(msg)
@@ -35,8 +31,9 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 	scope := cli.Scope()
 
 	// --- list: multi-format output, aliases, filter flags ---
-	listCmd, err := v2.NewCommand[AppConfig, *ListFlags](
+	listCmd, err := v2.NewCommand(
 		"list",
+		&ListFlags{},
 		func(_ context.Context, _ *AppConfig, flags *ListFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -62,8 +59,8 @@ func buildCommands(cli *v2.CLI[AppConfig]) error {
 
 			return v2.OutputTable(format, headers, rows)
 		},
-		v2.WithShort[AppConfig, *ListFlags]("List tasks"),
-		v2.WithLong[AppConfig, *ListFlags](`# List Tasks
+		v2.WithShort("List tasks"),
+		v2.WithLong(`# List Tasks
 
 Display all tasks with optional filtering by priority and completion status.
 
@@ -73,11 +70,10 @@ Supports multiple **output formats** for scripting and automation:
 - `+"`json`"+` — structured JSON for piping into `+"`jq`"+`
 - `+"`csv`"+` — comma-separated for spreadsheet import
 - `+"`yaml`"+` — structured YAML for config files`),
-		v2.WithExample[AppConfig, *ListFlags]("taskctl list --format json --all"),
-		v2.WithAliases[AppConfig, *ListFlags]("ls"),
-		v2.WithFlags[AppConfig, *ListFlags](&ListFlags{}),
-		v2.WithGroupID[AppConfig, *ListFlags]("tasks"),
-		v2.WithNoArgs[AppConfig, *ListFlags](),
+		v2.WithExample("taskctl list --format json --all"),
+		v2.WithAliases("ls"),
+		v2.WithGroupID("tasks"),
+		v2.WithNoArgs(),
 	)
 	if err != nil {
 		return err
@@ -87,8 +83,9 @@ Supports multiple **output formats** for scripting and automation:
 	}
 
 	// --- add: required flags, values tag, PreRunE validation ---
-	addCmd, err := v2.NewCommand[AppConfig, *AddFlags](
+	addCmd, err := v2.NewCommand(
 		"add",
+		&AddFlags{},
 		func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -99,26 +96,23 @@ Supports multiple **output formats** for scripting and automation:
 			fmt.Printf("Created task #%d: %s [%s]\n", task.ID, task.Title, task.Priority)
 			return nil
 		},
-		v2.WithShort[AppConfig, *AddFlags]("Add a new task"),
-		v2.WithLong[AppConfig, *AddFlags](`# Add Task
+		v2.WithShort("Add a new task"),
+		v2.WithLong(`# Add Task
 
 Create a new task with a **title** and *priority*.
 
 The `+"`--title`"+` flag is **required** and will prompt interactively if omitted.
 
 Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"`medium`"+`).`),
-		v2.WithExample[AppConfig, *AddFlags]("taskctl add --title \"Fix bug\" --priority high"),
-		v2.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
-		v2.WithPreRunE[AppConfig, *AddFlags](
-			func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
-				if _, err := v2.ParseEnum(flags.Priority, strings.Split(allowedPriorities, ",")); err != nil {
-					return v2.NewFlagError("priority", err)
-				}
-				return nil
-			},
-		),
-		v2.WithGroupID[AppConfig, *AddFlags]("tasks"),
-		v2.WithNoArgs[AppConfig, *AddFlags](),
+		v2.WithExample("taskctl add --title \"Fix bug\" --priority high"),
+		v2.WithPreRunE(func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
+			if _, err := v2.ParseEnum(flags.Priority, strings.Split(allowedPriorities, ",")); err != nil {
+				return v2.NewFlagError("priority", err)
+			}
+			return nil
+		}),
+		v2.WithGroupID("tasks"),
+		v2.WithNoArgs(),
 	)
 	if err != nil {
 		return err
@@ -128,8 +122,9 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 	}
 
 	// --- done: exit codes, PostRunE cleanup, dynamic completion ---
-	doneCmd, err := v2.NewCommand[AppConfig, *DoneFlags](
+	doneCmd, err := v2.NewCommand(
 		"done",
+		&DoneFlags{},
 		func(_ context.Context, _ *AppConfig, flags *DoneFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -145,26 +140,21 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 			fmt.Printf("Completed task #%d: %s\n", task.ID, task.Title)
 			return nil
 		},
-		v2.WithShort[AppConfig, *DoneFlags]("Mark a task as done"),
-		v2.WithExample[AppConfig, *DoneFlags]("taskctl done --id 1"),
-		v2.WithFlags[AppConfig, *DoneFlags](&DoneFlags{}),
-		v2.WithPostRunE[AppConfig, *DoneFlags](
-			func(_ context.Context, _ *AppConfig, _ *DoneFlags) error {
-				fmt.Println("[cleanup] syncing state")
-				return nil
-			},
-		),
-		v2.WithGroupID[AppConfig, *DoneFlags]("tasks"),
-		v2.WithCompletion[AppConfig, *DoneFlags](
-			func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-				store, err := v2.Invoke[*TaskStore](scope)
-				if err != nil {
-					return nil, cobra.ShellCompDirectiveError
-				}
-				return store.IDs(), cobra.ShellCompDirectiveNoFileComp
-			},
-		),
-		v2.WithNoArgs[AppConfig, *DoneFlags](),
+		v2.WithShort("Mark a task as done"),
+		v2.WithExample("taskctl done --id 1"),
+		v2.WithPostRunE(func(_ context.Context, _ *AppConfig, _ *DoneFlags) error {
+			fmt.Println("[cleanup] syncing state")
+			return nil
+		}),
+		v2.WithGroupID("tasks"),
+		v2.WithCompletion(func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			store, err := v2.Invoke[*TaskStore](scope)
+			if err != nil {
+				return nil, cobra.ShellCompDirectiveError
+			}
+			return store.IDs(), cobra.ShellCompDirectiveNoFileComp
+		}),
+		v2.WithNoArgs(),
 	)
 	if err != nil {
 		return err
@@ -174,8 +164,9 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 	}
 
 	// --- stats: OutputTable for terminal output ---
-	statsCmd, err := v2.NewCommand[AppConfig, *StatsFlags](
+	statsCmd, err := v2.NewCommand(
 		"stats",
+		&StatsFlags{},
 		func(_ context.Context, _ *AppConfig, _ *StatsFlags) error {
 			store, err := resolveStore(scope)
 			if err != nil {
@@ -197,10 +188,10 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 				},
 			)
 		},
-		v2.WithShort[AppConfig, *StatsFlags]("Show task statistics"),
-		v2.WithFlags[AppConfig, *StatsFlags](&StatsFlags{}),
-		v2.WithGroupID[AppConfig, *StatsFlags]("tasks"),
-		v2.WithNoArgs[AppConfig, *StatsFlags](),
+		v2.WithShort("Show task statistics"),
+		v2.WithExample("taskctl stats --format json"),
+		v2.WithGroupID("tasks"),
+		v2.WithNoArgs(),
 	)
 	if err != nil {
 		return err
@@ -210,8 +201,9 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 	}
 
 	// --- inspect: ExactArgs, BranchingFlowContext, real task lookup ---
-	inspectCmd, err := v2.NewCommand[AppConfig, *InspectFlags](
+	inspectCmd, err := v2.NewCommand(
 		"inspect",
+		&InspectFlags{},
 		func(ctx context.Context, _ *AppConfig, flags *InspectFlags) error {
 			bfc, ok := v2.GetBranchingFlowContext(ctx)
 			if ok {
@@ -223,10 +215,7 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 				return err
 			}
 
-			// Positional arg (task ID) is validated by WithExactArgs(1)
-			// but cobra doesn't pass it to our RunE. We look up via store.Get
-			// with the ID from the first valid arg.
-			task, found := store.Get(1) // demo: always shows task #1
+			task, found := store.Get(1)
 			if !found {
 				fmt.Println("No task found at ID")
 				return nil
@@ -243,12 +232,11 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 
 			return nil
 		},
-		v2.WithShort[AppConfig, *InspectFlags]("Inspect a task in detail"),
-		v2.WithExample[AppConfig, *InspectFlags]("taskctl inspect 1"),
-		v2.WithFlags[AppConfig, *InspectFlags](&InspectFlags{}),
-		v2.WithExactArgs[AppConfig, *InspectFlags](1),
-		v2.WithValidArgs[AppConfig, *InspectFlags]("1", "2", "3"),
-		v2.WithGroupID[AppConfig, *InspectFlags]("tasks"),
+		v2.WithShort("Inspect a task in detail"),
+		v2.WithExample("taskctl inspect 1"),
+		v2.WithExactArgs(1),
+		v2.WithValidArgs("1", "2", "3"),
+		v2.WithGroupID("tasks"),
 	)
 	if err != nil {
 		return err
@@ -257,51 +245,52 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		return err
 	}
 
-	// --- db: NewParentCommand with shared DBFlags ---
-	migrateCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+	// --- db: parent command with shared DBFlags ---
+	migrateCmd, err := v2.NewCommand(
 		"migrate",
+		&DBFlags{},
 		dbActionHandler("Running migrations on"),
-		v2.WithShort[AppConfig, *DBFlags]("Run database migrations"),
-		v2.WithLong[AppConfig, *DBFlags](`# Database Migrations
+		v2.WithShort("Run database migrations"),
+		v2.WithLong(`# Database Migrations
 
 Run pending database migrations against the configured environment.
 
 Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
-		v2.WithFlags[AppConfig, *DBFlags](&DBFlags{}),
 	)
 	if err != nil {
 		return err
 	}
 
-	seedCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+	seedCmd, err := v2.NewCommand(
 		"seed",
+		&DBFlags{},
 		dbActionHandler("Seeding"),
-		v2.WithShort[AppConfig, *DBFlags]("Seed the database"),
-		v2.WithFlags[AppConfig, *DBFlags](&DBFlags{}),
+		v2.WithShort("Seed the database"),
 	)
 	if err != nil {
 		return err
 	}
 
-	dbStatusCmd, err := v2.NewCommand[AppConfig, *DBFlags](
+	dbStatusCmd, err := v2.NewCommand(
 		"status",
+		&DBFlags{},
 		func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 			fmt.Printf("DB status on %s: connected\n", flags.Env)
 			return nil
 		},
-		v2.WithShort[AppConfig, *DBFlags]("Check database status"),
-		v2.WithFlags[AppConfig, *DBFlags](&DBFlags{}),
+		v2.WithShort("Check database status"),
 	)
 	if err != nil {
 		return err
 	}
 
-	dbCmd, err := v2.NewParentCommand[AppConfig, *DBFlags](
+	dbCmd, err := v2.NewParentCommand[AppConfig](
 		"db",
 		"Database operations",
-		[]v2.Command[AppConfig, *DBFlags]{migrateCmd, seedCmd, dbStatusCmd},
-		v2.WithShort[AppConfig, *DBFlags]("Database operations"),
-		v2.WithGroupID[AppConfig, *DBFlags]("system"),
+		&DBFlags{},
+		v2.WithSubcommands(migrateCmd, seedCmd, dbStatusCmd),
+		v2.WithShort("Database operations"),
+		v2.WithGroupID("system"),
 	)
 	if err != nil {
 		return err
@@ -323,8 +312,9 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	}
 
 	// --- config show: demonstrate env/config resolution ---
-	configShowCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+	configShowCmd, err := v2.NewCommand(
 		"show",
+		v2.NoFlags{},
 		func(_ context.Context, cfg *AppConfig, _ v2.NoFlags) error {
 			fmt.Println("Current configuration:")
 			fmt.Printf("  LogLevel:  %s\n", cfg.LogLevel)
@@ -336,15 +326,16 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 			fmt.Printf("  Verbose:     %d\n", cfg.Verbose)
 			return nil
 		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Show resolved configuration"),
-		v2.WithNoArgs[AppConfig, v2.NoFlags](),
+		v2.WithShort("Show resolved configuration"),
+		v2.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
-	configEditCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+	configEditCmd, err := v2.NewCommand(
 		"edit",
+		v2.NoFlags{},
 		func(ctx context.Context, cfg *AppConfig, _ v2.NoFlags) error {
 			content := fmt.Sprintf("log-level: %s\ndata-dir: %s\n", cfg.LogLevel, cfg.DataDir)
 			edited, err := v2.EditInEditor(ctx, content)
@@ -354,19 +345,20 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 			fmt.Printf("Edited config:\n%s", edited)
 			return nil
 		},
-		v2.WithShort[AppConfig, v2.NoFlags]("Edit config in $EDITOR"),
-		v2.WithNoArgs[AppConfig, v2.NoFlags](),
+		v2.WithShort("Edit config in $EDITOR"),
+		v2.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
-	configCmd, err := v2.NewParentCommand[AppConfig, v2.NoFlags](
+	configCmd, err := v2.NewParentCommand[AppConfig](
 		"config",
 		"Configuration management",
-		[]v2.Command[AppConfig, v2.NoFlags]{configShowCmd, configEditCmd},
-		v2.WithShort[AppConfig, v2.NoFlags]("Configuration management"),
-		v2.WithGroupID[AppConfig, v2.NoFlags]("system"),
+		v2.NoFlags{},
+		v2.WithSubcommands(configShowCmd, configEditCmd),
+		v2.WithShort("Configuration management"),
+		v2.WithGroupID("system"),
 	)
 	if err != nil {
 		return err
@@ -385,11 +377,12 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	}
 
 	// --- hidden command ---
-	hiddenCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+	hiddenCmd, err := v2.NewCommand(
 		"secret",
+		v2.NoFlags{},
 		printAndNil("You found the secret command!"),
-		v2.WithShort[AppConfig, v2.NoFlags]("Secret command"),
-		v2.WithHidden[AppConfig, v2.NoFlags](true),
+		v2.WithShort("Secret command"),
+		v2.WithHidden(true),
 	)
 	if err != nil {
 		return err
@@ -399,11 +392,12 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	}
 
 	// --- deprecated command ---
-	deprecatedCmd, err := v2.NewCommand[AppConfig, v2.NoFlags](
+	deprecatedCmd, err := v2.NewCommand(
 		"complete",
+		v2.NoFlags{},
 		printAndNil("Use 'done' instead."),
-		v2.WithShort[AppConfig, v2.NoFlags]("Deprecated: use done"),
-		v2.WithDeprecated[AppConfig, v2.NoFlags]("Use 'done' instead"),
+		v2.WithShort("Deprecated: use done"),
+		v2.WithDeprecated("Use 'done' instead"),
 	)
 	if err != nil {
 		return err

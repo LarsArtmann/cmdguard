@@ -94,10 +94,7 @@ func TestCommandGroups_CommandExecutionStillWorks(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "run",
-		short: "Run command",
-		long:  "Run command",
-		group: "main",
+		spec: commandSpec{use: "run", short: "Run command", long: "Run command", group: "main"},
 		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			executed = true
 
@@ -129,14 +126,10 @@ func TestCommandGroups_SubcommandsInheritFromParent(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "db",
-		short: "Database",
-		long:  "Database operations",
-		group: "core",
+		spec: commandSpec{use: "db", short: "Database", long: "Database operations", group: "core"},
 		commands: []Command[testConfig, NoFlags]{
 			{
-				use:   "migrate",
-				short: "Run migrations",
+				spec: commandSpec{use: "migrate", short: "Run migrations"},
 				runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 					childExecuted = true
 

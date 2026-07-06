@@ -35,14 +35,6 @@ func ArgsFromContext(ctx context.Context) []string {
 //
 // Returns (*T, true) when the config was stored; (nil, false) when it was not
 // (e.g., in unit tests calling RunE directly without going through Execute).
-//
-// Usage with a raw cobra subcommand:
-//
-//	func(cmd *cobra.Command, _ []string) error {
-//	    cfg, ok := v2.ConfigFromContext[MyConfig](cmd.Context())
-//	    if !ok { return errors.New("config not initialized") }
-//	    // use cfg.Field...
-//	}
 func ConfigFromContext[T any](ctx context.Context) (*T, bool) {
 	if ctx == nil {
 		return nil, false
@@ -75,24 +67,26 @@ func prepareRunContext[F any](
 func cliToCobraCommand[T, F any](
 	config *T, cmd Command[T, F], middlewares []Middleware[T], envPrefix string,
 ) (*cobra.Command, error) {
+	s := cmd.spec
+
 	cobraCmd := &cobra.Command{
-		Use:           cmd.use,
-		Short:         cmd.short,
-		Long:          cmd.long,
-		Example:       cmd.example,
-		Aliases:       cmd.aliases,
-		Hidden:        cmd.hidden,
-		Deprecated:    cmd.deprecated,
-		Version:       cmd.version,
-		SilenceErrors: cmd.silenceErrors,
-		SilenceUsage:  cmd.silenceUsage,
+		Use:           s.use,
+		Short:         s.short,
+		Long:          s.long,
+		Example:       s.example,
+		Aliases:       s.aliases,
+		Hidden:        s.hidden,
+		Deprecated:    s.deprecated,
+		Version:       s.version,
+		SilenceErrors: s.silenceErrors,
+		SilenceUsage:  s.silenceUsage,
 	}
 
-	if cmd.group != "" {
-		cobraCmd.GroupID = cmd.group
+	if s.group != "" {
+		cobraCmd.GroupID = s.group
 	}
 
-	flagRegistry, err := initCommandFlags(cobraCmd, cmd.use, cmd.flags, envPrefix)
+	flagRegistry, err := initCommandFlags(cobraCmd, s.use, cmd.flags, envPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("envPrefix=%s: %w", envPrefix, err)
 	}
@@ -102,22 +96,22 @@ func cliToCobraCommand[T, F any](
 	for _, subCmd := range cmd.commands {
 		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, envPrefix)
 		if err != nil {
-			return nil, fmt.Errorf("envPrefix=%s, subcommand of %q: %w", envPrefix, cmd.use, err)
+			return nil, fmt.Errorf("envPrefix=%s, subcommand of %q: %w", envPrefix, s.use, err)
 		}
 
 		cobraCmd.AddCommand(subCobraCmd)
 	}
 
-	if cmd.completionFn != nil {
-		cobraCmd.ValidArgsFunction = cmd.completionFn
+	if s.completionFn != nil {
+		cobraCmd.ValidArgsFunction = s.completionFn
 	}
 
-	if len(cmd.validArgs) > 0 {
-		cobraCmd.ValidArgs = cmd.validArgs
+	if len(s.validArgs) > 0 {
+		cobraCmd.ValidArgs = s.validArgs
 	}
 
-	if cmd.args != nil {
-		cobraCmd.Args = cmd.args
+	if s.args != nil {
+		cobraCmd.Args = s.args
 	}
 
 	return cobraCmd, nil
@@ -127,33 +121,47 @@ func wireAllHandlers[T, F any](
 	cobraCmd *cobra.Command, config *T, cmd Command[T, F],
 	flagRegistry *FlagRegistry, middlewares []Middleware[T],
 ) {
-	info := CommandInfo{Name: cmd.use, Phase: PhaseRun, HasRunE: cmd.runE != nil}
+	s := cmd.spec
+	info := CommandInfo{Name: s.use, Phase: PhaseRun, HasRunE: cmd.runE != nil}
 
 	wireHandlerWithMiddleware(handlerConfig[T, F]{
 		target: &cobraCmd.RunE, handler: cmd.runE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
-		phase: "command " + cmd.use, info: info, middlewares: middlewares,
-		promptOnMissing: cmd.promptOnMissing,
+		phase: "command " + s.use, info: info, middlewares: middlewares,
+		promptOnMissing: s.promptOnMissing,
 	})
+
+	// Type-assert stored lifecycle hooks — safe because generic constructors
+	// ensure T and F match across storage (WithPreRunE/WithPostRunE) and
+	// retrieval (here).
+	var preRunE func(context.Context, *T, F) error
+	if s.preRunEAny != nil {
+		preRunE = s.preRunEAny.(func(context.Context, *T, F) error)
+	}
+
+	var postRunE func(context.Context, *T, F) error
+	if s.postRunEAny != nil {
+		postRunE = s.postRunEAny.(func(context.Context, *T, F) error)
+	}
 
 	preInfo := info
 	preInfo.Phase = PhasePreRun
 
 	wireHandlerWithMiddleware(handlerConfig[T, F]{
-		target: &cobraCmd.PreRunE, handler: cmd.preRunE, config: config,
+		target: &cobraCmd.PreRunE, handler: preRunE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
-		phase: "pre-run of command " + cmd.use, info: preInfo, middlewares: middlewares,
-		promptOnMissing: cmd.promptOnMissing,
+		phase: "pre-run of command " + s.use, info: preInfo, middlewares: middlewares,
+		promptOnMissing: s.promptOnMissing,
 	})
 
 	postInfo := info
 	postInfo.Phase = PhasePostRun
 
 	wireHandlerWithMiddleware(handlerConfig[T, F]{
-		target: &cobraCmd.PostRunE, handler: cmd.postRunE, config: config,
+		target: &cobraCmd.PostRunE, handler: postRunE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
-		phase: "post-run of command " + cmd.use, info: postInfo, middlewares: middlewares,
-		promptOnMissing: cmd.promptOnMissing,
+		phase: "post-run of command " + s.use, info: postInfo, middlewares: middlewares,
+		promptOnMissing: s.promptOnMissing,
 	})
 }
 

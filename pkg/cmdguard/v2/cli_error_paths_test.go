@@ -39,12 +39,12 @@ func TestInitializeErrorPaths(t *testing.T) {
 			Name string `default:"test" flag:"name" help:"Name"`
 		}
 
-		cmd, err := v2.NewCommand[testCLIConfig, *ptrFlags](
+		cmd, err := v2.NewCommand(
 			"ptrcmd",
 			func(_ context.Context, _ *testCLIConfig, _ *ptrFlags) error {
 				return nil
 			},
-			v2.WithShort[testCLIConfig, *ptrFlags]("Command with pointer flags"),
+			v2.WithShort("Command with pointer flags"),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)
@@ -64,7 +64,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		childCmd := newTestCLICommandWithShort[testCLIConfig](t, "child", "Child command")
+		childCmd := newTestCLICommandWithShort(t, "child", "Child command")
 		parentCmd := newTestParentCommand[testCLIConfig](
 			t,
 			"parent",
@@ -117,12 +117,12 @@ func TestInitializeErrorPaths(t *testing.T) {
 			Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
 		}
 
-		cmd, err := v2.NewCommand[testCLIConfig, multiFlags](
+		cmd, err := v2.NewCommand(
 			"multi",
 			func(_ context.Context, _ *testCLIConfig, _ multiFlags) error {
 				return nil
 			},
-			v2.WithShort[testCLIConfig, multiFlags]("Multi-flag command"),
+			v2.WithShort("Multi-flag command"),
 			v2.WithFlags[testCLIConfig, multiFlags](multiFlags{}),
 		)
 		if err != nil {

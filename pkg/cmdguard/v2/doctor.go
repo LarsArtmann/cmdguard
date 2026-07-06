@@ -90,8 +90,9 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 	groupID := cfg.groupID
 	customChecks := cfg.checks
 
-	return NewCommand[T, NoFlags](
+	return NewCommand(
 		"doctor",
+		NoFlags{},
 		func(ctx context.Context, _ *T, _ NoFlags) error {
 			w := cli.rootCmd.OutOrStdout()
 
@@ -142,17 +143,17 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 
 			return nil
 		},
-		WithShort[T, NoFlags](short),
-		WithLong[T, NoFlags](long),
-		withDoctorGroupID[T](groupID),
+		WithShort(short),
+		WithLong(long),
+		withDoctorGroupID(groupID),
 	)
 }
 
 // withDoctorGroupID conditionally adds WithGroupID if non-empty.
-func withDoctorGroupID[T any](groupID string) CommandOption[T, NoFlags] {
-	return func(cmd *Command[T, NoFlags]) {
+func withDoctorGroupID(groupID string) CommandOption {
+	return func(s *commandSpec) {
 		if groupID != "" {
-			WithGroupID[T, NoFlags](groupID)(cmd)
+			s.group = groupID
 		}
 	}
 }

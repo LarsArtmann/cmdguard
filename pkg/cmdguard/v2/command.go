@@ -11,20 +11,17 @@ import (
 // Use it as the F type parameter: Command[MyConfig, NoFlags].
 type NoFlags struct{}
 
-// Command represents a type-safe CLI command with typed flags and config.
-// Fields are unexported to enforce construction through NewCommand or NewParentCommand,
-// making invalid states unrepresentable at compile time.
-type Command[T any, F any] struct {
+// commandSpec holds all command configuration. Non-generic fields are typed
+// directly; generic fields (lifecycle hooks, subcommands) are stored as any
+// and type-asserted once during cobra wiring. This is guaranteed safe because
+// the generic constructors (NewCommand, NewParentCommand) ensure T and F
+// match across storage and retrieval.
+type commandSpec struct {
 	use             string
 	short           string
 	long            string
-	aliases         []string
 	example         string
-	flags           F
-	runE            func(ctx context.Context, cfg *T, flags F) error
-	preRunE         func(ctx context.Context, cfg *T, flags F) error
-	postRunE        func(ctx context.Context, cfg *T, flags F) error
-	commands        []Command[T, F]
+	aliases         []string
 	hidden          bool
 	deprecated      string
 	version         string
@@ -36,22 +33,50 @@ type Command[T any, F any] struct {
 	args            cobra.PositionalArgs
 	promptOnMissing bool
 	optionErr       error
+
+	// Typed lifecycle hooks stored as any, set by generic option helpers
+	// (WithPreRunE, WithPostRunE). Type-asserted during cobra wiring.
+	preRunEAny  any
+	postRunEAny any
+
+	// Subcommands stored as any, set by WithSubcommands. Type-asserted
+	// during cobra wiring.
+	subcommandsAny []any
 }
 
+// CommandOption configures a command. All metadata options (descriptions,
+// grouping, arg validators, completion, etc.) are non-generic — no type
+// parameters needed. The few options that require type parameters
+// (WithPreRunE, WithPostRunE, WithSubcommands) are generic functions that
+// return a non-generic CommandOption.
+type CommandOption func(*commandSpec)
+
+// Command represents a type-safe CLI command with typed flags and config.
+// Fields are unexported to enforce construction through NewCommand or
+// NewParentCommand, making invalid states unrepresentable at compile time.
+type Command[T any, F any] struct {
+	spec     commandSpec
+	flags    F
+	runE     func(ctx context.Context, cfg *T, flags F) error
+	commands []Command[T, F]
+}
+
+// --- Accessors ---
+
 // Use returns the command name and usage string.
-func (c Command[T, F]) Use() string { return c.use }
+func (c Command[T, F]) Use() string { return c.spec.use }
 
 // Short returns the short description shown in help.
-func (c Command[T, F]) Short() string { return c.short }
+func (c Command[T, F]) Short() string { return c.spec.short }
 
 // Long returns the long description shown in help.
-func (c Command[T, F]) Long() string { return c.long }
+func (c Command[T, F]) Long() string { return c.spec.long }
 
 // Aliases returns the alternative names for the command.
-func (c Command[T, F]) Aliases() []string { return c.aliases }
+func (c Command[T, F]) Aliases() []string { return c.spec.aliases }
 
 // Example returns the example usage string.
-func (c Command[T, F]) Example() string { return c.example }
+func (c Command[T, F]) Example() string { return c.spec.example }
 
 // Flags returns the command-specific flags struct.
 func (c Command[T, F]) Flags() F { return c.flags }
@@ -63,34 +88,42 @@ func (c Command[T, F]) RunE() func(ctx context.Context, cfg *T, flags F) error {
 
 // PreRunE returns the pre-run validation hook.
 func (c Command[T, F]) PreRunE() func(ctx context.Context, cfg *T, flags F) error {
-	return c.preRunE
+	if c.spec.preRunEAny == nil {
+		return nil
+	}
+
+	return c.spec.preRunEAny.(func(context.Context, *T, F) error)
 }
 
 // PostRunE returns the post-run cleanup hook.
 func (c Command[T, F]) PostRunE() func(ctx context.Context, cfg *T, flags F) error {
-	return c.postRunE
+	if c.spec.postRunEAny == nil {
+		return nil
+	}
+
+	return c.spec.postRunEAny.(func(context.Context, *T, F) error)
 }
 
 // Commands returns the subcommands of this command.
 func (c Command[T, F]) Commands() []Command[T, F] { return c.commands }
 
 // Hidden returns whether the command is hidden from help output.
-func (c Command[T, F]) Hidden() bool { return c.hidden }
+func (c Command[T, F]) Hidden() bool { return c.spec.hidden }
 
 // Deprecated returns the deprecation message, if any.
-func (c Command[T, F]) Deprecated() string { return c.deprecated }
+func (c Command[T, F]) Deprecated() string { return c.spec.deprecated }
 
 // Version returns the version string.
-func (c Command[T, F]) Version() string { return c.version }
+func (c Command[T, F]) Version() string { return c.spec.version }
 
 // SilenceErrors returns whether error output is suppressed.
-func (c Command[T, F]) SilenceErrors() bool { return c.silenceErrors }
+func (c Command[T, F]) SilenceErrors() bool { return c.spec.silenceErrors }
 
 // SilenceUsage returns whether usage output on error is suppressed.
-func (c Command[T, F]) SilenceUsage() bool { return c.silenceUsage }
+func (c Command[T, F]) SilenceUsage() bool { return c.spec.silenceUsage }
 
 // Group returns the command group name.
-func (c Command[T, F]) Group() string { return c.group }
+func (c Command[T, F]) Group() string { return c.spec.group }
 
 // HasSubcommands returns true if this command has subcommands.
 func (c Command[T, F]) HasSubcommands() bool {
@@ -101,6 +134,8 @@ func (c Command[T, F]) HasSubcommands() bool {
 func (c Command[T, F]) HasHandler() bool {
 	return c.runE != nil
 }
+
+// --- Validation ---
 
 // ValidationMode controls how strictly commands are validated.
 type ValidationMode int
@@ -126,19 +161,19 @@ func (c Command[T, F]) ValidateStrict() error {
 }
 
 func (c Command[T, F]) validate(mode ValidationMode) error {
-	if c.use == "" {
+	if c.spec.use == "" {
 		return fmt.Errorf("%w: command has no Use field", ErrInvalidCommand)
 	}
 
-	if mode >= Strict && c.short == "" {
-		return fmt.Errorf("%w: %q has no short description", ErrMissingShort, c.use)
+	if mode >= Strict && c.spec.short == "" {
+		return fmt.Errorf("%w: %q has no short description", ErrMissingShort, c.spec.use)
 	}
 
-	if mode >= Draconian && c.runE != nil && c.example == "" {
+	if mode >= Draconian && c.runE != nil && c.spec.example == "" {
 		return fmt.Errorf(
 			"%w: %q has no example (required in draconian mode)",
 			ErrMissingExample,
-			c.use,
+			c.spec.use,
 		)
 	}
 
@@ -147,37 +182,37 @@ func (c Command[T, F]) validate(mode ValidationMode) error {
 			"%w: mode=%v, %q has no RunE and no subcommands",
 			ErrMissingHandler,
 			mode,
-			c.use,
+			c.spec.use,
 		)
 	}
 
-	if len(c.commands) > 0 && c.long == "" {
+	if len(c.commands) > 0 && c.spec.long == "" {
 		return fmt.Errorf(
 			"%w: mode=%v, %q has subcommands but no Long description",
 			ErrMissingLong,
 			mode,
-			c.use,
+			c.spec.use,
 		)
 	}
 
 	seen := make(map[string]bool)
 	for _, sub := range c.commands {
-		if seen[sub.use] {
+		if seen[sub.spec.use] {
 			return fmt.Errorf(
 				"%w: duplicate subcommand %q in command %q",
 				ErrDuplicateCommand,
-				sub.use,
-				c.use,
+				sub.spec.use,
+				c.spec.use,
 			)
 		}
 
-		seen[sub.use] = true
+		seen[sub.spec.use] = true
 	}
 
 	for i, sub := range c.commands {
 		err := sub.validate(mode)
 		if err != nil {
-			return fmt.Errorf("mode=%v, subcommand %d of %q: %w", mode, i, c.use, err)
+			return fmt.Errorf("mode=%v, subcommand %d of %q: %w", mode, i, c.spec.use, err)
 		}
 	}
 
@@ -193,13 +228,24 @@ func requireUse(use string) error {
 	return nil
 }
 
+// --- Constructors ---
+
 // NewCommand creates a new executable command with the given options.
 // The runE parameter is required and cannot be nil.
 // Use NewParentCommand for commands with subcommands.
+//
+// Type parameters T (config) and F (flags) are inferred from the flags and
+// runE arguments — no explicit type parameters needed:
+//
+//	cmd, err := cmdguard.NewCommand("greet", &GreetFlags{}, greetHandler,
+//	    cmdguard.WithShort("Say hello"),
+//	    cmdguard.WithNoArgs(),
+//	)
 func NewCommand[T, F any](
 	use string,
+	flags F,
 	runE func(ctx context.Context, cfg *T, flags F) error,
-	opts ...CommandOption[T, F],
+	opts ...CommandOption,
 ) (Command[T, F], error) {
 	if err := requireUse(use); err != nil {
 		return Command[T, F]{}, err
@@ -213,18 +259,21 @@ func NewCommand[T, F any](
 		)
 	}
 
-	cmd := Command[T, F]{use: use, runE: runE}
+	spec := commandSpec{use: use}
+
 	for _, opt := range opts {
-		opt(&cmd)
+		opt(&spec)
 	}
+
+	cmd := Command[T, F]{spec: spec, flags: flags, runE: runE}
 
 	err := cmd.Validate()
 	if err != nil {
 		return Command[T, F]{}, err
 	}
 
-	if cmd.optionErr != nil {
-		return Command[T, F]{}, cmd.optionErr
+	if cmd.spec.optionErr != nil {
+		return Command[T, F]{}, cmd.spec.optionErr
 	}
 
 	return cmd, nil
@@ -233,11 +282,18 @@ func NewCommand[T, F any](
 // NewParentCommand creates a parent command with subcommands.
 // The long description and at least one subcommand are required.
 // This makes it impossible to forget the Long description when adding subcommands.
+//
+// Type parameter T (config) must be specified explicitly; F defaults to the
+// flags type. Subcommands must share the same T and F.
+//
+//	cmd, err := cmdguard.NewParentCommand[AppConfig]("db", "Database ops", NoFlags{},
+//	    cmdguard.WithSubcommands(migrateCmd, seedCmd),
+//	)
 func NewParentCommand[T, F any](
 	use string,
 	long string,
-	subcommands []Command[T, F],
-	opts ...CommandOption[T, F],
+	flags F,
+	opts ...CommandOption,
 ) (Command[T, F], error) {
 	if err := requireUse(use); err != nil {
 		return Command[T, F]{}, err
@@ -252,7 +308,23 @@ func NewParentCommand[T, F any](
 		)
 	}
 
-	if len(subcommands) == 0 {
+	spec := commandSpec{use: use, long: long}
+
+	for _, opt := range opts {
+		opt(&spec)
+	}
+
+	cmd := Command[T, F]{spec: spec, flags: flags}
+
+	// Extract subcommands from spec
+	if len(spec.subcommandsAny) > 0 {
+		cmd.commands = make([]Command[T, F], len(spec.subcommandsAny))
+		for i, sub := range spec.subcommandsAny {
+			cmd.commands[i] = sub.(Command[T, F])
+		}
+	}
+
+	if len(cmd.commands) == 0 {
 		return Command[T, F]{}, fmt.Errorf(
 			"%w: long=%q, parent command %q requires at least one subcommand",
 			ErrMissingHandler,
@@ -261,18 +333,13 @@ func NewParentCommand[T, F any](
 		)
 	}
 
-	cmd := Command[T, F]{use: use, long: long, commands: subcommands}
-	for _, opt := range opts {
-		opt(&cmd)
-	}
-
 	err := cmd.Validate()
 	if err != nil {
 		return Command[T, F]{}, fmt.Errorf("long=%q: %w", long, err)
 	}
 
-	if cmd.optionErr != nil {
-		return Command[T, F]{}, cmd.optionErr
+	if cmd.spec.optionErr != nil {
+		return Command[T, F]{}, cmd.spec.optionErr
 	}
 
 	return cmd, nil

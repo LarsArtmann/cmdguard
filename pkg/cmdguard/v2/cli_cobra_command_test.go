@@ -16,7 +16,7 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 	var executedCmd string
 
 	leafCmd := Command[testAppConfig, NoFlags]{
-		use: "leaf",
+		spec: commandSpec{use: "leaf"},
 		runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			executedCmd = "leaf"
 
@@ -25,14 +25,12 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 	}
 
 	middleCmd := Command[testAppConfig, NoFlags]{
-		use:      "middle",
-		long:     "Middle level command",
+		spec:     commandSpec{use: "middle", long: "Middle level command"},
 		commands: []Command[testAppConfig, NoFlags]{leafCmd},
 	}
 
 	topCmd := Command[testAppConfig, NoFlags]{
-		use:      "top",
-		long:     "Top level command",
+		spec:     commandSpec{use: "top", long: "Top level command"},
 		commands: []Command[testAppConfig, NoFlags]{middleCmd},
 	}
 
@@ -58,13 +56,15 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		use:  "ok",
-		runE: noOpHandlerForTestAppConfig(),
-		postRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-			postRunCalled = true
+		spec: commandSpec{
+			use: "ok",
+			postRunEAny: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+				postRunCalled = true
 
-			return nil
+				return nil
+			},
 		},
+		runE: noOpHandlerForTestAppConfig(),
 	}
 
 	addCommand(t, cli, cmd)
@@ -90,10 +90,12 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		use:      "hooks",
-		preRunE:  makeHookRunE(&order, "pre"),
-		runE:     makeHookRunE(&order, "run"),
-		postRunE: makeHookRunE(&order, "post"),
+		spec: commandSpec{
+			use:         "hooks",
+			preRunEAny:  makeHookRunE(&order, "pre"),
+			postRunEAny: makeHookRunE(&order, "post"),
+		},
+		runE: makeHookRunE(&order, "run"),
 	}
 
 	addCommand(t, cli, cmd)
@@ -120,7 +122,7 @@ func TestCLIToCobraCommand_NilContextFallsBack(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		use: "ctxcheck",
+		spec: commandSpec{use: "ctxcheck"},
 		runE: func(ctx context.Context, _ *testAppConfig, _ NoFlags) error {
 			gotCtx = ctx
 
@@ -149,13 +151,12 @@ func TestCLIToCobraCommand_SubcommandError(t *testing.T) {
 	}
 
 	invalidChild := Command[testAppConfig, NoFlags]{
-		use:  "", // empty Use is invalid
+		spec: commandSpec{use: ""}, // empty Use is invalid
 		runE: noOpHandlerForTestAppConfig(),
 	}
 
 	parent := Command[testAppConfig, NoFlags]{
-		use:      "parent",
-		long:     "Parent command with invalid child",
+		spec:     commandSpec{use: "parent", long: "Parent command with invalid child"},
 		commands: []Command[testAppConfig, NoFlags]{invalidChild},
 	}
 

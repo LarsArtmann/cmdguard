@@ -12,9 +12,7 @@ import (
 
 func makeMiddlewareCommand[T any](name, desc string, handlerCalled *bool) Command[T, NoFlags] {
 	return Command[T, NoFlags]{
-		use:   name,
-		short: desc + " command",
-		long:  desc + " command",
+		spec: commandSpec{use: name, short: desc + " command", long: desc + " command"},
 		runE: func(_ context.Context, _ *T, _ NoFlags) error {
 			*handlerCalled = true
 
@@ -28,9 +26,7 @@ func addNoOpCommand[T any](t *testing.T, cli *CLI[T], use, short string) {
 	t.Helper()
 
 	err := AddCommand(cli, Command[T, NoFlags]{
-		use:   use,
-		short: short,
-		long:  short,
+		spec: commandSpec{use: use, short: short, long: short},
 		runE:  noOpRunE[T, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
@@ -91,9 +87,7 @@ func TestMiddleware_BasicChaining(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "run",
-		short: "Run command",
-		long:  "Run command",
+		spec: commandSpec{use: "run", short: "Run command", long: "Run command"},
 		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			callOrder = append(callOrder, "handler")
 
@@ -133,9 +127,7 @@ func TestMiddleware_ErrorPropagation(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "fail",
-		short: "Fail command",
-		long:  "Fail command",
+		spec: commandSpec{use: "fail", short: "Fail command", long: "Fail command"},
 		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			return handlerErr
 		},
@@ -256,9 +248,7 @@ func TestRecoveryMiddleware(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "panic",
-		short: "Panic command",
-		long:  "Panic command",
+		spec: commandSpec{use: "panic", short: "Panic command", long: "Panic command"},
 		runE: func(_ context.Context, _ *testConfig, _ NoFlags) error {
 			panic("something went wrong")
 		},

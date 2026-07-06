@@ -92,7 +92,7 @@ func TestPlugin_WithPluginOption(t *testing.T) {
 
 			return nil
 		},
-		WithShort[cfg, NoFlags]("run"),
+		WithShort("run"),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))

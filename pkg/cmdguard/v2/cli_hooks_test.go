@@ -23,9 +23,8 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "pre",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					use:     "test",
-					preRunE: makeHookRunE(order, "pre"),
-					runE:    makeHookRunE(order, "run"),
+					spec: commandSpec{use: "test", preRunEAny: makeHookRunE(order, "pre")},
+					runE: makeHookRunE(order, "run"),
 				}
 			},
 			want: []string{"pre", "run"},
@@ -35,9 +34,8 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "post",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					use:      "test",
-					runE:     makeHookRunE(order, "run"),
-					postRunE: makeHookRunE(order, "post"),
+					spec: commandSpec{use: "test", postRunEAny: makeHookRunE(order, "post")},
+					runE: makeHookRunE(order, "run"),
 				}
 			},
 			want: []string{"run", "post"},
@@ -82,9 +80,11 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 		}
 
 		cmd := Command[testAppConfig, NoFlags]{
-			use: "test",
-			preRunE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
-				return errTest
+			spec: commandSpec{
+				use: "test",
+				preRunEAny: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+					return errTest
+				},
 			},
 			runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				called = true
@@ -156,12 +156,14 @@ func TestCLI_CommandOptions(t *testing.T) {
 			}
 
 			cmd := Command[testAppConfig, NoFlags]{
-				use:        tt.use,
-				hidden:     tt.hidden,
-				deprecated: tt.deprecated,
-				aliases:    tt.aliases,
-				version:    tt.version,
-				runE:       noOpHandlerForTestAppConfig(),
+				spec: commandSpec{
+					use:        tt.use,
+					hidden:     tt.hidden,
+					deprecated: tt.deprecated,
+					aliases:    tt.aliases,
+					version:    tt.version,
+				},
+				runE: noOpHandlerForTestAppConfig(),
 			}
 			if err := AddCommand(cli, cmd); err != nil {
 				t.Fatalf("unexpected error: %v", err)
