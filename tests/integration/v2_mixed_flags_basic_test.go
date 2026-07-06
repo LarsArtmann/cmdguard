@@ -70,16 +70,16 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		configFlags  *ConfigFlags
 	)
 
-	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags](
+	greetCmd, err := v2.NewCommand(
 		"greet",
+		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			greetCalled = true
 			greetFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *GreetFlags]("Greet someone"),
-		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: defaultGreetName, Shout: false}),
+		v2.WithShort("Greet someone"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -90,16 +90,16 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	mathCmd, err := v2.NewCommand[RootConfig, *MathFlags](
+	mathCmd, err := v2.NewCommand(
 		"math",
+		&MathFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
 			mathCalled = true
 			mathFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *MathFlags]("Do math"),
-		v2.WithFlags[RootConfig, *MathFlags](&MathFlags{X: 0, Y: 0}),
+		v2.WithShort("Do math"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -110,16 +110,16 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	configCmd, err := v2.NewCommand[RootConfig, *ConfigFlags](
+	configCmd, err := v2.NewCommand(
 		"config",
+		&ConfigFlags{},
 		func(_ context.Context, _ *RootConfig, flags *ConfigFlags) error {
 			configCalled = true
 			configFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *ConfigFlags]("Manage config"),
-		v2.WithFlags[RootConfig, *ConfigFlags](&ConfigFlags{File: "", JSON: false}),
+		v2.WithShort("Manage config"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -198,26 +198,26 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		statusFlags   *DBFlags
 	)
 
-	statusSubCmd, err := v2.NewCommand[RootConfig, *DBFlags](
+	statusSubCmd, err := v2.NewCommand(
 		"status",
+		&DBFlags{},
 		func(_ context.Context, _ *RootConfig, flags *DBFlags) error {
 			statusCalled = true
 			statusFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *DBFlags]("Check database status"),
+		v2.WithShort("Check database status"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	dbCmd, err := v2.NewParentCommand[RootConfig, *DBFlags](
+	dbCmd, err := v2.NewParentCommand[RootConfig](
 		"db",
-		"Database management and maintenance commands",
-		[]v2.Command[RootConfig, *DBFlags]{statusSubCmd},
-		v2.WithShort[RootConfig, *DBFlags]("Database commands"),
-		v2.WithFlags[RootConfig, *DBFlags](&DBFlags{Host: "localhost", Port: 5432, Database: ""}),
+		"Database management and maintenance commands", &DBFlags{},
+		v2.WithSubcommands(statusSubCmd),
+		v2.WithShort("Database commands"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -228,16 +228,16 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	migrateCmd, err := v2.NewCommand[RootConfig, *MigrateFlags](
+	migrateCmd, err := v2.NewCommand(
 		"migrate",
+		&MigrateFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
 			migrateCalled = true
 			migrateFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *MigrateFlags]("Run migrations"),
-		v2.WithFlags[RootConfig, *MigrateFlags](&MigrateFlags{Steps: 0, Direction: "up"}),
+		v2.WithShort("Run migrations"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

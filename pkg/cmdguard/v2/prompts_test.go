@@ -308,13 +308,13 @@ func TestWithPromptOnMissing_Integration(t *testing.T) {
 
 			cmd, err := NewCommand(
 				"greet",
+				&Flags{},
 				func(_ context.Context, _ *testAppConfig, flags *Flags) error {
 					gotName = flags.Name
 
 					return nil
 				},
 				WithShort("Greet someone"),
-				WithFlags[testAppConfig, *Flags](&Flags{}),
 				WithPromptOnMissing(),
 			)
 			if err != nil {

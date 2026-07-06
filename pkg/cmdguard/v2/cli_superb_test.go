@@ -252,7 +252,8 @@ func TestWithStrictValidation(t *testing.T) {
 		parentCmd, err := NewParentCommand[testConfig](
 			"parent",
 			"Parent description",
-			[]Command[testConfig, NoFlags]{childCmd},
+			NoFlags{},
+			WithSubcommands(childCmd),
 			WithShort("Parent"),
 		)
 		testutil.AssertNoError(t, err)
@@ -318,7 +319,8 @@ func TestWithDraconianValidation(t *testing.T) {
 
 		parentCmd, err := NewParentCommand[testConfig](
 			"parent",
-			"Parent description", []Command[testConfig, NoFlags]{childCmd},
+			"Parent description", NoFlags{},
+			WithSubcommands(childCmd),
 			WithShort("Parent"),
 		)
 		testutil.AssertNoError(t, err)

@@ -20,7 +20,7 @@ func newTestCLICommand[C any](t *testing.T, use string) v2.Command[C, v2.NoFlags
 	return cmd
 }
 
-func newTestCLICommandWithShort(t *testing.T, use, short string) v2.Command[C, v2.NoFlags] {
+func newTestCLICommandWithShort[C any](t *testing.T, use, short string) v2.Command[C, v2.NoFlags] {
 	t.Helper()
 
 	cmd, err := v2.NewCommand(
@@ -41,7 +41,7 @@ func newTestParentCommand[C any](
 ) v2.Command[C, v2.NoFlags] {
 	t.Helper()
 
-	cmd, err := v2.NewParentCommand(
+	cmd, err := v2.NewParentCommand[C](
 		use, long, v2.NoFlags{},
 		v2.WithSubcommands(children...),
 		v2.WithShort(short),

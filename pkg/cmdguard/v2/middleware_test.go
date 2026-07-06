@@ -27,7 +27,7 @@ func addNoOpCommand[T any](t *testing.T, cli *CLI[T], use, short string) {
 
 	err := AddCommand(cli, Command[T, NoFlags]{
 		spec: commandSpec{use: use, short: short, long: short},
-		runE:  noOpRunE[T, NoFlags],
+		runE: noOpRunE[T, NoFlags],
 	})
 	testutil.AssertNoError(t, err)
 }
@@ -303,14 +303,11 @@ func TestMiddleware_Subcommands(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, NoFlags]{
-		use:   "parent",
-		short: "Parent",
-		long:  "Parent command with subcommands",
+		spec: commandSpec{use: "parent", short: "Parent", long: "Parent command with subcommands"},
 		commands: []Command[testConfig, NoFlags]{
 			{
-				use:   "child",
-				short: "Child",
-				runE:  noOpRunE[testConfig, NoFlags],
+				spec: commandSpec{use: "child", short: "Child"},
+				runE: noOpRunE[testConfig, NoFlags],
 			},
 		},
 	})
@@ -410,9 +407,7 @@ func TestMiddleware_WithFlags(t *testing.T) {
 	testutil.AssertNoError(t, err)
 
 	err = AddCommand(cli, Command[testConfig, *greetFlags]{
-		use:   "greet",
-		short: "Greet",
-		long:  "Greet someone",
+		spec:  commandSpec{use: "greet", short: "Greet", long: "Greet someone"},
 		flags: &greetFlags{},
 		runE: func(_ context.Context, _ *testConfig, _ *greetFlags) error {
 			return nil

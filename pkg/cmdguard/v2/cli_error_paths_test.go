@@ -41,6 +41,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 		cmd, err := v2.NewCommand(
 			"ptrcmd",
+			&ptrFlags{},
 			func(_ context.Context, _ *testCLIConfig, _ *ptrFlags) error {
 				return nil
 			},
@@ -64,7 +65,7 @@ func TestInitializeErrorPaths(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		childCmd := newTestCLICommandWithShort(t, "child", "Child command")
+		childCmd := newTestCLICommandWithShort[testCLIConfig](t, "child", "Child command")
 		parentCmd := newTestParentCommand[testCLIConfig](
 			t,
 			"parent",
@@ -82,9 +83,9 @@ func TestInitializeErrorPaths(t *testing.T) {
 	t.Run("AddCommand with command missing RunE and subcommands", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
-			"norun", nil,
-			v2.WithShort[testCLIConfig, v2.NoFlags]("Command without RunE"),
+		_, err := v2.NewCommand[testCLIConfig](
+			"norun", v2.NoFlags{}, nil,
+			v2.WithShort("Command without RunE"),
 		)
 		if err == nil {
 			t.Fatal("expected error for command without RunE and no subcommands")
@@ -94,8 +95,9 @@ func TestInitializeErrorPaths(t *testing.T) {
 	t.Run("AddCommand with empty Use field", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+		_, err := v2.NewCommand(
 			"",
+			v2.NoFlags{},
 			noOpRunE[testCLIConfig],
 		)
 		if err == nil {
@@ -119,11 +121,11 @@ func TestInitializeErrorPaths(t *testing.T) {
 
 		cmd, err := v2.NewCommand(
 			"multi",
+			multiFlags{},
 			func(_ context.Context, _ *testCLIConfig, _ multiFlags) error {
 				return nil
 			},
 			v2.WithShort("Multi-flag command"),
-			v2.WithFlags[testCLIConfig, multiFlags](multiFlags{}),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)

@@ -42,8 +42,9 @@ func runPrecedenceTest(t *testing.T, configPath, envValue string, args []string,
 		t.Fatal(err)
 	}
 
-	cmd, err := v2.NewCommand[precedenceConfig, v2.NoFlags](
+	cmd, err := v2.NewCommand(
 		"test",
+		v2.NoFlags{},
 		func(_ context.Context, cfg *precedenceConfig, _ v2.NoFlags) error {
 			if cfg.Name != wantName {
 				t.Errorf("Name = %q, want %q", cfg.Name, wantName)
@@ -51,7 +52,7 @@ func runPrecedenceTest(t *testing.T, configPath, envValue string, args []string,
 			called = true
 			return nil
 		},
-		v2.WithShort[precedenceConfig, v2.NoFlags]("Test"),
+		v2.WithShort("Test"),
 	)
 	if err != nil {
 		t.Fatal(err)

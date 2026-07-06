@@ -85,6 +85,7 @@ func TestPlugin_WithPluginOption(t *testing.T) {
 
 	cmd, err := NewCommand(
 		"run",
+		NoFlags{},
 		func(_ context.Context, c *cfg, _ NoFlags) error {
 			if c.Color != "blue" {
 				t.Errorf("expected 'blue', got %q", c.Color)

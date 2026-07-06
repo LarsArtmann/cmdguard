@@ -122,8 +122,9 @@ func TestCLIPrePostRunE(t *testing.T) {
 
 		preRan, postRan := false, false
 
-		cmd, err := v2.NewCommand[testCLIConfig, v2.NoFlags](
+		cmd, err := v2.NewCommand(
 			"test",
+			v2.NoFlags{},
 			noOpRunE[testCLIConfig],
 			v2.WithPreRunE[testCLIConfig, v2.NoFlags](
 				func(_ context.Context, _ *testCLIConfig, _ v2.NoFlags) error {
@@ -182,8 +183,8 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 
 		cmd, err := v2.NewCommand(
 			"test",
+			testFlags{},
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
-			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
 			v2.WithPreRunE[testCLIConfig, testFlags](
 				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 					receivedName = f.Name
@@ -230,8 +231,8 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 
 		cmd, err := v2.NewCommand(
 			"test",
+			testFlags{},
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
-			v2.WithFlags[testCLIConfig, testFlags](testFlags{}),
 			v2.WithPostRunE[testCLIConfig, testFlags](
 				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 					receivedValue = f.Value

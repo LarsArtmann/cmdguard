@@ -14,14 +14,15 @@ import (
 
 // newSimpleCmd is a local helper to create simple commands for examples.
 func newSimpleCmd[C any](name, message, short string) (v2.Command[C, v2.NoFlags], error) {
-	return v2.NewCommand[C, v2.NoFlags](
+	return v2.NewCommand(
 		name,
+		v2.NoFlags{},
 		func(_ context.Context, _ *C, _ v2.NoFlags) error {
 			fmt.Println(message)
 
 			return nil
 		},
-		v2.WithShort[C, v2.NoFlags](short),
+		v2.WithShort(short),
 	)
 }
 
@@ -51,13 +52,13 @@ func ExampleNewCommand_withFlags() {
 
 	_, err := v2.NewCommand(
 		"greet",
+		&greetFlags{},
 		func(ctx context.Context, cfg *config, flags *greetFlags) error {
 			fmt.Printf("Hello, %s!", flags.Name)
 
 			return nil
 		},
 		v2.WithShort("Greet someone"),
-		v2.WithFlags[config, *greetFlags](&greetFlags{}),
 	)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -73,11 +74,12 @@ func ExampleNewParentCommand() {
 	listCmd, _ := newSimpleCmd[config]("list", "listing items...", "List items")
 	createCmd, _ := newSimpleCmd[config]("create", "creating item...", "Create item")
 
-	parent, err := v2.NewParentCommand[config, v2.NoFlags](
+	parent, err := v2.NewParentCommand[config](
 		"items",
 		"Item management commands",
-		[]v2.Command[config, v2.NoFlags]{listCmd, createCmd},
-		v2.WithShort[config, v2.NoFlags]("Item management"),
+		v2.NoFlags{},
+		v2.WithSubcommands(listCmd, createCmd),
+		v2.WithShort("Item management"),
 	)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -93,14 +95,15 @@ func ExampleNewParentCommand() {
 func ExampleNewCommand_minimal() {
 	type config struct{}
 
-	cmd, err := v2.NewCommand[config, v2.NoFlags](
+	cmd, err := v2.NewCommand(
 		"version",
+		v2.NoFlags{},
 		func(ctx context.Context, cfg *config, flags v2.NoFlags) error {
 			fmt.Println("v1.0.0")
 
 			return nil
 		},
-		v2.WithShort[config, v2.NoFlags]("Print version"),
+		v2.WithShort("Print version"),
 	)
 	if err != nil {
 		fmt.Println("error:", err)

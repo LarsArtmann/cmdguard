@@ -50,16 +50,16 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmdA, err := v2.NewCommand[RootConfig, *GreetFlags](
+	cmdA, err := v2.NewCommand(
 		"cmd-a",
+		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
 			lastExecuted = "A"
 			lastFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *GreetFlags]("Command A"),
-		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "default", Shout: false}),
+		v2.WithShort("Command A"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -70,16 +70,16 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmdB, err := v2.NewCommand[RootConfig, *MathFlags](
+	cmdB, err := v2.NewCommand(
 		"cmd-b",
+		&MathFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
 			lastExecuted = "B"
 			lastFlags = flags
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *MathFlags]("Command B"),
-		v2.WithFlags[RootConfig, *MathFlags](&MathFlags{X: 0, Y: 0}),
+		v2.WithShort("Command B"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -160,14 +160,15 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 
 	var executed bool
 
-	simpleCmd, err := v2.NewCommand[RootConfig, v2.NoFlags](
+	simpleCmd, err := v2.NewCommand(
 		"simple",
+		v2.NoFlags{},
 		func(_ context.Context, _ *RootConfig, _ v2.NoFlags) error {
 			executed = true
 
 			return nil
 		},
-		v2.WithShort[RootConfig, v2.NoFlags]("Simple command"),
+		v2.WithShort("Simple command"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -178,15 +179,15 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	greetCmd, err := v2.NewCommand[RootConfig, *GreetFlags](
+	greetCmd, err := v2.NewCommand(
 		"greet",
+		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 			executed = true
 
 			return nil
 		},
-		v2.WithShort[RootConfig, *GreetFlags]("Greet command"),
-		v2.WithFlags[RootConfig, *GreetFlags](&GreetFlags{Name: "World", Shout: false}),
+		v2.WithShort("Greet command"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

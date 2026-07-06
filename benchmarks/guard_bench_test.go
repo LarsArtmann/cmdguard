@@ -25,10 +25,11 @@ type BenchFlags struct {
 func newBenchCommand(b *testing.B, use, short string) v2.Command[BenchConfig, v2.NoFlags] {
 	b.Helper()
 
-	cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
+	cmd, err := v2.NewCommand(
 		use,
+		v2.NoFlags{},
 		testutil.NoOpRunE[BenchConfig, v2.NoFlags],
-		v2.WithShort[BenchConfig, v2.NoFlags](short),
+		v2.WithShort(short),
 	)
 	if err != nil {
 		b.Fatal(err)
@@ -117,10 +118,11 @@ func BenchmarkExecute(b *testing.B) {
 // BenchmarkNewCommand measures the NewCommand constructor.
 func BenchmarkNewCommand(b *testing.B) {
 	for b.Loop() {
-		cmd, err := v2.NewCommand[BenchConfig, v2.NoFlags](
+		cmd, err := v2.NewCommand(
 			"greet",
+			v2.NoFlags{},
 			testutil.NoOpRunE[BenchConfig, v2.NoFlags],
-			v2.WithShort[BenchConfig, v2.NoFlags]("Greet someone"),
+			v2.WithShort("Greet someone"),
 		)
 		if err != nil {
 			b.Fatal(err)

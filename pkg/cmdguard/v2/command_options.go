@@ -90,6 +90,7 @@ func WithExactArgs(n int) CommandOption {
 	return func(s *commandSpec) {
 		if err := nonNegativeErr("WithExactArgs", n); err != nil {
 			s.optionErr = err
+
 			return
 		}
 
@@ -102,6 +103,7 @@ func WithMinimumArgs(n int) CommandOption {
 	return func(s *commandSpec) {
 		if err := nonNegativeErr("WithMinimumArgs", n); err != nil {
 			s.optionErr = err
+
 			return
 		}
 
@@ -114,6 +116,7 @@ func WithMaximumArgs(n int) CommandOption {
 	return func(s *commandSpec) {
 		if err := nonNegativeErr("WithMaximumArgs", n); err != nil {
 			s.optionErr = err
+
 			return
 		}
 
@@ -126,11 +129,13 @@ func WithRangeArgs(minArgs, maxArgs int) CommandOption {
 	return func(s *commandSpec) {
 		if minArgs < 0 {
 			s.optionErr = fmt.Errorf("WithRangeArgs: %w: min=%d", ErrNegativeArgCount, minArgs)
+
 			return
 		}
 
 		if minArgs > maxArgs {
 			s.optionErr = fmt.Errorf("WithRangeArgs: %w: min=%d max=%d", ErrInvalidArgRange, minArgs, maxArgs)
+
 			return
 		}
 

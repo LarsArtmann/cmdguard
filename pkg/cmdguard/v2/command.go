@@ -105,7 +105,22 @@ func (c Command[T, F]) PostRunE() func(ctx context.Context, cfg *T, flags F) err
 }
 
 // Commands returns the subcommands of this command.
-func (c Command[T, F]) Commands() []Command[T, F] { return c.commands }
+func (c Command[T, F]) Commands() []Command[T, F] {
+	if len(c.commands) > 0 {
+		return c.commands
+	}
+
+	if len(c.spec.subcommandsAny) > 0 {
+		cmds := make([]Command[T, F], len(c.spec.subcommandsAny))
+		for i, sub := range c.spec.subcommandsAny {
+			cmds[i] = sub.(Command[T, F])
+		}
+
+		return cmds
+	}
+
+	return nil
+}
 
 // Hidden returns whether the command is hidden from help output.
 func (c Command[T, F]) Hidden() bool { return c.spec.hidden }

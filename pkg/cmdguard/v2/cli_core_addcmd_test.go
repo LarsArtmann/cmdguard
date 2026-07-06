@@ -23,11 +23,11 @@ func TestCLIAddCommand(t *testing.T) {
 
 		cmd, err := v2.NewCommand(
 			"greet",
+			greetFlags{},
 			func(_ context.Context, _ *testCLIConfig, _ greetFlags) error {
 				return nil
 			},
 			v2.WithShort("Greet someone"),
-			v2.WithFlags[testCLIConfig, greetFlags](greetFlags{}),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)
@@ -47,7 +47,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommandWithShort(t, "version", "Show version")
+		cmd := newTestCLICommandWithShort[testCLIConfig](t, "version", "Show version")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
@@ -63,7 +63,7 @@ func TestCLIAddCommand(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommandWithShort(t, "test", "Test command")
+		cmd := newTestCLICommandWithShort[testCLIConfig](t, "test", "Test command")
 
 		err = v2.AddCommand(cli, cmd)
 		if err != nil {
