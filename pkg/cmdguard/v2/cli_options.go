@@ -9,236 +9,215 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CLIOption is a functional option for configuring a CLI.
-type CLIOption[T any] func(*CLI[T])
-
 // HelpTransformFunc transforms a cobra command's help text before execution.
 // Optional modules (e.g. cmdguard/glamour) use this hook to render markdown,
 // without the core module importing the rendering library.
 type HelpTransformFunc func(cmd *cobra.Command)
 
+// --- Non-generic CLI options (operate on cliSpec) ---
+
 // WithHelpTransform registers a function that transforms command help text
 // before the CLI executes. Multiple transforms run in registration order.
-// This is the extension point for optional help-rendering modules.
-func WithHelpTransform[T any](fn HelpTransformFunc) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.helpTransforms = append(cli.helpTransforms, fn)
+func WithHelpTransform(fn HelpTransformFunc) CLIOption {
+	return func(s *cliSpec) {
+		s.helpTransforms = append(s.helpTransforms, fn)
 	}
 }
 
 // WithCLIVersion sets the version string.
-// When fang is enabled, the version is automatically passed to fang.WithVersion
-// for styled version output alongside cmdguard's own version subcommand.
-func WithCLIVersion[T any](version string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.setVersion(version)
-		cli.fangOpts = append(cli.fangOpts, fang.WithVersion(version))
+func WithCLIVersion(version string) CLIOption {
+	return func(s *cliSpec) {
+		s.version = version
+		s.fangOpts = append(s.fangOpts, fang.WithVersion(version))
 	}
 }
 
-// WithCLICommit sets the git commit hash appended to the version string.
-// When fang is enabled, the commit is automatically passed to fang.WithCommit.
-func WithCLICommit[T any](commit string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.fangOpts = append(cli.fangOpts, fang.WithCommit(commit))
+// WithCLICommit sets the git commit hash.
+func WithCLICommit(commit string) CLIOption {
+	return func(s *cliSpec) {
+		s.fangOpts = append(s.fangOpts, fang.WithCommit(commit))
 	}
 }
 
 // WithCLILong sets the long description.
-func WithCLILong[T any](long string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.setLong(long)
+func WithCLILong(long string) CLIOption {
+	return func(s *cliSpec) {
+		s.long = long
 	}
 }
 
 // WithCLIScope sets a custom DI scope.
-func WithCLIScope[T any](scope *Scope) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.scope = scope
+func WithCLIScope(scope *Scope) CLIOption {
+	return func(s *cliSpec) {
+		s.scope = scope
 	}
 }
 
 // WithSilenceErrors suppresses automatic error printing from cobra.
-func WithSilenceErrors[T any]() CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.rootCmd.SilenceErrors = true
+func WithSilenceErrors() CLIOption {
+	return func(s *cliSpec) {
+		s.silenceErrors = true
 	}
 }
 
 // WithSilenceUsage suppresses automatic usage printing on error.
-func WithSilenceUsage[T any]() CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.rootCmd.SilenceUsage = true
+func WithSilenceUsage() CLIOption {
+	return func(s *cliSpec) {
+		s.silenceUsage = true
 	}
 }
 
 // WithFang enables or disables fang-based styled output.
-// When disabled, falls back to cobra's default plain text output.
-func WithFang[T any](enabled bool) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.useFang = enabled
+func WithFang(enabled bool) CLIOption {
+	return func(s *cliSpec) {
+		s.useFang = enabled
 	}
 }
 
 // WithFangOptions sets fang options for the CLI's Execute method.
-func WithFangOptions[T any](opts ...fang.Option) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.fangOpts = append(cli.fangOpts, opts...)
+func WithFangOptions(opts ...fang.Option) CLIOption {
+	return func(s *cliSpec) {
+		s.fangOpts = append(s.fangOpts, opts...)
 	}
 }
 
-// WithFangErrorHandler sets a custom error display function for fang's styled output.
-// The function receives the writer, fang styles, and the error to display.
-// Only effective when fang is enabled (default).
-func WithFangErrorHandler[T any](handler func(w io.Writer, styles fang.Styles, err error)) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.fangOpts = append(cli.fangOpts, fang.WithErrorHandler(handler))
+// WithFangErrorHandler sets a custom error display function for fang.
+func WithFangErrorHandler(handler func(w io.Writer, styles fang.Styles, err error)) CLIOption {
+	return func(s *cliSpec) {
+		s.fangOpts = append(s.fangOpts, fang.WithErrorHandler(handler))
 	}
 }
 
-// WithFangColorScheme sets a custom color scheme for fang's styled help and error output.
-// The function receives a lipgloss.LightDarkFunc and returns a fang.ColorScheme.
-// Only effective when fang is enabled (default).
-func WithFangColorScheme[T any](cs func(lightDark lipgloss.LightDarkFunc) fang.ColorScheme) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.fangOpts = append(cli.fangOpts, fang.WithColorSchemeFunc(cs))
-	}
-}
-
-// WithMiddleware adds middleware that wraps every command handler.
-// Middleware are applied in order: first wraps the second, etc.
-func WithMiddleware[T any](mw ...Middleware[T]) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.middleware = append(cli.middleware, mw...)
+// WithFangColorScheme sets a custom color scheme for fang.
+func WithFangColorScheme(cs func(lightDark lipgloss.LightDarkFunc) fang.ColorScheme) CLIOption {
+	return func(s *cliSpec) {
+		s.fangOpts = append(s.fangOpts, fang.WithColorSchemeFunc(cs))
 	}
 }
 
 // WithGroup registers a command group on the root command.
 // Groups organize commands in help output under titled sections.
-// Use the Group field on Command to assign a command to a registered group.
-func WithGroup[T any](groupID, title string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.rootCmd.AddGroup(&cobra.Group{ID: groupID, Title: title})
+func WithGroup(groupID, title string) CLIOption {
+	return func(s *cliSpec) {
+		s.groups = append(s.groups, cobraGroup{id: groupID, title: title})
 	}
 }
 
 // WithEnvPrefix sets a prefix for environment variable lookups.
-// When set, env tags are prefixed: prefix "APP_" + env tag "PORT" → "APP_PORT".
-func WithEnvPrefix[T any](prefix string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.envPrefix = prefix
+func WithEnvPrefix(prefix string) CLIOption {
+	return func(s *cliSpec) {
+		s.envPrefix = prefix
 	}
 }
 
 // WithSignalHandling adds automatic context cancellation on SIGINT/SIGTERM.
-// When a signal is received, the context passed to handlers is cancelled.
-// This does NOT trigger DI service shutdown — use WithGracefulShutdown for that.
-func WithSignalHandling[T any]() CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.signalHandling = true
+func WithSignalHandling() CLIOption {
+	return func(s *cliSpec) {
+		s.signalHandling = true
 	}
 }
 
-// WithConfigValidation adds a validation function that runs after root flag parsing
-// but before any command handler. Use this to validate the full config struct
-// (e.g., cross-field validation, business rules).
-//
-// The validator receives a pointer to the resolved config. Return an error to
-// stop execution before any command runs.
-func WithConfigValidation[T any](validate func(*T) error) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.configValidate = validate
-	}
-}
-
-// WithPostFlagParse adds a hook that runs after flag parsing, config storage in
-// context, and config validation — but before any command handler. Use this for
-// side effects that depend on the resolved config (initializing DI, setting up
-// logging, storing session data in the command context for raw cobra subcommands).
-//
-// The hook receives the cobra command (so you can call cmd.SetContext, cmd.Flags,
-// etc.) and a pointer to the resolved config. Multiple hooks run in registration
-// order; any error stops execution.
-//
-// This replaces the manual "save + wrap cmdguard's PersistentPreRunE" workaround
-// that consumers previously needed.
-func WithPostFlagParse[T any](fns ...func(cmd *cobra.Command, cfg *T) error) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.postFlagParse = append(cli.postFlagParse, fns...)
-	}
-}
-
-// WithCleanup registers hooks that run after a command's RunE completes —
-// including when RunE returns an error. This closes the gap left by Cobra,
-// whose PostRunE and PersistentPostRunE do not fire when RunE errors.
-//
-// The hook receives the cobra command, the resolved config (the same pointer
-// available via ConfigFromContext[T]; nil only when RunE is invoked without
-// going through Execute, e.g. in a unit test), and the error returned by RunE
-// (nil on success). The runErr parameter lets a hook branch on success versus
-// failure.
-//
-// Ordering and error semantics:
-//   - Hooks run in registration order, after EVERY command's RunE.
-//   - The original RunE error is never swallowed. If RunE failed, it stays the
-//     primary error; any cleanup errors are joined (errors.Join) so both stay
-//     reachable via errors.Is.
-//   - If RunE succeeded but a cleanup hook errors, that error is returned.
-//
-// Cleanup is wired by wrapping each command's RunE at Execute time, so it
-// covers both cmdguard-managed commands and raw *cobra.Command subcommands
-// added via cli.RootCommand().AddCommand (the escape hatch).
-func WithCleanup[T any](fns ...func(cmd *cobra.Command, cfg *T, runErr error) error) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.cleanupHooks = append(cli.cleanupHooks, fns...)
-	}
-}
-
-// WithStrictValidation enables strict command validation:
-//   - All commands must have a short description
-func WithStrictValidation[T any]() CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.validationMode = Strict
+// WithStrictValidation enables strict command validation.
+func WithStrictValidation() CLIOption {
+	return func(s *cliSpec) {
+		s.validationMode = Strict
 	}
 }
 
 // WithGracefulShutdown enables graceful DI shutdown on SIGINT/SIGTERM.
-// When a signal is received, all services implementing do.ShutdownerWithError
-// or do.ShutdownerWithContextAndError are shut down in reverse invocation order.
-// This also enables signal-based context cancellation (implies WithSignalHandling).
-func WithGracefulShutdown[T any]() CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.signalHandling = true
-		cli.gracefulShutdown = true
+func WithGracefulShutdown() CLIOption {
+	return func(s *cliSpec) {
+		s.signalHandling = true
+		s.gracefulShutdown = true
 	}
 }
 
 // WithDILogging enables internal logging for the DI container.
-// The provided function receives formatted log messages from samber/do
-// for service registration, invocation, and lifecycle events.
-func WithDILogging[T any](logf func(format string, args ...any)) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.diLogf = logf
+func WithDILogging(logf func(format string, args ...any)) CLIOption {
+	return func(s *cliSpec) {
+		s.diLogf = logf
 	}
 }
 
-// WithDraconianValidation enables draconian command validation:
-//   - All commands must have a short description
-//   - All leaf commands must have an example
-func WithDraconianValidation[T any]() CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.validationMode = Draconian
+// WithDraconianValidation enables draconian command validation.
+func WithDraconianValidation() CLIOption {
+	return func(s *cliSpec) {
+		s.validationMode = Draconian
 	}
 }
 
 // WithAuditLog enables DI audit logging via samber-do-auditlog.
-// The plugin captures service registration, invocation, shutdown, and health check events.
-// Use cli.AuditLog() to access the plugin for reports, exports, and HTML visualization.
-//
-// When Config.Enabled is false (the zero value), the plugin checks DO_AUDITLOG_ENABLED.
-// Set it to "true", "1", or "yes" to enable audit logging without changing code.
-func WithAuditLog[T any](plugin *auditlog.Plugin) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.auditLog = plugin
+func WithAuditLog(plugin *auditlog.Plugin) CLIOption {
+	return func(s *cliSpec) {
+		s.auditLog = plugin
+	}
+}
+
+// WithOutputFormat sets the default output format for structured output.
+func WithOutputFormat(defaultFormat OutputFormat) CLIOption {
+	return func(s *cliSpec) {
+		s.outputFormat = defaultFormat
+	}
+}
+
+// WithConfigFile loads JSON config from the given paths before flag registration.
+// Paths support $ENV and ~ expansion; missing files are silently skipped.
+func WithConfigFile(paths ...string) CLIOption {
+	return func(s *cliSpec) {
+		s.configFilePaths = paths
+		s.configLoader = &jsonLoader{}
+	}
+}
+
+// WithConfigFileLoader sets a custom config file loader and paths.
+func WithConfigFileLoader(loader ConfigFileLoader, paths ...string) CLIOption {
+	return func(s *cliSpec) {
+		s.configLoader = loader
+		s.configFilePaths = paths
+	}
+}
+
+// --- Generic CLI options (return non-generic CLIOption via sealed interface) ---
+
+// WithConfigValidation adds a validation function that runs after root flag
+// parsing but before any command handler.
+func WithConfigValidation[T any](validate func(*T) error) CLIOption {
+	return func(s *cliSpec) {
+		s.configValidate = &typedConfigValidator[T]{fn: validate}
+	}
+}
+
+// WithMiddleware adds middleware that wraps every command handler.
+func WithMiddleware[T any](mw ...Middleware[T]) CLIOption {
+	return func(s *cliSpec) {
+		if existing, ok := s.middleware.(*typedMiddlewareList[T]); ok {
+			existing.mws = append(existing.mws, mw...)
+		} else {
+			s.middleware = &typedMiddlewareList[T]{mws: mw}
+		}
+	}
+}
+
+// WithPostFlagParse adds hooks that run after flag parsing and config
+// validation but before any command handler.
+func WithPostFlagParse[T any](fns ...func(cmd *cobra.Command, cfg *T) error) CLIOption {
+	return func(s *cliSpec) {
+		if existing, ok := s.postFlagParse.(*typedPostFlagParseList[T]); ok {
+			existing.fns = append(existing.fns, fns...)
+		} else {
+			s.postFlagParse = &typedPostFlagParseList[T]{fns: fns}
+		}
+	}
+}
+
+// WithCleanup registers hooks that run after a command's RunE completes,
+// including when RunE returns an error.
+func WithCleanup[T any](fns ...func(cmd *cobra.Command, cfg *T, runErr error) error) CLIOption {
+	return func(s *cliSpec) {
+		if existing, ok := s.cleanupHooks.(*typedCleanupHookList[T]); ok {
+			existing.fns = append(existing.fns, fns...)
+		} else {
+			s.cleanupHooks = &typedCleanupHookList[T]{fns: fns}
+		}
 	}
 }

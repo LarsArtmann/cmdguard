@@ -115,7 +115,7 @@ func TestScope_Integration(t *testing.T) {
 			"test-app",
 			"Test Application",
 			config{Version: "1.0.0"},
-			WithCLIVersion[config]("1.0.0"),
+			WithCLIVersion("1.0.0"),
 		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)

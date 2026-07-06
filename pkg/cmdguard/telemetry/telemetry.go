@@ -70,5 +70,5 @@ func Middleware[T any](tracer trace.Tracer) v2.Middleware[T] {
 // WithTelemetry is a convenience wrapper that registers telemetry middleware
 // via v2.WithMiddleware.
 func WithTelemetry[T any](tracer trace.Tracer) v2.CLIOption[T] {
-	return v2.WithMiddleware[T](Middleware[T](tracer))
+	return v2.WithMiddleware(Middleware[T](tracer))
 }

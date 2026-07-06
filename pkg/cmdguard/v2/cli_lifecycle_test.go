@@ -269,7 +269,7 @@ func TestWithCLIScope(t *testing.T) {
 		customScope := v2.NewScope("custom")
 
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
-			v2.WithCLIScope[testCLIConfig](customScope))
+			v2.WithCLIScope(customScope))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -344,7 +344,7 @@ func TestCLINoColor(t *testing.T) {
 		t.Parallel()
 
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
-			v2.WithFang[testCLIConfig](false))
+			v2.WithFang(false))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -367,7 +367,7 @@ func TestCLINoColorEnvVar(t *testing.T) {
 	t.Setenv("NO_COLOR", "1")
 
 	cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
-		v2.WithFang[testCLIConfig](false))
+		v2.WithFang(false))
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
@@ -387,7 +387,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 		os.Unsetenv("NO_COLOR")
 
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
-			v2.WithFang[testCLIConfig](false))
+			v2.WithFang(false))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -410,7 +410,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 		t.Setenv("NO_COLOR", "0")
 
 		cli, err := v2.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
-			v2.WithFang[testCLIConfig](false))
+			v2.WithFang(false))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}

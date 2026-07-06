@@ -31,7 +31,7 @@ func TestWithOutputFormat(t *testing.T) {
 
 		cli, err := NewCLI[outputTestConfig](
 			"test", "test", outputTestConfig{},
-			WithOutputFormat[outputTestConfig](output.FormatJSON),
+			WithOutputFormat(output.FormatJSON),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -44,7 +44,7 @@ func TestWithOutputFormat(t *testing.T) {
 
 		cli, err := NewCLI[outputTestConfig](
 			"test", "test", outputTestConfig{},
-			WithOutputFormat[outputTestConfig](output.FormatTable),
+			WithOutputFormat(output.FormatTable),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -59,7 +59,7 @@ func TestWithOutputFormat(t *testing.T) {
 
 		cli, err := NewCLI[outputTestConfig](
 			"test", "test", outputTestConfig{},
-			WithOutputFormat[outputTestConfig](output.FormatTable),
+			WithOutputFormat(output.FormatTable),
 		)
 		testutil.AssertNoError(t, err)
 

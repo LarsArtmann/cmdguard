@@ -130,8 +130,8 @@ func TestWithAuditLog(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
-			v2.WithAuditLog[testCLIConfig](plugin),
-			v2.WithDILogging[testCLIConfig](func(format string, args ...any) {
+			v2.WithAuditLog(plugin),
+			v2.WithDILogging(func(format string, args ...any) {
 				logs = append(logs, format)
 			}),
 		)

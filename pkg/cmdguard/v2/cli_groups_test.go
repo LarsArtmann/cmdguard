@@ -16,11 +16,11 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithGroup[testConfig]("core", "Core Commands:"),
-		WithGroup[testConfig]("utils", "Utilities:"),
-		WithFang[testConfig](false),
-		WithSilenceUsage[testConfig](),
-		WithSilenceErrors[testConfig](),
+		WithGroup("core", "Core Commands:"),
+		WithGroup("utils", "Utilities:"),
+		WithFang(false),
+		WithSilenceUsage(),
+		WithSilenceErrors(),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -66,10 +66,10 @@ func TestCommandGroups_NoGroup(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithGroup[testConfig]("core", "Core Commands:"),
-		WithFang[testConfig](false),
-		WithSilenceUsage[testConfig](),
-		WithSilenceErrors[testConfig](),
+		WithGroup("core", "Core Commands:"),
+		WithFang(false),
+		WithSilenceUsage(),
+		WithSilenceErrors(),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -88,8 +88,8 @@ func TestCommandGroups_CommandExecutionStillWorks(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithGroup[testConfig]("main", "Main Commands:"),
-		WithFang[testConfig](false),
+		WithGroup("main", "Main Commands:"),
+		WithFang(false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -120,8 +120,8 @@ func TestCommandGroups_SubcommandsInheritFromParent(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithGroup[testConfig]("core", "Core Commands:"),
-		WithFang[testConfig](false),
+		WithGroup("core", "Core Commands:"),
+		WithFang(false),
 	)
 	testutil.AssertNoError(t, err)
 
@@ -155,12 +155,12 @@ func TestWithGroup_RegistersMultipleGroups(t *testing.T) {
 
 	cli, err := NewCLI[testConfig](
 		"test", "Test CLI", testConfig{},
-		WithGroup[testConfig]("alpha", "Alpha Group:"),
-		WithGroup[testConfig]("beta", "Beta Group:"),
-		WithGroup[testConfig]("gamma", "Gamma Group:"),
-		WithFang[testConfig](false),
-		WithSilenceUsage[testConfig](),
-		WithSilenceErrors[testConfig](),
+		WithGroup("alpha", "Alpha Group:"),
+		WithGroup("beta", "Beta Group:"),
+		WithGroup("gamma", "Gamma Group:"),
+		WithFang(false),
+		WithSilenceUsage(),
+		WithSilenceErrors(),
 	)
 	testutil.AssertNoError(t, err)
 

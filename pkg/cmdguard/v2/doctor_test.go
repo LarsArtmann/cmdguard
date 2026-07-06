@@ -17,7 +17,7 @@ func TestDoctorCommand(t *testing.T) {
 	newDoctorCLI := func(t *testing.T) *CLI[testConfig] {
 		t.Helper()
 
-		cli, err := NewCLI[testConfig]("myapp", "My app", testConfig{}, WithFang[testConfig](false))
+		cli, err := NewCLI[testConfig]("myapp", "My app", testConfig{}, WithFang(false))
 		testutil.AssertNoError(t, err)
 
 		return cli

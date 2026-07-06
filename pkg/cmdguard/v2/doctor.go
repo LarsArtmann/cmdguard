@@ -84,7 +84,7 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 		opt(&cfg)
 	}
 
-	appName := cli.name
+	appName := cli.spec.name
 	short := cfg.short
 	long := cfg.long
 	groupID := cfg.groupID

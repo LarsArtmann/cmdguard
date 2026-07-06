@@ -29,8 +29,8 @@ func newGracefulShutdownTestCLI(t *testing.T) *v2.CLI[testCLIConfig] {
 
 	cli, err := v2.NewCLI[testCLIConfig](
 		"test", "Test", testCLIConfig{},
-		v2.WithGracefulShutdown[testCLIConfig](),
-		v2.WithFang[testCLIConfig](false),
+		v2.WithGracefulShutdown(),
+		v2.WithFang(false),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
@@ -97,7 +97,7 @@ func TestGracefulShutdown_ImpliesSignalHandling(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
-			v2.WithGracefulShutdown[testCLIConfig](),
+			v2.WithGracefulShutdown(),
 		)
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)

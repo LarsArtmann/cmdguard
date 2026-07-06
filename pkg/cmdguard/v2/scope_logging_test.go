@@ -18,7 +18,7 @@ func TestWithDILogging(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test", testCLIConfig{},
-			v2.WithDILogging[testCLIConfig](func(format string, args ...any) {
+			v2.WithDILogging(func(format string, args ...any) {
 				mu.Lock()
 				logs = append(logs, format)
 				mu.Unlock()

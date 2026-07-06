@@ -62,10 +62,10 @@ func newEmptyTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 
 	cli, err := v2.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
-		v2.WithCLIVersion[AppConfig]("1.0.0"),
-		v2.WithStrictValidation[AppConfig](),
-		v2.WithGroup[AppConfig]("tasks", "Task Management"),
-		v2.WithGroup[AppConfig]("system", "System"),
+		v2.WithCLIVersion("1.0.0"),
+		v2.WithStrictValidation(),
+		v2.WithGroup("tasks", "Task Management"),
+		v2.WithGroup("system", "System"),
 	)
 	if err != nil {
 		t.Fatalf("failed to create CLI: %v", err)
@@ -104,11 +104,11 @@ func TestCLI_WithOptions(t *testing.T) {
 
 	cli, err := v2.NewCLI[AppConfig](
 		"taskctl", "test", AppConfig{},
-		v2.WithCLIVersion[AppConfig]("2.0.0"),
-		v2.WithEnvPrefix[AppConfig]("TASKCTL_"),
-		v2.WithStrictValidation[AppConfig](),
-		v2.WithGroup[AppConfig]("tasks", "Tasks"),
-		v2.WithGroup[AppConfig]("system", "System"),
+		v2.WithCLIVersion("2.0.0"),
+		v2.WithEnvPrefix("TASKCTL_"),
+		v2.WithStrictValidation(),
+		v2.WithGroup("tasks", "Tasks"),
+		v2.WithGroup("system", "System"),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI with options: %v", err)

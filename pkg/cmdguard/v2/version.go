@@ -18,15 +18,15 @@ import (
 //	)
 //	v2.AddCommand(cli, v2.VersionCommand[Config](cli))
 func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
-	if cli.version == "" {
+	if cli.spec.version == "" {
 		return Command[T, NoFlags]{}, fmt.Errorf(
 			"%w: version command requires WithCLIVersion",
 			ErrMissingVersion,
 		)
 	}
 
-	appName := cli.name
-	appVersion := cli.version
+	appName := cli.spec.name
+	appVersion := cli.spec.version
 
 	return NewCommand(
 		"version",
@@ -47,12 +47,12 @@ func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 // GenerateVersionCommand creates a raw cobra version command with custom formatting.
 // This provides more control over output format and destination writer.
 func GenerateVersionCommand[T any](cli *CLI[T], w io.Writer) (*cobra.Command, error) {
-	if cli.version == "" {
+	if cli.spec.version == "" {
 		return nil, fmt.Errorf("%w: version command requires WithCLIVersion", ErrMissingVersion)
 	}
 
-	appName := cli.name
-	appVersion := cli.version
+	appName := cli.spec.name
+	appVersion := cli.spec.version
 
 	return &cobra.Command{
 		Use:   "version",

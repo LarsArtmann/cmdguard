@@ -29,7 +29,7 @@ func TestWithCleanup_FiresOnSuccess(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(_ *cobra.Command, c *cfg, runErr error) error {
+		WithCleanup(func(_ *cobra.Command, c *cfg, runErr error) error {
 			fired = true
 			seenRunErr = runErr
 			seenCfg = c
@@ -67,7 +67,7 @@ func TestWithCleanup_FiresOnRunEError(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(_ *cobra.Command, _ *cfg, runErr error) error {
+		WithCleanup(func(_ *cobra.Command, _ *cfg, runErr error) error {
 			received = runErr
 
 			return nil
@@ -99,12 +99,12 @@ func TestWithCleanup_MultipleHooksInOrder(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(*cobra.Command, *cfg, error) error {
+		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			order = append(order, 1)
 
 			return nil
 		}),
-		WithCleanup[cfg](func(*cobra.Command, *cfg, error) error {
+		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			order = append(order, 2)
 
 			return nil
@@ -130,7 +130,7 @@ func TestWithCleanup_HookErrorOnSuccessReturned(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(*cobra.Command, *cfg, error) error {
+		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			return errCleanupHookFailed
 		}),
 	)
@@ -154,7 +154,7 @@ func TestWithCleanup_RunEErrorNotSwallowed(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(*cobra.Command, *cfg, error) error {
+		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			return errCleanupHookFailed
 		}),
 	)
@@ -193,7 +193,7 @@ func TestWithCleanup_FiresOncePerExecute(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(*cobra.Command, *cfg, error) error {
+		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			fires++
 
 			return nil
@@ -221,7 +221,7 @@ func TestWithCleanup_FiresForRootRunE(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithCleanup[cfg](func(*cobra.Command, *cfg, error) error {
+		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			fired = true
 
 			return nil

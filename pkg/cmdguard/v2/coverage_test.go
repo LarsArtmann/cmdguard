@@ -82,7 +82,7 @@ func TestWithSignalHandling(t *testing.T) {
 
 		type cfg struct{}
 
-		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithSignalHandling[cfg]())
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithSignalHandling())
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
@@ -96,7 +96,7 @@ func TestWithCLICommit(t *testing.T) {
 
 		type cfg struct{}
 
-		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithCLICommit[cfg]("abc123"))
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithCLICommit("abc123"))
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
@@ -110,7 +110,7 @@ func TestWithFangOptions(t *testing.T) {
 
 		type cfg struct{}
 
-		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangOptions[cfg]())
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangOptions())
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
@@ -125,7 +125,7 @@ func TestWithFangErrorHandler(t *testing.T) {
 		type cfg struct{}
 
 		handler := func(w io.Writer, styles fang.Styles, err error) {}
-		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangErrorHandler[cfg](handler))
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangErrorHandler(handler))
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
@@ -140,7 +140,7 @@ func TestWithFangColorScheme(t *testing.T) {
 		type cfg struct{}
 
 		cs := fang.DefaultColorScheme
-		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangColorScheme[cfg](cs))
+		cli, err := NewCLI[cfg]("test", "test", cfg{}, WithFangColorScheme(cs))
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})

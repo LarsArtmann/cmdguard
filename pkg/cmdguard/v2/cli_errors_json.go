@@ -124,11 +124,11 @@ func writeJSONError(w io.Writer, err error) error {
 }
 
 func (cli *CLI[T]) writeFormattedError(err error) {
-	if cli.outputFormat == "" {
+	if cli.spec.outputFormat == "" {
 		return
 	}
 
-	switch cli.outputFormat {
+	switch cli.spec.outputFormat {
 	case output.FormatJSON, output.FormatJSONL, output.FormatYAML, output.FormatTOML:
 		writeErr := writeJSONError(os.Stderr, err)
 		if writeErr != nil {

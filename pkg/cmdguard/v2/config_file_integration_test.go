@@ -36,7 +36,7 @@ func runPrecedenceTest(t *testing.T, configPath, envValue string, args []string,
 	called := false
 	cli, err := v2.NewCLI[precedenceConfig](
 		"app", "My app", precedenceConfig{},
-		v2.WithConfigFile[precedenceConfig](configPath),
+		v2.WithConfigFile(configPath),
 	)
 	if err != nil {
 		t.Fatal(err)

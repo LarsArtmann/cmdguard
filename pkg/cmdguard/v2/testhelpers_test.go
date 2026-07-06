@@ -123,7 +123,7 @@ func newTestCLIWithAuditLog(
 
 	cli, err := v2.NewCLI[testCLIConfig](
 		"test", "Test", testCLIConfig{},
-		v2.WithAuditLog[testCLIConfig](plugin),
+		v2.WithAuditLog(plugin),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)

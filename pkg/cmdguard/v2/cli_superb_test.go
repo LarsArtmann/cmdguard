@@ -14,7 +14,7 @@ import (
 func newTestCLIWithNoOpCmd(t *testing.T, opts ...CommandOption) *CLI[testConfig] {
 	t.Helper()
 
-	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
+	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang(false))
 	testutil.AssertNoError(t, err)
 
 	cmd, err := NewCommand(
@@ -154,7 +154,7 @@ func TestWithConfigValidation(t *testing.T) {
 		var validated bool
 		cli, err := NewCLI[config](
 			"test", "Test", config{},
-			WithConfigValidation[config](func(cfg *config) error {
+			WithConfigValidation(func(cfg *config) error {
 				validated = true
 
 				return nil
@@ -180,7 +180,7 @@ func TestWithConfigValidation(t *testing.T) {
 
 		cli, err := NewCLI[config](
 			"test", "Test", config{},
-			WithConfigValidation[config](func(cfg *config) error {
+			WithConfigValidation(func(cfg *config) error {
 				if cfg.Port < 1 {
 					return fmt.Errorf("port must be > 0, got %d", cfg.Port)
 				}
@@ -208,7 +208,7 @@ func TestWithStrictValidation(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"test", "Test", testConfig{},
-			WithStrictValidation[testConfig](),
+			WithStrictValidation(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -238,7 +238,7 @@ func TestWithStrictValidation(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"test", "Test", testConfig{},
-			WithStrictValidation[testConfig](),
+			WithStrictValidation(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -274,7 +274,7 @@ func TestWithDraconianValidation(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"test", "Test", testConfig{},
-			WithDraconianValidation[testConfig](),
+			WithDraconianValidation(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -298,7 +298,7 @@ func TestWithDraconianValidation(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"test", "Test", testConfig{},
-			WithDraconianValidation[testConfig](),
+			WithDraconianValidation(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -311,7 +311,7 @@ func TestWithDraconianValidation(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"test", "Test", testConfig{},
-			WithDraconianValidation[testConfig](),
+			WithDraconianValidation(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -332,7 +332,7 @@ func TestWithDraconianValidation(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"test", "Test", testConfig{},
-			WithDraconianValidation[testConfig](),
+			WithDraconianValidation(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -399,7 +399,7 @@ func TestVersionCommand(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"myapp", "Test", testConfig{},
-			WithCLIVersion[testConfig]("1.2.3"),
+			WithCLIVersion("1.2.3"),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -424,8 +424,8 @@ func TestVersionCommand(t *testing.T) {
 
 		cli, err := NewCLI[testConfig](
 			"myapp", "Test", testConfig{},
-			WithCLIVersion[testConfig]("2.0.0"),
-			WithFang[testConfig](false),
+			WithCLIVersion("2.0.0"),
+			WithFang(false),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -462,7 +462,7 @@ func TestWithExactArgs(t *testing.T) {
 	t.Run("exact args - correct count passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang[testConfig](false))
+		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang(false))
 		testutil.AssertNoError(t, err)
 
 		var received []string

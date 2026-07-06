@@ -58,8 +58,8 @@ func RegisterPlugin(plugin Plugin) error {
 // WithPlugin registers a plugin during CLI construction.
 // The plugin is applied to the global registries before the CLI initializes its
 // flags, so the plugin's handlers and validators are available to all commands.
-func WithPlugin[T any](plugin Plugin) CLIOption[T] {
-	return func(cli *CLI[T]) {
+func WithPlugin(plugin Plugin) CLIOption {
+	return func(_ *cliSpec) {
 		_ = RegisterPlugin(plugin)
 	}
 }

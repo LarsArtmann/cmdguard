@@ -18,7 +18,7 @@ func TestEnvTag_Integration(t *testing.T) {
 		envValue   string
 		args       []string
 		wantHost   string
-		cliOptions []CLIOption[envTestConfig]
+		cliOptions []CLIOption
 	}{
 		{
 			name:     "env var provides default when flag not set",
@@ -45,8 +45,8 @@ func TestEnvTag_Integration(t *testing.T) {
 			envValue: "prefixed.example.com",
 			args:     []string{"connect"},
 			wantHost: "prefixed.example.com",
-			cliOptions: []CLIOption[envTestConfig]{
-				WithEnvPrefix[envTestConfig]("MYAPP_"),
+			cliOptions: []CLIOption{
+				WithEnvPrefix("MYAPP_"),
 			},
 		},
 	}

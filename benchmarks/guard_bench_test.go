@@ -61,7 +61,7 @@ func BenchmarkNewWithLong(b *testing.B) {
 			"myapp",
 			"short",
 			defaults,
-			v2.WithCLILong[BenchConfig]("long description"),
+			v2.WithCLILong("long description"),
 		)
 		if err != nil {
 			b.Fatal(err)

@@ -27,8 +27,8 @@ import (
 // When enabled, the Long and Example fields of all commands are rendered
 // through glamour for styled terminal output. The theme is determined by
 // the GLAMOUR_STYLE environment variable, defaulting to "dark".
-func WithHelp[T any]() v2.CLIOption[T] {
-	return v2.WithHelpTransform[T](func(cmd *cobra.Command) {
+func WithHelp() v2.CLIOption {
+	return v2.WithHelpTransform(func(cmd *cobra.Command) {
 		applyToTree(cmd, "")
 	})
 }
@@ -36,8 +36,8 @@ func WithHelp[T any]() v2.CLIOption[T] {
 // WithHelpTheme enables markdown rendering with a specific glamour theme.
 // Supported themes: "ascii", "dark", "dracula", "light", "notty",
 // "pink", "tokyo-night".
-func WithHelpTheme[T any](theme string) v2.CLIOption[T] {
-	return v2.WithHelpTransform[T](func(cmd *cobra.Command) {
+func WithHelpTheme(theme string) v2.CLIOption {
+	return v2.WithHelpTransform(func(cmd *cobra.Command) {
 		applyToTree(cmd, theme)
 	})
 }

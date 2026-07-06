@@ -240,7 +240,7 @@ func assertValidatorError(t *testing.T, name string, validator func(string) erro
 
 func addShortCommandToStrictCLI(
 	t *testing.T,
-	opts ...CLIOption[testConfig],
+	opts ...CLIOption,
 ) {
 	t.Helper()
 
@@ -263,7 +263,7 @@ func addShortCommandToStrictCLI(
 // t.Run/t.Parallel/helper boilerplate per subtest.
 func assertShortCommandAcceptedOnStrictCLI(t *testing.T) {
 	t.Parallel()
-	addShortCommandToStrictCLI(t, WithStrictValidation[testConfig]())
+	addShortCommandToStrictCLI(t, WithStrictValidation())
 }
 
 // noShortCommand builds a minimal test command that omits a short description.

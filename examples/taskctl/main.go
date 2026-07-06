@@ -62,28 +62,28 @@ func main() {
 
 	cli, err := v2.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
-		v2.WithCLIVersion[AppConfig]("1.0.0"),
-		v2.WithEnvPrefix[AppConfig]("TASKCTL_"),
-		v2.WithAuditLog[AppConfig](auditPlugin),
-		v2.WithConfigFile[AppConfig]("$HOME/.config/taskctl/config.json"),
-		v2.WithConfigValidation[AppConfig](func(cfg *AppConfig) error {
+		v2.WithCLIVersion("1.0.0"),
+		v2.WithEnvPrefix("TASKCTL_"),
+		v2.WithAuditLog(auditPlugin),
+		v2.WithConfigFile("$HOME/.config/taskctl/config.json"),
+		v2.WithConfigValidation(func(cfg *AppConfig) error {
 			if cfg.DataDir == "" {
 				return fmt.Errorf("data-dir must not be empty")
 			}
 			return nil
 		}),
-		v2.WithGracefulShutdown[AppConfig](),
-		v2.WithStrictValidation[AppConfig](),
-		v2.WithMiddleware[AppConfig](
+		v2.WithGracefulShutdown(),
+		v2.WithStrictValidation(),
+		v2.WithMiddleware(
 			spinner.Middleware[AppConfig]("Working..."),
 			v2.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
 				fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
 			}),
 			v2.RecoveryMiddleware[AppConfig](),
 		),
-		glamour.WithHelpTheme[AppConfig]("dark"),
-		v2.WithGroup[AppConfig]("tasks", "Task Management"),
-		v2.WithGroup[AppConfig]("system", "System"),
+		glamour.WithHelpTheme("dark"),
+		v2.WithGroup("tasks", "Task Management"),
+		v2.WithGroup("system", "System"),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

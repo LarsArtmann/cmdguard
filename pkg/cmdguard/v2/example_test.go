@@ -123,8 +123,8 @@ func ExampleNewCLI() {
 
 	cli, err := v2.NewCLI[config](
 		"myapp", "My application", config{},
-		v2.WithCLIVersion[config]("1.0.0"),
-		v2.WithEnvPrefix[config]("MYAPP_"),
+		v2.WithCLIVersion("1.0.0"),
+		v2.WithEnvPrefix("MYAPP_"),
 	)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -185,7 +185,7 @@ func ExampleTimingMiddleware() {
 
 	cli, _ := v2.NewCLI[config](
 		"myapp", "My application", config{},
-		v2.WithMiddleware[config](v2.TimingMiddleware[config](func(name string, d time.Duration, err error) {
+		v2.WithMiddleware(v2.TimingMiddleware[config](func(name string, d time.Duration, err error) {
 			fmt.Printf("%s took %v (err=%v)\n", name, d, err)
 		})),
 	)

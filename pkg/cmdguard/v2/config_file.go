@@ -194,37 +194,21 @@ func (r *FlagRegistry) updateTagDefaultsFromConfig(cfg any, setFields []string) 
 // Environment variables and ~ are expanded in paths.
 // Only JSON files are supported in the core package;
 // use WithConfigFileLoader for YAML/TOML support.
-func WithConfigFile[T any](paths ...string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.configFilePaths = paths
-		cli.configFileLoader = &jsonLoader{}
-	}
-}
-
-// WithConfigFileLoader adds config file loading with a custom loader.
-// Paths are tried in order; the first existing file wins.
-func WithConfigFileLoader[T any](loader ConfigFileLoader, paths ...string) CLIOption[T] {
-	return func(cli *CLI[T]) {
-		cli.configFilePaths = paths
-		cli.configFileLoader = loader
-	}
-}
-
 // loadConfigFileOrSkip attempts to load a config file, returning nil on "not found".
 // This is the helper used during CLI initialization.
 func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, error) {
-	if cli.configFileLoader == nil || len(cli.configFilePaths) == 0 {
+	if cli.spec.configLoader == nil || len(cli.spec.configFilePaths) == 0 {
 		return nil, nil
 	}
 
-	paths := cli.configFilePaths
+	paths := cli.spec.configFilePaths
 
 	// Check for --config flag override.
 	if override := resolveConfigFlag(os.Args[1:]); override != "" {
 		paths = []string{override}
 	}
 
-	setFields, err := loadConfigFile(paths, cli.configFileLoader, cli.config)
+	setFields, err := loadConfigFile(paths, cli.spec.configLoader, cli.config)
 	if err != nil && errors.Is(err, ErrConfigFileNotFound) {
 		return nil, nil
 	}

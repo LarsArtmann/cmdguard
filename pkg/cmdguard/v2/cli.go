@@ -16,65 +16,160 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CLI provides type-safe CLI construction with a single type parameter.
-// T is the application config type. Commands can have any flags type.
-// This is the recommended API for new code (v2.1+).
-type CLI[T any] struct {
+// cliSpec holds all non-generic CLI configuration. Typed hooks (config
+// validation, middleware, post-flag-parse, cleanup) are stored behind sealed
+// interfaces, preserving type safety without genericizing the option type.
+type cliSpec struct {
 	name             string
 	short            string
 	long             string
 	version          string
-	defaults         T
-	config           *T
 	scope            *Scope
-	rootCmd          *cobra.Command
-	registry         *FlagRegistry
-	registeredCmds   map[string]struct{}
-	flowCtx          *BranchingFlowContext
 	useFang          bool
 	fangOpts         []fang.Option
-	middleware       []Middleware[T]
 	envPrefix        string
 	signalHandling   bool
+	silenceErrors    bool
+	silenceUsage     bool
 	outputFormat     OutputFormat
 	validationMode   ValidationMode
-	configValidate   func(*T) error
-	postFlagParse    []func(*cobra.Command, *T) error
-	cleanupHooks     []func(*cobra.Command, *T, error) error
-	cleanupWired     bool
+	configValidate   configValidator
+	middleware       middlewareList
+	postFlagParse    postFlagParseList
+	cleanupHooks     cleanupHookList
 	configFilePaths  []string
-	configFileLoader ConfigFileLoader
+	configLoader     ConfigFileLoader
 	helpTransforms   []HelpTransformFunc
-	noColorFlag      *bool
+	groups           []cobraGroup
 	gracefulShutdown bool
 	diLogf           func(string, ...any)
 	auditLog         *auditlog.Plugin
 }
 
+type cobraGroup struct {
+	id    string
+	title string
+}
+
+// Sealed interfaces for typed CLI hooks — the unexported methods prevent
+// external implementations, ensuring type safety through the non-generic
+// CLIOption.
+
+type configValidator interface {
+	isConfigValidator()
+}
+
+type typedConfigValidator[T any] struct {
+	fn func(*T) error
+}
+
+func (*typedConfigValidator[T]) isConfigValidator() {}
+
+type middlewareList interface {
+	isMiddlewareList()
+}
+
+type typedMiddlewareList[T any] struct {
+	mws []Middleware[T]
+}
+
+func (*typedMiddlewareList[T]) isMiddlewareList() {}
+
+type postFlagParseList interface {
+	isPostFlagParseList()
+}
+
+type typedPostFlagParseList[T any] struct {
+	fns []func(*cobra.Command, *T) error
+}
+
+func (*typedPostFlagParseList[T]) isPostFlagParseList() {}
+
+type cleanupHookList interface {
+	isCleanupHookList()
+}
+
+type typedCleanupHookList[T any] struct {
+	fns []func(*cobra.Command, *T, error) error
+}
+
+func (*typedCleanupHookList[T]) isCleanupHookList() {}
+
+// CLIOption configures a CLI. Non-generic — no type parameters needed on
+// most options. Generic-returning options (WithConfigValidation, WithMiddleware,
+// WithPostFlagParse, WithCleanup) use sealed interfaces internally.
+type CLIOption func(*cliSpec)
+
+// CLI provides type-safe CLI construction with a single type parameter.
+// T is the application config type. Commands can have any flags type.
+type CLI[T any] struct {
+	spec           cliSpec
+	defaults       T
+	config         *T
+	rootCmd        *cobra.Command
+	registry       *FlagRegistry
+	registeredCmds map[string]struct{}
+	flowCtx        *BranchingFlowContext
+	noColorFlag    *bool
+	cleanupWired   bool
+}
+
 // NewCLI creates a new CLI application with typed config.
 // Returns an error if initialization fails (never panics).
 // T is the application config type.
-func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
+//
+// Type parameter T must be specified explicitly; CLIOptions do not need
+// type parameters:
+//
+//	cli, err := cmdguard.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+//	    cmdguard.WithCLIVersion("1.0.0"),
+//	    cmdguard.WithEnvPrefix("MYAPP_"),
+//	    cmdguard.WithStrictValidation(),
+//	)
+func NewCLI[T any](name, short string, defaults T, opts ...CLIOption) (*CLI[T], error) {
 	err := validateName(name)
 	if err != nil {
 		return nil, fmt.Errorf("short=%q: creating CLI %q: %w", short, name, err)
 	}
 
-	cli := &CLI[T]{
-		name:           name,
-		short:          short,
-		defaults:       defaults,
-		scope:          nil,
-		rootCmd:        &cobra.Command{Use: name, Short: short},
-		registry:       nil,
-		registeredCmds: make(map[string]struct{}),
-		useFang:        true,
-		noColorFlag:    new(bool),
+	spec := cliSpec{
+		name:    name,
+		short:   short,
+		useFang: true,
 	}
 
 	for _, opt := range opts {
-		opt(cli)
+		opt(&spec)
 	}
+
+	cli := &CLI[T]{
+		spec:           spec,
+		defaults:       defaults,
+		rootCmd:        &cobra.Command{Use: name, Short: short},
+		registeredCmds: make(map[string]struct{}),
+		noColorFlag:    new(bool),
+	}
+
+	// Apply command groups
+	for _, g := range spec.groups {
+		cli.rootCmd.AddGroup(&cobra.Group{ID: g.id, Title: g.title})
+	}
+
+	// Apply version and long description
+	if spec.version != "" {
+		cli.rootCmd.Version = spec.version
+	}
+
+	if spec.long != "" {
+		cli.rootCmd.Long = spec.long
+	}
+
+	// Apply silence settings
+	if spec.silenceErrors {
+		cli.rootCmd.SilenceErrors = true
+	}
+
+	cli.rootCmd.SilenceUsage = true
 
 	err = cli.initialize(defaults)
 	if err != nil {
@@ -85,19 +180,21 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T
 }
 
 func (cli *CLI[T]) initialize(defaults T) error {
-	if cli.scope == nil {
+	s := &cli.spec
+
+	if s.scope == nil {
 		opts := cli.buildInjectorOpts()
 
 		if opts != nil {
-			cli.scope = NewScopeWithOpts(cli.name, opts)
+			s.scope = NewScopeWithOpts(s.name, opts)
 		} else {
-			cli.scope = NewScope(cli.name)
+			s.scope = NewScope(s.name)
 		}
 	}
 
 	cfg := defaults
 
-	err := ProvideValue(cli.scope, &cfg)
+	err := ProvideValue(s.scope, &cfg)
 	if err != nil {
 		return fmt.Errorf("%w: registering config type=%T: %w", ErrServiceRegistration, cfg, err)
 	}
@@ -114,7 +211,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		)
 	}
 
-	err = ProvideValue(cli.scope, registry)
+	err = ProvideValue(s.scope, registry)
 	if err != nil {
 		return fmt.Errorf(
 			"%w: registering flag registry for %T: %w",
@@ -132,19 +229,14 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		registry.updateTagDefaultsFromConfig(cli.config, setFields)
 	}
 
-	if cli.envPrefix != "" {
-		registry.SetEnvPrefix(cli.envPrefix)
+	if s.envPrefix != "" {
+		registry.SetEnvPrefix(s.envPrefix)
 	}
 
 	cli.initOutputFlag()
 	cli.initNoColorFlag()
 
-	// Silence usage-on-error by default. Raw Cobra prints the full usage block
-	// after every command error — the single most reported Cobra footgun. A CLI
-	// library that aims to make consumers "use Cobra correctly" must not expose
-	// that behaviour by default. Fang already forces this true when it executes;
-	// setting it here guarantees the same sane behaviour when fang is disabled.
-	// --help is unaffected (SilenceUsage only suppresses error usage).
+	// Silence usage-on-error by default.
 	cli.rootCmd.SilenceUsage = true
 
 	err = registry.RegisterScopedFlags(cli.rootCmd)
@@ -162,21 +254,19 @@ func (cli *CLI[T]) initialize(defaults T) error {
 			return fmt.Errorf("parsing global flags: %w", err)
 		}
 
-		// Store the resolved config in the command context so raw cobra
-		// subcommands (added via cli.RootCommand().AddCommand) can access it
-		// via ConfigFromContext[T](cmd.Context()) without a parallel
-		// context-key system.
 		c.SetContext(context.WithValue(c.Context(), configKey, cli.config))
 
-		if cli.configValidate != nil {
-			if err := cli.configValidate(cli.config); err != nil {
+		if cv, ok := s.configValidate.(*typedConfigValidator[T]); ok && cv != nil {
+			if err := cv.fn(cli.config); err != nil {
 				return fmt.Errorf("%w: %w", ErrConfigValidation, err)
 			}
 		}
 
-		for _, fn := range cli.postFlagParse {
-			if err := fn(c, cli.config); err != nil {
-				return fmt.Errorf("post-flag-parse hook: %w", err)
+		if pfpl, ok := s.postFlagParse.(*typedPostFlagParseList[T]); ok && pfpl != nil {
+			for _, fn := range pfpl.fns {
+				if err := fn(c, cli.config); err != nil {
+					return fmt.Errorf("post-flag-parse hook: %w", err)
+				}
 			}
 		}
 
@@ -187,20 +277,20 @@ func (cli *CLI[T]) initialize(defaults T) error {
 }
 
 // buildInjectorOpts merges DI logging and audit log hooks into a single InjectorOpts.
-// Returns nil when neither is configured, so the default injector is used.
 func (cli *CLI[T]) buildInjectorOpts() *do.InjectorOpts {
-	if cli.diLogf == nil && cli.auditLog == nil {
+	s := &cli.spec
+	if s.diLogf == nil && s.auditLog == nil {
 		return nil
 	}
 
 	opts := &do.InjectorOpts{}
 
-	if cli.diLogf != nil {
-		opts.Logf = cli.diLogf
+	if s.diLogf != nil {
+		opts.Logf = s.diLogf
 	}
 
-	if cli.auditLog != nil {
-		auditOpts := cli.auditLog.Opts()
+	if s.auditLog != nil {
+		auditOpts := s.auditLog.Opts()
 
 		opts.HookBeforeRegistration = append(opts.HookBeforeRegistration, auditOpts.HookBeforeRegistration...)
 		opts.HookAfterRegistration = append(opts.HookAfterRegistration, auditOpts.HookAfterRegistration...)
@@ -219,15 +309,15 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.spec.use)
 	}
 
-	if err := cmd.validate(cli.validationMode); err != nil {
-		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.spec.use, cli.name, err)
+	if err := cmd.validate(cli.spec.validationMode); err != nil {
+		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
 
 	cli.registeredCmds[cmd.spec.use] = struct{}{}
 
-	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.middleware, cli.envPrefix)
+	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.extractMiddleware(), cli.spec.envPrefix)
 	if err != nil {
-		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.name, err)
+		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
 
 	cli.rootCmd.AddCommand(cobraCmd)
@@ -235,8 +325,26 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	return nil
 }
 
+// extractMiddleware safely extracts the typed middleware from the sealed interface.
+func (cli *CLI[T]) extractMiddleware() []Middleware[T] {
+	if ml, ok := cli.spec.middleware.(*typedMiddlewareList[T]); ok {
+		return ml.mws
+	}
+
+	return nil
+}
+
+// extractCleanupHooks safely extracts typed cleanup hooks from the sealed interface.
+func (cli *CLI[T]) extractCleanupHooks() []func(*cobra.Command, *T, error) error {
+	if cl, ok := cli.spec.cleanupHooks.(*typedCleanupHookList[T]); ok {
+		return cl.fns
+	}
+
+	return nil
+}
+
 func (cli *CLI[T]) applyHelpTransforms() {
-	for _, fn := range cli.helpTransforms {
+	for _, fn := range cli.spec.helpTransforms {
 		fn(cli.rootCmd)
 	}
 }
@@ -246,11 +354,8 @@ func (cli *CLI[T]) initNoColorFlag() {
 		"Disable colored output (also respected via NO_COLOR env var)")
 }
 
-// applyNoColorIfSet temporarily sets NO_COLOR=1 around fang execution
-// if --no-color was passed. The original value is restored after execution
-// to avoid process-wide env mutation.
 func (cli *CLI[T]) applyNoColorIfSet() func() {
-	if !cli.useFang || cli.noColorFlag == nil || !*cli.noColorFlag {
+	if !cli.spec.useFang || cli.noColorFlag == nil || !*cli.noColorFlag {
 		return func() {}
 	}
 
@@ -266,21 +371,9 @@ func (cli *CLI[T]) applyNoColorIfSet() func() {
 	}
 }
 
-// applyCleanupHooks wraps every command's RunE — both cmdguard-managed
-// commands and raw *cobra.Command subcommands added via
-// RootCommand().AddCommand — so that cleanup hooks fire after RunE completes,
-// including when RunE returns an error.
-//
-// Cobra's PostRunE and PersistentPostRunE are NOT called when RunE errors, so
-// cleanup that must run on failure (flushing buffers, releasing resources,
-// emitting failure telemetry) has nowhere to live except the RunE wrapper
-// itself. This wires that wrapper once, uniformly, for the whole tree.
-//
-// It is a no-op when no cleanup hooks are registered, so CLIs that do not use
-// WithCleanup pay zero overhead. The wiring is idempotent so calling Execute
-// more than once does not double-wrap.
 func (cli *CLI[T]) applyCleanupHooks() {
-	if len(cli.cleanupHooks) == 0 || cli.cleanupWired {
+	hooks := cli.extractCleanupHooks()
+	if len(hooks) == 0 || cli.cleanupWired {
 		return
 	}
 
@@ -298,15 +391,12 @@ func (cli *CLI[T]) applyCleanupHooks() {
 
 				var cleanupErrs []error
 
-				for _, fn := range cli.cleanupHooks {
+				for _, fn := range hooks {
 					if cerr := fn(c, cfg, runErr); cerr != nil {
 						cleanupErrs = append(cleanupErrs, fmt.Errorf("cleanup hook: %w", cerr))
 					}
 				}
 
-				// The original RunE error is never swallowed. When the handler
-				// failed it stays the primary error; cleanup failures are joined
-				// so they remain reachable via errors.Is without hiding runErr.
 				if runErr != nil {
 					if len(cleanupErrs) == 0 {
 						return runErr
@@ -328,37 +418,37 @@ func (cli *CLI[T]) applyCleanupHooks() {
 }
 
 // Execute runs the CLI application.
-// The context is wrapped with a BranchingFlowContext for command path tracking.
-// If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
-// If WithGracefulShutdown was set, DI services are shut down on signal after command completes.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	cli.applyHelpTransforms()
 
 	restoreNoColor := cli.applyNoColorIfSet()
 	defer restoreNoColor()
 
-	jsonErrors := cli.outputFormat != "" &&
-		(cli.outputFormat == output.FormatJSON || cli.outputFormat == output.FormatJSONL ||
-			cli.outputFormat == output.FormatYAML || cli.outputFormat == output.FormatTOML)
+	jsonErrors := cli.spec.outputFormat != "" &&
+		(cli.spec.outputFormat == output.FormatJSON || cli.spec.outputFormat == output.FormatJSONL ||
+			cli.spec.outputFormat == output.FormatYAML || cli.spec.outputFormat == output.FormatTOML)
 
 	if jsonErrors {
 		cli.rootCmd.SilenceErrors = true
 		cli.rootCmd.SilenceUsage = true
 
-		if cli.useFang {
-			cli.fangOpts = append(cli.fangOpts, fang.WithErrorHandler(func(_ io.Writer, _ fang.Styles, _ error) {}))
+		if cli.spec.useFang {
+			cli.spec.fangOpts = append(
+				cli.spec.fangOpts,
+				fang.WithErrorHandler(func(_ io.Writer, _ fang.Styles, _ error) {}),
+			)
 		}
 	}
 
-	if cli.signalHandling {
+	if cli.spec.signalHandling {
 		var cancel context.CancelFunc
 
 		ctx, cancel = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 		defer cancel()
 
-		if cli.gracefulShutdown {
+		if cli.spec.gracefulShutdown {
 			shutdownCtx := context.WithoutCancel(ctx)
-			defer func() { _ = cli.scope.Shutdown(shutdownCtx) }()
+			defer func() { _ = cli.spec.scope.Shutdown(shutdownCtx) }()
 		}
 	}
 
@@ -366,22 +456,29 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		cli.flowCtx = NewBranchingFlowContext(ctx)
 	}
 
+	// Make flow context available to commands via context
 	flowCtx := WithBranchingFlowContext(ctx, cli.flowCtx)
+
+	if cli.rootCmd.Long == "" && cli.spec.long != "" {
+		cli.rootCmd.Long = cli.spec.long
+	}
 
 	cli.applyCleanupHooks()
 
+	return cli.executeWithCobra(flowCtx)
+}
+
+// executeWithCobra runs the cobra command, dispatching through fang when enabled.
+func (cli *CLI[T]) executeWithCobra(flowCtx context.Context) error {
 	var execErr error
 
-	if cli.useFang {
-		execErr = fang.Execute(flowCtx, cli.rootCmd, cli.fangOpts...)
+	if cli.spec.useFang {
+		execErr = fang.Execute(flowCtx, cli.rootCmd, cli.spec.fangOpts...)
 	} else {
 		execErr = cli.rootCmd.ExecuteContext(flowCtx)
 	}
 
 	if execErr != nil {
-		// writeFormattedError emits a structured JSON/YAML error to stderr when a
-		// machine-readable output format is selected (and fang is silenced above).
-		// The error is always returned so ExecuteAndExit can map it to an exit code.
 		cli.writeFormattedError(execErr)
 
 		return fmt.Errorf("failed to execute CLI: %w", execErr)
@@ -398,7 +495,6 @@ func (cli *CLI[T]) ExecuteWithArgs(ctx context.Context, args []string) error {
 }
 
 // ExecuteAndExit runs the CLI and exits with the appropriate exit code.
-// If the error implements ExitCoder, its exit code is used; otherwise defaults to 1.
 func (cli *CLI[T]) ExecuteAndExit(ctx context.Context) {
 	err := cli.Execute(ctx)
 	if err != nil {

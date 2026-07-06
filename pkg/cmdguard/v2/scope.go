@@ -402,15 +402,15 @@ func (s *Scope) Path() []string {
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func Package[T any](scope *Scope, name, short string, defaults T, opts ...CLIOption[T]) (*CLI[T], error) {
-	cliOpts := append([]CLIOption[T]{WithCLIScope[T](scope)}, opts...)
+func Package[T any](scope *Scope, name, short string, defaults T, opts ...CLIOption) (*CLI[T], error) {
+	cliOpts := append([]CLIOption{WithCLIScope(scope)}, opts...)
 
 	cli, err := NewCLI(name, short, defaults, cliOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("Package(name=%q, short=%q): %w", name, short, err)
 	}
 
-	do.ProvideValue(cli.scope.injector, cli)
+	do.ProvideValue(cli.spec.scope.injector, cli)
 
 	return cli, nil
 }

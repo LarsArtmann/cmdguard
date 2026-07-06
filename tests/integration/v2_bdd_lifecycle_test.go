@@ -95,17 +95,17 @@ func lifecycleErrHandler(err error) func(
 func newLifecycleStrictCLI(t *testing.T) *v2.CLI[lifecycleConfig] {
 	t.Helper()
 
-	return newLifecycleCLI(t, "strict", v2.WithStrictValidation[lifecycleConfig]())
+	return newLifecycleCLI(t, "strict", v2.WithStrictValidation())
 }
 
 // newLifecycleCLI builds a basic CLI with the given name and options.
 // Centralizes the standard "NewCLI + WithFang(false)" boilerplate.
-func newLifecycleCLI(t *testing.T, name string, opts ...v2.CLIOption[lifecycleConfig]) *v2.CLI[lifecycleConfig] {
+func newLifecycleCLI(t *testing.T, name string, opts ...v2.CLIOption) *v2.CLI[lifecycleConfig] {
 	t.Helper()
 
 	cli, err := v2.NewCLI[lifecycleConfig](
 		name, "Test", lifecycleConfig{},
-		append([]v2.CLIOption[lifecycleConfig]{v2.WithFang[lifecycleConfig](false)}, opts...)...,
+		append([]v2.CLIOption{v2.WithFang(false)}, opts...)...,
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
@@ -279,7 +279,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				}
 			}
 
-			cli := newLifecycleCLI(t, "mw", v2.WithMiddleware[lifecycleConfig](trackingMW("mw1"), trackingMW("mw2")))
+			cli := newLifecycleCLI(t, "mw", v2.WithMiddleware(trackingMW("mw1"), trackingMW("mw2")))
 
 			cmd, err := v2.NewCommand(
 				"run",
@@ -309,7 +309,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 			cli := newLifecycleCLI(
 				t,
 				"recover",
-				v2.WithMiddleware[lifecycleConfig](v2.RecoveryMiddleware[lifecycleConfig]()),
+				v2.WithMiddleware(v2.RecoveryMiddleware[lifecycleConfig]()),
 			)
 
 			cmd, err := v2.NewCommand(
@@ -356,7 +356,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				},
 			)
 
-			cli := newLifecycleCLI(t, "timing", v2.WithMiddleware[lifecycleConfig](timingMW))
+			cli := newLifecycleCLI(t, "timing", v2.WithMiddleware(timingMW))
 
 			cmd := newLifecycleCmd(t, "timed", "Timed")
 
@@ -577,8 +577,8 @@ func TestCLI_ConfigValidation_Integration(t *testing.T) {
 
 		cli, err := v2.NewCLI[serverConfig](
 			"server", "Test", serverConfig{},
-			v2.WithFang[serverConfig](false),
-			v2.WithConfigValidation[serverConfig](func(cfg *serverConfig) error {
+			v2.WithFang(false),
+			v2.WithConfigValidation(func(cfg *serverConfig) error {
 				if cfg.Name == "" {
 					return errors.New("name is required")
 				}
@@ -725,7 +725,7 @@ func TestCLI_VersionCommand_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli := newLifecycleCLI(t, "myapp", v2.WithCLIVersion[lifecycleConfig]("3.14.0"))
+			cli := newLifecycleCLI(t, "myapp", v2.WithCLIVersion("3.14.0"))
 
 			vCmd, err := v2.VersionCommand[lifecycleConfig](cli)
 			if err != nil {

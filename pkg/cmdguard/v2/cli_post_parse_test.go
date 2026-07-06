@@ -22,7 +22,7 @@ func TestWithPostFlagParse_RunsAfterFlagParsing(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithPostFlagParse[cfg](func(cmd *cobra.Command, c *cfg) error {
+		WithPostFlagParse(func(cmd *cobra.Command, c *cfg) error {
 			seenCfg = c
 			seenCmd = cmd
 
@@ -59,12 +59,12 @@ func TestWithPostFlagParse_MultipleHooksInOrder(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithPostFlagParse[cfg](func(*cobra.Command, *cfg) error {
+		WithPostFlagParse(func(*cobra.Command, *cfg) error {
 			order = append(order, 1)
 
 			return nil
 		}),
-		WithPostFlagParse[cfg](func(*cobra.Command, *cfg) error {
+		WithPostFlagParse(func(*cobra.Command, *cfg) error {
 			order = append(order, 2)
 
 			return nil
@@ -92,7 +92,7 @@ func TestWithPostFlagParse_ErrorStopsExecution(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithPostFlagParse[cfg](func(*cobra.Command, *cfg) error {
+		WithPostFlagParse(func(*cobra.Command, *cfg) error {
 			return errors.New("init failed")
 		}),
 	)
@@ -128,12 +128,12 @@ func TestWithPostFlagParse_RunsAfterConfigValidation(t *testing.T) {
 
 	cli, err := NewCLI[cfg](
 		"test", "Test", cfg{},
-		WithConfigValidation[cfg](func(c *cfg) error {
+		WithConfigValidation(func(c *cfg) error {
 			validateRan = true
 
 			return nil
 		}),
-		WithPostFlagParse[cfg](func(*cobra.Command, *cfg) error {
+		WithPostFlagParse(func(*cobra.Command, *cfg) error {
 			postParseRan = true
 
 			return nil

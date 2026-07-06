@@ -38,8 +38,8 @@ func TestNewCLI(t *testing.T) {
 			"myapp",
 			"My Application",
 			testCLIConfig{},
-			v2.WithCLIVersion[testCLIConfig]("1.0.0"),
-			v2.WithCLILong[testCLIConfig]("This is a long description"),
+			v2.WithCLIVersion("1.0.0"),
+			v2.WithCLILong("This is a long description"),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -73,7 +73,7 @@ func TestNewCLI(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithSilenceErrors[testCLIConfig](),
+			v2.WithSilenceErrors(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -85,7 +85,7 @@ func TestNewCLI(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithSilenceUsage[testCLIConfig](),
+			v2.WithSilenceUsage(),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -97,7 +97,7 @@ func TestNewCLI(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithFang[testCLIConfig](false),
+			v2.WithFang(false),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
@@ -108,7 +108,7 @@ func TestNewCLI(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithFang[testCLIConfig](true),
+			v2.WithFang(true),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
@@ -119,9 +119,9 @@ func TestNewCLI(t *testing.T) {
 
 		cli, err := v2.NewCLI[testCLIConfig](
 			"test", "Test CLI", testCLIConfig{},
-			v2.WithSilenceErrors[testCLIConfig](),
-			v2.WithSilenceUsage[testCLIConfig](),
-			v2.WithCLIVersion[testCLIConfig]("2.0.0"),
+			v2.WithSilenceErrors(),
+			v2.WithSilenceUsage(),
+			v2.WithCLIVersion("2.0.0"),
 		)
 		testutil.AssertNoError(t, err)
 

@@ -10,7 +10,7 @@ func TestVersionCommandSuccess(t *testing.T) {
 
 	cli, err := NewCLI[Config](
 		"myapp", "My app", Config{},
-		WithCLIVersion[Config]("2.0.0"),
+		WithCLIVersion("2.0.0"),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +34,7 @@ func TestGenerateVersionCommand(t *testing.T) {
 
 		cli, err := NewCLI[Config](
 			"myapp", "My app", Config{},
-			WithCLIVersion[Config]("3.0.0"),
+			WithCLIVersion("3.0.0"),
 		)
 		if err != nil {
 			t.Fatal(err)

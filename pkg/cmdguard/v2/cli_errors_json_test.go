@@ -174,7 +174,7 @@ func TestExitCode(t *testing.T) {
 func TestJSONErrorIntegration(t *testing.T) {
 	tests := []struct {
 		name           string
-		cliOpts        []CLIOption[jsonErrConfig]
+		cliOpts        []CLIOption
 		handlerErr     error
 		assertEnvelope func(t *testing.T, stderrOutput string, execErr error)
 	}{
@@ -195,7 +195,7 @@ func TestJSONErrorIntegration(t *testing.T) {
 		},
 		{
 			name:       "silences cobra errors when JSON output is active",
-			cliOpts:    []CLIOption[jsonErrConfig]{WithOutputFormat[jsonErrConfig](output.FormatJSON)},
+			cliOpts:    []CLIOption{WithOutputFormat(output.FormatJSON)},
 			handlerErr: errors.New("plain error"),
 			assertEnvelope: func(t *testing.T, stderrOutput string, execErr error) {
 				t.Helper()
@@ -210,7 +210,7 @@ func TestJSONErrorIntegration(t *testing.T) {
 		},
 		{
 			name:       "YAML output also triggers structured errors",
-			cliOpts:    []CLIOption[jsonErrConfig]{WithOutputFormat[jsonErrConfig](output.FormatYAML)},
+			cliOpts:    []CLIOption{WithOutputFormat(output.FormatYAML)},
 			handlerErr: fmt.Errorf("%w: missing", ErrConfigValidation),
 			assertEnvelope: func(t *testing.T, stderrOutput string, execErr error) {
 				t.Helper()
