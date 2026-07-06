@@ -4,4 +4,5 @@ use .
 use ./pkg/cmdguard/glamour
 use ./pkg/cmdguard/manpage
 use ./pkg/cmdguard/prompts
+use ./pkg/cmdguard/spinner
 use ./pkg/cmdguard/telemetry

@@ -336,16 +336,13 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	configEditCmd, err := v2.NewCommand(
 		"edit",
 		v2.NoFlags{},
-		func(ctx context.Context, cfg *AppConfig, _ v2.NoFlags) error {
-			content := fmt.Sprintf("log-level: %s\ndata-dir: %s\n", cfg.LogLevel, cfg.DataDir)
-			edited, err := v2.EditInEditor(ctx, content)
-			if err != nil {
-				return fmt.Errorf("editor: %w", err)
-			}
-			fmt.Printf("Edited config:\n%s", edited)
+		func(_ context.Context, cfg *AppConfig, _ v2.NoFlags) error {
+			fmt.Printf("Edit config manually at ~/.config/taskctl/config.json\n")
+			fmt.Printf("  LogLevel: %s\n", cfg.LogLevel)
+			fmt.Printf("  DataDir:  %s\n", cfg.DataDir)
 			return nil
 		},
-		v2.WithShort("Edit config in $EDITOR"),
+		v2.WithShort("Show config location"),
 		v2.WithNoArgs(),
 	)
 	if err != nil {

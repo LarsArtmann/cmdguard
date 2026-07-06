@@ -8,15 +8,6 @@ import (
 	"strings"
 
 	output "github.com/larsartmann/go-output"
-	_ "github.com/larsartmann/go-output/d2"
-	_ "github.com/larsartmann/go-output/delimited"
-	_ "github.com/larsartmann/go-output/graph"
-	_ "github.com/larsartmann/go-output/markdown"
-	_ "github.com/larsartmann/go-output/markup"
-	_ "github.com/larsartmann/go-output/plantuml"
-	_ "github.com/larsartmann/go-output/serialization"
-	_ "github.com/larsartmann/go-output/table"
-	_ "github.com/larsartmann/go-output/tree"
 )
 
 // OutputFormat is a type-safe output format enum, aliased from go-output.

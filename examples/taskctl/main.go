@@ -42,6 +42,7 @@ import (
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 
 	"github.com/larsartmann/cmdguard/glamour"
+	"github.com/larsartmann/cmdguard/spinner"
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
@@ -74,7 +75,7 @@ func main() {
 		v2.WithGracefulShutdown[AppConfig](),
 		v2.WithStrictValidation[AppConfig](),
 		v2.WithMiddleware[AppConfig](
-			v2.SpinnerMiddleware[AppConfig]("Working..."),
+			spinner.Middleware[AppConfig]("Working..."),
 			v2.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
 				fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
 			}),

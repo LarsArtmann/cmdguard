@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -33,7 +34,9 @@ func SetPromptRunner(r PromptRunner) {
 
 // ErrPromptNotRegistered is returned when prompt features are used without
 // the prompts module registered.
-var ErrPromptNotRegistered = fmt.Errorf("prompts module not registered: import github.com/larsartmann/cmdguard/prompts and call Register()")
+var ErrPromptNotRegistered = errors.New(
+	"prompts module not registered: import github.com/larsartmann/cmdguard/prompts and call Register()",
+)
 
 // PromptString prompts the user for a string value.
 func PromptString(title, defaultValue string) (string, error) {

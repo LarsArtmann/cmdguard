@@ -4,8 +4,6 @@
 // provides compile-time type safety for commands and flags, and integrates samber/do/v2
 // for dependency injection — all without panics in library code.
 //
-// Version: 2.10.2
-//
 // # Quick Start
 //
 //	package main
@@ -28,12 +26,12 @@
 //	        log.Fatal(err)
 //	    }
 //
-//	    cmd, err := v2.NewCommand[AppConfig, v2.NoFlags]("hello",
+//	    cmd, err := v2.NewCommand("hello", v2.NoFlags{},
 //	        func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
 //	            fmt.Println("Hello, World!")
 //	            return nil
 //	        },
-//	        v2.WithShort[AppConfig, v2.NoFlags]("Say hello"),
+//	        v2.WithShort("Say hello"),
 //	    )
 //	    if err != nil {
 //	        log.Fatal(err)
@@ -50,7 +48,9 @@
 //
 // # Type-Safe Flags
 //
-// Define flags as struct fields with tags instead of string lookups:
+// Define flags as struct fields with tags, then pass the struct positionally
+// to NewCommand. Type parameters T and F are inferred automatically — no
+// explicit type parameters needed on options:
 //
 //	type DeployFlags struct {
 //	    Env     string        `flag:"env"     short:"e" required:"true" help:"Target environment"`
@@ -58,11 +58,8 @@
 //	    Timeout time.Duration `flag:"timeout" short:"t" default:"5m"    help:"Deployment timeout"`
 //	}
 //
-// Pass the flags struct to NewCommand with WithFlags:
-//
-//	cmd, err := v2.NewCommand[AppConfig, *DeployFlags]("deploy", handler,
-//	    v2.WithShort[AppConfig, *DeployFlags]("Deploy the application"),
-//	    v2.WithFlags[AppConfig, *DeployFlags](&DeployFlags{}),
+//	cmd, err := v2.NewCommand("deploy", &DeployFlags{}, handler,
+//	    v2.WithShort("Deploy the application"),
 //	)
 //
 // Supported tags: flag, short, default, help, env, required, count.
@@ -90,44 +87,36 @@
 //
 // # Command Options
 //
-// Commands are created via constructors and configured with functional options:
+// All metadata options are non-generic — no type parameters needed.
+// Only lifecycle hooks (WithPreRunE, WithPostRunE, WithSubcommands)
+// are generic functions that return a non-generic CommandOption:
 //
-//	WithShort[T, F](short)        // Short description (required with StrictValidation)
-//	WithLong[T, F](long)          // Long description
-//	WithExample[T, F](example)    // Example usage
-//	WithFlags[T, F](flags)        // Typed flags struct
-//	WithPreRunE[T, F](fn)         // Pre-validation hook
-//	WithPostRunE[T, F](fn)        // Post-success cleanup
-//	WithExactArgs[T, F](n)        // Require exactly n positional args
-//	WithCompletion[T, F](fn)      // Dynamic shell completion
-//	WithHidden[T, F](bool)        // Hide from help
-//	WithDeprecated[T, F](msg)     // Deprecation message
+//	WithShort(short)              // Short description (required with StrictValidation)
+//	WithLong(long)                // Long description
+//	WithExample(example)          // Example usage
+//	WithPreRunE[T,F](fn)          // Pre-validation hook
+//	WithPostRunE[T,F](fn)         // Post-success cleanup
+//	WithExactArgs(n)              // Require exactly n positional args
+//	WithCompletion(fn)            // Dynamic shell completion
+//	WithHidden(bool)              // Hide from help
+//	WithDeprecated(msg)           // Deprecation message
 //
-// Parent commands (commands with subcommands) use NewParentCommand:
+// Parent commands use NewParentCommand with WithSubcommands:
 //
-//	parent, err := v2.NewParentCommand[AppConfig, v2.NoFlags]("user", "User management",
-//	    []v2.Command[AppConfig, v2.NoFlags]{listCmd, createCmd},
-//	    v2.WithShort[AppConfig, v2.NoFlags]("User management"),
+//	parent, err := v2.NewParentCommand[AppConfig]("user", "User management", v2.NoFlags{},
+//	    v2.WithSubcommands(listCmd, createCmd),
+//	    v2.WithShort("User management"),
 //	)
 //
-// # CLI Options
+// # Optional Sub-Modules
 //
-// Configure the root CLI with options passed to NewCLI:
+// Heavy dependencies are extracted into optional importable modules to keep
+// the core dependency tree minimal:
 //
-//	WithCLIVersion[T](v)              // Version string (auto-pipes to fang)
-//	WithCLICommit[T](commit)          // Git commit hash (auto-pipes to fang)
-//	WithEnvPrefix[T](prefix)          // Prefix for env var lookups
-//	WithSignalHandling[T]()           // Cancel context on SIGINT/SIGTERM
-//	WithGracefulShutdown[T]()         // Graceful DI shutdown on SIGINT/SIGTERM
-//	WithDILogging[T](logf)            // Internal DI container logging
-//	WithMiddleware[T](mw...)          // Wrap all command handlers
-//	WithStrictValidation[T]()         // Require WithShort on all commands
-//	WithConfigValidation[T](fn)       // Validate config after flag parsing
-//	WithConfigFile[T](paths...)       // Load JSON config before flags
-//	WithFang[T](bool)                 // Styled help output
-//	WithFangOptions[T](opts...)       // Custom fang options
-//	WithFangErrorHandler[T](handler)  // Custom fang error handler
-//	WithFangColorScheme[T](cs)        // Custom fang color scheme
+//	github.com/larsartmann/cmdguard/glamour   — Markdown help rendering (glamour/v2)
+//	github.com/larsartmann/cmdguard/prompts   — Interactive prompts (huh/v2)
+//	github.com/larsartmann/cmdguard/telemetry — OpenTelemetry spans
+//	github.com/larsartmann/cmdguard/manpage   — Man page generation (mango/roff)
 //
 // # Error Handling
 //
@@ -162,47 +151,12 @@
 //	    ),
 //	)
 //
-// Write custom middleware by implementing the MiddlewareFunc type.
+// # Version and Doctor Commands
 //
-// # Output Formats
-//
-// Render structured data in 16 formats using go-output directly:
-//
-//	v2.OutputTable(output.FormatJSON, headers, rows)
-//	v2.OutputTable(output.FormatCSV, headers, rows)
-//	v2.OutputTable(output.FormatYAML, headers, rows)
-//
-// Available: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree,
-// mermaid, dot, jsonl, asciidoc, toml, plantuml.
-//
-// WithCLIVersion and WithCLICommit automatically pipe version/commit info to fang.
-// Do NOT also pass these via WithFangOptions or you will get duplicates.
-//
-// # BranchingFlowContext
-//
-// Track command execution paths and share values across the hierarchy:
-//
-//	bfc, ok := v2.GetBranchingFlowContext(ctx)
-//	if ok {
-//	    fmt.Println("Path:", bfc.PathString())
-//	    bfc.SetValue("key", "value")
-//	}
-//
-// # Editor Support
-//
-// Open the user's $EDITOR for interactive input:
-//
-//	edited, err := v2.EditInEditor(ctx, "# Edit here\n")
-//
-// # Version Command
-//
-// Add a built-in version command:
+// Add built-in helper commands:
 //
 //	cmd, err := v2.VersionCommand[AppConfig](cli)
-//	if err != nil {
-//	    panic(err)
-//	}
-//	v2.AddCommand(cli, cmd)
+//	docCmd, err := v2.DoctorCommand[AppConfig](cli)
 //
 // # Custom Types
 //

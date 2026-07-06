@@ -9,6 +9,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes — v3 API Redesign
+
+#### Command API: Non-generic options + type inference
+
+- `CommandOption` is now non-generic. All metadata options (`WithShort`, `WithLong`, `WithExample`, `WithGroupID`, `WithNoArgs`, etc.) require zero type parameters.
+- `NewCommand` signature changed: `NewCommand(use string, flags F, runE func(ctx, *T, F) error, opts ...CommandOption)` — flags are now the second positional argument, enabling full type inference.
+- `WithFlags` option deleted entirely — pass flags positionally to `NewCommand`.
+- `NewParentCommand` signature changed: `NewParentCommand[T](use, long string, flags F, opts ...CommandOption)` — subcommands via `WithSubcommands(cmds...)` option.
+- `WithPreRunE`, `WithPostRunE`, `WithSubcommands` are generic functions that return non-generic `CommandOption` — type safety preserved via sealed interface pattern.
+
+**Before (7 type params per command):**
+```go
+v2.NewCommand[AppConfig, *ListFlags]("list", handler,
+    v2.WithShort[AppConfig, *ListFlags]("List tasks"),
+    v2.WithFlags[AppConfig, *ListFlags](&ListFlags{}),
+)
+```
+
+**After (zero type params):**
+```go
+v2.NewCommand("list", &ListFlags{}, handler,
+    v2.WithShort("List tasks"),
+)
+```
+
+#### Mono-repo modularization: optional sub-modules
+
+Heavy dependencies extracted into optional importable modules. Core direct deps reduced from 30 to 13.
+
+| Module | Import path | Deps isolated |
+|--------|------------|---------------|
+| Telemetry | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry SDK |
+| Manpage | `github.com/larsartmann/cmdguard/manpage` | mango/roff |
+| Glamour | `github.com/larsartmann/cmdguard/glamour` | chroma/goldmark/bluemonday |
+| Prompts | `github.com/larsartmann/cmdguard/prompts` | huh/bubbles/bubbletea |
+| Spinner | `github.com/larsartmann/cmdguard/spinner` | lipgloss |
+
+Core extension hooks: `WithHelpTransform[T]()`, `PromptRunner` interface + `SetPromptRunner()`.
+
+#### Removed from core
+
+- `result.go` — sum types (Result[T], Validated[T]) not a CLI concern
+- `editor.go` — EditInEditor $EDITOR support (marginal feature)
+- `telemetry.go` — moved to telemetry sub-module
+- `glamour.go` — moved to glamour sub-module
+- `spinner.go` — moved to spinner sub-module
+- `manpage.go` — moved to manpage sub-module
+- 10 go-output blank imports removed from `output.go`
+
 ## [2.10.2] - 2026-07-05
 
 ### Changed
