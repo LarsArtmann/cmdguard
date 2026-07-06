@@ -1,4 +1,19 @@
-package v2
+// Package telemetry provides OpenTelemetry middleware for cmdguard CLIs.
+// It is an optional module — import it only when you need OTel tracing,
+// to keep your dependency tree lean.
+//
+// Usage:
+//
+//	import (
+//	    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+//	    "github.com/larsartmann/cmdguard/telemetry"
+//	)
+//
+//	tracer := otel.Tracer("myapp")
+//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
+//	    v2.WithMiddleware(telemetry.Middleware[Config](tracer)),
+//	)
+package telemetry
 
 import (
 	"context"
@@ -6,23 +21,18 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
+
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
-// TelemetryMiddleware returns a middleware that creates an OpenTelemetry span
+// Middleware returns a cmdguard middleware that creates an OpenTelemetry span
 // for each command execution. The span captures the command name, phase, and
 // any error returned by the handler.
 //
 // Each phase (pre-run, run, post-run) gets a uniquely-named span so traces
 // are unambiguous: "deploy pre-run", "deploy run", "deploy post-run".
-//
-// Usage:
-//
-//	tracer := otel.Tracer("myapp")
-//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
-//	    v2.WithMiddleware(v2.TelemetryMiddleware[Config](tracer)),
-//	)
-func TelemetryMiddleware[T any](tracer trace.Tracer) Middleware[T] {
-	return func(ctx context.Context, _ *T, info CommandInfo, next func() error) error {
+func Middleware[T any](tracer trace.Tracer) v2.Middleware[T] {
+	return func(ctx context.Context, _ *T, info v2.CommandInfo, next func() error) error {
 		if tracer == nil {
 			return next()
 		}
@@ -57,15 +67,8 @@ func TelemetryMiddleware[T any](tracer trace.Tracer) Middleware[T] {
 	}
 }
 
-// WithTelemetry adds OpenTelemetry span tracking to every command.
-// It is a convenience wrapper around WithMiddleware(TelemetryMiddleware(tracer)).
-//
-// Usage:
-//
-//	tracer := otel.Tracer("myapp")
-//	cli, _ := v2.NewCLI[Config]("app", "My app", Config{},
-//	    v2.WithTelemetry[Config](tracer),
-//	)
-func WithTelemetry[T any](tracer trace.Tracer) CLIOption[T] {
-	return WithMiddleware[T](TelemetryMiddleware[T](tracer))
+// WithTelemetry is a convenience wrapper that registers telemetry middleware
+// via v2.WithMiddleware.
+func WithTelemetry[T any](tracer trace.Tracer) v2.CLIOption[T] {
+	return v2.WithMiddleware[T](Middleware[T](tracer))
 }
