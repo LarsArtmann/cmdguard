@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `WithPreRunE`, `WithPostRunE`, `WithSubcommands` are generic functions that return non-generic `CommandOption` — type safety preserved via sealed interface pattern.
 
 **Before (7 type params per command):**
+
 ```go
 v2.NewCommand[AppConfig, *ListFlags]("list", handler,
     v2.WithShort[AppConfig, *ListFlags]("List tasks"),
@@ -28,6 +29,7 @@ v2.NewCommand[AppConfig, *ListFlags]("list", handler,
 ```
 
 **After (zero type params):**
+
 ```go
 v2.NewCommand("list", &ListFlags{}, handler,
     v2.WithShort("List tasks"),
@@ -38,13 +40,13 @@ v2.NewCommand("list", &ListFlags{}, handler,
 
 Heavy dependencies extracted into optional importable modules. Core direct deps reduced from 30 to 13.
 
-| Module | Import path | Deps isolated |
-|--------|------------|---------------|
-| Telemetry | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry SDK |
-| Manpage | `github.com/larsartmann/cmdguard/manpage` | mango/roff |
-| Glamour | `github.com/larsartmann/cmdguard/glamour` | chroma/goldmark/bluemonday |
-| Prompts | `github.com/larsartmann/cmdguard/prompts` | huh/bubbles/bubbletea |
-| Spinner | `github.com/larsartmann/cmdguard/spinner` | lipgloss |
+| Module    | Import path                                 | Deps isolated              |
+| --------- | ------------------------------------------- | -------------------------- |
+| Telemetry | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry SDK          |
+| Manpage   | `github.com/larsartmann/cmdguard/manpage`   | mango/roff                 |
+| Glamour   | `github.com/larsartmann/cmdguard/glamour`   | chroma/goldmark/bluemonday |
+| Prompts   | `github.com/larsartmann/cmdguard/prompts`   | huh/bubbles/bubbletea      |
+| Spinner   | `github.com/larsartmann/cmdguard/spinner`   | lipgloss                   |
 
 Core extension hooks: `WithHelpTransform[T]()`, `PromptRunner` interface + `SetPromptRunner()`.
 

@@ -34,13 +34,13 @@ Sealed interface pattern: `lifecycleHook` + `typedHook[T,F]`. Unexported `isLife
 
 ### 3. Mono-Repo Modularization (5 Optional Modules Extracted)
 
-| Module | Path | Deps Isolated | Status |
-|--------|------|---------------|--------|
-| telemetry | `pkg/cmdguard/telemetry/` | OpenTelemetry SDK | ✅ |
-| manpage | `pkg/cmdguard/manpage/` | mango/roff | ✅ |
-| glamour | `pkg/cmdguard/glamour/` | chroma/goldmark/bluemonday | ✅ |
-| prompts | `pkg/cmdguard/prompts/` | huh/bubbles/bubbletea | ✅ |
-| spinner | `pkg/cmdguard/spinner/` | lipgloss (code separation) | ✅ |
+| Module    | Path                      | Deps Isolated              | Status |
+| --------- | ------------------------- | -------------------------- | ------ |
+| telemetry | `pkg/cmdguard/telemetry/` | OpenTelemetry SDK          | ✅     |
+| manpage   | `pkg/cmdguard/manpage/`   | mango/roff                 | ✅     |
+| glamour   | `pkg/cmdguard/glamour/`   | chroma/goldmark/bluemonday | ✅     |
+| prompts   | `pkg/cmdguard/prompts/`   | huh/bubbles/bubbletea      | ✅     |
+| spinner   | `pkg/cmdguard/spinner/`   | lipgloss (code separation) | ✅     |
 
 All 6 modules (core + 5 optional) build independently with `GOWORK=off`.
 
@@ -48,15 +48,15 @@ Extension hooks added to core: `WithHelpTransform`, `PromptRunner` interface + `
 
 ### 4. Dead Weight Cut
 
-| File | Lines | Reason | Status |
-|------|-------|--------|--------|
-| `result.go` | 147 | Sum types — not a CLI concern | ✅ Cut |
-| `editor.go` | 60 | $EDITOR support — marginal | ✅ Cut |
-| `telemetry.go` | 71 | Moved to sub-module | ✅ |
-| `glamour.go` | 102 | Moved to sub-module | ✅ |
-| `spinner.go` | 182 | Moved to sub-module | ✅ |
-| `manpage.go` | 65 | Moved to sub-module | ✅ |
-| 10 go-output blank imports | — | Users import go-output directly | ✅ |
+| File                       | Lines | Reason                          | Status |
+| -------------------------- | ----- | ------------------------------- | ------ |
+| `result.go`                | 147   | Sum types — not a CLI concern   | ✅ Cut |
+| `editor.go`                | 60    | $EDITOR support — marginal      | ✅ Cut |
+| `telemetry.go`             | 71    | Moved to sub-module             | ✅     |
+| `glamour.go`               | 102   | Moved to sub-module             | ✅     |
+| `spinner.go`               | 182   | Moved to sub-module             | ✅     |
+| `manpage.go`               | 65    | Moved to sub-module             | ✅     |
+| 10 go-output blank imports | —     | Users import go-output directly | ✅     |
 
 ### 5. Documentation
 
@@ -163,33 +163,33 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 
 ## f) Next 25 Tasks (Sorted by Impact/Effort)
 
-| #  | Task | Impact | Effort |
-|----|------|--------|--------|
-| 1  | Fix example/taskctl/README.md stale WithFlags ref | 5 | 5min |
-| 2  | Fix or remove WithSilenceUsage no-op | 6 | 10min |
-| 3  | Move koanf to configload sub-module (4 deps from root) | 7 | 30min |
-| 4  | Update README.md with v3 quickstart | 8 | 30min |
-| 5  | Update AGENTS.md module structure for v3 | 7 | 20min |
-| 6  | Update FEATURES.md with module status | 5 | 15min |
-| 7  | Write v3 migration guide (MIGRATION_TO_V3.md) | 8 | 30min |
-| 8  | Evaluate and cut/internalize flow_context.go | 5 | 30min |
-| 9  | Add command-level audit middleware | 8 | 60min |
-| 10 | Add built-in audit-log subcommand | 6 | 45min |
-| 11 | Design service-owned config ADR | 10 | 60min |
-| 12 | Update docs/API.md for v3 | 4 | 20min |
-| 13 | Update docs/QUICKSTART.md for v3 | 4 | 15min |
-| 14 | Clean up gopls infertypeargs warnings in tests | 2 | 30min |
-| 15 | Add integration test: import glamour from external | 5 | 30min |
-| 16 | Add integration test: import spinner from external | 4 | 15min |
-| 17 | Consider making fang optional (plain cobra fallback) | 7 | 90min |
-| 18 | Update docs/MIGRATION_FROM_COBRA.md for v3 | 3 | 20min |
-| 19 | Tag v3.0.0-alpha | 6 | 5min |
-| 20 | Update TODO_LIST.md with v3 status | 3 | 10min |
-| 21 | Update ROADMAP.md to reflect v3 direction | 3 | 15min |
-| 22 | Add CLI option to wire telemetry module (WithTelemetry) | 4 | 15min |
-| 23 | Consider cutting docgen.go if rarely used | 2 | 10min |
-| 24 | Audit all sentinel errors for completeness | 4 | 30min |
-| 25 | Performance: benchmark NewCLI with cliSpec vs old struct | 3 | 30min |
+| #   | Task                                                     | Impact | Effort |
+| --- | -------------------------------------------------------- | ------ | ------ |
+| 1   | Fix example/taskctl/README.md stale WithFlags ref        | 5      | 5min   |
+| 2   | Fix or remove WithSilenceUsage no-op                     | 6      | 10min  |
+| 3   | Move koanf to configload sub-module (4 deps from root)   | 7      | 30min  |
+| 4   | Update README.md with v3 quickstart                      | 8      | 30min  |
+| 5   | Update AGENTS.md module structure for v3                 | 7      | 20min  |
+| 6   | Update FEATURES.md with module status                    | 5      | 15min  |
+| 7   | Write v3 migration guide (MIGRATION_TO_V3.md)            | 8      | 30min  |
+| 8   | Evaluate and cut/internalize flow_context.go             | 5      | 30min  |
+| 9   | Add command-level audit middleware                       | 8      | 60min  |
+| 10  | Add built-in audit-log subcommand                        | 6      | 45min  |
+| 11  | Design service-owned config ADR                          | 10     | 60min  |
+| 12  | Update docs/API.md for v3                                | 4      | 20min  |
+| 13  | Update docs/QUICKSTART.md for v3                         | 4      | 15min  |
+| 14  | Clean up gopls infertypeargs warnings in tests           | 2      | 30min  |
+| 15  | Add integration test: import glamour from external       | 5      | 30min  |
+| 16  | Add integration test: import spinner from external       | 4      | 15min  |
+| 17  | Consider making fang optional (plain cobra fallback)     | 7      | 90min  |
+| 18  | Update docs/MIGRATION_FROM_COBRA.md for v3               | 3      | 20min  |
+| 19  | Tag v3.0.0-alpha                                         | 6      | 5min   |
+| 20  | Update TODO_LIST.md with v3 status                       | 3      | 10min  |
+| 21  | Update ROADMAP.md to reflect v3 direction                | 3      | 15min  |
+| 22  | Add CLI option to wire telemetry module (WithTelemetry)  | 4      | 15min  |
+| 23  | Consider cutting docgen.go if rarely used                | 2      | 10min  |
+| 24  | Audit all sentinel errors for completeness               | 4      | 30min  |
+| 25  | Performance: benchmark NewCLI with cliSpec vs old struct | 3      | 30min  |
 
 ---
 

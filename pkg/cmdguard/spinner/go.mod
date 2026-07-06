@@ -4,7 +4,7 @@ go 1.26.4
 
 require (
 	charm.land/lipgloss/v2 v2.0.5
-	github.com/larsartmann/cmdguard/v2 v2.10.2
+	github.com/larsartmann/cmdguard/v2 v2.0.0-00010101000000-000000000000
 	golang.org/x/term v0.44.0
 )
 

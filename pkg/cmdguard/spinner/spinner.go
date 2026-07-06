@@ -48,7 +48,6 @@ func DefaultConfig(title string) Config {
 		Frames:   defaultFrames,
 		Interval: defaultInterval,
 	}
-
 }
 
 // Middleware returns a cmdguard middleware that displays a terminal spinner
