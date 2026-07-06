@@ -131,17 +131,18 @@ func wireAllHandlers[T, F any](
 		promptOnMissing: s.promptOnMissing,
 	})
 
-	// Type-assert stored lifecycle hooks — safe because generic constructors
-	// ensure T and F match across storage (WithPreRunE/WithPostRunE) and
-	// retrieval (here).
+	// Extract lifecycle hooks from the sealed interface — safe because the
+	// generic constructors (WithPreRunE/WithPostRunE) ensure T and F match
+	// the Command's own type parameters. A mismatch silently yields nil
+	// (no panic), which is the correct behavior for a type-incompatible hook.
 	var preRunE func(context.Context, *T, F) error
-	if s.preRunEAny != nil {
-		preRunE = s.preRunEAny.(func(context.Context, *T, F) error)
+	if h, ok := s.preRunE.(*typedHook[T, F]); ok {
+		preRunE = h.fn
 	}
 
 	var postRunE func(context.Context, *T, F) error
-	if s.postRunEAny != nil {
-		postRunE = s.postRunEAny.(func(context.Context, *T, F) error)
+	if h, ok := s.postRunE.(*typedHook[T, F]); ok {
+		postRunE = h.fn
 	}
 
 	preInfo := info

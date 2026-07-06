@@ -23,7 +23,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "pre",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					spec: commandSpec{use: "test", preRunEAny: makeHookRunE(order, "pre")},
+					spec: commandSpec{use: "test", preRunE: &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(order, "pre")}},
 					runE: makeHookRunE(order, "run"),
 				}
 			},
@@ -34,7 +34,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 			hookName: "post",
 			setupCmd: func(order *[]string) Command[testAppConfig, NoFlags] {
 				return Command[testAppConfig, NoFlags]{
-					spec: commandSpec{use: "test", postRunEAny: makeHookRunE(order, "post")},
+					spec: commandSpec{use: "test", postRunE: &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(order, "post")}},
 					runE: makeHookRunE(order, "run"),
 				}
 			},
@@ -82,9 +82,9 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 		cmd := Command[testAppConfig, NoFlags]{
 			spec: commandSpec{
 				use: "test",
-				preRunEAny: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+				preRunE: &typedHook[testAppConfig, NoFlags]{fn: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 					return errTest
-				},
+				}},
 			},
 			runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				called = true

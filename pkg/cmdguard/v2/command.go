@@ -34,15 +34,45 @@ type commandSpec struct {
 	promptOnMissing bool
 	optionErr       error
 
-	// Typed lifecycle hooks stored as any, set by generic option helpers
-	// (WithPreRunE, WithPostRunE). Type-asserted during cobra wiring.
-	preRunEAny  any
-	postRunEAny any
+	// Typed lifecycle hooks stored behind a sealed interface, set by generic
+	// option helpers (WithPreRunE, WithPostRunE). Only constructable inside
+	// cmdguard — the unexported interface method prevents external implementations.
+	preRunE  lifecycleHook
+	postRunE lifecycleHook
 
-	// Subcommands stored as any, set by WithSubcommands. Type-asserted
-	// during cobra wiring.
-	subcommandsAny []any
+	// Subcommands stored behind a sealed interface, set by WithSubcommands.
+	subcommands subcommandList
 }
+
+// lifecycleHook is a sealed interface — the unexported method prevents any
+// external implementation. Only typedHook[T,F] (constructed by WithPreRunE /
+// WithPostRunE) can satisfy it, ensuring type info is carried through the
+// non-generic commandSpec without runtime panics on type mismatch.
+type lifecycleHook interface {
+	isLifecycleHook()
+}
+
+// typedHook wraps a type-safe lifecycle function for storage in commandSpec.
+// The generic parameters T and F are verified at construction time by Go's
+// type inference — the compiler rejects mismatched types at the call site.
+type typedHook[T, F any] struct {
+	fn func(context.Context, *T, F) error
+}
+
+func (*typedHook[T, F]) isLifecycleHook() {}
+
+// subcommandList is a sealed interface for storing typed subcommands in the
+// non-generic commandSpec.
+type subcommandList interface {
+	isSubcommandList()
+}
+
+// typedSubcommands wraps type-safe subcommands for storage in commandSpec.
+type typedSubcommands[T, F any] struct {
+	cmds []Command[T, F]
+}
+
+func (*typedSubcommands[T, F]) isSubcommandList() {}
 
 // CommandOption configures a command. All metadata options (descriptions,
 // grouping, arg validators, completion, etc.) are non-generic — no type
@@ -88,20 +118,20 @@ func (c Command[T, F]) RunE() func(ctx context.Context, cfg *T, flags F) error {
 
 // PreRunE returns the pre-run validation hook.
 func (c Command[T, F]) PreRunE() func(ctx context.Context, cfg *T, flags F) error {
-	if c.spec.preRunEAny == nil {
-		return nil
+	if h, ok := c.spec.preRunE.(*typedHook[T, F]); ok {
+		return h.fn
 	}
 
-	return c.spec.preRunEAny.(func(context.Context, *T, F) error)
+	return nil
 }
 
 // PostRunE returns the post-run cleanup hook.
 func (c Command[T, F]) PostRunE() func(ctx context.Context, cfg *T, flags F) error {
-	if c.spec.postRunEAny == nil {
-		return nil
+	if h, ok := c.spec.postRunE.(*typedHook[T, F]); ok {
+		return h.fn
 	}
 
-	return c.spec.postRunEAny.(func(context.Context, *T, F) error)
+	return nil
 }
 
 // Commands returns the subcommands of this command.
@@ -110,13 +140,8 @@ func (c Command[T, F]) Commands() []Command[T, F] {
 		return c.commands
 	}
 
-	if len(c.spec.subcommandsAny) > 0 {
-		cmds := make([]Command[T, F], len(c.spec.subcommandsAny))
-		for i, sub := range c.spec.subcommandsAny {
-			cmds[i] = sub.(Command[T, F])
-		}
-
-		return cmds
+	if list, ok := c.spec.subcommands.(*typedSubcommands[T, F]); ok {
+		return list.cmds
 	}
 
 	return nil
@@ -331,12 +356,9 @@ func NewParentCommand[T, F any](
 
 	cmd := Command[T, F]{spec: spec, flags: flags}
 
-	// Extract subcommands from spec
-	if len(spec.subcommandsAny) > 0 {
-		cmd.commands = make([]Command[T, F], len(spec.subcommandsAny))
-		for i, sub := range spec.subcommandsAny {
-			cmd.commands[i] = sub.(Command[T, F])
-		}
+	// Extract subcommands from the typed sealed interface
+	if list, ok := spec.subcommands.(*typedSubcommands[T, F]); ok {
+		cmd.commands = list.cmds
 	}
 
 	if len(cmd.commands) == 0 {

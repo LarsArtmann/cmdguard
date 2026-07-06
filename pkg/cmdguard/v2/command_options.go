@@ -170,12 +170,13 @@ func WithValidArgs(args ...string) CommandOption {
 
 // WithPreRunE sets the pre-run validation hook.
 // This is one of the few options that requires type parameters — it returns
-// a non-generic CommandOption that stores the typed function internally.
+// a non-generic CommandOption that stores the typed function behind a sealed
+// interface, preserving compile-time type safety.
 func WithPreRunE[T, F any](
 	preRunE func(ctx context.Context, cfg *T, flags F) error,
 ) CommandOption {
 	return func(s *commandSpec) {
-		s.preRunEAny = preRunE
+		s.preRunE = &typedHook[T, F]{fn: preRunE}
 	}
 }
 
@@ -185,7 +186,7 @@ func WithPostRunE[T, F any](
 	postRunE func(ctx context.Context, cfg *T, flags F) error,
 ) CommandOption {
 	return func(s *commandSpec) {
-		s.postRunEAny = postRunE
+		s.postRunE = &typedHook[T, F]{fn: postRunE}
 	}
 }
 
@@ -193,11 +194,6 @@ func WithPostRunE[T, F any](
 // Type parameters are inferred from the provided commands.
 func WithSubcommands[T, F any](cmds ...Command[T, F]) CommandOption {
 	return func(s *commandSpec) {
-		subs := make([]any, len(cmds))
-		for i, c := range cmds {
-			subs[i] = c
-		}
-
-		s.subcommandsAny = subs
+		s.subcommands = &typedSubcommands[T, F]{cmds: cmds}
 	}
 }

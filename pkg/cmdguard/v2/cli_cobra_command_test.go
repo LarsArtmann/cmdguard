@@ -58,11 +58,11 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 	cmd := Command[testAppConfig, NoFlags]{
 		spec: commandSpec{
 			use: "ok",
-			postRunEAny: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
+			postRunE: &typedHook[testAppConfig, NoFlags]{fn: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				postRunCalled = true
 
 				return nil
-			},
+			}},
 		},
 		runE: noOpHandlerForTestAppConfig(),
 	}
@@ -92,8 +92,8 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 	cmd := Command[testAppConfig, NoFlags]{
 		spec: commandSpec{
 			use:         "hooks",
-			preRunEAny:  makeHookRunE(&order, "pre"),
-			postRunEAny: makeHookRunE(&order, "post"),
+			preRunE:  &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(&order, "pre")},
+			postRunE: &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(&order, "post")},
 		},
 		runE: makeHookRunE(&order, "run"),
 	}
