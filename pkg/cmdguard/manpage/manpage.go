@@ -1,4 +1,17 @@
-package v2
+// Package manpage provides roff man page generation for cmdguard CLIs.
+// It is an optional module — import it only when you need man page output,
+// to keep your dependency tree lean.
+//
+// Usage:
+//
+//	import (
+//	    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+//	    "github.com/larsartmann/cmdguard/manpage"
+//	)
+//
+//	content, _ := manpage.Generate(cli, 1)
+//	fmt.Println(content)
+package manpage
 
 import (
 	"fmt"
@@ -8,12 +21,14 @@ import (
 	mcobra "github.com/muesli/mango-cobra"
 	"github.com/muesli/roff"
 	"github.com/spf13/cobra"
+
+	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
-// ManPage generates a roff man page for the CLI.
+// Generate produces a roff man page for the CLI.
 // Section is typically 1 for user commands or 8 for system commands.
-func (cli *CLI[T]) ManPage(section uint) (string, error) {
-	mp, err := mcobra.NewManPage(section, cli.rootCmd)
+func Generate[T any](cli *v2.CLI[T], section uint) (string, error) {
+	mp, err := mcobra.NewManPage(section, cli.RootCommand())
 	if err != nil {
 		return "", fmt.Errorf("section=%d: %w", section, err)
 	}
@@ -21,9 +36,9 @@ func (cli *CLI[T]) ManPage(section uint) (string, error) {
 	return mp.Build(roff.NewDocument()), nil
 }
 
-// WriteManPage generates and writes a roff man page to the given writer.
-func (cli *CLI[T]) WriteManPage(w io.Writer, section uint) error {
-	content, err := cli.ManPage(section)
+// Write generates and writes a roff man page to the given writer.
+func Write[T any](cli *v2.CLI[T], w io.Writer, section uint) error {
+	content, err := Generate[T](cli, section)
 	if err != nil {
 		return fmt.Errorf("section=%d: %w", section, err)
 	}
@@ -36,9 +51,9 @@ func (cli *CLI[T]) WriteManPage(w io.Writer, section uint) error {
 	return nil
 }
 
-// GenerateManPageCommand creates a cobra command that generates man pages.
+// GenerateCommand creates a cobra command that generates man pages.
 // Add this as a subcommand to provide `myapp man` functionality.
-func GenerateManPageCommand[T any](cli *CLI[T]) (*cobra.Command, error) {
+func GenerateCommand[T any](cli *v2.CLI[T]) (*cobra.Command, error) {
 	return &cobra.Command{
 		Use:   "man [section]",
 		Short: "Generate man page",
@@ -53,7 +68,7 @@ func GenerateManPageCommand[T any](cli *CLI[T]) (*cobra.Command, error) {
 				}
 			}
 
-			return cli.WriteManPage(cmd.OutOrStdout(), section)
+			return Write[T](cli, cmd.OutOrStdout(), section)
 		},
 	}, nil
 }
