@@ -52,7 +52,7 @@ func TestOutputResult_TableData(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			data := output.NewTableData([]string{"Name"})
+			data := output.NewTable([]string{"Name"})
 			data.AddRow([]string{"Alice"})
 
 			cfg := OutputConfig{Format: tt.format, Writer: &buf}
@@ -121,7 +121,7 @@ func TestOutputResult_NilData(t *testing.T) {
 	var buf bytes.Buffer
 	cfg := OutputConfig{Format: output.FormatJSON, Writer: &buf}
 
-	err := OutputResult(cfg, (*output.TableData)(nil))
+	err := OutputResult(cfg, (*output.Table)(nil))
 	testutil.AssertNoError(t, err)
 }
 
@@ -133,7 +133,7 @@ func TestOutputResult_NilWriter(t *testing.T) {
 
 		var buf bytes.Buffer
 		cfg := OutputConfig{Format: output.FormatJSON, Writer: &buf}
-		data := output.NewTableData([]string{"X"})
+		data := output.NewTable([]string{"X"})
 		data.AddRow([]string{"1"})
 
 		err := OutputResult(cfg, data)
@@ -147,7 +147,7 @@ func TestOutputResult_UnsupportedFormat(t *testing.T) {
 	var buf bytes.Buffer
 	cfg := OutputConfig{Format: OutputFormat("nonexistent"), Writer: &buf}
 
-	err := OutputResult(cfg, output.NewTableData([]string{"X"}))
+	err := OutputResult(cfg, output.NewTable([]string{"X"}))
 	testutil.AssertExpectedError(t, err)
 	testutil.AssertErrorIs(t, err, ErrUnsupportedFormat)
 }
@@ -242,7 +242,7 @@ func TestOutputResult_ShapeAwareError(t *testing.T) {
 	var buf bytes.Buffer
 	cfg := OutputConfig{Format: OutputFormat("nonexistent"), Writer: &buf}
 
-	err := OutputResult(cfg, output.NewTableData([]string{"X"}))
+	err := OutputResult(cfg, output.NewTable([]string{"X"}))
 	testutil.AssertExpectedError(t, err)
 
 	errMsg := err.Error()
