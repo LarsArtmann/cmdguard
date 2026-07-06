@@ -32,19 +32,19 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/larsartmann/go-branded-id v0.3.1 // indirect
-	github.com/larsartmann/go-output v0.23.3 // indirect
-	github.com/larsartmann/go-output/d2 v0.23.3 // indirect
-	github.com/larsartmann/go-output/daghtml v0.23.3 // indirect
-	github.com/larsartmann/go-output/delimited v0.23.3 // indirect
-	github.com/larsartmann/go-output/escape v0.23.3 // indirect
-	github.com/larsartmann/go-output/graph v0.23.3 // indirect
-	github.com/larsartmann/go-output/markdown v0.23.3 // indirect
-	github.com/larsartmann/go-output/markup v0.23.3 // indirect
-	github.com/larsartmann/go-output/plantuml v0.23.3 // indirect
-	github.com/larsartmann/go-output/serialization v0.23.3 // indirect
-	github.com/larsartmann/go-output/table v0.23.3 // indirect
-	github.com/larsartmann/go-output/tree v0.23.3 // indirect
-	github.com/larsartmann/samber-do-auditlog v0.3.1 // indirect
+	github.com/larsartmann/go-output v0.30.1 // indirect
+	github.com/larsartmann/go-output/d2 v0.30.1 // indirect
+	github.com/larsartmann/go-output/daghtml v0.30.1 // indirect
+	github.com/larsartmann/go-output/delimited v0.30.1 // indirect
+	github.com/larsartmann/go-output/escape v0.30.1 // indirect
+	github.com/larsartmann/go-output/graph v0.30.1 // indirect
+	github.com/larsartmann/go-output/markdown v0.30.1 // indirect
+	github.com/larsartmann/go-output/markup v0.30.1 // indirect
+	github.com/larsartmann/go-output/plantuml v0.30.1 // indirect
+	github.com/larsartmann/go-output/serialization v0.30.1 // indirect
+	github.com/larsartmann/go-output/table v0.30.1 // indirect
+	github.com/larsartmann/go-output/tree v0.30.1 // indirect
+	github.com/larsartmann/samber-do-auditlog v0.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
@@ -65,7 +65,7 @@ require (
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/term v0.44.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/text v0.39.0 // indirect
 )
 
 replace github.com/larsartmann/cmdguard/v2 => ../../..
