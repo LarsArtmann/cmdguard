@@ -12,6 +12,20 @@ import (
 // CLIOption is a functional option for configuring a CLI.
 type CLIOption[T any] func(*CLI[T])
 
+// HelpTransformFunc transforms a cobra command's help text before execution.
+// Optional modules (e.g. cmdguard/glamour) use this hook to render markdown,
+// without the core module importing the rendering library.
+type HelpTransformFunc func(cmd *cobra.Command)
+
+// WithHelpTransform registers a function that transforms command help text
+// before the CLI executes. Multiple transforms run in registration order.
+// This is the extension point for optional help-rendering modules.
+func WithHelpTransform[T any](fn HelpTransformFunc) CLIOption[T] {
+	return func(cli *CLI[T]) {
+		cli.helpTransforms = append(cli.helpTransforms, fn)
+	}
+}
+
 // WithCLIVersion sets the version string.
 // When fang is enabled, the version is automatically passed to fang.WithVersion
 // for styled version output alongside cmdguard's own version subcommand.

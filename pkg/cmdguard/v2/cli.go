@@ -44,8 +44,7 @@ type CLI[T any] struct {
 	cleanupWired     bool
 	configFilePaths  []string
 	configFileLoader ConfigFileLoader
-	glamourHelp      bool
-	glamourTheme     string
+	helpTransforms   []HelpTransformFunc
 	noColorFlag      *bool
 	gracefulShutdown bool
 	diLogf           func(string, ...any)
@@ -236,10 +235,9 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	return nil
 }
 
-func (cli *CLI[T]) applyGlamourIfEnabled() {
-	if cli.glamourHelp {
-		applyGlamourHelp(cli.rootCmd, cli.glamourTheme)
-		cli.glamourHelp = false
+func (cli *CLI[T]) applyHelpTransforms() {
+	for _, fn := range cli.helpTransforms {
+		fn(cli.rootCmd)
 	}
 }
 
@@ -334,7 +332,7 @@ func (cli *CLI[T]) applyCleanupHooks() {
 // If WithSignalHandling was set, the context is cancelled on SIGINT/SIGTERM.
 // If WithGracefulShutdown was set, DI services are shut down on signal after command completes.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
-	cli.applyGlamourIfEnabled()
+	cli.applyHelpTransforms()
 
 	restoreNoColor := cli.applyNoColorIfSet()
 	defer restoreNoColor()

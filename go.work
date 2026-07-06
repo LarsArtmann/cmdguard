@@ -1,5 +1,6 @@
 go 1.26.4
 
 use .
+use ./pkg/cmdguard/glamour
 use ./pkg/cmdguard/manpage
 use ./pkg/cmdguard/telemetry

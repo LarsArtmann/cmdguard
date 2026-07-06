@@ -41,6 +41,7 @@ import (
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 
+	"github.com/larsartmann/cmdguard/glamour"
 	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
 )
 
@@ -79,7 +80,7 @@ func main() {
 			}),
 			v2.RecoveryMiddleware[AppConfig](),
 		),
-		v2.WithGlamourHelpTheme[AppConfig]("dark"),
+		glamour.WithHelpTheme[AppConfig]("dark"),
 		v2.WithGroup[AppConfig]("tasks", "Task Management"),
 		v2.WithGroup[AppConfig]("system", "System"),
 	)
