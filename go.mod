@@ -12,17 +12,17 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/larsartmann/go-output v0.23.3
-	github.com/larsartmann/go-output/d2 v0.23.3
-	github.com/larsartmann/go-output/delimited v0.23.3
-	github.com/larsartmann/go-output/graph v0.23.3
-	github.com/larsartmann/go-output/markdown v0.23.3
-	github.com/larsartmann/go-output/markup v0.23.3
-	github.com/larsartmann/go-output/plantuml v0.23.3
-	github.com/larsartmann/go-output/serialization v0.23.3
-	github.com/larsartmann/go-output/table v0.23.3
-	github.com/larsartmann/go-output/tree v0.23.3
-	github.com/larsartmann/samber-do-auditlog v0.3.1
+	github.com/larsartmann/go-output v0.30.1
+	github.com/larsartmann/go-output/d2 v0.30.1
+	github.com/larsartmann/go-output/delimited v0.30.1
+	github.com/larsartmann/go-output/graph v0.30.1
+	github.com/larsartmann/go-output/markdown v0.30.1
+	github.com/larsartmann/go-output/markup v0.30.1
+	github.com/larsartmann/go-output/plantuml v0.30.1
+	github.com/larsartmann/go-output/serialization v0.30.1
+	github.com/larsartmann/go-output/table v0.30.1
+	github.com/larsartmann/go-output/tree v0.30.1
+	github.com/larsartmann/samber-do-auditlog v0.4.0
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -35,7 +35,7 @@ require (
 	golang.org/x/term v0.44.0
 )
 
-require github.com/larsartmann/go-output/escape v0.23.3 // indirect
+require github.com/larsartmann/go-output/escape v0.30.1 // indirect
 
 require (
 	charm.land/bubbles/v2 v2.1.1 // indirect
@@ -70,7 +70,9 @@ require (
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/larsartmann/go-branded-id v0.3.1 // indirect
-	github.com/larsartmann/go-output/daghtml v0.23.3 // indirect
+	github.com/larsartmann/go-output/daghtml v0.30.1 // indirect
+	github.com/larsartmann/go-output/testhelpers v0.30.1 // indirect
+	github.com/larsartmann/go-output/testhelpers/graphtest v0.30.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect

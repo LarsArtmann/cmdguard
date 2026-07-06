@@ -46,7 +46,7 @@ func (cli *CLI[T]) initOutputFlag() {
 		return
 	}
 
-	formats := output.RegisteredTableDataFormats()
+	formats := output.RegisteredTableMarshalFormats()
 
 	names := make([]string, len(formats))
 	for i, f := range formats {

@@ -38,8 +38,8 @@ func DefaultOutputConfig() OutputConfig {
 }
 
 // OutputResult renders data in the configured output format.
-// For *TableData, delegates to go-output's RenderTableData registry.
-// For arbitrary data, delegates to go-output's RenderAnyData registry (JSON, YAML, TOML).
+// For *Table, delegates to go-output's RenderTable registry.
+// For arbitrary data, delegates to go-output's RenderUnknown registry (JSON, YAML, TOML).
 // Returns shape-aware errors when a format does not support the provided data type.
 func OutputResult(cfg OutputConfig, data any) error {
 	if cfg.Writer == nil {
@@ -48,8 +48,8 @@ func OutputResult(cfg OutputConfig, data any) error {
 
 	opts := output.RenderOptions{Writer: cfg.Writer}
 
-	if td, ok := data.(*output.TableData); ok {
-		err := output.RenderTableData(td, cfg.Format, opts)
+	if td, ok := data.(*output.Table); ok {
+		err := output.RenderTable(td, cfg.Format, opts)
 		if _, unsupported := errors.AsType[*output.UnsupportedFormatError](err); unsupported {
 			return fmt.Errorf("%w: %s (format supports %s, not table data)",
 				ErrUnsupportedFormat, cfg.Format, formatShapes(cfg.Format))
@@ -58,7 +58,7 @@ func OutputResult(cfg OutputConfig, data any) error {
 		return err
 	}
 
-	err := output.RenderAnyData(data, cfg.Format, opts)
+	err := output.RenderUnknown(data, cfg.Format, opts)
 	if _, unsupported := errors.AsType[*output.UnsupportedFormatError](err); unsupported {
 		return fmt.Errorf("%w: %s (format does not support arbitrary data)",
 			ErrFormatRequiresTypedData, cfg.Format)
@@ -70,7 +70,7 @@ func OutputResult(cfg OutputConfig, data any) error {
 // OutputTable is a convenience function to output table data with headers and rows.
 // Uses AddRowChecked for fail-fast row validation.
 func OutputTable(format OutputFormat, headers []string, rows [][]string) error {
-	data := output.NewTableData(headers)
+	data := output.NewTable(headers)
 
 	for _, row := range rows {
 		if err := data.AddRowChecked(row); err != nil {
@@ -81,10 +81,10 @@ func OutputTable(format OutputFormat, headers []string, rows [][]string) error {
 	return OutputResult(OutputConfig{Format: format}, data)
 }
 
-// RegisteredFormats returns all output formats with registered TableData marshalers.
+// RegisteredFormats returns all output formats with registered Table marshalers.
 // Use this to dynamically discover available formats based on imported sub-modules.
 func RegisteredFormats() []OutputFormat {
-	return output.RegisteredTableDataFormats()
+	return output.RegisteredTableMarshalFormats()
 }
 
 // formatShapes returns a human-readable description of what shapes a format supports.
