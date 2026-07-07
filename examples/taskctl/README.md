@@ -44,7 +44,7 @@ Every cmdguard feature is demonstrated in this example:
 | `NewCommand`                 | commands.go         | list, add, done, stats, inspect                                                                                                           |
 | `DoctorCommand`              | commands.go         | Doctor command with DI health + custom checks                                                                                             |
 | `NewParentCommand`           | commands.go         | db, config command groups                                                                                                                 |
-| **Typed flags (positional)** | commands.go         | Flags passed as 2nd arg to `NewCommand`                                                                                                  |
+| **Typed flags (positional)** | commands.go         | Flags passed as 2nd arg to `NewCommand`                                                                                                   |
 | `WithShort`                  | commands.go         | All commands                                                                                                                              |
 | `WithLong`                   | main.go doc comment | Package docs                                                                                                                              |
 | `WithExample`                | commands.go         | list, add, done                                                                                                                           |
