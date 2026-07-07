@@ -96,3 +96,7 @@ require (
 	golang.org/x/text v0.38.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
+
+// v2.11.0 was a mis-release: it contained breaking v3 API changes on the /v2
+// module path, violating Go semver. Use v3.0.0+ (module .../v3) instead.
+retract v2.11.0
