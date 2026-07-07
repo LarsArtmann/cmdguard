@@ -9,7 +9,7 @@
 
 cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type safety, struct-tag-driven flags, and built-in dependency injection via [samber/do/v2](https://github.com/samber/do). Your flags are typed structs — no more stringly-typed `Flags().GetString("name")` calls that fail at runtime.
 
-> **API Stability:** The v2 API is stable and will only receive additive changes until v3. See [CHANGELOG.md](CHANGELOG.md) for deprecation policy.
+> **API Stability:** v3.0.0 is the current major version. The legacy v2 line is in maintenance at v2.10.4. See [CHANGELOG.md](CHANGELOG.md) and the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md).
 
 ---
 
@@ -157,12 +157,11 @@ HELLO, CMDGUARD!
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                        |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                          |
 | **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                           |
-| **Editor support**         | `EditInEditor()` — open `$EDITOR` for user input                                                        |
 | **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                             |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                 |
 | **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                          |
-| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`, or write your own |
-| **Interactive prompts**    | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh                                      |
+| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own; spinner/telemetry available as [sub-modules](#optional-sub-modules) |
+| **Interactive prompts**    | `WithPromptOnMissing()` with `prompt:"Question?"` tag via huh                                          |
 | **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                |
 | **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                       |
 | **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                             |
@@ -172,7 +171,7 @@ HELLO, CMDGUARD!
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime |
 | **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                           |
 | **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                      |
-| **430+ tests**             | 86.6% coverage, race-detected, fuzz-tested                                                              |
+| **420+ tests**             | 87.3% coverage, race-detected, fuzz-tested                                                              |
 
 ---
 
@@ -418,7 +417,7 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithConfigFile(paths...)`          | Auto-load JSON config from first found path                   |
 | `WithConfigFileLoader(l, paths...)` | Load config with custom loader (YAML/TOML)                    |
 | `glamour.WithHelp()`                | Render markdown in command help text (glamour sub-module)     |
-| `WithTelemetry[T](tracer)`          | OpenTelemetry spans for all commands                          |
+| `telemetry.WithTelemetry[T](tracer)` | OpenTelemetry spans for all commands (telemetry sub-module)   |
 
 ---
 
@@ -493,6 +492,32 @@ Generates roff-formatted man pages from your command structure.
 
 ---
 
+## Optional Sub-Modules
+
+cmdguard's core is dependency-free. Five optional features live in standalone sub-modules — import only what you need:
+
+| Sub-module                            | Import path                                  | Provides                                            |
+| ------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
+| **glamour**                           | `github.com/larsartmann/cmdguard/glamour`    | Markdown help rendering (`WithHelp`, `RenderMarkdown`) |
+| **manpage**                           | `github.com/larsartmann/cmdguard/manpage`    | Man page generation (`GenerateCommand`, `Write`)    |
+| **prompts**                           | `github.com/larsartmann/cmdguard/prompts`    | Interactive prompts via huh (`Register`)            |
+| **spinner**                           | `github.com/larsartmann/cmdguard/spinner`    | Terminal spinner middleware (`Middleware`)          |
+| **telemetry**                         | `github.com/larsartmann/cmdguard/telemetry`  | OpenTelemetry spans (`WithTelemetry`, `Middleware`) |
+
+```go
+import (
+    "github.com/larsartmann/cmdguard/spinner"
+    "github.com/larsartmann/cmdguard/telemetry"
+)
+
+cli, _ := v3.NewCLI[Config]("app", "...", Config{},
+    telemetry.WithTelemetry[Config](tracer),
+    v3.WithMiddleware[Config](spinner.Middleware[Config]("Working...")),
+)
+```
+
+---
+
 ## BranchingFlowContext
 
 Track the command execution path and share values across the hierarchy:
@@ -528,20 +553,6 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     v3.WithFang(true),   // styled help (default)
     v3.WithFang(false),  // plain text help
 )
-```
-
----
-
-## EditInEditor
-
-Open the user's `$EDITOR` to edit content interactively:
-
-```go
-edited, err := v3.EditInEditor(ctx, "# Edit your message here\n")
-if err != nil {
-    return err
-}
-fmt.Println("User wrote:", edited)
 ```
 
 ---

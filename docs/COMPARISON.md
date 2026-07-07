@@ -1,7 +1,7 @@
 # cmdguard vs. Alternative Go CLI Frameworks
 
 > An honest comparison for developers evaluating CLI frameworks.
-> **Last Updated:** 2026-05-27
+> **Last Updated:** 2026-07-07
 
 ---
 
@@ -29,7 +29,7 @@
 - ✅ **Built-in DI** — samber/do/v2 with `Provide`/`Invoke` and lifecycle hooks
 - ✅ **Typo suggestions** — "did you mean?" for flags and subcommands
 - ✅ **Constructor validation** — invalid commands caught at registration time
-- ✅ **Minimal panics** — all non-Must APIs return errors; Must variants panic for compile-time config
+- ✅ **Zero panics** — all functions return errors; no Must* variants exist
 - ✅ **Rich output** — 16 formats (JSON, CSV, YAML, table, JSONL, TOML, PlantUML, etc.)
 - ✅ **Config file support** — JSON/YAML/TOML with flag/env override
 - ⚠️ **Newer project** — smaller community than Kong or urfave/cli
@@ -100,7 +100,7 @@
 | **Shell completion**           | ✅                       | ✅         | ❌        | ❌         | ✅         |
 | **Middleware**                 | ✅                       | ✅         | ❌        | ❌         | ✅         |
 | **Man page generation**        | ✅                       | ❌         | ❌        | ❌         | ❌         |
-| **Minimal panics**             | ✅                       | ✅         | N/A       | N/A        | N/A        |
+| **Zero panics**              | ✅                       | ✅         | N/A       | N/A        | N/A        |
 | **Counting flags**             | ✅ `-v`/`-vv`/`-vvv`     | ❌         | ❌        | ❌         | ❌         |
 | **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅         | ❌        | ✅         | ✅         |
 
@@ -117,8 +117,8 @@ type Flags struct {
     Verbose bool  `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
 }
 
-cmd, err := v2.NewCommand[Config, *Flags]("greet", handler,
-    v2.WithFlags[Config, *Flags](&Flags{}),
+cmd, err := v3.NewCommand("greet", &Flags{}, handler,
+    v3.WithShort("Greet someone"),
 )
 ```
 

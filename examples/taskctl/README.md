@@ -44,7 +44,7 @@ Every cmdguard feature is demonstrated in this example:
 | `NewCommand`                 | commands.go         | list, add, done, stats, inspect                                                                                                           |
 | `DoctorCommand`              | commands.go         | Doctor command with DI health + custom checks                                                                                             |
 | `NewParentCommand`           | commands.go         | db, config command groups                                                                                                                 |
-| `WithFlags`                  | commands.go         | All task commands                                                                                                                         |
+| **Typed flags (positional)** | commands.go         | Flags passed as 2nd arg to `NewCommand`                                                                                                  |
 | `WithShort`                  | commands.go         | All commands                                                                                                                              |
 | `WithLong`                   | main.go doc comment | Package docs                                                                                                                              |
 | `WithExample`                | commands.go         | list, add, done                                                                                                                           |
@@ -72,7 +72,6 @@ Every cmdguard feature is demonstrated in this example:
 | `NewExitError`               | commands.go         | done returns code 2 on not-found                                                                                                          |
 | `VersionCommand`             | commands.go         | Auto version subcommand                                                                                                                   |
 | **BranchingFlowContext**     | commands.go         | inspect reads flow path                                                                                                                   |
-| `EditInEditor`               | commands.go         | config edit opens $EDITOR                                                                                                                 |
 | `ValueOrDefault`             | main_test.go        | Helper usage in tests                                                                                                                     |
 | `EnsureValid`                | main_test.go        | Helper usage in tests                                                                                                                     |
 | `ParseDuration`              | main_test.go        | Duration parsing test                                                                                                                     |

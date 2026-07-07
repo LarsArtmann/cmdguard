@@ -6,7 +6,7 @@
 //   - Per-command typed flags with prompt, required, validate, and values tags
 //   - PreRunE validation and PostRunE cleanup
 //   - Middleware (spinner + timing + recovery)
-//   - Glamour markdown help rendering (WithGlamourHelpTheme)
+//   - Glamour markdown help rendering (glamour.WithHelpTheme sub-module)
 //   - Rich output in multiple formats (OutputTable, OutputResult)
 //   - Command groups (WithGroup)
 //   - Subcommands via NewParentCommand
@@ -18,7 +18,6 @@
 //   - Command aliases
 //   - Arg validators (WithNoArgs, WithExactArgs)
 //   - BranchingFlowContext for path tracking
-//   - EditInEditor for config editing
 //   - Version command
 //   - DI audit logging via samber-do-auditlog (WithAuditLog + plugin accessor pattern)
 //
