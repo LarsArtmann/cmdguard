@@ -5,14 +5,14 @@ import (
 	"context"
 	"testing"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
 func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
+	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -24,7 +24,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 		receivedFlags *GreetFlags
 	)
 
-	greetCmd, err := v2.NewCommand(
+	greetCmd, err := v3.NewCommand(
 		"greet",
 		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
@@ -33,15 +33,15 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 
 			return nil
 		},
-		v2.WithShort("Greet with lifecycle"),
-		v2.WithPreRunE(
+		v3.WithShort("Greet with lifecycle"),
+		v3.WithPreRunE(
 			func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 				preRunCalled = true
 
 				return nil
 			},
 		),
-		v2.WithPostRunE(
+		v3.WithPostRunE(
 			func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
 				postRunCalled = true
 
@@ -53,7 +53,7 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli, greetCmd)
+	err = v3.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -87,21 +87,21 @@ func TestV2_MixedFlagTypes_WithLifecycleHooks(t *testing.T) {
 func TestV2_MixedFlagTypes_ValidationErrors(t *testing.T) {
 	t.Parallel()
 
-	_, err := v2.NewCommand(
+	_, err := v3.NewCommand(
 		"",
 		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, _ *GreetFlags) error { return nil },
-		v2.WithShort("Invalid command"),
+		v3.WithShort("Invalid command"),
 	)
 	if err == nil {
 		t.Error("expected error for empty Use field")
 	}
 
-	_, err = v2.NewCommand[RootConfig](
+	_, err = v3.NewCommand[RootConfig](
 		"invalid",
-		v2.NoFlags{},
+		v3.NoFlags{},
 		nil,
-		v2.WithShort("No handler"),
+		v3.WithShort("No handler"),
 	)
 	if err == nil {
 		t.Error("expected error for missing RunE")
@@ -118,14 +118,14 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 		Level:   "debug",
 	}
 
-	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", defaultConfig)
+	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", defaultConfig)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	var receivedConfig *RootConfig
 
-	checkCmd, err := v2.NewCommand(
+	checkCmd, err := v3.NewCommand(
 		"check",
 		&GreetFlags{},
 		func(_ context.Context, cfg *RootConfig, _ *GreetFlags) error {
@@ -133,13 +133,13 @@ func TestV2_MixedFlagTypes_ConfigAccess(t *testing.T) {
 
 			return nil
 		},
-		v2.WithShort("Check config access"),
+		v3.WithShort("Check config access"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli, checkCmd)
+	err = v3.AddCommand(cli, checkCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -166,14 +166,14 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v2.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
+	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	var executedFlags *MigrateFlags
 
-	migrateUpCmd, err := v2.NewCommand(
+	migrateUpCmd, err := v3.NewCommand(
 		"up",
 		&MigrateFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
@@ -181,23 +181,23 @@ func TestV2_MixedFlagTypes_DeeplyNested(t *testing.T) {
 
 			return nil
 		},
-		v2.WithShort("Run up migrations"),
+		v3.WithShort("Run up migrations"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	migrateCmd, err := v2.NewParentCommand[RootConfig](
+	migrateCmd, err := v3.NewParentCommand[RootConfig](
 		"migrate",
 		"Database migration management commands", &MigrateFlags{},
-		v2.WithSubcommands(migrateUpCmd),
-		v2.WithShort("Migration commands"),
+		v3.WithSubcommands(migrateUpCmd),
+		v3.WithShort("Migration commands"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v2.AddCommand(cli, migrateCmd)
+	err = v3.AddCommand(cli, migrateCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

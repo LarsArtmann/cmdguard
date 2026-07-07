@@ -4,7 +4,7 @@ go 1.26.4
 
 require (
 	charm.land/glamour/v2 v2.0.1
-	github.com/larsartmann/cmdguard/v2 v2.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/v3 v3.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
 )
 
@@ -69,4 +69,4 @@ require (
 	golang.org/x/text v0.39.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v2 => ../../..
+replace github.com/larsartmann/cmdguard/v3 => ../../..

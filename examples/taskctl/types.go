@@ -9,22 +9,22 @@ import (
 
 	"github.com/samber/do/v2"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
 // --- Config ---
 
 type AppConfig struct {
-	LogLevel   v2.LogLevel `flag:"log-level"   short:"l" default:"info"                  help:"Log level (debug, info, warn, error)" env:"TASK_LOG_LEVEL"`
+	LogLevel   v3.LogLevel `flag:"log-level"   short:"l" default:"info"                  help:"Log level (debug, info, warn, error)" env:"TASK_LOG_LEVEL"`
 	DataDir    string      `flag:"data-dir"    short:"d" default:"./data"                help:"Directory for task storage"           env:"TASK_DATA_DIR"`
-	Timeout    v2.Duration `flag:"timeout"               default:"30s"                   help:"Default operation timeout"`
-	Port       v2.Port     `flag:"port"                  default:"8080"                  help:"API port"`
-	AdminEmail v2.Email    `flag:"admin-email"           default:"admin@example.com"     help:"Admin contact email"`
-	APIUrl     v2.URL      `flag:"api-url"               default:"http://localhost:8080" help:"API base URL"`
+	Timeout    v3.Duration `flag:"timeout"               default:"30s"                   help:"Default operation timeout"`
+	Port       v3.Port     `flag:"port"                  default:"8080"                  help:"API port"`
+	AdminEmail v3.Email    `flag:"admin-email"           default:"admin@example.com"     help:"Admin contact email"`
+	APIUrl     v3.URL      `flag:"api-url"               default:"http://localhost:8080" help:"API base URL"`
 	Verbose    int         `flag:"verbose"     short:"v" default:"0"                     help:"Verbosity (-v, -vv, -vvv)"                                 count:"true"`
 }
 
-// --- Priority via v2.Enum ---
+// --- Priority via v3.Enum ---
 
 const allowedPriorities = "low,medium,high"
 
@@ -107,12 +107,12 @@ var (
 )
 
 func NewTaskStore(i do.Injector) (*TaskStore, error) {
-	scope, err := v2.NewScopeFromInjector(i, "provider")
+	scope, err := v3.NewScopeFromInjector(i, "provider")
 	if err != nil {
 		return nil, fmt.Errorf("create scope: %w", err)
 	}
 
-	cfg, err := v2.Invoke[*AppConfig](scope)
+	cfg, err := v3.Invoke[*AppConfig](scope)
 	if err != nil {
 		return nil, fmt.Errorf("resolve config: %w", err)
 	}

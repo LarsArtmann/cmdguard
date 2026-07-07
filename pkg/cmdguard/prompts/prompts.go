@@ -6,7 +6,7 @@
 //
 //	import (
 //	    "github.com/larsartmann/cmdguard/prompts"
-//	    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+//	    v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 //	)
 //
 //	func main() {
@@ -20,10 +20,10 @@ import (
 
 	"charm.land/huh/v2"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
-// HuhRunner implements v2.PromptRunner using the huh/v2 TUI library.
+// HuhRunner implements v3.PromptRunner using the huh/v2 TUI library.
 type HuhRunner struct{}
 
 func (h *HuhRunner) PromptString(title, defaultValue string) (string, error) {
@@ -77,5 +77,5 @@ func (h *HuhRunner) PromptConfirm(title string) (bool, error) {
 // Register wires huh-based prompting into cmdguard. Call this once at startup
 // to enable interactive prompts for missing flags with the `prompt:"..."` tag.
 func Register() {
-	v2.SetPromptRunner(&HuhRunner{})
+	v3.SetPromptRunner(&HuhRunner{})
 }

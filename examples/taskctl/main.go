@@ -43,7 +43,7 @@ import (
 
 	"github.com/larsartmann/cmdguard/glamour"
 	"github.com/larsartmann/cmdguard/spinner"
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
 func main() {
@@ -60,30 +60,30 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli, err := v2.NewCLI[AppConfig](
+	cli, err := v3.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
-		v2.WithCLIVersion("1.0.0"),
-		v2.WithEnvPrefix("TASKCTL_"),
-		v2.WithAuditLog(auditPlugin),
-		v2.WithConfigFile("$HOME/.config/taskctl/config.json"),
-		v2.WithConfigValidation(func(cfg *AppConfig) error {
+		v3.WithCLIVersion("1.0.0"),
+		v3.WithEnvPrefix("TASKCTL_"),
+		v3.WithAuditLog(auditPlugin),
+		v3.WithConfigFile("$HOME/.config/taskctl/config.json"),
+		v3.WithConfigValidation(func(cfg *AppConfig) error {
 			if cfg.DataDir == "" {
 				return fmt.Errorf("data-dir must not be empty")
 			}
 			return nil
 		}),
-		v2.WithGracefulShutdown(),
-		v2.WithStrictValidation(),
-		v2.WithMiddleware(
+		v3.WithGracefulShutdown(),
+		v3.WithStrictValidation(),
+		v3.WithMiddleware(
 			spinner.Middleware[AppConfig]("Working..."),
-			v2.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+			v3.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
 				fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
 			}),
-			v2.RecoveryMiddleware[AppConfig](),
+			v3.RecoveryMiddleware[AppConfig](),
 		),
 		glamour.WithHelpTheme("dark"),
-		v2.WithGroup("tasks", "Task Management"),
-		v2.WithGroup("system", "System"),
+		v3.WithGroup("tasks", "Task Management"),
+		v3.WithGroup("system", "System"),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -94,7 +94,7 @@ func main() {
 	cli.AddGlobalBoolFlag("debug", "D", false, "Enable debug mode")
 
 	// Register DI services
-	if err := v2.Provide(cli.Scope(), NewTaskStore); err != nil {
+	if err := v3.Provide(cli.Scope(), NewTaskStore); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
@@ -117,12 +117,12 @@ func main() {
 		// AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
 		// csv, tsv, mermaid, dot, d2, plantuml, tree, or htmltree.
 		// Defaults to html.
-		format, err := v2.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+		format, err := v3.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)
 		} else {
 			path := "taskctl-audit." + format.String()
-			if err := v2.ExportAuditLog(cli, v2.AuditLogExportConfig{
+			if err := v3.ExportAuditLog(cli, v3.AuditLogExportConfig{
 				Format: format,
 				Path:   path,
 			}); err != nil {
@@ -133,5 +133,5 @@ func main() {
 		}
 	}
 
-	os.Exit(v2.ExitCode(execErr))
+	os.Exit(v3.ExitCode(execErr))
 }

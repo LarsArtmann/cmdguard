@@ -1,4 +1,4 @@
-// Package benchmarks provides performance benchmarks for cmdguard v2.
+// Package benchmarks provides performance benchmarks for cmdguard v3.
 package benchmarks
 
 import (
@@ -7,8 +7,8 @@ import (
 
 	"github.com/samber/do/v2"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
-	"github.com/larsartmann/cmdguard/v2/pkg/testutil"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+	"github.com/larsartmann/cmdguard/v3/pkg/testutil"
 )
 
 type BenchConfig struct {
@@ -22,14 +22,14 @@ type BenchFlags struct {
 }
 
 // newBenchCommand creates a command with standard benchmark configuration.
-func newBenchCommand(b *testing.B, use, short string) v2.Command[BenchConfig, v2.NoFlags] {
+func newBenchCommand(b *testing.B, use, short string) v3.Command[BenchConfig, v3.NoFlags] {
 	b.Helper()
 
-	cmd, err := v2.NewCommand(
+	cmd, err := v3.NewCommand(
 		use,
-		v2.NoFlags{},
-		testutil.NoOpRunE[BenchConfig, v2.NoFlags],
-		v2.WithShort(short),
+		v3.NoFlags{},
+		testutil.NoOpRunE[BenchConfig, v3.NoFlags],
+		v3.WithShort(short),
 	)
 	if err != nil {
 		b.Fatal(err)
@@ -43,7 +43,7 @@ func BenchmarkNew(b *testing.B) {
 	defaults := BenchConfig{}
 
 	for b.Loop() {
-		cli, err := v2.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
+		cli, err := v3.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -57,11 +57,11 @@ func BenchmarkNewWithLong(b *testing.B) {
 	defaults := BenchConfig{}
 
 	for b.Loop() {
-		cli, err := v2.NewCLI[BenchConfig](
+		cli, err := v3.NewCLI[BenchConfig](
 			"myapp",
 			"short",
 			defaults,
-			v2.WithCLILong("long description"),
+			v3.WithCLILong("long description"),
 		)
 		if err != nil {
 			b.Fatal(err)
@@ -77,12 +77,12 @@ func BenchmarkAddCommand(b *testing.B) {
 
 	for b.Loop() {
 		// Need fresh CLI for each iteration since we can't add same command twice
-		testCli, err := v2.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
+		testCli, err := v3.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
 		if err != nil {
 			b.Fatal(err)
 		}
 
-		err = v2.AddCommand(testCli, newBenchCommand(b, "greet", "Greet someone"))
+		err = v3.AddCommand(testCli, newBenchCommand(b, "greet", "Greet someone"))
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -93,12 +93,12 @@ func BenchmarkAddCommand(b *testing.B) {
 func BenchmarkExecute(b *testing.B) {
 	defaults := BenchConfig{}
 
-	cli, err := v2.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
+	cli, err := v3.NewCLI[BenchConfig]("myapp", "My CLI", defaults)
 	if err != nil {
 		b.Fatal(err)
 	}
 
-	if err := v2.AddCommand(cli, newBenchCommand(b, "hello", "Say hello")); err != nil {
+	if err := v3.AddCommand(cli, newBenchCommand(b, "hello", "Say hello")); err != nil {
 		b.Fatal(err)
 	}
 
@@ -118,11 +118,11 @@ func BenchmarkExecute(b *testing.B) {
 // BenchmarkNewCommand measures the NewCommand constructor.
 func BenchmarkNewCommand(b *testing.B) {
 	for b.Loop() {
-		cmd, err := v2.NewCommand(
+		cmd, err := v3.NewCommand(
 			"greet",
-			v2.NoFlags{},
-			testutil.NoOpRunE[BenchConfig, v2.NoFlags],
-			v2.WithShort("Greet someone"),
+			v3.NoFlags{},
+			testutil.NoOpRunE[BenchConfig, v3.NoFlags],
+			v3.WithShort("Greet someone"),
 		)
 		if err != nil {
 			b.Fatal(err)
@@ -135,7 +135,7 @@ func BenchmarkNewCommand(b *testing.B) {
 // BenchmarkScopeCreation measures DI scope creation.
 func BenchmarkScopeCreation(b *testing.B) {
 	for b.Loop() {
-		scope := v2.NewScope("benchmark")
+		scope := v3.NewScope("benchmark")
 		_ = scope
 	}
 }
@@ -152,7 +152,7 @@ func BenchmarkParseFlagTags(b *testing.B) {
 	cfg := &TestConfig{}
 
 	for b.Loop() {
-		tags, err := v2.ParseFlagTags(cfg)
+		tags, err := v3.ParseFlagTags(cfg)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -173,7 +173,7 @@ func runFlagRegistryBench(b *testing.B) {
 	cfg := &TestConfig{}
 
 	for b.Loop() {
-		registry, err := v2.NewFlagRegistry(cfg)
+		registry, err := v3.NewFlagRegistry(cfg)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -217,7 +217,7 @@ func BenchmarkParseDuration(b *testing.B) {
 
 	for b.Loop() {
 		for _, d := range durations {
-			duration, err := v2.ParseDuration(d)
+			duration, err := v3.ParseDuration(d)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -233,7 +233,7 @@ func BenchmarkParseLogLevel(b *testing.B) {
 
 	for b.Loop() {
 		for _, level := range levels {
-			ll, err := v2.ParseLogLevel(level)
+			ll, err := v3.ParseLogLevel(level)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -255,7 +255,7 @@ func BenchmarkParseURL(b *testing.B) {
 
 	for b.Loop() {
 		for _, u := range urls {
-			url, err := v2.ParseURL(u)
+			url, err := v3.ParseURL(u)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -277,7 +277,7 @@ func BenchmarkParseEmail(b *testing.B) {
 
 	for b.Loop() {
 		for _, e := range emails {
-			email, err := v2.ParseEmail(e)
+			email, err := v3.ParseEmail(e)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -291,7 +291,7 @@ func BenchmarkParseEmail(b *testing.B) {
 func benchmarkParsePorts(b *testing.B, ports []string) {
 	for b.Loop() {
 		for _, p := range ports {
-			port, err := v2.ParsePort(p)
+			port, err := v3.ParsePort(p)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -333,7 +333,7 @@ func BenchmarkParseFilePath(b *testing.B) {
 
 	for b.Loop() {
 		for _, p := range paths {
-			fp, err := v2.ParseFilePath(p, false)
+			fp, err := v3.ParseFilePath(p, false)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -355,7 +355,7 @@ func BenchmarkParseHostPort(b *testing.B) {
 
 	for b.Loop() {
 		for _, hp := range hostports {
-			hostPort, err := v2.ParseHostPort(hp)
+			hostPort, err := v3.ParseHostPort(hp)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -371,8 +371,8 @@ type benchService struct {
 }
 
 // provideBenchService is a helper that provides a benchService with the given name to a scope.
-func provideBenchService(scope *v2.Scope, name string) error {
-	return v2.Provide[benchService](scope, func(i do.Injector) (benchService, error) {
+func provideBenchService(scope *v3.Scope, name string) error {
+	return v3.Provide[benchService](scope, func(i do.Injector) (benchService, error) {
 		return benchService{Name: name}, nil
 	})
 }
@@ -380,7 +380,7 @@ func provideBenchService(scope *v2.Scope, name string) error {
 // BenchmarkScopeProvide measures DI service registration.
 func BenchmarkScopeProvide(b *testing.B) {
 	for b.Loop() {
-		scope := v2.NewScope("bench")
+		scope := v3.NewScope("bench")
 		err := provideBenchService(scope, "test")
 		if err != nil {
 			b.Fatal(err)
@@ -390,7 +390,7 @@ func BenchmarkScopeProvide(b *testing.B) {
 
 // BenchmarkScopeInvoke measures DI service retrieval.
 func BenchmarkScopeInvoke(b *testing.B) {
-	scope := v2.NewScope("bench")
+	scope := v3.NewScope("bench")
 
 	err := provideBenchService(scope, "test")
 	if err != nil {
@@ -398,7 +398,7 @@ func BenchmarkScopeInvoke(b *testing.B) {
 	}
 
 	for b.Loop() {
-		svc, err := v2.Invoke[benchService](scope)
+		svc, err := v3.Invoke[benchService](scope)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -410,27 +410,27 @@ func BenchmarkScopeInvoke(b *testing.B) {
 // BenchmarkScopeCreationWithOpts measures DI scope creation with InjectorOpts.
 func BenchmarkScopeCreationWithOpts(b *testing.B) {
 	for b.Loop() {
-		scope := v2.NewScopeWithOpts("bench", nil)
+		scope := v3.NewScopeWithOpts("bench", nil)
 		_ = scope
 	}
 }
 
 // BenchmarkCloneScope measures scope cloning for test isolation.
 func BenchmarkCloneScope(b *testing.B) {
-	scope := v2.NewScope("bench")
+	scope := v3.NewScope("bench")
 	err := provideBenchService(scope, "test")
 	if err != nil {
 		b.Fatal(err)
 	}
 
-	_, err = v2.Invoke[benchService](scope)
+	_, err = v3.Invoke[benchService](scope)
 	if err != nil {
 		b.Fatal(err)
 	}
 
 	for b.Loop() {
-		cloned := v2.CloneScope(scope)
-		_, err := v2.Invoke[benchService](cloned)
+		cloned := v3.CloneScope(scope)
+		_, err := v3.Invoke[benchService](cloned)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -440,13 +440,13 @@ func BenchmarkCloneScope(b *testing.B) {
 // BenchmarkScopeProvideInvokeCycle measures full register-then-retrieve cycle.
 func BenchmarkScopeProvideInvokeCycle(b *testing.B) {
 	for b.Loop() {
-		scope := v2.NewScope("bench")
+		scope := v3.NewScope("bench")
 		err := provideBenchService(scope, "cycle")
 		if err != nil {
 			b.Fatal(err)
 		}
 
-		_, err = v2.Invoke[benchService](scope)
+		_, err = v3.Invoke[benchService](scope)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -463,14 +463,14 @@ func BenchmarkFlagRegistryCOWWithWrite(b *testing.B) {
 	cfg := &TestConfig{}
 
 	for b.Loop() {
-		registry, err := v2.NewFlagRegistry(cfg)
+		registry, err := v3.NewFlagRegistry(cfg)
 		if err != nil {
 			b.Fatal(err)
 		}
 
-		registry.RegisterTypeHandler(reflect.TypeFor[string](), v2.TypeHandlerFunc{
-			ParseFunc:   func(value string, _ v2.FlagTag) (any, error) { return value, nil },
-			DefaultFunc: func(_ v2.FlagTag) any { return "" },
+		registry.RegisterTypeHandler(reflect.TypeFor[string](), v3.TypeHandlerFunc{
+			ParseFunc:   func(value string, _ v3.FlagTag) (any, error) { return value, nil },
+			DefaultFunc: func(_ v3.FlagTag) any { return "" },
 		})
 	}
 }
@@ -482,7 +482,7 @@ func BenchmarkTagsSeq(b *testing.B) {
 		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
 	}
 
-	registry, err := v2.NewFlagRegistry(&TestConfig{})
+	registry, err := v3.NewFlagRegistry(&TestConfig{})
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -500,7 +500,7 @@ func BenchmarkTagsSlice(b *testing.B) {
 		Verbose bool   `default:"false" flag:"verbose" help:"Verbose"`
 	}
 
-	registry, err := v2.NewFlagRegistry(&TestConfig{})
+	registry, err := v3.NewFlagRegistry(&TestConfig{})
 	if err != nil {
 		b.Fatal(err)
 	}

@@ -90,6 +90,7 @@ reports/
 *.out
 go.work
 go.work.sum
+/v3
 
 ## Nix
 result-*

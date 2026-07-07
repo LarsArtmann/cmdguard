@@ -5,7 +5,7 @@
 // Usage:
 //
 //	import (
-//	    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+//	    v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 //	    "github.com/larsartmann/cmdguard/manpage"
 //	)
 //
@@ -22,12 +22,12 @@ import (
 	"github.com/muesli/roff"
 	"github.com/spf13/cobra"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
 // Generate produces a roff man page for the CLI.
 // Section is typically 1 for user commands or 8 for system commands.
-func Generate[T any](cli *v2.CLI[T], section uint) (string, error) {
+func Generate[T any](cli *v3.CLI[T], section uint) (string, error) {
 	mp, err := mcobra.NewManPage(section, cli.RootCommand())
 	if err != nil {
 		return "", fmt.Errorf("section=%d: %w", section, err)
@@ -37,7 +37,7 @@ func Generate[T any](cli *v2.CLI[T], section uint) (string, error) {
 }
 
 // Write generates and writes a roff man page to the given writer.
-func Write[T any](cli *v2.CLI[T], w io.Writer, section uint) error {
+func Write[T any](cli *v3.CLI[T], w io.Writer, section uint) error {
 	content, err := Generate[T](cli, section)
 	if err != nil {
 		return fmt.Errorf("section=%d: %w", section, err)
@@ -53,7 +53,7 @@ func Write[T any](cli *v2.CLI[T], w io.Writer, section uint) error {
 
 // GenerateCommand creates a cobra command that generates man pages.
 // Add this as a subcommand to provide `myapp man` functionality.
-func GenerateCommand[T any](cli *v2.CLI[T]) (*cobra.Command, error) {
+func GenerateCommand[T any](cli *v3.CLI[T]) (*cobra.Command, error) {
 	return &cobra.Command{
 		Use:   "man [section]",
 		Short: "Generate man page",

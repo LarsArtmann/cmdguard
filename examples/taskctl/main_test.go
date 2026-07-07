@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
-func newTestCLI(t *testing.T) *v2.CLI[AppConfig] {
+func newTestCLI(t *testing.T) *v3.CLI[AppConfig] {
 	t.Helper()
 
 	cli := newEmptyTestCLI(t)
@@ -30,7 +30,7 @@ func mustExec(t *testing.T, args ...string) {
 
 // mustExecOnCLI executes args on an existing CLI, failing on error.
 // Use this when tests need to share state (e.g. tasks added in earlier steps).
-func mustExecOnCLI(t *testing.T, cli *v2.CLI[AppConfig], args ...string) {
+func mustExecOnCLI(t *testing.T, cli *v3.CLI[AppConfig], args ...string) {
 	t.Helper()
 
 	runAndFailOnError(t, cli, args...)
@@ -38,7 +38,7 @@ func mustExecOnCLI(t *testing.T, cli *v2.CLI[AppConfig], args ...string) {
 
 // runAndFailOnError executes args on cli and fails the test if any error occurs.
 // Shared body for mustExec and mustExecOnCLI.
-func runAndFailOnError(t *testing.T, cli *v2.CLI[AppConfig], args ...string) {
+func runAndFailOnError(t *testing.T, cli *v3.CLI[AppConfig], args ...string) {
 	t.Helper()
 
 	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
@@ -57,21 +57,21 @@ func expectError(t *testing.T, args ...string) {
 }
 
 // newEmptyTestCLI creates a CLI without seed tasks, for tests that need a clean store.
-func newEmptyTestCLI(t *testing.T) *v2.CLI[AppConfig] {
+func newEmptyTestCLI(t *testing.T) *v3.CLI[AppConfig] {
 	t.Helper()
 
-	cli, err := v2.NewCLI[AppConfig](
+	cli, err := v3.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
-		v2.WithCLIVersion("1.0.0"),
-		v2.WithStrictValidation(),
-		v2.WithGroup("tasks", "Task Management"),
-		v2.WithGroup("system", "System"),
+		v3.WithCLIVersion("1.0.0"),
+		v3.WithStrictValidation(),
+		v3.WithGroup("tasks", "Task Management"),
+		v3.WithGroup("system", "System"),
 	)
 	if err != nil {
 		t.Fatalf("failed to create CLI: %v", err)
 	}
 
-	if err := v2.Provide(cli.Scope(), NewTaskStore); err != nil {
+	if err := v3.Provide(cli.Scope(), NewTaskStore); err != nil {
 		t.Fatalf("failed to register TaskStore: %v", err)
 	}
 
@@ -87,7 +87,7 @@ func newEmptyTestCLI(t *testing.T) *v2.CLI[AppConfig] {
 func TestCLI_Construction(t *testing.T) {
 	t.Parallel()
 
-	cli, err := v2.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
+	cli, err := v3.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
@@ -102,13 +102,13 @@ func TestCLI_Construction(t *testing.T) {
 func TestCLI_WithOptions(t *testing.T) {
 	t.Parallel()
 
-	cli, err := v2.NewCLI[AppConfig](
+	cli, err := v3.NewCLI[AppConfig](
 		"taskctl", "test", AppConfig{},
-		v2.WithCLIVersion("2.0.0"),
-		v2.WithEnvPrefix("TASKCTL_"),
-		v2.WithStrictValidation(),
-		v2.WithGroup("tasks", "Tasks"),
-		v2.WithGroup("system", "System"),
+		v3.WithCLIVersion("2.0.0"),
+		v3.WithEnvPrefix("TASKCTL_"),
+		v3.WithStrictValidation(),
+		v3.WithGroup("tasks", "Tasks"),
+		v3.WithGroup("system", "System"),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI with options: %v", err)
@@ -123,7 +123,7 @@ func TestCLI_WithOptions(t *testing.T) {
 func TestCLI_ConfigDefaults(t *testing.T) {
 	t.Parallel()
 
-	cli, err := v2.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
+	cli, err := v3.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
@@ -146,7 +146,7 @@ func TestDI_TaskStoreRegistration(t *testing.T) {
 
 	cli := newTestCLI(t)
 
-	store, err := v2.Invoke[*TaskStore](cli.Scope())
+	store, err := v3.Invoke[*TaskStore](cli.Scope())
 	if err != nil {
 		t.Fatalf("Invoke TaskStore: %v", err)
 	}
@@ -401,7 +401,7 @@ func TestErrorHandling_FlagError(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if flagErr, ok := errors.AsType[*v2.FlagError](err); ok {
+	if flagErr, ok := errors.AsType[*v3.FlagError](err); ok {
 		if flagErr.FlagName != "format" {
 			t.Errorf("FlagName = %q, want %q", flagErr.FlagName, "format")
 		}
@@ -417,7 +417,7 @@ func TestErrorHandling_ExitCode(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if exitCoder, ok := errors.AsType[*v2.ExitError](err); ok {
+	if exitCoder, ok := errors.AsType[*v3.ExitError](err); ok {
 		if exitCoder.Code != 2 {
 			t.Errorf("ExitCode = %d, want 2", exitCoder.Code)
 		}
@@ -455,7 +455,7 @@ func TestParsePriority(t *testing.T) {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := v2.ParseEnum(tt.input, strings.Split(allowedPriorities, ","))
+			got, err := v3.ParseEnum(tt.input, strings.Split(allowedPriorities, ","))
 			if tt.err {
 				if err == nil {
 					t.Error("expected error")
@@ -478,10 +478,10 @@ func TestValueOrDefault(t *testing.T) {
 	t.Parallel()
 
 	s := "hello"
-	if got := v2.ValueOrDefault(&s, "default"); got != "hello" {
+	if got := v3.ValueOrDefault(&s, "default"); got != "hello" {
 		t.Errorf("ValueOrDefault = %q, want %q", got, "hello")
 	}
-	if got := v2.ValueOrDefault[string](nil, "default"); got != "default" {
+	if got := v3.ValueOrDefault[string](nil, "default"); got != "default" {
 		t.Errorf("ValueOrDefault(nil) = %q, want %q", got, "default")
 	}
 }
@@ -492,10 +492,10 @@ func TestEnsureValid(t *testing.T) {
 	t.Parallel()
 
 	s := "value"
-	if err := v2.EnsureValid(&s, "test"); err != nil {
+	if err := v3.EnsureValid(&s, "test"); err != nil {
 		t.Errorf("EnsureValid with non-nil: %v", err)
 	}
-	if err := v2.EnsureValid[string](nil, "test"); err == nil {
+	if err := v3.EnsureValid[string](nil, "test"); err == nil {
 		t.Error("EnsureValid with nil should error")
 	}
 }
@@ -691,7 +691,7 @@ func TestTaskStore_IDs(t *testing.T) {
 func TestParseDuration(t *testing.T) {
 	t.Parallel()
 
-	got, err := v2.ParseDuration("5s")
+	got, err := v3.ParseDuration("5s")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -705,7 +705,7 @@ func TestParseDuration(t *testing.T) {
 func TestDurationType(t *testing.T) {
 	t.Parallel()
 
-	d, err := v2.ParseDuration("1h30m")
+	d, err := v3.ParseDuration("1h30m")
 	if err != nil {
 		t.Fatalf("ParseDuration: %v", err)
 	}
@@ -719,7 +719,7 @@ func TestDurationType(t *testing.T) {
 func TestLogLevelType(t *testing.T) {
 	t.Parallel()
 
-	ll, err := v2.ParseLogLevel("debug")
+	ll, err := v3.ParseLogLevel("debug")
 	if err != nil {
 		t.Fatalf("ParseLogLevel: %v", err)
 	}
@@ -733,7 +733,7 @@ func TestLogLevelType(t *testing.T) {
 func TestEnumType(t *testing.T) {
 	t.Parallel()
 
-	e, err := v2.ParseEnum("high", []string{"low", "medium", "high"})
+	e, err := v3.ParseEnum("high", []string{"low", "medium", "high"})
 	if err != nil {
 		t.Fatalf("ParseEnum: %v", err)
 	}
@@ -745,7 +745,7 @@ func TestEnumType(t *testing.T) {
 func TestEnumType_Invalid(t *testing.T) {
 	t.Parallel()
 
-	_, err := v2.ParseEnum("urgent", []string{"low", "medium", "high"})
+	_, err := v3.ParseEnum("urgent", []string{"low", "medium", "high"})
 	if err == nil {
 		t.Fatal("expected error for invalid enum value")
 	}
@@ -756,7 +756,7 @@ func TestEnumType_Invalid(t *testing.T) {
 func TestPortType(t *testing.T) {
 	t.Parallel()
 
-	p, err := v2.ParsePort("8080")
+	p, err := v3.ParsePort("8080")
 	if err != nil {
 		t.Fatalf("ParsePort: %v", err)
 	}
@@ -779,7 +779,7 @@ func TestCommandError(t *testing.T) {
 	t.Parallel()
 
 	inner := fmt.Errorf("inner error")
-	cmdErr := v2.NewCommandError("test", inner)
+	cmdErr := v3.NewCommandError("test", inner)
 	if !strings.Contains(cmdErr.Error(), "test") {
 		t.Errorf("CommandError should contain command name: %v", cmdErr)
 	}
@@ -789,7 +789,7 @@ func TestServiceError(t *testing.T) {
 	t.Parallel()
 
 	inner := fmt.Errorf("inner error")
-	svcErr := v2.NewServiceError("*TaskStore", inner)
+	svcErr := v3.NewServiceError("*TaskStore", inner)
 	if !strings.Contains(svcErr.Error(), "*TaskStore") {
 		t.Errorf("ServiceError should contain service type: %v", svcErr)
 	}
@@ -800,7 +800,7 @@ func TestServiceError(t *testing.T) {
 func TestNewExitError(t *testing.T) {
 	t.Parallel()
 
-	exitErr, err := v2.NewExitError(42, fmt.Errorf("test"))
+	exitErr, err := v3.NewExitError(42, fmt.Errorf("test"))
 	if err != nil {
 		t.Fatalf("NewExitError: %v", err)
 	}
@@ -812,7 +812,7 @@ func TestNewExitError(t *testing.T) {
 func TestNewExitError_InvalidCode(t *testing.T) {
 	t.Parallel()
 
-	_, err := v2.NewExitError(300, fmt.Errorf("test"))
+	_, err := v3.NewExitError(300, fmt.Errorf("test"))
 	if err == nil {
 		t.Fatal("expected error for invalid exit code")
 	}
@@ -823,7 +823,7 @@ func TestNewExitError_InvalidCode(t *testing.T) {
 func TestFlagError(t *testing.T) {
 	t.Parallel()
 
-	flagErr := v2.NewFlagError("port", fmt.Errorf("out of range"))
+	flagErr := v3.NewFlagError("port", fmt.Errorf("out of range"))
 	if !strings.Contains(flagErr.Error(), "port") {
 		t.Errorf("FlagError should contain flag name: %v", flagErr)
 	}
@@ -832,7 +832,7 @@ func TestFlagError(t *testing.T) {
 func TestFlagError_WithSuggestion(t *testing.T) {
 	t.Parallel()
 
-	flagErr := v2.NewFlagErrorWithSuggestion("prot", fmt.Errorf("unknown flag"), "port")
+	flagErr := v3.NewFlagErrorWithSuggestion("prot", fmt.Errorf("unknown flag"), "port")
 	if flagErr.Suggestion != "port" {
 		t.Errorf("Suggestion = %q, want %q", flagErr.Suggestion, "port")
 	}
@@ -849,17 +849,17 @@ func TestCloneAndOverride(t *testing.T) {
 
 		cli := newTestCLI(t)
 
-		clonedScope := v2.CloneScope(cli.Scope())
+		clonedScope := v3.CloneScope(cli.Scope())
 
 		overrideStore := &TaskStore{tasks: []Task{
 			{ID: 99, Title: "mocked task", Priority: "high", Done: true, CreatedAt: time.Now()},
 		}, next: 100}
 
-		if err := v2.OverrideValue(clonedScope, overrideStore); err != nil {
+		if err := v3.OverrideValue(clonedScope, overrideStore); err != nil {
 			t.Fatalf("OverrideValue failed: %v", err)
 		}
 
-		store, err := v2.Invoke[*TaskStore](clonedScope)
+		store, err := v3.Invoke[*TaskStore](clonedScope)
 		if err != nil {
 			t.Fatalf("Invoke on cloned scope failed: %v", err)
 		}

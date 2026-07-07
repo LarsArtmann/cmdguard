@@ -3,7 +3,7 @@ module github.com/larsartmann/cmdguard/manpage
 go 1.26.4
 
 require (
-	github.com/larsartmann/cmdguard/v2 v2.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/v3 v3.0.0-00010101000000-000000000000
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-cobra v1.3.0
 	github.com/muesli/roff v0.1.0
@@ -59,4 +59,4 @@ require (
 	golang.org/x/text v0.39.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v2 => ../../..
+replace github.com/larsartmann/cmdguard/v3 => ../../..
