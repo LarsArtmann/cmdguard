@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed (post-v3.0.0)
+
+- **Sub-module external resolution** — the 5 sub-modules were moved from `pkg/cmdguard/<name>/` to the repo root (`<name>/`) so their module paths (`github.com/larsartmann/cmdguard/<name>`) resolve for external consumers. Previously the `replace` directives in the root `go.mod` only worked locally; consumers got "missing go.mod at revision". Each sub-module's `go.mod` now requires the real published `cmdguard/v3 v3.0.0` (not the placeholder).
+- **telemetry sub-module compile error** — `WithTelemetry` returned `v3.CLIOption[T]` (non-existent generic); now returns non-generic `v3.CLIOption`.
+
+### Added (post-v3.0.0)
+
+- Sub-module releases tagged at `v0.1.0` each: `glamour/v0.1.0`, `manpage/v0.1.0`, `prompts/v0.1.0`, `spinner/v0.1.0`, `telemetry/v0.1.0`. These are the first independently versioned releases of the extracted modules.
+
 ## [3.0.0] - 2026-07-07
 
 > **⚠️ Version correction:** The v3 redesign was initially mis-tagged as `v2.11.0` on the `/v2` module path — a semver violation since the API is breaking. That tag has been deleted and retracted. The module path is now `github.com/larsartmann/cmdguard/v3`. If you pulled `v2.11.0`, switch to `v3.0.0` (update import paths from `/v2` to `/v3`). The v2 line continues at `v2.10.4` (retracts the bad `v2.11.0`).
