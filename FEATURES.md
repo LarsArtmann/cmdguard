@@ -12,7 +12,7 @@
 
 ---
 
-## v2 API (pkg/cmdguard/v2)
+## v3 API (pkg/cmdguard/v3)
 
 ### CLI[T]
 
@@ -304,8 +304,8 @@ bridge the typed cmdguard world to raw cobra handlers.
 
 | Package                      | Coverage  | Status  |
 | ---------------------------- | --------- | ------- |
-| `pkg/cmdguard/v2`            | ~86.6%    | ✅ Good |
-| `pkg/cmdguard/v2/configload` | ~87.5%    | ✅ Good |
+| `pkg/cmdguard/v3`            | ~87.3%    | ✅ Good |
+| `pkg/cmdguard/v3/configload` | ~87.5%    | ✅ Good |
 | Benchmarks                   | 26 total  | ✅ Good |
 | Fuzz tests                   | 7 targets | ✅ Good |
 

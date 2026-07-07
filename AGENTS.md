@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-07-05
+**Last Updated:** 2026-07-07
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v2.10.2 - zero panics, 86.7% coverage, 0 lint issues, 0 race conditions
+**Status:** v3.0.0 - zero panics, 87.3% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -44,9 +44,11 @@ nix flake check
 
 | API | Package           | Use Case                         |
 | --- | ----------------- | -------------------------------- |
-| v2  | `pkg/cmdguard/v2` | Type-safe, DI-powered, no panics |
+| v3  | `pkg/cmdguard/v3` | Type-safe, DI-powered, no panics |
 
-**Current Status:** v2.10.2. 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 86.7% coverage, 0 build errors.
+**Module path:** `github.com/larsartmann/cmdguard/v3`
+
+**Current Status:** v3.0.0. 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 87.3% coverage, 0 build errors.
 
 ---
 
@@ -55,7 +57,7 @@ nix flake check
 ```
 cmdguard/
 ├── pkg/cmdguard/
-│   ├── v2/                       # v2 API (recommended)
+│   ├── v3/                       # v3 API (recommended)
 │   │   ├── cli.go                # CLI[T] struct, NewCLI, AddCommand, Execute
 │   │   ├── cli_accessors.go      # CLI accessor methods (Config, Scope, etc.)
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
@@ -139,7 +141,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v2` | Type-safe API | Yes         | ~86.7%   |
+| `pkg/cmdguard/v3` | Type-safe API | Yes         | ~87.3%   |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -164,7 +166,7 @@ cmdguard/
 
 See [docs/API.md](docs/API.md) for the full API reference (constructors, options, methods, DI, middleware, error handling, version/doctor commands).
 
-Quick reference: `NewCLI[T]`, `NewCommand[T,F]`, `NewParentCommand[T,F]`, `AddCommand`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2) for godoc.
+Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positionally), `NewParentCommand[T]`, `AddCommand`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) for godoc.
 
 ---
 
@@ -175,7 +177,7 @@ Quick reference: `NewCLI[T]`, `NewCommand[T,F]`, `NewParentCommand[T,F]`, `AddCo
 - **Go 1.26** - Use modern Go features
 - **gofumpt** formatting (via `golangci-lint fmt`)
 - **Error handling** - Always check errors, wrap with `fmt.Errorf("context: %w", err)`
-- **No panics** in v2 library code
+- **No panics** in v3 library code
 - **Functional options** pattern for configuration
 - **Constructor pattern** - All Command creation via `NewCommand`/`NewParentCommand`, struct fields unexported
 
@@ -185,7 +187,7 @@ Quick reference: `NewCLI[T]`, `NewCommand[T,F]`, `NewParentCommand[T,F]`, `AddCo
 - `//nolint:paralleltest` for tests using `t.Setenv` or capturing `os.Stdout`
 - `//nolint:fatcontext` at file level for test files with context in closures
 - Table-driven tests: `tests := []struct{...}` pattern
-- Two test packages: `v2` (internal, access private helpers) and `v2_test` (external)
+- Two test packages: `v3` (internal, access private helpers) and `v3_test` (external)
 
 ### Test Commands
 
@@ -200,7 +202,7 @@ go build ./...                                   # Verify build
 
 ## Architecture Decisions
 
-### v2 Design Principles
+### v3 Design Principles
 
 1. **Single type parameter** - `CLI[T]` only parameterizes on config; each command has its own flags type
 2. **No Panics** - All operations return errors

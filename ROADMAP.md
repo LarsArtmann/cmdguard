@@ -150,7 +150,7 @@ not lost.
 
 ## go-output Dependency Architecture
 
-> **Status:** Integrated in v2.x via `pkg/cmdguard/v2/output.go`. Published at v0.17.0.
+> **Status:** Integrated in v2.x via `pkg/cmdguard/v3/output.go`. Published at v0.17.0.
 
 `go-output` provides 16 output formats as an independent module tree (root + 9 direct sub-modules + 3 indirect, all pinned in lockstep). Consumers already only pay the dependency cost when they use `--output`.
 

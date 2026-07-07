@@ -25,10 +25,10 @@ cmdguard is a **library**, not an executable. You use it to build your own CLI t
 // This is what YOU build with cmdguard
 package main
 
-import "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 
 func main() {
-    cli, _ := v2.New[AppConfig, v2.NoFlags]("myapp", "My CLI", AppConfig{})
+    cli, _ := v3.New[AppConfig, v3.NoFlags]("myapp", "My CLI", AppConfig{})
     cli.ExecuteAndExit(context.Background())
 }
 ```
@@ -72,7 +72,7 @@ type MyFlags struct {
 
 cmdguard doesn't provide:
 
-- Advanced config file loading (JSON built-in via WithConfigFile; for YAML/TOML use [configload](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/configload) or [knadh/koanf](https://github.com/knadh/koanf) for nested structs)
+- Advanced config file loading (JSON built-in via WithConfigFile; for YAML/TOML use [configload](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/configload) or [knadh/koanf](https://github.com/knadh/koanf) for nested structs)
 - Built-in logging (use your preferred logger)
 - Database ORMs
 - Web servers

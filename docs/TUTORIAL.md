@@ -25,7 +25,7 @@ Create a new Go module:
 ```bash
 mkdir taskctl && cd taskctl
 go mod init taskctl
-go get github.com/larsartmann/cmdguard/v2
+go get github.com/larsartmann/cmdguard/v3
 ```
 
 Create `main.go`:
@@ -38,7 +38,7 @@ import (
     "fmt"
     "os"
 
-    v2 "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+    v2 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
 type AppConfig struct {
@@ -46,7 +46,7 @@ type AppConfig struct {
 }
 
 func main() {
-    cli, err := v2.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
+    cli, err := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
@@ -79,20 +79,20 @@ type AddFlags struct {
     Priority string `flag:"priority" short:"p" default:"medium" help:"low, medium, or high"`
 }
 
-addCmd, err := v2.NewCommand[AppConfig, *AddFlags]("add",
+addCmd, err := v3.NewCommand[AppConfig, *AddFlags]("add",
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
         fmt.Printf("Adding task: %s [%s]\n", flags.Title, flags.Priority)
         return nil
     },
-    v2.WithShort[AppConfig, *AddFlags]("Add a new task"),
-    v2.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
+    v3.WithShort[AppConfig, *AddFlags]("Add a new task"),
+    v3.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
 )
 if err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
 }
 
-if err := v2.AddCommand(cli, addCmd); err != nil {
+if err := v3.AddCommand(cli, addCmd); err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
 }
@@ -127,9 +127,9 @@ type TaskStore struct {
     tasks []string
 }
 
-cli, _ := v2.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
+cli, _ := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
 
-v2.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
+v3.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
     fmt.Println("[store] initialized")
     return &TaskStore{tasks: []string{}}, nil
 })
@@ -138,9 +138,9 @@ v2.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
 Now commands can access the store:
 
 ```go
-addCmd, _ := v2.NewCommand[AppConfig, *AddFlags]("add",
+addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
-        store, err := v2.Invoke[*TaskStore](cli.Scope())
+        store, err := v3.Invoke[*TaskStore](cli.Scope())
         if err != nil {
             return err
         }
@@ -148,8 +148,8 @@ addCmd, _ := v2.NewCommand[AppConfig, *AddFlags]("add",
         fmt.Printf("Added task #%d: %s\n", len(store.tasks), flags.Title)
         return nil
     },
-    v2.WithShort[AppConfig, *AddFlags]("Add a new task"),
-    v2.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
+    v3.WithShort[AppConfig, *AddFlags]("Add a new task"),
+    v3.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
 )
 ```
 
@@ -162,16 +162,16 @@ type ListFlags struct {
     Format string `flag:"format" short:"f" default:"table" help:"Output format (table, json, csv, yaml)"`
 }
 
-listCmd, _ := v2.NewCommand[AppConfig, *ListFlags]("list",
+listCmd, _ := v3.NewCommand[AppConfig, *ListFlags]("list",
     func(ctx context.Context, cfg *AppConfig, flags *ListFlags) error {
-        store, _ := v2.Invoke[*TaskStore](cli.Scope())
+        store, _ := v3.Invoke[*TaskStore](cli.Scope())
 
         if len(store.tasks) == 0 {
             fmt.Println("No tasks found.")
             return nil
         }
 
-        format, _ := v2.ParseOutputFormat(flags.Format)
+        format, _ := v3.ParseOutputFormat(flags.Format)
 
         headers := []string{"#", "Title"}
         rows := make([][]string, len(store.tasks))
@@ -179,10 +179,10 @@ listCmd, _ := v2.NewCommand[AppConfig, *ListFlags]("list",
             rows[i] = []string{fmt.Sprintf("%d", i+1), t}
         }
 
-        return v2.OutputTable(format, headers, rows)
+        return v3.OutputTable(format, headers, rows)
     },
-    v2.WithShort[AppConfig, *ListFlags]("List all tasks"),
-    v2.WithFlags[AppConfig, *ListFlags](&ListFlags{}),
+    v3.WithShort[AppConfig, *ListFlags]("List all tasks"),
+    v3.WithFlags[AppConfig, *ListFlags](&ListFlags{}),
 )
 ```
 
@@ -203,11 +203,11 @@ go run main.go list --format yaml  # YAML
 Validate input before the handler runs:
 
 ```go
-addCmd, _ := v2.NewCommand[AppConfig, *AddFlags]("add",
+addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
     addHandler,
-    v2.WithShort[AppConfig, *AddFlags]("Add a new task"),
-    v2.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
-    v2.WithPreRunE[AppConfig, *AddFlags](
+    v3.WithShort[AppConfig, *AddFlags]("Add a new task"),
+    v3.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
+    v3.WithPreRunE[AppConfig, *AddFlags](
         func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
             if len(flags.Title) < 3 {
                 return fmt.Errorf("title must be at least 3 characters")
@@ -233,7 +233,7 @@ addCmd, _ := v2.NewCommand[AppConfig, *AddFlags]("add",
 ## Step 6: Add Cleanup with PostRunE
 
 ```go
-v2.WithPostRunE[AppConfig, *AddFlags](
+v3.WithPostRunE[AppConfig, *AddFlags](
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
         fmt.Println("[cleanup] flushing to disk")
         return nil
@@ -250,12 +250,12 @@ v2.WithPostRunE[AppConfig, *AddFlags](
 Middleware wraps every command handler:
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
-    v2.WithMiddleware[AppConfig](
-        v2.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+cli, _ := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
+    v3.WithMiddleware[AppConfig](
+        v3.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
             fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
         }),
-        v2.RecoveryMiddleware[AppConfig](),
+        v3.RecoveryMiddleware[AppConfig](),
     ),
 )
 ```
@@ -267,8 +267,8 @@ Now every command is timed and panic-safe.
 ## Step 8: Add Signal Handling
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
-    v2.WithSignalHandling[AppConfig](),
+cli, _ := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
+    v3.WithSignalHandling[AppConfig](),
 )
 ```
 
@@ -302,8 +302,8 @@ type AppConfig struct {
 Or use `WithEnvPrefix` to prefix all env lookups:
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
-    v2.WithEnvPrefix[AppConfig]("TASKCTL_"),
+cli, _ := v3.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
+    v3.WithEnvPrefix[AppConfig]("TASKCTL_"),
 )
 ```
 
@@ -316,14 +316,14 @@ Priority chain: **explicit flag → env var → default value**.
 Return typed errors with exit codes for CI/automation:
 
 ```go
-doneCmd, _ := v2.NewCommand[AppConfig, *DoneFlags]("done",
+doneCmd, _ := v3.NewCommand[AppConfig, *DoneFlags]("done",
     func(ctx context.Context, cfg *AppConfig, flags *DoneFlags) error {
         // task not found? Exit with code 2
-        exitErr, _ := v2.NewExitError(2, fmt.Errorf("task %d not found", flags.ID))
+        exitErr, _ := v3.NewExitError(2, fmt.Errorf("task %d not found", flags.ID))
         return exitErr
     },
-    v2.WithShort[AppConfig, *DoneFlags]("Mark a task as done"),
-    v2.WithFlags[AppConfig, *DoneFlags](&DoneFlags{}),
+    v3.WithShort[AppConfig, *DoneFlags]("Mark a task as done"),
+    v3.WithFlags[AppConfig, *DoneFlags](&DoneFlags{}),
 )
 ```
 
@@ -339,7 +339,7 @@ See [`examples/kitchen-sink/`](../examples/kitchen-sink/) for a fully working pr
 
 ## Next Steps
 
-- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2) for the full API
+- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) for the full API
 - See the [Quick Start Guide](QUICKSTART.md) for a complete feature tour
 - Check [MIGRATION_FROM_COBRA.md](MIGRATION_FROM_COBRA.md) if you're migrating an existing Cobra app
 - Browse [examples/](../examples/) for more working demos

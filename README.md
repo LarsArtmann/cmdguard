@@ -1,7 +1,7 @@
 # cmdguard
 
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v2.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v3.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -73,7 +73,7 @@ down resources), use `ExitCode` instead of `ExecuteAndExit`:
 ```go
 err := cli.Execute(ctx)
 // ...flush / export audit log / teardown...
-os.Exit(v2.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
+os.Exit(v3.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
 ```
 
 > Pitfall to avoid: `if err := cli.Execute(ctx); err != nil { fmt.Fprintln(os.Stderr, err) }`
@@ -84,7 +84,7 @@ os.Exit(v2.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
 ## Quick Start
 
 ```bash
-go get github.com/larsartmann/cmdguard/v2
+go get github.com/larsartmann/cmdguard/v3
 ```
 
 ```go
@@ -96,7 +96,7 @@ import (
     "os"
     "strings"
 
-    "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2"
+    "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
 )
 
 type AppConfig struct {
@@ -110,13 +110,13 @@ type GreetFlags struct {
 }
 
 func main() {
-    cli, err := v2.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
+    cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
         os.Exit(1)
     }
 
-    greetCmd, err := v2.NewCommand[AppConfig, *GreetFlags]("greet",
+    greetCmd, err := v3.NewCommand("greet", &GreetFlags{},
         func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
             if flags.Shout {
@@ -125,15 +125,14 @@ func main() {
             fmt.Println(msg)
             return nil
         },
-        v2.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-        v2.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+        v3.WithShort("Greet someone"),
     )
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create command: %v\n", err)
         os.Exit(1)
     }
 
-    v2.AddCommand(cli, greetCmd)
+    v3.AddCommand(cli, greetCmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```
@@ -154,20 +153,20 @@ HELLO, CMDGUARD!
 | **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks         |
 | **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                       |
 | **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more               |
-| **Signal handling**        | `WithSignalHandling[T]()` — Ctrl+C cancels context in all handlers                                      |
+| **Signal handling**        | `WithSignalHandling()` — Ctrl+C cancels context in all handlers                                         |
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                        |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                          |
 | **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                           |
 | **Editor support**         | `EditInEditor()` — open `$EDITOR` for user input                                                        |
-| **Config files**           | `WithConfigFile[T](paths...)` — JSON/YAML/TOML auto-loading with flag override                          |
+| **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                             |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                 |
 | **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                          |
 | **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, `SpinnerMiddleware`, `TelemetryMiddleware`, or write your own |
 | **Interactive prompts**    | `WithPromptOnMissing[T,F]()` with `prompt:"Question?"` tag via huh                                      |
-| **Markdown help**          | `WithGlamourHelp[T]()` renders Long/Example as styled markdown via glamour                              |
+| **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                |
 | **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                       |
-| **Shell completion**       | Dynamic completion via `WithCompletion[T, F](fn)`                                                       |
-| **Man page generation**    | `GenerateManPageCommand[T](cli)` for roff output                                                        |
+| **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                             |
+| **Man page generation**    | `manpage.GenerateCommand[T](cli)` for roff output                                                       |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                            |
 | **Zero panics**            | All functions return errors; no Must\* panic variants                                                   |
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime |
@@ -182,18 +181,18 @@ HELLO, CMDGUARD!
 Register services on the CLI scope and invoke them in handlers:
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{})
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{})
 scope := cli.Scope()
 
 // Register (lazy initialization)
-v2.Provide(scope, func(i do.Injector) (*Database, error) {
+v3.Provide(scope, func(i do.Injector) (*Database, error) {
     return &Database{DSN: "postgres://..."}, nil
 })
 
 // Invoke in handlers
-v2.NewCommand[AppConfig, v2.NoFlags]("query",
-    func(ctx context.Context, cfg *AppConfig, flags v2.NoFlags) error {
-        db, _ := v2.Invoke[*Database](cli.Scope())
+v3.NewCommand("query", v3.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
+        db, _ := v3.Invoke[*Database](cli.Scope())
         return db.Query(ctx)
     },
 )
@@ -212,8 +211,8 @@ type DBFlags struct {
     Password string `flag:"password" env:"DB_PASSWORD"                     help:"Database password"`
 }
 
-cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v2.WithEnvPrefix[AppConfig]("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithEnvPrefix("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
 )
 ```
 
@@ -226,12 +225,12 @@ Priority chain: **explicit flag → env var → config file → default value**.
 ```go
 import "github.com/larsartmann/go-output"
 
-v2.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
-v2.OutputTable(output.FormatJSON, headers, rows)    // JSON array
-v2.OutputTable(output.FormatYAML, headers, rows)    // YAML
+v3.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
+v3.OutputTable(output.FormatJSON, headers, rows)    // JSON array
+v3.OutputTable(output.FormatYAML, headers, rows)    // YAML
 
 format, _ := output.ParseFormat("csv")
-v2.OutputTable(format, headers, rows)
+v3.OutputTable(format, headers, rows)
 ```
 
 All 16 formats: `table`, `json`, `csv`, `tsv`, `markdown`, `xml`, `yaml`, `html`, `d2`, `tree`, `mermaid`, `dot`, `jsonl`, `asciidoc`, `toml`, `plantuml`.
@@ -241,17 +240,18 @@ All 16 formats: `table`, `json`, `csv`, `tsv`, `markdown`, `xml`, `yaml`, `html`
 ## Subcommands
 
 ```go
-listCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("list", listHandler,
-    v2.WithShort[AppConfig, v2.NoFlags]("List users"),
+listCmd, _ := v3.NewCommand("list", v3.NoFlags{}, listHandler,
+    v3.WithShort("List users"),
 )
-createCmd, _ := v2.NewCommand[AppConfig, v2.NoFlags]("create", createHandler,
-    v2.WithShort[AppConfig, v2.NoFlags]("Create a user"),
+createCmd, _ := v3.NewCommand("create", v3.NoFlags{}, createHandler,
+    v3.WithShort("Create a user"),
 )
-userCmd, _ := v2.NewParentCommand[AppConfig, v2.NoFlags]("user",
-    "User management", []v2.Command[AppConfig, v2.NoFlags]{listCmd, createCmd},
-    v2.WithShort[AppConfig, v2.NoFlags]("User management"),
+userCmd, _ := v3.NewParentCommand[AppConfig]("user",
+    "User management", v3.NoFlags{},
+    v3.WithSubcommands(listCmd, createCmd),
+    v3.WithShort("User management"),
 )
-v2.AddCommand(cli, userCmd)
+v3.AddCommand(cli, userCmd)
 ```
 
 ---
@@ -259,11 +259,11 @@ v2.AddCommand(cli, userCmd)
 ## Lifecycle Hooks
 
 ```go
-v2.NewCommand[AppConfig, *Flags]("deploy", runHandler,
-    v2.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+v3.NewCommand("deploy", &Flags{}, runHandler,
+    v3.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return validateConfig(flags)
     }),
-    v2.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    v3.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return cleanup()
     }),
 )
@@ -287,14 +287,14 @@ cli.RootCommand().AddCommand(myRawCmd)
 
 // 2. Access resolved config from any cobra command context
 func(cmd *cobra.Command, _ []string) error {
-    cfg, ok := v2.ConfigFromContext[AppConfig](cmd.Context())
+    cfg, ok := v3.ConfigFromContext[AppConfig](cmd.Context())
     if !ok { return errors.New("config not initialized") }
     // use cfg.Field...
 }
 
 // 3. Run initialization (DI, logging, session) after flag parsing
-cli, _ := v2.NewCLI[AppConfig]("app", "...", AppConfig{},
-    v2.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
+cli, _ := v3.NewCLI[AppConfig]("app", "...", AppConfig{},
+    v3.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
         // Flags are parsed, config is resolved, context is stored.
         // Initialize DI, set up logging, store session for subcommands.
         return initDI(cfg)
@@ -324,9 +324,9 @@ that need the root's execution-flag group.
 Add your own with `RegisterTypeHandler()`:
 
 ```go
-v2.RegisterTypeHandler(reflect.TypeFor[MyType](), v2.TypeHandlerFunc{
-    ParseFunc:    func(value string, _ v2.FlagTag) (any, error) { return MyType{Value: value}, nil },
-    DefaultFunc:  func(_ v2.FlagTag) any { return MyType{} },
+v3.RegisterTypeHandler(reflect.TypeFor[MyType](), v3.TypeHandlerFunc{
+    ParseFunc:    func(value string, _ v3.FlagTag) (any, error) { return MyType{Value: value}, nil },
+    DefaultFunc:  func(_ v3.FlagTag) any { return MyType{} },
 })
 ```
 
@@ -361,87 +361,87 @@ type Flags struct {
 
 ## Command Options
 
-| Option                           | Purpose                            |
-| -------------------------------- | ---------------------------------- |
-| `WithShort[T, F](short)`         | Short description                  |
-| `WithLong[T, F](long)`           | Long description                   |
-| `WithExample[T, F](example)`     | Example usage                      |
-| `WithAliases[T, F](aliases...)`  | Alternative names                  |
-| `WithFlags[T, F](flags)`         | Typed flags struct                 |
-| `WithPreRunE[T, F](fn)`          | Pre-validation hook                |
-| `WithPostRunE[T, F](fn)`         | Post-success cleanup               |
-| `WithHidden[T, F](bool)`         | Hide from help                     |
-| `WithDeprecated[T, F](msg)`      | Deprecation message                |
-| `WithGroupID[T, F](id)`          | Help group name                    |
-| `WithExactArgs[T, F](n)`         | Require exactly n positional args  |
-| `WithMinimumArgs[T, F](n)`       | Require at least n positional args |
-| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args    |
-| `WithValidArgs[T, F](args...)`   | Restrict args to allowed values    |
-| `WithSubcommands[T, F](cmds...)` | Attach child commands (parent)     |
-| `WithRangeArgs[T, F](min, max)`  | Require between min and max args   |
-| `WithNoArgs[T, F]()`             | Reject any positional args         |
-| `WithCompletion[T, F](fn)`       | Dynamic shell completion           |
+| Option                                        | Purpose                            |
+| --------------------------------------------- | ---------------------------------- |
+| `WithShort(short)`                            | Short description                  |
+| `WithLong(long)`                              | Long description                   |
+| `WithExample(example)`                        | Example usage                      |
+| `WithAliases(aliases...)`                     | Alternative names                  |
+| _(flags passed positionally to `NewCommand`)_ | —                                  |
+| `WithPreRunE[T, F](fn)`                       | Pre-validation hook                |
+| `WithPostRunE[T, F](fn)`                      | Post-success cleanup               |
+| `WithHidden(bool)`                            | Hide from help                     |
+| `WithDeprecated(msg)`                         | Deprecation message                |
+| `WithGroupID(id)`                             | Help group name                    |
+| `WithExactArgs(n)`                            | Require exactly n positional args  |
+| `WithMinimumArgs(n)`                          | Require at least n positional args |
+| `WithMaximumArgs(n)`                          | Allow at most n positional args    |
+| `WithValidArgs(args...)`                      | Restrict args to allowed values    |
+| `WithSubcommands(cmds...)`                    | Attach child commands (parent)     |
+| `WithRangeArgs(min, max)`                     | Require between min and max args   |
+| `WithNoArgs()`                                | Reject any positional args         |
+| `WithCompletion(fn)`                          | Dynamic shell completion           |
 
 ---
 
 ## CLI Options
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v2.WithCLIVersion[AppConfig]("1.0.0"),
-    v2.WithEnvPrefix[AppConfig]("MYAPP_"),
-    v2.WithSignalHandling[AppConfig](),
-    v2.WithFang[AppConfig](true),                  // Styled help output
-    v2.WithMiddleware[AppConfig](myMiddleware),     // Wrap all handlers
-    v2.WithStrictValidation[AppConfig](),           // Require WithShort on commands
-    v2.WithConfigValidation[AppConfig](validateFn), // Validate config after parsing
-    v2.WithPostFlagParse[AppConfig](initFn),        // DI init / session storage after flags
+cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v3.WithCLIVersion("1.0.0"),
+    v3.WithEnvPrefix("MYAPP_"),
+    v3.WithSignalHandling(),
+    v3.WithFang(true),                  // Styled help output
+    v3.WithMiddleware[AppConfig](myMiddleware),     // Wrap all handlers
+    v3.WithStrictValidation(),           // Require WithShort on commands
+    v3.WithConfigValidation[AppConfig](validateFn), // Validate config after parsing
+    v3.WithPostFlagParse[AppConfig](initFn),        // DI init / session storage after flags
 )
 ```
 
-| Option                                 | Purpose                                                       |
-| -------------------------------------- | ------------------------------------------------------------- |
-| `WithCLIVersion[T](v)`                 | Version string                                                |
-| `WithCLILong[T](desc)`                 | Long description                                              |
-| `WithSilenceErrors[T]()`               | Suppress error printing (advanced; fang handles this)         |
-| `WithSilenceUsage[T]()`                | Suppress usage on error (**default**; kept for compatibility) |
-| `WithFang[T](bool)`                    | Styled help output                                            |
-| `WithEnvPrefix[T](prefix)`             | Prefix for env vars                                           |
-| `WithSignalHandling[T]()`              | Cancel context on SIGINT/SIGTERM                              |
-| `WithMiddleware[T](mw...)`             | Middleware for all commands                                   |
-| `WithGroup[T](id, title)`              | Help group on root                                            |
-| `WithConfigValidation[T](fn)`          | Validate config after flag parsing                            |
-| `WithPostFlagParse[T](fn...)`          | Post-parse hook: DI init, session storage                     |
-| `WithCleanup[T](fn...)`                | Post-RunE cleanup that fires even when RunE errors            |
-| `WithStrictValidation[T]()`            | Require `WithShort` on all commands                           |
-| `WithDraconianValidation[T]()`         | Strict + require `WithExample` on leaf commands               |
-| `WithConfigFile[T](paths...)`          | Auto-load JSON config from first found path                   |
-| `WithConfigFileLoader[T](l, paths...)` | Load config with custom loader (YAML/TOML)                    |
-| `WithGlamourHelp[T]()`                 | Render markdown in command help text                          |
-| `WithTelemetry[T](tracer)`             | OpenTelemetry spans for all commands                          |
+| Option                              | Purpose                                                       |
+| ----------------------------------- | ------------------------------------------------------------- |
+| `WithCLIVersion(v)`                 | Version string                                                |
+| `WithCLILong(desc)`                 | Long description                                              |
+| `WithSilenceErrors()`               | Suppress error printing (advanced; fang handles this)         |
+| `WithSilenceUsage()`                | Suppress usage on error (**default**; kept for compatibility) |
+| `WithFang(bool)`                    | Styled help output                                            |
+| `WithEnvPrefix(prefix)`             | Prefix for env vars                                           |
+| `WithSignalHandling()`              | Cancel context on SIGINT/SIGTERM                              |
+| `WithMiddleware[T](mw...)`          | Middleware for all commands                                   |
+| `WithGroup(id, title)`              | Help group on root                                            |
+| `WithConfigValidation[T](fn)`       | Validate config after flag parsing                            |
+| `WithPostFlagParse[T](fn...)`       | Post-parse hook: DI init, session storage                     |
+| `WithCleanup[T](fn...)`             | Post-RunE cleanup that fires even when RunE errors            |
+| `WithStrictValidation()`            | Require `WithShort` on all commands                           |
+| `WithDraconianValidation()`         | Strict + require `WithExample` on leaf commands               |
+| `WithConfigFile(paths...)`          | Auto-load JSON config from first found path                   |
+| `WithConfigFileLoader(l, paths...)` | Load config with custom loader (YAML/TOML)                    |
+| `glamour.WithHelp()`                | Render markdown in command help text (glamour sub-module)     |
+| `WithTelemetry[T](tracer)`          | OpenTelemetry spans for all commands                          |
 
 ---
 
 ## Error Handling
 
 ```go
-// All v2 functions return errors — zero panics in library code
-cli, err := v2.NewCLI[Config]("app", "...", Config{})
-cmd, err := v2.NewCommand[Config, NoFlags]("test", handler)
+// All v3 functions return errors — zero panics in library code
+cli, err := v3.NewCLI[Config]("app", "...", Config{})
+cmd, err := v3.NewCommand("test", NoFlags{}, handler)
 
 // Sentinel errors for errors.Is()
-errors.Is(err, v2.ErrInvalidCommand)
-errors.Is(err, v2.ErrMissingHandler)
-errors.Is(err, v2.ErrDuplicateCommand)
+errors.Is(err, v3.ErrInvalidCommand)
+errors.Is(err, v3.ErrMissingHandler)
+errors.Is(err, v3.ErrDuplicateCommand)
 
 // Rich error types with context
-v2.NewCommandError(name, err)
-v2.NewFlagError(name, err)
-v2.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
-v2.NewExitError(code, err)                            // custom exit code
+v3.NewCommandError(name, err)
+v3.NewFlagError(name, err)
+v3.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
+v3.NewExitError(code, err)                            // custom exit code
 
 // ExitCoder interface — check with errors.As
-var exitCoder v2.ExitCoder
+var exitCoder v3.ExitCoder
 errors.As(err, &exitCoder)
 exitCoder.ExitCode() // returns custom exit code
 ```
@@ -453,8 +453,8 @@ exitCoder.ExitCode() // returns custom exit code
 ### JSON (built-in)
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v2.WithConfigFile[AppConfig]("~/.config/myapp/config.json", "/etc/myapp/config.json"),
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigFile("~/.config/myapp/config.json", "/etc/myapp/config.json"),
 )
 ```
 
@@ -463,14 +463,14 @@ Paths are tried in order; missing files are silently skipped. Supports `$ENV` an
 ### YAML / TOML (custom loaders)
 
 ```go
-import "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/configload"
+import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/configload"
 
-cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v2.WithConfigFileLoader[AppConfig](configload.YAML(), "config.yaml"),
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigFileLoader(configload.YAML(), "config.yaml"),
 )
 ```
 
-`configload.YAML()` and `configload.TOML()` return `ConfigFileLoader` implementations. See [`pkg/cmdguard/v2/configload/`](pkg/cmdguard/v2/configload/) for available loaders.
+`configload.YAML()` and `configload.TOML()` return `ConfigFileLoader` implementations. See [`pkg/cmdguard/v3/configload/`](pkg/cmdguard/v3/configload/) for available loaders.
 
 **Precedence:** explicit flag → env var → config file → default value (highest to lowest priority).
 
@@ -479,11 +479,13 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 ## Man Page Generation
 
 ```go
-manCmd, err := v2.GenerateManPageCommand[AppConfig](cli)
+import "github.com/larsartmann/cmdguard/manpage"
+
+manCmd, err := manpage.GenerateCommand[AppConfig](cli)
 if err != nil {
     log.Fatal(err)
 }
-v2.AddCommand(cli, manCmd)
+v3.AddCommand(cli, manCmd)
 // $ myapp man
 ```
 
@@ -497,7 +499,7 @@ Track the command execution path and share values across the hierarchy:
 
 ```go
 func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-    bfc, ok := v2.GetBranchingFlowContext(ctx)
+    bfc, ok := v3.GetBranchingFlowContext(ctx)
     if ok {
         fmt.Println("Path:", bfc.PathString()) // "myapp.resource.list"
         bfc.SetValue("key", "value")              // propagates to children
@@ -522,9 +524,9 @@ if cli.NoColor() {
 ```
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v2.WithFang[AppConfig](true),   // styled help (default)
-    v2.WithFang[AppConfig](false),  // plain text help
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithFang(true),   // styled help (default)
+    v3.WithFang(false),  // plain text help
 )
 ```
 
@@ -535,7 +537,7 @@ cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 Open the user's `$EDITOR` to edit content interactively:
 
 ```go
-edited, err := v2.EditInEditor(ctx, "# Edit your message here\n")
+edited, err := v3.EditInEditor(ctx, "# Edit your message here\n")
 if err != nil {
     return err
 }
@@ -547,15 +549,15 @@ fmt.Println("User wrote:", edited)
 ## Version Command
 
 ```go
-cli, _ := v2.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v2.WithCLIVersion[AppConfig]("1.0.0"),
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithCLIVersion("1.0.0"),
 )
 
-versionCmd, err := v2.VersionCommand[AppConfig](cli)
+versionCmd, err := v3.VersionCommand[AppConfig](cli)
 if err != nil {
     log.Fatal(err)
 }
-v2.AddCommand(cli, versionCmd)
+v3.AddCommand(cli, versionCmd)
 // $ myapp version
 ```
 
@@ -566,7 +568,7 @@ v2.AddCommand(cli, versionCmd)
 The `testutil` subpackage provides a harness for testing cmdguard CLIs:
 
 ```go
-import "github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2/testutil"
+import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/testutil"
 
 result := testutil.TestCLI(t, cli, []string{"greet", "--name", "Alice"})
 result.AssertNoError()
@@ -613,7 +615,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 - [Framework Comparison](docs/COMPARISON.md) — vs Kong, sflags, go-flags, urfave/cli
 - [Performance](docs/PERFORMANCE.md) — Benchmark results and overhead analysis
 - [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) — Design guidelines
-- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v2/pkg/cmdguard/v2) — Full API docs on pkg.go.dev
+- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) — Full API docs on pkg.go.dev
 
 ---
 

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-07-07
+
+> **⚠️ Version correction:** The v3 redesign was initially mis-tagged as `v2.11.0` on the `/v2` module path — a semver violation since the API is breaking. That tag has been deleted and retracted. The module path is now `github.com/larsartmann/cmdguard/v3`. If you pulled `v2.11.0`, switch to `v3.0.0` (update import paths from `/v2` to `/v3`). The v2 line continues at `v2.10.4` (retracts the bad `v2.11.0`).
+
 ### Breaking Changes — v3 API Redesign
 
 #### Command API: Non-generic options + type inference
@@ -31,8 +35,8 @@ v2.NewCommand[AppConfig, *ListFlags]("list", handler,
 **After (zero type params):**
 
 ```go
-v2.NewCommand("list", &ListFlags{}, handler,
-    v2.WithShort("List tasks"),
+v3.NewCommand("list", &ListFlags{}, handler,
+    v3.WithShort("List tasks"),
 )
 ```
 
@@ -502,7 +506,10 @@ failure or double-prints errors.
 - Flag binding with struct tags
 - Full Cobra integration
 
-[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v2.10.2...HEAD
+[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.0.0
+[2.10.4]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.4
+[2.10.3]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.3
 [2.10.2]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.2
 [2.10.1]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.1
 [2.10.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.0

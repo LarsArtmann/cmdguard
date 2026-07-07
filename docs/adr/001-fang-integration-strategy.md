@@ -2,7 +2,7 @@
 
 **Status:** ACCEPTED
 **Date:** 2026-06-10
-**Scope:** `pkg/cmdguard/v2/cli.go`, `cli_options.go`, `cli_accessors.go`
+**Scope:** `pkg/cmdguard/v3/cli.go`, `cli_options.go`, `cli_accessors.go`
 
 ## Context
 
