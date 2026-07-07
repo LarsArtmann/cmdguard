@@ -110,11 +110,11 @@ cmdguard/
 │   │   ├── types_log.go          # LogLevel type
 │   │   ├── types_port.go         # Port type
 │   │   └── types_url.go          # URL type
-│   ├── glamour/                  # SUB-MODULE: markdown help rendering (charm.land/glamour/v2)
-│   ├── manpage/                  # SUB-MODULE: man page generation (mango/roff)
-│   ├── prompts/                  # SUB-MODULE: huh/v2 interactive prompt runner
-│   ├── spinner/                  # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
-│   └── telemetry/                # SUB-MODULE: OpenTelemetry middleware
+├── glamour/                      # SUB-MODULE: markdown help rendering (charm.land/glamour/v2)
+├── manpage/                      # SUB-MODULE: man page generation (mango/roff)
+├── prompts/                      # SUB-MODULE: huh/v2 interactive prompt runner
+├── spinner/                      # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
+├── telemetry/                    # SUB-MODULE: OpenTelemetry middleware
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
@@ -317,6 +317,7 @@ go build ./...                                   # Verify build
 #### Sub-Modules (glamour / manpage / prompts / spinner / telemetry)
 
 - **Import path** — each is `github.com/larsartmann/cmdguard/<name>`; import only what you need. Core has zero deps on these.
+- **Directory layout is load-bearing** — each sub-module lives at the **repo root** (`<name>/`), NOT under `pkg/cmdguard/`. Go resolves a module path by finding `go.mod` at the matching directory in the repo: `github.com/larsartmann/cmdguard/telemetry` requires `telemetry/go.mod` at the repo root. The root `go.mod` `replace` directives only work locally (in the workspace); they are **ignored by downstream consumers**. Moving a sub-module under `pkg/` breaks external `go get` silently (builds still pass via workspace `replace`).
 - **glamour** — provides a markdown help transformer for the `WithHelpTransform[T]()` hook; uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`). The string `"auto"` is NOT a valid glamour theme — pass `""` for env-based detection.
 - **spinner** — `SpinnerMiddleware[T]` auto-skips when `os.Stderr` is not a terminal; override with `SpinnerConfig{Writer: ...}`.
 - **telemetry** — `TelemetryMiddleware[T]` starts a span per command but cannot propagate the new context to the handler (`next func() error` signature); child spans must use the original context.

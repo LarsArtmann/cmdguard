@@ -84,17 +84,17 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
-replace github.com/larsartmann/cmdguard/glamour => ./pkg/cmdguard/glamour
+replace github.com/larsartmann/cmdguard/glamour => ./glamour
 
 require (
 	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
 )
 
-replace github.com/larsartmann/cmdguard/manpage => ./pkg/cmdguard/manpage
+replace github.com/larsartmann/cmdguard/manpage => ./manpage
 
-replace github.com/larsartmann/cmdguard/prompts => ./pkg/cmdguard/prompts
+replace github.com/larsartmann/cmdguard/prompts => ./prompts
 
-replace github.com/larsartmann/cmdguard/telemetry => ./pkg/cmdguard/telemetry
+replace github.com/larsartmann/cmdguard/telemetry => ./telemetry
 
-replace github.com/larsartmann/cmdguard/spinner => ./pkg/cmdguard/spinner
+replace github.com/larsartmann/cmdguard/spinner => ./spinner
