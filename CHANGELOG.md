@@ -64,6 +64,29 @@ Core extension hooks: `WithHelpTransform[T]()`, `PromptRunner` interface + `SetP
 - `manpage.go` — moved to manpage sub-module
 - 10 go-output blank imports removed from `output.go`
 
+## [2.10.4] - 2026-07-07
+
+### Fixed
+
+- **Retract `v2.11.0`** — added `retract` directive to `go.mod`. The v3 redesign was incorrectly tagged `v2.11.0` on the `/v2` module path (a semver violation: the API is breaking). That tag is deleted and retracted. **Consumers should migrate to `v3.0.0`** (update import paths from `/v2` to `/v3`). See the [v3.0.0] entry and the [migration guide](docs/MIGRATION_v2_v3.md).
+
+### Changed
+
+- Created `release/v2.10` maintenance branch (home for any future v2.x patches).
+- This is the final planned release on the `/v2` module path.
+
+## [2.10.3] - 2026-07-06
+
+### Changed
+
+- Upgrade `github.com/larsartmann/go-output` to v0.30.1
+- Upgrade `github.com/larsartmann/samber-do-auditlog` to v0.4.0
+
+### Note
+
+- This tag was originally orphaned (on no branch). It now lives on `release/v2.10`.
+- The same dependency upgrades are included in `v3.0.0`.
+
 ## [2.10.2] - 2026-07-05
 
 ### Changed

@@ -9,6 +9,7 @@
 || ✅ FULLY_FUNCTIONAL | Feature works as designed, tested, and documented |
 || ⚠️ PARTIALLY_FUNCTIONAL | Feature works but has limitations, gaps, or known issues |
 || 📝 PLANNED | Feature is designed but not yet implemented |
+|| 📦 SUB-MODULE | Feature lives in an optional importable sub-module |
 
 ---
 
@@ -33,27 +34,27 @@
 
 | Option                         | Status              | Notes                                         |
 | ------------------------------ | ------------------- | --------------------------------------------- |
-| `WithCLIVersion[T](v)`         | ✅ FULLY_FUNCTIONAL | Set version string                            |
-| `WithCLILong[T](desc)`         | ✅ FULLY_FUNCTIONAL | Set long description                          |
-| `WithCLIScope[T](scope)`       | ✅ FULLY_FUNCTIONAL | Custom DI scope                               |
-| `WithSilenceErrors[T]()`       | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing                 |
-| `WithSilenceUsage[T]()`        | ✅ FULLY_FUNCTIONAL | Suppress usage on error (now the default)     |
-| `WithFang[T](bool)`            | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling                   |
-| `WithFangOptions[T](opts...)`  | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
-| `WithMiddleware[T]()`          | ✅ FULLY_FUNCTIONAL | Add command middleware                        |
-| `WithGroup[T](id,title)`       | ✅ FULLY_FUNCTIONAL | Command groups in help                        |
-| `WithEnvPrefix[T](pfx)`        | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups                    |
-| `WithSignalHandling[T]()`      | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation          |
-| `WithGracefulShutdown[T]()`    | ✅ FULLY_FUNCTIONAL | Graceful DI service shutdown on signals       |
-| `WithDILogging[T](logf)`       | ✅ FULLY_FUNCTIONAL | Internal DI container logging                 |
-| `WithCLICommit[T](c)`          | ✅ FULLY_FUNCTIONAL | Git commit hash (auto-piped to fang)          |
-| `WithFangErrorHandler[T](fn)`  | ✅ FULLY_FUNCTIONAL | Custom fang error display                     |
-| `WithFangColorScheme[T](fn)`   | ✅ FULLY_FUNCTIONAL | Custom fang color theme                       |
-| `WithOutputFormat[T]()`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection      |
-| `WithConfigValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing            |
-| `WithStrictValidation[T]()`    | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
-| `WithDraconianValidation[T]()` | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands            |
-| `WithGlamourHelp[T]()`         | ✅ FULLY_FUNCTIONAL | Markdown rendering for help text (auto theme) |
+| `WithCLIVersion(v)`            | ✅ FULLY_FUNCTIONAL | Set version string                            |
+| `WithCLILong(desc)`            | ✅ FULLY_FUNCTIONAL | Set long description                          |
+| `WithCLIScope(scope)`          | ✅ FULLY_FUNCTIONAL | Custom DI scope                               |
+| `WithSilenceErrors()`          | ✅ FULLY_FUNCTIONAL | Suppress cobra error printing                 |
+| `WithSilenceUsage()`           | ✅ FULLY_FUNCTIONAL | Suppress usage on error (now the default)     |
+| `WithFang(bool)`               | ✅ FULLY_FUNCTIONAL | Enable/disable fang styling                   |
+| `WithFangOptions(opts...)`     | ✅ FULLY_FUNCTIONAL | Pass fang options                             |
+| `WithMiddleware[T](mw...)`     | ✅ FULLY_FUNCTIONAL | Add command middleware                        |
+| `WithGroup(id,title)`          | ✅ FULLY_FUNCTIONAL | Command groups in help                        |
+| `WithEnvPrefix(pfx)`           | ✅ FULLY_FUNCTIONAL | Prefix for env var lookups                    |
+| `WithSignalHandling()`         | ✅ FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation          |
+| `WithGracefulShutdown()`       | ✅ FULLY_FUNCTIONAL | Graceful DI service shutdown on signals       |
+| `WithDILogging(logf)`          | ✅ FULLY_FUNCTIONAL | Internal DI container logging                 |
+| `WithCLICommit(c)`             | ✅ FULLY_FUNCTIONAL | Git commit hash (auto-piped to fang)          |
+| `WithFangErrorHandler(fn)`     | ✅ FULLY_FUNCTIONAL | Custom fang error display                     |
+| `WithFangColorScheme(fn)`      | ✅ FULLY_FUNCTIONAL | Custom fang color theme                       |
+| `WithOutputFormat(fmt)`        | ✅ FULLY_FUNCTIONAL | Auto --output flag with format selection      |
+| `WithConfigValidation[T](fn)`  | ✅ FULLY_FUNCTIONAL | Validate config after flag parsing            |
+| `WithStrictValidation()`       | ✅ FULLY_FUNCTIONAL | Require short desc on all commands            |
+| `WithDraconianValidation()`    | ✅ FULLY_FUNCTIONAL | Strict + examples on leaf commands            |
+| `glamour.WithHelp()`           | 📦 SUB-MODULE       | Markdown rendering for help text (auto theme) |
 | `WithPostFlagParse[T](fns...)` | ✅ FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage     |
 | `WithCleanup[T](fns...)`       | ✅ FULLY_FUNCTIONAL | Post-RunE cleanup that fires on error too     |
 
@@ -133,7 +134,7 @@ bridge the typed cmdguard world to raw cobra handlers.
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
-| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.23.3 registries                              |
+| `OutputResult()`        | ✅ FULLY_FUNCTIONAL | Shape-aware rendering with go-output v0.30.1 registries                              |
 | `OutputTable()`         | ✅ FULLY_FUNCTIONAL | Convenience for table data with AddRowChecked validation                             |
 | `RegisteredFormats()`   | ✅ FULLY_FUNCTIONAL | Dynamic format discovery from registered marshalers                                  |
 | 16 output formats       | ✅ FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
@@ -141,60 +142,62 @@ bridge the typed cmdguard world to raw cobra handlers.
 
 ### Middleware
 
-| Feature                       | Status              | Notes                               |
-| ----------------------------- | ------------------- | ----------------------------------- |
-| `TimingMiddleware`            | ✅ FULLY_FUNCTIONAL | Log command execution duration      |
-| `RecoveryMiddleware`          | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers     |
-| `SpinnerMiddleware`           | ✅ FULLY_FUNCTIONAL | Terminal spinner during execution   |
-| `SpinnerMiddlewareWithConfig` | ✅ FULLY_FUNCTIONAL | Configurable spinner (frames/speed) |
-| `TelemetryMiddleware`         | ✅ FULLY_FUNCTIONAL | OpenTelemetry span per command      |
-| `CommandInfo.FullPath`        | ✅ FULLY_FUNCTIONAL | Full command path for middleware    |
-| Custom middleware             | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error`  |
+| Feature                           | Status              | Notes                               |
+| --------------------------------- | ------------------- | ----------------------------------- |
+| `TimingMiddleware`                | ✅ FULLY_FUNCTIONAL | Log command execution duration      |
+| `RecoveryMiddleware`              | ✅ FULLY_FUNCTIONAL | Recover from panics in handlers     |
+| `spinner.Middleware[T]`           | 📦 SUB-MODULE       | Terminal spinner during execution   |
+| `spinner.MiddlewareWithConfig[T]` | 📦 SUB-MODULE       | Configurable spinner (frames/speed) |
+| `telemetry.Middleware[T]`         | 📦 SUB-MODULE       | OpenTelemetry span per command      |
+| `CommandInfo.FullPath`            | ✅ FULLY_FUNCTIONAL | Full command path for middleware    |
+| Custom middleware                 | ✅ FULLY_FUNCTIONAL | `func(ctx, cfg, info, next) error`  |
 
 ### Shell Completion
 
-|                               | Feature             | Status                                  | Notes |
-| ----------------------------- | ------------------- | --------------------------------------- | ----- |
-| `WithCompletion[T,F](fn)`     | ✅ FULLY_FUNCTIONAL | Dynamic shell completion                |
-| `WithValidArgs[T,F](args...)` | ✅ FULLY_FUNCTIONAL | Static valid arguments                  |
-| `CompletionFunc` type         | ✅ FULLY_FUNCTIONAL | Compatible with cobra ValidArgsFunction |
+|                          | Feature             | Status                                  | Notes |
+| ------------------------ | ------------------- | --------------------------------------- | ----- |
+| `WithCompletion(fn)`     | ✅ FULLY_FUNCTIONAL | Dynamic shell completion                |
+| `WithValidArgs(args...)` | ✅ FULLY_FUNCTIONAL | Static valid arguments                  |
+| `CompletionFunc` type    | ✅ FULLY_FUNCTIONAL | Compatible with cobra ValidArgsFunction |
 
-### Man Page Generation
+### Man Page Generation (manpage sub-module)
 
-|                                  | Feature             | Status                      | Notes |
-| -------------------------------- | ------------------- | --------------------------- | ----- |
-| `cli.ManPage(section)`           | ✅ FULLY_FUNCTIONAL | Generate roff man page      |
-| `cli.WriteManPage(w, section)`   | ✅ FULLY_FUNCTIONAL | Write man page to io.Writer |
-| `GenerateManPageCommand[T](cli)` | ✅ FULLY_FUNCTIONAL | Create `man` subcommand     |
+| Feature                       | Status        | Notes                       |
+| ----------------------------- | ------------- | --------------------------- |
+| `manpage.Generate[T](cli, n)` | 📦 SUB-MODULE | Generate roff man page      |
+| `manpage.Write[T](cli, w, n)` | 📦 SUB-MODULE | Write man page to io.Writer |
+| `manpage.GenerateCommand[T]`  | 📦 SUB-MODULE | Create `man` subcommand     |
 
-### Markdown Help (glamour)
+### Markdown Help (glamour sub-module)
 
-| Feature                              | Status              | Notes                                   |
-| ------------------------------------ | ------------------- | --------------------------------------- |
-| `WithGlamourHelp[T]()`               | ✅ FULLY_FUNCTIONAL | Render command Long/Example as markdown |
-| `RenderMarkdown(md)`                 | ✅ FULLY_FUNCTIONAL | Render markdown with auto theme         |
-| `RenderMarkdownWithTheme(md, theme)` | ✅ FULLY_FUNCTIONAL | Render with specific glamour theme      |
+| Feature                               | Status        | Notes                                   |
+| ------------------------------------- | ------------- | --------------------------------------- |
+| `glamour.WithHelp()`                  | 📦 SUB-MODULE | Render command Long/Example as markdown |
+| `glamour.WithHelpTheme(theme)`        | 📦 SUB-MODULE | Override the glamour theme              |
+| `glamour.RenderMarkdown(md)`          | 📦 SUB-MODULE | Render markdown with auto theme         |
+| `glamour.RenderMarkdownWithTheme(md)` | 📦 SUB-MODULE | Render with specific glamour theme      |
 
 ### Positional Arguments
 
-| Feature                         | Status              | Notes                             |
-| ------------------------------- | ------------------- | --------------------------------- |
-| `WithExactArgs[T, F](n)`        | ✅ FULLY_FUNCTIONAL | Require exactly n positional args |
-| `WithMinimumArgs[T, F](n)`      | ✅ FULLY_FUNCTIONAL | Require at least n args           |
-| `WithMaximumArgs[T, F](n)`      | ✅ FULLY_FUNCTIONAL | Allow at most n args              |
-| `WithRangeArgs[T, F](min, max)` | ✅ FULLY_FUNCTIONAL | Require between min and max args  |
-| `WithNoArgs[T, F]()`            | ✅ FULLY_FUNCTIONAL | Reject any positional args        |
-| `WithArgs[T, F](fn)`            | ✅ FULLY_FUNCTIONAL | Custom cobra.PositionalArgs       |
+| Feature                   | Status              | Notes                             |
+| ------------------------- | ------------------- | --------------------------------- |
+| `WithExactArgs(n)`        | ✅ FULLY_FUNCTIONAL | Require exactly n positional args |
+| `WithMinimumArgs(n)`      | ✅ FULLY_FUNCTIONAL | Require at least n args           |
+| `WithMaximumArgs(n)`      | ✅ FULLY_FUNCTIONAL | Allow at most n args              |
+| `WithRangeArgs(min, max)` | ✅ FULLY_FUNCTIONAL | Require between min and max args  |
+| `WithNoArgs()`            | ✅ FULLY_FUNCTIONAL | Reject any positional args        |
+| `WithArgs(fn)`            | ✅ FULLY_FUNCTIONAL | Custom cobra.PositionalArgs       |
 
 ### Interactive Prompts (huh)
 
 | Feature                         | Status              | Notes                                    |
 | ------------------------------- | ------------------- | ---------------------------------------- |
-| `WithPromptOnMissing[T, F]()`   | ✅ FULLY_FUNCTIONAL | Prompt for missing `prompt`-tagged flags |
+| `WithPromptOnMissing()`         | ✅ FULLY_FUNCTIONAL | Prompt for missing `prompt`-tagged flags |
 | `prompt:"Question?"` struct tag | ✅ FULLY_FUNCTIONAL | Marks field for interactive prompting    |
-| `PromptString(title, default)`  | ✅ FULLY_FUNCTIONAL | Text input via huh.NewInput              |
-| `PromptSelect(title, options)`  | ✅ FULLY_FUNCTIONAL | Selection via huh.NewSelect              |
-| `PromptConfirm(title)`          | ✅ FULLY_FUNCTIONAL | Yes/no via huh.NewConfirm                |
+| `PromptString(title, default)`  | ✅ FULLY_FUNCTIONAL | Text input (via PromptRunner interface)  |
+| `PromptSelect(title, options)`  | ✅ FULLY_FUNCTIONAL | Selection (via PromptRunner interface)   |
+| `PromptConfirm(title)`          | ✅ FULLY_FUNCTIONAL | Yes/no (via PromptRunner interface)      |
+| `prompts.HuhRunner`             | 📦 SUB-MODULE       | huh/v2 PromptRunner implementation       |
 | Bool fields → confirm prompt    | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
 | Enum fields → select prompt     | ✅ FULLY_FUNCTIONAL | Automatic prompt type selection          |
 
@@ -224,19 +227,8 @@ bridge the typed cmdguard world to raw cobra handlers.
 | `Plugin` interface              | ✅ FULLY_FUNCTIONAL | Bundle custom type handlers + validators          |
 | `PluginRegistrar`               | ✅ FULLY_FUNCTIONAL | Scoped `TypeHandler()`/`Validator()` registration |
 | `RegisterPlugin(plugin)`        | ✅ FULLY_FUNCTIONAL | Apply to global registries                        |
-| `WithPlugin[T](plugin)`         | ✅ FULLY_FUNCTIONAL | Apply per-instance (CLI option)                   |
+| `WithPlugin(plugin)`            | ✅ FULLY_FUNCTIONAL | Apply per-instance (CLI option)                   |
 | `FlagRegistry.RegisterPlugin()` | ✅ FULLY_FUNCTIONAL | Apply per-FlagRegistry                            |
-
-### Result[T] & Validated[T] (Sum Types)
-
-| Feature                                | Status              | Notes                                         |
-| -------------------------------------- | ------------------- | --------------------------------------------- |
-| `Ok[T](value)`                         | ✅ FULLY_FUNCTIONAL | Construct success result                      |
-| `Err[T](err)`                          | ✅ FULLY_FUNCTIONAL | Construct error result                        |
-| `Result[T].Value/UnwrapOr/Map/AndThen` | ✅ FULLY_FUNCTIONAL | Accessors + monadic ops (zero panics)         |
-| `Valid[T](value)`                      | ✅ FULLY_FUNCTIONAL | Construct valid wrapper                       |
-| `Invalid[T](value, errs)`              | ✅ FULLY_FUNCTIONAL | Partial-success wrapper (value + error slice) |
-| `Validated[T].AddErr/Combine/ToResult` | ✅ FULLY_FUNCTIONAL | Accumulate + convert errors                   |
 
 ### Documentation Generation
 
@@ -248,7 +240,7 @@ bridge the typed cmdguard world to raw cobra handlers.
 
 | Feature                               | Status              | Notes                                                                    |
 | ------------------------------------- | ------------------- | ------------------------------------------------------------------------ |
-| `WithAuditLog[T](plugin)`             | ✅ FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                 |
+| `WithAuditLog(plugin)`                | ✅ FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                 |
 | `ExportAuditLog[T](cli, cfg)`         | ✅ FULLY_FUNCTIONAL | Write audit snapshot to file or io.Writer                                |
 | `AuditLogFormat` strong type          | ✅ FULLY_FUNCTIONAL | Validated enum with `ParseAuditLogFormat()` + `Valid()`                  |
 | 11 export formats                     | ✅ FULLY_FUNCTIONAL | html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree |
@@ -267,7 +259,6 @@ bridge the typed cmdguard world to raw cobra handlers.
 
 | Feature          | Status              | Notes                     |
 | ---------------- | ------------------- | ------------------------- |
-| `EditInEditor`   | ✅ FULLY_FUNCTIONAL | Open content in $EDITOR   |
 | `ValueOrDefault` | ✅ FULLY_FUNCTIONAL | Nil-safe value access     |
 | `MergeConfigs`   | ✅ FULLY_FUNCTIONAL | Deep merge config structs |
 
@@ -284,19 +275,27 @@ bridge the typed cmdguard world to raw cobra handlers.
 
 ## Dependencies
 
+### Core (direct)
+
 | Dependency                                  | Version | Status              | Purpose                  |
 | ------------------------------------------- | ------- | ------------------- | ------------------------ |
 | `github.com/spf13/cobra`                    | v1.10.2 | ✅ FULLY_FUNCTIONAL | CLI framework            |
 | `github.com/samber/do/v2`                   | v2.0.0  | ✅ FULLY_FUNCTIONAL | Dependency injection     |
 | `github.com/spf13/pflag`                    | v1.0.10 | ✅ FULLY_FUNCTIONAL | Flag parsing             |
 | `charm.land/fang/v2`                        | v2.0.1  | ✅ FULLY_FUNCTIONAL | Cobra styling            |
-| `charm.land/huh/v2`                         | v2.0.3  | ✅ FULLY_FUNCTIONAL | Interactive prompts      |
-| `charm.land/glamour/v2`                     | v2.0.1  | ✅ FULLY_FUNCTIONAL | Markdown rendering       |
-| `charm.land/lipgloss/v2`                    | v2.0.4  | ✅ FULLY_FUNCTIONAL | Terminal styling         |
-| `go.opentelemetry.io/otel/trace`            | v1.44.0 | ✅ FULLY_FUNCTIONAL | OpenTelemetry tracing    |
-| `github.com/larsartmann/go-output`          | v0.23.3 | ✅ FULLY_FUNCTIONAL | Rich output (16 formats) |
-| `github.com/larsartmann/samber-do-auditlog` | v0.3.1  | ✅ FULLY_FUNCTIONAL | DI audit logging         |
+| `github.com/larsartmann/go-output`          | v0.30.1 | ✅ FULLY_FUNCTIONAL | Rich output (16 formats) |
+| `github.com/larsartmann/samber-do-auditlog` | v0.4.0  | ✅ FULLY_FUNCTIONAL | DI audit logging         |
 | `github.com/knadh/koanf/v2`                 | v2.3.5  | ✅ FULLY_FUNCTIONAL | Config file loading      |
+
+### Optional Sub-Modules (isolated — import only what you need)
+
+| Sub-module  | Dependency                       | Version | Purpose                 |
+| ----------- | -------------------------------- | ------- | ----------------------- |
+| `glamour`   | `charm.land/glamour/v2`          | v2.0.1  | Markdown help rendering |
+| `prompts`   | `charm.land/huh/v2`              | v2.0.3  | Interactive prompts     |
+| `spinner`   | `charm.land/lipgloss/v2`         | v2.0.5  | Terminal spinner        |
+| `telemetry` | `go.opentelemetry.io/otel/trace` | v1.44.0 | OpenTelemetry tracing   |
+| `manpage`   | `muesli/mango` + `mango-cobra`   | v0.2.0  | Man page generation     |
 
 ---
 

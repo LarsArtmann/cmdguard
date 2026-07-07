@@ -1,8 +1,8 @@
 # TODO List
 
-**Updated:** 2026-07-05
-**Status:** v2.10.2 — zero panics, 86.7% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, Result/Validated types, GenerateDocs, cobra-correctness contract (SilenceUsage default, ExitCode, escape-hatch APIs)
-**Tests:** 473 test functions (1355 runs incl. subtests), 26 benchmarks, 1 fuzz file, 0 build errors
+**Updated:** 2026-07-07
+**Status:** v3.0.0 — zero panics, 87.3% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, 5 optional sub-modules (glamour/manpage/prompts/spinner/telemetry), non-generic CLIOption/CommandOption, GenerateDocs, cobra-correctness contract (SilenceUsage default, ExitCode, escape-hatch APIs)
+**Tests:** 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 0 build errors
 
 ## Completed
 

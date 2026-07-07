@@ -61,33 +61,33 @@ cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
 
 Functional options:
 
-| Option                             | Purpose                                    |
-| ---------------------------------- | ------------------------------------------ |
-| `WithCLIVersion[T](v)`             | Set version string (auto-pipes to fang)    |
-| `WithCLICommit[T](commit)`         | Set git commit hash (auto-pipes to fang)   |
-| `WithCLILong[T](desc)`             | Set long description                       |
-| `WithCLIScope[T](scope)`           | Set custom DI scope                        |
-| `WithSilenceErrors[T]()`           | Suppress cobra error printing (advanced)   |
-| `WithSilenceUsage[T]()`            | Suppress usage on error (**default**)      |
-| `WithFang[T](bool)`                | Enable/disable fang styling (preferred)    |
-| `WithFangOptions[T](opts...)`      | Custom fang options                        |
-| `WithFangErrorHandler[T](handler)` | Custom fang error handler                  |
-| `WithFangColorScheme[T](cs)`       | Custom fang color scheme                   |
-| `WithMiddleware[T](mw...)`         | Middleware wrapping every handler          |
-| `WithGroup[T](id, title)`          | Register command group on root             |
-| `WithEnvPrefix[T](prefix)`         | Prefix for env var lookups                 |
-| `WithSignalHandling[T]()`          | Cancel context on SIGINT/SIGTERM           |
-| `WithGracefulShutdown[T]()`        | Graceful DI shutdown on SIGINT/SIGTERM     |
-| `WithDILogging[T](logf)`           | Internal DI container logging              |
-| `WithConfigValidation[T](fn)`      | Validate config after flag parsing         |
-| `WithStrictValidation[T]()`        | Require short descriptions on all commands |
-| `WithDraconianValidation[T]()`     | Strict + examples on leaf commands         |
-| `WithConfigFile[T](paths...)`      | Load JSON config file before flags         |
-| `WithConfigFileLoader[T](l,p)`     | Load config with custom loader (YAML/TOML) |
-| `WithGlamourHelp[T]()`             | Render markdown in command help text       |
-| `WithTelemetry[T](tracer)`         | OpenTelemetry spans for all commands       |
-| `WithPostFlagParse[T](fns...)`     | Post-parse hook: DI init, session storage  |
-| `WithCleanup[T](fns...)`           | Post-RunE cleanup (fires on error too)     |
+| Option                                              | Purpose                                    |
+| --------------------------------------------------- | ------------------------------------------ |
+| `WithCLIVersion(v)`                                 | Set version string (auto-pipes to fang)    |
+| `WithCLICommit(commit)`                             | Set git commit hash (auto-pipes to fang)   |
+| `WithCLILong(desc)`                                 | Set long description                       |
+| `WithCLIScope(scope)`                               | Set custom DI scope                        |
+| `WithSilenceErrors()`                               | Suppress cobra error printing (advanced)   |
+| `WithSilenceUsage()`                                | Suppress usage on error (**default**)      |
+| `WithFang(bool)`                                    | Enable/disable fang styling (preferred)    |
+| `WithFangOptions(opts...)`                          | Custom fang options                        |
+| `WithFangErrorHandler(handler)`                     | Custom fang error handler                  |
+| `WithFangColorScheme(cs)`                           | Custom fang color scheme                   |
+| `WithMiddleware[T](mw...)`                          | Middleware wrapping every handler          |
+| `WithGroup(id, title)`                              | Register command group on root             |
+| `WithEnvPrefix(prefix)`                             | Prefix for env var lookups                 |
+| `WithSignalHandling()`                              | Cancel context on SIGINT/SIGTERM           |
+| `WithGracefulShutdown()`                            | Graceful DI shutdown on SIGINT/SIGTERM     |
+| `WithDILogging(logf)`                               | Internal DI container logging              |
+| `WithConfigValidation[T](fn)`                       | Validate config after flag parsing         |
+| `WithStrictValidation()`                            | Require short descriptions on all commands |
+| `WithDraconianValidation()`                         | Strict + examples on leaf commands         |
+| `WithConfigFile(paths...)`                          | Load JSON config file before flags         |
+| `WithConfigFileLoader(l,p)`                         | Load config with custom loader (YAML/TOML) |
+| `glamour.WithHelp()` _(sub-module)_                 | Render markdown in command help text       |
+| `telemetry.WithTelemetry[T](tracer)` _(sub-module)_ | OpenTelemetry spans for all commands       |
+| `WithPostFlagParse[T](fns...)`                      | Post-parse hook: DI init, session storage  |
+| `WithCleanup[T](fns...)`                            | Post-RunE cleanup (fires on error too)     |
 
 ### CLI[T] Methods
 
@@ -306,16 +306,20 @@ cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
     v3.WithMiddleware(v3.RecoveryMiddleware[Config]()),
 )
 
-// Spinner middleware — shows terminal spinner
+// Spinner middleware — shows terminal spinner (spinner sub-module)
+import "github.com/larsartmann/cmdguard/spinner"
 cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
-    v3.WithMiddleware(v3.SpinnerMiddleware[Config]("Loading...")),
+    v3.WithMiddleware(spinner.Middleware[Config]("Loading...")),
 )
 
-// Telemetry middleware — OpenTelemetry spans
-import "go.opentelemetry.io/otel"
+// Telemetry middleware — OpenTelemetry spans (telemetry sub-module)
+import (
+    "github.com/larsartmann/cmdguard/telemetry"
+    "go.opentelemetry.io/otel"
+)
 tracer := otel.Tracer("myapp")
 cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
-    v3.WithTelemetry[Config](tracer), // or WithMiddleware(TelemetryMiddleware[Config](tracer))
+    telemetry.WithTelemetry[Config](tracer),
 )
 ```
 
@@ -396,11 +400,12 @@ for name, err := range results {
 }
 ```
 
-### Markdown Help (glamour)
+### Markdown Help (glamour sub-module)
 
 ```go
+import "github.com/larsartmann/cmdguard/glamour"
 cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithGlamourHelp[Config](),
+    glamour.WithHelp(),
 )
 // Command Long and Example fields are rendered as markdown in terminal help
 ```

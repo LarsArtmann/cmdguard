@@ -1,6 +1,6 @@
 # ROADMAP
 
-**Updated:** 2026-06-22
+**Updated:** 2026-07-07
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
@@ -48,22 +48,30 @@
 
 ---
 
-## v3.0 Major Redesign
+## Completed (v3.0.0) — 2026-07-07
 
-- [ ] Create v3.0 API design document
-- [ ] Create `pkg/cmdguard/v3/` directory
-- [ ] Implement core types, CLI, commands, flags, scope, options for v3
-- [ ] Write tests for v3 implementation
-- [ ] Create v3 examples
-- [ ] Write `MIGRATION_V2_TO_V3.md`
+The v3.0 redesign shipped on `github.com/larsartmann/cmdguard/v3`:
 
-### v3.0 API-Breaking Cleanup
+- [x] Create `pkg/cmdguard/v3/` directory (migrated via `git mv`)
+- [x] Implement non-generic `CLIOption` / `CommandOption` (eliminate type-param explosion)
+- [x] `NewCommand` / `NewParentCommand` positional-flags signature (full type inference)
+- [x] Write tests for v3 implementation (457 functions, 1430 runs, 87.3% coverage)
+- [x] Create v3 example (taskctl)
+- [x] Extract 5 optional sub-modules: `glamour`, `manpage`, `prompts`, `spinner`, `telemetry`
+- [x] Go workspace (`go.work`, 6 modules)
+- [x] Write `docs/MIGRATION_v2_v3.md`
+- [x] Make `NoFlags` a distinct named type
+- [x] Fix `telemetry.WithTelemetry` to return non-generic `CLIOption`
 
-These changes are deferred to v3.0 because they break the public API and would
-semver-violate a v2.x release. Each is documented here so the design intent is
-not lost.
+> **Note:** several v2.x features (Spinner, Glamour, Telemetry, Manpage, Prompts impl)
+> were extracted into optional sub-modules in v3.0 rather than removed — they remain
+> available via `github.com/larsartmann/cmdguard/<module>`. `EditInEditor` and
+> `Result[T]`/`Validated[T]` were removed entirely as non-CLI concerns.
 
-- [x] Make `NoFlags` a distinct named type (not `type NoFlags = struct{}`)
+### Deferred v3.0 API-Breaking Cleanup
+
+These remain open for a future v3.x or v4:
+
 - [ ] **Rename `Get[T]`/`MustGet[T]`** — `Get` is too generic; should be
       `GetService[T]` or similar. Breaking: every consumer's import surface changes.
 - [ ] **Make `RegisterInScope` generic** — currently takes `...any`; should be
