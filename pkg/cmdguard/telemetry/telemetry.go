@@ -68,7 +68,8 @@ func Middleware[T any](tracer trace.Tracer) v3.Middleware[T] {
 }
 
 // WithTelemetry is a convenience wrapper that registers telemetry middleware
-// via v3.WithMiddleware.
-func WithTelemetry[T any](tracer trace.Tracer) v3.CLIOption[T] {
+// via v3.WithMiddleware. It is generic (to instantiate Middleware[T]) but
+// returns a non-generic CLIOption, matching the v3 options API.
+func WithTelemetry[T any](tracer trace.Tracer) v3.CLIOption {
 	return v3.WithMiddleware(Middleware[T](tracer))
 }
