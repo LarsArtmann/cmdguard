@@ -147,8 +147,19 @@ func (r *typeRegistry) register(typ reflect.Type, handler TypeHandler) {
 // RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type.
 // This writes to the global defaults template; new FlagRegistries will include
 // this handler. For per-instance registration, use FlagRegistry.RegisterTypeHandler.
-func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
+// Returns an error if typ or handler is nil.
+func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) error {
+	if typ == nil {
+		return fmt.Errorf("%w: typ is nil", ErrServiceRegistration)
+	}
+
+	if handler == nil {
+		return fmt.Errorf("%w: handler is nil for type %v", ErrServiceRegistration, typ)
+	}
+
 	globalTypeRegistry.register(typ, handler)
+
+	return nil
 }
 
 // handledByTypeRegistry checks whether the given type has a handler in the given registry.

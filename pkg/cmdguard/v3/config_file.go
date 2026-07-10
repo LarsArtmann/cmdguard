@@ -22,6 +22,12 @@ type ConfigFileLoader interface {
 // Supports flat key-value objects where keys match flag tag names.
 type jsonLoader struct{}
 
+// NewJSONLoader returns a ConfigFileLoader for JSON files.
+// Supports flat key-value objects and nested objects where keys match flag tag names.
+func NewJSONLoader() ConfigFileLoader {
+	return &jsonLoader{}
+}
+
 // Load unmarshals JSON data into cfg and returns the list of fields that were set.
 func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]json.RawMessage

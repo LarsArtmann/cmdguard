@@ -102,8 +102,19 @@ func (r *validatorRegistry) lookup(name string) (FlagValidator, bool) {
 // RegisterValidator adds a named validator to the global defaults template.
 // New FlagRegistries will include this validator. For per-instance registration,
 // use FlagRegistry.RegisterFlagValidator.
-func RegisterValidator(name string, validator FlagValidator) {
+// Returns an error if name is empty or validator is nil.
+func RegisterValidator(name string, validator FlagValidator) error {
+	if name == "" {
+		return fmt.Errorf("%w: validator name is empty", ErrServiceRegistration)
+	}
+
+	if validator == nil {
+		return fmt.Errorf("%w: validator is nil for name %q", ErrServiceRegistration, name)
+	}
+
 	globalValidators.register(name, validator)
+
+	return nil
 }
 
 // lookupValidator finds a validator by name in the global registry.

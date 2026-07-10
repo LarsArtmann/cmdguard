@@ -441,7 +441,7 @@ func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
 			},
 		}
 
-		RegisterTypeHandler(reflect.TypeFor[Widget](), custom)
+		testutil.AssertNoError(t, RegisterTypeHandler(reflect.TypeFor[Widget](), custom))
 
 		h, ok := globalTypeRegistry.lookupHandler(reflect.TypeFor[Widget]())
 		testutil.AssertBoolTrue(t, ok, "custom type should be found after registration")

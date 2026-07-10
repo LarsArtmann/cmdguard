@@ -400,6 +400,10 @@ linters:
         text: returns interface
         linters:
           - ireturn
+      - path: pkg/cmdguard/v3/config_file.go$
+        text: NewJSONLoader returns interface
+        linters:
+          - ireturn
       - path: pkg/cmdguard/v3/example_test.go$
         linters:
           - forbidigo

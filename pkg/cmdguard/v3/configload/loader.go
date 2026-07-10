@@ -8,7 +8,6 @@
 package configload
 
 import (
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -68,39 +67,9 @@ func TOML() cmdguard.ConfigFileLoader {
 }
 
 // JSON returns a ConfigFileLoader for JSON files.
-// This is identical to the core package's built-in JSON loader.
+// Delegates to the core package's JSON loader for consistency.
 func JSON() cmdguard.ConfigFileLoader {
-	return &jsonLoader{}
-}
-
-type jsonLoader struct{}
-
-func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
-	var raw map[string]json.RawMessage
-
-	err := json.Unmarshal(data, &raw)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
-	}
-
-	tags, err := cmdguard.ParseFlagTags(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("%w: parsing flag tags: %w", cmdguard.ErrConfigFileParse, err)
-	}
-
-	present := make(map[string]bool, len(raw))
-	for k := range raw {
-		present[k] = true
-	}
-
-	setFields := cmdguard.FilterSetFields(tags, present)
-
-	err = json.Unmarshal(data, cfg)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
-	}
-
-	return setFields, nil
+	return cmdguard.NewJSONLoader()
 }
 
 // Auto returns a ConfigFileLoader that tries to parse data as YAML, then TOML,
