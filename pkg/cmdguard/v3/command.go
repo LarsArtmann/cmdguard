@@ -287,7 +287,8 @@ func NewCommand[T, F any](
 	runE func(ctx context.Context, cfg *T, flags F) error,
 	opts ...CommandOption,
 ) (Command[T, F], error) {
-	if err := requireUse(use); err != nil {
+	err := requireUse(use)
+	if err != nil {
 		return Command[T, F]{}, err
 	}
 
@@ -307,7 +308,7 @@ func NewCommand[T, F any](
 
 	cmd := Command[T, F]{spec: spec, flags: flags, runE: runE}
 
-	err := cmd.Validate()
+	err = cmd.Validate()
 	if err != nil {
 		return Command[T, F]{}, err
 	}
@@ -335,7 +336,8 @@ func NewParentCommand[T, F any](
 	flags F,
 	opts ...CommandOption,
 ) (Command[T, F], error) {
-	if err := requireUse(use); err != nil {
+	err := requireUse(use)
+	if err != nil {
 		return Command[T, F]{}, err
 	}
 
@@ -370,7 +372,7 @@ func NewParentCommand[T, F any](
 		)
 	}
 
-	err := cmd.Validate()
+	err = cmd.Validate()
 	if err != nil {
 		return Command[T, F]{}, fmt.Errorf("long=%q: %w", long, err)
 	}

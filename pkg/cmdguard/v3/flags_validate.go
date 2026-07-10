@@ -181,7 +181,8 @@ func validateEmail(value string) error {
 		return nil
 	}
 
-	if _, err := ParseEmail(value); err != nil {
+	_, err := ParseEmail(value)
+	if err != nil {
 		return fmt.Errorf("%w: %q is not a valid email", ErrInvalidEmail, value)
 	}
 
@@ -193,7 +194,8 @@ func validateURL(value string) error {
 		return nil
 	}
 
-	if _, err := ParseURL(value); err != nil {
+	_, err := ParseURL(value)
+	if err != nil {
 		return fmt.Errorf("%w: %q is not a valid URL", ErrInvalidURL, value)
 	}
 

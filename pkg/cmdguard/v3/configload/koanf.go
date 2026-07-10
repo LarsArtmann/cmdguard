@@ -92,10 +92,11 @@ func (l *KoanfLoader) Load(_ []byte, cfg any) ([]string, error) {
 		return nil, fmt.Errorf("%w: none of %v found", cmdguard.ErrConfigFileNotFound, l.paths)
 	}
 
-	if err := k.UnmarshalWithConf("", cfg, koanf.UnmarshalConf{
+	err := k.UnmarshalWithConf("", cfg, koanf.UnmarshalConf{
 		Tag:       "flag",
 		FlatPaths: true,
-	}); err != nil {
+	})
+	if err != nil {
 		return nil, fmt.Errorf("%w: unmarshaling koanf config: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
@@ -134,7 +135,8 @@ func expandKoanfPath(path string) string {
 	path = strings.ReplaceAll(path, "$HOME", "~")
 
 	if strings.HasPrefix(path, "~/") {
-		if home, err := os.UserHomeDir(); err == nil {
+		home, err := os.UserHomeDir()
+		if err == nil {
 			path = filepath.Join(home, path[2:])
 		}
 	}

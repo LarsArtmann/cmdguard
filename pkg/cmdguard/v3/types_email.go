@@ -20,7 +20,8 @@ type Email struct {
 // ParseEmail creates a new Email from a string.
 // Returns an error if the string is not a valid email address.
 func ParseEmail(s string) (Email, error) {
-	if err := requireNonEmpty(s, "email", ErrInvalidEmail); err != nil {
+	err := requireNonEmpty(s, "email", ErrInvalidEmail)
+	if err != nil {
 		return Email{}, err
 	}
 

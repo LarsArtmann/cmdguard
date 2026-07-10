@@ -44,6 +44,7 @@ type cliSpec struct {
 	gracefulShutdown bool
 	diLogf           func(string, ...any)
 	auditLog         *auditlog.Plugin
+	pluginErr        error
 }
 
 type cobraGroup struct {
@@ -133,13 +134,18 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption) (*CLI[T], 
 	}
 
 	spec := cliSpec{
-		name:    name,
-		short:   short,
-		useFang: true,
+		name:         name,
+		short:        short,
+		useFang:      true,
+		silenceUsage: true,
 	}
 
 	for _, opt := range opts {
 		opt(&spec)
+	}
+
+	if spec.pluginErr != nil {
+		return nil, fmt.Errorf("short=%q, creating CLI %q: %w", short, name, spec.pluginErr)
 	}
 
 	cli := &CLI[T]{
@@ -169,7 +175,7 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption) (*CLI[T], 
 		cli.rootCmd.SilenceErrors = true
 	}
 
-	cli.rootCmd.SilenceUsage = true
+	cli.rootCmd.SilenceUsage = spec.silenceUsage
 
 	err = cli.initialize(defaults)
 	if err != nil {
@@ -223,7 +229,8 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	cli.registry = registry
 
-	if setFields, err := cli.loadConfigFileOrSkip(); err != nil {
+	setFields, err := cli.loadConfigFileOrSkip()
+	if err != nil {
 		return fmt.Errorf("%w: loading config file: %w", ErrConfigFileLoad, err)
 	} else if len(setFields) > 0 {
 		registry.updateTagDefaultsFromConfig(cli.config, setFields)
@@ -236,8 +243,8 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	cli.initOutputFlag()
 	cli.initNoColorFlag()
 
-	// Silence usage-on-error by default.
-	cli.rootCmd.SilenceUsage = true
+	// Apply silence-usage setting from spec (defaults to true).
+	cli.rootCmd.SilenceUsage = s.silenceUsage
 
 	err = registry.RegisterScopedFlags(cli.rootCmd)
 	if err != nil {
@@ -312,7 +319,8 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.spec.use)
 	}
 
-	if err := cmd.validate(cli.spec.validationMode); err != nil {
+	err := cmd.validate(cli.spec.validationMode)
+	if err != nil {
 		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
 
@@ -322,6 +330,9 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 	if err != nil {
 		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
+
+	// Propagate CLI-level silence-usage to subcommands.
+	cobraCmd.SilenceUsage = cli.spec.silenceUsage
 
 	cli.rootCmd.AddCommand(cobraCmd)
 

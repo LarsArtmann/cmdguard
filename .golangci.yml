@@ -356,6 +356,53 @@ linters:
       - path: pkg/cmdguard/v2/manpage.go$
         linters:
           - wrapcheck
+      # v3 exclusions — design decisions matching v2 patterns
+      - path: pkg/cmdguard/v3/type_handler.go$
+        linters:
+          - gochecknoglobals
+          - wrapcheck
+      - path: pkg/cmdguard/v3/type_handler.go$
+        text: lookupHandler returns interface
+        linters:
+          - ireturn
+      - path: pkg/cmdguard/v3/type_handler_kinds.go$
+        linters:
+          - funlen
+      - path: pkg/cmdguard/v3/type_handler_custom.go$
+        linters:
+          - funlen
+      - path: pkg/cmdguard/v3/cli.go$
+        linters:
+          - cyclop
+          - funlen
+      - path: pkg/cmdguard/v3/flags_validate.go$
+        linters:
+          - gochecknoglobals
+      - path: pkg/cmdguard/v3/cli_command.go$
+        linters:
+          - gochecknoglobals
+      - path: pkg/cmdguard/v3/scope.go$
+        text: Injector returns interface
+        linters:
+          - ireturn
+      - path: pkg/cmdguard/v3/cli_accessors.go$
+        text: Injector returns interface
+        linters:
+          - ireturn
+      - path: pkg/cmdguard/v3/configload/loader.go$
+        text: returns interface
+        linters:
+          - ireturn
+      - path: pkg/cmdguard/v3/output.go$
+        linters:
+          - wrapcheck
+      - path: pkg/cmdguard/v3/configload/koanf.go$
+        text: returns interface
+        linters:
+          - ireturn
+      - path: pkg/cmdguard/v3/example_test.go$
+        linters:
+          - forbidigo
       - path: pkg/cmdguard/v2/editor.go$
         linters:
           - gosec
@@ -369,6 +416,9 @@ linters:
         linters:
           - paralleltest
       - path: pkg/cmdguard/v2/type_handler_test.go$
+        linters:
+          - paralleltest
+      - path: pkg/cmdguard/v3/type_handler_test.go$
         linters:
           - paralleltest
       - path: pkg/cmdguard/v2/cli_auditlog_test.go$

@@ -43,7 +43,8 @@ type Port struct {
 // Accepts numeric strings (e.g., "8080") or named ports (e.g., "http", "https").
 // Returns an error if the port is not valid.
 func ParsePort(s string) (Port, error) {
-	if err := requireNonEmpty(s, "port", ErrInvalidPort); err != nil {
+	err := requireNonEmpty(s, "port", ErrInvalidPort)
+	if err != nil {
 		return Port{}, err
 	}
 
@@ -69,7 +70,8 @@ func ParsePort(s string) (Port, error) {
 		return Port{}, fmt.Errorf("%w: %q is not a valid port number", ErrInvalidPort, s)
 	}
 
-	if err := validatePortRange(port); err != nil {
+	err = validatePortRange(port)
+	if err != nil {
 		return Port{}, err
 	}
 

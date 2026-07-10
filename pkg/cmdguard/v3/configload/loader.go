@@ -29,7 +29,9 @@ type genericLoader struct {
 
 func (l *genericLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]any
-	if err := l.unmarshal(data, &raw); err != nil {
+
+	err := l.unmarshal(data, &raw)
+	if err != nil {
 		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
@@ -45,7 +47,8 @@ func (l *genericLoader) Load(data []byte, cfg any) ([]string, error) {
 
 	setFields := cmdguard.FilterSetFields(tags, present)
 
-	if err := l.unmarshal(data, cfg); err != nil {
+	err = l.unmarshal(data, cfg)
+	if err != nil {
 		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
@@ -74,7 +77,9 @@ type jsonLoader struct{}
 
 func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]json.RawMessage
-	if err := json.Unmarshal(data, &raw); err != nil {
+
+	err := json.Unmarshal(data, &raw)
+	if err != nil {
 		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 
@@ -90,7 +95,8 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 
 	setFields := cmdguard.FilterSetFields(tags, present)
 
-	if err := json.Unmarshal(data, cfg); err != nil {
+	err = json.Unmarshal(data, cfg)
+	if err != nil {
 		return nil, fmt.Errorf("%w: %w", cmdguard.ErrConfigFileParse, err)
 	}
 

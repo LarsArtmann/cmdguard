@@ -24,7 +24,8 @@ func (cli *CLI[T]) GenerateDocs(w io.Writer) error {
 		return err
 	}
 
-	if _, err := io.WriteString(w, b.String()); err != nil {
+	_, err = io.WriteString(w, b.String())
+	if err != nil {
 		return fmt.Errorf("writing generated docs: %w", err)
 	}
 

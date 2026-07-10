@@ -16,7 +16,8 @@ type URL struct {
 // ParseURL creates a new URL from a string.
 // Returns an error if the string is not a valid URL.
 func ParseURL(s string) (URL, error) {
-	if err := requireNonEmpty(s, "URL", ErrInvalidURL); err != nil {
+	err := requireNonEmpty(s, "URL", ErrInvalidURL)
+	if err != nil {
 		return URL{}, err
 	}
 

@@ -17,7 +17,8 @@ type HostPort struct {
 // ParseHostPort creates a new HostPort from a string.
 // Accepts formats like "localhost:8080", "example.com:443", or ":8080" (any host).
 func ParseHostPort(s string) (HostPort, error) {
-	if err := requireNonEmpty(s, "host:port", ErrInvalidHostPort); err != nil {
+	err := requireNonEmpty(s, "host:port", ErrInvalidHostPort)
+	if err != nil {
 		return HostPort{}, err
 	}
 

@@ -64,7 +64,8 @@ func makeIntKindHandler(bitSize int) TypeHandlerFunc { //nolint:dupl // mirrors 
 				return fmt.Errorf("invalid int default for flag %q: %w", tag.Name, err)
 			}
 
-			if err := checkIntRange(def, bitSize); err != nil {
+			err = checkIntRange(def, bitSize)
+			if err != nil {
 				return fmt.Errorf("int default for flag %q: %w", tag.Name, err)
 			}
 
@@ -97,7 +98,8 @@ func makeUintKindHandler(bitSize int) TypeHandlerFunc { //nolint:dupl // mirrors
 				return fmt.Errorf("invalid uint default for flag %q: %w", tag.Name, err)
 			}
 
-			if err := checkUintRange(def, bitSize); err != nil {
+			err = checkUintRange(def, bitSize)
+			if err != nil {
 				return fmt.Errorf("uint default for flag %q: %w", tag.Name, err)
 			}
 

@@ -25,7 +25,9 @@ type jsonLoader struct{}
 // Load unmarshals JSON data into cfg and returns the list of fields that were set.
 func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 	var raw map[string]json.RawMessage
-	if err := json.Unmarshal(data, &raw); err != nil {
+
+	err := json.Unmarshal(data, &raw)
+	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
 	}
 
@@ -39,7 +41,8 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 
 	setFields := FilterSetFields(tags, present)
 
-	if err := json.Unmarshal(data, cfg); err != nil {
+	err = json.Unmarshal(data, cfg)
+	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
 	}
 

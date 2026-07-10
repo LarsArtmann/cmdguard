@@ -60,7 +60,9 @@ func WithSilenceErrors() CLIOption {
 	}
 }
 
-// WithSilenceUsage suppresses automatic usage printing on error.
+// WithSilenceUsage suppresses automatic usage printing on error for the root
+// command and all subcommands. Enabled by default — this option is only needed
+// if you want to make the intent explicit.
 func WithSilenceUsage() CLIOption {
 	return func(s *cliSpec) {
 		s.silenceUsage = true

@@ -1,6 +1,7 @@
 package v3
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -59,8 +60,12 @@ func RegisterPlugin(plugin Plugin) error {
 // WithPlugin registers a plugin during CLI construction.
 // The plugin is applied to the global registries before the CLI initializes its
 // flags, so the plugin's handlers and validators are available to all commands.
+// If the plugin fails to register, NewCLI returns the error.
 func WithPlugin(plugin Plugin) CLIOption {
-	return func(_ *cliSpec) {
-		_ = RegisterPlugin(plugin)
+	return func(s *cliSpec) {
+		err := RegisterPlugin(plugin)
+		if err != nil {
+			s.pluginErr = errors.Join(s.pluginErr, err)
+		}
 	}
 }

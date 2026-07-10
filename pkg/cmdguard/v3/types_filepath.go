@@ -21,7 +21,8 @@ type FilePath struct {
 // The path is cleaned (removes .. and . components) and converted to absolute.
 // Set checkExists to true to verify the path exists on the filesystem.
 func ParseFilePath(s string, checkExists bool) (FilePath, error) {
-	if err := requireNonEmpty(s, "path", ErrInvalidFilePath); err != nil {
+	err := requireNonEmpty(s, "path", ErrInvalidFilePath)
+	if err != nil {
 		return FilePath{}, err
 	}
 
