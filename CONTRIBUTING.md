@@ -107,7 +107,7 @@ if err := doSomething(); err != nil {
 
 ## Architecture Guidelines
 
-### v2 Design Principles
+### v3 Design Principles
 
 - No panics in library code — all operations return errors
 - Constructor pattern via `NewCommand`/`NewParentCommand`

@@ -1,7 +1,15 @@
 # ROADMAP
 
-**Updated:** 2026-07-07
+**Updated:** 2026-07-10
 **Purpose:** Aspirational items with no concrete timeline
+
+---
+
+## v1 Deprecation
+
+v1 (`pkg/cmdguard/v1`) is deprecated as of v3.0.0. It receives no new features
+and only critical security fixes. v1 will be removed in v4.0.0 (no earlier than
+2026-12-31). Consumers should migrate to v3 via `docs/MIGRATION_v2_v3.md`.
 
 ---
 
@@ -27,7 +35,7 @@
 - [x] Shell completion helpers (`WithCompletion`)
 - [x] Man page generation (`GenerateManPageCommand`)
 - [x] `BranchingFlowContext` for command path tracking
-- [x] `EditInEditor` for `$EDITOR` integration
+- [x] ~~`EditInEditor`~~ (removed in v3, non-CLI concern)
 - [x] Counting flags (`count:"true"`)
 - [x] Positional args validators (`WithExactArgs`, `WithRangeArgs`, etc.)
 - [x] `ExitCoder` / `NewExitError` for custom exit codes
@@ -65,8 +73,8 @@ The v3.0 redesign shipped on `github.com/larsartmann/cmdguard/v3`:
 
 > **Note:** several v2.x features (Spinner, Glamour, Telemetry, Manpage, Prompts impl)
 > were extracted into optional sub-modules in v3.0 rather than removed — they remain
-> available via `github.com/larsartmann/cmdguard/<module>`. `EditInEditor` and
-> `Result[T]`/`Validated[T]` were removed entirely as non-CLI concerns.
+> available via `github.com/larsartmann/cmdguard/<module>`. `Result[T]`/`Validated[T]`
+> were removed entirely as non-CLI concerns.
 
 ### Deferred v3.0 API-Breaking Cleanup
 
@@ -112,7 +120,7 @@ These remain open for a future v3.x or v4:
 
 - [ ] Create `examples/docs-generator/main.go`
 - [ ] Define `FlagDoc` struct
-- [ ] Add `GenerateDocs()` method to CLI
+- [x] Add `GenerateDocs()` method to CLI (implemented at `docgen.go:19`)
 - [ ] Implement markdown documentation generator
 - [ ] Add API examples to godoc
 

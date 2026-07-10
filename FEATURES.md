@@ -44,35 +44,35 @@
 
 ### CLI Options (26 total — all non-generic except where noted)
 
-| Option                                   | Status                  | Notes                                                                                                                                                                  |
-| ---------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WithCLIVersion(v)`                      | 🟢 FULLY_FUNCTIONAL     | Set version string; auto-pipes to fang                                                                                                                                 |
-| `WithCLICommit(c)`                       | 🟢 FULLY_FUNCTIONAL     | Git commit hash; auto-pipes to fang                                                                                                                                    |
-| `WithCLILong(desc)`                      | 🟢 FULLY_FUNCTIONAL     | Set long description                                                                                                                                                   |
-| `WithCLIScope(scope)`                    | 🟢 FULLY_FUNCTIONAL     | Custom DI scope                                                                                                                                                        |
-| `WithSilenceErrors()`                    | 🟢 FULLY_FUNCTIONAL     | Suppress cobra error printing                                                                                                                                          |
-| `WithSilenceUsage()`                     | 🟡 PARTIALLY_FUNCTIONAL | Root command always has `SilenceUsage=true` (hardcoded `cli.go:172,240,437`). Option controls subcommands only via `cli_command.go:82`. Inconsistent default behavior. |
-| `WithFang(bool)`                         | 🟢 FULLY_FUNCTIONAL     | Enable/disable fang styling                                                                                                                                            |
-| `WithFangOptions(opts...)`               | 🟢 FULLY_FUNCTIONAL     | Pass raw fang options                                                                                                                                                  |
-| `WithFangErrorHandler(fn)`               | 🟢 FULLY_FUNCTIONAL     | Custom fang error display (`cli_options.go:85`)                                                                                                                        |
-| `WithFangColorScheme(fn)`                | 🟢 FULLY_FUNCTIONAL     | Custom fang color theme (`cli_options.go:92`)                                                                                                                          |
-| `WithGroup(id, title)`                   | 🟢 FULLY_FUNCTIONAL     | Command groups in help (`cli_options.go:100`)                                                                                                                          |
-| `WithEnvPrefix(pfx)`                     | 🟢 FULLY_FUNCTIONAL     | Prefix for env var lookups (root + command level)                                                                                                                      |
-| `WithSignalHandling()`                   | 🟢 FULLY_FUNCTIONAL     | Auto SIGINT/SIGTERM ctx cancellation                                                                                                                                   |
-| `WithGracefulShutdown()`                 | 🟢 FULLY_FUNCTIONAL     | Graceful DI service shutdown on signals (implies above)                                                                                                                |
-| `WithDILogging(logf)`                    | 🟢 FULLY_FUNCTIONAL     | Internal DI container logging                                                                                                                                          |
-| `WithStrictValidation()`                 | 🟢 FULLY_FUNCTIONAL     | Require short desc on all commands                                                                                                                                     |
-| `WithDraconianValidation()`              | 🟢 FULLY_FUNCTIONAL     | Strict + examples on leaf commands                                                                                                                                     |
-| `WithAuditLog(plugin)`                   | 🟢 FULLY_FUNCTIONAL     | Wire samber-do-auditlog into DI injector                                                                                                                               |
-| `WithOutputFormat(fmt)`                  | 🟢 FULLY_FUNCTIONAL     | Auto `--output` flag with format selection (`cli_options.go:157`)                                                                                                      |
-| `WithConfigFile(paths...)`               | 🟢 FULLY_FUNCTIONAL     | JSON loader, core package                                                                                                                                              |
-| `WithConfigFileLoader(loader, paths...)` | 🟢 FULLY_FUNCTIONAL     | Custom loader (YAML/TOML via configload)                                                                                                                               |
-| `WithConfigValidation[T](fn)`            | 🟢 FULLY_FUNCTIONAL     | Validate config after flag parsing (generic)                                                                                                                           |
-| `WithMiddleware[T](mw...)`               | 🟢 FULLY_FUNCTIONAL     | Add command middleware chain (generic)                                                                                                                                 |
-| `WithPostFlagParse[T](fns...)`           | 🟢 FULLY_FUNCTIONAL     | Post-parse hook: DI init, session storage (generic)                                                                                                                    |
-| `WithCleanup[T](fns...)`                 | 🟢 FULLY_FUNCTIONAL     | Post-RunE cleanup, fires even on RunE error (generic)                                                                                                                  |
-| `WithHelpTransform(fn)`                  | 🟢 FULLY_FUNCTIONAL     | Transform command help text (glamour injection point)                                                                                                                  |
-| `WithPlugin(plugin)`                     | 🟡 PARTIALLY_FUNCTIONAL | Error swallowing: `_ = RegisterPlugin(plugin)` discards error (`plugin.go:63`). Violates zero-panic principle.                                                         |
+| Option                                   | Status              | Notes                                                                                                                    |
+| ---------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `WithCLIVersion(v)`                      | 🟢 FULLY_FUNCTIONAL | Set version string; auto-pipes to fang                                                                                   |
+| `WithCLICommit(c)`                       | 🟢 FULLY_FUNCTIONAL | Git commit hash; auto-pipes to fang                                                                                      |
+| `WithCLILong(desc)`                      | 🟢 FULLY_FUNCTIONAL | Set long description                                                                                                     |
+| `WithCLIScope(scope)`                    | 🟢 FULLY_FUNCTIONAL | Custom DI scope                                                                                                          |
+| `WithSilenceErrors()`                    | 🟢 FULLY_FUNCTIONAL | Suppress cobra error printing                                                                                            |
+| `WithSilenceUsage()`                     | 🟢 FULLY_FUNCTIONAL | Silenced by default for root + all subcommands. Root respects the field; subcommands inherit via AddCommand propagation. |
+| `WithFang(bool)`                         | 🟢 FULLY_FUNCTIONAL | Enable/disable fang styling                                                                                              |
+| `WithFangOptions(opts...)`               | 🟢 FULLY_FUNCTIONAL | Pass raw fang options                                                                                                    |
+| `WithFangErrorHandler(fn)`               | 🟢 FULLY_FUNCTIONAL | Custom fang error display (`cli_options.go:85`)                                                                          |
+| `WithFangColorScheme(fn)`                | 🟢 FULLY_FUNCTIONAL | Custom fang color theme (`cli_options.go:92`)                                                                            |
+| `WithGroup(id, title)`                   | 🟢 FULLY_FUNCTIONAL | Command groups in help (`cli_options.go:100`)                                                                            |
+| `WithEnvPrefix(pfx)`                     | 🟢 FULLY_FUNCTIONAL | Prefix for env var lookups (root + command level)                                                                        |
+| `WithSignalHandling()`                   | 🟢 FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation                                                                                     |
+| `WithGracefulShutdown()`                 | 🟢 FULLY_FUNCTIONAL | Graceful DI service shutdown on signals (implies above)                                                                  |
+| `WithDILogging(logf)`                    | 🟢 FULLY_FUNCTIONAL | Internal DI container logging                                                                                            |
+| `WithStrictValidation()`                 | 🟢 FULLY_FUNCTIONAL | Require short desc on all commands                                                                                       |
+| `WithDraconianValidation()`              | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                       |
+| `WithAuditLog(plugin)`                   | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                                 |
+| `WithOutputFormat(fmt)`                  | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:157`)                                                        |
+| `WithConfigFile(paths...)`               | 🟢 FULLY_FUNCTIONAL | JSON loader, core package                                                                                                |
+| `WithConfigFileLoader(loader, paths...)` | 🟢 FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload)                                                                                 |
+| `WithConfigValidation[T](fn)`            | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                             |
+| `WithMiddleware[T](mw...)`               | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                   |
+| `WithPostFlagParse[T](fns...)`           | 🟢 FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage (generic)                                                                      |
+| `WithCleanup[T](fns...)`                 | 🟢 FULLY_FUNCTIONAL | Post-RunE cleanup, fires even on RunE error (generic)                                                                    |
+| `WithHelpTransform(fn)`                  | 🟢 FULLY_FUNCTIONAL | Transform command help text (glamour injection point)                                                                    |
+| `WithPlugin(plugin)`                     | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                         |
 
 ### Command[T, F]
 
@@ -112,26 +112,26 @@
 
 ## Flag System
 
-| Feature                        | Status                  | Notes                                                              |
-| ------------------------------ | ----------------------- | ------------------------------------------------------------------ |
-| Struct tag flags               | 🟢 FULLY_FUNCTIONAL     | `flag:"name" short:"n" default:"val" help:"desc"`                  |
-| `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL     | Environment variable binding (with optional prefix)                |
-| `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL     | Counting flags: -vvv → 3                                           |
-| Short flags                    | 🟢 FULLY_FUNCTIONAL     | `short:"n"` for `-n`                                               |
-| Required flags                 | 🟢 FULLY_FUNCTIONAL     | `required:"true"` tag                                              |
-| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL     | Built-in + custom validators                                       |
-| Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL     | Levenshtein-based (`flags_suggest.go`)                             |
-| Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL     | "did you mean?" for unknown subcommands                            |
-| Instance-scoped validators     | 🟢 FULLY_FUNCTIONAL     | `FlagRegistry.RegisterFlagValidator()` (COW)                       |
-| TypeHandler registry           | 🟢 FULLY_FUNCTIONAL     | Extensible type dispatch system (COW)                              |
-| `RegisterTypeHandler()`        | 🟡 PARTIALLY_FUNCTIONAL | Returns void — no error on invalid input (`type_handler.go:150`)   |
-| `RegisterValidator()`          | 🟡 PARTIALLY_FUNCTIONAL | Returns void — no error on invalid input (`flags_validate.go:105`) |
-| Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL     | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)           |
-| Integer overflow validation    | 🟢 FULLY_FUNCTIONAL     | int8/16/32, uint8/16 range-checked → `ErrIntegerOverflow`          |
-| Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL     | Root-only flags not inherited by subcommands                       |
-| Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL     | Exclude from `--help`, stay functional                             |
-| Nested config structs          | 🟢 FULLY_FUNCTIONAL     | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path     |
-| Regex validation cache         | 🟡 PARTIALLY_FUNCTIONAL | Unbounded `sync.Map` with no eviction (`flags_validate.go:289`)    |
+| Feature                        | Status                  | Notes                                                           |
+| ------------------------------ | ----------------------- | --------------------------------------------------------------- |
+| Struct tag flags               | 🟢 FULLY_FUNCTIONAL     | `flag:"name" short:"n" default:"val" help:"desc"`               |
+| `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL     | Environment variable binding (with optional prefix)             |
+| `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL     | Counting flags: -vvv → 3                                        |
+| Short flags                    | 🟢 FULLY_FUNCTIONAL     | `short:"n"` for `-n`                                            |
+| Required flags                 | 🟢 FULLY_FUNCTIONAL     | `required:"true"` tag                                           |
+| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL     | Built-in + custom validators                                    |
+| Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL     | Levenshtein-based (`flags_suggest.go`)                          |
+| Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL     | "did you mean?" for unknown subcommands                         |
+| Instance-scoped validators     | 🟢 FULLY_FUNCTIONAL     | `FlagRegistry.RegisterFlagValidator()` (COW)                    |
+| TypeHandler registry           | 🟢 FULLY_FUNCTIONAL     | Extensible type dispatch system (COW)                           |
+| `RegisterTypeHandler()`        | 🟢 FULLY_FUNCTIONAL     | Returns error on nil typ/handler (`type_handler.go`)            |
+| `RegisterValidator()`          | 🟢 FULLY_FUNCTIONAL     | Returns error on empty name/nil validator (`flags_validate.go`) |
+| Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL     | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)        |
+| Integer overflow validation    | 🟢 FULLY_FUNCTIONAL     | int8/16/32, uint8/16 range-checked → `ErrIntegerOverflow`       |
+| Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL     | Root-only flags not inherited by subcommands                    |
+| Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL     | Exclude from `--help`, stay functional                          |
+| Nested config structs          | 🟢 FULLY_FUNCTIONAL     | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path  |
+| Regex validation cache         | 🟡 PARTIALLY_FUNCTIONAL | Unbounded `sync.Map` with no eviction (`flags_validate.go:289`) |
 
 ---
 
@@ -240,7 +240,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `configload.Auto()`                 | 🟢 FULLY_FUNCTIONAL     | Sequential YAML→TOML→JSON (NOT extension-based)                                                                   |
 | Nested struct config                | 🟢 FULLY_FUNCTIONAL     | Inner structs flattened; `FieldTag.Index` tracks reflect path                                                     |
 | `configload.KoanfLoader()`          | 🟡 PARTIALLY_FUNCTIONAL | Works but adds 4 direct deps to root go.mod (koanf json/yaml/file/v2). Roadmapped to move to optional sub-module. |
-| Duplicate `jsonLoader`              | 🟡 PARTIALLY_FUNCTIONAL | Same struct exists in both `config_file.go:23` and `configload/loader.go:73`                                      |
+| Duplicate `jsonLoader`              | 🟢 FULLY_FUNCTIONAL     | Deduplicated: configload.JSON() delegates to core `NewJSONLoader()`                                               |
 
 ### Flag Priority Chain
 
@@ -330,15 +330,15 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 ## Optional Sub-Modules
 
 All 5 sub-modules are independently importable. Core has **zero** dependencies on these.
-Each compiles cleanly with matching v3 API signatures. **All have zero test files.**
+Each compiles cleanly with matching v3 API signatures. All have basic test coverage.
 
-| Sub-module  | Key API                                               | Dependency                       | Version | Status                     |
-| ----------- | ----------------------------------------------------- | -------------------------------- | ------- | -------------------------- |
-| `glamour`   | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`   | `charm.land/glamour/v2`          | v2.0.1  | 🟡 📦 SUB-MODULE (0 tests) |
-| `manpage`   | `Generate[T]()`, `Write[T]()`, `GenerateCommand[T]()` | `muesli/mango` + `mango-cobra`   | v0.2.0  | 🟡 📦 SUB-MODULE (0 tests) |
-| `prompts`   | `HuhRunner`, `Register()`                             | `charm.land/huh/v2`              | v2.0.3  | 🟡 📦 SUB-MODULE (0 tests) |
-| `spinner`   | `Middleware[T]()`, `MiddlewareWithConfig[T]()`        | `charm.land/lipgloss/v2`         | v2.0.5  | 🟡 📦 SUB-MODULE (0 tests) |
-| `telemetry` | `Middleware[T]()`, `WithTelemetry[T]()`               | `go.opentelemetry.io/otel/trace` | v1.44.0 | 🟡 📦 SUB-MODULE (0 tests) |
+| Sub-module  | Key API                                               | Dependency                       | Version | Status           |
+| ----------- | ----------------------------------------------------- | -------------------------------- | ------- | ---------------- |
+| `glamour`   | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`   | `charm.land/glamour/v2`          | v2.0.1  | 🟢 📦 SUB-MODULE |
+| `manpage`   | `Generate[T]()`, `Write[T]()`, `GenerateCommand[T]()` | `muesli/mango` + `mango-cobra`   | v0.2.0  | 🟢 📦 SUB-MODULE |
+| `prompts`   | `HuhRunner`, `Register()`                             | `charm.land/huh/v2`              | v2.0.3  | 🟢 📦 SUB-MODULE |
+| `spinner`   | `Middleware[T]()`, `MiddlewareWithConfig[T]()`        | `charm.land/lipgloss/v2`         | v2.0.5  | 🟢 📦 SUB-MODULE |
+| `telemetry` | `Middleware[T]()`, `WithTelemetry[T]()`               | `go.opentelemetry.io/otel/trace` | v1.44.0 | 🟢 📦 SUB-MODULE |
 
 ---
 
@@ -369,17 +369,17 @@ Each compiles cleanly with matching v3 API signatures. **All have zero test file
 
 ## Testing & Quality
 
-| Metric                      | Value           | Status  | Notes                                                                                                               |
-| --------------------------- | --------------- | ------- | ------------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~87.3%          | 🟢 Good | `pkg/cmdguard/v3`                                                                                                   |
-| configload coverage         | ~87.5%          | 🟢 Good | `pkg/cmdguard/v3/configload`                                                                                        |
-| Test functions              | 457 (1430 runs) | 🟢 Good |                                                                                                                     |
-| Benchmarks                  | 26              | 🟢 Good |                                                                                                                     |
-| Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                                  |
-| Sub-module tests            | 0 across all 5  | 🔴 None | All sub-modules have zero test files                                                                                |
-| Lint issues                 | **38**          | 🟡 Debt | noinlineerr(10), ireturn(9), wrapcheck(5), paralleltest(5), gochecknoglobals(5), funlen(2), forbidigo(1), cyclop(1) |
-| `pkg/testutil` coverage     | 0%              | 🟡 Debt | 372-line public package, no tests                                                                                   |
-| `examples/taskctl` coverage | ~67%            | 🟡 Debt | Below core coverage                                                                                                 |
+| Metric                      | Value           | Status  | Notes                                                                                                          |
+| --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| Core coverage               | ~87.3%          | 🟢 Good | `pkg/cmdguard/v3`                                                                                              |
+| configload coverage         | ~87.5%          | 🟢 Good | `pkg/cmdguard/v3/configload`                                                                                   |
+| Test functions              | 457 (1430 runs) | 🟢 Good |                                                                                                                |
+| Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
+| Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
+| Sub-module tests            | 20 across all 5 | 🟢 Good | All sub-modules have basic test coverage                                                                       |
+| Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
+| `pkg/testutil` coverage     | 0%              | 🟡 Debt | 372-line public package, no tests                                                                              |
+| `examples/taskctl` coverage | ~67%            | 🟡 Debt | Below core coverage                                                                                            |
 
 ---
 

@@ -1,0 +1,62 @@
+name: Sub-module Smoke Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  submodule-smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [glamour, manpage, prompts, spinner, telemetry]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+      - name: Build and test ${{ matrix.module }}
+        run: |
+          cd ${{ matrix.module }}
+          go build ./...
+          go test ./... -count=1 -timeout 30s
+
+  external-resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+      - name: Verify sub-modules resolve externally
+        run: |
+          # Create a throwaway module that imports each sub-module
+          mkdir -p /tmp/smoke-test
+          cd /tmp/smoke-test
+          go mod init smoke-test
+          for mod in glamour manpage prompts spinner telemetry; do
+            echo "Testing $mod..."
+            echo "package main" > main.go
+            echo "import _ \"github.com/larsartmann/cmdguard/$mod\"" >> main.go
+            echo "func main() {}" >> main.go
+            # Use replace to resolve from local checkout
+            go mod edit -replace "github.com/larsartmann/cmdguard/$mod=$GITHUB_WORKSPACE/$mod"
+            go mod edit -replace "github.com/larsartmann/cmdguard/v3=$GITHUB_WORKSPACE"
+            go build ./... || { echo "FAILED: $mod did not resolve"; exit 1; }
+            echo "OK: $mod resolves"
+          done
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v2.0.2
+          args: --timeout 5m

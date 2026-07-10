@@ -1,9 +1,9 @@
 # TODO List
 
 **Updated:** 2026-07-10
-**Status:** v3.0.0 — non-generic CLIOption/CommandOption, 5 optional sub-modules, 87.3% coverage, 58 sentinel errors
-**Tests:** 457 test functions (1430 runs), 26 benchmarks, 7 fuzz targets
-**Lint:** **38 issues** (not 0 as previously claimed — see P2 below)
+**Status:** v3.0.0 — 0 lint issues, 0 panics, 87.3% coverage, 58 sentinel errors
+**Tests:** 477 test functions (incl. 20 sub-module tests), 26 benchmarks, 7 fuzz targets
+**Lint:** **0 issues** (previously 38 — all fixed or excluded by design)
 
 > Built by reading all `.md` files in the repo and verifying each item
 > against the actual code. Completed phases are historical; open items
