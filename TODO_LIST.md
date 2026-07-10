@@ -1,161 +1,153 @@
 # TODO List
 
-**Updated:** 2026-07-07
-**Status:** v3.0.0 — zero panics, 87.3% coverage, 0 lint issues, 0 race conditions, 16 output formats, 11 audit log formats, copy-on-write registries, nested config, plugin system, 5 optional sub-modules (glamour/manpage/prompts/spinner/telemetry), non-generic CLIOption/CommandOption, GenerateDocs, cobra-correctness contract (SilenceUsage default, ExitCode, escape-hatch APIs)
-**Tests:** 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 0 build errors
+**Updated:** 2026-07-10
+**Status:** v3.0.0 — non-generic CLIOption/CommandOption, 5 optional sub-modules, 87.3% coverage, 58 sentinel errors
+**Tests:** 457 test functions (1430 runs), 26 benchmarks, 7 fuzz targets
+**Lint:** **38 issues** (not 0 as previously claimed — see P2 below)
+
+> Built by reading all `.md` files in the repo and verifying each item
+> against the actual code. Completed phases are historical; open items
+> are sorted by impact within each priority tier.
+
+---
 
 ## Completed
 
-### Phase 1–9: All Complete
+### v3.0.0 (2026-07-07)
 
-- [x] All core features implemented and tested
-- [x] All architecture hardening complete
-- [x] All documentation updated
-- [x] Nix flake with devShell, formatter, and format check
-- [x] CI with pinned golangci-lint, codecov, Nix check, benchmarks
-- [x] Release automation workflow
+- [x] Non-generic `CLIOption` / `CommandOption` (eliminate type-param explosion)
+- [x] `NewCommand` / `NewParentCommand` positional-flags signature (full type inference)
+- [x] Extract 5 optional sub-modules: `glamour`, `manpage`, `prompts`, `spinner`, `telemetry`
+- [x] Go workspace (`go.work`, 6 modules)
+- [x] Module path migrated `cmdguard/v2` → `cmdguard/v3`
+- [x] `docs/MIGRATION_v2_v3.md` written
+- [x] Dead weight cut: `result.go`, `editor.go`
+- [x] go-output blank imports removed from core
+- [x] GitHub releases: v3.0.0, v2.10.4, 5× sub-module v0.1.0
+- [x] External smoke tests: v3.0.0, v2@latest, all 5 sub-modules resolve
+- [x] AGENTS.md + FEATURES.md rewritten for v3
+- [x] Stale reference cleanup (EditInEditor, WithFlags, SpinnerMiddleware, etc.)
 
-### Phase 10: Post-Release Maintenance (2026-06-08)
+### v2.2–v2.10 (all prior phases)
 
-- [x] Fix `flake.nix` infinite recursion (`goPkg = goPkg` → `pkgs.go_1_26`)
-- [x] Update FEATURES.md version from v2.3.0-dev to v2.4.0
-- [x] Fix test count metrics (357, not 356)
-- [x] Add gofumpt and goimports to flake.nix treefmt
-- [x] Add `Scope.HealthCheckResults()` / `HealthCheckResultsWithContext()`
-- [x] Add `CLI.HealthCheckResults()` / `HealthCheckResultsWithContext()`
-- [x] Add `DoctorCommand[T]` convenience helper
-- [x] DRY configload: extract `genericLoader` (3 files → 1)
-- [x] Add configload tests: YAML, TOML, JSON, Auto, LoaderForPath (22 tests)
-- [x] Consolidate `command_suggest.go` into `flags_suggest.go`
-- [x] Update taskctl example: manual health → DoctorCommand
-- [x] Update docs: FEATURES.md, TODO_LIST.md, AGENTS.md
+- [x] Zero panics — all Must\* functions removed (16 deleted)
+- [x] Error system overhaul: 58 sentinels, domain-specific error files
+- [x] DI maximization: Override, CloneScope, NewScopeWithOpts, graceful shutdown
+- [x] Copy-on-write typeRegistry + validatorRegistry (48% faster NewCLI)
+- [x] Cobra-correctness contract: SilenceUsage default, ExitCode, escape-hatch APIs
+- [x] Scoped flags (`local:"true"`), hidden flags (`hidden:"true"`)
+- [x] `WithCleanup[T]` — fires even on RunE error
+- [x] `ConfigFromContext[T]`, `WithPostFlagParse[T]`, `RegisterLocalCommandFlags`
+- [x] Plugin system, nested config structs, GenerateDocs, audit log (11 formats)
+- [x] 16 output formats via go-output v0.30.1 registries
 
-### Phase 11: Codebase Review (2026-06-10)
+---
 
-- [x] Code quality scan: build, lint, duplication analysis — 0 issues
-- [x] Full code review: all 50 source files reviewed
-- [x] Architecture review: modularity (8.5/10), scalability (9/10), composability (7/10)
-- [x] Architecture visualization: D2 diagrams (current + improved)
-- [x] Docs freshness check: fixed stale items in AGENTS.md, FEATURES.md
-- [x] Naming review: 9/10 quality — 3 minor issues
-- [x] Architecture deepening: 6 candidates identified
-- [x] Go modularization assessment: NOT recommended (project too small)
-- [x] Features audit: all features verified against code
-- [x] TODO list rebuilt from all .md sources
+## P0 — Critical (correctness / consumer trust)
 
-### Phase 12: Zero Panics (2026-06-10)
+| #   | Task                                                                                                                                                                     | Verified State                                                      | Effort |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------ |
+| 1   | **Fix `WithSilenceUsage` no-op** — field written but never read; SilenceUsage hardcoded `true` unconditionally (`cli.go:172,240,437`). Option should work or be removed. | `cli_options.go:64` writes `s.silenceUsage`; field never read       | 15m    |
+| 2   | **Fix `WithPlugin` error swallowing** — `_ = RegisterPlugin(plugin)` discards error (`plugin.go:63`)                                                                     | `RegisterPlugin` returns error; `WithPlugin` discards it with `_ =` | 20m    |
+| 3   | **Correct "0 lint issues" claim** — AGENTS.md, FEATURES.md, TODO_LIST.md all say 0 but actual count is 38                                                                | `golangci-lint run ./...` → 38 issues across 8 linters              | 30m    |
 
-- [x] Remove all Must\* panic-inducing functions (16 functions deleted)
-- [x] Update FEATURES.md: remove Must\* entries, update metrics
-- [x] Update README.md: remove Must\* examples, update tagline
-- [x] Update all docs for zero-panics guarantee
+---
 
-### Phase 13: samber/do v2 Utilization Sprint (2026-06-10)
+## P1 — High (sub-module safety, testing, CI)
 
-- [x] Research: full samber/do v2 API surface audit (54 public symbols)
-- [x] Add `WithGracefulShutdown[T]()` — graceful DI shutdown on SIGINT/SIGTERM
-- [x] Add `Override[T]` / `OverrideValue[T]` — replace services for testing
-- [x] Add `CloneScope(scope)` — clone DI scope for test isolation
-- [x] Add `NewScopeWithOpts(name, opts)` — create scope with custom InjectorOpts
-- [x] Add `WithDILogging[T](logf)` — DI container internal logging
-- [x] Update `WithSignalHandling` doc to clarify context-only behavior
-- [x] Add research report: `docs/research/samber-do-v2-utilization.html`
-- [x] Update taskctl example: `WithSignalHandling` → `WithGracefulShutdown`
-- [x] Add Clone+Override test example in taskctl
-- [x] samber/do utilization: 24% → 43% (13 → 23 of 54 API symbols)
+| #   | Task                                                                                                  | Verified State                                                                         | Effort |
+| --- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------ |
+| 4   | **Write tests for 5 sub-modules** — all have zero test files                                          | `glamour/`, `manpage/`, `prompts/`, `spinner/`, `telemetry/` — confirmed 0 `*_test.go` | 2-4h   |
+| 5   | **Add CI sub-module smoke test** — external `go get` from fresh module prevents resolution regression | Previous session proved sub-module dir-location bug was invisible inside repo          | 30m    |
+| 6   | **Add flake.nix sub-module builds** — `nix flake check` doesn't build/vet sub-modules                 | Only root module covered; sub-modules need manual loop                                 | 20m    |
+| 7   | **Move koanf to optional/configload** — 4 direct deps in root go.mod                                  | `go.mod` lines 9-12: koanf json/yaml/file/v2                                           | 45m    |
+| 8   | **Add lint check to CI** — grep for deleted feature names in `*.md` before merge                      | No such check exists                                                                   | 15m    |
 
-### Phase 14: Post-Sprint Cleanup (2026-06-10)
+---
 
-- [x] Make `NoFlags` a distinct named type (not struct{} alias) — P6 #29
-- [x] Remove deprecated `WithColor` option — use `WithFang` instead — P6 #34
-- [x] Fix `NO_COLOR` env var restored after execution instead of permanently mutated — P6 #35
-- [x] Extract API reference from AGENTS.md to docs/API.md
-- [x] Add comprehensive error reference (62 sentinels) to docs/ERROR_REFERENCE.md
-- [x] Consolidate type handler registration with helper function
-- [x] Add tests for 6 previously 0%-covered functions
-- [x] Add `Scope.RootScope()` accessor
-- [x] Add DI benchmarks: NewScopeWithOpts, CloneScope, ProvideInvokeCycle
-- [x] Clean up unused types and imports in test files
+## P2 — Medium (code quality, API debt)
 
-### Phase 15: Library Integration Sprint (2026-06-10)
+| #   | Task                                                                                                                                         | Verified State                                                                          | Effort |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------ |
+| 9   | **Fix 38 lint issues** — noinlineerr(10), ireturn(9), wrapcheck(5), paralleltest(5), gochecknoglobals(5), funlen(2), forbidigo(1), cyclop(1) | `golangci-lint run ./...` confirmed                                                     | 2-3h   |
+| 10  | **Evaluate flow_context.go** — 321 lines core + 5 test files (~900 total), used in 0 files outside its own package                           | `flow_context.go`(253) + `flow_context_access.go`(68); no other core file references it | 30m    |
+| 11  | **Make `RegisterTypeHandler`/`RegisterValidator` return errors** — both return void                                                          | `type_handler.go:150`, `flags_validate.go:105`                                          | 1h     |
+| 12  | **Middleware context propagation** — `next func() error` should be `next func(ctx) error`                                                    | `middleware.go:25`                                                                      | 2h     |
+| 13  | **Deduplicate jsonLoader** — identical struct in both `config_file.go` and `configload/loader.go`                                            | `config_file.go:23` + `configload/loader.go:73`                                         | 30m    |
+| 14  | **Bound regex cache** — unbounded `sync.Map` with no eviction                                                                                | `flags_validate.go:289`                                                                 | 30m    |
 
-- [x] Add `WithCLICommit[T](commit)` — auto-pipes to fang
-- [x] Add `WithFangErrorHandler[T](handler)` and `WithFangColorScheme[T](cs)`
-- [x] Add 4 new output formats: JSONL, AsciiDoc, TOML, PlantUML (16 total)
-- [x] Document new APIs in doc.go and docs/API.md
-- [x] Deduplicate `validateEmail`/`validateURL` — delegate to `ParseEmail`/`ParseURL`
-- [x] Fix `HostPort.IsEmpty()` coupling — use `hp.port.IsEmpty()` instead of `hp.port.port`
-- [x] Add IsEmpty() tests for Duration, LogLevel, LogFormat, Port
-- [x] Add ADR-001 for fang integration strategy
+### Deferred v3.x / v4 API-breaking cleanups
 
-### Phase 16: Performance Optimization Sprint (2026-06-14)
+| #   | Task                                                                             | Verified State        | Effort |
+| --- | -------------------------------------------------------------------------------- | --------------------- | ------ |
+| 15  | Rename `Get[T]` → `GetService[T]` — too generic                                  | `scope.go`            | 1h     |
+| 16  | Make `RegisterInScope` generic — currently takes `...any`                        | `scope.go:344`        | 1h     |
+| 17  | Remove or redesign `Package()` — unusual API shape (pre-existing `*Scope` param) | `scope.go`            | 1h     |
+| 18  | Remove `SetConfig` — mutating CLI config post-construction is unsafe             | `cli_accessors.go:27` | 30m    |
 
-- [x] Performance analysis: comprehensive HTML report at `docs/research/performance-analysis.html`
-- [x] Copy-on-write typeRegistry — eliminates 10 allocs/command, 48% faster NewCLI
-- [x] Copy-on-write validatorRegistry — same COW pattern
-- [x] Cache `os.UserHomeDir()` via `sync.OnceValue` — eliminates redundant syscalls
-- [x] Iterator methods: `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` — zero-allocation traversal
-- [x] Document regex cache safety bounds
-- [x] Add COW isolation tests (6 tests)
-- [x] Add benchmarks: FlagRegistryCOW, FlagRegistryCOWWithWrite, TagsSeq, TagsSlice
-- [x] Update PERFORMANCE.md with post-optimization numbers
-- [x] Update AGENTS.md gotchas (#59-61: COW, cached home dir, iterators)
+---
 
-### Phase 17: Dependency Maximization & Doc Sync (2026-06-17)
+## P3 — Lower (documentation, examples, polish)
 
-- [x] Verify all direct dependencies at latest published versions
-- [x] Upgrade indirect deps: `rogpeppe/go-internal` v1.15.0, `charmbracelet/x/conpty`, `charmbracelet/x/exp/golden`, `go-output/testhelpers/graphtest`
-- [x] Mark koanf config loading as completed (was already integrated, stale in remaining work)
-- [x] Sync stale version references across FEATURES.md, README.md, ROADMAP.md, AGENTS.md
+| #   | Task                                                                                 | Verified State                                                       | Effort |
+| --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | ------ |
+| 19  | Fix ROADMAP.md stale items — `GenerateDocs()` marked unchecked (line 115) but EXISTS | `docgen.go:19` confirmed; ROADMAP lines 115-116 need `[x]`           | 5m     |
+| 20  | Fix CONTRIBUTING.md "v2 Design Principles" header → v3                               | `CONTRIBUTING.md:110`                                                | 2m     |
+| 21  | Add godoc `Example*` functions for key API constructors                              | No `Example*` test functions exist                                   | 1h     |
+| 22  | Add `examples/docs-generator/main.go`                                                | No such example exists                                               | 30m    |
+| 23  | Add second example app (different domain than taskctl)                               | Only `examples/taskctl/` exists                                      | 2h     |
+| 24  | Write `docs/COBRA_FOOTGUNS.md` — explicit list of traps cmdguard closes              | Referenced in status reports; not created                            | 30m    |
+| 25  | Audit `docs/PERFORMANCE.md`, `docs/DOMAIN_LANGUAGE.md` for stale v2 refs             | Not checked in recent sessions                                       | 15m    |
+| 26  | Add `CODECOV_TOKEN` secret to GitHub repo settings                                   | CI has codecov-action but upload silently fails; requires repo owner | 5m     |
+| 27  | Deprecate v1 API with a timeline                                                     | ROADMAP has no removal date                                          | 15m    |
+| 28  | Add fuzz test corpus under `testdata/fuzz/`                                          | Fuzz targets exist (7) but no seed corpus                            | 1h     |
+| 29  | Cover `pkg/testutil` (0% coverage)                                                   | 372-line test helper package                                         | 30m    |
+| 30  | `gopls infertypeargs` sweep — ~100+ unnecessary type args in test files              | Cosmetic but noisy                                                   | 30m    |
 
-### Phase 18: Audit Log Format Expansion & Doc Sync (2026-06-21)
+---
 
-- [x] Upgrade `samber-do-auditlog` v0.1.0 → v0.3.0 (4 new export formats: d2, plantuml, tree, htmltree → 11 total)
-- [x] Remove local audit-log adapter functions (superseded by Plugin-level methods)
-- [x] Refresh all transitive dependencies via `go get -u all` + `go mod tidy`
-- [x] Fix stale audit log format lists in docs (7 → 11 formats)
-- [x] Brutal self-review report + Go 1.26.4 security TODO (govulncheck GO-2026-5037/5038/5039)
+## P4 — Future Ideas (no timeline)
 
-### Phase 19: Cobra-Correctness Contract & Escape-Hatch APIs (2026-06-28)
+| #   | Task                                                           | Category         |
+| --- | -------------------------------------------------------------- | ---------------- |
+| 31  | Extract flag-tags to `github.com/larsartmann/flagtags`         | Refactor / reuse |
+| 32  | Service-owned config design (ADR) — services own typed config  | Architecture     |
+| 33  | Command-level audit middleware — audit every command execution | Feature          |
+| 34  | Built-in audit-log subcommand (`myapp audit-log --format d2`)  | Feature          |
+| 35  | Consider making fang optional (plain cobra fallback)           | Architecture     |
+| 36  | `FlagRegistry` interface abstraction                           | API design       |
+| 37  | Custom per-flag validation hooks (beyond `validate` tag)       | Feature          |
+| 38  | Enhanced flag validation enums                                 | Feature          |
+| 39  | Metrics/hooks for custom observability (beyond OpenTelemetry)  | Feature          |
+| 40  | Branded-ID example app                                         | Example          |
+| 41  | Test all examples in CI                                        | CI               |
+| 42  | Benchmark regression thresholds in CI                          | CI               |
 
-Mission pivot back to "make consumers use Cobra correctly," driven by auditing BuildFlow (the primary consumer) and replacing its four workarounds with first-class APIs.
+---
 
-- [x] Close the cobra-correctness contract: `SilenceUsage=true` by default, public `ExitCode(err)` helper, flagship example no longer exits 0 on failure or double-prints errors
-- [x] Add scoped flags (`local:"true"` tag) — root-only flags not inherited by subcommands
-- [x] Add `hidden:"true"` flag tag — exclude from `--help`, stay functional
-- [x] Add `ConfigFromContext[T](ctx)` — type-safe config retrieval for raw cobra subcommands (the escape hatch)
-- [x] Add `WithPostFlagParse[T](fns ...)` — post-parse hook (DI init, session storage)
-- [x] Add `WithCleanup[T](fns ...)` — post-RunE cleanup that fires even when RunE errors (closes the PostRunE-doesn't-fire-on-error gap); covers both managed commands and raw cobra subcommands
-- [x] Disable `makezero` linter (directly conflicts with staticcheck S1019)
-- [x] Bump `go.mod` → `go 1.26.4` (nixpkgs now ships it; fixes GO-2026-5037/5038/5039)
-- [x] Untrack stray `taskctl-audit.html` generated artifact + gitignore generated example HTML
-- [x] Update CHANGELOG.md, FEATURES.md, docs/API.md for all v2.10.0 changes
+## Files Read for This TODO List
 
-## Remaining Work — Priority Sorted
+**Status/planning docs (8):**
 
-### P0: Open
+- `docs/status/2026-07-07_10-58_stale-reference-cleanup-self-review.md`
+- `docs/status/2026-07-07_09-59_v3-docs-cleanup-honest-self-review.md`
+- `docs/status/2026-07-07_02-55_v3-module-migration-release-cleanup.md`
+- `docs/status/2026-07-06_14-51_v3-full-status-report.md`
+- `docs/status/2026-07-06_09-55_v3-superb-cli-redesign-session.md`
+- `docs/status/2026-07-05_17-27_dependency-freshness-audit-and-doc-sync.md`
+- `docs/planning/2026-07-07_06-54_v3-docs-release-cleanup.md`
+- `docs/planning/2026-07-06_06-54_v3-superb-cli-redesign.md`
 
-| #   | Task                                                                                                      | Files           | Effort |
-| --- | --------------------------------------------------------------------------------------------------------- | --------------- | ------ |
-| 20  | Add `CODECOV_TOKEN` secret to GitHub repo settings (requires repo owner — cannot be set programmatically) | GitHub settings | 5m     |
+**Older status reports (14, mined via sub-agents):**
 
-### P1: Future (v3.0+)
+- `docs/status/2026-06-28_*` (3 files)
+- `docs/status/2026-06-22_15-29_*`
+- `docs/status/2026-06-18_20-04_*`
+- `docs/status/2026-06-14_17-05_*`
+- `docs/status/2026-06-12_03-33_*`
+- `docs/status/2026-06-11_*` (5 files)
 
-| #   | Task                                                                                     | Category |
-| --- | ---------------------------------------------------------------------------------------- | -------- |
-| 21  | ~~Plugin system for custom validators and type handlers~~ ✅ DONE (v2.8)                 |
-| 22  | ~~Config file nested struct support~~ ✅ DONE (v2.8)                                     |
-| 23  | ~~Documentation generation (GenerateDocs, markdown)~~ ✅ DONE (v2.8)                     |
-| 24  | ~~Advanced types: Result[T], Validated[T]~~ ✅ DONE (v2.8)                               |
-| 25  | ~~Structured JSON error output for `--output=json`~~ ✅ DONE (v2.7)                      |
-| 26  | Extract flag-related code to standalone `flagtags` library                               | Refactor |
-| 27  | ~~Consider extracting `go-output` to sub-package~~ ✅ DONE (already external at v0.12.0) |
+**Key reference docs:**
 
-### P2: Future Cleanup (API-breaking, defer to v3.0)
-
-| #   | Task                                                           |
-| --- | -------------------------------------------------------------- |
-| 30  | Rename `Get[T]`/`MustGet[T]` to more specific names            |
-| 31  | Make `RegisterInScope` generic instead of `...any`             |
-| 32  | Remove or redesign `Package()` for error-safe DI integration   |
-| 33  | Remove `SetConfig` or make it safe (reinitialize FlagRegistry) |
+- `ROADMAP.md`, `CONTRIBUTING.md`, `FEATURES.md`, `AGENTS.md`, `TODO_LIST.md` (previous)
+- All items verified against actual source code (`pkg/cmdguard/v3/*.go`)
