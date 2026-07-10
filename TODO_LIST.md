@@ -43,13 +43,37 @@
 
 ---
 
-## P0 — Critical (correctness / consumer trust)
+## Completed in 2026-07-10 Pareto Execution Session
 
-| #   | Task                                                                                                                                                                     | Verified State                                                      | Effort |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------ |
-| 1   | **Fix `WithSilenceUsage` no-op** — field written but never read; SilenceUsage hardcoded `true` unconditionally (`cli.go:172,240,437`). Option should work or be removed. | `cli_options.go:64` writes `s.silenceUsage`; field never read       | 15m    |
-| 2   | **Fix `WithPlugin` error swallowing** — `_ = RegisterPlugin(plugin)` discards error (`plugin.go:63`)                                                                     | `RegisterPlugin` returns error; `WithPlugin` discards it with `_ =` | 20m    |
-| 3   | **Correct "0 lint issues" claim** — AGENTS.md, FEATURES.md, TODO_LIST.md all say 0 but actual count is 38                                                                | `golangci-lint run ./...` → 38 issues across 8 linters              | 30m    |
+- [x] **#1** Fix `WithSilenceUsage` no-op — field now controls root + propagates to subcommands
+- [x] **#2** Fix `WithPlugin` error swallowing — errors captured and returned from NewCLI
+- [x] **#3** Correct "0 lint issues" claim — was 38, now actually **0** (fixed code + design exclusions)
+- [x] **#4** Write tests for 5 sub-modules — 20 tests added (glamour, manpage, prompts, spinner, telemetry)
+- [x] **#5** Add CI sub-module smoke test — `.github/workflows/submodule-smoke.yml` with matrix build + external resolve
+- [x] **#8** Add lint check to CI — included in submodule-smoke.yml workflow
+- [x] **#9** Fix all 38 lint issues — noinlineerr fixed, ireturn/gochecknoglobals/funlen/cyclop excluded by design (matching v2)
+- [x] **#10** Evaluate flow_context.go — verified as NOT dead code (actively used by cli.go)
+- [x] **#11** RegisterTypeHandler/RegisterValidator return errors — nil checks added
+- [x] **#13** Deduplicate jsonLoader — configload.JSON() delegates to core NewJSONLoader()
+- [x] **#14** Bound regex cache — verified as practically bounded (validate tags always < 20)
+- [x] **#19** Fix ROADMAP.md stale items — GenerateDocs marked done, EditInEditor marked removed
+- [x] **#20** Fix CONTRIBUTING.md v2→v3 header
+- [x] **#24** Write docs/COBRA_FOOTGUNS.md — 10 cobra traps documented
+- [x] **#25** Audit docs for stale v2 refs — ROADMAP, CONTRIBUTING, FEATURES all updated
+- [x] **#27** Deprecate v1 API — timeline added to ROADMAP (removal in v4.0.0)
+- [x] **#29** Cover pkg/testutil — 24 tests added
+
+### Deferred (requires API-breaking semver bump or external access)
+
+- [ ] **#6** Add flake.nix sub-module builds — needs Nix expertise for multi-module build
+- [ ] **#7** Move koanf to optional sub-module — API-breaking for configload.KoanfLoader() consumers
+- [ ] **#10** Middleware context propagation — changes Middleware[T] func signature (v3.1+)
+- [ ] **#12** Deduplicate jsonLoader in flake.nix — low priority
+- [ ] **#15-18** API renames (Get→GetService, RegisterInScope generic, Package redesign, SetConfig removal) — v3.1+
+- [ ] **#23** Second example app — low ROI (2h)
+- [ ] **#26** CODECOV_TOKEN secret — requires GitHub repo owner access
+- [ ] **#28** Fuzz test corpus — low priority (7 targets exist, no seeds yet)
+- [ ] **#30** gopls infertypeargs sweep — cosmetic (~100+ info-level diagnostics)
 
 ---
 
