@@ -186,21 +186,11 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption) (*CLI[T], 
 }
 
 func (cli *CLI[T]) initialize(defaults T) error {
-	s := &cli.spec
-
-	if s.scope == nil {
-		opts := cli.buildInjectorOpts()
-
-		if opts != nil {
-			s.scope = NewScopeWithOpts(s.name, opts)
-		} else {
-			s.scope = NewScope(s.name)
-		}
-	}
+	cli.ensureScope()
 
 	cfg := defaults
 
-	err := ProvideValue(s.scope, &cfg)
+	err := ProvideValue(cli.spec.scope, &cfg)
 	if err != nil {
 		return fmt.Errorf("%w: registering config type=%T: %w", ErrServiceRegistration, cfg, err)
 	}
@@ -217,7 +207,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		)
 	}
 
-	err = ProvideValue(s.scope, registry)
+	err = ProvideValue(cli.spec.scope, registry)
 	if err != nil {
 		return fmt.Errorf(
 			"%w: registering flag registry for %T: %w",
@@ -236,15 +226,14 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		registry.updateTagDefaultsFromConfig(cli.config, setFields)
 	}
 
-	if s.envPrefix != "" {
-		registry.SetEnvPrefix(s.envPrefix)
+	if cli.spec.envPrefix != "" {
+		registry.SetEnvPrefix(cli.spec.envPrefix)
 	}
 
 	cli.initOutputFlag()
 	cli.initNoColorFlag()
 
-	// Apply silence-usage setting from spec (defaults to true).
-	cli.rootCmd.SilenceUsage = s.silenceUsage
+	cli.rootCmd.SilenceUsage = cli.spec.silenceUsage
 
 	err = registry.RegisterScopedFlags(cli.rootCmd)
 	if err != nil {
@@ -255,6 +244,29 @@ func (cli *CLI[T]) initialize(defaults T) error {
 			err,
 		)
 	}
+
+	cli.setupPersistentPreRun()
+
+	return nil
+}
+
+func (cli *CLI[T]) ensureScope() {
+	if cli.spec.scope != nil {
+		return
+	}
+
+	opts := cli.buildInjectorOpts()
+
+	if opts != nil {
+		cli.spec.scope = NewScopeWithOpts(cli.spec.name, opts)
+	} else {
+		cli.spec.scope = NewScope(cli.spec.name)
+	}
+}
+
+func (cli *CLI[T]) setupPersistentPreRun() {
+	registry := cli.registry
+	s := &cli.spec
 
 	cli.rootCmd.PersistentPreRunE = func(c *cobra.Command, _ []string) error {
 		err := registry.ParseFlags(c, cli.config)
@@ -282,8 +294,6 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 		return cli.parseOutputFlag(c)
 	}
-
-	return nil
 }
 
 // buildInjectorOpts merges DI logging and audit log hooks into a single InjectorOpts.

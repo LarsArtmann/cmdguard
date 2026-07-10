@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
 
@@ -308,4 +309,73 @@ func TestResolveConfigFlag(t *testing.T) {
 			t.Errorf("resolveConfigFlag = %q, want empty", result)
 		}
 	})
+}
+
+func TestJSONLoader_RecursiveKeyCollection(t *testing.T) {
+	t.Parallel()
+
+	t.Run("flat keys match flag names", func(t *testing.T) {
+		t.Parallel()
+
+		type config struct {
+			Name string `flag:"name" json:"name"`
+			Port string `flag:"port" json:"port"`
+		}
+
+		loader := NewJSONLoader()
+		cfg := config{}
+
+		fields, err := loader.Load([]byte(`{"name":"test","port":"8080"}`), &cfg)
+		if err != nil {
+			t.Fatalf("Load failed: %v", err)
+		}
+
+		if cfg.Name != "test" {
+			t.Errorf("Name = %q, want %q", cfg.Name, "test")
+		}
+
+		if cfg.Port != "8080" {
+			t.Errorf("Port = %q, want %q", cfg.Port, "8080")
+		}
+
+		if !sliceContains(fields, "Name") {
+			t.Errorf("expected fields to contain 'Name', got: %v", fields)
+		}
+	})
+
+	t.Run("nested object keys are recursively collected", func(t *testing.T) {
+		t.Parallel()
+
+		type config struct {
+			Host string `flag:"host" json:"host"`
+		}
+
+		loader := NewJSONLoader()
+		cfg := config{}
+
+		fields, err := loader.Load([]byte(`{"db":{"host":"localhost"}}`), &cfg)
+		if err != nil {
+			t.Fatalf("Load failed: %v", err)
+		}
+
+		if !sliceContains(fields, "Host") {
+			t.Errorf("expected recursive key collection to find 'Host' from nested object, got: %v", fields)
+		}
+	})
+
+	t.Run("invalid JSON returns parse error", func(t *testing.T) {
+		t.Parallel()
+
+		loader := NewJSONLoader()
+		cfg := struct{}{}
+
+		_, err := loader.Load([]byte(`{invalid`), &cfg)
+		if err == nil {
+			t.Fatal("expected error for invalid JSON, got nil")
+		}
+	})
+}
+
+func sliceContains(slice []string, s string) bool {
+	return slices.Contains(slice, s)
 }

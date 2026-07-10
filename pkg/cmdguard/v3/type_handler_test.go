@@ -429,7 +429,10 @@ func TestTypeHandler_LookupHandler_Fallback(t *testing.T) {
 }
 
 func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
+	t.Parallel()
 	t.Run("custom type can be registered and looked up", func(t *testing.T) {
+		t.Parallel()
+
 		type Widget struct{ Name string }
 
 		custom := TypeHandlerFunc{
@@ -453,6 +456,19 @@ func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
 		testutil.AssertBoolTrue(t, ok, "result should be Widget")
 		testutil.AssertEqual(t, w.Name, "test")
 	})
+}
+
+func TestRegisterTypeHandler_NilReturnsError(t *testing.T) {
+	t.Parallel()
+
+	err := RegisterTypeHandler(nil, TypeHandlerFunc{
+		ParseFunc: func(_ string, _ FlagTag) (any, error) { return "", nil },
+	})
+	testutil.AssertExpectedError(t, err)
+
+	var handler TypeHandler
+	err = RegisterTypeHandler(reflect.TypeFor[string](), handler)
+	testutil.AssertExpectedError(t, err)
 }
 
 func TestTypeHandler_DispatchDefault(t *testing.T) {
@@ -693,6 +709,8 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	RegisterGoDurationHandler()
 
 	t.Run("registers time.Duration handler", func(t *testing.T) {
+		t.Parallel()
+
 		h, ok := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		testutil.AssertBoolTrue(t, ok, "time.Duration should be registered")
 
@@ -704,6 +722,8 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	})
 
 	t.Run("time.Duration default", func(t *testing.T) {
+		t.Parallel()
+
 		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		result := h.Default(FlagTag{Default: "10m"})
 		if result != 10*time.Minute {
@@ -738,6 +758,8 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	})
 
 	t.Run("time.Duration register with short", func(t *testing.T) {
+		t.Parallel()
+
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
 		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		err := h.Register(fs, FlagTag{Name: "timeout", Short: "t", Default: "30s", Help: "timeout"})
@@ -750,6 +772,8 @@ func TestRegisterGoDurationHandler(t *testing.T) {
 	})
 
 	t.Run("time.Duration invalid default returns error", func(t *testing.T) {
+		t.Parallel()
+
 		fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
 		h, _ := globalTypeRegistry.lookupHandler(reflect.TypeFor[time.Duration]())
 		err := h.Register(fs, FlagTag{Name: "bad", Default: "not-a-duration", Help: "bad duration"})

@@ -1,0 +1,2 @@
+go test fuzz v1
+string("https://example.com/very/long/path/that/goes/on/and/on/and/on?q=1&w=2&e=3&r=4&t=5&y=6&u=7&i=8&o=9&p=0")

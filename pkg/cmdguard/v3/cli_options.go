@@ -61,11 +61,21 @@ func WithSilenceErrors() CLIOption {
 }
 
 // WithSilenceUsage suppresses automatic usage printing on error for the root
-// command and all subcommands. Enabled by default — this option is only needed
-// if you want to make the intent explicit.
+// command and all subcommands. This is enabled by default to avoid cobra's
+// notorious footgun of dumping full usage text on every error. This option
+// exists to make the intent explicit.
 func WithSilenceUsage() CLIOption {
 	return func(s *cliSpec) {
 		s.silenceUsage = true
+	}
+}
+
+// WithoutSilenceUsage re-enables cobra's default behavior of printing usage
+// text on error. Use this when you want usage-on-error for debugging or when
+// your users expect to see usage hints when commands fail.
+func WithoutSilenceUsage() CLIOption {
+	return func(s *cliSpec) {
+		s.silenceUsage = false
 	}
 }
 

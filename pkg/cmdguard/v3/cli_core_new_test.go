@@ -133,4 +133,20 @@ func TestNewCLI(t *testing.T) {
 			t.Errorf("Version = %q, want %q", rootCmd.Version, "2.0.0")
 		}
 	})
+
+	t.Run("WithoutSilenceUsage re-enables usage on error", func(t *testing.T) {
+		t.Parallel()
+
+		cli, err := v3.NewCLI[testCLIConfig](
+			"test", "Test CLI", testCLIConfig{},
+			v3.WithoutSilenceUsage(),
+		)
+		testutil.AssertNoError(t, err)
+
+		testutil.AssertBoolFalse(
+			t,
+			cli.RootCommand().SilenceUsage,
+			"WithoutSilenceUsage should set SilenceUsage to false",
+		)
+	})
 }

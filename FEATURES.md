@@ -44,35 +44,35 @@
 
 ### CLI Options (26 total — all non-generic except where noted)
 
-| Option                                   | Status              | Notes                                                                                                                    |
-| ---------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `WithCLIVersion(v)`                      | 🟢 FULLY_FUNCTIONAL | Set version string; auto-pipes to fang                                                                                   |
-| `WithCLICommit(c)`                       | 🟢 FULLY_FUNCTIONAL | Git commit hash; auto-pipes to fang                                                                                      |
-| `WithCLILong(desc)`                      | 🟢 FULLY_FUNCTIONAL | Set long description                                                                                                     |
-| `WithCLIScope(scope)`                    | 🟢 FULLY_FUNCTIONAL | Custom DI scope                                                                                                          |
-| `WithSilenceErrors()`                    | 🟢 FULLY_FUNCTIONAL | Suppress cobra error printing                                                                                            |
-| `WithSilenceUsage()`                     | 🟢 FULLY_FUNCTIONAL | Silenced by default for root + all subcommands. Root respects the field; subcommands inherit via AddCommand propagation. |
-| `WithFang(bool)`                         | 🟢 FULLY_FUNCTIONAL | Enable/disable fang styling                                                                                              |
-| `WithFangOptions(opts...)`               | 🟢 FULLY_FUNCTIONAL | Pass raw fang options                                                                                                    |
-| `WithFangErrorHandler(fn)`               | 🟢 FULLY_FUNCTIONAL | Custom fang error display (`cli_options.go:85`)                                                                          |
-| `WithFangColorScheme(fn)`                | 🟢 FULLY_FUNCTIONAL | Custom fang color theme (`cli_options.go:92`)                                                                            |
-| `WithGroup(id, title)`                   | 🟢 FULLY_FUNCTIONAL | Command groups in help (`cli_options.go:100`)                                                                            |
-| `WithEnvPrefix(pfx)`                     | 🟢 FULLY_FUNCTIONAL | Prefix for env var lookups (root + command level)                                                                        |
-| `WithSignalHandling()`                   | 🟢 FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation                                                                                     |
-| `WithGracefulShutdown()`                 | 🟢 FULLY_FUNCTIONAL | Graceful DI service shutdown on signals (implies above)                                                                  |
-| `WithDILogging(logf)`                    | 🟢 FULLY_FUNCTIONAL | Internal DI container logging                                                                                            |
-| `WithStrictValidation()`                 | 🟢 FULLY_FUNCTIONAL | Require short desc on all commands                                                                                       |
-| `WithDraconianValidation()`              | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                       |
-| `WithAuditLog(plugin)`                   | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                                 |
-| `WithOutputFormat(fmt)`                  | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:157`)                                                        |
-| `WithConfigFile(paths...)`               | 🟢 FULLY_FUNCTIONAL | JSON loader, core package                                                                                                |
-| `WithConfigFileLoader(loader, paths...)` | 🟢 FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload)                                                                                 |
-| `WithConfigValidation[T](fn)`            | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                             |
-| `WithMiddleware[T](mw...)`               | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                   |
-| `WithPostFlagParse[T](fns...)`           | 🟢 FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage (generic)                                                                      |
-| `WithCleanup[T](fns...)`                 | 🟢 FULLY_FUNCTIONAL | Post-RunE cleanup, fires even on RunE error (generic)                                                                    |
-| `WithHelpTransform(fn)`                  | 🟢 FULLY_FUNCTIONAL | Transform command help text (glamour injection point)                                                                    |
-| `WithPlugin(plugin)`                     | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                         |
+| Option                                         | Status              | Notes                                                                                                                  |
+| ---------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `WithCLIVersion(v)`                            | 🟢 FULLY_FUNCTIONAL | Set version string; auto-pipes to fang                                                                                 |
+| `WithCLICommit(c)`                             | 🟢 FULLY_FUNCTIONAL | Git commit hash; auto-pipes to fang                                                                                    |
+| `WithCLILong(desc)`                            | 🟢 FULLY_FUNCTIONAL | Set long description                                                                                                   |
+| `WithCLIScope(scope)`                          | 🟢 FULLY_FUNCTIONAL | Custom DI scope                                                                                                        |
+| `WithSilenceErrors()`                          | 🟢 FULLY_FUNCTIONAL | Suppress cobra error printing                                                                                          |
+| `WithSilenceUsage()` / `WithoutSilenceUsage()` | 🟢 FULLY_FUNCTIONAL | Silenced by default; `WithoutSilenceUsage()` re-enables usage-on-error. Root + subcommands via AddCommand propagation. |
+| `WithFang(bool)`                               | 🟢 FULLY_FUNCTIONAL | Enable/disable fang styling                                                                                            |
+| `WithFangOptions(opts...)`                     | 🟢 FULLY_FUNCTIONAL | Pass raw fang options                                                                                                  |
+| `WithFangErrorHandler(fn)`                     | 🟢 FULLY_FUNCTIONAL | Custom fang error display (`cli_options.go:85`)                                                                        |
+| `WithFangColorScheme(fn)`                      | 🟢 FULLY_FUNCTIONAL | Custom fang color theme (`cli_options.go:92`)                                                                          |
+| `WithGroup(id, title)`                         | 🟢 FULLY_FUNCTIONAL | Command groups in help (`cli_options.go:100`)                                                                          |
+| `WithEnvPrefix(pfx)`                           | 🟢 FULLY_FUNCTIONAL | Prefix for env var lookups (root + command level)                                                                      |
+| `WithSignalHandling()`                         | 🟢 FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation                                                                                   |
+| `WithGracefulShutdown()`                       | 🟢 FULLY_FUNCTIONAL | Graceful DI service shutdown on signals (implies above)                                                                |
+| `WithDILogging(logf)`                          | 🟢 FULLY_FUNCTIONAL | Internal DI container logging                                                                                          |
+| `WithStrictValidation()`                       | 🟢 FULLY_FUNCTIONAL | Require short desc on all commands                                                                                     |
+| `WithDraconianValidation()`                    | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                     |
+| `WithAuditLog(plugin)`                         | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                               |
+| `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:157`)                                                      |
+| `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | JSON loader, core package                                                                                              |
+| `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload)                                                                               |
+| `WithConfigValidation[T](fn)`                  | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                           |
+| `WithMiddleware[T](mw...)`                     | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                 |
+| `WithPostFlagParse[T](fns...)`                 | 🟢 FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage (generic)                                                                    |
+| `WithCleanup[T](fns...)`                       | 🟢 FULLY_FUNCTIONAL | Post-RunE cleanup, fires even on RunE error (generic)                                                                  |
+| `WithHelpTransform(fn)`                        | 🟢 FULLY_FUNCTIONAL | Transform command help text (glamour injection point)                                                                  |
+| `WithPlugin(plugin)`                           | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                       |
 
 ### Command[T, F]
 

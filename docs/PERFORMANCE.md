@@ -1,7 +1,7 @@
 # Performance
 
-> Benchmarks for cmdguard v2 on AMD Ryzen AI MAX+ 395 (Linux/amd64).
-> **Last Updated:** 2026-06-14
+> Benchmarks for cmdguard v3 on AMD Ryzen AI MAX+ 395 (Linux/amd64).
+> **Last Updated:** 2026-07-10
 
 ---
 
@@ -9,18 +9,18 @@
 
 cmdguard adds **<6 µs** overhead for CLI creation and **~12 ns** for command validation. For typical CLIs with a few commands, the total cold-start overhead is well under 1 ms — less than 6% of Go runtime initialization.
 
-Copy-on-write registries (v2.7.0+) reduce per-command allocations by **48%** and memory by **22%** compared to eager cloning.
+Copy-on-write registries reduce per-command allocations by **48%** and memory by **22%** compared to eager cloning.
 
 ---
 
-## Optimizations Applied (v2.7.0)
+## Optimizations Applied
 
-| Optimization                          | Effect                                                  | Files                                              |
-| ------------------------------------- | ------------------------------------------------------- | -------------------------------------------------- |
-| Copy-on-write registries              | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI | `type_handler.go`, `flags_validate.go`, `flags.go` |
-| Cached `os.UserHomeDir()`             | Eliminates redundant syscalls for `~/` path expansion   | `config_file.go`                                   |
-| Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies         | `flags.go`, `flags_suggest.go`, `flow_context.go`  |
-| Regex cache safety documentation      | Documents bounded usage of `sync.Map` regex cache       | `flags_validate.go`                                |
+| Optimization                          | Effect                                                  | Files                                                              |
+| ------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| Copy-on-write registries              | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI | `pkg/cmdguard/v3/type_handler.go`, `flags_validate.go`, `flags.go` |
+| Cached `os.UserHomeDir()`             | Eliminates redundant syscalls for `~/` path expansion   | `pkg/cmdguard/v3/config_file.go`                                   |
+| Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies         | `pkg/cmdguard/v3/flags.go`, `flags_suggest.go`, `flow_context.go`  |
+| Regex cache safety documentation      | Documents bounded usage of `sync.Map` regex cache       | `pkg/cmdguard/v3/flags_validate.go`                                |
 
 ---
 
@@ -110,7 +110,7 @@ This is negligible for any CLI that does I/O.
 
 ## Copy-on-Write Registry Design
 
-Starting in v2.7.0, `FlagRegistry` uses copy-on-write for its `typeRegistry` and
+`FlagRegistry` uses copy-on-write for its `typeRegistry` and
 `validatorRegistry`. Instead of eagerly cloning the global registries at creation time
 (~12 allocs, ~1.5 KB per command), the registries share the global maps and only clone
 on the first write (`RegisterTypeHandler` / `RegisterFlagValidator`).

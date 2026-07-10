@@ -238,3 +238,21 @@ func TestValidatorLength_RuneCount(t *testing.T) {
 		}
 	})
 }
+
+func TestRegisterValidator_EmptyNameReturnsError(t *testing.T) {
+	t.Parallel()
+
+	err := RegisterValidator("", func(_ string) error { return nil })
+	if err == nil {
+		t.Fatal("expected error for empty validator name, got nil")
+	}
+}
+
+func TestRegisterValidator_NilValidatorReturnsError(t *testing.T) {
+	t.Parallel()
+
+	err := RegisterValidator("testnil", nil)
+	if err == nil {
+		t.Fatal("expected error for nil validator, got nil")
+	}
+}

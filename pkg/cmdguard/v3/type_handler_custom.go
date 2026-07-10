@@ -10,6 +10,11 @@ import (
 )
 
 func (r *typeRegistry) registerCustomTypes() {
+	r.registerEnumTypes()
+	r.registerValueTypes()
+}
+
+func (r *typeRegistry) registerEnumTypes() {
 	enumHelp := func(tag FlagTag) string {
 		if len(tag.Values) > 0 {
 			return fmt.Sprintf("%s (one of: %s)", tag.Help, strings.Join(tag.Values, ", "))
@@ -66,7 +71,9 @@ func (r *typeRegistry) registerCustomTypes() {
 		func(v string) (any, error) { return ParseLogFormat(v) },
 		logFormatAllowed,
 	)
+}
 
+func (r *typeRegistry) registerValueTypes() {
 	for _, entry := range []struct {
 		typ        reflect.Type
 		parse      func(string) (any, error)

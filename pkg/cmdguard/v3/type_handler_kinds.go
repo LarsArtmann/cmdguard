@@ -10,7 +10,17 @@ import (
 )
 
 func (r *typeRegistry) registerKinds() {
-	countHandler := TypeHandlerFunc{
+	r.registerCountHandler()
+	r.registerStringKind()
+	r.registerBoolKind()
+	r.registerIntKinds()
+	r.registerUintKinds()
+	r.registerFloatKinds()
+	r.registerSliceKind()
+}
+
+func (r *typeRegistry) registerCountHandler() {
+	r.countHandler = TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			if tag.Short != "" {
 				flags.CountP(tag.Name, tag.Short, tag.Help)
@@ -27,8 +37,9 @@ func (r *typeRegistry) registerKinds() {
 			return 0
 		},
 	}
-	r.countHandler = countHandler
+}
 
+func (r *typeRegistry) registerStringKind() {
 	r.byKind[reflect.String] = TypeHandlerFunc{
 		RegisterFunc: registerStringFlagFromTag,
 		ParseFunc: func(value string, _ FlagTag) (any, error) {
@@ -38,7 +49,9 @@ func (r *typeRegistry) registerKinds() {
 			return tag.Default
 		},
 	}
+}
 
+func (r *typeRegistry) registerBoolKind() {
 	r.byKind[reflect.Bool] = TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := parseBoolDefault(tag.Default)
@@ -63,21 +76,23 @@ func (r *typeRegistry) registerKinds() {
 			return v
 		},
 	}
+}
 
+func (r *typeRegistry) registerIntKinds() {
 	// Integer handlers are built per-kind so that flag values are validated
-	// against the field's actual bit-width. Previously every signed kind shared
-	// one handler that parsed with bitSize 64, so a value like 999 written into
-	// an int8 silently wrapped to -25. strconv.ParseInt with the matching
-	// bitSize now rejects out-of-range values, and the width-specific pflag
-	// registration enforces the same constraint at the flag layer.
+	// against the field's actual bit-width.
 	for _, k := range []reflect.Kind{reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64} {
 		r.byKind[k] = makeIntKindHandler(intBitSize(k))
 	}
+}
 
+func (r *typeRegistry) registerUintKinds() {
 	for _, k := range []reflect.Kind{reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr} {
 		r.byKind[k] = makeUintKindHandler(uintBitSize(k))
 	}
+}
 
+func (r *typeRegistry) registerFloatKinds() {
 	floatHandler := TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := parseFloat64Default(tag.Default)
@@ -102,9 +117,12 @@ func (r *typeRegistry) registerKinds() {
 			return v
 		},
 	}
+
 	r.byKind[reflect.Float32] = floatHandler
 	r.byKind[reflect.Float64] = floatHandler
+}
 
+func (r *typeRegistry) registerSliceKind() {
 	r.byKind[reflect.Slice] = TypeHandlerFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			var def []string

@@ -46,7 +46,7 @@ func OutputResult(cfg OutputConfig, data any) error {
 				ErrUnsupportedFormat, cfg.Format, formatShapes(cfg.Format))
 		}
 
-		return err
+		return wrapIfError("rendering table data", err)
 	}
 
 	err := output.RenderUnknown(data, cfg.Format, opts)
@@ -55,7 +55,7 @@ func OutputResult(cfg OutputConfig, data any) error {
 			ErrFormatRequiresTypedData, cfg.Format)
 	}
 
-	return err
+	return wrapIfError("rendering data", err)
 }
 
 // OutputTable is a convenience function to output table data with headers and rows.
@@ -66,7 +66,7 @@ func OutputTable(format OutputFormat, headers []string, rows [][]string) error {
 	for _, row := range rows {
 		err := data.AddRowChecked(row)
 		if err != nil {
-			return err
+			return fmt.Errorf("adding row to table: %w", err)
 		}
 	}
 
@@ -77,6 +77,16 @@ func OutputTable(format OutputFormat, headers []string, rows [][]string) error {
 // Use this to dynamically discover available formats based on imported sub-modules.
 func RegisteredFormats() []OutputFormat {
 	return output.RegisteredTableMarshalFormats()
+}
+
+// wrapIfError returns nil when err is nil, otherwise wraps with context.
+// This satisfies wrapcheck while preserving the nil-error contract.
+func wrapIfError(ctx string, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return fmt.Errorf("%s: %w", ctx, err)
 }
 
 // formatShapes returns a human-readable description of what shapes a format supports.

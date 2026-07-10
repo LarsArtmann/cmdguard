@@ -1,67 +1,61 @@
 # Domain Language
 
-A **Unified Language** for `.` — shared across Customer, Product Owner, Developer, and AI.
-Inspired by Domain-Driven Design (DDD) Ubiquitous Language.
+A **Unified Language** for `cmdguard` — shared across contributors and AI assistants.
 
-Every term below should mean the **same thing** to everyone who reads it.
-If a word means something different to a developer than to a customer, define it here.
+Inspired by Domain-Driven Design (DDD) Ubiquitous Language.
 
 ## Glossary
 
-| Term         | Definition               | Context                        |
-| ------------ | ------------------------ | ------------------------------ |
-| .            | The project/product name | What we call this system       |
-| Example Term | A placeholder definition | Replace with your actual terms |
+| Term          | Definition                                                          | Context                              |
+| ------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| CLI           | A `CLI[T]` instance — the root application container                | Entry point for all cmdguard apps    |
+| Command       | A `Command[T,F]` — a typed subcommand with config T and flags F     | Building block for command trees     |
+| Config        | The root type parameter `T` on `CLI[T]` — typed application config  | Drives flag registration             |
+| Flags         | The per-command type parameter `F` on `Command[T,F]`                | Typed flag struct with struct tags   |
+| FlagRegistry  | Holds parsed flag tags and type/validator registries                | Copy-on-write, per-CLI instance      |
+| FlagTag       | Parsed metadata from struct tags (`flag`, `default`, `help`, etc.)  | Drives flag registration and parsing |
+| Scope         | DI container wrapping `samber/do/v2` injector                       | Manages service lifecycle            |
+| Plugin        | Bundles custom type handlers + validators for one-step registration | Applied globally or per-instance     |
+| TypeHandler   | Interface for registering, parsing, and defaulting a flag type      | Extensible via `RegisterTypeHandler` |
+| FlagValidator | Named validation function applied to flag values                    | Registered via `RegisterValidator`   |
+| FlowContext   | Tracks command execution path and branch state                      | Used by middleware and hooks         |
+| SilenceUsage  | Suppresses cobra's usage-on-error footgun                           | True by default                      |
 
 ## Entities
 
-Objects with identity and lifecycle (e.g., User, Order, Account).
+Objects with identity and lifecycle.
 
-<!-- Add your entities here:
-| Term | Definition | Context |
-|------|-----------|---------|
-| User | A person who interacts with the system | Customer-facing |
--->
+| Term         | Definition                                                | Context                               |
+| ------------ | --------------------------------------------------------- | ------------------------------------- |
+| CLI[T]       | Root application — owns scope, root command, registry     | Created once per process              |
+| Command[T,F] | Typed subcommand with RunE handler                        | Registered via `AddCommand`           |
+| Scope        | DI container — manages service registration and lifecycle | Created by CLI or provided externally |
 
 ## Value Objects
 
-Immutable objects defined by attributes (e.g., Email, Money, Address).
+Immutable objects defined by attributes.
 
-<!-- Add your value objects here:
-| Term | Definition | Context |
-|------|-----------|---------|
-| Email | A validated email address | Unique identifier for users |
--->
-
-## Events
-
-Things that happen in the domain (e.g., UserRegistered, PaymentProcessed).
-
-<!-- Add your events here:
-| Term | Definition | Context |
-|------|-----------|---------|
-| UserRegistered | A new user completed signup | Triggers welcome email |
--->
+| Term         | Definition                                         | Context                                 |
+| ------------ | -------------------------------------------------- | --------------------------------------- |
+| FlagTag      | Parsed struct tag metadata for a single flag field | Built by `ParseFlagTags`                |
+| OutputFormat | Type-safe enum for output formats (table, json, …) | Aliased from go-output                  |
+| Duration     | Validated duration string (e.g. "5s", "1h30m")     | Custom type with Parse/Default handlers |
+| Port         | Validated network port (1-65535)                   | Custom type with Parse/Default handlers |
+| Email        | RFC 5322 validated email address                   | Custom type with Parse/Default handlers |
+| URL          | Validated URL string                               | Custom type with Parse/Default handlers |
+| Enum         | Enumerated string value from a fixed set           | Custom type with Parse/Default handlers |
 
 ## Commands
 
-Actions the system can perform (e.g., CreateUser, ProcessPayment).
+Actions the system can perform.
 
-<!-- Add your commands here:
-| Term | Definition | Context |
-|------|-----------|---------|
-| CreateUser | Registers a new user account | Admin action |
--->
-
-## Bounded Contexts
-
-Subsystems with distinct vocabulary (e.g., Billing vs. Shipping).
-
-<!-- Define contexts where the same word means different things:
-| Context | Description |
-|---------|------------|
-| Billing | Handles payments and invoices |
--->
+| Term            | Definition                                       | Context                             |
+| --------------- | ------------------------------------------------ | ----------------------------------- |
+| NewCLI          | Creates a CLI application with typed config      | Entry point                         |
+| AddCommand      | Registers a typed subcommand on the CLI          | Supports per-command flag types     |
+| Execute         | Runs the CLI with os.Args                        | Returns error for exit-code mapping |
+| ExecuteWithArgs | Runs the CLI with explicit args (testing)        | Used in tests                       |
+| ExecuteAndExit  | Runs CLI and calls os.Exit with mapped exit code | Blessed entry point                 |
 
 ---
 

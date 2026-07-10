@@ -2,6 +2,7 @@ package v3
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -100,4 +101,25 @@ func TestPlugin_WithPluginOption(t *testing.T) {
 
 	execErr := cli.ExecuteWithArgs(context.Background(), []string{"run", "--color", "blue"})
 	testutil.AssertNoError(t, execErr)
+}
+
+var errPluginFail = errors.New("plugin registration failed")
+
+type failingPlugin struct{}
+
+func (failingPlugin) Name() string { return "failing" }
+
+func (failingPlugin) Register(_ PluginRegistrar) error {
+	return errPluginFail
+}
+
+func TestPlugin_WithPluginReturnsErrorOnFailedRegister(t *testing.T) {
+	t.Parallel()
+
+	_, err := NewCLI("failingplugin", "1.0", struct{}{}, WithPlugin(failingPlugin{}))
+	testutil.AssertExpectedError(t, err)
+
+	if !errors.Is(err, errPluginFail) {
+		t.Errorf("expected error to wrap errPluginFail, got: %v", err)
+	}
 }

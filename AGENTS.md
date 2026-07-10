@@ -2,10 +2,10 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-10
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26
-**Status:** v3.0.0 - zero panics, 87.3% coverage, 0 lint issues, 0 race conditions
+**Status:** v3.0.0 - zero panics, 87.6% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -48,7 +48,7 @@ nix flake check
 
 **Module path:** `github.com/larsartmann/cmdguard/v3`
 
-**Current Status:** v3.0.0. 457 test functions (1430 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 87.3% coverage, 0 build errors.
+**Current Status:** v3.0.0. 463 test functions (1288 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 87.6% coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -92,9 +92,6 @@ cmdguard/
 │   │   ├── type_handler.go       # Extensible type registry
 │   │   ├── output.go             # Rich output (OutputTable, OutputResult, shape-aware errors)
 │   │   ├── plugin.go             # Plugin system (Plugin interface, RegisterPlugin, WithPlugin)
-│   │   ├── prompts.go            # PromptRunner interface (huh/v2 impl in prompts/ sub-module)
-│   │   ├── scope.go              # DI scope wrapping samber/do/v2
-│   │   ├── type_handler.go       # Extensible type registry
 │   │   ├── type_handler_kinds.go # Primitive kind handlers (string/bool/int/uint/float/slice)
 │   │   ├── type_handler_intwidth.go # Narrow integer overflow validation (int8/16/32, uint8/16)
 │   │   ├── type_handler_custom.go # Custom type handlers (Duration/Enum/URL/Email/Port)
@@ -213,6 +210,26 @@ go build ./...                                   # Verify build
 
 ## Architecture Decisions
 
+### Lint Strategy
+
+**Goal:** 0 lint issues via real code fixes, not silencing linters.
+
+**What was fixed (code refactored):**
+
+- `wrapcheck` in `output.go` — external errors now wrapped via `wrapIfError` helper (nil-safe)
+- `funlen` in `type_handler_kinds.go` — `registerKinds()` split into 7 focused helpers
+- `funlen` in `type_handler_custom.go` — `registerCustomTypes()` split into `registerEnumTypes()` + `registerValueTypes()`
+- `cyclop`/`funlen` in `cli.go` — `initialize()` split into `ensureScope()` + `setupPersistentPreRun()`
+- `paralleltest` in `type_handler_test.go` — added `t.Parallel()` to all test functions and subtests
+- `ireturn` — `TypeHandler` and `ConfigFileLoader` added to global ireturn allow list (legitimate interface returns)
+
+**What remains as documented design decisions (`.golangci.yml` exclusions):**
+
+- `gochecknoglobals` for `globalTypeRegistry`, `globalValidators`, `regexCache` — package-level registries are the COW pattern's foundation (ADR principle #11); injecting them would break the public `RegisterTypeHandler`/`RegisterValidator` API
+- `gochecknoglobals` for `argsKey`/`configKey` in `cli_command.go` — context keys must be package-level (Go convention)
+- `ireturn` for `do.Injector` returns in `scope.go`/`cli_accessors.go` — DI library interface, intentional
+- `ireturn` for `koanf` interface in `configload/koanf.go` — factory pattern for config loaders
+
 ### v3 Design Principles
 
 1. **Single type parameter on CLI only** — `CLI[T]` parameterizes on config. `CLIOption` and `CommandOption` are **non-generic** (`func(*spec)`); per-command flag types flow through `Command[T,F]`.
@@ -303,7 +320,7 @@ go build ./...                                   # Verify build
 #### Error Handling & Exit Codes
 
 - `ExecuteAndExit` checks for `ExitCoder`; `NewExitError(code, err)` returns `(*ExitError, error)` and validates the 0–255 range
-- **Error/exit contract** — cmdguard owns error display: the error is printed exactly once (fang when enabled, cobra when disabled). `SilenceUsage` is **true by default** (kills the #1 cobra footgun: usage-on-error). The error returned by `Execute` is for exit-code mapping only — consumers must NOT re-print it (that double-prints). `ExecuteAndExit` is the blessed entry point; `ExitCode(err) int` (public) supports the post-execution-work case (flush/audit/teardown before exit). `ExitCode(nil)==0`.
+- **Error/exit contract** — cmdguard owns error display: the error is printed exactly once (fang when enabled, cobra when disabled). `SilenceUsage` is **true by default** (kills the #1 cobra footgun: usage-on-error); use `WithoutSilenceUsage()` to re-enable usage-on-error. The error returned by `Execute` is for exit-code mapping only — consumers must NOT re-print it (that double-prints). `ExecuteAndExit` is the blessed entry point; `ExitCode(err) int` (public) supports the post-execution-work case (flush/audit/teardown before exit). `ExitCode(nil)==0`.
 - **Cobra escape hatch** — `ConfigFromContext[T](ctx)` retrieves resolved config from any cobra command context (stored by PersistentPreRunE). `WithPostFlagParse[T](fns...)` registers hooks that run after flag parsing + config validation but before command handlers (replaces manual PersistentPreRunE wrapping). `RegisterLocalCommandFlags(cmd)` registers the root's `local:"true"` flags on a subcommand.
 - **`WithCleanup[T]`** — registers hooks that fire after EVERY command's `RunE`, including when `RunE` errors (Cobra's `PostRunE`/`PersistentPostRunE` do NOT fire on `RunE` error). Implemented as a tree-walk at `Execute` time (`applyCleanupHooks` in `cli.go`) that wraps each command's `RunE` — so it covers BOTH cmdguard-managed `Command[T,F]` and raw cobra subcommands (escape hatch). Hook signature `func(cmd, cfg, runErr) error`; the original `runErr` is never swallowed (cleanup errors joined via `errors.Join`). Idempotent (`cleanupWired` guard) so calling `Execute` twice doesn't double-wrap. No-op when no hooks registered.
 - **Scoped flags** — `local:"true"` tag: registered on owning command only, NOT inherited by subcommands. `hidden:"true"` tag: excluded from `--help` but fully functional. Both parsed via `parseBoolTags`.
