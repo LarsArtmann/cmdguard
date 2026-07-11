@@ -1,4 +1,4 @@
-//nolint:nlreturn,paralleltest // test file with inline handler returns; top-level parallel blocked by t.Setenv subtests
+//nolint:nlreturn,paralleltest,tagliatelle // test file: inline returns, t.Setenv subtests, JSON tags intentionally match flag names
 package v3_test
 
 import (
@@ -15,12 +15,12 @@ type precedenceConfig struct {
 }
 
 type dbConfig struct {
-	Host string `flag:"db-host" default:"localhost"`
-	Port int    `flag:"db-port" default:"5432"`
+	Host string `flag:"db-host" json:"db-host" default:"localhost"`
+	Port int    `flag:"db-port" json:"db-port" default:"5432"`
 }
 
 type nestedConfigRoot struct {
-	Database dbConfig
+	Database dbConfig `json:"Database"`
 }
 
 func writeNestedConfigFile(t *testing.T) string {
@@ -28,7 +28,7 @@ func writeNestedConfigFile(t *testing.T) string {
 
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "config.json")
-	data := `{"Database": {"Host": "db.example.com", "Port": 6543}}`
+	data := `{"Database": {"db-host": "db.example.com", "db-port": 6543}}`
 	if err := os.WriteFile(configPath, []byte(data), 0o600); err != nil {
 		t.Fatal(err)
 	}

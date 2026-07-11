@@ -59,6 +59,77 @@ Actions the system can perform.
 
 ---
 
+## Bounded Contexts
+
+cmdguard has distinct areas of responsibility. Each context has its own vocabulary and rules.
+
+### 1. Command Construction
+
+Building typed command trees from Go structs.
+
+| Term          | Definition                                                              |
+| ------------- | ----------------------------------------------------------------------- |
+| Use           | The command name as typed by the user (e.g. `"deploy"`)                 |
+| Short         | One-line description shown in help and command listings                 |
+| Long          | Multi-line description shown in detailed help                           |
+| Example       | Usage example string shown in help                                      |
+| RunE          | The handler function executed when the command runs                     |
+| ParentCommand | A command with subcommands but no own RunE                              |
+| NoFlags       | Sentinel type for commands that take no flags (`type NoFlags struct{}`) |
+
+### 2. Flag System
+
+Parsing, validating, and defaulting typed flags from struct tags.
+
+| Term          | Definition                                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| FlagTag       | Parsed metadata from struct tags (`flag`, `default`, `help`, `short`, `env`, `validate`, `count`, `required`, `prompt`, `local`, `hidden`) |
+| FlagRegistry  | Per-CLI collection of flag tags + type/validator registries (copy-on-write)                                                                |
+| TypeHandler   | Interface for registering, parsing, and defaulting a specific flag type                                                                    |
+| FlagValidator | Named validation function applied to flag values at parse time                                                                             |
+| DefaultValue  | The initial value for a flag before env/flag overrides                                                                                     |
+| Precedence    | Resolution order: explicit flag > env var > config file > tag default                                                                      |
+| Counting Flag | A flag using `count:"true"` that increments on each occurrence (e.g. `-vvv`)                                                               |
+| Scoped Flag   | A flag with `local:"true"` that is NOT inherited by subcommands                                                                            |
+| Hidden Flag   | A flag with `hidden:"true"` that is excluded from help but fully functional                                                                |
+
+### 3. Dependency Injection
+
+Service lifecycle and injection via samber/do/v2.
+
+| Term             | Definition                                                        |
+| ---------------- | ----------------------------------------------------------------- |
+| Scope            | DI container wrapping `do.Injector`                               |
+| Injector         | The underlying samber/do/v2 service container                     |
+| Override         | Replace a service for testing (clone scope, override, invoke)     |
+| CloneScope       | Copy registrations without invoked state                          |
+| Shutdown         | DI service shutdown in reverse invocation order                   |
+| GracefulShutdown | SIGINT/SIGTERM-triggered DI shutdown via `WithGracefulShutdown()` |
+
+### 4. Output and Formatting
+
+Rendering command output in multiple formats.
+
+| Term         | Definition                                                            |
+| ------------ | --------------------------------------------------------------------- |
+| OutputFormat | Type-safe enum for output formats (table, json, yaml, markdown, etc.) |
+| OutputTable  | Render tabular data in the selected output format                     |
+| OutputResult | Render structured data in the selected output format                  |
+| AuditLog     | DI service invocation audit trail (11 export formats)                 |
+
+### 5. Extension Points
+
+Interfaces and hooks for customization without modifying core.
+
+| Term          | Definition                                                                   |
+| ------------- | ---------------------------------------------------------------------------- |
+| Plugin        | Bundles custom type handlers + validators for one-step registration          |
+| PromptRunner  | Interface for interactive flag prompting (huh/v2 impl in prompts sub-module) |
+| HelpTransform | Function hook for transforming command help text before display              |
+| Middleware    | Generic chain type for wrapping command execution                            |
+
+---
+
 > **How to use this file:**
 >
 > - Keep terms concise — one clear sentence per definition
