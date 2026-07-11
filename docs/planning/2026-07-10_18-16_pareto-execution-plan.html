@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cmdguard Pareto Execution Plan — 2026-07-10</title>
     <style>
-    
       /* =========================================================================
          BAUHAUS DARK — Dashboard template
          Design language: form follows function. Primary colors on graphite.
@@ -800,7 +799,6 @@
           grid-template-columns: 1fr;
         }
       }
-    
     </style>
   </head>
   <body>
@@ -832,7 +830,10 @@
           </div>
           <div class="hero-badge">PARETO PLAN</div>
           <h1>cmdguard v3 — Comprehensive Execution Plan</h1>
-          <p class="hero-subtitle">60 subtasks across 12 medium tasks, sorted by Pareto impact tiers. Covers all open TODO_LIST.md items (P0-P3). API-breaking changes deferred to v3.1+.</p>
+          <p class="hero-subtitle">
+            60 subtasks across 12 medium tasks, sorted by Pareto impact tiers. Covers all open
+            TODO_LIST.md items (P0-P3). API-breaking changes deferred to v3.1+.
+          </p>
         </div>
 
         <h2 id="summary"><span class="num">00</span>Summary</h2>
@@ -857,251 +858,1679 @@
 
         <div class="card card-problem">
           <h4>The 3 Lies We Must Fix First (1% &rarr; 51%)</h4>
-          <p><strong>WithSilenceUsage</strong> is a no-op for root command. <strong>WithPlugin</strong> silently swallows errors. <strong>Every doc claims "0 lint issues"</strong> but actual is 38. These are trust-destroying bugs.</p>
+          <p>
+            <strong>WithSilenceUsage</strong> is a no-op for root command.
+            <strong>WithPlugin</strong> silently swallows errors.
+            <strong>Every doc claims "0 lint issues"</strong> but actual is 38. These are
+            trust-destroying bugs.
+          </p>
         </div>
 
         <h2 id="pareto"><span class="num">01</span>Pareto Breakdown</h2>
 
         <h3>1% &rarr; 51% (Fix lies and broken features)</h3>
         <table>
-          <thead><tr><th>#</th><th>Task</th><th>Effort</th><th>Why</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Effort</th>
+              <th>Why</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>1</td><td>Fix <code>WithSilenceUsage</code> no-op</td><td>15m</td><td>Option exists but does nothing for root command</td></tr>
-            <tr><td>2</td><td>Fix <code>WithPlugin</code> error swallowing</td><td>20m</td><td><code>_ = RegisterPlugin(plugin)</code> silently discards errors</td></tr>
-            <tr><td>3</td><td>Correct "0 lint issues" in all docs</td><td>30m</td><td>Every doc lies &mdash; actual is 38</td></tr>
+            <tr>
+              <td>1</td>
+              <td>Fix <code>WithSilenceUsage</code> no-op</td>
+              <td>15m</td>
+              <td>Option exists but does nothing for root command</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Fix <code>WithPlugin</code> error swallowing</td>
+              <td>20m</td>
+              <td><code>_ = RegisterPlugin(plugin)</code> silently discards errors</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Correct "0 lint issues" in all docs</td>
+              <td>30m</td>
+              <td>Every doc lies &mdash; actual is 38</td>
+            </tr>
           </tbody>
         </table>
 
         <h3>4% &rarr; 64% (Add code quality + doc fixes)</h3>
         <table>
-          <thead><tr><th>#</th><th>Task</th><th>Effort</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Effort</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>4</td><td>Fix all 38 lint issues (8 linters)</td><td>2.5h</td></tr>
-            <tr><td>5</td><td>Deduplicate jsonLoader</td><td>30m</td></tr>
-            <tr><td>6</td><td>Bound regex cache (unbounded sync.Map)</td><td>30m</td></tr>
-            <tr><td>7</td><td>Remove dead code: flow_context.go (321 lines)</td><td>30m</td></tr>
-            <tr><td>8</td><td>Fix ROADMAP.md + CONTRIBUTING.md stale refs</td><td>7m</td></tr>
-            <tr><td>9</td><td>Audit all docs for stale v2 references</td><td>15m</td></tr>
+            <tr>
+              <td>4</td>
+              <td>Fix all 38 lint issues (8 linters)</td>
+              <td>2.5h</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Deduplicate jsonLoader</td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Bound regex cache (unbounded sync.Map)</td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Remove dead code: flow_context.go (321 lines)</td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Fix ROADMAP.md + CONTRIBUTING.md stale refs</td>
+              <td>7m</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Audit all docs for stale v2 references</td>
+              <td>15m</td>
+            </tr>
           </tbody>
         </table>
 
         <h3>20% &rarr; 80% (Add tests, CI, coverage)</h3>
         <table>
-          <thead><tr><th>#</th><th>Task</th><th>Effort</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Effort</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>10</td><td>Write sub-module tests (5 modules, 0 tests each)</td><td>3h</td></tr>
-            <tr><td>11</td><td>CI: smoke test + flake.nix + lint check</td><td>60m</td></tr>
-            <tr><td>12</td><td>RegisterTypeHandler/Validator return errors</td><td>1h</td></tr>
-            <tr><td>13</td><td>Cover pkg/testutil + fuzz corpus</td><td>90m</td></tr>
-            <tr><td>14</td><td>gopls infertypeargs sweep</td><td>30m</td></tr>
-            <tr><td>15</td><td>Deprecate v1 API with timeline</td><td>15m</td></tr>
+            <tr>
+              <td>10</td>
+              <td>Write sub-module tests (5 modules, 0 tests each)</td>
+              <td>3h</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>CI: smoke test + flake.nix + lint check</td>
+              <td>60m</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>RegisterTypeHandler/Validator return errors</td>
+              <td>1h</td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td>Cover pkg/testutil + fuzz corpus</td>
+              <td>90m</td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td>gopls infertypeargs sweep</td>
+              <td>30m</td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td>Deprecate v1 API with timeline</td>
+              <td>15m</td>
+            </tr>
           </tbody>
         </table>
 
         <h3>Remaining 20% &rarr; 100% (Polish)</h3>
         <table>
-          <thead><tr><th>#</th><th>Task</th><th>Effort</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Effort</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>16</td><td>Extract koanf to optional sub-module (drops 4 deps)</td><td>45m</td></tr>
-            <tr><td>17</td><td>Godoc Example* functions</td><td>60m</td></tr>
-            <tr><td>18</td><td>examples/docs-generator + COBRA_FOOTGUNS.md</td><td>60m</td></tr>
+            <tr>
+              <td>16</td>
+              <td>Extract koanf to optional sub-module (drops 4 deps)</td>
+              <td>45m</td>
+            </tr>
+            <tr>
+              <td>17</td>
+              <td>Godoc Example* functions</td>
+              <td>60m</td>
+            </tr>
+            <tr>
+              <td>18</td>
+              <td>examples/docs-generator + COBRA_FOOTGUNS.md</td>
+              <td>60m</td>
+            </tr>
           </tbody>
         </table>
 
         <h2 id="medium"><span class="num">02</span>Medium Plan (12 tasks, 15min-2.5h each)</h2>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Task</th><th>Scope</th><th>Effort</th><th>Impact</th><th>Tier</th><th>Deps</th></tr></thead>
-          <tbody>
-            <tr><td>M01</td><td>Fix P0 correctness bugs</td><td>WithSilenceUsage + WithPlugin</td><td>35m</td><td><span class="badge badge-critical">Critical</span></td><td>1%</td><td>&mdash;</td></tr>
-            <tr><td>M02</td><td>Fix all 38 lint issues</td><td>8 linters across pkg/</td><td>2.5h</td><td><span class="badge badge-high">High</span></td><td>4%</td><td>&mdash;</td></tr>
-            <tr><td>M03</td><td>Code quality fixes</td><td>Dedup jsonLoader, bound regex, remove flow_context</td><td>90m</td><td><span class="badge badge-high">High</span></td><td>4%</td><td>&mdash;</td></tr>
-            <tr><td>M04</td><td>API: return errors</td><td>RegisterTypeHandler + RegisterValidator</td><td>60m</td><td><span class="badge badge-medium">Medium</span></td><td>20%</td><td>&mdash;</td></tr>
-            <tr><td>M05</td><td>Extract koanf sub-module</td><td>Move 4 deps out of root go.mod</td><td>45m</td><td><span class="badge badge-medium">Medium</span></td><td>80%</td><td>&mdash;</td></tr>
-            <tr><td>M06</td><td>Documentation accuracy</td><td>AGENTS, FEATURES, TODO, ROADMAP, CONTRIBUTING</td><td>60m</td><td><span class="badge badge-critical">Critical</span></td><td>1%+4%</td><td>M01-M05</td></tr>
-            <tr><td>M07</td><td>Sub-module tests (5)</td><td>glamour, manpage, prompts, spinner, telemetry</td><td>3h</td><td><span class="badge badge-high">High</span></td><td>20%</td><td>&mdash;</td></tr>
-            <tr><td>M08</td><td>CI infrastructure</td><td>Smoke test, flake.nix, doc-drift check</td><td>60m</td><td><span class="badge badge-high">High</span></td><td>20%</td><td>M07</td></tr>
-            <tr><td>M09</td><td>Coverage gaps</td><td>pkg/testutil, fuzz corpus, infertypeargs</td><td>90m</td><td><span class="badge badge-medium">Medium</span></td><td>20%</td><td>&mdash;</td></tr>
-            <tr><td>M10</td><td>Deprecate v1 API</td><td>Timeline + notice</td><td>15m</td><td><span class="badge badge-low">Low</span></td><td>20%</td><td>&mdash;</td></tr>
-            <tr><td>M11</td><td>Godoc + examples</td><td>Example* functions, docs-generator</td><td>90m</td><td><span class="badge badge-low">Low</span></td><td>80%</td><td>&mdash;</td></tr>
-            <tr><td>M12</td><td>COBRA_FOOTGUNS.md</td><td>Document traps cmdguard closes</td><td>30m</td><td><span class="badge badge-low">Low</span></td><td>80%</td><td>&mdash;</td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Task</th>
+                <th>Scope</th>
+                <th>Effort</th>
+                <th>Impact</th>
+                <th>Tier</th>
+                <th>Deps</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M01</td>
+                <td>Fix P0 correctness bugs</td>
+                <td>WithSilenceUsage + WithPlugin</td>
+                <td>35m</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>1%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M02</td>
+                <td>Fix all 38 lint issues</td>
+                <td>8 linters across pkg/</td>
+                <td>2.5h</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>4%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M03</td>
+                <td>Code quality fixes</td>
+                <td>Dedup jsonLoader, bound regex, remove flow_context</td>
+                <td>90m</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>4%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M04</td>
+                <td>API: return errors</td>
+                <td>RegisterTypeHandler + RegisterValidator</td>
+                <td>60m</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>20%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M05</td>
+                <td>Extract koanf sub-module</td>
+                <td>Move 4 deps out of root go.mod</td>
+                <td>45m</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>80%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M06</td>
+                <td>Documentation accuracy</td>
+                <td>AGENTS, FEATURES, TODO, ROADMAP, CONTRIBUTING</td>
+                <td>60m</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>1%+4%</td>
+                <td>M01-M05</td>
+              </tr>
+              <tr>
+                <td>M07</td>
+                <td>Sub-module tests (5)</td>
+                <td>glamour, manpage, prompts, spinner, telemetry</td>
+                <td>3h</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>20%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M08</td>
+                <td>CI infrastructure</td>
+                <td>Smoke test, flake.nix, doc-drift check</td>
+                <td>60m</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>20%</td>
+                <td>M07</td>
+              </tr>
+              <tr>
+                <td>M09</td>
+                <td>Coverage gaps</td>
+                <td>pkg/testutil, fuzz corpus, infertypeargs</td>
+                <td>90m</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>20%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M10</td>
+                <td>Deprecate v1 API</td>
+                <td>Timeline + notice</td>
+                <td>15m</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>20%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M11</td>
+                <td>Godoc + examples</td>
+                <td>Example* functions, docs-generator</td>
+                <td>90m</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>80%</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>M12</td>
+                <td>COBRA_FOOTGUNS.md</td>
+                <td>Document traps cmdguard closes</td>
+                <td>30m</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>80%</td>
+                <td>&mdash;</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <h2 id="detailed"><span class="num">03</span>Detailed Breakdown (60 subtasks, max 15min each)</h2>
+        <h2 id="detailed">
+          <span class="num">03</span>Detailed Breakdown (60 subtasks, max 15min each)
+        </h2>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Subtask</th><th>Parent</th><th>Effort</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>Read cli.go:172,240,437 — understand SilenceUsage hardcoding</td><td>M01</td><td>5m</td></tr>
-            <tr><td>2</td><td>Fix root command to respect s.silenceUsage field</td><td>M01</td><td>10m</td></tr>
-            <tr><td>3</td><td>Fix WithPlugin error swallowing in plugin.go:63</td><td>M01</td><td>10m</td></tr>
-            <tr><td>4</td><td>Run tests for both P0 fixes</td><td>M01</td><td>5m</td></tr>
-            <tr><td>5</td><td>Fix 10 noinlineerr — extract err from if-init</td><td>M02</td><td>15m</td></tr>
-            <tr><td>6</td><td>Fix 9 ireturn — wrap returns or nolint</td><td>M02</td><td>15m</td></tr>
-            <tr><td>7</td><td>Fix 5 wrapcheck — wrap external errors</td><td>M02</td><td>10m</td></tr>
-            <tr><td>8</td><td>Fix 5 paralleltest — add t.Parallel() or nolint</td><td>M02</td><td>10m</td></tr>
-            <tr><td>9</td><td>Fix 5 gochecknoglobals — refactor or nolint</td><td>M02</td><td>15m</td></tr>
-            <tr><td>10</td><td>Fix 2 funlen — split registerCustomTypes/registerKinds</td><td>M02</td><td>15m</td></tr>
-            <tr><td>11</td><td>Fix 1 forbidigo — replace fmt.Println in example_test</td><td>M02</td><td>5m</td></tr>
-            <tr><td>12</td><td>Fix 1 cyclop — split initialize() function</td><td>M02</td><td>15m</td></tr>
-            <tr><td>13</td><td>Run golangci-lint, verify 0 issues</td><td>M02</td><td>5m</td></tr>
-            <tr><td>14</td><td>Deduplicate jsonLoader — remove from config_file.go</td><td>M03</td><td>10m</td></tr>
-            <tr><td>15</td><td>Bound regex cache — add LRU eviction</td><td>M03</td><td>15m</td></tr>
-            <tr><td>16</td><td>Verify flow_context.go has 0 external callers</td><td>M03</td><td>5m</td></tr>
-            <tr><td>17</td><td>Remove flow_context.go + flow_context_access.go + tests</td><td>M03</td><td>10m</td></tr>
-            <tr><td>18</td><td>Run full test suite after code quality changes</td><td>M03</td><td>5m</td></tr>
-            <tr><td>19</td><td>Change RegisterTypeHandler to return error</td><td>M04</td><td>10m</td></tr>
-            <tr><td>20</td><td>Change RegisterValidator to return error</td><td>M04</td><td>10m</td></tr>
-            <tr><td>21</td><td>Update all callers + add error handling</td><td>M04</td><td>10m</td></tr>
-            <tr><td>22</td><td>Run tests for API changes</td><td>M04</td><td>5m</td></tr>
-            <tr><td>23</td><td>Create configload-koanf/ sub-module structure</td><td>M05</td><td>10m</td></tr>
-            <tr><td>24</td><td>Move koanf.go, update imports</td><td>M05</td><td>15m</td></tr>
-            <tr><td>25</td><td>Update go.work, remove koanf deps from root go.mod</td><td>M05</td><td>10m</td></tr>
-            <tr><td>26</td><td>Test build + configload still works</td><td>M05</td><td>10m</td></tr>
-            <tr><td>27</td><td>Fix AGENTS.md — correct lint count, dep count, stale claims</td><td>M06</td><td>15m</td></tr>
-            <tr><td>28</td><td>Fix FEATURES.md — update statuses post-changes</td><td>M06</td><td>15m</td></tr>
-            <tr><td>29</td><td>Fix TODO_LIST.md — mark completed items</td><td>M06</td><td>10m</td></tr>
-            <tr><td>30</td><td>Fix ROADMAP.md — GenerateDocs done, EditInEditor removed</td><td>M06</td><td>5m</td></tr>
-            <tr><td>31</td><td>Fix CONTRIBUTING.md — v2 to v3 header</td><td>M06</td><td>2m</td></tr>
-            <tr><td>32</td><td>Audit PERFORMANCE.md + DOMAIN_LANGUAGE.md for stale refs</td><td>M06</td><td>10m</td></tr>
-            <tr><td>33</td><td>Read glamour/glamour.go, design test approach</td><td>M07</td><td>5m</td></tr>
-            <tr><td>34</td><td>Write + run glamour tests</td><td>M07</td><td>15m</td></tr>
-            <tr><td>35</td><td>Read manpage/ source, design test approach</td><td>M07</td><td>5m</td></tr>
-            <tr><td>36</td><td>Write + run manpage tests</td><td>M07</td><td>15m</td></tr>
-            <tr><td>37</td><td>Read prompts/prompts.go, design test approach</td><td>M07</td><td>5m</td></tr>
-            <tr><td>38</td><td>Write + run prompts tests</td><td>M07</td><td>15m</td></tr>
-            <tr><td>39</td><td>Read spinner/spinner.go, design test approach</td><td>M07</td><td>5m</td></tr>
-            <tr><td>40</td><td>Write + run spinner tests</td><td>M07</td><td>15m</td></tr>
-            <tr><td>41</td><td>Read telemetry/telemetry.go, design test approach</td><td>M07</td><td>5m</td></tr>
-            <tr><td>42</td><td>Write + run telemetry tests</td><td>M07</td><td>15m</td></tr>
-            <tr><td>43</td><td>Create .github/workflows/submodule-smoke.yml</td><td>M08</td><td>15m</td></tr>
-            <tr><td>44</td><td>Add flake.nix sub-module build checks</td><td>M08</td><td>15m</td></tr>
-            <tr><td>45</td><td>Create doc-drift lint script</td><td>M08</td><td>15m</td></tr>
-            <tr><td>46</td><td>Write pkg/testutil tests</td><td>M09</td><td>15m</td></tr>
-            <tr><td>47</td><td>Add fuzz seed corpus under testdata/fuzz/</td><td>M09</td><td>15m</td></tr>
-            <tr><td>48</td><td>gopls infertypeargs sweep in test files</td><td>M09</td><td>15m</td></tr>
-            <tr><td>49</td><td>Add v1 deprecation notice to README</td><td>M10</td><td>10m</td></tr>
-            <tr><td>50</td><td>Update ROADMAP with v1 removal timeline</td><td>M10</td><td>5m</td></tr>
-            <tr><td>51</td><td>Write ExampleNewCLI godoc test</td><td>M11</td><td>15m</td></tr>
-            <tr><td>52</td><td>Write ExampleNewCommand + ExampleAddCommand</td><td>M11</td><td>15m</td></tr>
-            <tr><td>53</td><td>Create examples/docs-generator/main.go</td><td>M11</td><td>15m</td></tr>
-            <tr><td>54</td><td>Write docs/COBRA_FOOTGUNS.md</td><td>M12</td><td>15m</td></tr>
-            <tr><td>55</td><td>Link COBRA_FOOTGUNS from README + AGENTS</td><td>M12</td><td>5m</td></tr>
-            <tr><td>56</td><td>Full build: go build ./... + all sub-modules</td><td>Verify</td><td>5m</td></tr>
-            <tr><td>57</td><td>Full test: go test ./... -race -count=1</td><td>Verify</td><td>5m</td></tr>
-            <tr><td>58</td><td>Full lint: golangci-lint run ./...</td><td>Verify</td><td>5m</td></tr>
-            <tr><td>59</td><td>Final git commit with detailed message</td><td>Verify</td><td>5m</td></tr>
-            <tr><td>60</td><td>git push</td><td>Verify</td><td>1m</td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Subtask</th>
+                <th>Parent</th>
+                <th>Effort</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Read cli.go:172,240,437 — understand SilenceUsage hardcoding</td>
+                <td>M01</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Fix root command to respect s.silenceUsage field</td>
+                <td>M01</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Fix WithPlugin error swallowing in plugin.go:63</td>
+                <td>M01</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Run tests for both P0 fixes</td>
+                <td>M01</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Fix 10 noinlineerr — extract err from if-init</td>
+                <td>M02</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Fix 9 ireturn — wrap returns or nolint</td>
+                <td>M02</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Fix 5 wrapcheck — wrap external errors</td>
+                <td>M02</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>Fix 5 paralleltest — add t.Parallel() or nolint</td>
+                <td>M02</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>Fix 5 gochecknoglobals — refactor or nolint</td>
+                <td>M02</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>Fix 2 funlen — split registerCustomTypes/registerKinds</td>
+                <td>M02</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td>Fix 1 forbidigo — replace fmt.Println in example_test</td>
+                <td>M02</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td>Fix 1 cyclop — split initialize() function</td>
+                <td>M02</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td>Run golangci-lint, verify 0 issues</td>
+                <td>M02</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td>Deduplicate jsonLoader — remove from config_file.go</td>
+                <td>M03</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td>Bound regex cache — add LRU eviction</td>
+                <td>M03</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>16</td>
+                <td>Verify flow_context.go has 0 external callers</td>
+                <td>M03</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td>Remove flow_context.go + flow_context_access.go + tests</td>
+                <td>M03</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>18</td>
+                <td>Run full test suite after code quality changes</td>
+                <td>M03</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>19</td>
+                <td>Change RegisterTypeHandler to return error</td>
+                <td>M04</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>20</td>
+                <td>Change RegisterValidator to return error</td>
+                <td>M04</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>Update all callers + add error handling</td>
+                <td>M04</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>22</td>
+                <td>Run tests for API changes</td>
+                <td>M04</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>23</td>
+                <td>Create configload-koanf/ sub-module structure</td>
+                <td>M05</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>24</td>
+                <td>Move koanf.go, update imports</td>
+                <td>M05</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>25</td>
+                <td>Update go.work, remove koanf deps from root go.mod</td>
+                <td>M05</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>26</td>
+                <td>Test build + configload still works</td>
+                <td>M05</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>27</td>
+                <td>Fix AGENTS.md — correct lint count, dep count, stale claims</td>
+                <td>M06</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>28</td>
+                <td>Fix FEATURES.md — update statuses post-changes</td>
+                <td>M06</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>29</td>
+                <td>Fix TODO_LIST.md — mark completed items</td>
+                <td>M06</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>30</td>
+                <td>Fix ROADMAP.md — GenerateDocs done, EditInEditor removed</td>
+                <td>M06</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>31</td>
+                <td>Fix CONTRIBUTING.md — v2 to v3 header</td>
+                <td>M06</td>
+                <td>2m</td>
+              </tr>
+              <tr>
+                <td>32</td>
+                <td>Audit PERFORMANCE.md + DOMAIN_LANGUAGE.md for stale refs</td>
+                <td>M06</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>33</td>
+                <td>Read glamour/glamour.go, design test approach</td>
+                <td>M07</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>34</td>
+                <td>Write + run glamour tests</td>
+                <td>M07</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>35</td>
+                <td>Read manpage/ source, design test approach</td>
+                <td>M07</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>36</td>
+                <td>Write + run manpage tests</td>
+                <td>M07</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>37</td>
+                <td>Read prompts/prompts.go, design test approach</td>
+                <td>M07</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>38</td>
+                <td>Write + run prompts tests</td>
+                <td>M07</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>39</td>
+                <td>Read spinner/spinner.go, design test approach</td>
+                <td>M07</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>40</td>
+                <td>Write + run spinner tests</td>
+                <td>M07</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>41</td>
+                <td>Read telemetry/telemetry.go, design test approach</td>
+                <td>M07</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>42</td>
+                <td>Write + run telemetry tests</td>
+                <td>M07</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>43</td>
+                <td>Create .github/workflows/submodule-smoke.yml</td>
+                <td>M08</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>44</td>
+                <td>Add flake.nix sub-module build checks</td>
+                <td>M08</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>45</td>
+                <td>Create doc-drift lint script</td>
+                <td>M08</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>46</td>
+                <td>Write pkg/testutil tests</td>
+                <td>M09</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>47</td>
+                <td>Add fuzz seed corpus under testdata/fuzz/</td>
+                <td>M09</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>48</td>
+                <td>gopls infertypeargs sweep in test files</td>
+                <td>M09</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>49</td>
+                <td>Add v1 deprecation notice to README</td>
+                <td>M10</td>
+                <td>10m</td>
+              </tr>
+              <tr>
+                <td>50</td>
+                <td>Update ROADMAP with v1 removal timeline</td>
+                <td>M10</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>51</td>
+                <td>Write ExampleNewCLI godoc test</td>
+                <td>M11</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>52</td>
+                <td>Write ExampleNewCommand + ExampleAddCommand</td>
+                <td>M11</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>53</td>
+                <td>Create examples/docs-generator/main.go</td>
+                <td>M11</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>54</td>
+                <td>Write docs/COBRA_FOOTGUNS.md</td>
+                <td>M12</td>
+                <td>15m</td>
+              </tr>
+              <tr>
+                <td>55</td>
+                <td>Link COBRA_FOOTGUNS from README + AGENTS</td>
+                <td>M12</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>56</td>
+                <td>Full build: go build ./... + all sub-modules</td>
+                <td>Verify</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>57</td>
+                <td>Full test: go test ./... -race -count=1</td>
+                <td>Verify</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>58</td>
+                <td>Full lint: golangci-lint run ./...</td>
+                <td>Verify</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>59</td>
+                <td>Final git commit with detailed message</td>
+                <td>Verify</td>
+                <td>5m</td>
+              </tr>
+              <tr>
+                <td>60</td>
+                <td>git push</td>
+                <td>Verify</td>
+                <td>1m</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <h2 id="graph"><span class="num">04</span>Execution Graph</h2>
         <div class="card">
-<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.7.1" preserveAspectRatio="xMinYMin meet" viewBox="0 0 1837 2516"><svg class="d2-2745463470 d2-svg" width="1837" height="2516" viewBox="-81 -85 1837 2516"><rect x="-81.000000" y="-85.000000" width="1837.000000" height="2516.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
-.d2-2745463470 .text {
-	font-family: "d2-2745463470-font-regular";
-}
-@font-face {
-	font-family: d2-2745463470-font-regular;
-	src: url("data:application/font-woff;base64,d09GRgABAAAAABXoAAoAAAAAIMQAAguFAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgXd/Vo2NtYXAAAAFUAAAAzQAAASQHnghuZ2x5ZgAAAiQAAA6QAAAUSOAbwntoZWFkAAAQtAAAADYAAAA2G4Ue32hoZWEAABDsAAAAJAAAACQKhAYGaG10eAAAERAAAADnAAABEIDmDNBsb2NhAAAR+AAAAIoAAACKtf6xim1heHAAABKEAAAAIAAAACAAXAD2bmFtZQAAEqQAAAMjAAAIFAbDVU1wb3N0AAAVyAAAAB0AAAAg/9EAMgADAgkBkAAFAAACigJYAAAASwKKAlgAAAFeADIBIwAAAgsFAwMEAwICBGAAAvcAAAADAAAAAAAAAABBREJPAEAAIP//Au7/BgAAA9gBESAAAZ8AAAAAAeYClAAAACAAA3ichM05TqoBGEDR8wNv4oEjKjgiioII4iw4xcoQF2CsjKWJhbFzXxo7h33YuBE/E2LvrU9ykUhLkJNJiqgoy0gpq6praGrp6DrVc+7CpWu37iPom9q3aes60XPWN1du3EXEh5KCgrxsfEbEW7zGSzzHezzFYzz0zz+VOHLg0LGuPS1r2tZt2LRl245dHSlpGb/89sdf/2T9l5M3YNCQYSNGFYwZN2FfUcmkKdNmzJpTNq9iwaKqJctq6lY0rGryBQAA//8BAAD//32QKPoAAAB4nIxYfXAb5Zl/3ldry47kj7Uky5IlS9q1dyVbsmStVitbsmTry7IjWY5kx7ETO4njxHa+mjgFGghJWwLJAddTKRwMBEp7zBTm4ArTmQDD9D4IcOFauLbTg7aQDNc/XOag7dWnuysBr252JX8Erjf3h2d3NO++7/P7Pb/n9zyvoQqmADCPHwQF1EIDNIEOgCNtZIeNZWmlwAkCrVcILCKVU+h9sYDQsI/w+4me6EfR0+fOoV1n8YNrR/vOLyy8PnvbbeKfr3woetHbHwIGBQA24wLUAgmgUXIsw7B0dbVCw2lollb+yPK6pcnaSDRYf3V99vpU+PcR9KX5eeFYb+8xcRoX1k5cvQoAoIBpANyOC0CCEWgpNs7b3KzTVit18qOaVnBeP+9jaJpcf5m+EjvY2+MObo+cGDm7f3wkkzm4PDE7s3MZF6zJvp5sA6EajQ/s7ESn+7y9nrViJNrfCwAIfKUibsWXwAxQRTEM7/P7OW+zXskwNFVdrdM2N3Nev6Cvrka53Ne2p8/nQ3tMLmO0MzzDeXeH3SOWbnZOveORI4cfyfVY/SZq8NZc7nTUTvlcXgDAMhYfLkCNxImMRKetptmNuJ965InHH5rYfurUqVPbceGZS4//Tfy+M2fulmObBkDXcQFUcn50Nh2no3U23TS6XfzlJ5+gHlxIvj30u6GNtT+Xud9cS8orb9zAheT1pPirDbwMvgTWP4VXgsvTPEdWV6M9O+9Jj16cjM+Yug1Rb3SOP7lED2jue9eyVIHMtfmN7YO35s58U9f01wnxY1tXJRZ4DhckPXAkR07npeSWf8cRXAB1+XcOcUoNrVDqpvMKRM6+9duZ107igvgiGr4hHkYTd/9kHdePcQGqyt/YdNN5ZMGFtRcl2JU978QFKX8cyWmam/Wc3y9oOJImfX6BVipoBUs3N+vI6fmzar2aUOvUZw6O1igI3xnhjI9QKHFB/C6VoKgEhWbXTqAl55Guh8Rn0fhDXUec4sMbZ7hwATTlM/Qcw/AkR27svPO3Q4RCmd35uyGCkPabv+g94kP5tRPo8Qs9iz7xGcAy7wfxJWj4nNJkQbNevywHShYcSufODQ2dy+XPplJn88FJz+Fduw57dqnHH11aenjHjoeXlh4dH46dzt3+jW/cnjsdgw2dqWStaLdUDE2TmyXyysjx8D1Hj87tzE/unMWF9onUwrz4GUoNJocEeQ9faTc+hS9BHXQCdNwUUxXFsN14a8zKzcpIb8SIFLtvNw8dDZWj71tM6if4ZqquscHbG7tjXAp4/I7Y9anYtl0P7CtjmS1MqbucVcRAde0GDisuQD3ot1a+hlZshfJWbDE4Fv/e7BO3Hc/kcpnjuEDviKdnSPHXSCd+hKYiA4O+sj46S0X0e3wJXDLrrCBHzfsYht3EU1G/hFOvb8MSOtSYuLXLS+/lBlPmHsuspd/BzwaD87SrbbhbiNm8xhmmv90/r+adfR2uoIeym+oddZ1RjzfrcrX7zTaf0+IwquyNrsEe34QXEJgA0Ge4AEoJFc3bdDT56zfQB2/gkWRy7XI51slSEXfjguTHskJIjiz7j19+ra5GsdiRcN6R6HImHWPhw2r/mSX0NfHO7G6G2Z1Fd4nnls74AcmCUOAC1AFwii01ofjZz6aWmlo1RJOJXJr4CS6IT/Qd7Os72Ifm5PrUA+AbuAC2z323ZQdaUfZ0peK79+1M1GprCVWLand6t7pFTdQ2bUuMXZw/UNtQQyibavbjgvgYf5jnj/jQQfEx35Hy29oJdB8zzDDDjHgLoFIJAF3DBWgA4HgFp68cJXAK3WuvT000WhoJkmoYn3xdRA+83J7s6Ei2vyweFyt6LaIX0CoYoR1AT0klJfjkVCpZObE6kpaCZSVLk83t1f4df/EY2WXvHDFbqQN9U2NxpYLa0UyH6dP7verhwbEJ0hKgrdreZsex3eI7fabOKGW50BByOzoAQ65URJ/iq6CpuCdLK2mS0ynLZ5XruFwyUqdCDmrYqlBGc9iWte+dC+5NhrLBhGWAtkbUNrMXX311l5m952T+1nBiYXrsAGUtmfRlHXSXiuj7aFXSzJ/2aKnwmgYWQ4NHwp6EoVPnNjsTbD5G9TW328bUoeWx3HKI0vs1Le6JQH7BrBXMNokzd6mIfrmOocyZvDnLc+tkCfzGQX/cfTy4X+gMW4l8XKkwpQ0DIUtvGxthkuq7T2dPhduM+VfWAr0mRyImmvTufGDyAGA5/n9Cq9AClpsQSIVs27ANhU2mCukHD4cj88LMQYTFl6omk3Sw1WzJ/ggRkV5uh7p/OTu2HD6zWGeozezRkX5tG2JGMlmZpzYAFME/L88vNC/wvgpPNKWT+9++aDQxrO9sbGo1xRcW0F+FqzIjk7XKiHo2ExNn5FnDVbKij9Eq9EA/ZDZUxDNbHvKmnI6uDB8UW85BJecK76ZNair+RDHlNf81dYKxNRkoTQvrHe/Rttc9M0/qPWNelqpr6uiZnZgIHU939oe6ukL9/uQ45x6vtzUaW7Z/EI9YepsJld1k6a4jtPEufrRTWRVp5C2+tINUtWr1bUK/K+1GL0R4PhTi+Yh4sZ+hjASh6dSx3TI3OQD0Lr5a6QbrGpW6oqxPMpdT0BlvZijn9HQEO/DVV+dt7v0z4o+RIx5mOsQnoVSCBAD8AF/GDAwAQDUMninrM1cqwi/wValmJb5km6ok9ZluR66+llAqVTXN6l4eH1p7UEMiFCaIckz4D2hV9heSk+pcYvamyJQbz1xcqbCmuwKRBmbUuX045+z2x3NOtz+OVpK0u8fp8K2Hu118svJYx41WK7grZ2zFHVcq6NEN4PJmN+Gu6Pff0So0QOv/2qs38o0agguRyEIwdCgSORSKZDKR8OhopfZCy7mx5VB8IT++uDieXwDZPzj0KVqt1N5mdLKqGFav02z1DylSW7Zrdi64N0DFKHybbB+Rdlv4LfyDgMl+4WTu1nCbceIpVP05/5A4mEWrlYmzfErFPcoEGFIOs75RrW2wxAxoZVe3f1uKILxh8Wr5e1OpiO5Cq9IUoL+5Z8ot83Mds9wwf+qbpR3WeJfHY+NaqWjnVNY1arIb/NburjZPKx13ObJq1iQYbC6LgdJvq7PxjmDWqvdpWjpNerNOVWcTutmoXT6/pVRECXxc6keyvmheEDi5oDd09tFofyq9LXHXXbbOujZ1o9atnk6hunDVxYsxcdXVU0uElSp5r+2lInobrUh6uEmrZMXuPsik8l0eJkhJvFBp9f4Z5BPfjYfZLjQlGtN2DyBpXkX/iFa+2E9f+f7EHpVeRaj02/bseBatiB+3p2g61Y60olHCAYAvo5X/Xz/99oXxVE29kqhprN0+lq4la4iaBuXQ6Nfnk7UNtURN47Y4WhF/Q8UoKkYhw5Y3I6qi4x0dCVr8DBDUA6Dn0QoYADiB3dJPlXq6ch9TKuu//a2pQVVLHaFqVgV3fuuJqaE6Yz1R16KOih8e0XRqtZ2aI3/4z5PNTp2uS39S5lFdcssctG7VhCDcREc9nm40qxtrtLUOf4PqysQBlUFFqLTbJsdeJN2Jn1YTg7gq6GpHvxH/w5KibCkrqltb9aRdUm04S0X0Or4XVOtZ91VKY2u9fbLv2LF9e48d2xuIxwOBREL93JPfefrp7zz5XPTc/fffccf995+TY80CoBfxWfmeIbU13u8XJBPMPvBl56Axcj6O3uFr9I1rb8TLem8HQK/heyVsHB/GlRJkN4pTMk9OZ993TzLUb4+b3Pbd4alDsVvSxoDh5Z5937yFE5Iuq9vJL0yE7riQxcQQIDCWiuhv8b1frCGa3xisN49Yv9l+nD5k7TSPBvpG2Kl0PEsFOXvM7OyYDuSPDvj6xgJ71QLtb+se4Jlea8Tqt7n97WYf7ZrI9I1oibp8NJBzApbqHv0LPgu1kuoFTupkUto1vI1HEg+0bvEqgQi1sZ4T/xWReyYnV182pgx6p170Pe9Hj4hfjj4v8WIoFdE/4LOVSWETgxy6xqajlZu2+G/peZvdnA4Ed4yEbW6zU4ci/03qu83ClL9/Tu23+U2ubCw6otWYEDf0Q3V9165EYr+3fHfxlIroTTn3dgBEVa4WvI9RfHH62Ry2UJUl1VYz1O8eCPrC832JL0V821u7NYE214gbt42x+QO+CZSyO2fmMpHwsPhs/M8OffXSEGvm9K3cbQc7ug7M9e/xyfl3SvWNz8r1HcaCjbfp6hXKF6rZTER8FT3Wm7Jria/83TOTQ1zq7guPlucGR6mIruJ7wQJO6JX5kSPdMjLIytGV3VGx9S6lqJipPCLcCM0KtNBG+z05Lr/fZNeavVZuhrTSfbwz6IhXBRKebDfDZdWuMW/nYE8jYUh5e0Yc+0ZsQXcD0ejs73KPutCieYB2RwNuxkuLb0R6HD6myZB08okyv/ZSEf39Or+asv/JbGo2suoX5B60tdHdEgxahyw1qf7uwV1cxtitFdqkmaNtzJ474JvgIvO9iePoh+Fhu2tmf2btj6zJpzf5vnKIccrExi8ufPVS5Y4+WCrCS7AMqpsr+04DTRtaaFpNt5pp2txKSzOHvBa9h1kIAKAlqJaegMAB76EGZAQFgMBzOsfKe5FI2Ze+jj4svSz9rudtOjV6/6wgyDPKGKrF70s51ZeHOb3Mt/6dcDIZ5vp6e/ueP3jt/Pnr8y17ry0vX9sLCJjSGFyrfMPKGZPY0Wmrp+T1XDiZfL6yumX++vnz10oloEtFRTO+BCxEAdA2YCGGlgFACVH0JpTxU7CI/hk7Jfzyv1Z4uZnpfnH58uDly4tXwleuhK9U+jY8hVbW/2+Sy6EVqY+U3sQjIODL0vfkFv5aLJaWFosFj5gNLW1tLQazlGu6VEQZ9MD/7aMvxXK5mPTHeDwM6/Goj87PHT06N3+Uy46OZjKjo/J8XZoqFeFTfEmKR4k49D10OCD+pRo/vbYLAP4HAAD//wEAAP//DBhhIAABAAAAAguFUqgnK18PPPUAAwPoAAAAANhdoKEAAAAA3WYvNv46/tsIbwPIAAAAAwACAAAAAAAAAAEAAAPY/u8AAAiY/jr+OghvAAEAAAAAAAAAAAAAAAAAAABEeJwsir1KM1EARM/MFl8TPtFCo4SwuEFcf7IWiz+IhYiVgnALJdcHECufQqzs7X0P69jYWNhYW4oXJMRqJZJimAPn+J4BQ3BO5lOi96l9RfQMUZ9EX1PrH9FHRH0Q/Ub0HdEP1N6e/h7R86y5Tce3XDiDbI4FvTeNxtQuCRrS9zqVvuirR1djNp0TGHFMQ8gOCC4I7v51QZcEPdJRoO2cE73S8gttPfF/wkpsKHGmRE+JJSVmlVhUYmvqSiVW+eFwMu1Q6puWKoIqVrJdCiWWGRGgedYNBefN4BcAAP//AQAA//+CyDgNAAAAACwALABQAIYAtgDUAOoA/gEwATwBVgFmAZgBugHqAgwCTgJ2AroCzALwAwwDRgNkA5wD0AP+BDAEZASGBPIFFAUgBTwFbgWQBbwF8AYQBlAGdgaYBrQG7gcaB0oHcAeIB7IH8AgUCEgIiAiiCPgJOAlOCVoJZglyCYwJpgm4CcwJ2AnuChQKJAAAAAEAAABEAIwADABmAAcAAQAAAAAAAAAAAAAAAAAEAAN4nJyU3U4bVxSFPwfbbVQ1FxWKyA06l22VjN0IogSuTAmKVYRTj9Mfqao0eMY/Yjwz8gxQqj5Ar/sWfYtc9Tn6EFWvq7O8DTaqFIEQsM6cvfdZZ6+1D7DJv2xQqz8E/mr+YLjGdnPP8AMeNZ8a3uC48bfh+kpMg7jxm+EmXzb6hj/iff0Pwx+zU//Z8EO26keGP+F5fdPwpxuOfww/Yof3C1yDl/xuuMYWheEHbPKT4Q0eYzVrdR7TNtzgM7YNN9kGBkypSJmSMcYxYsqYc+YklIQkzJkyIiHG0aVDSqWvGZGQY/y/XyNCKuZEqjihwpESkhJRMrGKvyor561OHGk1t70OFRMiTpVxRkSGI2dMTkbCmepUVBTs0aJFyVB8CypKAkqmpATkzBnToscRxwyYMKXEcaRKnllIzoiKSyKd7yzCd2ZIQkZprM7JiMXTiV+i7C7HOHoUil2tfLxW4SmO75TtueWK/YpAv26F2fq5SzYRF+pnqq6k2rmUghPt+nM7fCtcsYe7V3/WmXy4R7H+V6p8yrn0j6VUJiYZzm3RIZSDQvcEx4HWXUJ15Hu6DHhDj3cMtO7Qp0+HEwZ0ea3cHn0cX9PjhENldIUXe0dyzAk/4viGrmJ87cT6s1As4RcKc3cpjnPdY0ahnnvmge6a6IZ3V9jPUL7mjlI5Q82Rj3TSL9OcRYzNFYUYztTLpTdK619sjpjpLl7bm30/DRc2e8spviLXDHu3Ljh55RaMPqRqcMszl/oJiIjJOVXEkJwZLSquxPstEeekOA7VvTeakorOdY4/50ouSZiJQZdMdeYU+huZb0LjPlzzvbO3JFa+Z3p2fav7nOLUqxuN3ql7y73QupysKNAyVfMVNw3FNTPvJ5qpVf6hcku9bjnP6JNI9VQ3uP0OPCegzQ677DPROUPtXNgb0dY70eYV++rBGYmiRnJ1YhV2CXjBLru84sVazQ6HHNBj/w4cF1k9Dnh9a2ddp2UVZ3X+FJu2+DqeXa9e3luvz+/gyy80UTcvY1/a+G5fWLUb/58QMfNc3NbqndwTgv8AAAD//wEAAP//B1tMMAB4nGJgZgCD/+cYjBiwAAAAAAD//wEAAP//LwECAwAAAA==");
-}
-.d2-2745463470 .text-bold {
-	font-family: "d2-2745463470-font-bold";
-}
-@font-face {
-	font-family: d2-2745463470-font-bold;
-	src: url("data:application/font-woff;base64,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");
-}]]></style><style type="text/css"><![CDATA[.shape {
-  shape-rendering: geometricPrecision;
-  stroke-linejoin: round;
-}
-.connection {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.blend {
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
+          <?xml version="1.0" encoding="utf-8"?><svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            data-d2-version="v0.7.1"
+            preserveAspectRatio="xMinYMin meet"
+            viewBox="0 0 1837 2516"
+          >
+            <svg
+              class="d2-2745463470 d2-svg"
+              width="1837"
+              height="2516"
+              viewBox="-81 -85 1837 2516"
+            >
+              <rect
+                x="-81.000000"
+                y="-85.000000"
+                width="1837.000000"
+                height="2516.000000"
+                rx="0.000000"
+                fill="#FFFFFF"
+                class="fill-N7"
+                stroke-width="0"
+              />
+              <style type="text/css">
+                <![CDATA[
+                .d2-2745463470 .text {
+                	font-family: "d2-2745463470-font-regular";
+                }
+                @font-face {
+                	font-family: d2-2745463470-font-regular;
+                	src: url("data:application/font-woff;base64,d09GRgABAAAAABXoAAoAAAAAIMQAAguFAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgXd/Vo2NtYXAAAAFUAAAAzQAAASQHnghuZ2x5ZgAAAiQAAA6QAAAUSOAbwntoZWFkAAAQtAAAADYAAAA2G4Ue32hoZWEAABDsAAAAJAAAACQKhAYGaG10eAAAERAAAADnAAABEIDmDNBsb2NhAAAR+AAAAIoAAACKtf6xim1heHAAABKEAAAAIAAAACAAXAD2bmFtZQAAEqQAAAMjAAAIFAbDVU1wb3N0AAAVyAAAAB0AAAAg/9EAMgADAgkBkAAFAAACigJYAAAASwKKAlgAAAFeADIBIwAAAgsFAwMEAwICBGAAAvcAAAADAAAAAAAAAABBREJPAEAAIP//Au7/BgAAA9gBESAAAZ8AAAAAAeYClAAAACAAA3ichM05TqoBGEDR8wNv4oEjKjgiioII4iw4xcoQF2CsjKWJhbFzXxo7h33YuBE/E2LvrU9ykUhLkJNJiqgoy0gpq6praGrp6DrVc+7CpWu37iPom9q3aes60XPWN1du3EXEh5KCgrxsfEbEW7zGSzzHezzFYzz0zz+VOHLg0LGuPS1r2tZt2LRl245dHSlpGb/89sdf/2T9l5M3YNCQYSNGFYwZN2FfUcmkKdNmzJpTNq9iwaKqJctq6lY0rGryBQAA//8BAAD//32QKPoAAAB4nIxYfXAb5Zl/3ldry47kj7Uky5IlS9q1dyVbsmStVitbsmTry7IjWY5kx7ETO4njxHa+mjgFGghJWwLJAddTKRwMBEp7zBTm4ArTmQDD9D4IcOFauLbTg7aQDNc/XOag7dWnuysBr252JX8Erjf3h2d3NO++7/P7Pb/n9zyvoQqmADCPHwQF1EIDNIEOgCNtZIeNZWmlwAkCrVcILCKVU+h9sYDQsI/w+4me6EfR0+fOoV1n8YNrR/vOLyy8PnvbbeKfr3woetHbHwIGBQA24wLUAgmgUXIsw7B0dbVCw2lollb+yPK6pcnaSDRYf3V99vpU+PcR9KX5eeFYb+8xcRoX1k5cvQoAoIBpANyOC0CCEWgpNs7b3KzTVit18qOaVnBeP+9jaJpcf5m+EjvY2+MObo+cGDm7f3wkkzm4PDE7s3MZF6zJvp5sA6EajQ/s7ESn+7y9nrViJNrfCwAIfKUibsWXwAxQRTEM7/P7OW+zXskwNFVdrdM2N3Nev6Cvrka53Ne2p8/nQ3tMLmO0MzzDeXeH3SOWbnZOveORI4cfyfVY/SZq8NZc7nTUTvlcXgDAMhYfLkCNxImMRKetptmNuJ965InHH5rYfurUqVPbceGZS4//Tfy+M2fulmObBkDXcQFUcn50Nh2no3U23TS6XfzlJ5+gHlxIvj30u6GNtT+Xud9cS8orb9zAheT1pPirDbwMvgTWP4VXgsvTPEdWV6M9O+9Jj16cjM+Yug1Rb3SOP7lED2jue9eyVIHMtfmN7YO35s58U9f01wnxY1tXJRZ4DhckPXAkR07npeSWf8cRXAB1+XcOcUoNrVDqpvMKRM6+9duZ107igvgiGr4hHkYTd/9kHdePcQGqyt/YdNN5ZMGFtRcl2JU978QFKX8cyWmam/Wc3y9oOJImfX6BVipoBUs3N+vI6fmzar2aUOvUZw6O1igI3xnhjI9QKHFB/C6VoKgEhWbXTqAl55Guh8Rn0fhDXUec4sMbZ7hwATTlM/Qcw/AkR27svPO3Q4RCmd35uyGCkPabv+g94kP5tRPo8Qs9iz7xGcAy7wfxJWj4nNJkQbNevywHShYcSufODQ2dy+XPplJn88FJz+Fduw57dqnHH11aenjHjoeXlh4dH46dzt3+jW/cnjsdgw2dqWStaLdUDE2TmyXyysjx8D1Hj87tzE/unMWF9onUwrz4GUoNJocEeQ9faTc+hS9BHXQCdNwUUxXFsN14a8zKzcpIb8SIFLtvNw8dDZWj71tM6if4ZqquscHbG7tjXAp4/I7Y9anYtl0P7CtjmS1MqbucVcRAde0GDisuQD3ot1a+hlZshfJWbDE4Fv/e7BO3Hc/kcpnjuEDviKdnSPHXSCd+hKYiA4O+sj46S0X0e3wJXDLrrCBHzfsYht3EU1G/hFOvb8MSOtSYuLXLS+/lBlPmHsuspd/BzwaD87SrbbhbiNm8xhmmv90/r+adfR2uoIeym+oddZ1RjzfrcrX7zTaf0+IwquyNrsEe34QXEJgA0Ge4AEoJFc3bdDT56zfQB2/gkWRy7XI51slSEXfjguTHskJIjiz7j19+ra5GsdiRcN6R6HImHWPhw2r/mSX0NfHO7G6G2Z1Fd4nnls74AcmCUOAC1AFwii01ofjZz6aWmlo1RJOJXJr4CS6IT/Qd7Os72Ifm5PrUA+AbuAC2z323ZQdaUfZ0peK79+1M1GprCVWLand6t7pFTdQ2bUuMXZw/UNtQQyibavbjgvgYf5jnj/jQQfEx35Hy29oJdB8zzDDDjHgLoFIJAF3DBWgA4HgFp68cJXAK3WuvT000WhoJkmoYn3xdRA+83J7s6Ei2vyweFyt6LaIX0CoYoR1AT0klJfjkVCpZObE6kpaCZSVLk83t1f4df/EY2WXvHDFbqQN9U2NxpYLa0UyH6dP7verhwbEJ0hKgrdreZsex3eI7fabOKGW50BByOzoAQ65URJ/iq6CpuCdLK2mS0ynLZ5XruFwyUqdCDmrYqlBGc9iWte+dC+5NhrLBhGWAtkbUNrMXX311l5m952T+1nBiYXrsAGUtmfRlHXSXiuj7aFXSzJ/2aKnwmgYWQ4NHwp6EoVPnNjsTbD5G9TW328bUoeWx3HKI0vs1Le6JQH7BrBXMNokzd6mIfrmOocyZvDnLc+tkCfzGQX/cfTy4X+gMW4l8XKkwpQ0DIUtvGxthkuq7T2dPhduM+VfWAr0mRyImmvTufGDyAGA5/n9Cq9AClpsQSIVs27ANhU2mCukHD4cj88LMQYTFl6omk3Sw1WzJ/ggRkV5uh7p/OTu2HD6zWGeozezRkX5tG2JGMlmZpzYAFME/L88vNC/wvgpPNKWT+9++aDQxrO9sbGo1xRcW0F+FqzIjk7XKiHo2ExNn5FnDVbKij9Eq9EA/ZDZUxDNbHvKmnI6uDB8UW85BJecK76ZNair+RDHlNf81dYKxNRkoTQvrHe/Rttc9M0/qPWNelqpr6uiZnZgIHU939oe6ukL9/uQ45x6vtzUaW7Z/EI9YepsJld1k6a4jtPEufrRTWRVp5C2+tINUtWr1bUK/K+1GL0R4PhTi+Yh4sZ+hjASh6dSx3TI3OQD0Lr5a6QbrGpW6oqxPMpdT0BlvZijn9HQEO/DVV+dt7v0z4o+RIx5mOsQnoVSCBAD8AF/GDAwAQDUMninrM1cqwi/wValmJb5km6ok9ZluR66+llAqVTXN6l4eH1p7UEMiFCaIckz4D2hV9heSk+pcYvamyJQbz1xcqbCmuwKRBmbUuX045+z2x3NOtz+OVpK0u8fp8K2Hu118svJYx41WK7grZ2zFHVcq6NEN4PJmN+Gu6Pff0So0QOv/2qs38o0agguRyEIwdCgSORSKZDKR8OhopfZCy7mx5VB8IT++uDieXwDZPzj0KVqt1N5mdLKqGFav02z1DylSW7Zrdi64N0DFKHybbB+Rdlv4LfyDgMl+4WTu1nCbceIpVP05/5A4mEWrlYmzfErFPcoEGFIOs75RrW2wxAxoZVe3f1uKILxh8Wr5e1OpiO5Cq9IUoL+5Z8ot83Mds9wwf+qbpR3WeJfHY+NaqWjnVNY1arIb/NburjZPKx13ObJq1iQYbC6LgdJvq7PxjmDWqvdpWjpNerNOVWcTutmoXT6/pVRECXxc6keyvmheEDi5oDd09tFofyq9LXHXXbbOujZ1o9atnk6hunDVxYsxcdXVU0uElSp5r+2lInobrUh6uEmrZMXuPsik8l0eJkhJvFBp9f4Z5BPfjYfZLjQlGtN2DyBpXkX/iFa+2E9f+f7EHpVeRaj02/bseBatiB+3p2g61Y60olHCAYAvo5X/Xz/99oXxVE29kqhprN0+lq4la4iaBuXQ6Nfnk7UNtURN47Y4WhF/Q8UoKkYhw5Y3I6qi4x0dCVr8DBDUA6Dn0QoYADiB3dJPlXq6ch9TKuu//a2pQVVLHaFqVgV3fuuJqaE6Yz1R16KOih8e0XRqtZ2aI3/4z5PNTp2uS39S5lFdcssctG7VhCDcREc9nm40qxtrtLUOf4PqysQBlUFFqLTbJsdeJN2Jn1YTg7gq6GpHvxH/w5KibCkrqltb9aRdUm04S0X0Or4XVOtZ91VKY2u9fbLv2LF9e48d2xuIxwOBREL93JPfefrp7zz5XPTc/fffccf995+TY80CoBfxWfmeIbU13u8XJBPMPvBl56Axcj6O3uFr9I1rb8TLem8HQK/heyVsHB/GlRJkN4pTMk9OZ993TzLUb4+b3Pbd4alDsVvSxoDh5Z5937yFE5Iuq9vJL0yE7riQxcQQIDCWiuhv8b1frCGa3xisN49Yv9l+nD5k7TSPBvpG2Kl0PEsFOXvM7OyYDuSPDvj6xgJ71QLtb+se4Jlea8Tqt7n97WYf7ZrI9I1oibp8NJBzApbqHv0LPgu1kuoFTupkUto1vI1HEg+0bvEqgQi1sZ4T/xWReyYnV182pgx6p170Pe9Hj4hfjj4v8WIoFdE/4LOVSWETgxy6xqajlZu2+G/peZvdnA4Ed4yEbW6zU4ci/03qu83ClL9/Tu23+U2ubCw6otWYEDf0Q3V9165EYr+3fHfxlIroTTn3dgBEVa4WvI9RfHH62Ry2UJUl1VYz1O8eCPrC832JL0V821u7NYE214gbt42x+QO+CZSyO2fmMpHwsPhs/M8OffXSEGvm9K3cbQc7ug7M9e/xyfl3SvWNz8r1HcaCjbfp6hXKF6rZTER8FT3Wm7Jria/83TOTQ1zq7guPlucGR6mIruJ7wQJO6JX5kSPdMjLIytGV3VGx9S6lqJipPCLcCM0KtNBG+z05Lr/fZNeavVZuhrTSfbwz6IhXBRKebDfDZdWuMW/nYE8jYUh5e0Yc+0ZsQXcD0ejs73KPutCieYB2RwNuxkuLb0R6HD6myZB08okyv/ZSEf39Or+asv/JbGo2suoX5B60tdHdEgxahyw1qf7uwV1cxtitFdqkmaNtzJ474JvgIvO9iePoh+Fhu2tmf2btj6zJpzf5vnKIccrExi8ufPVS5Y4+WCrCS7AMqpsr+04DTRtaaFpNt5pp2txKSzOHvBa9h1kIAKAlqJaegMAB76EGZAQFgMBzOsfKe5FI2Ze+jj4svSz9rudtOjV6/6wgyDPKGKrF70s51ZeHOb3Mt/6dcDIZ5vp6e/ueP3jt/Pnr8y17ry0vX9sLCJjSGFyrfMPKGZPY0Wmrp+T1XDiZfL6yumX++vnz10oloEtFRTO+BCxEAdA2YCGGlgFACVH0JpTxU7CI/hk7Jfzyv1Z4uZnpfnH58uDly4tXwleuhK9U+jY8hVbW/2+Sy6EVqY+U3sQjIODL0vfkFv5aLJaWFosFj5gNLW1tLQazlGu6VEQZ9MD/7aMvxXK5mPTHeDwM6/Goj87PHT06N3+Uy46OZjKjo/J8XZoqFeFTfEmKR4k49D10OCD+pRo/vbYLAP4HAAD//wEAAP//DBhhIAABAAAAAguFUqgnK18PPPUAAwPoAAAAANhdoKEAAAAA3WYvNv46/tsIbwPIAAAAAwACAAAAAAAAAAEAAAPY/u8AAAiY/jr+OghvAAEAAAAAAAAAAAAAAAAAAABEeJwsir1KM1EARM/MFl8TPtFCo4SwuEFcf7IWiz+IhYiVgnALJdcHECufQqzs7X0P69jYWNhYW4oXJMRqJZJimAPn+J4BQ3BO5lOi96l9RfQMUZ9EX1PrH9FHRH0Q/Ub0HdEP1N6e/h7R86y5Tce3XDiDbI4FvTeNxtQuCRrS9zqVvuirR1djNp0TGHFMQ8gOCC4I7v51QZcEPdJRoO2cE73S8gttPfF/wkpsKHGmRE+JJSVmlVhUYmvqSiVW+eFwMu1Q6puWKoIqVrJdCiWWGRGgedYNBefN4BcAAP//AQAA//+CyDgNAAAAACwALABQAIYAtgDUAOoA/gEwATwBVgFmAZgBugHqAgwCTgJ2AroCzALwAwwDRgNkA5wD0AP+BDAEZASGBPIFFAUgBTwFbgWQBbwF8AYQBlAGdgaYBrQG7gcaB0oHcAeIB7IH8AgUCEgIiAiiCPgJOAlOCVoJZglyCYwJpgm4CcwJ2AnuChQKJAAAAAEAAABEAIwADABmAAcAAQAAAAAAAAAAAAAAAAAEAAN4nJyU3U4bVxSFPwfbbVQ1FxWKyA06l22VjN0IogSuTAmKVYRTj9Mfqao0eMY/Yjwz8gxQqj5Ar/sWfYtc9Tn6EFWvq7O8DTaqFIEQsM6cvfdZZ6+1D7DJv2xQqz8E/mr+YLjGdnPP8AMeNZ8a3uC48bfh+kpMg7jxm+EmXzb6hj/iff0Pwx+zU//Z8EO26keGP+F5fdPwpxuOfww/Yof3C1yDl/xuuMYWheEHbPKT4Q0eYzVrdR7TNtzgM7YNN9kGBkypSJmSMcYxYsqYc+YklIQkzJkyIiHG0aVDSqWvGZGQY/y/XyNCKuZEqjihwpESkhJRMrGKvyor561OHGk1t70OFRMiTpVxRkSGI2dMTkbCmepUVBTs0aJFyVB8CypKAkqmpATkzBnToscRxwyYMKXEcaRKnllIzoiKSyKd7yzCd2ZIQkZprM7JiMXTiV+i7C7HOHoUil2tfLxW4SmO75TtueWK/YpAv26F2fq5SzYRF+pnqq6k2rmUghPt+nM7fCtcsYe7V3/WmXy4R7H+V6p8yrn0j6VUJiYZzm3RIZSDQvcEx4HWXUJ15Hu6DHhDj3cMtO7Qp0+HEwZ0ea3cHn0cX9PjhENldIUXe0dyzAk/4viGrmJ87cT6s1As4RcKc3cpjnPdY0ahnnvmge6a6IZ3V9jPUL7mjlI5Q82Rj3TSL9OcRYzNFYUYztTLpTdK619sjpjpLl7bm30/DRc2e8spviLXDHu3Ljh55RaMPqRqcMszl/oJiIjJOVXEkJwZLSquxPstEeekOA7VvTeakorOdY4/50ouSZiJQZdMdeYU+huZb0LjPlzzvbO3JFa+Z3p2fav7nOLUqxuN3ql7y73QupysKNAyVfMVNw3FNTPvJ5qpVf6hcku9bjnP6JNI9VQ3uP0OPCegzQ677DPROUPtXNgb0dY70eYV++rBGYmiRnJ1YhV2CXjBLru84sVazQ6HHNBj/w4cF1k9Dnh9a2ddp2UVZ3X+FJu2+DqeXa9e3luvz+/gyy80UTcvY1/a+G5fWLUb/58QMfNc3NbqndwTgv8AAAD//wEAAP//B1tMMAB4nGJgZgCD/+cYjBiwAAAAAAD//wEAAP//LwECAwAAAA==");
+                }
+                .d2-2745463470 .text-bold {
+                	font-family: "d2-2745463470-font-bold";
+                }
+                @font-face {
+                	font-family: d2-2745463470-font-bold;
+                	src: url("data:application/font-woff;base64,d09GRgABAAAAABXUAAoAAAAAIIwAAguFAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgXxHXrmNtYXAAAAFUAAAAzQAAASQHnghuZ2x5ZgAAAiQAAA53AAAT+JNEu4toZWFkAAAQnAAAADYAAAA2G38e1GhoZWEAABDUAAAAJAAAACQKfwYDaG10eAAAEPgAAADnAAABEIiuCpZsb2NhAAAR4AAAAIoAAACKsrSuSG1heHAAABJsAAAAIAAAACAAXAD3bmFtZQAAEowAAAMoAAAIKgjwVkFwb3N0AAAVtAAAAB0AAAAg/9EAMgADAioCvAAFAAACigJYAAAASwKKAlgAAAFeADIBKQAAAgsHAwMEAwICBGAAAvcAAAADAAAAAAAAAABBREJPACAAIP//Au7/BgAAA9gBESAAAZ8AAAAAAfAClAAAACAAA3ichM05TqoBGEDR8wNv4oEjKjgiioII4iw4xcoQF2CsjKWJhbFzXxo7h33YuBE/E2LvrU9ykUhLkJNJiqgoy0gpq6praGrp6DrVc+7CpWu37iPom9q3aes60XPWN1du3EXEh5KCgrxsfEbEW7zGSzzHezzFYzz0zz+VOHLg0LGuPS1r2tZt2LRl245dHSlpGb/89sdf/2T9l5M3YNCQYSNGFYwZN2FfUcmkKdNmzJpTNq9iwaKqJctq6lY0rGryBQAA//8BAAD//32QKPoAAAB4nIRYfWwb53l/3pcnnkVRHyR1/BK/j3dHUiIl8nikRFGiPijqw6I+Y0mOKckRHFuxZFl15Eip5aRAvraEbtLIdZSkSFIjwbI02ZJ5A9yg7oBiaRbUQIYlmYdhddK08NxmS9SO65JUOg53pGTJHdA/xFcg7t739zzP7/d7npdQAkMAeAafBwWUQiVogQLgNU4Nw3McTUb5aJQ2KKIc0pBDWCu+8jLnJbxewudYt39zehqlp/D5rflD6ZmZ3083N4sv/PBt8Ry6920AnP8aAHfiLJSCBkBH8hzLcrRSqdDxOpqjyRtVT1SW15QTatPXV9+6+j3Pux7UF48HF/jwCfERnN1aev55AAAFpAFwHGdBA2ZwSdj4kF5PVStJSl6UtIIPRYQwS9MaPiSv6Y+T821+T6gzeap7uisSDIVTo/fHW0Zx1ppK1I5WEuX72zvv8KLHfDTrECcmahkABIF8DjfgdagBKHGxrBCORPiQ3kCyLO1SKqlqPR+KRA1KNDny+OiBcyOJI84BU5Su660d6/EkjAMj6v7vnph/dph3TRmsoamOI4tuU+YwYBl/P86CqpDZInolzfGhiIRbAnz5yNPDQ08e9lsaRwOB0UYLziafXFx8unvZkxkYOMiAhC8NgL7AWSiT60M5KZ6iKSeVRuviH65fR5U4u/rQmQurO8/elHO/69k0el788tNPcXb1mdUtgO2Yk3gd7P9fzMWQBVrgNUolOnHwOwfGnxrvPupImxp9/Yczh6pZ9fznrm8UAw87p/S2xZkjiyrV4or4oTNQwAGf4Cwo5Mg16TWpsIXv8TzOgrrwPa/jFTpaQVLpNeInF9/59fdf7MdZ8X9QmbgpriDdkb/ejulTnIWSwjtOKr2GMM5ubazCdsz4DZyVYpF21OsNfCQS1fEaWgorSpMkzXG0DVNU+vv3qLQqQqVRHXvpUbJUQQiTw5NhgthH4qx43dJqs7VakGtr6QvH4JD9+a++et4+NOj4YvsMqZa6whkGnmUFgdfQCo7W6ykq/cxrbQRRkZWWknKcFX/0VPhbsRtbS6jr25HV2H8AAJZz/gBeh8rbmCazgitQWU4+Gpt4ZP/+RyYKn50DA52dAwPqkWePz313cPDC8ePPjjy4NDOzsDAzswRFnjXIOa3ewzOa2tHFJz2nU6mlruGelbZ4Eme5zGD/TP3P0cgs74Mitj78El6HMmABmN1YXCy3BympL+pBicaK0JD52FP07NkC4sVpw6CXYirM2ub507MSytnT4vW7+/V/9XgB/kM/qHHZSGKutLyIfRRnoQIMuxUuGYWEviDv9Gddp5IJ4fwrZ4f7Yy0tsX6cZSYGeiYN4h8++wwdDjY0sFKN6HwOq/A6+OTsclEZqBBmOS6A/4jgBkMhS6i67cHQHfSYJ+Dnaw8442zzPcnGRd9+RxvH+pt8dzSnYgvqhsDdNtZltVu17or6VH1kIlznmzTV2C02m8ZlvKMrkmkEBCYArMNZIKVIaMFJ0Zqrl9DXl3DV6urWRoGrvfkcHpQ9TcIoaHiNrDX5HyUaePDR87FoNP7th9QXXkZT4trh/v7D6IR48eULgPJfAWAeZ6EcgFfs4rnix+98b6DSUElUGCvSF/4BZ8V/Eo5GIkcF1CBrrgJA4cBZcN723q4daEXBo0nFY/c/41dWKAmVTpU6m1LpVARZTvrPLf2wbV95CaEs39eCs+L7/LFw+BiPguL7wVlBOBZCwa0l5GHTbneaFf8VUP5LAEzhLFQC8IKCNxSPivIK6so7L8QqzOVEhaW8+bl3bqKXLzBdLNvFXBAzN2Uu+vI59CHaBBPQAAaXRL6oXDaSk4tIaWgJa1SyKNmff5wcengN0157m1uon4tNH11REfbufSZGNxC3q8cTAxOVTs5I3WV1L5wSf8Vb6FMG3biq1mo0yOe153NYj69AddENOZqkNTxF3iZO2iU1HtTl7LQS6nvXCGvSFZ+oj09PsJGxOm+1R+10CPjK6/1ma+s3+g/cn1hJ9T/q/5m2Qq67O59DV9AmmG/321t2KynK1HWyvee+ZKDb0kU7hESiwRjQxZgxdcvpkdGlFpth2trf3pamKg87agq65fI5tImvgA4c27mSN+Ykc9rJ0jbpf5c52Twd9jaalGsrKsKcwkZOq6utpiP16ifuHz7dajH2/+VWZ9BMr1Sbfqat6Ozu7QIsY/8F2gTjbd1CVqpTUpmEXcHLloHs3ac6OuebuyfrCSxeU6WCQiTITj13iatzRdStSyPDS4nEXFLHlEZ450GzDcW8Qn1BG0YAtITfk1ZJP9HbNCu1Ms2dHR3uoU57uKqm3KyusR08iM6eKKkRxsJq5XxJiZO13Ss+JM0Orrwfk2gT6qEZ+uTMsEJYSoREJmE7BANP0UWzdHFyHSR6VSuVil0OqCu6kIuVH/ldbKqxW1fjMJq9sSmhzvl3g2RpeCJqtWtd3qHMXcnVPivHWa0c5w21cQxvcqprWj4wN9bFPUS5x14TqiK0ydr4oEc9V+aqbupzqyr1Om1zJz8cQO/5vJzX4/H6xDW3yVClUBhNFmshN+1SsWWOSi5Z5CaloTUySlLTvkZa9oeGe9esDovHiK+8ftBUOzcpXkXOiMdkEN+CfB6iAPBz/AFmoQ0ASGiHxwt753NIi69IWjXs8iSpqP/Y37ymKS0hlVo1oz60H9Nb1wxahE6UkAVMCivalH1Fw0v6lqq1Bxm5s7ZLmkwFhXadsy84tH/N6mAapI96tNFm99d6XMFtuA3iW8VlO260WYy7eMbuuFdUhCO9EzjaSNj8e+Iu8Ffmwp/uu/rEyWTyZCKxkEwuJPyBgD/g9xe117I0OnK6ZTnd1t4vSbDgGz1YjzZBBzYAwy10Mp1YzkDpbtmGhNPay905G5+OOOLmkkE2Mlbrq/Zcxq8GzfSf33tgJVFjGvwOcu+Yhhw7ehJtgnZPfgtqKERe089SFpWx3FRlaalGG+OhYEnJgwThDYmfAAIqn0Mvok3g5Lre6odsoR/ubCZ1QxumqpUfBI+xHa6E3WmzBsy2Zs89B5rG7R3msLmpiXW0eGfVrD1jqjHoNHqdSu1u8naNccaJaj1nNFWU0U2BzskCVzX5HFrAS1JHl3qcQAvRKC8PoreMDjKDyX7NN5eXaavapDLoourjY++dUD788L3v+hglMadUF/aK53PoS7Qh1X8PNzVFe/uX4d41m8PC6tdWyhT2PvXcJAqLHwtesxX1iFVdTB0gadZEebRR7Ju7WtGlvzjfJnW4Up2q/dxFtPEbJs1xaeY3YtW2H+ENtFHsm7fe27UDXbzbkOT51acblColQZaXRh9sLK0kCbKUrP+z5df9ZDlJkGVkHdq4wfSwbB99Q157mBti1U/plMeTon8qnycVPYc2pDmC13G7jiENt86pWH/yhTqVXkXs0+5zrT/17AsNaoOaKK0u5RD+fIiqpahaaij/2xGqjqJq9SPSvup8K9pCGxL7b/EgGt2Tigq8ondWmkntPsajIv/+fHeZVkXs05TGz71uaBz8iZJYRCVuqxn98iNXiqG76Y/EstYDxdmRyefQZ/gxKCvqq8AtqlrSVuGeU7hG6dG+o2fPHpX+TB6DwWMyeoxGj/q1ixdfeeXixddOMVPj4xmXKzM+PiXfy1IA6N/wGfmuILUzIRKJSuaXenw53OOaX15GJw+pLNVbm8sFrtgA0K/wY2CRnm/FBVkXZwZZlZJr8hQzfDYV9LqixqH6mWRiSmjOhI1x/bfuSJ+9x18f5MyDIT50qEU4eTKiKFmV9tXnc+hj/Bh4b9cRLWybx/Zkcuty+t/pE3TSmvLUN1r6usbaPKwrauurm4nN3B/lo93tc+qQZ9Li5twWr362nnUyNvOdbO2h0WBKT1SlW5tHawu51QGgL/EZKJUUoOOl7iXRQCc4BZ2UC5p66dESRKjNFSHxv27+bW8v2nfMPmwzR2rEhfW70QPiucV1KQZDPoc+wWekDr4nBhm7zknR5E6W/ndgnu2wJj3BWGOdhbF2aNHsr8ucbPRQY/txdZiZNDOhYEOoQutD7avLlb7xZOpIWMbqzefQf8o88AAgV/GmIIRZxR/fqskdq0Q6E1+tanQ66+ttLQtdvac7ExlbuipqoWO0wtRrHZmLTSPG6trfFIyEfOL77U+cXF7v9dsntDXMeJ+Dnr67Yzos178OAN3AZ2Sdt+KoU3BSFQryRaUrFRd/id6OdjJVxPFXnxtdvbPzvjNPTcq/MUiz5k2ZMxyEd7rDrQlhd0kVt88ELCfzGpGJI7GEn2kIZ5rHj4ecgbbGuy2c1231xdVMgyvuoSwxdd0gH+szEpaeUGTQNz0Y6NYTpoFEaCiAHvA3MH43w9WJH3EeC2PV6ASrrx4wuPI5dEPOpxdAV/A9OXu6nQpGonKv2dPRXm1wm3idKupyNLQkJm0DVRGLu8mNTb3WyIFQ7HBTq5Rk9Dchn5xTUR2wFVJpd/vGOzsO8+2PL973bC8gaMnn4At4A8q2J8tCOi6wPM+yPK8WOI8geDhBmi3kZ9FvMQeNACgJSmkFBLXwHnKiICgAogJP1f7+vdnZgictoZv5d6XvDYKTUqN/z46OAoKefBp58MdSDQ2FUhjkHBuuJrq6EploKBS9dOz6ww9fP8bedW3u+LUZQNCQT6Oq4juc7DhSdqhqZTbTGAo1ZhJdXZfYmWvH567dxcrv5vNgzucUbXgdOOgAQErgoBOdlaeiDvQLKPiJC6bQ5zgixS//FiIUmtg/v/nm/JtvTl2evXx59nKxT8OHaGP7t472NbQhVgHKv4GbYBR/IL2v2ZU/JhBgmEAAN/lo2if9Sdox53NoGj0NZVLXNOz10B3W/SiVyaS6M5luE02bTDStXpiZmZ+fmVkYaUylIpFUSs55/kA+h6R7sAKARDz6ATp8QHxJjV/eygDA/wEAAP//AQAA//8CvUceAAABAAAAAguF3LI8cV8PPPUAAQPoAAAAANhdoIQAAAAA3WYvNv43/sQIbQPxAAEAAwACAAAAAAAAAAEAAAPY/u8AAAiY/jf+NwhtAAEAAAAAAAAAAAAAAAAAAABEeJwsijFKA1EYBuf/FoLiGp8YY0yRIq6IyWaxUzBbvCYo+IOFgaQQbPQMgqA3sM8dtLH1AvZexULTrLCkGKaY0QfXfIHKaqlbXBMKPeHKcKW4nilshOsBVwPXEtcC1xuFbla+x5VzoJx9LbhUXv0lI5rarH61xUAl0b7JVHKkBplN6ahNX+dEa3FqPWIyJ2pM1LD+or0S7ZNde2FbZ4y1QZqs0ZFoap1UgUMFJgr0FGgrsKPAngLHCuQKDBToW05Zc8XQfkhtxoXNOEnmdOveIkL1bo90uaum/wAAAP//AQAA//98ECexAAAAACwALABQAIQAsADUAOoA/gEuAToBVAFkAZYBuAHkAgYCQgJoAqgCugLYAvQDLgNMA4QDtgPiBBQESARuBNYE+AUEBSAFUgV0BaAF0AXwBiwGUgZ0BpAGyAb0ByQHUAdoB5QH0gf2CCgIaAiCCNAJEAkmCTIJPglKCWQJfgmQCaQJsAnGCewJ/AAAAAEAAABEAJAADABjAAcAAQAAAAAAAAAAAAAAAAAEAAN4nJyUz24bVRTGf05s0wrBAkVVuonugkWR6NhUSdU2K4fUikUUB48LQkJIE8/4jzKeGXkmDuEJWPMWvEVXPATPgVij+Xzs2AXRJoqSfHfu+fOdc75zgR3+ZptK9SHwRz0xXGGvfm54iwf1E8PbtOtbhqs8qf1puEZYmxuu83mtZ/gj3lZ/M/yA/epPhh+yW20b/phn1R3Dn2w7/jL8Kfu8XeAKvOBXwxV2yQxvscOPhrd5hMWsVHlE03CNz9gzXGcP6DOhIGZCwgjHkAkjrpgRkeMTMWPCkIgQR4cWMYW+JgRCjtF/fg3wKZgRKOKYAkeMT0xAztgi/iKvlHNlHOo0s7sWBWMCLuRxSUCCI2VESkLEpeIUFGS8okGDnIH4ZhTkeORMiPFImTGiQZc2p/QZMyHH0VakkplPypCCawLld2ZRdmZAREJurK5ICMXTiV8k7w6nOLpksl2PfLoR4Usc38m75JbK9is8/bo1Zpt5l2wC5upnrK7EurnWBMe6LfO2+Fa44BXuXv3ZZPL+HoX6XyjyBVeaf6hJJWKS4NwuLXwpyHePcRzp3MFXR76nQ58Turyhr3OLHj1anNGnw2v5dunh+JouZxzLoyO8uGtLMWf8gOMbOrIpY0fWn8XEIn4mM3Xn4jhTHVMy9bxk7qnWSBXefcLlDqUb6sjlM9AelZZO80u0ZwEjU0UmhlP1cqmN3PoXmiKmqqWc7e19uQ1z273lFt+QaodLtS44lZNbMHrfVL13NHOtH4+AkJQLWQxImdKg4Ea8zwm4IsZxrO6daEsKWiufMs+NVBIxFYMOieLMyPQ3MN34xn2woXtnb0ko/5Lp5aqq+2Rx6tXtjN6oe8s737ocrU2gYVNN19Q0ENfEtB9pp9b5+/LN9bqlPOWIlJjwXy/AMzya7HPAIWNlGOhmbq9DUy9Ek5ccqvpLIlkNpefIIhzg8ZwDDnjJ83f6uGTijItbcVnP3eKYI7ocflAVC/suR7xeffv/rL+LaVO1OJ6uTi/uPcUnd1DrF9qz2/eyp4mVk5hbtNutOCNgWnJxu+s1ucd4/wAAAP//AQAA///0t09ReJxiYGYAg//nGIwYsAAAAAAA//8BAAD//y8BAgMAAAA=");
+                }]]>
+              </style>
+              <style type="text/css">
+                <![CDATA[.shape {
+                  shape-rendering: geometricPrecision;
+                  stroke-linejoin: round;
+                }
+                .connection {
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                }
+                .blend {
+                  mix-blend-mode: multiply;
+                  opacity: 0.5;
+                }
 
-		.d2-2745463470 .fill-N1{fill:#0A0F25;}
-		.d2-2745463470 .fill-N2{fill:#676C7E;}
-		.d2-2745463470 .fill-N3{fill:#9499AB;}
-		.d2-2745463470 .fill-N4{fill:#CFD2DD;}
-		.d2-2745463470 .fill-N5{fill:#DEE1EB;}
-		.d2-2745463470 .fill-N6{fill:#EEF1F8;}
-		.d2-2745463470 .fill-N7{fill:#FFFFFF;}
-		.d2-2745463470 .fill-B1{fill:#0D32B2;}
-		.d2-2745463470 .fill-B2{fill:#0D32B2;}
-		.d2-2745463470 .fill-B3{fill:#E3E9FD;}
-		.d2-2745463470 .fill-B4{fill:#E3E9FD;}
-		.d2-2745463470 .fill-B5{fill:#EDF0FD;}
-		.d2-2745463470 .fill-B6{fill:#F7F8FE;}
-		.d2-2745463470 .fill-AA2{fill:#4A6FF3;}
-		.d2-2745463470 .fill-AA4{fill:#EDF0FD;}
-		.d2-2745463470 .fill-AA5{fill:#F7F8FE;}
-		.d2-2745463470 .fill-AB4{fill:#EDF0FD;}
-		.d2-2745463470 .fill-AB5{fill:#F7F8FE;}
-		.d2-2745463470 .stroke-N1{stroke:#0A0F25;}
-		.d2-2745463470 .stroke-N2{stroke:#676C7E;}
-		.d2-2745463470 .stroke-N3{stroke:#9499AB;}
-		.d2-2745463470 .stroke-N4{stroke:#CFD2DD;}
-		.d2-2745463470 .stroke-N5{stroke:#DEE1EB;}
-		.d2-2745463470 .stroke-N6{stroke:#EEF1F8;}
-		.d2-2745463470 .stroke-N7{stroke:#FFFFFF;}
-		.d2-2745463470 .stroke-B1{stroke:#0D32B2;}
-		.d2-2745463470 .stroke-B2{stroke:#0D32B2;}
-		.d2-2745463470 .stroke-B3{stroke:#E3E9FD;}
-		.d2-2745463470 .stroke-B4{stroke:#E3E9FD;}
-		.d2-2745463470 .stroke-B5{stroke:#EDF0FD;}
-		.d2-2745463470 .stroke-B6{stroke:#F7F8FE;}
-		.d2-2745463470 .stroke-AA2{stroke:#4A6FF3;}
-		.d2-2745463470 .stroke-AA4{stroke:#EDF0FD;}
-		.d2-2745463470 .stroke-AA5{stroke:#F7F8FE;}
-		.d2-2745463470 .stroke-AB4{stroke:#EDF0FD;}
-		.d2-2745463470 .stroke-AB5{stroke:#F7F8FE;}
-		.d2-2745463470 .background-color-N1{background-color:#0A0F25;}
-		.d2-2745463470 .background-color-N2{background-color:#676C7E;}
-		.d2-2745463470 .background-color-N3{background-color:#9499AB;}
-		.d2-2745463470 .background-color-N4{background-color:#CFD2DD;}
-		.d2-2745463470 .background-color-N5{background-color:#DEE1EB;}
-		.d2-2745463470 .background-color-N6{background-color:#EEF1F8;}
-		.d2-2745463470 .background-color-N7{background-color:#FFFFFF;}
-		.d2-2745463470 .background-color-B1{background-color:#0D32B2;}
-		.d2-2745463470 .background-color-B2{background-color:#0D32B2;}
-		.d2-2745463470 .background-color-B3{background-color:#E3E9FD;}
-		.d2-2745463470 .background-color-B4{background-color:#E3E9FD;}
-		.d2-2745463470 .background-color-B5{background-color:#EDF0FD;}
-		.d2-2745463470 .background-color-B6{background-color:#F7F8FE;}
-		.d2-2745463470 .background-color-AA2{background-color:#4A6FF3;}
-		.d2-2745463470 .background-color-AA4{background-color:#EDF0FD;}
-		.d2-2745463470 .background-color-AA5{background-color:#F7F8FE;}
-		.d2-2745463470 .background-color-AB4{background-color:#EDF0FD;}
-		.d2-2745463470 .background-color-AB5{background-color:#F7F8FE;}
-		.d2-2745463470 .color-N1{color:#0A0F25;}
-		.d2-2745463470 .color-N2{color:#676C7E;}
-		.d2-2745463470 .color-N3{color:#9499AB;}
-		.d2-2745463470 .color-N4{color:#CFD2DD;}
-		.d2-2745463470 .color-N5{color:#DEE1EB;}
-		.d2-2745463470 .color-N6{color:#EEF1F8;}
-		.d2-2745463470 .color-N7{color:#FFFFFF;}
-		.d2-2745463470 .color-B1{color:#0D32B2;}
-		.d2-2745463470 .color-B2{color:#0D32B2;}
-		.d2-2745463470 .color-B3{color:#E3E9FD;}
-		.d2-2745463470 .color-B4{color:#E3E9FD;}
-		.d2-2745463470 .color-B5{color:#EDF0FD;}
-		.d2-2745463470 .color-B6{color:#F7F8FE;}
-		.d2-2745463470 .color-AA2{color:#4A6FF3;}
-		.d2-2745463470 .color-AA4{color:#EDF0FD;}
-		.d2-2745463470 .color-AA5{color:#F7F8FE;}
-		.d2-2745463470 .color-AB4{color:#EDF0FD;}
-		.d2-2745463470 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-2745463470);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-2745463470);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-2745463470);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-2745463470);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-2745463470);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-2745463470);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-2745463470);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><g class="cGhhc2Ux"><g class="shape" ><rect x="20.000000" y="56.000000" width="443.000000" height="126.000000" stroke="#0D32B2" fill="#ffcccc" class=" stroke-B1" style="stroke-width:2;" /></g><text x="241.500000" y="43.000000" fill="#0A0F25" class="text fill-N1" style="text-anchor:middle;font-size:28px">P0 Critical (1% to 51%)</text></g><g class="cGhhc2Uy"><g class="shape" ><rect x="45.000000" y="268.000000" width="393.000000" height="504.000000" stroke="#0D32B2" fill="#fff3cc" class=" stroke-B1" style="stroke-width:2;" /></g><text x="241.500000" y="255.000000" fill="#0A0F25" class="text fill-N1" style="text-anchor:middle;font-size:28px">Code Quality (4% to 64%)</text></g><g class="cGhhc2Uz"><g class="shape" ><rect x="70.000000" y="858.000000" width="343.000000" height="504.000000" stroke="#0D32B2" fill="#cce0ff" class=" stroke-B1" style="stroke-width:2;" /></g><text x="241.500000" y="845.000000" fill="#0A0F25" class="text fill-N1" style="text-anchor:middle;font-size:28px">Safety Net (20% to 80%)</text></g><g class="cGhhc2U0"><g class="shape" ><rect x="74.000000" y="1448.000000" width="336.000000" height="378.000000" stroke="#0D32B2" fill="#ffe5cc" class=" stroke-B1" style="stroke-width:2;" /></g><text x="242.000000" y="1435.000000" fill="#0A0F25" class="text fill-N1" style="text-anchor:middle;font-size:28px">Polish (80% to 100%)</text></g><g class="dmVyaWZ5"><g class="shape" ><rect x="1276.000000" y="2138.000000" width="379.000000" height="66.000000" stroke="#0D32B2" fill="#6eb5ff" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1465.500000" y="2176.500000" fill="white" class="text-bold" style="text-anchor:middle;font-size:16px">VERIFY: Full Build + Test + Lint + Commit + Push</text></g><g class="TTAx"><g class="shape" ><rect x="205.000000" y="1976.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="241.500000" y="2014.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M01</text></g><g class="TTAy"><g class="shape" ><rect x="584.000000" y="1823.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="620.500000" y="1861.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M02</text></g><g class="TTAz"><g class="shape" ><rect x="584.000000" y="1949.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="620.500000" y="1987.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M03</text></g><g class="TTA0"><g class="shape" ><rect x="583.000000" y="2075.000000" width="74.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="620.000000" y="2113.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M04</text></g><g class="TTA2"><g class="shape" ><rect x="757.000000" y="1949.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="793.500000" y="1987.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M06</text></g><g class="TTA1"><g class="shape" ><rect x="584.000000" y="2201.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="620.500000" y="2239.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M05</text></g><g class="TTA3"><g class="shape" ><rect x="930.000000" y="1760.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="966.500000" y="1798.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M07</text></g><g class="TTA5"><g class="shape" ><rect x="1103.000000" y="1886.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1139.500000" y="1924.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M09</text></g><g class="TTEw"><g class="shape" ><rect x="1103.000000" y="2012.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1139.500000" y="2050.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M10</text></g><g class="TTA4"><g class="shape" ><rect x="1103.000000" y="1760.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1139.500000" y="1798.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M08</text></g><g class="TTEx"><g class="shape" ><rect x="1103.000000" y="2138.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1139.500000" y="2176.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M11</text></g><g class="TTEy"><g class="shape" ><rect x="1103.000000" y="2264.000000" width="73.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1139.500000" y="2302.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M12</text></g><g class="cGhhc2UxLk0wMQ=="><g class="shape" ><rect x="50.000000" y="86.000000" width="383.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="124.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M01: Fix WithSilenceUsage + WithPlugin (35min)</text></g><g class="cGhhc2UyLk0wMg=="><g class="shape" ><rect x="119.000000" y="298.000000" width="245.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="336.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M02: Fix 38 Lint Issues (2.5h)</text></g><g class="cGhhc2UyLk0wMw=="><g class="shape" ><rect x="75.000000" y="424.000000" width="333.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="462.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M03: Dedup + Cache + Dead Code (90min)</text></g><g class="cGhhc2UyLk0wNA=="><g class="shape" ><rect x="111.000000" y="550.000000" width="262.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="242.000000" y="588.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M04: API Return Errors (60min)</text></g><g class="cGhhc2UyLk0wNQ=="><g class="shape" ><rect x="79.000000" y="676.000000" width="325.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="714.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M05: Extract Koanf Sub-module (45min)</text></g><g class="cGhhc2UzLk0wNg=="><g class="shape" ><rect x="100.000000" y="888.000000" width="283.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="926.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M06: Doc Accuracy Sweep (60min)</text></g><g class="cGhhc2UzLk0wNw=="><g class="shape" ><rect x="112.000000" y="1014.000000" width="260.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="242.000000" y="1052.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M07: Sub-module Tests x5 (3h)</text></g><g class="cGhhc2UzLk0wOA=="><g class="shape" ><rect x="113.000000" y="1140.000000" width="257.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="1178.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M08: CI Infrastructure (60min)</text></g><g class="cGhhc2UzLk0wOQ=="><g class="shape" ><rect x="120.000000" y="1266.000000" width="244.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="242.000000" y="1304.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M09: Coverage Gaps (90min)</text></g><g class="cGhhc2U0Lk0xMA=="><g class="shape" ><rect x="126.000000" y="1478.000000" width="232.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="242.000000" y="1516.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M10: Deprecate v1 (15min)</text></g><g class="cGhhc2U0Lk0xMQ=="><g class="shape" ><rect x="108.000000" y="1604.000000" width="267.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="241.500000" y="1642.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M11: Godoc + Examples (90min)</text></g><g class="cGhhc2U0Lk0xMg=="><g class="shape" ><rect x="104.000000" y="1730.000000" width="276.000000" height="66.000000" stroke="#0D32B2" fill="#EDF0FD" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="242.000000" y="1768.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M12: COBRA_FOOTGUNS (30min)</text></g><g class="KE0wMSAtJmd0OyBNMDIpWzBd"><marker id="mk-d2-2745463470-3488378134" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 279.692742 1983.934812 C 442.000000 1881.800049 543.099976 1856.000000 579.500000 1856.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wMSAtJmd0OyBNMDMpWzBd"><path d="M 279.988582 2003.786592 C 442.000000 1986.400024 543.099976 1982.000000 579.500000 1982.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wMSAtJmd0OyBNMDQpWzBd"><path d="M 279.850666 2024.758310 C 442.000000 2091.198975 543.000000 2108.000000 579.000000 2108.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wMiAtJmd0OyBNMDYpWzBd"><path d="M 659.500000 1856.000000 C 697.099976 1856.000000 719.799988 1874.599976 768.732381 1945.704866" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wMyAtJmd0OyBNMDYpWzBd"><path d="M 659.500000 1982.000000 C 697.099976 1982.000000 717.000000 1982.000000 753.000000 1982.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNCAtJmd0OyBNMDYpWzBd"><path d="M 659.000000 2108.000000 C 697.000000 2108.000000 719.799988 2089.399902 768.732379 2018.295132" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNSAtJmd0OyBNMDYpWzBd"><path d="M 659.500000 2234.000000 C 697.099976 2234.000000 722.000000 2190.199951 780.704028 2018.784238" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNiAtJmd0OyBNMDcpWzBd"><path d="M 809.828485 1947.179667 C 865.799988 1824.199951 890.000000 1793.000000 926.000000 1793.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNiAtJmd0OyBNMDkpWzBd"><path d="M 831.623068 1953.831389 C 870.000000 1926.199951 897.299988 1919.000000 923.250000 1919.000000 C 949.200012 1919.000000 1063.000000 1919.000000 1099.000000 1919.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNiAtJmd0OyBNMTApWzBd"><path d="M 831.623068 2010.168611 C 870.000000 2037.800049 897.299988 2045.000000 923.250000 2045.000000 C 949.200012 2045.000000 1063.000000 2045.000000 1099.000000 2045.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNyAtJmd0OyBNMDgpWzBd"><path d="M 1005.000000 1793.000000 C 1043.000000 1793.000000 1063.000000 1793.000000 1099.000000 1793.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wNyAtJmd0OyB2ZXJpZnkpWzBd"><path d="M 1004.531410 1760.713616 C 1043.000000 1728.400024 1070.300049 1720.000000 1096.250000 1720.000000 C 1122.199951 1720.000000 1270.400024 1803.599976 1446.123791 2134.467318" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wOCAtJmd0OyB2ZXJpZnkpWzBd"><path d="M 1178.000000 1793.000000 C 1216.000000 1793.000000 1269.800049 1862.000000 1442.856300 2134.622938" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0wOSAtJmd0OyB2ZXJpZnkpWzBd"><path d="M 1178.000000 1919.000000 C 1216.000000 1919.000000 1267.599976 1962.800049 1431.245350 2135.099672" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0xMCAtJmd0OyB2ZXJpZnkpWzBd"><path d="M 1178.000000 2045.000000 C 1216.000000 2045.000000 1261.400024 2063.600098 1399.459025 2136.139490" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0xMSAtJmd0OyB2ZXJpZnkpWzBd"><path d="M 1178.000000 2171.000000 C 1216.000000 2171.000000 1236.000000 2171.000000 1272.000000 2171.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><g class="KE0xMiAtJmd0OyB2ZXJpZnkpWzBd"><path d="M 1178.000000 2297.000000 C 1216.000000 2297.000000 1261.400024 2278.399902 1399.459025 2205.860510" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2745463470-3488378134)" mask="url(#d2-2745463470)" /></g><mask id="d2-2745463470" maskUnits="userSpaceOnUse" x="-81" y="-85" width="1837" height="2516">
-<rect x="-81" y="-85" width="1837" height="2516" fill="white"></rect>
-
-</mask></svg></svg>
+                		.d2-2745463470 .fill-N1{fill:#0A0F25;}
+                		.d2-2745463470 .fill-N2{fill:#676C7E;}
+                		.d2-2745463470 .fill-N3{fill:#9499AB;}
+                		.d2-2745463470 .fill-N4{fill:#CFD2DD;}
+                		.d2-2745463470 .fill-N5{fill:#DEE1EB;}
+                		.d2-2745463470 .fill-N6{fill:#EEF1F8;}
+                		.d2-2745463470 .fill-N7{fill:#FFFFFF;}
+                		.d2-2745463470 .fill-B1{fill:#0D32B2;}
+                		.d2-2745463470 .fill-B2{fill:#0D32B2;}
+                		.d2-2745463470 .fill-B3{fill:#E3E9FD;}
+                		.d2-2745463470 .fill-B4{fill:#E3E9FD;}
+                		.d2-2745463470 .fill-B5{fill:#EDF0FD;}
+                		.d2-2745463470 .fill-B6{fill:#F7F8FE;}
+                		.d2-2745463470 .fill-AA2{fill:#4A6FF3;}
+                		.d2-2745463470 .fill-AA4{fill:#EDF0FD;}
+                		.d2-2745463470 .fill-AA5{fill:#F7F8FE;}
+                		.d2-2745463470 .fill-AB4{fill:#EDF0FD;}
+                		.d2-2745463470 .fill-AB5{fill:#F7F8FE;}
+                		.d2-2745463470 .stroke-N1{stroke:#0A0F25;}
+                		.d2-2745463470 .stroke-N2{stroke:#676C7E;}
+                		.d2-2745463470 .stroke-N3{stroke:#9499AB;}
+                		.d2-2745463470 .stroke-N4{stroke:#CFD2DD;}
+                		.d2-2745463470 .stroke-N5{stroke:#DEE1EB;}
+                		.d2-2745463470 .stroke-N6{stroke:#EEF1F8;}
+                		.d2-2745463470 .stroke-N7{stroke:#FFFFFF;}
+                		.d2-2745463470 .stroke-B1{stroke:#0D32B2;}
+                		.d2-2745463470 .stroke-B2{stroke:#0D32B2;}
+                		.d2-2745463470 .stroke-B3{stroke:#E3E9FD;}
+                		.d2-2745463470 .stroke-B4{stroke:#E3E9FD;}
+                		.d2-2745463470 .stroke-B5{stroke:#EDF0FD;}
+                		.d2-2745463470 .stroke-B6{stroke:#F7F8FE;}
+                		.d2-2745463470 .stroke-AA2{stroke:#4A6FF3;}
+                		.d2-2745463470 .stroke-AA4{stroke:#EDF0FD;}
+                		.d2-2745463470 .stroke-AA5{stroke:#F7F8FE;}
+                		.d2-2745463470 .stroke-AB4{stroke:#EDF0FD;}
+                		.d2-2745463470 .stroke-AB5{stroke:#F7F8FE;}
+                		.d2-2745463470 .background-color-N1{background-color:#0A0F25;}
+                		.d2-2745463470 .background-color-N2{background-color:#676C7E;}
+                		.d2-2745463470 .background-color-N3{background-color:#9499AB;}
+                		.d2-2745463470 .background-color-N4{background-color:#CFD2DD;}
+                		.d2-2745463470 .background-color-N5{background-color:#DEE1EB;}
+                		.d2-2745463470 .background-color-N6{background-color:#EEF1F8;}
+                		.d2-2745463470 .background-color-N7{background-color:#FFFFFF;}
+                		.d2-2745463470 .background-color-B1{background-color:#0D32B2;}
+                		.d2-2745463470 .background-color-B2{background-color:#0D32B2;}
+                		.d2-2745463470 .background-color-B3{background-color:#E3E9FD;}
+                		.d2-2745463470 .background-color-B4{background-color:#E3E9FD;}
+                		.d2-2745463470 .background-color-B5{background-color:#EDF0FD;}
+                		.d2-2745463470 .background-color-B6{background-color:#F7F8FE;}
+                		.d2-2745463470 .background-color-AA2{background-color:#4A6FF3;}
+                		.d2-2745463470 .background-color-AA4{background-color:#EDF0FD;}
+                		.d2-2745463470 .background-color-AA5{background-color:#F7F8FE;}
+                		.d2-2745463470 .background-color-AB4{background-color:#EDF0FD;}
+                		.d2-2745463470 .background-color-AB5{background-color:#F7F8FE;}
+                		.d2-2745463470 .color-N1{color:#0A0F25;}
+                		.d2-2745463470 .color-N2{color:#676C7E;}
+                		.d2-2745463470 .color-N3{color:#9499AB;}
+                		.d2-2745463470 .color-N4{color:#CFD2DD;}
+                		.d2-2745463470 .color-N5{color:#DEE1EB;}
+                		.d2-2745463470 .color-N6{color:#EEF1F8;}
+                		.d2-2745463470 .color-N7{color:#FFFFFF;}
+                		.d2-2745463470 .color-B1{color:#0D32B2;}
+                		.d2-2745463470 .color-B2{color:#0D32B2;}
+                		.d2-2745463470 .color-B3{color:#E3E9FD;}
+                		.d2-2745463470 .color-B4{color:#E3E9FD;}
+                		.d2-2745463470 .color-B5{color:#EDF0FD;}
+                		.d2-2745463470 .color-B6{color:#F7F8FE;}
+                		.d2-2745463470 .color-AA2{color:#4A6FF3;}
+                		.d2-2745463470 .color-AA4{color:#EDF0FD;}
+                		.d2-2745463470 .color-AA5{color:#F7F8FE;}
+                		.d2-2745463470 .color-AB4{color:#EDF0FD;}
+                		.d2-2745463470 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-2745463470);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-2745463470);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-2745463470);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-2745463470);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-2745463470);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-2745463470);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-2745463470);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-2745463470);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]>
+              </style>
+              <g class="cGhhc2Ux">
+                <g class="shape">
+                  <rect
+                    x="20.000000"
+                    y="56.000000"
+                    width="443.000000"
+                    height="126.000000"
+                    stroke="#0D32B2"
+                    fill="#ffcccc"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="43.000000"
+                  fill="#0A0F25"
+                  class="text fill-N1"
+                  style="text-anchor: middle; font-size: 28px"
+                >
+                  P0 Critical (1% to 51%)
+                </text>
+              </g>
+              <g class="cGhhc2Uy">
+                <g class="shape">
+                  <rect
+                    x="45.000000"
+                    y="268.000000"
+                    width="393.000000"
+                    height="504.000000"
+                    stroke="#0D32B2"
+                    fill="#fff3cc"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="255.000000"
+                  fill="#0A0F25"
+                  class="text fill-N1"
+                  style="text-anchor: middle; font-size: 28px"
+                >
+                  Code Quality (4% to 64%)
+                </text>
+              </g>
+              <g class="cGhhc2Uz">
+                <g class="shape">
+                  <rect
+                    x="70.000000"
+                    y="858.000000"
+                    width="343.000000"
+                    height="504.000000"
+                    stroke="#0D32B2"
+                    fill="#cce0ff"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="845.000000"
+                  fill="#0A0F25"
+                  class="text fill-N1"
+                  style="text-anchor: middle; font-size: 28px"
+                >
+                  Safety Net (20% to 80%)
+                </text>
+              </g>
+              <g class="cGhhc2U0">
+                <g class="shape">
+                  <rect
+                    x="74.000000"
+                    y="1448.000000"
+                    width="336.000000"
+                    height="378.000000"
+                    stroke="#0D32B2"
+                    fill="#ffe5cc"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="242.000000"
+                  y="1435.000000"
+                  fill="#0A0F25"
+                  class="text fill-N1"
+                  style="text-anchor: middle; font-size: 28px"
+                >
+                  Polish (80% to 100%)
+                </text>
+              </g>
+              <g class="dmVyaWZ5">
+                <g class="shape">
+                  <rect
+                    x="1276.000000"
+                    y="2138.000000"
+                    width="379.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#6eb5ff"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1465.500000"
+                  y="2176.500000"
+                  fill="white"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  VERIFY: Full Build + Test + Lint + Commit + Push
+                </text>
+              </g>
+              <g class="TTAx">
+                <g class="shape">
+                  <rect
+                    x="205.000000"
+                    y="1976.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="2014.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M01
+                </text>
+              </g>
+              <g class="TTAy">
+                <g class="shape">
+                  <rect
+                    x="584.000000"
+                    y="1823.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="620.500000"
+                  y="1861.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M02
+                </text>
+              </g>
+              <g class="TTAz">
+                <g class="shape">
+                  <rect
+                    x="584.000000"
+                    y="1949.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="620.500000"
+                  y="1987.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M03
+                </text>
+              </g>
+              <g class="TTA0">
+                <g class="shape">
+                  <rect
+                    x="583.000000"
+                    y="2075.000000"
+                    width="74.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="620.000000"
+                  y="2113.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M04
+                </text>
+              </g>
+              <g class="TTA2">
+                <g class="shape">
+                  <rect
+                    x="757.000000"
+                    y="1949.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="793.500000"
+                  y="1987.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M06
+                </text>
+              </g>
+              <g class="TTA1">
+                <g class="shape">
+                  <rect
+                    x="584.000000"
+                    y="2201.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="620.500000"
+                  y="2239.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M05
+                </text>
+              </g>
+              <g class="TTA3">
+                <g class="shape">
+                  <rect
+                    x="930.000000"
+                    y="1760.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="966.500000"
+                  y="1798.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M07
+                </text>
+              </g>
+              <g class="TTA5">
+                <g class="shape">
+                  <rect
+                    x="1103.000000"
+                    y="1886.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1139.500000"
+                  y="1924.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M09
+                </text>
+              </g>
+              <g class="TTEw">
+                <g class="shape">
+                  <rect
+                    x="1103.000000"
+                    y="2012.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1139.500000"
+                  y="2050.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M10
+                </text>
+              </g>
+              <g class="TTA4">
+                <g class="shape">
+                  <rect
+                    x="1103.000000"
+                    y="1760.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1139.500000"
+                  y="1798.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M08
+                </text>
+              </g>
+              <g class="TTEx">
+                <g class="shape">
+                  <rect
+                    x="1103.000000"
+                    y="2138.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1139.500000"
+                  y="2176.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M11
+                </text>
+              </g>
+              <g class="TTEy">
+                <g class="shape">
+                  <rect
+                    x="1103.000000"
+                    y="2264.000000"
+                    width="73.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#F7F8FE"
+                    class="stroke-B1 fill-B6"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1139.500000"
+                  y="2302.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M12
+                </text>
+              </g>
+              <g class="cGhhc2UxLk0wMQ==">
+                <g class="shape">
+                  <rect
+                    x="50.000000"
+                    y="86.000000"
+                    width="383.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="124.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M01: Fix WithSilenceUsage + WithPlugin (35min)
+                </text>
+              </g>
+              <g class="cGhhc2UyLk0wMg==">
+                <g class="shape">
+                  <rect
+                    x="119.000000"
+                    y="298.000000"
+                    width="245.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="336.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M02: Fix 38 Lint Issues (2.5h)
+                </text>
+              </g>
+              <g class="cGhhc2UyLk0wMw==">
+                <g class="shape">
+                  <rect
+                    x="75.000000"
+                    y="424.000000"
+                    width="333.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="462.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M03: Dedup + Cache + Dead Code (90min)
+                </text>
+              </g>
+              <g class="cGhhc2UyLk0wNA==">
+                <g class="shape">
+                  <rect
+                    x="111.000000"
+                    y="550.000000"
+                    width="262.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="242.000000"
+                  y="588.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M04: API Return Errors (60min)
+                </text>
+              </g>
+              <g class="cGhhc2UyLk0wNQ==">
+                <g class="shape">
+                  <rect
+                    x="79.000000"
+                    y="676.000000"
+                    width="325.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="714.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M05: Extract Koanf Sub-module (45min)
+                </text>
+              </g>
+              <g class="cGhhc2UzLk0wNg==">
+                <g class="shape">
+                  <rect
+                    x="100.000000"
+                    y="888.000000"
+                    width="283.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="926.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M06: Doc Accuracy Sweep (60min)
+                </text>
+              </g>
+              <g class="cGhhc2UzLk0wNw==">
+                <g class="shape">
+                  <rect
+                    x="112.000000"
+                    y="1014.000000"
+                    width="260.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="242.000000"
+                  y="1052.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M07: Sub-module Tests x5 (3h)
+                </text>
+              </g>
+              <g class="cGhhc2UzLk0wOA==">
+                <g class="shape">
+                  <rect
+                    x="113.000000"
+                    y="1140.000000"
+                    width="257.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="1178.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M08: CI Infrastructure (60min)
+                </text>
+              </g>
+              <g class="cGhhc2UzLk0wOQ==">
+                <g class="shape">
+                  <rect
+                    x="120.000000"
+                    y="1266.000000"
+                    width="244.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="242.000000"
+                  y="1304.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M09: Coverage Gaps (90min)
+                </text>
+              </g>
+              <g class="cGhhc2U0Lk0xMA==">
+                <g class="shape">
+                  <rect
+                    x="126.000000"
+                    y="1478.000000"
+                    width="232.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="242.000000"
+                  y="1516.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M10: Deprecate v1 (15min)
+                </text>
+              </g>
+              <g class="cGhhc2U0Lk0xMQ==">
+                <g class="shape">
+                  <rect
+                    x="108.000000"
+                    y="1604.000000"
+                    width="267.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="241.500000"
+                  y="1642.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M11: Godoc + Examples (90min)
+                </text>
+              </g>
+              <g class="cGhhc2U0Lk0xMg==">
+                <g class="shape">
+                  <rect
+                    x="104.000000"
+                    y="1730.000000"
+                    width="276.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#EDF0FD"
+                    class="stroke-B1 fill-B5"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="242.000000"
+                  y="1768.500000"
+                  fill="#0A0F25"
+                  class="text-bold fill-N1"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  M12: COBRA_FOOTGUNS (30min)
+                </text>
+              </g>
+              <g class="KE0wMSAtJmd0OyBNMDIpWzBd">
+                <marker
+                  id="mk-d2-2745463470-3488378134"
+                  markerWidth="10.000000"
+                  markerHeight="12.000000"
+                  refX="7.000000"
+                  refY="6.000000"
+                  viewBox="0.000000 0.000000 10.000000 12.000000"
+                  orient="auto"
+                  markerUnits="userSpaceOnUse"
+                >
+                  <polygon
+                    points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000"
+                    fill="#0D32B2"
+                    class="connection fill-B1"
+                    stroke-width="2"
+                  />
+                </marker>
+                <path
+                  d="M 279.692742 1983.934812 C 442.000000 1881.800049 543.099976 1856.000000 579.500000 1856.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wMSAtJmd0OyBNMDMpWzBd">
+                <path
+                  d="M 279.988582 2003.786592 C 442.000000 1986.400024 543.099976 1982.000000 579.500000 1982.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wMSAtJmd0OyBNMDQpWzBd">
+                <path
+                  d="M 279.850666 2024.758310 C 442.000000 2091.198975 543.000000 2108.000000 579.000000 2108.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wMiAtJmd0OyBNMDYpWzBd">
+                <path
+                  d="M 659.500000 1856.000000 C 697.099976 1856.000000 719.799988 1874.599976 768.732381 1945.704866"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wMyAtJmd0OyBNMDYpWzBd">
+                <path
+                  d="M 659.500000 1982.000000 C 697.099976 1982.000000 717.000000 1982.000000 753.000000 1982.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNCAtJmd0OyBNMDYpWzBd">
+                <path
+                  d="M 659.000000 2108.000000 C 697.000000 2108.000000 719.799988 2089.399902 768.732379 2018.295132"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNSAtJmd0OyBNMDYpWzBd">
+                <path
+                  d="M 659.500000 2234.000000 C 697.099976 2234.000000 722.000000 2190.199951 780.704028 2018.784238"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNiAtJmd0OyBNMDcpWzBd">
+                <path
+                  d="M 809.828485 1947.179667 C 865.799988 1824.199951 890.000000 1793.000000 926.000000 1793.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNiAtJmd0OyBNMDkpWzBd">
+                <path
+                  d="M 831.623068 1953.831389 C 870.000000 1926.199951 897.299988 1919.000000 923.250000 1919.000000 C 949.200012 1919.000000 1063.000000 1919.000000 1099.000000 1919.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNiAtJmd0OyBNMTApWzBd">
+                <path
+                  d="M 831.623068 2010.168611 C 870.000000 2037.800049 897.299988 2045.000000 923.250000 2045.000000 C 949.200012 2045.000000 1063.000000 2045.000000 1099.000000 2045.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNyAtJmd0OyBNMDgpWzBd">
+                <path
+                  d="M 1005.000000 1793.000000 C 1043.000000 1793.000000 1063.000000 1793.000000 1099.000000 1793.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wNyAtJmd0OyB2ZXJpZnkpWzBd">
+                <path
+                  d="M 1004.531410 1760.713616 C 1043.000000 1728.400024 1070.300049 1720.000000 1096.250000 1720.000000 C 1122.199951 1720.000000 1270.400024 1803.599976 1446.123791 2134.467318"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wOCAtJmd0OyB2ZXJpZnkpWzBd">
+                <path
+                  d="M 1178.000000 1793.000000 C 1216.000000 1793.000000 1269.800049 1862.000000 1442.856300 2134.622938"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0wOSAtJmd0OyB2ZXJpZnkpWzBd">
+                <path
+                  d="M 1178.000000 1919.000000 C 1216.000000 1919.000000 1267.599976 1962.800049 1431.245350 2135.099672"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0xMCAtJmd0OyB2ZXJpZnkpWzBd">
+                <path
+                  d="M 1178.000000 2045.000000 C 1216.000000 2045.000000 1261.400024 2063.600098 1399.459025 2136.139490"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0xMSAtJmd0OyB2ZXJpZnkpWzBd">
+                <path
+                  d="M 1178.000000 2171.000000 C 1216.000000 2171.000000 1236.000000 2171.000000 1272.000000 2171.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <g class="KE0xMiAtJmd0OyB2ZXJpZnkpWzBd">
+                <path
+                  d="M 1178.000000 2297.000000 C 1216.000000 2297.000000 1261.400024 2278.399902 1399.459025 2205.860510"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-2745463470-3488378134)"
+                  mask="url(#d2-2745463470)"
+                />
+              </g>
+              <mask
+                id="d2-2745463470"
+                maskUnits="userSpaceOnUse"
+                x="-81"
+                y="-85"
+                width="1837"
+                height="2516"
+              >
+                <rect x="-81" y="-85" width="1837" height="2516" fill="white"></rect>
+              </mask>
+            </svg>
+          </svg>
         </div>
 
         <h2 id="deferred"><span class="num">05</span>Deferred Items (API-breaking — v3.1+)</h2>
@@ -1109,8 +2538,13 @@
           <h4>Intentionally Deferred</h4>
           <p>These items change public API signatures and require a semver-minor bump (v3.1+):</p>
           <ul>
-            <li><strong>#12</strong> Middleware context propagation — changes <code>Middleware[T]</code> func signature</li>
-            <li><strong>#15</strong> Rename <code>Get[T]</code> &rarr; <code>GetService[T]</code></li>
+            <li>
+              <strong>#12</strong> Middleware context propagation — changes
+              <code>Middleware[T]</code> func signature
+            </li>
+            <li>
+              <strong>#15</strong> Rename <code>Get[T]</code> &rarr; <code>GetService[T]</code>
+            </li>
             <li><strong>#16</strong> Make <code>RegisterInScope</code> generic</li>
             <li><strong>#17</strong> Remove or redesign <code>Package()</code></li>
             <li><strong>#18</strong> Remove <code>SetConfig</code></li>
@@ -1125,7 +2559,8 @@
         </div>
 
         <footer class="footer">
-          Generated 2026-07-10 &middot; All task estimates verified against source code &middot; Pareto tiers based on customer trust impact
+          Generated 2026-07-10 &middot; All task estimates verified against source code &middot;
+          Pareto tiers based on customer trust impact
         </footer>
       </main>
     </div>
