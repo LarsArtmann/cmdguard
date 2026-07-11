@@ -244,7 +244,7 @@ func addShortCommandToStrictCLI(
 ) {
 	t.Helper()
 
-	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, opts...)
+	cli, err := NewCLI("test", "Test", testConfig{}, opts...)
 	testutil.AssertNoError(t, err)
 
 	cmd, err := NewCommand(

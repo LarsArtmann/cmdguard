@@ -16,7 +16,7 @@ func TestWithDILogging(t *testing.T) {
 		var mu sync.Mutex
 		var logs []string
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test", testCLIConfig{},
 			v3.WithDILogging(func(format string, args ...any) {
 				mu.Lock()
@@ -45,7 +45,7 @@ func TestWithDILogging(t *testing.T) {
 	t.Run("no logging when option not set", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}

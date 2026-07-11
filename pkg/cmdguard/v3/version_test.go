@@ -8,7 +8,7 @@ import (
 func TestVersionCommandSuccess(t *testing.T) {
 	t.Parallel()
 
-	cli, err := NewCLI[Config](
+	cli, err := NewCLI(
 		"myapp", "My app", Config{},
 		WithCLIVersion("2.0.0"),
 	)
@@ -32,7 +32,7 @@ func TestGenerateVersionCommand(t *testing.T) {
 	t.Run("writes version to custom writer", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[Config](
+		cli, err := NewCLI(
 			"myapp", "My app", Config{},
 			WithCLIVersion("3.0.0"),
 		)
@@ -61,7 +61,7 @@ func TestGenerateVersionCommand(t *testing.T) {
 	t.Run("returns error when no version set", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[Config]("myapp", "My app", Config{})
+		cli, err := NewCLI("myapp", "My app", Config{})
 		if err != nil {
 			t.Fatal(err)
 		}

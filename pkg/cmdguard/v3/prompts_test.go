@@ -301,7 +301,7 @@ func TestWithPromptOnMissing_Integration(t *testing.T) {
 
 			var gotName string
 
-			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+			cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("creating CLI: %v", err)
 			}

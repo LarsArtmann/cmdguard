@@ -14,7 +14,7 @@ import (
 func newTestCLIWithNoOpCmd(t *testing.T, opts ...CommandOption) *CLI[testConfig] {
 	t.Helper()
 
-	cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang(false))
+	cli, err := NewCLI("test", "Test", testConfig{}, WithFang(false))
 	testutil.AssertNoError(t, err)
 
 	cmd, err := NewCommand(
@@ -89,7 +89,7 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 	t.Run("default exit code is 1", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{})
+		cli, err := NewCLI("test", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
 		cmd, err := NewCommand(
@@ -114,7 +114,7 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 	t.Run("ExitError propagates exit code", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{})
+		cli, err := NewCLI("test", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
 		cmd, err := NewCommand(
@@ -152,7 +152,7 @@ func TestWithConfigValidation(t *testing.T) {
 		}
 
 		var validated bool
-		cli, err := NewCLI[config](
+		cli, err := NewCLI(
 			"test", "Test", config{},
 			WithConfigValidation(func(cfg *config) error {
 				validated = true
@@ -178,7 +178,7 @@ func TestWithConfigValidation(t *testing.T) {
 			Port int `flag:"port" default:"0" help:"Port"`
 		}
 
-		cli, err := NewCLI[config](
+		cli, err := NewCLI(
 			"test", "Test", config{},
 			WithConfigValidation(func(cfg *config) error {
 				if cfg.Port < 1 {
@@ -206,7 +206,7 @@ func TestWithStrictValidation(t *testing.T) {
 	t.Run("command without short fails in strict mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"test", "Test", testConfig{},
 			WithStrictValidation(),
 		)
@@ -226,7 +226,7 @@ func TestWithStrictValidation(t *testing.T) {
 	t.Run("command without short passes without strict mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{})
+		cli, err := NewCLI("test", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
 		cmd := noShortCommand(t)
@@ -236,7 +236,7 @@ func TestWithStrictValidation(t *testing.T) {
 	t.Run("subcommand without short fails in strict mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"test", "Test", testConfig{},
 			WithStrictValidation(),
 		)
@@ -272,7 +272,7 @@ func TestWithDraconianValidation(t *testing.T) {
 	t.Run("leaf without example fails in draconian mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"test", "Test", testConfig{},
 			WithDraconianValidation(),
 		)
@@ -296,7 +296,7 @@ func TestWithDraconianValidation(t *testing.T) {
 	t.Run("leaf with example passes in draconian mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"test", "Test", testConfig{},
 			WithDraconianValidation(),
 		)
@@ -309,7 +309,7 @@ func TestWithDraconianValidation(t *testing.T) {
 	t.Run("parent command without example passes in draconian mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"test", "Test", testConfig{},
 			WithDraconianValidation(),
 		)
@@ -330,7 +330,7 @@ func TestWithDraconianValidation(t *testing.T) {
 	t.Run("draconian also enforces short description", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"test", "Test", testConfig{},
 			WithDraconianValidation(),
 		)
@@ -397,7 +397,7 @@ func TestVersionCommand(t *testing.T) {
 	t.Run("creates version command with version set", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"myapp", "Test", testConfig{},
 			WithCLIVersion("1.2.3"),
 		)
@@ -412,7 +412,7 @@ func TestVersionCommand(t *testing.T) {
 	t.Run("fails without version set", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("myapp", "Test", testConfig{})
+		cli, err := NewCLI("myapp", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
 		_, err = VersionCommand[testConfig](cli)
@@ -422,7 +422,7 @@ func TestVersionCommand(t *testing.T) {
 	t.Run("executes and prints version", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig](
+		cli, err := NewCLI(
 			"myapp", "Test", testConfig{},
 			WithCLIVersion("2.0.0"),
 			WithFang(false),
@@ -446,7 +446,7 @@ func TestVersionCommand(t *testing.T) {
 	t.Run("VersionCommand returns error without version", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("myapp", "Test", testConfig{})
+		cli, err := NewCLI("myapp", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
 		_, err = VersionCommand[testConfig](cli)
@@ -462,7 +462,7 @@ func TestWithExactArgs(t *testing.T) {
 	t.Run("exact args - correct count passes", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testConfig]("test", "Test", testConfig{}, WithFang(false))
+		cli, err := NewCLI("test", "Test", testConfig{}, WithFang(false))
 		testutil.AssertNoError(t, err)
 
 		var received []string

@@ -221,14 +221,16 @@ go build ./...                                   # Verify build
 - `funlen` in `type_handler_custom.go` — `registerCustomTypes()` split into `registerEnumTypes()` + `registerValueTypes()`
 - `cyclop`/`funlen` in `cli.go` — `initialize()` split into `ensureScope()` + `setupPersistentPreRun()`
 - `paralleltest` in `type_handler_test.go` — added `t.Parallel()` to all test functions and subtests
-- `ireturn` — `TypeHandler` and `ConfigFileLoader` added to global ireturn allow list (legitimate interface returns)
+- `wrapcheck` in `type_handler.go` — `dispatchRegister` return errors now wrapped with `fmt.Errorf("registering flag %q: %w", ...)`
+- `ireturn` — `TypeHandler`, `ConfigFileLoader`, `do.Injector`, and `koanf.Parser` added to global ireturn allow list (legitimate interface returns). Zero per-file ireturn exclusions remain.
 
 **What remains as documented design decisions (`.golangci.yml` exclusions):**
 
 - `gochecknoglobals` for `globalTypeRegistry`, `globalValidators`, `regexCache` — package-level registries are the COW pattern's foundation (ADR principle #11); injecting them would break the public `RegisterTypeHandler`/`RegisterValidator` API
 - `gochecknoglobals` for `argsKey`/`configKey` in `cli_command.go` — context keys must be package-level (Go convention)
-- `ireturn` for `do.Injector` returns in `scope.go`/`cli_accessors.go` — DI library interface, intentional
-- `ireturn` for `koanf` interface in `configload/koanf.go` — factory pattern for config loaders
+- `forbidigo` for `example_test.go` — godoc examples must use `fmt.Println`
+
+**Exclusion count:** 4 per-file v3 exclusion rules + 4 ireturn allow-list entries. Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
 
 ### v3 Design Principles
 

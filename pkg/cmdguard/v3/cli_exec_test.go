@@ -19,7 +19,7 @@ func TestCLI_Execute(t *testing.T) {
 	t.Run("executes help command", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -35,7 +35,7 @@ func TestCLI_Execute(t *testing.T) {
 
 		executed := false
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -63,7 +63,7 @@ func TestCLI_Execute(t *testing.T) {
 	t.Run("error: unknown subcommand", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -87,7 +87,7 @@ func TestCLI_Execute(t *testing.T) {
 			Name string `default:"World" flag:"name"`
 		}
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -119,7 +119,7 @@ func TestCLI_ExecuteWithArgs(t *testing.T) {
 	t.Run("passes args to command", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -137,7 +137,7 @@ var errTestIntentionalFailure = errors.New("intentional failure")
 
 func runExecuteAndExitSubprocess(envVar, use string, testErr error) bool {
 	if os.Getenv(envVar) == "1" {
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Setup error: %v\n", err)
 			os.Exit(1)
@@ -160,7 +160,7 @@ func TestCLI_ExecuteAndExit(t *testing.T) {
 	t.Run("returns normally on success", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

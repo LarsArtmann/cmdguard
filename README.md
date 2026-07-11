@@ -58,7 +58,7 @@ type GreetFlags struct {
 cmdguard owns the error-output contract so you can't get it wrong:
 
 - **The error is printed exactly once** — styled by [fang](https://github.com/charmbracelet/fang) when enabled (the default), or plain by Cobra when disabled.
-- **Usage is never printed on error** (`SilenceUsage: true` by default).
+- **Usage is never printed on error** (`SilenceUsage: true` by default). Use `WithoutSilenceUsage()` to re-enable usage-on-error.
 - **The error returned by `Execute` is for exit-code mapping only — do not re-print it**, or you'll duplicate the output.
 
 **Recommended — one line, correct exit code:**
@@ -404,6 +404,7 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithCLILong(desc)`                  | Long description                                              |
 | `WithSilenceErrors()`                | Suppress error printing (advanced; fang handles this)         |
 | `WithSilenceUsage()`                 | Suppress usage on error (**default**; kept for compatibility) |
+| `WithoutSilenceUsage()`              | Re-enable usage-on-error (opt-in)                             |
 | `WithFang(bool)`                     | Styled help output                                            |
 | `WithEnvPrefix(prefix)`              | Prefix for env vars                                           |
 | `WithSignalHandling()`               | Cancel context on SIGINT/SIGTERM                              |

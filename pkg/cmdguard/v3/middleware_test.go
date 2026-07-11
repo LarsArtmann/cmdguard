@@ -79,7 +79,7 @@ func TestMiddleware_BasicChaining(t *testing.T) {
 	mw1 := beforeAfterMiddleware[testConfig](&callOrder, "mw1")
 	mw2 := beforeAfterMiddleware[testConfig](&callOrder, "mw2")
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(mw1, mw2),
 		WithFang(false),
@@ -120,7 +120,7 @@ func TestMiddleware_ErrorPropagation(t *testing.T) {
 
 	handlerErr := errors.New("handler failed")
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithFang(false),
 	)
@@ -153,7 +153,7 @@ func TestMiddleware_ShortCircuit(t *testing.T) {
 		return shortCircuitErr
 	}
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(blockingMiddleware),
 		WithFang(false),
@@ -180,7 +180,7 @@ func TestMiddleware_CommandInfo(t *testing.T) {
 
 	var capturedInfo CommandInfo
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(captureInfoMiddleware[testConfig](&capturedInfo)),
 		WithFang(false),
@@ -209,7 +209,7 @@ func TestTimingMiddleware(t *testing.T) {
 		capturedDuration time.Duration
 	)
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(TimingMiddleware[testConfig](func(name string, d time.Duration, err error) {
 			capturedName = name
@@ -240,7 +240,7 @@ func TestRecoveryMiddleware(t *testing.T) {
 
 	type testConfig struct{}
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(RecoveryMiddleware[testConfig]()),
 		WithFang(false),
@@ -268,7 +268,7 @@ func TestMiddleware_NoMiddleware(t *testing.T) {
 
 	type testConfig struct{}
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithFang(false),
 	)
@@ -295,7 +295,7 @@ func TestMiddleware_Subcommands(t *testing.T) {
 
 	var commandNames []string
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(captureNameMiddleware[testConfig](&commandNames)),
 		WithFang(false),
@@ -399,7 +399,7 @@ func TestMiddleware_WithFlags(t *testing.T) {
 
 	var capturedNames []string
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithMiddleware(captureNameMiddleware[testConfig](&capturedNames)),
 		WithFang(false),

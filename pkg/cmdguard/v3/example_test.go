@@ -121,7 +121,7 @@ func ExampleNewCLI() {
 		Verbose bool `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
 	}
 
-	cli, err := v3.NewCLI[config](
+	cli, err := v3.NewCLI(
 		"myapp", "My application", config{},
 		v3.WithCLIVersion("1.0.0"),
 		v3.WithEnvPrefix("MYAPP_"),
@@ -144,7 +144,7 @@ func ExampleProvide() {
 		DSN string
 	}
 
-	cli, _ := v3.NewCLI[config]("myapp", "My application", config{})
+	cli, _ := v3.NewCLI("myapp", "My application", config{})
 	scope := cli.Scope()
 
 	// Register a service.
@@ -183,7 +183,7 @@ func ExampleOutputResult() {
 func ExampleTimingMiddleware() {
 	type config struct{}
 
-	cli, _ := v3.NewCLI[config](
+	cli, _ := v3.NewCLI(
 		"myapp", "My application", config{},
 		v3.WithMiddleware(v3.TimingMiddleware[config](func(name string, d time.Duration, err error) {
 			fmt.Printf("%s took %v (err=%v)\n", name, d, err)

@@ -19,7 +19,7 @@ func TestCLI_Integration(t *testing.T) {
 			shout bool
 		}
 
-		cli, err := NewCLI[testAppConfig]("greet-cli", "A greeting CLI", testAppConfig{})
+		cli, err := NewCLI("greet-cli", "A greeting CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

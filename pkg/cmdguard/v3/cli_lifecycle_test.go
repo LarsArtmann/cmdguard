@@ -13,7 +13,7 @@ func TestCLISetLong(t *testing.T) {
 	t.Run("updates long description", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -35,7 +35,7 @@ func TestCLISetVersion(t *testing.T) {
 	t.Run("updates version", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -53,7 +53,7 @@ func TestCLIAddGlobalFlag(t *testing.T) {
 	t.Run("adds global string flag", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -84,7 +84,7 @@ func TestCLIAddGlobalBoolFlag(t *testing.T) {
 	t.Run("adds global bool flag", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -115,7 +115,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 	t.Run("calls PreRunE and PostRunE", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -170,7 +170,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 	t.Run("PreRunE receives parsed flags", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -218,7 +218,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 	t.Run("PostRunE receives parsed flags", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -268,7 +268,7 @@ func TestWithCLIScope(t *testing.T) {
 
 		customScope := v3.NewScope("custom")
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{},
 			v3.WithCLIScope(customScope))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -289,7 +289,7 @@ func TestCLIExecuteAndExit(t *testing.T) {
 	t.Run("calls ExecuteAndExit successfully", func(t *testing.T) {
 		t.Parallel()
 
-		cli, _ := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, _ := v3.NewCLI("test", "Test", testCLIConfig{})
 
 		cmd := newTestCLICommand[testCLIConfig](t, "run")
 
@@ -308,7 +308,7 @@ func TestCLINoColor(t *testing.T) {
 	t.Run("--no-color flag is registered", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -330,7 +330,7 @@ func TestCLINoColor(t *testing.T) {
 	t.Run("NoColor returns false by default", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -343,7 +343,7 @@ func TestCLINoColor(t *testing.T) {
 	t.Run("NoColor returns true after --no-color is parsed", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{},
 			v3.WithFang(false))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -366,7 +366,7 @@ func TestCLINoColor(t *testing.T) {
 func TestCLINoColorEnvVar(t *testing.T) {
 	t.Setenv("NO_COLOR", "1")
 
-	cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+	cli, err := v3.NewCLI("test", "Test", testCLIConfig{},
 		v3.WithFang(false))
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
@@ -386,7 +386,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 	t.Run("restores NO_COLOR after execution", func(t *testing.T) {
 		os.Unsetenv("NO_COLOR")
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{},
 			v3.WithFang(false))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
@@ -409,7 +409,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 	t.Run("restores previous NO_COLOR value", func(t *testing.T) {
 		t.Setenv("NO_COLOR", "0")
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{},
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{},
 			v3.WithFang(false))
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)

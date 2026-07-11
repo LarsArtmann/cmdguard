@@ -128,7 +128,7 @@ func TestWithAuditLog(t *testing.T) {
 
 		plugin := newTestPlugin(t)
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test", testCLIConfig{},
 			v3.WithAuditLog(plugin),
 			v3.WithDILogging(func(format string, args ...any) {

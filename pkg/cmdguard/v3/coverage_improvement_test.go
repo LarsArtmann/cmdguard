@@ -103,7 +103,7 @@ func TestCLI_HealthCheckResults(t *testing.T) {
 
 		type cfg struct{}
 
-		cli, err := NewCLI[cfg]("test", "Test", cfg{})
+		cli, err := NewCLI("test", "Test", cfg{})
 		testutil.AssertNoError(t, err)
 
 		results := cli.HealthCheckResults()
@@ -117,7 +117,7 @@ func TestCLI_HealthCheckResults(t *testing.T) {
 
 		type cfg struct{}
 
-		cli, err := NewCLI[cfg]("test", "Test", cfg{})
+		cli, err := NewCLI("test", "Test", cfg{})
 		testutil.AssertNoError(t, err)
 
 		mustProvideValue(t, cli.Scope(), "healthy-service")

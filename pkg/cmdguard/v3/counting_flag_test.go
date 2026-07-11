@@ -34,7 +34,7 @@ func TestCountingFlag_Integration(t *testing.T) {
 
 			var result int
 
-			cli, err := NewCLI[countTestConfig]("app", "test", countTestConfig{})
+			cli, err := NewCLI("app", "test", countTestConfig{})
 			testutil.AssertNoError(t, err)
 
 			cmd, err := NewCommand(

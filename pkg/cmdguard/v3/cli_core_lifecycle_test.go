@@ -11,7 +11,7 @@ func TestCLISetConfig(t *testing.T) {
 	t.Run("updates config", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -38,7 +38,7 @@ func TestCLIShutdown(t *testing.T) {
 	t.Run("shutdown succeeds", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -55,7 +55,7 @@ func TestCLIHealthCheck(t *testing.T) {
 	t.Run("health check succeeds", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -72,7 +72,7 @@ func TestCLIHealthCheckWithContext(t *testing.T) {
 	t.Run("health check with context succeeds", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}

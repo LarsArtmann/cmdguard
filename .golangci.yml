@@ -252,6 +252,8 @@ linters:
         - generic
         - github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3.ConfigFileLoader
         - github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3.TypeHandler
+        - github.com/samber/do/v2.Injector
+        - github.com/knadh/koanf/v2.Parser
     makezero:
       always: true
     nestif:
@@ -362,29 +364,12 @@ linters:
       - path: pkg/cmdguard/v3/type_handler.go$
         linters:
           - gochecknoglobals
-          - wrapcheck
       - path: pkg/cmdguard/v3/flags_validate.go$
         linters:
           - gochecknoglobals
       - path: pkg/cmdguard/v3/cli_command.go$
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/v3/scope.go$
-        text: Injector returns interface
-        linters:
-          - ireturn
-      - path: pkg/cmdguard/v3/cli_accessors.go$
-        text: Injector returns interface
-        linters:
-          - ireturn
-      - path: pkg/cmdguard/v3/configload/koanf.go$
-        text: returns interface
-        linters:
-          - ireturn
-      - path: pkg/cmdguard/v3/config_file.go$
-        text: NewJSONLoader returns interface
-        linters:
-          - ireturn
       - path: pkg/cmdguard/v3/example_test.go$
         linters:
           - forbidigo

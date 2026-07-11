@@ -27,7 +27,7 @@ func TestWithCleanup_FiresOnSuccess(t *testing.T) {
 		seenCfg    *cfg
 	)
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(_ *cobra.Command, c *cfg, runErr error) error {
 			fired = true
@@ -65,7 +65,7 @@ func TestWithCleanup_FiresOnRunEError(t *testing.T) {
 
 	var received error
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(_ *cobra.Command, _ *cfg, runErr error) error {
 			received = runErr
@@ -97,7 +97,7 @@ func TestWithCleanup_MultipleHooksInOrder(t *testing.T) {
 
 	var order []int
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			order = append(order, 1)
@@ -128,7 +128,7 @@ func TestWithCleanup_HookErrorOnSuccessReturned(t *testing.T) {
 
 	type cfg struct{}
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			return errCleanupHookFailed
@@ -152,7 +152,7 @@ func TestWithCleanup_RunEErrorNotSwallowed(t *testing.T) {
 
 	type cfg struct{}
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			return errCleanupHookFailed
@@ -191,7 +191,7 @@ func TestWithCleanup_FiresOncePerExecute(t *testing.T) {
 
 	var fires int
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			fires++
@@ -219,7 +219,7 @@ func TestWithCleanup_FiresForRootRunE(t *testing.T) {
 
 	var fired bool
 
-	cli, err := NewCLI[cfg](
+	cli, err := NewCLI(
 		"test", "Test", cfg{},
 		WithCleanup(func(*cobra.Command, *cfg, error) error {
 			fired = true
@@ -246,7 +246,7 @@ func TestWithCleanup_NoHooksLeavesRunEUnchanged(t *testing.T) {
 
 	ran := false
 
-	cli, err := NewCLI[cfg]("test", "Test", cfg{})
+	cli, err := NewCLI("test", "Test", cfg{})
 	testutil.AssertNoError(t, err)
 
 	subCmd := &cobra.Command{

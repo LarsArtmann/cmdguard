@@ -27,7 +27,7 @@ func (s *gracefulShutdownService) Shutdown() error {
 func newGracefulShutdownTestCLI(t *testing.T) *v3.CLI[testCLIConfig] {
 	t.Helper()
 
-	cli, err := v3.NewCLI[testCLIConfig](
+	cli, err := v3.NewCLI(
 		"test", "Test", testCLIConfig{},
 		v3.WithGracefulShutdown(),
 		v3.WithFang(false),
@@ -95,7 +95,7 @@ func TestGracefulShutdown_ImpliesSignalHandling(t *testing.T) {
 	t.Run("WithGracefulShutdown enables gracefulShutdown flag", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test", testCLIConfig{},
 			v3.WithGracefulShutdown(),
 		)

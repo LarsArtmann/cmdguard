@@ -14,6 +14,76 @@ type precedenceConfig struct {
 	Name string `flag:"name" default:"default" env:"TEST_NAME"`
 }
 
+type dbConfig struct {
+	Host string `flag:"db-host" default:"localhost"`
+	Port int    `flag:"db-port" default:"5432"`
+}
+
+type nestedConfigRoot struct {
+	Database dbConfig
+}
+
+func writeNestedConfigFile(t *testing.T) string {
+	t.Helper()
+
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	data := `{"Database": {"Host": "db.example.com", "Port": 6543}}`
+	if err := os.WriteFile(configPath, []byte(data), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	return configPath
+}
+
+func TestConfigFileNestedStructs(t *testing.T) {
+	t.Parallel()
+
+	configPath := writeNestedConfigFile(t)
+
+	cli, err := v3.NewCLI(
+		"app", "My app", nestedConfigRoot{},
+		v3.WithConfigFile(configPath),
+		v3.WithFang(false),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var gotHost string
+	var gotPort int
+
+	cmd, err := v3.NewCommand(
+		"test",
+		v3.NoFlags{},
+		func(_ context.Context, cfg *nestedConfigRoot, _ v3.NoFlags) error {
+			gotHost = cfg.Database.Host
+			gotPort = cfg.Database.Port
+			return nil
+		},
+		v3.WithShort("Test"),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := v3.AddCommand(cli, cmd); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := cli.ExecuteWithArgs(context.Background(), []string{"test"}); err != nil {
+		t.Fatal(err)
+	}
+
+	if gotHost != "db.example.com" {
+		t.Errorf("Database.Host = %q, want %q", gotHost, "db.example.com")
+	}
+
+	if gotPort != 6543 {
+		t.Errorf("Database.Port = %d, want %d", gotPort, 6543)
+	}
+}
+
 func writeTestConfigFile(t *testing.T) string {
 	t.Helper()
 
@@ -34,7 +104,7 @@ func runPrecedenceTest(t *testing.T, configPath, envValue string, args []string,
 	}
 
 	called := false
-	cli, err := v3.NewCLI[precedenceConfig](
+	cli, err := v3.NewCLI(
 		"app", "My app", precedenceConfig{},
 		v3.WithConfigFile(configPath),
 	)

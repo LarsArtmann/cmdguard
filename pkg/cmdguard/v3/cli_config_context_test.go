@@ -16,7 +16,7 @@ type ctxTestConfig struct {
 func TestConfigFromContext_StoredByPreRunE(t *testing.T) {
 	t.Parallel()
 
-	cli, err := NewCLI[ctxTestConfig]("test", "Test", ctxTestConfig{})
+	cli, err := NewCLI("test", "Test", ctxTestConfig{})
 	testutil.AssertNoError(t, err)
 
 	var gotCfg *ctxTestConfig

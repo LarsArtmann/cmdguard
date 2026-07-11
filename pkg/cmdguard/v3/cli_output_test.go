@@ -19,7 +19,7 @@ func TestWithOutputFormat(t *testing.T) {
 	t.Run("default_format_when_not_enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[outputTestConfig]("test", "test", outputTestConfig{})
+		cli, err := NewCLI("test", "test", outputTestConfig{})
 		testutil.AssertNoError(t, err)
 
 		format := cli.OutputFormat()
@@ -29,7 +29,7 @@ func TestWithOutputFormat(t *testing.T) {
 	t.Run("default_format_from_option", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[outputTestConfig](
+		cli, err := NewCLI(
 			"test", "test", outputTestConfig{},
 			WithOutputFormat(output.FormatJSON),
 		)
@@ -42,7 +42,7 @@ func TestWithOutputFormat(t *testing.T) {
 	t.Run("set_format_at_runtime", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[outputTestConfig](
+		cli, err := NewCLI(
 			"test", "test", outputTestConfig{},
 			WithOutputFormat(output.FormatTable),
 		)
@@ -57,7 +57,7 @@ func TestWithOutputFormat(t *testing.T) {
 	t.Run("output_flag_parsed_from_args", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[outputTestConfig](
+		cli, err := NewCLI(
 			"test", "test", outputTestConfig{},
 			WithOutputFormat(output.FormatTable),
 		)

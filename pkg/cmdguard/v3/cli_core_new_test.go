@@ -17,7 +17,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("creates CLI with defaults", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test CLI", testCLIConfig{})
 		testutil.AssertNoError(t, err)
 
 		testutil.AssertNotNil(t, cli)
@@ -34,7 +34,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("creates CLI with options", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"myapp",
 			"My Application",
 			testCLIConfig{},
@@ -55,14 +55,14 @@ func TestNewCLI(t *testing.T) {
 	t.Run("returns error for empty name", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := v3.NewCLI[testCLIConfig]("", "short", testCLIConfig{})
+		_, err := v3.NewCLI("", "short", testCLIConfig{})
 		testutil.AssertExpectedError(t, err)
 	})
 
 	t.Run("defaults SilenceUsage to true (no usage-on-error footgun)", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test CLI", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test CLI", testCLIConfig{})
 		testutil.AssertNoError(t, err)
 
 		testutil.AssertBoolTrue(t, cli.RootCommand().SilenceUsage, "default SilenceUsage")
@@ -71,7 +71,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("WithSilenceErrors sets SilenceErrors", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test CLI", testCLIConfig{},
 			v3.WithSilenceErrors(),
 		)
@@ -83,7 +83,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("WithSilenceUsage sets SilenceUsage", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test CLI", testCLIConfig{},
 			v3.WithSilenceUsage(),
 		)
@@ -95,7 +95,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("WithFang false disables fang", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test CLI", testCLIConfig{},
 			v3.WithFang(false),
 		)
@@ -106,7 +106,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("WithFang true keeps fang enabled", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test CLI", testCLIConfig{},
 			v3.WithFang(true),
 		)
@@ -117,7 +117,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("combines multiple options", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test CLI", testCLIConfig{},
 			v3.WithSilenceErrors(),
 			v3.WithSilenceUsage(),
@@ -137,7 +137,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("WithoutSilenceUsage re-enables usage on error", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig](
+		cli, err := v3.NewCLI(
 			"test", "Test CLI", testCLIConfig{},
 			v3.WithoutSilenceUsage(),
 		)

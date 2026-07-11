@@ -104,7 +104,7 @@ func addCommand[T, F any](t *testing.T, cli *v3.CLI[T], cmd v3.Command[T, F]) {
 func newTestCLI(t *testing.T) *v3.CLI[testCLIConfig] {
 	t.Helper()
 
-	cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+	cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
@@ -121,7 +121,7 @@ func newTestCLIWithAuditLog(
 ) *v3.CLI[testCLIConfig] {
 	t.Helper()
 
-	cli, err := v3.NewCLI[testCLIConfig](
+	cli, err := v3.NewCLI(
 		"test", "Test", testCLIConfig{},
 		v3.WithAuditLog(plugin),
 	)

@@ -173,7 +173,12 @@ func handledByTypeRegistry(tr *typeRegistry, typ reflect.Type) bool {
 func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error {
 	if tag.Count {
 		if tr.countHandler != nil {
-			return tr.countHandler.Register(flags, tag)
+			err := tr.countHandler.Register(flags, tag)
+			if err != nil {
+				return fmt.Errorf("registering count flag %q: %w", tag.Name, err)
+			}
+
+			return nil
 		}
 	}
 
@@ -184,7 +189,12 @@ func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error
 		return nil
 	}
 
-	return h.Register(flags, tag)
+	err := h.Register(flags, tag)
+	if err != nil {
+		return fmt.Errorf("registering flag %q: %w", tag.Name, err)
+	}
+
+	return nil
 }
 
 // dispatchParse dispatches value parsing to the TypeHandler registry.

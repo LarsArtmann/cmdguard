@@ -54,7 +54,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 
 			var order []string
 
-			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+			cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -80,7 +80,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 
 		called := false
 
-		cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+		cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -158,7 +158,7 @@ func TestCLI_CommandOptions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cli, err := NewCLI[testAppConfig]("myapp", "My CLI", testAppConfig{})
+			cli, err := NewCLI("myapp", "My CLI", testAppConfig{})
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}

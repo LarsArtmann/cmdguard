@@ -63,7 +63,7 @@ func TestEnvTag_Integration(t *testing.T) {
 
 			var result string
 
-			cli, err := NewCLI[envTestConfig]("app", "test", envTestConfig{}, tt.cliOptions...)
+			cli, err := NewCLI("app", "test", envTestConfig{}, tt.cliOptions...)
 			testutil.AssertNoError(t, err)
 
 			cmd, err := NewCommand(

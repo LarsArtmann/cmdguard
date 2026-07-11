@@ -14,7 +14,7 @@ func TestCommandGroups_BasicGrouping(t *testing.T) {
 
 	type testConfig struct{}
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithGroup("core", "Core Commands:"),
 		WithGroup("utils", "Utilities:"),
@@ -64,7 +64,7 @@ func TestCommandGroups_NoGroup(t *testing.T) {
 
 	type testConfig struct{}
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithGroup("core", "Core Commands:"),
 		WithFang(false),
@@ -86,7 +86,7 @@ func TestCommandGroups_CommandExecutionStillWorks(t *testing.T) {
 
 	executed := false
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithGroup("main", "Main Commands:"),
 		WithFang(false),
@@ -118,7 +118,7 @@ func TestCommandGroups_SubcommandsInheritFromParent(t *testing.T) {
 
 	childExecuted := false
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithGroup("core", "Core Commands:"),
 		WithFang(false),
@@ -153,7 +153,7 @@ func TestWithGroup_RegistersMultipleGroups(t *testing.T) {
 
 	type testConfig struct{}
 
-	cli, err := NewCLI[testConfig](
+	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
 		WithGroup("alpha", "Alpha Group:"),
 		WithGroup("beta", "Beta Group:"),

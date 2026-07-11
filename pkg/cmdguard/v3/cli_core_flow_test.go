@@ -12,7 +12,7 @@ func TestCLIFlowContext(t *testing.T) {
 	t.Run("FlowContext is nil before Execute", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -25,7 +25,7 @@ func TestCLIFlowContext(t *testing.T) {
 	t.Run("FlowContext is set after Execute", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -50,7 +50,7 @@ func TestCLIFlowContext(t *testing.T) {
 	t.Run("FlowContext is root context", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -83,7 +83,7 @@ func TestCLIFlowContextIntegration(t *testing.T) {
 	t.Run("command can access flow context", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("test", "Test", testCLIConfig{})
+		cli, err := v3.NewCLI("test", "Test", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
@@ -123,7 +123,7 @@ func TestCLIFlowContextIntegration(t *testing.T) {
 	t.Run("flow context has correct root name", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := v3.NewCLI[testCLIConfig]("myapp", "My App", testCLIConfig{})
+		cli, err := v3.NewCLI("myapp", "My App", testCLIConfig{})
 		if err != nil {
 			t.Fatalf("NewCLI failed: %v", err)
 		}

@@ -34,7 +34,7 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 		commands: []Command[testAppConfig, NoFlags]{middleCmd},
 	}
 
-	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
+	cli, err := NewCLI("app", "App", testAppConfig{})
 	testutil.AssertNoError(t, err)
 
 	addCommand(t, cli, topCmd)
@@ -50,7 +50,7 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 
 	var postRunCalled bool
 
-	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
+	cli, err := NewCLI("app", "App", testAppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
@@ -86,7 +86,7 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 
 	var order []string
 
-	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
+	cli, err := NewCLI("app", "App", testAppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
@@ -118,7 +118,7 @@ func TestCLIToCobraCommand_NilContextFallsBack(t *testing.T) {
 
 	var gotCtx context.Context
 
-	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
+	cli, err := NewCLI("app", "App", testAppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
@@ -147,7 +147,7 @@ func TestCLIToCobraCommand_NilContextFallsBack(t *testing.T) {
 func TestCLIToCobraCommand_SubcommandError(t *testing.T) {
 	t.Parallel()
 
-	cli, err := NewCLI[testAppConfig]("app", "App", testAppConfig{})
+	cli, err := NewCLI("app", "App", testAppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
