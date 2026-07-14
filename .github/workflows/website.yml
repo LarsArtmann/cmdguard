@@ -52,6 +52,7 @@ jobs:
         run: npx html-validate --config .htmlvalidate.json "dist/**/*.html"
 
       - name: Verify import paths contain /v3
+        working-directory: ${{ github.workspace }}
         run: |
           ERRORS=""
           for file in $(grep -rl 'github.com/larsartmann/cmdguard' --include='*.md' --include='*.mdx' --include='*.ts' --include='*.astro' README.md website/src/ 2>/dev/null); do

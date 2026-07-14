@@ -310,7 +310,8 @@ v3.NewCommand("deploy", &Flags{}, runHandler,
 ```
 
 `PostRunE` only fires on success — Cobra semantics. For cleanup that must run
-even on failure, put `defer` directly inside your `RunE` handler.
+even on failure, use [`WithCleanup[T]`](https://cmdguard.lars.software/guides/lifecycle/)
+which fires after every `RunE` regardless of outcome.
 
 ---
 
@@ -668,8 +669,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 - [Installation](https://cmdguard.lars.software/getting-started/installation/) — Get started in 30 seconds
 - [Quick Start](https://cmdguard.lars.software/getting-started/quick-start/) — Build a CLI in under a minute
 - [Type-Safe Flags](https://cmdguard.lars.software/guides/type-safe-flags/) — Struct tags reference
+- [Custom Value Types](https://cmdguard.lars.software/guides/custom-types/) — Built-in types and RegisterTypeHandler
 - [Dependency Injection](https://cmdguard.lars.software/guides/dependency-injection/) — samber/do/v2 integration
+- [Lifecycle & Signals](https://cmdguard.lars.software/guides/lifecycle/) — Graceful shutdown, WithCleanup, Doctor
 - [Error Handling](https://cmdguard.lars.software/guides/error-handling/) — Zero panics, exit codes, sentinel errors
+- [Audit Log](https://cmdguard.lars.software/guides/audit-log/) — DI audit trail in 11 export formats
 - [Migrating from Cobra](https://cmdguard.lars.software/guides/migrating-from-cobra/) — Step-by-step guide
 - [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) — Full API on pkg.go.dev
 

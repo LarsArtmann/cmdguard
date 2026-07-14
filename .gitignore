@@ -82,6 +82,7 @@ ehthumbs.db
 audit-log.*
 workflow-audit-log.*
 .buildflow-workflow-baseline.json
+!website/src/content/docs/guides/audit-log.mdx
 
 ## Reports and coverage
 reports/

@@ -1,0 +1,81 @@
+---
+title: Plugin System
+description: Bundle custom type handlers and validators into reusable plugins.
+---
+
+## Overview
+
+The `Plugin` interface bundles custom type handlers and validators into a single unit. Plugins provide one-step registration of domain-specific flag types and validation rules.
+
+## Plugin Interface
+
+```go
+type Plugin interface {
+    PluginName() string
+    RegisterTypeHandlers(r *v3.FlagRegistry)
+    RegisterValidators(r *v3.FlagRegistry)
+}
+```
+
+## Registering Plugins
+
+Three scopes, from broadest to narrowest:
+
+```go
+// 1. Global — affects all CLI instances
+v3.RegisterPlugin(myPlugin)
+
+// 2. CLI instance — affects this CLI only
+cli, _ := v3.NewCLI[Config]("app", "...", Config{},
+    v3.WithPlugin(myPlugin),
+)
+
+// 3. FlagRegistry — most granular
+fr := cli.FlagRegistry()
+fr.RegisterPlugin(myPlugin)
+```
+
+Global plugins are visible to all instances that haven't cloned their registry. Instance-level and FlagRegistry-level plugins trigger the copy-on-write clone, so they're isolated.
+
+## Writing a Plugin
+
+```go
+package myplugin
+
+type DatabasePlugin struct{}
+
+func (p *DatabasePlugin) PluginName() string { return "database-types" }
+
+func (p *DatabasePlugin) RegisterTypeHandlers(r *v3.FlagRegistry) {
+    r.RegisterTypeHandler(reflect.TypeFor[DSN](), v3.TypeHandlerFunc{
+        ParseFunc:   parseDSN,
+        DefaultFunc: func(_ v3.FlagTag) any { return DSN{} },
+    })
+}
+
+func (p *DatabasePlugin) RegisterValidators(r *v3.FlagRegistry) {
+    r.RegisterFlagValidator("dsn-format", validateDSNFormat)
+}
+```
+
+## Using a Plugin
+
+```go
+import "example.com/myplugin"
+
+func main() {
+    v3.RegisterPlugin(&myplugin.DatabasePlugin{})
+
+    cli, _ := v3.NewCLI[Config]("app", "...", Config{})
+
+    // Now DSN type is available as a flag type
+    cmd, _ := v3.NewCommand("connect", &ConnectFlags{
+        Database: myplugin.DSN{},
+    }, connectHandler)
+
+    v3.AddCommand(cli, cmd)
+    cli.ExecuteAndExit(context.Background())
+}
+```
+
+Plugins are the recommended way to share custom flag types across multiple CLIs or teams.

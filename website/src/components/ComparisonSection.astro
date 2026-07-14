@@ -1,6 +1,27 @@
 ---
-import { comparisons } from '../data/sections';
+import type { FrameworkSupport, SupportLevel } from '../data/types';
+import { comparisons } from '../data/comparisons';
 import SectionHeader from './SectionHeader.astro';
+
+const levelStyles: Record<SupportLevel, { dot: string; text: string }> = {
+  full: { dot: 'bg-success', text: 'text-success' },
+  partial: { dot: 'bg-amber', text: 'text-amber' },
+  diy: { dot: 'bg-text-muted', text: 'text-text-muted' },
+  none: { dot: 'bg-text-muted', text: 'text-text-muted' },
+  native: { dot: 'bg-accent', text: 'text-accent' },
+};
+
+const frameworks = [
+  { key: 'cobra', label: 'Cobra', highlight: false },
+  { key: 'kong', label: 'Kong', highlight: false },
+  { key: 'urfave', label: 'urfave/cli', highlight: false },
+  { key: 'cmdguard', label: 'cmdguard', highlight: true },
+] as const;
+
+function supportCell(s: FrameworkSupport, highlight: boolean) {
+  const style = levelStyles[s.level];
+  return { style, note: s.note, highlight };
+}
 ---
 
 <div>
@@ -11,20 +32,26 @@ import SectionHeader from './SectionHeader.astro';
       <thead>
         <tr class="border-b border-border bg-bg-card">
           <th class="text-left py-4 px-4 font-semibold text-text-muted">Capability</th>
-          <th class="text-center py-4 px-3 font-semibold text-text-muted">Cobra</th>
-          <th class="text-center py-4 px-3 font-semibold text-text-muted">Kong</th>
-          <th class="text-center py-4 px-3 font-semibold text-text-muted">urfave/cli</th>
-          <th class="text-center py-4 px-4 font-semibold text-accent">cmdguard</th>
+          {frameworks.map((fw) => (
+            <th class:list={["text-center py-4 px-3 font-semibold", fw.highlight ? "text-accent" : "text-text-muted"]}>{fw.label}</th>
+          ))}
         </tr>
       </thead>
       <tbody>
         {comparisons.map((row) => (
           <tr class="border-b border-border last:border-b-0">
             <td class="py-3 px-4 font-medium text-text-primary whitespace-nowrap">{row.label}</td>
-            <td class="py-3 px-3 text-center text-text-muted">{row.cobra}</td>
-            <td class="py-3 px-3 text-center text-text-muted">{row.kong}</td>
-            <td class="py-3 px-3 text-center text-text-muted">{row.urfave}</td>
-            <td class="py-3 px-4 text-center text-success font-medium">{row.cmdguard}</td>
+            {frameworks.map((fw) => {
+              const cell = supportCell(row[fw.key], fw.highlight);
+              return (
+                <td class:list={["py-3 px-3 text-center", cell.highlight ? "bg-accent-dim" : ""]}>
+                  <div class:list={["inline-flex items-center gap-1.5", cell.highlight ? cell.style.text : "text-text-muted"]}>
+                    <span class:list={["inline-block w-1.5 h-1.5 rounded-full flex-shrink-0", cell.style.dot]}></span>
+                    <span class="text-xs">{cell.note}</span>
+                  </div>
+                </td>
+              );
+            })}
           </tr>
         ))}
       </tbody>

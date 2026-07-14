@@ -1,0 +1,79 @@
+---
+title: Custom Value Types
+description: Built-in validated types and how to register your own with RegisterTypeHandler.
+---
+
+## Built-in Value Types
+
+cmdguard ships with validated types that parse and validate at construction time — not at runtime when a user passes bad input.
+
+| Type       | Validation                         |
+| ---------- | ---------------------------------- |
+| `Duration` | Wraps `time.Duration`              |
+| `Enum[T]`  | Validated against allowed values   |
+| `LogLevel` | debug / info / warn / error        |
+| `URL`      | Validated URL string               |
+| `Email`    | RFC 5322 email validation          |
+| `Port`     | 1–65535 range                      |
+| `FilePath` | Path cleaning and existence checks |
+| `HostPort` | `host:port` validation             |
+
+Use them directly as flag types:
+
+```go
+type ServerFlags struct {
+    Port     v3.Port     `flag:"port"     default:"8080"   help:"Listen port"`
+    Log      v3.LogLevel `flag:"log"      default:"info"   help:"Log level"`
+    URL      v3.URL      `flag:"url"      required:"true"  help:"API endpoint"`
+    Mode     v3.Enum[string] `flag:"mode" default:"dev"    help:"Run mode"`
+}
+```
+
+Invalid values are caught at parse time with descriptive errors — no runtime panics.
+
+## Register Custom Type Handlers
+
+Add your own types with `RegisterTypeHandler`:
+
+```go
+v3.RegisterTypeHandler(reflect.TypeFor[MyType](), v3.TypeHandlerFunc{
+    ParseFunc: func(value string, _ v3.FlagTag) (any, error) {
+        return MyType{Value: value}, nil
+    },
+    DefaultFunc: func(_ v3.FlagTag) any {
+        return MyType{}
+    },
+})
+```
+
+- `ParseFunc` — converts a string flag value to your type, returning an error on invalid input.
+- `DefaultFunc` — returns the zero value when no flag is provided.
+
+## Copy-on-Write Registry
+
+Package-level `RegisterTypeHandler` writes to the global registry (visible to all CLI instances). For instance-local handlers, use the `FlagRegistry` method:
+
+```go
+// Global — affects all CLI instances that haven't cloned yet
+v3.RegisterTypeHandler(reflect.TypeFor[MyType](), handler)
+
+// Instance-local — triggers a lazy clone, writes only to this CLI's registry
+fr := cli.FlagRegistry()
+fr.RegisterTypeHandler(reflect.TypeFor[MyType](), handler)
+```
+
+This copy-on-write pattern keeps `NewCLI` fast (~48% reduction) while allowing per-instance customization.
+
+## Custom Validators
+
+Register validation functions that run on every flag value:
+
+```go
+v3.RegisterValidator("alphanumeric", func(value string) error {
+    matched, _ := regexp.MatchString(`^[a-zA-Z0-9]+$`, value)
+    if !matched {
+        return fmt.Errorf("must be alphanumeric")
+    }
+    return nil
+})
+```

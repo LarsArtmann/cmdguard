@@ -16,12 +16,23 @@ export interface Feature {
   desc: string;
 }
 
+export const supportLevels = ["full", "partial", "diy", "none", "native"] as const;
+export type SupportLevel = (typeof supportLevels)[number];
+
+export interface FrameworkSupport {
+  level: SupportLevel;
+  note: string;
+}
+
+export const frameworkKeys = ["cobra", "kong", "urfave", "cmdguard"] as const;
+export type FrameworkKey = (typeof frameworkKeys)[number];
+
 export interface ComparisonRow {
   label: string;
-  cobra: string;
-  kong: string;
-  urfave: string;
-  cmdguard: string;
+  cobra: FrameworkSupport;
+  kong: FrameworkSupport;
+  urfave: FrameworkSupport;
+  cmdguard: FrameworkSupport;
 }
 
 export const useCaseIconKeys = ["cog", "chart", "refresh", "bolt", "check"] as const;

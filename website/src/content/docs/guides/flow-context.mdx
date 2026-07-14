@@ -1,0 +1,63 @@
+---
+title: BranchingFlowContext
+description: Track command execution path and share values across the command hierarchy.
+---
+
+## Overview
+
+`BranchingFlowContext` tracks the full command execution path and provides a hierarchical key-value store that propagates values from parent commands to children.
+
+## Accessing the Flow Context
+
+```go
+func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    bfc, ok := v3.GetBranchingFlowContext(ctx)
+    if !ok {
+        return nil // not available (e.g., in unit tests)
+    }
+
+    // Full path: "myapp.user.list"
+    fmt.Println("Path:", bfc.PathString())
+
+    return nil
+}
+```
+
+The flow context is automatically created on `Execute` — no setup required.
+
+## Sharing Values Across Hierarchy
+
+```go
+// In a parent command:
+func parentHandler(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
+    bfc, _ := v3.GetBranchingFlowContext(ctx)
+    bfc.SetValue("requestID", generateRequestID())
+    return nil
+}
+
+// In a child command:
+func childHandler(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
+    bfc, _ := v3.GetBranchingFlowContext(ctx)
+    requestID, ok := bfc.GetValue("requestID")
+    if ok {
+        log.SetRequestID(requestID.(string))
+    }
+    return nil
+}
+```
+
+`GetValue` walks up the hierarchy — if a child sets a value, siblings won't see it, but the child's own descendants will.
+
+## Path Tracking
+
+```go
+bfc, _ := v3.GetBranchingFlowContext(ctx)
+
+// For "myapp database migrate"
+bfc.PathString()           // "myapp.database.migrate"
+bfc.Path()                 // []string{"myapp", "database", "migrate"}
+bfc.Depth()                // 3
+bfc.Parent()               // parent context (database)
+```
+
+Useful for logging, metrics, and conditional behavior based on where in the command tree you are.

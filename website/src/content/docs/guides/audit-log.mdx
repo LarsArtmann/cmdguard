@@ -1,0 +1,79 @@
+---
+title: Audit Log
+description: Trace DI service creation and export in 11 formats with samber-do-auditlog.
+---
+
+## Overview
+
+cmdguard integrates [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) to capture a full audit trail of dependency injection — which services were created, in what order, whether they succeeded, and how long they took.
+
+## Wiring the Audit Log
+
+```go
+import auditlog "github.com/larsartmann/samber-do-auditlog"
+
+plugin, _ := auditlog.New(auditlog.Config{
+    Enabled:    true,
+    ContainerID: "myapp",
+})
+
+cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
+    v3.WithAuditLog(plugin),
+)
+```
+
+`WithAuditLog` hooks into the DI injector via `buildInjectorOpts()`. Every `Provide` and `Invoke` is recorded.
+
+## Programmatic Access
+
+```go
+report := cli.AuditLogReport()       // *auditlog.Report snapshot
+plugin := cli.AuditLog()              // *auditlog.Plugin (nil if not configured)
+
+// Query individual services
+info := v3.AuditLogServiceByName(cli, "database")
+if info != nil {
+    fmt.Printf("Status: %s, Duration: %v\n", info.Status, info.Duration)
+}
+
+// Find all failed services
+failed := v3.AuditLogFailedServices(cli)
+for _, svc := range failed {
+    log.Printf("FAILED: %s — %v", svc.Name, svc.Error)
+}
+```
+
+## Exporting
+
+Export in 11 formats — HTML, JSON, NDJSON, CSV, TSV, Mermaid, DOT, D2, PlantUML, tree, HTML tree:
+
+```go
+format, _ := v3.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+if format == "" {
+    format = v3.AuditLogFormatHTML
+}
+
+err := v3.ExportAuditLog(cli, v3.AuditLogExportConfig{
+    Format: format,
+    Path:   "audit-report." + format.String(),
+})
+```
+
+`ParseAuditLogFormat` validates the input — invalid values return `ErrUnsupportedAuditLogFormat` instead of failing silently.
+
+## Consumer Pattern
+
+cmdguard does not provide a built-in `audit-log` subcommand. Consumers export via their own flag/env pattern:
+
+```go
+// After Execute, check if audit export is requested
+if os.Getenv("DO_AUDITLOG_ENABLED") != "" {
+    format, _ := v3.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+    _ = v3.ExportAuditLog(cli, v3.AuditLogExportConfig{
+        Format: format,
+        Path:   "audit." + format.String(),
+    })
+}
+```
+
+This keeps the core CLI clean while giving you full control over when and where audit logs are written.

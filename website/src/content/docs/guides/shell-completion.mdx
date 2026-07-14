@@ -1,0 +1,78 @@
+---
+title: Shell Completion
+description: Dynamic and static shell completion via WithCompletion.
+---
+
+## Overview
+
+cmdguard supports dynamic shell completion through Cobra's completion infrastructure. Users get tab-completion for commands, flags, and flag values.
+
+## Enabling Completion
+
+Cobra generates completion scripts automatically. cmdguard inherits this:
+
+```bash
+# Generate completion for your shell
+$ myapp completion bash > /etc/bash_completion.d/myapp
+$ myapp completion zsh > "${fpath[1]}/_myapp"
+$ myapp completion fish > ~/.config/fish/completions/myapp.fish
+```
+
+## Dynamic Flag Completion
+
+Provide completion suggestions for flag values at runtime:
+
+```go
+type TaskFlags struct {
+    ID string `flag:"id" help:"Task ID"`
+}
+
+cmd, _ := v3.NewCommand("done", &TaskFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags *TaskFlags) error {
+        return markDone(flags.ID)
+    },
+    v3.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+        // Query your task store for matching IDs
+        tasks := taskStore.Search(toComplete)
+        var ids []string
+        for _, t := range tasks {
+            ids = append(ids, fmt.Sprintf("%s\t%s", t.ID, t.Title))
+        }
+        return ids, cobra.ShellCompDirectiveNoFileComp
+    }),
+)
+```
+
+When the user types `myapp done --id <TAB>`, cmdguard calls your completion function with `toComplete` set to whatever the user has typed so far.
+
+## Static Argument Validation
+
+Restrict positional arguments to a fixed set:
+
+```go
+cmd, _ := v3.NewCommand("set", v3.NoFlags{},
+    setHandler,
+    v3.WithValidArgs("debug", "info", "warn", "error"),
+)
+// $ myapp set de<TAB> → debug
+```
+
+## Completion with Flag Values
+
+For flags that accept enums or known values:
+
+```go
+type LogFlags struct {
+    Level string `flag:"level" default:"info" help:"Log level"`
+}
+
+cmd, _ := v3.NewCommand("log", &LogFlags{},
+    logHandler,
+    v3.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+        if cmd.Flags().Lookup("level") != nil && cmd.Flags().Changed("level") {
+            return []string{"debug", "info", "warn", "error"}, cobra.ShellCompDirectiveNoFileComp
+        }
+        return nil, cobra.ShellCompDirectiveDefault
+    }),
+)
+```

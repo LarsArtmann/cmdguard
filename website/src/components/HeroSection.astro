@@ -28,6 +28,7 @@ const highlightedCode = `<span class="text-text-muted">package</span> <span clas
 <span class="text-text-muted">import</span> (
     <span class="text-amber">"context"</span>
     <span class="text-amber">"fmt"</span>
+    <span class="text-amber">"os"</span>
 
     <span class="text-amber">"github.com/samber/do/v2"</span>
     <span class="text-accent-hover">"${importPath}"</span>
@@ -45,20 +46,27 @@ const highlightedCode = `<span class="text-text-muted">package</span> <span clas
     cli, err := v3.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
         v3.<span class="text-accent">WithGracefulShutdown</span>(), <span class="text-code-comment">// SIGINT → reverse-order shutdown</span>
     )
-    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> { <span class="text-text-muted">panic</span>(err) } <span class="text-code-comment">// only in main()</span>
+    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> {
+        fmt.<span class="text-accent">Fprintf</span>(os.Stderr, <span class="text-amber">"failed to create CLI: %v\\n"</span>, err)
+        os.<span class="text-accent">Exit</span>(1)
+    }
 
     <span class="text-code-comment">// Register a service (lazy, lifecycle-managed)</span>
     v3.<span class="text-accent">Provide</span>(cli.Scope(), <span class="text-text-muted">func</span>(i do.Injector) (*Database, <span class="text-text-muted">error</span>) {
         <span class="text-text-muted">return</span> &Database{DSN: <span class="text-amber">"postgres://..."</span>}, <span class="text-text-muted">nil</span>
     })
 
-    cmd, _ := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v3.NoFlags{},
+    cmd, err := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v3.NoFlags{},
         <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) <span class="text-text-muted">error</span> {
             db, _ := v3.<span class="text-accent">Invoke</span>[*Database](cli.Scope())
             <span class="text-text-muted">return</span> db.Query(ctx)
         },
         v3.<span class="text-accent">WithShort</span>(<span class="text-amber">"Query the database"</span>),
     )
+    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> {
+        fmt.<span class="text-accent">Fprintf</span>(os.Stderr, <span class="text-amber">"failed to create command: %v\\n"</span>, err)
+        os.<span class="text-accent">Exit</span>(1)
+    }
     v3.<span class="text-accent">AddCommand</span>(cli, cmd)
 
     cli.<span class="text-accent">ExecuteAndExit</span>(context.Background()) <span class="text-code-comment">// zero panics, correct exit code</span>

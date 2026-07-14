@@ -5,6 +5,7 @@ export const heroCode = `package main
 import (
     "context"
     "fmt"
+    "os"
 
     "github.com/samber/do/v2"
     "${importPath}"
@@ -23,20 +24,27 @@ func main() {
     cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{},
         v3.WithGracefulShutdown(), // SIGINT → reverse-order shutdown
     )
-    if err != nil { panic(err) } // only in main(), never in library
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "failed to create CLI: %v\\n", err)
+        os.Exit(1)
+    }
 
     // Register a service (lazy, lifecycle-managed)
     v3.Provide(cli.Scope(), func(i do.Injector) (*Database, error) {
         return &Database{DSN: "postgres://..."}, nil
     })
 
-    cmd, _ := v3.NewCommand("query", v3.NoFlags{},
+    cmd, err := v3.NewCommand("query", v3.NoFlags{},
         func(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
             db, _ := v3.Invoke[*Database](cli.Scope())
             return db.Query(ctx)
         },
         v3.WithShort("Query the database"),
     )
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "failed to create command: %v\\n", err)
+        os.Exit(1)
+    }
     v3.AddCommand(cli, cmd)
 
     cli.ExecuteAndExit(context.Background()) // zero panics, correct exit code

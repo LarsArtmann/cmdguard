@@ -1,0 +1,100 @@
+---
+title: Lifecycle & Signal Handling
+description: Graceful shutdown, signal handling, WithCleanup hooks, and the Doctor command.
+---
+
+## Signal Handling
+
+`WithSignalHandling()` cancels the context on SIGINT/SIGTERM. Handlers can check `ctx.Done()`:
+
+```go
+cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
+    v3.WithSignalHandling(),
+)
+
+// In a handler:
+func(ctx context.Context, cfg *Config, _ v3.NoFlags) error {
+    select {
+    case <-ctx.Done():
+        return ctx.Err() // SIGINT received
+    case result := <-work:
+        return process(result)
+    }
+}
+```
+
+## Graceful Shutdown
+
+`WithGracefulShutdown()` implies `WithSignalHandling` and additionally triggers DI service shutdown. Services implementing `do.ShutdownerWithError` are shut down in **reverse invocation order**:
+
+```go
+type Database struct{ DSN string }
+
+func (db *Database) Shutdown() error {
+    return db.Close() // called in reverse order on SIGINT/SIGTERM
+}
+
+cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
+    v3.WithGracefulShutdown(),
+)
+```
+
+This is the key differentiator: no other Go CLI framework manages service lifecycle for you.
+
+## WithCleanup — Fires Even on Error
+
+Cobra's `PostRunE` does NOT fire when `RunE` errors. This means resources leak on failure. cmdguard's `WithCleanup` solves this:
+
+```go
+cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
+    v3.WithCleanup[Config](func(cmd *cobra.Command, cfg *Config, runErr error) error {
+        // This fires after EVERY command's RunE — success or failure
+        // The original runErr is never swallowed
+        log.Close() // flush logs
+        return nil  // cleanup errors are joined, not swallowed
+    }),
+)
+```
+
+`WithCleanup` hooks:
+
+- Fire after every command's `RunE` (including errors)
+- Cover both cmdguard-managed and raw cobra subcommands
+- Are idempotent (safe to call `Execute` twice)
+- Never swallow the original error (cleanup errors joined via `errors.Join`)
+
+## Doctor Command
+
+The `DoctorCommand` runs health checks on all DI services:
+
+```go
+doctorCmd, _ := v3.DoctorCommand[Config](cli)
+v3.AddCommand(cli, doctorCmd)
+
+// $ myapp doctor
+// ✓ database — ok
+// ✓ cache — ok
+// ✗ queue — connection refused
+```
+
+Services implementing `do.HealthcheckerWithContext` are checked automatically. Add custom checks with `WithDoctorCheck`:
+
+```go
+doctorCmd, _ := v3.DoctorCommand[Config](cli,
+    v3.WithDoctorCheck("external-api", func(ctx context.Context) error {
+        return pingExternalAPI(ctx)
+    }),
+)
+```
+
+## Version Command
+
+```go
+cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
+    v3.WithCLIVersion("1.0.0"),
+)
+versionCmd, _ := v3.VersionCommand[Config](cli)
+v3.AddCommand(cli, versionCmd)
+// $ myapp version
+// 1.0.0
+```
