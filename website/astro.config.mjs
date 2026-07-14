@@ -110,7 +110,7 @@ export default defineConfig({
           attrs: {
             name: "description",
             content:
-              "Build production Go CLIs with type-safe flags, dependency injection, and zero panics. Wraps Cobra with struct-tag-driven configuration.",
+              "The only Go CLI framework that unifies type-safe flags, dependency injection with lifecycle management, and zero-panic error contracts. Wraps Cobra.",
           },
         },
       ],

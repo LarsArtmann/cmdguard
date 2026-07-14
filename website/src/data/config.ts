@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "cmdguard",
-  title: "cmdguard — Type-safe CLI Framework for Go",
+  title: "cmdguard — From Flags to Shutdown, Type-Safe",
   description:
-    "Build production Go CLIs with type-safe flags, dependency injection, and zero panics. Wraps Cobra with struct-tag-driven configuration.",
+    "The only Go CLI framework that unifies type-safe flags, dependency injection with lifecycle management, and zero-panic error contracts. Wraps Cobra.",
   ogDescription:
-    "Type-safe CLI framework for Go. Struct-tag flags, dependency injection, constructor validation, and zero panics. Wraps Cobra.",
+    "Type-safe flags + dependency injection + zero panics. The only Go CLI framework that unifies all three. Wraps Cobra.",
   siteUrl: "https://cmdguard.lars.software",
   github: "https://github.com/LarsArtmann/cmdguard",
   author: {

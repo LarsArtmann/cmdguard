@@ -28,36 +28,40 @@ const highlightedCode = `<span class="text-text-muted">package</span> <span clas
 <span class="text-text-muted">import</span> (
     <span class="text-amber">"context"</span>
     <span class="text-amber">"fmt"</span>
-    <span class="text-amber">"strings"</span>
 
+    <span class="text-amber">"github.com/samber/do/v2"</span>
     <span class="text-accent-hover">"${importPath}"</span>
 )
 
 <span class="text-text-muted">type</span> <span class="text-accent">AppConfig</span> <span class="text-text-muted">struct</span> {
-    Verbose <span class="text-text-muted">bool</span>   <span class="text-amber">\`flag:"verbose" short:"v" default:"false" help:"Verbose"\`</span>
-    Output  <span class="text-text-muted">string</span> <span class="text-amber">\`flag:"output" short:"o" default:"text" help:"Output format"\`</span>
+    Verbose <span class="text-text-muted">bool</span>   <span class="text-amber">\`flag:"verbose" short:"v" default:"false"\`</span>
+    Output  <span class="text-text-muted">string</span> <span class="text-amber">\`flag:"output" short:"o" default:"text"\`</span>
 }
 
-<span class="text-text-muted">type</span> <span class="text-accent">GreetFlags</span> <span class="text-text-muted">struct</span> {
-    Name  <span class="text-text-muted">string</span> <span class="text-amber">\`flag:"name" short:"n" default:"World" help:"Name to greet"\`</span>
-    Shout <span class="text-text-muted">bool</span>   <span class="text-amber">\`flag:"shout" short:"s" default:"false" help:"Uppercase"\`</span>
-}
+<span class="text-text-muted">type</span> <span class="text-accent">Database</span> <span class="text-text-muted">struct</span>{ DSN <span class="text-text-muted">string</span> }
+<span class="text-text-muted">func</span> (db *Database) <span class="text-accent">Shutdown</span>() <span class="text-text-muted">error</span> { <span class="text-text-muted">return</span> db.Close() }
 
 <span class="text-text-muted">func</span> <span class="text-accent">main</span>() {
-    cli, err := v3.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI app"</span>, AppConfig{})
-    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> { <span class="text-text-muted">panic</span>(err) }
+    cli, err := v3.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
+        v3.<span class="text-accent">WithGracefulShutdown</span>(), <span class="text-code-comment">// SIGINT → reverse-order shutdown</span>
+    )
+    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> { <span class="text-text-muted">panic</span>(err) } <span class="text-code-comment">// only in main()</span>
 
-    cmd, _ := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"greet"</span>, &GreetFlags{},
-        <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, f *GreetFlags) <span class="text-text-muted">error</span> {
-            msg := fmt.<span class="text-accent">Sprintf</span>(<span class="text-amber">"Hello, %s!"</span>, f.Name)
-            <span class="text-text-muted">if</span> f.Shout { msg = strings.<span class="text-accent">ToUpper</span>(msg) }
-            fmt.<span class="text-accent">Println</span>(msg)
-            <span class="text-text-muted">return</span> <span class="text-text-muted">nil</span>
+    <span class="text-code-comment">// Register a service (lazy, lifecycle-managed)</span>
+    v3.<span class="text-accent">Provide</span>(cli.Scope(), <span class="text-text-muted">func</span>(i do.Injector) (*Database, <span class="text-text-muted">error</span>) {
+        <span class="text-text-muted">return</span> &Database{DSN: <span class="text-amber">"postgres://..."</span>}, <span class="text-text-muted">nil</span>
+    })
+
+    cmd, _ := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v3.NoFlags{},
+        <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) <span class="text-text-muted">error</span> {
+            db, _ := v3.<span class="text-accent">Invoke</span>[*Database](cli.Scope())
+            <span class="text-text-muted">return</span> db.Query(ctx)
         },
-        v3.<span class="text-accent">WithShort</span>(<span class="text-amber">"Greet someone"</span>),
+        v3.<span class="text-accent">WithShort</span>(<span class="text-amber">"Query the database"</span>),
     )
     v3.<span class="text-accent">AddCommand</span>(cli, cmd)
-    cli.<span class="text-accent">ExecuteAndExit</span>(context.Background())
+
+    cli.<span class="text-accent">ExecuteAndExit</span>(context.Background()) <span class="text-code-comment">// zero panics, correct exit code</span>
 }`;
 ---
 
@@ -68,15 +72,15 @@ const highlightedCode = `<span class="text-text-muted">package</span> <span clas
       <Icon name="star" size={14} />
       {starsText}
     </a>
-    <h1 class="text-[clamp(3rem,8vw,4.5rem)] font-bold tracking-tighter leading-tight mb-6">
-      <span>Type-safe </span><span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">CLI framework</span><span> for Go.</span>
+    <h1 class="text-[clamp(2.5rem,7vw,4.5rem)] font-bold tracking-tighter leading-tight mb-6">
+      <span>From flags to </span><span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">shutdown</span><span>, type-safe.</span>
     </h1>
 
     <p class="text-[clamp(1.125rem,2.5vw,1.25rem)] text-text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
-      Build production Go CLIs with <em class="not-italic text-text-primary">struct-tag flags</em>,
-      <em class="not-italic text-text-primary"> dependency injection</em>, and
-      <em class="not-italic text-text-primary"> zero panics</em>.
-      Wraps Cobra so you don't have to learn its traps the hard way.
+      The only Go CLI framework that unifies <em class="not-italic text-text-primary">type-safe flags</em>,
+      <em class="not-italic text-text-primary"> dependency injection</em> with lifecycle management, and
+      <em class="not-italic text-text-primary"> zero-panic error contracts</em>.
+      Wraps Cobra — keep full compatibility, lose the footguns.
     </p>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">

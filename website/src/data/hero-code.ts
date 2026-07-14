@@ -5,37 +5,39 @@ export const heroCode = `package main
 import (
     "context"
     "fmt"
-    "strings"
 
+    "github.com/samber/do/v2"
     "${importPath}"
 )
 
 type AppConfig struct {
-    Verbose bool   \`flag:"verbose" short:"v" default:"false" help:"Enable verbose output"\`
-    Output  string \`flag:"output" short:"o" default:"text" help:"Output format"\`
+    Verbose bool   \`flag:"verbose" short:"v" default:"false"\`
+    Output  string \`flag:"output" short:"o" default:"text"\`
 }
 
-type GreetFlags struct {
-    Name  string \`flag:"name" short:"n" default:"World" help:"Name to greet"\`
-    Shout bool   \`flag:"shout" short:"s" default:"false" help:"Uppercase output"\`
-}
+type Database struct{ DSN string }
+
+func (db *Database) Shutdown() error { return db.Close() }
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI app", AppConfig{})
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Failed: %v\\n", err)
-        os.Exit(1)
-    }
-
-    greetCmd, _ := v3.NewCommand("greet", &GreetFlags{},
-        func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-            msg := fmt.Sprintf("Hello, %s!", flags.Name)
-            if flags.Shout { msg = strings.ToUpper(msg) }
-            fmt.Println(msg)
-            return nil
-        },
-        v3.WithShort("Greet someone"),
+    cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{},
+        v3.WithGracefulShutdown(), // SIGINT → reverse-order shutdown
     )
-    v3.AddCommand(cli, greetCmd)
-    cli.ExecuteAndExit(context.Background())
+    if err != nil { panic(err) } // only in main(), never in library
+
+    // Register a service (lazy, lifecycle-managed)
+    v3.Provide(cli.Scope(), func(i do.Injector) (*Database, error) {
+        return &Database{DSN: "postgres://..."}, nil
+    })
+
+    cmd, _ := v3.NewCommand("query", v3.NoFlags{},
+        func(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
+            db, _ := v3.Invoke[*Database](cli.Scope())
+            return db.Query(ctx)
+        },
+        v3.WithShort("Query the database"),
+    )
+    v3.AddCommand(cli, cmd)
+
+    cli.ExecuteAndExit(context.Background()) // zero panics, correct exit code
 }`;

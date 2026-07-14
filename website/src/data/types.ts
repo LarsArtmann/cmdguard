@@ -16,13 +16,15 @@ export interface Feature {
   desc: string;
 }
 
-export type ComparisonColumn = "cobra" | "cmdguard";
+export type FrameworkColumn = "cobra" | "kong" | "urfave" | "cmdguard";
 
 export interface ComparisonRow {
   label: string;
   cobra: string;
+  kong: string;
+  urfave: string;
   cmdguard: string;
-  cobraBad: boolean;
+  cmdguardBest: boolean;
 }
 
 export const useCaseIconKeys = ["cog", "chart", "refresh", "bolt", "check"] as const;

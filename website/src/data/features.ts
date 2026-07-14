@@ -2,24 +2,24 @@ import type { Feature } from "./types";
 
 export const features: Feature[] = [
   {
+    icon: "syringe",
+    title: "Dependency Injection",
+    desc: "Lazy services, lifecycle hooks, health checks, and graceful shutdown in reverse order. Powered by samber/do/v2.",
+  },
+  {
     icon: "shield",
     title: "Zero Panics",
-    desc: "Every function returns errors. No Must* panic variants exist in the library.",
+    desc: "Every function returns errors. No Run, no Must*. Only error-returning handlers exist — by construction.",
+  },
+  {
+    icon: "terminal",
+    title: "Validated at Construction",
+    desc: "Missing handlers, duplicate commands, invalid flags — caught at AddCommand time, not at runtime.",
   },
   {
     icon: "type",
     title: "Type-Safe Flags",
-    desc: "Struct tags define flags — no stringly-typed GetString lookups that fail at runtime.",
-  },
-  {
-    icon: "syringe",
-    title: "Dependency Injection",
-    desc: "Built-in samber/do/v2 integration with lifecycle hooks, health checks, and graceful shutdown.",
-  },
-  {
-    icon: "terminal",
-    title: "Constructor Validation",
-    desc: "Missing handlers, duplicate commands, invalid flags caught at AddCommand time, not runtime.",
+    desc: "Struct tags define flags with env vars, defaults, required, counting, and scoping. No string lookups.",
   },
   {
     icon: "file",

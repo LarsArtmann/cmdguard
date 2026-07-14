@@ -1,6 +1,7 @@
 # cmdguard
 
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
+[![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v3.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
 [![Coverage](https://img.shields.io/badge/coverage-87.6%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
@@ -10,9 +11,9 @@
 
 ---
 
-**Build production Go CLIs with type-safe flags, dependency injection, and zero panics.**
+**From flag definition to service shutdown — type-safe, validated, zero panics.**
 
-cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type safety, struct-tag-driven flags, and built-in dependency injection via [samber/do/v2](https://github.com/samber/do). Your flags are typed structs — no more stringly-typed `Flags().GetString("name")` calls that fail at runtime.
+cmdguard is the only Go CLI framework that unifies **type-safe flags**, **dependency injection with lifecycle management**, and a **zero-panic error contract** into a single system validated at construction. It wraps [Cobra](https://github.com/spf13/cobra) so you keep full compatibility while eliminating its footguns.
 
 > **API Stability:** v3.0.0 is the current major version. The legacy v2 line is in maintenance at v2.10.4. See [CHANGELOG.md](CHANGELOG.md) and the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md).
 
@@ -20,21 +21,48 @@ cmdguard wraps [Cobra](https://github.com/spf13/cobra) with compile-time type sa
 
 ## Why cmdguard?
 
-Raw Cobra is powerful but full of footguns that bite every new project. cmdguard
-makes the **correct behaviour the default** so consumers use Cobra properly
-without having to learn its traps the hard way.
+Other Go CLI frameworks give you flags. cmdguard gives you flags **plus** everything production CLIs need: dependency injection, service lifecycle, health checks, graceful shutdown, styled output, and error handling that won't bite you.
 
-**What cmdguard fixes by default (the parts raw Cobra gets wrong):**
+### The trinity — what no other CLI framework offers together
 
-| Raw Cobra footgun                                                               | cmdguard default                                                                           |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Prints the full usage block after _every_ command error (`SilenceUsage: false`) | Usage-on-error is silenced; `--help` still works                                           |
-| Errors print twice (Cobra prints _and_ `main()` prints the returned error)      | cmdguard prints the error exactly once — see [Error handling](#error-handling--exit-codes) |
-| Failed commands exit `0` (easy to forget `os.Exit` with the right code)         | `ExecuteAndExit` / `ExitCode(err)` map errors to correct exit codes                        |
-| `Run` (panics) vs `RunE` (returns error) confusion                              | Only error-returning handlers exist — zero panics, by construction                         |
-| Missing handler / duplicate command / invalid name found at runtime             | Caught at `NewCommand` / `AddCommand` time                                                 |
+| Capability                                        | Cobra | Kong | urfave/cli | **cmdguard** |
+| ------------------------------------------------- | ----- | ---- | ---------- | ------------ |
+| Struct-tag flags (no string lookups)              | —     | Yes  | —          | **Yes**      |
+| Dependency injection (lazy services, lifecycle)   | —     | —    | —          | **Yes**      |
+| Graceful shutdown (reverse-order on SIGINT)       | —     | —    | —          | **Yes**      |
+| Health checks (`DoctorCommand`, `Healthchecker`)  | —     | —    | —          | **Yes**      |
+| Zero panics by construction (no `Run`, no `Must`) | —     | —    | —          | **Yes**      |
+| Validated at construction (not at runtime)        | —     | Some | —          | **Yes**      |
+| Error printed exactly once + correct exit codes   | —     | —    | —          | **Yes**      |
+| Styled output by default (fang + lipgloss)        | —     | —    | —          | **Yes**      |
+| Gradual migration (raw cobra + typed runtime)     | —     | —    | —          | **Yes**      |
 
-**Plus: flags are typed structs, validated at construction — no stringly-typed lookups:**
+### Dependency injection — the real differentiator
+
+Register services, invoke them in handlers, and manage their entire lifecycle:
+
+```go
+cli, _ := v3.NewCLI[AppConfig]("myapp", "My production CLI", AppConfig{},
+    v3.WithGracefulShutdown(), // SIGINT → reverse-order shutdown of all services
+)
+
+// Register a database service (lazy — created on first invoke)
+v3.Provide(cli.Scope(), func(i do.Injector) (*Database, error) {
+    return &Database{DSN: "postgres://..."}, nil
+})
+
+// Use it in any command handler
+v3.NewCommand("query", v3.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
+        db, _ := v3.Invoke[*Database](cli.Scope())
+        return db.Query(ctx)
+    },
+)
+```
+
+Services can implement `HealthCheck` (wired into `DoctorCommand`) and `Shutdown` (called on SIGINT/SIGTERM in reverse invocation order).
+
+### Type-safe flags — validated at construction
 
 **Raw Cobra — flags are strings, validated at runtime:**
 
@@ -43,7 +71,7 @@ var name string
 var count int
 rootCmd.Flags().StringVarP(&name, "name", "n", "World", "Name to greet")
 rootCmd.Flags().IntVarP(&count, "count", "c", 1, "Number of greetings")
-// Oops — forgot to add "count"? You find out at runtime.
+// Forgot to add "count"? Missing handler? Duplicate command? Runtime surprise.
 ```
 
 **cmdguard — flags are typed structs, validated at construction:**
@@ -55,6 +83,24 @@ type GreetFlags struct {
 }
 // Missing handler? Duplicate command? Invalid name? Caught at AddCommand time.
 ```
+
+### Zero panics — by construction
+
+Every function returns errors. No `Run` (panics), no `Must*` variants. The error is printed exactly once (styled by [fang](https://github.com/charmbracelet/fang)), usage is silenced on error by default, and exit codes are handled automatically:
+
+```go
+cli.ExecuteAndExit(context.Background()) // one line, correct exit code
+```
+
+### Cobra footguns — fixed by default
+
+| Raw Cobra footgun                                                               | cmdguard default                                                                           |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Prints the full usage block after _every_ command error (`SilenceUsage: false`) | Usage-on-error is silenced; `--help` still works                                           |
+| Errors print twice (Cobra prints _and_ `main()` prints the returned error)      | cmdguard prints the error exactly once — see [Error handling](#error-handling--exit-codes) |
+| Failed commands exit `0` (easy to forget `os.Exit` with the right code)         | `ExecuteAndExit` / `ExitCode(err)` map errors to correct exit codes                        |
+| `Run` (panics) vs `RunE` (returns error) confusion                              | Only error-returning handlers exist — zero panics, by construction                         |
+| Missing handler / duplicate command / invalid name found at runtime             | Caught at `NewCommand` / `AddCommand` time                                                 |
 
 ---
 

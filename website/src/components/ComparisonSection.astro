@@ -4,23 +4,27 @@ import SectionHeader from './SectionHeader.astro';
 ---
 
 <div>
-  <SectionHeader title="Cobra, without the footguns." subtitle="Raw Cobra is powerful but full of traps. cmdguard makes the correct behaviour the default." />
+  <SectionHeader title="No other CLI framework gives you all three." subtitle="Type-safe flags exist elsewhere. DI lifecycle and zero-panic contracts do not." />
 
   <div class="overflow-x-auto rounded-xl border border-border">
     <table class="w-full text-sm">
       <thead>
         <tr class="border-b border-border bg-bg-card">
-          <th class="text-left py-4 px-6 font-semibold text-text-muted">Issue</th>
-          <th class="text-left py-4 px-6 font-semibold text-text-muted">Raw Cobra</th>
-          <th class="text-left py-4 px-6 font-semibold text-accent">cmdguard</th>
+          <th class="text-left py-4 px-4 font-semibold text-text-muted">Capability</th>
+          <th class="text-center py-4 px-3 font-semibold text-text-muted">Cobra</th>
+          <th class="text-center py-4 px-3 font-semibold text-text-muted">Kong</th>
+          <th class="text-center py-4 px-3 font-semibold text-text-muted">urfave/cli</th>
+          <th class="text-center py-4 px-4 font-semibold text-accent">cmdguard</th>
         </tr>
       </thead>
       <tbody>
         {comparisons.map((row) => (
           <tr class="border-b border-border last:border-b-0">
-            <td class="py-4 px-6 font-medium text-text-primary whitespace-nowrap">{row.label}</td>
-            <td class="py-4 px-6 text-red-400 dark:text-red-400">{row.cobra}</td>
-            <td class="py-4 px-6 text-success">{row.cmdguard}</td>
+            <td class="py-3 px-4 font-medium text-text-primary whitespace-nowrap">{row.label}</td>
+            <td class="py-3 px-3 text-center text-text-muted">{row.cobra}</td>
+            <td class="py-3 px-3 text-center text-text-muted">{row.kong}</td>
+            <td class="py-3 px-3 text-center text-text-muted">{row.urfave}</td>
+            <td class="py-3 px-4 text-center text-success font-medium">{row.cmdguard}</td>
           </tr>
         ))}
       </tbody>
