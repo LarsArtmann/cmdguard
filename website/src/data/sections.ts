@@ -7,7 +7,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "Yes",
     urfave: "String lookups",
     cmdguard: "Yes, validated at construction",
-    cmdguardBest: true,
   },
   {
     label: "Dependency injection",
@@ -15,7 +14,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "None",
     urfave: "None",
     cmdguard: "Lazy services, lifecycle, health checks",
-    cmdguardBest: true,
   },
   {
     label: "Graceful shutdown",
@@ -23,7 +21,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "DIY",
     urfave: "DIY",
     cmdguard: "Reverse-order on SIGINT/SIGTERM",
-    cmdguardBest: true,
   },
   {
     label: "Zero panics",
@@ -31,7 +28,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "Some panic variants",
     urfave: "Some panic variants",
     cmdguard: "Only error returns, by construction",
-    cmdguardBest: true,
   },
   {
     label: "Error printing",
@@ -39,7 +35,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "Manual",
     urfave: "Manual",
     cmdguard: "Exactly once, correct exit code",
-    cmdguardBest: true,
   },
   {
     label: "Usage on error",
@@ -47,7 +42,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "Configurable",
     urfave: "Configurable",
     cmdguard: "Silenced by default",
-    cmdguardBest: true,
   },
   {
     label: "Styled output",
@@ -55,7 +49,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "Plain",
     urfave: "Plain",
     cmdguard: "fang + lipgloss by default",
-    cmdguardBest: true,
   },
   {
     label: "Cobra compatibility",
@@ -63,7 +56,6 @@ export const comparisons: ComparisonRow[] = [
     kong: "No",
     urfave: "No",
     cmdguard: "Escape hatch + gradual migration",
-    cmdguardBest: true,
   },
 ];
 
