@@ -1,0 +1,124 @@
+---
+title: Type-Safe Flags
+description: Define CLI flags with struct tags — no string lookups, no runtime failures.
+---
+
+## Struct-Tag-Driven Flags
+
+cmdguard replaces Cobra's `Flags().GetString("name")` pattern with typed structs. Define your flags as struct fields with tags, and cmdguard handles registration, parsing, and validation automatically.
+
+```go
+type GreetFlags struct {
+    Name    string `flag:"name"    short:"n" default:"World"  help:"Name to greet"`
+    Verbose int    `flag:"verbose" short:"v" help:"Verbosity" count:"true"`
+    Host    string `flag:"host"             default:"localhost" env:"DB_HOST" help:"Database host"`
+    Mode    string `flag:"mode"  required:"true"                help:"Required!"`
+    Build   string `flag:"build" local:"true"  default:"full"   help:"Root-only flag"`
+    Debug   string `flag:"debug" hidden:"true"                  help:"Hidden from --help"`
+}
+```
+
+## Tag Reference
+
+| Tag        | Purpose                                 | Example                |
+| ---------- | --------------------------------------- | ---------------------- |
+| `flag`     | Flag name (required)                    | `flag:"name"`          |
+| `short`    | Short flag                              | `short:"n"`            |
+| `default`  | Default value                           | `default:"World"`      |
+| `help`     | Help text                               | `help:"Name to greet"` |
+| `env`      | Environment variable                    | `env:"DB_HOST"`        |
+| `required` | Mark as required                        | `required:"true"`      |
+| `count`    | Counting flag (`-v`/`-vv`/`-vvv`)       | `count:"true"`         |
+| `local`    | Root-only, not inherited by subcommands | `local:"true"`         |
+| `hidden`   | Exclude from --help but stay functional | `hidden:"true"`        |
+
+## Per-Command Flag Types
+
+Each `Command[T, F]` has its own `F` type. Mix different flag structs freely across commands:
+
+```go
+type GreetFlags struct {
+    Name string `flag:"name" default:"World"`
+}
+
+type DeployFlags struct {
+    Env     string `flag:"env"     default:"staging" env:"DEPLOY_ENV"`
+    Timeout int    `flag:"timeout" default:"300"     help:"Timeout in seconds"`
+}
+
+greetCmd, _ := v3.NewCommand("greet", &GreetFlags{}, greetHandler)
+deployCmd, _ := v3.NewCommand("deploy", &DeployFlags{}, deployHandler)
+```
+
+## Environment Variables
+
+The `env` tag reads from the environment. Use `WithEnvPrefix` to add a prefix:
+
+```go
+type DBFlags struct {
+    Host     string `flag:"host"     env:"DB_HOST"     default:"localhost"`
+    Port     int    `flag:"port"     env:"DB_PORT"     default:"5432"`
+    Password string `flag:"password" env:"DB_PASSWORD"`
+}
+
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithEnvPrefix("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT
+)
+```
+
+**Precedence chain:** explicit flag > env var > config file > default value.
+
+## Counting Flags
+
+The `count:"true"` tag enables `-v`/`-vv`/`-vvv` verbosity patterns:
+
+```go
+type Flags struct {
+    Verbose int `flag:"verbose" short:"v" help:"Verbosity level" count:"true"`
+}
+// $ myapp -vvv  → flags.Verbose == 3
+```
+
+Must use `int` type with `count:"true"`.
+
+## Built-in Value Types
+
+cmdguard includes validated types out of the box:
+
+| Type       | Validation                       |
+| ---------- | -------------------------------- |
+| `Duration` | Wraps `time.Duration`            |
+| `Enum[T]`  | Validated against allowed values |
+| `LogLevel` | debug / info / warn / error      |
+| `URL`      | Validated URL string             |
+| `Email`    | RFC 5322 email validation        |
+| `Port`     | 1-65535 range                    |
+| `FilePath` | Path cleaning and existence      |
+| `HostPort` | `host:port` validation           |
+
+## Custom Type Handlers
+
+Register your own types with `RegisterTypeHandler`:
+
+```go
+v3.RegisterTypeHandler(reflect.TypeFor[MyType](), v3.TypeHandlerFunc{
+    ParseFunc:    func(value string, _ v3.FlagTag) (any, error) { return MyType{Value: value}, nil },
+    DefaultFunc:  func(_ v3.FlagTag) any { return MyType{} },
+})
+```
+
+## Nested Config Structs
+
+`ParseFlagTags` recurses into nested structs, so you can organize flags hierarchically:
+
+```go
+type AppConfig struct {
+    Verbose bool `flag:"verbose" short:"v"`
+    DB      DatabaseConfig
+}
+
+type DatabaseConfig struct {
+    Host string `flag:"db-host" env:"DB_HOST"`
+    Port int    `flag:"db-port" env:"DB_PORT"`
+}
+```

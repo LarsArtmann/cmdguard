@@ -1,0 +1,15 @@
+---
+export interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+}
+
+const { width = 28, height = 28, class: className } = Astro.props;
+---
+
+<svg class={className} width={width} height={height} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="cmdguard logo">
+  <rect width="28" height="28" rx="6" class="fill-[var(--color-accent)]" />
+  <path d="M14 5L7 7.5V14C7 18.7 9.9 22.7 14 23.8C18.1 22.7 21 18.7 21 14V7.5L14 5Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linejoin="round" />
+  <text x="14" y="18" text-anchor="middle" fill="white" font-family="monospace" font-size="8" font-weight="700">CG</text>
+</svg>

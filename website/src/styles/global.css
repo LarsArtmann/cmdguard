@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dark mode (default) */
+  --color-bg-primary: #0c0a09;
+  --color-bg-card: rgba(28, 25, 23, 0.5);
+  --color-bg-card-solid: #1c1917;
+  --color-bg-code: rgba(28, 25, 23, 0.8);
+
+  --color-border: rgba(41, 37, 36, 0.6);
+  --color-border-hover: rgba(41, 37, 36, 1);
+
+  --color-text-primary: #e7e5e4;
+  --color-text-secondary: #a8a29e;
+  --color-text-muted: #9ca3af;
+
+  --color-accent: #818cf8;
+  --color-accent-hover: #a5b4fc;
+  --color-accent-dim: rgba(129, 140, 248, 0.1);
+  --color-accent-light: #c7d2fe;
+
+  --color-amber: #fbbf24;
+
+  --color-code-inline-bg: #1c1917;
+  --color-code-dot: #44403c;
+  --color-code-comment: #8590a0;
+  --color-success: #4ade80;
+
+  --font-sans: var(--font-space-grotesk), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  --animate-fade-in: fade-in 0.6s ease both;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+:root.light {
+  color-scheme: light;
+  --color-bg-primary: #fafaf9;
+  --color-bg-card: rgba(245, 245, 244, 0.7);
+  --color-bg-card-solid: #f5f5f4;
+  --color-bg-code: rgba(245, 245, 244, 0.9);
+
+  --color-border: rgba(228, 228, 231, 0.8);
+  --color-border-hover: rgba(228, 228, 231, 1);
+
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #6b7280;
+
+  --color-accent: #4f46e5;
+  --color-accent-hover: #6366f1;
+  --color-accent-dim: rgba(79, 70, 229, 0.1);
+  --color-accent-light: #818cf8;
+
+  --color-code-inline-bg: #e7e5e4;
+  --color-code-dot: #a8a29e;
+  --color-code-comment: #57534e;
+  --color-success: #22c55e;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-animate]:not(.animate-fade-in) {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-animate]:not(.animate-fade-in) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}

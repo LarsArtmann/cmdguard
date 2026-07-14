@@ -1,0 +1,29 @@
+---
+import { comparisons } from '../data/sections';
+import SectionHeader from './SectionHeader.astro';
+---
+
+<div>
+  <SectionHeader title="Cobra, without the footguns." subtitle="Raw Cobra is powerful but full of traps. cmdguard makes the correct behaviour the default." />
+
+  <div class="overflow-x-auto rounded-xl border border-border">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-border bg-bg-card">
+          <th class="text-left py-4 px-6 font-semibold text-text-muted">Issue</th>
+          <th class="text-left py-4 px-6 font-semibold text-text-muted">Raw Cobra</th>
+          <th class="text-left py-4 px-6 font-semibold text-accent">cmdguard</th>
+        </tr>
+      </thead>
+      <tbody>
+        {comparisons.map((row) => (
+          <tr class="border-b border-border last:border-b-0">
+            <td class="py-4 px-6 font-medium text-text-primary whitespace-nowrap">{row.label}</td>
+            <td class="py-4 px-6 text-red-400 dark:text-red-400">{row.cobra}</td>
+            <td class="py-4 px-6 text-success">{row.cmdguard}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

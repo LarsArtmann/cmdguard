@@ -1,0 +1,40 @@
+---
+title: Related Tools
+description: Tools that complement cmdguard in your Go toolchain.
+---
+
+## Cobra
+
+[Cobra](https://github.com/spf13/cobra) is the underlying CLI framework that cmdguard wraps. cmdguard adds type safety, DI, and eliminates footguns while keeping full Cobra compatibility.
+
+## samber/do
+
+[samber/do](https://github.com/samber/do) provides the dependency injection runtime. cmdguard integrates it with lifecycle management, health checks, and graceful shutdown.
+
+## go-output
+
+[go-output](https://github.com/larsartmann/go-output) provides the 16 output formats (table, JSON, CSV, YAML, D2, Mermaid, etc.) that cmdguard exposes via `OutputTable` and `OutputResult`.
+
+## fang
+
+[fang](https://github.com/charmbracelet/fang) provides styled help and error output. cmdguard enables it by default for beautiful terminal rendering.
+
+## huh
+
+[huh](https://github.com/charmbracelet/huh) provides interactive prompts. The `prompts` sub-module wires it into cmdguard's `PromptRunner` interface for `WithPromptOnMissing` functionality.
+
+## samber-do-auditlog
+
+[samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) traces service creation in the DI container. cmdguard integrates it via `WithAuditLog` with 11 export formats.
+
+## Glamour
+
+[Glamour](https://github.com/charmbracelet/glamour) renders markdown in the terminal. The `glamour` sub-module provides `WithHelp[T]()` to render command help text as styled markdown.
+
+## Other cmdguard Ecosystem Libraries
+
+| Library                                                           | Purpose                             |
+| ----------------------------------------------------------------- | ----------------------------------- |
+| [go-atomic-write](https://github.com/LarsArtmann/go-atomic-write) | Crash-safe, race-free file writes   |
+| [gogenfilter](https://github.com/LarsArtmann/gogenfilter)         | Detect and filter generated Go code |
+| [go-output](https://github.com/LarsArtmann/go-output)             | Rich output formats for Go CLIs     |

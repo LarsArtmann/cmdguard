@@ -1,0 +1,57 @@
+---
+title: Installation
+description: Install cmdguard in your Go project.
+---
+
+## Requirements
+
+- Go 1.26 or later (uses `GOEXPERIMENT=jsonv2`)
+- An active Go module (`go.mod`)
+
+## Install
+
+Run this in your project directory:
+
+```bash
+go get github.com/larsartmann/cmdguard/v3@latest
+```
+
+## Import
+
+```go
+import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+```
+
+For convenience, you can alias the import:
+
+```go
+import v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+```
+
+## Optional Sub-Modules
+
+cmdguard's core stays lean. Five optional features live in standalone sub-modules so you import only what you need:
+
+| Sub-module    | Import path                                 | Provides                    |
+| ------------- | ------------------------------------------- | --------------------------- |
+| **glamour**   | `github.com/larsartmann/cmdguard/glamour`   | Markdown help rendering     |
+| **manpage**   | `github.com/larsartmann/cmdguard/manpage`   | Man page generation         |
+| **prompts**   | `github.com/larsartmann/cmdguard/prompts`   | Interactive prompts via huh |
+| **spinner**   | `github.com/larsartmann/cmdguard/spinner`   | Terminal spinner middleware |
+| **telemetry** | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry spans         |
+
+```bash
+go get github.com/larsartmann/cmdguard/glamour
+```
+
+## Verify Installation
+
+```bash
+go list -m github.com/larsartmann/cmdguard/v3
+```
+
+## Next Steps
+
+- Follow the [Quick Start](/getting-started/quick-start/) for a complete example
+- Learn about [Type-Safe Flags](/guides/type-safe-flags/) to define flags with struct tags
+- See [Migrating from Cobra](/guides/migrating-from-cobra/) if you have an existing Cobra app

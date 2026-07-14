@@ -1,0 +1,5 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="cmdguard logo">
+  <rect width="32" height="32" rx="7" fill="#4f46e5"/>
+  <path d="M16 5L7 8.5V16C7 21.5 10.8 26.2 16 27.5C21.2 26.2 25 21.5 25 16V8.5L16 5Z" fill="none" stroke="#a5b4fc" stroke-width="1.8" stroke-linejoin="round"/>
+  <text x="16" y="20" text-anchor="middle" fill="#c7d2fe" font-family="monospace" font-size="9" font-weight="700">CG</text>
+</svg>

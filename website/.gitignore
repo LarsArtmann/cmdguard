@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.firebase/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.astro/
+bun.lock

@@ -1,0 +1,101 @@
+---
+title: Migrating from Cobra
+description: Step-by-step guide to migrate existing Cobra applications to cmdguard.
+---
+
+## Why Migrate?
+
+cmdguard wraps Cobra, so you keep all of Cobra's power while gaining:
+
+- Type-safe flags via struct tags (no string lookups)
+- Zero panics (only error-returning handlers)
+- Proper error display (printed once, correct exit codes)
+- Constructor validation (catch errors at AddCommand, not runtime)
+- Built-in DI, config loading, and rich output
+
+## Migration Strategies
+
+### Strategy 1: Full Migration (recommended for new projects)
+
+Replace all `cobra.Command` definitions with `Command[T,F]`:
+
+```go
+// Before — raw Cobra
+var name string
+rootCmd := &cobra.Command{
+    Use: "greet",
+    RunE: func(cmd *cobra.Command, args []string) error {
+        fmt.Printf("Hello, %s!\n", name)
+        return nil
+    },
+}
+rootCmd.Flags().StringVarP(&name, "name", "n", "World", "Name to greet")
+
+// After — cmdguard
+type GreetFlags struct {
+    Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+}
+greetCmd, _ := v3.NewCommand("greet", &GreetFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+        fmt.Printf("Hello, %s!\n", flags.Name)
+        return nil
+    },
+)
+```
+
+### Strategy 2: Gradual Migration (for existing apps)
+
+cmdguard provides an escape hatch so you can migrate one command at a time:
+
+```go
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{})
+
+// Keep existing raw cobra commands
+cli.RootCommand().AddCommand(myLegacyCmd)
+
+// Add cmdguard-managed commands
+v3.AddCommand(cli, newTypedCmd)
+```
+
+### Strategy 3: Hybrid (escape hatch APIs)
+
+Use cmdguard's runtime with raw cobra commands:
+
+```go
+// Access resolved config from any cobra command
+func(cmd *cobra.Command, _ []string) error {
+    cfg, ok := v3.ConfigFromContext[AppConfig](cmd.Context())
+    if !ok { return errors.New("config not initialized") }
+    // use cfg...
+}
+
+// Run initialization after flag parsing
+cli, _ := v3.NewCLI[AppConfig]("app", "...", AppConfig{},
+    v3.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
+        return initDI(cfg)
+    }),
+)
+```
+
+## Key Differences
+
+| Cobra                             | cmdguard                            |
+| --------------------------------- | ----------------------------------- |
+| `cmd.Flags().GetString("name")`   | `flags.Name` (typed struct field)   |
+| `Run` (panics) / `RunE` (returns) | Only error-returning handlers exist |
+| `SilenceUsage: false` (default)   | `SilenceUsage: true` (default)      |
+| Manual `os.Exit(exitCode)`        | `ExecuteAndExit(ctx)`               |
+| No DI                             | Built-in samber/do/v2               |
+| Errors printed by cobra AND main  | Error printed exactly once          |
+
+## Scoped Flags
+
+If you had root-only flags that shouldn't appear on subcommands:
+
+```go
+type AppConfig struct {
+    Build string `flag:"build" local:"true" default:"full" help:"Root-only"`
+}
+```
+
+The `local:"true"` tag prevents inheritance by subcommands. Use `cli.RegisterLocalCommandFlags(cmd)` to selectively register them on specific subcommands.

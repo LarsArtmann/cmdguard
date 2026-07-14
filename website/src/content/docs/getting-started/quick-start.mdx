@@ -1,0 +1,97 @@
+---
+title: Quick Start
+description: Build a type-safe CLI in under a minute.
+---
+
+## Your First cmdguard CLI
+
+Create a `main.go` with typed flags, a command, and proper exit codes:
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    "strings"
+
+    "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+)
+
+type AppConfig struct {
+    Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
+    Output  string `flag:"output" short:"o" default:"text" help:"Output format"`
+}
+
+type GreetFlags struct {
+    Name  string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+    Shout bool   `flag:"shout" short:"s" default:"false" help:"Uppercase output"`
+}
+
+func main() {
+    cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
+        os.Exit(1)
+    }
+
+    greetCmd, err := v3.NewCommand("greet", &GreetFlags{},
+        func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+            msg := fmt.Sprintf("Hello, %s!", flags.Name)
+            if flags.Shout {
+                msg = strings.ToUpper(msg)
+            }
+            fmt.Println(msg)
+            return nil
+        },
+        v3.WithShort("Greet someone"),
+    )
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to create command: %v\n", err)
+        os.Exit(1)
+    }
+
+    v3.AddCommand(cli, greetCmd)
+    cli.ExecuteAndExit(context.Background())
+}
+```
+
+## Run It
+
+```bash
+$ go run main.go greet -n "cmdguard" --shout
+HELLO, CMDGUARD!
+```
+
+## What Just Happened?
+
+1. **`NewCLI[AppConfig]`** — created the root CLI with your config struct as a type parameter
+2. **`NewCommand("greet", &GreetFlags{}, handler)`** — created a command with typed flags
+3. **`AddCommand(cli, greetCmd)`** — registered the command (validates at registration time)
+4. **`ExecuteAndExit(ctx)`** — ran the CLI and exited with the correct code
+
+## Subcommands
+
+Group related commands under a parent:
+
+```go
+listCmd, _ := v3.NewCommand("list", v3.NoFlags{}, listHandler,
+    v3.WithShort("List users"),
+)
+createCmd, _ := v3.NewCommand("create", v3.NoFlags{}, createHandler,
+    v3.WithShort("Create a user"),
+)
+userCmd, _ := v3.NewParentCommand[AppConfig]("user",
+    "User management", v3.NoFlags{},
+    v3.WithSubcommands(listCmd, createCmd),
+    v3.WithShort("User management"),
+)
+v3.AddCommand(cli, userCmd)
+```
+
+## Next Steps
+
+- [Type-Safe Flags](/guides/type-safe-flags/) — all available struct tags
+- [Dependency Injection](/guides/dependency-injection/) — register and invoke services
+- [Error Handling](/guides/error-handling/) — exit codes, sentinel errors, and the print contract

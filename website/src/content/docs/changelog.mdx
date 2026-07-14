@@ -1,0 +1,31 @@
+---
+title: Changelog
+description: All notable changes to cmdguard.
+---
+
+For the full changelog, see the [CHANGELOG.md on GitHub](https://github.com/LarsArtmann/cmdguard/blob/main/CHANGELOG.md).
+
+## v3.0.0 — 2026-07-07
+
+### Highlights
+
+- **Non-generic options** — `CommandOption` and `CLIOption` are non-generic. Type safety flows through generic constructors that return non-generic options. Eliminates the v2 "7 type params per command" explosion.
+- **Zero panics** — all functions return errors; no `Must*` variants
+- **Single type parameter on CLI only** — `CLI[T]` parameterizes on config; per-command flag types flow through `Command[T,F]`
+- **Copy-on-write registries** — shared global type/validator registries with lazy clone on write
+- **Plugin system** — `Plugin` interface bundles custom type handlers + validators
+- **Nested config structs** — `ParseFlagTags` recurses into nested structs
+- **1429 test runs, 87.6% coverage, 0 lint issues**
+
+### Sub-Module Releases
+
+Each sub-module released independently at v0.1.0:
+`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`.
+
+### v2 Maintenance
+
+The v2 line continues at `v2.10.4`. See the [v2 to v3 Migration Guide](https://github.com/LarsArtmann/cmdguard/blob/main/docs/MIGRATION_v2_v3.md).
+
+---
+
+For older versions and detailed change lists, see [CHANGELOG.md](https://github.com/LarsArtmann/cmdguard/blob/main/CHANGELOG.md).

@@ -1,0 +1,22 @@
+---
+import { features } from '../data/features';
+import Icon from './Icon.astro';
+import Card from './Card.astro';
+import SectionHeader from './SectionHeader.astro';
+---
+
+<div>
+  <SectionHeader title="Engineered for safety." subtitle="Every API decision optimized to make the correct behaviour the default." />
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {features.map((feature) => (
+      <Card variant="feature">
+        <div class="text-accent mb-3">
+          <Icon name={feature.icon} />
+        </div>
+        <h3 class="font-semibold text-text-primary mb-2">{feature.title}</h3>
+        <p class="text-sm text-text-muted leading-relaxed">{feature.desc}</p>
+      </Card>
+    ))}
+  </div>
+</div>

@@ -1,0 +1,83 @@
+---
+title: API Reference
+description: Overview of the cmdguard public API.
+---
+
+## Core Types
+
+### CLI[T]
+
+The root CLI instance. `T` is your config struct type.
+
+```go
+cli, err := v3.NewCLI[T](name, description, defaultValue{}, options...)
+```
+
+Key methods:
+
+| Method                | Returns            | Purpose                         |
+| --------------------- | ------------------ | ------------------------------- |
+| `Execute(ctx)`        | `error`            | Run the CLI                     |
+| `ExecuteAndExit(ctx)` | (never returns)    | Run and exit with correct code  |
+| `Scope()`             | `*Scope`           | Access the DI scope             |
+| `RootCommand()`       | `*cobra.Command`   | Access the underlying cobra cmd |
+| `NoColor()`           | `bool`             | Check if color is disabled      |
+| `AuditLog()`          | `*auditlog.Plugin` | Access the audit log plugin     |
+
+### Command[T, F]
+
+A typed command with its own flag struct `F`.
+
+```go
+cmd, err := v3.NewCommand(use string, flags F, runE func(ctx, *T, F) error, opts...)
+```
+
+### Scope
+
+Wraps `samber/do/v2` injector for dependency injection.
+
+| Function                 | Purpose                          |
+| ------------------------ | -------------------------------- |
+| `NewScope(name)`         | Create a new scope               |
+| `Provide(scope, fn)`     | Register a lazy service          |
+| `Invoke[T](scope)`       | Get or create a service          |
+| `Override[T](scope, fn)` | Replace a service (for testing)  |
+| `CloneScope(scope)`      | Copy registrations without state |
+
+## Constructors
+
+| Function                          | Returns                        |
+| --------------------------------- | ------------------------------ |
+| `NewCLI[T](name, desc, cfg, ...)` | `(*CLI[T], error)`             |
+| `NewCommand(use, flags, runE)`    | `(*Command[T,F], error)`       |
+| `NewParentCommand[T](...)`        | `(*Command[T,NoFlags], error)` |
+
+## Command Options
+
+`WithShort`, `WithLong`, `WithExample`, `WithAliases`, `WithHidden`, `WithDeprecated`, `WithGroupID`, `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithValidArgs`, `WithSubcommands`, `WithCompletion`, `WithPreRunE[T,F]`, `WithPostRunE[T,F]`.
+
+## CLI Options
+
+`WithCLIVersion`, `WithCLILong`, `WithSilenceErrors`, `WithSilenceUsage`, `WithoutSilenceUsage`, `WithFang`, `WithEnvPrefix`, `WithSignalHandling`, `WithGracefulShutdown`, `WithMiddleware[T]`, `WithGroup`, `WithConfigValidation[T]`, `WithPostFlagParse[T]`, `WithCleanup[T]`, `WithStrictValidation`, `WithDraconianValidation`, `WithConfigFile`, `WithConfigFileLoader`, `WithPlugin`, `WithAuditLog`, `WithDILogging[T]`.
+
+## Error Types
+
+| Type             | Constructor                       |
+| ---------------- | --------------------------------- |
+| `CommandError`   | `NewCommandError(name, err)`      |
+| `FlagError`      | `NewFlagError(name, err)`         |
+| `FlagError+Hint` | `NewFlagErrorWithSuggestion(...)` |
+| `ExitError`      | `NewExitError(code, err)`         |
+
+40+ sentinel errors: `ErrInvalidCommand`, `ErrMissingHandler`, `ErrDuplicateCommand`, `ErrConfigValidation`, etc.
+
+## Built-in Commands
+
+| Helper                   | Purpose                  |
+| ------------------------ | ------------------------ |
+| `VersionCommand[T](cli)` | `myapp version`          |
+| `DoctorCommand[T](cli)`  | Health check diagnostics |
+
+## Full API
+
+See the complete API on [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3).

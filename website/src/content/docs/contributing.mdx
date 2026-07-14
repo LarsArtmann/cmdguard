@@ -1,0 +1,80 @@
+---
+title: Contributing
+description: How to contribute to cmdguard.
+---
+
+## Development Setup
+
+**Requirements:** Go 1.26+, Nix (optional, recommended)
+
+```bash
+git clone https://github.com/LarsArtmann/cmdguard.git
+cd cmdguard
+nix develop  # or: ensure GOEXPERIMENT=jsonv2 is set
+go mod download
+```
+
+## Building
+
+```bash
+go build ./...
+```
+
+## Testing
+
+```bash
+# All tests with race detection
+go test ./... -count=1 -timeout 120s -race
+
+# Coverage report
+go test ./... -count=1 -timeout 120s -cover
+```
+
+## Linting
+
+```bash
+golangci-lint run ./...
+```
+
+The project maintains **0 lint issues** via real code fixes, not silencing linters.
+
+## Sub-Modules
+
+Each sub-module (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) has its own `go.mod`. Build and test them individually:
+
+```bash
+for m in glamour manpage prompts spinner telemetry; do
+    (cd $m && go build ./... && go test ./...)
+done
+```
+
+## Code Style
+
+- `gofumpt` formatting (via `golangci-lint fmt`)
+- `t.Parallel()` in every test function and subtest
+- `//nolint:paralleltest` for tests using `t.Setenv`
+- Table-driven tests: `tests := []struct{...}` pattern
+- Single internal test package (`v3`, accesses private helpers)
+- Error wrapping: `fmt.Errorf("context: %w", err)`
+- Functional options pattern for all configuration
+- No panics in library code — all functions return errors
+
+## CI
+
+All pull requests must pass:
+
+- `go build ./...` — compiles cleanly
+- `go test -race ./...` — tests pass with race detection
+- `golangci-lint run` — no lint issues
+
+## Pull Requests
+
+- Ensure all tests pass: `go test -race ./...`
+- Ensure linting passes: `golangci-lint run ./...`
+- Add tests for new functionality
+- Keep changes focused and atomic
+- Follow existing patterns (check similar code)
+
+## BuildFlow Pre-commit Hook
+
+The pre-commit hook runs golangci-lint + formatters automatically. Auto-fixes are applied, so commits proceed normally without `--no-verify`.

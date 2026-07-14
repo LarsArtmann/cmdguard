@@ -1,0 +1,88 @@
+---
+title: Config Files
+description: Auto-load JSON, YAML, and TOML config files with flag and env override.
+---
+
+## JSON (built-in)
+
+```go
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigFile("~/.config/myapp/config.json", "/etc/myapp/config.json"),
+)
+```
+
+Paths are tried in order. Missing files are silently skipped. Supports `$ENV` and `~` expansion.
+
+## YAML / TOML
+
+Use the `configload` package for YAML and TOML support:
+
+```go
+import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/configload"
+
+// YAML
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigFileLoader(configload.YAML(), "config.yaml"),
+)
+
+// TOML
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigFileLoader(configload.TOML(), "config.toml"),
+)
+```
+
+## Auto Detection
+
+`configload.Auto()` tries YAML, then TOML, then JSON sequentially:
+
+```go
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigFileLoader(configload.Auto(), "config"),
+)
+```
+
+For precise extension-based detection, use `LoaderForPath`.
+
+## Precedence
+
+**explicit flag > env var > config file > default value**
+
+Config values become the new tag defaults after loading, so flags and env vars still override them.
+
+## Config Validation
+
+Run validation after parsing but before any command handler:
+
+```go
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithConfigValidation[AppConfig](func(cfg *AppConfig) error {
+        if cfg.Port < 1 || cfg.Port > 65535 {
+            return fmt.Errorf("port out of range: %d", cfg.Port)
+        }
+        return nil
+    }),
+)
+```
+
+## Nested Config
+
+`ParseFlagTags` recurses into nested structs:
+
+```go
+type AppConfig struct {
+    DB DatabaseConfig
+}
+
+type DatabaseConfig struct {
+    Host string `flag:"db-host" env:"DB_HOST" default:"localhost"`
+    Port int    `flag:"db-port" env:"DB_PORT" default:"5432"`
+}
+```
+
+The `config` flag on your config struct overrides the default search paths:
+
+```go
+type AppConfig struct {
+    Config string `flag:"config" default:"" help:"Path to config file"`
+}
+```

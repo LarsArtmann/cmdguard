@@ -1,0 +1,78 @@
+---
+title: Middleware
+description: Wrap all command handlers with cross-cutting concerns.
+---
+
+## Core Middleware Chain
+
+cmdguard provides a generic `Middleware[T]` type for wrapping command handlers. Wire middleware via `WithMiddleware`:
+
+```go
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithMiddleware[AppConfig](myMiddleware),
+)
+```
+
+## Built-in Middleware
+
+cmdguard ships with reference implementations. The spinner and telemetry middleware live in their sub-modules.
+
+### Timing Middleware
+
+Measure execution time for every command:
+
+```go
+func TimingMiddleware[T any]() v3.Middleware[T] {
+    return func(cmd string, next func() error) func() error {
+        return func() error {
+            start := time.Now()
+            err := next()
+            log.Printf("%s took %v", cmd, time.Since(start))
+            return err
+        }
+    }
+}
+```
+
+### Recovery Middleware
+
+Catch panics from handlers (though cmdguard itself never panics):
+
+```go
+func RecoveryMiddleware[T any]() v3.Middleware[T] {
+    return func(cmd string, next func() error) func() error {
+        return func() (err error) {
+            defer func() {
+                if r := recover(); r != nil {
+                    err = fmt.Errorf("panic in %s: %v", cmd, r)
+                }
+            }()
+            return next()
+        }
+    }
+}
+```
+
+## Spinner Middleware (sub-module)
+
+```go
+import "github.com/larsartmann/cmdguard/spinner"
+
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v3.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
+)
+```
+
+Auto-skips when stderr is not a terminal. Override with `SpinnerConfig{Writer: ...}`.
+
+## Telemetry Middleware (sub-module)
+
+```go
+import "github.com/larsartmann/cmdguard/telemetry"
+
+cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    telemetry.WithTelemetry[AppConfig](tracer),
+)
+```
+
+Starts an OpenTelemetry span per command. Note: the span context cannot be propagated to the handler due to the `next func() error` signature.

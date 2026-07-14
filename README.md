@@ -3,7 +3,12 @@
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v3.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
+[![Coverage](https://img.shields.io/badge/coverage-87.6%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+**[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)**
+
+---
 
 **Build production Go CLIs with type-safe flags, dependency injection, and zero panics.**
 
@@ -622,13 +627,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 
 ## Documentation
 
-- [Tutorial](docs/TUTORIAL.md) — Build a task manager CLI step by step
-- [Quick Start Guide](docs/QUICKSTART.md) — Learn cmdguard in 5 minutes
-- [Migrating from Cobra](docs/MIGRATION_FROM_COBRA.md) — Step-by-step migration guide
-- [Framework Comparison](docs/COMPARISON.md) — vs Kong, sflags, go-flags, urfave/cli
-- [Performance](docs/PERFORMANCE.md) — Benchmark results and overhead analysis
-- [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md) — Design guidelines
-- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) — Full API docs on pkg.go.dev
+**Full docs at [cmdguard.lars.software](https://cmdguard.lars.software)**
+
+- [Installation](https://cmdguard.lars.software/getting-started/installation/) — Get started in 30 seconds
+- [Quick Start](https://cmdguard.lars.software/getting-started/quick-start/) — Build a CLI in under a minute
+- [Type-Safe Flags](https://cmdguard.lars.software/guides/type-safe-flags/) — Struct tags reference
+- [Dependency Injection](https://cmdguard.lars.software/guides/dependency-injection/) — samber/do/v2 integration
+- [Error Handling](https://cmdguard.lars.software/guides/error-handling/) — Zero panics, exit codes, sentinel errors
+- [Migrating from Cobra](https://cmdguard.lars.software/guides/migrating-from-cobra/) — Step-by-step guide
+- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) — Full API on pkg.go.dev
+
+Local docs: [Tutorial](docs/TUTORIAL.md), [Quick Start](docs/QUICKSTART.md), [Framework Comparison](docs/COMPARISON.md), [Performance](docs/PERFORMANCE.md), [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md).
 
 ---
 

@@ -1,0 +1,22 @@
+---
+import { useCases } from '../data/sections';
+import Icon from './Icon.astro';
+import Card from './Card.astro';
+import SectionHeader from './SectionHeader.astro';
+---
+
+<div>
+  <SectionHeader title="Built for real-world CLIs." subtitle="From developer tools to production microservices." />
+
+  <div class="grid gap-4 sm:grid-cols-3">
+    {useCases.map((uc) => (
+      <Card variant="usecase" padding="lg">
+        <div class="text-accent mb-4 flex justify-center">
+          <Icon name={uc.icon} size={28} />
+        </div>
+        <h3 class="font-semibold text-text-primary mb-2">{uc.title}</h3>
+        <p class="text-sm text-text-muted leading-relaxed">{uc.desc}</p>
+      </Card>
+    ))}
+  </div>
+</div>
