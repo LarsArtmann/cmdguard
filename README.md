@@ -92,16 +92,6 @@ Every function returns errors. No `Run` (panics), no `Must*` variants. The error
 cli.ExecuteAndExit(context.Background()) // one line, correct exit code
 ```
 
-### Cobra footguns — fixed by default
-
-| Raw Cobra footgun                                                               | cmdguard default                                                                           |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Prints the full usage block after _every_ command error (`SilenceUsage: false`) | Usage-on-error is silenced; `--help` still works                                           |
-| Errors print twice (Cobra prints _and_ `main()` prints the returned error)      | cmdguard prints the error exactly once — see [Error handling](#error-handling--exit-codes) |
-| Failed commands exit `0` (easy to forget `os.Exit` with the right code)         | `ExecuteAndExit` / `ExitCode(err)` map errors to correct exit codes                        |
-| `Run` (panics) vs `RunE` (returns error) confusion                              | Only error-returning handlers exist — zero panics, by construction                         |
-| Missing handler / duplicate command / invalid name found at runtime             | Caught at `NewCommand` / `AddCommand` time                                                 |
-
 ---
 
 ## Error handling & exit codes
