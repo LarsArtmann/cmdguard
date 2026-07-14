@@ -1,7 +1,8 @@
 package v3
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -113,10 +114,9 @@ func writeJSONError(w io.Writer, err error) error {
 		},
 	}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
+	enc := jsontext.NewEncoder(w, jsontext.WithIndent("  "))
 
-	encodeErr := enc.Encode(envelope)
+	encodeErr := json.MarshalEncode(enc, envelope)
 	if encodeErr != nil {
 		return fmt.Errorf("encoding JSON error envelope: %w", encodeErr)
 	}

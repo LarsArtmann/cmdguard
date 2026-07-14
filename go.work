@@ -1,8 +1,13 @@
 go 1.26.4
 
 use .
+
 use ./glamour
+
 use ./manpage
+
 use ./prompts
+
 use ./spinner
+
 use ./telemetry

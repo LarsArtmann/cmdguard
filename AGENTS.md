@@ -2,9 +2,9 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-13
 **Project:** cmdguard - CLI Guard Library
-**Go Version:** 1.26
+**Go Version:** 1.26 (GOEXPERIMENT=jsonv2)
 **Status:** v3.0.0 - zero panics, 87.6% coverage, 0 lint issues, 0 race conditions
 
 ---
@@ -48,7 +48,7 @@ nix flake check
 
 **Module path:** `github.com/larsartmann/cmdguard/v3`
 
-**Current Status:** v3.0.0. 463 test functions (1288 runs incl. subtests), 26 benchmarks, 7 fuzz targets, 87.6% coverage, 0 build errors, 0 lint issues.
+**Current Status:** v3.0.0. 1429 test runs, 26 benchmarks, 7 fuzz targets, 87.6% coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -96,7 +96,6 @@ cmdguard/
 │   │   ├── type_handler_intwidth.go # Narrow integer overflow validation (int8/16/32, uint8/16)
 │   │   ├── type_handler_custom.go # Custom type handlers (Duration/Enum/URL/Email/Port)
 │   │   ├── type_helpers.go       # Generic type helpers
-│   │   ├── testutil/             # Test harness utilities
 │   │   ├── version.go            # VersionCommand helper
 │   │   ├── doctor.go             # DoctorCommand helper
 │   │   ├── types_duration.go     # Duration type
@@ -115,12 +114,13 @@ cmdguard/
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
-│   └── taskctl/                   # Single superb example: production task manager CLI
-│       ├── main.go                # CLI construction, DI setup, all CLI options
-│       ├── commands.go            # All command definitions with options
-│       ├── types.go               # Config, flags, domain types, TaskStore service
-│       ├── main_test.go           # Comprehensive integration tests (~66 tests)
-│       └── README.md              # Feature matrix and usage guide
+│   ├── taskctl/                   # Flagship example: production task manager CLI
+│   │   ├── main.go                # CLI construction, DI setup, all CLI options
+│   │   ├── commands.go            # All command definitions with options
+│   │   ├── types.go               # Config, flags, domain types, TaskStore service
+│   │   ├── main_test.go           # Comprehensive integration tests (~66 tests)
+│   │   └── README.md              # Feature matrix and usage guide
+│   └── docs-generator/            # Example: GenerateDocs usage
 ├── benchmarks/                   # Performance benchmarks
 ├── tests/integration/            # Integration tests
 ├── docs/                         # Documentation
@@ -140,7 +140,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v3` | Type-safe API | Yes         | ~87.3%   |
+| `pkg/cmdguard/v3` | Type-safe API | Yes         | ~87.6%   |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -153,8 +153,8 @@ cmdguard/
 | `github.com/samber/do/v2`                   | Dependency injection | v2.0.0  |
 | `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.30.1 |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.4.0  |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.30.4 |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.5.0  |
 
 ### Optional Sub-Module Dependencies
 
@@ -167,6 +167,15 @@ Each sub-module is independently importable — core has **zero** dependencies o
 | `spinner`   | `charm.land/lipgloss/v2`         | v2.0.5  | Terminal spinner        |
 | `telemetry` | `go.opentelemetry.io/otel/trace` | v1.44.0 | OpenTelemetry spans     |
 | `manpage`   | `muesli/mango` + `mango-cobra`   | v0.2.0  | Man page generation     |
+
+### GOEXPERIMENT=jsonv2
+
+The project uses `encoding/json/v2` and `encoding/json/jsontext` (experimental in Go 1.26). The `GOEXPERIMENT=jsonv2` flag is set in `flake.nix` devShells. All `go build`/`go test` commands require this flag. When Go 1.27+ makes json/v2 default, the flag can be removed.
+
+Key v2 differences handled:
+
+- `json.MatchCaseInsensitiveNames(true)` preserves v1-compatible struct field matching (user config structs lack `json:` tags)
+- `jsontext.WithIndent("  ")` replaces v1's `enc.SetIndent("", "  ")`
 
 ---
 
@@ -195,7 +204,7 @@ Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positional
 - `//nolint:paralleltest` for tests using `t.Setenv` or capturing `os.Stdout`
 - `//nolint:fatcontext` at file level for test files with context in closures
 - Table-driven tests: `tests := []struct{...}` pattern
-- Two test packages: `v3` (internal, access private helpers) and `v3_test` (external)
+- Single internal test package (`v3`, accesses private helpers)
 
 ### Test Commands
 
@@ -276,7 +285,7 @@ go build ./...                                   # Verify build
 - **Copy-on-write registries** — `FlagRegistry` shares global `typeRegistry`/`validatorRegistry` lazily via `share()` and clones only on first write via `register()`. Package-level `RegisterTypeHandler()`/`RegisterValidator()` write to global defaults (visible to instances that haven't cloned); `FlagRegistry.RegisterTypeHandler()`/`RegisterFlagValidator()` trigger the lazy clone and write to instance-local maps. Reduces NewCLI by ~48%.
 - **Direct go-output usage** — Users import `output.FormatTable`, `output.FormatJSON`, etc. directly from `github.com/larsartmann/go-output`; cmdguard only re-exports the `OutputFormat = output.Format` type alias. No `ParseOutputFormat`, `SupportedFormats`, `IsFormatSupported`, or `Format*` constant re-exports.
 - **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map` (concurrency-safe; tests run in parallel)
-- **Integer overflow** — `int8`/`int16`/`int32`/`uint8`/`uint16` flag values are range-checked at parse time → `ErrIntegerOverflow`
+- **Integer overflow** — `int8`/`int16`/`int32`/`uint8`/`uint16` flag values are range-checked at parse time → `ErrValueOutOfRange`
 - **Iterator methods (`iter.Seq`)** — `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` are zero-allocation alternatives; the slice-returning methods return defensive copies
 
 #### Config Files
@@ -292,7 +301,7 @@ go build ./...                                   # Verify build
 
 #### Output & Styling
 
-- **16 output formats** via go-output `v0.30.1` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `RegisteredTableDataFormats()`.
+- **16 output formats** via go-output `v0.30.1` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `output.RegisteredTableMarshalFormats()`.
 - **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. All go-output modules are pinned at v0.30.1. The `enum` and `envdetect` sub-modules were absorbed into go-output core.
 - **fang styling** — styled output by default; `--no-color` persistent flag is registered by default and sets `NO_COLOR=1` for fang; `NO_COLOR` env var also respected automatically via fang's colorprofile. `cli.NoColor()` returns true if either is set.
 - **Help rendering hook** — `WithHelpTransform[T](fn)` is the core extension point for transforming command help text. The `glamour` sub-module provides a ready-made markdown transformer (see [Sub-Modules](#sub-modules) below); it is NOT imported by core.

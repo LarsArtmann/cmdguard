@@ -16,7 +16,7 @@ type config struct {
 
 type deployFlags struct {
 	Environment string `flag:"environment" short:"e" default:"production" help:"Target environment"`
-	DryRun      bool   `flag:"dry-run" help:"Print actions without executing"`
+	DryRun      bool   `flag:"dry-run"                                    help:"Print actions without executing"`
 }
 
 func main() {

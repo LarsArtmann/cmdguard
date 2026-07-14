@@ -1,13 +1,13 @@
 # TODO List
 
-**Updated:** 2026-07-10
-**Status:** v3.0.0 — 0 lint issues, 0 panics, 87.3% coverage, 58 sentinel errors
-**Tests:** 477 test functions (incl. 20 sub-module tests), 26 benchmarks, 7 fuzz targets
+**Updated:** 2026-07-13
+**Status:** v3.0.0 — 0 lint issues, 0 panics, 87.6% coverage, 58 sentinel errors
+**Tests:** 474 test functions (1429 runs), 26 benchmarks, 7 fuzz targets
 **Lint:** **0 issues** (previously 38 — all fixed or excluded by design)
 
 > Built by reading all `.md` files in the repo and verifying each item
 > against the actual code. Completed phases are historical; open items
-> are sorted by impact within each priority tier.
+> are in the Deferred and Future sections.
 
 ---
 
@@ -41,9 +41,7 @@
 - [x] Plugin system, nested config structs, GenerateDocs, audit log (11 formats)
 - [x] 16 output formats via go-output v0.30.1 registries
 
----
-
-## Completed in 2026-07-10 Pareto Execution Session
+### 2026-07-10 Pareto Execution Session
 
 - [x] **#1** Fix `WithSilenceUsage` no-op — field now controls root + propagates to subcommands
 - [x] **#2** Fix `WithPlugin` error swallowing — errors captured and returned from NewCLI
@@ -58,12 +56,16 @@
 - [x] **#14** Bound regex cache — verified as practically bounded (validate tags always < 20)
 - [x] **#19** Fix ROADMAP.md stale items — GenerateDocs marked done, EditInEditor marked removed
 - [x] **#20** Fix CONTRIBUTING.md v2→v3 header
+- [x] **#21** Add godoc `Example*` functions — 17 example functions exist in `example_test.go` and `example_types_test.go`
+- [x] **#22** Add `examples/docs-generator/main.go` — exists and demonstrates `GenerateDocs` usage
 - [x] **#24** Write docs/COBRA_FOOTGUNS.md — 10 cobra traps documented
 - [x] **#25** Audit docs for stale v2 refs — ROADMAP, CONTRIBUTING, FEATURES all updated
 - [x] **#27** Deprecate v1 API — timeline added to ROADMAP (removal in v4.0.0)
-- [x] **#29** Cover pkg/testutil — 24 tests added
+- [x] **#29** Cover pkg/testutil — 25 tests added (50% coverage)
 
-### Deferred (requires API-breaking semver bump or external access)
+---
+
+## Deferred (requires API-breaking semver bump or external access)
 
 - [ ] **#6** Add flake.nix sub-module builds — needs Nix expertise for multi-module build
 - [ ] **#7** Move koanf to optional sub-module — API-breaking for configload.KoanfLoader() consumers
@@ -77,60 +79,7 @@
 
 ---
 
-## P1 — High (sub-module safety, testing, CI)
-
-| #   | Task                                                                                                  | Verified State                                                                         | Effort |
-| --- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------ |
-| 4   | **Write tests for 5 sub-modules** — all have zero test files                                          | `glamour/`, `manpage/`, `prompts/`, `spinner/`, `telemetry/` — confirmed 0 `*_test.go` | 2-4h   |
-| 5   | **Add CI sub-module smoke test** — external `go get` from fresh module prevents resolution regression | Previous session proved sub-module dir-location bug was invisible inside repo          | 30m    |
-| 6   | **Add flake.nix sub-module builds** — `nix flake check` doesn't build/vet sub-modules                 | Only root module covered; sub-modules need manual loop                                 | 20m    |
-| 7   | **Move koanf to optional/configload** — 4 direct deps in root go.mod                                  | `go.mod` lines 9-12: koanf json/yaml/file/v2                                           | 45m    |
-| 8   | **Add lint check to CI** — grep for deleted feature names in `*.md` before merge                      | No such check exists                                                                   | 15m    |
-
----
-
-## P2 — Medium (code quality, API debt)
-
-| #   | Task                                                                                                                                         | Verified State                                                                          | Effort |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------ |
-| 9   | **Fix 38 lint issues** — noinlineerr(10), ireturn(9), wrapcheck(5), paralleltest(5), gochecknoglobals(5), funlen(2), forbidigo(1), cyclop(1) | `golangci-lint run ./...` confirmed                                                     | 2-3h   |
-| 10  | **Evaluate flow_context.go** — 321 lines core + 5 test files (~900 total), used in 0 files outside its own package                           | `flow_context.go`(253) + `flow_context_access.go`(68); no other core file references it | 30m    |
-| 11  | **Make `RegisterTypeHandler`/`RegisterValidator` return errors** — both return void                                                          | `type_handler.go:150`, `flags_validate.go:105`                                          | 1h     |
-| 12  | **Middleware context propagation** — `next func() error` should be `next func(ctx) error`                                                    | `middleware.go:25`                                                                      | 2h     |
-| 13  | **Deduplicate jsonLoader** — identical struct in both `config_file.go` and `configload/loader.go`                                            | `config_file.go:23` + `configload/loader.go:73`                                         | 30m    |
-| 14  | **Bound regex cache** — unbounded `sync.Map` with no eviction                                                                                | `flags_validate.go:289`                                                                 | 30m    |
-
-### Deferred v3.x / v4 API-breaking cleanups
-
-| #   | Task                                                                             | Verified State        | Effort |
-| --- | -------------------------------------------------------------------------------- | --------------------- | ------ |
-| 15  | Rename `Get[T]` → `GetService[T]` — too generic                                  | `scope.go`            | 1h     |
-| 16  | Make `RegisterInScope` generic — currently takes `...any`                        | `scope.go:344`        | 1h     |
-| 17  | Remove or redesign `Package()` — unusual API shape (pre-existing `*Scope` param) | `scope.go`            | 1h     |
-| 18  | Remove `SetConfig` — mutating CLI config post-construction is unsafe             | `cli_accessors.go:27` | 30m    |
-
----
-
-## P3 — Lower (documentation, examples, polish)
-
-| #   | Task                                                                                 | Verified State                                                       | Effort |
-| --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | ------ |
-| 19  | Fix ROADMAP.md stale items — `GenerateDocs()` marked unchecked (line 115) but EXISTS | `docgen.go:19` confirmed; ROADMAP lines 115-116 need `[x]`           | 5m     |
-| 20  | Fix CONTRIBUTING.md "v2 Design Principles" header → v3                               | `CONTRIBUTING.md:110`                                                | 2m     |
-| 21  | Add godoc `Example*` functions for key API constructors                              | No `Example*` test functions exist                                   | 1h     |
-| 22  | Add `examples/docs-generator/main.go`                                                | No such example exists                                               | 30m    |
-| 23  | Add second example app (different domain than taskctl)                               | Only `examples/taskctl/` exists                                      | 2h     |
-| 24  | Write `docs/COBRA_FOOTGUNS.md` — explicit list of traps cmdguard closes              | Referenced in status reports; not created                            | 30m    |
-| 25  | Audit `docs/PERFORMANCE.md`, `docs/DOMAIN_LANGUAGE.md` for stale v2 refs             | Not checked in recent sessions                                       | 15m    |
-| 26  | Add `CODECOV_TOKEN` secret to GitHub repo settings                                   | CI has codecov-action but upload silently fails; requires repo owner | 5m     |
-| 27  | Deprecate v1 API with a timeline                                                     | ROADMAP has no removal date                                          | 15m    |
-| 28  | Add fuzz test corpus under `testdata/fuzz/`                                          | Fuzz targets exist (7) but no seed corpus                            | 1h     |
-| 29  | Cover `pkg/testutil` (0% coverage)                                                   | 372-line test helper package                                         | 30m    |
-| 30  | `gopls infertypeargs` sweep — ~100+ unnecessary type args in test files              | Cosmetic but noisy                                                   | 30m    |
-
----
-
-## P4 — Future Ideas (no timeline)
+## Future Ideas (no timeline)
 
 | #   | Task                                                           | Category         |
 | --- | -------------------------------------------------------------- | ---------------- |

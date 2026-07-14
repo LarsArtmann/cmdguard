@@ -171,7 +171,7 @@ HELLO, CMDGUARD!
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                          |
 | **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                    |
 | **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                               |
-| **420+ tests**             | 87.3% coverage, race-detected, fuzz-tested                                                                                       |
+| **1429 test runs**         | 87.6% coverage, race-detected, fuzz-tested                                                                                       |
 
 ---
 
@@ -495,7 +495,7 @@ Generates roff-formatted man pages from your command structure.
 
 ## Optional Sub-Modules
 
-cmdguard's core is dependency-free. Five optional features live in standalone sub-modules — import only what you need:
+cmdguard's core stays lean — five optional features live in standalone sub-modules so you import only what you need:
 
 | Sub-module    | Import path                                 | Provides                                               |
 | ------------- | ------------------------------------------- | ------------------------------------------------------ |
@@ -577,16 +577,17 @@ v3.AddCommand(cli, versionCmd)
 
 ## Test Helpers
 
-The `testutil` subpackage provides a harness for testing cmdguard CLIs:
+The `testutil` package provides panic and assertion helpers for testing cmdguard CLIs:
 
 ```go
-import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/testutil"
+import "github.com/larsartmann/cmdguard/v3/pkg/testutil"
 
-result := testutil.TestCLI(t, cli, []string{"greet", "--name", "Alice"})
-result.AssertNoError()
-result.AssertExitCode(0)
-result.AssertOutputContains("Hello, Alice!")
+testutil.AssertNoError(t, err)
+testutil.AssertErrorIs(t, err, v3.ErrInvalidCommand)
+testutil.AssertPanics(t, func() { /* ... */ })
 ```
+
+See [`examples/taskctl/main_test.go`](examples/taskctl/main_test.go) for integration test patterns using `ExecuteWithArgs`.
 
 ---
 

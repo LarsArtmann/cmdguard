@@ -45,6 +45,7 @@
               ];
 
               GOWORK = "off";
+              GOEXPERIMENT = "jsonv2";
 
               shellHook = ''
                 echo "cmdguard dev shell — Go $(go version | awk '{print $3}')"
@@ -58,6 +59,7 @@
               ];
 
               GOWORK = "off";
+              GOEXPERIMENT = "jsonv2";
             };
           };
 

@@ -1,7 +1,8 @@
 package v3
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"os"
@@ -30,12 +31,15 @@ func NewJSONLoader() ConfigFileLoader {
 
 // Load unmarshals JSON data into cfg and returns the list of fields that were set.
 func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
-	var raw map[string]json.RawMessage
+	var raw map[string]jsontext.Value
 
 	err := json.Unmarshal(data, &raw)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
 	}
+
+	// MatchCaseInsensitiveNames preserves v1 behavior: JSON key "port" matches Go field "Port"
+	// without requiring explicit json tags on user config structs.
 
 	tags, err := ParseFlagTags(cfg)
 	if err != nil {
@@ -47,7 +51,7 @@ func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
 
 	setFields := FilterSetFields(tags, present)
 
-	err = json.Unmarshal(data, cfg)
+	err = json.Unmarshal(data, cfg, json.MatchCaseInsensitiveNames(true))
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
 	}
@@ -125,11 +129,11 @@ func FilterSetFields(tags []FlagTag, present map[string]bool) []string {
 // collectKeysRecursive walks a JSON raw-message map, recording every key at
 // every nesting level. This lets FilterSetFields detect leaf-level flag names
 // that appear inside nested config-file objects (e.g. {"db":{"host":"x"}} → "host").
-func collectKeysRecursive(raw map[string]json.RawMessage, keys map[string]bool) {
+func collectKeysRecursive(raw map[string]jsontext.Value, keys map[string]bool) {
 	for k, v := range raw {
 		keys[k] = true
 
-		var nested map[string]json.RawMessage
+		var nested map[string]jsontext.Value
 		if json.Unmarshal(v, &nested) == nil {
 			collectKeysRecursive(nested, keys)
 		}

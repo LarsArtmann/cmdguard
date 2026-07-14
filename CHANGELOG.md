@@ -528,11 +528,34 @@ failure or double-prints errors.
 
 ---
 
+## [1.0.0] - 2026-04-30
+
+Stability commitment release.
+
+### Changed
+
+- Dependency updates (charmbracelet/x/exp transitive dependencies)
+
+---
+
+## [0.2.0] - 2026-04-08
+
+### Added
+
+- `WithSilenceErrors`, `WithSilenceUsage`, `WithColor` CLI options
+- Comprehensive tests for flag helper functions, cliToCobraCommand edge cases, error paths
+
+### Changed
+
+- README and AGENTS.md rewritten for v2.1 API patterns
+
+---
+
 ## [0.1.0] - 2026-02-20
 
 ### Added
 
-- Initial release of cmdguard v2
+- Initial release of cmdguard
 - Type-safe CLI construction with generics
 - Dependency injection via samber/do/v2
 - Flag binding with struct tags
@@ -557,4 +580,6 @@ failure or double-prints errors.
 [2.2.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.2.0
 [2.1.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.1.0
 [2.0.0]: https://github.com/larsartmann/cmdguard/releases/tag/v2.0.0
+[1.0.0]: https://github.com/larsartmann/cmdguard/releases/tag/v1.0.0
+[0.2.0]: https://github.com/larsartmann/cmdguard/releases/tag/v0.2.0
 [0.1.0]: https://github.com/larsartmann/cmdguard/releases/tag/v0.1.0

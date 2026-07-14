@@ -28,13 +28,15 @@ banned_libraries:
     enabled: false
     reason: "FALSE POSITIVE - cmdguard IS a cobra wrapper library. Fang is used at execution layer. Internal files legitimately work with cobra commands."
 
-  # NOT ACTIONABLE YET: encoding/json/v2 migration
-  # Go 1.26.1 does not include encoding/json/v2 in the standard library.
-  # This rule should be re-enabled when Go 1.27+ is released with json/v2.
-  # Current test files use encoding/json which is the correct choice for now.
+  # encoding/json/v2 migration — COMPLETED
+  # Go 1.26.x provides encoding/json/v2 behind GOEXPERIMENT=jsonv2.
+  # The project enables it via flake.nix devShell (GOEXPERIMENT=jsonv2).
+  # Source files use encoding/json/v2 + encoding/json/jsontext.
+  # MatchCaseInsensitiveNames(true) preserves v1-compatible struct field matching.
+  # When Go 1.27+ makes json/v2 the default, the GOEXPERIMENT flag can be removed.
   encoding_json_v2_replacement:
-    enabled: false
-    reason: "NOT ACTIONABLE - encoding/json/v2 doesn't exist in Go 1.26.1. Re-enable when Go 1.27+ is available."
+    enabled: true
+    reason: "Migrated to encoding/json/v2 with GOEXPERIMENT=jsonv2. flake.nix sets GOEXPERIMENT=jsonv2 in all devShells."
 
 # Global settings
 settings:

@@ -28,7 +28,7 @@
 
 | Feature                                     | Status                  | Notes                                                                                                                               |
 | ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:105`)                                                                                    |
+| `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                    |
 | `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                     |
 | `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                      |
 | `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                      |
@@ -42,7 +42,7 @@
 | `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | Unsafe — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Roadmapped for removal. |
 | `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                      |
 
-### CLI Options (26 total — all non-generic except where noted)
+### CLI Options (27 total — all non-generic except where noted)
 
 | Option                                         | Status              | Notes                                                                                                                  |
 | ---------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -54,9 +54,9 @@
 | `WithSilenceUsage()` / `WithoutSilenceUsage()` | 🟢 FULLY_FUNCTIONAL | Silenced by default; `WithoutSilenceUsage()` re-enables usage-on-error. Root + subcommands via AddCommand propagation. |
 | `WithFang(bool)`                               | 🟢 FULLY_FUNCTIONAL | Enable/disable fang styling                                                                                            |
 | `WithFangOptions(opts...)`                     | 🟢 FULLY_FUNCTIONAL | Pass raw fang options                                                                                                  |
-| `WithFangErrorHandler(fn)`                     | 🟢 FULLY_FUNCTIONAL | Custom fang error display (`cli_options.go:85`)                                                                        |
-| `WithFangColorScheme(fn)`                      | 🟢 FULLY_FUNCTIONAL | Custom fang color theme (`cli_options.go:92`)                                                                          |
-| `WithGroup(id, title)`                         | 🟢 FULLY_FUNCTIONAL | Command groups in help (`cli_options.go:100`)                                                                          |
+| `WithFangErrorHandler(fn)`                     | 🟢 FULLY_FUNCTIONAL | Custom fang error display (`cli_options.go:97`)                                                                        |
+| `WithFangColorScheme(fn)`                      | 🟢 FULLY_FUNCTIONAL | Custom fang color theme (`cli_options.go:104`)                                                                         |
+| `WithGroup(id, title)`                         | 🟢 FULLY_FUNCTIONAL | Command groups in help (`cli_options.go:112`)                                                                          |
 | `WithEnvPrefix(pfx)`                           | 🟢 FULLY_FUNCTIONAL | Prefix for env var lookups (root + command level)                                                                      |
 | `WithSignalHandling()`                         | 🟢 FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation                                                                                   |
 | `WithGracefulShutdown()`                       | 🟢 FULLY_FUNCTIONAL | Graceful DI service shutdown on signals (implies above)                                                                |
@@ -64,7 +64,7 @@
 | `WithStrictValidation()`                       | 🟢 FULLY_FUNCTIONAL | Require short desc on all commands                                                                                     |
 | `WithDraconianValidation()`                    | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                     |
 | `WithAuditLog(plugin)`                         | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                               |
-| `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:157`)                                                      |
+| `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:169`)                                                      |
 | `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | JSON loader, core package                                                                                              |
 | `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (YAML/TOML via configload)                                                                               |
 | `WithConfigValidation[T](fn)`                  | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                           |
@@ -127,11 +127,11 @@
 | `RegisterTypeHandler()`        | 🟢 FULLY_FUNCTIONAL     | Returns error on nil typ/handler (`type_handler.go`)            |
 | `RegisterValidator()`          | 🟢 FULLY_FUNCTIONAL     | Returns error on empty name/nil validator (`flags_validate.go`) |
 | Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL     | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)        |
-| Integer overflow validation    | 🟢 FULLY_FUNCTIONAL     | int8/16/32, uint8/16 range-checked → `ErrIntegerOverflow`       |
+| Integer overflow validation    | 🟢 FULLY_FUNCTIONAL     | int8/16/32, uint8/16 range-checked → `ErrValueOutOfRange`       |
 | Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL     | Root-only flags not inherited by subcommands                    |
 | Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL     | Exclude from `--help`, stay functional                          |
 | Nested config structs          | 🟢 FULLY_FUNCTIONAL     | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path  |
-| Regex validation cache         | 🟡 PARTIALLY_FUNCTIONAL | Unbounded `sync.Map` with no eviction (`flags_validate.go:289`) |
+| Regex validation cache         | 🟡 PARTIALLY_FUNCTIONAL | Unbounded `sync.Map` with no eviction (`flags_validate.go:302`) |
 
 ---
 
@@ -181,7 +181,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `OutputTable()`         | 🟢 FULLY_FUNCTIONAL | Table data with `AddRowChecked()` validation                                         |
 | `RegisteredFormats()`   | 🟢 FULLY_FUNCTIONAL | Dynamic format discovery from registered marshalers                                  |
 | 16 output formats       | 🟢 FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
-| Dynamic `--output` help | 🟢 FULLY_FUNCTIONAL | Auto-generated from `RegisteredTableDataFormats()`                                   |
+| Dynamic `--output` help | 🟢 FULLY_FUNCTIONAL | Auto-generated from `output.RegisteredTableMarshalFormats()`                         |
 | Structured JSON errors  | 🟢 FULLY_FUNCTIONAL | `cli_errors_json.go` — structured error output for `--output=json`                   |
 
 ---
@@ -252,13 +252,13 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Plugin System
 
-| Feature                         | Status                  | Notes                                                 |
-| ------------------------------- | ----------------------- | ----------------------------------------------------- |
-| `Plugin` interface              | 🟢 FULLY_FUNCTIONAL     | Bundle custom type handlers + validators              |
-| `PluginRegistrar`               | 🟢 FULLY_FUNCTIONAL     | Scoped `TypeHandler()`/`Validator()` registration     |
-| `RegisterPlugin(plugin)`        | 🟢 FULLY_FUNCTIONAL     | Apply to global registries (returns error)            |
-| `WithPlugin(plugin)`            | 🟡 PARTIALLY_FUNCTIONAL | Swallows error from `RegisterPlugin` (`plugin.go:63`) |
-| `FlagRegistry.RegisterPlugin()` | 🟢 FULLY_FUNCTIONAL     | Apply per-FlagRegistry                                |
+| Feature                         | Status              | Notes                                                                         |
+| ------------------------------- | ------------------- | ----------------------------------------------------------------------------- |
+| `Plugin` interface              | 🟢 FULLY_FUNCTIONAL | Bundle custom type handlers + validators                                      |
+| `PluginRegistrar`               | 🟢 FULLY_FUNCTIONAL | Scoped `TypeHandler()`/`Validator()` registration                             |
+| `RegisterPlugin(plugin)`        | 🟢 FULLY_FUNCTIONAL | Apply to global registries (returns error)                                    |
+| `WithPlugin(plugin)`            | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr`, returned from NewCLI (`plugin.go:64`) |
+| `FlagRegistry.RegisterPlugin()` | 🟢 FULLY_FUNCTIONAL | Apply per-FlagRegistry                                                        |
 
 ---
 
@@ -371,15 +371,15 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~87.3%          | 🟢 Good | `pkg/cmdguard/v3`                                                                                              |
+| Core coverage               | 87.6%           | 🟢 Good | `pkg/cmdguard/v3`                                                                                              |
 | configload coverage         | ~87.5%          | 🟢 Good | `pkg/cmdguard/v3/configload`                                                                                   |
-| Test functions              | 457 (1430 runs) | 🟢 Good |                                                                                                                |
+| Test functions              | 474 (1429 runs) | 🟢 Good |                                                                                                                |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
 | Sub-module tests            | 20 across all 5 | 🟢 Good | All sub-modules have basic test coverage                                                                       |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 0%              | 🟡 Debt | 372-line public package, no tests                                                                              |
-| `examples/taskctl` coverage | ~67%            | 🟡 Debt | Below core coverage                                                                                            |
+| `pkg/testutil` coverage     | 50%             | 🟡 Debt | 372-line public package, 25 test functions                                                                     |
+| `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
 
 ---
 

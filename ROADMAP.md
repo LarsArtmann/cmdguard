@@ -63,7 +63,7 @@ The v3.0 redesign shipped on `github.com/larsartmann/cmdguard/v3`:
 - [x] Create `pkg/cmdguard/v3/` directory (migrated via `git mv`)
 - [x] Implement non-generic `CLIOption` / `CommandOption` (eliminate type-param explosion)
 - [x] `NewCommand` / `NewParentCommand` positional-flags signature (full type inference)
-- [x] Write tests for v3 implementation (457 functions, 1430 runs, 87.3% coverage)
+- [x] Write tests for v3 implementation (474 functions, 1429 runs, 87.6% coverage)
 - [x] Create v3 example (taskctl)
 - [x] Extract 5 optional sub-modules: `glamour`, `manpage`, `prompts`, `spinner`, `telemetry`
 - [x] Go workspace (`go.work`, 6 modules)
@@ -110,19 +110,19 @@ These remain open for a future v3.x or v4:
 
 ## Advanced Types
 
-- [x] Add `Result[T]` type for error handling (v2.8)
-- [x] Add `Validated[T]` wrapper with validation functions (v2.8)
+- [x] ~~Add `Result[T]` type for error handling (v2.8)~~ (removed in v3 — non-CLI concern)
+- [x] ~~Add `Validated[T]` wrapper with validation functions (v2.8)~~ (removed in v3 — non-CLI concern)
 - [ ] Create example application for branded IDs
 
 ---
 
 ## Documentation Generation
 
-- [ ] Create `examples/docs-generator/main.go`
-- [ ] Define `FlagDoc` struct
+- [x] Create `examples/docs-generator/main.go`
+- [x] Define `FlagDoc` struct
 - [x] Add `GenerateDocs()` method to CLI (implemented at `docgen.go:19`)
-- [ ] Implement markdown documentation generator
-- [ ] Add API examples to godoc
+- [x] Implement markdown documentation generator (GenerateDocs writes full markdown)
+- [x] Add API examples to godoc (17 `Example*` functions in `example_test.go`)
 
 ---
 
@@ -166,7 +166,7 @@ These remain open for a future v3.x or v4:
 
 ## go-output Dependency Architecture
 
-> **Status:** Integrated in v2.x via `pkg/cmdguard/v3/output.go`. Published at v0.17.0.
+> **Status:** Integrated in v3 via `pkg/cmdguard/v3/output.go`. Pinned at v0.30.1.
 
 `go-output` provides 16 output formats as an independent module tree (root + 9 direct sub-modules + 3 indirect, all pinned in lockstep). Consumers already only pay the dependency cost when they use `--output`.
 
@@ -179,7 +179,7 @@ These remain open for a future v3.x or v4:
 - [x] Set up CI/CD pipeline
 - [x] Create contribution guide
 - [x] Create issue/PR templates
-- [ ] Deprecate v1 API timeline
+- [x] Deprecate v1 API timeline (removal in v4.0.0, no earlier than 2026-12-31)
 
 ---
 

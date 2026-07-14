@@ -98,7 +98,7 @@ if err := doSomething(); err != nil {
 - Test both success and error cases
 - Use `t.Parallel()` in every test function and subtest
 - Use `//nolint:paralleltest` for tests using `t.Setenv`
-- Two test packages: `v3` (internal, access private helpers) and `v3_test` (external, black-box)
+- Single internal test package (`v3`, accesses private helpers)
 - Use `ExecuteWithArgs(ctx, args)` for integration tests that exercise the full CLI pipeline
 - Fuzz targets use inline `f.Add()` for seed corpus; file-based seeds go in `testdata/fuzz/`
 - `NoFlags` is a distinct named type — use `(NoFlags{})` with parens for comparisons
