@@ -54,13 +54,15 @@ func applyToTree(cmd *cobra.Command, theme string) {
 	}
 
 	if cmd.Long != "" {
-		if rendered, err := render(cmd.Long); err == nil {
+		rendered, err := render(cmd.Long)
+		if err == nil {
 			cmd.Long = rendered
 		}
 	}
 
 	if cmd.Example != "" {
-		if rendered, err := render(cmd.Example); err == nil {
+		rendered, err := render(cmd.Example)
+		if err == nil {
 			cmd.Example = rendered
 		}
 	}

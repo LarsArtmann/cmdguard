@@ -15,10 +15,8 @@ func TestHuhRunner_ImplementsPromptRunner(t *testing.T) {
 func TestHuhRunner_PromptConfirm(t *testing.T) {
 	t.Parallel()
 
-	runner := &HuhRunner{}
-	if runner == nil {
-		t.Fatal("HuhRunner instance is nil")
-	}
+	var runner v3.PromptRunner = &HuhRunner{}
+	_ = runner
 }
 
 func TestRegister_DoesNotPanic(t *testing.T) {

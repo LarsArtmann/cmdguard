@@ -224,12 +224,14 @@ linters:
             - go.opentelemetry.io/otel/codes
             - go.opentelemetry.io/otel/trace
             - go.opentelemetry.io/otel/trace/embedded
+            - go.opentelemetry.io/otel/trace/noop
           files:
             - $test
           list-mode: strict
     exhaustruct:
       exclude:
         - os/exec.Cmd
+        - github.com/spf13/cobra.Command
     funlen:
       lines: 80
       statements: 60

@@ -16,8 +16,8 @@ type testConfig struct {
 func TestMiddleware_ReturnsNonNil(t *testing.T) {
 	t.Parallel()
 
-	mw := Middleware[testConfig]("Loading...")
-	if mw == nil {
+	middleware := Middleware[testConfig]("Loading...")
+	if middleware == nil {
 		t.Fatal("Middleware returned nil")
 	}
 }
@@ -25,13 +25,13 @@ func TestMiddleware_ReturnsNonNil(t *testing.T) {
 func TestMiddlewareWithConfig_ReturnsNonNil(t *testing.T) {
 	t.Parallel()
 
-	mw := MiddlewareWithConfig[testConfig](Config{
+	middleware := MiddlewareWithConfig[testConfig](Config{
 		Title:    "Working",
 		Frames:   []string{"|", "/", "-", "\\"},
 		Interval: 50 * time.Millisecond,
 		Writer:   &bytes.Buffer{},
 	})
-	if mw == nil {
+	if middleware == nil {
 		t.Fatal("MiddlewareWithConfig returned nil")
 	}
 }
@@ -44,14 +44,14 @@ func TestMiddleware_NilTracerSkips(t *testing.T) {
 	info := v3.CommandInfo{Name: "test", Phase: v3.PhaseRun}
 
 	called := false
-	mw := MiddlewareWithConfig[testConfig](Config{
+	middleware := MiddlewareWithConfig[testConfig](Config{
 		Title:    "Loading",
 		Frames:   []string{"-"},
 		Interval: 10 * time.Millisecond,
 		Writer:   &bytes.Buffer{},
 	})
 
-	err := mw(ctx, cfg, info, func() error {
+	err := middleware(ctx, cfg, info, func() error {
 		called = true
 
 		return nil

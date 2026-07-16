@@ -37,13 +37,13 @@ func Generate[T any](cli *v3.CLI[T], section uint) (string, error) {
 }
 
 // Write generates and writes a roff man page to the given writer.
-func Write[T any](cli *v3.CLI[T], w io.Writer, section uint) error {
+func Write[T any](cli *v3.CLI[T], writer io.Writer, section uint) error {
 	content, err := Generate[T](cli, section)
 	if err != nil {
 		return fmt.Errorf("section=%d: %w", section, err)
 	}
 
-	_, err = fmt.Fprint(w, content)
+	_, err = fmt.Fprint(writer, content)
 	if err != nil {
 		return fmt.Errorf("writing man page: %w", err)
 	}
@@ -76,5 +76,10 @@ func GenerateCommand[T any](cli *v3.CLI[T]) (*cobra.Command, error) {
 // NewManPage creates a mango man page from a cobra command.
 // Useful for custom man page generation pipelines.
 func NewManPage(section uint, cmd *cobra.Command) (*mango.ManPage, error) {
-	return mcobra.NewManPage(section, cmd)
+	mp, err := mcobra.NewManPage(section, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("creating man page: %w", err)
+	}
+
+	return mp, nil
 }

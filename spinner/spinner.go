@@ -30,6 +30,7 @@ import (
 
 const defaultInterval = 100 * time.Millisecond
 
+//nolint:gochecknoglobals // package-level default frame set for braille spinners
 var defaultFrames = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 
 // Config configures the visual appearance of the spinner middleware.
@@ -90,8 +91,10 @@ type textSpinner struct {
 
 func newTextSpinner(cfg Config) *textSpinner {
 	return &textSpinner{
-		cfg:    cfg,
-		stopCh: make(chan struct{}),
+		cfg:      cfg,
+		stopCh:   make(chan struct{}),
+		stopOnce: sync.Once{},
+		mu:       sync.Mutex{},
 	}
 }
 

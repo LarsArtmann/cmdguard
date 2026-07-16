@@ -350,8 +350,7 @@ go build ./...                                   # Verify build
 - **telemetry** — `TelemetryMiddleware[T]` starts a span per command but cannot propagate the new context to the handler (`next func() error` signature); child spans must use the original context.
 - **prompts** — provides the `huh/v2` implementation of the core `PromptRunner` interface; wire via `SetPromptRunner()`.
 - **manpage** — `manpage.GenerateCommand` produces roff man pages via `muesli/mango-cobra`.
-
-#### Audit Log
+- **Lint** — all 5 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list.
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.
