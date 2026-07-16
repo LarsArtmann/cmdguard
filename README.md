@@ -3,7 +3,6 @@
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v3.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)
-[![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/cmdguard)](https://goreportcard.com/report/github.com/larsartmann/cmdguard)
 [![Coverage](https://img.shields.io/badge/coverage-87.6%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
