@@ -136,30 +136,30 @@ go get github.com/larsartmann/cmdguard
 
 ### Production Code Coupling Matrix
 
-| File → depends on  | errors | config | config_parse | config_set | flags | flags_parse | flags_validate | flags_suggest | flag_helpers | type_handler | type_helpers | types\_\* | scope | flow_ctx | middleware | cli | cli_options | cli_accessors | cli_command | cli_output | output | command | completion | editor | manpage | suggest |
+| File → depends on | errors | config | config_parse | config_set | flags | flags_parse | flags_validate | flags_suggest | flag_helpers | type_handler | type_helpers | types\_\* | scope | flow_ctx | middleware | cli | cli_options | cli_accessors | cli_command | cli_output | output | command | completion | editor | manpage | suggest |
 | ------------------ | ------ | ------ | ------------ | ---------- | ----- | ----------- | -------------- | ------------- | ------------ | ------------ | ------------ | --------- | ----- | -------- | ---------- | --- | ----------- | ------------- | ----------- | ---------- | ------ | ------- | ---------- | ------ | ------- | ------- | --- |
-| cli.go             | ●      |        |              |            | ●     |             |                |               |              |              |              |           | ●     | ●        | ●          |     | ●           |               | ●           | ●          | ●      | ●       |            |        |         |         |     |
-| cli_command.go     | ●      |        |              |            | ●     |             |                |               | ●            | ●            |              |           |       |          | ●          | ●   |             |               |             |            |        | ●       | ●          |        |         |         |
-| cli_options.go     |        |        |              |            |       |             |                |               |              |              |              |           | ●     |          | ●          | ●   |             |               |             |            |        |         |            |        |         |         |
-| cli_accessors.go   |        |        |              |            |       |             |                |               |              |              |              |           | ●     | ●        |            | ●   |             |               |             |            |        |         |            |        |         |         |
-| cli_output.go      |        |        |              |            |       |             |                |               |              |              |              |           |       |          |            | ●   |             | ●             |             |            | ●      |         |            |        |         |         |
-| command.go         | ●      |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |         |
-| config.go          | ●      |        | ●            |            |       |             |                |               |              | ●            |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| config_parsing.go  | ●      |        |              |            |       |             |                |               |              | ●            |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| config_setfield.go | ●      |        |              |            |       |             |                |               |              | ●            |              | ●         |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| flags.go           | ●      |        | ●            |            |       |             | ●              | ●             |              | ●            |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |         |
-| flags_parse.go     | ●      |        |              | ●          | ●     |             |                |               |              | ●            |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| flags_validate.go  | ●      |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| flags_suggest.go   |        |        |              |            | ●     |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| flag_helpers.go    | ●      | ●      |              |            | ●     |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| type_handler.go    |        | ●      | ●            |            |       |             |                |               |              |              |              | ●         |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| type_helpers.go    |        |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| scope.go           | ●      |        |              |            |       |             |                |               |              |              |              |           |       |          |            | ●   | ●           |               |             |            |        |         |            |        |         |
-| flow_context.go    | ●      |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| middleware.go      | ●      |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| output.go          | ●      |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| editor.go          |        |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| manpage.go         |        |        |              |            |       |             |                |               |              |              |              |           |       |          |            | ●   |             |               |             |            |        |         |            |        |         |
-| command_suggest.go |        |        |              |            |       |             |                | ●             |              |              |              |           |       |          |            |     |             |               |             |            |        |         |            |        |         |
-| completion.go      |        |        |              |            |       |             |                |               |              |              |              |           |       |          |            |     |             |               |             | ●          |        |         |            |        |
-| types\_\*.go       | ●      |        |              |            |       |             |                |               |              |              | ●            |           |       |          |            |     |             |               |             |            |        |         |            |        |
+| cli.go | ● | | | | ● | | | | | | | | ● | ● | ● | | ● | | ● | ● | ● | ● | | | | | |
+| cli_command.go | ● | | | | ● | | | | ● | ● | | | | | ● | ● | | | | | | ● | ● | | | |
+| cli_options.go | | | | | | | | | | | | | ● | | ● | ● | | | | | | | | | | |
+| cli_accessors.go | | | | | | | | | | | | | ● | ● | | ● | | | | | | | | | | |
+| cli_output.go | | | | | | | | | | | | | | | | ● | | ● | | | ● | | | | | |
+| command.go | ● | | | | | | | | | | | | | | | | | | | | | | | | | |
+| config.go | ● | | ● | | | | | | | ● | | | | | | | | | | | | | | | |
+| config_parsing.go | ● | | | | | | | | | ● | | | | | | | | | | | | | | | |
+| config_setfield.go | ● | | | | | | | | | ● | | ● | | | | | | | | | | | | | |
+| flags.go | ● | | ● | | | | ● | ● | | ● | | | | | | | | | | | | | | | | |
+| flags_parse.go | ● | | | ● | ● | | | | | ● | | | | | | | | | | | | | | | |
+| flags_validate.go | ● | | | | | | | | | | | | | | | | | | | | | | | | |
+| flags_suggest.go | | | | | ● | | | | | | | | | | | | | | | | | | | | |
+| flag_helpers.go | ● | ● | | | ● | | | | | | | | | | | | | | | | | | | | |
+| type_handler.go | | ● | ● | | | | | | | | | ● | | | | | | | | | | | | | |
+| type_helpers.go | | | | | | | | | | | | | | | | | | | | | | | | | |
+| scope.go | ● | | | | | | | | | | | | | | | ● | ● | | | | | | | | |
+| flow_context.go | ● | | | | | | | | | | | | | | | | | | | | | | | | |
+| middleware.go | ● | | | | | | | | | | | | | | | | | | | | | | | | |
+| output.go | ● | | | | | | | | | | | | | | | | | | | | | | | | |
+| editor.go | | | | | | | | | | | | | | | | | | | | | | | | | |
+| manpage.go | | | | | | | | | | | | | | | | ● | | | | | | | | | |
+| command_suggest.go | | | | | | | | ● | | | | | | | | | | | | | | | | | |
+| completion.go | | | | | | | | | | | | | | | | | | | | ● | | | | |
+| types\_\*.go | ● | | | | | | | | | | ● | | | | | | | | | | | | | |

@@ -2,7 +2,6 @@
 
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
-**Last Updated:** 2026-07-13
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26 (GOEXPERIMENT=jsonv2)
 **Status:** v3.0.0 - zero panics, 87.6% coverage, 0 lint issues, 0 race conditions

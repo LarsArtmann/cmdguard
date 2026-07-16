@@ -129,12 +129,12 @@ Rendering command output in multiple formats.
 
 Interfaces and hooks for customization without modifying core.
 
-| Term              | Definition                                                                   |
+| Term | Definition |
 | ----------------- | ---------------------------------------------------------------------------- | ----------------------------------- |
-| Plugin            | Bundles custom type handlers + validators for one-step registration          |
-| PromptRunner      | Interface for interactive flag prompting (huh/v2 impl in prompts sub-module) |
-| HelpTransformFunc | Function hook for transforming command help text before display              | Glamour sub-module provides an impl |
-| Middleware        | Generic chain type for wrapping command execution                            |
+| Plugin | Bundles custom type handlers + validators for one-step registration |
+| PromptRunner | Interface for interactive flag prompting (huh/v2 impl in prompts sub-module) |
+| HelpTransformFunc | Function hook for transforming command help text before display | Glamour sub-module provides an impl |
+| Middleware | Generic chain type for wrapping command execution |
 
 ---
 

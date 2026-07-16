@@ -88,16 +88,14 @@
             <pre class="text-xs mt-2">
 dispatchParse(tag, value) -&gt; any
   | (no type check)
-setField(cfg, fieldName, any) -&gt; panic</pre
-            >
+setField(cfg, fieldName, any) -&gt; panic</pre>
           </div>
           <div class="after">
             <strong>After</strong>
             <pre class="text-xs mt-2">
 dispatchParse(tag, value) -&gt; (any, error)
   | verify result.Type() == handler.TargetType()
-setField(cfg, fieldName, typed) -&gt; clean error</pre
-            >
+setField(cfg, fieldName, typed) -&gt; clean error</pre>
           </div>
         </div>
       </div>
