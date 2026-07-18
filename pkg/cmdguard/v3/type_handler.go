@@ -10,7 +10,7 @@ import (
 )
 
 // TypeHandler defines how a flag type is registered, parsed, defaulted, and set.
-// NOTE(v4): consider renaming to TypeCodec for precision (see docs/reviews/2026-07-18_09-44_naming-review.html).
+// TODO(v4): consider renaming to TypeCodec for precision (see docs/reviews/2026-07-18_09-44_naming-review.html).
 type TypeHandler interface {
 	Register(flags *pflag.FlagSet, tag FlagTag) error
 	Parse(value string, tag FlagTag) (any, error)

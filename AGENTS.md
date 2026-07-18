@@ -237,8 +237,9 @@ go build ./...                                   # Verify build
 - `gochecknoglobals` for `globalTypeRegistry`, `globalValidators`, `regexCache` — package-level registries are the COW pattern's foundation (ADR principle #11); injecting them would break the public `RegisterTypeHandler`/`RegisterValidator` API
 - `gochecknoglobals` for `argsKey`/`configKey` in `cli_command.go` — context keys must be package-level (Go convention)
 - `forbidigo` for `example_test.go` — godoc examples must use `fmt.Println`
+- `godox` source-pattern exclusion for `TODO(v4)` — the 3 `TODO(v4):` markers (`type_handler.go:13`, `middleware.go:40`, `prompts/prompts.go:27`) track deferred v4 breaking changes (public API renames from the 2026-07-18 naming review) that cannot ship in v3.x without breaking downstream consumers. They MUST stay `TODO` (not `NOTE`) so `grep TODO` finds them, and they are cross-referenced from `ROADMAP.md` §"Deferred from 2026-07-18 Audit Closure". The exclusion is deliberately narrow (`TODO\(v4\)` only) — bare `TODO` and `TODO(*)` are still flagged. **Do not broaden this pattern to dodge godox on real work items; either fix the work, defer it to ROADMAP, or scope it to `TODO(vN)`.**
 
-**Exclusion count:** 4 per-file v3 exclusion rules + 4 ireturn allow-list entries. Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
+**Exclusion count:** 4 per-file v3 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v4)`). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
 
 ### v3 Design Principles
 

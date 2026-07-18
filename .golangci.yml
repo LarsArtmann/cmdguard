@@ -300,6 +300,13 @@ linters:
       - legacy
       - std-error-handling
     rules:
+      # Allow scoped TODO(v4) markers for deferred v4 breaking changes tracked in ROADMAP.md
+      # ("Deferred from 2026-07-18 Audit Closure"). These are real actionable work items that
+      # must stay grep-discoverable as TODOs; they cannot be fixed in v3.x without breaking
+      # the public API. Narrow pattern: only TODO(v4) is exempted, not TODO(*) or bare TODO.
+      - source: 'TODO\(v4\)'
+        linters:
+          - godox
       - path: _test\.go$
         linters:
           - gocyclo

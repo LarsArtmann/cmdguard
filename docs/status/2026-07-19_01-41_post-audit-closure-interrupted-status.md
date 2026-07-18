@@ -45,13 +45,15 @@ These 17 items are complete, verified, and in commit `eb8586a`:
 
 ## B) PARTIALLY DONE (shipped but incomplete or compromised)
 
-### L1.03 — Add 4 inline TODOs → **shipped as `NOTE`, not `TODO`**
+### L1.03 — Add 4 inline TODOs → **shipped as `NOTE`, not `TODO`** → **RE-RESOLVED 2026-07-19**
 
 **What happened:** The plan said "add inline `// TODO(v4):` markers." I added them. Then `godox` linter flagged all 4. I tried `//nolint:godox` — didn't work on comment-only lines. I tried adding periods for `godot`. Finally I changed `TODO` → `NOTE` (which godox doesn't flag).
 
-**Compromise:** The intent (surface the decision at the code site) is preserved, but the marker is `NOTE(v4)` not `TODO(v4)`. `grep TODO` won't find these. The prompts sub-module (`HuhRunner`) was also affected.
+**Original compromise (now reverted):** The intent (surface the decision at the code site) was preserved, but the marker was `NOTE(v4)` not `TODO(v4)`. `grep TODO` wouldn't find these. This created split-brain: ROADMAP.md:205, the D2 file (`Status: TODO(v4) added`), and the brutal-self-review all referenced `TODO(v4)` while the source said `NOTE(v4)`.
 
 **Root cause:** I didn't check whether the project's `godox` linter would accept `TODO` before adding 4 of them. 4+ iterations on a 15-minute task.
+
+**Resolution (2026-07-19):** All 3 source markers converted back to `TODO(v4)` (the testutil `NOTE:` on `ContainsString` is a backward-looking "do not reintroduce" guard, not a deferred work item, and correctly stays `NOTE`). Added a narrow `source: 'TODO\(v4\)'` exclusion rule for `godox` in `.golangci.yml` with a 4-line comment explaining the rationale and scope (only `TODO(v4)` is exempt — not bare `TODO` or `TODO(*)`). `golangci-lint run ./...` → 0 issues. `go test ./... -race` → all green. Source now matches ROADMAP, D2, and brutal-self-review. `grep TODO` finds the deferred v4 work again.
 
 ### L1.15 — Spot-check website guides → **only 2 of ~5 drifted guides fixed**
 
@@ -164,8 +166,8 @@ Sorted by priority within each tier.
 
 ### P2 — Fix the compromises (15-22)
 
-15. Decide: keep `NOTE(v4)` markers, or configure `godox` to allow `TODO(v4)` via `.golangci.yml`
-16. If keeping `NOTE`, update the naming-review HTML appendix to say `NOTE` not `TODO`
+15. ~~Decide: keep `NOTE(v4)` markers, or configure `godox` to allow `TODO(v4)` via `.golangci.yml`~~ **DONE 2026-07-19** — converted all 3 to `TODO(v4)` + added narrow `source: 'TODO\(v4\)'` godox exclusion in `.golangci.yml`. See L1.03 resolution above.
+16. ~~If keeping `NOTE`, update the naming-review HTML appendix to say `NOTE` not `TODO`~~ **N/A** — decision was to use `TODO(v4)`, matching all existing references (ROADMAP, D2, brutal-self-review). No HTML update needed.
 17. Take screenshots of the website (dark + light, hero + comparison) for the frontend-design review
 18. Design a real signature element for the website hero (before/after split, terminal-style error, construction animation — pick one)
 19. Fix the hero-code duplication: extract a single source, derive the highlighted version, or add a test that diffs them
@@ -188,7 +190,7 @@ Sorted by priority within each tier.
 
 ### P4 — Quality improvements (33-42)
 
-33. Replace the hand-maintained `NOTE(v4)` markers with a `//go:generate` script that scans for them and produces a report
+33. Replace the hand-maintained `TODO(v4)` markers with a `//go:generate` script that scans for them and produces a report
 34. Add a `make fmt-check-strict` target that runs `gofumpt -l` and fails on any output
 35. The `frontend-design-review.md` is markdown — consider converting to HTML via the `html-report-kit` skill for consistency with other reviews
 36. The D2 diagram uses hardcoded hex colors — extract to a shared palette file
