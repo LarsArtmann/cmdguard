@@ -245,3 +245,7 @@ The ROADMAP.md lists many v3.0 features that would expand cmdguard beyond CLI co
 - **Option B: Expand to framework** — Invest in v3.0 with the full feature set. Pros: one-stop-shop for Go CLI apps. Cons: scope creep, longer to ship, more surface area to test and maintain.
 
 This is a business/product decision that depends on who the users are and what they need. I cannot determine this from the code alone.
+
+## Resolution (2026-07-18)
+
+This report covers v2.7.0-dev. The project is now at v3.0.0 (module path `github.com/larsartmann/cmdguard/v3`, tagged 2026-07-07); the v2 maintenance line ended at v2.10.4. Coverage is 87.6% across 1429 test runs. The COW registries, cached `UserHomeDir`, and `iter.Seq` methods shipped here survive into v3 core; the "v3.0 redesign Not Started" section is historical only. Fuzz targets grew from 2 to 7.

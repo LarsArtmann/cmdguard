@@ -229,3 +229,7 @@ But this is a fundamental API shape change that affects every consumer. I cannot
 - (C) Something else entirely
 
 This decision shapes the entire v3 API surface. **Which direction do you want?**
+
+## Resolution (2026-07-18)
+
+This v3-redesign session report is largely accurate but predates the v3.0.0 release (tagged 2026-07-07). Resolutions since: the §b "Not Started" extractions are now done — the project ships 6 Go modules (core + telemetry, manpage, glamour, prompts, spinner), all at repo root for external resolution. The §d #1 "CLIOption still generic" self-criticism was acted on (sealed-interface pattern applied). §d #3 (go.work.sum/replace directives) resolved pre-release. Current metrics: 87.6% coverage, 1429 test runs, 0 lint issues, jsonv2 migration embraced 2026-07-14.

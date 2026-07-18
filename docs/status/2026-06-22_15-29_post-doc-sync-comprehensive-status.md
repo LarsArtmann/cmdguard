@@ -335,3 +335,7 @@ I cannot resolve:
 ---
 
 _Generated 2026-06-22 15:29 — point-in-time snapshot._
+
+## Resolution (2026-07-18)
+
+v2.8.1 snapshot. Current release is v3.0.0 (`github.com/larsartmann/cmdguard/v3`, tagged 2026-07-07); v2 frozen at v2.10.4. The "v3.0 Major Redesign / Not Started" section is historical — v3 shipped. The §d Git-Tag/CHANGELOG inconsistency table (v0.2.0, v1.0.0 missing CHANGELOG entries; v2.0.0/v2.1.0 missing tags) appears to remain an open historical-record issue worth verifying against the current CHANGELOG.md. Coverage is now 87.6% (was 86.6%); tests 1393 → 1429 runs.

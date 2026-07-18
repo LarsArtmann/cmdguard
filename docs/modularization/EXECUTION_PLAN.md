@@ -593,3 +593,7 @@ Task 11: chore(cleanup): remove dead code (ErrLogLevel, ErrLogFormat, unused hel
 
 Task 12: chore(verify): final verification pass across all modules
 ```
+
+## Resolution (2026-07-18)
+
+NOT executed as written. The `/types`, `/output`, `/testutil` module extraction (Tasks 2–8) was abandoned; none of those module directories exist. v3.0.0 (2026-07-07) instead extracted 5 feature sub-modules (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) at the repo root — the curated `go.work` workspace now lists 6 modules. See `PROPOSAL.md` resolution note and CHANGELOG.md §[3.0.0].

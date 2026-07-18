@@ -83,3 +83,7 @@ Revisit when:
 - Package count exceeds 15
 - Clear independent consumers emerge (e.g., someone only wants the type validation without cobra)
 - The library exceeds 15,000 lines
+
+## Resolution (2026-07-18)
+
+The verdict held — the core was **not** split along the proposed types/output/testutil lines. However, v3.0.0 (tagged 2026-07-07) shipped a _different_ modularization: 5 optional-feature sub-modules (`glamour/`, `manpage/`, `prompts/`, `spinner/`, `telemetry/`) were extracted at the **repo root** to isolate heavy opt-in deps (chroma, huh, otel, lipgloss, mango). Core (`types`/`output`/`scope`/`flags`/`config`) stayed cohesive in `pkg/cmdguard/v3` — vindicating this assessment's recommendation. See CHANGELOG.md §[3.0.0] and `docs/architecture-understanding/2026-07-18_20-46_modularity-coupling.html` for the as-shipped modularity audit.

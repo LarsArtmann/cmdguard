@@ -262,3 +262,7 @@ Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygien
 | `cli.go`, `cli_errors_json.go`, `cli_errors_json_test.go`, `cli_core_new_test.go`, `examples/taskctl/main.go`, `README.md`, `AGENTS.md`, `docs/API.md` | **Crush (today)** — cobra-correctness fix       | working, tested, **commit these**        |
 | `config.go`, `config_parsing.go`, `flags.go`, `flags_parse.go`, `cli_accessors.go`, `flags_scoped_test.go` (untracked)                                 | **Pre-existing (not Crush)** — scoped-flags WIP | tests pass, unwired, **leave for owner** |
 | `go.sum`, `examples/taskctl/taskctl-audit.html` (untracked)                                                                                            | Pre-existing / generated                        | unrelated, **leave**                     |
+
+## Resolution (2026-07-18)
+
+This was a pre-commit working-tree snapshot at v2.9.0. Every "today's fix" item here shipped the same day: `SilenceUsage=true` default + public `ExitCode` + example fix landed in commit `03db723`; scoped flags (`local:"true"`) committed in `c60f690` and wired into the execution path before v2.10.0. v3.0.0 was released 2026-07-07; the v2 line froze at v2.10.4.

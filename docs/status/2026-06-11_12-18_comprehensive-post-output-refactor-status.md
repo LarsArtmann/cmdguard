@@ -415,3 +415,7 @@ All changes are in the working tree, ready to commit:
 ```
 
 **Verification:** `go build ./...` ✅ · `go test ./... -race` ✅ (410 tests) · `golangci-lint run ./...` ✅ (0 issues) · `go mod tidy` ✅
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). The "one real blocker" — 10 `go.mod` replace directives (§Executive Summary) — is fully resolved: go-output is at v0.30.4 and samber-do-auditlog at v0.5.0, no replace directives remain. Current metrics: 1429 test runs (was 404), 87.6% coverage (was 85.9%), 58 sentinel errors (was "60+"), 26 benchmarks (was 22), 7 fuzz targets (unchanged). jsonv2 (`GOEXPERIMENT=jsonv2`) was adopted 2026-07-14.

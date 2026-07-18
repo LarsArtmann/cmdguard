@@ -163,3 +163,7 @@ go get github.com/larsartmann/cmdguard
 | command_suggest.go | | | | | | | | ● | | | | | | | | | | | | | | | | | |
 | completion.go | | | | | | | | | | | | | | | | | | | | ● | | | | |
 | types\_\*.go | ● | | | | | | | | | | ● | | | | | | | | | | | | | |
+
+## Resolution (2026-07-18)
+
+The 'Proposed Dependency Graph' (splitting into `/types`, `/output`, `/testutil` modules) did NOT ship — none of those module directories were ever created. v3.0.0 instead modularized along feature lines: 5 sub-modules (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) live at the repo root. The 'Current Dependency Graph' here reflects v2.x: package path is now `/v3`, go-output advanced v0.2.0 → v0.30.4, and the root `go.mod` now also pulls `samber-do-auditlog v0.5.0`, koanf, and `lipgloss/v2` (sub-module deps).

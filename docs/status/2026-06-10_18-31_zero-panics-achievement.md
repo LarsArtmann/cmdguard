@@ -276,3 +276,7 @@ This is a product/strategy decision I cannot make.
 
 - `examples/taskctl/commands.go`, `examples/taskctl/main_test.go`
 - `benchmarks/guard_bench_test.go`
+
+## Resolution (2026-07-18)
+
+The "v2.5.0 or v3.0.0?" question in §G was resolved: this shipped as **v3.0.0 (2026-07-07)** on module path `github.com/larsartmann/cmdguard/v3`, not v2.5.0. The v2 line ended at v2.10.4. The `NO_COLOR` env mutation flagged in §F was fixed (commit `e53c8e6`). Zero-panics contract holds in v3 (no `Must*` variants exist).

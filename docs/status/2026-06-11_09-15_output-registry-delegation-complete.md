@@ -63,3 +63,7 @@ Replaced cmdguard's custom FormatStrategy registry (5 types, 16 entries, 2 free 
 ## Remaining go-mod Replace Directives
 
 Local replace directives for go-output sub-modules are needed until v0.9.0 is tagged. Once tagged, remove the replace block from go.mod.
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). The "tag go-output v0.9.0 then remove replace directives" follow-up shipped the next day (see `2026-06-12_03-33` report, items 1-2). go-output is now at v0.30.4; no replace directives remain in any of the 6 module `go.mod` files. `OutputStyledTable` (deprecated here) was removed in the v3 line.

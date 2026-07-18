@@ -141,3 +141,7 @@ Here's why I'm stuck:
 ---
 
 _Generated from session work on 2026-07-05. Scope: dependency freshness audit only._
+
+## Resolution (2026-07-18)
+
+"All deps at latest" was true on 2026-07-05 but is no longer: go-output has moved v0.23.3 → v0.30.4 and samber-do-auditlog v0.3.1 → v0.5.0 (jsonv2 migration embraced 2026-07-14). The §g "v2.10.1 vs v2.10.2?" question is moot — v3.0.0 superseded both (tagged 2026-07-07, module `github.com/larsartmann/cmdguard/v3`); v2 frozen at v2.10.4. Re-run a dep-freshness audit before trusting any version number in this report.

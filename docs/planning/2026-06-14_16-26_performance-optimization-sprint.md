@@ -260,3 +260,7 @@ graph TD
 - **Pre-build middleware chain** — requires breaking API change; deferred to v3.0
 - **Binary size reduction** — requires go-output module restructure; v3.0 scope
 - **v3.0 roadmap items** — plugin system, nested structs, etc. — separate sprint
+
+## Resolution (2026-07-18)
+
+Optimizations M1–M6 (COW type/validator registries, cached `UserHomeDir`, `iter.Seq` variants, `sync.OnceValue`) shipped and survive in `github.com/larsartmann/cmdguard/v3` — see ADR-003 (COW pattern). The "v2.6.0 / 85.5%" baseline is stale (now v3.0.0, 87.6% coverage). Historical snapshot.

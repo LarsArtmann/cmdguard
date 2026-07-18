@@ -222,3 +222,7 @@ The following open items persist from prior status reports (most recent: `2026-0
 ---
 
 **Session complete. All 20 clones migrated. 0 lint, 0 race, 0 harmful duplication. Awaiting instructions.**
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). The 3-helper split (`addCommand`/`testutil.AddCommand`/`registerCommand`) and the §G question about a public `v2test` package are historical — v3's 6-module structure (core + glamour/manpage/prompts/spinner/telemetry) redefines test-helper boundaries. Verify against current `pkg/cmdguard/v3` before relying on any helper name here.

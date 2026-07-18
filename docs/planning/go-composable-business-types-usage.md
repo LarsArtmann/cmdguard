@@ -448,3 +448,7 @@ This integration enables building CLI applications with the same level of type s
 2. Create example application
 3. Add integration tests
 4. Update documentation
+
+## Resolution (2026-07-18)
+
+**NOT IMPLEMENTED.** `go-composable-business-types` was never added to any module's `go.mod`, and no `examples/branded-ids/` exists. All code samples use the superseded `/v2` import path and the pre-v3 generic `Command[...]` API. Either execute the integration against `/v3` or archive this doc. Flagged for docs-health review (this file lives alongside dated historical plans but lacks a date stamp and reads as a living reference — its truthiness needs an explicit decision).

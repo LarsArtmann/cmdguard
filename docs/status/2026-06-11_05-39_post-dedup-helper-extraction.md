@@ -317,3 +317,7 @@ art-dupl --semantic --sort total-tokens -t 15 --only go pkg tests examples
 Awaiting user instruction on (a) commit message format/length preference, (b) whether to
 proceed with items 1-7 of the "Top #25" list, and (c) the open question in section (g) about
 the `v2test` package split.
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). The `output.go` 17-clone `registerXFormat` target flagged in §E.7 was resolved by the FormatStrategy refactor (see `2026-06-11_08-51` and `2026-06-11_09-15` reports) and ultimately by delegation to go-output v0.30.4 in v3. `output.go` no longer maintains a cmdguard-side format registry.

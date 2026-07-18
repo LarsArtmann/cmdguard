@@ -164,3 +164,7 @@ go-output v0.8.0 has the infrastructure (`RegisterTableDataMarshaler`, `RenderTa
 
 1. Commit the output.go refactor + tests (current working state)
 2. Then proceed with items #1-3 from the top 25 list
+
+## Resolution (2026-07-18)
+
+Superseded — this design was replaced the same day. The `FormatStrategy` interface + 5 strategy structs + cmdguard-side `formatRegistry` described here were discarded in favor of delegating to go-output's upstream `RenderTableData`/`RenderAnyData` registries (see `2026-06-11_09-15_output-registry-delegation-complete.md`). In v3.0.0, `output.go` no longer defines these types. The §f.10/11 upstream-contribution proposals shipped (`AnyDataMarshaler` registry and 16 `TableDataMarshaler` registrations were added to go-output).

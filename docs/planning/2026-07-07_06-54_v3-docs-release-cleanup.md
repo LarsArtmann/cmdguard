@@ -202,3 +202,7 @@ flowchart TD
 - **ROADMAP completed section is historical** — only add a migration note, don't rewrite history.
 - **Doc-only changes can't break build** — but verify anyway after each logical group.
 - **Never `git restore`/`git reset`** files I didn't change.
+
+## Resolution (2026-07-18)
+
+EXECUTED, then superseded by further dependency bumps. This plan corrected the v3 docs, but its "ground truth" versions (go-output v0.30.1, auditlog v0.4.0) are now stale — current `go.mod` pins go-output v0.30.4 and auditlog v0.5.0 (bumped via the 2026-07-14 jsonv2 migration). Historical snapshot.

@@ -335,3 +335,7 @@ cmdguard (6 direct deps: cobra, pflag, do, fang, go-toml, x/term)
 ├── cmdguard/auditlog (samber-do-auditlog — optional)
 └── cmdguard/output (go-output — optional)
 ```
+
+## Resolution (2026-07-18)
+
+SHIPPED as v3.0.0 (2026-07-07). Tasks 1–10 (non-generic `CommandOption`, sealed lifecycle hooks, `go.work` mono-repo with extracted sub-modules) are done. Note the actual module layout differs from the plan's `pkg/cmdguard/v2/` paths: core is `github.com/larsartmann/cmdguard/v3` (under `pkg/cmdguard/v3/`), and 5 sub-modules live at the **repo root** (`glamour/`, `manpage/`, `prompts/`, `spinner/`, `telemetry/`) — not under `pkg/cmdguard/` — so their module paths resolve for external consumers.

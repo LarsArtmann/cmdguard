@@ -194,3 +194,7 @@ Making `Enum` generic would eliminate the boilerplate pattern where `LogLevel`/`
 - Alternative: Keep `Enum` concrete, add a `DefineEnum(name, values)` helper that returns a typed wrapper
 
 The question is whether the boilerplate reduction (4 methods × N enum types) justifies the API complexity of generics for what is fundamentally a CLI library, not a types library. This is a design judgment call that needs the project owner's input.
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). Current state: 6 Go modules (core + glamour/manpage/prompts/spinner/telemetry), go-output v0.30.4, 87.6% coverage, 1429 test runs, 58 sentinel errors. The "Enum generic" open question (§G) and removal of `ErrNoFlags`/`ErrTooFewArgs`/`ErrTooManyArgs` were resolved in the v3 line (see `2026-06-12_03-33` report, items 4 & 20). Tests 395 → 1429; coverage 85.4% → 87.6%.

@@ -199,3 +199,7 @@ The tradeoff: this would couple the doctor command to the output system (which b
 **The library is production-ready and spotless.** All critical issues from the first sprint are fixed. All audit findings from the second pass are resolved. Zero lint, zero race, zero build errors.
 
 **Overall health: 9.8/10** (docked for pre-existing `pkg/testutil` issue and missing CODECOV_TOKEN).
+
+## Resolution (2026-07-18)
+
+Many P6 "v3 breaking change" items deferred here shipped in v3.0.0 (2026-07-07): `NoFlags` is now a distinct named type, `WithColor` was removed. The DoctorCommand and configload refactors landed on `/v2` and were carried into `/v3`. Coverage 82.9% → 87.6%.

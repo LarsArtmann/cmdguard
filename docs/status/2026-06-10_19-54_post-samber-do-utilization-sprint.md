@@ -196,3 +196,7 @@ The tradeoff: samber/do's native approach gives dependency-aware parallel shutdo
 ---
 
 _Generated: 2026-06-10 19:54_
+
+## Resolution (2026-07-18)
+
+The `WithGracefulShutdown`, `Override[T]`, `CloneScope`, `WithDILogging` features landed here on `/v2` and were carried into v3.0.0 (2026-07-07). The `injector.ShutdownOnSignals()` vs defer open question was kept — v3 still uses the defer approach. Coverage 83.9% → 87.6%.

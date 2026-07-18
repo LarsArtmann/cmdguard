@@ -321,3 +321,7 @@ a69e0ea docs,test,refactor: post-sprint cleanup — table alignment, test dedupl
 **Next action:** Awaiting user direction. The campaign is at a stable, well-triage'd endpoint.
 Recommended next step is the `output.go` Formatter strategy refactor (Appendix E #1) or adding CI
 (#2). See question in section g) for the open architectural call.
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). The §c.1 `output.go` 17-clone architectural target was executed (FormatStrategy → go-output delegation) and is gone in v3. "No CI observed" (§c.10) is outdated — BuildFlow pre-commit hook now gates commits. Coverage is 87.6% (was 85.0%).

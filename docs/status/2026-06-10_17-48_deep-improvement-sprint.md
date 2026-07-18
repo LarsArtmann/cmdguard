@@ -241,3 +241,7 @@ If v3 is on the table, several Tier 3 items collapse into a single coordinated A
 e3cd57b test(cmdguard): add tests for MustVersionCommand and GenerateVersionCommand
 b62aed4 test(cmdguard): add comprehensive tests for formatFieldValue
 ```
+
+## Resolution (2026-07-18)
+
+The `configload.Auto()` JSON-only bug fix (commit `6d832e3`) and `Package()` panic fix shipped here on `/v2` and were carried into v3.0.0 (2026-07-07). Coverage 84.0% → 87.6%.

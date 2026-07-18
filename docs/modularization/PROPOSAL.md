@@ -409,3 +409,7 @@ Update to build each module independently. Not blocking — can be done after.
 - **Not splitting integration tests** — They test the complete system
 - **Not changing the public API** — All existing types, functions, and options remain available from `pkg/cmdguard/v2`
 - **Not creating `internal/` packages** — Everything remains publicly importable
+
+## Resolution (2026-07-18)
+
+Superseded. Neither `cmdguard-types` nor `cmdguard-output` was created — value types and output rendering stayed in core `pkg/cmdguard/v3`. v3.0.0 shipped as a _breaking_ major version on module path `github.com/larsartmann/cmdguard/v3` (NOT the non-breaking `/v2` re-export strategy proposed here) and modularized instead into 5 feature sub-modules at the repo root: `glamour`, `manpage`, `prompts`, `spinner`, `telemetry`. See CHANGELOG.md §[3.0.0] and `docs/MIGRATION_v2_v3.md`.

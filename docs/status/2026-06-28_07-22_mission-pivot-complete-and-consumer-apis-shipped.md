@@ -201,3 +201,7 @@ Sorted by **impact × readiness** (consumer value first, then mission, then hygi
 | `hidden:"true"` tag                    | `config.go` + `config_parsing.go` | Exclude flag from --help, keep functional                |
 | `local:"true"` tag                     | `config.go` + `config_parsing.go` | Root-only flag, not inherited by subcommands             |
 | `SilenceUsage = true` default          | `cli.go`                          | Kills usage-on-error footgun by default                  |
+
+## Resolution (2026-07-18)
+
+v2.10.0-cycle session report. The "release v2.10.0 now?" question in §g was resolved same day: v2.10.0 shipped (tag `facb706` → commit `72059b2`). Current release is v3.0.0 (`github.com/larsartmann/cmdguard/v3`, 2026-07-07); v2 frozen at v2.10.4. The four escape-hatch APIs shipped here (`ConfigFromContext`, `WithPostFlagParse`, `hidden:"true"`, scoped flags) survive into v3, but `Command[T,F]` was made non-generic (positional flags, `WithFlags` deleted) in the 2026-07-06 v3 redesign.

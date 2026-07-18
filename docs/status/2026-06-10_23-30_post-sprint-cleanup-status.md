@@ -239,3 +239,7 @@ If we make it generic (`type Enum[T ~string] struct {...}`):
 | Command options       | 19                                                                            |
 | Dependencies          | 23 direct                                                                     |
 | 0% coverage functions | 10 real (+ 5 false)                                                           |
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). The `samber-do-auditlog` local-replace debt (§D.3) is resolved — it is now published at v0.5.0 and consumed from the Go module proxy. Coverage is 87.6% (was 85.1%). The Enum-generic / koanf / Emptyable proposals in §C and §E were not adopted in v3; consult current `pkg/cmdguard/v3` for the actual type model.

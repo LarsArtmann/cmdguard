@@ -822,14 +822,17 @@
       </aside>
       <main class="main">
         <div class="hero">
-          <div class="hero-shapes"><div class="circle"></div><div class="square"></div><div class="tri"></div></div>
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
           <div class="hero-badge">Architecture Review</div>
           <h1>cmdguard v3.0.0 &mdash; Modularity, Coupling &amp; Module Boundaries</h1>
           <p class="hero-subtitle">
-            Combined architecture-review + go-modularize proposal. The 6-module
-            split (core + glamour/manpage/prompts/spinner/telemetry) is already
-            at the Unix-philosophy target. No split or merge is recommended.
-            All 12 modularization failure modes are absent.
+            Combined architecture-review + go-modularize proposal. The 6-module split (core +
+            glamour/manpage/prompts/spinner/telemetry) is already at the Unix-philosophy target. No
+            split or merge is recommended. All 12 modularization failure modes are absent.
           </p>
         </div>
 
@@ -848,39 +851,90 @@
 
         <h2 id="summary"><span class="num">00</span>Summary</h2>
         <div class="stat-grid">
-          <div class="stat-card stat-good"><div class="stat-value">6</div><div class="stat-label">Go modules</div></div>
-          <div class="stat-card stat-good"><div class="stat-value">13</div><div class="stat-label">Direct deps (core)</div></div>
-          <div class="stat-card stat-good"><div class="stat-value">7</div><div class="stat-label">Packages in core</div></div>
-          <div class="stat-card stat-good"><div class="stat-value">0</div><div class="stat-label">Coupling hotspots</div></div>
-          <div class="stat-card stat-good"><div class="stat-value">0/12</div><div class="stat-label">Failure modes present</div></div>
-          <div class="stat-card stat-good"><div class="stat-value">A</div><div class="stat-label">Composability grade</div></div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">6</div>
+            <div class="stat-label">Go modules</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">13</div>
+            <div class="stat-label">Direct deps (core)</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Packages in core</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Coupling hotspots</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0/12</div>
+            <div class="stat-label">Failure modes present</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">A</div>
+            <div class="stat-label">Composability grade</div>
+          </div>
         </div>
 
         <div class="card card-solution">
           <h4>Verdict: architecture is at target &mdash; do not re-split or merge</h4>
           <p>
-            The 6-module structure follows the Unix philosophy: each module
-            does one thing, composes via thin interfaces
-            (<code>Middleware[T]</code>, <code>PromptRunner</code>,
-            <code>WithHelpTransform[T]</code>), and can be imported
-            independently. A consumer who wants only the core CLI pays for
-            13 direct deps; one who wants spinner middleware imports the
-            <code>spinner</code> sub-module and pays only for lipgloss.
-            <code>GOWORK=off go build ./...</code> passes per-module,
-            confirming no workspace-only coupling. No changes recommended.
+            The 6-module structure follows the Unix philosophy: each module does one thing, composes
+            via thin interfaces (<code>Middleware[T]</code>, <code>PromptRunner</code>,
+            <code>WithHelpTransform[T]</code>), and can be imported independently. A consumer who
+            wants only the core CLI pays for 13 direct deps; one who wants spinner middleware
+            imports the <code>spinner</code> sub-module and pays only for lipgloss.
+            <code>GOWORK=off go build ./...</code> passes per-module, confirming no workspace-only
+            coupling. No changes recommended.
           </p>
         </div>
 
         <h2 id="modularity"><span class="num">01</span>Modularity Score</h2>
         <table>
-          <thead><tr><th>Signal</th><th>Evidence</th><th>Score</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Signal</th>
+              <th>Evidence</th>
+              <th>Score</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>One responsibility per module</td><td>glamour=markdown, manpage=roff, prompts=huh, spinner=lipgloss, telemetry=otel</td><td><span class="badge badge-fixed">A</span></td></tr>
-            <tr><td>Thin public surface</td><td>Each sub-module exports 1-3 types; core is the only thick module</td><td><span class="badge badge-fixed">A</span></td></tr>
-            <tr><td>Mechanism not policy</td><td>Core defines <code>PromptRunner</code> interface; prompts sub-module provides huh impl</td><td><span class="badge badge-fixed">A</span></td></tr>
-            <tr><td>Independent versioning possible</td><td>Each sub-module has own go.mod; versioned together but could diverge</td><td><span class="badge badge-fixed">A</span></td></tr>
-            <tr><td>Faster CI per module</td><td>Sub-module smoke CI runs <code>go build ./...</code> only for changed module</td><td><span class="badge badge-fixed">A</span></td></tr>
-            <tr><td><code>internal/</code> usage</td><td>None &mdash; the v3 package IS the surface; internals are unexported fields/types</td><td><span class="badge badge-medium">N/A</span></td></tr>
+            <tr>
+              <td>One responsibility per module</td>
+              <td>glamour=markdown, manpage=roff, prompts=huh, spinner=lipgloss, telemetry=otel</td>
+              <td><span class="badge badge-fixed">A</span></td>
+            </tr>
+            <tr>
+              <td>Thin public surface</td>
+              <td>Each sub-module exports 1-3 types; core is the only thick module</td>
+              <td><span class="badge badge-fixed">A</span></td>
+            </tr>
+            <tr>
+              <td>Mechanism not policy</td>
+              <td>
+                Core defines <code>PromptRunner</code> interface; prompts sub-module provides huh
+                impl
+              </td>
+              <td><span class="badge badge-fixed">A</span></td>
+            </tr>
+            <tr>
+              <td>Independent versioning possible</td>
+              <td>Each sub-module has own go.mod; versioned together but could diverge</td>
+              <td><span class="badge badge-fixed">A</span></td>
+            </tr>
+            <tr>
+              <td>Faster CI per module</td>
+              <td>Sub-module smoke CI runs <code>go build ./...</code> only for changed module</td>
+              <td><span class="badge badge-fixed">A</span></td>
+            </tr>
+            <tr>
+              <td><code>internal/</code> usage</td>
+              <td>
+                None &mdash; the v3 package IS the surface; internals are unexported fields/types
+              </td>
+              <td><span class="badge badge-medium">N/A</span></td>
+            </tr>
           </tbody>
         </table>
 
@@ -893,26 +947,34 @@
           </p>
           <ul>
             <li><code>glamour</code> &rarr; <code>WithHelpTransform[T](fn)</code> hook</li>
-            <li><code>prompts</code> &rarr; <code>PromptRunner</code> interface + <code>SetPromptRunner()</code></li>
-            <li><code>spinner</code> / <code>telemetry</code> &rarr; <code>Middleware[T]</code> hook</li>
-            <li><code>manpage</code> &rarr; consumes <code>*cobra.Command</code> via <code>cli.Command(ctx)</code></li>
+            <li>
+              <code>prompts</code> &rarr; <code>PromptRunner</code> interface +
+              <code>SetPromptRunner()</code>
+            </li>
+            <li>
+              <code>spinner</code> / <code>telemetry</code> &rarr; <code>Middleware[T]</code> hook
+            </li>
+            <li>
+              <code>manpage</code> &rarr; consumes <code>*cobra.Command</code> via
+              <code>cli.Command(ctx)</code>
+            </li>
           </ul>
           <p>
-            Core has <strong>zero</strong> imports of any sub-module. The
-            dependency graph is a strict DAG. No circular deps. No workspace-only
-            resolution (<code>GOWORK=off go build ./...</code> passes per-module
-            with <code>GOEXPERIMENT=jsonv2</code>).
+            Core has <strong>zero</strong> imports of any sub-module. The dependency graph is a
+            strict DAG. No circular deps. No workspace-only resolution (<code
+              >GOWORK=off go build ./...</code
+            >
+            passes per-module with <code>GOEXPERIMENT=jsonv2</code>).
           </p>
         </div>
         <div class="dep-tree">
-<span class="root">core v3</span>
-  &#9500;&#9472;&#9472; <span class="ok">glamour</span>   (via WithHelpTransform hook)
-  &#9500;&#9472;&#9472; <span class="ok">prompts</span>   (via PromptRunner interface)
-  &#9500;&#9472;&#9472; <span class="ok">spinner</span>   (via Middleware[T] hook)
-  &#9500;&#9472;&#9472; <span class="ok">telemetry</span> (via Middleware[T] hook)
-  &#9492;&#9472;&#9472; <span class="ok">manpage</span>   (via *cobra.Command consumer)
-
-core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct)
+          <span class="root">core v3</span>
+          &#9500;&#9472;&#9472; <span class="ok">glamour</span> (via WithHelpTransform hook)
+          &#9500;&#9472;&#9472; <span class="ok">prompts</span> (via PromptRunner interface)
+          &#9500;&#9472;&#9472; <span class="ok">spinner</span> (via Middleware[T] hook)
+          &#9500;&#9472;&#9472; <span class="ok">telemetry</span> (via Middleware[T] hook)
+          &#9492;&#9472;&#9472; <span class="ok">manpage</span> (via *cobra.Command consumer) core
+          &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct)
         </div>
 
         <h2 id="composability"><span class="num">03</span>Composability Wins</h2>
@@ -921,48 +983,135 @@ core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct
             <div class="check">+</div>
             <div class="text">
               <strong>Consumer pays only for what they import</strong>
-              <span>Import core only &rarr; 13 deps. Import <code>telemetry</code> too &rarr; +otel. Import <code>prompts</code> too &rarr; +huh. No fat deps.</span>
+              <span
+                >Import core only &rarr; 13 deps. Import <code>telemetry</code> too &rarr; +otel.
+                Import <code>prompts</code> too &rarr; +huh. No fat deps.</span
+              >
             </div>
           </div>
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
               <strong>Interface-based extension points</strong>
-              <span><code>Middleware[T]</code>, <code>PromptRunner</code>, <code>TypeHandler</code>, <code>ConfigFileLoader</code>, <code>Plugin</code> &mdash; 5 extension seams, all thin.</span>
+              <span
+                ><code>Middleware[T]</code>, <code>PromptRunner</code>, <code>TypeHandler</code>,
+                <code>ConfigFileLoader</code>, <code>Plugin</code> &mdash; 5 extension seams, all
+                thin.</span
+              >
             </div>
           </div>
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
               <strong>Functional options over config structs</strong>
-              <span><code>WithAuditLog</code>, <code>WithPlugin</code>, <code>WithMiddleware[T]</code>, <code>WithHelpTransform[T]</code> &mdash; compose cleanly, no builder explosion.</span>
+              <span
+                ><code>WithAuditLog</code>, <code>WithPlugin</code>, <code>WithMiddleware[T]</code>,
+                <code>WithHelpTransform[T]</code> &mdash; compose cleanly, no builder
+                explosion.</span
+              >
             </div>
           </div>
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
               <strong>COW registries &mdash; shared reads, isolated writes</strong>
-              <span><code>FlagRegistry</code> shares global type/validator registries lazily; <code>RegisterTypeHandler</code> triggers a clone only on first write. 48% faster <code>NewCLI</code>.</span>
+              <span
+                ><code>FlagRegistry</code> shares global type/validator registries lazily;
+                <code>RegisterTypeHandler</code> triggers a clone only on first write. 48% faster
+                <code>NewCLI</code>.</span
+              >
             </div>
           </div>
         </div>
 
-        <h2 id="fm"><span class="num">04</span>Failure-Mode Audit (go-modularize FM#1&ndash;FM#12)</h2>
+        <h2 id="fm">
+          <span class="num">04</span>Failure-Mode Audit (go-modularize FM#1&ndash;FM#12)
+        </h2>
         <table>
-          <thead><tr><th>FM#</th><th>Failure mode</th><th>Present?</th><th>Evidence</th></tr></thead>
+          <thead>
+            <tr>
+              <th>FM#</th>
+              <th>Failure mode</th>
+              <th>Present?</th>
+              <th>Evidence</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>1</td><td>Import cycles</td><td><span class="badge badge-fixed">No</span></td><td><code>go build ./...</code> clean</td></tr>
-            <tr><td>2</td><td>Transitive dep bloat</td><td><span class="badge badge-fixed">No</span></td><td>Core has 13 direct deps; sub-modules each add 1-2</td></tr>
-            <tr><td>3</td><td>Test dep leaks</td><td><span class="badge badge-fixed">No</span></td><td>No test-only libs in production go.mod</td></tr>
-            <tr><td>4</td><td>go.work / replace drift</td><td><span class="badge badge-fixed">No</span></td><td>Root go.mod has no replace directives; workspace is dev-only</td></tr>
-            <tr><td>5</td><td>Broken consumers</td><td><span class="badge badge-fixed">No</span></td><td>v3 just shipped; public API stable</td></tr>
-            <tr><td>6</td><td>internal/ access breakage</td><td><span class="badge badge-fixed">No</span></td><td>No <code>internal/</code> dirs in Go code</td></tr>
-            <tr><td>7</td><td>Error type inaccessibility</td><td><span class="badge badge-fixed">No</span></td><td>All 58 sentinels live in core errors*.go; consumers import core</td></tr>
-            <tr><td>8</td><td>Over-modularization</td><td><span class="badge badge-fixed">No</span></td><td>5 sub-modules, each with composability payoff (per go-modularize Direction Neutrality test)</td></tr>
-            <tr><td>9</td><td>Stale go.work</td><td><span class="badge badge-fixed">No</span></td><td>go.work lists all 6 modules; <code>go work sync</code> clean</td></tr>
-            <tr><td>10</td><td>Build system breakage</td><td><span class="badge badge-fixed">No</span></td><td>flake.nix + CI reference correct paths</td></tr>
-            <tr><td>11</td><td>Under-modularization</td><td><span class="badge badge-fixed">No</span></td><td>Each sub-domain (glamour/prompts/etc.) composes independently</td></tr>
-            <tr><td>12</td><td>Workspace-only testing</td><td><span class="badge badge-fixed">No</span></td><td><code>GOEXPERIMENT=jsonv2 GOWORK=off go build ./...</code> passes per module</td></tr>
+            <tr>
+              <td>1</td>
+              <td>Import cycles</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td><code>go build ./...</code> clean</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Transitive dep bloat</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>Core has 13 direct deps; sub-modules each add 1-2</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Test dep leaks</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>No test-only libs in production go.mod</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>go.work / replace drift</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>Root go.mod has no replace directives; workspace is dev-only</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Broken consumers</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>v3 just shipped; public API stable</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>internal/ access breakage</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>No <code>internal/</code> dirs in Go code</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Error type inaccessibility</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>All 58 sentinels live in core errors*.go; consumers import core</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Over-modularization</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>
+                5 sub-modules, each with composability payoff (per go-modularize Direction
+                Neutrality test)
+              </td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Stale go.work</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>go.work lists all 6 modules; <code>go work sync</code> clean</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Build system breakage</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>flake.nix + CI reference correct paths</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>Under-modularization</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td>Each sub-domain (glamour/prompts/etc.) composes independently</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>Workspace-only testing</td>
+              <td><span class="badge badge-fixed">No</span></td>
+              <td><code>GOEXPERIMENT=jsonv2 GOWORK=off go build ./...</code> passes per module</td>
+            </tr>
           </tbody>
         </table>
 
@@ -970,14 +1119,24 @@ core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct
         <div class="card card-solution">
           <h4>Proposed structure: identical to current structure</h4>
           <p>
-            Per <code>go-modularize</code> Direction Neutrality: both
-            &ldquo;should we split?&rdquo; and &ldquo;should we merge?&rdquo;
-            answered <strong>NO</strong>.
+            Per <code>go-modularize</code> Direction Neutrality: both &ldquo;should we split?&rdquo;
+            and &ldquo;should we merge?&rdquo; answered <strong>NO</strong>.
           </p>
           <ul>
-            <li><strong>No split deeper:</strong> each sub-module already &ldquo;does one thing&rdquo; at the right depth. A 1-2 file module split would create micro-modules with no composability payoff (FM#8 anti-signal).</li>
-            <li><strong>No merge:</strong> some consumers import core without prompts/spinner/telemetry/etc. &mdash; the seam earns its keep (go-modularize &ldquo;When NOT to Consolidate&rdquo; #1).</li>
-            <li><strong>No internal/ extraction:</strong> the v3 package is the surface; internals are unexported types, not a separate package.</li>
+            <li>
+              <strong>No split deeper:</strong> each sub-module already &ldquo;does one thing&rdquo;
+              at the right depth. A 1-2 file module split would create micro-modules with no
+              composability payoff (FM#8 anti-signal).
+            </li>
+            <li>
+              <strong>No merge:</strong> some consumers import core without
+              prompts/spinner/telemetry/etc. &mdash; the seam earns its keep (go-modularize
+              &ldquo;When NOT to Consolidate&rdquo; #1).
+            </li>
+            <li>
+              <strong>No internal/ extraction:</strong> the v3 package is the surface; internals are
+              unexported types, not a separate package.
+            </li>
           </ul>
         </div>
 
@@ -986,7 +1145,10 @@ core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct
           <div class="migration-num">1</div>
           <div class="migration-content">
             <h4>Do nothing (default)</h4>
-            <p>The module structure is at target. This proposal exists to document the audit, not to drive change.</p>
+            <p>
+              The module structure is at target. This proposal exists to document the audit, not to
+              drive change.
+            </p>
           </div>
         </div>
         <div class="migration-step">
@@ -994,11 +1156,10 @@ core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct
           <div class="migration-content">
             <h4>Optional: koanf extraction (only if consumers ask)</h4>
             <p>
-              <code>koanf/v2</code> + 3 sub-packages are direct core deps for
-              YAML/TOML config loading. ROADMAP already notes this as a
-              candidate for a <code>configload</code> sub-module. Defer until
-              a consumer explicitly asks for &ldquo;core without koanf&rdquo;.
-              Until then, 4 deps is acceptable.
+              <code>koanf/v2</code> + 3 sub-packages are direct core deps for YAML/TOML config
+              loading. ROADMAP already notes this as a candidate for a
+              <code>configload</code> sub-module. Defer until a consumer explicitly asks for
+              &ldquo;core without koanf&rdquo;. Until then, 4 deps is acceptable.
             </p>
           </div>
         </div>
@@ -1007,15 +1168,16 @@ core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct
           <div class="migration-content">
             <h4>Optional: add CI job for <code>GOWORK=off</code> build per module</h4>
             <p>
-              Catches FM#4 (go.work/replace drift) and FM#12 (workspace-only
-              testing) at PR time. Currently verified manually. A 10-line CI
-              job iterating the 6 modules with <code>GOEXPERIMENT=jsonv2 GOWORK=off go build ./...</code> would lock this in.
+              Catches FM#4 (go.work/replace drift) and FM#12 (workspace-only testing) at PR time.
+              Currently verified manually. A 10-line CI job iterating the 6 modules with
+              <code>GOEXPERIMENT=jsonv2 GOWORK=off go build ./...</code> would lock this in.
             </p>
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-18 &middot; Combined architecture-review + go-modularize proposal against v3.0.0 (commit 73d49ad)
+          Generated 2026-07-18 &middot; Combined architecture-review + go-modularize proposal
+          against v3.0.0 (commit 73d49ad)
         </footer>
       </main>
     </div>
@@ -1025,22 +1187,33 @@ core &rarr; cobra, pflag, samber/do, fang, go-output, auditlog, koanf (13 direct
         var nav = document.querySelector("[data-nav]");
         if (!nav) return;
         var links = nav.querySelectorAll('a[href^="#"]');
-        var ids = Array.from(links).map(function (l) { return l.getAttribute("href").slice(1); });
-        var sections = ids.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
         if (!sections.length) return;
         var observer = new IntersectionObserver(
           function (entries) {
             entries.forEach(function (entry) {
               if (entry.isIntersecting) {
                 links.forEach(function (link) {
-                  link.classList.toggle("active", link.getAttribute("href") === "#" + entry.target.id);
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
                 });
               }
             });
           },
           { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
         );
-        sections.forEach(function (s) { observer.observe(s); });
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
       })();
     </script>
   </body>

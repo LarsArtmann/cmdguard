@@ -206,3 +206,7 @@ gofumpt -l .                                       # 1 file: cli_auditlog_test.g
 ---
 
 **End of report. Awaiting next instructions.**
+
+## Resolution (2026-07-18)
+
+Superseded by v3.0.0 (2026-07-07). All `pkg/cmdguard/v2/...` paths here are now `pkg/cmdguard/v3/...`. The "promote to public v2test" question (§G) is moot — v3's 6-module structure (core + glamour/manpage/prompts/spinner/telemetry) redefines test-helper boundaries. Notably, the `gopls infertypeargs` warnings flagged in §F.14 are still present in v3 test files today (2026-07-18). Tests 395 → 1429.
