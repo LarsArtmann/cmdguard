@@ -21,52 +21,23 @@ async function getGitHubStars(): Promise<number | null> {
 const stars = await getGitHubStars();
 const starsText = stars !== null ? `${stars} Stars` : 'Star on GitHub';
 
-const importPath = 'github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3';
-
-const highlightedCode = `<span class="text-text-muted">package</span> <span class="text-text-secondary">main</span>
-
-<span class="text-text-muted">import</span> (
-    <span class="text-amber">"context"</span>
-    <span class="text-amber">"fmt"</span>
-    <span class="text-amber">"os"</span>
-
-    <span class="text-amber">"github.com/samber/do/v2"</span>
-    <span class="text-accent-hover">"${importPath}"</span>
-)
-
-<span class="text-text-muted">type</span> <span class="text-accent">AppConfig</span> <span class="text-text-muted">struct</span> {
-    Verbose <span class="text-text-muted">bool</span>   <span class="text-amber">\`flag:"verbose" short:"v" default:"false"\`</span>
-    Output  <span class="text-text-muted">string</span> <span class="text-amber">\`flag:"output" short:"o" default:"text"\`</span>
-}
-
-<span class="text-text-muted">type</span> <span class="text-accent">Database</span> <span class="text-text-muted">struct</span>{ DSN <span class="text-text-muted">string</span> }
-<span class="text-text-muted">func</span> (db *Database) <span class="text-accent">Shutdown</span>() <span class="text-text-muted">error</span> { <span class="text-text-muted">return</span> db.Close() }
-
-<span class="text-text-muted">func</span> <span class="text-accent">main</span>() {
-    cli, err := v3.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
+const highlightedCode = `<span class="text-text-muted">func</span> <span class="text-accent">main</span>() {
+    cli, _ := v3.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
         v3.<span class="text-accent">WithGracefulShutdown</span>(), <span class="text-code-comment">// SIGINT → reverse-order shutdown</span>
     )
-    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> {
-        fmt.<span class="text-accent">Fprintf</span>(os.Stderr, <span class="text-amber">"failed to create CLI: %v\\n"</span>, err)
-        os.<span class="text-accent">Exit</span>(1)
-    }
 
     <span class="text-code-comment">// Register a service (lazy, lifecycle-managed)</span>
     v3.<span class="text-accent">Provide</span>(cli.Scope(), <span class="text-text-muted">func</span>(i do.Injector) (*Database, <span class="text-text-muted">error</span>) {
         <span class="text-text-muted">return</span> &Database{DSN: <span class="text-amber">"postgres://..."</span>}, <span class="text-text-muted">nil</span>
     })
 
-    cmd, err := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v3.NoFlags{},
+    cmd, _ := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v3.NoFlags{},
         <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) <span class="text-text-muted">error</span> {
             db, _ := v3.<span class="text-accent">Invoke</span>[*Database](cli.Scope())
             <span class="text-text-muted">return</span> db.Query(ctx)
         },
         v3.<span class="text-accent">WithShort</span>(<span class="text-amber">"Query the database"</span>),
     )
-    <span class="text-text-muted">if</span> err != <span class="text-text-muted">nil</span> {
-        fmt.<span class="text-accent">Fprintf</span>(os.Stderr, <span class="text-amber">"failed to create command: %v\\n"</span>, err)
-        os.<span class="text-accent">Exit</span>(1)
-    }
     v3.<span class="text-accent">AddCommand</span>(cli, cmd)
 
     cli.<span class="text-accent">ExecuteAndExit</span>(context.Background()) <span class="text-code-comment">// zero panics, correct exit code</span>
@@ -81,7 +52,7 @@ const highlightedCode = `<span class="text-text-muted">package</span> <span clas
       {starsText}
     </a>
     <h1 class="text-[clamp(2.5rem,7vw,4.5rem)] font-bold tracking-tighter leading-tight mb-6">
-      <span>From flags to </span><span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">shutdown</span><span>, type-safe.</span>
+      <span>From flags to </span><em class="not-italic text-accent font-extrabold">shutdown</em><span>, type-safe.</span>
     </h1>
 
     <p class="text-[clamp(1.125rem,2.5vw,1.25rem)] text-text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
@@ -100,10 +71,8 @@ const highlightedCode = `<span class="text-text-muted">package</span> <span clas
       <div class="absolute -inset-4 bg-gradient-to-r from-accent/10 via-transparent to-accent/10 rounded-2xl blur-6 pointer-events-none"></div>
       <div class="relative rounded-xl border border-border bg-bg-code shadow-2xl overflow-hidden code-preview">
         <div class="flex items-center gap-1.5 px-4 py-3 border-b border-border">
-          {Array(3).fill(null).map(() => (
-            <span class="w-3 h-3 rounded-full bg-code-dot"></span>
-          ))}
-          <span class="ml-3 text-xs text-text-muted font-mono">main.go</span>
+          <span class="text-accent font-mono text-sm select-none">❯</span>
+          <span class="ml-1 text-xs text-text-muted font-mono">main.go</span>
         </div>
         <pre class="p-4 text-left text-sm font-mono leading-relaxed overflow-x-auto relative"><code id="hero-code" set:html={highlightedCode} /></pre>
         <button class="absolute top-2 right-2 bg-code-inline-bg/80 border border-border rounded-md text-text-muted px-1.5 py-1.5 cursor-pointer text-xs font-mono hover:text-text-primary hover:border-border-hover transition-all duration-150 opacity-0 [.code-preview:hover_&]:opacity-100" id="copy-btn" data-code={heroCode} aria-label="Copy code to clipboard">Copy</button>

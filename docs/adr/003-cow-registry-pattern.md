@@ -17,7 +17,7 @@ The problem: creating a new `CLI[T]` instance required deep-copying these regist
 Instead of copying on every `NewCLI`, registries are **shared by default** and only **cloned on first write**:
 
 1. **`share()`** — New `FlagRegistry` instances reference the global maps directly (zero copy)
-2. **`register()`** — First write triggers `sync.Once`-guarded clone of the maps; subsequent writes go to the instance-local copy
+2. **`register()`** — First write triggers a `sync.RWMutex`-guarded clone of the maps (guarded by a boolean `owned` flag); subsequent writes go to the instance-local copy
 3. **Reads** always use the shared maps until the first write
 
 ### Public API implications

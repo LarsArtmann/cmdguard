@@ -415,7 +415,7 @@ func TestVersionCommand(t *testing.T) {
 		cli, err := NewCLI("myapp", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
-		_, err = VersionCommand[testConfig](cli)
+		_, err = VersionCommand(cli)
 		testutil.AssertExpectedError(t, err)
 	})
 
@@ -429,7 +429,7 @@ func TestVersionCommand(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := VersionCommand[testConfig](cli)
+		cmd, err := VersionCommand(cli)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
@@ -449,7 +449,7 @@ func TestVersionCommand(t *testing.T) {
 		cli, err := NewCLI("myapp", "Test", testConfig{})
 		testutil.AssertNoError(t, err)
 
-		_, err = VersionCommand[testConfig](cli)
+		_, err = VersionCommand(cli)
 		if err == nil {
 			t.Fatal("expected error when no version set")
 		}

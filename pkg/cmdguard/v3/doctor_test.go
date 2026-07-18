@@ -28,7 +28,7 @@ func TestDoctorCommand(t *testing.T) {
 	newFailingDoctor := func(t *testing.T, cli *CLI[testConfig], name, errMsg string) {
 		t.Helper()
 
-		cmd, err := DoctorCommand[testConfig](
+		cmd, err := DoctorCommand(
 			cli,
 			WithDoctorCheck[testConfig](name, func(_ context.Context) error {
 				return errors.New(errMsg)
@@ -42,7 +42,7 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd, err := DoctorCommand[testConfig](cli)
+		cmd, err := DoctorCommand(cli)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
@@ -64,7 +64,7 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorHealthyService{}))
 
-		cmd, err := DoctorCommand[testConfig](cli)
+		cmd, err := DoctorCommand(cli)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
@@ -88,7 +88,7 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		testutil.AssertNoError(t, ProvideValue(cli.Scope(), &doctorUnhealthyService{}))
 
-		cmd, err := DoctorCommand[testConfig](cli)
+		cmd, err := DoctorCommand(cli)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
 
@@ -115,7 +115,7 @@ func TestDoctorCommand(t *testing.T) {
 		cli := newDoctorCLI(t)
 		customCheckCalled := false
 
-		cmd, err := DoctorCommand[testConfig](
+		cmd, err := DoctorCommand(
 			cli,
 			WithDoctorCheck[testConfig]("custom", func(ctx context.Context) error {
 				customCheckCalled = true
@@ -168,7 +168,7 @@ func TestDoctorCommand(t *testing.T) {
 
 		cli := newDoctorCLI(t)
 
-		cmd, err := DoctorCommand[testConfig](
+		cmd, err := DoctorCommand(
 			cli,
 			WithDoctorCheck[testConfig]("zebra", func(ctx context.Context) error {
 				return nil
@@ -199,7 +199,7 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd, err := DoctorCommand[testConfig](
+		cmd, err := DoctorCommand(
 			cli,
 			WithDoctorShort[testConfig]("Run diagnostics"),
 		)
@@ -213,7 +213,7 @@ func TestDoctorCommand(t *testing.T) {
 		t.Parallel()
 
 		cli := newDoctorCLI(t)
-		cmd, err := DoctorCommand[testConfig](
+		cmd, err := DoctorCommand(
 			cli,
 			WithDoctorGroupID[testConfig]("system"),
 		)

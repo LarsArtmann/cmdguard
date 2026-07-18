@@ -126,7 +126,7 @@ func noOpHandlerForTestAppConfig() func(context.Context, *testAppConfig, NoFlags
 // noOpRunE wraps testutil.NoOpRunE as a regular function for use in struct fields
 // where generic type parameters would be unwieldy.
 func noOpRunE[T, F any](ctx context.Context, cfg *T, flags F) error {
-	return testutil.NoOpRunE[T, F](ctx, cfg, flags)
+	return testutil.NoOpRunE(ctx, cfg, flags)
 }
 
 // makeHookRunE creates a RunE function that records execution order.

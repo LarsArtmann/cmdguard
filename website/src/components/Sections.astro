@@ -11,8 +11,8 @@ const sections = [
 ] as const;
 ---
 
-{sections.map(({ component: SectionComponent }) => (
-  <Section width="narrow" class="text-center">
+{sections.map(({ component: SectionComponent }, i) => (
+  <Section width={i === 0 ? 'wide' : 'narrow'} class="text-center">
     <SectionComponent />
   </Section>
 ))}

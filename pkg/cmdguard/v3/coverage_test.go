@@ -18,7 +18,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("success returns CLI", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
+		cli, err := NewCLI("test", "test app", struct{}{})
 		testutil.AssertNoError(t, err)
 		testutil.AssertNotNil(t, cli)
 	})
@@ -26,7 +26,7 @@ func TestNewCLI(t *testing.T) {
 	t.Run("empty name returns error", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := NewCLI[struct{}]("", "test", struct{}{})
+		_, err := NewCLI("", "test", struct{}{})
 		testutil.AssertExpectedError(t, err)
 	})
 }
@@ -37,7 +37,7 @@ func TestAddCommand(t *testing.T) {
 	t.Run("success adds command", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
+		cli, err := NewCLI("test", "test app", struct{}{})
 		testutil.AssertNoError(t, err)
 		cmd, err := NewCommand(
 			"hello",
@@ -53,7 +53,7 @@ func TestAddCommand(t *testing.T) {
 	t.Run("duplicate command returns error", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI[struct{}]("test", "test app", struct{}{})
+		cli, err := NewCLI("test", "test app", struct{}{})
 		testutil.AssertNoError(t, err)
 		cmd, err := NewCommand(
 			"hello",

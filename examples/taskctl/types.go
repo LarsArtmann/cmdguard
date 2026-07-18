@@ -181,9 +181,9 @@ func (s *TaskStore) IDs() []string {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	ids := make([]string, len(s.tasks))
-	for i, t := range s.tasks {
-		ids[i] = strconv.FormatUint(uint64(t.ID), 10)
+	ids := make([]string, 0, len(s.tasks))
+	for _, t := range s.tasks {
+		ids = append(ids, strconv.FormatUint(uint64(t.ID), 10))
 	}
 	return ids
 }

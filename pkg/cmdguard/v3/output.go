@@ -93,9 +93,9 @@ func wrapIfError(ctx string, err error) error {
 func formatShapes(f output.Format) string {
 	shapes := f.Shapes()
 	if len(shapes) > 0 {
-		names := make([]string, len(shapes))
-		for i, s := range shapes {
-			names[i] = string(s)
+		names := make([]string, 0, len(shapes))
+		for _, s := range shapes {
+			names = append(names, string(s))
 		}
 
 		return strings.Join(names, ", ")

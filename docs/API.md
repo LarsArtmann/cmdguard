@@ -12,9 +12,8 @@ Commands are created via constructors — `NewCommand` for leaf commands, `NewPa
 
 ```go
 cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
-cmd, err := v3.NewCommand[AppConfig, *GreetFlags]("greet", greetHandler,
-    v3.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-    v3.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+cmd, err := v3.NewCommand("greet", &GreetFlags{}, greetHandler,
+    v3.WithShort("Greet someone"),
 )
 v3.AddCommand(cli, cmd)
 ```
@@ -22,36 +21,37 @@ v3.AddCommand(cli, cmd)
 ### Command Constructors
 
 ```go
-// Leaf command with handler
-func NewCommand[T, F any](use string, runE func(ctx context.Context, cfg *T, flags F) error, opts ...CommandOption[T, F]) (Command[T, F], error)
+// Leaf command with handler — flags passed positionally
+func NewCommand[T, F any](use string, flags F, runE func(ctx context.Context, cfg *T, flags F) error, opts ...CommandOption) (Command[T, F], error)
 
-// Parent command with subcommands
-func NewParentCommand[T, F any](use string, long string, subcommands []Command[T, F], opts ...CommandOption[T, F]) (Command[T, F], error)
+// Parent command with subcommands — flags passed positionally, subcommands via WithSubcommands
+func NewParentCommand[T, F any](use string, long string, flags F, opts ...CommandOption) (Command[T, F], error)
 ```
+
+**Note:** `CommandOption` is non-generic (`func(*spec)`). Type safety flows through the generic constructors that _return_ non-generic options. Most options (`WithShort`, `WithLong`, `WithExample`, etc.) take zero type parameters.
 
 ### Command Options
 
-| Option                           | Purpose                                              |
-| -------------------------------- | ---------------------------------------------------- |
-| `WithShort[T, F](short)`         | Short description                                    |
-| `WithLong[T, F](long)`           | Long description                                     |
-| `WithAliases[T, F](aliases...)`  | Alternative names                                    |
-| `WithExample[T, F](example)`     | Example usage                                        |
-| `WithFlags[T, F](flags)`         | Typed flags struct                                   |
-| `WithRunE[T, F](runE)`           | Main handler (required for NewCommand)               |
-| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook                                  |
-| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook                            |
-| `WithSubcommands[T, F](cmds...)` | Child commands                                       |
-| `WithHidden[T, F](hidden)`       | Hide from help                                       |
-| `WithDeprecated[T, F](msg)`      | Deprecation message                                  |
-| `WithGroupID[T, F](group)`       | Help group name                                      |
-| `WithExactArgs[T, F](n)`         | Require exactly n positional args                    |
-| `WithMinimumArgs[T, F](n)`       | Require at least n positional args                   |
-| `WithMaximumArgs[T, F](n)`       | Allow at most n positional args                      |
-| `WithRangeArgs[T, F](min, max)`  | Require between min and max args                     |
-| `WithNoArgs[T, F]()`             | Reject any positional args                           |
-| `WithArgs[T, F](fn)`             | Custom cobra.PositionalArgs validator                |
-| `WithPromptOnMissing[T, F]()`    | Interactive prompt for missing `prompt`-tagged flags |
+| Option                           | Purpose                                               |
+| -------------------------------- | ----------------------------------------------------- |
+| `WithShort(short)`               | Short description                                     |
+| `WithLong(long)`                 | Long description                                      |
+| `WithAliases(aliases...)`        | Alternative names                                     |
+| `WithExample(example)`           | Example usage                                         |
+| `WithRunE(runE)`                 | Main handler (required for NewCommand)                |
+| `WithPreRunE[T, F](preRunE)`     | Pre-validation hook (generic — infers from arg)       |
+| `WithPostRunE[T, F](postRunE)`   | Post-success cleanup hook (generic — infers from arg) |
+| `WithSubcommands[T, F](cmds...)` | Child commands                                        |
+| `WithHidden(hidden)`             | Hide from help                                        |
+| `WithDeprecated(msg)`            | Deprecation message                                   |
+| `WithGroupID(group)`             | Help group name                                       |
+| `WithExactArgs(n)`               | Require exactly n positional args                     |
+| `WithMinimumArgs(n)`             | Require at least n positional args                    |
+| `WithMaximumArgs(n)`             | Allow at most n positional args                       |
+| `WithRangeArgs(min, max)`        | Require between min and max args                      |
+| `WithNoArgs()`                   | Reject any positional args                            |
+| `WithArgs(fn)`                   | Custom cobra.PositionalArgs validator                 |
+| `WithPromptOnMissing()`          | Interactive prompt for missing `prompt`-tagged flags  |
 
 ### CLI[T] Constructor
 
@@ -69,6 +69,7 @@ Functional options:
 | `WithCLIScope(scope)`                               | Set custom DI scope                        |
 | `WithSilenceErrors()`                               | Suppress cobra error printing (advanced)   |
 | `WithSilenceUsage()`                                | Suppress usage on error (**default**)      |
+| `WithoutSilenceUsage()`                             | Re-enable usage on error                   |
 | `WithFang(bool)`                                    | Enable/disable fang styling (preferred)    |
 | `WithFangOptions(opts...)`                          | Custom fang options                        |
 | `WithFangErrorHandler(handler)`                     | Custom fang error handler                  |
@@ -136,12 +137,12 @@ func main() {
         panic(err)
     }
 
-    cmd, err := v3.NewCommand[AppConfig, v3.NoFlags]("hello",
+    cmd, err := v3.NewCommand("hello", v3.NoFlags{},
         func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
             fmt.Printf("Hello! Verbose: %v\n", cfg.Verbose)
             return nil
         },
-        v3.WithShort[AppConfig, v3.NoFlags]("Say hello"),
+        v3.WithShort("Say hello"),
     )
     if err != nil {
         panic(err)
@@ -166,7 +167,7 @@ type GreetFlags struct {
     Shout bool   `flag:"shout" default:"false"          help:"Shout the greeting"`
 }
 
-greetCmd, err := v3.NewCommand[AppConfig, *GreetFlags]("greet",
+greetCmd, err := v3.NewCommand("greet", &GreetFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         for i := uint(0); i < flags.Count; i++ {
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
@@ -177,8 +178,7 @@ greetCmd, err := v3.NewCommand[AppConfig, *GreetFlags]("greet",
         }
         return nil
     },
-    v3.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-    v3.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+    v3.WithShort("Greet someone"),
 )
 v3.AddCommand(cli, greetCmd)
 ```
@@ -186,15 +186,15 @@ v3.AddCommand(cli, greetCmd)
 ### Subcommands
 
 ```go
-listCmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("list",
-    listUsersHandler, v3.WithShort[AppConfig, v3.NoFlags]("List users"),
+listCmd, _ := v3.NewCommand("list", v3.NoFlags{},
+    listUsersHandler, v3.WithShort("List users"),
 )
-createCmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("create",
-    createUserHandler, v3.WithShort[AppConfig, v3.NoFlags]("Create user"),
+createCmd, _ := v3.NewCommand("create", v3.NoFlags{},
+    createUserHandler, v3.WithShort("Create user"),
 )
-userCmd, err := v3.NewParentCommand[AppConfig, v3.NoFlags]("user",
-    "User management", []v3.Command[AppConfig, v3.NoFlags]{listCmd, createCmd},
-    v3.WithShort[AppConfig, v3.NoFlags]("User management"),
+userCmd, err := v3.NewParentCommand[AppConfig]("user", "User management", v3.NoFlags{},
+    v3.WithShort("User management"),
+    v3.WithSubcommands(listCmd, createCmd),
 )
 v3.AddCommand(cli, userCmd)
 ```
@@ -234,6 +234,7 @@ mockDB, _ := v3.Invoke[*Database](cloned) // returns mock
 | `OverrideValue[T](scope, value)`   | Replace pre-constructed value (testing) |
 | `CloneScope(scope)`                | Clone scope for test isolation          |
 | `NewScopeWithOpts(name, opts)`     | Create scope with custom InjectorOpts   |
+| `Package[T](scope, ...)`           | CLI with pre-existing scope             |
 | `Scope.Child(name)`                | Create child scope                      |
 | `Scope.Shutdown(ctx)`              | Graceful shutdown of scope services     |
 | `Scope.ShutdownAll(ctx)`           | Shutdown scope + all parents            |
@@ -241,11 +242,11 @@ mockDB, _ := v3.Invoke[*Database](cloned) // returns mock
 ### Lifecycle Hooks
 
 ```go
-cmd, err := v3.NewCommand[AppConfig, *Flags]("example", runHandler,
-    v3.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+cmd, err := v3.NewCommand("example", &Flags{}, runHandler,
+    v3.WithPreRunE(func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return nil // validation
     }),
-    v3.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    v3.WithPostRunE(func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return nil // cleanup (only called on success)
     }),
 )
@@ -261,7 +262,7 @@ parallel context-key system:
 ```go
 cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
     // Initialise DI / store session once flags are parsed
-    v3.WithPostFlagParse[Config](func(cmd *cobra.Command, cfg *Config) error {
+    v3.WithPostFlagParse(func(cmd *cobra.Command, cfg *Config) error {
         return initDI(cfg) // runs after parsing + config validation
     }),
 )
@@ -337,9 +338,9 @@ bfc.GetValue(key)       // looks up hierarchy
 ### Error Handling
 
 ```go
-// All v2 functions return errors
+// All v3 functions return errors
 cli, err := v3.NewCLI[Config]("app", "My app", Config{})
-cmd, err := v3.NewCommand[Config, NoFlags]("test", handler)
+cmd, err := v3.NewCommand("test", v3.NoFlags{}, handler)
 
 // Sentinel errors for errors.Is()
 errors.Is(err, v3.ErrInvalidCommand)
@@ -362,9 +363,9 @@ errors.As(err, &exitCoder)       // check if error implements ExitCoder
 
 ```go
 cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithCLIVersion[Config]("1.0.0"),
+    v3.WithCLIVersion("1.0.0"),
 )
-cmd, err := v3.VersionCommand[Config](cli)
+cmd, err := v3.VersionCommand(cli)
 if err != nil {
     panic(err)
 }
@@ -375,18 +376,18 @@ v3.AddCommand(cli, cmd)
 
 ```go
 // Simple — just DI health checks
-cmd, err := v3.DoctorCommand[Config](cli)
+cmd, err := v3.DoctorCommand(cli)
 if err != nil {
     panic(err)
 }
 v3.AddCommand(cli, cmd)
 
 // With custom diagnostic checks and group
-cmd, err := v3.DoctorCommand[Config](cli,
-    v3.WithDoctorCheck[Config]("database", func(ctx context.Context) error {
+cmd, err := v3.DoctorCommand(cli,
+    v3.WithDoctorCheck("database", func(ctx context.Context) error {
         return db.Ping(ctx)
     }),
-    v3.WithDoctorGroupID[Config]("system"),
+    v3.WithDoctorGroupID("system"),
 )
 if err != nil {
     panic(err)
@@ -414,7 +415,7 @@ cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
 
 ```go
 cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithStrictValidation[Config](),  // requires WithShort on all commands
+    v3.WithStrictValidation(),  // requires WithShort on all commands
 )
 ```
 
@@ -422,7 +423,7 @@ cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
 
 ```go
 cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithConfigValidation[Config](func(cfg *Config) error {
+    v3.WithConfigValidation(func(cfg *Config) error {
         if cfg.Port < 1 { return fmt.Errorf("invalid port") }
         return nil
     }),
@@ -441,7 +442,7 @@ import auditlog "github.com/larsartmann/samber-do-auditlog"
 plugin, _ := auditlog.New(auditlog.Config{Enabled: true, ContainerID: "myapp"})
 
 cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithAuditLog[Config](plugin),
+    v3.WithAuditLog(plugin),
 )
 
 // after Execute, export the snapshot
@@ -455,12 +456,11 @@ _ = v3.ExportAuditLog(cli, v3.AuditLogExportConfig{
 Accessors and query helpers:
 
 ```go
-cli.AuditLog()                 // *auditlog.Plugin (nil if not configured)
-cli.AuditLogReport()           // *auditlog.Report snapshot (nil if not configured)
-cli.RecordAuditHealthCheck(ctx) // map[string]error
+cli.AuditLog()                  // *auditlog.Plugin (nil if not configured)
+cli.AuditLogReport()            // *auditlog.Report snapshot (nil if not configured)
 
-v3.AuditLogServiceByName[Config](cli, "taskStore")  // *auditlog.ServiceInfo
-v3.AuditLogFailedServices[Config](cli)              // []auditlog.ServiceInfo
+v3.AuditLogServiceByName(cli, "taskStore")  // *auditlog.ServiceInfo
+v3.AuditLogFailedServices(cli)              // []auditlog.ServiceInfo
 ```
 
 `AuditLogFormat` is a validated enum &mdash; build it via `ParseAuditLogFormat` so an

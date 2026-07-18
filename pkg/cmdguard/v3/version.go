@@ -14,9 +14,9 @@ import (
 // Usage:
 //
 //	cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-//	    v3.WithCLIVersion[Config]("1.0.0"),
+//	    v3.WithCLIVersion("1.0.0"),
 //	)
-//	v3.AddCommand(cli, v3.VersionCommand[Config](cli))
+//	v3.AddCommand(cli, v3.VersionCommand(cli))
 func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 	if cli.spec.version == "" {
 		return Command[T, NoFlags]{}, fmt.Errorf(

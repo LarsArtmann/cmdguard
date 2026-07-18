@@ -52,9 +52,9 @@ func buildCommands(cli *v3.CLI[AppConfig]) error {
 			}
 
 			headers := []string{"ID", "Title", "Priority", "Status", "Created"}
-			rows := make([][]string, len(tasks))
-			for i, t := range tasks {
-				rows[i] = t.Row()
+			rows := make([][]string, 0, len(tasks))
+			for _, t := range tasks {
+				rows = append(rows, t.Row())
 			}
 
 			return v3.OutputTable(format, headers, rows)

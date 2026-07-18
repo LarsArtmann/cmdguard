@@ -189,3 +189,26 @@ These remain open for a future v3.x or v4:
 - [x] Add issue/PR templates
 - [ ] Test all examples in CI
 - [ ] Extract flag-related code to standalone `flagtags` library
+
+---
+
+## Deferred from 2026-07-18 Audit Closure
+
+The following items were identified during the multi-skill audit session (2026-07-18) and
+explicitly deferred with rationale. They are NOT blocking; they are documented here to stop
+them from haunting the TODO list.
+
+| #   | Item                                                                                              | Deferral rationale                                                                                         |
+| --- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 1   | Re-run 4 skills with reference files loaded                                                       | More reports = more debt without action layer. Re-audit in a dedicated future session AFTER closure ships. |
+| 2   | Run 4 additional skills (brutal-self-review, library-deep-dive, status-report, docs-health BUILD) | New audits, not closure. Belong in a future session.                                                       |
+| 3   | TypeHandler to TypeCodec rename + Deprecated alias                                                | Public API break. v4 only. TODO(v4) marker added at type_handler.go:13.                                    |
+| 4   | ConfigFile branded type                                                                           | YAGNI until a consumer needs it.                                                                           |
+| 5   | Extract koanf into configload sub-module                                                          | YAGNI until consumer asks or core LOC > 12k. Currently 8.2k.                                               |
+| 6   | Split v3 into v3 + v3/internal/                                                                   | LOC trigger (12k) not met. Currently 8.2k. Premature split adds boundary friction.                         |
+| 7   | Fuzz corpus expansion                                                                             | Existing 7 targets have minimal corpus. Valuable but not closure.                                          |
+| 8   | Audit examples/taskctl/main_test.go (876 lines)                                                   | Test-smell audit is a separate concern.                                                                    |
+| 9   | CONTRIBUTING.md refresh                                                                           | Not blocking. Verify-then-decide in a future pass.                                                         |
+| 10  | Verify git-town.toml + library-policy.yaml                                                        | Config sanity, not closure.                                                                                |
+| 11  | Update WHAT_THIS_PROJECT_IS_ABOUT.md + _NOT.md                                                    | Living docs; belongs in docs-health, not this closure.                                                     |
+| 12  | Schedule re-run after v3.1 ships                                                                  | Re-audit after the next minor release.                                                                     |

@@ -19,6 +19,7 @@ Inspired by Domain-Driven Design (DDD) Ubiquitous Language.
 | TypeHandler          | Interface for registering, parsing, and defaulting a flag type      | Extensible via `RegisterTypeHandler` |
 | FlagValidator        | Named validation function applied to flag values                    | Registered via `RegisterValidator`   |
 | BranchingFlowContext | Tracks command execution path and branch state                      | Used by middleware and hooks         |
+| CommandInfo          | Metadata struct passed to middleware (name, path, phase, hasRunE)   | Middleware context                   |
 | SilenceUsage         | Suppresses cobra's usage-on-error footgun                           | True by default                      |
 
 ## Entities
@@ -113,6 +114,8 @@ Service lifecycle and injection via samber/do/v2.
 | CloneScope       | Copy registrations without invoked state                          |
 | Shutdown         | DI service shutdown in reverse invocation order                   |
 | GracefulShutdown | SIGINT/SIGTERM-triggered DI shutdown via `WithGracefulShutdown()` |
+| Package          | CLI constructor taking a pre-existing scope (external scope DI)   |
+| NewScopeWithOpts | Create a scope with custom `do.InjectorOpts` (logging, hooks)     |
 
 ### 4. Output and Formatting
 
@@ -135,6 +138,7 @@ Interfaces and hooks for customization without modifying core.
 | PromptRunner | Interface for interactive flag prompting (huh/v2 impl in prompts sub-module) |
 | HelpTransformFunc | Function hook for transforming command help text before display | Glamour sub-module provides an impl |
 | Middleware | Generic chain type for wrapping command execution |
+| Phase | Execution phase enum (pre-run, run, post-run) passed to middleware via CommandInfo |
 
 ---
 

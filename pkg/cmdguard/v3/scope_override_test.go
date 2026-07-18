@@ -56,7 +56,7 @@ func TestOverride(t *testing.T) {
 	t.Run("returns error for nil scope", func(t *testing.T) {
 		t.Parallel()
 
-		err := v3.Override[*realService](nil, func(i do.Injector) (*realService, error) {
+		err := v3.Override(nil, func(i do.Injector) (*realService, error) {
 			return &realService{}, nil
 		})
 		if err == nil {

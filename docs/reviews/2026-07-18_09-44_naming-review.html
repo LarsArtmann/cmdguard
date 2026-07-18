@@ -1349,5 +1349,10 @@
         });
       })();
     </script>
+    <!-- Severity Recalibration 2026-07-18: CommandInfo and HuhRunner downgraded Medium to Low.
+         Per naming-review skill guide, these are style/convention issues (suffix choice),
+         not behavioral problems. They do not affect API contracts or correctness.
+         TypeHandler to TypeCodec remains the only v4 rename candidate (Medium, public API).
+         Inline TODO(v4) markers added at all 3 sites during post-audit closure. -->
   </body>
 </html>

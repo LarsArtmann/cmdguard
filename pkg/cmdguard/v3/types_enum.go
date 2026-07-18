@@ -7,6 +7,12 @@ import (
 // Enum provides type-safe enum values with validation.
 // Use this for config fields that must be one of a set of allowed values.
 //
+// Design decision: Enum is a struct (not a Go iota constant or string alias)
+// because it must carry the allowed-values list at runtime for flag parsing,
+// validation, and shell completion. A static iota cannot provide this without
+// a parallel registry. The struct stores the current value and the allowed set
+// together, making invalid states (value not in allowed) checkable at parse time.
+//
 //nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
 type Enum struct {
 	value   string

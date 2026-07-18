@@ -55,8 +55,8 @@ func editDistance(a, b string) int {
 	}
 
 	// Use a single row for space optimization
-	prev := make([]int, bLen+1)
-	curr := make([]int, bLen+1)
+	prev := make([]int, bLen+1) //nolint:makezero // DP array requires index access
+	curr := make([]int, bLen+1) //nolint:makezero // DP array requires index access
 
 	for j := 0; j <= bLen; j++ {
 		prev[j] = j
@@ -107,9 +107,9 @@ func (r *FlagRegistry) GenerateHelp() string {
 // FlagNames returns all registered flag names for suggestion purposes.
 // For zero-allocation iteration, prefer FlagNamesSeq().
 func (r *FlagRegistry) FlagNames() []string {
-	names := make([]string, len(r.tags))
-	for i, tag := range r.tags {
-		names[i] = tag.Name
+	names := make([]string, 0, len(r.tags))
+	for _, tag := range r.tags {
+		names = append(names, tag.Name)
 	}
 
 	return names

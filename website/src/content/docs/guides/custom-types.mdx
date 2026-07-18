@@ -10,7 +10,7 @@ cmdguard ships with validated types that parse and validate at construction time
 | Type       | Validation                         |
 | ---------- | ---------------------------------- |
 | `Duration` | Wraps `time.Duration`              |
-| `Enum[T]`  | Validated against allowed values   |
+| `Enum`     | Validated against allowed values   |
 | `LogLevel` | debug / info / warn / error        |
 | `URL`      | Validated URL string               |
 | `Email`    | RFC 5322 email validation          |
@@ -25,7 +25,7 @@ type ServerFlags struct {
     Port     v3.Port     `flag:"port"     default:"8080"   help:"Listen port"`
     Log      v3.LogLevel `flag:"log"      default:"info"   help:"Log level"`
     URL      v3.URL      `flag:"url"      required:"true"  help:"API endpoint"`
-    Mode     v3.Enum[string] `flag:"mode" default:"dev"    help:"Run mode"`
+    Mode     v3.Enum     `flag:"mode" default:"dev" enum:"dev,prod" help:"Run mode"`
 }
 ```
 

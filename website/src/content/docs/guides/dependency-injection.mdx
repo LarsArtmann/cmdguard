@@ -83,7 +83,7 @@ Pattern: clone -> override -> invoke.
 Create scopes with custom injector options (logging, lifecycle hooks, health check timeouts):
 
 ```go
-scope := v3.NewScopeWithOpts("custom", do.InjectorOpts{
+scope := v3.NewScopeWithOpts("custom", &do.InjectorOpts{
     Logf: func(format string, args ...any) {
         log.Printf("DI: "+format, args...)
     },
@@ -96,7 +96,7 @@ cli, _ := v3.Package(scope, "myapp", "Description", AppConfig{})
 
 ```go
 cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithDILogging[AppConfig](func(format string, args ...any) {
+    v3.WithDILogging(func(format string, args ...any) {
         log.Printf("DI: "+format, args...)
     }),
 )
@@ -115,7 +115,7 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 
 // Access programmatically
 report := cli.AuditLogReport()
-failed := v3.AuditLogFailedServices(report)
+failed := v3.AuditLogFailedServices(cli)
 ```
 
 Export in 11 formats: HTML, JSON, NDJSON, CSV, TSV, Mermaid, DOT, D2, PlantUML, tree, HTML tree.

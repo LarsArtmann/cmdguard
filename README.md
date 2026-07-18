@@ -10,9 +10,11 @@
 
 ---
 
-**From flag definition to service shutdown — type-safe, validated, zero panics.**
+**The Go CLI framework that catches missing handlers, duplicate commands, and invalid flags at construction — not at 2am in production.**
 
 cmdguard is the only Go CLI framework that unifies **type-safe flags**, **dependency injection with lifecycle management**, and a **zero-panic error contract** into a single system validated at construction. It wraps [Cobra](https://github.com/spf13/cobra) so you keep full compatibility while eliminating its footguns.
+
+**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v3` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
 > **API Stability:** v3.0.0 is the current major version. The legacy v2 line is in maintenance at v2.10.4. See [CHANGELOG.md](CHANGELOG.md) and the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md).
 
@@ -24,17 +26,19 @@ Other Go CLI frameworks give you flags. cmdguard gives you flags **plus** everyt
 
 ### The trinity — what no other CLI framework offers together
 
-| Capability                                        | Cobra | Kong | urfave/cli | **cmdguard** |
-| ------------------------------------------------- | ----- | ---- | ---------- | ------------ |
-| Struct-tag flags (no string lookups)              | —     | Yes  | —          | **Yes**      |
-| Dependency injection (lazy services, lifecycle)   | —     | —    | —          | **Yes**      |
-| Graceful shutdown (reverse-order on SIGINT)       | —     | —    | —          | **Yes**      |
-| Health checks (`DoctorCommand`, `Healthchecker`)  | —     | —    | —          | **Yes**      |
-| Zero panics by construction (no `Run`, no `Must`) | —     | —    | —          | **Yes**      |
-| Validated at construction (not at runtime)        | —     | Some | —          | **Yes**      |
-| Error printed exactly once + correct exit codes   | —     | —    | —          | **Yes**      |
-| Styled output by default (fang + lipgloss)        | —     | —    | —          | **Yes**      |
-| Gradual migration (raw cobra + typed runtime)     | —     | —    | —          | **Yes**      |
+| Capability                                        | Cobra | Kong                | urfave/cli | **cmdguard** |
+| ------------------------------------------------- | ----- | ------------------- | ---------- | ------------ |
+| Struct-tag flags (no string lookups)              | —     | Yes                 | —          | **Yes**      |
+| Dependency injection (lazy services, lifecycle)   | —     | —                   | —          | **Yes**      |
+| Graceful shutdown (reverse-order on SIGINT)       | —     | —                   | —          | **Yes**      |
+| Health checks (`DoctorCommand`, `Healthchecker`)  | —     | —                   | —          | **Yes**      |
+| Zero panics by construction (no `Run`, no `Must`) | —     | —                   | —          | **Yes**      |
+| Validated at construction (not at runtime)        | —     | Some <sup>[1]</sup> | —          | **Yes**      |
+| Error printed exactly once + correct exit codes   | —     | —                   | —          | **Yes**      |
+| Styled output by default (fang + lipgloss)        | —     | —                   | —          | **Yes**      |
+| Gradual migration (raw cobra + typed runtime)     | —     | —                   | —          | **Yes**      |
+
+<sup>[1]</sup> Kong validates struct tags at parse time but does not validate command structure (missing handlers, duplicates) at registration.
 
 ### Dependency injection — the real differentiator
 

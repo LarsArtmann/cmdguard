@@ -167,7 +167,7 @@
 //	    DefaultFunc: func(_ v3.FlagTag) any { return MyType{} },
 //	})
 //
-// Built-in custom types: Duration, Enum[T], LogLevel, URL, Email, Port, FilePath, HostPort.
+// Built-in custom types: Duration, Enum, LogLevel, URL, Email, Port, FilePath, HostPort.
 //
 // # Further Reading
 //

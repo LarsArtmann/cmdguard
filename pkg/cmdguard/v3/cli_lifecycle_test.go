@@ -126,14 +126,14 @@ func TestCLIPrePostRunE(t *testing.T) {
 			"test",
 			v3.NoFlags{},
 			noOpRunE[testCLIConfig],
-			v3.WithPreRunE[testCLIConfig, v3.NoFlags](
+			v3.WithPreRunE(
 				func(_ context.Context, _ *testCLIConfig, _ v3.NoFlags) error {
 					preRan = true
 
 					return nil
 				},
 			),
-			v3.WithPostRunE[testCLIConfig, v3.NoFlags](
+			v3.WithPostRunE(
 				func(_ context.Context, _ *testCLIConfig, _ v3.NoFlags) error {
 					postRan = true
 
@@ -185,7 +185,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 			"test",
 			testFlags{},
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
-			v3.WithPreRunE[testCLIConfig, testFlags](
+			v3.WithPreRunE(
 				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 					receivedName = f.Name
 
@@ -233,7 +233,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 			"test",
 			testFlags{},
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
-			v3.WithPostRunE[testCLIConfig, testFlags](
+			v3.WithPostRunE(
 				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 					receivedValue = f.Value
 

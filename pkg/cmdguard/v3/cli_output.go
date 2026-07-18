@@ -31,9 +31,9 @@ func (cli *CLI[T]) initOutputFlag() {
 
 	formats := output.RegisteredTableMarshalFormats()
 
-	names := make([]string, len(formats))
-	for i, f := range formats {
-		names[i] = string(f)
+	names := make([]string, 0, len(formats))
+	for _, f := range formats {
+		names = append(names, string(f))
 	}
 
 	help := fmt.Sprintf("Output format (%s)", strings.Join(names, ", "))

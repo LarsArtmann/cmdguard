@@ -67,14 +67,14 @@ func TestCLISubcommands(t *testing.T) {
 		}
 
 		subCmd := newTestCLICommandWithShort[testCLIConfig](t, "list", "List items")
-		parentCmd := newTestParentCommand[testCLIConfig](
+		parentCmd := newTestParentCommand(
 			t,
 			"items",
 			"Item management",
 			"Item management long description",
 			subCmd,
 		)
-		cmd := newTestParentCommand[testCLIConfig](
+		cmd := newTestParentCommand(
 			t,
 			"admin",
 			"Admin commands",

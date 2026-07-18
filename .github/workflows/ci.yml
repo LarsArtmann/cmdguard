@@ -89,3 +89,19 @@ jobs:
 
       - name: Run benchmarks
         run: go test ./benchmarks/ -bench=. -benchmem -count=1 -timeout 120s
+
+  gowork-off:
+    runs-on: ubuntu-latest
+    env:
+      GOEXPERIMENT: jsonv2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Verify build without workspace
+        run: GOWORK=off go build ./...
+        working-directory: ${{ github.workspace }}

@@ -104,7 +104,7 @@ func AssertStderrContains(t *testing.T, stderr string, substrings ...string) {
 }
 
 // ContainsString checks if a slice contains a specific string.
-// Deprecated: prefer [slices.Contains] directly in new code.
+// NOTE: prefer [slices.Contains] directly in new code; StringSliceContains alias was deleted (do not reintroduce).
 func ContainsString(slice []string, s string) bool {
 	return slices.Contains(slice, s)
 }

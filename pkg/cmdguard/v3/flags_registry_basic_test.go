@@ -184,9 +184,9 @@ func TestFlagRegistry_Tags(t *testing.T) {
 		tags := registry.Tags()
 		testutil.AssertFieldLen(t, tags, 2, "tags")
 
-		names := make([]string, len(tags))
-		for i, tag := range tags {
-			names[i] = tag.Name
+		names := make([]string, 0, len(tags))
+		for _, tag := range tags {
+			names = append(names, tag.Name)
 		}
 
 		testutil.AssertContainsString(t, names, "name")

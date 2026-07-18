@@ -16,7 +16,7 @@ func TestVersionCommandSuccess(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cmd, err := VersionCommand[Config](cli)
+	cmd, err := VersionCommand(cli)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestGenerateVersionCommand(t *testing.T) {
 
 		var buf bytes.Buffer
 
-		cmd, err := GenerateVersionCommand[Config](cli, &buf)
+		cmd, err := GenerateVersionCommand(cli, &buf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -68,7 +68,7 @@ func TestGenerateVersionCommand(t *testing.T) {
 
 		var buf bytes.Buffer
 
-		_, err = GenerateVersionCommand[Config](cli, &buf)
+		_, err = GenerateVersionCommand(cli, &buf)
 		if err == nil {
 			t.Fatal("expected error when no version set")
 		}

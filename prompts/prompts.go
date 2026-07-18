@@ -24,6 +24,7 @@ import (
 )
 
 // HuhRunner implements v3.PromptRunner using the huh/v2 TUI library.
+// NOTE(v4): "Runner" suffix is generic; consider HuhPrompter (see naming-review 2026-07-18).
 type HuhRunner struct{}
 
 func (h *HuhRunner) PromptString(title, defaultValue string) (string, error) {
