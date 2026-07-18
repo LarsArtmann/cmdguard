@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard — Naming Review (2026-07-18)</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS DARK — Dashboard template
+         Design language: form follows function. Primary colors on graphite.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Dark) --- */
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+
+        /* --- Semantic layer (shared vocabulary with editorial template) --- */
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 15%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 20%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px; /* Bauhaus default: sharp corners */
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
+          monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Sticky-header offset for anchor jumps */
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Accessibility: keyboard focus --- */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges (used inside issue cards) --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges (used in tables) --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
+
+      /* --- Callouts (used inside issues or standalone) --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+
+      /* --- Stat cards / scorecards (aliased vocabulary) --- */
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card,
+      .score-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before,
+      .score-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-bad,
+      .score-bad {
+        /* default top bar already set */
+      }
+      .stat-bad::before,
+      .score-bad::before {
+        background: var(--problem);
+      }
+      .stat-good::before,
+      .score-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before,
+      .score-warn::before {
+        background: var(--warning);
+      }
+      .stat-value,
+      .score {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-bad .stat-value,
+      .score-bad .score {
+        color: var(--problem);
+      }
+      .stat-good .stat-value,
+      .score-good .score {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value,
+      .score-warn .score {
+        color: var(--warning);
+      }
+      .stat-label,
+      .score-card .label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+
+      /* --- Strengths list --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--solution);
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* --- Tables --- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--accent);
+      } /* func, type, struct, if, return */
+      .tok-type {
+        color: var(--warning);
+      } /* int, string, bool, error */
+      .tok-string {
+        color: var(--solution);
+      } /* "quoted strings" */
+      .tok-comment {
+        color: var(--text-faint);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #74a9ff;
+      } /* function names */
+      .tok-number {
+        color: var(--accent);
+      } /* 42, 3.14 */
+      .tok-generic {
+        color: var(--problem);
+      } /* T, ID in generics */
+      .tok-builtin {
+        color: #4dd9ff;
+      } /* make, len, append */
+      .tok-punct {
+        color: var(--text-muted);
+      } /* { } ( ) ; = : */
+      .tok-attr {
+        color: var(--accent);
+      } /* Nix attribute names */
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--surface-sunken);
+        border: 1px solid var(--border-strong);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+        border-color: var(--accent);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+        border-color: var(--problem);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+        border-color: var(--solution);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids (responsive) --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC (alternative to sidebar) --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .stat-grid,
+        .scorecard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Full-bleed top bar (optional — remove for quieter reports) -->
+    <div class="top-bar">
+      <span>NAMING REVIEW</span>
+      <span>2026-07-18</span>
+      <span>cmdguard v3.0.0</span>
+    </div>
+
+    <div class="layout">
+      <!-- Sidebar TOC (hidden below 1024px; use inline .toc if you prefer) -->
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#glossary">Type Glossary</a>
+          <a href="#honesty">Honesty Issues</a>
+          <a href="#clarity">Clarity Issues</a>
+          <a href="#domain">Domain Alignment</a>
+          <a href="#consistency">Consistency Issues</a>
+          <a href="#leakage">Implementation Leakage</a>
+          <a href="#strengths">Strengths</a>
+          <a href="#actions">Recommended Renames</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="hero-badge">Naming Review</div>
+          <h1>cmdguard v3.0.0 &mdash; Identifier Quality Audit</h1>
+          <p class="hero-subtitle">
+            71 top-level type declarations + ~180 functions reviewed against
+            Clean Code, DDD, and Go convention checklist. The bar is high
+            because the rest of the code is: only a handful of names fall
+            short of the standard the codebase already sets for itself.
+          </p>
+        </div>
+
+        <nav class="toc">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#summary">Summary</a></li>
+            <li><a href="#methodology">Methodology</a></li>
+            <li><a href="#glossary">Type Glossary</a></li>
+            <li><a href="#honesty">Honesty Issues</a></li>
+            <li><a href="#clarity">Clarity Issues</a></li>
+            <li><a href="#domain">Domain Alignment</a></li>
+            <li><a href="#consistency">Consistency Issues</a></li>
+            <li><a href="#leakage">Implementation Leakage</a></li>
+            <li><a href="#strengths">Strengths</a></li>
+            <li><a href="#actions">Recommended Renames</a></li>
+          </ul>
+        </nav>
+
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">71</div>
+            <div class="stat-label">Types reviewed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">~180</div>
+            <div class="stat-label">Functions reviewed</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Critical (lying names)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">3</div>
+            <div class="stat-label">High (vague / Handler)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Medium</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Low (style)</div>
+          </div>
+        </div>
+
+        <div class="card card-solution">
+          <h4>Headline: clean codebase, three names worth renaming</h4>
+          <p>
+            No name lies about behavior. No <code>Impl</code>, no
+            <code>Abstract</code>, no <code>I</code> prefixes. Constructors,
+            functional options, and sentinels follow Go convention
+            consistently. The three High-severity findings below are the only
+            names where a newcomer would have to read the definition to
+            understand what the type does &mdash; everything else reads from
+            the call site.
+          </p>
+        </div>
+
+        <h2 id="methodology"><span class="num">01</span>Methodology</h2>
+        <div class="card">
+          <h4>Automated</h4>
+          <p>
+            <code>golangci-lint run ./...</code> (0 issues, includes
+            <code>var-naming</code>, <code>exported</code>,
+            <code>package-naming</code>, <code>receiver-naming</code>) &mdash;
+            already green, so this review focused on the semantic layer linters
+            cannot reach.
+          </p>
+        </div>
+        <div class="card">
+          <h4>Semantic</h4>
+          <p>
+            Ripgrep across all 60 source files for: vague nouns
+            (<code>Data|Info|Record|Item|Object|Thing</code>), trash-can
+            suffixes (<code>Manager|Handler|Processor|Helper|Util|Utility</code>),
+            architecture leakage (<code>Impl|Concrete|Default|Abstract|Base</code>),
+            <code>I</code> prefixes, and vague verbs
+            (<code>do|handle|process|manage|perform</code>). Then a
+            hand-review of every <code>type ... struct|interface</code> and
+            every exported function in <code>pkg/cmdguard/v3</code>,
+            <code>pkg/testutil</code>, the 5 sub-modules, and the examples.
+          </p>
+        </div>
+
+        <h2 id="glossary"><span class="num">02</span>Type Glossary (excerpt)</h2>
+        <table>
+          <thead>
+            <tr><th>Code Name</th><th>Role</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>CLI[T]</code></td><td>Root CLI struct</td><td>Generic on Config; clean.</td></tr>
+            <tr><td><code>Command[T,F]</code></td><td>Command struct</td><td>Generic on Config+Flags; clean.</td></tr>
+            <tr><td><code>Scope</code></td><td>DI scope</td><td>Wraps samber/do; name honest.</td></tr>
+            <tr><td><code>BranchingFlowContext</code></td><td>Branch-aware ctx</td><td>Long but precise; no shorter name captures it.</td></tr>
+            <tr><td><code>Email / Port / URL / FilePath / HostPort / Duration / Enum</code></td><td>Branded domain types</td><td>Excellent &mdash; branded primitives with constructors.</td></tr>
+            <tr><td><code>LogLevel / LogFormat</code></td><td>Typed aliases over <code>Enum</code></td><td>Composed, not duplicated; clean.</td></tr>
+            <tr><td><code>NoFlags</code></td><td>Empty flag struct sentinel</td><td>Named type (not alias) by design &mdash; honest.</td></tr>
+            <tr><td><code>TypeHandler</code></td><td>Interface</td><td><span class="badge badge-high">High</span> &ldquo;Handler&rdquo; is vague; see below.</td></tr>
+            <tr><td><code>CommandInfo</code></td><td>Middleware metadata</td><td><span class="badge badge-medium">Medium</span> &ldquo;Info&rdquo; suffix &mdash; see below.</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="honesty"><span class="num">03</span>Honesty Issues (Critical)</h2>
+        <div class="card card-solution">
+          <h4>None found.</h4>
+          <p>
+            No function mutates state while named <code>getX</code>; no
+            euphemisms (<code>sanitize</code> for <code>delete</code>);
+            no misleading scope. Every getter (<code>cli.Name()</code>,
+            <code>cli.Config()</code>, <code>email.Domain()</code>) is a pure
+            query. Every command verb (<code>Add</code>, <code>Done</code>,
+            <code>Shutdown</code>) does what it says.
+          </p>
+        </div>
+
+        <h2 id="clarity"><span class="num">04</span>Clarity Issues (High)</h2>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">High</span>
+          <h3><code>TypeHandler</code> interface &mdash; &ldquo;Handler&rdquo; is a trash-can name</h3>
+          <div class="where">pkg/cmdguard/v3/type_handler.go:12-17</div>
+          <p>
+            The interface has three methods: <code>Register</code>,
+            <code>Parse</code>, <code>Default</code>. It does not
+            &ldquo;handle&rdquo; anything in the usual event-handler sense;
+            it adapts a <code>reflect.Type</code> to the flag system by
+            providing parse/default/register behavior. Every implementor is
+            a codec for a specific type.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Better name</strong>
+            <code>TypeCodec</code> &mdash; parallels
+            <code>encoding/json.Marshaler</code> / <code>TextMarshaler</code>,
+            both of which bundle parse+format under one contract. The
+            functional adapter becomes <code>TypeCodecFunc</code>, and the
+            registry helper stays <code>RegisterTypeCodec</code>. If
+            backward compatibility matters, deprecate <code>TypeHandler</code>
+            as an alias and ship the new name alongside.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">High</span>
+          <h3><code>StringSliceContains</code> is a duplicate name for <code>ContainsString</code></h3>
+          <div class="where">pkg/testutil/panic_test_helpers.go:107-114</div>
+          <p>
+            Two exported functions do the same thing. The doc comment even
+            admits it: <code>&quot;StringSliceContains is an alias for
+            ContainsString for better readability.&quot;</code> Two names for
+            one concept is the textbook split-brain: a reader who sees both
+            in different files wonders if they differ. (Both also just wrap
+            <code>slices.Contains</code>.)
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong>
+            Delete one. Keep <code>slices.Contains</code> directly at call
+            sites; if a testutil helper is wanted, keep
+            <code>ContainsString</code> and remove the alias. Better yet,
+            migrate callers to <code>slices.Contains</code> and remove both
+            &mdash; the stdlib name is already the right one.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">High</span>
+          <h3><code>doPanicTest</code> uses the vague <code>do</code> prefix</h3>
+          <div class="where">pkg/testutil/panic_test_helpers.go:132-147</div>
+          <p>
+            <code>do</code> says nothing. The function returns true if
+            <code>fn</code> panicked. The exported wrappers
+            (<code>AssertPanics</code>, <code>ExpectPanics</code>,
+            <code>AssertDoesNotPanic</code>) are well named; only the private
+            helper has the smell.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Better name</strong>
+            <code>panics(fn) bool</code> &mdash; reads naturally at call
+            sites: <code>if panics(fn) { ... }</code>. Matches the bool-as-
+            question convention.
+          </div>
+        </div>
+
+        <h2 id="domain"><span class="num">05</span>Domain Alignment (Medium)</h2>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Medium</span>
+          <h3><code>CommandInfo</code> &mdash; mild &ldquo;Info&rdquo; suffix</h3>
+          <div class="where">pkg/cmdguard/v3/middleware.go:40-45</div>
+          <p>
+            The struct carries metadata about an in-progress command
+            (<code>Name</code>, <code>FullPath</code>, <code>Phase</code>,
+            <code>HasRunE</code>) for middleware. <code>Info</code> is one of
+            the &ldquo;I contain stuff&rdquo; anti-words, but the alternative
+            <code>CommandMeta</code> is longer and the current name is
+            idiomatic. Worth a rename only if other <code>*Info</code> types
+            start appearing.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Optional</strong>
+            Rename to <code>CommandMeta</code> if the team prefers; otherwise
+            accept and document the convention so the suffix does not
+            proliferate.
+          </div>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Medium</span>
+          <h3><code>HuhRunner</code> leaks the implementation library</h3>
+          <div class="where">prompts/prompts.go</div>
+          <p>
+            The unexported struct embeds huh/v2 directly. The name is fine
+            for an unexported type, but if it ever becomes exported, prefer
+            <code>PromptRunner</code> (matching the interface it implements)
+            over naming it after the library.
+          </p>
+          <div class="callout callout-amber">
+            <strong>Accept as-is</strong>
+            Unexported; no rename needed. Flag for review if exported later.
+          </div>
+        </div>
+
+        <h2 id="consistency"><span class="num">06</span>Consistency Issues</h2>
+        <div class="card card-solution">
+          <h4>No verb-tense or synonym drift detected.</h4>
+          <p>
+            CRUD verbs on <code>TaskStore</code> are consistent
+            (<code>Add/Get/List/Done/Shutdown</code>). Constructors all use
+            <code>New*</code> (<code>NewCLI</code>, <code>NewCommand</code>,
+            <code>NewParentCommand</code>, <code>NewScope</code>,
+            <code>NewManPage</code>, <code>NewTaskStore</code>). Functional
+            options all use <code>With*</code> consistently
+            (<code>WithShort</code>, <code>WithLong</code>,
+            <code>WithExample</code>, <code>WithAuditLog</code>, etc.).
+            Iterator methods share the <code>*Seq</code> suffix
+            (<code>TagsSeq</code>, <code>FlagNamesSeq</code>,
+            <code>PathSeq</code>, <code>ChildrenSeq</code>).
+          </p>
+        </div>
+
+        <h2 id="leakage"><span class="num">07</span>Implementation Leakage</h2>
+        <div class="card card-solution">
+          <h4>None detected.</h4>
+          <p>
+            No <code>Impl</code> suffix. No <code>Abstract</code> or
+            <code>Base</code> prefixes. No <code>I</code> prefix on interfaces
+            (Go convention). The only mildly leaky name is
+            <code>HuhRunner</code> (above), and it is unexported. The DI
+            <code>Scope</code> is named for its role, not for samber/do.
+            Flag types (<code>Enum</code>, <code>Port</code>, etc.) are named
+            for the domain concept they brand, not for pflag.
+          </p>
+        </div>
+
+        <h2 id="strengths"><span class="num">08</span>Strengths to Preserve</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Branded primitive types</strong>
+              <span><code>Email</code>, <code>Port</code>, <code>URL</code>, <code>FilePath</code>, <code>HostPort</code>, <code>Duration</code> &mdash; each is a named type with a validating constructor. The domain language IS the type system.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Consistent <code>Err*</code> sentinels</strong>
+              <span>40+ sentinel errors all use <code>Err</code> prefix, all chainable via <code>errors.Is</code>. No <code>...Error</code> suffix, no mixed conventions.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Question-shaped booleans</strong>
+              <span><code>NoColor() bool</code>, <code>Valid() bool</code>, <code>HasRunE</code> &mdash; all read as yes/no questions. No <code>isNotEnabled</code>-style inversions.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Domain verbs in TaskStore</strong>
+              <span><code>Done(id)</code> over <code>UpdateStatus(id, &quot;done&quot;)</code>; <code>Seed</code>/<code>Stats</code>/<code>IDs</code> are short, declarative, and use the domain vocabulary.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Role-named DI type</strong>
+              <span><code>Scope</code> (not <code>DoInjector</code> or <code>DIContainer</code>) &mdash; named for its architectural role, not for the library that implements it.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Two-letter type params</strong>
+              <span><code>CLI[T]</code>, <code>Command[T,F]</code> &mdash; single-letter type params are the one accepted exception to the no-abbreviation rule (math context, Go convention).</span>
+            </div>
+          </div>
+        </div>
+
+        <h2 id="actions"><span class="num">09</span>Recommended Renames</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Severity</th>
+              <th>File</th>
+              <th>Line</th>
+              <th>Current name</th>
+              <th>Better name</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>pkg/cmdguard/v3/type_handler.go</td>
+              <td>13</td>
+              <td><code>TypeHandler</code></td>
+              <td><code>TypeCodec</code></td>
+              <td>Three methods (Register/Parse/Default) form a codec contract, not event-handling</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>pkg/cmdguard/v3/type_handler.go</td>
+              <td>36</td>
+              <td><code>TypeHandlerFunc</code></td>
+              <td><code>TypeCodecFunc</code></td>
+              <td>Follows #1; functional adapter for the codec contract</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>pkg/cmdguard/v3/type_handler.go</td>
+              <td>13 (comment)</td>
+              <td><code>&quot;defines how a flag type is registered...&quot;</code></td>
+              <td><code>&quot;TypeCodec defines how a flag type is parsed, defaulted, and registered.&quot;</code></td>
+              <td>Doc comment uses &ldquo;handled&rdquo; implicitly; align with new name</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>pkg/testutil/panic_test_helpers.go</td>
+              <td>111-114</td>
+              <td><code>StringSliceContains</code></td>
+              <td><em>delete</em></td>
+              <td>Duplicate of <code>ContainsString</code>; admits so in its own doc comment</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>pkg/testutil/panic_test_helpers.go</td>
+              <td>132</td>
+              <td><code>doPanicTest</code></td>
+              <td><code>panics</code></td>
+              <td><code>do</code> verb says nothing; <code>panics(fn) bool</code> reads naturally</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>pkg/cmdguard/v3/middleware.go</td>
+              <td>40</td>
+              <td><code>CommandInfo</code></td>
+              <td><code>CommandMeta</code> (optional)</td>
+              <td><code>Info</code> is a &ldquo;bag of fields&rdquo; suffix; only rename if more <code>*Info</code> types appear</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>pkg/cmdguard/v3/flags.go and callers</td>
+              <td>multiple</td>
+              <td><code>RegisterTypeHandler</code> + <code>FlagRegistry.RegisterTypeHandler</code></td>
+              <td><code>RegisterTypeCodec</code> + <code>RegisterTypeCodec</code></td>
+              <td>Follows #1; current name exposes the vague &ldquo;Handler&rdquo; word</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-amber">
+          <strong>Rename safety</strong>
+          <code>TypeHandler</code> and <code>RegisterTypeHandler</code> are
+          <em>exported public API</em>. Renaming them is a breaking change for
+          downstream consumers. Options: (a) rename now and bump to v4 since
+          v3 just shipped, (b) ship <code>TypeCodec</code> as an alias and
+          deprecate <code>TypeHandler</code> with a <code>// Deprecated:</code>
+          notice, or (c) accept the name and document it. The testutil names
+          (#4, #5) are safe to rename immediately &mdash; testutil is shared
+          internally.
+        </div>
+
+        <footer class="footer">
+          Generated 2026-07-18 &middot; 60 source files / 71 types / ~180 functions reviewed against v3.0.0
+        </footer>
+      </main>
+    </div>
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>

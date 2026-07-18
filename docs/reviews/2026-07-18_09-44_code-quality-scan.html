@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard — Code Quality Scan (2026-07-18)</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS DARK — Dashboard template
+         Design language: form follows function. Primary colors on graphite.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Dark) --- */
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+
+        /* --- Semantic layer (shared vocabulary with editorial template) --- */
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 15%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 20%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px; /* Bauhaus default: sharp corners */
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
+          monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Sticky-header offset for anchor jumps */
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Accessibility: keyboard focus --- */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges (used inside issue cards) --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges (used in tables) --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
+
+      /* --- Callouts (used inside issues or standalone) --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+
+      /* --- Stat cards / scorecards (aliased vocabulary) --- */
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card,
+      .score-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before,
+      .score-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-bad,
+      .score-bad {
+        /* default top bar already set */
+      }
+      .stat-bad::before,
+      .score-bad::before {
+        background: var(--problem);
+      }
+      .stat-good::before,
+      .score-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before,
+      .score-warn::before {
+        background: var(--warning);
+      }
+      .stat-value,
+      .score {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-bad .stat-value,
+      .score-bad .score {
+        color: var(--problem);
+      }
+      .stat-good .stat-value,
+      .score-good .score {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value,
+      .score-warn .score {
+        color: var(--warning);
+      }
+      .stat-label,
+      .score-card .label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+
+      /* --- Strengths list --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--solution);
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* --- Tables --- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--accent);
+      } /* func, type, struct, if, return */
+      .tok-type {
+        color: var(--warning);
+      } /* int, string, bool, error */
+      .tok-string {
+        color: var(--solution);
+      } /* "quoted strings" */
+      .tok-comment {
+        color: var(--text-faint);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #74a9ff;
+      } /* function names */
+      .tok-number {
+        color: var(--accent);
+      } /* 42, 3.14 */
+      .tok-generic {
+        color: var(--problem);
+      } /* T, ID in generics */
+      .tok-builtin {
+        color: #4dd9ff;
+      } /* make, len, append */
+      .tok-punct {
+        color: var(--text-muted);
+      } /* { } ( ) ; = : */
+      .tok-attr {
+        color: var(--accent);
+      } /* Nix attribute names */
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--surface-sunken);
+        border: 1px solid var(--border-strong);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+        border-color: var(--accent);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+        border-color: var(--problem);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+        border-color: var(--solution);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids (responsive) --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC (alternative to sidebar) --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .stat-grid,
+        .scorecard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Full-bleed top bar (optional — remove for quieter reports) -->
+    <div class="top-bar">
+      <span>CODE QUALITY SCAN</span>
+      <span>2026-07-18</span>
+      <span>cmdguard v3.0.0</span>
+    </div>
+
+    <div class="layout">
+      <!-- Sidebar TOC (hidden below 1024px; use inline .toc if you prefer) -->
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#build-lint">Build &amp; Lint</a>
+          <a href="#vet">Vet &amp; Diagnostics</a>
+          <a href="#duplication">Duplication</a>
+          <a href="#issues">Issue Table</a>
+          <a href="#strengths">Strengths</a>
+          <a href="#plan">Recommended Actions</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="hero-badge">Code Quality Scan</div>
+          <h1>cmdguard v3.0.0 &mdash; Build, Lint &amp; Duplication Audit</h1>
+          <p class="hero-subtitle">
+            160 Go files audited across 6 modules (core + 5 sub-modules). Baseline:
+            0 lint issues, 87.6% coverage, all tests green. This scan surfaces what
+            the linters do not: residual duplication, gopls hints, and module-level
+            quality observations.
+          </p>
+        </div>
+
+        <nav class="toc">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#summary">Summary</a></li>
+            <li><a href="#build-lint">Build &amp; Lint</a></li>
+            <li><a href="#vet">Vet &amp; Diagnostics</a></li>
+            <li><a href="#duplication">Duplication</a></li>
+            <li><a href="#issues">Issue Table</a></li>
+            <li><a href="#strengths">Strengths</a></li>
+            <li><a href="#plan">Recommended Actions</a></li>
+          </ul>
+        </nav>
+
+        <!-- Stats Dashboard -->
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <div class="stat-grid">
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Lint issues (golangci-lint)</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Build errors</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">87.6%</div>
+            <div class="stat-label">Coverage (core v3)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Clone groups @ t=3 (1 @ t=5)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">33+</div>
+            <div class="stat-label">gopls infertypeargs hints</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">160</div>
+            <div class="stat-label">Go files (60 source / 100 test)</div>
+          </div>
+        </div>
+
+        <div class="card card-solution">
+          <h4>Headline: production-ready baseline, low residual debt</h4>
+          <p>
+            The codebase already meets its stated quality bar: zero panics, 0 lint
+            issues, 87.6% coverage, 7 fuzz targets, 26 benchmarks, all tests pass
+            with <code>-race</code>. What this scan adds is the next layer of
+            detail &mdash; residual duplication that the team has explicitly
+            accepted (validateMin/Max, Min/Max IntWidth, FilePath validators),
+            plus a long tail of <code>infertypeargs</code> hints in test files
+            that gopls would auto-fix if asked.
+          </p>
+        </div>
+
+        <!-- Build & Lint -->
+        <h2 id="build-lint"><span class="num">01</span>Build &amp; Lint</h2>
+
+        <div class="card">
+          <h4>Build: <code>GOEXPERIMENT=jsonv2 go build ./...</code> &mdash; PASS</h4>
+          <p>
+            Core module + 5 sub-modules (glamour, manpage, prompts, spinner,
+            telemetry) all compile. <code>GOEXPERIMENT=jsonv2</code> is required
+            because the project uses <code>encoding/json/v2</code> and
+            <code>encoding/json/jsontext</code> from Go 1.26.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>Lint: <code>golangci-lint run ./...</code> &mdash; 0 issues</h4>
+          <p>
+            Core and all 5 sub-modules report zero issues against the repo's
+            <code>.golangci.yml</code>. The 4 per-file v3 exclusions and 4
+            ireturn allow-list entries are documented in AGENTS.md as
+            intentional design decisions (COW registries, context keys,
+            legitimate interface returns).
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>Tests: <code>go test ./... -race -count=1</code> &mdash; PASS</h4>
+          <p>
+            All packages pass with race detector. Coverage:
+            core v3 = 87.6%, configload = 87.5%, testutil = 50.0%,
+            examples/taskctl = 68.2%, docs-generator = 0% (example binary).
+          </p>
+        </div>
+
+        <!-- Vet & Diagnostics -->
+        <h2 id="vet"><span class="num">02</span>Vet &amp; LSP Diagnostics</h2>
+
+        <div class="card card-problem">
+          <h4><code>go vet</code>: clean. gopls surfaces 33+ infertypeargs hints</h4>
+          <p>
+            <code>go vet ./...</code> reports nothing. However, gopls
+            reports <strong>33+ unnecessary type arguments</strong> across at
+            least 9 test files. These are calls like
+            <code>NewCLI[TaskConfig]()</code> where Go can infer
+            <code>[TaskConfig]</code> from context. The hints are informational
+            (the code is correct), but each is a 5-second fix that would silence
+            a gopls nag and tighten the tests.
+          </p>
+        </div>
+
+        <div class="callout callout-solution">
+          <strong>Fix</strong>
+          Run <code>GOEXPERIMENT=jsonv2 gopls fix -a ./pkg/cmdguard/v3/...</code>
+          on the affected test files, or apply <code>gofumpt</code>-driven
+          simplification. None of the call sites change semantics.
+        </div>
+
+        <!-- Duplication -->
+        <h2 id="duplication"><span class="num">03</span>Duplication (art-dupl)</h2>
+
+        <div class="card">
+          <h4>Tool: <code>art-dupl --semantic --sort total-tokens -t 5</code></h4>
+          <p>
+            At threshold 5 (duplicated statements), <strong>1 clone group</strong>
+            remains. At threshold 3, <strong>5 clone groups</strong>. All
+            reviewed below with judgment per clone.
+          </p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Accept</span>
+          <h3>Clone 1: validateMin / validateMax (flags_validate.go:253-296)</h3>
+          <div class="where">pkg/cmdguard/v3/flags_validate.go:253-266 and :276-289</div>
+          <p>
+            Two ~14-line validators with the same shape: parse
+            <code>name:value</code>, convert to float64, compare against
+            actual, return wrapped sentinel. The only differences are the
+            operator (<code>&lt;</code> vs <code>&gt;</code>) and the sentinel
+            (<code>ErrValueTooSmall</code> vs <code>ErrValueTooLarge</code>).
+          </p>
+          <div class="callout callout-amber">
+            <strong>Why we accept</strong>
+            Forcing a single generic helper would either take a comparator
+            function argument (more params than the duplicated code has lines)
+            or use a numeric operator token (stringly-typed dispatch). The
+            current pair reads more clearly than
+            <code>validateRange(val, opLess, ErrValueTooSmall)</code> would.
+            Two near-copies that name their intent are preferable to one
+            abstraction that hides it.
+          </div>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Accept</span>
+          <h3>Clone 2: validateMinLen / validateMaxLen (flags_validate.go:217-243)</h3>
+          <div class="where">pkg/cmdguard/v3/flags_validate.go:217-225 and :235-243</div>
+          <p>
+            Same pattern as Clone 1, but for string length validation.
+            Acceptable for the same reason: the abstraction cost exceeds the
+            duplication cost.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Accept</span>
+          <h3>Clone 3: validator loop in flags_validate.go:71-77 and type_handler.go:114-120</h3>
+          <div class="where">pkg/cmdguard/v3/flags_validate.go:71-77 &middot; type_handler.go:114-120</div>
+          <p>
+            Both iterate over registered validators and short-circuit on first
+            error. Different domains (flag validators vs type handlers) make
+            extraction artificial; both are 7 lines and read fine inline.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Accept</span>
+          <h3>Clone 4: FilePath validators (types_filepath.go:91-112)</h3>
+          <div class="where">pkg/cmdguard/v3/types_filepath.go:91-98 and :105-112</div>
+          <p>
+            <code>validateFile</code> and <code>validateDir</code> share
+            structure (call <code>os.Stat</code>, check mode bit). The two
+            differ in <code>IsRegular()</code> vs <code>IsDir()</code>, which
+            is the entire point of having two functions. Acceptable.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Review</span>
+          <h3>Clone 5: FlowContext.Shutdown vs Scope.Shutdown (6 lines)</h3>
+          <div class="where">pkg/cmdguard/v3/flow_context.go:175-180 &middot; scope.go:82-87</div>
+          <p>
+            Both walk a list of shutdown hooks/services in reverse order and
+            collect errors via <code>errors.Join</code>. Worth a glance &mdash;
+            could potentially share a small <code>shutdownAllReverse[T]</code>
+            helper &mdash; but the type signatures differ enough
+            (<code>[]ShutdownHook</code> vs <code>[]do.ShutdownHook</code>)
+            that the abstraction earns little. Acceptable as-is; flag for
+            revisit if either grows.
+          </p>
+        </div>
+
+        <!-- Issue Table -->
+        <h2 id="issues"><span class="num">04</span>Issue Table</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Severity</th>
+              <th>File</th>
+              <th>Line</th>
+              <th>Issue</th>
+              <th>Suggested Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td>pkg/cmdguard/v3/*_test.go (9+ files)</td>
+              <td>multiple</td>
+              <td>33+ unnecessary explicit type args (<code>NewCLI[T]</code>, <code>NewCommand[T]</code>)</td>
+              <td><code>gopls fix -a</code> &mdash; remove explicit type args where inferable</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>pkg/cmdguard/v3/flags_validate.go</td>
+              <td>253-296</td>
+              <td>validateMin/validateMax near-duplicate (~14 stmts each)</td>
+              <td>Accept: abstraction cost exceeds duplication cost</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>pkg/cmdguard/v3/flags_validate.go</td>
+              <td>217-243</td>
+              <td>validateMinLen/validateMaxLen near-duplicate</td>
+              <td>Accept: same rationale as #2</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>pkg/cmdguard/v3/types_filepath.go</td>
+              <td>91-112</td>
+              <td>validateFile/validateDir share structure</td>
+              <td>Accept: the difference is the predicate</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>pkg/cmdguard/v3/flow_context.go &amp; scope.go</td>
+              <td>175-180 / 82-87</td>
+              <td>Shutdown reverse-iteration pattern duplicated</td>
+              <td>Revisit if either grows; for now accept</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>pkg/cmdguard/v3/flags_validate.go &amp; type_handler.go</td>
+              <td>71-77 / 114-120</td>
+              <td>Validator loop pattern duplicated across domains</td>
+              <td>Accept: different domains</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Strengths -->
+        <h2 id="strengths"><span class="num">05</span>Strengths</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Zero panics by design</strong>
+              <span>Every constructor returns errors; no <code>Must*</code> variants. 1429 test runs across 26 benchmarks and 7 fuzz targets enforce this.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>0 lint issues across 6 modules</strong>
+              <span>Real code fixes were applied (wrapcheck helpers, funlen splits, ireturn allow-list) rather than silencing linters. AGENTS.md tracks 4+4 documented exclusions.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Thin core, modular sub-modules</strong>
+              <span>Core v3 has 13 direct deps; 5 optional sub-modules isolate heavy deps (huh, lipgloss, otel, glamour, mango). Sub-modules pass lint independently.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Copy-on-write registries</strong>
+              <span><code>FlagRegistry</code> shares global type/validator registries lazily and clones on first write &mdash; reduces <code>NewCLI</code> by ~48%.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Honest status reporting</strong>
+              <span>Sub-modules self-skip when stderr is not a TTY (<code>spinner</code>); audit log query helpers expose failed services explicitly.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Numbered Steps -->
+        <h2 id="plan"><span class="num">06</span>Recommended Actions</h2>
+        <div class="migration-step">
+          <div class="migration-num">1</div>
+          <div class="migration-content">
+            <h4>Auto-fix infertypeargs hints (Pareto: high impact, near-zero effort)</h4>
+            <p>
+              Run <code>GOEXPERIMENT=jsonv2 gopls fix -a &lt;file&gt;</code>
+              across the 9+ affected test files. Verify with
+              <code>go test ./... -race</code>. Expected: 33+ hints silenced,
+              no behavior change.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">2</div>
+          <div class="migration-content">
+            <h4>Document the 5 accepted clone groups in AGENTS.md</h4>
+            <p>
+              Each accepted clone should record its rationale (most already do).
+              Add a one-line table entry so the next duplication pass skips them
+              without re-deliberation.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">3</div>
+          <div class="migration-content">
+            <h4>Add a CI guard for infertypeargs regression</h4>
+            <p>
+              <code>golangci-lint</code> does not currently surface gopls
+              hints. Consider <code>gopls check</code> as a separate CI job
+              (with <code>GOEXPERIMENT=jsonv2</code>) so future unnecessary
+              type args are caught at PR time.
+            </p>
+          </div>
+        </div>
+
+        <footer class="footer">
+          Generated 2026-07-18 &middot; Build/lint/test/vet/art-dupl verified against v3.0.0 (commit 73d49ad)
+        </footer>
+      </main>
+    </div>
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>
