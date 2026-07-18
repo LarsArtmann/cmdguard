@@ -69,13 +69,6 @@ func TestContainsString(t *testing.T) {
 	}
 }
 
-func TestStringSliceContains(t *testing.T) {
-	t.Parallel()
-	if !StringSliceContains([]string{"x"}, "x") {
-		t.Error("expected true")
-	}
-}
-
 func TestAssertPanics(t *testing.T) {
 	t.Parallel()
 	AssertPanics(t, func() { panic("test") })

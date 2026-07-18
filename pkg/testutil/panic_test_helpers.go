@@ -104,12 +104,8 @@ func AssertStderrContains(t *testing.T, stderr string, substrings ...string) {
 }
 
 // ContainsString checks if a slice contains a specific string.
+// Deprecated: prefer [slices.Contains] directly in new code.
 func ContainsString(slice []string, s string) bool {
-	return slices.Contains(slice, s)
-}
-
-// StringSliceContains is an alias for ContainsString for better readability.
-func StringSliceContains(slice []string, s string) bool {
 	return slices.Contains(slice, s)
 }
 
@@ -129,8 +125,8 @@ func NoOpRunE[T, F any](_ context.Context, _ *T, _ F) error {
 	return nil
 }
 
-// doPanicTest runs fn and returns true if it panicked.
-func doPanicTest(fn func()) bool {
+// panics runs fn and returns true if it panicked.
+func panics(fn func()) bool {
 	didPanic := false
 
 	func() {
@@ -150,7 +146,7 @@ func doPanicTest(fn func()) bool {
 func AssertPanics(t *testing.T, fn func()) {
 	t.Helper()
 
-	if !doPanicTest(fn) {
+	if !panics(fn) {
 		t.Error("expected panic, got none")
 	}
 }
@@ -159,14 +155,14 @@ func AssertPanics(t *testing.T, fn func()) {
 func ExpectPanics(t *testing.T, fn func()) bool {
 	t.Helper()
 
-	return doPanicTest(fn)
+	return panics(fn)
 }
 
 // AssertDoesNotPanic runs fn and fails the test if it panics.
 func AssertDoesNotPanic(t *testing.T, fn func()) {
 	t.Helper()
 
-	if doPanicTest(fn) {
+	if panics(fn) {
 		t.Error("expected no panic, but it panicked")
 	}
 }

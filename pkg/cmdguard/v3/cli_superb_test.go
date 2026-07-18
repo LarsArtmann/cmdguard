@@ -403,7 +403,7 @@ func TestVersionCommand(t *testing.T) {
 		)
 		testutil.AssertNoError(t, err)
 
-		cmd, err := VersionCommand[testConfig](cli)
+		cmd, err := VersionCommand(cli)
 		testutil.AssertNoError(t, err)
 		testutil.AssertFieldEqString(t, cmd.Use(), "version", "Use()")
 		testutil.AssertFieldEqString(t, cmd.Short(), "Print version information", "Short()")
