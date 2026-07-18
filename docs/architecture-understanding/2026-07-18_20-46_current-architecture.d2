@@ -1,0 +1,83 @@
+direction: down
+
+cmdguard v3.0.0 — Current Architecture (6 Go modules): {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+
+  go_work: "go.work\n(6 modules)" {
+    style.fill: "#18181d"
+    style.font-color: "#f4f4f0"
+  }
+
+  core: "core module\ngithub.com/larsartmann/cmdguard/v3\npkg/cmdguard/v3 + pkg/testutil + examples + tests" {
+    style.fill: "#ffb347"
+    style.font-color: "#0e0e10"
+
+    v3_pkg: "v3 package\n60 source files · 8.2k LOC · 87.6% coverage\nCLI[T] · Command[T,F] · Scope · FlagRegistry\nTypeHandler · 7 branded types · 58 sentinels"
+    testutil: "testutil\nAssertEqual/AssertPanics/NoOpRunE"
+    examples: "examples/taskctl + docs-generator"
+    integration: "tests/integration"
+  }
+
+  sub_modules: "Optional sub-modules (each own go.mod)" {
+    style.fill: "#18181d"
+    style.font-color: "#f4f4f0"
+
+    glamour: "glamour\ncharm.land/glamour/v2\nmarkdown help rendering"
+    manpage: "manpage\nmuesli/mango + mango-cobra\nroff man page generation"
+    prompts: "prompts\ncharm.land/huh/v2\ninteractive PromptRunner"
+    spinner: "spinner\ncharm.land/lipgloss/v2\nSpinnerMiddleware[T]"
+    telemetry: "telemetry\ngo.opentelemetry.io/otel\nTelemetryMiddleware[T]"
+  }
+
+  external: "Core external dependencies (13 direct)" {
+    style.fill: "#18181d"
+    style.font-color: "#f4f4f0"
+    style.stroke-dash: 3
+
+    cobra: "spf13/cobra v1.10.2"
+    pflag: "spf13/pflag v1.0.10"
+    do: "samber/do/v2 v2.0.0"
+    fang: "charm.land/fang/v2 v2.0.1"
+    go_output: "larsartmann/go-output v0.30.4"
+    auditlog: "samber-do-auditlog v0.5.0"
+    koanf: "knadh/koanf/v2 v2.3.5"
+  }
+
+  consumers: "Downstream consumers" {
+    style.fill: "#18181d"
+    style.font-color: "#6eb5ff"
+    style.stroke-dash: 4
+
+    consumer_a: "CLI app\nimport core only\n(13 deps)"
+    consumer_b: "CLI app + prompts\nimport core + prompts sub-module"
+    consumer_c: "CLI app + telemetry\nimport core + telemetry sub-module"
+  }
+
+  go_work -> core
+  go_work -> sub_modules
+
+  core.v3_pkg -> core.testutil: test-only
+  core.examples -> core.v3_pkg
+  core.integration -> core.v3_pkg
+
+  core.v3_pkg -> external.cobra
+  core.v3_pkg -> external.pflag
+  core.v3_pkg -> external.do
+  core.v3_pkg -> external.fang
+  core.v3_pkg -> external.go_output
+  core.v3_pkg -> external.auditlog
+  core.v3_pkg -> external.koanf
+
+  sub_modules.glamour -> core.v3_pkg: "WithHelpTransform[T] hook"
+  sub_modules.manpage -> core.v3_pkg
+  sub_modules.prompts -> core.v3_pkg: "PromptRunner interface"
+  sub_modules.spinner -> core.v3_pkg: "Middleware[T] hook"
+  sub_modules.telemetry -> core.v3_pkg: "Middleware[T] hook"
+
+  consumers.consumer_a -> core.v3_pkg
+  consumers.consumer_b -> core.v3_pkg
+  consumers.consumer_b -> sub_modules.prompts
+  consumers.consumer_c -> core.v3_pkg
+  consumers.consumer_c -> sub_modules.telemetry
+}

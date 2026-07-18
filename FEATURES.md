@@ -173,7 +173,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ---
 
-## Rich Output (go-output v0.30.1)
+## Rich Output (go-output v0.30.4)
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
@@ -353,8 +353,8 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | `github.com/spf13/pflag`                    | v1.0.10 | Flag parsing                                   |
 | `charm.land/fang/v2`                        | v2.0.1  | Cobra styling                                  |
 | `charm.land/lipgloss/v2`                    | v2.0.5  | Terminal styling (fang dep, but listed direct) |
-| `github.com/larsartmann/go-output`          | v0.30.1 | Rich output (16 formats)                       |
-| `github.com/larsartmann/samber-do-auditlog` | v0.4.0  | DI audit logging                               |
+| `github.com/larsartmann/go-output`          | v0.30.4 | Rich output (16 formats)                       |
+| `github.com/larsartmann/samber-do-auditlog` | v0.5.0  | DI audit logging                               |
 | `github.com/knadh/koanf/v2`                 | v2.3.5  | Config loading (roadmapped for extraction)     |
 | `github.com/knadh/koanf/parsers/json`       | v1.0.0  | Koanf JSON parser                              |
 | `github.com/knadh/koanf/parsers/yaml`       | v1.1.0  | Koanf YAML parser                              |

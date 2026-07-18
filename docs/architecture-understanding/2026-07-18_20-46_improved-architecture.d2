@@ -1,0 +1,41 @@
+direction: down
+
+cmdguard v3.0.0 — Target Architecture (minimal deltas from current): {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+
+  note: |d2
+    The current architecture is already at target.
+    Only 2 deltas are worth tracking; both are optional refinements,
+    NOT forced changes. Do nothing unless a concrete driver appears.
+  |
+  note.style.font-color: "#f4d35e"
+
+  core_box: "core module — unchanged shape" {
+    style.fill: "#ffb347"
+    style.font-color: "#0e0e10"
+
+    v3_pkg: "v3 package\nSingle package, 60 source files.\nDelta A (optional): consider splitting pkg/cmdguard/v3 into\n  v3 (public API) + v3/internal/flag system + v3/internal/di\nIF the single package grows past ~12k LOC. Currently 8.2k — no action."
+  }
+
+  optional_delta_b: "Delta B (optional, only if rename ships in v4):\nTypeHandler -> TypeCodec\nReported-only in naming review; do NOT execute in v3." {
+    style.fill: "#18181d"
+    style.font-color: "#f4d35e"
+    style.stroke-dash: 4
+  }
+
+  sub_modules_box: "5 sub-modules — unchanged\nUnix-philosophy split is already correct.\nNo consolidation (each composes independently).\nNo further split (each does one thing at the right depth)." {
+    style.fill: "#18181d"
+    style.font-color: "#6eb5ff"
+  }
+
+  external_box: "13 direct deps — unchanged\nkoanf is roadmapped for extraction into a\nconfigload sub-module IF consumers ask; until then, accept." {
+    style.fill: "#18181d"
+    style.font-color: "#f4f4f0"
+    style.stroke-dash: 3
+  }
+
+  core_box -> sub_modules_box: extension hooks\n(WithHelpTransform, PromptRunner, Middleware)
+  core_box -> external_box: depends on
+  optional_delta_b -> core_box: post-v4 only
+}

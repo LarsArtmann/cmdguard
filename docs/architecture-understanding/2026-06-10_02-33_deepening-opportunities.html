@@ -194,5 +194,14 @@ setField(cfg, fieldName, typed) -&gt; clean error</pre>
         </p>
       </section>
     </div>
+    <!--
+      Resolution (2026-07-18): Candidate 1 (TypeHandler type guards) is addressed
+      in docs/reviews/2026-07-18_09-44_naming-review.html — the recommendation
+      is to rename TypeHandler -> TypeCodec in a future v4 (public API break,
+      deferred). Candidate 4 (global singletons) is documented as accepted in
+      AGENTS.md (COW registry pattern, ADR-003). Candidates 2 and 3 were resolved
+      during v3.0.0 development. See also the 2026-07-18 data-model-review and
+      full-code-review HTML reports.
+    -->
   </body>
 </html>

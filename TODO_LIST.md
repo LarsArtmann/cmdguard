@@ -39,7 +39,7 @@
 - [x] `WithCleanup[T]` — fires even on RunE error
 - [x] `ConfigFromContext[T]`, `WithPostFlagParse[T]`, `RegisterLocalCommandFlags`
 - [x] Plugin system, nested config structs, GenerateDocs, audit log (11 formats)
-- [x] 16 output formats via go-output v0.30.1 registries
+- [x] 16 output formats via go-output v0.30.4 registries
 
 ### 2026-07-10 Pareto Execution Session
 
