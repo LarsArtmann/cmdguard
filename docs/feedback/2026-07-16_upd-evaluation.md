@@ -116,10 +116,10 @@ Each module should have minimal transitive deps. Users import only what they nee
 
 ---
 
+**Update 2026-07-16:** We subsequently adopted `charm.land/fang/v2` (a thin Cobra styling layer) rather than `cmdguard`. It gives `upd` styled help, styled errors, man pages, and shell completions with a much smaller dependency footprint than a full framework, validating the feedback above: the right abstraction for single-purpose CLIs is a lightweight, composable presentation layer, not a framework that owns the entire command lifecycle.
+
 ## Summary
 
 `cmdguard` is an excellent framework that solves real problems for **multi-command, service-oriented CLIs**. For focused single-purpose tools like `upd`, the dependency cost vastly exceeds the value extracted.
 
 The gap between "stdlib `flag`" and "full CLI framework" is currently unoccupied. A lightweight, modular cmdguard that lets users adopt incrementally — starting with just better flags or better help — would capture a much broader audience.
-
-We'll revisit if a lite/modular variant ships. Until then, we're staying on stdlib `flag` and cherry-picking individual features (~50 lines of code for typo suggestions + env vars).
