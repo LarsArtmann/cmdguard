@@ -23,6 +23,22 @@ type validatorRegistry struct {
 	parent     *validatorRegistry // nil when owned; shared source for COW reads
 }
 
+func (r *validatorRegistry) isCowOwned() bool {
+	return r.owned
+}
+
+func (r *validatorRegistry) cowParent() (*validatorRegistry, bool) {
+	return r.parent, r.parent != nil
+}
+
+func (r *validatorRegistry) cowLock() {
+	r.mu.RLock()
+}
+
+func (r *validatorRegistry) cowUnlock() {
+	r.mu.RUnlock()
+}
+
 // globalValidators is the package-level validator registry.
 var globalValidators = newValidatorRegistry()
 
@@ -63,23 +79,52 @@ func (r *validatorRegistry) register(name string, validator FlagValidator) {
 	r.validators[name] = validator
 }
 
+// cowNode is the subset of a copy-on-write registry needed to walk to its root.
+// Both typeRegistry and validatorRegistry satisfy this interface; see cowRoot.
+type cowNode[T any] interface {
+	isCowOwned() bool
+	cowParent() (T, bool)
+	cowLock()
+	cowUnlock()
+}
+
+// cowRoot walks from r to its owning root: returns the parent if r is a non-owned
+// view and a parent exists, otherwise r itself. Caller must hold the returned
+// root's read lock for the duration of any read.
+func cowRoot[T cowNode[T]](r T) T {
+	if !r.isCowOwned() {
+		if p, ok := r.cowParent(); ok {
+			return p
+		}
+	}
+
+	return r
+}
+
+// cowShare creates a copy-on-write view of r, holding r's root read lock while
+// the constructor builds the new non-owned instance from the root. The lock is
+// held so that the parent pointer and root fields captured by construct remain
+// stable across the share.
+func cowShare[T cowNode[T]](r T, construct func(root T) T) T {
+	root := cowRoot(r)
+
+	root.cowLock()
+	defer root.cowUnlock()
+
+	return construct(root)
+}
+
 // share returns a copy-on-write view of this registry.
 // The returned instance reads from this registry's map until the first write,
 // at which point it clones lazily. This avoids the clone cost for the common
 // case where no per-instance customization is used.
 func (r *validatorRegistry) share() *validatorRegistry {
-	root := r
-	if !r.owned && r.parent != nil {
-		root = r.parent
-	}
-
-	root.mu.RLock()
-	defer root.mu.RUnlock()
-
-	return &validatorRegistry{
-		owned:  false,
-		parent: root,
-	}
+	return cowShare(r, func(root *validatorRegistry) *validatorRegistry {
+		return &validatorRegistry{
+			owned:  false,
+			parent: root,
+		}
+	})
 }
 
 func (r *validatorRegistry) lookup(name string) (FlagValidator, bool) {
@@ -214,14 +259,9 @@ func validateURL(value string) error {
 }
 
 func validateMinLen(value string) error {
-	minStr, val, ok := strings.Cut(value, ":")
-	if !ok {
-		return fmt.Errorf("%w: minlen requires format \"min:value\"", ErrInvalidValidatorParam)
-	}
-
-	minLen, err := strconv.Atoi(minStr)
+	minLen, val, err := parseLabeledValue(value, "minlen")
 	if err != nil {
-		return fmt.Errorf("%w: minlen: invalid integer %q", ErrInvalidValidatorParam, minStr)
+		return err
 	}
 
 	if utf8.RuneCountInString(val) < minLen {
@@ -232,14 +272,9 @@ func validateMinLen(value string) error {
 }
 
 func validateMaxLen(value string) error {
-	maxStr, val, ok := strings.Cut(value, ":")
-	if !ok {
-		return fmt.Errorf("%w: maxlen requires format \"max:value\"", ErrInvalidValidatorParam)
-	}
-
-	maxLen, err := strconv.Atoi(maxStr)
+	maxLen, val, err := parseLabeledValue(value, "maxlen")
 	if err != nil {
-		return fmt.Errorf("%w: maxlen: invalid integer %q", ErrInvalidValidatorParam, maxStr)
+		return err
 	}
 
 	if utf8.RuneCountInString(val) > maxLen {
@@ -249,20 +284,26 @@ func validateMaxLen(value string) error {
 	return nil
 }
 
-func validateMin(value string) error {
-	minStr, val, ok := strings.Cut(value, ":")
+// parseLabeledValue splits a "param:value" string into an integer parameter and the value.
+// Returns ErrInvalidValidatorParam-wrapped errors tagged with label.
+func parseLabeledValue(value, label string) (int, string, error) {
+	paramStr, val, ok := strings.Cut(value, ":")
 	if !ok {
-		return fmt.Errorf("%w: min requires format \"min:value\"", ErrInvalidValidatorParam)
+		return 0, "", fmt.Errorf("%w: %s requires format \"%s:value\"", ErrInvalidValidatorParam, label, label)
 	}
 
-	minVal, err := strconv.ParseFloat(minStr, 64)
+	param, err := strconv.Atoi(paramStr)
 	if err != nil {
-		return fmt.Errorf("%w: min: invalid number %q", ErrInvalidValidatorParam, minStr)
+		return 0, "", fmt.Errorf("%w: %s: invalid integer %q", ErrInvalidValidatorParam, label, paramStr)
 	}
 
-	actual, err := strconv.ParseFloat(val, 64)
+	return param, val, nil
+}
+
+func validateMin(value string) error {
+	minVal, actual, err := parseLabeledFloat(value, "min")
 	if err != nil {
-		return fmt.Errorf("%w: min: value %q is not a number", ErrInvalidValidatorParam, val)
+		return err
 	}
 
 	if actual < minVal {
@@ -273,19 +314,9 @@ func validateMin(value string) error {
 }
 
 func validateMax(value string) error {
-	maxStr, val, ok := strings.Cut(value, ":")
-	if !ok {
-		return fmt.Errorf("%w: max requires format \"max:value\"", ErrInvalidValidatorParam)
-	}
-
-	maxVal, err := strconv.ParseFloat(maxStr, 64)
+	maxVal, actual, err := parseLabeledFloat(value, "max")
 	if err != nil {
-		return fmt.Errorf("%w: max: invalid number %q", ErrInvalidValidatorParam, maxStr)
-	}
-
-	actual, err := strconv.ParseFloat(val, 64)
-	if err != nil {
-		return fmt.Errorf("%w: max: value %q is not a number", ErrInvalidValidatorParam, val)
+		return err
 	}
 
 	if actual > maxVal {
@@ -293,6 +324,27 @@ func validateMax(value string) error {
 	}
 
 	return nil
+}
+
+// parseLabeledFloat splits a "param:value" string into a float64 parameter and a float64 value.
+// Returns ErrInvalidValidatorParam-wrapped errors tagged with label.
+func parseLabeledFloat(value, label string) (float64, float64, error) {
+	paramStr, val, ok := strings.Cut(value, ":")
+	if !ok {
+		return 0, 0, fmt.Errorf("%w: %s requires format \"%s:value\"", ErrInvalidValidatorParam, label, label)
+	}
+
+	param, err := strconv.ParseFloat(paramStr, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("%w: %s: invalid number %q", ErrInvalidValidatorParam, label, paramStr)
+	}
+
+	actual, err := strconv.ParseFloat(val, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("%w: %s: value %q is not a number", ErrInvalidValidatorParam, label, val)
+	}
+
+	return param, actual, nil
 }
 
 // regexCache caches compiled regex patterns to avoid recompilation on every validate call.

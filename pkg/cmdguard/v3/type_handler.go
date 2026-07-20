@@ -66,6 +66,22 @@ type typeRegistry struct {
 	parent       *typeRegistry // nil when owned; shared source for COW reads
 }
 
+func (r *typeRegistry) isCowOwned() bool {
+	return r.owned
+}
+
+func (r *typeRegistry) cowParent() (*typeRegistry, bool) {
+	return r.parent, r.parent != nil
+}
+
+func (r *typeRegistry) cowLock() {
+	r.mu.RLock()
+}
+
+func (r *typeRegistry) cowUnlock() {
+	r.mu.RUnlock()
+}
+
 // globalTypeRegistry is the default registry with all built-in types.
 var globalTypeRegistry = newTypeRegistry()
 
@@ -112,19 +128,13 @@ func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
 // at which point it clones lazily. This avoids the clone cost for the common
 // case where no per-instance customization is used.
 func (r *typeRegistry) share() *typeRegistry {
-	root := r
-	if !r.owned && r.parent != nil {
-		root = r.parent
-	}
-
-	root.mu.RLock()
-	defer root.mu.RUnlock()
-
-	return &typeRegistry{
-		countHandler: root.countHandler,
-		owned:        false,
-		parent:       root,
-	}
+	return cowShare(r, func(root *typeRegistry) *typeRegistry {
+		return &typeRegistry{
+			countHandler: root.countHandler,
+			owned:        false,
+			parent:       root,
+		}
+	})
 }
 
 // register adds or replaces a TypeHandler for a specific reflect.Type.

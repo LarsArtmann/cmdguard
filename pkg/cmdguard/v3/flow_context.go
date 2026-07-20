@@ -172,12 +172,11 @@ func (b *BranchingFlowContext) ChildrenSeq() iter.Seq[*BranchingFlowContext] {
 
 // Root returns the root context of this tree.
 func (b *BranchingFlowContext) Root() *BranchingFlowContext {
-	current := b
-	for current.parent != nil {
-		current = current.parent
-	}
+	return walkRoot(b, flowParentOf)
+}
 
-	return current
+func flowParentOf(b *BranchingFlowContext) (*BranchingFlowContext, bool) {
+	return b.parent, b.parent != nil
 }
 
 // SetValue sets a value in this context and propagates to descendants.

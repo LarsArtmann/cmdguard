@@ -88,20 +88,18 @@ func (fp FilePath) IsEmpty() bool {
 
 // IsDir returns true if the path is a directory (requires Exists() to be true).
 func (fp FilePath) IsDir() bool {
-	if !fp.exists {
-		return false
-	}
-
-	info, err := os.Stat(fp.absolute)
-	if err != nil {
-		return false
-	}
-
-	return info.IsDir()
+	return fp.fileInfoMatches(isDirPredicate)
 }
 
 // IsFile returns true if the path is a regular file (requires Exists() to be true).
 func (fp FilePath) IsFile() bool {
+	return fp.fileInfoMatches(isFilePredicate)
+}
+
+// fileInfoMatches returns true when the path exists and the predicate returns true
+// for the file's os.FileInfo. Returns false when the path does not exist or when
+// os.Stat fails.
+func (fp FilePath) fileInfoMatches(predicate func(os.FileInfo) bool) bool {
 	if !fp.exists {
 		return false
 	}
@@ -111,6 +109,14 @@ func (fp FilePath) IsFile() bool {
 		return false
 	}
 
+	return predicate(info)
+}
+
+func isDirPredicate(info os.FileInfo) bool {
+	return info.IsDir()
+}
+
+func isFilePredicate(info os.FileInfo) bool {
 	return !info.IsDir()
 }
 

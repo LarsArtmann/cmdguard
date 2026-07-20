@@ -79,12 +79,26 @@ func (s *Scope) Injector() do.Injector {
 // RootScope returns the root scope by navigating up the parent chain.
 // For a root scope, returns itself.
 func (s *Scope) RootScope() *Scope {
-	current := s
-	for current.parent != nil {
-		current = current.parent
-	}
+	return walkRoot(s, scopeParentOf)
+}
 
-	return current
+// walkRoot walks up the parent chain to the topmost ancestor. hasParent
+// returns the next node and true if a parent exists; false otherwise.
+// Used by Scope.RootScope and BranchingFlowContext.Root.
+func walkRoot[T any](node T, hasParent func(T) (T, bool)) T {
+	current := node
+	for {
+		next, ok := hasParent(current)
+		if !ok {
+			return current
+		}
+
+		current = next
+	}
+}
+
+func scopeParentOf(s *Scope) (*Scope, bool) {
+	return s.parent, s.parent != nil
 }
 
 // safeProvide calls fn with panic recovery, returning an error on panic.

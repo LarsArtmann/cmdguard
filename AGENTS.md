@@ -287,13 +287,7 @@ go build ./...                                   # Verify build
 - **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map` (concurrency-safe; tests run in parallel)
 - **Integer overflow** — `int8`/`int16`/`int32`/`uint8`/`uint16` flag values are range-checked at parse time → `ErrValueOutOfRange`
 - **Iterator methods (`iter.Seq`)** — `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` are zero-allocation alternatives; the slice-returning methods return defensive copies
-- **Accepted clone groups** — `art-dupl --semantic -t 5` reports 1 group; `-t 3` reports 5. All are ACCEPTED with rationale (verified 2026-07-18):
-  - `validateMin`/`validateMax` (`flags_validate.go:253-296`) — comparator abstraction would take more params than the duplicated code has lines
-  - `validateMinLen`/`validateMaxLen` (`flags_validate.go:217-243`) — same rationale as above, for string length
-  - `makeIntKindHandler`/`makeUintKindHandler` (`type_handler_intwidth.go:59,93`) — intentional signed/unsigned mirror, marked `//nolint:dupl`
-  - `intBitSize`/`uintBitSize` (`type_handler_intwidth.go:23,39`) — same signed/unsigned mirror
-  - `validateFile`/`validateDir` (`types_filepath.go:91-112`) — the predicate difference IS the point of having two functions
-  - `BranchingFlowContext.Root`/`Scope.RootScope` (`flow_context.go:174`/`scope.go:81`) — 6-line parent-walk; different receiver types make a generic helper artificial
+- **Accepted clone groups** — `art-dupl --semantic -t 3` reports 0 groups (was 5 before 2026-07-20 dedup pass); `-t 2` reports trivial 2-line snippets only. The remaining intentional sibling pairs are:
 
 #### Config Files
 
