@@ -244,7 +244,7 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 | 14.2 | Implement AuditMiddleware that captures per-command | 15min  |
 | 14.3 | Record: command name, args, duration, error         | 10min  |
 | 14.4 | Store events in DI scope for later retrieval        | 10min  |
-| 14.5 | Add WithCommandAudit[T]() CLI option                | 10min  |
+| 14.5 | Add WithCommandAudit[T](<>) CLI option              | 10min  |
 | 14.6 | Write tests for audit middleware                    | 15min  |
 | 14.7 | Commit                                              | 5min   |
 

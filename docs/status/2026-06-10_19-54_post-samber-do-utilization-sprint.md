@@ -14,7 +14,7 @@ Implemented the 3 highest-impact samber/do v2 features that actually matter for 
 
 | #   | Feature                                                                            | Files Changed                                 | Tests Added                                |
 | --- | ---------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------ |
-| 1   | **WithGracefulShutdown[T]()** — graceful DI service shutdown on SIGINT/SIGTERM     | `cli.go`, `cli_options.go`                    | 3 tests in `cli_graceful_shutdown_test.go` |
+| 1   | **WithGracefulShutdown[T](<>)** — graceful DI service shutdown on SIGINT/SIGTERM   | `cli.go`, `cli_options.go`                    | 3 tests in `cli_graceful_shutdown_test.go` |
 | 2   | **Override[T] + OverrideValue[T]** — replace services for testing                  | `scope.go`                                    | 8 tests in `scope_override_test.go`        |
 | 3   | **CloneScope(scope)** — clone DI scope for test isolation                          | `scope.go`                                    | 4 tests (part of scope_override_test.go)   |
 | 4   | **NewScopeWithOpts(name, opts)** — create scope with custom `do.InjectorOpts`      | `scope.go`                                    | 1 test in `scope_logging_test.go`          |
@@ -172,7 +172,7 @@ The tradeoff: samber/do's native approach gives dependency-aware parallel shutdo
 ### Production Code
 
 - `pkg/cmdguard/v2/cli.go` — gracefulShutdown + diLogf fields, WithDILogging wiring, shutdown in Execute()
-- `pkg/cmdguard/v2/cli_options.go` — WithGracefulShutdown[T](), WithDILogging[T](), updated WithSignalHandling docs
+- `pkg/cmdguard/v2/cli_options.go` — WithGracefulShutdown[T](<>), WithDILogging[T](<>), updated WithSignalHandling docs
 - `pkg/cmdguard/v2/scope.go` — Override[T], OverrideValue[T], CloneScope(), NewScopeWithOpts()
 - `pkg/cmdguard/v2/doc.go` — new CLI options, testing example
 
