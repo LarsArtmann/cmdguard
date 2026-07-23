@@ -4,6 +4,8 @@
 
 ---
 
+> **Update 2026-07-23:** DNS propagation and the Firebase service-account secret remain unresolved external blockers. The website was redeployed and guide pages expanded in the 2026-07-14 follow-up sessions. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## A) FULLY DONE
 
 ### 1. Website Infrastructure (Astro + Starlight + Firebase)
@@ -302,3 +304,9 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 ```
 
 **Redeployed:** `npm run build && firebase deploy --only hosting:cmdguard` — 3 files changed, live at `cmdguard.web.app`.
+
+## Resolution (2026-07-23)
+
+- `cmdguard.web.app` remains live; `cmdguard.lars.software` DNS is still pending.
+- 6 additional guide pages were added in the 2026-07-14_06-37 session.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.

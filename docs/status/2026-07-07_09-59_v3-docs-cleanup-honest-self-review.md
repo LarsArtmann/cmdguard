@@ -6,6 +6,8 @@
 
 ---
 
+> **Update 2026-07-23:** The README `EditInEditor` and stale references identified in §b were fixed in `7eba617`; the remaining sub-module tests/CI/lint gaps were closed in `f8f3ad4` and `cccfdc9`. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## Executive Summary
 
 The session started with a plan to fix stale docs. It succeeded at the core mission but **discovered 3 critical bugs** the previous session's status report claimed were done — and then **missed its own stale references** in README.md and examples while declaring victory. The sub-module relocation was the highest-value discovery; the README miss is the most embarrassing.
@@ -155,3 +157,10 @@ I verified from a single machine (`go get .../v2@latest` → `v2.10.4`, `@v2.11.
 | Test runs                       | 1831 (0 failures)                                               |
 | Coverage                        | 87.3% (core), 87.7% (configload)                                |
 | **Docs with stale refs missed** | **2 (README.md, examples/taskctl/main.go)**                     |
+
+## Resolution (2026-07-23)
+
+- §b README `EditInEditor`, `WithPromptOnMissing` type params, and `SpinnerMiddleware`/`TelemetryMiddleware` core-claims were corrected in `7eba617`.
+- §c "NOT STARTED" sub-module tests/CI/lint were closed in `f8f3ad4` (tests), `da3b454` (lint), and `cccfdc9`/`0afaab8` (CI).
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

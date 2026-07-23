@@ -4,6 +4,8 @@
 
 ---
 
+> **Update 2026-07-23:** The USP pivot and website polish shipped. DNS, the Firebase service-account secret, the OG image, and Lighthouse remain external blockers. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## A) FULLY DONE
 
 ### 1. Website — Full Astro + Starlight + Firebase Deployment
@@ -249,3 +251,9 @@ The 5-column comparison table mentions Cobra, Kong, and urfave/cli by name. Link
 ### 2. Should we add `astro-og-canvas` now or defer?
 
 OG images significantly improve social media sharing appearance. gogenfilter uses `astro-og-canvas` for dynamic generation. But adding it now means another dependency, another build step, and design decisions about the image layout. **Should I add OG image generation now, or defer until we have a proper logo?**
+
+## Resolution (2026-07-23)
+
+- §A items 1–6 are complete.
+- §B DNS propagation is still blocked.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.

@@ -8,6 +8,8 @@
 
 ---
 
+> **Update 2026-07-23:** The "NOT STARTED" spinner/output/auditlog extractions and remaining docs were completed in the follow-up sessions from `9297257` to `a9c8e82`. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## a) FULLY DONE
 
 ### 1. Type Parameter Explosion Eliminated
@@ -233,3 +235,10 @@ This decision shapes the entire v3 API surface. **Which direction do you want?**
 ## Resolution (2026-07-18)
 
 This v3-redesign session report is largely accurate but predates the v3.0.0 release (tagged 2026-07-07). Resolutions since: the §b "Not Started" extractions are now done — the project ships 6 Go modules (core + telemetry, manpage, glamour, prompts, spinner), all at repo root for external resolution. The §d #1 "CLIOption still generic" self-criticism was acted on (sealed-interface pattern applied). §d #3 (go.work.sum/replace directives) resolved pre-release. Current metrics: 87.6% coverage, 1429 test runs, 0 lint issues, jsonv2 migration embraced 2026-07-14.
+
+## Resolution (2026-07-23)
+
+- §3 "NOT STARTED" items (spinner/output sub-modules, docs, `go.work`, replace directives) were completed before v3.0.0.
+- Sub-module tests and lint cleanup followed in `f8f3ad4` and `da3b454`.
+- Architecture items (koanf extraction, middleware context propagation, API renames) remain deferred and are tracked in `ROADMAP.md`.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

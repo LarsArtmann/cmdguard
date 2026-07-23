@@ -8,6 +8,8 @@
 
 ---
 
+> **Update 2026-07-23:** The P0/P1 fixes shipped in `cccfdc9`; the partially-done lint/CI gaps were closed in `bff562a` and later sessions. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## a) FULLY DONE (genuinely complete, verified)
 
 1. **`WithoutSilenceUsage()` option** — Added to `cli_options.go:72`. Sets `s.silenceUsage = false`. Gives users an escape hatch from the default-silenced behavior. Regression test added in `cli_core_new_test.go:137`.
@@ -242,3 +244,10 @@ Currently `scope.go` and `cli_accessors.go` have per-file ireturn exclusions for
 | Regression tests               | 0                    | 6                                                  |
 | Dead exclusion rules           | 0                    | 1 (config_file.go ireturn)                         |
 | Real wrapcheck issues excluded | 0                    | 2 (type_handler.go lines 165, 176)                 |
+
+## Resolution (2026-07-23)
+
+- §a 22 items are complete; the remaining §b partial items and §c not-started tasks were addressed in the 2026-07-11 and 2026-07-14 sessions.
+- `nix flake check`, `go.work` build verification, and sub-module loops are now part of the quality gate.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

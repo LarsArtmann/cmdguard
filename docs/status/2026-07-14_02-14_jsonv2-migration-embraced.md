@@ -5,6 +5,8 @@
 
 ---
 
+> **Update 2026-07-23:** Sub-module lint issues were fixed in `da3b454`; the four test files were migrated to `encoding/json/v2` in `2a673a4`; `GOEXPERIMENT=jsonv2` is documented in `AGENTS.md` and `flake.nix`. The CHANGELOG now records the migration. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## Executive Summary
 
 BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`, which has build constraints excluding Go 1.26.4. In the first attempt, I fought the tool — reverting source files and dependency versions. The user correctly said "THEN UPGRADE!" so I embraced the full migration: enabled `GOEXPERIMENT=jsonv2`, fixed API differences, upgraded dependencies, and updated all config/docs.
@@ -193,3 +195,10 @@ Sub-mods:  5/5 have pre-existing lint issues (14 total)
 | `AGENTS.md`                             | Updated versions, status line, GOEXPERIMENT section                      |
 | `go.mod` + `go.sum`                     | Upgraded go-output v0.30.4, samber-do-auditlog v0.5.0                    |
 | `*/go.mod` + `*/go.sum` (5 sub-modules) | Same dependency upgrades                                                 |
+
+## Resolution (2026-07-23)
+
+- §b "Sub-module lint issues" and §c "Test files still use `encoding/json` v1" were closed.
+- `CHANGELOG.md` now records the json/v2 migration.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

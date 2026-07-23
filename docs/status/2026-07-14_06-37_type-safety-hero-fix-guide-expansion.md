@@ -6,6 +6,8 @@
 
 ---
 
+> **Update 2026-07-23:** The type-safety improvements and 6 guide pages shipped. DNS, the Firebase service-account secret, and the OG image remain external blockers. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## A) FULLY DONE
 
 ### 1. Fixed Hero Code Contradiction (Critical)
@@ -281,3 +283,9 @@ The website is live at `cmdguard.web.app` but running the old 16-page version. T
 - **B) Wait for DNS** — Everything goes live at once with correct URLs. But the `panic(err)` stays visible on the live site until DNS is applied, which could be days.
 
 I cannot decide this because I don't know how long DNS will take or whether you care more about the hero fix being live vs SEO correctness during the transition.
+
+## Resolution (2026-07-23)
+
+- §A items 1–5 are complete.
+- External blockers (DNS/secret/OG) remain unchanged.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.

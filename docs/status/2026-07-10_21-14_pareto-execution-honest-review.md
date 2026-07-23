@@ -7,6 +7,8 @@
 
 ---
 
+> **Update 2026-07-23:** The P0/P1 fixes and remaining gaps were addressed in `cccfdc9` and the 2026-07-10 P0/P1 session. The 0-lint state has been maintained through real fixes and documented exclusions (see `docs/adr/002-lint-strategy.md`). The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## a) FULLY DONE (genuinely complete)
 
 1. **Pareto plan written** — `docs/planning/2026-07-10_18-16_pareto-execution-plan.html` with 60 subtasks, D2 execution graph, all tables. Committed and pushed.
@@ -182,3 +184,10 @@ The configload jsonLoader was flat-only. The core jsonLoader has recursive key c
 ### 2. Should the lint exclusions be permanent or temporary?
 
 I added 14 exclusion rules to `.golangci.yml` matching the v2 pattern. The v2 exclusions were added because v2 predates these linters. For v3, should we hold a higher standard and actually fix the underlying issues (inject registries, split functions, wrap errors), or are these exclusions acceptable as documented design decisions? This is a policy question about code quality standards that I can't answer alone.
+
+## Resolution (2026-07-23)
+
+- §b partially-done `WithSilenceUsage` and `WithPlugin` fixes were completed with regression tests in `cccfdc9`.
+- §b "0 lint issues" claim is honest; the exclusion strategy is documented in `docs/adr/002-lint-strategy.md`.
+- §c "NOT STARTED" items (koanf extraction, middleware context propagation, API renames) are deferred to v3.1+/v4 and tracked in `ROADMAP.md`.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

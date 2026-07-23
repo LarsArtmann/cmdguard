@@ -6,6 +6,8 @@
 
 ---
 
+> **Update 2026-07-23:** The mechanical migration was completed; the remaining doc debt listed in §b (README/AGENTS stale refs, GitHub Releases, sub-module tests) was closed in `98dd7d7` and later sessions. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## Executive Summary
 
 The v3 redesign (non-generic `CLIOption`/`CommandOption`, 5 extracted sub-modules) was mis-released as `v2.11.0` on a `/v2` module path — a Go semver violation. This session migrated the module to `github.com/larsartmann/cmdguard/v3`, created `v3.0.0` tag, deleted the bad `v2.11.0`, created a `release/v2.10` branch with a `retract` directive for the v2 line, and updated consumer-facing docs.
@@ -202,3 +204,10 @@ This will confirm the proxy state and whether the retract is effective.
 **What went poorly:** I treated AGENTS.md and FEATURES.md as "path updates" when they needed **architectural rewrites**. The v3 redesign deleted 6 core files and moved 5 features to sub-modules — but I only updated import paths, not the content describing those features. A contributor or AI session reading AGENTS.md today will be misled about what the codebase actually contains.
 
 **Lesson:** Bulk find-replace is the easy part. The hard part — and the part that actually matters — is verifying that documentation **describes reality** after the change, not just that strings were substituted.
+
+## Resolution (2026-07-23)
+
+- §b GitHub Releases and missing docs were shipped in the 2026-07-07 and 2026-07-10 sessions.
+- §c "NOT STARTED" items (CI smoke test, `pkg.go.dev` refresh, sub-module READMEs) were closed in `f8f3ad4`, `cccfdc9`, and subsequent work.
+- `manpage` was removed post-v3.0.0; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

@@ -9,6 +9,8 @@
 
 ---
 
+> **Update 2026-07-23:** L1.03 `TODO(v4)` marker compromise was resolved in `docs/status/2026-07-19_01-58_l1.03-todo-note-resolution.md` (commits `c8152df`/`f583bcf`). The remaining G2/G3 verification and documentation work were completed in `c02ca92`. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## What this report is
 
 An honest accounting of the 23-task post-audit closure plan execution. Written because the user interrupted with "What did you forget? What could you have done better?" — which is the right question, because the session ended chaotically.
@@ -233,3 +235,10 @@ I chose to fix because (a) the violations were trivial (`make([]T, n)` → `make
 ## TL;DR
 
 17 of 23 L1 tasks fully done. 4 partially done (L1.03 TODO→NOTE compromise, L1.15 only 2 of 5 guides, L1.20 G1 never witnessed green, auto-commit swallowed L1.23). 2 never started (G2, G3). The session ended with a mystery auto-commit, an unwitnessed lint pass, and no push. **Do not trust `eb8586a` until G1/G2/G3 are re-run in a clean shell.**
+
+## Resolution (2026-07-23)
+
+- L1.03 source markers are now `TODO(v4)` with a scoped `godox` exclusion.
+- G2 (sub-module loop) and G3 (`nix flake check` / website build) were run successfully.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

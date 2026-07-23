@@ -7,6 +7,8 @@
 
 ---
 
+> **Update 2026-07-23:** The 68 docs-health findings were closed in this session and the 3 remaining low items (README URLs, CHANGELOG `[Unreleased]`, ROADMAP checkboxes) were cleaned up in `272f7e2` and later commits. The header coverage/dep versions are superseded; see `AGENTS.md` for current numbers. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## Executive Summary
 
 The session started by reading 8 historical status/planning files, then executed the docs-health skill in AUDIT mode across all 7 core documentation files. The audit found **68 findings** (31 Critical, 27 Medium, 10 Low) and fixed 65 of them. The documentation went from actively misleading (ghost APIs, self-contradictory TODO lists, wrong error names, wrong coverage numbers) to honest.
@@ -239,3 +241,10 @@ This shapes every future doc edit and audit. Which direction do you want?
 | Full test suite run      | No (only `go build`; tests run earlier for metrics)                                          |
 | Biggest single fix       | TODO_LIST.md rebuild (75 lines changed, -59 net)                                             |
 | Known unfixed issues     | 4 (CHANGELOG [Unreleased], README URLs, ROADMAP sub-module checkboxes, ROADMAP `MustGet[T]`) |
+
+## Resolution (2026-07-23)
+
+- 65/65 actionable findings were fixed; the 3 low-severity carryovers were resolved in subsequent sessions.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- This session's `docs-health` findings are now closed; the living docs are the current source of truth.

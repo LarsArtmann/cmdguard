@@ -6,6 +6,8 @@
 
 ---
 
+> **Update 2026-07-23:** All sub-modules were lint-clean at the time. The `manpage` sub-module was subsequently removed in `34a0c6e`; the remaining sub-modules are glamour, prompts, spinner, telemetry. The AGENTS.md `Audit Log` heading was restored in `c02ca92`.
+
 ## a) FULLY DONE
 
 | Module              | What was fixed                                                                                                                                                        | Verified                |
@@ -186,3 +188,10 @@ The test originally tested nothing useful (dead nil check). I made it worse (no-
 ### 3. Should these lint fixes be committed as one commit or split per sub-module?
 
 The changes span 5 sub-modules + core config. One commit is simpler; per-module commits give cleaner history. I don't know your preference for commit granularity on cross-cutting changes like this.
+
+## Resolution (2026-07-23)
+
+- Lint-clean status holds for the 4 remaining sub-modules.
+- The `manpage` fixes recorded here are historical; the module no longer exists.
+- `AGENTS.md` structure was restored in `c02ca92`.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

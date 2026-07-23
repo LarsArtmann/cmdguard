@@ -8,6 +8,8 @@
 
 ---
 
+> **Update 2026-07-23:** The wrapcheck/ireturn/ADR/domain-language work shipped. The nested-config UX question and deep nolint audit were not actioned; they remain tracked in `ROADMAP.md` deferred items. The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## a) FULLY DONE (genuinely complete, verified)
 
 1. **Fixed 2 wrapcheck issues in `type_handler.go`** — `dispatchRegister()` now wraps `tr.countHandler.Register(...)` and `h.Register(...)` returns with `fmt.Errorf("registering flag %q: %w", tag.Name, err)`. Real fix, not an exclusion. The `wrapcheck` per-file exclusion for `type_handler.go` was removed from `.golangci.yml`.
@@ -260,3 +262,10 @@ This is a project-wide convention decision I can't make unilaterally.
 | Examples                      | 1                   | 2                                  |
 | Coverage                      | 87.6%               | 87.6% (unchanged — added 1 test)   |
 | Uncommitted files             | 0                   | 5                                  |
+
+## Resolution (2026-07-23)
+
+- §a items 1–14 are complete.
+- §b partially-done items (nolint audit depth, nested config UX) remain open and are tracked in `ROADMAP.md` "Deferred from 2026-07-18 Audit Closure".
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

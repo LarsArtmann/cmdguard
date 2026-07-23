@@ -11,6 +11,8 @@
 
 ---
 
+> **Update 2026-07-23:** This report captured the v3 redesign just before release. The remaining "NOT STARTED" doc/release items (README/AGENTS refresh, `docs/MIGRATION_v2_v3.md`, sub-module tests, GitHub Releases, lint cleanup) were completed in the sessions following 2026-07-06 (`83f6602` through `a9c8e82`). The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## a) FULLY DONE
 
 ### 1. Type Parameter Explosion Eliminated (Both Command AND CLI Options)
@@ -200,3 +202,10 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 fang pulls lipgloss, mango-cobra, and ~15 transitive deps. If we made fang optional (core uses plain cobra, users who want styled output import the fang module), core direct deps would drop to ~8 (cobra, pflag, do, go-toml, go-yaml, go-output, samber-do-auditlog, x/term).
 
 But fang provides the core "superb CLI" experience — styled help, styled errors, automatic version. Making it optional undermines the "batteries included" promise. The question is: **is the dependency cost worth the UX benefit for users who don't want styled output?**
+
+## Resolution (2026-07-23)
+
+- §a "5 Optional Modules" extraction was completed before v3.0.0; the workspace later moved to 4 sub-modules after `manpage` was removed (`34a0c6e`).
+- §c "NOT STARTED" docs/release tasks (migration guide, GitHub Releases, sub-module tests, lint cleanup) were closed in the 2026-07-07 through 2026-07-11 sessions.
+- Remaining architecture items (koanf extraction, middleware context propagation, public API renames) are deferred to v3.1+/v4 and tracked in `ROADMAP.md` "Deferred from 2026-07-18 Audit Closure".
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.

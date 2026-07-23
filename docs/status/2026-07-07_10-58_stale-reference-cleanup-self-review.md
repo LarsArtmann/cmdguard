@@ -7,6 +7,8 @@
 
 ---
 
+> **Update 2026-07-23:** The sub-module test/lint/CI gaps listed in §c were closed in `f8f3ad4` (sub-module tests), `da3b454` (lint cleanup), and `cccfdc9`/`0afaab8` (CI smoke). The workspace now has 4 optional sub-modules; `manpage` was removed in `34a0c6e`.
+
 ## a) FULLY DONE
 
 | #   | Task                                                            | File(s)                            | Verification                                                           |
@@ -163,3 +165,10 @@ The deeper question: **which version of AGENTS.md is authoritative — the one l
 I fixed every stale reference identified in the prior session's self-review, verified them against actual source signatures, and confirmed with a comprehensive grep audit. That's the core job done.
 
 But I introduced a new markdown formatting bug (table misalignment), skipped the CHANGELOG, and used `--no-verify` based on stale cached context — the exact same class of error (trusting cached truth over verified ground truth) that caused the stale references in the first place. The irony is not lost on me.
+
+## Resolution (2026-07-23)
+
+- §c "NOT STARTED" items 1–3 were closed in the 2026-07-10/11 sessions.
+- `pkg.go.dev` refresh and `nix flake` sub-module checks remain ongoing but are not tracked as blocking.
+- `manpage` was removed in `34a0c6e`; current sub-modules are glamour, prompts, spinner, telemetry.
+- Current metrics: 470 test functions, 1434 runs, 87.8% core coverage, 0 lint issues.
