@@ -109,12 +109,12 @@ Five features moved out of core into independently importable sub-modules.
 **Core no longer depends on their libraries** — import a sub-module only when you
 need it.
 
-| Feature          | v2 (core)                   | v3 sub-module                                         |
-| ---------------- | --------------------------- | ----------------------------------------------------- |
-| Markdown help    | `v2.WithGlamourHelp[T]()`   | `glamour.WithHelp()`                                  |
-| Terminal spinner | `v2.SpinnerMiddleware[T]`   | `spinner.Middleware[T](title)`                        |
-| OpenTelemetry    | `v2.WithTelemetry[T]`       | `telemetry.WithTelemetry[T](tracer)`                  |
-| huh prompts      | (built-in)                  | `prompts` package (`HuhRunner`) + `SetPromptRunner()` |
+| Feature          | v2 (core)                 | v3 sub-module                                         |
+| ---------------- | ------------------------- | ----------------------------------------------------- |
+| Markdown help    | `v2.WithGlamourHelp[T]()` | `glamour.WithHelp()`                                  |
+| Terminal spinner | `v2.SpinnerMiddleware[T]` | `spinner.Middleware[T](title)`                        |
+| OpenTelemetry    | `v2.WithTelemetry[T]`     | `telemetry.WithTelemetry[T](tracer)`                  |
+| huh prompts      | (built-in)                | `prompts` package (`HuhRunner`) + `SetPromptRunner()` |
 
 ### Example: spinner + telemetry
 

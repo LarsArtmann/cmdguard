@@ -3,7 +3,7 @@
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v3.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)
-[![Coverage](https://img.shields.io/badge/coverage-87.6%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-87.8%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3)**
@@ -214,7 +214,7 @@ HELLO, CMDGUARD!
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                          |
 | **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                    |
 | **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                               |
-| **1429 test runs**         | 87.6% coverage, race-detected, fuzz-tested                                                                                       |
+| **1434 test runs**         | 87.8% coverage, race-detected, fuzz-tested                                                                                       |
 
 ---
 

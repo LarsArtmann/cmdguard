@@ -11,12 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed (post-v3.0.0)
 
-- **Sub-module external resolution** — the 5 sub-modules were moved from `pkg/cmdguard/<name>/` to the repo root (`<name>/`) so their module paths (`github.com/larsartmann/cmdguard/<name>`) resolve for external consumers. Previously the `replace` directives in the root `go.mod` only worked locally; consumers got "missing go.mod at revision". Each sub-module's `go.mod` now requires the real published `cmdguard/v3 v3.0.0` (not the placeholder).
+- **Sub-module external resolution** — the 4 sub-modules were moved from `pkg/cmdguard/<name>/` to the repo root (`<name>/`) so their module paths (`github.com/larsartmann/cmdguard/<name>`) resolve for external consumers. Previously the `replace` directives in the root `go.mod` only worked locally; consumers got "missing go.mod at revision". Each sub-module's `go.mod` now requires the real published `cmdguard/v3 v3.0.0` (not the placeholder).
 - **telemetry sub-module compile error** — `WithTelemetry` returned `v3.CLIOption[T]` (non-existent generic); now returns non-generic `v3.CLIOption`.
+- **prompts sub-module lint violation** — `make([]huh.Option[string], len(options))` replaced with a zero-length append slice to satisfy the `makezero` linter.
+
+### Changed (post-v3.0.0)
+
+- **Audit log integration refreshed** — updated to `samber-do-auditlog v0.5.0` API (`auditlog.ServiceName` removed; `ServiceByName` now takes a plain string).
+- **Migration guide and living docs refreshed** — `docs/MIGRATION_v2_v3.md`, `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, and `ROADMAP.md` updated to reflect the current 4-sub-module workspace and verified metrics.
+- **Nix flake lock refreshed** — `flake.lock` updated and LF line endings enforced.
+- **Internal traversal consolidated** — repeated internal parsing/traversal logic deduplicated.
+
+### Removed (post-v3.0.0)
+
+- **Manpage sub-module** — removed from the workspace (`34a0c6e`). The feature was not worth the maintenance surface for v3; consumers who need man pages can use `muesli/mango-cobra` directly.
 
 ### Added (post-v3.0.0)
 
-- Sub-module releases tagged at `v0.1.0` each: `glamour/v0.1.0`, `manpage/v0.1.0`, `prompts/v0.1.0`, `spinner/v0.1.0`, `telemetry/v0.1.0`. These are the first independently versioned releases of the extracted modules.
+- Sub-module releases tagged at `v0.1.0` for `glamour/v0.1.0`, `prompts/v0.1.0`, `spinner/v0.1.0`, and `telemetry/v0.1.0`. These are the first independently versioned releases of the extracted modules. (`manpage` was removed before a stable release.)
 
 ## [3.0.0] - 2026-07-07
 

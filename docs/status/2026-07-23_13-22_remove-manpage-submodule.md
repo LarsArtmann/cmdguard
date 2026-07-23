@@ -51,18 +51,21 @@ None for this task.
 ## f) Up to 50 Things We Should Get Done Next
 
 ### P0 (Blocking)
+
 1. Fix `auditlog.go:176` — `auditlog.ServiceName` is undefined. This blocks ALL builds, tests, and linting.
 2. Verify full test suite passes after auditlog fix
 3. Verify golangci-lint passes after auditlog fix
 4. Run sub-module build/test loop: `for m in glamour prompts spinner telemetry; do (cd $m && GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 60s); done`
 
 ### P1 (High value, low effort)
+
 5. Add CHANGELOG.md entry noting manpage sub-module removal
 6. Check if `samber-do-auditlog` v0.5.0 actually exports `ServiceName` or if the API changed
 7. Verify `.golangci.yml` exclusion count is still accurate (was "4 per-file v3 exclusion rules" — may have changed)
 8. Check if any downstream consumers import `github.com/larsartmann/cmdguard/manpage` (published v0.1.0 tag exists)
 
 ### P2 (Important but not blocking)
+
 9. Audit remaining stale exclusions in `.golangci.yml` (v2 paths like `pkg/cmdguard/v2/output.go$`, `pkg/cmdguard/v2/env_tag_test.go$`)
 10. Verify `go.work.sum` is committed and up to date
 11. Check if `flake.nix` needs updating (manpage was not in flake.nix, but verify)
@@ -72,6 +75,7 @@ None for this task.
 15. Verify `docs/API.md` doesn't reference manpage (if it exists)
 
 ### P3 (Cleanup & consistency)
+
 16. Clean stale v2 lint exclusions from `.golangci.yml` (output.go, env_tag_test.go, type_handler_test.go)
 17. Update internal "5 sub-modules" references that may remain in docs/planning/ files
 18. Check if CONTRIBUTING.md references manpage
@@ -79,6 +83,7 @@ None for this task.
 20. Check if any Makefile/justfile references manpage (shouldn't exist per project conventions)
 
 ### P4 (Quality & health)
+
 21. Run `nix fmt` to ensure formatting consistency
 22. Run `nix flake check` to verify Nix configuration
 23. Check if any Go doc comments in core reference manpage
@@ -86,6 +91,7 @@ None for this task.
 25. Review if fang's built-in manpage generation covers all use cases the removed sub-module provided
 
 ### P5 (Documentation)
+
 26. Update this session's TODO_LIST.md with manpage removal as completed work
 27. Consider adding a "Removed features" section to ROADMAP.md for v3.x changelog
 28. Check if examples/taskctl/ references manpage
@@ -106,16 +112,16 @@ None for this task.
 
 ## Files Changed
 
-| File | Nature of Change |
-|------|-----------------|
-| `manpage/` | DELETED (4 files) |
-| `go.mod` | Removed replace directive |
-| `.github/workflows/submodule-smoke.yml` | Removed from CI matrix and loop |
-| `AGENTS.md` | Removed from structure, deps, principles, sub-modules section, counts |
-| `FEATURES.md` | Removed row, updated counts |
-| `TODO_LIST.md` | Updated counts |
-| `docs/MIGRATION_v2_v3.md` | Removed from migration table, checklist, intro |
-| `.golangci.yml` | Removed 2 stale v2 exclusion rules |
+| File                                    | Nature of Change                                                      |
+| --------------------------------------- | --------------------------------------------------------------------- |
+| `manpage/`                              | DELETED (4 files)                                                     |
+| `go.mod`                                | Removed replace directive                                             |
+| `.github/workflows/submodule-smoke.yml` | Removed from CI matrix and loop                                       |
+| `AGENTS.md`                             | Removed from structure, deps, principles, sub-modules section, counts |
+| `FEATURES.md`                           | Removed row, updated counts                                           |
+| `TODO_LIST.md`                          | Updated counts                                                        |
+| `docs/MIGRATION_v2_v3.md`               | Removed from migration table, checklist, intro                        |
+| `.golangci.yml`                         | Removed 2 stale v2 exclusion rules                                    |
 
 **Files NOT changed (already clean at HEAD per `b998722`):** `go.work`, `pkg/cmdguard/v3/doc.go`, `README.md`, `ROADMAP.md`
 

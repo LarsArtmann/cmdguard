@@ -112,26 +112,26 @@
 
 ## Flag System
 
-| Feature                        | Status                  | Notes                                                           |
-| ------------------------------ | ----------------------- | --------------------------------------------------------------- |
-| Struct tag flags               | 🟢 FULLY_FUNCTIONAL     | `flag:"name" short:"n" default:"val" help:"desc"`               |
-| `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL     | Environment variable binding (with optional prefix)             |
-| `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL     | Counting flags: -vvv → 3                                        |
-| Short flags                    | 🟢 FULLY_FUNCTIONAL     | `short:"n"` for `-n`                                            |
-| Required flags                 | 🟢 FULLY_FUNCTIONAL     | `required:"true"` tag                                           |
-| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL     | Built-in + custom validators                                    |
-| Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL     | Levenshtein-based (`flags_suggest.go`)                          |
-| Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL     | "did you mean?" for unknown subcommands                         |
-| Instance-scoped validators     | 🟢 FULLY_FUNCTIONAL     | `FlagRegistry.RegisterFlagValidator()` (COW)                    |
-| TypeHandler registry           | 🟢 FULLY_FUNCTIONAL     | Extensible type dispatch system (COW)                           |
-| `RegisterTypeHandler()`        | 🟢 FULLY_FUNCTIONAL     | Returns error on nil typ/handler (`type_handler.go`)            |
-| `RegisterValidator()`          | 🟢 FULLY_FUNCTIONAL     | Returns error on empty name/nil validator (`flags_validate.go`) |
-| Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL     | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)        |
-| Integer overflow validation    | 🟢 FULLY_FUNCTIONAL     | int8/16/32, uint8/16 range-checked → `ErrValueOutOfRange`       |
-| Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL     | Root-only flags not inherited by subcommands                    |
-| Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL     | Exclude from `--help`, stay functional                          |
-| Nested config structs          | 🟢 FULLY_FUNCTIONAL     | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path  |
-| Regex validation cache         | 🟡 PARTIALLY_FUNCTIONAL | Unbounded `sync.Map` with no eviction (`flags_validate.go:302`) |
+| Feature                        | Status              | Notes                                                                                           |
+| ------------------------------ | ------------------- | ----------------------------------------------------------------------------------------------- |
+| Struct tag flags               | 🟢 FULLY_FUNCTIONAL | `flag:"name" short:"n" default:"val" help:"desc"`                                               |
+| `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL | Environment variable binding (with optional prefix)                                             |
+| `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL | Counting flags: -vvv → 3                                                                        |
+| Short flags                    | 🟢 FULLY_FUNCTIONAL | `short:"n"` for `-n`                                                                            |
+| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag                                                                           |
+| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL | Built-in + custom validators                                                                    |
+| Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL | Levenshtein-based (`flags_suggest.go`)                                                          |
+| Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands                                                         |
+| Instance-scoped validators     | 🟢 FULLY_FUNCTIONAL | `FlagRegistry.RegisterFlagValidator()` (COW)                                                    |
+| TypeHandler registry           | 🟢 FULLY_FUNCTIONAL | Extensible type dispatch system (COW)                                                           |
+| `RegisterTypeHandler()`        | 🟢 FULLY_FUNCTIONAL | Returns error on nil typ/handler (`type_handler.go`)                                            |
+| `RegisterValidator()`          | 🟢 FULLY_FUNCTIONAL | Returns error on empty name/nil validator (`flags_validate.go`)                                 |
+| Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)                                        |
+| Integer overflow validation    | 🟢 FULLY_FUNCTIONAL | int8/16/32, uint8/16 range-checked → `ErrValueOutOfRange`                                       |
+| Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL | Root-only flags not inherited by subcommands                                                    |
+| Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL | Exclude from `--help`, stay functional                                                          |
+| Nested config structs          | 🟢 FULLY_FUNCTIONAL | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path                                  |
+| Regex validation cache         | 🟢 FULLY_FUNCTIONAL | Bounded by unique `validate` tag patterns; typical usage <20 patterns (`flags_validate.go:356`) |
 
 ---
 
@@ -332,12 +332,12 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 All 4 sub-modules are independently importable. Core has **zero** dependencies on these.
 Each compiles cleanly with matching v3 API signatures. All have basic test coverage.
 
-| Sub-module  | Key API                                               | Dependency                       | Version | Status           |
-| ----------- | ----------------------------------------------------- | -------------------------------- | ------- | ---------------- |
-| `glamour`   | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`   | `charm.land/glamour/v2`          | v2.0.1  | 🟢 📦 SUB-MODULE |
-| `prompts`   | `HuhRunner`, `Register()`                             | `charm.land/huh/v2`              | v2.0.3  | 🟢 📦 SUB-MODULE |
-| `spinner`   | `Middleware[T]()`, `MiddlewareWithConfig[T]()`        | `charm.land/lipgloss/v2`         | v2.0.5  | 🟢 📦 SUB-MODULE |
-| `telemetry` | `Middleware[T]()`, `WithTelemetry[T]()`               | `go.opentelemetry.io/otel/trace` | v1.44.0 | 🟢 📦 SUB-MODULE |
+| Sub-module  | Key API                                             | Dependency                       | Version | Status           |
+| ----------- | --------------------------------------------------- | -------------------------------- | ------- | ---------------- |
+| `glamour`   | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()` | `charm.land/glamour/v2`          | v2.0.1  | 🟢 📦 SUB-MODULE |
+| `prompts`   | `HuhRunner`, `Register()`                           | `charm.land/huh/v2`              | v2.0.3  | 🟢 📦 SUB-MODULE |
+| `spinner`   | `Middleware[T]()`, `MiddlewareWithConfig[T]()`      | `charm.land/lipgloss/v2`         | v2.0.5  | 🟢 📦 SUB-MODULE |
+| `telemetry` | `Middleware[T]()`, `WithTelemetry[T]()`             | `go.opentelemetry.io/otel/trace` | v1.44.0 | 🟢 📦 SUB-MODULE |
 
 ---
 
@@ -370,14 +370,14 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | 87.6%           | 🟢 Good | `pkg/cmdguard/v3`                                                                                              |
+| Core coverage               | 87.8%           | 🟢 Good | `pkg/cmdguard/v3`                                                                                              |
 | configload coverage         | ~87.5%          | 🟢 Good | `pkg/cmdguard/v3/configload`                                                                                   |
-| Test functions              | 474 (1429 runs) | 🟢 Good |                                                                                                                |
+| Test functions              | 470 (1434 runs) | 🟢 Good |                                                                                                                |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
 | Sub-module tests            | 17 across all 4 | 🟢 Good | All sub-modules have basic test coverage                                                                       |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 50%             | 🟡 Debt | 372-line public package, 25 test functions                                                                     |
+| `pkg/testutil` coverage     | 49.6%           | 🟡 Debt | 372-line public package, 24 test functions                                                                     |
 | `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
 
 ---

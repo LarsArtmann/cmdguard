@@ -4,7 +4,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26 (GOEXPERIMENT=jsonv2)
-**Status:** v3.0.0 - zero panics, 87.6% coverage, 0 lint issues, 0 race conditions
+**Status:** v3.0.0+ - zero panics, 87.8% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -47,7 +47,7 @@ nix flake check
 
 **Module path:** `github.com/larsartmann/cmdguard/v3`
 
-**Current Status:** v3.0.0. 1429 test runs, 26 benchmarks, 7 fuzz targets, 87.6% coverage, 0 build errors, 0 lint issues.
+**Current Status:** v3.0.0+. 1434 test runs, 26 benchmarks, 7 fuzz targets, 87.8% coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -138,7 +138,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v3` | Type-safe API | Yes         | ~87.6%   |
+| `pkg/cmdguard/v3` | Type-safe API | Yes         | ~87.8%   |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -164,7 +164,6 @@ Each sub-module is independently importable — core has **zero** dependencies o
 | `prompts`   | `charm.land/huh/v2`              | v2.0.3  | Interactive prompts     |
 | `spinner`   | `charm.land/lipgloss/v2`         | v2.0.5  | Terminal spinner        |
 | `telemetry` | `go.opentelemetry.io/otel/trace` | v1.44.0 | OpenTelemetry spans     |
-
 
 ### GOEXPERIMENT=jsonv2
 
