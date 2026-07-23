@@ -4,8 +4,6 @@ use .
 
 use ./glamour
 
-use ./manpage
-
 use ./prompts
 
 use ./spinner

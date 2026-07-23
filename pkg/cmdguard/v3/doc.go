@@ -116,7 +116,6 @@
 //	github.com/larsartmann/cmdguard/glamour   — Markdown help rendering (glamour/v2)
 //	github.com/larsartmann/cmdguard/prompts   — Interactive prompts (huh/v2)
 //	github.com/larsartmann/cmdguard/telemetry — OpenTelemetry spans
-//	github.com/larsartmann/cmdguard/manpage   — Man page generation (mango/roff)
 //
 // # Error Handling
 //

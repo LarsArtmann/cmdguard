@@ -368,9 +368,6 @@ linters:
         linters:
           - gochecknoglobals
           - wrapcheck
-      - path: pkg/cmdguard/v2/manpage.go$
-        linters:
-          - wrapcheck
       - path: pkg/cmdguard/v3/type_handler.go$
         linters:
           - gochecknoglobals
@@ -390,9 +387,6 @@ linters:
         linters:
           - paralleltest
       - path: pkg/cmdguard/v2/env_tag_test.go$
-        linters:
-          - paralleltest
-      - path: pkg/cmdguard/v2/manpage_test.go$
         linters:
           - paralleltest
       - path: pkg/cmdguard/v2/type_handler_test.go$

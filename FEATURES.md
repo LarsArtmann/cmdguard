@@ -335,7 +335,6 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | Sub-module  | Key API                                               | Dependency                       | Version | Status           |
 | ----------- | ----------------------------------------------------- | -------------------------------- | ------- | ---------------- |
 | `glamour`   | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`   | `charm.land/glamour/v2`          | v2.0.1  | 🟢 📦 SUB-MODULE |
-| `manpage`   | `Generate[T]()`, `Write[T]()`, `GenerateCommand[T]()` | `muesli/mango` + `mango-cobra`   | v0.2.0  | 🟢 📦 SUB-MODULE |
 | `prompts`   | `HuhRunner`, `Register()`                             | `charm.land/huh/v2`              | v2.0.3  | 🟢 📦 SUB-MODULE |
 | `spinner`   | `Middleware[T]()`, `MiddlewareWithConfig[T]()`        | `charm.land/lipgloss/v2`         | v2.0.5  | 🟢 📦 SUB-MODULE |
 | `telemetry` | `Middleware[T]()`, `WithTelemetry[T]()`               | `go.opentelemetry.io/otel/trace` | v1.44.0 | 🟢 📦 SUB-MODULE |

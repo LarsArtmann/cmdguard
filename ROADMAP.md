@@ -65,8 +65,8 @@ The v3.0 redesign shipped on `github.com/larsartmann/cmdguard/v3`:
 - [x] `NewCommand` / `NewParentCommand` positional-flags signature (full type inference)
 - [x] Write tests for v3 implementation (474 functions, 1429 runs, 87.6% coverage)
 - [x] Create v3 example (taskctl)
-- [x] Extract 5 optional sub-modules: `glamour`, `manpage`, `prompts`, `spinner`, `telemetry`
-- [x] Go workspace (`go.work`, 6 modules)
+- [x] Extract 4 optional sub-modules: `glamour`, `prompts`, `spinner`, `telemetry`
+- [x] Go workspace (`go.work`, 5 modules)
 - [x] Write `docs/MIGRATION_v2_v3.md`
 - [x] Make `NoFlags` a distinct named type
 - [x] Fix `telemetry.WithTelemetry` to return non-generic `CLIOption`

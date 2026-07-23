@@ -17,8 +17,8 @@
 
 - [x] Non-generic `CLIOption` / `CommandOption` (eliminate type-param explosion)
 - [x] `NewCommand` / `NewParentCommand` positional-flags signature (full type inference)
-- [x] Extract 5 optional sub-modules: `glamour`, `manpage`, `prompts`, `spinner`, `telemetry`
-- [x] Go workspace (`go.work`, 6 modules)
+- [x] Extract 4 optional sub-modules: `glamour`, `prompts`, `spinner`, `telemetry`
+- [x] Go workspace (`go.work`, 5 modules)
 - [x] Module path migrated `cmdguard/v2` → `cmdguard/v3`
 - [x] `docs/MIGRATION_v2_v3.md` written
 - [x] Dead weight cut: `result.go`, `editor.go`
@@ -46,7 +46,7 @@
 - [x] **#1** Fix `WithSilenceUsage` no-op — field now controls root + propagates to subcommands
 - [x] **#2** Fix `WithPlugin` error swallowing — errors captured and returned from NewCLI
 - [x] **#3** Correct "0 lint issues" claim — was 38, now actually **0** (fixed code + design exclusions)
-- [x] **#4** Write tests for 5 sub-modules — 20 tests added (glamour, manpage, prompts, spinner, telemetry)
+- [x] **#4** Write tests for 4 sub-modules — 17 tests added (glamour, prompts, spinner, telemetry)
 - [x] **#5** Add CI sub-module smoke test — `.github/workflows/submodule-smoke.yml` with matrix build + external resolve
 - [x] **#8** Add lint check to CI — included in submodule-smoke.yml workflow
 - [x] **#9** Fix all 38 lint issues — noinlineerr fixed, ireturn/gochecknoglobals/funlen/cyclop excluded by design (matching v2)

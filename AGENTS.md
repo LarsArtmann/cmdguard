@@ -106,7 +106,6 @@ cmdguard/
 │   │   ├── types_port.go         # Port type
 │   │   └── types_url.go          # URL type
 ├── glamour/                      # SUB-MODULE: markdown help rendering (charm.land/glamour/v2)
-├── manpage/                      # SUB-MODULE: man page generation (mango/roff)
 ├── prompts/                      # SUB-MODULE: huh/v2 interactive prompt runner
 ├── spinner/                      # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
 ├── telemetry/                    # SUB-MODULE: OpenTelemetry middleware
@@ -257,7 +256,7 @@ go build ./...                                   # Verify build
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
 14. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
-15. **Modular sub-modules** — 5 optional importable sub-modules (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) isolate heavy dependencies; core stays lean (13 direct deps). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
+15. **Modular sub-modules** — 4 optional importable sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`) isolate heavy dependencies; core stays lean (13 direct deps). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
 16. **Audit log integration** — `WithAuditLog(plugin)` wires `samber-do-auditlog` into the DI injector; `cli.AuditLog()`/`cli.AuditLogReport()` for programmatic access; `AuditLogServiceByName`/`AuditLogFailedServices` query helpers; `ExportAuditLog[T]` supports 11 formats (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). No built-in subcommand — consumers export via their own flag/env pattern (e.g. `DO_AUDITLOG_ENABLED` + `AUDIT_LOG_FORMAT`)
 17. **Plugin system** — `Plugin` interface bundles custom type handlers + validators; `RegisterPlugin()` applies globally, `WithPlugin()` / `FlagRegistry.RegisterPlugin()` apply per-instance
 18. **Nested config structs** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path for flattened flag registration
@@ -270,7 +269,7 @@ go build ./...                                   # Verify build
 
 - `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 - `NoFlags` is a distinct named type (`type NoFlags struct{}`, not an alias) — use `(NoFlags{})` with parens for comparisons
-- **Nested modules** — `go build ./...` from the repo root does NOT descend into the 5 sub-module directories (each has its own `go.mod`). Build/test them individually: `for m in glamour manpage prompts spinner telemetry; do (cd pkg/cmdguard/$m && go build ./... && go test ./...); done`
+- **Nested modules** — `go build ./...` from the repo root does NOT descend into the 4 sub-module directories (each has its own `go.mod`). Build/test them individually: `for m in glamour prompts spinner telemetry; do (cd pkg/cmdguard/$m && go build ./... && go test ./...); done`
 - `flake.nix` provides devShell + formatter + format check only (no `buildGoModule` or vet checks)
 
 #### Cobra Behavior
@@ -343,7 +342,7 @@ go build ./...                                   # Verify build
 
 - **Core middleware chain** — `Middleware[T]` (middleware.go) is the generic chain type. Wire middleware via `WithMiddleware[T](mw...)`. The `spinner` and `telemetry` middleware implementations live in their sub-modules (see below).
 
-#### Sub-Modules (glamour / manpage / prompts / spinner / telemetry)
+#### Sub-Modules (glamour / prompts / spinner / telemetry)
 
 - **Import path** — each is `github.com/larsartmann/cmdguard/<name>`; import only what you need. Core has zero deps on these.
 - **Directory layout is load-bearing** — each sub-module lives at the **repo root** (`<name>/`), NOT under `pkg/cmdguard/`. Go resolves a module path by finding `go.mod` at the matching directory in the repo: `github.com/larsartmann/cmdguard/telemetry` requires `telemetry/go.mod` at the repo root. The root `go.mod` `replace` directives only work locally (in the workspace); they are **ignored by downstream consumers**. Moving a sub-module under `pkg/` breaks external `go get` silently (builds still pass via workspace `replace`).
@@ -351,8 +350,7 @@ go build ./...                                   # Verify build
 - **spinner** — `SpinnerMiddleware[T]` auto-skips when `os.Stderr` is not a terminal; override with `SpinnerConfig{Writer: ...}`.
 - **telemetry** — `TelemetryMiddleware[T]` starts a span per command but cannot propagate the new context to the handler (`next func() error` signature); child spans must use the original context.
 - **prompts** — provides the `huh/v2` implementation of the core `PromptRunner` interface; wire via `SetPromptRunner()`.
-- **manpage** — `manpage.GenerateCommand` produces roff man pages via `muesli/mango-cobra`.
-- **Lint** — all 5 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list.
+- **Lint** — all 4 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list.
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.

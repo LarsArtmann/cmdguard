@@ -209,7 +209,6 @@ HELLO, CMDGUARD!
 | **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                         |
 | **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                                                |
 | **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                                                      |
-| **Man page generation**    | `manpage.GenerateCommand[T](cli)` for roff output                                                                                |
 | **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                                                     |
 | **Zero panics**            | All functions return errors; no Must\* panic variants                                                                            |
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                          |
@@ -521,31 +520,13 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 
 ---
 
-## Man Page Generation
-
-```go
-import "github.com/larsartmann/cmdguard/manpage"
-
-manCmd, err := manpage.GenerateCommand[AppConfig](cli)
-if err != nil {
-    log.Fatal(err)
-}
-v3.AddCommand(cli, manCmd)
-// $ myapp man
-```
-
-Generates roff-formatted man pages from your command structure.
-
----
-
 ## Optional Sub-Modules
 
-cmdguard's core stays lean — five optional features live in standalone sub-modules so you import only what you need:
+cmdguard's core stays lean — four optional features live in standalone sub-modules so you import only what you need:
 
 | Sub-module    | Import path                                 | Provides                                               |
 | ------------- | ------------------------------------------- | ------------------------------------------------------ |
 | **glamour**   | `github.com/larsartmann/cmdguard/glamour`   | Markdown help rendering (`WithHelp`, `RenderMarkdown`) |
-| **manpage**   | `github.com/larsartmann/cmdguard/manpage`   | Man page generation (`GenerateCommand`, `Write`)       |
 | **prompts**   | `github.com/larsartmann/cmdguard/prompts`   | Interactive prompts via huh (`Register`)               |
 | **spinner**   | `github.com/larsartmann/cmdguard/spinner`   | Terminal spinner middleware (`Middleware`)             |
 | **telemetry** | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry spans (`WithTelemetry`, `Middleware`)    |
