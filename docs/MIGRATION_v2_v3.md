@@ -2,7 +2,7 @@
 
 > **TL;DR:** Change every `cmdguard/v2` import to `cmdguard/v3`, drop redundant
 > type parameters from options, pass flags positionally to `NewCommand`, and import
-> the relevant sub-module for spinner/telemetry/glamour/manpage/prompts features.
+> the relevant sub-module for spinner/telemetry/glamour/prompts features.
 
 **Source version:** `v2.10.2` (the last stable v2)
 **Target version:** `v3.0.0` (`github.com/larsartmann/cmdguard/v3`)
@@ -114,7 +114,6 @@ need it.
 | Markdown help    | `v2.WithGlamourHelp[T]()`   | `glamour.WithHelp()`                                  |
 | Terminal spinner | `v2.SpinnerMiddleware[T]`   | `spinner.Middleware[T](title)`                        |
 | OpenTelemetry    | `v2.WithTelemetry[T]`       | `telemetry.WithTelemetry[T](tracer)`                  |
-| Man pages        | `v2.GenerateManPageCommand` | `manpage.GenerateCommand[T](cli)`                     |
 | huh prompts      | (built-in)                  | `prompts` package (`HuhRunner`) + `SetPromptRunner()` |
 
 ### Example: spinner + telemetry
@@ -209,7 +208,7 @@ go mod tidy
 - [ ] Keep `[T]` only on callback-bearing options (`WithMiddleware`,
       `WithConfigValidation`, `WithPostFlagParse`, `WithCleanup`,
       `WithSubcommands`, `WithPreRunE`, `WithPostRunE`)
-- [ ] Import the sub-module for spinner / telemetry / glamour / manpage / prompts
+- [ ] Import the sub-module for spinner / telemetry / glamour / prompts
 - [ ] Remove usages of `EditInEditor`, `Result[T]`, `Validated[T]`
 - [ ] `go build ./... && go vet ./... && go test ./...`
 

@@ -24,7 +24,7 @@
 - [x] Dead weight cut: `result.go`, `editor.go`
 - [x] go-output blank imports removed from core
 - [x] GitHub releases: v3.0.0, v2.10.4, 5× sub-module v0.1.0
-- [x] External smoke tests: v3.0.0, v2@latest, all 5 sub-modules resolve
+- [x] External smoke tests: v3.0.0, v2@latest, all 4 sub-modules resolve
 - [x] AGENTS.md + FEATURES.md rewritten for v3
 - [x] Stale reference cleanup (EditInEditor, WithFlags, SpinnerMiddleware, etc.)
 

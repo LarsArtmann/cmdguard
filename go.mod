@@ -89,8 +89,6 @@ require (
 	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
 )
 
-replace github.com/larsartmann/cmdguard/manpage => ./manpage
-
 replace github.com/larsartmann/cmdguard/prompts => ./prompts
 
 replace github.com/larsartmann/cmdguard/telemetry => ./telemetry

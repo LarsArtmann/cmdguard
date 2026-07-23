@@ -128,7 +128,7 @@ cmdguard/
 ├── ROADMAP.md                    # Long-term direction and raw ideas
 ├── CHANGELOG.md                  # Change history per version
 ├── .golangci.yml                 # Lint configuration
-├── go.work                       # Go workspace (6 modules: core + 5 sub-modules)
+├── go.work                       # Go workspace (5 modules: core + 4 sub-modules)
 ├── flake.nix                     # Nix dev shell, formatter, checks
 ├── flake.lock                    # Nix lock file
 └── README.md                     # User documentation
@@ -164,7 +164,7 @@ Each sub-module is independently importable — core has **zero** dependencies o
 | `prompts`   | `charm.land/huh/v2`              | v2.0.3  | Interactive prompts     |
 | `spinner`   | `charm.land/lipgloss/v2`         | v2.0.5  | Terminal spinner        |
 | `telemetry` | `go.opentelemetry.io/otel/trace` | v1.44.0 | OpenTelemetry spans     |
-| `manpage`   | `muesli/mango` + `mango-cobra`   | v0.2.0  | Man page generation     |
+
 
 ### GOEXPERIMENT=jsonv2
 
@@ -261,7 +261,7 @@ go build ./...                                   # Verify build
 17. **Plugin system** — `Plugin` interface bundles custom type handlers + validators; `RegisterPlugin()` applies globally, `WithPlugin()` / `FlagRegistry.RegisterPlugin()` apply per-instance
 18. **Nested config structs** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path for flattened flag registration
 19. **Docs generation** — `cli.GenerateDocs(w)` writes markdown documentation for the full command tree to any `io.Writer`
-20. **Go workspace** — `go.work` spans 6 modules (core + 5 sub-modules) for unified local builds; `go build ./...` compiles all modules
+20. **Go workspace** — `go.work` spans 5 modules (core + 4 sub-modules) for unified local builds; `go build ./...` compiles all modules
 
 ### Key Gotchas
 

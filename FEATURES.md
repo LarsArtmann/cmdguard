@@ -329,7 +329,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Optional Sub-Modules
 
-All 5 sub-modules are independently importable. Core has **zero** dependencies on these.
+All 4 sub-modules are independently importable. Core has **zero** dependencies on these.
 Each compiles cleanly with matching v3 API signatures. All have basic test coverage.
 
 | Sub-module  | Key API                                               | Dependency                       | Version | Status           |
@@ -375,7 +375,7 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | Test functions              | 474 (1429 runs) | 🟢 Good |                                                                                                                |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
-| Sub-module tests            | 20 across all 5 | 🟢 Good | All sub-modules have basic test coverage                                                                       |
+| Sub-module tests            | 17 across all 4 | 🟢 Good | All sub-modules have basic test coverage                                                                       |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
 | `pkg/testutil` coverage     | 50%             | 🟡 Debt | 372-line public package, 25 test functions                                                                     |
 | `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
