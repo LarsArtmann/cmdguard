@@ -6,6 +6,8 @@
 
 ---
 
+> **Update 2026-07-23:** The P0 items below were completed in the same session: the `auditlog.ServiceName` build failure was fixed by updating the call to `auditlog.ServiceByName` (plain string), a `CHANGELOG.md` `[Unreleased]` entry was added for the manpage removal and related changes, and the full test/lint/`nix flake check` gate passed.
+
 ## Context
 
 Session started with a library audit ("What libs do we use?"), which led to questioning the `manpage/` sub-module's value. Since fang already bundles man page generation via `mango-cobra`, the separate `manpage/` sub-module was redundant. User authorized removal.
@@ -126,6 +128,15 @@ None for this task.
 **Files NOT changed (already clean at HEAD per `b998722`):** `go.work`, `pkg/cmdguard/v3/doc.go`, `README.md`, `ROADMAP.md`
 
 **Historical files NOT touched (intentional):** All `docs/status/`, `docs/planning/`, `docs/modularization/`, `CHANGELOG.md`
+
+---
+
+## Resolution (2026-07-23)
+
+- **P0 #1 (auditlog build failure):** Fixed in `pkg/cmdguard/v3/auditlog.go` by calling `ServiceByName` with a plain `string` instead of the removed `auditlog.ServiceName` type.
+- **P0 #2-4 (verification):** Full `go test ./... -race`, `golangci-lint run ./...`, and `nix flake check` passed after the fix. Sub-module loop (`glamour`, `prompts`, `spinner`, `telemetry`) is green.
+- **P1 #5 (CHANGELOG entry):** `CHANGELOG.md` `[Unreleased]` now notes the manpage sub-module removal, auditlog refresh, prompts lint fix, and related post-v3.0.0 changes.
+- **Historical files:** The 2026-07 status and planning documents were annotated with non-destructive resolution notes rather than rewritten; `CHANGELOG.md` carries the canonical removal record.
 
 ---
 
