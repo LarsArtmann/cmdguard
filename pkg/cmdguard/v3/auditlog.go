@@ -173,7 +173,7 @@ func AuditLogServiceByName[T any](cli *CLI[T], name string) *auditlog.ServiceInf
 		return nil
 	}
 
-	return cli.spec.auditLog.Report().ServiceByName(name)
+	return cli.spec.auditLog.Report().ServiceByName(auditlog.ServiceName(name))
 }
 
 // AuditLogFailedServices returns all services with invocation or shutdown errors.
