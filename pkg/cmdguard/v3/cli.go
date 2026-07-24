@@ -44,6 +44,7 @@ type cliSpec struct {
 	gracefulShutdown bool
 	diLogf           func(string, ...any)
 	auditLog         *auditlog.Plugin
+	onError          func(error)
 	pluginErr        error
 }
 
@@ -504,6 +505,10 @@ func (cli *CLI[T]) executeWithCobra(flowCtx context.Context) error {
 	}
 
 	if execErr != nil {
+		if cli.spec.onError != nil {
+			cli.spec.onError(execErr)
+		}
+
 		cli.writeFormattedError(execErr)
 
 		return fmt.Errorf("failed to execute CLI: %w", execErr)

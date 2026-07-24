@@ -151,6 +151,24 @@ func WithDILogging(logf func(format string, args ...any)) CLIOption {
 	}
 }
 
+// WithOnError registers a callback invoked when Execute returns a non-nil error,
+// before the error is returned to the caller. Use this for structured logging
+// (e.g. slog for journald/Loki), metrics, or audit trails at the CLI boundary.
+//
+// The callback receives the raw execution error (before the "failed to execute
+// CLI" wrapper). It is called at most once per Execute call.
+//
+//	cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+//	    v3.WithOnError(func(err error) {
+//	        slog.Error("command failed", "err", err)
+//	    }),
+//	)
+func WithOnError(fn func(error)) CLIOption {
+	return func(s *cliSpec) {
+		s.onError = fn
+	}
+}
+
 // WithDraconianValidation enables draconian command validation.
 func WithDraconianValidation() CLIOption {
 	return func(s *cliSpec) {
