@@ -16,7 +16,8 @@ func TestWithOnError(t *testing.T) {
 
 		var capturedErr error
 
-		cli, err := v3.NewCLI("test", "Test CLI", testCLIConfig{},
+		cli, err := v3.NewCLI(
+			"test", "Test CLI", testCLIConfig{},
 			v3.WithFang(false),
 			v3.WithOnError(func(err error) {
 				capturedErr = err
@@ -61,7 +62,8 @@ func TestWithOnError(t *testing.T) {
 
 		called := false
 
-		cli, err := v3.NewCLI("test", "Test CLI", testCLIConfig{},
+		cli, err := v3.NewCLI(
+			"test", "Test CLI", testCLIConfig{},
 			v3.WithFang(false),
 			v3.WithOnError(func(_ error) {
 				called = true
