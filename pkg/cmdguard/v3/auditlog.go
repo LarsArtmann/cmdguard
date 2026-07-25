@@ -176,12 +176,12 @@ func exportAuditLogToWriter(plugin *auditlog.Plugin, format AuditLogFormat, w io
 
 // AuditLogServiceByName returns the first auditlog ServiceInfo matching the name.
 // Returns nil if audit logging is not enabled.
-func AuditLogServiceByName[T any](cli *CLI[T], name string) *auditlog.ServiceInfo {
+func AuditLogServiceByName[T any](cli *CLI[T], name auditlog.ServiceName) *auditlog.ServiceInfo {
 	if cli.spec.auditLog == nil {
 		return nil
 	}
 
-	return cli.spec.auditLog.Report().ServiceByName(auditlog.ServiceName(name))
+	return cli.spec.auditLog.Report().ServiceByName(name)
 }
 
 // AuditLogFailedServices returns all services with invocation or shutdown errors.
