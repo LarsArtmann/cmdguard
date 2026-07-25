@@ -42,6 +42,14 @@ type auditLogExporter struct {
 	toWriter func(*auditlog.Plugin, io.Writer) error
 }
 
+func adaptDiagramExport(fn func(*auditlog.Plugin, string, ...auditlog.DiagramOption) error) func(*auditlog.Plugin, string) error {
+	return func(p *auditlog.Plugin, path string) error { return fn(p, path) }
+}
+
+func adaptDiagramWrite(fn func(*auditlog.Plugin, io.Writer, ...auditlog.DiagramOption) error) func(*auditlog.Plugin, io.Writer) error {
+	return func(p *auditlog.Plugin, w io.Writer) error { return fn(p, w) }
+}
+
 // auditLogExporterRegistry is the single source of truth for supported audit
 // log export formats. Kept as a function (not a package-level var) to satisfy
 // gochecknoglobals; the per-call allocation is negligible (export runs once).
@@ -52,10 +60,10 @@ func auditLogExporterRegistry() map[AuditLogFormat]auditLogExporter {
 		AuditLogFormatNDJSON:   {(*auditlog.Plugin).ExportEventsToNDJSON, (*auditlog.Plugin).WriteEventsNDJSON},
 		AuditLogFormatCSV:      {(*auditlog.Plugin).ExportToCSV, (*auditlog.Plugin).WriteReportCSV},
 		AuditLogFormatTSV:      {(*auditlog.Plugin).ExportToTSV, (*auditlog.Plugin).WriteReportTSV},
-		AuditLogFormatMermaid:  {(*auditlog.Plugin).ExportToMermaid, (*auditlog.Plugin).WriteMermaid},
-		AuditLogFormatDOT:      {(*auditlog.Plugin).ExportToDOT, (*auditlog.Plugin).WriteDOT},
-		AuditLogFormatD2:       {(*auditlog.Plugin).ExportToD2, (*auditlog.Plugin).WriteD2},
-		AuditLogFormatPlantUML: {(*auditlog.Plugin).ExportToPlantUML, (*auditlog.Plugin).WritePlantUML},
+		AuditLogFormatMermaid:  {adaptDiagramExport((*auditlog.Plugin).ExportToMermaid), adaptDiagramWrite((*auditlog.Plugin).WriteMermaid)},
+		AuditLogFormatDOT:      {adaptDiagramExport((*auditlog.Plugin).ExportToDOT), adaptDiagramWrite((*auditlog.Plugin).WriteDOT)},
+		AuditLogFormatD2:       {adaptDiagramExport((*auditlog.Plugin).ExportToD2), adaptDiagramWrite((*auditlog.Plugin).WriteD2)},
+		AuditLogFormatPlantUML: {adaptDiagramExport((*auditlog.Plugin).ExportToPlantUML), adaptDiagramWrite((*auditlog.Plugin).WritePlantUML)},
 		AuditLogFormatTree:     {(*auditlog.Plugin).ExportToTree, (*auditlog.Plugin).WriteTree},
 		AuditLogFormatHTMLTree: {(*auditlog.Plugin).ExportToHTMLTree, (*auditlog.Plugin).WriteHTMLTree},
 	}
