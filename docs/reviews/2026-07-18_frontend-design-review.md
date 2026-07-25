@@ -112,7 +112,7 @@ These are L1.07 scope or beyond; for now, the critique documents the gap.
 ```html
 <span>From flags to </span
 ><span class="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent"
-  >shutdown</span
+	>shutdown</span
 ><span>, type-safe.</span>
 ```
 
