@@ -190,12 +190,14 @@ func WithOutputFormat(defaultFormat OutputFormat) CLIOption {
 	}
 }
 
-// WithConfigFile loads JSON config from the given paths before flag registration.
-// Paths support $ENV and ~ expansion; missing files are silently skipped.
+// WithConfigFile adds config file loading with the given search paths.
+// Paths are tried in order; the first existing file wins.
+// Environment variables and ~ are expanded in paths.
+// Supports JSON, YAML, and TOML formats with automatic detection by file extension.
 func WithConfigFile(paths ...string) CLIOption {
 	return func(s *cliSpec) {
 		s.configFilePaths = paths
-		s.configLoader = &jsonLoader{}
+		s.configLoader = NewKoanfLoader(paths...)
 	}
 }
 

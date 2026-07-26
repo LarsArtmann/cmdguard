@@ -19,46 +19,6 @@ type ConfigFileLoader interface {
 	Load(data []byte, cfg any) (setFields []string, err error)
 }
 
-// jsonLoader loads configuration from JSON files.
-// Supports flat key-value objects where keys match flag tag names.
-type jsonLoader struct{}
-
-// NewJSONLoader returns a ConfigFileLoader for JSON files.
-// Supports flat key-value objects and nested objects where keys match flag tag names.
-func NewJSONLoader() ConfigFileLoader {
-	return &jsonLoader{}
-}
-
-// Load unmarshals JSON data into cfg and returns the list of fields that were set.
-func (l *jsonLoader) Load(data []byte, cfg any) ([]string, error) {
-	var raw map[string]jsontext.Value
-
-	err := json.Unmarshal(data, &raw)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
-	}
-
-	// MatchCaseInsensitiveNames preserves v1 behavior: JSON key "port" matches Go field "Port"
-	// without requiring explicit json tags on user config structs.
-
-	tags, err := ParseFlagTags(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("%w: parsing flag tags: %w", ErrConfigFileParse, err)
-	}
-
-	present := make(map[string]bool, len(raw))
-	collectKeysRecursive(raw, present)
-
-	setFields := FilterSetFields(tags, present)
-
-	err = json.Unmarshal(data, cfg, json.MatchCaseInsensitiveNames(true))
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
-	}
-
-	return setFields, nil
-}
-
 // loadConfigFile tries to load a config file from the given paths.
 // Paths are expanded via expandConfigPath. Missing files are skipped.
 // Returns ErrConfigFileNotFound if none of the paths exist.
@@ -202,25 +162,42 @@ func (r *FlagRegistry) updateTagDefaultsFromConfig(cfg any, setFields []string) 
 	}
 }
 
-// WithConfigFile adds config file loading with the given search paths.
-// Paths are tried in order; the first existing file wins.
-// Environment variables and ~ are expanded in paths.
-// Only JSON files are supported in the core package;
-// use WithConfigFileLoader for YAML/TOML support.
 // loadConfigFileOrSkip attempts to load a config file, returning nil on "not found".
-// This is the helper used during CLI initialization.
+// KoanfLoader manages its own file reading; custom loaders receive bytes via
+// loadConfigFile.
 func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, error) {
 	if cli.spec.configLoader == nil || len(cli.spec.configFilePaths) == 0 {
 		return nil, nil
 	}
 
-	paths := cli.spec.configFilePaths
-
 	// Check for --config flag override.
 	if override := resolveConfigFlag(os.Args[1:]); override != "" {
-		paths = []string{override}
+		if kl, ok := cli.spec.configLoader.(*KoanfLoader); ok {
+			kl.SetPaths(override)
+			setFields, err := kl.Load(nil, cli.config)
+			if err != nil && errors.Is(err, ErrConfigFileNotFound) {
+				return nil, nil
+			}
+
+			return setFields, err
+		}
+
+		return loadConfigFileOrError(cli, []string{override})
 	}
 
+	if kl, ok := cli.spec.configLoader.(*KoanfLoader); ok {
+		setFields, err := kl.Load(nil, cli.config)
+		if err != nil && errors.Is(err, ErrConfigFileNotFound) {
+			return nil, nil
+		}
+
+		return setFields, err
+	}
+
+	return loadConfigFileOrError(cli, cli.spec.configFilePaths)
+}
+
+func loadConfigFileOrError[T any](cli *CLI[T], paths []string) ([]string, error) {
 	setFields, err := loadConfigFile(paths, cli.spec.configLoader, cli.config)
 	if err != nil && errors.Is(err, ErrConfigFileNotFound) {
 		return nil, nil
