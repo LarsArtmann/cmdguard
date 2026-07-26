@@ -3,45 +3,7 @@ title: Config Files
 description: Auto-load JSON, YAML, and TOML config files with flag and env override.
 ---
 
-## JSON (built-in)
 
-```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigFile("~/.config/myapp/config.json", "/etc/myapp/config.json"),
-)
-```
-
-Paths are tried in order. Missing files are silently skipped. Supports `$ENV` and `~` expansion.
-
-## YAML / TOML
-
-Use the `configload` package for YAML and TOML support:
-
-```go
-import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/configload"
-
-// YAML
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigFileLoader(configload.YAML(), "config.yaml"),
-)
-
-// TOML
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigFileLoader(configload.TOML(), "config.toml"),
-)
-```
-
-## Auto Detection
-
-`configload.Auto()` tries YAML, then TOML, then JSON sequentially:
-
-```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigFileLoader(configload.Auto(), "config"),
-)
-```
-
-For precise extension-based detection, use `LoaderForPath`.
 
 ## Precedence
 

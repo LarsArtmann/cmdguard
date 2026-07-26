@@ -47,7 +47,7 @@ nix flake check
 
 **Module path:** `github.com/larsartmann/cmdguard/v3`
 
-**Current Status:** v3.0.0+. 1434 test runs, 26 benchmarks, 7 fuzz targets, 87.8% coverage, 0 build errors, 0 lint issues.
+**Current Status:** v3.0.0+. 467 test functions, 26 benchmarks, 7 fuzz targets, 87.8% coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -148,11 +148,11 @@ cmdguard/
 | Library                                     | Purpose              | Version |
 | ------------------------------------------- | -------------------- | ------- |
 | `github.com/spf13/cobra`                    | CLI framework        | v1.10.2 |
-| `github.com/samber/do/v2`                   | Dependency injection | v2.0.0  |
+| `github.com/samber/do/v2`                   | Dependency injection | v2.1.0  |
 | `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.30.4 |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.5.0  |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.32.0 |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.8.0  |
 
 ### Optional Sub-Module Dependencies
 
@@ -250,7 +250,7 @@ go build ./...                                   # Verify build
 7. **Env tags** - `env:"VAR_NAME"` struct tag reads from environment
 8. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
 9. **Signal handling** — `WithSignalHandling()` cancels context on SIGINT/SIGTERM; `WithGracefulShutdown()` additionally triggers DI service shutdown (implies the former)
-10. **Rich output** - OutputTable/OutputResult with 16 formats via go-output v0.30.4 registries
+10. **Rich output** - OutputTable/OutputResult with 16 formats via go-output v0.32.0 registries
 11. **Copy-on-write registries** — `FlagRegistry` shares global type/validator registries via copy-on-write; reads use the shared maps, writes trigger a lazy clone. `RegisterTypeHandler()`/`RegisterValidator()` write to global defaults (visible to instances that haven't cloned); `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` trigger COW clone and write to instance-local maps
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
@@ -299,8 +299,8 @@ go build ./...                                   # Verify build
 
 #### Output & Styling
 
-- **16 output formats** via go-output `v0.30.4` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `output.RegisteredTableMarshalFormats()`.
-- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. All go-output modules are pinned at v0.30.4. The `enum` and `envdetect` sub-modules were absorbed into go-output core.
+- **16 output formats** via go-output `v0.32.0` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `output.RegisteredTableMarshalFormats()`.
+- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. All go-output modules are pinned at v0.32.0. The `enum` and `envdetect` sub-modules were absorbed into go-output core.
 - **fang styling** — styled output by default; `--no-color` persistent flag is registered by default and sets `NO_COLOR=1` for fang; `NO_COLOR` env var also respected automatically via fang's colorprofile. `cli.NoColor()` returns true if either is set.
 - **Help rendering hook** — `WithHelpTransform[T](fn)` is the core extension point for transforming command help text. The `glamour` sub-module provides a ready-made markdown transformer (see [Sub-Modules](#sub-modules) below); it is NOT imported by core.
 
@@ -352,7 +352,7 @@ go build ./...                                   # Verify build
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.
-- `samber-do-auditlog` is consumed from the Go module proxy (`v0.5.0`). The sibling repo at `../samber-do-auditlog` is for local dev only — a `replace` directive works for local builds but is **ignored by downstream consumers** (replace directives in a library's go.mod only affect the module's own build/CI).
+- `samber-do-auditlog` is consumed from the Go module proxy (`v0.8.0`). The sibling repo at `../samber-do-auditlog` is for local dev only — a `replace` directive works for local builds but is **ignored by downstream consumers** (replace directives in a library's go.mod only affect the module's own build/CI).
 
 #### Fang Integration (ADR-001)
 
