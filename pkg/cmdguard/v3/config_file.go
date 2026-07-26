@@ -170,35 +170,22 @@ func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, error) {
 		return nil, nil
 	}
 
-	// Check for --config flag override.
+	paths := cli.spec.configFilePaths
+
 	if override := resolveConfigFlag(os.Args[1:]); override != "" {
-		if kl, ok := cli.spec.configLoader.(*KoanfLoader); ok {
-			kl.SetPaths(override)
-			setFields, err := kl.Load(nil, cli.config)
-			if err != nil && errors.Is(err, ErrConfigFileNotFound) {
-				return nil, nil
-			}
-
-			return setFields, err
-		}
-
-		return loadConfigFileOrError(cli, []string{override})
+		paths = []string{override}
 	}
 
 	if kl, ok := cli.spec.configLoader.(*KoanfLoader); ok {
-		setFields, err := kl.Load(nil, cli.config)
-		if err != nil && errors.Is(err, ErrConfigFileNotFound) {
-			return nil, nil
-		}
+		kl.SetPaths(paths...)
 
-		return setFields, err
+		return skipNotFound(kl.Load(nil, cli.config))
 	}
 
-	return loadConfigFileOrError(cli, cli.spec.configFilePaths)
+	return skipNotFound(loadConfigFile(paths, cli.spec.configLoader, cli.config))
 }
 
-func loadConfigFileOrError[T any](cli *CLI[T], paths []string) ([]string, error) {
-	setFields, err := loadConfigFile(paths, cli.spec.configLoader, cli.config)
+func skipNotFound(setFields []string, err error) ([]string, error) {
 	if err != nil && errors.Is(err, ErrConfigFileNotFound) {
 		return nil, nil
 	}

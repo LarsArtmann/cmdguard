@@ -366,8 +366,10 @@ func TestKoanfLoader_FormatDetection(t *testing.T) {
 }
 
 func TestKoanfLoader_PathExpansion(t *testing.T) {
-	//nolint:paralleltest // uses t.Setenv
+	t.Parallel()
+
 	t.Run("expands environment variables in path", func(t *testing.T) {
+		//nolint:paralleltest // uses t.Setenv
 		dir := t.TempDir()
 		path := filepath.Join(dir, "config.yaml")
 		err := os.WriteFile(path, []byte("name: env-expanded\n"), 0o600)

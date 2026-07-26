@@ -3,6 +3,7 @@ package v3
 import (
 	"encoding/json/jsontext"
 	"encoding/json/v2"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -95,9 +96,14 @@ func (l *KoanfLoader) Load(_ []byte, cfg any) ([]string, error) {
 type bytesProvider struct{ data []byte }
 
 func (b *bytesProvider) ReadBytes() ([]byte, error) { return b.data, nil }
+
 func (b *bytesProvider) Read() (map[string]any, error) {
-	return nil, nil
+	return nil, errKoanfReadNotImplemented
 }
+
+// errKoanfReadNotImplemented is returned by bytesProvider.Read, which is never
+// called by koanf when a Parser is provided to Load.
+var errKoanfReadNotImplemented = errors.New("bytesProvider.Read not implemented; koanf should use ReadBytes")
 
 // koanfParserForPath returns the appropriate koanf parser based on file extension.
 func koanfParserForPath(path string) koanf.Parser {
