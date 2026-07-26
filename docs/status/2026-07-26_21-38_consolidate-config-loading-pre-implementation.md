@@ -38,17 +38,17 @@
 
 ## c) NOT STARTED
 
-| Task | Description | Status |
-|------|-------------|--------|
+| Task             | Description                                                                                            | Status      |
+| ---------------- | ------------------------------------------------------------------------------------------------------ | ----------- |
 | Task 1 (1.2-1.8) | Rewrite KoanfLoader.Load, add TOML to parserForPath, add SetPaths, fix doc comment, update koanf tests | Not started |
-| Task 2 (2.1-2.4) | Make WithConfigFile use KoanfLoader, update loadConfigFileOrSkip, update docs | Not started |
-| Task 3 (3.1-3.4) | Delete loader.go, loader_test.go, jsonLoader, NewJSONLoader, update configload doc | Not started |
-| Task 4 (4.1-4.4) | Update config_file_test.go, config_nested_test.go, verify integration tests, full suite | Not started |
-| Task 5 (5.1-5.3) | go mod tidy, verify build, verify sub-module builds | Not started |
-| Task 6 (6.1-6.2) | Update taskctl example, run example tests | Not started |
-| Task 7 (7.1-7.2) | Update .golangci.yml ireturn allow list, run lint | Not started |
-| Task 8 (8.1-8.9) | Update README, FEATURES, AGENTS, CHANGELOG, API, TODO, website, ADR | Not started |
-| Task 9 (9.1-9.6) | Final verification (tests -race, lint, build, benchmarks, commit, push) | Not started |
+| Task 2 (2.1-2.4) | Make WithConfigFile use KoanfLoader, update loadConfigFileOrSkip, update docs                          | Not started |
+| Task 3 (3.1-3.4) | Delete loader.go, loader_test.go, jsonLoader, NewJSONLoader, update configload doc                     | Not started |
+| Task 4 (4.1-4.4) | Update config_file_test.go, config_nested_test.go, verify integration tests, full suite                | Not started |
+| Task 5 (5.1-5.3) | go mod tidy, verify build, verify sub-module builds                                                    | Not started |
+| Task 6 (6.1-6.2) | Update taskctl example, run example tests                                                              | Not started |
+| Task 7 (7.1-7.2) | Update .golangci.yml ireturn allow list, run lint                                                      | Not started |
+| Task 8 (8.1-8.9) | Update README, FEATURES, AGENTS, CHANGELOG, API, TODO, website, ADR                                    | Not started |
+| Task 9 (9.1-9.6) | Final verification (tests -race, lint, build, benchmarks, commit, push)                                | Not started |
 
 ---
 
@@ -89,12 +89,14 @@
 ## f) Up to 50 Things We Should Get Done Next
 
 ### Immediate (Block consolidation work)
+
 1. **Resolve the circular dependency** — Decide: move KoanfLoader into `v3` or export jsonLoader helpers. This blocks Task 1.3.
 2. **Revert go.work to remove go-output paths** — The 14 `use` directives for `/home/lars/projects/go-output/*` must not ship. Add `replace` directives in go.mod instead, or use `GOWORK=off`.
 3. **Verify `GOEXPERIMENT=jsonv2` is set in the dev shell** — All go commands need this flag. Confirm it's in `flake.nix` devShell.
 4. **Decide on go-output dependency strategy** — Can we pin to `v0.30.4` (which worked) instead of `v0.31.1` (which has broken pseudo-versions)? Or does go-output need to publish its sub-modules?
 
 ### Task 1: Refactor KoanfLoader
+
 5. **1.2** Add `.toml` case to `parserForPath` in `koanf.go`
 6. **1.3** Rewrite `KoanfLoader.Load` — koanf parse → `k.Marshal(json.Parser())` → `collectKeysRecursive` + `FilterSetFields` + `json.Unmarshal` with `MatchCaseInsensitiveNames`
 7. **1.4** Add `SetPaths(paths ...string)` method to KoanfLoader
@@ -104,37 +106,44 @@
 11. **1.8** Run koanf tests, fix failures
 
 ### Task 2: Make WithConfigFile use KoanfLoader
+
 12. **2.1** Change `WithConfigFile` in `cli_options.go:195` to create `NewKoanfLoader(paths...)` instead of `&jsonLoader{}`
 13. **2.2** Update `loadConfigFileOrSkip` in `config_file.go:212` to handle KoanfLoader's path-based loading (type-check for `*KoanfLoader` → `SetPaths` + `Load(nil, cfg)`)
 14. **2.3** Update `WithConfigFile` doc comment (no longer JSON-only)
 15. **2.4** Run `config_file_integration_test.go`, fix failures
 
 ### Task 3: Delete old loaders
+
 16. **3.1** Delete `configload/loader.go` (genericLoader, autoLoader, YAML, TOML, JSON, Auto, LoaderForPath)
 17. **3.2** Delete `configload/loader_test.go`
 18. **3.3** Delete `jsonLoader` struct and `NewJSONLoader()` from `config_file.go`; keep helpers
 19. **3.4** Update `configload` package doc comment
 
 ### Task 4: Update tests
+
 20. **4.1** Update `config_file_test.go`: replace `&jsonLoader{}` with KoanfLoader; keep helper tests
 21. **4.2** Update `config_nested_test.go`: replace `&jsonLoader{}` with KoanfLoader
 22. **4.3** Verify `config_file_integration_test.go` passes (koanf→JSON round-trip with `json:` tags)
 23. **4.4** Run full test suite with `-race -count=1`, fix failures
 
 ### Task 5: Update deps
+
 24. **5.1** `go mod tidy` to remove `go-faster/yaml` and `pelletier/go-toml/v2`
 25. **5.2** Verify `go build ./...` succeeds
 26. **5.3** Verify sub-modules still build: `glamour`, `prompts`, `spinner`, `telemetry`
 
 ### Task 6: Update examples
+
 27. **6.1** Update `examples/taskctl/main.go` if needed
 28. **6.2** Run taskctl tests, fix failures
 
 ### Task 7: Update lint config
+
 29. **7.1** Check if `ConfigFileLoader` still needs ireturn allow-list entry in `.golangci.yml`
 30. **7.2** Run `golangci-lint run ./...`, fix issues
 
 ### Task 8: Update documentation
+
 31. **8.1** Update `README.md`: config file section — one loader, auto-format detection, TOML support
 32. **8.2** Update `FEATURES.md`: remove old loader entries, update KoanfLoader status
 33. **8.3** Update `AGENTS.md`: config loading section — one loader, koanf as parser
@@ -146,6 +155,7 @@
 39. **8.9** Update `docs/adr/002-lint-strategy-and-exclusion-policy.md`
 
 ### Task 9: Final verification
+
 40. **9.1** Run `go test ./... -count=1 -timeout 120s -race`
 41. **9.2** Run `golangci-lint run ./...`
 42. **9.3** Run `go build ./...` + sub-module builds
@@ -154,6 +164,7 @@
 45. **9.6** Git push
 
 ### Additional improvements identified
+
 46. **Fix go.work before pushing** — Remove go-output workspace entries, use `replace` directives in go.mod for local dev, or pin go-output to v0.30.4
 47. **Consider squashing the 3 auto-committed infrastructure commits** — `98e0730`, `2552a62`, `fc2108b` should be reviewed and possibly squashed before push
 48. **Update AGENTS.md with the go.work version fix** — Document that go.work must match the installed Go version (1.26.5)

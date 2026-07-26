@@ -59,24 +59,25 @@
 
 ## c) NOT STARTED
 
-| Task | Description | Why skipped |
-|------|-------------|-------------|
-| Website docs | `website/src/content/docs/guides/config-files.mdx` still shows `configload.YAML()`, `configload.TOML()`, `configload.Auto()` examples | Forgot |
-| Website API ref | `website/src/content/docs/api-reference.mdx` still references old loaders | Forgot |
-| `docs/API.md` | Still references old loader functions | Forgot |
-| `docs/adr/002` | ireturn allow-list ADR not updated (ConfigFileLoader still in allow-list) | Forgot |
-| Benchmarks | Plan Task 9.4 — run benchmarks, verify no regression | Forgot |
-| `WHAT_THIS_PROJECT_IS_NOT.md` | Line 75 still links to `configload` package on pkg.go.dev | Forgot |
-| `ROADMAP.md` | Line 56 still says "Extract koanf into configload sub-module" as a future idea | Forgot |
-| `docs/modularization/ASSESSMENT.md` | References `configload/` as a package | Historical doc, lower priority |
-| ireturn allow-list review | `ConfigFileLoader` is still in the ireturn allow-list at `.golangci.yml:255`. `NewJSONLoader()` (which returned the interface) is deleted, but `WithConfigFileLoader` still accepts the interface as a parameter. Need to check if the allow-list entry is still needed. | Forgot |
-| Pre-existing `auditlog.go:45` golines lint issue | Not my change, but noted in plan as "fix on sight" | Pre-existing, deliberately untouched |
+| Task                                             | Description                                                                                                                                                                                                                                                              | Why skipped                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| Website docs                                     | `website/src/content/docs/guides/config-files.mdx` still shows `configload.YAML()`, `configload.TOML()`, `configload.Auto()` examples                                                                                                                                    | Forgot                               |
+| Website API ref                                  | `website/src/content/docs/api-reference.mdx` still references old loaders                                                                                                                                                                                                | Forgot                               |
+| `docs/API.md`                                    | Still references old loader functions                                                                                                                                                                                                                                    | Forgot                               |
+| `docs/adr/002`                                   | ireturn allow-list ADR not updated (ConfigFileLoader still in allow-list)                                                                                                                                                                                                | Forgot                               |
+| Benchmarks                                       | Plan Task 9.4 — run benchmarks, verify no regression                                                                                                                                                                                                                     | Forgot                               |
+| `WHAT_THIS_PROJECT_IS_NOT.md`                    | Line 75 still links to `configload` package on pkg.go.dev                                                                                                                                                                                                                | Forgot                               |
+| `ROADMAP.md`                                     | Line 56 still says "Extract koanf into configload sub-module" as a future idea                                                                                                                                                                                           | Forgot                               |
+| `docs/modularization/ASSESSMENT.md`              | References `configload/` as a package                                                                                                                                                                                                                                    | Historical doc, lower priority       |
+| ireturn allow-list review                        | `ConfigFileLoader` is still in the ireturn allow-list at `.golangci.yml:255`. `NewJSONLoader()` (which returned the interface) is deleted, but `WithConfigFileLoader` still accepts the interface as a parameter. Need to check if the allow-list entry is still needed. | Forgot                               |
+| Pre-existing `auditlog.go:45` golines lint issue | Not my change, but noted in plan as "fix on sight"                                                                                                                                                                                                                       | Pre-existing, deliberately untouched |
 
 ---
 
 ## d) TOTALLY FUCKED UP
 
 1. **`go.work` STILL polluted with 13 local go-output paths** — This was identified as the #1 critical blocker at the START of the session. I said "pin to v0.30.4" in my opening decisions, discovered go-output has no published versions, said "pre-existing issue, not part of the consolidation task", and then COMPLETELY FORGOT about it. The go.work still contains:
+
    ```
    use (
        /home/lars/projects/go-output
@@ -84,6 +85,7 @@
        ... 11 more ...
    )
    ```
+
    **Impact:** The repository CANNOT be built on any machine other than this one. CI will fail. Other developers will fail. This MUST be fixed before pushing.
 
 2. **CHANGELOG and FEATURES claim deps were "removed" but they weren't** — The CHANGELOG says "Removed direct deps: `go-faster/yaml`, `pelletier/go-toml/v2`". They were demoted to `// indirect` (still in go.mod, pulled by koanf). The FEATURES.md says the same. This is misleading documentation. The net dependency count did not decrease.
@@ -125,11 +127,13 @@
 ## f) Up to 50 Things We Should Get Done Next
 
 ### Critical (blocks shipping)
+
 1. **Fix go.work** — Remove 13 go-output local paths. Use `replace` directives in go.mod or accept local-clone requirement.
 2. **Squash auto-commits** — Consolidate `e5c2284` through `924c3dd` into one clean commit.
 3. **Verify build works WITHOUT go-output in workspace** — Test with `GOWORK=off go build ./...` or after removing go-output paths.
 
 ### Documentation fixes (stale references)
+
 4. **Update `website/src/content/docs/guides/config-files.mdx`** — Remove all `configload.*` examples, show `WithConfigFile` with auto-detection.
 5. **Update `website/src/content/docs/api-reference.mdx`** — Remove old loader function references.
 6. **Update `docs/API.md`** — Remove old loader functions, update WithConfigFile description.
@@ -143,6 +147,7 @@
 14. **Update `docs/adr/002-lint-strategy-and-exclusion-policy.md`** — If ireturn allow-list changes.
 
 ### Quality and verification
+
 15. **Review ireturn allow-list** — Is `ConfigFileLoader` at `.golangci.yml:255` still needed?
 16. **Run benchmarks** — `go test ./benchmarks/... -bench=.` and compare to baseline.
 17. **Test koanf→JSON edge cases** — TOML datetimes, YAML anchors, int vs float64.
@@ -152,12 +157,14 @@
 21. **Fix pre-existing `auditlog.go:45` golines issue** — Not mine but "fix on sight" principle.
 
 ### Architecture improvements
+
 22. **Consider making `loadConfigFile` private-only** — It's only used internally now.
 23. **Consider whether `WithConfigFileLoader` is still worth keeping** — Most users will just use `WithConfigFile`. The escape hatch may be YAGNI.
 24. **Add a TOML example to `examples/taskctl/`** — Showcase the new multi-format capability.
 25. **Consider adding `koanf/parsers/json` as the round-trip format** — Currently aliased as `koanfjson` to avoid collision with `encoding/json/v2`. Verify this is the cleanest approach.
 
 ### Process improvements
+
 26. **Create a pre-flight checklist for "can this be pushed?"** — go.work clean, no local paths, build works without workspace.
 27. **Document the go-output local-clone requirement** — If go-output must be cloned locally, document it in README or AGENTS.md.
 28. **Consider disabling the git auto-commit daemon during active work** — It creates noisy history and commits incomplete states.

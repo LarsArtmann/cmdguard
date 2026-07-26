@@ -66,7 +66,7 @@
 | `WithAuditLog(plugin)`                         | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                               |
 | `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:169`)                                                      |
 | `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | JSON loader, core package                                                                                              |
-| `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                    |
+| `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                     |
 | `WithConfigValidation[T](fn)`                  | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                           |
 | `WithMiddleware[T](mw...)`                     | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                 |
 | `WithPostFlagParse[T](fns...)`                 | 🟢 FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage (generic)                                                                    |
@@ -228,15 +228,15 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ## Config File Loading
 
-| Feature                             | Status                  | Notes                                                                                                             |
-| ----------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `WithConfigFile(paths...)`          | 🟢 FULLY_FUNCTIONAL     | KoanfLoader: auto-detects JSON/YAML/TOML by extension                                                             |
-| `WithConfigFileLoader(loader, ...)` | 🟢 FULLY_FUNCTIONAL     | Custom loader (advanced use cases)                                                                                |
-| `$ENV` and `~` expansion            | 🟢 FULLY_FUNCTIONAL     | Path expansion before loading (`cachedHomeDir` via `sync.OnceValue`)                                              |
-| `--config` flag override            | 🟢 FULLY_FUNCTIONAL     | Overrides default search paths                                                                                    |
-| Missing file = silent skip          | 🟢 FULLY_FUNCTIONAL     | Not an error when default path missing                                                                            |
-| Nested struct config                | 🟢 FULLY_FUNCTIONAL     | Inner structs flattened; `FieldTag.Index` tracks reflect path                                                     |
-| `KoanfLoader` (single loader)       | 🟢 FULLY_FUNCTIONAL     | Consolidated: koanf as format parser → JSON → `loadConfigFromJSON` (case-insensitive matching). `configload` package deleted. |
+| Feature                             | Status              | Notes                                                                                                                         |
+| ----------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `WithConfigFile(paths...)`          | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension                                                                         |
+| `WithConfigFileLoader(loader, ...)` | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                            |
+| `$ENV` and `~` expansion            | 🟢 FULLY_FUNCTIONAL | Path expansion before loading (`cachedHomeDir` via `sync.OnceValue`)                                                          |
+| `--config` flag override            | 🟢 FULLY_FUNCTIONAL | Overrides default search paths                                                                                                |
+| Missing file = silent skip          | 🟢 FULLY_FUNCTIONAL | Not an error when default path missing                                                                                        |
+| Nested struct config                | 🟢 FULLY_FUNCTIONAL | Inner structs flattened; `FieldTag.Index` tracks reflect path                                                                 |
+| `KoanfLoader` (single loader)       | 🟢 FULLY_FUNCTIONAL | Consolidated: koanf as format parser → JSON → `loadConfigFromJSON` (case-insensitive matching). `configload` package deleted. |
 
 ### Flag Priority Chain
 
@@ -350,7 +350,7 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | `charm.land/lipgloss/v2`                    | v2.0.5  | Terminal styling (fang dep, but listed direct) |
 | `github.com/larsartmann/go-output`          | v0.30.4 | Rich output (16 formats)                       |
 | `github.com/larsartmann/samber-do-auditlog` | v0.5.0  | DI audit logging                               |
-| `github.com/knadh/koanf/v2`                 | v2.3.5  | Config loading (KoanfLoader)                             |
+| `github.com/knadh/koanf/v2`                 | v2.3.5  | Config loading (KoanfLoader)                   |
 | `github.com/knadh/koanf/parsers/json`       | v1.0.0  | Koanf JSON parser                              |
 | `github.com/knadh/koanf/parsers/yaml`       | v1.1.0  | Koanf YAML parser                              |
 | `github.com/knadh/koanf/parsers/toml`       | v0.1.0  | Koanf TOML parser                              |
@@ -367,7 +367,7 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v3` (includes KoanfLoader)       |
+| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v3` (includes KoanfLoader)                                                                       |
 | Test functions              | 470 (1434 runs) | 🟢 Good |                                                                                                                |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |

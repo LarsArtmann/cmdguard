@@ -42,11 +42,15 @@ type auditLogExporter struct {
 	toWriter func(*auditlog.Plugin, io.Writer) error
 }
 
-func adaptDiagramExport(fn func(*auditlog.Plugin, string, ...auditlog.DiagramOption) error) func(*auditlog.Plugin, string) error {
+func adaptDiagramExport(
+	fn func(*auditlog.Plugin, string, ...auditlog.DiagramOption) error,
+) func(*auditlog.Plugin, string) error {
 	return func(p *auditlog.Plugin, path string) error { return fn(p, path) }
 }
 
-func adaptDiagramWrite(fn func(*auditlog.Plugin, io.Writer, ...auditlog.DiagramOption) error) func(*auditlog.Plugin, io.Writer) error {
+func adaptDiagramWrite(
+	fn func(*auditlog.Plugin, io.Writer, ...auditlog.DiagramOption) error,
+) func(*auditlog.Plugin, io.Writer) error {
 	return func(p *auditlog.Plugin, w io.Writer) error { return fn(p, w) }
 }
 
@@ -55,15 +59,27 @@ func adaptDiagramWrite(fn func(*auditlog.Plugin, io.Writer, ...auditlog.DiagramO
 // gochecknoglobals; the per-call allocation is negligible (export runs once).
 func auditLogExporterRegistry() map[AuditLogFormat]auditLogExporter {
 	return map[AuditLogFormat]auditLogExporter{
-		AuditLogFormatHTML:     {(*auditlog.Plugin).ExportToHTML, (*auditlog.Plugin).WriteHTML},
-		AuditLogFormatJSON:     {(*auditlog.Plugin).ExportToFile, (*auditlog.Plugin).WriteReportJSON},
-		AuditLogFormatNDJSON:   {(*auditlog.Plugin).ExportEventsToNDJSON, (*auditlog.Plugin).WriteEventsNDJSON},
-		AuditLogFormatCSV:      {(*auditlog.Plugin).ExportToCSV, (*auditlog.Plugin).WriteReportCSV},
-		AuditLogFormatTSV:      {(*auditlog.Plugin).ExportToTSV, (*auditlog.Plugin).WriteReportTSV},
-		AuditLogFormatMermaid:  {adaptDiagramExport((*auditlog.Plugin).ExportToMermaid), adaptDiagramWrite((*auditlog.Plugin).WriteMermaid)},
-		AuditLogFormatDOT:      {adaptDiagramExport((*auditlog.Plugin).ExportToDOT), adaptDiagramWrite((*auditlog.Plugin).WriteDOT)},
-		AuditLogFormatD2:       {adaptDiagramExport((*auditlog.Plugin).ExportToD2), adaptDiagramWrite((*auditlog.Plugin).WriteD2)},
-		AuditLogFormatPlantUML: {adaptDiagramExport((*auditlog.Plugin).ExportToPlantUML), adaptDiagramWrite((*auditlog.Plugin).WritePlantUML)},
+		AuditLogFormatHTML:   {(*auditlog.Plugin).ExportToHTML, (*auditlog.Plugin).WriteHTML},
+		AuditLogFormatJSON:   {(*auditlog.Plugin).ExportToFile, (*auditlog.Plugin).WriteReportJSON},
+		AuditLogFormatNDJSON: {(*auditlog.Plugin).ExportEventsToNDJSON, (*auditlog.Plugin).WriteEventsNDJSON},
+		AuditLogFormatCSV:    {(*auditlog.Plugin).ExportToCSV, (*auditlog.Plugin).WriteReportCSV},
+		AuditLogFormatTSV:    {(*auditlog.Plugin).ExportToTSV, (*auditlog.Plugin).WriteReportTSV},
+		AuditLogFormatMermaid: {
+			adaptDiagramExport((*auditlog.Plugin).ExportToMermaid),
+			adaptDiagramWrite((*auditlog.Plugin).WriteMermaid),
+		},
+		AuditLogFormatDOT: {
+			adaptDiagramExport((*auditlog.Plugin).ExportToDOT),
+			adaptDiagramWrite((*auditlog.Plugin).WriteDOT),
+		},
+		AuditLogFormatD2: {
+			adaptDiagramExport((*auditlog.Plugin).ExportToD2),
+			adaptDiagramWrite((*auditlog.Plugin).WriteD2),
+		},
+		AuditLogFormatPlantUML: {
+			adaptDiagramExport((*auditlog.Plugin).ExportToPlantUML),
+			adaptDiagramWrite((*auditlog.Plugin).WritePlantUML),
+		},
 		AuditLogFormatTree:     {(*auditlog.Plugin).ExportToTree, (*auditlog.Plugin).WriteTree},
 		AuditLogFormatHTMLTree: {(*auditlog.Plugin).ExportToHTMLTree, (*auditlog.Plugin).WriteHTMLTree},
 	}
