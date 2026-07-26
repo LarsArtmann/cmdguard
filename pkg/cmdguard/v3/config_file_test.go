@@ -85,10 +85,8 @@ func TestCachedHomeDir_MatchesOS(t *testing.T) {
 	}
 }
 
-func TestJSONLoader_Load(t *testing.T) {
+func TestLoadConfigFromJSON(t *testing.T) {
 	t.Parallel()
-
-	loader := &jsonLoader{}
 
 	t.Run("loads flat config", func(t *testing.T) {
 		t.Parallel()
@@ -100,7 +98,7 @@ func TestJSONLoader_Load(t *testing.T) {
 
 		cfg := Config{}
 		data := []byte(`{"name": "config", "count": 5}`)
-		setFields, err := loader.Load(data, &cfg)
+		setFields, err := loadConfigFromJSON(data, &cfg)
 		if err != nil {
 			t.Fatalf("Load error: %v", err)
 		}
@@ -126,7 +124,7 @@ func TestJSONLoader_Load(t *testing.T) {
 
 		cfg := Config{}
 		data := []byte(`{"name": "only-name"}`)
-		setFields, err := loader.Load(data, &cfg)
+		setFields, err := loadConfigFromJSON(data, &cfg)
 		if err != nil {
 			t.Fatalf("Load error: %v", err)
 		}
@@ -148,7 +146,7 @@ func TestJSONLoader_Load(t *testing.T) {
 
 		cfg := Config{}
 		data := []byte(`{invalid`)
-		_, err := loader.Load(data, &cfg)
+		_, err := loadConfigFromJSON(data, &cfg)
 		if err == nil {
 			t.Fatal("expected error for invalid JSON")
 		}
@@ -156,6 +154,12 @@ func TestJSONLoader_Load(t *testing.T) {
 			t.Errorf("error = %v, want ErrConfigFileParse", err)
 		}
 	})
+}
+
+type testJSONFileLoader struct{}
+
+func (l *testJSONFileLoader) Load(data []byte, cfg any) ([]string, error) {
+	return loadConfigFromJSON(data, cfg)
 }
 
 func TestLoadConfigFile(t *testing.T) {
@@ -170,7 +174,7 @@ func TestLoadConfigFile(t *testing.T) {
 			Name string `flag:"name"`
 		}
 		cfg := Config{}
-		loader := &jsonLoader{}
+		loader := &testJSONFileLoader{}
 
 		setFields, err := loadConfigFile([]string{path}, loader, &cfg)
 		if err != nil {
@@ -193,7 +197,7 @@ func TestLoadConfigFile(t *testing.T) {
 			Name string `flag:"name"`
 		}
 		cfg := Config{}
-		loader := &jsonLoader{}
+		loader := &testJSONFileLoader{}
 
 		setFields, err := loadConfigFile([]string{"/does/not/exist.json", path}, loader, &cfg)
 		if err != nil {
@@ -214,7 +218,7 @@ func TestLoadConfigFile(t *testing.T) {
 			Name string `flag:"name"`
 		}
 		cfg := Config{}
-		loader := &jsonLoader{}
+		loader := &testJSONFileLoader{}
 
 		_, err := loadConfigFile([]string{"/does/not/exist.json"}, loader, &cfg)
 		if !errors.Is(err, ErrConfigFileNotFound) {
@@ -311,7 +315,7 @@ func TestResolveConfigFlag(t *testing.T) {
 	})
 }
 
-func TestJSONLoader_RecursiveKeyCollection(t *testing.T) {
+func TestLoadConfigFromJSON_RecursiveKeyCollection(t *testing.T) {
 	t.Parallel()
 
 	t.Run("flat keys match flag names", func(t *testing.T) {
@@ -322,10 +326,9 @@ func TestJSONLoader_RecursiveKeyCollection(t *testing.T) {
 			Port string `flag:"port" json:"port"`
 		}
 
-		loader := NewJSONLoader()
 		cfg := config{}
 
-		fields, err := loader.Load([]byte(`{"name":"test","port":"8080"}`), &cfg)
+		fields, err := loadConfigFromJSON([]byte(`{"name":"test","port":"8080"}`), &cfg)
 		if err != nil {
 			t.Fatalf("Load failed: %v", err)
 		}
@@ -350,10 +353,9 @@ func TestJSONLoader_RecursiveKeyCollection(t *testing.T) {
 			Host string `flag:"host" json:"host"`
 		}
 
-		loader := NewJSONLoader()
 		cfg := config{}
 
-		fields, err := loader.Load([]byte(`{"db":{"host":"localhost"}}`), &cfg)
+		fields, err := loadConfigFromJSON([]byte(`{"db":{"host":"localhost"}}`), &cfg)
 		if err != nil {
 			t.Fatalf("Load failed: %v", err)
 		}
@@ -366,10 +368,9 @@ func TestJSONLoader_RecursiveKeyCollection(t *testing.T) {
 	t.Run("invalid JSON returns parse error", func(t *testing.T) {
 		t.Parallel()
 
-		loader := NewJSONLoader()
 		cfg := struct{}{}
 
-		_, err := loader.Load([]byte(`{invalid`), &cfg)
+		_, err := loadConfigFromJSON([]byte(`{invalid`), &cfg)
 		if err == nil {
 			t.Fatal("expected error for invalid JSON, got nil")
 		}

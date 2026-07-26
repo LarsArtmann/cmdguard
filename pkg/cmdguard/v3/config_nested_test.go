@@ -109,8 +109,7 @@ func TestNestedConfig_JSONFile(t *testing.T) {
 	jsonData := `{"debug": true, "DB": {"host": "prod.db", "port": 9999}}`
 
 	cfg := &nestedRootConfig{}
-	loader := &jsonLoader{}
-	setFields, err := loader.Load([]byte(jsonData), cfg)
+	setFields, err := loadConfigFromJSON([]byte(jsonData), cfg)
 	testutil.AssertNoError(t, err)
 
 	if !cfg.Debug {

@@ -1,4 +1,4 @@
-package configload_test
+package v3
 
 import (
 	"errors"
@@ -6,26 +6,32 @@ import (
 	"path/filepath"
 	"testing"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
-	"github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/configload"
 	"github.com/larsartmann/cmdguard/v3/pkg/testutil"
 )
 
-// flatConfig matches the config struct used in loader_test.go
-// to verify koanf produces identical results for flat files.
 type koanfFlatConfig struct {
 	Name    string `flag:"name"    default:""      help:"Name"`
 	Port    int    `flag:"port"    default:"8080"  help:"Port"`
 	Verbose bool   `flag:"verbose" default:"false" help:"Verbose"`
 }
 
-// nestedConfig uses dotted flag names to match flattened nested YAML keys.
+type koanfServerConfig struct {
+	Port int    `flag:"port" default:"8080" help:"Server port"`
+	Host string `flag:"host" default:""     help:"Server host"`
+}
+
+type koanfDatabaseConfig struct {
+	Name string `flag:"name" default:"" help:"Database name"`
+}
+
+type koanfLogConfig struct {
+	Level string `flag:"level" default:"info" help:"Log level"`
+}
+
 type koanfNestedConfig struct {
-	ServerPort   int    `flag:"server.port"   default:"8080" help:"Server port"`
-	ServerHost   string `flag:"server.host"   default:""     help:"Server host"`
-	DatabaseName string `flag:"database.name" default:""     help:"Database name"`
-	DatabasePort int    `flag:"database.port" default:"5432" help:"Database port"`
-	LogLevel     string `flag:"log.level"     default:"info" help:"Log level"`
+	Server   koanfServerConfig   // no flag tag → recurse
+	Database koanfDatabaseConfig // no flag tag → recurse
+	Log      koanfLogConfig      // no flag tag → recurse
 }
 
 func TestKoanfLoader_YAML(t *testing.T) {
@@ -39,7 +45,7 @@ func TestKoanfLoader_YAML(t *testing.T) {
 		err := os.WriteFile(path, []byte("name: test\nport: 9090\nverbose: true\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
@@ -61,7 +67,7 @@ func TestKoanfLoader_YAML(t *testing.T) {
 		err := os.WriteFile(path, []byte("name: only-name\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
@@ -79,12 +85,12 @@ func TestKoanfLoader_YAML(t *testing.T) {
 		err := os.WriteFile(path, []byte("{{invalid yaml\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		_, err = loader.Load(nil, &cfg)
 		testutil.AssertExpectedError(t, err)
-		if !errors.Is(err, v3.ErrConfigFileParse) {
+		if !errors.Is(err, ErrConfigFileParse) {
 			t.Errorf("expected ErrConfigFileParse, got: %v", err)
 		}
 	})
@@ -101,7 +107,7 @@ func TestKoanfLoader_JSON(t *testing.T) {
 		err := os.WriteFile(path, []byte(`{"name":"test","port":9090,"verbose":true}`), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
@@ -123,21 +129,47 @@ func TestKoanfLoader_JSON(t *testing.T) {
 		err := os.WriteFile(path, []byte("{{invalid json"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		_, err = loader.Load(nil, &cfg)
 		testutil.AssertExpectedError(t, err)
-		if !errors.Is(err, v3.ErrConfigFileParse) {
+		if !errors.Is(err, ErrConfigFileParse) {
 			t.Errorf("expected ErrConfigFileParse, got: %v", err)
 		}
+	})
+}
+
+func TestKoanfLoader_TOML(t *testing.T) {
+	t.Parallel()
+
+	t.Run("loads flat TOML config", func(t *testing.T) {
+		t.Parallel()
+
+		dir := t.TempDir()
+		path := filepath.Join(dir, "config.toml")
+		err := os.WriteFile(path, []byte(`name = "test"`+"\n"+"port = 9090\n"+"verbose = true\n"), 0o600)
+		testutil.AssertNoError(t, err)
+
+		loader := NewKoanfLoader(path)
+		cfg := koanfFlatConfig{}
+
+		setFields, err := loader.Load(nil, &cfg)
+		testutil.AssertNoError(t, err)
+
+		testutil.AssertFieldEqString(t, cfg.Name, "test", "Name")
+		if cfg.Port != 9090 {
+			t.Errorf("expected port 9090, got %d", cfg.Port)
+		}
+		testutil.AssertBoolTrue(t, cfg.Verbose, "Verbose")
+		testutil.AssertFieldLen(t, setFields, 3, "setFields")
 	})
 }
 
 func TestKoanfLoader_NestedConfig(t *testing.T) {
 	t.Parallel()
 
-	t.Run("flattens nested YAML keys to dotted flag names", func(t *testing.T) {
+	t.Run("loads nested YAML into nested structs", func(t *testing.T) {
 		t.Parallel()
 
 		dir := t.TempDir()
@@ -147,32 +179,28 @@ func TestKoanfLoader_NestedConfig(t *testing.T) {
   host: localhost
 database:
   name: myapp
-  port: 5433
 log:
   level: debug
 `
 		err := os.WriteFile(path, []byte(content), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfNestedConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
 		testutil.AssertNoError(t, err)
 
-		if cfg.ServerPort != 3000 {
-			t.Errorf("expected server.port 3000, got %d", cfg.ServerPort)
+		if cfg.Server.Port != 3000 {
+			t.Errorf("expected Server.Port 3000, got %d", cfg.Server.Port)
 		}
-		testutil.AssertFieldEqString(t, cfg.ServerHost, "localhost", "ServerHost")
-		testutil.AssertFieldEqString(t, cfg.DatabaseName, "myapp", "DatabaseName")
-		if cfg.DatabasePort != 5433 {
-			t.Errorf("expected database.port 5433, got %d", cfg.DatabasePort)
-		}
-		testutil.AssertFieldEqString(t, cfg.LogLevel, "debug", "LogLevel")
-		testutil.AssertFieldLen(t, setFields, 5, "setFields")
+		testutil.AssertFieldEqString(t, cfg.Server.Host, "localhost", "Server.Host")
+		testutil.AssertFieldEqString(t, cfg.Database.Name, "myapp", "Database.Name")
+		testutil.AssertFieldEqString(t, cfg.Log.Level, "debug", "Log.Level")
+		testutil.AssertFieldLen(t, setFields, 4, "setFields")
 	})
 
-	t.Run("returns only deeply-nested present keys", func(t *testing.T) {
+	t.Run("returns only present nested keys", func(t *testing.T) {
 		t.Parallel()
 
 		dir := t.TempDir()
@@ -183,19 +211,19 @@ log:
 		err := os.WriteFile(path, []byte(content), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfNestedConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
 		testutil.AssertNoError(t, err)
 
 		testutil.AssertFieldLen(t, setFields, 1, "setFields")
-		if cfg.ServerPort != 3000 {
-			t.Errorf("expected server.port 3000, got %d", cfg.ServerPort)
+		if cfg.Server.Port != 3000 {
+			t.Errorf("expected Server.Port 3000, got %d", cfg.Server.Port)
 		}
 	})
 
-	t.Run("flattens nested JSON keys to dotted flag names", func(t *testing.T) {
+	t.Run("loads nested JSON into nested structs", func(t *testing.T) {
 		t.Parallel()
 
 		dir := t.TempDir()
@@ -204,17 +232,17 @@ log:
 		err := os.WriteFile(path, []byte(content), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfNestedConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
 		testutil.AssertNoError(t, err)
 
-		if cfg.ServerPort != 3000 {
-			t.Errorf("expected server.port 3000, got %d", cfg.ServerPort)
+		if cfg.Server.Port != 3000 {
+			t.Errorf("expected Server.Port 3000, got %d", cfg.Server.Port)
 		}
-		testutil.AssertFieldEqString(t, cfg.ServerHost, "example.com", "ServerHost")
-		testutil.AssertFieldEqString(t, cfg.DatabaseName, "testdb", "DatabaseName")
+		testutil.AssertFieldEqString(t, cfg.Server.Host, "example.com", "Server.Host")
+		testutil.AssertFieldEqString(t, cfg.Database.Name, "testdb", "Database.Name")
 		testutil.AssertFieldLen(t, setFields, 3, "setFields")
 	})
 }
@@ -232,7 +260,7 @@ func TestKoanfLoader_MultiplePaths(t *testing.T) {
 		err := os.WriteFile(second, []byte("name: from-second\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(first, second)
+		loader := NewKoanfLoader(first, second)
 		cfg := koanfFlatConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
@@ -252,7 +280,7 @@ func TestKoanfLoader_MultiplePaths(t *testing.T) {
 		err := os.WriteFile(existing, []byte("name: found-it\nport: 4444\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(missing, existing)
+		loader := NewKoanfLoader(missing, existing)
 		cfg := koanfFlatConfig{}
 
 		setFields, err := loader.Load(nil, &cfg)
@@ -269,7 +297,7 @@ func TestKoanfLoader_MultiplePaths(t *testing.T) {
 		t.Parallel()
 
 		dir := t.TempDir()
-		loader := configload.NewKoanfLoader(
+		loader := NewKoanfLoader(
 			filepath.Join(dir, "a.yaml"),
 			filepath.Join(dir, "b.json"),
 		)
@@ -277,7 +305,7 @@ func TestKoanfLoader_MultiplePaths(t *testing.T) {
 
 		_, err := loader.Load(nil, &cfg)
 		testutil.AssertExpectedError(t, err)
-		if !errors.Is(err, v3.ErrConfigFileNotFound) {
+		if !errors.Is(err, ErrConfigFileNotFound) {
 			t.Errorf("expected ErrConfigFileNotFound, got: %v", err)
 		}
 	})
@@ -294,7 +322,7 @@ func TestKoanfLoader_FormatDetection(t *testing.T) {
 		err := os.WriteFile(path, []byte("name: yml-ext\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		_, err = loader.Load(nil, &cfg)
@@ -302,26 +330,43 @@ func TestKoanfLoader_FormatDetection(t *testing.T) {
 		testutil.AssertFieldEqString(t, cfg.Name, "yml-ext", "Name")
 	})
 
-	t.Run("unknown extension returns ErrConfigFileNotFound", func(t *testing.T) {
+	t.Run("detects .toml extension", func(t *testing.T) {
 		t.Parallel()
 
 		dir := t.TempDir()
 		path := filepath.Join(dir, "config.toml")
-		err := os.WriteFile(path, []byte("name = \"toml\"\n"), 0o600)
+		err := os.WriteFile(path, []byte(`name = "toml-ext"`+"\n"), 0o600)
 		testutil.AssertNoError(t, err)
 
-		loader := configload.NewKoanfLoader(path)
+		loader := NewKoanfLoader(path)
+		cfg := koanfFlatConfig{}
+
+		_, err = loader.Load(nil, &cfg)
+		testutil.AssertNoError(t, err)
+		testutil.AssertFieldEqString(t, cfg.Name, "toml-ext", "Name")
+	})
+
+	t.Run("unsupported extension returns ErrConfigFileNotFound", func(t *testing.T) {
+		t.Parallel()
+
+		dir := t.TempDir()
+		path := filepath.Join(dir, "config.ini")
+		err := os.WriteFile(path, []byte("name=ini\n"), 0o600)
+		testutil.AssertNoError(t, err)
+
+		loader := NewKoanfLoader(path)
 		cfg := koanfFlatConfig{}
 
 		_, err = loader.Load(nil, &cfg)
 		testutil.AssertExpectedError(t, err)
-		if !errors.Is(err, v3.ErrConfigFileNotFound) {
+		if !errors.Is(err, ErrConfigFileNotFound) {
 			t.Errorf("expected ErrConfigFileNotFound for unsupported extension, got: %v", err)
 		}
 	})
 }
 
 func TestKoanfLoader_PathExpansion(t *testing.T) {
+	//nolint:paralleltest // uses t.Setenv
 	t.Run("expands environment variables in path", func(t *testing.T) {
 		dir := t.TempDir()
 		path := filepath.Join(dir, "config.yaml")
@@ -330,11 +375,30 @@ func TestKoanfLoader_PathExpansion(t *testing.T) {
 
 		t.Setenv("MY_TEST_CONFIG_DIR", dir)
 
-		loader := configload.NewKoanfLoader("$MY_TEST_CONFIG_DIR/config.yaml")
+		loader := NewKoanfLoader("$MY_TEST_CONFIG_DIR/config.yaml")
 		cfg := koanfFlatConfig{}
 
 		_, err = loader.Load(nil, &cfg)
 		testutil.AssertNoError(t, err)
 		testutil.AssertFieldEqString(t, cfg.Name, "env-expanded", "Name")
 	})
+}
+
+func TestKoanfLoader_SetPaths(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	first := filepath.Join(dir, "first.yaml")
+	second := filepath.Join(dir, "second.yaml")
+
+	err := os.WriteFile(second, []byte("name: from-second\n"), 0o600)
+		testutil.AssertNoError(t, err)
+
+	loader := NewKoanfLoader(first)
+	loader.SetPaths(first, second)
+	cfg := koanfFlatConfig{}
+
+	_, err = loader.Load(nil, &cfg)
+	testutil.AssertNoError(t, err)
+	testutil.AssertFieldEqString(t, cfg.Name, "from-second", "Name")
 }
