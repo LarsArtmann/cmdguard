@@ -1,6 +1,6 @@
 module github.com/larsartmann/cmdguard/v3
 
-go 1.26.4
+go 1.26.5
 
 require (
 	charm.land/fang/v2 v2.0.1
@@ -55,6 +55,7 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
+	github.com/knadh/koanf/parsers/toml v0.1.0 // indirect
 	github.com/larsartmann/go-atomic-write v0.3.0 // indirect
 	github.com/larsartmann/go-branded-id v0.3.2 // indirect
 	github.com/larsartmann/go-error-family v0.9.0 // indirect
@@ -70,6 +71,7 @@ require (
 	github.com/muesli/mango-cobra v1.3.0 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
 	github.com/muesli/roff v0.1.0 // indirect
+	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.15.0 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
