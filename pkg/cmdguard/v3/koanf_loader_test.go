@@ -366,24 +366,19 @@ func TestKoanfLoader_FormatDetection(t *testing.T) {
 }
 
 func TestKoanfLoader_PathExpansion(t *testing.T) {
-	t.Parallel()
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.yaml")
+	err := os.WriteFile(path, []byte("name: env-expanded\n"), 0o600)
+	testutil.AssertNoError(t, err)
 
-	t.Run("expands environment variables in path", func(t *testing.T) {
-		//nolint:paralleltest // uses t.Setenv
-		dir := t.TempDir()
-		path := filepath.Join(dir, "config.yaml")
-		err := os.WriteFile(path, []byte("name: env-expanded\n"), 0o600)
-		testutil.AssertNoError(t, err)
+	t.Setenv("MY_TEST_CONFIG_DIR", dir)
 
-		t.Setenv("MY_TEST_CONFIG_DIR", dir)
+	loader := NewKoanfLoader("$MY_TEST_CONFIG_DIR/config.yaml")
+	cfg := koanfFlatConfig{}
 
-		loader := NewKoanfLoader("$MY_TEST_CONFIG_DIR/config.yaml")
-		cfg := koanfFlatConfig{}
-
-		_, err = loader.Load(nil, &cfg)
-		testutil.AssertNoError(t, err)
-		testutil.AssertFieldEqString(t, cfg.Name, "env-expanded", "Name")
-	})
+	_, err = loader.Load(nil, &cfg)
+	testutil.AssertNoError(t, err)
+	testutil.AssertFieldEqString(t, cfg.Name, "env-expanded", "Name")
 }
 
 func TestKoanfLoader_SetPaths(t *testing.T) {
@@ -394,7 +389,7 @@ func TestKoanfLoader_SetPaths(t *testing.T) {
 	second := filepath.Join(dir, "second.yaml")
 
 	err := os.WriteFile(second, []byte("name: from-second\n"), 0o600)
-		testutil.AssertNoError(t, err)
+	testutil.AssertNoError(t, err)
 
 	loader := NewKoanfLoader(first)
 	loader.SetPaths(first, second)

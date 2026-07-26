@@ -67,10 +67,9 @@ cmdguard/
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
 │   │   ├── command_options.go    # CommandOption functions (WithShort, WithFlags, etc.)
 │   │   ├── config.go             # Config type constraint
-│   │   ├── config_file.go        # ConfigFileLoader, JSON loader, WithConfigFile
+│   │   ├── config_file.go        # ConfigFileLoader interface, loadConfigFile, expandConfigPath, FilterSetFields, collectKeysRecursive
 │   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue (recurses into nested structs)
 │   │   ├── config_setfield.go    # SetField for config structs
-│   │   ├── configload/           # YAML/TOML/Auto/Koanf loaders (loader.go, koanf.go)
 │   │   ├── docgen.go             # GenerateDocs (markdown command-tree docs)
 │   │   ├── errors.go             # Error types (CommandError, FlagError, etc.) + sentinels
 │   │   ├── errors_command.go     # Command-related sentinel errors
