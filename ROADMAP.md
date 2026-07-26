@@ -1,6 +1,6 @@
 # ROADMAP
 
-**Updated:** 2026-07-23
+**Updated:** 2026-07-27
 **Purpose:** Aspirational items with no concrete timeline
 
 ---
@@ -31,6 +31,14 @@ These remain open for a future v3.x or v4:
 ## Future Ideas
 
 - [ ] **Extract flag-tag parsing to `github.com/larsartmann/flagtags`**
+- [ ] **Service-owned config design (ADR)** — services own typed config slices
+      rather than one root config struct
+- [ ] **Command-level audit middleware** — audit every command execution
+      (currently only DI lifecycle events are captured; see FEATURES.md
+      "Audit Log" → "Command-level audit middleware" PLANNED)
+- [ ] **Built-in audit-log subcommand** (`myapp audit-log --format d2`)
+- [ ] **Consider making fang optional** — plain cobra fallback for environments
+      where fang styling is unwanted
 - [ ] **Branded-ID example application**
 - [ ] **Add `FlagRegistry` interface abstraction**
 - [ ] **Custom per-flag validation hooks (beyond `validate` tag)**
@@ -53,7 +61,7 @@ them from haunting the TODO list.
 | 2   | Run 4 additional skills (brutal-self-review, library-deep-dive, status-report, docs-health BUILD) | New audits, not closure. Belong in a future session.                                                       |
 | 3   | TypeHandler to TypeCodec rename + Deprecated alias                                                | Public API break. v4 only. `TODO(v4)` marker added at `type_handler.go:13`.                                |
 | 4   | ConfigFile branded type                                                                           | YAGNI until a consumer needs it.                                                                           |
-| 5   | Extract koanf into configload sub-module                                                          | YAGNI until consumer asks or core LOC > 12k. Currently ~8k.                                                |
+| 5   | Extract koanf into configload sub-module                                                          | **Moot** — `configload` was deleted entirely (commit `e3e710c`); KoanfLoader now lives in `v3` (`koanf_loader.go`). There is no sub-package left to extract.            |
 | 6   | Split v3 into v3 + v3/internal/                                                                   | LOC trigger (12k) not met. Premature split adds boundary friction.                                         |
 | 7   | Fuzz corpus expansion                                                                             | Existing 7 targets have minimal corpus. Valuable but not closure.                                          |
 | 8   | Audit examples/taskctl/main_test.go (876 lines)                                                   | Test-smell audit is a separate concern.                                                                    |

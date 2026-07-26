@@ -65,7 +65,7 @@
 | `WithDraconianValidation()`                    | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                     |
 | `WithAuditLog(plugin)`                         | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                               |
 | `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:169`)                                                      |
-| `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | JSON loader, core package                                                                                              |
+| `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension (`koanf_loader.go`) |
 | `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                     |
 | `WithConfigValidation[T](fn)`                  | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                           |
 | `WithMiddleware[T](mw...)`                     | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                 |
@@ -173,7 +173,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ---
 
-## Rich Output (go-output v0.30.4)
+## Rich Output (go-output v0.32.0)
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
@@ -344,22 +344,27 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | Dependency                                  | Version | Purpose                                        |
 | ------------------------------------------- | ------- | ---------------------------------------------- |
 | `github.com/spf13/cobra`                    | v1.10.2 | CLI framework                                  |
-| `github.com/samber/do/v2`                   | v2.0.0  | Dependency injection                           |
+| `github.com/samber/do/v2`                   | v2.1.0  | Dependency injection                           |
 | `github.com/spf13/pflag`                    | v1.0.10 | Flag parsing                                   |
 | `charm.land/fang/v2`                        | v2.0.1  | Cobra styling                                  |
 | `charm.land/lipgloss/v2`                    | v2.0.5  | Terminal styling (fang dep, but listed direct) |
-| `github.com/larsartmann/go-output`          | v0.30.4 | Rich output (16 formats)                       |
-| `github.com/larsartmann/samber-do-auditlog` | v0.5.0  | DI audit logging                               |
+| `github.com/larsartmann/go-output`          | v0.32.0 | Rich output (16 formats)                       |
+| `github.com/larsartmann/samber-do-auditlog` | v0.8.0  | DI audit logging                               |
 | `github.com/knadh/koanf/v2`                 | v2.3.5  | Config loading (KoanfLoader)                   |
 | `github.com/knadh/koanf/parsers/json`       | v1.0.0  | Koanf JSON parser                              |
 | `github.com/knadh/koanf/parsers/yaml`       | v1.1.0  | Koanf YAML parser                              |
 | `github.com/knadh/koanf/parsers/toml`       | v0.1.0  | Koanf TOML parser                              |
 
-> **Note:** go-faster/yaml and pelletier/go-toml/v2 were removed as direct deps.
-> koanf/providers/file was eliminated in favor of an in-repo `bytesProvider`.
+> **Note:** `go-faster/yaml` and `pelletier/go-toml/v2` were demoted from direct
+> to `// indirect` dependencies (koanf still pulls them transitively, so the net
+> dependency count did not decrease). `koanf/providers/file` was eliminated in
+> favor of an in-repo `bytesProvider`. `pelletier/go-toml v1.9.5` (v1) was added
+> as an indirect dep via `koanf/parsers/toml`.
 
-> **Note:** 4 of the 13 direct deps are koanf — moving koanf to an optional
-> sub-module would drop core to 9 direct deps. See TODO_LIST.md #7.
+> **Note:** 4 of the 13 direct deps are koanf. KoanfLoader now lives in core
+> (`koanf_loader.go`), so moving koanf to an optional sub-module is no longer
+> planned — see ROADMAP.md "Deferred from 2026-07-18 Audit Closure" item #5
+> (moot).
 
 ---
 
@@ -368,7 +373,7 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
 | Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v3` (includes KoanfLoader)                                                                       |
-| Test functions              | 470 (1434 runs) | 🟢 Good |                                                                                                                |
+| Test functions              | 467             | 🟢 Good | Across v3 core + sub-modules + examples + benchmarks                                                          |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
 | Sub-module tests            | 17 across all 4 | 🟢 Good | All sub-modules have basic test coverage                                                                       |

@@ -7,6 +7,18 @@
 
 ---
 
+> **Update 2026-07-27 (docs-health pass):** Re-verified against the current
+> codebase at `e3e710c`. Status of this report's open items:
+>
+> - **d.1 (go.work pollution):** **STILL OPEN** — the 13 `/home/lars/projects/go-output/*` `use` directives are still present (`grep -c go-output go.work` = 13). This remains the #1 blocker; nothing has shipped a fix. Tracked in `TODO_LIST.md`.
+> - **d.2 (CHANGELOG/FEATURES "removed direct deps" claim):** **fixed this session** — reworded to "demoted to `// indirect`" (the deps are still pulled transitively by koanf).
+> - **c / f.20 (auditlog.go:45 golines):** **FIXED** — `golangci-lint run ./...` now reports 0 issues; `auditlog.go` was reworked in `e3e710c`.
+> - **Stale doc refs (c: website, `WHAT_THIS_PROJECT_IS_NOT.md`, `ROADMAP.md`, planning doc):** **fixed this session** (docs-health pass). `docs/API.md` and `api-reference.mdx` were verified clean (no stale loader refs).
+> - **Dep versions have drifted since this report:** go-output is now `v0.32.0` (report context was v0.30.4/v0.31.1), `samber-do-auditlog` is `v0.8.0` (report said v0.5.0), `samber/do` is `v2.1.0` (report said v2.0.0). Living docs updated to match.
+> - **Still genuinely open** (routed to `TODO_LIST.md`): go.work fix; koanf→JSON edge-case tests; benchmark regression run; review whether `WithConfigFileLoader` and the `ConfigFileLoader` ireturn allow-list entry are now dead API/config.
+
+---
+
 ## a) FULLY DONE
 
 1. **KoanfLoader created in `v3` package** (`koanf_loader.go`) — Uses koanf as format parser only (YAML/TOML/JSON → JSON bytes via `k.Marshal(json.Parser())`), then reuses shared `loadConfigFromJSON` for case-insensitive nested struct matching. Implements `ConfigFileLoader` interface. Supports `.yaml`/`.yml`/`.json`/`.toml` via extension-based parser selection.
