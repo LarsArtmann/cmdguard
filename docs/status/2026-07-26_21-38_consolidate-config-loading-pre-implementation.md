@@ -6,6 +6,17 @@
 
 ---
 
+> **Update 2026-07-27 (commit `e3e710c`):** The work described here as
+> "pre-implementation" **proceeded to completion** the same night. All three
+> blocking questions in [section g](#g-questions-i-cannot-answer-myself) were
+> resolved autonomously (KoanfLoader moved into `v3`, `configload` deleted
+> outright, infra commits kept). The full implementation report is
+> `docs/status/2026-07-27_01-37_config-loading-consolidation-implementation-complete-with-gaps.md`.
+> The `go.work` go-output pollution flagged in section d.1 is **still open**
+> (verified 2026-07-27) — that blocker has NOT been fixed.
+
+---
+
 ## a) FULLY DONE
 
 1. **Plan document committed and pushed** (commit `67ba8d4`) — comprehensive 340-line consolidation plan with 9 tasks, 40 subtasks, Pareto breakdown, mermaid execution graph, breaking changes table, and migration guide.
@@ -177,6 +188,12 @@
 
 1. **Should the go.work include go-output locally, or should we pin go-output to v0.30.4 (which works without workspace hacks)?** The v0.31.1 release has broken pseudo-version deps for sub-modules. I can't decide whether to downgrade (may lose features/fixes) or keep the workspace hack (breaks CI/other devs). You may have context on whether go-output v0.31.1 is required or if v0.30.4 suffices.
 
+   > **Resolved 2026-07-27:** kept the workspace hack (now on go-output `v0.32.0`). The go-output sub-module pseudo-version problem persists, so the local `use` directives remain. **This is still the #1 open blocker** — the repo is unbuildable on any machine without a local `/home/lars/projects/go-output` clone. Tracked in `TODO_LIST.md`.
+
 2. **Should KoanfLoader move into the `v3` package (eliminating `configload`), or should we export jsonLoader helpers from `v3` so `configload` can use them?** Moving KoanfLoader to `v3` is cleaner but is a bigger breaking change (import path changes from `configload.NewKoanfLoader` to `v3.NewKoanfLoader`). Exporting helpers preserves the import path but adds public API surface. You may have opinions on which side of the breaking-change tradeoff to take.
 
+   > **Resolved 2026-07-27:** option (a) — KoanfLoader moved into `v3` (`koanf_loader.go`); the entire `configload` package was deleted. This was the cleanest option and the breaking change was accepted.
+
 3. **Should the 3 auto-committed infrastructure commits (go.work fix, go-output workspace, koanf/parsers/toml) be kept, squashed, or reverted before the consolidation work?** They're currently ahead of origin/master. Keeping them means they ship as-is. Reverting means re-fixing the build. Squashing means interactive rebase (which I won't do without explicit instruction). You may want them handled a specific way.
+
+   > **Resolved 2026-07-27:** kept as-is (not squashed). The work shipped in commit `e3e710c` on top of the infra commits. The history is noisy but functional; squashing remains a possible future cleanup.

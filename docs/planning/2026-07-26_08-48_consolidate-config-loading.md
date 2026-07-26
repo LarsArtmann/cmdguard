@@ -1,8 +1,18 @@
 # Consolidate Config Loading to KoanfLoader Only
 
 **Date:** 2026-07-26
-**Status:** Planning
+**Status:** ~~Planning~~ Implemented 2026-07-27 (commit `e3e710c`)
 **Author:** AI Session
+
+> **Update 2026-07-27 (commit `e3e710c`):** This plan was **executed**. The
+> `configload` sub-package was deleted entirely; `KoanfLoader` now lives in the
+> `v3` package (`koanf_loader.go`); `jsonLoader`/`NewJSONLoader()` were deleted;
+> `WithConfigFile` creates a `KoanfLoader` with auto-format detection. Full
+> item-by-item status in [Resolution](#resolution-2026-07-27) below. The circular
+> dependency blocker flagged in section "Critical Architectural Decision" was
+> resolved by **moving KoanfLoader into `v3`** (eliminating the `configload`
+> package), which was option (a) of the options later raised. The go.work
+> go-output pollution noted in the implementation report is **still open**.
 
 ---
 
@@ -337,4 +347,36 @@ cli, _ := cmdguard.NewCLI[Config]("app", "1.0", Config{},
 
 3. **KoanfLoader TOML**: Requires `github.com/knadh/koanf/parsers/toml` as a new dependency (replaces `pelletier/go-toml/v2`).
 
-4. **Sub-module extraction deferred**: `configload` remains a sub-package of core (not a separate sub-module). TODO #7 tracks this as a future YAGNI task.
+4. **Sub-module extraction deferred → moot:** `configload` was deleted entirely (not extracted). KoanfLoader lives in `v3` (`koanf_loader.go`), so there is no sub-package left to extract. The original TODO #7 is closed.
+
+---
+
+## Resolution (2026-07-27)
+
+This plan was implemented across two sessions (2026-07-26 → 2026-07-27) and
+shipped in commit `e3e710c`. The implementation report lives at
+`docs/status/2026-07-27_01-37_config-loading-consolidation-implementation-complete-with-gaps.md`.
+
+| Plan task | Outcome |
+| --- | --- |
+| Task 1 (Refactor KoanfLoader) | DONE — KoanfLoader moved into `v3` (`koanf_loader.go`); uses koanf as parser → JSON → `loadConfigFromJSON` |
+| Task 2 (WithConfigFile → KoanfLoader) | DONE — `WithConfigFile` now creates `NewKoanfLoader(paths...)` |
+| Task 3 (Delete old loaders) | DONE — `configload/` package deleted entirely; `jsonLoader`/`NewJSONLoader()` deleted |
+| Task 4 (Update tests) | DONE — `koanf_loader_test.go` (14 cases); `config_file_test.go`, `config_nested_test.go` updated |
+| Task 5 (go mod tidy) | DONE — `go-faster/yaml` + `pelletier/go-toml/v2` demoted to `// indirect` (NOT fully removed — koanf pulls them transitively) |
+| Task 6 (Update examples) | DONE — taskctl passes unchanged |
+| Task 7 (Lint config) | DONE — depguard updated; `ConfigFileLoader` ireturn allow-list entry is now dead config (nothing returns the interface — `NewKoanfLoader` returns `*KoanfLoader`) |
+| Task 8 (Update docs) | PARTIAL — core living docs updated; website docs + `WHAT_THIS_PROJECT_IS_NOT.md` + this file left stale (addressed 2026-07-27 docs-health pass) |
+| Task 9 (Final verification) | DONE — build OK, tests green, lint 0 issues, coverage 87.8% |
+
+**Deviation from plan:** the circular dependency (raised later in the
+implementation report) was resolved by **moving KoanfLoader into `v3`** and
+deleting `configload` outright, rather than keeping `configload` as the plan's
+section "What this means for the ConfigFileLoader interface" assumed. This was
+cleaner than the plan's "export jsonLoader helpers" option.
+
+**Still open (from the implementation report):** the `go.work` still contains 13
+local `/home/lars/projects/go-output/*` `use` directives that make the repo
+unbuildable on any other machine — the #1 blocker flagged in the report and
+**not yet fixed**. Tracked in `TODO_LIST.md`.
+

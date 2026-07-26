@@ -13,8 +13,12 @@ import (
 )
 
 // ConfigFileLoader loads configuration from a file.
-// Implementations read raw bytes and populate a config struct,
-// returning the list of struct field names that were explicitly set.
+// Implementations populate a config struct and return the list of struct field
+// names that were explicitly set.
+//
+// The data parameter may be nil for loaders that handle their own file reading
+// (e.g. KoanfLoader, which reads from configured paths via SetPaths). Custom
+// byte-based loaders receive the raw file contents in data.
 type ConfigFileLoader interface {
 	Load(data []byte, cfg any) (setFields []string, err error)
 }
