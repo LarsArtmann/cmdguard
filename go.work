@@ -8,4 +8,19 @@ use ./prompts
 
 use ./spinner
 
-use ./telemetry
+use (
+	./telemetry
+	/home/lars/projects/go-output
+	/home/lars/projects/go-output/d2
+	/home/lars/projects/go-output/daghtml
+	/home/lars/projects/go-output/delimited
+	/home/lars/projects/go-output/escape
+	/home/lars/projects/go-output/graph
+	/home/lars/projects/go-output/markdown
+	/home/lars/projects/go-output/markup
+	/home/lars/projects/go-output/plantuml
+	/home/lars/projects/go-output/serialization
+	/home/lars/projects/go-output/table
+	/home/lars/projects/go-output/testhelpers
+	/home/lars/projects/go-output/tree
+)
