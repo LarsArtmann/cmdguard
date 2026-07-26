@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (breaking)
+
+- **Config loading consolidated to a single KoanfLoader** — the `configload` sub-package (`configload.YAML()`, `configload.TOML()`, `configload.JSON()`, `configload.Auto()`, `configload.LoaderForPath()`, `configload.NewKoanfLoader()`) and the core `jsonLoader`/`NewJSONLoader()` have been deleted. `WithConfigFile(paths...)` now creates a `KoanfLoader` that auto-detects JSON/YAML/TOML by file extension. KoanfLoader lives in the `v3` package (`koanf_loader.go`), uses koanf only as a format parser, converts to JSON, then reuses the shared `loadConfigFromJSON` processing path for case-insensitive nested struct matching. Removed direct deps: `go-faster/yaml`, `pelletier/go-toml/v2`, `koanf/providers/file` (replaced by in-repo `bytesProvider`). Added `koanf/parsers/toml`. **Migration:** Replace `configload.YAML()`/`configload.TOML()`/`configload.Auto()` + `WithConfigFileLoader(loader, paths...)` with just `WithConfigFile(paths...)`. Replace `configload.NewKoanfLoader(paths...)` with `v3.NewKoanfLoader(paths...)`.
+
 ### Fixed (post-v3.0.0)
 
 - **Sub-module external resolution** — the 4 sub-modules were moved from `pkg/cmdguard/<name>/` to the repo root (`<name>/`) so their module paths (`github.com/larsartmann/cmdguard/<name>`) resolve for external consumers. Previously the `replace` directives in the root `go.mod` only worked locally; consumers got "missing go.mod at revision". Each sub-module's `go.mod` now requires the real published `cmdguard/v3 v3.0.0` (not the placeholder).

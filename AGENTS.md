@@ -80,6 +80,7 @@ cmdguard/
 │   │   ├── flags_parse.go        # Flag parsing logic
 │   │   ├── flags_suggest.go      # Typo suggestions (Levenshtein) for flags + commands
 │   │   ├── flags_validate.go     # Flag validation
+│   │   ├── koanf_loader.go      # KoanfLoader (YAML/TOML/JSON via koanf → JSON → loadConfigFromJSON)
 │   │   ├── completion.go         # Shell completion support
 │   │   ├── doc.go                # Package documentation
 │   │   ├── flag_helpers.go       # Flag type constraints, cloning, parsing helpers
@@ -289,12 +290,11 @@ go build ./...                                   # Verify build
 #### Config Files
 
 - **Precedence** — explicit flag → `env:"VAR"` (with optional prefix) → config file → default value
-- `WithConfigFile(paths...)` loads config BEFORE flag registration; config values become the new tag defaults, so flags/env still override them
+- `WithConfigFile(paths...)` creates a `KoanfLoader` that auto-detects JSON/YAML/TOML by file extension; loads config BEFORE flag registration so config values become the new tag defaults, which flags/env still override
 - Paths support `$ENV` and `~` expansion; missing files are silently skipped
 - If the config struct has a `config` flag, its value overrides the default search paths
 - **Nested structs supported** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path
-- **`configload.Auto()`** — tries YAML → TOML → JSON sequentially (NOT file-extension based); since JSON is valid YAML, JSON data is handled by the YAML parser first. Use `LoaderForPath()` for precise extension-based detection
-- **configload internals** — all loaders use `genericLoader` with a pluggable `unmarshalFunc`; TOML import aliased as `toml` to avoid conflict with the local `cmdguard` import alias. `KoanfLoader()` handles nested config objects (e.g. `{"db":{"host":"x"}}` → `--db-host`)
+- **Single loader** — `KoanfLoader` (in `koanf_loader.go`) is the only config loader. It uses koanf as a format parser (YAML/TOML/JSON), converts to JSON via `k.Marshal(json.Parser())`, then reuses `loadConfigFromJSON` (shared with the rest of the config system) for case-insensitive key matching and nested struct population. The `configload` sub-package has been deleted.
 - `os.UserHomeDir()` is cached via `sync.OnceValue` (`cachedHomeDir`) to eliminate redundant syscalls across multiple `~/` paths
 
 #### Output & Styling

@@ -494,27 +494,15 @@ exitCoder.ExitCode() // returns custom exit code
 
 ## Config Files
 
-### JSON (built-in)
+`WithConfigFile` auto-detects JSON, YAML, and TOML by file extension. No extra imports needed.
 
 ```go
 cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigFile("~/.config/myapp/config.json", "/etc/myapp/config.json"),
+    v3.WithConfigFile("~/.config/myapp/config.yaml", "/etc/myapp/config.json"),
 )
 ```
 
-Paths are tried in order; missing files are silently skipped. Supports `$ENV` and `~` expansion.
-
-### YAML / TOML (custom loaders)
-
-```go
-import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3/configload"
-
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigFileLoader(configload.YAML(), "config.yaml"),
-)
-```
-
-`configload.YAML()` and `configload.TOML()` return `ConfigFileLoader` implementations. See [`pkg/cmdguard/v3/configload/`](pkg/cmdguard/v3/configload/) for available loaders.
+Paths are tried in order; missing files are silently skipped. Supports `$ENV` and `~` expansion. Nested config structs are fully supported (case-insensitive Go field name matching).
 
 **Precedence:** explicit flag → env var → config file → default value (highest to lowest priority).
 

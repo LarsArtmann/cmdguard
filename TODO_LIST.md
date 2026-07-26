@@ -13,9 +13,9 @@
 ## Deferred (requires API-breaking semver bump or external access)
 
 - [ ] **#6** Add flake.nix sub-module builds — needs Nix expertise for multi-module build
-- [ ] **#7** Move koanf to optional sub-module — API-breaking for `configload.KoanfLoader()` consumers
+- [x] **#7** ~~Move koanf to optional sub-module~~ — DONE: consolidated all config loading into a single `KoanfLoader` in `v3` package. The `configload` sub-package has been deleted entirely. KoanfLoader uses koanf as a format parser only (YAML/TOML/JSON → JSON → `loadConfigFromJSON`).
 - [ ] **#10** Middleware context propagation — changes `Middleware[T]` func signature (v3.1+)
-- [ ] **#12** Deduplicate `jsonLoader` in flake.nix — low priority
+- [x] **#12** ~~Deduplicate `jsonLoader`~~ — DONE: `jsonLoader` and `NewJSONLoader()` deleted; all config loading goes through `KoanfLoader` → `loadConfigFromJSON`.
 - [ ] **#15-18** API renames (`Get`→`GetService`, `RegisterInScope` generic, `Package` redesign, `SetConfig` removal) — v3.1+
 - [ ] **#23** Second example app — low ROI (2h)
 - [ ] **#26** `CODECOV_TOKEN` secret — requires GitHub repo owner access
