@@ -65,7 +65,7 @@
 | `WithDraconianValidation()`                    | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                     |
 | `WithAuditLog(plugin)`                         | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                               |
 | `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:169`)                                                      |
-| `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension (`koanf_loader.go`) |
+| `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension (`koanf_loader.go`)                                              |
 | `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                     |
 | `WithConfigValidation[T](fn)`                  | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                           |
 | `WithMiddleware[T](mw...)`                     | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                 |
@@ -373,7 +373,7 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
 | Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v3` (includes KoanfLoader)                                                                       |
-| Test functions              | 467             | 🟢 Good | Across v3 core + sub-modules + examples + benchmarks                                                          |
+| Test functions              | 467             | 🟢 Good | Across v3 core + sub-modules + examples + benchmarks                                                           |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
 | Sub-module tests            | 17 across all 4 | 🟢 Good | All sub-modules have basic test coverage                                                                       |

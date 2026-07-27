@@ -357,17 +357,17 @@ This plan was implemented across two sessions (2026-07-26 → 2026-07-27) and
 shipped in commit `e3e710c`. The implementation report lives at
 `docs/status/2026-07-27_01-37_config-loading-consolidation-implementation-complete-with-gaps.md`.
 
-| Plan task | Outcome |
-| --- | --- |
-| Task 1 (Refactor KoanfLoader) | DONE — KoanfLoader moved into `v3` (`koanf_loader.go`); uses koanf as parser → JSON → `loadConfigFromJSON` |
-| Task 2 (WithConfigFile → KoanfLoader) | DONE — `WithConfigFile` now creates `NewKoanfLoader(paths...)` |
-| Task 3 (Delete old loaders) | DONE — `configload/` package deleted entirely; `jsonLoader`/`NewJSONLoader()` deleted |
-| Task 4 (Update tests) | DONE — `koanf_loader_test.go` (14 cases); `config_file_test.go`, `config_nested_test.go` updated |
-| Task 5 (go mod tidy) | DONE — `go-faster/yaml` + `pelletier/go-toml/v2` demoted to `// indirect` (NOT fully removed — koanf pulls them transitively) |
-| Task 6 (Update examples) | DONE — taskctl passes unchanged |
-| Task 7 (Lint config) | DONE — depguard updated; `ConfigFileLoader` ireturn allow-list entry is now dead config (nothing returns the interface — `NewKoanfLoader` returns `*KoanfLoader`) |
-| Task 8 (Update docs) | PARTIAL — core living docs updated; website docs + `WHAT_THIS_PROJECT_IS_NOT.md` + this file left stale (addressed 2026-07-27 docs-health pass) |
-| Task 9 (Final verification) | DONE — build OK, tests green, lint 0 issues, coverage 87.8% |
+| Plan task                             | Outcome                                                                                                                                                           |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Task 1 (Refactor KoanfLoader)         | DONE — KoanfLoader moved into `v3` (`koanf_loader.go`); uses koanf as parser → JSON → `loadConfigFromJSON`                                                        |
+| Task 2 (WithConfigFile → KoanfLoader) | DONE — `WithConfigFile` now creates `NewKoanfLoader(paths...)`                                                                                                    |
+| Task 3 (Delete old loaders)           | DONE — `configload/` package deleted entirely; `jsonLoader`/`NewJSONLoader()` deleted                                                                             |
+| Task 4 (Update tests)                 | DONE — `koanf_loader_test.go` (14 cases); `config_file_test.go`, `config_nested_test.go` updated                                                                  |
+| Task 5 (go mod tidy)                  | DONE — `go-faster/yaml` + `pelletier/go-toml/v2` demoted to `// indirect` (NOT fully removed — koanf pulls them transitively)                                     |
+| Task 6 (Update examples)              | DONE — taskctl passes unchanged                                                                                                                                   |
+| Task 7 (Lint config)                  | DONE — depguard updated; `ConfigFileLoader` ireturn allow-list entry is now dead config (nothing returns the interface — `NewKoanfLoader` returns `*KoanfLoader`) |
+| Task 8 (Update docs)                  | PARTIAL — core living docs updated; website docs + `WHAT_THIS_PROJECT_IS_NOT.md` + this file left stale (addressed 2026-07-27 docs-health pass)                   |
+| Task 9 (Final verification)           | DONE — build OK, tests green, lint 0 issues, coverage 87.8%                                                                                                       |
 
 **Deviation from plan:** the circular dependency (raised later in the
 implementation report) was resolved by **moving KoanfLoader into `v3`** and
@@ -379,4 +379,3 @@ cleaner than the plan's "export jsonLoader helpers" option.
 local `/home/lars/projects/go-output/*` `use` directives that make the repo
 unbuildable on any other machine — the #1 blocker flagged in the report and
 **not yet fixed**. Tracked in `TODO_LIST.md`.
-

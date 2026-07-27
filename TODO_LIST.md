@@ -56,7 +56,7 @@ These were surfaced by the 2026-07-27 config-loading consolidation
 - [ ] **#47** Remove dead `ConfigFileLoader` ireturn allow-list entry —
       `.golangci.yml:255` allow-lists `ConfigFileLoader`, but nothing returns
       the interface anymore (`NewKoanfLoader` returns concrete `*KoanfLoader`;
-      `WithConfigFileLoader` only *accepts* the interface as a parameter).
+      `WithConfigFileLoader` only _accepts_ the interface as a parameter).
       Safe to remove; update AGENTS.md exclusion count (4→3 ireturn entries)
       and ADR-002 if proceeding.
 - [ ] **#48** Consider making `loadConfigFile` private-only — it is only used
@@ -69,8 +69,8 @@ These were surfaced by the 2026-07-27 config-loading consolidation
 
 - All metrics above are verified against the current codebase: `go test ./...`
   reports 467 `func Test` declarations across all modules (v3 core + sub-modules
-  + examples + benchmarks); coverage is 87.8% in `pkg/cmdguard/v3`; lint reports
-  0 issues; all 4 sub-modules build cleanly.
+  - examples + benchmarks); coverage is 87.8% in `pkg/cmdguard/v3`; lint reports
+    0 issues; all 4 sub-modules build cleanly.
 - `manpage` was removed from the workspace in commit `34a0c6e`; the remaining
   optional sub-modules are glamour, prompts, spinner, and telemetry.
 - The `configload` sub-package was deleted entirely (commit `e3e710c`); config

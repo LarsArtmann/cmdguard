@@ -42,7 +42,7 @@
 
 ## b) PARTIALLY DONE
 
-1. **docs-health AUDIT format** — I fixed everything I found, but I did NOT produce the prescribed per-finding classification **before** fixing. The skill's AUDIT process is: inventory → classify (Critical/Medium/Low) → fix → report with two scored axes (Accuracy + Fitness) and explicit math. I computed scores **retroactively** (10/10 + 10/10) rather than running the structured audit and presenting the pre-fix baseline. The fixes are real; the *process artifact* (the health report table with original findings) was skipped.
+1. **docs-health AUDIT format** — I fixed everything I found, but I did NOT produce the prescribed per-finding classification **before** fixing. The skill's AUDIT process is: inventory → classify (Critical/Medium/Low) → fix → report with two scored axes (Accuracy + Fitness) and explicit math. I computed scores **retroactively** (10/10 + 10/10) rather than running the structured audit and presenting the pre-fix baseline. The fixes are real; the _process artifact_ (the health report table with original findings) was skipped.
 
 2. **Dep version sweep** — I updated the 3 stale versions I noticed (go-output, auditlog, do/v2). I did NOT do a comprehensive diff of every version in go.mod against every version cited in every doc. There may be other drifted versions I didn't catch (e.g. koanf parser versions, cobra/pflag — though those I did spot-check).
 
@@ -52,7 +52,7 @@
 
 ## c) NOT STARTED
 
-1. **docs-health reference files not loaded** — The skill explicitly says: "For detailed BUILD procedures... load [./references/build-guide.md]", "For per-file verification checklists... load [./references/verify-checklist.md]", "For the full decision tree... load [./references/common-mistakes.md]", "For the full ownership rules... load [./references/doc-ownership.md]". I read only the SKILL.md bodies. I applied the rules stated *in* the SKILL.md, but the detailed checklists and templates in those 4 reference files were never opened. This is the single biggest process gap.
+1. **docs-health reference files not loaded** — The skill explicitly says: "For detailed BUILD procedures... load [./references/build-guide.md]", "For per-file verification checklists... load [./references/verify-checklist.md]", "For the full decision tree... load [./references/common-mistakes.md]", "For the full ownership rules... load [./references/doc-ownership.md]". I read only the SKILL.md bodies. I applied the rules stated _in_ the SKILL.md, but the detailed checklists and templates in those 4 reference files were never opened. This is the single biggest process gap.
 
 2. **AGENTS.md lint-strategy section not updated** — Line 240 says "4 ireturn allow-list entries". I identified (and TODO'd) that `ConfigFileLoader` is now dead config, but I did NOT update this count in AGENTS.md itself, nor add a note that one entry is candidate-for-removal.
 
@@ -94,9 +94,9 @@
 
 4. **Attempt the obvious mechanical fix before routing to TODO.** The go.work pollution may have a 2-minute fix (`GOWORK=off go build` to confirm, then strip paths). I treated a possible quick win as a blocked decision.
 
-5. **Run sub-module tests, not just builds, when touching shared config.** I changed config-loading code paths; verifying sub-module *tests* (not just compile) was the correct bar.
+5. **Run sub-module tests, not just builds, when touching shared config.** I changed config-loading code paths; verifying sub-module _tests_ (not just compile) was the correct bar.
 
-6. **Be more skeptical of "done" claims in the final report.** The closing message should state what was verified and what was *not*, not present a clean bill of health.
+6. **Be more skeptical of "done" claims in the final report.** The closing message should state what was verified and what was _not_, not present a clean bill of health.
 
 ---
 
@@ -181,20 +181,20 @@
 
 ## Files Changed This Session
 
-| File | Change |
-| --- | --- |
-| `TODO_LIST.md` | Rebuilt: removed done items, deduped Future Ideas, added #43–#48 |
-| `ROADMAP.md` | Marked configload item moot, merged ideas, updated date |
-| `FEATURES.md` | Loader description, dep versions, dependency-claim correction, test count |
-| `CHANGELOG.md` | "Removed direct deps" → "demoted to indirect" |
-| `AGENTS.md` | Dep versions (go-output/auditlog/do), test count |
-| `WHAT_THIS_PROJECT_IS_NOT.md` | Dead configload pkg.go.dev link fixed |
-| `website/.../config-files.mdx` | Rewrote 3 sections to new WithConfigFile API |
-| `pkg/cmdguard/v3/config_file.go` | ConfigFileLoader interface doc (data may be nil) |
-| `docs/planning/2026-07-26_08-48_*.md` | Annotated: status, known-limitation, Resolution table |
-| `docs/status/2026-07-26_21-38_*.md` | Annotated: opening update + per-question resolutions |
-| `docs/status/2026-07-27_01-37_*.md` | Annotated: opening update on open-item re-verification |
-| `docs/status/2026-07-23_*manpage*` | LEAVE ALONE (already resolved) |
+| File                                  | Change                                                                    |
+| ------------------------------------- | ------------------------------------------------------------------------- |
+| `TODO_LIST.md`                        | Rebuilt: removed done items, deduped Future Ideas, added #43–#48          |
+| `ROADMAP.md`                          | Marked configload item moot, merged ideas, updated date                   |
+| `FEATURES.md`                         | Loader description, dep versions, dependency-claim correction, test count |
+| `CHANGELOG.md`                        | "Removed direct deps" → "demoted to indirect"                             |
+| `AGENTS.md`                           | Dep versions (go-output/auditlog/do), test count                          |
+| `WHAT_THIS_PROJECT_IS_NOT.md`         | Dead configload pkg.go.dev link fixed                                     |
+| `website/.../config-files.mdx`        | Rewrote 3 sections to new WithConfigFile API                              |
+| `pkg/cmdguard/v3/config_file.go`      | ConfigFileLoader interface doc (data may be nil)                          |
+| `docs/planning/2026-07-26_08-48_*.md` | Annotated: status, known-limitation, Resolution table                     |
+| `docs/status/2026-07-26_21-38_*.md`   | Annotated: opening update + per-question resolutions                      |
+| `docs/status/2026-07-27_01-37_*.md`   | Annotated: opening update on open-item re-verification                    |
+| `docs/status/2026-07-23_*manpage*`    | LEAVE ALONE (already resolved)                                            |
 
 All changes auto-committed by the git daemon across 3 commits (`65e2838`, `b3f8e95`, `2c57db8`). Quality gate green: `go test -race` ✓ · `golangci-lint` 0 issues ✓ · `nix flake check` ✓.
 
