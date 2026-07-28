@@ -48,6 +48,8 @@
               GOEXPERIMENT = "jsonv2";
 
               shellHook = ''
+                export GOTMPDIR="$HOME/.cache/go-tmp"
+                mkdir -p "$GOTMPDIR"
                 echo "cmdguard dev shell — Go $(go version | awk '{print $3}')"
               '';
             };
@@ -60,7 +62,11 @@
 
               GOWORK = "off";
               GOEXPERIMENT = "jsonv2";
-            };
+
+              shellHook = ''
+                export GOTMPDIR="$HOME/.cache/go-tmp"
+                mkdir -p "$GOTMPDIR"
+              '';
           };
 
           checks.format = config.treefmt.build.check self;
