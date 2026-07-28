@@ -384,14 +384,14 @@ func (cli *CLI[T]) applyNoColorIfSet() func() {
 		return func() {}
 	}
 
-	previous := os.Getenv("NO_COLOR")
+	previousValue, previousSet := os.LookupEnv("NO_COLOR")
 	_ = os.Setenv("NO_COLOR", "1")
 
 	return func() {
-		if previous == "" {
-			_ = os.Unsetenv("NO_COLOR")
+		if previousSet {
+			_ = os.Setenv("NO_COLOR", previousValue)
 		} else {
-			_ = os.Setenv("NO_COLOR", previous)
+			_ = os.Unsetenv("NO_COLOR")
 		}
 	}
 }

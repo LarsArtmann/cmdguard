@@ -384,6 +384,15 @@ func TestCLINoColorEnvVar(t *testing.T) {
 func TestCLINoColorRestoresEnvVar(t *testing.T) {
 	//nolint:paralleltest // mutates process-wide env var
 	t.Run("restores NO_COLOR after execution", func(t *testing.T) {
+		origValue, origSet := os.LookupEnv("NO_COLOR")
+		t.Cleanup(func() {
+			if origSet {
+				os.Setenv("NO_COLOR", origValue)
+			} else {
+				os.Unsetenv("NO_COLOR")
+			}
+		})
+
 		os.Unsetenv("NO_COLOR")
 
 		cli, err := v4.NewCLI("test", "Test", testCLIConfig{},
