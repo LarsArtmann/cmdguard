@@ -1,4 +1,4 @@
-package v3
+package v4
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/larsartmann/cmdguard/v3/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
 )
 
 func TestWithPostFlagParse_RunsAfterFlagParsing(t *testing.T) {

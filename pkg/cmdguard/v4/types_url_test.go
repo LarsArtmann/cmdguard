@@ -1,10 +1,10 @@
-package v3_test
+package v4_test
 
 import (
 	"testing"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
-	"github.com/larsartmann/cmdguard/v3/pkg/testutil"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
 )
 
 func TestURL(t *testing.T) {
@@ -13,7 +13,7 @@ func TestURL(t *testing.T) {
 	t.Run("ParseURL valid", func(t *testing.T) {
 		t.Parallel()
 
-		u, err := v3.ParseURL("https://example.com:8080/path")
+		u, err := v4.ParseURL("https://example.com:8080/path")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -55,7 +55,7 @@ func TestURL(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
-				testParseError(t, func() (v3.URL, error) { return v3.ParseURL(tt.input) }, "URL")
+				testParseError(t, func() (v4.URL, error) { return v4.ParseURL(tt.input) }, "URL")
 			})
 		}
 	})
@@ -63,7 +63,7 @@ func TestURL(t *testing.T) {
 	t.Run("ParseURL valid", func(t *testing.T) {
 		t.Parallel()
 
-		u, err := v3.ParseURL("https://example.com")
+		u, err := v4.ParseURL("https://example.com")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -75,7 +75,7 @@ func TestURL(t *testing.T) {
 	t.Run("URL IsEmpty", func(t *testing.T) {
 		t.Parallel()
 
-		u, _ := v3.ParseURL("https://example.com")
+		u, _ := v4.ParseURL("https://example.com")
 		if u.IsEmpty() {
 			t.Error("IsEmpty() = true, want false")
 		}
@@ -84,7 +84,7 @@ func TestURL(t *testing.T) {
 	t.Run("URL returns copy", func(t *testing.T) {
 		t.Parallel()
 
-		u, _ := v3.ParseURL("https://example.com")
+		u, _ := v4.ParseURL("https://example.com")
 		url1 := u.URL()
 
 		url2 := u.URL()
@@ -96,7 +96,7 @@ func TestURL(t *testing.T) {
 	t.Run("URL MarshalText", func(t *testing.T) {
 		t.Parallel()
 
-		u, _ := v3.ParseURL("https://example.com/path")
+		u, _ := v4.ParseURL("https://example.com/path")
 
 		data, err := u.MarshalText()
 		if err != nil {
@@ -111,7 +111,7 @@ func TestURL(t *testing.T) {
 	t.Run("URL UnmarshalText", func(t *testing.T) {
 		t.Parallel()
 
-		var u v3.URL
+		var u v4.URL
 
 		err := u.UnmarshalText([]byte("https://example.com"))
 		if err != nil {

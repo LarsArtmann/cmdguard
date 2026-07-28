@@ -2,10 +2,7 @@ module github.com/larsartmann/cmdguard/prompts
 
 go 1.26.5
 
-require (
-	charm.land/huh/v2 v2.0.3
-	github.com/larsartmann/cmdguard/v3 v3.1.0
-)
+require charm.land/huh/v2 v2.0.3
 
 require (
 	charm.land/bubbles/v2 v2.1.1 // indirect
@@ -33,6 +30,7 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/larsartmann/cmdguard/v4 v4.0.0
 	github.com/larsartmann/go-atomic-write v0.4.0 // indirect
 	github.com/larsartmann/go-branded-id v0.5.0 // indirect
 	github.com/larsartmann/go-error-family v0.10.0 // indirect
@@ -72,3 +70,5 @@ require (
 	golang.org/x/term v0.45.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
 )
+
+replace github.com/larsartmann/cmdguard/v4 v4.0.0 => ../

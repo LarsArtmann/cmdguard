@@ -1,4 +1,4 @@
-package v3
+package v4
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 
 	output "github.com/larsartmann/go-output"
 
-	"github.com/larsartmann/cmdguard/v3/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
 )
 
 type jsonErrConfig struct {

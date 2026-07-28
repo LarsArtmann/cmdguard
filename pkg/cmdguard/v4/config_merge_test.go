@@ -1,9 +1,9 @@
-package v3
+package v4
 
 import (
 	"testing"
 
-	"github.com/larsartmann/cmdguard/v3/pkg/testutil"
+	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
 )
 
 func TestMergeConfigs(t *testing.T) {
