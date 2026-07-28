@@ -105,8 +105,7 @@ github.com/larsartmann/go-output/table v0.35.0 h1:/5OyUe2T5iXG+yw/9QwCDO1BaIVis/
 github.com/larsartmann/go-output/table v0.35.0/go.mod h1:1m8WRiLKUTX2HkrdD+FQsX7qFdKIYnlwECRe+1fO6WE=
 github.com/larsartmann/go-output/testhelpers v0.34.0 h1:6Lw5Y18UT2eIKOp7+qbhD678/EWkcMFWEOW3wlAYt+s=
 github.com/larsartmann/go-output/testhelpers v0.34.0/go.mod h1:CtP2aiCXEjiH/rh1cO2UJ0H8bW0eoqoqcTpUxqG6O6w=
-github.com/larsartmann/go-output/testhelpers/graphtest v0.34.0 h1:Aa8x/8ik+VM4QxbOwtc3Wta1ohASjyhff+BoQwDmszo=
-github.com/larsartmann/go-output/testhelpers/graphtest v0.34.0/go.mod h1:u8gCtwVTjsJInrulwuDXl4JJttxcJTKdzz6RsVIL7jc=
+github.com/larsartmann/go-output/testhelpers/graphtest v0.35.0 h1:QL2UQUZla7PwnWV10v4u9oeJ7ljXIua6iTfO0ivo7kU=
 github.com/larsartmann/go-output/tree v0.35.0 h1:iCXUM4IDlEH5VKwRVUjqahJGjPXk7zzmcZA+/2Y0tCE=
 github.com/larsartmann/go-output/tree v0.35.0/go.mod h1:9uYXXrmMeImVyHPGadE53EmVVtArPM2AsNypbVMDo7g=
 github.com/larsartmann/samber-do-auditlog v0.8.1 h1:5AF8aENo0WHdC9grVJG+DFHXuDJdbDvG0Ja4IzQL80k=
@@ -164,8 +163,7 @@ go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN8
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
 go.yaml.in/yaml/v3 v3.0.5/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
-golang.org/x/exp v0.0.0-20260611194520-c48552f49976 h1:X8Hz2ImujgbmetVuW+w2YkyZChE3cBpZi2P158rTG9M=
-golang.org/x/exp v0.0.0-20260611194520-c48552f49976/go.mod h1:vnf4pv9iKZXY58sQE1L86zmNWJ4159e1RkcWiLCkeEY=
+golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 h1:ex206bKw+v3K0dm3andkrIF+ijyQKJG1pLgwQ2PYdQM=
 golang.org/x/net v0.57.0 h1:K5+3DljvIuDG9/Jv9rvyMywYNFCQ9RSUY6OOTTkT+tE=
 golang.org/x/net v0.57.0/go.mod h1:KpXc8iv+r3XplLAG/f7Jsf9RPszJzdR0f58q9vGOuEU=
 golang.org/x/sync v0.22.0 h1:SZjpbeLmrCk4xhRSZFNZW5gFUeCeFgjekvI/+gfScek=
