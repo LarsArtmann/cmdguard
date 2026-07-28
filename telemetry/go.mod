@@ -3,7 +3,7 @@ module github.com/larsartmann/cmdguard/telemetry
 go 1.26.5
 
 require (
-	github.com/larsartmann/cmdguard/v3 v3.2.0
+	github.com/larsartmann/cmdguard/v3 v3.1.0
 	go.opentelemetry.io/otel v1.44.0
 	go.opentelemetry.io/otel/trace v1.44.0
 )
