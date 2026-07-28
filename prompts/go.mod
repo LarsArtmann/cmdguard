@@ -5,6 +5,19 @@ go 1.26.5
 require charm.land/huh/v2 v2.0.3
 
 require (
+	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
+	github.com/knadh/koanf/maps v0.1.2 // indirect
+	github.com/knadh/koanf/parsers/json v1.0.0 // indirect
+	github.com/knadh/koanf/parsers/toml v0.1.0 // indirect
+	github.com/knadh/koanf/parsers/yaml v1.1.0 // indirect
+	github.com/knadh/koanf/v2 v2.3.5 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/pelletier/go-toml v1.9.5 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
+)
+
+require (
 	charm.land/bubbles/v2 v2.1.1 // indirect
 	charm.land/bubbletea/v2 v2.0.8 // indirect
 	charm.land/fang/v2 v2.0.1 // indirect

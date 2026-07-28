@@ -1,6 +1,6 @@
 # Error Reference — cmdguard v2
 
-**Auto-generated from source:** `pkg/cmdguard/v3/errors_*.go`, `types_*.go`
+**Auto-generated from source:** `pkg/cmdguard/v4/errors_*.go`, `types_*.go`
 **Last updated:** 2026-06-10
 
 ---
@@ -10,7 +10,7 @@
 All sentinel errors support `errors.Is()` for identification:
 
 ```go
-if errors.Is(err, v3.ErrRequiredFlag) {
+if errors.Is(err, v4.ErrRequiredFlag) {
     // handle missing required flag
 }
 ```

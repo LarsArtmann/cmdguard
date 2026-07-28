@@ -1,6 +1,6 @@
 # cmdguard API Reference
 
-Extracted from AGENTS.md for conciseness. See the [pkg.go.dev reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) for the complete API.
+Extracted from AGENTS.md for conciseness. See the [pkg.go.dev reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) for the complete API.
 
 ## API Reference
 
@@ -11,11 +11,11 @@ Extracted from AGENTS.md for conciseness. See the [pkg.go.dev reference](https:/
 Commands are created via constructors — `NewCommand` for leaf commands, `NewParentCommand` for commands with subcommands. Struct fields are unexported to enforce validation at construction time.
 
 ```go
-cli, err := v3.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
-cmd, err := v3.NewCommand("greet", &GreetFlags{}, greetHandler,
-    v3.WithShort("Greet someone"),
+cli, err := v4.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
+cmd, err := v4.NewCommand("greet", &GreetFlags{}, greetHandler,
+    v4.WithShort("Greet someone"),
 )
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 ```
 
 ### Command Constructors
@@ -56,7 +56,7 @@ func NewParentCommand[T, F any](use string, long string, flags F, opts ...Comman
 ### CLI[T] Constructor
 
 ```go
-cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
 ```
 
 Functional options:
@@ -123,7 +123,7 @@ import (
     "context"
     "fmt"
 
-    "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 type AppConfig struct {
@@ -132,23 +132,23 @@ type AppConfig struct {
 }
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+    cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
     if err != nil {
         panic(err)
     }
 
-    cmd, err := v3.NewCommand("hello", v3.NoFlags{},
-        func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
+    cmd, err := v4.NewCommand("hello", v4.NoFlags{},
+        func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
             fmt.Printf("Hello! Verbose: %v\n", cfg.Verbose)
             return nil
         },
-        v3.WithShort("Say hello"),
+        v4.WithShort("Say hello"),
     )
     if err != nil {
         panic(err)
     }
 
-    if err := v3.AddCommand(cli, cmd); err != nil {
+    if err := v4.AddCommand(cli, cmd); err != nil {
         panic(err)
     }
 
@@ -167,7 +167,7 @@ type GreetFlags struct {
     Shout bool   `flag:"shout" default:"false"          help:"Shout the greeting"`
 }
 
-greetCmd, err := v3.NewCommand("greet", &GreetFlags{},
+greetCmd, err := v4.NewCommand("greet", &GreetFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         for i := uint(0); i < flags.Count; i++ {
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
@@ -178,47 +178,47 @@ greetCmd, err := v3.NewCommand("greet", &GreetFlags{},
         }
         return nil
     },
-    v3.WithShort("Greet someone"),
+    v4.WithShort("Greet someone"),
 )
-v3.AddCommand(cli, greetCmd)
+v4.AddCommand(cli, greetCmd)
 ```
 
 ### Subcommands
 
 ```go
-listCmd, _ := v3.NewCommand("list", v3.NoFlags{},
-    listUsersHandler, v3.WithShort("List users"),
+listCmd, _ := v4.NewCommand("list", v4.NoFlags{},
+    listUsersHandler, v4.WithShort("List users"),
 )
-createCmd, _ := v3.NewCommand("create", v3.NoFlags{},
-    createUserHandler, v3.WithShort("Create user"),
+createCmd, _ := v4.NewCommand("create", v4.NoFlags{},
+    createUserHandler, v4.WithShort("Create user"),
 )
-userCmd, err := v3.NewParentCommand[AppConfig]("user", "User management", v3.NoFlags{},
-    v3.WithShort("User management"),
-    v3.WithSubcommands(listCmd, createCmd),
+userCmd, err := v4.NewParentCommand[AppConfig]("user", "User management", v4.NoFlags{},
+    v4.WithShort("User management"),
+    v4.WithSubcommands(listCmd, createCmd),
 )
-v3.AddCommand(cli, userCmd)
+v4.AddCommand(cli, userCmd)
 ```
 
 ### Dependency Injection
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
 scope := cli.Scope()
 
 // Register services
-v3.Provide(scope, func(i do.Injector) (*Database, error) {
-    cfg, _ := v3.Invoke[*AppConfig](scope)
+v4.Provide(scope, func(i do.Injector) (*Database, error) {
+    cfg, _ := v4.Invoke[*AppConfig](scope)
     return &Database{DSN: cfg.DSN}, nil
 })
-v3.ProvideValue(scope, &Logger{Level: "info"})
+v4.ProvideValue(scope, &Logger{Level: "info"})
 
 // Invoke in command handlers
-db, err := v3.Invoke[*Database](cli.Scope())
+db, err := v4.Invoke[*Database](cli.Scope())
 
 // Testing — clone scope and override services
-cloned := v3.CloneScope(scope)
-v3.OverrideValue(cloned, &MockDatabase{})
-mockDB, _ := v3.Invoke[*Database](cloned) // returns mock
+cloned := v4.CloneScope(scope)
+v4.OverrideValue(cloned, &MockDatabase{})
+mockDB, _ := v4.Invoke[*Database](cloned) // returns mock
 ```
 
 #### DI Scope Functions
@@ -242,11 +242,11 @@ mockDB, _ := v3.Invoke[*Database](cloned) // returns mock
 ### Lifecycle Hooks
 
 ```go
-cmd, err := v3.NewCommand("example", &Flags{}, runHandler,
-    v3.WithPreRunE(func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+cmd, err := v4.NewCommand("example", &Flags{}, runHandler,
+    v4.WithPreRunE(func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return nil // validation
     }),
-    v3.WithPostRunE(func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    v4.WithPostRunE(func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return nil // cleanup (only called on success)
     }),
 )
@@ -260,9 +260,9 @@ command context during `PersistentPreRunE`, so raw handlers retrieve it without 
 parallel context-key system:
 
 ```go
-cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
+cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
     // Initialise DI / store session once flags are parsed
-    v3.WithPostFlagParse(func(cmd *cobra.Command, cfg *Config) error {
+    v4.WithPostFlagParse(func(cmd *cobra.Command, cfg *Config) error {
         return initDI(cfg) // runs after parsing + config validation
     }),
 )
@@ -271,7 +271,7 @@ root := cli.RootCommand()
 root.AddCommand(&cobra.Command{
     Use: "raw",
     RunE: func(cmd *cobra.Command, _ []string) error {
-        cfg, ok := v3.ConfigFromContext[Config](cmd.Context())
+        cfg, ok := v4.ConfigFromContext[Config](cmd.Context())
         if !ok {
             return errors.New("config not initialised")
         }
@@ -296,21 +296,21 @@ subcommand that needs it (e.g. one that re-runs the root pipeline).
 
 ```go
 // Timing middleware — logs execution duration
-cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
-    v3.WithMiddleware(v3.TimingMiddleware[Config](func(name string, d time.Duration, err error) {
+cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+    v4.WithMiddleware(v4.TimingMiddleware[Config](func(name string, d time.Duration, err error) {
         log.Printf("%s took %v (err=%v)", name, d, err)
     })),
 )
 
 // Recovery middleware — catches panics
-cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
-    v3.WithMiddleware(v3.RecoveryMiddleware[Config]()),
+cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+    v4.WithMiddleware(v4.RecoveryMiddleware[Config]()),
 )
 
 // Spinner middleware — shows terminal spinner (spinner sub-module)
 import "github.com/larsartmann/cmdguard/spinner"
-cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
-    v3.WithMiddleware(spinner.Middleware[Config]("Loading...")),
+cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+    v4.WithMiddleware(spinner.Middleware[Config]("Loading...")),
 )
 
 // Telemetry middleware — OpenTelemetry spans (telemetry sub-module)
@@ -319,7 +319,7 @@ import (
     "go.opentelemetry.io/otel"
 )
 tracer := otel.Tracer("myapp")
-cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
+cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
     telemetry.WithTelemetry[Config](tracer),
 )
 ```
@@ -329,7 +329,7 @@ cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
 Automatically created on `Execute`. Access via `GetBranchingFlowContext(ctx)` in handlers.
 
 ```go
-bfc, ok := v3.GetBranchingFlowContext(ctx)
+bfc, ok := v4.GetBranchingFlowContext(ctx)
 bfc.PathString()  // "app.subcmd"
 bfc.SetValue(key, val)  // propagates to children
 bfc.GetValue(key)       // looks up hierarchy
@@ -339,60 +339,60 @@ bfc.GetValue(key)       // looks up hierarchy
 
 ```go
 // All v3 functions return errors
-cli, err := v3.NewCLI[Config]("app", "My app", Config{})
-cmd, err := v3.NewCommand("test", v3.NoFlags{}, handler)
+cli, err := v4.NewCLI[Config]("app", "My app", Config{})
+cmd, err := v4.NewCommand("test", v4.NoFlags{}, handler)
 
 // Sentinel errors for errors.Is()
-errors.Is(err, v3.ErrInvalidCommand)
-errors.Is(err, v3.ErrMissingName)
-errors.Is(err, v3.ErrDuplicateCommand)
-errors.Is(err, v3.ErrMissingHandler)
+errors.Is(err, v4.ErrInvalidCommand)
+errors.Is(err, v4.ErrMissingName)
+errors.Is(err, v4.ErrDuplicateCommand)
+errors.Is(err, v4.ErrMissingHandler)
 
 // Rich error types
-v3.NewCommandError(name, err)    // wraps with command context
-v3.NewServiceError(type, err)    // wraps with DI service context
-v3.NewFlagError(name, err)       // wraps with flag context
-v3.NewFlagErrorWithSuggestion(name, err, suggestion)  // includes typo fix
+v4.NewCommandError(name, err)    // wraps with command context
+v4.NewServiceError(type, err)    // wraps with DI service context
+v4.NewFlagError(name, err)       // wraps with flag context
+v4.NewFlagErrorWithSuggestion(name, err, suggestion)  // includes typo fix
 
 // Exit codes
-v3.NewExitError(code, err)       // error with custom exit code for ExecuteAndExit
+v4.NewExitError(code, err)       // error with custom exit code for ExecuteAndExit
 errors.As(err, &exitCoder)       // check if error implements ExitCoder
 ```
 
 ### Version Command
 
 ```go
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithCLIVersion("1.0.0"),
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithCLIVersion("1.0.0"),
 )
-cmd, err := v3.VersionCommand(cli)
+cmd, err := v4.VersionCommand(cli)
 if err != nil {
     panic(err)
 }
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 ```
 
 ### Doctor Command
 
 ```go
 // Simple — just DI health checks
-cmd, err := v3.DoctorCommand(cli)
+cmd, err := v4.DoctorCommand(cli)
 if err != nil {
     panic(err)
 }
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 
 // With custom diagnostic checks and group
-cmd, err := v3.DoctorCommand(cli,
-    v3.WithDoctorCheck("database", func(ctx context.Context) error {
+cmd, err := v4.DoctorCommand(cli,
+    v4.WithDoctorCheck("database", func(ctx context.Context) error {
         return db.Ping(ctx)
     }),
-    v3.WithDoctorGroupID("system"),
+    v4.WithDoctorGroupID("system"),
 )
 if err != nil {
     panic(err)
 }
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 
 // Per-service results programmatically
 results := cli.HealthCheckResultsWithContext(ctx)
@@ -405,7 +405,7 @@ for name, err := range results {
 
 ```go
 import "github.com/larsartmann/cmdguard/glamour"
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
     glamour.WithHelp(),
 )
 // Command Long and Example fields are rendered as markdown in terminal help
@@ -414,16 +414,16 @@ cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
 ### Strict Validation
 
 ```go
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithStrictValidation(),  // requires WithShort on all commands
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithStrictValidation(),  // requires WithShort on all commands
 )
 ```
 
 ### Config Validation
 
 ```go
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithConfigValidation(func(cfg *Config) error {
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithConfigValidation(func(cfg *Config) error {
         if cfg.Port < 1 { return fmt.Errorf("invalid port") }
         return nil
     }),
@@ -441,13 +441,13 @@ import auditlog "github.com/larsartmann/samber-do-auditlog"
 
 plugin, _ := auditlog.New(auditlog.Config{Enabled: true, ContainerID: "myapp"})
 
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithAuditLog(plugin),
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithAuditLog(plugin),
 )
 
 // after Execute, export the snapshot
-format, _ := v3.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT")) // "" -> html
-_ = v3.ExportAuditLog(cli, v3.AuditLogExportConfig{
+format, _ := v4.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT")) // "" -> html
+_ = v4.ExportAuditLog(cli, v4.AuditLogExportConfig{
     Format: format,            // html | json | ndjson | csv | tsv | mermaid | dot | d2 | plantuml | tree | htmltree
     Path:   "myapp-audit." + format.String(),
 })
@@ -459,8 +459,8 @@ Accessors and query helpers:
 cli.AuditLog()                  // *auditlog.Plugin (nil if not configured)
 cli.AuditLogReport()            // *auditlog.Report snapshot (nil if not configured)
 
-v3.AuditLogServiceByName(cli, "taskStore")  // *auditlog.ServiceInfo
-v3.AuditLogFailedServices(cli)              // []auditlog.ServiceInfo
+v4.AuditLogServiceByName(cli, "taskStore")  // *auditlog.ServiceInfo
+v4.AuditLogFailedServices(cli)              // []auditlog.ServiceInfo
 ```
 
 `AuditLogFormat` is a validated enum &mdash; build it via `ParseAuditLogFormat` so an

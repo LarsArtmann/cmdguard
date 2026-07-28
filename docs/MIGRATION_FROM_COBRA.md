@@ -75,7 +75,7 @@ import (
     "fmt"
     "os"
 
-    v2 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+    v2 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
     "github.com/spf13/cobra"
 )
 
@@ -98,7 +98,7 @@ func init() {
 }
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+    cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
@@ -165,27 +165,27 @@ type DeployFlags struct {
 }
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+    cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
     }
 
-    deployCmd, err := v3.NewCommand[AppConfig, *DeployFlags]("deploy",
+    deployCmd, err := v4.NewCommand[AppConfig, *DeployFlags]("deploy",
         func(ctx context.Context, cfg *AppConfig, flags *DeployFlags) error {
             fmt.Printf("Deploying to %s (dry-run=%v, timeout=%v)\n",
                 flags.Env, flags.DryRun, flags.Timeout)
             return nil
         },
-        v3.WithShort[AppConfig, *DeployFlags]("Deploy the application"),
-        v3.WithFlags[AppConfig, *DeployFlags](&DeployFlags{}),
+        v4.WithShort[AppConfig, *DeployFlags]("Deploy the application"),
+        v4.WithFlags[AppConfig, *DeployFlags](&DeployFlags{}),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
     }
 
-    if err := v3.AddCommand(cli, deployCmd); err != nil {
+    if err := v4.AddCommand(cli, deployCmd); err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
     }
@@ -221,7 +221,7 @@ func (db *Database) Query(ctx context.Context) error {
 }
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+    cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
@@ -230,27 +230,27 @@ func main() {
     // Register services in the DI scope.
     scope := cli.Scope()
 
-    v3.Provide(scope, func(i do.Injector) (*Database, error) {
-        cfg, _ := v3.Invoke[*AppConfig](scope)
+    v4.Provide(scope, func(i do.Injector) (*Database, error) {
+        cfg, _ := v4.Invoke[*AppConfig](scope)
         return &Database{DSN: cfg.DatabaseURL}, nil
     })
 
-    queryCmd, err := v3.NewCommand[AppConfig, v3.NoFlags]("query",
-        func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
-            db, err := v3.Invoke[*Database](scope)
+    queryCmd, err := v4.NewCommand[AppConfig, v4.NoFlags]("query",
+        func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+            db, err := v4.Invoke[*Database](scope)
             if err != nil {
                 return err
             }
             return db.Query(ctx)
         },
-        v3.WithShort[AppConfig, v3.NoFlags]("Run a database query"),
+        v4.WithShort[AppConfig, v4.NoFlags]("Run a database query"),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
     }
 
-    v3.AddCommand(cli, queryCmd)
+    v4.AddCommand(cli, queryCmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```
@@ -261,14 +261,14 @@ func main() {
 
 ```go
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("myapp", "My application", AppConfig{
+    cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{
         Verbose: false,
     },
-        v3.WithCLIVersion[AppConfig]("1.2.3"),
-        v3.WithEnvPrefix[AppConfig]("MYAPP_"),
-        v3.WithSignalHandling[AppConfig](),
-        v3.WithStrictValidation[AppConfig](),
-        v3.WithMiddleware[AppConfig](v3.TimingMiddleware[AppConfig]()),
+        v4.WithCLIVersion[AppConfig]("1.2.3"),
+        v4.WithEnvPrefix[AppConfig]("MYAPP_"),
+        v4.WithSignalHandling[AppConfig](),
+        v4.WithStrictValidation[AppConfig](),
+        v4.WithMiddleware[AppConfig](v4.TimingMiddleware[AppConfig]()),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
@@ -276,33 +276,33 @@ func main() {
     }
 
     // Add a version command.
-    versionCmd, err := v3.VersionCommand[AppConfig](cli)
+    versionCmd, err := v4.VersionCommand[AppConfig](cli)
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
     }
-    v3.AddCommand(cli, versionCmd)
+    v4.AddCommand(cli, versionCmd)
 
     // Parent command with subcommands.
-    listCmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("list", listHandler,
-        v3.WithShort[AppConfig, v3.NoFlags]("List resources"),
+    listCmd, _ := v4.NewCommand[AppConfig, v4.NoFlags]("list", listHandler,
+        v4.WithShort[AppConfig, v4.NoFlags]("List resources"),
     )
-    createCmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("create", createHandler,
-        v3.WithShort[AppConfig, v3.NoFlags]("Create a resource"),
-        v3.WithExactArgs[AppConfig, v3.NoFlags](1),
+    createCmd, _ := v4.NewCommand[AppConfig, v4.NoFlags]("create", createHandler,
+        v4.WithShort[AppConfig, v4.NoFlags]("Create a resource"),
+        v4.WithExactArgs[AppConfig, v4.NoFlags](1),
     )
 
-    resourceCmd, err := v3.NewParentCommand[AppConfig, v3.NoFlags]("resource",
+    resourceCmd, err := v4.NewParentCommand[AppConfig, v4.NoFlags]("resource",
         "Resource management",
-        []v3.Command[AppConfig, v3.NoFlags]{listCmd, createCmd},
-        v3.WithShort[AppConfig, v3.NoFlags]("Resource management"),
+        []v4.Command[AppConfig, v4.NoFlags]{listCmd, createCmd},
+        v4.WithShort[AppConfig, v4.NoFlags]("Resource management"),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
     }
 
-    v3.AddCommand(cli, resourceCmd)
+    v4.AddCommand(cli, resourceCmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```
@@ -337,11 +337,11 @@ You can add raw `*cobra.Command` to a cmdguard CLI at any time:
 legacyCmd := &cobra.Command{Use: "legacy", ...}
 
 // New command written with cmdguard.
-newCmd, _ := v3.NewCommand[AppConfig, *NewFlags]("new", ...)
+newCmd, _ := v4.NewCommand[AppConfig, *NewFlags]("new", ...)
 
 // Both coexist on the same CLI.
 cli.RootCommand().AddCommand(legacyCmd)
-v3.AddCommand(cli, newCmd)
+v4.AddCommand(cli, newCmd)
 ```
 
 This lets you migrate command-by-command without a big-bang rewrite.
@@ -396,8 +396,8 @@ Cobra has no built-in graceful shutdown. In cmdguard, services implementing `do.
 // In Cobra: you'd manually handle signals + cleanup
 // In cmdguard: one option
 
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithGracefulShutdown[Config](),
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithGracefulShutdown[Config](),
 )
 
 // Services are shut down in reverse invocation order on signal
@@ -416,18 +416,18 @@ cmdguard provides first-class test isolation through scope cloning and service o
 ```go
 func TestWithMockDB(t *testing.T) {
     // Create production CLI
-    cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{})
-    v3.Provide(cli.Scope(), NewDatabase) // real DB
+    cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{})
+    v4.Provide(cli.Scope(), NewDatabase) // real DB
 
     // Clone scope and override with mock
-    cloned := v3.CloneScope(cli.Scope())
-    v3.OverrideValue(cloned, &MockDatabase{})
+    cloned := v4.CloneScope(cli.Scope())
+    v4.OverrideValue(cloned, &MockDatabase{})
 
     // Invoked services use the mock
-    db, _ := v3.Invoke[*Database](cloned) // returns MockDatabase
+    db, _ := v4.Invoke[*Database](cloned) // returns MockDatabase
 
     // Original scope is unaffected
-    realDB, _ := v3.Invoke[*Database](cli.Scope()) // returns real Database
+    realDB, _ := v4.Invoke[*Database](cli.Scope()) // returns real Database
 }
 ```
 

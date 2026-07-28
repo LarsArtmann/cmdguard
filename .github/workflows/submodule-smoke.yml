@@ -43,7 +43,7 @@ jobs:
             echo "func main() {}" >> main.go
             # Use replace to resolve from local checkout
             go mod edit -replace "github.com/larsartmann/cmdguard/$mod=$GITHUB_WORKSPACE/$mod"
-            go mod edit -replace "github.com/larsartmann/cmdguard/v3=$GITHUB_WORKSPACE"
+            go mod edit -replace "github.com/larsartmann/cmdguard/v4=$GITHUB_WORKSPACE"
             go build ./... || { echo "FAILED: $mod did not resolve"; exit 1; }
             echo "OK: $mod resolves"
           done

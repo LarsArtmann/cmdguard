@@ -78,10 +78,10 @@ ehthumbs.db
 *.tmp
 *.temp
 
-## Buildflow artifacts (root-only — don't collide with docs)
-/audit-log.*
-/workflow-audit-log.*
-/.buildflow-workflow-baseline.json
+## Buildflow artifacts
+audit-log.*
+workflow-audit-log.*
+.buildflow-workflow-baseline.json
 
 ## Reports and coverage
 reports/
@@ -90,7 +90,7 @@ reports/
 *.out
 go.work
 go.work.sum
-/v3
+/v4
 
 ## Nix
 result-*
