@@ -1,4 +1,4 @@
-// Package v3 provides a type-safe, dependency-injection-powered CLI framework built on Cobra.
+// Package v4 provides a type-safe, dependency-injection-powered CLI framework built on Cobra.
 //
 // cmdguard eliminates runtime flag lookups by using struct tags for flag definitions,
 // provides compile-time type safety for commands and flags, and integrates samber/do/v2

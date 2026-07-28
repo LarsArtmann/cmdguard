@@ -37,7 +37,7 @@ const (
 )
 
 // CommandInfo provides command metadata to middleware.
-// TODO(v4): "Info" suffix is vague; consider CommandMetadata (see naming-review 2026-07-18).
+// TODO(v5): "Info" suffix is vague; consider CommandMetadata (see naming-review 2026-07-18).
 type CommandInfo struct {
 	Name     string
 	FullPath string

@@ -252,8 +252,8 @@ linters:
         - anon
         - stdlib
         - generic
-        - github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3.ConfigFileLoader
-        - github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3.TypeHandler
+        - github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4.ConfigFileLoader
+        - github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4.TypeHandler
         - github.com/samber/do/v2.Injector
         - github.com/knadh/koanf/v2.Parser
     makezero:
@@ -300,9 +300,9 @@ linters:
     rules:
       # Allow scoped TODO(v4) markers for deferred v4 breaking changes tracked in ROADMAP.md
       # ("Deferred from 2026-07-18 Audit Closure"). These are real actionable work items that
-      # must stay grep-discoverable as TODOs; they cannot be fixed in v3.x without breaking
-      # the public API. Narrow pattern: only TODO(v4) is exempted, not TODO(*) or bare TODO.
-      - source: 'TODO\(v4\)'
+      # must stay grep-discoverable as TODOs; they cannot be fixed in v4.x without breaking
+      # the public API. Narrow pattern: only TODO(v5) is exempted, not TODO(*) or bare TODO.
+      - source: 'TODO\(v5\)'
         linters:
           - godox
       - path: _test\.go$
@@ -366,16 +366,16 @@ linters:
         linters:
           - gochecknoglobals
           - wrapcheck
-      - path: pkg/cmdguard/v3/type_handler.go$
+      - path: pkg/cmdguard/v4/type_handler.go$
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/v3/flags_validate.go$
+      - path: pkg/cmdguard/v4/flags_validate.go$
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/v3/cli_command.go$
+      - path: pkg/cmdguard/v4/cli_command.go$
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/v3/example_test.go$
+      - path: pkg/cmdguard/v4/example_test.go$
         linters:
           - forbidigo
       - path: pkg/cmdguard/v2/editor.go$
