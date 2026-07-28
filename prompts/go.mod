@@ -4,7 +4,7 @@ go 1.26.5
 
 require (
 	charm.land/huh/v2 v2.0.3
-	github.com/larsartmann/cmdguard/v3 v3.1.0
+	github.com/larsartmann/cmdguard/v3 v3.2.0
 )
 
 require (

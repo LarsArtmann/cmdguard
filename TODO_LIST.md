@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-07-27
-**Status:** v3.0.0+ — 0 lint issues, 0 panics, 87.8% coverage
+**Status:** v3.2.0+ — 0 lint issues, 0 panics, 87.8% coverage
 **Tests:** 467 test functions, 26 benchmarks, 7 fuzz targets
 **Lint:** 0 issues
 **Sub-modules:** 4 optional modules (glamour, prompts, spinner, telemetry)

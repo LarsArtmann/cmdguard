@@ -9,30 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-07-28
+
 ### Changed (breaking)
 
 - **Config loading consolidated to a single KoanfLoader** — the `configload` sub-package (`configload.YAML()`, `configload.TOML()`, `configload.JSON()`, `configload.Auto()`, `configload.LoaderForPath()`, `configload.NewKoanfLoader()`) and the core `jsonLoader`/`NewJSONLoader()` have been deleted. `WithConfigFile(paths...)` now creates a `KoanfLoader` that auto-detects JSON/YAML/TOML by file extension. KoanfLoader lives in the `v3` package (`koanf_loader.go`), uses koanf only as a format parser, converts to JSON, then reuses the shared `loadConfigFromJSON` processing path for case-insensitive nested struct matching. Dependency changes: `go-faster/yaml` and `pelletier/go-toml/v2` demoted from direct to `// indirect` (koanf still pulls them transitively, so the net count did not drop); `koanf/providers/file` eliminated in favor of an in-repo `bytesProvider`; `koanf/parsers/toml` (`v0.1.0`) added, which pulls `pelletier/go-toml v1.9.5` as an indirect dep. **Migration:** Replace `configload.YAML()`/`configload.TOML()`/`configload.Auto()` + `WithConfigFileLoader(loader, paths...)` with just `WithConfigFile(paths...)`. Replace `configload.NewKoanfLoader(paths...)` with `v3.NewKoanfLoader(paths...)`.
 
-### Fixed (post-v3.0.0)
+### Changed
+
+- **go-output upgraded** from v0.31.1 to v0.35.0 (thread-safe format registries, 16 output formats).
+- **samber-do-auditlog upgraded** from v0.7.0 to v0.8.1.
+- Sub-module dependency updates across all 4 sub-modules (glamour, prompts, spinner, telemetry).
+
+## [3.1.0] - 2026-07-25
+
+### Added
+
+- **Audit logging integration** — `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the DI injector via `buildInjectorOpts()`; `cli.AuditLog()`/`cli.AuditLogReport()` for programmatic access; `AuditLogServiceByName`/`AuditLogFailedServices` query helpers; `ExportAuditLog[T]` supports 11 formats (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). No built-in subcommand — consumers export via their own flag/env pattern.
+- **Prompts sub-module** (`github.com/larsartmann/cmdguard/prompts`) — `huh/v2` interactive prompt runner implementing the core `PromptRunner` interface (bool → confirm, enum → select, else → input).
+- **Sub-module releases** tagged at `v0.1.0` for `glamour/v0.1.0`, `prompts/v0.1.0`, `spinner/v0.1.0`, and `telemetry/v0.1.0`.
+- **CLI error handling test coverage** — comprehensive tests for error paths, exit codes, and `ExitCoder`/`NewExitError` contracts.
+
+### Changed
+
+- **CLI options restructured** — command configuration and options handling refactored for cleaner internal wiring.
+- **Audit log integration refreshed** — updated to `samber-do-auditlog v0.7.0` API (`auditlog.ServiceName` removed; `ServiceByName` now takes a plain string).
+- **Migration guide and living docs refreshed** — `docs/MIGRATION_v2_v3.md`, `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, and `ROADMAP.md` updated to reflect the current 4-sub-module workspace and verified metrics.
+- **Internal traversal consolidated** — repeated internal parsing/traversal logic deduplicated.
+
+### Fixed
 
 - **Sub-module external resolution** — the 4 sub-modules were moved from `pkg/cmdguard/<name>/` to the repo root (`<name>/`) so their module paths (`github.com/larsartmann/cmdguard/<name>`) resolve for external consumers. Previously the `replace` directives in the root `go.mod` only worked locally; consumers got "missing go.mod at revision". Each sub-module's `go.mod` now requires the real published `cmdguard/v3 v3.0.0` (not the placeholder).
 - **telemetry sub-module compile error** — `WithTelemetry` returned `v3.CLIOption[T]` (non-existent generic); now returns non-generic `v3.CLIOption`.
 - **prompts sub-module lint violation** — `make([]huh.Option[string], len(options))` replaced with a zero-length append slice to satisfy the `makezero` linter.
 
-### Changed (post-v3.0.0)
-
-- **Audit log integration refreshed** — updated to `samber-do-auditlog v0.5.0` API (`auditlog.ServiceName` removed; `ServiceByName` now takes a plain string).
-- **Migration guide and living docs refreshed** — `docs/MIGRATION_v2_v3.md`, `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, and `ROADMAP.md` updated to reflect the current 4-sub-module workspace and verified metrics.
-- **Nix flake lock refreshed** — `flake.lock` updated and LF line endings enforced.
-- **Internal traversal consolidated** — repeated internal parsing/traversal logic deduplicated.
-
-### Removed (post-v3.0.0)
+### Removed
 
 - **Manpage sub-module** — removed from the workspace (`34a0c6e`). The feature was not worth the maintenance surface for v3; consumers who need man pages can use `muesli/mango-cobra` directly.
-
-### Added (post-v3.0.0)
-
-- Sub-module releases tagged at `v0.1.0` for `glamour/v0.1.0`, `prompts/v0.1.0`, `spinner/v0.1.0`, and `telemetry/v0.1.0`. These are the first independently versioned releases of the extracted modules. (`manpage` was removed before a stable release.)
 
 ## [3.0.0] - 2026-07-07
 
@@ -577,7 +590,9 @@ Stability commitment release.
 - Flag binding with struct tags
 - Full Cobra integration
 
-[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v3.2.0...HEAD
+[3.2.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.2.0
+[3.1.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.1.0
 [3.0.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.0.0
 [2.10.4]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.4
 [2.10.3]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.3
