@@ -382,17 +382,11 @@ func TestCLINoColorEnvVar(t *testing.T) {
 }
 
 func TestCLINoColorRestoresEnvVar(t *testing.T) {
-	//nolint:paralleltest // mutates process-wide env var
 	t.Run("restores NO_COLOR after execution", func(t *testing.T) {
-		origValue, origSet := os.LookupEnv("NO_COLOR")
-		t.Cleanup(func() {
-			if origSet {
-				os.Setenv("NO_COLOR", origValue)
-			} else {
-				os.Unsetenv("NO_COLOR")
-			}
-		})
-
+		// t.Setenv saves/restores the original value; os.Unsetenv then
+		// makes it genuinely unset (not empty string) so the CLI's
+		// LookupEnv-based restore logic is exercised correctly.
+		t.Setenv("NO_COLOR", "")
 		os.Unsetenv("NO_COLOR")
 
 		cli, err := v4.NewCLI("test", "Test", testCLIConfig{},

@@ -67,6 +67,7 @@
                 export GOTMPDIR="$HOME/.cache/go-tmp"
                 mkdir -p "$GOTMPDIR"
               '';
+            };
           };
 
           checks.format = config.treefmt.build.check self;
