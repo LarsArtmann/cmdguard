@@ -5,11 +5,11 @@
 // Usage:
 //
 //	import (
-//	    v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+//	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 //	    "github.com/larsartmann/cmdguard/glamour"
 //	)
 //
-//	cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
+//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
 //	    glamour.WithHelp[T](),
 //	)
 package glamour
@@ -20,15 +20,15 @@ import (
 	glamourlib "charm.land/glamour/v2"
 	"github.com/spf13/cobra"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 // WithHelp enables markdown rendering for command help text.
 // When enabled, the Long and Example fields of all commands are rendered
 // through glamour for styled terminal output. The theme is determined by
 // the GLAMOUR_STYLE environment variable, defaulting to "dark".
-func WithHelp() v3.CLIOption {
-	return v3.WithHelpTransform(func(cmd *cobra.Command) {
+func WithHelp() v4.CLIOption {
+	return v4.WithHelpTransform(func(cmd *cobra.Command) {
 		applyToTree(cmd, "")
 	})
 }
@@ -36,8 +36,8 @@ func WithHelp() v3.CLIOption {
 // WithHelpTheme enables markdown rendering with a specific glamour theme.
 // Supported themes: "ascii", "dark", "dracula", "light", "notty",
 // "pink", "tokyo-night".
-func WithHelpTheme(theme string) v3.CLIOption {
-	return v3.WithHelpTransform(func(cmd *cobra.Command) {
+func WithHelpTheme(theme string) v4.CLIOption {
+	return v4.WithHelpTransform(func(cmd *cobra.Command) {
 		applyToTree(cmd, theme)
 	})
 }

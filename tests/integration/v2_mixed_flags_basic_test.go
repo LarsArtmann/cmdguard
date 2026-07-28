@@ -5,7 +5,7 @@ import (
 	"context"
 	"testing"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 const (
@@ -56,7 +56,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
+	cli, err := v4.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -70,7 +70,7 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 		configFlags  *ConfigFlags
 	)
 
-	greetCmd, err := v3.NewCommand(
+	greetCmd, err := v4.NewCommand(
 		"greet",
 		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
@@ -79,18 +79,18 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Greet someone"),
+		v4.WithShort("Greet someone"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, greetCmd)
+	err = v4.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	mathCmd, err := v3.NewCommand(
+	mathCmd, err := v4.NewCommand(
 		"math",
 		&MathFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
@@ -99,18 +99,18 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Do math"),
+		v4.WithShort("Do math"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, mathCmd)
+	err = v4.AddCommand(cli, mathCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	configCmd, err := v3.NewCommand(
+	configCmd, err := v4.NewCommand(
 		"config",
 		&ConfigFlags{},
 		func(_ context.Context, _ *RootConfig, flags *ConfigFlags) error {
@@ -119,13 +119,13 @@ func TestV2_MixedFlagTypes_BasicCommands(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Manage config"),
+		v4.WithShort("Manage config"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, configCmd)
+	err = v4.AddCommand(cli, configCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -186,7 +186,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
+	cli, err := v4.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -198,7 +198,7 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 		statusFlags   *DBFlags
 	)
 
-	statusSubCmd, err := v3.NewCommand(
+	statusSubCmd, err := v4.NewCommand(
 		"status",
 		&DBFlags{},
 		func(_ context.Context, _ *RootConfig, flags *DBFlags) error {
@@ -207,28 +207,28 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Check database status"),
+		v4.WithShort("Check database status"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	dbCmd, err := v3.NewParentCommand[RootConfig](
+	dbCmd, err := v4.NewParentCommand[RootConfig](
 		"db",
 		"Database management and maintenance commands", &DBFlags{},
-		v3.WithSubcommands(statusSubCmd),
-		v3.WithShort("Database commands"),
+		v4.WithSubcommands(statusSubCmd),
+		v4.WithShort("Database commands"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, dbCmd)
+	err = v4.AddCommand(cli, dbCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	migrateCmd, err := v3.NewCommand(
+	migrateCmd, err := v4.NewCommand(
 		"migrate",
 		&MigrateFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MigrateFlags) error {
@@ -237,13 +237,13 @@ func TestV2_MixedFlagTypes_NestedSubcommands(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Run migrations"),
+		v4.WithShort("Run migrations"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, migrateCmd)
+	err = v4.AddCommand(cli, migrateCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

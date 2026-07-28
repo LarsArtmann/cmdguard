@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 type config struct {
@@ -20,54 +20,54 @@ type deployFlags struct {
 }
 
 func main() {
-	cli, err := v3.NewCLI(
+	cli, err := v4.NewCLI(
 		"docs-generator",
 		"Generate CLI documentation with cmdguard",
 		config{},
-		v3.WithCLIVersion("0.1.0"),
+		v4.WithCLIVersion("0.1.0"),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	deployCmd, err := v3.NewCommand(
+	deployCmd, err := v4.NewCommand(
 		"deploy",
 		deployFlags{},
 		func(_ context.Context, _ *config, flags deployFlags) error {
 			fmt.Printf("Deploying to %s (dry-run: %v)\n", flags.Environment, flags.DryRun)
 			return nil
 		},
-		v3.WithShort("Deploy the application"),
-		v3.WithLong("Deploy the application to a target environment with optional dry-run mode."),
-		v3.WithExample("docs-generator deploy -e staging --dry-run"),
+		v4.WithShort("Deploy the application"),
+		v4.WithLong("Deploy the application to a target environment with optional dry-run mode."),
+		v4.WithExample("docs-generator deploy -e staging --dry-run"),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	statusCmd, err := v3.NewCommand(
+	statusCmd, err := v4.NewCommand(
 		"status",
-		v3.NoFlags{},
-		func(_ context.Context, _ *config, _ v3.NoFlags) error {
+		v4.NoFlags{},
+		func(_ context.Context, _ *config, _ v4.NoFlags) error {
 			fmt.Println("All systems operational")
 			return nil
 		},
-		v3.WithShort("Show deployment status"),
-		v3.WithExample("docs-generator status"),
+		v4.WithShort("Show deployment status"),
+		v4.WithExample("docs-generator status"),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := v3.AddCommand(cli, deployCmd); err != nil {
+	if err := v4.AddCommand(cli, deployCmd); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := v3.AddCommand(cli, statusCmd); err != nil {
+	if err := v4.AddCommand(cli, statusCmd); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}

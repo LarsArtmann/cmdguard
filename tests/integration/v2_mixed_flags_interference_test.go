@@ -5,7 +5,7 @@ import (
 	"context"
 	"testing"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 // assertCommandExecution runs a command multiple times and verifies the execution state.
@@ -13,7 +13,7 @@ func assertCommandExecution[
 	T any,
 ](
 	t *testing.T,
-	cli *v3.CLI[T],
+	cli *v4.CLI[T],
 	args []string,
 	wantExecuted string,
 	assertFlags func(t *testing.T, flags any),
@@ -45,12 +45,12 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
+	cli, err := v4.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmdA, err := v3.NewCommand(
+	cmdA, err := v4.NewCommand(
 		"cmd-a",
 		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, flags *GreetFlags) error {
@@ -59,18 +59,18 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Command A"),
+		v4.WithShort("Command A"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, cmdA)
+	err = v4.AddCommand(cli, cmdA)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmdB, err := v3.NewCommand(
+	cmdB, err := v4.NewCommand(
 		"cmd-b",
 		&MathFlags{},
 		func(_ context.Context, _ *RootConfig, flags *MathFlags) error {
@@ -79,13 +79,13 @@ func TestV2_MixedFlagTypes_NoInterference(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Command B"),
+		v4.WithShort("Command B"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, cmdB)
+	err = v4.AddCommand(cli, cmdB)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -153,33 +153,33 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 
-	cli, err := v3.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
+	cli, err := v4.NewCLI[RootConfig]("testapp", "Test application", RootConfig{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
 	var executed bool
 
-	simpleCmd, err := v3.NewCommand(
+	simpleCmd, err := v4.NewCommand(
 		"simple",
-		v3.NoFlags{},
-		func(_ context.Context, _ *RootConfig, _ v3.NoFlags) error {
+		v4.NoFlags{},
+		func(_ context.Context, _ *RootConfig, _ v4.NoFlags) error {
 			executed = true
 
 			return nil
 		},
-		v3.WithShort("Simple command"),
+		v4.WithShort("Simple command"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, simpleCmd)
+	err = v4.AddCommand(cli, simpleCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	greetCmd, err := v3.NewCommand(
+	greetCmd, err := v4.NewCommand(
 		"greet",
 		&GreetFlags{},
 		func(_ context.Context, _ *RootConfig, _ *GreetFlags) error {
@@ -187,13 +187,13 @@ func TestV2_MixedFlagTypes_WithNoFlags(t *testing.T) {
 
 			return nil
 		},
-		v3.WithShort("Greet command"),
+		v4.WithShort("Greet command"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	err = v3.AddCommand(cli, greetCmd)
+	err = v4.AddCommand(cli, greetCmd)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

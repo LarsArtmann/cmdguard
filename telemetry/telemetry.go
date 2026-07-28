@@ -5,13 +5,13 @@
 // Usage:
 //
 //	import (
-//	    v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+//	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 //	    "github.com/larsartmann/cmdguard/telemetry"
 //	)
 //
 //	tracer := otel.Tracer("myapp")
-//	cli, _ := v3.NewCLI[Config]("app", "My app", Config{},
-//	    v3.WithMiddleware(telemetry.Middleware[Config](tracer)),
+//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+//	    v4.WithMiddleware(telemetry.Middleware[Config](tracer)),
 //	)
 package telemetry
 
@@ -22,7 +22,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
-	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 // Middleware returns a cmdguard middleware that creates an OpenTelemetry span
@@ -31,8 +31,8 @@ import (
 //
 // Each phase (pre-run, run, post-run) gets a uniquely-named span so traces
 // are unambiguous: "deploy pre-run", "deploy run", "deploy post-run".
-func Middleware[T any](tracer trace.Tracer) v3.Middleware[T] {
-	return func(ctx context.Context, _ *T, info v3.CommandInfo, next func() error) error {
+func Middleware[T any](tracer trace.Tracer) v4.Middleware[T] {
+	return func(ctx context.Context, _ *T, info v4.CommandInfo, next func() error) error {
 		if tracer == nil {
 			return next()
 		}
@@ -68,8 +68,8 @@ func Middleware[T any](tracer trace.Tracer) v3.Middleware[T] {
 }
 
 // WithTelemetry is a convenience wrapper that registers telemetry middleware
-// via v3.WithMiddleware. It is generic (to instantiate Middleware[T]) but
+// via v4.WithMiddleware. It is generic (to instantiate Middleware[T]) but
 // returns a non-generic CLIOption, matching the v3 options API.
-func WithTelemetry[T any](tracer trace.Tracer) v3.CLIOption {
-	return v3.WithMiddleware(Middleware[T](tracer))
+func WithTelemetry[T any](tracer trace.Tracer) v4.CLIOption {
+	return v4.WithMiddleware(Middleware[T](tracer))
 }
