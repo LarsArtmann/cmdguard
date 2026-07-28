@@ -4,7 +4,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.26 (GOEXPERIMENT=jsonv2)
-**Status:** v3.2.0+ - zero panics, 87.8% coverage, 0 lint issues, 0 race conditions
+**Status:** v4.0.0+ - zero panics, 87.8% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -43,11 +43,11 @@ nix flake check
 
 | API | Package           | Use Case                         |
 | --- | ----------------- | -------------------------------- |
-| v3  | `pkg/cmdguard/v3` | Type-safe, DI-powered, no panics |
+| v4  | `pkg/cmdguard/v4` | Type-safe, DI-powered, no panics |
 
-**Module path:** `github.com/larsartmann/cmdguard/v3`
+**Module path:** `github.com/larsartmann/cmdguard/v4`
 
-**Current Status:** v3.2.0+. 467 test functions, 26 benchmarks, 7 fuzz targets, 87.8% coverage, 0 build errors, 0 lint issues.
+**Current Status:** v4.0.0+. 467 test functions, 26 benchmarks, 7 fuzz targets, 87.8% coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -138,7 +138,7 @@ cmdguard/
 
 | Package           | Purpose       | Importable? | Coverage |
 | ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v3` | Type-safe API | Yes         | ~87.8%   |
+| `pkg/cmdguard/v4` | Type-safe API | Yes         | ~87.8%   |
 | `pkg/testutil`    | Test helpers  | Yes         | —        |
 
 ---
@@ -180,7 +180,7 @@ Key v2 differences handled:
 
 See [docs/API.md](docs/API.md) for the full API reference (constructors, options, methods, DI, middleware, error handling, version/doctor commands).
 
-Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positionally), `NewParentCommand[T]`, `AddCommand`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) for godoc.
+Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positionally), `NewParentCommand[T]`, `AddCommand`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) for godoc.
 
 ---
 
@@ -191,7 +191,7 @@ Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positional
 - **Go 1.26** - Use modern Go features
 - **gofumpt** formatting (via `golangci-lint fmt`)
 - **Error handling** - Always check errors, wrap with `fmt.Errorf("context: %w", err)`
-- **No panics** in v3 library code
+- **No panics** in v4 library code
 - **Functional options** pattern for configuration
 - **Constructor pattern** - All Command creation via `NewCommand`/`NewParentCommand`, struct fields unexported
 
@@ -201,7 +201,7 @@ Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positional
 - `//nolint:paralleltest` for tests using `t.Setenv` or capturing `os.Stdout`
 - `//nolint:fatcontext` at file level for test files with context in closures
 - Table-driven tests: `tests := []struct{...}` pattern
-- Single internal test package (`v3`, accesses private helpers)
+- Single internal test package (`v4`, accesses private helpers)
 
 ### Test Commands
 
@@ -235,11 +235,11 @@ go build ./...                                   # Verify build
 - `gochecknoglobals` for `globalTypeRegistry`, `globalValidators`, `regexCache` — package-level registries are the COW pattern's foundation (ADR principle #11); injecting them would break the public `RegisterTypeHandler`/`RegisterValidator` API
 - `gochecknoglobals` for `argsKey`/`configKey` in `cli_command.go` — context keys must be package-level (Go convention)
 - `forbidigo` for `example_test.go` — godoc examples must use `fmt.Println`
-- `godox` source-pattern exclusion for `TODO(v4)` — the 3 `TODO(v4):` markers (`type_handler.go:13`, `middleware.go:40`, `prompts/prompts.go:27`) track deferred v4 breaking changes (public API renames from the 2026-07-18 naming review) that cannot ship in v3.x without breaking downstream consumers. They MUST stay `TODO` (not `NOTE`) so `grep TODO` finds them, and they are cross-referenced from `ROADMAP.md` §"Deferred from 2026-07-18 Audit Closure". The exclusion is deliberately narrow (`TODO\(v4\)` only) — bare `TODO` and `TODO(*)` are still flagged. **Do not broaden this pattern to dodge godox on real work items; either fix the work, defer it to ROADMAP, or scope it to `TODO(vN)`.**
+- `godox` source-pattern exclusion for `TODO(v5)` — the 3 `TODO(v5):` markers (`type_handler.go:13`, `middleware.go:40`, `prompts/prompts.go:27`) track deferred v5 breaking changes (public API renames from the 2026-07-18 naming review) that cannot ship in v4.x without breaking downstream consumers. They MUST stay `TODO` (not `NOTE`) so `grep TODO` finds them, and they are cross-referenced from `ROADMAP.md` §"Deferred from 2026-07-18 Audit Closure". The exclusion is deliberately narrow (`TODO\(v5\)` only) — bare `TODO` and `TODO(*)` are still flagged. **Do not broaden this pattern to dodge godox on real work items; either fix the work, defer it to ROADMAP, or scope it to `TODO(vN)`.**
 
-**Exclusion count:** 4 per-file v3 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v4)`). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
+**Exclusion count:** 4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v5)`). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
 
-### v3 Design Principles
+### v4 Design Principles
 
 1. **Single type parameter on CLI only** — `CLI[T]` parameterizes on config. `CLIOption` and `CommandOption` are **non-generic** (`func(*spec)`); per-command flag types flow through `Command[T,F]`.
 2. **Non-generic options** — Metadata options (`WithShort`, `WithLong`, `WithExample`, `WithAuditLog`, `WithConfigFile`, `WithStrictValidation`, `WithPlugin`, …) take **zero** type parameters. Type safety is preserved via generic constructors that _return_ non-generic options: `WithSubcommands[T,F](...)`, `WithPreRunE[T,F](...)`, `WithConfigValidation[T](...)`, `WithPostFlagParse[T](...)`, `WithCleanup[T](...)`. This eliminates the v2 "7 type params per command" explosion.

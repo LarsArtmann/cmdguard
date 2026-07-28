@@ -9,17 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.2.0] - 2026-07-28
+## [4.0.0] - 2026-07-28
 
-### Changed (breaking)
+### Breaking Changes
 
-- **Config loading consolidated to a single KoanfLoader** — the `configload` sub-package (`configload.YAML()`, `configload.TOML()`, `configload.JSON()`, `configload.Auto()`, `configload.LoaderForPath()`, `configload.NewKoanfLoader()`) and the core `jsonLoader`/`NewJSONLoader()` have been deleted. `WithConfigFile(paths...)` now creates a `KoanfLoader` that auto-detects JSON/YAML/TOML by file extension. KoanfLoader lives in the `v3` package (`koanf_loader.go`), uses koanf only as a format parser, converts to JSON, then reuses the shared `loadConfigFromJSON` processing path for case-insensitive nested struct matching. Dependency changes: `go-faster/yaml` and `pelletier/go-toml/v2` demoted from direct to `// indirect` (koanf still pulls them transitively, so the net count did not drop); `koanf/providers/file` eliminated in favor of an in-repo `bytesProvider`; `koanf/parsers/toml` (`v0.1.0`) added, which pulls `pelletier/go-toml v1.9.5` as an indirect dep. **Migration:** Replace `configload.YAML()`/`configload.TOML()`/`configload.Auto()` + `WithConfigFileLoader(loader, paths...)` with just `WithConfigFile(paths...)`. Replace `configload.NewKoanfLoader(paths...)` with `v3.NewKoanfLoader(paths...)`.
+- **Module path changed to `github.com/larsartmann/cmdguard/v4`** — update all import paths from `/v3` to `/v4`. The package directory moved from `pkg/cmdguard/v3/` to `pkg/cmdguard/v4/`. Package name changed from `v3` to `v4`. Update import aliases from `v3` to `v4` (e.g., `v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"`).
+- **Config loading consolidated to a single KoanfLoader** — the `configload` sub-package (`configload.YAML()`, `configload.TOML()`, `configload.JSON()`, `configload.Auto()`, `configload.LoaderForPath()`, `configload.NewKoanfLoader()`) and the core `jsonLoader`/`NewJSONLoader()` have been deleted. `WithConfigFile(paths...)` now creates a `KoanfLoader` that auto-detects JSON/YAML/TOML by file extension. KoanfLoader lives in the `v4` package (`koanf_loader.go`), uses koanf only as a format parser, converts to JSON, then reuses the shared `loadConfigFromJSON` processing path for case-insensitive nested struct matching. Dependency changes: `go-faster/yaml` and `pelletier/go-toml/v2` demoted from direct to `// indirect`; `koanf/providers/file` eliminated in favor of an in-repo `bytesProvider`; `koanf/parsers/toml` (`v0.1.0`) added.
+
+### Migration from v3
+
+1. **Module path**: `github.com/larsartmann/cmdguard/v3` → `github.com/larsartmann/cmdguard/v4`
+2. **Import paths**: `cmdguard/v3/pkg/cmdguard/v3` → `cmdguard/v4/pkg/cmdguard/v4`
+3. **Package alias**: `v3 "..."` → `v4 "..."` and all `v3.Function()` → `v4.Function()`
+4. **Config loading**: Replace `configload.YAML()`/`configload.TOML()`/`configload.Auto()` + `WithConfigFileLoader(loader, paths...)` with just `WithConfigFile(paths...)`. Replace `configload.NewKoanfLoader(paths...)` with `v4.NewKoanfLoader(paths...)`.
 
 ### Changed
 
 - **go-output upgraded** from v0.31.1 to v0.35.0 (thread-safe format registries, 16 output formats).
 - **samber-do-auditlog upgraded** from v0.7.0 to v0.8.1.
 - Sub-module dependency updates across all 4 sub-modules (glamour, prompts, spinner, telemetry).
+- Deferred `TODO(v4)` markers updated to `TODO(v5)` — the naming-review renames (TypeHandler → TypeCodec, CommandInfo → CommandMetadata, PromptRunner → HuhPrompter) are deferred to v5.
 
 ## [3.1.0] - 2026-07-25
 
@@ -590,8 +599,8 @@ Stability commitment release.
 - Flag binding with struct tags
 - Full Cobra integration
 
-[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v3.2.0...HEAD
-[3.2.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.2.0
+[Unreleased]: https://github.com/larsartmann/cmdguard/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/larsartmann/cmdguard/releases/tag/v4.0.0
 [3.1.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.1.0
 [3.0.0]: https://github.com/larsartmann/cmdguard/releases/tag/v3.0.0
 [2.10.4]: https://github.com/larsartmann/cmdguard/releases/tag/v2.10.4

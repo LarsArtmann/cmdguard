@@ -22,7 +22,7 @@
 
 ---
 
-## CLI Core (`pkg/cmdguard/v3`)
+## CLI Core (`pkg/cmdguard/v4`)
 
 ### CLI[T] — Construction & Execution
 
@@ -372,8 +372,8 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v3` (includes KoanfLoader)                                                                       |
-| Test functions              | 467             | 🟢 Good | Across v3 core + sub-modules + examples + benchmarks                                                           |
+| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader)                                                                       |
+| Test functions              | 467             | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                           |
 | Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
 | Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
 | Sub-module tests            | 17 across all 4 | 🟢 Good | All sub-modules have basic test coverage                                                                       |

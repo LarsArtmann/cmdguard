@@ -1,7 +1,7 @@
 # TODO List
 
 **Updated:** 2026-07-27
-**Status:** v3.2.0+ — 0 lint issues, 0 panics, 87.8% coverage
+**Status:** v4.0.0+ — 0 lint issues, 0 panics, 87.8% coverage
 **Tests:** 467 test functions, 26 benchmarks, 7 fuzz targets
 **Lint:** 0 issues
 **Sub-modules:** 4 optional modules (glamour, prompts, spinner, telemetry)
@@ -68,13 +68,13 @@ These were surfaced by the 2026-07-27 config-loading consolidation
 ## Notes
 
 - All metrics above are verified against the current codebase: `go test ./...`
-  reports 467 `func Test` declarations across all modules (v3 core + sub-modules
-  - examples + benchmarks); coverage is 87.8% in `pkg/cmdguard/v3`; lint reports
+  reports 467 `func Test` declarations across all modules (v4 core + sub-modules
+  - examples + benchmarks); coverage is 87.8% in `pkg/cmdguard/v4`; lint reports
     0 issues; all 4 sub-modules build cleanly.
 - `manpage` was removed from the workspace in commit `34a0c6e`; the remaining
   optional sub-modules are glamour, prompts, spinner, and telemetry.
 - The `configload` sub-package was deleted entirely (commit `e3e710c`); config
-  loading is now a single `KoanfLoader` in the `v3` package. See `CHANGELOG.md`
+  loading is now a single `KoanfLoader` in the `v4` package. See `CHANGELOG.md`
   `[Unreleased]`.
 - Long-term / unbounded ideas live in `ROADMAP.md` — they are NOT duplicated
   here. When a ROADMAP idea becomes bounded and short-term, it graduates into
