@@ -393,6 +393,9 @@ linters:
       - path: pkg/cmdguard/v2/cli_auditlog_test.go$
         linters:
           - paralleltest
+      - path: flightrecorder/.*_test\.go$
+        linters:
+          - paralleltest
       - path: pkg/cmdguard/v2/example_test.go$
         linters:
           - forbidigo

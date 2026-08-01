@@ -109,6 +109,7 @@ cmdguard/
 ├── prompts/                      # SUB-MODULE: huh/v2 interactive prompt runner
 ├── spinner/                      # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
 ├── telemetry/                    # SUB-MODULE: OpenTelemetry middleware
+├── flightrecorder/               # SUB-MODULE: Go runtime execution trace flight recorder (stdlib only)
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
@@ -128,7 +129,7 @@ cmdguard/
 ├── ROADMAP.md                    # Long-term direction and raw ideas
 ├── CHANGELOG.md                  # Change history per version
 ├── .golangci.yml                 # Lint configuration
-├── go.work                       # Go workspace (5 modules: core + 4 sub-modules)
+├── go.work                       # Go workspace (6 modules: core + 5 sub-modules)
 ├── flake.nix                     # Nix dev shell, formatter, checks
 ├── flake.lock                    # Nix lock file
 └── README.md                     # User documentation
@@ -136,10 +137,11 @@ cmdguard/
 
 ### Package Guidelines
 
-| Package           | Purpose       | Importable? | Coverage |
-| ----------------- | ------------- | ----------- | -------- |
-| `pkg/cmdguard/v4` | Type-safe API | Yes         | ~87.8%   |
-| `pkg/testutil`    | Test helpers  | Yes         | —        |
+| Package           | Purpose                             | Importable? | Coverage |
+| ----------------- | ----------------------------------- | ----------- | -------- |
+| `pkg/cmdguard/v4` | Type-safe API                       | Yes         | ~87.8%   |
+| `pkg/testutil`    | Test helpers                        | Yes         | —        |
+| `flightrecorder`  | Flight recorder middleware (stdlib) | Yes         | ~91%     |
 
 ---
 
@@ -158,12 +160,13 @@ cmdguard/
 
 Each sub-module is independently importable — core has **zero** dependencies on these libraries.
 
-| Sub-module  | Library                          | Version | Purpose                 |
-| ----------- | -------------------------------- | ------- | ----------------------- |
-| `glamour`   | `charm.land/glamour/v2`          | v2.0.1  | Markdown help rendering |
-| `prompts`   | `charm.land/huh/v2`              | v2.0.3  | Interactive prompts     |
-| `spinner`   | `charm.land/lipgloss/v2`         | v2.0.5  | Terminal spinner        |
-| `telemetry` | `go.opentelemetry.io/otel/trace` | v1.44.0 | OpenTelemetry spans     |
+| Sub-module       | Library                          | Version  | Purpose                         |
+| ---------------- | -------------------------------- | -------- | ------------------------------- |
+| `glamour`        | `charm.land/glamour/v2`          | v2.0.1   | Markdown help rendering         |
+| `prompts`        | `charm.land/huh/v2`              | v2.0.3   | Interactive prompts             |
+| `spinner`        | `charm.land/lipgloss/v2`         | v2.0.5   | Terminal spinner                |
+| `telemetry`      | `go.opentelemetry.io/otel/trace` | v1.44.0  | OpenTelemetry spans             |
+| `flightrecorder` | _(stdlib `runtime/trace`)_       | Go 1.25+ | Execution trace flight recorder |
 
 ### GOEXPERIMENT=jsonv2
 
@@ -237,7 +240,7 @@ go build ./...                                   # Verify build
 - `forbidigo` for `example_test.go` — godoc examples must use `fmt.Println`
 - `godox` source-pattern exclusion for `TODO(v5)` — the 3 `TODO(v5):` markers (`type_handler.go:13`, `middleware.go:40`, `prompts/prompts.go:27`) track deferred v5 breaking changes (public API renames from the 2026-07-18 naming review) that cannot ship in v4.x without breaking downstream consumers. They MUST stay `TODO` (not `NOTE`) so `grep TODO` finds them, and they are cross-referenced from `ROADMAP.md` §"Deferred from 2026-07-18 Audit Closure". The exclusion is deliberately narrow (`TODO\(v5\)` only) — bare `TODO` and `TODO(*)` are still flagged. **Do not broaden this pattern to dodge godox on real work items; either fix the work, defer it to ROADMAP, or scope it to `TODO(vN)`.**
 
-**Exclusion count:** 4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v5)`). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
+**Exclusion count:** 4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v5)`) + 1 `paralleltest` path exclusion for `flightrecorder/.*_test\.go$` (process-wide singleton). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
 
 ### v4 Design Principles
 
@@ -255,12 +258,12 @@ go build ./...                                   # Verify build
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
 14. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
-15. **Modular sub-modules** — 4 optional importable sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`) isolate heavy dependencies; core stays lean (13 direct deps). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
+15. **Modular sub-modules** — 5 optional importable sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`) isolate heavy dependencies; core stays lean (13 direct deps). `flightrecorder` has **zero** external deps (uses Go 1.25+ `runtime/trace`). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
 16. **Audit log integration** — `WithAuditLog(plugin)` wires `samber-do-auditlog` into the DI injector; `cli.AuditLog()`/`cli.AuditLogReport()` for programmatic access; `AuditLogServiceByName`/`AuditLogFailedServices` query helpers; `ExportAuditLog[T]` supports 11 formats (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). No built-in subcommand — consumers export via their own flag/env pattern (e.g. `DO_AUDITLOG_ENABLED` + `AUDIT_LOG_FORMAT`)
 17. **Plugin system** — `Plugin` interface bundles custom type handlers + validators; `RegisterPlugin()` applies globally, `WithPlugin()` / `FlagRegistry.RegisterPlugin()` apply per-instance
 18. **Nested config structs** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path for flattened flag registration
 19. **Docs generation** — `cli.GenerateDocs(w)` writes markdown documentation for the full command tree to any `io.Writer`
-20. **Go workspace** — `go.work` spans 5 modules (core + 4 sub-modules) for unified local builds; `go build ./...` compiles all modules
+20. **Go workspace** — `go.work` spans 6 modules (core + 5 sub-modules) for unified local builds; `go build ./...` compiles all modules
 
 ### Key Gotchas
 
@@ -338,9 +341,9 @@ go build ./...                                   # Verify build
 
 #### Middleware
 
-- **Core middleware chain** — `Middleware[T]` (middleware.go) is the generic chain type. Wire middleware via `WithMiddleware[T](mw...)`. The `spinner` and `telemetry` middleware implementations live in their sub-modules (see below).
+- **Core middleware chain** — `Middleware[T]` (middleware.go) is the generic chain type. Wire middleware via `WithMiddleware[T](mw...)`. The `spinner`, `telemetry`, and `flightrecorder` middleware implementations live in their sub-modules (see below).
 
-#### Sub-Modules (glamour / prompts / spinner / telemetry)
+#### Sub-Modules (glamour / prompts / spinner / telemetry / flightrecorder)
 
 - **Import path** — each is `github.com/larsartmann/cmdguard/<name>`; import only what you need. Core has zero deps on these.
 - **Directory layout is load-bearing** — each sub-module lives at the **repo root** (`<name>/`), NOT under `pkg/cmdguard/`. Go resolves a module path by finding `go.mod` at the matching directory in the repo: `github.com/larsartmann/cmdguard/telemetry` requires `telemetry/go.mod` at the repo root. The root `go.mod` `replace` directives only work locally (in the workspace); they are **ignored by downstream consumers**. Moving a sub-module under `pkg/` breaks external `go get` silently (builds still pass via workspace `replace`).
@@ -348,7 +351,8 @@ go build ./...                                   # Verify build
 - **spinner** — `SpinnerMiddleware[T]` auto-skips when `os.Stderr` is not a terminal; override with `SpinnerConfig{Writer: ...}`.
 - **telemetry** — `TelemetryMiddleware[T]` starts a span per command but cannot propagate the new context to the handler (`next func() error` signature); child spans must use the original context.
 - **prompts** — provides the `huh/v2` implementation of the core `PromptRunner` interface; wire via `SetPromptRunner()`.
-- **Lint** — all 4 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list.
+- **flightrecorder** — wraps Go 1.25+ `runtime/trace.FlightRecorder`. Continuously buffers execution traces in memory; auto-captures `.trace` snapshots when commands are slow (`CaptureOnSlow`+`SlowThreshold`) or error (`CaptureOnError`). Analyze snapshots with `go tool trace snapshot.trace`. Zero external dependencies. Process-wide singleton: at most one flight recorder active at a time (runtime/trace limitation). Recorder uses a `sync.WaitGroup` so `Stop()` waits for in-flight `WriteTo`/`Capture` operations before calling `fr.Stop()`. Tests use `//nolint:paralleltest` (path-excluded in `.golangci.yml`) since the singleton constraint prevents parallel test execution.
+- **Lint** — all 5 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list, `flightrecorder/.*_test\.go$` paralleltest exclusion (process-wide singleton).
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.

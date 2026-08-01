@@ -98,3 +98,5 @@ replace github.com/larsartmann/cmdguard/prompts => ./prompts
 replace github.com/larsartmann/cmdguard/telemetry => ./telemetry
 
 replace github.com/larsartmann/cmdguard/spinner => ./spinner
+
+replace github.com/larsartmann/cmdguard/flightrecorder => ./flightrecorder

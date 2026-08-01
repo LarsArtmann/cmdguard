@@ -188,14 +188,15 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ## Middleware
 
-| Feature                   | Status                  | Notes                                                                                                              |
-| ------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `TimingMiddleware[T]`     | 🟢 FULLY_FUNCTIONAL     | Log command execution duration (`middleware.go:69`)                                                                |
-| `RecoveryMiddleware[T]`   | 🟢 FULLY_FUNCTIONAL     | Recover from panics in handlers (`middleware.go:82`)                                                               |
-| `CommandInfo.FullPath`    | 🟢 FULLY_FUNCTIONAL     | Full command path for middleware context                                                                           |
-| Custom middleware         | 🟡 PARTIALLY_FUNCTIONAL | `next func() error` — context NOT propagated to next (`middleware.go:25`). Blocks timeout/cancellation middleware. |
-| `spinner.Middleware[T]`   | 📦 SUB-MODULE           | Terminal spinner during execution (`spinner/spinner.go`)                                                           |
-| `telemetry.Middleware[T]` | 📦 SUB-MODULE           | OpenTelemetry span per command (`telemetry/telemetry.go`)                                                          |
+| Feature                        | Status                  | Notes                                                                                                              |
+| ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `TimingMiddleware[T]`          | 🟢 FULLY_FUNCTIONAL     | Log command execution duration (`middleware.go:69`)                                                                |
+| `RecoveryMiddleware[T]`        | 🟢 FULLY_FUNCTIONAL     | Recover from panics in handlers (`middleware.go:82`)                                                               |
+| `CommandInfo.FullPath`         | 🟢 FULLY_FUNCTIONAL     | Full command path for middleware context                                                                           |
+| Custom middleware              | 🟡 PARTIALLY_FUNCTIONAL | `next func() error` — context NOT propagated to next (`middleware.go:25`). Blocks timeout/cancellation middleware. |
+| `spinner.Middleware[T]`        | 📦 SUB-MODULE           | Terminal spinner during execution (`spinner/spinner.go`)                                                           |
+| `telemetry.Middleware[T]`      | 📦 SUB-MODULE           | OpenTelemetry span per command (`telemetry/telemetry.go`)                                                          |
+| `flightrecorder.Middleware[T]` | 📦 SUB-MODULE           | Runtime trace snapshots on slow/error (`flightrecorder/middleware.go`)                                             |
 
 ---
 
@@ -325,15 +326,16 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Optional Sub-Modules
 
-All 4 sub-modules are independently importable. Core has **zero** dependencies on these.
-Each compiles cleanly with matching v3 API signatures. All have basic test coverage.
+All 5 sub-modules are independently importable. Core has **zero** dependencies on these.
+Each compiles cleanly with matching v4 API signatures. All have basic test coverage.
 
-| Sub-module  | Key API                                             | Dependency                       | Version | Status           |
-| ----------- | --------------------------------------------------- | -------------------------------- | ------- | ---------------- |
-| `glamour`   | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()` | `charm.land/glamour/v2`          | v2.0.1  | 🟢 📦 SUB-MODULE |
-| `prompts`   | `HuhRunner`, `Register()`                           | `charm.land/huh/v2`              | v2.0.3  | 🟢 📦 SUB-MODULE |
-| `spinner`   | `Middleware[T]()`, `MiddlewareWithConfig[T]()`      | `charm.land/lipgloss/v2`         | v2.0.5  | 🟢 📦 SUB-MODULE |
-| `telemetry` | `Middleware[T]()`, `WithTelemetry[T]()`             | `go.opentelemetry.io/otel/trace` | v1.44.0 | 🟢 📦 SUB-MODULE |
+| Sub-module       | Key API                                             | Dependency                       | Version  | Status           |
+| ---------------- | --------------------------------------------------- | -------------------------------- | -------- | ---------------- |
+| `glamour`        | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()` | `charm.land/glamour/v2`          | v2.0.1   | 🟢 📦 SUB-MODULE |
+| `prompts`        | `HuhRunner`, `Register()`                           | `charm.land/huh/v2`              | v2.0.3   | 🟢 📦 SUB-MODULE |
+| `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`      | `charm.land/lipgloss/v2`         | v2.0.5   | 🟢 📦 SUB-MODULE |
+| `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`             | `go.opentelemetry.io/otel/trace` | v1.44.0  | 🟢 📦 SUB-MODULE |
+| `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`        | _(stdlib `runtime/trace`)_       | Go 1.25+ | 🟢 📦 SUB-MODULE |
 
 ---
 
@@ -373,10 +375,10 @@ Each compiles cleanly with matching v3 API signatures. All have basic test cover
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
 | Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader)                                                                       |
-| Test functions              | 467             | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                           |
-| Benchmarks                  | 26              | 🟢 Good |                                                                                                                |
-| Fuzz targets                | 7               | 🟢 Good | No seed corpus yet                                                                                             |
-| Sub-module tests            | 17 across all 4 | 🟢 Good | All sub-modules have basic test coverage                                                                       |
+| Test functions              | 500             | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                           |
+| Benchmarks                  | 29              | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
+| Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
+| Sub-module tests            | 54 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 33 tests + 4 examples, 94.6% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
 | `pkg/testutil` coverage     | 49.6%           | 🟡 Debt | 372-line public package, 24 test functions                                                                     |
 | `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |

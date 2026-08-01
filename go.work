@@ -2,6 +2,8 @@ go 1.26.5
 
 use .
 
+use ./flightrecorder
+
 use ./glamour
 
 use ./prompts
