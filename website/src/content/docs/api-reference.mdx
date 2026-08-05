@@ -29,6 +29,7 @@ Key methods:
 A typed command with its own flag struct `F`.
 
 ```go
+// skip-validate
 cmd, err := v4.NewCommand(use string, flags F, runE func(ctx, *T, F) error, opts...)
 ```
 

@@ -28,6 +28,7 @@ func(ctx context.Context, cfg *Config, _ v4.NoFlags) error {
 `WithGracefulShutdown()` implies `WithSignalHandling` and additionally triggers DI service shutdown. Services implementing `do.ShutdownerWithError` are shut down in **reverse invocation order**:
 
 ```go
+// skip-validate
 type Database struct{ DSN string }
 
 func (db *Database) Shutdown() error {
