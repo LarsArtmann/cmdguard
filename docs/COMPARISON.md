@@ -117,8 +117,8 @@ type Flags struct {
     Verbose bool  `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
 }
 
-cmd, err := v3.NewCommand("greet", &Flags{}, handler,
-    v3.WithShort("Greet someone"),
+cmd, err := v4.NewCommand("greet", &Flags{}, handler,
+    v4.WithShort("Greet someone"),
 )
 ```
 
