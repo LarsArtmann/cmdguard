@@ -11,5 +11,5 @@ export const siteConfig = {
     name: "LarsArtmann",
     url: "https://larsartmann.com/",
   },
-  pkgGoDev: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3",
+  pkgGoDev: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4",
 } as const;

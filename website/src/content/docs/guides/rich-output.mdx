@@ -13,10 +13,10 @@ import "github.com/larsartmann/go-output"
 headers := []string{"Name", "Status", "Created"}
 rows := [][]string{"api-server", "running", "2026-01-15"}
 
-v3.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
-v3.OutputTable(output.FormatJSON, headers, rows)    // JSON array
-v3.OutputTable(output.FormatCSV, headers, rows)     // CSV
-v3.OutputTable(output.FormatYAML, headers, rows)    // YAML
+v4.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
+v4.OutputTable(output.FormatJSON, headers, rows)    // JSON array
+v4.OutputTable(output.FormatCSV, headers, rows)     // CSV
+v4.OutputTable(output.FormatYAML, headers, rows)    // YAML
 ```
 
 ## All 16 Formats
@@ -40,7 +40,7 @@ cmdguard registers the `--output` flag automatically with help text listing all 
 For non-tabular data:
 
 ```go
-v3.OutputResult(myStruct, output.FormatJSON)
+v4.OutputResult(myStruct, output.FormatJSON)
 ```
 
 ## Shape-Aware Errors

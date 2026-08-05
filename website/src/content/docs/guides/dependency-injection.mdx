@@ -10,12 +10,12 @@ cmdguard integrates [samber/do/v2](https://github.com/samber/do) for dependency 
 ## Register Services
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{})
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{})
 scope := cli.Scope()
 
 // Lazy initialization — service is created on first Invoke
-v3.Provide(scope, func(i do.Injector) (*Database, error) {
-    cfg, _ := v3.Invoke[*AppConfig](scope)
+v4.Provide(scope, func(i do.Injector) (*Database, error) {
+    cfg, _ := v4.Invoke[*AppConfig](scope)
     return &Database{DSN: cfg.DSN}, nil
 })
 ```
@@ -23,9 +23,9 @@ v3.Provide(scope, func(i do.Injector) (*Database, error) {
 ## Invoke in Handlers
 
 ```go
-v3.NewCommand("query", v3.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
-        db, _ := v3.Invoke[*Database](cli.Scope())
+v4.NewCommand("query", v4.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+        db, _ := v4.Invoke[*Database](cli.Scope())
         return db.Query(ctx)
     },
 )
@@ -52,13 +52,13 @@ func (db *Database) Shutdown() error {
 ## Signal Handling
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     // Cancel context on SIGINT/SIGTERM (handlers can check ctx.Done())
-    v3.WithSignalHandling(),
+    v4.WithSignalHandling(),
 
     // Full graceful shutdown: cancels context AND triggers DI shutdown
     // Services implementing do.ShutdownerWithError shut down in reverse order
-    v3.WithGracefulShutdown(),
+    v4.WithGracefulShutdown(),
 )
 ```
 
@@ -70,8 +70,8 @@ Replace services in tests without touching production code:
 
 ```go
 func TestHandler(t *testing.T) {
-    clone := v3.CloneScope(originalScope)
-    v3.OverrideValue(clone, &Database{DSN: "test://mock"})
+    clone := v4.CloneScope(originalScope)
+    v4.OverrideValue(clone, &Database{DSN: "test://mock"})
     // Now Invoke[*Database] returns the mock
 }
 ```
@@ -83,20 +83,20 @@ Pattern: clone -> override -> invoke.
 Create scopes with custom injector options (logging, lifecycle hooks, health check timeouts):
 
 ```go
-scope := v3.NewScopeWithOpts("custom", &do.InjectorOpts{
+scope := v4.NewScopeWithOpts("custom", &do.InjectorOpts{
     Logf: func(format string, args ...any) {
         log.Printf("DI: "+format, args...)
     },
 })
 
-cli, _ := v3.Package(scope, "myapp", "Description", AppConfig{})
+cli, _ := v4.Package(scope, "myapp", "Description", AppConfig{})
 ```
 
 ## DI Logging
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithDILogging(func(format string, args ...any) {
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithDILogging(func(format string, args ...any) {
         log.Printf("DI: "+format, args...)
     }),
 )
@@ -109,13 +109,13 @@ Wire [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) to 
 ```go
 import auditlog "github.com/larsartmann/samber-do-auditlog/v2"
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithAuditLog(auditlog.NewDefaultPlugin()),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithAuditLog(auditlog.NewDefaultPlugin()),
 )
 
 // Access programmatically
 report := cli.AuditLogReport()
-failed := v3.AuditLogFailedServices(cli)
+failed := v4.AuditLogFailedServices(cli)
 ```
 
 Export in 11 formats: HTML, JSON, NDJSON, CSV, TSV, Mermaid, DOT, D2, PlantUML, tree, HTML tree.

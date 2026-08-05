@@ -40,10 +40,10 @@ The project maintains **0 lint issues** via real code fixes, not silencing linte
 
 ## Sub-Modules
 
-Each sub-module (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) has its own `go.mod`. Build and test them individually:
+Each sub-module (`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`) has its own `go.mod`. Build and test them individually:
 
 ```bash
-for m in glamour manpage prompts spinner telemetry; do
+for m in glamour prompts spinner telemetry flightrecorder; do
     (cd $m && go build ./... && go test ./...)
 done
 ```

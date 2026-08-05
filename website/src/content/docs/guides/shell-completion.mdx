@@ -27,11 +27,11 @@ type TaskFlags struct {
     ID string `flag:"id" help:"Task ID"`
 }
 
-cmd, _ := v3.NewCommand("done", &TaskFlags{},
+cmd, _ := v4.NewCommand("done", &TaskFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *TaskFlags) error {
         return markDone(flags.ID)
     },
-    v3.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+    v4.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
         // Query your task store for matching IDs
         tasks := taskStore.Search(toComplete)
         var ids []string
@@ -50,9 +50,9 @@ When the user types `myapp done --id <TAB>`, cmdguard calls your completion func
 Restrict positional arguments to a fixed set:
 
 ```go
-cmd, _ := v3.NewCommand("set", v3.NoFlags{},
+cmd, _ := v4.NewCommand("set", v4.NoFlags{},
     setHandler,
-    v3.WithValidArgs("debug", "info", "warn", "error"),
+    v4.WithValidArgs("debug", "info", "warn", "error"),
 )
 // $ myapp set de<TAB> → debug
 ```
@@ -66,9 +66,9 @@ type LogFlags struct {
     Level string `flag:"level" default:"info" help:"Log level"`
 }
 
-cmd, _ := v3.NewCommand("log", &LogFlags{},
+cmd, _ := v4.NewCommand("log", &LogFlags{},
     logHandler,
-    v3.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+    v4.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
         if cmd.Flags().Lookup("level") != nil && cmd.Flags().Changed("level") {
             return []string{"debug", "info", "warn", "error"}, cobra.ShellCompDirectiveNoFileComp
         }

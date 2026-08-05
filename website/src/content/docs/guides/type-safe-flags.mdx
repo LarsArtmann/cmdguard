@@ -46,8 +46,8 @@ type DeployFlags struct {
     Timeout int    `flag:"timeout" default:"300"     help:"Timeout in seconds"`
 }
 
-greetCmd, _ := v3.NewCommand("greet", &GreetFlags{}, greetHandler)
-deployCmd, _ := v3.NewCommand("deploy", &DeployFlags{}, deployHandler)
+greetCmd, _ := v4.NewCommand("greet", &GreetFlags{}, greetHandler)
+deployCmd, _ := v4.NewCommand("deploy", &DeployFlags{}, deployHandler)
 ```
 
 ## Environment Variables
@@ -61,8 +61,8 @@ type DBFlags struct {
     Password string `flag:"password" env:"DB_PASSWORD"`
 }
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithEnvPrefix("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithEnvPrefix("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT
 )
 ```
 
@@ -101,9 +101,9 @@ cmdguard includes validated types out of the box:
 Register your own types with `RegisterTypeHandler`:
 
 ```go
-v3.RegisterTypeHandler(reflect.TypeFor[MyType](), v3.TypeHandlerFunc{
-    ParseFunc:    func(value string, _ v3.FlagTag) (any, error) { return MyType{Value: value}, nil },
-    DefaultFunc:  func(_ v3.FlagTag) any { return MyType{} },
+v4.RegisterTypeHandler(reflect.TypeFor[MyType](), v4.TypeHandlerFunc{
+    ParseFunc:    func(value string, _ v4.FlagTag) (any, error) { return MyType{Value: value}, nil },
+    DefaultFunc:  func(_ v4.FlagTag) any { return MyType{} },
 })
 ```
 

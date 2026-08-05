@@ -1,5 +1,10 @@
 # Migration Guide: v2 → v3
 
+> **Note:** The current release is **v4.0.0** on the v4 major line. If you're
+> migrating from v3 to v4, see [CHANGELOG.md](../CHANGELOG.md) §[4.0.0] for the
+> breaking changes (module path `/v3` → `/v4`, package directory, config loading
+> consolidation). This guide covers the v2→v3 migration only.
+
 > **TL;DR:** Change every `cmdguard/v2` import to `cmdguard/v3`, drop redundant
 > type parameters from options, pass flags positionally to `NewCommand`, and import
 > the relevant sub-module for spinner/telemetry/glamour/prompts features.

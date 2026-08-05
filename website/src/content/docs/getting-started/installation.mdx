@@ -13,32 +13,32 @@ description: Install cmdguard in your Go project.
 Run this in your project directory:
 
 ```bash
-go get github.com/larsartmann/cmdguard/v3@latest
+go get github.com/larsartmann/cmdguard/v4@latest
 ```
 
 ## Import
 
 ```go
-import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+import "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 ```
 
 For convenience, you can alias the import:
 
 ```go
-import v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+import v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 ```
 
 ## Optional Sub-Modules
 
 cmdguard's core stays lean. Five optional features live in standalone sub-modules so you import only what you need:
 
-| Sub-module    | Import path                                 | Provides                    |
-| ------------- | ------------------------------------------- | --------------------------- |
-| **glamour**   | `github.com/larsartmann/cmdguard/glamour`   | Markdown help rendering     |
-| **manpage**   | `github.com/larsartmann/cmdguard/manpage`   | Man page generation         |
-| **prompts**   | `github.com/larsartmann/cmdguard/prompts`   | Interactive prompts via huh |
-| **spinner**   | `github.com/larsartmann/cmdguard/spinner`   | Terminal spinner middleware |
-| **telemetry** | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry spans         |
+| Sub-module         | Import path                                        | Provides                      |
+| ------------------ | -------------------------------------------------- | ----------------------------- |
+| **glamour**        | `github.com/larsartmann/cmdguard/glamour`           | Markdown help rendering        |
+| **prompts**        | `github.com/larsartmann/cmdguard/prompts`           | Interactive prompts via huh   |
+| **spinner**        | `github.com/larsartmann/cmdguard/spinner`           | Terminal spinner middleware   |
+| **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`         | OpenTelemetry spans           |
+| **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder`    | Runtime trace flight recorder |
 
 ```bash
 go get github.com/larsartmann/cmdguard/glamour
@@ -47,7 +47,7 @@ go get github.com/larsartmann/cmdguard/glamour
 ## Verify Installation
 
 ```bash
-go list -m github.com/larsartmann/cmdguard/v3
+go list -m github.com/larsartmann/cmdguard/v4
 ```
 
 ## Next Steps

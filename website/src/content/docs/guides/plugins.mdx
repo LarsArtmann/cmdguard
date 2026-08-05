@@ -12,8 +12,8 @@ The `Plugin` interface bundles custom type handlers and validators into a single
 ```go
 type Plugin interface {
     PluginName() string
-    RegisterTypeHandlers(r *v3.FlagRegistry)
-    RegisterValidators(r *v3.FlagRegistry)
+    RegisterTypeHandlers(r *v4.FlagRegistry)
+    RegisterValidators(r *v4.FlagRegistry)
 }
 ```
 
@@ -23,11 +23,11 @@ Three scopes, from broadest to narrowest:
 
 ```go
 // 1. Global — affects all CLI instances
-v3.RegisterPlugin(myPlugin)
+v4.RegisterPlugin(myPlugin)
 
 // 2. CLI instance — affects this CLI only
-cli, _ := v3.NewCLI[Config]("app", "...", Config{},
-    v3.WithPlugin(myPlugin),
+cli, _ := v4.NewCLI[Config]("app", "...", Config{},
+    v4.WithPlugin(myPlugin),
 )
 
 // 3. FlagRegistry — most granular
@@ -46,14 +46,14 @@ type DatabasePlugin struct{}
 
 func (p *DatabasePlugin) PluginName() string { return "database-types" }
 
-func (p *DatabasePlugin) RegisterTypeHandlers(r *v3.FlagRegistry) {
-    r.RegisterTypeHandler(reflect.TypeFor[DSN](), v3.TypeHandlerFunc{
+func (p *DatabasePlugin) RegisterTypeHandlers(r *v4.FlagRegistry) {
+    r.RegisterTypeHandler(reflect.TypeFor[DSN](), v4.TypeHandlerFunc{
         ParseFunc:   parseDSN,
-        DefaultFunc: func(_ v3.FlagTag) any { return DSN{} },
+        DefaultFunc: func(_ v4.FlagTag) any { return DSN{} },
     })
 }
 
-func (p *DatabasePlugin) RegisterValidators(r *v3.FlagRegistry) {
+func (p *DatabasePlugin) RegisterValidators(r *v4.FlagRegistry) {
     r.RegisterFlagValidator("dsn-format", validateDSNFormat)
 }
 ```
@@ -64,16 +64,16 @@ func (p *DatabasePlugin) RegisterValidators(r *v3.FlagRegistry) {
 import "example.com/myplugin"
 
 func main() {
-    v3.RegisterPlugin(&myplugin.DatabasePlugin{})
+    v4.RegisterPlugin(&myplugin.DatabasePlugin{})
 
-    cli, _ := v3.NewCLI[Config]("app", "...", Config{})
+    cli, _ := v4.NewCLI[Config]("app", "...", Config{})
 
     // Now DSN type is available as a flag type
-    cmd, _ := v3.NewCommand("connect", &ConnectFlags{
+    cmd, _ := v4.NewCommand("connect", &ConnectFlags{
         Database: myplugin.DSN{},
     }, connectHandler)
 
-    v3.AddCommand(cli, cmd)
+    v4.AddCommand(cli, cmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```

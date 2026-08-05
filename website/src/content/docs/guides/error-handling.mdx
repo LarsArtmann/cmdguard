@@ -8,7 +8,7 @@ description: Zero panics, proper exit codes, and the error-print contract.
 Every function in cmdguard returns errors. No `Must*` panic variants exist. This is enforced by construction — there is no `Run` field, only `RunE`.
 
 ```go
-cli, err := v3.NewCLI[Config]("app", "...", Config{})
+cli, err := v4.NewCLI[Config]("app", "...", Config{})
 if err != nil {
     return err // never panics
 }
@@ -33,7 +33,7 @@ cli.ExecuteAndExit(context.Background())
 ```go
 err := cli.Execute(ctx)
 // ...flush logs / export audit log / teardown...
-os.Exit(v3.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
+os.Exit(v4.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
 ```
 
 ### Pitfall to avoid
@@ -49,11 +49,11 @@ if err := cli.Execute(ctx); err != nil {
 
 ```go
 // Custom exit code
-err := v3.NewExitError(42, errors.New("config missing required field"))
+err := v4.NewExitError(42, errors.New("config missing required field"))
 // ExecuteAndExit will exit with code 42
 
 // Check programmatically
-code := v3.ExitCode(err) // returns 0 for nil, ExitCoder code, or 1
+code := v4.ExitCode(err) // returns 0 for nil, ExitCoder code, or 1
 ```
 
 ## Sentinel Errors
@@ -61,10 +61,10 @@ code := v3.ExitCode(err) // returns 0 for nil, ExitCoder code, or 1
 All errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability:
 
 ```go
-errors.Is(err, v3.ErrInvalidCommand)
-errors.Is(err, v3.ErrMissingHandler)
-errors.Is(err, v3.ErrDuplicateCommand)
-errors.Is(err, v3.ErrConfigValidation)
+errors.Is(err, v4.ErrInvalidCommand)
+errors.Is(err, v4.ErrMissingHandler)
+errors.Is(err, v4.ErrDuplicateCommand)
+errors.Is(err, v4.ErrConfigValidation)
 ```
 
 40+ sentinel errors cover every failure mode.
@@ -72,10 +72,10 @@ errors.Is(err, v3.ErrConfigValidation)
 ## Rich Error Types
 
 ```go
-v3.NewCommandError(name, err)
-v3.NewFlagError(name, err)
-v3.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
-v3.NewExitError(code, err)                           // custom exit code
+v4.NewCommandError(name, err)
+v4.NewFlagError(name, err)
+v4.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
+v4.NewExitError(code, err)                           // custom exit code
 ```
 
 ## Typo Suggestions
@@ -93,9 +93,9 @@ Did you mean: --name?
 Config validation uses `errors.Join` so individual errors are reachable:
 
 ```go
-errs := v3.ValidateConfig(cfg)
+errs := v4.ValidateConfig(cfg)
 for _, err := range errs {
-    if errors.Is(err, v3.ErrConfigValidation) {
+    if errors.Is(err, v4.ErrConfigValidation) {
         // handle
     }
 }

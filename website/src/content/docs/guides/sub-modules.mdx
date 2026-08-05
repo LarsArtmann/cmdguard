@@ -7,13 +7,13 @@ description: Optional features as independently versioned Go modules.
 
 cmdguard's core stays lean (13 direct deps). Five optional features live in standalone Go modules so you import only what you need. Each lives at the repo root for correct external resolution.
 
-| Sub-module    | Import path                                 | Provides                       |
-| ------------- | ------------------------------------------- | ------------------------------ |
-| **glamour**   | `github.com/larsartmann/cmdguard/glamour`   | Markdown help rendering        |
-| **manpage**   | `github.com/larsartmann/cmdguard/manpage`   | Man page generation (roff)     |
-| **prompts**   | `github.com/larsartmann/cmdguard/prompts`   | Interactive prompts via huh/v2 |
-| **spinner**   | `github.com/larsartmann/cmdguard/spinner`   | Terminal spinner middleware    |
-| **telemetry** | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry spans            |
+| Sub-module         | Import path                                        | Provides                       |
+| ------------------ | -------------------------------------------------- | ------------------------------ |
+| **glamour**        | `github.com/larsartmann/cmdguard/glamour`           | Markdown help rendering        |
+| **prompts**        | `github.com/larsartmann/cmdguard/prompts`           | Interactive prompts via huh/v2 |
+| **spinner**        | `github.com/larsartmann/cmdguard/spinner`           | Terminal spinner middleware    |
+| **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`         | OpenTelemetry spans            |
+| **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder`    | Runtime trace flight recorder  |
 
 ## Glamour — Markdown Help
 
@@ -22,24 +22,12 @@ Render command `Long` and `Example` text as styled markdown:
 ```go
 import "github.com/larsartmann/cmdguard/glamour"
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     glamour.WithHelp[AppConfig](),
 )
 ```
 
 Uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`).
-
-## Manpage — Man Page Generation
-
-Generate roff-formatted man pages from your command structure:
-
-```go
-import "github.com/larsartmann/cmdguard/manpage"
-
-manCmd, _ := manpage.GenerateCommand[AppConfig](cli)
-v3.AddCommand(cli, manCmd)
-// $ myapp man
-```
 
 ## Prompts — Interactive Input
 
@@ -49,14 +37,14 @@ Enable interactive prompting for missing required flags:
 import "github.com/larsartmann/cmdguard/prompts"
 
 // Register the huh/v2 prompt runner
-v3.SetPromptRunner(prompts.New())
+v4.SetPromptRunner(prompts.New())
 
 type Flags struct {
     Name string `flag:"name" prompt:"What is your name?"`
 }
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithPromptOnMissing(),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithPromptOnMissing(),
 )
 ```
 
@@ -67,8 +55,8 @@ The prompt type adapts to the flag type: `bool` becomes a confirm prompt, `Enum[
 ```go
 import "github.com/larsartmann/cmdguard/spinner"
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
 )
 ```
 
@@ -77,10 +65,28 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 ```go
 import "github.com/larsartmann/cmdguard/telemetry"
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     telemetry.WithTelemetry[AppConfig](tracer),
 )
 ```
+
+## Flight Recorder — Execution Trace Snapshots
+
+```go
+import "github.com/larsartmann/cmdguard/flightrecorder"
+
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithMiddleware[AppConfig](flightrecorder.Middleware[AppConfig](
+        flightrecorder.WithCaptureOnSlow(5*time.Second),
+        flightrecorder.WithCaptureOnError(),
+    )),
+)
+```
+
+The flight recorder wraps Go 1.25+ `runtime/trace.FlightRecorder`. It continuously
+buffers execution traces in memory and auto-captures snapshots when commands are slow
+or error. Analyze snapshots with `go tool trace snapshot.trace`. Zero external
+dependencies (stdlib only).
 
 ## Directory Layout
 

@@ -3,29 +3,32 @@ title: Changelog
 description: All notable changes to cmdguard.
 ---
 
-For the full changelog, see the [CHANGELOG.md on GitHub](https://github.com/LarsArtmann/cmdguard/blob/main/CHANGELOG.md).
+For the full changelog, see the [CHANGELOG.md on GitHub](https://github.com/larsartmann/cmdguard/blob/main/CHANGELOG.md).
 
-## v3.0.0 — 2026-07-07
+## v4.0.0 — 2026-07-28
 
-### Highlights
+### Breaking Changes
 
-- **Non-generic options** — `CommandOption` and `CLIOption` are non-generic. Type safety flows through generic constructors that return non-generic options. Eliminates the v2 "7 type params per command" explosion.
-- **Zero panics** — all functions return errors; no `Must*` variants
-- **Single type parameter on CLI only** — `CLI[T]` parameterizes on config; per-command flag types flow through `Command[T,F]`
-- **Copy-on-write registries** — shared global type/validator registries with lazy clone on write
-- **Plugin system** — `Plugin` interface bundles custom type handlers + validators
-- **Nested config structs** — `ParseFlagTags` recurses into nested structs
-- **1429 test runs, 87.6% coverage, 0 lint issues**
+- **Module path:** `github.com/larsartmann/cmdguard/v3` → `github.com/larsartmann/cmdguard/v4`
+- **Package directory:** `pkg/cmdguard/v3/` → `pkg/cmdguard/v4/`
+- **Config loading:** `configload` sub-package deleted; `WithConfigFile(paths...)` now auto-detects JSON/YAML/TOML via `KoanfLoader`
+- `NewJSONLoader` deleted
 
-### Sub-Module Releases
+### Changed
 
-Each sub-module released independently at v0.1.0:
-`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`.
+- go-output upgraded v0.31.1 → v0.35.0
+- samber-do-auditlog upgraded v0.7.0 → v0.8.1
+- 500 test functions, 29 benchmarks, 8 fuzz targets, 87.8% coverage, 0 lint issues
+
+### Sub-Modules
+
+5 optional sub-modules (each independently importable):
+`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`.
 
 ### v2 Maintenance
 
-The v2 line continues at `v2.10.4`. See the [v2 to v3 Migration Guide](https://github.com/LarsArtmann/cmdguard/blob/main/docs/MIGRATION_v2_v3.md).
+The v2 line continues at `v2.10.4`. See the [v2 to v3 Migration Guide](https://github.com/larsartmann/cmdguard/blob/main/docs/MIGRATION_v2_v3.md).
 
 ---
 
-For older versions and detailed change lists, see [CHANGELOG.md](https://github.com/LarsArtmann/cmdguard/blob/main/CHANGELOG.md).
+For older versions and detailed change lists, see [CHANGELOG.md](https://github.com/larsartmann/cmdguard/blob/main/CHANGELOG.md).

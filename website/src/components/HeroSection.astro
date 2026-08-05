@@ -22,23 +22,23 @@ const stars = await getGitHubStars();
 const starsText = stars !== null ? `${stars} Stars` : 'Star on GitHub';
 
 const highlightedCode = `<span class="text-text-muted">func</span> <span class="text-accent">main</span>() {
-    cli, _ := v3.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
-        v3.<span class="text-accent">WithGracefulShutdown</span>(), <span class="text-code-comment">// SIGINT → reverse-order shutdown</span>
+    cli, _ := v4.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
+        v4.<span class="text-accent">WithGracefulShutdown</span>(), <span class="text-code-comment">// SIGINT → reverse-order shutdown</span>
     )
 
     <span class="text-code-comment">// Register a service (lazy, lifecycle-managed)</span>
-    v3.<span class="text-accent">Provide</span>(cli.Scope(), <span class="text-text-muted">func</span>(i do.Injector) (*Database, <span class="text-text-muted">error</span>) {
+    v4.<span class="text-accent">Provide</span>(cli.Scope(), <span class="text-text-muted">func</span>(i do.Injector) (*Database, <span class="text-text-muted">error</span>) {
         <span class="text-text-muted">return</span> &Database{DSN: <span class="text-amber">"postgres://..."</span>}, <span class="text-text-muted">nil</span>
     })
 
-    cmd, _ := v3.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v3.NoFlags{},
-        <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) <span class="text-text-muted">error</span> {
-            db, _ := v3.<span class="text-accent">Invoke</span>[*Database](cli.Scope())
+    cmd, _ := v4.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v4.NoFlags{},
+        <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) <span class="text-text-muted">error</span> {
+            db, _ := v4.<span class="text-accent">Invoke</span>[*Database](cli.Scope())
             <span class="text-text-muted">return</span> db.Query(ctx)
         },
-        v3.<span class="text-accent">WithShort</span>(<span class="text-amber">"Query the database"</span>),
+        v4.<span class="text-accent">WithShort</span>(<span class="text-amber">"Query the database"</span>),
     )
-    v3.<span class="text-accent">AddCommand</span>(cli, cmd)
+    v4.<span class="text-accent">AddCommand</span>(cli, cmd)
 
     cli.<span class="text-accent">ExecuteAndExit</span>(context.Background()) <span class="text-code-comment">// zero panics, correct exit code</span>
 }`;
@@ -64,7 +64,7 @@ const highlightedCode = `<span class="text-text-muted">func</span> <span class="
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
       <a href="/getting-started/installation/" data-astro-prefetch class="px-6 py-3 bg-accent text-bg-primary font-semibold rounded-lg text-sm hover:bg-accent-hover transition-colors duration-150 inline-flex items-center gap-2 border-none cursor-pointer">Get Started &rarr;</a>
-      <div class="flex items-center gap-2 py-2.5 px-4 rounded-lg bg-bg-card-solid border border-border font-mono text-sm text-text-primary select-all">$ go get github.com/larsartmann/cmdguard/v3</div>
+      <div class="flex items-center gap-2 py-2.5 px-4 rounded-lg bg-bg-card-solid border border-border font-mono text-sm text-text-primary select-all">$ go get github.com/larsartmann/cmdguard/v4</div>
     </div>
 
     <div class="relative max-w-xl mx-auto">

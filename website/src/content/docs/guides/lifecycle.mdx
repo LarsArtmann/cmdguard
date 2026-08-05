@@ -8,12 +8,12 @@ description: Graceful shutdown, signal handling, WithCleanup hooks, and the Doct
 `WithSignalHandling()` cancels the context on SIGINT/SIGTERM. Handlers can check `ctx.Done()`:
 
 ```go
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithSignalHandling(),
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithSignalHandling(),
 )
 
 // In a handler:
-func(ctx context.Context, cfg *Config, _ v3.NoFlags) error {
+func(ctx context.Context, cfg *Config, _ v4.NoFlags) error {
     select {
     case <-ctx.Done():
         return ctx.Err() // SIGINT received
@@ -34,8 +34,8 @@ func (db *Database) Shutdown() error {
     return db.Close() // called in reverse order on SIGINT/SIGTERM
 }
 
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithGracefulShutdown(),
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithGracefulShutdown(),
 )
 ```
 
@@ -46,8 +46,8 @@ This is the key differentiator: no other Go CLI framework manages service lifecy
 Cobra's `PostRunE` does NOT fire when `RunE` errors. This means resources leak on failure. cmdguard's `WithCleanup` solves this:
 
 ```go
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithCleanup[Config](func(cmd *cobra.Command, cfg *Config, runErr error) error {
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithCleanup[Config](func(cmd *cobra.Command, cfg *Config, runErr error) error {
         // This fires after EVERY command's RunE — success or failure
         // The original runErr is never swallowed
         log.Close() // flush logs
@@ -68,8 +68,8 @@ cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
 The `DoctorCommand` runs health checks on all DI services:
 
 ```go
-doctorCmd, _ := v3.DoctorCommand[Config](cli)
-v3.AddCommand(cli, doctorCmd)
+doctorCmd, _ := v4.DoctorCommand[Config](cli)
+v4.AddCommand(cli, doctorCmd)
 
 // $ myapp doctor
 // ✓ database — ok
@@ -80,8 +80,8 @@ v3.AddCommand(cli, doctorCmd)
 Services implementing `do.HealthcheckerWithContext` are checked automatically. Add custom checks with `WithDoctorCheck`:
 
 ```go
-doctorCmd, _ := v3.DoctorCommand[Config](cli,
-    v3.WithDoctorCheck("external-api", func(ctx context.Context) error {
+doctorCmd, _ := v4.DoctorCommand[Config](cli,
+    v4.WithDoctorCheck("external-api", func(ctx context.Context) error {
         return pingExternalAPI(ctx)
     }),
 )
@@ -90,11 +90,11 @@ doctorCmd, _ := v3.DoctorCommand[Config](cli,
 ## Version Command
 
 ```go
-cli, _ := v3.NewCLI[Config]("myapp", "My app", Config{},
-    v3.WithCLIVersion("1.0.0"),
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithCLIVersion("1.0.0"),
 )
-versionCmd, _ := v3.VersionCommand[Config](cli)
-v3.AddCommand(cli, versionCmd)
+versionCmd, _ := v4.VersionCommand[Config](cli)
+v4.AddCommand(cli, versionCmd)
 // $ myapp version
 // 1.0.0
 ```

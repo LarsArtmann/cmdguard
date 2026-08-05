@@ -14,8 +14,8 @@ Config values become the new tag defaults after loading, so flags and env vars s
 Run validation after parsing but before any command handler:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithConfigValidation[AppConfig](func(cfg *AppConfig) error {
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithConfigValidation[AppConfig](func(cfg *AppConfig) error {
         if cfg.Port < 1 || cfg.Port > 65535 {
             return fmt.Errorf("port out of range: %d", cfg.Port)
         }

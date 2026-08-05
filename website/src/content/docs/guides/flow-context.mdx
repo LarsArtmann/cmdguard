@@ -11,7 +11,7 @@ description: Track command execution path and share values across the command hi
 
 ```go
 func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-    bfc, ok := v3.GetBranchingFlowContext(ctx)
+    bfc, ok := v4.GetBranchingFlowContext(ctx)
     if !ok {
         return nil // not available (e.g., in unit tests)
     }
@@ -29,15 +29,15 @@ The flow context is automatically created on `Execute` — no setup required.
 
 ```go
 // In a parent command:
-func parentHandler(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
-    bfc, _ := v3.GetBranchingFlowContext(ctx)
+func parentHandler(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) error {
+    bfc, _ := v4.GetBranchingFlowContext(ctx)
     bfc.SetValue("requestID", generateRequestID())
     return nil
 }
 
 // In a child command:
-func childHandler(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
-    bfc, _ := v3.GetBranchingFlowContext(ctx)
+func childHandler(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) error {
+    bfc, _ := v4.GetBranchingFlowContext(ctx)
     requestID, ok := bfc.GetValue("requestID")
     if ok {
         log.SetRequestID(requestID.(string))
@@ -51,7 +51,7 @@ func childHandler(ctx context.Context, cfg *AppConfig, _ v3.NoFlags) error {
 ## Path Tracking
 
 ```go
-bfc, _ := v3.GetBranchingFlowContext(ctx)
+bfc, _ := v4.GetBranchingFlowContext(ctx)
 
 // For "myapp database migrate"
 bfc.PathString()           // "myapp.database.migrate"

@@ -8,8 +8,8 @@ description: Wrap all command handlers with cross-cutting concerns.
 cmdguard provides a generic `Middleware[T]` type for wrapping command handlers. Wire middleware via `WithMiddleware`:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithMiddleware[AppConfig](myMiddleware),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithMiddleware[AppConfig](myMiddleware),
 )
 ```
 
@@ -22,7 +22,7 @@ cmdguard ships with reference implementations. The spinner and telemetry middlew
 Measure execution time for every command:
 
 ```go
-func TimingMiddleware[T any]() v3.Middleware[T] {
+func TimingMiddleware[T any]() v4.Middleware[T] {
     return func(cmd string, next func() error) func() error {
         return func() error {
             start := time.Now()
@@ -39,7 +39,7 @@ func TimingMiddleware[T any]() v3.Middleware[T] {
 Catch panics from handlers (though cmdguard itself never panics):
 
 ```go
-func RecoveryMiddleware[T any]() v3.Middleware[T] {
+func RecoveryMiddleware[T any]() v4.Middleware[T] {
     return func(cmd string, next func() error) func() error {
         return func() (err error) {
             defer func() {
@@ -58,8 +58,8 @@ func RecoveryMiddleware[T any]() v3.Middleware[T] {
 ```go
 import "github.com/larsartmann/cmdguard/spinner"
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v3.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v4.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
 )
 ```
 
@@ -70,7 +70,7 @@ Auto-skips when stderr is not a terminal. Override with `SpinnerConfig{Writer: .
 ```go
 import "github.com/larsartmann/cmdguard/telemetry"
 
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     telemetry.WithTelemetry[AppConfig](tracer),
 )
 ```

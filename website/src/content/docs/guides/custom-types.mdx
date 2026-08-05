@@ -22,10 +22,10 @@ Use them directly as flag types:
 
 ```go
 type ServerFlags struct {
-    Port     v3.Port     `flag:"port"     default:"8080"   help:"Listen port"`
-    Log      v3.LogLevel `flag:"log"      default:"info"   help:"Log level"`
-    URL      v3.URL      `flag:"url"      required:"true"  help:"API endpoint"`
-    Mode     v3.Enum     `flag:"mode" default:"dev" enum:"dev,prod" help:"Run mode"`
+    Port     v4.Port     `flag:"port"     default:"8080"   help:"Listen port"`
+    Log      v4.LogLevel `flag:"log"      default:"info"   help:"Log level"`
+    URL      v4.URL      `flag:"url"      required:"true"  help:"API endpoint"`
+    Mode     v4.Enum     `flag:"mode" default:"dev" enum:"dev,prod" help:"Run mode"`
 }
 ```
 
@@ -36,11 +36,11 @@ Invalid values are caught at parse time with descriptive errors — no runtime p
 Add your own types with `RegisterTypeHandler`:
 
 ```go
-v3.RegisterTypeHandler(reflect.TypeFor[MyType](), v3.TypeHandlerFunc{
-    ParseFunc: func(value string, _ v3.FlagTag) (any, error) {
+v4.RegisterTypeHandler(reflect.TypeFor[MyType](), v4.TypeHandlerFunc{
+    ParseFunc: func(value string, _ v4.FlagTag) (any, error) {
         return MyType{Value: value}, nil
     },
-    DefaultFunc: func(_ v3.FlagTag) any {
+    DefaultFunc: func(_ v4.FlagTag) any {
         return MyType{}
     },
 })
@@ -55,7 +55,7 @@ Package-level `RegisterTypeHandler` writes to the global registry (visible to al
 
 ```go
 // Global — affects all CLI instances that haven't cloned yet
-v3.RegisterTypeHandler(reflect.TypeFor[MyType](), handler)
+v4.RegisterTypeHandler(reflect.TypeFor[MyType](), handler)
 
 // Instance-local — triggers a lazy clone, writes only to this CLI's registry
 fr := cli.FlagRegistry()
@@ -69,7 +69,7 @@ This copy-on-write pattern keeps `NewCLI` fast (~48% reduction) while allowing p
 Register validation functions that run on every flag value:
 
 ```go
-v3.RegisterValidator("alphanumeric", func(value string) error {
+v4.RegisterValidator("alphanumeric", func(value string) error {
     matched, _ := regexp.MatchString(`^[a-zA-Z0-9]+$`, value)
     if !matched {
         return fmt.Errorf("must be alphanumeric")

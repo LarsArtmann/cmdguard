@@ -10,7 +10,7 @@ description: Overview of the cmdguard public API.
 The root CLI instance. `T` is your config struct type.
 
 ```go
-cli, err := v3.NewCLI[T](name, description, defaultValue{}, options...)
+cli, err := v4.NewCLI[T](name, description, defaultValue{}, options...)
 ```
 
 Key methods:
@@ -29,7 +29,7 @@ Key methods:
 A typed command with its own flag struct `F`.
 
 ```go
-cmd, err := v3.NewCommand(use string, flags F, runE func(ctx, *T, F) error, opts...)
+cmd, err := v4.NewCommand(use string, flags F, runE func(ctx, *T, F) error, opts...)
 ```
 
 ### Scope
@@ -80,4 +80,4 @@ Wraps `samber/do/v2` injector for dependency injection.
 
 ## Full API
 
-See the complete API on [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3).
+See the complete API on [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4).

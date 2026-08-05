@@ -35,7 +35,7 @@ rootCmd.Flags().StringVarP(&name, "name", "n", "World", "Name to greet")
 type GreetFlags struct {
     Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
 }
-greetCmd, _ := v3.NewCommand("greet", &GreetFlags{},
+greetCmd, _ := v4.NewCommand("greet", &GreetFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         fmt.Printf("Hello, %s!\n", flags.Name)
         return nil
@@ -48,13 +48,13 @@ greetCmd, _ := v3.NewCommand("greet", &GreetFlags{},
 cmdguard provides an escape hatch so you can migrate one command at a time:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "...", AppConfig{})
+cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{})
 
 // Keep existing raw cobra commands
 cli.RootCommand().AddCommand(myLegacyCmd)
 
 // Add cmdguard-managed commands
-v3.AddCommand(cli, newTypedCmd)
+v4.AddCommand(cli, newTypedCmd)
 ```
 
 ### Strategy 3: Hybrid (escape hatch APIs)
@@ -64,14 +64,14 @@ Use cmdguard's runtime with raw cobra commands:
 ```go
 // Access resolved config from any cobra command
 func(cmd *cobra.Command, _ []string) error {
-    cfg, ok := v3.ConfigFromContext[AppConfig](cmd.Context())
+    cfg, ok := v4.ConfigFromContext[AppConfig](cmd.Context())
     if !ok { return errors.New("config not initialized") }
     // use cfg...
 }
 
 // Run initialization after flag parsing
-cli, _ := v3.NewCLI[AppConfig]("app", "...", AppConfig{},
-    v3.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
+cli, _ := v4.NewCLI[AppConfig]("app", "...", AppConfig{},
+    v4.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
         return initDI(cfg)
     }),
 )
