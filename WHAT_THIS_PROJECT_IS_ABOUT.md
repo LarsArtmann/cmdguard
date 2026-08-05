@@ -8,9 +8,9 @@ cmdguard is a Go library that wraps the [Cobra](https://github.com/spf13/cobra) 
 
 cmdguard ensures CLI commands are valid at construction time rather than failing silently at runtime. It provides a single API:
 
-| API                  | Use Case                                  |
-| -------------------- | ----------------------------------------- |
-| **v4** (current)     | Type-safe, DI-powered, no panics          |
+| API              | Use Case                         |
+| ---------------- | -------------------------------- |
+| **v4** (current) | Type-safe, DI-powered, no panics |
 
 **Module path:** `github.com/larsartmann/cmdguard/v4`
 

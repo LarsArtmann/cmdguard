@@ -14,42 +14,42 @@
 
 Every user-facing and contributor-facing document now references the v4 API correctly. The project had shipped v4.0.0 (module path `/v4`, package directory `pkg/cmdguard/v4/`, package name `v4`) but every doc still used the v3 API.
 
-| File | What was fixed |
-|------|----------------|
-| `AGENTS.md` | Project structure tree showed `v3/` directory; fixed to `v4/`. Added missing `middleware.go` to file listing. Fixed `WithFlags` reference in command_options.go description. |
-| `WHAT_THIS_PROJECT_IS_ABOUT.md` | Full rewrite — referenced v1/v2 API, wrong API table, stale code examples. Now uses v4 API throughout. |
-| `WHAT_THIS_PROJECT_IS_NOT.md` | Full rewrite — referenced v3 API, v1 panic model, stale `pkg.go.dev/v3` links. Now uses v4 API. |
-| `docs/QUICKSTART.md` | Full rewrite — used v3 API throughout (generic options `WithShort[T,F]`, `WithFlags[T,F]`, `NewCommand[T,F]`). Now uses v4 API (non-generic options, positional flags). |
-| `docs/TUTORIAL.md` | Full rewrite — same v3 API staleness + dead `examples/kitchen-sink/` reference. Now uses v4 API + correct `examples/taskctl/` reference. |
-| `docs/MIGRATION_FROM_COBRA.md` | 7 code blocks fixed — v3 API patterns (`NewCommand[T,F]`, `WithShort[T,F]`, `WithFlags[T,F]`, `NewParentCommand[T,F]` with slice arg). Now uses v4 API (positional flags, `WithSubcommands`, non-generic options). **Uncommitted.** |
-| `docs/COMPARISON.md` | `v3.` references in cmdguard code example. Fixed to `v4.`. |
-| `docs/PERFORMANCE.md` | `pkg/cmdguard/v3/` file paths. Fixed to `pkg/cmdguard/v4/`. |
-| `docs/MIGRATION_v2_v3.md` | Added v4 migration note at top pointing to CHANGELOG §[4.0.0]. (This doc is intentionally v2→v3 — it's historical.) |
-| `pkg/cmdguard/v4/doc.go` | `v3` import alias in godoc example + "All v2 constructors return errors" text. Fixed to `v4` alias + "All constructors". |
-| `README.md` | Only referenced v2→v3 migration guide. Added v3→v4 CHANGELOG reference. |
-| `CHANGELOG.md` | Rebuilt from scratch — was a template with only "0.1.0 - Initial release". Now contains full version history (v0.1.0 through v4.0.0 + Unreleased) derived from git tags and tag messages. |
+| File                            | What was fixed                                                                                                                                                                                                                      |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AGENTS.md`                     | Project structure tree showed `v3/` directory; fixed to `v4/`. Added missing `middleware.go` to file listing. Fixed `WithFlags` reference in command_options.go description.                                                        |
+| `WHAT_THIS_PROJECT_IS_ABOUT.md` | Full rewrite — referenced v1/v2 API, wrong API table, stale code examples. Now uses v4 API throughout.                                                                                                                              |
+| `WHAT_THIS_PROJECT_IS_NOT.md`   | Full rewrite — referenced v3 API, v1 panic model, stale `pkg.go.dev/v3` links. Now uses v4 API.                                                                                                                                     |
+| `docs/QUICKSTART.md`            | Full rewrite — used v3 API throughout (generic options `WithShort[T,F]`, `WithFlags[T,F]`, `NewCommand[T,F]`). Now uses v4 API (non-generic options, positional flags).                                                             |
+| `docs/TUTORIAL.md`              | Full rewrite — same v3 API staleness + dead `examples/kitchen-sink/` reference. Now uses v4 API + correct `examples/taskctl/` reference.                                                                                            |
+| `docs/MIGRATION_FROM_COBRA.md`  | 7 code blocks fixed — v3 API patterns (`NewCommand[T,F]`, `WithShort[T,F]`, `WithFlags[T,F]`, `NewParentCommand[T,F]` with slice arg). Now uses v4 API (positional flags, `WithSubcommands`, non-generic options). **Uncommitted.** |
+| `docs/COMPARISON.md`            | `v3.` references in cmdguard code example. Fixed to `v4.`.                                                                                                                                                                          |
+| `docs/PERFORMANCE.md`           | `pkg/cmdguard/v3/` file paths. Fixed to `pkg/cmdguard/v4/`.                                                                                                                                                                         |
+| `docs/MIGRATION_v2_v3.md`       | Added v4 migration note at top pointing to CHANGELOG §[4.0.0]. (This doc is intentionally v2→v3 — it's historical.)                                                                                                                 |
+| `pkg/cmdguard/v4/doc.go`        | `v3` import alias in godoc example + "All v2 constructors return errors" text. Fixed to `v4` alias + "All constructors".                                                                                                            |
+| `README.md`                     | Only referenced v2→v3 migration guide. Added v3→v4 CHANGELOG reference.                                                                                                                                                             |
+| `CHANGELOG.md`                  | Rebuilt from scratch — was a template with only "0.1.0 - Initial release". Now contains full version history (v0.1.0 through v4.0.0 + Unreleased) derived from git tags and tag messages.                                           |
 
 ### A2. Website v3→v4 fix — 23 files changed
 
-| File | What was fixed |
-|------|----------------|
-| `website/src/components/HeroSection.astro` | `v3.` code refs + `cmdguard/v3` go get command |
-| `website/src/data/config.ts` | `pkg.go.dev/v3` URL |
-| `website/src/data/hero-code.ts` | `cmdguard/v3` import path + `v3.` code refs |
-| `website/src/content/docs/changelog.mdx` | Wrong date (2026-07-07), described v3.0.0 features as v4.0.0, listed removed `manpage` sub-module, stale stats. Full rewrite with correct v4.0.0 info. |
-| `website/src/content/docs/contributing.mdx` | `manpage` in sub-module list + build loop. Replaced with `flightrecorder`. |
-| `website/src/content/docs/getting-started/installation.mdx` | `cmdguard/v3` go get + import paths + `manpage` in sub-module table. Fixed to v4 + added `flightrecorder`. |
-| `website/src/content/docs/getting-started/quick-start.mdx` | `cmdguard/v3` import + `v3.` code refs throughout. Fixed to v4. |
-| `website/src/content/docs/api-reference.mdx` | `v3.` code refs + `pkg.go.dev/v3` link. Fixed to v4. |
-| `website/src/content/docs/guides/*.mdx` (14 files) | All used `v3.` code references. Systematic `v3`→`v4` replacement via sed. |
-| `website/src/content/docs/guides/sub-modules.mdx` | Full rewrite — removed `manpage` section, added `flightrecorder` section, updated sub-module table. |
+| File                                                        | What was fixed                                                                                                                                         |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `website/src/components/HeroSection.astro`                  | `v3.` code refs + `cmdguard/v3` go get command                                                                                                         |
+| `website/src/data/config.ts`                                | `pkg.go.dev/v3` URL                                                                                                                                    |
+| `website/src/data/hero-code.ts`                             | `cmdguard/v3` import path + `v3.` code refs                                                                                                            |
+| `website/src/content/docs/changelog.mdx`                    | Wrong date (2026-07-07), described v3.0.0 features as v4.0.0, listed removed `manpage` sub-module, stale stats. Full rewrite with correct v4.0.0 info. |
+| `website/src/content/docs/contributing.mdx`                 | `manpage` in sub-module list + build loop. Replaced with `flightrecorder`.                                                                             |
+| `website/src/content/docs/getting-started/installation.mdx` | `cmdguard/v3` go get + import paths + `manpage` in sub-module table. Fixed to v4 + added `flightrecorder`.                                             |
+| `website/src/content/docs/getting-started/quick-start.mdx`  | `cmdguard/v3` import + `v3.` code refs throughout. Fixed to v4.                                                                                        |
+| `website/src/content/docs/api-reference.mdx`                | `v3.` code refs + `pkg.go.dev/v3` link. Fixed to v4.                                                                                                   |
+| `website/src/content/docs/guides/*.mdx` (14 files)          | All used `v3.` code references. Systematic `v3`→`v4` replacement via sed.                                                                              |
+| `website/src/content/docs/guides/sub-modules.mdx`           | Full rewrite — removed `manpage` section, added `flightrecorder` section, updated sub-module table.                                                    |
 
 ### A3. Missing living docs created
 
-| File | What was created |
-|------|-----------------|
-| `TODO_LIST.md` | **Was referenced in AGENTS.md but didn't exist.** Created with 11 actionable items: 3 v5 breaking changes (TODO(v5) markers), 5 partially-functional items, 1 planned feature, 2 technical debt items. |
-| `ROADMAP.md` | **Was referenced in AGENTS.md but didn't exist.** Created with: v5 major release direction, architectural directions (middleware context propagation, command-level audit, internal package split), "Deferred from 2026-07-18 Audit Closure" section (12 items with rationale — as referenced by AGENTS.md), and raw ideas. |
+| File           | What was created                                                                                                                                                                                                                                                                                                            |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TODO_LIST.md` | **Was referenced in AGENTS.md but didn't exist.** Created with 11 actionable items: 3 v5 breaking changes (TODO(v5) markers), 5 partially-functional items, 1 planned feature, 2 technical debt items.                                                                                                                      |
+| `ROADMAP.md`   | **Was referenced in AGENTS.md but didn't exist.** Created with: v5 major release direction, architectural directions (middleware context propagation, command-level audit, internal package split), "Deferred from 2026-07-18 Audit Closure" section (12 items with rationale — as referenced by AGENTS.md), and raw ideas. |
 
 ### A4. Verification — all green
 
@@ -119,6 +119,7 @@ The file paths were fixed from `v3/` to `v4/`, but the benchmark numbers themsel
 ### D1. The `sed` blanket replacement on website files
 
 I used `sed -i 's|cmdguard/v3|cmdguard/v4|g; s|\bv3\.|v4.|g; s|v3 "github|v4 "github|g'` across all website source files. This was a blunt instrument that:
+
 - **Could have corrupted** the `Icon.astro` SVG paths (they contain `v3` in path data — but only in `M12 0c-6.626...` which doesn't match `v3.` or `cmdguard/v3`, so it was safe).
 - **Did not distinguish** between `v3` as a package alias and `v3` as part of a word in prose.
 - **Was efficient** (23 files in one command) but **risky** — I should have verified each file individually after the sed, not just grepped for remaining `v3.` patterns.
@@ -181,58 +182,58 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 
 ## F) Up to 50 things we should get done next
 
-| # | Task | Priority | Effort |
-|---|------|----------|--------|
-| 1 | Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes | P0 | 1min |
-| 2 | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) | P0 | 5min |
-| 3 | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" | P0 | 2min |
-| 4 | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide | P1 | 30min |
-| 5 | Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3 | P1 | 5min |
-| 6 | Fix CHANGELOG.md v3.0.0 section — note manpage later removed | P1 | 5min |
-| 7 | Audit `.github/workflows/` for stale `cmdguard/v3` references | P1 | 15min |
-| 8 | Run website build verification (`npm run build` in `website/`) | P1 | 10min |
-| 9 | Run `nix flake check` to verify format | P1 | 5min |
-| 10 | Full audit of website guide prose against v4 API (14 .mdx files) | P2 | 60min |
-| 11 | Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0 | P2 | 30min |
-| 12 | Audit `docs/COMPARISON.md` feature matrix for v4 accuracy | P2 | 20min |
-| 13 | Cross-check ROADMAP.md "Deferred" items against current codebase | P2 | 20min |
-| 14 | Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API | P2 | 15min |
-| 15 | Add CI check for referenced-files existence (AGENTS.md → TODO_LIST, ROADMAP, etc.) | P3 | 30min |
-| 16 | Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove | P3 | 30min |
-| 17 | Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove | P3 | 30min |
-| 18 | Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify | P3 | 5min |
-| 19 | Add `flightrecorder` to `docs/PERFORMANCE.md` benchmark section | P3 | 15min |
-| 20 | Audit `docs/architecture.d2` and `architecture.svg` for v4 accuracy | P3 | 20min |
-| 21 | Update `docs/architecture-understanding/` diagrams for v4 module layout | P3 | 30min |
-| 22 | Verify `examples/taskctl/` code examples match v4 API (they import v4, but check patterns) | P2 | 20min |
-| 23 | Run `golangci-lint run ./...` on each sub-module independently | P2 | 15min |
-| 24 | Add `docs/MIGRATION_v3_v4.md` link to README.md alongside v2→v3 link | P1 | 2min |
-| 25 | Update `docs/CLI_DESIGN_PRINCIPLES.md` if it references v3 patterns | P3 | 10min |
-| 26 | Verify `library-policy.yaml` references are still accurate for v4 | P3 | 10min |
-| 27 | Check `git-town.toml` main branch setting (`master` vs `main`) | P3 | 2min |
-| 28 | Add flightrecorder to `docs/QUICKSTART.md` sub-modules section | P3 | 10min |
-| 29 | Verify `FEATURES.md` sub-module table includes flightrecorder | P2 | 5min |
-| 30 | Check if `docs/QUICKSTART.md` "12 output formats" → should be "16" | P3 | 2min |
-| 31 | Audit `docs/TUTORIAL.md` "Complete Example" section references | P3 | 5min |
-| 32 | Verify website `related-tools.mdx` for v4 accuracy | P3 | 10min |
-| 33 | Check `AUTHORS` file for accuracy | P3 | 2min |
-| 34 | Verify `SECURITY.md` version table includes v4 | P2 | 5min |
-| 35 | Add v4.0.0 GitHub release notes (if not already done) | P2 | 15min |
-| 36 | Verify `pkg.go.dev` badge URL in README points to v4 (it does, but verify) | P3 | 2min |
-| 37 | Run `go mod tidy` on all modules to verify go.sum consistency | P2 | 10min |
-| 38 | Check if `go.work` local replace directives need updating for external consumers | P3 | 10min |
-| 39 | Verify `flightrecorder/go.mod` module path is correct | P2 | 2min |
-| 40 | Add `flightrecorder` to `docs/guides/sub-modules.mdx` directory layout note | P3 | 2min |
-| 41 | Audit website `config.ts` for any other stale references beyond pkgGoDev URL | P3 | 10min |
-| 42 | Check if `docs/feedback/` files need v4 updates | P3 | 5min |
-| 43 | Verify `examples/docs-generator/` uses v4 API correctly | P3 | 10min |
-| 44 | Check if `benchmarks/` code uses v4 API correctly | P3 | 5min |
-| 45 | Add a "Documentation Verification" section to CONTRIBUTING.md | P3 | 15min |
-| 46 | Consider adding `docs/MIGRATION_v3_v4.md` to website sidebar | P3 | 10min |
-| 47 | Verify all `//nolint:godox` TODO(v5) markers still have ROADMAP.md cross-references | P3 | 10min |
-| 48 | Check if `docs/proposals/` files need v4 updates | P3 | 5min |
-| 49 | Run `go test ./... -cover` and update coverage badge if changed | P3 | 10min |
-| 50 | Consider whether `docs/MIGRATION_v2_v3.md` should be moved to `docs/archive/` | P3 | 5min |
+| #   | Task                                                                                       | Priority | Effort |
+| --- | ------------------------------------------------------------------------------------------ | -------- | ------ |
+| 1   | Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes                              | P0       | 1min   |
+| 2   | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references)                                         | P0       | 5min   |
+| 3   | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4"                                          | P0       | 2min   |
+| 4   | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide                         | P1       | 30min  |
+| 5   | Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3                                 | P1       | 5min   |
+| 6   | Fix CHANGELOG.md v3.0.0 section — note manpage later removed                               | P1       | 5min   |
+| 7   | Audit `.github/workflows/` for stale `cmdguard/v3` references                              | P1       | 15min  |
+| 8   | Run website build verification (`npm run build` in `website/`)                             | P1       | 10min  |
+| 9   | Run `nix flake check` to verify format                                                     | P1       | 5min   |
+| 10  | Full audit of website guide prose against v4 API (14 .mdx files)                           | P2       | 60min  |
+| 11  | Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0                                 | P2       | 30min  |
+| 12  | Audit `docs/COMPARISON.md` feature matrix for v4 accuracy                                  | P2       | 20min  |
+| 13  | Cross-check ROADMAP.md "Deferred" items against current codebase                           | P2       | 20min  |
+| 14  | Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API                                  | P2       | 15min  |
+| 15  | Add CI check for referenced-files existence (AGENTS.md → TODO_LIST, ROADMAP, etc.)         | P3       | 30min  |
+| 16  | Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove                          | P3       | 30min  |
+| 17  | Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove                      | P3       | 30min  |
+| 18  | Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify                     | P3       | 5min   |
+| 19  | Add `flightrecorder` to `docs/PERFORMANCE.md` benchmark section                            | P3       | 15min  |
+| 20  | Audit `docs/architecture.d2` and `architecture.svg` for v4 accuracy                        | P3       | 20min  |
+| 21  | Update `docs/architecture-understanding/` diagrams for v4 module layout                    | P3       | 30min  |
+| 22  | Verify `examples/taskctl/` code examples match v4 API (they import v4, but check patterns) | P2       | 20min  |
+| 23  | Run `golangci-lint run ./...` on each sub-module independently                             | P2       | 15min  |
+| 24  | Add `docs/MIGRATION_v3_v4.md` link to README.md alongside v2→v3 link                       | P1       | 2min   |
+| 25  | Update `docs/CLI_DESIGN_PRINCIPLES.md` if it references v3 patterns                        | P3       | 10min  |
+| 26  | Verify `library-policy.yaml` references are still accurate for v4                          | P3       | 10min  |
+| 27  | Check `git-town.toml` main branch setting (`master` vs `main`)                             | P3       | 2min   |
+| 28  | Add flightrecorder to `docs/QUICKSTART.md` sub-modules section                             | P3       | 10min  |
+| 29  | Verify `FEATURES.md` sub-module table includes flightrecorder                              | P2       | 5min   |
+| 30  | Check if `docs/QUICKSTART.md` "12 output formats" → should be "16"                         | P3       | 2min   |
+| 31  | Audit `docs/TUTORIAL.md` "Complete Example" section references                             | P3       | 5min   |
+| 32  | Verify website `related-tools.mdx` for v4 accuracy                                         | P3       | 10min  |
+| 33  | Check `AUTHORS` file for accuracy                                                          | P3       | 2min   |
+| 34  | Verify `SECURITY.md` version table includes v4                                             | P2       | 5min   |
+| 35  | Add v4.0.0 GitHub release notes (if not already done)                                      | P2       | 15min  |
+| 36  | Verify `pkg.go.dev` badge URL in README points to v4 (it does, but verify)                 | P3       | 2min   |
+| 37  | Run `go mod tidy` on all modules to verify go.sum consistency                              | P2       | 10min  |
+| 38  | Check if `go.work` local replace directives need updating for external consumers           | P3       | 10min  |
+| 39  | Verify `flightrecorder/go.mod` module path is correct                                      | P2       | 2min   |
+| 40  | Add `flightrecorder` to `docs/guides/sub-modules.mdx` directory layout note                | P3       | 2min   |
+| 41  | Audit website `config.ts` for any other stale references beyond pkgGoDev URL               | P3       | 10min  |
+| 42  | Check if `docs/feedback/` files need v4 updates                                            | P3       | 5min   |
+| 43  | Verify `examples/docs-generator/` uses v4 API correctly                                    | P3       | 10min  |
+| 44  | Check if `benchmarks/` code uses v4 API correctly                                          | P3       | 5min   |
+| 45  | Add a "Documentation Verification" section to CONTRIBUTING.md                              | P3       | 15min  |
+| 46  | Consider adding `docs/MIGRATION_v3_v4.md` to website sidebar                               | P3       | 10min  |
+| 47  | Verify all `//nolint:godox` TODO(v5) markers still have ROADMAP.md cross-references        | P3       | 10min  |
+| 48  | Check if `docs/proposals/` files need v4 updates                                           | P3       | 5min   |
+| 49  | Run `go test ./... -cover` and update coverage badge if changed                            | P3       | 10min  |
+| 50  | Consider whether `docs/MIGRATION_v2_v3.md` should be moved to `docs/archive/`              | P3       | 5min   |
 
 ---
 

@@ -100,11 +100,11 @@ It won't fix:
 
 ## Summary
 
-| What cmdguard IS        | What cmdguard IS NOT         |
-| ----------------------- | ---------------------------- |
-| A library               | An executable                |
-| Wraps Cobra + uses fang | Replaces Cobra               |
-| Type-safe               | Code-generated               |
-| Error-returning (v4)    | A complete framework         |
-| DI-powered              | Multi-language               |
-| Go only                 | A silver bullet              |
+| What cmdguard IS        | What cmdguard IS NOT |
+| ----------------------- | -------------------- |
+| A library               | An executable        |
+| Wraps Cobra + uses fang | Replaces Cobra       |
+| Type-safe               | Code-generated       |
+| Error-returning (v4)    | A complete framework |
+| DI-powered              | Multi-language       |
+| Go only                 | A silver bullet      |

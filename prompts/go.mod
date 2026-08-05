@@ -7,10 +7,10 @@ require charm.land/huh/v2 v2.0.3
 require (
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
-	github.com/knadh/koanf/parsers/json v1.0.0 // indirect
+	github.com/knadh/koanf/parsers/json v1.0.1 // indirect
 	github.com/knadh/koanf/parsers/toml v0.1.0 // indirect
-	github.com/knadh/koanf/parsers/yaml v1.1.0 // indirect
-	github.com/knadh/koanf/v2 v2.3.5 // indirect
+	github.com/knadh/koanf/parsers/yaml v1.1.1 // indirect
+	github.com/knadh/koanf/v2 v2.3.6 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
@@ -27,9 +27,9 @@ require (
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20260729212402-27c57c10ce6f // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20260803092147-8b693049ce2a // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260727090823-41c9e6be3365 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260803091719-3755ebad01b1 // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -48,20 +48,20 @@ require (
 	github.com/larsartmann/go-branded-id v0.5.1 // indirect
 	github.com/larsartmann/go-error-family v0.10.0 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
-	github.com/larsartmann/go-output v0.35.0 // indirect
-	github.com/larsartmann/go-output/d2 v0.35.0 // indirect
-	github.com/larsartmann/go-output/daghtml v0.35.0 // indirect
-	github.com/larsartmann/go-output/delimited v0.35.0 // indirect
-	github.com/larsartmann/go-output/escape v0.35.0 // indirect
-	github.com/larsartmann/go-output/graph v0.35.0 // indirect
-	github.com/larsartmann/go-output/markdown v0.35.0 // indirect
-	github.com/larsartmann/go-output/markup v0.35.0 // indirect
-	github.com/larsartmann/go-output/plantuml v0.35.0 // indirect
-	github.com/larsartmann/go-output/serialization v0.35.0 // indirect
-	github.com/larsartmann/go-output/table v0.35.0 // indirect
-	github.com/larsartmann/go-output/tree v0.35.0 // indirect
+	github.com/larsartmann/go-output v0.37.0 // indirect
+	github.com/larsartmann/go-output/d2 v0.36.0 // indirect
+	github.com/larsartmann/go-output/daghtml v0.36.0 // indirect
+	github.com/larsartmann/go-output/delimited v0.36.0 // indirect
+	github.com/larsartmann/go-output/escape v0.36.0 // indirect
+	github.com/larsartmann/go-output/graph v0.36.0 // indirect
+	github.com/larsartmann/go-output/markdown v0.36.0 // indirect
+	github.com/larsartmann/go-output/markup v0.36.0 // indirect
+	github.com/larsartmann/go-output/plantuml v0.36.0 // indirect
+	github.com/larsartmann/go-output/serialization v0.36.0 // indirect
+	github.com/larsartmann/go-output/table v0.36.0 // indirect
+	github.com/larsartmann/go-output/tree v0.36.0 // indirect
 	github.com/larsartmann/samber-do-auditlog v0.8.1 // indirect
-	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
+	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.27 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
