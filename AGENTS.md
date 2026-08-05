@@ -56,7 +56,7 @@ nix flake check
 ```
 cmdguard/
 ├── pkg/cmdguard/
-│   ├── v3/                       # v3 API (recommended)
+│   ├── v4/                       # v4 API (current)
 │   │   ├── cli.go                # CLI[T] struct, NewCLI, AddCommand, Execute
 │   │   ├── cli_accessors.go      # CLI accessor methods (Config, Scope, etc.)
 │   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
@@ -65,7 +65,7 @@ cmdguard/
 │   │   ├── cli_errors_json.go    # Structured JSON error output for --output=json
 │   │   ├── auditlog.go           # Audit-log export (ExportAuditLog, 11 formats), query helpers
 │   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
-│   │   ├── command_options.go    # CommandOption functions (WithShort, WithFlags, etc.)
+│   │   ├── command_options.go    # CommandOption functions (WithShort, WithLong, etc.)
 │   │   ├── config.go             # Config type constraint
 │   │   ├── config_file.go        # ConfigFileLoader interface, loadConfigFile, expandConfigPath, FilterSetFields, collectKeysRecursive
 │   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue (recurses into nested structs)
@@ -86,6 +86,7 @@ cmdguard/
 │   │   ├── flag_helpers.go       # Flag type constraints, cloning, parsing helpers
 │   │   ├── flow_context.go       # BranchingFlowContext for command path tracking
 │   │   ├── flow_context_access.go # Flow context helpers (typed value access)
+│   │   ├── middleware.go         # Middleware chain (TimingMiddleware, RecoveryMiddleware)
 │   │   ├── prompts.go            # PromptRunner interface (huh/v2 impl in prompts/ sub-module)
 │   │   ├── scope.go              # DI scope wrapping samber/do/v2
 │   │   ├── type_handler.go       # Extensible type registry

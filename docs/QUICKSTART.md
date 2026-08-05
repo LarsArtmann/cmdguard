@@ -2,14 +2,14 @@
 
 **Learn cmdguard in 5 minutes.**
 
-cmdguard is a Go library for building validated CLI applications with type-safe flags, dependency injection, and 12 output formats.
+cmdguard is a Go library for building validated CLI applications with type-safe flags, dependency injection, and 16 output formats.
 
 ---
 
 ## Installation
 
 ```bash
-go get github.com/larsartmann/cmdguard/v3
+go get github.com/larsartmann/cmdguard/v4
 ```
 
 ---
@@ -26,31 +26,31 @@ import (
     "fmt"
     "os"
 
-    "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 type AppConfig struct{}
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("hello", "A simple CLI", AppConfig{})
+    cli, err := v4.NewCLI[AppConfig]("hello", "A simple CLI", AppConfig{})
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
 
-    cmd, err := v3.NewCommand[AppConfig, v3.NoFlags]("greet",
-        func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
+    cmd, err := v4.NewCommand("greet", v4.NoFlags{},
+        func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
             fmt.Println("Hello, World!")
             return nil
         },
-        v3.WithShort[AppConfig, v3.NoFlags]("Greet someone"),
+        v4.WithShort("Greet someone"),
     )
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
 
-    if err := v3.AddCommand(cli, cmd); err != nil {
+    if err := v4.AddCommand(cli, cmd); err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
@@ -85,7 +85,7 @@ type GreetFlags struct {
 ### 2. Use in Command
 
 ```go
-cmd, err := v3.NewCommand[AppConfig, *GreetFlags]("greet",
+cmd, err := v4.NewCommand("greet", &GreetFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         msg := fmt.Sprintf("Hello, %s!", flags.Name)
         if flags.Shout {
@@ -94,10 +94,9 @@ cmd, err := v3.NewCommand[AppConfig, *GreetFlags]("greet",
         fmt.Println(msg)
         return nil
     },
-    v3.WithShort[AppConfig, *GreetFlags]("Greet someone"),
-    v3.WithFlags[AppConfig, *GreetFlags](&GreetFlags{}),
+    v4.WithShort("Greet someone"),
 )
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 ```
 
 ### 3. Run It
@@ -118,28 +117,27 @@ go run main.go greet --help
 ## Subcommands (1 minute)
 
 ```go
-migrateCmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("migrate",
-    func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
+migrateCmd, _ := v4.NewCommand("migrate", v4.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
         fmt.Println("Running migrations...")
         return nil
     },
-    v3.WithShort[AppConfig, v3.NoFlags]("Run migrations"),
+    v4.WithShort("Run migrations"),
 )
 
-rollbackCmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("rollback",
-    func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
+rollbackCmd, _ := v4.NewCommand("rollback", v4.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
         fmt.Println("Rolling back...")
         return nil
     },
-    v3.WithShort[AppConfig, v3.NoFlags]("Rollback last migration"),
+    v4.WithShort("Rollback last migration"),
 )
 
-dbCmd, _ := v3.NewParentCommand[AppConfig, v3.NoFlags]("db",
-    "Database operations",
-    []v3.Command[AppConfig, v3.NoFlags]{migrateCmd, rollbackCmd},
-    v3.WithShort[AppConfig, v3.NoFlags]("Database operations"),
+dbCmd, _ := v4.NewParentCommand[AppConfig]("db", "Database operations", v4.NoFlags{},
+    v4.WithSubcommands(migrateCmd, rollbackCmd),
+    v4.WithShort("Database operations"),
 )
-v3.AddCommand(cli, dbCmd)
+v4.AddCommand(cli, dbCmd)
 ```
 
 ```bash
@@ -166,8 +164,8 @@ Priority: explicit flag > env var > default.
 Add a prefix with `WithEnvPrefix`:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v3.WithEnvPrefix[AppConfig]("MYAPP_"),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v4.WithEnvPrefix("MYAPP_"),
 )
 // Now reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
 ```
@@ -197,26 +195,26 @@ myapp run -vvv     # Verbose = 3
 ### 1. Register Services
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
 
-v3.ProvideValue(cli.Scope(), &Logger{Level: "info"})
+v4.ProvideValue(cli.Scope(), &Logger{Level: "info"})
 ```
 
 ### 2. Use in Handler
 
 ```go
-cmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("log",
-    func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
-        logger, err := v3.Invoke[*Logger](cli.Scope())
+cmd, _ := v4.NewCommand("log", v4.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+        logger, err := v4.Invoke[*Logger](cli.Scope())
         if err != nil {
             return err
         }
         logger.Log("Hello from DI!")
         return nil
     },
-    v3.WithShort[AppConfig, v3.NoFlags]("Log a message"),
+    v4.WithShort("Log a message"),
 )
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 ```
 
 ---
@@ -226,8 +224,8 @@ v3.AddCommand(cli, cmd)
 One-line opt-in for graceful shutdown:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v3.WithSignalHandling[AppConfig](),
+cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v4.WithSignalHandling(),
 )
 // Ctrl+C cancels the context in handlers
 ```
@@ -237,18 +235,15 @@ cli, _ := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 ## Rich Output (16 Formats)
 
 ```go
-output "github.com/larsartmann/go-output"
+import "github.com/larsartmann/go-output"
 
-data := v3.DefaultOutputConfig()
-data.Format = output.FormatJSON
-
-// Or parse from string:
-format, _ := output.ParseFormat("yaml")
+// Use go-output directly for format parsing
+format := output.FormatJSON
 
 // Render table data
 headers := []string{"Name", "Age"}
 rows := [][]string{{"Alice", "30"}, {"Bob", "25"}}
-v3.OutputTable(output.FormatTable, headers, rows)
+v4.OutputTable(format, headers, rows)
 ```
 
 Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml.
@@ -262,14 +257,16 @@ Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, m
 All commands are created via constructors, not struct literals:
 
 ```go
-// Leaf command
-cmd, err := v3.NewCommand[T, F]("name", handler, opts...)
+// Leaf command — flags passed positionally, options are non-generic
+cmd, err := v4.NewCommand("name", &Flags{}, handler, opts...)
 
-// Parent command
-parent, err := v3.NewParentCommand[T, F]("name", "desc", subcommands, opts...)
+// Parent command — subcommands added via WithSubcommands option
+parent, err := v4.NewParentCommand[T]("name", "long desc", v4.NoFlags{},
+    v4.WithSubcommands(childCmd1, childCmd2),
+)
 
 // Add to CLI
-v3.AddCommand(cli, cmd)
+v4.AddCommand(cli, cmd)
 ```
 
 ### Type Parameters
@@ -277,16 +274,18 @@ v3.AddCommand(cli, cmd)
 | Parameter | Description     | Example                     |
 | --------- | --------------- | --------------------------- |
 | `T`       | App config type | `AppConfig`                 |
-| `F`       | Flags type      | `*GreetFlags`, `v3.NoFlags` |
+| `F`       | Flags type      | `*GreetFlags`, `v4.NoFlags` |
+
+Type parameters are inferred from the flags argument — you rarely need to specify them explicitly.
 
 ### NoFlags
 
-Use `v3.NoFlags` for commands without flags:
+Use `v4.NoFlags` for commands without flags:
 
 ```go
-cmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("version",
-    func(ctx context.Context, cfg *AppConfig, flags v3.NoFlags) error {
-        fmt.Println("v2.2.0")
+cmd, _ := v4.NewCommand("version", v4.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+        fmt.Println("v4.0.0")
         return nil
     },
 )
@@ -294,10 +293,10 @@ cmd, _ := v3.NewCommand[AppConfig, v3.NoFlags]("version",
 
 ### Error Handling
 
-All v2 functions return errors — no panics in library code:
+All functions return errors — no panics in library code:
 
 ```go
-cli, err := v3.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+cli, err := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
 if err != nil {
     return err
 }

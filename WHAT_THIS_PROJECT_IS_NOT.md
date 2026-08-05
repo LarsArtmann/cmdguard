@@ -1,7 +1,5 @@
 # What This Project Is Not
 
-**Last Updated:** 2026-03-28
-
 cmdguard is a focused library, not a full-fledged CLI framework. Here's what it deliberately avoids:
 
 ---
@@ -25,33 +23,24 @@ cmdguard is a **library**, not an executable. You use it to build your own CLI t
 // This is what YOU build with cmdguard
 package main
 
-import "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+import "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 
 func main() {
-    cli, _ := v3.New[AppConfig, v3.NoFlags]("myapp", "My CLI", AppConfig{})
+    cli, _ := v4.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
     cli.ExecuteAndExit(context.Background())
 }
 ```
 
 ---
 
-## Not Graceful Error Handling (v1)
+## Not for Embedded Scenarios (legacy v1)
 
-The v1 API **panics** on invalid commands. This is intentional — it's "fail fast" design. If you need to handle errors gracefully, use v2:
+The legacy v1 API **panicked** on invalid commands. The v4 API returns errors instead:
 
 ```go
-// v1: panics
-root.AddCommand(invalidCmd) // PANIC!
-
-// v2: returns error
-err := cli.AddCommand(invalidCmd) // err != nil
+// v4: returns error
+err := v4.AddCommand(cli, invalidCmd) // err != nil
 ```
-
----
-
-## Not for Embedded Scenarios (v1)
-
-If you're embedding a CLI in a larger application that cannot tolerate panics, v1 is not suitable. Use v2 instead, which returns errors rather than panicking.
 
 ---
 
@@ -72,7 +61,7 @@ type MyFlags struct {
 
 cmdguard doesn't provide:
 
-- Advanced config file loading beyond JSON/YAML/TOML auto-detection (`WithConfigFile` covers the three common formats via KoanfLoader; for exotic formats use `WithConfigFileLoader` with a custom [ConfigFileLoader](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3#ConfigFileLoader) or [knadh/koanf](https://github.com/knadh/koanf) directly)
+- Advanced config file loading beyond JSON/YAML/TOML auto-detection (`WithConfigFile` covers the three common formats via KoanfLoader; for exotic formats use `WithConfigFileLoader` with a custom [ConfigFileLoader](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4#ConfigFileLoader) or [knadh/koanf](https://github.com/knadh/koanf) directly)
 - Built-in logging (use your preferred logger)
 - Database ORMs
 - Web servers
@@ -116,6 +105,6 @@ It won't fix:
 | A library               | An executable                |
 | Wraps Cobra + uses fang | Replaces Cobra               |
 | Type-safe               | Code-generated               |
-| Fail-fast (v1)          | Graceful error handling (v1) |
-| DI-powered              | A complete framework         |
-| Go only                 | Multi-language               |
+| Error-returning (v4)    | A complete framework         |
+| DI-powered              | Multi-language               |
+| Go only                 | A silver bullet              |

@@ -6,12 +6,13 @@ cmdguard is a Go library that wraps the [Cobra](https://github.com/spf13/cobra) 
 
 ## Purpose
 
-cmdguard ensures CLI commands are valid at construction time rather than failing silently at runtime. It provides two APIs:
+cmdguard ensures CLI commands are valid at construction time rather than failing silently at runtime. It provides a single API:
 
 | API                  | Use Case                                  |
 | -------------------- | ----------------------------------------- |
-| **v2** (recommended) | Type-safe, DI-powered, no panics          |
-| **v1** (legacy)      | Simple wrapper with panic-at-construction |
+| **v4** (current)     | Type-safe, DI-powered, no panics          |
+
+**Module path:** `github.com/larsartmann/cmdguard/v4`
 
 ---
 
@@ -22,14 +23,15 @@ cmdguard ensures CLI commands are valid at construction time rather than failing
 Commands are validated when they're added to the CLI, not when executed. This catches misconfigurations during development.
 
 ```go
-// v1 API: panics immediately if command is invalid
-root.AddCommand(&cobra.Command{Use: "hello"}) // PANIC: no Run handler
-
-// v2 API: returns error instead
-err := cli.AddCommand(cmd) // error: missing handler
+// Every constructor returns an error — no panics
+cli, err := v4.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
+cmd, err := v4.NewCommand("greet", &GreetFlags{}, handler,
+    v4.WithShort("Greet someone"),
+)
+err = v4.AddCommand(cli, cmd) // error if command is invalid
 ```
 
-### 2. Type-Safe Configuration (v2)
+### 2. Type-Safe Configuration
 
 Application configuration is typed via generics:
 
@@ -39,12 +41,12 @@ type AppConfig struct {
     Output  string `flag:"output" short:"o" default:"text"`
 }
 
-cli, err := v2.New[AppConfig, NoFlags]("myapp", "My CLI", AppConfig{})
+cli, err := v4.NewCLI[AppConfig]("myapp", "My CLI", AppConfig{})
 ```
 
-### 3. Type-Safe Flags (v2)
+### 3. Type-Safe Flags
 
-Define flags using struct tags:
+Define flags using struct tags, then pass the struct positionally to `NewCommand`:
 
 ```go
 type GreetFlags struct {
@@ -52,31 +54,30 @@ type GreetFlags struct {
     Shout bool   `flag:"shout" short:"s" default:"false" help:"Shout the greeting"`
 }
 
-cmd := v2.Command[AppConfig, *GreetFlags]{
-    Use:   "greet",
-    Flags: &GreetFlags{},
-    RunE: func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+cmd, err := v4.NewCommand("greet", &GreetFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         // flags is fully typed - IDE autocomplete works
         fmt.Printf("Hello, %s!\n", flags.Name)
         return nil
     },
-}
+    v4.WithShort("Greet someone"),
+)
 ```
 
-### 4. Dependency Injection (v2)
+### 4. Dependency Injection
 
 Built-in DI through [samber/do/v2](https://github.com/samber/do):
 
 ```go
 // Register services
-v2.Provide(scope, NewDatabaseService)
-v2.ProvideValue(scope, &Logger{Level: "info"})
+v4.Provide(cli.Scope(), NewDatabaseService)
+v4.ProvideValue(cli.Scope(), &Logger{Level: "info"})
 
 // Invoke in command handlers
-db, err := v2.Invoke[*DatabaseService](scope)
+db, err := v4.Invoke[*DatabaseService](cli.Scope())
 ```
 
-### 5. Lifecycle Management (v2)
+### 5. Lifecycle Management
 
 - **PreRunE / PostRunE** hooks
 - **HealthCheck()** for service health checks
