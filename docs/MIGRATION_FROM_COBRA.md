@@ -171,14 +171,13 @@ func main() {
         os.Exit(1)
     }
 
-    deployCmd, err := v4.NewCommand[AppConfig, *DeployFlags]("deploy",
+    deployCmd, err := v4.NewCommand("deploy", &DeployFlags{},
         func(ctx context.Context, cfg *AppConfig, flags *DeployFlags) error {
             fmt.Printf("Deploying to %s (dry-run=%v, timeout=%v)\n",
                 flags.Env, flags.DryRun, flags.Timeout)
             return nil
         },
-        v4.WithShort[AppConfig, *DeployFlags]("Deploy the application"),
-        v4.WithFlags[AppConfig, *DeployFlags](&DeployFlags{}),
+        v4.WithShort("Deploy the application"),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
@@ -235,7 +234,7 @@ func main() {
         return &Database{DSN: cfg.DatabaseURL}, nil
     })
 
-    queryCmd, err := v4.NewCommand[AppConfig, v4.NoFlags]("query",
+    queryCmd, err := v4.NewCommand("query", v4.NoFlags{},
         func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
             db, err := v4.Invoke[*Database](scope)
             if err != nil {
@@ -243,7 +242,7 @@ func main() {
             }
             return db.Query(ctx)
         },
-        v4.WithShort[AppConfig, v4.NoFlags]("Run a database query"),
+        v4.WithShort("Run a database query"),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
@@ -264,11 +263,15 @@ func main() {
     cli, err := v4.NewCLI[AppConfig]("myapp", "My application", AppConfig{
         Verbose: false,
     },
-        v4.WithCLIVersion[AppConfig]("1.2.3"),
-        v4.WithEnvPrefix[AppConfig]("MYAPP_"),
-        v4.WithSignalHandling[AppConfig](),
-        v4.WithStrictValidation[AppConfig](),
-        v4.WithMiddleware[AppConfig](v4.TimingMiddleware[AppConfig]()),
+        v4.WithCLIVersion("1.2.3"),
+        v4.WithEnvPrefix("MYAPP_"),
+        v4.WithSignalHandling(),
+        v4.WithStrictValidation(),
+        v4.WithMiddleware[AppConfig](v4.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+            if err != nil {
+                fmt.Fprintf(os.Stderr, "[timing] %s failed after %v: %v\n", name, d, err)
+            }
+        })),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
@@ -284,18 +287,19 @@ func main() {
     v4.AddCommand(cli, versionCmd)
 
     // Parent command with subcommands.
-    listCmd, _ := v4.NewCommand[AppConfig, v4.NoFlags]("list", listHandler,
-        v4.WithShort[AppConfig, v4.NoFlags]("List resources"),
+    listCmd, _ := v4.NewCommand("list", v4.NoFlags{}, listHandler,
+        v4.WithShort("List resources"),
     )
-    createCmd, _ := v4.NewCommand[AppConfig, v4.NoFlags]("create", createHandler,
-        v4.WithShort[AppConfig, v4.NoFlags]("Create a resource"),
-        v4.WithExactArgs[AppConfig, v4.NoFlags](1),
+    createCmd, _ := v4.NewCommand("create", v4.NoFlags{}, createHandler,
+        v4.WithShort("Create a resource"),
+        v4.WithExactArgs(1),
     )
 
-    resourceCmd, err := v4.NewParentCommand[AppConfig, v4.NoFlags]("resource",
+    resourceCmd, err := v4.NewParentCommand[AppConfig]("resource",
         "Resource management",
-        []v4.Command[AppConfig, v4.NoFlags]{listCmd, createCmd},
-        v4.WithShort[AppConfig, v4.NoFlags]("Resource management"),
+        v4.NoFlags{},
+        v4.WithSubcommands(listCmd, createCmd),
+        v4.WithShort("Resource management"),
     )
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
@@ -316,7 +320,7 @@ func main() {
 | **Define a flag**      | `cmd.Flags().StringP("name", "n", "World", "Name")` | `Name string \`flag:"name" short:"n" default:"World" help:"Name"\`` |
 | **Read a flag**        | `cmd.Flags().GetString("name")`                     | `flags.Name` (typed)                                                |
 | **Required flag**      | `cmd.MarkFlagRequired("name")`                      | `required:"true"` struct tag                                        |
-| **Add subcommand**     | `parent.AddCommand(child)`                          | `NewParentCommand(..., []Command{child})`                           |
+| **Add subcommand**     | `parent.AddCommand(child)`                          | `NewParentCommand(name, desc, flags{}, WithSubcommands(child))`     |
 | **Pre-run validation** | `PreRunE` func                                      | `WithPreRunE[T, F](fn)`                                             |
 | **Shared services**    | Manual globals / closures                           | `Provide`/`Invoke` in DI scope                                      |
 | **Env vars**           | Manual `os.Getenv`                                  | `env:"VAR_NAME"` struct tag                                         |
@@ -337,7 +341,7 @@ You can add raw `*cobra.Command` to a cmdguard CLI at any time:
 legacyCmd := &cobra.Command{Use: "legacy", ...}
 
 // New command written with cmdguard.
-newCmd, _ := v4.NewCommand[AppConfig, *NewFlags]("new", ...)
+newCmd, _ := v4.NewCommand("new", &NewFlags{}, ...)
 
 // Both coexist on the same CLI.
 cli.RootCommand().AddCommand(legacyCmd)
@@ -376,7 +380,7 @@ type AppConfig struct {
 
 ### "unknown flag" errors after migration
 
-Make sure you passed `WithFlags[T, F](&MyFlags{})` to `NewCommand`. Without it, cmdguard doesn't know to register flags for that command.
+Make sure you pass `&MyFlags{}` as the second argument to `NewCommand`. Without it, cmdguard doesn't know to register flags for that command.
 
 ### "command has no handler" error
 
