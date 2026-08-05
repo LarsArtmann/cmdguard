@@ -13,7 +13,7 @@
 //	    "fmt"
 //	    "log"
 //
-//	    v3 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+//	    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 //	)
 //
 //	type AppConfig struct {
@@ -119,7 +119,7 @@
 //
 // # Error Handling
 //
-// All v2 constructors return errors. Functions never panic — every function
+// All constructors return errors. Functions never panic — every function
 // returns errors. Sentinel errors support errors.Is() for identification:
 //
 //	errors.Is(err, v4.ErrInvalidCommand)

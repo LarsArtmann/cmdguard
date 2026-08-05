@@ -25,7 +25,7 @@ Create a new Go module:
 ```bash
 mkdir taskctl && cd taskctl
 go mod init taskctl
-go get github.com/larsartmann/cmdguard/v3
+go get github.com/larsartmann/cmdguard/v4
 ```
 
 Create `main.go`:
@@ -38,7 +38,7 @@ import (
     "fmt"
     "os"
 
-    v2 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
+    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 type AppConfig struct {
@@ -46,7 +46,7 @@ type AppConfig struct {
 }
 
 func main() {
-    cli, err := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
+    cli, err := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
@@ -71,7 +71,7 @@ You now have a CLI with auto-generated help, version flag, and styled output.
 
 ## Step 2: Add Your First Command
 
-Commands in cmdguard are created with `NewCommand` and have their own typed flags:
+Commands in cmdguard are created with `NewCommand` — flags are passed positionally and options are non-generic:
 
 ```go
 type AddFlags struct {
@@ -79,20 +79,19 @@ type AddFlags struct {
     Priority string `flag:"priority" short:"p" default:"medium" help:"low, medium, or high"`
 }
 
-addCmd, err := v3.NewCommand[AppConfig, *AddFlags]("add",
+addCmd, err := v4.NewCommand("add", &AddFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
         fmt.Printf("Adding task: %s [%s]\n", flags.Title, flags.Priority)
         return nil
     },
-    v3.WithShort[AppConfig, *AddFlags]("Add a new task"),
-    v3.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
+    v4.WithShort("Add a new task"),
 )
 if err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
 }
 
-if err := v3.AddCommand(cli, addCmd); err != nil {
+if err := v4.AddCommand(cli, addCmd); err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
 }
@@ -100,9 +99,10 @@ if err := v3.AddCommand(cli, addCmd); err != nil {
 
 **Key points:**
 
-- `Command[AppConfig, *AddFlags]` — first type param is the shared config, second is per-command flags
+- Flags are passed as the second argument to `NewCommand` — type parameters are inferred
 - `required:"true"` makes the flag mandatory — cmdguard enforces this automatically
 - Flags are defined as struct tags, not string lookups
+- Options like `WithShort` are non-generic — no type parameters needed
 
 Run it:
 
@@ -127,9 +127,9 @@ type TaskStore struct {
     tasks []string
 }
 
-cli, _ := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
+cli, _ := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
 
-v3.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
+v4.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
     fmt.Println("[store] initialized")
     return &TaskStore{tasks: []string{}}, nil
 })
@@ -138,9 +138,9 @@ v3.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
 Now commands can access the store:
 
 ```go
-addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
+addCmd, _ := v4.NewCommand("add", &AddFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
-        store, err := v3.Invoke[*TaskStore](cli.Scope())
+        store, err := v4.Invoke[*TaskStore](cli.Scope())
         if err != nil {
             return err
         }
@@ -148,8 +148,7 @@ addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
         fmt.Printf("Added task #%d: %s\n", len(store.tasks), flags.Title)
         return nil
     },
-    v3.WithShort[AppConfig, *AddFlags]("Add a new task"),
-    v3.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
+    v4.WithShort("Add a new task"),
 )
 ```
 
@@ -158,20 +157,22 @@ addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
 ## Step 4: Add a List Command with Rich Output
 
 ```go
+import "github.com/larsartmann/go-output"
+
 type ListFlags struct {
     Format string `flag:"format" short:"f" default:"table" help:"Output format (table, json, csv, yaml)"`
 }
 
-listCmd, _ := v3.NewCommand[AppConfig, *ListFlags]("list",
+listCmd, _ := v4.NewCommand("list", &ListFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *ListFlags) error {
-        store, _ := v3.Invoke[*TaskStore](cli.Scope())
+        store, _ := v4.Invoke[*TaskStore](cli.Scope())
 
         if len(store.tasks) == 0 {
             fmt.Println("No tasks found.")
             return nil
         }
 
-        format, _ := v3.ParseOutputFormat(flags.Format)
+        format, _ := output.ParseFormat(flags.Format)
 
         headers := []string{"#", "Title"}
         rows := make([][]string, len(store.tasks))
@@ -179,10 +180,9 @@ listCmd, _ := v3.NewCommand[AppConfig, *ListFlags]("list",
             rows[i] = []string{fmt.Sprintf("%d", i+1), t}
         }
 
-        return v3.OutputTable(format, headers, rows)
+        return v4.OutputTable(format, headers, rows)
     },
-    v3.WithShort[AppConfig, *ListFlags]("List all tasks"),
-    v3.WithFlags[AppConfig, *ListFlags](&ListFlags{}),
+    v4.WithShort("List all tasks"),
 )
 ```
 
@@ -203,11 +203,10 @@ go run main.go list --format yaml  # YAML
 Validate input before the handler runs:
 
 ```go
-addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
+addCmd, _ := v4.NewCommand("add", &AddFlags{},
     addHandler,
-    v3.WithShort[AppConfig, *AddFlags]("Add a new task"),
-    v3.WithFlags[AppConfig, *AddFlags](&AddFlags{}),
-    v3.WithPreRunE[AppConfig, *AddFlags](
+    v4.WithShort("Add a new task"),
+    v4.WithPreRunE[AppConfig, *AddFlags](
         func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
             if len(flags.Title) < 3 {
                 return fmt.Errorf("title must be at least 3 characters")
@@ -228,17 +227,18 @@ addCmd, _ := v3.NewCommand[AppConfig, *AddFlags]("add",
 
 `PreRunE` fires before `RunE`. If it returns an error, the handler never runs.
 
+Note: `WithPreRunE` and `WithPostRunE` are generic functions that return a non-generic `CommandOption` — they're the only options that require type parameters.
+
 ---
 
 ## Step 6: Add Cleanup with PostRunE
 
 ```go
-v3.WithPostRunE[AppConfig, *AddFlags](
+v4.WithPostRunE[AppConfig, *AddFlags](
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
         fmt.Println("[cleanup] flushing to disk")
         return nil
-    },
-),
+    ),
 ```
 
 `PostRunE` only fires on **success** — standard Cobra semantics.
@@ -250,12 +250,12 @@ v3.WithPostRunE[AppConfig, *AddFlags](
 Middleware wraps every command handler:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
-    v3.WithMiddleware[AppConfig](
-        v3.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+cli, _ := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
+    v4.WithMiddleware[AppConfig](
+        v4.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
             fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
         }),
-        v3.RecoveryMiddleware[AppConfig](),
+        v4.RecoveryMiddleware[AppConfig](),
     ),
 )
 ```
@@ -267,8 +267,8 @@ Now every command is timed and panic-safe.
 ## Step 8: Add Signal Handling
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
-    v3.WithSignalHandling[AppConfig](),
+cli, _ := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
+    v4.WithSignalHandling(),
 )
 ```
 
@@ -302,8 +302,8 @@ type AppConfig struct {
 Or use `WithEnvPrefix` to prefix all env lookups:
 
 ```go
-cli, _ := v3.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
-    v3.WithEnvPrefix[AppConfig]("TASKCTL_"),
+cli, _ := v4.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
+    v4.WithEnvPrefix("TASKCTL_"),
 )
 ```
 
@@ -316,14 +316,13 @@ Priority chain: **explicit flag → env var → default value**.
 Return typed errors with exit codes for CI/automation:
 
 ```go
-doneCmd, _ := v3.NewCommand[AppConfig, *DoneFlags]("done",
+doneCmd, _ := v4.NewCommand("done", &DoneFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *DoneFlags) error {
         // task not found? Exit with code 2
-        exitErr, _ := v3.NewExitError(2, fmt.Errorf("task %d not found", flags.ID))
+        exitErr, _ := v4.NewExitError(2, fmt.Errorf("task %d not found", flags.ID))
         return exitErr
     },
-    v3.WithShort[AppConfig, *DoneFlags]("Mark a task as done"),
-    v3.WithFlags[AppConfig, *DoneFlags](&DoneFlags{}),
+    v4.WithShort("Mark a task as done"),
 )
 ```
 
@@ -333,13 +332,13 @@ When using `cli.ExecuteAndExit(ctx)`, the exit code is propagated to `os.Exit`.
 
 ## Complete Example
 
-See [`examples/kitchen-sink/`](../examples/kitchen-sink/) for a fully working production-grade CLI that uses every feature described above.
+See [`examples/taskctl/`](../examples/taskctl/) for a fully working production-grade CLI that uses every feature described above.
 
 ---
 
 ## Next Steps
 
-- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3) for the full API
+- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) for the full API
 - See the [Quick Start Guide](QUICKSTART.md) for a complete feature tour
 - Check [MIGRATION_FROM_COBRA.md](MIGRATION_FROM_COBRA.md) if you're migrating an existing Cobra app
 - Browse [examples/](../examples/) for more working demos
