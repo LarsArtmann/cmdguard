@@ -77,9 +77,30 @@ the long tail from haunting the TODO list. Each has a rationale for deferral.
 
 These are unformed ideas that may or may not become features:
 
+### Core Library
+
 - **Config file watching** — hot-reload config on file change (inotify/fsnotify)
 - **Plugin marketplace** — community-contributed type handlers and validators
 - **gRPC middleware sub-module** — command-level gRPC tracing
 - **Web-based CLI preview** — render command tree as interactive HTML
 - **Shell completion v2** — richer dynamic completion with type-aware suggestions
 - **Benchmark dashboard** — track performance across releases
+- **v3→v4 migration guide** — dedicated `docs/MIGRATION_v3_v4.md` (v2→v3 got one; v3→v4 only has a CHANGELOG entry)
+
+### Flight Recorder Enhancements
+
+- **`MaxSnapshots` config** — rate limiting / disk protection against runaway trace file creation
+- **`CaptureReasonPanic`** — capture on panic recovery (currently only slow/error)
+- **`CaptureReasonTimeout`** — capture on context-deadline
+- **`Sync()` method** — flush pending captures without stopping the recorder
+- **`Recorder.Status()`** — snapshot stats (started, captures, last capture time)
+- **Configurable timestamp format** — let users choose precision or timezone
+- **`WithFlightRecorderIf[T](cond)`** — custom capture predicates
+- **Structured logging** — `slog` handler instead of printf-style
+- **Metric hooks** — capture count, bytes written, capture duration
+- **`CaptureOnSignal`** — capture on SIGINT/SIGTERM before shutdown
+- **gzip compression** — compress snapshots on write for disk savings
+- **Trace upload hook** — post-capture callback for remote storage
+- **`flightrecorder/d2`** — trace visualization export
+- **`flightrecorder/pprof`** — convert trace to pprof profile
+- **env-based config** — `WithFlightRecorderEnvVar` for environment-driven setup

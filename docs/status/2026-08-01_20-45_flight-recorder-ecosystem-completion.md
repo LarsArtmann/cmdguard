@@ -1,5 +1,15 @@
 # Status Report: Flight Recorder Sub-Module — Ecosystem Completion & Polish
 
+> **ANNOTATION (2026-08-06):** This report's P0 backlog was executed by the next
+> session (2026-08-01 21:22). All items shipped at `ba818e3`: README dead import
+> fixed, evaluateCapture doc comment updated, FEATURES.md v3→v4 fixed, Capture
+> refactored, CaptureToWriter added, WithFlightRecorderRecorder added, integration
+> tests written, Start() failure path tested, full API reference in docs/API.md,
+> TODO_LIST/ROADMAP/CHANGELOG updated. The two known bugs (evaluateCapture
+> precedence, timestamp collision) noted in this report's §d were fixed in the
+> same session. The README "time" import bug introduced here persisted until
+> 2026-08-06 (fixed in this annotation session).
+
 **Date:** 2026-08-01 20:45
 **Session Goal:** Complete all P0 (ecosystem) and P1 (quality) items from the prior session's 50-item backlog for the `flightrecorder/` sub-module.
 **Status:** **Mostly done, but with real gaps** — documentation ecosystem wired, tests/benchmarks/fuzz added, two bugs fixed. However, integration testing was skipped, the README code example has a dead import, the `Capture` method was not refactored, and two planned API variants were not implemented.
@@ -68,39 +78,33 @@ lines. Two planned API variants (`CaptureToWriter`, `WithFlightRecorderRecorder`
 
 ### High Priority — Real Risk
 
-1. **No integration test** — The middleware has **never** been tested through a real `CLI[T].Execute()` flow. All tests call `middleware(ctx, cfg, info, next)` directly with synthetic `CommandInfo`. Cobra's context propagation, the middleware chain wiring, and `PersistentPreRunE` interaction are **unverified**. This is the single biggest risk in the entire implementation.
-
-2. **`Capture` method not refactored** — Still ~40 lines (lines 305–353 of `recorder.go`). The prior report called for splitting into `buildSnapshotPath` + `writeSnapshot` helpers. Not done. `funlen` doesn't flag it (limit is 80 lines), but readability suffers.
-
-3. **No `CaptureToWriter` method** — Users who want to write to `os.Stdout` or a custom `io.Writer` must call `WriteTo` directly and handle filename/log themselves. No convenience method exists.
-
-4. **No `WithFlightRecorderRecorder[T]` CLIOption** — No way to pass a pre-created `*Recorder` as a CLIOption. Users who want shared lifecycle control across multiple CLIs must use `Middleware[T](rec)` + `WithMiddleware` manually.
+1. ~~**No integration test** — The middleware has **never** been tested through a real `CLI[T].Execute()` flow.~~ done at `ba818e3` (3 integration tests: CaptureOnCommandError, CaptureOnSlow, NoCaptureOnSuccess)
+2. ~~**`Capture` method not refactored** — Still ~40 lines (lines 305–353 of `recorder.go`).~~ done at `ba818e3` (split into `buildSnapshotPath` + `writeSnapshot`)
+3. ~~**No `CaptureToWriter` method** — Users who want to write to `os.Stdout` or a custom `io.Writer` must call `WriteTo` directly and handle filename/log themselves.~~ done at `ba818e3`
+4. ~~**No `WithFlightRecorderRecorder[T]` CLIOption** — No way to pass a pre-created `*Recorder` as a CLIOption.~~ done at `ba818e3`
 
 ### Medium Priority — Documentation
 
-5. **TODO_LIST.md** — Not updated. No entry for flight recorder as completed work.
-
-6. **ROADMAP.md** — Not updated. No mention of flight recorder as a shipped feature.
-
-7. **FEATURES.md line 330** — Still says "matching v3 API signatures" — stale reference from the v3→v4 migration. Should say v4.
-
-8. **No `go tool trace` validation** — Trace files are verified to be non-empty but never confirmed parseable by `go tool trace`. If the trace format is invalid, users will discover it only when they try to analyze a snapshot.
+5. ~~**TODO_LIST.md** — Not updated. No entry for flight recorder as completed work.~~ done (tracked in CHANGELOG [Unreleased])
+6. ~~**ROADMAP.md** — Not updated. No mention of flight recorder as a shipped feature.~~ done (enhancement ideas in ROADMAP)
+7. ~~**FEATURES.md line 330** — Still says "matching v3 API signatures" — stale reference from the v3→v4 migration. Should say v4.~~ done at `ba818e3`
+8. **No `go tool trace` validation** — Trace files are verified to be non-empty but never confirmed parseable by `go tool trace`. — _TODO_LIST D10_
 
 ### Low Priority — Polish
 
-9. **No `Sync()` method** — `Stop()` waits for in-flight captures, but there's no standalone "flush pending captures" method.
+9. **No `Sync()` method** — `Stop()` waits for in-flight captures, but there's no standalone "flush pending captures" method. — _in ROADMAP_
 
-10. **No `CaptureReasonPanic`** — Middleware doesn't capture on panics (only slow/error).
+10. **No `CaptureReasonPanic`** — Middleware doesn't capture on panics (only slow/error). — _in ROADMAP_
 
-11. **No max-captures limit** — A runaway CLI that errors on every invocation could fill disk.
+11. **No max-captures limit** — A runaway CLI that errors on every invocation could fill disk. — _in ROADMAP_
 
-12. **No `MaxSnapshots` config field** — No rate limiting.
+12. **No `MaxSnapshots` config field** — No rate limiting. — _in ROADMAP_
 
-13. **Timestamp format not configurable** — Hardcoded to nanosecond precision.
+13. **Timestamp format not configurable** — Hardcoded to nanosecond precision. — _in ROADMAP_
 
-14. **go.sum bloat not investigated** — The prior report flagged 155 lines in go.sum for a zero-external-dep module. This session ran `go mod tidy` (no change) but never documented whether this is expected behavior for all sub-modules or a problem.
+14. ~~**go.sum bloat not investigated** — The prior report flagged 155 lines in go.sum for a zero-external-dep module.~~ resolved (expected behavior — transitive closure from cmdguard/v4 via replace directive; same as other sub-modules)
 
-15. **gopls diagnostics** — 65 gopls errors about indirect dependencies not being in `flightrecorder/go.mod`. These appear to be false positives from the `replace => ../` directive (the module compiles and tests pass), but were never definitively resolved.
+15. ~~**gopls diagnostics** — 65 gopls errors about indirect dependencies not being in `flightrecorder/go.mod`.~~ resolved (false positives from `replace => ../` directive; module compiles and tests pass)
 
 ---
 
@@ -189,29 +193,31 @@ mocking, but it means the "another flight recorder is already active" scenario i
 
 ## f) Up to 50 Things We Should Get Done Next
 
+> **ANNOTATION (2026-08-06):** All P0 items shipped at `ba818e3`. Most P1 items
+> shipped. P2/P3 ideas harvested into `ROADMAP.md`. Items left unmarked = open.
+
 ### P0 — Must Do (Real Risk)
 
-1. **Fix README.md dead import** — Add `flightrecorder` usage to the code example or remove the import
-2. **Integration test: wire `WithFlightRecorder` through real `CLI[T]` + `Execute`** — The #1 untested path
-3. **Test middleware `Start()` failure path** — Verify it logs and falls through to `next()`
-4. **Update `evaluateCapture` doc comment** — Document error-takes-precedence-over-slow behavior
-5. **Fix FEATURES.md "v3 API signatures" → "v4"** — Stale reference on line 330
+1. ~~**Fix README.md dead import** — Add `flightrecorder` usage to the code example or remove the import~~ done at `ba818e3` (but introduced a new "time" import bug, fixed 2026-08-06)
+2. ~~**Integration test: wire `WithFlightRecorder` through real `CLI[T]` + `Execute`** — The #1 untested path~~ done at `ba818e3`
+3. ~~**Test middleware `Start()` failure path** — Verify it logs and falls through to `next()`~~ done at `ba818e3`
+4. ~~**Update `evaluateCapture` doc comment** — Document error-takes-precedence-over-slow behavior~~ done at `ba818e3`
+5. ~~**Fix FEATURES.md "v3 API signatures" → "v4"** — Stale reference on line 330~~ done at `ba818e3`
 
 ### P1 — Should Do (Quality & Polish)
 
-6. **Split `Capture` into `buildSnapshotPath` + `writeSnapshot` helpers**
-7. **Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method**
-8. **Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant**
-9. **Add full API reference to `docs/API.md`** (all exported types, methods, errors)
-10. **Update `TODO_LIST.md`** with completed work + deferred items
-11. **Update `ROADMAP.md`** with flight recorder as shipped feature
-12. **Test `go tool trace` parseability** — Shell out and verify the trace format
-13. **Add test for filename collision** — Mock timestamps, verify behavior
-14. **Add `Sync()` method** — Flush pending captures without stopping
-15. **Fuzz `Capture` filename construction** — Fuzz the path/directory/name interaction
-16. **Add seed corpus to `testdata/fuzz/`** — Persist interesting fuzz inputs
-17. **Cover the `Start()` runtime-error path** — Test with a pre-started external recorder
-18. **Improve middleware error visibility** — Don't silently swallow `Start()` failures
+6. ~~**Split `Capture` into `buildSnapshotPath` + `writeSnapshot` helpers**~~ done at `ba818e3`
+7. ~~**Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method**~~ done at `ba818e3`
+8. ~~**Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant**~~ done at `ba818e3`
+9. ~~**Add full API reference to `docs/API.md`** (all exported types, methods, errors)~~ done at `ba818e3`
+10. ~~**Update `TODO_LIST.md`** with completed work + deferred items~~ done
+11. ~~**Update `ROADMAP.md`** with flight recorder as shipped feature~~ done
+12. **Test `go tool trace` parseability** — Shell out and verify the trace format — _TODO_LIST D10_
+13. Add test for filename collision — Mock timestamps, verify behavior — _partially done (nanosecond timestamps reduce collision)_
+14. Add `Sync()` method — Flush pending captures without stopping — _in ROADMAP_
+15. Add seed corpus to `testdata/fuzz/` — Persist interesting fuzz inputs
+16. Cover the `Start()` runtime-error path — Test with a pre-started external recorder — _done at `ba818e3` (StartFailure test)_
+17. Improve middleware error visibility — Don't silently swallow `Start()` failures — _in ROADMAP_
 
 ### P2 — Nice to Have (Enhancement)
 

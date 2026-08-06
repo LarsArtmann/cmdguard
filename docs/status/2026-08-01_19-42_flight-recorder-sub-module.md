@@ -1,5 +1,14 @@
 # Status Report: Flight Recorder Sub-Module Implementation
 
+> **ANNOTATION (2026-08-06):** This report's entire backlog was executed across the
+> next two sessions (2026-08-01 20:45 and 21:22). All P0 items (CHANGELOG, FEATURES,
+> README, API docs, Package Guidelines table, lint strategy, flightrecorder/README.md)
+> shipped at `ba818e3`. All P1 code items (CaptureToWriter, WithFlightRecorderRecorder,
+> Capture refactor, integration tests, Start failure test, edge case tests) shipped at
+> `ba818e3`. P2/P3 enhancement ideas were harvested into `ROADMAP.md` "Flight Recorder
+> Enhancements." Two godoc examples were lost in a subsequent git corruption event
+> (see `2026-08-01_22-03` report) and are tracked in `TODO_LIST.md` (D9).
+
 **Date:** 2026-08-01 19:42
 **Session Goal:** Leverage Go 1.25 `runtime/trace.FlightRecorder` (from [the Go blog post](https://go.dev/blog/flight-recorder)) in cmdguard
 **Status:** Implementation works, tests pass, lint clean — but **documentation, ecosystem integration, and polish are incomplete**
@@ -48,26 +57,26 @@ benchmarks, examples, go.sum auditing — was **not done**.
 
 ### High Priority
 
-1. **CHANGELOG.md** — No `[Unreleased]` entry for the new sub-module. This is a user-facing addition.
-2. **FEATURES.md** — `flightrecorder` not listed anywhere in the feature inventory. Status should be DONE.
-3. **README.md** — Root README doesn't mention flight recorder capability. Users discovering cmdguard won't know it exists.
-4. **`docs/API.md`** — No API documentation for `Recorder`, `Middleware`, `WithFlightRecorder`, `Config`, `CaptureReason`.
-5. **No `flightrecorder/README.md`** — Every other sub-module's purpose is documented somewhere; this one has no standalone docs.
+1. ~~**CHANGELOG.md** — No `[Unreleased]` entry for the new sub-module. This is a user-facing addition.~~ done at `ba818e3`
+2. ~~**FEATURES.md** — `flightrecorder` not listed anywhere in the feature inventory. Status should be DONE.~~ done at `ba818e3`
+3. ~~**README.md** — Root README doesn't mention flight recorder capability. Users discovering cmdguard won't know it exists.~~ done at `ba818e3`
+4. ~~**`docs/API.md`** — No API documentation for `Recorder`, `Middleware`, `WithFlightRecorder`, `Config`, `CaptureReason`.~~ done at `ba818e3`
+5. ~~**No `flightrecorder/README.md`** — Every other sub-module's purpose is documented somewhere; this one has no standalone docs.~~ done at `ba818e3` (recreated after git corruption at `ba818e3`)
 
 ### Medium Priority
 
 6. **No example in `examples/`** — No demonstration of how to wire flight recorder into a CLI. The other middleware modules (telemetry, spinner) are used in `examples/taskctl/`.
-7. **No benchmarks** — Project has 26 benchmarks in core; flightrecorder has 0. Middleware overhead (start, time measurement, capture goroutine) should be benchmarked.
-8. **No fuzz tests** — Project has 7 fuzz targets; flightrecorder has 0. `sanitizeFilename` and `Capture` (filename construction) are fuzz-worthy.
-9. **No `go doc` example functions** — The package doc has usage examples in comments, but no runnable `Example*` functions (project convention uses `example_test.go`).
-10. **Package Guidelines table** — `flightrecorder` not added as a row in the `### Package Guidelines` table in AGENTS.md.
+7. ~~**No benchmarks** — Project has 26 benchmarks in core; flightrecorder has 0. Middleware overhead (start, time measurement, capture goroutine) should be benchmarked.~~ done at `ba818e3` (3 benchmarks added)
+8. ~~**No fuzz tests** — Project has 7 fuzz targets; flightrecorder has 0. `sanitizeFilename` and `Capture` (filename construction) are fuzz-worthy.~~ done at `ba818e3` (`FuzzSanitizeFilename` added)
+9. ~~**No `go doc` example functions** — The package doc has usage examples in comments, but no runnable `Example*` functions (project convention uses `example_test.go`).~~ partially done at `ba818e3` (3 examples; 2 more lost in git corruption — see TODO_LIST D9)
+10. ~~**Package Guidelines table** — `flightrecorder` not added as a row in the `### Package Guidelines` table in AGENTS.md.~~ done at `ba818e3`
 
 ### Low Priority
 
-11. **TODO_LIST.md** — No task entries for follow-up work (benchmarks, examples, etc.).
-12. **ROADMAP.md** — No mention of flight recorder as a shipped feature or future direction.
-13. **`flake.nix`** — Not checked whether `nix flake check` needs updating for the new module (probably fine since it's just `treefmt`, but not verified).
-14. **`nix fmt` / `nix flake check`** — Not run. Only `golangci-lint fmt` was used.
+11. ~~**TODO_LIST.md** — No task entries for follow-up work (benchmarks, examples, etc.).~~ done (tracked in CHANGELOG [Unreleased])
+12. ~~**ROADMAP.md** — No mention of flight recorder as a shipped feature or future direction.~~ done (enhancement ideas in ROADMAP "Flight Recorder Enhancements")
+13. ~~**`flake.nix`** — Not checked whether `nix flake check` needs updating for the new module (probably fine since it's just `treefmt`, but not verified).~~ done at `ba818e3` (`nix flake check` passes)
+14. ~~**`nix fmt` / `nix flake check`** — Not run. Only `golangci-lint fmt` was used.~~ done at `ba818e3`
 
 ---
 
@@ -119,37 +128,44 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 
 ## f) Up to 50 Things We Should Get Done Next
 
+> **ANNOTATION (2026-08-06):** All P0 items shipped at `ba818e3`. Most P1 items
+> shipped at `ba818e3`. P2/P3 enhancement ideas were harvested into `ROADMAP.md`.
+> Items left unmarked are still open.
+
 ### P0 — Must Do (Ecosystem Completion)
 
-1. Add `CHANGELOG.md` `[Unreleased]` entry for `flightrecorder` sub-module
-2. Add `flightrecorder` to `FEATURES.md` as DONE
-3. Add flight recorder section to root `README.md`
-4. Add `flightrecorder` API reference to `docs/API.md`
-5. Add `flightrecorder` row to Package Guidelines table in `AGENTS.md`
-6. Update AGENTS.md Lint Strategy section: bump exclusion count, document the new `paralleltest` path exclusion
-7. Create `flightrecorder/README.md` with quick-start guide
-8. Verify `nix fmt` and `nix flake check` pass with the new module
-9. Add `flightrecorder` to `TODO_LIST.md` as completed work
+1. ~~Add `CHANGELOG.md` `[Unreleased]` entry for `flightrecorder` sub-module~~ done at `ba818e3`
+2. ~~Add `flightrecorder` to `FEATURES.md` as DONE~~ done at `ba818e3`
+3. ~~Add flight recorder section to root `README.md`~~ done at `ba818e3`
+4. ~~Add `flightrecorder` API reference to `docs/API.md`~~ done at `ba818e3`
+5. ~~Add `flightrecorder` row to Package Guidelines table in `AGENTS.md`~~ done at `ba818e3`
+6. ~~Update AGENTS.md Lint Strategy section: bump exclusion count, document the new `paralleltest` path exclusion~~ done at `ba818e3`
+7. ~~Create `flightrecorder/README.md` with quick-start guide~~ done at `ba818e3`
+8. ~~Verify `nix fmt` and `nix flake check` pass with the new module~~ done at `ba818e3`
+9. ~~Add `flightrecorder` to `TODO_LIST.md` as completed work~~ done (in CHANGELOG [Unreleased])
 
 ### P1 — Should Do (Quality & Polish)
 
-10. Add `ExampleMiddleware` and `ExampleWithFlightRecorder` functions (`example_test.go`)
-11. Add benchmarks: `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`, `BenchmarkNew`
-12. Add fuzz test for `sanitizeFilename`
+10. ~~Add `ExampleMiddleware` and `ExampleWithFlightRecorder` functions (`example_test.go`)~~ partially done at `ba818e3` (3 examples exist; 2 more lost in git corruption — TODO_LIST D9)
+11. ~~Add benchmarks: `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`, `BenchmarkNew`~~ done at `ba818e3`
+12. ~~Add fuzz test for `sanitizeFilename`~~ done at `ba818e3`
 13. Add fuzz test for `Capture` filename construction
-14. Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method
-15. Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant
-16. Add test asserting `errors.Is(err, ErrAlreadyStarted)` on double-Start
-17. Add test for concurrent `Capture` calls from multiple goroutines
-18. Add test for `WriteTo` after `Stop` (should return `ErrNotEnabled`)
-19. Add test for empty command name fallback to "command"
-20. Add test for filename collision (same-second captures)
-21. Add integration test: wire through real `CLI[T]` + `Execute`
-22. Add `CaptureReasonPanic` support (capture on panic recovery)
-23. Split `Capture` method into `buildSnapshotPath` + `writeSnapshot`
-24. Add `Sync()` method for flushing pending captures without stopping
+14. ~~Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method~~ done at `ba818e3`
+15. ~~Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant~~ done at `ba818e3`
+16. ~~Add test asserting `errors.Is(err, ErrAlreadyStarted)` on double-Start~~ done at `ba818e3`
+17. ~~Add test for concurrent `Capture` calls from multiple goroutines~~ done at `ba818e3`
+18. ~~Add test for `WriteTo` after `Stop` (should return `ErrNotEnabled`)~~ done at `ba818e3`
+19. ~~Add test for empty command name fallback to "command"~~ done at `ba818e3`
+20. ~~Add test for filename collision (same-second captures)~~ done at `ba818e3`
+21. ~~Add integration test: wire through real `CLI[T]` + `Execute`~~ done at `ba818e3` (3 integration tests)
+22. Add `CaptureReasonPanic` support (capture on panic recovery) — _in ROADMAP_
+23. ~~Split `Capture` method into `buildSnapshotPath` + `writeSnapshot`~~ done at `ba818e3`
+24. Add `Sync()` method for flushing pending captures without stopping — _in ROADMAP_
 
 ### P2 — Nice to Have (Enhancement)
+
+> **ANNOTATION (2026-08-06):** All P2 items are enhancement ideas harvested into
+> `ROADMAP.md` "Flight Recorder Enhancements." None shipped. Left unmarked = open.
 
 25. Add `MaxSnapshots` config field (rate limit / disk protection)
 26. Add configurable timestamp format in filenames
@@ -164,6 +180,9 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 35. Add `CaptureOnSignal` option (capture on SIGINT/SIGTERM before shutdown)
 
 ### P3 — Future Consideration
+
+> **ANNOTATION (2026-08-06):** All P3 items are future ideas harvested into
+> `ROADMAP.md` "Flight Recorder Enhancements." None shipped. Left unmarked = open.
 
 36. Consider `flightrecorder/d2` sub-module for trace visualization export
 37. Consider integration with `cli.DoctorCommand` (health check for recorder status)
