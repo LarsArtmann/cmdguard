@@ -90,7 +90,7 @@ export default defineConfig({
 						{ label: "Overview", slug: "api-reference" },
 						{
 							label: "Full API on pkg.go.dev",
-							link: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3",
+							link: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4",
 						},
 					],
 				},

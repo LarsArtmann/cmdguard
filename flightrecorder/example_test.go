@@ -1,10 +1,13 @@
 package flightrecorder_test
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/larsartmann/cmdguard/flightrecorder"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
 
 func ExampleDefaultConfig() {
@@ -54,4 +57,65 @@ func ExampleCaptureReason() {
 	// Output:
 	// slow
 	// error
+}
+
+func ExampleRecorder_CaptureToWriter() {
+	rec := flightrecorder.New(flightrecorder.Config{
+		CaptureOnSlow: true,
+		SlowThreshold: 1 * time.Millisecond,
+		OutputDir:     "", // use os.TempDir()
+	})
+
+	if err := rec.Start(); err != nil {
+		fmt.Println("start error:", err)
+
+		return
+	}
+	defer rec.Stop()
+
+	written, err := rec.CaptureToWriter(
+		context.Background(),
+		io.Discard,
+		"my-command",
+		flightrecorder.CaptureReasonSlow,
+	)
+	if err != nil {
+		fmt.Println("capture error:", err)
+
+		return
+	}
+
+	fmt.Println("captured bytes:", written > 0)
+
+	// Output:
+	// captured bytes: true
+}
+
+func ExampleWithFlightRecorderRecorder() {
+	rec := flightrecorder.New(flightrecorder.DefaultConfig())
+	defer rec.Stop()
+
+	type appConfig struct {
+		Debug bool `flag:"debug" default:"false" help:"Enable debug mode"`
+	}
+
+	// WithFlightRecorderRecorder injects a pre-built Recorder into the CLI
+	// middleware chain. Use this when you need direct access to the Recorder
+	// (e.g. for programmatic CaptureToWriter calls or custom lifecycle control).
+	cli, err := v4.NewCLI[appConfig](
+		"myapp",
+		"My Application",
+		appConfig{},
+		flightrecorder.WithFlightRecorderRecorder[appConfig](rec),
+	)
+	if err != nil {
+		fmt.Println("error:", err)
+
+		return
+	}
+
+	fmt.Println("cli created:", cli.Name())
+
+	// Output:
+	// cli created: myapp
 }

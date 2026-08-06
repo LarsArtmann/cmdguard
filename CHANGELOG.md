@@ -30,6 +30,20 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ---
 
+## [flightrecorder/v0.1.0] - 2026-08-06
+
+First stable release of the `flightrecorder` sub-module. Tagged alongside v4.0.0 core.
+
+- Zero external dependencies (Go 1.25+ stdlib `runtime/trace`)
+- Continuous in-memory trace buffering with configurable capacity
+- Context-aware snapshot capture: `Recorder.Capture`, `Recorder.CaptureToWriter`
+- Automatic slow-command (`CaptureOnSlow`+`SlowThreshold`) and error (`CaptureOnError`) capture middleware
+- `WithFlightRecorder[T]` and `WithFlightRecorderRecorder[T]` CLI options
+- Process-wide singleton with `sync.WaitGroup` coordination
+- 48 test functions, 3 benchmarks, 1 fuzz target, 96.1% coverage
+
+---
+
 ## [4.0.0] - 2026-07-28
 
 ### Breaking Changes
