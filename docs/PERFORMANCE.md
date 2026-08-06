@@ -15,12 +15,12 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ## Optimizations Applied
 
-| Optimization                          | Effect                                                  | Files                                                              |
-| ------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| Optimization                          | Effect                                                                                                   | Files                                                              |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Copy-on-write registries              | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI _(measured at original optimization time, v2.6)_ | `pkg/cmdguard/v4/type_handler.go`, `flags_validate.go`, `flags.go` |
-| Cached `os.UserHomeDir()`             | Eliminates redundant syscalls for `~/` path expansion   | `pkg/cmdguard/v4/config_file.go`                                   |
-| Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies         | `pkg/cmdguard/v4/flags.go`, `flags_suggest.go`, `flow_context.go`  |
-| Regex cache safety documentation      | Documents bounded usage of `sync.Map` regex cache       | `pkg/cmdguard/v4/flags_validate.go`                                |
+| Cached `os.UserHomeDir()`             | Eliminates redundant syscalls for `~/` path expansion                                                    | `pkg/cmdguard/v4/config_file.go`                                   |
+| Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies                                                          | `pkg/cmdguard/v4/flags.go`, `flags_suggest.go`, `flow_context.go`  |
+| Regex cache safety documentation      | Documents bounded usage of `sync.Map` regex cache                                                        | `pkg/cmdguard/v4/flags_validate.go`                                |
 
 ---
 
@@ -28,31 +28,31 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ### CLI Lifecycle
 
-| Operation          | Time      | Allocations | Memory  |
-| ------------------ | --------- | ----------- | ------- |
-| `NewCLI`           | ~12.8 µs  | 77          | ~6.9 KB |
-| `Execute` (help)   | ~838 µs   | 6,195       | ~284 KB |
-| `NewCommand`       | ~180 ns   | 1           | ~288 B  |
-| `Command.Validate` | ~13.5 ns  | 0           | 0 B     |
+| Operation          | Time     | Allocations | Memory  |
+| ------------------ | -------- | ----------- | ------- |
+| `NewCLI`           | ~12.8 µs | 77          | ~6.9 KB |
+| `Execute` (help)   | ~838 µs  | 6,195       | ~284 KB |
+| `NewCommand`       | ~180 ns  | 1           | ~288 B  |
+| `Command.Validate` | ~13.5 ns | 0           | 0 B     |
 
 _Note: `Execute` with help is slower because fang renders styled output. Actual command execution is significantly faster._
 
 ### Flag Parsing
 
-| Operation                    | Time    | Allocations | Memory  |
-| ---------------------------- | ------- | ----------- | ------- |
-| `ParseFlagTags` (4 fields)   | ~3.5 µs | 11          | ~1.6 KB |
+| Operation                  | Time    | Allocations | Memory  |
+| -------------------------- | ------- | ----------- | ------- |
+| `ParseFlagTags` (4 fields) | ~3.5 µs | 11          | ~1.6 KB |
 
 _Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recursion support. Each field allocates an `Index` reflect path for the flattened flag registration. This is expected v4 overhead for the richer feature set._
-| `NewFlagRegistry` (2 fields) | ~1.8 µs | 9           | ~896 B  |
-| `ParseDuration`              | ~153 ns | 0           | 0 B     |
-| `ParseLogLevel`              | ~80 ns  | 0           | 0 B     |
-| `ParseURL`                   | ~871 ns | 6           | ~768 B  |
-| `ParseEmail`                 | ~1.7 µs | 25          | ~504 B  |
-| `ParsePort` (numeric)        | ~77 ns  | 0           | 0 B     |
-| `ParsePort` (named)          | ~44 ns  | 0           | 0 B     |
-| `ParseFilePath`              | ~2.2 µs | 7           | ~586 B  |
-| `ParseHostPort`              | ~149 ns | 0           | 0 B     |
+| `NewFlagRegistry` (2 fields) | ~1.8 µs | 9 | ~896 B |
+| `ParseDuration` | ~153 ns | 0 | 0 B |
+| `ParseLogLevel` | ~80 ns | 0 | 0 B |
+| `ParseURL` | ~871 ns | 6 | ~768 B |
+| `ParseEmail` | ~1.7 µs | 25 | ~504 B |
+| `ParsePort` (numeric) | ~77 ns | 0 | 0 B |
+| `ParsePort` (named) | ~44 ns | 0 | 0 B |
+| `ParseFilePath` | ~2.2 µs | 7 | ~586 B |
+| `ParseHostPort` | ~149 ns | 0 | 0 B |
 
 ### Copy-on-Write Registry
 
@@ -76,11 +76,11 @@ _Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recu
 
 ### Flight Recorder
 
-| Operation              | Time    | Allocations | Memory |
-| ---------------------- | ------- | ----------- | ------ |
-| `New` (Recorder)       | ~170 ns | 2           | ~304 B |
-| `Middleware` overhead  | ~95 ns  | 0           | 0 B    |
-| `Capture`              | ~772 µs | 94          | ~47 KB |
+| Operation             | Time    | Allocations | Memory |
+| --------------------- | ------- | ----------- | ------ |
+| `New` (Recorder)      | ~170 ns | 2           | ~304 B |
+| `Middleware` overhead | ~95 ns  | 0           | 0 B    |
+| `Capture`             | ~772 µs | 94          | ~47 KB |
 
 _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serialization and file I/O._
 
