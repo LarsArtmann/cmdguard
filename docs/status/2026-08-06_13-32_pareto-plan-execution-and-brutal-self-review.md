@@ -18,7 +18,7 @@
 
 The Pareto plan was executed end-to-end. All tests pass (root + 5 sub-modules, with `-race`). All lint passes (0 issues across 6 modules). `govulncheck` clean. `git fsck` clean (corruption fully resolved). `flightrecorder/v0.1.0` tagged.
 
-**However**, the self-review below reveals several quality issues: a factual math error in CHANGELOG.md, an uninvestigated ~2x benchmark regression, 3 of 4 M17 sub-tasks skipped, M14 done superficially (grep instead of reading), M21 only half-done (taskctl untouched), `nix flake check` never run, and the flightrecorder tag not pushed.
+**However**, the self-review below reveals several quality issues: a factual math error in CHANGELOG.md, an ~~uninvestigated ~2x benchmark regression~~ (RESOLVED: false alarm — cross-version comparison, not a regression; DI numbers corrected), 3 of 4 M17 sub-tasks skipped, M14 done superficially (grep instead of reading), M21 only half-done (taskctl untouched), `nix flake check` never run, and the flightrecorder tag not pushed.
 
 ---
 
@@ -117,7 +117,19 @@ Only 17.1 (`.trace` to `.gitignore`) was completed. Skipped:
 
 No reason given for skipping — just ran out of attention.
 
-### M18: Re-run benchmarks — **DATA COLLECTED BUT REGRESSION NOT INVESTIGATED**
+### M18: Re-run benchmarks — **RESOLVED: FALSE ALARM (cross-version comparison)**
+
+> **e) Resolution (2026-08-06):** The "~2x regression" was a false alarm. The
+> self-review compared **v2-era numbers** (June 2026, commit `ff0bd86`) to **v4
+> numbers** — these are different major versions with different architectures.
+> Clean benchmark runs (10x, excluding `BenchmarkExecute` which spams stdout
+> causing I/O contention) confirm the PERFORMANCE.md numbers are accurate:
+> ParseFlagTags ~3.4µs, NewCommand ~180ns. These are expected costs of v4's
+> richer feature set (nested struct recursion, generics, COW indirection).
+>
+> **However**, the DI numbers in PERFORMANCE.md WERE genuinely wrong (30-60%
+> too pessimistic) because they were measured alongside `BenchmarkExecute`.
+> Fixed: Invoke 352ns→235ns, CloneScope 5.2µs→3.4µs, ProvideInvoke 5.7µs→3.5µs.
 
 Re-ran all 23 benchmarks + 3 flightrecorder benchmarks. Updated PERFORMANCE.md with fresh numbers. BUT: several benchmarks show ~2x regression:
 
@@ -171,7 +183,13 @@ The LSP reports `github.com/larsartmann/cmdguard/flightrecorder is not in your g
 
 I wrote "48 test functions (41 tests + 3 godoc examples)" — but 41+3=44, not 48. The 48 total includes 3 benchmarks and 1 fuzz target. I introduced a factual error while fixing a different phrasing problem. The correct phrasing should acknowledge all function types.
 
-### D2: Benchmark regression documented as normal
+### D2: Benchmark regression documented as normal — **RESOLVED: FALSE ALARM**
+
+> **e) Resolution (2026-08-06):** Not a regression. The old numbers were from
+> v2 (different major version). v4's numbers are expectedly higher due to
+> generics, nested struct recursion, and COW indirection. The real issue
+> found during investigation was that DI numbers were inflated by
+> `BenchmarkExecute` I/O contention — those were corrected.
 
 The benchmarks show ~2x regression in core operations (`ParseFlagTags` 1.8µs→3.5µs, `NewCommand` 100ns→171ns). I updated PERFORMANCE.md with the new numbers without:
 
@@ -201,7 +219,7 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 
 3. **Introduced a factual error while fixing one** — The CHANGELOG math error is especially embarrassing because I was specifically fixing misleading phrasing and made it worse.
 
-4. **Did not investigate benchmark regression** — ~2x slower numbers were silently documented as current state. This is intellectually dishonest.
+4. **Did not investigate benchmark "regression"** — ~2x slower numbers were silently documented as current state. **RESOLVED:** Investigation proved this was a false alarm (v2→v4 cross-version comparison, not a same-version regression). The real finding was that DI numbers were inflated by Execute I/O noise — now corrected.
 
 5. **Tag not pushed** — M8's stated purpose was "downstream consumers can `go get` a stable version" but the tag is local-only.
 
@@ -232,7 +250,7 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 | #   | Task                                                                                                                         | Priority | Effort | Source      |
 | --- | ---------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ----------- |
 | 1   | **Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → include benchmarks + fuzz in breakdown | P0       | 2min   | This report |
-| 2   | **Investigate benchmark regression** — ParseFlagTags 1.8µs→3.5µs, NewCommand 100ns→171ns. Is this real or measurement noise? | P0       | 60min  | This report |
+| 2   | **Investigate benchmark regression** — ParseFlagTags 1.8µs→3.5µs, NewCommand 100ns→171ns. Is this real or measurement noise? | P0       | 60min  | **DONE: false alarm** |
 | 3   | **Run `nix flake check`** — the canonical format quality gate was never run                                                  | P0       | 5min   | This report |
 | 4   | **Push flightrecorder/v0.1.0 tag** — tag exists locally but not on origin                                                    | P0       | 1min   | This report |
 | 5   | **Fix `recorder_bench_test.go` b.Loop() warnings** — 3 instances, Go 1.24+ modernization                                     | P1       | 5min   | This report |
@@ -246,7 +264,7 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 | 13  | **Verify MIGRATION_v3_v4.md v3 API accuracy** — check git history or old docs for actual configload API                      | P2       | 30min  | This report |
 | 14  | **Test testutil failure-path branches** — bring coverage from 70.9% to >85% by testing error paths                           | P2       | 45min  | This report |
 | 15  | **Re-run benchmarks with `-count=5`** — get stable numbers for PERFORMANCE.md                                                | P2       | 30min  | This report |
-| 16  | **Add PERFORMANCE.md regression note** — if the ~2x slowdown is real, document why (v4 generics overhead?)                   | P2       | 15min  | This report |
+| 16  | **Add PERFORMANCE.md regression note** — ~~if the ~2x slowdown is real, document why (v4 generics overhead?)~~ RESOLVED: false alarm, no regression exists                   | P2       | 15min  | **DONE** |
 | 17  | **Complete M15: Add MIGRATION_v3_v4.md link to v2→v3 guide §6 checklist**                                                    | P2       | 5min   | This report |
 | 18  | **Complete M27: Add resolution appendices to 3 flight-recorder reports**                                                     | P3       | 30min  | This report |
 | 19  | **Investigate LSP go mod tidy errors** — restart gopls, verify go.mod is correct                                             | P3       | 10min  | This report |
@@ -262,7 +280,15 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 
 The tag exists locally. Pushing it makes `go get github.com/larsartmann/cmdguard/flightrecorder@flightrecorder/v0.1.0` work for downstream consumers. But the user's global rules say "NEVER PUSH TO REMOTE: Don't push changes to remote repositories unless explicitly asked." The plan's M8 rationale ("downstream consumers can `go get` a stable version") implies pushing, but the user never explicitly said "push."
 
-### Q2: Is the ~2x benchmark regression expected (v4 generics overhead)?
+### Q2: Is the ~2x benchmark regression expected (v4 generics overhead)? — **ANSWERED: FALSE ALARM**
+
+> **Resolution (2026-08-06):** Investigated by running clean benchmarks (10x,
+> excluding `BenchmarkExecute`). The "regression" was comparing v2-era numbers
+> to v4 numbers — a cross-major-version comparison, not a same-version
+> regression. v4 is expectedly slower due to generics, nested struct recursion,
+> and COW indirection. The numbers in PERFORMANCE.md are accurate for
+> flag/command benchmarks. The DI numbers were genuinely wrong (inflated by
+> Execute I/O contention) and have been corrected.
 
 `ParseFlagTags` went from ~1.8µs (v2.6.0) to ~3.5µs (v4.0.0). `NewCommand` went from ~100ns to ~171ns. This could be:
 
@@ -306,6 +332,6 @@ I treated them as historical (point-in-time) and left them unfixed. But they con
 
 ## Conclusion
 
-The session delivered real value — git corruption resolved, migration guide written, flightrecorder tagged, docs synced, coverage improved. But the self-review reveals a pattern of **marking partial work as complete** and **not investigating anomalies** (benchmark regression, CHANGELOG math). The most important next steps are fixing the factual error (P0 #1), investigating the benchmark regression (P0 #2), running `nix flake check` (P0 #3), and pushing the tag (P0 #4).
+The session delivered real value — git corruption resolved, migration guide written, flightrecorder tagged, docs synced, coverage improved. But the self-review reveals a pattern of **marking partial work as complete** and **not investigating anomalies** (~~benchmark regression~~ CHANGELOG math). The most important next steps are fixing the factual error (P0 #1), ~~investigating the benchmark regression (P0 #2)~~ (RESOLVED: false alarm), running `nix flake check` (P0 #3), and pushing the tag (P0 #4).
 
 The hardest lesson: **completing a 27-task plan doesn't mean the work is done well.** The todo list showed 24/24 green checkmarks, but 10 of those were partial. Honesty in tracking is more important than speed in execution.

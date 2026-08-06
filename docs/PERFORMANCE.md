@@ -28,11 +28,11 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ### CLI Lifecycle
 
-| Operation          | Time    | Allocations | Memory  |
-| ------------------ | ------- | ----------- | ------- |
-| `Execute` (help)   | ~838 µs | 6,195       | ~284 KB |
-| `NewCommand`       | ~171 ns | 1           | ~288 B  |
-| `Command.Validate` | ~13 ns  | 0           | 0 B     |
+| Operation          | Time     | Allocations | Memory  |
+| ------------------ | -------- | ----------- | ------- |
+| `Execute` (help)   | ~838 µs  | 6,195       | ~284 KB |
+| `NewCommand`       | ~180 ns  | 1           | ~288 B  |
+| `Command.Validate` | ~13.5 ns | 0           | 0 B     |
 
 _Note: `Execute` with help is slower because fang renders styled output. Actual command execution is significantly faster._
 
@@ -64,12 +64,12 @@ _Note: `Execute` with help is slower because fang renders styled output. Actual 
 
 | Operation          | Time    | Allocations | Memory  |
 | ------------------ | ------- | ----------- | ------- |
-| `NewScope`         | ~666 ns | 11          | ~688 B  |
-| `NewScopeWithOpts` | ~621 ns | 11          | ~688 B  |
-| `Provide`          | ~2.7 µs | 26          | ~1.7 KB |
-| `Invoke`           | ~352 ns | 5           | ~160 B  |
-| `CloneScope`       | ~5.2 µs | 39          | ~3.0 KB |
-| `ProvideInvoke`    | ~5.7 µs | 41          | ~3.1 KB |
+| `NewScope`         | ~700 ns | 11          | ~688 B  |
+| `NewScopeWithOpts` | ~470 ns | 11          | ~688 B  |
+| `Provide`          | ~2.9 µs | 26          | ~1.7 KB |
+| `Invoke`           | ~235 ns | 5           | ~160 B  |
+| `CloneScope`       | ~3.4 µs | 39          | ~3.0 KB |
+| `ProvideInvoke`    | ~3.5 µs | 41          | ~3.1 KB |
 
 ### Flight Recorder
 
@@ -87,9 +87,9 @@ _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serializa
 
 For a typical CLI with 5 commands:
 
-- 1× `NewCLI` + `ScopeCreation`: ~666 ns
-- 5× `NewCommand` + validation: ~855 ns
-- Total startup: **<1.6 µs**
+- 1× `NewCLI` + `ScopeCreation`: ~700 ns
+- 5× `NewCommand` + validation: ~967 ns
+- Total startup: **<1.7 µs**
 
 This is negligible compared to Go runtime initialization (~1–5 ms).
 
@@ -97,20 +97,20 @@ This is negligible compared to Go runtime initialization (~1–5 ms).
 
 For a command with typed flags:
 
-- Flag tag parsing: ~3.5 µs (once at registration)
-- Flag registry creation: ~1.9 µs (once at registration, COW)
-- Command validation: ~13 ns (once at registration)
+- Flag tag parsing: ~3.4 µs (once at registration)
+- Flag registry creation: ~1.8 µs (once at registration, COW)
+- Command validation: ~13.5 ns (once at registration)
 
 At execution time, cmdguard adds essentially zero overhead beyond what Cobra already does — flags are parsed by pflag just like in raw Cobra.
 
 ### DI Overhead
 
-- Service registration (`Provide`): ~2.7 µs
-- Service lookup (`Invoke`): ~352 ns
+- Service registration (`Provide`): ~2.9 µs
+- Service lookup (`Invoke`): ~235 ns
 
 For a CLI that resolves 10 services per command:
 
-- 10 × 352 ns = **3.5 µs** of DI overhead per execution
+- 10 × 235 ns = **2.4 µs** of DI overhead per execution
 
 This is negligible for any CLI that does I/O.
 
@@ -147,3 +147,13 @@ GOEXPERIMENT=jsonv2 go test ./flightrecorder/ -bench=. -benchmem -count=5
 ```
 
 For stable results, close other applications and run on a quiet machine.
+
+**Important:** `BenchmarkExecute` renders help text to stdout on every iteration.
+Run it separately from other benchmarks to avoid I/O contention inflating
+results:
+
+```bash
+# Run Execute separately to avoid I/O noise polluting other benchmarks
+GOEXPERIMENT=jsonv2 go test ./benchmarks/ -bench='BenchmarkExecute' -benchmem -count=5
+GOEXPERIMENT=jsonv2 go test ./benchmarks/ -bench='NewCommand|ParseFlagTags|FlagRegistry|Scope|Command' -benchmem -count=10
+```
