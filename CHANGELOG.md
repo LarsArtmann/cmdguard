@@ -9,17 +9,24 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Added
 
-- **flightrecorder sub-module** — independently importable module built on Go 1.25+ `runtime/trace.FlightRecorder`. Provides continuous trace buffering, context-aware snapshot capture, automatic slow-command and error capture middleware, and writer-based export. Zero external dependencies (stdlib only). Sixth workspace module.
+- **flightrecorder sub-module** — independently importable module (`github.com/larsartmann/cmdguard/flightrecorder`) built on Go 1.25+ `runtime/trace.FlightRecorder`. Provides continuous in-memory trace buffering, context-aware snapshot capture, and automatic slow-command / error capture middleware. Zero external dependencies (stdlib only). Sixth workspace module. Full API surface: `Recorder` (Start/Stop/Enabled/WriteTo/Capture/CaptureToWriter), `Config` (8 fields with defaults), `Middleware[T]`, `WithFlightRecorder[T]`, `WithFlightRecorderRecorder[T]`, sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), 48 tests + 3 examples, 3 benchmarks, 1 fuzz target, 96.1% coverage.
 - CLI lifecycle improvements — enhanced command shutdown behavior and lifecycle test coverage.
+- `TODO_LIST.md` and `ROADMAP.md` — created (were referenced in AGENTS.md but missing).
 
 ### Changed
 
-- Documentation overhaul — updated all user-facing docs (QUICKSTART, TUTORIAL, WHAT_THIS_PROJECT_IS_ABOUT, WHAT_THIS_PROJECT_IS_NOT) to reflect v4 API.
-- AGENTS.md project structure corrected from stale v3 references to v4.
+- **Documentation v3→v4 drift fix** — 36 user-facing and contributor-facing documents updated from stale v3 API references to v4 (QUICKSTART, TUTORIAL, WHAT_THIS_PROJECT_IS_ABOUT, WHAT_THIS_PROJECT_IS_NOT, MIGRATION_FROM_COBRA, COMPARISON, PERFORMANCE, doc.go, README, website guides). 23 website source files updated.
+- AGENTS.md project structure corrected from stale v3 references to v4; flightrecorder sub-module documented (package table, lint strategy, design principles, gotchas).
+- `CHANGELOG.md` rebuilt with real version history (v0.1.0 through v4.0.0) derived from git tags and tag messages.
+- `go-output` upgraded v0.35.0 → v0.37.0.
+- Nix flake inputs updated; go.mod `replace` directives consolidated into a single block.
 
 ### Fixed
 
 - `doc.go` godoc example — fixed stale `v3` import alias and "v2 constructors" reference.
+- README.md sub-modules code example — fixed missing `"time"` import (used `time.Millisecond` without importing the `time` package).
+- flightrecorder `evaluateCapture` — error reason now takes precedence over slow reason when both conditions are met (previously slow overwrote error).
+- flightrecorder timestamp format — changed to nanosecond precision to prevent same-second concurrent captures from clobbering each other's files.
 
 ---
 

@@ -173,7 +173,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ---
 
-## Rich Output (go-output v0.35.0)
+## Rich Output (go-output v0.37.0)
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |
@@ -335,7 +335,7 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | `prompts`        | `HuhRunner`, `Register()`                           | `charm.land/huh/v2`              | v2.0.3   | 🟢 📦 SUB-MODULE |
 | `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`      | `charm.land/lipgloss/v2`         | v2.0.5   | 🟢 📦 SUB-MODULE |
 | `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`             | `go.opentelemetry.io/otel/trace` | v1.44.0  | 🟢 📦 SUB-MODULE |
-| `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`        | _(stdlib `runtime/trace`)_       | Go 1.25+ | 🟢 📦 SUB-MODULE |
+| `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`, `WithFlightRecorderRecorder[T]()`, `Capture()`, `CaptureToWriter()` | _(stdlib `runtime/trace`)_       | Go 1.25+ | 🟢 📦 SUB-MODULE |
 
 ---
 
@@ -350,7 +350,7 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | `github.com/spf13/pflag`                    | v1.0.10 | Flag parsing                                   |
 | `charm.land/fang/v2`                        | v2.0.1  | Cobra styling                                  |
 | `charm.land/lipgloss/v2`                    | v2.0.5  | Terminal styling (fang dep, but listed direct) |
-| `github.com/larsartmann/go-output`          | v0.35.0 | Rich output (16 formats)                       |
+| `github.com/larsartmann/go-output`          | v0.37.0 | Rich output (16 formats)                       |
 | `github.com/larsartmann/samber-do-auditlog` | v0.8.1  | DI audit logging                               |
 | `github.com/knadh/koanf/v2`                 | v2.3.5  | Config loading (KoanfLoader)                   |
 | `github.com/knadh/koanf/parsers/json`       | v1.0.0  | Koanf JSON parser                              |
@@ -374,11 +374,11 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader)                                                                       |
-| Test functions              | 500             | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                           |
+| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 87.8% verified                                                                       |
+| Test functions              | ~550            | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                                           |
 | Benchmarks                  | 29              | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
 | Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
-| Sub-module tests            | 54 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 33 tests + 4 examples, 94.6% coverage)                     |
+| Sub-module tests            | 65 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 48 tests + 3 examples, 96.1% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
 | `pkg/testutil` coverage     | 49.6%           | 🟡 Debt | 372-line public package, 24 test functions                                                                     |
 | `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
@@ -408,4 +408,4 @@ defaults; instance-level writes trigger COW clone. Reduces `NewCLI` by ~48%.
 
 ---
 
-**Last updated 2026-07-10. Every status verified against source code.**
+**Last updated 2026-08-06. Every status verified against source code.**
