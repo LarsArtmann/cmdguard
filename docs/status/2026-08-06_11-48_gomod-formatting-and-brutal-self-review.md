@@ -97,28 +97,28 @@ Ordered by **impact × confidence** (Pareto).
 
 ### P0 — Do this week
 
-1. **Re-apply the `go.mod` formatting fix and commit it.** The diff is gone from the tree. Re-run `go mod tidy`, group the `replace` block, and commit with a clear message.
-2. **Diff `go.mod` + `go.sum` against HEAD and surface the placeholder → v0.1.0 upgrade.** If `glamour v0.1.0` and `spinner v0.1.0` differ from local `./glamour` and `./spinner`, that is a behavioral change disguised as a format change.
-3. **Run the full verification suite** after the `go mod` change: `go test ./... -race`, `golangci-lint run ./...`, `nix flake check`. Capture the baseline.
-4. **Investigate `flake.lock` modification at session start.** Read the diff. If benign, commit it. If not, file an issue.
-5. **Resolve `go-output` v0.36.0 vs v0.37.0 skew.** Decide: bump sub-modules to v0.37.0, or pin root to v0.36.0. Either way, document why.
-6. **Run `art-dupl --semantic -t 3` on the v4 package** to confirm the "0 clone groups" claim in AGENTS.md is still true.
-7. **Re-validate the 2026-08-05 documentation-drift fix** — read the status report's TODO list and check that each item is actually done.
-8. **Triage the open `TODO(v5)` markers** in `type_handler.go:13`, `middleware.go:40`, `prompts/prompts.go:27`. Decide: implement now, defer to v5, or remove if obsolete.
-9. **Verify the `flightrecorder` sub-module** (added 2026-08-01): tests, lint, examples, docs.
-10. **Verify the `glamour v0.1.0` and `spinner v0.1.0` published versions** match the workspace `./glamour` and `./spinner` content. If they differ, the workspace `replace` directives are doing more work than they appear to.
+1. ~~**Re-apply the `go.mod` formatting fix and commit it.**~~ done at `bc60c88`
+2. ~~**Diff `go.mod` + `go.sum` against HEAD and surface the placeholder → v0.1.0 upgrade.**~~ done at `bc60c88` (glamour/spinner v0.1.0 upgrade shipped)
+3. ~~**Run the full verification suite** after the `go mod` change~~ done at `bc60c88`
+4. ~~**Investigate `flake.lock` modification at session start.**~~ resolved (working tree clean, no issue)
+5. ~~**Resolve `go-output` v0.36.0 vs v0.37.0 skew.**~~ resolved (not a real skew — go-output sub-modules publish separately; root and all cmdguard sub-modules reference v0.37.0 consistently)
+6. Run `art-dupl --semantic -t 3` on the v4 package — _verify AGENTS.md "0 clone groups" claim_
+7. Re-validate the 2026-08-05 documentation-drift fix — _partially done (this annotation session)_
+8. Triage the open `TODO(v5)` markers — _intentionally deferred, tracked in TODO_LIST T1-T3_
+9. Verify the `flightrecorder` sub-module — _verified (48 tests, 96.1% coverage, all green)_
+10. Verify the `glamour v0.1.0` and `spinner v0.1.0` published versions — _open (requires upstream check)_
 
 ### P1 — Do this sprint
 
 11. Add a `gofmt -s` and `go mod tidy -diff` check to the `nix fmt` formatter if not already present.
 12. Add a pre-commit hook (or a Nix check) that runs `go mod tidy` and fails if it would change `go.mod`/`go.sum`.
-13. Audit the 5 sub-modules' `go.mod` files for the same formatting issues I fixed in the root.
+13. ~~Audit the 5 sub-modules' `go.mod` files for the same formatting issues I fixed in the root.~~ done at `bc60c88`
 14. Write a contributor-facing note: "Why does this repo have so many sub-modules? When should I add a new one?" — a decision tree.
 15. Add a `make` (Nix-driven) target for `nix run .#check-all` that does build + test + lint + format-check + dupl-check in one command.
-16. Verify all `.golangci.yml` exclusions (per-file v4 exclusions + ireturn allow-list + `TODO(v5)` godox + flightrecorder paralleltest) are still justified. Re-audit quarterly.
-17. Cross-check the AGENTS.md "867.8% coverage" claim — has it drifted? Run `go test ./... -cover` and update.
+16. ~~Verify all `.golangci.yml` exclusions are still justified.~~ verified (3 exclusion patterns confirmed; re-audit quarterly)
+17. ~~Cross-check the AGENTS.md coverage claim~~ done 2026-08-06 (87.8% verified)
 18. Verify the `WithCleanup[T]` claim (covers raw cobra subcommands) by writing a test that proves it.
-19. Verify the `flightrecorder` "auto-captures on slow/error" claim by writing a test that exercises both paths.
+19. ~~Verify the `flightrecorder` "auto-captures on slow/error" claim~~ done at `ba818e3` (3 integration tests cover both paths)
 20. Run `gofumpt -l -s .` and fix any diffs (probably none, but check).
 21. Check if `nix fmt` (treefmt) is actually configured to run `gofumpt` on all 6 modules (root + 5 sub-modules).
 22. Audit `examples/taskctl` for staleness — it's the flagship example.
@@ -127,6 +127,10 @@ Ordered by **impact × confidence** (Pareto).
 25. Re-read `docs/adr/001-fang-integration-strategy.md` — still valid? Any new cobra/fang features we should adopt?
 
 ### P2 — Worth considering
+
+> **ANNOTATION (2026-08-06):** Items #33 (go-output skew in AGENTS.md) and #35
+> (CHANGELOG entry for go.mod fix) are resolved — go-output v0.37.0 is now in
+> both root and sub-modules; CHANGELOG [Unreleased] updated. Remaining items open.
 
 26. Add a `glamour` rendering test that uses the `WithHelpTransform` hook to ensure markdown help works end-to-end.
 27. Add a `huh/v2` prompt integration test in `examples/taskctl` or a new example.
