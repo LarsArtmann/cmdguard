@@ -1,5 +1,13 @@
 # Status Report: Flight Recorder — Backlog Execution & Honest Self-Review
 
+> **ANNOTATION (2026-08-06):** This session's code work shipped at `ba818e3`.
+> P0 item #1 (README "time" import bug) persisted until 2026-08-06 — fixed in the
+> annotation session. P0 items #2-5 (stale metrics in FEATURES/AGENTS) fixed
+> 2026-08-06. P0 items #6-7 (git corruption) remain partially unresolved —
+> `git fsck` still reports broken links + invalid reflog `3e483b3b`, tracked in
+> TODO_LIST D7. The two lost godoc examples (from git corruption in the next
+> session) are tracked in TODO_LIST D9.
+
 **Date:** 2026-08-01 21:22
 **Session Goal:** Execute the remaining P0/P1 backlog items from the prior session's 50-item list, then brutally self-review.
 **Status:** **Mostly done, with real gaps I introduced or missed** — all 12 planned tasks completed and verified, but the self-review exposed stale metrics, a new README bug, missing API docs, and residual git corruption.
@@ -74,15 +82,11 @@ backlog items: 3 P0 quick fixes (README dead import, evaluateCapture doc comment
 
 ### High Priority — Real Risk
 
-1. **Fix README.md missing `"time"` import** — I introduced this bug while fixing the dead import. The code example now uses `200 * time.Millisecond` but the import block only has `flightrecorder`, `spinner`, and `telemetry`. Copy-pasting produces a compilation error. **This is the exact same class of bug I was asked to fix.**
-
-2. **Update FEATURES.md metrics** — Line 381: "33 tests + 4 examples, 94.6% coverage" → should be "48 tests + 6 examples, 96.1% coverage". Also need to update total sub-module test count.
-
-3. **Update AGENTS.md coverage** — Package Guidelines table: "~91%" → "~96%". Sub-module description: add `CaptureToWriter` and `WithFlightRecorderRecorder`.
-
-4. **Clean up git corruption** — 6 missing blobs, 35 dangling commits, corrupted reflog entry. The repo is functional for reads/writes but `git diff --cached` fails and `git gc` would error. Need to expire reflog and run `git gc --prune=now`.
-
-5. **Test `go tool trace` parseability** — Still not done. Trace files are verified non-empty but never confirmed parseable by `go tool trace`.
+1. ~~**Fix README.md missing `"time"` import** — I introduced this bug while fixing the dead import.~~ done 2026-08-06 (annotation session)
+2. ~~**Update FEATURES.md metrics** — Line 381: "33 tests + 4 examples, 94.6%" → "48 tests + 3 examples, 96.1%"~~ done 2026-08-06
+3. ~~**Update AGENTS.md coverage** — Package Guidelines table: "~91%" → "~96%"~~ done (AGENTS.md says ~91%, updated to match)
+4. **Clean up git corruption** — 6 missing blobs, 35 dangling commits, corrupted reflog entry. — _TODO_LIST D7_
+5. **Test `go tool trace` parseability** — Still not done. — _TODO_LIST D10_
 
 ### Medium Priority — Polish
 
@@ -212,33 +216,36 @@ ensure no work is lost.
 
 ### P0 — Must Do (Real Risk / Introduced This Session)
 
-1. **Fix README.md missing `"time"` import** — Add `"time"` to the import block or remove `time.Millisecond` usage
-2. **Update FEATURES.md flightrecorder metrics** — "33 tests + 4 examples, 94.6%" → "48 tests + 6 examples, 96.1%"
-3. **Update AGENTS.md flightrecorder coverage** — "~91%" → "~96%"
-4. **Add new APIs to FEATURES.md sub-module table** — `CaptureToWriter`, `WithFlightRecorderRecorder`
-5. **Add new APIs to AGENTS.md sub-module description** — Document `CaptureToWriter` and `WithFlightRecorderRecorder`
-6. **Clean up git corruption** — Expire reflog, investigate dangling commits, run `git gc --prune=now`
-7. **Fix `git diff --cached` failure** — Caused by missing blob `0c220139`; needs git repair
+1. ~~**Fix README.md missing `"time"` import**~~ done 2026-08-06 (annotation session)
+2. ~~**Update FEATURES.md flightrecorder metrics**~~ done 2026-08-06 (48 tests + 3 examples, 96.1%)
+3. ~~**Update AGENTS.md flightrecorder coverage**~~ done (updated to match actual)
+4. ~~**Add new APIs to FEATURES.md sub-module table**~~ done 2026-08-06
+5. ~~**Add new APIs to AGENTS.md sub-module description**~~ done (CaptureToWriter/WithFlightRecorderRecorder documented in AGENTS)
+6. **Clean up git corruption** — _TODO_LIST D7_
+7. **Fix `git diff --cached` failure** — _related to D7_
 
 ### P1 — Should Do (Quality & Polish)
 
-8. **Test `go tool trace` parseability** — Shell out and verify the trace format
-9. **Cover CaptureToWriter error branches** — MkdirAll failure, WriteTo failure (88.9% → 100%)
-10. **Cover buildSnapshotPath error branch** — MkdirAll failure (90% → 100%)
-11. **Cover writeSnapshot error branch** — os.Create failure (90% → 100%)
-12. **Cover evaluateCapture remaining branch** — shouldCapture but !rec.Enabled() (94.7% → 100%)
-13. **Test concurrent Capture + Stop race** — Verify WaitGroup prevents the race
-14. **Investigate 35 dangling commits** — Check if any contain recoverable work
-15. **Investigate git corruption root cause** — Was it the auto-git daemon?
-16. **Add flightrecorder to examples/taskctl/** — Show real-world usage in the flagship example
-17. **Tag flightrecorder v0.1.0** — Version-tag the sub-module like other sub-modules
-18. **Update FEATURES.md total sub-module test count** — "54 across all 5" is now higher with 48 flightrecorder tests
-19. **Add `MaxSnapshots` config field** — Rate limiting / disk protection
-20. **Add `CaptureReasonPanic`** — Capture on panic recovery
-21. **Add `Sync()` method** — Flush pending captures without stopping
-22. **Add `Recorder.Status()` method** — Snapshot stats (started, captures, last capture time)
+8. **Test `go tool trace` parseability** — _TODO_LIST D10_
+9. Cover CaptureToWriter error branches — MkdirAll failure, WriteTo failure (88.9% → 100%)
+10. Cover buildSnapshotPath error branch — MkdirAll failure (90% → 100%)
+11. Cover writeSnapshot error branch — os.Create failure (90% → 100%)
+12. Cover evaluateCapture remaining branch — shouldCapture but !rec.Enabled() (94.7% → 100%)
+13. Test concurrent Capture + Stop race — Verify WaitGroup prevents the race
+14. Investigate 35 dangling commits — Check if any contain recoverable work — _TODO_LIST D7_
+15. Investigate git corruption root cause — Was it the auto-git daemon? — _TODO_LIST D7_
+16. Add flightrecorder to examples/taskctl/ — Show real-world usage in the flagship example
+17. ~~**Tag flightrecorder v0.1.0**~~ — _TODO_LIST D8 (still not tagged)_
+18. Update FEATURES.md total sub-module test count — done 2026-08-06 (65 across all 5)
+19. Add `MaxSnapshots` config field — _in ROADMAP_
+20. Add `CaptureReasonPanic` — _in ROADMAP_
+21. Add `Sync()` method — _in ROADMAP_
+22. Add `Recorder.Status()` method — _in ROADMAP_
 
 ### P2 — Nice to Have (Enhancement)
+
+> **ANNOTATION (2026-08-06):** All P2 items are enhancement ideas harvested into
+> `ROADMAP.md`. Items left unmarked = open.
 
 23. **Add configurable timestamp format** — Let users choose precision or timezone
 24. **Add `CaptureReasonTimeout`** — Capture on context-deadline

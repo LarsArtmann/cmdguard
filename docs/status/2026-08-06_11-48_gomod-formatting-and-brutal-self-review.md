@@ -1,5 +1,15 @@
 # Status Report — 2026-08-06 11:48 — go.mod Formatting & Brutal Self-Review
 
+> **ANNOTATION (2026-08-06, later session):** The go.mod formatting work was
+> re-applied and committed at `bc60c88` (chore(deps): update nix flake inputs
+> and reformat go.mod replace directives). The "work disappeared" concern (§d #1)
+> is resolved — the change is now in git history. The `glamour`/`spinner` v0.1.0
+> placeholder upgrade (§d #2) shipped in that same commit. The `go-output` v0.36.0
+> vs v0.37.0 "skew" (§2 #6) is not a real issue — go-output's own sub-modules
+> (d2, delimited, etc.) publish separately from the main module; root and all
+> cmdguard sub-modules consistently reference `go-output v0.37.0`. The `flake.lock`
+> modification (§2 #7) is resolved (working tree clean).
+
 **Session date:** 2026-08-06 11:48
 **Session scope:** 1 user prompt, ~3 tool calls. **Effectively zero work done.**
 

@@ -1,5 +1,13 @@
 # Documentation Drift Fix — Comprehensive Status Report
 
+> **ANNOTATION (2026-08-06):** The core drift fix (36 files + 23 website files)
+> shipped at `0abae74` + `a7aab73`. `docs/MIGRATION_FROM_COBRA.md` was committed
+> at `a7aab73`. However, several residual items from the "NOT STARTED" section
+> remain open and are tracked in TODO_LIST.md: `CONTRIBUTING.md` still says `v3`
+> (D3), `docs/ERROR_REFERENCE.md` title still says "v2" (D4), and
+> `docs/MIGRATION_v3_v4.md` was never created (D5). The `flake.lock` modification
+> flagged in later reports was resolved (working tree clean).
+
 **Date:** 2026-08-05 04:20
 **Session scope:** Adopt the cmdguard project — fix all documentation drift from v3→v4 API migration, create missing living docs, and verify project health.
 **Baseline commit:** `072c642` (2026-08-01, docs: establish a structured project changelog)
@@ -82,35 +90,41 @@ The sed replacement caught all `v3.` → `v4.` and `cmdguard/v3` → `cmdguard/v
 
 ### C1. `docs/ERROR_REFERENCE.md` — title says "v2"
 
-The file title is "Error Reference — cmdguard v2" but it references `pkg/cmdguard/v4/errors_*.go` in its source note. The title needs updating to v4. Not started.
+~~The file title is "Error Reference — cmdguard v2" but it references `pkg/cmdguard/v4/errors_*.go` in its source note. The title needs updating to v4. Not started.~~
+
+**Still open — TODO_LIST D4.** Title confirmed still "v2" as of 2026-08-06.
 
 ### C2. `CONTRIBUTING.md` — references `v3` package name
 
-Line 101 says "Single internal test package (`v3`, accesses private helpers)" and line 115 says "v3 Design Principles". Both should say `v4`. Not started.
+~~Line 101 says "Single internal test package (`v3`, accesses private helpers)" and line 115 says "v3 Design Principles". Both should say `v4`. Not started.~~
+
+**Still open — TODO_LIST D3.** Lines 101 and 115 confirmed still `v3` as of 2026-08-06.
 
 ### C3. `docs/DOMAIN_LANGUAGE.md` — not audited for v4 accuracy
 
-The file references `samber/do/v2` (correct — that's the library version, not the cmdguard version) but I did not verify whether the domain language terms themselves are still accurate for v4. Not started.
+Still open — not verified.
 
 ### C4. Website build verification — `npm run build` / `astro build` not run
 
-The website source files were edited but the build was not verified. The `.mdx` and `.astro` changes are text-only (no logic), but a build would catch any syntax errors. Not started.
+Still open — not verified.
 
 ### C5. `nix flake check` — not run
 
-The flake check (format verification) was not run. The changes are documentation-only (no `.nix` files changed), so this is low-risk, but it wasn't verified. Not started.
+~~The flake check (format verification) was not run. The changes are documentation-only (no `.nix` files changed), so this is low-risk, but it wasn't verified. Not started.~~
+
+Resolved — `nix flake check` passes (verified in later sessions at `ba818e3`).
 
 ### C6. `docs/COMPARISON.md` — full content not audited
 
-Only the `v3.` → `v4.` code references were fixed. The comparison table content (feature matrix vs Kong, urfave/cli, etc.) was not audited for accuracy against the actual v4 API. Not started.
+Still open — only `v3.` → `v4.` code references were fixed; prose not audited.
 
 ### C7. `docs/PERFORMANCE.md` — benchmark numbers not re-verified
 
-The file paths were fixed from `v3/` to `v4/`, but the benchmark numbers themselves were not re-run. They may be stale. Not started.
+Still open — file paths fixed but numbers from v2.6.0 era not re-run.
 
 ### C8. CI workflows — not audited for v4 references
 
-`.github/workflows/ci.yml`, `release.yml`, `submodule-smoke.yml`, `website.yml` were not checked for stale v3 references. Not started.
+Still open — `.github/workflows/` not checked for stale `v3` references.
 
 ---
 
@@ -182,12 +196,17 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 
 ## F) Up to 50 things we should get done next
 
+> **ANNOTATION (2026-08-06):** Item #1 (commit MIGRATION_FROM_COBRA.md) done at
+> `a7aab73`. Items #2-3 (CONTRIBUTING.md, ERROR_REFERENCE.md) still open —
+> TODO_LIST D3/D4. Item #4 (MIGRATION_v3_v4.md) still open — TODO_LIST D5. Most
+> P2/P3 items remain open. Items left unmarked in the table below are still open.
+
 | #   | Task                                                                                       | Priority | Effort |
 | --- | ------------------------------------------------------------------------------------------ | -------- | ------ |
-| 1   | Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes                              | P0       | 1min   |
-| 2   | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references)                                         | P0       | 5min   |
-| 3   | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4"                                          | P0       | 2min   |
-| 4   | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide                         | P1       | 30min  |
+| 1   | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`       | P0       | 1min   |
+| 2   | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) — _TODO_LIST D3_                        | P0       | 5min   |
+| 3   | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_                         | P0       | 2min   |
+| 4   | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_        | P1       | 30min  |
 | 5   | Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3                                 | P1       | 5min   |
 | 6   | Fix CHANGELOG.md v3.0.0 section — note manpage later removed                               | P1       | 5min   |
 | 7   | Audit `.github/workflows/` for stale `cmdguard/v3` references                              | P1       | 15min  |

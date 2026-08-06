@@ -1,5 +1,15 @@
 # Status Report: 2026-08-01 22:03 — Git Corruption Recovery & Honest Self-Review
 
+> **ANNOTATION (2026-08-06):** The live `master` branch is clean and fully
+> functional (all tests pass, all builds succeed). However, **the corruption was
+> never fully cleaned up**: `git fsck` still reports 6 broken links, 37 dangling
+> commits, and invalid reflog entry `3e483b3b`. The backup ref
+> `recovery/921bf73-backup` still exists. The two reconstructed files
+> (`flightrecorder/README.md`, `flightrecorder/example_test.go`) are in the tree
+> but are NOT byte-identical to the originals (which are permanently lost).
+> Cleanup is tracked in TODO_LIST D7. The reconstructed `example_test.go` has
+> only 3 examples (the originals had 5+; 2 were lost forever).
+
 **Session focus:** Recovering from a corrupted git object database (missing blobs) that blocked a `git sync` rebase, then honest self-critique of the recovery.
 
 ---
@@ -118,46 +128,46 @@ I created it as a safety net but didn't tell the user what it is, why it exists,
 
 ### Immediate (This Session / Next Session)
 
-1. Ask user if they have the original `flightrecorder/README.md` and `example_test.go` elsewhere
-2. Delete `recovery/921bf73-backup` ref once user confirms recovery is satisfactory
-3. Run `git gc --prune=now` to clean up the 12 broken/dangling objects from fsck
+1. ~~Ask user if they have the original `flightrecorder/README.md` and `example_test.go` elsewhere~~ resolved (originals confirmed permanently lost; reconstructions are the source of truth)
+2. Delete `recovery/921bf73-backup` ref once user confirms recovery is satisfactory — _still open; TODO_LIST D7_
+3. Run `git gc --prune=now` to clean up the 12 broken/dangling objects from fsck — _still open; TODO_LIST D7_
 4. Verify git-town is in a clean state (`git town status` or equivalent)
-5. Commit the working tree changes (flightrecorder sub-module + doc changes + deletions)
-6. Push to origin (user diverged; needs force-with-lease or fresh push)
+5. ~~Commit the working tree changes (flightrecorder sub-module + doc changes + deletions)~~ done at `ba818e3`
+6. ~~Push to origin~~ done (master tracks origin cleanly)
 
 ### flightrecorder Sub-Module
 
 7. Fix the 3 `b.Loop()` modernization warnings in `recorder_bench_test.go`
-8. Verify the recreated README renders correctly on GitHub/pkg.go.dev
-9. Add the flightrecorder sub-module to the main README feature list
-10. Update FEATURES.md to list flightrecorder as DONE
-11. Update AGENTS.md sub-module count and table (currently says "5 sub-modules" — flightrecorder is the 6th but listed in structure)
+8. ~~Verify the recreated README renders correctly on GitHub/pkg.go.dev~~ done
+9. ~~Add the flightrecorder sub-module to the main README feature list~~ done at `ba818e3`
+10. ~~Update FEATURES.md to list flightrecorder as DONE~~ done at `ba818e3`
+11. ~~Update AGENTS.md sub-module count and table~~ done at `ba818e3`
 12. Verify the flightrecorder CI smoke test works (`.github/workflows/submodule-smoke.yml`)
 13. Add flightrecorder to the workspace CI matrix
 14. Consider adding a `flightrecorder/go.sum` audit step
 
 ### Git Hygiene
 
-15. Run full `git fsck --full --strict` on master to confirm zero corruption in the live branch
-16. Check if other commits in history reference the same missing blobs (chain integrity)
+15. Run full `git fsck --full --strict` on master to confirm zero corruption in the live branch — _partially done (master is functional, but 6 broken links remain)_
+16. Check if other commits in history reference the same missing blobs (chain integrity) — _TODO_LIST D7_
 17. Set up `git config core.fsmonitor` and `core.untrackedCache` for faster git operations
-18. Consider `git gc --auto` configuration to prevent future blob corruption from interrupted operations
+18. Consider `git gc --auto` configuration to prevent future blob corruption from interrupted operations — _TODO_LIST D7_
 19. Add a pre-push hook that runs `git fsck --connectivity-only` to catch corruption before push
 
 ### Documentation Consolidation (User Is Deleting Files)
 
-20. Verify the intentional deletion of CHANGELOG.md, ROADMAP.md, TODO_LIST.md, docs/API.md
-21. If CHANGELOG.md is being replaced, ensure release notes have a new home
-22. If ROADMAP.md content moved, verify it's in FEATURES.md or AGENTS.md
-23. If TODO_LIST.md content moved, verify nothing was lost
-24. If docs/API.md is removed, ensure pkg.go.dev covers the same ground
-25. Update all cross-references in AGENTS.md that point to deleted files (multiple links exist)
+20. ~~Verify the intentional deletion of CHANGELOG.md, ROADMAP.md, TODO_LIST.md, docs/API.md~~ resolved (files were restored/recreated in later sessions; all exist now)
+21. ~~If CHANGELOG.md is being replaced, ensure release notes have a new home~~ resolved (CHANGELOG.md rebuilt at `0abae74`)
+22. ~~If ROADMAP.md content moved, verify it's in FEATURES.md or AGENTS.md~~ resolved (ROADMAP.md exists at `578d206`)
+23. ~~If TODO_LIST.md content moved, verify nothing was lost~~ resolved (TODO_LIST.md exists at `578d206`)
+24. ~~If docs/API.md is removed, ensure pkg.go.dev covers the same ground~~ resolved (docs/API.md exists)
+25. ~~Update all cross-references in AGENTS.md that point to deleted files~~ resolved (files exist)
 
 ### The 3 Untracked Status Reports
 
-26. Review `docs/status/2026-08-01_19-42_flight-recorder-sub-module.md` — commit or discard
-27. Review `docs/status/2026-08-01_20-45_flight-recorder-ecosystem-completion.md` — commit or discard
-28. Review `docs/status/2026-08-01_21-22_flight-recorder-backlog-execution-and-self-review.md` — commit or discard
+26. ~~Review `docs/status/2026-08-01_19-42_flight-recorder-sub-module.md`~~ done (annotated 2026-08-06)
+27. ~~Review `docs/status/2026-08-01_20-45_flight-recorder-ecosystem-completion.md`~~ done (annotated 2026-08-06)
+28. ~~Review `docs/status/2026-08-01_21-22_flight-recorder-backlog-execution-and-self-review.md`~~ done (annotated 2026-08-06)
 
 ### Build / CI
 
@@ -188,9 +198,9 @@ I created it as a safety net but didn't tell the user what it is, why it exists,
 44. Add a shell.nix or .envrc that exports GOEXPERIMENT=jsonv2 for non-nix shells
 45. Consider a `just` or nix target for `git fsck` health check
 46. Add flightrecorder to the examples/taskctl flagship example as a usage demonstration
-47. Write integration test that exercises flightrecorder middleware through a real CLI execution
+47. ~~Write integration test that exercises flightrecorder middleware through a real CLI execution~~ done at `ba818e3`
 48. Consider adding a benchmark comparing CLI with/without flightrecorder middleware (overhead measurement)
-49. Document the `go tool trace` analysis workflow in the flightrecorder README
+49. Document the `go tool trace` analysis workflow in the flightrecorder README — _TODO_LIST D10_
 50. Add a `.trace` file to `.gitignore` (snapshot output files shouldn't be committed)
 
 ---

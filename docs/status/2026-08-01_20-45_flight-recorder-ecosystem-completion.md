@@ -221,6 +221,9 @@ mocking, but it means the "another flight recorder is already active" scenario i
 
 ### P2 — Nice to Have (Enhancement)
 
+> **ANNOTATION (2026-08-06):** All P2 items are enhancement ideas harvested into
+> `ROADMAP.md` "Flight Recorder Enhancements." None shipped. Left unmarked = open.
+
 19. **Add `MaxSnapshots` config field** — Rate limiting / disk protection
 20. **Add configurable timestamp format** — Let users choose precision or timezone
 21. **Add `CaptureReasonPanic`** — Capture on panic recovery
@@ -240,6 +243,10 @@ mocking, but it means the "another flight recorder is already active" scenario i
 35. **Consider trace upload hook** — Post-capture callback for remote storage
 
 ### P3 — Future Consideration
+
+> **ANNOTATION (2026-08-06):** All P3 items are future ideas. go.sum bloat (#44)
+> and gopls diagnostics (#45) are resolved (expected behavior). Remaining items
+> are in `ROADMAP.md`. Left unmarked = open.
 
 36. **Consider `flightrecorder/d2`** — Trace visualization export
 37. **Consider `cli.DoctorCommand` integration** — Health check for recorder status
