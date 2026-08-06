@@ -523,6 +523,8 @@ cmdguard's core stays lean — five optional features live in standalone sub-mod
 
 ```go
 import (
+    "time"
+
     "github.com/larsartmann/cmdguard/flightrecorder"
     "github.com/larsartmann/cmdguard/spinner"
     "github.com/larsartmann/cmdguard/telemetry"
