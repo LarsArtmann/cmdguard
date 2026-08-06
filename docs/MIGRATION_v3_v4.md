@@ -88,12 +88,12 @@ by file extension. Missing files are silently skipped. Paths support `$ENV` and
 
 ### What was deleted
 
-| v3 API                                               | v4 Replacement                                  |
-| ---------------------------------------------------- | ----------------------------------------------- |
-| `configload.NewKoanfLoader(path)`                    | `WithConfigFile(path)`                          |
-| `configload.NewKoanfLoaderFromBytes(data, ext)`      | Load via file path instead                      |
-| `configload.NewJSONLoader()` / `NewJSONLoader()`     | `WithConfigFile(path)` (auto-detects JSON)      |
-| `configload` sub-package                             | Deleted — `KoanfLoader` lives in the main package |
+| v3 API                                           | v4 Replacement                                    |
+| ------------------------------------------------ | ------------------------------------------------- |
+| `configload.NewKoanfLoader(path)`                | `WithConfigFile(path)`                            |
+| `configload.NewKoanfLoaderFromBytes(data, ext)`  | Load via file path instead                        |
+| `configload.NewJSONLoader()` / `NewJSONLoader()` | `WithConfigFile(path)` (auto-detects JSON)        |
+| `configload` sub-package                         | Deleted — `KoanfLoader` lives in the main package |
 
 ### Config precedence
 
@@ -117,10 +117,10 @@ The following are **unchanged** from v3 to v4:
 
 ### Dependency upgrades
 
-| Dependency                     | v3       | v4       |
-| ------------------------------ | -------- | -------- |
-| `github.com/larsartmann/go-output` | v0.35.0  | v0.37.0  |
-| `samber-do-auditlog`           | v0.7.0   | v0.8.1   |
+| Dependency                         | v3      | v4      |
+| ---------------------------------- | ------- | ------- |
+| `github.com/larsartmann/go-output` | v0.35.0 | v0.37.0 |
+| `samber-do-auditlog`               | v0.7.0  | v0.8.1  |
 
 These are transitive — `go mod tidy` after updating the module path will pull
 the correct versions.

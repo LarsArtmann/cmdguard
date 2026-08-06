@@ -110,6 +110,7 @@ Added manpage removal note (correct — manpage was extracted then removed). Upd
 ### M17: Add tooling — **1 OF 4 SUB-TASKS DONE**
 
 Only 17.1 (`.trace` to `.gitignore`) was completed. Skipped:
+
 - 17.2: Check if `nix fmt` includes `gofmt -s` (it does — `gofumpt.enable = true` in flake.nix, which is stricter)
 - 17.3: Add `go mod tidy -diff` check to nix fmt or a Nix check
 - 17.4: Add Nix `check-all` target (build + test + lint + format-check)
@@ -119,6 +120,7 @@ No reason given for skipping — just ran out of attention.
 ### M18: Re-run benchmarks — **DATA COLLECTED BUT REGRESSION NOT INVESTIGATED**
 
 Re-ran all 23 benchmarks + 3 flightrecorder benchmarks. Updated PERFORMANCE.md with fresh numbers. BUT: several benchmarks show ~2x regression:
+
 - `ParseFlagTags`: 1.8µs → 3.5µs (~2x slower)
 - `NewCommand`: 100ns → 171ns (~1.7x slower)
 - `ParseFlagTags`: 9 allocs → 11 allocs
@@ -172,6 +174,7 @@ I wrote "48 test functions (41 tests + 3 godoc examples)" — but 41+3=44, not 4
 ### D2: Benchmark regression documented as normal
 
 The benchmarks show ~2x regression in core operations (`ParseFlagTags` 1.8µs→3.5µs, `NewCommand` 100ns→171ns). I updated PERFORMANCE.md with the new numbers without:
+
 - Noting the regression
 - Investigating the root cause
 - Adding a warning or note
@@ -226,30 +229,30 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 
 ## f) Up to 50 Things We Should Get Done Next
 
-| #   | Task                                                                                               | Priority | Effort  | Source       |
-| --- | -------------------------------------------------------------------------------------------------- | -------- | ------- | ------------ |
-| 1   | **Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → include benchmarks + fuzz in breakdown | P0       | 2min    | This report  |
-| 2   | **Investigate benchmark regression** — ParseFlagTags 1.8µs→3.5µs, NewCommand 100ns→171ns. Is this real or measurement noise? | P0       | 60min   | This report  |
-| 3   | **Run `nix flake check`** — the canonical format quality gate was never run                       | P0       | 5min    | This report  |
-| 4   | **Push flightrecorder/v0.1.0 tag** — tag exists locally but not on origin                          | P0       | 1min    | This report  |
-| 5   | **Fix `recorder_bench_test.go` b.Loop() warnings** — 3 instances, Go 1.24+ modernization           | P1       | 5min    | This report  |
-| 6   | **Fix ExampleRecorder_CaptureToWriter noise** — set Config.Log to no-op in example                 | P1       | 5min    | This report  |
-| 7   | **Complete M17: Add `go mod tidy -diff` check to Nix** — prevent go.mod drift in CI               | P1       | 30min   | This report  |
-| 8   | **Complete M17: Add Nix `check-all` target** — build + test + lint + format-check in one command   | P1       | 30min   | This report  |
-| 9   | **Actually READ the 14 website .mdx files** — verify v4 semantics, not just grep patterns          | P1       | 60min   | This report  |
-| 10  | **Improve taskctl coverage** — currently 68.2%, plan wanted it closer to 87.8%                    | P2       | 100min  | This report  |
-| 11  | **Add automated `go tool trace` validation test** — make M10 repeatable in CI                     | P2       | 30min   | This report  |
-| 12  | **Add integration test for flightrecorder in taskctl** — verify trace files are generated         | P2       | 30min   | This report  |
-| 13  | **Verify MIGRATION_v3_v4.md v3 API accuracy** — check git history or old docs for actual configload API | P2   | 30min   | This report  |
-| 14  | **Test testutil failure-path branches** — bring coverage from 70.9% to >85% by testing error paths | P2       | 45min   | This report  |
-| 15  | **Re-run benchmarks with `-count=5`** — get stable numbers for PERFORMANCE.md                     | P2       | 30min   | This report  |
-| 16  | **Add PERFORMANCE.md regression note** — if the ~2x slowdown is real, document why (v4 generics overhead?) | P2   | 15min   | This report  |
-| 17  | **Complete M15: Add MIGRATION_v3_v4.md link to v2→v3 guide §6 checklist**                         | P2       | 5min    | This report  |
-| 18  | **Complete M27: Add resolution appendices to 3 flight-recorder reports**                           | P3       | 30min   | This report  |
-| 19  | **Investigate LSP go mod tidy errors** — restart gopls, verify go.mod is correct                   | P3       | 10min   | This report  |
-| 20  | **Fix 2 stale v3 refs in docs/reviews/** — copywriting review has `go get .../v3`, frontend review has `v3.NewCLI` | P3   | 5min    | This report  |
-| 21  | **Add flightrecorder section to docs/PERFORMANCE.md benchmarks** — actually DONE but verify it's complete | P3   | 5min    | This report  |
-| 22  | **Write GitHub release notes for v4.0.0** — or verify they exist via `gh release view`            | P3       | 15min   | This report  |
+| #   | Task                                                                                                                         | Priority | Effort | Source      |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ----------- |
+| 1   | **Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → include benchmarks + fuzz in breakdown | P0       | 2min   | This report |
+| 2   | **Investigate benchmark regression** — ParseFlagTags 1.8µs→3.5µs, NewCommand 100ns→171ns. Is this real or measurement noise? | P0       | 60min  | This report |
+| 3   | **Run `nix flake check`** — the canonical format quality gate was never run                                                  | P0       | 5min   | This report |
+| 4   | **Push flightrecorder/v0.1.0 tag** — tag exists locally but not on origin                                                    | P0       | 1min   | This report |
+| 5   | **Fix `recorder_bench_test.go` b.Loop() warnings** — 3 instances, Go 1.24+ modernization                                     | P1       | 5min   | This report |
+| 6   | **Fix ExampleRecorder_CaptureToWriter noise** — set Config.Log to no-op in example                                           | P1       | 5min   | This report |
+| 7   | **Complete M17: Add `go mod tidy -diff` check to Nix** — prevent go.mod drift in CI                                          | P1       | 30min  | This report |
+| 8   | **Complete M17: Add Nix `check-all` target** — build + test + lint + format-check in one command                             | P1       | 30min  | This report |
+| 9   | **Actually READ the 14 website .mdx files** — verify v4 semantics, not just grep patterns                                    | P1       | 60min  | This report |
+| 10  | **Improve taskctl coverage** — currently 68.2%, plan wanted it closer to 87.8%                                               | P2       | 100min | This report |
+| 11  | **Add automated `go tool trace` validation test** — make M10 repeatable in CI                                                | P2       | 30min  | This report |
+| 12  | **Add integration test for flightrecorder in taskctl** — verify trace files are generated                                    | P2       | 30min  | This report |
+| 13  | **Verify MIGRATION_v3_v4.md v3 API accuracy** — check git history or old docs for actual configload API                      | P2       | 30min  | This report |
+| 14  | **Test testutil failure-path branches** — bring coverage from 70.9% to >85% by testing error paths                           | P2       | 45min  | This report |
+| 15  | **Re-run benchmarks with `-count=5`** — get stable numbers for PERFORMANCE.md                                                | P2       | 30min  | This report |
+| 16  | **Add PERFORMANCE.md regression note** — if the ~2x slowdown is real, document why (v4 generics overhead?)                   | P2       | 15min  | This report |
+| 17  | **Complete M15: Add MIGRATION_v3_v4.md link to v2→v3 guide §6 checklist**                                                    | P2       | 5min   | This report |
+| 18  | **Complete M27: Add resolution appendices to 3 flight-recorder reports**                                                     | P3       | 30min  | This report |
+| 19  | **Investigate LSP go mod tidy errors** — restart gopls, verify go.mod is correct                                             | P3       | 10min  | This report |
+| 20  | **Fix 2 stale v3 refs in docs/reviews/** — copywriting review has `go get .../v3`, frontend review has `v3.NewCLI`           | P3       | 5min   | This report |
+| 21  | **Add flightrecorder section to docs/PERFORMANCE.md benchmarks** — actually DONE but verify it's complete                    | P3       | 5min   | This report |
+| 22  | **Write GitHub release notes for v4.0.0** — or verify they exist via `gh release view`                                       | P3       | 15min  | This report |
 
 ---
 
@@ -262,6 +265,7 @@ The tag exists locally. Pushing it makes `go get github.com/larsartmann/cmdguard
 ### Q2: Is the ~2x benchmark regression expected (v4 generics overhead)?
 
 `ParseFlagTags` went from ~1.8µs (v2.6.0) to ~3.5µs (v4.0.0). `NewCommand` went from ~100ns to ~171ns. This could be:
+
 - Real regression from v4's copy-on-write registry changes or generics overhead
 - Measurement noise (different machine state, `-count=1`)
 - Expected cost of the v4 redesign (COW registries, nested struct recursion)
@@ -271,6 +275,7 @@ I cannot determine if this is acceptable without knowing whether the project has
 ### Q3: Should the docs/reviews/ files be treated as living docs or historical?
 
 Two review reports have stale `v3` references:
+
 - `docs/reviews/2026-07-18_20-46_copywriting-review.md:47` — `go get .../v3`
 - `docs/reviews/2026-07-18_frontend-design-review.md:84` — `v3.NewCLI`
 
@@ -280,22 +285,22 @@ I treated them as historical (point-in-time) and left them unfixed. But they con
 
 ## Session Metrics
 
-| Metric                      | Value                                              |
-| --------------------------- | -------------------------------------------------- |
-| Tasks planned               | 27                                                 |
-| Tasks fully completed       | 14                                                 |
-| Tasks partially completed   | 10                                                 |
-| Tasks correctly deferred    | 2 (M22+M23 → v5)                                   |
-| Tasks not started           | 1 (`nix flake check` never run)                    |
-| Factual errors introduced   | 1 (CHANGELOG math)                                 |
-| Regressions not investigated| 1 (benchmark ~2x slowdown)                         |
-| Files created               | 2 (MIGRATION_v3_v4.md, this report)                |
-| Files deleted               | 1 (WHAT_THIS_PROJECT_IS_ABOUT.md)                  |
-| Files modified              | ~20 (AGENTS, CHANGELOG, FEATURES, README, SECURITY, CONTRIBUTING, PERFORMANCE, .gitignore, ADR-001, MIGRATION_v2_v3, MIGRATION_FROM_COBRA, example_test.go, panic_test_helpers_test.go, taskctl/main.go, taskctl/README.md, 3 status reports, astro.config.mjs) |
-| Tests added                 | 13 (12 testutil + 2 FR examples)                   |
-| Tags created                | 1 (flightrecorder/v0.1.0)                          |
-| Tags pushed                 | 0                                                  |
-| Commits this session        | 12                                                 |
+| Metric                       | Value                                                                                                                                                                                                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tasks planned                | 27                                                                                                                                                                                                                                                              |
+| Tasks fully completed        | 14                                                                                                                                                                                                                                                              |
+| Tasks partially completed    | 10                                                                                                                                                                                                                                                              |
+| Tasks correctly deferred     | 2 (M22+M23 → v5)                                                                                                                                                                                                                                                |
+| Tasks not started            | 1 (`nix flake check` never run)                                                                                                                                                                                                                                 |
+| Factual errors introduced    | 1 (CHANGELOG math)                                                                                                                                                                                                                                              |
+| Regressions not investigated | 1 (benchmark ~2x slowdown)                                                                                                                                                                                                                                      |
+| Files created                | 2 (MIGRATION_v3_v4.md, this report)                                                                                                                                                                                                                             |
+| Files deleted                | 1 (WHAT_THIS_PROJECT_IS_ABOUT.md)                                                                                                                                                                                                                               |
+| Files modified               | ~20 (AGENTS, CHANGELOG, FEATURES, README, SECURITY, CONTRIBUTING, PERFORMANCE, .gitignore, ADR-001, MIGRATION_v2_v3, MIGRATION_FROM_COBRA, example_test.go, panic_test_helpers_test.go, taskctl/main.go, taskctl/README.md, 3 status reports, astro.config.mjs) |
+| Tests added                  | 13 (12 testutil + 2 FR examples)                                                                                                                                                                                                                                |
+| Tags created                 | 1 (flightrecorder/v0.1.0)                                                                                                                                                                                                                                       |
+| Tags pushed                  | 0                                                                                                                                                                                                                                                               |
+| Commits this session         | 12                                                                                                                                                                                                                                                              |
 
 ---
 

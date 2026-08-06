@@ -329,12 +329,12 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 All 5 sub-modules are independently importable. Core has **zero** dependencies on these.
 Each compiles cleanly with matching v4 API signatures. All have basic test coverage.
 
-| Sub-module       | Key API                                             | Dependency                       | Version  | Status           |
-| ---------------- | --------------------------------------------------- | -------------------------------- | -------- | ---------------- |
-| `glamour`        | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()` | `charm.land/glamour/v2`          | v2.0.1   | 🟢 📦 SUB-MODULE |
-| `prompts`        | `HuhRunner`, `Register()`                           | `charm.land/huh/v2`              | v2.0.3   | 🟢 📦 SUB-MODULE |
-| `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`      | `charm.land/lipgloss/v2`         | v2.0.5   | 🟢 📦 SUB-MODULE |
-| `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`             | `go.opentelemetry.io/otel/trace` | v1.44.0  | 🟢 📦 SUB-MODULE |
+| Sub-module       | Key API                                                                                                           | Dependency                       | Version  | Status           |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------- | ---------------- |
+| `glamour`        | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`                                                               | `charm.land/glamour/v2`          | v2.0.1   | 🟢 📦 SUB-MODULE |
+| `prompts`        | `HuhRunner`, `Register()`                                                                                         | `charm.land/huh/v2`              | v2.0.3   | 🟢 📦 SUB-MODULE |
+| `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`                                                                    | `charm.land/lipgloss/v2`         | v2.0.5   | 🟢 📦 SUB-MODULE |
+| `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`                                                                           | `go.opentelemetry.io/otel/trace` | v1.44.0  | 🟢 📦 SUB-MODULE |
 | `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`, `WithFlightRecorderRecorder[T]()`, `Capture()`, `CaptureToWriter()` | _(stdlib `runtime/trace`)_       | Go 1.25+ | 🟢 📦 SUB-MODULE |
 
 ---
@@ -374,13 +374,13 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 87.8% verified                                                                       |
-| Test functions              | ~580            | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                                           |
+| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 87.8% verified                                                      |
+| Test functions              | ~580            | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                           |
 | Benchmarks                  | 29              | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
 | Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
 | Sub-module tests            | 65 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 48 tests + 3 examples, 96.1% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 70.9%           | 🟡 Debt | Public package with assertion helpers — failure-path branches remain uncovered by design                          |
+| `pkg/testutil` coverage     | 70.9%           | 🟡 Debt | Public package with assertion helpers — failure-path branches remain uncovered by design                       |
 | `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
 
 ---

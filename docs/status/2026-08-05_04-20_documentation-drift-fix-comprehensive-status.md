@@ -203,7 +203,7 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 
 | #   | Task                                                                                       | Priority | Effort |
 | --- | ------------------------------------------------------------------------------------------ | -------- | ------ |
-| 1   | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`       | P0       | 1min   |
+| 1   | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`        | P0       | 1min   |
 | 2   | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) — _TODO_LIST D3_                        | P0       | 5min   |
 | 3   | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_                         | P0       | 2min   |
 | 4   | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_        | P1       | 30min  |

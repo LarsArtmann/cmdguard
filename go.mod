@@ -10,15 +10,15 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/v2 v2.3.6
 	github.com/larsartmann/go-output v0.37.0
-	github.com/larsartmann/go-output/d2 v0.36.0 // indirect
-	github.com/larsartmann/go-output/delimited v0.36.0 // indirect
-	github.com/larsartmann/go-output/graph v0.36.0 // indirect
-	github.com/larsartmann/go-output/markdown v0.36.0 // indirect
-	github.com/larsartmann/go-output/markup v0.36.0 // indirect
-	github.com/larsartmann/go-output/plantuml v0.36.0 // indirect
-	github.com/larsartmann/go-output/serialization v0.36.0 // indirect
-	github.com/larsartmann/go-output/table v0.36.0 // indirect
-	github.com/larsartmann/go-output/tree v0.36.0 // indirect
+	github.com/larsartmann/go-output/d2 v0.37.0 // indirect
+	github.com/larsartmann/go-output/delimited v0.37.0 // indirect
+	github.com/larsartmann/go-output/graph v0.37.0 // indirect
+	github.com/larsartmann/go-output/markdown v0.37.0 // indirect
+	github.com/larsartmann/go-output/markup v0.37.0 // indirect
+	github.com/larsartmann/go-output/plantuml v0.37.0 // indirect
+	github.com/larsartmann/go-output/serialization v0.37.0 // indirect
+	github.com/larsartmann/go-output/table v0.37.0 // indirect
+	github.com/larsartmann/go-output/tree v0.37.0 // indirect
 	github.com/larsartmann/samber-do-auditlog v0.8.1
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/samber/do/v2 v2.1.0
@@ -27,7 +27,7 @@ require (
 	golang.org/x/term v0.45.0 // indirect
 )
 
-require github.com/larsartmann/go-output/escape v0.36.0 // indirect
+require github.com/larsartmann/go-output/escape v0.37.0 // indirect
 
 require (
 	charm.land/glamour/v2 v2.0.1 // indirect
@@ -57,7 +57,7 @@ require (
 	github.com/larsartmann/go-branded-id v0.5.1 // indirect
 	github.com/larsartmann/go-error-family v0.10.0 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
-	github.com/larsartmann/go-output/daghtml v0.36.0 // indirect
+	github.com/larsartmann/go-output/daghtml v0.37.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.27 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect

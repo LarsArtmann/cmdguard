@@ -28,54 +28,54 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ### CLI Lifecycle
 
-| Operation                 | Time      | Allocations | Memory   |
-| ------------------------- | --------- | ----------- | -------- |
-| `Execute` (help)          | ~838 µs   | 6,195       | ~284 KB  |
-| `NewCommand`              | ~171 ns   | 1           | ~288 B   |
-| `Command.Validate`        | ~13 ns    | 0           | 0 B      |
+| Operation          | Time    | Allocations | Memory  |
+| ------------------ | ------- | ----------- | ------- |
+| `Execute` (help)   | ~838 µs | 6,195       | ~284 KB |
+| `NewCommand`       | ~171 ns | 1           | ~288 B  |
+| `Command.Validate` | ~13 ns  | 0           | 0 B     |
 
 _Note: `Execute` with help is slower because fang renders styled output. Actual command execution is significantly faster._
 
 ### Flag Parsing
 
-| Operation                    | Time     | Allocations | Memory   |
-| ---------------------------- | -------- | ----------- | -------- |
-| `ParseFlagTags` (4 fields)   | ~3.5 µs  | 11          | ~1.6 KB  |
-| `NewFlagRegistry` (2 fields) | ~1.8 µs  | 9           | ~896 B   |
-| `ParseDuration`              | ~153 ns  | 0           | 0 B      |
-| `ParseLogLevel`              | ~80 ns   | 0           | 0 B      |
-| `ParseURL`                   | ~871 ns  | 6           | ~768 B   |
-| `ParseEmail`                 | ~1.7 µs  | 25          | ~504 B   |
-| `ParsePort` (numeric)        | ~77 ns   | 0           | 0 B      |
-| `ParsePort` (named)          | ~44 ns   | 0           | 0 B      |
-| `ParseFilePath`              | ~2.2 µs  | 7           | ~586 B   |
-| `ParseHostPort`              | ~149 ns  | 0           | 0 B      |
+| Operation                    | Time    | Allocations | Memory  |
+| ---------------------------- | ------- | ----------- | ------- |
+| `ParseFlagTags` (4 fields)   | ~3.5 µs | 11          | ~1.6 KB |
+| `NewFlagRegistry` (2 fields) | ~1.8 µs | 9           | ~896 B  |
+| `ParseDuration`              | ~153 ns | 0           | 0 B     |
+| `ParseLogLevel`              | ~80 ns  | 0           | 0 B     |
+| `ParseURL`                   | ~871 ns | 6           | ~768 B  |
+| `ParseEmail`                 | ~1.7 µs | 25          | ~504 B  |
+| `ParsePort` (numeric)        | ~77 ns  | 0           | 0 B     |
+| `ParsePort` (named)          | ~44 ns  | 0           | 0 B     |
+| `ParseFilePath`              | ~2.2 µs | 7           | ~586 B  |
+| `ParseHostPort`              | ~149 ns | 0           | 0 B     |
 
 ### Copy-on-Write Registry
 
-| Operation                         | Time     | Allocations | Memory   | Notes                     |
-| --------------------------------- | -------- | ----------- | -------- | ------------------------- |
-| `NewFlagRegistry` (COW, no write) | ~1.9 µs  | 9           | ~896 B   | Shares global maps        |
-| `NewFlagRegistry` + 1 write       | ~2.0 µs  | 15          | ~2.1 KB  | Triggers lazy clone       |
-| `TagsSeq()` (iterator)            | ~16 ns   | 0           | 0 B      | Zero-allocation traversal |
-| `Tags()` (defensive copy)         | ~195 ns  | 1           | ~448 B   | Legacy API                |
+| Operation                         | Time    | Allocations | Memory  | Notes                     |
+| --------------------------------- | ------- | ----------- | ------- | ------------------------- |
+| `NewFlagRegistry` (COW, no write) | ~1.9 µs | 9           | ~896 B  | Shares global maps        |
+| `NewFlagRegistry` + 1 write       | ~2.0 µs | 15          | ~2.1 KB | Triggers lazy clone       |
+| `TagsSeq()` (iterator)            | ~16 ns  | 0           | 0 B     | Zero-allocation traversal |
+| `Tags()` (defensive copy)         | ~195 ns | 1           | ~448 B  | Legacy API                |
 
 ### Dependency Injection
 
-| Operation          | Time     | Allocations | Memory   |
-| ------------------ | -------- | ----------- | -------- |
-| `NewScope`         | ~666 ns  | 11          | ~688 B   |
-| `NewScopeWithOpts` | ~621 ns  | 11          | ~688 B   |
-| `Provide`          | ~2.7 µs  | 26          | ~1.7 KB  |
-| `Invoke`           | ~352 ns  | 5           | ~160 B   |
-| `CloneScope`       | ~5.2 µs  | 39          | ~3.0 KB  |
-| `ProvideInvoke`    | ~5.7 µs  | 41          | ~3.1 KB  |
+| Operation          | Time    | Allocations | Memory  |
+| ------------------ | ------- | ----------- | ------- |
+| `NewScope`         | ~666 ns | 11          | ~688 B  |
+| `NewScopeWithOpts` | ~621 ns | 11          | ~688 B  |
+| `Provide`          | ~2.7 µs | 26          | ~1.7 KB |
+| `Invoke`           | ~352 ns | 5           | ~160 B  |
+| `CloneScope`       | ~5.2 µs | 39          | ~3.0 KB |
+| `ProvideInvoke`    | ~5.7 µs | 41          | ~3.1 KB |
 
 ### Flight Recorder
 
-| Operation  | Time     | Allocations | Memory  |
-| ---------- | -------- | ----------- | ------- |
-| `Capture`  | ~724 µs  | 94          | ~47 KB  |
+| Operation | Time    | Allocations | Memory |
+| --------- | ------- | ----------- | ------ |
+| `Capture` | ~724 µs | 94          | ~47 KB |
 
 _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serialization and file I/O._
 

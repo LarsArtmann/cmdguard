@@ -665,16 +665,16 @@ Local docs: [Tutorial](docs/TUTORIAL.md), [Quick Start](docs/QUICKSTART.md), [Fr
 
 ## Related Projects
 
-| Project | Description |
-| --- | --- |
-| [spf13/cobra](https://github.com/spf13/cobra) | The CLI framework cmdguard wraps |
-| [samber/do](https://github.com/samber/do) | Dependency injection container |
-| [charm.land/fang](https://github.com/charmbracelet/fang) | Styled output for Cobra |
-| [larsartmann/go-output](https://github.com/larsartmann/go-output) | Rich output formats (16 formats) |
-| [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) | DI audit logging integration |
-| [charm.land/huh](https://github.com/charmbracelet/huh) | Interactive prompts (`prompts` sub-module) |
-| [charm.land/glamour](https://github.com/charmbracelet/glamour) | Markdown rendering (`glamour` sub-module) |
-| [charm.land/lipgloss](https://github.com/charmbracelet/lipgloss) | Terminal spinner (`spinner` sub-module) |
+| Project                                                                 | Description                                |
+| ----------------------------------------------------------------------- | ------------------------------------------ |
+| [spf13/cobra](https://github.com/spf13/cobra)                           | The CLI framework cmdguard wraps           |
+| [samber/do](https://github.com/samber/do)                               | Dependency injection container             |
+| [charm.land/fang](https://github.com/charmbracelet/fang)                | Styled output for Cobra                    |
+| [larsartmann/go-output](https://github.com/larsartmann/go-output)       | Rich output formats (16 formats)           |
+| [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) | DI audit logging integration               |
+| [charm.land/huh](https://github.com/charmbracelet/huh)                  | Interactive prompts (`prompts` sub-module) |
+| [charm.land/glamour](https://github.com/charmbracelet/glamour)          | Markdown rendering (`glamour` sub-module)  |
+| [charm.land/lipgloss](https://github.com/charmbracelet/lipgloss)        | Terminal spinner (`spinner` sub-module)    |
 
 ---
 
