@@ -7,7 +7,7 @@
 
 ## TL;DR
 
-cmdguard adds **~13 µs** overhead for full CLI creation (`NewCLI`), **~180 ns** per command, and **~13.5 ns** for command validation. The per-command overhead is negligible — a typical 5-command CLI adds ~14 µs total, well under 1% of Go runtime initialization (~1–5 ms).
+cmdguard adds **~6.9 µs** overhead for full CLI creation (`NewCLI`), **~100 ns** per command, and **~10.5 ns** for command validation. The per-command overhead is negligible — a typical 5-command CLI adds ~7.4 µs total, well under 1% of Go runtime initialization (~1–5 ms).
 
 Copy-on-write registries reduce per-command allocations by **48%** and memory by **22%** compared to eager cloning.
 
@@ -28,51 +28,51 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ### CLI Lifecycle
 
-| Operation          | Time     | Allocations | Memory  |
-| ------------------ | -------- | ----------- | ------- |
-| `NewCLI`           | ~12.8 µs | 77          | ~6.9 KB |
-| `Execute` (help)   | ~838 µs  | 6,195       | ~284 KB |
-| `NewCommand`       | ~180 ns  | 1           | ~288 B  |
-| `Command.Validate` | ~13.5 ns | 0           | 0 B     |
+| Operation          | Time      | Allocations | Memory  |
+| ------------------ | --------- | ----------- | ------- |
+| `NewCLI`           | ~6.9 µs   | 77          | ~6.8 KB |
+| `Execute` (help)   | ~580 µs   | ~6,300      | ~294 KB |
+| `NewCommand`       | ~102 ns   | 1           | ~288 B  |
+| `Command.Validate` | ~10.5 ns  | 0           | 0 B     |
 
-_Note: `Execute` with help is slower because fang renders styled output. Actual command execution is significantly faster._
+_Note: `Execute` with help is high-variance (580 µs–1.1 ms across runs) because it exercises the full cobra execution path including GC. The best-case (~580 µs) reflects true overhead without external interference. Stdout is redirected to `/dev/null` during benchmarking._
 
 ### Flag Parsing
 
-| Operation                  | Time    | Allocations | Memory  |
-| -------------------------- | ------- | ----------- | ------- |
-| `ParseFlagTags` (4 fields) | ~3.5 µs | 11          | ~1.6 KB |
+| Operation                  | Time     | Allocations | Memory  |
+| -------------------------- | -------- | ----------- | ------- |
+| `ParseFlagTags` (4 fields) | ~4.3 µs  | 11          | ~1.6 KB |
+| `NewFlagRegistry` (2 fields) | ~910 ns | 9          | ~896 B  |
+| `ParseDuration`            | ~86 ns   | 0           | 0 B     |
+| `ParseLogLevel`            | ~78 ns   | 0           | 0 B     |
+| `ParseURL`                 | ~636 ns  | 6           | ~768 B  |
+| `ParseEmail`               | ~907 ns  | 25          | ~504 B  |
+| `ParsePort` (numeric)      | ~61 ns   | 0           | 0 B     |
+| `ParsePort` (named)        | ~39 ns   | 0           | 0 B     |
+| `ParseFilePath`            | ~1.2 µs  | 7           | ~586 B  |
+| `ParseHostPort`            | ~119 ns  | 0           | 0 B     |
 
 _Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recursion support. Each field allocates an `Index` reflect path for the flattened flag registration. This is expected v4 overhead for the richer feature set._
-| `NewFlagRegistry` (2 fields) | ~1.8 µs | 9 | ~896 B |
-| `ParseDuration` | ~153 ns | 0 | 0 B |
-| `ParseLogLevel` | ~80 ns | 0 | 0 B |
-| `ParseURL` | ~871 ns | 6 | ~768 B |
-| `ParseEmail` | ~1.7 µs | 25 | ~504 B |
-| `ParsePort` (numeric) | ~77 ns | 0 | 0 B |
-| `ParsePort` (named) | ~44 ns | 0 | 0 B |
-| `ParseFilePath` | ~2.2 µs | 7 | ~586 B |
-| `ParseHostPort` | ~149 ns | 0 | 0 B |
 
 ### Copy-on-Write Registry
 
-| Operation                         | Time    | Allocations | Memory  | Notes                     |
-| --------------------------------- | ------- | ----------- | ------- | ------------------------- |
-| `NewFlagRegistry` (COW, no write) | ~1.9 µs | 9           | ~896 B  | Shares global maps        |
-| `NewFlagRegistry` + 1 write       | ~2.0 µs | 15          | ~2.1 KB | Triggers lazy clone       |
-| `TagsSeq()` (iterator)            | ~16 ns  | 0           | 0 B     | Zero-allocation traversal |
-| `Tags()` (defensive copy)         | ~195 ns | 1           | ~448 B  | Legacy API                |
+| Operation                         | Time     | Allocations | Memory  | Notes                     |
+| --------------------------------- | -------- | ----------- | ------- | ------------------------- |
+| `NewFlagRegistry` (COW, no write) | ~880 ns  | 9           | ~896 B  | Shares global maps        |
+| `NewFlagRegistry` + 1 write       | ~1.1 µs  | 15          | ~2.1 KB | Triggers lazy clone       |
+| `TagsSeq()` (iterator)            | ~18.5 ns | 0           | 0 B     | Zero-allocation traversal |
+| `Tags()` (defensive copy)         | ~453 ns  | 1           | ~448 B  | Legacy API                |
 
 ### Dependency Injection
 
-| Operation          | Time    | Allocations | Memory  |
-| ------------------ | ------- | ----------- | ------- |
-| `NewScope`         | ~700 ns | 11          | ~688 B  |
-| `NewScopeWithOpts` | ~470 ns | 11          | ~688 B  |
-| `Provide`          | ~2.9 µs | 26          | ~1.7 KB |
-| `Invoke`           | ~235 ns | 5           | ~160 B  |
-| `CloneScope`       | ~3.4 µs | 39          | ~3.0 KB |
-| `ProvideInvoke`    | ~3.5 µs | 41          | ~3.1 KB |
+| Operation          | Time     | Allocations | Memory  |
+| ------------------ | -------- | ----------- | ------- |
+| `NewScope`         | ~410 ns  | 11          | ~688 B  |
+| `NewScopeWithOpts` | ~420 ns  | 11          | ~688 B  |
+| `Provide`          | ~1.7 µs  | 26          | ~1.7 KB |
+| `Invoke`           | ~213 ns  | 5           | ~160 B  |
+| `CloneScope`       | ~6.4 µs  | 39          | ~3.0 KB |
+| `ProvideInvoke`    | ~7.8 µs  | 41          | ~3.1 KB |
 
 ### Flight Recorder
 
@@ -92,9 +92,9 @@ _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serializa
 
 For a typical CLI with 5 commands:
 
-- 1× `NewCLI` (includes scope creation + flag registration + CLIOption processing): ~12.8 µs
-- 5× `NewCommand` + validation: ~967 ns
-- Total startup: **~13.8 µs**
+- 1× `NewCLI` (includes scope creation + flag registration + CLIOption processing): ~6.9 µs
+- 5× `NewCommand` + validation: ~563 ns
+- Total startup: **~7.4 µs**
 
 This is negligible compared to Go runtime initialization (~1–5 ms).
 
@@ -102,20 +102,20 @@ This is negligible compared to Go runtime initialization (~1–5 ms).
 
 For a command with typed flags:
 
-- Flag tag parsing: ~3.4 µs (once at registration)
-- Flag registry creation: ~1.8 µs (once at registration, COW)
-- Command validation: ~13.5 ns (once at registration)
+- Flag tag parsing: ~4.3 µs (once at registration)
+- Flag registry creation: ~880 ns (once at registration, COW)
+- Command validation: ~10.5 ns (once at registration)
 
 At execution time, cmdguard adds essentially zero overhead beyond what Cobra already does — flags are parsed by pflag just like in raw Cobra.
 
 ### DI Overhead
 
-- Service registration (`Provide`): ~2.9 µs
-- Service lookup (`Invoke`): ~235 ns
+- Service registration (`Provide`): ~1.7 µs
+- Service lookup (`Invoke`): ~213 ns
 
 For a CLI that resolves 10 services per command:
 
-- 10 × 235 ns = **2.4 µs** of DI overhead per execution
+- 10 × 213 ns = **2.1 µs** of DI overhead per execution
 
 This is negligible for any CLI that does I/O.
 
