@@ -109,9 +109,13 @@ These remain generic because their callback signature needs the config type:
 
 ## 3. Sub-module adoption
 
-Five features moved out of core into independently importable sub-modules.
+Four features moved out of core into independently importable sub-modules.
 **Core no longer depends on their libraries** — import a sub-module only when you
 need it.
+
+> **Note:** The `manpage` sub-module was also extracted in v3 but has since been
+> **removed**. If you relied on `pkg/cmdguard/manpage`, use Go's `cmd/internal`
+> manpage generation or a third-party library instead.
 
 | Feature          | v2 (core)                 | v3 sub-module                                         |
 | ---------------- | ------------------------- | ----------------------------------------------------- |
