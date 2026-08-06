@@ -76,11 +76,11 @@ _Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recu
 
 ### Flight Recorder
 
-| Operation             | Time    | Allocations | Memory |
-| --------------------- | ------- | ----------- | ------ |
-| `New` (Recorder)      | ~170 ns | 2           | ~304 B |
-| `Middleware` overhead | ~95 ns  | 0           | 0 B    |
-| `Capture`             | ~772 µs | 94          | ~47 KB |
+| Operation             | Time     | Allocations | Memory |
+| --------------------- | -------- | ----------- | ------ |
+| `New` (Recorder)      | ~69 ns   | 2           | ~304 B |
+| `Middleware` overhead | ~71 ns   | 0           | 0 B    |
+| `Capture`             | ~433 µs  | 91          | ~47 KB |
 
 _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serialization and file I/O._
 
