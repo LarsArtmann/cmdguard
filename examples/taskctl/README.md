@@ -31,7 +31,8 @@ Every cmdguard feature is demonstrated in this example:
 | `WithConfigValidation`       | main.go             | Validates DataDir not empty                                                                                                               |
 | `WithGracefulShutdown`       | main.go             | Graceful DI shutdown on SIGINT/SIGTERM                                                                                                    |
 | `WithStrictValidation`       | main.go             | All commands have `WithShort`                                                                                                             |
-| `WithMiddleware`             | main.go             | `TimingMiddleware` + `RecoveryMiddleware`                                                                                                 |
+| `WithMiddleware`             | main.go             | `TimingMiddleware` + `RecoveryMiddleware` + `spinner.Middleware`                                                                           |
+| **flightrecorder**           | main.go             | `WithFlightRecorder` — captures execution traces for slow/failing commands (analyze with `go tool trace`)                                 |
 | `WithGroup`                  | main.go             | "tasks" + "system" groups                                                                                                                 |
 | `AddGlobalBoolFlag`          | main.go             | `--debug` global flag                                                                                                                     |
 | **env tags**                 | types.go            | `env:"TASK_LOG_LEVEL"`, `env:"TASK_DATA_DIR"`                                                                                             |

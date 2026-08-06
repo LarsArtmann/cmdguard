@@ -40,6 +40,7 @@ import (
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 
+	"github.com/larsartmann/cmdguard/flightrecorder"
 	"github.com/larsartmann/cmdguard/glamour"
 	"github.com/larsartmann/cmdguard/spinner"
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
@@ -80,6 +81,14 @@ func main() {
 			}),
 			v4.RecoveryMiddleware[AppConfig](),
 		),
+		// Flight recorder — captures execution traces for slow or failing
+		// commands. Snapshots are written to /tmp and analyzed with:
+		//   go tool trace /tmp/cmdguard-*.trace
+		flightrecorder.WithFlightRecorder[AppConfig](flightrecorder.Config{
+			CaptureOnSlow:  true,
+			SlowThreshold:  5 * time.Second,
+			CaptureOnError: true,
+		}),
 		glamour.WithHelpTheme("dark"),
 		v4.WithGroup("tasks", "Task Management"),
 		v4.WithGroup("system", "System"),
