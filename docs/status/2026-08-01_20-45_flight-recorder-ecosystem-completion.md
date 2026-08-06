@@ -149,6 +149,10 @@ mocking, but it means the "another flight recorder is already active" scenario i
 
 ## e) WHAT WE SHOULD IMPROVE
 
+> **ANNOTATION (2026-08-06):** Item 1 is **DONE** (`buildSnapshotPath` extracted
+> at `ba818e3`). Items 2–3 are **DONE** or documented as intentional design.
+> Remaining improvement ideas are in `ROADMAP.md` §"Flight Recorder Enhancements".
+
 ### Code Quality
 
 1. **Split `Capture` into `buildSnapshotPath` + `writeSnapshot`** — The method does too many things: context check, enabled check, directory creation, filename construction, file creation, write, cleanup, logging. Extract helpers for testability and readability.

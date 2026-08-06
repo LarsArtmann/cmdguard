@@ -156,6 +156,11 @@ ensure no work is lost.
 
 ## e) WHAT WE SHOULD IMPROVE
 
+> **ANNOTATION (2026-08-06):** Most items resolved at `ba818e3`. Flight recorder
+> tagged `v0.1.0`, 48 tests (96.1% coverage), `go tool trace` validation passed,
+> godoc examples restored, and added to `examples/taskctl/`. Remaining ideas in
+> `ROADMAP.md` §"Flight Recorder Enhancements".
+
 ### Code Quality
 
 1. **Always verify examples compile** — Before changing any code example in documentation, mentally

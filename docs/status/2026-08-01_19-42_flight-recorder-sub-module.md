@@ -94,6 +94,12 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 
 ## e) WHAT WE SHOULD IMPROVE
 
+> **ANNOTATION (2026-08-06):** Items 1, 2, 9, 10, 11–18 are **DONE** (shipped at
+> `ba818e3` or verified this session). Items 3–7 are enhancement ideas harvested
+> into `ROADMAP.md` §"Flight Recorder Enhancements". Item 8 is an intentional
+> design decision (immutable config). Item 7 is a stdlib limitation that cannot
+> be fixed without `runtime/trace.WriteTo` accepting a context.
+
 ### Code Quality
 
 1. **`Capture` method is 40+ lines** — Could be split into `buildSnapshotPath` + `writeSnapshot` helpers for readability.
