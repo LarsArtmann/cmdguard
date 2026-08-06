@@ -98,7 +98,7 @@ if err := doSomething(); err != nil {
 - Test both success and error cases
 - Use `t.Parallel()` in every test function and subtest
 - Use `//nolint:paralleltest` for tests using `t.Setenv`
-- Single internal test package (`v3`, accesses private helpers)
+- Single internal test package (`v4`, accesses private helpers)
 - Use `ExecuteWithArgs(ctx, args)` for integration tests that exercise the full CLI pipeline
 - Fuzz targets use inline `f.Add()` for seed corpus; file-based seeds go in `testdata/fuzz/`
 - `NoFlags` is a distinct named type — use `(NoFlags{})` with parens for comparisons
@@ -112,7 +112,7 @@ if err := doSomething(); err != nil {
 
 ## Architecture Guidelines
 
-### v3 Design Principles
+### v4 Design Principles
 
 - No panics in library code — all operations return errors
 - Constructor pattern via `NewCommand`/`NewParentCommand`

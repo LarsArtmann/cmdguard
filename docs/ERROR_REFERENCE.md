@@ -1,4 +1,4 @@
-# Error Reference — cmdguard v2
+# Error Reference — cmdguard v4
 
 **Auto-generated from source:** `pkg/cmdguard/v4/errors_*.go`, `types_*.go`
 **Last updated:** 2026-06-10

@@ -9,7 +9,7 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Added
 
-- **flightrecorder sub-module** — independently importable module (`github.com/larsartmann/cmdguard/flightrecorder`) built on Go 1.25+ `runtime/trace.FlightRecorder`. Provides continuous in-memory trace buffering, context-aware snapshot capture, and automatic slow-command / error capture middleware. Zero external dependencies (stdlib only). Sixth workspace module. Full API surface: `Recorder` (Start/Stop/Enabled/WriteTo/Capture/CaptureToWriter), `Config` (8 fields with defaults), `Middleware[T]`, `WithFlightRecorder[T]`, `WithFlightRecorderRecorder[T]`, sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), 48 tests + 3 examples, 3 benchmarks, 1 fuzz target, 96.1% coverage.
+- **flightrecorder sub-module** — independently importable module (`github.com/larsartmann/cmdguard/flightrecorder`) built on Go 1.25+ `runtime/trace.FlightRecorder`. Provides continuous in-memory trace buffering, context-aware snapshot capture, and automatic slow-command / error capture middleware. Zero external dependencies (stdlib only). Sixth workspace module. Full API surface: `Recorder` (Start/Stop/Enabled/WriteTo/Capture/CaptureToWriter), `Config` (8 fields with defaults), `Middleware[T]`, `WithFlightRecorder[T]`, `WithFlightRecorderRecorder[T]`, sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), 48 test functions (41 tests + 3 godoc examples), 3 benchmarks, 1 fuzz target, 96.1% coverage.
 - CLI lifecycle improvements — enhanced command shutdown behavior and lifecycle test coverage.
 - `TODO_LIST.md` and `ROADMAP.md` — created (were referenced in AGENTS.md but missing).
 
