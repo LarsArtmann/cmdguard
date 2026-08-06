@@ -83,18 +83,16 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/glamour => ./glamour
-
 require (
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
 )
 
-replace github.com/larsartmann/cmdguard/prompts => ./prompts
-
-replace github.com/larsartmann/cmdguard/telemetry => ./telemetry
-
-replace github.com/larsartmann/cmdguard/spinner => ./spinner
-
-replace github.com/larsartmann/cmdguard/flightrecorder => ./flightrecorder
+replace (
+	github.com/larsartmann/cmdguard/flightrecorder => ./flightrecorder
+	github.com/larsartmann/cmdguard/glamour => ./glamour
+	github.com/larsartmann/cmdguard/prompts => ./prompts
+	github.com/larsartmann/cmdguard/spinner => ./spinner
+	github.com/larsartmann/cmdguard/telemetry => ./telemetry
+)
