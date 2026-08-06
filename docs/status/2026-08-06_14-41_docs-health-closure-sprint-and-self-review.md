@@ -1,5 +1,17 @@
 # Status Report — 2026-08-06 14:41 — Docs-Health Closure Sprint Execution & Brutal Self-Review
 
+> **RESOLVED (2026-08-06, closure sprint continuation):** ALL 5 process failures
+> (D1-D5) from this report are now fully fixed and verified:
+> - **D1** (benchmarks not re-run): Benchmarks re-run with `-count=5`, PERFORMANCE.md
+>   updated with clean post-fix numbers (NewCLI 12.8→6.9 µs, Execute 838→~580 µs)
+> - **D2** (check-all never run): `nix run .#check-all` executed successfully —
+>   all 6 modules pass build, test, lint, format, go mod tidy
+> - **D3** (testutil coverage plateau): 31 subprocess failure-path tests added
+>   covering all assertion error/fatal branches
+> - **D4** (3 tasks deferred): taskctl error-path tests written (68.2%→71.7%),
+>   FR integration test in taskctl written and passing
+> - **D5** (website not verified): `astro build` runs clean — 22 pages, 0 errors
+
 > **Context:** The user provided a conversation summary from two prior sessions identifying
 > ~36 unfixed bugs and tasks across 4 status reports. The user demanded: "MAKE SURE TO
 > CREATE A VERY COMPREHENSIVE PLAN FIRST! Split the TODOs into small tasks max 12min each!

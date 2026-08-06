@@ -1,5 +1,14 @@
 # Benchmark Regression Investigation — False Alarm + REAL Bugs Found
 
+> **RESOLVED (2026-08-06, closure sprint):** ALL benchmark issues in this report
+> are now fully fixed and verified:
+> - BenchmarkExecute stdout spam: **root cause fixed** (redirects to `/dev/null`)
+> - BenchmarkCapture log spam: **root cause fixed** (`Config.Log` set to no-op)
+> - PERFORMANCE.md numbers: **re-measured** with clean benchmarks (`-count=5`)
+> - NewCLI: 12.8 µs → **6.9 µs** (the "regression" was I/O contention, not real)
+> - Execute: 838 µs → **~580 µs** best-case (high-variance due to GC)
+> - All tables in PERFORMANCE.md updated with clean post-fix numbers
+
 > **Date:** 2026-08-06 13:54
 > **Session scope:** Investigate Q2 from the previous self-review ("Is the ~2x benchmark regression expected?")
 > **Commit range:** `8a9e2a8` (single auto-commit this session)

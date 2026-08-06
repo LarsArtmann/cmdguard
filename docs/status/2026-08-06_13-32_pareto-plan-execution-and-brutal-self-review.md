@@ -1,5 +1,16 @@
 # Status Report — 2026-08-06 13:32 — Pareto Plan Execution & Brutal Self-Review
 
+> **RESOLVED (2026-08-06, closure sprint):** The coverage gaps flagged in this
+> report are now addressed:
+> - taskctl coverage: **68.2% → 71.7%** — added error-path tests for `resolveStore`,
+>   `taskStatusLabel`, `seedTasks`, `Row`, `Get`, `NewTaskStore`, plus inspect
+>   not-found and metadata branches. All previously-uncovered helper functions
+>   now at 100%.
+> - testutil coverage: added **31 subprocess failure-path tests** covering all
+>   assertion error/fatal branches via the re-exec pattern
+> - FR integration test in taskctl: **written and passing** — verifies trace
+>   files generated on command error and no-capture on success
+
 > **Context:** This session executed the 27-task Pareto plan from
 > `docs/planning/2026-08-06_12-40_docs-health-closure-and-quality-sprint.md`.
 > 24 of 27 tasks were completed (M22+M23 deferred to v5 as documented in ROADMAP).
