@@ -375,12 +375,12 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
 | Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 87.8% verified                                                                       |
-| Test functions              | ~550            | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                                           |
+| Test functions              | ~580            | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                                           |
 | Benchmarks                  | 29              | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
 | Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
 | Sub-module tests            | 65 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 48 tests + 3 examples, 96.1% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 49.6%           | 🟡 Debt | 372-line public package, 24 test functions                                                                     |
+| `pkg/testutil` coverage     | 70.9%           | 🟡 Debt | Public package with assertion helpers — failure-path branches remain uncovered by design                          |
 | `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
 
 ---

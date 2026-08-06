@@ -47,7 +47,7 @@ nix flake check
 
 **Module path:** `github.com/larsartmann/cmdguard/v4`
 
-**Current Status:** v4.0.0+. ~565 test functions, 29 benchmarks, 8 fuzz targets, 87.8% core / 96.1% flightrecorder coverage, 0 build errors, 0 lint issues.
+**Current Status:** v4.0.0+. ~580 test functions, 29 benchmarks, 8 fuzz targets, 87.8% core / 96.1% flightrecorder coverage, 0 build errors, 0 lint issues.
 
 ---
 
