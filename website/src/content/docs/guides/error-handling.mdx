@@ -93,8 +93,8 @@ Did you mean: --name?
 Config validation uses `errors.Join` so individual errors are reachable:
 
 ```go
-errs := v4.ValidateConfig(cfg)
-for _, err := range errs {
+err := v4.ValidateConfig(cfg)
+if err != nil {
     if errors.Is(err, v4.ErrConfigValidation) {
         // handle
     }

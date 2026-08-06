@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime/trace"
 	"strings"
@@ -677,5 +678,63 @@ func TestRecorder_CaptureToWriter_CancelledContext(t *testing.T) {
 	_, err := rec.CaptureToWriter(ctx, &buf, "test", CaptureReasonSlow)
 	if err == nil {
 		t.Fatal("CaptureToWriter with cancelled context should return error")
+	}
+}
+
+// TestTraceSnapshot_IsParseableByGoToolTrace validates that snapshots produced
+// by the flight recorder can be parsed by `go tool trace`. This makes the
+// manual M10 validation repeatable in CI.
+func TestTraceSnapshot_IsParseableByGoToolTrace(t *testing.T) {
+	dir := t.TempDir()
+
+	rec := New(Config{
+		MinAge:    1 * time.Second,
+		MaxBytes:  1 << 20,
+		OutputDir: dir,
+	})
+
+	if err := rec.Start(); err != nil {
+		t.Fatalf("Start failed: %v", err)
+	}
+
+	defer rec.Stop()
+
+	trace.WithRegion(context.Background(), "validation-work", func() {
+		time.Sleep(2 * time.Millisecond)
+	})
+
+	path, err := rec.Capture(context.Background(), "validation", CaptureReasonSlow)
+	if err != nil {
+		t.Fatalf("Capture failed: %v", err)
+	}
+
+	info, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("snapshot file not found: %v", err)
+	}
+
+	if info.Size() < 100 {
+		t.Fatalf("snapshot file too small (%d bytes), expected trace data", info.Size())
+	}
+
+	// Run `go tool trace` with a short timeout. If parsing fails, it exits
+	// with an error before the timeout. If parsing succeeds, it starts a web
+	// server and blocks — we kill it via the timeout and treat that as success.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "go", "tool", "trace", path)
+	output, err := cmd.CombinedOutput()
+
+	// If the context deadline was exceeded, the trace parsed successfully
+	// (the tool was waiting for web server requests). Any other error means
+	// parsing failed.
+	if err != nil && ctx.Err() != context.DeadlineExceeded {
+		t.Fatalf("go tool trace failed to parse snapshot: %v\noutput: %s", err, output)
+	}
+
+	outputStr := string(output)
+	if strings.Contains(outputStr, "failed to parse trace") {
+		t.Fatalf("go tool trace reported parse failure:\n%s", outputStr)
 	}
 }

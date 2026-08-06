@@ -107,7 +107,7 @@ cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 Wire [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) to trace service creation:
 
 ```go
-import auditlog "github.com/larsartmann/samber-do-auditlog/v2"
+import auditlog "github.com/larsartmann/samber-do-auditlog"
 
 cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
     v4.WithAuditLog(auditlog.NewDefaultPlugin()),

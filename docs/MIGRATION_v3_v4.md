@@ -91,8 +91,10 @@ by file extension. Missing files are silently skipped. Paths support `$ENV` and
 | v3 API                                           | v4 Replacement                                    |
 | ------------------------------------------------ | ------------------------------------------------- |
 | `configload.NewKoanfLoader(path)`                | `WithConfigFile(path)`                            |
-| `configload.NewKoanfLoaderFromBytes(data, ext)`  | Load via file path instead                        |
-| `configload.NewJSONLoader()` / `NewJSONLoader()` | `WithConfigFile(path)` (auto-detects JSON)        |
+| `configload.YAML()`, `configload.TOML()`, `configload.JSON()`, `configload.Auto()` | `WithConfigFile(path)` (auto-detects by extension) |
+| `configload.LoaderForPath(...)`                  | `WithConfigFile(paths...)`                        |
+| `v3.NewJSONLoader()`                             | `WithConfigFile(path)` (auto-detects JSON)        |
+| `v3.WithConfigFileLoader(loader, paths...)`     | Still exists in v4 — pass a `KoanfLoader` or custom `ConfigFileLoader` |
 | `configload` sub-package                         | Deleted — `KoanfLoader` lives in the main package |
 
 ### Config precedence

@@ -11,7 +11,7 @@ Render structured data in any of 16 formats:
 import "github.com/larsartmann/go-output"
 
 headers := []string{"Name", "Status", "Created"}
-rows := [][]string{"api-server", "running", "2026-01-15"}
+rows := [][]string{{"api-server", "running", "2026-01-15"}}
 
 v4.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
 v4.OutputTable(output.FormatJSON, headers, rows)    // JSON array
@@ -40,7 +40,7 @@ cmdguard registers the `--output` flag automatically with help text listing all 
 For non-tabular data:
 
 ```go
-v4.OutputResult(myStruct, output.FormatJSON)
+v4.OutputResult(v4.OutputConfig{Format: output.FormatJSON}, myStruct)
 ```
 
 ## Shape-Aware Errors

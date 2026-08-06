@@ -54,7 +54,7 @@ done
 - `t.Parallel()` in every test function and subtest
 - `//nolint:paralleltest` for tests using `t.Setenv`
 - Table-driven tests: `tests := []struct{...}` pattern
-- Single internal test package (`v3`, accesses private helpers)
+- Single internal test package (`v4`, accesses private helpers)
 - Error wrapping: `fmt.Errorf("context: %w", err)`
 - Functional options pattern for all configuration
 - No panics in library code — all functions return errors
