@@ -12,7 +12,7 @@ import (
 func BenchmarkNew(b *testing.B) {
 	b.ReportAllocs()
 
-	for range b.N {
+	for b.Loop() {
 		_ = New(DefaultConfig())
 	}
 }
@@ -42,7 +42,7 @@ func BenchmarkMiddleware_Overhead(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 
-	for range b.N {
+	for b.Loop() {
 		_ = middleware(ctx, cfg, info, next)
 	}
 }
@@ -54,6 +54,7 @@ func BenchmarkCapture(b *testing.B) {
 		MinAge:    1 * time.Second,
 		MaxBytes:  1 << 20,
 		OutputDir: dir,
+		Log:       func(string, ...any) {}, // suppress log spam during benchmark
 	})
 
 	if err := rec.Start(); err != nil {
@@ -71,7 +72,7 @@ func BenchmarkCapture(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 
-	for range b.N {
+	for b.Loop() {
 		_, _ = rec.Capture(ctx, "bench", CaptureReasonSlow)
 	}
 }

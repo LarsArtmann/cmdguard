@@ -63,7 +63,8 @@ func ExampleRecorder_CaptureToWriter() {
 	rec := flightrecorder.New(flightrecorder.Config{
 		CaptureOnSlow: true,
 		SlowThreshold: 1 * time.Millisecond,
-		OutputDir:     "", // use os.TempDir()
+		OutputDir:     "",                  // use os.TempDir()
+		Log:           func(string, ...any) {}, // suppress diagnostic output in example
 	})
 
 	if err := rec.Start(); err != nil {

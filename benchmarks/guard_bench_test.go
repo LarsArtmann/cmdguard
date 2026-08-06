@@ -2,6 +2,7 @@
 package benchmarks
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -103,6 +104,18 @@ func BenchmarkExecute(b *testing.B) {
 	}
 
 	ctx := b.Context()
+
+	// Suppress stdout to prevent help-text rendering from causing I/O
+	// contention that inflates co-running benchmarks.
+	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer devNull.Close()
+
+	origStdout := os.Stdout
+	os.Stdout = devNull
+	defer func() { os.Stdout = origStdout }()
 
 	for b.Loop() {
 		// Execute with help to avoid actual command running

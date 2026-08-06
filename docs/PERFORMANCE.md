@@ -7,7 +7,7 @@
 
 ## TL;DR
 
-cmdguard adds **<2 µs** overhead for CLI creation and **~13 ns** for command validation. For typical CLIs with a few commands, the total cold-start overhead is well under 5 µs — less than 1% of Go runtime initialization.
+cmdguard adds **~13 µs** overhead for full CLI creation (`NewCLI`), **~180 ns** per command, and **~13.5 ns** for command validation. The per-command overhead is negligible — a typical 5-command CLI adds ~14 µs total, well under 1% of Go runtime initialization (~1–5 ms).
 
 Copy-on-write registries reduce per-command allocations by **48%** and memory by **22%** compared to eager cloning.
 
@@ -28,11 +28,12 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ### CLI Lifecycle
 
-| Operation          | Time     | Allocations | Memory  |
-| ------------------ | -------- | ----------- | ------- |
-| `Execute` (help)   | ~838 µs  | 6,195       | ~284 KB |
-| `NewCommand`       | ~180 ns  | 1           | ~288 B  |
-| `Command.Validate` | ~13.5 ns | 0           | 0 B     |
+| Operation          | Time      | Allocations | Memory  |
+| ------------------ | --------- | ----------- | ------- |
+| `NewCLI`           | ~12.8 µs  | 77          | ~6.9 KB |
+| `Execute` (help)   | ~838 µs   | 6,195       | ~284 KB |
+| `NewCommand`       | ~180 ns   | 1           | ~288 B  |
+| `Command.Validate` | ~13.5 ns  | 0           | 0 B     |
 
 _Note: `Execute` with help is slower because fang renders styled output. Actual command execution is significantly faster._
 
@@ -73,9 +74,11 @@ _Note: `Execute` with help is slower because fang renders styled output. Actual 
 
 ### Flight Recorder
 
-| Operation | Time    | Allocations | Memory |
-| --------- | ------- | ----------- | ------ |
-| `Capture` | ~724 µs | 94          | ~47 KB |
+| Operation              | Time    | Allocations | Memory |
+| ---------------------- | ------- | ----------- | ------ |
+| `New` (Recorder)       | ~170 ns | 2           | ~304 B |
+| `Middleware` overhead  | ~95 ns  | 0           | 0 B    |
+| `Capture`              | ~772 µs | 94          | ~47 KB |
 
 _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serialization and file I/O._
 
@@ -87,9 +90,9 @@ _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serializa
 
 For a typical CLI with 5 commands:
 
-- 1× `NewCLI` + `ScopeCreation`: ~700 ns
+- 1× `NewCLI` (includes scope creation + flag registration + CLIOption processing): ~12.8 µs
 - 5× `NewCommand` + validation: ~967 ns
-- Total startup: **<1.7 µs**
+- Total startup: **~13.8 µs**
 
 This is negligible compared to Go runtime initialization (~1–5 ms).
 
@@ -147,13 +150,4 @@ GOEXPERIMENT=jsonv2 go test ./flightrecorder/ -bench=. -benchmem -count=5
 ```
 
 For stable results, close other applications and run on a quiet machine.
-
-**Important:** `BenchmarkExecute` renders help text to stdout on every iteration.
-Run it separately from other benchmarks to avoid I/O contention inflating
-results:
-
-```bash
-# Run Execute separately to avoid I/O noise polluting other benchmarks
-GOEXPERIMENT=jsonv2 go test ./benchmarks/ -bench='BenchmarkExecute' -benchmem -count=5
-GOEXPERIMENT=jsonv2 go test ./benchmarks/ -bench='NewCommand|ParseFlagTags|FlagRegistry|Scope|Command' -benchmem -count=10
-```
+All benchmarks suppress stdout/stderr output during the measurement loop.
