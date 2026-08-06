@@ -1,8 +1,11 @@
 package testutil
 
 import (
+	"context"
 	"errors"
 	"testing"
+
+	"github.com/spf13/cobra"
 )
 
 func TestAssertEqual(t *testing.T) {
@@ -52,6 +55,12 @@ func TestAssertErrorContains(t *testing.T) {
 func TestAssertBoolTrue(t *testing.T) {
 	t.Parallel()
 	AssertBoolTrue(t, true, "flag")
+}
+
+func TestAssertBoolField(t *testing.T) {
+	t.Parallel()
+	AssertBoolField(t, true, true, "enabled")
+	AssertBoolField(t, false, false, "disabled")
 }
 
 func TestAssertBoolFalse(t *testing.T) {
@@ -148,3 +157,65 @@ func TestAssertStringerEq(t *testing.T) {
 type testStringer string
 
 func (s testStringer) String() string { return string(s) }
+
+func TestAssertErrorIsf(t *testing.T) {
+	t.Parallel()
+	err := errors.New("test error")
+	AssertErrorIsf(t, err, err, "context: %d", 1)
+}
+
+func TestAssertStderrContains(t *testing.T) {
+	t.Parallel()
+	AssertStderrContains(t, "Error: something failed", "error", "failed")
+}
+
+func TestNoOpRunE(t *testing.T) {
+	t.Parallel()
+	type cfg struct{ Debug bool }
+	type flags struct{ Name string }
+	err := NoOpRunE[cfg, flags](context.Background(), &cfg{}, flags{})
+	AssertNoError(t, err)
+}
+
+func TestAssertFieldEq(t *testing.T) {
+	t.Parallel()
+	AssertFieldEq(t, 42, 42, "count")
+}
+
+func TestAssertFieldEqString(t *testing.T) {
+	t.Parallel()
+	AssertFieldEqString(t, "hello", "hello", "name")
+}
+
+func TestAssertFlagRegistered(t *testing.T) {
+	t.Parallel()
+	cmd := &cobra.Command{Use: "test"}
+	cmd.Flags().String("name", "", "name flag")
+	AssertFlagRegistered(t, cmd, "name")
+}
+
+func TestAssertFlagNotRegistered(t *testing.T) {
+	t.Parallel()
+	cmd := &cobra.Command{Use: "test"}
+	AssertFlagNotRegistered(t, cmd, "nonexistent")
+}
+
+func TestAssertStringFieldContains(t *testing.T) {
+	t.Parallel()
+	AssertStringFieldContains(t, "hello world", "world", "greeting")
+}
+
+func TestAssertExpectedError(t *testing.T) {
+	t.Parallel()
+	AssertExpectedError(t, errors.New("expected"))
+}
+
+func TestAssertJSONMarshal(t *testing.T) {
+	t.Parallel()
+	AssertJSONMarshal(t, []byte(`{"key":"value"}`), `{"key":"value"}`)
+}
+
+func TestAssertFieldEqQuote(t *testing.T) {
+	t.Parallel()
+	AssertFieldEqQuote(t, "value", "value", "field")
+}
