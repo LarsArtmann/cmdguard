@@ -8,8 +8,10 @@
 /examples/*/typed_example
 /taskctl
 
-# Generated example artifacts (audit logs, exports, etc.)
+# Generated example artifacts (audit logs, exports, flight recorder traces, etc.)
 /examples/*/*.html
+/examples/*/*.trace
+*.trace
 
 # Test binaries
 *.test
