@@ -44,7 +44,7 @@ require (
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/larsartmann/cmdguard/v4 v4.0.0
+	github.com/larsartmann/cmdguard/v4 v4.0.1
 	github.com/larsartmann/go-atomic-write v0.4.1 // indirect
 	github.com/larsartmann/go-branded-id v0.5.1 // indirect
 	github.com/larsartmann/go-error-family v0.10.0 // indirect
@@ -87,4 +87,4 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v4 v4.0.0 => ../
+replace github.com/larsartmann/cmdguard/v4 v4.0.1 => ../

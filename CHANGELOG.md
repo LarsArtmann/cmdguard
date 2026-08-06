@@ -7,26 +7,60 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
-### Added
+---
 
-- **flightrecorder sub-module** — independently importable module (`github.com/larsartmann/cmdguard/flightrecorder`) built on Go 1.25+ `runtime/trace.FlightRecorder`. Provides continuous in-memory trace buffering, context-aware snapshot capture, and automatic slow-command / error capture middleware. Zero external dependencies (stdlib only). Sixth workspace module. Full API surface: `Recorder` (Start/Stop/Enabled/WriteTo/Capture/CaptureToWriter), `Config` (8 fields with defaults), `Middleware[T]`, `WithFlightRecorder[T]`, `WithFlightRecorderRecorder[T]`, sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), 48 test functions (41 tests, 3 godoc examples, 3 benchmarks, 1 fuzz target), 96.1% coverage.
-- CLI lifecycle improvements — enhanced command shutdown behavior and lifecycle test coverage.
-- `TODO_LIST.md` and `ROADMAP.md` — created (were referenced in AGENTS.md but missing).
+## [glamour/v0.2.0] - 2026-08-06
 
 ### Changed
 
-- **Documentation v3→v4 drift fix** — 36 user-facing and contributor-facing documents updated from stale v3 API references to v4 (QUICKSTART, TUTORIAL, WHAT_THIS_PROJECT_IS_ABOUT, WHAT_THIS_PROJECT_IS_NOT, MIGRATION_FROM_COBRA, COMPARISON, PERFORMANCE, doc.go, README, website guides). 23 website source files updated.
-- AGENTS.md project structure corrected from stale v3 references to v4; flightrecorder sub-module documented (package table, lint strategy, design principles, gotchas).
-- `CHANGELOG.md` rebuilt with real version history (v0.1.0 through v4.0.0) derived from git tags and tag messages.
-- `go-output` upgraded v0.35.0 → v0.37.0.
-- Nix flake inputs updated; go.mod `replace` directives consolidated into a single block.
+- **BREAKING:** Migrated dependency from `cmdguard/v3` to `cmdguard/v4`. All public function return types changed from `v3.CLIOption` to `v4.CLIOption`. Update import aliases from `v3` to `v4`.
+
+---
+
+## [prompts/v0.2.0] - 2026-08-06
+
+### Changed
+
+- **BREAKING:** Migrated dependency from `cmdguard/v3` to `cmdguard/v4`. All public function return types changed from `v3.CLIOption` to `v4.CLIOption`. Update import aliases from `v3` to `v4`.
+
+---
+
+## [spinner/v0.2.0] - 2026-08-06
+
+### Changed
+
+- **BREAKING:** Migrated dependency from `cmdguard/v3` to `cmdguard/v4`. All public function return types changed from `v3.CLIOption` / `v3.Middleware[T]` to `v4.CLIOption` / `v4.Middleware[T]`. Update import aliases from `v3` to `v4`.
 
 ### Fixed
 
+- Added `sync.Once` and `sync.Mutex` to `textSpinner` for concurrency-safe stop behavior.
+
+---
+
+## [telemetry/v0.2.0] - 2026-08-06
+
+### Changed
+
+- **BREAKING:** Migrated dependency from `cmdguard/v3` to `cmdguard/v4`. All public function return types changed from `v3.CLIOption` / `v3.Middleware[T]` to `v4.CLIOption` / `v4.Middleware[T]`. Update import aliases from `v3` to `v4`.
+
+---
+
+## [4.0.1] - 2026-08-06
+
+### Fixed
+
+- `NO_COLOR` env var restore — `applyNoColorIfSet` now uses `os.LookupEnv` instead of `os.Getenv` to correctly distinguish "unset" from "set to empty string" when restoring the environment after `--no-color` flag execution. Previously, a pre-existing `NO_COLOR=""` would be unset instead of restored.
 - `doc.go` godoc example — fixed stale `v3` import alias and "v2 constructors" reference.
 - README.md sub-modules code example — fixed missing `"time"` import (used `time.Millisecond` without importing the `time` package).
-- flightrecorder `evaluateCapture` — error reason now takes precedence over slow reason when both conditions are met (previously slow overwrote error).
-- flightrecorder timestamp format — changed to nanosecond precision to prevent same-second concurrent captures from clobbering each other's files.
+
+### Changed
+
+- `go-output` upgraded v0.35.0 → v0.37.0.
+- `koanf` patched: v2.3.5 → v2.3.6, parsers/json v1.0.0 → v1.0.1, parsers/yaml v1.1.0 → v1.1.1.
+- **Documentation v3→v4 drift fix** — 36 user-facing and contributor-facing documents updated from stale v3 API references to v4 (QUICKSTART, TUTORIAL, WHAT_THIS_PROJECT_IS_ABOUT, WHAT_THIS_PROJECT_IS_NOT, MIGRATION_FROM_COBRA, COMPARISON, PERFORMANCE, doc.go, README, website guides). 23 website source files updated.
+- AGENTS.md project structure corrected from stale v3 references to v4; flightrecorder sub-module documented (package table, lint strategy, design principles, gotchas).
+- Nix flake inputs updated; go.mod `replace` directives consolidated into a single block.
+- `TODO_LIST.md` and `ROADMAP.md` created.
 
 ---
 
