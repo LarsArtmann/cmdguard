@@ -2,6 +2,7 @@
 
 > **RESOLVED (2026-08-06, closure sprint):** ALL benchmark issues in this report
 > are now fully fixed and verified:
+>
 > - BenchmarkExecute stdout spam: **root cause fixed** (redirects to `/dev/null`)
 > - BenchmarkCapture log spam: **root cause fixed** (`Config.Log` set to no-op)
 > - PERFORMANCE.md numbers: **re-measured** with clean benchmarks (`-count=5`)

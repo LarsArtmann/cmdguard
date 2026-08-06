@@ -35,14 +35,14 @@ Ran the full script end-to-end. All 6 modules pass: build, test (race), lint, fo
 
 Ran `go test ./benchmarks/ -bench=. -benchmem -count=5` (181s) and `go test ./flightrecorder/ -bench=. -benchmem -count=5` (49s). Updated all 6 tables in PERFORMANCE.md with clean post-fix numbers. Key deltas:
 
-| Benchmark | Old (with spam) | New (clean) | Delta |
-|-----------|-----------------|-------------|-------|
-| NewCLI | ~12.8 µs | ~6.9 µs | -46% |
-| Execute | ~838 µs | ~580 µs (best) | -31% |
-| NewCommand | ~180 ns | ~102 ns | -43% |
-| FR Capture | ~772 µs | ~433 µs | -44% |
-| FR New | ~170 ns | ~69 ns | -59% |
-| FR Middleware | ~95 ns | ~71 ns | -25% |
+| Benchmark     | Old (with spam) | New (clean)    | Delta |
+| ------------- | --------------- | -------------- | ----- |
+| NewCLI        | ~12.8 µs        | ~6.9 µs        | -46%  |
+| Execute       | ~838 µs         | ~580 µs (best) | -31%  |
+| NewCommand    | ~180 ns         | ~102 ns        | -43%  |
+| FR Capture    | ~772 µs         | ~433 µs        | -44%  |
+| FR New        | ~170 ns         | ~69 ns         | -59%  |
+| FR Middleware | ~95 ns          | ~71 ns         | -25%  |
 
 The prior session's "2x regression" was entirely I/O contention from stdout spam. The real numbers are ~2x faster than what was documented.
 
@@ -56,19 +56,19 @@ All 31 cases pass. Lint clean (0 issues).
 
 Created `coverage_test.go` with 11 new tests targeting previously-uncovered branches:
 
-| Test | What it covers |
-|------|---------------|
-| `TestTaskStatusLabel` | Both branches of `taskStatusLabel` (done/pending) |
-| `TestTaskRow_DoneTrue` | `Row()` with `Done=true` branch |
-| `TestTaskStore_GetNotFound` | `Get()` returns `false` for non-existent ID |
-| `TestTaskStore_GetFound` | `Get()` returns `true` for existing ID |
-| `TestTaskStore_ListHideDone` | `List()` hides done tasks when `showAll=false` |
-| `TestTaskStore_ListFilterPriorityAndHideDone` | Combined priority filter + done hiding |
-| `TestResolveStore_Error` | `resolveStore` on empty scope returns error |
-| `TestSeedTasks_NoStore` | `seedTasks` silently returns when Invoke fails |
-| `TestInspectCommand_NoTaskFound` | Inspect handler when task not found |
-| `TestInspectCommand_WithMetadata` | Inspect handler `--metadata` branch |
-| `TestNewTaskStore_Success` / `MissingConfig` | Both error paths in `NewTaskStore` |
+| Test                                          | What it covers                                    |
+| --------------------------------------------- | ------------------------------------------------- |
+| `TestTaskStatusLabel`                         | Both branches of `taskStatusLabel` (done/pending) |
+| `TestTaskRow_DoneTrue`                        | `Row()` with `Done=true` branch                   |
+| `TestTaskStore_GetNotFound`                   | `Get()` returns `false` for non-existent ID       |
+| `TestTaskStore_GetFound`                      | `Get()` returns `true` for existing ID            |
+| `TestTaskStore_ListHideDone`                  | `List()` hides done tasks when `showAll=false`    |
+| `TestTaskStore_ListFilterPriorityAndHideDone` | Combined priority filter + done hiding            |
+| `TestResolveStore_Error`                      | `resolveStore` on empty scope returns error       |
+| `TestSeedTasks_NoStore`                       | `seedTasks` silently returns when Invoke fails    |
+| `TestInspectCommand_NoTaskFound`              | Inspect handler when task not found               |
+| `TestInspectCommand_WithMetadata`             | Inspect handler `--metadata` branch               |
+| `TestNewTaskStore_Success` / `MissingConfig`  | Both error paths in `NewTaskStore`                |
 
 Coverage: **68.2% → 72.1%** (+3.9%). `resolveStore`, `taskStatusLabel`, `seedTasks`, `Row`, `Get` all now at 100%.
 
@@ -106,6 +106,7 @@ The 31 subprocess tests verify that every assertion helper produces the correct 
 ### 2. taskctl coverage plateau — structurally limited
 
 Coverage improved from 68.2% to 72.1%, but the remaining gaps are:
+
 - `main()` at 0% — Go entry point, structurally untestable
 - `buildCommands` at ~74% — the uncovered lines are almost exclusively `if err != nil { return err }` from `NewCommand`/`AddCommand` calls. Testing these would require mocking the v4 package, which is inappropriate for example code.
 - `List` at 90% — the `result == nil` initialization branch (empty result set that never appends)
@@ -155,6 +156,7 @@ The Execute benchmark produced 5 runs: 1105, 939, 1107, 580, 616 µs. The median
 The Execute benchmark's allocation count varies from 5,317 to 9,179 across 5 runs — a **72% spread**. This is not normal GC noise. Normal benchmark variance is 5-15%. A 72% spread means the benchmark is fundamentally unreliable: something non-deterministic is happening inside `ExecuteWithArgs("--help")`.
 
 Possible causes I didn't investigate:
+
 - fang/cobra creates different amounts of temporary objects depending on terminal detection, environment, or GC timing
 - The `--help` path may trigger lazy initialization that only happens once (first iteration allocates more)
 - Map iteration order in cobra's flag/command traversal may cause different allocation patterns
@@ -166,6 +168,7 @@ I documented the variance in a footnote but didn't investigate the root cause. T
 `TestFR_Integration_CaptureOnCommandError` calls `rec.Start()` explicitly before CLI creation. `TestFR_Integration_NoCaptureOnSuccess` does NOT call `rec.Start()` — it relies on the middleware's lazy start. This asymmetry exists because the error test's middleware lazy-start was failing silently (likely due to `runtime/trace.Start()` process-wide singleton conflict with a prior test), so I worked around it by pre-starting.
 
 I didn't investigate WHY the lazy start failed. I just added `rec.Start()` and moved on when the test passed. The root cause could be:
+
 - The two non-parallel tests run sequentially, but `defer rec.Stop()` in the first test may not complete before the second test's middleware tries `Start()`
 - `runtime/trace.Stop()` may not immediately make `runtime/trace.Start()` available again
 - There's a race between the middleware's lazy start and the previous test's cleanup
@@ -218,58 +221,58 @@ I verified `astro build` produces 22 pages with 0 errors. But "builds" ≠ "rend
 
 ## f) Up to 50 Things We Should Get Done Next
 
-| #   | Task                                                                                  | Priority | Effort  | Source          |
-| --- | ------------------------------------------------------------------------------------- | -------- | ------- | --------------- |
-| 1   | **Fix PERFORMANCE.md Execute row** — use median (~939 µs), not best-case (~580 µs)    | P0       | 2min    | This report D1  |
-| 2   | **Investigate BenchmarkExecute 72% allocation variance** — root cause or restructure  | P0       | 60min   | This report D2  |
-| 3   | **Use GOCOVERDIR for testutil subprocess coverage** — merge into parent profile       | P0       | 30min   | This report D4  |
-| 4   | **Verify rendered website HTML** — spot-check 5 changed .mdx pages                    | P0       | 10min   | This report D5  |
-| 5   | **Investigate FR lazy-start asymmetry** — why does error test need explicit Start()?  | P1       | 30min   | This report D3  |
-| 6   | **Annotate 12-38 status report** — resolution banner for items fixed this session     | P1       | 10min   | This report c.1 |
-| 7   | **Verify/update AGENTS.md metrics** — test count, benchmarks, fuzz, coverage, version | P1       | 15min   | 12-38 report    |
-| 8   | **Create v4.0.0 GitHub release** — draft release notes from CHANGELOG                 | P1       | 20min   | Prior reports   |
-| 9   | **Re-verify COW claim numbers** — 48% faster, -10 allocs for v4                       | P2       | 30min   | 14:41 report    |
-| 10  | **Run `nix run .#check-all` in CI** — wire into GitHub Actions                        | P2       | 30min   | 14:41 report    |
-| 11  | **Add benchmark CI gating** — compare against baseline, fail on regression            | P2       | 60min   | ROADMAP         |
-| 12  | **Improve taskctl coverage further** — target 75% (practical ceiling)                 | P2       | 45min   | This report b.2 |
-| 13  | **Write fuzz tests for type_handler_intwidth.go** — new code paths since v3            | P2       | 45min   | Prior reports   |
-| 14  | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees      | P2       | 30min   | Prior reports   |
-| 15  | **Profile a real taskctl invocation** — find next micro-optimization target            | P2       | 60min   | Prior reports   |
-| 16  | **Add MaxSnapshots config to flightrecorder** — rate limiting / disk protection        | P2       | 45min   | ROADMAP         |
-| 17  | **Add CaptureReasonPanic to flightrecorder** — capture on panic recovery              | P2       | 30min   | ROADMAP         |
-| 18  | **Add Sync() method to flightrecorder** — flush pending captures                        | P2       | 30min   | ROADMAP         |
-| 19  | **Add Recorder.Status() to flightrecorder** — snapshot stats                            | P2       | 30min   | ROADMAP         |
-| 20  | **Write flightrecorder README** — usage example + go tool trace screenshot             | P2       | 30min   | Prior reports   |
-| 21  | **Add website preview check to check-all** — `astro build` in CI                        | P2       | 15min   | 14:41 report    |
-| 22  | **Add `--output=json` error shape test** — verify structured error rendering           | P2       | 30min   | Prior reports   |
-| 23  | **Test audit log export in taskctl** — 11-format export verification                   | P2       | 45min   | Prior reports   |
-| 24  | **Verify glamour v0.1.0 published = local source** — diff workspace vs tag             | P2       | 15min   | Prior reports   |
-| 25  | **Verify all .golangci.yml exclusions still justified** — quarterly audit               | P3       | 15min   | Prior reports   |
-| 26  | **Consider koanf → lighter config loader** — koanf is heavy for JSON/YAML/TOML         | P3       | 120min  | Prior reports   |
-| 27  | **Expose RenderAnyData directly** — non-table output API                                | P3       | 30min   | Prior reports   |
-| 28  | **Add structured logging (slog) to flightrecorder** — Log field as slog handler        | P3       | 45min   | Prior reports   |
-| 29  | **Migrate from samber/do v2 to v3** — when released                                      | P3       | 120min  | Prior reports   |
-| 30  | **Add `goat` ASCII diagram of v4 command lifecycle** — docs                             | P3       | 60min   | Prior reports   |
-| 31  | **Write blog post: "Why we built cmdguard v4"** — marketing                             | P3       | 120min  | Prior reports   |
-| 32  | **Add GitHub Action badge for nix flake check** — README                                | P3       | 10min   | Prior reports   |
-| 33  | **Consider renaming v4 package to just `cmdguard`** — v3 as deprecation alias           | P3       | 120min  | Prior reports   |
-| 34  | **Sponsor/contribute back to samber/do, fang, glamour, huh** — ecosystem health        | P3       | —       | Prior reports   |
-| 35  | **Add slog handler integration test** — verify structured logging works                 | P3       | 30min   | Prior reports   |
-| 36  | **Write CONTRIBUTING.md section on testing patterns** — document GOCOVERDIR             | P3       | 20min   | This report D4  |
-| 37  | **Add `gofmt -s` check to check-all** — already in treefmt but explicit                 | P3       | 5min    | Prior reports   |
-| 38  | **Document why each sub-module exists** — design rationale doc                          | P3       | 60min   | Prior reports   |
-| 39  | **Add benchmark comparing v4 to raw cobra** — show overhead is minimal                  | P3       | 60min   | Prior reports   |
-| 40  | **Add configurable timestamp format to flightrecorder** — user-chosen precision         | P3       | 30min   | ROADMAP         |
-| 41  | **Add CaptureReasonTimeout to flightrecorder** — context-deadline capture               | P3       | 30min   | ROADMAP         |
-| 42  | **Verify fang v2.0.1 is latest** — dependency freshness                                  | P3       | 5min    | Prior reports   |
-| 43  | **Add doctor command to taskctl example** — showcase DoctorCommand                       | P3       | 30min   | Prior reports   |
-| 44  | **Add shell completion v2** — type-aware dynamic completion                             | P3       | 120min  | ROADMAP         |
-| 45  | **Add plugin marketplace** — community type handlers                                     | P3       | 240min  | ROADMAP         |
-| 46  | **Add gRPC middleware sub-module** — command-level gRPC tracing                         | P3       | 120min  | ROADMAP         |
-| 47  | **Add web-based CLI preview** — render command tree as HTML                              | P3       | 180min  | ROADMAP         |
-| 48  | **Add ContextualCaptureReason to flightrecorder** — custom capture triggers             | P3       | 45min   | ROADMAP         |
-| 49  | **Consider v4.1.0 release** — once P0/P1 items done                                     | P3       | 30min   | Prior reports   |
-| 50  | **Add resolution appendices to 3 FR reports** — detailed per-item resolution             | P3       | 30min   | Prior reports   |
+| #   | Task                                                                                  | Priority | Effort | Source          |
+| --- | ------------------------------------------------------------------------------------- | -------- | ------ | --------------- |
+| 1   | **Fix PERFORMANCE.md Execute row** — use median (~939 µs), not best-case (~580 µs)    | P0       | 2min   | This report D1  |
+| 2   | **Investigate BenchmarkExecute 72% allocation variance** — root cause or restructure  | P0       | 60min  | This report D2  |
+| 3   | **Use GOCOVERDIR for testutil subprocess coverage** — merge into parent profile       | P0       | 30min  | This report D4  |
+| 4   | **Verify rendered website HTML** — spot-check 5 changed .mdx pages                    | P0       | 10min  | This report D5  |
+| 5   | **Investigate FR lazy-start asymmetry** — why does error test need explicit Start()?  | P1       | 30min  | This report D3  |
+| 6   | **Annotate 12-38 status report** — resolution banner for items fixed this session     | P1       | 10min  | This report c.1 |
+| 7   | **Verify/update AGENTS.md metrics** — test count, benchmarks, fuzz, coverage, version | P1       | 15min  | 12-38 report    |
+| 8   | **Create v4.0.0 GitHub release** — draft release notes from CHANGELOG                 | P1       | 20min  | Prior reports   |
+| 9   | **Re-verify COW claim numbers** — 48% faster, -10 allocs for v4                       | P2       | 30min  | 14:41 report    |
+| 10  | **Run `nix run .#check-all` in CI** — wire into GitHub Actions                        | P2       | 30min  | 14:41 report    |
+| 11  | **Add benchmark CI gating** — compare against baseline, fail on regression            | P2       | 60min  | ROADMAP         |
+| 12  | **Improve taskctl coverage further** — target 75% (practical ceiling)                 | P2       | 45min  | This report b.2 |
+| 13  | **Write fuzz tests for type_handler_intwidth.go** — new code paths since v3           | P2       | 45min  | Prior reports   |
+| 14  | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees      | P2       | 30min  | Prior reports   |
+| 15  | **Profile a real taskctl invocation** — find next micro-optimization target           | P2       | 60min  | Prior reports   |
+| 16  | **Add MaxSnapshots config to flightrecorder** — rate limiting / disk protection       | P2       | 45min  | ROADMAP         |
+| 17  | **Add CaptureReasonPanic to flightrecorder** — capture on panic recovery              | P2       | 30min  | ROADMAP         |
+| 18  | **Add Sync() method to flightrecorder** — flush pending captures                      | P2       | 30min  | ROADMAP         |
+| 19  | **Add Recorder.Status() to flightrecorder** — snapshot stats                          | P2       | 30min  | ROADMAP         |
+| 20  | **Write flightrecorder README** — usage example + go tool trace screenshot            | P2       | 30min  | Prior reports   |
+| 21  | **Add website preview check to check-all** — `astro build` in CI                      | P2       | 15min  | 14:41 report    |
+| 22  | **Add `--output=json` error shape test** — verify structured error rendering          | P2       | 30min  | Prior reports   |
+| 23  | **Test audit log export in taskctl** — 11-format export verification                  | P2       | 45min  | Prior reports   |
+| 24  | **Verify glamour v0.1.0 published = local source** — diff workspace vs tag            | P2       | 15min  | Prior reports   |
+| 25  | **Verify all .golangci.yml exclusions still justified** — quarterly audit             | P3       | 15min  | Prior reports   |
+| 26  | **Consider koanf → lighter config loader** — koanf is heavy for JSON/YAML/TOML        | P3       | 120min | Prior reports   |
+| 27  | **Expose RenderAnyData directly** — non-table output API                              | P3       | 30min  | Prior reports   |
+| 28  | **Add structured logging (slog) to flightrecorder** — Log field as slog handler       | P3       | 45min  | Prior reports   |
+| 29  | **Migrate from samber/do v2 to v3** — when released                                   | P3       | 120min | Prior reports   |
+| 30  | **Add `goat` ASCII diagram of v4 command lifecycle** — docs                           | P3       | 60min  | Prior reports   |
+| 31  | **Write blog post: "Why we built cmdguard v4"** — marketing                           | P3       | 120min | Prior reports   |
+| 32  | **Add GitHub Action badge for nix flake check** — README                              | P3       | 10min  | Prior reports   |
+| 33  | **Consider renaming v4 package to just `cmdguard`** — v3 as deprecation alias         | P3       | 120min | Prior reports   |
+| 34  | **Sponsor/contribute back to samber/do, fang, glamour, huh** — ecosystem health       | P3       | —      | Prior reports   |
+| 35  | **Add slog handler integration test** — verify structured logging works               | P3       | 30min  | Prior reports   |
+| 36  | **Write CONTRIBUTING.md section on testing patterns** — document GOCOVERDIR           | P3       | 20min  | This report D4  |
+| 37  | **Add `gofmt -s` check to check-all** — already in treefmt but explicit               | P3       | 5min   | Prior reports   |
+| 38  | **Document why each sub-module exists** — design rationale doc                        | P3       | 60min  | Prior reports   |
+| 39  | **Add benchmark comparing v4 to raw cobra** — show overhead is minimal                | P3       | 60min  | Prior reports   |
+| 40  | **Add configurable timestamp format to flightrecorder** — user-chosen precision       | P3       | 30min  | ROADMAP         |
+| 41  | **Add CaptureReasonTimeout to flightrecorder** — context-deadline capture             | P3       | 30min  | ROADMAP         |
+| 42  | **Verify fang v2.0.1 is latest** — dependency freshness                               | P3       | 5min   | Prior reports   |
+| 43  | **Add doctor command to taskctl example** — showcase DoctorCommand                    | P3       | 30min  | Prior reports   |
+| 44  | **Add shell completion v2** — type-aware dynamic completion                           | P3       | 120min | ROADMAP         |
+| 45  | **Add plugin marketplace** — community type handlers                                  | P3       | 240min | ROADMAP         |
+| 46  | **Add gRPC middleware sub-module** — command-level gRPC tracing                       | P3       | 120min | ROADMAP         |
+| 47  | **Add web-based CLI preview** — render command tree as HTML                           | P3       | 180min | ROADMAP         |
+| 48  | **Add ContextualCaptureReason to flightrecorder** — custom capture triggers           | P3       | 45min  | ROADMAP         |
+| 49  | **Consider v4.1.0 release** — once P0/P1 items done                                   | P3       | 30min  | Prior reports   |
+| 50  | **Add resolution appendices to 3 FR reports** — detailed per-item resolution          | P3       | 30min  | Prior reports   |
 
 ---
 
@@ -291,16 +294,16 @@ The 31 tests verify that assertion helpers produce the correct error messages on
 
 ## Session Metrics
 
-| Metric                          | Value                                      |
-| ------------------------------- | ------------------------------------------ |
-| Tasks planned                   | 8                                          |
-| Tasks fully completed           | 8                                          |
-| Files modified                  | 7 (PERFORMANCE.md, flake.nix, 3 status reports, 2 new test files) |
-| Tests added                     | 44 (31 testutil + 13 taskctl)              |
-| Benchmarks re-run               | 34 (29 core + 5 FR), `-count=5`            |
-| Coverage delta (taskctl)        | 68.2% → 72.1% (+3.9%)                      |
-| Coverage delta (testutil)       | 71.8% → 71.8% (0% — subprocess limitation) |
-| Quality gates                   | All pass (build, test -race, lint, format, tidy) |
-| Clone groups                    | 0 (`art-dupl --semantic -t 3`)             |
-| Process failures identified     | 5 (D1-D5)                                  |
-| Honest self-assessment          | 7/10 — all gaps closed, but Execute benchmark number is misleading and wasn't investigated |
+| Metric                      | Value                                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| Tasks planned               | 8                                                                                          |
+| Tasks fully completed       | 8                                                                                          |
+| Files modified              | 7 (PERFORMANCE.md, flake.nix, 3 status reports, 2 new test files)                          |
+| Tests added                 | 44 (31 testutil + 13 taskctl)                                                              |
+| Benchmarks re-run           | 34 (29 core + 5 FR), `-count=5`                                                            |
+| Coverage delta (taskctl)    | 68.2% → 72.1% (+3.9%)                                                                      |
+| Coverage delta (testutil)   | 71.8% → 71.8% (0% — subprocess limitation)                                                 |
+| Quality gates               | All pass (build, test -race, lint, format, tidy)                                           |
+| Clone groups                | 0 (`art-dupl --semantic -t 3`)                                                             |
+| Process failures identified | 5 (D1-D5)                                                                                  |
+| Honest self-assessment      | 7/10 — all gaps closed, but Execute benchmark number is misleading and wasn't investigated |

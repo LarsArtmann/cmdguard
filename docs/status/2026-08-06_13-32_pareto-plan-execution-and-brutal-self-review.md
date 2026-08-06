@@ -2,6 +2,7 @@
 
 > **RESOLVED (2026-08-06, closure sprint):** The coverage gaps flagged in this
 > report are now addressed:
+>
 > - taskctl coverage: **68.2% → 71.7%** — added error-path tests for `resolveStore`,
 >   `taskStatusLabel`, `seedTasks`, `Row`, `Get`, `NewTaskStore`, plus inspect
 >   not-found and metadata branches. All previously-uncovered helper functions

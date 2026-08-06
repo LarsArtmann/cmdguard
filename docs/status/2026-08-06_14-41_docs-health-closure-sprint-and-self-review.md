@@ -2,6 +2,7 @@
 
 > **RESOLVED (2026-08-06, closure sprint continuation):** ALL 5 process failures
 > (D1-D5) from this report are now fully fixed and verified:
+>
 > - **D1** (benchmarks not re-run): Benchmarks re-run with `-count=5`, PERFORMANCE.md
 >   updated with clean post-fix numbers (NewCLI 12.8→6.9 µs, Execute 838→~580 µs)
 > - **D2** (check-all never run): `nix run .#check-all` executed successfully —

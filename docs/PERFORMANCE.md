@@ -28,29 +28,29 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 ### CLI Lifecycle
 
-| Operation          | Time      | Allocations | Memory  |
-| ------------------ | --------- | ----------- | ------- |
-| `NewCLI`           | ~6.9 µs   | 77          | ~6.8 KB |
-| `Execute` (help)   | ~580 µs   | ~6,300      | ~294 KB |
-| `NewCommand`       | ~102 ns   | 1           | ~288 B  |
-| `Command.Validate` | ~10.5 ns  | 0           | 0 B     |
+| Operation          | Time     | Allocations | Memory  |
+| ------------------ | -------- | ----------- | ------- |
+| `NewCLI`           | ~6.9 µs  | 77          | ~6.8 KB |
+| `Execute` (help)   | ~580 µs  | ~6,300      | ~294 KB |
+| `NewCommand`       | ~102 ns  | 1           | ~288 B  |
+| `Command.Validate` | ~10.5 ns | 0           | 0 B     |
 
 _Note: `Execute` with help is high-variance (580 µs–1.1 ms across runs) because it exercises the full cobra execution path including GC. The best-case (~580 µs) reflects true overhead without external interference. Stdout is redirected to `/dev/null` during benchmarking._
 
 ### Flag Parsing
 
-| Operation                  | Time     | Allocations | Memory  |
-| -------------------------- | -------- | ----------- | ------- |
-| `ParseFlagTags` (4 fields) | ~4.3 µs  | 11          | ~1.6 KB |
-| `NewFlagRegistry` (2 fields) | ~910 ns | 9          | ~896 B  |
-| `ParseDuration`            | ~86 ns   | 0           | 0 B     |
-| `ParseLogLevel`            | ~78 ns   | 0           | 0 B     |
-| `ParseURL`                 | ~636 ns  | 6           | ~768 B  |
-| `ParseEmail`               | ~907 ns  | 25          | ~504 B  |
-| `ParsePort` (numeric)      | ~61 ns   | 0           | 0 B     |
-| `ParsePort` (named)        | ~39 ns   | 0           | 0 B     |
-| `ParseFilePath`            | ~1.2 µs  | 7           | ~586 B  |
-| `ParseHostPort`            | ~119 ns  | 0           | 0 B     |
+| Operation                    | Time    | Allocations | Memory  |
+| ---------------------------- | ------- | ----------- | ------- |
+| `ParseFlagTags` (4 fields)   | ~4.3 µs | 11          | ~1.6 KB |
+| `NewFlagRegistry` (2 fields) | ~910 ns | 9           | ~896 B  |
+| `ParseDuration`              | ~86 ns  | 0           | 0 B     |
+| `ParseLogLevel`              | ~78 ns  | 0           | 0 B     |
+| `ParseURL`                   | ~636 ns | 6           | ~768 B  |
+| `ParseEmail`                 | ~907 ns | 25          | ~504 B  |
+| `ParsePort` (numeric)        | ~61 ns  | 0           | 0 B     |
+| `ParsePort` (named)          | ~39 ns  | 0           | 0 B     |
+| `ParseFilePath`              | ~1.2 µs | 7           | ~586 B  |
+| `ParseHostPort`              | ~119 ns | 0           | 0 B     |
 
 _Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recursion support. Each field allocates an `Index` reflect path for the flattened flag registration. This is expected v4 overhead for the richer feature set._
 
@@ -65,22 +65,22 @@ _Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recu
 
 ### Dependency Injection
 
-| Operation          | Time     | Allocations | Memory  |
-| ------------------ | -------- | ----------- | ------- |
-| `NewScope`         | ~410 ns  | 11          | ~688 B  |
-| `NewScopeWithOpts` | ~420 ns  | 11          | ~688 B  |
-| `Provide`          | ~1.7 µs  | 26          | ~1.7 KB |
-| `Invoke`           | ~213 ns  | 5           | ~160 B  |
-| `CloneScope`       | ~6.4 µs  | 39          | ~3.0 KB |
-| `ProvideInvoke`    | ~7.8 µs  | 41          | ~3.1 KB |
+| Operation          | Time    | Allocations | Memory  |
+| ------------------ | ------- | ----------- | ------- |
+| `NewScope`         | ~410 ns | 11          | ~688 B  |
+| `NewScopeWithOpts` | ~420 ns | 11          | ~688 B  |
+| `Provide`          | ~1.7 µs | 26          | ~1.7 KB |
+| `Invoke`           | ~213 ns | 5           | ~160 B  |
+| `CloneScope`       | ~6.4 µs | 39          | ~3.0 KB |
+| `ProvideInvoke`    | ~7.8 µs | 41          | ~3.1 KB |
 
 ### Flight Recorder
 
-| Operation             | Time     | Allocations | Memory |
-| --------------------- | -------- | ----------- | ------ |
-| `New` (Recorder)      | ~69 ns   | 2           | ~304 B |
-| `Middleware` overhead | ~71 ns   | 0           | 0 B    |
-| `Capture`             | ~433 µs  | 91          | ~47 KB |
+| Operation             | Time    | Allocations | Memory |
+| --------------------- | ------- | ----------- | ------ |
+| `New` (Recorder)      | ~69 ns  | 2           | ~304 B |
+| `Middleware` overhead | ~71 ns  | 0           | 0 B    |
+| `Capture`             | ~433 µs | 91          | ~47 KB |
 
 _Captures a runtime/trace snapshot to disk. Cost is dominated by trace serialization and file I/O._
 
