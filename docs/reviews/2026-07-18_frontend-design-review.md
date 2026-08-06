@@ -81,7 +81,7 @@ Per the skill: "Signature: the single unique element this page will be remembere
 - Feature cards with outline icons — standard
 - Comparison table — well-executed but standard
 
-If you screenshot this site and put it next to 10 other dev-tool landing pages, there is **no element that identifies it as cmdguard**. The code in the preview is the most specific thing (it shows Go with `v3.NewCLI`), but the code is wrapped in the most generic container possible.
+If you screenshot this site and put it next to 10 other dev-tool landing pages, there is **no element that identifies it as cmdguard**. The code in the preview is the most specific thing (it shows Go with `v4.NewCLI`), but the code is wrapped in the most generic container possible.
 
 **Severity:** High. This is the core issue. Everything else is polish.
 

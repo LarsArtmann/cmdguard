@@ -17,7 +17,7 @@ Copy-on-write registries reduce per-command allocations by **48%** and memory by
 
 | Optimization                          | Effect                                                  | Files                                                              |
 | ------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
-| Copy-on-write registries              | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI | `pkg/cmdguard/v4/type_handler.go`, `flags_validate.go`, `flags.go` |
+| Copy-on-write registries              | **-10 allocs, -1.9 KB per command**, -48% faster NewCLI _(measured at original optimization time, v2.6)_ | `pkg/cmdguard/v4/type_handler.go`, `flags_validate.go`, `flags.go` |
 | Cached `os.UserHomeDir()`             | Eliminates redundant syscalls for `~/` path expansion   | `pkg/cmdguard/v4/config_file.go`                                   |
 | Iterator-based traversal (`iter.Seq`) | Zero-allocation alternative to defensive copies         | `pkg/cmdguard/v4/flags.go`, `flags_suggest.go`, `flow_context.go`  |
 | Regex cache safety documentation      | Documents bounded usage of `sync.Map` regex cache       | `pkg/cmdguard/v4/flags_validate.go`                                |
@@ -128,9 +128,9 @@ on the first write (`RegisterTypeHandler` / `RegisterFlagValidator`).
 
 **Benefits:**
 
-- 48% faster `NewCLI` (measured at original optimization time)
-- 10 fewer allocations per command
-- 22% less memory per command
+- 48% faster `NewCLI` (measured at original optimization time, v2.6)
+- 10 fewer allocations per command (v2.6 baseline)
+- 22% less memory per command (v2.6 baseline)
 - Zero cost for commands that never customize their registries (the common case)
 
 **Behavioral note:** With COW, global registrations via `RegisterTypeHandler()` /

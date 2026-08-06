@@ -44,7 +44,7 @@ Score: **8.5/10**. Would be 9.5 with the two changes below.
 **Fix:** Add a one-line CTA right after the tagline:
 
 ```markdown
-**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v3` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
+**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v4` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 ```
 
 - _Rationale:_ gives the impatient reader a single line to act on; mirrors the website's pattern; the inline `go get` lets them copy-paste immediately.

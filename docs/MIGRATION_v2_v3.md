@@ -220,6 +220,9 @@ go mod tidy
 - [ ] Remove usages of `EditInEditor`, `Result[T]`, `Validated[T]`
 - [ ] `go build ./... && go vet ./... && go test ./...`
 
+> **Migrating further?** If you're moving from v3 to v4, see the
+> [v3→v4 Migration Guide](./MIGRATION_v3_v4.md).
+
 ---
 
 ## 7. Reference migration
