@@ -75,6 +75,7 @@
           apps = {
             check-all = {
               type = "app";
+              meta.description = "Run all quality gates: build, test (race), lint, format check, go mod tidy across all 6 modules";
               program = toString (
                 pkgs.writeShellScript "check-all" ''
                   set -euo pipefail
