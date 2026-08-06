@@ -126,6 +126,26 @@ When adding features:
 3. Maintain >80% test coverage for new code
 4. Add examples for significant features
 
+### Sub-Modules: When to Extract
+
+cmdguard uses sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`) to isolate heavy dependencies. Core has **zero** dependencies on these libraries.
+
+**Decision tree — should a new feature be a sub-module?**
+
+1. Does the feature require a new external dependency? → **Yes:** continue to step 2. **No:** keep it in core.
+2. Is the dependency heavy (>1MB binary, slow compile, CGO)? → **Yes:** extract. **No:** continue to step 3.
+3. Will most users NOT need this feature? → **Yes:** extract. **No:** keep in core and accept the dependency.
+
+**Rules for sub-modules:**
+
+- Each sub-module lives at the **repo root** (e.g., `glamour/`, NOT `pkg/cmdguard/glamour/`). Go resolves module paths by finding `go.mod` at the matching directory.
+- Each has its own `go.mod` with the module path `github.com/larsartmann/cmdguard/<name>`.
+- The root `go.mod` has a `replace` directive for local development.
+- The root `go.work` includes it for unified `go build ./...`.
+- Tag independently: `<name>/v0.1.0`.
+- Must pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`).
+- Must have its own tests with >80% coverage.
+
 ## Questions?
 
 - Open an issue for questions
