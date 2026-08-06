@@ -85,7 +85,8 @@ These are unformed ideas that may or may not become features:
 - **Web-based CLI preview** — render command tree as interactive HTML
 - **Shell completion v2** — richer dynamic completion with type-aware suggestions
 - **Benchmark dashboard** — track performance across releases
-- **v3→v4 migration guide** — dedicated `docs/MIGRATION_v3_v4.md` (v2→v3 got one; v3→v4 only has a CHANGELOG entry)
+- **Benchmark CI gating** — detect performance regressions automatically by comparing benchmark results against a baseline in CI
+- **v3→v4 migration guide** — ~~dedicated `docs/MIGRATION_v3_v4.md`~~ done (2026-08-06)
 
 ### Flight Recorder Enhancements
 

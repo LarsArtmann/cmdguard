@@ -717,24 +717,33 @@ func TestTraceSnapshot_IsParseableByGoToolTrace(t *testing.T) {
 		t.Fatalf("snapshot file too small (%d bytes), expected trace data", info.Size())
 	}
 
-	// Run `go tool trace` with a short timeout. If parsing fails, it exits
-	// with an error before the timeout. If parsing succeeds, it starts a web
-	// server and blocks — we kill it via the timeout and treat that as success.
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Run `go tool trace` with a short timeout. If parsing fails, the tool
+	// exits quickly with a non-zero status. If parsing succeeds, it starts a
+	// web server and blocks — the timeout kills it, which we treat as success.
+	// We discard output to prevent pipe-buffer deadlocks.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "go", "tool", "trace", path)
-	output, err := cmd.CombinedOutput()
+	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		t.Fatalf("failed to open /dev/null: %v", err)
+	}
+	defer devNull.Close()
 
-	// If the context deadline was exceeded, the trace parsed successfully
-	// (the tool was waiting for web server requests). Any other error means
-	// parsing failed.
-	if err != nil && ctx.Err() != context.DeadlineExceeded {
-		t.Fatalf("go tool trace failed to parse snapshot: %v\noutput: %s", err, output)
+	cmd := exec.CommandContext(ctx, "go", "tool", "trace", path)
+	cmd.Stdout = devNull
+	cmd.Stderr = devNull
+
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("failed to start go tool trace: %v", err)
 	}
 
-	outputStr := string(output)
-	if strings.Contains(outputStr, "failed to parse trace") {
-		t.Fatalf("go tool trace reported parse failure:\n%s", outputStr)
+	err = cmd.Wait()
+
+	// DeadlineExceeded means the tool was still running after 5 seconds
+	// (parsing succeeded, web server started). Any other error means either
+	// the tool failed during parsing or was killed by a signal.
+	if ctx.Err() != context.DeadlineExceeded {
+		t.Fatalf("go tool trace failed during parsing (exit before timeout): %v", err)
 	}
 }

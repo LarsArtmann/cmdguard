@@ -31,6 +31,9 @@ go test ./... -count=1 -timeout 120s -cover
 
 # Check everything (format check)
 nix flake check
+
+# Check everything (build + test + lint + format + go mod tidy — all 6 modules)
+nix run .#check-all
 ```
 
 **BuildFlow pre-commit hook:** runs golangci-lint + formatters on commit (auto-fixes applied automatically). Commits proceed normally — no `--no-verify` needed.

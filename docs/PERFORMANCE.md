@@ -42,6 +42,8 @@ _Note: `Execute` with help is slower because fang renders styled output. Actual 
 | Operation                    | Time    | Allocations | Memory  |
 | ---------------------------- | ------- | ----------- | ------- |
 | `ParseFlagTags` (4 fields)   | ~3.5 µs | 11          | ~1.6 KB |
+
+_Note: v4's `ParseFlagTags` uses 11 allocs (vs v2's 9) due to nested struct recursion support. Each field allocates an `Index` reflect path for the flattened flag registration. This is expected v4 overhead for the richer feature set._
 | `NewFlagRegistry` (2 fields) | ~1.8 µs | 9           | ~896 B  |
 | `ParseDuration`              | ~153 ns | 0           | 0 B     |
 | `ParseLogLevel`              | ~80 ns  | 0           | 0 B     |
