@@ -85,9 +85,9 @@ require (
 
 require (
 	github.com/knadh/koanf/parsers/toml v0.1.0
-	github.com/larsartmann/cmdguard/flightrecorder v0.0.0-00010101000000-000000000000
-	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
-	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/flightrecorder v0.1.0
+	github.com/larsartmann/cmdguard/glamour v0.2.0
+	github.com/larsartmann/cmdguard/spinner v0.2.0
 )
 
 replace (
