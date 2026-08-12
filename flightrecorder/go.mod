@@ -2,7 +2,7 @@ module github.com/larsartmann/cmdguard/flightrecorder
 
 go 1.26.5
 
-require github.com/larsartmann/cmdguard/v4 v4.0.1
+require github.com/larsartmann/cmdguard/v4 v4.0.2
 
 require (
 	charm.land/fang/v2 v2.0.1 // indirect
