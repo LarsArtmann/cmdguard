@@ -104,7 +104,7 @@ The sed replacement caught all `v3.` → `v4.` and `cmdguard/v3` → `cmdguard/v
 
 Still open — not verified.
 
-### C4. Website build verification — `npm run build` / `astro build` not run
+### C4. Website build verification — `pnpm run build` / `astro build` not run
 
 Still open — not verified.
 
@@ -210,7 +210,7 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 | 5   | Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3                                 | P1       | 5min   |
 | 6   | Fix CHANGELOG.md v3.0.0 section — note manpage later removed                               | P1       | 5min   |
 | 7   | Audit `.github/workflows/` for stale `cmdguard/v3` references                              | P1       | 15min  |
-| 8   | Run website build verification (`npm run build` in `website/`)                             | P1       | 10min  |
+| 8   | Run website build verification (`pnpm run build` in `website/`)                             | P1       | 10min  |
 | 9   | Run `nix flake check` to verify format                                                     | P1       | 5min   |
 | 10  | Full audit of website guide prose against v4 API (14 .mdx files)                           | P2       | 60min  |
 | 11  | Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0                                 | P2       | 30min  |

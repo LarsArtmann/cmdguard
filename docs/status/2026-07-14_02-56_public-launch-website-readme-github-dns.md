@@ -272,7 +272,7 @@ The current plan uses `cmdguard.lars.software` (consistent with gogenfilter, go-
 
 ### 2. Should `package-lock.json` be committed?
 
-gogenfilter tracks it; go-atomic-write does not. Both approaches work. The npm docs recommend committing it for applications (which this is). **What's your preference?**
+gogenfilter tracks it; go-atomic-write does not. Both approaches work. The pnpm docs recommend committing it for applications (which this is). **What's your preference?**
 
 ---
 
@@ -303,7 +303,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 }
 ```
 
-**Redeployed:** `npm run build && firebase deploy --only hosting:cmdguard` — 3 files changed, live at `cmdguard.web.app`.
+**Redeployed:** `pnpm run build && firebase deploy --only hosting:cmdguard` — 3 files changed, live at `cmdguard.web.app`.
 
 ## Resolution (2026-07-23)
 

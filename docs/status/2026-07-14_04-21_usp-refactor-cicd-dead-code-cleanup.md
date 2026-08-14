@@ -30,7 +30,7 @@
 ### 3. CI/CD Pipeline
 
 - Created `.github/workflows/website.yml` — triggers on `website/**` and `website.yml` changes
-- Build job: npm install, typecheck (`astro check`), build, HTML validation, import-path verification
+- Build job: pnpm install, typecheck (`astro check`), build, HTML validation, import-path verification
 - Deploy job: runs on push to master only, deploys to Firebase `cmdguard` hosting target
 - Added website CI badge to README
 
@@ -69,7 +69,7 @@
 ### 3. Website CI/CD — First Run Not Verified
 
 - Workflow has never run (created after the last push)
-- Need to confirm the build job passes on GitHub Actions (npm install, astro check, html-validate)
+- Need to confirm the build job passes on GitHub Actions (pnpm install, astro check, html-validate)
 - Deploy job blocked by missing secret
 
 ### 4. README Links Point to Unresolvable Domain
@@ -103,7 +103,7 @@
 
 ### 5. `package-lock.json` Decision
 
-- Currently tracked in git (needed for CI npm cache)
+- Currently tracked in git (needed for CI pnpm cache)
 - No explicit decision made — it just got committed alongside everything else
 
 ### 6. Website `.gitignore` for `dist/` Verification

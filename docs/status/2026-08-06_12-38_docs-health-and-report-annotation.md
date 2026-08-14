@@ -136,7 +136,7 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 14. Test `go tool trace` parseability of flightrecorder snapshots
 15. Fix `docs/MIGRATION_v2_v3.md` — add `manpage` removal note
 16. Audit `.github/workflows/` for stale `v3` references
-17. Run website build verification (`npm run build` in `website/`)
+17. Run website build verification (`pnpm run build` in `website/`)
 18. Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0
 19. Audit `docs/COMPARISON.md` feature matrix for v4 accuracy
 20. Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API

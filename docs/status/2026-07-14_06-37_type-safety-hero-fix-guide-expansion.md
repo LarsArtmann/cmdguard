@@ -72,7 +72,7 @@ The root `.gitignore` has `audit-log.*` (for BuildFlow artifacts). This silently
 ### 7. Full Build Verification
 
 - `astro check`: 0 errors, 0 warnings, 0 hints (29 files)
-- `npm run build`: 22 pages built successfully
+- `pnpm run build`: 22 pages built successfully
 - `html-validate`: 0 errors
 - Import path check: passes from repo root
 - BuildFlow pre-commit: passed (commit intact, auto-fixes applied)
@@ -158,8 +158,8 @@ I built the website, ran typecheck, ran HTML validation — all programmatic che
 
 ### CI/CD
 
-8. **Deploy step uses `npm install -g firebase-tools`** — should use a versioned GitHub Action (`w9jds/firebase-action`) for reproducibility
-9. **`npm audit` runs with `continue-on-error: true`** — security vulnerabilities are silently ignored
+8. **Deploy step uses `pnpm add -g firebase-tools`** — should use a versioned GitHub Action (`w9jds/firebase-action`) for reproducibility
+9. **`pnpm audit` runs with `continue-on-error: true`** — security vulnerabilities are silently ignored
 10. **No Lighthouse CI** — should add performance/accessibility/SEO regression detection
 11. **No link checker** — should verify all internal links resolve (especially after adding 6 new pages)
 12. **No preview deployments** — PRs should deploy previews, not just build-check
@@ -221,13 +221,13 @@ I built the website, ran typecheck, ran HTML validation — all programmatic che
 
 ### CI/CD & Quality
 
-21. Replace `npm install -g firebase-tools` with `w9jds/firebase-action@v15`
-22. Remove `continue-on-error: true` from `npm audit` or document why it stays
+21. Replace `pnpm add -g firebase-tools` with `w9jds/firebase-action@v15`
+22. Remove `continue-on-error: true` from `pnpm audit` or document why it stays
 23. Add a link-checker step to CI (lychee or similar)
 24. Add Lighthouse CI for performance regression detection
 25. Add Firebase preview channel deploys on PRs
 26. Add a `website-test` job that runs `astro build` on PRs (already partially done)
-27. Pin npm dependencies to exact versions (currently using `^` ranges)
+27. Pin pnpm dependencies to exact versions (currently using `^` ranges)
 
 ### Design & UX
 
@@ -256,7 +256,7 @@ I built the website, ran typecheck, ran HTML validation — all programmatic che
 44. Add ` SECURITY.md` file
 45. Add GitHub issue templates
 46. Add GitHub discussion templates
-47. Set up Dependabot for website npm dependencies
+47. Set up Dependabot for website pnpm dependencies
 48. Add `CITATION.cff` for academic citations
 49. Create a GitHub release for v3.0.0 (if not already done)
 50. Add the website to the GitHub repo "About" section with description

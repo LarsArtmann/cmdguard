@@ -78,7 +78,7 @@ The plan has 3 mandatory verification gates. I ran (partially) G1. **G2 and G3 w
 | L1.21 | **G2: Sub-module independence test loop**                        | Never ran                                                                                                                                                                         |
 | L1.22 | **G3: `nix flake check`**                                        | Never ran                                                                                                                                                                         |
 | L1.23 | **Final commit + push + closure appendix**                       | The commit was auto-authored by a hook; the push never happened; the closure appendix on `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` was never written |
-| —     | **Website build verification** (`npm run build` / `astro build`) | Never ran — 7 `.astro`/`.ts`/`.css` files changed, none verified to compile                                                                                                       |
+| —     | **Website build verification** (`pnpm run build` / `astro build`) | Never ran — 7 `.astro`/`.ts`/`.css` files changed, none verified to compile                                                                                                       |
 | —     | **Push to origin/master**                                        | Not done                                                                                                                                                                          |
 | —     | **G5 Verschlimmbesserung check**                                 | Never explicitly run (I followed the guards but didn't tick the boxes)                                                                                                            |
 
@@ -124,7 +124,7 @@ The plan said "Auto-fix 33+ infertypeargs." The initial LSP diagnostics showed ~
 
 4. **Retry canceled commands.** "context canceled" is not "success." I should have retried the lint run or investigated the cancel source.
 
-5. **Verify website builds after editing 7 components.** I changed `.astro`, `.ts`, and `.css` files without running `npm run build` or equivalent. The site may not compile.
+5. **Verify website builds after editing 7 components.** I changed `.astro`, `.ts`, and `.css` files without running `pnpm run build` or equivalent. The site may not compile.
 
 6. **Re-verify counts after bulk fixes.** Plan said 33+ infertypeargs. I fixed 28. The delta (5+) was never reconciled. Could be false positive in the plan, could be sites I missed.
 
@@ -151,7 +151,7 @@ Sorted by priority within each tier.
 1. **Run G1 cleanly:** `GOEXPERIMENT=jsonv2 go build ./... && golangci-lint run ./... && go test ./... -race -count=1 -timeout 120s` — witness it pass
 2. **Run G2:** `for m in glamour manpage prompts spinner telemetry; do (cd $m && GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 60s); done`
 3. **Run G3:** `nix flake check`
-4. **Verify the website builds:** `cd website && npm run build` (or whatever the command is — check `website/package.json`)
+4. **Verify the website builds:** `cd website && pnpm run build` (or whatever the command is — check `website/package.json`)
 5. **Reconcile infertypeargs count:** run LSP diagnostics, confirm 0 remain
 6. **Understand what produced commit `eb8586a`** — ask the user
 
