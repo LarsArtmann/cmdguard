@@ -86,23 +86,23 @@
 
 ## Feature Matrix
 
-| Feature                        | cmdguard                 | Kong       | sflags    | go-flags   | urfave/cli |
-| ------------------------------ | ------------------------ | ---------- | --------- | ---------- | ---------- |
-| **Struct tags for flags**      | ✅                       | ✅         | ✅        | ✅         | ❌         |
-| **Cobra integration**          | ✅ Native                | ❌         | ✅ Native | ❌         | ❌         |
-| **Compile-time type safety**   | ✅ Generics              | ⚠️ Mappers | ❌        | ❌         | ❌         |
-| **Required validation**        | ✅ `required:"true"`     | ✅         | ✅        | ✅         | ✅         |
-| **Typo suggestions**           | ✅ Levenshtein           | ❌         | ❌        | ❌         | ❌         |
+| Feature                        | cmdguard                 | Kong       | sflags    | go-flags  | urfave/cli |
+| ------------------------------ | ------------------------ | ---------- | --------- | --------- | ---------- |
+| **Struct tags for flags**      | ✅                       | ✅         | ✅        | ✅        | ❌         |
+| **Cobra integration**          | ✅ Native                | ❌         | ✅ Native | ❌        | ❌         |
+| **Compile-time type safety**   | ✅ Generics              | ⚠️ Mappers  | ❌        | ❌        | ❌         |
+| **Required validation**        | ✅ `required:"true"`     | ✅         | ✅        | ✅        | ✅         |
+| **Typo suggestions**           | ✅ Levenshtein           | ❌         | ❌        | ❌        | ❌         |
 | **Custom types**               | ✅ Enum, Duration, etc.  | ✅ Mappers | ❌        | ⚠️ Limited | ❌         |
-| **Dependency injection**       | ✅ samber/do/v2          | ❌         | ❌        | ❌         | ❌         |
-| **Environment variables**      | ✅ `env:"VAR"`           | ✅         | ✅        | ✅         | ✅         |
-| **Config files**               | ✅ JSON/YAML/TOML        | ✅         | ❌        | ❌         | ❌         |
-| **Shell completion**           | ✅                       | ✅         | ❌        | ❌         | ✅         |
-| **Middleware**                 | ✅                       | ✅         | ❌        | ❌         | ✅         |
-| **Man page generation**        | ✅                       | ❌         | ❌        | ❌         | ❌         |
-| **Zero panics**                | ✅                       | ✅         | N/A       | N/A        | N/A        |
-| **Counting flags**             | ✅ `-v`/`-vv`/`-vvv`     | ❌         | ❌        | ❌         | ❌         |
-| **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅         | ❌        | ✅         | ✅         |
+| **Dependency injection**       | ✅ samber/do/v2          | ❌         | ❌        | ❌        | ❌         |
+| **Environment variables**      | ✅ `env:"VAR"`           | ✅         | ✅        | ✅        | ✅         |
+| **Config files**               | ✅ JSON/YAML/TOML        | ✅         | ❌        | ❌        | ❌         |
+| **Shell completion**           | ✅                       | ✅         | ❌        | ❌        | ✅         |
+| **Middleware**                 | ✅                       | ✅         | ❌        | ❌        | ✅         |
+| **Man page generation**        | ✅                       | ❌         | ❌        | ❌        | ❌         |
+| **Zero panics**                | ✅                       | ✅         | N/A       | N/A       | N/A        |
+| **Counting flags**             | ✅ `-v`/`-vv`/`-vvv`     | ❌         | ❌        | ❌        | ❌         |
+| **Positional args validation** | ✅ `WithExactArgs`, etc. | ✅         | ❌        | ✅        | ✅         |
 
 ---
 

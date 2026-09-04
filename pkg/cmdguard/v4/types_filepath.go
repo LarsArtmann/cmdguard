@@ -10,7 +10,7 @@ import (
 // Use this for config fields that specify file or directory paths.
 // Provides validation, existence checks, and path cleaning.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type FilePath struct {
 	path     string
 	absolute string

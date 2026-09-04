@@ -122,33 +122,33 @@ Nothing. The refactor is clean, all tests pass, no regressions.
 
 Sorted by Impact × Effort (Pareto order):
 
-| #   | Task                                                                                                                        | Impact | Effort | Category |
-| --- | --------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| 1   | Fix YAML to be `dualStrategy` (TableData+any) — currently `marshalStrategy` silently serializes struct fields for TableData | H      | S      | Bug fix  |
-| 2   | Eliminate `styledTableStrategy`/`csvStrategy` — fold into `tableRenderStrategy`                                             | M      | S      | Cleanup  |
-| 3   | Expose `RegisterFormatStrategy(format, strategy)` for user extensibility                                                    | H      | S      | Feature  |
-| 4   | Add `UnregisterFormatStrategy(format)` or `ReplaceFormatStrategy(format, strategy)` for testing                             | M      | S      | Feature  |
-| 5   | Fix trailing newline double-\n issue in all strategies                                                                      | L      | S      | Bug fix  |
-| 6   | Deprecate `OutputStyledTable` — point users to `OutputResult(OutputConfig{Format: FormatTable}, data)`                      | M      | S      | Cleanup  |
-| 7   | Add `FormatStrategy` to doc.go package docs as extension point                                                              | M      | S      | Docs     |
-| 8   | Add `RegisterFormatStrategy` tests: custom strategy, override existing, unknown format                                      | H      | S      | Tests    |
-| 9   | Fold `renderTableStyled`/`renderTableCSV` into their strategy structs as private helpers                                    | L      | S      | Cleanup  |
-| 10  | Contribute TableDataMarshaler implementations upstream to go-output (CSV, JSON, YAML, XML, HTML, etc.)                      | H      | M      | Upstream |
-| 11  | Propose `RegisterAnyDataMarshaler` to go-output for JSON/YAML/TOML any-data paths                                           | H      | M      | Upstream |
-| 12  | Update AGENTS.md: FormatStrategy section, new gotchas, RegisterFormatStrategy                                               | M      | S      | Docs     |
-| 13  | Update TODO_LIST.md: mark output refactor done, add remaining items                                                         | M      | S      | Docs     |
-| 14  | Add `SupportedFormats()` function that returns `formatRegistry` keys for CLI help text                                      | M      | S      | Feature  |
-| 15  | Add `IsFormatSupported(format) bool` helper                                                                                 | L      | S      | Feature  |
-| 16  | Consider `RenderOptions` passthrough: Title for HTML, GraphID for DOT                                                       | M      | M      | Feature  |
-| 17  | Benchmark: measure registry lookup vs old type-switch for 16 formats                                                        | L      | S      | Perf     |
-| 18  | Consider `sync.RWMutex` for `formatRegistry` if `RegisterFormatStrategy` is called concurrently                             | M      | S      | Safety   |
-| 19  | Example_test.go: add FormatStrategy example showing custom format registration                                              | M      | S      | Docs     |
-| 20  | Audit all `label` strings in strategies for consistency (some use lowercase "markdown", others "JSON")                      | L      | S      | Cleanup  |
-| 21  | Consider `Validate()` on `FormatStrategy` interface for registration-time validation                                        | L      | M      | Feature  |
-| 22  | Update FEATURES.md: add FormatStrategy interface, RegisterFormatStrategy                                                    | M      | S      | Docs     |
-| 23  | Consider typed generics: `TypedFormatStrategy[T any]` for type-safe renderers                                               | L      | M      | Future   |
-| 24  | Investigate go-output v0.8.0 `shape.go` for structured data rendering beyond TableData                                      | M      | M      | Research |
-| 25  | Consider `formatStrategyName(strategy) string` for error messages instead of label duplication                              | L      | S      | Cleanup  |
+| #  | Task                                                                                                                        | Impact | Effort | Category |
+| -- | --------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
+| 1  | Fix YAML to be `dualStrategy` (TableData+any) — currently `marshalStrategy` silently serializes struct fields for TableData | H      | S      | Bug fix  |
+| 2  | Eliminate `styledTableStrategy`/`csvStrategy` — fold into `tableRenderStrategy`                                             | M      | S      | Cleanup  |
+| 3  | Expose `RegisterFormatStrategy(format, strategy)` for user extensibility                                                    | H      | S      | Feature  |
+| 4  | Add `UnregisterFormatStrategy(format)` or `ReplaceFormatStrategy(format, strategy)` for testing                             | M      | S      | Feature  |
+| 5  | Fix trailing newline double-\n issue in all strategies                                                                      | L      | S      | Bug fix  |
+| 6  | Deprecate `OutputStyledTable` — point users to `OutputResult(OutputConfig{Format: FormatTable}, data)`                      | M      | S      | Cleanup  |
+| 7  | Add `FormatStrategy` to doc.go package docs as extension point                                                              | M      | S      | Docs     |
+| 8  | Add `RegisterFormatStrategy` tests: custom strategy, override existing, unknown format                                      | H      | S      | Tests    |
+| 9  | Fold `renderTableStyled`/`renderTableCSV` into their strategy structs as private helpers                                    | L      | S      | Cleanup  |
+| 10 | Contribute TableDataMarshaler implementations upstream to go-output (CSV, JSON, YAML, XML, HTML, etc.)                      | H      | M      | Upstream |
+| 11 | Propose `RegisterAnyDataMarshaler` to go-output for JSON/YAML/TOML any-data paths                                           | H      | M      | Upstream |
+| 12 | Update AGENTS.md: FormatStrategy section, new gotchas, RegisterFormatStrategy                                               | M      | S      | Docs     |
+| 13 | Update TODO_LIST.md: mark output refactor done, add remaining items                                                         | M      | S      | Docs     |
+| 14 | Add `SupportedFormats()` function that returns `formatRegistry` keys for CLI help text                                      | M      | S      | Feature  |
+| 15 | Add `IsFormatSupported(format) bool` helper                                                                                 | L      | S      | Feature  |
+| 16 | Consider `RenderOptions` passthrough: Title for HTML, GraphID for DOT                                                       | M      | M      | Feature  |
+| 17 | Benchmark: measure registry lookup vs old type-switch for 16 formats                                                        | L      | S      | Perf     |
+| 18 | Consider `sync.RWMutex` for `formatRegistry` if `RegisterFormatStrategy` is called concurrently                             | M      | S      | Safety   |
+| 19 | Example_test.go: add FormatStrategy example showing custom format registration                                              | M      | S      | Docs     |
+| 20 | Audit all `label` strings in strategies for consistency (some use lowercase "markdown", others "JSON")                      | L      | S      | Cleanup  |
+| 21 | Consider `Validate()` on `FormatStrategy` interface for registration-time validation                                        | L      | M      | Feature  |
+| 22 | Update FEATURES.md: add FormatStrategy interface, RegisterFormatStrategy                                                    | M      | S      | Docs     |
+| 23 | Consider typed generics: `TypedFormatStrategy[T any]` for type-safe renderers                                               | L      | M      | Future   |
+| 24 | Investigate go-output v0.8.0 `shape.go` for structured data rendering beyond TableData                                      | M      | M      | Research |
+| 25 | Consider `formatStrategyName(strategy) string` for error messages instead of label duplication                              | L      | S      | Cleanup  |
 
 ---
 

@@ -31,18 +31,18 @@ Pushed dedup threshold from **t=50 → t=30**. Eliminated **all 10 clone groups*
 
 ### Clone groups eliminated (all 10 at t=30)
 
-| #   | File(s)                                          | Pattern                                               | Fix                                                                  |
-| --- | ------------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------- |
-| 1   | `cli_superb_test.go` (3x @ 230, 255, 374)        | `NewCommand[testConfig, NoFlags]("noshort", …)`       | `noShortCommand(t)` helper in test_helpers_test.go                   |
-| 2   | `examples/taskctl/commands.go` (migrate/seed)    | `fmt.Printf("…%s (force=%v)\n", flags.Env, …)`        | `dbActionHandler(verb)` closure in `buildCommands`                   |
-| 3   | `examples/taskctl/main_test.go` (lines 18, 215)  | `v2.NewCLI[AppConfig](…)` scaffolding                 | Refactored `newTestCLI` → calls `newEmptyTestCLI` + `seedTasks(cli)` |
-| 4   | `bdd_lifecycle_test.go` (lines 702, 748)         | `v2.NewParentCommand[lifecycleConfig, v2.NoFlags]…`   | `newLifecycleParentCmd(t, child, short)` helper                      |
-| 5   | `bdd_lifecycle_test.go` (lines 126, 182)         | `v2.WithPostRunE[…](func() { *flag = true; nil })`    | `newLifecyclePostRunFlag(flag)` option factory                       |
-| 6   | `cli_superb_test.go` (lines 163, 200)            | `NewCommand[config, NoFlags]("run", set-executed…)`   | Generic `runFlagCommand[T any](t, cli, &executed)` helper            |
-| 7   | `scope_override_test.go` (lines 24, 164)         | `v2.Provide(scope, func(i) (*realService, error){…})` | `provideRealService(t, scope, name)` helper                          |
-| 8   | `cli_superb_test.go` (lines 329, 348)            | `NewCommand(…, WithShort, WithExample)`               | `goodCommand(t, use, short, example)` helper                         |
-| 9   | `examples/taskctl/main_test.go` (lines 273, 526) | `cli.ExecuteWithArgs + if err==nil { t.Fatal }`       | `expectError(t, args …string)` helper                                |
-| 10  | `bdd_lifecycle_test.go` (lines 702, 748)         | Same as #4 — second site of NewParentCommand pattern  | Same fix as #4                                                       |
+| #  | File(s)                                          | Pattern                                               | Fix                                                                  |
+| -- | ------------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------- |
+| 1  | `cli_superb_test.go` (3x @ 230, 255, 374)        | `NewCommand[testConfig, NoFlags]("noshort", …)`       | `noShortCommand(t)` helper in test_helpers_test.go                   |
+| 2  | `examples/taskctl/commands.go` (migrate/seed)    | `fmt.Printf("…%s (force=%v)\n", flags.Env, …)`        | `dbActionHandler(verb)` closure in `buildCommands`                   |
+| 3  | `examples/taskctl/main_test.go` (lines 18, 215)  | `v2.NewCLI[AppConfig](…)` scaffolding                 | Refactored `newTestCLI` → calls `newEmptyTestCLI` + `seedTasks(cli)` |
+| 4  | `bdd_lifecycle_test.go` (lines 702, 748)         | `v2.NewParentCommand[lifecycleConfig, v2.NoFlags]…`   | `newLifecycleParentCmd(t, child, short)` helper                      |
+| 5  | `bdd_lifecycle_test.go` (lines 126, 182)         | `v2.WithPostRunE[…](func() { *flag = true; nil })`    | `newLifecyclePostRunFlag(flag)` option factory                       |
+| 6  | `cli_superb_test.go` (lines 163, 200)            | `NewCommand[config, NoFlags]("run", set-executed…)`   | Generic `runFlagCommand[T any](t, cli, &executed)` helper            |
+| 7  | `scope_override_test.go` (lines 24, 164)         | `v2.Provide(scope, func(i) (*realService, error){…})` | `provideRealService(t, scope, name)` helper                          |
+| 8  | `cli_superb_test.go` (lines 329, 348)            | `NewCommand(…, WithShort, WithExample)`               | `goodCommand(t, use, short, example)` helper                         |
+| 9  | `examples/taskctl/main_test.go` (lines 273, 526) | `cli.ExecuteWithArgs + if err==nil { t.Fatal }`       | `expectError(t, args …string)` helper                                |
+| 10 | `bdd_lifecycle_test.go` (lines 702, 748)         | Same as #4 — second site of NewParentCommand pattern  | Same fix as #4                                                       |
 
 ### Helpers introduced (all in existing test helper files)
 
@@ -117,33 +117,33 @@ Pre-existing observations (not introduced or worsened by this session):
 
 **Ordered by impact-to-effort ratio (Pareto).**
 
-| #   | Task                                                                                             | Impact | Effort | Notes                                                                                 |
-| --- | ------------------------------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------------------------------------------------- |
-| 1   | Add `art-dupl -t 30 --semantic` step to `nix flake check`                                        | HIGH   | XS     | Locks the win                                                                         |
-| 2   | Add pre-push git hook for `golangci-lint run ./...` + `go test ./... -race`                      | HIGH   | S      | Already exists but with pre-existing errors per AGENTS.md                             |
-| 3   | Coverage sprint: lift main pkg from 85.1% → 90%+ (15 functions at 0%)                            | HIGH   | M      | Public API + internal helpers                                                         |
-| 4   | Lift `taskctl` example coverage from 70.5% → 90%+                                                | MED    | M      | Showpiece example, should model best practices                                        |
-| 5   | Audit all `//nolint:*` directives for staleness                                                  | MED    | S      | Some are pre-existing; run with newer golangci-lint                                   |
-| 6   | Fix `auditlog.go:14` long line OR move `nolint:golines` to a position `golangci-lint fmt` honors | MED    | XS     | Mechanical                                                                            |
-| 7   | Run `gofumpt -w` on `cli_auditlog_test.go` (pre-existing drift)                                  | LOW    | XS     | Mechanical                                                                            |
-| 8   | Convert `bdd_lifecycle_test.go` pre-existing subtests to table-driven where it improves clarity  | MED    | M      | BDD naming is intentional; selective                                                  |
-| 9   | Add a `taskctl` README section showing the test helper hierarchy                                 | LOW    | S      | Documentation for the example                                                         |
-| 10  | Add a `Makefile` or `just` alias for `nix develop -c go test ./... -count=1 -race`               | MED    | S      | Common workflow shortcut (note: project uses Nix flakes, not Make/just per AGENTS.md) |
-| 11  | Split `auditlog.go` (231 lines) into 3-4 files by responsibility                                 | LOW    | M      | Becomes a problem only if it grows further                                            |
-| 12  | Document the helper extraction pattern in `docs/architecture-understanding/test-design.md`       | MED    | S      | Reusable insight                                                                      |
-| 13  | Add benchmark comparison: t=30 vs t=50 vs t=22 clone detection runtime                           | LOW    | S      | Justify t=30 choice                                                                   |
-| 14  | Investigate why `gopls infertypeargs` reports 200+ "unnecessary type arguments" warnings         | LOW    | S      | All in tests; cosmetic but noisy                                                      |
-| 15  | Add an example: BDD-style test using Ginkgo (referenced in skill but not in project)             | LOW    | M      | If we adopt BDD broadly                                                               |
-| 16  | Add `nix run .#bench` integration so benchmarks are reproducible                                 | MED    | M      | Currently ad-hoc `go test -bench`                                                     |
-| 17  | Add `//go:build` tags for `testutil` to allow test-only consumers                                | LOW    | S      | Currently `pkg/testutil` has no build tags                                            |
-| 18  | Re-examine `taskctl/commands.go` for any further DB family consolidation                         | LOW    | S      | `dbStatusCmd` not in scope for t=30; would be at t=22                                 |
-| 19  | Add `WithMiddlewareGroup[T]` API for ordering middlewares by group name                          | MED    | L      | Currently order is positional                                                         |
-| 20  | Add OpenTelemetry span attribute for `FullPath` (currently empty outside cobra execution)        | MED    | S      | Gotcha #24 in AGENTS.md                                                               |
-| 21  | Investigate `taskctl` benchmark: does `dbActionHandler` add measurable overhead?                 | LOW    | XS     | Closure indirection vs inline                                                         |
-| 22  | Add a `cmdguard` CLI example: a sub-CLI that introspects its own commands                        | MED    | M      | Demonstrates `WithCommandInfo` usage in real code                                     |
-| 23  | Extend `WithGlamourHelp` to support per-command theme override (currently global)                | LOW    | M      | If requested                                                                          |
-| 24  | Add a public `cmdguard/v2/testing` package exporting the helpers used in v2 tests                | MED    | M      | Library users can't reuse our test helpers                                            |
-| 25  | Schedule a Phase 17 sprint: "Test infrastructure externalization" (helpers + golden files)       | MED    | L      | Long-term payoff                                                                      |
+| #  | Task                                                                                             | Impact | Effort | Notes                                                                                 |
+| -- | ------------------------------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------------------------------------------------- |
+| 1  | Add `art-dupl -t 30 --semantic` step to `nix flake check`                                        | HIGH   | XS     | Locks the win                                                                         |
+| 2  | Add pre-push git hook for `golangci-lint run ./...` + `go test ./... -race`                      | HIGH   | S      | Already exists but with pre-existing errors per AGENTS.md                             |
+| 3  | Coverage sprint: lift main pkg from 85.1% → 90%+ (15 functions at 0%)                            | HIGH   | M      | Public API + internal helpers                                                         |
+| 4  | Lift `taskctl` example coverage from 70.5% → 90%+                                                | MED    | M      | Showpiece example, should model best practices                                        |
+| 5  | Audit all `//nolint:*` directives for staleness                                                  | MED    | S      | Some are pre-existing; run with newer golangci-lint                                   |
+| 6  | Fix `auditlog.go:14` long line OR move `nolint:golines` to a position `golangci-lint fmt` honors | MED    | XS     | Mechanical                                                                            |
+| 7  | Run `gofumpt -w` on `cli_auditlog_test.go` (pre-existing drift)                                  | LOW    | XS     | Mechanical                                                                            |
+| 8  | Convert `bdd_lifecycle_test.go` pre-existing subtests to table-driven where it improves clarity  | MED    | M      | BDD naming is intentional; selective                                                  |
+| 9  | Add a `taskctl` README section showing the test helper hierarchy                                 | LOW    | S      | Documentation for the example                                                         |
+| 10 | Add a `Makefile` or `just` alias for `nix develop -c go test ./... -count=1 -race`               | MED    | S      | Common workflow shortcut (note: project uses Nix flakes, not Make/just per AGENTS.md) |
+| 11 | Split `auditlog.go` (231 lines) into 3-4 files by responsibility                                 | LOW    | M      | Becomes a problem only if it grows further                                            |
+| 12 | Document the helper extraction pattern in `docs/architecture-understanding/test-design.md`       | MED    | S      | Reusable insight                                                                      |
+| 13 | Add benchmark comparison: t=30 vs t=50 vs t=22 clone detection runtime                           | LOW    | S      | Justify t=30 choice                                                                   |
+| 14 | Investigate why `gopls infertypeargs` reports 200+ "unnecessary type arguments" warnings         | LOW    | S      | All in tests; cosmetic but noisy                                                      |
+| 15 | Add an example: BDD-style test using Ginkgo (referenced in skill but not in project)             | LOW    | M      | If we adopt BDD broadly                                                               |
+| 16 | Add `nix run .#bench` integration so benchmarks are reproducible                                 | MED    | M      | Currently ad-hoc `go test -bench`                                                     |
+| 17 | Add `//go:build` tags for `testutil` to allow test-only consumers                                | LOW    | S      | Currently `pkg/testutil` has no build tags                                            |
+| 18 | Re-examine `taskctl/commands.go` for any further DB family consolidation                         | LOW    | S      | `dbStatusCmd` not in scope for t=30; would be at t=22                                 |
+| 19 | Add `WithMiddlewareGroup[T]` API for ordering middlewares by group name                          | MED    | L      | Currently order is positional                                                         |
+| 20 | Add OpenTelemetry span attribute for `FullPath` (currently empty outside cobra execution)        | MED    | S      | Gotcha #24 in AGENTS.md                                                               |
+| 21 | Investigate `taskctl` benchmark: does `dbActionHandler` add measurable overhead?                 | LOW    | XS     | Closure indirection vs inline                                                         |
+| 22 | Add a `cmdguard` CLI example: a sub-CLI that introspects its own commands                        | MED    | M      | Demonstrates `WithCommandInfo` usage in real code                                     |
+| 23 | Extend `WithGlamourHelp` to support per-command theme override (currently global)                | LOW    | M      | If requested                                                                          |
+| 24 | Add a public `cmdguard/v2/testing` package exporting the helpers used in v2 tests                | MED    | M      | Library users can't reuse our test helpers                                            |
+| 25 | Schedule a Phase 17 sprint: "Test infrastructure externalization" (helpers + golden files)       | MED    | L      | Long-term payoff                                                                      |
 
 ---
 

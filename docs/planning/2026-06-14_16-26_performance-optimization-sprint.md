@@ -93,14 +93,14 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 
 ### Phase 1: Copy-on-write typeRegistry (M1)
 
-| #   | Task                                                              | Est | Depends |
-| --- | ----------------------------------------------------------------- | --- | ------- |
-| F1  | Add `owned bool` field to typeRegistry struct                     | 5m  | —       |
-| F2  | Modify `register()` to lazy-clone when `!owned`                   | 10m | F1      |
-| F3  | Modify `clone()` to set `owned=true` on result                    | 5m  | F1      |
-| F4  | Change `NewFlagRegistry` to share global pointer instead of clone | 10m | F2, F3  |
-| F5  | Add test: COW isolation — instance write doesn't leak to global   | 10m | F4      |
-| F6  | Add test: COW isolation — global write doesn't leak to instance   | 10m | F4      |
+| #  | Task                                                              | Est | Depends |
+| -- | ----------------------------------------------------------------- | --- | ------- |
+| F1 | Add `owned bool` field to typeRegistry struct                     | 5m  | —       |
+| F2 | Modify `register()` to lazy-clone when `!owned`                   | 10m | F1      |
+| F3 | Modify `clone()` to set `owned=true` on result                    | 5m  | F1      |
+| F4 | Change `NewFlagRegistry` to share global pointer instead of clone | 10m | F2, F3  |
+| F5 | Add test: COW isolation — instance write doesn't leak to global   | 10m | F4      |
+| F6 | Add test: COW isolation — global write doesn't leak to instance   | 10m | F4      |
 
 ### Phase 2: Copy-on-write validatorRegistry (M2)
 

@@ -259,30 +259,30 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 
 ## f) Up to 50 Things We Should Get Done Next
 
-| #   | Task                                                                                                                                                       | Priority | Effort | Source                |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------------- |
-| 1   | **Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → include benchmarks + fuzz in breakdown                               | P0       | 2min   | This report           |
-| 2   | **Investigate benchmark regression** — ParseFlagTags 1.8µs→3.5µs, NewCommand 100ns→171ns. Is this real or measurement noise?                               | P0       | 60min  | **DONE: false alarm** |
-| 3   | **Run `nix flake check`** — the canonical format quality gate was never run                                                                                | P0       | 5min   | This report           |
-| 4   | **Push flightrecorder/v0.1.0 tag** — tag exists locally but not on origin                                                                                  | P0       | 1min   | This report           |
-| 5   | **Fix `recorder_bench_test.go` b.Loop() warnings** — 3 instances, Go 1.24+ modernization                                                                   | P1       | 5min   | This report           |
-| 6   | **Fix ExampleRecorder_CaptureToWriter noise** — set Config.Log to no-op in example                                                                         | P1       | 5min   | This report           |
-| 7   | **Complete M17: Add `go mod tidy -diff` check to Nix** — prevent go.mod drift in CI                                                                        | P1       | 30min  | This report           |
-| 8   | **Complete M17: Add Nix `check-all` target** — build + test + lint + format-check in one command                                                           | P1       | 30min  | This report           |
-| 9   | **Actually READ the 14 website .mdx files** — verify v4 semantics, not just grep patterns                                                                  | P1       | 60min  | This report           |
-| 10  | **Improve taskctl coverage** — currently 68.2%, plan wanted it closer to 87.8%                                                                             | P2       | 100min | This report           |
-| 11  | **Add automated `go tool trace` validation test** — make M10 repeatable in CI                                                                              | P2       | 30min  | This report           |
-| 12  | **Add integration test for flightrecorder in taskctl** — verify trace files are generated                                                                  | P2       | 30min  | This report           |
-| 13  | **Verify MIGRATION_v3_v4.md v3 API accuracy** — check git history or old docs for actual configload API                                                    | P2       | 30min  | This report           |
-| 14  | **Test testutil failure-path branches** — bring coverage from 70.9% to >85% by testing error paths                                                         | P2       | 45min  | This report           |
-| 15  | **Re-run benchmarks with `-count=5`** — get stable numbers for PERFORMANCE.md                                                                              | P2       | 30min  | This report           |
-| 16  | **Add PERFORMANCE.md regression note** — ~~if the ~2x slowdown is real, document why (v4 generics overhead?)~~ RESOLVED: false alarm, no regression exists | P2       | 15min  | **DONE**              |
-| 17  | **Complete M15: Add MIGRATION_v3_v4.md link to v2→v3 guide §6 checklist**                                                                                  | P2       | 5min   | This report           |
-| 18  | **Complete M27: Add resolution appendices to 3 flight-recorder reports**                                                                                   | P3       | 30min  | This report           |
-| 19  | **Investigate LSP go mod tidy errors** — restart gopls, verify go.mod is correct                                                                           | P3       | 10min  | This report           |
-| 20  | **Fix 2 stale v3 refs in docs/reviews/** — copywriting review has `go get .../v3`, frontend review has `v3.NewCLI`                                         | P3       | 5min   | This report           |
-| 21  | **Add flightrecorder section to docs/PERFORMANCE.md benchmarks** — actually DONE but verify it's complete                                                  | P3       | 5min   | This report           |
-| 22  | **Write GitHub release notes for v4.0.0** — or verify they exist via `gh release view`                                                                     | P3       | 15min  | This report           |
+| #  | Task                                                                                                                                                       | Priority | Effort | Source                |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------------- |
+| 1  | **Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → include benchmarks + fuzz in breakdown                               | P0       | 2min   | This report           |
+| 2  | **Investigate benchmark regression** — ParseFlagTags 1.8µs→3.5µs, NewCommand 100ns→171ns. Is this real or measurement noise?                               | P0       | 60min  | **DONE: false alarm** |
+| 3  | **Run `nix flake check`** — the canonical format quality gate was never run                                                                                | P0       | 5min   | This report           |
+| 4  | **Push flightrecorder/v0.1.0 tag** — tag exists locally but not on origin                                                                                  | P0       | 1min   | This report           |
+| 5  | **Fix `recorder_bench_test.go` b.Loop() warnings** — 3 instances, Go 1.24+ modernization                                                                   | P1       | 5min   | This report           |
+| 6  | **Fix ExampleRecorder_CaptureToWriter noise** — set Config.Log to no-op in example                                                                         | P1       | 5min   | This report           |
+| 7  | **Complete M17: Add `go mod tidy -diff` check to Nix** — prevent go.mod drift in CI                                                                        | P1       | 30min  | This report           |
+| 8  | **Complete M17: Add Nix `check-all` target** — build + test + lint + format-check in one command                                                           | P1       | 30min  | This report           |
+| 9  | **Actually READ the 14 website .mdx files** — verify v4 semantics, not just grep patterns                                                                  | P1       | 60min  | This report           |
+| 10 | **Improve taskctl coverage** — currently 68.2%, plan wanted it closer to 87.8%                                                                             | P2       | 100min | This report           |
+| 11 | **Add automated `go tool trace` validation test** — make M10 repeatable in CI                                                                              | P2       | 30min  | This report           |
+| 12 | **Add integration test for flightrecorder in taskctl** — verify trace files are generated                                                                  | P2       | 30min  | This report           |
+| 13 | **Verify MIGRATION_v3_v4.md v3 API accuracy** — check git history or old docs for actual configload API                                                    | P2       | 30min  | This report           |
+| 14 | **Test testutil failure-path branches** — bring coverage from 70.9% to >85% by testing error paths                                                         | P2       | 45min  | This report           |
+| 15 | **Re-run benchmarks with `-count=5`** — get stable numbers for PERFORMANCE.md                                                                              | P2       | 30min  | This report           |
+| 16 | **Add PERFORMANCE.md regression note** — ~~if the ~2x slowdown is real, document why (v4 generics overhead?)~~ RESOLVED: false alarm, no regression exists | P2       | 15min  | **DONE**              |
+| 17 | **Complete M15: Add MIGRATION_v3_v4.md link to v2→v3 guide §6 checklist**                                                                                  | P2       | 5min   | This report           |
+| 18 | **Complete M27: Add resolution appendices to 3 flight-recorder reports**                                                                                   | P3       | 30min  | This report           |
+| 19 | **Investigate LSP go mod tidy errors** — restart gopls, verify go.mod is correct                                                                           | P3       | 10min  | This report           |
+| 20 | **Fix 2 stale v3 refs in docs/reviews/** — copywriting review has `go get .../v3`, frontend review has `v3.NewCLI`                                         | P3       | 5min   | This report           |
+| 21 | **Add flightrecorder section to docs/PERFORMANCE.md benchmarks** — actually DONE but verify it's complete                                                  | P3       | 5min   | This report           |
+| 22 | **Write GitHub release notes for v4.0.0** — or verify they exist via `gh release view`                                                                     | P3       | 15min  | This report           |
 
 ---
 

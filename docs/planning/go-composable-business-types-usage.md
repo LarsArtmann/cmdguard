@@ -1,8 +1,8 @@
 # go-composable-business-types/id Integration Plan
 
-**Date:** 2026-03-17  
-**Library:** `github.com/larsartmann/go-composable-business-types/id`  
-**Purpose:** Branded, strongly-typed identifiers for cmdguard applications  
+**Date:** 2026-03-17\
+**Library:** `github.com/larsartmann/go-composable-business-types/id`\
+**Purpose:** Branded, strongly-typed identifiers for cmdguard applications\
 **Status:** Planning Complete - Ready for Implementation
 
 ---

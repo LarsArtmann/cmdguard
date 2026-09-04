@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -289,15 +289,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -310,15 +322,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -832,10 +856,11 @@
           <div class="hero-badge">Data Model Review</div>
           <h1>cmdguard v3.0.0 &mdash; Type System Deep Dive</h1>
           <p class="hero-subtitle">
-            First-principles review of 71 type declarations. Verdict: the data model is already
-            excellent &mdash; branded primitives, validating constructors, closed
-            <code>Enum</code> union, no primitive obsession at the domain layer. Three minor
-            refinements worth considering; none forced.
+            First-principles review of 71 type declarations. Verdict: the data
+            model is already excellent &mdash; branded primitives, validating
+            constructors, closed
+            <code>Enum</code> union, no primitive obsession at the domain layer.
+            Three minor refinements worth considering; none forced.
           </p>
         </div>
 
@@ -874,17 +899,20 @@
 
         <div class="card card-solution">
           <h4>
-            Headline: this is what &ldquo;make invalid states unrepresentable&rdquo; looks like
+            Headline: this is what &ldquo;make invalid states
+            unrepresentable&rdquo; looks like
           </h4>
           <p>
-            The data model is the project's strongest asset. Every domain concept that could be
-            stringly-typed (<code>Email</code>,
-            <code>Port</code>, <code>URL</code>, <code>FilePath</code>, <code>HostPort</code>,
-            <code>Duration</code>, <code>Enum</code>) is a branded struct with a single unexported
-            field and a <code>Parse*</code> constructor that validates at creation time. There is no
-            way to produce an <code>Email</code> value that fails <code>mail.ParseAddress</code>.
-            There is no way to produce a <code>Port</code> outside 1&ndash;65535. The
-            <code>Enum</code> type is a closed union: <code>ParseEnum("x", allowed)</code> rejects
+            The data model is the project's strongest asset. Every domain
+            concept that could be stringly-typed (<code>Email</code>,
+            <code>Port</code>, <code>URL</code>, <code>FilePath</code>,
+            <code>HostPort</code>, <code>Duration</code>, <code>Enum</code>) is
+            a branded struct with a single unexported field and a
+            <code>Parse*</code> constructor that validates at creation time.
+            There is no way to produce an <code>Email</code> value that fails
+            <code>mail.ParseAddress</code>. There is no way to produce a
+            <code>Port</code> outside 1&ndash;65535. The <code>Enum</code> type
+            is a closed union: <code>ParseEnum("x", allowed)</code> rejects
             values outside <code>allowed</code> at the type boundary.
           </p>
         </div>
@@ -960,12 +988,17 @@
             <tr>
               <td><code>CLI[T any]</code></td>
               <td>Root CLI struct</td>
-              <td>Generic on Config only; holds *Scope, *FlagRegistry, *BranchingFlowContext</td>
+              <td>
+                Generic on Config only; holds *Scope, *FlagRegistry,
+                *BranchingFlowContext
+              </td>
             </tr>
             <tr>
               <td><code>Command[T,F any]</code></td>
               <td>Command spec</td>
-              <td>Generic on Config+Flags; holds runE/preRunE/postRunE closures</td>
+              <td>
+                Generic on Config+Flags; holds runE/preRunE/postRunE closures
+              </td>
             </tr>
             <tr>
               <td><code>Scope</code></td>
@@ -975,7 +1008,10 @@
             <tr>
               <td><code>FlagRegistry</code></td>
               <td>Flag registration</td>
-              <td>COW shares global registries; lazy-clones on first per-instance write</td>
+              <td>
+                COW shares global registries; lazy-clones on first per-instance
+                write
+              </td>
             </tr>
             <tr>
               <td><code>FlagTag</code></td>
@@ -985,7 +1021,9 @@
             <tr>
               <td><code>TypeHandler</code> (interface)</td>
               <td>Type codec</td>
-              <td>3 methods: Register/Parse/Default (see naming review re: name)</td>
+              <td>
+                3 methods: Register/Parse/Default (see naming review re: name)
+              </td>
             </tr>
             <tr>
               <td><code>Config</code></td>
@@ -995,7 +1033,9 @@
             <tr>
               <td><code>BranchingFlowContext</code></td>
               <td>Branch-aware ctx</td>
-              <td>Tree of parent/children with localKeys + propagated values</td>
+              <td>
+                Tree of parent/children with localKeys + propagated values
+              </td>
             </tr>
             <tr>
               <td><code>CommandInfo</code></td>
@@ -1005,31 +1045,39 @@
             <tr>
               <td><code>NoFlags</code></td>
               <td>Empty-flags sentinel</td>
-              <td>Named type (not alias) &mdash; required for generic dispatch</td>
+              <td>
+                Named type (not alias) &mdash; required for generic dispatch
+              </td>
             </tr>
           </tbody>
         </table>
 
-        <h2 id="catalog"><span class="num">02</span>Problem Catalog (brutal honesty)</h2>
+        <h2 id="catalog">
+          <span class="num">02</span>Problem Catalog (brutal honesty)
+        </h2>
 
         <div class="card card-solution">
           <h4>P1 Stringly-typed everything &mdash; NOT PRESENT</h4>
           <p>
             Every domain concept is a branded type. The only raw
-            <code>string</code> fields in domain types are <code>Config.ConfigFile</code> (path to a
-            file, where <code>FilePath</code> would be heavier than needed) and
-            <code>FlagTag</code> fields (which are configuration metadata, not domain concepts).
-            Verdict: clean.
+            <code>string</code> fields in domain types are
+            <code>Config.ConfigFile</code> (path to a file, where
+            <code>FilePath</code> would be heavier than needed) and
+            <code>FlagTag</code> fields (which are configuration metadata, not
+            domain concepts). Verdict: clean.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>P2 Pointer fields as state encoding &mdash; NOT PRESENT</h4>
           <p>
-            No <code>*time.Time</code>-as-&ldquo;not yet&rdquo; pattern. Optional state is handled
-            via zero-value checks (<code>IsEmpty()</code> methods on branded types) or via the
-            <code>localKeys map[any]struct{}</code> set in <code>BranchingFlowContext</code>. No
-            nullable-as-tri-state.
+            No <code>*time.Time</code>-as-&ldquo;not yet&rdquo; pattern.
+            Optional state is handled via zero-value checks (<code
+              >IsEmpty()</code
+            >
+            methods on branded types) or via the
+            <code>localKeys map[any]struct{}</code> set in
+            <code>BranchingFlowContext</code>. No nullable-as-tri-state.
           </p>
         </div>
 
@@ -1037,99 +1085,120 @@
           <h4>P3 No validation at type level &mdash; NOT PRESENT</h4>
           <p>
             Every branded type enforces its invariant in its
-            <code>Parse*</code> constructor. <code>Port{}</code> (zero value) is the only
-            &ldquo;unset&rdquo; state, and <code>Port.IsValid()</code> distinguishes it.
-            <code>Email{}</code> is empty and <code>Email.IsEmpty()</code> checks it.
-            Construct-valid-or-error is the universal pattern.
+            <code>Parse*</code> constructor. <code>Port{}</code> (zero value) is
+            the only &ldquo;unset&rdquo; state, and
+            <code>Port.IsValid()</code> distinguishes it.
+            <code>Email{}</code> is empty and
+            <code>Email.IsEmpty()</code> checks it. Construct-valid-or-error is
+            the universal pattern.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>P4 Primitive obsession &mdash; NOT PRESENT</h4>
           <p>
-            The 7 branded types are the textbook counter-example to primitive obsession.
-            <code>HostPort</code> even composes <code>Port</code> rather than re-declaring a
-            <code>uint16</code>.
+            The 7 branded types are the textbook counter-example to primitive
+            obsession.
+            <code>HostPort</code> even composes <code>Port</code> rather than
+            re-declaring a <code>uint16</code>.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Low</span>
-          <h3>P5 Interface-based unions &mdash; <code>Enum</code> uses struct+slice instead</h3>
+          <h3>
+            P5 Interface-based unions &mdash; <code>Enum</code> uses
+            struct+slice instead
+          </h3>
           <div class="where">pkg/cmdguard/v3/types_enum.go:11</div>
           <p>
             <code>Enum</code> is a struct with <code>value string</code> +
-            <code>allowed []string</code>. The Go-idiomatic alternative is a sealed interface:
+            <code>allowed []string</code>. The Go-idiomatic alternative is a
+            sealed interface:
             <code>type Enum interface { isEnum() }</code>
             with unexported implementations, or typed constants via
             <code>iota</code>. The current design is deliberate: it allows
-            <em>runtime-defined</em> enum sets (the <code>allowed</code> list comes from the
-            caller), which a compile-time <code>iota</code>
-            enum cannot do. This is the right call for a CLI library where enum values come from
-            struct tags.
+            <em>runtime-defined</em> enum sets (the <code>allowed</code> list
+            comes from the caller), which a compile-time <code>iota</code>
+            enum cannot do. This is the right call for a CLI library where enum
+            values come from struct tags.
           </p>
           <div class="callout callout-amber">
             <strong>Verdict: accept</strong>
-            The runtime-flexibility requirement justifies the struct shape. Document the decision so
-            future readers do not &ldquo;fix&rdquo; it.
+            The runtime-flexibility requirement justifies the struct shape.
+            Document the decision so future readers do not &ldquo;fix&rdquo; it.
           </div>
         </div>
 
         <div class="card card-solution">
           <h4>P6 No composition, only embedding &mdash; NOT PRESENT</h4>
           <p>
-            <code>LogLevel</code> and <code>LogFormat</code> are typed aliases over
-            <code>Enum</code> (<code>type LogLevel Enum</code>), which is composition.
-            <code>HostPort</code> embeds <code>Port</code> as a field (not a promoted method set,
-            but a HAS-A relationship). No deep embedding hierarchies anywhere.
+            <code>LogLevel</code> and <code>LogFormat</code> are typed aliases
+            over <code>Enum</code> (<code>type LogLevel Enum</code>), which is
+            composition. <code>HostPort</code> embeds <code>Port</code> as a
+            field (not a promoted method set, but a HAS-A relationship). No deep
+            embedding hierarchies anywhere.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Low</span>
-          <h3>P7 Implicit relationships &mdash; FlagTag.Type is reflect.Type</h3>
+          <h3>
+            P7 Implicit relationships &mdash; FlagTag.Type is reflect.Type
+          </h3>
           <div class="where">pkg/cmdguard/v3/config.go:28</div>
           <p>
-            <code>FlagTag.Type reflect.Type</code> links a flag to its Go type via reflection rather
-            than via a typed identifier. This is inherent to the struct-tag-driven design: the
-            library reads the config struct via <code>reflect</code>, so the type link is
-            necessarily <code>reflect.Type</code>. A branded <code>FlagTypeID</code> would add a
-            layer without removing the reflection. Accept.
+            <code>FlagTag.Type reflect.Type</code> links a flag to its Go type
+            via reflection rather than via a typed identifier. This is inherent
+            to the struct-tag-driven design: the library reads the config struct
+            via <code>reflect</code>, so the type link is necessarily
+            <code>reflect.Type</code>. A branded <code>FlagTypeID</code> would
+            add a layer without removing the reflection. Accept.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Low</span>
-          <h3>P8 No versioning or lifecycle &mdash; Config has no CreatedAt/UpdatedAt</h3>
+          <h3>
+            P8 No versioning or lifecycle &mdash; Config has no
+            CreatedAt/UpdatedAt
+          </h3>
           <div class="where">pkg/cmdguard/v3/config.go:12</div>
           <p>
-            <code>Config</code> is a static configuration record, not a domain entity. It does not
-            need lifecycle fields. The DI <code>Scope</code> has lifecycle hooks
-            (<code>do.HealthcheckerWithContext</code>, <code>do.ShutdownerWithError</code>) via
-            samber/do, so services DO have lifecycle &mdash; just not via struct fields. Accept.
+            <code>Config</code> is a static configuration record, not a domain
+            entity. It does not need lifecycle fields. The DI
+            <code>Scope</code> has lifecycle hooks
+            (<code>do.HealthcheckerWithContext</code>,
+            <code>do.ShutdownerWithError</code>) via samber/do, so services DO
+            have lifecycle &mdash; just not via struct fields. Accept.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>P9 Duplicated logic across types &mdash; NOT PRESENT</h4>
           <p>
-            The <code>textMarshal</code>/<code>textUnmarshal</code> generic helpers centralize
-            <code>MarshalText</code>/<code>UnmarshalText</code> for all branded types.
-            <code>requireNonEmpty</code> centralizes the empty-string guard. No validation logic is
-            copy-pasted across <code>Email</code>/<code>Port</code>/<code>URL</code>/etc.
+            The <code>textMarshal</code>/<code>textUnmarshal</code> generic
+            helpers centralize <code>MarshalText</code>/<code
+              >UnmarshalText</code
+            >
+            for all branded types. <code>requireNonEmpty</code> centralizes the
+            empty-string guard. No validation logic is copy-pasted across
+            <code>Email</code>/<code>Port</code>/<code>URL</code>/etc.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>
-            P10&ndash;P12 Weak collections / no generics / missing error models &mdash; NOT PRESENT
+            P10&ndash;P12 Weak collections / no generics / missing error models
+            &mdash; NOT PRESENT
           </h4>
           <p>
             <code>CLI[T]</code> and <code>Command[T,F]</code> are generics.
             <code>MergeConfigs[T any]</code>, <code>Override[T]</code>,
-            <code>OverrideValue[T]</code>, <code>CloneScope</code> all use generics. Errors are
-            structured (<code>EnumError</code>, <code>CommandError</code>, <code>ConfigError</code>)
-            with <code>errors.Is</code>-chainable sentinels (58 of them).
+            <code>OverrideValue[T]</code>, <code>CloneScope</code> all use
+            generics. Errors are structured (<code>EnumError</code>,
+            <code>CommandError</code>, <code>ConfigError</code>) with
+            <code>errors.Is</code>-chainable sentinels (58 of them).
           </p>
         </div>
 
@@ -1138,15 +1207,20 @@
         <div class="card card-solution">
           <h4>The model is already at the target state</h4>
           <p>
-            For a CLI library, the data model cannot be improved materially without breaking the
-            struct-tag-driven API that is the project's core value proposition. The branded types
-            already enforce invariants at construction. The <code>Enum</code> union is deliberately
-            runtime-flexible. The generics are at the right level (Config on CLI, Config+Flags on
-            Command). Forcing more patterns here would be a Verschlimmbesserung.
+            For a CLI library, the data model cannot be improved materially
+            without breaking the struct-tag-driven API that is the project's
+            core value proposition. The branded types already enforce invariants
+            at construction. The <code>Enum</code> union is deliberately
+            runtime-flexible. The generics are at the right level (Config on
+            CLI, Config+Flags on Command). Forcing more patterns here would be a
+            Verschlimmbesserung.
           </p>
         </div>
 
-        <h3>What &ldquo;perfect&rdquo; would look like (and why we are already there)</h3>
+        <h3>
+          What &ldquo;perfect&rdquo; would look like (and why we are already
+          there)
+        </h3>
         <pre><code><span class="tok-comment">// Branded type: invalid state unrepresentable</span>
 <span class="tok-keyword">type</span> <span class="tok-type">Email</span> <span class="tok-keyword">struct</span><span class="tok-punct">{</span> address <span class="tok-type">string</span> <span class="tok-punct">}</span>
 
@@ -1170,9 +1244,11 @@
             <div class="text">
               <strong>Branded primitives with unexported fields</strong>
               <span
-                >The only way to construct an <code>Email</code> is via <code>ParseEmail</code>,
-                which validates. Zero-value is &ldquo;unset&rdquo; and <code>IsEmpty()</code> checks
-                it. Textbook &ldquo;make invalid states unrepresentable&rdquo;.</span
+                >The only way to construct an <code>Email</code> is via
+                <code>ParseEmail</code>, which validates. Zero-value is
+                &ldquo;unset&rdquo; and <code>IsEmpty()</code> checks it.
+                Textbook &ldquo;make invalid states
+                unrepresentable&rdquo;.</span
               >
             </div>
           </div>
@@ -1181,9 +1257,10 @@
             <div class="text">
               <strong>Generics at the right level</strong>
               <span
-                ><code>CLI[T]</code> parameterizes on Config. <code>Command[T,F]</code> on
-                Config+Flags. Options are non-generic (<code>func(*spec)</code>). This is the v3
-                design that eliminated the v2 &ldquo;7 type params per command&rdquo;
+                ><code>CLI[T]</code> parameterizes on Config.
+                <code>Command[T,F]</code> on Config+Flags. Options are
+                non-generic (<code>func(*spec)</code>). This is the v3 design
+                that eliminated the v2 &ldquo;7 type params per command&rdquo;
                 explosion.</span
               >
             </div>
@@ -1193,10 +1270,10 @@
             <div class="text">
               <strong>Composition over inheritance</strong>
               <span
-                ><code>HostPort</code> HAS-A <code>Port</code>. <code>LogLevel</code>/<code
-                  >LogFormat</code
-                >
-                are typed aliases over <code>Enum</code>. No base structs, no deep embedding.</span
+                ><code>HostPort</code> HAS-A <code>Port</code>.
+                <code>LogLevel</code>/<code>LogFormat</code> are typed aliases
+                over <code>Enum</code>. No base structs, no deep
+                embedding.</span
               >
             </div>
           </div>
@@ -1205,9 +1282,10 @@
             <div class="text">
               <strong>Centralized helpers kill duplication</strong>
               <span
-                ><code>textMarshal[T]</code>/<code>textUnmarshal[T]</code> generic helpers mean each
-                branded type's <code>MarshalText</code>/<code>UnmarshalText</code> is one line. No
-                copy-pasted serialization.</span
+                ><code>textMarshal[T]</code>/<code>textUnmarshal[T]</code>
+                generic helpers mean each branded type's
+                <code>MarshalText</code>/<code>UnmarshalText</code> is one line.
+                No copy-pasted serialization.</span
               >
             </div>
           </div>
@@ -1216,8 +1294,9 @@
             <div class="text">
               <strong>Structured errors with sentinel chain</strong>
               <span
-                >58 sentinels (<code>ErrInvalidEmail</code>, <code>ErrValueOutOfRange</code>, etc.)
-                all chainable via <code>errors.Is</code>. Callers can branch on the exact failure
+                >58 sentinels (<code>ErrInvalidEmail</code>,
+                <code>ErrValueOutOfRange</code>, etc.) all chainable via
+                <code>errors.Is</code>. Callers can branch on the exact failure
                 mode.</span
               >
             </div>
@@ -1245,7 +1324,9 @@
               <td><span class="badge badge-fixed">Excellent</span></td>
             </tr>
             <tr>
-              <td>Generic struct (<code>CLI[T]</code>, <code>Command[T,F]</code>)</td>
+              <td>
+                Generic struct (<code>CLI[T]</code>, <code>Command[T,F]</code>)
+              </td>
               <td>cli.go, command.go</td>
               <td><span class="badge badge-fixed">Excellent</span></td>
             </tr>
@@ -1257,7 +1338,10 @@
             <tr>
               <td>Closed union via <code>allowed []string</code></td>
               <td>types_enum.go</td>
-              <td><span class="badge badge-medium">Deliberate</span> (runtime-flexible)</td>
+              <td>
+                <span class="badge badge-medium">Deliberate</span>
+                (runtime-flexible)
+              </td>
             </tr>
             <tr>
               <td>Copy-on-write registries</td>
@@ -1267,7 +1351,10 @@
             <tr>
               <td>Tag-driven field metadata (<code>FlagTag</code>)</td>
               <td>config.go:20</td>
-              <td><span class="badge badge-fixed">Necessary</span> (struct-tag-driven API)</td>
+              <td>
+                <span class="badge badge-fixed">Necessary</span>
+                (struct-tag-driven API)
+              </td>
             </tr>
             <tr>
               <td>Sentinel error + <code>errors.Is</code> chain</td>
@@ -1280,9 +1367,10 @@
         <h2 id="roadmap"><span class="num">06</span>Migration Roadmap</h2>
         <div class="callout callout-solution">
           <strong>Recommendation: do nothing</strong>
-          The data model is already at the target state. The three Low findings (P5 Enum shape, P7
-          FlagTag.Type, P8 Config lifecycle) are all deliberate design choices documented above.
-          Forcing changes would break the struct-tag-driven API or the runtime-flexibility promise.
+          The data model is already at the target state. The three Low findings
+          (P5 Enum shape, P7 FlagTag.Type, P8 Config lifecycle) are all
+          deliberate design choices documented above. Forcing changes would
+          break the struct-tag-driven API or the runtime-flexibility promise.
         </div>
 
         <div class="migration-step">
@@ -1290,29 +1378,33 @@
           <div class="migration-content">
             <h4>Document the Enum design decision</h4>
             <p>
-              Add a one-paragraph note to <code>types_enum.go</code> explaining why
-              <code>Enum</code> is a struct (runtime-flexible allowed list) rather than an
-              <code>iota</code> enum or sealed interface. This stops future &ldquo;why isn't this
-              iota?&rdquo; questions.
+              Add a one-paragraph note to <code>types_enum.go</code> explaining
+              why <code>Enum</code> is a struct (runtime-flexible allowed list)
+              rather than an <code>iota</code> enum or sealed interface. This
+              stops future &ldquo;why isn't this iota?&rdquo; questions.
             </p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">2</div>
           <div class="migration-content">
-            <h4>Consider <code>ConfigFile FilePath</code> (optional, low priority)</h4>
+            <h4>
+              Consider <code>ConfigFile FilePath</code> (optional, low priority)
+            </h4>
             <p>
-              <code>Config.ConfigFile string</code> could become <code>ConfigFile FilePath</code> to
-              brand it. Tradeoff: <code>FilePath</code> validation is heavier than the field needs
-              (it may point to a not-yet-existing file for write paths). Probably not worth it; flag
-              for future review only if <code>ConfigFile</code> misuse becomes a support burden.
+              <code>Config.ConfigFile string</code> could become
+              <code>ConfigFile FilePath</code> to brand it. Tradeoff:
+              <code>FilePath</code> validation is heavier than the field needs
+              (it may point to a not-yet-existing file for write paths).
+              Probably not worth it; flag for future review only if
+              <code>ConfigFile</code> misuse becomes a support burden.
             </p>
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-18 &middot; 71 types reviewed across pkg/cmdguard/v3 + 5 sub-modules +
-          pkg/testutil
+          Generated 2026-07-18 &middot; 71 types reviewed across pkg/cmdguard/v3
+          + 5 sub-modules + pkg/testutil
         </footer>
       </main>
     </div>

@@ -201,58 +201,58 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 > TODO_LIST D3/D4. Item #4 (MIGRATION_v3_v4.md) still open — TODO_LIST D5. Most
 > P2/P3 items remain open. Items left unmarked in the table below are still open.
 
-| #   | Task                                                                                       | Priority | Effort |
-| --- | ------------------------------------------------------------------------------------------ | -------- | ------ |
-| 1   | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`        | P0       | 1min   |
-| 2   | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) — _TODO_LIST D3_                        | P0       | 5min   |
-| 3   | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_                         | P0       | 2min   |
-| 4   | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_        | P1       | 30min  |
-| 5   | Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3                                 | P1       | 5min   |
-| 6   | Fix CHANGELOG.md v3.0.0 section — note manpage later removed                               | P1       | 5min   |
-| 7   | Audit `.github/workflows/` for stale `cmdguard/v3` references                              | P1       | 15min  |
-| 8   | Run website build verification (`pnpm run build` in `website/`)                             | P1       | 10min  |
-| 9   | Run `nix flake check` to verify format                                                     | P1       | 5min   |
-| 10  | Full audit of website guide prose against v4 API (14 .mdx files)                           | P2       | 60min  |
-| 11  | Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0                                 | P2       | 30min  |
-| 12  | Audit `docs/COMPARISON.md` feature matrix for v4 accuracy                                  | P2       | 20min  |
-| 13  | Cross-check ROADMAP.md "Deferred" items against current codebase                           | P2       | 20min  |
-| 14  | Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API                                  | P2       | 15min  |
-| 15  | Add CI check for referenced-files existence (AGENTS.md → TODO_LIST, ROADMAP, etc.)         | P3       | 30min  |
-| 16  | Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove                          | P3       | 30min  |
-| 17  | Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove                      | P3       | 30min  |
-| 18  | Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify                     | P3       | 5min   |
-| 19  | Add `flightrecorder` to `docs/PERFORMANCE.md` benchmark section                            | P3       | 15min  |
-| 20  | Audit `docs/architecture.d2` and `architecture.svg` for v4 accuracy                        | P3       | 20min  |
-| 21  | Update `docs/architecture-understanding/` diagrams for v4 module layout                    | P3       | 30min  |
-| 22  | Verify `examples/taskctl/` code examples match v4 API (they import v4, but check patterns) | P2       | 20min  |
-| 23  | Run `golangci-lint run ./...` on each sub-module independently                             | P2       | 15min  |
-| 24  | Add `docs/MIGRATION_v3_v4.md` link to README.md alongside v2→v3 link                       | P1       | 2min   |
-| 25  | Update `docs/CLI_DESIGN_PRINCIPLES.md` if it references v3 patterns                        | P3       | 10min  |
-| 26  | Verify `library-policy.yaml` references are still accurate for v4                          | P3       | 10min  |
-| 27  | Check `git-town.toml` main branch setting (`master` vs `main`)                             | P3       | 2min   |
-| 28  | Add flightrecorder to `docs/QUICKSTART.md` sub-modules section                             | P3       | 10min  |
-| 29  | Verify `FEATURES.md` sub-module table includes flightrecorder                              | P2       | 5min   |
-| 30  | Check if `docs/QUICKSTART.md` "12 output formats" → should be "16"                         | P3       | 2min   |
-| 31  | Audit `docs/TUTORIAL.md` "Complete Example" section references                             | P3       | 5min   |
-| 32  | Verify website `related-tools.mdx` for v4 accuracy                                         | P3       | 10min  |
-| 33  | Check `AUTHORS` file for accuracy                                                          | P3       | 2min   |
-| 34  | Verify `SECURITY.md` version table includes v4                                             | P2       | 5min   |
-| 35  | Add v4.0.0 GitHub release notes (if not already done)                                      | P2       | 15min  |
-| 36  | Verify `pkg.go.dev` badge URL in README points to v4 (it does, but verify)                 | P3       | 2min   |
-| 37  | Run `go mod tidy` on all modules to verify go.sum consistency                              | P2       | 10min  |
-| 38  | Check if `go.work` local replace directives need updating for external consumers           | P3       | 10min  |
-| 39  | Verify `flightrecorder/go.mod` module path is correct                                      | P2       | 2min   |
-| 40  | Add `flightrecorder` to `docs/guides/sub-modules.mdx` directory layout note                | P3       | 2min   |
-| 41  | Audit website `config.ts` for any other stale references beyond pkgGoDev URL               | P3       | 10min  |
-| 42  | Check if `docs/feedback/` files need v4 updates                                            | P3       | 5min   |
-| 43  | Verify `examples/docs-generator/` uses v4 API correctly                                    | P3       | 10min  |
-| 44  | Check if `benchmarks/` code uses v4 API correctly                                          | P3       | 5min   |
-| 45  | Add a "Documentation Verification" section to CONTRIBUTING.md                              | P3       | 15min  |
-| 46  | Consider adding `docs/MIGRATION_v3_v4.md` to website sidebar                               | P3       | 10min  |
-| 47  | Verify all `//nolint:godox` TODO(v5) markers still have ROADMAP.md cross-references        | P3       | 10min  |
-| 48  | Check if `docs/proposals/` files need v4 updates                                           | P3       | 5min   |
-| 49  | Run `go test ./... -cover` and update coverage badge if changed                            | P3       | 10min  |
-| 50  | Consider whether `docs/MIGRATION_v2_v3.md` should be moved to `docs/archive/`              | P3       | 5min   |
+| #  | Task                                                                                       | Priority | Effort |
+| -- | ------------------------------------------------------------------------------------------ | -------- | ------ |
+| 1  | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`        | P0       | 1min   |
+| 2  | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) — _TODO_LIST D3_                        | P0       | 5min   |
+| 3  | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_                         | P0       | 2min   |
+| 4  | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_        | P1       | 30min  |
+| 5  | Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3                                 | P1       | 5min   |
+| 6  | Fix CHANGELOG.md v3.0.0 section — note manpage later removed                               | P1       | 5min   |
+| 7  | Audit `.github/workflows/` for stale `cmdguard/v3` references                              | P1       | 15min  |
+| 8  | Run website build verification (`pnpm run build` in `website/`)                            | P1       | 10min  |
+| 9  | Run `nix flake check` to verify format                                                     | P1       | 5min   |
+| 10 | Full audit of website guide prose against v4 API (14 .mdx files)                           | P2       | 60min  |
+| 11 | Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0                                 | P2       | 30min  |
+| 12 | Audit `docs/COMPARISON.md` feature matrix for v4 accuracy                                  | P2       | 20min  |
+| 13 | Cross-check ROADMAP.md "Deferred" items against current codebase                           | P2       | 20min  |
+| 14 | Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API                                  | P2       | 15min  |
+| 15 | Add CI check for referenced-files existence (AGENTS.md → TODO_LIST, ROADMAP, etc.)         | P3       | 30min  |
+| 16 | Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove                          | P3       | 30min  |
+| 17 | Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove                      | P3       | 30min  |
+| 18 | Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify                     | P3       | 5min   |
+| 19 | Add `flightrecorder` to `docs/PERFORMANCE.md` benchmark section                            | P3       | 15min  |
+| 20 | Audit `docs/architecture.d2` and `architecture.svg` for v4 accuracy                        | P3       | 20min  |
+| 21 | Update `docs/architecture-understanding/` diagrams for v4 module layout                    | P3       | 30min  |
+| 22 | Verify `examples/taskctl/` code examples match v4 API (they import v4, but check patterns) | P2       | 20min  |
+| 23 | Run `golangci-lint run ./...` on each sub-module independently                             | P2       | 15min  |
+| 24 | Add `docs/MIGRATION_v3_v4.md` link to README.md alongside v2→v3 link                       | P1       | 2min   |
+| 25 | Update `docs/CLI_DESIGN_PRINCIPLES.md` if it references v3 patterns                        | P3       | 10min  |
+| 26 | Verify `library-policy.yaml` references are still accurate for v4                          | P3       | 10min  |
+| 27 | Check `git-town.toml` main branch setting (`master` vs `main`)                             | P3       | 2min   |
+| 28 | Add flightrecorder to `docs/QUICKSTART.md` sub-modules section                             | P3       | 10min  |
+| 29 | Verify `FEATURES.md` sub-module table includes flightrecorder                              | P2       | 5min   |
+| 30 | Check if `docs/QUICKSTART.md` "12 output formats" → should be "16"                         | P3       | 2min   |
+| 31 | Audit `docs/TUTORIAL.md` "Complete Example" section references                             | P3       | 5min   |
+| 32 | Verify website `related-tools.mdx` for v4 accuracy                                         | P3       | 10min  |
+| 33 | Check `AUTHORS` file for accuracy                                                          | P3       | 2min   |
+| 34 | Verify `SECURITY.md` version table includes v4                                             | P2       | 5min   |
+| 35 | Add v4.0.0 GitHub release notes (if not already done)                                      | P2       | 15min  |
+| 36 | Verify `pkg.go.dev` badge URL in README points to v4 (it does, but verify)                 | P3       | 2min   |
+| 37 | Run `go mod tidy` on all modules to verify go.sum consistency                              | P2       | 10min  |
+| 38 | Check if `go.work` local replace directives need updating for external consumers           | P3       | 10min  |
+| 39 | Verify `flightrecorder/go.mod` module path is correct                                      | P2       | 2min   |
+| 40 | Add `flightrecorder` to `docs/guides/sub-modules.mdx` directory layout note                | P3       | 2min   |
+| 41 | Audit website `config.ts` for any other stale references beyond pkgGoDev URL               | P3       | 10min  |
+| 42 | Check if `docs/feedback/` files need v4 updates                                            | P3       | 5min   |
+| 43 | Verify `examples/docs-generator/` uses v4 API correctly                                    | P3       | 10min  |
+| 44 | Check if `benchmarks/` code uses v4 API correctly                                          | P3       | 5min   |
+| 45 | Add a "Documentation Verification" section to CONTRIBUTING.md                              | P3       | 15min  |
+| 46 | Consider adding `docs/MIGRATION_v3_v4.md` to website sidebar                               | P3       | 10min  |
+| 47 | Verify all `//nolint:godox` TODO(v5) markers still have ROADMAP.md cross-references        | P3       | 10min  |
+| 48 | Check if `docs/proposals/` files need v4 updates                                           | P3       | 5min   |
+| 49 | Run `go test ./... -cover` and update coverage badge if changed                            | P3       | 10min  |
+| 50 | Consider whether `docs/MIGRATION_v2_v3.md` should be moved to `docs/archive/`              | P3       | 5min   |
 
 ---
 

@@ -337,14 +337,14 @@ Rationale:
 
 ### 4.3 Cross-Reference with how-to-golang
 
-| Check                  | Result                                                                               |
-| ---------------------- | ------------------------------------------------------------------------------------ |
-| No banned dependencies | ✅ All deps clean (samber/do/v2, cobra, pflag, fang/v2, go-output)                   |
+| Check                  | Result                                                                              |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| No banned dependencies | ✅ All deps clean (samber/do/v2, cobra, pflag, fang/v2, go-output)                  |
 | Files over 300 lines   | ⚠️ 6 files exceed limit — address in execution plan                                  |
-| No `any` types         | ✅ Uses generics throughout                                                          |
-| No magic strings       | ✅ Constants used                                                                    |
+| No `any` types         | ✅ Uses generics throughout                                                         |
+| No magic strings       | ✅ Constants used                                                                   |
 | Clean root             | ⚠️ Root has many stray files (PARTS.md, PROGRESS_2026-04-01.md, etc.) — out of scope |
-| Latest Go version      | ✅ Go 1.26.2                                                                         |
+| Latest Go version      | ✅ Go 1.26.2                                                                        |
 
 ---
 

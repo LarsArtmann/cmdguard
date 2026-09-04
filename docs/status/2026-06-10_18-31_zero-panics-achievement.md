@@ -75,28 +75,28 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 
 ## C) NOT STARTED
 
-| #   | Task                                                                    | Category    | Impact | Effort |
-| --- | ----------------------------------------------------------------------- | ----------- | ------ | ------ |
-| 1   | Update FEATURES.md: remove all Must\* entries, add "Zero Panics" badge  | Docs        | High   | 30m    |
-| 2   | Update TODO_LIST.md: reflect v2.5.0 state, mark P6 Must\* items as done | Docs        | Medium | 15m    |
-| 3   | Update ROADMAP.md: mark Package() redesign as done                      | Docs        | Low    | 5m     |
-| 4   | Audit README.md for Must\* references                                   | Docs        | High   | 15m    |
-| 5   | Audit docs/_.md for Must_ references                                    | Docs        | Medium | 20m    |
-| 6   | Add `CODECOV_TOKEN` to GitHub repo settings                             | CI          | Medium | 5m     |
-| 7   | Nested struct config file support                                       | Feature     | High   | 3-5d   |
-| 8   | Plugin system for validators/type handlers                              | Feature     | High   | 3-5d   |
-| 9   | Documentation generation (GenerateDocs)                                 | Feature     | Medium | 2-3d   |
-| 10  | Advanced types: Result[T], Validated[T], branded IDs                    | Feature     | Medium | 3-5d   |
-| 11  | Structured JSON error output                                            | Feature     | Low    | 1-2d   |
-| 12  | Extract flagtags to standalone library                                  | Refactor    | Low    | 2-3d   |
-| 13  | v3.0 API design document                                                | Planning    | High   | 2-3d   |
-| 14  | v3.0 directory skeleton                                                 | Planning    | Medium | 1d     |
-| 15  | `NoFlags` as distinct named type (not alias)                            | v3 Breaking | High   | 2h     |
-| 16  | Remove deprecated `WithColor` option                                    | v3 Breaking | Low    | 30m    |
-| 17  | Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation                  | v3 Breaking | Medium | 2h     |
-| 18  | Remove `SetConfig` or make it safe                                      | v3 Breaking | Medium | 2h     |
-| 19  | Fuzz testing expansion                                                  | Testing     | Medium | 1-2d   |
-| 20  | Go module with `buildGoModule` in flake.nix                             | Nix         | Low    | 2h     |
+| #  | Task                                                                    | Category    | Impact | Effort |
+| -- | ----------------------------------------------------------------------- | ----------- | ------ | ------ |
+| 1  | Update FEATURES.md: remove all Must\* entries, add "Zero Panics" badge  | Docs        | High   | 30m    |
+| 2  | Update TODO_LIST.md: reflect v2.5.0 state, mark P6 Must\* items as done | Docs        | Medium | 15m    |
+| 3  | Update ROADMAP.md: mark Package() redesign as done                      | Docs        | Low    | 5m     |
+| 4  | Audit README.md for Must\* references                                   | Docs        | High   | 15m    |
+| 5  | Audit docs/_.md for Must_ references                                    | Docs        | Medium | 20m    |
+| 6  | Add `CODECOV_TOKEN` to GitHub repo settings                             | CI          | Medium | 5m     |
+| 7  | Nested struct config file support                                       | Feature     | High   | 3-5d   |
+| 8  | Plugin system for validators/type handlers                              | Feature     | High   | 3-5d   |
+| 9  | Documentation generation (GenerateDocs)                                 | Feature     | Medium | 2-3d   |
+| 10 | Advanced types: Result[T], Validated[T], branded IDs                    | Feature     | Medium | 3-5d   |
+| 11 | Structured JSON error output                                            | Feature     | Low    | 1-2d   |
+| 12 | Extract flagtags to standalone library                                  | Refactor    | Low    | 2-3d   |
+| 13 | v3.0 API design document                                                | Planning    | High   | 2-3d   |
+| 14 | v3.0 directory skeleton                                                 | Planning    | Medium | 1d     |
+| 15 | `NoFlags` as distinct named type (not alias)                            | v3 Breaking | High   | 2h     |
+| 16 | Remove deprecated `WithColor` option                                    | v3 Breaking | Low    | 30m    |
+| 17 | Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation                  | v3 Breaking | Medium | 2h     |
+| 18 | Remove `SetConfig` or make it safe                                      | v3 Breaking | Medium | 2h     |
+| 19 | Fuzz testing expansion                                                  | Testing     | Medium | 1-2d   |
+| 20 | Go module with `buildGoModule` in flake.nix                             | Nix         | Low    | 2h     |
 
 ---
 
@@ -155,33 +155,33 @@ This is not a code problem — it's a documentation consistency problem. The cod
 
 Priority-ordered, impact-weighted:
 
-| #   | Task                                                      | Category | Impact   | Effort | Status      |
-| --- | --------------------------------------------------------- | -------- | -------- | ------ | ----------- |
-| 1   | Update FEATURES.md: remove Must\* entries, update status  | Docs     | Critical | 30m    | Not started |
-| 2   | Update README.md: remove Must\* examples                  | Docs     | Critical | 15m    | Not started |
-| 3   | Update TODO_LIST.md: metrics, version, completed items    | Docs     | High     | 15m    | Not started |
-| 4   | Audit all docs/_.md for Must_ references                  | Docs     | High     | 20m    | Not started |
-| 5   | Update ROADMAP.md: mark completed items                   | Docs     | Medium   | 5m     | Not started |
-| 6   | Version bump to v2.5.0 in go.mod and doc.go               | Release  | High     | 5m     | Not started |
-| 7   | Git tag v2.5.0                                            | Release  | High     | 1m     | Not started |
-| 8   | Write CHANGELOG.md entry for v2.5.0                       | Docs     | Medium   | 15m    | Not started |
-| 9   | Add `nix buildGoModule` to flake.nix                      | Nix      | Medium   | 2h     | Not started |
-| 10  | Coverage gap analysis: identify uncovered paths           | Testing  | Medium   | 1h     | Not started |
-| 11  | Add integration tests to tests/integration/               | Testing  | Medium   | 1d     | Not started |
-| 12  | Error reference doc: auto-generated table of 60 sentinels | Docs     | Medium   | 2h     | Not started |
-| 13  | Nested struct config file support (YAML/TOML/JSON)        | Feature  | High     | 3-5d   | Not started |
-| 14  | Plugin system for validators and type handlers            | Feature  | High     | 3-5d   | Not started |
-| 15  | Fix os.Setenv("NO_COLOR") process-wide mutation           | v3 Prep  | Medium   | 2h     | Not started |
-| 16  | Make NoFlags a distinct named type                        | v3 Prep  | Medium   | 2h     | Not started |
-| 17  | Remove deprecated WithColor option                        | v3 Prep  | Low      | 30m    | Not started |
-| 18  | Add CODECOV_TOKEN to GitHub                               | CI       | Medium   | 5m     | Not started |
-| 19  | Expand fuzz test targets                                  | Testing  | Low      | 1-2d   | Not started |
-| 20  | v3.0 API design document                                  | Planning | High     | 2-3d   | Not started |
-| 21  | Documentation generation (GenerateDocs)                   | Feature  | Medium   | 2-3d   | Not started |
-| 22  | Structured JSON error output for --output=json            | Feature  | Low      | 1-2d   | Not started |
-| 23  | Advanced types: Result[T], Validated[T]                   | Feature  | Medium   | 3-5d   | Not started |
-| 24  | Extract flagtags to standalone library                    | Refactor | Low      | 2-3d   | Not started |
-| 25  | Config auto-loading with koanf integration                | Feature  | Low      | 2-3d   | Not started |
+| #  | Task                                                      | Category | Impact   | Effort | Status      |
+| -- | --------------------------------------------------------- | -------- | -------- | ------ | ----------- |
+| 1  | Update FEATURES.md: remove Must\* entries, update status  | Docs     | Critical | 30m    | Not started |
+| 2  | Update README.md: remove Must\* examples                  | Docs     | Critical | 15m    | Not started |
+| 3  | Update TODO_LIST.md: metrics, version, completed items    | Docs     | High     | 15m    | Not started |
+| 4  | Audit all docs/_.md for Must_ references                  | Docs     | High     | 20m    | Not started |
+| 5  | Update ROADMAP.md: mark completed items                   | Docs     | Medium   | 5m     | Not started |
+| 6  | Version bump to v2.5.0 in go.mod and doc.go               | Release  | High     | 5m     | Not started |
+| 7  | Git tag v2.5.0                                            | Release  | High     | 1m     | Not started |
+| 8  | Write CHANGELOG.md entry for v2.5.0                       | Docs     | Medium   | 15m    | Not started |
+| 9  | Add `nix buildGoModule` to flake.nix                      | Nix      | Medium   | 2h     | Not started |
+| 10 | Coverage gap analysis: identify uncovered paths           | Testing  | Medium   | 1h     | Not started |
+| 11 | Add integration tests to tests/integration/               | Testing  | Medium   | 1d     | Not started |
+| 12 | Error reference doc: auto-generated table of 60 sentinels | Docs     | Medium   | 2h     | Not started |
+| 13 | Nested struct config file support (YAML/TOML/JSON)        | Feature  | High     | 3-5d   | Not started |
+| 14 | Plugin system for validators and type handlers            | Feature  | High     | 3-5d   | Not started |
+| 15 | Fix os.Setenv("NO_COLOR") process-wide mutation           | v3 Prep  | Medium   | 2h     | Not started |
+| 16 | Make NoFlags a distinct named type                        | v3 Prep  | Medium   | 2h     | Not started |
+| 17 | Remove deprecated WithColor option                        | v3 Prep  | Low      | 30m    | Not started |
+| 18 | Add CODECOV_TOKEN to GitHub                               | CI       | Medium   | 5m     | Not started |
+| 19 | Expand fuzz test targets                                  | Testing  | Low      | 1-2d   | Not started |
+| 20 | v3.0 API design document                                  | Planning | High     | 2-3d   | Not started |
+| 21 | Documentation generation (GenerateDocs)                   | Feature  | Medium   | 2-3d   | Not started |
+| 22 | Structured JSON error output for --output=json            | Feature  | Low      | 1-2d   | Not started |
+| 23 | Advanced types: Result[T], Validated[T]                   | Feature  | Medium   | 3-5d   | Not started |
+| 24 | Extract flagtags to standalone library                    | Refactor | Low      | 2-3d   | Not started |
+| 25 | Config auto-loading with koanf integration                | Feature  | Low      | 2-3d   | Not started |
 
 ---
 

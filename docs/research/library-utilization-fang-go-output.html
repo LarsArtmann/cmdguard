@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cmdguard — Library Utilization Research: fang/v2 &amp; go-output</title>
+    <title>
+      cmdguard — Library Utilization Research: fang/v2 &amp; go-output
+    </title>
     <style>
       :root {
         --bg-primary: #0a0e17;
@@ -161,7 +163,9 @@
   </head>
   <body>
     <h1>Library Utilization Research: fang/v2 &amp; go-output</h1>
-    <p class="section-meta">cmdguard v2.5.0 · June 2026 · Post-sprint cleanup</p>
+    <p class="section-meta">
+      cmdguard v2.5.0 · June 2026 · Post-sprint cleanup
+    </p>
 
     <!-- ============================================================ -->
     <h2>1. charm.land/fang/v2 — Styled Cobra Execution</h2>
@@ -194,20 +198,25 @@
         <tr>
           <td><code>fang.Execute(ctx, cmd, opts...)</code></td>
           <td>Core entry point — styled help, errors, version</td>
-          <td><span class="tag tag-used">INTEGRATED</span> via <code>WithFang</code> option</td>
+          <td>
+            <span class="tag tag-used">INTEGRATED</span> via
+            <code>WithFang</code> option
+          </td>
         </tr>
         <tr>
           <td><code>fang.WithVersion(v)</code></td>
           <td>Semantic version string for <code>--version</code></td>
           <td>
-            <span class="tag tag-used">INTEGRATED</span> auto-piped via <code>WithCLIVersion</code>
+            <span class="tag tag-used">INTEGRATED</span> auto-piped via
+            <code>WithCLIVersion</code>
           </td>
         </tr>
         <tr>
           <td><code>fang.WithCommit(c)</code></td>
           <td>Git commit hash appended to version</td>
           <td>
-            <span class="tag tag-used">INTEGRATED</span> auto-piped via <code>WithCLICommit</code>
+            <span class="tag tag-used">INTEGRATED</span> auto-piped via
+            <code>WithCLICommit</code>
           </td>
         </tr>
         <tr>
@@ -215,26 +224,32 @@
           <td>Graceful shutdown on OS signals</td>
           <td>
             <span class="tag tag-low">INTENTIONAL SKIP</span> cmdguard has own
-            <code>WithSignalHandling</code>/<code>WithGracefulShutdown</code> with DI-aware shutdown
+            <code>WithSignalHandling</code>/<code>WithGracefulShutdown</code>
+            with DI-aware shutdown
           </td>
         </tr>
         <tr>
           <td><code>fang.WithoutManpage()</code></td>
           <td>Disable auto man page subcommand</td>
           <td>
-            <span class="tag tag-low">INTENTIONAL SKIP</span> cmdguard has its own
-            <code>ManPage()</code> helper
+            <span class="tag tag-low">INTENTIONAL SKIP</span> cmdguard has its
+            own <code>ManPage()</code> helper
           </td>
         </tr>
         <tr>
           <td><code>fang.WithErrorHandler(fn)</code></td>
           <td>Custom error display (writer + styles + error)</td>
-          <td><span class="tag tag-gap">GAP</span> users cannot customize error formatting</td>
+          <td>
+            <span class="tag tag-gap">GAP</span> users cannot customize error
+            formatting
+          </td>
         </tr>
         <tr>
           <td><code>fang.WithColorSchemeFunc(fn)</code></td>
           <td>Custom color scheme for fang output</td>
-          <td><span class="tag tag-gap">GAP</span> no theme customization exposed</td>
+          <td>
+            <span class="tag tag-gap">GAP</span> no theme customization exposed
+          </td>
         </tr>
         <tr>
           <td><code>fang.Styles</code> type</td>
@@ -254,18 +269,21 @@
         <code>fang.Execute(flowCtx, cli.rootCmd, cli.fangOpts...)</code>
       </p>
       <p>
-        <strong>Control:</strong> <code>WithFang(true/false)</code> enables/disables;
+        <strong>Control:</strong>
+        <code>WithFang(true/false)</code> enables/disables;
         <code>WithFangOptions(opts...)</code> passes through raw fang options
       </p>
       <p>
-        <strong>Version/Commit:</strong> <code>WithCLIVersion</code> auto-appends
-        <code>fang.WithVersion</code>; <code>WithCLICommit</code> auto-appends
-        <code>fang.WithCommit</code> — single option controls both cmdguard and fang
+        <strong>Version/Commit:</strong>
+        <code>WithCLIVersion</code> auto-appends <code>fang.WithVersion</code>;
+        <code>WithCLICommit</code> auto-appends <code>fang.WithCommit</code> —
+        single option controls both cmdguard and fang
       </p>
       <p>
         <strong>NO_COLOR:</strong> <code>applyNoColorIfSet()</code> sets
-        <code>NO_COLOR=1</code> before fang execution when <code>--no-color</code> flag is set;
-        fang's colorprofile picks it up automatically
+        <code>NO_COLOR=1</code> before fang execution when
+        <code>--no-color</code> flag is set; fang's colorprofile picks it up
+        automatically
       </p>
     </div>
 
@@ -276,13 +294,14 @@
         <strong>MEDIUM — Expose <code>WithErrorHandler</code></strong>
       </p>
       <p>
-        Add <code>WithFangErrorHandler[T](fn)</code> CLI option so users can customize error
-        formatting. Currently errors always use fang's default styled output. Power users may want
-        structured error output or custom branding.
+        Add <code>WithFangErrorHandler[T](fn)</code> CLI option so users can
+        customize error formatting. Currently errors always use fang's default
+        styled output. Power users may want structured error output or custom
+        branding.
       </p>
       <p>
-        <em>Effort:</em> ~15 lines in <code>cli_options.go</code>, just appends to
-        <code>cli.fangOpts</code>.
+        <em>Effort:</em> ~15 lines in <code>cli_options.go</code>, just appends
+        to <code>cli.fangOpts</code>.
       </p>
     </div>
 
@@ -291,8 +310,8 @@
         <strong>LOW — Expose <code>WithColorSchemeFunc</code></strong>
       </p>
       <p>
-        Allow custom color themes. Niche — most CLIs are fine with fang defaults. Could be exposed
-        as <code>WithFangColorScheme[T](fn)</code>.
+        Allow custom color themes. Niche — most CLIs are fine with fang
+        defaults. Could be exposed as <code>WithFangColorScheme[T](fn)</code>.
       </p>
     </div>
 
@@ -427,21 +446,25 @@
     <h3>How cmdguard Uses go-output</h3>
     <div class="card">
       <p>
-        <strong>Integration file:</strong> <code>output.go</code> — re-exports format constants,
-        provides <code>OutputResult</code>, <code>OutputTable</code>, <code>OutputStyledTable</code>
+        <strong>Integration file:</strong> <code>output.go</code> — re-exports
+        format constants, provides <code>OutputResult</code>,
+        <code>OutputTable</code>, <code>OutputStyledTable</code>
       </p>
       <p>
         <strong>Rendering architecture:</strong> Two registries —
-        <code>tableFormatRegistry</code> (12 renderers for <code>*TableData</code>) and
-        <code>anyFormatRegistry</code> (2 renderers for arbitrary data: JSON + YAML)
+        <code>tableFormatRegistry</code> (12 renderers for
+        <code>*TableData</code>) and <code>anyFormatRegistry</code> (2 renderers
+        for arbitrary data: JSON + YAML)
       </p>
       <p>
-        <strong>CLI flag:</strong> <code>--output</code> / <code>-o</code> registered via
-        <code>cli_output.go</code>, parsed via <code>ParseOutputFormat</code>
+        <strong>CLI flag:</strong> <code>--output</code> /
+        <code>-o</code> registered via <code>cli_output.go</code>, parsed via
+        <code>ParseOutputFormat</code>
       </p>
       <p>
-        <strong>Sub-packages used:</strong> <code>d2</code>, <code>delimited</code>,
-        <code>graph</code>, <code>markup</code>, <code>serialization</code>, <code>table</code>
+        <strong>Sub-packages used:</strong> <code>d2</code>,
+        <code>delimited</code>, <code>graph</code>, <code>markup</code>,
+        <code>serialization</code>, <code>table</code>
       </p>
     </div>
 
@@ -450,49 +473,52 @@
     <div class="card">
       <h3 style="margin-top: 0">JSONL (JSON Lines)</h3>
       <p>
-        <strong>go-output provides:</strong> <code>JSONLTableRenderer</code> and streaming
-        <code>JSONLWriter</code>. Useful for streaming/piped output.
+        <strong>go-output provides:</strong> <code>JSONLTableRenderer</code> and
+        streaming <code>JSONLWriter</code>. Useful for streaming/piped output.
       </p>
       <p>
-        <strong>cmdguard gap:</strong> Not in format constants or registries. High value — JSONL is
-        standard for log processing pipelines.
+        <strong>cmdguard gap:</strong> Not in format constants or registries.
+        High value — JSONL is standard for log processing pipelines.
       </p>
-      <p><strong>Effort:</strong> Add constant re-export + table renderer entry. ~5 lines.</p>
+      <p>
+        <strong>Effort:</strong> Add constant re-export + table renderer entry.
+        ~5 lines.
+      </p>
     </div>
 
     <div class="card">
       <h3 style="margin-top: 0">AsciiDoc</h3>
       <p>
-        <strong>go-output provides:</strong> AsciiDoc table rendering. Useful for documentation
-        generation.
+        <strong>go-output provides:</strong> AsciiDoc table rendering. Useful
+        for documentation generation.
       </p>
       <p>
-        <strong>cmdguard gap:</strong> Not exposed. Medium value — nice for CLI tools that generate
-        docs.
+        <strong>cmdguard gap:</strong> Not exposed. Medium value — nice for CLI
+        tools that generate docs.
       </p>
     </div>
 
     <div class="card">
       <h3 style="margin-top: 0">TOML</h3>
       <p>
-        <strong>go-output provides:</strong> Full support (Table, Tree, Graph). Uses
-        <code>go-toml/v2</code>.
+        <strong>go-output provides:</strong> Full support (Table, Tree, Graph).
+        Uses <code>go-toml/v2</code>.
       </p>
       <p>
-        <strong>cmdguard gap:</strong> Not exposed. Medium value — TOML is common in config-heavy
-        CLIs.
+        <strong>cmdguard gap:</strong> Not exposed. Medium value — TOML is
+        common in config-heavy CLIs.
       </p>
     </div>
 
     <div class="card">
       <h3 style="margin-top: 0">PlantUML</h3>
       <p>
-        <strong>go-output provides:</strong> Component diagrams via <code>PlantUMLDiagram</code>.
-        Table, Tree, and Graph shapes.
+        <strong>go-output provides:</strong> Component diagrams via
+        <code>PlantUMLDiagram</code>. Table, Tree, and Graph shapes.
       </p>
       <p>
-        <strong>cmdguard gap:</strong> Not exposed. Low value — niche format for architecture
-        visualization.
+        <strong>cmdguard gap:</strong> Not exposed. Low value — niche format for
+        architecture visualization.
       </p>
     </div>
 
@@ -501,29 +527,30 @@
     <div class="rec-box priority-high">
       <p><strong>HIGH — Add JSONL support</strong></p>
       <p>
-        JSONL is the de facto standard for streaming structured data. Many CLI tools output JSONL
-        for pipe compatibility. Missing this format limits cmdguard's utility in data pipeline
-        contexts.
+        JSONL is the de facto standard for streaming structured data. Many CLI
+        tools output JSONL for pipe compatibility. Missing this format limits
+        cmdguard's utility in data pipeline contexts.
       </p>
       <p>
-        <em>Effort:</em> Add <code>FormatJSONL</code> constant re-export + table registry entry
-        using <code>serialization</code> or <code>go-output/enum</code>. ~8 lines total.
+        <em>Effort:</em> Add <code>FormatJSONL</code> constant re-export + table
+        registry entry using <code>serialization</code> or
+        <code>go-output/enum</code>. ~8 lines total.
       </p>
     </div>
 
     <div class="rec-box priority-medium">
       <p><strong>MEDIUM — Add TOML support</strong></p>
       <p>
-        TOML is widely used in Go config files. Exposing it makes cmdguard a one-stop output
-        solution. go-output already handles all shapes.
+        TOML is widely used in Go config files. Exposing it makes cmdguard a
+        one-stop output solution. go-output already handles all shapes.
       </p>
     </div>
 
     <div class="rec-box priority-low">
       <p><strong>LOW — Add AsciiDoc and PlantUML</strong></p>
       <p>
-        Niche formats. Add when users request them, or when go-output adds more capabilities. Low
-        urgency.
+        Niche formats. Add when users request them, or when go-output adds more
+        capabilities. Low urgency.
       </p>
     </div>
 
@@ -544,7 +571,10 @@
         <tbody>
           <tr>
             <td>fang/v2</td>
-            <td>4/8 symbols integrated (Execute, WithVersion, WithCommit + passthrough)</td>
+            <td>
+              4/8 symbols integrated (Execute, WithVersion, WithCommit +
+              passthrough)
+            </td>
             <td style="color: var(--accent-green)">A</td>
             <td>Custom error handler not exposed</td>
           </tr>
@@ -618,9 +648,11 @@
     </div>
 
     <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 3rem">
-      Research conducted June 2026 · cmdguard v2.5.0 · fang v2.0.1 · go-output v0.8.0
+      Research conducted June 2026 · cmdguard v2.5.0 · fang v2.0.1 · go-output
+      v0.8.0
       <br />Updated after fang integration: <code>WithCLIVersion</code> →
-      <code>fang.WithVersion</code>, <code>WithCLICommit</code> → <code>fang.WithCommit</code>
+      <code>fang.WithVersion</code>, <code>WithCLICommit</code> →
+      <code>fang.WithCommit</code>
     </p>
 
     <!--

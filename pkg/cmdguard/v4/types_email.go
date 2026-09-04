@@ -12,7 +12,7 @@ const emailPartsCount = 2
 // Email wraps a validated email address.
 // Use this for config fields that must be valid email addresses.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type Email struct {
 	address string
 }

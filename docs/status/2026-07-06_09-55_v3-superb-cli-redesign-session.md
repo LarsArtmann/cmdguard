@@ -178,33 +178,33 @@ We made **massive** breaking API changes (NewCommand signature changed, WithFlag
 
 ## f) Next 25 Tasks (Sorted by Impact/Effort)
 
-| #   | Task                                                | Impact   | Effort |
-| --- | --------------------------------------------------- | -------- | ------ |
-| 1   | Fix doc.go stale WithFlags references               | High     | 5min   |
-| 2   | Fix 4 lint issues (gci/golines formatting)          | Medium   | 10min  |
-| 3   | Add CHANGELOG.md entry for v3 breaking changes      | High     | 15min  |
-| 4   | Commit go.work.sum + add missing replace directives | High     | 10min  |
-| 5   | Remove go-output blank imports from output.go       | High     | 30min  |
-| 6   | Cut result.go (sum types)                           | Medium   | 10min  |
-| 7   | Cut editor.go ($EDITOR)                             | Low      | 10min  |
-| 8   | Extract spinner to sub-module                       | Low      | 30min  |
-| 9   | Verify GOWORK=off builds for all 5 modules          | High     | 30min  |
-| 10  | Make CLIOption non-generic (sealed interface)       | High     | 45min  |
-| 11  | Add command-level audit middleware                  | High     | 60min  |
-| 12  | Add built-in audit-log subcommand                   | Medium   | 45min  |
-| 13  | Move koanf to configload or make optional           | Medium   | 30min  |
-| 14  | Cut or internalize flow_context.go                  | Low      | 20min  |
-| 15  | Update README.md with v3 quickstart                 | High     | 30min  |
-| 16  | Update AGENTS.md module structure                   | High     | 20min  |
-| 17  | Update FEATURES.md for v3                           | Medium   | 20min  |
-| 18  | Update example to showcase v3 patterns              | Medium   | 45min  |
-| 19  | Design service-owned config pattern (ADR)           | Critical | 60min  |
-| 20  | Implement WithProvider for flag scoping             | High     | 90min  |
-| 21  | Add strict flag audit mode                          | Medium   | 45min  |
-| 22  | Consider cutting go-toml/yaml from core             | Medium   | 30min  |
-| 23  | Update MIGRATION_FROM_COBRA.md for v3               | Low      | 20min  |
-| 24  | Add integration test for sub-module imports         | Medium   | 30min  |
-| 25  | Release v3.0.0-alpha tag                            | High     | 10min  |
+| #  | Task                                                | Impact   | Effort |
+| -- | --------------------------------------------------- | -------- | ------ |
+| 1  | Fix doc.go stale WithFlags references               | High     | 5min   |
+| 2  | Fix 4 lint issues (gci/golines formatting)          | Medium   | 10min  |
+| 3  | Add CHANGELOG.md entry for v3 breaking changes      | High     | 15min  |
+| 4  | Commit go.work.sum + add missing replace directives | High     | 10min  |
+| 5  | Remove go-output blank imports from output.go       | High     | 30min  |
+| 6  | Cut result.go (sum types)                           | Medium   | 10min  |
+| 7  | Cut editor.go ($EDITOR)                             | Low      | 10min  |
+| 8  | Extract spinner to sub-module                       | Low      | 30min  |
+| 9  | Verify GOWORK=off builds for all 5 modules          | High     | 30min  |
+| 10 | Make CLIOption non-generic (sealed interface)       | High     | 45min  |
+| 11 | Add command-level audit middleware                  | High     | 60min  |
+| 12 | Add built-in audit-log subcommand                   | Medium   | 45min  |
+| 13 | Move koanf to configload or make optional           | Medium   | 30min  |
+| 14 | Cut or internalize flow_context.go                  | Low      | 20min  |
+| 15 | Update README.md with v3 quickstart                 | High     | 30min  |
+| 16 | Update AGENTS.md module structure                   | High     | 20min  |
+| 17 | Update FEATURES.md for v3                           | Medium   | 20min  |
+| 18 | Update example to showcase v3 patterns              | Medium   | 45min  |
+| 19 | Design service-owned config pattern (ADR)           | Critical | 60min  |
+| 20 | Implement WithProvider for flag scoping             | High     | 90min  |
+| 21 | Add strict flag audit mode                          | Medium   | 45min  |
+| 22 | Consider cutting go-toml/yaml from core             | Medium   | 30min  |
+| 23 | Update MIGRATION_FROM_COBRA.md for v3               | Low      | 20min  |
+| 24 | Add integration test for sub-module imports         | Medium   | 30min  |
+| 25 | Release v3.0.0-alpha tag                            | High     | 10min  |
 
 ---
 

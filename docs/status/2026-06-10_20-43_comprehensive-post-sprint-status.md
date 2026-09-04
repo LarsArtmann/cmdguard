@@ -1,8 +1,8 @@
 # cmdguard — Comprehensive Status Report
 
-**Date:** 2026-06-10 20:43  
-**Version:** v2.5.0  
-**Branch:** master (clean, pushed to origin)  
+**Date:** 2026-06-10 20:43\
+**Version:** v2.5.0\
+**Branch:** master (clean, pushed to origin)\
 **Author:** AI-assisted improvement sprint
 
 ---
@@ -243,33 +243,33 @@ Nothing is truly fucked. The codebase is solid. But there are annoyances:
 
 Sorted by impact/effort ratio:
 
-| #   | Task                                                                                | Impact | Effort | Category |
-| --- | ----------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| 1   | Fix nix pre-commit hooks (nixfmt/deadnix/vulnix)                                    | High   | 30m    | Infra    |
-| 2   | Add CODECOV_TOKEN to GitHub repo settings                                           | High   | 5m     | CI/CD    |
-| 3   | Test IsEmpty() methods (Duration, LogLevel, LogFormat, Port)                        | Low    | 15m    | Coverage |
-| 4   | Test validators (validateEmail, validateURL, validateNonEmpty, validateFieldByKind) | Medium | 30m    | Coverage |
-| 5   | Test RegisterValidator global function                                              | Low    | 10m    | Coverage |
-| 6   | Test WithDoctorLong option                                                          | Low    | 5m     | Coverage |
-| 7   | Test renderAndWrite directly                                                        | Low    | 10m    | Coverage |
-| 8   | Test WithConfigFileLoader integration via CLI Execute                               | Medium | 30m    | Coverage |
-| 9   | Cover WithExactArgs/WithMinimumArgs/WithMaximumArgs error paths                     | Low    | 20m    | Coverage |
-| 10  | Cover WithRangeArgs error paths (negative min, min>max)                             | Low    | 10m    | Coverage |
-| 11  | Add fuzz tests for ParseDuration, ParseEmail, ParseURL, ParsePort                   | High   | 1h     | Quality  |
-| 12  | Add CONTRIBUTING.md                                                                 | Medium | 30m    | Docs     |
-| 13  | Add GitHub issue/PR templates                                                       | Medium | 20m    | Docs     |
-| 14  | Update TODO_LIST.md — mark #29 (NoFlags), #34 (WithColor), #35 (NO_COLOR) as DONE   | Low    | 10m    | Docs     |
-| 15  | Add buildGoModule to flake.nix for proper Nix packaging                             | Medium | 1h     | Infra    |
-| 16  | Add Scope.HealthCheckResults test (currently 0% at scope.go:212)                    | Low    | 10m    | Coverage |
-| 17  | Add ArgsFromContext full coverage (currently 60%)                                   | Low    | 15m    | Coverage |
-| 18  | Structured JSON error output for --output=json                                      | High   | 2h     | Feature  |
-| 19  | Config file nested struct support                                                   | High   | 4h     | Feature  |
-| 20  | Plugin system for custom validators and type handlers                               | High   | 4h     | Feature  |
-| 21  | Documentation generation (GenerateDocs)                                             | Medium | 3h     | Feature  |
-| 22  | Extract flag-related code to standalone flagtags library                            | Medium | 4h     | Refactor |
-| 23  | Advanced types: Result[T], Validated[T], branded IDs                                | Medium | 4h     | Feature  |
-| 24  | Config auto-loading with koanf integration                                          | Medium | 3h     | Feature  |
-| 25  | Shared test config type (reduce 44+ testConfig definitions)                         | Low    | 1h     | Cleanup  |
+| #  | Task                                                                                | Impact | Effort | Category |
+| -- | ----------------------------------------------------------------------------------- | ------ | ------ | -------- |
+| 1  | Fix nix pre-commit hooks (nixfmt/deadnix/vulnix)                                    | High   | 30m    | Infra    |
+| 2  | Add CODECOV_TOKEN to GitHub repo settings                                           | High   | 5m     | CI/CD    |
+| 3  | Test IsEmpty() methods (Duration, LogLevel, LogFormat, Port)                        | Low    | 15m    | Coverage |
+| 4  | Test validators (validateEmail, validateURL, validateNonEmpty, validateFieldByKind) | Medium | 30m    | Coverage |
+| 5  | Test RegisterValidator global function                                              | Low    | 10m    | Coverage |
+| 6  | Test WithDoctorLong option                                                          | Low    | 5m     | Coverage |
+| 7  | Test renderAndWrite directly                                                        | Low    | 10m    | Coverage |
+| 8  | Test WithConfigFileLoader integration via CLI Execute                               | Medium | 30m    | Coverage |
+| 9  | Cover WithExactArgs/WithMinimumArgs/WithMaximumArgs error paths                     | Low    | 20m    | Coverage |
+| 10 | Cover WithRangeArgs error paths (negative min, min>max)                             | Low    | 10m    | Coverage |
+| 11 | Add fuzz tests for ParseDuration, ParseEmail, ParseURL, ParsePort                   | High   | 1h     | Quality  |
+| 12 | Add CONTRIBUTING.md                                                                 | Medium | 30m    | Docs     |
+| 13 | Add GitHub issue/PR templates                                                       | Medium | 20m    | Docs     |
+| 14 | Update TODO_LIST.md — mark #29 (NoFlags), #34 (WithColor), #35 (NO_COLOR) as DONE   | Low    | 10m    | Docs     |
+| 15 | Add buildGoModule to flake.nix for proper Nix packaging                             | Medium | 1h     | Infra    |
+| 16 | Add Scope.HealthCheckResults test (currently 0% at scope.go:212)                    | Low    | 10m    | Coverage |
+| 17 | Add ArgsFromContext full coverage (currently 60%)                                   | Low    | 15m    | Coverage |
+| 18 | Structured JSON error output for --output=json                                      | High   | 2h     | Feature  |
+| 19 | Config file nested struct support                                                   | High   | 4h     | Feature  |
+| 20 | Plugin system for custom validators and type handlers                               | High   | 4h     | Feature  |
+| 21 | Documentation generation (GenerateDocs)                                             | Medium | 3h     | Feature  |
+| 22 | Extract flag-related code to standalone flagtags library                            | Medium | 4h     | Refactor |
+| 23 | Advanced types: Result[T], Validated[T], branded IDs                                | Medium | 4h     | Feature  |
+| 24 | Config auto-loading with koanf integration                                          | Medium | 3h     | Feature  |
+| 25 | Shared test config type (reduce 44+ testConfig definitions)                         | Low    | 1h     | Cleanup  |
 
 ---
 

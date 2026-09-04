@@ -1,7 +1,7 @@
 # ADR-003: Copy-on-Write Registry Pattern
 
-**Status:** Accepted  
-**Date:** 2026-07-11  
+**Status:** Accepted\
+**Date:** 2026-07-11\
 **Deciders:** Lars Artmann
 
 ## Context

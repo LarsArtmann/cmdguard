@@ -193,17 +193,17 @@
 
 The git tags and CHANGELOG entries are **completely out of sync**:
 
-| Tags that exist                     | CHANGELOG entries that exist |
-| ----------------------------------- | ---------------------------- |
-| v0.1.0 ✅                           | [0.1.0] ✅                   |
+| Tags that exist                    | CHANGELOG entries that exist |
+| ---------------------------------- | ---------------------------- |
+| v0.1.0 ✅                          | [0.1.0] ✅                   |
 | **v0.2.0** ⚠️ (no CHANGELOG entry!) | [2.0.0] (no tag!)            |
 | **v1.0.0** ⚠️ (no CHANGELOG entry!) | [2.1.0] (no tag!)            |
-| v2.5.0 ✅                           | [2.2.0] (no tag!)            |
-| v2.6.0 ✅                           | [2.3.0] (no tag!)            |
-| v2.6.1 ✅                           | [2.4.0] (no tag!)            |
-| v2.7.0 ✅                           |                              |
-| v2.8.0 ✅                           |                              |
-| v2.8.1 ✅                           |                              |
+| v2.5.0 ✅                          | [2.2.0] (no tag!)            |
+| v2.6.0 ✅                          | [2.3.0] (no tag!)            |
+| v2.6.1 ✅                          | [2.4.0] (no tag!)            |
+| v2.7.0 ✅                          |                              |
+| v2.8.0 ✅                          |                              |
+| v2.8.1 ✅                          |                              |
 
 **Problems:**
 
@@ -265,33 +265,33 @@ The git tags and CHANGELOG entries are **completely out of sync**:
 
 Ranked by impact × effort ratio (highest first).
 
-| #   | Task                                                                                                                                             | Impact | Effort | Category     |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------ |
-| 1   | **Add `CODECOV_TOKEN` secret to GitHub repo settings**                                                                                           | High   | 5m     | CI           |
-| 2   | **Bump `go.mod` to `go 1.26.4`** when nixpkgs packages it (fixes GO-2026-5037/5038/5039)                                                         | High   | 5m     | Security     |
-| 3   | **Cover `WithPlugin[T]`** — public CLI option with 0% coverage                                                                                   | High   | 30m    | Testing      |
-| 4   | **Cover `PluginRegistrar.TypeHandler`** — plugin registration with 0% coverage                                                                   | High   | 30m    | Testing      |
-| 5   | **Cover `RegisterValidator`** — global validator registration with 0% coverage                                                                   | High   | 20m    | Testing      |
-| 6   | **Cover the validator dispatch chain** (`validateEmail`, `validateURL`, `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`) | High   | 1h     | Testing      |
-| 7   | **Cover `NewManPage`** — public constructor with 0% coverage                                                                                     | Medium | 20m    | Testing      |
-| 8   | **Cover `WithConfigFileLoader`** — public API with 0% coverage                                                                                   | Medium | 20m    | Testing      |
-| 9   | **Cover `WithDoctorLong`** — doctor option with 0% coverage                                                                                      | Low    | 10m    | Testing      |
-| 10  | **Investigate and fix git tag history** — tag v2.0.0–v2.4.0 or document why untagged                                                             | High   | 1h     | Release      |
-| 11  | **Remove or replace BuildFlow pre-commit hook** — every commit bypasses validation                                                               | Medium | 15m    | Tooling      |
-| 12  | **Add fuzz seed corpus** to `testdata/fuzz/` for the 7 fuzz targets                                                                              | Medium | 2h     | Testing      |
-| 13  | **Write v3.0 API design document** — consolidate v2 warts into coherent v3 plan                                                                  | High   | 4h     | Architecture |
-| 14  | **Test `pkg/testutil`** — 372 lines at 0% coverage                                                                                               | Medium | 1h     | Testing      |
-| 15  | **Add separate CI job for examples** — dedicated pass/fail signal for taskctl                                                                    | Low    | 30m    | CI           |
-| 16  | **Improve taskctl coverage** from 67.4% → 80%+                                                                                                   | Medium | 3h     | Testing      |
-| 17  | **Add minimal "hello world" example** — quick start for new users                                                                                | Low    | 1h     | Docs         |
-| 18  | **Write branded types example** — showcase Result[T]/Validated[T]                                                                                | Low    | 2h     | Docs         |
-| 19  | **Link DOMAIN_LANGUAGE.md from README** — discoverability                                                                                        | Low    | 5m     | Docs         |
-| 20  | **Add `--version` flag auto-detection** — if WithCLIVersion is set, register a `--version` flag automatically (currently only subcommand)        | Medium | 1h     | Feature      |
-| 21  | **Deprecate v1 API with timeline** — ROADMAP has no removal date                                                                                 | Low    | 30m    | Process      |
-| 22  | **Extract `flagtags` library** (v3.0) — ~2000 lines of reusable tag parsing                                                                      | High   | 8h     | Architecture |
-| 23  | **Rename `Get[T]` → `GetService[T]`** (v3.0) — current name is too generic                                                                       | Medium | 2h     | API          |
-| 24  | **Add metrics/observability hooks** — beyond OpenTelemetry spans                                                                                 | Low    | 4h     | Feature      |
-| 25  | **Add enhanced flag validation enums** — beyond current `validate:` tag                                                                          | Low    | 3h     | Feature      |
+| #  | Task                                                                                                                                             | Impact | Effort | Category     |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------ |
+| 1  | **Add `CODECOV_TOKEN` secret to GitHub repo settings**                                                                                           | High   | 5m     | CI           |
+| 2  | **Bump `go.mod` to `go 1.26.4`** when nixpkgs packages it (fixes GO-2026-5037/5038/5039)                                                         | High   | 5m     | Security     |
+| 3  | **Cover `WithPlugin[T]`** — public CLI option with 0% coverage                                                                                   | High   | 30m    | Testing      |
+| 4  | **Cover `PluginRegistrar.TypeHandler`** — plugin registration with 0% coverage                                                                   | High   | 30m    | Testing      |
+| 5  | **Cover `RegisterValidator`** — global validator registration with 0% coverage                                                                   | High   | 20m    | Testing      |
+| 6  | **Cover the validator dispatch chain** (`validateEmail`, `validateURL`, `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`) | High   | 1h     | Testing      |
+| 7  | **Cover `NewManPage`** — public constructor with 0% coverage                                                                                     | Medium | 20m    | Testing      |
+| 8  | **Cover `WithConfigFileLoader`** — public API with 0% coverage                                                                                   | Medium | 20m    | Testing      |
+| 9  | **Cover `WithDoctorLong`** — doctor option with 0% coverage                                                                                      | Low    | 10m    | Testing      |
+| 10 | **Investigate and fix git tag history** — tag v2.0.0–v2.4.0 or document why untagged                                                             | High   | 1h     | Release      |
+| 11 | **Remove or replace BuildFlow pre-commit hook** — every commit bypasses validation                                                               | Medium | 15m    | Tooling      |
+| 12 | **Add fuzz seed corpus** to `testdata/fuzz/` for the 7 fuzz targets                                                                              | Medium | 2h     | Testing      |
+| 13 | **Write v3.0 API design document** — consolidate v2 warts into coherent v3 plan                                                                  | High   | 4h     | Architecture |
+| 14 | **Test `pkg/testutil`** — 372 lines at 0% coverage                                                                                               | Medium | 1h     | Testing      |
+| 15 | **Add separate CI job for examples** — dedicated pass/fail signal for taskctl                                                                    | Low    | 30m    | CI           |
+| 16 | **Improve taskctl coverage** from 67.4% → 80%+                                                                                                   | Medium | 3h     | Testing      |
+| 17 | **Add minimal "hello world" example** — quick start for new users                                                                                | Low    | 1h     | Docs         |
+| 18 | **Write branded types example** — showcase Result[T]/Validated[T]                                                                                | Low    | 2h     | Docs         |
+| 19 | **Link DOMAIN_LANGUAGE.md from README** — discoverability                                                                                        | Low    | 5m     | Docs         |
+| 20 | **Add `--version` flag auto-detection** — if WithCLIVersion is set, register a `--version` flag automatically (currently only subcommand)        | Medium | 1h     | Feature      |
+| 21 | **Deprecate v1 API with timeline** — ROADMAP has no removal date                                                                                 | Low    | 30m    | Process      |
+| 22 | **Extract `flagtags` library** (v3.0) — ~2000 lines of reusable tag parsing                                                                      | High   | 8h     | Architecture |
+| 23 | **Rename `Get[T]` → `GetService[T]`** (v3.0) — current name is too generic                                                                       | Medium | 2h     | API          |
+| 24 | **Add metrics/observability hooks** — beyond OpenTelemetry spans                                                                                 | Low    | 4h     | Feature      |
+| 25 | **Add enhanced flag validation enums** — beyond current `validate:` tag                                                                          | Low    | 3h     | Feature      |
 
 ---
 

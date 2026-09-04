@@ -151,11 +151,11 @@ When I ran `go clean -cache` to clean up space, I **unnecessarily nuked the enti
 When editing `flake.nix` to add the `ci` shell's `shellHook`, I lost the closing brace for the `ci` attrset, producing:
 
 ```nix
-              shellHook = ''
-                export GOTMPDIR="$HOME/.cache/go-tmp"
-                mkdir -p "$GOTMPDIR"
-              '';
-          };   # <-- missing closing brace for `ci = ...`
+    shellHook = ''
+      export GOTMPDIR="$HOME/.cache/go-tmp"
+      mkdir -p "$GOTMPDIR"
+    '';
+};   # <-- missing closing brace for `ci = ...`
 ```
 
 This caused `nix flake check` to fail with a syntax error. I had to read the file and fix it with a second edit. **I should have verified the edit result by viewing the file or running `nix flake check` immediately after editing.**
@@ -185,58 +185,58 @@ I spent significant time (agent search, 15+ shuffle runs, race detection runs, r
 
 ## f) Up to 50 Things to Do Next
 
-| #   | Task                                                                                                  | Priority  | Effort |
-| --- | ----------------------------------------------------------------------------------------------------- | --------- | ------ |
-| 1   | Add `GOTMPDIR` to `.github/workflows/ci.yml` `env:` block                                             | 🔴 High   | 5m     |
-| 2   | Delete stale `cmdguard.test`, `configload.test`, `taskctl` from repo root                             | 🔴 High   | 1m     |
-| 3   | Set `GOTMPDIR` globally (shell profile or `~/.config/environment.d/go.conf`)                          | 🟡 Medium | 5m     |
-| 4   | Add systemd timer or cron job to clean stale `/tmp/go-build*` weekly                                  | 🟡 Medium | 15m    |
-| 5   | Consider `go env -w GOCACHE=/path/on/disk` to move cache off tmpfs                                    | 🟡 Medium | 5m     |
-| 6   | Add `GOMAXPROCS` / resource limits to CI to prevent parallel `/tmp` explosion                         | 🟢 Low    | 10m    |
-| 7   | Add a `just`/nix check for `/tmp` free space before running tests                                     | 🟢 Low    | 10m    |
-| 8   | Document the `/tmp` tmpfs constraint in AGENTS.md gotchas section                                     | 🟡 Medium | 5m     |
-| 9   | Add `GOTMPDIR` to the `devShells.ci` shellHook documentation                                          | 🟢 Low    | 2m     |
-| 10  | Investigate why `tests/integration` has `[no statements]` coverage                                    | 🟡 Medium | 30m    |
-| 11  | Add integration test coverage instrumentation (`-coverpkg=./...`)                                     | 🟡 Medium | 15m    |
-| 12  | Consider Go 1.27 migration (json/v2 becomes default, removes GOEXPERIMENT flag)                       | 🟢 Low    | 2h     |
-| 13  | Review the 26 gopls `stdversion` warnings (json/v2 APIs requiring go1.27)                             | 🟡 Medium | 30m    |
-| 14  | Fix `gopls SA1012` warning in `coverage_improvement_test.go:78` (nil context)                         | 🟢 Low    | 5m     |
-| 15  | Remove unused functions flagged by gopls (`assertNotPanic`, `recordHandlerCall`)                      | 🟢 Low    | 5m     |
-| 16  | Add `go env GOCACHE` size to `buildflow doctor` output (feature request?)                             | 🟢 Low    | —      |
-| 17  | Consider `GOGC` tuning for CI to reduce memory pressure                                               | 🟢 Low    | 10m    |
-| 18  | Add `/tmp` space check to BuildFlow pre-flight (feature request?)                                     | 🟡 Medium | —      |
-| 19  | Audit all other `os.Getenv` calls for the same LookupEnv bug pattern                                  | 🔴 High   | 15m    |
-| 20  | Add unit test for `applyNoColorIfSet` when `NO_COLOR=""` explicitly                                   | 🟡 Medium | 10m    |
-| 21  | Consider adding `t.Parallel()` back to `TestCLINoColorRestoresEnvVar` (now safe with t.Setenv)        | 🟢 Low    | 5m     |
-| 22  | Review `cli_lifecycle_test.go:366` `TestCLINoColorEnvVar` — uses t.Setenv but not marked non-parallel | 🟢 Low    | 5m     |
-| 23  | Add a CI step to clean `/tmp` before test runs                                                        | 🟡 Medium | 5m     |
-| 24  | Pin Go cache size with `go env -w GOFLAGS=-trimpath` to reduce cache bloat                            | 🟢 Low    | 5m     |
-| 25  | Document the GOTMPDIR fix in README "Troubleshooting" section                                         | 🟢 Low    | 10m    |
-| 26  | Add `df -h /tmp` to the `buildflow doctor` diagnostics output                                         | 🟢 Low    | —      |
-| 27  | Consider moving `reports/` dir to `$XDG_CACHE_HOME/cmdguard/reports/`                                 | 🟢 Low    | 15m    |
-| 28  | Add `.cache/` to `.gitignore` if not already (it is via buildflow-managed block)                      | 🟢 Low    | 1m     |
-| 29  | Review if `go.work` should be gitignored (it is, but it's tracked — contradiction?)                   | 🟡 Medium | 10m    |
-| 30  | Audit all `os.Setenv`/`os.Unsetenv` in non-test code for the LookupEnv pattern                        | 🔴 High   | 20m    |
-| 31  | Add integration test that verifies NO_COLOR save/restore under concurrent execution                   | 🟡 Medium | 30m    |
-| 32  | Consider a `golangci-lint` custom linter for `os.Getenv` in save/restore patterns                     | 🟢 Low    | 2h     |
-| 33  | Review fang integration — does fang itself set NO_COLOR?                                              | 🟢 Low    | 15m    |
-| 34  | Check if the `--no-color` flag should also respect `CLICOLOR=0` and `CLICOLOR_FORCE=1`                | 🟢 Low    | 15m    |
-| 35  | Add `GOTMPDIR` to the `devShells.default` documentation in AGENTS.md                                  | 🟢 Low    | 5m     |
-| 36  | Consider nix `mkDerivation` for CI that sets GOTMPDIR declaratively                                   | 🟢 Low    | 30m    |
-| 37  | Add a pre-commit hook check for `/tmp` space                                                          | 🟢 Low    | 10m    |
-| 38  | Review `go test -parallel=32` default — may be too aggressive for tmpfs systems                       | 🟡 Medium | 10m    |
-| 39  | Add `GOFLAGS=-p=4` to limit parallel package compilation                                              | 🟢 Low    | 5m     |
-| 40  | Consider `go test -p=1` for CI to reduce peak `/tmp` usage                                            | 🟡 Medium | 5m     |
-| 41  | Document the `GOTMPDIR` fix in CONTRIBUTING.md                                                        | 🟢 Low    | 5m     |
-| 42  | Add a `Makefile`/nix target `clean-tmp` that cleans `/tmp/go-build*`                                  | 🟢 Low    | 5m     |
-| 43  | Consider `go env -w GOTMPDIR=...` as a global setting (persistent)                                    | 🟡 Medium | 2m     |
-| 44  | Audit all devShell env vars for completeness (GOWORK, GOEXPERIMENT, GOTMPDIR, GOCACHE?)               | 🟡 Medium | 15m    |
-| 45  | Review if `GOCACHE` should also be moved off tmpfs (it's on disk already at ~/.cache)                 | 🟢 Low    | 5m     |
-| 46  | Add a CI badge for disk space monitoring                                                              | 🟢 Low    | —      |
-| 47  | Consider a `nix flake check` that validates GOTMPDIR is set                                           | 🟢 Low    | 15m    |
-| 48  | Review the `ci` devShell — is it actually used by anyone? CI uses setup-go directly                   | 🟡 Medium | 10m    |
-| 49  | Remove the `ci` devShell if unused, or wire CI to use `nix develop .#ci`                              | 🟡 Medium | 30m    |
-| 50  | Add session learnings to AGENTS.md gotchas: "always check df -h /tmp first"                           | 🔴 High   | 5m     |
+| #  | Task                                                                                                  | Priority  | Effort |
+| -- | ----------------------------------------------------------------------------------------------------- | --------- | ------ |
+| 1  | Add `GOTMPDIR` to `.github/workflows/ci.yml` `env:` block                                             | 🔴 High   | 5m     |
+| 2  | Delete stale `cmdguard.test`, `configload.test`, `taskctl` from repo root                             | 🔴 High   | 1m     |
+| 3  | Set `GOTMPDIR` globally (shell profile or `~/.config/environment.d/go.conf`)                          | 🟡 Medium | 5m     |
+| 4  | Add systemd timer or cron job to clean stale `/tmp/go-build*` weekly                                  | 🟡 Medium | 15m    |
+| 5  | Consider `go env -w GOCACHE=/path/on/disk` to move cache off tmpfs                                    | 🟡 Medium | 5m     |
+| 6  | Add `GOMAXPROCS` / resource limits to CI to prevent parallel `/tmp` explosion                         | 🟢 Low    | 10m    |
+| 7  | Add a `just`/nix check for `/tmp` free space before running tests                                     | 🟢 Low    | 10m    |
+| 8  | Document the `/tmp` tmpfs constraint in AGENTS.md gotchas section                                     | 🟡 Medium | 5m     |
+| 9  | Add `GOTMPDIR` to the `devShells.ci` shellHook documentation                                          | 🟢 Low    | 2m     |
+| 10 | Investigate why `tests/integration` has `[no statements]` coverage                                    | 🟡 Medium | 30m    |
+| 11 | Add integration test coverage instrumentation (`-coverpkg=./...`)                                     | 🟡 Medium | 15m    |
+| 12 | Consider Go 1.27 migration (json/v2 becomes default, removes GOEXPERIMENT flag)                       | 🟢 Low    | 2h     |
+| 13 | Review the 26 gopls `stdversion` warnings (json/v2 APIs requiring go1.27)                             | 🟡 Medium | 30m    |
+| 14 | Fix `gopls SA1012` warning in `coverage_improvement_test.go:78` (nil context)                         | 🟢 Low    | 5m     |
+| 15 | Remove unused functions flagged by gopls (`assertNotPanic`, `recordHandlerCall`)                      | 🟢 Low    | 5m     |
+| 16 | Add `go env GOCACHE` size to `buildflow doctor` output (feature request?)                             | 🟢 Low    | —      |
+| 17 | Consider `GOGC` tuning for CI to reduce memory pressure                                               | 🟢 Low    | 10m    |
+| 18 | Add `/tmp` space check to BuildFlow pre-flight (feature request?)                                     | 🟡 Medium | —      |
+| 19 | Audit all other `os.Getenv` calls for the same LookupEnv bug pattern                                  | 🔴 High   | 15m    |
+| 20 | Add unit test for `applyNoColorIfSet` when `NO_COLOR=""` explicitly                                   | 🟡 Medium | 10m    |
+| 21 | Consider adding `t.Parallel()` back to `TestCLINoColorRestoresEnvVar` (now safe with t.Setenv)        | 🟢 Low    | 5m     |
+| 22 | Review `cli_lifecycle_test.go:366` `TestCLINoColorEnvVar` — uses t.Setenv but not marked non-parallel | 🟢 Low    | 5m     |
+| 23 | Add a CI step to clean `/tmp` before test runs                                                        | 🟡 Medium | 5m     |
+| 24 | Pin Go cache size with `go env -w GOFLAGS=-trimpath` to reduce cache bloat                            | 🟢 Low    | 5m     |
+| 25 | Document the GOTMPDIR fix in README "Troubleshooting" section                                         | 🟢 Low    | 10m    |
+| 26 | Add `df -h /tmp` to the `buildflow doctor` diagnostics output                                         | 🟢 Low    | —      |
+| 27 | Consider moving `reports/` dir to `$XDG_CACHE_HOME/cmdguard/reports/`                                 | 🟢 Low    | 15m    |
+| 28 | Add `.cache/` to `.gitignore` if not already (it is via buildflow-managed block)                      | 🟢 Low    | 1m     |
+| 29 | Review if `go.work` should be gitignored (it is, but it's tracked — contradiction?)                   | 🟡 Medium | 10m    |
+| 30 | Audit all `os.Setenv`/`os.Unsetenv` in non-test code for the LookupEnv pattern                        | 🔴 High   | 20m    |
+| 31 | Add integration test that verifies NO_COLOR save/restore under concurrent execution                   | 🟡 Medium | 30m    |
+| 32 | Consider a `golangci-lint` custom linter for `os.Getenv` in save/restore patterns                     | 🟢 Low    | 2h     |
+| 33 | Review fang integration — does fang itself set NO_COLOR?                                              | 🟢 Low    | 15m    |
+| 34 | Check if the `--no-color` flag should also respect `CLICOLOR=0` and `CLICOLOR_FORCE=1`                | 🟢 Low    | 15m    |
+| 35 | Add `GOTMPDIR` to the `devShells.default` documentation in AGENTS.md                                  | 🟢 Low    | 5m     |
+| 36 | Consider nix `mkDerivation` for CI that sets GOTMPDIR declaratively                                   | 🟢 Low    | 30m    |
+| 37 | Add a pre-commit hook check for `/tmp` space                                                          | 🟢 Low    | 10m    |
+| 38 | Review `go test -parallel=32` default — may be too aggressive for tmpfs systems                       | 🟡 Medium | 10m    |
+| 39 | Add `GOFLAGS=-p=4` to limit parallel package compilation                                              | 🟢 Low    | 5m     |
+| 40 | Consider `go test -p=1` for CI to reduce peak `/tmp` usage                                            | 🟡 Medium | 5m     |
+| 41 | Document the `GOTMPDIR` fix in CONTRIBUTING.md                                                        | 🟢 Low    | 5m     |
+| 42 | Add a `Makefile`/nix target `clean-tmp` that cleans `/tmp/go-build*`                                  | 🟢 Low    | 5m     |
+| 43 | Consider `go env -w GOTMPDIR=...` as a global setting (persistent)                                    | 🟡 Medium | 2m     |
+| 44 | Audit all devShell env vars for completeness (GOWORK, GOEXPERIMENT, GOTMPDIR, GOCACHE?)               | 🟡 Medium | 15m    |
+| 45 | Review if `GOCACHE` should also be moved off tmpfs (it's on disk already at ~/.cache)                 | 🟢 Low    | 5m     |
+| 46 | Add a CI badge for disk space monitoring                                                              | 🟢 Low    | —      |
+| 47 | Consider a `nix flake check` that validates GOTMPDIR is set                                           | 🟢 Low    | 15m    |
+| 48 | Review the `ci` devShell — is it actually used by anyone? CI uses setup-go directly                   | 🟡 Medium | 10m    |
+| 49 | Remove the `ci` devShell if unused, or wire CI to use `nix develop .#ci`                              | 🟡 Medium | 30m    |
+| 50 | Add session learnings to AGENTS.md gotchas: "always check df -h /tmp first"                           | 🔴 High   | 5m     |
 
 ---
 

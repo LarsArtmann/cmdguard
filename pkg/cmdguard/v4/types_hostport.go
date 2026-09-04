@@ -8,7 +8,7 @@ import (
 // HostPort combines a hostname and port for network addresses.
 // Use this for config fields that specify network endpoints.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type HostPort struct {
 	host string
 	port Port

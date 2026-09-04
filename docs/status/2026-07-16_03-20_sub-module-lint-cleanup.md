@@ -1,7 +1,7 @@
 # Status Report: Sub-Module Lint Cleanup
 
-**Date:** 2026-07-16 03:20  
-**Session scope:** Ran `golangci-lint run --fix ./...` across all 6 Go modules (core + 5 sub-modules)  
+**Date:** 2026-07-16 03:20\
+**Session scope:** Ran `golangci-lint run --fix ./...` across all 6 Go modules (core + 5 sub-modules)\
 **Verdict:** All modules now lint-clean (0 issues), all sub-module tests pass — **but I introduced a documentation regression and made one test meaningless.**
 
 ---
@@ -81,16 +81,16 @@ I added `github.com/spf13/cobra.Command` to the **global** exhaustruct exclude l
 
 ## e) WHAT WE SHOULD IMPROVE
 
-| #   | Issue                                             | Fix                                                                         |
-| --- | ------------------------------------------------- | --------------------------------------------------------------------------- |
-| 1   | **Restore `#### Audit Log` heading** in AGENTS.md | Re-insert the heading between the lint note and the audit log bullets       |
-| 2   | **Fix or delete `TestHuhRunner_PromptConfirm`**   | Write a real test or remove it                                              |
-| 3   | **Scope the `cobra.Command` exhaustruct exclude** | Replace global exclude with per-file `//nolint:exhaustruct` in `manpage.go` |
-| 4   | **Update exclusion count in AGENTS.md**           | Reflect the new exhaustruct type exclude in the tracking note               |
-| 5   | **Run core tests + workspace build**              | Verify nothing broke from `.golangci.yml` changes                           |
-| 6   | **Run `nix flake check`**                         | Verify format and checks pass                                               |
-| 7   | **Add CHANGELOG entry**                           | Document the sub-module lint fixes                                          |
-| 8   | **Commit the work**                               | Changes are uncommitted (8 files modified, not staged)                      |
+| # | Issue                                             | Fix                                                                         |
+| - | ------------------------------------------------- | --------------------------------------------------------------------------- |
+| 1 | **Restore `#### Audit Log` heading** in AGENTS.md | Re-insert the heading between the lint note and the audit log bullets       |
+| 2 | **Fix or delete `TestHuhRunner_PromptConfirm`**   | Write a real test or remove it                                              |
+| 3 | **Scope the `cobra.Command` exhaustruct exclude** | Replace global exclude with per-file `//nolint:exhaustruct` in `manpage.go` |
+| 4 | **Update exclusion count in AGENTS.md**           | Reflect the new exhaustruct type exclude in the tracking note               |
+| 5 | **Run core tests + workspace build**              | Verify nothing broke from `.golangci.yml` changes                           |
+| 6 | **Run `nix flake check`**                         | Verify format and checks pass                                               |
+| 7 | **Add CHANGELOG entry**                           | Document the sub-module lint fixes                                          |
+| 8 | **Commit the work**                               | Changes are uncommitted (8 files modified, not staged)                      |
 
 ---
 

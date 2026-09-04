@@ -261,58 +261,58 @@ I made 6 code-block edits across 5 `.mdx` files. One of them changed `[][]string
 
 ## f) Up to 50 Things We Should Get Done Next
 
-| #   | Task                                                                                     | Priority | Effort | Source          |
-| --- | ---------------------------------------------------------------------------------------- | -------- | ------ | --------------- |
-| 1   | **Re-run benchmarks after stdout fix** — Execute numbers in PERFORMANCE.md are stale     | P0       | 10min  | This report D1  |
-| 2   | **Run `nix run .#check-all`** — verify the script works end-to-end                       | P0       | 5min   | This report D2  |
-| 3   | **Build website after .mdx edits** — verify no structural breakage                       | P0       | 2min   | This report D5  |
-| 4   | **Implement testableT pattern** — unlock all testutil failure-path testing               | P1       | 30min  | This report D3  |
-| 5   | **Write taskctl error-path tests** — improve from 68.2% to >80%                          | P1       | 60min  | This report D4  |
-| 6   | **Add FR integration test in taskctl** — verify trace files generated on slow/error      | P1       | 30min  | This report D4  |
-| 7   | **Annotate prior status reports** — add resolution banners for bugs fixed this session   | P1       | 15min  | This report D4  |
-| 8   | **Create v4.0.0 GitHub release** — draft release notes highlighting v4 features          | P1       | 20min  | This report c.4 |
-| 9   | **Run `nix run .#check-all` in CI** — wire it into GitHub Actions                        | P2       | 30min  | This report     |
-| 10  | **Add benchmark CI gating** — compare against baseline, fail on regression               | P2       | 60min  | ROADMAP         |
-| 11  | **Improve taskctl coverage further** — target 87.8% to match core package                | P2       | 90min  | Prior reports   |
-| 12  | **Write fuzz tests for type_handler_intwidth.go** — new code paths since v3              | P2       | 45min  | Prior reports   |
-| 13  | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees         | P2       | 30min  | Prior reports   |
-| 14  | **Profile a real taskctl invocation** — find next micro-optimization target              | P2       | 60min  | Prior reports   |
-| 15  | **Add MaxSnapshots config to flightrecorder** — rate limiting / disk protection          | P2       | 45min  | ROADMAP         |
-| 16  | **Add CaptureReasonPanic to flightrecorder** — capture on panic recovery                 | P2       | 30min  | ROADMAP         |
-| 17  | **Add Sync() method to flightrecorder** — flush pending captures                         | P2       | 30min  | ROADMAP         |
-| 18  | **Add Recorder.Status() to flightrecorder** — snapshot stats                             | P2       | 30min  | ROADMAP         |
-| 19  | **Write flightrecorder README** — usage example + go tool trace screenshot               | P2       | 30min  | Prior reports   |
-| 20  | **Add resolution appendices to 3 FR reports** — detailed per-item resolution             | P3       | 30min  | Prior reports   |
-| 21  | **Verify glamour v0.1.0 published = local source** — diff workspace vs published tag     | P2       | 15min  | Prior reports   |
-| 22  | **Consider koanf → lighter config loader** — koanf is heavy for JSON/YAML/TOML → JSON    | P3       | 120min | Prior reports   |
-| 23  | **Expose RenderAnyData directly** — non-table output API                                 | P3       | 30min  | Prior reports   |
-| 24  | **Add structured logging (slog) to flightrecorder** — Log field as slog handler          | P3       | 45min  | Prior reports   |
-| 25  | **Migrate from samber/do v2 to v3** — when released                                      | P3       | 120min | Prior reports   |
-| 26  | **Add `goat` ASCII diagram of v4 command lifecycle** — docs                              | P3       | 60min  | Prior reports   |
-| 27  | **Write blog post: "Why we built cmdguard v4"** — marketing                              | P3       | 120min | Prior reports   |
-| 28  | **Add GitHub Action badge for nix flake check** — README                                 | P3       | 10min  | Prior reports   |
-| 29  | **Consider renaming v4 package to just `cmdguard`** — v3 as deprecation alias            | P3       | 120min | Prior reports   |
-| 30  | **Sponsor/contribute back to samber/do, fang, glamour, huh** — ecosystem health          | P3       | —      | Prior reports   |
-| 31  | **Investigate if COW claim numbers (48%, -10 allocs) still hold for v4** — re-verify     | P2       | 30min  | This report     |
-| 32  | **Add slog handler integration test** — verify structured logging works                  | P3       | 30min  | Prior reports   |
-| 33  | **Write CONTRIBUTING.md section on testing patterns** — document testableT               | P3       | 20min  | This report     |
-| 34  | **Add website preview check to check-all** — `astro build` in CI                         | P3       | 15min  | This report     |
-| 35  | **Add `--output=json` error shape test** — verify structured error rendering             | P2       | 30min  | Prior reports   |
-| 36  | **Verify all .golangci.yml exclusions still justified** — quarterly audit                | P3       | 15min  | Prior reports   |
-| 37  | **Consider v4.1.0 release** — once P0/P1 items done                                      | P3       | 30min  | Prior reports   |
-| 38  | **Add `gofmt -s` check to check-all** — already in treefmt but explicit                  | P3       | 5min   | Prior reports   |
-| 39  | **Document why each sub-module exists** — design rationale doc                           | P3       | 60min  | Prior reports   |
-| 40  | **Add benchmark comparing v4 to raw cobra** — show overhead is minimal                   | P3       | 60min  | Prior reports   |
-| 41  | **Add configurable timestamp format to flightrecorder** — user-chosen precision/timezone | P3       | 30min  | ROADMAP         |
-| 42  | **Add CaptureReasonTimeout to flightrecorder** — context-deadline capture                | P3       | 30min  | ROADMAP         |
-| 43  | **Verify fang v2.0.1 is latest** — dependency freshness                                  | P3       | 5min   | Prior reports   |
-| 44  | **Add doctor command to taskctl example** — showcase DoctorCommand                       | P3       | 30min  | Prior reports   |
-| 45  | **Test audit log export in taskctl** — 11-format export verification                     | P2       | 45min  | Prior reports   |
-| 46  | **Add shell completion v2** — type-aware dynamic completion                              | P3       | 120min | ROADMAP         |
-| 47  | **Add plugin marketplace** — community type handlers                                     | P3       | 240min | ROADMAP         |
-| 48  | **Add gRPC middleware sub-module** — command-level gRPC tracing                          | P3       | 120min | ROADMAP         |
-| 49  | **Add web-based CLI preview** — render command tree as HTML                              | P3       | 180min | ROADMAP         |
-| 50  | **Add ContextualCaptureReason to flightrecorder** — custom capture triggers              | P3       | 45min  | ROADMAP         |
+| #  | Task                                                                                     | Priority | Effort | Source          |
+| -- | ---------------------------------------------------------------------------------------- | -------- | ------ | --------------- |
+| 1  | **Re-run benchmarks after stdout fix** — Execute numbers in PERFORMANCE.md are stale     | P0       | 10min  | This report D1  |
+| 2  | **Run `nix run .#check-all`** — verify the script works end-to-end                       | P0       | 5min   | This report D2  |
+| 3  | **Build website after .mdx edits** — verify no structural breakage                       | P0       | 2min   | This report D5  |
+| 4  | **Implement testableT pattern** — unlock all testutil failure-path testing               | P1       | 30min  | This report D3  |
+| 5  | **Write taskctl error-path tests** — improve from 68.2% to >80%                          | P1       | 60min  | This report D4  |
+| 6  | **Add FR integration test in taskctl** — verify trace files generated on slow/error      | P1       | 30min  | This report D4  |
+| 7  | **Annotate prior status reports** — add resolution banners for bugs fixed this session   | P1       | 15min  | This report D4  |
+| 8  | **Create v4.0.0 GitHub release** — draft release notes highlighting v4 features          | P1       | 20min  | This report c.4 |
+| 9  | **Run `nix run .#check-all` in CI** — wire it into GitHub Actions                        | P2       | 30min  | This report     |
+| 10 | **Add benchmark CI gating** — compare against baseline, fail on regression               | P2       | 60min  | ROADMAP         |
+| 11 | **Improve taskctl coverage further** — target 87.8% to match core package                | P2       | 90min  | Prior reports   |
+| 12 | **Write fuzz tests for type_handler_intwidth.go** — new code paths since v3              | P2       | 45min  | Prior reports   |
+| 13 | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees         | P2       | 30min  | Prior reports   |
+| 14 | **Profile a real taskctl invocation** — find next micro-optimization target              | P2       | 60min  | Prior reports   |
+| 15 | **Add MaxSnapshots config to flightrecorder** — rate limiting / disk protection          | P2       | 45min  | ROADMAP         |
+| 16 | **Add CaptureReasonPanic to flightrecorder** — capture on panic recovery                 | P2       | 30min  | ROADMAP         |
+| 17 | **Add Sync() method to flightrecorder** — flush pending captures                         | P2       | 30min  | ROADMAP         |
+| 18 | **Add Recorder.Status() to flightrecorder** — snapshot stats                             | P2       | 30min  | ROADMAP         |
+| 19 | **Write flightrecorder README** — usage example + go tool trace screenshot               | P2       | 30min  | Prior reports   |
+| 20 | **Add resolution appendices to 3 FR reports** — detailed per-item resolution             | P3       | 30min  | Prior reports   |
+| 21 | **Verify glamour v0.1.0 published = local source** — diff workspace vs published tag     | P2       | 15min  | Prior reports   |
+| 22 | **Consider koanf → lighter config loader** — koanf is heavy for JSON/YAML/TOML → JSON    | P3       | 120min | Prior reports   |
+| 23 | **Expose RenderAnyData directly** — non-table output API                                 | P3       | 30min  | Prior reports   |
+| 24 | **Add structured logging (slog) to flightrecorder** — Log field as slog handler          | P3       | 45min  | Prior reports   |
+| 25 | **Migrate from samber/do v2 to v3** — when released                                      | P3       | 120min | Prior reports   |
+| 26 | **Add `goat` ASCII diagram of v4 command lifecycle** — docs                              | P3       | 60min  | Prior reports   |
+| 27 | **Write blog post: "Why we built cmdguard v4"** — marketing                              | P3       | 120min | Prior reports   |
+| 28 | **Add GitHub Action badge for nix flake check** — README                                 | P3       | 10min  | Prior reports   |
+| 29 | **Consider renaming v4 package to just `cmdguard`** — v3 as deprecation alias            | P3       | 120min | Prior reports   |
+| 30 | **Sponsor/contribute back to samber/do, fang, glamour, huh** — ecosystem health          | P3       | —      | Prior reports   |
+| 31 | **Investigate if COW claim numbers (48%, -10 allocs) still hold for v4** — re-verify     | P2       | 30min  | This report     |
+| 32 | **Add slog handler integration test** — verify structured logging works                  | P3       | 30min  | Prior reports   |
+| 33 | **Write CONTRIBUTING.md section on testing patterns** — document testableT               | P3       | 20min  | This report     |
+| 34 | **Add website preview check to check-all** — `astro build` in CI                         | P3       | 15min  | This report     |
+| 35 | **Add `--output=json` error shape test** — verify structured error rendering             | P2       | 30min  | Prior reports   |
+| 36 | **Verify all .golangci.yml exclusions still justified** — quarterly audit                | P3       | 15min  | Prior reports   |
+| 37 | **Consider v4.1.0 release** — once P0/P1 items done                                      | P3       | 30min  | Prior reports   |
+| 38 | **Add `gofmt -s` check to check-all** — already in treefmt but explicit                  | P3       | 5min   | Prior reports   |
+| 39 | **Document why each sub-module exists** — design rationale doc                           | P3       | 60min  | Prior reports   |
+| 40 | **Add benchmark comparing v4 to raw cobra** — show overhead is minimal                   | P3       | 60min  | Prior reports   |
+| 41 | **Add configurable timestamp format to flightrecorder** — user-chosen precision/timezone | P3       | 30min  | ROADMAP         |
+| 42 | **Add CaptureReasonTimeout to flightrecorder** — context-deadline capture                | P3       | 30min  | ROADMAP         |
+| 43 | **Verify fang v2.0.1 is latest** — dependency freshness                                  | P3       | 5min   | Prior reports   |
+| 44 | **Add doctor command to taskctl example** — showcase DoctorCommand                       | P3       | 30min  | Prior reports   |
+| 45 | **Test audit log export in taskctl** — 11-format export verification                     | P2       | 45min  | Prior reports   |
+| 46 | **Add shell completion v2** — type-aware dynamic completion                              | P3       | 120min | ROADMAP         |
+| 47 | **Add plugin marketplace** — community type handlers                                     | P3       | 240min | ROADMAP         |
+| 48 | **Add gRPC middleware sub-module** — command-level gRPC tracing                          | P3       | 120min | ROADMAP         |
+| 49 | **Add web-based CLI preview** — render command tree as HTML                              | P3       | 180min | ROADMAP         |
+| 50 | **Add ContextualCaptureReason to flightrecorder** — custom capture triggers              | P3       | 45min  | ROADMAP         |
 
 ---
 

@@ -1,7 +1,7 @@
 # ADR-002: Lint Strategy and Exclusion Policy
 
-**Status:** Accepted  
-**Date:** 2026-07-11  
+**Status:** Accepted\
+**Date:** 2026-07-11\
 **Deciders:** Lars Artmann
 
 ## Context

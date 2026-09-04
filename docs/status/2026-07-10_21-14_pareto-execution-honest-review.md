@@ -120,58 +120,58 @@ The project uses Nix for build automation. I never verified the flake still work
 
 ## f) Up to 50 Things to Get Done Next
 
-| #   | Task                                                                    | Effort | Priority |
-| --- | ----------------------------------------------------------------------- | ------ | -------- |
-| 1   | Add `WithoutSilenceUsage()` option                                      | 10m    | P0       |
-| 2   | Add regression test: WithSilenceUsage controls root behavior            | 10m    | P0       |
-| 3   | Add regression test: WithPlugin returns error on failed Register()      | 10m    | P0       |
-| 4   | Add regression test: RegisterTypeHandler returns error on nil typ       | 5m     | P0       |
-| 5   | Add regression test: jsonLoader recursive behavior matches expectations | 15m    | P0       |
-| 6   | Fix 3 wrapcheck issues properly (wrap external errors)                  | 15m    | P1       |
-| 7   | Refactor globalTypeRegistry into injected dependency                    | 1h     | P1       |
-| 8   | Refactor globalValidators into injected dependency                      | 30m    | P1       |
-| 9   | Refactor regexCache into injected dependency                            | 20m    | P1       |
-| 10  | Refactor argsKey/configKey into non-global pattern                      | 20m    | P1       |
-| 11  | Split `initialize()` into focused helpers                               | 30m    | P1       |
-| 12  | Split `registerKinds()` into per-kind functions                         | 20m    | P1       |
-| 13  | Split `registerCustomTypes()` into per-type functions                   | 15m    | P1       |
-| 14  | Remove ireturn exclusions — return concrete types or document           | 1h     | P1       |
-| 15  | Remove paralleltest exclusion — fix global-state test isolation         | 30m    | P1       |
-| 16  | Add ExampleNewCLI godoc test                                            | 15m    | P2       |
-| 17  | Add ExampleNewCommand godoc test                                        | 15m    | P2       |
-| 18  | Add ExampleAddCommand godoc test                                        | 15m    | P2       |
-| 19  | Create examples/docs-generator/main.go                                  | 15m    | P2       |
-| 20  | Add fuzz seed corpus (2-3 seeds per target)                             | 30m    | P2       |
-| 21  | gopls infertypeargs sweep (~100+ fixes)                                 | 30m    | P2       |
-| 22  | Run CI workflow once to verify it works                                 | 15m    | P2       |
-| 23  | Update AGENTS.md with honest lint strategy                              | 15m    | P2       |
-| 24  | Fix AGENTS.md duplicate prompts.go entry                                | 2m     | P2       |
-| 25  | Run `nix flake check` after all changes                                 | 5m     | P2       |
-| 26  | Verify examples/taskctl compiles and runs                               | 10m    | P2       |
-| 27  | Extract koanf to optional sub-module (behind build tag)                 | 45m    | P2       |
-| 28  | Add flake.nix sub-module build checks                                   | 20m    | P2       |
-| 29  | Audit PERFORMANCE.md for stale v2 refs                                  | 10m    | P2       |
-| 30  | Audit DOMAIN_LANGUAGE.md for stale v2 refs                              | 10m    | P2       |
-| 31  | Add Middleware context propagation (v3.1 breaking)                      | 2h     | P3       |
-| 32  | Rename Get[T] → GetService[T] (v3.1 breaking)                           | 1h     | P3       |
-| 33  | Make RegisterInScope generic (v3.1 breaking)                            | 1h     | P3       |
-| 34  | Remove or redesign Package() (v3.1 breaking)                            | 1h     | P3       |
-| 35  | Remove SetConfig (v3.1 breaking)                                        | 30m    | P3       |
-| 36  | Add CODECOV_TOKEN to GitHub repo settings                               | 5m     | P3       |
-| 37  | Create second example app (different domain)                            | 2h     | P3       |
-| 38  | Add benchmark regression thresholds in CI                               | 30m    | P3       |
-| 39  | Add test-all-examples-in-CI                                             | 30m    | P3       |
-| 40  | Extract flag-tags to github.com/larsartmann/flagtags                    | 2h     | P4       |
-| 41  | Service-owned config design (ADR)                                       | 1h     | P4       |
-| 42  | Command-level audit middleware                                          | 2h     | P4       |
-| 43  | Built-in audit-log subcommand                                           | 1h     | P4       |
-| 44  | Consider making fang optional (plain cobra fallback)                    | 2h     | P4       |
-| 45  | FlagRegistry interface abstraction                                      | 1h     | P4       |
-| 46  | Custom per-flag validation hooks                                        | 1h     | P4       |
-| 47  | Enhanced flag validation enums                                          | 1h     | P4       |
-| 48  | Metrics/hooks for custom observability                                  | 2h     | P4       |
-| 49  | Branded-ID example app                                                  | 1h     | P4       |
-| 50  | Write docs/MIGRATION_FROM_COBRA.md (referenced but may not exist)       | 30m    | P4       |
+| #  | Task                                                                    | Effort | Priority |
+| -- | ----------------------------------------------------------------------- | ------ | -------- |
+| 1  | Add `WithoutSilenceUsage()` option                                      | 10m    | P0       |
+| 2  | Add regression test: WithSilenceUsage controls root behavior            | 10m    | P0       |
+| 3  | Add regression test: WithPlugin returns error on failed Register()      | 10m    | P0       |
+| 4  | Add regression test: RegisterTypeHandler returns error on nil typ       | 5m     | P0       |
+| 5  | Add regression test: jsonLoader recursive behavior matches expectations | 15m    | P0       |
+| 6  | Fix 3 wrapcheck issues properly (wrap external errors)                  | 15m    | P1       |
+| 7  | Refactor globalTypeRegistry into injected dependency                    | 1h     | P1       |
+| 8  | Refactor globalValidators into injected dependency                      | 30m    | P1       |
+| 9  | Refactor regexCache into injected dependency                            | 20m    | P1       |
+| 10 | Refactor argsKey/configKey into non-global pattern                      | 20m    | P1       |
+| 11 | Split `initialize()` into focused helpers                               | 30m    | P1       |
+| 12 | Split `registerKinds()` into per-kind functions                         | 20m    | P1       |
+| 13 | Split `registerCustomTypes()` into per-type functions                   | 15m    | P1       |
+| 14 | Remove ireturn exclusions — return concrete types or document           | 1h     | P1       |
+| 15 | Remove paralleltest exclusion — fix global-state test isolation         | 30m    | P1       |
+| 16 | Add ExampleNewCLI godoc test                                            | 15m    | P2       |
+| 17 | Add ExampleNewCommand godoc test                                        | 15m    | P2       |
+| 18 | Add ExampleAddCommand godoc test                                        | 15m    | P2       |
+| 19 | Create examples/docs-generator/main.go                                  | 15m    | P2       |
+| 20 | Add fuzz seed corpus (2-3 seeds per target)                             | 30m    | P2       |
+| 21 | gopls infertypeargs sweep (~100+ fixes)                                 | 30m    | P2       |
+| 22 | Run CI workflow once to verify it works                                 | 15m    | P2       |
+| 23 | Update AGENTS.md with honest lint strategy                              | 15m    | P2       |
+| 24 | Fix AGENTS.md duplicate prompts.go entry                                | 2m     | P2       |
+| 25 | Run `nix flake check` after all changes                                 | 5m     | P2       |
+| 26 | Verify examples/taskctl compiles and runs                               | 10m    | P2       |
+| 27 | Extract koanf to optional sub-module (behind build tag)                 | 45m    | P2       |
+| 28 | Add flake.nix sub-module build checks                                   | 20m    | P2       |
+| 29 | Audit PERFORMANCE.md for stale v2 refs                                  | 10m    | P2       |
+| 30 | Audit DOMAIN_LANGUAGE.md for stale v2 refs                              | 10m    | P2       |
+| 31 | Add Middleware context propagation (v3.1 breaking)                      | 2h     | P3       |
+| 32 | Rename Get[T] → GetService[T] (v3.1 breaking)                           | 1h     | P3       |
+| 33 | Make RegisterInScope generic (v3.1 breaking)                            | 1h     | P3       |
+| 34 | Remove or redesign Package() (v3.1 breaking)                            | 1h     | P3       |
+| 35 | Remove SetConfig (v3.1 breaking)                                        | 30m    | P3       |
+| 36 | Add CODECOV_TOKEN to GitHub repo settings                               | 5m     | P3       |
+| 37 | Create second example app (different domain)                            | 2h     | P3       |
+| 38 | Add benchmark regression thresholds in CI                               | 30m    | P3       |
+| 39 | Add test-all-examples-in-CI                                             | 30m    | P3       |
+| 40 | Extract flag-tags to github.com/larsartmann/flagtags                    | 2h     | P4       |
+| 41 | Service-owned config design (ADR)                                       | 1h     | P4       |
+| 42 | Command-level audit middleware                                          | 2h     | P4       |
+| 43 | Built-in audit-log subcommand                                           | 1h     | P4       |
+| 44 | Consider making fang optional (plain cobra fallback)                    | 2h     | P4       |
+| 45 | FlagRegistry interface abstraction                                      | 1h     | P4       |
+| 46 | Custom per-flag validation hooks                                        | 1h     | P4       |
+| 47 | Enhanced flag validation enums                                          | 1h     | P4       |
+| 48 | Metrics/hooks for custom observability                                  | 2h     | P4       |
+| 49 | Branded-ID example app                                                  | 1h     | P4       |
+| 50 | Write docs/MIGRATION_FROM_COBRA.md (referenced but may not exist)       | 30m    | P4       |
 
 ---
 

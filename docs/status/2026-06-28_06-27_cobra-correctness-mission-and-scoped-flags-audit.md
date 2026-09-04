@@ -28,14 +28,14 @@ not wired into the execution path, is not committed, and is not documented anywh
 
 ### Today's fix — the Cobra-correctness contract (uncommitted, ready to commit)
 
-| #   | Change                                                                                               | File                       | Verified                  |
-| --- | ---------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------- |
-| 1   | **`SilenceUsage = true` by default**                                                                 | `cli.go`                   | ✅ test + runtime         |
-| 2   | **Public `ExitCode(err) int`** helper (0 on nil, `ExitCoder` code or 1)                              | `cli_errors_json.go`       | ✅ 3 tests                |
-| 3   | **`ExecuteAndExit` uses public `ExitCode`** (single source of truth)                                 | `cli.go`                   | ✅ build                  |
-| 4   | **Flagship example fixed** — no double-print, correct exit codes                                     | `examples/taskctl/main.go` | ✅ `version`→0, bad cmd→1 |
-| 5   | **README rewritten** — "Why" leads with correctness wins + new "Error handling & exit codes" section | `README.md`                | ✅                        |
-| 6   | **AGENTS.md + docs/API.md** — contract documented, SilenceUsage marked default                       | `AGENTS.md`, `docs/API.md` | ✅                        |
+| # | Change                                                                                               | File                       | Verified                  |
+| - | ---------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------- |
+| 1 | **`SilenceUsage = true` by default**                                                                 | `cli.go`                   | ✅ test + runtime         |
+| 2 | **Public `ExitCode(err) int`** helper (0 on nil, `ExitCoder` code or 1)                              | `cli_errors_json.go`       | ✅ 3 tests                |
+| 3 | **`ExecuteAndExit` uses public `ExitCode`** (single source of truth)                                 | `cli.go`                   | ✅ build                  |
+| 4 | **Flagship example fixed** — no double-print, correct exit codes                                     | `examples/taskctl/main.go` | ✅ `version`→0, bad cmd→1 |
+| 5 | **README rewritten** — "Why" leads with correctness wins + new "Error handling & exit codes" section | `README.md`                | ✅                        |
+| 6 | **AGENTS.md + docs/API.md** — contract documented, SilenceUsage marked default                       | `AGENTS.md`, `docs/API.md` | ✅                        |
 
 **Evidence the example is now correct:**
 
@@ -193,33 +193,33 @@ check`. Extract a `parseLocalTag` helper — 2 minutes of work.
 
 Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygiene → roadmap).
 
-| #   | Task                                                                                                               | Impact                   | Effort             |
-| --- | ------------------------------------------------------------------------------------------------------------------ | ------------------------ | ------------------ |
-| 1   | **Commit today's cobra-correctness fix** (SilenceUsage default + `ExitCode` + example fix + docs)                  | 🔴 mission-critical      | done (just commit) |
-| 2   | **Finish + wire scoped flags**: `cli.go` use `RegisterScopedFlags`; `WithLocalFlagGroup` command option; commit it | 🔴 closes a real footgun | M                  |
-| 3   | Extract `parseLocalTag` helper → fix `config_parsing.go` cyclomatic lint → `nix flake check` green                 | 🔴 unblocks release      | S                  |
-| 4   | Add **failure-cleanup hook** (`WithCleanup` / `OnRunError`) so teardown runs on RunE error too                     | 🔴 mission               | M                  |
-| 5   | **Audit every default** against a "Cobra footguns off by default" checklist; document in AGENTS                    | 🔴 mission               | S                  |
-| 6   | Set `CODECOV_TOKEN` secret in GitHub                                                                               | hygiene                  | 5m                 |
-| 7   | Bump `go.mod` → `go 1.26.4` once nixpkgs ships it (CVEs GO-2026-5037/8/9)                                          | security                 | 5m                 |
-| 8   | Update FEATURES.md / CHANGELOG.md / ROADMAP.md for: `ExitCode`, SilenceUsage default, scoped flags                 | docs                     | S                  |
-| 9   | Add `examples/` execution to CI (run each example's tests)                                                         | reliability              | S                  |
-| 10  | Own error display uniformly (fang-off path prints via cobra; make cmdguard the single owner)                       | mission                  | M                  |
-| 11  | Add a second example app focused on a different domain (e.g. server/devtool) to validate the contract              | adoption                 | M                  |
-| 12  | Reset-global-state audit: ensure parallel tests don't pollute the shared COW registries (`t.Cleanup`)              | reliability              | M                  |
-| 13  | Write `docs/COBRA_FOOTGUNS.md` — the explicit list of traps cmdguard closes (marketing + clarity)                  | adoption                 | S                  |
-| 14  | Add fuzz corpus under `testdata/fuzz/` for flag parsing                                                            | robustness               | S                  |
-| 15  | Add `FlagRegistry` interface abstraction (enables mocking / alt impls)                                             | extensibility            | M                  |
-| 16  | Branded-ID example (`types_enum.go` showcase)                                                                      | adoption                 | S                  |
-| 17  | `examples/docs-generator/` app exercising `GenerateDocs`                                                           | adoption                 | S                  |
-| 18  | Deprecation timeline for v1 API                                                                                    | clarity                  | S                  |
-| 19  | Custom validation hooks (per-flag, beyond `required`)                                                              | power                    | M                  |
-| 20  | Metrics/hooks observability beyond OTel                                                                            | ops                      | L                  |
-| 21  | v3.0 API design document (scope before any code)                                                                   | strategic                | L                  |
-| 22  | `flagtags` library extraction (defer to v3; stabilize tag format first)                                            | strategic                | L                  |
-| 23  | Rename `Get[T]`→`GetService[T]` (v3 breaking)                                                                      | clarity                  | M                  |
-| 24  | Generic `RegisterInScope[T]` (v3 breaking)                                                                         | type-safety              | M                  |
-| 25  | Remove `SetConfig` footgun (v3 breaking)                                                                           | safety                   | S                  |
+| #  | Task                                                                                                               | Impact                   | Effort             |
+| -- | ------------------------------------------------------------------------------------------------------------------ | ------------------------ | ------------------ |
+| 1  | **Commit today's cobra-correctness fix** (SilenceUsage default + `ExitCode` + example fix + docs)                  | 🔴 mission-critical      | done (just commit) |
+| 2  | **Finish + wire scoped flags**: `cli.go` use `RegisterScopedFlags`; `WithLocalFlagGroup` command option; commit it | 🔴 closes a real footgun | M                  |
+| 3  | Extract `parseLocalTag` helper → fix `config_parsing.go` cyclomatic lint → `nix flake check` green                 | 🔴 unblocks release      | S                  |
+| 4  | Add **failure-cleanup hook** (`WithCleanup` / `OnRunError`) so teardown runs on RunE error too                     | 🔴 mission               | M                  |
+| 5  | **Audit every default** against a "Cobra footguns off by default" checklist; document in AGENTS                    | 🔴 mission               | S                  |
+| 6  | Set `CODECOV_TOKEN` secret in GitHub                                                                               | hygiene                  | 5m                 |
+| 7  | Bump `go.mod` → `go 1.26.4` once nixpkgs ships it (CVEs GO-2026-5037/8/9)                                          | security                 | 5m                 |
+| 8  | Update FEATURES.md / CHANGELOG.md / ROADMAP.md for: `ExitCode`, SilenceUsage default, scoped flags                 | docs                     | S                  |
+| 9  | Add `examples/` execution to CI (run each example's tests)                                                         | reliability              | S                  |
+| 10 | Own error display uniformly (fang-off path prints via cobra; make cmdguard the single owner)                       | mission                  | M                  |
+| 11 | Add a second example app focused on a different domain (e.g. server/devtool) to validate the contract              | adoption                 | M                  |
+| 12 | Reset-global-state audit: ensure parallel tests don't pollute the shared COW registries (`t.Cleanup`)              | reliability              | M                  |
+| 13 | Write `docs/COBRA_FOOTGUNS.md` — the explicit list of traps cmdguard closes (marketing + clarity)                  | adoption                 | S                  |
+| 14 | Add fuzz corpus under `testdata/fuzz/` for flag parsing                                                            | robustness               | S                  |
+| 15 | Add `FlagRegistry` interface abstraction (enables mocking / alt impls)                                             | extensibility            | M                  |
+| 16 | Branded-ID example (`types_enum.go` showcase)                                                                      | adoption                 | S                  |
+| 17 | `examples/docs-generator/` app exercising `GenerateDocs`                                                           | adoption                 | S                  |
+| 18 | Deprecation timeline for v1 API                                                                                    | clarity                  | S                  |
+| 19 | Custom validation hooks (per-flag, beyond `required`)                                                              | power                    | M                  |
+| 20 | Metrics/hooks observability beyond OTel                                                                            | ops                      | L                  |
+| 21 | v3.0 API design document (scope before any code)                                                                   | strategic                | L                  |
+| 22 | `flagtags` library extraction (defer to v3; stabilize tag format first)                                            | strategic                | L                  |
+| 23 | Rename `Get[T]`→`GetService[T]` (v3 breaking)                                                                      | clarity                  | M                  |
+| 24 | Generic `RegisterInScope[T]` (v3 breaking)                                                                         | type-safety              | M                  |
+| 25 | Remove `SetConfig` footgun (v3 breaking)                                                                           | safety                   | S                  |
 
 ---
 

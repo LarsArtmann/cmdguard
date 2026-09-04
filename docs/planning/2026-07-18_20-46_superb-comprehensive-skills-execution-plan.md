@@ -27,14 +27,14 @@
 
 ### Verschlimmbesserung threats (explicitly avoided)
 
-| #   | Threat                                                  | Why it would make things worse                                                          | Mitigation in this plan                                                     |
-| --- | ------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| V1  | Renaming `TypeHandler` → `TypeCodec`                    | BREAKING public API change; v3 just shipped; would force v4                             | Report only; do NOT execute without explicit user approval                  |
-| V2  | Refactoring the 5 accepted clone groups                 | Team already accepted them for documented reasons (abstraction cost > duplication cost) | Document decisions, do not refactor                                         |
-| V3  | Blanket-annotating 40+ old status reports               | This is the exact incident that created the `update-old-docs` skill                     | Per-file judgment, annotate only files where a reader would clearly benefit |
-| V4  | Rebuilding living docs from scratch                     | `docs-health` says "upsert, don't rewrite"; nuance lives in current docs                | Verify in place, patch drift only                                           |
-| V5  | Generating low-effort HTML reports to tick skill boxes  | Noise devalues the signal reports                                                       | Each report cites `file:line` evidence and records rationale                |
-| V6  | Renaming `Scope`, `BranchingFlowContext`, branded types | Names are already honest; churning them breaks consumers                                | Preserve; call out in strengths                                             |
+| #  | Threat                                                  | Why it would make things worse                                                          | Mitigation in this plan                                                     |
+| -- | ------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| V1 | Renaming `TypeHandler` → `TypeCodec`                    | BREAKING public API change; v3 just shipped; would force v4                             | Report only; do NOT execute without explicit user approval                  |
+| V2 | Refactoring the 5 accepted clone groups                 | Team already accepted them for documented reasons (abstraction cost > duplication cost) | Document decisions, do not refactor                                         |
+| V3 | Blanket-annotating 40+ old status reports               | This is the exact incident that created the `update-old-docs` skill                     | Per-file judgment, annotate only files where a reader would clearly benefit |
+| V4 | Rebuilding living docs from scratch                     | `docs-health` says "upsert, don't rewrite"; nuance lives in current docs                | Verify in place, patch drift only                                           |
+| V5 | Generating low-effort HTML reports to tick skill boxes  | Noise devalues the signal reports                                                       | Each report cites `file:line` evidence and records rationale                |
+| V6 | Renaming `Scope`, `BranchingFlowContext`, branded types | Names are already honest; churning them breaks consumers                                | Preserve; call out in strengths                                             |
 
 ### Skills coverage matrix
 

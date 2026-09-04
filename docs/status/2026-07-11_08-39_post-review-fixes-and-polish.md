@@ -163,58 +163,58 @@ Instead I said "T13-T15: Verify existing tests for WithCleanup/doctor/version (a
 
 ## f) Up to 50 Things to Get Done Next
 
-| #   | Task                                                                       | Effort | Priority |
-| --- | -------------------------------------------------------------------------- | ------ | -------- |
-| 1   | Commit the 5 uncommitted files (ADRs, DOMAIN_LANGUAGE, CONTRIBUTING, test) | 2m     | P0       |
-| 2   | Link ADR-002/003 from AGENTS.md and CONTRIBUTING.md                        | 5m     | P0       |
-| 3   | Fix tagliatelle nolint in config_file_integration_test.go                  | 5m     | P0       |
-| 4   | Investigate nested config JSON key-matching: flag names vs field names     | 30m    | P0       |
-| 5   | Document config file key-matching behavior in AGENTS.md gotchas            | 10m    | P0       |
-| 6   | Deep nolint audit: check each of 42 directives for relevance               | 45m    | P1       |
-| 7   | Check `recvcheck` exclusions: are pointer receivers needed?                | 15m    | P1       |
-| 8   | Check `exhaustive` exclusions: are all switch cases handled?               | 10m    | P1       |
-| 9   | Check `dupl` exclusions in type_handler_intwidth.go: extract shared code?  | 15m    | P1       |
-| 10  | Check `containedctx` in flow_context.go: is embedded context needed?       | 15m    | P1       |
-| 11  | Write test: config file with 3-level nested structs                        | 15m    | P1       |
-| 12  | Write test: config file with array/slice values                            | 15m    | P1       |
-| 13  | Write test: config file with env var interpolation (`$HOME` in paths)      | 10m    | P1       |
-| 14  | Add `go vet` as a separate CI check                                        | 5m     | P1       |
-| 15  | Run CI workflow via `act` or push trigger                                  | 15m    | P1       |
-| 16  | Add flake.nix sub-module build checks                                      | 20m    | P1       |
-| 17  | Extract koanf to optional sub-module (removes 4 deps from core)            | 45m    | P2       |
-| 18  | Write ADR-004: Config File Key-Matching Strategy                           | 20m    | P2       |
-| 19  | Add doc-drift lint script (grep for deleted features in docs)              | 15m    | P2       |
-| 20  | Add Dependabot/Renovate config for automated dep updates                   | 15m    | P2       |
-| 21  | Write ADR-005: Sub-Module Isolation Strategy                               | 20m    | P2       |
-| 22  | Add integration test for plugin system end-to-end                          | 20m    | P2       |
-| 23  | Add integration test for audit log export (11 formats)                     | 30m    | P2       |
-| 24  | Add integration test for signal handling + graceful shutdown               | 20m    | P2       |
-| 25  | Write test: doctor command with failing DI health check                    | 10m    | P2       |
-| 26  | Write test: version command with commit hash                               | 10m    | P2       |
-| 27  | Add coverage badge to README (needs CI integration)                        | 30m    | P2       |
-| 28  | Add semver check to CI (ensures no breaking changes in patch)              | 30m    | P3       |
-| 29  | Create second example app (different domain than taskctl)                  | 2h     | P3       |
-| 30  | Add Middleware context propagation (v3.1 breaking)                         | 2h     | P3       |
-| 31  | Rename Get[T] → GetService[T] (v3.1 breaking)                              | 1h     | P3       |
-| 32  | Make RegisterInScope generic (v3.1 breaking)                               | 1h     | P3       |
-| 33  | Remove or redesign Package() (v3.1 breaking)                               | 1h     | P3       |
-| 34  | Remove SetConfig — mutating CLI config post-construction is unsafe         | 30m    | P3       |
-| 35  | Add benchmark regression thresholds in CI                                  | 30m    | P3       |
-| 36  | Test all examples in CI                                                    | 30m    | P3       |
-| 37  | Extract flag-tags to github.com/larsartmann/flagtags                       | 2h     | P4       |
-| 38  | Service-owned config design (ADR)                                          | 1h     | P4       |
-| 39  | Command-level audit middleware                                             | 2h     | P4       |
-| 40  | Built-in audit-log subcommand                                              | 1h     | P4       |
-| 41  | Consider making fang optional (plain cobra fallback)                       | 2h     | P4       |
-| 42  | FlagRegistry interface abstraction                                         | 1h     | P4       |
-| 43  | Custom per-flag validation hooks                                           | 1h     | P4       |
-| 44  | Enhanced flag validation enums                                             | 1h     | P4       |
-| 45  | Metrics/hooks for custom observability                                     | 2h     | P4       |
-| 46  | Branded-ID example app                                                     | 1h     | P4       |
-| 47  | Add property-based testing for flag parsing                                | 1h     | P3       |
-| 48  | Add CODECOV_TOKEN to GitHub repo settings                                  | 5m     | P3       |
-| 49  | Add godoclint compliance for all exported functions                        | 1h     | P2       |
-| 50  | Add `go vet` + `golangci-lint` to CI for sub-modules                       | 15m    | P1       |
+| #  | Task                                                                       | Effort | Priority |
+| -- | -------------------------------------------------------------------------- | ------ | -------- |
+| 1  | Commit the 5 uncommitted files (ADRs, DOMAIN_LANGUAGE, CONTRIBUTING, test) | 2m     | P0       |
+| 2  | Link ADR-002/003 from AGENTS.md and CONTRIBUTING.md                        | 5m     | P0       |
+| 3  | Fix tagliatelle nolint in config_file_integration_test.go                  | 5m     | P0       |
+| 4  | Investigate nested config JSON key-matching: flag names vs field names     | 30m    | P0       |
+| 5  | Document config file key-matching behavior in AGENTS.md gotchas            | 10m    | P0       |
+| 6  | Deep nolint audit: check each of 42 directives for relevance               | 45m    | P1       |
+| 7  | Check `recvcheck` exclusions: are pointer receivers needed?                | 15m    | P1       |
+| 8  | Check `exhaustive` exclusions: are all switch cases handled?               | 10m    | P1       |
+| 9  | Check `dupl` exclusions in type_handler_intwidth.go: extract shared code?  | 15m    | P1       |
+| 10 | Check `containedctx` in flow_context.go: is embedded context needed?       | 15m    | P1       |
+| 11 | Write test: config file with 3-level nested structs                        | 15m    | P1       |
+| 12 | Write test: config file with array/slice values                            | 15m    | P1       |
+| 13 | Write test: config file with env var interpolation (`$HOME` in paths)      | 10m    | P1       |
+| 14 | Add `go vet` as a separate CI check                                        | 5m     | P1       |
+| 15 | Run CI workflow via `act` or push trigger                                  | 15m    | P1       |
+| 16 | Add flake.nix sub-module build checks                                      | 20m    | P1       |
+| 17 | Extract koanf to optional sub-module (removes 4 deps from core)            | 45m    | P2       |
+| 18 | Write ADR-004: Config File Key-Matching Strategy                           | 20m    | P2       |
+| 19 | Add doc-drift lint script (grep for deleted features in docs)              | 15m    | P2       |
+| 20 | Add Dependabot/Renovate config for automated dep updates                   | 15m    | P2       |
+| 21 | Write ADR-005: Sub-Module Isolation Strategy                               | 20m    | P2       |
+| 22 | Add integration test for plugin system end-to-end                          | 20m    | P2       |
+| 23 | Add integration test for audit log export (11 formats)                     | 30m    | P2       |
+| 24 | Add integration test for signal handling + graceful shutdown               | 20m    | P2       |
+| 25 | Write test: doctor command with failing DI health check                    | 10m    | P2       |
+| 26 | Write test: version command with commit hash                               | 10m    | P2       |
+| 27 | Add coverage badge to README (needs CI integration)                        | 30m    | P2       |
+| 28 | Add semver check to CI (ensures no breaking changes in patch)              | 30m    | P3       |
+| 29 | Create second example app (different domain than taskctl)                  | 2h     | P3       |
+| 30 | Add Middleware context propagation (v3.1 breaking)                         | 2h     | P3       |
+| 31 | Rename Get[T] → GetService[T] (v3.1 breaking)                              | 1h     | P3       |
+| 32 | Make RegisterInScope generic (v3.1 breaking)                               | 1h     | P3       |
+| 33 | Remove or redesign Package() (v3.1 breaking)                               | 1h     | P3       |
+| 34 | Remove SetConfig — mutating CLI config post-construction is unsafe         | 30m    | P3       |
+| 35 | Add benchmark regression thresholds in CI                                  | 30m    | P3       |
+| 36 | Test all examples in CI                                                    | 30m    | P3       |
+| 37 | Extract flag-tags to github.com/larsartmann/flagtags                       | 2h     | P4       |
+| 38 | Service-owned config design (ADR)                                          | 1h     | P4       |
+| 39 | Command-level audit middleware                                             | 2h     | P4       |
+| 40 | Built-in audit-log subcommand                                              | 1h     | P4       |
+| 41 | Consider making fang optional (plain cobra fallback)                       | 2h     | P4       |
+| 42 | FlagRegistry interface abstraction                                         | 1h     | P4       |
+| 43 | Custom per-flag validation hooks                                           | 1h     | P4       |
+| 44 | Enhanced flag validation enums                                             | 1h     | P4       |
+| 45 | Metrics/hooks for custom observability                                     | 2h     | P4       |
+| 46 | Branded-ID example app                                                     | 1h     | P4       |
+| 47 | Add property-based testing for flag parsing                                | 1h     | P3       |
+| 48 | Add CODECOV_TOKEN to GitHub repo settings                                  | 5m     | P3       |
+| 49 | Add godoclint compliance for all exported functions                        | 1h     | P2       |
+| 50 | Add `go vet` + `golangci-lint` to CI for sub-modules                       | 15m    | P1       |
 
 ---
 

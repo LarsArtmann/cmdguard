@@ -83,7 +83,7 @@ release prep, and nice-to-have enhancements. Important but not urgent.
 | M10 | **Test `go tool trace` parseability** — shell out to `go tool trace`, verify snapshot files are valid                                                                                                                                      | 20%→80%   | Medium   | 30min  | —    | Confidence that trace snapshots actually work                 |
 | M11 | **Add flightrecorder to `examples/taskctl/`** — demonstrate real-world usage in the flagship example                                                                                                                                       | 20%→80%   | Medium   | 60min  | M9   | Users see how to wire flight recorder in a real CLI           |
 | M12 | **Sub-module lint + test audit** — run `golangci-lint run ./...` and `go test ./... -race` on each of the 5 sub-modules independently                                                                                                      | 20%→80%   | High     | 60min  | —    | Confidence that all sub-modules are independently healthy     |
-| M13 | **Website build verification** — `pnpm run build` in `website/`, check for stale references                                                                                                                                                 | 20%→80%   | Medium   | 30min  | —    | Website doesn't have broken builds or stale content           |
+| M13 | **Website build verification** — `pnpm run build` in `website/`, check for stale references                                                                                                                                                | 20%→80%   | Medium   | 30min  | —    | Website doesn't have broken builds or stale content           |
 | M14 | **Audit website guide prose** — verify 14 `.mdx` files describe v4 API behavior (not just v4 import paths)                                                                                                                                 | 20%→80%   | Medium   | 60min  | —    | Website guides match actual v4 semantics                      |
 | M15 | **Fix `docs/MIGRATION_v2_v3.md`** — add manpage removal note to §3, add MIGRATION_v3_v4.md link to README                                                                                                                                  | other 20% | Low      | 15min  | M6   | Historical migration guide is accurate                        |
 | M16 | **Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example** — simplify the callback                                                                                                                                                    | other 20% | Low      | 15min  | —    | Migration example is clean and minimal                        |
@@ -235,7 +235,7 @@ release prep, and nice-to-have enhancements. Important but not urgent.
 
 | Sub# | Sub-task                                                | Time  |
 | ---- | ------------------------------------------------------- | ----- |
-| 13.1 | `cd website && pnpm run build`                           | 10min |
+| 13.1 | `cd website && pnpm run build`                          | 10min |
 | 13.2 | Check build output for warnings/errors                  | 5min  |
 | 13.3 | Grep website source for remaining stale `v3` references | 10min |
 

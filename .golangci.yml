@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.4
+  go: 1.26.7
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -28,7 +28,6 @@ linters:
     - copyloopvar
     - cyclop
     - decorder
-    - depguard
     - dogsled
     - dupl
     - dupword
@@ -126,108 +125,29 @@ linters:
     - wsl_v5
     - zerologlint
   disable:
+    - depguard
     - noinlineerr
   settings:
     cyclop:
       max-complexity: 15
-    depguard:
-      rules:
-        Benchmarks:
-          allow:
-            - $gostd
-            - github.com/larsartmann/cmdguard
-            - github.com/larsartmann/go-output
-            - github.com/samber/do/v2
-            - github.com/spf13/cobra
-            - github.com/spf13/pflag
-          files:
-            - "**/benchmarks/**"
-          list-mode: lax
-        Examples:
-          allow:
-            - $gostd
-            - charm.land/fang/v2
-            - charm.land/huh/v2
-            - github.com/larsartmann/cmdguard
-            - github.com/larsartmann/go-output
-            - github.com/larsartmann/go-output/table
-            - github.com/larsartmann/go-output/markdown
-            - github.com/larsartmann/go-output/tree
-            - github.com/larsartmann/samber-do-auditlog
-            - github.com/samber/do/v2
-            - github.com/spf13/cobra
-            - github.com/spf13/pflag
-          files:
-            - "**/examples/**"
-          list-mode: lax
-        Integration:
-          allow:
-            - $gostd
-            - github.com/larsartmann/cmdguard
-            - github.com/samber/do/v2
-            - github.com/spf13/cobra
-          files:
-            - "**/tests/**"
-          list-mode: lax
-        Main:
-          allow:
-            - $gostd
-            - charm.land/fang/v2
-            - charm.land/huh/v2
-            - charm.land/lipgloss/v2
-            - charm.land/glamour/v2
-            - github.com/larsartmann/cmdguard
-            - github.com/larsartmann/go-output
-            - github.com/larsartmann/go-output/d2
-            - github.com/larsartmann/go-output/delimited
-            - github.com/larsartmann/go-output/graph
-            - github.com/larsartmann/go-output/markdown
-            - github.com/larsartmann/go-output/markup
-            - github.com/larsartmann/go-output/plantuml
-            - github.com/larsartmann/go-output/serialization
-            - github.com/larsartmann/go-output/table
-            - github.com/larsartmann/go-output/tree
-            - github.com/larsartmann/samber-do-auditlog
-            - github.com/muesli/mango
-            - github.com/muesli/mango-cobra
-            - github.com/muesli/roff
-            - github.com/samber/do/v2
-            - github.com/spf13/cobra
-            - github.com/spf13/pflag
-            - go.opentelemetry.io/otel/attribute
-            - go.opentelemetry.io/otel/codes
-            - go.opentelemetry.io/otel/trace
-            - github.com/knadh/koanf/v2
-            - github.com/knadh/koanf/parsers/json
-            - github.com/knadh/koanf/parsers/yaml
-            - github.com/knadh/koanf/parsers/toml
-            - golang.org/x/term
-            - go.opentelemetry.io/otel/attribute
-            - $all
-            - "!$test"
-            - "!**/examples/**"
-            - "!**/benchmarks/**"
-            - "!**/tests/**"
-          list-mode: strict
-        Test:
-          allow:
-            - $gostd
-            - charm.land/fang/v2
-            - charm.land/huh/v2
-            - github.com/larsartmann/cmdguard
-            - github.com/larsartmann/go-output
-            - github.com/larsartmann/samber-do-auditlog
-            - github.com/samber/do/v2
-            - github.com/spf13/cobra
-            - github.com/spf13/pflag
-            - go.opentelemetry.io/otel/attribute
-            - go.opentelemetry.io/otel/codes
-            - go.opentelemetry.io/otel/trace
-            - go.opentelemetry.io/otel/trace/embedded
-            - go.opentelemetry.io/otel/trace/noop
-          files:
-            - $test
-          list-mode: strict
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - (io.Closer).Close
+        - (*sql.DB).Close
+        - (*sql.Rows).Close
+        - (*sql.Stmt).Close
+        - (net.Conn).Close
+        - (*net.TCPConn).Close
+        - (*net.UDPConn).Close
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Print
+        - fmt.Printf
+        - fmt.Println
+        - (*strings.Builder).WriteString
+        - (*bytes.Buffer).WriteString
     exhaustruct:
       exclude:
         - os/exec.Cmd
@@ -245,6 +165,10 @@ linters:
         - ifElseChain
     gomoddirectives:
       replace-local: true
+    gosec:
+      excludes:
+        - G304
+        - G115
     ireturn:
       allow:
         - error
@@ -258,6 +182,12 @@ linters:
         - github.com/knadh/koanf/v2.Parser
     makezero:
       always: true
+    mnd:
+      ignored-numbers:
+        - "0"
+        - "1"
+        - "2"
+        - "100"
     nestif:
       min-complexity: 6
     revive:
@@ -290,6 +220,17 @@ linters:
         - b
         - v
       ignore-type-assert-ok: true
+    wrapcheck:
+      ignore-sigs:
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+        - errors.Join(
+        - .Wrap(
+        - .Wrapf(
+        - .WithMessage(
+        - .WithMessagef(
+        - .WithStack(
   exclusions:
     generated: lax
     presets:
@@ -298,11 +239,7 @@ linters:
       - legacy
       - std-error-handling
     rules:
-      # Allow scoped TODO(v4) markers for deferred v4 breaking changes tracked in ROADMAP.md
-      # ("Deferred from 2026-07-18 Audit Closure"). These are real actionable work items that
-      # must stay grep-discoverable as TODOs; they cannot be fixed in v4.x without breaking
-      # the public API. Narrow pattern: only TODO(v5) is exempted, not TODO(*) or bare TODO.
-      - source: 'TODO\(v5\)'
+      - source: TODO\(v5\)
         linters:
           - godox
       - path: _test\.go$

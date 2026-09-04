@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -289,15 +289,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -310,15 +322,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -833,9 +857,10 @@
           <div class="hero-badge">Nix Flake Migration Review</div>
           <h1>cmdguard v3.0.0 &mdash; Flake vs Standard Stack Audit</h1>
           <p class="hero-subtitle">
-            The flake is already 95% on the standard stack (flake-parts + treefmt-nix + systems +
-            nixos-unstable + mkShellNoCC). This review documents the 2 intentional deviations and
-            confirms no migration is needed &mdash; only a documentation note.
+            The flake is already 95% on the standard stack (flake-parts +
+            treefmt-nix + systems + nixos-unstable + mkShellNoCC). This review
+            documents the 2 intentional deviations and confirms no migration is
+            needed &mdash; only a documentation note.
           </p>
         </div>
 
@@ -871,13 +896,17 @@
         </div>
 
         <div class="card card-solution">
-          <h4>Verdict: no migration needed &mdash; flake is already standard</h4>
+          <h4>
+            Verdict: no migration needed &mdash; flake is already standard
+          </h4>
           <p>
-            cmdguard's <code>flake.nix</code> already uses the ecosystem-standard stack recommended
-            by the <strong>nix-flake-migration</strong> skill. The two deviations (no
-            <code>buildGoModule</code>, no <code>git-hooks.nix</code>) are intentional and
-            documented below. Forcing either would be a Verschlimmbesserung: the project is a
-            library (no binary to build), and BuildFlow already provides pre-commit automation that
+            cmdguard's <code>flake.nix</code> already uses the
+            ecosystem-standard stack recommended by the
+            <strong>nix-flake-migration</strong> skill. The two deviations (no
+            <code>buildGoModule</code>, no <code>git-hooks.nix</code>) are
+            intentional and documented below. Forcing either would be a
+            Verschlimmbesserung: the project is a library (no binary to build),
+            and BuildFlow already provides pre-commit automation that
             <code>git-hooks.nix</code> would duplicate.
           </p>
         </div>
@@ -939,42 +968,56 @@
               <td><code>checks.format</code></td>
               <td>Yes</td>
               <td><span class="badge badge-fixed">Present</span></td>
-              <td><code>checks.format = config.treefmt.build.check self</code></td>
+              <td>
+                <code>checks.format = config.treefmt.build.check self</code>
+              </td>
             </tr>
             <tr>
               <td><code>git-hooks.nix</code> input</td>
               <td>Yes</td>
-              <td><span class="badge badge-medium">Intentionally absent</span></td>
+              <td>
+                <span class="badge badge-medium">Intentionally absent</span>
+              </td>
               <td>See <a href="#deviations">&sect;2</a></td>
             </tr>
             <tr>
-              <td><code>buildGoModule</code> + <code>packages.default</code></td>
+              <td>
+                <code>buildGoModule</code> + <code>packages.default</code>
+              </td>
               <td>Yes (for apps)</td>
-              <td><span class="badge badge-medium">Intentionally absent</span></td>
+              <td>
+                <span class="badge badge-medium">Intentionally absent</span>
+              </td>
               <td>See <a href="#deviations">&sect;2</a></td>
             </tr>
           </tbody>
         </table>
 
-        <h2 id="deviations"><span class="num">02</span>Deviations (both intentional)</h2>
+        <h2 id="deviations">
+          <span class="num">02</span>Deviations (both intentional)
+        </h2>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Accept</span>
-          <h3>Deviation 1: no <code>buildGoModule</code> / <code>packages.default</code></h3>
+          <h3>
+            Deviation 1: no <code>buildGoModule</code> /
+            <code>packages.default</code>
+          </h3>
           <div class="where">flake.nix</div>
           <p>
-            cmdguard is a <strong>Go library</strong>, not an application. There is no
-            <code>cmd/</code> binary to compile and ship as a Nix package. Adding
-            <code>buildGoModule</code> would require inventing a fake <code>main</code> package or
-            building one of the <code>examples/</code> binaries, neither of which serves library
-            consumers. The flake correctly provides only <code>devShells</code> and
-            <code>checks.format</code>.
+            cmdguard is a <strong>Go library</strong>, not an application. There
+            is no <code>cmd/</code> binary to compile and ship as a Nix package.
+            Adding <code>buildGoModule</code> would require inventing a fake
+            <code>main</code> package or building one of the
+            <code>examples/</code> binaries, neither of which serves library
+            consumers. The flake correctly provides only
+            <code>devShells</code> and <code>checks.format</code>.
           </p>
           <div class="callout callout-amber">
             <strong>If the project ever ships a binary</strong>
             (e.g. a <code>cmdguard-doctor</code> CLI), add
-            <code>packages.default = buildGoModule { ... }</code> at that time. Until then, this
-            deviation is correct.
+            <code>packages.default = buildGoModule { ... }</code> at that time.
+            Until then, this deviation is correct.
           </div>
         </div>
 
@@ -985,15 +1028,16 @@
           <p>
             The project uses <strong>BuildFlow</strong>
             (a Nix-based pre-commit framework) as its hook runner instead of
-            <code>git-hooks.nix</code>. BuildFlow runs <code>golangci-lint</code> + formatters on
-            commit, auto-fixes where possible, and is already wired in CI. Adding
-            <code>git-hooks.nix</code> on top would duplicate the hook configuration across two
-            systems &mdash; a split brain.
+            <code>git-hooks.nix</code>. BuildFlow runs
+            <code>golangci-lint</code> + formatters on commit, auto-fixes where
+            possible, and is already wired in CI. Adding
+            <code>git-hooks.nix</code> on top would duplicate the hook
+            configuration across two systems &mdash; a split brain.
           </p>
           <div class="callout callout-amber">
             <strong>If BuildFlow is ever removed</strong>
-            <code>git-hooks.nix</code> is the correct replacement and should be added then. Both
-            achieve the same goal; pick one.
+            <code>git-hooks.nix</code> is the correct replacement and should be
+            added then. Both achieve the same goal; pick one.
           </div>
         </div>
 
@@ -1032,15 +1076,26 @@
             </tr>
             <tr>
               <td><code>GOEXPERIMENT=jsonv2</code> set in devShells</td>
-              <td><span class="badge badge-fixed">Yes</span> (required for json/v2)</td>
+              <td>
+                <span class="badge badge-fixed">Yes</span> (required for
+                json/v2)
+              </td>
             </tr>
             <tr>
               <td><code>checks.build</code> defined</td>
-              <td><span class="badge badge-medium">N/A &mdash; library, no binary</span></td>
+              <td>
+                <span class="badge badge-medium"
+                  >N/A &mdash; library, no binary</span
+                >
+              </td>
             </tr>
             <tr>
               <td><code>overlays.default</code> exported</td>
-              <td><span class="badge badge-medium">N/A &mdash; library, no binary</span></td>
+              <td>
+                <span class="badge badge-medium"
+                  >N/A &mdash; library, no binary</span
+                >
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1051,27 +1106,32 @@
           <div class="migration-content">
             <h4>Do nothing (default)</h4>
             <p>
-              The flake is already standard. No migration, no refactor. This proposal exists to
-              document the audit result, not to drive change.
+              The flake is already standard. No migration, no refactor. This
+              proposal exists to document the audit result, not to drive change.
             </p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">2</div>
           <div class="migration-content">
-            <h4>Optional: add a one-line comment in flake.nix explaining the two deviations</h4>
+            <h4>
+              Optional: add a one-line comment in flake.nix explaining the two
+              deviations
+            </h4>
             <p>
               Future readers (or AI sessions) running the
-              <code>nix-flake-migration</code> skill will re-derive the same conclusions. A two-line
-              comment near the top of <code>perSystem</code> would save them the deliberation:
-              "Library, no binary &mdash; buildGoModule intentionally absent. BuildFlow handles
-              pre-commit &mdash; git-hooks.nix intentionally absent."
+              <code>nix-flake-migration</code> skill will re-derive the same
+              conclusions. A two-line comment near the top of
+              <code>perSystem</code> would save them the deliberation: "Library,
+              no binary &mdash; buildGoModule intentionally absent. BuildFlow
+              handles pre-commit &mdash; git-hooks.nix intentionally absent."
             </p>
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-18 &middot; Reviewed against flake.nix at commit 73d49ad
+          Generated 2026-07-18 &middot; Reviewed against flake.nix at commit
+          73d49ad
         </footer>
       </main>
     </div>

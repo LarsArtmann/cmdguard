@@ -8,7 +8,7 @@ import (
 // URL wraps url.URL with parsing validation and text marshaling.
 // Use this for config fields that must be valid URLs.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type URL struct {
 	url *url.URL
 }

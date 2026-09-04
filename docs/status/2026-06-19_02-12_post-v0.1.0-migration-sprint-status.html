@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -280,15 +280,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -301,15 +313,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -815,10 +839,11 @@
           <div class="hero-badge">Status &middot; v2.8.0-dev</div>
           <h1>cmdguard Post-v0.1.0 Migration Sprint</h1>
           <p class="hero-subtitle">
-            Comprehensive snapshot after upgrading <code>samber-do-auditlog</code> to v0.1.0, adding
-            CSV/TSV/DOT export, fixing a latent test race, unifying format enumeration, and
-            documenting the audit API. What landed, what's partial, what's fucked, and the top 25
-            next moves.
+            Comprehensive snapshot after upgrading
+            <code>samber-do-auditlog</code> to v0.1.0, adding CSV/TSV/DOT
+            export, fixing a latent test race, unifying format enumeration, and
+            documenting the audit API. What landed, what's partial, what's
+            fucked, and the top 25 next moves.
           </p>
         </div>
 
@@ -859,12 +884,16 @@
         </div>
 
         <p style="margin-top: 1.2rem; color: var(--text-muted)">
-          The v0.1.0 migration sprint shipped cleanly: dependency bumped, 3 new export formats
-          (CSV/TSV/DOT) added, a pre-existing flaky test race root-caused and fixed, format
-          enumeration consolidated into a single source of truth, and the audit API fully
-          documented. The library is in its strongest state ever &mdash;
-          <strong>the &ldquo;0 race conditions&rdquo; claim is now actually true</strong> (verified
-          at <code>-race -count=3</code>
+          The v0.1.0 migration sprint shipped cleanly: dependency bumped, 3 new
+          export formats (CSV/TSV/DOT) added, a pre-existing flaky test race
+          root-caused and fixed, format enumeration consolidated into a single
+          source of truth, and the audit API fully documented. The library is in
+          its strongest state ever &mdash;
+          <strong
+            >the &ldquo;0 race conditions&rdquo; claim is now actually
+            true</strong
+          >
+          (verified at <code>-race -count=3</code>
           across all packages). Coverage ticked up from 85.6% to 86.5%.
         </p>
 
@@ -949,19 +978,21 @@
           <h4>v0.1.0 auditlog migration</h4>
           <p>
             <code>samber-do-auditlog</code> bumped v0.0.4 &rarr; v0.1.0, local
-            <code>replace</code> directive removed (now consumed from the Go module proxy). The two
-            v0.1.0 breaking removals
-            (<code>LoadReportFromJSON</code>/<code>LoadReportFromNDJSON</code>) were never used.
-            <code>go.sum</code> refreshed, full suite green.
+            <code>replace</code> directive removed (now consumed from the Go
+            module proxy). The two v0.1.0 breaking removals
+            (<code>LoadReportFromJSON</code>/<code>LoadReportFromNDJSON</code>)
+            were never used. <code>go.sum</code> refreshed, full suite green.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>CSV / TSV / DOT audit export formats</h4>
           <p>
-            Wired the three new v0.1.0 export formats through <code>ExportAuditLog</code>. Format
-            count: 4 &rarr; 7. Tested across both file and writer paths for all 7 formats. Example
-            updated to demonstrate env-driven format selection (<code>AUDIT_LOG_FORMAT</code>).
+            Wired the three new v0.1.0 export formats through
+            <code>ExportAuditLog</code>. Format count: 4 &rarr; 7. Tested across
+            both file and writer paths for all 7 formats. Example updated to
+            demonstrate env-driven format selection
+            (<code>AUDIT_LOG_FORMAT</code>).
           </p>
         </div>
 
@@ -971,8 +1002,9 @@
             Root-caused a flaky ~1-in-3 <code>-race</code> failure:
             <code>type_handler_test.go</code> read
             <code>globalTypeRegistry.byType[...]</code> directly, bypassing the
-            <code>sync.RWMutex</code>-guarded <code>lookupHandler()</code>. All 8 sites switched to
-            the locked accessor. <code>-race -count=3</code> across all packages now passes clean.
+            <code>sync.RWMutex</code>-guarded <code>lookupHandler()</code>. All
+            8 sites switched to the locked accessor.
+            <code>-race -count=3</code> across all packages now passes clean.
             The &ldquo;0 race conditions&rdquo; status is now truthful.
           </p>
         </div>
@@ -980,20 +1012,23 @@
         <div class="card card-solution">
           <h4>Format enumeration unified (split brain killed)</h4>
           <p>
-            The 7 supported formats were enumerated in <strong>5 places</strong> (const block,
-            <code>Valid()</code> switch, <code>supportedAuditLogFormatNames()</code>, to-file map,
-            to-writer map). Introduced <code>auditLogExporterRegistry()</code> as the single source
-            of truth; <code>Valid()</code>, names, and both dispatchers derive from it. Adding a
-            format is now a one-line map entry. Error messages are now deterministically sorted.
+            The 7 supported formats were enumerated in
+            <strong>5 places</strong> (const block, <code>Valid()</code> switch,
+            <code>supportedAuditLogFormatNames()</code>, to-file map, to-writer
+            map). Introduced <code>auditLogExporterRegistry()</code> as the
+            single source of truth; <code>Valid()</code>, names, and both
+            dispatchers derive from it. Adding a format is now a one-line map
+            entry. Error messages are now deterministically sorted.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>Audit API documented end-to-end</h4>
           <p>
-            Added <code>WithAuditLog</code> to FEATURES.md CLI Options, a dedicated Audit Log
-            feature section (8 rows), an API.md section with wiring + export examples, and an
-            example README row for <code>AUDIT_LOG_FORMAT</code>. The audit feature is no longer
+            Added <code>WithAuditLog</code> to FEATURES.md CLI Options, a
+            dedicated Audit Log feature section (8 rows), an API.md section with
+            wiring + export examples, and an example README row for
+            <code>AUDIT_LOG_FORMAT</code>. The audit feature is no longer
             invisible in the docs.
           </p>
         </div>
@@ -1001,9 +1036,10 @@
         <div class="card card-solution">
           <h4>Brutal self-review report</h4>
           <p>
-            <code>docs/reviews/2026-06-19_09-30_v0.1.0-migration-brutal-self-review.html</code>:
-            full 11-question self-critique with prioritized remediation plan. Drove the race fix,
-            unification, and doc completion.
+            <code
+              >docs/reviews/2026-06-19_09-30_v0.1.0-migration-brutal-self-review.html</code
+            >: full 11-question self-critique with prioritized remediation plan.
+            Drove the race fix, unification, and doc completion.
           </p>
         </div>
 
@@ -1013,30 +1049,33 @@
         <div class="card card-warning">
           <h4>Documentation freshness</h4>
           <p>
-            <code>AGENTS.md</code>, <code>FEATURES.md</code>, <code>CHANGELOG.md</code>,
-            <code>API.md</code>, and the example README are now current. <strong>But</strong>
-            <code>TODO_LIST.md</code> header still says &ldquo;430+ passing&rdquo; (actually 463)
-            and &ldquo;86.3% coverage&rdquo; (actually 86.5%), and <code>ROADMAP.md</code> was last
-            updated 2026-06-17. A docs-freshness pass would catch remaining drift.
+            <code>AGENTS.md</code>, <code>FEATURES.md</code>,
+            <code>CHANGELOG.md</code>, <code>API.md</code>, and the example
+            README are now current. <strong>But</strong>
+            <code>TODO_LIST.md</code> header still says &ldquo;430+
+            passing&rdquo; (actually 463) and &ldquo;86.3% coverage&rdquo;
+            (actually 86.5%), and <code>ROADMAP.md</code> was last updated
+            2026-06-17. A docs-freshness pass would catch remaining drift.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>v3.0 design document</h4>
           <p>
-            ROADMAP lists v3.0 API-breaking cleanup items (rename <code>Get[T]</code>, generic
-            <code>RegisterInScope</code>, redesign <code>Package()</code>, remove
-            <code>SetConfig</code>) but no design doc exists. The <code>flagtags</code> library
-            extraction is also sketched but not started.
+            ROADMAP lists v3.0 API-breaking cleanup items (rename
+            <code>Get[T]</code>, generic <code>RegisterInScope</code>, redesign
+            <code>Package()</code>, remove <code>SetConfig</code>) but no design
+            doc exists. The <code>flagtags</code> library extraction is also
+            sketched but not started.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>Codecov integration</h4>
           <p>
-            CI pipeline exists and release automation works, but codecov coverage reporting needs
-            the <code>CODECOV_TOKEN</code> secret added to GitHub repo settings (TODO P0 #20, 5min
-            task, still open).
+            CI pipeline exists and release automation works, but codecov
+            coverage reporting needs the <code>CODECOV_TOKEN</code> secret added
+            to GitHub repo settings (TODO P0 #20, 5min task, still open).
           </p>
         </div>
 
@@ -1046,32 +1085,33 @@
         <div class="card">
           <h4>flagtags library extraction</h4>
           <p>
-            ~2000 LOC of struct-tag parsing is self-contained and reusable. Deferred to v3.0 per
-            ROADMAP (requires frozen tag format first).
+            ~2000 LOC of struct-tag parsing is self-contained and reusable.
+            Deferred to v3.0 per ROADMAP (requires frozen tag format first).
           </p>
         </div>
 
         <div class="card">
           <h4>Branded IDs example + docs-generator example</h4>
           <p>
-            ROADMAP lists an <code>examples/docs-generator/</code> and a branded-ID example
-            application. Neither exists; only <code>examples/taskctl</code> ships.
+            ROADMAP lists an <code>examples/docs-generator/</code> and a
+            branded-ID example application. Neither exists; only
+            <code>examples/taskctl</code> ships.
           </p>
         </div>
 
         <div class="card">
           <h4>v1 API deprecation timeline</h4>
           <p>
-            No deprecation schedule published for the v1 API. Low urgency (v2 is the recommended
-            path) but should be communicated before v3.
+            No deprecation schedule published for the v1 API. Low urgency (v2 is
+            the recommended path) but should be communicated before v3.
           </p>
         </div>
 
         <div class="card">
           <h4>Custom observability metrics/hooks</h4>
           <p>
-            OpenTelemetry tracing is integrated (<code>WithTelemetry</code>); general metrics hooks
-            for custom observability are not.
+            OpenTelemetry tracing is integrated (<code>WithTelemetry</code>);
+            general metrics hooks for custom observability are not.
           </p>
         </div>
 
@@ -1082,66 +1122,78 @@
           <h4>The &ldquo;0 race conditions&rdquo; lie (now fixed)</h4>
           <p>
             <strong>This was the big one.</strong> <code>AGENTS.md</code> and
-            <code>FEATURES.md</code> both claimed &ldquo;0 race conditions&rdquo; for weeks, but the
-            <code>-race</code> suite failed ~1-in-3 runs because tests bypassed the locked registry
-            accessor. The claim was aspirational, not factual.
-            <strong>Status: FIXED this sprint.</strong> The lie is corrected and the race is gone.
-            Listed here as a process failure: a status claim was repeated without verification.
+            <code>FEATURES.md</code> both claimed &ldquo;0 race
+            conditions&rdquo; for weeks, but the <code>-race</code> suite failed
+            ~1-in-3 runs because tests bypassed the locked registry accessor.
+            The claim was aspirational, not factual.
+            <strong>Status: FIXED this sprint.</strong> The lie is corrected and
+            the race is gone. Listed here as a process failure: a status claim
+            was repeated without verification.
           </p>
         </div>
 
         <div class="card card-problem">
           <h4>Commit granularity (process miss)</h4>
           <p>
-            The user explicitly asked for &ldquo;commit after each smallest self-contained
-            change&rdquo;. The initial v0.1.0 migration landed as one blob (dep bump + formats +
-            example + docs) instead of 3-4 focused commits. Corrected in subsequent commits (race
-            fix, unification, docs each shipped separately). Process lesson logged.
+            The user explicitly asked for &ldquo;commit after each smallest
+            self-contained change&rdquo;. The initial v0.1.0 migration landed as
+            one blob (dep bump + formats + example + docs) instead of 3-4
+            focused commits. Corrected in subsequent commits (race fix,
+            unification, docs each shipped separately). Process lesson logged.
           </p>
         </div>
 
         <!-- E. WHAT WE SHOULD IMPROVE -->
-        <h2 id="improve"><span class="num">06</span>E. What We Should Improve</h2>
+        <h2 id="improve">
+          <span class="num">06</span>E. What We Should Improve
+        </h2>
 
         <div class="card card-warning">
           <h4>Treat <code>-race</code> as a hard gate, not a coin-flip</h4>
           <p>
-            When the detector fires, root-cause it the same session. A flaky test is a broken test.
-            Add <code>-count=3</code> (or higher) to CI race runs to catch intermittent races that
-            single runs miss.
+            When the detector fires, root-cause it the same session. A flaky
+            test is a broken test. Add <code>-count=3</code> (or higher) to CI
+            race runs to catch intermittent races that single runs miss.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>Single source of truth for enumerations</h4>
           <p>
-            The 5-way format split brain was preventable. Audit other enum-like sets (custom types,
-            sentinel errors, output formats) for the same anti-pattern. A registry map from which
-            <code>Valid()</code> and name-lists derive is the pattern to replicate.
+            The 5-way format split brain was preventable. Audit other enum-like
+            sets (custom types, sentinel errors, output formats) for the same
+            anti-pattern. A registry map from which
+            <code>Valid()</code> and name-lists derive is the pattern to
+            replicate.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>Doc freshness as a release gate</h4>
           <p>
-            FEATURES.md said v0.0.4 while go.mod said v0.1.0. Version strings and test counts are
-            mentioned in 4+ files and drift silently. A <code>docs-freshness-check</code> in CI (or
-            at least pre-commit) would catch this.
+            FEATURES.md said v0.0.4 while go.mod said v0.1.0. Version strings
+            and test counts are mentioned in 4+ files and drift silently. A
+            <code>docs-freshness-check</code> in CI (or at least pre-commit)
+            would catch this.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>Verify status claims before printing them</h4>
           <p>
-            &ldquo;0 race conditions&rdquo; was printed without a verification command. Every
-            quantitative claim in docs should map to a command that proves it.
+            &ldquo;0 race conditions&rdquo; was printed without a verification
+            command. Every quantitative claim in docs should map to a command
+            that proves it.
           </p>
         </div>
 
         <!-- F. Top 25 Next -->
-        <h2 id="next25"><span class="num">07</span>F. Top 25 Things to Get Done Next</h2>
+        <h2 id="next25">
+          <span class="num">07</span>F. Top 25 Things to Get Done Next
+        </h2>
         <p style="color: var(--text-muted); margin-bottom: 1rem">
-          Sorted by impact &darr;, then effort &uarr;. Badges estimate severity/urgency.
+          Sorted by impact &darr;, then effort &uarr;. Badges estimate
+          severity/urgency.
         </p>
         <table>
           <thead>
@@ -1155,14 +1207,18 @@
           <tbody>
             <tr>
               <td>1</td>
-              <td>Add <code>CODECOV_TOKEN</code> secret + enable coverage reporting in CI</td>
+              <td>
+                Add <code>CODECOV_TOKEN</code> secret + enable coverage
+                reporting in CI
+              </td>
               <td>5m</td>
               <td><span class="badge badge-critical">High</span></td>
             </tr>
             <tr>
               <td>2</td>
               <td>
-                Add <code>-race -count=3</code> to CI (not just local) to prevent race regressions
+                Add <code>-race -count=3</code> to CI (not just local) to
+                prevent race regressions
               </td>
               <td>15m</td>
               <td><span class="badge badge-critical">High</span></td>
@@ -1170,58 +1226,77 @@
             <tr>
               <td>3</td>
               <td>
-                Sync TODO_LIST.md &amp; ROADMAP.md headers (test count 463, coverage 86.5%, date)
+                Sync TODO_LIST.md &amp; ROADMAP.md headers (test count 463,
+                coverage 86.5%, date)
               </td>
               <td>10m</td>
               <td><span class="badge badge-high">Med</span></td>
             </tr>
             <tr>
               <td>4</td>
-              <td>Run <code>docs-freshness-check</code> skill; fix all drift</td>
+              <td>
+                Run <code>docs-freshness-check</code> skill; fix all drift
+              </td>
               <td>30m</td>
               <td><span class="badge badge-high">Med</span></td>
             </tr>
             <tr>
               <td>5</td>
-              <td>Write v3.0 API design doc (consolidate ROADMAP v3.0 items)</td>
+              <td>
+                Write v3.0 API design doc (consolidate ROADMAP v3.0 items)
+              </td>
               <td>2h</td>
               <td><span class="badge badge-high">Med</span></td>
             </tr>
             <tr>
               <td>6</td>
-              <td>Extract <code>flagtags</code> library (2000 LOC, zero cmdguard deps)</td>
+              <td>
+                Extract <code>flagtags</code> library (2000 LOC, zero cmdguard
+                deps)
+              </td>
               <td>1d</td>
               <td><span class="badge badge-high">Med</span></td>
             </tr>
             <tr>
               <td>7</td>
-              <td>Add <code>examples/docs-generator/</code> (GenerateDocs example)</td>
+              <td>
+                Add <code>examples/docs-generator/</code> (GenerateDocs example)
+              </td>
               <td>2h</td>
               <td><span class="badge badge-medium">Med</span></td>
             </tr>
             <tr>
               <td>8</td>
-              <td>Add branded-ID example application (Validated[T] showcase)</td>
+              <td>
+                Add branded-ID example application (Validated[T] showcase)
+              </td>
               <td>2h</td>
               <td><span class="badge badge-medium">Med</span></td>
             </tr>
             <tr>
               <td>9</td>
               <td>
-                Audit other enums for the 5-way split-brain pattern (output formats, sentinels)
+                Audit other enums for the 5-way split-brain pattern (output
+                formats, sentinels)
               </td>
               <td>1h</td>
               <td><span class="badge badge-medium">Med</span></td>
             </tr>
             <tr>
               <td>10</td>
-              <td>Add <code>testdata/fuzz/</code> corpora for existing fuzz targets</td>
+              <td>
+                Add <code>testdata/fuzz/</code> corpora for existing fuzz
+                targets
+              </td>
               <td>1h</td>
               <td><span class="badge badge-medium">Med</span></td>
             </tr>
             <tr>
               <td>11</td>
-              <td>v3.0: rename <code>Get[T]</code> &rarr; <code>GetService[T]</code></td>
+              <td>
+                v3.0: rename <code>Get[T]</code> &rarr;
+                <code>GetService[T]</code>
+              </td>
               <td>30m</td>
               <td><span class="badge badge-medium">Med</span></td>
             </tr>
@@ -1233,7 +1308,9 @@
             </tr>
             <tr>
               <td>13</td>
-              <td>v3.0: remove/redesign <code>Package()</code> for error-safe DI</td>
+              <td>
+                v3.0: remove/redesign <code>Package()</code> for error-safe DI
+              </td>
               <td>1h</td>
               <td><span class="badge badge-medium">Med</span></td>
             </tr>
@@ -1257,13 +1334,19 @@
             </tr>
             <tr>
               <td>17</td>
-              <td>Extend <code>flake.nix</code> with <code>buildGoModule</code> + vet checks</td>
+              <td>
+                Extend <code>flake.nix</code> with <code>buildGoModule</code> +
+                vet checks
+              </td>
               <td>1h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
             <tr>
               <td>18</td>
-              <td>Add general metrics/hooks for custom observability (beyond OTel traces)</td>
+              <td>
+                Add general metrics/hooks for custom observability (beyond OTel
+                traces)
+              </td>
               <td>3h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
@@ -1275,7 +1358,10 @@
             </tr>
             <tr>
               <td>20</td>
-              <td>Add <code>FlagRegistry</code> interface abstraction (ROADMAP plugin)</td>
+              <td>
+                Add <code>FlagRegistry</code> interface abstraction (ROADMAP
+                plugin)
+              </td>
               <td>2h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
@@ -1288,26 +1374,36 @@
             <tr>
               <td>22</td>
               <td>
-                Config file nested-struct loading (ParseFlagTags recurses, but loader is flat)
+                Config file nested-struct loading (ParseFlagTags recurses, but
+                loader is flat)
               </td>
               <td>3h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
             <tr>
               <td>23</td>
-              <td>Deduplication sweep (<code>deduplicate-code</code> skill at threshold 15)</td>
+              <td>
+                Deduplication sweep (<code>deduplicate-code</code> skill at
+                threshold 15)
+              </td>
               <td>1h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
             <tr>
               <td>24</td>
-              <td>Full code review (<code>full-code-review</code> skill) post-v3 design</td>
+              <td>
+                Full code review (<code>full-code-review</code> skill) post-v3
+                design
+              </td>
               <td>4h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
             <tr>
               <td>25</td>
-              <td>Architecture review (<code>architecture-review</code> skill) for v3 readiness</td>
+              <td>
+                Architecture review (<code>architecture-review</code> skill) for
+                v3 readiness
+              </td>
               <td>2h</td>
               <td><span class="badge badge-low">Low</span></td>
             </tr>
@@ -1316,7 +1412,8 @@
 
         <!-- G. Top Question -->
         <h2 id="question">
-          <span class="num">08</span>G. The Top Question I Cannot Figure Out Myself
+          <span class="num">08</span>G. The Top Question I Cannot Figure Out
+          Myself
         </h2>
         <div class="callout callout-warning">
           <strong
@@ -1324,14 +1421,17 @@
             <code>flagtags</code> first?</strong
           >
           <p style="margin-top: 0.5rem">
-            The ROADMAP lists v3.0 API-breaking cleanup (rename <code>Get</code>, generic
-            <code>RegisterInScope</code>, remove <code>SetConfig</code>/<code>Package</code>) and
-            the <code>flagtags</code> extraction as parallel tracks. I cannot determine the intended
-            sequencing: extracting <code>flagtags</code> <em>before</em> v3 would let v3 consume it
-            as a real dependency (cleaner), but it also commits us to the current tag format before
+            The ROADMAP lists v3.0 API-breaking cleanup (rename
+            <code>Get</code>, generic <code>RegisterInScope</code>, remove
+            <code>SetConfig</code>/<code>Package</code>) and the
+            <code>flagtags</code> extraction as parallel tracks. I cannot
+            determine the intended sequencing: extracting <code>flagtags</code>
+            <em>before</em> v3 would let v3 consume it as a real dependency
+            (cleaner), but it also commits us to the current tag format before
             v3 has a chance to evolve it. Conversely, shipping v3 first means
-            <code>flagtags</code> extraction happens against a frozen surface (safer) but delays the
-            reuse benefit. <strong>Which order do you want?</strong>
+            <code>flagtags</code> extraction happens against a frozen surface
+            (safer) but delays the reuse benefit.
+            <strong>Which order do you want?</strong>
           </p>
         </div>
 

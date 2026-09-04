@@ -4,7 +4,7 @@ import "time"
 
 // Duration wraps time.Duration with parsing validation.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type Duration struct {
 	duration time.Duration
 }

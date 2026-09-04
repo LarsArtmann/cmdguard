@@ -73,14 +73,14 @@ The plan has 3 mandatory verification gates. I ran (partially) G1. **G2 and G3 w
 
 ## C) NOT STARTED
 
-| #     | Task                                                             | Why                                                                                                                                                                               |
-| ----- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| L1.21 | **G2: Sub-module independence test loop**                        | Never ran                                                                                                                                                                         |
-| L1.22 | **G3: `nix flake check`**                                        | Never ran                                                                                                                                                                         |
-| L1.23 | **Final commit + push + closure appendix**                       | The commit was auto-authored by a hook; the push never happened; the closure appendix on `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` was never written |
+| #     | Task                                                              | Why                                                                                                                                                                               |
+| ----- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L1.21 | **G2: Sub-module independence test loop**                         | Never ran                                                                                                                                                                         |
+| L1.22 | **G3: `nix flake check`**                                         | Never ran                                                                                                                                                                         |
+| L1.23 | **Final commit + push + closure appendix**                        | The commit was auto-authored by a hook; the push never happened; the closure appendix on `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` was never written |
 | —     | **Website build verification** (`pnpm run build` / `astro build`) | Never ran — 7 `.astro`/`.ts`/`.css` files changed, none verified to compile                                                                                                       |
-| —     | **Push to origin/master**                                        | Not done                                                                                                                                                                          |
-| —     | **G5 Verschlimmbesserung check**                                 | Never explicitly run (I followed the guards but didn't tick the boxes)                                                                                                            |
+| —     | **Push to origin/master**                                         | Not done                                                                                                                                                                          |
+| —     | **G5 Verschlimmbesserung check**                                  | Never explicitly run (I followed the guards but didn't tick the boxes)                                                                                                            |
 
 ---
 

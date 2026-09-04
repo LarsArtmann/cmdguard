@@ -23,61 +23,61 @@ The type parameter explosion is fixed (commit `4f9b0ea`). Now we tackle the real
 
 ### 1% → 51%: Restore type safety + finish ergonomics
 
-| ID  | Task                                                                         | Impact   | Effort |
-| --- | ---------------------------------------------------------------------------- | -------- | ------ |
-| 1   | Restore compile-time safety on lifecycle hooks (sealed interface, not `any`) | Critical | 45min  |
-| 2   | Make CLIOption non-generic (eliminate `[T]` from 22 CLI options)             | Critical | 30min  |
+| ID | Task                                                                         | Impact   | Effort |
+| -- | ---------------------------------------------------------------------------- | -------- | ------ |
+| 1  | Restore compile-time safety on lifecycle hooks (sealed interface, not `any`) | Critical | 45min  |
+| 2  | Make CLIOption non-generic (eliminate `[T]` from 22 CLI options)             | Critical | 30min  |
 
 ### 4% → 64%: Mono-repo modularization
 
-| ID  | Task                                      | Impact | Effort |
-| --- | ----------------------------------------- | ------ | ------ |
-| 3   | Create go.work workspace                  | High   | 30min  |
-| 4   | Extract core module (cobra+do+fang+pflag) | High   | 90min  |
-| 5   | Extract glamour module                    | Medium | 45min  |
-| 6   | Extract prompts module (huh/bubbles)      | Medium | 45min  |
-| 7   | Extract spinner module (lipgloss)         | Medium | 30min  |
-| 8   | Extract telemetry module (otel)           | Low    | 30min  |
-| 9   | Extract manpage module (mango/roff)       | Low    | 30min  |
-| 10  | Verify GOWORK=off builds for every module | High   | 60min  |
+| ID | Task                                      | Impact | Effort |
+| -- | ----------------------------------------- | ------ | ------ |
+| 3  | Create go.work workspace                  | High   | 30min  |
+| 4  | Extract core module (cobra+do+fang+pflag) | High   | 90min  |
+| 5  | Extract glamour module                    | Medium | 45min  |
+| 6  | Extract prompts module (huh/bubbles)      | Medium | 45min  |
+| 7  | Extract spinner module (lipgloss)         | Medium | 30min  |
+| 8  | Extract telemetry module (otel)           | Low    | 30min  |
+| 9  | Extract manpage module (mango/roff)       | Low    | 30min  |
+| 10 | Verify GOWORK=off builds for every module | High   | 60min  |
 
 ### 20% → 80%: Config revolution + cleanup + audit deepening
 
-| ID  | Task                                           | Impact | Effort |
-| --- | ---------------------------------------------- | ------ | ------ |
-| 11  | Remove go-output blank imports from core       | High   | 45min  |
-| 12  | Cut result.go (sum types not a CLI concern)    | Low    | 15min  |
-| 13  | Cut editor.go                                  | Low    | 15min  |
-| 14  | Add command-level audit events (middleware)    | High   | 60min  |
-| 15  | Add built-in audit-log export subcommand       | Medium | 45min  |
-| 16  | Update example to showcase v3 API              | High   | 60min  |
-| 17  | Update README + AGENTS.md + FEATURES.md        | Medium | 45min  |
-| 18  | Final verification: build + test + lint + race | High   | 30min  |
+| ID | Task                                           | Impact | Effort |
+| -- | ---------------------------------------------- | ------ | ------ |
+| 11 | Remove go-output blank imports from core       | High   | 45min  |
+| 12 | Cut result.go (sum types not a CLI concern)    | Low    | 15min  |
+| 13 | Cut editor.go                                  | Low    | 15min  |
+| 14 | Add command-level audit events (middleware)    | High   | 60min  |
+| 15 | Add built-in audit-log export subcommand       | Medium | 45min  |
+| 16 | Update example to showcase v3 API              | High   | 60min  |
+| 17 | Update README + AGENTS.md + FEATURES.md        | Medium | 45min  |
+| 18 | Final verification: build + test + lint + race | High   | 30min  |
 
 ---
 
 ## Comprehensive Plan (Medium Granularity — 18 tasks, 30-90min each)
 
-| #   | Task                                                              | Priority | Impact | Effort | Status |
-| --- | ----------------------------------------------------------------- | -------- | ------ | ------ | ------ |
-| 1   | Restore lifecycle hook compile-time safety (sealed interface)     | P0       | 10     | 45min  | TODO   |
-| 2   | Make CLIOption non-generic                                        | P0       | 9      | 30min  | TODO   |
-| 3   | Create go.work workspace + verify existing build                  | P1       | 8      | 30min  | TODO   |
-| 4   | Extract core module: move cobra/do/fang/pflag deps to core go.mod | P1       | 10     | 90min  | TODO   |
-| 5   | Extract glamour to pkg/cmdguard/glamour/ module                   | P1       | 6      | 45min  | TODO   |
-| 6   | Extract prompts to pkg/cmdguard/prompts/ module                   | P1       | 6      | 45min  | TODO   |
-| 7   | Extract spinner to pkg/cmdguard/spinner/ module                   | P1       | 5      | 30min  | TODO   |
-| 8   | Extract telemetry to pkg/cmdguard/telemetry/ module               | P2       | 4      | 30min  | TODO   |
-| 9   | Extract manpage to pkg/cmdguard/manpage/ module                   | P2       | 4      | 30min  | TODO   |
-| 10  | Verify GOWORK=off builds for every module                         | P1       | 8      | 60min  | TODO   |
-| 11  | Remove go-output blank imports from core (output.go cleanup)      | P1       | 7      | 45min  | TODO   |
-| 12  | Cut result.go (sum types)                                         | P2       | 3      | 15min  | TODO   |
-| 13  | Cut editor.go                                                     | P2       | 3      | 15min  | TODO   |
-| 14  | Add command-level audit middleware (audit every command exec)     | P1       | 8      | 60min  | TODO   |
-| 15  | Add built-in audit-log export subcommand                          | P2       | 5      | 45min  | TODO   |
-| 16  | Update example/taskctl to showcase clean v3 API                   | P1       | 7      | 60min  | TODO   |
-| 17  | Update README + AGENTS.md + FEATURES.md for v3                    | P2       | 5      | 45min  | TODO   |
-| 18  | Final verification: build + test + lint + race                    | P0       | 9      | 30min  | TODO   |
+| #  | Task                                                              | Priority | Impact | Effort | Status |
+| -- | ----------------------------------------------------------------- | -------- | ------ | ------ | ------ |
+| 1  | Restore lifecycle hook compile-time safety (sealed interface)     | P0       | 10     | 45min  | TODO   |
+| 2  | Make CLIOption non-generic                                        | P0       | 9      | 30min  | TODO   |
+| 3  | Create go.work workspace + verify existing build                  | P1       | 8      | 30min  | TODO   |
+| 4  | Extract core module: move cobra/do/fang/pflag deps to core go.mod | P1       | 10     | 90min  | TODO   |
+| 5  | Extract glamour to pkg/cmdguard/glamour/ module                   | P1       | 6      | 45min  | TODO   |
+| 6  | Extract prompts to pkg/cmdguard/prompts/ module                   | P1       | 6      | 45min  | TODO   |
+| 7  | Extract spinner to pkg/cmdguard/spinner/ module                   | P1       | 5      | 30min  | TODO   |
+| 8  | Extract telemetry to pkg/cmdguard/telemetry/ module               | P2       | 4      | 30min  | TODO   |
+| 9  | Extract manpage to pkg/cmdguard/manpage/ module                   | P2       | 4      | 30min  | TODO   |
+| 10 | Verify GOWORK=off builds for every module                         | P1       | 8      | 60min  | TODO   |
+| 11 | Remove go-output blank imports from core (output.go cleanup)      | P1       | 7      | 45min  | TODO   |
+| 12 | Cut result.go (sum types)                                         | P2       | 3      | 15min  | TODO   |
+| 13 | Cut editor.go                                                     | P2       | 3      | 15min  | TODO   |
+| 14 | Add command-level audit middleware (audit every command exec)     | P1       | 8      | 60min  | TODO   |
+| 15 | Add built-in audit-log export subcommand                          | P2       | 5      | 45min  | TODO   |
+| 16 | Update example/taskctl to showcase clean v3 API                   | P1       | 7      | 60min  | TODO   |
+| 17 | Update README + AGENTS.md + FEATURES.md for v3                    | P2       | 5      | 45min  | TODO   |
+| 18 | Final verification: build + test + lint + race                    | P0       | 9      | 30min  | TODO   |
 
 **Total estimated effort:** ~13 hours
 **Sorted by:** Priority (P0→P2), then Impact (desc), then Effort (asc)
@@ -244,7 +244,7 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 | 14.2 | Implement AuditMiddleware that captures per-command | 15min  |
 | 14.3 | Record: command name, args, duration, error         | 10min  |
 | 14.4 | Store events in DI scope for later retrieval        | 10min  |
-| 14.5 | Add WithCommandAudit[T](<>) CLI option              | 10min  |
+| 14.5 | Add WithCommandAudit[T]() CLI option                | 10min  |
 | 14.6 | Write tests for audit middleware                    | 15min  |
 | 14.7 | Commit                                              | 5min   |
 

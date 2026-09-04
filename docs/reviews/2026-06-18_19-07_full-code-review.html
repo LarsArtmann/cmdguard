@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -280,15 +280,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -301,15 +313,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -816,8 +840,9 @@
           <div class="hero-badge">Senior Architect Audit</div>
           <h1>cmdguard — Full Code Review</h1>
           <p class="hero-subtitle">
-            Every production file reviewed against architect-grade standards: type safety, dead
-            code, split brains, naming, and the zero-panic contract.
+            Every production file reviewed against architect-grade standards:
+            type safety, dead code, split brains, naming, and the zero-panic
+            contract.
           </p>
         </div>
 
@@ -838,14 +863,14 @@
         <!-- Stats Dashboard -->
         <h2 id="summary"><span class="num">00</span>Summary</h2>
         <p>
-          A mature, well-tested Go CLI library. The core architecture is genuinely strong — opaque
-          value types with parse-constructors, a layered zero-panic guarantee (<code
-            >safeProvide</code
-          >
-          + <code>RecoveryMiddleware</code>), copy-on-write registries, and centralized sentinel
-          errors. This review found <strong>no correctness bugs in production paths</strong>; it
-          surfaced dead code, doc drift, and one misleading dead conditional — all now fixed or
-          ticketed below.
+          A mature, well-tested Go CLI library. The core architecture is
+          genuinely strong — opaque value types with parse-constructors, a
+          layered zero-panic guarantee (<code>safeProvide</code> +
+          <code>RecoveryMiddleware</code>), copy-on-write registries, and
+          centralized sentinel errors. This review found
+          <strong>no correctness bugs in production paths</strong>; it surfaced
+          dead code, doc drift, and one misleading dead conditional — all now
+          fixed or ticketed below.
         </p>
         <div class="stat-grid">
           <div class="stat-card">
@@ -875,7 +900,9 @@
         </div>
 
         <!-- Baseline -->
-        <h2 id="baseline"><span class="num">&diams;</span>Baseline Verification</h2>
+        <h2 id="baseline">
+          <span class="num">&diams;</span>Baseline Verification
+        </h2>
         <div class="card card-solution">
           <h4>Before &rarr; After review (all green)</h4>
           <p>
@@ -890,21 +917,26 @@
         <h2 id="findings"><span class="num">01</span>Findings</h2>
 
         <div class="card card-problem">
-          <h4>Dead <code>Must*</code> constructors violated the zero-panic contract</h4>
+          <h4>
+            Dead <code>Must*</code> constructors violated the zero-panic
+            contract
+          </h4>
           <p>
-            <code>MustNewCommand</code> / <code>MustNewParentCommand</code> were the
-            <strong>only</strong> <code>panic()</code> calls in non-test library code, had zero
-            callers, and directly contradicted AGENTS.md Gotcha #38 ("All Must* functions removed in
-            v2.5.0"). Removed.
+            <code>MustNewCommand</code> / <code>MustNewParentCommand</code> were
+            the <strong>only</strong> <code>panic()</code> calls in non-test
+            library code, had zero callers, and directly contradicted AGENTS.md
+            Gotcha #38 ("All Must* functions removed in v2.5.0"). Removed.
           </p>
         </div>
 
         <div class="card card-problem">
           <h4>Dead <code>FlowContext</code> interface</h4>
           <p>
-            Declared in <code>flow_context_access.go</code> but never implemented, never used as a
-            constraint, never referenced outside its own declaration. Its
-            <code>Branch(...) (*Scope,...)</code> method existed nowhere. Removed.
+            Declared in <code>flow_context_access.go</code> but never
+            implemented, never used as a constraint, never referenced outside
+            its own declaration. Its
+            <code>Branch(...) (*Scope,...)</code> method existed nowhere.
+            Removed.
           </p>
         </div>
 
@@ -912,17 +944,20 @@
           <h4>Split brain: two <code>FEATURES.md</code> files</h4>
           <p>
             Root <code>FEATURES.md</code> (current, v2.7.0) coexisted with
-            <code>docs/FEATURES.md</code> (stale, v2.4.0). The stale copy diverged on status legend,
-            version, and feature list. Removed the stale duplicate.
+            <code>docs/FEATURES.md</code> (stale, v2.4.0). The stale copy
+            diverged on status legend, version, and feature list. Removed the
+            stale duplicate.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>Misleading dead conditional in <code>Execute()</code></h4>
           <p>
-            Both branches of <code>if cli.writeFormattedError(execErr)</code> returned an identical
-            wrapped error, making the conditional meaningless. Simplified to a single unconditional
-            return; the JSON-error side effect is now an explicit comment.
+            Both branches of
+            <code>if cli.writeFormattedError(execErr)</code> returned an
+            identical wrapped error, making the conditional meaningless.
+            Simplified to a single unconditional return; the JSON-error side
+            effect is now an explicit comment.
           </p>
         </div>
 
@@ -930,8 +965,9 @@
           <h4>Length validators now count characters, not bytes</h4>
           <p>
             <code>validateMinLen</code>/<code>validateMaxLen</code> used
-            <code>len(val)</code> (bytes) but reported "characters". Multi-byte UTF-8 input was
-            miscounted. Switched to <code>utf8.RuneCountInString</code> and added a regression test.
+            <code>len(val)</code> (bytes) but reported "characters". Multi-byte
+            UTF-8 input was miscounted. Switched to
+            <code>utf8.RuneCountInString</code> and added a regression test.
           </p>
         </div>
 
@@ -944,13 +980,13 @@
           <div class="where">pkg/cmdguard/v2/command.go:281-309</div>
           <p>
             The library's defining principle is "zero panics". Two exported
-            <code>Must*</code> helpers (<code>panic</code> on error) survived despite AGENTS.md
-            stating they were removed in v2.5.0, and had no callers anywhere (code, tests,
-            examples).
+            <code>Must*</code> helpers (<code>panic</code> on error) survived
+            despite AGENTS.md stating they were removed in v2.5.0, and had no
+            callers anywhere (code, tests, examples).
           </p>
           <div class="callout callout-solution">
-            <strong>Fixed</strong> Removed both functions. Code now matches the documented contract.
-            Build, vet, all tests pass.
+            <strong>Fixed</strong> Removed both functions. Code now matches the
+            documented contract. Build, vet, all tests pass.
           </div>
         </div>
 
@@ -961,23 +997,26 @@
           <p>
             An interface whose second method (<code
               >Branch(commandName) (*Scope, *BranchingFlowContext, func())</code
-            >) had no implementation anywhere. It was never a parameter, return type, or type
-            constraint — pure dead surface area.
+            >) had no implementation anywhere. It was never a parameter, return
+            type, or type constraint — pure dead surface area.
           </p>
           <div class="callout callout-solution">
-            <strong>Fixed</strong> Removed the interface. No callers existed to break.
+            <strong>Fixed</strong> Removed the interface. No callers existed to
+            break.
           </div>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Fixed</span>
           <h3>Duplicated exit-code extraction logic</h3>
-          <div class="where">pkg/cmdguard/v2/cli.go:317-328 (ExecuteAndExit)</div>
+          <div class="where">
+            pkg/cmdguard/v2/cli.go:317-328 (ExecuteAndExit)
+          </div>
           <p>
             <code>ExecuteAndExit</code> reimplemented the
-            <code>errors.AsType[ExitCoder]</code> dance that already lived in the private
-            <code>extractExitCode()</code> helper. Consolidated onto the helper; dropped the
-            now-unused <code>errors</code> import.
+            <code>errors.AsType[ExitCoder]</code> dance that already lived in
+            the private <code>extractExitCode()</code> helper. Consolidated onto
+            the helper; dropped the now-unused <code>errors</code> import.
           </p>
         </div>
 
@@ -986,10 +1025,11 @@
           <h3>Global variable tripped gochecknoglobals</h3>
           <div class="where">pkg/cmdguard/v2/auditlog.go:28</div>
           <p>
-            <code>supportedAuditLogFormats</code> was a package-level slice used only for
-            membership/format listing. Replaced with a type-switch <code>Valid()</code> and a
-            <code>supportedAuditLogFormatNames()</code> function, eliminating the global and the
-            lint warning.
+            <code>supportedAuditLogFormats</code> was a package-level slice used
+            only for membership/format listing. Replaced with a type-switch
+            <code>Valid()</code> and a
+            <code>supportedAuditLogFormatNames()</code> function, eliminating
+            the global and the lint warning.
           </p>
         </div>
 
@@ -998,8 +1038,9 @@
           <h3>Import grouping tripped gci</h3>
           <div class="where">examples/taskctl/main.go:36-45</div>
           <p>
-            Third-party imports were split across two groups; the gci linter (custom-order: standard
-            / default / prefix) flagged it. Regrouped to match the configured sections.
+            Third-party imports were split across two groups; the gci linter
+            (custom-order: standard / default / prefix) flagged it. Regrouped to
+            match the configured sections.
           </p>
         </div>
 
@@ -1008,9 +1049,9 @@
           <h3>Stale comment referenced deleted type</h3>
           <div class="where">pkg/cmdguard/v2/flag_helpers.go:13</div>
           <p>
-            <code>FlagTypeConstraint</code> doc mentioned <code>GuardedCommand</code> (the pre-v2
-            name), which no longer exists anywhere. Corrected to reference
-            <code>Command</code> only.
+            <code>FlagTypeConstraint</code> doc mentioned
+            <code>GuardedCommand</code> (the pre-v2 name), which no longer
+            exists anywhere. Corrected to reference <code>Command</code> only.
           </p>
         </div>
 
@@ -1019,9 +1060,10 @@
           <h3>doc.go Quick Start used <code>panic(err)</code></h3>
           <div class="where">pkg/cmdguard/v2/doc.go:11-48</div>
           <p>
-            The package doc opens by stating the library is "all without panics", yet the example
-            used <code>panic(err)</code> on every error. The <code>Package</code> example already
-            used <code>log.Fatal</code>. Made the Quick Start consistent with
+            The package doc opens by stating the library is "all without
+            panics", yet the example used <code>panic(err)</code> on every
+            error. The <code>Package</code> example already used
+            <code>log.Fatal</code>. Made the Quick Start consistent with
             <code>log.Fatal</code>.
           </p>
         </div>
@@ -1031,19 +1073,22 @@
           <h3>Manual slice reverse instead of <code>slices.Reverse</code></h3>
           <div class="where">pkg/cmdguard/v2/scope.go:366-381</div>
           <p>
-            <code>Scope.Path()</code> hand-rolled an index-swap reverse loop. The rest of the
-            codebase uses the <code>slices</code> package. Replaced with
-            <code>slices.Reverse</code>.
+            <code>Scope.Path()</code> hand-rolled an index-swap reverse loop.
+            The rest of the codebase uses the <code>slices</code> package.
+            Replaced with <code>slices.Reverse</code>.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Fixed</span>
-          <h3><code>sort.Strings</code> inconsistent with <code>slices</code> usage</h3>
+          <h3>
+            <code>sort.Strings</code> inconsistent with
+            <code>slices</code> usage
+          </h3>
           <div class="where">pkg/cmdguard/v2/doctor.go:111</div>
           <p>
-            Switched to <code>slices.Sort</code> for consistency with the rest of the module and
-            dropped the <code>sort</code> import.
+            Switched to <code>slices.Sort</code> for consistency with the rest
+            of the module and dropped the <code>sort</code> import.
           </p>
         </div>
 
@@ -1052,8 +1097,9 @@
           <h3>Unused bool return on <code>writeFormattedError</code></h3>
           <div class="where">pkg/cmdguard/v2/cli_errors_json.go:101</div>
           <p>
-            After the dead-conditional fix the <code>bool</code> return was no longer read anywhere.
-            Simplified the private method to return nothing.
+            After the dead-conditional fix the <code>bool</code> return was no
+            longer read anywhere. Simplified the private method to return
+            nothing.
           </p>
         </div>
 
@@ -1066,8 +1112,9 @@
               <strong>Layered zero-panic guarantee</strong>
               <span
                 ><code>safeProvide</code> recovers provider panics into errors;
-                <code>RecoveryMiddleware</code> recovers handler panics with stack traces. Two
-                independent nets make the contract robust.</span
+                <code>RecoveryMiddleware</code> recovers handler panics with
+                stack traces. Two independent nets make the contract
+                robust.</span
               >
             </div>
           </div>
@@ -1076,10 +1123,11 @@
             <div class="text">
               <strong>"Parse, don't validate" value types</strong>
               <span
-                ><code>Port</code>, <code>Email</code>, <code>URL</code>, <code>Duration</code>,
-                <code>HostPort</code>, <code>Enum</code> are opaque structs with unexported fields,
-                constructible only via <code>Parse*</code>. Invalid states are unrepresentable at
-                compile time.</span
+                ><code>Port</code>, <code>Email</code>, <code>URL</code>,
+                <code>Duration</code>, <code>HostPort</code>,
+                <code>Enum</code> are opaque structs with unexported fields,
+                constructible only via <code>Parse*</code>. Invalid states are
+                unrepresentable at compile time.</span
               >
             </div>
           </div>
@@ -1088,9 +1136,9 @@
             <div class="text">
               <strong>Copy-on-write registries</strong>
               <span
-                ><code>typeRegistry</code>/<code>validatorRegistry</code> share global maps via lazy
-                clone, cutting <code>NewCLI</code> cost ~48% while keeping per-instance overrides
-                safe.</span
+                ><code>typeRegistry</code>/<code>validatorRegistry</code> share
+                global maps via lazy clone, cutting <code>NewCLI</code> cost
+                ~48% while keeping per-instance overrides safe.</span
               >
             </div>
           </div>
@@ -1099,9 +1147,11 @@
             <div class="text">
               <strong>Centralized, chainable error model</strong>
               <span
-                >40+ sentinels across domain files, all wrapped with <code>%w</code> so
-                <code>errors.Is</code> works end-to-end. Typed wrappers (<code>CommandError</code>,
-                <code>FlagError</code>, …) add context without losing the chain.</span
+                >40+ sentinels across domain files, all wrapped with
+                <code>%w</code> so <code>errors.Is</code> works end-to-end.
+                Typed wrappers (<code>CommandError</code>,
+                <code>FlagError</code>, …) add context without losing the
+                chain.</span
               >
             </div>
           </div>
@@ -1110,9 +1160,11 @@
             <div class="text">
               <strong>Modern Go throughout</strong>
               <span
-                ><code>iter.Seq</code> zero-alloc iterators, <code>errors.AsType[T]</code>,
-                <code>slices</code>/<code>maps</code>, <code>sync.OnceValue</code> caching,
-                generics-native DI (<code>Provide[T]</code>).</span
+                ><code>iter.Seq</code> zero-alloc iterators,
+                <code>errors.AsType[T]</code>,
+                <code>slices</code>/<code>maps</code>,
+                <code>sync.OnceValue</code> caching, generics-native DI
+                (<code>Provide[T]</code>).</span
               >
             </div>
           </div>
@@ -1219,7 +1271,9 @@
               <td>13</td>
               <td><span class="badge badge-medium">Medium</span></td>
               <td>errors_di.go</td>
-              <td><code>ErrServiceNotFound</code> never returned by prod code</td>
+              <td>
+                <code>ErrServiceNotFound</code> never returned by prod code
+              </td>
               <td><span class="badge badge-low">Open</span></td>
             </tr>
             <tr>
@@ -1257,10 +1311,12 @@
         <div class="card card-warning">
           <h4><code>ErrServiceNotFound</code> — exported but unreachable</h4>
           <p>
-            The sentinel is declared, unit-tested, and listed in the JSON error classifier, but
-            <strong>no production code path returns it</strong>. It is part of the public API, so
-            removing it would be breaking. Decision deferred to maintainer: either wire it into a
-            real path (e.g. a typed <code>Invoke</code> wrapper) or document it as a consumer-facing
+            The sentinel is declared, unit-tested, and listed in the JSON error
+            classifier, but
+            <strong>no production code path returns it</strong>. It is part of
+            the public API, so removing it would be breaking. Decision deferred
+            to maintainer: either wire it into a real path (e.g. a typed
+            <code>Invoke</code> wrapper) or document it as a consumer-facing
             sentinel.
           </p>
         </div>
@@ -1268,21 +1324,25 @@
         <div class="card card-warning">
           <h4>AGENTS.md claims drift</h4>
           <p>
-            Header still says "0 lint issues" (was 2 before this review; now genuinely 0 again).
-            Gotcha #14 claims the <code>sync.Map</code> regex cache "must not run in parallel" —
-            <code>sync.Map</code> is concurrency-safe, so the caveat is misleading. Both are
-            doc-only fixes.
+            Header still says "0 lint issues" (was 2 before this review; now
+            genuinely 0 again). Gotcha #14 claims the
+            <code>sync.Map</code> regex cache "must not run in parallel" —
+            <code>sync.Map</code> is concurrency-safe, so the caveat is
+            misleading. Both are doc-only fixes.
           </p>
         </div>
 
         <div class="card">
           <h4>int64 / uint64 flag precision</h4>
           <p>
-            All integer kinds route through pflag's 32-bit <code>Int</code>/<code>Uint</code>
-            registration, so an <code>int64</code> or <code>uint64</code> config field cannot hold
-            values &gt; 2³¹−1. Registering dedicated <code>Int64</code>/<code>Uint64</code> handlers
-            for those kinds would remove the silent truncation. Low customer impact today; worth a
-            follow-up.
+            All integer kinds route through pflag's 32-bit
+            <code>Int</code>/<code>Uint</code> registration, so an
+            <code>int64</code> or <code>uint64</code> config field cannot hold
+            values &gt; 2³¹−1. Registering dedicated <code>Int64</code>/<code
+              >Uint64</code
+            >
+            handlers for those kinds would remove the silent truncation. Low
+            customer impact today; worth a follow-up.
           </p>
         </div>
 
@@ -1290,35 +1350,41 @@
           <h4>Test-helper file naming clarity</h4>
           <p>
             Three files differ by a single underscore and a misleading name:
-            <code>test_helpers_test.go</code> (internal), <code>testhelpers_test.go</code> (external
-            <code>v2_test</code>), and <code>helpers_test.go</code> (which actually contains real
-            tests like <code>TestLogLevel</code>, not just helpers). Renaming/consolidating would
-            improve navigability — purely cosmetic, deferred to avoid churn.
+            <code>test_helpers_test.go</code> (internal),
+            <code>testhelpers_test.go</code> (external <code>v2_test</code>),
+            and <code>helpers_test.go</code> (which actually contains real tests
+            like <code>TestLogLevel</code>, not just helpers).
+            Renaming/consolidating would improve navigability — purely cosmetic,
+            deferred to avoid churn.
           </p>
         </div>
 
         <div class="card">
           <h4>Minor type-strictness opportunities (design notes)</h4>
           <p>
-            <strong>Port</strong> stores an <code>int</code> where <code>uint16</code> would make
-            the 0–65535 invariant unrepresentable-violating (matches the architect checklist's "use
-            uints"). <strong>Arg-count options</strong> (<code>WithExactArgs</code>, …) take
-            <code>int</code> and validate non-negative at runtime; <code>uint</code> would push that
-            to compile time. Both conflict slightly with cobra/pflag's <code>int</code> APIs, so
-            they are tradeoffs, not defects.
+            <strong>Port</strong> stores an <code>int</code> where
+            <code>uint16</code> would make the 0–65535 invariant
+            unrepresentable-violating (matches the architect checklist's "use
+            uints").
+            <strong>Arg-count options</strong> (<code>WithExactArgs</code>, …)
+            take <code>int</code> and validate non-negative at runtime;
+            <code>uint</code> would push that to compile time. Both conflict
+            slightly with cobra/pflag's <code>int</code> APIs, so they are
+            tradeoffs, not defects.
           </p>
         </div>
 
         <div class="callout callout-solution">
-          <strong>Verdict</strong> No action-blocking defects remain. The codebase is
-          production-grade: strong types, defense-in-depth against panics, comprehensive tests
-          (86.5%, race-clean), and zero lint issues. The remaining items are polish and doc-sync
-          work.
+          <strong>Verdict</strong> No action-blocking defects remain. The
+          codebase is production-grade: strong types, defense-in-depth against
+          panics, comprehensive tests (86.5%, race-clean), and zero lint issues.
+          The remaining items are polish and doc-sync work.
         </div>
 
         <footer class="footer">
-          Generated 2026-06-18 &middot; Reviewed against cmdguard v2.7.0 (commit 9cd2d53) &middot;
-          Every claim verified via build + <code>go test -race</code> + <code>golangci-lint</code>
+          Generated 2026-06-18 &middot; Reviewed against cmdguard v2.7.0 (commit
+          9cd2d53) &middot; Every claim verified via build +
+          <code>go test -race</code> + <code>golangci-lint</code>
         </footer>
       </main>
     </div>

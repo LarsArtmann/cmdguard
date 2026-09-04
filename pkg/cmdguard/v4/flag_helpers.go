@@ -68,7 +68,7 @@ func createFlagPrototype[F any](flags F) F {
 
 	t := reflect.TypeOf(zero)
 	if t != nil && t.Kind() == reflect.Pointer {
-		if proto, ok := reflect.New(t.Elem()).Interface().(F); ok {
+		if proto, ok := reflect.TypeAssert[F](reflect.New(t.Elem())); ok {
 			return proto
 		}
 	}
@@ -121,7 +121,7 @@ func cloneFlags[F any](flags F) F {
 		newPtr := reflect.New(v.Elem().Type())
 		deepCopyValue(newPtr.Elem(), v.Elem())
 
-		if cloned, ok := newPtr.Interface().(F); ok {
+		if cloned, ok := reflect.TypeAssert[F](newPtr); ok {
 			return cloned
 		}
 
@@ -132,7 +132,7 @@ func cloneFlags[F any](flags F) F {
 		newStruct := reflect.New(v.Type()).Elem()
 		deepCopyValue(newStruct, v)
 
-		if cloned, ok := newStruct.Interface().(F); ok {
+		if cloned, ok := reflect.TypeAssert[F](newStruct); ok {
 			return cloned
 		}
 
@@ -159,7 +159,7 @@ func createNilFlags[F any]() (F, any, error) {
 	if t.Kind() == reflect.Pointer {
 		newVal := reflect.New(t.Elem())
 
-		fc, ok := newVal.Interface().(F)
+		fc, ok := reflect.TypeAssert[F](newVal)
 		if !ok {
 			return zero, nil, fmt.Errorf(
 				"cloneAndParseFlags: failed to create flag instance for type %T: %w",
@@ -173,7 +173,7 @@ func createNilFlags[F any]() (F, any, error) {
 
 	newPtr := reflect.New(t)
 
-	fc, ok := newPtr.Elem().Interface().(F)
+	fc, ok := reflect.TypeAssert[F](newPtr.Elem())
 	if !ok {
 		return zero, nil, fmt.Errorf(
 			"cloneAndParseFlags: failed to create flag instance for type %T: %w",
@@ -221,7 +221,7 @@ func parseAndSyncFlags[F any](
 
 	t := reflect.TypeOf(flags)
 	if t != nil && t.Kind() != reflect.Pointer {
-		if fc, ok := reflect.ValueOf(flagsPtr).Elem().Interface().(F); ok {
+		if fc, ok := reflect.TypeAssert[F](reflect.ValueOf(flagsPtr).Elem()); ok {
 			return fc, nil
 		}
 	}
@@ -271,7 +271,7 @@ func formatFieldValue(field reflect.Value) string {
 		return ""
 	}
 
-	if s, ok := field.Interface().(fmt.Stringer); ok {
+	if s, ok := reflect.TypeAssert[fmt.Stringer](field); ok {
 		return s.String()
 	}
 

@@ -128,33 +128,33 @@ The only pre-existing issue is in `pkg/testutil/panic_test_helpers.go` (type ass
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #   | Item                                            | Impact                 | Effort  | Tier         |
-| --- | ----------------------------------------------- | ---------------------- | ------- | ------------ |
-| 1   | Add `CODECOV_TOKEN` to repo                     | CI completeness        | 2min    | Now          |
-| 2   | Fuzz test corpus for 7 targets                  | Robustness             | Medium  | This week    |
-| 3   | Structured JSON error output                    | Feature polish         | Medium  | This week    |
-| 4   | Smoke test for benchmarks package               | Testing gap            | Small   | This week    |
-| 5   | `checks.build` via `buildGoModule` in flake.nix | CI completeness        | Medium  | This month   |
-| 6   | charmbracelet/log integration                   | Modern logging         | Small   | This month   |
-| 7   | CONTRIBUTING.md                                 | Community              | Small   | This month   |
-| 8   | Issue/PR templates                              | Community              | Small   | This month   |
-| 9   | Test all examples in CI                         | CI reliability         | Small   | This week    |
-| 10  | `Result[T]` type for error handling             | Type safety            | Medium  | Next quarter |
-| 11  | `Validated[T]` wrapper with validation          | Type safety            | Medium  | Next quarter |
-| 12  | Plugin system design document                   | Architecture           | Large   | v3.0         |
-| 13  | Config file nested struct support               | Most requested         | Large   | v3.0         |
-| 14  | v3.0 API design document                        | Foundation             | Large   | v3.0         |
-| 15  | Make NoFlags distinct named type                | Type safety (breaking) | Medium  | v3.0         |
-| 16  | Rename Get[T]/MustGet[T]                        | Clarity (breaking)     | Medium  | v3.0         |
-| 17  | Make RegisterInScope generic                    | Type safety (breaking) | Medium  | v3.0         |
-| 18  | Remove WithColor deprecation                    | Cleanup (breaking)     | Trivial | v3.0         |
-| 19  | Remove IsExecutable deprecation                 | Cleanup (breaking)     | Trivial | v3.0         |
-| 20  | Extract flagtags standalone library             | Reusability            | Large   | Future       |
-| 21  | go-output as optional sub-package               | Dependency hygiene     | Large   | v3.0         |
-| 22  | Documentation generation from CLI               | Self-documenting       | Large   | Future       |
-| 23  | Metrics/hooks for observability                 | Production readiness   | Medium  | Future       |
-| 24  | BDD tests with ginkgo                           | Test quality           | Medium  | Future       |
-| 25  | Deprecate v1 API timeline                       | Process                | Trivial | v3.0         |
+| #  | Item                                            | Impact                 | Effort  | Tier         |
+| -- | ----------------------------------------------- | ---------------------- | ------- | ------------ |
+| 1  | Add `CODECOV_TOKEN` to repo                     | CI completeness        | 2min    | Now          |
+| 2  | Fuzz test corpus for 7 targets                  | Robustness             | Medium  | This week    |
+| 3  | Structured JSON error output                    | Feature polish         | Medium  | This week    |
+| 4  | Smoke test for benchmarks package               | Testing gap            | Small   | This week    |
+| 5  | `checks.build` via `buildGoModule` in flake.nix | CI completeness        | Medium  | This month   |
+| 6  | charmbracelet/log integration                   | Modern logging         | Small   | This month   |
+| 7  | CONTRIBUTING.md                                 | Community              | Small   | This month   |
+| 8  | Issue/PR templates                              | Community              | Small   | This month   |
+| 9  | Test all examples in CI                         | CI reliability         | Small   | This week    |
+| 10 | `Result[T]` type for error handling             | Type safety            | Medium  | Next quarter |
+| 11 | `Validated[T]` wrapper with validation          | Type safety            | Medium  | Next quarter |
+| 12 | Plugin system design document                   | Architecture           | Large   | v3.0         |
+| 13 | Config file nested struct support               | Most requested         | Large   | v3.0         |
+| 14 | v3.0 API design document                        | Foundation             | Large   | v3.0         |
+| 15 | Make NoFlags distinct named type                | Type safety (breaking) | Medium  | v3.0         |
+| 16 | Rename Get[T]/MustGet[T]                        | Clarity (breaking)     | Medium  | v3.0         |
+| 17 | Make RegisterInScope generic                    | Type safety (breaking) | Medium  | v3.0         |
+| 18 | Remove WithColor deprecation                    | Cleanup (breaking)     | Trivial | v3.0         |
+| 19 | Remove IsExecutable deprecation                 | Cleanup (breaking)     | Trivial | v3.0         |
+| 20 | Extract flagtags standalone library             | Reusability            | Large   | Future       |
+| 21 | go-output as optional sub-package               | Dependency hygiene     | Large   | v3.0         |
+| 22 | Documentation generation from CLI               | Self-documenting       | Large   | Future       |
+| 23 | Metrics/hooks for observability                 | Production readiness   | Medium  | Future       |
+| 24 | BDD tests with ginkgo                           | Test quality           | Medium  | Future       |
+| 25 | Deprecate v1 API timeline                       | Process                | Trivial | v3.0         |
 
 ---
 

@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -289,15 +289,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -310,15 +322,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -831,8 +855,9 @@
           <div class="hero-badge">PARETO PLAN</div>
           <h1>cmdguard v3 — Comprehensive Execution Plan</h1>
           <p class="hero-subtitle">
-            60 subtasks across 12 medium tasks, sorted by Pareto impact tiers. Covers all open
-            TODO_LIST.md items (P0-P3). API-breaking changes deferred to v3.1+.
+            60 subtasks across 12 medium tasks, sorted by Pareto impact tiers.
+            Covers all open TODO_LIST.md items (P0-P3). API-breaking changes
+            deferred to v3.1+.
           </p>
         </div>
 
@@ -861,8 +886,8 @@
           <p>
             <strong>WithSilenceUsage</strong> is a no-op for root command.
             <strong>WithPlugin</strong> silently swallows errors.
-            <strong>Every doc claims "0 lint issues"</strong> but actual is 38. These are
-            trust-destroying bugs.
+            <strong>Every doc claims "0 lint issues"</strong> but actual is 38.
+            These are trust-destroying bugs.
           </p>
         </div>
 
@@ -889,7 +914,9 @@
               <td>2</td>
               <td>Fix <code>WithPlugin</code> error swallowing</td>
               <td>20m</td>
-              <td><code>_ = RegisterPlugin(plugin)</code> silently discards errors</td>
+              <td>
+                <code>_ = RegisterPlugin(plugin)</code> silently discards errors
+              </td>
             </tr>
             <tr>
               <td>3</td>
@@ -1014,7 +1041,9 @@
           </tbody>
         </table>
 
-        <h2 id="medium"><span class="num">02</span>Medium Plan (12 tasks, 15min-2.5h each)</h2>
+        <h2 id="medium">
+          <span class="num">02</span>Medium Plan (12 tasks, 15min-2.5h each)
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1142,7 +1171,8 @@
         </div>
 
         <h2 id="detailed">
-          <span class="num">03</span>Detailed Breakdown (60 subtasks, max 15min each)
+          <span class="num">03</span>Detailed Breakdown (60 subtasks, max 15min
+          each)
         </h2>
         <div class="table-wrap">
           <table>
@@ -1157,7 +1187,9 @@
             <tbody>
               <tr>
                 <td>1</td>
-                <td>Read cli.go:172,240,437 — understand SilenceUsage hardcoding</td>
+                <td>
+                  Read cli.go:172,240,437 — understand SilenceUsage hardcoding
+                </td>
                 <td>M01</td>
                 <td>5m</td>
               </tr>
@@ -1313,7 +1345,9 @@
               </tr>
               <tr>
                 <td>27</td>
-                <td>Fix AGENTS.md — correct lint count, dep count, stale claims</td>
+                <td>
+                  Fix AGENTS.md — correct lint count, dep count, stale claims
+                </td>
                 <td>M06</td>
                 <td>15m</td>
               </tr>
@@ -1331,7 +1365,9 @@
               </tr>
               <tr>
                 <td>30</td>
-                <td>Fix ROADMAP.md — GenerateDocs done, EditInEditor removed</td>
+                <td>
+                  Fix ROADMAP.md — GenerateDocs done, EditInEditor removed
+                </td>
                 <td>M06</td>
                 <td>5m</td>
               </tr>
@@ -1343,7 +1379,9 @@
               </tr>
               <tr>
                 <td>32</td>
-                <td>Audit PERFORMANCE.md + DOMAIN_LANGUAGE.md for stale refs</td>
+                <td>
+                  Audit PERFORMANCE.md + DOMAIN_LANGUAGE.md for stale refs
+                </td>
                 <td>M06</td>
                 <td>10m</td>
               </tr>
@@ -2527,40 +2565,61 @@
                 width="1837"
                 height="2516"
               >
-                <rect x="-81" y="-85" width="1837" height="2516" fill="white"></rect>
+                <rect
+                  x="-81"
+                  y="-85"
+                  width="1837"
+                  height="2516"
+                  fill="white"
+                ></rect>
               </mask>
             </svg>
           </svg>
         </div>
 
-        <h2 id="deferred"><span class="num">05</span>Deferred Items (API-breaking — v3.1+)</h2>
+        <h2 id="deferred">
+          <span class="num">05</span>Deferred Items (API-breaking — v3.1+)
+        </h2>
         <div class="card card-warning">
           <h4>Intentionally Deferred</h4>
-          <p>These items change public API signatures and require a semver-minor bump (v3.1+):</p>
+          <p>
+            These items change public API signatures and require a semver-minor
+            bump (v3.1+):
+          </p>
           <ul>
             <li>
               <strong>#12</strong> Middleware context propagation — changes
               <code>Middleware[T]</code> func signature
             </li>
             <li>
-              <strong>#15</strong> Rename <code>Get[T]</code> &rarr; <code>GetService[T]</code>
+              <strong>#15</strong> Rename <code>Get[T]</code> &rarr;
+              <code>GetService[T]</code>
             </li>
-            <li><strong>#16</strong> Make <code>RegisterInScope</code> generic</li>
-            <li><strong>#17</strong> Remove or redesign <code>Package()</code></li>
+            <li>
+              <strong>#16</strong> Make <code>RegisterInScope</code> generic
+            </li>
+            <li>
+              <strong>#17</strong> Remove or redesign <code>Package()</code>
+            </li>
             <li><strong>#18</strong> Remove <code>SetConfig</code></li>
           </ul>
         </div>
         <div class="card">
           <h4>Cannot Execute (requires external access)</h4>
           <ul>
-            <li><strong>#23</strong> Second example app — low ROI, 2h effort</li>
-            <li><strong>#26</strong> CODECOV_TOKEN secret — requires GitHub repo owner settings</li>
+            <li>
+              <strong>#23</strong> Second example app — low ROI, 2h effort
+            </li>
+            <li>
+              <strong>#26</strong> CODECOV_TOKEN secret — requires GitHub repo
+              owner settings
+            </li>
           </ul>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-10 &middot; All task estimates verified against source code &middot;
-          Pareto tiers based on customer trust impact
+          Generated 2026-07-10 &middot; All task estimates verified against
+          source code &middot; Pareto tiers based on customer trust impact
         </footer>
       </main>
     </div>

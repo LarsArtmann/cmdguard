@@ -35,29 +35,29 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 
 ### Bugs Fixed
 
-| #   | Bug                                                                  | Root Cause                                                                                            | Fix                                                     | Commit    |
-| --- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | --------- |
-| 1   | `configload.Auto()` always used JSON                                 | `autoLoader.Load()` delegated to `JSON()` unconditionally                                             | Try YAML → TOML → JSON sequentially                     | `6d832e3` |
-| 2   | `ShutdownAll` double-wrapped `ErrServiceConstruction`                | `Shutdown()` wraps once, `ShutdownAll` wrapped again                                                  | Removed redundant wrapping                              | `3e4c5f5` |
-| 3   | `getFieldValue` incomplete — missed struct types with `fmt.Stringer` | Only checked `fmt.Stringer` for primitive kinds, returned `("", false)` for all structs               | Replaced with `formatFieldValue`                        | `090b9f6` |
-| 4   | `ErrLogLevel`/`ErrLogFormat` unreachable                             | `ParseLogLevel`/`ParseLogFormat` passed through `ParseEnum` error without wrapping their own sentinel | Added `fmt.Errorf("%w: %w", ErrLogLevel, err)` wrapping | `670e8ea` |
-| 5   | 3 bare sentinel returns without context                              | `ErrConfigNil` (×2) and `ErrConfigFileNotFound` returned bare                                         | Added `fmt.Errorf` wrapping with diagnostic context     | `670e8ea` |
+| # | Bug                                                                  | Root Cause                                                                                            | Fix                                                     | Commit    |
+| - | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | --------- |
+| 1 | `configload.Auto()` always used JSON                                 | `autoLoader.Load()` delegated to `JSON()` unconditionally                                             | Try YAML → TOML → JSON sequentially                     | `6d832e3` |
+| 2 | `ShutdownAll` double-wrapped `ErrServiceConstruction`                | `Shutdown()` wraps once, `ShutdownAll` wrapped again                                                  | Removed redundant wrapping                              | `3e4c5f5` |
+| 3 | `getFieldValue` incomplete — missed struct types with `fmt.Stringer` | Only checked `fmt.Stringer` for primitive kinds, returned `("", false)` for all structs               | Replaced with `formatFieldValue`                        | `090b9f6` |
+| 4 | `ErrLogLevel`/`ErrLogFormat` unreachable                             | `ParseLogLevel`/`ParseLogFormat` passed through `ParseEnum` error without wrapping their own sentinel | Added `fmt.Errorf("%w: %w", ErrLogLevel, err)` wrapping | `670e8ea` |
+| 5 | 3 bare sentinel returns without context                              | `ErrConfigNil` (×2) and `ErrConfigFileNotFound` returned bare                                         | Added `fmt.Errorf` wrapping with diagnostic context     | `670e8ea` |
 
 ### Features Added
 
-| #   | Feature                                                                           | Commit    |
-| --- | --------------------------------------------------------------------------------- | --------- |
-| 1   | `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat`                    | `7fe2940` |
-| 2   | `MustParseEnum` (custom signature, not generic MustParse[T])                      | `903c8c5` |
-| 3   | `registerGoDurationHandler` now validates non-empty defaults at registration time | `7fe2940` |
+| # | Feature                                                                           | Commit    |
+| - | --------------------------------------------------------------------------------- | --------- |
+| 1 | `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat`                    | `7fe2940` |
+| 2 | `MustParseEnum` (custom signature, not generic MustParse[T])                      | `903c8c5` |
+| 3 | `registerGoDurationHandler` now validates non-empty defaults at registration time | `7fe2940` |
 
 ### Architecture Improvements
 
-| #   | Improvement                                                                                                 | Commit    |
-| --- | ----------------------------------------------------------------------------------------------------------- | --------- |
-| 1   | `validatorRegistry` threaded through `ValidateConfig` path (internal functions accept `*validatorRegistry`) | `37d994c` |
-| 2   | Removed dead `getFieldValue` function (replaced by `formatFieldValue`)                                      | `090b9f6` |
-| 3   | Enum Marshal/Unmarshal documented as intentionally hand-written                                             | `86bf188` |
+| # | Improvement                                                                                                 | Commit    |
+| - | ----------------------------------------------------------------------------------------------------------- | --------- |
+| 1 | `validatorRegistry` threaded through `ValidateConfig` path (internal functions accept `*validatorRegistry`) | `37d994c` |
+| 2 | Removed dead `getFieldValue` function (replaced by `formatFieldValue`)                                      | `090b9f6` |
+| 3 | Enum Marshal/Unmarshal documented as intentionally hand-written                                             | `86bf188` |
 
 ### Test Coverage Added
 
@@ -98,18 +98,18 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 
 ### Known Gaps (from audit, sorted by impact)
 
-| #   | Gap                                                                               | Impact                                                                           | Effort                          |
-| --- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------- |
-| 1   | `RegisterInScope` can't accept typed providers (`func(do.Injector) (*T, error)`)  | High — function is essentially unusable with the library's own `Provide` pattern | 2h (needs Go generics redesign) |
-| 2   | `Package()` panics on CLI creation failure                                        | Medium — contradicts "no panics" principle                                       | 30min                           |
-| 3   | Slice handler only supports `[]string`                                            | Medium — `[]int`, `[]Port`, etc. are common                                      | 4h                              |
-| 4   | Config file nested struct support                                                 | Medium — flat-only is limiting                                                   | 1d                              |
-| 5   | `validateTagRules` has 16.7% coverage                                             | Low                                                                              | 1h                              |
-| 6   | `completion.go` has 0% coverage (thin cobra wiring)                               | Low                                                                              | 30min                           |
-| 7   | `RegisterValidator()` public API has 0% coverage                                  | Low                                                                              | 30min                           |
-| 8   | `manpage.go` — `GenerateManPageCommand` at 14.3%, `NewManPage` at 0%              | Low                                                                              | 1h                              |
-| 9   | `flow_context_access.go` — `Get[T]` and `MustGet[T]` at 0%                        | Low                                                                              | 30min                           |
-| 10  | `prompts.go` — `PromptString`/`PromptSelect`/`PromptConfirm` at 0% (requires TTY) | Low                                                                              | 2h                              |
+| #  | Gap                                                                               | Impact                                                                           | Effort                          |
+| -- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------- |
+| 1  | `RegisterInScope` can't accept typed providers (`func(do.Injector) (*T, error)`)  | High — function is essentially unusable with the library's own `Provide` pattern | 2h (needs Go generics redesign) |
+| 2  | `Package()` panics on CLI creation failure                                        | Medium — contradicts "no panics" principle                                       | 30min                           |
+| 3  | Slice handler only supports `[]string`                                            | Medium — `[]int`, `[]Port`, etc. are common                                      | 4h                              |
+| 4  | Config file nested struct support                                                 | Medium — flat-only is limiting                                                   | 1d                              |
+| 5  | `validateTagRules` has 16.7% coverage                                             | Low                                                                              | 1h                              |
+| 6  | `completion.go` has 0% coverage (thin cobra wiring)                               | Low                                                                              | 30min                           |
+| 7  | `RegisterValidator()` public API has 0% coverage                                  | Low                                                                              | 30min                           |
+| 8  | `manpage.go` — `GenerateManPageCommand` at 14.3%, `NewManPage` at 0%              | Low                                                                              | 1h                              |
+| 9  | `flow_context_access.go` — `Get[T]` and `MustGet[T]` at 0%                        | Low                                                                              | 30min                           |
+| 10 | `prompts.go` — `PromptString`/`PromptSelect`/`PromptConfirm` at 0% (requires TTY) | Low                                                                              | 2h                              |
 
 ### Future Work (from TODO_LIST.md)
 
@@ -169,44 +169,44 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 
 ### Tier 1: High Impact, Low Effort (Do Now)
 
-| #   | Task                                                       | Effort | Impact               |
-| --- | ---------------------------------------------------------- | ------ | -------------------- |
-| 1   | Add `CODECOV_TOKEN` to GitHub repo settings                | 5min   | CI coverage tracking |
-| 2   | Add tests for `RegisterValidator()` public API             | 30min  | Coverage gap         |
-| 3   | Add tests for `Get[T]`/`MustGet[T]` flow context accessors | 30min  | Coverage gap         |
-| 4   | Add tests for `WithCompletion`/`WithValidArgs`             | 30min  | Coverage gap         |
-| 5   | Document `validate` tag in README.md                       | 30min  | Discoverability      |
-| 6   | Add `WithArgs` test (currently 0% coverage)                | 20min  | Coverage gap         |
+| # | Task                                                       | Effort | Impact               |
+| - | ---------------------------------------------------------- | ------ | -------------------- |
+| 1 | Add `CODECOV_TOKEN` to GitHub repo settings                | 5min   | CI coverage tracking |
+| 2 | Add tests for `RegisterValidator()` public API             | 30min  | Coverage gap         |
+| 3 | Add tests for `Get[T]`/`MustGet[T]` flow context accessors | 30min  | Coverage gap         |
+| 4 | Add tests for `WithCompletion`/`WithValidArgs`             | 30min  | Coverage gap         |
+| 5 | Document `validate` tag in README.md                       | 30min  | Discoverability      |
+| 6 | Add `WithArgs` test (currently 0% coverage)                | 20min  | Coverage gap         |
 
 ### Tier 2: Medium Impact, Medium Effort (Do Soon)
 
-| #   | Task                                                         | Effort | Impact                   |
-| --- | ------------------------------------------------------------ | ------ | ------------------------ |
-| 7   | Wire instance-scoped validators through `ValidateFlags` path | 2h     | Architecture correctness |
-| 8   | Add `validateTagRules` tests (16.7% → 80%+)                  | 1h     | Validation coverage      |
-| 9   | Add manpage tests (`GenerateManPageCommand`, `NewManPage`)   | 1h     | Coverage gap             |
-| 10  | Add `renderAndWrite` output tests                            | 1h     | Coverage gap             |
-| 11  | Add `WithDoctorLong` test                                    | 20min  | Coverage gap             |
-| 12  | Add `WithConfigFileLoader` test                              | 30min  | Coverage gap             |
-| 13  | Add `HealthCheckResults` (Scope) test                        | 20min  | Coverage gap             |
-| 14  | Fix `Package()` to return error instead of panic             | 30min  | API correctness          |
+| #  | Task                                                         | Effort | Impact                   |
+| -- | ------------------------------------------------------------ | ------ | ------------------------ |
+| 7  | Wire instance-scoped validators through `ValidateFlags` path | 2h     | Architecture correctness |
+| 8  | Add `validateTagRules` tests (16.7% → 80%+)                  | 1h     | Validation coverage      |
+| 9  | Add manpage tests (`GenerateManPageCommand`, `NewManPage`)   | 1h     | Coverage gap             |
+| 10 | Add `renderAndWrite` output tests                            | 1h     | Coverage gap             |
+| 11 | Add `WithDoctorLong` test                                    | 20min  | Coverage gap             |
+| 12 | Add `WithConfigFileLoader` test                              | 30min  | Coverage gap             |
+| 13 | Add `HealthCheckResults` (Scope) test                        | 20min  | Coverage gap             |
+| 14 | Fix `Package()` to return error instead of panic             | 30min  | API correctness          |
 
 ### Tier 3: High Impact, High Effort (Plan for v3)
 
-| #   | Task                                                        | Effort | Impact                  |
-| --- | ----------------------------------------------------------- | ------ | ----------------------- |
-| 15  | Generic `RegisterInScope[T]` redesign                       | 2h     | API usability           |
-| 16  | Slice handler: support `[]int`, `[]Port`, etc.              | 4h     | Common feature request  |
-| 17  | Config file nested struct support                           | 1d     | Major feature gap       |
-| 18  | `ConfigFileLoader` path-aware interface                     | 2h     | Better auto-detection   |
-| 18  | Remove `SetConfig` or make it safe                          | 2h     | API correctness         |
-| 19  | Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation      | 1h     | Side-effect elimination |
-| 20  | Make `NoFlags` distinct named type                          | 1h     | Type safety             |
-| 21  | Structured JSON error output for `--output=json`            | 4h     | CLI best practice       |
-| 22  | Config auto-loading with koanf integration                  | 4h     | Ecosystem integration   |
-| 23  | Extract flag-related code to standalone `flagtags` library  | 1d     | Reusability             |
-| 24  | Plugin system for custom validators and type handlers       | 2d     | Extensibility           |
-| 25  | Documentation generation (GenerateDocs, markdown, API docs) | 2d     | Discoverability         |
+| #  | Task                                                        | Effort | Impact                  |
+| -- | ----------------------------------------------------------- | ------ | ----------------------- |
+| 15 | Generic `RegisterInScope[T]` redesign                       | 2h     | API usability           |
+| 16 | Slice handler: support `[]int`, `[]Port`, etc.              | 4h     | Common feature request  |
+| 17 | Config file nested struct support                           | 1d     | Major feature gap       |
+| 18 | `ConfigFileLoader` path-aware interface                     | 2h     | Better auto-detection   |
+| 18 | Remove `SetConfig` or make it safe                          | 2h     | API correctness         |
+| 19 | Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation      | 1h     | Side-effect elimination |
+| 20 | Make `NoFlags` distinct named type                          | 1h     | Type safety             |
+| 21 | Structured JSON error output for `--output=json`            | 4h     | CLI best practice       |
+| 22 | Config auto-loading with koanf integration                  | 4h     | Ecosystem integration   |
+| 23 | Extract flag-related code to standalone `flagtags` library  | 1d     | Reusability             |
+| 24 | Plugin system for custom validators and type handlers       | 2d     | Extensibility           |
+| 25 | Documentation generation (GenerateDocs, markdown, API docs) | 2d     | Discoverability         |
 
 ---
 

@@ -32,12 +32,12 @@ Extracted the repeated `AddCommand` fatal pattern into three scoped generic help
 
 ### Clone group eliminated (20 sites → 3 helpers + 20 one-liner call sites)
 
-| #   | File(s)                                                                                                       | Pattern                                                                                        | Fix                            |
-| --- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------ |
-| 1   | `pkg/cmdguard/v2/cli_graceful_shutdown_test.go:60-62, 85-87` (2 sites)                                        | `if err := v2.AddCommand(cli, cmd); err != nil { t.Fatalf("AddCommand failed: %v", err) }`     | `addCommand(t, cli, cmd)`      |
-| 2   | `pkg/cmdguard/v2/cli_lifecycle_test.go:352-354, 377-379, 399-401, 424-426` (4 sites)                          | Same pattern as #1                                                                             | Same helper                    |
-| 3   | `pkg/cmdguard/v2/testutil/testutil_test.go:52-54, 83-85, 143-145` (3 sites)                                   | `if err := v2.AddCommand(cli, cmd); err != nil { t.Fatalf("failed to add command: %v", err) }` | `AddCommand(t, cli, cmd)`      |
-| 4   | `tests/integration/v2_bdd_lifecycle_test.go:152, 198, 246, 307, 352, 397, 462, 555, 668, 852, 925` (11 sites) | `if err := v2.AddCommand(cli, cmd); err != nil { t.Fatalf("AddCommand: %v", err) }`            | `registerCommand(t, cli, cmd)` |
+| # | File(s)                                                                                                       | Pattern                                                                                        | Fix                            |
+| - | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------ |
+| 1 | `pkg/cmdguard/v2/cli_graceful_shutdown_test.go:60-62, 85-87` (2 sites)                                        | `if err := v2.AddCommand(cli, cmd); err != nil { t.Fatalf("AddCommand failed: %v", err) }`     | `addCommand(t, cli, cmd)`      |
+| 2 | `pkg/cmdguard/v2/cli_lifecycle_test.go:352-354, 377-379, 399-401, 424-426` (4 sites)                          | Same pattern as #1                                                                             | Same helper                    |
+| 3 | `pkg/cmdguard/v2/testutil/testutil_test.go:52-54, 83-85, 143-145` (3 sites)                                   | `if err := v2.AddCommand(cli, cmd); err != nil { t.Fatalf("failed to add command: %v", err) }` | `AddCommand(t, cli, cmd)`      |
+| 4 | `tests/integration/v2_bdd_lifecycle_test.go:152, 198, 246, 307, 352, 397, 462, 555, 668, 852, 925` (11 sites) | `if err := v2.AddCommand(cli, cmd); err != nil { t.Fatalf("AddCommand: %v", err) }`            | `registerCommand(t, cli, cmd)` |
 
 ### Helpers introduced (3, one per package boundary)
 
@@ -119,33 +119,33 @@ Pre-existing observations (not introduced or worsened by this session):
 
 **Ordered by impact-to-effort ratio (Pareto). New items are marked `[NEW]`.**
 
-| #   | Task                                                                                             | Impact | Effort | Notes                                                                    |
-| --- | ------------------------------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------------------------------------ |
-| 1   | De-duplicate the 3 `addCommand`/`AddCommand`/`registerCommand` helpers into 1 public API         | HIGH   | S      | [NEW] All have identical structure, only error message differs           |
-| 2   | Promote `pkg/cmdguard/v2/testutil.AddCommand` as canonical public test helper                    | HIGH   | M      | [NEW] Foundation for `pkg/cmdguard/v2/v2test` package (resolves prior Q) |
-| 3   | Add `art-dupl -t 15 --semantic` step to `nix flake check` (lock t=15 + t=30 in CI)               | HIGH   | XS     | Locks the wins from this and prior session                               |
-| 4   | Coverage sprint: lift main pkg from 85.0% → 90%+ (15 functions at 0%)                            | HIGH   | M      | Public API + internal helpers                                            |
-| 5   | Lift `taskctl` example coverage from 70.5% → 90%+                                                | MED    | M      | Showpiece example, should model best practices                           |
-| 6   | Audit all `//nolint:*` directives for staleness                                                  | MED    | S      | Some are pre-existing; run with newer golangci-lint                      |
-| 7   | Fix `auditlog.go:14` long line OR move `nolint:golines` to a position `golangci-lint fmt` honors | MED    | XS     | Mechanical                                                               |
-| 8   | Run `gofumpt -w` on `cli_auditlog_test.go` (pre-existing drift)                                  | LOW    | XS     | Mechanical                                                               |
-| 9   | Convert `bdd_lifecycle_test.go` pre-existing subtests to table-driven where it improves clarity  | MED    | M      | BDD naming is intentional; selective                                     |
-| 10  | Add a `taskctl` README section showing the test helper hierarchy                                 | LOW    | S      | Documentation for the example                                            |
-| 11  | Split `auditlog.go` (231 lines) into 3-4 files by responsibility                                 | LOW    | M      | Becomes a problem only if it grows further                               |
-| 12  | Document the helper extraction pattern in `docs/architecture-understanding/test-design.md`       | MED    | S      | Reusable insight                                                         |
-| 13  | Add benchmark comparison: t=15 vs t=30 vs t=50 clone detection runtime                           | LOW    | S      | Justify t=15 choice (was t=30)                                           |
-| 14  | Investigate why `gopls infertypeargs` reports 200+ "unnecessary type arguments" warnings         | LOW    | S      | All in tests; cosmetic but noisy                                         |
-| 15  | Add an example: BDD-style test using Ginkgo (referenced in skill but not in project)             | LOW    | M      | If we adopt BDD broadly                                                  |
-| 16  | Add `nix run .#bench` integration so benchmarks are reproducible                                 | MED    | M      | Currently ad-hoc `go test -bench`                                        |
-| 17  | Add `//go:build` tags for `testutil` to allow test-only consumers                                | LOW    | S      | Currently `pkg/testutil` has no build tags                               |
-| 18  | Re-examine `taskctl/commands.go` for any further DB family consolidation                         | LOW    | S      | `dbStatusCmd` not in scope for t=30; would be at t=22                    |
-| 19  | Add `WithMiddlewareGroup[T]` API for ordering middlewares by group name                          | MED    | L      | Currently order is positional                                            |
-| 20  | Add OpenTelemetry span attribute for `FullPath` (currently empty outside cobra execution)        | MED    | S      | Gotcha #24 in AGENTS.md                                                  |
-| 21  | Investigate `taskctl` benchmark: does `dbActionHandler` add measurable overhead?                 | LOW    | XS     | Closure indirection vs inline                                            |
-| 22  | Add a `cmdguard` CLI example: a sub-CLI that introspects its own commands                        | MED    | M      | Demonstrates `WithCommandInfo` usage in real code                        |
-| 23  | Extend `WithGlamourHelp` to support per-command theme override (currently global)                | LOW    | M      | If requested                                                             |
-| 24  | Add a public `cmdguard/v2/testing` package exporting the helpers used in v2 tests                | MED    | M      | Library users can't reuse our test helpers                               |
-| 25  | Schedule a Phase 18 sprint: "Test infrastructure externalization" (helpers + golden files)       | MED    | L      | Long-term payoff                                                         |
+| #  | Task                                                                                             | Impact | Effort | Notes                                                                    |
+| -- | ------------------------------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------------------------------------ |
+| 1  | De-duplicate the 3 `addCommand`/`AddCommand`/`registerCommand` helpers into 1 public API         | HIGH   | S      | [NEW] All have identical structure, only error message differs           |
+| 2  | Promote `pkg/cmdguard/v2/testutil.AddCommand` as canonical public test helper                    | HIGH   | M      | [NEW] Foundation for `pkg/cmdguard/v2/v2test` package (resolves prior Q) |
+| 3  | Add `art-dupl -t 15 --semantic` step to `nix flake check` (lock t=15 + t=30 in CI)               | HIGH   | XS     | Locks the wins from this and prior session                               |
+| 4  | Coverage sprint: lift main pkg from 85.0% → 90%+ (15 functions at 0%)                            | HIGH   | M      | Public API + internal helpers                                            |
+| 5  | Lift `taskctl` example coverage from 70.5% → 90%+                                                | MED    | M      | Showpiece example, should model best practices                           |
+| 6  | Audit all `//nolint:*` directives for staleness                                                  | MED    | S      | Some are pre-existing; run with newer golangci-lint                      |
+| 7  | Fix `auditlog.go:14` long line OR move `nolint:golines` to a position `golangci-lint fmt` honors | MED    | XS     | Mechanical                                                               |
+| 8  | Run `gofumpt -w` on `cli_auditlog_test.go` (pre-existing drift)                                  | LOW    | XS     | Mechanical                                                               |
+| 9  | Convert `bdd_lifecycle_test.go` pre-existing subtests to table-driven where it improves clarity  | MED    | M      | BDD naming is intentional; selective                                     |
+| 10 | Add a `taskctl` README section showing the test helper hierarchy                                 | LOW    | S      | Documentation for the example                                            |
+| 11 | Split `auditlog.go` (231 lines) into 3-4 files by responsibility                                 | LOW    | M      | Becomes a problem only if it grows further                               |
+| 12 | Document the helper extraction pattern in `docs/architecture-understanding/test-design.md`       | MED    | S      | Reusable insight                                                         |
+| 13 | Add benchmark comparison: t=15 vs t=30 vs t=50 clone detection runtime                           | LOW    | S      | Justify t=15 choice (was t=30)                                           |
+| 14 | Investigate why `gopls infertypeargs` reports 200+ "unnecessary type arguments" warnings         | LOW    | S      | All in tests; cosmetic but noisy                                         |
+| 15 | Add an example: BDD-style test using Ginkgo (referenced in skill but not in project)             | LOW    | M      | If we adopt BDD broadly                                                  |
+| 16 | Add `nix run .#bench` integration so benchmarks are reproducible                                 | MED    | M      | Currently ad-hoc `go test -bench`                                        |
+| 17 | Add `//go:build` tags for `testutil` to allow test-only consumers                                | LOW    | S      | Currently `pkg/testutil` has no build tags                               |
+| 18 | Re-examine `taskctl/commands.go` for any further DB family consolidation                         | LOW    | S      | `dbStatusCmd` not in scope for t=30; would be at t=22                    |
+| 19 | Add `WithMiddlewareGroup[T]` API for ordering middlewares by group name                          | MED    | L      | Currently order is positional                                            |
+| 20 | Add OpenTelemetry span attribute for `FullPath` (currently empty outside cobra execution)        | MED    | S      | Gotcha #24 in AGENTS.md                                                  |
+| 21 | Investigate `taskctl` benchmark: does `dbActionHandler` add measurable overhead?                 | LOW    | XS     | Closure indirection vs inline                                            |
+| 22 | Add a `cmdguard` CLI example: a sub-CLI that introspects its own commands                        | MED    | M      | Demonstrates `WithCommandInfo` usage in real code                        |
+| 23 | Extend `WithGlamourHelp` to support per-command theme override (currently global)                | LOW    | M      | If requested                                                             |
+| 24 | Add a public `cmdguard/v2/testing` package exporting the helpers used in v2 tests                | MED    | M      | Library users can't reuse our test helpers                               |
+| 25 | Schedule a Phase 18 sprint: "Test infrastructure externalization" (helpers + golden files)       | MED    | L      | Long-term payoff                                                         |
 
 ---
 

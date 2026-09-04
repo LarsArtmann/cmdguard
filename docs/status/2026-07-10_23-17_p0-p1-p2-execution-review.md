@@ -164,58 +164,58 @@ I took the lazy way out and excluded instead of fixing.
 
 ## f) Up to 50 Things to Get Done Next
 
-| #   | Task                                                               | Effort | Priority |
-| --- | ------------------------------------------------------------------ | ------ | -------- |
-| 1   | Fix 2 wrapcheck in type_handler.go (wrap dispatchRegister returns) | 10m    | P0       |
-| 2   | Remove redundant config_file.go ireturn exclusion                  | 2m     | P0       |
-| 3   | Correct exclusion count in AGENTS.md lint strategy                 | 5m     | P0       |
-| 4   | Verify fuzz corpus with `-fuzz` flag                               | 5m     | P0       |
-| 5   | infertypeargs sweep (143 mechanical fixes in test files)           | 30m    | P1       |
-| 6   | Create examples/docs-generator/main.go                             | 15m    | P1       |
-| 7   | Add `do.Injector` to ireturn allow list (removes 2 exclusions)     | 5m     | P1       |
-| 8   | Add `koanf` interface to ireturn allow list (removes 1 exclusion)  | 5m     | P1       |
-| 9   | Run CI workflow via `act` or push trigger                          | 15m    | P1       |
-| 10  | Track exclusion count as a metric (add to AGENTS.md)               | 5m     | P1       |
-| 11  | Add more fuzz seeds for FuzzParseFlagTags and FuzzSetField         | 10m    | P2       |
-| 12  | Expand DOMAIN_LANGUAGE.md with bounded contexts                    | 20m    | P2       |
-| 13  | Extract koanf behind build tag (removes direct dep from core)      | 45m    | P2       |
-| 14  | Add flake.nix sub-module build checks                              | 20m    | P2       |
-| 15  | Create second example app (different domain)                       | 2h     | P3       |
-| 16  | Add Middleware context propagation (v3.1 breaking)                 | 2h     | P3       |
-| 17  | Rename Get[T] → GetService[T] (v3.1 breaking)                      | 1h     | P3       |
-| 18  | Make RegisterInScope generic (v3.1 breaking)                       | 1h     | P3       |
-| 19  | Remove or redesign Package() (v3.1 breaking)                       | 1h     | P3       |
-| 20  | Add benchmark regression thresholds in CI                          | 30m    | P3       |
-| 21  | Add test-all-examples-in-CI                                        | 30m    | P3       |
-| 22  | Extract flag-tags to github.com/larsartmann/flagtags               | 2h     | P4       |
-| 23  | Service-owned config design (ADR)                                  | 1h     | P4       |
-| 24  | Command-level audit middleware                                     | 2h     | P4       |
-| 25  | Built-in audit-log subcommand                                      | 1h     | P4       |
-| 26  | Consider making fang optional (plain cobra fallback)               | 2h     | P4       |
-| 27  | FlagRegistry interface abstraction                                 | 1h     | P4       |
-| 28  | Custom per-flag validation hooks                                   | 1h     | P4       |
-| 29  | Enhanced flag validation enums                                     | 1h     | P4       |
-| 30  | Metrics/hooks for custom observability                             | 2h     | P4       |
-| 31  | Branded-ID example app                                             | 1h     | P4       |
-| 32  | Add coverage badge to README (needs CI integration)                | 30m    | P3       |
-| 33  | Add CODECOV_TOKEN to GitHub repo settings                          | 5m     | P3       |
-| 34  | Add `godoclint` compliance for all exported functions              | 1h     | P2       |
-| 35  | Audit all `//nolint:` directives for relevance                     | 30m    | P2       |
-| 36  | Add integration test for WithConfigFile + nested structs           | 30m    | P2       |
-| 37  | Add test for WithCleanup firing on RunE error                      | 20m    | P2       |
-| 38  | Add test for WithGracefulShutdown signal handling                  | 30m    | P2       |
-| 39  | Add test for doctor command with custom checks                     | 20m    | P2       |
-| 40  | Add test for version command output format                         | 15m    | P2       |
-| 41  | Document the COW registry pattern in an ADR                        | 30m    | P2       |
-| 42  | Add `go vet` to CI workflow                                        | 5m     | P1       |
-| 43  | Add `golangci-lint` to CI workflow for sub-modules                 | 15m    | P1       |
-| 44  | Add semver check to CI (ensures no breaking changes in patch)      | 30m    | P3       |
-| 45  | Add Dependabot/Renovate config                                     | 15m    | P3       |
-| 46  | Create CONTRIBUTING.md section on testing patterns                 | 30m    | P2       |
-| 47  | Add `WithoutSilenceUsage` to README quick start                    | 10m    | P2       |
-| 48  | Review all error sentinel names for consistency                    | 30m    | P2       |
-| 49  | Add Property-based testing for flag parsing                        | 1h     | P3       |
-| 50  | Write ADR-002: Lint Strategy and Exclusion Policy                  | 30m    | P2       |
+| #  | Task                                                               | Effort | Priority |
+| -- | ------------------------------------------------------------------ | ------ | -------- |
+| 1  | Fix 2 wrapcheck in type_handler.go (wrap dispatchRegister returns) | 10m    | P0       |
+| 2  | Remove redundant config_file.go ireturn exclusion                  | 2m     | P0       |
+| 3  | Correct exclusion count in AGENTS.md lint strategy                 | 5m     | P0       |
+| 4  | Verify fuzz corpus with `-fuzz` flag                               | 5m     | P0       |
+| 5  | infertypeargs sweep (143 mechanical fixes in test files)           | 30m    | P1       |
+| 6  | Create examples/docs-generator/main.go                             | 15m    | P1       |
+| 7  | Add `do.Injector` to ireturn allow list (removes 2 exclusions)     | 5m     | P1       |
+| 8  | Add `koanf` interface to ireturn allow list (removes 1 exclusion)  | 5m     | P1       |
+| 9  | Run CI workflow via `act` or push trigger                          | 15m    | P1       |
+| 10 | Track exclusion count as a metric (add to AGENTS.md)               | 5m     | P1       |
+| 11 | Add more fuzz seeds for FuzzParseFlagTags and FuzzSetField         | 10m    | P2       |
+| 12 | Expand DOMAIN_LANGUAGE.md with bounded contexts                    | 20m    | P2       |
+| 13 | Extract koanf behind build tag (removes direct dep from core)      | 45m    | P2       |
+| 14 | Add flake.nix sub-module build checks                              | 20m    | P2       |
+| 15 | Create second example app (different domain)                       | 2h     | P3       |
+| 16 | Add Middleware context propagation (v3.1 breaking)                 | 2h     | P3       |
+| 17 | Rename Get[T] → GetService[T] (v3.1 breaking)                      | 1h     | P3       |
+| 18 | Make RegisterInScope generic (v3.1 breaking)                       | 1h     | P3       |
+| 19 | Remove or redesign Package() (v3.1 breaking)                       | 1h     | P3       |
+| 20 | Add benchmark regression thresholds in CI                          | 30m    | P3       |
+| 21 | Add test-all-examples-in-CI                                        | 30m    | P3       |
+| 22 | Extract flag-tags to github.com/larsartmann/flagtags               | 2h     | P4       |
+| 23 | Service-owned config design (ADR)                                  | 1h     | P4       |
+| 24 | Command-level audit middleware                                     | 2h     | P4       |
+| 25 | Built-in audit-log subcommand                                      | 1h     | P4       |
+| 26 | Consider making fang optional (plain cobra fallback)               | 2h     | P4       |
+| 27 | FlagRegistry interface abstraction                                 | 1h     | P4       |
+| 28 | Custom per-flag validation hooks                                   | 1h     | P4       |
+| 29 | Enhanced flag validation enums                                     | 1h     | P4       |
+| 30 | Metrics/hooks for custom observability                             | 2h     | P4       |
+| 31 | Branded-ID example app                                             | 1h     | P4       |
+| 32 | Add coverage badge to README (needs CI integration)                | 30m    | P3       |
+| 33 | Add CODECOV_TOKEN to GitHub repo settings                          | 5m     | P3       |
+| 34 | Add `godoclint` compliance for all exported functions              | 1h     | P2       |
+| 35 | Audit all `//nolint:` directives for relevance                     | 30m    | P2       |
+| 36 | Add integration test for WithConfigFile + nested structs           | 30m    | P2       |
+| 37 | Add test for WithCleanup firing on RunE error                      | 20m    | P2       |
+| 38 | Add test for WithGracefulShutdown signal handling                  | 30m    | P2       |
+| 39 | Add test for doctor command with custom checks                     | 20m    | P2       |
+| 40 | Add test for version command output format                         | 15m    | P2       |
+| 41 | Document the COW registry pattern in an ADR                        | 30m    | P2       |
+| 42 | Add `go vet` to CI workflow                                        | 5m     | P1       |
+| 43 | Add `golangci-lint` to CI workflow for sub-modules                 | 15m    | P1       |
+| 44 | Add semver check to CI (ensures no breaking changes in patch)      | 30m    | P3       |
+| 45 | Add Dependabot/Renovate config                                     | 15m    | P3       |
+| 46 | Create CONTRIBUTING.md section on testing patterns                 | 30m    | P2       |
+| 47 | Add `WithoutSilenceUsage` to README quick start                    | 10m    | P2       |
+| 48 | Review all error sentinel names for consistency                    | 30m    | P2       |
+| 49 | Add Property-based testing for flag parsing                        | 1h     | P3       |
+| 50 | Write ADR-002: Lint Strategy and Exclusion Policy                  | 30m    | P2       |
 
 ---
 

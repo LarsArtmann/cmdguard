@@ -29,22 +29,22 @@
 
 ### This Session (4 commits)
 
-| #   | Commit    | Description                                                                                                                      |
-| --- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `2f69674` | `WithCLIVersion` auto-pipes to `fang.WithVersion`; new `WithCLICommit` auto-pipes to `fang.WithCommit`                           |
-| 2   | `75b6ff9` | ADR-001: fang integration strategy — why we skip `WithNotifySignal`/`WithoutManpage`, what gaps remain                           |
-| 3   | `8fa843d` | 4 new output formats (JSONL, TOML, AsciiDoc, PlantUML) + `WithFangErrorHandler` + `WithFangColorScheme` + all docs updated 12→16 |
+| # | Commit    | Description                                                                                                                      |
+| - | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | `2f69674` | `WithCLIVersion` auto-pipes to `fang.WithVersion`; new `WithCLICommit` auto-pipes to `fang.WithCommit`                           |
+| 2 | `75b6ff9` | ADR-001: fang integration strategy — why we skip `WithNotifySignal`/`WithoutManpage`, what gaps remain                           |
+| 3 | `8fa843d` | 4 new output formats (JSONL, TOML, AsciiDoc, PlantUML) + `WithFangErrorHandler` + `WithFangColorScheme` + all docs updated 12→16 |
 
 ### Prior Sessions (already committed)
 
-| #   | Description                                                                                                               |
-| --- | ------------------------------------------------------------------------------------------------------------------------- |
-| 1   | samber/do v2 utilization sprint: `WithGracefulShutdown`, `Override[T]`, `CloneScope`, `NewScopeWithOpts`, `WithDILogging` |
-| 2   | Post-sprint cleanup: dead code removal, `RootScope()`, DI benchmarks, library research                                    |
-| 3   | Zero panics: all 16 Must\* functions removed                                                                              |
-| 4   | NoFlags as distinct named type                                                                                            |
-| 5   | NO_COLOR fix (env var restored after execution)                                                                           |
-| 6   | Audit log integration with `samber-do-auditlog`                                                                           |
+| # | Description                                                                                                               |
+| - | ------------------------------------------------------------------------------------------------------------------------- |
+| 1 | samber/do v2 utilization sprint: `WithGracefulShutdown`, `Override[T]`, `CloneScope`, `NewScopeWithOpts`, `WithDILogging` |
+| 2 | Post-sprint cleanup: dead code removal, `RootScope()`, DI benchmarks, library research                                    |
+| 3 | Zero panics: all 16 Must\* functions removed                                                                              |
+| 4 | NoFlags as distinct named type                                                                                            |
+| 5 | NO_COLOR fix (env var restored after execution)                                                                           |
+| 6 | Audit log integration with `samber-do-auditlog`                                                                           |
 
 ---
 
@@ -96,18 +96,18 @@
 
 ## C) NOT STARTED 🔲
 
-| #   | Task                                                                                  | Priority | Effort                 |
-| --- | ------------------------------------------------------------------------------------- | -------- | ---------------------- |
-| 1   | Document new APIs in `doc.go` and `docs/API.md`                                       | HIGH     | 15m                    |
-| 2   | Cover 17 functions at 0% (mainly validate, types, manpage)                            | MEDIUM   | 30m                    |
-| 3   | Deduplicate `validateEmail`/`validateURL` — delegate to `ParseEmail`/`ParseURL`       | MEDIUM   | 10m                    |
-| 4   | Fix `HostPort.IsEmpty()` coupling — use `hp.port.IsEmpty()` instead of `hp.port.port` | LOW      | 2m                     |
-| 5   | Remove unused `FlowContext` interface                                                 | LOW      | 5m                     |
-| 6   | Unified error types for all domain types (not just Enum/Duration)                     | LOW      | 20m                    |
-| 7   | Plugin system for custom validators                                                   | P1 (v3)  | Large                  |
-| 8   | Config file nested struct support                                                     | P1 (v3)  | Large                  |
-| 9   | Extract flag-related code to `flagtags` library                                       | P1 (v3)  | Large                  |
-| 10  | CODECOV_TOKEN secret for GitHub                                                       | P0       | 5m (needs repo access) |
+| #  | Task                                                                                  | Priority | Effort                 |
+| -- | ------------------------------------------------------------------------------------- | -------- | ---------------------- |
+| 1  | Document new APIs in `doc.go` and `docs/API.md`                                       | HIGH     | 15m                    |
+| 2  | Cover 17 functions at 0% (mainly validate, types, manpage)                            | MEDIUM   | 30m                    |
+| 3  | Deduplicate `validateEmail`/`validateURL` — delegate to `ParseEmail`/`ParseURL`       | MEDIUM   | 10m                    |
+| 4  | Fix `HostPort.IsEmpty()` coupling — use `hp.port.IsEmpty()` instead of `hp.port.port` | LOW      | 2m                     |
+| 5  | Remove unused `FlowContext` interface                                                 | LOW      | 5m                     |
+| 6  | Unified error types for all domain types (not just Enum/Duration)                     | LOW      | 20m                    |
+| 7  | Plugin system for custom validators                                                   | P1 (v3)  | Large                  |
+| 8  | Config file nested struct support                                                     | P1 (v3)  | Large                  |
+| 9  | Extract flag-related code to `flagtags` library                                       | P1 (v3)  | Large                  |
+| 10 | CODECOV_TOKEN secret for GitHub                                                       | P0       | 5m (needs repo access) |
 
 ---
 
@@ -153,33 +153,33 @@
 
 Sorted by: impact × customer-value ÷ effort
 
-| #   | Task                                                                                                  | Impact | Effort | Category     |
-| --- | ----------------------------------------------------------------------------------------------------- | ------ | ------ | ------------ |
-| 1   | Document `WithCLICommit`, `WithFangErrorHandler`, `WithFangColorScheme` in `doc.go` and `docs/API.md` | HIGH   | 10m    | Docs         |
-| 2   | Document 4 new format constants in `doc.go` and `docs/API.md`                                         | HIGH   | 5m     | Docs         |
-| 3   | Add fang version integration note to `doc.go` (WithCLIVersion auto-pipes to fang)                     | MEDIUM | 3m     | Docs         |
-| 4   | Deduplicate `validateEmail` → delegate to `ParseEmail()`                                              | MEDIUM | 5m     | Architecture |
-| 5   | Deduplicate `validateURL` → delegate to `ParseURL()`                                                  | MEDIUM | 5m     | Architecture |
-| 6   | Fix `HostPort.IsEmpty()` — use `hp.port.IsEmpty()` not `hp.port.port`                                 | LOW    | 2m     | Bug          |
-| 7   | Test `IsEmpty()` on Duration, LogLevel, LogFormat, Port (4 functions)                                 | MEDIUM | 5m     | Coverage     |
-| 8   | Test `RegisterValidator` (global validator registration)                                              | MEDIUM | 5m     | Coverage     |
-| 9   | Test `WithAuditLogGroupID` option                                                                     | LOW    | 3m     | Coverage     |
-| 10  | Test `WithConfigFileLoader` option                                                                    | LOW    | 5m     | Coverage     |
-| 11  | Test `WithDoctorLong` option                                                                          | LOW    | 3m     | Coverage     |
-| 12  | Test `NewManPage` constructor                                                                         | LOW    | 3m     | Coverage     |
-| 13  | Cover `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`                         | MEDIUM | 10m    | Coverage     |
-| 14  | Cover `validateMin`, `validateMax`, `validateMaxLen` (41-55%)                                         | LOW    | 5m     | Coverage     |
-| 15  | Remove unused `FlowContext` interface from `flow_context_access.go`                                   | LOW    | 5m     | Cleanup      |
-| 16  | Update `TODO_LIST.md` for current sprint                                                              | MEDIUM | 10m    | Docs         |
-| 17  | Make `Enum` actually generic (`Enum[T ~string]`) — eliminate boilerplate for LogLevel/LogFormat       | HIGH   | 30m    | Architecture |
-| 18  | Add typed error structs for URL, Email, Port, FilePath, HostPort                                      | LOW    | 20m    | Architecture |
-| 19  | Check go-output sub-package version alignment (v0.7.0 vs v0.8.0)                                      | LOW    | 5m     | Deps         |
-| 20  | Add `CODECOV_TOKEN` to GitHub repo settings                                                           | LOW    | 5m     | CI           |
-| 21  | Add structured JSON error output for `--output=json`                                                  | MEDIUM | 20m    | Feature      |
-| 22  | Add fuzz test corpus in `testdata/fuzz/`                                                              | LOW    | 15m    | Testing      |
-| 23  | Update `docs/MIGRATION_FROM_COBRA.md` with fang version integration                                   | LOW    | 5m     | Docs         |
-| 24  | Rename `VersionCommand` → `NewVersionCommand` (breaking, defer to v3)                                 | LOW    | 10m    | Naming       |
-| 25  | Research `charm.land/log` as replacement for `WithDILogging` formatting                               | LOW    | 10m    | Research     |
+| #  | Task                                                                                                  | Impact | Effort | Category     |
+| -- | ----------------------------------------------------------------------------------------------------- | ------ | ------ | ------------ |
+| 1  | Document `WithCLICommit`, `WithFangErrorHandler`, `WithFangColorScheme` in `doc.go` and `docs/API.md` | HIGH   | 10m    | Docs         |
+| 2  | Document 4 new format constants in `doc.go` and `docs/API.md`                                         | HIGH   | 5m     | Docs         |
+| 3  | Add fang version integration note to `doc.go` (WithCLIVersion auto-pipes to fang)                     | MEDIUM | 3m     | Docs         |
+| 4  | Deduplicate `validateEmail` → delegate to `ParseEmail()`                                              | MEDIUM | 5m     | Architecture |
+| 5  | Deduplicate `validateURL` → delegate to `ParseURL()`                                                  | MEDIUM | 5m     | Architecture |
+| 6  | Fix `HostPort.IsEmpty()` — use `hp.port.IsEmpty()` not `hp.port.port`                                 | LOW    | 2m     | Bug          |
+| 7  | Test `IsEmpty()` on Duration, LogLevel, LogFormat, Port (4 functions)                                 | MEDIUM | 5m     | Coverage     |
+| 8  | Test `RegisterValidator` (global validator registration)                                              | MEDIUM | 5m     | Coverage     |
+| 9  | Test `WithAuditLogGroupID` option                                                                     | LOW    | 3m     | Coverage     |
+| 10 | Test `WithConfigFileLoader` option                                                                    | LOW    | 5m     | Coverage     |
+| 11 | Test `WithDoctorLong` option                                                                          | LOW    | 3m     | Coverage     |
+| 12 | Test `NewManPage` constructor                                                                         | LOW    | 3m     | Coverage     |
+| 13 | Cover `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`                         | MEDIUM | 10m    | Coverage     |
+| 14 | Cover `validateMin`, `validateMax`, `validateMaxLen` (41-55%)                                         | LOW    | 5m     | Coverage     |
+| 15 | Remove unused `FlowContext` interface from `flow_context_access.go`                                   | LOW    | 5m     | Cleanup      |
+| 16 | Update `TODO_LIST.md` for current sprint                                                              | MEDIUM | 10m    | Docs         |
+| 17 | Make `Enum` actually generic (`Enum[T ~string]`) — eliminate boilerplate for LogLevel/LogFormat       | HIGH   | 30m    | Architecture |
+| 18 | Add typed error structs for URL, Email, Port, FilePath, HostPort                                      | LOW    | 20m    | Architecture |
+| 19 | Check go-output sub-package version alignment (v0.7.0 vs v0.8.0)                                      | LOW    | 5m     | Deps         |
+| 20 | Add `CODECOV_TOKEN` to GitHub repo settings                                                           | LOW    | 5m     | CI           |
+| 21 | Add structured JSON error output for `--output=json`                                                  | MEDIUM | 20m    | Feature      |
+| 22 | Add fuzz test corpus in `testdata/fuzz/`                                                              | LOW    | 15m    | Testing      |
+| 23 | Update `docs/MIGRATION_FROM_COBRA.md` with fang version integration                                   | LOW    | 5m     | Docs         |
+| 24 | Rename `VersionCommand` → `NewVersionCommand` (breaking, defer to v3)                                 | LOW    | 10m    | Naming       |
+| 25 | Research `charm.land/log` as replacement for `WithDILogging` formatting                               | LOW    | 10m    | Research     |
 
 ---
 

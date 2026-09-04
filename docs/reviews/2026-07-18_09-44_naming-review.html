@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -289,15 +289,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -310,15 +322,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -838,9 +862,10 @@
           <div class="hero-badge">Naming Review</div>
           <h1>cmdguard v3.0.0 &mdash; Identifier Quality Audit</h1>
           <p class="hero-subtitle">
-            71 top-level type declarations + ~180 functions reviewed against Clean Code, DDD, and Go
-            convention checklist. The bar is high because the rest of the code is: only a handful of
-            names fall short of the standard the codebase already sets for itself.
+            71 top-level type declarations + ~180 functions reviewed against
+            Clean Code, DDD, and Go convention checklist. The bar is high
+            because the rest of the code is: only a handful of names fall short
+            of the standard the codebase already sets for itself.
           </p>
         </div>
 
@@ -891,11 +916,12 @@
         <div class="card card-solution">
           <h4>Headline: clean codebase, three names worth renaming</h4>
           <p>
-            No name lies about behavior. No <code>Impl</code>, no <code>Abstract</code>, no
-            <code>I</code> prefixes. Constructors, functional options, and sentinels follow Go
-            convention consistently. The three High-severity findings below are the only names where
-            a newcomer would have to read the definition to understand what the type does &mdash;
-            everything else reads from the call site.
+            No name lies about behavior. No <code>Impl</code>, no
+            <code>Abstract</code>, no <code>I</code> prefixes. Constructors,
+            functional options, and sentinels follow Go convention consistently.
+            The three High-severity findings below are the only names where a
+            newcomer would have to read the definition to understand what the
+            type does &mdash; everything else reads from the call site.
           </p>
         </div>
 
@@ -903,28 +929,33 @@
         <div class="card">
           <h4>Automated</h4>
           <p>
-            <code>golangci-lint run ./...</code> (0 issues, includes <code>var-naming</code>,
-            <code>exported</code>, <code>package-naming</code>, <code>receiver-naming</code>)
-            &mdash; already green, so this review focused on the semantic layer linters cannot
-            reach.
+            <code>golangci-lint run ./...</code> (0 issues, includes
+            <code>var-naming</code>, <code>exported</code>,
+            <code>package-naming</code>, <code>receiver-naming</code>) &mdash;
+            already green, so this review focused on the semantic layer linters
+            cannot reach.
           </p>
         </div>
         <div class="card">
           <h4>Semantic</h4>
           <p>
             Ripgrep across all 60 source files for: vague nouns
-            (<code>Data|Info|Record|Item|Object|Thing</code>), trash-can suffixes
-            (<code>Manager|Handler|Processor|Helper|Util|Utility</code>), architecture leakage
+            (<code>Data|Info|Record|Item|Object|Thing</code>), trash-can
+            suffixes
+            (<code>Manager|Handler|Processor|Helper|Util|Utility</code>),
+            architecture leakage
             (<code>Impl|Concrete|Default|Abstract|Base</code>),
             <code>I</code> prefixes, and vague verbs
-            (<code>do|handle|process|manage|perform</code>). Then a hand-review of every
-            <code>type ... struct|interface</code> and every exported function in
-            <code>pkg/cmdguard/v3</code>, <code>pkg/testutil</code>, the 5 sub-modules, and the
-            examples.
+            (<code>do|handle|process|manage|perform</code>). Then a hand-review
+            of every <code>type ... struct|interface</code> and every exported
+            function in <code>pkg/cmdguard/v3</code>, <code>pkg/testutil</code>,
+            the 5 sub-modules, and the examples.
           </p>
         </div>
 
-        <h2 id="glossary"><span class="num">02</span>Type Glossary (excerpt)</h2>
+        <h2 id="glossary">
+          <span class="num">02</span>Type Glossary (excerpt)
+        </h2>
         <table>
           <thead>
             <tr>
@@ -955,7 +986,12 @@
               <td>Long but precise; no shorter name captures it.</td>
             </tr>
             <tr>
-              <td><code>Email / Port / URL / FilePath / HostPort / Duration / Enum</code></td>
+              <td>
+                <code
+                  >Email / Port / URL / FilePath / HostPort / Duration /
+                  Enum</code
+                >
+              </td>
               <td>Branded domain types</td>
               <td>Excellent &mdash; branded primitives with constructors.</td>
             </tr>
@@ -973,31 +1009,33 @@
               <td><code>TypeHandler</code></td>
               <td>Interface</td>
               <td>
-                <span class="badge badge-high">High</span> &ldquo;Handler&rdquo; is vague; see
-                below.
+                <span class="badge badge-high">High</span> &ldquo;Handler&rdquo;
+                is vague; see below.
               </td>
             </tr>
             <tr>
               <td><code>CommandInfo</code></td>
               <td>Middleware metadata</td>
               <td>
-                <span class="badge badge-medium">Medium</span> &ldquo;Info&rdquo; suffix &mdash; see
-                below.
+                <span class="badge badge-medium">Medium</span>
+                &ldquo;Info&rdquo; suffix &mdash; see below.
               </td>
             </tr>
           </tbody>
         </table>
 
-        <h2 id="honesty"><span class="num">03</span>Honesty Issues (Critical)</h2>
+        <h2 id="honesty">
+          <span class="num">03</span>Honesty Issues (Critical)
+        </h2>
         <div class="card card-solution">
           <h4>None found.</h4>
           <p>
-            No function mutates state while named <code>getX</code>; no euphemisms (<code
-              >sanitize</code
-            >
-            for <code>delete</code>); no misleading scope. Every getter (<code>cli.Name()</code>,
-            <code>cli.Config()</code>, <code>email.Domain()</code>) is a pure query. Every command
-            verb (<code>Add</code>, <code>Done</code>, <code>Shutdown</code>) does what it says.
+            No function mutates state while named <code>getX</code>; no
+            euphemisms (<code>sanitize</code> for <code>delete</code>); no
+            misleading scope. Every getter (<code>cli.Name()</code>,
+            <code>cli.Config()</code>, <code>email.Domain()</code>) is a pure
+            query. Every command verb (<code>Add</code>, <code>Done</code>,
+            <code>Shutdown</code>) does what it says.
           </p>
         </div>
 
@@ -1006,22 +1044,26 @@
         <div class="issue issue-important">
           <span class="severity severity-important">High</span>
           <h3>
-            <code>TypeHandler</code> interface &mdash; &ldquo;Handler&rdquo; is a trash-can name
+            <code>TypeHandler</code> interface &mdash; &ldquo;Handler&rdquo; is
+            a trash-can name
           </h3>
           <div class="where">pkg/cmdguard/v3/type_handler.go:12-17</div>
           <p>
-            The interface has three methods: <code>Register</code>, <code>Parse</code>,
-            <code>Default</code>. It does not &ldquo;handle&rdquo; anything in the usual
-            event-handler sense; it adapts a <code>reflect.Type</code> to the flag system by
-            providing parse/default/register behavior. Every implementor is a codec for a specific
-            type.
+            The interface has three methods: <code>Register</code>,
+            <code>Parse</code>, <code>Default</code>. It does not
+            &ldquo;handle&rdquo; anything in the usual event-handler sense; it
+            adapts a <code>reflect.Type</code> to the flag system by providing
+            parse/default/register behavior. Every implementor is a codec for a
+            specific type.
           </p>
           <div class="callout callout-solution">
             <strong>Better name</strong>
-            <code>TypeCodec</code> &mdash; parallels <code>encoding/json.Marshaler</code> /
-            <code>TextMarshaler</code>, both of which bundle parse+format under one contract. The
-            functional adapter becomes <code>TypeCodecFunc</code>, and the registry helper stays
-            <code>RegisterTypeCodec</code>. If backward compatibility matters, deprecate
+            <code>TypeCodec</code> &mdash; parallels
+            <code>encoding/json.Marshaler</code> / <code>TextMarshaler</code>,
+            both of which bundle parse+format under one contract. The functional
+            adapter becomes <code>TypeCodecFunc</code>, and the registry helper
+            stays <code>RegisterTypeCodec</code>. If backward compatibility
+            matters, deprecate
             <code>TypeHandler</code>
             as an alias and ship the new name alongside.
           </div>
@@ -1030,61 +1072,78 @@
         <div class="issue issue-important">
           <span class="severity severity-important">High</span>
           <h3>
-            <code>StringSliceContains</code> is a duplicate name for <code>ContainsString</code>
+            <code>StringSliceContains</code> is a duplicate name for
+            <code>ContainsString</code>
           </h3>
           <div class="where">pkg/testutil/panic_test_helpers.go:107-114</div>
           <p>
-            Two exported functions do the same thing. The doc comment even admits it:
+            Two exported functions do the same thing. The doc comment even
+            admits it:
             <code
-              >&quot;StringSliceContains is an alias for ContainsString for better
-              readability.&quot;</code
+              >&quot;StringSliceContains is an alias for ContainsString for
+              better readability.&quot;</code
             >
-            Two names for one concept is the textbook split-brain: a reader who sees both in
-            different files wonders if they differ. (Both also just wrap
+            Two names for one concept is the textbook split-brain: a reader who
+            sees both in different files wonders if they differ. (Both also just
+            wrap
             <code>slices.Contains</code>.)
           </p>
           <div class="callout callout-solution">
             <strong>Fix</strong>
-            Delete one. Keep <code>slices.Contains</code> directly at call sites; if a testutil
-            helper is wanted, keep <code>ContainsString</code> and remove the alias. Better yet,
-            migrate callers to <code>slices.Contains</code> and remove both &mdash; the stdlib name
-            is already the right one.
+            Delete one. Keep <code>slices.Contains</code> directly at call
+            sites; if a testutil helper is wanted, keep
+            <code>ContainsString</code> and remove the alias. Better yet,
+            migrate callers to <code>slices.Contains</code> and remove both
+            &mdash; the stdlib name is already the right one.
           </div>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">High</span>
-          <h3><code>doPanicTest</code> uses the vague <code>do</code> prefix</h3>
+          <h3>
+            <code>doPanicTest</code> uses the vague <code>do</code> prefix
+          </h3>
           <div class="where">pkg/testutil/panic_test_helpers.go:132-147</div>
           <p>
-            <code>do</code> says nothing. The function returns true if <code>fn</code> panicked. The
-            exported wrappers (<code>AssertPanics</code>, <code>ExpectPanics</code>,
-            <code>AssertDoesNotPanic</code>) are well named; only the private helper has the smell.
+            <code>do</code> says nothing. The function returns true if
+            <code>fn</code> panicked. The exported wrappers
+            (<code>AssertPanics</code>, <code>ExpectPanics</code>,
+            <code>AssertDoesNotPanic</code>) are well named; only the private
+            helper has the smell.
           </p>
           <div class="callout callout-solution">
             <strong>Better name</strong>
             <code>panics(fn) bool</code> &mdash; reads naturally at call sites:
-            <code>if panics(fn) { ... }</code>. Matches the bool-as- question convention.
+            <code>if panics(fn) { ... }</code>. Matches the bool-as- question
+            convention.
           </div>
         </div>
 
-        <h2 id="domain"><span class="num">05</span>Domain Alignment (Medium)</h2>
+        <h2 id="domain">
+          <span class="num">05</span>Domain Alignment (Medium)
+        </h2>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Medium</span>
-          <h3><code>CommandInfo</code> &mdash; mild &ldquo;Info&rdquo; suffix</h3>
+          <h3>
+            <code>CommandInfo</code> &mdash; mild &ldquo;Info&rdquo; suffix
+          </h3>
           <div class="where">pkg/cmdguard/v3/middleware.go:40-45</div>
           <p>
-            The struct carries metadata about an in-progress command (<code>Name</code>,
-            <code>FullPath</code>, <code>Phase</code>, <code>HasRunE</code>) for middleware.
-            <code>Info</code> is one of the &ldquo;I contain stuff&rdquo; anti-words, but the
-            alternative <code>CommandMeta</code> is longer and the current name is idiomatic. Worth
-            a rename only if other <code>*Info</code> types start appearing.
+            The struct carries metadata about an in-progress command
+            (<code>Name</code>,
+            <code>FullPath</code>, <code>Phase</code>, <code>HasRunE</code>) for
+            middleware. <code>Info</code> is one of the &ldquo;I contain
+            stuff&rdquo; anti-words, but the alternative
+            <code>CommandMeta</code> is longer and the current name is
+            idiomatic. Worth a rename only if other <code>*Info</code> types
+            start appearing.
           </p>
           <div class="callout callout-solution">
             <strong>Optional</strong>
-            Rename to <code>CommandMeta</code> if the team prefers; otherwise accept and document
-            the convention so the suffix does not proliferate.
+            Rename to <code>CommandMeta</code> if the team prefers; otherwise
+            accept and document the convention so the suffix does not
+            proliferate.
           </div>
         </div>
 
@@ -1093,10 +1152,10 @@
           <h3><code>HuhRunner</code> leaks the implementation library</h3>
           <div class="where">prompts/prompts.go</div>
           <p>
-            The unexported struct embeds huh/v2 directly. The name is fine for an unexported type,
-            but if it ever becomes exported, prefer
-            <code>PromptRunner</code> (matching the interface it implements) over naming it after
-            the library.
+            The unexported struct embeds huh/v2 directly. The name is fine for
+            an unexported type, but if it ever becomes exported, prefer
+            <code>PromptRunner</code> (matching the interface it implements)
+            over naming it after the library.
           </p>
           <div class="callout callout-amber">
             <strong>Accept as-is</strong>
@@ -1111,11 +1170,13 @@
             CRUD verbs on <code>TaskStore</code> are consistent
             (<code>Add/Get/List/Done/Shutdown</code>). Constructors all use
             <code>New*</code> (<code>NewCLI</code>, <code>NewCommand</code>,
-            <code>NewParentCommand</code>, <code>NewScope</code>, <code>NewManPage</code>,
-            <code>NewTaskStore</code>). Functional options all use <code>With*</code> consistently
-            (<code>WithShort</code>, <code>WithLong</code>, <code>WithExample</code>,
-            <code>WithAuditLog</code>, etc.). Iterator methods share the <code>*Seq</code> suffix
-            (<code>TagsSeq</code>, <code>FlagNamesSeq</code>, <code>PathSeq</code>,
+            <code>NewParentCommand</code>, <code>NewScope</code>,
+            <code>NewManPage</code>, <code>NewTaskStore</code>). Functional
+            options all use <code>With*</code> consistently
+            (<code>WithShort</code>, <code>WithLong</code>,
+            <code>WithExample</code>, <code>WithAuditLog</code>, etc.). Iterator
+            methods share the <code>*Seq</code> suffix (<code>TagsSeq</code>,
+            <code>FlagNamesSeq</code>, <code>PathSeq</code>,
             <code>ChildrenSeq</code>).
           </p>
         </div>
@@ -1124,11 +1185,13 @@
         <div class="card card-solution">
           <h4>None detected.</h4>
           <p>
-            No <code>Impl</code> suffix. No <code>Abstract</code> or <code>Base</code> prefixes. No
-            <code>I</code> prefix on interfaces (Go convention). The only mildly leaky name is
-            <code>HuhRunner</code> (above), and it is unexported. The DI <code>Scope</code> is named
-            for its role, not for samber/do. Flag types (<code>Enum</code>, <code>Port</code>, etc.)
-            are named for the domain concept they brand, not for pflag.
+            No <code>Impl</code> suffix. No <code>Abstract</code> or
+            <code>Base</code> prefixes. No <code>I</code> prefix on interfaces
+            (Go convention). The only mildly leaky name is
+            <code>HuhRunner</code> (above), and it is unexported. The DI
+            <code>Scope</code> is named for its role, not for samber/do. Flag
+            types (<code>Enum</code>, <code>Port</code>, etc.) are named for the
+            domain concept they brand, not for pflag.
           </p>
         </div>
 
@@ -1139,9 +1202,11 @@
             <div class="text">
               <strong>Branded primitive types</strong>
               <span
-                ><code>Email</code>, <code>Port</code>, <code>URL</code>, <code>FilePath</code>,
-                <code>HostPort</code>, <code>Duration</code> &mdash; each is a named type with a
-                validating constructor. The domain language IS the type system.</span
+                ><code>Email</code>, <code>Port</code>, <code>URL</code>,
+                <code>FilePath</code>, <code>HostPort</code>,
+                <code>Duration</code> &mdash; each is a named type with a
+                validating constructor. The domain language IS the type
+                system.</span
               >
             </div>
           </div>
@@ -1150,8 +1215,9 @@
             <div class="text">
               <strong>Consistent <code>Err*</code> sentinels</strong>
               <span
-                >40+ sentinel errors all use <code>Err</code> prefix, all chainable via
-                <code>errors.Is</code>. No <code>...Error</code> suffix, no mixed conventions.</span
+                >40+ sentinel errors all use <code>Err</code> prefix, all
+                chainable via <code>errors.Is</code>. No
+                <code>...Error</code> suffix, no mixed conventions.</span
               >
             </div>
           </div>
@@ -1171,9 +1237,10 @@
             <div class="text">
               <strong>Domain verbs in TaskStore</strong>
               <span
-                ><code>Done(id)</code> over <code>UpdateStatus(id, &quot;done&quot;)</code>;
-                <code>Seed</code>/<code>Stats</code>/<code>IDs</code> are short, declarative, and
-                use the domain vocabulary.</span
+                ><code>Done(id)</code> over
+                <code>UpdateStatus(id, &quot;done&quot;)</code>;
+                <code>Seed</code>/<code>Stats</code>/<code>IDs</code> are short,
+                declarative, and use the domain vocabulary.</span
               >
             </div>
           </div>
@@ -1182,9 +1249,9 @@
             <div class="text">
               <strong>Role-named DI type</strong>
               <span
-                ><code>Scope</code> (not <code>DoInjector</code> or <code>DIContainer</code>)
-                &mdash; named for its architectural role, not for the library that implements
-                it.</span
+                ><code>Scope</code> (not <code>DoInjector</code> or
+                <code>DIContainer</code>) &mdash; named for its architectural
+                role, not for the library that implements it.</span
               >
             </div>
           </div>
@@ -1193,9 +1260,9 @@
             <div class="text">
               <strong>Two-letter type params</strong>
               <span
-                ><code>CLI[T]</code>, <code>Command[T,F]</code> &mdash; single-letter type params
-                are the one accepted exception to the no-abbreviation rule (math context, Go
-                convention).</span
+                ><code>CLI[T]</code>, <code>Command[T,F]</code> &mdash;
+                single-letter type params are the one accepted exception to the
+                no-abbreviation rule (math context, Go convention).</span
               >
             </div>
           </div>
@@ -1223,7 +1290,8 @@
               <td><code>TypeHandler</code></td>
               <td><code>TypeCodec</code></td>
               <td>
-                Three methods (Register/Parse/Default) form a codec contract, not event-handling
+                Three methods (Register/Parse/Default) form a codec contract,
+                not event-handling
               </td>
             </tr>
             <tr>
@@ -1240,14 +1308,21 @@
               <td><span class="badge badge-high">High</span></td>
               <td>pkg/cmdguard/v3/type_handler.go</td>
               <td>13 (comment)</td>
-              <td><code>&quot;defines how a flag type is registered...&quot;</code></td>
               <td>
                 <code
-                  >&quot;TypeCodec defines how a flag type is parsed, defaulted, and
-                  registered.&quot;</code
+                  >&quot;defines how a flag type is registered...&quot;</code
                 >
               </td>
-              <td>Doc comment uses &ldquo;handled&rdquo; implicitly; align with new name</td>
+              <td>
+                <code
+                  >&quot;TypeCodec defines how a flag type is parsed, defaulted,
+                  and registered.&quot;</code
+                >
+              </td>
+              <td>
+                Doc comment uses &ldquo;handled&rdquo; implicitly; align with
+                new name
+              </td>
             </tr>
             <tr>
               <td>4</td>
@@ -1256,7 +1331,10 @@
               <td>111-114</td>
               <td><code>StringSliceContains</code></td>
               <td><em>delete</em></td>
-              <td>Duplicate of <code>ContainsString</code>; admits so in its own doc comment</td>
+              <td>
+                Duplicate of <code>ContainsString</code>; admits so in its own
+                doc comment
+              </td>
             </tr>
             <tr>
               <td>5</td>
@@ -1266,7 +1344,8 @@
               <td><code>doPanicTest</code></td>
               <td><code>panics</code></td>
               <td>
-                <code>do</code> verb says nothing; <code>panics(fn) bool</code> reads naturally
+                <code>do</code> verb says nothing;
+                <code>panics(fn) bool</code> reads naturally
               </td>
             </tr>
             <tr>
@@ -1277,8 +1356,8 @@
               <td><code>CommandInfo</code></td>
               <td><code>CommandMeta</code> (optional)</td>
               <td>
-                <code>Info</code> is a &ldquo;bag of fields&rdquo; suffix; only rename if more
-                <code>*Info</code> types appear
+                <code>Info</code> is a &ldquo;bag of fields&rdquo; suffix; only
+                rename if more <code>*Info</code> types appear
               </td>
             </tr>
             <tr>
@@ -1287,10 +1366,16 @@
               <td>pkg/cmdguard/v3/flags.go and callers</td>
               <td>multiple</td>
               <td>
-                <code>RegisterTypeHandler</code> + <code>FlagRegistry.RegisterTypeHandler</code>
+                <code>RegisterTypeHandler</code> +
+                <code>FlagRegistry.RegisterTypeHandler</code>
               </td>
-              <td><code>RegisterTypeCodec</code> + <code>RegisterTypeCodec</code></td>
-              <td>Follows #1; current name exposes the vague &ldquo;Handler&rdquo; word</td>
+              <td>
+                <code>RegisterTypeCodec</code> + <code>RegisterTypeCodec</code>
+              </td>
+              <td>
+                Follows #1; current name exposes the vague &ldquo;Handler&rdquo;
+                word
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1298,17 +1383,19 @@
         <div class="callout callout-amber">
           <strong>Rename safety</strong>
           <code>TypeHandler</code> and <code>RegisterTypeHandler</code> are
-          <em>exported public API</em>. Renaming them is a breaking change for downstream consumers.
-          Options: (a) rename now and bump to v4 since v3 just shipped, (b) ship
-          <code>TypeCodec</code> as an alias and deprecate <code>TypeHandler</code> with a
+          <em>exported public API</em>. Renaming them is a breaking change for
+          downstream consumers. Options: (a) rename now and bump to v4 since v3
+          just shipped, (b) ship <code>TypeCodec</code> as an alias and
+          deprecate <code>TypeHandler</code> with a
           <code>// Deprecated:</code>
-          notice, or (c) accept the name and document it. The testutil names (#4, #5) are safe to
-          rename immediately &mdash; testutil is shared internally.
+          notice, or (c) accept the name and document it. The testutil names
+          (#4, #5) are safe to rename immediately &mdash; testutil is shared
+          internally.
         </div>
 
         <footer class="footer">
-          Generated 2026-07-18 &middot; 60 source files / 71 types / ~180 functions reviewed against
-          v3.0.0
+          Generated 2026-07-18 &middot; 60 source files / 71 types / ~180
+          functions reviewed against v3.0.0
         </footer>
       </main>
     </div>

@@ -1,7 +1,7 @@
 # cmdguard v2 Design: Type-Safe, DI-Powered CLI Framework
 
-**Status:** DRAFT  
-**Date:** 2026-02-15  
+**Status:** DRAFT\
+**Date:** 2026-02-15\
 **Goal:** Rebuild cmdguard with single source of truth, no panics, and DI scopes
 
 ---

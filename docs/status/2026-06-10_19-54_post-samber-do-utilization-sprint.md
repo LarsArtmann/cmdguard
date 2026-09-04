@@ -12,18 +12,18 @@ Implemented the 3 highest-impact samber/do v2 features that actually matter for 
 
 ## a) FULLY DONE ✅
 
-| #   | Feature                                                                            | Files Changed                                 | Tests Added                                |
-| --- | ---------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------ |
-| 1   | **WithGracefulShutdown[T](<>)** — graceful DI service shutdown on SIGINT/SIGTERM   | `cli.go`, `cli_options.go`                    | 3 tests in `cli_graceful_shutdown_test.go` |
-| 2   | **Override[T] + OverrideValue[T]** — replace services for testing                  | `scope.go`                                    | 8 tests in `scope_override_test.go`        |
-| 3   | **CloneScope(scope)** — clone DI scope for test isolation                          | `scope.go`                                    | 4 tests (part of scope_override_test.go)   |
-| 4   | **NewScopeWithOpts(name, opts)** — create scope with custom `do.InjectorOpts`      | `scope.go`                                    | 1 test in `scope_logging_test.go`          |
-| 5   | **WithDILogging[T](logf)** — DI container internal logging                         | `cli_options.go`, `cli.go`                    | 2 tests in `scope_logging_test.go`         |
-| 6   | **WithSignalHandling doc update** — clarifies context-only behavior                | `cli_options.go`                              | —                                          |
-| 7   | **Research report** — full samber/do v2 utilization analysis                       | `docs/research/samber-do-v2-utilization.html` | —                                          |
-| 8   | **AGENTS.md** — new DI Scope Functions table, gotchas 45-47                        | `AGENTS.md`                                   | —                                          |
-| 9   | **doc.go** — new CLI options, testing example                                      | `doc.go`                                      | —                                          |
-| 10  | **examples/taskctl** — switched to WithGracefulShutdown, added Clone+Override test | `main.go`, `main_test.go`                     | 1 test                                     |
+| #  | Feature                                                                            | Files Changed                                 | Tests Added                                |
+| -- | ---------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------ |
+| 1  | **WithGracefulShutdown[T]()** — graceful DI service shutdown on SIGINT/SIGTERM     | `cli.go`, `cli_options.go`                    | 3 tests in `cli_graceful_shutdown_test.go` |
+| 2  | **Override[T] + OverrideValue[T]** — replace services for testing                  | `scope.go`                                    | 8 tests in `scope_override_test.go`        |
+| 3  | **CloneScope(scope)** — clone DI scope for test isolation                          | `scope.go`                                    | 4 tests (part of scope_override_test.go)   |
+| 4  | **NewScopeWithOpts(name, opts)** — create scope with custom `do.InjectorOpts`      | `scope.go`                                    | 1 test in `scope_logging_test.go`          |
+| 5  | **WithDILogging[T](logf)** — DI container internal logging                         | `cli_options.go`, `cli.go`                    | 2 tests in `scope_logging_test.go`         |
+| 6  | **WithSignalHandling doc update** — clarifies context-only behavior                | `cli_options.go`                              | —                                          |
+| 7  | **Research report** — full samber/do v2 utilization analysis                       | `docs/research/samber-do-v2-utilization.html` | —                                          |
+| 8  | **AGENTS.md** — new DI Scope Functions table, gotchas 45-47                        | `AGENTS.md`                                   | —                                          |
+| 9  | **doc.go** — new CLI options, testing example                                      | `doc.go`                                      | —                                          |
+| 10 | **examples/taskctl** — switched to WithGracefulShutdown, added Clone+Override test | `main.go`, `main_test.go`                     | 1 test                                     |
 
 ### Metrics
 
@@ -102,48 +102,48 @@ Nothing broken. Zero issues across build, lint, tests, race detection.
 
 ### High Impact (Production Safety & Core API)
 
-| #   | Task                                                                                                     | Impact | Effort |
-| --- | -------------------------------------------------------------------------------------------------------- | ------ | ------ |
-| 1   | Add `WithConfigFileWatcher[T]()` — hot-reload config on file change                                      | High   | Large  |
-| 2   | Add `WithTelemetryGracefulShutdown` — integrate OpenTelemetry span on shutdown                           | Med    | Med    |
-| 3   | Add `version.go` — extract version from `runtime/debug.ReadBuildInfo()` at build time                    | Med    | Small  |
-| 4   | Add `WithCompletionCommand[T]()` — auto-generated shell completion subcommand                            | Med    | Med    |
-| 5   | Fix `WithSignalHandling` + `WithGracefulShutdown` interaction when both set — double signal registration | Med    | Small  |
-| 6   | Add E2E test for graceful shutdown pipeline using subprocess test pattern                                | Med    | Med    |
-| 7   | Add `OutputFormat` auto-detection from `stdout` is-TTY (table vs JSON)                                   | Med    | Small  |
-| 8   | Add `WithOutputFormat[T](format)` CLI option to set default output format                                | Med    | Small  |
-| 9   | Add `Scope.RootScope()` accessor method for accessing root scope from child                              | Low    | Small  |
-| 10  | Add benchmark for DI scope creation + Provide/Invoke cycle                                               | Low    | Small  |
+| #  | Task                                                                                                     | Impact | Effort |
+| -- | -------------------------------------------------------------------------------------------------------- | ------ | ------ |
+| 1  | Add `WithConfigFileWatcher[T]()` — hot-reload config on file change                                      | High   | Large  |
+| 2  | Add `WithTelemetryGracefulShutdown` — integrate OpenTelemetry span on shutdown                           | Med    | Med    |
+| 3  | Add `version.go` — extract version from `runtime/debug.ReadBuildInfo()` at build time                    | Med    | Small  |
+| 4  | Add `WithCompletionCommand[T]()` — auto-generated shell completion subcommand                            | Med    | Med    |
+| 5  | Fix `WithSignalHandling` + `WithGracefulShutdown` interaction when both set — double signal registration | Med    | Small  |
+| 6  | Add E2E test for graceful shutdown pipeline using subprocess test pattern                                | Med    | Med    |
+| 7  | Add `OutputFormat` auto-detection from `stdout` is-TTY (table vs JSON)                                   | Med    | Small  |
+| 8  | Add `WithOutputFormat[T](format)` CLI option to set default output format                                | Med    | Small  |
+| 9  | Add `Scope.RootScope()` accessor method for accessing root scope from child                              | Low    | Small  |
+| 10 | Add benchmark for DI scope creation + Provide/Invoke cycle                                               | Low    | Small  |
 
 ### Code Quality & Cleanup
 
-| #   | Task                                                                                | Impact | Effort  |
-| --- | ----------------------------------------------------------------------------------- | ------ | ------- |
-| 11  | Remove unused `mockService` type from `scope_override_test.go`                      | Low    | Trivial |
-| 12  | Clean up `scope_logging_test.go` — remove unused `buf` and `strings` import         | Low    | Trivial |
-| 13  | Run `nix fmt` and verify all files pass treefmt before every commit                 | Low    | Trivial |
-| 14  | Add `//nolint:errcheck` to `Override`/`OverrideValue` calls if they show up in lint | Low    | Trivial |
-| 15  | Verify `golangci-lint` config has `gci` linter enabled for import ordering          | Low    | Trivial |
+| #  | Task                                                                                | Impact | Effort  |
+| -- | ----------------------------------------------------------------------------------- | ------ | ------- |
+| 11 | Remove unused `mockService` type from `scope_override_test.go`                      | Low    | Trivial |
+| 12 | Clean up `scope_logging_test.go` — remove unused `buf` and `strings` import         | Low    | Trivial |
+| 13 | Run `nix fmt` and verify all files pass treefmt before every commit                 | Low    | Trivial |
+| 14 | Add `//nolint:errcheck` to `Override`/`OverrideValue` calls if they show up in lint | Low    | Trivial |
+| 15 | Verify `golangci-lint` config has `gci` linter enabled for import ordering          | Low    | Trivial |
 
 ### Documentation & Examples
 
-| #   | Task                                                                                        | Impact | Effort  |
-| --- | ------------------------------------------------------------------------------------------- | ------ | ------- |
-| 16  | Update `MIGRATION_FROM_COBRA.md` with new APIs (WithGracefulShutdown, Override, CloneScope) | Med    | Small   |
-| 17  | Add link to research report from README or FEATURES.md                                      | Low    | Trivial |
-| 18  | Add `examples/testing/` — standalone example showing Clone+Override pattern                 | Med    | Small   |
-| 19  | Update `FEATURES.md` with new features and their status                                     | Med    | Small   |
-| 20  | Update `TODO_LIST.md` — mark completed items, add new ones from this sprint                 | Med    | Small   |
+| #  | Task                                                                                        | Impact | Effort  |
+| -- | ------------------------------------------------------------------------------------------- | ------ | ------- |
+| 16 | Update `MIGRATION_FROM_COBRA.md` with new APIs (WithGracefulShutdown, Override, CloneScope) | Med    | Small   |
+| 17 | Add link to research report from README or FEATURES.md                                      | Low    | Trivial |
+| 18 | Add `examples/testing/` — standalone example showing Clone+Override pattern                 | Med    | Small   |
+| 19 | Update `FEATURES.md` with new features and their status                                     | Med    | Small   |
+| 20 | Update `TODO_LIST.md` — mark completed items, add new ones from this sprint                 | Med    | Small   |
 
 ### Research & Future
 
-| #   | Task                                                                                               | Impact | Effort |
-| --- | -------------------------------------------------------------------------------------------------- | ------ | ------ |
-| 21  | Research `charm.land/fang/v2` latest API — are we using it to the max?                             | Med    | Med    |
-| 22  | Research `go-output v0.7.2` latest API — any new formats we should expose?                         | Med    | Med    |
-| 23  | Investigate `do.ShutdownOnSignals()` vs defer approach — benchmark parallel vs sequential shutdown | Low    | Med    |
-| 24  | Prototype `DIDebugCommand[T]` — CLI subcommand for DI introspection (`list`, `graph`, `explain`)   | Med    | Large  |
-| 25  | Evaluate Go 1.26 `iter` package for streaming output in `OutputTable`                              | Low    | Med    |
+| #  | Task                                                                                               | Impact | Effort |
+| -- | -------------------------------------------------------------------------------------------------- | ------ | ------ |
+| 21 | Research `charm.land/fang/v2` latest API — are we using it to the max?                             | Med    | Med    |
+| 22 | Research `go-output v0.7.2` latest API — any new formats we should expose?                         | Med    | Med    |
+| 23 | Investigate `do.ShutdownOnSignals()` vs defer approach — benchmark parallel vs sequential shutdown | Low    | Med    |
+| 24 | Prototype `DIDebugCommand[T]` — CLI subcommand for DI introspection (`list`, `graph`, `explain`)   | Med    | Large  |
+| 25 | Evaluate Go 1.26 `iter` package for streaming output in `OutputTable`                              | Low    | Med    |
 
 ---
 
@@ -172,7 +172,7 @@ The tradeoff: samber/do's native approach gives dependency-aware parallel shutdo
 ### Production Code
 
 - `pkg/cmdguard/v2/cli.go` — gracefulShutdown + diLogf fields, WithDILogging wiring, shutdown in Execute()
-- `pkg/cmdguard/v2/cli_options.go` — WithGracefulShutdown[T](<>), WithDILogging[T](<>), updated WithSignalHandling docs
+- `pkg/cmdguard/v2/cli_options.go` — WithGracefulShutdown[T](), WithDILogging[T](), updated WithSignalHandling docs
 - `pkg/cmdguard/v2/scope.go` — Override[T], OverrideValue[T], CloneScope(), NewScopeWithOpts()
 - `pkg/cmdguard/v2/doc.go` — new CLI options, testing example
 

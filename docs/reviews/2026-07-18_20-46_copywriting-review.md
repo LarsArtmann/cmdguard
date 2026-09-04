@@ -110,15 +110,15 @@ Score: **8.5/10**. Would be 9.5 with the two changes below.
 
 ## Prioritized actions
 
-| #   | Finding                                | Impact | Effort | Recommendation                              |
-| --- | -------------------------------------- | ------ | ------ | ------------------------------------------- |
-| 1   | Hero subtitle → outcome-led (Option C) | High   | XS     | **Apply**                                   |
-| 2   | Add one-line CTA after tagline         | High   | XS     | **Apply**                                   |
-| 3   | "Trinity" framing                      | —      | —      | Keep                                        |
-| 4   | Comparison table sources for "Some"    | Med    | S      | Optional                                    |
-| 5   | Website hero code trim/highlight       | Med    | M      | Optional (frontend-design review owns this) |
-| 6   | Feature card descriptions              | —      | —      | Keep                                        |
-| 7   | "Zero panics" evidence                 | —      | —      | Keep                                        |
+| # | Finding                                | Impact | Effort | Recommendation                              |
+| - | -------------------------------------- | ------ | ------ | ------------------------------------------- |
+| 1 | Hero subtitle → outcome-led (Option C) | High   | XS     | **Apply**                                   |
+| 2 | Add one-line CTA after tagline         | High   | XS     | **Apply**                                   |
+| 3 | "Trinity" framing                      | —      | —      | Keep                                        |
+| 4 | Comparison table sources for "Some"    | Med    | S      | Optional                                    |
+| 5 | Website hero code trim/highlight       | Med    | M      | Optional (frontend-design review owns this) |
+| 6 | Feature card descriptions              | —      | —      | Keep                                        |
+| 7 | "Zero panics" evidence                 | —      | —      | Keep                                        |
 
 **If only 2 changes are made:** #1 and #2. They are ~2 lines of README diff with outsized first-impression impact.
 

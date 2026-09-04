@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -289,15 +289,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -310,15 +322,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -835,18 +859,20 @@
           <div class="hero-badge">Code Quality Scan</div>
           <h1>cmdguard v3.0.0 &mdash; Build, Lint &amp; Duplication Audit</h1>
           <p class="hero-subtitle">
-            160 Go files audited across 6 modules (core + 5 sub-modules). Baseline: 0 lint issues,
-            87.6% coverage, all tests green. This scan surfaces what the linters do not: residual
-            duplication, gopls hints, and module-level quality observations.
+            160 Go files audited across 6 modules (core + 5 sub-modules).
+            Baseline: 0 lint issues, 87.6% coverage, all tests green. This scan
+            surfaces what the linters do not: residual duplication, gopls hints,
+            and module-level quality observations.
           </p>
         </div>
 
         <div class="callout callout-amber">
           <strong>Update 2026-07-23</strong>
-          The 33+ <code>gopls infertypeargs</code> hints were auto-fixed in <code>caad0f8</code> and
-          <code>c02ca92</code>. Lint and build remain 0 issues; core coverage is 87.8%. The
-          <code>manpage</code> sub-module was removed in <code>34a0c6e</code>; the workspace now has
-          4 optional sub-modules (glamour, prompts, spinner, telemetry) plus core.
+          The 33+ <code>gopls infertypeargs</code> hints were auto-fixed in
+          <code>caad0f8</code> and <code>c02ca92</code>. Lint and build remain 0
+          issues; core coverage is 87.8%. The <code>manpage</code> sub-module
+          was removed in <code>34a0c6e</code>; the workspace now has 4 optional
+          sub-modules (glamour, prompts, spinner, telemetry) plus core.
         </div>
 
         <nav class="toc">
@@ -894,12 +920,13 @@
         <div class="card card-solution">
           <h4>Headline: production-ready baseline, low residual debt</h4>
           <p>
-            The codebase already meets its stated quality bar: zero panics, 0 lint issues, 87.6%
-            coverage, 7 fuzz targets, 26 benchmarks, all tests pass with <code>-race</code>. What
-            this scan adds is the next layer of detail &mdash; residual duplication that the team
-            has explicitly accepted (validateMin/Max, Min/Max IntWidth, FilePath validators), plus a
-            long tail of <code>infertypeargs</code> hints in test files that gopls would auto-fix if
-            asked.
+            The codebase already meets its stated quality bar: zero panics, 0
+            lint issues, 87.6% coverage, 7 fuzz targets, 26 benchmarks, all
+            tests pass with <code>-race</code>. What this scan adds is the next
+            layer of detail &mdash; residual duplication that the team has
+            explicitly accepted (validateMin/Max, Min/Max IntWidth, FilePath
+            validators), plus a long tail of <code>infertypeargs</code> hints in
+            test files that gopls would auto-fix if asked.
           </p>
         </div>
 
@@ -907,11 +934,15 @@
         <h2 id="build-lint"><span class="num">01</span>Build &amp; Lint</h2>
 
         <div class="card">
-          <h4>Build: <code>GOEXPERIMENT=jsonv2 go build ./...</code> &mdash; PASS</h4>
+          <h4>
+            Build: <code>GOEXPERIMENT=jsonv2 go build ./...</code> &mdash; PASS
+          </h4>
           <p>
-            Core module + 5 sub-modules (glamour, manpage, prompts, spinner, telemetry) all compile.
-            <code>GOEXPERIMENT=jsonv2</code> is required because the project uses
-            <code>encoding/json/v2</code> and <code>encoding/json/jsontext</code> from Go 1.26.
+            Core module + 5 sub-modules (glamour, manpage, prompts, spinner,
+            telemetry) all compile.
+            <code>GOEXPERIMENT=jsonv2</code> is required because the project
+            uses <code>encoding/json/v2</code> and
+            <code>encoding/json/jsontext</code> from Go 1.26.
           </p>
         </div>
 
@@ -919,17 +950,19 @@
           <h4>Lint: <code>golangci-lint run ./...</code> &mdash; 0 issues</h4>
           <p>
             Core and all 5 sub-modules report zero issues against the repo's
-            <code>.golangci.yml</code>. The 4 per-file v3 exclusions and 4 ireturn allow-list
-            entries are documented in AGENTS.md as intentional design decisions (COW registries,
-            context keys, legitimate interface returns).
+            <code>.golangci.yml</code>. The 4 per-file v3 exclusions and 4
+            ireturn allow-list entries are documented in AGENTS.md as
+            intentional design decisions (COW registries, context keys,
+            legitimate interface returns).
           </p>
         </div>
 
         <div class="card">
           <h4>Tests: <code>go test ./... -race -count=1</code> &mdash; PASS</h4>
           <p>
-            All packages pass with race detector. Coverage: core v3 = 87.6%, configload = 87.5%,
-            testutil = 50.0%, examples/taskctl = 68.2%, docs-generator = 0% (example binary).
+            All packages pass with race detector. Coverage: core v3 = 87.6%,
+            configload = 87.5%, testutil = 50.0%, examples/taskctl = 68.2%,
+            docs-generator = 0% (example binary).
           </p>
         </div>
 
@@ -937,100 +970,134 @@
         <h2 id="vet"><span class="num">02</span>Vet &amp; LSP Diagnostics</h2>
 
         <div class="card card-problem">
-          <h4><code>go vet</code>: clean. gopls surfaces 33+ infertypeargs hints</h4>
+          <h4>
+            <code>go vet</code>: clean. gopls surfaces 33+ infertypeargs hints
+          </h4>
           <p>
             <code>go vet ./...</code> reports nothing. However, gopls reports
-            <strong>33+ unnecessary type arguments</strong> across at least 9 test files. These are
-            calls like <code>NewCLI[TaskConfig]()</code> where Go can infer
-            <code>[TaskConfig]</code> from context. The hints are informational (the code is
-            correct), but each is a 5-second fix that would silence a gopls nag and tighten the
-            tests.
+            <strong>33+ unnecessary type arguments</strong> across at least 9
+            test files. These are calls like
+            <code>NewCLI[TaskConfig]()</code> where Go can infer
+            <code>[TaskConfig]</code> from context. The hints are informational
+            (the code is correct), but each is a 5-second fix that would silence
+            a gopls nag and tighten the tests.
           </p>
         </div>
 
         <div class="callout callout-solution">
           <strong>Fix</strong>
-          Run <code>GOEXPERIMENT=jsonv2 gopls fix -a ./pkg/cmdguard/v3/...</code> on the affected
-          test files, or apply <code>gofumpt</code>-driven simplification. None of the call sites
-          change semantics.
+          Run
+          <code>GOEXPERIMENT=jsonv2 gopls fix -a ./pkg/cmdguard/v3/...</code> on
+          the affected test files, or apply <code>gofumpt</code>-driven
+          simplification. None of the call sites change semantics.
         </div>
 
         <!-- Duplication -->
-        <h2 id="duplication"><span class="num">03</span>Duplication (art-dupl)</h2>
+        <h2 id="duplication">
+          <span class="num">03</span>Duplication (art-dupl)
+        </h2>
 
         <div class="card">
-          <h4>Tool: <code>art-dupl --semantic --sort total-tokens -t 5</code></h4>
+          <h4>
+            Tool: <code>art-dupl --semantic --sort total-tokens -t 5</code>
+          </h4>
           <p>
-            At threshold 5 (duplicated statements), <strong>1 clone group</strong> remains. At
-            threshold 3, <strong>5 clone groups</strong>. All reviewed below with judgment per
-            clone.
+            At threshold 5 (duplicated statements),
+            <strong>1 clone group</strong> remains. At threshold 3,
+            <strong>5 clone groups</strong>. All reviewed below with judgment
+            per clone.
           </p>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Accept</span>
-          <h3>Clone 1: validateMin / validateMax (flags_validate.go:253-296)</h3>
-          <div class="where">pkg/cmdguard/v3/flags_validate.go:253-266 and :276-289</div>
+          <h3>
+            Clone 1: validateMin / validateMax (flags_validate.go:253-296)
+          </h3>
+          <div class="where">
+            pkg/cmdguard/v3/flags_validate.go:253-266 and :276-289
+          </div>
           <p>
             Two ~14-line validators with the same shape: parse
-            <code>name:value</code>, convert to float64, compare against actual, return wrapped
-            sentinel. The only differences are the operator (<code>&lt;</code> vs <code>&gt;</code>)
-            and the sentinel (<code>ErrValueTooSmall</code> vs <code>ErrValueTooLarge</code>).
+            <code>name:value</code>, convert to float64, compare against actual,
+            return wrapped sentinel. The only differences are the operator
+            (<code>&lt;</code> vs <code>&gt;</code>) and the sentinel (<code
+              >ErrValueTooSmall</code
+            >
+            vs <code>ErrValueTooLarge</code>).
           </p>
           <div class="callout callout-amber">
             <strong>Why we accept</strong>
-            Forcing a single generic helper would either take a comparator function argument (more
-            params than the duplicated code has lines) or use a numeric operator token
-            (stringly-typed dispatch). The current pair reads more clearly than
-            <code>validateRange(val, opLess, ErrValueTooSmall)</code> would. Two near-copies that
-            name their intent are preferable to one abstraction that hides it.
+            Forcing a single generic helper would either take a comparator
+            function argument (more params than the duplicated code has lines)
+            or use a numeric operator token (stringly-typed dispatch). The
+            current pair reads more clearly than
+            <code>validateRange(val, opLess, ErrValueTooSmall)</code> would. Two
+            near-copies that name their intent are preferable to one abstraction
+            that hides it.
           </div>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Accept</span>
-          <h3>Clone 2: validateMinLen / validateMaxLen (flags_validate.go:217-243)</h3>
-          <div class="where">pkg/cmdguard/v3/flags_validate.go:217-225 and :235-243</div>
+          <h3>
+            Clone 2: validateMinLen / validateMaxLen (flags_validate.go:217-243)
+          </h3>
+          <div class="where">
+            pkg/cmdguard/v3/flags_validate.go:217-225 and :235-243
+          </div>
           <p>
-            Same pattern as Clone 1, but for string length validation. Acceptable for the same
-            reason: the abstraction cost exceeds the duplication cost.
+            Same pattern as Clone 1, but for string length validation.
+            Acceptable for the same reason: the abstraction cost exceeds the
+            duplication cost.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Accept</span>
-          <h3>Clone 3: validator loop in flags_validate.go:71-77 and type_handler.go:114-120</h3>
+          <h3>
+            Clone 3: validator loop in flags_validate.go:71-77 and
+            type_handler.go:114-120
+          </h3>
           <div class="where">
-            pkg/cmdguard/v3/flags_validate.go:71-77 &middot; type_handler.go:114-120
+            pkg/cmdguard/v3/flags_validate.go:71-77 &middot;
+            type_handler.go:114-120
           </div>
           <p>
-            Both iterate over registered validators and short-circuit on first error. Different
-            domains (flag validators vs type handlers) make extraction artificial; both are 7 lines
-            and read fine inline.
+            Both iterate over registered validators and short-circuit on first
+            error. Different domains (flag validators vs type handlers) make
+            extraction artificial; both are 7 lines and read fine inline.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Accept</span>
           <h3>Clone 4: FilePath validators (types_filepath.go:91-112)</h3>
-          <div class="where">pkg/cmdguard/v3/types_filepath.go:91-98 and :105-112</div>
+          <div class="where">
+            pkg/cmdguard/v3/types_filepath.go:91-98 and :105-112
+          </div>
           <p>
-            <code>validateFile</code> and <code>validateDir</code> share structure (call
-            <code>os.Stat</code>, check mode bit). The two differ in <code>IsRegular()</code> vs
-            <code>IsDir()</code>, which is the entire point of having two functions. Acceptable.
+            <code>validateFile</code> and <code>validateDir</code> share
+            structure (call <code>os.Stat</code>, check mode bit). The two
+            differ in <code>IsRegular()</code> vs <code>IsDir()</code>, which is
+            the entire point of having two functions. Acceptable.
           </p>
         </div>
 
         <div class="issue issue-nice">
           <span class="severity severity-nice">Review</span>
           <h3>Clone 5: FlowContext.Shutdown vs Scope.Shutdown (6 lines)</h3>
-          <div class="where">pkg/cmdguard/v3/flow_context.go:175-180 &middot; scope.go:82-87</div>
+          <div class="where">
+            pkg/cmdguard/v3/flow_context.go:175-180 &middot; scope.go:82-87
+          </div>
           <p>
-            Both walk a list of shutdown hooks/services in reverse order and collect errors via
-            <code>errors.Join</code>. Worth a glance &mdash; could potentially share a small
-            <code>shutdownAllReverse[T]</code> helper &mdash; but the type signatures differ enough
-            (<code>[]ShutdownHook</code> vs <code>[]do.ShutdownHook</code>) that the abstraction
-            earns little. Acceptable as-is; flag for revisit if either grows.
+            Both walk a list of shutdown hooks/services in reverse order and
+            collect errors via
+            <code>errors.Join</code>. Worth a glance &mdash; could potentially
+            share a small <code>shutdownAllReverse[T]</code> helper &mdash; but
+            the type signatures differ enough (<code>[]ShutdownHook</code> vs
+            <code>[]do.ShutdownHook</code>) that the abstraction earns little.
+            Acceptable as-is; flag for revisit if either grows.
           </p>
         </div>
 
@@ -1057,7 +1124,10 @@
                 33+ unnecessary explicit type args (<code>NewCLI[T]</code>,
                 <code>NewCommand[T]</code>)
               </td>
-              <td><code>gopls fix -a</code> &mdash; remove explicit type args where inferable</td>
+              <td>
+                <code>gopls fix -a</code> &mdash; remove explicit type args
+                where inferable
+              </td>
             </tr>
             <tr>
               <td>2</td>
@@ -1110,8 +1180,9 @@
             <div class="text">
               <strong>Zero panics by design</strong>
               <span
-                >Every constructor returns errors; no <code>Must*</code> variants. 1429 test runs
-                across 26 benchmarks and 7 fuzz targets enforce this.</span
+                >Every constructor returns errors; no
+                <code>Must*</code> variants. 1429 test runs across 26 benchmarks
+                and 7 fuzz targets enforce this.</span
               >
             </div>
           </div>
@@ -1120,8 +1191,9 @@
             <div class="text">
               <strong>0 lint issues across 6 modules</strong>
               <span
-                >Real code fixes were applied (wrapcheck helpers, funlen splits, ireturn allow-list)
-                rather than silencing linters. AGENTS.md tracks 4+4 documented exclusions.</span
+                >Real code fixes were applied (wrapcheck helpers, funlen splits,
+                ireturn allow-list) rather than silencing linters. AGENTS.md
+                tracks 4+4 documented exclusions.</span
               >
             </div>
           </div>
@@ -1130,8 +1202,9 @@
             <div class="text">
               <strong>Thin core, modular sub-modules</strong>
               <span
-                >Core v3 has 13 direct deps; 5 optional sub-modules isolate heavy deps (huh,
-                lipgloss, otel, glamour, mango). Sub-modules pass lint independently.</span
+                >Core v3 has 13 direct deps; 5 optional sub-modules isolate
+                heavy deps (huh, lipgloss, otel, glamour, mango). Sub-modules
+                pass lint independently.</span
               >
             </div>
           </div>
@@ -1140,8 +1213,9 @@
             <div class="text">
               <strong>Copy-on-write registries</strong>
               <span
-                ><code>FlagRegistry</code> shares global type/validator registries lazily and clones
-                on first write &mdash; reduces <code>NewCLI</code> by ~48%.</span
+                ><code>FlagRegistry</code> shares global type/validator
+                registries lazily and clones on first write &mdash; reduces
+                <code>NewCLI</code> by ~48%.</span
               >
             </div>
           </div>
@@ -1150,8 +1224,9 @@
             <div class="text">
               <strong>Honest status reporting</strong>
               <span
-                >Sub-modules self-skip when stderr is not a TTY (<code>spinner</code>); audit log
-                query helpers expose failed services explicitly.</span
+                >Sub-modules self-skip when stderr is not a TTY
+                (<code>spinner</code>); audit log query helpers expose failed
+                services explicitly.</span
               >
             </div>
           </div>
@@ -1162,11 +1237,15 @@
         <div class="migration-step">
           <div class="migration-num">1</div>
           <div class="migration-content">
-            <h4>Auto-fix infertypeargs hints (Pareto: high impact, near-zero effort)</h4>
+            <h4>
+              Auto-fix infertypeargs hints (Pareto: high impact, near-zero
+              effort)
+            </h4>
             <p>
               Run <code>GOEXPERIMENT=jsonv2 gopls fix -a &lt;file&gt;</code>
               across the 9+ affected test files. Verify with
-              <code>go test ./... -race</code>. Expected: 33+ hints silenced, no behavior change.
+              <code>go test ./... -race</code>. Expected: 33+ hints silenced, no
+              behavior change.
             </p>
           </div>
         </div>
@@ -1175,8 +1254,9 @@
           <div class="migration-content">
             <h4>Document the 5 accepted clone groups in AGENTS.md</h4>
             <p>
-              Each accepted clone should record its rationale (most already do). Add a one-line
-              table entry so the next duplication pass skips them without re-deliberation.
+              Each accepted clone should record its rationale (most already do).
+              Add a one-line table entry so the next duplication pass skips them
+              without re-deliberation.
             </p>
           </div>
         </div>
@@ -1185,16 +1265,17 @@
           <div class="migration-content">
             <h4>Add a CI guard for infertypeargs regression</h4>
             <p>
-              <code>golangci-lint</code> does not currently surface gopls hints. Consider
-              <code>gopls check</code> as a separate CI job (with <code>GOEXPERIMENT=jsonv2</code>)
-              so future unnecessary type args are caught at PR time.
+              <code>golangci-lint</code> does not currently surface gopls hints.
+              Consider <code>gopls check</code> as a separate CI job (with
+              <code>GOEXPERIMENT=jsonv2</code>) so future unnecessary type args
+              are caught at PR time.
             </p>
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-18 &middot; Build/lint/test/vet/art-dupl verified against v3.0.0 (commit
-          73d49ad)
+          Generated 2026-07-18 &middot; Build/lint/test/vet/art-dupl verified
+          against v3.0.0 (commit 73d49ad)
         </footer>
       </main>
     </div>

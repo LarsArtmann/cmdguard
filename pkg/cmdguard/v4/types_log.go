@@ -17,7 +17,7 @@ var logFormatAllowed = []string{"text", "json"}
 
 // LogLevel is a type-safe log level enum.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type LogLevel Enum
 
 // Log level constants.
@@ -68,7 +68,7 @@ func (l LogLevel) IsEmpty() bool {
 
 // LogFormat is a type-safe log format enum.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type LogFormat Enum
 
 // Log format constants.

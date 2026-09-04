@@ -73,8 +73,16 @@
         width: 200%;
         height: 200%;
         background:
-          radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 70% 50%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+          radial-gradient(
+            circle at 30% 50%,
+            rgba(59, 130, 246, 0.08) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 70% 50%,
+            rgba(6, 182, 212, 0.06) 0%,
+            transparent 50%
+          );
         pointer-events: none;
       }
 
@@ -707,10 +715,14 @@
           <span class="dot"></span>
           Deep Research Report — June 2026
         </div>
-        <h1>Are we using <span class="gradient">samber/do v2</span><br />to the max?</h1>
+        <h1>
+          Are we using <span class="gradient">samber/do v2</span><br />to the
+          max?
+        </h1>
         <p class="subtitle">
-          A comprehensive audit of cmdguard's DI integration — what's used, what's missing, and what
-          opportunities remain untapped. Every API surface analyzed, every gap quantified.
+          A comprehensive audit of cmdguard's DI integration — what's used,
+          what's missing, and what opportunities remain untapped. Every API
+          surface analyzed, every gap quantified.
         </p>
         <div class="hero-meta">
           <div class="hero-meta-item">
@@ -727,7 +739,9 @@
           </div>
           <div class="hero-meta-item">
             <span class="label">Verdict</span>
-            <span class="value" style="color: var(--accent-yellow)">Moderate — Room to Grow</span>
+            <span class="value" style="color: var(--accent-yellow)"
+              >Moderate — Room to Grow</span
+            >
           </div>
         </div>
       </div>
@@ -742,7 +756,10 @@
               <span class="card-title">Registration</span>
               <div
                 class="card-icon"
-                style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green)"
+                style="
+                  background: rgba(16, 185, 129, 0.12);
+                  color: var(--accent-green);
+                "
               >
                 ✓
               </div>
@@ -761,7 +778,10 @@
               <span class="card-title">Invocation</span>
               <div
                 class="card-icon"
-                style="background: rgba(245, 158, 11, 0.12); color: var(--accent-yellow)"
+                style="
+                  background: rgba(245, 158, 11, 0.12);
+                  color: var(--accent-yellow);
+                "
               >
                 ◐
               </div>
@@ -780,13 +800,18 @@
               <span class="card-title">Lifecycle</span>
               <div
                 class="card-icon"
-                style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green)"
+                style="
+                  background: rgba(16, 185, 129, 0.12);
+                  color: var(--accent-green);
+                "
               >
                 ✓
               </div>
             </div>
             <div class="score-value score-used">4 / 8</div>
-            <div class="score-detail">Shutdown, HealthCheck + WithContext variants</div>
+            <div class="score-detail">
+              Shutdown, HealthCheck + WithContext variants
+            </div>
             <div class="progress-bar">
               <div
                 class="progress-fill"
@@ -799,15 +824,23 @@
               <span class="card-title">Advanced</span>
               <div
                 class="card-icon"
-                style="background: rgba(239, 68, 68, 0.12); color: var(--accent-red)"
+                style="
+                  background: rgba(239, 68, 68, 0.12);
+                  color: var(--accent-red);
+                "
               >
                 ✗
               </div>
             </div>
             <div class="score-value score-unused">0 / 12</div>
-            <div class="score-detail">Hooks, Aliasing, Transient, Override, Clone, StructTag</div>
+            <div class="score-detail">
+              Hooks, Aliasing, Transient, Override, Clone, StructTag
+            </div>
             <div class="progress-bar">
-              <div class="progress-fill" style="width: 0%; background: var(--gradient-red)"></div>
+              <div
+                class="progress-fill"
+                style="width: 0%; background: var(--gradient-red)"
+              ></div>
             </div>
           </div>
           <div class="score-card">
@@ -815,7 +848,10 @@
               <span class="card-title">Scope Tree</span>
               <div
                 class="card-icon"
-                style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green)"
+                style="
+                  background: rgba(16, 185, 129, 0.12);
+                  color: var(--accent-green);
+                "
               >
                 ✓
               </div>
@@ -834,15 +870,23 @@
               <span class="card-title">Debug / Introspection</span>
               <div
                 class="card-icon"
-                style="background: rgba(239, 68, 68, 0.12); color: var(--accent-red)"
+                style="
+                  background: rgba(239, 68, 68, 0.12);
+                  color: var(--accent-red);
+                "
               >
                 ✗
               </div>
             </div>
             <div class="score-value score-unused">0 / 6</div>
-            <div class="score-detail">ExplainInjector, ExplainService, Web UI, ListServices</div>
+            <div class="score-detail">
+              ExplainInjector, ExplainService, Web UI, ListServices
+            </div>
             <div class="progress-bar">
-              <div class="progress-fill" style="width: 0%; background: var(--gradient-red)"></div>
+              <div
+                class="progress-fill"
+                style="width: 0%; background: var(--gradient-red)"
+              ></div>
             </div>
           </div>
         </div>
@@ -855,7 +899,10 @@
         <div class="section-header">
           <div
             class="section-number"
-            style="background: rgba(59, 130, 246, 0.12); color: var(--accent-blue)"
+            style="
+              background: rgba(59, 130, 246, 0.12);
+              color: var(--accent-blue);
+            "
           >
             01
           </div>
@@ -903,7 +950,9 @@
             <div class="feature-name">
               <div>
                 <code>do.ProvideValue[T]</code>
-                <div class="desc">Eager registration of pre-constructed values</div>
+                <div class="desc">
+                  Eager registration of pre-constructed values
+                </div>
               </div>
             </div>
             <div><span class="badge badge-used">✓ Used</span></div>
@@ -927,7 +976,9 @@
             <div class="feature-name">
               <div>
                 <code>do.ProvideTransient[T]</code>
-                <div class="desc">New instance on every invocation (factory)</div>
+                <div class="desc">
+                  New instance on every invocation (factory)
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -976,7 +1027,9 @@
             <div class="feature-name">
               <div>
                 <code>do.InvokeAs[T]</code>
-                <div class="desc">Invoke by interface type (implicit alias)</div>
+                <div class="desc">
+                  Invoke by interface type (implicit alias)
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1049,7 +1102,8 @@
           <div class="feature-row">
             <div class="feature-name">
               <div>
-                <code>do.OverrideNamed[T]</code> / <code>OverrideTransient[T]</code>
+                <code>do.OverrideNamed[T]</code> /
+                <code>OverrideTransient[T]</code>
                 <div class="desc">Named and transient override variants</div>
               </div>
             </div>
@@ -1099,7 +1153,9 @@
             <div class="feature-name">
               <div>
                 <code>do.Shutdown[T]</code> / <code>ShutdownNamed()</code>
-                <div class="desc">Shutdown individual service by type or name</div>
+                <div class="desc">
+                  Shutdown individual service by type or name
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1111,7 +1167,9 @@
             <div class="feature-name">
               <div>
                 <code>do.HealthCheck[T]</code> / <code>HealthCheckNamed()</code>
-                <div class="desc">Health check individual service by type or name</div>
+                <div class="desc">
+                  Health check individual service by type or name
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1124,7 +1182,9 @@
             <div class="feature-name">
               <div>
                 <code>InjectorOpts.Hook*</code> (6 hooks)
-                <div class="desc">Before/After Registration, Invocation, Shutdown hooks</div>
+                <div class="desc">
+                  Before/After Registration, Invocation, Shutdown hooks
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1136,7 +1196,9 @@
             <div class="feature-name">
               <div>
                 <code>InjectorOpts.HealthCheck*</code>
-                <div class="desc">Parallelism, global timeout, per-service timeout</div>
+                <div class="desc">
+                  Parallelism, global timeout, per-service timeout
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1148,7 +1210,9 @@
             <div class="feature-name">
               <div>
                 <code>InjectorOpts.Logf</code>
-                <div class="desc">Custom logging for DI container internals</div>
+                <div class="desc">
+                  Custom logging for DI container internals
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1247,7 +1311,9 @@
             <div class="feature-name">
               <div>
                 <code>injector.Clone()</code> / <code>CloneWithOpts()</code>
-                <div class="desc">Clone container for testing with service overrides</div>
+                <div class="desc">
+                  Clone container for testing with service overrides
+                </div>
               </div>
             </div>
             <div><span class="badge badge-unused">✗ Unused</span></div>
@@ -1288,17 +1354,24 @@
         <div class="section-header">
           <div
             class="section-number"
-            style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green)"
+            style="
+              background: rgba(16, 185, 129, 0.12);
+              color: var(--accent-green);
+            "
           >
             02
           </div>
           <h2>Current Integration Architecture</h2>
         </div>
-        <p class="section-desc">What cmdguard wraps and exposes today from samber/do v2.</p>
+        <p class="section-desc">
+          What cmdguard wraps and exposes today from samber/do v2.
+        </p>
 
         <div class="arch-diagram">
           <div class="arch-layer">
-            <div class="arch-layer-label">cmdguard Scope API (exposed to users)</div>
+            <div class="arch-layer-label">
+              cmdguard Scope API (exposed to users)
+            </div>
             <div class="arch-boxes">
               <div class="arch-box exposed">Provide[T]</div>
               <div class="arch-box exposed">ProvideNamed[T]</div>
@@ -1330,7 +1403,9 @@
               <div class="arch-box exposed">injector.Scope()</div>
               <div class="arch-box exposed">injector.ShutdownWithContext()</div>
               <div class="arch-box exposed">injector.HealthCheck()</div>
-              <div class="arch-box exposed">injector.HealthCheckWithContext()</div>
+              <div class="arch-box exposed">
+                injector.HealthCheckWithContext()
+              </div>
             </div>
           </div>
 
@@ -1353,7 +1428,9 @@
               <div class="arch-box missing">ExplainService[T]</div>
               <div class="arch-box missing">ListProvidedServices()</div>
               <div class="arch-box missing">Clone()</div>
-              <div class="arch-box missing">InjectorOpts (hooks, logging, timeouts)</div>
+              <div class="arch-box missing">
+                InjectorOpts (hooks, logging, timeouts)
+              </div>
             </div>
           </div>
         </div>
@@ -1366,20 +1443,26 @@
         <div class="section-header">
           <div
             class="section-number"
-            style="background: rgba(239, 68, 68, 0.12); color: var(--accent-red)"
+            style="
+              background: rgba(239, 68, 68, 0.12);
+              color: var(--accent-red);
+            "
           >
             03
           </div>
           <h2>High-Impact Opportunities</h2>
         </div>
         <p class="section-desc">
-          The features that would transform cmdguard's DI story from "basic wrapper" to
-          "best-in-class CLI DI experience."
+          The features that would transform cmdguard's DI story from "basic
+          wrapper" to "best-in-class CLI DI experience."
         </p>
 
         <div class="opportunity-grid">
           <!-- Opportunity 1: Lifecycle Hooks -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-red)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-red)"
+          >
             <div class="opp-header">
               <div class="opp-title">1. Lifecycle Hooks via InjectorOpts</div>
               <span class="priority priority-high">HIGH IMPACT</span>
@@ -1387,31 +1470,37 @@
             <div class="opp-body">
               <p>
                 samber/do v2 provides <strong>6 lifecycle hooks</strong> in
-                <code>InjectorOpts</code> that fire at every stage: before/after registration,
-                invocation, and shutdown. cmdguard currently creates its injector via
-                <code>do.New()</code> which uses zero options.
+                <code>InjectorOpts</code> that fire at every stage: before/after
+                registration, invocation, and shutdown. cmdguard currently
+                creates its injector via <code>do.New()</code> which uses zero
+                options.
               </p>
               <p>
-                <strong>Why it matters:</strong> These hooks enable structured logging, metrics, and
-                observability for the entire DI lifecycle — without any middleware. Every service
-                registration, instantiation, and shutdown becomes observable.
+                <strong>Why it matters:</strong> These hooks enable structured
+                logging, metrics, and observability for the entire DI lifecycle
+                — without any middleware. Every service registration,
+                instantiation, and shutdown becomes observable.
               </p>
               <div class="opp-code">
                 <code
-                  >InjectorOpts{ HookBeforeRegistration: []func(*Scope, string){ ... }, // validate,
-                  log HookAfterRegistration: []func(*Scope, string){ ... }, // metrics
-                  HookBeforeInvocation: []func(*Scope, string){ ... }, // tracing start
-                  HookAfterInvocation: []func(*Scope, string, error){ ... }, // tracing end
-                  HookBeforeShutdown: []func(*Scope, string){ ... }, // log HookAfterShutdown:
-                  []func(*Scope, string, error){ ... }, // audit Logf: func(format string, args
-                  ...any) { slog.Info(fmt.Sprintf(format, args...)) }, }</code
+                  >InjectorOpts{ HookBeforeRegistration: []func(*Scope, string){
+                  ... }, // validate, log HookAfterRegistration: []func(*Scope,
+                  string){ ... }, // metrics HookBeforeInvocation:
+                  []func(*Scope, string){ ... }, // tracing start
+                  HookAfterInvocation: []func(*Scope, string, error){ ... }, //
+                  tracing end HookBeforeShutdown: []func(*Scope, string){ ... },
+                  // log HookAfterShutdown: []func(*Scope, string, error){ ...
+                  }, // audit Logf: func(format string, args ...any) {
+                  slog.Info(fmt.Sprintf(format, args...)) }, }</code
                 >
               </div>
               <p>
-                <strong>How to integrate:</strong> Add <code>WithDILogging[T](fn)</code> and
+                <strong>How to integrate:</strong> Add
+                <code>WithDILogging[T](fn)</code> and
                 <code>WithDIHooks[T](opts)</code> CLI options. Pass hooks to
-                <code>do.NewWithOpts()</code> instead of <code>do.New()</code> in
-                <code>NewScope()</code>. Optionally expose per-hook CLI options like
+                <code>do.NewWithOpts()</code> instead of
+                <code>do.New()</code> in <code>NewScope()</code>. Optionally
+                expose per-hook CLI options like
                 <code>WithDIInvocationHook[T](fn)</code>.
               </p>
               <div class="opp-impact">
@@ -1424,74 +1513,96 @@
           </div>
 
           <!-- Opportunity 2: ShutdownOnSignals -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-red)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-red)"
+          >
             <div class="opp-header">
-              <div class="opp-title">2. ShutdownOnSignals — Graceful OS Signal Handling</div>
+              <div class="opp-title">
+                2. ShutdownOnSignals — Graceful OS Signal Handling
+              </div>
               <span class="priority priority-high">HIGH IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                cmdguard has <code>WithSignalHandling[T]()</code> which sets up a context cancelled
-                on SIGINT/SIGTERM — but it <strong>does NOT trigger DI shutdown</strong>. The
-                scope's services (implementing <code>ShutdownerWithError</code>) are never notified
-                when the process receives a signal.
+                cmdguard has <code>WithSignalHandling[T]()</code> which sets up
+                a context cancelled on SIGINT/SIGTERM — but it
+                <strong>does NOT trigger DI shutdown</strong>. The scope's
+                services (implementing <code>ShutdownerWithError</code>) are
+                never notified when the process receives a signal.
               </p>
               <p>
                 samber/do provides
-                <code>injector.ShutdownOnSignals(syscall.SIGTERM, os.Interrupt)</code> which blocks
-                until a signal arrives, then performs
+                <code
+                  >injector.ShutdownOnSignals(syscall.SIGTERM,
+                  os.Interrupt)</code
+                >
+                which blocks until a signal arrives, then performs
                 <strong>dependency-aware parallel shutdown</strong>
                 in reverse invocation order. This is a one-liner integration.
               </p>
               <div class="opp-code">
                 <code
                   >// Instead of just cancelling context:
-                  injector.ShutdownOnSignals(syscall.SIGTERM, os.Interrupt) // This handles: signal
-                  → parallel shutdown → clean exit</code
+                  injector.ShutdownOnSignals(syscall.SIGTERM, os.Interrupt) //
+                  This handles: signal → parallel shutdown → clean exit</code
                 >
               </div>
               <p>
                 <strong>How to integrate:</strong> Merge with existing
-                <code>WithSignalHandling</code>. When signal handling is enabled, call
-                <code>scope.Injector().RootScope().ShutdownOnSignals()</code> in a goroutine
-                alongside <code>cli.Execute()</code>. On signal, the DI container gracefully shuts
-                down all services, then the cancelled context terminates the active command.
+                <code>WithSignalHandling</code>. When signal handling is
+                enabled, call
+                <code>scope.Injector().RootScope().ShutdownOnSignals()</code> in
+                a goroutine alongside <code>cli.Execute()</code>. On signal, the
+                DI container gracefully shuts down all services, then the
+                cancelled context terminates the active command.
               </p>
               <div class="opp-impact">
                 <div class="impact-tag">🛡️ Production safety</div>
                 <div class="impact-tag">🔄 Graceful degradation</div>
                 <div class="impact-tag">⚡ Dependency-aware parallel</div>
-                <div class="impact-tag">🔗 Complements existing signal handling</div>
+                <div class="impact-tag">
+                  🔗 Complements existing signal handling
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Opportunity 3: Override for Testing -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-red)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-red)"
+          >
             <div class="opp-header">
-              <div class="opp-title">3. Override[T] — First-Class Testing Support</div>
+              <div class="opp-title">
+                3. Override[T] — First-Class Testing Support
+              </div>
               <span class="priority priority-high">HIGH IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                samber/do's <code>Override[T]</code> and <code>OverrideValue[T]</code> let you
-                replace services in a cloned injector — the standard testing pattern. Combined with
-                <code>injector.Clone()</code>, this enables per-test DI isolation without touching
-                global state.
+                samber/do's <code>Override[T]</code> and
+                <code>OverrideValue[T]</code> let you replace services in a
+                cloned injector — the standard testing pattern. Combined with
+                <code>injector.Clone()</code>, this enables per-test DI
+                isolation without touching global state.
               </p>
               <div class="opp-code">
                 <code
-                  >// In test setup: testScope := scope.Injector().RootScope().Clone()
-                  do.Override[*Database](testScope, func(i do.Injector) (*Database, error) { return
-                  &MockDatabase{}, nil }) testCLI := v2.NewCLIWithScope("test", "test", Config{},
-                  testScope)</code
+                  >// In test setup: testScope :=
+                  scope.Injector().RootScope().Clone()
+                  do.Override[*Database](testScope, func(i do.Injector)
+                  (*Database, error) { return &MockDatabase{}, nil }) testCLI :=
+                  v2.NewCLIWithScope("test", "test", Config{}, testScope)</code
                 >
               </div>
               <p>
-                <strong>How to integrate:</strong> Add <code>Override[T](scope, provider)</code> and
-                <code>OverrideValue[T](scope, value)</code> as cmdguard wrapper functions. Add
-                <code>CloneScope(scope)</code> to clone the DI container for test isolation.
-                Document the testing pattern in examples.
+                <strong>How to integrate:</strong> Add
+                <code>Override[T](scope, provider)</code> and
+                <code>OverrideValue[T](scope, value)</code> as cmdguard wrapper
+                functions. Add <code>CloneScope(scope)</code> to clone the DI
+                container for test isolation. Document the testing pattern in
+                examples.
               </p>
               <div class="opp-impact">
                 <div class="impact-tag">🧪 Testability</div>
@@ -1502,31 +1613,39 @@
           </div>
 
           <!-- Opportunity 4: Transient Services -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-yellow)"
+          >
             <div class="opp-header">
-              <div class="opp-title">4. ProvideTransient[T] — Factory Pattern</div>
+              <div class="opp-title">
+                4. ProvideTransient[T] — Factory Pattern
+              </div>
               <span class="priority priority-medium">MEDIUM IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                CLI commands often need fresh instances — request contexts, temporary resources,
-                per-command handlers.
+                CLI commands often need fresh instances — request contexts,
+                temporary resources, per-command handlers.
                 <code>ProvideTransient[T]</code> creates a new instance on every
-                <code>Invoke[T]</code> call, acting as a type-safe factory registry.
+                <code>Invoke[T]</code> call, acting as a type-safe factory
+                registry.
               </p>
               <div class="opp-code">
                 <code
                   >// Register a factory for per-command contexts
-                  v2.ProvideTransient[AppConfig](scope, func(i do.Injector) (AppConfig, error) {
-                  return AppConfig{RequestID: uuid.New().String()}, nil }) // Every Invoke gets a
-                  fresh instance cfg := v2.Invoke[AppConfig](scope) // unique request ID each
-                  time</code
+                  v2.ProvideTransient[AppConfig](scope, func(i do.Injector)
+                  (AppConfig, error) { return AppConfig{RequestID:
+                  uuid.New().String()}, nil }) // Every Invoke gets a fresh
+                  instance cfg := v2.Invoke[AppConfig](scope) // unique request
+                  ID each time</code
                 >
               </div>
               <p>
                 <strong>How to integrate:</strong> Add
                 <code>ProvideTransient[T](scope, provider)</code> and
-                <code>ProvideNamedTransient[T](scope, name, provider)</code> wrappers in scope.go.
+                <code>ProvideNamedTransient[T](scope, name, provider)</code>
+                wrappers in scope.go.
               </p>
               <div class="opp-impact">
                 <div class="impact-tag">🏭 Factory pattern</div>
@@ -1537,32 +1656,41 @@
           </div>
 
           <!-- Opportunity 5: Service Aliasing -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-yellow)"
+          >
             <div class="opp-header">
-              <div class="opp-title">5. Service Aliasing — Accept Interfaces, Return Structs</div>
+              <div class="opp-title">
+                5. Service Aliasing — Accept Interfaces, Return Structs
+              </div>
               <span class="priority priority-medium">MEDIUM IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                Go's best practice is "accept interfaces, return structs." samber/do v2 has
-                first-class support:
-                <code>do.As[Concrete, Interface]()</code> for explicit binding, and
+                Go's best practice is "accept interfaces, return structs."
+                samber/do v2 has first-class support:
+                <code>do.As[Concrete, Interface]()</code> for explicit binding,
+                and
                 <code>do.InvokeAs[Interface]()</code>
-                for implicit resolution. This enables proper SOLID DI without coupling consumers to
-                implementations.
+                for implicit resolution. This enables proper SOLID DI without
+                coupling consumers to implementations.
               </p>
               <div class="opp-code">
                 <code
-                  >// Register concrete implementation v2.Provide(scope, NewPostgresStore) // Bind
-                  to interface v2.As[*PostgresStore, TaskRepository](scope) // Consumers only know
-                  about the interface repo := v2.Invoke[TaskRepository](scope) // ← interface, not
-                  concrete</code
+                  >// Register concrete implementation v2.Provide(scope,
+                  NewPostgresStore) // Bind to interface v2.As[*PostgresStore,
+                  TaskRepository](scope) // Consumers only know about the
+                  interface repo := v2.Invoke[TaskRepository](scope) // ←
+                  interface, not concrete</code
                 >
               </div>
               <p>
-                <strong>How to integrate:</strong> Add <code>As[Concrete, Interface](scope)</code>,
-                <code>InvokeAs[Interface](scope)</code>, and <code>AsNamed</code> wrappers. This
-                would make cmdguard the first Go CLI framework with SOLID DI support.
+                <strong>How to integrate:</strong> Add
+                <code>As[Concrete, Interface](scope)</code>,
+                <code>InvokeAs[Interface](scope)</code>, and
+                <code>AsNamed</code> wrappers. This would make cmdguard the
+                first Go CLI framework with SOLID DI support.
               </p>
               <div class="opp-impact">
                 <div class="impact-tag">🏗️ SOLID principles</div>
@@ -1573,32 +1701,41 @@
           </div>
 
           <!-- Opportunity 6: Debug / Introspection -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-yellow)"
+          >
             <div class="opp-header">
               <div class="opp-title">6. Debug & Introspection API</div>
               <span class="priority priority-medium">MEDIUM IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                samber/do provides rich introspection: <code>ExplainInjector()</code> shows the full
-                scope tree and service graph, <code>ExplainService[T]()</code> shows dependencies
-                for a single service, and <code>ListProvidedServices()</code> /
+                samber/do provides rich introspection:
+                <code>ExplainInjector()</code> shows the full scope tree and
+                service graph, <code>ExplainService[T]()</code> shows
+                dependencies for a single service, and
+                <code>ListProvidedServices()</code> /
                 <code>ListInvokedServices()</code> enumerate all services.
               </p>
               <div class="opp-code">
                 <code
-                  >// cmdguard could add a built-in "di" debug command: // $ myapp di list → shows
-                  all registered services // $ myapp di graph → shows dependency graph // $ myapp di
-                  explain TaskStore → shows service dependencies // $ myapp di scopes → shows scope
-                  tree</code
+                  >// cmdguard could add a built-in "di" debug command: // $
+                  myapp di list → shows all registered services // $ myapp di
+                  graph → shows dependency graph // $ myapp di explain TaskStore
+                  → shows service dependencies // $ myapp di scopes → shows
+                  scope tree</code
                 >
               </div>
               <p>
-                <strong>How to integrate:</strong> Add a <code>DIDebugCommand[T](cli)</code> that
-                exposes subcommands: <code>list</code>, <code>graph</code>,
-                <code>explain &lt;service&gt;</code>, <code>scopes</code>. Wire to
-                <code>ExplainInjector()</code>, <code>ExplainService[T]()</code>,
-                <code>ListProvidedServices()</code>, <code>ListInvokedServices()</code>.
+                <strong>How to integrate:</strong> Add a
+                <code>DIDebugCommand[T](cli)</code> that exposes subcommands:
+                <code>list</code>, <code>graph</code>,
+                <code>explain &lt;service&gt;</code>, <code>scopes</code>. Wire
+                to <code>ExplainInjector()</code>,
+                <code>ExplainService[T]()</code>,
+                <code>ListProvidedServices()</code>,
+                <code>ListInvokedServices()</code>.
               </p>
               <div class="opp-impact">
                 <div class="impact-tag">🔍 Debugging</div>
@@ -1609,23 +1746,30 @@
           </div>
 
           <!-- Opportunity 7: Individual Service Lifecycle -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-yellow)"
+          >
             <div class="opp-header">
-              <div class="opp-title">7. Individual Service Lifecycle Operations</div>
+              <div class="opp-title">
+                7. Individual Service Lifecycle Operations
+              </div>
               <span class="priority priority-medium">MEDIUM IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                Currently cmdguard only exposes whole-scope health check and shutdown. samber/do
-                supports per-service operations: <code>do.Shutdown[T]()</code>,
-                <code>do.HealthCheck[T]()</code>, and their named variants. This enables
-                fine-grained service management.
+                Currently cmdguard only exposes whole-scope health check and
+                shutdown. samber/do supports per-service operations:
+                <code>do.Shutdown[T]()</code>, <code>do.HealthCheck[T]()</code>,
+                and their named variants. This enables fine-grained service
+                management.
               </p>
               <div class="opp-code">
                 <code
-                  >// Health check a single service err := v2.HealthCheckService[*Database](scope)
-                  // Gracefully shutdown a single service err := v2.ShutdownService[*Cache](scope)
-                  // Named variants for multi-implementation err :=
+                  >// Health check a single service err :=
+                  v2.HealthCheckService[*Database](scope) // Gracefully shutdown
+                  a single service err := v2.ShutdownService[*Cache](scope) //
+                  Named variants for multi-implementation err :=
                   v2.HealthCheckServiceNamed(scope, "cache-redis")</code
                 >
               </div>
@@ -1638,23 +1782,30 @@
           </div>
 
           <!-- Opportunity 8: InvokeStruct -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-orange)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-orange)"
+          >
             <div class="opp-header">
-              <div class="opp-title">8. InvokeStruct[T] — Tag-Based Auto-Injection</div>
+              <div class="opp-title">
+                8. InvokeStruct[T] — Tag-Based Auto-Injection
+              </div>
               <span class="priority priority-low">LOWER IMPACT</span>
             </div>
             <div class="opp-body">
               <p>
-                <code>do.InvokeStruct[T]</code> auto-injects dependencies into struct fields using
+                <code>do.InvokeStruct[T]</code> auto-injects dependencies into
+                struct fields using
                 <code>do:"service-name"</code>
-                tags. While powerful, it relies on reflection and may not fit cmdguard's explicit,
-                type-safe philosophy. Worth considering for ergonomics but lower priority.
+                tags. While powerful, it relies on reflection and may not fit
+                cmdguard's explicit, type-safe philosophy. Worth considering for
+                ergonomics but lower priority.
               </p>
               <div class="opp-code">
                 <code
-                  >type Handler struct { DB *Database `do:""` // auto-resolve by type Port int
-                  `do:"config.port"` // resolve by name } handler :=
-                  do.InvokeStruct[Handler](injector) // auto-filled</code
+                  >type Handler struct { DB *Database `do:""` // auto-resolve by
+                  type Port int `do:"config.port"` // resolve by name } handler
+                  := do.InvokeStruct[Handler](injector) // auto-filled</code
                 >
               </div>
               <div class="opp-impact">
@@ -1666,7 +1817,10 @@
           </div>
 
           <!-- Opportunity 9: HealthCheck Options -->
-          <div class="opportunity-card" style="border-left: 3px solid var(--accent-yellow)">
+          <div
+            class="opportunity-card"
+            style="border-left: 3px solid var(--accent-yellow)"
+          >
             <div class="opp-header">
               <div class="opp-title">9. HealthCheck Parallelism & Timeouts</div>
               <span class="priority priority-medium">MEDIUM IMPACT</span>
@@ -1674,21 +1828,24 @@
             <div class="opp-body">
               <p>
                 samber/do supports <code>HealthCheckParallelism</code>,
-                <code>HealthCheckGlobalTimeout</code>, and <code>HealthCheckTimeout</code> in
-                <code>InjectorOpts</code>. Currently cmdguard uses <code>do.New()</code> which runs
-                all health checks in parallel with no timeouts.
+                <code>HealthCheckGlobalTimeout</code>, and
+                <code>HealthCheckTimeout</code> in <code>InjectorOpts</code>.
+                Currently cmdguard uses <code>do.New()</code> which runs all
+                health checks in parallel with no timeouts.
               </p>
               <div class="opp-code">
                 <code
-                  >do.NewWithOpts(&do.InjectorOpts{ HealthCheckParallelism: 5, // max 5 concurrent
-                  checks HealthCheckGlobalTimeout: 10 * time.Second, HealthCheckTimeout: 2 *
-                  time.Second, })</code
+                  >do.NewWithOpts(&do.InjectorOpts{ HealthCheckParallelism: 5,
+                  // max 5 concurrent checks HealthCheckGlobalTimeout: 10 *
+                  time.Second, HealthCheckTimeout: 2 * time.Second, })</code
                 >
               </div>
               <p>
-                <strong>How to integrate:</strong> Add <code>WithHealthCheckTimeout[T](d)</code> and
-                <code>WithHealthCheckParallelism[T](n)</code> CLI options. Switch from
-                <code>do.New()</code> to <code>do.NewWithOpts()</code> in <code>NewScope()</code>.
+                <strong>How to integrate:</strong> Add
+                <code>WithHealthCheckTimeout[T](d)</code> and
+                <code>WithHealthCheckParallelism[T](n)</code> CLI options.
+                Switch from <code>do.New()</code> to
+                <code>do.NewWithOpts()</code> in <code>NewScope()</code>.
               </p>
               <div class="opp-impact">
                 <div class="impact-tag">⏱️ Timeout control</div>
@@ -1707,13 +1864,18 @@
         <div class="section-header">
           <div
             class="section-number"
-            style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green)"
+            style="
+              background: rgba(16, 185, 129, 0.12);
+              color: var(--accent-green);
+            "
           >
             04
           </div>
           <h2>What's Already Done Well</h2>
         </div>
-        <p class="section-desc">These integrations are solid and don't need changes.</p>
+        <p class="section-desc">
+          These integrations are solid and don't need changes.
+        </p>
 
         <div class="arch-diagram">
           <table class="summary-table">
@@ -1727,7 +1889,9 @@
             <tbody>
               <tr>
                 <td><code>Scope</code> wrapping</td>
-                <td>Clean abstraction with name, parent tracking, path resolution</td>
+                <td>
+                  Clean abstraction with name, parent tracking, path resolution
+                </td>
                 <td><span class="badge badge-used">Excellent</span></td>
               </tr>
               <tr>
@@ -1735,7 +1899,9 @@
                   <code>Provide[T]</code> / <code>ProvideNamed[T]</code> /
                   <code>ProvideValue[T]</code>
                 </td>
-                <td>Generic wrappers with nil-safety checks and error wrapping</td>
+                <td>
+                  Generic wrappers with nil-safety checks and error wrapping
+                </td>
                 <td><span class="badge badge-used">Excellent</span></td>
               </tr>
               <tr>
@@ -1750,12 +1916,16 @@
               </tr>
               <tr>
                 <td><code>Shutdown</code> + <code>ShutdownAll</code></td>
-                <td>Child→parent cascade with error collection via errors.Join</td>
+                <td>
+                  Child→parent cascade with error collection via errors.Join
+                </td>
                 <td><span class="badge badge-used">Excellent</span></td>
               </tr>
               <tr>
                 <td><code>HealthCheck</code> variants (4 methods)</td>
-                <td>WithContext variants, per-service results, first-error helpers</td>
+                <td>
+                  WithContext variants, per-service results, first-error helpers
+                </td>
                 <td><span class="badge badge-used">Excellent</span></td>
               </tr>
               <tr>
@@ -1770,12 +1940,16 @@
               </tr>
               <tr>
                 <td><code>DoctorCommand</code></td>
-                <td>Integrates DI health checks into CLI command — unique feature</td>
+                <td>
+                  Integrates DI health checks into CLI command — unique feature
+                </td>
                 <td><span class="badge badge-used">Excellent</span></td>
               </tr>
               <tr>
                 <td><code>CLI → Scope → Injector</code> access</td>
-                <td>Full chain: cli.Scope().Injector() for raw samber/do access</td>
+                <td>
+                  Full chain: cli.Scope().Injector() for raw samber/do access
+                </td>
                 <td><span class="badge badge-used">Excellent</span></td>
               </tr>
             </tbody>
@@ -1790,23 +1964,34 @@
         <div class="section-header">
           <div
             class="section-number"
-            style="background: rgba(139, 92, 246, 0.12); color: var(--accent-purple)"
+            style="
+              background: rgba(139, 92, 246, 0.12);
+              color: var(--accent-purple);
+            "
           >
             05
           </div>
           <h2>Implementation Roadmap</h2>
         </div>
-        <p class="section-desc">Phased plan to maximize samber/do v2 utilization.</p>
+        <p class="section-desc">
+          Phased plan to maximize samber/do v2 utilization.
+        </p>
 
         <div class="timeline">
           <div class="timeline-item phase-1">
-            <div class="timeline-phase">Phase 1 — Foundation (High Impact, Low Effort)</div>
-            <div class="timeline-title">Switch to NewWithOpts + Lifecycle Hooks</div>
+            <div class="timeline-phase">
+              Phase 1 — Foundation (High Impact, Low Effort)
+            </div>
+            <div class="timeline-title">
+              Switch to NewWithOpts + Lifecycle Hooks
+            </div>
             <div class="timeline-desc">
               Change <code>NewScope()</code> from <code>do.New()</code> to
-              <code>do.NewWithOpts()</code>. Add <code>WithDIHooks[T](...)</code> and
-              <code>WithDILogging[T](fn)</code> CLI options. Wire lifecycle hooks for observability.
-              Integrate ShutdownOnSignals with existing signal handling.
+              <code>do.NewWithOpts()</code>. Add
+              <code>WithDIHooks[T](...)</code> and
+              <code>WithDILogging[T](fn)</code> CLI options. Wire lifecycle
+              hooks for observability. Integrate ShutdownOnSignals with existing
+              signal handling.
             </div>
             <div class="timeline-items">
               <span class="timeline-tag">NewWithOpts</span>
@@ -1820,11 +2005,13 @@
 
           <div class="timeline-item phase-1">
             <div class="timeline-phase">Phase 1 — Testing Support</div>
-            <div class="timeline-title">Override + Clone for Test Isolation</div>
+            <div class="timeline-title">
+              Override + Clone for Test Isolation
+            </div>
             <div class="timeline-desc">
               Add <code>Override[T]</code>, <code>OverrideValue[T]</code>,
-              <code>CloneScope()</code> wrappers. Document the pattern in examples/taskctl and
-              AGENTS.md.
+              <code>CloneScope()</code> wrappers. Document the pattern in
+              examples/taskctl and AGENTS.md.
             </div>
             <div class="timeline-items">
               <span class="timeline-tag">Override[T]</span>
@@ -1836,11 +2023,15 @@
 
           <div class="timeline-item phase-2">
             <div class="timeline-phase">Phase 2 — API Completeness</div>
-            <div class="timeline-title">Transient, Aliasing, Per-Service Lifecycle</div>
+            <div class="timeline-title">
+              Transient, Aliasing, Per-Service Lifecycle
+            </div>
             <div class="timeline-desc">
-              Add wrappers for <code>ProvideTransient[T]</code>, <code>As[T, Interface]</code>,
-              <code>InvokeAs[T]</code>, <code>HealthCheckService[T]</code>,
-              <code>ShutdownService[T]</code>. These complete the DI API surface.
+              Add wrappers for <code>ProvideTransient[T]</code>,
+              <code>As[T, Interface]</code>, <code>InvokeAs[T]</code>,
+              <code>HealthCheckService[T]</code>,
+              <code>ShutdownService[T]</code>. These complete the DI API
+              surface.
             </div>
             <div class="timeline-items">
               <span class="timeline-tag">ProvideTransient[T]</span>
@@ -1856,10 +2047,11 @@
             <div class="timeline-phase">Phase 3 — Developer Experience</div>
             <div class="timeline-title">Debug Command + Introspection</div>
             <div class="timeline-desc">
-              Add <code>DIDebugCommand[T](cli)</code> with <code>list</code>, <code>graph</code>,
-              <code>explain</code>, <code>scopes</code> subcommands. Expose
-              <code>ListProvidedServices()</code>, <code>ExplainInjector()</code>,
-              <code>ExplainService[T]()</code>.
+              Add <code>DIDebugCommand[T](cli)</code> with <code>list</code>,
+              <code>graph</code>, <code>explain</code>,
+              <code>scopes</code> subcommands. Expose
+              <code>ListProvidedServices()</code>,
+              <code>ExplainInjector()</code>, <code>ExplainService[T]()</code>.
             </div>
             <div class="timeline-items">
               <span class="timeline-tag">ExplainInjector()</span>
@@ -1879,19 +2071,27 @@
         <div class="section-header">
           <div
             class="section-number"
-            style="background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan)"
+            style="
+              background: rgba(6, 182, 212, 0.12);
+              color: var(--accent-cyan);
+            "
           >
             06
           </div>
           <h2>Summary Scorecard</h2>
         </div>
 
-        <div class="score-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr))">
+        <div
+          class="score-grid"
+          style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr))"
+        >
           <div class="score-card">
             <div class="card-header">
               <span class="card-title">Overall Utilization</span>
             </div>
-            <div class="score-value" style="color: var(--accent-yellow)">24%</div>
+            <div class="score-value" style="color: var(--accent-yellow)">
+              24%
+            </div>
             <div class="score-detail">13 of 54 API symbols used</div>
             <div class="progress-bar">
               <div
@@ -1904,8 +2104,12 @@
             <div class="card-header">
               <span class="card-title">After Phase 1 ✅ DONE</span>
             </div>
-            <div class="score-value" style="color: var(--accent-green)">43%</div>
-            <div class="score-detail">23 of 54 — hooks, override, clone, signals, logging</div>
+            <div class="score-value" style="color: var(--accent-green)">
+              43%
+            </div>
+            <div class="score-detail">
+              23 of 54 — hooks, override, clone, signals, logging
+            </div>
             <div class="progress-bar">
               <div
                 class="progress-fill"
@@ -1917,7 +2121,9 @@
             <div class="card-header">
               <span class="card-title">After Phase 2</span>
             </div>
-            <div class="score-value" style="color: var(--accent-green)">59%</div>
+            <div class="score-value" style="color: var(--accent-green)">
+              59%
+            </div>
             <div class="score-detail">32 of 54 — complete DI API surface</div>
             <div class="progress-bar">
               <div
@@ -1931,20 +2137,33 @@
               <span class="card-title">After Phase 3</span>
             </div>
             <div class="score-value" style="color: var(--accent-cyan)">72%</div>
-            <div class="score-detail">39 of 54 — full lifecycle + debug + introspection</div>
+            <div class="score-detail">
+              39 of 54 — full lifecycle + debug + introspection
+            </div>
             <div class="progress-bar">
-              <div class="progress-fill" style="width: 72%; background: var(--gradient-blue)"></div>
+              <div
+                class="progress-fill"
+                style="width: 72%; background: var(--gradient-blue)"
+              ></div>
             </div>
           </div>
         </div>
 
         <div class="arch-diagram" style="margin-top: 32px">
-          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px">Verdict</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem">
-            cmdguard uses the <strong>core DI primitives well</strong> — service registration,
-            invocation, scope management, health checks, and shutdown are all solid. The integration
-            quality is high: generic wrappers with nil-safety, error wrapping, and clean
-            abstractions.
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px">
+            Verdict
+          </h3>
+          <p
+            style="
+              color: var(--text-secondary);
+              line-height: 1.8;
+              font-size: 0.95rem;
+            "
+          >
+            cmdguard uses the <strong>core DI primitives well</strong> — service
+            registration, invocation, scope management, health checks, and
+            shutdown are all solid. The integration quality is high: generic
+            wrappers with nil-safety, error wrapping, and clean abstractions.
           </p>
           <p
             style="
@@ -1955,13 +2174,16 @@
             "
           >
             The gaps are in
-            <strong style="color: var(--accent-red)">observability</strong> (lifecycle hooks,
-            logging),
-            <strong style="color: var(--accent-red)">production safety</strong> (ShutdownOnSignals,
-            health check timeouts),
-            <strong style="color: var(--accent-yellow)">testing</strong> (Override, Clone), and
-            <strong style="color: var(--accent-yellow)">advanced patterns</strong> (transient,
-            aliasing, introspection).
+            <strong style="color: var(--accent-red)">observability</strong>
+            (lifecycle hooks, logging),
+            <strong style="color: var(--accent-red)">production safety</strong>
+            (ShutdownOnSignals, health check timeouts),
+            <strong style="color: var(--accent-yellow)">testing</strong>
+            (Override, Clone), and
+            <strong style="color: var(--accent-yellow)"
+              >advanced patterns</strong
+            >
+            (transient, aliasing, introspection).
           </p>
           <p
             style="
@@ -1971,12 +2193,14 @@
               margin-top: 12px;
             "
           >
-            The biggest ROI comes from Phase 1: switching <code>do.New()</code> →
-            <code>do.NewWithOpts()</code> unlocks 6 lifecycle hooks, custom logging, and health
-            check timeouts with a single-line change. Adding <code>ShutdownOnSignals</code> turns
-            the existing signal handling from "context cancellation" into true graceful shutdown.
-            These are <strong>high-impact, low-effort</strong> wins that would bring cmdguard to the
-            next level.
+            The biggest ROI comes from Phase 1: switching
+            <code>do.New()</code> → <code>do.NewWithOpts()</code> unlocks 6
+            lifecycle hooks, custom logging, and health check timeouts with a
+            single-line change. Adding <code>ShutdownOnSignals</code> turns the
+            existing signal handling from "context cancellation" into true
+            graceful shutdown. These are
+            <strong>high-impact, low-effort</strong> wins that would bring
+            cmdguard to the next level.
           </p>
         </div>
       </div>
@@ -1987,8 +2211,9 @@
       <div class="container">
         <p>cmdguard × samber/do v2 Research Report — June 2026</p>
         <p style="margin-top: 8px">
-          Generated from source code analysis of <code>samber/do v2.0.0</code> (54 public API
-          symbols) against <code>cmdguard v2.5.0</code>
+          Generated from source code analysis of
+          <code>samber/do v2.0.0</code> (54 public API symbols) against
+          <code>cmdguard v2.5.0</code>
         </p>
       </div>
     </footer>

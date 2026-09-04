@@ -204,33 +204,33 @@
 
 Sorted by impact × ease (highest impact/lowest effort first).
 
-| #   | Task                                                          | Impact | Effort | Category |
-| --- | ------------------------------------------------------------- | ------ | ------ | -------- |
-| 1   | Add `CODECOV_TOKEN` to GitHub repo settings                   | High   | 5m     | Infra    |
-| 2   | Fix `flake.nix` meta attribute block                          | Medium | 15m    | Infra    |
-| 3   | Add snapshot tests for 16 output formats                      | High   | 2h     | Testing  |
-| 4   | Increase v2 coverage from 85.6% → 90%                         | Medium | 3h     | Testing  |
-| 5   | Add fuzz test corpora in `testdata/fuzz/`                     | Medium | 1h     | Testing  |
-| 6   | Add benchmark regression thresholds in CI                     | Medium | 30m    | Infra    |
-| 7   | Config file nested struct support                             | High   | 4h     | Feature  |
-| 8   | Structured JSON error output for `--output=json`              | High   | 3h     | Feature  |
-| 9   | Config auto-loading with koanf (file extension detection)     | Medium | 2h     | Feature  |
-| 10  | Documentation generation (`GenerateDocs()`, markdown)         | Medium | 4h     | Feature  |
-| 11  | v3.0 API design document                                      | High   | 4h     | Design   |
-| 12  | Fix telemetry context propagation (v3.0 middleware signature) | High   | 6h     | v3.0     |
-| 13  | Make FlagTag immutable (v3.0 builder pattern)                 | Medium | 4h     | v3.0     |
-| 14  | Plugin system for custom validators                           | Medium | 6h     | Feature  |
-| 15  | Extract flagtags as standalone library                        | Low    | 3h     | Refactor |
-| 16  | Add Result[T] type                                            | Medium | 3h     | Feature  |
-| 17  | Add Validated[T] wrapper                                      | Low    | 2h     | Feature  |
-| 18  | Branded IDs example application                               | Low    | 2h     | Example  |
-| 19  | Test all examples in CI                                       | Medium | 1h     | Infra    |
-| 20  | Deprecate v1 API timeline                                     | Low    | 30m    | Process  |
-| 21  | Add property-based tests for type parsers                     | Medium | 2h     | Testing  |
-| 22  | Conditional go-output format imports (reduce binary size)     | Low    | 3h     | Refactor |
-| 23  | Single-pass JSON config loading (eliminate double unmarshal)  | Low    | 1h     | Perf     |
-| 24  | Add enhanced flag validation enums                            | Low    | 2h     | Feature  |
-| 25  | Metrics/hooks for custom observability                        | Low    | 4h     | Feature  |
+| #  | Task                                                          | Impact | Effort | Category |
+| -- | ------------------------------------------------------------- | ------ | ------ | -------- |
+| 1  | Add `CODECOV_TOKEN` to GitHub repo settings                   | High   | 5m     | Infra    |
+| 2  | Fix `flake.nix` meta attribute block                          | Medium | 15m    | Infra    |
+| 3  | Add snapshot tests for 16 output formats                      | High   | 2h     | Testing  |
+| 4  | Increase v2 coverage from 85.6% → 90%                         | Medium | 3h     | Testing  |
+| 5  | Add fuzz test corpora in `testdata/fuzz/`                     | Medium | 1h     | Testing  |
+| 6  | Add benchmark regression thresholds in CI                     | Medium | 30m    | Infra    |
+| 7  | Config file nested struct support                             | High   | 4h     | Feature  |
+| 8  | Structured JSON error output for `--output=json`              | High   | 3h     | Feature  |
+| 9  | Config auto-loading with koanf (file extension detection)     | Medium | 2h     | Feature  |
+| 10 | Documentation generation (`GenerateDocs()`, markdown)         | Medium | 4h     | Feature  |
+| 11 | v3.0 API design document                                      | High   | 4h     | Design   |
+| 12 | Fix telemetry context propagation (v3.0 middleware signature) | High   | 6h     | v3.0     |
+| 13 | Make FlagTag immutable (v3.0 builder pattern)                 | Medium | 4h     | v3.0     |
+| 14 | Plugin system for custom validators                           | Medium | 6h     | Feature  |
+| 15 | Extract flagtags as standalone library                        | Low    | 3h     | Refactor |
+| 16 | Add Result[T] type                                            | Medium | 3h     | Feature  |
+| 17 | Add Validated[T] wrapper                                      | Low    | 2h     | Feature  |
+| 18 | Branded IDs example application                               | Low    | 2h     | Example  |
+| 19 | Test all examples in CI                                       | Medium | 1h     | Infra    |
+| 20 | Deprecate v1 API timeline                                     | Low    | 30m    | Process  |
+| 21 | Add property-based tests for type parsers                     | Medium | 2h     | Testing  |
+| 22 | Conditional go-output format imports (reduce binary size)     | Low    | 3h     | Refactor |
+| 23 | Single-pass JSON config loading (eliminate double unmarshal)  | Low    | 1h     | Perf     |
+| 24 | Add enhanced flag validation enums                            | Low    | 2h     | Feature  |
+| 25 | Metrics/hooks for custom observability                        | Low    | 4h     | Feature  |
 
 ---
 

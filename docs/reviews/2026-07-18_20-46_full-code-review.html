@@ -65,14 +65,14 @@
 
         /* --- Type stacks (system only — zero external fonts) --- */
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -289,15 +289,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       /* --- Issue cards --- */
@@ -310,15 +322,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -830,21 +854,25 @@
           <div class="hero-badge">Full Code Review</div>
           <h1>cmdguard v3.0.0 &mdash; Every-File Architect Audit</h1>
           <p class="hero-subtitle">
-            Sampled visit of all 160 Go files (60 source + 100 test) across 6 modules + testutil +
-            examples + integration + benchmarks. Senior-Architect lens: type safety, split brains,
-            duplication, honesty. Conclusion: the codebase is already at a high bar; only minor
-            polish suggestions.
+            Sampled visit of all 160 Go files (60 source + 100 test) across 6
+            modules + testutil + examples + integration + benchmarks.
+            Senior-Architect lens: type safety, split brains, duplication,
+            honesty. Conclusion: the codebase is already at a high bar; only
+            minor polish suggestions.
           </p>
         </div>
 
         <div class="callout callout-amber">
           <strong>Update 2026-07-23</strong>
-          The "0 inline TODOs added" finding was revised during post-audit closure:
-          <code>TODO(v4)</code> markers were added at the three deferred rename sites (commits
-          <code>c8152df</code>/<code>f583bcf</code>). The testutil/infertypeargs follow-ups were
-          completed in <code>caad0f8</code> and <code>c02ca92</code>. The
-          <code>manpage</code> sub-module was removed in <code>34a0c6e</code>; the workspace now has
-          4 optional sub-modules (glamour, prompts, spinner, telemetry) plus core.
+          The "0 inline TODOs added" finding was revised during post-audit
+          closure:
+          <code>TODO(v4)</code> markers were added at the three deferred rename
+          sites (commits <code>c8152df</code>/<code>f583bcf</code>). The
+          testutil/infertypeargs follow-ups were completed in
+          <code>caad0f8</code> and <code>c02ca92</code>. The
+          <code>manpage</code> sub-module was removed in <code>34a0c6e</code>;
+          the workspace now has 4 optional sub-modules (glamour, prompts,
+          spinner, telemetry) plus core.
         </div>
 
         <nav class="toc">
@@ -891,20 +919,26 @@
         <div class="card card-solution">
           <h4>Verdict: ship-ready, no blockers</h4>
           <p>
-            Every file sampled shows the same disciplined patterns: constructors validate, errors
-            wrap with sentinels, unexported fields behind branded types, functional options for
-            configuration, generic types at the right level. No split brains (no duplicate type
-            definitions, no competing concepts under different names). No type-safety holes (no
-            <code>interface{}</code> escape hatches in domain code). The 4 Medium findings are the
-            same ones already documented in the naming-review and code-quality-scan reports
-            (TypeHandler name, testutil duplicates, infertypeargs hints). No new inline TODOs were
-            needed &mdash; the code already either does the right thing or carries an explicit
+            Every file sampled shows the same disciplined patterns: constructors
+            validate, errors wrap with sentinels, unexported fields behind
+            branded types, functional options for configuration, generic types
+            at the right level. No split brains (no duplicate type definitions,
+            no competing concepts under different names). No type-safety holes
+            (no
+            <code>interface{}</code> escape hatches in domain code). The 4
+            Medium findings are the same ones already documented in the
+            naming-review and code-quality-scan reports (TypeHandler name,
+            testutil duplicates, infertypeargs hints). No new inline TODOs were
+            needed &mdash; the code already either does the right thing or
+            carries an explicit
             <code>//nolint</code>
             with rationale.
           </p>
         </div>
 
-        <h2 id="files"><span class="num">01</span>Files Reviewed (sampled by area)</h2>
+        <h2 id="files">
+          <span class="num">01</span>Files Reviewed (sampled by area)
+        </h2>
         <table>
           <thead>
             <tr>
@@ -917,8 +951,8 @@
             <tr>
               <td>Core v3 &mdash; CLI plumbing</td>
               <td>
-                cli.go, cli_accessors.go, cli_command.go, cli_options.go, cli_output.go,
-                cli_errors_json.go
+                cli.go, cli_accessors.go, cli_command.go, cli_options.go,
+                cli_output.go, cli_errors_json.go
               </td>
               <td>Full read</td>
             </tr>
@@ -930,44 +964,51 @@
             <tr>
               <td>Core v3 &mdash; Config/Flags</td>
               <td>
-                config.go, config_parsing.go, config_setfield.go, config_file.go, flags.go,
-                flags_parse.go, flags_validate.go, flags_suggest.go, flag_helpers.go
+                config.go, config_parsing.go, config_setfield.go,
+                config_file.go, flags.go, flags_parse.go, flags_validate.go,
+                flags_suggest.go, flag_helpers.go
               </td>
               <td>Full read</td>
             </tr>
             <tr>
               <td>Core v3 &mdash; Types</td>
               <td>
-                type_handler.go, type_handler_kinds.go, type_handler_intwidth.go,
-                type_handler_custom.go, type_helpers.go, types_email.go, types_port.go,
-                types_enum.go, types_url.go, types_filepath.go, types_hostport.go,
+                type_handler.go, type_handler_kinds.go,
+                type_handler_intwidth.go, type_handler_custom.go,
+                type_helpers.go, types_email.go, types_port.go, types_enum.go,
+                types_url.go, types_filepath.go, types_hostport.go,
                 types_duration.go, types_log.go
               </td>
               <td>Full read</td>
             </tr>
             <tr>
               <td>Core v3 &mdash; DI/Flow</td>
-              <td>scope.go, flow_context.go, flow_context_access.go, middleware.go</td>
+              <td>
+                scope.go, flow_context.go, flow_context_access.go, middleware.go
+              </td>
               <td>Full read</td>
             </tr>
             <tr>
               <td>Core v3 &mdash; Errors</td>
-              <td>errors.go, errors_command.go, errors_config.go, errors_di.go, errors_flags.go</td>
+              <td>
+                errors.go, errors_command.go, errors_config.go, errors_di.go,
+                errors_flags.go
+              </td>
               <td>Full read</td>
             </tr>
             <tr>
               <td>Core v3 &mdash; Output/Auditlog</td>
               <td>
-                output.go, auditlog.go, doctor.go, version.go, docgen.go, completion.go, plugin.go,
-                prompts.go
+                output.go, auditlog.go, doctor.go, version.go, docgen.go,
+                completion.go, plugin.go, prompts.go
               </td>
               <td>Full read</td>
             </tr>
             <tr>
               <td>Sub-modules</td>
               <td>
-                glamour/glamour.go, manpage/manpage.go, prompts/prompts.go, spinner/spinner.go,
-                telemetry/telemetry.go
+                glamour/glamour.go, manpage/manpage.go, prompts/prompts.go,
+                spinner/spinner.go, telemetry/telemetry.go
               </td>
               <td>Full read</td>
             </tr>
@@ -978,12 +1019,18 @@
             </tr>
             <tr>
               <td>Examples</td>
-              <td>examples/taskctl/{main,commands,types}.go, examples/docs-generator/main.go</td>
+              <td>
+                examples/taskctl/{main,commands,types}.go,
+                examples/docs-generator/main.go
+              </td>
               <td>Full read</td>
             </tr>
             <tr>
               <td>Test files</td>
-              <td>100 *_test.go files across v3 + sub-modules + examples + integration</td>
+              <td>
+                100 *_test.go files across v3 + sub-modules + examples +
+                integration
+              </td>
               <td>Sampling (headers, structure, parallel pattern)</td>
             </tr>
           </tbody>
@@ -996,20 +1043,21 @@
           <h3>F1: <code>TypeHandler</code> interface name is vague</h3>
           <div class="where">pkg/cmdguard/v3/type_handler.go:13</div>
           <p>
-            See naming-review report. <code>TypeCodec</code> is more honest. Public API &mdash;
-            defer to v4.
+            See naming-review report. <code>TypeCodec</code> is more honest.
+            Public API &mdash; defer to v4.
           </p>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Medium</span>
           <h3>
-            F2: <code>StringSliceContains</code> duplicates <code>ContainsString</code> in testutil
+            F2: <code>StringSliceContains</code> duplicates
+            <code>ContainsString</code> in testutil
           </h3>
           <div class="where">pkg/testutil/panic_test_helpers.go:107-114</div>
           <p>
-            Doc comment admits it. Both wrap <code>slices.Contains</code>. Safe to delete the
-            duplicate now.
+            Doc comment admits it. Both wrap <code>slices.Contains</code>. Safe
+            to delete the duplicate now.
           </p>
         </div>
 
@@ -1018,8 +1066,8 @@
           <h3>F3: 33+ unnecessary explicit type args in test files</h3>
           <div class="where">pkg/cmdguard/v3/*_test.go (9+ files)</div>
           <p>
-            gopls <code>infertypeargs</code> hints. <code>gopls fix -a</code> auto-fixes; zero
-            semantic change.
+            gopls <code>infertypeargs</code> hints.
+            <code>gopls fix -a</code> auto-fixes; zero semantic change.
           </p>
         </div>
 
@@ -1027,7 +1075,10 @@
           <span class="severity severity-important">Medium</span>
           <h3>F4: <code>doPanicTest</code> uses vague <code>do</code> verb</h3>
           <div class="where">pkg/testutil/panic_test_helpers.go:132</div>
-          <p>Private helper; <code>panics(fn) bool</code> reads better. Safe internal rename.</p>
+          <p>
+            Private helper; <code>panics(fn) bool</code> reads better. Safe
+            internal rename.
+          </p>
         </div>
 
         <h3>Low findings (7)</h3>
@@ -1054,7 +1105,8 @@
               <td>L3</td>
               <td>type_handler_intwidth.go:59,93</td>
               <td>
-                makeIntKindHandler/makeUintKindHandler accepted clone (<code>//nolint:dupl</code>)
+                makeIntKindHandler/makeUintKindHandler accepted clone
+                (<code>//nolint:dupl</code>)
               </td>
             </tr>
             <tr>
@@ -1071,39 +1123,48 @@
               <td>L6</td>
               <td>middleware.go:40</td>
               <td>
-                <code>CommandInfo</code> &ldquo;Info&rdquo; suffix (optional rename to
-                <code>CommandMeta</code>)
+                <code>CommandInfo</code> &ldquo;Info&rdquo; suffix (optional
+                rename to <code>CommandMeta</code>)
               </td>
             </tr>
             <tr>
               <td>L7</td>
               <td>prompts/prompts.go</td>
-              <td><code>HuhRunner</code> leaks huh lib name (unexported; accept)</td>
+              <td>
+                <code>HuhRunner</code> leaks huh lib name (unexported; accept)
+              </td>
             </tr>
           </tbody>
         </table>
 
         <h2 id="type-safety"><span class="num">03</span>Type Safety Audit</h2>
         <div class="card card-solution">
-          <h4>No <code>interface{}</code> / <code>any</code> escape hatches in domain code</h4>
+          <h4>
+            No <code>interface{}</code> / <code>any</code> escape hatches in
+            domain code
+          </h4>
           <p>
             The only <code>any</code> uses are: (a)
-            <code>BranchingFlowContext.values map[any]any</code> &mdash; a deliberate bag for
-            user-typed values, with typed accessors <code>Value[T]()</code>; (b)
-            <code>TypeHandler.Parse</code> returning <code>(any, error)</code> &mdash; unavoidable
-            because the parsed value's type depends on <code>reflect.Type</code> at runtime; (c)
-            <code>commandSpec</code> storing hooks as <code>lifecycleHook</code> (sealed interface
-            with unexported method) &mdash; type-safe via the generic constructors. No raw
+            <code>BranchingFlowContext.values map[any]any</code> &mdash; a
+            deliberate bag for user-typed values, with typed accessors
+            <code>Value[T]()</code>; (b)
+            <code>TypeHandler.Parse</code> returning
+            <code>(any, error)</code> &mdash; unavoidable because the parsed
+            value's type depends on <code>reflect.Type</code> at runtime; (c)
+            <code>commandSpec</code> storing hooks as
+            <code>lifecycleHook</code> (sealed interface with unexported method)
+            &mdash; type-safe via the generic constructors. No raw
             <code>interface{}</code> in domain entities.
           </p>
         </div>
         <div class="card card-solution">
           <h4>Branded types enforce invariants at construction</h4>
           <p>
-            <code>Email</code>, <code>Port</code>, <code>URL</code>, <code>FilePath</code>,
-            <code>HostPort</code>, <code>Duration</code>, <code>Enum</code>,
-            <code>AuditLogFormat</code> &mdash; every one has a <code>Parse*</code> constructor that
-            validates. Zero-value is &ldquo;unset&rdquo; and <code>IsEmpty()</code> /
+            <code>Email</code>, <code>Port</code>, <code>URL</code>,
+            <code>FilePath</code>, <code>HostPort</code>, <code>Duration</code>,
+            <code>Enum</code>, <code>AuditLogFormat</code> &mdash; every one has
+            a <code>Parse*</code> constructor that validates. Zero-value is
+            &ldquo;unset&rdquo; and <code>IsEmpty()</code> /
             <code>IsValid()</code>
             distinguishes. See data-model-review report for the full table.
           </p>
@@ -1113,7 +1174,8 @@
           <p>
             58 sentinels in errors*.go, all <code>errors.Is</code>-chainable via
             <code>fmt.Errorf("%w: ...", sentinel)</code>. Custom error types
-            (<code>EnumError</code>, <code>CommandError</code>, <code>ConfigError</code>) support
+            (<code>EnumError</code>, <code>CommandError</code>,
+            <code>ConfigError</code>) support
             <code>errors.AsType[T]</code>
             (Go 1.26). No string-matching error handling anywhere.
           </p>
@@ -1123,26 +1185,31 @@
         <div class="card card-solution">
           <h4>None detected.</h4>
           <p>
-            No duplicate type definitions. No competing concepts under different names (the
-            <code>StringSliceContains</code> / <code>ContainsString</code> pair in testutil is the
-            closest, and it is a duplicate function, not a duplicate concept). Domain language is
-            consistent: <code>Scope</code> everywhere (not <code>Container</code> /
-            <code>Injector</code>), <code>FlagRegistry</code> everywhere (not <code>FlagSet</code> /
-            <code>FlagStore</code>), <code>Command</code> everywhere (not <code>Cmd</code> /
+            No duplicate type definitions. No competing concepts under different
+            names (the
+            <code>StringSliceContains</code> / <code>ContainsString</code> pair
+            in testutil is the closest, and it is a duplicate function, not a
+            duplicate concept). Domain language is consistent:
+            <code>Scope</code> everywhere (not <code>Container</code> /
+            <code>Injector</code>), <code>FlagRegistry</code> everywhere (not
+            <code>FlagSet</code> / <code>FlagStore</code>),
+            <code>Command</code> everywhere (not <code>Cmd</code> /
             <code>Action</code>).
           </p>
         </div>
 
-        <h2 id="strengths"><span class="num">05</span>Strengths (preserve these)</h2>
+        <h2 id="strengths">
+          <span class="num">05</span>Strengths (preserve these)
+        </h2>
         <div class="strengths">
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
               <strong>Zero panics by design, not by luck</strong>
               <span
-                >Every constructor returns error. <code>safeProvide</code> wraps user providers with
-                recover(). <code>AssertPanics</code> exists only in testutil for verifying the
-                invariant.</span
+                >Every constructor returns error. <code>safeProvide</code> wraps
+                user providers with recover(). <code>AssertPanics</code> exists
+                only in testutil for verifying the invariant.</span
               >
             </div>
           </div>
@@ -1153,9 +1220,10 @@
               <span
                 ><code>lifecycleHook</code>, <code>configValidator</code>,
                 <code>middlewareList</code>, <code>postFlagParseList</code>,
-                <code>cleanupHookList</code>, <code>subcommandList</code> &mdash; all use unexported
-                method tags so only cmdguard can construct them. Generic type info is preserved
-                without genericizing the option type.</span
+                <code>cleanupHookList</code>,
+                <code>subcommandList</code> &mdash; all use unexported method
+                tags so only cmdguard can construct them. Generic type info is
+                preserved without genericizing the option type.</span
               >
             </div>
           </div>
@@ -1164,9 +1232,9 @@
             <div class="text">
               <strong>Consistent error wrapping discipline</strong>
               <span
-                >Every <code>fmt.Errorf</code> uses <code>%w</code> with a sentinel.
-                <code>errors.Join</code> aggregates without losing individuals.
-                <code>wrapIfError</code> helper is nil-safe.</span
+                >Every <code>fmt.Errorf</code> uses <code>%w</code> with a
+                sentinel. <code>errors.Join</code> aggregates without losing
+                individuals. <code>wrapIfError</code> helper is nil-safe.</span
               >
             </div>
           </div>
@@ -1176,8 +1244,8 @@
               <strong>Copy-on-write registries</strong>
               <span
                 ><code>FlagRegistry</code> + <code>typeRegistry</code> +
-                <code>validatorRegistry</code> all share global maps lazily and clone on first
-                write. Documented in ADR-003.</span
+                <code>validatorRegistry</code> all share global maps lazily and
+                clone on first write. Documented in ADR-003.</span
               >
             </div>
           </div>
@@ -1186,9 +1254,11 @@
             <div class="text">
               <strong>Zero-allocation iterators</strong>
               <span
-                ><code>TagsSeq</code>, <code>FlagNamesSeq</code>, <code>PathSeq</code>,
-                <code>ChildrenSeq</code> return <code>iter.Seq[T]</code> (Go 1.23+). Slice-returning
-                variants return defensive copies. Both patterns coexist deliberately.</span
+                ><code>TagsSeq</code>, <code>FlagNamesSeq</code>,
+                <code>PathSeq</code>, <code>ChildrenSeq</code> return
+                <code>iter.Seq[T]</code> (Go 1.23+). Slice-returning variants
+                return defensive copies. Both patterns coexist
+                deliberately.</span
               >
             </div>
           </div>
@@ -1197,8 +1267,10 @@
             <div class="text">
               <strong>Documented <code>//nolint</code> with rationale</strong>
               <span
-                >Every <code>//nolint:dupl</code>, <code>//nolint:gochecknoglobals</code>,
-                <code>//nolint:exhaustive</code> carries a one-line reason. No bare silencing.</span
+                >Every <code>//nolint:dupl</code>,
+                <code>//nolint:gochecknoglobals</code>,
+                <code>//nolint:exhaustive</code> carries a one-line reason. No
+                bare silencing.</span
               >
             </div>
           </div>
@@ -1208,24 +1280,26 @@
         <div class="card">
           <h4>None added.</h4>
           <p>
-            The codebase does not need inline TODOs from this review. Every finding is either: (a)
-            already documented in a sibling report (naming-review, code-quality-scan,
-            data-model-review), (b) an accepted clone with <code>//nolint</code> rationale, or (c) a
-            public-API rename that must wait for v4. Adding TODOs here would duplicate the reports
-            without adding signal.
+            The codebase does not need inline TODOs from this review. Every
+            finding is either: (a) already documented in a sibling report
+            (naming-review, code-quality-scan, data-model-review), (b) an
+            accepted clone with <code>//nolint</code> rationale, or (c) a
+            public-API rename that must wait for v4. Adding TODOs here would
+            duplicate the reports without adding signal.
           </p>
         </div>
 
         <div class="callout callout-amber">
           <strong>Recommended next action</strong>
-          The 4 Medium findings (F1&ndash;F4) are safe to address in a follow-up: F2 + F4 are
-          internal testutil renames (zero API break), F3 is an auto-fix, F1 is a v4 consideration.
-          None block the current v3.0.0 release.
+          The 4 Medium findings (F1&ndash;F4) are safe to address in a
+          follow-up: F2 + F4 are internal testutil renames (zero API break), F3
+          is an auto-fix, F1 is a v4 consideration. None block the current
+          v3.0.0 release.
         </div>
 
         <footer class="footer">
-          Generated 2026-07-18 &middot; 160 Go files sampled across 6 modules + testutil + examples
-          + integration + benchmarks
+          Generated 2026-07-18 &middot; 160 Go files sampled across 6 modules +
+          testutil + examples + integration + benchmarks
         </footer>
       </main>
     </div>

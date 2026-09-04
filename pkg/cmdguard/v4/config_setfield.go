@@ -86,7 +86,7 @@ func applyFieldValue(field reflect.Value, value any, tr *typeRegistry) error {
 	// Handle time.Duration to Duration conversion
 	if val.Type() == reflect.TypeFor[time.Duration]() &&
 		field.Type() == reflect.TypeFor[Duration]() {
-		duration, ok := val.Interface().(time.Duration)
+		duration, ok := reflect.TypeAssert[time.Duration](val)
 		if !ok {
 			return fmt.Errorf(
 				"SetField: type assertion failed for time.Duration, value=%v, field=%s: %w",
@@ -179,7 +179,7 @@ func setStringFieldError(field reflect.Value, str string, err error) error {
 func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 	// Special handling for Enum (needs current allowed values from the field)
 	if field.Type() == reflect.TypeFor[Enum]() {
-		current, ok := field.Interface().(Enum)
+		current, ok := reflect.TypeAssert[Enum](field)
 		if !ok {
 			return NewConfigError(
 				field.Type().String(),

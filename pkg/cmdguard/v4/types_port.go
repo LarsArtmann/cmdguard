@@ -34,7 +34,7 @@ func validatePortRange(port int) error {
 // Port represents a valid network port number (1-65535).
 // Use this for config fields that specify TCP/UDP ports.
 //
-//nolint:recvcheck // MarshalText/UnmarshalText require different receivers per Go convention
+
 type Port struct {
 	port uint16
 }
@@ -75,7 +75,7 @@ func ParsePort(s string) (Port, error) {
 		return Port{}, err
 	}
 
-	return Port{port: uint16(port)}, nil //nolint:gosec // range validated by validatePortRange
+	return Port{port: uint16(port)}, nil
 }
 
 // PortFromInt creates a Port from an int.
@@ -86,7 +86,7 @@ func PortFromInt(port int) (Port, error) {
 		return Port{}, fmt.Errorf("port=%d: %w", port, err)
 	}
 
-	return Port{port: uint16(port)}, nil //nolint:gosec // range validated by validatePortRange
+	return Port{port: uint16(port)}, nil
 }
 
 // Int returns the port as an int.

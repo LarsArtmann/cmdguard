@@ -253,7 +253,7 @@ I built the website, ran typecheck, ran HTML validation — all programmatic che
 
 42. Set up uptime monitoring for `cmdguard.web.app`
 43. Set up uptime monitoring for `cmdguard.lars.software` (once DNS works)
-44. Add ` SECURITY.md` file
+44. Add `SECURITY.md` file
 45. Add GitHub issue templates
 46. Add GitHub discussion templates
 47. Set up Dependabot for website pnpm dependencies

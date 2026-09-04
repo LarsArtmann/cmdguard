@@ -112,17 +112,17 @@ The interface `Load(data []byte, cfg any) (setFields []string, err error)` stays
 
 ## Comprehensive Plan (30-100min tasks)
 
-| #   | Task                                                                                        | Est   | Impact   | Effort | Priority |
-| --- | ------------------------------------------------------------------------------------------- | ----- | -------- | ------ | -------- |
-| 1   | Refactor KoanfLoader: koanf as parser → JSON → existing jsonLoader logic                    | 45min | Critical | Medium | P0       |
-| 2   | Make `WithConfigFile` use KoanfLoader; update `loadConfigFileOrSkip`                        | 30min | Critical | Low    | P0       |
-| 3   | Delete old loaders (`loader.go`, `loader_test.go`, `jsonLoader`, `NewJSONLoader`)           | 30min | High     | Low    | P1       |
-| 4   | Update tests (`config_file_test.go`, `config_nested_test.go`, `koanf_test.go`, integration) | 60min | Critical | Medium | P0       |
-| 5   | Update deps (`go.mod`: remove go-faster/yaml + pelletier/go-toml, add koanf/parsers/toml)   | 15min | Medium   | Low    | P1       |
-| 6   | Update examples (`taskctl/main.go`)                                                         | 15min | Low      | Low    | P2       |
-| 7   | Update lint config (`.golangci.yml` ireturn allow list)                                     | 15min | Low      | Low    | P2       |
-| 8   | Update documentation (README, FEATURES, AGENTS, CHANGELOG, API, TODO, website, ADR)         | 90min | Medium   | Low    | P2       |
-| 9   | Final verification (tests -race, lint, build, benchmarks)                                   | 30min | Critical | Low    | P0       |
+| # | Task                                                                                        | Est   | Impact   | Effort | Priority |
+| - | ------------------------------------------------------------------------------------------- | ----- | -------- | ------ | -------- |
+| 1 | Refactor KoanfLoader: koanf as parser → JSON → existing jsonLoader logic                    | 45min | Critical | Medium | P0       |
+| 2 | Make `WithConfigFile` use KoanfLoader; update `loadConfigFileOrSkip`                        | 30min | Critical | Low    | P0       |
+| 3 | Delete old loaders (`loader.go`, `loader_test.go`, `jsonLoader`, `NewJSONLoader`)           | 30min | High     | Low    | P1       |
+| 4 | Update tests (`config_file_test.go`, `config_nested_test.go`, `koanf_test.go`, integration) | 60min | Critical | Medium | P0       |
+| 5 | Update deps (`go.mod`: remove go-faster/yaml + pelletier/go-toml, add koanf/parsers/toml)   | 15min | Medium   | Low    | P1       |
+| 6 | Update examples (`taskctl/main.go`)                                                         | 15min | Low      | Low    | P2       |
+| 7 | Update lint config (`.golangci.yml` ireturn allow list)                                     | 15min | Low      | Low    | P2       |
+| 8 | Update documentation (README, FEATURES, AGENTS, CHANGELOG, API, TODO, website, ADR)         | 90min | Medium   | Low    | P2       |
+| 9 | Final verification (tests -race, lint, build, benchmarks)                                   | 30min | Critical | Low    | P0       |
 
 **Total estimated: ~330min (5.5 hours)**
 
