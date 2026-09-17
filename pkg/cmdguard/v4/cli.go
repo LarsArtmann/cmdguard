@@ -489,7 +489,7 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		cli.rootCmd.Long = cli.spec.long
 	}
 
-	cli.applyCleanupHooks()
+	cli.applyCleanupHooks() //nolint:contextcheck // hooks read c.Context() inside RunE, which cobra only sets during execution — no ctx to pass yet
 
 	return cli.executeWithCobra(flowCtx)
 }
