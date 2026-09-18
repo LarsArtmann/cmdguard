@@ -99,7 +99,7 @@ cmdguard/
 │   │   ├── type_handler_intwidth.go # Narrow integer overflow validation (int8/16/32, uint8/16)
 │   │   ├── type_handler_custom.go # Custom type handlers (Duration/Enum/URL/Email/Port)
 │   │   ├── type_helpers.go       # Generic type helpers
-│   │   ├── version.go            # VersionCommand helper
+│   │   ├── version.go            # VersionCommand helper (prints pkg/version.Version — fleet standard: ../file-and-image-renamer/docs/FLEET-STANDARD-VERSION-STAMPS.md)
 │   │   ├── doctor.go             # DoctorCommand helper
 │   │   ├── types_duration.go     # Duration type
 │   │   ├── types_email.go        # Email type
