@@ -8,6 +8,7 @@ import (
 	"os"
 
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	"github.com/larsartmann/cmdguard/v4/pkg/version"
 )
 
 type config struct {
@@ -24,7 +25,7 @@ func main() {
 		"docs-generator",
 		"Generate CLI documentation with cmdguard",
 		config{},
-		v4.WithCLIVersion("0.1.0"),
+		v4.WithCLIVersion(version.Version),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)

@@ -44,6 +44,7 @@ import (
 	"github.com/larsartmann/cmdguard/glamour"
 	"github.com/larsartmann/cmdguard/spinner"
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	"github.com/larsartmann/cmdguard/v4/pkg/version"
 )
 
 func main() {
@@ -62,7 +63,7 @@ func main() {
 
 	cli, err := v4.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
-		v4.WithCLIVersion("1.0.0"),
+		v4.WithCLIVersion(version.Version),
 		v4.WithEnvPrefix("TASKCTL_"),
 		v4.WithAuditLog(auditPlugin),
 		v4.WithConfigFile("$HOME/.config/taskctl/config.json"),
