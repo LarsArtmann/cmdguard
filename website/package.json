@@ -2,7 +2,7 @@
   "name": "cmdguard-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Website and documentation for cmdguard — type-safe CLI framework for Go",
+  "description": "Website and documentation for cmdguard \u2014 type-safe CLI framework for Go",
   "keywords": [
     "astro",
     "cli",
@@ -50,5 +50,10 @@
   "overrides": {
     "brace-expansion": "5.0.6"
   },
-  "packageManager": "pnpm@11.20.0"
+  "packageManager": "pnpm@11.20.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
 }
