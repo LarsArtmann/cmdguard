@@ -181,6 +181,17 @@ Key v2 differences handled:
 - `json.MatchCaseInsensitiveNames(true)` preserves v1-compatible struct field matching (user config structs lack `json:` tags)
 - `jsontext.WithIndent("  ")` replaces v1's `enc.SetIndent("", "  ")`
 
+### Website build (pnpm v11)
+
+`website/` builds with pnpm ≥ 11, which **ignores `pnpm.overrides` and `pnpm.onlyBuiltDependencies` in `package.json`** — build-script approvals live in `website/pnpm-workspace.yaml` instead:
+
+```yaml
+allowBuilds:
+  esbuild: true
+```
+
+Without this, `pnpm install` prints `[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild` and `astro build` fails on a missing esbuild binary. (A prior iteration of this file carried the scaffold placeholder `esbuild: set this to true or false`, which pnpm silently ignores — the value must be a real `true`.) Machine-local `pnpm config set verify-deps-before-run false` is NOT a substitute: it does not travel with the repo or CI.
+
 ---
 
 ## API Reference
