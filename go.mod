@@ -1,6 +1,6 @@
 module github.com/larsartmann/cmdguard/v4
 
-go 1.26.7
+go 1.27.1
 
 require (
 	charm.land/fang/v2 v2.0.1

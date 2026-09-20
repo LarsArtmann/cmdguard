@@ -27,7 +27,7 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260910203606-6c9e17dc7a16 // indirect
 	github.com/charmbracelet/x/ansi v0.11.8 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260913004009-c615ff2f7805 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260920004010-53e2afe73ae5 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
@@ -39,9 +39,9 @@ require (
 	github.com/gofrs/flock v0.13.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/larsartmann/cmdguard/v4 v4.0.2
-	github.com/larsartmann/go-atomic-write v0.5.1 // indirect
-	github.com/larsartmann/go-branded-id v0.5.1 // indirect
-	github.com/larsartmann/go-error-family v0.10.0 // indirect
+	github.com/larsartmann/go-atomic-write v0.5.2 // indirect
+	github.com/larsartmann/go-branded-id v0.6.0 // indirect
+	github.com/larsartmann/go-error-family v0.10.1 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
 	github.com/larsartmann/go-output v0.38.0 // indirect
 	github.com/larsartmann/go-output/d2 v0.38.0 // indirect

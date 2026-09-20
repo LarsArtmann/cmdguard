@@ -16,25 +16,25 @@ Baseline scan found exactly 1 finding: **HW-2 ×1** — `*CLI[T]` implements bar
 
 ## 2. a) FULLY DONE
 
-| Item | Evidence |
-| --- | --- |
-| Baseline scan run first, per member (`go.work` → 6 in-repo members scanned separately) | 1 finding (HW-2), exit 1; other 5 members exit 0 |
-| HW-2 root cause understood from linter source (module cache, v0.2.2 `pkg/healthwash/rules.go`): fires when `bareCheck && !ctxCheck`; fix = type must have `HealthCheck(context.Context) error` and must NOT keep bare `HealthCheck()` | Confirmed HW-5/HW-1/HW-7 won't fire after the change |
-| `(*CLI[T]).HealthCheck(ctx)` migrated, threading ctx into the underlying sweep via `HealthCheckWithContext` | pkg/cmdguard/v4/cli_accessors.go:41-45 |
-| Both bare callers migrated to `t.Context()` | cli_core_lifecycle_test.go:63, examples/taskctl/main_test.go:163 |
-| Re-scan → **0 findings, exit 0 on all 6 members**; coverage 1/3 unchanged | `.`, flightrecorder, glamour, prompts, spinner, telemetry |
-| Full quality gate `nix run .#check-all` (no `.buildflow.yml` in repo → flake.nix commands per constraint): build, all tests with `-race`, golangci-lint **0 issues**, format check, `go mod tidy` — **all 6 modules** | Gate output: "All checks passed!" |
-| `examples/taskctl` race test run explicitly (not visible in check-all's package list — see §3) | `ok github.com/larsartmann/cmdguard/v4/examples/taskctl 1.201s` |
-| Dogfooding audit: **no** committed samber-linter baseline/config; `.github/workflows/*` do not reference samber-linter; repo's own golangci-lint gate passes 0 issues unchanged | `git ls-files` + workflow grep clean |
-| Constraints honored: no suppressions, no blanket allows, no formatters/lint/tidy run manually, no baseline files touched, no drive-by renames (`Scope.HealthCheck()` bare left alone — `*Scope` is never DI-registered, so unflagged) | Diff = exactly 3 files |
-| Linter rule source read before editing (no cargo-culting of the fix shape) | `pkg/healthwash/rules.go` (`reportSweepRules`, `addBareCheckRule`) |
+| Item                                                                                                                                                                                                                                  | Evidence                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Baseline scan run first, per member (`go.work` → 6 in-repo members scanned separately)                                                                                                                                                | 1 finding (HW-2), exit 1; other 5 members exit 0                   |
+| HW-2 root cause understood from linter source (module cache, v0.2.2 `pkg/healthwash/rules.go`): fires when `bareCheck && !ctxCheck`; fix = type must have `HealthCheck(context.Context) error` and must NOT keep bare `HealthCheck()` | Confirmed HW-5/HW-1/HW-7 won't fire after the change               |
+| `(*CLI[T]).HealthCheck(ctx)` migrated, threading ctx into the underlying sweep via `HealthCheckWithContext`                                                                                                                           | pkg/cmdguard/v4/cli_accessors.go:41-45                             |
+| Both bare callers migrated to `t.Context()`                                                                                                                                                                                           | cli_core_lifecycle_test.go:63, examples/taskctl/main_test.go:163   |
+| Re-scan → **0 findings, exit 0 on all 6 members**; coverage 1/3 unchanged                                                                                                                                                             | `.`, flightrecorder, glamour, prompts, spinner, telemetry          |
+| Full quality gate `nix run .#check-all` (no `.buildflow.yml` in repo → flake.nix commands per constraint): build, all tests with `-race`, golangci-lint **0 issues**, format check, `go mod tidy` — **all 6 modules**                 | Gate output: "All checks passed!"                                  |
+| `examples/taskctl` race test run explicitly (not visible in check-all's package list — see §3)                                                                                                                                        | `ok github.com/larsartmann/cmdguard/v4/examples/taskctl 1.201s`    |
+| Dogfooding audit: **no** committed samber-linter baseline/config; `.github/workflows/*` do not reference samber-linter; repo's own golangci-lint gate passes 0 issues unchanged                                                       | `git ls-files` + workflow grep clean                               |
+| Constraints honored: no suppressions, no blanket allows, no formatters/lint/tidy run manually, no baseline files touched, no drive-by renames (`Scope.HealthCheck()` bare left alone — `*Scope` is never DI-registered, so unflagged) | Diff = exactly 3 files                                             |
+| Linter rule source read before editing (no cargo-culting of the fix shape)                                                                                                                                                            | `pkg/healthwash/rules.go` (`reportSweepRules`, `addBareCheckRule`) |
 
 Auto-commit daemon landed the 3 files as `580dfa6 chore: auto-commit 3 changed file(s) (heuristic)`.
 
 ## 3. b) PARTIALLY DONE
 
 1. **Verification of check-all's example coverage** — I noticed `examples/taskctl` was absent from check-all's package list and compensated by running its tests manually (passed). But I never read the flake's test command to learn **why** it's excluded. Local gate may be narrower than CI (`ci.yml` runs plain `go test ./...`, which includes it). The compensation works; the root cause of the gap is unverified.
-2. **Documentation sweep for the signature change** — grepped README.md (lines 66, 243), doc.go:80, examples/taskctl/README.md:68, docs/API.md for `HealthCheck`. Only generic "Services can implement HealthCheck" prose — nothing states the bare signature, so nothing is *wrong* — but none of these docs mention the new ctx-threading contract either. Left untouched under "no drive-by" (defensible, but the docs are now vaguer than the API).
+2. **Documentation sweep for the signature change** — grepped README.md (lines 66, 243), doc.go:80, examples/taskctl/README.md:68, docs/API.md for `HealthCheck`. Only generic "Services can implement HealthCheck" prose — nothing states the bare signature, so nothing is _wrong_ — but none of these docs mention the new ctx-threading contract either. Left untouched under "no drive-by" (defensible, but the docs are now vaguer than the API).
 3. **Bare/ctx duplication** — `CLI.HealthCheckWithContext(ctx)` (cli_accessors.go:51) is now an **exact duplicate** of `HealthCheck(ctx)`. I kept it deliberately (removal = rename = drive-by under the constraints) and flagged it nowhere (no TODO, no ROADMAP entry, no deprecation). The split-brain is real; its resolution is deferred, not done.
 
 ## 4. c) NOT STARTED
@@ -55,14 +55,14 @@ Nothing catastrophic. Two self-inflicted stumbles, both caught and corrected wit
 ## 6. e) WHAT WE SHOULD IMPROVE
 
 1. **Env discipline:** separate env profiles per command class (scan vs test); `-race` ⇒ `CGO_ENABLED=1`, always.
-2. **Gate comprehension:** "green" must include *what was scanned/tested*, not just exit code — check file/package counts before believing a pass.
+2. **Gate comprehension:** "green" must include _what was scanned/tested_, not just exit code — check file/package counts before believing a pass.
 3. **Breaking-change reflex:** any public signature change in a published library should immediately trigger: CHANGELOG entry + consumer-impact thought + version-policy question. I did none proactively.
-4. **Duplication hygiene:** when a fix *creates* an exact duplicate API, record the follow-up (ROADMAP/TODO_LIST/TODO(v5) marker) in the same session, not in a status report.
+4. **Duplication hygiene:** when a fix _creates_ an exact duplicate API, record the follow-up (ROADMAP/TODO_LIST/TODO(v5) marker) in the same session, not in a status report.
 5. **Local/CI gate parity:** check-all should cover what CI covers (or explicitly document exclusions) — the examples/taskctl gap proves local-green ≠ CI-green.
 
 ## 7. f) Up to 50 things to get done next
 
-*Grounded strictly in this session's observations (no unrelated research). Ordered roughly by impact:*
+_Grounded strictly in this session's observations (no unrelated research). Ordered roughly by impact:_
 
 1. Decide version policy for the `CLI.HealthCheck` signature change (v4.x accepted break vs v5) and record it.
 2. Write CHANGELOG.md entry for the breaking change (cli_accessors.go).
@@ -95,7 +95,7 @@ Nothing catastrophic. Two self-inflicted stumbles, both caught and corrected wit
 29. Consider raising health coverage above 1/3 as the ratchet's first rung once items 6–7 land.
 30. Record in AGENTS.md gotchas: `GOTOOLCHAIN=go1.27.1` + `CGO_ENABLED=0` for samber-linter runs; `-race` tests need `CGO_ENABLED=1`; check-all ≠ full CI package set — so the next session doesn't rediscover this.
 
-*(30 grounded items; stopping there rather than padding to 50 with unverified speculation.)*
+_(30 grounded items; stopping there rather than padding to 50 with unverified speculation.)_
 
 ## 8. g) Questions for Lars (not answerable from this repo/session)
 
@@ -107,20 +107,20 @@ Nothing catastrophic. Two self-inflicted stumbles, both caught and corrected wit
 
 ## Appendix A — Change Set (exact)
 
-| File | Change |
-| --- | --- |
-| `pkg/cmdguard/v4/cli_accessors.go` | `HealthCheck()` → `HealthCheck(ctx context.Context) error`; body delegates to `scope.HealthCheckWithContext(ctx)`; doc comment states ctx contract |
-| `pkg/cmdguard/v4/cli_core_lifecycle_test.go` | `cli.HealthCheck()` → `cli.HealthCheck(t.Context())` |
-| `examples/taskctl/main_test.go` | `cli.HealthCheck()` → `cli.HealthCheck(t.Context())` |
+| File                                         | Change                                                                                                                                             |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pkg/cmdguard/v4/cli_accessors.go`           | `HealthCheck()` → `HealthCheck(ctx context.Context) error`; body delegates to `scope.HealthCheckWithContext(ctx)`; doc comment states ctx contract |
+| `pkg/cmdguard/v4/cli_core_lifecycle_test.go` | `cli.HealthCheck()` → `cli.HealthCheck(t.Context())`                                                                                               |
+| `examples/taskctl/main_test.go`              | `cli.HealthCheck()` → `cli.HealthCheck(t.Context())`                                                                                               |
 
 Commit: `580dfa6 chore: auto-commit 3 changed file(s) (heuristic)` (auto-commit daemon). Working tree clean.
 
 ## Appendix B — Verification Matrix
 
-| Gate | Command | Result |
-| --- | --- | --- |
-| Scanner (baseline) | `go run github.com/larsartmann/samber-linter/cmd/samber-linter@v0.2.2 ./...` per member, `GOTOOLCHAIN=go1.27.1 GOEXPERIMENT=jsonv2 CGO_ENABLED=0` | 1 finding (HW-2), exit 1 |
-| Scanner (after) | same, all 6 members | 0 findings, exit 0, coverage 1/3 |
-| Build+Test+Race+Lint+Format+Tidy (6 modules) | `nix run .#check-all` | All checks passed; lint 0 issues ×6 |
-| examples/taskctl (explicit) | `go test ./... -race` with `CGO_ENABLED=1` | ok 1.201s |
-| Dogfooding config audit | `git ls-files` + `.github/workflows` grep | No samber-linter config/baseline/CI wiring exists; repo lint gate passes unchanged |
+| Gate                                         | Command                                                                                                                                           | Result                                                                             |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Scanner (baseline)                           | `go run github.com/larsartmann/samber-linter/cmd/samber-linter@v0.2.2 ./...` per member, `GOTOOLCHAIN=go1.27.1 GOEXPERIMENT=jsonv2 CGO_ENABLED=0` | 1 finding (HW-2), exit 1                                                           |
+| Scanner (after)                              | same, all 6 members                                                                                                                               | 0 findings, exit 0, coverage 1/3                                                   |
+| Build+Test+Race+Lint+Format+Tidy (6 modules) | `nix run .#check-all`                                                                                                                             | All checks passed; lint 0 issues ×6                                                |
+| examples/taskctl (explicit)                  | `go test ./... -race` with `CGO_ENABLED=1`                                                                                                        | ok 1.201s                                                                          |
+| Dogfooding config audit                      | `git ls-files` + `.github/workflows` grep                                                                                                         | No samber-linter config/baseline/CI wiring exists; repo lint gate passes unchanged |
