@@ -160,7 +160,7 @@ func TestDI_HealthCheck(t *testing.T) {
 
 	cli := newTestCLI(t)
 
-	if err := cli.HealthCheck(); err != nil {
+	if err := cli.HealthCheck(t.Context()); err != nil {
 		t.Errorf("HealthCheck: %v", err)
 	}
 }

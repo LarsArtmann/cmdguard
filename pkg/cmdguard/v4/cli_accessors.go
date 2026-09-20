@@ -38,9 +38,10 @@ func (cli *CLI[T]) Shutdown(ctx context.Context) error {
 	return cli.spec.scope.Shutdown(ctx)
 }
 
-// HealthCheck runs health checks on all registered services.
-func (cli *CLI[T]) HealthCheck() error {
-	return cli.spec.scope.HealthCheck()
+// HealthCheck runs health checks on all registered services, passing ctx so
+// services implementing HealthcheckerWithContext can honour cancellation.
+func (cli *CLI[T]) HealthCheck(ctx context.Context) error {
+	return cli.spec.scope.HealthCheckWithContext(ctx)
 }
 
 // HealthCheckResults runs health checks and returns per-service results.
