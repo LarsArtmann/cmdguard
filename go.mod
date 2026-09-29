@@ -1,33 +1,6 @@
 module github.com/larsartmann/cmdguard/v4
 
-go 1.27.1
-
-require (
-	charm.land/fang/v2 v2.0.1
-	charm.land/lipgloss/v2 v2.0.6
-	github.com/go-faster/yaml v0.4.6 // indirect
-	github.com/knadh/koanf/parsers/json v1.0.1
-	github.com/knadh/koanf/parsers/yaml v1.1.1
-	github.com/knadh/koanf/v2 v2.3.6
-	github.com/larsartmann/go-output v0.38.0
-	github.com/larsartmann/go-output/d2 v0.38.0 // indirect
-	github.com/larsartmann/go-output/delimited v0.38.0 // indirect
-	github.com/larsartmann/go-output/graph v0.38.0 // indirect
-	github.com/larsartmann/go-output/markdown v0.38.0 // indirect
-	github.com/larsartmann/go-output/markup v0.38.0 // indirect
-	github.com/larsartmann/go-output/plantuml v0.38.0 // indirect
-	github.com/larsartmann/go-output/serialization v0.38.0 // indirect
-	github.com/larsartmann/go-output/table v0.38.0 // indirect
-	github.com/larsartmann/go-output/tree v0.38.0 // indirect
-	github.com/larsartmann/samber-do-auditlog v0.10.0
-	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
-	github.com/samber/do/v2 v2.1.0
-	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
-	golang.org/x/term v0.46.0 // indirect
-)
-
-require github.com/larsartmann/go-output/escape v0.38.0 // indirect
+go 1.27
 
 require (
 	charm.land/glamour/v2 v2.0.1 // indirect
@@ -38,8 +11,8 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260910203606-6c9e17dc7a16 // indirect
 	github.com/charmbracelet/x/ansi v0.11.8 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260913004009-c615ff2f7805 // indirect
-	github.com/charmbracelet/x/exp/slice v0.0.0-20260913004009-c615ff2f7805 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260920004010-53e2afe73ae5 // indirect
+	github.com/charmbracelet/x/exp/slice v0.0.0-20260920004010-53e2afe73ae5 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
@@ -48,16 +21,27 @@ require (
 	github.com/dlclark/regexp2/v2 v2.8.0 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-faster/jx v1.2.0 // indirect
+	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gofrs/flock v0.13.1 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.3 // indirect
-	github.com/larsartmann/go-atomic-write v0.5.1 // indirect
-	github.com/larsartmann/go-branded-id v0.5.1 // indirect
-	github.com/larsartmann/go-error-family v0.10.0 // indirect
+	github.com/larsartmann/go-atomic-write v0.5.2 // indirect
+	github.com/larsartmann/go-branded-id v0.6.0 // indirect
+	github.com/larsartmann/go-error-family v0.10.1 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
+	github.com/larsartmann/go-output/d2 v0.38.0 // indirect
 	github.com/larsartmann/go-output/daghtml v0.38.0 // indirect
+	github.com/larsartmann/go-output/delimited v0.38.0 // indirect
+	github.com/larsartmann/go-output/escape v0.38.0 // indirect
+	github.com/larsartmann/go-output/graph v0.38.0 // indirect
+	github.com/larsartmann/go-output/markdown v0.38.0 // indirect
+	github.com/larsartmann/go-output/markup v0.38.0 // indirect
+	github.com/larsartmann/go-output/plantuml v0.38.0 // indirect
+	github.com/larsartmann/go-output/serialization v0.38.0 // indirect
+	github.com/larsartmann/go-output/table v0.38.0 // indirect
+	github.com/larsartmann/go-output/tree v0.38.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.30 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
@@ -69,6 +53,7 @@ require (
 	github.com/muesli/mango-pflag v0.2.0 // indirect
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
+	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
@@ -80,14 +65,25 @@ require (
 	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 )
 
 require (
+	charm.land/fang/v2 v2.0.1
+	charm.land/lipgloss/v2 v2.0.6
+	github.com/knadh/koanf/parsers/json v1.0.1
 	github.com/knadh/koanf/parsers/toml v0.1.0
+	github.com/knadh/koanf/parsers/yaml v1.1.1
+	github.com/knadh/koanf/v2 v2.3.6
 	github.com/larsartmann/cmdguard/flightrecorder v0.1.0
 	github.com/larsartmann/cmdguard/glamour v0.2.0
 	github.com/larsartmann/cmdguard/spinner v0.2.0
+	github.com/larsartmann/go-output v0.38.0
+	github.com/larsartmann/samber-do-auditlog v0.10.0
+	github.com/samber/do/v2 v2.1.0
+	github.com/spf13/cobra v1.10.2
+	github.com/spf13/pflag v1.0.10
 )
 
 replace (
