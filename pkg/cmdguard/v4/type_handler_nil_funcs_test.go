@@ -18,18 +18,22 @@ func nilFuncsHandler() TypeHandlerFunc {
 	return TypeHandlerFunc{}
 }
 
-// TestTypeHandlerFunc_NilRegisterFuncErrors pins the registration-time
-// contract: a handler without RegisterFunc must FAIL registration instead of
-// silently registering nothing (the flag then vanishes and the CLI reports
-// "unknown flag" for a field the struct plainly declares).
-func TestTypeHandlerFunc_NilRegisterFuncErrors(t *testing.T) {
+// TestDispatchRegister_NilRegisterFuncRejected pins the footgun fix: a
+// TypeHandlerFunc without RegisterFunc must fail at dispatch (CLI build time)
+// instead of silently registering nothing, which used to surface far from the
+// cause as "unknown flag" at invocation time.
+func TestDispatchRegister_NilRegisterFuncRejected(t *testing.T) {
 	t.Parallel()
+
+	registry := newTypeRegistry()
+	registry.register(reflect.TypeFor[nilHandlerProbeType](), nilFuncsHandler())
 
 	fs := pflag.NewFlagSet("probe", pflag.ContinueOnError)
 	tag := FlagTag{Name: "probe-flag", Type: reflect.TypeFor[nilHandlerProbeType]()}
 
-	err := nilFuncsHandler().Register(fs, tag)
+	err := dispatchRegister(registry, fs, tag)
 	testutil.AssertErrorContains(t, err, "RegisterFunc", "nil")
+
 	if f := fs.Lookup("probe-flag"); f != nil {
 		t.Errorf("nil RegisterFunc registered the flag anyway: %v", f)
 	}

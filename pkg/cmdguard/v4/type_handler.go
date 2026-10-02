@@ -33,7 +33,10 @@ func registerStringFlagFromTag(flags *pflag.FlagSet, tag FlagTag) error {
 	return nil
 }
 
-// TypeHandlerFunc is a functional adapter for TypeHandler where Register is not needed.
+// TypeHandlerFunc is a functional adapter for TypeHandler. A nil RegisterFunc
+// is tolerated at the adapter level (for derived/internal handlers) but is
+// rejected by dispatchRegister: a handler that registers nothing makes the
+// flag silently vanish, surfacing later as "unknown flag" at invocation time.
 type TypeHandlerFunc struct {
 	ParseFunc    func(value string, tag FlagTag) (any, error)
 	DefaultFunc  func(tag FlagTag) any
@@ -49,10 +52,18 @@ func (h TypeHandlerFunc) Register(flags *pflag.FlagSet, tag FlagTag) error {
 }
 
 func (h TypeHandlerFunc) Parse(value string, tag FlagTag) (any, error) {
+	if h.ParseFunc == nil {
+		return nil, fmt.Errorf("%w: TypeHandlerFunc.ParseFunc is nil", ErrServiceRegistration)
+	}
+
 	return h.ParseFunc(value, tag)
 }
 
 func (h TypeHandlerFunc) Default(tag FlagTag) any {
+	if h.DefaultFunc == nil {
+		return nil
+	}
+
 	return h.DefaultFunc(tag)
 }
 
@@ -198,6 +209,11 @@ func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error
 		registerStringFlag(flags, tag.Name, tag.Short, tag.Default, tag.Help)
 
 		return nil
+	}
+
+	if hf, isFunc := h.(TypeHandlerFunc); isFunc && hf.RegisterFunc == nil {
+		return fmt.Errorf("%w: type handler for %s has nil RegisterFunc; it would register nothing and the flag %q would silently vanish",
+			ErrServiceRegistration, tag.Type, tag.Name)
 	}
 
 	err := h.Register(flags, tag)
