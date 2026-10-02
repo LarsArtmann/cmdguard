@@ -211,7 +211,7 @@ func (s *Scope) Shutdown(ctx context.Context) error {
 		return nil
 	}
 
-	return fmt.Errorf("%w: shutdown of scope %q: %w", ErrServiceConstruction, s.name, report)
+	return fmt.Errorf("%w: shutdown of scope %q: %w", ErrServiceConstruction, s.name, *report)
 }
 
 // ShutdownAll shuts down this scope and all parent scopes.
