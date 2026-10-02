@@ -12,6 +12,7 @@ import (
 func (r *typeRegistry) registerCustomTypes() {
 	r.registerEnumTypes()
 	r.registerValueTypes()
+	r.registerGoDurationHandler()
 }
 
 func (r *typeRegistry) registerEnumTypes() {

@@ -7,6 +7,22 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Nil `TypeHandlerFunc.RegisterFunc` no longer silently drops the flag.** A handler
+  that registers nothing made the flag vanish from the CLI, surfacing far from the
+  cause as "unknown flag" at invocation time (found dogfooding in nsfw-classifier).
+  `dispatchRegister` now rejects such handlers at CLI-build time with an error naming
+  the type and flag. `Parse`/`Default` with nil funcs return errors/nil instead of
+  panicking. The low-level `Register` stays nil-tolerant for derived handlers.
+
+### Changed
+
+- **stdlib `time.Duration` is now handled by default.** A fresh registry (and the
+  global template) includes the duration handler previously available only via the
+  opt-in `RegisterGoDurationHandler()`: native pflag duration registration, `5s`-style
+  parsing, duration defaults. Explicit `RegisterTypeHandler` overrides still win.
+
 ---
 
 ## [glamour/v0.2.0] - 2026-08-06

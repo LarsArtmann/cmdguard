@@ -3,6 +3,7 @@ package v4
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/spf13/pflag"
 
@@ -77,5 +78,34 @@ func TestTypeHandlerFunc_NilDefaultFuncErrors(t *testing.T) {
 
 	if got != nil {
 		t.Errorf("Default with nil DefaultFunc returned %v, want nil", got)
+	}
+}
+
+// TestGoDurationHandlerDefaultOn pins that stdlib time.Duration is handled on
+// a FRESH registry without any explicit RegisterGoDurationHandler call, so a
+// plain `Timeout time.Duration` field works out of the box.
+func TestGoDurationHandlerDefaultOn(t *testing.T) {
+	t.Parallel()
+
+	registry := newTypeRegistry()
+
+	h, ok := registry.lookupHandler(reflect.TypeFor[time.Duration]())
+	if !ok {
+		t.Fatal("time.Duration handler missing from a fresh registry")
+	}
+
+	registered := pflag.NewFlagSet("probe", pflag.ContinueOnError)
+	err := h.Register(registered, FlagTag{Name: "timeout", Default: "2s", Type: reflect.TypeFor[time.Duration]()})
+	testutil.AssertNoError(t, err)
+
+	if f := registered.Lookup("timeout"); f == nil || f.Value.Type() != "duration" {
+		t.Errorf("want native duration flag, got %+v", f)
+	}
+
+	parsed, err := h.Parse("90s", FlagTag{Type: reflect.TypeFor[time.Duration]()})
+	testutil.AssertNoError(t, err)
+
+	if parsed != 90*time.Second {
+		t.Errorf("Parse(90s) = %v, want 90s", parsed)
 	}
 }
