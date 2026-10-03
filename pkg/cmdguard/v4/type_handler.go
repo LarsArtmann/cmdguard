@@ -212,8 +212,12 @@ func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error
 	}
 
 	if hf, isFunc := h.(TypeHandlerFunc); isFunc && hf.RegisterFunc == nil {
-		return fmt.Errorf("%w: type handler for %s has nil RegisterFunc; it would register nothing and the flag %q would silently vanish",
-			ErrServiceRegistration, tag.Type, tag.Name)
+		return fmt.Errorf(
+			"%w: type handler for %s has nil RegisterFunc; it would register nothing and the flag %q would silently vanish",
+			ErrServiceRegistration,
+			tag.Type,
+			tag.Name,
+		)
 	}
 
 	err := h.Register(flags, tag)
