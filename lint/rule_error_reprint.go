@@ -23,7 +23,7 @@ var executeErrorReprintMeta = linter.RuleMeta{
 	ID:          RuleExecuteErrorReprint,
 	Name:        "execute error reprinted",
 	Description: "the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure",
-	Cat:         linter.CategoryBestPractice,
+	Cat:         CategoryUsage,
 	Sev:         finding.SeverityWarning,
 }
 

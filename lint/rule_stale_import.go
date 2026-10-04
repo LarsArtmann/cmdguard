@@ -19,7 +19,7 @@ var staleMajorImportMeta = linter.RuleMeta{
 	ID:          RuleStaleMajorImport,
 	Name:        "stale cmdguard major",
 	Description: "importing a frozen cmdguard major blocks all fixes and sub-module features; migrate to the current major",
-	Cat:         linter.CategoryBestPractice,
+	Cat:         CategoryUsage,
 	Sev:         finding.SeverityError,
 }
 

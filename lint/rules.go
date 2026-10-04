@@ -24,6 +24,11 @@ const (
 // ToolName is the finding attribution for every rule in this linter.
 const ToolName = "cmdguard-lint"
 
+// CategoryUsage is this linter's custom rule category: findings about how a
+// codebase consumes (or under-consumes) cmdguard, as opposed to defects in
+// the code itself. The go-linter-sdk explicitly supports domain categories.
+const CategoryUsage = linter.Category("usage")
+
 // AllRules returns every rule in registration order. Filter with
 // linter.FilterRules for --enable/--disable semantics.
 func AllRules() []linter.RuleFunc {
