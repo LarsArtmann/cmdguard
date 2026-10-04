@@ -384,7 +384,7 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | Sub-module tests            | 65 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 48 tests + 3 examples, 96.1% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
 | `pkg/testutil` coverage     | 80.3%           | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                     |
-| `examples/taskctl` coverage | 80.1%           | 🟢 Good | Production composition (`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04)        |
+| `examples/taskctl` coverage | 85.9%           | 🟢 Good | Production composition (`run`/`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04)   |
 
 ---
 

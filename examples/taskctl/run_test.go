@@ -31,26 +31,17 @@ func newTestRecorder(t *testing.T) *flightrecorder.Recorder {
 	return rec
 }
 
-// runProduction executes args against the full production composition
-// (audit log, middleware, flight recorder, config file, validation) and
-// exports the audit log afterwards, mirroring main() end to end.
-// Not parallel: the flight recorder is a process-wide singleton and
-// WithGracefulShutdown installs signal handlers.
+// runProduction mirrors main() end to end: full production composition
+// (audit log, middleware, flight recorder, config file, validation),
+// execution, audit export, recorder stop. Not parallel: the flight recorder
+// is a process-wide singleton and WithGracefulShutdown installs signal
+// handlers.
 func runProduction(t *testing.T, args []string) error {
 	t.Helper()
 
 	t.Chdir(t.TempDir())
 
-	cli, err := buildApp(newTestRecorder(t))
-	if err != nil {
-		t.Fatalf("buildApp: %v", err)
-	}
-
-	execErr := cli.ExecuteWithArgs(context.Background(), args)
-
-	exportAuditLog(cli)
-
-	return execErr
+	return run(context.Background(), args)
 }
 
 //nolint:paralleltest // buildApp wires the process-wide flight recorder singleton

@@ -50,7 +50,7 @@ nix run .#check-all
 
 **Module path:** `github.com/larsartmann/cmdguard/v4`
 
-**Current Status:** v4.0.2. ~590 test functions, 29 benchmarks, 8 fuzz targets, 87.8% core / 96.1% flightrecorder / 80.3% testutil / 80.1% taskctl coverage, 0 build errors, 0 lint issues.
+**Current Status:** v4.0.2. ~590 test functions, 29 benchmarks, 8 fuzz targets, 87.8% core / 96.1% flightrecorder / 80.3% testutil / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
 
 ---
 

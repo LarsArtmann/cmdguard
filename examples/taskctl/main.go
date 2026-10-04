@@ -48,28 +48,32 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	os.Exit(v4.ExitCode(run(context.Background(), os.Args[1:])))
+}
 
-	// Explicit recorder lifecycle: the middleware starts it lazily on first
-	// command execution; Stop flushes in-flight snapshot writes before exit.
+// run builds the full production CLI and executes args against it: audit
+// logging, middleware, flight recorder (started lazily, stopped before
+// return), and the post-run audit export. Split from main so tests can drive
+// the exact production composition. Construction errors are printed here and
+// returned; the execution error is printed by cmdguard exactly once and
+// returned unprinted — main only maps it to the process exit code.
+func run(ctx context.Context, args []string) error {
 	rec := newProductionRecorder()
 
 	cli, err := buildApp(rec)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+
+		return err
 	}
 
-	// cmdguard prints command errors exactly once (via fang by default). The
-	// error returned by Execute is used only to map the process exit code —
-	// re-printing it would duplicate the error output on stderr.
-	execErr := cli.Execute(ctx)
+	execErr := cli.ExecuteWithArgs(ctx, args)
 
 	exportAuditLog(cli)
 
 	rec.Stop()
 
-	os.Exit(v4.ExitCode(execErr))
+	return execErr
 }
 
 // newProductionRecorder returns the production flight recorder: snapshots
