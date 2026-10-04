@@ -355,6 +355,8 @@ built with cmdguard v4 itself).
 | text / JSON / SARIF output | 🟢 DONE | SARIF round-trips via `finding.FindingsFromSARIF` (tested) |
 | `--enable` / `--disable` filtering | 🟢 DONE | Client-side filter over the single-pass detect |
 | Corpus validation | 🟢 DONE | timesheets 18/18 at hand-audited locations, CG002 15/15 exact vs `rg`, 0 FP on 4 negative corpora |
+| Published as `lint/v0.1.0` | 🟢 DONE | 2026-10-04: CHANGELOG, annotated tag pushed, proxy-verified via scratch consumer, GitHub release |
+| Wired into BuildFlow | 🟢 DONE | 2026-10-04: blank import in `sdk_imports.go` (fleet provider count 118), vendor + tests + `docs --check` green |
 | Cross-file dataflow (CG003/CG004/CG006 are file-scoped) | 🔴 PLANNED | TODO_LIST L-section |
 | Baseline / ratchet mode | 🔴 PLANNED | TODO_LIST L-section |
 
