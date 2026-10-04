@@ -35,6 +35,7 @@ type cliSpec struct {
 	validationMode   ValidationMode
 	configValidate   configValidator
 	middleware       middlewareList
+	ctxMiddleware    middlewareList
 	postFlagParse    postFlagParseList
 	cleanupHooks     cleanupHookList
 	configFilePaths  []string
@@ -76,6 +77,12 @@ type typedMiddlewareList[T any] struct {
 }
 
 func (*typedMiddlewareList[T]) isMiddlewareList() {}
+
+type typedContextMiddlewareList[T any] struct {
+	mws []ContextMiddleware[T]
+}
+
+func (*typedContextMiddlewareList[T]) isMiddlewareList() {}
 
 type postFlagParseList interface {
 	isPostFlagParseList()
@@ -337,7 +344,7 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 
 	cli.registeredCmds[cmd.spec.use] = struct{}{}
 
-	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.extractMiddleware(), cli.spec.envPrefix)
+	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.extractMiddleware(), cli.extractContextMiddleware(), cli.spec.envPrefix)
 	if err != nil {
 		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
@@ -353,6 +360,16 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 // extractMiddleware safely extracts the typed middleware from the sealed interface.
 func (cli *CLI[T]) extractMiddleware() []Middleware[T] {
 	if ml, ok := cli.spec.middleware.(*typedMiddlewareList[T]); ok {
+		return ml.mws
+	}
+
+	return nil
+}
+
+// extractContextMiddleware safely extracts the typed context middleware from
+// the sealed interface.
+func (cli *CLI[T]) extractContextMiddleware() []ContextMiddleware[T] {
+	if ml, ok := cli.spec.ctxMiddleware.(*typedContextMiddlewareList[T]); ok {
 		return ml.mws
 	}
 

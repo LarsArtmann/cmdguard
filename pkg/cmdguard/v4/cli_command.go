@@ -65,7 +65,8 @@ func prepareRunContext[F any](
 }
 
 func cliToCobraCommand[T, F any](
-	config *T, cmd Command[T, F], middlewares []Middleware[T], envPrefix string,
+	config *T, cmd Command[T, F],
+	middlewares []Middleware[T], ctxMiddlewares []ContextMiddleware[T], envPrefix string,
 ) (*cobra.Command, error) {
 	s := cmd.spec
 
@@ -91,10 +92,10 @@ func cliToCobraCommand[T, F any](
 		return nil, fmt.Errorf("envPrefix=%s: %w", envPrefix, err)
 	}
 
-	wireAllHandlers(cobraCmd, config, cmd, flagRegistry, middlewares)
+	wireAllHandlers(cobraCmd, config, cmd, flagRegistry, middlewares, ctxMiddlewares)
 
 	for _, subCmd := range cmd.commands {
-		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, envPrefix)
+		subCobraCmd, err := cliToCobraCommand(config, subCmd, middlewares, ctxMiddlewares, envPrefix)
 		if err != nil {
 			return nil, fmt.Errorf("envPrefix=%s, subcommand of %q: %w", envPrefix, s.use, err)
 		}
@@ -119,7 +120,7 @@ func cliToCobraCommand[T, F any](
 
 func wireAllHandlers[T, F any](
 	cobraCmd *cobra.Command, config *T, cmd Command[T, F],
-	flagRegistry *FlagRegistry, middlewares []Middleware[T],
+	flagRegistry *FlagRegistry, middlewares []Middleware[T], ctxMiddlewares []ContextMiddleware[T],
 ) {
 	s := cmd.spec
 	info := CommandInfo{Name: s.use, Phase: PhaseRun, HasRunE: cmd.runE != nil}
@@ -128,7 +129,8 @@ func wireAllHandlers[T, F any](
 		target: &cobraCmd.RunE, handler: cmd.runE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
 		phase: "command " + s.use, info: info, middlewares: middlewares,
-		promptOnMissing: s.promptOnMissing,
+		contextMiddlewares: ctxMiddlewares,
+		promptOnMissing:    s.promptOnMissing,
 	})
 
 	// Extract lifecycle hooks from the sealed interface — safe because the
@@ -152,7 +154,8 @@ func wireAllHandlers[T, F any](
 		target: &cobraCmd.PreRunE, handler: preRunE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
 		phase: "pre-run of command " + s.use, info: preInfo, middlewares: middlewares,
-		promptOnMissing: s.promptOnMissing,
+		contextMiddlewares: ctxMiddlewares,
+		promptOnMissing:    s.promptOnMissing,
 	})
 
 	postInfo := info
@@ -162,7 +165,8 @@ func wireAllHandlers[T, F any](
 		target: &cobraCmd.PostRunE, handler: postRunE, config: config,
 		flags: cmd.flags, registry: flagRegistry,
 		phase: "post-run of command " + s.use, info: postInfo, middlewares: middlewares,
-		promptOnMissing: s.promptOnMissing,
+		contextMiddlewares: ctxMiddlewares,
+		promptOnMissing:    s.promptOnMissing,
 	})
 }
 
@@ -205,15 +209,16 @@ func initCommandFlags[F any](
 }
 
 type handlerConfig[T, F any] struct {
-	target          *func(*cobra.Command, []string) error
-	handler         func(context.Context, *T, F) error
-	config          *T
-	flags           F
-	registry        *FlagRegistry
-	phase           string
-	info            CommandInfo
-	middlewares     []Middleware[T]
-	promptOnMissing bool
+	target             *func(*cobra.Command, []string) error
+	handler            func(context.Context, *T, F) error
+	config             *T
+	flags              F
+	registry           *FlagRegistry
+	phase              string
+	info               CommandInfo
+	middlewares        []Middleware[T]
+	contextMiddlewares []ContextMiddleware[T]
+	promptOnMissing    bool
 }
 
 func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
@@ -241,14 +246,26 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 
 		ctx = context.WithValue(ctx, argsKey, args)
 
-		if len(cfg.middlewares) == 0 {
-			return h(ctx, cfg.config, parsed)
+		// run executes the handler with context c, wrapping plain middleware
+		// lazily so a context middleware's derived context reaches them too.
+		run := func(c context.Context) error {
+			if len(cfg.middlewares) == 0 {
+				return h(c, cfg.config, parsed)
+			}
+
+			chain := buildChain(c, cfg.config, info, cfg.middlewares, func() error {
+				return h(c, cfg.config, parsed)
+			})
+
+			return chain()
 		}
 
-		chain := buildChain(ctx, cfg.config, info, cfg.middlewares, func() error {
-			return h(ctx, cfg.config, parsed)
-		})
+		if len(cfg.contextMiddlewares) == 0 {
+			return run(ctx)
+		}
 
-		return chain()
+		ctxChain := buildContextChain(ctx, cfg.config, info, cfg.contextMiddlewares, run)
+
+		return ctxChain(ctx)
 	}
 }

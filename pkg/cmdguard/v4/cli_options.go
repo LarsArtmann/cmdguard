@@ -230,6 +230,21 @@ func WithMiddleware[T any](mw ...Middleware[T]) CLIOption {
 	}
 }
 
+// WithContextMiddleware adds context-aware middleware that wraps every command
+// handler. Context middleware run outside plain middleware (see
+// [ContextMiddleware]); the context they pass to next reaches plain middleware
+// and handlers, enabling timeout/cancellation middleware such as
+// [TimeoutMiddleware]. Wire via NewCLI[T](..., WithContextMiddleware[T](...)).
+func WithContextMiddleware[T any](mw ...ContextMiddleware[T]) CLIOption {
+	return func(s *cliSpec) {
+		if existing, ok := s.ctxMiddleware.(*typedContextMiddlewareList[T]); ok {
+			existing.mws = append(existing.mws, mw...)
+		} else {
+			s.ctxMiddleware = &typedContextMiddlewareList[T]{mws: mw}
+		}
+	}
+}
+
 // WithPostFlagParse adds hooks that run after flag parsing and config
 // validation but before any command handler.
 func WithPostFlagParse[T any](fns ...func(cmd *cobra.Command, cfg *T) error) CLIOption {

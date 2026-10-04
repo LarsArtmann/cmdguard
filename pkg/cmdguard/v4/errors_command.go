@@ -25,6 +25,11 @@ var (
 	// ErrCommandPanic indicates a command handler panicked during execution.
 	ErrCommandPanic = errors.New("command panicked")
 
+	// ErrCommandTimeout indicates a command exceeded the deadline imposed by
+	// TimeoutMiddleware. Errors wrapping this sentinel also match
+	// context.DeadlineExceeded.
+	ErrCommandTimeout = errors.New("command timed out")
+
 	// ErrMissingExample indicates a leaf command has no example in draconian mode.
 	ErrMissingExample = errors.New("command has no example")
 
