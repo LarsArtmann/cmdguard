@@ -14,18 +14,7 @@ import (
 // into fang.WithVersion; combining it with WithFangOptions(fang.WithVersion(...))
 // in the same NewCLI call produces duplicate fang options, whose resolution
 // order is undefined from cmdguard's perspective.
-var duplicateVersionOptsMeta = linter.RuleMeta{
-	ID:          RuleDuplicateVersionOpts,
-	Name:        "duplicate version options",
-	Description: "WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options",
-	Cat:         linter.CategoryCorrectness,
-	Sev:         finding.SeverityError,
-	ToolName:    ToolName,
-}
-
-var duplicateVersionOptsRule = ruleFor(duplicateVersionOptsMeta, checkDuplicateVersionOpts)
-
-func checkDuplicateVersionOpts(proj *project) []finding.Finding {
+func checkDuplicateVersionOpts(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
@@ -66,7 +55,7 @@ func checkDuplicateVersionOpts(proj *project) []finding.Finding {
 			}
 
 			findings = append(findings, newFinding(
-				duplicateVersionOptsMeta,
+				meta,
 				"WithCLIVersion already pipes into fang.WithVersion: combining it with WithFangOptions(fang.WithVersion(...)) passes the version twice",
 				file.pos(call),
 			).

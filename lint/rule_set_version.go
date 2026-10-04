@@ -17,18 +17,7 @@ import (
 // Detection is dataflow-lite: the receiver identifier must be assigned from
 // a cmdguard NewCLI call in the same file, keeping the rule precise without
 // type information.
-var setVersionRuntimeMeta = linter.RuleMeta{
-	ID:          RuleSetVersionRuntime,
-	Name:        "runtime SetVersion",
-	Description: "cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand helper) instead",
-	Cat:         CategoryUsage,
-	Sev:         finding.SeverityWarning,
-	ToolName:    ToolName,
-}
-
-var setVersionRuntimeRule = ruleFor(setVersionRuntimeMeta, checkSetVersionRuntime)
-
-func checkSetVersionRuntime(proj *project) []finding.Finding {
+func checkSetVersionRuntime(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
@@ -56,7 +45,7 @@ func checkSetVersionRuntime(proj *project) []finding.Finding {
 				}
 
 				findings = append(findings, newFinding(
-					setVersionRuntimeMeta,
+					meta,
 					"cli.SetVersion patches the version after construction: pass WithCLIVersion(version) to NewCLI so fang's version wiring is complete from the start",
 					file.pos(call),
 				).

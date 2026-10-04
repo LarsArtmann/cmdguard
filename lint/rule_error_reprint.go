@@ -19,18 +19,7 @@ import (
 // fmt.Print/Printf/Println/Fprint/Fprintf/Fprintln. fmt.Errorf wrapping is
 // deliberately NOT flagged: mapping errors into wrapped errors is part of
 // the supported exit-code path.
-var executeErrorReprintMeta = linter.RuleMeta{
-	ID:          RuleExecuteErrorReprint,
-	Name:        "execute error reprinted",
-	Description: "the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure",
-	Cat:         CategoryUsage,
-	Sev:         finding.SeverityWarning,
-	ToolName:    ToolName,
-}
-
-var executeErrorReprintRule = ruleFor(executeErrorReprintMeta, checkExecuteErrorReprint)
-
-func checkExecuteErrorReprint(proj *project) []finding.Finding {
+func checkExecuteErrorReprint(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
@@ -64,7 +53,7 @@ func checkExecuteErrorReprint(proj *project) []finding.Finding {
 				}
 
 				findings = append(findings, newFinding(
-					executeErrorReprintMeta,
+					meta,
 					"the error returned by cli.Execute has already been displayed exactly once by cmdguard; printing it again double-reports the failure",
 					file.pos(call),
 				).

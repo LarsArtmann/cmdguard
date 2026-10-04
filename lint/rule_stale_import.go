@@ -15,18 +15,7 @@ import (
 // telemetry, flightrecorder) only target the current major, so their features
 // are unreachable from a stale import. The v3->v4 migration is mechanical
 // (import-path rename), which makes staying behind purely a loss.
-var staleMajorImportMeta = linter.RuleMeta{
-	ID:          RuleStaleMajorImport,
-	Name:        "stale cmdguard major",
-	Description: "importing a frozen cmdguard major blocks all fixes and sub-module features; migrate to the current major",
-	Cat:         CategoryUsage,
-	Sev:         finding.SeverityError,
-	ToolName:    ToolName,
-}
-
-var staleMajorImportRule = ruleFor(staleMajorImportMeta, checkStaleMajorImport)
-
-func checkStaleMajorImport(proj *project) []finding.Finding {
+func checkStaleMajorImport(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
@@ -42,7 +31,7 @@ func checkStaleMajorImport(proj *project) []finding.Finding {
 			}
 
 			findings = append(findings, newFinding(
-				staleMajorImportMeta,
+				meta,
 				fmt.Sprintf("cmdguard %s is frozen (no further fixes; sub-modules unreachable): migrate the import to %s", major, CurrentMajor),
 				file.pos(spec),
 			).

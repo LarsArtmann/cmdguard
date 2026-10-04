@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-//nolint:paralleltest // single fang/cobra process state (NO_COLOR) shared across runs
 func TestLintCommandCleanTreeExitsZero(t *testing.T) {
 	dir := t.TempDir()
 
@@ -28,7 +27,6 @@ func TestLintCommandCleanTreeExitsZero(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // single fang/cobra process state (NO_COLOR) shared across runs
 func TestLintCommandFindingsFailTheRun(t *testing.T) {
 	dir := t.TempDir()
 
@@ -55,7 +53,6 @@ func TestLintCommandFindingsFailTheRun(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // single fang/cobra process state (NO_COLOR) shared across runs
 func TestRulesCommandListsAllRules(t *testing.T) {
 	t.Setenv("NO_COLOR", "1")
 

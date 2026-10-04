@@ -17,7 +17,7 @@ import (
 // and suppresses nothing.
 const suppressionDirective = "//cmdguard-lint:ignore"
 
-var suppressionPattern = regexp.MustCompile( //nolint:gochecknoglobals // compiled once, immutable
+var suppressionPattern = regexp.MustCompile(
 	`^//cmdguard-lint:ignore\s+([A-Z]+[0-9]+)\s+(\S.*)$`,
 )
 
@@ -52,19 +52,19 @@ func applySuppressions(proj *project, findings []finding.Finding) []finding.Find
 
 	kept := make([]finding.Finding, 0, len(findings))
 
-	for _, f := range findings {
-		if f.Position.File == "" || f.Position.Line <= 0 {
-			kept = append(kept, f)
+	for _, candidate := range findings {
+		if candidate.Position.File == "" || candidate.Position.Line <= 0 {
+			kept = append(kept, candidate)
 
 			continue
 		}
 
-		ruleID, active := directives[string(f.Position.File)][f.Position.Line]
-		if active && ruleID == string(f.Rule) {
+		ruleID, active := directives[string(candidate.Position.File)][candidate.Position.Line]
+		if active && ruleID == string(candidate.Rule) {
 			continue
 		}
 
-		kept = append(kept, f)
+		kept = append(kept, candidate)
 	}
 
 	return kept

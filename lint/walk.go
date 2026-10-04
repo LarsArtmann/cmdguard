@@ -79,7 +79,7 @@ type project struct {
 // re-invoking with a mutated tree should use [analyze] via a fresh process or
 // call [ClearCache].
 var (
-	analyzeCacheMu sync.Mutex
+	analyzeCacheMu sync.Mutex              //nolint:gochecknoglobals // guards analyzeCache, the process-lifetime memo
 	analyzeCache   = map[string]*project{} //nolint:gochecknoglobals // process-lifetime memo, see ClearCache
 )
 
@@ -134,7 +134,7 @@ func analyze(_ context.Context, dir string) (*project, error) {
 			return nil
 		}
 
-		sf, parseErr := parseGoFile(fset, root, path)
+		sf, skipFile, parseErr := parseGoFile(fset, root, path)
 		if parseErr != nil {
 			if rel, relErr := filepath.Rel(root, path); relErr == nil {
 				proj.skipped = append(proj.skipped, rel)
@@ -143,7 +143,7 @@ func analyze(_ context.Context, dir string) (*project, error) {
 			return nil
 		}
 
-		if sf == nil {
+		if skipFile || sf == nil {
 			return nil
 		}
 
@@ -167,24 +167,24 @@ func analyze(_ context.Context, dir string) (*project, error) {
 	return proj, nil
 }
 
-// parseGoFile reads, generated-checks, and parses one Go file. It returns
-// (file, nil) on success, (zero, nil) for files skipped silently (generated
-// or unreadable), and (zero, err) when the file does not parse — the caller
-// records those in project.skipped; the compiler is the right reporter for
-// syntax errors, the linter just stays resilient on dirty trees.
-func parseGoFile(fset *token.FileSet, root, path string) (*sourceFile, error) {
-	src, err := os.ReadFile(path)
-	if err != nil {
-		return nil, nil
+// parseGoFile reads, generated-checks, and parses one Go file. skip reports
+// that the file is deliberately not analyzed (unreadable or generated); err
+// reports a parse failure, which the caller records in project.skipped — the
+// compiler is the right reporter for syntax errors, the linter just stays
+// resilient on dirty trees.
+func parseGoFile(fset *token.FileSet, root, path string) (*sourceFile, bool, error) {
+	src, readErr := os.ReadFile(path)
+	if readErr != nil {
+		return nil, true, nil //nolint:nilerr // deliberate skip: unreadable files are not lint findings
 	}
 
 	if isGenerated(src) {
-		return nil, nil
+		return nil, true, nil
 	}
 
 	parsed, parseErr := parser.ParseFile(fset, path, src, parser.ParseComments|parser.SkipObjectResolution)
 	if parseErr != nil {
-		return nil, parseErr
+		return nil, false, parseErr
 	}
 
 	rel, relErr := filepath.Rel(root, path)
@@ -199,13 +199,13 @@ func parseGoFile(fset *token.FileSet, root, path string) (*sourceFile, error) {
 		imports:       resolveImports(parsed),
 		cmdguardMajor: "",
 		lines:         strings.Split(string(src), "\n"),
-	}, nil
+	}, false, nil
 }
 
 // cmdguardImport reports whether any resolved import is a cmdguard path, and
 // which core major it belongs to. Sub-module imports (major "") count as
 // cmdguard usage without pinning a core major.
-func cmdguardImport(imports map[string]string) (major string, found bool) {
+func cmdguardImport(imports map[string]string) (string, bool) {
 	for _, importPath := range imports {
 		if strings.HasPrefix(importPath, cmdguardImportPrefix) {
 			return majorOf(importPath), true
@@ -298,7 +298,7 @@ func majorOf(importPath string) string {
 		return ""
 	}
 
-	segment := strings.SplitN(strings.TrimPrefix(rest, "/"), "/", 2)[0]
+	segment, _, _ := strings.Cut(strings.TrimPrefix(rest, "/"), "/")
 
 	if isMajorSegment(segment) {
 		return segment
@@ -307,11 +307,15 @@ func majorOf(importPath string) string {
 	return ""
 }
 
+// generatedHeaderLines is how many leading lines isGenerated inspects for
+// the standard "Code generated ... DO NOT EDIT." marker.
+const generatedHeaderLines = 5
+
 // isGenerated reports whether a file's header carries the standard
 // "Code generated ... DO NOT EDIT." marker.
 func isGenerated(src []byte) bool {
 	for i, line := range strings.Split(string(src), "\n") {
-		if i >= 5 {
+		if i >= generatedHeaderLines {
 			break
 		}
 

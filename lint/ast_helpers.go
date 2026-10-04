@@ -138,7 +138,7 @@ func (f *sourceFile) callArgIsRootCommand(call *ast.CallExpr, rootCommandIdents 
 // collectRootCommandIdents returns the identifiers in the file assigned from
 // `x.RootCommand()` calls (e.g. `root := cli.RootCommand()`).
 func collectRootCommandIdents(file *ast.File) map[string]bool {
-	id := map[string]bool{}
+	idents := map[string]bool{}
 
 	visitCallAssignments(file, func(call *ast.CallExpr) bool {
 		sel, ok := call.Fun.(*ast.SelectorExpr)
@@ -146,11 +146,11 @@ func collectRootCommandIdents(file *ast.File) map[string]bool {
 		return ok && sel.Sel != nil && sel.Sel.Name == "RootCommand"
 	}, func(_ *ast.CallExpr, resultIdents []string) {
 		for _, name := range resultIdents {
-			id[name] = true
+			idents[name] = true
 		}
 	})
 
-	return id
+	return idents
 }
 
 // cliVars returns identifiers assigned from `<cmdguard>.NewCLI(...)` calls in

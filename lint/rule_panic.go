@@ -15,18 +15,7 @@ import (
 // must-style wrapper re-introduces it. Constructors only fail on invalid
 // static arguments, so probability is low — but the failure mode is a startup
 // panic instead of a checkable error.
-var panicOnConstructorMeta = linter.RuleMeta{
-	ID:          RulePanicOnConstructor,
-	Name:        "panic on constructor error",
-	Description: "panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return the error instead",
-	Cat:         linter.CategoryCorrectness,
-	Sev:         finding.SeverityError,
-	ToolName:    ToolName,
-}
-
-var panicOnConstructorRule = ruleFor(panicOnConstructorMeta, checkPanicOnConstructor)
-
-func checkPanicOnConstructor(proj *project) []finding.Finding {
+func checkPanicOnConstructor(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
@@ -67,7 +56,7 @@ func checkPanicOnConstructor(proj *project) []finding.Finding {
 					}
 
 					findings = append(findings, newFinding(
-						panicOnConstructorMeta,
+						meta,
 						"panic on a cmdguard constructor error re-introduces the panic cmdguard removed by design: constructors return errors so registration failures surface as checkable errors",
 						file.pos(stmt),
 					).

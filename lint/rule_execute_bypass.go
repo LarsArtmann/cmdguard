@@ -19,18 +19,7 @@ import (
 // Signals: (1) the project imports cmdguard anywhere, (2) a fang.Execute
 // call, (3) an argument that is a RootCommand() call or an identifier
 // assigned from one. All three together are deterministic.
-var executeBypassMeta = linter.RuleMeta{
-	ID:          RuleExecuteBypass,
-	Name:        "execute bypass",
-	Description: "fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract",
-	Cat:         linter.CategoryCorrectness,
-	Sev:         finding.SeverityCritical,
-	ToolName:    ToolName,
-}
-
-var executeBypassRule = ruleFor(executeBypassMeta, checkExecuteBypass)
-
-func checkExecuteBypass(proj *project) []finding.Finding {
+func checkExecuteBypass(proj *project, meta linter.RuleMeta) []finding.Finding {
 	if !proj.importsCmdguard {
 		return nil
 	}
@@ -56,7 +45,7 @@ func checkExecuteBypass(proj *project) []finding.Finding {
 			}
 
 			findings = append(findings, newFinding(
-				executeBypassMeta,
+				meta,
 				"fang.Execute runs the raw cobra tree: cmdguard's cli.Execute is bypassed, so signal handling, graceful shutdown, cleanup hooks, and the single-error-display contract never engage",
 				file.pos(call),
 			).

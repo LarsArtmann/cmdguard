@@ -21,13 +21,13 @@ import (
 )
 
 type cliConfig struct {
-	Output  string `flag:"output"  default:"text" help:"Output format for findings"                     values:"text,json,sarif"`
-	Enable  string `flag:"enable"  default:""     help:"Comma-separated rule IDs to run (default: all)"`
-	Disable string `flag:"disable" default:""     help:"Comma-separated rule IDs to skip"`
+	Output  string `default:"text" flag:"output"  help:"Output format for findings"                     values:"text,json,sarif"`
+	Enable  string `default:""     flag:"enable"  help:"Comma-separated rule IDs to run (default: all)"`
+	Disable string `default:""     flag:"disable" help:"Comma-separated rule IDs to skip"`
 }
 
 type lintFlags struct {
-	Dir string `flag:"dir" default:"." help:"Directory to lint"`
+	Dir string `default:"." flag:"dir" help:"Directory to lint"`
 }
 
 func main() {
@@ -89,9 +89,7 @@ func newApp() (*v4.CLI[cliConfig], error) {
 
 // errFindings is returned when the lint run produced findings; cmdguard
 // displays it once and ExecuteAndExit maps it to exit code 1.
-var errFindings = errors.New(
-	"lint run produced findings",
-) //nolint:err113 // sentinel with dynamic count in the wrapping site
+var errFindings = errors.New("lint run produced findings")
 
 func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 	findings, err := detectFiltered(ctx, flags.Dir, cfg)
@@ -146,12 +144,12 @@ func detectFiltered(ctx context.Context, dir string, cfg *cliConfig) ([]finding.
 
 	kept := make([]finding.Finding, 0, len(findings))
 
-	for _, f := range findings {
-		if disabled[string(f.Rule)] {
+	for _, candidate := range findings {
+		if disabled[string(candidate.Rule)] {
 			continue
 		}
 
-		if len(enabled) > 0 && !enabled[string(f.Rule)] {
+		if len(enabled) > 0 && !enabled[string(candidate.Rule)] {
 			continue
 		}
 
@@ -165,7 +163,7 @@ func detectFiltered(ctx context.Context, dir string, cfg *cliConfig) ([]finding.
 func idSet(value string) map[string]bool {
 	set := map[string]bool{}
 
-	for _, part := range strings.Split(value, ",") {
+	for part := range strings.SplitSeq(value, ",") {
 		if trimmed := strings.TrimSpace(part); trimmed != "" {
 			set[trimmed] = true
 		}
