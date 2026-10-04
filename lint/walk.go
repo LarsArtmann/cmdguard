@@ -2,6 +2,7 @@ package lint
 
 import (
 	"context"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -97,7 +98,7 @@ func ClearCache() {
 func analyze(_ context.Context, dir string) (*project, error) {
 	root, err := filepath.Abs(dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cmdguard-lint: resolving %s: %w", dir, err)
 	}
 
 	analyzeCacheMu.Lock()
@@ -117,24 +118,24 @@ func analyze(_ context.Context, dir string) (*project, error) {
 
 	fset := token.NewFileSet()
 
-	err = filepath.WalkDir(root, func(path string, d fs.DirEntry, walkErr error) error {
+	err = filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
 
-		if d.IsDir() {
-			if path != root && (skippedDirs[d.Name()] || strings.HasPrefix(d.Name(), ".")) {
+		if entry.IsDir() {
+			if path != root && (skippedDirs[entry.Name()] || strings.HasPrefix(entry.Name(), ".")) {
 				return filepath.SkipDir
 			}
 
 			return nil
 		}
 
-		if !strings.HasSuffix(d.Name(), ".go") {
+		if !strings.HasSuffix(entry.Name(), ".go") {
 			return nil
 		}
 
-		sf, skipFile, parseErr := parseGoFile(fset, root, path)
+		parsedFile, skipFile, parseErr := parseGoFile(fset, root, path)
 		if parseErr != nil {
 			if rel, relErr := filepath.Rel(root, path); relErr == nil {
 				proj.skipped = append(proj.skipped, rel)
@@ -143,21 +144,21 @@ func analyze(_ context.Context, dir string) (*project, error) {
 			return nil
 		}
 
-		if skipFile || sf == nil {
+		if skipFile || parsedFile == nil {
 			return nil
 		}
 
-		if major, found := cmdguardImport(sf.imports); found {
-			sf.cmdguardMajor = major
+		if major, found := cmdguardImport(parsedFile.imports); found {
+			parsedFile.cmdguardMajor = major
 			proj.importsCmdguard = true
 		}
 
-		proj.files = append(proj.files, *sf)
+		proj.files = append(proj.files, *parsedFile)
 
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cmdguard-lint: walking %s: %w", root, err)
 	}
 
 	analyzeCacheMu.Lock()
@@ -184,7 +185,7 @@ func parseGoFile(fset *token.FileSet, root, path string) (*sourceFile, bool, err
 
 	parsed, parseErr := parser.ParseFile(fset, path, src, parser.ParseComments|parser.SkipObjectResolution)
 	if parseErr != nil {
-		return nil, false, parseErr
+		return nil, false, fmt.Errorf("cmdguard-lint: parsing %s: %w", path, parseErr)
 	}
 
 	rel, relErr := filepath.Rel(root, path)

@@ -136,7 +136,7 @@ func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 func detectFiltered(ctx context.Context, dir string, cfg *cliConfig) ([]finding.Finding, error) {
 	findings, err := lint.Detect(ctx, dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("detecting cmdguard usage findings in %s: %w", dir, err)
 	}
 
 	enabled := idSet(cfg.Enable)
@@ -153,7 +153,7 @@ func detectFiltered(ctx context.Context, dir string, cfg *cliConfig) ([]finding.
 			continue
 		}
 
-		kept = append(kept, f)
+		kept = append(kept, candidate)
 	}
 
 	return kept, nil
@@ -185,10 +185,12 @@ func runRules(_ context.Context, _ *cliConfig, _ v4.NoFlags) error {
 		}
 	}
 
-	_, err := fmt.Fprintln(
+	if _, err := fmt.Fprintln(
 		os.Stdout,
 		"\nSuppress with //cmdguard-lint:ignore <RULE> <reason> on the offending line or the line above.",
-	)
+	); err != nil {
+		return fmt.Errorf("printing suppression hint: %w", err)
+	}
 
-	return err
+	return nil
 }
