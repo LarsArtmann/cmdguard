@@ -33,3 +33,21 @@ ROADMAP.md §"Additional v5 candidates" — keep them there, not here.
 | #  | Task                           | Blocker                                                                                                                                                                                                                                                                                                                                                | Priority | Status     |
 | -- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------- |
 | F1 | Command-level audit middleware | Upstream API is implemented: `Plugin.RecordCommand` / `Recorder.RecordCommand` / `EventTypeCommand` in `../samber-do-auditlog` (Unreleased, committed locally). **Unblock:** push + tag samber-do-auditlog ≥ v0.11.0, bump cmdguard `go.mod`, then add `AuditMiddleware[T]` (records PhaseBefore/PhaseAfter + duration + error per command execution). | Medium   | 🟡 BLOCKED |
+
+---
+
+## Lint Sub-Module (`lint/`)
+
+Harvested from `docs/status/2026-10-04_07-11_cmdguard-lint-sub-module-build.md` §f
+(full 50-item backlog lives there; these are the near-term actionable ones).
+
+| #  | Task                                                                                     | Notes                                                                                                                    | Priority | Status       |
+| -- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------- | ------------ |
+| L1 | Tag `lint/v0.1.0`                                                                         | Via go-release skill; timesheets adoption gate. Gated on user review of severities/messages                               | High     | 🟡 AWAIT-USER |
+| L2 | Wire `lint/provider` into the BuildFlow repo                                              | Self-registering toolsdk provider; gated on user decision (dogfood+tag first vs wire now)                                 | High     | 🟡 AWAIT-USER |
+| L3 | Cross-file dataflow for CG003/CG004/CG006                                                 | Name tracing is file-scoped today; constructor in one file + use in another is missed                                     | Medium   | 🔴 TODO      |
+| L4 | Baseline / ratchet mode                                                                   | Save snapshot of current findings so adoption is incremental (old pass, new fail)                                         | Medium   | 🔴 TODO      |
+| L5 | Provider options (enable/disable via BuildFlow config)                                    | `provider.Register` spec has no options surface yet                                                                       | Medium   | 🔴 TODO      |
+| L6 | golangci-lint module-plugin distribution layer                                            | `.custom-gcl.yml` wiring per go-humanize-linter pattern                                                                   | Low      | 🔴 TODO      |
+| L7 | Auto-generate README rule table from `allRuleDefs()`                                      | Prevents doc drift when rules change (golden test or `go:generate`)                                                       | Low      | 🔴 TODO      |
+| L8 | Bump `CurrentMajor` in `lint/walk.go` when cmdguard v5 ships                              | Standing duty; CG002 tracks the constant. Rule IDs CG001–CG006 are load-bearing (suppressions key on them) — never renumber | —        | 🔵 STANDING  |

@@ -98,17 +98,17 @@
 
 ## f) NEXT — up to 50 items (Pareto-ranked)
 
-1. Fix vacuous `TestSuppressionLineAboveWithCmdguard` (trigger CG001, then suppress it).
-2. Add JSON + SARIF output tests (round-trip via `FindingsFromSARIF`).
-3. Run `nix flake check` + `nix fmt` on the new files.
-4. Align replace directive with siblings (`v4.0.2 => ../`).
-5. Re-run root-module `go test ./... -race` (cli_lifecycle_test.go edit).
-6. Review/hand-off the non-authored taskctl/FEATURES diffs.
-7. Tag `lint/v0.1.0` (go-release skill: sub-module tag, proxy check).
-8. CHANGELOG.md entry for the sub-module.
-9. Import `lint/provider` into BuildFlow (fleet activation).
-10. FEATURES.md + TODO_LIST.md updates.
-11. Doc-comment polish pass on rule files.
+1. Fix vacuous `TestSuppressionLineAboveWithCmdguard` (trigger CG001, then suppress it). ✅ DONE 2026-10-04 (control pass now asserts CG001 fires without the directive; suppression pass asserts it is silenced)
+2. Add JSON + SARIF output tests (round-trip via `FindingsFromSARIF`). ✅ DONE 2026-10-04 (both green, SARIF round-trips CG002@stale.go:3)
+3. Run `nix flake check` + `nix fmt` on the new files. ✅ DONE 2026-10-04 (treefmt check green, 192 files 0 changed — after fixing `goPkg` go_1_26→go_1_27 + GOTOOLCHAIN=local goimports wrapper in flake.nix; the check had been broken repo-wide by the go.mod 1.27 bump)
+4. Align replace directive with siblings (`v4.0.2 => ../`). ✅ DONE 2026-10-04
+5. Re-run root-module `go test ./... -race` (cli_lifecycle_test.go edit). ✅ DONE 2026-10-04 (TestCLISetVersion + full v4 package green)
+6. Review/hand-off the non-authored taskctl/FEATURES diffs. ✅ RESOLVED (auto-commit daemon committed them; taskctl run() refactor untouched by lint work; FEATURES lint section added 2026-10-04)
+7. Tag `lint/v0.1.0` (go-release skill: sub-module tag, proxy check). 🟡 AWAIT-USER (TODO_LIST L1)
+8. CHANGELOG.md entry for the sub-module. 🔴 TODO (ships with the v0.1.0 tag)
+9. Import `lint/provider` into BuildFlow (fleet activation). 🟡 AWAIT-USER (TODO_LIST L2)
+10. FEATURES.md + TODO_LIST.md updates. ✅ DONE 2026-10-04 (lint sub-module section + L1–L8 harvest)
+11. Doc-comment polish pass on rule files. ✅ DONE 2026-10-04 (stale `*Meta is the identity header` references replaced with check-function docs naming the rule ID)
 12. Cross-file CG001 dataflow (RootCommand ident across files).
 13. Cross-file CG006 (Execute error printed elsewhere).
 14. toolsdk Options on the provider (enable/disable/exclude).
