@@ -82,6 +82,10 @@ jobs:
     needs: build-website
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    # The secrets context is not allowed in `if:`; mirror it through job
+    # env so the step can skip when the key is not configured yet.
+    env:
+      HAS_FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -103,7 +107,7 @@ jobs:
         # Skip cleanly until the repo has the FIREBASE_SERVICE_ACCOUNT
         # secret: an empty key would only fail the deploy with an auth
         # error instead.
-        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        if: env.HAS_FIREBASE_KEY == 'true'
         run: |
           # pnpm refuses global installs unless its global bin is already
           # on PATH, and $GITHUB_PATH only affects LATER steps - export it
