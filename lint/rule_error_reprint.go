@@ -7,7 +7,8 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// executeErrorReprintMeta is the identity header of the error-reprint rule.
+// checkExecuteErrorReprint detects fmt Print calls on the error returned by
+// CLI Execute, double-displaying it (rule CG006).
 //
 // Origin: cmdguard's error/exit contract (v4). The error returned by
 // cli.Execute has already been displayed exactly once (fang when enabled,

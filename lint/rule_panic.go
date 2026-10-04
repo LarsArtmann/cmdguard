@@ -7,7 +7,8 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// panicOnConstructorMeta is the identity header of the panic rule.
+// checkPanicOnConstructor detects panic calls inside `if err != nil`
+// branches where err traces to a cmdguard constructor (rule CG003).
 //
 // Origin: timesheets deep dive F6. cmdguard eliminated Must* constructors by
 // design: every function returns errors and the failure mode of a panic at

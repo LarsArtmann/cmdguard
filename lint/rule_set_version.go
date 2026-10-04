@@ -7,7 +7,8 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// setVersionRuntimeMeta is the identity header of the SetVersion rule.
+// checkSetVersionRuntime detects SetVersion calls on a CLI variable at
+// runtime instead of the WithCLIVersion option (rule CG004).
 //
 // Origin: timesheets deep dive F7. cmdguard's WithCLIVersion wires fang's
 // version machinery at construction time; calling cli.SetVersion after the

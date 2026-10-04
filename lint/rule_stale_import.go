@@ -8,7 +8,8 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// staleMajorImportMeta is the identity header of the stale-major-import rule.
+// checkStaleMajorImport detects imports of cmdguard majors other than the
+// current one (rule CG002).
 //
 // Origin: timesheets deep dive F2 (critical). Older majors are frozen: they
 // receive no fixes, and the cmdguard sub-modules (glamour, prompts, spinner,

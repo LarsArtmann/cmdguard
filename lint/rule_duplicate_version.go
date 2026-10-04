@@ -7,8 +7,8 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// duplicateVersionOptsMeta is the identity header of the duplicate-version
-// rule.
+// checkDuplicateVersionOpts detects NewCLI calls that pass both
+// WithCLIVersion and WithFangOptions(fang.WithVersion(...)) (rule CG005).
 //
 // Origin: cmdguard ADR-001 (fang integration). WithCLIVersion already pipes
 // into fang.WithVersion; combining it with WithFangOptions(fang.WithVersion(...))

@@ -7,7 +7,8 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// executeBypassMeta is the identity header of the execute-bypass rule.
+// checkExecuteBypass detects fang.Execute calls that run the cmdguard root
+// command directly, bypassing the cmdguard lifecycle (rule CG001).
 //
 // Origin: timesheets deep dive F1 (critical). fang only installs a signal
 // context when the caller passes fang.WithNotifySignal; routing the cmdguard
