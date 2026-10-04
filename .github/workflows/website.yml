@@ -98,6 +98,7 @@ jobs:
         working-directory: website
         run: |
           pnpm add -g firebase-tools
+          echo "$(pnpm bin -g)" >> "$GITHUB_PATH"
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > "$RUNNER_TEMP/gcp-key.json"
           firebase deploy --only hosting:cmdguard --project lars-software
         env:
