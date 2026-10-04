@@ -79,6 +79,8 @@ func Detect(ctx context.Context, dir string) ([]finding.Finding, error) {
 }
 
 // ruleFor wraps a check into a go-linter-sdk RuleFunc with stable identity.
+// Checks build findings via newFinding (not the rule variable) to avoid Go
+// initialization cycles.
 func ruleFor(meta linter.RuleMeta, check func(*project) []finding.Finding) linter.RuleFunc {
 	meta.ToolName = ToolName
 
@@ -93,6 +95,15 @@ func ruleFor(meta linter.RuleMeta, check func(*project) []finding.Finding) linte
 			return applySuppressions(proj, check(proj)), nil
 		},
 	}
+}
+
+// newFinding builds a finding builder pre-stamped with the rule's identity,
+// mirroring linter.RuleFunc.NewFinding. Checks use this instead of the rule
+// variable so package initialization stays acyclic.
+func newFinding(meta linter.RuleMeta, message string, pos finding.Position) *finding.Builder {
+	meta.ToolName = ToolName
+
+	return linter.RuleFunc{Meta: meta}.NewFinding(message, pos)
 }
 
 // pos builds a finding position for a node in a scanned file.

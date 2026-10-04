@@ -7,7 +7,7 @@ import (
 	linter "github.com/larsartmann/go-linter-sdk"
 )
 
-// executeBypassRule detects fang.Execute receiving a cmdguard RootCommand().
+// executeBypassMeta is the identity header of the execute-bypass rule.
 //
 // Origin: timesheets deep dive F1 (critical). fang only installs a signal
 // context when the caller passes fang.WithNotifySignal; routing the cmdguard
@@ -18,18 +18,16 @@ import (
 //
 // Signals: (1) the project imports cmdguard anywhere, (2) a fang.Execute
 // call, (3) an argument that is a RootCommand() call or an identifier
-// assigned from one. All three together are deterministic; confidence is
-// full.
-var executeBypassRule = ruleFor(
-	linter.RuleMeta{
-		ID:          RuleExecuteBypass,
-		Name:        "execute bypass",
-		Description: "fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract",
-		Cat:         linter.CategoryCorrectness,
-		Sev:         finding.SeverityCritical,
-	},
-	checkExecuteBypass,
-)
+// assigned from one. All three together are deterministic.
+var executeBypassMeta = linter.RuleMeta{
+	ID:          RuleExecuteBypass,
+	Name:        "execute bypass",
+	Description: "fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract",
+	Cat:         linter.CategoryCorrectness,
+	Sev:         finding.SeverityCritical,
+}
+
+var executeBypassRule = ruleFor(executeBypassMeta, checkExecuteBypass)
 
 func checkExecuteBypass(proj *project) []finding.Finding {
 	if !proj.importsCmdguard {
@@ -56,7 +54,7 @@ func checkExecuteBypass(proj *project) []finding.Finding {
 				return true
 			}
 
-			findings = append(findings, executeBypassRule.NewFinding(
+			findings = append(findings, newFinding(executeBypassMeta,
 				"fang.Execute runs the raw cobra tree: cmdguard's cli.Execute is bypassed, so signal handling, graceful shutdown, cleanup hooks, and the single-error-display contract never engage",
 				file.pos(call),
 			).

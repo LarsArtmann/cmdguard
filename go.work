@@ -6,6 +6,8 @@ use ./flightrecorder
 
 use ./glamour
 
+use ./lint
+
 use ./prompts
 
 use ./spinner
