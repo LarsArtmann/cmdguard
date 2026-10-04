@@ -13,18 +13,19 @@ breaking changes are tracked with `TODO(v5)` markers in source code:
 
 | # | Change                                             | Rationale                                                      | Source Location         |
 | - | -------------------------------------------------- | -------------------------------------------------------------- | ----------------------- |
-| 1 | Rename `CommandInfo` → `CommandMetadata`           | "Info" suffix is vague; `Metadata` is precise                  | `middleware.go:40`      |
-| 2 | Rename `TypeHandler` → `TypeCodec`                 | "Handler" is generic; `Codec` captures parse/default dual role | `type_handler.go:13`    |
-| 3 | Rename `PromptRunner` → `HuhPrompter` (or similar) | "Runner" suffix is generic                                     | `prompts/prompts.go:27` |
+| 1 | Rename `CommandInfo` → `CommandMetadata`           | "Info" suffix is vague; `Metadata` is precise                  | `middleware.go`         |
+| 2 | Rename `TypeHandler` → `TypeCodec`                 | "Handler" is generic; `Codec` captures parse/default dual role | `type_handler.go`       |
+| 3 | Rename `PromptRunner` → `HuhPrompter` (or similar) | "Runner" suffix is generic                                     | `prompts/prompts.go`    |
+| 4 | Remove `SetConfig(cfg)` — now `// Deprecated:`    | Unsafe post-construction mutation without re-initializing FlagRegistry | `cli_accessors.go` |
+| 5 | Replace `RegisterInScope` with generic variant — now `// Deprecated:` | Erases provider types; use `Child` + `do.Provide` meanwhile | `scope.go`      |
 
 Additional v5 candidates from partially functional items:
 
 | # | Change                                                    | Rationale                                                              |
 | - | --------------------------------------------------------- | ---------------------------------------------------------------------- |
-| 4 | Remove `SetConfig(cfg)`                                   | Unsafe post-construction mutation without re-initializing FlagRegistry |
-| 5 | Rename `Get[T]` → `GetService[T]`                         | `Get` is too generic for a DI scope                                    |
-| 6 | Fix `RegisterInScope(parent, name, ...any)` to be generic | Takes `...any` instead of type-safe generics                           |
+| 6 | Rename `Get[T]` → `GetService[T]`                         | `Get` is too generic for a DI scope                                    |
 | 7 | Redesign `Package[T](scope, ...)`                         | Unusual API shape with pre-existing `*Scope` param                     |
+| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]`          | Two signatures coexist since v4 delivered context propagation additively; v5 can collapse to the context-threading signature |
 
 ---
 
@@ -32,16 +33,21 @@ Additional v5 candidates from partially functional items:
 
 ### Middleware Context Propagation
 
-Current middleware uses `next func() error` — context is NOT propagated to the
-next middleware in the chain. This blocks timeout/cancellation middleware. A
-redesign to `next func(ctx context.Context) error` would enable context-aware
-middleware but is a breaking change to the `Middleware[T]` interface.
+**Delivered additively in v4** (2026-10-04): `ContextMiddleware[T]` threads a
+`next func(context.Context) error` through the chain, wired via
+`WithContextMiddleware[T]`; context middleware run outside plain middleware so
+derived contexts (timeouts, cancellation, tracing scopes) reach every inner
+middleware and the handler. `TimeoutMiddleware[T]` ships as the reference
+implementation (`ErrCommandTimeout`). Remaining v5 work: unify `Middleware[T]`
+and `ContextMiddleware[T]` into one signature (breaking).
 
 ### Command-Level Audit Middleware
 
-Only DI lifecycle events are currently captured by the audit log. A
-command-level audit middleware would capture command execution events (start,
-end, duration, error). See FEATURES.md "Command-level audit middleware" (PLANNED).
+The upstream recording API is implemented in ../samber-do-auditlog
+(`Plugin.RecordCommand` / `EventTypeCommand`, Unreleased). Blocked on that
+library being pushed + tagged (≥ v0.11.0); then bump cmdguard's go.mod and add
+`AuditMiddleware[T]` capturing command execution events (start, end, duration,
+error). See TODO_LIST.md "Blocked on Upstream".
 
 ### Internal Package Split
 

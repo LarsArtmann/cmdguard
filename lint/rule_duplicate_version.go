@@ -20,6 +20,7 @@ var duplicateVersionOptsMeta = linter.RuleMeta{
 	Description: "WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options",
 	Cat:         linter.CategoryCorrectness,
 	Sev:         finding.SeverityError,
+	ToolName: ToolName,
 }
 
 var duplicateVersionOptsRule = ruleFor(duplicateVersionOptsMeta, checkDuplicateVersionOpts)

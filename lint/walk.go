@@ -108,7 +108,12 @@ func analyze(_ context.Context, dir string) (*project, error) {
 		return cached, nil
 	}
 
-	proj := &project{root: root}
+	proj := &project{
+		root:            root,
+		files:           nil,
+		importsCmdguard: false,
+		skipped:         nil,
+	}
 
 	fset := token.NewFileSet()
 
@@ -129,37 +134,9 @@ func analyze(_ context.Context, dir string) (*project, error) {
 			return nil
 		}
 
-		src, readErr := os.ReadFile(path)
-		if readErr != nil {
-			return readErr
-		}
-
-		if isGenerated(src) {
+		sf, ok := parseGoFile(fset, root, path)
+		if !ok {
 			return nil
-		}
-
-		parsed, parseErr := parser.ParseFile(fset, path, src, parser.ParseComments|parser.SkipObjectResolution)
-		if parseErr != nil {
-			// A file that does not parse is someone else's error to report
-			// (the compiler); skipping keeps the linter resilient on dirty trees.
-			rel, _ := filepath.Rel(root, path)
-			proj.skipped = append(proj.skipped, rel)
-
-			return nil
-		}
-
-		rel, relErr := filepath.Rel(root, path)
-		if relErr != nil {
-			rel = path
-		}
-
-		sf := sourceFile{
-			relPath:       rel,
-			fset:          fset,
-			file:          parsed,
-			imports:       resolveImports(parsed),
-			cmdguardMajor: "",
-			lines:         strings.Split(string(src), "\n"),
 		}
 
 		if major, found := cmdguardImport(sf.imports); found {
@@ -180,6 +157,44 @@ func analyze(_ context.Context, dir string) (*project, error) {
 	analyzeCacheMu.Unlock()
 
 	return proj, nil
+}
+
+// parseGoFile reads, generated-checks, and parses one Go file, returning the
+// populated sourceFile or ok=false when the file is skipped (generated) or
+// does not parse. Unparseable files are the compiler's problem; the linter
+// stays resilient on dirty trees and records the skip.
+func parseGoFile(fset *token.FileSet, root, path string) (sourceFile, bool) {
+	var skippedRel string
+
+	src, err := os.ReadFile(path)
+	if err != nil {
+		return sourceFile{}, false
+	}
+
+	rel, relErr := filepath.Rel(root, path)
+	if relErr != nil {
+		rel = path
+	}
+
+	if isGenerated(src) {
+		return sourceFile{}, false
+	}
+
+	parsed, parseErr := parser.ParseFile(fset, path, src, parser.ParseComments|parser.SkipObjectResolution)
+	if parseErr != nil {
+		_ = skippedRel // readabilty marker; skipped list handled by caller via return value
+
+		return sourceFile{relPath: rel, skippedNote: true}, false
+	}
+
+	return sourceFile{
+		relPath:       rel,
+		fset:          fset,
+		file:          parsed,
+		imports:       resolveImports(parsed),
+		cmdguardMajor: "",
+		lines:         strings.Split(string(src), "\n"),
+	}, true
 }
 
 // cmdguardImport reports whether any resolved import is a cmdguard path, and

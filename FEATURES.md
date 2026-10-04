@@ -39,7 +39,7 @@
 | `HealthCheck()` / `HealthCheckResults()`    | 🟢 FULLY_FUNCTIONAL     | Runs health checks via DI                                                                                                           |
 | `RootCommand()`                             | 🟢 FULLY_FUNCTIONAL     | Returns underlying `*cobra.Command`                                                                                                 |
 | `Injector()`                                | 🟢 FULLY_FUNCTIONAL     | Returns `do.Injector` for raw DI access                                                                                             |
-| `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | Unsafe — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Roadmapped for removal. |
+| `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Carries `TODO(v5)` removal marker; pass defaults to `NewCLI` instead. |
 | `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                      |
 
 ### CLI Options (27 total — all non-generic except where noted)
@@ -164,7 +164,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `Override[T]`, `OverrideValue[T]`       | 🟢 FULLY_FUNCTIONAL     | Replace services for testing                                              |
 | `CloneScope(scope)`                     | 🟢 FULLY_FUNCTIONAL     | Clone scope for test isolation                                            |
 | `Get[T]`                                | 🟡 PARTIALLY_FUNCTIONAL | Name too generic — roadmapped for rename to `GetService[T]`               |
-| `RegisterInScope(parent, name, ...any)` | 🟡 PARTIALLY_FUNCTIONAL | Takes `...any` instead of being generic — roadmapped for fix              |
+| `RegisterInScope(parent, name, ...any)` | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — erases provider types (everything registers as `any`). Use `parent.Child(name)` + `do.Provide(child.Injector(), ...)`. Carries `TODO(v5)` marker. |
 | `Child(name)`                           | 🟢 FULLY_FUNCTIONAL     | Hierarchical scopes                                                       |
 | `RootScope()`                           | 🟢 FULLY_FUNCTIONAL     | Navigate to root from any child                                           |
 | `Shutdown`, `ShutdownAll`               | 🟢 FULLY_FUNCTIONAL     | Graceful service shutdown (reverse invocation order)                      |
@@ -192,8 +192,11 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `TimingMiddleware[T]`          | 🟢 FULLY_FUNCTIONAL     | Log command execution duration (`middleware.go:69`)                                                                |
 | `RecoveryMiddleware[T]`        | 🟢 FULLY_FUNCTIONAL     | Recover from panics in handlers (`middleware.go:82`)                                                               |
+| `ContextMiddleware[T]`         | 🟢 FULLY_FUNCTIONAL     | Context-aware variant — `next func(context.Context) error` threads derived contexts through the chain (`middleware.go`) |
+| `WithContextMiddleware[T](mw)` | 🟢 FULLY_FUNCTIONAL     | Wire context middleware; runs OUTSIDE plain middleware (`cli_options.go`)                                          |
+| `TimeoutMiddleware[T](d)`      | 🟢 FULLY_FUNCTIONAL     | Bounds execution to d; deadline errors match `ErrCommandTimeout` + `context.DeadlineExceeded` (`middleware.go`)    |
 | `CommandInfo.FullPath`         | 🟢 FULLY_FUNCTIONAL     | Full command path for middleware context                                                                           |
-| Custom middleware              | 🟡 PARTIALLY_FUNCTIONAL | `next func() error` — context NOT propagated to next (`middleware.go:25`). Blocks timeout/cancellation middleware. |
+| Custom middleware              | 🟢 FULLY_FUNCTIONAL     | `Middleware[T]` (`next func() error`) plus context-aware `ContextMiddleware[T]` (`next func(context.Context) error`) that propagates derived contexts to inner middleware and handlers. |
 | `spinner.Middleware[T]`        | 📦 SUB-MODULE           | Terminal spinner during execution (`spinner/spinner.go`)                                                           |
 | `telemetry.Middleware[T]`      | 📦 SUB-MODULE           | OpenTelemetry span per command (`telemetry/telemetry.go`)                                                          |
 | `flightrecorder.Middleware[T]` | 📦 SUB-MODULE           | Runtime trace snapshots on slow/error (`flightrecorder/middleware.go`)                                             |
@@ -223,7 +226,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `AuditLogServiceByName[T](cli)`       | 🟢 FULLY_FUNCTIONAL | Query a named service's audit info (`auditlog.go:171`)                   |
 | `AuditLogFailedServices[T](cli)`      | 🟢 FULLY_FUNCTIONAL | List services that failed to construct (`auditlog.go:181`)               |
 | `cli.AuditLog()` / `AuditLogReport()` | 🟢 FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot                             |
-| Command-level audit middleware        | ⚪ PLANNED          | Only DI lifecycle events captured; command-level events not implemented  |
+| Command-level audit middleware        | ⚪ PLANNED          | Upstream API ready: `Plugin.RecordCommand` implemented in ../samber-do-auditlog (unreleased). cmdguard middleware wiring blocked until that library is pushed + tagged; then bump go.mod and add `AuditMiddleware[T]`. |
 
 ---
 
@@ -380,8 +383,8 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
 | Sub-module tests            | 65 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 48 tests + 3 examples, 96.1% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 70.9%           | 🟡 Debt | Public package with assertion helpers — failure-path branches remain uncovered by design                       |
-| `examples/taskctl` coverage | 68.2%           | 🟡 Debt | Below core coverage                                                                                            |
+| `pkg/testutil` coverage     | 80.3%           | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                     |
+| `examples/taskctl` coverage | 80.1%           | 🟢 Good | Production composition (`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04)        |
 
 ---
 

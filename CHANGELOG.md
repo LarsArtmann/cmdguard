@@ -25,6 +25,15 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ---
 
+## [4.0.2] - 2026-08-06
+
+### Changed
+
+- Dependency alignment release: sub-module and core dependency bumps to align
+  with the v4.0.1 sub-module releases (no API changes).
+
+---
+
 ## [glamour/v0.2.0] - 2026-08-06
 
 ### Changed
@@ -58,6 +67,15 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 ### Changed
 
 - **BREAKING:** Migrated dependency from `cmdguard/v3` to `cmdguard/v4`. All public function return types changed from `v3.CLIOption` / `v3.Middleware[T]` to `v4.CLIOption` / `v4.Middleware[T]`. Update import aliases from `v3` to `v4`.
+
+---
+
+## [4.0.2] - 2026-08-06
+
+### Changed
+
+- Dependency alignment release: sub-module and core dependency bumps to align
+  with the v4.0.1 sub-module releases (no API changes).
 
 ---
 

@@ -25,6 +25,7 @@ var executeErrorReprintMeta = linter.RuleMeta{
 	Description: "the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure",
 	Cat:         CategoryUsage,
 	Sev:         finding.SeverityWarning,
+	ToolName: ToolName,
 }
 
 var executeErrorReprintRule = ruleFor(executeErrorReprintMeta, checkExecuteErrorReprint)

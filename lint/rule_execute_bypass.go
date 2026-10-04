@@ -25,6 +25,7 @@ var executeBypassMeta = linter.RuleMeta{
 	Description: "fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract",
 	Cat:         linter.CategoryCorrectness,
 	Sev:         finding.SeverityCritical,
+	ToolName: ToolName,
 }
 
 var executeBypassRule = ruleFor(executeBypassMeta, checkExecuteBypass)

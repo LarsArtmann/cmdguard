@@ -23,6 +23,7 @@ var setVersionRuntimeMeta = linter.RuleMeta{
 	Description: "cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand helper) instead",
 	Cat:         CategoryUsage,
 	Sev:         finding.SeverityWarning,
+	ToolName: ToolName,
 }
 
 var setVersionRuntimeRule = ruleFor(setVersionRuntimeMeta, checkSetVersionRuntime)

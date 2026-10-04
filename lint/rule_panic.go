@@ -21,6 +21,7 @@ var panicOnConstructorMeta = linter.RuleMeta{
 	Description: "panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return the error instead",
 	Cat:         linter.CategoryCorrectness,
 	Sev:         finding.SeverityError,
+	ToolName: ToolName,
 }
 
 var panicOnConstructorRule = ruleFor(panicOnConstructorMeta, checkPanicOnConstructor)

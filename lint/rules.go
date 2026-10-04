@@ -102,13 +102,17 @@ func ruleFor(meta linter.RuleMeta, check func(*project) []finding.Finding) linte
 	}
 }
 
-// newFinding builds a finding builder pre-stamped with the rule's identity,
-// mirroring linter.RuleFunc.NewFinding. Checks use this instead of the rule
-// variable so package initialization stays acyclic.
+// newFinding builds a finding builder pre-stamped with the rule's identity.
+// Checks use this instead of the rule variable so package initialization
+// stays acyclic.
 func newFinding(meta linter.RuleMeta, message string, pos finding.Position) *finding.Builder {
-	meta.ToolName = ToolName
+	builder := finding.NewBuilder(finding.RuleName(meta.ID), meta.ToolName, message, meta.Sev, pos)
 
-	return linter.RuleFunc{Meta: meta}.NewFinding(message, pos)
+	if meta.Cat != "" {
+		builder = builder.WithCategory(finding.Category(meta.Cat))
+	}
+
+	return builder
 }
 
 // pos builds a finding position for a node in a scanned file.

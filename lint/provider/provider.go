@@ -20,11 +20,13 @@ import (
 //
 //nolint:gochecknoglobals // toolsdk contract: specs self-register as package-level vars
 var Provider = toolsdk.Register(toolsdk.Spec{
-	Name:        "cmdguard-lint",
-	Description: "cmdguard usage linter: execute bypass, stale majors, constructor panics, version/option misuse, double error display",
-	Trigger:     toolsdk.OnGoModule(),
+	Name:         "cmdguard-lint",
+	Description:  "cmdguard usage linter: execute bypass, stale majors, constructor panics, version/option misuse, double error display",
+	Trigger:      toolsdk.OnGoModule(),
+	DependsOn:    nil,
 	ModuleFanOut: true,
-	Inputs:      []string{"**/*.go"},
+	Inputs:       []string{"**/*.go"},
+	Options:      nil,
 	Detect: finding.NamedDetectorFunc("cmdguard-lint", func(ctx context.Context) ([]finding.Finding, error) {
 		dir := finding.WorkingDirFromContext(ctx)
 		if dir == "" {
@@ -33,4 +35,6 @@ var Provider = toolsdk.Register(toolsdk.Spec{
 
 		return lint.Detect(ctx, dir)
 	}),
+	Repair:      nil,
+	HealthCheck: nil,
 })
