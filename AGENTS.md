@@ -59,85 +59,38 @@ nix run .#check-all
 ```
 cmdguard/
 ├── pkg/cmdguard/
-│   ├── v4/                       # v4 API (current)
-│   │   ├── cli.go                # CLI[T] struct, NewCLI, AddCommand, Execute
-│   │   ├── cli_accessors.go      # CLI accessor methods (Config, Scope, etc.)
-│   │   ├── cli_command.go        # Internal cobra wiring (cliToCobraCommand)
-│   │   ├── cli_options.go        # CLI functional options (20 in this file; more in other files)
-│   │   ├── cli_output.go         # Output format flag registration/parsing, dynamic help
-│   │   ├── cli_errors_json.go    # Structured JSON error output for --output=json
-│   │   ├── auditlog.go           # Audit-log export (ExportAuditLog, 11 formats), query helpers
-│   │   ├── command.go            # Command[T,F] struct, constructors, options, Validate
-│   │   ├── command_options.go    # CommandOption functions (WithShort, WithLong, etc.)
-│   │   ├── config.go             # Config type constraint
-│   │   ├── config_file.go        # ConfigFileLoader interface, loadConfigFile, expandConfigPath, FilterSetFields, collectKeysRecursive
-│   │   ├── config_parsing.go     # ParseFlagTags, DefaultValue (recurses into nested structs)
-│   │   ├── config_setfield.go    # SetField for config structs
-│   │   ├── docgen.go             # GenerateDocs (markdown command-tree docs)
-│   │   ├── errors.go             # Error types (CommandError, FlagError, etc.) + sentinels
-│   │   ├── errors_command.go     # Command-related sentinel errors
-│   │   ├── errors_config.go      # Config-related sentinel errors
-│   │   ├── errors_di.go          # DI-related sentinel errors
-│   │   ├── errors_flags.go       # Flag-related sentinel errors
-│   │   ├── flags.go              # FlagRegistry with struct tags
-│   │   ├── flags_parse.go        # Flag parsing logic
-│   │   ├── flags_suggest.go      # Typo suggestions (Levenshtein) for flags + commands
-│   │   ├── flags_validate.go     # Flag validation
-│   │   ├── koanf_loader.go      # KoanfLoader (YAML/TOML/JSON via koanf → JSON → loadConfigFromJSON)
-│   │   ├── completion.go         # Shell completion support
-│   │   ├── doc.go                # Package documentation
-│   │   ├── flag_helpers.go       # Flag type constraints, cloning, parsing helpers
-│   │   ├── flow_context.go       # BranchingFlowContext for command path tracking
-│   │   ├── flow_context_access.go # Flow context helpers (typed value access)
-│   │   ├── middleware.go         # Middleware chain (TimingMiddleware, RecoveryMiddleware)
-│   │   ├── prompts.go            # PromptRunner interface (huh/v2 impl in prompts/ sub-module)
-│   │   ├── scope.go              # DI scope wrapping samber/do/v2
-│   │   ├── type_handler.go       # Extensible type registry
-│   │   ├── output.go             # Rich output (OutputTable, OutputResult, shape-aware errors)
-│   │   ├── plugin.go             # Plugin system (Plugin interface, RegisterPlugin, WithPlugin)
-│   │   ├── type_handler_kinds.go # Primitive kind handlers (string/bool/int/uint/float/slice)
-│   │   ├── type_handler_intwidth.go # Narrow integer overflow validation (int8/16/32, uint8/16)
-│   │   ├── type_handler_custom.go # Custom type handlers (Duration/Enum/URL/Email/Port)
-│   │   ├── type_helpers.go       # Generic type helpers
-│   │   ├── version.go            # VersionCommand helper (prints pkg/version.Version — fleet standard: ../file-and-image-renamer/docs/FLEET-STANDARD-VERSION-STAMPS.md)
-│   │   ├── doctor.go             # DoctorCommand helper
-│   │   ├── types_duration.go     # Duration type
-│   │   ├── types_email.go        # Email type
-│   │   ├── types_enum.go         # Enum[T] type
-│   │   ├── types_filepath.go     # FilePath type
-│   │   ├── types_hostport.go     # HostPort type
-│   │   ├── types_log.go          # LogLevel type
-│   │   ├── types_port.go         # Port type
-│   │   └── types_url.go          # URL type
-├── glamour/                      # SUB-MODULE: markdown help rendering (charm.land/glamour/v2)
-├── prompts/                      # SUB-MODULE: huh/v2 interactive prompt runner
-├── spinner/                      # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
-├── telemetry/                    # SUB-MODULE: OpenTelemetry middleware
-├── flightrecorder/               # SUB-MODULE: Go runtime execution trace flight recorder (stdlib only)
-├── lint/                         # SUB-MODULE: cmdguard usage linter (go-finding + toolsdk); provider/ + cmd/cmdguard-lint/
-├── pkg/testutil/
-│   └── panic_test_helpers.go     # Shared test assertions
-├── examples/
-│   ├── taskctl/                   # Flagship example: production task manager CLI
-│   │   ├── main.go                # CLI construction, DI setup, all CLI options
-│   │   ├── commands.go            # All command definitions with options
-│   │   ├── types.go               # Config, flags, domain types, TaskStore service
-│   │   ├── main_test.go           # Comprehensive integration tests (~66 tests)
-│   │   └── README.md              # Feature matrix and usage guide
-│   └── docs-generator/            # Example: GenerateDocs usage
-├── benchmarks/                   # Performance benchmarks
-├── tests/integration/            # Integration tests
-├── docs/                         # Documentation
-├── AGENTS.md                     # This file (enduring context for AI sessions)
-├── FEATURES.md                   # Feature inventory by status
-├── TODO_LIST.md                  # Short/mid-term tasks
-├── ROADMAP.md                    # Long-term direction and raw ideas
-├── CHANGELOG.md                  # Change history per version
-├── .golangci.yml                 # Lint configuration
-├── go.work                       # Go workspace (6 modules: core + 5 sub-modules)
-├── flake.nix                     # Nix dev shell, formatter, checks
-├── flake.lock                    # Nix lock file
-└── README.md                     # User documentation
+│   ├── v4/                   # v4 API (current). Entry points: cli.go (CLI[T], NewCLI, Execute),
+│   │                         # command.go (Command[T,F]), flags.go (FlagRegistry). Supporting:
+│   │                         # cli_*.go (options, wiring, output, accessors), command_options.go,
+│   │                         # config*.go (files, parsing, SetField), errors*.go (typed errors +
+│   │                         # sentinels), flags_*.go (parse, suggest, validate), scope.go (DI),
+│   │                         # middleware.go, output.go, auditlog.go, plugin.go, completion.go,
+│   │                         # docgen.go, version.go, doctor.go, type_handler*.go (extensible
+│   │                         # type registry), types_*.go (Duration/Enum/URL/Email/Port/...),
+│   │                         # flow_context*.go (branching flow), flag_helpers.go, doc.go
+│   └── testutil/             # Shared test assertions
+├── glamour/                  # SUB-MODULE: markdown help rendering (charm.land/glamour/v2)
+├── prompts/                  # SUB-MODULE: huh/v2 interactive prompt runner
+├── spinner/                  # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
+├── telemetry/                # SUB-MODULE: OpenTelemetry middleware
+├── flightrecorder/           # SUB-MODULE: Go runtime execution trace flight recorder (stdlib only)
+├── lint/                     # SUB-MODULE: cmdguard usage linter (go-finding + toolsdk); provider/ + cmd/cmdguard-lint/
+├── examples/taskctl/         # Flagship example: production task manager CLI (~66 integration tests)
+├── examples/docs-generator/  # Example: GenerateDocs usage
+├── benchmarks/               # Performance benchmarks
+├── tests/integration/        # Integration tests
+├── docs/                     # Documentation (API.md, ADRs, status reports)
+├── website/                  # Documentation website (Astro Starlight, pnpm ≥ 11)
+├── AGENTS.md                 # This file (enduring context for AI sessions)
+├── FEATURES.md               # Feature inventory by status
+├── TODO_LIST.md              # Short/mid-term tasks
+├── ROADMAP.md                # Long-term direction and raw ideas
+├── CHANGELOG.md              # Change history per version
+├── .golangci.yml             # Lint configuration
+├── go.work                   # Go workspace (7 modules: core + 6 sub-modules)
+├── flake.nix                 # Nix dev shell, formatter, checks
+├── flake.lock                # Nix lock file
+└── README.md                 # User documentation
 ```
 
 ### Package Guidelines
@@ -370,7 +323,7 @@ go build ./...                                   # Verify build
 - **prompts** — provides the `huh/v2` implementation of the core `PromptRunner` interface; wire via `SetPromptRunner()`.
 - **flightrecorder** — wraps Go 1.25+ `runtime/trace.FlightRecorder`. Continuously buffers execution traces in memory; auto-captures `.trace` snapshots when commands are slow (`CaptureOnSlow`+`SlowThreshold`) or error (`CaptureOnError`). Public API: `WithFlightRecorder[T](cfg)` (CLIOption with internal recorder), `WithFlightRecorderRecorder[T](rec *Recorder)` (bring-your-own recorder for advanced setups), `Recorder.CaptureToWriter(ctx, w, commandName, reason)` (write snapshot to any `io.Writer`), `Recorder.Capture(ctx, commandName, reason)` (write snapshot to file). Analyze snapshots with `go tool trace snapshot.trace`. Zero external dependencies. Process-wide singleton: at most one flight recorder active at a time (runtime/trace limitation). Recorder uses a `sync.WaitGroup` so `Stop()` waits for in-flight `WriteTo`/`Capture` operations before calling `fr.Stop()`. Tests use `//nolint:paralleltest` (path-excluded in `.golangci.yml`) since the singleton constraint prevents parallel test execution.
 - **lint** — the cmdguard usage linter (`github.com/larsartmann/cmdguard/lint`), built on go-finding + go-linter-sdk; `lint/provider/` registers the BuildFlow toolsdk spec (`cmdguard-lint`, `ModuleFanOut: true`); `lint/cmd/cmdguard-lint/` is a dogfood CLI (built with cmdguard v4 itself). 6 rules (CG001 execute bypass, CG002 stale major, CG003 constructor panic, CG004 runtime SetVersion, CG005 duplicate version options, CG006 execute-error reprint), all syntactic (go/parser AST walk, no type info, no build needed). Rule table is the single source of truth in `rules.go` (`allRuleDefs()`); checks take `meta linter.RuleMeta` — do NOT reintroduce package-level rule vars (Go initialization cycles). Suppressions: `//cmdguard-lint:ignore <ID> <reason>` on the finding line or the line above; reason required. `analyze()` memoizes per-directory for the process lifetime — long-lived consumers call `ClearCache()`. `CurrentMajor` (walk.go) must be bumped when a new cmdguard major ships so CG002 tracks. Validated: timesheets corpus 18/18 findings at hand-audited locations, 0 FP on cmdguard/erraudit/go-structure-linter/branching-flow.
-- **Lint** — all 5 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list, `flightrecorder/.*_test\.go$` paralleltest exclusion (process-wide singleton).
+- **Lint** — all 6 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list, `flightrecorder/.*_test\.go$` paralleltest exclusion (process-wide singleton).
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.
