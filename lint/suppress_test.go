@@ -15,7 +15,11 @@ func TestSuppressionSameLine(t *testing.T) {
 
 	for _, f := range findings {
 		if string(f.Rule) == RuleStaleMajorImport {
-			t.Errorf("expected CG002 suppressed by same-line directive, still reported at %s:%d", f.Position.File, f.Position.Line)
+			t.Errorf(
+				"expected CG002 suppressed by same-line directive, still reported at %s:%d",
+				f.Position.File,
+				f.Position.Line,
+			)
 		}
 	}
 }
@@ -44,7 +48,11 @@ type rootCmd struct{}
 
 	for _, f := range findings {
 		if string(f.Rule) == RuleExecuteBypass {
-			t.Errorf("expected CG001 suppressed by directive above the call, still reported at %s:%d", f.Position.File, f.Position.Line)
+			t.Errorf(
+				"expected CG001 suppressed by directive above the call, still reported at %s:%d",
+				f.Position.File,
+				f.Position.Line,
+			)
 		}
 	}
 }

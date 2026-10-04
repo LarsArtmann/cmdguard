@@ -7,9 +7,10 @@ package provider
 import (
 	"context"
 
-	"github.com/larsartmann/cmdguard/lint"
 	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/go-finding/toolsdk"
+
+	"github.com/larsartmann/cmdguard/lint"
 )
 
 // Provider is the BuildFlow tool spec for cmdguard-lint. Detection runs all

@@ -20,7 +20,7 @@ var duplicateVersionOptsMeta = linter.RuleMeta{
 	Description: "WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options",
 	Cat:         linter.CategoryCorrectness,
 	Sev:         finding.SeverityError,
-	ToolName: ToolName,
+	ToolName:    ToolName,
 }
 
 var duplicateVersionOptsRule = ruleFor(duplicateVersionOptsMeta, checkDuplicateVersionOpts)
@@ -55,7 +55,8 @@ func checkDuplicateVersionOpts(proj *project) []finding.Finding {
 					hasCLIVersion = true
 				}
 
-				if file.isSelectorCall(optCall, cmdguardPath, "WithFangOptions") && containsFangVersion(file, optCall.Args) {
+				if file.isSelectorCall(optCall, cmdguardPath, "WithFangOptions") &&
+					containsFangVersion(file, optCall.Args) {
 					fangVersionInsideFangOpts = true
 				}
 			}
@@ -64,7 +65,8 @@ func checkDuplicateVersionOpts(proj *project) []finding.Finding {
 				return true
 			}
 
-			findings = append(findings, newFinding(duplicateVersionOptsMeta,
+			findings = append(findings, newFinding(
+				duplicateVersionOptsMeta,
 				"WithCLIVersion already pipes into fang.WithVersion: combining it with WithFangOptions(fang.WithVersion(...)) passes the version twice",
 				file.pos(call),
 			).

@@ -25,7 +25,7 @@ var executeErrorReprintMeta = linter.RuleMeta{
 	Description: "the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure",
 	Cat:         CategoryUsage,
 	Sev:         finding.SeverityWarning,
-	ToolName: ToolName,
+	ToolName:    ToolName,
 }
 
 var executeErrorReprintRule = ruleFor(executeErrorReprintMeta, checkExecuteErrorReprint)
@@ -63,7 +63,8 @@ func checkExecuteErrorReprint(proj *project) []finding.Finding {
 					continue
 				}
 
-				findings = append(findings, newFinding(executeErrorReprintMeta,
+				findings = append(findings, newFinding(
+					executeErrorReprintMeta,
 					"the error returned by cli.Execute has already been displayed exactly once by cmdguard; printing it again double-reports the failure",
 					file.pos(call),
 				).
@@ -80,4 +81,3 @@ func checkExecuteErrorReprint(proj *project) []finding.Finding {
 
 	return findings
 }
-

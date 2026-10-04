@@ -65,7 +65,11 @@ func isMethodCallOn(call *ast.CallExpr, recvIdent, method string) bool {
 // receiving its results. It handles both the pairwise form (`x := f()`,
 // one LHS per RHS) and the multi-value form (`v, err := f()`, two LHS for
 // one RHS): in the multi-value form all LHS identifiers belong to the call.
-func visitCallAssignments(root ast.Node, match func(*ast.CallExpr) bool, visit func(call *ast.CallExpr, resultIdents []string)) {
+func visitCallAssignments(
+	root ast.Node,
+	match func(*ast.CallExpr) bool,
+	visit func(call *ast.CallExpr, resultIdents []string),
+) {
 	ast.Inspect(root, func(n ast.Node) bool {
 		assign, ok := n.(*ast.AssignStmt)
 		if !ok {
@@ -211,7 +215,12 @@ func forFuncs(file *ast.File, fn func(body *ast.BlockStmt)) {
 // (`x, err := v4.NewCommand(...)`, `err := v4.AddCommand(...)`, and the
 // if-init form `if err := v4.AddCommand(...); err != nil`).
 func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[string]bool {
-	constructorNames := map[string]bool{"NewCLI": true, "NewCommand": true, "NewParentCommand": true, "AddCommand": true}
+	constructorNames := map[string]bool{
+		"NewCLI":           true,
+		"NewCommand":       true,
+		"NewParentCommand": true,
+		"AddCommand":       true,
+	}
 	cmdguardPath := firstCmdguardPath(f.imports)
 	errs := map[string]bool{}
 

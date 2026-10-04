@@ -21,7 +21,7 @@ var staleMajorImportMeta = linter.RuleMeta{
 	Description: "importing a frozen cmdguard major blocks all fixes and sub-module features; migrate to the current major",
 	Cat:         CategoryUsage,
 	Sev:         finding.SeverityError,
-	ToolName: ToolName,
+	ToolName:    ToolName,
 }
 
 var staleMajorImportRule = ruleFor(staleMajorImportMeta, checkStaleMajorImport)
@@ -41,7 +41,8 @@ func checkStaleMajorImport(proj *project) []finding.Finding {
 				continue
 			}
 
-			findings = append(findings, newFinding(staleMajorImportMeta,
+			findings = append(findings, newFinding(
+				staleMajorImportMeta,
 				fmt.Sprintf("cmdguard %s is frozen (no further fixes; sub-modules unreachable): migrate the import to %s", major, CurrentMajor),
 				file.pos(spec),
 			).

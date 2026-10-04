@@ -25,7 +25,7 @@ var executeBypassMeta = linter.RuleMeta{
 	Description: "fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract",
 	Cat:         linter.CategoryCorrectness,
 	Sev:         finding.SeverityCritical,
-	ToolName: ToolName,
+	ToolName:    ToolName,
 }
 
 var executeBypassRule = ruleFor(executeBypassMeta, checkExecuteBypass)
@@ -55,7 +55,8 @@ func checkExecuteBypass(proj *project) []finding.Finding {
 				return true
 			}
 
-			findings = append(findings, newFinding(executeBypassMeta,
+			findings = append(findings, newFinding(
+				executeBypassMeta,
 				"fang.Execute runs the raw cobra tree: cmdguard's cli.Execute is bypassed, so signal handling, graceful shutdown, cleanup hooks, and the single-error-display contract never engage",
 				file.pos(call),
 			).

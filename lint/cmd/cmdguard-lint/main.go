@@ -13,16 +13,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/larsartmann/go-finding"
+
 	"github.com/larsartmann/cmdguard/lint"
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 	"github.com/larsartmann/cmdguard/v4/pkg/version"
-	"github.com/larsartmann/go-finding"
 )
 
 type cliConfig struct {
-	Output string `flag:"output" default:"text" help:"Output format for findings" values:"text,json,sarif"`
-	Enable string `flag:"enable" default:"" help:"Comma-separated rule IDs to run (default: all)"`
-	Disable string `flag:"disable" default:"" help:"Comma-separated rule IDs to skip"`
+	Output  string `flag:"output"  default:"text" help:"Output format for findings"                     values:"text,json,sarif"`
+	Enable  string `flag:"enable"  default:""     help:"Comma-separated rule IDs to run (default: all)"`
+	Disable string `flag:"disable" default:""     help:"Comma-separated rule IDs to skip"`
 }
 
 type lintFlags struct {
@@ -45,7 +46,7 @@ func newApp() (*v4.CLI[cliConfig], error) {
 	cli, err := v4.NewCLI(
 		"cmdguard-lint",
 		"cmdguard usage linter",
-		cliConfig{},
+		cliConfig{Output: "text", Enable: "", Disable: ""},
 		v4.WithCLIVersion(version.Version),
 		v4.WithSignalHandling(),
 	)
@@ -55,7 +56,7 @@ func newApp() (*v4.CLI[cliConfig], error) {
 
 	lintCmd, err := v4.NewCommand(
 		"lint",
-		lintFlags{},
+		lintFlags{Dir: "."},
 		runLint,
 		v4.WithShort("Lint a directory for cmdguard usage anti-patterns"),
 		v4.WithExample("cmdguard-lint lint --dir . --output sarif"),
@@ -88,7 +89,9 @@ func newApp() (*v4.CLI[cliConfig], error) {
 
 // errFindings is returned when the lint run produced findings; cmdguard
 // displays it once and ExecuteAndExit maps it to exit code 1.
-var errFindings = errors.New("lint run produced findings") //nolint:err113 // sentinel with dynamic count in the wrapping site
+var errFindings = errors.New(
+	"lint run produced findings",
+) //nolint:err113 // sentinel with dynamic count in the wrapping site
 
 func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 	findings, err := detectFiltered(ctx, flags.Dir, cfg)
@@ -120,7 +123,11 @@ func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 	}
 
 	if len(findings) > 0 {
-		return fmt.Errorf("%d cmdguard-lint finding(s) (suppress with //cmdguard-lint:ignore <RULE> <reason>): %w", len(findings), errFindings)
+		return fmt.Errorf(
+			"%d cmdguard-lint finding(s) (suppress with //cmdguard-lint:ignore <RULE> <reason>): %w",
+			len(findings),
+			errFindings,
+		)
 	}
 
 	return nil
@@ -169,10 +176,21 @@ func idSet(value string) map[string]bool {
 
 func runRules(_ context.Context, _ *cliConfig, _ v4.NoFlags) error {
 	for _, rule := range lint.AllRules() {
-		fmt.Printf("%s  %-28s %s\n", rule.Meta.ID, rule.Meta.Name, rule.Meta.Description)
+		if _, err := fmt.Fprintf(
+			os.Stdout,
+			"%s  %-28s %s\n",
+			rule.Meta.ID,
+			rule.Meta.Name,
+			rule.Meta.Description,
+		); err != nil {
+			return fmt.Errorf("printing rule: %w", err)
+		}
 	}
 
-	fmt.Println("\nSuppress with //cmdguard-lint:ignore <RULE> <reason> on the offending line or the line above.")
+	_, err := fmt.Fprintln(
+		os.Stdout,
+		"\nSuppress with //cmdguard-lint:ignore <RULE> <reason> on the offending line or the line above.",
+	)
 
-	return nil
+	return err
 }

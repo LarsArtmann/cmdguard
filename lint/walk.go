@@ -38,8 +38,8 @@ var knownPackageNames = map[string]string{ //nolint:gochecknoglobals // static t
 // skippedDirs are directory names never descended into: vendored code is not
 // the consumer's own, testdata is fixtures, hidden dirs are tooling state.
 var skippedDirs = map[string]bool{ //nolint:gochecknoglobals // static table
-	"vendor":    true,
-	"testdata":  true,
+	"vendor":       true,
+	"testdata":     true,
 	"node_modules": true,
 }
 
@@ -134,8 +134,16 @@ func analyze(_ context.Context, dir string) (*project, error) {
 			return nil
 		}
 
-		sf, ok := parseGoFile(fset, root, path)
-		if !ok {
+		sf, parseErr := parseGoFile(fset, root, path)
+		if parseErr != nil {
+			if rel, relErr := filepath.Rel(root, path); relErr == nil {
+				proj.skipped = append(proj.skipped, rel)
+			}
+
+			return nil
+		}
+
+		if sf == nil {
 			return nil
 		}
 
@@ -144,7 +152,7 @@ func analyze(_ context.Context, dir string) (*project, error) {
 			proj.importsCmdguard = true
 		}
 
-		proj.files = append(proj.files, sf)
+		proj.files = append(proj.files, *sf)
 
 		return nil
 	})
@@ -159,16 +167,24 @@ func analyze(_ context.Context, dir string) (*project, error) {
 	return proj, nil
 }
 
-// parseGoFile reads, generated-checks, and parses one Go file, returning the
-// populated sourceFile or ok=false when the file is skipped (generated) or
-// does not parse. Unparseable files are the compiler's problem; the linter
-// stays resilient on dirty trees and records the skip.
-func parseGoFile(fset *token.FileSet, root, path string) (sourceFile, bool) {
-	var skippedRel string
-
+// parseGoFile reads, generated-checks, and parses one Go file. It returns
+// (file, nil) on success, (zero, nil) for files skipped silently (generated
+// or unreadable), and (zero, err) when the file does not parse — the caller
+// records those in project.skipped; the compiler is the right reporter for
+// syntax errors, the linter just stays resilient on dirty trees.
+func parseGoFile(fset *token.FileSet, root, path string) (*sourceFile, error) {
 	src, err := os.ReadFile(path)
 	if err != nil {
-		return sourceFile{}, false
+		return nil, nil
+	}
+
+	if isGenerated(src) {
+		return nil, nil
+	}
+
+	parsed, parseErr := parser.ParseFile(fset, path, src, parser.ParseComments|parser.SkipObjectResolution)
+	if parseErr != nil {
+		return nil, parseErr
 	}
 
 	rel, relErr := filepath.Rel(root, path)
@@ -176,25 +192,14 @@ func parseGoFile(fset *token.FileSet, root, path string) (sourceFile, bool) {
 		rel = path
 	}
 
-	if isGenerated(src) {
-		return sourceFile{}, false
-	}
-
-	parsed, parseErr := parser.ParseFile(fset, path, src, parser.ParseComments|parser.SkipObjectResolution)
-	if parseErr != nil {
-		_ = skippedRel // readabilty marker; skipped list handled by caller via return value
-
-		return sourceFile{relPath: rel, skippedNote: true}, false
-	}
-
-	return sourceFile{
+	return &sourceFile{
 		relPath:       rel,
 		fset:          fset,
 		file:          parsed,
 		imports:       resolveImports(parsed),
 		cmdguardMajor: "",
 		lines:         strings.Split(string(src), "\n"),
-	}, true
+	}, nil
 }
 
 // cmdguardImport reports whether any resolved import is a cmdguard path, and

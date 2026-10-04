@@ -21,7 +21,7 @@ var panicOnConstructorMeta = linter.RuleMeta{
 	Description: "panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return the error instead",
 	Cat:         linter.CategoryCorrectness,
 	Sev:         finding.SeverityError,
-	ToolName: ToolName,
+	ToolName:    ToolName,
 }
 
 var panicOnConstructorRule = ruleFor(panicOnConstructorMeta, checkPanicOnConstructor)
@@ -66,7 +66,8 @@ func checkPanicOnConstructor(proj *project) []finding.Finding {
 						continue
 					}
 
-					findings = append(findings, newFinding(panicOnConstructorMeta,
+					findings = append(findings, newFinding(
+						panicOnConstructorMeta,
 						"panic on a cmdguard constructor error re-introduces the panic cmdguard removed by design: constructors return errors so registration failures surface as checkable errors",
 						file.pos(stmt),
 					).
