@@ -3,7 +3,7 @@ module github.com/larsartmann/cmdguard/lint
 go 1.27
 
 require (
-	github.com/larsartmann/cmdguard/v4 v4.0.2
+	github.com/larsartmann/cmdguard/v4 v4.1.0
 	github.com/larsartmann/go-finding v1.13.0
 	github.com/larsartmann/go-finding/toolsdk v1.14.0
 	github.com/larsartmann/go-linter-sdk v0.3.1
@@ -12,7 +12,7 @@ require (
 require (
 	charm.land/fang/v2 v2.0.1 // indirect
 	charm.land/lipgloss/v2 v2.0.6 // indirect
-	github.com/a-h/templ v0.3.1020 // indirect
+	github.com/a-h/templ v0.3.1070 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20261001125412-878653296cfd // indirect

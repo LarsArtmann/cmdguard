@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	charm.land/huh/v2 v2.0.3
-	github.com/larsartmann/cmdguard/v4 v4.0.2
+	github.com/larsartmann/cmdguard/v4 v4.1.0
 )
 
 require (
@@ -12,7 +12,7 @@ require (
 	charm.land/bubbletea/v2 v2.0.10 // indirect
 	charm.land/fang/v2 v2.0.1 // indirect
 	charm.land/lipgloss/v2 v2.0.6 // indirect
-	github.com/a-h/templ v0.3.1020 // indirect
+	github.com/a-h/templ v0.3.1070 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
