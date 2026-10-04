@@ -40,6 +40,7 @@ func TestCLISetVersion(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
+		//cmdguard-lint:ignore CG004 this test exercises the SetVersion API itself
 		cli.SetVersion("2.0.0")
 
 		if cli.RootCommand().Version != "2.0.0" {

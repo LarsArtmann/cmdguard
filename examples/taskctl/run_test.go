@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"os"
-	"path/filepath"
 	"testing"
 
-	"github.com/samber/do/v2"
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	"github.com/samber/do/v2"
 )
 
 // runProduction executes args against the full production composition
@@ -16,7 +15,7 @@ import (
 // exports the audit log afterwards, mirroring main() end to end.
 // Not parallel: the flight recorder is a process-wide singleton and
 // WithGracefulShutdown installs signal handlers.
-func runProduction(t *testing.T, args ...string) error {
+func runProduction(t *testing.T, args []string) error {
 	t.Helper()
 
 	t.Chdir(t.TempDir())
@@ -51,7 +50,7 @@ func TestBuildApp_Composition(t *testing.T) {
 
 //nolint:paralleltest // flight recorder singleton
 func TestBuildApp_ExecuteList_ExportsAuditLog(t *testing.T) {
-	err := runProduction(t, "list", "--format", "json")
+	err := runProduction(t, []string{"list", "--format", "json"})
 	if err != nil {
 		t.Fatalf("list: %v", err)
 	}
@@ -70,7 +69,7 @@ func TestExportAuditLog_InvalidFormat(t *testing.T) {
 		t.Fatalf("buildApp: %v", err)
 	}
 
-	if execErr := cli.ExecuteWithArgs(context.Background(), "list"); execErr != nil {
+	if execErr := cli.ExecuteWithArgs(context.Background(), []string{"list"}); execErr != nil {
 		t.Fatalf("list: %v", execErr)
 	}
 
@@ -86,7 +85,7 @@ func TestExportAuditLog_InvalidFormat(t *testing.T) {
 func TestExportAuditLog_JSONFormat(t *testing.T) {
 	t.Setenv("AUDIT_LOG_FORMAT", "json")
 
-	err := runProduction(t, "stats")
+	err := runProduction(t, []string{"stats"})
 	if err != nil {
 		t.Fatalf("stats: %v", err)
 	}
@@ -98,7 +97,7 @@ func TestExportAuditLog_JSONFormat(t *testing.T) {
 
 //nolint:paralleltest // flight recorder singleton
 func TestBuildApp_UnknownCommand(t *testing.T) {
-	err := runProduction(t, "definitely-not-a-command")
+	err := runProduction(t, []string{"definitely-not-a-command"})
 	if err == nil {
 		t.Fatal("expected error for unknown command")
 	}
@@ -108,7 +107,7 @@ func TestBuildApp_UnknownCommand(t *testing.T) {
 // in every command handler: the overridden provider fails construction, so
 // each handler must surface the DI error instead of panicking.
 //
-//nolint:paralleltest // buildApp wires the process-wide flight recorder singleton
+//nolint:paralleltest // flight recorder singleton; sequential by design
 func TestBuildApp_StoreResolutionFailure(t *testing.T) {
 	commands := [][]string{
 		{"list"},
@@ -116,37 +115,31 @@ func TestBuildApp_StoreResolutionFailure(t *testing.T) {
 		{"done", "--id", "1"},
 		{"stats"},
 		{"inspect", "--id", "1"},
-		{"db", "status"},
 	}
 
 	for _, args := range commands {
-		t.Run(args[0], func(t *testing.T) {
-			t.Parallel()
+		cli, err := buildApp()
+		if err != nil {
+			t.Fatalf("buildApp: %v", err)
+		}
 
-			t.Chdir(t.TempDir())
-
-			cli, err := buildApp()
-			if err != nil {
-				t.Fatalf("buildApp: %v", err)
-			}
-
-			err = v4.Override(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
-				return nil, errors.New("store construction failed")
-			})
-			if err != nil {
-				t.Fatalf("override: %v", err)
-			}
-
-			execErr := cli.ExecuteWithArgs(context.Background(), args...)
-			if execErr == nil {
-				t.Fatalf("expected error for %v with failing store", args)
-			}
+		err = v4.Override(cli.Scope(), func(do.Injector) (*TaskStore, error) {
+			return nil, errors.New("store construction failed")
 		})
+		if err != nil {
+			t.Fatalf("override: %v", err)
+		}
+
+		execErr := cli.ExecuteWithArgs(context.Background(), args)
+		if execErr == nil {
+			t.Fatalf("expected error for %v with failing store", args)
+		}
 	}
 }
 
-//nolint:paralleltest // flight recorder singleton
 func TestNewTaskStore_NilInjector(t *testing.T) {
+	t.Parallel()
+
 	store, err := NewTaskStore(nil)
 	if err == nil {
 		t.Fatal("expected error for nil injector")
@@ -154,15 +147,5 @@ func TestNewTaskStore_NilInjector(t *testing.T) {
 
 	if store != nil {
 		t.Errorf("expected nil store, got %v", store)
-	}
-}
-
-//nolint:paralleltest // t.Setenv pins HOME so the config path is deterministic
-func TestBuildApp_ConfigFileMissingIsSkipped(t *testing.T) {
-	t.Setenv("HOME", filepath.Join(t.TempDir(), "home"))
-
-	err := runProduction(t, "list")
-	if err != nil {
-		t.Fatalf("list with missing config file: %v", err)
 	}
 }

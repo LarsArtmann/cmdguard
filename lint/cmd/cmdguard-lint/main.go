@@ -30,6 +30,18 @@ type lintFlags struct {
 }
 
 func main() {
+	cli, err := newApp()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
+}
+
+// newApp builds the CLI. Split from main for in-process testing via
+// ExecuteWithArgs.
+func newApp() (*v4.CLI[cliConfig], error) {
 	cli, err := v4.NewCLI(
 		"cmdguard-lint",
 		"cmdguard usage linter",
@@ -38,11 +50,10 @@ func main() {
 		v4.WithSignalHandling(),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("building CLI: %w", err)
 	}
 
-	lintCmd, lintErr := v4.NewCommand(
+	lintCmd, err := v4.NewCommand(
 		"lint",
 		lintFlags{},
 		runLint,
@@ -50,33 +61,29 @@ func main() {
 		v4.WithExample("cmdguard-lint lint --dir . --output sarif"),
 		v4.WithExample("cmdguard-lint lint --disable CG004,CG006"),
 	)
-	if lintErr != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", lintErr)
-		os.Exit(1)
+	if err != nil {
+		return nil, fmt.Errorf("building lint command: %w", err)
 	}
 
-	rulesCmd, rulesErr := v4.NewCommand(
+	rulesCmd, err := v4.NewCommand(
 		"rules",
 		v4.NoFlags{},
 		runRules,
 		v4.WithShort("List available rules"),
 	)
-	if rulesErr != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", rulesErr)
-		os.Exit(1)
+	if err != nil {
+		return nil, fmt.Errorf("building rules command: %w", err)
 	}
 
 	if err := v4.AddCommand(cli, lintCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("registering lint command: %w", err)
 	}
 
 	if err := v4.AddCommand(cli, rulesCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("registering rules command: %w", err)
 	}
 
-	cli.ExecuteAndExit(context.Background())
+	return cli, nil
 }
 
 // errFindings is returned when the lint run produced findings; cmdguard
