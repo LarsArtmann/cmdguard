@@ -329,7 +329,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Optional Sub-Modules
 
-All 5 sub-modules are independently importable. Core has **zero** dependencies on these.
+All 6 sub-modules are independently importable. Core has **zero** dependencies on these.
 Each compiles cleanly with matching v4 API signatures. All have basic test coverage.
 
 | Sub-module       | Key API                                                                                                           | Dependency                       | Version  | Status           |
@@ -339,6 +339,24 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`                                                                    | `charm.land/lipgloss/v2`         | v2.0.5   | 🟢 📦 SUB-MODULE |
 | `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`                                                                           | `go.opentelemetry.io/otel/trace` | v1.44.0  | 🟢 📦 SUB-MODULE |
 | `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`, `WithFlightRecorderRecorder[T]()`, `Capture()`, `CaptureToWriter()` | _(stdlib `runtime/trace`)_       | Go 1.25+ | 🟢 📦 SUB-MODULE |
+| `lint`           | `Detect()`, `AllRules()`, `NewRegistry()`, `provider.Register()`                                                    | `go-finding` + `go-linter-sdk`    | v1.13.0 / v0.3.1 | 🟢 📦 SUB-MODULE |
+
+### Usage Linter (`lint`)
+
+Static analyzer for cmdguard anti-patterns, built on go-finding + go-linter-sdk.
+One detector core behind three distribution layers: library (`lint.Detect`),
+BuildFlow provider (`lint/provider`), and a dogfood CLI (`lint/cmd/cmdguard-lint`,
+built with cmdguard v4 itself).
+
+| Capability | Status | Notes |
+| ---------- | ------ | ----- |
+| Rules CG001–CG006 (execute bypass, stale major, constructor panic, runtime SetVersion, duplicate version opts, error reprint) | 🟢 DONE | All syntactic (AST walk, no build needed); single source of truth in `allRuleDefs()` |
+| In-source suppressions `//cmdguard-lint:ignore <ID> <reason>` | 🟢 DONE | Reason required, rule-scoped, applies to finding line or line above |
+| text / JSON / SARIF output | 🟢 DONE | SARIF round-trips via `finding.FindingsFromSARIF` (tested) |
+| `--enable` / `--disable` filtering | 🟢 DONE | Client-side filter over the single-pass detect |
+| Corpus validation | 🟢 DONE | timesheets 18/18 at hand-audited locations, CG002 15/15 exact vs `rg`, 0 FP on 4 negative corpora |
+| Cross-file dataflow (CG003/CG004/CG006 are file-scoped) | 🔴 PLANNED | TODO_LIST L-section |
+| Baseline / ratchet mode | 🔴 PLANNED | TODO_LIST L-section |
 
 ---
 

@@ -200,7 +200,7 @@ func TestLintCommandSARIFOutput(t *testing.T) {
 				} `json:"driver"`
 			} `json:"tool"`
 			Results []struct {
-				RuleID string `json:"ruleId"`
+				RuleID string `json:"ruleId"` //nolint:tagliatelle // SARIF 2.1.0 mandates camelCase keys
 			} `json:"results"`
 		} `json:"runs"`
 	}
