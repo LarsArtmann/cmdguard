@@ -25,6 +25,27 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ---
 
+## [lint/v0.1.0] - 2026-10-04
+
+First stable release of the `lint` sub-module: a usage linter for cmdguard-based CLIs.
+
+- 6 syntactic rules (CG001–CG006): execute bypass (`fang.Execute` around cmdguard),
+  stale major import, constructor panic (`MustNew*`), runtime `SetVersion`,
+  duplicate version options, execute-error reprint
+- Pure `go/parser` AST walk — no type info, no build required
+- BuildFlow provider (`lint/provider`, toolsdk spec `cmdguard-lint`, module fan-out)
+- Dogfood CLI `cmd/cmdguard-lint` (built with cmdguard v4 itself) with text, JSON,
+  and SARIF 2.1.0 output (round-trips via `finding.FindingsFromSARIF`)
+- Suppressions: `//cmdguard-lint:ignore <ID> <reason>` (reason required) on the
+  finding line or the line above
+- Per-directory memoized analysis with `ClearCache()` for long-lived processes
+- `CurrentMajor` constant tracks the latest cmdguard major for CG002
+- Validated: timesheets corpus 18/18 findings at hand-audited locations, 0 false
+  positives on cmdguard/erraudit/go-structure-linter/branching-flow
+- 34 test functions; golangci-lint clean under the repo config
+
+---
+
 ## [4.0.2] - 2026-08-06
 
 ### Changed
