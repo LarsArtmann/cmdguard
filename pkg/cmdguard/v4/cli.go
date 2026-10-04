@@ -344,7 +344,10 @@ func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
 
 	cli.registeredCmds[cmd.spec.use] = struct{}{}
 
-	cobraCmd, err := cliToCobraCommand(cli.config, cmd, cli.extractMiddleware(), cli.extractContextMiddleware(), cli.spec.envPrefix)
+	cobraCmd, err := cliToCobraCommand(
+		cli.config, cmd,
+		cli.extractMiddleware(), cli.extractContextMiddleware(), cli.spec.envPrefix,
+	)
 	if err != nil {
 		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}

@@ -355,6 +355,16 @@ func ScopedProvider[T any](
 
 // RegisterInScope registers providers in a child scope.
 // Returns the child scope for further operations.
+//
+// Deprecated: RegisterInScope erases provider types — every provider is
+// registered as func(do.Injector) (any, error), so services resolve only via
+// do.Call[any] and two providers collide on the same any key. Create the
+// child scope yourself and register typed providers directly:
+//
+//	child := parent.Child(name)
+//	do.Provide(child.Injector(), func(i do.Injector) (*MyService, error) { ... })
+//
+// TODO(v5): replace with a generic RegisterInScope[T] (naming-review 2026-07-18 follow-up).
 func RegisterInScope(parent *Scope, name string, providers ...any) (*Scope, error) {
 	if parent == nil {
 		return nil, fmt.Errorf(

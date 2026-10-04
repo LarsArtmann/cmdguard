@@ -24,6 +24,13 @@ func (cli *CLI[T]) Config() *T {
 }
 
 // SetConfig updates the configuration.
+//
+// Deprecated: SetConfig mutates the CLI after construction without
+// re-initializing the FlagRegistry, so registered flags keep the defaults
+// captured at NewCLI time — the replaced config silently diverges from what
+// flag parsing will produce. Pass the desired defaults to NewCLI instead.
+// SetConfig will be removed in v5 (naming-review 2026-07-18 follow-up).
+// TODO(v5): remove SetConfig — unsafe post-construction mutation.
 func (cli *CLI[T]) SetConfig(cfg T) {
 	cli.config = &cfg
 }
