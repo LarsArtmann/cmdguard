@@ -30,11 +30,16 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # pnpm was never installed here (npm→pnpm migration gap): setup-node
+      # only provides node, and the cache key still pointed at the removed
+      # package-lock.json. corepack reads packageManager from package.json.
+      - run: corepack enable
+
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
           cache: pnpm
-          cache-dependency-path: website/package-lock.json
+          cache-dependency-path: website/pnpm-lock.yaml
 
       - run: pnpm install
 
