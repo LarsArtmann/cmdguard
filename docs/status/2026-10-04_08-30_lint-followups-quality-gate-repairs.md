@@ -110,6 +110,10 @@ a listed follow-up ("run `nix flake check`") turned out to be broken repo-wide.
    clean — direct `golangci-lint run ./...` reports 0 issues. Remedy started:
    `golangci-lint cache clean` (still deleting at report time — large dir).
    Needs: re-run `check-all` once the cache clean finishes.
+   > ✅ RESOLVED 2026-10-04 (later session): cache clean completed (needed a
+   > retry on the /mnt/buildcache mount); `nix run .#check-all` exit 0 —
+   > build, race tests (15 pkgs), lint 0 issues × 7 modules, flake check,
+   > tidy × 7 all green.
 2. **`buildflow format` exit=69 (pre-existing, environmental, not mine):**
    - 8 failed step executions, all `license-check` fan-out: `go-licenses`
      E1004 "Package net/mail does not have module info" — go-licenses is
@@ -123,11 +127,23 @@ a listed follow-up ("run `nix flake check`") turned out to be broken repo-wide.
 
 ## c) NOT STARTED (deliberate / gated — unchanged from prior session)
 
-- Tag `lint/v0.1.0` (TODO_LIST L1, AWAIT-USER).
-- Wire `lint/provider` into the BuildFlow repo (L2, AWAIT-USER).
-- Restore dead pre-commit hook (`buildflow precommit install` changes
-   `core.hooksPath` git config — approval required).
-- CHANGELOG.md entry for the sub-module (ships with the tag).
+> Session-3 resolution: ALL four gates below were approved and executed on
+> 2026-10-04 (later session) — see §g annotations.
+
+- ✅ Tag `lint/v0.1.0` — DONE (TODO_LIST L1): CHANGELOG entry, annotated tag
+  pushed, proxy-verified via scratch consumer (`go get` + build + run),
+  GitHub release published.
+- ✅ Wire `lint/provider` into the BuildFlow repo (L2) — DONE: blank import
+  in `sdk_imports.go`, require v0.1.0 + pinned local replace, `go work
+  vendor` + vendorHash, wiring regression test, inventory guards updated
+  (ToolCmdguardLint, moduleScopedGoToolSpecs, edge snapshot 279→287),
+  `docs --check` green (provider count 118).
+- ✅ Restore dead pre-commit hook — DONE: root cause was the GLOBAL
+  `core.hooksPath=.githooks` (fleet convention) while this repo lacked the
+  directory. Shipped a tracked `.githooks/pre-commit` (fleet pattern) running
+  BuildFlow pre-commit mode; advisory until the license-check Go 1.27 fleet
+  fix lands. Verified live on its own commit.
+- ✅ CHANGELOG.md entry for the sub-module (ships with the tag) — DONE.
 - Prior report §f items 12–50: cross-file dataflow, baseline mode, provider
   options, golangci plugin layer, fuzzing, benchmarks, coverage gaps,
   CG007–CG009 candidates, suppression AST/expiry, ternary exit codes, etc.
@@ -224,7 +240,12 @@ a listed follow-up ("run `nix flake check`") turned out to be broken repo-wide.
 
 1. **BuildFlow wiring:** import `lint/provider` into the BuildFlow repo now
    (fleet activation), or dogfood locally + tag first?
+   > ✅ ANSWERED: wire now. Done — see §c.
 2. **Pre-commit hook:** restore via `buildflow precommit install`? It changes
    `core.hooksPath` git config — I will not touch git config without approval.
+   > ✅ ANSWERED: yes. Root cause turned out to be the global hooksPath
+   > convention; fixed via tracked `.githooks/pre-commit` instead (no git
+   > config change needed) — see §c.
 3. **Tag timing:** cut `lint/v0.1.0` immediately so timesheets can adopt, or
    wait for your review of rule severities/messages first?
+   > ✅ ANSWERED: tag now. Done — see §c.

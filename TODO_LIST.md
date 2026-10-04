@@ -43,11 +43,19 @@ Harvested from `docs/status/2026-10-04_07-11_cmdguard-lint-sub-module-build.md` 
 
 | #  | Task                                                                                     | Notes                                                                                                                    | Priority | Status       |
 | -- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------- | ------------ |
-| L1 | Tag `lint/v0.1.0`                                                                         | Via go-release skill; timesheets adoption gate. Gated on user review of severities/messages                               | High     | 🟡 AWAIT-USER |
-| L2 | Wire `lint/provider` into the BuildFlow repo                                              | Self-registering toolsdk provider; gated on user decision (dogfood+tag first vs wire now)                                 | High     | 🟡 AWAIT-USER |
+| L1 | Tag `lint/v0.1.0`                                                                         | DONE 2026-10-04: user approved; CHANGELOG entry, annotated tag pushed, proxy-verified (scratch consumer go get + build + run), GitHub release published                                                   | High     | ✅ DONE       |
+| L2 | Wire `lint/provider` into the BuildFlow repo                                              | DONE 2026-10-04: user approved wire-now; blank import in sdk_imports.go, require v0.1.0 + pinned replace, vendor + vendorHash, wiring test + inventory guards, docs --check green (provider 118)                                                   | High     | ✅ DONE       |
 | L3 | Cross-file dataflow for CG003/CG004/CG006                                                 | Name tracing is file-scoped today; constructor in one file + use in another is missed                                     | Medium   | 🔴 TODO      |
 | L4 | Baseline / ratchet mode                                                                   | Save snapshot of current findings so adoption is incremental (old pass, new fail)                                         | Medium   | 🔴 TODO      |
 | L5 | Provider options (enable/disable via BuildFlow config)                                    | `provider.Register` spec has no options surface yet                                                                       | Medium   | 🔴 TODO      |
 | L6 | golangci-lint module-plugin distribution layer                                            | `.custom-gcl.yml` wiring per go-humanize-linter pattern                                                                   | Low      | 🔴 TODO      |
 | L7 | Auto-generate README rule table from `allRuleDefs()`                                      | Prevents doc drift when rules change (golden test or `go:generate`)                                                       | Low      | 🔴 TODO      |
 | L8 | Bump `CurrentMajor` in `lint/walk.go` when cmdguard v5 ships                              | Standing duty; CG002 tracks the constant. Rule IDs CG001–CG006 are load-bearing (suppressions key on them) — never renumber | —        | 🔵 STANDING  |
+
+---
+
+## Security
+
+| #  | Task                                        | Notes                                                                                                                                                                                                              | Priority | Status |
+| -- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------ |
+| S1 | Triage the 16 Dependabot vulnerabilities    | Reported by GitHub on push 2026-10-04 (11 high, 4 moderate, 1 low) on the default branch. Likely transitive deps (examples/website included). Run `gh api repos/LarsArtmann/cmdguard/dependabot/alerts` or check the security tab; `buildflow update` / dependency bumps may clear most. | High     | 🔴 TODO |
