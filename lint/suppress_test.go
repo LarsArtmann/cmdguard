@@ -27,8 +27,12 @@ func TestSuppressionSameLine(t *testing.T) {
 func TestSuppressionLineAboveWithCmdguard(t *testing.T) {
 	t.Parallel()
 
-	findings := detectOn(t, map[string]string{
-		"guard.go": "package main\n\nimport \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = v4.NoFlags{}\n",
+	guard := "package main\n\nimport \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = v4.NoFlags{}\n"
+
+	// Control: the same fixture without the directive must trigger CG001,
+	// proving the suppression pass below is load-bearing, not vacuous.
+	control := detectOn(t, map[string]string{
+		"guard.go": guard,
 		"main.go": `package main
 
 import (
@@ -36,17 +40,33 @@ import (
 )
 
 func main() {
-	//cmdguard-lint:ignore CG001 errorfamily owns display; verified in AUDIT-12
-	_ = fang.Execute(nil, rootOfCLI())
+	cli := newCLI()
+	root := cli.RootCommand()
+	_ = fang.Execute(nil, root)
 }
-
-func rootOfCLI() *rootCmd { return nil }
-
-type rootCmd struct{}
 `,
 	})
 
-	for _, f := range findings {
+	assertFinding(t, control, RuleExecuteBypass, "main.go", 10)
+
+	suppressed := detectOn(t, map[string]string{
+		"guard.go": guard,
+		"main.go": `package main
+
+import (
+	"charm.land/fang/v2"
+)
+
+func main() {
+	cli := newCLI()
+	root := cli.RootCommand()
+	//cmdguard-lint:ignore CG001 errorfamily owns display; verified in AUDIT-12
+	_ = fang.Execute(nil, root)
+}
+`,
+	})
+
+	for _, f := range suppressed {
 		if string(f.Rule) == RuleExecuteBypass {
 			t.Errorf(
 				"expected CG001 suppressed by directive above the call, still reported at %s:%d",
