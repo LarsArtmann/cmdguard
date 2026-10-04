@@ -100,12 +100,16 @@ jobs:
 
       - name: Deploy to Firebase Hosting
         working-directory: website
+        # Skip cleanly until the repo has the FIREBASE_SERVICE_ACCOUNT
+        # secret: an empty key would only fail the deploy with an auth
+        # error instead.
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
         run: |
-          # pnpm refuses global installs unless its global bin is already on
-          # PATH, and $GITHUB_PATH only affects LATER steps - so export it
-          # inline (pnpm's Linux default, as the error message prints it).
+          # pnpm refuses global installs unless its global bin is already
+          # on PATH, and $GITHUB_PATH only affects LATER steps - export it
+          # inline. pnpm's configured global bin is PNPM_HOME/bin on Linux.
           export PNPM_HOME="$HOME/.local/share/pnpm"
-          export PATH="$PNPM_HOME:$PATH"
+          export PATH="$PNPM_HOME/bin:$PATH"
           pnpm add -g firebase-tools
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > "$RUNNER_TEMP/gcp-key.json"
           firebase deploy --only hosting:cmdguard --project lars-software
