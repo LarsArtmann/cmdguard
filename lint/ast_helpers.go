@@ -60,6 +60,57 @@ func isMethodCallOn(call *ast.CallExpr, recvIdent, method string) bool {
 	return ok && ident.Name == recvIdent
 }
 
+// visitCallAssignments walks every assignment in root whose right side is a
+// call matching match, invoking visit with the call and the identifiers
+// receiving its results. It handles both the pairwise form (`x := f()`,
+// one LHS per RHS) and the multi-value form (`v, err := f()`, two LHS for
+// one RHS): in the multi-value form all LHS identifiers belong to the call.
+func visitCallAssignments(root ast.Node, match func(*ast.CallExpr) bool, visit func(call *ast.CallExpr, resultIdents []string)) {
+	ast.Inspect(root, func(n ast.Node) bool {
+		assign, ok := n.(*ast.AssignStmt)
+		if !ok {
+			return true
+		}
+
+		for i, rhs := range assign.Rhs {
+			call, ok := rhs.(*ast.CallExpr)
+			if !ok || !match(call) {
+				continue
+			}
+
+			visit(call, lhsIdentsFor(assign, i))
+		}
+
+		return true
+	})
+}
+
+// lhsIdentsFor returns the LHS identifiers that receive the result of the
+// call at assign.Rhs[i].
+func lhsIdentsFor(assign *ast.AssignStmt, rhsIndex int) []string {
+	var idents []string
+
+	if len(assign.Lhs) > len(assign.Rhs) {
+		// Multi-value form: every LHS identifier receives one result of the
+		// single call (e.g. `v, err := NewCLI(...)`).
+		for _, lhs := range assign.Lhs {
+			if ident, ok := lhs.(*ast.Ident); ok {
+				idents = append(idents, ident.Name)
+			}
+		}
+
+		return idents
+	}
+
+	if rhsIndex < len(assign.Lhs) {
+		if ident, ok := assign.Lhs[rhsIndex].(*ast.Ident); ok {
+			idents = append(idents, ident.Name)
+		}
+	}
+
+	return idents
+}
+
 // callArgIsRootCommand reports whether any argument of call is a
 // `x.RootCommand()` selector call or an identifier previously assigned from
 // one (tracked in rootCommandIdents).
@@ -85,59 +136,31 @@ func (f *sourceFile) callArgIsRootCommand(call *ast.CallExpr, rootCommandIdents 
 func collectRootCommandIdents(file *ast.File) map[string]bool {
 	id := map[string]bool{}
 
-	ast.Inspect(file, func(n ast.Node) bool {
-		assign, ok := n.(*ast.AssignStmt)
-		if !ok || len(assign.Lhs) != len(assign.Rhs) {
-			return true
+	visitCallAssignments(file, func(call *ast.CallExpr) bool {
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+
+		return ok && sel.Sel != nil && sel.Sel.Name == "RootCommand"
+	}, func(_ *ast.CallExpr, resultIdents []string) {
+		for _, name := range resultIdents {
+			id[name] = true
 		}
-
-		for i, rhs := range assign.Rhs {
-			call, ok := rhs.(*ast.CallExpr)
-			if !ok || call.Fun == nil {
-				continue
-			}
-
-			if sel, ok := call.Fun.(*ast.SelectorExpr); ok && sel.Sel != nil && sel.Sel.Name == "RootCommand" {
-				if ident, ok := assign.Lhs[i].(*ast.Ident); ok {
-					id[ident.Name] = true
-				}
-			}
-		}
-
-		return true
 	})
 
 	return id
 }
 
 // cliVars returns identifiers assigned from `<cmdguard>.NewCLI(...)` calls in
-// the file (the first LHS identifier of each assignment). These are treated
-// as cmdguard CLI values for the dataflow-lite rules CG004 and CG006.
+// the file (the value identifier of each assignment). These are treated as
+// cmdguard CLI values for the dataflow-lite rules CG004 and CG006.
 func (f *sourceFile) cliVars() map[string]bool {
 	vars := map[string]bool{}
 
-	ast.Inspect(f.file, func(n ast.Node) bool {
-		assign, ok := n.(*ast.AssignStmt)
-		if !ok || len(assign.Lhs) != len(assign.Rhs) {
-			return true
+	visitCallAssignments(f.file, func(call *ast.CallExpr) bool {
+		return f.isSelectorCall(call, firstCmdguardPath(f.imports), "NewCLI")
+	}, func(_ *ast.CallExpr, resultIdents []string) {
+		if len(resultIdents) > 0 {
+			vars[resultIdents[0]] = true
 		}
-
-		for i, rhs := range assign.Rhs {
-			call, ok := rhs.(*ast.CallExpr)
-			if !ok {
-				continue
-			}
-
-			if !f.isSelectorCall(call, firstCmdguardPath(f.imports), "NewCLI") {
-				continue
-			}
-
-			if ident, ok := assign.Lhs[i].(*ast.Ident); ok {
-				vars[ident.Name] = true
-			}
-		}
-
-		return true
 	})
 
 	return vars
@@ -186,7 +209,7 @@ func forFuncs(file *ast.File, fn func(body *ast.BlockStmt)) {
 // cmdguardConstructorErrIdents walks a function body and returns the names of
 // identifiers that receive the error return of a cmdguard constructor call
 // (`x, err := v4.NewCommand(...)`, `err := v4.AddCommand(...)`, and the
-// if-init form `if err := v4.NewCLI(...); err != nil`).
+// if-init form `if err := v4.AddCommand(...); err != nil`).
 func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[string]bool {
 	constructorNames := map[string]bool{"NewCLI": true, "NewCommand": true, "NewParentCommand": true, "AddCommand": true}
 	cmdguardPath := firstCmdguardPath(f.imports)
@@ -196,38 +219,60 @@ func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[strin
 		return errs
 	}
 
-	ast.Inspect(body, func(n ast.Node) bool {
-		assign, ok := n.(*ast.AssignStmt)
-		if !ok || len(assign.Lhs) != len(assign.Rhs) {
-			return true
+	visitCallAssignments(body, func(call *ast.CallExpr) bool {
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok || sel.Sel == nil || !constructorNames[sel.Sel.Name] {
+			return false
 		}
 
-		for _, rhs := range assign.Rhs {
-			call, ok := rhs.(*ast.CallExpr)
-			if !ok {
-				continue
-			}
-
-			sel, ok := call.Fun.(*ast.SelectorExpr)
-			if !ok || sel.Sel == nil || !constructorNames[sel.Sel.Name] {
-				continue
-			}
-
-			if !f.selectorFrom(sel, cmdguardPath) {
-				continue
-			}
-
-			// Error result is the last LHS identifier (NewCLI/NewCommand
-			// return (value, error); AddCommand returns just error).
-			if ident, ok := assign.Lhs[len(assign.Lhs)-1].(*ast.Ident); ok {
-				errs[ident.Name] = true
-			}
+		return f.selectorFrom(sel, cmdguardPath)
+	}, func(_ *ast.CallExpr, resultIdents []string) {
+		// Error result is the last identifier (NewCLI/NewCommand return
+		// (value, error); AddCommand returns just error, which is also last).
+		if len(resultIdents) > 0 {
+			errs[resultIdents[len(resultIdents)-1]] = true
 		}
-
-		return true
 	})
 
 	return errs
+}
+
+// collectExecuteErrIdents returns identifiers assigned from
+// `<cliVar>.Execute(...)` calls for the given CLI variables.
+func collectExecuteErrIdents(file *ast.File, cliVars map[string]bool) map[string]bool {
+	errs := map[string]bool{}
+
+	visitCallAssignments(file, func(call *ast.CallExpr) bool {
+		for name := range cliVars {
+			if isMethodCallOn(call, name, "Execute") {
+				return true
+			}
+		}
+
+		return false
+	}, func(_ *ast.CallExpr, resultIdents []string) {
+		for _, name := range resultIdents {
+			errs[name] = true
+		}
+	})
+
+	return errs
+}
+
+// isFmtPrintCall reports whether call is one of the fmt display functions
+// (Print, Println, Printf, Fprint, Fprintln, Fprintf).
+func isFmtPrintCall(file *sourceFile, call *ast.CallExpr) bool {
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok || sel.Sel == nil {
+		return false
+	}
+
+	switch sel.Sel.Name {
+	case "Print", "Println", "Printf", "Fprint", "Fprintln", "Fprintf":
+		return file.selectorFrom(sel, "fmt")
+	default:
+		return false
+	}
 }
 
 // condIsErrNotNil reports whether cond has the shape `IDENT != nil` or
@@ -239,17 +284,16 @@ func condIsErrNotNil(cond ast.Expr) (string, bool) {
 	}
 
 	left, lok := bin.X.(*ast.Ident)
-	rightNil, rok := bin.Y.(*ast.Ident)
+	right, rok := bin.Y.(*ast.Ident)
 
-	if lok && rok && rightNil.Name == "nil" {
-		return left.Name, true
-	}
+	if lok && rok {
+		if right.Name == "nil" && left.Name != "nil" {
+			return left.Name, true
+		}
 
-	leftNil, lok2 := bin.X.(*ast.Ident)
-	right, rok2 := bin.Y.(*ast.Ident)
-
-	if lok2 && rok2 && leftNil.Name == "nil" {
-		return right.Name, true
+		if left.Name == "nil" && right.Name != "nil" {
+			return right.Name, true
+		}
 	}
 
 	return "", false
