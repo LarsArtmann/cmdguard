@@ -212,6 +212,8 @@ go build ./...                                   # Verify build
 
 **Exclusion count:** 4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v5)`) + 1 `paralleltest` path exclusion for `flightrecorder/.*_test\.go$` (process-wide singleton). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
 
+**Exclusion linter names must match the enabled linter name.** The enable list uses `exhaustruct_v5`; the path exclusions for `pkg/cmdguard/`, `examples/`, `benchmarks/`, `tests/` must also say `exhaustruct_v5`. When the linter was renamed (v5 migration), the exclusion entries kept the dead name `exhaustruct` and silently matched nothing — 41 findings appeared repo-wide (fixed 2026-10-04). After any linter rename in the enable list, grep the exclusions for the old name.
+
 ### v4 Design Principles
 
 1. **Single type parameter on CLI only** — `CLI[T]` parameterizes on config. `CLIOption` and `CommandOption` are **non-generic** (`func(*spec)`); per-command flag types flow through `Command[T,F]`.

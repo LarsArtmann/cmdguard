@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 
 	output "github.com/larsartmann/go-output"
 )
@@ -129,11 +130,21 @@ func (cli *CLI[T]) writeFormattedError(err error) {
 		return
 	}
 
-	switch cli.spec.outputFormat {
-	case output.FormatJSON, output.FormatJSONL, output.FormatYAML, output.FormatTOML:
-		writeErr := writeJSONError(os.Stderr, err)
-		if writeErr != nil {
-			_, _ = fmt.Fprintln(os.Stderr, err.Error())
-		}
+	// Formats in which errors are emitted as structured JSON envelopes
+	// instead of plain text.
+	machineReadable := []output.Format{
+		output.FormatJSON,
+		output.FormatJSONL,
+		output.FormatYAML,
+		output.FormatTOML,
+	}
+
+	if !slices.Contains(machineReadable, cli.spec.outputFormat) {
+		return
+	}
+
+	writeErr := writeJSONError(os.Stderr, err)
+	if writeErr != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err.Error())
 	}
 }
