@@ -11,21 +11,21 @@
 The next major version will focus on API clarity and correctness. The following
 breaking changes are tracked with `TODO(v5)` markers in source code:
 
-| # | Change                                             | Rationale                                                      | Source Location         |
-| - | -------------------------------------------------- | -------------------------------------------------------------- | ----------------------- |
-| 1 | Rename `CommandInfo` → `CommandMetadata`           | "Info" suffix is vague; `Metadata` is precise                  | `middleware.go`         |
-| 2 | Rename `TypeHandler` → `TypeCodec`                 | "Handler" is generic; `Codec` captures parse/default dual role | `type_handler.go`       |
-| 3 | Rename `PromptRunner` → `HuhPrompter` (or similar) | "Runner" suffix is generic                                     | `prompts/prompts.go`    |
-| 4 | Remove `SetConfig(cfg)` — now `// Deprecated:`    | Unsafe post-construction mutation without re-initializing FlagRegistry | `cli_accessors.go` |
-| 5 | Replace `RegisterInScope` with generic variant — now `// Deprecated:` | Erases provider types; use `Child` + `do.Provide` meanwhile | `scope.go`      |
+| # | Change                                                                | Rationale                                                              | Source Location      |
+| - | --------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------- |
+| 1 | Rename `CommandInfo` → `CommandMetadata`                              | "Info" suffix is vague; `Metadata` is precise                          | `middleware.go`      |
+| 2 | Rename `TypeHandler` → `TypeCodec`                                    | "Handler" is generic; `Codec` captures parse/default dual role         | `type_handler.go`    |
+| 3 | Rename `PromptRunner` → `HuhPrompter` (or similar)                    | "Runner" suffix is generic                                             | `prompts/prompts.go` |
+| 4 | Remove `SetConfig(cfg)` — now `// Deprecated:`                        | Unsafe post-construction mutation without re-initializing FlagRegistry | `cli_accessors.go`   |
+| 5 | Replace `RegisterInScope` with generic variant — now `// Deprecated:` | Erases provider types; use `Child` + `do.Provide` meanwhile            | `scope.go`           |
 
 Additional v5 candidates from partially functional items:
 
-| # | Change                                                    | Rationale                                                              |
-| - | --------------------------------------------------------- | ---------------------------------------------------------------------- |
-| 6 | Rename `Get[T]` → `GetService[T]`                         | `Get` is too generic for a DI scope                                    |
-| 7 | Redesign `Package[T](scope, ...)`                         | Unusual API shape with pre-existing `*Scope` param                     |
-| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]`          | Two signatures coexist since v4 delivered context propagation additively; v5 can collapse to the context-threading signature |
+| # | Change                                           | Rationale                                                                                                                    |
+| - | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| 6 | Rename `Get[T]` → `GetService[T]`                | `Get` is too generic for a DI scope                                                                                          |
+| 7 | Redesign `Package[T](scope, ...)`                | Unusual API shape with pre-existing `*Scope` param                                                                           |
+| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]` | Two signatures coexist since v4 delivered context propagation additively; v5 can collapse to the context-threading signature |
 
 ---
 

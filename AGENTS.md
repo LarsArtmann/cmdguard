@@ -165,13 +165,13 @@ cmdguard/
 
 Each sub-module is independently importable — core has **zero** dependencies on these libraries.
 
-| Sub-module       | Library                          | Version  | Purpose                         |
-| ---------------- | -------------------------------- | -------- | ------------------------------- |
-| `glamour`        | `charm.land/glamour/v2`          | v2.0.1   | Markdown help rendering         |
-| `prompts`        | `charm.land/huh/v2`              | v2.0.3   | Interactive prompts             |
-| `spinner`        | `charm.land/lipgloss/v2`         | v2.0.5   | Terminal spinner                |
-| `telemetry`      | `go.opentelemetry.io/otel/trace` | v1.44.0  | OpenTelemetry spans             |
-| `flightrecorder` | _(stdlib `runtime/trace`)_       | Go 1.25+ | Execution trace flight recorder |
+| Sub-module       | Library                                               | Version                    | Purpose                                          |
+| ---------------- | ----------------------------------------------------- | -------------------------- | ------------------------------------------------ |
+| `glamour`        | `charm.land/glamour/v2`                               | v2.0.1                     | Markdown help rendering                          |
+| `prompts`        | `charm.land/huh/v2`                                   | v2.0.3                     | Interactive prompts                              |
+| `spinner`        | `charm.land/lipgloss/v2`                              | v2.0.5                     | Terminal spinner                                 |
+| `telemetry`      | `go.opentelemetry.io/otel/trace`                      | v1.44.0                    | OpenTelemetry spans                              |
+| `flightrecorder` | _(stdlib `runtime/trace`)_                            | Go 1.25+                   | Execution trace flight recorder                  |
 | `lint`           | `go-finding` + `go-finding/toolsdk` + `go-linter-sdk` | v1.13.0 / v1.14.0 / v0.3.1 | cmdguard usage linter (BuildFlow provider + CLI) |
 
 ### GOEXPERIMENT=jsonv2

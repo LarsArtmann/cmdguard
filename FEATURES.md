@@ -26,21 +26,21 @@
 
 ### CLI[T] — Construction & Execution
 
-| Feature                                     | Status                  | Notes                                                                                                                               |
-| ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                    |
-| `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                     |
-| `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                      |
-| `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                      |
-| `ExecuteAndExit(ctx)`                       | 🟢 FULLY_FUNCTIONAL     | Run + `os.Exit` (respects `ExitCoder`) (`cli.go`)                                                                                   |
-| `Scope()`                                   | 🟢 FULLY_FUNCTIONAL     | Returns DI scope (`cli_accessors.go`)                                                                                               |
-| `Config()`                                  | 🟢 FULLY_FUNCTIONAL     | Returns typed config `*T`                                                                                                           |
-| `Shutdown(ctx)`                             | 🟢 FULLY_FUNCTIONAL     | Graceful DI service shutdown                                                                                                        |
-| `HealthCheck()` / `HealthCheckResults()`    | 🟢 FULLY_FUNCTIONAL     | Runs health checks via DI                                                                                                           |
-| `RootCommand()`                             | 🟢 FULLY_FUNCTIONAL     | Returns underlying `*cobra.Command`                                                                                                 |
-| `Injector()`                                | 🟢 FULLY_FUNCTIONAL     | Returns `do.Injector` for raw DI access                                                                                             |
+| Feature                                     | Status                  | Notes                                                                                                                                                                                     |
+| ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                                                                          |
+| `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                                                                           |
+| `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                                                                            |
+| `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                                                                            |
+| `ExecuteAndExit(ctx)`                       | 🟢 FULLY_FUNCTIONAL     | Run + `os.Exit` (respects `ExitCoder`) (`cli.go`)                                                                                                                                         |
+| `Scope()`                                   | 🟢 FULLY_FUNCTIONAL     | Returns DI scope (`cli_accessors.go`)                                                                                                                                                     |
+| `Config()`                                  | 🟢 FULLY_FUNCTIONAL     | Returns typed config `*T`                                                                                                                                                                 |
+| `Shutdown(ctx)`                             | 🟢 FULLY_FUNCTIONAL     | Graceful DI service shutdown                                                                                                                                                              |
+| `HealthCheck()` / `HealthCheckResults()`    | 🟢 FULLY_FUNCTIONAL     | Runs health checks via DI                                                                                                                                                                 |
+| `RootCommand()`                             | 🟢 FULLY_FUNCTIONAL     | Returns underlying `*cobra.Command`                                                                                                                                                       |
+| `Injector()`                                | 🟢 FULLY_FUNCTIONAL     | Returns `do.Injector` for raw DI access                                                                                                                                                   |
 | `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Carries `TODO(v5)` removal marker; pass defaults to `NewCLI` instead. |
-| `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                      |
+| `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                                                                            |
 
 ### CLI Options (27 total — all non-generic except where noted)
 
@@ -155,21 +155,21 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ## Dependency Injection
 
-| Feature                                 | Status                  | Notes                                                                     |
-| --------------------------------------- | ----------------------- | ------------------------------------------------------------------------- |
-| `NewScope(name)`                        | 🟢 FULLY_FUNCTIONAL     | Creates DI scope wrapping samber/do/v2                                    |
-| `NewScopeWithOpts(name, opts)`          | 🟢 FULLY_FUNCTIONAL     | Scope with custom `do.InjectorOpts`                                       |
-| `Provide[T]`, `ProvideValue[T]`         | 🟢 FULLY_FUNCTIONAL     | Register services                                                         |
-| `Invoke[T]`, `InvokeNamed[T]`           | 🟢 FULLY_FUNCTIONAL     | Get services                                                              |
-| `Override[T]`, `OverrideValue[T]`       | 🟢 FULLY_FUNCTIONAL     | Replace services for testing                                              |
-| `CloneScope(scope)`                     | 🟢 FULLY_FUNCTIONAL     | Clone scope for test isolation                                            |
-| `Get[T]`                                | 🟡 PARTIALLY_FUNCTIONAL | Name too generic — roadmapped for rename to `GetService[T]`               |
+| Feature                                 | Status                  | Notes                                                                                                                                                              |
+| --------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NewScope(name)`                        | 🟢 FULLY_FUNCTIONAL     | Creates DI scope wrapping samber/do/v2                                                                                                                             |
+| `NewScopeWithOpts(name, opts)`          | 🟢 FULLY_FUNCTIONAL     | Scope with custom `do.InjectorOpts`                                                                                                                                |
+| `Provide[T]`, `ProvideValue[T]`         | 🟢 FULLY_FUNCTIONAL     | Register services                                                                                                                                                  |
+| `Invoke[T]`, `InvokeNamed[T]`           | 🟢 FULLY_FUNCTIONAL     | Get services                                                                                                                                                       |
+| `Override[T]`, `OverrideValue[T]`       | 🟢 FULLY_FUNCTIONAL     | Replace services for testing                                                                                                                                       |
+| `CloneScope(scope)`                     | 🟢 FULLY_FUNCTIONAL     | Clone scope for test isolation                                                                                                                                     |
+| `Get[T]`                                | 🟡 PARTIALLY_FUNCTIONAL | Name too generic — roadmapped for rename to `GetService[T]`                                                                                                        |
 | `RegisterInScope(parent, name, ...any)` | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — erases provider types (everything registers as `any`). Use `parent.Child(name)` + `do.Provide(child.Injector(), ...)`. Carries `TODO(v5)` marker. |
-| `Child(name)`                           | 🟢 FULLY_FUNCTIONAL     | Hierarchical scopes                                                       |
-| `RootScope()`                           | 🟢 FULLY_FUNCTIONAL     | Navigate to root from any child                                           |
-| `Shutdown`, `ShutdownAll`               | 🟢 FULLY_FUNCTIONAL     | Graceful service shutdown (reverse invocation order)                      |
-| `HealthCheck`, `HealthCheckWithContext` | 🟢 FULLY_FUNCTIONAL     | Lifecycle management                                                      |
-| `Package[T](scope, ...)`                | 🟡 PARTIALLY_FUNCTIONAL | Unusual API shape (pre-existing `*Scope` param) — roadmapped for redesign |
+| `Child(name)`                           | 🟢 FULLY_FUNCTIONAL     | Hierarchical scopes                                                                                                                                                |
+| `RootScope()`                           | 🟢 FULLY_FUNCTIONAL     | Navigate to root from any child                                                                                                                                    |
+| `Shutdown`, `ShutdownAll`               | 🟢 FULLY_FUNCTIONAL     | Graceful service shutdown (reverse invocation order)                                                                                                               |
+| `HealthCheck`, `HealthCheckWithContext` | 🟢 FULLY_FUNCTIONAL     | Lifecycle management                                                                                                                                               |
+| `Package[T](scope, ...)`                | 🟡 PARTIALLY_FUNCTIONAL | Unusual API shape (pre-existing `*Scope` param) — roadmapped for redesign                                                                                          |
 
 ---
 
@@ -188,18 +188,18 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ## Middleware
 
-| Feature                        | Status                  | Notes                                                                                                              |
-| ------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `TimingMiddleware[T]`          | 🟢 FULLY_FUNCTIONAL     | Log command execution duration (`middleware.go:69`)                                                                |
-| `RecoveryMiddleware[T]`        | 🟢 FULLY_FUNCTIONAL     | Recover from panics in handlers (`middleware.go:82`)                                                               |
-| `ContextMiddleware[T]`         | 🟢 FULLY_FUNCTIONAL     | Context-aware variant — `next func(context.Context) error` threads derived contexts through the chain (`middleware.go`) |
-| `WithContextMiddleware[T](mw)` | 🟢 FULLY_FUNCTIONAL     | Wire context middleware; runs OUTSIDE plain middleware (`cli_options.go`)                                          |
-| `TimeoutMiddleware[T](d)`      | 🟢 FULLY_FUNCTIONAL     | Bounds execution to d; deadline errors match `ErrCommandTimeout` + `context.DeadlineExceeded` (`middleware.go`)    |
-| `CommandInfo.FullPath`         | 🟢 FULLY_FUNCTIONAL     | Full command path for middleware context                                                                           |
-| Custom middleware              | 🟢 FULLY_FUNCTIONAL     | `Middleware[T]` (`next func() error`) plus context-aware `ContextMiddleware[T]` (`next func(context.Context) error`) that propagates derived contexts to inner middleware and handlers. |
-| `spinner.Middleware[T]`        | 📦 SUB-MODULE           | Terminal spinner during execution (`spinner/spinner.go`)                                                           |
-| `telemetry.Middleware[T]`      | 📦 SUB-MODULE           | OpenTelemetry span per command (`telemetry/telemetry.go`)                                                          |
-| `flightrecorder.Middleware[T]` | 📦 SUB-MODULE           | Runtime trace snapshots on slow/error (`flightrecorder/middleware.go`)                                             |
+| Feature                        | Status              | Notes                                                                                                                                                                                   |
+| ------------------------------ | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TimingMiddleware[T]`          | 🟢 FULLY_FUNCTIONAL | Log command execution duration (`middleware.go:69`)                                                                                                                                     |
+| `RecoveryMiddleware[T]`        | 🟢 FULLY_FUNCTIONAL | Recover from panics in handlers (`middleware.go:82`)                                                                                                                                    |
+| `ContextMiddleware[T]`         | 🟢 FULLY_FUNCTIONAL | Context-aware variant — `next func(context.Context) error` threads derived contexts through the chain (`middleware.go`)                                                                 |
+| `WithContextMiddleware[T](mw)` | 🟢 FULLY_FUNCTIONAL | Wire context middleware; runs OUTSIDE plain middleware (`cli_options.go`)                                                                                                               |
+| `TimeoutMiddleware[T](d)`      | 🟢 FULLY_FUNCTIONAL | Bounds execution to d; deadline errors match `ErrCommandTimeout` + `context.DeadlineExceeded` (`middleware.go`)                                                                         |
+| `CommandInfo.FullPath`         | 🟢 FULLY_FUNCTIONAL | Full command path for middleware context                                                                                                                                                |
+| Custom middleware              | 🟢 FULLY_FUNCTIONAL | `Middleware[T]` (`next func() error`) plus context-aware `ContextMiddleware[T]` (`next func(context.Context) error`) that propagates derived contexts to inner middleware and handlers. |
+| `spinner.Middleware[T]`        | 📦 SUB-MODULE       | Terminal spinner during execution (`spinner/spinner.go`)                                                                                                                                |
+| `telemetry.Middleware[T]`      | 📦 SUB-MODULE       | OpenTelemetry span per command (`telemetry/telemetry.go`)                                                                                                                               |
+| `flightrecorder.Middleware[T]` | 📦 SUB-MODULE       | Runtime trace snapshots on slow/error (`flightrecorder/middleware.go`)                                                                                                                  |
 
 ---
 
@@ -217,15 +217,15 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ## Audit Log
 
-| Feature                               | Status              | Notes                                                                    |
-| ------------------------------------- | ------------------- | ------------------------------------------------------------------------ |
-| `WithAuditLog(plugin)`                | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                 |
-| `ExportAuditLog[T](cli, cfg)`         | 🟢 FULLY_FUNCTIONAL | Write audit snapshot to file or `io.Writer` (`auditlog.go:123`)          |
-| `AuditLogFormat` strong type          | 🟢 FULLY_FUNCTIONAL | Validated enum with `ParseAuditLogFormat()` + `Valid()`                  |
-| 11 export formats                     | 🟢 FULLY_FUNCTIONAL | html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree |
-| `AuditLogServiceByName[T](cli)`       | 🟢 FULLY_FUNCTIONAL | Query a named service's audit info (`auditlog.go:171`)                   |
-| `AuditLogFailedServices[T](cli)`      | 🟢 FULLY_FUNCTIONAL | List services that failed to construct (`auditlog.go:181`)               |
-| `cli.AuditLog()` / `AuditLogReport()` | 🟢 FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot                             |
+| Feature                               | Status              | Notes                                                                                                                                                                                                                  |
+| ------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WithAuditLog(plugin)`                | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                                                                                                                               |
+| `ExportAuditLog[T](cli, cfg)`         | 🟢 FULLY_FUNCTIONAL | Write audit snapshot to file or `io.Writer` (`auditlog.go:123`)                                                                                                                                                        |
+| `AuditLogFormat` strong type          | 🟢 FULLY_FUNCTIONAL | Validated enum with `ParseAuditLogFormat()` + `Valid()`                                                                                                                                                                |
+| 11 export formats                     | 🟢 FULLY_FUNCTIONAL | html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree                                                                                                                                               |
+| `AuditLogServiceByName[T](cli)`       | 🟢 FULLY_FUNCTIONAL | Query a named service's audit info (`auditlog.go:171`)                                                                                                                                                                 |
+| `AuditLogFailedServices[T](cli)`      | 🟢 FULLY_FUNCTIONAL | List services that failed to construct (`auditlog.go:181`)                                                                                                                                                             |
+| `cli.AuditLog()` / `AuditLogReport()` | 🟢 FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot                                                                                                                                                                           |
 | Command-level audit middleware        | ⚪ PLANNED          | Upstream API ready: `Plugin.RecordCommand` implemented in ../samber-do-auditlog (unreleased). cmdguard middleware wiring blocked until that library is pushed + tagged; then bump go.mod and add `AuditMiddleware[T]`. |
 
 ---
@@ -383,8 +383,8 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
 | Sub-module tests            | 65 across all 5 | 🟢 Good | All sub-modules have test coverage (flightrecorder: 48 tests + 3 examples, 96.1% coverage)                     |
 | Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 80.3%           | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                     |
-| `examples/taskctl` coverage | 85.9%           | 🟢 Good | Production composition (`run`/`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04)   |
+| `pkg/testutil` coverage     | 80.3%           | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                    |
+| `examples/taskctl` coverage | 85.9%           | 🟢 Good | Production composition (`run`/`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04) |
 
 ---
 

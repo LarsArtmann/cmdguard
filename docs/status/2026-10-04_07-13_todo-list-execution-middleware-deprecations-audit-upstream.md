@@ -17,17 +17,17 @@ concurrent session and the re-apply failed on a mid-air collision.
 
 All verified against source before removal — none were re-done blindly:
 
-| #  | Item                                            | Evidence                                                        |
-| -- | ----------------------------------------------- | --------------------------------------------------------------- |
-| D3 | CONTRIBUTING.md v3→v4 drift                     | Lines 101/115 already say v4; fixed in commit `ef694eb`         |
-| D4 | ERROR_REFERENCE.md title v2→v4                  | Line 1 already "cmdguard v4"                                    |
-| D5 | docs/MIGRATION_v3_v4.md missing                 | File exists, complete (171 lines)                               |
-| D6 | manpage note in MIGRATION_v2_v3.md §3           | Note present at lines 116-118                                   |
-| D7 | git corruption (fsck broken links, reflog)      | `git fsck --no-dangling` clean; reflog entry `3e483b3b` gone    |
-| D8 | Tag flightrecorder v0.1.0                       | `flightrecorder/v0.1.0` tag exists                              |
-| D9 | Lost flightrecorder godoc examples              | `ExampleRecorder_CaptureToWriter` (:62) + `ExampleWithFlightRecorderRecorder` (:95) exist |
-| D10| `go tool trace` parseability test               | `TestTraceSnapshot_IsParseableByGoToolTrace` (recorder_test.go:687) |
-| D1 | pkg/testutil coverage                           | Measured 80.3% (was 49.6%) — already improved by a prior session |
+| #   | Item                                       | Evidence                                                                                  |
+| --- | ------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| D3  | CONTRIBUTING.md v3→v4 drift                | Lines 101/115 already say v4; fixed in commit `ef694eb`                                   |
+| D4  | ERROR_REFERENCE.md title v2→v4             | Line 1 already "cmdguard v4"                                                              |
+| D5  | docs/MIGRATION_v3_v4.md missing            | File exists, complete (171 lines)                                                         |
+| D6  | manpage note in MIGRATION_v2_v3.md §3      | Note present at lines 116-118                                                             |
+| D7  | git corruption (fsck broken links, reflog) | `git fsck --no-dangling` clean; reflog entry `3e483b3b` gone                              |
+| D8  | Tag flightrecorder v0.1.0                  | `flightrecorder/v0.1.0` tag exists                                                        |
+| D9  | Lost flightrecorder godoc examples         | `ExampleRecorder_CaptureToWriter` (:62) + `ExampleWithFlightRecorderRecorder` (:95) exist |
+| D10 | `go tool trace` parseability test          | `TestTraceSnapshot_IsParseableByGoToolTrace` (recorder_test.go:687)                       |
+| D1  | pkg/testutil coverage                      | Measured 80.3% (was 49.6%) — already improved by a prior session                          |
 
 ### P5 — Middleware context propagation (NEW v4 feature, non-breaking)
 
@@ -60,9 +60,9 @@ All verified against source before removal — none were re-done blindly:
 
 - `main.go` restructured for testability: `run(ctx, args)` (full production
   composition incl. recorder lifecycle) + `buildApp(rec)` + `newProductionRecorder()`
-  + `exportAuditLog(cli)` + thin `main()`; taskctl now demonstrates the explicit
-  `WithFlightRecorderRecorder` lifecycle (the sub-module's documented pattern)
-  instead of the never-stopping `WithFlightRecorder`.
+  - `exportAuditLog(cli)` + thin `main()`; taskctl now demonstrates the explicit
+    `WithFlightRecorderRecorder` lifecycle (the sub-module's documented pattern)
+    instead of the never-stopping `WithFlightRecorder`.
 - `run_test.go`: composition test, audit export (html/json/bogus-format/no-plugin/
   write-failure), unknown command, store-construction failure across 5 commands
   (covers every `resolveStore` error branch), nil-injector guard, recorder config.
@@ -71,6 +71,7 @@ All verified against source before removal — none were re-done blindly:
 ### F1 — Command-level audit middleware (upstream half)
 
 Implemented in ../samber-do-auditlog (local, Unreleased):
+
 - `EventTypeCommand "command"` + label/color meta + `Event.IsCommand()`.
 - `Recorder.RecordCommand(scopeID, scopeName, commandName, phase, durationMs, err)`
   and `Plugin.RecordCommand(...)` — command events enter the event stream only;
@@ -154,9 +155,9 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
    reproduced across 6+ runs before mine. Go build/test/race/lint steps green.
 8. **lint/ sub-module is mid-refactor by a concurrent session** (working-tree
    changes I didn't author + a parse error in `lint/cmd/cmdguard-lint/main.go`
-   + their own status file written 2 min ago). Workspace-wide builds that fan
-   into ./lint fail through no fault of this session's changes. Left untouched
-   per "never revert changes you didn't author".
+   - their own status file written 2 min ago). Workspace-wide builds that fan
+     into ./lint fail through no fault of this session's changes. Left untouched
+     per "never revert changes you didn't author".
 
 ---
 

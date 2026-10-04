@@ -197,7 +197,11 @@ func TestContextMiddleware_DerivedContextFlowsThroughWholeChain(t *testing.T) {
 	}
 
 	if seenByPlain != "from-first" {
-		t.Errorf("handler saw %v, want %q (derived context must reach plain middleware and handler)", seenByPlain, "from-first")
+		t.Errorf(
+			"handler saw %v, want %q (derived context must reach plain middleware and handler)",
+			seenByPlain,
+			"from-first",
+		)
 	}
 
 	if seenByFirst != nil {
@@ -211,10 +215,14 @@ func TestContextMiddleware_ErrorPropagation(t *testing.T) {
 	sentinel := errors.New("boom")
 
 	cli, err := NewCLI(
-		"test", "Test CLI", ctxMiddlewareConfig{},
-		WithContextMiddleware(func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
-			return next(ctx)
-		}),
+		"test",
+		"Test CLI",
+		ctxMiddlewareConfig{},
+		WithContextMiddleware(
+			func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
+				return next(ctx)
+			},
+		),
 		WithFang(false),
 	)
 	testutil.AssertNoError(t, err)
@@ -338,9 +346,11 @@ func TestWithContextMiddleware_TypeMismatchYieldsNoMiddleware(t *testing.T) {
 
 	// A context middleware registered with the wrong config type must be
 	// silently ignored (sealed-interface extraction yields nil), not panic.
-	mismatched := WithContextMiddleware(func(_ context.Context, _ *otherConfig, _ CommandInfo, next func(context.Context) error) error {
-		return errors.New("must not run")
-	})
+	mismatched := WithContextMiddleware(
+		func(_ context.Context, _ *otherConfig, _ CommandInfo, next func(context.Context) error) error {
+			return errors.New("must not run")
+		},
+	)
 
 	cli, err := NewCLI(
 		"test", "Test CLI", ctxMiddlewareConfig{},

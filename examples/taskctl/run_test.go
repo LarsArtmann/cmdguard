@@ -72,7 +72,6 @@ func TestBuildApp_ExecuteList_ExportsAuditLog(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // t.Setenv
 func TestExportAuditLog_InvalidFormat(t *testing.T) {
 	t.Setenv("AUDIT_LOG_FORMAT", "bogus")
 
@@ -93,7 +92,6 @@ func TestExportAuditLog_InvalidFormat(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // t.Setenv
 func TestExportAuditLog_JSONFormat(t *testing.T) {
 	t.Setenv("AUDIT_LOG_FORMAT", "json")
 
@@ -149,7 +147,6 @@ func TestBuildApp_StoreResolutionFailure(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // t.Setenv
 func TestExportAuditLog_NoPluginIsNoOp(t *testing.T) {
 	t.Setenv("AUDIT_LOG_FORMAT", "json")
 
@@ -168,7 +165,6 @@ func TestExportAuditLog_NoPluginIsNoOp(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest // t.Chdir
 func TestExportAuditLog_WriteFailure(t *testing.T) {
 	if os.Geteuid() == 0 {
 		t.Skip("root ignores directory permissions; read-only dir test is meaningless")

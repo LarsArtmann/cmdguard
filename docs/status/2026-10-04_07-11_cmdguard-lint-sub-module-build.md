@@ -9,12 +9,14 @@
 ## a) FULLY DONE (verified)
 
 ### Research & design
+
 - Read the full deep-dive report; extracted the 9 findings (F1–F9) and mapped each to lintable/unlintable with explicit rationale (absence-of-usage findings deliberately excluded — FP-prone, not file:line-attributable).
 - Studied `go-finding` (Finding/Builder/Detector/Position/Suppression APIs, module layout), `toolsdk` (Spec contract, `Register`, `OnGoModule()`, ModuleFanOut, per-field semantics), `go-linter-sdk` v0.3.1 (Rule/RuleFunc/Registry, `DetectorFromRegistry`, `FilterRules`, exit codes) — all against **published tags**, not local HEADs (caught `CategoryBestPractice` existing only locally; used the SDK's documented custom-category mechanism instead).
 - Studied this repo's sub-module pattern (root-level dir + own go.mod + version-pinned replace + go.work entry) and the erraudit provider as the reference provider implementation.
 - Mechanism decision (per linter-building skill): pure **AST walker** (go/parser, no type info, no build required) — all six rules are syntax-shape + dataflow-lite.
 
 ### The `lint/` sub-module (`github.com/larsartmann/cmdguard/lint`)
+
 - **6 rules**, each with origin citation, trust signals, severity, confidence:
   - **CG001 execute-bypass** (critical): `fang.Execute` receiving `RootCommand()` (direct call or ident), gated on project importing cmdguard — deep-dive F1.
   - **CG002 stale-major-import** (error): import of a cmdguard major < CurrentMajor — F2.
@@ -29,6 +31,7 @@
 - **CLI** (`lint/cmd/cmdguard-lint/`): dogfoods cmdguard v4 itself (WithCLIVersion, WithSignalHandling, ExecuteAndExit, values-tag enum); `lint --dir --output text|json|sarif --enable --disable` + `rules`; findings → exit 1 with single-display error contract honored; `newApp()` split for ExecuteWithArgs testing.
 
 ### Tests (all green, `-race`)
+
 - Walker tests (skips, alias/major resolution, majorOf, packageNameFor, cache clear).
 - Per-rule positive + negative fixture tests (exact file:line assertions).
 - Suppression tests (same-line, requires-reason, wrong-rule, parse table).
@@ -36,16 +39,19 @@
 - CLI tests via `ExecuteWithArgs` (clean→pass, findings→fail with message, rules list).
 
 ### Validation (linter-author discipline)
+
 - **Positive corpus (timesheets):** 18 findings — CG001 at `cmd/timesheet/main.go:26` (audit cites 26–29), 15× CG002 with **exact 15/15 match against `rg` ground truth (0 FP, 0 FN)**, CG003 at `cmdguard_helpers.go:21` panic, CG004 at `guard.go:50` (audit cites 50–51). Every location matches the hand audit.
 - **Negative corpus:** cmdguard itself (0 after 1 legitimate self-suppression in `cli_lifecycle_test.go`), erraudit, go-structure-linter, branching-flow — all 0 findings.
 - **Discrimination proof:** inverted CG002's condition → tests FAIL → restored → pass. The tests test.
 
 ### Quality gates
+
 - `golangci-lint run ./...` in lint/: **0 issues** — via real fixes (rule-table refactor killing 12 gochecknoglobals findings, explicit struct literals, exhaustive Spec, Fprint writers for forbidigo, SplitSeq/Cut modernize, named constant for mnd, wrapper-error wrapcheck fixes, no named returns), not exclusion creep. Only nolints: the two documented process-lifetime cache globals + one deliberate-skip nilerr, each with reasons.
 - `go build`, `go vet`, `go test -race` green; **GOWORK=off standalone build/test green** (replace directive works for downstream-shape builds).
 - BuildFlow fast mode run: lint module contributes **0 findings**; the 2 failing steps (license-check go-licenses E1004, website eslint/vulns/TS) are **pre-existing**, unrelated to this work.
 
 ### Wiring & docs
+
 - `go.work`: 7 modules now (added `use ./lint`).
 - `flake.nix` check-all: lint added to build/test/lint/tidy loops; description 6→7 modules.
 - `AGENTS.md`: project tree, sub-module dependency table, design principle #15/#20 counts, nested-modules gotcha, new full **lint** section (rule table, no-rule-vars lesson, CurrentMajor bump duty, suppression format, corpus evidence).

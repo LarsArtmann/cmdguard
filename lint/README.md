@@ -14,14 +14,14 @@ package depends only on go-finding and go-linter-sdk.
 
 ## Rules
 
-| ID    | Severity | Finding                                                                                     |
-| ----- | -------- | ------------------------------------------------------------------------------------------- |
+| ID    | Severity | Finding                                                                                                                                |
+| ----- | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | CG001 | critical | `fang.Execute` receives `RootCommand()`, bypassing `cli.Execute` (signals, shutdown, cleanup hooks, single-error-display never engage) |
-| CG002 | error    | Import of a frozen cmdguard major (below current) — no fixes, sub-modules unreachable        |
-| CG003 | error    | `panic` on a `NewCLI`/`NewCommand`/`NewParentCommand`/`AddCommand` error re-introduces the panic cmdguard removed by design |
-| CG004 | warning  | `cli.SetVersion(...)` after construction instead of `WithCLIVersion` in the `NewCLI` options |
-| CG005 | error    | `WithCLIVersion` combined with `WithFangOptions(fang.WithVersion(...))` passes duplicate fang version options (ADR-001) |
-| CG006 | warning  | The error returned by `cli.Execute` re-printed via `fmt.Print*` — cmdguard already displayed it exactly once |
+| CG002 | error    | Import of a frozen cmdguard major (below current) — no fixes, sub-modules unreachable                                                  |
+| CG003 | error    | `panic` on a `NewCLI`/`NewCommand`/`NewParentCommand`/`AddCommand` error re-introduces the panic cmdguard removed by design            |
+| CG004 | warning  | `cli.SetVersion(...)` after construction instead of `WithCLIVersion` in the `NewCLI` options                                           |
+| CG005 | error    | `WithCLIVersion` combined with `WithFangOptions(fang.WithVersion(...))` passes duplicate fang version options (ADR-001)                |
+| CG006 | warning  | The error returned by `cli.Execute` re-printed via `fmt.Print*` — cmdguard already displayed it exactly once                           |
 
 Detection is syntactic (AST walk, no type information, no build required):
 multi-signal matching with dataflow-lite receiver tracing keeps false
