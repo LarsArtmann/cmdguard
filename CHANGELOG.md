@@ -9,12 +9,30 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Fixed
 
+- Nothing yet.
+
+### Changed
+
+- Nothing yet.
+
+---
+
+## [4.1.0] - 2026-10-04
+
+### Fixed
+
 - **Nil `TypeHandlerFunc.RegisterFunc` no longer silently drops the flag.** A handler
   that registers nothing made the flag vanish from the CLI, surfacing far from the
   cause as "unknown flag" at invocation time (found dogfooding in nsfw-classifier).
   `dispatchRegister` now rejects such handlers at CLI-build time with an error naming
   the type and flag. `Parse`/`Default` with nil funcs return errors/nil instead of
   panicking. The low-level `Register` stays nil-tolerant for derived handlers.
+- **Repeated `[]string` flags no longer parse pflag's bracketed render form.** A
+  changed slice flag is read through `flag.Value.String()`, which renders `"[a,b]"`;
+  splitting that string on commas handed downstream handlers elements like `"[100"`
+  and `"101]"` instead of `"100"` and `"101"` (seen live with a consumer's repeatable
+  `--document` ID flag). The slice parse now trims the brackets before splitting,
+  with an end-to-end regression test through `ExecuteWithArgs`.
 
 ### Changed
 
@@ -22,6 +40,11 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   global template) includes the duration handler previously available only via the
   opt-in `RegisterGoDurationHandler()`: native pflag duration registration, `5s`-style
   parsing, duration defaults. Explicit `RegisterTypeHandler` overrides still win.
+
+### CI
+
+- Workflows install Go 1.27 (matching the repo's `go 1.27` floor) and pin
+  golangci-lint to v2.14.0, the version whose `config verify` passes the repo config.
 
 ---
 
