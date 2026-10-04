@@ -40,7 +40,7 @@ func checkExecuteErrorReprint(proj *project) []finding.Finding {
 			continue
 		}
 
-		execErrIdents := collectExecuteErrIdents(file, cliVars)
+		execErrIdents := collectExecuteErrIdents(file.file, cliVars)
 
 		if len(execErrIdents) == 0 {
 			continue
@@ -80,52 +80,3 @@ func checkExecuteErrorReprint(proj *project) []finding.Finding {
 	return findings
 }
 
-// collectExecuteErrIdents returns identifiers assigned from
-// `<cliVar>.Execute(...)` calls for the given CLI variables.
-func collectExecuteErrIdents(file *sourceFile, cliVars map[string]bool) map[string]bool {
-	errs := map[string]bool{}
-
-	ast.Inspect(file.file, func(n ast.Node) bool {
-		assign, ok := n.(*ast.AssignStmt)
-		if !ok || len(assign.Lhs) != len(assign.Rhs) {
-			return true
-		}
-
-		for i, rhs := range assign.Rhs {
-			call, ok := rhs.(*ast.CallExpr)
-			if !ok {
-				continue
-			}
-
-			for name := range cliVars {
-				if !isMethodCallOn(call, name, "Execute") {
-					continue
-				}
-
-				if ident, ok := assign.Lhs[i].(*ast.Ident); ok {
-					errs[ident.Name] = true
-				}
-			}
-		}
-
-		return true
-	})
-
-	return errs
-}
-
-// isFmtPrintCall reports whether call is one of the fmt display functions
-// (Print, Println, Printf, Fprint, Fprintln, Fprintf).
-func isFmtPrintCall(file *sourceFile, call *ast.CallExpr) bool {
-	sel, ok := call.Fun.(*ast.SelectorExpr)
-	if !ok || sel.Sel == nil {
-		return false
-	}
-
-	switch sel.Sel.Name {
-	case "Print", "Println", "Printf", "Fprint", "Fprintln", "Fprintf":
-		return file.selectorFrom(sel, "fmt")
-	default:
-		return false
-	}
-}

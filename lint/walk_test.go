@@ -151,7 +151,7 @@ func TestMajorOf(t *testing.T) {
 	}
 }
 
-func TestGuessPackageName(t *testing.T) {
+func TestPackageNameFor(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -164,8 +164,8 @@ func TestGuessPackageName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if got := guessPackageName(test.path); got != test.want {
-			t.Errorf("guessPackageName(%q) = %q, want %q", test.path, got, test.want)
+		if got := packageNameFor(test.path); got != test.want {
+			t.Errorf("packageNameFor(%q) = %q, want %q", test.path, got, test.want)
 		}
 	}
 }

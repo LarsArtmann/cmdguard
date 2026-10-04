@@ -208,11 +208,7 @@ func resolveImports(file *ast.File) map[string]string {
 
 		switch {
 		case spec.Name == nil:
-			if known, ok := knownPackageNames[path]; ok {
-				local = known
-			} else {
-				local = guessPackageName(path)
-			}
+			local = packageNameFor(path)
 		case spec.Name.Name == "_":
 			continue
 		case spec.Name.Name == ".":
@@ -227,18 +223,44 @@ func resolveImports(file *ast.File) map[string]string {
 	return imports
 }
 
-// guessPackageName derives a package name from an import path: the last
-// segment, with a trailing major-version segment ("/v2") skipped so
-// "example.com/foo/v2" guesses "foo".
-func guessPackageName(path string) string {
+// packageNameFor guesses the package name of an import path. Known paths come
+// from the table; cmdguard core paths are special because their package name
+// IS the major segment (github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4 is
+// package v4); everything else falls back to the last segment with a trailing
+// major-version segment skipped (example.com/foo/v2 -> foo).
+func packageNameFor(path string) string {
+	if known, ok := knownPackageNames[path]; ok {
+		return known
+	}
+
 	segments := strings.Split(path, "/")
 	last := segments[len(segments)-1]
 
-	if len(segments) > 1 && len(last) >= 2 && last[0] == 'v' && last[1] >= '1' && last[1] <= '9' {
+	if strings.HasPrefix(path, cmdguardImportPrefix) && isMajorSegment(last) {
+		return last
+	}
+
+	if len(segments) > 1 && isMajorSegment(last) {
 		return segments[len(segments)-2]
 	}
 
 	return last
+}
+
+// isMajorSegment reports whether a path segment is a major-version suffix
+// (v1..v9, v10, ...).
+func isMajorSegment(segment string) bool {
+	if len(segment) < 2 || segment[0] != 'v' {
+		return false
+	}
+
+	for _, char := range segment[1:] {
+		if char < '0' || char > '9' {
+			return false
+		}
+	}
+
+	return true
 }
 
 // majorOf extracts the major-version segment ("", "v1", "v2", ...) from a
@@ -258,7 +280,7 @@ func majorOf(importPath string) string {
 
 	segment := strings.SplitN(strings.TrimPrefix(rest, "/"), "/", 2)[0]
 
-	if len(segment) >= 2 && segment[0] == 'v' && segment[1] >= '1' && segment[1] <= '9' {
+	if isMajorSegment(segment) {
 		return segment
 	}
 

@@ -50,6 +50,27 @@ import (
 func main() {
 	ctx := context.Background()
 
+	cli, err := buildApp()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	// cmdguard prints command errors exactly once (via fang by default). The
+	// error returned by Execute is used only to map the process exit code —
+	// re-printing it would duplicate the error output on stderr.
+	execErr := cli.Execute(ctx)
+
+	exportAuditLog(cli)
+
+	os.Exit(v4.ExitCode(execErr))
+}
+
+// buildApp composes the full production CLI: audit logging, config file
+// loading, validation, graceful shutdown, middleware (spinner + timing +
+// recovery), flight recorder, glamour help, and command groups. Split from
+// main so tests can exercise the exact production composition.
+func buildApp() (*v4.CLI[AppConfig], error) {
 	// Audit logging — captures DI lifecycle events for observability
 	// Set DO_AUDITLOG_ENABLED=true to enable without changing code.
 	auditPlugin, err := auditlog.New(auditlog.Config{
@@ -57,8 +78,7 @@ func main() {
 		ContainerID: "taskctl",
 	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating audit log plugin: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("creating audit log plugin: %w", err)
 	}
 
 	cli, err := v4.NewCLI[AppConfig](
@@ -95,8 +115,7 @@ func main() {
 		v4.WithGroup("system", "System"),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("creating CLI: %w", err)
 	}
 
 	// Global flags available to all commands
@@ -104,8 +123,7 @@ func main() {
 
 	// Register DI services
 	if err := v4.Provide(cli.Scope(), NewTaskStore); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("registering TaskStore: %w", err)
 	}
 
 	// Seed demo data
@@ -113,34 +131,37 @@ func main() {
 
 	// Build all commands
 	if err := buildCommands(cli); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("building commands: %w", err)
 	}
 
-	// cmdguard prints command errors exactly once (via fang by default). The
-	// error returned by Execute is used only to map the process exit code —
-	// re-printing it would duplicate the error output on stderr.
-	execErr := cli.Execute(ctx)
+	return cli, nil
+}
 
-	if plugin := cli.AuditLog(); plugin != nil && plugin.EventsCount() > 0 {
-		// AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
-		// csv, tsv, mermaid, dot, d2, plantuml, tree, or htmltree.
-		// Defaults to html.
-		format, err := v4.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)
-		} else {
-			path := "taskctl-audit." + format.String()
-			if err := v4.ExportAuditLog(cli, v4.AuditLogExportConfig{
-				Format: format,
-				Path:   path,
-			}); err != nil {
-				fmt.Fprintf(os.Stderr, "audit-log export failed: %v\n", err)
-			} else {
-				fmt.Fprintf(os.Stderr, "audit-log written to %s\n", path)
-			}
-		}
+// exportAuditLog writes the DI audit log to disk when any events were
+// captured. AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
+// csv, tsv, mermaid, dot, d2, plantuml, tree, or htmltree (default: html).
+func exportAuditLog(cli *v4.CLI[AppConfig]) {
+	plugin := cli.AuditLog()
+	if plugin == nil || plugin.EventsCount() == 0 {
+		return
 	}
 
-	os.Exit(v4.ExitCode(execErr))
+	format, err := v4.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)
+
+		return
+	}
+
+	path := "taskctl-audit." + format.String()
+	if err := v4.ExportAuditLog(cli, v4.AuditLogExportConfig{
+		Format: format,
+		Path:   path,
+	}); err != nil {
+		fmt.Fprintf(os.Stderr, "audit-log export failed: %v\n", err)
+
+		return
+	}
+
+	fmt.Fprintf(os.Stderr, "audit-log written to %s\n", path)
 }
