@@ -44,6 +44,10 @@ jobs:
             # Use replace to resolve from local checkout
             go mod edit -replace "github.com/larsartmann/cmdguard/$mod=$GITHUB_WORKSPACE/$mod"
             go mod edit -replace "github.com/larsartmann/cmdguard/v4=$GITHUB_WORKSPACE"
+            # Newer Go rejects "replaced but not required" instead of
+            # auto-adding: record the requires the imports resolve through.
+            go mod edit -require "github.com/larsartmann/cmdguard/$mod@v0.0.0"
+            go mod edit -require "github.com/larsartmann/cmdguard/v4@v4.0.0"
             go build ./... || { echo "FAILED: $mod did not resolve"; exit 1; }
             echo "OK: $mod resolves"
           done
