@@ -139,7 +139,7 @@ func (r *typeRegistry) registerSliceKind() {
 			return nil
 		},
 		ParseFunc: func(value string, _ FlagTag) (any, error) {
-			return strings.Split(value, ","), nil
+			return splitSliceValue(value), nil
 		},
 		DefaultFunc: func(tag FlagTag) any {
 			if tag.Default == "" {
@@ -149,4 +149,22 @@ func (r *typeRegistry) registerSliceKind() {
 			return strings.Split(tag.Default, ",")
 		},
 	}
+}
+
+// splitSliceValue parses a rendered slice-flag value back into its elements.
+// Registry flag parsing is stringly end-to-end: a changed pflag slice flag is
+// read through flag.Value.String(), which renders the bracketed form
+// "[a,b]" — commas inside a single element are CSV-quoted by pflag, and a
+// raw strings.Split would hand downstream code "[a" and "b]" as elements
+// (seen live: repeatable --document IDs arrived as "[101]"). Trim the
+// brackets, then split on the comma separator.
+func splitSliceValue(value string) []string {
+	value = strings.TrimPrefix(value, "[")
+	value = strings.TrimSuffix(value, "]")
+
+	if value == "" {
+		return []string{}
+	}
+
+	return strings.Split(value, ",")
 }
