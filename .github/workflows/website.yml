@@ -101,8 +101,12 @@ jobs:
       - name: Deploy to Firebase Hosting
         working-directory: website
         run: |
+          # pnpm refuses global installs unless its global bin is already on
+          # PATH, and $GITHUB_PATH only affects LATER steps - so export it
+          # inline (pnpm's Linux default, as the error message prints it).
+          export PNPM_HOME="$HOME/.local/share/pnpm"
+          export PATH="$PNPM_HOME:$PATH"
           pnpm add -g firebase-tools
-          echo "$(pnpm bin -g)" >> "$GITHUB_PATH"
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > "$RUNNER_TEMP/gcp-key.json"
           firebase deploy --only hosting:cmdguard --project lars-software
         env:
