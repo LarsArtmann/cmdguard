@@ -114,6 +114,7 @@ cmdguard/
 ├── spinner/                      # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
 ├── telemetry/                    # SUB-MODULE: OpenTelemetry middleware
 ├── flightrecorder/               # SUB-MODULE: Go runtime execution trace flight recorder (stdlib only)
+├── lint/                         # SUB-MODULE: cmdguard usage linter (go-finding + toolsdk); provider/ + cmd/cmdguard-lint/
 ├── pkg/testutil/
 │   └── panic_test_helpers.go     # Shared test assertions
 ├── examples/
@@ -171,6 +172,7 @@ Each sub-module is independently importable — core has **zero** dependencies o
 | `spinner`        | `charm.land/lipgloss/v2`         | v2.0.5   | Terminal spinner                |
 | `telemetry`      | `go.opentelemetry.io/otel/trace` | v1.44.0  | OpenTelemetry spans             |
 | `flightrecorder` | _(stdlib `runtime/trace`)_       | Go 1.25+ | Execution trace flight recorder |
+| `lint`           | `go-finding` + `go-finding/toolsdk` + `go-linter-sdk` | v1.13.0 / v1.14.0 / v0.3.1 | cmdguard usage linter (BuildFlow provider + CLI) |
 
 ### GOEXPERIMENT=jsonv2
 
@@ -273,12 +275,12 @@ go build ./...                                   # Verify build
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
 14. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
-15. **Modular sub-modules** — 5 optional importable sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`) isolate heavy dependencies; core stays lean (14 direct deps). `flightrecorder` has **zero** external deps (uses Go 1.25+ `runtime/trace`). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
+15. **Modular sub-modules** — 6 optional importable sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`, `lint`) isolate heavy dependencies; core stays lean (14 direct deps). `flightrecorder` has **zero** external deps (uses Go 1.25+ `runtime/trace`). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
 16. **Audit log integration** — `WithAuditLog(plugin)` wires `samber-do-auditlog` into the DI injector; `cli.AuditLog()`/`cli.AuditLogReport()` for programmatic access; `AuditLogServiceByName`/`AuditLogFailedServices` query helpers; `ExportAuditLog[T]` supports 11 formats (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). No built-in subcommand — consumers export via their own flag/env pattern (e.g. `DO_AUDITLOG_ENABLED` + `AUDIT_LOG_FORMAT`)
 17. **Plugin system** — `Plugin` interface bundles custom type handlers + validators; `RegisterPlugin()` applies globally, `WithPlugin()` / `FlagRegistry.RegisterPlugin()` apply per-instance
 18. **Nested config structs** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path for flattened flag registration
 19. **Docs generation** — `cli.GenerateDocs(w)` writes markdown documentation for the full command tree to any `io.Writer`
-20. **Go workspace** — `go.work` spans 6 modules (core + 5 sub-modules) for unified local builds; `go build ./...` compiles all modules
+20. **Go workspace** — `go.work` spans 7 modules (core + 6 sub-modules) for unified local builds; `go build ./...` compiles all modules
 
 ### Key Gotchas
 
@@ -286,7 +288,7 @@ go build ./...                                   # Verify build
 
 - `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 - `NoFlags` is a distinct named type (`type NoFlags struct{}`, not an alias) — use `(NoFlags{})` with parens for comparisons
-- **Nested modules** — `go build ./...` from the repo root does NOT descend into the 4 sub-module directories (each has its own `go.mod`). Build/test them individually: `for m in glamour prompts spinner telemetry; do (cd pkg/cmdguard/$m && go build ./... && go test ./...); done`
+- **Nested modules** — `go build ./...` from the repo root does NOT descend into the sub-module directories (each has its own `go.mod`, at the repo root). Build/test them individually: `for m in glamour prompts spinner telemetry flightrecorder lint; do (cd $m && go build ./... && go test ./...); done`
 - `flake.nix` provides devShell + formatter + format check only (no `buildGoModule` or vet checks)
 
 #### Cobra Behavior
@@ -358,7 +360,7 @@ go build ./...                                   # Verify build
 
 - **Core middleware chain** — `Middleware[T]` (middleware.go), wired via `WithMiddleware[T](mw...)`. `ContextMiddleware[T]` is the context-aware variant (`next func(context.Context) error`), wired via `WithContextMiddleware[T](mw...)`; it runs OUTSIDE plain middleware so derived contexts (timeouts/cancellation) reach all inner middleware and handlers — `TimeoutMiddleware[T](d)` is the reference implementation (`ErrCommandTimeout` + `context.DeadlineExceeded`). V5 may unify the signatures. The `spinner`, `telemetry`, and `flightrecorder` middleware implementations live in their sub-modules (see below).
 
-#### Sub-Modules (glamour / prompts / spinner / telemetry / flightrecorder)
+#### Sub-Modules (glamour / prompts / spinner / telemetry / flightrecorder / lint)
 
 - **Import path** — each is `github.com/larsartmann/cmdguard/<name>`; import only what you need. Core has zero deps on these.
 - **Directory layout is load-bearing** — each sub-module lives at the **repo root** (`<name>/`), NOT under `pkg/cmdguard/`. Go resolves a module path by finding `go.mod` at the matching directory in the repo: `github.com/larsartmann/cmdguard/telemetry` requires `telemetry/go.mod` at the repo root. The root `go.mod` `replace` directives only work locally (in the workspace); they are **ignored by downstream consumers**. Moving a sub-module under `pkg/` breaks external `go get` silently (builds still pass via workspace `replace`).
@@ -367,6 +369,7 @@ go build ./...                                   # Verify build
 - **telemetry** — `TelemetryMiddleware[T]` starts a span per command but cannot propagate the span context to the handler (plain `Middleware[T]` signature); use `WithContextMiddleware[T]` + a custom `ContextMiddleware[T]` when propagation matters; migrating telemetry to it is future work.
 - **prompts** — provides the `huh/v2` implementation of the core `PromptRunner` interface; wire via `SetPromptRunner()`.
 - **flightrecorder** — wraps Go 1.25+ `runtime/trace.FlightRecorder`. Continuously buffers execution traces in memory; auto-captures `.trace` snapshots when commands are slow (`CaptureOnSlow`+`SlowThreshold`) or error (`CaptureOnError`). Public API: `WithFlightRecorder[T](cfg)` (CLIOption with internal recorder), `WithFlightRecorderRecorder[T](rec *Recorder)` (bring-your-own recorder for advanced setups), `Recorder.CaptureToWriter(ctx, w, commandName, reason)` (write snapshot to any `io.Writer`), `Recorder.Capture(ctx, commandName, reason)` (write snapshot to file). Analyze snapshots with `go tool trace snapshot.trace`. Zero external dependencies. Process-wide singleton: at most one flight recorder active at a time (runtime/trace limitation). Recorder uses a `sync.WaitGroup` so `Stop()` waits for in-flight `WriteTo`/`Capture` operations before calling `fr.Stop()`. Tests use `//nolint:paralleltest` (path-excluded in `.golangci.yml`) since the singleton constraint prevents parallel test execution.
+- **lint** — the cmdguard usage linter (`github.com/larsartmann/cmdguard/lint`), built on go-finding + go-linter-sdk; `lint/provider/` registers the BuildFlow toolsdk spec (`cmdguard-lint`, `ModuleFanOut: true`); `lint/cmd/cmdguard-lint/` is a dogfood CLI (built with cmdguard v4 itself). 6 rules (CG001 execute bypass, CG002 stale major, CG003 constructor panic, CG004 runtime SetVersion, CG005 duplicate version options, CG006 execute-error reprint), all syntactic (go/parser AST walk, no type info, no build needed). Rule table is the single source of truth in `rules.go` (`allRuleDefs()`); checks take `meta linter.RuleMeta` — do NOT reintroduce package-level rule vars (Go initialization cycles). Suppressions: `//cmdguard-lint:ignore <ID> <reason>` on the finding line or the line above; reason required. `analyze()` memoizes per-directory for the process lifetime — long-lived consumers call `ClearCache()`. `CurrentMajor` (walk.go) must be bumped when a new cmdguard major ships so CG002 tracks. Validated: timesheets corpus 18/18 findings at hand-audited locations, 0 FP on cmdguard/erraudit/go-structure-linter/branching-flow.
 - **Lint** — all 5 sub-modules pass `golangci-lint run ./...` with 0 issues (same root `.golangci.yml`). Config-level exclusions for sub-modules: `cobra.Command` in exhaustruct exclude (type-level, 30+ fields), `defaultFrames` nolint:gochecknoglobals in spinner, `go.opentelemetry.io/otel/trace/noop` in depguard Test allow-list, `flightrecorder/.*_test\.go$` paralleltest exclusion (process-wide singleton).
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.

@@ -50,7 +50,11 @@ import (
 func main() {
 	ctx := context.Background()
 
-	cli, err := buildApp()
+	// Explicit recorder lifecycle: the middleware starts it lazily on first
+	// command execution; Stop flushes in-flight snapshot writes before exit.
+	rec := newProductionRecorder()
+
+	cli, err := buildApp(rec)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
@@ -63,14 +67,27 @@ func main() {
 
 	exportAuditLog(cli)
 
+	rec.Stop()
+
 	os.Exit(v4.ExitCode(execErr))
+}
+
+// newProductionRecorder returns the production flight recorder: snapshots
+// on commands slower than 5s or on errors. Split from main for testability.
+func newProductionRecorder() *flightrecorder.Recorder {
+	return flightrecorder.New(flightrecorder.Config{
+		CaptureOnSlow:  true,
+		SlowThreshold:  5 * time.Second,
+		CaptureOnError: true,
+	})
 }
 
 // buildApp composes the full production CLI: audit logging, config file
 // loading, validation, graceful shutdown, middleware (spinner + timing +
 // recovery), flight recorder, glamour help, and command groups. Split from
-// main so tests can exercise the exact production composition.
-func buildApp() (*v4.CLI[AppConfig], error) {
+// main so tests can exercise the exact production composition; rec is started
+// lazily by the middleware and stopped by the caller (see main).
+func buildApp(rec *flightrecorder.Recorder) (*v4.CLI[AppConfig], error) {
 	// Audit logging — captures DI lifecycle events for observability
 	// Set DO_AUDITLOG_ENABLED=true to enable without changing code.
 	auditPlugin, err := auditlog.New(auditlog.Config{
@@ -105,11 +122,7 @@ func buildApp() (*v4.CLI[AppConfig], error) {
 		// Flight recorder — captures execution traces for slow or failing
 		// commands. Snapshots are written to /tmp and analyzed with:
 		//   go tool trace /tmp/cmdguard-*.trace
-		flightrecorder.WithFlightRecorder[AppConfig](flightrecorder.Config{
-			CaptureOnSlow:  true,
-			SlowThreshold:  5 * time.Second,
-			CaptureOnError: true,
-		}),
+		flightrecorder.WithFlightRecorderRecorder[AppConfig](rec),
 		glamour.WithHelpTheme("dark"),
 		v4.WithGroup("tasks", "Task Management"),
 		v4.WithGroup("system", "System"),

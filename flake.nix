@@ -79,7 +79,7 @@
           apps = {
             check-all = {
               type = "app";
-              meta.description = "Run all quality gates: build, test (race), lint, format check, go mod tidy across all 6 modules";
+              meta.description = "Run all quality gates: build, test (race), lint, format check, go mod tidy across all 7 modules";
               program = toString (
                 pkgs.writeShellScript "check-all" ''
                   set -euo pipefail
@@ -87,19 +87,19 @@
 
                   echo "=== Build ==="
                   ${goPkg}/bin/go build ./...
-                  for mod in glamour prompts spinner telemetry flightrecorder; do
+                  for mod in glamour prompts spinner telemetry flightrecorder lint; do
                     (cd "$mod" && ${goPkg}/bin/go build ./...)
                   done
 
                   echo "=== Test (race) ==="
                   ${goPkg}/bin/go test ./... -count=1 -timeout 120s -race
-                  for mod in glamour prompts spinner telemetry flightrecorder; do
+                  for mod in glamour prompts spinner telemetry flightrecorder lint; do
                     (cd "$mod" && ${goPkg}/bin/go test ./... -count=1 -timeout 120s -race)
                   done
 
                   echo "=== Lint ==="
                   ${pkgs.golangci-lint}/bin/golangci-lint run ./...
-                  for mod in glamour prompts spinner telemetry flightrecorder; do
+                  for mod in glamour prompts spinner telemetry flightrecorder lint; do
                     (cd "$mod" && ${pkgs.golangci-lint}/bin/golangci-lint run ./...)
                   done
 
@@ -108,7 +108,7 @@
 
                   echo "=== go mod tidy check ==="
                   export GOWORK=off
-                  for dir in . glamour prompts spinner telemetry flightrecorder; do
+                  for dir in . glamour prompts spinner telemetry flightrecorder lint; do
                     if [ -f "$dir/go.mod" ]; then
                       (cd "$dir" && ${goPkg}/bin/go mod tidy)
                       if ! (cd "$dir" && git diff --exit-code go.mod go.sum >/dev/null 2>&1); then

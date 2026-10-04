@@ -5,10 +5,31 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 	"github.com/samber/do/v2"
+
+	"github.com/larsartmann/cmdguard/flightrecorder"
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 )
+
+// newTestRecorder returns a flight recorder scoped to a temp dir with a
+// silent logger. Each test owns its recorder and stops it via t.Cleanup,
+// keeping the process-wide singleton free for other tests in any order.
+func newTestRecorder(t *testing.T) *flightrecorder.Recorder {
+	t.Helper()
+
+	rec := flightrecorder.New(flightrecorder.Config{
+		MinAge:         1 * time.Second,
+		MaxBytes:       1 << 20,
+		OutputDir:      t.TempDir(),
+		CaptureOnError: true,
+		Log:            func(string, ...any) {},
+	})
+	t.Cleanup(rec.Stop)
+
+	return rec
+}
 
 // runProduction executes args against the full production composition
 // (audit log, middleware, flight recorder, config file, validation) and
@@ -20,7 +41,7 @@ func runProduction(t *testing.T, args []string) error {
 
 	t.Chdir(t.TempDir())
 
-	cli, err := buildApp()
+	cli, err := buildApp(newTestRecorder(t))
 	if err != nil {
 		t.Fatalf("buildApp: %v", err)
 	}
@@ -34,7 +55,7 @@ func runProduction(t *testing.T, args []string) error {
 
 //nolint:paralleltest // buildApp wires the process-wide flight recorder singleton
 func TestBuildApp_Composition(t *testing.T) {
-	cli, err := buildApp()
+	cli, err := buildApp(newTestRecorder(t))
 	if err != nil {
 		t.Fatalf("buildApp: %v", err)
 	}
@@ -64,7 +85,7 @@ func TestBuildApp_ExecuteList_ExportsAuditLog(t *testing.T) {
 func TestExportAuditLog_InvalidFormat(t *testing.T) {
 	t.Setenv("AUDIT_LOG_FORMAT", "bogus")
 
-	cli, err := buildApp()
+	cli, err := buildApp(newTestRecorder(t))
 	if err != nil {
 		t.Fatalf("buildApp: %v", err)
 	}
@@ -118,7 +139,7 @@ func TestBuildApp_StoreResolutionFailure(t *testing.T) {
 	}
 
 	for _, args := range commands {
-		cli, err := buildApp()
+		cli, err := buildApp(newTestRecorder(t))
 		if err != nil {
 			t.Fatalf("buildApp: %v", err)
 		}
@@ -134,6 +155,68 @@ func TestBuildApp_StoreResolutionFailure(t *testing.T) {
 		if execErr == nil {
 			t.Fatalf("expected error for %v with failing store", args)
 		}
+	}
+}
+
+//nolint:paralleltest // t.Setenv
+func TestExportAuditLog_NoPluginIsNoOp(t *testing.T) {
+	t.Setenv("AUDIT_LOG_FORMAT", "json")
+
+	t.Chdir(t.TempDir())
+
+	// A CLI without an audit plugin exports nothing and errors nowhere.
+	cli, err := v4.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
+	if err != nil {
+		t.Fatalf("NewCLI: %v", err)
+	}
+
+	exportAuditLog(cli)
+
+	if _, statErr := os.Stat("taskctl-audit.json"); statErr == nil {
+		t.Error("no export expected without audit plugin")
+	}
+}
+
+//nolint:paralleltest // t.Chdir
+func TestExportAuditLog_WriteFailure(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root ignores directory permissions; read-only dir test is meaningless")
+	}
+
+	t.Setenv("AUDIT_LOG_FORMAT", "json")
+
+	dir := t.TempDir()
+	if err := os.Chmod(dir, 0o500); err != nil {
+		t.Fatalf("chmod: %v", err)
+	}
+
+	t.Chdir(dir)
+
+	cli, err := buildApp(newTestRecorder(t))
+	if err != nil {
+		t.Fatalf("buildApp: %v", err)
+	}
+
+	if execErr := cli.ExecuteWithArgs(context.Background(), []string{"list"}); execErr != nil {
+		t.Fatalf("list: %v", execErr)
+	}
+
+	// Must report the failure without panicking.
+	exportAuditLog(cli)
+}
+
+func TestNewProductionRecorder_Config(t *testing.T) {
+	t.Parallel()
+
+	rec := newProductionRecorder()
+	cfg := rec.Config()
+
+	if !cfg.CaptureOnSlow || !cfg.CaptureOnError {
+		t.Errorf("expected slow+error capture, got %+v", cfg)
+	}
+
+	if cfg.SlowThreshold != 5*time.Second {
+		t.Errorf("SlowThreshold: want 5s, got %s", cfg.SlowThreshold)
 	}
 }
 
