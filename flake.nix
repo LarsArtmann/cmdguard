@@ -36,7 +36,23 @@
               nixfmt.enable = true;
               gofmt.enable = true;
               gofumpt.enable = true;
-              goimports.enable = true;
+              # goimports shells out to `go` for import resolution. In the
+              # sandboxed treefmt check there is no network, so the default
+              # GOTOOLCHAIN=auto fails trying to download the toolchain the
+              # go 1.27 directive names. Wrap it: GOTOOLCHAIN=local plus
+              # go_1_27 on PATH satisfies the directive without any download.
+              goimports = {
+                enable = true;
+                package = pkgs.writeShellApplication {
+                  name = "goimports";
+                  runtimeInputs = [ goPkg ];
+                  text = ''
+                    export GOTOOLCHAIN=local
+                    export GOCACHE="''${GOCACHE:-$TMPDIR/goimports-cache}"
+                    exec ${pkgs.gotools}/bin/goimports "$@"
+                  '';
+                };
+              };
             };
           };
 
