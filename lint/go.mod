@@ -77,4 +77,7 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v4 => ../
+replace (
+	github.com/larsartmann/cmdguard/v4 => ../
+	github.com/larsartmann/cmdguard/v4 v4.0.2 => ../
+)

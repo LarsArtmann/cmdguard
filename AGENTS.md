@@ -3,7 +3,7 @@
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
 **Project:** cmdguard - CLI Guard Library
-**Go Version:** 1.26 (GOEXPERIMENT=jsonv2)
+**Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
 **Status:** v4.0.2 - zero panics, 87.8% coverage, 0 lint issues, 0 race conditions
 
 ---
@@ -11,7 +11,7 @@
 ## Quick Start
 
 ```bash
-# Enter dev shell (Go 1.26, gopls, golangci-lint)
+# Enter dev shell (Go 1.27, gopls, golangci-lint)
 nix develop
 
 # Run tests (all packages, with race detection)
@@ -242,6 +242,7 @@ go build ./...                                   # Verify build
 - `t.Setenv` + `t.Parallel()` = panic — use `//nolint:paralleltest`
 - `NoFlags` is a distinct named type (`type NoFlags struct{}`, not an alias) — use `(NoFlags{})` with parens for comparisons
 - **Nested modules** — `go build ./...` from the repo root does NOT descend into the sub-module directories (each has its own `go.mod`, at the repo root). Build/test them individually: `for m in glamour prompts spinner telemetry flightrecorder lint; do (cd $m && go build ./... && go test ./...); done`
+- **Sandboxed treefmt vs toolchain download** — `flake.nix` pins `goPkg = pkgs.go_1_27` and wraps the treefmt `goimports` formatter with `GOTOOLCHAIN=local` + `goPkg` on PATH. goimports shells out to `go` for import resolution; in the sandboxed `nix flake check` there is no network, so if `goPkg` is older than the `go` directive in go.mod, the check fails on every Go file with `go: download goX.Y.Z: ... connection refused` under "formatting failures detected". Rule: `goPkg` major.minor must be ≥ the go directive. Symptom signature and fix pattern shared with httputil (2026-09-23 incident).
 - `flake.nix` provides devShell + formatter + format check only (no `buildGoModule` or vet checks)
 
 #### Cobra Behavior
