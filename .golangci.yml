@@ -355,16 +355,16 @@ linters:
           - forbidigo
       - path: pkg/cmdguard/
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: examples/
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: benchmarks/
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: tests/
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - text: for loop can be changed to use an integer range
         linters:
           - intrange
@@ -496,7 +496,6 @@ linters:
           - gomoddirectives
       - path: _test\.go
         linters:
-          - exhaustruct
           - testpackage
           - gochecknoglobals
           - funlen
