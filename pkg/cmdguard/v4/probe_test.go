@@ -6,32 +6,43 @@ import (
 	"testing"
 )
 
-type probeConfig struct {
-	Store  string `default:"memory" flag:"store"  help:"store backend"`
-	DBPath string `default:"x.db"   flag:"db-path" help:"db path"`
+type probeAppConfig struct {
+	Notifier    string `default:"stdout" flag:"notifier" help:"Notifier backend"`
+	PapURL      string `default:""       flag:"pap-url"  help:"Pap URL"`
+	Store       string `default:"memory" flag:"store"    help:"Store backend"`
+	DBPath      string `default:"sk.db"  flag:"db-path"  help:"DB path"`
+	GitHubToken string `default:""       flag:"github-token" help:"token"`
 }
 
-func TestProbePointerFlags(t *testing.T) {
-	type checkinFlags struct {
-		TeamID   string   `default:"" flag:"team"   help:"team"  short:"t"`
-		MemberID string   `default:"" flag:"member" help:"member" short:"m"`
-		Answers  []string `default:"" flag:"answer" help:"answers" short:"a"`
-	}
+type probeCheckinFlags struct {
+	TeamID   string   `default:"" flag:"team"   help:"Team ID (required)"   short:"t"`
+	MemberID string   `default:"" flag:"member" help:"Member ID (required)" short:"m"`
+	Answers  []string `default:"" flag:"answer" help:"Answers as questionID=text (repeatable)" short:"a"`
+}
 
+func TestProbeExactMirror(t *testing.T) {
 	var got []string
 
-	cli, err := NewCLI[probeConfig]("probetest3", "probe3", probeConfig{})
+	opts := []CLIOption{
+		WithFang(false),
+		WithCLIVersion("0.1.0"),
+		WithCLILong("Async standup automation — replace synchronous daily standup meetings with asynchronous check-ins."),
+	}
+
+	cli, err := NewCLI[probeAppConfig]("standup-killer", "Kill your daily standup meeting", probeAppConfig{}, opts...)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	cmd, err := NewCommand(
+	cmd, err := NewCommand[probeAppConfig](
 		"checkin",
-		&checkinFlags{},
-		func(_ context.Context, _ *probeConfig, flags *checkinFlags) error {
+		&probeCheckinFlags{TeamID: "", MemberID: "", Answers: nil},
+		func(_ context.Context, _ *probeAppConfig, flags *probeCheckinFlags) error {
 			got = flags.Answers
 			return nil
 		},
+		WithShort("Submit a standup check-in"),
+		WithLong("Submit a check-in with answers for today's standup. Use --answer flag repeatedly with questionID=text format, e.g. --answer yesterday='Fixed bug' --answer today='Code review' --answer blockers='None'"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -42,6 +53,7 @@ func TestProbePointerFlags(t *testing.T) {
 	}
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{
+		"--store=sqlite", "--db-path=/tmp/x.db",
 		"checkin", "-t", "s2", "-m", "bob", "-a", "yesterday=Wrote", "-a", "blockers=ok",
 	})
 	if err != nil {
