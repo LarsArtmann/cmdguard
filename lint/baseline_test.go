@@ -200,7 +200,7 @@ func TestLoadBaseline(t *testing.T) {
 			t.Fatalf("writing fixture: %v", err)
 		}
 
-		if _, err := LoadBaseline(path); err == nil {
+		if _, _, err := LoadBaseline(path); err == nil {
 			t.Error("expected an error for a version mismatch")
 		}
 	})
@@ -213,7 +213,7 @@ func TestLoadBaseline(t *testing.T) {
 			t.Fatalf("writing fixture: %v", err)
 		}
 
-		if _, err := LoadBaseline(path); err == nil {
+		if _, _, err := LoadBaseline(path); err == nil {
 			t.Error("expected an error for invalid JSON")
 		}
 	})

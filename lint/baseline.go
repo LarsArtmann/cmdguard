@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,6 +26,10 @@ var (
 // incompatible changes so LoadBaseline can reject future formats loudly
 // instead of misinterpreting them.
 const baselineVersion = 1
+
+// baselineFileMode is the baseline file permission (owner-only: the file
+// maps the codebase's lint debt, no reason for group/other access).
+const baselineFileMode = 0o600
 
 // DefaultBaselinePath is the file a lint run picks up automatically (relative
 // to the linted directory) when no explicit --baseline path is given. Keep in
@@ -54,7 +59,7 @@ type Baseline struct {
 // baseline and nil error) when the file does not exist: "no baseline" is the
 // normal pre-adoption state. Use the explicit path when the caller asked for
 // one and wants absence reported as ErrBaselineNotFound.
-func LoadBaseline(path string) (baseline *Baseline, found bool, err error) {
+func LoadBaseline(path string) (*Baseline, bool, error) {
 	raw, readErr := os.ReadFile(path)
 	if readErr != nil {
 		if os.IsNotExist(readErr) {
@@ -63,6 +68,8 @@ func LoadBaseline(path string) (baseline *Baseline, found bool, err error) {
 
 		return nil, false, fmt.Errorf("reading baseline %s: %w", path, readErr)
 	}
+
+	var baseline Baseline
 
 	if unmarshalErr := json.Unmarshal(raw, &baseline); unmarshalErr != nil {
 		return nil, false, fmt.Errorf("parsing baseline %s: %w", path, unmarshalErr)
@@ -75,7 +82,7 @@ func LoadBaseline(path string) (baseline *Baseline, found bool, err error) {
 		)
 	}
 
-	return baseline, true, nil
+	return &baseline, true, nil
 }
 
 // WriteBaseline serializes findings into a baseline file at path. Used at
@@ -94,12 +101,16 @@ func WriteBaseline(findings []finding.Finding, path string) error {
 		})
 	}
 
-	encoded, err := json.MarshalIndent(baseline, "", "  ")
-	if err != nil {
+	var encoded bytes.Buffer
+
+	encoder := json.NewEncoder(&encoded)
+	encoder.SetIndent("", "  ")
+
+	if err := encoder.Encode(baseline); err != nil {
 		return fmt.Errorf("marshaling baseline: %w", err)
 	}
 
-	if err := os.WriteFile(path, append(encoded, '\n'), 0o600); err != nil {
+	if err := os.WriteFile(path, encoded.Bytes(), baselineFileMode); err != nil {
 		return fmt.Errorf("writing baseline %s: %w", path, err)
 	}
 
