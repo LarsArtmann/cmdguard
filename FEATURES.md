@@ -226,7 +226,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `AuditLogServiceByName[T](cli)`       | 🟢 FULLY_FUNCTIONAL | Query a named service's audit info (`auditlog.go:171`)                                                                                                                                                                 |
 | `AuditLogFailedServices[T](cli)`      | 🟢 FULLY_FUNCTIONAL | List services that failed to construct (`auditlog.go:181`)                                                                                                                                                             |
 | `cli.AuditLog()` / `AuditLogReport()` | 🟢 FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot                                                                                                                                                                           |
-| Command-level audit middleware        | ⚪ PLANNED          | Upstream API ready: `Plugin.RecordCommand` implemented in ../samber-do-auditlog (unreleased). cmdguard middleware wiring blocked until that library is pushed + tagged; then bump go.mod and add `AuditMiddleware[T]`. |
+| Command-level audit middleware        | 🟢 FULLY_FUNCTIONAL | `AuditMiddleware[T]` + `WithAuditMiddleware[T]` (auditlog.go) record PhaseBefore/PhaseAfter command events with duration + error via upstream `Plugin.RecordCommand` (samber-do-auditlog v0.11.0); nil plugin = passthrough; taskctl wires it; 7 tests + live export verified |
 
 ---
 

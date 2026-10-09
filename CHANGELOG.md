@@ -7,13 +7,31 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Added
+
+- **Command-level audit middleware.** `AuditMiddleware[T]` records a
+  PhaseBefore event before each command runs and a PhaseAfter event after it
+  completes, carrying the wall-clock duration in milliseconds and the
+  command's error (nil on success), via samber-do-auditlog v0.11.0's
+  `Plugin.RecordCommand`. Command events surface in `Report.Events` and the
+  NDJSON stream (`Event.IsCommand()` distinguishes them from service events).
+  `WithAuditMiddleware[T](plugin)` wires it into the middleware chain — pair
+  it with `WithAuditLog(plugin)` using the same plugin. A nil plugin makes
+  the middleware a transparent passthrough.
+
 ### Fixed
 
 - Nothing yet.
 
 ### Changed
 
-- Nothing yet.
+- **Dependency bumps:** `samber-do-auditlog` v0.10.0 → v0.11.0 (command
+  execution events), `golang.org/x/net` v0.59.0 → v0.60.0 in core + glamour
+  (GO-2026-6617/6611/6603, govulncheck-verified reachable).
+- **website:** `postcss-nested` overridden to ^8.0.1 in
+  `website/pnpm-workspace.yaml`, pulling patched `postcss-selector-parser`
+  ≥7.1.6 (GHSA-rj75-hqrm-r3gf, moderate). `pnpm audit` clean; `astro build`
+  green.
 
 ---
 

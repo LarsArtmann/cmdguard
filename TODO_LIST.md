@@ -30,9 +30,9 @@ ROADMAP.md §"Additional v5 candidates" — keep them there, not here.
 
 ## Blocked on Upstream
 
-| #  | Task                           | Blocker                                                                                                                                                                                                                                                                                                                                                | Priority | Status     |
-| -- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------- |
-| F1 | Command-level audit middleware | Upstream API is implemented: `Plugin.RecordCommand` / `Recorder.RecordCommand` / `EventTypeCommand` in `../samber-do-auditlog` (Unreleased, committed locally). **Unblock:** push + tag samber-do-auditlog ≥ v0.11.0, bump cmdguard `go.mod`, then add `AuditMiddleware[T]` (records PhaseBefore/PhaseAfter + duration + error per command execution). | Medium   | 🟡 BLOCKED |
+| #  | Task                           | Blocker                                                                                                                                                                                                                | Priority | Status     |
+| -- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| F1 | Command-level audit middleware | DONE 2026-10-09: upstream v0.11.0 hit the module proxy (tag pushed); cmdguard `go.mod` bumped to v0.11.0; `AuditMiddleware[T]` + `WithAuditMiddleware[T]` implemented in `auditlog.go` (PhaseBefore/PhaseAfter + duration ms + error, nil-plugin passthrough, FullPath-preferred naming) with 7 tests in `audit_middleware_test.go`; taskctl wires it in `buildApp` and a live `taskctl list` run exported command events (`event_type: command`, before/after, `duration_ms: 1.264`). FEATURES row → FULLY_FUNCTIONAL. | Medium   | ✅ DONE     |
 
 ---
 
