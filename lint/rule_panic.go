@@ -26,8 +26,17 @@ func checkPanicOnConstructor(proj *project, meta linter.RuleMeta) []finding.Find
 			continue
 		}
 
+		// Package-level constructor errors (var x, err = NewCLI(...) in any
+		// file of the package) are visible to every function body; body-local
+		// assignments stay primary. See crossfile.go.
+		packageErrs := proj.constructorErrIdentsFor(file)
+
 		forFuncs(file.file, func(body *ast.BlockStmt) {
 			errIdents := file.cmdguardConstructorErrIdents(body)
+
+			for name := range packageErrs {
+				errIdents[name] = true
+			}
 
 			ast.Inspect(body, func(n ast.Node) bool {
 				ifStmt, ok := n.(*ast.IfStmt)

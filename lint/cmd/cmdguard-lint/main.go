@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/larsartmann/go-finding"
 
@@ -198,45 +197,16 @@ func pluralY(n int) string {
 	return "ies"
 }
 
-// detectFiltered runs lint.Detect and removes findings from disabled rules,
-// keeping the single-pass fast path while honoring --enable/--disable.
+// detectFiltered runs lint.Detect and applies the enable/disable filters,
+// keeping the single-pass fast path. Filtering itself lives in
+// lint.FilterByIDs so the CLI flags and the provider options share semantics.
 func detectFiltered(ctx context.Context, dir string, cfg *cliConfig) ([]finding.Finding, error) {
 	findings, err := lint.Detect(ctx, dir)
 	if err != nil {
 		return nil, fmt.Errorf("detecting cmdguard usage findings in %s: %w", dir, err)
 	}
 
-	enabled := idSet(cfg.Enable)
-	disabled := idSet(cfg.Disable)
-
-	kept := make([]finding.Finding, 0, len(findings))
-
-	for _, candidate := range findings {
-		if disabled[string(candidate.Rule)] {
-			continue
-		}
-
-		if len(enabled) > 0 && !enabled[string(candidate.Rule)] {
-			continue
-		}
-
-		kept = append(kept, candidate)
-	}
-
-	return kept, nil
-}
-
-// idSet splits a comma-separated flag value into an ID set.
-func idSet(value string) map[string]bool {
-	set := map[string]bool{}
-
-	for part := range strings.SplitSeq(value, ",") {
-		if trimmed := strings.TrimSpace(part); trimmed != "" {
-			set[trimmed] = true
-		}
-	}
-
-	return set
+	return lint.FilterByIDs(findings, cfg.Enable, cfg.Disable), nil
 }
 
 func runRules(_ context.Context, _ *cliConfig, flags rulesFlags) error {

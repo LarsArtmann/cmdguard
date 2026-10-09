@@ -72,6 +72,9 @@ type project struct {
 	importsCmdguard bool
 	// skipped records files that failed to parse (kept for diagnostics).
 	skipped []string
+	// crossFile unions package-level identifier facts per directory group
+	// (see crossfile.go); built once in analyze so every rule shares it.
+	crossFile map[string]*crossFileIndex
 }
 
 // analyzeCache memoizes analyze results per absolute directory so the six
@@ -160,6 +163,8 @@ func analyze(_ context.Context, dir string) (*project, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cmdguard-lint: walking %s: %w", root, err)
 	}
+
+	proj.crossFile = buildCrossFileIndex(proj.files)
 
 	analyzeCacheMu.Lock()
 	analyzeCache[root] = proj

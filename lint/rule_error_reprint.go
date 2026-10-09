@@ -16,22 +16,23 @@ import (
 // fmt Print family double-reports every failure.
 //
 // Detection: an identifier assigned from <cli>.Execute(...) where <cli> was
-// assigned from NewCLI in the same file, later passed as an argument to
-// fmt.Print/Printf/Println/Fprint/Fprintf/Fprintln. fmt.Errorf wrapping is
-// deliberately NOT flagged: mapping errors into wrapped errors is part of
-// the supported exit-code path.
+// assigned from NewCLI in the same file OR as a package-level var anywhere
+// in the package (cross-file name tracing, see crossfile.go), later passed as
+// an argument to fmt.Print/Printf/Println/Fprint/Fprintf/Fprintln.
+// fmt.Errorf wrapping is deliberately NOT flagged: mapping errors into
+// wrapped errors is part of the supported exit-code path.
 func checkExecuteErrorReprint(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
 		file := &proj.files[i]
-		cliVars := file.cliVars()
+		cliVars := proj.cliVarsFor(file)
 
 		if len(cliVars) == 0 {
 			continue
 		}
 
-		execErrIdents := collectExecuteErrIdents(file.file, cliVars)
+		execErrIdents := proj.execErrIdentsFor(file, cliVars)
 
 		if len(execErrIdents) == 0 {
 			continue

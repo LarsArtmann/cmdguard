@@ -16,14 +16,15 @@ import (
 // version command cmdguard already ships (VersionCommand helper).
 //
 // Detection is dataflow-lite: the receiver identifier must be assigned from
-// a cmdguard NewCLI call in the same file, keeping the rule precise without
-// type information.
+// a cmdguard NewCLI call in the same file or declared as a package-level var
+// anywhere in the package (cross-file name tracing, see crossfile.go),
+// keeping the rule precise without type information.
 func checkSetVersionRuntime(proj *project, meta linter.RuleMeta) []finding.Finding {
 	var findings []finding.Finding
 
 	for i := range proj.files {
 		file := &proj.files[i]
-		cliVars := file.cliVars()
+		cliVars := proj.cliVarsFor(file)
 
 		if len(cliVars) == 0 {
 			continue
