@@ -112,7 +112,7 @@ cmdguard/
 | `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
 | `github.com/larsartmann/go-output`          | Rich output formats  | v0.37.0 |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.10.0 |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.11.0 |
 
 ### Optional Sub-Module Dependencies
 
@@ -231,7 +231,7 @@ go build ./...                                   # Verify build
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
 14. **Generic helpers** - `textMarshal[T]`/`textUnmarshal[T]`, `renderAndWrite`/`marshalAndWrite`, `branchWithCtx`
 15. **Modular sub-modules** — 6 optional importable sub-modules (`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`, `lint`) isolate heavy dependencies; core stays lean (14 direct deps). `flightrecorder` has **zero** external deps (uses Go 1.25+ `runtime/trace`). Extension hooks: `WithHelpTransform[T]()` (markdown rendering injection point), `PromptRunner` interface + `SetPromptRunner()` (prompt injection point). Import a sub-module only when you need its feature.
-16. **Audit log integration** — `WithAuditLog(plugin)` wires `samber-do-auditlog` into the DI injector; `cli.AuditLog()`/`cli.AuditLogReport()` for programmatic access; `AuditLogServiceByName`/`AuditLogFailedServices` query helpers; `ExportAuditLog[T]` supports 11 formats (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). No built-in subcommand — consumers export via their own flag/env pattern (e.g. `DO_AUDITLOG_ENABLED` + `AUDIT_LOG_FORMAT`)
+16. **Audit log integration** — `WithAuditLog(plugin)` wires `samber-do-auditlog` into the DI injector; `AuditMiddleware[T]` / `WithAuditMiddleware[T](plugin)` (auditlog.go) additionally record command execution events (PhaseBefore/PhaseAfter + duration ms + error) via `Plugin.RecordCommand` — pair with `WithAuditLog` using the same plugin; nil plugin = passthrough; `cli.AuditLog()`/`cli.AuditLogReport()` for programmatic access; `AuditLogServiceByName`/`AuditLogFailedServices` query helpers; `ExportAuditLog[T]` supports 11 formats (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). No built-in subcommand — consumers export via their own flag/env pattern (e.g. `DO_AUDITLOG_ENABLED` + `AUDIT_LOG_FORMAT`)
 17. **Plugin system** — `Plugin` interface bundles custom type handlers + validators; `RegisterPlugin()` applies globally, `WithPlugin()` / `FlagRegistry.RegisterPlugin()` apply per-instance
 18. **Nested config structs** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path for flattened flag registration
 19. **Docs generation** — `cli.GenerateDocs(w)` writes markdown documentation for the full command tree to any `io.Writer`
@@ -331,7 +331,7 @@ go build ./...                                   # Verify build
 
 - `WithAuditLog(plugin)` wires `samber-do-auditlog` hooks into the injector via `buildInjectorOpts()`. `cli.AuditLog()` returns the plugin; `cli.AuditLogReport()` returns a snapshot. `AuditLogServiceByName`/`AuditLogFailedServices` query the report.
 - `ExportAuditLog[T]` + `AuditLogExportConfig` write to file or `io.Writer` in **11 formats** (html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree). `ParseAuditLogFormat` validates input. No built-in `audit-log` subcommand — consumers implement their own export via flags/env.
-- `samber-do-auditlog` is consumed from the Go module proxy (`v0.10.0`). The sibling repo at `../samber-do-auditlog` is for local dev only — a `replace` directive works for local builds but is **ignored by downstream consumers**. Command-level audit events (`Plugin.RecordCommand`/`EventTypeCommand`) are implemented in the sibling repo's Unreleased section; cmdguard's `AuditMiddleware[T]` stays unwired until that library is pushed + tagged (TODO_LIST "Blocked on Upstream").
+- `samber-do-auditlog` is consumed from the Go module proxy (`v0.11.0`). The sibling repo at `../samber-do-auditlog` is for local dev only — a `replace` directive works for local builds but is **ignored by downstream consumers**. Command-level audit events ship since v0.11.0 (`Plugin.RecordCommand`/`EventTypeCommand`); cmdguard's `AuditMiddleware[T]` + `WithAuditMiddleware[T]` wire them (auditlog.go).
 
 #### Fang Integration (ADR-001)
 

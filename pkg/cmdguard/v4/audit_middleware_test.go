@@ -102,6 +102,7 @@ func TestAuditMiddleware(t *testing.T) {
 		called := false
 		err := mw(t.Context(), &testCLIConfig{}, v4.CommandInfo{Name: "run"}, func() error {
 			called = true
+
 			return nil
 		})
 		if err != nil {
@@ -253,6 +254,7 @@ func TestWithAuditMiddleware(t *testing.T) {
 			"deadline", v4.NoFlags{},
 			func(ctx context.Context, _ *testCLIConfig, _ v4.NoFlags) error {
 				_, gotDeadline = ctx.Deadline()
+
 				return nil
 			},
 		)

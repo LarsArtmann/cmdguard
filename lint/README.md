@@ -14,14 +14,21 @@ package depends only on go-finding and go-linter-sdk.
 
 ## Rules
 
-| ID    | Severity | Finding                                                                                                                                |
-| ----- | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| CG001 | critical | `fang.Execute` receives `RootCommand()`, bypassing `cli.Execute` (signals, shutdown, cleanup hooks, single-error-display never engage) |
-| CG002 | error    | Import of a frozen cmdguard major (below current) — no fixes, sub-modules unreachable                                                  |
-| CG003 | error    | `panic` on a `NewCLI`/`NewCommand`/`NewParentCommand`/`AddCommand` error re-introduces the panic cmdguard removed by design            |
-| CG004 | warning  | `cli.SetVersion(...)` after construction instead of `WithCLIVersion` in the `NewCLI` options                                           |
-| CG005 | error    | `WithCLIVersion` combined with `WithFangOptions(fang.WithVersion(...))` passes duplicate fang version options (ADR-001)                |
-| CG006 | warning  | The error returned by `cli.Execute` re-printed via `fmt.Print*` — cmdguard already displayed it exactly once                           |
+<!-- BEGIN RULES TABLE: generated from allRuleDefs() — regenerate with `go run ./cmd/cmdguard-lint rules --markdown` -->
+| ID | Severity | Rule | Description |
+| -- | -------- | ---- | ----------- |
+| CG001 | critical | execute bypass | fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract |
+| CG002 | error | stale cmdguard major | importing a frozen cmdguard major blocks all fixes and sub-module features; migrate to the current major |
+| CG003 | error | panic on constructor error | panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return the error instead |
+| CG004 | warning | runtime SetVersion | cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand helper) instead |
+| CG005 | error | duplicate version options | WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options |
+| CG006 | warning | execute error reprinted | the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure |
+<!-- END RULES TABLE -->
+
+The table is generated (L7 drift guard): `rules_table_test.go` fails when the
+section between the markers diverges from `allRuleDefs()`. After changing a
+rule, regenerate with `go run ./cmd/cmdguard-lint rules --markdown` and
+replace the marked section.
 
 Detection is syntactic (AST walk, no type information, no build required):
 multi-signal matching with dataflow-lite receiver tracing keeps false
@@ -77,10 +84,12 @@ directive without a reason does not suppress.
    in `rule_<name>.go`, documenting the rule's origin and trust signals.
 3. Add positive AND negative fixtures to `rules_test.go`; state the rule's
    false-positive budget in the doc comment.
-4. Sweep the corpora: the audited timesheets tree (positive) and cmdguard
+4. Refresh the README rule table: `go run ./cmd/cmdguard-lint rules --markdown`
+   (between the markers — `rules_table_test.go` fails the build on drift).
+5. Sweep the corpora: the audited timesheets tree (positive) and cmdguard
    itself (negative). A rule that cannot hold its FP budget on the corpus
    ships disabled.
-5. Bump `CurrentMajor` when cmdguard ships a new major so CG002 follows.
+6. Bump `CurrentMajor` when cmdguard ships a new major so CG002 follows.
 
 ## Origin
 

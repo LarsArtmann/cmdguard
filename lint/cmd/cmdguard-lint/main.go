@@ -30,6 +30,10 @@ type lintFlags struct {
 	Dir string `default:"." flag:"dir" help:"Directory to lint"`
 }
 
+type rulesFlags struct {
+	Markdown bool `default:"false" flag:"markdown" help:"Print the rule table in Markdown (README generation)"`
+}
+
 func main() {
 	cli, err := newApp()
 	if err != nil {
@@ -68,9 +72,10 @@ func newApp() (*v4.CLI[cliConfig], error) {
 
 	rulesCmd, err := v4.NewCommand(
 		"rules",
-		v4.NoFlags{},
+		rulesFlags{},
 		runRules,
 		v4.WithShort("List available rules"),
+		v4.WithExample("cmdguard-lint rules --markdown"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("building rules command: %w", err)
@@ -172,7 +177,15 @@ func idSet(value string) map[string]bool {
 	return set
 }
 
-func runRules(_ context.Context, _ *cliConfig, _ v4.NoFlags) error {
+func runRules(_ context.Context, _ *cliConfig, flags rulesFlags) error {
+	if flags.Markdown {
+		if _, err := fmt.Fprint(os.Stdout, lint.RuleTableMarkdown()); err != nil {
+			return fmt.Errorf("printing rule table: %w", err)
+		}
+
+		return nil
+	}
+
 	for _, rule := range lint.AllRules() {
 		if _, err := fmt.Fprintf(
 			os.Stdout,

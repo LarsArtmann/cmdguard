@@ -24,6 +24,21 @@ cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
 
 `WithAuditLog` hooks into the DI injector via `buildInjectorOpts()`. Every `Provide` and `Invoke` is recorded.
 
+## Command Execution Events
+
+`WithAuditMiddleware` records a `PhaseBefore` event when each command starts and a `PhaseAfter` event when it completes, carrying the wall-clock duration in milliseconds and the command's error (nil on success):
+
+```go
+cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
+    v4.WithAuditLog(plugin),
+    v4.WithAuditMiddleware[Config](plugin),
+)
+```
+
+Use the same plugin for both options — `WithAuditMiddleware` records on the plugin that `WithAuditLog` captures and exports. Commands are not DI services: command events appear in `Report.Events` (and the NDJSON stream) only, never in `Report.Services`. Distinguish them with `Event.IsCommand()`; the event's `ServiceName` carries the command's full path (e.g. `myapp tasks list`). A nil plugin turns the middleware into a transparent passthrough.
+
+The middleware never alters execution — the handler's error is returned unchanged.
+
 ## Programmatic Access
 
 ```go
