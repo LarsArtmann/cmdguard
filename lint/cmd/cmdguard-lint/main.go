@@ -27,9 +27,9 @@ type cliConfig struct {
 }
 
 type lintFlags struct {
-	Dir            string `default:"."                          flag:"dir"            help:"Directory to lint"`
-	Baseline       string `default:""                             flag:"baseline"       help:"Baseline file for ratchet mode (default: <dir>/" + ".cmdguard-lint-baseline.json" + " when present)"`
-	WriteBaseline  bool   `default:"false"                        flag:"write-baseline" help:"Write current findings as the new baseline, then exit 0"`
+	Dir           string `default:"."     flag:"dir"            help:"Directory to lint"`
+	Baseline      string `default:""      flag:"baseline"       help:"Baseline file for ratchet mode (default: .cmdguard-lint-baseline.json in the linted dir when present)"`
+	WriteBaseline bool   `default:"false" flag:"write-baseline" help:"Write current findings as the new baseline, then exit 0"`
 }
 
 type rulesFlags struct {
@@ -112,7 +112,7 @@ func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 
 	if flags.WriteBaseline {
 		if err := lint.WriteBaseline(findings, baselinePath); err != nil {
-			return err
+			return fmt.Errorf("writing baseline: %w", err)
 		}
 
 		fmt.Fprintf(os.Stderr, "baseline written: %s (%d accepted finding(s))\n", baselinePath, len(findings))
@@ -168,21 +168,22 @@ func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 }
 
 // resolveBaseline loads the baseline for ratchet mode: the explicit --baseline
-// path when given (missing explicit file is an error), otherwise the default
+// path when given (a missing explicit file is an error), otherwise the default
 // location inside the linted directory when it exists, otherwise no baseline.
 func resolveBaseline(flags lintFlags) (string, *lint.Baseline, error) {
 	path := flags.Baseline
+
 	if path == "" {
 		path = filepath.Join(flags.Dir, lint.DefaultBaselinePath)
 	}
 
-	baseline, err := lint.LoadBaseline(path)
+	baseline, found, err := lint.LoadBaseline(path)
 	if err != nil {
-		return "", nil, err
+		return "", nil, fmt.Errorf("loading baseline: %w", err)
 	}
 
-	if baseline == nil && flags.Baseline != "" {
-		return "", nil, fmt.Errorf("baseline %s not found — create it with --write-baseline", flags.Baseline)
+	if !found && flags.Baseline != "" {
+		return "", nil, fmt.Errorf("%w: %s (create it with --write-baseline)", lint.ErrBaselineNotFound, flags.Baseline)
 	}
 
 	return path, baseline, nil

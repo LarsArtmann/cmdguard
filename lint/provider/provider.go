@@ -6,6 +6,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/go-finding/toolsdk"
@@ -58,7 +59,7 @@ var Provider = toolsdk.Register(toolsdk.Spec{
 
 		findings, err := lint.Detect(ctx, dir)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cmdguard-lint detection: %w", err)
 		}
 
 		return lint.FilterByIDs(findings, optionString(ctx, "enable"), optionString(ctx, "disable")), nil

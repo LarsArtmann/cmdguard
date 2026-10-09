@@ -18,6 +18,22 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   `WithAuditMiddleware[T](plugin)` wires it into the middleware chain — pair
   it with `WithAuditLog(plugin)` using the same plugin. A nil plugin makes
   the middleware a transparent passthrough.
+- **lint: baseline/ratchet mode.** `--write-baseline` snapshots current
+  findings into `.cmdguard-lint-baseline.json`; subsequent runs fail only on
+  findings beyond the baseline (per rule+file, line-drift tolerant, stale
+  entries reported so the ratchet can tighten). Library surface:
+  `LoadBaseline`/`WriteBaseline`/`ApplyBaseline`.
+- **lint: cross-file name tracing for CG003/CG004/CG006.** Package-level CLI
+  variables, Execute errors, and constructor errors are unioned per directory
+  group (test files never merge with prod files; function-local names never
+  leak), so a constructor in one file plus its misuse in another is caught.
+  FP budget held: cmdguard itself and examples stay at 0 findings.
+- **lint: provider options.** The BuildFlow provider declares `enable` and
+  `disable` (comma-separated rule IDs, same semantics as the CLI flags via
+  the new `lint.FilterByIDs`).
+- **lint: generated README rule table.** `rules --markdown` emits the rule
+  table from `allRuleDefs()`; `rules_table_test.go` fails the build when the
+  README section drifts.
 
 ### Fixed
 

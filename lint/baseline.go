@@ -2,10 +2,23 @@ package lint
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/larsartmann/go-finding"
+)
+
+// Sentinel errors for baseline handling. Match with errors.Is; wrapped
+// details name the offending path.
+var (
+	// ErrBaselineVersionMismatch reports a baseline file whose schema version
+	// this cmdguard-lint cannot interpret (regenerating fixes it).
+	ErrBaselineVersionMismatch = errors.New("baseline schema version mismatch")
+	// ErrBaselineNotFound reports an explicitly requested baseline file that
+	// does not exist (the default location being absent is normal, not an
+	// error: LoadBaseline signals that via its found return).
+	ErrBaselineNotFound = errors.New("baseline file not found")
 )
 
 // baselineVersion is the schema version of the baseline file. Bump on
@@ -19,7 +32,7 @@ const baselineVersion = 1
 const DefaultBaselinePath = ".cmdguard-lint-baseline.json"
 
 // BaselineEntry records one accepted finding: its rule and location when the
-// baseline was written. Line numbers are match hints, not exact contracts —
+// baseline was written. Line numbers are match hints, not exact contracts:
 // ApplyBaseline tolerates drift within the same rule+file (edits above a
 // finding shift its line without changing its identity).
 type BaselineEntry struct {
@@ -37,31 +50,32 @@ type Baseline struct {
 	Entries []BaselineEntry `json:"entries"`
 }
 
-// LoadBaseline reads and validates a baseline file. A missing file returns
-// (nil, nil): "no baseline" is the normal pre-adoption state, not an error.
-func LoadBaseline(path string) (*Baseline, error) {
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
+// LoadBaseline reads and validates a baseline file. found is false (with nil
+// baseline and nil error) when the file does not exist: "no baseline" is the
+// normal pre-adoption state. Use the explicit path when the caller asked for
+// one and wants absence reported as ErrBaselineNotFound.
+func LoadBaseline(path string) (baseline *Baseline, found bool, err error) {
+	raw, readErr := os.ReadFile(path)
+	if readErr != nil {
+		if os.IsNotExist(readErr) {
+			return nil, false, nil
 		}
 
-		return nil, fmt.Errorf("reading baseline %s: %w", path, err)
+		return nil, false, fmt.Errorf("reading baseline %s: %w", path, readErr)
 	}
 
-	var baseline Baseline
-	if err := json.Unmarshal(raw, &baseline); err != nil {
-		return nil, fmt.Errorf("parsing baseline %s: %w", path, err)
+	if unmarshalErr := json.Unmarshal(raw, &baseline); unmarshalErr != nil {
+		return nil, false, fmt.Errorf("parsing baseline %s: %w", path, unmarshalErr)
 	}
 
 	if baseline.Version != baselineVersion {
-		return nil, fmt.Errorf(
-			"baseline %s has version %d, this cmdguard-lint expects %d — regenerate the baseline",
-			path, baseline.Version, baselineVersion,
+		return nil, false, fmt.Errorf(
+			"%w: %s has version %d, this cmdguard-lint expects %d (regenerate the baseline)",
+			ErrBaselineVersionMismatch, path, baseline.Version, baselineVersion,
 		)
 	}
 
-	return &baseline, nil
+	return baseline, true, nil
 }
 
 // WriteBaseline serializes findings into a baseline file at path. Used at
@@ -85,16 +99,16 @@ func WriteBaseline(findings []finding.Finding, path string) error {
 		return fmt.Errorf("marshaling baseline: %w", err)
 	}
 
-	if err := os.WriteFile(path, append(encoded, '\n'), 0o644); err != nil {
+	if err := os.WriteFile(path, append(encoded, '\n'), 0o600); err != nil {
 		return fmt.Errorf("writing baseline %s: %w", path, err)
 	}
 
 	return nil
 }
 
-// ApplyBaseline splits findings into fresh (not covered by the baseline —
+// ApplyBaseline splits findings into fresh (not covered by the baseline:
 // these gate the run) and returns the stale baseline entries (cover nothing
-// anymore — fixed findings, so the baseline can be tightened). A nil baseline
+// anymore: fixed findings, so the baseline can be tightened). A nil baseline
 // marks every finding fresh.
 //
 // Matching is per rule+file with one baseline entry consuming at most one
@@ -104,32 +118,41 @@ func WriteBaseline(findings []finding.Finding, path string) error {
 func ApplyBaseline(
 	findings []finding.Finding,
 	baseline *Baseline,
-) (fresh []finding.Finding, stale []BaselineEntry) {
+) ([]finding.Finding, []BaselineEntry) {
 	if baseline == nil {
 		return findings, nil
 	}
 
-	consumed := make([]bool, len(baseline.Entries))
-	kept := make([]bool, len(findings))
+	consumed := map[int]bool{}
+	kept := map[int]bool{}
 
 	for i := range findings {
 		f := &findings[i]
-		entry := matchBaselineEntry(baseline, consumed, string(f.Rule), string(f.Position.File), f.Position.Line)
+
+		entry := matchBaselineEntry(
+			baseline, consumed,
+			string(f.Rule), string(f.Position.File), f.Position.Line,
+		)
+
 		if entry >= 0 {
 			consumed[entry] = true
 			kept[i] = true
 		}
 	}
 
-	for i, wasKept := range kept {
-		if !wasKept {
+	fresh := make([]finding.Finding, 0, len(findings)-len(kept))
+
+	for i := range findings {
+		if !kept[i] {
 			fresh = append(fresh, findings[i])
 		}
 	}
 
-	for i, used := range consumed {
-		if !used {
-			stale = append(stale, baseline.Entries[i])
+	stale := make([]BaselineEntry, 0, len(baseline.Entries)-len(consumed))
+
+	for i, entry := range baseline.Entries {
+		if !consumed[i] {
+			stale = append(stale, entry)
 		}
 	}
 
@@ -138,10 +161,10 @@ func ApplyBaseline(
 
 // matchBaselineEntry finds the index of the best unconsumed entry for the
 // rule+file: an exact line match if present, otherwise the first entry for
-// the same rule+file (drift absorption). File paths compare exactly — the
+// the same rule+file (drift absorption). File paths compare exactly: the
 // baseline is written from this tool's own findings, so paths always agree.
 // Returns -1 when nothing matches.
-func matchBaselineEntry(baseline *Baseline, consumed []bool, rule, file string, line int) int {
+func matchBaselineEntry(baseline *Baseline, consumed map[int]bool, rule, file string, line int) int {
 	fallback := -1
 
 	for i, entry := range baseline.Entries {

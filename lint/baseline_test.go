@@ -87,7 +87,7 @@ func TestApplyBaseline(t *testing.T) {
 		}
 
 		if fresh[0].Position.Line != 30 {
-			t.Errorf("fresh finding line=%d, want 30 (newest must not hide behind the baseline)", fresh[0].Position.Line)
+			t.Errorf("fresh finding line=%d, want 30", fresh[0].Position.Line)
 		}
 	})
 
@@ -155,13 +155,13 @@ func TestBaselineRoundTrip(t *testing.T) {
 		t.Fatalf("WriteBaseline: %v", err)
 	}
 
-	loaded, err := LoadBaseline(path)
+	loaded, found, err := LoadBaseline(path)
 	if err != nil {
 		t.Fatalf("LoadBaseline: %v", err)
 	}
 
-	if loaded == nil {
-		t.Fatal("LoadBaseline returned nil for an existing file")
+	if !found {
+		t.Fatal("LoadBaseline reported not-found for an existing file")
 	}
 
 	if loaded.Version != baselineVersion {
@@ -185,10 +185,10 @@ func TestLoadBaseline(t *testing.T) {
 	t.Run("missing file is nil without error", func(t *testing.T) {
 		t.Parallel()
 
-		baseline, err := LoadBaseline(filepath.Join(t.TempDir(), "absent.json"))
+		baseline, found, err := LoadBaseline(filepath.Join(t.TempDir(), "absent.json"))
 
-		if baseline != nil || err != nil {
-			t.Errorf("baseline=%v err=%v, want nil/nil", baseline, err)
+		if baseline != nil || found || err != nil {
+			t.Errorf("baseline=%v found=%v err=%v, want nil/false/nil", baseline, found, err)
 		}
 	})
 

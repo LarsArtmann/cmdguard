@@ -162,11 +162,5 @@ func testPatch() {
 }
 
 func containsRule(values []string, want string) bool {
-	for _, value := range values {
-		if value == want {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(values, want)
 }

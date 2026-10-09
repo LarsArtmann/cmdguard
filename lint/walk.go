@@ -117,6 +117,7 @@ func analyze(_ context.Context, dir string) (*project, error) {
 		files:           nil,
 		importsCmdguard: false,
 		skipped:         nil,
+		crossFile:       nil,
 	}
 
 	fset := token.NewFileSet()

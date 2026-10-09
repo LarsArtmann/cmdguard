@@ -50,31 +50,19 @@ func checkPanicOnConstructor(proj *project, meta linter.RuleMeta) []finding.Find
 					return true
 				}
 
-				for _, stmt := range ifStmt.Body.List {
-					expr, ok := stmt.(*ast.ExprStmt)
-					if !ok {
-						continue
-					}
-
-					call, ok := expr.X.(*ast.CallExpr)
-					if !ok || call.Fun == nil {
-						continue
-					}
-
-					ident, ok := call.Fun.(*ast.Ident)
-					if !ok || ident.Name != "panic" {
-						continue
-					}
-
-					findings = append(findings, newFinding(
-						meta,
-						"panic on a cmdguard constructor error re-introduces the panic cmdguard removed by design: constructors return errors so registration failures surface as checkable errors",
-						file.pos(stmt),
-					).
-						WithConfidence(finding.ConfidenceFull).
-						WithSuggestion("Return the error (the command registration table can check it once) instead of panicking").
-						MustBuild())
+				stmt := panicStatementIn(ifStmt.Body.List)
+				if stmt == nil {
+					return true
 				}
+
+				findings = append(findings, newFinding(
+					meta,
+					"panic on a cmdguard constructor error re-introduces the panic cmdguard removed by design: constructors return errors so registration failures surface as checkable errors",
+					file.pos(stmt),
+				).
+					WithConfidence(finding.ConfidenceFull).
+					WithSuggestion("Return the error (the command registration table can check it once) instead of panicking").
+					MustBuild())
 
 				return true
 			})
@@ -82,4 +70,27 @@ func checkPanicOnConstructor(proj *project, meta linter.RuleMeta) []finding.Find
 	}
 
 	return findings
+}
+
+// panicStatementIn returns the first bare `panic(...)` expression statement
+// in stmts, or nil when the branch does anything else.
+func panicStatementIn(stmts []ast.Stmt) ast.Stmt {
+	for _, stmt := range stmts {
+		expr, ok := stmt.(*ast.ExprStmt)
+		if !ok {
+			continue
+		}
+
+		call, ok := expr.X.(*ast.CallExpr)
+		if !ok || call.Fun == nil {
+			continue
+		}
+
+		ident, ok := call.Fun.(*ast.Ident)
+		if ok && ident.Name == "panic" {
+			return stmt
+		}
+	}
+
+	return nil
 }
