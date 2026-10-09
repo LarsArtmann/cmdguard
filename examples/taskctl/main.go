@@ -107,6 +107,7 @@ func buildApp(rec *flightrecorder.Recorder) (*v4.CLI[AppConfig], error) {
 		v4.WithCLIVersion(version.Version),
 		v4.WithEnvPrefix("TASKCTL_"),
 		v4.WithAuditLog(auditPlugin),
+		v4.WithAuditMiddleware[AppConfig](auditPlugin),
 		v4.WithConfigFile("$HOME/.config/taskctl/config.json"),
 		v4.WithConfigValidation(func(cfg *AppConfig) error {
 			if cfg.DataDir == "" {
