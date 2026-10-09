@@ -80,7 +80,7 @@ require (
 	github.com/larsartmann/cmdguard/glamour v0.2.0
 	github.com/larsartmann/cmdguard/spinner v0.2.0
 	github.com/larsartmann/go-output v0.38.3
-	github.com/larsartmann/samber-do-auditlog v0.10.0
+	github.com/larsartmann/samber-do-auditlog v0.11.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10

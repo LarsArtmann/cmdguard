@@ -1,6 +1,7 @@
 package v4
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -8,9 +9,15 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"time"
 
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 )
+
+// microsPerMillisecond converts microseconds to milliseconds the same way the
+// auditlog library records its own durations, so command events and service
+// events share one unit convention.
+const microsPerMillisecond = 1000.0
 
 // ErrUnsupportedAuditLogFormat indicates an unsupported audit log export format.
 var ErrUnsupportedAuditLogFormat = errors.New("unsupported audit log format")
@@ -208,4 +215,47 @@ func AuditLogFailedServices[T any](cli *CLI[T]) []auditlog.ServiceInfo {
 	}
 
 	return cli.spec.auditLog.Report().FailedServices()
+}
+
+// AuditMiddleware returns a middleware that records command execution events
+// on the audit log plugin: a PhaseBefore event before the command runs and a
+// PhaseAfter event after it completes, carrying the wall-clock duration in
+// milliseconds and the command's error (nil on success).
+//
+// The middleware never alters execution: the error from next is returned
+// unchanged, and a nil plugin makes it a transparent passthrough so wiring
+// stays safe when audit logging is conditionally disabled.
+//
+// Events are attributed to the plugin's root scope. Command names use
+// CommandInfo.FullPath when available (populated during cobra execution),
+// falling back to Name.
+func AuditMiddleware[T any](plugin *auditlog.Plugin) Middleware[T] {
+	return func(ctx context.Context, cfg *T, info CommandInfo, next func() error) error {
+		if plugin == nil {
+			return next()
+		}
+
+		name := info.FullPath
+		if name == "" {
+			name = info.Name
+		}
+
+		plugin.RecordCommand(name, auditlog.PhaseBefore, nil, nil)
+
+		start := time.Now()
+		err := next()
+
+		durationMs := float64(time.Since(start).Microseconds()) / microsPerMillisecond
+		plugin.RecordCommand(name, auditlog.PhaseAfter, &durationMs, err)
+
+		return err
+	}
+}
+
+// WithAuditMiddleware wires [AuditMiddleware] into the CLI's middleware chain.
+// It does not enable audit logging by itself: pair it with [WithAuditLog]
+// using the same plugin so recorded events are captured and exportable via
+// [ExportAuditLog].
+func WithAuditMiddleware[T any](plugin *auditlog.Plugin) CLIOption {
+	return WithMiddleware[T](AuditMiddleware[T](plugin))
 }
