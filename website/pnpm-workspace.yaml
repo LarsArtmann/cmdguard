@@ -5,3 +5,4 @@ minimumReleaseAgeExclude:
   - http-cache-semantics@4.3.0
 overrides:
   http-cache-semantics: ^4.2.1
+  postcss-nested: ^8.0.1
