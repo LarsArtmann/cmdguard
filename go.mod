@@ -76,9 +76,9 @@ require (
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/v2 v2.3.7
-	github.com/larsartmann/cmdguard/flightrecorder v0.1.0
-	github.com/larsartmann/cmdguard/glamour v0.2.0
-	github.com/larsartmann/cmdguard/spinner v0.2.0
+	github.com/larsartmann/cmdguard/flightrecorder v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/go-output v0.38.3
 	github.com/larsartmann/samber-do-auditlog v0.11.0
 	github.com/samber/do/v2 v2.1.0

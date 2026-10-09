@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/larsartmann/go-finding"
@@ -27,7 +28,9 @@ type cliConfig struct {
 }
 
 type lintFlags struct {
-	Dir string `default:"." flag:"dir" help:"Directory to lint"`
+	Dir            string `default:"."                          flag:"dir"            help:"Directory to lint"`
+	Baseline       string `default:""                             flag:"baseline"       help:"Baseline file for ratchet mode (default: <dir>/" + ".cmdguard-lint-baseline.json" + " when present)"`
+	WriteBaseline  bool   `default:"false"                        flag:"write-baseline" help:"Write current findings as the new baseline, then exit 0"`
 }
 
 type rulesFlags struct {
@@ -60,11 +63,12 @@ func newApp() (*v4.CLI[cliConfig], error) {
 
 	lintCmd, err := v4.NewCommand(
 		"lint",
-		lintFlags{Dir: "."},
+		lintFlags{Dir: ".", Baseline: "", WriteBaseline: false},
 		runLint,
 		v4.WithShort("Lint a directory for cmdguard usage anti-patterns"),
 		v4.WithExample("cmdguard-lint lint --dir . --output sarif"),
 		v4.WithExample("cmdguard-lint lint --disable CG004,CG006"),
+		v4.WithExample("cmdguard-lint lint --write-baseline"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("building lint command: %w", err)
@@ -72,7 +76,7 @@ func newApp() (*v4.CLI[cliConfig], error) {
 
 	rulesCmd, err := v4.NewCommand(
 		"rules",
-		rulesFlags{},
+		rulesFlags{Markdown: false},
 		runRules,
 		v4.WithShort("List available rules"),
 		v4.WithExample("cmdguard-lint rules --markdown"),
@@ -100,6 +104,34 @@ func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 	findings, err := detectFiltered(ctx, flags.Dir, cfg)
 	if err != nil {
 		return err
+	}
+
+	baselinePath, baseline, err := resolveBaseline(flags)
+	if err != nil {
+		return err
+	}
+
+	if flags.WriteBaseline {
+		if err := lint.WriteBaseline(findings, baselinePath); err != nil {
+			return err
+		}
+
+		fmt.Fprintf(os.Stderr, "baseline written: %s (%d accepted finding(s))\n", baselinePath, len(findings))
+
+		return nil
+	}
+
+	var stale []lint.BaselineEntry
+
+	if baseline != nil {
+		findings, stale = lint.ApplyBaseline(findings, baseline)
+
+		if count := len(stale); count > 0 {
+			fmt.Fprintf(os.Stderr,
+				"baseline: %d stale entr%s (fixed finding(s)) — tighten with --write-baseline\n",
+				count, pluralY(count),
+			)
+		}
 	}
 
 	report := finding.NewReportFromFindings(finding.ToolInfo{Name: lint.ToolName, Version: version.Version}, findings)
@@ -134,6 +166,36 @@ func runLint(ctx context.Context, cfg *cliConfig, flags lintFlags) error {
 	}
 
 	return nil
+}
+
+// resolveBaseline loads the baseline for ratchet mode: the explicit --baseline
+// path when given (missing explicit file is an error), otherwise the default
+// location inside the linted directory when it exists, otherwise no baseline.
+func resolveBaseline(flags lintFlags) (string, *lint.Baseline, error) {
+	path := flags.Baseline
+	if path == "" {
+		path = filepath.Join(flags.Dir, lint.DefaultBaselinePath)
+	}
+
+	baseline, err := lint.LoadBaseline(path)
+	if err != nil {
+		return "", nil, err
+	}
+
+	if baseline == nil && flags.Baseline != "" {
+		return "", nil, fmt.Errorf("baseline %s not found — create it with --write-baseline", flags.Baseline)
+	}
+
+	return path, baseline, nil
+}
+
+// pluralY returns "y" or "ies" for the stale-entry message.
+func pluralY(n int) string {
+	if n == 1 {
+		return "y"
+	}
+
+	return "ies"
 }
 
 // detectFiltered runs lint.Detect and removes findings from disabled rules,
