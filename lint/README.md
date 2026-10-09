@@ -45,7 +45,25 @@ go run ./cmd/cmdguard-lint lint --dir .            # text output, exit 1 on find
 go run ./cmd/cmdguard-lint lint --output sarif     # SARIF for CI upload
 go run ./cmd/cmdguard-lint lint --disable CG004    # rule filtering
 go run ./cmd/cmdguard-lint rules                   # list rules
+go run ./cmd/cmdguard-lint rules --markdown        # rule table for this README
 ```
+
+### Baseline / Ratchet Mode
+
+Adopting on a codebase with pre-existing findings? Record them as the
+baseline once, then only NEW findings gate the run:
+
+```bash
+go run ./cmd/cmdguard-lint lint --write-baseline   # snapshot current findings, exit 0
+go run ./cmd/cmdguard-lint lint --dir .            # now fails only on findings beyond the baseline
+```
+
+The baseline defaults to `.cmdguard-lint-baseline.json` in the linted
+directory (override with `--baseline <path>`). Matching is per rule+file with
+line-drift tolerance: an edit that shifts a baselined finding's line keeps it
+baselined; a surplus finding for the same rule+file is new and fails the run.
+When findings get fixed, the run prints the stale entry count — rerun
+`--write-baseline` to tighten the ratchet. Baselines never grow on their own.
 
 ### BuildFlow
 

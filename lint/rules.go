@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go/ast"
+	"strings"
 
 	"github.com/larsartmann/go-finding"
 	linter "github.com/larsartmann/go-linter-sdk"
@@ -156,6 +157,45 @@ func Detect(ctx context.Context, dir string) ([]finding.Finding, error) {
 	}
 
 	return applySuppressions(proj, findings), nil
+}
+
+// FilterByIDs applies --enable/--disable semantics to a finding set: findings
+// from disabled rules are dropped; when enable is non-empty, only findings
+// from enabled rules survive. Both take comma-separated rule IDs (spaces
+// tolerated, empty segments ignored) — the same syntax as the CLI flags and
+// the provider's enable/disable options, so all three surfaces stay uniform.
+func FilterByIDs(findings []finding.Finding, enable, disable string) []finding.Finding {
+	enabled := idSet(enable)
+	disabled := idSet(disable)
+
+	kept := make([]finding.Finding, 0, len(findings))
+
+	for _, candidate := range findings {
+		if disabled[string(candidate.Rule)] {
+			continue
+		}
+
+		if len(enabled) > 0 && !enabled[string(candidate.Rule)] {
+			continue
+		}
+
+		kept = append(kept, candidate)
+	}
+
+	return kept
+}
+
+// idSet splits a comma-separated rule-ID list into a set.
+func idSet(value string) map[string]bool {
+	set := map[string]bool{}
+
+	for part := range strings.SplitSeq(value, ",") {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			set[trimmed] = true
+		}
+	}
+
+	return set
 }
 
 // ruleFor wraps a check into a go-linter-sdk RuleFunc with stable identity.
