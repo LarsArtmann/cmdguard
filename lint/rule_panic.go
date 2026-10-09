@@ -22,14 +22,15 @@ func checkPanicOnConstructor(proj *project, meta linter.RuleMeta) []finding.Find
 	for i := range proj.files {
 		file := &proj.files[i]
 
-		if firstCmdguardPath(file.imports) == "" {
-			continue
-		}
-
 		// Package-level constructor errors (var x, err = NewCLI(...) in any
 		// file of the package) are visible to every function body; body-local
-		// assignments stay primary. See crossfile.go.
+		// assignments stay primary. See crossfile.go. A file without its own
+		// cmdguard import still qualifies when the package declares one.
 		packageErrs := proj.constructorErrIdentsFor(file)
+
+		if firstCmdguardPath(file.imports) == "" && len(packageErrs) == 0 {
+			continue
+		}
 
 		forFuncs(file.file, func(body *ast.BlockStmt) {
 			errIdents := file.cmdguardConstructorErrIdents(body)

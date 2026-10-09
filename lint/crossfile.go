@@ -46,6 +46,10 @@ func dirGroupOf(file *sourceFile) string {
 // buildCrossFileIndex walks every file once and unions its package-level
 // facts per directory group. Called once from analyze so all rules share the
 // result without per-check recomputation or lazy-init races.
+//
+// Two phases: constructor facts first (their receiver is the imported
+// package, resolvable per file), then Execute facts (their receiver is a CLI
+// variable, which may be declared in another file — hence phase order).
 func buildCrossFileIndex(files []sourceFile) map[string]*crossFileIndex {
 	index := map[string]*crossFileIndex{}
 
@@ -72,33 +76,50 @@ func buildCrossFileIndex(files []sourceFile) map[string]*crossFileIndex {
 		cmdguardPath := firstCmdguardPath(file.imports)
 
 		file.topLevelVarCalls(func(sel *ast.SelectorExpr) bool {
-			if cmdguardPath == "" || sel.Sel == nil {
+			if cmdguardPath == "" || sel.Sel == nil || !cmdguardConstructors()[sel.Sel.Name] {
 				return false
 			}
 
-			if sel.Sel.Name == "NewCLI" || sel.Sel.Name == "Execute" || cmdguardConstructors()[sel.Sel.Name] {
-				return file.selectorFrom(sel, cmdguardPath)
-			}
-
-			return false
+			return file.selectorFrom(sel, cmdguardPath)
 		}, func(names []*ast.Ident, call *ast.CallExpr) {
 			sel, _ := call.Fun.(*ast.SelectorExpr)
 			if sel == nil || sel.Sel == nil {
 				return
 			}
 
-			switch sel.Sel.Name {
-			case "NewCLI":
+			if sel.Sel.Name == "NewCLI" {
 				// var cli, err = NewCLI(...): cli is the value slot, err the error.
 				addFirstIdent(group.cliVars, names)
-				addLastIdent(group.constructorErrs, names)
-			case "Execute":
-				addLastIdent(group.execErrs, names)
-			default:
-				// NewCommand / NewParentCommand / AddCommand: the error is
-				// the (last) result.
-				addLastIdent(group.constructorErrs, names)
 			}
+
+			// NewCLI/NewCommand/NewParentCommand/AddCommand: the error is
+			// the (last) result.
+			addLastIdent(group.constructorErrs, names)
+		})
+	}
+
+	for i := range files {
+		file := &files[i]
+		group := groupFor(file)
+
+		// A package-level Execute receiver can be a CLI var this file
+		// assigned locally or one another file declared package-level.
+		cliVars := file.cliVars()
+
+		for name := range group.cliVars {
+			cliVars[name] = true
+		}
+
+		file.topLevelVarCalls(func(sel *ast.SelectorExpr) bool {
+			if sel == nil || sel.Sel == nil || sel.Sel.Name != "Execute" {
+				return false
+			}
+
+			receiver, ok := sel.X.(*ast.Ident)
+
+			return ok && cliVars[receiver.Name]
+		}, func(names []*ast.Ident, _ *ast.CallExpr) {
+			addLastIdent(group.execErrs, names)
 		})
 	}
 
