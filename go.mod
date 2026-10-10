@@ -9,8 +9,8 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20261001125412-878653296cfd // indirect
-	github.com/charmbracelet/x/ansi v0.11.8 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20261008173134-6b8d4baf91b4 // indirect
+	github.com/charmbracelet/x/ansi v0.11.9 // indirect
 	github.com/charmbracelet/x/exp/charmtone v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/slice v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -18,7 +18,7 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/dlclark/regexp2/v2 v2.8.3 // indirect
+	github.com/dlclark/regexp2/v2 v2.8.4 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-faster/jx v1.2.0 // indirect
 	github.com/go-faster/yaml v0.4.6 // indirect
@@ -31,19 +31,19 @@ require (
 	github.com/larsartmann/go-branded-id v0.7.0 // indirect
 	github.com/larsartmann/go-error-family v0.11.0 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
-	github.com/larsartmann/go-output/d2 v0.38.3 // indirect
+	github.com/larsartmann/go-output/d2 v0.38.4 // indirect
 	github.com/larsartmann/go-output/daghtml v0.38.3 // indirect
-	github.com/larsartmann/go-output/delimited v0.38.3 // indirect
+	github.com/larsartmann/go-output/delimited v0.38.4 // indirect
 	github.com/larsartmann/go-output/escape v0.38.3 // indirect
-	github.com/larsartmann/go-output/graph v0.38.3 // indirect
-	github.com/larsartmann/go-output/markdown v0.38.3 // indirect
-	github.com/larsartmann/go-output/markup v0.38.3 // indirect
-	github.com/larsartmann/go-output/plantuml v0.38.3 // indirect
-	github.com/larsartmann/go-output/serialization v0.38.3 // indirect
-	github.com/larsartmann/go-output/table v0.38.3 // indirect
-	github.com/larsartmann/go-output/tree v0.38.3 // indirect
+	github.com/larsartmann/go-output/graph v0.38.4 // indirect
+	github.com/larsartmann/go-output/markdown v0.38.4 // indirect
+	github.com/larsartmann/go-output/markup v0.38.4 // indirect
+	github.com/larsartmann/go-output/plantuml v0.38.4 // indirect
+	github.com/larsartmann/go-output/serialization v0.38.4 // indirect
+	github.com/larsartmann/go-output/table v0.38.4 // indirect
+	github.com/larsartmann/go-output/tree v0.38.4 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
-	github.com/mattn/go-runewidth v0.0.30 // indirect
+	github.com/mattn/go-runewidth v0.0.31 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
@@ -62,11 +62,11 @@ require (
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/net v0.60.0 // indirect
-	golang.org/x/sync v0.23.0 // indirect
-	golang.org/x/sys v0.48.0 // indirect
-	golang.org/x/term v0.46.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/term v0.47.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 )
 
 require (
@@ -75,11 +75,11 @@ require (
 	github.com/knadh/koanf/parsers/json v1.0.1
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.1
-	github.com/knadh/koanf/v2 v2.3.7
+	github.com/knadh/koanf/v2 v2.3.8
 	github.com/larsartmann/cmdguard/flightrecorder v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
-	github.com/larsartmann/go-output v0.38.3
+	github.com/larsartmann/go-output v0.38.4
 	github.com/larsartmann/samber-do-auditlog v0.11.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2

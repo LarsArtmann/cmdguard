@@ -15,14 +15,16 @@ package depends only on go-finding and go-linter-sdk.
 ## Rules
 
 <!-- BEGIN RULES TABLE: generated from allRuleDefs() — regenerate with `go run ./cmd/cmdguard-lint rules --markdown` -->
-| ID | Severity | Rule | Description |
-| -- | -------- | ---- | ----------- |
-| CG001 | critical | execute bypass | fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract |
-| CG002 | error | stale cmdguard major | importing a frozen cmdguard major blocks all fixes and sub-module features; migrate to the current major |
-| CG003 | error | panic on constructor error | panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return the error instead |
-| CG004 | warning | runtime SetVersion | cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand helper) instead |
-| CG005 | error | duplicate version options | WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options |
-| CG006 | warning | execute error reprinted | the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure |
+
+| ID    | Severity | Rule                       | Description                                                                                                                                              |
+| ----- | -------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CG001 | critical | execute bypass             | fang.Execute runs the raw cobra tree, bypassing cli.Execute and its signal handling, graceful shutdown, cleanup hooks, and single-error-display contract |
+| CG002 | error    | stale cmdguard major       | importing a frozen cmdguard major blocks all fixes and sub-module features; migrate to the current major                                                 |
+| CG003 | error    | panic on constructor error | panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return the error instead                                   |
+| CG004 | warning  | runtime SetVersion         | cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand helper) instead                                     |
+| CG005 | error    | duplicate version options  | WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options                                         |
+| CG006 | warning  | execute error reprinted    | the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure                                            |
+
 <!-- END RULES TABLE -->
 
 The table is generated (L7 drift guard): `rules_table_test.go` fails when the

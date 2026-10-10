@@ -2,7 +2,8 @@ package lint
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"os"
@@ -103,10 +104,9 @@ func WriteBaseline(findings []finding.Finding, path string) error {
 
 	var encoded bytes.Buffer
 
-	encoder := json.NewEncoder(&encoded)
-	encoder.SetIndent("", "  ")
+	encoder := jsontext.NewEncoder(&encoded, jsontext.WithIndent("  "))
 
-	if err := encoder.Encode(baseline); err != nil {
+	if err := json.MarshalEncode(encoder, baseline); err != nil {
 		return fmt.Errorf("marshaling baseline: %w", err)
 	}
 

@@ -55,7 +55,7 @@
 4. **Baseline first draft had a false-positive hole:** `sameFile` compared only path base names (`cmd/util.go` ≡ `internal/util.go`) and would merge across directories. Caught in reflection before tests shipped, but it should never have been drafted — the baseline is written by the same tool that reads it; paths always agree; exact compare is the only correct semantics.
 5. **crossfile.go first draft recorded the wrong ident for `var cli, err = NewCLI(...)`:** `addLastIdent(cliVars, names)` marked `err` as a CLI var. Caught while writing tests. Sloppy slot reasoning on the first pass.
 6. **First CG006 cross-file test was invalid Go** (`cli, execErr := cli, cli.Execute(...)`) plus leftover unused vars and an `import` hack — rewrote the whole test file. Drafting garbage cost a write-compile-fail cycle.
-7. **Ratchet e2e test convergence was slow:** first "new finding" fixture used a method *parameter* (`cli2`) that cliVars legitimately doesn't track; the second attempt still missed that 1-old+1-new for the same rule+file is absorbed BY DESIGN (count semantics) before I built the proper 2-vs-1 surplus case. Three attempts to construct one correct fixture.
+7. **Ratchet e2e test convergence was slow:** first "new finding" fixture used a method _parameter_ (`cli2`) that cliVars legitimately doesn't track; the second attempt still missed that 1-old+1-new for the same rule+file is absorbed BY DESIGN (count semantics) before I built the proper 2-vs-1 surplus case. Three attempts to construct one correct fixture.
 8. **Edit mid-air collision** on `lint/README.md` ("file modified since read") — self-inflicted via d.1; recovered by re-reading.
 9. **FP sweep pointed at the wrong root:** `--dir ../..` from `lint/` is `~/projects`, not cmdguard — I initially presented sibling-project findings as "repo findings". The output happened to be informative (real corpus hits), but the scan target was wrong and briefly risked a false "FP regression" conclusion.
 10. **Ran `golangci-lint fmt ./...` directly** inside lint/ during cleanup — a mild BuildFlow-skill anti-pattern (bypasses the verify layer). No drift resulted (check-all format step green after), but the canonical path was `buildflow`.
@@ -114,9 +114,9 @@
 ## g) QUESTIONS I CANNOT ANSWER MYSELF
 
 1. **Release `lint/v0.2.0` now?** Tag + push + proxy-verify + BuildFlow bump in one go, or batch it with the next core (v4.x) release? Pushing requires your explicit approval either way.
-2. **Ratchet semantics preference:** current baseline absorbs a *replaced* finding (1 fixed + 1 new in the same rule+file nets zero, exit 0). Keep count-based absorption, or should replaced findings also fail (strict identity mode with an explicit `--strict-baseline`)? This is an adoption-UX product call.
+2. **Ratchet semantics preference:** current baseline absorbs a _replaced_ finding (1 fixed + 1 new in the same rule+file nets zero, exit 0). Keep count-based absorption, or should replaced findings also fail (strict identity mode with an explicit `--strict-baseline`)? This is an adoption-UX product call.
 3. **S2 tradeoff:** set `toolchain go1.27.2` now to close 6 reachable stdlib vulns and accept temporarily-red sandboxed nix/treefmt checks until nixpkgs ships 1.27.2 — or keep checks green and wait for nixpkgs (current choice)?
 
 ---
 
-*Point-in-time snapshot. TODO_LIST.md/FEATURES.md/AGENTS.md/CHANGELOG were updated live during the session; items f.14+ are harvest candidates, not yet routed.*
+_Point-in-time snapshot. TODO_LIST.md/FEATURES.md/AGENTS.md/CHANGELOG were updated live during the session; items f.14+ are harvest candidates, not yet routed._
