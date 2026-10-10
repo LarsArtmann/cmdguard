@@ -24,7 +24,7 @@ Instead, send an email to **lars@larsartmann.com** with:
 
 You can expect an initial response within 48 hours. If the vulnerability is confirmed, we will work with you to coordinate a fix and disclosure timeline.
 
-## Security Best Practices
+## Security Practices
 
 When using cmdguard in production:
 
