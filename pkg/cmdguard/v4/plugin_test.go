@@ -38,7 +38,7 @@ func (colorPlugin) Register(r PluginRegistrar) error {
 	return nil
 }
 
-var errContainsDash = dashError("value must not contain dashes")
+var errContainsDash error = dashError("value must not contain dashes")
 
 type dashError string
 
