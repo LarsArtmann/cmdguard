@@ -21,15 +21,54 @@ const (
 //
 // and replace the marked section. Pipes in descriptions are escaped so a
 // future rule text cannot silently break the table.
+//
+// Columns are padded to the widest cell (dprint's Markdown table format), so
+// the generated section is a fixed point for both this generator and the
+// dprint formatter — rules_table_test.go pins it byte-for-byte, and running
+// dprint over README.md never rewrites it.
 func RuleTableMarkdown() string {
-	var b strings.Builder
+	header := []string{"ID", "Severity", "Rule", "Description"}
+	sep := []string{"--", "--------", "----", "-----------"}
 
-	b.WriteString("| ID | Severity | Rule | Description |\n")
-	b.WriteString("| -- | -------- | ---- | ----------- |\n")
+	rows := make([][]string, 0, len(allRuleDefs())+2)
+	rows = append(rows, header, sep)
 
 	for _, def := range allRuleDefs() {
 		description := strings.ReplaceAll(def.meta.Description, "|", "\\|")
-		fmt.Fprintf(&b, "| %s | %s | %s | %s |\n", def.meta.ID, def.meta.Sev, def.meta.Name, description)
+		rows = append(rows, []string{def.meta.ID, fmt.Sprint(def.meta.Sev), def.meta.Name, description})
+	}
+
+	width := make([]int, len(header))
+
+	for _, row := range rows {
+		if row[0] == "--" {
+			continue
+		}
+
+		for i, cell := range row {
+			if len(cell) > width[i] {
+				width[i] = len(cell)
+			}
+		}
+	}
+
+	var b strings.Builder
+
+	writeRow := func(cells []string, isSep bool) {
+		parts := make([]string, len(cells))
+		for i, cell := range cells {
+			if isSep {
+				parts[i] = " " + strings.Repeat("-", width[i]) + " "
+			} else {
+				parts[i] = " " + cell + strings.Repeat(" ", width[i]-len(cell)) + " "
+			}
+		}
+
+		b.WriteString("|" + strings.Join(parts, "|") + "|\n")
+	}
+
+	for _, row := range rows {
+		writeRow(row, row[0] == "--")
 	}
 
 	return b.String()

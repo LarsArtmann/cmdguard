@@ -36,9 +36,16 @@ func TestReadmeRuleTableInSync(t *testing.T) {
 	}
 
 	section := content[begin+len(readmeTableBegin) : end]
-	want := "\n" + RuleTableMarkdown()
+	want := strings.TrimSpace(RuleTableMarkdown())
+	got := strings.TrimSpace(section)
 
-	if section != want {
+	// Compared trimmed: dprint owns the blank lines around the section and
+	// rewrites README.md whenever they differ, so pinning them here made the
+	// two guards fight (generator regenerated raw, dprint repadded, guard red
+	// again). The generator owns the table content byte-for-byte — padded
+	// columns included (RuleTableMarkdown emits dprint's exact table format) —
+	// and this test still fails on any rule add/remove/reword.
+	if got != want {
 		t.Errorf(`README.md rule table is stale (L7 drift guard).
 Regenerate with: go run ./cmd/cmdguard-lint rules --markdown
 and replace the section between the markers.
@@ -46,6 +53,6 @@ and replace the section between the markers.
 want:
 %s
 got:
-%s`, want, section)
+%s`, want, got)
 	}
 }
