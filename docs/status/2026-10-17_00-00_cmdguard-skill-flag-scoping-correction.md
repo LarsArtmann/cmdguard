@@ -12,8 +12,8 @@
 Lars reported that `~/projects/erraudit` "thinks you can not scope a flag per-command"
 and demanded a cmdguard skill so consumer-side AI sessions stop rediscovering — and
 misdocumenting — cmdguard's flag model. The offending text was found at
-`erraudit/AGENTS.md:184`: *"cmdguard v4 has no per-subcommand exclusion (only root-local
-`local:"true"`)"*, embedded in an otherwise-valuable dead-flag matrix bullet.
+`erraudit/AGENTS.md:184`: _"cmdguard v4 has no per-subcommand exclusion (only root-local
+`local:"true"`)"_, embedded in an otherwise-valuable dead-flag matrix bullet.
 
 ---
 
@@ -145,6 +145,7 @@ Nothing irreversible. Two honest near-misses:
 ## f) NEXT WORK (up to 50, ordered roughly by leverage)
 
 **Close out this session's loose ends:**
+
 1. Run `nix flake check` (or `buildflow`) in cmdguard; fix any format drift in
    `flake.nix`/`AGENTS.md`/`SKILL.md`.
 2. Commit the three change sets explicitly (or verify pma captured them: `git status`
@@ -165,39 +166,39 @@ Nothing irreversible. Two honest near-misses:
 
 **erraudit remediation (the reason this all started):**
 11. Decide the dead-flag strategy: migrate command-specific flags out of `AppConfig`
-    into per-command `F` structs (`fix` has 17 dead; `tree` ignores 8; `errorflow`,
-    `nolint-audit`, `portfolio`, `lsp`, `extension` each ignore several).
+into per-command `F` structs (`fix` has 17 dead; `tree` ignores 8; `errorflow`,
+`nolint-audit`, `portfolio`, `lsp`, `extension` each ignore several).
 12. Implement the AGENTS.md-documented guard: reject explicitly-CLI-set dead flags per
-    command, keyed on `cmd.Flags().Changed`, never config/env values.
+command, keyed on `cmd.Flags().Changed`, never config/env values.
 13. Re-run the dead-flag matrix after migration; update AGENTS.md:184's matrix.
 14. Consider `local:"true"` + `RegisterLocalCommandFlags` for root-run-only flags
-    (e.g. `violations-only` pattern) instead of persistence-by-default.
+(e.g. `violations-only` pattern) instead of persistence-by-default.
 15. Fix the `nolint-audit` `--no-suppress` lie (forced `NoSuppress:true`).
 
 **Skill hardening:**
 16. Add `references/` layer for deep content (DI/middleware/auditlog/output formats)
-    if the body grows past ~400 lines.
+if the body grows past ~400 lines.
 17. Add a worked "migrate a persistent flag into an F struct" recipe to the skill.
 18. Cross-link the skill from cmdguard README (consumers browsing GitHub).
 19. Document the skill in FEATURES.md (WORTH CONSIDERING → DONE after first trigger).
 20. Re-verify the skill's source-line references each release (they rot); the
-    AGENTS.md sync rule now says so — make it a release-checklist item.
+AGENTS.md sync rule now says so — make it a release-checklist item.
 21. Consider a cmdguard-lint rule for "root config field consumed by exactly one
-    command" (dead-flag detection at the library level, fleet-wide value — BuildFlow
-    provider via the existing `lint` sub-module).
+command" (dead-flag detection at the library level, fleet-wide value — BuildFlow
+provider via the existing `lint` sub-module).
 
 ** cmdguard repo health noticed in passing:**
 22. AGENTS.md says "Go 1.26" in Coding Standards but go.mod says `go 1.27` — align.
 23. AGENTS.md header "Status: v4.0.2" — verify against latest tag when convenient.
 24. `lint/v0.2.0` release + BuildFlow fleet bump is still pending per AGENTS.md
-    (baseline/cross-file/options need shipping fleet-wide).
+(baseline/cross-file/options need shipping fleet-wide).
 25. Website (`website/`) doesn't mention the skill — optional surface.
 
 **Process:**
 26. Encode the `rg -rn` lesson in crush-config `references/lessons.md` (commit there;
-    the global install is read-only by design).
+the global install is read-only by design).
 27. Next session: confirm the cmdguard skill appears in `available_skills` and
-    triggers on a flag-scoping question — the real acceptance test.
+triggers on a flag-scoping question — the real acceptance test.
 
 ---
 
@@ -216,4 +217,4 @@ Nothing irreversible. Two honest near-misses:
 
 ---
 
-*Arte in Aeternum — report ends. Awaiting instructions.*
+_Arte in Aeternum — report ends. Awaiting instructions._

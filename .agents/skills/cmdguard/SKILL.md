@@ -8,19 +8,27 @@ description: Build, extend, or review Go CLIs built with cmdguard v4 (`github.co
 cmdguard v4 wraps spf13/cobra with struct-tag flags, samber/do DI, middleware,
 config-file loading, rich output, and a no-panics API. Everything returns errors.
 Module: `github.com/larsartmann/cmdguard/v4`, package `pkg/cmdguard/v4`.
+Published: v4.1.0 (2026-10-04, pkg.go.dev-verified).
 
 ## Verification status
 
-| Claim                                                                  | Status      | Source                                                                                     |
-| ---------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| Per-command F-struct flags registered via `cmd.Flags()` (local, never inherited) | ✅ Verified | `pkg/cmdguard/v4/cli_command.go:203` + `flags.go:69-71`, runnable proof 2026-10-16         |
-| Root T fields persistent by default; `local:"true"` → root-only          | ✅ Verified | `flags.go:85-104` (`RegisterScopedFlags`), wired at `cli.go:246`; `flags_scoped_test.go`   |
-| `noop --depth` and `scan --build` both fail with "Unknown flag"          | ✅ Verified | End-to-end `ExecuteWithArgs` proof run, 2026-10-16                                          |
-| `cli.RegisterLocalCommandFlags(cmd)` opts a subcommand into root-local flags | ✅ Verified | `cli_accessors.go:112`, `flags.go:115-137` (subcommand's own flag definition wins)     |
-| Full tag set: flag, short, default, help, values, required, count, local, hidden, validate, env, prompt | ✅ Verified | `config_parsing.go:123-233`, `FlagTag` struct at `config.go:20-36` |
-| Nested config structs recurse (except registered value types)           | ✅ Verified | `config_parsing.go:100-118`                                                                  |
+All rows below verified against source in `~/projects/cmdguard` on 2026-10-16,
+unless the Source column says otherwise.
 
-Everything below was read from v4 source (repo at `~/projects/cmdguard`) unless marked otherwise.
+| Claim                                                                        | Status      | Source                                                                                          |
+| ---------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------- |
+| Per-command F-struct flags registered via `cmd.Flags()` (local, never inherited) | ✅ Verified | `cli_command.go:203` + `flags.go:69-71`; end-to-end regression test `cli_flag_scoping_test.go`   |
+| Root T fields persistent by default; `local:"true"` → root-only                | ✅ Verified | `flags.go:85-104` (`RegisterScopedFlags`), wired at `cli.go:246`; `flags_scoped_test.go`         |
+| `noop --depth` / `scan --build` fail with "Unknown flag"; root accepts `--build` | ✅ Verified | `cli_flag_scoping_test.go` (4 subtests, race-enabled)                                           |
+| Local-flag default + env still apply on commands lacking the flag              | ✅ Verified | `flags_parse.go:26-38`                                                                          |
+| Precedence: flag → env → default (default pre-updated by config file)          | ✅ Verified | `flags_parse.go:45-71` + `cli.go:230-235` (`updateTagDefaultsFromConfig`)                        |
+| `cli.RegisterLocalCommandFlags(cmd)` opts a subcommand into root-local flags   | ✅ Verified | `cli_accessors.go:112`, `flags.go:115-137` (subcommand's own flag definition wins)               |
+| Full tag set: flag, short, default, help, values, required, count, local, hidden, validate, env, prompt | ✅ Verified | `config_parsing.go:123-233`, `FlagTag` struct at `config.go:20-36` |
+| Nested config structs recurse (except registered value types)                 | ✅ Verified | `config_parsing.go:100-118`                                                                      |
+| `ArgsFromContext(ctx)` retrieves positional args                              | ✅ Verified | `cli_command.go:19`                                                                              |
+| pkg.go.dev page for the package exists (v4.1.0)                               | ✅ Verified | Fetched live 2026-10-16                                                                          |
+| 59 exported sentinel error vars; 87 test funcs in `examples/taskctl`           | ✅ Verified | `rg` over `errors*.go` / taskctl tests, 2026-10-16                                                |
+| CG001-CG006 lint rule semantics                                               | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                            |
 
 ## The mental model: one type param on the CLI, a flag struct per command
 
@@ -42,6 +50,8 @@ err = cli.ExecuteAndExit(ctx) // blessed entry point
 - Type params are inferred at `NewCommand` — no explicit instantiation needed.
 - Parents: `NewParentCommand[T, F]("db", "Long description (required)", NoFlags{},
   cmdguard.WithSubcommands(migrate, seed))`. Subcommands must share T and F.
+- Handlers receive `(ctx, *T, F)` — no positional args. Get them with
+  `cmdguard.ArgsFromContext(ctx)`; cmdguard stores them automatically.
 
 ## Flag scoping — read this before claiming something is impossible
 
@@ -53,19 +63,30 @@ err = cli.ExecuteAndExit(ctx) // blessed entry point
 | Root `T` struct + `local:"true"`                           | Root only — not inherited by any subcommand                  |
 | A command's own `F` struct (e.g. `ScanFlags`)              | That command only — never inherited, rejected elsewhere      |
 
-Mechanics (verified in source):
+Mechanics (all source-verified):
 
 - Root `T` flags go through `RegisterScopedFlags` (`cli.go:246`): default persistent,
   `local:"true"` lands on `cmd.Flags()` (root-only).
 - Every command's `F` flags go through `RegisterFlags` → `cmd.Flags()` (`cli_command.go:203`)
   — cobra-local, so they exist ONLY on that command. `noop --depth` fails with
   "Unknown flag: --depth" when `depth` lives in `ScanFlags`. That is the designed
-  behavior, not a limitation.
+  behavior, not a limitation. Pinned by `cli_flag_scoping_test.go`.
 - A subcommand that needs a root-local flag opts in:
   `cli.RegisterLocalCommandFlags(cobraCmd)` registers the root's `local:"true"` flags
   on it. If the subcommand already defines a flag with the same name, its own
   definition wins.
 - `hidden:"true"` hides a flag from `--help` anywhere, fully functional otherwise.
+
+Subtleties worth knowing:
+
+- A `local:"true"` flag's declared DEFAULT (and its `env` var, if tagged) still
+  applies on commands where the flag is not registered — a default is a default
+  regardless of which command runs. Only the explicit CLI value is impossible there
+  (`flags_parse.go:26-38`).
+- The bare root run (no subcommand) shows help and short-circuits BEFORE
+  `PersistentPreRunE` parses flags into the config: root-local flags are ACCEPTED on
+  the bare root, but their values only materialize in `cfg` when a command actually
+  executes.
 
 **What does NOT exist:** excluding one inherited root-persistent flag from one
 specific subcommand ("persistent everywhere except `foo`"). The idiomatic fix is not
@@ -79,35 +100,47 @@ an exclusion mechanism — it is putting the flag where it belongs:
 The classic smell (seen in erraudit, 2026-10-16): stuffing every flag into the root
 `AppConfig` makes them all persistent, so subcommands silently accept flags they
 ignore ("dead flags"). That is a consumer-side modeling problem, not a cmdguard
-limitation — move command-specific flags into per-command `F` structs.
+limitation. Migration recipe:
+
+1. Define the flag as a field in the consuming command's `F` struct (create the
+   struct if the command used `NoFlags{}`), with the usual struct tags, e.g. a
+   `DryRun bool` field tagged `flag:"dry-run"` plus `help:"..."`.
+2. Move any `env`/`validate`/`values` tags along with it; keep `local:"true"` OFF —
+   F-struct flags are already command-local.
+3. Read the value from the handler's `flags` parameter instead of `cfg`.
+4. Drop the field from root `T`. Any other command still passing the flag now gets
+   the desired "Unknown flag" error instead of silent acceptance.
+5. Config-file users of that key need the value re-homed (config file values feed
+   root `T` defaults) — check `.yaml` consumers before migrating.
 
 ## Struct tag reference
 
 A field becomes a flag only when it has a `flag` tag (`flag:"-"` skips it).
 
-| Tag                     | Effect                                                                   |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `flag:"name"`           | Flag name (required for the field to register at all)                     |
-| `short:"v"`             | Single-character shorthand                                               |
-| `default:"..."`         | Default value (zero value when absent)                                   |
-| `help:"text"`           | Help text                                                                |
-| `values:"a,b,c"`        | Enum constraint (validated → `ErrInvalidEnum`)                            |
-| `required:"true"`       | Must be explicitly set (bool tag)                                         |
-| `count:"true"`          | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                |
-| `local:"true"`          | Owning command only, not inherited (bool tag)                             |
-| `hidden:"true"`         | Excluded from `--help`, fully functional (bool tag)                       |
-| `validate:"min=1,max=100"` | Rule-based validation (`ErrValueOutOfRange` etc.)                      |
-| `env:"VAR_NAME"`        | Environment fallback (prefixable via `WithEnvPrefix`)                     |
-| `prompt:"Question?"`    | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module) |
+| Tag                        | Effect                                                                   |
+| -------------------------- | ------------------------------------------------------------------------ |
+| `flag:"name"`              | Flag name (required for the field to register at all)                     |
+| `short:"v"`                | Single-character shorthand                                               |
+| `default:"..."`            | Default value (zero value when absent)                                   |
+| `help:"text"`              | Help text                                                                |
+| `values:"a,b,c"`           | Enum constraint (validated → `ErrInvalidEnum`)                            |
+| `required:"true"`          | Must be explicitly set (bool tag)                                         |
+| `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                |
+| `local:"true"`             | Owning command only, not inherited (bool tag)                             |
+| `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                       |
+| `validate:"min=1,max=100"` | Rule-based validation (`ErrValueOutOfRange` etc.)                         |
+| `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                     |
+| `prompt:"Question?"`       | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module) |
 
 Nested structs recurse automatically into flattened flags — EXCEPT registered value
 types (`Duration`, `Port`, `Email`, `URL`, `HostPort`, `Enum`, `FilePath`, `LogLevel`,
 `time.Duration`, `time.Time`), which stay atomic.
 
-Precedence: explicit flag → `env` → config file → default. Config files
-(`WithConfigFile(paths...)`, JSON/YAML/TOML auto-detected, `$VAR`/`~` expanded,
-missing files skipped) load BEFORE flag registration, so config values become the new
-defaults that flags/env still override.
+Precedence (source-verified, `flags_parse.go:45-71` + `cli.go:230-235`): explicit
+flag → `env` → default, where the config file has already overwritten the defaults
+before flags register. Effectively: flag → env → config file → tag default. Config
+files (`WithConfigFile(paths...)`, JSON/YAML/TOML auto-detected, `$VAR`/`~` expanded,
+missing files skipped) feed root `T` only.
 
 ## Error and exit contract
 
@@ -119,8 +152,9 @@ defaults that flags/env still override.
   `ExecuteAndExit` honors `ExitCoder` implementations.
 - `SilenceUsage` is true by default (no usage-on-error spam); `WithoutSilenceUsage()`
   re-enables it.
-- All errors are `fmt.Errorf("%w: ...", sentinel)`-wrapped — reach sentinels with
-  `errors.Is`, typed errors with `errors.AsType[*T]` (Go 1.26+).
+- 59 exported sentinel errors, all `fmt.Errorf("%w: ...", sentinel)`-wrapped — reach
+  them with `errors.Is`, typed errors with `errors.AsType[*T]` (Go 1.26+). Full list:
+  `docs/ERROR_REFERENCE.md`.
 
 ## Gotchas that bite consumers
 
@@ -152,18 +186,22 @@ Core has zero dependencies on these. Each lives at the repo root and imports as
 | `flightrecorder`  | Go 1.25+ `runtime/trace` flight recorder, zero external deps     | `WithFlightRecorder[T](cfg)`                        |
 | `lint`            | cmdguard usage linter (go-finding; BuildFlow provider + CLI)     | `cmdguard-lint`, rules CG001-CG006                  |
 
-cmdguard-lint rules worth knowing while writing consumers: CG001 execute bypass
-(`Execute` without exit handling), CG002 stale major version, CG003 constructor panic
-(ignoring `New*` errors), CG004 runtime `SetVersion`, CG005 duplicate version options,
-CG006 re-printing the execute error. Suppress with `//cmdguard-lint:ignore <ID> <reason>`.
+cmdguard-lint rules worth knowing while writing consumers (repo-documented): CG001
+execute bypass (`Execute` without exit handling), CG002 stale major version, CG003
+constructor panic (ignoring `New*` errors), CG004 runtime `SetVersion`, CG005
+duplicate version options, CG006 re-printing the execute error. Suppress with
+`//cmdguard-lint:ignore <ID> <reason>`.
 
 ## Where deeper truth lives (cmdguard repo)
 
 - `AGENTS.md` — contributor context, design principles, full gotcha list
 - `docs/QUICKSTART.md`, `docs/TUTORIAL.md` — guided walkthroughs
-- `docs/ERROR_REFERENCE.md` — the 40+ sentinel errors
+- `docs/ERROR_REFERENCE.md` — the sentinel error catalog
 - `docs/MIGRATION_FROM_COBRA.md`, `docs/MIGRATION_v3_v4.md` — migration paths
 - `docs/COBRA_FOOTGUNS.md` — cobra behaviors cmdguard neutralizes
-- `pkg/cmdguard/v4/flags.go`, `cli_command.go`, `cli.go` — flag scoping source of truth
-- `examples/taskctl/` — flagship example (~66 integration tests)
-- pkg.go.dev/github.com/larsartmann/cmdguard/v4 — godoc
+- `pkg/cmdguard/v4/flags.go`, `cli_command.go`, `cli.go`, `flags_parse.go` — flag
+  scoping and precedence source of truth
+- `pkg/cmdguard/v4/cli_flag_scoping_test.go`, `flags_scoped_test.go` — scoping
+  regression tests (end-to-end and registry-level)
+- `examples/taskctl/` — flagship example (87 test functions)
+- pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4 — godoc (verified live)

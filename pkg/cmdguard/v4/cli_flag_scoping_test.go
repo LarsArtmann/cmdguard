@@ -10,8 +10,8 @@ import (
 
 // scopingConfig defines one persistent flag and one root-local flag.
 type scopingConfig struct {
-	Global string `default:"" flag:"global" help:"global persistent flag"`
-	Build  string `default:"full" flag:"build" help:"root-only flag" local:"true"`
+	Global string `default:""     flag:"global" help:"global persistent flag"`
+	Build  string `default:"full" flag:"build"  help:"root-only flag"         local:"true"`
 }
 
 // scopingScanFlags defines a flag that exists only on the scan command.

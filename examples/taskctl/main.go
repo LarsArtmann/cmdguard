@@ -60,7 +60,9 @@ func main() {
 func run(ctx context.Context, args []string) error {
 	rec := newProductionRecorder()
 
-	cli, err := buildApp(rec) //nolint:contextcheck // DI construction is context-free by design; ctx arrives at ExecuteWithArgs below
+	cli, err := buildApp(
+		rec,
+	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 

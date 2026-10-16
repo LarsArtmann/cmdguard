@@ -4,7 +4,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v4.0.2 - zero panics, 87.8% coverage, 0 lint issues, 0 race conditions
+**Status:** v4.1.0 - zero panics, 87.8% coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -50,7 +50,7 @@ nix run .#check-all
 
 **Module path:** `github.com/larsartmann/cmdguard/v4`
 
-**Current Status:** v4.0.2. ~590 test functions, 29 benchmarks, 8 fuzz targets, 87.8% core / 96.1% flightrecorder / 80.3% testutil / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
+**Current Status:** v4.1.0. ~980 test functions workspace-wide (370 in core), 29 benchmarks, 8 fuzz targets, 87.8% core / 96.1% flightrecorder / 80.3% testutil / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -75,7 +75,7 @@ cmdguard/
 ├── telemetry/                # SUB-MODULE: OpenTelemetry middleware
 ├── flightrecorder/           # SUB-MODULE: Go runtime execution trace flight recorder (stdlib only)
 ├── lint/                     # SUB-MODULE: cmdguard usage linter (go-finding + toolsdk); provider/ + cmd/cmdguard-lint/
-├── examples/taskctl/         # Flagship example: production task manager CLI (~66 integration tests)
+├── examples/taskctl/         # Flagship example: production task manager CLI (87 test functions)
 ├── examples/docs-generator/  # Example: GenerateDocs usage
 ├── benchmarks/               # Performance benchmarks
 ├── tests/integration/        # Integration tests
