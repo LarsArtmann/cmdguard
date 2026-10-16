@@ -73,6 +73,7 @@ linters:
     - intrange
     - iotamixing
     - ireturn
+    - lll
     - loggercheck
     - maintidx
     - makezero
@@ -379,7 +380,7 @@ linters:
       - text: weak cryptographic primitive
         linters:
           - gosec
-      - text: "unused-parameter: parameter .+ seems to be unused"
+      - text: 'unused-parameter: parameter .+ seems to be unused'
         linters:
           - revive
       - path: _test\.go$
