@@ -71,6 +71,12 @@
                 export GOTMPDIR="$HOME/.cache/go-tmp"
                 mkdir -p "$GOTMPDIR"
                 echo "cmdguard dev shell — Go $(go version | awk '{print $3}')"
+
+                # Keep the Crush skill fan-out pointing at this working checkout
+                # ($PWD, never a store path — 2026-09 stale-skill incident).
+                if [ -d "''${HOME:-}/.config/crush/skills" ] && [ -d "$PWD/.agents/skills/cmdguard" ]; then
+                  ln -sfn "$PWD/.agents/skills/cmdguard" "$HOME/.config/crush/skills/cmdguard"
+                fi
               '';
             };
 

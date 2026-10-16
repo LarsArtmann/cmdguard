@@ -79,7 +79,8 @@ cmdguard/
 ├── examples/docs-generator/  # Example: GenerateDocs usage
 ├── benchmarks/               # Performance benchmarks
 ├── tests/integration/        # Integration tests
-├── docs/                     # Documentation (API.md, ADRs, status reports)
+├── docs/                     # Documentation (QUICKSTART, TUTORIAL, ERROR_REFERENCE, ADRs, status reports)
+├── .agents/skills/cmdguard/ # Consumer-facing Crush skill (symlinked into ~/.config/crush/skills/cmdguard)
 ├── website/                  # Documentation website (Astro Starlight, pnpm ≥ 11)
 ├── AGENTS.md                 # This file (enduring context for AI sessions)
 ├── FEATURES.md               # Feature inventory by status
@@ -151,7 +152,9 @@ Without this, `pnpm install` prints `[ERR_PNPM_IGNORED_BUILDS] Ignored build scr
 
 ## API Reference
 
-See [docs/API.md](docs/API.md) for the full API reference (constructors, options, methods, DI, middleware, error handling, version/doctor commands).
+Full reference: [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) godoc plus [docs/QUICKSTART.md](docs/QUICKSTART.md), [docs/TUTORIAL.md](docs/TUTORIAL.md), and [docs/ERROR_REFERENCE.md](docs/ERROR_REFERENCE.md). (A historical docs/API.md was removed in the flightrecorder docs refresh — do not link it.)
+
+Consumer-facing AI sessions get the [`.agents/skills/cmdguard/SKILL.md`](.agents/skills/cmdguard/SKILL.md) skill (fan-out symlink, self-healed by the devShell shellHook). When public flag/command/scoping APIs change, update that skill in the same change — it documents the flag scoping model with source-line references that can rot.
 
 Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positionally), `NewParentCommand[T]`, `AddCommand`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) for godoc.
 
