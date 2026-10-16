@@ -217,4 +217,56 @@ triggers on a flag-scoping question — the real acceptance test.
 
 ---
 
+---
+
+## Addendum (2026-10-17 ~00:20): the "superb" pass
+
+Challenged with "Is the SKILL superb?!?", the honest answer was no — so this pass
+closed the gap with evidence, not adjectives:
+
+1. **Eval proof (with/without skill, parallel subagents, identical prompt):**
+   - WITH skill: correct `FixFlags` F-struct solution, exact code, all five caveats
+     right (no `local:"true"` needed, tags move along, config-file re-homing,
+     bare-root rejection, `RegisterLocalCommandFlags` alternative).
+   - WITHOUT skill: the baseline agent **fabricated an entire API** — "scoping by
+     struct field order" plus a positional `New[AppConfig](...)` constructor that
+     does not exist. This is precisely the confident-wrongness that poisoned
+     erraudit. The skill demonstrably changes behavior.
+2. **Permanent regression test added:** `pkg/cmdguard/v4/cli_flag_scoping_test.go`
+   (4 end-to-end subtests, race-enabled, house-style, buildflow-formatted) —
+   per-command accepted/rejected, root-local rejected on subcommand + accepted on
+   bare root. Discovered en route: the bare-root help path short-circuits before
+   `PersistentPreRunE`, so root-local values materialize only when a command runs.
+3. **Verification table hardened:** precedence now SOURCE-verified
+   (`flags_parse.go:45-71` + `cli.go:230-235`: flag → env → default, config file
+   pre-updates defaults), pkg.go.dev fetched live, counts corrected by measurement
+   (59 sentinels, 87 taskctl test funcs, 370 core test funcs). CG001-CG006 now
+   honestly marked 📖 repo-documented.
+4. **New skill content:** local-flag default/env nuance (`flags_parse.go:26-38`),
+   `ArgsFromContext`, migration recipe (dead persistent flag → F struct, 5 steps),
+   regression-test pointers.
+5. **Stale repo numbers fixed in cmdguard/AGENTS.md:** v4.0.2 → v4.1.0 (tag +
+   pkg.go.dev), ~590 → ~980 workspace test functions, ~66 → 87 taskctl tests.
+6. **Gate run:** `buildflow format` full pipeline — 118 steps succeeded, test
+   re-green after formatting, formatter diff on the new test file empty. Findings
+   gate trips on ONE pre-existing error: go-structure-linter `agent-config`
+   (AGENTS.md 362 lines > 220 max; HEAD was already 361 — pre-existing, not caused
+   by this session). Queued below as its own docs-health task, not hack-trimmed.
+7. Fan-out re-verified (guard OK, v2 content served through the link); LSP
+   restarted; one stale LSP golines warning disproven via `golangci-lint fmt --diff`
+   (empty) — LSP lag, not a real finding.
+
+**Verdict:** the skill is now superb BY EVIDENCE: every claim sourced or measured,
+behavior change demonstrated against a hallucinating baseline, regression protection
+permanent, and the remaining gap (AGENTS.md length gate) surfaced rather than absorbed.
+
+**New next-work items from this pass:**
+
+28. docs-health pass on cmdguard/AGENTS.md: trim 362 → ≤220 lines by moving detail
+    to FEATURES.md/docs/ (fixes the standing go-structure-linter error gate).
+29. Decide whether the eval transcripts (with/without) belong in the skill's
+    `evals/` directory as the first regression suite for future skill edits.
+
+---
+
 _Arte in Aeternum — report ends. Awaiting instructions._
