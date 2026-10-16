@@ -140,6 +140,7 @@ not iterate INTO it.
 ## f) NEXT WORK (consolidated, ~50 max; ✅ = done this session)
 
 **Close the current session's loops:**
+
 1. ✅ `nix flake check`/buildflow after edits (done pass 2; repeat for post-00:08
    markdown files)
 2. Run `buildflow format` (or `nix fmt`) over skill v2 + both reports (post-00:08
@@ -164,46 +165,46 @@ not iterate INTO it.
 
 **cmdguard repo health (noticed this session):**
 13. docs-health pass: AGENTS.md 362 → ≤220 lines (fixes standing go-structure-linter
-    error; moves detail to FEATURES.md/docs/) — repo buildflow gate is RED until
-    this lands
+error; moves detail to FEATURES.md/docs/) — repo buildflow gate is RED until
+this lands
 14. Verify AGENTS.md coverage claims (87.8%/96.1%/80.3%/85.9%) are current for v4.1.0
 15. Consider making "counts" in AGENTS.md non-numeric or dated to stop staleness
-    (this session caught three stale numbers)
+(this session caught three stale numbers)
 16. `lint/v0.2.0` release + BuildFlow fleet bump (pre-existing backlog, AGENTS.md)
 17. cmdguard-lint candidate rule: root-config field consumed by exactly one command
-    (dead-flag detection at library level; fleet-wide via BuildFlow provider)
+(dead-flag detection at library level; fleet-wide via BuildFlow provider)
 18. AGENTS.md "Go 1.26" vs go.mod `go 1.27` inconsistency (Coding Standards section)
 19. Re-check "~590→~980" style counts at each release via a script, not by hand
 
 **Skill depth (post-trigger-verification):**
 20. Add `references/` layer for DI/middleware/auditlog/output deep-dives if the body
-    grows
+grows
 21. Add worked config-file + env precedence example with observed values
 22. Add prompt/spinner/telemetry wiring mini-examples (currently one-liners)
 23. Description-optimization loop (20 trigger queries) once the skill has proven
-    baseline behavior
+baseline behavior
 24. Cross-link skill from cmdguard README + FEATURES.md
 25. Document the with/without eval as the skill's acceptance test in its header
 
 **erraudit remediation (the origin story):**
 26. Decide + schedule dead-flag → per-command-`F` migration (fix: 17 dead; tree: 8;
-    errorflow/nolint-audit/portfolio/lsp/extension: several each)
+errorflow/nolint-audit/portfolio/lsp/extension: several each)
 27. Implement the `cmd.Flags().Changed`-keyed dead-flag guard (never config/env)
 28. Re-run the dead-flag matrix post-migration; update AGENTS.md:184
 29. Fix `nolint-audit` forcing `NoSuppress:true` while accepting `--no-suppress`
 30. Consider `local:"true"` + `RegisterLocalCommandFlags` for root-run-only flags
 31. Verify erraudit's `.erraudit.yaml` users aren't broken by any flag migration
-    (config-file keys feed root T only)
+(config-file keys feed root T only)
 
 **Process/fleet:**
 32. Encode the `rg -rn` lesson in crush-config `references/lessons.md` (commit;
-    global install is read-only)
+global install is read-only)
 33. Propose to crush-config: fan-out guard could also detect skill files NOT served
-    (git-committed but link missing) — symmetric to the store-pin check
+(git-committed but link missing) — symmetric to the store-pin check
 34. Consider a fleet-wide "consumer skill" convention note (AGENTS.md sync rule
-    pattern) now that 3+ project skills exist
+pattern) now that 3+ project skills exist
 35. Review whether erraudit should adopt the same `.agents/skills/` pattern for its
-    own consumer knowledge (it has none)
+own consumer knowledge (it has none)
 
 ---
 
