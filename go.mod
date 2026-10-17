@@ -79,7 +79,7 @@ require (
 	github.com/larsartmann/cmdguard/flightrecorder v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
-	github.com/larsartmann/go-output v0.38.4
+	github.com/larsartmann/go-output v0.38.5
 	github.com/larsartmann/samber-do-auditlog v0.11.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
