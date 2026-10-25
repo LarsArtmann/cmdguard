@@ -13,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/dustin/go-humanize/english"
+
 	"github.com/larsartmann/go-finding"
 
 	"github.com/larsartmann/cmdguard/lint"
@@ -191,11 +193,7 @@ func resolveBaseline(flags lintFlags) (string, *lint.Baseline, error) {
 
 // pluralY returns "y" or "ies" for the stale-entry message.
 func pluralY(n int) string {
-	if n == 1 {
-		return "y"
-	}
-
-	return "ies"
+	return english.PluralWord(n, "entry", "entries")
 }
 
 // detectFiltered runs lint.Detect and applies the enable/disable filters,
