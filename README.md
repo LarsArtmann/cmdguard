@@ -172,29 +172,32 @@ type GreetFlags struct {
 }
 
 func main() {
-    cli, err := v4.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
+    cli, err := v4.NewApp("myapp", "My CLI application", AppConfig{},
+        func(cli *v4.CLI[AppConfig]) error {
+            greet, err := v4.NewCommand("greet", &GreetFlags{},
+                func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+                    msg := fmt.Sprintf("Hello, %s!", flags.Name)
+                    if flags.Shout {
+                        msg = strings.ToUpper(msg)
+                    }
+                    fmt.Println(msg)
+                    return nil
+                },
+                v4.WithShort("Greet someone"),
+            )
+            if err != nil {
+                return err
+            }
+            return v4.AddCommands(cli, greet)
+        },
+        v4.WithCLIVersion("1.0.0"),
+        v4.WithBatteries(), // strict validation, signals, version/doctor, hints
+    )
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
         os.Exit(1)
     }
 
-    greetCmd, err := v4.NewCommand("greet", &GreetFlags{},
-        func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-            msg := fmt.Sprintf("Hello, %s!", flags.Name)
-            if flags.Shout {
-                msg = strings.ToUpper(msg)
-            }
-            fmt.Println(msg)
-            return nil
-        },
-        v4.WithShort("Greet someone"),
-    )
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Failed to create command: %v\n", err)
-        os.Exit(1)
-    }
-
-    v4.AddCommand(cli, greetCmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```
@@ -218,6 +221,10 @@ HELLO, CMDGUARD!
 | **Signal handling**        | `WithSignalHandling()` — Ctrl+C cancels context in all handlers                                                                                  |
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                 |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                   |
+| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                            |
+| **Batteries included**     | `WithBatteries()` — strict validation, signal handling, graceful shutdown, version/doctor commands, actionable hints, all opt-in               |
+| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                               |
+| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                   |
 | **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                    |
 | **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                      |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                          |

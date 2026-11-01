@@ -98,8 +98,11 @@ before the major bump.
 from `main` to a running CLI, excluding domain handlers) with no behavior
 regression in `examples/taskctl/*_test.go`.
 
-**Status:** partially shipped pre-v5 (`AddCommands` removes the per-command
-error stanzas). `NewApp`/`WithBatteries` are v5.
+**Status:** shipped pre-v5 as opt-in: `WithBatteries()` (strict validation,
+signals + graceful shutdown, hints, auto `version` when a version is set, and
+`doctor`) plus `NewApp` (construct + build callback, discards a half-built CLI
+on error). Remaining v5 work: flip the defaults and add the deferred-error
+`Builder`.
 
 ### W3. Errors that teach (P3)
 
@@ -117,8 +120,11 @@ error stanzas). `NewApp`/`WithBatteries` are v5.
 **Gate:** a coverage test asserts every exported sentinel has a hint or an
 explicit `no hint by design` entry; JSON envelope snapshot includes `hint`.
 
-**Status:** partially shipped pre-v5 (`ErrorHint` + `hint` in the JSON
-envelope). Fang rendering is v5.
+**Status:** shipped pre-v5. `ErrorHint` powers both the JSON envelope's `hint`
+and a `Hint:` line under human-readable errors (fang's default handler is
+wrapped, not replaced; the plain cobra path prints it after the error).
+`WithoutErrorHints()` opts out. Remaining v5 work: generated
+ERROR_REFERENCE rows.
 
 ### W4. Minimum-code ergonomics (P4)
 
@@ -224,6 +230,9 @@ These shipped additively, with tests and the full quality gate green:
 | W3 | `errors_hints.go`: `ErrorHint(err)` for every classified sentinel; `hint` added to the JSON error envelope; coverage test. |
 | W4 | `AddCommands[T]` atomic batch registration; `AddCommand` split into prepare/attach (a failed conversion no longer reserves the name); duplicate detection keyed on the command name. taskctl: 11 commands, one call, 10 error stanzas gone (432 -> 402 LOC). |
 | W5 | `cmdguard-lint` CG007 (missing short description) and CG008 (missing CLI version), generated README table refreshed, lint module brought back to 0 issues. |
+| W2 | `WithBatteries()` and `NewApp` (opt-in; v5 flips the defaults). |
+| W3 | Human `Hint:` line under errors via fang's default handler; `WithoutErrorHints()`; the plain cobra path prints it too. |
+| Fix | `required`/`values`/`validate` tags are now enforced at run time (the validator had no production caller); string `min`/`max` mean length; meta commands are exempt from required enforcement; validation errors lost their stacked prefixes. |
 
 Verification: `nix run .#check-all` (build, race tests, lint, format, tidy across
 all 7 modules) plus a live `taskctl describe | jq` round-trip.

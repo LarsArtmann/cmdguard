@@ -32,6 +32,9 @@ unless the Source column says otherwise.
 | `Describe()` / hidden `describe` command contract                             | ✅ Verified | `pkg/cmdguard/v4/describe.go` + `describe_test.go`, 2026-11-01                                  |
 | `AddCommands` atomic batch registration                                       | ✅ Verified | `pkg/cmdguard/v4/cli.go` + `describe_test.go` (atomicity, mixed F, name-keyed duplicates), 2026-11-01 |
 | `ErrorHint` coverage of classified sentinels                                  | ✅ Verified | `errors_hints.go` + `errors_hints_test.go` (coverage test), 2026-11-01                          |
+| Human `Hint:` line on errors                                                  | ✅ Verified | `errors_hints.go` (`writeErrorWithHint`) + `errors_hints_render_test.go`, 2026-11-01            |
+| `WithBatteries` / `NewApp` production defaults                                | ✅ Verified | `cli_batteries.go` + `cli_batteries_test.go`, 2026-11-01                                        |
+| Runtime enforcement of `required` / `values` / `validate`                     | ✅ Verified | `flags.go` (`ValidateFlags`) + `flags_runtime_validation_test.go`, 2026-11-01                   |
 
 ## The mental model: one type param on the CLI, a flag struct per command
 
@@ -91,6 +94,35 @@ if err := cmdguard.AddCommands(cli, listCmd, addCmd, doneCmd); err != nil {
 
 Duplicate detection keys on the cobra command name, so `"list [path]"` and
 `"list"` correctly collide.
+
+## Production batteries
+
+`WithBatteries()` is the one-option path to a production-grade CLI. It turns on:
+
+- strict command validation (every command needs `WithShort`),
+- signal handling plus graceful DI shutdown,
+- actionable `Hint:` lines on errors,
+- an auto-registered `version` command when `WithCLIVersion` is set,
+- an auto-registered `doctor` command.
+
+A consumer-defined command named `version` or `doctor` wins. `NewApp` combines
+construction with command registration and never returns a half-built CLI:
+
+```go
+cli, err := cmdguard.NewApp("app", "My app", AppConfig{},
+    func(cli *cmdguard.CLI[AppConfig]) error {
+        return cmdguard.AddCommands(cli, listCmd, addCmd)
+    },
+    cmdguard.WithCLIVersion(version.Version),
+    cmdguard.WithBatteries(),
+)
+if err != nil {
+    return err
+}
+cli.ExecuteAndExit(ctx)
+```
+
+The options are additive; v5 flips these to the defaults.
 
 ## Flag scoping — read this before claiming something is impossible
 
@@ -163,11 +195,11 @@ A field becomes a flag only when it has a `flag` tag (`flag:"-"` skips it).
 | `default:"..."`            | Default value (zero value when absent)                                   |
 | `help:"text"`              | Help text                                                                |
 | `values:"a,b,c"`           | Enum constraint (validated → `ErrInvalidEnum`)                            |
-| `required:"true"`          | Must be explicitly set (bool tag)                                         |
+| `required:"true"`          | Must be set by flag or env var; enforced after parsing (bool tag)         |
 | `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                |
 | `local:"true"`             | Owning command only, not inherited (bool tag)                             |
 | `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                       |
-| `validate:"min=1,max=100"` | Rule-based validation (`ErrValueOutOfRange` etc.)                         |
+| `validate:"min=1,max=100"` | Rule-based validation; `min`/`max` = length on strings, numeric otherwise |
 | `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                     |
 | `prompt:"Question?"`       | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module) |
 
@@ -194,6 +226,9 @@ missing files skipped) feed root `T` only.
 - 59 exported sentinel errors, all `fmt.Errorf("%w: ...", sentinel)`-wrapped — reach
   them with `errors.Is`, typed errors with `errors.AsType[*T]` (Go 1.26+). Full list:
   `docs/ERROR_REFERENCE.md`.
+- Human-readable errors print the error once and then a `Hint:` line when
+  cmdguard knows the fix (`WithoutErrorHints()` disables it; JSON envelopes keep
+  the `hint` field).
 - `ErrorHint(err)` returns one actionable fix sentence per classified sentinel
   (empty when unknown). The JSON error envelope includes it as `hint`; use it in
   custom handlers instead of duplicating fix text.
@@ -212,6 +247,9 @@ missing files skipped) feed root `T` only.
   additionally shuts down DI services (implies the former).
 - Integer flags `int8`/`int16`/`int32`/`uint8`/`uint16` are range-checked → `ErrValueOutOfRange`.
 - Counting flags must not reuse flag names from the root config.
+- `required` is satisfied by an explicit flag or its env var; a tag default does
+  not satisfy it. `describe`, `version`, `doctor`, `completion`, and `help` skip
+  required enforcement so discovery always works.
 
 ## Optional sub-modules (import only what you need)
 

@@ -50,8 +50,16 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   prepare/attach path and no longer reserves a name when conversion fails.
 - **Actionable error hints.** `ErrorHint(err)` maps every sentinel used by the
   JSON error classifier to one fix sentence, and the machine-readable error
-  envelope now carries it as `hint`. A coverage test fails when a newly
-  classified sentinel lacks a hint.
+  envelope now carries it as `hint`. Human-readable errors also get a `Hint:`
+  line (fang's default view and the plain cobra path); `WithoutErrorHints()`
+  turns it off. A coverage test fails when a newly classified sentinel lacks a
+  hint.
+- **Production batteries.** `WithBatteries()` opts into strict command
+  validation, signal handling with graceful DI shutdown, error hints, and
+  auto-registered `version` (when `WithCLIVersion` is set) and `doctor`
+  commands; consumer-defined commands of the same name win. `NewApp` wraps
+  construction plus command registration and discards the half-built CLI when
+  the build callback fails.
 - **lint: CG007 missing short description, CG008 missing CLI version.** The
   end-goal baseline: a command without `WithShort` renders as a blank help
   line, and a CLI without `WithCLIVersion` cannot identify its build. Both are
@@ -60,7 +68,19 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Fixed
 
-- Nothing yet.
+- **`required`, `values`, and `validate` tags are now enforced at run time.**
+  `FlagRegistry.ValidateFlags` had tests but no production caller, so the tags
+  were parsed and documented but never checked: a missing required flag fell
+  through to the handler, and an invalid enum or `min`/`max` value was accepted.
+  Validation now runs after parsing for the root and every command registry.
+  `min`/`max` on string fields mean length (previously the text was parsed as a
+  number, producing "invalid validator parameter"). Environment- and
+  default-sourced values are validated too; `describe`, `version`, `doctor`,
+  `completion`, and `help` skip required enforcement so discovery always works.
+- **Readable validation errors.** Removed the stacked
+  "preparing run context / validating flags for / validating flag / required
+  flag not set" prefixes; a failure now reads
+  `Command "add": flag "title": value too short: "ab" must be at least 3 characters.`
 
 ### Changed
 

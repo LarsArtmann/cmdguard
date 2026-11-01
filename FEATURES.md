@@ -30,6 +30,7 @@
 | ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                                                                          |
 | `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                                                                           |
+| `NewApp(name, short, defaults, build, ...)` | 🟢 FULLY_FUNCTIONAL     | Construct CLI, run the build callback, discard half-built app on error (`cli_batteries.go`)                                                                                              |
 | `AddCommands(cli, cmds...)`                 | 🟢 FULLY_FUNCTIONAL     | Atomic batch registration: every command is validated and converted before any is attached (`cli.go`)                                                                                     |
 | `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                                                                            |
 | `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                                                                            |
@@ -45,7 +46,7 @@
 | `Describe()` / `WriteDescription(w)`        | 🟢 FULLY_FUNCTIONAL     | Machine-readable JSON contract (`schema_version`, commands, flags with env/required/values) (`describe.go`)                                                                               |
 | `describe` command                          | 🟢 FULLY_FUNCTIONAL     | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                             |
 
-### CLI Options (28 total — all non-generic except where noted)
+### CLI Options (30 total — all non-generic except where noted)
 
 | Option                                         | Status              | Notes                                                                                                                  |
 | ---------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -77,6 +78,8 @@
 | `WithHelpTransform(fn)`                        | 🟢 FULLY_FUNCTIONAL | Transform command help text (glamour injection point)                                                                  |
 | `WithPlugin(plugin)`                           | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                       |
 | `WithoutDescribeCommand()`                     | 🟢 FULLY_FUNCTIONAL | Disable the auto-registered JSON `describe` command (contract stays available via `Describe()`)                        |
+| `WithBatteries()`                              | 🟢 FULLY_FUNCTIONAL | Production defaults: strict validation, signals + graceful shutdown, hints, auto version/doctor commands               |
+| `WithoutErrorHints()`                          | 🟢 FULLY_FUNCTIONAL | Disable the `Hint:` line under human-readable errors (JSON envelopes keep `hint`)                                     |
 
 ### Command[T, F]
 
@@ -122,8 +125,8 @@
 | `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL | Environment variable binding (with optional prefix)                                             |
 | `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL | Counting flags: -vvv → 3                                                                        |
 | Short flags                    | 🟢 FULLY_FUNCTIONAL | `short:"n"` for `-n`                                                                            |
-| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag                                                                           |
-| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL | Built-in + custom validators                                                                    |
+| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag, enforced after parsing; an explicit flag or its env var satisfies it      |
+| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL | Built-in + custom validators; `min`/`max` mean length on string fields                          |
 | Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL | Levenshtein-based (`flags_suggest.go`)                                                          |
 | Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands                                                         |
 | Instance-scoped validators     | 🟢 FULLY_FUNCTIONAL | `FlagRegistry.RegisterFlagValidator()` (COW)                                                    |
@@ -132,6 +135,7 @@
 | `RegisterValidator()`          | 🟢 FULLY_FUNCTIONAL | Returns error on empty name/nil validator (`flags_validate.go`)                                 |
 | Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)                                        |
 | Integer overflow validation    | 🟢 FULLY_FUNCTIONAL | int8/16/32, uint8/16 range-checked → `ErrValueOutOfRange`                                       |
+| Runtime tag validation         | 🟢 FULLY_FUNCTIONAL | required/values/validate enforced for flag, env, and default values; meta commands exempt       |
 | Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL | Root-only flags not inherited by subcommands                                                    |
 | Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL | Exclude from `--help`, stay functional                                                          |
 | Nested config structs          | 🟢 FULLY_FUNCTIONAL | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path                                  |
@@ -321,6 +325,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 | `ExitCode(err) int`        | 🟢 FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |
 | `errors.Is()` chainability | 🟢 FULLY_FUNCTIONAL | All sentinels use `fmt.Errorf("%w: ...", sentinel)`      |
 | `ErrorHint(err) string`    | 🟢 FULLY_FUNCTIONAL | Actionable fix sentence per sentinel; also emitted as `hint` in the JSON error envelope (`errors_hints.go`) |
+| `Hint:` line on errors     | 🟢 FULLY_FUNCTIONAL | Printed under human-readable errors (fang default view + plain cobra path); `WithoutErrorHints()` opts out |
 
 ---
 
