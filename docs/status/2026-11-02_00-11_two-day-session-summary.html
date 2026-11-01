@@ -1,0 +1,1539 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmdguard: two days on the paved road (2026-11-01 to 2026-11-02)</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS LIGHT — Editorial template
+         Design language: form follows function. Primary colors on warm paper.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Light) --- */
+        --color-paper: #f4f4f0;
+        --color-paper-2: #ffffff;
+        --color-paper-3: #e8e8e2;
+        --color-ink: #111111;
+        --color-red: #e63946;
+        --color-blue: #1d3557;
+        --color-yellow: #f4d35e;
+        --color-hairline: rgba(17, 17, 17, 0.14);
+        --color-hairline-strong: rgba(17, 17, 17, 0.3);
+
+        /* --- Semantic layer (shared vocabulary with dark template) --- */
+        --surface: var(--color-paper);
+        --surface-raised: var(--color-paper-2);
+        --surface-sunken: var(--color-paper-3);
+        --text: var(--color-ink);
+        --text-muted: rgba(17, 17, 17, 0.72);
+        --text-faint: rgba(17, 17, 17, 0.5);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-red);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber: var(--warning);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 22%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 12%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 12%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px;
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Accessibility: keyboard focus --- */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--text);
+      }
+      .sidebar a {
+        font-size: 0.86rem;
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-left: 4px solid transparent;
+        font-weight: 600;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+        color: var(--accent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      h1 {
+        font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+        line-height: 1.05;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 3px solid var(--text);
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      h3 {
+        font-size: 1.15rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 1rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 2rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid var(--text);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+        margin-bottom: 0.9rem;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0 0 1rem;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 0.25rem 0.6rem;
+        background: var(--surface-sunken);
+        color: var(--text);
+        border: 1px solid var(--border-strong);
+      }
+      .tag.amber {
+        background: var(--warning);
+        border-color: var(--warning);
+        color: var(--text);
+      }
+      .tag.teal {
+        background: var(--solution);
+        border-color: var(--solution);
+        color: var(--surface);
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 90px;
+        margin-bottom: 1.2rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        right: 180px;
+        width: 64px;
+        height: 64px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 26px;
+        right: 90px;
+        width: 56px;
+        height: 56px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 32px solid transparent;
+        border-right: 32px solid transparent;
+        border-bottom: 56px solid var(--warning);
+      }
+      .hero-shapes .bar {
+        position: absolute;
+        bottom: 0;
+        right: 230px;
+        width: 100px;
+        height: 14px;
+        background: var(--text);
+      }
+
+      /* --- Scorecard / stat cards --- */
+      .scorecard,
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0;
+        margin: 1.5rem 0 2rem;
+        border: 3px solid var(--text);
+      }
+      .score-card,
+      .stat-card {
+        padding: 1.3rem 1rem;
+        text-align: center;
+        border-right: 3px solid var(--text);
+        background: var(--surface-raised);
+      }
+      .score-card:last-child,
+      .stat-card:last-child {
+        border-right: none;
+      }
+
+      .score,
+      .stat-value {
+        font-family: var(--font-heading);
+        font-size: 2.6rem;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .score-card .label,
+      .stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-top: 0.5rem;
+      }
+      /* Semantic state classes — no nth-child decoration, no !important */
+      .score-good,
+      .stat-good {
+        background: var(--solution);
+        color: var(--surface);
+      }
+      .score-warn,
+      .stat-warn {
+        background: var(--warning);
+        color: var(--text);
+      }
+      .score-bad,
+      .stat-bad {
+        background: var(--problem);
+        color: var(--surface);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border-left: 8px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border-left: 8px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.22rem 0.6rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+        color: var(--text);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        border: 1px solid var(--text);
+        color: var(--text);
+      }
+      .badge-critical {
+        background: var(--problem);
+        color: var(--surface);
+      }
+      .badge-high {
+        background: var(--warning);
+      }
+      .badge-medium {
+        background: var(--surface-sunken);
+      }
+      .badge-low {
+        background: var(--surface-raised);
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        background: var(--solution);
+        color: var(--surface);
+      }
+
+      /* --- Callouts --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--border-strong);
+        border-left: 4px solid var(--border-strong);
+        background: var(--surface-sunken);
+        font-size: 0.92rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-teal,
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(
+          in srgb,
+          var(--solution) 10%,
+          var(--surface-raised)
+        );
+      }
+      .callout-amber,
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(
+          in srgb,
+          var(--warning) 18%,
+          var(--surface-raised)
+        );
+      }
+
+      /* --- Strengths --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.9rem;
+        padding: 0.75rem 0;
+        border-bottom: 2px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 900;
+        color: var(--solution);
+        font-size: 1.3rem;
+        line-height: 1.3;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Tables --- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.92rem;
+        border: 2px solid var(--text);
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--text);
+        color: var(--surface);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-right: 1px solid var(--border-strong);
+      }
+      th:last-child {
+        border-right: none;
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-top: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+      }
+      td:last-child {
+        border-right: none;
+      }
+      tr:nth-child(even) td {
+        background: var(--surface-sunken);
+      }
+      table.compare td.yes {
+        color: var(--solution);
+        font-weight: 700;
+      }
+      table.compare td.no {
+        color: var(--problem);
+        font-weight: 700;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--text);
+        color: var(--surface);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+        border: 2px solid var(--text);
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--warning);
+      }
+      .tok-type {
+        color: var(--warning);
+      }
+      .tok-string {
+        color: #95e1d3;
+      }
+      .tok-comment {
+        color: rgba(244, 244, 240, 0.45);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #6eb5ff;
+      }
+      .tok-number {
+        color: var(--warning);
+      }
+      .tok-generic {
+        color: var(--problem);
+      }
+      .tok-builtin {
+        color: #6eb5ff;
+      }
+      .tok-punct {
+        color: rgba(244, 244, 240, 0.7);
+      }
+      .tok-attr {
+        color: var(--warning);
+      }
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 2px solid var(--text);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.4rem 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: var(--surface-sunken);
+        border: 1px solid var(--text);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        border-left: 6px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1.1rem;
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        border-left: 6px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 900;
+        font-size: 1.8rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.94rem;
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 3px solid var(--text);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .scorecard,
+        .stat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .score-card:nth-child(2),
+        .stat-card:nth-child(2) {
+          border-right: none;
+        }
+        .score-card:nth-child(1),
+        .stat-card:nth-child(1),
+        .score-card:nth-child(2),
+        .stat-card:nth-child(2) {
+          border-bottom: 3px solid var(--text);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+        .hero-shapes {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="top-bar">
+      <span>SESSION REPORT</span>
+      <span>2026-11-01 &rarr; 2026-11-02</span>
+      <span>cmdguard &middot; v5 preparation</span>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#timeline">Timeline</a>
+          <a href="#shipped">What shipped</a>
+          <a href="#bug">The validation bug</a>
+          <a href="#verification">Verification</a>
+          <a href="#gaps">Partial &amp; not started</a>
+          <a href="#screwups">Screw-ups</a>
+          <a href="#improve">What to improve</a>
+          <a href="#next">Next 50</a>
+          <a href="#questions">Three questions</a>
+          <a href="#appendix">Appendix</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="hero">
+          <div class="hero-shapes">
+            <div class="bar"></div>
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="eyebrow">SESSION SUMMARY &middot; 2026-11-01 &rarr; 2026-11-02</div>
+          <h1>Two Days on the Paved Road</h1>
+          <p class="subtitle">
+            cmdguard&rsquo;s v5 preparation: a strategy, two implementation slices,
+            and a correctness bug that had been sitting in plain sight. Everything
+            below is from this session only.
+          </p>
+          <div class="meta">
+            <span class="tag amber">Scope: v5 prep + correctness</span>
+            <span class="tag teal">Gate: nix run .#check-all green</span>
+            <span class="tag">Coverage: 90.4%</span>
+            <span class="tag">HEAD: 3a987c8</span>
+          </div>
+        </header>
+
+        <section id="scorecard" class="scorecard">
+          <div class="score-card score-good">
+            <div class="score">22</div>
+            <div class="label">Fully done</div>
+          </div>
+          <div class="score-card score-warn">
+            <div class="score">9</div>
+            <div class="label">Partial</div>
+          </div>
+          <div class="score-card">
+            <div class="score">12</div>
+            <div class="label">Not started</div>
+          </div>
+          <div class="score-card score-bad">
+            <div class="score">9</div>
+            <div class="label">Screw-ups</div>
+          </div>
+          <div class="score-card score-good">
+            <div class="score">3</div>
+            <div class="label">Blocking decisions</div>
+          </div>
+        </section>
+
+        <section id="summary">
+          <h2><span class="num">00</span>Summary</h2>
+          <p>
+            The session started with &ldquo;what is the end goal?&rdquo; and ended with the
+            first real down payment on it. The end goal is now written at the top of
+            <code>README.md</code> and <code>AGENTS.md</code>: make it impossible to
+            <em>not</em> create superb CLI apps, with near-zero bugs and minimum code
+            for developers and agents. A full v5 plan (&ldquo;Paved Road&rdquo;) maps that
+            goal to four testable properties and eight workstreams.
+          </p>
+          <p>
+            Two slices shipped additively: a machine-readable <code>describe</code>
+            contract, atomic <code>AddCommands</code>, actionable error hints, the
+            lint baseline rules CG007/CG008, then production batteries
+            (<code>WithBatteries</code>/<code>NewApp</code>) and a human
+            <code>Hint:</code> line. Coverage rose to 90.4%, and the full gate
+            passed twice.
+          </p>
+          <p>
+            While exercising the hint path, a real bug surfaced:
+            <strong>the <code>required</code>, <code>values</code>, and
+            <code>validate</code> tags were parsed and documented but never
+            enforced</strong>. <code>ValidateFlags</code> had tests and no
+            production caller. That is now fixed, with env/default awareness, string
+            bounds, meta-command exemptions, and much cleaner error text.
+          </p>
+          <div class="callout callout-amber">
+            <strong>The one decision before tagging anything</strong>
+            The validation fix changes runtime behavior and error text. It is correct,
+            but it is a breaking change for a v4 minor. It needs an explicit release
+            vehicle (v4.x with a migration note, an opt-in, or v5) before a release.
+          </div>
+        </section>
+
+        <section id="timeline">
+          <h2><span class="num">01</span>Timeline</h2>
+          <div class="grid-2">
+            <div class="card card-solution">
+              <h3>2026-11-01 &middot; Strategy</h3>
+              <p>
+                Added the end goal verbatim to README and AGENTS. Audited v4 against
+                it (bootstrap boilerplate, opt-in safety, no machine contract,
+                linter only protecting regressions). Wrote the v5 Paved Road plan:
+                P1 inevitable quality, P2 zero-bug by construction, P3 fantastic UX,
+                P4 minimum code; workstreams W1-W8 with gates and owner decisions.
+              </p>
+            </div>
+            <div class="card card-solution">
+              <h3>2026-11-01 &middot; First slice</h3>
+              <p>
+                Shipped W1 <code>describe</code>, W4 <code>AddCommands</code>, W3
+                <code>ErrorHint</code> plus JSON <code>hint</code>, and W5 CG007/CG008.
+                Migrated taskctl to one registration call (10 error stanzas gone) and
+                brought the repo gate back to green, including pre-existing lint debt
+                in the lint module.
+              </p>
+            </div>
+            <div class="card card-solution">
+              <h3>2026-11-01 &middot; Second slice</h3>
+              <p>
+                Shipped W2 <code>WithBatteries</code> and <code>NewApp</code>, then the
+                human <code>Hint:</code> line through fang&rsquo;s default handler and the
+                plain cobra path. Added the end-goal acceptance test. Coverage 90.4%.
+              </p>
+            </div>
+            <div class="card card-warning">
+              <h3>2026-11-01 &middot; The discovery</h3>
+              <p>
+                Live-testing hints exposed that <code>required</code>,
+                <code>values</code>, and <code>validate</code> never ran. Fixing it
+                forced three sub-fixes: resolved-value validation (flag &gt; env &gt;
+                default), string <code>min</code>/<code>max</code> as length, and a
+                meta-command exemption so discovery commands never require business
+                flags.
+              </p>
+            </div>
+            <div class="card">
+              <h3>2026-11-02 &middot; Report + audit</h3>
+              <p>
+                Wrote the Markdown status report, then noticed unexplained working-tree
+                changes that were auto-committed with the work: a
+                <code>.golangci.yml</code> change removing <code>lll</code>, a
+                <code>flake.lock</code> bump, website dependency bumps, and extra
+                <code>go.sum</code> hashes. They were left untouched but need review.
+              </p>
+            </div>
+            <div class="card">
+              <h3>2026-11-02 &middot; This report</h3>
+              <p>
+                A self-contained HTML snapshot of the two days: what is done, what is
+                partial, what is not started, the honest screw-ups, and the next 50
+                things.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="shipped">
+          <h2><span class="num">02</span>What shipped</h2>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">W1 &middot; DONE</span>
+            <h3>Machine-readable CLI contract</h3>
+            <p>
+              <code>Describe()</code> / <code>WriteDescription()</code> emit a versioned
+              JSON schema (<code>schema_version: &quot;1&quot;</code>) of the whole
+              command tree. A hidden <code>describe</code> command is registered at
+              <code>Execute</code> time; a consumer command of the same name wins, and
+              <code>WithoutDescribeCommand()</code> opts out. Flag metadata pflag cannot
+              model (env, required, values, count, prompt, validate) is attached to cobra
+              annotations at wiring time.
+            </p>
+            <p class="where">pkg/cmdguard/v4/describe.go &middot; describe_test.go &middot; live taskctl describe | jq</p>
+          </div>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">W4 &middot; DONE</span>
+            <h3>Atomic batch registration</h3>
+            <p>
+              <code>AddCommands[T](cli, cmds...)</code> validates and converts every
+              command before attaching any, accepts heterogeneous flags types through
+              the sealed <code>AddableCommand[T]</code>, rejects nil entries, and keys
+              duplicate detection on the cobra name. <code>AddCommand</code> now shares
+              the prepare/attach path and no longer reserves a name when conversion
+              fails. taskctl graduated from 10 error stanzas to one call.
+            </p>
+            <p class="where">pkg/cmdguard/v4/cli.go &middot; examples/taskctl/commands.go (432 &rarr; 402 LOC)</p>
+          </div>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">W3 &middot; DONE</span>
+            <h3>Errors that teach</h3>
+            <p>
+              <code>ErrorHint(err)</code> maps every classified sentinel to one fix
+              sentence. The JSON error envelope carries it as <code>hint</code>; human
+              errors print a <code>Hint:</code> line after fang&rsquo;s styled error (or
+              after the plain cobra error). A coverage test fails when a newly
+              classified sentinel has no hint. <code>WithoutErrorHints()</code> opts out.
+            </p>
+            <p class="where">pkg/cmdguard/v4/errors_hints.go &middot; cli_errors_json.go &middot; errors_hints_render_test.go</p>
+          </div>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">W5 &middot; DONE</span>
+            <h3>Lint baseline rules</h3>
+            <p>
+              CG007 flags a command without <code>WithShort</code> (a blank line in
+              <code>--help</code>); CG008 flags <code>NewCLI</code> without a version
+              source. Both skip <code>_test.go</code> files and spread option lists.
+              The generated README rule table was refreshed, and the lint module itself
+              was brought back to zero findings.
+            </p>
+            <p class="where">lint/rule_ux_baseline.go &middot; rules.go &middot; README.md rule table</p>
+          </div>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">W2 &middot; DONE (opt-in)</span>
+            <h3>Production batteries + one-call app</h3>
+            <p>
+              <code>WithBatteries()</code> enables strict validation, signal handling
+              with graceful DI shutdown, hints, an auto <code>version</code> command
+              when versioned, and <code>doctor</code>. <code>NewApp</code> constructs
+              the CLI, runs a build callback, and discards the half-built app on error.
+              v5 will flip the defaults; today it is the adoption path.
+            </p>
+            <p class="where">pkg/cmdguard/v4/cli_batteries.go &middot; cli_batteries_test.go (7 tests)</p>
+          </div>
+
+          <div class="card card-problem">
+            <span class="badge badge-critical">CORRECTNESS &middot; FIXED</span>
+            <h3>Tags are now actually enforced</h3>
+            <p>
+              <code>required</code>, <code>values</code>, and <code>validate</code> were
+              decorative. Validation now runs for the root and every command registry
+              against the resolved value, handles string bounds as length, lets env
+              satisfy <code>required</code>, and exempts introspection commands. Error
+              text was flattened from four nested prefixes to one readable sentence.
+            </p>
+            <p class="where">pkg/cmdguard/v4/flags.go &middot; cli.go &middot; cli_command.go &middot; flags_runtime_validation_test.go</p>
+          </div>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">PROOF &middot; DONE</span>
+            <h3>Acceptance test for the end goal</h3>
+            <p>
+              <code>TestEndGoal_MinimalSuperbCLI</code> asserts, in one flow: discovery
+              before knowing business flags, version, doctor, missing root flag, missing
+              command flag, min-length failure, hints, and a clean run. This is the
+              regression net for the &ldquo;minimal superb CLI&rdquo; promise.
+            </p>
+            <p class="where">pkg/cmdguard/v4/end_goal_test.go</p>
+          </div>
+
+          <div class="card card-solution">
+            <span class="badge badge-fixed">HOUSEKEEPING &middot; DONE</span>
+            <h3>Gate green again</h3>
+            <p>
+              Cleared pre-existing lint debt in taskctl and the lint module, split long
+              finding strings, promoted <code>go-humanize</code> to a direct dependency
+              in <code>lint/go.mod</code>, and verified with
+              <code>nix run .#check-all</code> across all seven modules.
+            </p>
+          </div>
+        </section>
+
+        <section id="bug">
+          <h2><span class="num">03</span>The validation bug</h2>
+          <div class="issue issue-critical">
+            <span class="severity severity-critical">Critical &middot; Latent since the tags were introduced</span>
+            <h3>The tags were parsed, documented, tested in isolation, and never run</h3>
+            <div class="where">pkg/cmdguard/v4/flags.go &middot; ValidateFlags had zero production callers</div>
+            <p>
+              Live-testing hints exposed it: <code>taskctl add --title ab</code> created
+              a task instead of rejecting the two-character title, and
+              <code>taskctl done</code> reached the handler with <code>id=0</code> instead
+              of failing on the missing required flag.
+            </p>
+            <pre><code><span class="tok-comment">// Before: dead code (tests only)</span>
+<span class="tok-keyword">func</span> (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) <span class="tok-type">error</span> { ... }
+
+<span class="tok-comment">// After: enforced in cli.go (root) and cli_command.go (commands)</span>
+<span class="tok-keyword">if</span> !skipsFlagValidation(c.Name()) {
+    <span class="tok-keyword">if</span> err := registry.ValidateFlags(c); err != <span class="tok-builtin">nil</span> {
+        <span class="tok-keyword">return</span> err
+    }
+}</code></pre>
+            <p>
+              Fixing it surfaced three more issues, all fixed: validation used only
+              <code>flag.Changed</code> (so env/default values escaped), string fields
+              ran the numeric <code>min</code>/<code>max</code> (producing
+              &ldquo;value is not a number&rdquo;), and required root flags would have
+              blocked <code>describe</code>/<code>version</code>/<code>doctor</code>.
+            </p>
+            <div class="callout callout-amber">
+              <strong>Impact: behavior change, not just a bug fix</strong>
+              Invocations that used to succeed may now fail, and error text changed.
+              Correctness is not in question; release discipline is. This needs an
+              explicit v4.x-with-note, opt-in, or v5 decision before a tag.
+            </div>
+          </div>
+        </section>
+
+        <section id="verification">
+          <h2><span class="num">04</span>Verification</h2>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead>
+                <tr><th>Check</th><th>Result</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>nix run .#check-all</code> (run twice)</td><td class="yes">Build, race tests, golangci-lint, treefmt, tidy: green</td></tr>
+                <tr><td><code>go test ./... -race</code> (core)</td><td class="yes">All packages green</td></tr>
+                <tr><td>All 6 submodules</td><td class="yes">glamour, prompts, spinner, telemetry, flightrecorder, lint</td></tr>
+                <tr><td><code>go test -cover</code> (core)</td><td class="yes">90.4% (was 87.8%)</td></tr>
+                <tr><td><code>golangci-lint run</code> (core + taskctl, lll still on)</td><td class="yes">0 issues</td></tr>
+                <tr><td><code>golangci-lint run</code> (lint module)</td><td class="yes">0 issues</td></tr>
+                <tr><td><code>cmdguard-lint lint --dir ..</code></td><td class="yes">0 findings (dogfood)</td></tr>
+                <tr><td><code>taskctl describe | jq</code></td><td class="yes">schema 1, 14 commands, 11 root flags</td></tr>
+                <tr><td>Live validation + hint output</td><td class="yes">required and min-length failures, readable, hinted</td></tr>
+                <tr><td><code>TestEndGoal_MinimalSuperbCLI</code></td><td class="yes">Pass</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="gaps">
+          <h2><span class="num">05</span>Partial and not started</h2>
+          <h3>Partially done</h3>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>Item</th><th>Missing</th></tr></thead>
+              <tbody>
+                <tr><td>Describe byte-stability gate</td><td>No golden fixture; structural tests only</td></tr>
+                <tr><td>Batteries (W2)</td><td>Default flip, Builder, fang-on tests, Draconian + batteries test</td></tr>
+                <tr><td>Hints (W3)</td><td>Not every sentinel, ERROR_REFERENCE not generated, hint unstyled</td></tr>
+                <tr><td>Ergonomics (W4)</td><td>Other examples not migrated; no Builder</td></tr>
+                <tr><td>Lint (W5)</td><td>v0.2.0 not released; no committed consumer baseline; no dead-flag rule</td></tr>
+                <tr><td>Teaching (W8)</td><td>QUICKSTART, TUTORIAL, website untouched</td></tr>
+                <tr><td>Consumer proof</td><td>erraudit/timesheets were linted, not built or tested</td></tr>
+                <tr><td>Message audit</td><td>Only the validation path was flattened</td></tr>
+                <tr><td>Config-source semantics</td><td>A config-file value does not satisfy <code>required</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Not started</h3>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>Item</th><th>Why it matters</th></tr></thead>
+              <tbody>
+                <tr><td>Module path <code>/v5</code></td><td>Blocks every rename and the migration guide</td></tr>
+                <tr><td>Strict-by-default</td><td>The P1 &ldquo;inevitable quality&rdquo; flip</td></tr>
+                <tr><td>Signals/graceful-shutdown by default</td><td>Safety should not be opt-in</td></tr>
+                <tr><td>Deferred-error Builder</td><td>The real end of the constructor error ladder</td></tr>
+                <tr><td>All <code>TODO(v5)</code> renames/removals</td><td>API honesty</td></tr>
+                <tr><td>Middleware unification, <code>Get</code>, <code>Package</code></td><td>Remaining v5 candidates</td></tr>
+                <tr><td>Migration guide + codemod</td><td>Makes the break payable</td></tr>
+                <tr><td>lint/v0.2.0 + BuildFlow bump</td><td>CG007/CG008 do not reach the fleet yet</td></tr>
+                <tr><td>Generated ERROR_REFERENCE</td><td>Prevents hint/message drift</td></tr>
+                <tr><td>Golden help/describe/error fixtures</td><td>Locks the UX contract</td></tr>
+                <tr><td>Benchmarks for Describe/AddCommands/validation</td><td>Proves the paved road is not slower</td></tr>
+                <tr><td>Website docs and landing page</td><td>The public story is behind the code</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="screwups">
+          <h2><span class="num">06</span>Screw-ups (honest)</h2>
+
+          <div class="issue issue-critical">
+            <span class="severity severity-critical">Highest risk</span>
+            <h3>Behavior-breaking fix in a v4 minor</h3>
+            <p>
+              Enforcing the tags was correct, but it changes runtime behavior and error
+              text without a release decision or migration note. This is the one thing
+              to resolve before tagging.
+            </p>
+          </div>
+
+          <div class="issue issue-important">
+            <span class="severity severity-important">Important</span>
+            <h3>No fang-on tests for hints or batteries</h3>
+            <p>
+              Unit coverage uses <code>WithFang(false)</code>. The fang path was verified
+              only by live taskctl runs, and taskctl does not use batteries.
+            </p>
+          </div>
+
+          <div class="issue issue-important">
+            <span class="severity severity-important">Important</span>
+            <h3><code>go.sum</code> changes were not reviewed</h3>
+            <p>
+              I diffed <code>go.mod</code> after tidy but not <code>go.sum</code>; the
+              final tree gained <code>/go.mod</code> hash lines in several modules. They
+              are benign but unexamined.
+            </p>
+          </div>
+
+          <div class="issue issue-important">
+            <span class="severity severity-important">Unowned changes</span>
+            <h3>Unexpected working-tree edits were auto-committed</h3>
+            <p>
+              <code>.golangci.yml</code> lost <code>lll</code> and set unlimited
+              max-issues; <code>flake.lock</code> and website dependencies were bumped.
+              I did not author or review them, and now they are in HEAD.
+            </p>
+          </div>
+
+          <div class="issue issue-nice">
+            <span class="severity severity-nice">Nice to know</span>
+            <h3>Two self-inflicted breaks during work</h3>
+            <p>
+              I replaced CG006&rsquo;s rule definition while adding CG007/CG008, and I
+              broke taskctl&rsquo;s function braces while converting it. Both were caught
+              by tests or the compiler, but verification was reactive.
+            </p>
+          </div>
+
+          <div class="issue issue-nice">
+            <span class="severity severity-nice">Nice to know</span>
+            <h3>Schema emitted boolean noise</h3>
+            <p>
+              The first describe schema used <code>omitempty</code> on bools, so every
+              flag reported <code>&quot;required&quot;: false</code>. json/v2 keeps false
+              with <code>omitempty</code>; fixed with <code>omitzero</code> after seeing
+              live output.
+            </p>
+          </div>
+
+          <div class="issue issue-nice">
+            <span class="severity severity-nice">Housekeeping</span>
+            <h3>Generated artifact churn</h3>
+            <p>
+              Live runs rewrote the tracked <code>taskctl-audit.html</code>; restored at
+              the end of the session.
+            </p>
+          </div>
+
+          <div class="issue issue-important">
+            <span class="severity severity-important">Process</span>
+            <h3>Batteries shipped before the defaults decision</h3>
+            <p>
+              <code>WithBatteries</code> front-runs the owner&rsquo;s defaults decision.
+              It is opt-in and reversible, but the order should have been decision first.
+            </p>
+          </div>
+
+          <div class="issue issue-important">
+            <span class="severity severity-important">Process</span>
+            <h3>Error text compatibility was not considered</h3>
+            <p>
+              Removing the nested prefixes improves UX but can break consumer tests or
+              scripts that match the old text. No shim or compatibility note exists.
+            </p>
+          </div>
+        </section>
+
+        <section id="improve">
+          <h2><span class="num">07</span>What we should improve</h2>
+          <div class="grid-2">
+            <div class="card card-warning">
+              <h3>Process</h3>
+              <p>
+                Decide semver before behavior changes. Run the canonical gate after every
+                slice, not after a batch. Diff <code>go.sum</code> as well as
+                <code>go.mod</code>. Keep a checklist that includes the enabled
+                configuration (fang on/off, batteries on/off, strict/draconian).
+              </p>
+            </div>
+            <div class="card card-warning">
+              <h3>Design</h3>
+              <p>
+                One source of truth for validation messages. Stable machine error codes.
+                Track config sources so <code>required</code> can be satisfied by a config
+                file. Validate defaults at registration. Resolve parsed types before
+                numeric bounds.
+              </p>
+            </div>
+            <div class="card card-warning">
+              <h3>Testing</h3>
+              <p>
+                Golden snapshots for describe/help/error/exit codes. End-to-end env
+                required tests. Fang-on tests. Consumer builds and tests, not just linter
+                scans. Benchmarks for the new hot paths.
+              </p>
+            </div>
+            <div class="card card-warning">
+              <h3>Docs</h3>
+              <p>
+                Generate ERROR_REFERENCE from code. Bring QUICKSTART, TUTORIAL, and the
+                website to parity with README and the skill. Record shipped workstreams
+                in ROADMAP, not just the plan.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="next">
+          <h2><span class="num">08</span>Next 50</h2>
+          <p>
+            Ordered by blocking risk, then v5, then guardrails, then polish.
+            <span class="badge badge-critical">P0</span> before tagging,
+            <span class="badge badge-high">P1</span> v5, <span class="badge badge-low">P2</span> polish.
+          </p>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>#</th><th>Task</th><th>Area</th><th>P</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Decide the release vehicle for tag enforcement (v4.x note, opt-in, or v5)</td><td>Release</td><td><span class="badge badge-critical">P0</span></td></tr>
+                <tr><td>2</td><td>Add the behavior-change note to CHANGELOG and the release announcement</td><td>Release</td><td><span class="badge badge-critical">P0</span></td></tr>
+                <tr><td>3</td><td>Add an opt-out (option or build tag) if a softer landing is wanted</td><td>Release</td><td><span class="badge badge-critical">P0</span></td></tr>
+                <tr><td>4</td><td>End-to-end test: required flag satisfied by env</td><td>Testing</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>5</td><td>End-to-end test: config default does not satisfy required (or change it)</td><td>Testing</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>6</td><td>Validate tag defaults at registration and fail construction</td><td>Correctness</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>7</td><td>Resolve Duration/custom types before numeric bounds</td><td>Correctness</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>8</td><td>Audit every sentinel message for nested prefixes</td><td>Correctness</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>9</td><td>Decide the module path (<code>/v5</code> vs <code>/v4</code>) and scaffold it</td><td>v5</td><td><span class="badge badge-critical">P0</span></td></tr>
+                <tr><td>10</td><td>Flip strict validation to the default</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>11</td><td>Flip signal handling and graceful shutdown to the default</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>12</td><td>Implement the deferred-error Builder</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>13</td><td>Rename CommandInfo to CommandMetadata</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>14</td><td>Rename TypeHandler to TypeCodec</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>15</td><td>Rename PromptRunner (HuhPrompter or similar)</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>16</td><td>Remove SetConfig</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>17</td><td>Replace RegisterInScope with a generic variant</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>18</td><td>Rename Get to GetService</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>19</td><td>Redesign Package[T]</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>20</td><td>Unify Middleware and ContextMiddleware</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>21</td><td>Write MIGRATION_v4_v5.md</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>22</td><td>Write the rename codemod</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>23</td><td>Bump lint.CurrentMajor and re-verify CG002</td><td>v5</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>24</td><td>Release lint/v0.2.0 (CG007/CG008, baseline, options)</td><td>Lint</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>25</td><td>Bump BuildFlow to the linter release</td><td>Lint</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>26</td><td>Commit a reviewed lint baseline for the consumer corpus</td><td>Lint</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>27</td><td>Add a dead root-persistent flag rule</td><td>Lint</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>28</td><td>Make CG008 mention batteries when present</td><td>Lint</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>29</td><td>Decide the fate of the .golangci.yml lll/max-issues change</td><td>Guardrails</td><td><span class="badge badge-critical">P0</span></td></tr>
+                <tr><td>30</td><td>Add go vet and govulncheck to check-all</td><td>Guardrails</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>31</td><td>Add a coverage floor to check-all</td><td>Guardrails</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>32</td><td>Add DescribeCommand(path) for subtree discovery</td><td>Contract</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>33</td><td>Add a golden describe fixture and stability test</td><td>Contract</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>34</td><td>Add a stable machine code per sentinel</td><td>Contract</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>35</td><td>Generate ERROR_REFERENCE from sentinels + hints</td><td>Docs</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>36</td><td>Style the Hint line to match fang</td><td>UX</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>37</td><td>Add hints for every exported sentinel</td><td>UX</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>38</td><td>Consider a --help=json or --describe flag alias</td><td>UX</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>39</td><td>Migrate examples/docs-generator to NewApp + AddCommands</td><td>Ergonomics</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>40</td><td>Document why taskctl stays manually configured</td><td>Ergonomics</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>41</td><td>Update QUICKSTART with batteries/describe/hints</td><td>Docs</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>42</td><td>Update TUTORIAL with runtime tag semantics</td><td>Docs</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>43</td><td>Update the website docs and landing page</td><td>Docs</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>44</td><td>Mark shipped workstreams in ROADMAP</td><td>Docs</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>45</td><td>Add fang-on tests for hints and batteries</td><td>Testing</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>46</td><td>Add a batteries + Draconian validation test</td><td>Testing</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>47</td><td>Add a WithoutErrorHints + fang test</td><td>Testing</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>48</td><td>Add benchmarks for Describe, AddCommands, validation</td><td>Testing</td><td><span class="badge badge-low">P2</span></td></tr>
+                <tr><td>49</td><td>Build and test erraudit and timesheets against the new library</td><td>Proof</td><td><span class="badge badge-high">P1</span></td></tr>
+                <tr><td>50</td><td>Cut a CHANGELOG version section and status update on release</td><td>Release</td><td><span class="badge badge-high">P1</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="questions">
+          <h2><span class="num">09</span>Three questions</h2>
+          <div class="grid-3">
+            <div class="card card-warning">
+              <h3>1. Module path</h3>
+              <p>
+                Move to <code>github.com/larsartmann/cmdguard/v5</code> (true semantic
+                import versioning, every import changes), or keep <code>/v4</code> and
+                treat v5 as a deliberate exception? This blocks every rename.
+              </p>
+            </div>
+            <div class="card card-warning">
+              <h3>2. Release vehicle</h3>
+              <p>
+                Is the validation enforcement acceptable in a v4.x release with a
+                migration note, must it be opt-in, or must it wait for v5? This blocks
+                tagging.
+              </p>
+            </div>
+            <div class="card card-warning">
+              <h3>3. v5 defaults</h3>
+              <p>
+                Should strict validation, signals, and graceful shutdown become the
+                defaults, and should batteries become the default behavior? This decides
+                whether W2/W5 is a flip or a permanent opt-in.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="appendix">
+          <h2><span class="num">10</span>Appendix</h2>
+          <h3>Artifacts</h3>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>Artifact</th><th>Path</th></tr></thead>
+              <tbody>
+                <tr><td>v5 plan</td><td><code>docs/planning/2026-11-01_v5-end-goal-paved-road.md</code></td></tr>
+                <tr><td>Markdown status report</td><td><code>docs/status/2026-11-02_00-05_v5-end-goal-slices-and-validation-fix.md</code></td></tr>
+                <tr><td>Describe contract</td><td><code>pkg/cmdguard/v4/describe.go</code></td></tr>
+                <tr><td>Hints</td><td><code>pkg/cmdguard/v4/errors_hints.go</code></td></tr>
+                <tr><td>Batteries</td><td><code>pkg/cmdguard/v4/cli_batteries.go</code></td></tr>
+                <tr><td>Runtime validation</td><td><code>pkg/cmdguard/v4/flags.go</code></td></tr>
+                <tr><td>Acceptance test</td><td><code>pkg/cmdguard/v4/end_goal_test.go</code></td></tr>
+                <tr><td>Lint rules</td><td><code>lint/rule_ux_baseline.go</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Unowned working-tree changes</h3>
+          <div class="callout callout-warning">
+            <strong>Needs owner review</strong>
+            <code>.golangci.yml</code> removed <code>lll</code> and set unlimited
+            max-issues; <code>flake.lock</code> bumped nixpkgs; website dependencies were
+            bumped; extra <code>go.sum</code> hashes appeared. They were auto-committed
+            with this session&rsquo;s work and were not authored or reviewed here.
+          </div>
+
+          <h3>One-sentence takeaway</h3>
+          <p>
+            The paved road is real now: discovery, batching, hints, batteries, and
+            enforced validation all exist, and the next step is not more features but
+            the release and defaults decisions that let v5 ship them safely.
+          </p>
+        </section>
+
+        <footer class="footer">
+          <p>
+            Generated 2026-11-02 00:11 CET &middot; from this session only &middot;
+            verified with <code>nix run .#check-all</code> and live taskctl runs &middot;
+            HEAD <code>3a987c8</code>
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>
