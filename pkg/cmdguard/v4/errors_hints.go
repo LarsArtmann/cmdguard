@@ -1,6 +1,12 @@
 package v4
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"io"
+
+	"charm.land/fang/v2"
+)
 
 // errorHint pairs a sentinel with one actionable sentence telling the caller
 // how to fix the failure. Order matters: more specific sentinels must come
@@ -100,4 +106,18 @@ func ErrorHint(err error) string {
 	}
 
 	return ""
+}
+
+// writeErrorWithHint is the default fang error handler. It renders the error
+// exactly as fang normally would, then appends one actionable hint line when
+// cmdguard knows how to fix the failure.
+func writeErrorWithHint(w io.Writer, styles fang.Styles, err error) {
+	fang.DefaultErrorHandler(w, styles, err)
+
+	hint := ErrorHint(err)
+	if hint == "" {
+		return
+	}
+
+	_, _ = fmt.Fprintf(w, "Hint: %s\n", hint)
 }

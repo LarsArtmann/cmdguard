@@ -48,6 +48,9 @@ type cliSpec struct {
 	auditLog         *auditlog.Plugin
 	onError          func(error)
 	noDescribeCmd    bool
+	batteries        bool
+	errorHints       bool
+	customErrorView  bool
 	pluginErr        error
 }
 
@@ -149,10 +152,15 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption) (*CLI[T], 
 		short:        short,
 		useFang:      true,
 		silenceUsage: true,
+		errorHints:   true,
 	}
 
 	for _, opt := range opts {
 		opt(&spec)
+	}
+
+	if spec.errorHints && spec.useFang && !spec.customErrorView {
+		spec.fangOpts = append(spec.fangOpts, fang.WithErrorHandler(writeErrorWithHint))
 	}
 
 	if spec.pluginErr != nil {
@@ -568,11 +576,7 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 	restoreNoColor := cli.applyNoColorIfSet()
 	defer restoreNoColor()
 
-	jsonErrors := cli.spec.outputFormat != "" &&
-		(cli.spec.outputFormat == output.FormatJSON || cli.spec.outputFormat == output.FormatJSONL ||
-			cli.spec.outputFormat == output.FormatYAML || cli.spec.outputFormat == output.FormatTOML)
-
-	if jsonErrors {
+	if isMachineReadableFormat(cli.spec.outputFormat) {
 		cli.rootCmd.SilenceErrors = true
 		cli.rootCmd.SilenceUsage = true
 
@@ -628,11 +632,43 @@ func (cli *CLI[T]) executeWithCobra(flowCtx context.Context) error {
 		}
 
 		cli.writeFormattedError(execErr)
+		cli.writePlainErrorHint(execErr)
 
 		return fmt.Errorf("failed to execute CLI: %w", execErr)
 	}
 
 	return nil
+}
+
+// isMachineReadableFormat reports whether errors are emitted as structured
+// envelopes rather than prose, which changes where hints are delivered.
+func isMachineReadableFormat(format OutputFormat) bool {
+	switch format {
+	case output.FormatJSON, output.FormatJSONL, output.FormatYAML, output.FormatTOML:
+		return true
+	default:
+		return false
+	}
+}
+
+// writePlainErrorHint prints the actionable hint for err when cmdguard is not
+// using fang's styled error view. Cobra prints the error itself in this mode;
+// the hint is additive and never repeats the error message.
+func (cli *CLI[T]) writePlainErrorHint(err error) {
+	if !cli.spec.errorHints || cli.spec.customErrorView || cli.spec.silenceErrors || cli.spec.useFang {
+		return
+	}
+
+	if isMachineReadableFormat(cli.spec.outputFormat) {
+		return
+	}
+
+	hint := ErrorHint(err)
+	if hint == "" {
+		return
+	}
+
+	_, _ = fmt.Fprintf(cli.rootCmd.ErrOrStderr(), "\nHint: %s\n", hint)
 }
 
 // ExecuteWithArgs runs the CLI application with specific arguments.

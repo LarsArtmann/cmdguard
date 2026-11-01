@@ -161,7 +161,9 @@ table is in sync, and running the linter over the consumer corpus produces a
 reviewed, baselined finding set.
 
 **Status:** CG007/CG008 ship pre-v5 so consumers can clean up before the
-default flips.
+default flips. Verified 2026-11-01: cmdguard itself (core + examples),
+erraudit, and timesheets report 0 findings from the new rules (timesheets'
+single finding is the pre-existing CG003).
 
 ### W6. Contract honesty: the v5 break (P1)
 
@@ -211,6 +213,20 @@ tests.
 **Gate:** a fresh session, given only README + skill, builds a CLI that passes
 `WithDraconianValidation()` and `cmdguard-lint` with zero findings on the first
 attempt.
+
+## Delivered in the pre-v5 slice (2026-11-01)
+
+These shipped additively, with tests and the full quality gate green:
+
+| Workstream | Shipped |
+| ---------- | ------- |
+| W1 | `describe.go`: `CLIDescription`/`CommandDescription`/`FlagDescription`, `Describe()`, `WriteDescription()`, auto-registered hidden `describe` command, `WithoutDescribeCommand()`, flag metadata on cobra annotations. |
+| W3 | `errors_hints.go`: `ErrorHint(err)` for every classified sentinel; `hint` added to the JSON error envelope; coverage test. |
+| W4 | `AddCommands[T]` atomic batch registration; `AddCommand` split into prepare/attach (a failed conversion no longer reserves the name); duplicate detection keyed on the command name. taskctl: 11 commands, one call, 10 error stanzas gone (432 -> 402 LOC). |
+| W5 | `cmdguard-lint` CG007 (missing short description) and CG008 (missing CLI version), generated README table refreshed, lint module brought back to 0 issues. |
+
+Verification: `nix run .#check-all` (build, race tests, lint, format, tidy across
+all 7 modules) plus a live `taskctl describe | jq` round-trip.
 
 ## Sequencing
 
