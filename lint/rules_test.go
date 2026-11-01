@@ -447,8 +447,19 @@ func TestDetectRunsAllRulesWithUniqueIDs(t *testing.T) {
 
 	all := AllRules()
 
-	if len(all) != 6 {
-		t.Fatalf("expected 6 rules, got %d", len(all))
+	want := []string{
+		RuleExecuteBypass,
+		RuleStaleMajorImport,
+		RulePanicOnConstructor,
+		RuleSetVersionRuntime,
+		RuleDuplicateVersionOpts,
+		RuleExecuteErrorReprint,
+		RuleMissingDescription,
+		RuleMissingVersion,
+	}
+
+	if len(all) != len(want) {
+		t.Fatalf("expected %d rules, got %d", len(want), len(all))
 	}
 
 	ids := make([]string, 0, len(all))
@@ -466,6 +477,11 @@ func TestDetectRunsAllRulesWithUniqueIDs(t *testing.T) {
 	}
 
 	slices.Sort(ids)
+	slices.Sort(want)
+
+	if !slices.Equal(ids, want) {
+		t.Fatalf("rule IDs = %v, want %v", ids, want)
+	}
 
 	for i := 1; i < len(ids); i++ {
 		if ids[i] == ids[i-1] {

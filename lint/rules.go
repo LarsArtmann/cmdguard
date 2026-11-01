@@ -20,6 +20,8 @@ const (
 	RuleSetVersionRuntime    = "CG004"
 	RuleDuplicateVersionOpts = "CG005"
 	RuleExecuteErrorReprint  = "CG006"
+	RuleMissingDescription   = "CG007"
+	RuleMissingVersion       = "CG008"
 )
 
 // ToolName is the finding attribution for every rule in this linter.
@@ -109,6 +111,28 @@ func allRuleDefs() []ruleDef {
 				ToolName:    ToolName,
 			},
 			check: checkExecuteErrorReprint,
+		},
+		{
+			meta: linter.RuleMeta{
+				ID:          RuleMissingDescription,
+				Name:        "missing short description",
+				Description: "a command without WithShort renders as a blank line in --help: it is invisible in command lists and fails WithStrictValidation",
+				Cat:         CategoryUsage,
+				Sev:         finding.SeverityWarning,
+				ToolName:    ToolName,
+			},
+			check: checkMissingShortDescription,
+		},
+		{
+			meta: linter.RuleMeta{
+				ID:          RuleMissingVersion,
+				Name:        "missing CLI version",
+				Description: "NewCLI without WithCLIVersion ships a binary that cannot identify its build or answer --version",
+				Cat:         CategoryUsage,
+				Sev:         finding.SeverityWarning,
+				ToolName:    ToolName,
+			},
+			check: checkMissingCLIVersion,
 		},
 	}
 }
