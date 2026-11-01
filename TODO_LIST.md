@@ -28,6 +28,22 @@ ROADMAP.md §"Additional v5 candidates" — keep them there, not here.
 
 ---
 
+## v5 End-Goal Workstreams (pre-v5 slice)
+
+Plan: [docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
+These are the additive, non-breaking pieces shipped before the major so
+consumers can adopt early and the v5 break stays small.
+
+| #  | Task                     | Notes                                                                                                                                                                                                                                                                                          | Status  |
+| -- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| D1 | Machine-readable contract | `Describe()` / `WriteDescription()` (`describe.go`) plus an auto-registered hidden `describe` command; flag metadata (env, required, values, count, prompt, validate) rides on cobra annotations. Consumer-defined `describe` wins; `WithoutDescribeCommand()` opts out. 8 tests.                 | ✅ DONE |
+| D2 | Atomic batch registration | `AddCommands[T](cli, cmds...)`: prepares and validates every command before attaching any, accepts mixed flags types, rejects nil entries, and keys duplicate detection on the cobra command name (`"list [path]"` vs `"list"`). `examples/taskctl` registers 11 commands in one call (432→402 LOC). | ✅ DONE |
+| D3 | Errors that teach        | `ErrorHint(err)` returns one actionable fix per classified sentinel; the JSON error envelope gains `hint`. A coverage test fails when a classified sentinel has no hint.                                                                                                                          | ✅ DONE |
+| D4 | Baseline guardrails      | `cmdguard-lint` CG007 (missing short description) and CG008 (missing CLI version); test files and spread option lists are skipped; generated README table refreshed.                                                                                                                             | ✅ DONE |
+| D5 | Batteries + strict flip  | `WithBatteries` / `NewApp` one-call superb app, strict validation by default, fang-rendered hints. v5-only.                                                                                                                                                                                     | 🔴 TODO |
+
+---
+
 ## Blocked on Upstream
 
 | #  | Task                           | Blocker                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Priority | Status  |
@@ -50,7 +66,7 @@ Harvested from `docs/status/2026-10-04_07-11_cmdguard-lint-sub-module-build.md` 
 | L5 | Provider options (enable/disable via BuildFlow config)       | DONE 2026-10-09: the blocker was stale — toolsdk v1.14.0 HAS the options surface. `lint.FilterByIDs` extracted (CLI + provider share semantics); provider declares `enable`/`disable` string options read via `OptionsFromContext`; ValidateOptions contract tested. Needs `lint/v0.2.0` release + BuildFlow `go get` bump to reach the fleet — release on user approval.                                            | Medium   | ✅ DONE     |
 | L6 | golangci-lint module-plugin distribution layer               | Scoped 2026-10-09: requires an `analysis.Analyzer` bridge (golangci/plugin-module-register, per go-humanize-linter pattern: `lint/plugin/` package + `.custom-gcl.yml` + `.golangci.custom.yml`). One pass = one package's files, so cross-file tracing carries over; checks need a pass.Files→project adapter. NOT a thin wiring task — do not half-ship. Also needs the custom-gcl build verified against corpora. | Low      | 🔴 TODO     |
 | L7 | Auto-generate README rule table from `allRuleDefs()`         | DONE 2026-10-09: `RuleTableMarkdown()` + `rules --markdown` CLI flag + `rules_table_test.go` byte-exact drift guard over the marker-bracketed README section (mutation-verified: edit→FAIL, regenerate→PASS). "Adding a rule" now lists the regenerate step.                                                                                                                                                         | Low      | ✅ DONE     |
-| L8 | Bump `CurrentMajor` in `lint/walk.go` when cmdguard v5 ships | Standing duty; CG002 tracks the constant. Rule IDs CG001–CG006 are load-bearing (suppressions key on them) — never renumber                                                                                                                                                                                                                                                                                          | —        | 🔵 STANDING |
+| L8 | Bump `CurrentMajor` in `lint/walk.go` when cmdguard v5 ships | Standing duty; CG002 tracks the constant. Rule IDs CG001–CG008 are load-bearing (suppressions key on them) — never renumber                                                                                                                                                                                                                                                                                          | —        | 🔵 STANDING |
 
 ---
 

@@ -28,7 +28,10 @@ unless the Source column says otherwise.
 | `ArgsFromContext(ctx)` retrieves positional args                              | ✅ Verified | `cli_command.go:19`                                                                              |
 | pkg.go.dev page for the package exists (v4.1.0)                               | ✅ Verified | Fetched live 2026-10-16                                                                          |
 | 59 exported sentinel error vars; 87 test funcs in `examples/taskctl`           | ✅ Verified | `rg` over `errors*.go` / taskctl tests, 2026-10-16                                                |
-| CG001-CG006 lint rule semantics                                               | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                            |
+| CG001-CG008 lint rule semantics                                               | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                            |
+| `Describe()` / hidden `describe` command contract                             | ✅ Verified | `pkg/cmdguard/v4/describe.go` + `describe_test.go`, 2026-11-01                                  |
+| `AddCommands` atomic batch registration                                       | ✅ Verified | `pkg/cmdguard/v4/cli.go` + `describe_test.go` (atomicity, mixed F, name-keyed duplicates), 2026-11-01 |
+| `ErrorHint` coverage of classified sentinels                                  | ✅ Verified | `errors_hints.go` + `errors_hints_test.go` (coverage test), 2026-11-01                          |
 
 ## The mental model: one type param on the CLI, a flag struct per command
 
@@ -52,6 +55,42 @@ err = cli.ExecuteAndExit(ctx) // blessed entry point
   cmdguard.WithSubcommands(migrate, seed))`. Subcommands must share T and F.
 - Handlers receive `(ctx, *T, F)` — no positional args. Get them with
   `cmdguard.ArgsFromContext(ctx)`; cmdguard stores them automatically.
+
+## Machine-readable contract (`describe`)
+
+Every CLI gets a hidden `describe` command at `Execute` time; it prints a
+versioned JSON contract for agents and tooling:
+
+```bash
+app describe
+# {"schema_version":"1","name":"app","version":"1.0.0","flags":[...],"commands":[{"name":"scan","path":"app scan","flags":[...]}]}
+```
+
+- Programmatic: `cli.Describe() *CLIDescription` and `cli.WriteDescription(w)`.
+- Flag entries carry `type`, `default`, `env` (prefix already applied), `values`
+  (enums), `required`, `count`, `prompt`, `validate`, `hidden`, `inherited`.
+- The schema is additive within `schema_version`; names and meanings never change
+  inside a major.
+- A consumer command named `describe` wins over the built-in; `WithoutDescribeCommand()`
+  opts out entirely (the programmatic API keeps working).
+
+Prefer this over scraping `--help` when driving a CLI from an agent or a test.
+
+## Registering many commands
+
+`AddCommands(cli, a, b, c)` collapses the per-command error ladder into one check
+and registers atomically: every command is validated and converted before any is
+attached, so a failed batch leaves the CLI unchanged. Commands may have different
+flags types; `T` is still type-checked.
+
+```go
+if err := cmdguard.AddCommands(cli, listCmd, addCmd, doneCmd); err != nil {
+    return err
+}
+```
+
+Duplicate detection keys on the cobra command name, so `"list [path]"` and
+`"list"` correctly collide.
 
 ## Flag scoping — read this before claiming something is impossible
 
@@ -155,6 +194,9 @@ missing files skipped) feed root `T` only.
 - 59 exported sentinel errors, all `fmt.Errorf("%w: ...", sentinel)`-wrapped — reach
   them with `errors.Is`, typed errors with `errors.AsType[*T]` (Go 1.26+). Full list:
   `docs/ERROR_REFERENCE.md`.
+- `ErrorHint(err)` returns one actionable fix sentence per classified sentinel
+  (empty when unknown). The JSON error envelope includes it as `hint`; use it in
+  custom handlers instead of duplicating fix text.
 
 ## Gotchas that bite consumers
 
@@ -184,12 +226,13 @@ Core has zero dependencies on these. Each lives at the repo root and imports as
 | `spinner`         | Terminal spinner middleware (auto-skips non-TTY stderr)          | `SpinnerMiddleware[T]`                              |
 | `telemetry`       | OpenTelemetry span per command                                   | `TelemetryMiddleware[T]`                            |
 | `flightrecorder`  | Go 1.25+ `runtime/trace` flight recorder, zero external deps     | `WithFlightRecorder[T](cfg)`                        |
-| `lint`            | cmdguard usage linter (go-finding; BuildFlow provider + CLI)     | `cmdguard-lint`, rules CG001-CG006                  |
+| `lint`            | cmdguard usage linter (go-finding; BuildFlow provider + CLI)     | `cmdguard-lint`, rules CG001-CG008                  |
 
 cmdguard-lint rules worth knowing while writing consumers (repo-documented): CG001
 execute bypass (`Execute` without exit handling), CG002 stale major version, CG003
 constructor panic (ignoring `New*` errors), CG004 runtime `SetVersion`, CG005
-duplicate version options, CG006 re-printing the execute error. Suppress with
+duplicate version options, CG006 re-printing the execute error, CG007 missing
+`WithShort` (blank help line), CG008 missing `WithCLIVersion`. Suppress with
 `//cmdguard-lint:ignore <ID> <reason>`.
 
 ## Where deeper truth lives (cmdguard repo)

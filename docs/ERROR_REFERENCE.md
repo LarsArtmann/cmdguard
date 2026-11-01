@@ -1,7 +1,7 @@
 # Error Reference — cmdguard v4
 
 **Auto-generated from source:** `pkg/cmdguard/v4/errors_*.go`, `types_*.go`
-**Last updated:** 2026-06-10
+**Last updated:** 2026-11-01
 
 ---
 
@@ -14,6 +14,28 @@ if errors.Is(err, v4.ErrRequiredFlag) {
     // handle missing required flag
 }
 ```
+
+## Actionable hints
+
+`ErrorHint(err)` returns one sentence describing how to fix the failure, or
+`""` when no hint is known:
+
+```go
+if hint := v4.ErrorHint(err); hint != "" {
+    fmt.Fprintln(os.Stderr, hint)
+}
+```
+
+Hints are separate from messages so error text stays stable for parsing and
+tests. Machine-readable output includes the same hint as `hint` in the JSON
+error envelope:
+
+```json
+{"error":{"type":"flag","message":"required flag not set: name","hint":"pass the flag on the command line, or set its env var or config-file value","code":1}}
+```
+
+Every sentinel used by the JSON classifier has a hint; a test fails when a newly
+classified sentinel is missing one.
 
 ## Typed Errors
 

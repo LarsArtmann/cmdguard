@@ -8,8 +8,11 @@
 
 ## v5 Major Release
 
-The next major version will focus on API clarity and correctness. The following
-breaking changes are tracked with `TODO(v5)` markers in source code:
+The v5 thesis and full workstream plan (P1 inevitable quality, P2 zero-bug by
+construction, P3 fantastic UX, P4 minimum code): [docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
+Renames are the smallest part of v5, not the point of it.
+
+The following breaking changes are tracked with `TODO(v5)` markers in source code:
 
 | # | Change                                                                | Rationale                                                              | Source Location      |
 | - | --------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------- |

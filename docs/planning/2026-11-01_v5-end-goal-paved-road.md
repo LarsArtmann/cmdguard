@@ -34,7 +34,7 @@ are hygiene; the release earns its major number by moving P1-P4.
 | Safety defaults | `WithSignalHandling` / `WithGracefulShutdown` are opt-in. `Strict`/`Draconian` validation is opt-in. | An unopinionated developer gets no signal handling and no short-description checks. P1 fails. |
 | Error output | Sentinel errors are precise and `errors.Is`-chainable, but the text says what failed, rarely what to do. | Humans re-read the docs; agents guess. P3 fails. |
 | Machine readability | `--output json` affects data output; errors become a JSON envelope. The CLI itself has no schema. | An agent must scrape `--help` prose to drive an unknown binary. P4 fails for agents. |
-| Guardrails | Six lint rules (CG001-CG006), all about *not* regressing cmdguard's contract. | Nothing enforces the positive baseline (short description, version, no dead flags). P2/P3 gap. |
+| Guardrails | Eight lint rules: CG001-CG006 protect the execution contract, CG007/CG008 (shipped 2026-11-01) enforce the short-description and version baseline. | Nothing yet enforces dead-flag hygiene, and the baseline rules default to warnings rather than failures. P2/P3 gap. |
 | Versioning of the contract | Sentinel errors are stable; the CLI description has no version. | Tooling cannot pin a schema. |
 
 Evidence lives in `pkg/cmdguard/v4/cli.go`, `cli_command.go`,
@@ -137,7 +137,7 @@ envelope). Fang rendering is v5.
 regression test covers `"list [path]"` vs `"list"`; a failed batch leaves the
 CLI unchanged.
 
-**Status:** `AddCommands` and name-keyed duplicate detection ship pre-v5.
+**Status:** `AddCommands` and name-keyed duplicate detection ship pre-v5; taskctl now registers 11 commands in one call (432 -> 402 LOC in `commands.go`, 10 error stanzas removed).
 
 ### W5. Guardrails: make the bad shape impossible (P1, P2)
 
@@ -209,7 +209,7 @@ tests.
 - Website landing page leads with the end goal and a live `describe` output.
 
 **Gate:** a fresh session, given only README + skill, builds a CLI that passes
-`WithDraconianValidation()` and`cmdguard-lint` with zero findings on the first
+`WithDraconianValidation()` and `cmdguard-lint` with zero findings on the first
 attempt.
 
 ## Sequencing

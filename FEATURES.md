@@ -30,6 +30,7 @@
 | ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                                                                          |
 | `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                                                                           |
+| `AddCommands(cli, cmds...)`                 | 🟢 FULLY_FUNCTIONAL     | Atomic batch registration: every command is validated and converted before any is attached (`cli.go`)                                                                                     |
 | `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                                                                            |
 | `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                                                                            |
 | `ExecuteAndExit(ctx)`                       | 🟢 FULLY_FUNCTIONAL     | Run + `os.Exit` (respects `ExitCoder`) (`cli.go`)                                                                                                                                         |
@@ -41,8 +42,10 @@
 | `Injector()`                                | 🟢 FULLY_FUNCTIONAL     | Returns `do.Injector` for raw DI access                                                                                                                                                   |
 | `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Carries `TODO(v5)` removal marker; pass defaults to `NewCLI` instead. |
 | `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                                                                            |
+| `Describe()` / `WriteDescription(w)`        | 🟢 FULLY_FUNCTIONAL     | Machine-readable JSON contract (`schema_version`, commands, flags with env/required/values) (`describe.go`)                                                                               |
+| `describe` command                          | 🟢 FULLY_FUNCTIONAL     | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                             |
 
-### CLI Options (27 total — all non-generic except where noted)
+### CLI Options (28 total — all non-generic except where noted)
 
 | Option                                         | Status              | Notes                                                                                                                  |
 | ---------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -73,6 +76,7 @@
 | `WithCleanup[T](fns...)`                       | 🟢 FULLY_FUNCTIONAL | Post-RunE cleanup, fires even on RunE error (generic)                                                                  |
 | `WithHelpTransform(fn)`                        | 🟢 FULLY_FUNCTIONAL | Transform command help text (glamour injection point)                                                                  |
 | `WithPlugin(plugin)`                           | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                       |
+| `WithoutDescribeCommand()`                     | 🟢 FULLY_FUNCTIONAL | Disable the auto-registered JSON `describe` command (contract stays available via `Describe()`)                        |
 
 ### Command[T, F]
 
@@ -293,6 +297,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 | Feature               | Status              | Notes                                                               |
 | --------------------- | ------------------- | ------------------------------------------------------------------- |
 | `cli.GenerateDocs(w)` | 🟢 FULLY_FUNCTIONAL | Markdown docs for full command tree to `io.Writer` (`docgen.go:19`) |
+| `describe` command | 🟢 FULLY_FUNCTIONAL | JSON contract for agents/tooling (`describe.go`), auto-registered at Execute |
 
 ---
 
@@ -315,6 +320,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 | `ExitCoder` / `ExitError`  | 🟢 FULLY_FUNCTIONAL | Custom exit codes for `ExecuteAndExit`                   |
 | `ExitCode(err) int`        | 🟢 FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |
 | `errors.Is()` chainability | 🟢 FULLY_FUNCTIONAL | All sentinels use `fmt.Errorf("%w: ...", sentinel)`      |
+| `ErrorHint(err) string`    | 🟢 FULLY_FUNCTIONAL | Actionable fix sentence per sentinel; also emitted as `hint` in the JSON error envelope (`errors_hints.go`) |
 
 ---
 
@@ -350,7 +356,7 @@ built with cmdguard v4 itself).
 
 | Capability                                                                                                                    | Status     | Notes                                                                                                                                               |
 | ----------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rules CG001–CG006 (execute bypass, stale major, constructor panic, runtime SetVersion, duplicate version opts, error reprint) | 🟢 DONE    | All syntactic (AST walk, no build needed); single source of truth in `allRuleDefs()`                                                                |
+| Rules CG001–CG008 (execute bypass, stale major, constructor panic, runtime SetVersion, duplicate version opts, error reprint, missing short description, missing CLI version) | 🟢 DONE    | All syntactic (AST walk, no build needed); single source of truth in `allRuleDefs()`                                                                |
 | In-source suppressions `//cmdguard-lint:ignore <ID> <reason>`                                                                 | 🟢 DONE    | Reason required, rule-scoped, applies to finding line or line above                                                                                 |
 | text / JSON / SARIF output                                                                                                    | 🟢 DONE    | SARIF round-trips via `finding.FindingsFromSARIF` (tested)                                                                                          |
 | `--enable` / `--disable` filtering                                                                                            | 🟢 DONE    | `lint.FilterByIDs` shared by CLI flags and provider options (single semantics)                                                                      |

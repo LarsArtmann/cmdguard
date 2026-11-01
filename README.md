@@ -97,6 +97,22 @@ Every function returns errors. No `Run` (panics), no `Must*` variants. The error
 cli.ExecuteAndExit(context.Background()) // one line, correct exit code
 ```
 
+### Machine-readable by default
+
+Every cmdguard CLI can describe itself. A hidden `describe` command prints the
+full command and flag tree as versioned JSON (`schema_version`, types, defaults,
+env vars, enum values, required flags), and the JSON error envelope carries an
+actionable `hint` next to the message:
+
+```bash
+myapp describe
+# {"schema_version":"1","name":"myapp","commands":[{"name":"scan","path":"myapp scan",...}]}
+```
+
+AI agents and tooling can discover and drive your CLI without scraping
+`--help`. The same contract is available programmatically:
+`cli.Describe()` / `cli.WriteDescription(w)`.
+
 ---
 
 ## Error handling & exit codes
