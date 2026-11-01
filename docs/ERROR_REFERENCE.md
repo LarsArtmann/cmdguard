@@ -31,7 +31,14 @@ tests. Machine-readable output includes the same hint as `hint` in the JSON
 error envelope:
 
 ```json
-{"error":{"type":"flag","message":"required flag not set: name","hint":"pass the flag on the command line, or set its env var or config-file value","code":1}}
+{
+  "error": {
+    "type": "flag",
+    "message": "required flag not set: name",
+    "hint": "pass the flag on the command line, or set its env var or config-file value",
+    "code": 1
+  }
+}
 ```
 
 Every sentinel used by the JSON classifier has a hint; a test fails when a newly

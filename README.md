@@ -221,10 +221,10 @@ HELLO, CMDGUARD!
 | **Signal handling**        | `WithSignalHandling()` — Ctrl+C cancels context in all handlers                                                                                  |
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                 |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                   |
-| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                            |
-| **Batteries included**     | `WithBatteries()` — strict validation, signal handling, graceful shutdown, version/doctor commands, actionable hints, all opt-in               |
-| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                               |
-| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                   |
+| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                             |
+| **Batteries included**     | `WithBatteries()` — strict validation, signal handling, graceful shutdown, version/doctor commands, actionable hints, all opt-in                 |
+| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                                |
+| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                    |
 | **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                    |
 | **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                      |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                          |

@@ -16,26 +16,26 @@
 Four testable properties. A change that does not move one of them is not a v5
 change, it is maintenance.
 
-| # | Property | Question the release must answer "yes" to |
-| - | -------- | ----------------------------------------- |
-| P1 | Inevitable quality | Can a developer who ignores every doc still end up with a superb CLI? |
-| P2 | Zero-bug by construction | Is every mistake caught at construction, lint, or first run, never in production? |
-| P3 | Fantastic UX | Does every surface (help, errors, exit codes, docs, completion) teach the user what to do next? |
-| P4 | Minimum code | Is handwritten code proportional to the domain, not to the framework? |
+| #  | Property                 | Question the release must answer "yes" to                                                       |
+| -- | ------------------------ | ----------------------------------------------------------------------------------------------- |
+| P1 | Inevitable quality       | Can a developer who ignores every doc still end up with a superb CLI?                           |
+| P2 | Zero-bug by construction | Is every mistake caught at construction, lint, or first run, never in production?               |
+| P3 | Fantastic UX             | Does every surface (help, errors, exit codes, docs, completion) teach the user what to do next? |
+| P4 | Minimum code             | Is handwritten code proportional to the domain, not to the framework?                           |
 
 **Corollary:** v5 is not a rename release. The renames already on the roadmap
 are hygiene; the release earns its major number by moving P1-P4.
 
 ## v4 reality check (measured, not asserted)
 
-| Surface | v4 today | Gap to the end goal |
-| ------- | -------- | ------------------- |
-| Bootstrap | `NewCLI` + one error check per command + one `AddCommand` error check per command. `examples/taskctl/commands.go` has 10 `AddCommand` error blocks for 12 commands. | Every registration is a 3-line error stanza. P4 fails. |
-| Safety defaults | `WithSignalHandling` / `WithGracefulShutdown` are opt-in. `Strict`/`Draconian` validation is opt-in. | An unopinionated developer gets no signal handling and no short-description checks. P1 fails. |
-| Error output | Sentinel errors are precise and `errors.Is`-chainable, but the text says what failed, rarely what to do. | Humans re-read the docs; agents guess. P3 fails. |
-| Machine readability | `--output json` affects data output; errors become a JSON envelope. The CLI itself has no schema. | An agent must scrape `--help` prose to drive an unknown binary. P4 fails for agents. |
-| Guardrails | Eight lint rules: CG001-CG006 protect the execution contract, CG007/CG008 (shipped 2026-11-01) enforce the short-description and version baseline. | Nothing yet enforces dead-flag hygiene, and the baseline rules default to warnings rather than failures. P2/P3 gap. |
-| Versioning of the contract | Sentinel errors are stable; the CLI description has no version. | Tooling cannot pin a schema. |
+| Surface                    | v4 today                                                                                                                                                            | Gap to the end goal                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Bootstrap                  | `NewCLI` + one error check per command + one `AddCommand` error check per command. `examples/taskctl/commands.go` has 10 `AddCommand` error blocks for 12 commands. | Every registration is a 3-line error stanza. P4 fails.                                                              |
+| Safety defaults            | `WithSignalHandling` / `WithGracefulShutdown` are opt-in. `Strict`/`Draconian` validation is opt-in.                                                                | An unopinionated developer gets no signal handling and no short-description checks. P1 fails.                       |
+| Error output               | Sentinel errors are precise and `errors.Is`-chainable, but the text says what failed, rarely what to do.                                                            | Humans re-read the docs; agents guess. P3 fails.                                                                    |
+| Machine readability        | `--output json` affects data output; errors become a JSON envelope. The CLI itself has no schema.                                                                   | An agent must scrape `--help` prose to drive an unknown binary. P4 fails for agents.                                |
+| Guardrails                 | Eight lint rules: CG001-CG006 protect the execution contract, CG007/CG008 (shipped 2026-11-01) enforce the short-description and version baseline.                  | Nothing yet enforces dead-flag hygiene, and the baseline rules default to warnings rather than failures. P2/P3 gap. |
+| Versioning of the contract | Sentinel errors are stable; the CLI description has no version.                                                                                                     | Tooling cannot pin a schema.                                                                                        |
 
 Evidence lives in `pkg/cmdguard/v4/cli.go`, `cli_command.go`,
 `examples/taskctl/commands.go`, and `lint/rules.go`.
@@ -224,15 +224,15 @@ attempt.
 
 These shipped additively, with tests and the full quality gate green:
 
-| Workstream | Shipped |
-| ---------- | ------- |
-| W1 | `describe.go`: `CLIDescription`/`CommandDescription`/`FlagDescription`, `Describe()`, `WriteDescription()`, auto-registered hidden `describe` command, `WithoutDescribeCommand()`, flag metadata on cobra annotations. |
-| W3 | `errors_hints.go`: `ErrorHint(err)` for every classified sentinel; `hint` added to the JSON error envelope; coverage test. |
-| W4 | `AddCommands[T]` atomic batch registration; `AddCommand` split into prepare/attach (a failed conversion no longer reserves the name); duplicate detection keyed on the command name. taskctl: 11 commands, one call, 10 error stanzas gone (432 -> 402 LOC). |
-| W5 | `cmdguard-lint` CG007 (missing short description) and CG008 (missing CLI version), generated README table refreshed, lint module brought back to 0 issues. |
-| W2 | `WithBatteries()` and `NewApp` (opt-in; v5 flips the defaults). |
-| W3 | Human `Hint:` line under errors via fang's default handler; `WithoutErrorHints()`; the plain cobra path prints it too. |
-| Fix | `required`/`values`/`validate` tags are now enforced at run time (the validator had no production caller); string `min`/`max` mean length; meta commands are exempt from required enforcement; validation errors lost their stacked prefixes. |
+| Workstream | Shipped                                                                                                                                                                                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| W1         | `describe.go`: `CLIDescription`/`CommandDescription`/`FlagDescription`, `Describe()`, `WriteDescription()`, auto-registered hidden `describe` command, `WithoutDescribeCommand()`, flag metadata on cobra annotations.                                       |
+| W3         | `errors_hints.go`: `ErrorHint(err)` for every classified sentinel; `hint` added to the JSON error envelope; coverage test.                                                                                                                                   |
+| W4         | `AddCommands[T]` atomic batch registration; `AddCommand` split into prepare/attach (a failed conversion no longer reserves the name); duplicate detection keyed on the command name. taskctl: 11 commands, one call, 10 error stanzas gone (432 -> 402 LOC). |
+| W5         | `cmdguard-lint` CG007 (missing short description) and CG008 (missing CLI version), generated README table refreshed, lint module brought back to 0 issues.                                                                                                   |
+| W2         | `WithBatteries()` and `NewApp` (opt-in; v5 flips the defaults).                                                                                                                                                                                              |
+| W3         | Human `Hint:` line under errors via fang's default handler; `WithoutErrorHints()`; the plain cobra path prints it too.                                                                                                                                       |
+| Fix        | `required`/`values`/`validate` tags are now enforced at run time (the validator had no production caller); string `min`/`max` mean length; meta commands are exempt from required enforcement; validation errors lost their stacked prefixes.                |
 
 Verification: `nix run .#check-all` (build, race tests, lint, format, tidy across
 all 7 modules), a live `taskctl describe | jq` round-trip, and
@@ -241,13 +241,13 @@ min-length failures, hints, and a clean run in one acceptance test).
 
 ## Sequencing
 
-| Order | Workstream | Why this order |
-| ----- | ---------- | -------------- |
-| 1 | W1 describe, W4 AddCommands, W3 hints, W5 CG007/CG008 (all additive) | Ships value now, de-risks v5, and gives consumers time to adopt |
-| 2 | W2 batteries + `NewApp` (additive, defaults flipped in v5) | Needs W1/W4 primitives |
-| 3 | W8 docs/skill refresh | Documents what actually exists |
-| 4 | W6 the break + migration guide | Only after the additive surface is proven |
-| 5 | W5 strict-by-default flip, W7 corpus proof, release gate | Last, so the corpus migrates on a stable API |
+| Order | Workstream                                                           | Why this order                                                  |
+| ----- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 1     | W1 describe, W4 AddCommands, W3 hints, W5 CG007/CG008 (all additive) | Ships value now, de-risks v5, and gives consumers time to adopt |
+| 2     | W2 batteries + `NewApp` (additive, defaults flipped in v5)           | Needs W1/W4 primitives                                          |
+| 3     | W8 docs/skill refresh                                                | Documents what actually exists                                  |
+| 4     | W6 the break + migration guide                                       | Only after the additive surface is proven                       |
+| 5     | W5 strict-by-default flip, W7 corpus proof, release gate             | Last, so the corpus migrates on a stable API                    |
 
 ## Release gate (definition of done for v5)
 

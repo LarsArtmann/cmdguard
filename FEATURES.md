@@ -30,7 +30,7 @@
 | ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                                                                          |
 | `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                                                                           |
-| `NewApp(name, short, defaults, build, ...)` | 🟢 FULLY_FUNCTIONAL     | Construct CLI, run the build callback, discard half-built app on error (`cli_batteries.go`)                                                                                              |
+| `NewApp(name, short, defaults, build, ...)` | 🟢 FULLY_FUNCTIONAL     | Construct CLI, run the build callback, discard half-built app on error (`cli_batteries.go`)                                                                                               |
 | `AddCommands(cli, cmds...)`                 | 🟢 FULLY_FUNCTIONAL     | Atomic batch registration: every command is validated and converted before any is attached (`cli.go`)                                                                                     |
 | `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                                                                            |
 | `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                                                                            |
@@ -44,7 +44,7 @@
 | `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Carries `TODO(v5)` removal marker; pass defaults to `NewCLI` instead. |
 | `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                                                                            |
 | `Describe()` / `WriteDescription(w)`        | 🟢 FULLY_FUNCTIONAL     | Machine-readable JSON contract (`schema_version`, commands, flags with env/required/values) (`describe.go`)                                                                               |
-| `describe` command                          | 🟢 FULLY_FUNCTIONAL     | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                             |
+| `describe` command                          | 🟢 FULLY_FUNCTIONAL     | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                            |
 
 ### CLI Options (32 total — all non-generic except where noted)
 
@@ -79,7 +79,7 @@
 | `WithPlugin(plugin)`                           | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                       |
 | `WithoutDescribeCommand()`                     | 🟢 FULLY_FUNCTIONAL | Disable the auto-registered JSON `describe` command (contract stays available via `Describe()`)                        |
 | `WithBatteries()`                              | 🟢 FULLY_FUNCTIONAL | Production defaults: strict validation, signals + graceful shutdown, hints, auto version/doctor commands               |
-| `WithoutErrorHints()`                          | 🟢 FULLY_FUNCTIONAL | Disable the `Hint:` line under human-readable errors (JSON envelopes keep `hint`)                                     |
+| `WithoutErrorHints()`                          | 🟢 FULLY_FUNCTIONAL | Disable the `Hint:` line under human-readable errors (JSON envelopes keep `hint`)                                      |
 
 ### Command[T, F]
 
@@ -125,7 +125,7 @@
 | `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL | Environment variable binding (with optional prefix)                                             |
 | `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL | Counting flags: -vvv → 3                                                                        |
 | Short flags                    | 🟢 FULLY_FUNCTIONAL | `short:"n"` for `-n`                                                                            |
-| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag, enforced after parsing; an explicit flag or its env var satisfies it      |
+| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag, enforced after parsing; an explicit flag or its env var satisfies it     |
 | `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL | Built-in + custom validators; `min`/`max` mean length on string fields                          |
 | Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL | Levenshtein-based (`flags_suggest.go`)                                                          |
 | Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands                                                         |
@@ -298,10 +298,10 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Documentation Generation
 
-| Feature               | Status              | Notes                                                               |
-| --------------------- | ------------------- | ------------------------------------------------------------------- |
-| `cli.GenerateDocs(w)` | 🟢 FULLY_FUNCTIONAL | Markdown docs for full command tree to `io.Writer` (`docgen.go:19`) |
-| `describe` command | 🟢 FULLY_FUNCTIONAL | JSON contract for agents/tooling (`describe.go`), auto-registered at Execute |
+| Feature               | Status              | Notes                                                                        |
+| --------------------- | ------------------- | ---------------------------------------------------------------------------- |
+| `cli.GenerateDocs(w)` | 🟢 FULLY_FUNCTIONAL | Markdown docs for full command tree to `io.Writer` (`docgen.go:19`)          |
+| `describe` command    | 🟢 FULLY_FUNCTIONAL | JSON contract for agents/tooling (`describe.go`), auto-registered at Execute |
 
 ---
 
@@ -317,15 +317,15 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Error Handling
 
-| Feature                    | Status              | Notes                                                    |
-| -------------------------- | ------------------- | -------------------------------------------------------- |
-| 60 sentinel errors         | 🟢 FULLY_FUNCTIONAL | 58 in `errors*.go` + 2 in `auditlog.go`/`prompts.go`     |
-| Typed errors               | 🟢 FULLY_FUNCTIONAL | `CommandError`, `FlagError`, `ServiceError`, etc.        |
-| `ExitCoder` / `ExitError`  | 🟢 FULLY_FUNCTIONAL | Custom exit codes for `ExecuteAndExit`                   |
-| `ExitCode(err) int`        | 🟢 FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |
-| `errors.Is()` chainability | 🟢 FULLY_FUNCTIONAL | All sentinels use `fmt.Errorf("%w: ...", sentinel)`      |
+| Feature                    | Status              | Notes                                                                                                       |
+| -------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 60 sentinel errors         | 🟢 FULLY_FUNCTIONAL | 58 in `errors*.go` + 2 in `auditlog.go`/`prompts.go`                                                        |
+| Typed errors               | 🟢 FULLY_FUNCTIONAL | `CommandError`, `FlagError`, `ServiceError`, etc.                                                           |
+| `ExitCoder` / `ExitError`  | 🟢 FULLY_FUNCTIONAL | Custom exit codes for `ExecuteAndExit`                                                                      |
+| `ExitCode(err) int`        | 🟢 FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1)                                                    |
+| `errors.Is()` chainability | 🟢 FULLY_FUNCTIONAL | All sentinels use `fmt.Errorf("%w: ...", sentinel)`                                                         |
 | `ErrorHint(err) string`    | 🟢 FULLY_FUNCTIONAL | Actionable fix sentence per sentinel; also emitted as `hint` in the JSON error envelope (`errors_hints.go`) |
-| `Hint:` line on errors     | 🟢 FULLY_FUNCTIONAL | Printed under human-readable errors (fang default view + plain cobra path); `WithoutErrorHints()` opts out |
+| `Hint:` line on errors     | 🟢 FULLY_FUNCTIONAL | Printed under human-readable errors (fang default view + plain cobra path); `WithoutErrorHints()` opts out  |
 
 ---
 
@@ -359,20 +359,20 @@ One detector core behind three distribution layers: library (`lint.Detect`),
 BuildFlow provider (`lint/provider`), and a dogfood CLI (`lint/cmd/cmdguard-lint`,
 built with cmdguard v4 itself).
 
-| Capability                                                                                                                    | Status     | Notes                                                                                                                                               |
-| ----------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capability                                                                                                                                                                    | Status     | Notes                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Rules CG001–CG008 (execute bypass, stale major, constructor panic, runtime SetVersion, duplicate version opts, error reprint, missing short description, missing CLI version) | 🟢 DONE    | All syntactic (AST walk, no build needed); single source of truth in `allRuleDefs()`                                                                |
-| In-source suppressions `//cmdguard-lint:ignore <ID> <reason>`                                                                 | 🟢 DONE    | Reason required, rule-scoped, applies to finding line or line above                                                                                 |
-| text / JSON / SARIF output                                                                                                    | 🟢 DONE    | SARIF round-trips via `finding.FindingsFromSARIF` (tested)                                                                                          |
-| `--enable` / `--disable` filtering                                                                                            | 🟢 DONE    | `lint.FilterByIDs` shared by CLI flags and provider options (single semantics)                                                                      |
-| Corpus validation                                                                                                             | 🟢 DONE    | timesheets 18/18 at hand-audited locations, CG002 15/15 exact vs `rg`, 0 FP on 4 negative corpora                                                   |
-| Published as `lint/v0.1.0`                                                                                                    | 🟢 DONE    | 2026-10-04: CHANGELOG, annotated tag pushed, proxy-verified via scratch consumer, GitHub release                                                    |
-| Wired into BuildFlow                                                                                                          | 🟢 DONE    | 2026-10-04: blank import in `sdk_imports.go` (fleet provider count 118), vendor + tests + `docs --check` green                                      |
-| Cross-file dataflow (CG003/CG004/CG006)                                                                                       | 🟢 DONE    | 2026-10-09: per-directory-group index of package-level names (crossfile.go); test ⊥ prod; locals never leak; FP budget held                         |
-| Baseline / ratchet mode                                                                                                       | 🟢 DONE    | 2026-10-09: `--write-baseline`/`--baseline`, per rule+file with line-drift tolerance, stale-entry reporting; `Load/Write/ApplyBaseline` library API |
-| Provider options (`enable`/`disable` via BuildFlow config)                                                                    | 🟢 DONE    | 2026-10-09: toolsdk Option surface; needs `lint/v0.2.0` release + BuildFlow bump to reach the fleet                                                 |
-| Generated README rule table + drift guard                                                                                     | 🟢 DONE    | 2026-10-09: `RuleTableMarkdown()`, `rules --markdown`, byte-exact `rules_table_test.go`                                                             |
-| golangci-lint module plugin                                                                                                   | 🔴 PLANNED | TODO_LIST L6: needs `analysis.Analyzer` bridge per go-humanize-linter pattern                                                                       |
+| In-source suppressions `//cmdguard-lint:ignore <ID> <reason>`                                                                                                                 | 🟢 DONE    | Reason required, rule-scoped, applies to finding line or line above                                                                                 |
+| text / JSON / SARIF output                                                                                                                                                    | 🟢 DONE    | SARIF round-trips via `finding.FindingsFromSARIF` (tested)                                                                                          |
+| `--enable` / `--disable` filtering                                                                                                                                            | 🟢 DONE    | `lint.FilterByIDs` shared by CLI flags and provider options (single semantics)                                                                      |
+| Corpus validation                                                                                                                                                             | 🟢 DONE    | timesheets 18/18 at hand-audited locations, CG002 15/15 exact vs `rg`, 0 FP on 4 negative corpora                                                   |
+| Published as `lint/v0.1.0`                                                                                                                                                    | 🟢 DONE    | 2026-10-04: CHANGELOG, annotated tag pushed, proxy-verified via scratch consumer, GitHub release                                                    |
+| Wired into BuildFlow                                                                                                                                                          | 🟢 DONE    | 2026-10-04: blank import in `sdk_imports.go` (fleet provider count 118), vendor + tests + `docs --check` green                                      |
+| Cross-file dataflow (CG003/CG004/CG006)                                                                                                                                       | 🟢 DONE    | 2026-10-09: per-directory-group index of package-level names (crossfile.go); test ⊥ prod; locals never leak; FP budget held                         |
+| Baseline / ratchet mode                                                                                                                                                       | 🟢 DONE    | 2026-10-09: `--write-baseline`/`--baseline`, per rule+file with line-drift tolerance, stale-entry reporting; `Load/Write/ApplyBaseline` library API |
+| Provider options (`enable`/`disable` via BuildFlow config)                                                                                                                    | 🟢 DONE    | 2026-10-09: toolsdk Option surface; needs `lint/v0.2.0` release + BuildFlow bump to reach the fleet                                                 |
+| Generated README rule table + drift guard                                                                                                                                     | 🟢 DONE    | 2026-10-09: `RuleTableMarkdown()`, `rules --markdown`, byte-exact `rules_table_test.go`                                                             |
+| golangci-lint module plugin                                                                                                                                                   | 🔴 PLANNED | TODO_LIST L6: needs `analysis.Analyzer` bridge per go-humanize-linter pattern                                                                       |
 
 ---
 
