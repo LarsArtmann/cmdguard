@@ -1,3 +1,4 @@
+//nolint:lll // struct-tag tables are aligned and inherently long
 package v4
 
 import (

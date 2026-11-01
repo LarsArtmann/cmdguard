@@ -558,7 +558,7 @@ func (cli *CLI[T]) applyCleanupHooks() {
 
 // Execute runs the CLI application.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
-	err := cli.ensureDescribeCommand() //nolint:contextcheck // wiring captures c.Context(), set only during cobra execution
+	err := cli.ensureDescribeCommand() //nolint:contextcheck // c.Context() is set only during cobra execution
 	if err != nil {
 		return err
 	}

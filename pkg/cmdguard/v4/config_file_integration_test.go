@@ -1,4 +1,4 @@
-//nolint:nlreturn,paralleltest,tagliatelle // test file: inline returns, t.Setenv subtests, JSON tags intentionally match flag names
+//nolint:nlreturn,paralleltest,tagliatelle // test file: inline returns, t.Setenv, JSON tags match flag names
 package v4_test
 
 import (

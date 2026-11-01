@@ -37,12 +37,17 @@ type Middleware[T any] func(ctx context.Context, cfg *T, info CommandInfo, next 
 //
 // Example — timeout middleware:
 //
-//	TimeoutMiddleware := func(ctx context.Context, cfg *MyConfig, info CommandInfo, next func(context.Context) error) error {
+//	TimeoutMiddleware := func(
+//		ctx context.Context, cfg *MyConfig, info CommandInfo,
+//		next func(context.Context) error,
+//	) error {
 //	    ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 //	    defer cancel()
 //	    return next(ctx)
 //	}
-type ContextMiddleware[T any] func(ctx context.Context, cfg *T, info CommandInfo, next func(context.Context) error) error
+type ContextMiddleware[T any] func(
+	ctx context.Context, cfg *T, info CommandInfo, next func(context.Context) error,
+) error
 
 // Phase identifies the execution stage of a command handler.
 type Phase string

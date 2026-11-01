@@ -87,7 +87,12 @@ func (r *typeRegistry) registerIntKinds() {
 }
 
 func (r *typeRegistry) registerUintKinds() {
-	for _, k := range []reflect.Kind{reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr} {
+	uintKinds := []reflect.Kind{
+		reflect.Uint, reflect.Uint8, reflect.Uint16,
+		reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+	}
+
+	for _, k := range uintKinds {
 		r.byKind[k] = makeUintKindHandler(uintBitSize(k))
 	}
 }
