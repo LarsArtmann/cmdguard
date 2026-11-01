@@ -3,6 +3,7 @@ module github.com/larsartmann/cmdguard/lint
 go 1.27
 
 require (
+	github.com/dustin/go-humanize v1.1.0
 	github.com/larsartmann/cmdguard/v4 v4.1.0
 	github.com/larsartmann/go-finding v1.14.0
 	github.com/larsartmann/go-finding/toolsdk v1.15.0
@@ -23,7 +24,6 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/dustin/go-humanize v1.1.0 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-faster/jx v1.2.0 // indirect
 	github.com/go-faster/yaml v0.4.6 // indirect

@@ -56,11 +56,15 @@ func checkDuplicateVersionOpts(proj *project, meta linter.RuleMeta) []finding.Fi
 
 			findings = append(findings, newFinding(
 				meta,
-				"WithCLIVersion already pipes into fang.WithVersion: combining it with WithFangOptions(fang.WithVersion(...)) passes the version twice",
+				"WithCLIVersion already pipes into fang.WithVersion: combining it with "+
+					"WithFangOptions(fang.WithVersion(...)) passes the version twice",
 				file.pos(call),
 			).
 				WithConfidence(finding.ConfidenceFull).
-				WithSuggestion("Keep exactly one version source: WithCLIVersion (preferred) or the fang option, not both (see cmdguard ADR-001)").
+				WithSuggestion(
+					"Keep exactly one version source: WithCLIVersion (preferred) or the fang option, not both (see "+
+						"cmdguard ADR-001)",
+				).
 				MustBuild())
 
 			return true

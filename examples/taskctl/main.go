@@ -1,7 +1,8 @@
 // Package main demonstrates every major cmdguard feature in a production-grade task manager.
 //
 // Features shown:
-//   - Type-safe config with env var bindings, counting flags, and validated types (Email, URL, LogLevel, Duration, Port)
+//   - Type-safe config with env vars, counting flags, and validated types
+//     (Email, URL, LogLevel, Duration, Port)
 //   - Dependency injection with lifecycle hooks (HealthCheck, Shutdown)
 //   - Per-command typed flags with prompt, required, validate, and values tags
 //   - PreRunE validation and PostRunE cleanup

@@ -1,3 +1,4 @@
+//nolint:lll // flag tag tables are hand-aligned to keep full help text; struct tags cannot wrap
 package main
 
 import (

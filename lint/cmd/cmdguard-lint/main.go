@@ -14,7 +14,6 @@ import (
 	"path/filepath"
 
 	"github.com/dustin/go-humanize/english"
-
 	"github.com/larsartmann/go-finding"
 
 	"github.com/larsartmann/cmdguard/lint"

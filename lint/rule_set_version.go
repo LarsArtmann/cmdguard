@@ -48,11 +48,15 @@ func checkSetVersionRuntime(proj *project, meta linter.RuleMeta) []finding.Findi
 
 				findings = append(findings, newFinding(
 					meta,
-					"cli.SetVersion patches the version after construction: pass WithCLIVersion(version) to NewCLI so fang's version wiring is complete from the start",
+					"cli.SetVersion patches the version after construction: pass WithCLIVersion(version) to NewCLI so "+
+						"fang's version wiring is complete from the start",
 					file.pos(call),
 				).
 					WithConfidence(finding.ConfidenceHigh).
-					WithSuggestion("Move the version into NewCLI options: cmdguard.WithCLIVersion(version) (WithCLICommit for the commit stamp)").
+					WithSuggestion(
+						"Move the version into NewCLI options: cmdguard.WithCLIVersion(version) (WithCLICommit for the commit "+
+							"stamp)",
+					).
 					MustBuild())
 
 				break

@@ -56,11 +56,15 @@ func checkExecuteErrorReprint(proj *project, meta linter.RuleMeta) []finding.Fin
 
 				findings = append(findings, newFinding(
 					meta,
-					"the error returned by cli.Execute has already been displayed exactly once by cmdguard; printing it again double-reports the failure",
+					"the error returned by cli.Execute has already been displayed exactly once by cmdguard; printing it "+
+						"again double-reports the failure",
 					file.pos(call),
 				).
 					WithConfidence(finding.ConfidenceHigh).
-					WithSuggestion("Map the error to an exit code instead: cli.ExecuteAndExit(ctx), or ExitCode(err) after your post-execution work").
+					WithSuggestion(
+						"Map the error to an exit code instead: cli.ExecuteAndExit(ctx), or ExitCode(err) after your "+
+							"post-execution work",
+					).
 					MustBuild())
 
 				break

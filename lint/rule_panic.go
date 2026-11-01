@@ -57,7 +57,8 @@ func checkPanicOnConstructor(proj *project, meta linter.RuleMeta) []finding.Find
 
 				findings = append(findings, newFinding(
 					meta,
-					"panic on a cmdguard constructor error re-introduces the panic cmdguard removed by design: constructors return errors so registration failures surface as checkable errors",
+					"panic on a cmdguard constructor error re-introduces the panic cmdguard removed by design: "+
+						"constructors return errors so registration failures surface as checkable errors",
 					file.pos(stmt),
 				).
 					WithConfidence(finding.ConfidenceFull).
