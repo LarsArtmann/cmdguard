@@ -1,5 +1,7 @@
 # AGENTS.md - cmdguard Contributor & AI Assistant Guide
 
+> **End goal:** Make it IMPOSSIBLE to NOT create SUPERB CLI apps with near ZERO-BUGs and fantastic User Experience while keeping Code requirements developers and AI Agents need to write to an absolute minimum!
+
 > **Note:** This file serves as both a contributor guide and context for AI-assisted development. It documents architecture decisions, API reference, coding standards, and known gotchas.
 
 **Project:** cmdguard - CLI Guard Library

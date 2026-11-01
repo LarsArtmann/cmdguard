@@ -1,5 +1,7 @@
 # cmdguard
 
+> **End goal:** Make it IMPOSSIBLE to NOT create SUPERB CLI apps with near ZERO-BUGs and fantastic User Experience while keeping Code requirements developers and AI Agents need to write to an absolute minimum!
+
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v4.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4)
