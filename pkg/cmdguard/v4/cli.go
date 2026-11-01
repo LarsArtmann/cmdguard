@@ -397,6 +397,7 @@ func AddCommands[T any](cli *CLI[T], cmds ...AddableCommand[T]) error {
 		}
 
 		seen[name] = struct{}{}
+
 		prepared = append(prepared, cobraCmd)
 	}
 
@@ -447,11 +448,9 @@ func (cli *CLI[T]) attachCommand(cobraCmd *cobra.Command) {
 // commandName extracts the command name from a cobra Use line, mirroring
 // cobra.Command.Name (everything before the first space).
 func commandName(use string) string {
-	if i := strings.IndexByte(use, ' '); i >= 0 {
-		return use[:i]
-	}
+	name, _, _ := strings.Cut(use, " ")
 
-	return use
+	return name
 }
 
 // extractMiddleware safely extracts the typed middleware from the sealed interface.
@@ -559,7 +558,7 @@ func (cli *CLI[T]) applyCleanupHooks() {
 
 // Execute runs the CLI application.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
-	err := cli.ensureDescribeCommand()
+	err := cli.ensureDescribeCommand() //nolint:contextcheck // wiring captures c.Context(), set only during cobra execution
 	if err != nil {
 		return err
 	}
@@ -608,7 +607,7 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		cli.rootCmd.Long = cli.spec.long
 	}
 
-	cli.applyCleanupHooks() //nolint:contextcheck // hooks read c.Context() inside RunE, which cobra only sets during execution — no ctx to pass yet
+	cli.applyCleanupHooks() //nolint:contextcheck // hooks read c.Context() inside RunE, set only during execution
 
 	return cli.executeWithCobra(flowCtx)
 }

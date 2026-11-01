@@ -24,6 +24,8 @@ package depends only on go-finding and go-linter-sdk.
 | CG004 | warning  | runtime SetVersion         | cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand helper) instead                                     |
 | CG005 | error    | duplicate version options  | WithCLIVersion and WithFangOptions(fang.WithVersion(...)) in one NewCLI call pass duplicate fang version options                                         |
 | CG006 | warning  | execute error reprinted    | the error returned by cli.Execute is already displayed by cmdguard; re-printing it double-reports the failure                                            |
+| CG007 | warning  | missing short description  | a command without WithShort renders as a blank line in --help: it is invisible in command lists and fails WithStrictValidation                           |
+| CG008 | warning  | missing CLI version        | NewCLI without WithCLIVersion ships a binary that cannot identify its build or answer --version                                                          |
 
 <!-- END RULES TABLE -->
 

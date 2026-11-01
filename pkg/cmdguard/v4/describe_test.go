@@ -13,10 +13,10 @@ import (
 )
 
 type describeConfig struct {
-	Name      string `default:"world" flag:"name"       short:"n" help:"Name to greet"          env:"NAME"`
-	Verbose   int    `                flag:"verbose"    short:"v" help:"Verbosity (repeatable)"            count:"true"`
-	Secret    string `                flag:"secret"               help:"Hidden option"                                  hidden:"true"`
-	LocalOnly string `                flag:"local-only"           help:"Root-run only"                                                local:"true"`
+	Name      string `flag:"name"       short:"n" default:"world" help:"Name"      env:"NAME"`
+	Verbose   int    `flag:"verbose"    short:"v"                 help:"Verbosity"            count:"true"`
+	Secret    string `flag:"secret"                               help:"Hidden"                            hidden:"true"`
+	LocalOnly string `flag:"local-only"                           help:"Root only"                                       local:"true"`
 }
 
 type describeScanFlags struct {
@@ -223,6 +223,7 @@ func TestDescribeCommand_ConsumerCommandWins(t *testing.T) {
 		NoFlags{},
 		func(_ context.Context, _ *describeConfig, _ NoFlags) error {
 			_, writeErr := fmt.Fprintln(cli.RootCommand().OutOrStdout(), "mine")
+
 			return writeErr
 		},
 		WithShort("Consumer describe"),
