@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"charm.land/fang/v2"
@@ -46,6 +47,7 @@ type cliSpec struct {
 	diLogf           func(string, ...any)
 	auditLog         *auditlog.Plugin
 	onError          func(error)
+	noDescribeCmd    bool
 	pluginErr        error
 }
 
@@ -121,6 +123,7 @@ type CLI[T any] struct {
 	flowCtx        *BranchingFlowContext
 	noColorFlag    *bool
 	cleanupWired   bool
+	describeWired  bool
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -253,6 +256,11 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		)
 	}
 
+	err = attachFlagMetadata(cli.rootCmd, registry)
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrFlagParseFailed, err)
+	}
+
 	cli.setupPersistentPreRun()
 
 	return nil
@@ -333,31 +341,117 @@ func (cli *CLI[T]) buildInjectorOpts() *do.InjectorOpts {
 
 // AddCommand adds a subcommand to the CLI with any flags type.
 func AddCommand[T, F any](cli *CLI[T], cmd Command[T, F]) error {
-	if _, exists := cli.registeredCmds[cmd.spec.use]; exists {
-		return fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, cmd.spec.use)
+	cobraCmd, err := prepareCommand(cli, cmd)
+	if err != nil {
+		return err
+	}
+
+	cli.attachCommand(cobraCmd)
+
+	return nil
+}
+
+// AddableCommand is a command that can be registered on a CLI[T]. Command[T, F]
+// implements it for every flags type F; the unexported method seals the
+// interface so only cmdguard commands can be added while T stays type-checked.
+type AddableCommand[T any] interface {
+	prepareFor(cli *CLI[T]) (*cobra.Command, error)
+}
+
+// prepareFor lets a Command[T, F] satisfy AddableCommand[T] for any F.
+func (c Command[T, F]) prepareFor(cli *CLI[T]) (*cobra.Command, error) {
+	return prepareCommand(cli, c)
+}
+
+// AddCommands registers every command in one call and returns the first error.
+// It collapses the per-command `if err != nil { return err }` ladder into a
+// single check, which is where most of a cmdguard app's boilerplate lives.
+//
+// Registration is atomic: every command is validated and converted before any
+// is attached, so a failed batch leaves the CLI exactly as it was.
+//
+//	cli, err := cmdguard.NewCLI[AppConfig]("app", "App", AppConfig{})
+//	...
+//	err = cmdguard.AddCommands(cli, listCmd, addCmd, doneCmd)
+func AddCommands[T any](cli *CLI[T], cmds ...AddableCommand[T]) error {
+	prepared := make([]*cobra.Command, 0, len(cmds))
+	seen := make(map[string]struct{}, len(cmds))
+
+	for _, cmd := range cmds {
+		if cmd == nil {
+			return fmt.Errorf("%w: nil command in AddCommands", ErrInvalidCommand)
+		}
+
+		cobraCmd, err := cmd.prepareFor(cli)
+		if err != nil {
+			return err
+		}
+
+		name := cobraCmd.Name()
+		if _, duplicate := seen[name]; duplicate {
+			return fmt.Errorf(
+				"%w: command %q appears twice in this AddCommands call",
+				ErrDuplicateCommand,
+				name,
+			)
+		}
+
+		seen[name] = struct{}{}
+		prepared = append(prepared, cobraCmd)
+	}
+
+	for _, cobraCmd := range prepared {
+		cli.attachCommand(cobraCmd)
+	}
+
+	return nil
+}
+
+// prepareCommand validates cmd and converts it to a cobra command without
+// mutating the CLI. Separating preparation from attachment is what makes
+// AddCommands atomic.
+func prepareCommand[T, F any](cli *CLI[T], cmd Command[T, F]) (*cobra.Command, error) {
+	name := commandName(cmd.spec.use)
+
+	if _, exists := cli.registeredCmds[name]; exists {
+		return nil, fmt.Errorf("%w: command %q already exists", ErrDuplicateCommand, name)
 	}
 
 	err := cmd.validate(cli.spec.validationMode)
 	if err != nil {
-		return fmt.Errorf("validating command %q on CLI %q: %w", cmd.spec.use, cli.spec.name, err)
+		return nil, fmt.Errorf("validating command %q on CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
-
-	cli.registeredCmds[cmd.spec.use] = struct{}{}
 
 	cobraCmd, err := cliToCobraCommand(
 		cli.config, cmd,
 		cli.extractMiddleware(), cli.extractContextMiddleware(), cli.spec.envPrefix,
 	)
 	if err != nil {
-		return fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.spec.name, err)
+		return nil, fmt.Errorf("converting command %q for CLI %q: %w", cmd.spec.use, cli.spec.name, err)
 	}
 
 	// Propagate CLI-level silence-usage to subcommands.
 	cobraCmd.SilenceUsage = cli.spec.silenceUsage
 
-	cli.rootCmd.AddCommand(cobraCmd)
+	return cobraCmd, nil
+}
 
-	return nil
+// attachCommand records and adds a prepared cobra command. Registration keys on
+// the cobra command name (not the raw Use string), so "list [path]" and "list"
+// are correctly detected as duplicates.
+func (cli *CLI[T]) attachCommand(cobraCmd *cobra.Command) {
+	cli.registeredCmds[cobraCmd.Name()] = struct{}{}
+	cli.rootCmd.AddCommand(cobraCmd)
+}
+
+// commandName extracts the command name from a cobra Use line, mirroring
+// cobra.Command.Name (everything before the first space).
+func commandName(use string) string {
+	if i := strings.IndexByte(use, ' '); i >= 0 {
+		return use[:i]
+	}
+
+	return use
 }
 
 // extractMiddleware safely extracts the typed middleware from the sealed interface.
@@ -465,6 +559,11 @@ func (cli *CLI[T]) applyCleanupHooks() {
 
 // Execute runs the CLI application.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
+	err := cli.ensureDescribeCommand()
+	if err != nil {
+		return err
+	}
+
 	cli.applyHelpTransforms()
 
 	restoreNoColor := cli.applyNoColorIfSet()

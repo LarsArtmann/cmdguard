@@ -176,6 +176,19 @@ func WithDraconianValidation() CLIOption {
 	}
 }
 
+// WithoutDescribeCommand disables the hidden "describe" command that prints
+// the CLI's machine-readable JSON contract. The contract stays available
+// programmatically via Describe and WriteDescription.
+//
+// The describe command is registered by default because it is the cheapest way
+// to make a CLI usable by AI agents and tooling without scraping help text. A
+// consumer-defined command named "describe" always wins over the built-in one.
+func WithoutDescribeCommand() CLIOption {
+	return func(s *cliSpec) {
+		s.noDescribeCmd = true
+	}
+}
+
 // WithAuditLog enables DI audit logging via samber-do-auditlog.
 func WithAuditLog(plugin *auditlog.Plugin) CLIOption {
 	return func(s *cliSpec) {

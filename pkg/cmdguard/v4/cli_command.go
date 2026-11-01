@@ -92,6 +92,11 @@ func cliToCobraCommand[T, F any](
 		return nil, fmt.Errorf("envPrefix=%s: %w", envPrefix, err)
 	}
 
+	err = attachFlagMetadata(cobraCmd, flagRegistry)
+	if err != nil {
+		return nil, fmt.Errorf("command %q: %w", s.use, err)
+	}
+
 	wireAllHandlers(cobraCmd, config, cmd, flagRegistry, middlewares, ctxMiddlewares)
 
 	for _, subCmd := range cmd.commands {
