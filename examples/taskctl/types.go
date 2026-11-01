@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -117,7 +118,7 @@ func NewTaskStore(i do.Injector) (*TaskStore, error) {
 		return nil, fmt.Errorf("resolve config: %w", err)
 	}
 
-	fmt.Printf("[store] initialized with data-dir=%s\n", cfg.DataDir)
+	fmt.Fprintf(os.Stderr, "[store] initialized with data-dir=%s\n", cfg.DataDir)
 
 	return &TaskStore{
 		tasks: []Task{},
@@ -203,7 +204,7 @@ func (s *TaskStore) Stats() (total, pending, done int, byPriority map[string]int
 }
 
 func (s *TaskStore) Shutdown() error {
-	fmt.Println("[store] shutting down — flushing data")
+	fmt.Fprintln(os.Stderr, "[store] shutting down: flushing data")
 	return nil
 }
 

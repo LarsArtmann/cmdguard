@@ -43,10 +43,10 @@ type CLIDescription struct {
 	SchemaVersion string               `json:"schema_version"`
 	Name          string               `json:"name"`
 	Short         string               `json:"short"`
-	Long          string               `json:"long,omitempty"`
-	Version       string               `json:"version,omitempty"`
-	Flags         []FlagDescription    `json:"flags,omitempty"`
-	Commands      []CommandDescription `json:"commands,omitempty"`
+	Long          string               `json:"long,omitzero"`
+	Version       string               `json:"version,omitzero"`
+	Flags         []FlagDescription    `json:"flags,omitzero"`
+	Commands      []CommandDescription `json:"commands,omitzero"`
 }
 
 // CommandDescription describes one command in the CLI tree.
@@ -54,33 +54,33 @@ type CommandDescription struct {
 	Name       string               `json:"name"`
 	Path       string               `json:"path"`
 	Short      string               `json:"short"`
-	Long       string               `json:"long,omitempty"`
-	Example    string               `json:"example,omitempty"`
-	Aliases    []string             `json:"aliases,omitempty"`
-	Group      string               `json:"group,omitempty"`
-	Hidden     bool                 `json:"hidden,omitempty"`
-	Deprecated string               `json:"deprecated,omitempty"`
-	Flags      []FlagDescription    `json:"flags,omitempty"`
-	Commands   []CommandDescription `json:"commands,omitempty"`
+	Long       string               `json:"long,omitzero"`
+	Example    string               `json:"example,omitzero"`
+	Aliases    []string             `json:"aliases,omitzero"`
+	Group      string               `json:"group,omitzero"`
+	Hidden     bool                 `json:"hidden,omitzero"`
+	Deprecated string               `json:"deprecated,omitzero"`
+	Flags      []FlagDescription    `json:"flags,omitzero"`
+	Commands   []CommandDescription `json:"commands,omitzero"`
 }
 
 // FlagDescription describes one accepted flag, including the struct-tag
 // metadata (env, required, enum values) that determines a valid invocation.
 type FlagDescription struct {
 	Name       string   `json:"name"`
-	Shorthand  string   `json:"shorthand,omitempty"`
+	Shorthand  string   `json:"shorthand,omitzero"`
 	Type       string   `json:"type"`
-	Default    string   `json:"default,omitempty"`
+	Default    string   `json:"default,omitzero"`
 	Usage      string   `json:"usage"`
-	Env        string   `json:"env,omitempty"`
-	Values     []string `json:"values,omitempty"`
-	Required   bool     `json:"required,omitempty"`
-	Count      bool     `json:"count,omitempty"`
-	Prompt     string   `json:"prompt,omitempty"`
-	Validate   string   `json:"validate,omitempty"`
-	Hidden     bool     `json:"hidden,omitempty"`
-	Deprecated string   `json:"deprecated,omitempty"`
-	Inherited  bool     `json:"inherited,omitempty"`
+	Env        string   `json:"env,omitzero"`
+	Values     []string `json:"values,omitzero"`
+	Required   bool     `json:"required,omitzero"`
+	Count      bool     `json:"count,omitzero"`
+	Prompt     string   `json:"prompt,omitzero"`
+	Validate   string   `json:"validate,omitzero"`
+	Hidden     bool     `json:"hidden,omitzero"`
+	Deprecated string   `json:"deprecated,omitzero"`
+	Inherited  bool     `json:"inherited,omitzero"`
 }
 
 // flagMetadata is the internal, annotation-encoded subset of FlagTag that
@@ -89,12 +89,12 @@ type FlagDescription struct {
 // struct-tag parser's field set.
 type flagMetadata struct {
 	Name     string   `json:"name"`
-	Env      string   `json:"env,omitempty"`
-	Values   []string `json:"values,omitempty"`
-	Required bool     `json:"required,omitempty"`
-	Count    bool     `json:"count,omitempty"`
-	Prompt   string   `json:"prompt,omitempty"`
-	Validate string   `json:"validate,omitempty"`
+	Env      string   `json:"env,omitzero"`
+	Values   []string `json:"values,omitzero"`
+	Required bool     `json:"required,omitzero"`
+	Count    bool     `json:"count,omitzero"`
+	Prompt   string   `json:"prompt,omitzero"`
+	Validate string   `json:"validate,omitzero"`
 }
 
 // Describe returns a machine-readable description of the CLI command tree.
