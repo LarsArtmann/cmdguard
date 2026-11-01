@@ -36,46 +36,46 @@ a migration note, or v5) before anyone tags it.
 
 ## a) FULLY DONE
 
-| # | Item | Evidence | Verified by |
-| - | ---- | -------- | ----------- |
-| 1 | End goal added to README and AGENTS | `README.md:3`, `AGENTS.md:3` | Visual check |
-| 2 | v5 "Paved Road" plan | `docs/planning/2026-11-01_v5-end-goal-paved-road.md`: 4 properties (P1-P4), 8 workstreams, release gate, owner decisions | Read-through |
-| 3 | Machine-readable contract | `pkg/cmdguard/v4/describe.go`: `CLIDescription`, `CommandDescription`, `FlagDescription`, `Describe()`, `WriteDescription()`, schema version `1` | 8 tests in `describe_test.go`, live `taskctl describe \| jq` |
-| 4 | Auto-registered `describe` command | Hidden, idempotent, consumer command wins, `WithoutDescribeCommand()` opt-out, flag metadata carried on cobra annotations (env/required/values/count/prompt/validate) | `TestDescribeCommand_*`; `TestDescribeCommand_IgnoresRequiredFlags` |
-| 5 | Error → hint model | `errors_hints.go`: `ErrorHint(err)` for every sentinel used by the JSON classifier; `hint` field added to the JSON envelope | Coverage test fails if a classified sentinel lacks a hint |
-| 6 | Human hint rendering | fang default handler wrapped (`writeErrorWithHint`), plain cobra path prints the hint after the error, `WithoutErrorHints()` opt-out, skipped for machine formats and silenced errors | `errors_hints_render_test.go` (6 tests) |
-| 7 | Atomic batch registration | `AddCommands[T](cli, cmds...)` in `cli.go`: validate/convert all, then attach; mixed flags types via sealed `AddableCommand[T]`; nil guard; name-keyed duplicates | `TestAddCommands_*`, `TestAddCommand_DuplicateUseLineNames` |
-| 8 | `AddCommand` bug fix | No longer reserves a command name before conversion succeeds (old code marked it registered then failed) | `TestAddCommand_FailedConversionReleasesName` |
-| 9 | Duplicate detection fix | Keys on the cobra command name, so `"list [path]"` and `"list"` collide correctly | `TestAddCommand_DuplicateUseLineNames`, `TestAddCommands_DuplicateUseLineNames` |
-| 10 | Dogfooding | `examples/taskctl` registers 11 commands in one call; `lint/cmd/cmdguard-lint` uses `AddCommands` | taskctl suite green; 432 → 402 LOC in `commands.go`, 10 error stanzas removed |
-| 11 | Production batteries | `WithBatteries()`: strict validation, signals + graceful DI shutdown, hints, auto `version` (when versioned) + `doctor`; consumer commands win; idempotent | `cli_batteries_test.go` (7 tests) |
-| 12 | One-call app | `NewApp(name, short, defaults, build, opts...)`; returns the wrapped build error and discards the half-built CLI | `TestNewApp_*` |
-| 13 | Runtime tag enforcement (bug fix) | `ValidateFlags` wired into root `PersistentPreRunE` and command handler preparation; flag > env > default resolution; env satisfies required; string `min`/`max` mean length | `flags_runtime_validation_test.go` (6 tests) + live `taskctl` |
-| 14 | Meta-command exemption | `describe`, `version`, `doctor`, `completion`, `help` skip required enforcement so discovery always works | `TestDescribeCommand_IgnoresRequiredFlags`, acceptance test |
-| 15 | Readable validation errors | Removed stacked prefixes; now `Command "add": flag "title": value too short: "ab" must be at least 3 characters.` | Live output; tests still green |
-| 16 | Lint baseline rules | CG007 missing short description, CG008 missing CLI version; skip `_test.go` and spread option lists | `rule_ux_baseline_test.go` (10 subtests), README table regenerated |
-| 17 | Lint module brought to 0 issues | Split long finding strings, file-level `//nolint:lll` only for inline Go fixtures, `makezero`/`exhaustruct` fixes, `allRuleDefs` split for funlen | `golangci-lint run ./...` in `lint/` = 0 |
-| 18 | Repo gate debt cleared | taskctl lll, lint module findings, `lint/go.mod` go-humanize promoted to direct | `nix run .#check-all` green |
-| 19 | End-goal acceptance test | `end_goal_test.go`: discovery, version, doctor, missing root flag, missing command flag, min-length, hints, clean run | `TestEndGoal_MinimalSuperbCLI` |
-| 20 | Documentation sweep | README (quick start now uses `NewApp` + `AddCommands` + `WithBatteries`, new feature rows), AGENTS (principles 21-25, validation gotchas), FEATURES, TODO_LIST (D1-D7), ROADMAP, CHANGELOG, ERROR_REFERENCE, consumer skill | Read-through; lint README drift test |
-| 21 | Coverage update | 87.8% → 90.4% core, propagated to README badge, AGENTS, FEATURES | `go test -cover` |
-| 22 | Full verification | `nix run .#check-all` twice; `-race` across core + 6 submodules; golangci-lint; treefmt; `go mod tidy`; linter dogfood 0 findings; live `describe \| jq` and live validation/hint output | See Verification Log |
+| #  | Item                                | Evidence                                                                                                                                                                                                                    | Verified by                                                                     |
+| -- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 1  | End goal added to README and AGENTS | `README.md:3`, `AGENTS.md:3`                                                                                                                                                                                                | Visual check                                                                    |
+| 2  | v5 "Paved Road" plan                | `docs/planning/2026-11-01_v5-end-goal-paved-road.md`: 4 properties (P1-P4), 8 workstreams, release gate, owner decisions                                                                                                    | Read-through                                                                    |
+| 3  | Machine-readable contract           | `pkg/cmdguard/v4/describe.go`: `CLIDescription`, `CommandDescription`, `FlagDescription`, `Describe()`, `WriteDescription()`, schema version `1`                                                                            | 8 tests in `describe_test.go`, live `taskctl describe \| jq`                    |
+| 4  | Auto-registered `describe` command  | Hidden, idempotent, consumer command wins, `WithoutDescribeCommand()` opt-out, flag metadata carried on cobra annotations (env/required/values/count/prompt/validate)                                                       | `TestDescribeCommand_*`; `TestDescribeCommand_IgnoresRequiredFlags`             |
+| 5  | Error → hint model                  | `errors_hints.go`: `ErrorHint(err)` for every sentinel used by the JSON classifier; `hint` field added to the JSON envelope                                                                                                 | Coverage test fails if a classified sentinel lacks a hint                       |
+| 6  | Human hint rendering                | fang default handler wrapped (`writeErrorWithHint`), plain cobra path prints the hint after the error, `WithoutErrorHints()` opt-out, skipped for machine formats and silenced errors                                       | `errors_hints_render_test.go` (6 tests)                                         |
+| 7  | Atomic batch registration           | `AddCommands[T](cli, cmds...)` in `cli.go`: validate/convert all, then attach; mixed flags types via sealed `AddableCommand[T]`; nil guard; name-keyed duplicates                                                           | `TestAddCommands_*`, `TestAddCommand_DuplicateUseLineNames`                     |
+| 8  | `AddCommand` bug fix                | No longer reserves a command name before conversion succeeds (old code marked it registered then failed)                                                                                                                    | `TestAddCommand_FailedConversionReleasesName`                                   |
+| 9  | Duplicate detection fix             | Keys on the cobra command name, so `"list [path]"` and `"list"` collide correctly                                                                                                                                           | `TestAddCommand_DuplicateUseLineNames`, `TestAddCommands_DuplicateUseLineNames` |
+| 10 | Dogfooding                          | `examples/taskctl` registers 11 commands in one call; `lint/cmd/cmdguard-lint` uses `AddCommands`                                                                                                                           | taskctl suite green; 432 → 402 LOC in `commands.go`, 10 error stanzas removed   |
+| 11 | Production batteries                | `WithBatteries()`: strict validation, signals + graceful DI shutdown, hints, auto `version` (when versioned) + `doctor`; consumer commands win; idempotent                                                                  | `cli_batteries_test.go` (7 tests)                                               |
+| 12 | One-call app                        | `NewApp(name, short, defaults, build, opts...)`; returns the wrapped build error and discards the half-built CLI                                                                                                            | `TestNewApp_*`                                                                  |
+| 13 | Runtime tag enforcement (bug fix)   | `ValidateFlags` wired into root `PersistentPreRunE` and command handler preparation; flag > env > default resolution; env satisfies required; string `min`/`max` mean length                                                | `flags_runtime_validation_test.go` (6 tests) + live `taskctl`                   |
+| 14 | Meta-command exemption              | `describe`, `version`, `doctor`, `completion`, `help` skip required enforcement so discovery always works                                                                                                                   | `TestDescribeCommand_IgnoresRequiredFlags`, acceptance test                     |
+| 15 | Readable validation errors          | Removed stacked prefixes; now `Command "add": flag "title": value too short: "ab" must be at least 3 characters.`                                                                                                           | Live output; tests still green                                                  |
+| 16 | Lint baseline rules                 | CG007 missing short description, CG008 missing CLI version; skip `_test.go` and spread option lists                                                                                                                         | `rule_ux_baseline_test.go` (10 subtests), README table regenerated              |
+| 17 | Lint module brought to 0 issues     | Split long finding strings, file-level `//nolint:lll` only for inline Go fixtures, `makezero`/`exhaustruct` fixes, `allRuleDefs` split for funlen                                                                           | `golangci-lint run ./...` in `lint/` = 0                                        |
+| 18 | Repo gate debt cleared              | taskctl lll, lint module findings, `lint/go.mod` go-humanize promoted to direct                                                                                                                                             | `nix run .#check-all` green                                                     |
+| 19 | End-goal acceptance test            | `end_goal_test.go`: discovery, version, doctor, missing root flag, missing command flag, min-length, hints, clean run                                                                                                       | `TestEndGoal_MinimalSuperbCLI`                                                  |
+| 20 | Documentation sweep                 | README (quick start now uses `NewApp` + `AddCommands` + `WithBatteries`, new feature rows), AGENTS (principles 21-25, validation gotchas), FEATURES, TODO_LIST (D1-D7), ROADMAP, CHANGELOG, ERROR_REFERENCE, consumer skill | Read-through; lint README drift test                                            |
+| 21 | Coverage update                     | 87.8% → 90.4% core, propagated to README badge, AGENTS, FEATURES                                                                                                                                                            | `go test -cover`                                                                |
+| 22 | Full verification                   | `nix run .#check-all` twice; `-race` across core + 6 submodules; golangci-lint; treefmt; `go mod tidy`; linter dogfood 0 findings; live `describe \| jq` and live validation/hint output                                    | See Verification Log                                                            |
 
 ---
 
 ## b) PARTIALLY DONE
 
-| # | Item | What exists | What is missing |
-| - | ---- | ----------- | --------------- |
-| 1 | W1 gate: "byte-stable JSON" | Structural tests and deterministic sorting | No golden fixture; no explicit test that two runs produce identical bytes |
-| 2 | W2 batteries | Opt-in `WithBatteries`, `NewApp` | Default flip (v5), deferred-error `Builder`, fang-on end-to-end test, Draconian+batteries test |
-| 3 | W3 errors | Hints for classified sentinels, JSON `hint`, human `Hint:` | Not every exported sentinel has a hint; ERROR_REFERENCE is hand-written, not generated; hint line is unstyled |
-| 4 | W4 ergonomics | `AddCommands`, taskctl + linter CLI adopted | Other examples not migrated; no `Builder`; no flag-less handler adapters |
-| 5 | W5 guardrails | CG007/CG008 as warnings, tests, generated table | Not released (`lint/v0.2.0` pending); no committed consumer baseline; no dead-flag rule; strict-by-default still v5 |
-| 6 | W8 teaching | README + skill updated | `docs/QUICKSTART.md`, `docs/TUTORIAL.md`, and the website were not touched |
-| 7 | Consumer proof | Linter run over cmdguard, erraudit, timesheets (0 new-rule findings) | Consumer builds/tests were not run; no LOC/error-stanza measurements outside taskctl |
-| 8 | Error message cleanup | Main validation path simplified | No audit of every sentinel's message for similar nested prefixes |
-| 9 | Config-source semantics | required accepts flag or env | Config-file-supplied values do not satisfy `required`; behavior documented but not solved |
+| # | Item                        | What exists                                                          | What is missing                                                                                                     |
+| - | --------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 1 | W1 gate: "byte-stable JSON" | Structural tests and deterministic sorting                           | No golden fixture; no explicit test that two runs produce identical bytes                                           |
+| 2 | W2 batteries                | Opt-in `WithBatteries`, `NewApp`                                     | Default flip (v5), deferred-error `Builder`, fang-on end-to-end test, Draconian+batteries test                      |
+| 3 | W3 errors                   | Hints for classified sentinels, JSON `hint`, human `Hint:`           | Not every exported sentinel has a hint; ERROR_REFERENCE is hand-written, not generated; hint line is unstyled       |
+| 4 | W4 ergonomics               | `AddCommands`, taskctl + linter CLI adopted                          | Other examples not migrated; no `Builder`; no flag-less handler adapters                                            |
+| 5 | W5 guardrails               | CG007/CG008 as warnings, tests, generated table                      | Not released (`lint/v0.2.0` pending); no committed consumer baseline; no dead-flag rule; strict-by-default still v5 |
+| 6 | W8 teaching                 | README + skill updated                                               | `docs/QUICKSTART.md`, `docs/TUTORIAL.md`, and the website were not touched                                          |
+| 7 | Consumer proof              | Linter run over cmdguard, erraudit, timesheets (0 new-rule findings) | Consumer builds/tests were not run; no LOC/error-stanza measurements outside taskctl                                |
+| 8 | Error message cleanup       | Main validation path simplified                                      | No audit of every sentinel's message for similar nested prefixes                                                    |
+| 9 | Config-source semantics     | required accepts flag or env                                         | Config-file-supplied values do not satisfy `required`; behavior documented but not solved                           |
 
 ---
 
@@ -141,7 +141,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 - Run the canonical gate (`nix run .#check-all`) after every slice, not after a
   batch of slices.
 - Diff `go.sum` (not just `go.mod`) after tidy.
-- Keep a session checklist that includes tests for the *enabled* configuration
+- Keep a session checklist that includes tests for the _enabled_ configuration
   (fang on/off, batteries on/off, strict/draconian).
 
 **Design**
@@ -268,19 +268,19 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 ## Verification Log
 
-| Command | Result |
-| ------- | ------ |
-| `GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 300s -race` | All core packages green |
-| `for m in glamour prompts spinner telemetry flightrecorder lint; do ...` | All 6 submodules build + test green |
-| `go test ./pkg/cmdguard/v4/ -cover` | 90.4% of statements |
-| `nix run .#check-all` | Build, race tests, golangci-lint, treefmt, `go mod tidy` all green (run twice; second run after the second slice) |
-| `golangci-lint run ./pkg/cmdguard/v4/... ./examples/taskctl/...` | 0 issues (while `lll` was still enabled) |
-| `golangci-lint run ./...` in `lint/` | 0 issues |
-| `go run ./cmd/cmdguard-lint lint --dir ..` | 0 findings |
-| `go run ./examples/taskctl describe \| jq ...` | `schema=1 name=taskctl version=dev commands=14 root_flags=11` |
-| `go run ./examples/taskctl done` | `Command "done": required flag not set: "id" is missing.` + hint |
-| `go run ./examples/taskctl add --title ab` | `Command "add": flag "title": value too short: "ab" must be at least 3 characters.` + hint |
-| `TestEndGoal_MinimalSuperbCLI` | Pass |
+| Command                                                                  | Result                                                                                                            |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 300s -race`         | All core packages green                                                                                           |
+| `for m in glamour prompts spinner telemetry flightrecorder lint; do ...` | All 6 submodules build + test green                                                                               |
+| `go test ./pkg/cmdguard/v4/ -cover`                                      | 90.4% of statements                                                                                               |
+| `nix run .#check-all`                                                    | Build, race tests, golangci-lint, treefmt, `go mod tidy` all green (run twice; second run after the second slice) |
+| `golangci-lint run ./pkg/cmdguard/v4/... ./examples/taskctl/...`         | 0 issues (while `lll` was still enabled)                                                                          |
+| `golangci-lint run ./...` in `lint/`                                     | 0 issues                                                                                                          |
+| `go run ./cmd/cmdguard-lint lint --dir ..`                               | 0 findings                                                                                                        |
+| `go run ./examples/taskctl describe \| jq ...`                           | `schema=1 name=taskctl version=dev commands=14 root_flags=11`                                                     |
+| `go run ./examples/taskctl done`                                         | `Command "done": required flag not set: "id" is missing.` + hint                                                  |
+| `go run ./examples/taskctl add --title ab`                               | `Command "add": flag "title": value too short: "ab" must be at least 3 characters.` + hint                        |
+| `TestEndGoal_MinimalSuperbCLI`                                           | Pass                                                                                                              |
 
 ---
 
