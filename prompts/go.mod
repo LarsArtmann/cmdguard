@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	charm.land/huh/v2 v2.0.3
-	github.com/larsartmann/cmdguard/v4 v4.1.0
+	github.com/larsartmann/cmdguard/v4 v4.0.0-00010101000000-000000000000
 )
 
 require (
@@ -83,4 +83,4 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v4 v4.0.1 => ../
+replace github.com/larsartmann/cmdguard/v4 => ../

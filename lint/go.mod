@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	github.com/dustin/go-humanize v1.1.0
-	github.com/larsartmann/cmdguard/v4 v4.1.0
+	github.com/larsartmann/cmdguard/v4 v4.0.0-00010101000000-000000000000
 	github.com/larsartmann/go-finding v1.14.0
 	github.com/larsartmann/go-finding/toolsdk v1.15.0
 	github.com/larsartmann/go-linter-sdk v0.4.0
@@ -78,4 +78,4 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v4 v4.0.2 => ../
+replace github.com/larsartmann/cmdguard/v4 => ../
