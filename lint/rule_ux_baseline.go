@@ -54,7 +54,8 @@ func checkMissingShortDescription(proj *project, meta linter.RuleMeta) []finding
 
 			findings = append(findings, newFinding(
 				meta,
-				"command "+commandLabel(call)+" has no WithShort: it renders as a blank line in --help and fails WithStrictValidation",
+				"command "+commandLabel(call)+
+					" has no WithShort: it renders as a blank line in --help and fails WithStrictValidation",
 				file.pos(call),
 			).
 				WithConfidence(finding.ConfidenceHigh).
@@ -110,7 +111,10 @@ func checkMissingCLIVersion(proj *project, meta linter.RuleMeta) []finding.Findi
 				file.pos(call),
 			).
 				WithConfidence(finding.ConfidenceHigh).
-				WithSuggestion("Pass cmdguard.WithCLIVersion(version.Version) to NewCLI (and register VersionCommand for a subcommand)").
+				WithSuggestion(
+					"Pass cmdguard.WithCLIVersion(version.Version) to NewCLI "+
+						"(and register VersionCommand for a subcommand)",
+				).
 				MustBuild())
 
 			return true

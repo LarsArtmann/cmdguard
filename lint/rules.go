@@ -43,8 +43,21 @@ type ruleDef struct {
 // allRuleDefs returns every rule with its identity header and detection
 // closure. Each check's doc comment carries the rule's origin and trust
 // signals; the meta is passed into the check so findings are stamped without
-// package-level rule variables.
+// package-level rule variables. The table is the single source of truth:
+// AllRules, NewRegistry, and Detect all derive from it.
 func allRuleDefs() []ruleDef {
+	defs := make([]ruleDef, 0, 8)
+
+	defs = append(defs, contractRuleDefs()...)
+	defs = append(defs, uxBaselineRuleDefs()...)
+
+	return defs
+}
+
+// contractRuleDefs protect cmdguard's documented execution and error contract
+// (CG001-CG006). They catch regressions introduced by consumers pulling the
+// CLI apart or re-implementing behavior cmdguard already owns.
+func contractRuleDefs() []ruleDef {
 	return []ruleDef{
 		{
 			meta: linter.RuleMeta{
@@ -112,6 +125,14 @@ func allRuleDefs() []ruleDef {
 			},
 			check: checkExecuteErrorReprint,
 		},
+	}
+}
+
+// uxBaselineRuleDefs enforce the v5 end-goal baseline (CG007-CG008): a CLI is
+// only superb if every command is discoverable and the binary can identify its
+// own build.
+func uxBaselineRuleDefs() []ruleDef {
+	return []ruleDef{
 		{
 			meta: linter.RuleMeta{
 				ID:          RuleMissingDescription,
