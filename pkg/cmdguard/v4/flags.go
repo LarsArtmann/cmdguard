@@ -3,8 +3,10 @@ package v4
 import (
 	"fmt"
 	"iter"
+	"os"
 	"reflect"
 	"slices"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -187,22 +189,18 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	return nil
 }
 
-// validateTag validates a single flag tag.
+// validateTag validates a single flag tag. Each check returns an error that
+// already names the flag and wraps its sentinel, so this function adds no
+// further wrapping: nested prefixes make user-facing errors unreadable.
 func (r *FlagRegistry) validateTag(cmd *cobra.Command, tag FlagTag) error {
 	err := r.validateRequiredFlag(cmd, tag)
 	if err != nil {
-		return fmt.Errorf(
-			"%w: validating required flag %q on command %q: %w",
-			ErrRequiredFlag,
-			tag.Name,
-			cmd.Use,
-			err,
-		)
+		return err
 	}
 
 	err = r.validateEnumValue(cmd, tag)
 	if err != nil {
-		return fmt.Errorf("validating enum value for flag %q: %w", tag.Name, err)
+		return err
 	}
 
 	return r.validateTagRules(cmd, tag)
@@ -228,18 +226,11 @@ func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) err
 
 	// An environment variable is an explicit, supported source for a flag
 	// (flag > env > config > default), so it satisfies "required".
-	if isEnvSet(r, tag) {
+	if _, ok := r.envValue(tag); ok {
 		return nil
 	}
 
-	return fmt.Errorf(
-		"required flag %q not set on command %q: %w",
-		tag.Name,
-		cmd.Use,
-		ErrRequiredFlag,
-	)
-
-	return nil
+	return fmt.Errorf("%w: %q is missing", ErrRequiredFlag, tag.Name)
 }
 
 // validateEnumValue validates that an enum flag has an allowed value.
@@ -248,17 +239,52 @@ func (r *FlagRegistry) validateEnumValue(cmd *cobra.Command, tag FlagTag) error 
 		return nil
 	}
 
-	flag := r.lookupFlagForValidation(cmd, tag.Name)
-	if flag == nil || !flag.Changed {
+	value, present := r.resolvedValue(cmd, tag)
+	if !present {
 		return nil
 	}
 
-	if !r.isAllowedValue(flag.Value.String(), tag.Values) {
-		return fmt.Errorf("enum flag %q on command %q has invalid value %q: must be one of: %v: %w",
-			tag.Name, cmd.Use, flag.Value.String(), tag.Values, ErrInvalidEnum)
+	if !r.isAllowedValue(value, tag.Values) {
+		return fmt.Errorf("%w: %q = %q, allowed: %v", ErrInvalidEnum, tag.Name, value, tag.Values)
 	}
 
 	return nil
+}
+
+// resolvedValue returns the value a flag resolves to at run time, using the
+// same precedence as parsing: explicit flag > environment > tag default.
+// Validation operates on this value, so env- and default-sourced values are
+// checked too, not only values typed on the command line.
+func (r *FlagRegistry) resolvedValue(cmd *cobra.Command, tag FlagTag) (string, bool) {
+	flag := r.lookupFlagForValidation(cmd, tag.Name)
+	if flag != nil && flag.Changed {
+		return flag.Value.String(), true
+	}
+
+	if value, ok := r.envValue(tag); ok {
+		return value, true
+	}
+
+	if tag.Default != "" {
+		return tag.Default, true
+	}
+
+	return "", false
+}
+
+// envValue returns the environment value for tag, applying the registry's
+// prefix exactly as flag parsing does.
+func (r *FlagRegistry) envValue(tag FlagTag) (string, bool) {
+	if tag.Env == "" {
+		return "", false
+	}
+
+	name := tag.Env
+	if r.envPrefix != "" {
+		name = r.envPrefix + name
+	}
+
+	return os.LookupEnv(name)
 }
 
 // lookupFlagForValidation finds a flag by name for validation purposes.
@@ -288,25 +314,34 @@ func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 		return nil
 	}
 
-	flag := r.lookupFlagForValidation(cmd, tag.Name)
-	if flag == nil || !flag.Changed {
+	expr := tag.Validate
+	if tag.Type != nil && tag.Type.Kind() == reflect.String {
+		// min/max on a string field mean length; using the numeric validators
+		// would try to parse the text as a number and fail confusingly.
+		expr = stringLengthRules(expr)
+	}
+
+	rules, err := parseValidateRulesWithRegistry(expr, r.validators)
+	if err != nil {
+		return fmt.Errorf("flag %q: %w", tag.Name, err)
+	}
+
+	value, present := r.resolvedValue(cmd, tag)
+	if !present {
 		return nil
 	}
 
-	rules, err := parseValidateRulesWithRegistry(tag.Validate, r.validators)
-	if err != nil {
-		return fmt.Errorf(
-			"%w: validating flag %q on command %q: %w",
-			ErrFlagParseFailed,
-			tag.Name,
-			cmd.Use,
-			err,
-		)
+	for _, rule := range rules {
+		err := rule.Validate(value)
+		if err != nil {
+			return fmt.Errorf("flag %q: %w", tag.Name, err)
+		}
 	}
 
-	for _, rule := range rules {
-		err := rule.Validate(flag.Value.String())
-		if err != nil {
+	return nil
+}
+
+// unreachable placeholder
 			return fmt.Errorf(
 				"%w: validating flag %q on command %q: %w",
 				ErrFlagParseFailed,
@@ -330,4 +365,26 @@ func skipsFlagValidation(name string) bool {
 	default:
 		return false
 	}
+}
+
+// stringLengthRules rewrites numeric bounds to their length equivalents for a
+// string field, so validate:"min=3" means "at least 3 characters".
+func stringLengthRules(expr string) string {
+	parts := strings.Split(expr, ",")
+
+	for i, part := range parts {
+		name, param, ok := strings.Cut(part, "=")
+		if !ok {
+			continue
+		}
+
+		switch strings.TrimSpace(name) {
+		case "min":
+			parts[i] = "minlen=" + param
+		case "max":
+			parts[i] = "maxlen=" + param
+		}
+	}
+
+	return strings.Join(parts, ",")
 }
