@@ -532,6 +532,13 @@
       .table-wrap {
         overflow-x: auto;
       }
+      /* Report-specific addition (not in template): table footnote. */
+      .table-note {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: -0.5rem 0 1.5rem;
+        line-height: 1.5;
+      }
       table {
         width: 100%;
         border-collapse: collapse;
@@ -859,6 +866,7 @@
       <aside class="sidebar" data-nav>
         <nav>
           <div class="label">Contents</div>
+          <a href="#scorecard">At a glance</a>
           <a href="#summary">Summary</a>
           <a href="#timeline">Timeline</a>
           <a href="#shipped">What shipped</a>
@@ -892,7 +900,7 @@
             <span class="tag amber">Scope: v5 prep + correctness</span>
             <span class="tag teal">Gate: nix run .#check-all green</span>
             <span class="tag">Coverage: 90.4%</span>
-            <span class="tag">HEAD: 3a987c8</span>
+            <span class="tag">HEAD at write: 3a987c8</span>
           </div>
         </header>
 
@@ -1006,11 +1014,13 @@
               </p>
             </div>
             <div class="card">
-              <h3>2026-11-02 &middot; This report</h3>
+              <h3>2026-11-02 &middot; Session totals</h3>
               <p>
-                A self-contained HTML snapshot of the two days: what is done, what is
-                partial, what is not started, the honest screw-ups, and the next 50
-                things.
+                35 new core test functions (13 describe, 8 batteries, 6 hint
+                rendering, 5 runtime validation, 2 hint coverage, 1 end-goal
+                acceptance) plus 10 linter subtests. taskctl&rsquo;s
+                <code>commands.go</code> went from 432 to 402 lines while gaining
+                one-call registration. Core coverage 87.8% &rarr; 90.4%.
               </p>
             </div>
           </div>
@@ -1084,7 +1094,7 @@
               the CLI, runs a build callback, and discards the half-built app on error.
               v5 will flip the defaults; today it is the adoption path.
             </p>
-            <p class="where">pkg/cmdguard/v4/cli_batteries.go &middot; cli_batteries_test.go (7 tests)</p>
+            <p class="where">pkg/cmdguard/v4/cli_batteries.go &middot; cli_batteries_test.go (8 tests)</p>
           </div>
 
           <div class="card card-problem">
@@ -1173,7 +1183,7 @@
                 <tr><td><code>go test ./... -race</code> (core)</td><td class="yes">All packages green</td></tr>
                 <tr><td>All 6 submodules</td><td class="yes">glamour, prompts, spinner, telemetry, flightrecorder, lint</td></tr>
                 <tr><td><code>go test -cover</code> (core)</td><td class="yes">90.4% (was 87.8%)</td></tr>
-                <tr><td><code>golangci-lint run</code> (core + taskctl, lll still on)</td><td class="yes">0 issues</td></tr>
+                <tr><td><code>golangci-lint run</code> (core + taskctl; <code>lll</code> still enabled at run time)</td><td class="yes">0 issues</td></tr>
                 <tr><td><code>golangci-lint run</code> (lint module)</td><td class="yes">0 issues</td></tr>
                 <tr><td><code>cmdguard-lint lint --dir ..</code></td><td class="yes">0 findings (dogfood)</td></tr>
                 <tr><td><code>taskctl describe | jq</code></td><td class="yes">schema 1, 14 commands, 11 root flags</td></tr>
@@ -1182,6 +1192,12 @@
               </tbody>
             </table>
           </div>
+          <p class="table-note">
+            All checks ran during the session. The unowned
+            <code>.golangci.yml</code> change (see Screw-ups) removed
+            <code>lll</code> and set unlimited <code>max-issues-per-linter</code>
+            <em>after</em> these runs; deciding its fate is Next&nbsp;50 #29.
+          </p>
         </section>
 
         <section id="gaps">
