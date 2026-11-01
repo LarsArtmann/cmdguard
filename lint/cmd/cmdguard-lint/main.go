@@ -21,16 +21,19 @@ import (
 	"github.com/larsartmann/cmdguard/v4/pkg/version"
 )
 
+// cliConfig holds the linter's global flags. Enable is empty by default
+// (every rule runs); both filters take comma-separated rule IDs, matching the
+// provider options and lint.FilterByIDs.
 type cliConfig struct {
-	Output  string `default:"text" flag:"output"  help:"Output format for findings"                     values:"text,json,sarif"`
-	Enable  string `default:""     flag:"enable"  help:"Comma-separated rule IDs to run (default: all)"`
-	Disable string `default:""     flag:"disable" help:"Comma-separated rule IDs to skip"`
+	Output  string `default:"text" flag:"output"  help:"Output format"                 values:"text,json,sarif"`
+	Enable  string `default:""     flag:"enable"  help:"Rule IDs to run (default all)"`
+	Disable string `default:""     flag:"disable" help:"Rule IDs to skip"`
 }
 
 type lintFlags struct {
 	Dir           string `default:"."     flag:"dir"            help:"Directory to lint"`
-	Baseline      string `default:""      flag:"baseline"       help:"Baseline file for ratchet mode (default: .cmdguard-lint-baseline.json in the linted dir when present)"`
-	WriteBaseline bool   `default:"false" flag:"write-baseline" help:"Write current findings as the new baseline, then exit 0"`
+	Baseline      string `default:""      flag:"baseline"       help:"Baseline file for ratchet mode"`
+	WriteBaseline bool   `default:"false" flag:"write-baseline" help:"Write findings as new baseline"`
 }
 
 type rulesFlags struct {

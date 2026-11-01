@@ -91,8 +91,8 @@ func contractRuleDefs() []ruleDef {
 			meta: linter.RuleMeta{
 				ID:   RulePanicOnConstructor,
 				Name: "panic on constructor error",
-				Description: "panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; return " +
-					"the error instead",
+				Description: "panicking on a cmdguard constructor error re-introduces the panic cmdguard removed by design; " +
+					"return the error instead",
 				Cat:      linter.CategoryCorrectness,
 				Sev:      finding.SeverityError,
 				ToolName: ToolName,
@@ -103,8 +103,8 @@ func contractRuleDefs() []ruleDef {
 			meta: linter.RuleMeta{
 				ID:   RuleSetVersionRuntime,
 				Name: "runtime SetVersion",
-				Description: "cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the VersionCommand " +
-					"helper) instead",
+				Description: "cli.SetVersion mutates after construction; pass WithCLIVersion to NewCLI (and use the " +
+					"VersionCommand helper) instead",
 				Cat:      CategoryUsage,
 				Sev:      finding.SeverityWarning,
 				ToolName: ToolName,
@@ -147,8 +147,8 @@ func uxBaselineRuleDefs() []ruleDef {
 			meta: linter.RuleMeta{
 				ID:   RuleMissingDescription,
 				Name: "missing short description",
-				Description: "a command without WithShort renders as a blank line in --help: it is invisible in command lists and " +
-					"fails WithStrictValidation",
+				Description: "a command without WithShort renders as a blank line in --help: it is invisible in command " +
+					"lists and fails WithStrictValidation",
 				Cat:      CategoryUsage,
 				Sev:      finding.SeverityWarning,
 				ToolName: ToolName,

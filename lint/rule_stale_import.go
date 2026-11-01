@@ -33,11 +33,19 @@ func checkStaleMajorImport(proj *project, meta linter.RuleMeta) []finding.Findin
 
 			findings = append(findings, newFinding(
 				meta,
-				fmt.Sprintf("cmdguard %s is frozen (no further fixes; sub-modules unreachable): migrate the import to %s", major, CurrentMajor),
+				fmt.Sprintf(
+					"cmdguard %s is frozen (no further fixes; sub-modules unreachable): "+
+						"migrate the import to %s",
+					major, CurrentMajor,
+				),
 				file.pos(spec),
 			).
 				WithConfidence(finding.ConfidenceFull).
-				WithSuggestion(fmt.Sprintf("go get github.com/larsartmann/cmdguard/%s@latest and rename the import path", CurrentMajor)).
+				WithSuggestion(fmt.Sprintf(
+					"go get github.com/larsartmann/cmdguard/%s@latest and "+
+						"rename the import path",
+					CurrentMajor,
+				)).
 				MustBuild())
 		}
 	}

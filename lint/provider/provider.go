@@ -31,10 +31,12 @@ import (
 //
 //nolint:gochecknoglobals // toolsdk contract: specs self-register as package-level vars
 var Provider = toolsdk.Register(toolsdk.Spec{
-	Name:         "cmdguard-lint",
-	Description:  "cmdguard usage linter: execute bypass, stale majors, constructor panics, version/option misuse, double error display",
+	Name: "cmdguard-lint",
+	Description: "cmdguard usage linter: execute bypass, stale majors, constructor panics, " +
+		"version/option misuse, double error display",
 	Trigger:      toolsdk.OnGoModule(),
 	DependsOn:    nil,
+	SwitchCases:  nil,
 	ModuleFanOut: true,
 	Inputs:       []string{"**/*.go"},
 	Options: []toolsdk.Option{

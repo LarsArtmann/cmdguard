@@ -9,8 +9,9 @@ import (
 // them must equal RuleTableMarkdown() exactly; rules_table_test.go enforces
 // the sync so adding a rule without refreshing the README fails CI.
 const (
-	readmeTableBegin = `<!-- BEGIN RULES TABLE: generated from allRuleDefs() — regenerate with ` + "`go run ./cmd/cmdguard-lint rules --markdown`" + ` -->`
-	readmeTableEnd   = "<!-- END RULES TABLE -->"
+	readmeTableBegin = `<!-- BEGIN RULES TABLE: generated from allRuleDefs() ` +
+		"— regenerate with " + "`go run ./cmd/cmdguard-lint rules --markdown`" + ` -->`
+	readmeTableEnd = "<!-- END RULES TABLE -->"
 )
 
 // RuleTableMarkdown renders the full rule inventory as a Markdown table, one
@@ -38,7 +39,7 @@ func RuleTableMarkdown() string {
 		rows = append(rows, []string{def.meta.ID, fmt.Sprint(def.meta.Sev), def.meta.Name, description})
 	}
 
-	width := make([]int, len(header))
+	width := make([]int, len(header)) //nolint:makezero // column widths are indexed by column, never appended
 
 	for _, row := range rows {
 		if row[0] == "--" {
@@ -55,12 +56,12 @@ func RuleTableMarkdown() string {
 	var b strings.Builder
 
 	writeRow := func(cells []string, isSep bool) {
-		parts := make([]string, len(cells))
+		parts := make([]string, 0, len(cells))
 		for i, cell := range cells {
 			if isSep {
-				parts[i] = " " + strings.Repeat("-", width[i]) + " "
+				parts = append(parts, " "+strings.Repeat("-", width[i])+" ")
 			} else {
-				parts[i] = " " + cell + strings.Repeat(" ", width[i]-len(cell)) + " "
+				parts = append(parts, " "+cell+strings.Repeat(" ", width[i]-len(cell))+" ")
 			}
 		}
 

@@ -1,3 +1,4 @@
+//nolint:lll // inline Go fixtures are single-line strings by design
 package lint
 
 import (
