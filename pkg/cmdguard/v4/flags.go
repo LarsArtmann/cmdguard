@@ -222,14 +222,22 @@ func (r *FlagRegistry) validateRequiredFlag(cmd *cobra.Command, tag FlagTag) err
 		return nil
 	}
 
-	if flag == nil || !flag.Changed {
-		return fmt.Errorf(
-			"required flag %q not set on command %q: %w",
-			tag.Name,
-			cmd.Use,
-			ErrRequiredFlag,
-		)
+	if flag != nil && flag.Changed {
+		return nil
 	}
+
+	// An environment variable is an explicit, supported source for a flag
+	// (flag > env > config > default), so it satisfies "required".
+	if isEnvSet(r, tag) {
+		return nil
+	}
+
+	return fmt.Errorf(
+		"required flag %q not set on command %q: %w",
+		tag.Name,
+		cmd.Use,
+		ErrRequiredFlag,
+	)
 
 	return nil
 }
@@ -310,4 +318,16 @@ func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 	}
 
 	return nil
+}
+
+// skipsFlagValidation reports whether a command is an introspection or
+// maintenance command that must stay runnable even when business flags are
+// required (agents run describe/version/doctor before they know the flags).
+func skipsFlagValidation(name string) bool {
+	switch name {
+	case describeCommandName, "version", "doctor", "completion", helpCommandName:
+		return true
+	default:
+		return false
+	}
 }

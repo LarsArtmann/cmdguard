@@ -298,6 +298,13 @@ func (cli *CLI[T]) setupPersistentPreRun() {
 			return fmt.Errorf("parsing global flags: %w", err)
 		}
 
+		if !skipsFlagValidation(c.Name()) {
+			err = registry.ValidateFlags(c)
+			if err != nil {
+				return fmt.Errorf("validating global flags: %w", err)
+			}
+		}
+
 		c.SetContext(context.WithValue(c.Context(), configKey, cli.config))
 
 		if cv, ok := s.configValidate.(*typedConfigValidator[T]); ok && cv != nil {

@@ -61,6 +61,15 @@ func prepareRunContext[F any](
 		return ctx, zero, fmt.Errorf("parsing flags for %s: %w", phase, parseErr)
 	}
 
+	if registry != nil {
+		validateErr := registry.ValidateFlags(c)
+		if validateErr != nil {
+			var zero F
+
+			return ctx, zero, fmt.Errorf("validating flags for %s: %w", phase, validateErr)
+		}
+	}
+
 	return ctx, flags, nil
 }
 
