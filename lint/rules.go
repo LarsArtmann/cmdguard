@@ -32,6 +32,10 @@ const ToolName = "cmdguard-lint"
 // the code itself. The go-linter-sdk explicitly supports domain categories.
 const CategoryUsage = linter.Category("usage")
 
+// ruleDefCapacity is the allocation hint for the rule table; the slice grows
+// if a future rule group exceeds it.
+const ruleDefCapacity = 8
+
 // ruleDef couples a rule's declarative identity with its check. The table in
 // allRuleDefs is the single source of truth: AllRules, NewRegistry, and
 // Detect all derive from it.
@@ -46,7 +50,7 @@ type ruleDef struct {
 // package-level rule variables. The table is the single source of truth:
 // AllRules, NewRegistry, and Detect all derive from it.
 func allRuleDefs() []ruleDef {
-	defs := make([]ruleDef, 0, 8)
+	defs := make([]ruleDef, 0, ruleDefCapacity)
 
 	defs = append(defs, contractRuleDefs()...)
 	defs = append(defs, uxBaselineRuleDefs()...)

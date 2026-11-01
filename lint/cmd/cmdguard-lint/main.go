@@ -86,12 +86,8 @@ func newApp() (*v4.CLI[cliConfig], error) {
 		return nil, fmt.Errorf("building rules command: %w", err)
 	}
 
-	if err := v4.AddCommand(cli, lintCmd); err != nil {
-		return nil, fmt.Errorf("registering lint command: %w", err)
-	}
-
-	if err := v4.AddCommand(cli, rulesCmd); err != nil {
-		return nil, fmt.Errorf("registering rules command: %w", err)
+	if err := v4.AddCommands(cli, lintCmd, rulesCmd); err != nil {
+		return nil, fmt.Errorf("registering commands: %w", err)
 	}
 
 	return cli, nil

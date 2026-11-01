@@ -78,9 +78,6 @@ Supports multiple **output formats** for scripting and automation:
 	if err != nil {
 		return err
 	}
-	if err := v4.AddCommand(cli, listCmd); err != nil {
-		return err
-	}
 
 	// --- add: required flags, values tag, PreRunE validation ---
 	addCmd, err := v4.NewCommand(
@@ -115,9 +112,6 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		v4.WithNoArgs(),
 	)
 	if err != nil {
-		return err
-	}
-	if err := v4.AddCommand(cli, addCmd); err != nil {
 		return err
 	}
 
@@ -159,9 +153,6 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 	if err != nil {
 		return err
 	}
-	if err := v4.AddCommand(cli, doneCmd); err != nil {
-		return err
-	}
 
 	// --- stats: OutputTable for terminal output ---
 	statsCmd, err := v4.NewCommand(
@@ -194,9 +185,6 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		v4.WithNoArgs(),
 	)
 	if err != nil {
-		return err
-	}
-	if err := v4.AddCommand(cli, statsCmd); err != nil {
 		return err
 	}
 
@@ -239,9 +227,6 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		v4.WithGroupID("tasks"),
 	)
 	if err != nil {
-		return err
-	}
-	if err := v4.AddCommand(cli, inspectCmd); err != nil {
 		return err
 	}
 
@@ -295,9 +280,6 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	if err != nil {
 		return err
 	}
-	if err := v4.AddCommand(cli, dbCmd); err != nil {
-		return err
-	}
 
 	// --- doctor: DoctorCommand, HealthCheckResultsWithContext ---
 	doctorCmd, err := v4.DoctorCommand[AppConfig](
@@ -305,9 +287,6 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		v4.WithDoctorGroupID[AppConfig]("system"),
 	)
 	if err != nil {
-		return err
-	}
-	if err := v4.AddCommand(cli, doctorCmd); err != nil {
 		return err
 	}
 
@@ -360,16 +339,10 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	if err != nil {
 		return err
 	}
-	if err := v4.AddCommand(cli, configCmd); err != nil {
-		return err
-	}
 
 	// --- version: VersionCommand ---
 	versionCmd, err := v4.VersionCommand[AppConfig](cli)
 	if err != nil {
-		return err
-	}
-	if err := v4.AddCommand(cli, versionCmd); err != nil {
 		return err
 	}
 
@@ -384,9 +357,6 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	if err != nil {
 		return err
 	}
-	if err := v4.AddCommand(cli, hiddenCmd); err != nil {
-		return err
-	}
 
 	// --- deprecated command ---
 	deprecatedCmd, err := v4.NewCommand(
@@ -399,11 +369,11 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	if err != nil {
 		return err
 	}
-	if err := v4.AddCommand(cli, deprecatedCmd); err != nil {
-		return err
-	}
 
-	return nil
+	return v4.AddCommands(cli,
+		listCmd, addCmd, doneCmd, statsCmd, inspectCmd,
+		dbCmd, doctorCmd, configCmd, versionCmd, hiddenCmd, deprecatedCmd,
+	)
 }
 
 func resolveStore(scope *v4.Scope) (*TaskStore, error) {
