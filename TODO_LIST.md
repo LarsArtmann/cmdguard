@@ -28,6 +28,29 @@ ROADMAP.md §"Additional v5 candidates" — keep them there, not here.
 
 ---
 
+## Pareto Plan Tasks (2026-11-02)
+
+Full ranked plan with fine-grained breakdown (123 tasks) and execution graph:
+[docs/planning/2026-11-02_00-38_pareto-v5-release-execution-plan.md](docs/planning/2026-11-02_00-38_pareto-v5-release-execution-plan.md).
+Only P0/P1 near-term items duplicated here; P2 lives in the plan.
+
+| #  | Task                                             | Notes                                                                                     | Priority | Status  |
+| -- | ------------------------------------------------ | ----------------------------------------------------------------------------------------- | -------- | ------- |
+| P1 | Owner decisions (vehicle / module path / v5 defaults) | Three decisions gate the release and all v5 work. Ask Lars.                          | P0       | 🔴 TODO |
+| P2 | Unowned-changes review (.golangci.yml, go.sum, website deps) | Must be decided before tagging (Next-50 #29).                                     | P0       | 🔴 TODO |
+| P3 | Fang-on tests + batteries×Draconian test         | Release trustworthiness; fang is the default path.                                        | P0       | 🔴 TODO |
+| P4 | Golden describe fixture + byte-stability test    | Agents can pin the JSON contract.                                                         | P0       | 🔴 TODO |
+| P5 | Cut the release (v4.2.0 or v5.0.0 per decision)  | CHANGELOG section + behavior-change note + tag + proxy verify + GitHub release.           | P0       | 🔴 TODO |
+| P6 | lint/v0.2.0 + BuildFlow bump + fleet baseline    | CG007/CG008, baseline, options reach the fleet.                                           | P1       | 🔴 TODO |
+| P7 | Consumer proof: erraudit + timesheets            | Build + full tests against the release.                                                   | P1       | 🔴 TODO |
+| P8 | v5 scaffold + Builder + default flips + renames  | See plan M11–M15; unblocked by the module-path decision.                                  | P1       | 🔴 TODO |
+| P9 | Codemod + MIGRATION_v4_v5.md                     | Makes the break payable; dry-run on consumers.                                            | P1       | 🔴 TODO |
+| P10 | Machine error codes + generated ERROR_REFERENCE  | Stable `code` per sentinel; docs cannot drift.                                            | P1       | 🔴 TODO |
+| P11 | Validation-semantics hardening (M06–M08)         | Env/config e2e, registration-time defaults, Duration bounds.                              | P1       | 🔴 TODO |
+| P12 | QUICKSTART + TUTORIAL parity                     | Batteries, describe, hints, runtime tag semantics.                                        | P1       | 🔴 TODO |
+
+---
+
 ## v5 End-Goal Workstreams (pre-v5 slice)
 
 Plan: [docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
@@ -36,7 +59,7 @@ consumers can adopt early and the v5 break stays small.
 
 | #  | Task                      | Notes                                                                                                                                                                                                                                                                                                | Status  |
 | -- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| D1 | Machine-readable contract | `Describe()` / `WriteDescription()` (`describe.go`) plus an auto-registered hidden `describe` command; flag metadata (env, required, values, count, prompt, validate) rides on cobra annotations. Consumer-defined `describe` wins; `WithoutDescribeCommand()` opts out. 8 tests.                    | ✅ DONE |
+| D1 | Machine-readable contract | `Describe()` / `WriteDescription()` (`describe.go`) plus an auto-registered hidden `describe` command; flag metadata (env, required, values, count, prompt, validate) rides on cobra annotations. Consumer-defined `describe` wins; `WithoutDescribeCommand()` opts out. 7 describe + 6 AddCommands tests. | ✅ DONE |
 | D2 | Atomic batch registration | `AddCommands[T](cli, cmds...)`: prepares and validates every command before attaching any, accepts mixed flags types, rejects nil entries, and keys duplicate detection on the cobra command name (`"list [path]"` vs `"list"`). `examples/taskctl` registers 11 commands in one call (432→402 LOC). | ✅ DONE |
 | D3 | Errors that teach         | `ErrorHint(err)` returns one actionable fix per classified sentinel; the JSON error envelope gains `hint`. A coverage test fails when a classified sentinel has no hint.                                                                                                                             | ✅ DONE |
 | D4 | Baseline guardrails       | `cmdguard-lint` CG007 (missing short description) and CG008 (missing CLI version); test files and spread option lists are skipped; generated README table refreshed.                                                                                                                                 | ✅ DONE |
