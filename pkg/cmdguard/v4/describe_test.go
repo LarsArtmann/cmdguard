@@ -13,15 +13,15 @@ import (
 )
 
 type describeConfig struct {
-	Name      string `default:"world" flag:"name" short:"n" help:"Name to greet" env:"NAME"`
-	Verbose   int    `flag:"verbose"    short:"v"       help:"Verbosity (repeatable)"       count:"true"`
-	Secret    string `flag:"secret"     help:"Hidden option"                                hidden:"true"`
-	LocalOnly string `flag:"local-only" help:"Root-run only"                                local:"true"`
+	Name      string `default:"world" flag:"name"       short:"n" help:"Name to greet"          env:"NAME"`
+	Verbose   int    `                flag:"verbose"    short:"v" help:"Verbosity (repeatable)"            count:"true"`
+	Secret    string `                flag:"secret"               help:"Hidden option"                                  hidden:"true"`
+	LocalOnly string `                flag:"local-only"           help:"Root-run only"                                                local:"true"`
 }
 
 type describeScanFlags struct {
-	Mode string `flag:"mode" default:"fast" help:"Scan mode" values:"fast,slow" env:"MODE"`
-	Tag  string `flag:"tag"  help:"Tag to scan"  required:"true"`
+	Mode string `flag:"mode" default:"fast" help:"Scan mode"   values:"fast,slow" env:"MODE"`
+	Tag  string `flag:"tag"                 help:"Tag to scan"                               required:"true"`
 }
 
 func newDescribeCLI(t *testing.T, opts ...CLIOption) *CLI[describeConfig] {

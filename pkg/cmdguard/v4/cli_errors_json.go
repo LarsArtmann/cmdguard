@@ -19,6 +19,7 @@ type jsonErrorEnvelope struct {
 type jsonErrorDetail struct {
 	Type    string `json:"type"`
 	Message string `json:"message"`
+	Hint    string `json:"hint,omitempty"`
 	Code    int    `json:"code,omitempty"`
 }
 
@@ -108,12 +109,13 @@ func ExitCode(err error) int {
 
 func writeJSONError(w io.Writer, err error) error {
 	envelope := jsonErrorEnvelope{
-		Error: jsonErrorDetail{
-			Type:    classifyError(err),
-			Message: err.Error(),
-			Code:    extractExitCode(err),
-		},
-	}
+	Error: jsonErrorDetail{
+		Type:    classifyError(err),
+		Message: err.Error(),
+		Hint:    ErrorHint(err),
+		Code:    extractExitCode(err),
+	},
+}
 
 	enc := jsontext.NewEncoder(w, jsontext.WithIndent("  "))
 

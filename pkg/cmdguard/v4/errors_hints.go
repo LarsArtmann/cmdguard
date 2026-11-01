@@ -30,7 +30,10 @@ func errorHints() []errorHint {
 		{ErrFormatRequiresTypedData, "emit typed rows or values, or choose a text format instead"},
 		{ErrUnsupportedAuditLogFormat, "choose one of the formats accepted by ParseAuditLogFormat"},
 		{ErrConfigValidation, "fix the reported config fields at their source: flag, env var, or config file"},
-		{ErrConfigFileParse, "check the config file's syntax and that its extension matches its JSON/YAML/TOML content"},
+		{
+			ErrConfigFileParse,
+			"check the config file's syntax and that its extension matches its JSON/YAML/TOML content",
+		},
 		{ErrConfigFileRead, "check that the config file exists and is readable by this user"},
 		{ErrConfigFileNotFound, "pass --config with an existing path, or rely on defaults by omitting the file"},
 		{ErrConfigFileLoad, "check the config file path, permissions, and syntax"},
