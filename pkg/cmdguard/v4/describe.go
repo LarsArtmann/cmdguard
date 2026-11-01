@@ -134,7 +134,7 @@ func (cli *CLI[T]) WriteDescription(w io.Writer) error {
 // machine-readable contract. Registration is idempotent, skipped when disabled,
 // and yields to a consumer-defined command of the same name.
 func (cli *CLI[T]) ensureDescribeCommand() error {
-	if cli.describeWired || cli.spec.noDescribeCommand {
+	if cli.describeWired || cli.spec.noDescribeCmd {
 		return nil
 	}
 
@@ -188,9 +188,14 @@ func attachFlagMetadata(cmd *cobra.Command, registry *FlagRegistry) error {
 	metas := make([]flagMetadata, 0, len(tags))
 
 	for _, tag := range tags {
+		env := tag.Env
+		if env != "" && registry.envPrefix != "" {
+			env = registry.envPrefix + env
+		}
+
 		metas = append(metas, flagMetadata{
 			Name:     tag.Name,
-			Env:      tag.Env,
+			Env:      env,
 			Values:   slices.Clone(tag.Values),
 			Required: tag.Required,
 			Count:    tag.Count,
