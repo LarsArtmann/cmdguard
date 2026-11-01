@@ -48,6 +48,7 @@ Only P0/P1 near-term items duplicated here; P2 lives in the plan.
 | P10 | Machine error codes + generated ERROR_REFERENCE  | Stable `code` per sentinel; docs cannot drift.                                            | P1       | 🔴 TODO |
 | P11 | Validation-semantics hardening (M06–M08)         | Env/config e2e, registration-time defaults, Duration bounds.                              | P1       | 🔴 TODO |
 | P12 | QUICKSTART + TUTORIAL parity                     | Batteries, describe, hints, runtime tag semantics.                                        | P1       | 🔴 TODO |
+| P13 | Triage 19 new Dependabot findings (website deps: undici <8.12.2, fast-uri <3.1.9, ...) | Surfaced at push 2026-11-02 (6 high/10 mod/3 low); S1's 2026-10-09 all-clear predates them. Fix = website pnpm overrides/bumps + `pnpm audit` clean. | P0       | 🔴 TODO |
 
 ---
 

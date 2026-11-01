@@ -25,6 +25,7 @@ Per pareto-planning Step 0, every candidate task was checked against reality:
 | Test counts in the 00-05/00-11 status reports | Already corrected earlier this session (7+6, 8, 5) |
 | `TODO_LIST.md` L5 marked DONE | Correct but the *release* it needs (lint/v0.2.0) is still open → M09 |
 | S2 toolchain bump (go1.27.2) | Still blocked on nixpkgs `go_1_27` ≥ 1.27.2; folded into M23 as a recheck trigger, not a standalone task |
+| NEW (found at push, 2026-11-02): GitHub reports 19 Dependabot vulnerabilities (6 high, 10 moderate, 3 low) | Website pnpm deps (undici <8.12.2 ×3, fast-uri <3.1.9, +14 more; matches BuildFlow `pnpm-audit`). S1's 2026-10-09 all-clear predates them. Folded into M02 scope: triage + `pnpm audit` clean before the release tag |
 
 ---
 
