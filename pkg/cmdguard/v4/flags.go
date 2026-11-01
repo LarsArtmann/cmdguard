@@ -176,13 +176,7 @@ func (r *FlagRegistry) ValidateFlags(cmd *cobra.Command) error {
 	for _, tag := range r.tags {
 		err := r.validateTag(cmd, tag)
 		if err != nil {
-			return fmt.Errorf(
-				"%w: validating flag %q on command %q: %w",
-				ErrFlagParseFailed,
-				tag.Name,
-				cmd.Use,
-				err,
-			)
+			return fmt.Errorf("command %q: %w", cmd.Name(), err)
 		}
 	}
 
@@ -335,20 +329,6 @@ func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 		err := rule.Validate(value)
 		if err != nil {
 			return fmt.Errorf("flag %q: %w", tag.Name, err)
-		}
-	}
-
-	return nil
-}
-
-// unreachable placeholder
-			return fmt.Errorf(
-				"%w: validating flag %q on command %q: %w",
-				ErrFlagParseFailed,
-				tag.Name,
-				cmd.Use,
-				err,
-			)
 		}
 	}
 

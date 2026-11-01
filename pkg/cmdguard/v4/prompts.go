@@ -148,16 +148,7 @@ func promptMissingCommandFlags(c *cobra.Command, registry *FlagRegistry) error {
 }
 
 func isEnvSet(registry *FlagRegistry, tag FlagTag) bool {
-	if tag.Env == "" {
-		return false
-	}
-
-	envName := tag.Env
-	if registry.envPrefix != "" {
-		envName = registry.envPrefix + envName
-	}
-
-	_, ok := os.LookupEnv(envName)
+	_, ok := registry.envValue(tag)
 
 	return ok
 }

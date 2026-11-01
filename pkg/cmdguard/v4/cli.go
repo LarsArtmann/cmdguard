@@ -301,7 +301,7 @@ func (cli *CLI[T]) setupPersistentPreRun() {
 		if !skipsFlagValidation(c.Name()) {
 			err = registry.ValidateFlags(c)
 			if err != nil {
-				return fmt.Errorf("validating global flags: %w", err)
+				return err
 			}
 		}
 

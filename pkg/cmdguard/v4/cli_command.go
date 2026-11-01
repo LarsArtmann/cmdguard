@@ -66,7 +66,7 @@ func prepareRunContext[F any](
 		if validateErr != nil {
 			var zero F
 
-			return ctx, zero, fmt.Errorf("validating flags for %s: %w", phase, validateErr)
+			return ctx, zero, validateErr
 		}
 	}
 
@@ -255,7 +255,7 @@ func wireHandlerWithMiddleware[T, F any](cfg handlerConfig[T, F]) {
 
 		ctx, parsed, err := prepareRunContext(c, cfg.flags, cfg.registry, cfg.phase)
 		if err != nil {
-			return fmt.Errorf("preparing run context: %w", err)
+			return err
 		}
 
 		ctx = context.WithValue(ctx, argsKey, args)

@@ -191,6 +191,28 @@ func TestDescribeCommand_AutoRegistered(t *testing.T) {
 	}
 }
 
+func TestDescribeCommand_IgnoresRequiredFlags(t *testing.T) {
+	t.Parallel()
+
+	type requiredConfig struct {
+		Token string `flag:"token" required:"true" help:"API token"`
+	}
+
+	cli, err := NewCLI("app", "App", requiredConfig{}, WithFang(false))
+	testutil.AssertNoError(t, err)
+
+	var out bytes.Buffer
+
+	cli.RootCommand().SetOut(&out)
+
+	testutil.AssertNoError(t, cli.ExecuteWithArgs(context.Background(), []string{"describe"}))
+
+	var desc CLIDescription
+	testutil.AssertNoError(t, json.Unmarshal(out.Bytes(), &desc))
+
+	testutil.AssertFieldEqString(t, desc.Name, "app", "described name")
+}
+
 func TestDescribeCommand_OptOut(t *testing.T) {
 	t.Parallel()
 
