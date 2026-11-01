@@ -54,8 +54,7 @@ func checkMissingShortDescription(proj *project, meta linter.RuleMeta) []finding
 
 			findings = append(findings, newFinding(
 				meta,
-				"command "+commandLabel(call)+
-					" has no WithShort: it renders as a blank line in --help and fails WithStrictValidation",
+				missingShortMessage(call),
 				file.pos(call),
 			).
 				WithConfidence(finding.ConfidenceHigh).
@@ -177,22 +176,24 @@ func callHasAnyVersionSource(file *sourceFile, cmdguardPath string, call *ast.Ca
 	return false
 }
 
-// commandLabel renders a quoted command name for a finding message, falling
-// back to a generic label when the Use argument is not a string literal.
-func commandLabel(call *ast.CallExpr) string {
+// missingShortMessage renders the CG007 message, naming the command when its
+// Use argument is a string literal and staying generic otherwise.
+func missingShortMessage(call *ast.CallExpr) string {
+	const consequence = "has no WithShort: it renders as a blank line in --help and fails WithStrictValidation"
+
 	if len(call.Args) == 0 {
-		return "command"
+		return "command " + consequence
 	}
 
 	lit, ok := call.Args[0].(*ast.BasicLit)
 	if !ok || lit.Kind != token.STRING {
-		return "command"
+		return "command " + consequence
 	}
 
 	use, err := strconv.Unquote(lit.Value)
 	if err != nil || use == "" {
-		return "command"
+		return "command " + consequence
 	}
 
-	return strconv.Quote(use)
+	return "command " + strconv.Quote(use) + " " + consequence
 }

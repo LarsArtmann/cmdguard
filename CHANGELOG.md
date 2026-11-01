@@ -34,6 +34,29 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 - **lint: generated README rule table.** `rules --markdown` emits the rule
   table from `allRuleDefs()`; `rules_table_test.go` fails the build when the
   README section drifts.
+- **Machine-readable CLI contract.** `cli.Describe()` and
+  `cli.WriteDescription(w)` emit a versioned JSON schema (`schema_version`)
+  of the whole command tree, including flag type, default, env var (with prefix
+  applied), enum values, required/count/hidden/inherited, and the command tree
+  with aliases, groups and deprecations. A hidden `describe` command is
+  registered automatically at `Execute` time so agents and tooling can drive a
+  CLI without scraping `--help`; a consumer-defined `describe` command wins and
+  `WithoutDescribeCommand()` opts out. Additive within a schema major.
+- **Atomic batch command registration.** `AddCommands[T](cli, cmds...)`
+  validates and converts every command before attaching any, accepts
+  heterogeneous flags types through the sealed `AddableCommand[T]` interface,
+  rejects nil entries, and keys duplicate detection on the cobra command name
+  so `"list [path]"` and `"list"` collide. `AddCommand` shares the same
+  prepare/attach path and no longer reserves a name when conversion fails.
+- **Actionable error hints.** `ErrorHint(err)` maps every sentinel used by the
+  JSON error classifier to one fix sentence, and the machine-readable error
+  envelope now carries it as `hint`. A coverage test fails when a newly
+  classified sentinel lacks a hint.
+- **lint: CG007 missing short description, CG008 missing CLI version.** The
+  end-goal baseline: a command without `WithShort` renders as a blank help
+  line, and a CLI without `WithCLIVersion` cannot identify its build. Both are
+  warnings, skip `_test.go` files and calls with spread option lists, and are
+  suppressible with the usual `//cmdguard-lint:ignore`.
 
 ### Fixed
 
