@@ -46,7 +46,7 @@
 | `Describe()` / `WriteDescription(w)`        | 🟢 FULLY_FUNCTIONAL     | Machine-readable JSON contract (`schema_version`, commands, flags with env/required/values) (`describe.go`)                                                                               |
 | `describe` command                          | 🟢 FULLY_FUNCTIONAL     | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                             |
 
-### CLI Options (30 total — all non-generic except where noted)
+### CLI Options (32 total — all non-generic except where noted)
 
 | Option                                         | Status              | Notes                                                                                                                  |
 | ---------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -411,7 +411,7 @@ built with cmdguard v4 itself).
 
 | Metric                      | Value           | Status  | Notes                                                                                                          |
 | --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~88%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 87.8% verified                                                      |
+| Core coverage               | ~90%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 90.4% verified                                                      |
 | Test functions              | ~580            | 🟢 Good | Across v4 core + sub-modules + examples + benchmarks                                                           |
 | Benchmarks                  | 29              | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
 | Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |

@@ -235,7 +235,9 @@ These shipped additively, with tests and the full quality gate green:
 | Fix | `required`/`values`/`validate` tags are now enforced at run time (the validator had no production caller); string `min`/`max` mean length; meta commands are exempt from required enforcement; validation errors lost their stacked prefixes. |
 
 Verification: `nix run .#check-all` (build, race tests, lint, format, tidy across
-all 7 modules) plus a live `taskctl describe | jq` round-trip.
+all 7 modules), a live `taskctl describe | jq` round-trip, and
+`TestEndGoal_MinimalSuperbCLI` (discovery, version, doctor, required-flag and
+min-length failures, hints, and a clean run in one acceptance test).
 
 ## Sequencing
 
