@@ -44,7 +44,7 @@ func TestValidateFlags_DefaultValueIsValidated(t *testing.T) {
 	}
 }
 
-func TestValidateFlags_EnvValueIsValidated(t *testing.T) { //nolint:paralleltest // t.Setenv forbids parallel
+func TestValidateFlags_EnvValueIsValidated(t *testing.T) {
 	type envConfig struct {
 		Mode string `flag:"mode" values:"dev,prod" env:"VALIDATE_MODE"`
 	}
@@ -59,7 +59,7 @@ func TestValidateFlags_EnvValueIsValidated(t *testing.T) { //nolint:paralleltest
 	}
 }
 
-func TestValidateFlags_EnvSatisfiesRequired(t *testing.T) { //nolint:paralleltest // t.Setenv forbids parallel
+func TestValidateFlags_EnvSatisfiesRequired(t *testing.T) {
 	type requiredConfig struct {
 		Token string `flag:"token" required:"true" env:"VALIDATE_TOKEN"`
 	}

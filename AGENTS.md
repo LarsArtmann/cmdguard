@@ -244,7 +244,9 @@ go build ./...                                   # Verify build
 20. **Go workspace** — `go.work` spans 7 modules (core + 6 sub-modules) for unified local builds; `go build ./...` compiles all modules
 21. **Machine-readable contract** — `Describe()` / `WriteDescription()` emit versioned JSON (`schema_version`) of the whole command tree, and a hidden `describe` command is auto-registered at `Execute` time (a consumer-defined `describe` wins; `WithoutDescribeCommand()` opts out). Flag metadata pflag cannot model (env, required, values, count, prompt, validate) is stored in cobra annotations at wiring time.
 22. **Atomic batch registration** — `AddCommands[T](cli, cmds...)` prepares and validates every command before attaching any, accepts heterogeneous flags types via the sealed `AddableCommand[T]` interface, and keys duplicate detection on the cobra command name (`"list [path]"` collides with `"list"`). `AddCommand` is now a thin wrapper over the same prepare/attach path.
-23. **Hints separate from messages** — error text stays stable for parsing and tests; `ErrorHint(err)` supplies one actionable fix per sentinel and is emitted as `hint` in the JSON error envelope. A coverage test fails when a classified sentinel lacks a hint.
+23. **Hints separate from messages** — error text stays stable for parsing and tests; `ErrorHint(err)` supplies one actionable fix per sentinel and is emitted as `hint` in the JSON error envelope, plus a `Hint:` line under human-readable errors (fang's default view and the plain cobra path; `WithoutErrorHints()` opts out). A coverage test fails when a classified sentinel lacks a hint.
+24. **Batteries + one-call app** — `WithBatteries()` opts into the production defaults (strict validation, signal handling with graceful DI shutdown, hints, auto-registered `version` when a version is set, and `doctor`); `NewApp(name, short, defaults, build, opts...)` constructs the CLI, runs `build` to register commands, and discards the half-built app on error. v5 flips those defaults; until then this option is the adoption path.
+25. **Validation is enforced at run time** — `required`, `values`, and `validate` tags are checked after flag parsing for both the root registry and each command registry, against the value a flag actually resolves to (flag > env > tag default). `min`/`max` on string fields mean length (`minlen`/`maxlen` internally). Introspection commands (`describe`, `version`, `doctor`, `completion`, `help`) skip *required* enforcement so an agent can always discover the CLI.
 
 ### Key Gotchas
 
@@ -302,6 +304,9 @@ go build ./...                                   # Verify build
 
 #### Validation
 
+- **Runtime tag enforcement** — `required`, `values`, and `validate` are enforced after parsing (root + command registries). Required is satisfied by an explicit flag **or** its env var; a config-file-supplied default does not satisfy it (command flags cannot come from config files anyway). Env-sourced and default-sourced values are validated too, so an invalid default fails on every run.
+- **String bounds** — `validate:"min=3,max=20"` on a string field is rewritten to `minlen`/`maxlen`; numeric fields keep numeric min/max. Before this, a string field tried to parse its text as a number and failed with "invalid validator parameter".
+- **Meta-command exemption** — `describe`, `version`, `doctor`, `completion`, and `help` skip required-flag enforcement (`skipsFlagValidation`), so `app describe` works before the caller knows any business flags.
 - **Strict** — `WithStrictValidation()` requires `WithShort` on all commands; enforced at `AddCommand` time
 - **Draconian** — `WithDraconianValidation()` is strict + requires `WithExample` on leaf commands; parent commands are exempt
 - **Config validation** — `WithConfigValidation[T](fn)` runs after root flag parsing but before any command handler; blocks execution on error

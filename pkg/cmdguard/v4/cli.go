@@ -578,7 +578,7 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		return err
 	}
 
-	err = cli.ensureBatteryCommands()
+	err = cli.ensureBatteryCommands() //nolint:contextcheck // handlers read c.Context(), set only during cobra execution
 	if err != nil {
 		return err
 	}
@@ -658,6 +658,10 @@ func isMachineReadableFormat(format OutputFormat) bool {
 	switch format {
 	case output.FormatJSON, output.FormatJSONL, output.FormatYAML, output.FormatTOML:
 		return true
+	case output.FormatTable, output.FormatCSV, output.FormatTSV, output.FormatMarkdown,
+		output.FormatXML, output.FormatD2, output.FormatHTML, output.FormatTree,
+		output.FormatMermaid, output.FormatDOT, output.FormatAsciiDoc, output.FormatPlantUML:
+		return false
 	default:
 		return false
 	}
