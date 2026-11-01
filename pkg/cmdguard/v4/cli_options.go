@@ -93,10 +93,41 @@ func WithFangOptions(opts ...fang.Option) CLIOption {
 	}
 }
 
-// WithFangErrorHandler sets a custom error display function for fang.
+// WithFangErrorHandler sets a custom error display function for fang. When
+// set, cmdguard does not install its default hint-rendering handler; the
+// custom handler owns the entire error view.
 func WithFangErrorHandler(handler func(w io.Writer, styles fang.Styles, err error)) CLIOption {
 	return func(s *cliSpec) {
 		s.fangOpts = append(s.fangOpts, fang.WithErrorHandler(handler))
+		s.customErrorView = true
+	}
+}
+
+// WithoutErrorHints disables the actionable hint line printed under errors
+// (both fang's default view and the plain cobra path). Machine-readable output
+// formats keep the hint in the JSON error envelope either way.
+func WithoutErrorHints() CLIOption {
+	return func(s *cliSpec) {
+		s.errorHints = false
+	}
+}
+
+// WithBatteries turns on the production defaults every serious CLI needs:
+// strict command validation (every command must carry WithShort), signal
+// handling with graceful DI shutdown, actionable error hints, the JSON
+// describe contract, and auto-registered version (when WithCLIVersion is set)
+// and doctor commands. Consumer-defined commands with those names win.
+//
+// It is additive and opt-in. v5 flips these defaults; until then this option
+// is how a consumer gets them without waiting for the major. Passing
+// WithDraconianValidation after WithBatteries raises validation further.
+func WithBatteries() CLIOption {
+	return func(s *cliSpec) {
+		s.batteries = true
+		s.validationMode = Strict
+		s.signalHandling = true
+		s.gracefulShutdown = true
+		s.errorHints = true
 	}
 }
 

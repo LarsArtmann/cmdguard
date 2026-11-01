@@ -145,6 +145,7 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 		},
 		WithShort(short),
 		WithLong(long),
+		WithExample(appName+" doctor"),
 		withDoctorGroupID(groupID),
 	)
 }

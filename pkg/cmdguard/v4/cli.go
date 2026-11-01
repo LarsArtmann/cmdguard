@@ -571,6 +571,11 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		return err
 	}
 
+	err = cli.ensureBatteryCommands()
+	if err != nil {
+		return err
+	}
+
 	cli.applyHelpTransforms()
 
 	restoreNoColor := cli.applyNoColorIfSet()

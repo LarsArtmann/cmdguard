@@ -41,6 +41,7 @@ func VersionCommand[T any](cli *CLI[T]) (Command[T, NoFlags], error) {
 		},
 		WithShort("Print version information"),
 		WithLong(fmt.Sprintf("Print the version of %s.", appName)),
+		WithExample(appName+" version"),
 	)
 }
 
