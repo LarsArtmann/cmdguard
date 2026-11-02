@@ -195,6 +195,13 @@ go build ./...                                   # Verify build
 
 ## Architecture Decisions
 
+### Workspace module replaces (2026-11-02)
+
+Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `prompts/`, `glamour/`) must carry an **unversioned** `replace github.com/larsartmann/cmdguard/v4 => ../` plus the require pinned to the zero pseudo-version `v4.0.0-00010101000000-000000000000`, AND consumer-side replaces for the root module's internal siblings (`flightrecorder`, `glamour`, `spinner` => `../<name>`). Two failure modes fixed by this:
+
+- A **version-pinned** replace (`cmdguard/v4 v4.0.2 => ../`) goes silently inert the moment a require bumps past the pin — GOWORK=off builds then resolve the stale published tag instead of local source (`v4.AddCommands` existed only locally, tag `v4.1.0` predated it; go-mod-update's compile gate failed and blamed the bump). Workspace-mode builds never notice because `use .` always wins.
+- Replaces never propagate: when a submodule resolves the local root go.mod, root's zero-pseudo sibling requires are only valid with root as the MAIN module — without consumer-side replaces, `GOWORK=off go list -m all` fails with `unknown revision 000000000000` while `go build`/`tidy` pass via graph pruning (same trap as BuildFlow gotcha #241).
+
 ### Lint Strategy
 
 **Goal:** 0 lint issues via real code fixes, not silencing linters.

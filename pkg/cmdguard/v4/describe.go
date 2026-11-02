@@ -39,6 +39,12 @@ const helpCommandName = "help"
 //
 // SchemaVersion is stable within a major: fields may be added, never renamed
 // or repurposed. Treat unknown fields as additive.
+//
+// Schema stability rule: the exact bytes of the contract for a comprehensive
+// fixture CLI are pinned by testdata/describe_golden.json (and the opt-out /
+// consumer-wins variants). Any drift must be an intentional, CHANGELOG-noted
+// contract change within the additive-only policy; regenerate the fixtures
+// with `go test ./pkg/cmdguard/v4 -run TestDescribe -update-golden`.
 type CLIDescription struct {
 	SchemaVersion string               `json:"schema_version"`
 	Name          string               `json:"name"`

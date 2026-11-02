@@ -1,0 +1,592 @@
+{
+  "schema_version": "1",
+  "name": "fixture",
+  "short": "Golden describe fixture",
+  "long": "Fixture CLI whose describe output is pinned byte-for-byte.",
+  "version": "9.9.9",
+  "flags": [
+    {
+      "name": "api-token",
+      "type": "string",
+      "usage": "API token for authenticated calls",
+      "env": "FIXTURE_API_TOKEN"
+    },
+    {
+      "name": "environment",
+      "shorthand": "e",
+      "type": "string",
+      "default": "dev",
+      "usage": "Target environment",
+      "env": "FIXTURE_ENV",
+      "values": [
+        "dev",
+        "staging",
+        "prod"
+      ]
+    },
+    {
+      "name": "help",
+      "shorthand": "h",
+      "type": "bool",
+      "default": "false",
+      "usage": "help for fixture"
+    },
+    {
+      "name": "no-color",
+      "type": "bool",
+      "default": "false",
+      "usage": "Disable colored output (also respected via NO_COLOR env var)"
+    },
+    {
+      "name": "quiet",
+      "type": "bool",
+      "default": "false",
+      "usage": "Suppress non-error output",
+      "hidden": true
+    },
+    {
+      "name": "verbose",
+      "shorthand": "v",
+      "type": "count",
+      "default": "0",
+      "usage": "Verbosity level; repeat for more",
+      "count": true
+    },
+    {
+      "name": "version",
+      "type": "bool",
+      "default": "false",
+      "usage": "version for fixture"
+    }
+  ],
+  "commands": [
+    {
+      "name": "completion",
+      "path": "fixture completion",
+      "short": "Generate the autocompletion script for the specified shell",
+      "long": "Generate the autocompletion script for fixture for the specified shell.\nSee each sub-command's help for details on how to use the generated script.\n",
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for completion"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": [
+        {
+          "name": "bash",
+          "path": "fixture completion bash",
+          "short": "Generate the autocompletion script for bash",
+          "long": "Generate the autocompletion script for the bash shell.\n\nThis script depends on the 'bash-completion' package.\nIf it is not installed already, you can install it via your OS's package manager.\n\nTo load completions in your current shell session:\n\n\tsource <(fixture completion bash)\n\nTo load completions for every new session, execute once:\n\n#### Linux:\n\n\tfixture completion bash > /etc/bash_completion.d/fixture\n\n#### macOS:\n\n\tfixture completion bash > $(brew --prefix)/etc/bash_completion.d/fixture\n\nYou will need to start a new shell for this setup to take effect.\n",
+          "flags": [
+            {
+              "name": "api-token",
+              "type": "string",
+              "usage": "API token for authenticated calls",
+              "inherited": true
+            },
+            {
+              "name": "environment",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Target environment",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for bash"
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "no-descriptions",
+              "type": "bool",
+              "default": "false",
+              "usage": "disable completion descriptions"
+            },
+            {
+              "name": "quiet",
+              "type": "bool",
+              "default": "false",
+              "usage": "Suppress non-error output",
+              "hidden": true,
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity level; repeat for more",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        },
+        {
+          "name": "fish",
+          "path": "fixture completion fish",
+          "short": "Generate the autocompletion script for fish",
+          "long": "Generate the autocompletion script for the fish shell.\n\nTo load completions in your current shell session:\n\n\tfixture completion fish | source\n\nTo load completions for every new session, execute once:\n\n\tfixture completion fish > ~/.config/fish/completions/fixture.fish\n\nYou will need to start a new shell for this setup to take effect.\n",
+          "flags": [
+            {
+              "name": "api-token",
+              "type": "string",
+              "usage": "API token for authenticated calls",
+              "inherited": true
+            },
+            {
+              "name": "environment",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Target environment",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for fish"
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "no-descriptions",
+              "type": "bool",
+              "default": "false",
+              "usage": "disable completion descriptions"
+            },
+            {
+              "name": "quiet",
+              "type": "bool",
+              "default": "false",
+              "usage": "Suppress non-error output",
+              "hidden": true,
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity level; repeat for more",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        },
+        {
+          "name": "powershell",
+          "path": "fixture completion powershell",
+          "short": "Generate the autocompletion script for powershell",
+          "long": "Generate the autocompletion script for powershell.\n\nTo load completions in your current shell session:\n\n\tfixture completion powershell | Out-String | Invoke-Expression\n\nTo load completions for every new session, add the output of the above command\nto your powershell profile.\n",
+          "flags": [
+            {
+              "name": "api-token",
+              "type": "string",
+              "usage": "API token for authenticated calls",
+              "inherited": true
+            },
+            {
+              "name": "environment",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Target environment",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for powershell"
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "no-descriptions",
+              "type": "bool",
+              "default": "false",
+              "usage": "disable completion descriptions"
+            },
+            {
+              "name": "quiet",
+              "type": "bool",
+              "default": "false",
+              "usage": "Suppress non-error output",
+              "hidden": true,
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity level; repeat for more",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        },
+        {
+          "name": "zsh",
+          "path": "fixture completion zsh",
+          "short": "Generate the autocompletion script for zsh",
+          "long": "Generate the autocompletion script for the zsh shell.\n\nIf shell completion is not already enabled in your environment you will need\nto enable it.  You can execute the following once:\n\n\techo \"autoload -U compinit; compinit\" >> ~/.zshrc\n\nTo load completions in your current shell session:\n\n\tsource <(fixture completion zsh)\n\nTo load completions for every new session, execute once:\n\n#### Linux:\n\n\tfixture completion zsh > \"${fpath[1]}/_fixture\"\n\n#### macOS:\n\n\tfixture completion zsh > $(brew --prefix)/share/zsh/site-functions/_fixture\n\nYou will need to start a new shell for this setup to take effect.\n",
+          "flags": [
+            {
+              "name": "api-token",
+              "type": "string",
+              "usage": "API token for authenticated calls",
+              "inherited": true
+            },
+            {
+              "name": "environment",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Target environment",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for zsh"
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "no-descriptions",
+              "type": "bool",
+              "default": "false",
+              "usage": "disable completion descriptions"
+            },
+            {
+              "name": "quiet",
+              "type": "bool",
+              "default": "false",
+              "usage": "Suppress non-error output",
+              "hidden": true,
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity level; repeat for more",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        }
+      ]
+    },
+    {
+      "name": "deploy",
+      "path": "fixture deploy",
+      "short": "Deploy the service",
+      "example": "fixture deploy --region eu-central-1",
+      "aliases": [
+        "release"
+      ],
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for deploy"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "usage": "Region to deploy to",
+          "env": "FIXTURE_REGION",
+          "required": true
+        },
+        {
+          "name": "replicas",
+          "type": "int",
+          "default": "1",
+          "usage": "Replica count",
+          "validate": "min=1,max=10"
+        },
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "30s",
+          "usage": "Deploy timeout"
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "describe",
+      "path": "fixture describe",
+      "short": "Print a machine-readable JSON description of this CLI",
+      "long": "Print the full command and flag tree as JSON. Designed for AI agents and tooling that need to drive this CLI without parsing help text.",
+      "example": "fixture describe",
+      "hidden": true,
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for describe"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "remote",
+      "path": "fixture remote",
+      "short": "Remote operations",
+      "long": "Remote operations",
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for remote"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": [
+        {
+          "name": "list",
+          "path": "fixture remote list",
+          "short": "List remotes",
+          "example": "fixture remote list",
+          "flags": [
+            {
+              "name": "api-token",
+              "type": "string",
+              "usage": "API token for authenticated calls",
+              "inherited": true
+            },
+            {
+              "name": "environment",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Target environment",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for list"
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "quiet",
+              "type": "bool",
+              "default": "false",
+              "usage": "Suppress non-error output",
+              "hidden": true,
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity level; repeat for more",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        }
+      ]
+    }
+  ]
+}

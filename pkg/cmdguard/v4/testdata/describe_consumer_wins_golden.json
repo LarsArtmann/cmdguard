@@ -1,0 +1,300 @@
+{
+  "schema_version": "1",
+  "name": "fixture",
+  "short": "Golden describe fixture",
+  "long": "Fixture CLI whose describe output is pinned byte-for-byte.",
+  "version": "9.9.9",
+  "flags": [
+    {
+      "name": "api-token",
+      "type": "string",
+      "usage": "API token for authenticated calls",
+      "env": "FIXTURE_API_TOKEN"
+    },
+    {
+      "name": "environment",
+      "shorthand": "e",
+      "type": "string",
+      "default": "dev",
+      "usage": "Target environment",
+      "env": "FIXTURE_ENV",
+      "values": [
+        "dev",
+        "staging",
+        "prod"
+      ]
+    },
+    {
+      "name": "help",
+      "shorthand": "h",
+      "type": "bool",
+      "default": "false",
+      "usage": "help for fixture"
+    },
+    {
+      "name": "no-color",
+      "type": "bool",
+      "default": "false",
+      "usage": "Disable colored output (also respected via NO_COLOR env var)"
+    },
+    {
+      "name": "quiet",
+      "type": "bool",
+      "default": "false",
+      "usage": "Suppress non-error output",
+      "hidden": true
+    },
+    {
+      "name": "verbose",
+      "shorthand": "v",
+      "type": "count",
+      "default": "0",
+      "usage": "Verbosity level; repeat for more",
+      "count": true
+    },
+    {
+      "name": "version",
+      "type": "bool",
+      "default": "false",
+      "usage": "version for fixture"
+    }
+  ],
+  "commands": [
+    {
+      "name": "deploy",
+      "path": "fixture deploy",
+      "short": "Deploy the service",
+      "example": "fixture deploy --region eu-central-1",
+      "aliases": [
+        "release"
+      ],
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for deploy"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "usage": "Region to deploy to",
+          "env": "FIXTURE_REGION",
+          "required": true
+        },
+        {
+          "name": "replicas",
+          "type": "int",
+          "default": "1",
+          "usage": "Replica count",
+          "validate": "min=1,max=10"
+        },
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "30s",
+          "usage": "Deploy timeout"
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "describe",
+      "path": "fixture describe",
+      "short": "Consumer-owned describe",
+      "example": "fixture describe",
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for describe"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "remote",
+      "path": "fixture remote",
+      "short": "Remote operations",
+      "long": "Remote operations",
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for remote"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": [
+        {
+          "name": "list",
+          "path": "fixture remote list",
+          "short": "List remotes",
+          "example": "fixture remote list",
+          "flags": [
+            {
+              "name": "api-token",
+              "type": "string",
+              "usage": "API token for authenticated calls",
+              "inherited": true
+            },
+            {
+              "name": "environment",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Target environment",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for list"
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "quiet",
+              "type": "bool",
+              "default": "false",
+              "usage": "Suppress non-error output",
+              "hidden": true,
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity level; repeat for more",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        }
+      ]
+    }
+  ]
+}
