@@ -346,11 +346,15 @@ func TestLoadConfigFromJSON_RecursiveKeyCollection(t *testing.T) {
 		}
 	})
 
-	t.Run("nested object keys are recursively collected", func(t *testing.T) {
+	t.Run("nested key under an unknown parent does not mark the field set", func(t *testing.T) {
 		t.Parallel()
 
+		// The file nests "host" under "db", but the config struct has no "db"
+		// group. Nothing is populated, so nothing may be reported as set: the
+		// set-field list rewrites tag defaults, and marking a field set from a
+		// value the file never supplied silently wipes its default.
 		type config struct {
-			Host string `flag:"host" json:"host"`
+			Host string `flag:"host" json:"host" default:"localhost"`
 		}
 
 		cfg := config{}
@@ -360,8 +364,12 @@ func TestLoadConfigFromJSON_RecursiveKeyCollection(t *testing.T) {
 			t.Fatalf("Load failed: %v", err)
 		}
 
-		if !sliceContains(fields, "Host") {
-			t.Errorf("expected recursive key collection to find 'Host' from nested object, got: %v", fields)
+		if len(fields) != 0 {
+			t.Errorf("expected no fields to be set, got: %v", fields)
+		}
+
+		if cfg.Host != "" {
+			t.Errorf("Host = %q, want empty (the key is not addressed by the file)", cfg.Host)
 		}
 	})
 

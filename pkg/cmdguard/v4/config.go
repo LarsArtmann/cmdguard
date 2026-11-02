@@ -33,6 +33,11 @@ type FlagTag struct {
 	Prompt   string // Interactive prompt title when flag is missing
 	Local    bool   // Local: registered on the owning command only, not inherited by subcommands
 	Hidden   bool   // Hidden: excluded from --help output but fully functional
+	Secret   bool   // Secret: value is redacted wherever cmdguard prints it
+	// Key is the canonical config-file key for this field: the json tag name
+	// when present, otherwise the Go field name. A config file may also use the
+	// flag name, or any spelling that differs only in case and separators.
+	Key string
 }
 
 // ValidateConfig validates a config struct.

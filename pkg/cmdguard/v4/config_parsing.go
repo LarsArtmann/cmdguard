@@ -132,6 +132,7 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		Field: field.Name,
 		Type:  field.Type,
 		Name:  flagTag,
+		Key:   configKeyName(field),
 	}
 
 	// Parse short form
@@ -161,7 +162,7 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 		tag.Values = strings.Split(values, ",")
 	}
 
-	// Parse required, count, and local boolean tags in one pass.
+	// Parse required, count, local, hidden, and secret boolean tags in one pass.
 	bools, err := parseBoolTags(field)
 	if err != nil {
 		return FlagTag{}, false, err
@@ -171,6 +172,7 @@ func parseFieldFlag(field reflect.StructField) (FlagTag, bool, error) {
 	tag.Count = bools.Count
 	tag.Local = bools.Local
 	tag.Hidden = bools.Hidden
+	tag.Secret = bools.Secret
 
 	// Parse validate tag
 	if validate := field.Tag.Get("validate"); validate != "" {
@@ -196,11 +198,13 @@ type boolTagSet struct {
 	Count    bool
 	Local    bool
 	Hidden   bool
+	Secret   bool
 }
 
-// parseBoolTags parses the required, count, and local boolean struct tags.
-// Absent tags keep their zero value (false). An invalid value returns an error
-// naming the offending tag key, matching the historical per-tag error messages.
+// parseBoolTags parses the required, count, local, hidden, and secret boolean
+// struct tags. Absent tags keep their zero value (false). An invalid value
+// returns an error naming the offending tag key, matching the historical
+// per-tag error messages.
 func parseBoolTags(field reflect.StructField) (boolTagSet, error) {
 	var out boolTagSet
 
@@ -212,6 +216,7 @@ func parseBoolTags(field reflect.StructField) (boolTagSet, error) {
 		{"count", &out.Count},
 		{"local", &out.Local},
 		{"hidden", &out.Hidden},
+		{"secret", &out.Secret},
 	} {
 		raw := field.Tag.Get(t.key)
 		if raw == "" {

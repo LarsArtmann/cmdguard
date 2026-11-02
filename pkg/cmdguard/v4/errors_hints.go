@@ -37,6 +37,10 @@ func errorHints() []errorHint {
 		{ErrUnsupportedAuditLogFormat, "choose one of the formats accepted by ParseAuditLogFormat"},
 		{ErrConfigValidation, "fix the reported config fields at their source: flag, env var, or config file"},
 		{
+			ErrConfigUnknownKey,
+			"fix or remove the key; its spelling must match a struct field, a json tag, or a flag name",
+		},
+		{
 			ErrConfigFileParse,
 			"check the config file's syntax and that its extension matches its JSON/YAML/TOML content",
 		},

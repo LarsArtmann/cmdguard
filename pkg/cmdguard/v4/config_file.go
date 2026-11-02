@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -21,6 +22,15 @@ import (
 // byte-based loaders receive the raw file contents in data.
 type ConfigFileLoader interface {
 	Load(data []byte, cfg any) (setFields []string, err error)
+}
+
+// StrictConfigKeyLoader is an optional [ConfigFileLoader] capability: the
+// loader can reject config-file keys the config struct does not define.
+// [KoanfLoader] implements it, and [WithStrictConfigKeys] turns it on. Custom
+// loaders that do not implement it keep accepting unknown keys, because
+// cmdguard cannot inspect their parse step.
+type StrictConfigKeyLoader interface {
+	SetStrictKeys(enabled bool)
 }
 
 // loadConfigFile tries to load a config file from the given paths.
@@ -78,11 +88,15 @@ func expandConfigPath(path string) string {
 	return path
 }
 
-// FilterSetFields returns the field names from tags whose flag name is present.
+// FilterSetFields returns the struct field names whose flag name or config-file
+// key is present. Both spellings are accepted because a config file may address
+// a field either way; the loader normalizes keys before this runs, so the
+// canonical key is the one that normally matches.
 func FilterSetFields(tags []FlagTag, present map[string]bool) []string {
 	setFields := make([]string, 0, len(present))
+
 	for _, tag := range tags {
-		if present[tag.Name] {
+		if present[tag.Name] || (tag.Key != "" && present[tag.Key]) {
 			setFields = append(setFields, tag.Field)
 		}
 	}
@@ -169,24 +183,59 @@ func (r *FlagRegistry) updateTagDefaultsFromConfig(cfg any, setFields []string) 
 // loadConfigFileOrSkip attempts to load a config file, returning nil on "not found".
 // KoanfLoader manages its own file reading; custom loaders receive bytes via
 // loadConfigFile.
-func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, error) {
+//
+// It also returns the path of the file that was loaded (empty when none was),
+// so the CLI can report where a value came from instead of guessing.
+func (cli *CLI[T]) loadConfigFileOrSkip() ([]string, string, error) {
 	if cli.spec.configLoader == nil || len(cli.spec.configFilePaths) == 0 {
-		return nil, nil
+		return nil, "", nil
 	}
 
-	paths := cli.spec.configFilePaths
+	paths := cli.configSearchPaths()
 
-	if override := resolveConfigFlag(os.Args[1:]); override != "" {
-		paths = []string{override}
+	if strict, ok := cli.spec.configLoader.(StrictConfigKeyLoader); ok {
+		strict.SetStrictKeys(cli.spec.strictConfigKeys)
 	}
 
 	if kl, ok := cli.spec.configLoader.(*KoanfLoader); ok {
 		kl.SetPaths(paths...)
 
-		return skipNotFound(kl.Load(nil, cli.config))
+		setFields, err := skipNotFound(kl.Load(nil, cli.config))
+
+		return setFields, kl.LoadedPath(), err
 	}
 
-	return skipNotFound(loadConfigFile(paths, cli.spec.configLoader, cli.config))
+	setFields, err := skipNotFound(loadConfigFile(paths, cli.spec.configLoader, cli.config))
+
+	return setFields, firstExistingConfigPath(paths), err
+}
+
+// configSearchPaths returns the config file search order, honouring a --config
+// override found in the process arguments.
+func (cli *CLI[T]) configSearchPaths() []string {
+	paths := slices.Clone(cli.spec.configFilePaths)
+
+	if override := resolveConfigFlag(os.Args[1:]); override != "" {
+		paths = []string{override}
+	}
+
+	return paths
+}
+
+// firstExistingConfigPath returns the first expanded path that exists, or an
+// empty string. It exists to report which file a custom loader read without
+// duplicating the loader's own search loop.
+func firstExistingConfigPath(paths []string) string {
+	for _, path := range paths {
+		expanded := expandConfigPath(path)
+
+		info, err := os.Stat(expanded)
+		if err == nil && !info.IsDir() {
+			return expanded
+		}
+	}
+
+	return ""
 }
 
 func skipNotFound(setFields []string, err error) ([]string, error) {

@@ -21,6 +21,19 @@ type FlagRegistry struct {
 	envPrefix  string
 	validators *validatorRegistry
 	types      *typeRegistry
+	// declaredDefaults holds each tag's default as written in the struct tag,
+	// before a config file replaced it. Loading a config file rewrites
+	// tags[i].Default so config values act as flag defaults — which is correct
+	// for precedence, but destroys the ability to say where a value came from.
+	// Keeping the declared default alongside it restores that.
+	declaredDefaults []string
+}
+
+// DeclaredDefaults returns the tag defaults as declared in the config struct,
+// in the same order as [FlagRegistry.Tags]. Entries are empty for fields whose
+// tag declared no default.
+func (r *FlagRegistry) DeclaredDefaults() []string {
+	return slices.Clone(r.declaredDefaults)
 }
 
 // Tags returns a defensive copy of all parsed flag tags.
@@ -49,10 +62,22 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 	}
 
 	return &FlagRegistry{
-		tags:       tags,
-		validators: globalValidators.share(),
-		types:      globalTypeRegistry.share(),
+		tags:             tags,
+		validators:       globalValidators.share(),
+		types:            globalTypeRegistry.share(),
+		declaredDefaults: declaredDefaults(tags),
 	}, nil
+}
+
+// declaredDefaults extracts the default value of each tag. It runs before any
+// config file is loaded, so the result is the default the struct declares.
+func declaredDefaults(tags []FlagTag) []string {
+	defaults := make([]string, len(tags))
+	for i, tag := range tags {
+		defaults[i] = tag.Default
+	}
+
+	return defaults
 }
 
 // RegisterFlagValidator adds a named validator to this registry's instance-scoped set.

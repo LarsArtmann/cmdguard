@@ -121,6 +121,16 @@ func WithoutErrorHints() CLIOption {
 // It is additive and opt-in. v5 flips these defaults; until then this option
 // is how a consumer gets them without waiting for the major. Passing
 // WithDraconianValidation after WithBatteries raises validation further.
+// WithBatteries turns on the production defaults every serious CLI needs:
+// strict command validation (every command must carry WithShort), strict
+// config-file keys (a typo fails instead of silently doing nothing), signal
+// handling with graceful DI shutdown, actionable error hints, the JSON
+// describe contract, and auto-registered version (when WithCLIVersion is set)
+// and doctor commands. Consumer-defined commands with those names win.
+//
+// It is additive and opt-in. v5 flips these defaults; until then this option
+// is how a consumer gets them without waiting for the major. Passing
+// WithDraconianValidation after WithBatteries raises validation further.
 func WithBatteries() CLIOption {
 	return func(s *cliSpec) {
 		s.batteries = true
@@ -128,6 +138,7 @@ func WithBatteries() CLIOption {
 		s.signalHandling = true
 		s.gracefulShutdown = true
 		s.errorHints = true
+		s.strictConfigKeys = true
 	}
 }
 
@@ -250,6 +261,38 @@ func WithConfigFileLoader(loader ConfigFileLoader, paths ...string) CLIOption {
 	return func(s *cliSpec) {
 		s.configLoader = loader
 		s.configFilePaths = paths
+	}
+}
+
+// WithStrictConfigKeys makes a config file that contains a key no field of the
+// config struct accepts fail the load with [ErrConfigUnknownKey], naming the
+// key and the file. Without it, a typo is silently ignored and the application
+// runs on defaults, which is the hardest configuration failure to diagnose.
+//
+// A key is accepted when it matches a struct field name, a json tag, or a flag
+// name, ignoring case and separators ("log-level", "log_level", and "LogLevel"
+// all address the same field).
+//
+// The check is opt-in for v4 because a config file shared with other tools, or
+// written for a newer version, may legitimately carry extra keys.
+// [WithBatteries] turns it on, and v5 makes it the default. Custom loaders that
+// do not implement [StrictConfigKeyLoader] are unaffected.
+func WithStrictConfigKeys() CLIOption {
+	return func(s *cliSpec) {
+		s.strictConfigKeys = true
+	}
+}
+
+// WithConfigExplainCommand registers a hidden "config explain" command that
+// prints how every flag's effective value was decided: the flag, the
+// environment variable, the config file, or the declared default.
+//
+// It is opt-in rather than part of [WithBatteries] because it prints resolved
+// values, which may be sensitive even when they are not tagged secret:"true".
+// Tags marked secret:"true" are always redacted.
+func WithConfigExplainCommand() CLIOption {
+	return func(s *cliSpec) {
+		s.configExplainCmd = true
 	}
 }
 

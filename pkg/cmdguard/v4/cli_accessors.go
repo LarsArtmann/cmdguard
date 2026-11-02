@@ -81,6 +81,19 @@ func (cli *CLI[T]) Long() string {
 	return cli.spec.long
 }
 
+// StrictConfigKeys reports whether config-file keys the config struct does not
+// define are rejected instead of ignored. See [WithStrictConfigKeys].
+func (cli *CLI[T]) StrictConfigKeys() bool {
+	return cli.spec.strictConfigKeys
+}
+
+// ConfigFilePath returns the config file that was actually loaded, or an empty
+// string when no file was found. It is the file the search order picked, not
+// the first path that was tried.
+func (cli *CLI[T]) ConfigFilePath() string {
+	return cli.configFilePath
+}
+
 // SetLong sets the long description.
 func (cli *CLI[T]) SetLong(long string) {
 	cli.spec.long = long

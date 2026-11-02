@@ -38,7 +38,9 @@ import (
 // WithConfigFile creates a KoanfLoader automatically. For advanced use cases,
 // construct one explicitly and pass it to [WithConfigFileLoader].
 type KoanfLoader struct {
-	paths []string
+	paths      []string
+	strictKeys bool
+	loadedPath string
 }
 
 // NewKoanfLoader creates a koanf-based config loader.
@@ -52,6 +54,20 @@ func NewKoanfLoader(paths ...string) *KoanfLoader {
 // a --config flag override at initialization time.
 func (l *KoanfLoader) SetPaths(paths ...string) {
 	l.paths = paths
+}
+
+// SetStrictKeys makes Load reject config-file keys that no field of the config
+// struct accepts. Satisfies [StrictConfigKeyLoader], which is how
+// [WithStrictConfigKeys] reaches the loader.
+func (l *KoanfLoader) SetStrictKeys(enabled bool) {
+	l.strictKeys = enabled
+}
+
+// LoadedPath returns the path of the file that was actually loaded, or an
+// empty string when no file was found. It lets callers report which file won
+// the search order instead of guessing.
+func (l *KoanfLoader) LoadedPath() string {
+	return l.loadedPath
 }
 
 // Load reads config from the first existing file and populates cfg.
@@ -84,7 +100,18 @@ func (l *KoanfLoader) Load(_ []byte, cfg any) ([]string, error) {
 			return nil, fmt.Errorf("%w: converting %q to JSON: %w", ErrConfigFileParse, expanded, err)
 		}
 
-		return loadConfigFromJSON(jsonBytes, cfg)
+		setFields, err := loadConfigFromJSONWithOptions(
+			jsonBytes,
+			cfg,
+			configLoadOptions{rejectUnknownKeys: l.strictKeys},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("%q: %w", expanded, err)
+		}
+
+		l.loadedPath = expanded
+
+		return setFields, nil
 	}
 
 	return nil, fmt.Errorf("%w: none of %v found", ErrConfigFileNotFound, l.paths)
@@ -121,11 +148,33 @@ func koanfParserForPath(path string) koanf.Parser {
 	}
 }
 
-// loadConfigFromJSON parses JSON bytes into cfg using case-insensitive field
-// matching. It is the shared processing path used by KoanfLoader (after
-// converting YAML/TOML to JSON via koanf) and by any future loader that
-// produces JSON bytes.
+// configLoadOptions controls how a config file's JSON is interpreted.
+type configLoadOptions struct {
+	// rejectUnknownKeys fails the load when the file contains a key that no
+	// field of the config struct accepts, instead of ignoring it.
+	rejectUnknownKeys bool
+}
+
+// loadConfigFromJSON parses JSON bytes into cfg, accepting every recognized key
+// spelling and ignoring keys nothing accepts.
 func loadConfigFromJSON(data []byte, cfg any) ([]string, error) {
+	return loadConfigFromJSONWithOptions(data, cfg, configLoadOptions{})
+}
+
+// loadConfigFromJSONWithOptions parses JSON bytes into cfg. It is the shared
+// processing path used by KoanfLoader (after converting YAML/TOML to JSON via
+// koanf) and by any custom loader that produces JSON bytes.
+//
+// Keys are normalized to the config struct's canonical spelling before
+// unmarshalling, so the flag name, the json tag name, and the Go field name all
+// address the same setting. Without that step the track of which fields the file
+// set depended on the user spelling the key exactly like the flag tag, while
+// decoding depended on it matching the field name.
+func loadConfigFromJSONWithOptions(
+	data []byte,
+	cfg any,
+	opts configLoadOptions,
+) ([]string, error) {
 	var raw map[string]jsontext.Value
 
 	err := json.Unmarshal(data, &raw)
@@ -138,12 +187,33 @@ func loadConfigFromJSON(data []byte, cfg any) ([]string, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags: %w", ErrConfigFileParse, err)
 	}
 
+	normalized, unknown, err := normalizeConfigKeys(raw, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
+	}
+
+	if opts.rejectUnknownKeys && len(unknown) > 0 {
+		return nil, unknownConfigKeyError(unknown)
+	}
+
+	payload := data
+	presentSource := raw
+
+	if normalized != nil {
+		payload = normalized
+
+		var normalizedRaw map[string]jsontext.Value
+		if json.Unmarshal(normalized, &normalizedRaw) == nil {
+			presentSource = normalizedRaw
+		}
+	}
+
 	present := make(map[string]bool, len(raw))
-	collectKeysRecursive(raw, present)
+	collectKeysRecursive(presentSource, present)
 
 	setFields := FilterSetFields(tags, present)
 
-	err = json.Unmarshal(data, cfg, json.MatchCaseInsensitiveNames(true))
+	err = json.Unmarshal(payload, cfg, json.MatchCaseInsensitiveNames(true))
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrConfigFileParse, err)
 	}

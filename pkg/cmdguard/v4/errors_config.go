@@ -24,4 +24,9 @@ var (
 
 	// ErrConfigFileNotFound indicates no config file was found in any search path.
 	ErrConfigFileNotFound = errors.New("config file not found")
+
+	// ErrConfigUnknownKey indicates a config file used a key that no field of
+	// the config struct accepts. Detected only when strict config keys are
+	// enabled (see [WithStrictConfigKeys]).
+	ErrConfigUnknownKey = errors.New("unknown config key")
 )
