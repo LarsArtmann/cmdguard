@@ -75,11 +75,11 @@ require (
 	github.com/knadh/koanf/parsers/json v1.0.1
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.1
-	github.com/knadh/koanf/v2 v2.3.8
+	github.com/knadh/koanf/v2 v2.4.1
 	github.com/larsartmann/cmdguard/flightrecorder v0.1.0
 	github.com/larsartmann/cmdguard/glamour v0.2.0
 	github.com/larsartmann/cmdguard/spinner v0.2.0
-	github.com/larsartmann/go-output v0.38.4
+	github.com/larsartmann/go-output v0.38.7
 	github.com/larsartmann/samber-do-auditlog v0.11.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
