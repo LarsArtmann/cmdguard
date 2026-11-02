@@ -68,7 +68,7 @@ updates:
     groups:
       actions:
         patterns:
-          - '*'
+          - "*"
   - package-ecosystem: npm
     directory: /
     schedule:

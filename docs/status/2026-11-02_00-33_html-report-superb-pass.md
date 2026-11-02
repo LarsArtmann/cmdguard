@@ -37,7 +37,7 @@ superb — and the pass itself surfaced lessons, listed below.**
 4. **Fixed 5 defects** in the HTML report:
    - lll contradiction (verification table vs Screw-up #4) → time-scoped row
      plus a `.table-note` tying it to Screw-ups and Next-50 #29;
-   - stale test counts → corrected in HTML *and* the Markdown companion
+   - stale test counts → corrected in HTML _and_ the Markdown companion
      (batteries 7→8; describe 8→"7 describe + 6 AddCommands"; runtime
      validation 6→5);
    - self-referential filler timeline card → "Session totals" card with
@@ -57,38 +57,38 @@ superb — and the pass itself surfaced lessons, listed below.**
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-| - | ---- | -------- |
-| 1 | Kit skill + full guide read before acting | `html-report-kit/SKILL.md`, `references/html-output-guide.md` |
-| 2 | Stale-diagnostic triage (taskctl "syntax error") | `go build ./examples/taskctl/` exit 0; `git status` clean |
-| 3 | CSS Series-Discipline diff vs template | selector diff empty; post-edit diff = 1 documented addition |
-| 4 | lll contradiction resolved (row + note) | verification table + `.table-note` in the HTML |
-| 5 | Stale test counts corrected (HTML) | batteries "(8 tests)"; Session totals card |
-| 6 | Stale test counts corrected (MD companion) | rows 3, 11, 13 of the 00-05 report |
-| 7 | Filler timeline card replaced with real data | "Session totals" card, all numbers verified |
-| 8 | Nav completeness (`#scorecard` reachable) | 12/12 anchors resolve, scrollspy covers all |
-| 9 | HEAD framing disambiguated | "HEAD at write" in hero and footer |
-| 10 | Full structural validation suite (repeated) | tags/ids/entities/classes/rows: all green |
-| 11 | Revision marker added to HTML footer | "revised 00:34 CET (…)" line |
-| 12 | Post-edit CSS re-diff (clean-subset proof) | only `.table-note` block differs from template |
-| 13 | Cross-doc grep for the same stale counts | FEATURES/CHANGELOG/TODO_LIST/ROADMAP/README/AGENTS: clean |
+| #  | Item                                             | Evidence                                                      |
+| -- | ------------------------------------------------ | ------------------------------------------------------------- |
+| 1  | Kit skill + full guide read before acting        | `html-report-kit/SKILL.md`, `references/html-output-guide.md` |
+| 2  | Stale-diagnostic triage (taskctl "syntax error") | `go build ./examples/taskctl/` exit 0; `git status` clean     |
+| 3  | CSS Series-Discipline diff vs template           | selector diff empty; post-edit diff = 1 documented addition   |
+| 4  | lll contradiction resolved (row + note)          | verification table + `.table-note` in the HTML                |
+| 5  | Stale test counts corrected (HTML)               | batteries "(8 tests)"; Session totals card                    |
+| 6  | Stale test counts corrected (MD companion)       | rows 3, 11, 13 of the 00-05 report                            |
+| 7  | Filler timeline card replaced with real data     | "Session totals" card, all numbers verified                   |
+| 8  | Nav completeness (`#scorecard` reachable)        | 12/12 anchors resolve, scrollspy covers all                   |
+| 9  | HEAD framing disambiguated                       | "HEAD at write" in hero and footer                            |
+| 10 | Full structural validation suite (repeated)      | tags/ids/entities/classes/rows: all green                     |
+| 11 | Revision marker added to HTML footer             | "revised 00:34 CET (…)" line                                  |
+| 12 | Post-edit CSS re-diff (clean-subset proof)       | only `.table-note` block differs from template                |
+| 13 | Cross-doc grep for the same stale counts         | FEATURES/CHANGELOG/TODO_LIST/ROADMAP/README/AGENTS: clean     |
 
 ## b) PARTIALLY DONE
 
-| Item | What remains |
-| ---- | ------------ |
-| "Superb" verification of the report | Structural + factual verification complete; **visual render verification missing** (never opened in a browser, no screenshot) |
-| Scrollspy/progressive-enhancement check | Code reviewed against the template; behavior not exercised |
-| Stale LSP diagnostics | Identified as stale; LSP never restarted, warnings kept polluting every tool call |
+| Item                                    | What remains                                                                                                                  |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| "Superb" verification of the report     | Structural + factual verification complete; **visual render verification missing** (never opened in a browser, no screenshot) |
+| Scrollspy/progressive-enhancement check | Code reviewed against the template; behavior not exercised                                                                    |
+| Stale LSP diagnostics                   | Identified as stale; LSP never restarted, warnings kept polluting every tool call                                             |
 
 ## c) NOT STARTED
 
-| Item | Why it matters |
-| ----- | -------------- |
-| Headless-browser render gate for HTML reports | Structural checks can't catch visual regressions (overflow, contrast, collapsed grids) |
-| Reusable HTML validator script | The Python checker was written ad hoc twice this session; it belongs in a script |
-| Audit checklist encoded in the kit skill | The superb-pass method (counts fact-check, nav completeness, class check, CSS diff) is repeatable and should be documented |
-| `.table-note` upstreamed to the kit template | The addition is report-local; the template lacks a table-footnote component |
+| Item                                          | Why it matters                                                                                                             |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Headless-browser render gate for HTML reports | Structural checks can't catch visual regressions (overflow, contrast, collapsed grids)                                     |
+| Reusable HTML validator script                | The Python checker was written ad hoc twice this session; it belongs in a script                                           |
+| Audit checklist encoded in the kit skill      | The superb-pass method (counts fact-check, nav completeness, class check, CSS diff) is repeatable and should be documented |
+| `.table-note` upstreamed to the kit template  | The addition is report-local; the template lacks a table-footnote component                                                |
 
 ## d) TOTALLY FUCKED UP
 
@@ -116,6 +116,7 @@ superb — and the pass itself surfaced lessons, listed below.**
 ## e) WHAT WE SHOULD IMPROVE
 
 **Verification discipline**
+
 - "Superb" claims require the strongest verification available, not the
   most convenient one. For visual artifacts that means a render, or an
   explicit statement that rendering was not performed.
@@ -123,6 +124,7 @@ superb — and the pass itself surfaced lessons, listed below.**
   tooling exists (headless chromium, playwright, even `lynx -dump`).
 
 **Report integrity**
+
 - Snapshot reports that receive post-generation fixes must carry a revision
   marker. Promote this to a rule in the html-report-kit skill.
 - Fact-checking numeric claims against reality (`rg -c '^func Test'`, `wc -l`)
@@ -130,6 +132,7 @@ superb — and the pass itself surfaced lessons, listed below.**
   reports deserve the same skepticism as numbers in tests.
 
 **Tooling**
+
 - Promote the ad hoc Python validator (tag balance, duplicate ids, entity
   check, class check, nav completeness) into a reusable script — run it as the
   last step of every HTML report.
@@ -138,6 +141,7 @@ superb — and the pass itself surfaced lessons, listed below.**
   report is born verified.
 
 **Hygiene**
+
 - Restart the LSP when diagnostics are proven stale instead of tolerating noise.
 - Re-read files before editing when an auto-commit daemon shares the tree.
 
