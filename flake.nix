@@ -129,7 +129,10 @@
                   nix --extra-experimental-features 'nix-command flakes' flake check
 
                   echo "=== go mod tidy check ==="
-                  export GOWORK=off
+                  # Workspace-aware tidy: with GOWORK=off, tidy rewrites the
+                  # replaced sibling requires in go.mod to unfetchable
+                  # pseudo-versions (v0.0.0-00010101-...), which would poison
+                  # published tags. The workspace keeps the real version pins.
                   for dir in . glamour prompts spinner telemetry flightrecorder lint; do
                     if [ -f "$dir/go.mod" ]; then
                       (cd "$dir" && ${goPkg}/bin/go mod tidy)

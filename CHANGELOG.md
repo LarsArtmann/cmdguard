@@ -9,15 +9,6 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Added
 
-- **Command-level audit middleware.** `AuditMiddleware[T]` records a
-  PhaseBefore event before each command runs and a PhaseAfter event after it
-  completes, carrying the wall-clock duration in milliseconds and the
-  command's error (nil on success), via samber-do-auditlog v0.11.0's
-  `Plugin.RecordCommand`. Command events surface in `Report.Events` and the
-  NDJSON stream (`Event.IsCommand()` distinguishes them from service events).
-  `WithAuditMiddleware[T](plugin)` wires it into the middleware chain — pair
-  it with `WithAuditLog(plugin)` using the same plugin. A nil plugin makes
-  the middleware a transparent passthrough.
 - **lint: baseline/ratchet mode.** `--write-baseline` snapshots current
   findings into `.cmdguard-lint-baseline.json`; subsequent runs fail only on
   findings beyond the baseline (per rule+file, line-drift tolerant, stale
@@ -34,6 +25,44 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 - **lint: generated README rule table.** `rules --markdown` emits the rule
   table from `allRuleDefs()`; `rules_table_test.go` fails the build when the
   README section drifts.
+- **lint: CG007 missing short description, CG008 missing CLI version.** The
+  end-goal baseline: a command without `WithShort` renders as a blank help
+  line, and a CLI without `WithCLIVersion` cannot identify its build. Both are
+  warnings, skip `_test.go` files and calls with spread option lists, and are
+  suppressible with the usual `//cmdguard-lint:ignore`. Ships to consumers
+  with `lint/v0.2.0`.
+
+---
+
+## [4.2.0] - 2026-11-02
+
+**Behavior changes to review before upgrading:**
+
+- **Flag tags are enforced now.** `required`, `values`, and `validate` run at
+  execution time against resolved values (flag, env, default). CLIs that
+  silently accepted missing required flags or invalid enum/range values will
+  start failing with typed errors. Discovery commands (`describe`, `version`,
+  `doctor`, `completion`, `help`) are exempt from `required` enforcement, and
+  `min`/`max` on string flags now mean length.
+- **Validation error text changed.** Failures read
+  `Command "add": flag "title": value too short: "ab" must be at least 3 characters.`
+  — no more stacked `preparing run context / validating flags for / ...`
+  prefixes. Anything matching on the old wording (tests, parsing) must update.
+- **Errors teach.** Human-readable errors print one actionable `Hint:` line
+  (disable with `WithoutErrorHints()`); machine-format error envelopes carry
+  the same sentence as `hint`.
+
+### Added
+
+- **Command-level audit middleware.** `AuditMiddleware[T]` records a
+  PhaseBefore event before each command runs and a PhaseAfter event after it
+  completes, carrying the wall-clock duration in milliseconds and the
+  command's error (nil on success), via samber-do-auditlog v0.11.0's
+  `Plugin.RecordCommand`. Command events surface in `Report.Events` and the
+  NDJSON stream (`Event.IsCommand()` distinguishes them from service events).
+  `WithAuditMiddleware[T](plugin)` wires it into the middleware chain — pair
+  it with `WithAuditLog(plugin)` using the same plugin. A nil plugin makes
+  the middleware a transparent passthrough.
 - **Machine-readable CLI contract.** `cli.Describe()` and
   `cli.WriteDescription(w)` emit a versioned JSON schema (`schema_version`)
   of the whole command tree, including flag type, default, env var (with prefix
@@ -60,11 +89,6 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   commands; consumer-defined commands of the same name win. `NewApp` wraps
   construction plus command registration and discards the half-built CLI when
   the build callback fails.
-- **lint: CG007 missing short description, CG008 missing CLI version.** The
-  end-goal baseline: a command without `WithShort` renders as a blank help
-  line, and a CLI without `WithCLIVersion` cannot identify its build. Both are
-  warnings, skip `_test.go` files and calls with spread option lists, and are
-  suppressible with the usual `//cmdguard-lint:ignore`.
 
 ### Fixed
 
@@ -91,6 +115,10 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   `website/pnpm-workspace.yaml`, pulling patched `postcss-selector-parser`
   ≥7.1.6 (GHSA-rj75-hqrm-r3gf, moderate). `pnpm audit` clean; `astro build`
   green.
+- **website:** dependency refresh clearing the 2026-11-02 Dependabot batch —
+  astro 7.4.4, vite 8.3.5, typescript 7.0.2, html-validate 11.18.0, plus
+  transitive `undici` ≥8.12.2, `zod` ≥4.6.6, `fast-uri` ≥3.1.9. Full
+  `pnpm audit` clean (19 findings, 6 high → 0); site builds 22 pages.
 
 ---
 
