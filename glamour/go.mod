@@ -37,12 +37,12 @@ require (
 	github.com/knadh/koanf/parsers/json v1.0.1 // indirect
 	github.com/knadh/koanf/parsers/toml v0.1.0 // indirect
 	github.com/knadh/koanf/parsers/yaml v1.1.1 // indirect
-	github.com/knadh/koanf/v2 v2.3.8 // indirect
+	github.com/knadh/koanf/v2 v2.4.1 // indirect
 	github.com/larsartmann/go-atomic-write v0.6.0 // indirect
 	github.com/larsartmann/go-branded-id v0.7.0 // indirect
 	github.com/larsartmann/go-error-family v0.11.0 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
-	github.com/larsartmann/go-output v0.38.4 // indirect
+	github.com/larsartmann/go-output v0.38.7 // indirect
 	github.com/larsartmann/go-output/d2 v0.38.4 // indirect
 	github.com/larsartmann/go-output/daghtml v0.38.3 // indirect
 	github.com/larsartmann/go-output/delimited v0.38.4 // indirect
