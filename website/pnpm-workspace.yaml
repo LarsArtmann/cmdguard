@@ -1,7 +1,7 @@
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - html-validate@11.16.2
+  - html-validate@11.16.2 || 11.18.0
   - http-cache-semantics@4.3.0
 overrides:
   http-cache-semantics: ^4.2.1

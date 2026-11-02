@@ -545,5 +545,9 @@ formatters:
       - _enum\.go$
       - _templ\.go$
 issues:
+  # 0 = unlimited. Intentional (owner decision 2026-11-02): this repo targets 0
+  # issues, so truncating the report would only hide real findings. Line length
+  # is enforced by the golines formatter (max-len: 120), so the lll linter was
+  # removed as redundant.
   max-issues-per-linter: 0
   max-same-issues: 0

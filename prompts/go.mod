@@ -84,3 +84,9 @@ require (
 )
 
 replace github.com/larsartmann/cmdguard/v4 => ../
+
+replace github.com/larsartmann/cmdguard/flightrecorder => ../flightrecorder
+
+replace github.com/larsartmann/cmdguard/glamour => ../glamour
+
+replace github.com/larsartmann/cmdguard/spinner => ../spinner

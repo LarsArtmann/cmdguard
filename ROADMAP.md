@@ -12,6 +12,18 @@ The v5 thesis and full workstream plan (P1 inevitable quality, P2 zero-bug by
 construction, P3 fantastic UX, P4 minimum code): [docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
 Renames are the smallest part of v5, not the point of it.
 
+**Owner decisions (2026-11-02):**
+
+- **Release vehicle:** enforced flag-tag validation ships as **v4.2.0 with a
+  migration note** (documented behavior change); v5 stays reserved for the
+  defaults + renames major.
+- **Module path:** v5.0.0 lives at **`github.com/larsartmann/cmdguard/v5`**
+  (standard Go semver; consumers rewrite imports via codemod). Scaffold = plan
+  task M11.
+- **v5 defaults:** strict validation, signals + graceful shutdown, and
+  batteries all flip **on** by default; every individual opt-out
+  (`WithoutStrictValidation` etc.) remains available.
+
 The following breaking changes are tracked with `TODO(v5)` markers in source code:
 
 | # | Change                                                                | Rationale                                                              | Source Location      |
