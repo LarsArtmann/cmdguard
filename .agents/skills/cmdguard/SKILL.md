@@ -15,26 +15,26 @@ Published: v4.1.0 (2026-10-04, pkg.go.dev-verified).
 All rows below verified against source in `~/projects/cmdguard` on 2026-10-16,
 unless the Source column says otherwise.
 
-| Claim                                                                        | Status      | Source                                                                                          |
-| ---------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------- |
-| Per-command F-struct flags registered via `cmd.Flags()` (local, never inherited) | ✅ Verified | `cli_command.go:203` + `flags.go:69-71`; end-to-end regression test `cli_flag_scoping_test.go`   |
-| Root T fields persistent by default; `local:"true"` → root-only                | ✅ Verified | `flags.go:85-104` (`RegisterScopedFlags`), wired at `cli.go:246`; `flags_scoped_test.go`         |
-| `noop --depth` / `scan --build` fail with "Unknown flag"; root accepts `--build` | ✅ Verified | `cli_flag_scoping_test.go` (4 subtests, race-enabled)                                           |
-| Local-flag default + env still apply on commands lacking the flag              | ✅ Verified | `flags_parse.go:26-38`                                                                          |
-| Precedence: flag → env → default (default pre-updated by config file)          | ✅ Verified | `flags_parse.go:45-71` + `cli.go:230-235` (`updateTagDefaultsFromConfig`)                        |
-| `cli.RegisterLocalCommandFlags(cmd)` opts a subcommand into root-local flags   | ✅ Verified | `cli_accessors.go:112`, `flags.go:115-137` (subcommand's own flag definition wins)               |
-| Full tag set: flag, short, default, help, values, required, count, local, hidden, validate, env, prompt | ✅ Verified | `config_parsing.go:123-233`, `FlagTag` struct at `config.go:20-36` |
-| Nested config structs recurse (except registered value types)                 | ✅ Verified | `config_parsing.go:100-118`                                                                      |
-| `ArgsFromContext(ctx)` retrieves positional args                              | ✅ Verified | `cli_command.go:19`                                                                              |
-| pkg.go.dev page for the package exists (v4.1.0)                               | ✅ Verified | Fetched live 2026-10-16                                                                          |
-| 59 exported sentinel error vars; 87 test funcs in `examples/taskctl`           | ✅ Verified | `rg` over `errors*.go` / taskctl tests, 2026-10-16                                                |
-| CG001-CG008 lint rule semantics                                               | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                            |
-| `Describe()` / hidden `describe` command contract                             | ✅ Verified | `pkg/cmdguard/v4/describe.go` + `describe_test.go`, 2026-11-01                                  |
-| `AddCommands` atomic batch registration                                       | ✅ Verified | `pkg/cmdguard/v4/cli.go` + `describe_test.go` (atomicity, mixed F, name-keyed duplicates), 2026-11-01 |
-| `ErrorHint` coverage of classified sentinels                                  | ✅ Verified | `errors_hints.go` + `errors_hints_test.go` (coverage test), 2026-11-01                          |
-| Human `Hint:` line on errors                                                  | ✅ Verified | `errors_hints.go` (`writeErrorWithHint`) + `errors_hints_render_test.go`, 2026-11-01            |
-| `WithBatteries` / `NewApp` production defaults                                | ✅ Verified | `cli_batteries.go` + `cli_batteries_test.go`, 2026-11-01                                        |
-| Runtime enforcement of `required` / `values` / `validate`                     | ✅ Verified | `flags.go` (`ValidateFlags`) + `flags_runtime_validation_test.go`, 2026-11-01                   |
+| Claim                                                                                                   | Status             | Source                                                                                                |
+| ------------------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------- |
+| Per-command F-struct flags registered via `cmd.Flags()` (local, never inherited)                        | ✅ Verified        | `cli_command.go:203` + `flags.go:69-71`; end-to-end regression test `cli_flag_scoping_test.go`        |
+| Root T fields persistent by default; `local:"true"` → root-only                                         | ✅ Verified        | `flags.go:85-104` (`RegisterScopedFlags`), wired at `cli.go:246`; `flags_scoped_test.go`              |
+| `noop --depth` / `scan --build` fail with "Unknown flag"; root accepts `--build`                        | ✅ Verified        | `cli_flag_scoping_test.go` (4 subtests, race-enabled)                                                 |
+| Local-flag default + env still apply on commands lacking the flag                                       | ✅ Verified        | `flags_parse.go:26-38`                                                                                |
+| Precedence: flag → env → default (default pre-updated by config file)                                   | ✅ Verified        | `flags_parse.go:45-71` + `cli.go:230-235` (`updateTagDefaultsFromConfig`)                             |
+| `cli.RegisterLocalCommandFlags(cmd)` opts a subcommand into root-local flags                            | ✅ Verified        | `cli_accessors.go:112`, `flags.go:115-137` (subcommand's own flag definition wins)                    |
+| Full tag set: flag, short, default, help, values, required, count, local, hidden, validate, env, prompt | ✅ Verified        | `config_parsing.go:123-233`, `FlagTag` struct at `config.go:20-36`                                    |
+| Nested config structs recurse (except registered value types)                                           | ✅ Verified        | `config_parsing.go:100-118`                                                                           |
+| `ArgsFromContext(ctx)` retrieves positional args                                                        | ✅ Verified        | `cli_command.go:19`                                                                                   |
+| pkg.go.dev page for the package exists (v4.1.0)                                                         | ✅ Verified        | Fetched live 2026-10-16                                                                               |
+| 59 exported sentinel error vars; 87 test funcs in `examples/taskctl`                                    | ✅ Verified        | `rg` over `errors*.go` / taskctl tests, 2026-10-16                                                    |
+| CG001-CG008 lint rule semantics                                                                         | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                                     |
+| `Describe()` / hidden `describe` command contract                                                       | ✅ Verified        | `pkg/cmdguard/v4/describe.go` + `describe_test.go`, 2026-11-01                                        |
+| `AddCommands` atomic batch registration                                                                 | ✅ Verified        | `pkg/cmdguard/v4/cli.go` + `describe_test.go` (atomicity, mixed F, name-keyed duplicates), 2026-11-01 |
+| `ErrorHint` coverage of classified sentinels                                                            | ✅ Verified        | `errors_hints.go` + `errors_hints_test.go` (coverage test), 2026-11-01                                |
+| Human `Hint:` line on errors                                                                            | ✅ Verified        | `errors_hints.go` (`writeErrorWithHint`) + `errors_hints_render_test.go`, 2026-11-01                  |
+| `WithBatteries` / `NewApp` production defaults                                                          | ✅ Verified        | `cli_batteries.go` + `cli_batteries_test.go`, 2026-11-01                                              |
+| Runtime enforcement of `required` / `values` / `validate`                                               | ✅ Verified        | `flags.go` (`ValidateFlags`) + `flags_runtime_validation_test.go`, 2026-11-01                         |
 
 ## The mental model: one type param on the CLI, a flag struct per command
 
@@ -128,11 +128,11 @@ The options are additive; v5 flips these to the defaults.
 
 **Yes, you CAN scope a flag per-command. Three scopes exist:**
 
-| Where the field lives                                    | Scope                                                       |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-| Root `T` struct (plain)                                   | Persistent: inherited by EVERY subcommand                    |
-| Root `T` struct + `local:"true"`                           | Root only — not inherited by any subcommand                  |
-| A command's own `F` struct (e.g. `ScanFlags`)              | That command only — never inherited, rejected elsewhere      |
+| Where the field lives                         | Scope                                                   |
+| --------------------------------------------- | ------------------------------------------------------- |
+| Root `T` struct (plain)                       | Persistent: inherited by EVERY subcommand               |
+| Root `T` struct + `local:"true"`              | Root only — not inherited by any subcommand             |
+| A command's own `F` struct (e.g. `ScanFlags`) | That command only — never inherited, rejected elsewhere |
 
 Mechanics (all source-verified):
 
@@ -188,19 +188,19 @@ limitation. Migration recipe:
 
 A field becomes a flag only when it has a `flag` tag (`flag:"-"` skips it).
 
-| Tag                        | Effect                                                                   |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `flag:"name"`              | Flag name (required for the field to register at all)                     |
-| `short:"v"`                | Single-character shorthand                                               |
-| `default:"..."`            | Default value (zero value when absent)                                   |
-| `help:"text"`              | Help text                                                                |
-| `values:"a,b,c"`           | Enum constraint (validated → `ErrInvalidEnum`)                            |
-| `required:"true"`          | Must be set by flag or env var; enforced after parsing (bool tag)         |
-| `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                |
-| `local:"true"`             | Owning command only, not inherited (bool tag)                             |
-| `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                       |
-| `validate:"min=1,max=100"` | Rule-based validation; `min`/`max` = length on strings, numeric otherwise |
-| `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                     |
+| Tag                        | Effect                                                                                   |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `flag:"name"`              | Flag name (required for the field to register at all)                                    |
+| `short:"v"`                | Single-character shorthand                                                               |
+| `default:"..."`            | Default value (zero value when absent)                                                   |
+| `help:"text"`              | Help text                                                                                |
+| `values:"a,b,c"`           | Enum constraint (validated → `ErrInvalidEnum`)                                           |
+| `required:"true"`          | Must be set by flag or env var; enforced after parsing (bool tag)                        |
+| `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                               |
+| `local:"true"`             | Owning command only, not inherited (bool tag)                                            |
+| `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                                      |
+| `validate:"min=1,max=100"` | Rule-based validation; `min`/`max` = length on strings, numeric otherwise                |
+| `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                                    |
 | `prompt:"Question?"`       | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module) |
 
 Nested structs recurse automatically into flattened flags — EXCEPT registered value
@@ -219,8 +219,16 @@ missing files skipped) feed root `T` only.
   cobra when not). Never re-print the error returned by `Execute` — that double-prints.
 - `ExecuteAndExit` is the blessed entry point. Need work after execution (flush,
   audit export, teardown)? Use `ExitCode(err)` (0 for nil) and exit yourself.
+- A NON-ZERO code from an `ExitCoder` wins; a zero code means "no override" and
+  falls back to 1 (third-party error types use 0 as their "not set" sentinel, so
+  a failed CLI must not exit 0). `ExitCode(nil)` is still 0.
 - `NewExitError(code, err)` returns an `*ExitError` for the 0-255 range;
   `ExecuteAndExit` honors `ExitCoder` implementations.
+- Reusing one CLI for several `ExecuteWithArgs` calls is safe: every `Execute`
+  resets flag state and the typed config to the post-constructor snapshot, so
+  flags set in an earlier run never leak into a later one (raw cobra
+  escape-hatch flags of pflag's appending kinds like `intSlice` only get their
+  `Changed` marker reset).
 - `SilenceUsage` is true by default (no usage-on-error spam); `WithoutSilenceUsage()`
   re-enables it.
 - 59 exported sentinel errors, all `fmt.Errorf("%w: ...", sentinel)`-wrapped — reach
@@ -257,14 +265,14 @@ Core has zero dependencies on these. Each lives at the repo root and imports as
 `github.com/larsartmann/cmdguard/<name>` — directory placement is load-bearing
 (moving one under `pkg/` breaks downstream `go get` while local builds still pass).
 
-| Sub-module        | Purpose                                                          | Key API                                            |
-| ----------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
-| `glamour`         | Markdown help rendering for `WithHelpTransform[T]`               | `RenderWithEnvironmentConfig` (`GLAMOUR_STYLE`)    |
-| `prompts`         | huh/v2 interactive prompts for `prompt:"..."` tags               | wired via `SetPromptRunner()`                       |
-| `spinner`         | Terminal spinner middleware (auto-skips non-TTY stderr)          | `SpinnerMiddleware[T]`                              |
-| `telemetry`       | OpenTelemetry span per command                                   | `TelemetryMiddleware[T]`                            |
-| `flightrecorder`  | Go 1.25+ `runtime/trace` flight recorder, zero external deps     | `WithFlightRecorder[T](cfg)`                        |
-| `lint`            | cmdguard usage linter (go-finding; BuildFlow provider + CLI)     | `cmdguard-lint`, rules CG001-CG008                  |
+| Sub-module       | Purpose                                                      | Key API                                         |
+| ---------------- | ------------------------------------------------------------ | ----------------------------------------------- |
+| `glamour`        | Markdown help rendering for `WithHelpTransform[T]`           | `RenderWithEnvironmentConfig` (`GLAMOUR_STYLE`) |
+| `prompts`        | huh/v2 interactive prompts for `prompt:"..."` tags           | wired via `SetPromptRunner()`                   |
+| `spinner`        | Terminal spinner middleware (auto-skips non-TTY stderr)      | `SpinnerMiddleware[T]`                          |
+| `telemetry`      | OpenTelemetry span per command                               | `TelemetryMiddleware[T]`                        |
+| `flightrecorder` | Go 1.25+ `runtime/trace` flight recorder, zero external deps | `WithFlightRecorder[T](cfg)`                    |
+| `lint`           | cmdguard usage linter (go-finding; BuildFlow provider + CLI) | `cmdguard-lint`, rules CG001-CG008              |
 
 cmdguard-lint rules worth knowing while writing consumers (repo-documented): CG001
 execute bypass (`Execute` without exit handling), CG002 stale major version, CG003
