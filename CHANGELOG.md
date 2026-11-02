@@ -7,6 +7,27 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`ExitCode` no longer maps a failing error to exit 0 when an `ExitCoder`
+  reports 0 (#11).** Third-party error types (e.g. go-error-family) implement
+  `ExitCoder` with 0 as their "no explicit override" sentinel; `extractExitCode`
+  trusted it verbatim, so failed CLIs exited 0. A zero code from an `ExitCoder`
+  is now treated as "no override" and falls back to the generic failure code 1
+  (a nil error still yields 0). The JSON error envelope `code` field follows the
+  same rule.
+- **Flag values no longer leak across repeated `ExecuteWithArgs` calls on a
+  reused CLI (#13).** pflag marks a flag `Changed` forever after its first parse
+  and never restores values, so a second execute re-ran with the first parse's
+  flags (including write-action flags like `--apply` that the new args never
+  mentioned). Every `Execute` now resets per-flag state first: `Changed`
+  markers, values (stringSlice values are rebuilt because pflag's append
+  semantics make `Set(DefValue)` corrupt them), and the typed config, which is
+  restored to its post-constructor snapshot (defaults plus config-file
+  overlay). One-execute-per-process CLIs are unaffected. Caveat: raw cobra
+  escape-hatch flags of pflag's other appending kinds (intSlice and friends)
+  keep their residue value; only their `Changed` marker resets.
+
 ### Added
 
 - **lint: baseline/ratchet mode.** `--write-baseline` snapshots current

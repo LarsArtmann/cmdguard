@@ -77,7 +77,15 @@ func classifyError(err error) string {
 
 func extractExitCode(err error) int {
 	if exitCoder, ok := errors.AsType[ExitCoder](err); ok {
-		return exitCoder.ExitCode()
+		// A 0 from an ExitCoder means "no override, fall back to the generic
+		// failure code", not "success": err is non-nil here, so the process
+		// failed and must not exit 0. Third-party error types (e.g.
+		// go-error-family) use 0 as their "no explicit code set" sentinel while
+		// still implementing ExitCoder; trusting it verbatim made failed CLIs
+		// exit 0.
+		if code := exitCoder.ExitCode(); code != 0 {
+			return code
+		}
 	}
 
 	return 1
@@ -85,8 +93,10 @@ func extractExitCode(err error) int {
 
 // ExitCode extracts the process exit code from an error returned by Execute.
 //
-// If the error (or any error in its chain) implements ExitCoder, its code is
-// used; otherwise the generic failure code 1 is returned. A nil error yields 0.
+// If the error (or any error in its chain) implements ExitCoder with a
+// NON-ZERO code, that code is used; a zero code from an ExitCoder is treated
+// as "no override" (third-party error types use 0 as their "not set"
+// sentinel) and falls back to the generic failure code 1. A nil error yields 0.
 //
 // cmdguard already prints the error exactly once (styled via fang when enabled,
 // plain via cobra when disabled). The value returned by Execute is therefore for

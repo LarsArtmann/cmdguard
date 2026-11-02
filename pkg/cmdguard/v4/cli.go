@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"reflect"
 	"strings"
 	"syscall"
 
@@ -15,6 +16,7 @@ import (
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // cliSpec holds all non-generic CLI configuration. Typed hooks (config
@@ -41,6 +43,7 @@ type cliSpec struct {
 	cleanupHooks     cleanupHookList
 	configFilePaths  []string
 	configLoader     ConfigFileLoader
+	strictConfigKeys bool
 	helpTransforms   []HelpTransformFunc
 	groups           []cobraGroup
 	gracefulShutdown bool
@@ -48,6 +51,7 @@ type cliSpec struct {
 	auditLog         *auditlog.Plugin
 	onError          func(error)
 	noDescribeCmd    bool
+	configExplainCmd bool
 	batteries        bool
 	errorHints       bool
 	customErrorView  bool
@@ -120,6 +124,7 @@ type CLI[T any] struct {
 	spec           cliSpec
 	defaults       T
 	config         *T
+	pristineConfig *T
 	rootCmd        *cobra.Command
 	registry       *FlagRegistry
 	registeredCmds map[string]struct{}
@@ -127,6 +132,13 @@ type CLI[T any] struct {
 	noColorFlag    *bool
 	cleanupWired   bool
 	describeWired  bool
+	// configSetFields holds the struct field names the config file supplied.
+	// It is the only surviving evidence of that origin: loading rewrites the
+	// tag defaults so config values act as defaults, which erases the
+	// distinction between a declared default and a file value.
+	configSetFields map[string]struct{}
+	// configFilePath is the file that was actually loaded, empty when none was.
+	configFilePath string
 }
 
 // NewCLI creates a new CLI application with typed config.
@@ -238,10 +250,19 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	cli.registry = registry
 
-	setFields, err := cli.loadConfigFileOrSkip()
+	setFields, configPath, err := cli.loadConfigFileOrSkip()
 	if err != nil {
 		return fmt.Errorf("%w: loading config file: %w", ErrConfigFileLoad, err)
-	} else if len(setFields) > 0 {
+	}
+
+	cli.configFilePath = configPath
+	cli.configSetFields = make(map[string]struct{}, len(setFields))
+
+	for _, field := range setFields {
+		cli.configSetFields[field] = struct{}{}
+	}
+
+	if len(setFields) > 0 {
 		registry.updateTagDefaultsFromConfig(cli.config, setFields)
 	}
 
@@ -270,6 +291,10 @@ func (cli *CLI[T]) initialize(defaults T) error {
 	}
 
 	cli.setupPersistentPreRun()
+
+	// Snapshot the constructor state (defaults plus config-file overlay) so
+	// every Execute can start from it; parses mutate cli.config in place.
+	cli.pristineConfig = deepCopy(cli.config)
 
 	return nil
 }
@@ -573,6 +598,8 @@ func (cli *CLI[T]) applyCleanupHooks() {
 
 // Execute runs the CLI application.
 func (cli *CLI[T]) Execute(ctx context.Context) error {
+	cli.resetFlagStateForReuse()
+
 	err := cli.ensureDescribeCommand() //nolint:contextcheck // c.Context() is set only during cobra execution
 	if err != nil {
 		return err
@@ -688,10 +715,96 @@ func (cli *CLI[T]) writePlainErrorHint(err error) {
 }
 
 // ExecuteWithArgs runs the CLI application with specific arguments.
+// It is safe to call repeatedly on the same CLI: every Execute resets
+// per-flag parse state first, so flags set in an earlier run never leak
+// into a later one.
 func (cli *CLI[T]) ExecuteWithArgs(ctx context.Context, args []string) error {
 	cli.rootCmd.SetArgs(args)
 
 	return cli.Execute(ctx)
+}
+
+// resetFlagStateForReuse clears pflag parse residue from every command in
+// the tree so each Execute starts from the registered defaults. pflag marks
+// a flag Changed forever after its first parse and never restores the value,
+// so without this reset a second Execute on a reused CLI silently inherits
+// the previous parse's flags, including write-action flags like --apply that
+// the new args never mentioned. One-execute-per-process CLIs are unaffected.
+func (cli *CLI[T]) resetFlagStateForReuse() {
+	// Restore the config struct in place: fields without a tag default are
+	// never rewritten by ParseFlags, so parse residue would otherwise survive
+	// in cli.config even after the pflag reset below. In-place keeps the
+	// pointer stable for the DI scope and contexts already holding it.
+	if cli.pristineConfig != nil {
+		deepCopyValue(reflect.ValueOf(cli.config).Elem(), reflect.ValueOf(cli.pristineConfig).Elem())
+	}
+
+	var reset func(cmd *cobra.Command)
+
+	reset = func(cmd *cobra.Command) {
+		resetFlagSet(cmd.Flags())
+		resetFlagSet(cmd.PersistentFlags())
+
+		for _, sub := range cmd.Commands() {
+			reset(sub)
+		}
+	}
+
+	reset(cli.rootCmd)
+}
+
+// resetFlagSet returns every flag in the set to its default value and marks
+// it unchanged, undoing what a previous cobra parse did to it.
+//
+// stringSlice flags get a rebuilt Value instead of a Set call: pflag slice
+// values append on every Set after their first write, and their bracketed
+// default form ("[a,b]") is not re-readable by their own CSV parser, so
+// Set(DefValue) would corrupt the value (a literal "[]" element).
+// Other appending pflag kinds (intSlice and friends, reachable only through
+// raw cobra escape-hatch flags) parse their bracketed default as an error and
+// therefore keep their residue value; Changed=false alone still stops the
+// registry from treating them as explicitly set.
+func resetFlagSet(flags *pflag.FlagSet) {
+	flags.VisitAll(func(f *pflag.Flag) {
+		f.Changed = false
+
+		if f.Value == nil {
+			return
+		}
+
+		if f.Value.Type() == "stringSlice" {
+			resetStringSliceFlagValue(f)
+			return
+		}
+
+		// Best effort: a custom type that rejects its own default string
+		// keeps its current value; Changed=false already stops ParseFlags
+		// from treating it as explicitly set.
+		_ = f.Value.Set(f.DefValue)
+	})
+}
+
+// resetStringSliceFlagValue rebuilds a stringSlice flag's Value from its
+// definition, resetting pflag's internal append cursor and the value in one
+// step. The fresh Value is created in a scratch FlagSet and transplanted onto
+// the existing flag: re-registering in place would panic (pflag flags cannot
+// be redefined), and Set cannot work (append semantics plus a bracketed
+// default form pflag's own CSV parser cannot re-read).
+func resetStringSliceFlagValue(f *pflag.Flag) {
+	scratch := pflag.NewFlagSet(f.Name, pflag.ContinueOnError)
+
+	def := splitSliceValue(f.DefValue)
+
+	if f.Shorthand != "" {
+		scratch.StringSliceP(f.Name, f.Shorthand, def, f.Usage)
+	} else {
+		scratch.StringSlice(f.Name, def, f.Usage)
+	}
+
+	if fresh := scratch.Lookup(f.Name); fresh != nil {
+		f.Value = fresh.Value
+		f.DefValue = fresh.DefValue
+	}
 }
 
 // ExecuteAndExit runs the CLI and exits with the appropriate exit code.

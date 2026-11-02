@@ -137,7 +137,36 @@ func TestExtractExitCode(t *testing.T) {
 			t.Errorf("extractExitCode(wrapped ExitError) = %d, want 7", code)
 		}
 	})
+
+	t.Run("zero code from ExitCoder means no override, falls back to 1", func(t *testing.T) {
+		t.Parallel()
+
+		// Mirrors go-error-family's contract: an Error without an explicit
+		// WithExitCode override reports 0 from ExitCode() while still being a
+		// real failure. extractExitCode must not map that to a successful exit.
+		stub := zeroExitError{errors.New("family failure")}
+
+		if code := extractExitCode(stub); code != 1 {
+			t.Errorf("extractExitCode(zero ExitCoder) = %d, want 1", code)
+		}
+
+		wrapped := fmt.Errorf("outer: %w", stub)
+		if code := extractExitCode(wrapped); code != 1 {
+			t.Errorf("extractExitCode(wrapped zero ExitCoder) = %d, want 1", code)
+		}
+	})
 }
+
+// zeroExitError is an ExitCoder whose ExitCode is always 0, modeling
+// third-party error types (e.g. go-error-family) that use 0 as their
+// "no explicit override" sentinel.
+type zeroExitError struct{ err error }
+
+func (e zeroExitError) Error() string { return e.err.Error() }
+
+func (e zeroExitError) Unwrap() error { return e.err }
+
+func (e zeroExitError) ExitCode() int { return 0 }
 
 func TestExitCode(t *testing.T) {
 	t.Parallel()
@@ -166,6 +195,14 @@ func TestExitCode(t *testing.T) {
 
 		if code := ExitCode(exitErr); code != 42 {
 			t.Errorf("ExitCode(ExitError) = %d, want 42", code)
+		}
+	})
+
+	t.Run("zero ExitCoder code is not success, falls back to 1", func(t *testing.T) {
+		t.Parallel()
+
+		if code := ExitCode(zeroExitError{errors.New("family failure")}); code != 1 {
+			t.Errorf("ExitCode(zero ExitCoder) = %d, want 1", code)
 		}
 	})
 }
