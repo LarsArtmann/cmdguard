@@ -6,13 +6,14 @@ import (
 	"io"
 	"testing"
 
-	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
 	"github.com/spf13/cobra"
+
+	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
 )
 
 type reuseConfig struct {
-	Apply     bool   `flag:"apply" help:"Apply changes"`
-	Directory string `flag:"directory" default:"/tmp" help:"Working directory"`
+	Apply     bool   `flag:"apply"     help:"Apply changes"`
+	Directory string `flag:"directory" help:"Working directory" default:"/tmp"`
 }
 
 func TestExecuteWithArgs_FlagValuesDoNotLeakAcrossExecutes(t *testing.T) {

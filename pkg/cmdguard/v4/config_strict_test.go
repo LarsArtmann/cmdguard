@@ -17,9 +17,9 @@ type strictServerConfig struct {
 }
 
 type strictFixtureConfig struct {
-	LogLevel string              `flag:"log-level" default:"info" env:"LOG_LEVEL" help:"Log level"`
+	LogLevel string               `flag:"log-level" default:"info" env:"LOG_LEVEL" help:"Log level"`
 	Servers  []strictServerConfig // no flag tag → array of config groups
-	Server   strictServerConfig  // no flag tag → nested config group
+	Server   strictServerConfig   // no flag tag → nested config group
 }
 
 // writeConfigFile writes content to a uniquely named file inside a temp dir.
@@ -175,7 +175,9 @@ func TestStrictConfigKeys_NoKeySuggestionWhenNothingIsClose(t *testing.T) {
 func TestWithBatteries_EnablesStrictConfigKeys(t *testing.T) {
 	t.Parallel()
 
-	type cfg struct{ Name string `flag:"name"` }
+	type cfg struct {
+		Name string `flag:"name"`
+	}
 
 	plain, err := NewCLI("app", "app", cfg{})
 	testutil.AssertNoError(t, err)
