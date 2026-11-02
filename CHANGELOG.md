@@ -7,7 +7,62 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Added
+
+- **Strict config keys, opt in (`WithStrictConfigKeys()`).** Unknown keys in a
+  config file are now an error instead of a silent no-op, with the offending
+  dotted key, the loaded file path, and a "did you mean" suggestion for likely
+  typos (`ErrConfigUnknownKey`). Accepted spellings match what config loading
+  already accepts (canonical field name, flag name, and case/hyphen/underscore
+  variants), and nested/array keys are named in full (`servers[0].port`).
+  Off by default in v4 because a shared config file may legitimately carry
+  extra keys; **`WithBatteries()` turns it on** as part of the production
+  defaults (v5 flips the global default). `doctor` reports config problems
+  (missing file, parse failure, unknown keys) alongside DI health via the new
+  `CLI.ConfigDiagnostics()`, and `WithDoctorSchemaValidator` attaches an
+  external JSON Schema check.
+- **Config provenance: the new `config explain` command (`WithConfigExplainCommand()`).**
+  Answers "where did this value come from?" per field: flag, environment,
+  config file, tag default, or unset — resolved with the same precedence the
+  runtime uses. Table output for humans, `--output json` for scripts.
+  `CLI.ExplainConfig()` exposes the same data programmatically. Fields tagged
+  `secret:"true"` are redacted to `***` in every view while still reporting
+  their source, so provenance can be audited without leaking credentials.
+- **`secret:"true"` struct tag.** Marks a config value that must never be
+  logged or committed. It appears in the machine contract (`describe`), the
+  generated docs, the config schema, and drives `config explain` redaction.
+- **`schema` sub-module** (`github.com/larsartmann/cmdguard/schema`): emits a
+  JSON Schema draft 2020-12 document describing a config struct (`FromConfig`)
+  or a whole CLI (`FromCLI`), including nested objects, arrays, enums,
+  min/max constraints, and cmdguard hints (`flag`, `env`, format, `secret`)
+  under `x-cmdguard`. Properties always reject unknown keys
+  (`additionalProperties: false`), matching strict loading — a schema typo is
+  the same typo the binary rejects. Output is deterministic and editor-friendly
+  (`Emit`/`Marshal` write indented JSON). Experimental surface.
+- **`v4.ConfigKeys(cfg)`**: the public vocabulary of a config struct — every
+  accepted key with its flag, env var, type, format, constraints, default, and
+  nested shape. It is the single source shared by strict-key checking and the
+  schema emitter, so the two can never disagree.
+
 ### Fixed
+
+- **Config values in camelCase, lowercase, or snake_case no longer lose the
+  race against flag defaults.** Key matching accepted `{"LogLevel": "debug"}`
+  (case-insensitive JSON decoding) while the "which fields did the file set?"
+  bookkeeping matched only the exact flag spelling (`log-level`), so those
+  fields were treated as unset and flag parsing overwrote the config value
+  with the tag default. Every accepted spelling is now normalized to the
+  canonical key before decoding, and the same accepted-spelling vocabulary is
+  used for both the value assignment and the bookkeeping.
+- **Generated markdown docs now carry exactly the facts the machine contract
+  carries.** `GenerateDocs` previously rendered from pflag's `FlagUsages`,
+  a second representation that silently drifted from `describe` (missing env
+  vars, required markers, accepted values, counting and secret markers).
+  It now renders from the same source as the JSON contract: an eight-column
+  table (flag, type, env, default, values, required, secret, help), with inherited
+  flags in their own section and table-escaping so pipes in help text cannot
+  break the layout. Root-only CLIs (no subcommands) no longer produce empty
+  output.
 
 - **`ExitCode` no longer maps a failing error to exit 0 when an `ExitCoder`
   reports 0 (#11).** Third-party error types (e.g. go-error-family) implement

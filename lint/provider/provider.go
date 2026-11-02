@@ -39,6 +39,7 @@ var Provider = toolsdk.Register(toolsdk.Spec{
 	SwitchCases:  nil,
 	ModuleFanOut: true,
 	Inputs:       []string{"**/*.go"},
+	Outputs:      []string{lint.DefaultBaselinePath},
 	Options: []toolsdk.Option{
 		{
 			Name:        "enable",

@@ -363,6 +363,15 @@ linters:
       - path: tests/
         linters:
           - exhaustruct_v5
+      # schema/ emits JSON Schema, whose field names are fixed by the SPEC
+      # (camelCase additionalProperties/minLength, namespaced x-cmdguard), so
+      # tagliatelle's snake_case rule cannot apply. Property and Hints
+      # literals are deliberately partial: every field carries ,omitzero, so
+      # omitting unset fields IS the design.
+      - path: schema/
+        linters:
+          - exhaustruct_v5
+          - tagliatelle
       - text: for loop can be changed to use an integer range
         linters:
           - intrange

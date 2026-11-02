@@ -188,20 +188,21 @@ limitation. Migration recipe:
 
 A field becomes a flag only when it has a `flag` tag (`flag:"-"` skips it).
 
-| Tag                        | Effect                                                                                   |
-| -------------------------- | ---------------------------------------------------------------------------------------- |
-| `flag:"name"`              | Flag name (required for the field to register at all)                                    |
-| `short:"v"`                | Single-character shorthand                                                               |
-| `default:"..."`            | Default value (zero value when absent)                                                   |
-| `help:"text"`              | Help text                                                                                |
-| `values:"a,b,c"`           | Enum constraint (validated → `ErrInvalidEnum`)                                           |
-| `required:"true"`          | Must be set by flag or env var; enforced after parsing (bool tag)                        |
-| `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                               |
-| `local:"true"`             | Owning command only, not inherited (bool tag)                                            |
-| `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                                      |
-| `validate:"min=1,max=100"` | Rule-based validation; `min`/`max` = length on strings, numeric otherwise                |
-| `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                                    |
-| `prompt:"Question?"`       | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module) |
+| Tag                        | Effect                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| `flag:"name"`              | Flag name (required for the field to register at all)                                      |
+| `short:"v"`                | Single-character shorthand                                                                 |
+| `default:"..."`            | Default value (zero value when absent)                                                     |
+| `help:"text"`              | Help text                                                                                  |
+| `values:"a,b,c"`           | Enum constraint (validated → `ErrInvalidEnum`)                                             |
+| `required:"true"`          | Must be set by flag or env var; enforced after parsing (bool tag)                          |
+| `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                                 |
+| `local:"true"`             | Owning command only, not inherited (bool tag)                                              |
+| `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                                        |
+| `validate:"min=1,max=100"` | Rule-based validation; `min`/`max` = length on strings, numeric otherwise                  |
+| `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                                      |
+| `prompt:"Question?"`       | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module)   |
+| `secret:"true"`            | Value is redacted to `***` in `config explain`, the contract, docs, and schemas (bool tag) |
 
 Nested structs recurse automatically into flattened flags — EXCEPT registered value
 types (`Duration`, `Port`, `Email`, `URL`, `HostPort`, `Enum`, `FilePath`, `LogLevel`,
@@ -211,7 +212,12 @@ Precedence (source-verified, `flags_parse.go:45-71` + `cli.go:230-235`): explici
 flag → `env` → default, where the config file has already overwritten the defaults
 before flags register. Effectively: flag → env → config file → tag default. Config
 files (`WithConfigFile(paths...)`, JSON/YAML/TOML auto-detected, `$VAR`/`~` expanded,
-missing files skipped) feed root `T` only.
+missing files skipped) feed root `T` only. Every accepted key spelling (canonical field
+name, flag name, case/hyphen/underscore foldings) works; with
+`WithStrictConfigKeys()` (also inside `WithBatteries()`) unknown keys fail with
+`ErrConfigUnknownKey` plus a "did you mean" suggestion. The `config explain`
+command (opt-in `WithConfigExplainCommand()`) reports where each value came from;
+`v4.ConfigKeys(cfg)` is the public key vocabulary.
 
 ## Error and exit contract
 
@@ -265,14 +271,15 @@ Core has zero dependencies on these. Each lives at the repo root and imports as
 `github.com/larsartmann/cmdguard/<name>` — directory placement is load-bearing
 (moving one under `pkg/` breaks downstream `go get` while local builds still pass).
 
-| Sub-module       | Purpose                                                      | Key API                                         |
-| ---------------- | ------------------------------------------------------------ | ----------------------------------------------- |
-| `glamour`        | Markdown help rendering for `WithHelpTransform[T]`           | `RenderWithEnvironmentConfig` (`GLAMOUR_STYLE`) |
-| `prompts`        | huh/v2 interactive prompts for `prompt:"..."` tags           | wired via `SetPromptRunner()`                   |
-| `spinner`        | Terminal spinner middleware (auto-skips non-TTY stderr)      | `SpinnerMiddleware[T]`                          |
-| `telemetry`      | OpenTelemetry span per command                               | `TelemetryMiddleware[T]`                        |
-| `flightrecorder` | Go 1.25+ `runtime/trace` flight recorder, zero external deps | `WithFlightRecorder[T](cfg)`                    |
-| `lint`           | cmdguard usage linter (go-finding; BuildFlow provider + CLI) | `cmdguard-lint`, rules CG001-CG008              |
+| Sub-module       | Purpose                                                       | Key API                                         |
+| ---------------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| `glamour`        | Markdown help rendering for `WithHelpTransform[T]`            | `RenderWithEnvironmentConfig` (`GLAMOUR_STYLE`) |
+| `prompts`        | huh/v2 interactive prompts for `prompt:"..."` tags            | wired via `SetPromptRunner()`                   |
+| `spinner`        | Terminal spinner middleware (auto-skips non-TTY stderr)       | `SpinnerMiddleware[T]`                          |
+| `telemetry`      | OpenTelemetry span per command                                | `TelemetryMiddleware[T]`                        |
+| `flightrecorder` | Go 1.25+ `runtime/trace` flight recorder, zero external deps  | `WithFlightRecorder[T](cfg)`                    |
+| `lint`           | cmdguard usage linter (go-finding; BuildFlow provider + CLI)  | `cmdguard-lint`, rules CG001-CG008              |
+| `schema`         | JSON Schema 2020-12 emitter for config structs (experimental) | `schema.FromConfig`/`FromCLI`/`Emit`            |
 
 cmdguard-lint rules worth knowing while writing consumers (repo-documented): CG001
 execute bypass (`Execute` without exit handling), CG002 stale major version, CG003

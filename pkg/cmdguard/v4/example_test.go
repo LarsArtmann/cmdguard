@@ -209,3 +209,32 @@ func ExampleNewExitError() {
 	}
 	// Output: exit code: 2
 }
+
+// ExampleCLI_ExplainConfig demonstrates reporting where each configuration
+// value came from: flag, environment, config file, or declared default.
+func ExampleCLI_ExplainConfig() {
+	type config struct {
+		LogLevel string `flag:"log-level" env:"APP_LOG_LEVEL" default:"info" help:"Log level"`
+		Token    string `flag:"token"     env:"APP_TOKEN"                    help:"API token" secret:"true"`
+	}
+
+	cli, err := v4.NewCLI[config]("myapp", "Explain configuration", config{})
+	if err != nil {
+		fmt.Println("error:", err)
+
+		return
+	}
+
+	explanation := cli.ExplainConfig()
+	for _, flag := range explanation.Flags {
+		value := flag.Value
+		if flag.Redacted {
+			value = "***"
+		}
+
+		fmt.Printf("%s: source=%s value=%s\n", flag.Name, flag.Source, value)
+	}
+	// Output:
+	// log-level: source=default value=info
+	// token: source=unset value=***
+}

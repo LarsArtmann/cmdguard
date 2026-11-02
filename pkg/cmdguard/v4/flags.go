@@ -72,9 +72,9 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 // declaredDefaults extracts the default value of each tag. It runs before any
 // config file is loaded, so the result is the default the struct declares.
 func declaredDefaults(tags []FlagTag) []string {
-	defaults := make([]string, len(tags))
-	for i, tag := range tags {
-		defaults[i] = tag.Default
+	defaults := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		defaults = append(defaults, tag.Default)
 	}
 
 	return defaults

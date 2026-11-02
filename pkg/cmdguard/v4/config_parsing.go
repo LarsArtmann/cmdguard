@@ -109,6 +109,7 @@ func shouldRecurseInto(t reflect.Type) bool {
 		reflect.TypeFor[Enum](),
 		reflect.TypeFor[FilePath](),
 		reflect.TypeFor[LogLevel](),
+		reflect.TypeFor[LogFormat](),
 		reflect.TypeFor[time.Duration](),
 		reflect.TypeFor[time.Time]():
 		return false

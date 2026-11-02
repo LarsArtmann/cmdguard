@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"slices"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -29,6 +30,11 @@ type configKeyEntry struct {
 	// canonical is the spelling written back into the JSON before unmarshalling.
 	canonical string
 	node      *configKeyNode
+	// typ and tag carry the metadata a schema or documentation generator needs.
+	// tag is zero when the field has no flag tag (a nested group).
+	typ    reflect.Type
+	tag    FlagTag
+	hasTag bool
 }
 
 // configKeyObject is the accepted key vocabulary of one JSON object: the root
@@ -139,9 +145,9 @@ func (o *configKeyObject) lookup(key string) (*configKeyEntry, bool) {
 // addEmbedded promotes an anonymous struct's fields into o, mirroring how
 // encoding/json flattens embedded structs. It reports whether field was an
 // embedded config group.
-func (o *configKeyObject) addEmbedded(field reflect.StructField) bool {
+func (o *configKeyObject) addEmbedded(field reflect.StructField) (bool, error) {
 	if !field.Anonymous {
-		return false
+		return false, nil
 	}
 
 	t := field.Type
@@ -150,33 +156,56 @@ func (o *configKeyObject) addEmbedded(field reflect.StructField) bool {
 	}
 
 	if t.Kind() != reflect.Struct || !shouldRecurseInto(t) {
-		return false
+		return false, nil
 	}
 
-	o.merge(buildConfigKeyObject(t))
+	embedded, err := buildConfigKeyObject(t)
+	if err != nil {
+		return false, err
+	}
 
-	return true
+	o.merge(embedded)
+
+	return true, nil
 }
 
 // buildConfigKeyObject derives the accepted vocabulary of a struct type.
-func buildConfigKeyObject(t reflect.Type) *configKeyObject {
+func buildConfigKeyObject(t reflect.Type) (*configKeyObject, error) {
 	obj := &configKeyObject{
 		exact:  make(map[string]*configKeyEntry, t.NumField()),
 		folded: make(map[string]*configKeyEntry, t.NumField()),
 	}
 
-	for i := range t.NumField() {
-		field := t.Field(i)
+	for field := range t.Fields() {
 		if !field.IsExported() || field.Tag.Get("json") == "-" {
 			continue
 		}
 
-		if obj.addEmbedded(field) {
+		embedded, err := obj.addEmbedded(field)
+		if err != nil {
+			return nil, err
+		}
+
+		if embedded {
 			continue
 		}
 
 		canonical := configKeyName(field)
-		entry := &configKeyEntry{canonical: canonical, node: buildConfigKeyNode(field.Type)}
+
+		node, err := buildConfigKeyNode(field.Type)
+		if err != nil {
+			return nil, err
+		}
+
+		entry := &configKeyEntry{canonical: canonical, node: node, typ: field.Type}
+
+		tag, ok, err := parseFieldFlag(field)
+		if err != nil {
+			return nil, err
+		}
+
+		entry.tag = tag
+		entry.hasTag = ok
 
 		obj.add(canonical, entry)
 
@@ -187,13 +216,13 @@ func buildConfigKeyObject(t reflect.Type) *configKeyObject {
 		obj.spellings = append(obj.spellings, canonical)
 	}
 
-	return obj
+	return obj, nil
 }
 
 // buildConfigKeyNode derives the vocabulary of a value type. Structs that
 // cmdguard treats as opaque values (durations, enums, ports, ...) and scalars
 // are leaves.
-func buildConfigKeyNode(t reflect.Type) *configKeyNode {
+func buildConfigKeyNode(t reflect.Type) (*configKeyNode, error) {
 	for t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
@@ -201,21 +230,30 @@ func buildConfigKeyNode(t reflect.Type) *configKeyNode {
 	switch t.Kind() { //nolint:exhaustive // every other kind is a leaf
 	case reflect.Struct:
 		if !shouldRecurseInto(t) {
-			return &configKeyNode{}
+			return &configKeyNode{}, nil
 		}
 
-		return &configKeyNode{object: buildConfigKeyObject(t)}
+		obj, err := buildConfigKeyObject(t)
+		if err != nil {
+			return nil, err
+		}
+
+		return &configKeyNode{object: obj}, nil
 	case reflect.Slice, reflect.Array:
-		elem := buildConfigKeyNode(t.Elem())
-		if elem.object == nil && elem.element == nil && !elem.open {
-			return &configKeyNode{}
+		elem, err := buildConfigKeyNode(t.Elem())
+		if err != nil {
+			return nil, err
 		}
 
-		return &configKeyNode{element: elem}
+		if elem.object == nil && elem.element == nil && !elem.open {
+			return &configKeyNode{}, nil
+		}
+
+		return &configKeyNode{element: elem}, nil
 	case reflect.Map:
-		return &configKeyNode{open: true}
+		return &configKeyNode{open: true}, nil
 	default:
-		return &configKeyNode{}
+		return &configKeyNode{}, nil
 	}
 }
 
@@ -226,7 +264,7 @@ func configKeyTree(cfg any) (*configKeyNode, error) {
 		return nil, err
 	}
 
-	return buildConfigKeyNode(v.Type()), nil
+	return buildConfigKeyNode(v.Type())
 }
 
 // joinConfigPath builds the dotted path shown to a user when a nested key is
@@ -351,7 +389,7 @@ func encodeConfigObject(obj map[string]jsontext.Value) jsontext.Value {
 		if err != nil {
 			// Only invalid UTF-8 in a config key can reach here, and the
 			// replacement-character form is still valid JSON.
-			quoted, _ = json.Marshal(key) //nolint:errchkjson // string marshal cannot fail
+			quoted, _ = json.Marshal(key)
 		}
 
 		b.Write(quoted)
@@ -395,7 +433,7 @@ func normalizeConfigKeys(
 	}
 
 	if tree.object == nil {
-		return nil, nil, nil //nolint:nilnil // non-struct config is rejected by ParseFlagTags
+		return nil, nil, nil
 	}
 
 	var unknown []configUnknownKey
@@ -428,4 +466,200 @@ func unknownConfigKeyError(unknown []configUnknownKey) error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// ConfigKey describes one key a config file accepts, with the metadata a schema
+// emitter or a documentation generator needs. Keys nest, mirroring the shape of
+// the config struct: an object key carries Properties, an array key carries the
+// shape of one element in Items.
+//
+// The vocabulary is the same one strict config loading enforces, so a generated
+// schema can never accept a key the loader rejects.
+type ConfigKey struct {
+	// Key is the canonical spelling of the property in the config file.
+	Key string `json:"key"`
+	// Flag is the command-line flag that sets the same field, when the field
+	// has a flag tag. It is an accepted alias for Key in a config file.
+	Flag string `json:"flag,omitempty"`
+	// Type is the JSON type: string, integer, number, boolean, array, or object.
+	Type string `json:"type"`
+	// Format is a semantic hint beyond JSON's types: duration, email, uri,
+	// path, hostport, or date-time.
+	Format string `json:"format,omitempty"`
+	Help   string `json:"help,omitempty"`
+	// Values lists the accepted values (the `values` tag).
+	Values   []string `json:"values,omitempty"`
+	Required bool     `json:"required,omitempty"`
+	// Default is the default exactly as the struct tag declares it.
+	Default    string      `json:"default,omitempty"`
+	Env        string      `json:"env,omitempty"`
+	Secret     bool        `json:"secret,omitempty"`
+	Validate   string      `json:"validate,omitempty"`
+	Properties []ConfigKey `json:"properties,omitempty"`
+	// Items is the shape of one array element. Its Key is empty: the element
+	// has no name of its own, it lives at its parent's key with an index
+	// (servers[0]). Nested Properties inside Items DO carry their own keys.
+	Items *ConfigKey `json:"items,omitempty"`
+}
+
+// ConfigKeys returns the config-file vocabulary of a config struct, derived
+// from the same tags that drive flags. It is the source of truth for generated
+// schemas and for the strict-key check.
+func ConfigKeys(cfg any) ([]ConfigKey, error) {
+	tree, err := configKeyTree(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return buildConfigKeysFromObject(tree.object), nil
+}
+
+// buildConfigKeysFromObject converts an object node's declarations into keys.
+func buildConfigKeysFromObject(obj *configKeyObject) []ConfigKey {
+	if obj == nil || len(obj.spellings) == 0 {
+		return nil
+	}
+
+	keys := make([]ConfigKey, 0, len(obj.spellings))
+
+	for _, spelling := range obj.spellings {
+		entry := obj.exact[spelling]
+		if entry == nil {
+			continue
+		}
+
+		keys = append(keys, buildConfigKey(entry))
+	}
+
+	return keys
+}
+
+// buildConfigKey converts one declared field into a key, descending into nested
+// config groups and arrays.
+func buildConfigKey(entry *configKeyEntry) ConfigKey {
+	typ, format := configKeyType(entry.typ)
+
+	key := ConfigKey{Key: entry.canonical, Type: typ, Format: format}
+
+	if entry.hasTag {
+		key.Flag = entry.tag.Name
+		key.Help = entry.tag.Help
+		key.Values = entry.tag.Values
+		key.Required = entry.tag.Required
+		key.Default = entry.tag.Default
+		key.Env = entry.tag.Env
+		key.Secret = entry.tag.Secret
+		key.Validate = entry.tag.Validate
+	}
+
+	key.Properties = buildConfigKeysFromObject(entry.node.object)
+
+	if configKeyIsCollection(entry.typ) {
+		items := buildConfigKeyFromNode(entry.node.element, configKeyElementType(entry.typ))
+		key.Items = &items
+	}
+
+	return key
+}
+
+// configKeyIsCollection reports whether t is a slice or array (modulo
+// pointers), so its element shape belongs in Items even when the element is a
+// leaf scalar.
+func configKeyIsCollection(t reflect.Type) bool {
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+
+	return t.Kind() == reflect.Slice || t.Kind() == reflect.Array
+}
+
+// buildConfigKeyFromNode builds the shape of one array element.
+func buildConfigKeyFromNode(node *configKeyNode, t reflect.Type) ConfigKey {
+	typ, format := configKeyType(t)
+
+	item := ConfigKey{Type: typ, Format: format}
+
+	if node != nil {
+		item.Properties = buildConfigKeysFromObject(node.object)
+
+		if node.element != nil {
+			nested := buildConfigKeyFromNode(node.element, configKeyElementType(t))
+			item.Items = &nested
+		}
+	}
+
+	return item
+}
+
+// configKeyElementType returns the element type of a slice or array, or the
+// type itself when it is not one.
+func configKeyElementType(t reflect.Type) reflect.Type {
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+
+	if t.Kind() == reflect.Slice || t.Kind() == reflect.Array {
+		return t.Elem()
+	}
+
+	return t
+}
+
+// configKeyType maps a Go type to the JSON type a config file uses, plus an
+// optional semantic format. cmdguard's value types are named structs, so they
+// are matched explicitly before the kind switch.
+func configKeyType(t reflect.Type) (string, string) {
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+
+	if typ, format, ok := configKeyNamedType(t); ok {
+		return typ, format
+	}
+
+	return configKeyKindType(t)
+}
+
+// configKeyNamedType matches cmdguard's named value types and the stdlib types
+// they wrap, reporting whether the receiver matched one.
+func configKeyNamedType(t reflect.Type) (string, string, bool) {
+	switch t {
+	case reflect.TypeFor[Duration](), reflect.TypeFor[time.Duration]():
+		return "string", "duration", true
+	case reflect.TypeFor[Email]():
+		return "string", "email", true
+	case reflect.TypeFor[URL]():
+		return "string", "uri", true
+	case reflect.TypeFor[FilePath]():
+		return "string", "path", true
+	case reflect.TypeFor[HostPort]():
+		return "string", "hostport", true
+	case reflect.TypeFor[time.Time]():
+		return "string", "date-time", true
+	case reflect.TypeFor[Port]():
+		return "integer", "", true
+	case reflect.TypeFor[Enum](), reflect.TypeFor[LogLevel](), reflect.TypeFor[LogFormat]():
+		return "string", "", true
+	}
+
+	return "", "", false
+}
+
+// configKeyKindType maps the remaining Go kinds to their JSON types.
+func configKeyKindType(t reflect.Type) (string, string) {
+	switch t.Kind() { //nolint:exhaustive // remaining kinds fall back to string
+	case reflect.Bool:
+		return "boolean", ""
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return "integer", ""
+	case reflect.Float32, reflect.Float64:
+		return "number", ""
+	case reflect.Slice, reflect.Array:
+		return "array", ""
+	case reflect.Map, reflect.Struct:
+		return "object", ""
+	default:
+		return "string", ""
+	}
 }

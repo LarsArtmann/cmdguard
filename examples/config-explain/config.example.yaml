@@ -1,0 +1,10 @@
+# Example config for the config-explain demo.
+# Every spelling below is accepted: field name, flag name, and
+# case/hyphen/underscore foldings.
+log-level: debug
+
+database:
+  db-host: db.internal
+  db-port: 5433
+  # Uncomment to see config explain redact it:
+  # db-password: hunter2

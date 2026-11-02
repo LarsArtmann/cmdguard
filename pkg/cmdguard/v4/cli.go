@@ -132,6 +132,8 @@ type CLI[T any] struct {
 	noColorFlag    *bool
 	cleanupWired   bool
 	describeWired  bool
+	// configExplainWired guards idempotent registration of the config command.
+	configExplainWired bool
 	// configSetFields holds the struct field names the config file supplied.
 	// It is the only surviving evidence of that origin: loading rewrites the
 	// tag defaults so config values act as defaults, which erases the
@@ -610,6 +612,11 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		return err
 	}
 
+	err = cli.ensureConfigExplainCommand() //nolint:contextcheck // handler reads the CLI config, not a request context
+	if err != nil {
+		return err
+	}
+
 	cli.applyHelpTransforms()
 
 	restoreNoColor := cli.applyNoColorIfSet()
@@ -774,6 +781,7 @@ func resetFlagSet(flags *pflag.FlagSet) {
 
 		if f.Value.Type() == "stringSlice" {
 			resetStringSliceFlagValue(f)
+
 			return
 		}
 

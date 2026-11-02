@@ -250,6 +250,38 @@ Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, m
 
 ---
 
+## Config Files and Strict Keys
+
+```go
+cli, err := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v4.WithConfigFile("myapp.yaml", "$HOME/.config/myapp.yaml"),
+    v4.WithStrictConfigKeys(), // also enabled by v4.WithBatteries()
+)
+```
+
+Every field in your config struct accepts several spellings in the file: the
+field name (`LogLevel`), the flag name (`log-level`), and case/hyphen/underscore
+variants (`loglevel`, `log_level`). Nested keys are dotted (`database.host`);
+arrays are indexed (`servers[0].port`).
+
+Unknown keys are silently ignored by default. Turn strict checking on to catch
+typos instead:
+
+```go
+v4.WithStrictConfigKeys(), // also enabled by v4.WithBatteries()
+```
+
+A typo now fails with the key, the file path, and a suggestion:
+
+```
+error: ...: failed to load config file: loading config file: "/home/me/.config/myapp.yaml": unknown config key "log-leve1" (did you mean "LogLevel"?)
+```
+
+`app doctor` reports config problems (missing file, parse failure, unknown
+keys) alongside DI health.
+
+---
+
 ## Key Concepts
 
 ### Constructor Pattern

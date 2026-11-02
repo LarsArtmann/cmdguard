@@ -87,6 +87,7 @@ type FlagDescription struct {
 	Hidden     bool     `json:"hidden,omitzero"`
 	Deprecated string   `json:"deprecated,omitzero"`
 	Inherited  bool     `json:"inherited,omitzero"`
+	Secret     bool     `json:"secret,omitzero"`
 }
 
 // flagMetadata is the internal, annotation-encoded subset of FlagTag that
@@ -101,6 +102,7 @@ type flagMetadata struct {
 	Count    bool     `json:"count,omitzero"`
 	Prompt   string   `json:"prompt,omitzero"`
 	Validate string   `json:"validate,omitzero"`
+	Secret   bool     `json:"secret,omitzero"`
 }
 
 // Describe returns a machine-readable description of the CLI command tree.
@@ -207,6 +209,7 @@ func attachFlagMetadata(cmd *cobra.Command, registry *FlagRegistry) error {
 			Count:    tag.Count,
 			Prompt:   tag.Prompt,
 			Validate: tag.Validate,
+			Secret:   tag.Secret,
 		})
 	}
 
@@ -331,5 +334,6 @@ func flagDescription(flag *pflag.Flag, meta flagMetadata, inherited bool) FlagDe
 		Hidden:     flag.Hidden,
 		Deprecated: flag.Deprecated,
 		Inherited:  inherited,
+		Secret:     meta.Secret,
 	}
 }

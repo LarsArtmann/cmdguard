@@ -40,7 +40,7 @@ func loadConfigFile(paths []string, loader ConfigFileLoader, cfg any) ([]string,
 	for _, path := range paths {
 		path = expandConfigPath(path)
 
-		data, err := os.ReadFile(path) //nolint:gosec // intentional config file loading with user-provided paths
+		data, err := os.ReadFile(path)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue

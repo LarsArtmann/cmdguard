@@ -68,7 +68,7 @@ updates:
     groups:
       actions:
         patterns:
-          - "*"
+          - '*'
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -91,6 +91,16 @@ updates:
           - patch
   - package-ecosystem: gomod
     directory: /lint
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: gomod
+    directory: /schema
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

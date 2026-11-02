@@ -14,10 +14,11 @@ type DoctorCheck struct {
 
 // doctorConfig holds the configuration for the doctor command.
 type doctorConfig[T any] struct {
-	short   string
-	long    string
-	groupID string
-	checks  []DoctorCheck
+	short           string
+	long            string
+	groupID         string
+	checks          []DoctorCheck
+	schemaValidator func(configPath string) error
 }
 
 // DoctorOption configures the doctor command.
@@ -41,6 +42,20 @@ func WithDoctorLong[T any](long string) DoctorOption[T] {
 func WithDoctorGroupID[T any](groupID string) DoctorOption[T] {
 	return func(cfg *doctorConfig[T]) {
 		cfg.groupID = groupID
+	}
+}
+
+// WithDoctorSchemaValidator adds a config-schema conformance check. It runs
+// only when a config file exists, and receives the path that was found. The
+// schema emitter lives in its own module (it needs reflection over the config
+// struct), so cmdguard core cannot import it; wire it here instead:
+//
+//	cmdguard.WithDoctorSchemaValidator[Config](func(path string) error {
+//	    return schema.ValidateFile(path, Config{})
+//	})
+func WithDoctorSchemaValidator[T any](validate func(configPath string) error) DoctorOption[T] {
+	return func(cfg *doctorConfig[T]) {
+		cfg.schemaValidator = validate
 	}
 }
 
@@ -84,70 +99,78 @@ func DoctorCommand[T any](cli *CLI[T], opts ...DoctorOption[T]) (Command[T, NoFl
 		opt(&cfg)
 	}
 
-	appName := cli.spec.name
-	short := cfg.short
-	long := cfg.long
-	groupID := cfg.groupID
-	customChecks := cfg.checks
-
 	return NewCommand(
 		"doctor",
 		NoFlags{},
-		func(ctx context.Context, _ *T, _ NoFlags) error {
-			w := cli.rootCmd.OutOrStdout()
-
-			results := cli.HealthCheckResultsWithContext(ctx)
-
-			for _, check := range customChecks {
-				err := check.Run(ctx)
-				results[check.Name] = err
-			}
-
-			names := make([]string, 0, len(results))
-
-			for name := range results {
-				names = append(names, name)
-			}
-
-			slices.Sort(names)
-
-			passed := 0
-			failed := 0
-
-			for _, name := range names {
-				err := results[name]
-				if err != nil {
-					fmt.Fprintf(w, "✗ %s\t%s\n", name, err)
-
-					failed++
-				} else {
-					fmt.Fprintf(w, "✓ %s\tok\n", name)
-
-					passed++
-				}
-			}
-
-			fmt.Fprintf(w, "\n%d passed, %d failed\n", passed, failed)
-
-			if failed > 0 {
-				doctorErr := fmt.Errorf(
-					"%w: %s: %d check(s) failed",
-					ErrDoctorFailed,
-					appName,
-					failed,
-				)
-				exitErr, _ := NewExitError(1, doctorErr)
-
-				return exitErr
-			}
-
-			return nil
-		},
-		WithShort(short),
-		WithLong(long),
-		WithExample(appName+" doctor"),
-		withDoctorGroupID(groupID),
+		doctorRun(cli, cfg),
+		WithShort(cfg.short),
+		WithLong(cfg.long),
+		WithExample(cli.spec.name+" doctor"),
+		withDoctorGroupID(cfg.groupID),
 	)
+}
+
+// doctorRun builds the doctor handler: DI health, config diagnostics, the
+// optional schema validator, and custom checks — one report line each.
+func doctorRun[T any](cli *CLI[T], cfg doctorConfig[T]) func(context.Context, *T, NoFlags) error {
+	return func(ctx context.Context, _ *T, _ NoFlags) error {
+		w := cli.rootCmd.OutOrStdout()
+
+		results := cli.HealthCheckResultsWithContext(ctx)
+
+		for _, diagnostic := range cli.ConfigDiagnostics() {
+			results[diagnostic.Name] = diagnostic.Err
+		}
+
+		if cfg.schemaValidator != nil {
+			results[DiagnosticConfigSchema] = runSchemaValidator(cfg.schemaValidator, cli.configFilePath)
+		}
+
+		for _, check := range cfg.checks {
+			err := check.Run(ctx)
+			results[check.Name] = err
+		}
+
+		names := make([]string, 0, len(results))
+
+		for name := range results {
+			names = append(names, name)
+		}
+
+		slices.Sort(names)
+
+		passed := 0
+		failed := 0
+
+		for _, name := range names {
+			err := results[name]
+			if err != nil {
+				fmt.Fprintf(w, "✗ %s\t%s\n", name, err)
+
+				failed++
+			} else {
+				fmt.Fprintf(w, "✓ %s\tok\n", name)
+
+				passed++
+			}
+		}
+
+		fmt.Fprintf(w, "\n%d passed, %d failed\n", passed, failed)
+
+		if failed > 0 {
+			doctorErr := fmt.Errorf(
+				"%w: %s: %d check(s) failed",
+				ErrDoctorFailed,
+				cli.spec.name,
+				failed,
+			)
+			exitErr, _ := NewExitError(1, doctorErr)
+
+			return exitErr
+		}
+
+		return nil
+	}
 }
 
 // withDoctorGroupID conditionally adds WithGroupID if non-empty.
@@ -157,4 +180,15 @@ func withDoctorGroupID(groupID string) CommandOption {
 			s.group = groupID
 		}
 	}
+}
+
+// runSchemaValidator runs a consumer-supplied schema check. No config file
+// means there is nothing to validate, so the check passes rather than failing
+// for a reason the user cannot act on.
+func runSchemaValidator(validate func(configPath string) error, configPath string) error {
+	if configPath == "" {
+		return nil
+	}
+
+	return validate(configPath)
 }

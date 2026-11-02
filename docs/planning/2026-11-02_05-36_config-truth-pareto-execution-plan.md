@@ -30,18 +30,20 @@ Every coarse task has an explicit "done when" so a reviewer can reject it.
 
 ## 1. Grounded findings behind the plan
 
-| #   | Finding                                                                                           | Evidence                                                                                                                                        |
-| --- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1  | Config files silently ignore unknown keys, so a typo leaves the app on defaults                   | `pkg/cmdguard/v4/koanf_loader.go:146` uses `json.Unmarshal` without `json.RejectUnknownMembers`; `encoding/json/v2.RejectUnknownMembers` exists |
-| F2  | Validation is strictly field-local, so conditional requirements need hand-written code            | `pkg/cmdguard/v4/config.go:54`, `pkg/cmdguard/v4/flags_validate.go`                                                                             |
-| F3  | Config precedence is four layers deep and cannot be explained                                     | flag > env > config > tag default, implemented by rewriting tag defaults at `pkg/cmdguard/v4/config_file.go:163`                                |
-| F4  | The source of a value is computed then destroyed                                                  | `setFields` is consumed only by `updateTagDefaultsFromConfig`, which overwrites `Default`                                                       |
-| F5  | Human docs are generated from pflag text, not from the machine contract                           | `pkg/cmdguard/v4/docgen.go:60` prints `cmd.LocalFlags().FlagUsages()`                                                                           |
-| F6  | `Describe()` already carries env, required, values, validate, prompt, count                       | `pkg/cmdguard/v4/describe.go:75-90`                                                                                                             |
-| F7  | There is no redaction concept, so any value-printing feature leaks by default                     | no `secret` tag anywhere in `pkg/cmdguard/v4`                                                                                                   |
-| F8  | One flag is described four times, so every flag feature costs four edits                          | `FlagTag` -> `flagMetadata` -> `FlagDescription` -> pflag                                                                                       |
-| F9  | The doctor command has no config awareness                                                        | `pkg/cmdguard/v4/doctor.go` runs DI and custom checks only                                                                                      |
-| F10 | CUE would add a pre-1.0 dependency and a second DSL for problems that are cheaper to fix directly | `cuelang.org/go` v0.17.1, 43 imports in the `cue` package                                                                                       |
+| #   | Finding                                                                                                                                                                      | Evidence                                                                                                                                                                                                                                                          |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1  | Config files silently ignore unknown keys, so a typo leaves the app on defaults                                                                                              | `pkg/cmdguard/v4/koanf_loader.go:146` uses `json.Unmarshal` without `json.RejectUnknownMembers`; `encoding/json/v2.RejectUnknownMembers` exists                                                                                                                   |
+| F2  | Validation is strictly field-local, so conditional requirements need hand-written code                                                                                       | `pkg/cmdguard/v4/config.go:54`, `pkg/cmdguard/v4/flags_validate.go`                                                                                                                                                                                               |
+| F3  | Config precedence is four layers deep and cannot be explained                                                                                                                | flag > env > config > tag default, implemented by rewriting tag defaults at `pkg/cmdguard/v4/config_file.go:163`                                                                                                                                                  |
+| F4  | The source of a value is computed then destroyed                                                                                                                             | `setFields` is consumed only by `updateTagDefaultsFromConfig`, which overwrites `Default`                                                                                                                                                                         |
+| F5  | Human docs are generated from pflag text, not from the machine contract                                                                                                      | `pkg/cmdguard/v4/docgen.go:60` prints `cmd.LocalFlags().FlagUsages()`                                                                                                                                                                                             |
+| F6  | `Describe()` already carries env, required, values, validate, prompt, count                                                                                                  | `pkg/cmdguard/v4/describe.go:75-90`                                                                                                                                                                                                                               |
+| F7  | There is no redaction concept, so any value-printing feature leaks by default                                                                                                | no `secret` tag anywhere in `pkg/cmdguard/v4`                                                                                                                                                                                                                     |
+| F8  | One flag is described four times, so every flag feature costs four edits                                                                                                     | `FlagTag` -> `flagMetadata` -> `FlagDescription` -> pflag                                                                                                                                                                                                         |
+| F9  | The doctor command has no config awareness                                                                                                                                   | `pkg/cmdguard/v4/doctor.go` runs DI and custom checks only                                                                                                                                                                                                        |
+| F10 | CUE would add a pre-1.0 dependency and a second DSL for problems that are cheaper to fix directly                                                                            | `cuelang.org/go` v0.17.1, 43 imports in the `cue` package                                                                                                                                                                                                         |
+| F11 | Key-spelling split brain: the file parser accepted more spellings than the set-fields bookkeeping, so `{"LogLevel": ...}` parsed but was then overwritten by the tag default | found during A3 execution: `MatchCaseInsensitiveNames(true)` populated the struct from any casing while `FilterSetFields` matched only exact flag spellings; fixed by normalizing every accepted spelling to the canonical key before decoding (`config_keys.go`) |
+| F12 | `GenerateDocs` on a root-only CLI (no subcommands, no Run) produced EMPTY output — cobra reports the root as `!IsAvailableCommand()`                                         | found during C execution; fixed by documenting the root unconditionally (`docgen.go`)                                                                                                                                                                             |
 
 ## 2. Pareto analysis
 
@@ -557,10 +559,19 @@ its own behind the option. Nothing else blocks it.
 - Website redesign, release tagging, and version bumps.
 - Any item not traceable to findings F1 to F10.
 
-## 9. Open questions blocking execution
+## 9. Open questions — RESOLVED during execution (2026-11-02)
 
-1. Is strict config-key rejection allowed as a `v4.x` default, or must it be opt-in?
-2. Is the next release headline provenance for humans, or the schema and contract
-   surface for agents?
-3. Does a `secret:"true"` tag ship as part of this work, or does provenance ship with
-   sources only and no values?
+1. Strict config-key rejection: **opt-in in v4** (`WithStrictConfigKeys()`),
+   **on inside `WithBatteries()`**, default in v5. A shared config file may
+   legitimately carry extra keys; failing loudly by default would break
+   working applications on a patch release.
+2. Next headline: **provenance first** (`config explain`), schema second.
+   Provenance answers a question every user hits; the schema serves agents
+   and CI, which `describe` already partially serves.
+3. `secret:"true"` **ships with provenance**, redacting to `***`
+   unconditionally while still reporting the source. A provenance view that
+   prints values would leak by default (finding F7).
+
+Execution status is tracked in the mid-flight report
+(`docs/status/2026-11-02_10-15_config-truth-execution-mid-flight.md`) and the
+CHANGELOG's Unreleased section.

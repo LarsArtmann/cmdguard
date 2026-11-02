@@ -46,7 +46,7 @@ func loadStrict(t *testing.T, cfg any, path string, strict bool) ([]string, erro
 func TestStrictConfigKeys_UnknownTopLevelKey(t *testing.T) {
 	t.Parallel()
 
-	path := writeConfigFile(t, "config.yaml", "log-levle: debug\n")
+	path := writeConfigFile(t, "config.yaml", "log-leve1: debug\n")
 
 	cfg := strictFixtureConfig{}
 
@@ -54,7 +54,7 @@ func TestStrictConfigKeys_UnknownTopLevelKey(t *testing.T) {
 	testutil.AssertExpectedError(t, err)
 	testutil.AssertBoolTrue(t, errors.Is(err, ErrConfigUnknownKey), "errors.Is(ErrConfigUnknownKey)")
 
-	if !strings.Contains(err.Error(), "log-levle") {
+	if !strings.Contains(err.Error(), "log-leve1") {
 		t.Errorf("error must name the offending key, got: %v", err)
 	}
 
@@ -191,7 +191,7 @@ func TestWithBatteries_EnablesStrictConfigKeys(t *testing.T) {
 func TestStrictConfigKeys_EndToEndFailsAtConstruction(t *testing.T) {
 	t.Parallel()
 
-	path := writeConfigFile(t, "config.yaml", "log-levle: debug\n")
+	path := writeConfigFile(t, "config.yaml", "log-leve1: debug\n")
 
 	_, err := NewCLI(
 		"app",

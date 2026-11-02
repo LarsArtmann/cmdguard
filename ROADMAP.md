@@ -42,6 +42,46 @@ Additional v5 candidates from partially functional items:
 | 7 | Redesign `Package[T](scope, ...)`                | Unusual API shape with pre-existing `*Scope` param                                                                           |
 | 8 | Unify `Middleware[T]` and `ContextMiddleware[T]` | Two signatures coexist since v4 delivered context propagation additively; v5 can collapse to the context-threading signature |
 
+### Flag-representation consolidation (v5 scope, from ADR-002)
+
+A flag is described four times (`FlagTag` → `flagMetadata` → `FlagDescription`
+→ `pflag.Flag`); the inventory and the accepted gaps live in
+[docs/design/2026-11-02_flag-representation-gap-matrix.md](docs/design/2026-11-02_flag-representation-gap-matrix.md).
+v4 tolerates the split because ADR-002 pins one producer per fact and the
+drift gate enforces the docgen hop. v5 collapses the plumbing:
+
+**Target model.**
+
+- One registration-time `flagMeta` value per flag, produced once from struct
+  tags, stored in the cobra annotation as the single durable copy.
+- `FlagDescription` becomes a thin view: contract facts from `flagMeta`,
+  runtime facts (`Deprecated`, `Hidden`) from pflag.
+- `FlagTag` stays the parser's output type but stops being re-read after
+  registration (today `config explain` and `ConfigKeys` re-parse tags from
+  the struct; they would consume the same `flagMeta`).
+- The config-file vocabulary (`v4.ConfigKey`) remains a separate type — file
+  shapes (nested objects, indexed arrays) are not flag shapes — but shares
+  the canonical key.
+- The contract's `Type` field is revisited: pflag's value-type string today,
+  with the JSON type exposed alongside so schema consumers stop guessing.
+
+**Breaking changes for v5.**
+
+- `FlagTag.Type reflect.Type` leaves the public struct (leaky implementation
+  detail; consumers use the string contract).
+- Strict config keys flip to default-on (decision recorded 2026-11-02;
+  `WithStrictConfigKeys()` stays for discoverability; a `Without*` opt-out
+  ships with it).
+- `flagMetadata` JSON may be reshaped freely — it is internal annotation
+  payload, not a consumer surface (ADR-002 §1 applies to `FlagDescription`,
+  not to annotations).
+
+**Migration and effort.** Consumers of the JSON contract are unaffected
+(additive rule). Go-API consumers touching `FlagTag.Type` are rare (the lint
+corpus showed none); a codemod replaces it with the contract string.
+Estimate: 2–3 days including the strict-default flip, migration note, and
+consumer re-verification on erraudit + timesheets.
+
 ---
 
 ## Architectural Directions
@@ -101,6 +141,7 @@ These are unformed ideas that may or may not become features:
 ### Core Library
 
 - **Config file watching** — hot-reload config on file change (inotify/fsnotify)
+- **CUE for the machine contract** — revisit only when a consumer needs to VALIDATE the contract itself (not config files) against a schema, AND cue's Go codegen round-trips cmdguard's struct tags losslessly, AND the build-time cost is measured. Analysis: `docs/status/2026-11-02_04-52_cue-adoption-analysis-and-self-review.md`; decision record: ADR-002 §6. The struct tags are the single declaration surface today — a parallel CUE schema would be a second source of truth until all three criteria hold.
 - **Plugin marketplace** — community-contributed type handlers and validators
 - **gRPC middleware sub-module** — command-level gRPC tracing
 - **Web-based CLI preview** — render command tree as interactive HTML

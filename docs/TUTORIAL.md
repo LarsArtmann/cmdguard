@@ -330,6 +330,37 @@ When using `cli.ExecuteAndExit(ctx)`, the exit code is propagated to `os.Exit`.
 
 ---
 
+## Step 11: Explain Where Values Come From
+
+When a value surprises you at runtime, `config explain` tells you which layer
+won. Opt in when building the CLI:
+
+```go
+cli, _ := v4.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
+    v4.WithConfigExplainCommand(),
+)
+```
+
+```console
+$ taskctl config explain
+FLAG        SOURCE     VALUE    DEFAULT  ENV
+data-dir    default    ./tasks  ./tasks  TASKCTL_DATA_DIR
+log-level   flag       debug    info     TASKCTL_LOG_LEVEL
+```
+
+Sources, in precedence order: `flag`, `environment`, `config-file`, `default`,
+`unset`. For machine consumption, build the CLI with
+`v4.WithOutputFormat(output.FormatJSON)` (importing
+`github.com/larsartmann/go-output`) and the same command emits the versioned
+JSON contract instead. Fields tagged `secret:"true"` (API keys, tokens,
+passwords) are redacted to `***` in every view while still reporting their
+source, so you can audit provenance without leaking credentials.
+
+`app doctor` pairs with this: it reports config file problems (missing file,
+parse failure, unknown keys when strict checking is on) alongside DI health.
+
+---
+
 ## Complete Example
 
 See [`examples/taskctl/`](../examples/taskctl/) for a fully working production-grade CLI that uses every feature described above.

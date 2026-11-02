@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "database": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "Database host",
+          "default": "localhost",
+          "x-cmdguard": {
+            "flag": "db-host",
+            "env": "DB_HOST",
+            "secret": false
+          }
+        },
+        "password": {
+          "type": "string",
+          "description": "Database password",
+          "x-cmdguard": {
+            "flag": "db-password",
+            "secret": true
+          }
+        },
+        "port": {
+          "type": "integer",
+          "description": "Database port",
+          "default": 5432,
+          "minimum": 1,
+          "maximum": 65535,
+          "x-cmdguard": {
+            "flag": "db-port",
+            "secret": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "debug": {
+      "type": "boolean",
+      "description": "Debug mode",
+      "default": false,
+      "x-cmdguard": {
+        "flag": "debug",
+        "secret": false
+      }
+    },
+    "log_level": {
+      "type": "string",
+      "description": "Log level",
+      "default": "info",
+      "enum": [
+        "debug",
+        "info",
+        "warn",
+        "error"
+      ],
+      "x-cmdguard": {
+        "flag": "log-level",
+        "secret": false
+      }
+    },
+    "name": {
+      "type": "string",
+      "description": "Application name",
+      "minLength": 3,
+      "maxLength": 20,
+      "pattern": "^[a-z]+$",
+      "x-cmdguard": {
+        "flag": "name",
+        "secret": false
+      }
+    },
+    "ratio": {
+      "type": "number",
+      "description": "Sampling ratio",
+      "default": 0.5,
+      "minimum": 0,
+      "maximum": 1,
+      "x-cmdguard": {
+        "flag": "ratio",
+        "secret": false
+      }
+    },
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "Server host",
+            "default": "localhost",
+            "x-cmdguard": {
+              "flag": "var-host",
+              "secret": false
+            }
+          },
+          "port": {
+            "type": "integer",
+            "description": "Server port",
+            "default": 8080,
+            "x-cmdguard": {
+              "flag": "var-port",
+              "secret": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags",
+      "items": {
+        "type": "string"
+      },
+      "x-cmdguard": {
+        "flag": "tag",
+        "secret": false
+      }
+    },
+    "timeout": {
+      "type": "string",
+      "description": "Request timeout",
+      "default": "30s",
+      "x-cmdguard": {
+        "flag": "timeout",
+        "format": "duration",
+        "secret": false
+      }
+    },
+    "workers": {
+      "type": "integer",
+      "description": "Worker count",
+      "default": 4,
+      "minimum": 1,
+      "maximum": 64,
+      "x-cmdguard": {
+        "flag": "workers",
+        "secret": false
+      }
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "additionalProperties": false
+}

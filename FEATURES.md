@@ -240,15 +240,22 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ## Config File Loading
 
-| Feature                             | Status              | Notes                                                                                                                         |
-| ----------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `WithConfigFile(paths...)`          | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension                                                                         |
-| `WithConfigFileLoader(loader, ...)` | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                            |
-| `$ENV` and `~` expansion            | 🟢 FULLY_FUNCTIONAL | Path expansion before loading (`cachedHomeDir` via `sync.OnceValue`)                                                          |
-| `--config` flag override            | 🟢 FULLY_FUNCTIONAL | Overrides default search paths                                                                                                |
-| Missing file = silent skip          | 🟢 FULLY_FUNCTIONAL | Not an error when default path missing                                                                                        |
-| Nested struct config                | 🟢 FULLY_FUNCTIONAL | Inner structs flattened; `FieldTag.Index` tracks reflect path                                                                 |
-| `KoanfLoader` (single loader)       | 🟢 FULLY_FUNCTIONAL | Consolidated: koanf as format parser → JSON → `loadConfigFromJSON` (case-insensitive matching). `configload` package deleted. |
+| Feature                             | Status              | Notes                                                                                                                                                                |
+| ----------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WithConfigFile(paths...)`          | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension                                                                                                                |
+| `WithConfigFileLoader(loader, ...)` | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                                                                   |
+| `$ENV` and `~` expansion            | 🟢 FULLY_FUNCTIONAL | Path expansion before loading (`cachedHomeDir` via `sync.OnceValue`)                                                                                                 |
+| `--config` flag override            | 🟢 FULLY_FUNCTIONAL | Overrides default search paths                                                                                                                                       |
+| Missing file = silent skip          | 🟢 FULLY_FUNCTIONAL | Not an error when default path missing                                                                                                                               |
+| Nested struct config                | 🟢 FULLY_FUNCTIONAL | Inner structs flattened; `FieldTag.Index` tracks reflect path                                                                                                        |
+| `KoanfLoader` (single loader)       | 🟢 FULLY_FUNCTIONAL | Consolidated: koanf as format parser → JSON → `loadConfigFromJSON` (case-insensitive matching). `configload` package deleted.                                        |
+| Strict config keys                  | 🟢 FULLY_FUNCTIONAL | `WithStrictConfigKeys()` (opt-in, on inside `WithBatteries()`); unknown keys → `ErrConfigUnknownKey` with dotted path, file, and suggestion; tolerant mode unchanged |
+| Key-spelling vocabulary             | 🟢 FULLY_FUNCTIONAL | Canonical key (json tag else field name) + flag name + case/hyphen/underscore foldings, all accepted everywhere (`config_keys.go`)                                   |
+| `config explain`                    | 🟢 FULLY_FUNCTIONAL | `WithConfigExplainCommand()`; table + JSON provenance (flag/env/config-file/default/unset) via `CLI.ExplainConfig()`                                                 |
+| `secret:"true"` tag                 | 🟢 FULLY_FUNCTIONAL | Redaction to `***` in explain/contract/docs/schema (`v4.RedactedValue` exported)                                                                                     |
+| `CLI.ConfigDiagnostics()`           | 🟢 FULLY_FUNCTIONAL | doctor reports config path, parse, unknown-key, and schema problems                                                                                                  |
+| `v4.ConfigKeys(cfg)`                | 🟢 FULLY_FUNCTIONAL | Public config vocabulary; single source for strict checking and schema emission                                                                                      |
+| `schema` sub-module                 | 📦 `SUB-MODULE`     | JSON Schema 2020-12 emitter (`FromConfig`/`FromCLI`/`Emit`/`Marshal`), `additionalProperties: false`, deterministic output; experimental surface                     |
 
 ### Flag Priority Chain
 
