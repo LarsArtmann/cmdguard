@@ -27,8 +27,8 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.3 // indirect
-	github.com/larsartmann/go-atomic-write v0.6.0 // indirect
-	github.com/larsartmann/go-branded-id v0.7.0 // indirect
+	github.com/larsartmann/go-atomic-write v0.6.1 // indirect
+	github.com/larsartmann/go-branded-id v0.7.1 // indirect
 	github.com/larsartmann/go-error-family v0.12.0 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
 	github.com/larsartmann/go-output/d2 v0.38.7 // indirect
@@ -76,11 +76,11 @@ require (
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/v2 v2.4.1
-	github.com/larsartmann/cmdguard/flightrecorder v0.1.0
-	github.com/larsartmann/cmdguard/glamour v0.2.0
-	github.com/larsartmann/cmdguard/spinner v0.2.0
+	github.com/larsartmann/cmdguard/flightrecorder v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/glamour v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/spinner v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/go-output v0.38.7
-	github.com/larsartmann/samber-do-auditlog v0.11.0
+	github.com/larsartmann/samber-do-auditlog v0.12.1
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10

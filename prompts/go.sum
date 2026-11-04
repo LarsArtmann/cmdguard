@@ -79,10 +79,10 @@ github.com/knadh/koanf/parsers/yaml v1.1.1 h1:u70vV5IyaM0HvONh8HoqBC97oTgO33KcpZ
 github.com/knadh/koanf/parsers/yaml v1.1.1/go.mod h1:HHmcHXUrp9cOPcuC+2wrr44GTUB0EC+PyfN3HZD9tFg=
 github.com/knadh/koanf/v2 v2.4.1 h1:MK2JDkLy4UGzEUkW1CCCKQftd9+M+NX8hAZ2axbf/jo=
 github.com/knadh/koanf/v2 v2.4.1/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
-github.com/larsartmann/go-atomic-write v0.6.0 h1:+f7NE8pEe4Fqb6u+2sCtB9dOWWfgwjdTn24o3hMjY5o=
-github.com/larsartmann/go-atomic-write v0.6.0/go.mod h1:2Mj3sw25Lx5dN3WjOC6O/p9nGxcU/jjn977CanerqcU=
-github.com/larsartmann/go-branded-id v0.7.0 h1:k5KT50Kh0WmeniH0rQ3Gvm2RdSAQFZtuRhXWDtQkWhU=
-github.com/larsartmann/go-branded-id v0.7.0/go.mod h1:gM5FhB6d23qZO8hIU/rHpUnm/6dwKy9UGMhgvXDqNsc=
+github.com/larsartmann/go-atomic-write v0.6.1 h1:lL4arpBDRh70H1ktdS37bu4VswO5PekGgjfynwqcbrM=
+github.com/larsartmann/go-atomic-write v0.6.1/go.mod h1:rIkglf/MmsaEMMWykVE6wFwvDHtfcYm5t2qb4m9C+VU=
+github.com/larsartmann/go-branded-id v0.7.1 h1:w68pg/t74AM8PsTVVw7VkL3vq2C70zLH1jFxJCJwLPk=
+github.com/larsartmann/go-branded-id v0.7.1/go.mod h1:gM5FhB6d23qZO8hIU/rHpUnm/6dwKy9UGMhgvXDqNsc=
 github.com/larsartmann/go-error-family v0.12.0 h1:HEtocvwaPe9udDusqDqV0pxN9Wx98KHQBK0MEHZupzg=
 github.com/larsartmann/go-error-family v0.12.0/go.mod h1:gB43rKC69SoPilihuze43OFqKYMGQxDNUi/25PF9MgE=
 github.com/larsartmann/go-ndjson v0.0.1 h1:wchwH5pv+0ZnFem/WrlGZA8dDGvZumT+OcVn5dbou3A=
@@ -115,8 +115,8 @@ github.com/larsartmann/go-output/testhelpers/graphtest v0.38.5 h1:ynYEtkHWtqh+F3
 github.com/larsartmann/go-output/testhelpers/graphtest v0.38.5/go.mod h1:kNkMg2CzD6EHn7APJLZEHh7KFgRtWGmtWeYkM+4GZ1c=
 github.com/larsartmann/go-output/tree v0.38.7 h1:NdmX+Ydxlz1JIt3DfIl2jngZp56x703y70zJ8eRaXJQ=
 github.com/larsartmann/go-output/tree v0.38.7/go.mod h1:ls6UUCL3oXG6YawQVZZIqwesA3W5fc/Bz08rDCNMD/Q=
-github.com/larsartmann/samber-do-auditlog v0.11.0 h1:3wA194yEIESUe0CNapIceHLPpJ4u8DHj5XRmWH5qxo8=
-github.com/larsartmann/samber-do-auditlog v0.11.0/go.mod h1:GbGs3CNXBM+CescSeZhHHYhKxWtvHt3MoeKq9viZKBA=
+github.com/larsartmann/samber-do-auditlog v0.12.1 h1:gvZ4tduM8kq/4gX9g6QsScsvPz+LrcSJkwu8cz2RfyU=
+github.com/larsartmann/samber-do-auditlog v0.12.1/go.mod h1:NJYJfA5FGY6kyMrIVPDo1Y42hvoRYlrFpNFZsdHAaT8=
 github.com/lucasb-eyer/go-colorful v1.4.1 h1:1EO+WB73+EH8EVbzlrG3KLAfEypQWVHIBqlTf+2hNss=
 github.com/lucasb-eyer/go-colorful v1.4.1/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-runewidth v0.0.31 h1:1oCV4ReTlosDBc6rYRw5cL8S/4y8iv5oRl4SJ5IBgwo=
