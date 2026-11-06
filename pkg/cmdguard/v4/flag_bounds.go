@@ -102,11 +102,12 @@ func (r *FlagRegistry) validateDefaults() error {
 func validateTagDefault(tag FlagTag, vr *validatorRegistry) error {
 	if len(tag.Values) > 0 && !slices.Contains(tag.Values, tag.Default) {
 		return fmt.Errorf(
-			"%w: flag %q default %q, allowed: %v",
+			"%w: flag %q default %q, allowed: %v: %w",
 			ErrInvalidFlagDefault,
 			tag.Name,
 			tag.Default,
 			tag.Values,
+			ErrInvalidEnum,
 		)
 	}
 

@@ -31,20 +31,9 @@ func TestValidateFlags_StringMinMeansLength(t *testing.T) {
 	testutil.AssertNoError(t, registry.ValidateFlags(cmd))
 }
 
-func TestValidateFlags_DefaultValueIsValidated(t *testing.T) {
-	t.Parallel()
-
-	type defaultConfig struct {
-		Mode string `flag:"mode" default:"bogus" values:"dev,prod"`
-	}
-
-	registry, cmd := setupFlagTest(t, defaultConfig{})
-
-	err := registry.ValidateFlags(cmd)
-	if !errors.Is(err, ErrInvalidEnum) {
-		t.Fatalf("expected an invalid default enum to fail validation, got: %v", err)
-	}
-}
+// TestValidateFlags_DefaultValueIsValidated was retired: an invalid default
+// now fails construction (TestNewFlagRegistry_RejectsInvalidEnumDefault in
+// flag_defaults_test.go) instead of surviving to run time.
 
 func TestValidateFlags_EnvValueIsValidated(t *testing.T) {
 	type envConfig struct {

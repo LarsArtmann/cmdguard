@@ -46,6 +46,24 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Fixed
 
+- **`min`/`max` validate rules now resolve in the flag type's domain.**
+  Duration-typed flags (`v4.Duration` and `time.Duration`) compare bounds as
+  durations, so `validate:"min=10s,max=1m"` means ten seconds and one minute —
+  previously the numeric validators parsed the value text as a plain number
+  and failed with "invalid validator parameter" (or, for `time.Duration`,
+  silently compared nanoseconds). Textual parsed types (URL, Email, HostPort,
+  FilePath) fall back to length bounds instead of failing to parse as
+  numbers. String kinds keep the existing length semantics, numeric kinds and
+  Port keep numeric semantics. The same resolution now applies to
+  `ValidateConfig`, which previously validated the raw tag text without the
+  string length rewrite.
+- **Impossible flag defaults now fail at construction, not on the first
+  run.** `NewFlagRegistry` (and therefore `NewCommand`/`NewCLI`) validates
+  every tag default against that tag's `values` and `validate` rules and
+  rejects violations with the new `ErrInvalidFlagDefault` sentinel. Defaults
+  whose `validate` tag names a validator registered after construction are
+  skipped at construction time and remain enforced at run time, so the
+  register-after-construction pattern keeps working.
 - **Config values in camelCase, lowercase, or snake_case no longer lose the
   race against flag defaults.** Key matching accepted `{"LogLevel": "debug"}`
   (case-insensitive JSON decoding) while the "which fields did the file set?"

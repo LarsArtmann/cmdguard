@@ -466,7 +466,7 @@ func validateFieldByKind(field reflect.Value, tag FlagTag, vr *validatorRegistry
 
 	strValue := formatFieldValue(field)
 
-	return runValidateTagWithRegistry(tag.Validate, strValue, vr)
+	return runValidateTagWithRegistry(validateExprForType(tag), strValue, vr)
 }
 
 // runValidateTagWithRegistry runs all validators specified in a validate tag using the given registry.
