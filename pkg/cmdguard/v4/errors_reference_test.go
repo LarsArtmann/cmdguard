@@ -4,7 +4,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-
 )
 
 // errorReferencePath is the committed doc the generated table must match.
@@ -18,6 +17,27 @@ func TestErrorReferenceDoc(t *testing.T) { //nolint:paralleltest // rewrites a r
 
 	content := string(doc)
 
+	generated := GenerateErrorReference()
+
+	if *updateGolden {
+		spliced := content
+
+		start := strings.Index(content, errorRefBegin)
+		stop := strings.Index(content, errorRefEnd)
+
+		if start >= 0 && stop >= start {
+			spliced = content[:start] + generated + content[stop+len(errorRefEnd):]
+		} else {
+			spliced = content + "\n" + generated + "\n"
+		}
+
+		if writeErr := os.WriteFile(errorReferencePath, []byte(spliced), 0o644); writeErr != nil {
+			t.Fatalf("rewriting error reference doc: %v", writeErr)
+		}
+
+		return
+	}
+
 	begin := strings.Count(content, errorRefBegin)
 	end := strings.Count(content, errorRefEnd)
 	if begin != 1 || end != 1 {
@@ -28,17 +48,6 @@ func TestErrorReferenceDoc(t *testing.T) { //nolint:paralleltest // rewrites a r
 	stop := strings.Index(content, errorRefEnd) + len(errorRefEnd)
 	if stop < start {
 		t.Fatal("error reference markers are out of order")
-	}
-
-	generated := GenerateErrorReference()
-
-	if *updateGolden {
-		spliced := content[:start] + generated + content[stop:]
-		if writeErr := os.WriteFile(errorReferencePath, []byte(spliced), 0o644); writeErr != nil {
-			t.Fatalf("rewriting error reference doc: %v", writeErr)
-		}
-
-		return
 	}
 
 	current := content[start:stop]
@@ -70,7 +79,7 @@ func TestGenerateErrorReference(t *testing.T) {
 		}
 	}
 
-	if strings.Count(ref, "### ") == 0 {
-		t.Fatal("expected at least one class section")
+	if !strings.Contains(ref, "### flag errors") {
+		t.Fatal("expected class sections in the generated reference")
 	}
 }
