@@ -9,6 +9,22 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Added
 
+- **Stable machine error codes (`ErrorCode(err)`, envelope `error_code`).**
+  Every sentinel now carries a stable lowercase snake_case code
+  (`required_flag`, `config_unknown_key`, …) that survives Go identifier
+  renames, so scripts and agents can switch on failures without parsing
+  messages. The machine-readable error envelope (`--output json|yaml|toml`)
+  gains an additive `error_code` field; the human error path is unchanged.
+  Sentinel facts (identifier, envelope class, code, hint) live in ONE
+  canonical table, so hint coverage, error classification, and codes cannot
+  drift apart — and run-time errors that previously classified as `"unknown"`
+  in the envelope (invalid URL/email/duration values, command timeouts,
+  editor failures) now carry their real class.
+- **Generated, drift-guarded error reference.** `docs/ERROR_REFERENCE.md`'s
+  sentinel table is rendered from the same canonical fact table via
+  `GenerateErrorReference()`; a test fails when the committed doc stops
+  matching the code. Regenerate with
+  `go test ./pkg/cmdguard/v4 -run TestErrorReferenceDoc -update-golden`.
 - **Strict config keys, opt in (`WithStrictConfigKeys()`).** Unknown keys in a
   config file are now an error instead of a silent no-op, with the offending
   dotted key, the loaded file path, and a "did you mean" suggestion for likely
