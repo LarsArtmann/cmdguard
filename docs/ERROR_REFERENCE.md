@@ -1,7 +1,13 @@
 # Error Reference — cmdguard v4
 
-**Auto-generated from source:** `pkg/cmdguard/v4/errors_*.go`, `types_*.go`
-**Last updated:** 2026-11-01
+**The sentinel table is generated from source** and drift-guarded by a test:
+the facts (code, class, message, hint) come from the canonical sentinel fact
+table in `pkg/cmdguard/v4/errors_facts.go`, and the doc cannot say anything
+the code does not. Regenerate the bracketed section with:
+
+```bash
+go test ./pkg/cmdguard/v4 -run TestErrorReferenceDoc -update-golden
+```
 
 ---
 
@@ -15,6 +21,36 @@ if errors.Is(err, v4.ErrRequiredFlag) {
 }
 ```
 
+Prefer the stable machine code when the consumer is a script or an agent:
+it survives identifier renames and reads from the JSON error envelope without
+parsing messages.
+
+```go
+code := v4.ErrorCode(err) // "required_flag", "" when unknown
+```
+
+## Machine error codes
+
+`ErrorCode(err)` returns one stable lowercase snake_case code per sentinel
+(`""` when the error wraps no cmdguard sentinel). Machine-readable output
+(`--output json|yaml|toml`) carries it in the JSON error envelope:
+
+```json
+{
+  "error": {
+    "type": "flag",
+    "message": "required flag not set: name",
+    "hint": "pass the flag on the command line, or set its env var or config-file value",
+    "error_code": "required_flag",
+    "code": 1
+  }
+}
+```
+
+The envelope fields mean: `type` is the error class, `message` the stable
+error text, `hint` the actionable fix, `error_code` the stable machine code,
+and `code` the process exit code.
+
 ## Actionable hints
 
 `ErrorHint(err)` returns one sentence describing how to fix the failure, or
@@ -27,22 +63,17 @@ if hint := v4.ErrorHint(err); hint != "" {
 ```
 
 Hints are separate from messages so error text stays stable for parsing and
-tests. Machine-readable output includes the same hint as `hint` in the JSON
-error envelope:
+tests. Every sentinel with a fact-table row has a hint; a test fails when a
+new sentinel is added without one.
 
-```json
-{
-  "error": {
-    "type": "flag",
-    "message": "required flag not set: name",
-    "hint": "pass the flag on the command line, or set its env var or config-file value",
-    "code": 1
-  }
-}
-```
+## Exit codes
 
-Every sentinel used by the JSON classifier has a hint; a test fails when a newly
-classified sentinel is missing one.
+`ExecuteAndExit` is the blessed entry point: exit `0` on success, `1` on a
+failure with no explicit code, and the `ExitCoder` code when the error chain
+carries one (0–255, validated by `NewExitError`). A zero code from a
+third-party `ExitCoder` is treated as "not set" and falls back to `1`, so a
+failed CLI can never exit `0`. `ExitCode(err)` exposes the same mapping for
+post-execution teardown that needs the code before exiting.
 
 ## Typed Errors
 
@@ -59,115 +90,5 @@ classified sentinel is missing one.
 
 All typed errors implement `Unwrap()` for `errors.Is()`/`errors.As()` chaining.
 
-## Sentinel Errors by Category
+## Sentinel Errors
 
-### Command Errors
-
-| Sentinel              | Message                                            | Source File       |
-| --------------------- | -------------------------------------------------- | ----------------- |
-| `ErrInvalidCommand`   | `"invalid command"`                                | errors_command.go |
-| `ErrMissingHandler`   | `"command has no handler"`                         | errors_command.go |
-| `ErrMissingName`      | `"command has no name"`                            | errors_command.go |
-| `ErrMissingShort`     | `"command has no short description"`               | errors_command.go |
-| `ErrMissingLong`      | `"command has no long description"`                | errors_command.go |
-| `ErrMissingExample`   | `"command has no example"`                         | errors_command.go |
-| `ErrMissingVersion`   | `"version is required but not set"`                | errors.go         |
-| `ErrDuplicateCommand` | `"duplicate command"`                              | errors_command.go |
-| `ErrCommandPanic`     | `"command panicked"`                               | errors_command.go |
-| `ErrNegativeArgCount` | `"argument count must not be negative"`            | errors_command.go |
-| `ErrInvalidArgRange`  | `"minimum argument count must not exceed maximum"` | errors_command.go |
-
-### Flag Errors
-
-| Sentinel                   | Message                            | Source File     |
-| -------------------------- | ---------------------------------- | --------------- |
-| `ErrFlagParseFailed`       | `"failed to parse flags"`          | errors_flags.go |
-| `ErrFlagNotFound`          | `"flag not found"`                 | errors_flags.go |
-| `ErrFlagInstance`          | `"failed to create flag instance"` | errors_flags.go |
-| `ErrRequiredFlag`          | `"required flag not set"`          | errors_flags.go |
-| `ErrInvalidFlagType`       | `"invalid flag type"`              | errors_flags.go |
-| `ErrUnknownValidator`      | `"unknown validator"`              | errors_flags.go |
-| `ErrInvalidValidatorParam` | `"invalid validator parameter"`    | errors_flags.go |
-
-### Config Errors
-
-| Sentinel                | Message                                | Source File      |
-| ----------------------- | -------------------------------------- | ---------------- |
-| `ErrConfigNil`          | `"config must not be nil"`             | errors_config.go |
-| `ErrConfigNotPointer`   | `"config must be a pointer to struct"` | errors_config.go |
-| `ErrConfigValidation`   | `"config validation failed"`           | errors_config.go |
-| `ErrConfigFileLoad`     | `"failed to load config file"`         | errors_config.go |
-| `ErrConfigFileNotFound` | `"config file not found"`              | errors_config.go |
-| `ErrConfigFileParse`    | `"failed to parse config file"`        | errors_config.go |
-| `ErrConfigFileRead`     | `"failed to read config file"`         | errors_config.go |
-| `ErrFieldNotFound`      | `"field not found"`                    | errors_config.go |
-| `ErrFieldNotSettable`   | `"field is not settable"`              | errors_config.go |
-
-### DI / Scope Errors
-
-| Sentinel                 | Message                         | Source File  |
-| ------------------------ | ------------------------------- | ------------ |
-| `ErrInvalidScope`        | `"invalid scope"`               | errors_di.go |
-| `ErrServiceNotFound`     | `"service not found"`           | errors_di.go |
-| `ErrServiceConstruction` | `"service construction failed"` | errors_di.go |
-| `ErrServiceRegistration` | `"service registration failed"` | errors_di.go |
-
-### Type & Value Errors
-
-| Sentinel                   | Message                           | Source File |
-| -------------------------- | --------------------------------- | ----------- |
-| `ErrInvalidEnum`           | `"invalid enum value"`            | errors.go   |
-| `ErrInvalidDuration`       | `"invalid duration"`              | errors.go   |
-| `ErrInvalidURL`            | `"invalid URL"`                   | errors.go   |
-| `ErrInvalidEmail`          | `"invalid email address"`         | errors.go   |
-| `ErrInvalidPort`           | `"invalid port"`                  | errors.go   |
-| `ErrInvalidFilePath`       | `"invalid file path"`             | errors.go   |
-| `ErrInvalidHostPort`       | `"invalid host:port"`             | errors.go   |
-| `ErrLogLevel`              | `"invalid log level"`             | errors.go   |
-| `ErrLogFormat`             | `"invalid log format"`            | errors.go   |
-| `ErrTypeConversion`        | `"type conversion failed"`        | errors.go   |
-| `ErrUnsupportedConversion` | `"unsupported string conversion"` | errors.go   |
-| `ErrNilValue`              | `"value must not be nil"`         | errors.go   |
-
-### Validation Errors
-
-| Sentinel                  | Message                          | Source File |
-| ------------------------- | -------------------------------- | ----------- |
-| `ErrValueEmpty`           | `"value is empty"`               | errors.go   |
-| `ErrValueTooShort`        | `"value too short"`              | errors.go   |
-| `ErrValueTooLong`         | `"value too long"`               | errors.go   |
-| `ErrValueTooSmall`        | `"value too small"`              | errors.go   |
-| `ErrValueTooLarge`        | `"value too large"`              | errors.go   |
-| `ErrValuePatternMismatch` | `"value does not match pattern"` | errors.go   |
-
-### Output Errors
-
-| Sentinel                     | Message                        | Source File |
-| ---------------------------- | ------------------------------ | ----------- |
-| `ErrUnsupportedFormat`       | `"unsupported output format"`  | errors.go   |
-| `ErrFormatRequiresTypedData` | `"format requires typed data"` | errors.go   |
-
-### Editor Errors
-
-| Sentinel            | Message                                   | Source File |
-| ------------------- | ----------------------------------------- | ----------- |
-| `ErrEditorTempFile` | `"failed to create temp file for editor"` | errors.go   |
-| `ErrEditorWrite`    | `"failed to write to temp file"`          | errors.go   |
-| `ErrEditorRun`      | `"editor execution failed"`               | errors.go   |
-| `ErrEditorRead`     | `"failed to read edited file"`            | errors.go   |
-
-### Exit & Doctor Errors
-
-| Sentinel             | Message                                 | Source File |
-| -------------------- | --------------------------------------- | ----------- |
-| `ErrInvalidExitCode` | `"exit code must be between 0 and 255"` | errors.go   |
-| `ErrDoctorFailed`    | `"doctor checks failed"`                | errors.go   |
-
-### Unused (reserved for future use)
-
-| Sentinel | Message | Source File |
-| -------- | ------- | ----------- |
-
----
-
-**Total: 62 sentinel errors, 8 typed error constructors**

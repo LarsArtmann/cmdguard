@@ -53,9 +53,9 @@ func TestErrorHint(t *testing.T) {
 	t.Run("every classified sentinel has a hint", func(t *testing.T) {
 		t.Parallel()
 
-		for _, entry := range errorTypeNames() {
-			if ErrorHint(entry.match) == "" {
-				t.Errorf("sentinel %q (class %q) has no actionable hint", entry.match, entry.name)
+		for _, fact := range sentinelFacts() {
+			if fact.hint == "" || ErrorCode(fact.match) == "" {
+				t.Errorf("sentinel %q lacks a hint or machine error code", fact.match)
 			}
 		}
 	})

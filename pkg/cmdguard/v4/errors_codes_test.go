@@ -72,9 +72,9 @@ func TestErrorCode(t *testing.T) {
 	t.Run("every classified sentinel has a code", func(t *testing.T) {
 		t.Parallel()
 
-		for _, entry := range errorTypeNames() {
-			if ErrorCode(entry.match) == "" {
-				t.Errorf("sentinel %q (class %q) has no machine error code", entry.match, entry.name)
+		for _, fact := range sentinelFacts() {
+			if ErrorCode(fact.match) == "" || fact.class == "" || fact.name == "" {
+				t.Errorf("sentinel %q lacks code, class, or name", fact.match)
 			}
 		}
 	})

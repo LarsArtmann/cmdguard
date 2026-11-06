@@ -24,57 +24,16 @@ type jsonErrorDetail struct {
 	Code      int    `json:"code,omitempty"`
 }
 
-type errorTypeEntry struct {
-	match error
-	name  string
-}
-
-func errorTypeNames() []errorTypeEntry {
-	return []errorTypeEntry{
-		{ErrFlagParseFailed, "flag"},
-		{ErrRequiredFlag, "flag"},
-		{ErrFlagNotFound, "flag"},
-		{ErrInvalidFlagType, "flag"},
-		{ErrInvalidEnum, "flag"},
-		{ErrValueTooShort, "flag"},
-		{ErrValueTooLong, "flag"},
-		{ErrValueTooSmall, "flag"},
-		{ErrValueTooLarge, "flag"},
-		{ErrValueOutOfRange, "flag"},
-		{ErrValuePatternMismatch, "flag"},
-		{ErrValueEmpty, "flag"},
-		{ErrInvalidFlagDefault, "flag"},
-		{ErrConfigValidation, "config"},
-		{ErrConfigNil, "config"},
-		{ErrConfigNotPointer, "config"},
-		{ErrConfigFileLoad, "config"},
-		{ErrConfigFileRead, "config"},
-		{ErrConfigFileParse, "config"},
-		{ErrConfigFileNotFound, "config"},
-		{ErrInvalidCommand, "command"},
-		{ErrMissingHandler, "command"},
-		{ErrMissingName, "command"},
-		{ErrDuplicateCommand, "command"},
-		{ErrCommandPanic, "command"},
-		{ErrServiceNotFound, "service"},
-		{ErrServiceConstruction, "service"},
-		{ErrServiceRegistration, "service"},
-		{ErrInvalidScope, "service"},
-		{ErrUnsupportedFormat, "output"},
-		{ErrFormatRequiresTypedData, "output"},
-		{ErrUnsupportedAuditLogFormat, "audit"},
-		{ErrInvalidExitCode, "exit_code"},
-	}
-}
-
+// classifyError names the error class for the JSON envelope's type field.
+// It walks the canonical sentinel fact table most-specific-first; an error
+// that wraps no cmdguard sentinel classifies as "unknown".
 func classifyError(err error) string {
-	for _, entry := range errorTypeNames() {
-		if errors.Is(err, entry.match) {
-			return entry.name
-		}
+	fact, ok := classifySentinel(err)
+	if !ok {
+		return "unknown"
 	}
 
-	return "unknown"
+	return fact.class
 }
 
 func extractExitCode(err error) int {
