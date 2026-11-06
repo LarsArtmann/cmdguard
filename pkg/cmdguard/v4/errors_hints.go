@@ -32,6 +32,10 @@ func errorHints() []errorHint {
 		{ErrValueEmpty, "provide a non-empty value for this flag"},
 		{ErrUnknownValidator, "use a validator registered with RegisterValidator, or fix the validate tag spelling"},
 		{ErrInvalidValidatorParam, "fix the parameter syntax in the flag's validate tag"},
+		{
+			ErrInvalidFlagDefault,
+			"fix the flag's default so it satisfies the same tag's values and validate rules",
+		},
 		{ErrUnsupportedFormat, "run with --help to see the supported output formats"},
 		{ErrFormatRequiresTypedData, "emit typed rows or values, or choose a text format instead"},
 		{ErrUnsupportedAuditLogFormat, "choose one of the formats accepted by ParseAuditLogFormat"},

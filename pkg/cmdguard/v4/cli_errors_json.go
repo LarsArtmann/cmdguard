@@ -42,6 +42,7 @@ func errorTypeNames() []errorTypeEntry {
 		{ErrValueOutOfRange, "flag"},
 		{ErrValuePatternMismatch, "flag"},
 		{ErrValueEmpty, "flag"},
+		{ErrInvalidFlagDefault, "flag"},
 		{ErrConfigValidation, "config"},
 		{ErrConfigNil, "config"},
 		{ErrConfigNotPointer, "config"},

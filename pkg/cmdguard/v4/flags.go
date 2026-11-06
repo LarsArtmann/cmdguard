@@ -61,12 +61,18 @@ func NewFlagRegistry(cfg any) (*FlagRegistry, error) {
 		return nil, fmt.Errorf("%w: parsing flag tags for %T: %w", ErrFlagParseFailed, cfg, err)
 	}
 
-	return &FlagRegistry{
+	registry := &FlagRegistry{
 		tags:             tags,
 		validators:       globalValidators.share(),
 		types:            globalTypeRegistry.share(),
 		declaredDefaults: declaredDefaults(tags),
-	}, nil
+	}
+
+	if err := registry.validateDefaults(); err != nil {
+		return nil, fmt.Errorf("validating flag defaults for %T: %w", cfg, err)
+	}
+
+	return registry, nil
 }
 
 // declaredDefaults extracts the default value of each tag. It runs before any
@@ -333,12 +339,7 @@ func (r *FlagRegistry) validateTagRules(cmd *cobra.Command, tag FlagTag) error {
 		return nil
 	}
 
-	expr := tag.Validate
-	if tag.Type != nil && tag.Type.Kind() == reflect.String {
-		// min/max on a string field mean length; using the numeric validators
-		// would try to parse the text as a number and fail confusingly.
-		expr = stringLengthRules(expr)
-	}
+	expr := validateExprForType(tag)
 
 	rules, err := parseValidateRulesWithRegistry(expr, r.validators)
 	if err != nil {

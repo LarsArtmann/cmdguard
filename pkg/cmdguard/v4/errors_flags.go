@@ -64,4 +64,9 @@ var (
 
 	// ErrNilValue indicates a required value was nil.
 	ErrNilValue = errors.New("value must not be nil")
+
+	// ErrInvalidFlagDefault indicates a flag tag default violates the same
+	// tag's values/validate rules. It surfaces at construction
+	// (NewFlagRegistry/NewCommand/NewCLI) so the mistake dies where it is made.
+	ErrInvalidFlagDefault = errors.New("invalid flag default")
 )

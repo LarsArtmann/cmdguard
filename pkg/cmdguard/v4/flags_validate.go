@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 	"unicode/utf8"
 )
 
@@ -60,6 +61,8 @@ func (r *validatorRegistry) registerBuiltins() {
 	r.validators["maxlen"] = validateMaxLen
 	r.validators["min"] = validateMin
 	r.validators["max"] = validateMax
+	r.validators["dmin"] = validateDurationMin
+	r.validators["dmax"] = validateDurationMax
 	r.validators["regex"] = validateRegex
 	r.validators["nonempty"] = validateNonEmpty
 }
@@ -324,6 +327,70 @@ func validateMax(value string) error {
 	}
 
 	return nil
+}
+
+func validateDurationMin(value string) error {
+	bound, actual, err := parseLabeledDuration(value, "dmin")
+	if err != nil {
+		return err
+	}
+
+	if actual < bound {
+		return fmt.Errorf("%w: %v must be at least %v", ErrValueTooSmall, actual, bound)
+	}
+
+	return nil
+}
+
+func validateDurationMax(value string) error {
+	bound, actual, err := parseLabeledDuration(value, "dmax")
+	if err != nil {
+		return err
+	}
+
+	if actual > bound {
+		return fmt.Errorf("%w: %v must be at most %v", ErrValueTooLarge, actual, bound)
+	}
+
+	return nil
+}
+
+// parseLabeledDuration splits a "param:value" string into a duration parameter
+// and a duration value. The bound parameter must carry a unit ("10s"); a unit
+// value is accepted too, so a raw nanosecond count from a time.Duration flag
+// stays comparable.
+func parseLabeledDuration(value, label string) (time.Duration, time.Duration, error) {
+	paramStr, val, ok := strings.Cut(value, ":")
+	if !ok {
+		return 0, 0, fmt.Errorf("%w: %s requires format \"%s:10s\"", ErrInvalidValidatorParam, label, label)
+	}
+
+	param, err := time.ParseDuration(paramStr)
+	if err != nil {
+		return 0, 0, fmt.Errorf("%w: %s: invalid duration bound %q", ErrInvalidValidatorParam, label, paramStr)
+	}
+
+	actual, err := parseDurationValue(val)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return param, actual, nil
+}
+
+// parseDurationValue parses a duration in either Go duration syntax ("30s")
+// or as a bare nanosecond count, which is what time.Duration prints as.
+func parseDurationValue(val string) (time.Duration, error) {
+	if d, err := time.ParseDuration(val); err == nil {
+		return d, nil
+	}
+
+	nanos, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("%w: %q is not a valid duration", ErrInvalidDuration, val)
+	}
+
+	return time.Duration(nanos), nil
 }
 
 // parseLabeledFloat splits a "param:value" string into a float64 parameter and a float64 value.
