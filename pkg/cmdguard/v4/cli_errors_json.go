@@ -17,10 +17,11 @@ type jsonErrorEnvelope struct {
 }
 
 type jsonErrorDetail struct {
-	Type    string `json:"type"`
-	Message string `json:"message"`
-	Hint    string `json:"hint,omitempty"`
-	Code    int    `json:"code,omitempty"`
+	Type      string `json:"type"`
+	Message   string `json:"message"`
+	Hint      string `json:"hint,omitempty"`
+	ErrorCode string `json:"error_code,omitempty"`
+	Code      int    `json:"code,omitempty"`
 }
 
 type errorTypeEntry struct {
@@ -121,10 +122,11 @@ func ExitCode(err error) int {
 func writeJSONError(w io.Writer, err error) error {
 	envelope := jsonErrorEnvelope{
 		Error: jsonErrorDetail{
-			Type:    classifyError(err),
-			Message: err.Error(),
-			Hint:    ErrorHint(err),
-			Code:    extractExitCode(err),
+			Type:      classifyError(err),
+			Message:   err.Error(),
+			Hint:      ErrorHint(err),
+			ErrorCode: ErrorCode(err),
+			Code:      extractExitCode(err),
 		},
 	}
 
