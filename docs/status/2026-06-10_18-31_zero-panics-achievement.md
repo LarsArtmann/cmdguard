@@ -16,6 +16,7 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 
 ### Panic Elimination (This Session)
 
+<!-- check-rows:ledger -->
 | What                                              | Status      | Details                                                        |
 | ------------------------------------------------- | ----------- | -------------------------------------------------------------- |
 | `MustNewCommand` / `MustNewParentCommand`         | **Deleted** | Removed from `command.go`                                      |
@@ -42,6 +43,7 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 
 ### Previous Sprint (Committed Before Panic Work)
 
+<!-- check-rows:ledger -->
 | What                                                         | Commit    | Details                      |
 | ------------------------------------------------------------ | --------- | ---------------------------- |
 | `formatFieldValue` tests                                     | `b62aed4` | 10 subtests                  |
@@ -60,6 +62,7 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 
 ## B) PARTIALLY DONE
 
+<!-- check-rows:ledger -->
 | Area                          | Status             | What's Left                                                                                                                                                              |
 | ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | FEATURES.md                   | **Stale**          | Still lists `MustNewCommand`, `MustVersionCommand`, `MustDoctorCommand`, `MustParse[T]`, `MustParseEmail`, etc. as ✅ FULLY_FUNCTIONAL. These functions no longer exist. |
@@ -77,26 +80,26 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 
 | #  | Task                                                                    | Category    | Impact | Effort |
 | -- | ----------------------------------------------------------------------- | ----------- | ------ | ------ |
-| 1  | Update FEATURES.md: remove all Must\* entries, add "Zero Panics" badge  | Docs        | High   | 30m    |
-| 2  | Update TODO_LIST.md: reflect v2.5.0 state, mark P6 Must\* items as done | Docs        | Medium | 15m    |
-| 3  | Update ROADMAP.md: mark Package() redesign as done                      | Docs        | Low    | 5m     |
-| 4  | Audit README.md for Must\* references                                   | Docs        | High   | 15m    |
-| 5  | Audit docs/_.md for Must_ references                                    | Docs        | Medium | 20m    |
-| 6  | Add `CODECOV_TOKEN` to GitHub repo settings                             | CI          | Medium | 5m     |
-| 7  | Nested struct config file support                                       | Feature     | High   | 3-5d   |
-| 8  | Plugin system for validators/type handlers                              | Feature     | High   | 3-5d   |
-| 9  | Documentation generation (GenerateDocs)                                 | Feature     | Medium | 2-3d   |
-| 10 | Advanced types: Result[T], Validated[T], branded IDs                    | Feature     | Medium | 3-5d   |
-| 11 | Structured JSON error output                                            | Feature     | Low    | 1-2d   |
-| 12 | Extract flagtags to standalone library                                  | Refactor    | Low    | 2-3d   |
-| 13 | v3.0 API design document                                                | Planning    | High   | 2-3d   |
-| 14 | v3.0 directory skeleton                                                 | Planning    | Medium | 1d     |
-| 15 | `NoFlags` as distinct named type (not alias)                            | v3 Breaking | High   | 2h     |
-| 16 | Remove deprecated `WithColor` option                                    | v3 Breaking | Low    | 30m    |
-| 17 | Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation                  | v3 Breaking | Medium | 2h     |
-| 18 | Remove `SetConfig` or make it safe                                      | v3 Breaking | Medium | 2h     |
-| 19 | Fuzz testing expansion                                                  | Testing     | Medium | 1-2d   |
-| 20 | Go module with `buildGoModule` in flake.nix                             | Nix         | Low    | 2h     |
+| ~~1~~  | ~~Update FEATURES.md: remove all Must\* entries, add "Zero Panics" badge~~ done — FEATURES rewritten repeatedly; zero-panics canon lives in AGENTS.md | ~~Docs~~ | ~~High~~ | ~~30m~~ |
+| ~~2~~  | ~~Update TODO_LIST.md: reflect v2.5.0 state, mark P6 Must\* items as done~~ **Superseded — TODO_LIST rewritten; done items removed per policy.** | ~~Docs~~ | ~~Medium~~ | ~~15m~~ |
+| ~~3~~  | ~~Update ROADMAP.md: mark Package() redesign as done~~ **Superseded — current ROADMAP tracks Package[T] as v5 candidate #7.** | ~~Docs~~ | ~~Low~~ | ~~5m~~ |
+| ~~4~~  | ~~Audit README.md for Must\* references~~ done — README audited repeatedly; zero Must* (v4 has no Must* variants — AGENTS.md) | ~~Docs~~ | ~~High~~ | ~~15m~~ |
+| ~~5~~  | ~~Audit docs/_.md for Must_ references~~ done — docs audited in the 2026-06-22 doc-sync pass and later docs-health passes | ~~Docs~~ | ~~Medium~~ | ~~20m~~ |
+| ~~6~~  | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~CI~~ | ~~Medium~~ | ~~5m~~ |
+| ~~7~~  | ~~Nested struct config file support~~ done — nested config structs supported (AGENTS.md) | ~~Feature~~ | ~~High~~ | ~~3-5d~~ |
+| ~~8~~  | ~~Plugin system for validators/type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~Feature~~ | ~~High~~ | ~~3-5d~~ |
+| ~~9~~  | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go + the describe JSON contract | ~~Feature~~ | ~~Medium~~ | ~~2-3d~~ |
+| 10 | Advanced types: Result[T], Validated[T], branded IDs **→ ROADMAP raw ideas (Result[T]/Validated[T]; branded IDs via go-branded-id)** | Feature     | Medium | 3-5d   |
+| ~~11~~ | ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output | ~~Feature~~ | ~~Low~~ | ~~1-2d~~ |
+| 12 | Extract flagtags to standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Refactor    | Low    | 2-3d   |
+| ~~13~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).** | ~~Planning~~ | ~~High~~ | ~~2-3d~~ |
+| ~~14~~ | ~~v3.0 directory skeleton~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~Planning~~ | ~~Medium~~ | ~~1d~~ |
+| ~~15~~ | ~~`NoFlags` as distinct named type (not alias)~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha) | ~~v3 Breaking~~ | ~~High~~ | ~~2h~~ |
+| ~~16~~ | ~~Remove deprecated `WithColor` option~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.** | ~~v3 Breaking~~ | ~~Low~~ | ~~30m~~ |
+| ~~17~~ | ~~Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation~~ done — kept by design — --no-color sets NO_COLOR=1 for fang (AGENTS.md) | ~~v3 Breaking~~ | ~~Medium~~ | ~~2h~~ |
+| 18 | Remove `SetConfig` or make it safe **→ deprecated in v4 — removal tracked as TODO_LIST T4** | v3 Breaking | Medium | 2h     |
+| 19 | Fuzz testing expansion **→ ROADMAP deferred #7 (seeds shipped, corpus expansion tracked)** | Testing     | Medium | 1-2d   |
+| ~~20~~ | ~~Go module with `buildGoModule` in flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Nix~~ | ~~Low~~ | ~~2h~~ |
 
 ---
 
@@ -112,9 +115,9 @@ Nothing is totally fucked up. The codebase is in excellent shape:
 
 However, there is **documentation debt** from this session's work:
 
-1. **FEATURES.md is actively lying** — lists 6+ functions that no longer exist as "✅ FULLY_FUNCTIONAL"
-2. **TODO_LIST.md metrics are wrong** — says "373 tests, 84.0%" when it's actually 744, 83.5%
-3. **doc.go** was updated but other docs were not
+~~1. **FEATURES.md is actively lying** — lists 6+ functions that no longer exist as "✅ FULLY_FUNCTIONAL"~~ done — FEATURES.md rewritten repeatedly since; refreshed 2026-11-07
+~~2. **TODO_LIST.md metrics are wrong** — says "373 tests, 84.0%" when it's actually 744, 83.5%~~ **Superseded — TODO_LIST rewritten; done items removed per policy.**
+~~3. **doc.go** was updated but other docs were not~~ **Superseded — doc.go maintained through v4.**
 
 This is not a code problem — it's a documentation consistency problem. The code is correct; the docs are stale.
 
@@ -124,15 +127,15 @@ This is not a code problem — it's a documentation consistency problem. The cod
 
 ### Immediate (Documentation Sync)
 
-1. **FEATURES.md** — The single most important doc to fix. Lists deleted functions as functional. This misleads users.
-2. **TODO_LIST.md** — Metrics, version, and completion status all stale.
-3. **README.md** — Likely has Must\* examples that no longer compile.
-4. **ROADMAP.md** — Items already completed still listed as TODO.
-5. **All docs/\*.md** — Comprehensive audit for Must\* references.
+1. ~~**FEATURES.md** — The single most important doc to fix. Lists deleted functions as functional. This misleads users.~~ done — FEATURES.md rewritten; refreshed again in the 2026-11-07 docs-health pass
+2. ~~**TODO_LIST.md** — Metrics, version, and completion status all stale.~~ **Superseded — TODO_LIST rewritten; done items removed per policy.**
+3. ~~**README.md** — Likely has Must\* examples that no longer compile.~~ done — README audited repeatedly; Must-free in v4
+4. ~~**ROADMAP.md** — Items already completed still listed as TODO.~~ **Superseded — current ROADMAP is accurate (2026-11-07 pass verifies it).**
+5. ~~**All docs/\*.md** — Comprehensive audit for Must\* references.~~ done — doc-sync pass 2026-06-22 + later docs-health passes
 
 ### Short-Term (Quality)
 
-6. **Coverage gap analysis** — 83.5% is good but identify the 16.5% gaps systematically.
+6. ~~**Coverage gap analysis** — 83.5% is good but identify the 16.5% gaps systematically.~~ **Superseded — coverage is 90.4% today; gaps tracked via CI coverage.**
 7. **Integration test expansion** — `tests/integration/` has no tests yet. The taskctl example serves as de facto integration tests but they're in the example module.
 8. **Error documentation** — 60 sentinel errors deserve a generated reference table.
 9. **API stability guarantees** — Document which APIs are stable vs. experimental.
