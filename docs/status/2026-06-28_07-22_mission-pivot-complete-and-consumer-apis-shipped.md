@@ -14,6 +14,7 @@ This session pivoted cmdguard from **breadth drift** (output formats, audit form
 
 | BuildFlow workaround                                          | Lines of glue           | Now replaced by                                    |
 | ------------------------------------------------------------- | ----------------------- | -------------------------------------------------- |
+<!-- check-rows:ledger -->
 | `configFromCmd(cmd)` — hand-rolled context-key session system | 8 files, ~11 call sites | `v2.ConfigFromContext[T](ctx)`                     |
 | `hideAdvancedFlags(root)` — hardcoded list of 11 flag names   | 1 function, 11 names    | `hidden:"true"` struct tag                         |
 | Save + wrap cmdguard's `PersistentPreRunE`                    | 7 references in root.go | `v2.WithPostFlagParse[T](fn)`                      |
@@ -29,6 +30,7 @@ Plus the foundational fix from earlier this session: `SilenceUsage=true` by defa
 
 ### This session's deliverables (9 commits, `8db8275..2d50def`)
 
+<!-- check-rows:ledger -->
 | # | Commit                | What                                                                                   | Consumer Impact                                               |
 | - | --------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | 1 | `03db723`             | `SilenceUsage=true` by default + public `ExitCode(err)` + example fix                  | Kills Cobra's #1 footgun (usage-on-error); correct exit codes |
@@ -58,10 +60,10 @@ cmdguard now has the four APIs BuildFlow needs, but BuildFlow still uses its wor
 
 ### Documentation freshness
 
-- `TODO_LIST.md` still says "v2.9.0, 430+ test functions" — now 473 tests and 4 new APIs not listed
-- `FEATURES.md` doesn't mention scoped flags, hidden flags, ConfigFromContext, WithPostFlagParse
+~~- `TODO_LIST.md` still says "v2.9.0, 430+ test functions" — now 473 tests and 4 new APIs not listed~~ done — rewritten since; refreshed 2026-11-07
+~~- `FEATURES.md` doesn't mention scoped flags, hidden flags, ConfigFromContext, WithPostFlagParse~~ done — FEATURES lists all four APIs; refreshed 2026-11-07
 - `docs/API.md` CLI Options table missing `WithPostFlagParse`
-- `CHANGELOG.md` has no v2.10.0 entry for this session's features
+~~- `CHANGELOG.md` has no v2.10.0 entry for this session's features~~ done — the [2.10.0] entry exists (cea25f2)
 
 ### Go version
 
@@ -91,15 +93,18 @@ CI wired but `CODECOV_TOKEN` secret still not set in GitHub (P0, 5-minute task, 
 
 > Nothing is catastrophically broken. The "fucked up" items are **process debt** — things that were true earlier this session and are now fixed, or things still lingering.
 
-### 🔴 #1 — TODO_LIST.md and FEATURES.md are stale (STILL)
+<!-- routing:skip -->
+### 🔴 #1 — TODO_LIST.md and FEATURES.md are stale (STILL) — FIXED in the v2.10.0 cycle (09:37 plan tasks 4-5); both docs maintained through v4
 
 Both still describe v2.9.0 with "430+ test functions" and no mention of scoped flags, hidden flags, ConfigFromContext, or WithPostFlagParse. A new contributor reading these would have **no idea** the mission pivot happened. This is the single most damaging doc-staleness in the repo right now.
 
-### 🔴 #2 — No CHANGELOG entry for 4 new public APIs
+<!-- routing:skip -->
+### 🔴 #2 — No CHANGELOG entry for 4 new public APIs — FIXED (cea25f2, CHANGELOG [2.10.0])
 
 `CHANGELOG.md` stops at v2.9.0. The 4 new APIs (scoped flags, hidden tag, ConfigFromContext, WithPostFlagParse) + the SilenceUsage/ExitCode fix are **undocumented in the release history**. Consumers tracking changes have no record.
 
-### 🔴 #3 — No v2.10.0 release
+<!-- routing:skip -->
+### 🔴 #3 — No v2.10.0 release — FIXED — tag v2.10.0 exists (2026-06-28)
 
 The features are committed and pushed but **not tagged/released**. BuildFlow (and any other consumer) must use a `replace` directive to access them. Without a release, `go get` still pulls v2.9.0.
 
@@ -115,12 +120,12 @@ The features are committed and pushed but **not tagged/released**. BuildFlow (an
 
 ## e) WHAT WE SHOULD IMPROVE! 🛠️
 
-1. **Release v2.10.0 NOW.** Four new public APIs are sitting unreleased. Tag, push, update BuildFlow's `go.mod` to drop the `replace` directive. This is the highest-leverage action.
-2. **Update TODO_LIST.md + FEATURES.md + CHANGELOG.md in the same release.** A release with stale docs is worse than no release — it lies about what exists.
-3. **Add a "consumer pain" column to the roadmap.** Every feature this session came from studying BuildFlow's workarounds. That method works — institutionalize it. Before any new feature, ask: "which consumer pain does this solve?"
-4. **Migrate BuildFlow as the integration test.** Once BuildFlow uses `ConfigFromContext` + `WithPostFlagParse` + `hidden:"true"`, those APIs are proven. Until then they're "works in unit tests."
-5. **Stop deferring 5-minute tasks.** CODECOV_TOKEN and Go 1.26.4 have been P0 for weeks. Just do them.
-6. **The Cobra escape hatch should be a first-class story, not an afterthought.** Most real consumers will mix `Command[T,F]` with raw cobra. The README now has the section — but the example app should demonstrate it.
+1. ~~**Release v2.10.0 NOW.** Four new public APIs are sitting unreleased. Tag, push, update BuildFlow's `go.mod` to drop the `replace` directive. This is the highest-leverage action.~~ done — tag v2.10.0 exists (2026-06-28)
+2. ~~**Update TODO_LIST.md + FEATURES.md + CHANGELOG.md in the same release.** A release with stale docs is worse than no release — it lies about what exists.~~ done — via the 09:37 plan (CHANGELOG/TODO/FEATURES/API.md tasks)
+3. ~~**Add a "consumer pain" column to the roadmap.** Every feature this session came from studying BuildFlow's workarounds. That method works — institutionalize it. Before any new feature, ask: "which consumer pain does this solve?"~~ done (docs-health pass the consumer-pain method repeated in v4 (escape-hatch + audit middleware came from consumer study))
+4. ~~**Migrate BuildFlow as the integration test.** Once BuildFlow uses `ConfigFromContext` + `WithPostFlagParse` + `hidden:"true"`, those APIs are proven. Until then they're "works in unit tests."~~ **Superseded — superseded — BuildFlow consumes cmdguard-lint via the provider wiring (2026-10-04); the escape-hatch APIs are proven in cmdguard integration tests.**
+5. ~~**Stop deferring 5-minute tasks.** CODECOV_TOKEN and Go 1.26.4 have been P0 for weeks. Just do them.~~ **Superseded — Go 1.27 shipped; Codecov stays tokenless by choice.**
+6. ~~**The Cobra escape hatch should be a first-class story, not an afterthought.** Most real consumers will mix `Command[T,F]` with raw cobra. The README now has the section — but the example app should demonstrate it.~~ done — README has the Cobra Escape Hatch section; FEATURES lists all five APIs
 
 ---
 
@@ -130,31 +135,31 @@ Sorted by **impact × readiness** (consumer value first, then mission, then hygi
 
 | #  | Task                                                                                          | Impact               | Effort |
 | -- | --------------------------------------------------------------------------------------------- | -------------------- | ------ |
-| 1  | **Release v2.10.0** — tag + push; unblocks all consumers                                      | 🔴 critical          | 10m    |
-| 2  | **Update CHANGELOG.md** for v2.10.0 (4 new APIs + SilenceUsage + ExitCode)                    | 🔴 critical          | 10m    |
-| 3  | **Update TODO_LIST.md** — test count, new APIs, completed items                               | 🔴 high              | 10m    |
-| 4  | **Update FEATURES.md** — scoped flags, hidden tag, escape hatch, ConfigFromContext            | 🔴 high              | 10m    |
-| 5  | **Update docs/API.md** — add WithPostFlagParse, ConfigFromContext to tables                   | 🟡 medium            | 10m    |
-| 6  | **Migrate BuildFlow** — replace `configFromCmd` → `ConfigFromContext`                         | 🔴 high (proves API) | 30m    |
-| 7  | **Migrate BuildFlow** — replace `hideAdvancedFlags` → `hidden:"true"` tags                    | 🔴 high              | 15m    |
-| 8  | **Migrate BuildFlow** — replace `PersistentPreRunE` wrap → `WithPostFlagParse`                | 🔴 high              | 20m    |
-| 9  | **Add failure-cleanup hook** (`WithCleanup`/`OnRunError`) — PostRunE doesn't fire on error    | 🔴 mission           | 30m    |
-| 10 | **Set CODECOV_TOKEN** in GitHub secrets                                                       | hygiene              | 5m     |
-| 11 | **Bump go.mod → go 1.26.4** when nixpkgs ships it (CVEs)                                      | security             | 5m     |
-| 12 | **Own error display in fang-off mode** (make cmdguard the single owner)                       | mission              | 30m    |
-| 13 | **Add `examples/escape-hatch/`** — demonstrates raw cobra + ConfigFromContext + PostFlagParse | adoption             | 30m    |
-| 14 | **Second example app** (different domain — server/devtool) to validate contract               | adoption             | 60m    |
-| 15 | **Reset-global-state audit** — ensure parallel tests don't pollute COW registries             | reliability          | 30m    |
-| 16 | **Write `docs/COBRA_FOOTGUNS.md`** — explicit list of traps cmdguard closes                   | adoption             | 20m    |
-| 17 | **Add fuzz corpus** under `testdata/fuzz/`                                                    | robustness           | 20m    |
-| 18 | **FlagRegistry interface abstraction** (enables mocking)                                      | extensibility        | 40m    |
-| 19 | **Custom per-flag validation hooks** (beyond `required`)                                      | power                | 30m    |
-| 20 | **v3.0 API design document** (scope before code)                                              | strategic            | 60m    |
-| 21 | **`flagtags` library extraction** (defer to v3)                                               | strategic            | 120m   |
-| 22 | **Rename `Get[T]`→`GetService[T]`** (v3 breaking)                                             | clarity              | 30m    |
-| 23 | **Generic `RegisterInScope[T]`** (v3 breaking)                                                | type-safety          | 30m    |
-| 24 | **Remove `SetConfig` footgun** (v3 breaking)                                                  | safety               | 15m    |
-| 25 | **Deprecate v1 API timeline**                                                                 | clarity              | 10m    |
+| ~~1~~  | ~~**Release v2.10.0** — tag + push; unblocks all consumers~~ done — tag v2.10.0 exists | ~~🔴 critical~~ | ~~10m~~ |
+| ~~2~~  | ~~**Update CHANGELOG.md** for v2.10.0 (4 new APIs + SilenceUsage + ExitCode)~~ done — CHANGELOG [2.10.0] entry exists (cea25f2) | ~~🔴 critical~~ | ~~10m~~ |
+| ~~3~~  | ~~**Update TODO_LIST.md** — test count, new APIs, completed items~~ done — TODO_LIST rewritten since | ~~🔴 high~~ | ~~10m~~ |
+| ~~4~~  | ~~**Update FEATURES.md** — scoped flags, hidden tag, escape hatch, ConfigFromContext~~ done — FEATURES lists scoped flags, hidden tag, escape hatch, ConfigFromContext | ~~🔴 high~~ | ~~10m~~ |
+| ~~5~~  | ~~**Update docs/API.md** — add WithPostFlagParse, ConfigFromContext to tables~~ **Superseded — docs/API.md was removed in the 2026-08-06 refresh; the APIs live in FEATURES + website.** | ~~🟡 medium~~ | ~~10m~~ |
+| ~~6~~  | ~~**Migrate BuildFlow** — replace `configFromCmd` → `ConfigFromContext`~~ done — migrated — f50df49b (09:37 plan task 8) | ~~🔴 high (proves API)~~ | ~~30m~~ |
+| ~~7~~  | ~~**Migrate BuildFlow** — replace `hideAdvancedFlags` → `hidden:"true"` tags~~ done — migrated — 93ac6f5f (task 9) | ~~🔴 high~~ | ~~15m~~ |
+| ~~8~~  | ~~**Migrate BuildFlow** — replace `PersistentPreRunE` wrap → `WithPostFlagParse`~~ **Superseded — superseded — BuildFlow consumes cmdguard-lint via the provider wiring (2026-10-04).** | ~~🔴 high~~ | ~~20m~~ |
+| ~~9~~  | ~~**Add failure-cleanup hook** (`WithCleanup`/`OnRunError`) — PostRunE doesn't fire on error~~ done — WithCleanup[T] ships (AGENTS.md) | ~~🔴 mission~~ | ~~30m~~ |
+| ~~10~~ | ~~**Set CODECOV_TOKEN** in GitHub secrets~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~hygiene~~ | ~~5m~~ |
+| ~~11~~ | ~~**Bump go.mod → go 1.26.4** when nixpkgs ships it (CVEs)~~ **Superseded — superseded — the repo is on Go 1.27.** | ~~security~~ | ~~5m~~ |
+| ~~12~~ | ~~**Own error display in fang-off mode** (make cmdguard the single owner)~~ done — cmdguard owns error display, printed exactly once (AGENTS.md) | ~~mission~~ | ~~30m~~ |
+| ~~13~~ | ~~**Add `examples/escape-hatch/`** — demonstrates raw cobra + ConfigFromContext + PostFlagParse~~ **Superseded — superseded — escape-hatch documented in README/FEATURES.** | ~~adoption~~ | ~~30m~~ |
+| ~~14~~ | ~~**Second example app** (different domain — server/devtool) to validate contract~~ **Superseded — superseded — taskctl stays the flagship.** | ~~adoption~~ | ~~60m~~ |
+| ~~15~~ | ~~**Reset-global-state audit** — ensure parallel tests don't pollute COW registries~~ done — -race green in CI; COW documented concurrency-safe | ~~reliability~~ | ~~30m~~ |
+| ~~16~~ | ~~**Write `docs/COBRA_FOOTGUNS.md`** — explicit list of traps cmdguard closes~~ done — docs/COBRA_FOOTGUNS.md exists | ~~adoption~~ | ~~20m~~ |
+| ~~17~~ | ~~**Add fuzz corpus** under `testdata/fuzz/`~~ done — testdata/fuzz seeds shipped; ROADMAP deferred #7 | ~~robustness~~ | ~~20m~~ |
+| ~~18~~ | ~~**FlagRegistry interface abstraction** (enables mocking)~~ **Superseded — superseded — plugin system via Plugin interface.** | ~~extensibility~~ | ~~40m~~ |
+| ~~19~~ | ~~**Custom per-flag validation hooks** (beyond `required`)~~ done — custom validators ship — RegisterValidator + validate tag | ~~power~~ | ~~30m~~ |
+| ~~20~~ | ~~**v3.0 API design document** (scope before code)~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~strategic~~ | ~~60m~~ |
+| 21 | **`flagtags` library extraction** (defer to v3) **→ ROADMAP raw ideas (extract flagtags standalone library)** | strategic            | 120m   |
+| 22 | **Rename `Get[T]`→`GetService[T]`** (v3 breaking) **→ ROADMAP v5 candidate #6** | clarity              | 30m    |
+| 23 | **Generic `RegisterInScope[T]`** (v3 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)** | type-safety          | 30m    |
+| 24 | **Remove `SetConfig` footgun** (v3 breaking) **→ deprecated in v4 — removal tracked as TODO_LIST T4** | safety               | 15m    |
+| ~~25~~ | ~~**Deprecate v1 API timeline**~~ **Superseded — the v1 package no longer exists (v4.0.0 module migration).** | ~~clarity~~ | ~~10m~~ |
 
 ---
 
@@ -167,11 +172,14 @@ Sorted by **impact × readiness** (consumer value first, then mission, then hygi
 > Argument for **migrate BuildFlow first**: unit tests prove correctness but not _fit_. If migrating BuildFlow reveals a design flaw in `ConfigFromContext` or `WithPostFlagParse` (wrong signature, missing parameter), fixing it post-release means a v2.10.1 or a v2.11.0 — semver churn for something preventable.
 >
 > I can't resolve this alone because it's a **risk tolerance** call: ship-fast-and-iterate vs prove-in-production-first. My instinct is **migrate BuildFlow first** (it's ~60 min and de-risks the release entirely), but if you want v2.10.0 tagged today I'll do that instead.
+>
+> **Answered:** v2.10.0 was tagged the same day (2026-06-28); the BuildFlow migration ran in parallel (2 of 3 workarounds migrated by 09:37 per the next report; the third was superseded by the v3 module line).
 
 ---
 
 ## Health Metrics (ground truth, this session)
 
+<!-- check-rows:ledger -->
 | Metric                 | Value                                    |
 | ---------------------- | ---------------------------------------- |
 | Branch                 | `master` (clean, up to date with origin) |
@@ -190,6 +198,7 @@ Sorted by **impact × readiness** (consumer value first, then mission, then hygi
 
 ## New Public API Surface Added This Session
 
+<!-- check-rows:ledger -->
 | API                                    | File                              | Purpose                                                  |
 | -------------------------------------- | --------------------------------- | -------------------------------------------------------- |
 | `ExitCode(err) int`                    | `cli_errors_json.go`              | Public exit-code mapping (nil→0, ExitCoder→code, else→1) |

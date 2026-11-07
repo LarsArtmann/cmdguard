@@ -28,6 +28,7 @@ not wired into the execution path, is not committed, and is not documented anywh
 
 ### Today's fix — the Cobra-correctness contract (uncommitted, ready to commit)
 
+<!-- check-rows:ledger -->
 | # | Change                                                                                               | File                       | Verified                  |
 | - | ---------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------- |
 | 1 | **`SilenceUsage = true` by default**                                                                 | `cli.go`                   | ✅ test + runtime         |
@@ -78,9 +79,11 @@ flags can be local to the root run and not inherited by subcommands.
 
 | Component                                   | Status                  | Evidence                                                                             |
 | ------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------ |
+<!-- check-rows:ledger -->
 | `FlagTag.Local` field                       | ✅ done                 | `config.go`                                                                          |
 | `local:"true"` tag parsing                  | ✅ done                 | `config_parsing.go` (pushed `parseFieldFlag` cyclomatic complexity → lint FAIL)      |
 | `RegisterScopedFlags(cmd)`                  | ✅ done, **tests pass** | `flags.go`                                                                           |
+<!-- check-rows:ledger -->
 | `RegisterLocalFlags(cmd)`                   | ✅ done, **tests pass** | `flags.go`                                                                           |
 | `ParseFlags` skips absent local flags       | ✅ done, **tests pass** | `flags_parse.go`                                                                     |
 | CLI accessor `RegisterLocalCommandFlags`    | ✅ exists               | `cli_accessors.go`                                                                   |
@@ -106,18 +109,18 @@ repo. Also note: `go.sum` was modified (new transitive test deps: `MakeNowJust/h
 
 (from ROADMAP.md + analysis — items with zero code/commits)
 
-- ⬜ **v3.0 API design** — no design doc, no `pkg/cmdguard/v3/`, no migration guide
-- ⬜ **v3 breaking cleanups:** rename `Get[T]`→`GetService[T]`; generic `RegisterInScope[T]`; remove/redesign `Package()`; remove `SetConfig`
-- ⬜ **`flagtags` library extraction** — ~2000 LOC of tag parsing into `github.com/larsartmann/flagtags`
-- ⬜ **First-class failure cleanup hook** — Cobra's `PostRunE` doesn't fire on `RunE` error; cmdguard documents this as a "gotcha" but offers no `OnFailure`/cleanup-on-error abstraction
-- ⬜ **Owning error display in all modes** — when fang is OFF, Cobra (not cmdguard) prints the error; a unified owner would make the contract identical in every mode
-- ⬜ **Branded-ID example** (ROADMAP Advanced Types)
-- ⬜ **`examples/docs-generator/`** (ROADMAP marks `GenerateDocs` done at impl level but no example app)
-- ⬜ **FlagRegistry interface abstraction** + custom validation hooks (ROADMAP Plugin System)
-- ⬜ **Fuzz corpus in `testdata/fuzz/`**
-- ⬜ **Metrics/hooks custom observability** (beyond OTel)
-- ⬜ **Deprecate v1 API timeline**
-- ⬜ **Test all examples in CI**
+~~- ⬜ **v3.0 API design** — no design doc, no `pkg/cmdguard/v3/`, no migration guide~~ done — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54)
+~~- ⬜ **v3 breaking cleanups:** rename `Get[T]`→`GetService[T]`; generic `RegisterInScope[T]`; remove/redesign `Package()`; remove `SetConfig`~~ → ROADMAP v5 candidates #6/#7 + TODO_LIST T4/T5
+~~- ⬜ **`flagtags` library extraction** — ~2000 LOC of tag parsing into `github.com/larsartmann/flagtags`~~ → ROADMAP raw ideas (extract flagtags standalone library)
+~~- ⬜ **First-class failure cleanup hook** — Cobra's `PostRunE` doesn't fire on `RunE` error; cmdguard documents this as a "gotcha" but offers no `OnFailure`/cleanup-on-error abstraction~~ done — WithCleanup[T] ships and fires even on RunE error (AGENTS.md; cli.go applyCleanupHooks)
+~~- ⬜ **Owning error display in all modes** — when fang is OFF, Cobra (not cmdguard) prints the error; a unified owner would make the contract identical in every mode~~ done — cmdguard owns error display, printed exactly once (AGENTS.md error/exit contract)
+~~- ⬜ **Branded-ID example** (ROADMAP Advanced Types)~~ → ROADMAP raw ideas (branded-ID example app)
+~~- ⬜ **`examples/docs-generator/`** (ROADMAP marks `GenerateDocs` done at impl level but no example app)~~ done — examples/docs-generator exists (project structure)
+~~- ⬜ **FlagRegistry interface abstraction** + custom validation hooks (ROADMAP Plugin System)~~ done — superseded — plugin system shipped via Plugin interface + RegisterValidator
+~~- ⬜ **Fuzz corpus in `testdata/fuzz/`**~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7
+~~- ⬜ **Metrics/hooks custom observability** (beyond OTel)~~ → ROADMAP raw ideas (metrics/hooks observability)
+~~- ⬜ **Deprecate v1 API timeline**~~ done — the v1 package no longer exists (v4.0.0 module migration)
+~~- ⬜ **Test all examples in CI**~~ done — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest)
 
 ---
 
@@ -140,7 +143,8 @@ os.Exit(0)                                         // ← FAILED COMMANDS EXIT 0
 A library whose entire purpose is "use Cobra correctly" demonstrated **both** wrong-exit-code
 **and** double-error-printing in its own showcase. **Fixed today** (uncommitted).
 
-### 🔴 #2 — Usage-on-error was the DEFAULT
+<!-- routing:skip -->
+### 🔴 #2 — Usage-on-error was the DEFAULT — FIXED same day (`03db723`: `SilenceUsage=true` is the v4 default; `WithoutSilenceUsage()` re-enables)
 
 `SilenceUsage` defaulted to `false`. Fang forces it `true` only when _it_ executes (`fang.go:135`),
 so the instant anyone used `WithFang(false)` they got raw Cobra's usage-spam-on-every-error — the
@@ -151,7 +155,8 @@ single most-reported Cobra footgun, unguarded. **Fixed today** (uncommitted).
 `extractExitCode` was unexported, forcing anyone with post-execution work (audit export, log flush)
 into the broken `os.Exit(0)` pattern. **Fixed today** via public `ExitCode(err)`.
 
-### 🔴 #4 — Scoped-flags feature marooned in the working tree
+<!-- routing:skip -->
+### 🔴 #4 — Scoped-flags feature marooned in the working tree — FIXED (`c60f690`, wired before v2.10.0)
 
 A genuinely valuable, tested feature is uncommitted, unwired, and undocumented. It will be lost on
 the next `git checkout`/`git stash` if not committed. (Not my code — discovered, not authored.)
@@ -235,11 +240,14 @@ Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygien
 > **(b) commit as `WIP: scoped flags (local:"true")` on a feature branch** so it isn't lost, then
 > finish wiring in a follow-up — but I won't touch it without your call since per project rules I
 > don't commit changes I didn't author without approval.
+>
+> **Answered:** committed and wired — `c60f690` landed scoped flags; wired into the execution path before v2.10.0 (Resolution below).
 
 ---
 
 ## Health Metrics (ground truth, this session)
 
+<!-- check-rows:ledger -->
 | Metric                 | Value                                                                              |
 | ---------------------- | ---------------------------------------------------------------------------------- |
 | Branch                 | `master` (up to date with origin)                                                  |
@@ -257,6 +265,7 @@ Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygien
 
 ## Working-tree change ownership (critical for commit hygiene)
 
+<!-- check-rows:ledger -->
 | Files                                                                                                                                                  | Author                                          | Status                                   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ---------------------------------------- |
 | `cli.go`, `cli_errors_json.go`, `cli_errors_json_test.go`, `cli_core_new_test.go`, `examples/taskctl/main.go`, `README.md`, `AGENTS.md`, `docs/API.md` | **Crush (today)** — cobra-correctness fix       | working, tested, **commit these**        |
