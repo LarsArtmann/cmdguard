@@ -7,7 +7,7 @@ require (
 	github.com/larsartmann/cmdguard/v4 v4.0.0-00010101000000-000000000000
 	github.com/larsartmann/go-finding v1.15.1
 	github.com/larsartmann/go-finding/toolsdk v1.16.0
-	github.com/larsartmann/go-linter-sdk v0.4.0
+	github.com/larsartmann/go-linter-sdk v0.4.1
 )
 
 require (

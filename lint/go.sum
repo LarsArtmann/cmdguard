@@ -73,8 +73,8 @@ github.com/larsartmann/go-finding v1.15.1 h1:oL3EixoLh7rnmTNgnoJaoZVgKtRwmAJdknD
 github.com/larsartmann/go-finding v1.15.1/go.mod h1:upXEXF6XGxDydeqkuk7f8wiYsqIG2E84R+t+WnpX8Fw=
 github.com/larsartmann/go-finding/toolsdk v1.16.0 h1:RgIapYJksJNwu4Og4LVsmJdOLys5O5LAQK+ymxmrPdc=
 github.com/larsartmann/go-finding/toolsdk v1.16.0/go.mod h1:zj3DnZkfCsC16Pj2xwzdkNIuLpbl8t9WKSf12F5akfY=
-github.com/larsartmann/go-linter-sdk v0.4.0 h1:dD+/SfmvOXxhE++d8N+ceRz4mb53CUqRqbBrzmt0FG8=
-github.com/larsartmann/go-linter-sdk v0.4.0/go.mod h1:kq0p790gxfo7NQXZKos5VqKc/EsgsNHGDG7/PqGOLfU=
+github.com/larsartmann/go-linter-sdk v0.4.1 h1:uI4j3Ao7aKmEr+qV1LLeQBGyQa7afpt2ztMSXN15KUM=
+github.com/larsartmann/go-linter-sdk v0.4.1/go.mod h1:O/W7NtP+sPegNiW9G6a4vmi8WNd5t+GxRkCHETmShHQ=
 github.com/larsartmann/go-ndjson v0.0.1 h1:wchwH5pv+0ZnFem/WrlGZA8dDGvZumT+OcVn5dbou3A=
 github.com/larsartmann/go-ndjson v0.0.1/go.mod h1:ueEJJ39Jei+zfPCEx455kpunYWZf/pkwn7HqETHrQkU=
 github.com/larsartmann/go-output v0.38.7 h1:U6+bAttbScCmy8izcBQ4tLEQ5yYVHXjioAWJ5yocAA4=
