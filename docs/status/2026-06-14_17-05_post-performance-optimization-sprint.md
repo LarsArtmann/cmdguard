@@ -12,6 +12,7 @@
 
 ## Project Metrics Snapshot
 
+<!-- check-rows:ledger -->
 | Metric                        | Value                    |
 | ----------------------------- | ------------------------ |
 | Version                       | 2.7.0-dev                |
@@ -108,11 +109,11 @@
 
 | Item              | Status                                      | What's Missing                                                                                                         |
 | ----------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Test coverage     | 85.6% (v2)                                  | Target is 90%+. ~14.4% of statements uncovered, mostly error paths and edge cases                                      |
-| Fuzz testing      | 2 fuzz targets exist                        | Missing `testdata/fuzz/` corpora for systematic fuzz testing                                                           |
-| Binary size       | 24 MB                                       | Users who don't need all 16 output formats still pull in all go-output sub-modules via init() side-effect imports      |
-| Pre-commit hooks  | BuildFlow runs but flake-meta-checker fails | Pre-existing: flake.nix missing `meta` attribute block. Requires `--no-verify` to commit                               |
-| koanf integration | `configload/koanf.go` exists with loader    | Not wired as default; users must opt-in via `WithConfigFileLoader`. Auto-detection from file extension not implemented |
+| ~~Test coverage~~ done — core coverage is 90.4% today (README badge) | ~~85.6% (v2)~~ | ~~Target is 90%+. ~14.4% of statements uncovered, mostly error paths and edge cases~~ |
+| ~~Fuzz testing~~ done — 8 fuzz targets + testdata/fuzz seeds today (ROADMAP deferred #7 tracks expansion) | ~~2 fuzz targets exist~~ | ~~Missing `testdata/fuzz/` corpora for systematic fuzz testing~~ |
+| ~~Binary size~~ done — the v3 sub-module split moved heavy deps out of core (AGENTS.md dep budget) | ~~24 MB~~ | ~~Users who don't need all 16 output formats still pull in all go-output sub-modules via init() side-effect imports~~ |
+| ~~Pre-commit hooks~~ done — flake.nix carries meta now; the BuildFlow pre-commit hook passes cleanly | ~~BuildFlow runs but flake-meta-checker fails~~ | ~~Pre-existing: flake.nix missing `meta` attribute block. Requires `--no-verify` to commit~~ |
+| ~~koanf integration~~ done — KoanfLoader IS the single default loader with extension auto-detection (AGENTS.md) | ~~`configload/koanf.go` exists with loader~~ | ~~Not wired as default; users must opt-in via `WithConfigFileLoader`. Auto-detection from file extension not implemented~~ |
 
 ---
 
@@ -162,7 +163,7 @@
 - Clean git history, working tree clean, all pushed
 - No known data-loss risks or security vulnerabilities
 
-**One pre-existing annoyance:** `flake.nix` lacks a `meta` attribute block, causing the pre-commit `flake-meta-checker` to fail. This requires `git commit --no-verify`. Not caused by recent work — predates it.
+**~~One pre-existing annoyance:~~ `flake.nix` lacks a `meta` attribute block, causing the pre-commit `flake-meta-checker` to fail.~~ Fixed: flake.nix carries meta now, and the BuildFlow pre-commit hook (`.githooks/pre-commit`) runs clean without `--no-verify`.**
 
 ---
 
@@ -170,33 +171,33 @@
 
 ### Architecture & Code Quality
 
-1. **FlagTag mutability** — `FlagTag` has exported fields and is mutated in place by `updateTagDefaultsFromConfig`. Immutable value types with a builder pattern would prevent accidental mutation. (v3.0 scope — API-breaking)
+1. **FlagTag mutability** — `FlagTag` has exported fields and is mutated in place by `updateTagDefaultsFromConfig`. Immutable value types with a builder pattern would prevent accidental mutation. (v3.0 scope — API-breaking) **→ ROADMAP flag-representation consolidation (v5 scope; docs/design/2026-11-02_flag-representation-gap-matrix.md)**
 
-2. **Telemetry context propagation gap** — `TelemetryMiddleware` starts a span but can't propagate the new context to the handler (middleware signature is `next func() error`). Child spans inside handlers won't link to the telemetry span. Documented limitation, but architecturally suboptimal. (v3.0 scope — requires middleware signature change)
+2. **Telemetry context propagation gap** — `TelemetryMiddleware` starts a span but can't propagate the new context to the handler (middleware signature is `next func() error`). Child spans inside handlers won't link to the telemetry span. Documented limitation, but architecturally suboptimal. (v3.0 scope — requires middleware signature change) **→ ContextMiddleware[T] shipped 2026-10-04; telemetry sub-module migration documented as future work (AGENTS.md)**
 
-3. **Error system vs go-error-family** — The how-to-golang skill recommends `go-error-family` for structured, classified errors. cmdguard uses 62 sentinel errors with `fmt.Errorf("%w:...")`. The current system is idiomatic Go and works well, but doesn't have Rejection/Transient classification. Assessment: not recommended for v2.x; consider for v3.0 if service-oriented use cases emerge.
+3. ~~**Error system vs go-error-family** — The how-to-golang skill recommends `go-error-family` for structured, classified errors. cmdguard uses 62 sentinel errors with `fmt.Errorf("%w:...")`. The current system is idiomatic Go and works well, but doesn't have Rejection/Transient classification. Assessment: not recommended for v2.x; consider for v3.0 if service-oriented use cases emerge.~~ **NOT-DO — not adopted — error classification shipped natively 2026-11-02 (error_code envelope).**
 
-4. **Config file double-unmarshal** — `jsonLoader.Load()` unmarshals JSON twice: once into `map[string]json.RawMessage` to detect present fields, then again into the config struct. Could use a single-pass approach with `json.Decoder` + `More()`. Low impact (one-time startup cost).
+4. ~~**Config file double-unmarshal** — `jsonLoader.Load()` unmarshals JSON twice: once into `map[string]json.RawMessage` to detect present fields, then again into the config struct. Could use a single-pass approach with `json.Decoder` + `More()`. Low impact (one-time startup cost).~~ **Superseded — superseded — KoanfLoader replaced the jsonLoader path entirely.**
 
-5. **Unbounded regex cache** — `regexCache sync.Map` has no eviction. Safe today (patterns are developer-defined from struct tags), but if user-derived patterns are ever supported, this could grow unbounded. Documented; no action needed for v2.x.
+5. ~~**Unbounded regex cache** — `regexCache sync.Map` has no eviction. Safe today (patterns are developer-defined from struct tags), but if user-derived patterns are ever supported, this could grow unbounded. Documented; no action needed for v2.x.~~ **NOT-DO — accepted — cache bounded by developer-defined patterns (FEATURES.md).**
 
-6. **Defensive copies remain** — `Tags()`, `FlagNames()`, `Path()`, `Children()` still allocate. `iter.Seq` variants added as alternatives, but the old methods are still the "default" API. Could deprecate them in v3.0.
+6. ~~**Defensive copies remain** — `Tags()`, `FlagNames()`, `Path()`, `Children()` still allocate. `iter.Seq` variants added as alternatives, but the old methods are still the "default" API. Could deprecate them in v3.0.~~ done — iter.Seq variants shipped — TagsSeq/FlagNamesSeq/PathSeq/ChildrenSeq (AGENTS.md)
 
-7. **go-output init() side-effects** — All 8 go-output format sub-modules are imported via blank imports in `output.go`. Users who don't need d2/plantuml/graph formats still pay the binary cost. Could use conditional compilation or a registry pattern in v3.0.
+7. ~~**go-output init() side-effects** — All 8 go-output format sub-modules are imported via blank imports in `output.go`. Users who don't need d2/plantuml/graph formats still pay the binary cost. Could use conditional compilation or a registry pattern in v3.0.~~ **Superseded — superseded — go-output restructured (v0.38.7 sub-modules); cmdguard imports explicitly (output.go).**
 
 ### Testing
 
-8. **Coverage gaps** — 85.6% is good but not 90%+. Most uncovered code is error paths and edge cases in the cobra wiring layer (`cli_command.go`).
+8. ~~**Coverage gaps** — 85.6% is good but not 90%+. Most uncovered code is error paths and edge cases in the cobra wiring layer (`cli_command.go`).~~ **Superseded — coverage is 90.4% today (README badge).**
 
-9. **No snapshot tests** — Output rendering (16 formats) would benefit from snapshot testing via `go-snaps` to catch format regressions.
+9. **No snapshot tests** — Output rendering (16 formats) would benefit from snapshot testing via `go-snaps` to catch format regressions. **→ ROADMAP raw ideas (output format snapshot tests)**
 
-10. **No property-based tests** — Type parsing (Duration, URL, Email, Port, etc.) would benefit from property-based testing with `gopter` to verify round-trip properties.
+10. **No property-based tests** — Type parsing (Duration, URL, Email, Port, etc.) would benefit from property-based testing with `gopter` to verify round-trip properties. **→ ROADMAP raw ideas (property-based type-parser tests)**
 
 ### Developer Experience
 
-11. **No benchmark CI gating** — Benchmarks run in CI but don't gate PRs. A regression threshold (e.g., "NewCLI must be < 8µs") would catch performance regressions automatically.
+11. **No benchmark CI gating** — Benchmarks run in CI but don't gate PRs. A regression threshold (e.g., "NewCLI must be < 8µs") would catch performance regressions automatically. **→ ROADMAP raw ideas (Benchmark CI gating)**
 
-12. **No interactive example** — The taskctl example is comprehensive but not interactive. A "try it yourself" script would improve onboarding.
+12. ~~**No interactive example** — The taskctl example is comprehensive but not interactive. A "try it yourself" script would improve onboarding.~~ **Superseded — superseded — website quickstart + taskctl docs serve onboarding.**
 
 ---
 
@@ -206,31 +207,31 @@ Sorted by impact × ease (highest impact/lowest effort first).
 
 | #  | Task                                                          | Impact | Effort | Category |
 | -- | ------------------------------------------------------------- | ------ | ------ | -------- |
-| 1  | Add `CODECOV_TOKEN` to GitHub repo settings                   | High   | 5m     | Infra    |
-| 2  | Fix `flake.nix` meta attribute block                          | Medium | 15m    | Infra    |
-| 3  | Add snapshot tests for 16 output formats                      | High   | 2h     | Testing  |
-| 4  | Increase v2 coverage from 85.6% → 90%                         | Medium | 3h     | Testing  |
-| 5  | Add fuzz test corpora in `testdata/fuzz/`                     | Medium | 1h     | Testing  |
-| 6  | Add benchmark regression thresholds in CI                     | Medium | 30m    | Infra    |
-| 7  | Config file nested struct support                             | High   | 4h     | Feature  |
-| 8  | Structured JSON error output for `--output=json`              | High   | 3h     | Feature  |
-| 9  | Config auto-loading with koanf (file extension detection)     | Medium | 2h     | Feature  |
-| 10 | Documentation generation (`GenerateDocs()`, markdown)         | Medium | 4h     | Feature  |
-| 11 | v3.0 API design document                                      | High   | 4h     | Design   |
-| 12 | Fix telemetry context propagation (v3.0 middleware signature) | High   | 6h     | v3.0     |
-| 13 | Make FlagTag immutable (v3.0 builder pattern)                 | Medium | 4h     | v3.0     |
-| 14 | Plugin system for custom validators                           | Medium | 6h     | Feature  |
-| 15 | Extract flagtags as standalone library                        | Low    | 3h     | Refactor |
-| 16 | Add Result[T] type                                            | Medium | 3h     | Feature  |
-| 17 | Add Validated[T] wrapper                                      | Low    | 2h     | Feature  |
-| 18 | Branded IDs example application                               | Low    | 2h     | Example  |
-| 19 | Test all examples in CI                                       | Medium | 1h     | Infra    |
-| 20 | Deprecate v1 API timeline                                     | Low    | 30m    | Process  |
-| 21 | Add property-based tests for type parsers                     | Medium | 2h     | Testing  |
-| 22 | Conditional go-output format imports (reduce binary size)     | Low    | 3h     | Refactor |
-| 23 | Single-pass JSON config loading (eliminate double unmarshal)  | Low    | 1h     | Perf     |
-| 24 | Add enhanced flag validation enums                            | Low    | 2h     | Feature  |
-| 25 | Metrics/hooks for custom observability                        | Low    | 4h     | Feature  |
+| ~~1~~  | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~High~~ | ~~5m~~ | ~~Infra~~ |
+| ~~2~~  | ~~Fix `flake.nix` meta attribute block~~ done — flake.nix carries meta/description today | ~~Medium~~ | ~~15m~~ | ~~Infra~~ |
+| 3  | Add snapshot tests for 16 output formats **→ ROADMAP raw ideas (output format snapshot tests)** | High   | 2h     | Testing  |
+| ~~4~~  | ~~Increase v2 coverage from 85.6% → 90%~~ done — core coverage is 90.4% today (README badge) | ~~Medium~~ | ~~3h~~ | ~~Testing~~ |
+| ~~5~~  | ~~Add fuzz test corpora in `testdata/fuzz/`~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~Medium~~ | ~~1h~~ | ~~Testing~~ |
+| 6  | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)** | Medium | 30m    | Infra    |
+| ~~7~~  | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~High~~ | ~~4h~~ | ~~Feature~~ |
+| ~~8~~  | ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output | ~~High~~ | ~~3h~~ | ~~Feature~~ |
+| ~~9~~  | ~~Config auto-loading with koanf (file extension detection)~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Medium~~ | ~~2h~~ | ~~Feature~~ |
+| ~~10~~ | ~~Documentation generation (`GenerateDocs()`, markdown)~~ done — GenerateDocs/docgen.go + the describe JSON contract | ~~Medium~~ | ~~4h~~ | ~~Feature~~ |
+| ~~11~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).** | ~~High~~ | ~~4h~~ | ~~Design~~ |
+| 12 | Fix telemetry context propagation (v3.0 middleware signature) **→ ContextMiddleware[T] shipped 2026-10-04; telemetry migration = future work (AGENTS.md)** | High   | 6h     | v3.0     |
+| 13 | Make FlagTag immutable (v3.0 builder pattern) **→ ROADMAP flag-representation consolidation (v5 scope)** | Medium | 4h     | v3.0     |
+| ~~14~~ | ~~Plugin system for custom validators~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~Medium~~ | ~~6h~~ | ~~Feature~~ |
+| 15 | Extract flagtags as standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Low    | 3h     | Refactor |
+| 16 | Add Result[T] type **→ ROADMAP raw ideas (Result[T] monad)** | Medium | 3h     | Feature  |
+| 17 | Add Validated[T] wrapper **→ ROADMAP raw ideas (Validated[T] wrapper)** | Low    | 2h     | Feature  |
+| 18 | Branded IDs example application **→ ROADMAP raw ideas (branded-ID example app)** | Low    | 2h     | Example  |
+| ~~19~~ | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).** | ~~Medium~~ | ~~1h~~ | ~~Infra~~ |
+| ~~20~~ | ~~Deprecate v1 API timeline~~ **Superseded — the v1 package no longer exists — pkg/ contains only v4 (v4.0.0 migration).** | ~~Low~~ | ~~30m~~ | ~~Process~~ |
+| 21 | Add property-based tests for type parsers **→ ROADMAP raw ideas (property-based type-parser tests)** | Medium | 2h     | Testing  |
+| ~~22~~ | ~~Conditional go-output format imports (reduce binary size)~~ **Superseded — superseded — go-output restructured; cmdguard imports explicitly.** | ~~Low~~ | ~~3h~~ | ~~Refactor~~ |
+| ~~23~~ | ~~Single-pass JSON config loading (eliminate double unmarshal)~~ **Superseded — superseded — KoanfLoader replaced the jsonLoader path.** | ~~Low~~ | ~~1h~~ | ~~Perf~~ |
+| ~~24~~ | ~~Add enhanced flag validation enums~~ done — v4 validation is richer — values/min/max/minlen/maxlen/dmin/dmax + custom validators | ~~Low~~ | ~~2h~~ | ~~Feature~~ |
+| 25 | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)** | Low    | 4h     | Feature  |
 
 ---
 
@@ -245,6 +246,8 @@ The ROADMAP.md lists many v3.0 features that would expand cmdguard beyond CLI co
 - **Option B: Expand to framework** — Invest in v3.0 with the full feature set. Pros: one-stop-shop for Go CLI apps. Cons: scope creep, longer to ship, more surface area to test and maintain.
 
 This is a business/product decision that depends on who the users are and what they need. I cannot determine this from the code alone.
+
+**Answered:** Option B happened — v3.0.0 shipped 2026-07-07 and v4.0.0 on 2026-07-28 grew the framework surface (machine contract, batteries, hints, audit middleware). Result[T]/Validated[T] stayed unbuilt and live in ROADMAP raw ideas.
 
 ## Resolution (2026-07-18)
 
