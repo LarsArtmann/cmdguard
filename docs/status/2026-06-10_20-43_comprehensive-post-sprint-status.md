@@ -171,33 +171,33 @@ These are mostly error-path branches not exercised in tests.
 
 **P4: CI/CD**
 
-- [ ] #20 — Add `CODECOV_TOKEN` secret to GitHub repo settings (5 min, manual)
+~~- [ ] #20 — Add `CODECOV_TOKEN` secret to GitHub repo settings (5 min, manual)~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**
 
 **P5: Future Features (v3.0+)**
 
-- [ ] #21 — Plugin system for custom validators and type handlers
-- [ ] #22 — Config file nested struct support
-- [ ] #23 — Documentation generation (GenerateDocs, markdown, API docs)
-- [ ] #24 — Advanced types: Result[T], Validated[T], branded IDs
-- [ ] #25 — Config auto-loading with koanf integration
-- [ ] #26 — Structured JSON error output for `--output=json`
-- [ ] #27 — Extract flag-related code to standalone `flagtags` library
-- [ ] #28 — Consider extracting `go-output` to sub-package
+~~- [ ] #21 — Plugin system for custom validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin
+~~- [ ] #22 — Config file nested struct support~~ done — nested config structs supported (AGENTS.md gotcha 18)
+~~- [ ] #23 — Documentation generation (GenerateDocs, markdown, API docs)~~ done — GenerateDocs/docgen.go + describe JSON contract
+~~- [ ] #24 — Advanced types: Result[T], Validated[T], branded IDs~~ **Superseded — Result/Validated removed from core in v3.0.0; branded IDs ship via go-branded-id dep.**
+~~- [ ] #25 — Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)
+~~- [ ] #26 — Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output
+~~- [ ] #27 — Extract flag-related code to standalone `flagtags` library~~ **Won't implement — idea dropped, not in the 2026-11-02 ROADMAP restructure.**
+~~- [ ] #28 — Consider extracting `go-output` to sub-package~~ **Superseded — go-output is an external published dep (v0.30.4), not a sub-package.**
 
 **P6: Future Cleanup (API-breaking, defer to v3.0)**
 
-- [ ] #30 — Rename `Get[T]` to more specific names
-- [ ] #31 — Make `RegisterInScope` generic instead of `...any`
-- [ ] #32 — Remove or redesign `Package()` for error-safe DI integration
-- [ ] #33 — Remove `SetConfig` or make it safe (reinitialize FlagRegistry)
+~~- [ ] #30 — Rename `Get[T]` to more specific names~~ **→ ROADMAP v5 candidate #6 (MustGet gone in v4)**
+~~- [ ] #31 — Make `RegisterInScope` generic instead of `...any`~~ **→ TODO_LIST T5 (TODO(v5) scope.go:367)**
+~~- [ ] #32 — Remove or redesign `Package()` for error-safe DI integration~~ **→ ROADMAP v5 candidate #7 (panic-safe via safeProvide, scope.go:107)**
+~~- [ ] #33 — Remove `SetConfig` or make it safe (reinitialize FlagRegistry)~~ **→ ROADMAP v5 candidate #4 (Deprecated; TODO(v5) cli_accessors.go)**
 
 **Not in TODO but identified:**
 
-- [ ] Fix nix pre-commit hooks (nixfmt, deadnix, vulnix missing)
-- [ ] Add `buildGoModule` to flake.nix for proper Nix packaging
-- [ ] Add fuzz tests (mentioned in ROADMAP but not implemented)
-- [ ] Add CONTRIBUTING.md
-- [ ] Add issue/PR templates
+~~- [ ] Fix nix pre-commit hooks (nixfmt, deadnix, vulnix missing)~~ done — obsolete pre-commit hook removed (8618022)
+~~- [ ] Add `buildGoModule` to flake.nix for proper Nix packaging~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**
+~~- [ ] Add fuzz tests (mentioned in ROADMAP but not implemented)~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7
+~~- [ ] Add CONTRIBUTING.md~~ done — CONTRIBUTING.md exists at repo root
+~~- [ ] Add issue/PR templates~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist
 
 ---
 

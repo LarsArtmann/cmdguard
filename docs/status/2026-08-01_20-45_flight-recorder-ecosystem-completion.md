@@ -35,6 +35,7 @@ lines. Two planned API variants (`CaptureToWriter`, `WithFlightRecorderRecorder`
 
 | Item                                | Details                                                                                                                                                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+<!-- check-rows:ledger -->
 | **CHANGELOG.md**                    | `[Unreleased]` → `### Added` entry for flight recorder sub-module                                                                                                                                            |
 | **FEATURES.md — Middleware table**  | `flightrecorder.Middleware[T]` row added as `📦 SUB-MODULE`                                                                                                                                                  |
 | **FEATURES.md — Sub-Modules table** | `flightrecorder` row added with API, dependency, version, status                                                                                                                                             |
@@ -66,6 +67,7 @@ lines. Two planned API variants (`CaptureToWriter`, `WithFlightRecorderRecorder`
 
 | Item                              | What Exists                                                                  | What's Missing                                                                                                                                                                                                                      |
 | --------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | **README.md code example**        | `flightrecorder` import added to the import block                            | **Dead import** — the code below doesn't use `flightrecorder`. If a user copy-pastes the example, it won't compile (unused import). Should either add a `flightrecorder.WithFlightRecorder[Config](...)` call or remove the import. |
 | **docs/API.md**                   | Middleware code example added                                                | **No API reference section** — the prior report called for documenting `Recorder`, `Middleware`, `WithFlightRecorder`, `Config`, `CaptureReason` types and methods. Only a usage example was added, not a full reference.           |
 | **AGENTS.md exclusion count**     | Count bumped from `+ 1 godox` to `+ 1 godox + 1 paralleltest path exclusion` | The phrasing is awkward — the `paralleltest` exclusion is a path-level rule, not the same category as the per-file v4 exclusions or ireturn allow-list. Could be clearer.                                                           |
@@ -88,19 +90,19 @@ lines. Two planned API variants (`CaptureToWriter`, `WithFlightRecorderRecorder`
 5. ~~**TODO_LIST.md** — Not updated. No entry for flight recorder as completed work.~~ done (tracked in CHANGELOG [Unreleased])
 6. ~~**ROADMAP.md** — Not updated. No mention of flight recorder as a shipped feature.~~ done (enhancement ideas in ROADMAP)
 7. ~~**FEATURES.md line 330** — Still says "matching v3 API signatures" — stale reference from the v3→v4 migration. Should say v4.~~ done at `ba818e3`
-8. **No `go tool trace` validation** — Trace files are verified to be non-empty but never confirmed parseable by `go tool trace`. — _TODO_LIST D10_
+~~8. **No `go tool trace` validation** — Trace files are verified to be non-empty but never confirmed parseable by `go tool trace`. — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation; its era's TODO_LIST D10 is gone)
 
 ### Low Priority — Polish
 
-9. **No `Sync()` method** — `Stop()` waits for in-flight captures, but there's no standalone "flush pending captures" method. — _in ROADMAP_
+~~9. **No `Sync()` method** — `Stop()` waits for in-flight captures, but there's no standalone "flush pending captures" method. — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
 
-10. **No `CaptureReasonPanic`** — Middleware doesn't capture on panics (only slow/error). — _in ROADMAP_
+~~10. **No `CaptureReasonPanic`** — Middleware doesn't capture on panics (only slow/error). — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)
 
-11. **No max-captures limit** — A runaway CLI that errors on every invocation could fill disk. — _in ROADMAP_
+~~11. **No max-captures limit** — A runaway CLI that errors on every invocation could fill disk. — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (MaxSnapshots config)
 
-12. **No `MaxSnapshots` config field** — No rate limiting. — _in ROADMAP_
+~~12. **No `MaxSnapshots` config field** — No rate limiting. — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (MaxSnapshots config)
 
-13. **Timestamp format not configurable** — Hardcoded to nanosecond precision. — _in ROADMAP_
+~~13. **Timestamp format not configurable** — Hardcoded to nanosecond precision. — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Configurable timestamp format)
 
 14. ~~**go.sum bloat not investigated** — The prior report flagged 155 lines in go.sum for a zero-external-dep module.~~ resolved (expected behavior — transitive closure from cmdguard/v4 via replace directive; same as other sub-modules)
 
@@ -163,7 +165,7 @@ mocking, but it means the "another flight recorder is already active" scenario i
 
 4. **Consider `Capture` returning the `WriteTo` error separately** — Currently, `Capture` wraps the `WriteTo` error in a generic "creating snapshot" message. Users can't distinguish "file creation failed" from "trace write failed".
 
-5. **Filename collision still possible** — Nanosecond timestamps dramatically reduce collision probability but don't eliminate it. Two goroutines capturing in the same nanosecond on a high-core-count machine would still clobber. Consider appending a random suffix or using `os.CreateTemp` pattern.
+~~5. **Filename collision still possible** — Nanosecond timestamps dramatically reduce collision probability but don't eliminate it. Two goroutines capturing in the same nanosecond on a high-core-count machine would still clobber. Consider appending a random suffix or using `os.CreateTemp` pattern.~~ → ROADMAP Flight Recorder Enhancements (os.CreateTemp pattern)
 
 ### Testing
 
@@ -262,11 +264,11 @@ mocking, but it means the "another flight recorder is already active" scenario i
 43. **Consider `MinFreeDisk` config** — Skip capture if disk space low
 44. **Investigate go.sum bloat** — Is 155 lines expected for a zero-dep module via `replace`?
 45. **Resolve gopls diagnostics** — 65 errors about indirect deps not in go.mod
-46. **Consider CI fuzzing** — Add `-fuzztime` to CI for continuous fuzzing
-47. **Consider `Capture` returning separate file-creation vs write errors**
+~~46. **Consider CI fuzzing** — Add `-fuzztime` to CI for continuous fuzzing~~ → ROADMAP Flight Recorder Enhancements (CI fuzzing)
+~~47. **Consider `Capture` returning separate file-creation vs write errors**~~ → ROADMAP Flight Recorder Enhancements (Separate file-creation vs write errors)
 48. **Consider `os.CreateTemp` pattern for collision-free filenames**
-49. **Consider `Config.Validate()` method** — Validate config before Start
-50. **Consider `flightrecorder` version tagging** — Tag `v0.1.0` like other sub-modules
+~~49. **Consider `Config.Validate()` method** — Validate config before Start~~ → ROADMAP Flight Recorder Enhancements (Config.Validate())
+~~50. **Consider `flightrecorder` version tagging** — Tag `v0.1.0` like other sub-modules~~ v:done — flightrecorder/v0.1.0 tagged 2026-08-06 (CHANGELOG flightrecorder/v0.1.0)
 
 ---
 
@@ -298,6 +300,7 @@ these as indirect deps). Should I investigate whether the flightrecorder go.mod 
 
 | Metric                  | Value                                                                                                                                                |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | Files created           | 4 (`example_test.go`, `recorder_bench_test.go`, `fuzz_test.go`, `README.md`)                                                                         |
 | Files modified          | 7 (`CHANGELOG.md`, `FEATURES.md`, `README.md`, `docs/API.md`, `AGENTS.md`, `recorder.go`, `middleware.go`, `recorder_test.go`, `middleware_test.go`) |
 | Test functions added    | 5 (`ErrAlreadyStarted`, `WriteTo-after-Stop`, `EmptyCommandName`, `ConcurrentCapture`, `ErrorPrecedence`)                                            |
@@ -311,6 +314,7 @@ these as indirect deps). Should I investigate whether the flightrecorder go.mod 
 | `nix fmt`               | 7 files formatted                                                                                                                                    |
 | `nix flake check`       | all checks passed                                                                                                                                    |
 | Fuzz iterations         | 359,091 (0 failures)                                                                                                                                 |
+<!-- check-rows:ledger -->
 | Dead imports introduced | 1 (README.md code example)                                                                                                                           |
 
 ---

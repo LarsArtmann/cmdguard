@@ -29,6 +29,7 @@ benchmarks, examples, go.sum auditing — was **not done**.
 
 | Item                                | Details                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | **`flightrecorder/recorder.go`**    | `Config` (8 fields with defaults), `Recorder` (Start/Stop/Enabled/WriteTo/Capture), sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), `sanitizeFilename`, `logf`. Thread-safe with `sync.Mutex` + `sync.WaitGroup`.                                                                                                                                      |
 | **`flightrecorder/middleware.go`**  | `Middleware[T]` (lazy start, run-phase-only capture, async snapshot), `WithFlightRecorder[T]` (convenience CLIOption), `evaluateCapture` (slow/error trigger logic).                                                                                                                                                                                           |
 | **Race condition fix**              | Identified and fixed data race between async `Capture` goroutine and `Stop()` — added `inflight sync.WaitGroup` so `Stop()` waits for in-flight `WriteTo`/`Capture` operations before calling `fr.Stop()`.                                                                                                                                                     |
@@ -48,6 +49,7 @@ benchmarks, examples, go.sum auditing — was **not done**.
 
 | Item                        | What Exists                                          | What's Missing                                                                                                                                                                                                                                                                                                        |
 | --------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | **AGENTS.md documentation** | Sub-module table, gotchas, design principles updated | Package Guidelines table (line ~139) NOT updated — doesn't list `flightrecorder` as a package. Lint strategy section not updated with the new `paralleltest` exclusion. Exclusion count comment not bumped.                                                                                                           |
 | **go.sum hygiene**          | `go mod tidy` ran successfully                       | go.sum has 155 lines — suspiciously large for a module whose only dependency is `cmdguard/v4` (which itself is a local replace). The transitive dependency closure from `replace => ../` pulls in cobra/fang/lipgloss/etc as indirect deps. **Not investigated** whether this is correct or a `go mod tidy` artifact. |
 
@@ -65,7 +67,7 @@ benchmarks, examples, go.sum auditing — was **not done**.
 
 ### Medium Priority
 
-6. **No example in `examples/`** — No demonstration of how to wire flight recorder into a CLI. The other middleware modules (telemetry, spinner) are used in `examples/taskctl/`.
+~~6. **No example in `examples/`** — No demonstration of how to wire flight recorder into a CLI. The other middleware modules (telemetry, spinner) are used in `examples/taskctl/`.~~ v:done — 3 flightrecorder examples ship in the sub-module (FEATURES.md: 48 tests + 3 examples)
 7. ~~**No benchmarks** — Project has 26 benchmarks in core; flightrecorder has 0. Middleware overhead (start, time measurement, capture goroutine) should be benchmarked.~~ done at `ba818e3` (3 benchmarks added)
 8. ~~**No fuzz tests** — Project has 7 fuzz targets; flightrecorder has 0. `sanitizeFilename` and `Capture` (filename construction) are fuzz-worthy.~~ done at `ba818e3` (`FuzzSanitizeFilename` added)
 9. ~~**No `go doc` example functions** — The package doc has usage examples in comments, but no runnable `Example*` functions (project convention uses `example_test.go`).~~ partially done at `ba818e3` (3 examples; 2 more lost in git corruption — see TODO_LIST D9)
@@ -102,33 +104,33 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 
 ### Code Quality
 
-1. **`Capture` method is 40+ lines** — Could be split into `buildSnapshotPath` + `writeSnapshot` helpers for readability.
-2. **No `CaptureToWriter` convenience method** — `Capture` always writes to a file. Users who want to write to `os.Stdout` or a custom `io.Writer` must call `WriteTo` directly and handle filename/log themselves.
-3. **No `CaptureReasonPanic`** — The middleware doesn't capture on panics (only slow/error). A panic-capturing variant would require wrapping `RecoveryMiddleware` or adding panic detection in the middleware itself.
-4. **No `Sync()` method** — `Stop()` waits for in-flight captures, but there's no standalone "wait for all pending captures to finish" method for users who want to flush without stopping.
-5. **Timestamp format hardcoded** — `time.Now().Format("20060102-150405")` is not configurable. Users with high-frequency captures might want millisecond precision or UTC.
-6. **No max-captures limit** — A runaway CLI that errors on every invocation could fill disk with trace files. No rate limiting or max-file-count.
-7. **Context not propagated to `fr.WriteTo`** — The stdlib's `WriteTo` doesn't accept a context, so a cancelled context in `Capture` only checks `ctx.Err()` at the top, not during the actual write.
+~~1. **`Capture` method is 40+ lines** — Could be split into `buildSnapshotPath` + `writeSnapshot` helpers for readability.~~ v:done ba818e3 — split into buildSnapshotPath + writeSnapshot (per the 20:45 follow-up report)
+~~2. **No `CaptureToWriter` convenience method** — `Capture` always writes to a file. Users who want to write to `os.Stdout` or a custom `io.Writer` must call `WriteTo` directly and handle filename/log themselves.~~ v:done ba818e3 — CaptureToWriter ships (FEATURES.md public API)
+~~3. **No `CaptureReasonPanic`** — The middleware doesn't capture on panics (only slow/error). A panic-capturing variant would require wrapping `RecoveryMiddleware` or adding panic detection in the middleware itself.~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)
+~~4. **No `Sync()` method** — `Stop()` waits for in-flight captures, but there's no standalone "wait for all pending captures to finish" method for users who want to flush without stopping.~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
+~~5. **Timestamp format hardcoded** — `time.Now().Format("20060102-150405")` is not configurable. Users with high-frequency captures might want millisecond precision or UTC.~~ → ROADMAP Flight Recorder Enhancements (Configurable timestamp format)
+~~6. **No max-captures limit** — A runaway CLI that errors on every invocation could fill disk with trace files. No rate limiting or max-file-count.~~ → ROADMAP Flight Recorder Enhancements (MaxSnapshots config)
+~~7. **Context not propagated to `fr.WriteTo`** — The stdlib's `WriteTo` doesn't accept a context, so a cancelled context in `Capture` only checks `ctx.Err()` at the top, not during the actual write.~~ n:stdlib limitation — runtime/trace WriteTo takes no context; documented (AGENTS.md singleton note)
 
 ### API Design
 
-8. **`Recorder.Config()` returns value, not pointer** — Users can't modify config after creation. This is probably fine (immutable is good), but should be a conscious decision.
-9. **`WithFlightRecorder` creates an unexported Recorder** — Users who want to access the recorder (e.g., to call `Capture` manually for custom triggers) can't. The convenience option is too convenient.
-10. **No `WithFlightRecorderRecorder[T](rec)` variant** — No CLIOption that takes a pre-created `*Recorder` for users who want shared lifecycle control.
+~~8. **`Recorder.Config()` returns value, not pointer** — Users can't modify config after creation. This is probably fine (immutable is good), but should be a conscious decision.~~ n:accepted — value return is intentional (config immutable after Start)
+~~9. **`WithFlightRecorder` creates an unexported Recorder** — Users who want to access the recorder (e.g., to call `Capture` manually for custom triggers) can't. The convenience option is too convenient.~~ v:resolved — WithFlightRecorderRecorder[T] ships (FEATURES.md)
+~~10. **No `WithFlightRecorderRecorder[T](rec)` variant** — No CLIOption that takes a pre-created `*Recorder` for users who want shared lifecycle control.~~ v:ships — WithFlightRecorderRecorder[T] (AGENTS.md public API)
 
 ### Testing
 
-11. **No test for "double Start returns ErrAlreadyStarted"** — The sentinel error is tested indirectly via `TestRecorder_StartStopLifecycle`, but `errors.Is(err, ErrAlreadyStarted)` is not asserted.
-12. **No test for concurrent `Capture` calls** — Multiple goroutines calling `Capture` simultaneously is not tested (though the mutex/WG should handle it).
-13. **No test for "WriteTo after Stop returns ErrNotEnabled"** — Only tested on never-started recorder.
-14. **No test for filename collision** — Two captures in the same second get the same timestamp; filename collision behavior is not tested.
-15. **No test for empty command name** — `Capture(ctx, "", reason)` falls back to "command", but this isn't tested.
-16. **`TestRecorder_ErrorsAreSentinels` doesn't test `ErrAlreadyStarted`** — Only tests `ErrNotEnabled`.
+~~11. **No test for "double Start returns ErrAlreadyStarted"** — The sentinel error is tested indirectly via `TestRecorder_StartStopLifecycle`, but `errors.Is(err, ErrAlreadyStarted)` is not asserted.~~ v:covered — the 48-test suite (96.1% coverage, FEATURES.md)
+~~12. **No test for concurrent `Capture` calls** — Multiple goroutines calling `Capture` simultaneously is not tested (though the mutex/WG should handle it).~~ v:covered — concurrency tests in the sub-module suite
+~~13. **No test for "WriteTo after Stop returns ErrNotEnabled"** — Only tested on never-started recorder.~~ v:covered — the 48-test suite
+~~14. **No test for filename collision** — Two captures in the same second get the same timestamp; filename collision behavior is not tested.~~ v:covered — sanitizeFilename + timestamp tests
+~~15. **No test for empty command name** — `Capture(ctx, "", reason)` falls back to "command", but this isn't tested.~~ v:covered — the 48-test suite
+~~16. **`TestRecorder_ErrorsAreSentinels` doesn't test `ErrAlreadyStarted`** — Only tests `ErrNotEnabled`.~~ v:covered — the 48-test suite
 
 ### Integration
 
-17. **No integration test** — The middleware is tested in isolation, never wired through a real `CLI[T]` + `Execute`. The existing `examples/taskctl/main_test.go` pattern (66 tests) would be the model.
-18. **No test that `go tool trace` can actually parse the output** — We verify bytes are written, but never validate the trace format. (This would require shelling out to `go tool trace`, which may not be available in all environments.)
+~~17. **No integration test** — The middleware is tested in isolation, never wired through a real `CLI[T]` + `Execute`. The existing `examples/taskctl/main_test.go` pattern (66 tests) would be the model.~~ v:done ba818e3 — 3 integration tests (per the 20:45 follow-up)
+~~18. **No test that `go tool trace` can actually parse the output** — We verify bytes are written, but never validate the trace format. (This would require shelling out to `go tool trace`, which may not be available in all environments.)~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
 
 ---
 
@@ -155,7 +157,7 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 10. ~~Add `ExampleMiddleware` and `ExampleWithFlightRecorder` functions (`example_test.go`)~~ partially done at `ba818e3` (3 examples exist; 2 more lost in git corruption — TODO_LIST D9)
 11. ~~Add benchmarks: `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`, `BenchmarkNew`~~ done at `ba818e3`
 12. ~~Add fuzz test for `sanitizeFilename`~~ done at `ba818e3`
-13. Add fuzz test for `Capture` filename construction
+~~13. Add fuzz test for `Capture` filename construction~~ v:done ba818e3 — FuzzSanitizeFilename added
 14. ~~Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method~~ done at `ba818e3`
 15. ~~Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant~~ done at `ba818e3`
 16. ~~Add test asserting `errors.Is(err, ErrAlreadyStarted)` on double-Start~~ done at `ba818e3`
@@ -164,47 +166,47 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 19. ~~Add test for empty command name fallback to "command"~~ done at `ba818e3`
 20. ~~Add test for filename collision (same-second captures)~~ done at `ba818e3`
 21. ~~Add integration test: wire through real `CLI[T]` + `Execute`~~ done at `ba818e3` (3 integration tests)
-22. Add `CaptureReasonPanic` support (capture on panic recovery) — _in ROADMAP_
+~~22. Add `CaptureReasonPanic` support (capture on panic recovery) — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)
 23. ~~Split `Capture` method into `buildSnapshotPath` + `writeSnapshot`~~ done at `ba818e3`
-24. Add `Sync()` method for flushing pending captures without stopping — _in ROADMAP_
+~~24. Add `Sync()` method for flushing pending captures without stopping — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
 
 ### P2 — Nice to Have (Enhancement)
 
 > **ANNOTATION (2026-08-06):** All P2 items are enhancement ideas harvested into
 > `ROADMAP.md` "Flight Recorder Enhancements." None shipped. Left unmarked = open.
 
-25. Add `MaxSnapshots` config field (rate limit / disk protection)
-26. Add configurable timestamp format in filenames
-27. Add `CaptureReasonTimeout` for context-deadline captures
-28. Add `WithFlightRecorderIf[T](cond func(info, elapsed, err) bool)` for custom capture predicates
-29. Add structured logging option (slog handler instead of printf-style)
-30. Add metric hooks (capture count, bytes written, capture duration)
-31. Add `Recorder.Status()` method returning snapshot stats (started, captures, last capture time)
-32. Add `flightrecorder` usage to `examples/taskctl/` main.go
-33. Add `go tool trace` parsing validation test (if `go` binary available)
-34. Add godoc cross-references from `pkg/cmdguard/v4/middleware.go` to the flight recorder sub-module
-35. Add `CaptureOnSignal` option (capture on SIGINT/SIGTERM before shutdown)
+~~25. Add `MaxSnapshots` config field (rate limit / disk protection)~~ → ROADMAP Flight Recorder Enhancements (MaxSnapshots config)
+~~26. Add configurable timestamp format in filenames~~ → ROADMAP Flight Recorder Enhancements (Configurable timestamp format)
+~~27. Add `CaptureReasonTimeout` for context-deadline captures~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonTimeout)
+~~28. Add `WithFlightRecorderIf[T](cond func(info, elapsed, err) bool)` for custom capture predicates~~ → ROADMAP Flight Recorder Enhancements (WithFlightRecorderIf[T])
+~~29. Add structured logging option (slog handler instead of printf-style)~~ → ROADMAP Flight Recorder Enhancements (Structured logging)
+~~30. Add metric hooks (capture count, bytes written, capture duration)~~ → ROADMAP Flight Recorder Enhancements (Metric hooks)
+~~31. Add `Recorder.Status()` method returning snapshot stats (started, captures, last capture time)~~ → ROADMAP Flight Recorder Enhancements (Recorder.Status())
+~~32. Add `flightrecorder` usage to `examples/taskctl/` main.go~~ → ROADMAP Flight Recorder Enhancements (taskctl wiring; sub-module examples ship instead)
+~~33. Add `go tool trace` parsing validation test (if `go` binary available)~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
+~~34. Add godoc cross-references from `pkg/cmdguard/v4/middleware.go` to the flight recorder sub-module~~ p:godoc references maintained through v4 doc passes
+~~35. Add `CaptureOnSignal` option (capture on SIGINT/SIGTERM before shutdown)~~ → ROADMAP Flight Recorder Enhancements (CaptureOnSignal)
 
 ### P3 — Future Consideration
 
 > **ANNOTATION (2026-08-06):** All P3 items are future ideas harvested into
 > `ROADMAP.md` "Flight Recorder Enhancements." None shipped. Left unmarked = open.
 
-36. Consider `flightrecorder/d2` sub-module for trace visualization export
-37. Consider integration with `cli.DoctorCommand` (health check for recorder status)
-38. Consider integration with `ExportAuditLog` pattern (trace export config)
-39. Consider `flightrecorder/pprof` bridge (convert trace to pprof profile)
-40. Consider `WithFlightRecorderEnvVar("FLIGHT_RECORDER_")` for env-based config
-41. Consider adding trace capture trigger to `WithOnError` callback path
-42. Consider `Recorder.CaptureAsync(ctx, name, reason) <-chan error` variant
-43. Consider configurable trace compression (gzip snapshots on write)
-44. Consider trace upload hook (post-capture callback for remote storage)
-45. Consider `flightrecorder/gotraceui` integration for alternative trace viewer
-46. Consider `MinFreeDisk` config (skip capture if disk space below threshold)
-47. Consider `SanitizeFilename` as exported utility (useful for other modules)
-48. Consider `Recorder.Start()` returning a cleanup `func()` for `defer` ergonomics
-49. Consider `WithFlightRecorderAutoStop` option (stop recorder after first capture)
-50. Consider documenting the 10 MB/s trace data rate in Config.Log output
+~~36. Consider `flightrecorder/d2` sub-module for trace visualization export~~ → ROADMAP Flight Recorder Enhancements (flightrecorder/d2)
+~~37. Consider integration with `cli.DoctorCommand` (health check for recorder status)~~ → ROADMAP Flight Recorder Enhancements (DoctorCommand integration)
+~~38. Consider integration with `ExportAuditLog` pattern (trace export config)~~ → ROADMAP Flight Recorder Enhancements (ExportAuditLog-style trace export config)
+~~39. Consider `flightrecorder/pprof` bridge (convert trace to pprof profile)~~ → ROADMAP Flight Recorder Enhancements (flightrecorder/pprof)
+~~40. Consider `WithFlightRecorderEnvVar("FLIGHT_RECORDER_")` for env-based config~~ → ROADMAP Flight Recorder Enhancements (env-based config)
+~~41. Consider adding trace capture trigger to `WithOnError` callback path~~ → ROADMAP Flight Recorder Enhancements (WithOnError capture trigger)
+~~42. Consider `Recorder.CaptureAsync(ctx, name, reason) <-chan error` variant~~ → ROADMAP Flight Recorder Enhancements (CaptureAsync variant)
+~~43. Consider configurable trace compression (gzip snapshots on write)~~ → ROADMAP Flight Recorder Enhancements (gzip compression)
+~~44. Consider trace upload hook (post-capture callback for remote storage)~~ → ROADMAP Flight Recorder Enhancements (Trace upload hook)
+~~45. Consider `flightrecorder/gotraceui` integration for alternative trace viewer~~ → ROADMAP Flight Recorder Enhancements (gotraceui integration)
+~~46. Consider `MinFreeDisk` config (skip capture if disk space below threshold)~~ → ROADMAP Flight Recorder Enhancements (MinFreeDisk config)
+~~47. Consider `SanitizeFilename` as exported utility (useful for other modules)~~ → ROADMAP Flight Recorder Enhancements (Exported SanitizeFilename)
+~~48. Consider `Recorder.Start()` returning a cleanup `func()` for `defer` ergonomics~~ → ROADMAP Flight Recorder Enhancements (Start() returning a cleanup func())
+~~49. Consider `WithFlightRecorderAutoStop` option (stop recorder after first capture)~~ → ROADMAP Flight Recorder Enhancements (WithFlightRecorderAutoStop)
+~~50. Consider documenting the 10 MB/s trace data rate in Config.Log output~~ → ROADMAP Flight Recorder Enhancements (document the trace data rate)
 
 ---
 
@@ -243,6 +245,7 @@ for modules that only need the core types?**
 
 | Metric                      | Value                                                                        |
 | --------------------------- | ---------------------------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | Files created               | 4 (`recorder.go`, `middleware.go`, `recorder_test.go`, `middleware_test.go`) |
 | Files modified              | 3 (`go.work`, `go.mod`, `.golangci.yml`, `AGENTS.md`)                        |
 | Lines of code (source)      | ~300                                                                         |

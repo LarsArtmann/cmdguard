@@ -199,3 +199,17 @@ here instead of re-minted as TODO rows. Each bullet is the routing target its
 - **`flightrecorder/d2`** — trace visualization export
 - **`flightrecorder/pprof`** — convert trace to pprof profile
 - **env-based config** — `WithFlightRecorderEnvVar` for environment-driven setup
+- **`go tool trace` parse validation** — test that produced snapshots actually parse
+- **CI fuzzing** — `-fuzztime` in CI for continuous fuzzing
+- **Separate file-creation vs write errors** — `Capture` error taxonomy
+- **`os.CreateTemp` pattern** — collision-free snapshot filenames
+- **`Config.Validate()`** — validate config before `Start`
+- **DoctorCommand integration** — recorder health as a doctor check
+- **`ExportAuditLog`-style trace export config** — trace export options
+- **`WithOnError` capture trigger** — capture on the error-callback path
+- **`CaptureAsync` variant** — `CaptureAsync(ctx, name, reason) <-chan error`
+- **`gotraceui` integration** — alternative trace viewer
+- **`MinFreeDisk` config** — skip capture below a disk-space threshold
+- **Exported `SanitizeFilename`** — useful for other modules
+- **`Start()` returning a cleanup `func()`** — defer ergonomics
+- **`WithFlightRecorderAutoStop`** — stop the recorder after the first capture
