@@ -150,6 +150,38 @@ These are unformed ideas that may or may not become features:
 - **Benchmark CI gating** — detect performance regressions automatically by comparing benchmark results against a baseline in CI
 - **v3→v4 migration guide** — ~~dedicated `docs/MIGRATION_v3_v4.md`~~ done (2026-08-06)
 
+### Harvested from 2026-0X status reports (2026-11-07 docs-health annotate pass)
+
+Recurring ideas that surfaced across the June–September reports and were routed
+here instead of re-minted as TODO rows. Each bullet is the routing target its
+`→ ROADMAP` annotation points at.
+
+- **Structured logging adapter (slog)** — core-side slog integration beyond the flightrecorder handler
+- **charmbracelet/log integration** — structured logging for middleware/DI internals
+- **Observability hooks (metrics, custom tracing)** — middleware-level metric hooks beyond OpenTelemetry spans
+- **Metrics/hooks observability** — same class as above; kept as one idea
+- **`Mark(err, sentinel)` identity stamping** — cockroachdb-style error marking as an alternative to `RegisterClassification`
+- **Family-specific error format constructors** — `NewRejectionf`-style helpers (go-error-family adjacent)
+- **`Compose` returning the worst error Family** — richer than `errors.Join`
+- **`Result[T]` monad** — Rust-style result type (existed in v2.8, removed in the v3/v4 slim-down; revive only on demand)
+- **`Validated[T]` wrapper** — validation-carrying type, same revival bar as `Result[T]`
+- **Typed slice flag handlers** — `[]int`, `[]Port` beyond the `[]string`/raw-cobra escape hatch
+- **Typed flow-context keys** — `BranchingFlowContext` `SetValue` takes `any`; generic keys would prevent runtime type mismatches
+- **`Validator[T]` composition API** — `.And()`/`.Or()` combinators instead of string-parsed `validate` params
+- **Lazy `Branch()` copy-on-write** — replace `maps.Clone` per branch with parent-lookup (pathological-tree perf only)
+- **Remove the `setStringField` Enum registry bypass** — config decode special-cases `Enum` outside the TypeHandler registry (`config_setfield.go`)
+- **`PortFromInt` accepting `uint16`** — still takes `int` for backward compat (`types_port.go`)
+- **`iter.Seq` output streaming** — streaming rows into `OutputTable`
+- **Output format snapshot tests** — golden files for the 16 formats
+- **Property-based type-parser tests** — round-trip properties for Duration/URL/Email/Port parsers
+- **Version embedding via `runtime/debug.ReadBuildInfo`/`-ldflags`** — accurate `--version` without a released-tag string
+- **Telemetry shutdown span integration** — OpenTelemetry span around graceful shutdown
+- **Telemetry → `ContextMiddleware[T]` migration** — documented future work in AGENTS.md (span-context propagation)
+- **Branded-ID example app** — showcase app built on go-branded-id
+- **Plugin-based custom type handler example** — runnable example for `RegisterTypeHandler`
+- **Extract a `flagtags` standalone library** — struct-tag parsing as its own module (~2000 LOC); revisit only with a real second consumer
+- **Test all examples in CI** — dedicated CI job building/testing `examples/` (harvested 2026-11-07 into TODO_LIST; this bullet is the long-term home)
+
 ### Flight Recorder Enhancements
 
 - **`MaxSnapshots` config** — rate limiting / disk protection against runaway trace file creation

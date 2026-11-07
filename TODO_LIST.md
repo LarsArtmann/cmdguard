@@ -84,6 +84,19 @@ status report: `docs/status/2026-11-02_10-15_config-truth-execution-mid-flight.m
 
 ---
 
+## Harvested (2026-11-07 docs-health pass)
+
+Items pulled forward from the 2026-06→2026-09 status reports during the
+annotate/archive sweep. Everything else those reports contained was either
+resolved (struck with evidence in the report itself) or routed to ROADMAP
+"Harvested from 2026-0X status reports".
+
+| #  | Task                                       | Notes                                                                                                        | Priority | Status  |
+| -- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | -------- | ------- |
+| H1 | Test all examples in CI                    | `examples/` compile via `go build ./...` but no CI job runs their tests; add an examples job to `ci.yml` (30m) | Low      | 🔴 TODO |
+
+---
+
 ## Blocked on Upstream
 
 | #  | Task                           | Blocker                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Priority | Status  |

@@ -205,13 +205,13 @@ These are mostly error-path branches not exercised in tests.
 
 Nothing is truly fucked. The codebase is solid. But there are annoyances:
 
-1. **Pre-commit hooks are broken** — The nix-based pre-commit hook (BuildFlow) has broken steps (nixfmt, deadnix, vulnix missing from nixpkgs or misconfigured). Every commit requires `--no-verify`. This is annoying but not dangerous.
+1. ~~**Pre-commit hooks are broken** — The nix-based pre-commit hook (BuildFlow) has broken steps (nixfmt, deadnix, vulnix missing from nixpkgs or misconfigured). Every commit requires `--no-verify`. This is annoying but not dangerous.~~ done — fixed — obsolete pre-commit hook removed (8618022)
 
-2. **LSP shows 16+ stale errors** — gopls caches errors from previous sessions' failed edits (e.g., `WithColor` references that were fixed). `go build` succeeds fine. Need to restart gopls periodically.
+2. ~~**LSP shows 16+ stale errors** — gopls caches errors from previous sessions' failed edits (e.g., `WithColor` references that were fixed). `go build` succeeds fine. Need to restart gopls periodically.~~ **Won't implement — transient gopls cache — environment-only, no code artifact.**
 
-3. **Coverage data is misleading** — The `grep '0\.0%'` output includes ALL functions with coverage below 100% (e.g., 90.0%, 60.0%). The actual count of 0.0% functions (17) is correct but the grep is noisy.
+3. ~~**Coverage data is misleading** — The `grep '0\.0%'` output includes ALL functions with coverage below 100% (e.g., 90.0%, 60.0%). The actual count of 0.0% functions (17) is correct but the grep is noisy.~~ **Won't implement — informational note about grep noise — no action item.**
 
-4. **`testConfig` type defined per-test-file** — Each test file defines its own `type testConfig struct{}` (44+ occurrences). This is a Go test pattern that works but is redundant. A shared test config would be cleaner.
+4. ~~**`testConfig` type defined per-test-file** — Each test file defines its own `type testConfig struct{}` (44+ occurrences). This is a Go test pattern that works but is redundant. A shared test config would be cleaner.~~ **NOT-DO — accepted Go test idiom — per-file testConfig kept; helpers shared via pkg/testutil.**
 
 ---
 
@@ -219,23 +219,23 @@ Nothing is truly fucked. The codebase is solid. But there are annoyances:
 
 ### High-Impact, Low-Effort
 
-1. **Fix pre-commit hooks** — Either fix the nix steps or simplify the hook. Saves `--no-verify` on every commit.
-2. **Add CODECOV_TOKEN** — 5-minute task, enables coverage tracking.
-3. **Test remaining 0% functions** — The `IsEmpty()` methods and validators are trivial to test.
-4. **Test `WithConfigFileLoader`** — Integration test with YAML/TOML via CLI Execute.
+1. ~~**Fix pre-commit hooks** — Either fix the nix steps or simplify the hook. Saves `--no-verify` on every commit.~~ done — fixed — obsolete pre-commit hook removed (8618022)
+2. ~~**Add CODECOV_TOKEN** — 5-minute task, enables coverage tracking.~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**
+3. ~~**Test remaining 0% functions** — The `IsEmpty()` methods and validators are trivial to test.~~ done — IsEmpty/validator tests shipped — duration_test.go:123, types_port_test.go:94, helpers_test.go:64
+4. ~~**Test `WithConfigFileLoader`** — Integration test with YAML/TOML via CLI Execute.~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**
 
 ### Medium-Impact, Medium-Effort
 
-5. **Reach 90% coverage** — Current 84.8% → 90% requires covering error paths in arg validators, config parsing, and output rendering.
-6. **Add fuzz tests** — Go 1.26 fuzzing for ParseDuration, ParseEmail, ParseURL, ParsePort, etc.
-7. **Add CONTRIBUTING.md** — Standardize contributor onboarding.
-8. **Fix LSP staleness** — Investigate why gopls caches old errors.
+5. ~~**Reach 90% coverage** — Current 84.8% → 90% requires covering error paths in arg validators, config parsing, and output rendering.~~ done — core at 90.4% (FEATURES.md metrics table)
+6. ~~**Add fuzz tests** — Go 1.26 fuzzing for ParseDuration, ParseEmail, ParseURL, ParsePort, etc.~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7
+7. ~~**Add CONTRIBUTING.md** — Standardize contributor onboarding.~~ done — CONTRIBUTING.md exists at repo root
+8. ~~**Fix LSP staleness** — Investigate why gopls caches old errors.~~ **Won't implement — transient gopls cache — environment-only.**
 
 ### High-Impact, Higher-Effort
 
-9. **Nested config file support** — Currently flat only. Would unlock real-world config files.
-10. **Structured JSON errors** — Machine-readable error output for `--output=json`.
-11. **Nix packaging** — Add `buildGoModule` to flake.nix for proper package builds.
+9. ~~**Nested config file support** — Currently flat only. Would unlock real-world config files.~~ done — nested config structs supported (AGENTS.md gotcha 18)
+10. ~~**Structured JSON errors** — Machine-readable error output for `--output=json`.~~ done — cli_errors_json.go structured JSON error output
+11. ~~**Nix packaging** — Add `buildGoModule` to flake.nix for proper package builds.~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**
 
 ---
 
@@ -245,31 +245,31 @@ Sorted by impact/effort ratio:
 
 | #  | Task                                                                                | Impact | Effort | Category |
 | -- | ----------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| 1  | Fix nix pre-commit hooks (nixfmt/deadnix/vulnix)                                    | High   | 30m    | Infra    |
-| 2  | Add CODECOV_TOKEN to GitHub repo settings                                           | High   | 5m     | CI/CD    |
-| 3  | Test IsEmpty() methods (Duration, LogLevel, LogFormat, Port)                        | Low    | 15m    | Coverage |
-| 4  | Test validators (validateEmail, validateURL, validateNonEmpty, validateFieldByKind) | Medium | 30m    | Coverage |
-| 5  | Test RegisterValidator global function                                              | Low    | 10m    | Coverage |
-| 6  | Test WithDoctorLong option                                                          | Low    | 5m     | Coverage |
-| 7  | Test renderAndWrite directly                                                        | Low    | 10m    | Coverage |
-| 8  | Test WithConfigFileLoader integration via CLI Execute                               | Medium | 30m    | Coverage |
-| 9  | Cover WithExactArgs/WithMinimumArgs/WithMaximumArgs error paths                     | Low    | 20m    | Coverage |
-| 10 | Cover WithRangeArgs error paths (negative min, min>max)                             | Low    | 10m    | Coverage |
-| 11 | Add fuzz tests for ParseDuration, ParseEmail, ParseURL, ParsePort                   | High   | 1h     | Quality  |
-| 12 | Add CONTRIBUTING.md                                                                 | Medium | 30m    | Docs     |
-| 13 | Add GitHub issue/PR templates                                                       | Medium | 20m    | Docs     |
-| 14 | Update TODO_LIST.md — mark #29 (NoFlags), #34 (WithColor), #35 (NO_COLOR) as DONE   | Low    | 10m    | Docs     |
-| 15 | Add buildGoModule to flake.nix for proper Nix packaging                             | Medium | 1h     | Infra    |
-| 16 | Add Scope.HealthCheckResults test (currently 0% at scope.go:212)                    | Low    | 10m    | Coverage |
-| 17 | Add ArgsFromContext full coverage (currently 60%)                                   | Low    | 15m    | Coverage |
-| 18 | Structured JSON error output for --output=json                                      | High   | 2h     | Feature  |
-| 19 | Config file nested struct support                                                   | High   | 4h     | Feature  |
-| 20 | Plugin system for custom validators and type handlers                               | High   | 4h     | Feature  |
-| 21 | Documentation generation (GenerateDocs)                                             | Medium | 3h     | Feature  |
-| 22 | Extract flag-related code to standalone flagtags library                            | Medium | 4h     | Refactor |
-| 23 | Advanced types: Result[T], Validated[T], branded IDs                                | Medium | 4h     | Feature  |
-| 24 | Config auto-loading with koanf integration                                          | Medium | 3h     | Feature  |
-| 25 | Shared test config type (reduce 44+ testConfig definitions)                         | Low    | 1h     | Cleanup  |
+| ~~1~~  | ~~Fix nix pre-commit hooks (nixfmt/deadnix/vulnix)~~ done — obsolete pre-commit hook removed (8618022) | ~~High~~ | ~~30m~~ | ~~Infra~~ |
+| ~~2~~  | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~High~~ | ~~5m~~ | ~~CI/CD~~ |
+| ~~3~~  | ~~Test IsEmpty() methods (Duration, LogLevel, LogFormat, Port)~~ done — IsEmpty tests shipped — duration_test.go:123, types_port_test.go:94, helpers_test.go:64 | ~~Low~~ | ~~15m~~ | ~~Coverage~~ |
+| ~~4~~  | ~~Test validators (validateEmail, validateURL, validateNonEmpty, validateFieldByKind)~~ done — validators delegate to ParseEmail/ParseURL (flags_validate.go:238) | ~~Medium~~ | ~~30m~~ | ~~Coverage~~ |
+| ~~5~~  | ~~Test RegisterValidator global function~~ done — flags_validate_test.go covers RegisterValidator | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
+| ~~6~~  | ~~Test WithDoctorLong option~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor covered by doctor_test.go.** | ~~Low~~ | ~~5m~~ | ~~Coverage~~ |
+| ~~7~~  | ~~Test renderAndWrite directly~~ **Superseded — symbol gone — output.go rewritten via go-output registries.** | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
+| ~~8~~  | ~~Test WithConfigFileLoader integration via CLI Execute~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~Medium~~ | ~~30m~~ | ~~Coverage~~ |
+| ~~9~~  | ~~Cover WithExactArgs/WithMinimumArgs/WithMaximumArgs error paths~~ **Superseded — rewritten through v3/v4 — ErrTooFewArgs/ErrTooManyArgs removed (CHANGELOG 3.0.0).** | ~~Low~~ | ~~20m~~ | ~~Coverage~~ |
+| ~~10~~ | ~~Cover WithRangeArgs error paths (negative min, min>max)~~ **Superseded — rewritten through v3/v4 — WithRangeArgs(minArgs, maxArgs) reshaped.** | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
+| ~~11~~ | ~~Add fuzz tests for ParseDuration, ParseEmail, ParseURL, ParsePort~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~High~~ | ~~1h~~ | ~~Quality~~ |
+| ~~12~~ | ~~Add CONTRIBUTING.md~~ done — CONTRIBUTING.md exists at repo root | ~~Medium~~ | ~~30m~~ | ~~Docs~~ |
+| ~~13~~ | ~~Add GitHub issue/PR templates~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist | ~~Medium~~ | ~~20m~~ | ~~Docs~~ |
+| ~~14~~ | ~~Update TODO_LIST.md — mark #29 (NoFlags), #34 (WithColor), #35 (NO_COLOR) as DONE~~ **Superseded — rewritten repeatedly since; TODO_LIST refreshed through v4 (2026-11).** | ~~Low~~ | ~~10m~~ | ~~Docs~~ |
+| ~~15~~ | ~~Add buildGoModule to flake.nix for proper Nix packaging~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Medium~~ | ~~1h~~ | ~~Infra~~ |
+| ~~16~~ | ~~Add Scope.HealthCheckResults test (currently 0% at scope.go:212)~~ done — coverage_improvement_test.go covers HealthCheckResults | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
+| ~~17~~ | ~~Add ArgsFromContext full coverage (currently 60%)~~ done — cli_superb_test.go covers ArgsFromContext | ~~Low~~ | ~~15m~~ | ~~Coverage~~ |
+| ~~18~~ | ~~Structured JSON error output for --output=json~~ done — cli_errors_json.go structured JSON error output | ~~High~~ | ~~2h~~ | ~~Feature~~ |
+| ~~19~~ | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~High~~ | ~~4h~~ | ~~Feature~~ |
+| ~~20~~ | ~~Plugin system for custom validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~High~~ | ~~4h~~ | ~~Feature~~ |
+| ~~21~~ | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go | ~~Medium~~ | ~~3h~~ | ~~Feature~~ |
+| ~~22~~ | ~~Extract flag-related code to standalone flagtags library~~ **Won't implement — idea dropped — not in 2026-11-02 ROADMAP restructure.** | ~~Medium~~ | ~~4h~~ | ~~Refactor~~ |
+| ~~23~~ | ~~Advanced types: Result[T], Validated[T], branded IDs~~ **Superseded — Result/Validated removed in v3.0.0; branded IDs via go-branded-id dep.** | ~~Medium~~ | ~~4h~~ | ~~Feature~~ |
+| ~~24~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Medium~~ | ~~3h~~ | ~~Feature~~ |
+| ~~25~~ | ~~Shared test config type (reduce 44+ testConfig definitions)~~ **NOT-DO — accepted Go test idiom — helpers shared via pkg/testutil instead.** | ~~Low~~ | ~~1h~~ | ~~Cleanup~~ |
 
 ---
 
