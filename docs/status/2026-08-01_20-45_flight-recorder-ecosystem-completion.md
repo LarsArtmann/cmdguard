@@ -157,43 +157,43 @@ mocking, but it means the "another flight recorder is already active" scenario i
 
 ### Code Quality
 
-1. **Split `Capture` into `buildSnapshotPath` + `writeSnapshot`** — The method does too many things: context check, enabled check, directory creation, filename construction, file creation, write, cleanup, logging. Extract helpers for testability and readability.
+~~1. **Split `Capture` into `buildSnapshotPath` + `writeSnapshot`** — The method does too many things: context check, enabled check, directory creation, filename construction, file creation, write, cleanup, logging. Extract helpers for testability and readability.~~ v:done ba818e3 (§c item 2)
 
-2. **Don't swallow `Start()` errors in middleware** — When the recorder fails to start, the middleware silently logs and continues. This is a **debugging anti-pattern** for a debugging tool — the user enables flight recording, it silently fails, and they wonder why no snapshots appear. At minimum, the log message should be prominent (stderr, not just the configured `Log` func).
+~~2. **Don't swallow `Start()` errors in middleware** — When the recorder fails to start, the middleware silently logs and continues. This is a **debugging anti-pattern** for a debugging tool — the user enables flight recording, it silently fails, and they wonder why no snapshots appear. At minimum, the log message should be prominent (stderr, not just the configured `Log` func).~~ p:addressed in the backlog-execution pass (2026-08-01_21-22)
 
-3. **Make `evaluateCapture` doc comment precise** — Should say "Error takes precedence over slow when both conditions are met" so readers don't have to reverse-engineer the control flow.
+~~3. **Make `evaluateCapture` doc comment precise** — Should say "Error takes precedence over slow when both conditions are met" so readers don't have to reverse-engineer the control flow.~~ p:addressed in the backlog pass; the doc comment was corrected
 
-4. **Consider `Capture` returning the `WriteTo` error separately** — Currently, `Capture` wraps the `WriteTo` error in a generic "creating snapshot" message. Users can't distinguish "file creation failed" from "trace write failed".
+~~4. **Consider `Capture` returning the `WriteTo` error separately** — Currently, `Capture` wraps the `WriteTo` error in a generic "creating snapshot" message. Users can't distinguish "file creation failed" from "trace write failed".~~ → ROADMAP Flight Recorder Enhancements (Separate file-creation vs write errors)
 
 ~~5. **Filename collision still possible** — Nanosecond timestamps dramatically reduce collision probability but don't eliminate it. Two goroutines capturing in the same nanosecond on a high-core-count machine would still clobber. Consider appending a random suffix or using `os.CreateTemp` pattern.~~ → ROADMAP Flight Recorder Enhancements (os.CreateTemp pattern)
 
 ### Testing
 
-6. **Integration test through `CLI[T].Execute()`** — This is the #1 gap. Create a minimal CLI with `WithFlightRecorder`, execute a command that errors, assert the `.trace` file appears. This validates the entire chain: CLIOption → WithMiddleware → buildChain → middleware execution → cobra context propagation → async capture.
+~~6. **Integration test through `CLI[T].Execute()`** — This is the #1 gap. Create a minimal CLI with `WithFlightRecorder`, execute a command that errors, assert the `.trace` file appears. This validates the entire chain: CLIOption → WithMiddleware → buildChain → middleware execution → cobra context propagation → async capture.~~ v:done ba818e3 — 3 integration tests
 
-7. **Test the `Start()` failure path in middleware** — Create a scenario where `Start()` fails (e.g., manually start a second recorder first), run the middleware, verify it logs and still calls `next()`.
+~~7. **Test the `Start()` failure path in middleware** — Create a scenario where `Start()` fails (e.g., manually start a second recorder first), run the middleware, verify it logs and still calls `next()`.~~ p:covered by the backlog pass test additions
 
-8. **Test `go tool trace` parseability** — Shell out to `go tool trace -http=:0 <file>` (or just `go tool trace <file>` with a timeout) and verify it doesn't error. This validates the trace format end-to-end.
+~~8. **Test `go tool trace` parseability** — Shell out to `go tool trace -http=:0 <file>` (or just `go tool trace <file>` with a timeout) and verify it doesn't error. This validates the trace format end-to-end.~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
 
-9. **Test filename collision behavior** — Two captures in the same nanosecond (hard to reproduce, but a focused test with mocked timestamps would work).
+~~9. **Test filename collision behavior** — Two captures in the same nanosecond (hard to reproduce, but a focused test with mocked timestamps would work).~~ p:covered by the sub-module's 48-test suite
 
 ### Documentation
 
-10. **Fix README.md dead import** — Either add `flightrecorder.WithFlightRecorder[Config](...)` to the example code, or remove the import.
+~~10. **Fix README.md dead import** — Either add `flightrecorder.WithFlightRecorder[Config](...)` to the example code, or remove the import.~~ v:done ba818e3
 
-11. **Full API reference in docs/API.md** — Document all exported types (`Config`, `Recorder`, `CaptureReason`), functions (`New`, `DefaultConfig`, `Middleware`, `WithFlightRecorder`), methods (`Start`, `Stop`, `Enabled`, `WriteTo`, `Capture`, `Config`), and sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`).
+~~11. **Full API reference in docs/API.md** — Document all exported types (`Config`, `Recorder`, `CaptureReason`), functions (`New`, `DefaultConfig`, `Middleware`, `WithFlightRecorder`), methods (`Start`, `Stop`, `Enabled`, `WriteTo`, `Capture`, `Config`), and sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`).~~ s:superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the reference lives in pkg.go.dev + FEATURES
 
-12. **Fix FEATURES.md "v3 API signatures"** — Line 330 still references v3.
+~~12. **Fix FEATURES.md "v3 API signatures"** — Line 330 still references v3.~~ v:done ba818e3
 
-13. **Update TODO_LIST.md and ROADMAP.md** — Document the shipped feature and any deferred work.
+~~13. **Update TODO_LIST.md and ROADMAP.md** — Document the shipped feature and any deferred work.~~ v:done — ROADMAP carries the Flight Recorder Enhancements section
 
 ### Architecture
 
-14. **Consider `CaptureToWriter(writer io.Writer, commandName string, reason CaptureReason) (int64, error)`** — Decouples snapshot writing from file system. Useful for piping to stdout, network storage, or testing.
+~~14. **Consider `CaptureToWriter(writer io.Writer, commandName string, reason CaptureReason) (int64, error)`** — Decouples snapshot writing from file system. Useful for piping to stdout, network storage, or testing.~~ v:ships — CaptureToWriter(ctx, w, commandName, reason) (AGENTS.md)
 
-15. **Consider `WithFlightRecorderRecorder[T](rec *Recorder) v4.CLIOption`** — Takes a pre-created recorder for shared lifecycle control across multiple CLIs.
+~~15. **Consider `WithFlightRecorderRecorder[T](rec *Recorder) v4.CLIOption`** — Takes a pre-created recorder for shared lifecycle control across multiple CLIs.~~ v:ships — WithFlightRecorderRecorder[T] (FEATURES.md)
 
-16. **Consider `Sync()` method** — Flush pending captures without stopping the recorder.
+~~16. **Consider `Sync()` method** — Flush pending captures without stopping the recorder.~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
 
 ---
 
@@ -218,35 +218,35 @@ mocking, but it means the "another flight recorder is already active" scenario i
 9. ~~**Add full API reference to `docs/API.md`** (all exported types, methods, errors)~~ done at `ba818e3`
 10. ~~**Update `TODO_LIST.md`** with completed work + deferred items~~ done
 11. ~~**Update `ROADMAP.md`** with flight recorder as shipped feature~~ done
-12. **Test `go tool trace` parseability** — Shell out and verify the trace format — _TODO_LIST D10_
-13. Add test for filename collision — Mock timestamps, verify behavior — _partially done (nanosecond timestamps reduce collision)_
-14. Add `Sync()` method — Flush pending captures without stopping — _in ROADMAP_
-15. Add seed corpus to `testdata/fuzz/` — Persist interesting fuzz inputs
-16. Cover the `Start()` runtime-error path — Test with a pre-started external recorder — _done at `ba818e3` (StartFailure test)_
-17. Improve middleware error visibility — Don't silently swallow `Start()` failures — _in ROADMAP_
+~~12. **Test `go tool trace` parseability** — Shell out and verify the trace format — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
+~~13. Add test for filename collision — Mock timestamps, verify behavior — _partially done (nanosecond timestamps reduce collision)_~~ p:covered by the sub-module test suite
+~~14. Add `Sync()` method — Flush pending captures without stopping — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
+~~15. Add seed corpus to `testdata/fuzz/` — Persist interesting fuzz inputs~~ v:done ba818e3 — FuzzSanitizeFilename seeds
+~~16. Cover the `Start()` runtime-error path — Test with a pre-started external recorder — _done at `ba818e3` (StartFailure test)_~~ p:covered by the 48-test suite (96.1% coverage)
+~~17. Improve middleware error visibility — Don't silently swallow `Start()` failures — _in ROADMAP_~~ p:addressed in the backlog pass
 
 ### P2 — Nice to Have (Enhancement)
 
 > **ANNOTATION (2026-08-06):** All P2 items are enhancement ideas harvested into
 > `ROADMAP.md` "Flight Recorder Enhancements." None shipped. Left unmarked = open.
 
-19. **Add `MaxSnapshots` config field** — Rate limiting / disk protection
-20. **Add configurable timestamp format** — Let users choose precision or timezone
-21. **Add `CaptureReasonPanic`** — Capture on panic recovery
-22. **Add `CaptureReasonTimeout`** — Capture on context-deadline
-23. **Add `WithFlightRecorderIf[T](cond)` — Custom capture predicates
-24. **Add structured logging option** — `slog` handler instead of printf-style
-25. **Add metric hooks** — Capture count, bytes written, capture duration
-26. **Add `Recorder.Status()` method** — Snapshot stats (started, captures, last capture time)
-27. **Add `flightrecorder` usage to `examples/taskctl/`**
-28. **Add godoc cross-references** from `pkg/cmdguard/v4/middleware.go` to sub-modules
-29. **Add `CaptureOnSignal` option** — Capture on SIGINT/SIGTERM before shutdown
-30. **Add `SanitizeFilename` as exported utility**
-31. **Add `Recorder.Start()` returning cleanup `func()`** — `defer` ergonomics
-32. **Add `WithFlightRecorderAutoStop`** — Stop after first capture
-33. **Document trace data rate** (~10 MB/s) in Config.Log output
-34. **Consider gzip compression for snapshots** — Disk savings
-35. **Consider trace upload hook** — Post-capture callback for remote storage
+~~19. **Add `MaxSnapshots` config field** — Rate limiting / disk protection~~ → ROADMAP Flight Recorder Enhancements (MaxSnapshots config)
+~~20. **Add configurable timestamp format** — Let users choose precision or timezone~~ → ROADMAP Flight Recorder Enhancements (Configurable timestamp format)
+~~21. **Add `CaptureReasonPanic`** — Capture on panic recovery~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)
+~~22. **Add `CaptureReasonTimeout`** — Capture on context-deadline~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonTimeout)
+~~23. **Add `WithFlightRecorderIf[T](cond)` — Custom capture predicates~~ → ROADMAP Flight Recorder Enhancements (WithFlightRecorderIf[T])
+~~24. **Add structured logging option** — `slog` handler instead of printf-style~~ → ROADMAP Flight Recorder Enhancements (Structured logging)
+~~25. **Add metric hooks** — Capture count, bytes written, capture duration~~ → ROADMAP Flight Recorder Enhancements (Metric hooks)
+~~26. **Add `Recorder.Status()` method** — Snapshot stats (started, captures, last capture time)~~ → ROADMAP Flight Recorder Enhancements (Recorder.Status())
+~~27. **Add `flightrecorder` usage to `examples/taskctl/`**~~ → ROADMAP Flight Recorder Enhancements (taskctl wiring)
+~~28. **Add godoc cross-references** from `pkg/cmdguard/v4/middleware.go` to sub-modules~~ p:godoc references maintained through v4 doc passes
+~~29. **Add `CaptureOnSignal` option** — Capture on SIGINT/SIGTERM before shutdown~~ → ROADMAP Flight Recorder Enhancements (CaptureOnSignal)
+~~30. **Add `SanitizeFilename` as exported utility**~~ → ROADMAP Flight Recorder Enhancements (Exported SanitizeFilename)
+~~31. **Add `Recorder.Start()` returning cleanup `func()`** — `defer` ergonomics~~ → ROADMAP Flight Recorder Enhancements (Start() returning a cleanup func())
+~~32. **Add `WithFlightRecorderAutoStop`** — Stop after first capture~~ → ROADMAP Flight Recorder Enhancements (WithFlightRecorderAutoStop)
+~~33. **Document trace data rate** (~10 MB/s) in Config.Log output~~ → ROADMAP Flight Recorder Enhancements (document the trace data rate)
+~~34. **Consider gzip compression for snapshots** — Disk savings~~ → ROADMAP Flight Recorder Enhancements (gzip compression)
+~~35. **Consider trace upload hook** — Post-capture callback for remote storage~~ → ROADMAP Flight Recorder Enhancements (Trace upload hook)
 
 ### P3 — Future Consideration
 
@@ -254,19 +254,19 @@ mocking, but it means the "another flight recorder is already active" scenario i
 > and gopls diagnostics (#45) are resolved (expected behavior). Remaining items
 > are in `ROADMAP.md`. Left unmarked = open.
 
-36. **Consider `flightrecorder/d2`** — Trace visualization export
-37. **Consider `cli.DoctorCommand` integration** — Health check for recorder status
-38. **Consider `ExportAuditLog` pattern integration** — Trace export config
-39. **Consider `flightrecorder/pprof` bridge** — Convert trace to pprof profile
-40. **Consider `WithFlightRecorderEnvVar`** — Env-based config
-41. **Consider `Recorder.CaptureAsync`** — `<-chan error` variant
-42. **Consider `flightrecorder/gotraceui` integration** — Alternative trace viewer
-43. **Consider `MinFreeDisk` config** — Skip capture if disk space low
-44. **Investigate go.sum bloat** — Is 155 lines expected for a zero-dep module via `replace`?
-45. **Resolve gopls diagnostics** — 65 errors about indirect deps not in go.mod
+~~36. **Consider `flightrecorder/d2`** — Trace visualization export~~ → ROADMAP Flight Recorder Enhancements (flightrecorder/d2)
+~~37. **Consider `cli.DoctorCommand` integration** — Health check for recorder status~~ → ROADMAP Flight Recorder Enhancements (DoctorCommand integration)
+~~38. **Consider `ExportAuditLog` pattern integration** — Trace export config~~ → ROADMAP Flight Recorder Enhancements (ExportAuditLog-style trace export config)
+~~39. **Consider `flightrecorder/pprof` bridge** — Convert trace to pprof profile~~ → ROADMAP Flight Recorder Enhancements (flightrecorder/pprof)
+~~40. **Consider `WithFlightRecorderEnvVar`** — Env-based config~~ → ROADMAP Flight Recorder Enhancements (env-based config)
+~~41. **Consider `Recorder.CaptureAsync`** — `<-chan error` variant~~ → ROADMAP Flight Recorder Enhancements (CaptureAsync variant)
+~~42. **Consider `flightrecorder/gotraceui` integration** — Alternative trace viewer~~ → ROADMAP Flight Recorder Enhancements (gotraceui integration)
+~~43. **Consider `MinFreeDisk` config** — Skip capture if disk space low~~ → ROADMAP Flight Recorder Enhancements (MinFreeDisk config)
+~~44. **Investigate go.sum bloat** — Is 155 lines expected for a zero-dep module via `replace`?~~ v:resolved — expected transitive closure (§c item 14)
+~~45. **Resolve gopls diagnostics** — 65 errors about indirect deps not in go.mod~~ v:resolved — false positives from the replace directive (§c item 15)
 ~~46. **Consider CI fuzzing** — Add `-fuzztime` to CI for continuous fuzzing~~ → ROADMAP Flight Recorder Enhancements (CI fuzzing)
 ~~47. **Consider `Capture` returning separate file-creation vs write errors**~~ → ROADMAP Flight Recorder Enhancements (Separate file-creation vs write errors)
-48. **Consider `os.CreateTemp` pattern for collision-free filenames**
+~~48. **Consider `os.CreateTemp` pattern for collision-free filenames**~~ → ROADMAP Flight Recorder Enhancements (os.CreateTemp pattern)
 ~~49. **Consider `Config.Validate()` method** — Validate config before Start~~ → ROADMAP Flight Recorder Enhancements (Config.Validate())
 ~~50. **Consider `flightrecorder` version tagging** — Tag `v0.1.0` like other sub-modules~~ v:done — flightrecorder/v0.1.0 tagged 2026-08-06 (CHANGELOG flightrecorder/v0.1.0)
 

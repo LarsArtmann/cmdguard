@@ -81,18 +81,18 @@
 
 | # | Task                                                                                                  | Category     | Impact | Effort | Breaking? |
 | - | ----------------------------------------------------------------------------------------------------- | ------------ | ------ | ------ | --------- |
-| 1 | Make `Enum` generic (`Enum[T ~string]`) — eliminates 4 method re-declarations per derived type        | Architecture | HIGH   | 30min  | YES (v3)  |
-| 2 | Extract `IsEmpty()` interface — `type Emptyable interface { IsEmpty() bool }` for generic constraints | Architecture | MEDIUM | 15min  | No        |
-| 3 | Extract `TextMarshalable` / `TextUnmarshalable` interfaces for type constraints                       | Architecture | LOW    | 10min  | No        |
-| 4 | Consolidate LogLevel/LogFormat pattern — they share identical method boilerplate                      | DRY          | MEDIUM | 20min  | No        |
+| ~~1~~ | ~~Make `Enum` generic (`Enum[T ~string]`) — eliminates 4 method re-declarations per derived type~~ **Won't implement — never adopted — Enum remains concrete struct in v4 (types_enum.go).** | ~~Architecture~~ | ~~HIGH~~ | ~~30min~~ | ~~YES (v3)~~ |
+| ~~2~~ | ~~Extract `IsEmpty()` interface — `type Emptyable interface { IsEmpty() bool }` for generic constraints~~ **Won't implement — never adopted — no shared Emptyable interface in v4.** | ~~Architecture~~ | ~~MEDIUM~~ | ~~15min~~ | ~~No~~ |
+| ~~3~~ | ~~Extract `TextMarshalable` / `TextUnmarshalable` interfaces for type constraints~~ **Won't implement — never adopted — no TextMarshalable/TextUnmarshalable interfaces in v4.** | ~~Architecture~~ | ~~LOW~~ | ~~10min~~ | ~~No~~ |
+| ~~4~~ | ~~Consolidate LogLevel/LogFormat pattern — they share identical method boilerplate~~ **Won't implement — never consolidated — per-type methods remain in v4 (types_log.go).** | ~~DRY~~ | ~~MEDIUM~~ | ~~20min~~ | ~~No~~ |
 
 ### Library Improvements
 
 | # | Task                                                                                | Category | Impact | Effort |
 | - | ----------------------------------------------------------------------------------- | -------- | ------ | ------ |
-| 5 | Use `go-valid` or similar for validator registration pattern instead of hand-rolled | Library  | LOW    | 60min  |
-| 6 | Consider `koanf` for config file loading instead of hand-rolled loaders             | Library  | MEDIUM | 120min |
-| 7 | Replace `muesli/mango`+`muesli/roff` with a simpler man page solution (or remove)   | Cleanup  | LOW    | 30min  |
+| ~~5~~ | ~~Use `go-valid` or similar for validator registration pattern instead of hand-rolled~~ **Won't implement — never adopted — hand-rolled validator registry remains (flags_validate.go).** | ~~Library~~ | ~~LOW~~ | ~~60min~~ |
+| ~~6~~ | ~~Consider `koanf` for config file loading instead of hand-rolled loaders~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Library~~ | ~~MEDIUM~~ | ~~120min~~ |
+| ~~7~~ | ~~Replace `muesli/mango`+`muesli/roff` with a simpler man page solution (or remove)~~ **Superseded — man-page generation removed in v4 (mango indirect only).** | ~~Cleanup~~ | ~~LOW~~ | ~~30min~~ |
 
 ### Code Quality
 
@@ -125,13 +125,13 @@
 
 ### But there ARE architectural debts that should be acknowledged:
 
-1. **Enum boilerplate problem** — `LogLevel` and `LogFormat` must re-declare 4-5 identical methods each because Go's `type X Enum` pattern doesn't inherit methods. This is 40+ lines of pure boilerplate that would disappear with `Enum[T ~string]`.
+1. ~~**Enum boilerplate problem** — `LogLevel` and `LogFormat` must re-declare 4-5 identical methods each because Go's `type X Enum` pattern doesn't inherit methods. This is 40+ lines of pure boilerplate that would disappear with `Enum[T ~string]`.~~ **Won't implement — never adopted — Enum remains concrete struct in v4 (types_enum.go).**
 
-2. **validateEmail/validateURL double-wrapping** — After our dedup, `validateEmail` delegates to `ParseEmail()` which returns `ErrInvalidEmail`, but `validateEmail` then wraps again with `ErrInvalidEmail`. This means the error chain has `ErrInvalidEmail → ErrInvalidEmail → ...`. Functionally correct (errors.Is works) but semantically redundant.
+2. ~~**validateEmail/validateURL double-wrapping** — After our dedup, `validateEmail` delegates to `ParseEmail()` which returns `ErrInvalidEmail`, but `validateEmail` then wraps again with `ErrInvalidEmail`. This means the error chain has `ErrInvalidEmail → ErrInvalidEmail → ...`. Functionally correct (errors.Is works) but semantically redundant.~~ done — resolved — single-wrap delegation to Parse* in v4 (flags_validate.go:238)
 
-3. **`samber-do-auditlog` local replace** — `go.mod` has `replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog` pointing to a local sibling directory. This makes the project non-buildable from a clean clone without that directory. Should be removed or published.
+3. ~~**`samber-do-auditlog` local replace** — `go.mod` has `replace github.com/larsartmann/samber-do-auditlog => ../samber-do-auditlog` pointing to a local sibling directory. This makes the project non-buildable from a clean clone without that directory. Should be removed or published.~~ done — resolved — samber-do-auditlog published (v0.12.1 from proxy); local replace removed
 
-4. **go-output version split** — Main module at v0.8.0 but sub-packages (serialization, markup, graph, plantuml) at v0.7.0. This version drift is confusing but not broken.
+4. ~~**go-output version split** — Main module at v0.8.0 but sub-packages (serialization, markup, graph, plantuml) at v0.7.0. This version drift is confusing but not broken.~~ **Superseded — go-output external upstream (v0.30.4); version drift resolved upstream.**
 
 ---
 
@@ -139,25 +139,25 @@
 
 ### High-Impact / Low-Effort (do now)
 
-1. **Fix validateEmail/validateURL double-wrapping** — The delegation to `ParseEmail()`/`ParseURL()` already wraps with `ErrInvalidEmail`/`ErrInvalidURL`. The validator wrapper adds a second wrap. Simplify: just return the error from Parse* directly, or don't wrap at all since Parse* already has the sentinel.
+1. ~~**Fix validateEmail/validateURL double-wrapping** — The delegation to `ParseEmail()`/`ParseURL()` already wraps with `ErrInvalidEmail`/`ErrInvalidURL`. The validator wrapper adds a second wrap. Simplify: just return the error from Parse* directly, or don't wrap at all since Parse* already has the sentinel.~~ done — resolved — single-wrap delegation to Parse* in v4 (flags_validate.go:238)
 
-2. **Add coverage for 6 easy 0% functions** — `WithAuditLogGroupID`, `WithDoctorLong`, `RegisterValidator`, `validateNonEmpty`, `NewManPage`, `WithConfigFileLoader`. Each is 2-5 minutes. Could push coverage to 86%+.
+2. ~~**Add coverage for 6 easy 0% functions** — `WithAuditLogGroupID`, `WithDoctorLong`, `RegisterValidator`, `validateNonEmpty`, `NewManPage`, `WithConfigFileLoader`. Each is 2-5 minutes. Could push coverage to 86%+.~~ done — core at 90.4% (FEATURES.md)
 
-3. **Update ADR-001** — It says "gaps remain" for `WithFangErrorHandler` and `WithFangColorScheme`, but those are now integrated. Update the ADR status.
+3. ~~**Update ADR-001** — It says "gaps remain" for `WithFangErrorHandler` and `WithFangColorScheme`, but those are now integrated. Update the ADR status.~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.**
 
 ### Medium-Impact / Medium-Effort (plan for next sprint)
 
-4. **Extract `Emptyable` interface** — `type Emptyable interface { IsEmpty() bool }`. Use it as a constraint in generic helpers. All 9 value types already implement it. Zero cost, improves generic utility.
+4. ~~**Extract `Emptyable` interface** — `type Emptyable interface { IsEmpty() bool }`. Use it as a constraint in generic helpers. All 9 value types already implement it. Zero cost, improves generic utility.~~ **Won't implement — never adopted — no shared Emptyable interface in v4.**
 
-5. **Consolidate LogLevel/LogFormat boilerplate** — Even without making Enum generic, we could extract shared method implementations. `textMarshal`/`textUnmarshal` already help, but `String()`, `IsEmpty()`, `MarshalText()`, `UnmarshalText()` are still hand-written per type.
+5. ~~**Consolidate LogLevel/LogFormat boilerplate** — Even without making Enum generic, we could extract shared method implementations. `textMarshal`/`textUnmarshal` already help, but `String()`, `IsEmpty()`, `MarshalText()`, `UnmarshalText()` are still hand-written per type.~~ **Won't implement — never consolidated — per-type methods remain in v4 (types_log.go).**
 
-6. **Resolve `samber-do-auditlog` replace directive** — Either publish the dependency properly or document the local development setup clearly.
+6. ~~**Resolve `samber-do-auditlog` replace directive** — Either publish the dependency properly or document the local development setup clearly.~~ done — resolved — published v0.12.1 from proxy; replace removed
 
 ### High-Impact / High-Effort (defer to v3)
 
-7. **Make Enum generic** — `Enum[T ~string]` would eliminate all boilerplate for derived enum types. But this is a breaking API change — all `type LogLevel Enum` becomes `type LogLevel = Enum[LogLevelKind]` or similar. Requires careful design.
+7. ~~**Make Enum generic** — `Enum[T ~string]` would eliminate all boilerplate for derived enum types. But this is a breaking API change — all `type LogLevel Enum` becomes `type LogLevel = Enum[LogLevelKind]` or similar. Requires careful design.~~ **Won't implement — never adopted — Enum concrete in v4 (types_enum.go).**
 
-8. **Replace hand-rolled config loaders with koanf** — The `configload` package (3 loaders + auto-detect) reimplements what koanf does better. But this changes the dependency tree and potentially the API.
+8. ~~**Replace hand-rolled config loaders with koanf** — The `configload` package (3 loaders + auto-detect) reimplements what koanf does better. But this changes the dependency tree and potentially the API.~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)
 
 ---
 

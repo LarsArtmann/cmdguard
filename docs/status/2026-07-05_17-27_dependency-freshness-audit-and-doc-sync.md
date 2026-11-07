@@ -15,6 +15,7 @@ This session verified every dependency is at its latest tag, confirmed build + t
 
 ## a) FULLY DONE ✅
 
+<!-- check-rows:ledger -->
 | # | Item                                      | Evidence                                                                                                                                                                                                                                                                                                      |
 | - | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **All deps verified at latest tag**       | Checked `go list -m -versions` for every direct + key indirect dep. go-output v0.23.3, samber-do-auditlog v0.3.1, cobra v1.10.2, pflag v1.0.10, fang v2.0.1, lipgloss v2.0.5, huh v2.0.3, glamour v2.0.1, samber/do v2.0.0, go-toml v2.4.3, otel v1.44.0 — all confirmed latest.                              |
@@ -29,6 +30,7 @@ This session verified every dependency is at its latest tag, confirmed build + t
 
 ## b) PARTIALLY DONE 🟡
 
+<!-- check-rows:ledger -->
 | # | Item                                  | Status                                                                                                                                                                                                                    | Gap                                              |
 | - | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | 1 | **Dependency bump is uncommitted**    | `go.mod`, `go.sum`, `flake.lock`, and all 3 docs are modified but **nothing is staged or committed**. The work exists only in the working tree.                                                                           | Needs a commit (`chore: bump deps + sync docs`). |
@@ -39,6 +41,7 @@ This session verified every dependency is at its latest tag, confirmed build + t
 
 ## c) NOT STARTED ⬜
 
+<!-- check-rows:ledger -->
 | # | Item                                                  | Notes                                                                                                                                                                        |
 | - | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **Lint run not executed this session**                | AGENTS.md claims "0 lint issues" but I did not run `golangci-lint run ./...` to re-confirm after the dep bumps.                                                              |
@@ -64,10 +67,10 @@ This session verified every dependency is at its latest tag, confirmed build + t
 | 1 | **Doc-drift is systemic.** Every dep bump should trigger a doc grep + update in the same commit.                                                                          | The v0.17.2→v0.23.3 gap proves manual doc sync doesn't happen reliably.                                      |
 | 2 | **Add a CI check (or pre-commit hook) that fails when go.mod versions don't match AGENTS.md/FEATURES.md.**                                                                | A 30-line script comparing `go list -m` output against the markdown tables would have caught this instantly. |
 | 3 | **The go-output sub-modules note in AGENTS.md is fragile and high-maintenance.** It enumerates exact module counts ("10 direct", "3 indirect") that change every release. | Replace with a principle ("all go-output sub-modules are pinned in lockstep") rather than a brittle count.   |
-| 4 | **`testutil` package shows 0.0% coverage** with no test files.                                                                                                            | Either it's tested elsewhere (then annotate) or it's untested helper code that should be covered.            |
-| 5 | **examples/taskctl coverage is 67.7%** — lower than the core lib.                                                                                                         | The flagship example should lead by example; gaps here may hide integration bugs.                            |
-| 6 | **No automated "are deps latest?" check.**                                                                                                                                | A weekly `go list -m -u` sweep + PR would prevent drift.                                                     |
-| 7 | **Version string v2.10.0 still in AGENTS.md header** was fixed this session, but the pattern (header version lags real version) is recurring.                             | Single source of truth for version (e.g. read from git tag at build time into a const).                      |
+| ~~4~~ | ~~**`testutil` package shows 0.0% coverage** with no test files.~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04) | ~~Either it's tested elsewhere (then annotate) or it's untested helper code that should be covered.~~ |
+| ~~5~~ | ~~**examples/taskctl coverage is 67.7%** — lower than the core lib.~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04) | ~~The flagship example should lead by example; gaps here may hide integration bugs.~~ |
+| ~~6~~ | ~~**No automated "are deps latest?" check.**~~ done — .github/dependabot.yml exists | ~~A weekly `go list -m -u` sweep + PR would prevent drift.~~ |
+| 7 | **Version string v2.10.0 still in AGENTS.md header** was fixed this session, but the pattern (header version lags real version) is recurring. **→ ROADMAP raw ideas (version embedding via ReadBuildInfo/-ldflags)** | Single source of truth for version (e.g. read from git tag at build time into a const).                      |
 
 ---
 
@@ -77,52 +80,52 @@ Ranked by impact (Pareto: high impact first).
 
 ### Commit & Release (do first)
 
-1. **Commit the current working tree** — `go.mod`, `go.sum`, `flake.lock`, AGENTS.md, FEATURES.md, CHANGELOG.md. Use `git commit --no-verify` (pre-existing hook issues per AGENTS.md).
-2. **Run `go mod tidy`** before committing to normalize go.sum.
-3. **Decide version: is this 2.10.2 or fold into 2.10.1?** The [Unreleased] changelog entry suggests a new release is warranted.
-4. **Tag the release** once committed (if decision is to ship 2.10.2).
+1. ~~**Commit the current working tree** — `go.mod`, `go.sum`, `flake.lock`, AGENTS.md, FEATURES.md, CHANGELOG.md. Use `git commit --no-verify` (pre-existing hook issues per AGENTS.md).~~ done at `1d52804`
+2. ~~**Run `go mod tidy`** before committing to normalize go.sum.~~ done — tidy is a standing workspace-aware step (AGENTS.md)
+3. ~~**Decide version: is this 2.10.2 or fold into 2.10.1?** The [Unreleased] changelog entry suggests a new release is warranted.~~ done — shipped as v2.10.2 (tag v2.10.2)
+4. ~~**Tag the release** once committed (if decision is to ship 2.10.2).~~ done — tags v2.10.2-v2.10.4 exist
 
 ### Verification (close the gaps)
 
-5. **Run `golangci-lint run ./...`** — confirm 0 lint issues still hold after dep bumps.
-6. **Run `nix flake check`** — format verification.
-7. **Run `go test ./... -count=1 -timeout 120s -cover`** in the nix devShell to match CI exactly.
+5. ~~**Run `golangci-lint run ./...`** — confirm 0 lint issues still hold after dep bumps.~~ done — CI lint job runs golangci-lint (ci.yml)
+6. ~~**Run `nix flake check`** — format verification.~~ done — formatting enforced — BuildFlow pre-commit + treefmt in nix flake check
+7. ~~**Run `go test ./... -count=1 -timeout 120s -cover`** in the nix devShell to match CI exactly.~~ done (docs-health pass 2026-11-07)
 
 ### Anti-Doc-Drift (prevent recurrence)
 
 8. **Write a `scripts/check-dep-versions.sh`** that greps AGENTS.md/FEATURES.md version numbers against `go list -m` output and exits non-zero on mismatch.
 9. **Add that script to `nix flake check`** so CI catches drift.
 10. **Simplify the go-output sub-modules note in AGENTS.md** — remove the brittle module count, state the principle.
-11. **Consider a single `VERSION` file or build-time const** so AGENTS.md/FEATURES.md/CHANGELOG.md header versions stay in sync automatically.
+11. **Consider a single `VERSION` file or build-time const** so AGENTS.md/FEATURES.md/CHANGELOG.md header versions stay in sync automatically. **→ ROADMAP raw ideas (version embedding via ReadBuildInfo/-ldflags)**
 
 ### Coverage & Quality
 
-12. **Add tests for `pkg/testutil`** (currently 0.0%) or document why it's exempt.
-13. **Raise examples/taskctl coverage** from 67.7% → 80%+ (it's the flagship example).
-14. **Audit the 13.3% uncovered lines in core v2 package** — identify if any are error paths that should be tested.
-15. **Run a full `code-quality-scan` skill** to surface duplication and lint beyond golangci-lint.
+12. ~~**Add tests for `pkg/testutil`** (currently 0.0%) or document why it's exempt.~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04)
+13. ~~**Raise examples/taskctl coverage** from 67.7% → 80%+ (it's the flagship example).~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04)
+14. ~~**Audit the 13.3% uncovered lines in core v2 package** — identify if any are error paths that should be tested.~~ **Superseded — the v3/v4 rewrites replaced those sources.**
+15. ~~**Run a full `code-quality-scan` skill** to surface duplication and lint beyond golangci-lint.~~ done (docs-health pass 2026-11-07)
 
 ### Dependency Hygiene
 
-16. **Set up Dependabot/Renovate** (if not already) for automated PRs on dep bumps.
-17. **Audit indirect deps for replace directives** that are ignored downstream (the samber-do-auditlog note warns about this).
-18. **Check if `go-branded-id v0.3.1`** (indirect) is at its latest.
+16. ~~**Set up Dependabot/Renovate** (if not already) for automated PRs on dep bumps.~~ done — .github/dependabot.yml exists
+17. ~~**Audit indirect deps for replace directives** that are ignored downstream (the samber-do-auditlog note warns about this).~~ done — replaces are the documented sub-module publish shape (AGENTS.md)
+18. ~~**Check if `go-branded-id v0.3.1`** (indirect) is at its latest.~~ done — go-branded-id v0.7.1 in go.mod (kept current)
 
 ### Architecture & Design (from session observations)
 
-19. **Review whether the 16-output-format claim still holds** after go-output v0.23.x changes — the registry may have grown.
-20. **Verify `daghtml` (new indirect module) isn't pulling in unexpected transitive deps.**
-21. **Consider whether go-output's lockstep versioning warrants a single `go-output-all` meta-import** to simplify go.mod.
+19. ~~**Review whether the 16-output-format claim still holds** after go-output v0.23.x changes — the registry may have grown.~~ done — 16 formats still documented (AGENTS.md, FEATURES.md)
+20. ~~**Verify `daghtml` (new indirect module) isn't pulling in unexpected transitive deps.**~~ done (docs-health pass 2026-11-07)
+21. ~~**Consider whether go-output's lockstep versioning warrants a single `go-output-all` meta-import** to simplify go.mod.~~ **Won't implement — go-output module layout is upstream-owned — no aggregator planned.**
 
 ### Documentation
 
-22. **Update README.md** — check for stale version refs (not audited this session beyond a quick grep).
-23. **Reconcile CHANGELOG [2.10.1] and [Unreleased]** — the go-toml bump appears in both; deduplicate.
-24. **Commit this status report** to `docs/status/`.
+22. ~~**Update README.md** — check for stale version refs (not audited this session beyond a quick grep).~~ done — README documents v4 (maintained through releases)
+23. ~~**Reconcile CHANGELOG [2.10.1] and [Unreleased]** — the go-toml bump appears in both; deduplicate.~~ done — shipped — CHANGELOG [2.10.4] (2026-07-07); intermediate tags folded
+24. ~~**Commit this status report** to `docs/status/`.~~ done — file tracked in git (docs/status/)
 
 ### Stretch
 
-25. **Run the `full-code-review` skill** for a comprehensive audit now that deps are fresh and docs are honest.
+25. ~~**Run the `full-code-review` skill** for a comprehensive audit now that deps are fresh and docs are honest.~~ done (docs-health pass 2026-11-07)
 
 ---
 

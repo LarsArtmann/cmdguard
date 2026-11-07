@@ -66,6 +66,7 @@ cmdguard is in **excellent shape**. After a deep improvement sprint spanning 10 
 
 ### Quality Metrics
 
+<!-- check-rows:ledger -->
 | Metric                | Value   |
 | --------------------- | ------- |
 | Source files          | 48      |
@@ -96,6 +97,7 @@ cmdguard is in **excellent shape**. After a deep improvement sprint spanning 10 
 
 ### Sprint Commits (This Session)
 
+<!-- check-rows:ledger -->
 | Commit    | Description                                                 |
 | --------- | ----------------------------------------------------------- |
 | `e53c8e6` | Fix NO_COLOR env var restore after execution                |
@@ -115,6 +117,7 @@ cmdguard is in **excellent shape**. After a deep improvement sprint spanning 10 
 
 These functions exist but have no direct test coverage:
 
+<!-- check-rows:ledger -->
 | Function                        | File                  | Why                                                                   |
 | ------------------------------- | --------------------- | --------------------------------------------------------------------- |
 | `huhPromptRunner.PromptString`  | prompts.go:23         | Requires interactive terminal; tested via `promptMissingCommandFlags` |
@@ -139,6 +142,7 @@ Most of these are thin wrappers, interactive-terminal functions, or `IsEmpty()` 
 
 ### Partially-Covered Functions (50-90%)
 
+<!-- check-rows:ledger -->
 | Function                      | Coverage | File                   |
 | ----------------------------- | -------- | ---------------------- |
 | `NewCLI`                      | 90%      | cli.go:51              |
@@ -289,6 +293,7 @@ Starting v3 would allow breaking changes (NoFlags already done, could also clean
 
 ## Metrics Dashboard
 
+<!-- check-rows:ledger -->
 | Metric               | Value         | Trend                       |
 | -------------------- | ------------- | --------------------------- |
 | Coverage             | 84.8%         | ↑ from 83.5% (sprint start) |
