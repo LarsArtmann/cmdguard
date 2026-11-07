@@ -167,25 +167,25 @@ tracked the contract's correctness defaults.
 
 ## e) WHAT WE SHOULD IMPROVE! 🛠️
 
-1. **Make the mission measurable.** Add an explicit "Cobra-correctness defaults" checklist to
-   AGENTS.md: SilenceUsage, single-error-print, correct-exit-code, no-RunE-panics, constructor-time
-   validation. Audit it every release.
-2. **Stop leaving features uncommitted.** The scoped-flags work should be committed (or explicitly
-   WIP-stashed with a `WIP:` branch). Uncommitted work in `master`'s tree is invisible to CI and
-   teammates.
-3. **Wire features end-to-end before calling them done.** Scoped flags has registry methods + tests
-   but no path from `NewCLI` → consumer benefit. "Done" means a consumer can use it without calling
-   private-feeling registry methods.
-4. **Pay lint debt on sight.** `config_parsing.go` cyclomatic complexity (17 > 15) fails `nix flake
-check`. Extract a `parseLocalTag` helper — 2 minutes of work.
-5. **Reframe the README around the mission, not the feature count.** The old "Why" sold typed flags;
-   the real differentiator is "Cobra, but the footguns are off by default." (Started today.)
-6. **Add a failure-cleanup abstraction.** Cobra's `PostRunE`-not-on-error is a known trap; a
-   `WithCleanup[T](fn)` or documenting the `defer`-in-handler pattern closes it.
-7. **Set the CODECOV_TOKEN and bump to Go 1.26.4** — two 5-minute P0 items that have lingered.
-8. **Guard against test-ordering flakes.** Today's suite showed transient failures on a first full
-   run that passed on isolation — suggests global registry state (COW shared maps) leaking between
-   parallel tests. Worth a `t.Cleanup` reset audit.
+1. ~~**Make the mission measurable.** Add an explicit "Cobra-correctness defaults" checklist to~~ done — AGENTS.md documents the error/exit contract; WithBatteries codifies the defaults
+   ~~AGENTS.md: SilenceUsage, single-error-print, correct-exit-code, no-RunE-panics, constructor-time~~
+   ~~validation. Audit it every release.~~
+2. ~~**Stop leaving features uncommitted.** The scoped-flags work should be committed (or explicitly~~ done — resolved — scoped flags committed as c60f690
+   ~~WIP-stashed with a `WIP:` branch). Uncommitted work in `master`'s tree is invisible to CI and~~
+   ~~teammates.~~
+3. ~~**Wire features end-to-end before calling them done.** Scoped flags has registry methods + tests~~ done — resolved — wired into the execution path before v2.10.0 (Resolution below)
+   ~~but no path from `NewCLI` → consumer benefit. "Done" means a consumer can use it without calling~~
+   ~~private-feeling registry methods.~~
+4. ~~**Pay lint debt on sight.** `config_parsing.go` cyclomatic complexity (17 > 15) fails `nix flake~~ done — 0 lint issues today; the config parsing path was rewritten through v3/v4
+~~check`. Extract a `parseLocalTag` helper — 2 minutes of work.~~
+5. ~~**Reframe the README around the mission, not the feature count.** The old "Why" sold typed flags;~~ done — README now leads with correctness — "catches missing handlers, duplicate commands, and invalid flags at construction"
+   ~~the real differentiator is "Cobra, but the footguns are off by default." (Started today.)~~
+6. ~~**Add a failure-cleanup abstraction.** Cobra's `PostRunE`-not-on-error is a known trap; a~~ done — WithCleanup[T] ships (AGENTS.md principle; fires on RunE error too)
+   ~~`WithCleanup[T](fn)` or documenting the `defer`-in-handler pattern closes it.~~
+7. ~~**Set the CODECOV_TOKEN and bump to Go 1.26.4** — two 5-minute P0 items that have lingered.~~ **Superseded — superseded — the repo moved to Go 1.27; Codecov stays tokenless by choice.**
+8. ~~**Guard against test-ordering flakes.** Today's suite showed transient failures on a first full~~ done — -race is green in CI; the COW registries are documented concurrency-safe
+   ~~run that passed on isolation — suggests global registry state (COW shared maps) leaking between~~
+   ~~parallel tests. Worth a `t.Cleanup` reset audit.~~
 
 ---
 
@@ -195,31 +195,31 @@ Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygien
 
 | #  | Task                                                                                                               | Impact                   | Effort             |
 | -- | ------------------------------------------------------------------------------------------------------------------ | ------------------------ | ------------------ |
-| 1  | **Commit today's cobra-correctness fix** (SilenceUsage default + `ExitCode` + example fix + docs)                  | 🔴 mission-critical      | done (just commit) |
-| 2  | **Finish + wire scoped flags**: `cli.go` use `RegisterScopedFlags`; `WithLocalFlagGroup` command option; commit it | 🔴 closes a real footgun | M                  |
-| 3  | Extract `parseLocalTag` helper → fix `config_parsing.go` cyclomatic lint → `nix flake check` green                 | 🔴 unblocks release      | S                  |
-| 4  | Add **failure-cleanup hook** (`WithCleanup` / `OnRunError`) so teardown runs on RunE error too                     | 🔴 mission               | M                  |
-| 5  | **Audit every default** against a "Cobra footguns off by default" checklist; document in AGENTS                    | 🔴 mission               | S                  |
-| 6  | Set `CODECOV_TOKEN` secret in GitHub                                                                               | hygiene                  | 5m                 |
-| 7  | Bump `go.mod` → `go 1.26.4` once nixpkgs ships it (CVEs GO-2026-5037/8/9)                                          | security                 | 5m                 |
-| 8  | Update FEATURES.md / CHANGELOG.md / ROADMAP.md for: `ExitCode`, SilenceUsage default, scoped flags                 | docs                     | S                  |
-| 9  | Add `examples/` execution to CI (run each example's tests)                                                         | reliability              | S                  |
-| 10 | Own error display uniformly (fang-off path prints via cobra; make cmdguard the single owner)                       | mission                  | M                  |
-| 11 | Add a second example app focused on a different domain (e.g. server/devtool) to validate the contract              | adoption                 | M                  |
-| 12 | Reset-global-state audit: ensure parallel tests don't pollute the shared COW registries (`t.Cleanup`)              | reliability              | M                  |
-| 13 | Write `docs/COBRA_FOOTGUNS.md` — the explicit list of traps cmdguard closes (marketing + clarity)                  | adoption                 | S                  |
-| 14 | Add fuzz corpus under `testdata/fuzz/` for flag parsing                                                            | robustness               | S                  |
-| 15 | Add `FlagRegistry` interface abstraction (enables mocking / alt impls)                                             | extensibility            | M                  |
-| 16 | Branded-ID example (`types_enum.go` showcase)                                                                      | adoption                 | S                  |
-| 17 | `examples/docs-generator/` app exercising `GenerateDocs`                                                           | adoption                 | S                  |
-| 18 | Deprecation timeline for v1 API                                                                                    | clarity                  | S                  |
-| 19 | Custom validation hooks (per-flag, beyond `required`)                                                              | power                    | M                  |
-| 20 | Metrics/hooks observability beyond OTel                                                                            | ops                      | L                  |
-| 21 | v3.0 API design document (scope before any code)                                                                   | strategic                | L                  |
-| 22 | `flagtags` library extraction (defer to v3; stabilize tag format first)                                            | strategic                | L                  |
-| 23 | Rename `Get[T]`→`GetService[T]` (v3 breaking)                                                                      | clarity                  | M                  |
-| 24 | Generic `RegisterInScope[T]` (v3 breaking)                                                                         | type-safety              | M                  |
-| 25 | Remove `SetConfig` footgun (v3 breaking)                                                                           | safety                   | S                  |
+| ~~1~~  | ~~**Commit today's cobra-correctness fix** (SilenceUsage default + `ExitCode` + example fix + docs)~~ done — committed as 03db723 (Resolution below) | ~~🔴 mission-critical~~ | ~~done (just commit)~~ |
+| ~~2~~  | ~~**Finish + wire scoped flags**: `cli.go` use `RegisterScopedFlags`; `WithLocalFlagGroup` command option; commit it~~ done — committed c60f690 + wired (Resolution below) | ~~🔴 closes a real footgun~~ | ~~M~~ |
+| ~~3~~  | ~~Extract `parseLocalTag` helper → fix `config_parsing.go` cyclomatic lint → `nix flake check` green~~ done — 0 lint issues today | ~~🔴 unblocks release~~ | ~~S~~ |
+| ~~4~~  | ~~Add **failure-cleanup hook** (`WithCleanup` / `OnRunError`) so teardown runs on RunE error too~~ done — WithCleanup[T] ships (AGENTS.md) | ~~🔴 mission~~ | ~~M~~ |
+| ~~5~~  | ~~**Audit every default** against a "Cobra footguns off by default" checklist; document in AGENTS~~ done — WithBatteries codifies the production defaults (AGENTS.md principle 24) | ~~🔴 mission~~ | ~~S~~ |
+| ~~6~~  | ~~Set `CODECOV_TOKEN` secret in GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~hygiene~~ | ~~5m~~ |
+| ~~7~~  | ~~Bump `go.mod` → `go 1.26.4` once nixpkgs ships it (CVEs GO-2026-5037/8/9)~~ **Superseded — superseded — the repo is on Go 1.27.** | ~~security~~ | ~~5m~~ |
+| ~~8~~  | ~~Update FEATURES.md / CHANGELOG.md / ROADMAP.md for: `ExitCode`, SilenceUsage default, scoped flags~~ done — docs maintained through v4.2.1 (CHANGELOG [2.10.0] entry exists) | ~~docs~~ | ~~S~~ |
+| ~~9~~  | ~~Add `examples/` execution to CI (run each example's tests)~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).** | ~~reliability~~ | ~~S~~ |
+| ~~10~~ | ~~Own error display uniformly (fang-off path prints via cobra; make cmdguard the single owner)~~ done — cmdguard owns error display, printed exactly once (AGENTS.md) | ~~mission~~ | ~~M~~ |
+| ~~11~~ | ~~Add a second example app focused on a different domain (e.g. server/devtool) to validate the contract~~ **Superseded — superseded — taskctl stays the flagship; the website serves onboarding.** | ~~adoption~~ | ~~M~~ |
+| ~~12~~ | ~~Reset-global-state audit: ensure parallel tests don't pollute the shared COW registries (`t.Cleanup`)~~ done — -race green in CI; COW registries documented concurrency-safe | ~~reliability~~ | ~~M~~ |
+| ~~13~~ | ~~Write `docs/COBRA_FOOTGUNS.md` — the explicit list of traps cmdguard closes (marketing + clarity)~~ done — docs/COBRA_FOOTGUNS.md exists | ~~adoption~~ | ~~S~~ |
+| ~~14~~ | ~~Add fuzz corpus under `testdata/fuzz/` for flag parsing~~ done — testdata/fuzz seeds shipped; ROADMAP deferred #7 | ~~robustness~~ | ~~S~~ |
+| ~~15~~ | ~~Add `FlagRegistry` interface abstraction (enables mocking / alt impls)~~ **Superseded — superseded — plugin system via Plugin interface.** | ~~extensibility~~ | ~~M~~ |
+| 16 | Branded-ID example (`types_enum.go` showcase) **→ ROADMAP raw ideas (branded-ID example app)** | adoption                 | S                  |
+| ~~17~~ | ~~`examples/docs-generator/` app exercising `GenerateDocs`~~ done — examples/docs-generator exists | ~~adoption~~ | ~~S~~ |
+| ~~18~~ | ~~Deprecation timeline for v1 API~~ **Superseded — the v1 package no longer exists (v4.0.0 migration).** | ~~clarity~~ | ~~S~~ |
+| ~~19~~ | ~~Custom validation hooks (per-flag, beyond `required`)~~ done — custom validators ship — RegisterValidator + validate tag (FEATURES.md) | ~~power~~ | ~~M~~ |
+| 20 | Metrics/hooks observability beyond OTel **→ ROADMAP raw ideas (metrics/hooks observability)** | ops                      | L                  |
+| ~~21~~ | ~~v3.0 API design document (scope before any code)~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~strategic~~ | ~~L~~ |
+| 22 | `flagtags` library extraction (defer to v3; stabilize tag format first) **→ ROADMAP raw ideas (extract flagtags standalone library)** | strategic                | L                  |
+| 23 | Rename `Get[T]`→`GetService[T]` (v3 breaking) **→ ROADMAP v5 candidate #6** | clarity                  | M                  |
+| 24 | Generic `RegisterInScope[T]` (v3 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)** | type-safety              | M                  |
+| 25 | Remove `SetConfig` footgun (v3 breaking) **→ deprecated in v4 — removal tracked as TODO_LIST T4** | safety                   | S                  |
 
 ---
 

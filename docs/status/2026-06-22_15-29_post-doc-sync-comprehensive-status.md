@@ -10,6 +10,7 @@
 
 | Metric                | Value                                                      |
 | --------------------- | ---------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | **Version**           | v2.8.1                                                     |
 | **Go version**        | 1.26.3 (go.mod) / go_1_26 (flake.nix)                      |
 | **Build**             | ✅ PASSING                                                 |
@@ -115,21 +116,21 @@
 
 | Function                      | File                  | Impact                                      |
 | ----------------------------- | --------------------- | ------------------------------------------- |
-| `WithConfigFileLoader`        | config_file.go:206    | Public API, untested directly               |
-| `WithDoctorLong`              | doctor.go:34          | Doctor option, untested                     |
-| `RegisterValidator`           | flags_validate.go:105 | Global validator registration               |
-| `validateEmail`               | flags_validate.go:179 | Delegates to ParseEmail (tested indirectly) |
-| `validateURL`                 | flags_validate.go:191 | Delegates to ParseURL (tested indirectly)   |
-| `validateNonEmpty`            | flags_validate.go:321 | Validator helper                            |
-| `validateFieldByKind`         | flags_validate.go:330 | Validator dispatch                          |
-| `runValidateTagWithRegistry`  | flags_validate.go:341 | Registry-based validation                   |
-| `NewManPage`                  | manpage.go:63         | Man page constructor                        |
-| `PluginRegistrar.TypeHandler` | plugin.go:25          | Plugin registration method                  |
-| `WithPlugin`                  | plugin.go:61          | CLI option for plugins                      |
-| `PromptString`                | prompts.go:23         | Interactive prompt (hard to test — TUI)     |
-| `PromptSelect`                | prompts.go:37         | Interactive prompt (hard to test — TUI)     |
-| `PromptConfirm`               | prompts.go:57         | Interactive prompt (hard to test — TUI)     |
-| `Result[T].MustValue`         | result.go:44          | Panics on Err — intentionally untested?     |
+| ~~`WithConfigFileLoader`~~ done — koanf_loader_test.go covers the loader path | ~~config_file.go:206~~ | ~~Public API, untested directly~~ |
+| ~~`WithDoctorLong`~~ done — doctor_test.go | ~~doctor.go:34~~ | ~~Doctor option, untested~~ |
+| ~~`RegisterValidator`~~ done — flags_validate_test.go | ~~flags_validate.go:105~~ | ~~Global validator registration~~ |
+| ~~`validateEmail`~~ done — delegates to ParseEmail; flags_validate_test.go | ~~flags_validate.go:179~~ | ~~Delegates to ParseEmail (tested indirectly)~~ |
+| ~~`validateURL`~~ done — delegates to ParseURL; flags_validate_test.go | ~~flags_validate.go:191~~ | ~~Delegates to ParseURL (tested indirectly)~~ |
+| ~~`validateNonEmpty`~~ done — flags_validate_test.go | ~~flags_validate.go:321~~ | ~~Validator helper~~ |
+| ~~`validateFieldByKind`~~ done — flags_validate_test.go | ~~flags_validate.go:330~~ | ~~Validator dispatch~~ |
+| ~~`runValidateTagWithRegistry`~~ done — runtime tag validation ships (v4 D6); flags_validate_test.go | ~~flags_validate.go:341~~ | ~~Registry-based validation~~ |
+| ~~`NewManPage`~~ **Superseded — the manpage sub-module was removed (2026-07-23_13-22 report).** | ~~manpage.go:63~~ | ~~Man page constructor~~ |
+| ~~`PluginRegistrar.TypeHandler`~~ done — plugin_test.go | ~~plugin.go:25~~ | ~~Plugin registration method~~ |
+| ~~`WithPlugin`~~ done — plugin_test.go | ~~plugin.go:61~~ | ~~CLI option for plugins~~ |
+| ~~`PromptString`~~ done — prompts/prompts_test.go (sub-module) | ~~prompts.go:23~~ | ~~Interactive prompt (hard to test — TUI)~~ |
+| ~~`PromptSelect`~~ done — prompts/prompts_test.go (sub-module) | ~~prompts.go:37~~ | ~~Interactive prompt (hard to test — TUI)~~ |
+| ~~`PromptConfirm`~~ done — prompts/prompts_test.go (sub-module) | ~~prompts.go:57~~ | ~~Interactive prompt (hard to test — TUI)~~ |
+| ~~`Result[T].MustValue`~~ **Superseded — Result/Validated were removed in the v3/v4 API slim-down.** | ~~result.go:44~~ | ~~Panics on Err — intentionally untested?~~ |
 
 ### Codecov Integration
 
@@ -158,32 +159,32 @@
 
 ### v3.0 Major Redesign
 
-- [ ] v3.0 API design document
-- [ ] `pkg/cmdguard/v3/` directory
-- [ ] Core types, CLI, commands, flags, scope, options for v3
-- [ ] v3 tests, examples, MIGRATION_V2_TO_V3.md
+~~- [ ] v3.0 API design document~~ done — shipped as v3.0.0 (2026-07-07; docs/planning/2026-07-06_06-54)
+~~- [ ] `pkg/cmdguard/v3/` directory~~ done — shipped as v3.0.0
+~~- [ ] Core types, CLI, commands, flags, scope, options for v3~~ done — shipped as v3.0.0
+~~- [ ] v3 tests, examples, MIGRATION_V2_TO_V3.md~~ done — shipped; docs/MIGRATION_v2_v3.md
 
 ### v3.0 API-Breaking Cleanup (deferred to v3)
 
-- [ ] Rename `Get[T]`/`MustGet[T]` → `GetService[T]` (too generic currently)
-- [ ] Make `RegisterInScope` generic (currently `...any`)
-- [ ] Remove or redesign `Package()` (unusual API shape)
-- [ ] Remove `SetConfig` (mutating CLI config after construction is unsafe)
+~~- [ ] Rename `Get[T]`/`MustGet[T]` → `GetService[T]` (too generic currently)~~ → ROADMAP v5 candidate #6
+~~- [ ] Make `RegisterInScope` generic (currently `...any`)~~ → TODO_LIST T5 (TODO(v5), scope.go)
+~~- [ ] Remove or redesign `Package()` (unusual API shape)~~ → ROADMAP v5 candidate #7
+~~- [ ] Remove `SetConfig` (mutating CLI config after construction is unsafe)~~ → deprecated in v4 — removal tracked as TODO_LIST T4
 
 ### v3.0 Extraction: `flagtags` Library
 
-- [ ] Extract struct-tag parsing to `github.com/larsartmann/flagtags`
-- [ ] ~2000 lines of self-contained, reusable code with zero cmdguard-specific deps
+~~- [ ] Extract struct-tag parsing to `github.com/larsartmann/flagtags`~~ → ROADMAP raw ideas (extract flagtags standalone library)
+~~- [ ] ~2000 lines of self-contained, reusable code with zero cmdguard-specific deps~~ → (continuation — the row above's verdict covers this)
 
 ### Other Not Started
 
-- [ ] `FlagRegistry` interface abstraction
-- [ ] Custom validation hooks (beyond current validator system)
-- [ ] Enhanced flag validation enums
-- [ ] Metrics/hooks for custom observability
-- [ ] Test all examples in CI
-- [ ] Deprecate v1 API timeline
-- [ ] Example application for branded IDs (Result[T] showcase)
+~~- [ ] `FlagRegistry` interface abstraction~~ done — superseded — plugin system shipped via Plugin interface + FlagRegistry methods
+~~- [ ] Custom validation hooks (beyond current validator system)~~ done — custom validators ship — RegisterValidator + validate tag (FEATURES.md)
+~~- [ ] Enhanced flag validation enums~~ done — values/min/max/dmin/dmax shipped
+~~- [ ] Metrics/hooks for custom observability~~ → ROADMAP raw ideas (metrics/hooks observability)
+~~- [ ] Test all examples in CI~~ done — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest)
+~~- [ ] Deprecate v1 API timeline~~ done — the v1 package no longer exists (v4.0.0 module migration)
+~~- [ ] Example application for branded IDs (Result[T] showcase)~~ → ROADMAP raw ideas (branded-ID example app)
 
 ---
 
@@ -193,6 +194,7 @@
 
 The git tags and CHANGELOG entries are **completely out of sync**:
 
+<!-- check-rows:ledger -->
 | Tags that exist                    | CHANGELOG entries that exist |
 | ---------------------------------- | ---------------------------- |
 | v0.1.0 ✅                          | [0.1.0] ✅                   |
@@ -239,25 +241,25 @@ The git tags and CHANGELOG entries are **completely out of sync**:
 
 ### High Impact
 
-1. **Fix the git tag history** — retroactively tag v2.0.0–v2.4.0 at their respective commits, or document why they were never tagged. This affects reproducibility.
-2. **Bump to Go 1.26.4** — eliminates 3 stdlib CVEs. Watch for nixpkgs packaging update.
-3. **Add CODECOV_TOKEN** — coverage is being collected but not reported. 5-minute fix.
-4. **Cover the 15 zero-coverage functions** — especially `WithPlugin`, `PluginRegistrar.TypeHandler`, `RegisterValidator`, and the validator dispatch chain. These are public API surface.
+1. ~~**Fix the git tag history** — retroactively tag v2.0.0–v2.4.0 at their respective commits, or document why they were never tagged. This affects reproducibility.~~ **Superseded — release history settled — CHANGELOG complete from [2.5.0]; early tags lost in the 2026-08-01 git corruption and documented there.**
+2. ~~**Bump to Go 1.26.4** — eliminates 3 stdlib CVEs. Watch for nixpkgs packaging update.~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).**
+3. ~~**Add CODECOV_TOKEN** — coverage is being collected but not reported. 5-minute fix.~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**
+4. ~~**Cover the 15 zero-coverage functions** — especially `WithPlugin`, `PluginRegistrar.TypeHandler`, `RegisterValidator`, and the validator dispatch chain. These are public API surface.~~ done — all covered — flags_validate_test.go, doctor_test.go, plugin_test.go, koanf_loader_test.go, prompts tests
 
 ### Medium Impact
 
-5. **Add fuzz corpus** — the 7 fuzz targets have no seed corpus. Even a handful of edge cases would improve mutation testing confidence.
-6. **Test testutil** — the 372-line test helper package has 0% coverage. If a helper breaks, every test using it silently breaks.
-7. **Separate CI job for examples** — `examples/taskctl` deserves its own CI job with its own pass/fail signal.
-8. **v3.0 design document** — the ROADMAP has v3.0 items but no design doc. The v2 API has known warts (Get[T] naming, Package() shape, SetConfig footgun) that need a coherent v3 plan.
-9. **Replace BuildFlow pre-commit hook** — either install a cmdguard-specific hook or remove the foreign one and rely on CI.
+5. ~~**Add fuzz corpus** — the 7 fuzz targets have no seed corpus. Even a handful of edge cases would improve mutation testing confidence.~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7
+6. ~~**Test testutil** — the 372-line test helper package has 0% coverage. If a helper breaks, every test using it silently breaks.~~ done — testutil at 80.3% coverage (FEATURES.md)
+7. ~~**Separate CI job for examples** — `examples/taskctl` deserves its own CI job with its own pass/fail signal.~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).**
+8. ~~**v3.0 design document** — the ROADMAP has v3.0 items but no design doc. The v2 API has known warts (Get[T] naming, Package() shape, SetConfig footgun) that need a coherent v3 plan.~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).**
+9. ~~**Replace BuildFlow pre-commit hook** — either install a cmdguard-specific hook or remove the foreign one and rely on CI.~~ done — the repo-owned BuildFlow hook (.githooks/pre-commit) is the pre-commit now
 
 ### Low Impact / Polish
 
-10. **Improve taskctl example coverage** — 67.4% is below the library's 86.6%. The example should demonstrate best practices including testing.
-11. **Add more examples** — a minimal "hello world" example for users who don't want the full taskctl showcase.
-12. **Domain language consistency** — `docs/DOMAIN_LANGUAGE.md` exists but isn't referenced from README.md.
-13. **Branded types example** — ROADMAP mentions "example application for branded IDs" using Result[T] — would showcase the sum type system.
+10. ~~**Improve taskctl example coverage** — 67.4% is below the library's 86.6%. The example should demonstrate best practices including testing.~~ done — examples/taskctl at 85.9% (FEATURES.md)
+11. ~~**Add more examples** — a minimal "hello world" example for users who don't want the full taskctl showcase.~~ done — examples/docs-generator + examples/config-explain exist
+12. ~~**Domain language consistency** — `docs/DOMAIN_LANGUAGE.md` exists but isn't referenced from README.md.~~ **Superseded — superseded — README links DOMAIN_LANGUAGE.md via the 2026-11-07 docs-health pass.**
+13. **Branded types example** — ROADMAP mentions "example application for branded IDs" using Result[T] — would showcase the sum type system. **→ ROADMAP raw ideas (branded-ID example app)**
 
 ---
 
@@ -267,31 +269,31 @@ Ranked by impact × effort ratio (highest first).
 
 | #  | Task                                                                                                                                             | Impact | Effort | Category     |
 | -- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------ |
-| 1  | **Add `CODECOV_TOKEN` secret to GitHub repo settings**                                                                                           | High   | 5m     | CI           |
-| 2  | **Bump `go.mod` to `go 1.26.4`** when nixpkgs packages it (fixes GO-2026-5037/5038/5039)                                                         | High   | 5m     | Security     |
-| 3  | **Cover `WithPlugin[T]`** — public CLI option with 0% coverage                                                                                   | High   | 30m    | Testing      |
-| 4  | **Cover `PluginRegistrar.TypeHandler`** — plugin registration with 0% coverage                                                                   | High   | 30m    | Testing      |
-| 5  | **Cover `RegisterValidator`** — global validator registration with 0% coverage                                                                   | High   | 20m    | Testing      |
-| 6  | **Cover the validator dispatch chain** (`validateEmail`, `validateURL`, `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`) | High   | 1h     | Testing      |
-| 7  | **Cover `NewManPage`** — public constructor with 0% coverage                                                                                     | Medium | 20m    | Testing      |
-| 8  | **Cover `WithConfigFileLoader`** — public API with 0% coverage                                                                                   | Medium | 20m    | Testing      |
-| 9  | **Cover `WithDoctorLong`** — doctor option with 0% coverage                                                                                      | Low    | 10m    | Testing      |
-| 10 | **Investigate and fix git tag history** — tag v2.0.0–v2.4.0 or document why untagged                                                             | High   | 1h     | Release      |
-| 11 | **Remove or replace BuildFlow pre-commit hook** — every commit bypasses validation                                                               | Medium | 15m    | Tooling      |
-| 12 | **Add fuzz seed corpus** to `testdata/fuzz/` for the 7 fuzz targets                                                                              | Medium | 2h     | Testing      |
-| 13 | **Write v3.0 API design document** — consolidate v2 warts into coherent v3 plan                                                                  | High   | 4h     | Architecture |
-| 14 | **Test `pkg/testutil`** — 372 lines at 0% coverage                                                                                               | Medium | 1h     | Testing      |
-| 15 | **Add separate CI job for examples** — dedicated pass/fail signal for taskctl                                                                    | Low    | 30m    | CI           |
-| 16 | **Improve taskctl coverage** from 67.4% → 80%+                                                                                                   | Medium | 3h     | Testing      |
-| 17 | **Add minimal "hello world" example** — quick start for new users                                                                                | Low    | 1h     | Docs         |
-| 18 | **Write branded types example** — showcase Result[T]/Validated[T]                                                                                | Low    | 2h     | Docs         |
-| 19 | **Link DOMAIN_LANGUAGE.md from README** — discoverability                                                                                        | Low    | 5m     | Docs         |
-| 20 | **Add `--version` flag auto-detection** — if WithCLIVersion is set, register a `--version` flag automatically (currently only subcommand)        | Medium | 1h     | Feature      |
-| 21 | **Deprecate v1 API with timeline** — ROADMAP has no removal date                                                                                 | Low    | 30m    | Process      |
-| 22 | **Extract `flagtags` library** (v3.0) — ~2000 lines of reusable tag parsing                                                                      | High   | 8h     | Architecture |
-| 23 | **Rename `Get[T]` → `GetService[T]`** (v3.0) — current name is too generic                                                                       | Medium | 2h     | API          |
-| 24 | **Add metrics/observability hooks** — beyond OpenTelemetry spans                                                                                 | Low    | 4h     | Feature      |
-| 25 | **Add enhanced flag validation enums** — beyond current `validate:` tag                                                                          | Low    | 3h     | Feature      |
+| ~~1~~  | ~~**Add `CODECOV_TOKEN` secret to GitHub repo settings**~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~High~~ | ~~5m~~ | ~~CI~~ |
+| ~~2~~  | ~~**Bump `go.mod` to `go 1.26.4`** when nixpkgs packages it (fixes GO-2026-5037/5038/5039)~~ **Superseded — superseded — the repo is on Go 1.27.** | ~~High~~ | ~~5m~~ | ~~Security~~ |
+| ~~3~~  | ~~**Cover `WithPlugin[T]`** — public CLI option with 0% coverage~~ done — plugin_test.go | ~~High~~ | ~~30m~~ | ~~Testing~~ |
+| ~~4~~  | ~~**Cover `PluginRegistrar.TypeHandler`** — plugin registration with 0% coverage~~ done — plugin_test.go | ~~High~~ | ~~30m~~ | ~~Testing~~ |
+| ~~5~~  | ~~**Cover `RegisterValidator`** — global validator registration with 0% coverage~~ done — flags_validate_test.go | ~~High~~ | ~~20m~~ | ~~Testing~~ |
+| ~~6~~  | ~~**Cover the validator dispatch chain** (`validateEmail`, `validateURL`, `validateNonEmpty`, `validateFieldByKind`, `runValidateTagWithRegistry`)~~ done — flags_validate_test.go + runtime tag validation (v4 D6) | ~~High~~ | ~~1h~~ | ~~Testing~~ |
+| ~~7~~  | ~~**Cover `NewManPage`** — public constructor with 0% coverage~~ **Superseded — the manpage sub-module was removed (2026-07-23_13-22 report).** | ~~Medium~~ | ~~20m~~ | ~~Testing~~ |
+| ~~8~~  | ~~**Cover `WithConfigFileLoader`** — public API with 0% coverage~~ done — koanf_loader_test.go | ~~Medium~~ | ~~20m~~ | ~~Testing~~ |
+| ~~9~~  | ~~**Cover `WithDoctorLong`** — doctor option with 0% coverage~~ done — doctor_test.go | ~~Low~~ | ~~10m~~ | ~~Testing~~ |
+| ~~10~~ | ~~**Investigate and fix git tag history** — tag v2.0.0–v2.4.0 or document why untagged~~ **Superseded — release history settled — CHANGELOG complete from [2.5.0]; early-tag loss documented in the 2026-08-01 corruption report.** | ~~High~~ | ~~1h~~ | ~~Release~~ |
+| ~~11~~ | ~~**Remove or replace BuildFlow pre-commit hook** — every commit bypasses validation~~ done — the repo-owned BuildFlow hook (.githooks/pre-commit) is the pre-commit now | ~~Medium~~ | ~~15m~~ | ~~Tooling~~ |
+| ~~12~~ | ~~**Add fuzz seed corpus** to `testdata/fuzz/` for the 7 fuzz targets~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~Medium~~ | ~~2h~~ | ~~Testing~~ |
+| ~~13~~ | ~~**Write v3.0 API design document** — consolidate v2 warts into coherent v3 plan~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~High~~ | ~~4h~~ | ~~Architecture~~ |
+| ~~14~~ | ~~**Test `pkg/testutil`** — 372 lines at 0% coverage~~ done — testutil at 80.3% coverage (FEATURES.md) | ~~Medium~~ | ~~1h~~ | ~~Testing~~ |
+| ~~15~~ | ~~**Add separate CI job for examples** — dedicated pass/fail signal for taskctl~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).** | ~~Low~~ | ~~30m~~ | ~~CI~~ |
+| ~~16~~ | ~~**Improve taskctl coverage** from 67.4% → 80%+~~ done — examples/taskctl at 85.9% (FEATURES.md) | ~~Medium~~ | ~~3h~~ | ~~Testing~~ |
+| ~~17~~ | ~~**Add minimal "hello world" example** — quick start for new users~~ **Superseded — superseded — website QUICKSTART + examples cover onboarding.** | ~~Low~~ | ~~1h~~ | ~~Docs~~ |
+| 18 | **Write branded types example** — showcase Result[T]/Validated[T] **→ ROADMAP raw ideas (branded-ID example app)** | Low    | 2h     | Docs         |
+| ~~19~~ | ~~**Link DOMAIN_LANGUAGE.md from README** — discoverability~~ **Superseded — superseded — README links DOMAIN_LANGUAGE.md via the 2026-11-07 docs-health pass.** | ~~Low~~ | ~~5m~~ | ~~Docs~~ |
+| ~~20~~ | ~~**Add `--version` flag auto-detection** — if WithCLIVersion is set, register a `--version` flag automatically (currently only subcommand)~~ **Superseded — superseded — WithBatteries auto-registers the version command (AGENTS.md principle 24).** | ~~Medium~~ | ~~1h~~ | ~~Feature~~ |
+| ~~21~~ | ~~**Deprecate v1 API with timeline** — ROADMAP has no removal date~~ **Superseded — the v1 package no longer exists (v4.0.0 module migration).** | ~~Low~~ | ~~30m~~ | ~~Process~~ |
+| 22 | **Extract `flagtags` library** (v3.0) — ~2000 lines of reusable tag parsing **→ ROADMAP raw ideas (extract flagtags standalone library)** | High   | 8h     | Architecture |
+| 23 | **Rename `Get[T]` → `GetService[T]`** (v3.0) — current name is too generic **→ ROADMAP v5 candidate #6** | Medium | 2h     | API          |
+| 24 | **Add metrics/observability hooks** — beyond OpenTelemetry spans **→ ROADMAP raw ideas (metrics/hooks observability)** | Low    | 4h     | Feature      |
+| ~~25~~ | ~~**Add enhanced flag validation enums** — beyond current `validate:` tag~~ done — v4 validation is richer — values/min/max/minlen/maxlen/dmin/dmax + custom validators | ~~Low~~ | ~~3h~~ | ~~Feature~~ |
 
 ---
 
@@ -315,8 +317,12 @@ I cannot resolve:
 
 ---
 
+
+
+**Answered (2026-11-07 audit):** the tags and CHANGELOG tell one story from [2.5.0] onward; the pre-2.5 tags were lost in the 2026-08-01 git corruption (see docs/status/2026-06-22 §d1 and the 2026-08-01_22-03 recovery report). The [2.5.0]+ line is fully tagged: v2.5.0 → v2.10.4, v3.0.0/v3.1.0, v4.0.0 → v4.2.1 + per-module tags.
 ## Health Scorecard
 
+<!-- check-rows:ledger -->
 | Dimension             | Score    | Notes                                                                     |
 | --------------------- | -------- | ------------------------------------------------------------------------- |
 | **Build stability**   | 🟢 10/10 | Build, vet, lint, tests all pass clean                                    |
