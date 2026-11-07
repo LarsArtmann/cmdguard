@@ -240,7 +240,7 @@ ensure no work is lost.
 14. Investigate 35 dangling commits — Check if any contain recoverable work — _TODO_LIST D7_
 15. Investigate git corruption root cause — Was it the auto-git daemon? — _TODO_LIST D7_
 16. Add flightrecorder to examples/taskctl/ — Show real-world usage in the flagship example
-17. ~~**Tag flightrecorder v0.1.0**~~ — _TODO_LIST D8 (still not tagged)_
+17. ~~**Tag flightrecorder v0.1.0**~~ done at flightrecorder/v0.1.0 (tagged 2026-08-06, CHANGELOG `flightrecorder/v0.1.0`)
 18. Update FEATURES.md total sub-module test count — done 2026-08-06 (65 across all 5)
 19. Add `MaxSnapshots` config field — _in ROADMAP_
 20. Add `CaptureReasonPanic` — _in ROADMAP_

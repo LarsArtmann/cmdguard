@@ -198,7 +198,7 @@ Ordered by severity; each caught and corrected, but they happened:
    `flightrecorder not tidy` FAIL as mysterious flakiness; it took three runs
    to understand (a) HEAD's go.mod was genuinely stale from the koanf bump,
    (b) the gate compares worktree-vs-INDEX so an uncommitted settle always
-   fails, and (c) the script `git restore`s the settle on failure — which
+   fails, and (c) the script runs `git restore` on settle failure — which
    silently reverted my first fix. The `nix develop -c go mod tidy` settle
    path was documented in AGENTS.md the whole time.
 5. **Forgotten mandates caught late:** consumer SKILL.md update (AGENTS.md
@@ -235,7 +235,7 @@ Process:
 4. **Drive "done" from the plan's §6 table per workstream**, not from
    intuition; two criteria (mutation test, exit-code assertion) surfaced only
    in the end-of-session sweep.
-5. **check-all literacy:** read the script once (it `git restore`s on tidy
+5. **check-all literacy:** read the script once (it runs `git restore` on tidy
    failure, and compares worktree-vs-index) before interpreting failures;
    record the `GOLANGCI_LINT_TIMEOUT` + private-cache env as the standard
    recipe for full-gate runs.

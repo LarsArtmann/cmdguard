@@ -168,8 +168,8 @@ Sorted by priority within each tier.
 
 ### P2 — Fix the compromises (15-22)
 
-15. ~~Decide: keep `NOTE(v4)` markers, or configure `godox` to allow `TODO(v4)` via `.golangci.yml`~~ **DONE 2026-07-19** — converted all 3 to `TODO(v4)` + added narrow `source: 'TODO\(v4\)'` godox exclusion in `.golangci.yml`. See L1.03 resolution above.
-16. ~~If keeping `NOTE`, update the naming-review HTML appendix to say `NOTE` not `TODO`~~ **N/A** — decision was to use `TODO(v4)`, matching all existing references (ROADMAP, D2, brutal-self-review). No HTML update needed.
+15. ~~Decide: keep `NOTE(v4)` markers, or configure `godox` to allow `TODO(v4)` via `.golangci.yml`~~ done — 2026-07-19: converted all 3 to `TODO(v4)` + added narrow `source: 'TODO\(v4\)'` godox exclusion in `.golangci.yml`. See L1.03 resolution above.
+16. ~~If keeping `NOTE`, update the naming-review HTML appendix to say `NOTE` not `TODO`~~ **NOT-DO — conditional on keeping `NOTE`; the decision chose `TODO(v4)`, matching all existing references (ROADMAP, D2, brutal-self-review). No HTML update needed.**
 17. Take screenshots of the website (dark + light, hero + comparison) for the frontend-design review
 18. Design a real signature element for the website hero (before/after split, terminal-style error, construction animation — pick one)
 19. Fix the hero-code duplication: extract a single source, derive the highlighted version, or add a test that diffs them

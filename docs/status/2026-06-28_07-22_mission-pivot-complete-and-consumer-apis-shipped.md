@@ -105,11 +105,11 @@ The features are committed and pushed but **not tagged/released**. BuildFlow (an
 
 ### Previously fucked up (NOW FIXED ✅)
 
-- ~~Flagship example exited 0 on failure + double-printed errors~~ → fixed `03db723`
-- ~~Usage-on-error was the default~~ → fixed `03db723`
-- ~~No public exit-code helper~~ → fixed `03db723`
-- ~~Scoped flags marooned uncommitted~~ → committed `c60f690`
-- ~~configFromCmd / hideAdvancedFlags / PersistentPreRunE wrap had no cmdguard API~~ → added `b4c1788`, `753a784`, `efbe729`
+- ~~Flagship example exited 0 on failure + double-printed errors~~ done at `03db723`
+- ~~Usage-on-error was the default~~ done at `03db723`
+- ~~No public exit-code helper~~ done at `03db723`
+- ~~Scoped flags marooned uncommitted~~ done at `c60f690`
+- ~~configFromCmd / hideAdvancedFlags / PersistentPreRunE wrap had no cmdguard API~~ done at `b4c1788`, `753a784`, `efbe729`
 
 ---
 

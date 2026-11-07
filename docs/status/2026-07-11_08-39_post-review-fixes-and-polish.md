@@ -122,7 +122,7 @@ Still wrong — same signature mismatch.
 
 My third attempt used `WithRunE[deployFlags]` which doesn't exist. The actual API is `NewCommand(use, flags, runE, opts...)` where `runE` is passed positionally, not via an option.
 
-**Root cause:** I guessed at the API instead of reading the source first. This violates the #1 principle: READ BEFORE YOU WRITE. I should have `view`ed `cli.go` and `command.go` to see the actual signatures before writing any example code.
+**Root cause:** I guessed at the API instead of reading the source first. This violates the #1 principle: READ BEFORE YOU WRITE. I should have used `view` on `cli.go` and `command.go` to see the actual signatures before writing any example code.
 
 ### 3. Nested Config Test: Fixed the Test, Not the Problem
 
