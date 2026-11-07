@@ -12,6 +12,7 @@ Implemented the 3 highest-impact samber/do v2 features that actually matter for 
 
 ## a) FULLY DONE ✅
 
+<!-- check-rows:ledger -->
 | #  | Feature                                                                            | Files Changed                                 | Tests Added                                |
 | -- | ---------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------ |
 | 1  | **WithGracefulShutdown[T]()** — graceful DI service shutdown on SIGINT/SIGTERM     | `cli.go`, `cli_options.go`                    | 3 tests in `cli_graceful_shutdown_test.go` |

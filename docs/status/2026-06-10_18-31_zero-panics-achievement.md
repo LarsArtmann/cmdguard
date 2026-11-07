@@ -136,21 +136,21 @@ This is not a code problem — it's a documentation consistency problem. The cod
 ### Short-Term (Quality)
 
 6. ~~**Coverage gap analysis** — 83.5% is good but identify the 16.5% gaps systematically.~~ **Superseded — coverage is 90.4% today; gaps tracked via CI coverage.**
-7. **Integration test expansion** — `tests/integration/` has no tests yet. The taskctl example serves as de facto integration tests but they're in the example module.
-8. **Error documentation** — 60 sentinel errors deserve a generated reference table.
-9. **API stability guarantees** — Document which APIs are stable vs. experimental.
+7. ~~**Integration test expansion** — `tests/integration/` has no tests yet. The taskctl example serves as de facto integration tests but they're in the example module.~~ done — tests/integration/ exists (project structure)
+8. ~~**Error documentation** — 60 sentinel errors deserve a generated reference table.~~ done — ERROR_REFERENCE.md generated from sentinelFacts + drift test
+9. ~~**API stability guarantees** — Document which APIs are stable vs. experimental.~~ done — README carries an API Stability note; doc.go documents the surface
 
 ### Medium-Term (Features)
 
-10. **Nested config file support** — Most requested missing feature. Config files only support flat key-value pairs.
-11. **Plugin system** — Runtime-extensible validators and type handlers.
-12. **v3.0 planning** — Several P6 items are API-breaking; plan the next major version.
+10. ~~**Nested config file support** — Most requested missing feature. Config files only support flat key-value pairs.~~ done — nested config structs supported (AGENTS.md)
+11. ~~**Plugin system** — Runtime-extensible validators and type handlers.~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin
+12. ~~**v3.0 planning** — Several P6 items are API-breaking; plan the next major version.~~ **Superseded — v3.0.0 shipped 2026-07-07.**
 
 ### Architecture
 
-13. **`optionErr` pattern** — The new approach of setting errors in CommandOption closures and surfacing in constructors works but is slightly non-obvious. Consider documenting the pattern or making it more explicit.
-14. **`Package()` return type** — Changed from `func(do.Injector)` to `(*CLI[T], error)`. This is a better API but we should verify no downstream consumers relied on the old signature.
-15. **Test helper signatures** — `newTestCLICommand`, `newTestCLICommandWithShort`, `newTestParentCommand` all gained a `*testing.T` parameter. This is correct but touched many files. Consider if there's a cleaner pattern.
+13. ~~**`optionErr` pattern** — The new approach of setting errors in CommandOption closures and surfacing in constructors works but is slightly non-obvious. Consider documenting the pattern or making it more explicit.~~ done — pattern ships — plugin errors captured via cliSpec.pluginErr and returned from NewCLI (FEATURES.md)
+14. ~~**`Package()` return type** — Changed from `func(do.Injector)` to `(*CLI[T], error)`. This is a better API but we should verify no downstream consumers relied on the old signature.~~ done — carried into v3/v4 (FEATURES.md DI Package[T] row)
+15. ~~**Test helper signatures** — `newTestCLICommand`, `newTestCLICommandWithShort`, `newTestParentCommand` all gained a `*testing.T` parameter. This is correct but touched many files. Consider if there's a cleaner pattern.~~ **Superseded — test helpers rewritten through v3/v4.**
 
 ---
 
@@ -160,31 +160,31 @@ Priority-ordered, impact-weighted:
 
 | #  | Task                                                      | Category | Impact   | Effort | Status      |
 | -- | --------------------------------------------------------- | -------- | -------- | ------ | ----------- |
-| 1  | Update FEATURES.md: remove Must\* entries, update status  | Docs     | Critical | 30m    | Not started |
-| 2  | Update README.md: remove Must\* examples                  | Docs     | Critical | 15m    | Not started |
-| 3  | Update TODO_LIST.md: metrics, version, completed items    | Docs     | High     | 15m    | Not started |
-| 4  | Audit all docs/_.md for Must_ references                  | Docs     | High     | 20m    | Not started |
-| 5  | Update ROADMAP.md: mark completed items                   | Docs     | Medium   | 5m     | Not started |
-| 6  | Version bump to v2.5.0 in go.mod and doc.go               | Release  | High     | 5m     | Not started |
-| 7  | Git tag v2.5.0                                            | Release  | High     | 1m     | Not started |
-| 8  | Write CHANGELOG.md entry for v2.5.0                       | Docs     | Medium   | 15m    | Not started |
-| 9  | Add `nix buildGoModule` to flake.nix                      | Nix      | Medium   | 2h     | Not started |
-| 10 | Coverage gap analysis: identify uncovered paths           | Testing  | Medium   | 1h     | Not started |
-| 11 | Add integration tests to tests/integration/               | Testing  | Medium   | 1d     | Not started |
-| 12 | Error reference doc: auto-generated table of 60 sentinels | Docs     | Medium   | 2h     | Not started |
-| 13 | Nested struct config file support (YAML/TOML/JSON)        | Feature  | High     | 3-5d   | Not started |
-| 14 | Plugin system for validators and type handlers            | Feature  | High     | 3-5d   | Not started |
-| 15 | Fix os.Setenv("NO_COLOR") process-wide mutation           | v3 Prep  | Medium   | 2h     | Not started |
-| 16 | Make NoFlags a distinct named type                        | v3 Prep  | Medium   | 2h     | Not started |
-| 17 | Remove deprecated WithColor option                        | v3 Prep  | Low      | 30m    | Not started |
-| 18 | Add CODECOV_TOKEN to GitHub                               | CI       | Medium   | 5m     | Not started |
-| 19 | Expand fuzz test targets                                  | Testing  | Low      | 1-2d   | Not started |
-| 20 | v3.0 API design document                                  | Planning | High     | 2-3d   | Not started |
-| 21 | Documentation generation (GenerateDocs)                   | Feature  | Medium   | 2-3d   | Not started |
-| 22 | Structured JSON error output for --output=json            | Feature  | Low      | 1-2d   | Not started |
-| 23 | Advanced types: Result[T], Validated[T]                   | Feature  | Medium   | 3-5d   | Not started |
-| 24 | Extract flagtags to standalone library                    | Refactor | Low      | 2-3d   | Not started |
-| 25 | Config auto-loading with koanf integration                | Feature  | Low      | 2-3d   | Not started |
+| ~~1~~  | ~~Update FEATURES.md: remove Must\* entries, update status~~ done — FEATURES rewritten repeatedly; zero-panics canon in AGENTS.md | ~~Docs~~ | ~~Critical~~ | ~~30m~~ | ~~Not started~~ |
+| ~~2~~  | ~~Update README.md: remove Must\* examples~~ done — README audited repeatedly; Must-free in v4 | ~~Docs~~ | ~~Critical~~ | ~~15m~~ | ~~Not started~~ |
+| ~~3~~  | ~~Update TODO_LIST.md: metrics, version, completed items~~ **Superseded — TODO_LIST rewritten; done items removed per policy.** | ~~Docs~~ | ~~High~~ | ~~15m~~ | ~~Not started~~ |
+| ~~4~~  | ~~Audit all docs/_.md for Must_ references~~ done — doc-sync pass 2026-06-22 + later docs-health passes | ~~Docs~~ | ~~High~~ | ~~20m~~ | ~~Not started~~ |
+| ~~5~~  | ~~Update ROADMAP.md: mark completed items~~ **Superseded — current ROADMAP is accurate.** | ~~Docs~~ | ~~Medium~~ | ~~5m~~ | ~~Not started~~ |
+| ~~6~~  | ~~Version bump to v2.5.0 in go.mod and doc.go~~ done — tag v2.5.0 exists; CHANGELOG [2.5.0] 2026-06-05 | ~~Release~~ | ~~High~~ | ~~5m~~ | ~~Not started~~ |
+| ~~7~~  | ~~Git tag v2.5.0~~ done — tag v2.5.0 exists | ~~Release~~ | ~~High~~ | ~~1m~~ | ~~Not started~~ |
+| ~~8~~  | ~~Write CHANGELOG.md entry for v2.5.0~~ done — CHANGELOG [2.5.0] entry exists | ~~Docs~~ | ~~Medium~~ | ~~15m~~ | ~~Not started~~ |
+| ~~9~~  | ~~Add `nix buildGoModule` to flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Nix~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
+| ~~10~~ | ~~Coverage gap analysis: identify uncovered paths~~ **Superseded — coverage is 90.4% today.** | ~~Testing~~ | ~~Medium~~ | ~~1h~~ | ~~Not started~~ |
+| ~~11~~ | ~~Add integration tests to tests/integration/~~ done — tests/integration/ exists | ~~Testing~~ | ~~Medium~~ | ~~1d~~ | ~~Not started~~ |
+| ~~12~~ | ~~Error reference doc: auto-generated table of 60 sentinels~~ done — ERROR_REFERENCE.md generated from sentinelFacts | ~~Docs~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
+| ~~13~~ | ~~Nested struct config file support (YAML/TOML/JSON)~~ done — nested config structs supported (AGENTS.md) | ~~Feature~~ | ~~High~~ | ~~3-5d~~ | ~~Not started~~ |
+| ~~14~~ | ~~Plugin system for validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~Feature~~ | ~~High~~ | ~~3-5d~~ | ~~Not started~~ |
+| ~~15~~ | ~~Fix os.Setenv("NO_COLOR") process-wide mutation~~ done — kept by design — --no-color sets NO_COLOR=1 for fang (AGENTS.md) | ~~v3 Prep~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
+| ~~16~~ | ~~Make NoFlags a distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha) | ~~v3 Prep~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
+| ~~17~~ | ~~Remove deprecated WithColor option~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.** | ~~v3 Prep~~ | ~~Low~~ | ~~30m~~ | ~~Not started~~ |
+| ~~18~~ | ~~Add CODECOV_TOKEN to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~CI~~ | ~~Medium~~ | ~~5m~~ | ~~Not started~~ |
+| 19 | Expand fuzz test targets **→ ROADMAP deferred #7** | Testing  | Low      | 1-2d   | Not started |
+| ~~20~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~Planning~~ | ~~High~~ | ~~2-3d~~ | ~~Not started~~ |
+| ~~21~~ | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go ships (FEATURES.md) | ~~Feature~~ | ~~Medium~~ | ~~2-3d~~ | ~~Not started~~ |
+| ~~22~~ | ~~Structured JSON error output for --output=json~~ done — cli_errors_json.go structured JSON error output | ~~Feature~~ | ~~Low~~ | ~~1-2d~~ | ~~Not started~~ |
+| 23 | Advanced types: Result[T], Validated[T] **→ ROADMAP raw ideas (Result[T]/Validated[T])** | Feature  | Medium   | 3-5d   | Not started |
+| 24 | Extract flagtags to standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Refactor | Low      | 2-3d   | Not started |
+| ~~25~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Feature~~ | ~~Low~~ | ~~2-3d~~ | ~~Not started~~ |
 
 ---
 
@@ -206,6 +206,7 @@ This is a product/strategy decision I cannot make.
 
 ## Metrics Dashboard
 
+<!-- check-rows:ledger -->
 | Metric                     | Value  | Change                                        |
 | -------------------------- | ------ | --------------------------------------------- |
 | **Source files**           | 121    | Unchanged                                     |
@@ -225,6 +226,7 @@ This is a product/strategy decision I cannot make.
 
 ### Coverage By Package
 
+<!-- check-rows:ledger -->
 | Package                      | Coverage |
 | ---------------------------- | -------- |
 | `pkg/cmdguard/v2`            | 83.5%    |
@@ -234,6 +236,7 @@ This is a product/strategy decision I cannot make.
 
 ### Git History (Last 10 Commits)
 
+<!-- check-rows:ledger -->
 | Commit    | Description                                                                              |
 | --------- | ---------------------------------------------------------------------------------------- |
 | `c8d86c8` | fix(cmdguard): remove all panic-inducing functions — zero panics guaranteed              |
