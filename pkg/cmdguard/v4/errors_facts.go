@@ -34,7 +34,7 @@ type sentinelFact struct {
 // documentation-facing (godoc anchor), the class column feeds the envelope's
 // type field, and both are derived here so adding a sentinel is a single
 // table row.
-func sentinelFacts() []sentinelFact {
+func sentinelFacts() []sentinelFact { //nolint:funlen,maintidx // canonical data table: length is the sentinel count, not logic complexity; splitting it risks the classification-precedence order (specific before generic wrapper)
 	return []sentinelFact{
 		{
 			ErrRequiredFlag,
