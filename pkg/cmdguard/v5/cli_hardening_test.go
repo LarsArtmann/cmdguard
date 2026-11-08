@@ -47,7 +47,7 @@ func TestKoanfLoader_LoadedPath_EmptyFileIsAbsent(t *testing.T) {
 
 			_, err := loader.Load(nil, &cfg)
 			if !errors.Is(err, ErrConfigFileNotFound) {
-				t.Fatalf("empty/missing files must surface ErrConfigFileNotFound (the CLI layer tolerates it), got: %v", err)
+				t.Fatalf("empty/missing files must surface ErrConfigFileNotFound: %v", err)
 			}
 
 			if got := loader.LoadedPath(); got != "" {
@@ -61,12 +61,12 @@ func TestKoanfLoader_LoadedPath_RealFileIsReported(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
-	real := filepath.Join(dir, "real.json")
-	if err := os.WriteFile(real, []byte(`{"log-level": "debug"}`), 0o600); err != nil {
+	realPath := filepath.Join(dir, "real.json")
+	if err := os.WriteFile(realPath, []byte(`{"log-level": "debug"}`), 0o600); err != nil {
 		t.Fatalf("writing config: %v", err)
 	}
 
-	loader := NewKoanfLoader(real)
+	loader := NewKoanfLoader(realPath)
 	cfg := struct {
 		LogLevel string `flag:"log-level"`
 	}{}
@@ -75,8 +75,8 @@ func TestKoanfLoader_LoadedPath_RealFileIsReported(t *testing.T) {
 		t.Fatalf("Load: %v", err)
 	}
 
-	if got := loader.LoadedPath(); got != real {
-		t.Fatalf("LoadedPath = %q, want %q", got, real)
+	if got := loader.LoadedPath(); got != realPath {
+		t.Fatalf("LoadedPath = %q, want %q", got, realPath)
 	}
 
 	if cfg.LogLevel != "debug" {
