@@ -119,6 +119,25 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ---
 
+## [lint/v0.2.1] - 2026-11-08
+
+Patch release of the `lint` sub-module: rules now see through generic
+instantiations.
+
+- **Fixed:** `v4.NewCLI[Config](...)`, `v4.NewCommand[C, F](...)`, and
+  package-level `var cli, err = v4.NewCLI[T](...)` were invisible to every
+  rule (CG001–CG008) and to the cross-file name tracing — the called selector
+  is wrapped in type arguments (`IndexExpr`/`IndexListExpr`) and none of the
+  four extraction sites unwrapped them. Consumers using cmdguard's
+  recommended generic entry points were effectively unlinted. The new
+  `selectorExprOf` helper fixes detection for all rules; regression tests
+  cover single- and two-type-parameter calls, cross-file constructor-error
+  tracing, and the non-generic forms.
+- Dogfooding the fix immediately caught one previously invisible CG008
+  violation (`examples/config-explain`), which gained `WithCLIVersion`.
+
+---
+
 ## [lint/v0.2.0] - 2026-11-08
 
 Second release of the `lint` sub-module: ships the baseline ratchet, cross-file

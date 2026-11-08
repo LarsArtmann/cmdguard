@@ -93,7 +93,11 @@ func main() {
 		})
 
 		if !hasRuleInFile(findings, RulePanicOnConstructor, "main.go") {
-			t.Fatalf("expected %s via the generic package-level constructor union, got %v", RulePanicOnConstructor, summarize(findings))
+			t.Fatalf(
+				"expected %s via the generic package-level constructor union, got %v",
+				RulePanicOnConstructor,
+				summarize(findings),
+			)
 		}
 	})
 
