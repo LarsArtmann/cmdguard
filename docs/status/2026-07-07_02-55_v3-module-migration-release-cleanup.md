@@ -20,6 +20,7 @@ However, the migration was **mechanical** (sed-based find-replace) and several d
 
 ## a) FULLY DONE
 
+<!-- check-rows:ledger -->
 | #  | What                                                                                             | Evidence                                               |
 | -- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
 | 1  | Module path migrated `cmdguard/v2` → `cmdguard/v3`                                               | `go.mod` module line, all 731 internal refs, 159 files |
@@ -53,10 +54,10 @@ However, the migration was **mechanical** (sed-based find-replace) and several d
 
 | # | What                                                                    | What's Missing                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | - | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **AGENTS.md** — header, module path, status line, API reference updated | Dependency table still shows `go-output v0.23.3` / `samber-do-auditlog v0.3.1` (actual: v0.30.1 / v0.4.0). File structure tree still lists `editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go` as core files — **all removed in v3**. Design principles list (`WithGlamourHelp[T]()`, `EditInEditor()`, `Result[T]` sum types, etc.) still describes deleted features. ~40% of the file is stale. |
-| 2 | **FEATURES.md** — package path and coverage updated                     | Dependency table still shows `go-output v0.23.3` / `samber-do-auditlog v0.3.1`. References `huh/v2` and `glamour/v2` as core deps (now sub-module deps). Feature list still mentions `EditInEditor`, `Result[T]`, `WithGlamourHelp[T]`.                                                                                                                                                                                          |
-| 3 | **CHANGELOG.md** — v3.0.0 section, retract note, link list updated      | The "Before" code example still uses `v2.NewCommand[...]` syntax (intentional as migration contrast, but the alias should be contextualized). `[2.10.3]` link exists but no changelog entry for v2.10.3 or v2.10.4.                                                                                                                                                                                                              |
-| 4 | **Go module proxy** — `v3.0.0` resolves                                 | `v2.11.0` is **still cached on the proxy** and downloadable. The `retract` directive in `v2.10.4` will warn consumers, but won't prevent download. No GitHub Release created for v3.0.0 or v2.10.4.                                                                                                                                                                                                                              |
+| ~~1~~ | ~~**AGENTS.md** — header, module path, status line, API reference updated~~ done — AGENTS.md fully rewritten through v4 (2026-11-02) | ~~Dependency table still shows `go-output v0.23.3` / `samber-do-auditlog v0.3.1` (actual: v0.30.1 / v0.4.0). File structure tree still lists `editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go` as core files — **all removed in v3**. Design principles list (`WithGlamourHelp[T]()`, `EditInEditor()`, `Result[T]` sum types, etc.) still describes deleted features. ~40% of the file is stale.~~ |
+| ~~2~~ | ~~**FEATURES.md** — package path and coverage updated~~ done — FEATURES.md dep tables maintained through v4 releases | ~~Dependency table still shows `go-output v0.23.3` / `samber-do-auditlog v0.3.1`. References `huh/v2` and `glamour/v2` as core deps (now sub-module deps). Feature list still mentions `EditInEditor`, `Result[T]`, `WithGlamourHelp[T]`.~~ |
+| ~~3~~ | ~~**CHANGELOG.md** — v3.0.0 section, retract note, link list updated~~ done — shipped — CHANGELOG [3.0.0] + [2.10.4] sections; before/after kept as migration contrast | ~~The "Before" code example still uses `v2.NewCommand[...]` syntax (intentional as migration contrast, but the alias should be contextualized). `[2.10.3]` link exists but no changelog entry for v2.10.3 or v2.10.4.~~ |
+| ~~4~~ | ~~**Go module proxy** — `v3.0.0` resolves~~ done — GitHub Releases published (gh release list); retract shipped in v2.10.4 | ~~`v2.11.0` is **still cached on the proxy** and downloadable. The `retract` directive in `v2.10.4` will warn consumers, but won't prevent download. No GitHub Release created for v3.0.0 or v2.10.4.~~ |
 
 ---
 
@@ -64,19 +65,20 @@ However, the migration was **mechanical** (sed-based find-replace) and several d
 
 | # | What                                       | Why It Matters                                                                                          |
 | - | ------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| 1 | GitHub Releases for `v3.0.0` and `v2.10.4` | Tags exist but no release notes on GitHub — consumers browsing releases see nothing after v2.10.2       |
-| 2 | GitHub Release deletion/edit for `v2.11.0` | No GitHub release was ever created for it (confirmed), but worth double-checking the releases page      |
-| 3 | `pkg.go.dev` refresh for v3 module         | Badge URL updated in README but pkg.go.dev hasn't indexed `/v3` yet — first `go get` triggers it        |
-| 4 | Migration guide for v2→v3 consumers        | No `docs/MIGRATION_v2_v3.md` exists — users upgrading from v2 to v3 have no upgrade path documented     |
-| 5 | Version bump in any Nix flake or CI config | `.github/` has no v2 refs (confirmed clean), but `flake.nix` wasn't checked for version strings         |
-| 6 | `TODO_LIST.md` sync                        | Still references v2 work items                                                                          |
-| 7 | `ROADMAP.md` content audit                 | Path refs updated but content may describe v2-era plans                                                 |
-| 8 | Consumer smoke test                        | Never verified `go get github.com/larsartmann/cmdguard/v3@v3.0.0` from a fresh module outside this repo |
+| ~~1~~ | ~~GitHub Releases for `v3.0.0` and `v2.10.4`~~ done — GitHub Releases published (gh release list) | ~~Tags exist but no release notes on GitHub — consumers browsing releases see nothing after v2.10.2~~ |
+| ~~2~~ | ~~GitHub Release deletion/edit for `v2.11.0`~~ done — moot — no release ever existed (confirmed in-row) | ~~No GitHub release was ever created for it (confirmed), but worth double-checking the releases page~~ |
+| ~~3~~ | ~~`pkg.go.dev` refresh for v3 module~~ done — indexed — README badge links pkg.go.dev/v4 | ~~Badge URL updated in README but pkg.go.dev hasn't indexed `/v3` yet — first `go get` triggers it~~ |
+| ~~4~~ | ~~Migration guide for v2→v3 consumers~~ done — docs/MIGRATION_v2_v3.md exists | ~~No `docs/MIGRATION_v2_v3.md` exists — users upgrading from v2 to v3 have no upgrade path documented~~ |
+| ~~5~~ | ~~Version bump in any Nix flake or CI config~~ done — flake.nix carries no version strings; CI clean | ~~`.github/` has no v2 refs (confirmed clean), but `flake.nix` wasn't checked for version strings~~ |
+| ~~6~~ | ~~`TODO_LIST.md` sync~~ done — TODO_LIST.md maintained (v5 sections, 2026-11-02) | ~~Still references v2 work items~~ |
+| ~~7~~ | ~~`ROADMAP.md` content audit~~ done — ROADMAP.md reflects v4/v5 direction (2026-11-02) | ~~Path refs updated but content may describe v2-era plans~~ |
+| ~~8~~ | ~~Consumer smoke test~~ done — closed per Resolution (2026-07-23) | ~~Never verified `go get github.com/larsartmann/cmdguard/v3@v3.0.0` from a fresh module outside this repo~~ |
 
 ---
 
 ## d) TOTALLY FUCKED UP
 
+<!-- check-rows:ledger -->
 | # | What                                                                                                                                                                                                                                                                                                                                  | Impact                                                                                                                                                                      | Severity                                                         |
 | - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | 1 | **AGENTS.md is a lie** — I updated the header and deps table partially but left **6 deleted files** in the structure tree (`editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go`) and **6+ deleted features** in the Design Principles section (`EditInEditor`, `Result[T]`, `WithGlamourHelp[T]`, etc.) | Any AI session or contributor reading AGENTS.md will look for files and features that **don't exist**. This is the #1 context file for the project and I left it 40% stale. | **HIGH** — this is the file I should have been most careful with |
@@ -92,16 +94,16 @@ However, the migration was **mechanical** (sed-based find-replace) and several d
 
 | #  | Area                                                                                                                              | Current State                                                                                                                                                 | Should Be                                                                                                                                        |
 | -- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1  | **Mechanical sed migration without verifying semantic correctness**                                                               | I ran sed on 731 occurrences and checked for build/lint/test failures — but never verified that the resulting **docs** accurately describe the v3 API surface | After any bulk rename, do a **semantic audit**: read every doc file and verify it describes reality, not just that string substitutions happened |
-| 2  | **AGENTS.md as afterthought**                                                                                                     | I updated it with targeted edits (header, deps, paths) but didn't re-read the whole file to find stale sections                                               | AGENTS.md is the **most critical context file** — it should be read end-to-end after any architectural change, not spot-edited                   |
-| 3  | **Deleted features not cleaned from docs**                                                                                        | The v3 redesign removed `editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go` from core — but docs still list them               | When files are deleted, grep for their names in ALL docs and update/remove references                                                            |
-| 4  | **No GitHub Releases**                                                                                                            | Git tags are pushed but GitHub Releases page is empty                                                                                                         | Create proper release notes — that's what consumers browse                                                                                       |
-| 5  | **No migration guide**                                                                                                            | v1→v2 migration guide exists (`docs/MIGRATION_v1_v2.md`) but no v2→v3                                                                                         | Breaking changes need migration docs — especially when the module path changes                                                                   |
-| 6  | **Dependency version drift in docs**                                                                                              | AGENTS.md and FEATURES.md show `go-output v0.23.3` and `samber-do-auditlog v0.3.1` while the actual deps are v0.30.1/v0.4.0                                   | Dependency tables in docs should be derived from `go.mod`, not hand-maintained                                                                   |
-| 7  | **CHANGELOG [3.0.0] comparison link** points to `releases/tag/v3.0.0` but there's no GitHub Release there                         | Link is dead until a release is created                                                                                                                       | Create the release or change to `compare/v2.10.4...v3.0.0`                                                                                       |
-| 8  | **Sub-module deps table in AGENTS.md** still lists `huh/v2`, `glamour/v2` as core deps                                            | These are now sub-module deps                                                                                                                                 | Move them to a separate sub-module deps table                                                                                                    |
-| 9  | **Design Principles section in AGENTS.md** has 22 numbered principles, ~8 of which reference deleted/moved features               | The list should be pruned to match v3 reality                                                                                                                 | Rewrite this section                                                                                                                             |
-| 10 | **`Gotchas` section in AGENTS.md** has extensive notes on glamour/prompts/spinner/telemetry behavior — these moved to sub-modules | Either move the gotchas to sub-module docs or add a note that they apply to the sub-modules                                                                   |                                                                                                                                                  |
+| 1  | **Mechanical sed migration without verifying semantic correctness** **→ ROADMAP raw ideas (post-rewrite semantic doc audit)** | I ran sed on 731 occurrences and checked for build/lint/test failures — but never verified that the resulting **docs** accurately describe the v3 API surface | After any bulk rename, do a **semantic audit**: read every doc file and verify it describes reality, not just that string substitutions happened |
+| 2  | **AGENTS.md as afterthought** **→ ROADMAP raw ideas (post-rewrite semantic doc audit)** | I updated it with targeted edits (header, deps, paths) but didn't re-read the whole file to find stale sections                                               | AGENTS.md is the **most critical context file** — it should be read end-to-end after any architectural change, not spot-edited                   |
+| 3  | **Deleted features not cleaned from docs** **→ ROADMAP raw ideas (post-rewrite semantic doc audit)** | The v3 redesign removed `editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go` from core — but docs still list them               | When files are deleted, grep for their names in ALL docs and update/remove references                                                            |
+| ~~4~~  | ~~**No GitHub Releases**~~ done — GitHub Releases published (gh release list) | ~~Git tags are pushed but GitHub Releases page is empty~~ | ~~Create proper release notes — that's what consumers browse~~ |
+| ~~5~~  | ~~**No migration guide**~~ done — docs/MIGRATION_v2_v3.md + MIGRATION_v3_v4.md exist | ~~v1→v2 migration guide exists (`docs/MIGRATION_v1_v2.md`) but no v2→v3~~ | ~~Breaking changes need migration docs — especially when the module path changes~~ |
+| 6  | **Dependency version drift in docs** **→ ROADMAP raw ideas (derive doc dep tables from go.mod)** | AGENTS.md and FEATURES.md show `go-output v0.23.3` and `samber-do-auditlog v0.3.1` while the actual deps are v0.30.1/v0.4.0                                   | Dependency tables in docs should be derived from `go.mod`, not hand-maintained                                                                   |
+| ~~7~~  | ~~**CHANGELOG [3.0.0] comparison link** points to `releases/tag/v3.0.0` but there's no GitHub Release there~~ done — fixed — GitHub Releases published | ~~Link is dead until a release is created~~ | ~~Create the release or change to `compare/v2.10.4...v3.0.0`~~ |
+| ~~8~~  | ~~**Sub-module deps table in AGENTS.md** still lists `huh/v2`, `glamour/v2` as core deps~~ done — AGENTS.md Optional Sub-Module Dependencies table | ~~These are now sub-module deps~~ | ~~Move them to a separate sub-module deps table~~ |
+| ~~9~~  | ~~**Design Principles section in AGENTS.md** has 22 numbered principles, ~8 of which reference deleted/moved features~~ done — AGENTS.md principles rewritten for v4 (2026-11-02) | ~~The list should be pruned to match v3 reality~~ | ~~Rewrite this section~~ |
+| ~~10~~ | ~~**`Gotchas` section in AGENTS.md** has extensive notes on glamour/prompts/spinner/telemetry behavior — these moved to sub-modules~~ done — AGENTS.md gotchas document the sub-modules | ~~Either move the gotchas to sub-module docs or add a note that they apply to the sub-modules~~ | ~~~~ |
 
 ---
 
@@ -109,40 +111,40 @@ However, the migration was **mechanical** (sed-based find-replace) and several d
 
 ### Critical (do first)
 
-1. **Fix AGENTS.md fully** — remove deleted files from structure tree (`editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go`), update deps table versions (`go-output v0.30.1`, `samber-do-auditlog v0.4.0`), move `huh/v2` + `glamour/v2` to sub-module deps, remove deleted features from Design Principles (#11 EditInEditor, #16 WithGlamourHelp, #20 Result[T] sum types, #17 TelemetryMiddleware), update all `[T]` type params on now-non-generic options
-2. **Fix FEATURES.md deps table** — update `go-output v0.23.3` → `v0.30.1`, `samber-do-auditlog v0.3.1` → `v0.4.0`, move sub-module deps to separate table
-3. **Create GitHub Release for v3.0.0** — with migration notes and breaking changes summary
-4. **Create GitHub Release for v2.10.4** — with retract explanation
-5. **Write `docs/MIGRATION_v2_v3.md`** — breaking changes, import path migration, before/after code examples, sub-module adoption guide
+1. ~~**Fix AGENTS.md fully** — remove deleted files from structure tree (`editor.go`, `result.go`, `telemetry.go`, `glamour.go`, `spinner.go`, `manpage.go`), update deps table versions (`go-output v0.30.1`, `samber-do-auditlog v0.4.0`), move `huh/v2` + `glamour/v2` to sub-module deps, remove deleted features from Design Principles (#11 EditInEditor, #16 WithGlamourHelp, #20 Result[T] sum types, #17 TelemetryMiddleware), update all `[T]` type params on now-non-generic options~~ done — AGENTS.md fully rewritten through v4 (2026-11-02)
+2. ~~**Fix FEATURES.md deps table** — update `go-output v0.23.3` → `v0.30.1`, `samber-do-auditlog v0.3.1` → `v0.4.0`, move sub-module deps to separate table~~ done — FEATURES.md dep tables maintained through v4 releases
+3. ~~**Create GitHub Release for v3.0.0** — with migration notes and breaking changes summary~~ done — GitHub Releases published (gh release list)
+4. ~~**Create GitHub Release for v2.10.4** — with retract explanation~~ done — GitHub Releases published (gh release list)
+5. ~~**Write `docs/MIGRATION_v2_v3.md`** — breaking changes, import path migration, before/after code examples, sub-module adoption guide~~ done — docs/MIGRATION_v2_v3.md exists
 
 ### High Priority
 
-6. **Add CHANGELOG entries for v2.10.3 and v2.10.4** — currently no changelog content for these tags
-7. **Consumer smoke test** — create a throwaway module, `go get github.com/larsartmann/cmdguard/v3@v3.0.0`, write a minimal CLI, verify it compiles and runs
-8. **Remove `/v3` from `.gitignore`** — BuildFlow artifact, wrong intent
-9. **Update `docs/API.md`** — verify all function signatures match v3 (non-generic `CommandOption`, positional flags in `NewCommand`, etc.)
-10. **Audit `Gotchas` section in AGENTS.md** — move sub-module-specific gotchas (glamour/prompts/spinner/telemetry) to their respective packages or add cross-references
+6. ~~**Add CHANGELOG entries for v2.10.3 and v2.10.4** — currently no changelog content for these tags~~ done — CHANGELOG [2.10.4] shipped (2026-07-07); v2.10.3 left tag-only (v2 frozen)
+7. ~~**Consumer smoke test** — create a throwaway module, `go get github.com/larsartmann/cmdguard/v3@v3.0.0`, write a minimal CLI, verify it compiles and runs~~ done — closed per Resolution (2026-07-23)
+8. ~~**Remove `/v3` from `.gitignore`** — BuildFlow artifact, wrong intent~~ done — clean — no /v3 in .gitignore
+9. ~~**Update `docs/API.md`** — verify all function signatures match v3 (non-generic `CommandOption`, positional flags in `NewCommand`, etc.)~~ **Superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the contract lives in FEATURES + the describe JSON.**
+10. ~~**Audit `Gotchas` section in AGENTS.md** — move sub-module-specific gotchas (glamour/prompts/spinner/telemetry) to their respective packages or add cross-references~~ done — AGENTS.md gotchas document the sub-modules
 
 ### Medium Priority
 
-11. **Sync `TODO_LIST.md`** — remove v2-era items, add v3 post-migration tasks
-12. **Audit `ROADMAP.md`** — verify plans are still relevant for v3 architecture
-13. **Update `examples/taskctl/README.md`** — verify all API examples match v3 signatures (path refs are clean, but code examples may be stale)
-14. **Create `docs/adr/002-v3-module-migration.md`** — ADR documenting why the module path changed and the v2.11.0 mis-release incident
-15. **Verify sub-module READMEs or docs** — glamour/manpage/prompts/spinner/telemetry packages may need import path updates in their godoc examples
-16. **Update `flake.nix`** if it contains any version strings or module path references
-17. **Add `// Deprecated:` comments** on any v2 compatibility shims if consumers need gradual migration
-18. **Trigger pkg.go.dev indexing** — visit `https://pkg.go.dev/github.com/larsartmann/cmdguard/v3` to request a refresh
+11. ~~**Sync `TODO_LIST.md`** — remove v2-era items, add v3 post-migration tasks~~ done — TODO_LIST.md maintained (v5 sections, 2026-11-02)
+12. ~~**Audit `ROADMAP.md`** — verify plans are still relevant for v3 architecture~~ done — ROADMAP.md reflects v4/v5 direction (2026-11-02)
+13. ~~**Update `examples/taskctl/README.md`** — verify all API examples match v3 signatures (path refs are clean, but code examples may be stale)~~ done — cleaned — examples maintained through v4
+14. ~~**Create `docs/adr/002-v3-module-migration.md`** — ADR documenting why the module path changed and the v2.11.0 mis-release incident~~ **Superseded — superseded — migration documented in CHANGELOG [3.0.0] + docs/MIGRATION_v2_v3.md; docs/adr/ took a different numbering.**
+15. ~~**Verify sub-module READMEs or docs** — glamour/manpage/prompts/spinner/telemetry packages may need import path updates in their godoc examples~~ done — sub-module docs maintained through v4 (manpage later removed)
+16. ~~**Update `flake.nix`** if it contains any version strings or module path references~~ done — flake.nix carries no version strings
+17. ~~**Add `// Deprecated:` comments** on any v2 compatibility shims if consumers need gradual migration~~ done — // Deprecated: markers on SetConfig/RegisterInScope (ROADMAP v5 table)
+18. ~~**Trigger pkg.go.dev indexing** — visit `https://pkg.go.dev/github.com/larsartmann/cmdguard/v3` to request a refresh~~ done — indexed — README badge links pkg.go.dev/v4
 
 ### Lower Priority
 
-19. **Audit all `docs/status/` historical reports** — decide whether to add a header note clarifying they describe v2 architecture
-20. **Update `docs/design/` design docs** — at minimum add a note that the v2 design doc describes the predecessor architecture
-21. **Consider a `go-output` version audit** — verify all 10 go-output sub-modules are at v0.30.1 across all 6 go.mod files
-22. **Run `golangci-lint` with `--new-from-rev=v3.0.0`** to establish a clean baseline for future development
-23. **Update benchmark comments** — `benchmarks/guard_bench_test.go` package comment was updated but internal comments may still reference v2 patterns
-24. **Verify `go.work.sum`** doesn't exist or is correct for the workspace
-25. **Consider adding a `CONTRIBUTING.md`** note about the v2→v3 split for contributors who forked v2
+19. ~~**Audit all `docs/status/` historical reports** — decide whether to add a header note clarifying they describe v2 architecture~~ done — status reports carry Update/Resolution headers (docs-health passes)
+20. ~~**Update `docs/design/` design docs** — at minimum add a note that the v2 design doc describes the predecessor architecture~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54); docs/MIGRATION_v2_v3.md exists.**
+21. ~~**Consider a `go-output` version audit** — verify all 10 go-output sub-modules are at v0.30.1 across all 6 go.mod files~~ done — go-output v0.38.7 lockstep across go.mod files
+22. ~~**Run `golangci-lint` with `--new-from-rev=v3.0.0`** to establish a clean baseline for future development~~ done (docs-health pass 2026-11-08)
+23. ~~**Update benchmark comments** — `benchmarks/guard_bench_test.go` package comment was updated but internal comments may still reference v2 patterns~~ done — benchmarks/guard_bench_test.go maintained
+24. ~~**Verify `go.work.sum`** doesn't exist or is correct for the workspace~~ done — go.work.sum committed at repo root
+25. ~~**Consider adding a `CONTRIBUTING.md`** note about the v2→v3 split for contributors who forked v2~~ done — CONTRIBUTING.md exists at repo root
 
 ---
 
@@ -170,10 +172,13 @@ go get github.com/larsartmann/cmdguard/v3@latest
 
 This will confirm the proxy state and whether the retract is effective.
 
+**Answered:** moot — the v2 line is frozen at v2.10.4 with the `retract v2.11.0` directive shipped; the main line moved to `/v3` (2026-07-07) then `/v4`; v2.11.0 stays proxy-cached with retract as the standing mitigation.
+
 ---
 
 ## Metrics Summary
 
+<!-- check-rows:ledger -->
 | Metric                            | Value                                                |
 | --------------------------------- | ---------------------------------------------------- |
 | Commits this session              | 4 (migration + docs + v2.10.4 retract + this report) |

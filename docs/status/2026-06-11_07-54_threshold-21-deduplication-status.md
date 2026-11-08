@@ -28,6 +28,7 @@ shims, or merging data-distinct table rows). Further work should pivot to **arch
 
 ### Sprint 5 (Just Completed)
 
+<!-- check-rows:ledger -->
 | # | Refactor                                                                                                                | File                                        | Net Lines  |
 | - | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------- |
 | 1 | `if cfg.Name != tt.expect { t.Errorf(...) }` → `testutil.AssertFieldEqString(t, cfg.Name, tt.expect, "name")` (2 sites) | `pkg/cmdguard/v2/configload/loader_test.go` | -4         |
@@ -37,6 +38,7 @@ Commit: `ce54ad8 refactor,test: replace cfg.Name field checks with AssertFieldEq
 
 ### Cumulative Campaign (5 Sprints)
 
+<!-- check-rows:ledger -->
 | Sprint    | Theme                                                                                       | Groups Eliminated                      | Net Lines    | Date       |
 | --------- | ------------------------------------------------------------------------------------------- | -------------------------------------- | ------------ | ---------- |
 | 1         | Test fixture consolidation                                                                  | 159 → ~80                              | -74          | 2026-06-10 |
@@ -48,6 +50,7 @@ Commit: `ce54ad8 refactor,test: replace cfg.Name field checks with AssertFieldEq
 
 ### Quality Gates (Post-Sprint)
 
+<!-- check-rows:ledger -->
 | Gate                                         | Status     | Details                           |
 | -------------------------------------------- | ---------- | --------------------------------- |
 | `go build ./...`                             | ✅ PASS    | Clean compile, zero errors        |
@@ -64,6 +67,7 @@ Commit: `ce54ad8 refactor,test: replace cfg.Name field checks with AssertFieldEq
 
 Helpers available in `pkg/testutil` AND `pkg/cmdguard/v2/testutil` (cross-package mirror per Sprint 3 pattern):
 
+<!-- check-rows:ledger -->
 | Helper                                          | Purpose                                    | Used At                |
 | ----------------------------------------------- | ------------------------------------------ | ---------------------- |
 | `AssertNoError`                                 | `t.Fatalf` if err is non-nil               | Most test files        |
@@ -256,6 +260,7 @@ library's long-term scope.**
 
 ## Appendix A: All 19 Clone Groups at t=21 (Triaged)
 
+<!-- check-rows:ledger -->
 | #            | Pattern                                                                                               | File(s)                                                                    | Decision                                      |
 | ------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
 | G1 (5×)      | `func(ctx, cfg, flags) error { return nil }`                                                          | `coverage_test.go:44,154,166,178,190`                                      | Accept (handler sig)                          |
@@ -282,6 +287,7 @@ library's long-term scope.**
 
 ## Appendix B: Clone Group Counts by Threshold (Campaign Trajectory)
 
+<!-- check-rows:ledger -->
 | Threshold | Groups | Trend                  |
 | --------- | ------ | ---------------------- |
 | t=30      | 0      | (Sprint 2 milestone)   |

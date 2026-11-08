@@ -18,6 +18,7 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 
 ## a) FULLY DONE ✅
 
+<!-- check-rows:ledger -->
 | #  | What                           | Evidence                                                                                                                            |
 | -- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | 1  | **AGENTS.md rewrite**          | Structure tree, deps table, design principles, gotchas, sub-module section — all verified against actual code signatures            |
@@ -62,6 +63,7 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 
 ## d) TOTALLY FUCKED UP 💥
 
+<!-- check-rows:ledger -->
 | # | What happened                                                           | Impact                                                                                                                                                                                                                                                                                                              | Root cause                                                                                                                                                                                                                                       |
 | - | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1 | **README.md still advertises `EditInEditor`** — a feature DELETED in v3 | Consumers reading the README will try to use a function that doesn't exist. The feature table (line 160) AND a full code example section (lines 535-543) reference it.                                                                                                                                              | **I claimed README was done** based on the previous session's note "paths, code examples updated" without actually grepping for deleted feature names. I only checked for `cmdguard/v2` path strings. **This is the #1 failure of the session.** |
@@ -144,6 +146,7 @@ I verified from a single machine (`go get .../v2@latest` → `v2.10.4`, `@v2.11.
 
 ## Session Metrics
 
+<!-- check-rows:ledger -->
 | Metric                          | Value                                                           |
 | ------------------------------- | --------------------------------------------------------------- |
 | Commits                         | 7                                                               |

@@ -22,6 +22,7 @@
 
 Every user-facing and contributor-facing document now references the v4 API correctly. The project had shipped v4.0.0 (module path `/v4`, package directory `pkg/cmdguard/v4/`, package name `v4`) but every doc still used the v3 API.
 
+<!-- check-rows:ledger -->
 | File                            | What was fixed                                                                                                                                                                                                                      |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AGENTS.md`                     | Project structure tree showed `v3/` directory; fixed to `v4/`. Added missing `middleware.go` to file listing. Fixed `WithFlags` reference in command_options.go description.                                                        |
@@ -39,6 +40,7 @@ Every user-facing and contributor-facing document now references the v4 API corr
 
 ### A2. Website v3→v4 fix — 23 files changed
 
+<!-- check-rows:ledger -->
 | File                                                        | What was fixed                                                                                                                                         |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `website/src/components/HeroSection.astro`                  | `v3.` code refs + `cmdguard/v3` go get command                                                                                                         |
@@ -54,6 +56,7 @@ Every user-facing and contributor-facing document now references the v4 API corr
 
 ### A3. Missing living docs created
 
+<!-- check-rows:ledger -->
 | File           | What was created                                                                                                                                                                                                                                                                                                            |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `TODO_LIST.md` | **Was referenced in AGENTS.md but didn't exist.** Created with 11 actionable items: 3 v5 breaking changes (TODO(v5) markers), 5 partially-functional items, 1 planned feature, 2 technical debt items.                                                                                                                      |
@@ -203,7 +206,7 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 
 | #  | Task                                                                                       | Priority | Effort |
 | -- | ------------------------------------------------------------------------------------------ | -------- | ------ |
-| 1  | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`        | P0       | 1min   |
+| ~~1~~  | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ h:a7aab73        | ~~P0~~       | ~~1min~~   |
 | 2  | Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) — _TODO_LIST D3_                        | P0       | 5min   |
 | 3  | Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_                         | P0       | 2min   |
 | 4  | Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_        | P1       | 30min  |

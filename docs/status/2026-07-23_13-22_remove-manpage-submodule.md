@@ -16,19 +16,19 @@ Session started with a library audit ("What libs do we use?"), which led to ques
 
 ## a) FULLY DONE
 
-1. **manpage/ directory deleted** — `manpage.go`, `manpage_test.go`, `go.mod`, `go.sum` trashed
-2. **go.work** — `use ./manpage` removed (was already clean at HEAD per `b998722`)
-3. **go.mod** — `replace github.com/larsartmann/cmdguard/manpage => ./manpage` removed
-4. **pkg/cmdguard/v3/doc.go** — manpage removed from sub-modules list (was already clean at HEAD)
-5. **.golangci.yml** — 2 stale v2 manpage exclusion rules removed (`pkg/cmdguard/v2/manpage.go$` wrapcheck, `pkg/cmdguard/v2/manpage_test.go$` paralleltest)
-6. **AGENTS.md** — removed from: project structure tree, deps table, principle #15 (5→4 sub-modules), nested modules gotcha (5→4, 6→5), sub-modules section (removed manpage bullet, updated counts to 4 sub-modules / 5 modules)
-7. **README.md** — removed man page feature row, entire "Man Page Generation" code section, manpage from sub-modules table (was already clean at HEAD)
-8. **FEATURES.md** — removed manpage row from sub-modules table, updated "5 sub-modules" → "4 sub-modules", "20 across all 5" → "17 across all 4"
-9. **.github/workflows/submodule-smoke.yml** — removed manpage from matrix (`[glamour, prompts, spinner, telemetry]`) and external-resolve loop
-10. **TODO_LIST.md** — updated "Extract 5" → "Extract 4", "go.work, 6 modules" → "5 modules", "20 tests" → "17 tests", "all 5 sub-modules" → "all 4"
-11. **ROADMAP.md** — updated "Extract 5" → "Extract 4", "go.work, 6 modules" → "5 modules"
-12. **docs/MIGRATION_v2_v3.md** — removed manpage from migration table row, checklist item, and intro line
-13. **Zero manpage references in active files** — verified via grep (excludes docs/status/, docs/planning/, docs/modularization/, CHANGELOG.md which are historical)
+1. ~~**manpage/ directory deleted** — `manpage.go`, `manpage_test.go`, `go.mod`, `go.sum` trashed~~ done — manpage/ absent from the tree today
+2. ~~**go.work** — `use ./manpage` removed (was already clean at HEAD per `b998722`)~~ done — go.work carries no manpage use (grep clean)
+3. ~~**go.mod** — `replace github.com/larsartmann/cmdguard/manpage => ./manpage` removed~~ done — no manpage replace in go.mod
+4. ~~**pkg/cmdguard/v3/doc.go** — manpage removed from sub-modules list (was already clean at HEAD)~~ done — doc.go sub-module list clean (grep clean)
+5. ~~**.golangci.yml** — 2 stale v2 manpage exclusion rules removed (`pkg/cmdguard/v2/manpage.go$` wrapcheck, `pkg/cmdguard/v2/manpage_test.go$` paralleltest)~~ done — no manpage paths in .golangci.yml
+6. ~~**AGENTS.md** — removed from: project structure tree, deps table, principle #15 (5→4 sub-modules), nested modules gotcha (5→4, 6→5), sub-modules section (removed manpage bullet, updated counts to 4 sub-modules / 5 modules)~~ done — AGENTS.md documents the current sub-module set
+7. ~~**README.md** — removed man page feature row, entire "Man Page Generation" code section, manpage from sub-modules table (was already clean at HEAD)~~ done — README carries no manpage references
+8. ~~**FEATURES.md** — removed manpage row from sub-modules table, updated "5 sub-modules" → "4 sub-modules", "20 across all 5" → "17 across all 4"~~ done — FEATURES.md carries no manpage references
+9. ~~**.github/workflows/submodule-smoke.yml** — removed manpage from matrix (`[glamour, prompts, spinner, telemetry]`) and external-resolve loop~~ done — submodule-smoke.yml matrix is [glamour, prompts, spinner, telemetry]
+10. ~~**TODO_LIST.md** — updated "Extract 5" → "Extract 4", "go.work, 6 modules" → "5 modules", "20 tests" → "17 tests", "all 5 sub-modules" → "all 4"~~ done — TODO_LIST.md counts updated
+11. ~~**ROADMAP.md** — updated "Extract 5" → "Extract 4", "go.work, 6 modules" → "5 modules"~~ done — ROADMAP.md counts updated
+12. ~~**docs/MIGRATION_v2_v3.md** — removed manpage from migration table row, checklist item, and intro line~~ done — MIGRATION_v2_v3.md carries no manpage references
+13. ~~**Zero manpage references in active files** — verified via grep (excludes docs/status/, docs/planning/, docs/modularization/, CHANGELOG.md which are historical)~~ done — grep clean across active files today (historical docs excepted)
 
 ## b) PARTIALLY DONE
 
@@ -40,15 +40,15 @@ None for this task.
 
 ## d) TOTALLY FUCKED UP
 
-1. **git stash disaster** — Used `git stash` to verify the pre-existing `auditlog.ServiceName` build failure. The stash/pop cycle reverted ALL earlier edits (go.work, doc.go, AGENTS.md, README.md, FEATURES.md, .golangci.yml, ROADMAP.md, TODO_LIST.md). Had to re-read and re-edit many files. Wasted ~10 round-trips.
-2. **Unnecessary stash** — Could have verified the pre-existing failure by checking `git log` (commit `b998722` message), reading the LSP diagnostic, or simply noting the error existed before any edits. No need to stash.
+1. ~~**git stash disaster** — Used `git stash` to verify the pre-existing `auditlog.ServiceName` build failure. The stash/pop cycle reverted ALL earlier edits (go.work, doc.go, AGENTS.md, README.md, FEATURES.md, .golangci.yml, ROADMAP.md, TODO_LIST.md). Had to re-read and re-edit many files. Wasted ~10 round-trips.~~ **Won't implement — process lesson — no repo artifact.**
+2. ~~**Unnecessary stash** — Could have verified the pre-existing failure by checking `git log` (commit `b998722` message), reading the LSP diagnostic, or simply noting the error existed before any edits. No need to stash.~~ **Won't implement — process lesson — no repo artifact.**
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Pre-existing build failure blocks everything** — `auditlog.go:176` has `undefined: auditlog.ServiceName`. This blocks `go build`, `go test`, and `golangci-lint` for the entire project. Must be fixed before any meaningful verification can happen.
-2. **Historical docs drift** — docs/status/ and docs/planning/ contain 100+ stale manpage references. These are historical records and shouldn't be rewritten, but a note in CHANGELOG.md about the removal would be appropriate.
-3. **Module count consistency** — "5 sub-modules" vs "4 sub-modules" counts were scattered across 8+ files. Consider a single source of truth (AGENTS.md) and cross-reference from others.
-4. **Stash discipline** — Never use `git stash` mid-session to verify unrelated issues. Use `git log`, LSP diagnostics, or direct inspection instead.
+1. ~~**Pre-existing build failure blocks everything** — `auditlog.go:176` has `undefined: auditlog.ServiceName`. This blocks `go build`, `go test`, and `golangci-lint` for the entire project. Must be fixed before any meaningful verification can happen.~~ done — fixed via the ServiceByName call in-era (Resolution below); the v4 API later grew AuditLogServiceByName
+2. ~~**Historical docs drift** — docs/status/ and docs/planning/ contain 100+ stale manpage references. These are historical records and shouldn't be rewritten, but a note in CHANGELOG.md about the removal would be appropriate.~~ done — in-era (Resolution below) — the note was lost in later CHANGELOG reorganizations
+3. ~~**Module count consistency** — "5 sub-modules" vs "4 sub-modules" counts were scattered across 8+ files. Consider a single source of truth (AGENTS.md) and cross-reference from others.~~ done — AGENTS.md is the module-count source of truth today
+4. ~~**Stash discipline** — Never use `git stash` mid-session to verify unrelated issues. Use `git log`, LSP diagnostics, or direct inspection instead.~~ **Won't implement — process lesson — no repo artifact.**
 
 ## f) Up to 50 Things We Should Get Done Next
 
@@ -114,6 +114,7 @@ None for this task.
 
 ## Files Changed
 
+<!-- check-rows:ledger -->
 | File                                    | Nature of Change                                                      |
 | --------------------------------------- | --------------------------------------------------------------------- |
 | `manpage/`                              | DELETED (4 files)                                                     |
@@ -136,6 +137,7 @@ None for this task.
 - **P0 #1 (auditlog build failure):** Fixed in `pkg/cmdguard/v3/auditlog.go` by calling `ServiceByName` with a plain `string` instead of the removed `auditlog.ServiceName` type.
 - **P0 #2-4 (verification):** Full `go test ./... -race`, `golangci-lint run ./...`, and `nix flake check` passed after the fix. Sub-module loop (`glamour`, `prompts`, `spinner`, `telemetry`) is green.
 - **P1 #5 (CHANGELOG entry):** `CHANGELOG.md` `[Unreleased]` now notes the manpage sub-module removal, auditlog refresh, prompts lint fix, and related post-v3.0.0 changes.
+  **Update 2026-11-07:** that note did not survive later CHANGELOG reorganizations into per-release sections — today's CHANGELOG has no explicit manpage-removal entry (only the v3.0.0 Added line still lists manpage).
 - **Historical files:** The 2026-07 status and planning documents were annotated with non-destructive resolution notes rather than rewritten; `CHANGELOG.md` carries the canonical removal record.
 
 ---
