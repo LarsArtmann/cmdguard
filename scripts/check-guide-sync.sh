@@ -51,6 +51,15 @@ grep -qE "Go 1\.2[0-9]+ or later" "$inst" || viol "installation.mdx has no Go ve
 grep -q "cmdguard/v5" docs/QUICKSTART.md || viol "docs/QUICKSTART.md does not import cmdguard/v5"
 grep -q "NewBuilder" docs/QUICKSTART.md || viol "docs/QUICKSTART.md does not teach the v5 Builder"
 
+# 5. The website hero snippet (hero-code.ts) must teach the current major —
+#    it is the FIRST code a visitor sees (H4 guard).
+hero="website/src/data/hero-code.ts"
+[ -f "$hero" ] || viol "missing $hero"
+if grep -q "cmdguard/v4\|v4\." "$hero"; then
+	viol "$hero still teaches cmdguard v4"
+fi
+grep -q "v5.NewCLI" "$hero" || viol "$hero does not use v5.NewCLI"
+
 if [ "$fail" -eq 1 ]; then
 	echo
 	echo "check-guide-sync FAILED — fix the DRIFT lines above."
