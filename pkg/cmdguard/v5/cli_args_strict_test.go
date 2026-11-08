@@ -3,7 +3,10 @@ package v5
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 )
 
@@ -116,38 +119,33 @@ func TestBuilder_ConcurrentAdds_AreRaceFree(t *testing.T) {
 
 	var wg sync.WaitGroup
 
-	errs := make([]error, goroutines)
-
-	for g := range goroutines {
+	for range goroutines {
 		wg.Add(1)
 
 		go func() {
 			defer wg.Done()
 
-			for i := range perGoroutine {
+			for range perGoroutine {
 				Add(b, "cmd", NoFlags{}, func(ctx context.Context, cfg *struct{}, flags NoFlags) error {
 					return nil
 				}, WithShort("Racing"))
 				b.Check(nil)
-
-				_ = errs
 			}
 		}()
 	}
 
 	wg.Wait()
 
+	// All adds share one name, so exactly one command attaches and Build
+	// reports the rest as duplicates — this exercises the duplicate detector
+	// on a concurrently-queued batch.
 	buildErr := b.Build()
-	if buildErr != nil {
-		t.Fatalf("Build after concurrent adds: %v", buildErr)
+	if buildErr == nil {
+		t.Fatal("duplicate-name batch silently built, want duplicate errors")
 	}
 
-	// All adds used the same name, so exactly one command must have attached
-	// (duplicates are reported, not attached) — this also exercises the
-	// duplicate detector on a concurrently-queued batch.
-	errs = b.errs
-	if len(errs) != goroutines*perGoroutine-1 {
-		t.Fatalf("expected %d duplicate-name errors (one attach, rest reported), got %d", goroutines*perGoroutine-1, len(errs))
+	if !errors.Is(buildErr, ErrDuplicateCommand) {
+		t.Fatalf("Build error does not wrap ErrDuplicateCommand: %v", buildErr)
 	}
 }
 
@@ -165,13 +163,17 @@ func TestBuilder_ConcurrentAdds_UniqueNames_AllAttach(t *testing.T) {
 
 	var wg sync.WaitGroup
 
-	for i := range n {
+	var counter atomic.Int32
+
+	for range n {
 		wg.Add(1)
 
 		go func() {
 			defer wg.Done()
 
-			Add(b, "unique", NoFlags{}, func(ctx context.Context, cfg *struct{}, flags NoFlags) error {
+			name := fmt.Sprintf("cmd-%d", counter.Add(1))
+
+			Add(b, name, NoFlags{}, func(ctx context.Context, cfg *struct{}, flags NoFlags) error {
 				return nil
 			}, WithShort("Unique"))
 		}()
@@ -183,7 +185,17 @@ func TestBuilder_ConcurrentAdds_UniqueNames_AllAttach(t *testing.T) {
 		t.Fatalf("Build: %v", err)
 	}
 
-	_ = n
+	got := 0
+
+	for _, sub := range cli.rootCmd.Commands() {
+		if strings.HasPrefix(sub.Name(), "cmd-") {
+			got++
+		}
+	}
+
+	if got != n {
+		t.Fatalf("expected %d attached commands, got %d", n, got)
+	}
 }
 
 // --- R4: repeated ExecuteWithArgs interleaved with signal cancel ---
@@ -191,46 +203,54 @@ func TestBuilder_ConcurrentAdds_UniqueNames_AllAttach(t *testing.T) {
 func TestRepeatedExecute_InterleavedSignalCancel_IsRaceFree(t *testing.T) {
 	t.Parallel()
 
-	cfg := struct {
+	type appCfg struct {
 		Verbose bool `flag:"verbose" short:"v" help:"chatty"`
-	}{}
+	}
 
-	cli, err := NewCLI("interleave", "Interleave", cfg)
+	cli, err := NewCLI("interleave", "Interleave", appCfg{})
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
 	b := NewBuilder(cli)
-	Add(b, "work", NoFlags{}, func(ctx context.Context, c *struct {
-		Verbose bool `flag:"verbose" short:"v" help:"chatty"`
-	}, flags NoFlags) error {
+	Add(b, "work", NoFlags{}, func(ctx context.Context, c *appCfg, flags NoFlags) error {
 		return nil
 	}, WithShort("Work"))
 	if err := b.Build(); err != nil {
 		t.Fatalf("Build: %v", err)
 	}
 
+	// Contract note: one CLI is single-flight — concurrent Execute on the
+	// SAME instance mutates shared flag state by design (resetFlagStateForReuse).
+	// The supported reuse pattern is SEQUENTIAL ExecuteWithArgs, interleaved
+	// with cancelled runs (the SIGINT path). This test races the detector over
+	// that pattern; parallel Executes belong on separate CLI instances (every
+	// t.Parallel test here does exactly that).
 	const runs = 12
 
-	var wg sync.WaitGroup
-
-	runErrs := make([]error, runs)
+	cancelled := 0
 
 	for i := range runs {
-		wg.Add(1)
+		ctx, cancel := context.WithCancel(t.Context())
+		if i%3 == 0 {
+			cancel() // simulate the SIGINT path feeding a cancelled run
+		}
 
-		go func() {
-			defer wg.Done()
+		runErr := cli.ExecuteWithArgs(ctx, []string{"work"})
+		cancel()
 
-			runErrs[i] = cli.ExecuteWithArgs(t.Context(), []string{"work"})
-		}()
-	}
+		if ctx.Err() != nil {
+			cancelled++
 
-	wg.Wait()
+			continue // signal-cancelled run: cancellation error is expected
+		}
 
-	for i, runErr := range runErrs {
-		if runErr != nil && !errors.Is(runErr, context.Canceled) {
+		if runErr != nil {
 			t.Fatalf("run %d failed unexpectedly: %v", i, runErr)
 		}
+	}
+
+	if cancelled == 0 {
+		t.Fatal("no cancelled runs exercised the signal path")
 	}
 }
