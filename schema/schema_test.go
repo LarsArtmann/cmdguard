@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/larsartmann/cmdguard/schema"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 var updateGolden = flag.Bool("update-golden", false, "rewrite golden schema fixture files")
@@ -223,7 +223,7 @@ func TestFromConfig_ArrayOfObjects(t *testing.T) {
 func TestFromCLI_UsesTheCLIIdentity(t *testing.T) {
 	t.Parallel()
 
-	cli, err := v4.NewCLI("app", "My application", fixtureConfig{}, v4.WithFang(false))
+	cli, err := v5.NewCLI("app", "My application", fixtureConfig{}, v5.WithFang(false))
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
@@ -240,12 +240,12 @@ func TestFromCLI_UsesTheCLIIdentity(t *testing.T) {
 func TestCommandSchemas_DescribesEveryCommand(t *testing.T) {
 	t.Parallel()
 
-	cli, err := v4.NewCLI("app", "My application", fixtureConfig{}, v4.WithFang(false))
+	cli, err := v5.NewCLI("app", "My application", fixtureConfig{}, v5.WithFang(false))
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
-	deploy, err := v4.NewCommand(
+	deploy, err := v5.NewCommand(
 		"deploy",
 		struct {
 			Region string `flag:"region" required:"true" help:"Region" values:"eu,us"`
@@ -256,13 +256,13 @@ func TestCommandSchemas_DescribesEveryCommand(t *testing.T) {
 		) error {
 			return nil
 		},
-		v4.WithShort("Deploy"),
+		v5.WithShort("Deploy"),
 	)
 	if err != nil {
 		t.Fatalf("NewCommand: %v", err)
 	}
 
-	if err := v4.AddCommand(cli, deploy); err != nil {
+	if err := v5.AddCommand(cli, deploy); err != nil {
 		t.Fatalf("AddCommand: %v", err)
 	}
 
@@ -314,7 +314,7 @@ func TestFromConfig_UnknownKeysMatchStrictLoading(t *testing.T) {
 
 	// The schema's property names are the canonical config keys. Anything else
 	// must be rejected, which is exactly what additionalProperties: false says.
-	keys, err := v4.ConfigKeys(fixtureConfig{})
+	keys, err := v5.ConfigKeys(fixtureConfig{})
 	if err != nil {
 		t.Fatalf("ConfigKeys: %v", err)
 	}

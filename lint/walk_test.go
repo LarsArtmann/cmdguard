@@ -84,7 +84,7 @@ func TestAnalyzeResolvesAliasesAndMajors(t *testing.T) {
 
 	dir := writeTree(t, map[string]string{
 		"aliased.go": "package main\n\nimport cmdguard \"github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3\"\n\nvar _ = cmdguard.NoFlags{}\n",
-		"plain.go":   "package other\n\nimport \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = v4.NoFlags{}\n",
+		"plain.go":   "package other\n\nimport \"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5\"\n\nvar _ = v5.NoFlags{}\n",
 		"none.go":    "package none\n\nimport \"fmt\"\n\nvar _ = fmt.Println\n",
 	})
 
@@ -121,7 +121,7 @@ func TestAnalyzeResolvesAliasesAndMajors(t *testing.T) {
 	}
 
 	// Unaliased v4 import resolves to the package name "v4" (last segment).
-	if got := plain.imports["v4"]; got != "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4" {
+	if got := plain.imports["v4"]; got != "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5" {
 		t.Errorf("plain import resolution: got %q", got)
 	}
 
@@ -139,7 +139,7 @@ func TestMajorOf(t *testing.T) {
 	}{
 		{"github.com/larsartmann/cmdguard", "v1"},
 		{"github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3", "v3"},
-		{"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4", "v4"},
+		{"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5", "v4"},
 		{"github.com/larsartmann/cmdguard/spinner", ""},
 		{"github.com/larsartmann/cmdguard/telemetry", ""},
 		{"example.com/other/v2", ""},

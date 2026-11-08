@@ -3,19 +3,19 @@ package prompts
 import (
 	"testing"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func TestHuhRunner_ImplementsPromptRunner(t *testing.T) {
 	t.Parallel()
 
-	var _ v4.PromptRunner = (*HuhRunner)(nil)
+	var _ v5.PromptRunner = (*HuhRunner)(nil)
 }
 
 func TestHuhRunner_PromptConfirm(t *testing.T) {
 	t.Parallel()
 
-	var runner v4.PromptRunner = &HuhRunner{}
+	var runner v5.PromptRunner = &HuhRunner{}
 	_ = runner
 }
 

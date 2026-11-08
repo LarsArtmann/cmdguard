@@ -2,7 +2,7 @@
 // it detects anti-patterns from real consumer audits (execute bypass, stale
 // majors, constructor panics, version/option misuse, double error display).
 //
-// It is dogfood: the CLI itself is built with cmdguard v4.
+// It is dogfood: the CLI itself is built with cmdguard v5.
 package main
 
 import (
@@ -17,8 +17,8 @@ import (
 	"github.com/larsartmann/go-finding"
 
 	"github.com/larsartmann/cmdguard/lint"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
-	"github.com/larsartmann/cmdguard/v4/pkg/version"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/larsartmann/cmdguard/v5/pkg/version"
 )
 
 // cliConfig holds the linter's global flags. Enable is empty by default
@@ -52,43 +52,43 @@ func main() {
 
 // newApp builds the CLI. Split from main for in-process testing via
 // ExecuteWithArgs.
-func newApp() (*v4.CLI[cliConfig], error) {
-	cli, err := v4.NewCLI(
+func newApp() (*v5.CLI[cliConfig], error) {
+	cli, err := v5.NewCLI(
 		"cmdguard-lint",
 		"cmdguard usage linter",
 		cliConfig{Output: "text", Enable: "", Disable: ""},
-		v4.WithCLIVersion(version.Version),
-		v4.WithSignalHandling(),
+		v5.WithCLIVersion(version.Version),
+		v5.WithSignalHandling(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("building CLI: %w", err)
 	}
 
-	lintCmd, err := v4.NewCommand(
+	lintCmd, err := v5.NewCommand(
 		"lint",
 		lintFlags{Dir: ".", Baseline: "", WriteBaseline: false},
 		runLint,
-		v4.WithShort("Lint a directory for cmdguard usage anti-patterns"),
-		v4.WithExample("cmdguard-lint lint --dir . --output sarif"),
-		v4.WithExample("cmdguard-lint lint --disable CG004,CG006"),
-		v4.WithExample("cmdguard-lint lint --write-baseline"),
+		v5.WithShort("Lint a directory for cmdguard usage anti-patterns"),
+		v5.WithExample("cmdguard-lint lint --dir . --output sarif"),
+		v5.WithExample("cmdguard-lint lint --disable CG004,CG006"),
+		v5.WithExample("cmdguard-lint lint --write-baseline"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("building lint command: %w", err)
 	}
 
-	rulesCmd, err := v4.NewCommand(
+	rulesCmd, err := v5.NewCommand(
 		"rules",
 		rulesFlags{Markdown: false},
 		runRules,
-		v4.WithShort("List available rules"),
-		v4.WithExample("cmdguard-lint rules --markdown"),
+		v5.WithShort("List available rules"),
+		v5.WithExample("cmdguard-lint rules --markdown"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("building rules command: %w", err)
 	}
 
-	if err := v4.AddCommands(cli, lintCmd, rulesCmd); err != nil {
+	if err := v5.AddCommands(cli, lintCmd, rulesCmd); err != nil {
 		return nil, fmt.Errorf("registering commands: %w", err)
 	}
 

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/larsartmann/cmdguard/flightrecorder"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type integrationConfig struct {
@@ -37,7 +37,7 @@ func TestIntegration_CaptureOnCommandError(t *testing.T) {
 
 	defer rec.Stop()
 
-	cli, err := v4.NewCLI[integrationConfig](
+	cli, err := v5.NewCLI[integrationConfig](
 		"testapp", "Test app", integrationConfig{},
 		flightrecorder.WithFlightRecorderRecorder[integrationConfig](rec),
 	)
@@ -45,19 +45,19 @@ func TestIntegration_CaptureOnCommandError(t *testing.T) {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
-	cmd, err := v4.NewCommand(
+	cmd, err := v5.NewCommand(
 		"fail",
-		v4.NoFlags{},
-		func(_ context.Context, _ *integrationConfig, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, _ *integrationConfig, _ v5.NoFlags) error {
 			return errors.New("boom")
 		},
-		v4.WithShort("Always fails"),
+		v5.WithShort("Always fails"),
 	)
 	if err != nil {
 		t.Fatalf("NewCommand: %v", err)
 	}
 
-	if err := v4.AddCommand(cli, cmd); err != nil {
+	if err := v5.AddCommand(cli, cmd); err != nil {
 		t.Fatalf("AddCommand: %v", err)
 	}
 
@@ -99,7 +99,7 @@ func TestIntegration_CaptureOnSlow(t *testing.T) {
 
 	defer rec.Stop()
 
-	cli, err := v4.NewCLI[integrationConfig](
+	cli, err := v5.NewCLI[integrationConfig](
 		"testapp", "Test app", integrationConfig{},
 		flightrecorder.WithFlightRecorderRecorder[integrationConfig](rec),
 	)
@@ -107,21 +107,21 @@ func TestIntegration_CaptureOnSlow(t *testing.T) {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
-	cmd, err := v4.NewCommand(
+	cmd, err := v5.NewCommand(
 		"slow",
-		v4.NoFlags{},
-		func(_ context.Context, _ *integrationConfig, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, _ *integrationConfig, _ v5.NoFlags) error {
 			time.Sleep(5 * time.Millisecond)
 
 			return nil
 		},
-		v4.WithShort("Slow command"),
+		v5.WithShort("Slow command"),
 	)
 	if err != nil {
 		t.Fatalf("NewCommand: %v", err)
 	}
 
-	if err := v4.AddCommand(cli, cmd); err != nil {
+	if err := v5.AddCommand(cli, cmd); err != nil {
 		t.Fatalf("AddCommand: %v", err)
 	}
 
@@ -156,7 +156,7 @@ func TestIntegration_NoCaptureOnSuccess(t *testing.T) {
 
 	defer rec.Stop()
 
-	cli, err := v4.NewCLI[integrationConfig](
+	cli, err := v5.NewCLI[integrationConfig](
 		"testapp", "Test app", integrationConfig{},
 		flightrecorder.WithFlightRecorderRecorder[integrationConfig](rec),
 	)
@@ -164,19 +164,19 @@ func TestIntegration_NoCaptureOnSuccess(t *testing.T) {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
-	cmd, err := v4.NewCommand(
+	cmd, err := v5.NewCommand(
 		"ok",
-		v4.NoFlags{},
-		func(_ context.Context, _ *integrationConfig, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, _ *integrationConfig, _ v5.NoFlags) error {
 			return nil
 		},
-		v4.WithShort("Succeeds fast"),
+		v5.WithShort("Succeeds fast"),
 	)
 	if err != nil {
 		t.Fatalf("NewCommand: %v", err)
 	}
 
-	if err := v4.AddCommand(cli, cmd); err != nil {
+	if err := v5.AddCommand(cli, cmd); err != nil {
 		t.Fatalf("AddCommand: %v", err)
 	}
 

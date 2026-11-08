@@ -11,7 +11,7 @@ import (
 	"github.com/samber/do/v2"
 
 	"github.com/larsartmann/cmdguard/flightrecorder"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func TestTaskStatusLabel(t *testing.T) {
@@ -94,7 +94,7 @@ func TestTaskStore_ListFilterPriorityAndHideDone(t *testing.T) {
 func TestResolveStore_Error(t *testing.T) {
 	t.Parallel()
 
-	scope := v4.NewScope("empty")
+	scope := v5.NewScope("empty")
 
 	_, err := resolveStore(scope)
 	if err == nil {
@@ -105,9 +105,9 @@ func TestResolveStore_Error(t *testing.T) {
 func TestSeedTasks_NoStore(t *testing.T) {
 	t.Parallel()
 
-	cli, err := v4.NewCLI[AppConfig](
+	cli, err := v5.NewCLI[AppConfig](
 		"taskctl", "test", AppConfig{},
-		v4.WithCLIVersion("1.0.0"),
+		v5.WithCLIVersion("1.0.0"),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
@@ -119,7 +119,7 @@ func TestSeedTasks_NoStore(t *testing.T) {
 func TestNewTaskStore_MissingConfig(t *testing.T) {
 	t.Parallel()
 
-	scope := v4.NewScope("test-no-config")
+	scope := v5.NewScope("test-no-config")
 
 	_, err := NewTaskStore(scope.Injector())
 	if err == nil {
@@ -152,9 +152,9 @@ func TestInspectCommand_WithMetadata(t *testing.T) {
 func TestNewTaskStore_Success(t *testing.T) {
 	t.Parallel()
 
-	scope := v4.NewScope("test-success")
+	scope := v5.NewScope("test-success")
 
-	if err := v4.Provide(scope, func(i do.Injector) (*AppConfig, error) {
+	if err := v5.Provide(scope, func(i do.Injector) (*AppConfig, error) {
 		return &AppConfig{}, nil
 	}); err != nil {
 		t.Fatalf("provide config: %v", err)
@@ -187,18 +187,18 @@ func TestFR_Integration_CaptureOnCommandError(t *testing.T) {
 		t.Fatalf("rec.Start: %v", err)
 	}
 
-	cli, err := v4.NewCLI[AppConfig](
+	cli, err := v5.NewCLI[AppConfig](
 		"taskctl", "test", AppConfig{},
-		v4.WithCLIVersion("1.0.0"),
-		v4.WithGroup("tasks", "Task Management"),
-		v4.WithGroup("system", "System"),
+		v5.WithCLIVersion("1.0.0"),
+		v5.WithGroup("tasks", "Task Management"),
+		v5.WithGroup("system", "System"),
 		flightrecorder.WithFlightRecorderRecorder[AppConfig](rec),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
-	if err := v4.Provide(cli.Scope(), NewTaskStore); err != nil {
+	if err := v5.Provide(cli.Scope(), NewTaskStore); err != nil {
 		t.Fatalf("provide TaskStore: %v", err)
 	}
 
@@ -244,18 +244,18 @@ func TestFR_Integration_NoCaptureOnSuccess(t *testing.T) {
 
 	defer rec.Stop()
 
-	cli, err := v4.NewCLI[AppConfig](
+	cli, err := v5.NewCLI[AppConfig](
 		"taskctl", "test", AppConfig{},
-		v4.WithCLIVersion("1.0.0"),
-		v4.WithGroup("tasks", "Task Management"),
-		v4.WithGroup("system", "System"),
+		v5.WithCLIVersion("1.0.0"),
+		v5.WithGroup("tasks", "Task Management"),
+		v5.WithGroup("system", "System"),
 		flightrecorder.WithFlightRecorderRecorder[AppConfig](rec),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}
 
-	if err := v4.Provide(cli.Scope(), NewTaskStore); err != nil {
+	if err := v5.Provide(cli.Scope(), NewTaskStore); err != nil {
 		t.Fatalf("provide TaskStore: %v", err)
 	}
 

@@ -9,8 +9,8 @@ import (
 
 	"github.com/samber/do/v2"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
-	"github.com/larsartmann/cmdguard/v4/pkg/testutil"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/larsartmann/cmdguard/v5/pkg/testutil"
 )
 
 const cmdRun = "run"
@@ -19,16 +19,16 @@ type lifecycleConfig struct {
 	Verbose bool `flag:"verbose" short:"v" default:"false" help:"Verbose"`
 }
 
-func newLifecycleCmd(t *testing.T, use, short string) v4.Command[lifecycleConfig, v4.NoFlags] {
+func newLifecycleCmd(t *testing.T, use, short string) v5.Command[lifecycleConfig, v5.NoFlags] {
 	t.Helper()
 
-	cmd, err := v4.NewCommand(
+	cmd, err := v5.NewCommand(
 		use,
-		v4.NoFlags{},
-		func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 			return nil
 		},
-		v4.WithShort(short),
+		v5.WithShort(short),
 	)
 	if err != nil {
 		t.Fatalf("NewCommand %s: %v", use, err)
@@ -39,15 +39,15 @@ func newLifecycleCmd(t *testing.T, use, short string) v4.Command[lifecycleConfig
 
 func newLifecycleParentCmd(
 	t *testing.T,
-	child v4.Command[lifecycleConfig, v4.NoFlags],
+	child v5.Command[lifecycleConfig, v5.NoFlags],
 	short string,
-) v4.Command[lifecycleConfig, v4.NoFlags] {
+) v5.Command[lifecycleConfig, v5.NoFlags] {
 	t.Helper()
 
-	parent, err := v4.NewParentCommand[lifecycleConfig](
-		"parent", "Parent description", v4.NoFlags{},
-		v4.WithSubcommands(child),
-		v4.WithShort(short),
+	parent, err := v5.NewParentCommand[lifecycleConfig](
+		"parent", "Parent description", v5.NoFlags{},
+		v5.WithSubcommands(child),
+		v5.WithShort(short),
 	)
 	if err != nil {
 		t.Fatalf("NewParentCommand: %v", err)
@@ -58,9 +58,9 @@ func newLifecycleParentCmd(
 
 // newLifecyclePostRunFlag returns a WithPostRunE option that sets *flag to true.
 // Used to verify post-run is (or is not) called from lifecycle tests.
-func newLifecyclePostRunFlag(flag *bool) v4.CommandOption {
-	return v4.WithPostRunE(
-		func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+func newLifecyclePostRunFlag(flag *bool) v5.CommandOption {
+	return v5.WithPostRunE(
+		func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 			*flag = true
 
 			return nil
@@ -71,9 +71,9 @@ func newLifecyclePostRunFlag(flag *bool) v4.CommandOption {
 // recordLifecycleStep returns a RunE/PreRunE/PostRunE handler that appends step
 // to *order, then returns nil. Used by lifecycle tests to keep handler bodies terse.
 func recordLifecycleStep(order *[]string, step string) func(
-	_ context.Context, _ *lifecycleConfig, _ v4.NoFlags,
+	_ context.Context, _ *lifecycleConfig, _ v5.NoFlags,
 ) error {
-	return func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+	return func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 		*order = append(*order, step)
 
 		return nil
@@ -83,29 +83,29 @@ func recordLifecycleStep(order *[]string, step string) func(
 // lifecycleErrHandler returns a RunE handler that always returns err.
 // Used by lifecycle tests to assert error propagation through hooks.
 func lifecycleErrHandler(err error) func(
-	_ context.Context, _ *lifecycleConfig, _ v4.NoFlags,
+	_ context.Context, _ *lifecycleConfig, _ v5.NoFlags,
 ) error {
-	return func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+	return func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 		return err
 	}
 }
 
 // newLifecycleStrictCLI builds a CLI configured for strict validation tests.
 // Centralizes the NewCLI call so individual tests stay terse.
-func newLifecycleStrictCLI(t *testing.T) *v4.CLI[lifecycleConfig] {
+func newLifecycleStrictCLI(t *testing.T) *v5.CLI[lifecycleConfig] {
 	t.Helper()
 
-	return newLifecycleCLI(t, "strict", v4.WithStrictValidation())
+	return newLifecycleCLI(t, "strict", v5.WithStrictValidation())
 }
 
 // newLifecycleCLI builds a basic CLI with the given name and options.
 // Centralizes the standard "NewCLI + WithFang(false)" boilerplate.
-func newLifecycleCLI(t *testing.T, name string, opts ...v4.CLIOption) *v4.CLI[lifecycleConfig] {
+func newLifecycleCLI(t *testing.T, name string, opts ...v5.CLIOption) *v5.CLI[lifecycleConfig] {
 	t.Helper()
 
-	cli, err := v4.NewCLI[lifecycleConfig](
+	cli, err := v5.NewCLI[lifecycleConfig](
 		name, "Test", lifecycleConfig{},
-		append([]v4.CLIOption{v4.WithFang(false)}, opts...)...,
+		append([]v5.CLIOption{v5.WithFang(false)}, opts...)...,
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
@@ -116,7 +116,7 @@ func newLifecycleCLI(t *testing.T, name string, opts ...v4.CLIOption) *v4.CLI[li
 
 // execLifecycle runs the CLI with the given args and fails the test on error.
 // Centralizes the standard "execute and check err" pattern.
-func execLifecycle(t *testing.T, cli *v4.CLI[lifecycleConfig], args ...string) {
+func execLifecycle(t *testing.T, cli *v5.CLI[lifecycleConfig], args ...string) {
 	t.Helper()
 
 	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
@@ -127,12 +127,12 @@ func execLifecycle(t *testing.T, cli *v4.CLI[lifecycleConfig], args ...string) {
 // registerCommand adds a Command to a CLI and fails the test on error.
 func registerCommand[T, F any](
 	t *testing.T,
-	cli *v4.CLI[T],
-	cmd v4.Command[T, F],
+	cli *v5.CLI[T],
+	cmd v5.Command[T, F],
 ) {
 	t.Helper()
 
-	if err := v4.AddCommand(cli, cmd); err != nil {
+	if err := v5.AddCommand(cli, cmd); err != nil {
 		t.Fatalf("AddCommand: %v", err)
 	}
 }
@@ -150,15 +150,15 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			cli := newLifecycleCLI(t, "lifecycle")
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				cmdRun,
-				v4.NoFlags{},
+				v5.NoFlags{},
 				recordLifecycleStep(&order, cmdRun),
-				v4.WithShort("Run"),
-				v4.WithPreRunE(
+				v5.WithShort("Run"),
+				v5.WithPreRunE(
 					recordLifecycleStep(&order, "pre-run"),
 				),
-				v4.WithPostRunE(
+				v5.WithPostRunE(
 					recordLifecycleStep(&order, "post-run"),
 				),
 			)
@@ -186,11 +186,11 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			cli := newLifecycleCLI(t, "lifecycle")
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"fail",
-				v4.NoFlags{},
+				v5.NoFlags{},
 				lifecycleErrHandler(errors.New("command failed")),
-				v4.WithShort("Fail"),
+				v5.WithShort("Fail"),
 				newLifecyclePostRunFlag(&postRunCalled),
 			)
 			if err != nil {
@@ -220,16 +220,16 @@ func TestCLI_Lifecycle_PreRunAndPostRun(t *testing.T) {
 
 			cli := newLifecycleCLI(t, "lifecycle")
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"prefail",
-				v4.NoFlags{},
-				func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+				v5.NoFlags{},
+				func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 					handlerCalled = true
 
 					return nil
 				},
-				v4.WithShort("Pre-fail"),
-				v4.WithPreRunE(
+				v5.WithShort("Pre-fail"),
+				v5.WithPreRunE(
 					lifecycleErrHandler(errors.New("pre-run rejected")),
 				),
 				newLifecyclePostRunFlag(&postRunCalled),
@@ -267,9 +267,9 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 
 			var order []string
 
-			trackingMW := func(name string) v4.Middleware[lifecycleConfig] {
+			trackingMW := func(name string) v5.Middleware[lifecycleConfig] {
 				return func(
-					_ context.Context, _ *lifecycleConfig, _ v4.CommandInfo, next func() error,
+					_ context.Context, _ *lifecycleConfig, _ v5.CommandInfo, next func() error,
 				) error {
 					order = append(order, name+"-before")
 					err := next()
@@ -279,13 +279,13 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				}
 			}
 
-			cli := newLifecycleCLI(t, "mw", v4.WithMiddleware(trackingMW("mw1"), trackingMW("mw2")))
+			cli := newLifecycleCLI(t, "mw", v5.WithMiddleware(trackingMW("mw1"), trackingMW("mw2")))
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"run",
-				v4.NoFlags{},
+				v5.NoFlags{},
 				recordLifecycleStep(&order, "handler"),
-				v4.WithShort("Run"),
+				v5.WithShort("Run"),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -309,16 +309,16 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 			cli := newLifecycleCLI(
 				t,
 				"recover",
-				v4.WithMiddleware(v4.RecoveryMiddleware[lifecycleConfig]()),
+				v5.WithMiddleware(v5.RecoveryMiddleware[lifecycleConfig]()),
 			)
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"panic",
-				v4.NoFlags{},
-				func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+				v5.NoFlags{},
+				func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 					panic("something went wrong")
 				},
-				v4.WithShort("Panic"),
+				v5.WithShort("Panic"),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -331,7 +331,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 				t.Fatal("expected error from panic recovery")
 			}
 
-			if !errors.Is(err, v4.ErrCommandPanic) {
+			if !errors.Is(err, v5.ErrCommandPanic) {
 				t.Errorf("expected ErrCommandPanic, got: %v", err)
 			}
 
@@ -349,14 +349,14 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 			var timedCommand string
 			var gotDuration bool
 
-			timingMW := v4.TimingMiddleware[lifecycleConfig](
+			timingMW := v5.TimingMiddleware[lifecycleConfig](
 				func(name string, d time.Duration, err error) {
 					timedCommand = name
 					gotDuration = d > 0
 				},
 			)
 
-			cli := newLifecycleCLI(t, "timing", v4.WithMiddleware(timingMW))
+			cli := newLifecycleCLI(t, "timing", v5.WithMiddleware(timingMW))
 
 			cmd := newLifecycleCmd(t, "timed", "Timed")
 
@@ -390,7 +390,7 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 
 			cli := newLifecycleCLI(t, "di")
 
-			if err := v4.Provide(cli.Scope(), func(_ do.Injector) (*Database, error) {
+			if err := v5.Provide(cli.Scope(), func(_ do.Injector) (*Database, error) {
 				return &Database{DSN: "postgres://localhost:5432"}, nil
 			}); err != nil {
 				t.Fatalf("Provide: %v", err)
@@ -398,11 +398,11 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 
 			var resolvedDSN string
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"query",
-				v4.NoFlags{},
-				func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
-					db, err := v4.Invoke[*Database](cli.Scope())
+				v5.NoFlags{},
+				func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
+					db, err := v5.Invoke[*Database](cli.Scope())
 					if err != nil {
 						return err
 					}
@@ -411,7 +411,7 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 
 					return nil
 				},
-				v4.WithShort("Query"),
+				v5.WithShort("Query"),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -437,11 +437,11 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 
 			childScope := cli.Scope().Child("plugin")
 
-			if err := v4.ProvideValue(childScope, "child-service-value"); err != nil {
+			if err := v5.ProvideValue(childScope, "child-service-value"); err != nil {
 				t.Fatalf("ProvideValue: %v", err)
 			}
 
-			val, err := v4.Invoke[string](childScope)
+			val, err := v5.Invoke[string](childScope)
 			if err != nil {
 				t.Fatalf("Invoke from child: %v", err)
 			}
@@ -457,14 +457,14 @@ func TestCLI_DependencyInjection_Scope(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			err := v4.Provide[string](nil, func(_ do.Injector) (string, error) {
+			err := v5.Provide[string](nil, func(_ do.Injector) (string, error) {
 				return "", nil
 			})
 			if err == nil {
 				t.Fatal("expected error for nil scope")
 			}
 
-			if !errors.Is(err, v4.ErrInvalidScope) {
+			if !errors.Is(err, v5.ErrInvalidScope) {
 				t.Errorf("expected ErrInvalidScope, got: %v", err)
 			}
 		},
@@ -482,15 +482,15 @@ func TestCLI_ErrorChains(t *testing.T) {
 
 			cli := newLifecycleCLI(t, "exit")
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"die",
-				v4.NoFlags{},
-				func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
-					exitErr, _ := v4.NewExitError(42, errors.New("permission denied"))
+				v5.NoFlags{},
+				func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
+					exitErr, _ := v5.NewExitError(42, errors.New("permission denied"))
 
 					return exitErr
 				},
-				v4.WithShort("Die"),
+				v5.WithShort("Die"),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -503,7 +503,7 @@ func TestCLI_ErrorChains(t *testing.T) {
 				t.Fatal("expected error")
 			}
 
-			exitCoder, ok := errors.AsType[v4.ExitCoder](err)
+			exitCoder, ok := errors.AsType[v5.ExitCoder](err)
 			if !ok {
 				t.Fatal("expected errors.AsType to find ExitCoder")
 			}
@@ -520,7 +520,7 @@ func TestCLI_ErrorChains(t *testing.T) {
 			t.Parallel()
 
 			inner := errors.New("root cause")
-			cmdErr := v4.NewCommandError("mycommand", inner)
+			cmdErr := v5.NewCommandError("mycommand", inner)
 
 			if cmdErr.Error() == "" {
 				t.Error("CommandError.Error() should not be empty")
@@ -547,7 +547,7 @@ func TestCLI_ErrorChains(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			flagErr := v4.NewFlagErrorWithSuggestion("nme", errors.New("unknown flag"), "name")
+			flagErr := v5.NewFlagErrorWithSuggestion("nme", errors.New("unknown flag"), "name")
 			msg := flagErr.Error()
 
 			if !strings.Contains(msg, "nme") {
@@ -572,13 +572,13 @@ func TestCLI_ConfigValidation_Integration(t *testing.T) {
 		Name string `flag:"name" default:"" help:"Server name"`
 	}
 
-	newValidatedServerCLI := func(t *testing.T) *v4.CLI[serverConfig] {
+	newValidatedServerCLI := func(t *testing.T) *v5.CLI[serverConfig] {
 		t.Helper()
 
-		cli, err := v4.NewCLI[serverConfig](
+		cli, err := v5.NewCLI[serverConfig](
 			"server", "Test", serverConfig{},
-			v4.WithFang(false),
-			v4.WithConfigValidation(func(cfg *serverConfig) error {
+			v5.WithFang(false),
+			v5.WithConfigValidation(func(cfg *serverConfig) error {
 				if cfg.Name == "" {
 					return errors.New("name is required")
 				}
@@ -593,16 +593,16 @@ func TestCLI_ConfigValidation_Integration(t *testing.T) {
 		return cli
 	}
 
-	addStartCmd := func(t *testing.T, cli *v4.CLI[serverConfig], handler func() error) {
+	addStartCmd := func(t *testing.T, cli *v5.CLI[serverConfig], handler func() error) {
 		t.Helper()
 
-		cmd, err := v4.NewCommand(
+		cmd, err := v5.NewCommand(
 			"start",
-			v4.NoFlags{},
-			func(_ context.Context, _ *serverConfig, _ v4.NoFlags) error {
+			v5.NoFlags{},
+			func(_ context.Context, _ *serverConfig, _ v5.NoFlags) error {
 				return handler()
 			},
-			v4.WithShort("Start"),
+			v5.WithShort("Start"),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand: %v", err)
@@ -691,10 +691,10 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 
 			cli := newLifecycleStrictCLI(t)
 
-			child, err := v4.NewCommand(
+			child, err := v5.NewCommand(
 				"child",
-				v4.NoFlags{},
-				func(_ context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
+				v5.NoFlags{},
+				func(_ context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
 					return nil
 				},
 			)
@@ -704,12 +704,12 @@ func TestCLI_StrictMode_Integration(t *testing.T) {
 
 			parent := newLifecycleParentCmd(t, child, "Parent")
 
-			err = v4.AddCommand(cli, parent)
+			err = v5.AddCommand(cli, parent)
 			if err == nil {
 				t.Fatal("expected strict mode to reject command without short")
 			}
 
-			if !errors.Is(err, v4.ErrMissingShort) {
+			if !errors.Is(err, v5.ErrMissingShort) {
 				t.Errorf("expected ErrMissingShort, got: %v", err)
 			}
 		},
@@ -725,9 +725,9 @@ func TestCLI_VersionCommand_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			cli := newLifecycleCLI(t, "myapp", v4.WithCLIVersion("3.14.0"))
+			cli := newLifecycleCLI(t, "myapp", v5.WithCLIVersion("3.14.0"))
 
-			vCmd, err := v4.VersionCommand[lifecycleConfig](cli)
+			vCmd, err := v5.VersionCommand[lifecycleConfig](cli)
 			if err != nil {
 				t.Fatalf("VersionCommand: %v", err)
 			}
@@ -758,16 +758,16 @@ func TestCLI_FlowContext_Integration(t *testing.T) {
 
 			var flowCtxPresent bool
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"run",
-				v4.NoFlags{},
-				func(ctx context.Context, _ *lifecycleConfig, _ v4.NoFlags) error {
-					_, ok := v4.GetBranchingFlowContext(ctx)
+				v5.NoFlags{},
+				func(ctx context.Context, _ *lifecycleConfig, _ v5.NoFlags) error {
+					_, ok := v5.GetBranchingFlowContext(ctx)
 					flowCtxPresent = ok
 
 					return nil
 				},
-				v4.WithShort("Run"),
+				v5.WithShort("Run"),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)
@@ -789,7 +789,7 @@ func TestCLI_FlowContext_Integration(t *testing.T) {
 		func(t *testing.T) {
 			t.Parallel()
 
-			root := v4.NewBranchingFlowContext(context.Background())
+			root := v5.NewBranchingFlowContext(context.Background())
 			child, cancel := root.Branch("parent")
 			defer cancel()
 
@@ -824,7 +824,7 @@ func TestCLI_FlagTypes_Integration(t *testing.T) {
 
 			var parsedFlags *allTypesFlags
 
-			cmd, err := v4.NewCommand(
+			cmd, err := v5.NewCommand(
 				"check",
 				&allTypesFlags{},
 				func(_ context.Context, _ *lifecycleConfig, flags *allTypesFlags) error {
@@ -832,7 +832,7 @@ func TestCLI_FlagTypes_Integration(t *testing.T) {
 
 					return nil
 				},
-				v4.WithShort("Check"),
+				v5.WithShort("Check"),
 			)
 			if err != nil {
 				t.Fatalf("NewCommand: %v", err)

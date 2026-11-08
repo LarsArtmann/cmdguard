@@ -20,7 +20,7 @@ import (
 
 // injected is set at link time, e.g.:
 //
-//	-X github.com/larsartmann/cmdguard/v4/pkg/version.injected=<shortRev>
+//	-X github.com/larsartmann/cmdguard/v5/pkg/version.injected=<shortRev>
 //
 // It is a separate variable because -X can only replace statically
 // initialized strings; Version's dynamic initializer would clobber it.

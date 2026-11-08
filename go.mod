@@ -1,4 +1,4 @@
-module github.com/larsartmann/cmdguard/v4
+module github.com/larsartmann/cmdguard/v5
 
 go 1.27
 

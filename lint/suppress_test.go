@@ -28,7 +28,7 @@ func TestSuppressionSameLine(t *testing.T) {
 func TestSuppressionLineAboveWithCmdguard(t *testing.T) {
 	t.Parallel()
 
-	guard := "package main\n\nimport \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = v4.NoFlags{}\n"
+	guard := "package main\n\nimport \"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5\"\n\nvar _ = v5.NoFlags{}\n"
 
 	// Control: the same fixture without the directive must trigger CG001,
 	// proving the suppression pass below is load-bearing, not vacuous.

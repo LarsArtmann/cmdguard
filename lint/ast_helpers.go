@@ -238,8 +238,8 @@ func forFuncs(file *ast.File, fn func(body *ast.BlockStmt)) {
 
 // cmdguardConstructorErrIdents walks a function body and returns the names of
 // identifiers that receive the error return of a cmdguard constructor call
-// (`x, err := v4.NewCommand(...)`, `err := v4.AddCommand(...)`, and the
-// if-init form `if err := v4.AddCommand(...); err != nil`).
+// (`x, err := v5.NewCommand(...)`, `err := v5.AddCommand(...)`, and the
+// if-init form `if err := v5.AddCommand(...); err != nil`).
 func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[string]bool {
 	constructorNames := map[string]bool{
 		"NewCLI":           true,

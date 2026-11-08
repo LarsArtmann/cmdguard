@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 // Middleware returns a cmdguard middleware that manages the flight recorder
@@ -22,8 +22,8 @@ import (
 //
 // The returned error from next is always passed through unchanged — the
 // middleware only adds observability, it never changes program behavior.
-func Middleware[T any](rec *Recorder) v4.Middleware[T] {
-	return func(ctx context.Context, _ *T, info v4.CommandInfo, next func() error) error {
+func Middleware[T any](rec *Recorder) v5.Middleware[T] {
+	return func(ctx context.Context, _ *T, info v5.CommandInfo, next func() error) error {
 		if !rec.Enabled() {
 			if startErr := rec.Start(); startErr != nil {
 				rec.logf("flightrecorder: failed to start: %v", startErr)
@@ -34,7 +34,7 @@ func Middleware[T any](rec *Recorder) v4.Middleware[T] {
 
 		// Only evaluate capture conditions during the run phase.
 		// Pre-run and post-run phases should not trigger captures.
-		if info.Phase != v4.PhaseRun {
+		if info.Phase != v5.PhaseRun {
 			return next()
 		}
 
@@ -53,7 +53,7 @@ func Middleware[T any](rec *Recorder) v4.Middleware[T] {
 // slow AND errors, error takes precedence over slow — the error reason is always
 // the primary concern for debugging.
 // The snapshot write runs in a background goroutine to avoid blocking.
-func evaluateCapture(ctx context.Context, rec *Recorder, info v4.CommandInfo, elapsed time.Duration, runErr error) {
+func evaluateCapture(ctx context.Context, rec *Recorder, info v5.CommandInfo, elapsed time.Duration, runErr error) {
 	cfg := rec.Config()
 
 	var reason CaptureReason
@@ -92,24 +92,24 @@ func evaluateCapture(ctx context.Context, rec *Recorder, info v4.CommandInfo, el
 }
 
 // WithFlightRecorder is a convenience CLIOption that creates a Recorder from
-// the given Config and registers it as middleware via v4.WithMiddleware.
+// the given Config and registers it as middleware via v5.WithMiddleware.
 //
 // The recorder is lazily started on first command execution. For explicit
 // lifecycle control (Start/Stop), use New + Middleware instead.
 //
 // Example:
 //
-//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+//	cli, _ := v5.NewCLI[Config]("app", "My app", Config{},
 //	    flightrecorder.WithFlightRecorder[Config](flightrecorder.Config{
 //	        CaptureOnSlow:  true,
 //	        SlowThreshold:  200 * time.Millisecond,
 //	        CaptureOnError: true,
 //	    }),
 //	)
-func WithFlightRecorder[T any](cfg Config) v4.CLIOption {
+func WithFlightRecorder[T any](cfg Config) v5.CLIOption {
 	rec := New(cfg)
 
-	return v4.WithMiddleware(Middleware[T](rec))
+	return v5.WithMiddleware(Middleware[T](rec))
 }
 
 // WithFlightRecorderRecorder is a CLIOption that registers a pre-created Recorder
@@ -122,9 +122,9 @@ func WithFlightRecorder[T any](cfg Config) v4.CLIOption {
 //	rec := flightrecorder.New(flightrecorder.DefaultConfig())
 //	defer rec.Stop()
 //
-//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+//	cli, _ := v5.NewCLI[Config]("app", "My app", Config{},
 //	    flightrecorder.WithFlightRecorderRecorder[Config](rec),
 //	)
-func WithFlightRecorderRecorder[T any](rec *Recorder) v4.CLIOption {
-	return v4.WithMiddleware(Middleware[T](rec))
+func WithFlightRecorderRecorder[T any](rec *Recorder) v5.CLIOption {
+	return v5.WithMiddleware(Middleware[T](rec))
 }

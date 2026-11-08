@@ -5,12 +5,12 @@
 // Usage:
 //
 //	import (
-//	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+//	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 //	    "github.com/larsartmann/cmdguard/spinner"
 //	)
 //
-//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
-//	    v4.WithMiddleware(spinner.Middleware[Config]("Loading...")),
+//	cli, _ := v5.NewCLI[Config]("app", "My app", Config{},
+//	    v5.WithMiddleware(spinner.Middleware[Config]("Loading...")),
 //	)
 package spinner
 
@@ -25,7 +25,7 @@ import (
 	"charm.land/lipgloss/v2"
 	"golang.org/x/term"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 const defaultInterval = 100 * time.Millisecond
@@ -56,13 +56,13 @@ func DefaultConfig(title string) Config {
 // automatically cleared when the command completes.
 //
 // If stderr is not a terminal, the spinner is silently skipped.
-func Middleware[T any](title string) v4.Middleware[T] {
+func Middleware[T any](title string) v5.Middleware[T] {
 	return MiddlewareWithConfig[T](DefaultConfig(title))
 }
 
 // MiddlewareWithConfig returns spinner middleware using the provided configuration.
-func MiddlewareWithConfig[T any](cfg Config) v4.Middleware[T] {
-	return func(_ context.Context, _ *T, _ v4.CommandInfo, next func() error) error {
+func MiddlewareWithConfig[T any](cfg Config) v5.Middleware[T] {
+	return func(_ context.Context, _ *T, _ v5.CommandInfo, next func() error) error {
 		if cfg.Writer == nil || cfg.Interval <= 0 || len(cfg.Frames) == 0 {
 			return next()
 		}

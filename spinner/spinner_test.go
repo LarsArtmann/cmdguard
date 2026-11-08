@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type testConfig struct {
@@ -41,7 +41,7 @@ func TestMiddleware_NilTracerSkips(t *testing.T) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v4.CommandInfo{Name: "test", Phase: v4.PhaseRun}
+	info := v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}
 
 	called := false
 	middleware := MiddlewareWithConfig[testConfig](Config{

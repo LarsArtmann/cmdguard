@@ -2,7 +2,7 @@ module github.com/larsartmann/cmdguard/flightrecorder
 
 go 1.27
 
-require github.com/larsartmann/cmdguard/v4 v4.0.0-00010101000000-000000000000
+require github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
 
 require (
 	charm.land/fang/v2 v2.0.1 // indirect
@@ -72,7 +72,7 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v4 => ../
+replace github.com/larsartmann/cmdguard/v5 => ../
 
 replace github.com/larsartmann/cmdguard/flightrecorder => ../flightrecorder
 

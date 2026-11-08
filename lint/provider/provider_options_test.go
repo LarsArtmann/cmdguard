@@ -56,13 +56,13 @@ func TestProviderDetectHonorsOptions(t *testing.T) {
 
 import (
 	v3 "github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 var _ = v3.NoFlags{}
 
 func setup() {
-	cli, _ := v4.NewCLI("x", "X", cfg{})
+	cli, _ := v5.NewCLI("x", "X", cfg{})
 	cli.SetVersion("2.0.0")
 }
 

@@ -15,10 +15,10 @@ func crossFileFixtures(useGo string) map[string]string {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-var cli, setupErr = v4.NewCLI("app", "App", cfg{})
+var cli, setupErr = v5.NewCLI("app", "App", cfg{})
 
 type cfg struct{}
 
@@ -55,10 +55,10 @@ func patchVersion() {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-var cli, setupErr = v4.NewCLI("app", "App", cfg{})
+var cli, setupErr = v5.NewCLI("app", "App", cfg{})
 
 type cfg struct{}
 
@@ -104,10 +104,10 @@ func mustApp() {
 		findings := detectOn(t, map[string]string{
 			"setup.go": `package app
 
-import v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+import v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 
 func build() {
-	cli, err := v4.NewCLI("app", "App", cfg{})
+	cli, err := v5.NewCLI("app", "App", cfg{})
 	_, _ = cli, err
 }
 
@@ -137,9 +137,9 @@ func unrelated(msg string) {
 		findings := detectOn(t, map[string]string{
 			"setup.go": `package app
 
-import v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+import v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 
-var cli, _ = v4.NewCLI("app", "App", cfg{})
+var cli, _ = v5.NewCLI("app", "App", cfg{})
 
 type cfg struct{}
 `,

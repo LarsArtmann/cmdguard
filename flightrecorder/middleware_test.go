@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type testConfig struct {
@@ -40,7 +40,7 @@ func TestMiddleware_CallsNextAndPassesError(t *testing.T) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v4.CommandInfo{Name: "test", Phase: v4.PhaseRun}
+	info := v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}
 
 	expectedErr := errors.New("command failed")
 	called := false
@@ -84,12 +84,12 @@ func TestMiddleware_NonRunPhaseDoesNotCapture(t *testing.T) {
 	middleware := Middleware[testConfig](rec)
 
 	// Pre-run phase: should NOT capture even though slow/error conditions are met.
-	_ = middleware(ctx, cfg, v4.CommandInfo{Name: "cmd", Phase: v4.PhasePreRun}, func() error {
+	_ = middleware(ctx, cfg, v5.CommandInfo{Name: "cmd", Phase: v5.PhasePreRun}, func() error {
 		return errors.New("error")
 	})
 
 	// Post-run phase: should NOT capture.
-	_ = middleware(ctx, cfg, v4.CommandInfo{Name: "cmd", Phase: v4.PhasePostRun}, func() error {
+	_ = middleware(ctx, cfg, v5.CommandInfo{Name: "cmd", Phase: v5.PhasePostRun}, func() error {
 		return errors.New("error")
 	})
 
@@ -123,7 +123,7 @@ func TestMiddleware_CapturesOnSlow(t *testing.T) {
 	cfg := &testConfig{}
 	middleware := Middleware[testConfig](rec)
 
-	_ = middleware(ctx, cfg, v4.CommandInfo{Name: "slowcmd", Phase: v4.PhaseRun}, func() error {
+	_ = middleware(ctx, cfg, v5.CommandInfo{Name: "slowcmd", Phase: v5.PhaseRun}, func() error {
 		time.Sleep(5 * time.Millisecond) // exceeds 1ms threshold
 
 		return nil
@@ -163,7 +163,7 @@ func TestMiddleware_CapturesOnError(t *testing.T) {
 	middleware := Middleware[testConfig](rec)
 
 	cmdErr := errors.New("boom")
-	err := middleware(ctx, cfg, v4.CommandInfo{Name: "errcmd", Phase: v4.PhaseRun}, func() error {
+	err := middleware(ctx, cfg, v5.CommandInfo{Name: "errcmd", Phase: v5.PhaseRun}, func() error {
 		return cmdErr
 	})
 
@@ -204,7 +204,7 @@ func TestMiddleware_NoCaptureWhenConditionsNotMet(t *testing.T) {
 	cfg := &testConfig{}
 	middleware := Middleware[testConfig](rec)
 
-	_ = middleware(ctx, cfg, v4.CommandInfo{Name: "fastcmd", Phase: v4.PhaseRun}, func() error {
+	_ = middleware(ctx, cfg, v5.CommandInfo{Name: "fastcmd", Phase: v5.PhaseRun}, func() error {
 		return nil // fast, no error
 	})
 
@@ -237,10 +237,10 @@ func TestMiddleware_UsesFullPathWhenAvailable(t *testing.T) {
 	cfg := &testConfig{}
 	middleware := Middleware[testConfig](rec)
 
-	_ = middleware(ctx, cfg, v4.CommandInfo{
+	_ = middleware(ctx, cfg, v5.CommandInfo{
 		Name:     "deploy",
 		FullPath: "myapp deploy",
-		Phase:    v4.PhaseRun,
+		Phase:    v5.PhaseRun,
 	}, func() error {
 		time.Sleep(5 * time.Millisecond)
 
@@ -274,7 +274,7 @@ func TestMiddleware_LazilyStartsRecorder(t *testing.T) {
 	cfg := &testConfig{}
 	middleware := Middleware[testConfig](rec)
 
-	_ = middleware(ctx, cfg, v4.CommandInfo{Name: "test", Phase: v4.PhaseRun}, func() error {
+	_ = middleware(ctx, cfg, v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}, func() error {
 		return nil
 	})
 
@@ -359,7 +359,7 @@ func TestMiddleware_ErrorTakesPrecedenceOverSlow(t *testing.T) {
 
 	// Command is both slow (exceeds 1ns threshold) AND errors.
 	// The snapshot reason should be "error" (takes precedence over "slow").
-	_ = middleware(ctx, cfg, v4.CommandInfo{Name: "both", Phase: v4.PhaseRun}, func() error {
+	_ = middleware(ctx, cfg, v5.CommandInfo{Name: "both", Phase: v5.PhaseRun}, func() error {
 		return errors.New("failed")
 	})
 
@@ -411,7 +411,7 @@ func TestMiddleware_StartFailure_LogsAndContinues(t *testing.T) {
 
 	nextCalled := false
 
-	err := middleware(ctx, cfg, v4.CommandInfo{Name: "test", Phase: v4.PhaseRun}, func() error {
+	err := middleware(ctx, cfg, v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}, func() error {
 		nextCalled = true
 
 		return nil

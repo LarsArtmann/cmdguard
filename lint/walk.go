@@ -16,7 +16,7 @@ import (
 // CurrentMajor is the cmdguard major version this linter tracks. Imports of
 // older majors are stale (frozen, unfixed). When cmdguard ships a new major,
 // bump this constant and re-verify CG002's message.
-const CurrentMajor = "v4"
+const CurrentMajor = "v5"
 
 // cmdguardImportPrefix matches every cmdguard import path ever published:
 // the pre-module root ("github.com/larsartmann/cmdguard") and each major
@@ -30,7 +30,7 @@ const fangImportPath = "charm.land/fang/v2"
 
 // knownPackageNames maps import paths this linter reasons about to their real
 // Go package names, which cannot always be derived from the path (e.g. fang/v2
-// is package "fang", cmdguard/v4's package is "v4"). Aliased imports override
+// is package "fang", cmdguard/v5's package is "v5"). Aliased imports override
 // the guess at resolution time.
 var knownPackageNames = map[string]string{ //nolint:gochecknoglobals // static table of well-known import paths
 	fangImportPath: "fang",
@@ -252,7 +252,7 @@ func resolveImports(file *ast.File) map[string]string {
 
 // packageNameFor guesses the package name of an import path. Known paths come
 // from the table; cmdguard core paths are special because their package name
-// IS the major segment (github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4 is
+// IS the major segment (github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5 is
 // package v4); everything else falls back to the last segment with a trailing
 // major-version segment skipped (example.com/foo/v2 -> foo).
 func packageNameFor(path string) string {

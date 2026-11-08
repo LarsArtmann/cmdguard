@@ -2,7 +2,7 @@
 //
 // The point is to let editors, CI pipelines, and non-Go tools validate a config
 // file without running the binary. The schema is derived from the same struct
-// tags that drive flags and strict config loading ([v4.ConfigKeys]), so it
+// tags that drive flags and strict config loading ([v5.ConfigKeys]), so it
 // cannot accept a key the loader rejects or miss one it accepts.
 //
 // This package deliberately lives outside the core module: it is a build-time
@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 // Dialect is the JSON Schema dialect emitted. Draft 2020-12 is what editors and
@@ -122,9 +122,9 @@ func FromConfig(cfg any) (*Document, error) {
 
 // FromCLI builds the schema for a CLI's config, using the CLI's name and short
 // description as the document's title and description.
-func FromCLI[T any](cli *v4.CLI[T]) (*Document, error) {
+func FromCLI[T any](cli *v5.CLI[T]) (*Document, error) {
 	if cli == nil {
-		return nil, fmt.Errorf("building config schema: %w", v4.ErrConfigNil)
+		return nil, fmt.Errorf("building config schema: %w", v5.ErrConfigNil)
 	}
 
 	return fromConfigWithIdentity(cli.Config(), cli.Name(), cli.Short())
@@ -171,7 +171,7 @@ func encode(writer io.Writer, document *Document) error {
 
 // fromConfigWithIdentity builds a document and optionally names it.
 func fromConfigWithIdentity(cfg any, title, description string) (*Document, error) {
-	keys, err := v4.ConfigKeys(cfg)
+	keys, err := v5.ConfigKeys(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("reading config keys: %w", err)
 	}
@@ -191,7 +191,7 @@ func fromConfigWithIdentity(cfg any, title, description string) (*Document, erro
 
 // propertiesFor converts config keys into schema properties, collecting the
 // required ones in declaration order.
-func propertiesFor(keys []v4.ConfigKey) (PropertyMap, []string) {
+func propertiesFor(keys []v5.ConfigKey) (PropertyMap, []string) {
 	properties := make(PropertyMap, len(keys))
 	required := make([]string, 0, len(keys))
 
@@ -207,7 +207,7 @@ func propertiesFor(keys []v4.ConfigKey) (PropertyMap, []string) {
 }
 
 // propertyFor converts one config key into a schema property.
-func propertyFor(key v4.ConfigKey) *Property {
+func propertyFor(key v5.ConfigKey) *Property {
 	property := &Property{
 		Type:        key.Type,
 		Description: key.Help,
@@ -240,7 +240,7 @@ func propertyFor(key v4.ConfigKey) *Property {
 
 // hintsFor builds the cmdguard extension, returning nil when there is nothing
 // to say so the emitted schema stays clean.
-func hintsFor(key v4.ConfigKey) *Hints {
+func hintsFor(key v5.ConfigKey) *Hints {
 	hints := &Hints{Flag: key.Flag, Env: key.Env, Secret: key.Secret}
 
 	if !isStandardFormat(key.Format) {
@@ -379,7 +379,7 @@ func applyBound(property *Property, jsonType, value string, isMin bool) {
 //
 // This is for tooling that drives a binary: a config schema constrains a file,
 // a flag schema constrains an invocation.
-func CommandSchemas(description *v4.CLIDescription) map[string]*Document {
+func CommandSchemas(description *v5.CLIDescription) map[string]*Document {
 	if description == nil {
 		return nil
 	}
@@ -394,7 +394,7 @@ func CommandSchemas(description *v4.CLIDescription) map[string]*Document {
 }
 
 // commandSchema builds the flag schema for one command path.
-func commandSchema(path, short string, flags []v4.FlagDescription) *Document {
+func commandSchema(path, short string, flags []v5.FlagDescription) *Document {
 	properties, required := flagProperties(flags)
 
 	return &Document{
@@ -409,7 +409,7 @@ func commandSchema(path, short string, flags []v4.FlagDescription) *Document {
 }
 
 // collectCommandSchemas records every command in the tree, at any depth.
-func collectCommandSchemas(commands []v4.CommandDescription, schemas map[string]*Document) {
+func collectCommandSchemas(commands []v5.CommandDescription, schemas map[string]*Document) {
 	for _, command := range commands {
 		schemas[command.Path] = commandSchema(command.Path, command.Short, command.Flags)
 		collectCommandSchemas(command.Commands, schemas)
@@ -417,7 +417,7 @@ func collectCommandSchemas(commands []v4.CommandDescription, schemas map[string]
 }
 
 // flagProperties converts flag descriptions into properties keyed by flag name.
-func flagProperties(flags []v4.FlagDescription) (map[string]*Property, []string) {
+func flagProperties(flags []v5.FlagDescription) (map[string]*Property, []string) {
 	properties := make(map[string]*Property, len(flags))
 	required := make([]string, 0, len(flags))
 

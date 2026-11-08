@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/larsartmann/cmdguard/flightrecorder"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func ExampleDefaultConfig() {
@@ -103,7 +103,7 @@ func ExampleWithFlightRecorderRecorder() {
 	// WithFlightRecorderRecorder injects a pre-built Recorder into the CLI
 	// middleware chain. Use this when you need direct access to the Recorder
 	// (e.g. for programmatic CaptureToWriter calls or custom lifecycle control).
-	cli, err := v4.NewCLI[appConfig](
+	cli, err := v5.NewCLI[appConfig](
 		"myapp",
 		"My Application",
 		appConfig{},

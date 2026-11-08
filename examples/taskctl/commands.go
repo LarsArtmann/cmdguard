@@ -9,11 +9,11 @@ import (
 	output "github.com/larsartmann/go-output"
 	"github.com/spf13/cobra"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 //nolint:gocyclo // example file: linear command registration reads best as a single function
-func buildCommands(cli *v4.CLI[AppConfig]) error {
+func buildCommands(cli *v5.CLI[AppConfig]) error {
 	dbActionHandler := func(verb string) func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 		return func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 			fmt.Printf("%s %s (force=%v)\n", verb, flags.Env, flags.Force)
@@ -21,8 +21,8 @@ func buildCommands(cli *v4.CLI[AppConfig]) error {
 			return nil
 		}
 	}
-	printAndNil := func(msg string) func(_ context.Context, _ *AppConfig, _ v4.NoFlags) error {
-		return func(_ context.Context, _ *AppConfig, _ v4.NoFlags) error {
+	printAndNil := func(msg string) func(_ context.Context, _ *AppConfig, _ v5.NoFlags) error {
+		return func(_ context.Context, _ *AppConfig, _ v5.NoFlags) error {
 			fmt.Println(msg)
 
 			return nil
@@ -31,7 +31,7 @@ func buildCommands(cli *v4.CLI[AppConfig]) error {
 	scope := cli.Scope()
 
 	// --- list: multi-format output, aliases, filter flags ---
-	listCmd, err := v4.NewCommand(
+	listCmd, err := v5.NewCommand(
 		"list",
 		&ListFlags{},
 		func(_ context.Context, _ *AppConfig, flags *ListFlags) error {
@@ -48,7 +48,7 @@ func buildCommands(cli *v4.CLI[AppConfig]) error {
 
 			format, err := output.ParseFormat(flags.Format)
 			if err != nil {
-				return v4.NewFlagError("format", err)
+				return v5.NewFlagError("format", err)
 			}
 
 			headers := []string{"ID", "Title", "Priority", "Status", "Created"}
@@ -57,10 +57,10 @@ func buildCommands(cli *v4.CLI[AppConfig]) error {
 				rows = append(rows, t.Row())
 			}
 
-			return v4.OutputTable(format, headers, rows)
+			return v5.OutputTable(format, headers, rows)
 		},
-		v4.WithShort("List tasks"),
-		v4.WithLong(`# List Tasks
+		v5.WithShort("List tasks"),
+		v5.WithLong(`# List Tasks
 
 Display all tasks with optional filtering by priority and completion status.
 
@@ -70,17 +70,17 @@ Supports multiple **output formats** for scripting and automation:
 - `+"`json`"+` — structured JSON for piping into `+"`jq`"+`
 - `+"`csv`"+` — comma-separated for spreadsheet import
 - `+"`yaml`"+` — structured YAML for config files`),
-		v4.WithExample("taskctl list --format json --all"),
-		v4.WithAliases("ls"),
-		v4.WithGroupID("tasks"),
-		v4.WithNoArgs(),
+		v5.WithExample("taskctl list --format json --all"),
+		v5.WithAliases("ls"),
+		v5.WithGroupID("tasks"),
+		v5.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- add: required flags, values tag, PreRunE validation ---
-	addCmd, err := v4.NewCommand(
+	addCmd, err := v5.NewCommand(
 		"add",
 		&AddFlags{},
 		func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
@@ -93,30 +93,30 @@ Supports multiple **output formats** for scripting and automation:
 			fmt.Printf("Created task #%d: %s [%s]\n", task.ID, task.Title, task.Priority)
 			return nil
 		},
-		v4.WithShort("Add a new task"),
-		v4.WithLong(`# Add Task
+		v5.WithShort("Add a new task"),
+		v5.WithLong(`# Add Task
 
 Create a new task with a **title** and *priority*.
 
 The `+"`--title`"+` flag is **required** and will prompt interactively if omitted.
 
 Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"`medium`"+`).`),
-		v4.WithExample("taskctl add --title \"Fix bug\" --priority high"),
-		v4.WithPreRunE(func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
-			if _, err := v4.ParseEnum(flags.Priority, strings.Split(allowedPriorities, ",")); err != nil {
-				return v4.NewFlagError("priority", err)
+		v5.WithExample("taskctl add --title \"Fix bug\" --priority high"),
+		v5.WithPreRunE(func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
+			if _, err := v5.ParseEnum(flags.Priority, strings.Split(allowedPriorities, ",")); err != nil {
+				return v5.NewFlagError("priority", err)
 			}
 			return nil
 		}),
-		v4.WithGroupID("tasks"),
-		v4.WithNoArgs(),
+		v5.WithGroupID("tasks"),
+		v5.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- done: exit codes, PostRunE cleanup, dynamic completion ---
-	doneCmd, err := v4.NewCommand(
+	doneCmd, err := v5.NewCommand(
 		"done",
 		&DoneFlags{},
 		func(_ context.Context, _ *AppConfig, flags *DoneFlags) error {
@@ -127,35 +127,35 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 
 			task, err := store.Done(flags.ID)
 			if err != nil {
-				exitErr, _ := v4.NewExitError(2, v4.NewCommandError("done", err))
+				exitErr, _ := v5.NewExitError(2, v5.NewCommandError("done", err))
 				return exitErr
 			}
 
 			fmt.Printf("Completed task #%d: %s\n", task.ID, task.Title)
 			return nil
 		},
-		v4.WithShort("Mark a task as done"),
-		v4.WithExample("taskctl done --id 1"),
-		v4.WithPostRunE(func(_ context.Context, _ *AppConfig, _ *DoneFlags) error {
+		v5.WithShort("Mark a task as done"),
+		v5.WithExample("taskctl done --id 1"),
+		v5.WithPostRunE(func(_ context.Context, _ *AppConfig, _ *DoneFlags) error {
 			fmt.Println("[cleanup] syncing state")
 			return nil
 		}),
-		v4.WithGroupID("tasks"),
-		v4.WithCompletion(func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-			store, err := v4.Invoke[*TaskStore](scope)
+		v5.WithGroupID("tasks"),
+		v5.WithCompletion(func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			store, err := v5.Invoke[*TaskStore](scope)
 			if err != nil {
 				return nil, cobra.ShellCompDirectiveError
 			}
 			return store.IDs(), cobra.ShellCompDirectiveNoFileComp
 		}),
-		v4.WithNoArgs(),
+		v5.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- stats: OutputTable for terminal output ---
-	statsCmd, err := v4.NewCommand(
+	statsCmd, err := v5.NewCommand(
 		"stats",
 		&StatsFlags{},
 		func(_ context.Context, _ *AppConfig, _ *StatsFlags) error {
@@ -166,7 +166,7 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 
 			total, pending, done, byPriority := store.Stats()
 
-			return v4.OutputTable(
+			return v5.OutputTable(
 				output.FormatTable,
 				[]string{"Metric", "Value"},
 				[][]string{
@@ -179,21 +179,21 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 				},
 			)
 		},
-		v4.WithShort("Show task statistics"),
-		v4.WithExample("taskctl stats --format json"),
-		v4.WithGroupID("tasks"),
-		v4.WithNoArgs(),
+		v5.WithShort("Show task statistics"),
+		v5.WithExample("taskctl stats --format json"),
+		v5.WithGroupID("tasks"),
+		v5.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- inspect: ExactArgs, BranchingFlowContext, real task lookup ---
-	inspectCmd, err := v4.NewCommand(
+	inspectCmd, err := v5.NewCommand(
 		"inspect",
 		&InspectFlags{},
 		func(ctx context.Context, _ *AppConfig, flags *InspectFlags) error {
-			bfc, ok := v4.GetBranchingFlowContext(ctx)
+			bfc, ok := v5.GetBranchingFlowContext(ctx)
 			if ok {
 				fmt.Printf("Flow path: %s\n", bfc.PathString())
 			}
@@ -220,23 +220,23 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 
 			return nil
 		},
-		v4.WithShort("Inspect a task in detail"),
-		v4.WithExample("taskctl inspect 1"),
-		v4.WithExactArgs(1),
-		v4.WithValidArgs("1", "2", "3"),
-		v4.WithGroupID("tasks"),
+		v5.WithShort("Inspect a task in detail"),
+		v5.WithExample("taskctl inspect 1"),
+		v5.WithExactArgs(1),
+		v5.WithValidArgs("1", "2", "3"),
+		v5.WithGroupID("tasks"),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- db: parent command with shared DBFlags ---
-	migrateCmd, err := v4.NewCommand(
+	migrateCmd, err := v5.NewCommand(
 		"migrate",
 		&DBFlags{},
 		dbActionHandler("Running migrations on"),
-		v4.WithShort("Run database migrations"),
-		v4.WithLong(`# Database Migrations
+		v5.WithShort("Run database migrations"),
+		v5.WithLong(`# Database Migrations
 
 Run pending database migrations against the configured environment.
 
@@ -246,55 +246,55 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		return err
 	}
 
-	seedCmd, err := v4.NewCommand(
+	seedCmd, err := v5.NewCommand(
 		"seed",
 		&DBFlags{},
 		dbActionHandler("Seeding"),
-		v4.WithShort("Seed the database"),
+		v5.WithShort("Seed the database"),
 	)
 	if err != nil {
 		return err
 	}
 
-	dbStatusCmd, err := v4.NewCommand(
+	dbStatusCmd, err := v5.NewCommand(
 		"status",
 		&DBFlags{},
 		func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 			fmt.Printf("DB status on %s: connected\n", flags.Env)
 			return nil
 		},
-		v4.WithShort("Check database status"),
+		v5.WithShort("Check database status"),
 	)
 	if err != nil {
 		return err
 	}
 
-	dbCmd, err := v4.NewParentCommand[AppConfig](
+	dbCmd, err := v5.NewParentCommand[AppConfig](
 		"db",
 		"Database operations",
 		&DBFlags{},
-		v4.WithSubcommands(migrateCmd, seedCmd, dbStatusCmd),
-		v4.WithShort("Database operations"),
-		v4.WithGroupID("system"),
+		v5.WithSubcommands(migrateCmd, seedCmd, dbStatusCmd),
+		v5.WithShort("Database operations"),
+		v5.WithGroupID("system"),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- doctor: DoctorCommand, HealthCheckResultsWithContext ---
-	doctorCmd, err := v4.DoctorCommand[AppConfig](
+	doctorCmd, err := v5.DoctorCommand[AppConfig](
 		cli,
-		v4.WithDoctorGroupID[AppConfig]("system"),
+		v5.WithDoctorGroupID[AppConfig]("system"),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- config show: demonstrate env/config resolution ---
-	configShowCmd, err := v4.NewCommand(
+	configShowCmd, err := v5.NewCommand(
 		"show",
-		v4.NoFlags{},
-		func(_ context.Context, cfg *AppConfig, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, cfg *AppConfig, _ v5.NoFlags) error {
 			fmt.Println("Current configuration:")
 			fmt.Printf("  LogLevel:  %s\n", cfg.LogLevel)
 			fmt.Printf("  DataDir:     %s\n", cfg.DataDir)
@@ -305,81 +305,81 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 			fmt.Printf("  Verbose:     %d\n", cfg.Verbose)
 			return nil
 		},
-		v4.WithShort("Show resolved configuration"),
-		v4.WithNoArgs(),
+		v5.WithShort("Show resolved configuration"),
+		v5.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
-	configEditCmd, err := v4.NewCommand(
+	configEditCmd, err := v5.NewCommand(
 		"edit",
-		v4.NoFlags{},
-		func(_ context.Context, cfg *AppConfig, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, cfg *AppConfig, _ v5.NoFlags) error {
 			fmt.Printf("Edit config manually at ~/.config/taskctl/config.json\n")
 			fmt.Printf("  LogLevel: %s\n", cfg.LogLevel)
 			fmt.Printf("  DataDir:  %s\n", cfg.DataDir)
 			return nil
 		},
-		v4.WithShort("Show config location"),
-		v4.WithNoArgs(),
+		v5.WithShort("Show config location"),
+		v5.WithNoArgs(),
 	)
 	if err != nil {
 		return err
 	}
 
-	configCmd, err := v4.NewParentCommand[AppConfig](
+	configCmd, err := v5.NewParentCommand[AppConfig](
 		"config",
 		"Configuration management",
-		v4.NoFlags{},
-		v4.WithSubcommands(configShowCmd, configEditCmd),
-		v4.WithShort("Configuration management"),
-		v4.WithGroupID("system"),
+		v5.NoFlags{},
+		v5.WithSubcommands(configShowCmd, configEditCmd),
+		v5.WithShort("Configuration management"),
+		v5.WithGroupID("system"),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- version: VersionCommand ---
-	versionCmd, err := v4.VersionCommand[AppConfig](cli)
+	versionCmd, err := v5.VersionCommand[AppConfig](cli)
 	if err != nil {
 		return err
 	}
 
 	// --- hidden command ---
-	hiddenCmd, err := v4.NewCommand(
+	hiddenCmd, err := v5.NewCommand(
 		"secret",
-		v4.NoFlags{},
+		v5.NoFlags{},
 		printAndNil("You found the secret command!"),
-		v4.WithShort("Secret command"),
-		v4.WithHidden(true),
+		v5.WithShort("Secret command"),
+		v5.WithHidden(true),
 	)
 	if err != nil {
 		return err
 	}
 
 	// --- deprecated command ---
-	deprecatedCmd, err := v4.NewCommand(
+	deprecatedCmd, err := v5.NewCommand(
 		"complete",
-		v4.NoFlags{},
+		v5.NoFlags{},
 		printAndNil("Use 'done' instead."),
-		v4.WithShort("Deprecated: use done"),
-		v4.WithDeprecated("Use 'done' instead"),
+		v5.WithShort("Deprecated: use done"),
+		v5.WithDeprecated("Use 'done' instead"),
 	)
 	if err != nil {
 		return err
 	}
 
-	return v4.AddCommands(cli,
+	return v5.AddCommands(cli,
 		listCmd, addCmd, doneCmd, statsCmd, inspectCmd,
 		dbCmd, doctorCmd, configCmd, versionCmd, hiddenCmd, deprecatedCmd,
 	)
 }
 
-func resolveStore(scope *v4.Scope) (*TaskStore, error) {
-	store, err := v4.Invoke[*TaskStore](scope)
+func resolveStore(scope *v5.Scope) (*TaskStore, error) {
+	store, err := v5.Invoke[*TaskStore](scope)
 	if err != nil {
-		return nil, v4.NewCommandError("task", fmt.Errorf("resolve store: %w", err))
+		return nil, v5.NewCommandError("task", fmt.Errorf("resolve store: %w", err))
 	}
 	return store, nil
 }
@@ -391,8 +391,8 @@ func taskStatusLabel(done bool) string {
 	return taskStatusPending
 }
 
-func seedTasks(cli *v4.CLI[AppConfig]) {
-	store, err := v4.Invoke[*TaskStore](cli.Scope())
+func seedTasks(cli *v5.CLI[AppConfig]) {
+	store, err := v5.Invoke[*TaskStore](cli.Scope())
 	if err != nil {
 		return
 	}

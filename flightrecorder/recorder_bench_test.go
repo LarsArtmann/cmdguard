@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func BenchmarkNew(b *testing.B) {
@@ -34,7 +34,7 @@ func BenchmarkMiddleware_Overhead(b *testing.B) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v4.CommandInfo{Name: "bench", Phase: v4.PhaseRun}
+	info := v5.CommandInfo{Name: "bench", Phase: v5.PhaseRun}
 	middleware := Middleware[testConfig](rec)
 
 	next := func() error { return nil }

@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	charm.land/lipgloss/v2 v2.0.6
-	github.com/larsartmann/cmdguard/v4 v4.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
 	golang.org/x/term v0.47.0
 )
 
@@ -74,7 +74,7 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v4 => ../
+replace github.com/larsartmann/cmdguard/v5 => ../
 
 replace github.com/larsartmann/cmdguard/flightrecorder => ../flightrecorder
 

@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"os"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
-	"github.com/larsartmann/cmdguard/v4/pkg/version"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/larsartmann/cmdguard/v5/pkg/version"
 )
 
 type databaseConfig struct {
@@ -29,36 +29,36 @@ type config struct {
 }
 
 func main() {
-	cli, err := v4.NewCLI[config]("config-explain",
+	cli, err := v5.NewCLI[config]("config-explain",
 		"Demo: config files, strict keys, and value provenance",
 		config{},
-		v4.WithCLIVersion(version.Version),
-		v4.WithConfigFile("config.example.yaml"),
-		v4.WithStrictConfigKeys(),
-		v4.WithConfigExplainCommand(),
+		v5.WithCLIVersion(version.Version),
+		v5.WithConfigFile("config.example.yaml"),
+		v5.WithStrictConfigKeys(),
+		v5.WithConfigExplainCommand(),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	greetCmd, err := v4.NewCommand(
+	greetCmd, err := v5.NewCommand(
 		"greet",
-		v4.NoFlags{},
-		func(_ context.Context, cfg *config, _ v4.NoFlags) error {
+		v5.NoFlags{},
+		func(_ context.Context, cfg *config, _ v5.NoFlags) error {
 			fmt.Printf("greeting with log level %s, database %s:%d\n",
 				cfg.LogLevel, cfg.Database.Host, cfg.Database.Port)
 
 			return nil
 		},
-		v4.WithShort("Greet using the resolved configuration"),
+		v5.WithShort("Greet using the resolved configuration"),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := v4.AddCommand(cli, greetCmd); err != nil {
+	if err := v5.AddCommand(cli, greetCmd); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}

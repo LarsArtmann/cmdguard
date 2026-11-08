@@ -10,7 +10,7 @@ import (
 	"github.com/samber/do/v2"
 
 	"github.com/larsartmann/cmdguard/flightrecorder"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 // newTestRecorder returns a flight recorder scoped to a temp dir with a
@@ -133,7 +133,7 @@ func TestBuildApp_StoreResolutionFailure(t *testing.T) {
 			t.Fatalf("buildApp: %v", err)
 		}
 
-		err = v4.Override(cli.Scope(), func(do.Injector) (*TaskStore, error) {
+		err = v5.Override(cli.Scope(), func(do.Injector) (*TaskStore, error) {
 			return nil, errors.New("store construction failed")
 		})
 		if err != nil {
@@ -153,7 +153,7 @@ func TestExportAuditLog_NoPluginIsNoOp(t *testing.T) {
 	t.Chdir(t.TempDir())
 
 	// A CLI without an audit plugin exports nothing and errors nowhere.
-	cli, err := v4.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
+	cli, err := v5.NewCLI[AppConfig]("taskctl", "test", AppConfig{})
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
 	}

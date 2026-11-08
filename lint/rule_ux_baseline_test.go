@@ -29,12 +29,12 @@ func TestRuleMissingShortDescription(t *testing.T) {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
-	cmd, err := v4.NewCommand("scan", v4.NoFlags{},
-		func(_ context.Context, _ *struct{}, _ v4.NoFlags) error { return nil })
+	cmd, err := v5.NewCommand("scan", v5.NoFlags{},
+		func(_ context.Context, _ *struct{}, _ v5.NoFlags) error { return nil })
 	_, _ = cmd, err
 }
 `,
@@ -54,13 +54,13 @@ func main() {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
-	cmd, err := v4.NewCommand("scan", v4.NoFlags{},
-		func(_ context.Context, _ *struct{}, _ v4.NoFlags) error { return nil },
-		v4.WithShort("Scan things"))
+	cmd, err := v5.NewCommand("scan", v5.NoFlags{},
+		func(_ context.Context, _ *struct{}, _ v5.NoFlags) error { return nil },
+		v5.WithShort("Scan things"))
 	_, _ = cmd, err
 }
 `,
@@ -80,13 +80,13 @@ func main() {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
-	cmd, err := v4.NewCommand("scan", v4.NoFlags{},
-		func(_ context.Context, _ *struct{}, _ v4.NoFlags) error { return nil },
-		v4.WithShort("  "))
+	cmd, err := v5.NewCommand("scan", v5.NoFlags{},
+		func(_ context.Context, _ *struct{}, _ v5.NoFlags) error { return nil },
+		v5.WithShort("  "))
 	_, _ = cmd, err
 }
 `,
@@ -106,13 +106,13 @@ func main() {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
-	opts := []v4.CommandOption{}
-	cmd, err := v4.NewCommand("scan", v4.NoFlags{},
-		func(_ context.Context, _ *struct{}, _ v4.NoFlags) error { return nil },
+	opts := []v5.CommandOption{}
+	cmd, err := v5.NewCommand("scan", v5.NoFlags{},
+		func(_ context.Context, _ *struct{}, _ v5.NoFlags) error { return nil },
 		opts...)
 	_, _ = cmd, err
 }
@@ -134,12 +134,12 @@ import (
 	"context"
 	"testing"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func TestApp(t *testing.T) {
-	_, _ = v4.NewCommand("scan", v4.NoFlags{},
-		func(_ context.Context, _ *struct{}, _ v4.NoFlags) error { return nil })
+	_, _ = v5.NewCommand("scan", v5.NoFlags{},
+		func(_ context.Context, _ *struct{}, _ v5.NoFlags) error { return nil })
 }
 `,
 		})
@@ -160,13 +160,13 @@ func TestRuleMissingCLIVersion(t *testing.T) {
 			"main.go": `package main
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type cfg struct{}
 
 func main() {
-	cli, err := v4.NewCLI("app", "App", cfg{})
+	cli, err := v5.NewCLI("app", "App", cfg{})
 	_, _ = cli, err
 }
 `,
@@ -184,13 +184,13 @@ func main() {
 			"main.go": `package main
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type cfg struct{}
 
 func main() {
-	cli, err := v4.NewCLI("app", "App", cfg{}, v4.WithCLIVersion("1.0.0"))
+	cli, err := v5.NewCLI("app", "App", cfg{}, v5.WithCLIVersion("1.0.0"))
 	_, _ = cli, err
 }
 `,
@@ -210,14 +210,14 @@ func main() {
 import (
 	"charm.land/fang/v2"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type cfg struct{}
 
 func main() {
-	cli, err := v4.NewCLI("app", "App", cfg{},
-		v4.WithFangOptions(fang.WithVersion("1.0.0")))
+	cli, err := v5.NewCLI("app", "App", cfg{},
+		v5.WithFangOptions(fang.WithVersion("1.0.0")))
 	_, _ = cli, err
 }
 `,
@@ -235,14 +235,14 @@ func main() {
 			"main.go": `package main
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type cfg struct{}
 
 func main() {
-	opts := []v4.CLIOption{}
-	cli, err := v4.NewCLI("app", "App", cfg{}, opts...)
+	opts := []v5.CLIOption{}
+	cli, err := v5.NewCLI("app", "App", cfg{}, opts...)
 	_, _ = cli, err
 }
 `,
@@ -262,13 +262,13 @@ func main() {
 import (
 	"testing"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type cfg struct{}
 
 func TestBuild(t *testing.T) {
-	_, _ = v4.NewCLI("app", "App", cfg{})
+	_, _ = v5.NewCLI("app", "App", cfg{})
 }
 `,
 		})

@@ -44,12 +44,12 @@ import (
 	"github.com/larsartmann/cmdguard/flightrecorder"
 	"github.com/larsartmann/cmdguard/glamour"
 	"github.com/larsartmann/cmdguard/spinner"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
-	"github.com/larsartmann/cmdguard/v4/pkg/version"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/larsartmann/cmdguard/v5/pkg/version"
 )
 
 func main() {
-	os.Exit(v4.ExitCode(run(context.Background(), os.Args[1:])))
+	os.Exit(v5.ExitCode(run(context.Background(), os.Args[1:])))
 }
 
 // run builds the full production CLI and executes args against it: audit
@@ -94,7 +94,7 @@ func newProductionRecorder() *flightrecorder.Recorder {
 // recovery), flight recorder, glamour help, and command groups. Split from
 // main so tests can exercise the exact production composition; rec is started
 // lazily by the middleware and stopped by the caller (see main).
-func buildApp(rec *flightrecorder.Recorder) (*v4.CLI[AppConfig], error) {
+func buildApp(rec *flightrecorder.Recorder) (*v5.CLI[AppConfig], error) {
 	// Audit logging — captures DI lifecycle events for observability
 	// Set DO_AUDITLOG_ENABLED=true to enable without changing code.
 	auditPlugin, err := auditlog.New(auditlog.Config{
@@ -105,35 +105,35 @@ func buildApp(rec *flightrecorder.Recorder) (*v4.CLI[AppConfig], error) {
 		return nil, fmt.Errorf("creating audit log plugin: %w", err)
 	}
 
-	cli, err := v4.NewCLI[AppConfig](
+	cli, err := v5.NewCLI[AppConfig](
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
-		v4.WithCLIVersion(version.Version),
-		v4.WithEnvPrefix("TASKCTL_"),
-		v4.WithAuditLog(auditPlugin),
-		v4.WithAuditMiddleware[AppConfig](auditPlugin),
-		v4.WithConfigFile("$HOME/.config/taskctl/config.json"),
-		v4.WithConfigValidation(func(cfg *AppConfig) error {
+		v5.WithCLIVersion(version.Version),
+		v5.WithEnvPrefix("TASKCTL_"),
+		v5.WithAuditLog(auditPlugin),
+		v5.WithAuditMiddleware[AppConfig](auditPlugin),
+		v5.WithConfigFile("$HOME/.config/taskctl/config.json"),
+		v5.WithConfigValidation(func(cfg *AppConfig) error {
 			if cfg.DataDir == "" {
 				return fmt.Errorf("data-dir must not be empty")
 			}
 			return nil
 		}),
-		v4.WithGracefulShutdown(),
-		v4.WithStrictValidation(),
-		v4.WithMiddleware(
+		v5.WithGracefulShutdown(),
+		v5.WithStrictValidation(),
+		v5.WithMiddleware(
 			spinner.Middleware[AppConfig]("Working..."),
-			v4.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+			v5.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
 				fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
 			}),
-			v4.RecoveryMiddleware[AppConfig](),
+			v5.RecoveryMiddleware[AppConfig](),
 		),
 		// Flight recorder — captures execution traces for slow or failing
 		// commands. Snapshots are written to /tmp and analyzed with:
 		//   go tool trace /tmp/cmdguard-*.trace
 		flightrecorder.WithFlightRecorderRecorder[AppConfig](rec),
 		glamour.WithHelpTheme("dark"),
-		v4.WithGroup("tasks", "Task Management"),
-		v4.WithGroup("system", "System"),
+		v5.WithGroup("tasks", "Task Management"),
+		v5.WithGroup("system", "System"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("creating CLI: %w", err)
@@ -143,7 +143,7 @@ func buildApp(rec *flightrecorder.Recorder) (*v4.CLI[AppConfig], error) {
 	cli.AddGlobalBoolFlag("debug", "D", false, "Enable debug mode")
 
 	// Register DI services
-	if err := v4.Provide(cli.Scope(), NewTaskStore); err != nil {
+	if err := v5.Provide(cli.Scope(), NewTaskStore); err != nil {
 		return nil, fmt.Errorf("registering TaskStore: %w", err)
 	}
 
@@ -161,13 +161,13 @@ func buildApp(rec *flightrecorder.Recorder) (*v4.CLI[AppConfig], error) {
 // exportAuditLog writes the DI audit log to disk when any events were
 // captured. AUDIT_LOG_FORMAT selects the export format: html, json, ndjson,
 // csv, tsv, mermaid, dot, d2, plantuml, tree, or htmltree (default: html).
-func exportAuditLog(cli *v4.CLI[AppConfig]) {
+func exportAuditLog(cli *v5.CLI[AppConfig]) {
 	plugin := cli.AuditLog()
 	if plugin == nil || plugin.EventsCount() == 0 {
 		return
 	}
 
-	format, err := v4.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+	format, err := v5.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)
 
@@ -175,7 +175,7 @@ func exportAuditLog(cli *v4.CLI[AppConfig]) {
 	}
 
 	path := "taskctl-audit." + format.String()
-	if err := v4.ExportAuditLog(cli, v4.AuditLogExportConfig{
+	if err := v5.ExportAuditLog(cli, v5.AuditLogExportConfig{
 		Format: format,
 		Path:   path,
 	}); err != nil {

@@ -6,7 +6,7 @@ import (
 
 // Generic instantiations wrap the called selector in IndexExpr (one type
 // argument) or IndexListExpr (two or more). cmdguard's constructors are
-// generic — `v4.NewCLI[Config](...)`, `v4.NewCommand[C, F](...)` — so every
+// generic — `v5.NewCLI[Config](...)`, `v5.NewCommand[C, F](...)` — so every
 // selector-matching rule must see through the type arguments. These tests
 // pin the unwrap in selectorExprOf (regression for the v0.2.1 fix where
 // explicit instantiation syntax silenced the rules).
@@ -22,13 +22,13 @@ func TestGenericInstantiationDetection(t *testing.T) {
 import (
 	"context"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type scanFlags struct{}
 
 func main() {
-	cmd, err := v4.NewCommand[struct{}, scanFlags]("scan", scanFlags{},
+	cmd, err := v5.NewCommand[struct{}, scanFlags]("scan", scanFlags{},
 		func(_ context.Context, _ *struct{}, _ scanFlags) error { return nil })
 	_, _ = cmd, err
 }
@@ -47,13 +47,13 @@ func main() {
 			"main.go": `package main
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type demoConfig struct{}
 
 func main() {
-	cli, err := v4.NewCLI[demoConfig]("demo", "demo CLI", demoConfig{})
+	cli, err := v5.NewCLI[demoConfig]("demo", "demo CLI", demoConfig{})
 	_, _ = cli, err
 }
 `,
@@ -71,12 +71,12 @@ func main() {
 			"cli.go": `package main
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type demoConfig struct{}
 
-var appCLI, appErr = v4.NewCLI[demoConfig]("demo", "demo CLI", demoConfig{})
+var appCLI, appErr = v5.NewCLI[demoConfig]("demo", "demo CLI", demoConfig{})
 `,
 			"main.go": `package main
 
@@ -108,13 +108,13 @@ func main() {
 			"main.go": `package main
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type demoConfig struct{}
 
 func main() {
-	cli, err := v4.NewCLI("demo", "demo CLI", demoConfig{})
+	cli, err := v5.NewCLI("demo", "demo CLI", demoConfig{})
 	_, _ = cli, err
 }
 `,

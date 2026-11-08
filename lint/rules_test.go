@@ -59,7 +59,7 @@ func TestRuleExecuteBypassPositive(t *testing.T) {
 	// The exact timesheets shape: CLI dismantled via RootCommand, handed to
 	// raw fang.Execute, in a project that imports cmdguard (other file).
 	findings := detectOn(t, map[string]string{
-		"guard.go": "package cmd\n\nimport cmdguard \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = cmdguard.NoFlags{}\n",
+		"guard.go": "package cmd\n\nimport cmdguard \"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5\"\n\nvar _ = cmdguard.NoFlags{}\n",
 		"main.go": `package main
 
 import (
@@ -86,7 +86,7 @@ func TestRuleExecuteBypassPositiveViaVariable(t *testing.T) {
 	t.Parallel()
 
 	findings := detectOn(t, map[string]string{
-		"a.go": "package a\n\nimport \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = v4.NoFlags{}\n",
+		"a.go": "package a\n\nimport \"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5\"\n\nvar _ = v5.NoFlags{}\n",
 		"main.go": `package main
 
 import (
@@ -120,12 +120,12 @@ import (
 	"context"
 
 	"charm.land/fang/v2"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
 	ctx := context.Background()
-	cli, _ := v4.NewCLI("app", "app", struct{}{})
+	cli, _ := v5.NewCLI("app", "app", struct{}{})
 	_ = fang.Execute(ctx, nil) // fang without RootCommand: other runner use
 	_ = cli.Execute(ctx)
 }
@@ -181,7 +181,7 @@ func TestRuleStaleMajorImportNegative(t *testing.T) {
 	t.Parallel()
 
 	findings := detectOn(t, map[string]string{
-		"cmd.go": "package cmd\n\nimport v4 \"github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4\"\n\nvar _ = v4.NoFlags{}\n",
+		"cmd.go": "package cmd\n\nimport v4 \"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5\"\n\nvar _ = v5.NoFlags{}\n",
 		"sub.go": "package cmd\n\nimport \"github.com/larsartmann/cmdguard/spinner\"\n\nvar _ = spinner.Spin\n",
 	})
 
@@ -201,7 +201,7 @@ func TestRulePanicOnConstructorPositive(t *testing.T) {
 import (
 	"fmt"
 
-	cmdguard "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	cmdguard "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func mustNewCommand(use string) cmdguard.Command[struct{}, struct{}] {
@@ -225,11 +225,11 @@ func TestRulePanicOnConstructorPositiveAddCommand(t *testing.T) {
 		"reg.go": `package cmd
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-func register(cli *v4.CLI[struct{}], cmd v4.Command[struct{}, struct{}]) {
-	if err := v4.AddCommand(cli, cmd); err != nil {
+func register(cli *v5.CLI[struct{}], cmd v5.Command[struct{}, struct{}]) {
+	if err := v5.AddCommand(cli, cmd); err != nil {
 		panic(err)
 	}
 }
@@ -248,12 +248,12 @@ func TestRulePanicOnConstructorNegative(t *testing.T) {
 import (
 	"fmt"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 // Errors are returned, not panicked on.
-func newCommand(use string) (v4.Command[struct{}, struct{}], error) {
-	cmd, err := v4.NewCommand(use, struct{}{}, nil)
+func newCommand(use string) (v5.Command[struct{}, struct{}], error) {
+	cmd, err := v5.NewCommand(use, struct{}{}, nil)
 	if err != nil {
 		return cmd, fmt.Errorf("building %q: %w", use, err)
 	}
@@ -284,11 +284,11 @@ func TestRuleSetVersionPositive(t *testing.T) {
 		"guard.go": `package cmd
 
 import (
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func setup() {
-	cli, err := v4.NewCLI("app", "app", struct{}{})
+	cli, err := v5.NewCLI("app", "app", struct{}{})
 	if err != nil {
 		return
 	}
@@ -333,13 +333,13 @@ func TestRuleDuplicateVersionOptsPositive(t *testing.T) {
 
 import (
 	"charm.land/fang/v2"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func build() {
-	_, _ = v4.NewCLI("app", "app", struct{}{},
-		v4.WithCLIVersion("1.2.3"),
-		v4.WithFangOptions(fang.WithVersion("1.2.3")),
+	_, _ = v5.NewCLI("app", "app", struct{}{},
+		v5.WithCLIVersion("1.2.3"),
+		v5.WithFangOptions(fang.WithVersion("1.2.3")),
 	)
 }
 `,
@@ -356,13 +356,13 @@ func TestRuleDuplicateVersionOptsNegative(t *testing.T) {
 
 import (
 	"charm.land/fang/v2"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func build() {
-	_, _ = v4.NewCLI("app", "app", struct{}{},
-		v4.WithCLIVersion("1.2.3"),
-		v4.WithFangOptions(fang.WithColors()),
+	_, _ = v5.NewCLI("app", "app", struct{}{},
+		v5.WithCLIVersion("1.2.3"),
+		v5.WithFangOptions(fang.WithColors()),
 	)
 }
 `,
@@ -385,12 +385,12 @@ import (
 	"context"
 	"fmt"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
 	ctx := context.Background()
-	cli, _ := v4.NewCLI("app", "app", struct{}{})
+	cli, _ := v5.NewCLI("app", "app", struct{}{})
 	if err := cli.Execute(ctx); err != nil {
 		fmt.Println(err)
 	}
@@ -414,12 +414,12 @@ import (
 	"fmt"
 
 	"charm.land/fang/v2"
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 func main() {
 	ctx := context.Background()
-	cli, _ := v4.NewCLI("app", "app", struct{}{})
+	cli, _ := v5.NewCLI("app", "app", struct{}{})
 	if err := cli.Execute(ctx); err != nil {
 		wrapped := fmt.Errorf("run failed: %w", err)
 		_ = wrapped

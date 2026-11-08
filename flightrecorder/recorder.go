@@ -16,11 +16,11 @@
 // threshold or returns an error will automatically produce a .trace file:
 //
 //	import (
-//	    v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+//	    v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 //	    "github.com/larsartmann/cmdguard/flightrecorder"
 //	)
 //
-//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
+//	cli, _ := v5.NewCLI[Config]("app", "My app", Config{},
 //	    flightrecorder.WithFlightRecorder[Config](flightrecorder.Config{
 //	        CaptureOnSlow:    true,
 //	        SlowThreshold:    200 * time.Millisecond,
@@ -39,8 +39,8 @@
 //	}
 //	defer rec.Stop()
 //
-//	cli, _ := v4.NewCLI[Config]("app", "My app", Config{},
-//	    v4.WithMiddleware(flightrecorder.Middleware[Config](rec)),
+//	cli, _ := v5.NewCLI[Config]("app", "My app", Config{},
+//	    v5.WithMiddleware(flightrecorder.Middleware[Config](rec)),
 //	)
 //
 // # Analyzing traces
