@@ -84,8 +84,13 @@ func evaluateCapture(ctx context.Context, rec *Recorder, info v5.CommandMetadata
 	finalName := name
 	finalReason := reason
 
+	// The snapshot is post-hoc telemetry: it must survive Execute returning,
+	// which cancels the request context (v5 signal handling cancels on every
+	// run's exit). Keep values, drop cancellation.
+	captureCtx := context.WithoutCancel(ctx)
+
 	go func() {
-		if _, captureErr := rec.Capture(ctx, finalName, finalReason); captureErr != nil {
+		if _, captureErr := rec.Capture(captureCtx, finalName, finalReason); captureErr != nil {
 			rec.logf("flightrecorder: failed to capture %s snapshot: %v", finalReason, captureErr)
 		}
 	}()

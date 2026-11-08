@@ -136,7 +136,7 @@ type CLI[T any] struct {
 	// contexts persist across executions (PersistentPreRunE's SetContext
 	// shadows the root ctx), so every run must derive from this, not from
 	// a stale per-command ctx.
-	execCtx context.Context
+	execCtx context.Context //nolint:containedctx // lives exactly one Execute call; fixes stale-subcommand-ctx across repeated ExecuteWithArgs
 	// configExplainWired guards idempotent registration of the config command.
 	configExplainWired bool
 	// configSetFields holds the struct field names the config file supplied.
