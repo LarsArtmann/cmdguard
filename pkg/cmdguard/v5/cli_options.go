@@ -113,24 +113,16 @@ func WithoutErrorHints() CLIOption {
 }
 
 // WithBatteries turns on the production defaults every serious CLI needs:
-// strict command validation (every command must carry WithShort), signal
-// handling with graceful DI shutdown, actionable error hints, the JSON
-// describe contract, and auto-registered version (when WithCLIVersion is set)
-// and doctor commands. Consumer-defined commands with those names win.
-//
-// It is additive and opt-in. v5 flips these defaults; until then this option
-// is how a consumer gets them without waiting for the major. Passing
-// WithDraconianValidation after WithBatteries raises validation further.
-// WithBatteries turns on the production defaults every serious CLI needs:
 // strict command validation (every command must carry WithShort), strict
 // config-file keys (a typo fails instead of silently doing nothing), signal
 // handling with graceful DI shutdown, actionable error hints, the JSON
 // describe contract, and auto-registered version (when WithCLIVersion is set)
 // and doctor commands. Consumer-defined commands with those names win.
 //
-// It is additive and opt-in. v5 flips these defaults; until then this option
-// is how a consumer gets them without waiting for the major. Passing
-// WithDraconianValidation after WithBatteries raises validation further.
+// v5 makes this bundle the default; WithBatteries stays as an explicit
+// reinforcement and re-enables the bundle after any Without* opt-out.
+// Passing WithDraconianValidation after WithBatteries raises validation
+// further.
 func WithBatteries() CLIOption {
 	return func(s *cliSpec) {
 		s.batteries = true
@@ -141,6 +133,12 @@ func WithBatteries() CLIOption {
 		s.strictConfigKeys = true
 	}
 }
+
+// WithoutBatteries reverts to the v4-era defaults: lenient validation, no
+// signal handling or DI shutdown, lenient config-file keys. Error hints stay
+// on (their own opt-out is WithoutErrorHints). Individual opt-outs
+// (WithoutStrictValidation, WithoutSignalHandling, WithoutStrictConfigKeys)
+// keep the rest of the bundle.
 
 // WithFangColorScheme sets a custom color scheme for fang.
 func WithFangColorScheme(cs func(lightDark lipgloss.LightDarkFunc) fang.ColorScheme) CLIOption {
@@ -165,24 +163,52 @@ func WithEnvPrefix(prefix string) CLIOption {
 }
 
 // WithSignalHandling adds automatic context cancellation on SIGINT/SIGTERM.
+// On by default in v5; WithoutSignalHandling opts out.
 func WithSignalHandling() CLIOption {
 	return func(s *cliSpec) {
 		s.signalHandling = true
 	}
 }
 
-// WithStrictValidation enables strict command validation.
+// WithoutSignalHandling disables the SIGINT/SIGTERM context cancellation and,
+// with it, graceful DI shutdown.
+func WithoutSignalHandling() CLIOption {
+	return func(s *cliSpec) {
+		s.signalHandling = false
+		s.gracefulShutdown = false
+	}
+}
+
+// WithStrictValidation enables strict command validation. On by default in
+// v5; WithoutStrictValidation opts out.
 func WithStrictValidation() CLIOption {
 	return func(s *cliSpec) {
 		s.validationMode = Strict
 	}
 }
 
+// WithoutStrictValidation reverts to lenient command validation (name and
+// handler only).
+func WithoutStrictValidation() CLIOption {
+	return func(s *cliSpec) {
+		s.validationMode = Lenient
+	}
+}
+
 // WithGracefulShutdown enables graceful DI shutdown on SIGINT/SIGTERM.
+// On by default in v5 (implied by the default signal handling).
 func WithGracefulShutdown() CLIOption {
 	return func(s *cliSpec) {
 		s.signalHandling = true
 		s.gracefulShutdown = true
+	}
+}
+
+// WithoutGracefulShutdown keeps SIGINT/SIGTERM context cancellation but skips
+// DI service shutdown.
+func WithoutGracefulShutdown() CLIOption {
+	return func(s *cliSpec) {
+		s.gracefulShutdown = false
 	}
 }
 
@@ -280,6 +306,14 @@ func WithConfigFileLoader(loader ConfigFileLoader, paths ...string) CLIOption {
 func WithStrictConfigKeys() CLIOption {
 	return func(s *cliSpec) {
 		s.strictConfigKeys = true
+	}
+}
+
+// WithoutStrictConfigKeys reverts to lenient config-file loading: unknown keys
+// are silently ignored.
+func WithoutStrictConfigKeys() CLIOption {
+	return func(s *cliSpec) {
+		s.strictConfigKeys = false
 	}
 }
 

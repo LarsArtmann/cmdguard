@@ -162,11 +162,16 @@ func NewCLI[T any](name, short string, defaults T, opts ...CLIOption) (*CLI[T], 
 	}
 
 	spec := cliSpec{
-		name:         name,
-		short:        short,
-		useFang:      true,
-		silenceUsage: true,
-		errorHints:   true,
+		name:             name,
+		short:            short,
+		useFang:          true,
+		silenceUsage:     true,
+		errorHints:       true,
+		batteries:        true,
+		validationMode:   Strict,
+		signalHandling:   true,
+		gracefulShutdown: true,
+		strictConfigKeys: true,
 	}
 
 	for _, opt := range opts {
