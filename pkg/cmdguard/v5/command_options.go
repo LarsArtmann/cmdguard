@@ -153,6 +153,31 @@ func WithNoArgs() CommandOption {
 	}
 }
 
+// WithStrictPositionalArgs rejects every positional argument a command never
+// declared. Today this is opt-in per command; a future v5.x release is
+// expected to flip it to the DEFAULT for commands that declared no args
+// validator (the silent-ignore footgun: extra positionals are accepted and
+// dropped without error), with WithArgsPassthrough as the opt-out — see
+// ROADMAP.md. Only applies when no other args validator was set (an explicit
+// WithExactArgs/WithNoArgs/... wins; this option never overrides one).
+func WithStrictPositionalArgs() CommandOption {
+	return func(s *commandSpec) {
+		if s.args == nil {
+			s.args = cobra.NoArgs
+		}
+	}
+}
+
+// WithArgsPassthrough accepts any positional arguments, ignoring extras.
+// It pins today's cobra-default behavior explicitly; once the strict
+// positional default lands in a future v5.x (see ROADMAP.md), this is the
+// documented opt-out for commands that genuinely take free-form positionals.
+func WithArgsPassthrough() CommandOption {
+	return func(s *commandSpec) {
+		s.args = nil
+	}
+}
+
 // --- Completion (non-generic) ---
 
 // WithCompletion sets the shell completion function for a command.

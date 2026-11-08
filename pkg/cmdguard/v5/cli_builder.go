@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/spf13/cobra"
 )
@@ -24,6 +25,7 @@ import (
 // errors joined, so a construction failure names every broken command, not
 // just the first. Callers that already hold a (Command, error) pair use Try.
 type Builder[T any] struct {
+	mu   sync.Mutex
 	cli  *CLI[T]
 	cmds []AddableCommand[T]
 	errs []error
@@ -34,8 +36,12 @@ func NewBuilder[T any](cli *CLI[T]) *Builder[T] {
 	return &Builder[T]{cli: cli}
 }
 
-// add queues cmd when err is nil, otherwise collects err.
+// add queues cmd when err is nil, otherwise collects err. Safe for
+// concurrent use (Add/AddParent/Try from multiple goroutines, then one Build).
 func (b *Builder[T]) add(cmd AddableCommand[T], err error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
 	if err != nil {
 		b.errs = append(b.errs, err)
 
@@ -97,6 +103,9 @@ func (b *Builder[T]) Check(err error) {
 		return
 	}
 
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
 	if err != nil {
 		b.errs = append(b.errs, err)
 	}
@@ -118,6 +127,9 @@ func Try[T, F any](b *Builder[T], cmd Command[T, F], err error) {
 // found across the batch (prepare is side-effect-free, so all commands are
 // checked even after one fails). On error, nothing is attached.
 func (b *Builder[T]) Build() error {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
 	errs := append([]error(nil), b.errs...)
 
 	prepared := make([]*cobra.Command, 0, len(b.cmds))
