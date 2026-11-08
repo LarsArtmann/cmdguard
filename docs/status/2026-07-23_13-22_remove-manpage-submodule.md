@@ -54,59 +54,59 @@ None for this task.
 
 ### P0 (Blocking)
 
-1. Fix `auditlog.go:176` — `auditlog.ServiceName` is undefined. This blocks ALL builds, tests, and linting.
-2. Verify full test suite passes after auditlog fix
-3. Verify golangci-lint passes after auditlog fix
-4. Run sub-module build/test loop: `for m in glamour prompts spinner telemetry; do (cd $m && GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 60s); done`
+1. ~~Fix `auditlog.go:176` — `auditlog.ServiceName` is undefined. This blocks ALL builds, tests, and linting.~~ done — ServiceByName fix shipped in-era (Resolution below)
+2. ~~Verify full test suite passes after auditlog fix~~ done — full suite green (Resolution 2026-07-23); CI green today
+3. ~~Verify golangci-lint passes after auditlog fix~~ done — lint green (Resolution 2026-07-23); CI lint job green today
+4. ~~Run sub-module build/test loop: `for m in glamour prompts spinner telemetry; do (cd $m && GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 60s); done`~~ done — sub-module loop green (Resolution); submodule-smoke.yml ships it in CI
 
 ### P1 (High value, low effort)
 
-5. Add CHANGELOG.md entry noting manpage sub-module removal
-6. Check if `samber-do-auditlog` v0.5.0 actually exports `ServiceName` or if the API changed
-7. Verify `.golangci.yml` exclusion count is still accurate (was "4 per-file v3 exclusion rules" — may have changed)
-8. Check if any downstream consumers import `github.com/larsartmann/cmdguard/manpage` (published v0.1.0 tag exists)
+5. ~~Add CHANGELOG.md entry noting manpage sub-module removal~~ done — in-era (Resolution below) — the note was lost in later CHANGELOG reorganizations
+6. ~~Check if `samber-do-auditlog` v0.5.0 actually exports `ServiceName` or if the API changed~~ done — API settled; v4 uses AuditLogServiceByName over auditlog.ServiceName (pkg/cmdguard/v4/auditlog.go:202)
+7. ~~Verify `.golangci.yml` exclusion count is still accurate (was "4 per-file v3 exclusion rules" — may have changed)~~ done — AGENTS.md:227 exclusion inventory current
+8. ~~Check if any downstream consumers import `github.com/larsartmann/cmdguard/manpage` (published v0.1.0 tag exists)~~ **Won't implement — external concern — no in-tree consumers; retired module path.**
 
 ### P2 (Important but not blocking)
 
 9. Audit remaining stale exclusions in `.golangci.yml` (v2 paths like `pkg/cmdguard/v2/output.go$`, `pkg/cmdguard/v2/env_tag_test.go$`)
-10. Verify `go.work.sum` is committed and up to date
-11. Check if `flake.nix` needs updating (manpage was not in flake.nix, but verify)
-12. Update MIGRATION_v2_v3.md line 117 — the manpage row was removed but the table formatting may need adjustment
-13. Consider whether `FEATURES.md` "Sub-module tests: 17 across all 4" is accurate (manpage had 3 tests, 20-3=17)
-14. Check if any examples/ code references manpage
-15. Verify `docs/API.md` doesn't reference manpage (if it exists)
+10. ~~Verify `go.work.sum` is committed and up to date~~ **Won't implement — machine-local — go.work/go.work.sum are untracked workspace files.**
+11. ~~Check if `flake.nix` needs updating (manpage was not in flake.nix, but verify)~~ done — flake needs no manpage entry; nix flake check green (nix-check CI job)
+12. ~~Update MIGRATION_v2_v3.md line 117 — the manpage row was removed but the table formatting may need adjustment~~ done — manpage row removed cleanly from MIGRATION_v2_v3.md
+13. ~~Consider whether `FEATURES.md` "Sub-module tests: 17 across all 4" is accurate (manpage had 3 tests, 20-3=17)~~ done — FEATURES.md sub-module counts maintained for the current module set
+14. ~~Check if any examples/ code references manpage~~ done — no examples/ manpage references (grep clean)
+15. ~~Verify `docs/API.md` doesn't reference manpage (if it exists)~~ **Superseded — superseded — docs/API.md removed 2026-08-06.**
 
 ### P3 (Cleanup & consistency)
 
 16. Clean stale v2 lint exclusions from `.golangci.yml` (output.go, env_tag_test.go, type_handler_test.go)
-17. Update internal "5 sub-modules" references that may remain in docs/planning/ files
-18. Check if CONTRIBUTING.md references manpage
-19. Verify CI workflow runs correctly after manpage removal (submodule-smoke.yml matrix should now have 4 entries)
-20. Check if any Makefile/justfile references manpage (shouldn't exist per project conventions)
+17. ~~Update internal "5 sub-modules" references that may remain in docs/planning/ files~~ **Won't implement — intentional — historical planning docs preserved per the report own note.**
+18. ~~Check if CONTRIBUTING.md references manpage~~ done — CONTRIBUTING.md carries no manpage references
+19. ~~Verify CI workflow runs correctly after manpage removal (submodule-smoke.yml matrix should now have 4 entries)~~ done — matrix is [glamour, prompts, spinner, telemetry]; workflow green in CI
+20. ~~Check if any Makefile/justfile references manpage (shouldn't exist per project conventions)~~ **Won't implement — rejected — no Makefile/justfile exists.**
 
 ### P4 (Quality & health)
 
-21. Run `nix fmt` to ensure formatting consistency
-22. Run `nix flake check` to verify Nix configuration
-23. Check if any Go doc comments in core reference manpage
-24. Verify `pkg.go.dev` documentation won't break (manpage module has v0.1.0 tag — consumers may pin it)
-25. Review if fang's built-in manpage generation covers all use cases the removed sub-module provided
+21. ~~Run `nix fmt` to ensure formatting consistency~~ done — formatting enforced — BuildFlow pre-commit + treefmt in nix flake check
+22. ~~Run `nix flake check` to verify Nix configuration~~ done — nix flake check green (Resolution + nix-check CI job)
+23. ~~Check if any Go doc comments in core reference manpage~~ done — no manpage references in Go sources (grep clean)
+24. ~~Verify `pkg.go.dev` documentation won't break (manpage module has v0.1.0 tag — consumers may pin it)~~ **Won't implement — external concern — pkg.go.dev serves the frozen manpage v0.1.0 snapshot.**
+25. ~~Review if fang's built-in manpage generation covers all use cases the removed sub-module provided~~ **Won't implement — accepted — fang mango-cobra generation is the documented replacement.**
 
 ### P5 (Documentation)
 
-26. Update this session's TODO_LIST.md with manpage removal as completed work
-27. Consider adding a "Removed features" section to ROADMAP.md for v3.x changelog
-28. Check if examples/taskctl/ references manpage
-29. Verify README.md "Optional Sub-Modules" table renders correctly (4 rows now)
-30. Check if any Go test files import manpage package
+26. ~~Update this session's TODO_LIST.md with manpage removal as completed work~~ done — TODO_LIST.md updated in-era (section a #10)
+27. ~~Consider adding a "Removed features" section to ROADMAP.md for v3.x changelog~~ **Won't implement — rejected — CHANGELOG remains the removal record; ROADMAP section not adopted.**
+28. ~~Check if examples/taskctl/ references manpage~~ done — no taskctl manpage references (grep clean)
+29. ~~Verify README.md "Optional Sub-Modules" table renders correctly (4 rows now)~~ done — README sub-modules table maintained for the current module set
+30. ~~Check if any Go test files import manpage package~~ done — no test files import manpage (grep clean)
 
 ---
 
 ## g) Questions I Cannot Answer
 
-1. **Should we tag a v3.1.0 for the manpage removal?** This is a breaking change for consumers who import `github.com/larsartmann/cmdguard/manpage`. The module was at v0.1.0 (pre-1.0 semver), so technically no major version bump needed, but consumers with `go get github.com/larsartmann/cmdguard/manpage@v0.1.0` will get a module that no longer exists in the repo. Do you want to add a deprecation notice or just let it go?
+1. ~~**Should we tag a v3.1.0 for the manpage removal?** This is a breaking change for consumers who import `github.com/larsartmann/cmdguard/manpage`. The module was at v0.1.0 (pre-1.0 semver), so technically no major version bump needed, but consumers with `go get github.com/larsartmann/cmdguard/manpage@v0.1.0` will get a module that no longer exists in the repo. Do you want to add a deprecation notice or just let it go?~~ done — answered — v3.1.0 shipped 2026-07-25 (CHANGELOG [3.1.0]); the removal rode the normal release train
 
-2. **Should we fix the `auditlog.ServiceName` build failure now?** It's pre-existing (from commit `b998722`) and blocks ALL verification. I can investigate and fix it, but it's unrelated to the manpage removal. Do you want me to tackle it in this session or separately?
+2. ~~**Should we fix the `auditlog.ServiceName` build failure now?** It's pre-existing (from commit `b998722`) and blocks ALL verification. I can investigate and fix it, but it's unrelated to the manpage removal. Do you want me to tackle it in this session or separately?~~ done — fixed in-era (Resolution below)
 
 3. **Should we remove the v2 lint exclusions from `.golangci.yml`?** There are stale exclusion rules for `pkg/cmdguard/v2/manpage.go$` (already removed by this session), plus other v2 paths (`output.go`, `env_tag_test.go`, `type_handler_test.go`). These are dead config. Clean them up now or leave for a separate pass?
 

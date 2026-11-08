@@ -19,36 +19,37 @@
 
 ## a) FULLY DONE
 
-1. **Plan document committed and pushed** (commit `67ba8d4`) — comprehensive 340-line consolidation plan with 9 tasks, 40 subtasks, Pareto breakdown, mermaid execution graph, breaking changes table, and migration guide.
+1. ~~**Plan document committed and pushed** (commit `67ba8d4`) — comprehensive 340-line consolidation plan with 9 tasks, 40 subtasks, Pareto breakdown, mermaid execution graph, breaking changes table, and migration guide.~~ done at `67ba8d4`
 
-2. **go.work version mismatch fixed** — Changed `go 1.26.4` → `go 1.26.5` to match installed Go version and resolve the "go.work lists go 1.26.4" build error that blocked ALL go commands and the pre-commit hook. Auto-committed by the git daemon as `98e0730`.
+2. ~~**go.work version mismatch fixed** — Changed `go 1.26.4` → `go 1.26.5` to match installed Go version and resolve the "go.work lists go 1.26.4" build error that blocked ALL go commands and the pre-commit hook. Auto-committed by the git daemon as `98e0730`.~~ done at `98e0730`
 
-3. **go-output workspace integration** — Added `/home/lars/projects/go-output` and all 13 of its sub-modules to `go.work`. The published `go-output@v0.31.1` has unresolvable pseudo-version dependencies (`v0.0.0-00010101000000-000000000000`) for `testhelpers`, `escape`, and other sub-modules due to local `replace` directives that are ignored by downstream consumers. Adding them to the workspace resolves all of them. Auto-committed as `2552a62` and `fc2108b`.
+3. ~~**go-output workspace integration** — Added `/home/lars/projects/go-output` and all 13 of its sub-modules to `go.work`. The published `go-output@v0.31.1` has unresolvable pseudo-version dependencies (`v0.0.0-00010101000000-000000000000`) for `testhelpers`, `escape`, and other sub-modules due to local `replace` directives that are ignored by downstream consumers. Adding them to the workspace resolves all of them. Auto-committed as `2552a62` and `fc2108b`.~~ done at `2552a62`, `fc2108b`
 
-4. **koanf/parsers/toml dependency added** — Ran `go get github.com/knadh/koanf/parsers/toml@latest`, added `v0.1.0` to `go.mod`. Also pulled in `github.com/pelletier/go-toml v1.9.5` (the koanf TOML parser's internal dependency — different from the `pelletier/go-toml/v2` we're removing). Auto-committed as `fc2108b`.
+4. ~~**koanf/parsers/toml dependency added** — Ran `go get github.com/knadh/koanf/parsers/toml@latest`, added `v0.1.0` to `go.mod`. Also pulled in `github.com/pelletier/go-toml v1.9.5` (the koanf TOML parser's internal dependency — different from the `pelletier/go-toml/v2` we're removing). Auto-committed as `fc2108b`.~~ done at `fc2108b`
 
-5. **Baseline verified** — Full test suite passes: `go test ./... -count=1 -timeout 120s -race` — all packages green. `go build ./...` succeeds. This is the clean baseline before consolidation work begins.
+5. ~~**Baseline verified** — Full test suite passes: `go test ./... -count=1 -timeout 120s -race` — all packages green. `go build ./...` succeeds. This is the clean baseline before consolidation work begins.~~ done — baseline green — suite green at session end (same-night implementation followed)
 
-6. **All relevant source files read and analyzed:**
-   - `configload/koanf.go` — current KoanfLoader (koanf native unmarshal, `Tag: "flag"`, `FlatPaths: true`)
-   - `config_file.go` — jsonLoader, `loadConfigFile`, `expandConfigPath`, `FilterSetFields`, `collectKeysRecursive`, `resolveConfigFlag`, `updateTagDefaultsFromConfig`, `loadConfigFileOrSkip`
-   - `configload/loader.go` — genericLoader, autoLoader, YAML/TOML/JSON/Auto/LoaderForPath (to be deleted)
-   - `cli_options.go` — `WithConfigFile` (hardcodes `&jsonLoader{}`), `WithConfigFileLoader`
-   - `configload/koanf_test.go` — 341 lines, flat + dotted-flag-name nested tests
-   - `config_nested_test.go` — nested struct tests with `collectKeysRecursive` + case-insensitive matching
-   - `config_file_test.go` — 382 lines, jsonLoader tests, `loadConfigFile` tests, `expandConfigPath` tests
-   - `config_file_integration_test.go` — 200 lines, external test package, precedence tests with `json:` tags
+6. ~~**All relevant source files read and analyzed:**~~ done — analysis recorded — fed the same-night implementation (e3e710c)
+   ~~- `configload/koanf.go` — current KoanfLoader (koanf native unmarshal, `Tag: "flag"`, `FlatPaths: true`)~~
+   ~~- `config_file.go` — jsonLoader, `loadConfigFile`, `expandConfigPath`, `FilterSetFields`, `collectKeysRecursive`, `resolveConfigFlag`, `updateTagDefaultsFromConfig`, `loadConfigFileOrSkip`~~
+   ~~- `configload/loader.go` — genericLoader, autoLoader, YAML/TOML/JSON/Auto/LoaderForPath (to be deleted)~~
+   ~~- `cli_options.go` — `WithConfigFile` (hardcodes `&jsonLoader{}`), `WithConfigFileLoader`~~
+   ~~- `configload/koanf_test.go` — 341 lines, flat + dotted-flag-name nested tests~~
+   ~~- `config_nested_test.go` — nested struct tests with `collectKeysRecursive` + case-insensitive matching~~
+   ~~- `config_file_test.go` — 382 lines, jsonLoader tests, `loadConfigFile` tests, `expandConfigPath` tests~~
+   ~~- `config_file_integration_test.go` — 200 lines, external test package, precedence tests with `json:` tags~~
 
 ---
 
 ## b) PARTIALLY DONE
 
-1. **Task 1 (Refactor KoanfLoader)** — Subtask 1.1 (add koanf/parsers/toml dep) is DONE. All other subtasks (1.2-1.8) NOT STARTED. No code changes to `koanf.go` have been made yet.
+1. ~~**Task 1 (Refactor KoanfLoader)** — Subtask 1.1 (add koanf/parsers/toml dep) is DONE. All other subtasks (1.2-1.8) NOT STARTED. No code changes to `koanf.go` have been made yet.~~ **Superseded — superseded — completed the same night (e3e710c; implementation report 2026-07-27_01-37).**
 
 ---
 
 ## c) NOT STARTED
 
+<!-- check-rows:ledger -->
 | Task             | Description                                                                                            | Status      |
 | ---------------- | ------------------------------------------------------------------------------------------------------ | ----------- |
 | Task 1 (1.2-1.8) | Rewrite KoanfLoader.Load, add TOML to parserForPath, add SetPaths, fix doc comment, update koanf tests | Not started |
@@ -65,35 +66,35 @@
 
 ## d) TOTALLY FUCKED UP
 
-1. **go.work polluted with absolute paths to sibling project** — The go.work now contains `use` directives for `/home/lars/projects/go-output` and 13 of its sub-modules. This is a **local development hack** that:
-   - Breaks for any other developer or CI environment (these paths don't exist outside this machine)
-   - Was auto-committed by the git daemon without review
-   - Should NOT be pushed or merged — it needs to be reverted before the consolidation work ships
-   - The real fix is for go-output to publish its sub-modules properly (not use local `replace` directives with pseudo-versions)
+1. ~~**go.work polluted with absolute paths to sibling project** — The go.work now contains `use` directives for `/home/lars/projects/go-output` and 13 of its sub-modules. This is a **local development hack** that:~~ done — resolved — go.work is no longer shipped (d29bc4d stop-shipping-go.work); machine-local workspace
+   ~~- Breaks for any other developer or CI environment (these paths don't exist outside this machine)~~
+   ~~- Was auto-committed by the git daemon without review~~
+   ~~- Should NOT be pushed or merged — it needs to be reverted before the consolidation work ships~~
+   ~~- The real fix is for go-output to publish its sub-modules properly (not use local `replace` directives with pseudo-versions)~~
 
-2. **`pelletier/go-toml v1.9.5` added as transitive dep** — The koanf TOML parser (`koanf/parsers/toml@v0.1.0`) depends on `pelletier/go-toml v1.9.5` (v1, not v2). This means we're adding a TOML library while the plan says to remove `pelletier/go-toml/v2`. We'll end up with `pelletier/go-toml v1.9.5` (via koanf) instead of `pelletier/go-toml/v2 v2.4.3` (direct). The net dependency count may not decrease as much as planned.
+2. ~~**`pelletier/go-toml v1.9.5` added as transitive dep** — The koanf TOML parser (`koanf/parsers/toml@v0.1.0`) depends on `pelletier/go-toml v1.9.5` (v1, not v2). This means we're adding a TOML library while the plan says to remove `pelletier/go-toml/v2`. We'll end up with `pelletier/go-toml v1.9.5` (via koanf) instead of `pelletier/go-toml/v2 v2.4.3` (direct). The net dependency count may not decrease as much as planned.~~ done — accepted tradeoff — koanf/parsers/toml ships; pelletier v2 is gone from go.mod
 
-3. **No actual consolidation code written** — Despite reading all files and understanding the architecture, zero lines of consolidation code have been written. The session was entirely consumed by infrastructure fixes (go.work version, go-output workspace, dep addition) and file analysis.
+3. ~~**No actual consolidation code written** — Despite reading all files and understanding the architecture, zero lines of consolidation code have been written. The session was entirely consumed by infrastructure fixes (go.work version, go-output workspace, dep addition) and file analysis.~~ **Superseded — superseded — completed the same night (e3e710c).**
 
 ---
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Revert go.work to not include go-output** — The go.work with local go-output paths was auto-committed and should be reverted. Instead, we should either: (a) add `replace` directives in cmdguard's `go.mod` for the go-output sub-modules, or (b) fix go-output to publish properly, or (c) use `GOWORK=off` for builds and only use the workspace for local dev. The current approach makes the repo unbuildable on any other machine.
+1. ~~**Revert go.work to not include go-output** — The go.work with local go-output paths was auto-committed and should be reverted. Instead, we should either: (a) add `replace` directives in cmdguard's `go.mod` for the go-output sub-modules, or (b) fix go-output to publish properly, or (c) use `GOWORK=off` for builds and only use the workspace for local dev. The current approach makes the repo unbuildable on any other machine.~~ done — go.work unshipped (d29bc4d); go.mod pins published go-output v0.38.7
 
-2. **The circular dependency problem was identified but not solved** — `configload` imports `cmdguard/v3` (for `ConfigFileLoader` interface, `ParseFlagTags`, `FilterSetFields`, error sentinels). This means `v3` CANNOT import `configload`. The plan says to "reuse jsonLoader logic from KoanfLoader" but KoanfLoader lives in `configload` which can't see `jsonLoader` (unexported, in `v3`). The solution options are:
-   - (a) Move KoanfLoader into `v3` (eliminates the `configload` package entirely)
-   - (b) Export the jsonLoader logic from `v3` as a shared helper
-   - (c) Duplicate the logic in `configload`
-   - Option (a) is cleanest — `configload` becomes unnecessary if KoanfLoader is the only loader
+2. ~~**The circular dependency problem was identified but not solved** — `configload` imports `cmdguard/v3` (for `ConfigFileLoader` interface, `ParseFlagTags`, `FilterSetFields`, error sentinels). This means `v3` CANNOT import `configload`. The plan says to "reuse jsonLoader logic from KoanfLoader" but KoanfLoader lives in `configload` which can't see `jsonLoader` (unexported, in `v3`). The solution options are:~~ done — option (a): KoanfLoader in v3 (koanf_loader.go); configload deleted
+   ~~- (a) Move KoanfLoader into `v3` (eliminates the `configload` package entirely)~~
+   ~~- (b) Export the jsonLoader logic from `v3` as a shared helper~~
+   ~~- (c) Duplicate the logic in `configload`~~
+   ~~- Option (a) is cleanest — `configload` becomes unnecessary if KoanfLoader is the only loader~~
 
-3. **The plan underestimates the circular dependency issue** — The plan's Task 1.3 says "reuse the existing jsonLoader logic" but doesn't address HOW, given the import direction. This needs to be resolved before implementation begins.
+3. ~~**The plan underestimates the circular dependency issue** — The plan's Task 1.3 says "reuse the existing jsonLoader logic" but doesn't address HOW, given the import direction. This needs to be resolved before implementation begins.~~ **Superseded — superseded — resolved in the implementation (option a).**
 
-4. **Auto-commit daemon committed infrastructure changes without review** — The go.work changes and go.mod dep addition were auto-committed by the git daemon. These commits (`2552a62`, `fc2108b`, `98e0730`) are ahead of origin and include the problematic go-output workspace paths. They should be reviewed and possibly squashed/reverted before pushing.
+4. ~~**Auto-commit daemon committed infrastructure changes without review** — The go.work changes and go.mod dep addition were auto-committed by the git daemon. These commits (`2552a62`, `fc2108b`, `98e0730`) are ahead of origin and include the problematic go-output workspace paths. They should be reviewed and possibly squashed/reverted before pushing.~~ done — answered — daemon commits kept; shipped via e3e710c (on origin/master)
 
-5. **The koanf TOML parser pulls in pelletier/go-toml v1** — The plan assumed we'd remove pelletier/go-toml entirely, but koanf/parsers/toml depends on v1. We trade `pelletier/go-toml/v2` (direct) for `pelletier/go-toml v1` (indirect). The plan's "remove pelletier/go-toml/v2 dep" goal is still achievable, but "fewer dependencies" is partially undermined.
+5. ~~**The koanf TOML parser pulls in pelletier/go-toml v1** — The plan assumed we'd remove pelletier/go-toml entirely, but koanf/parsers/toml depends on v1. We trade `pelletier/go-toml/v2` (direct) for `pelletier/go-toml v1` (indirect). The plan's "remove pelletier/go-toml/v2 dep" goal is still achievable, but "fewer dependencies" is partially undermined.~~ done — accepted tradeoff — koanf/parsers/toml in go.mod; go-faster/yaml remains indirect via the koanf chain
 
-6. **Pre-commit hook is now unblocked but still needs `--no-verify` for some cases** — The go.work version fix resolved the primary block, but the go-output workspace hack may cause issues in CI. The pre-commit hook (BuildFlow) may still fail if it tries to resolve go-output sub-modules.
+6. ~~**Pre-commit hook is now unblocked but still needs `--no-verify` for some cases** — The go.work version fix resolved the primary block, but the go-output workspace hack may cause issues in CI. The pre-commit hook (BuildFlow) may still fail if it tries to resolve go-output sub-modules.~~ done — resolved — GOEXPERIMENT=jsonv2 in flake.nix devShell (flake.nix:108) + CI env
 
 ---
 

@@ -43,9 +43,9 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 
 | # | What                         | What's done                                                                                                                           | What's missing                                                                                                                                                                                                                            |
 | - | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **README.md**                | Import paths updated, badge, code examples for NewCommand/WithShort                                                                   | **Still advertises `EditInEditor`** (feature table line 160 + full code section lines 535-543); **lists `SpinnerMiddleware`/`TelemetryMiddleware` as core** (line 164); **`WithPromptOnMissing[T,F]()`** still has type params (line 166) |
-| 2 | **examples/taskctl/main.go** | Code compiles, imports correct                                                                                                        | **Comments reference deleted features**: "WithGlamourHelpTheme" (line 9, should be sub-module), "EditInEditor for config editing" (line 21, deleted)                                                                                      |
-| 3 | **Comprehensive doc audit**  | Checked QUICKSTART, TUTORIAL, MIGRATION_FROM_COBRA, ERROR_REFERENCE, CLI_DESIGN_PRINCIPLES, WHAT_THIS_PROJECT_IS_NOT, ADR — all clean | **Did not grep README.md for deleted feature NAMES** (`EditInEditor`, `SpinnerMiddleware`, etc.) — only checked for `cmdguard/v2` path strings. This is the root cause of the miss.                                                       |
+| ~~1~~ | ~~**README.md**~~ done — fixed — README corrected in 7eba617; no EditInEditor/middleware-as-core refs remain | ~~Import paths updated, badge, code examples for NewCommand/WithShort~~ | ~~**Still advertises `EditInEditor`** (feature table line 160 + full code section lines 535-543); **lists `SpinnerMiddleware`/`TelemetryMiddleware` as core** (line 164); **`WithPromptOnMissing[T,F]()`** still has type params (line 166)~~ |
+| ~~2~~ | ~~**examples/taskctl/main.go**~~ done — cleaned — taskctl maintained through v4 | ~~Code compiles, imports correct~~ | ~~**Comments reference deleted features**: "WithGlamourHelpTheme" (line 9, should be sub-module), "EditInEditor for config editing" (line 21, deleted)~~ |
+| ~~3~~ | ~~**Comprehensive doc audit**~~ done — moot — later audits (docs-health passes) grep feature names across all docs | ~~Checked QUICKSTART, TUTORIAL, MIGRATION_FROM_COBRA, ERROR_REFERENCE, CLI_DESIGN_PRINCIPLES, WHAT_THIS_PROJECT_IS_NOT, ADR — all clean~~ | ~~**Did not grep README.md for deleted feature NAMES** (`EditInEditor`, `SpinnerMiddleware`, etc.) — only checked for `cmdguard/v2` path strings. This is the root cause of the miss.~~ |
 
 ---
 
@@ -53,11 +53,11 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 
 | # | What                                  | Why                                                                                                                                   |
 | - | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **docs/COMPARISON.md audit**          | Not checked for stale v2 feature references                                                                                           |
-| 2 | **golangci-lint pre-existing issues** | 57 lint issues in v3 core package (ireturn, wrapcheck, paralleltest, etc.) — pre-existing, not from this session, but never addressed |
-| 3 | **Sub-module tests**                  | All 5 sub-modules have `[no test files]` — zero test coverage on the extracted code                                                   |
-| 4 | **Consumer integration test in CI**   | No automated external-resolution smoke test in GitHub Actions                                                                         |
-| 5 | **Go proxy cache for v2.11.0**        | The retracted tag is still cached on the proxy; retract is reactive only                                                              |
+| ~~1~~ | ~~**docs/COMPARISON.md audit**~~ done — docs/COMPARISON.md maintained for v4 | ~~Not checked for stale v2 feature references~~ |
+| ~~2~~ | ~~**golangci-lint pre-existing issues**~~ done — 0 lint issues (FEATURES.md; CI lint job) | ~~57 lint issues in v3 core package (ireturn, wrapcheck, paralleltest, etc.) — pre-existing, not from this session, but never addressed~~ |
+| ~~3~~ | ~~**Sub-module tests**~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~All 5 sub-modules have `[no test files]` — zero test coverage on the extracted code~~ |
+| ~~4~~ | ~~**Consumer integration test in CI**~~ done — .github/workflows/submodule-smoke.yml | ~~No automated external-resolution smoke test in GitHub Actions~~ |
+| ~~5~~ | ~~**Go proxy cache for v2.11.0**~~ **Won't implement — proxy cache is external infrastructure — retract is the standing mitigation; v2 frozen at v2.10.4.** | ~~The retracted tag is still cached on the proxy; retract is reactive only~~ |
 
 ---
 
@@ -76,12 +76,12 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 
 | # | Lesson                                                            | Action                                                                                                                                                                                                    |
 | - | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **Doc audits must grep for feature NAMES, not just import paths** | When features are deleted/moved, grep for the function/type name across ALL `.md` files — not just the module path string. `EditInEditor`, `SpinnerMiddleware`, `Result[T]` are the patterns that matter. |
-| 2 | **Sub-module builds must be verified individually**               | `go build ./...` from root does NOT build nested `go.mod` packages. Always run `for m in glamour manpage prompts spinner telemetry; do (cd $m && go build ./...); done` as a verification step.           |
-| 3 | **External smoke tests are non-optional for module releases**     | The sub-module resolution bug (wrong directory location) was invisible inside the repo. Only `go get` from `/tmp` revealed it. This should be a CI step.                                                  |
-| 4 | **Don't trust "done" claims from status reports**                 | The previous report said "build passes, all docs updated" — both were partially false. Always verify independently.                                                                                       |
-| 5 | **CHANGELOG historical entries have 40 `[T]` refs**               | These are in pre-v3 entries (historical, correct for their time). Not a bug, but worth noting that `grep -c "\[T\]"` returns 40 — context matters when scanning.                                          |
-| 6 | **README is the #1 consumer-facing doc**                          | It got the least attention. AGENTS.md (AI context) got a full rewrite; README (user-facing) got a path update only. Priority was backwards for consumer impact.                                           |
+| 1 | **Doc audits must grep for feature NAMES, not just import paths** **→ ROADMAP raw ideas (post-rewrite semantic doc audit)** | When features are deleted/moved, grep for the function/type name across ALL `.md` files — not just the module path string. `EditInEditor`, `SpinnerMiddleware`, `Result[T]` are the patterns that matter. |
+| ~~2~~ | ~~**Sub-module builds must be verified individually**~~ done — codified — AGENTS.md nested-modules gotcha + per-module build loop | ~~`go build ./...` from root does NOT build nested `go.mod` packages. Always run `for m in glamour manpage prompts spinner telemetry; do (cd $m && go build ./...); done` as a verification step.~~ |
+| ~~3~~ | ~~**External smoke tests are non-optional for module releases**~~ done — .github/workflows/submodule-smoke.yml | ~~The sub-module resolution bug (wrong directory location) was invisible inside the repo. Only `go get` from `/tmp` revealed it. This should be a CI step.~~ |
+| ~~4~~ | ~~**Don't trust "done" claims from status reports**~~ done (docs-health pass 2026-11-08) | ~~The previous report said "build passes, all docs updated" — both were partially false. Always verify independently.~~ |
+| ~~5~~ | ~~**CHANGELOG historical entries have 40 `[T]` refs**~~ done (docs-health pass 2026-11-08) | ~~These are in pre-v3 entries (historical, correct for their time). Not a bug, but worth noting that `grep -c "\[T\]"` returns 40 — context matters when scanning.~~ |
+| ~~6~~ | ~~**README is the #1 consumer-facing doc**~~ done — README rewritten through v4 (maintained releases) | ~~It got the least attention. AGENTS.md (AI context) got a full rewrite; README (user-facing) got a path update only. Priority was backwards for consumer impact.~~ |
 
 ---
 
@@ -91,46 +91,46 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 
 | # | Task                                                                                      | Impact                               | Effort |
 | - | ----------------------------------------------------------------------------------------- | ------------------------------------ | ------ |
-| 1 | **Remove `EditInEditor` from README** (feature table + code section)                      | 🔴 Consumers will hit compile errors | 5m     |
-| 2 | **Fix README middleware line** — mark Spinner/Telemetry as sub-module                     | 🔴 Same                              | 5m     |
-| 3 | **Fix README `WithPromptOnMissing[T,F]`** → `WithPromptOnMissing()`                       | 🟠 Wrong genericity                  | 2m     |
-| 4 | **Fix examples/taskctl/main.go comments** — remove EditInEditor/WithGlamourHelpTheme refs | 🟡 Misleading                        | 5m     |
-| 5 | **Audit docs/COMPARISON.md** for stale v2 feature refs                                    | 🟡 Unknown state                     | 10m    |
+| ~~1~~ | ~~**Remove `EditInEditor` from README** (feature table + code section)~~ done — fixed — README corrected in 7eba617; no EditInEditor refs remain | ~~🔴 Consumers will hit compile errors~~ | ~~5m~~ |
+| ~~2~~ | ~~**Fix README middleware line** — mark Spinner/Telemetry as sub-module~~ done — README documents the sub-modules (SUB-MODULE rows in FEATURES; README links) | ~~🔴 Same~~ | ~~5m~~ |
+| ~~3~~ | ~~**Fix README `WithPromptOnMissing[T,F]`** → `WithPromptOnMissing()`~~ done — WithPromptOnMissing() ships non-generic (FEATURES.md) | ~~🟠 Wrong genericity~~ | ~~2m~~ |
+| ~~4~~ | ~~**Fix examples/taskctl/main.go comments** — remove EditInEditor/WithGlamourHelpTheme refs~~ done — cleaned — taskctl maintained through v4 | ~~🟡 Misleading~~ | ~~5m~~ |
+| ~~5~~ | ~~**Audit docs/COMPARISON.md** for stale v2 feature refs~~ done — docs/COMPARISON.md maintained for v4 | ~~🟡 Unknown state~~ | ~~10m~~ |
 
 ### High value
 
 | #  | Task                                                                | Impact                             | Effort |
 | -- | ------------------------------------------------------------------- | ---------------------------------- | ------ |
-| 6  | **Add sub-module smoke test to CI** (GitHub Actions)                | 🔴 Prevents future resolution bugs | 30m    |
-| 7  | **Write tests for sub-modules** (all 5 have zero test files)        | 🟠 No coverage on extracted code   | 2-4h   |
-| 8  | **Fix the 57 pre-existing lint issues** in v3 core                  | 🟡 Code quality                    | 1-2h   |
-| 9  | **Add a `make submodules` / flake check** that builds all 6 modules | 🟡 Prevents masked compile errors  | 15m    |
-| 10 | **Verify `go get .../v2@latest` from a completely fresh machine**   | 🟡 Confirm proxy propagation       | 10m    |
+| ~~6~~  | ~~**Add sub-module smoke test to CI** (GitHub Actions)~~ done — .github/workflows/submodule-smoke.yml | ~~🔴 Prevents future resolution bugs~~ | ~~30m~~ |
+| ~~7~~  | ~~**Write tests for sub-modules** (all 5 have zero test files)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~🟠 No coverage on extracted code~~ | ~~2-4h~~ |
+| ~~8~~  | ~~**Fix the 57 pre-existing lint issues** in v3 core~~ done — 0 lint issues (FEATURES.md; CI lint job) | ~~🟡 Code quality~~ | ~~1-2h~~ |
+| ~~9~~  | ~~**Add a `make submodules` / flake check** that builds all 6 modules~~ done — AGENTS.md per-module build loop + treefmt in nix flake check | ~~🟡 Prevents masked compile errors~~ | ~~15m~~ |
+| ~~10~~ | ~~**Verify `go get .../v2@latest` from a completely fresh machine**~~ done — external smoke verified 2026-07-07 (§a.12; Resolution 2026-07-23) | ~~🟡 Confirm proxy propagation~~ | ~~10m~~ |
 
 ### Medium value
 
 | #  | Task                                                                           | Impact             | Effort |
 | -- | ------------------------------------------------------------------------------ | ------------------ | ------ |
-| 11 | **Add `pkg/cmdguard/v3/` coverage badge** that auto-updates                    | 🟡 Trust           | 20m    |
-| 12 | **Write godoc comments** for the 5 sub-module packages                         | 🟡 Discoverability | 30m    |
-| 13 | **Add sub-module examples** to docs/MIGRATION_v2_v3.md (full working programs) | 🟡 Adoption        | 30m    |
-| 14 | **Create a `CONTRIBUTING.md`** with the sub-module build/test instructions     | 🟡 Onboarding      | 20m    |
-| 15 | **Add `golangci-lint` config** for each sub-module (currently inherit root)    | 🟡 Consistency     | 15m    |
-| 16 | **Tag sub-modules as `v0.1.1`** if any post-v0.1.0 fixes are needed            | 🟡 Version hygiene | 5m     |
-| 17 | **Add a versioning policy** to README (when do sub-modules bump?)              | 🟡 Clarity         | 15m    |
-| 18 | **Run `gofumpt` on all sub-module files**                                      | 🟡 Formatting      | 5m     |
-| 19 | **Check if `go-output` v0.30.1 has breaking changes** vs v0.23.3               | 🟡 Risk            | 15m    |
-| 20 | **Verify fang v2.0.1 compatibility** with Go 1.26.4                            | 🟡 Risk            | 10m    |
+| ~~11~~ | ~~**Add `pkg/cmdguard/v3/` coverage badge** that auto-updates~~ done — README coverage badge (90.4%) | ~~🟡 Trust~~ | ~~20m~~ |
+| ~~12~~ | ~~**Write godoc comments** for the 5 sub-module packages~~ done — sub-modules carry godoc (telemetry/telemetry.go) | ~~🟡 Discoverability~~ | ~~30m~~ |
+| ~~13~~ | ~~**Add sub-module examples** to docs/MIGRATION_v2_v3.md (full working programs)~~ done — docs/MIGRATION_v2_v3.md ships sub-module guidance + examples | ~~🟡 Adoption~~ | ~~30m~~ |
+| ~~14~~ | ~~**Create a `CONTRIBUTING.md`** with the sub-module build/test instructions~~ done — exists at repo root | ~~🟡 Onboarding~~ | ~~20m~~ |
+| ~~15~~ | ~~**Add `golangci-lint` config** for each sub-module (currently inherit root)~~ done — lint policy documented — docs/adr/002-lint-strategy-and-exclusion-policy.md; root .golangci.yml shared by design | ~~🟡 Consistency~~ | ~~15m~~ |
+| ~~16~~ | ~~**Tag sub-modules as `v0.1.1`** if any post-v0.1.0 fixes are needed~~ **Superseded — superseded — sub-modules bumped to v0.2.0 (2026-08-06).** | ~~🟡 Version hygiene~~ | ~~5m~~ |
+| ~~17~~ | ~~**Add a versioning policy** to README (when do sub-modules bump?)~~ done — AGENTS.md publish-shape rule documents version bumping (2026-11-02) | ~~🟡 Clarity~~ | ~~15m~~ |
+| ~~18~~ | ~~**Run `gofumpt` on all sub-module files**~~ done — formatting enforced — BuildFlow pre-commit + treefmt in nix flake check | ~~🟡 Formatting~~ | ~~5m~~ |
+| ~~19~~ | ~~**Check if `go-output` v0.30.1 has breaking changes** vs v0.23.3~~ done — go-output v0.38.7 integrated; 16 formats verified (FEATURES.md) | ~~🟡 Risk~~ | ~~15m~~ |
+| ~~20~~ | ~~**Verify fang v2.0.1 compatibility** with Go 1.26.4~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).** | ~~🟡 Risk~~ | ~~10m~~ |
 
 ### Lower priority
 
 | #  | Task                                                   | Impact             | Effort   |
 | -- | ------------------------------------------------------ | ------------------ | -------- |
-| 21 | **Add a `CHANGELOG.md`** to each sub-module            | 🟢 Pro             | 10m each |
-| 22 | **Create pkg.go.dev links** for sub-modules in README  | 🟢 Discoverability | 5m       |
-| 23 | **Add GitHub topic tags** (`cli`, `cobra`, `go`, `di`) | 🟢 Discoverability | 2m       |
-| 24 | **Write a blog post / X thread** about the v3 redesign | 🟢 Marketing       | 30m      |
-| 25 | **Consider extracting `flagtags`** (ROADMAP item)      | 🟢 Future          | 4-8h     |
+| ~~21~~ | ~~**Add a `CHANGELOG.md`** to each sub-module~~ **Superseded — superseded — release notes live in the root CHANGELOG per-module sections (glamour/ + prompts/ carry their own).** | ~~🟢 Pro~~ | ~~10m each~~ |
+| ~~22~~ | ~~**Create pkg.go.dev links** for sub-modules in README~~ done — README documents the sub-modules (SUB-MODULE rows in FEATURES; README links) | ~~🟢 Discoverability~~ | ~~5m~~ |
+| ~~23~~ | ~~**Add GitHub topic tags** (`cli`, `cobra`, `go`, `di`)~~ done — repo topics set (gh: cli, cobra, go, dependency-injection, …) | ~~🟢 Discoverability~~ | ~~2m~~ |
+| 24 | **Write a blog post / X thread** about the v3 redesign **→ ROADMAP raw ideas (launch marketing & infra)** | 🟢 Marketing       | 30m      |
+| 25 | **Consider extracting `flagtags`** (ROADMAP item) **→ ROADMAP raw ideas (extract flagtags standalone library)** | 🟢 Future          | 4-8h     |
 
 ---
 
@@ -141,6 +141,8 @@ The session started with a plan to fix stale docs. It succeeded at the core miss
 I verified from a single machine (`go get .../v2@latest` → `v2.10.4`, `@v2.11.0` → retract warning). But Go's proxy infrastructure has multiple mirrors (proxy.golang.org, Athens, JFrog, corporate proxies). The retract directive is **reactive** — it requires the consumer's proxy to have fetched `v2.10.4`'s go.mod to see the retract. A proxy that cached `v2.11.0` before the deletion and hasn't refreshed may still serve it without warning.
 
 **The only way to fully verify:** check `https://proxy.golang.org/github.com/larsartmann/cmdguard/v2/@latest` directly and confirm the response. I cannot do this from inside the repo with certainty because local `GONOSUMCHECK` / `GONOSUMDB` / `GOFLAGS` may affect resolution.
+
+**Answered:** `proxy.golang.org` serves `v2.10.4` as `@latest` for the `/v2` path with the `v2.11.0` retract warning (verified by the §a.12 external smoke tests on 2026-07-07); the v2 line is frozen at v2.10.4.
 
 ---
 
