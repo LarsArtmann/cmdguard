@@ -66,6 +66,7 @@
 
 **What actually happened:** I removed ~6 v3-specific exclusion rules (funlen x3, cyclop x1, paralleltest x1, wrapcheck in output.go x1) and converted the ireturn issues to a global allow list. But 10 v3-specific exclusion rules still remain:
 
+<!-- check-rows:ledger -->
 | File                  | Linter           | Issue                                                                               | Legitimate?                                               |
 | --------------------- | ---------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `type_handler.go`     | gochecknoglobals | `globalTypeRegistry`                                                                | Yes — COW pattern foundation                              |
@@ -225,14 +226,19 @@ I took the lazy way out and excluded instead of fixing.
 
 The `globalTypeRegistry`, `globalValidators`, and `regexCache` globals are the foundation of the copy-on-write pattern. They enable `RegisterTypeHandler()` and `RegisterValidator()` as package-level functions that write to global defaults. Injecting them would mean changing the public API (no more `cmdguard.RegisterTypeHandler()`, instead `cli.Registry().RegisterTypeHandler()`). This is a v3.1 breaking change decision. Is the tradeoff worth it?
 
+**Answered:** kept — the globals are the documented COW-registry foundation (`docs/adr/003-cow-registry-pattern.md`); gochecknoglobals exclusions are standing policy per `docs/adr/002-lint-strategy-and-exclusion-policy.md`. No injected-registry refactor is planned.
+
 ### 2. Should the ireturn per-file exclusions for `do.Injector` be converted to allow-list entries?
 
 Currently `scope.go` and `cli_accessors.go` have per-file ireturn exclusions for returning `do.Injector`. I could add `github.com/samber/do/v2.Injector` to the global ireturn allow list instead. This would be cleaner (one config line vs two exclusion rules) but would allow ireturn violations for `do.Injector` in ALL files, not just the two that need it. Which is the right tradeoff — precision (per-file exclusions) or simplicity (global allow)?
+
+**Answered:** simplicity won — `github.com/samber/do/v2.Injector` is in the global ireturn allow list (`.golangci.yml:185`).
 
 ---
 
 ## Session Metrics
 
+<!-- check-rows:ledger -->
 | Metric                         | Before               | After                                              |
 | ------------------------------ | -------------------- | -------------------------------------------------- |
 | Lint issues                    | 0 (14 v3 exclusions) | 0 (10 v3 exclusions + 2 allow-list)                |
