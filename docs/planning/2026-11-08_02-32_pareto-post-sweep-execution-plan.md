@@ -27,11 +27,15 @@ Scoring: **customer value** (what consumers/fleet actually get) × **impact**
 
 ### 🎯 The 1% that delivers 51% — ONE workstream
 
+<!-- check-rows:ledger -->
+
 | #      | Workstream                                                                                                                                                                                                   | Why this is the 1%                                                                                                                                                                                                                                                                                                                                                    |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **A1** | **Ship `lint/v0.2.0` + BuildFlow bump + fleet baseline** (TODO P6) — with **W1 folded in** (the CHANGELOG entry for the silently-shipped `CLI.HealthCheck(ctx)` breaking change rides the same release docs) | The lint module's ENTIRE payoff (CG007/CG008, baseline ratchet, enable/disable options — all built and tested) is stranded until this tag ships and BuildFlow consumes it. One workstream activates 8 rules fleet-wide, closes the "built but not delivered" gap, and fixes the one undocumented breaking change. Everything else is incremental; this is the payoff. |
 
 ### 🎯 The 4% that delivers 64% — the v5 break begins
+
+<!-- check-rows:ledger -->
 
 | #      | Workstream                                                                                                  | Why                                                                                              |
 | ------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -43,6 +47,8 @@ Scoring: **customer value** (what consumers/fleet actually get) × **impact**
 ### 🎯 The 20% that delivers 80%
 
 A-tier + B-tier, plus:
+
+<!-- check-rows:ledger -->
 
 | #  | Task                                                                                                      | Why it's in the 20%                                        |
 | -- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -66,6 +72,8 @@ Marketing/website ports, doc-CI guards, FR enhancements, misc harvest
 ---
 
 ## 2. TABLE VIEW — Comprehensive plan (30–100 min tasks, ALL todos, Pareto-sorted)
+
+<!-- check-rows:ledger -->
 
 | #  | Tier | Task (source)                                                                                                                                                                                         | Est      | Value driver                                         |
 | -- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------- |
@@ -120,6 +128,8 @@ Sorted in execution order. T = tier. "☐" = ready to execute.
 
 ### Tier A — the 1% (do first)
 
+<!-- check-rows:ledger -->
+
 | ☐ | Micro-task                                                                                                         | ≤    | Parent |
 | - | ------------------------------------------------------------------------------------------------------------------ | ---- | ------ |
 | ☐ | A1.1 Restore `lint/go.mod` publish shape: real pin `cmdguard/v4 v4.2.1` + version-scoped `replace … v4.2.1 => ../` | 8 m  | #1     |
@@ -135,6 +145,8 @@ Sorted in execution order. T = tier. "☐" = ready to execute.
 | ☐ | A3.1 W1: draft the `CLI.HealthCheck(ctx)` breaking-change entry; insert per owner's §g2 answer                     | 12 m | #3     |
 
 ### Tier B — the 4%
+
+<!-- check-rows:ledger -->
 
 | ☐ | Micro-task                                                                                 | ≤    | Parent |
 | - | ------------------------------------------------------------------------------------------ | ---- | ------ |
@@ -160,6 +172,8 @@ Sorted in execution order. T = tier. "☐" = ready to execute.
 
 ### Tier C — completes the 20%
 
+<!-- check-rows:ledger -->
+
 | ☐ | Micro-task                                                                         | ≤    | Parent |
 | - | ---------------------------------------------------------------------------------- | ---- | ------ |
 | ☐ | C1.1 erraudit: build + full tests vs HEAD; record evidence                         | 12 m | #8     |
@@ -184,6 +198,8 @@ Sorted in execution order. T = tier. "☐" = ready to execute.
 | ☐ | C10.1 HealthCheck cancellation tests (cancelled ctx → error path)                  | 12 m | #17    |
 
 ### Tier D — the remaining 80% (first ≤12-min slice each; clusters expand on start)
+
+<!-- check-rows:ledger -->
 
 | ☐ | Micro-task (first slice)                                                   | ≤       | Parent |
 | - | -------------------------------------------------------------------------- | ------- | ------ |
@@ -276,19 +292,24 @@ flowchart TD
 
 ## 5. Verification gates (per phase)
 
-| Phase            | Gate                                                                                                                     |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Every micro-task | `go build ./...` green (or the touched module's build)                                                                   |
-| Tier A           | `docs-gates run .` 5/5; scratch-consumer `go get` resolves; BuildFlow `docs --check` provider count unchanged-or-bumped  |
-| Tier B           | `/v5` GOWORK=off build; flip test matrix green; codemod dry-run diffs reviewed by owner; `-race` + `golangci-lint` clean |
-| Tier C           | erraudit/timesheets full suites green; new tests actually assert (no no-ops); CI legs green                              |
-| Tier D           | Per-item: the slice either lands a file or records an explicit decision                                                  |
+| Phase | Gate |
+| ----- | ---- |
+
+<!-- check-rows:ledger -->
+
+| Every micro-task | `go build ./...` green (or the touched module's build) |
+| Tier A | `docs-gates run .` 5/5; scratch-consumer `go get` resolves; BuildFlow `docs --check` provider count unchanged-or-bumped |
+| Tier B | `/v5` GOWORK=off build; flip test matrix green; codemod dry-run diffs reviewed by owner; `-race` + `golangci-lint` clean |
+| Tier C | erraudit/timesheets full suites green; new tests actually assert (no no-ops); CI legs green |
+| Tier D | Per-item: the slice either lands a file or records an explicit decision |
 
 **Verschlimmbesserung guardrails** (per the standing threat): no code-formatting passes over annotated archive tables without a follow-up `check-rows`; no default flip without its opt-out test; no CHANGELOG rewrite of published sections without an owner answer to §g2 of the status report; no ROADMAP bullet deleted without recording where the idea went.
 
 ---
 
 ## 6. Time budget summary
+
+<!-- check-rows:ledger -->
 
 | Tier    | Items | Micro-tasks      | Est. total             |
 | ------- | ----- | ---------------- | ---------------------- |
