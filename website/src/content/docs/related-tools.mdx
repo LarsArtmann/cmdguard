@@ -31,6 +31,10 @@ description: Tools that complement cmdguard in your Go toolchain.
 
 [Glamour](https://github.com/charmbracelet/glamour) renders markdown in the terminal. The `glamour` sub-module provides `WithHelp[T]()` to render command help text as styled markdown.
 
+## config explain (built in)
+
+Not a separate library — a cmdguard feature. The opt-in `config explain` command (`WithConfigExplainCommand()`) answers "where did this value come from?" per config field (flag, env var, config file, or tag default) in table or JSON form, with `secret:"true"` values redacted.
+
 ## Other cmdguard Ecosystem Libraries
 
 | Library                                                           | Purpose                             |

@@ -1,7 +1,9 @@
 # cmdguard vs. Alternative Go CLI Frameworks
 
 > An honest comparison for developers evaluating CLI frameworks.
-> **Last Updated:** 2026-07-07
+> **Last Updated:** 2026-11-08 (v5.0.0 era; sample code and default-claims audited pass 1 of 3)
+>
+> v5 note: cmdguard's production batteries (strict validation, signal handling + graceful DI shutdown, strict config keys, hints, doctor/version commands) are ON by default since v5.0.0; every piece has a `Without*` opt-out.
 
 ---
 
@@ -117,8 +119,8 @@ type Flags struct {
     Verbose bool  `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
 }
 
-cmd, err := v4.NewCommand("greet", &Flags{}, handler,
-    v4.WithShort("Greet someone"),
+cmd, err := v5.NewCommand("greet", Flags{}, handler,
+    v5.WithShort("Greet someone"),
 )
 ```
 

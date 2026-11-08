@@ -233,6 +233,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 
 	cfg := defaults
 
+	//samber-linter:allow hw-5 resolved config value is inert data; doctor checks DI services, not the config struct
 	err := ProvideValue(cli.spec.scope, &cfg)
 	if err != nil {
 		return fmt.Errorf("%w: registering config type=%T: %w", ErrServiceRegistration, cfg, err)
@@ -250,6 +251,7 @@ func (cli *CLI[T]) initialize(defaults T) error {
 		)
 	}
 
+	//samber-linter:allow hw-5 flag registry is a parser artifact with no runtime resources; nothing to health-check
 	err = ProvideValue(cli.spec.scope, registry)
 	if err != nil {
 		return fmt.Errorf(

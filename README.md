@@ -554,11 +554,13 @@ Paths are tried in order; missing files are silently skipped. Supports `$ENV` an
 
 **Precedence:** explicit flag → env var → config file → default value (highest to lowest priority).
 
+**Where did this value come from?** The opt-in `config explain` command (`WithConfigExplainCommand()`) resolves every field to its source — flag, env var, config file, or tag default — in table or JSON form. Fields tagged `secret:"true"` are redacted to `***` while still reporting their source, so provenance is auditable without leaking credentials. `CLI.ExplainConfig()` is the programmatic form.
+
 ---
 
 ## Optional Sub-Modules
 
-cmdguard's core stays lean — five optional features live in standalone sub-modules so you import only what you need:
+cmdguard's core stays lean — seven optional features live in standalone sub-modules so you import only what you need:
 
 | Sub-module         | Import path                                      | Provides                                                                   |
 | ------------------ | ------------------------------------------------ | -------------------------------------------------------------------------- |
@@ -567,6 +569,8 @@ cmdguard's core stays lean — five optional features live in standalone sub-mod
 | **spinner**        | `github.com/larsartmann/cmdguard/spinner`        | Terminal spinner middleware (`Middleware`)                                 |
 | **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`      | OpenTelemetry spans (`WithTelemetry`, `Middleware`)                        |
 | **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder` | Runtime trace snapshots on slow/error (`WithFlightRecorder`, `Middleware`) |
+| **lint**           | `github.com/larsartmann/cmdguard/lint`           | cmdguard usage linter CG001-CG008 (`cmdguard-lint` CLI + BuildFlow provider) |
+| **schema**         | `github.com/larsartmann/cmdguard/schema`         | JSON Schema 2020-12 emitter for config structs (`FromConfig`, `FromCLI`)   |
 
 ```go
 import (
