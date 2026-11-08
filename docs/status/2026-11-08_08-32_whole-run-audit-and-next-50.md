@@ -169,7 +169,7 @@
    (15m).
 6. Full `-race` battery on the final tree (including Builder/koanf/shutdown)
    (10m).
-7. Publish-shape `go.mod`s for root + 7 sub-modules (real pin + version-
+7. Publish-shape `go.mod` files for root + 7 sub-modules (real pin + version-
    scoped replaces) (20m).
 8. Tag `v5.0.0` annotated; push; proxy-verify via scratch consumer (15m).
 9. GH release page v5.0.0 from MIGRATION + CHANGELOG (10m).
