@@ -41,6 +41,9 @@ It prints (but does not change) every call site that needs a human:
   `RegisterInScope[T](parent *Scope, name string, provider func(do.Injector) (T, error))`.
   The provider returns the typed value directly; resolution uses
   `do.Invoke[T]`.
+- `cli.HealthCheckWithContext(ctx)` — **removed**; `cli.HealthCheck(ctx)` was
+  always the context-aware form. Rename the call. (`Scope` keeps both:
+  `HealthCheck()` delegates to `HealthCheckWithContext(context.Background())`.)
 
 Sub-module import paths are unchanged (they are unversioned:
 `github.com/larsartmann/cmdguard/prompts`).

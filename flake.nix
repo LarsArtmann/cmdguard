@@ -125,6 +125,16 @@
                     (cd "$mod" && ${pkgs.golangci-lint}/bin/golangci-lint run ./...)
                   done
 
+                  echo "=== samber-linter (health-washing ratchet) ==="
+                  # Advisory when the binary is absent (not a flake input yet);
+                  # with the committed baseline it fails only on regressions.
+                  if command -v samber-linter >/dev/null 2>&1; then
+                    ${goPkg}/bin/go build ./pkg/cmdguard/v5/...
+                    samber-linter ./pkg/cmdguard/v5/... --baseline .samber-linter-baseline.json --no-color
+                  else
+                    echo "  skipped: samber-linter not on PATH"
+                  fi
+
                   echo "=== Format check ==="
                   nix --extra-experimental-features 'nix-command flakes' flake check
 

@@ -56,6 +56,12 @@ flag_manual() {
 			grep -n 'RegisterInScope(' "$f" | sed 's/^/    /'
 			found=1
 		fi
+
+		if grep -nq "cli\.HealthCheckWithContext(" "$f"; then
+			echo "  CLI.HealthCheckWithContext removed (HealthCheck is ctx-aware): $f"
+			grep -n "cli\.HealthCheckWithContext(" "$f" | sed "s/^/    /"
+			found=1
+		fi
 	done
 
 	if [ "$found" -eq 0 ]; then
