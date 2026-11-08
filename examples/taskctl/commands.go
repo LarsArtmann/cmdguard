@@ -12,7 +12,6 @@ import (
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-//nolint:gocyclo // example file: linear command registration reads best as a single function
 func buildCommands(cli *v5.CLI[AppConfig]) error {
 	dbActionHandler := func(verb string) func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
 		return func(_ context.Context, _ *AppConfig, flags *DBFlags) error {
@@ -29,9 +28,10 @@ func buildCommands(cli *v5.CLI[AppConfig]) error {
 		}
 	}
 	scope := cli.Scope()
+	b := v5.NewBuilder(cli)
 
 	// --- list: multi-format output, aliases, filter flags ---
-	listCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"list",
 		&ListFlags{},
 		func(_ context.Context, _ *AppConfig, flags *ListFlags) error {
@@ -75,12 +75,9 @@ Supports multiple **output formats** for scripting and automation:
 		v5.WithGroupID("tasks"),
 		v5.WithNoArgs(),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- add: required flags, values tag, PreRunE validation ---
-	addCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"add",
 		&AddFlags{},
 		func(_ context.Context, _ *AppConfig, flags *AddFlags) error {
@@ -111,12 +108,9 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		v5.WithGroupID("tasks"),
 		v5.WithNoArgs(),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- done: exit codes, PostRunE cleanup, dynamic completion ---
-	doneCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"done",
 		&DoneFlags{},
 		func(_ context.Context, _ *AppConfig, flags *DoneFlags) error {
@@ -150,12 +144,9 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		}),
 		v5.WithNoArgs(),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- stats: OutputTable for terminal output ---
-	statsCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"stats",
 		&StatsFlags{},
 		func(_ context.Context, _ *AppConfig, _ *StatsFlags) error {
@@ -184,12 +175,9 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		v5.WithGroupID("tasks"),
 		v5.WithNoArgs(),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- inspect: ExactArgs, BranchingFlowContext, real task lookup ---
-	inspectCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"inspect",
 		&InspectFlags{},
 		func(ctx context.Context, _ *AppConfig, flags *InspectFlags) error {
@@ -226,9 +214,6 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 		v5.WithValidArgs("1", "2", "3"),
 		v5.WithGroupID("tasks"),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- db: parent command with shared DBFlags ---
 	migrateCmd, err := v5.NewCommand(
@@ -242,9 +227,7 @@ Run pending database migrations against the configured environment.
 
 Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 	)
-	if err != nil {
-		return err
-	}
+	b.Check(err)
 
 	seedCmd, err := v5.NewCommand(
 		"seed",
@@ -252,9 +235,7 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		dbActionHandler("Seeding"),
 		v5.WithShort("Seed the database"),
 	)
-	if err != nil {
-		return err
-	}
+	b.Check(err)
 
 	dbStatusCmd, err := v5.NewCommand(
 		"status",
@@ -265,11 +246,9 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		},
 		v5.WithShort("Check database status"),
 	)
-	if err != nil {
-		return err
-	}
+	b.Check(err)
 
-	dbCmd, err := v5.NewParentCommand[AppConfig](
+	v5.AddParent(b,
 		"db",
 		"Database operations",
 		&DBFlags{},
@@ -277,18 +256,13 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		v5.WithShort("Database operations"),
 		v5.WithGroupID("system"),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- doctor: DoctorCommand, HealthCheckResultsWithContext ---
 	doctorCmd, err := v5.DoctorCommand[AppConfig](
 		cli,
 		v5.WithDoctorGroupID[AppConfig]("system"),
 	)
-	if err != nil {
-		return err
-	}
+	v5.Try(b, doctorCmd, err)
 
 	// --- config show: demonstrate env/config resolution ---
 	configShowCmd, err := v5.NewCommand(
@@ -308,9 +282,7 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		v5.WithShort("Show resolved configuration"),
 		v5.WithNoArgs(),
 	)
-	if err != nil {
-		return err
-	}
+	b.Check(err)
 
 	configEditCmd, err := v5.NewCommand(
 		"edit",
@@ -324,11 +296,9 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		v5.WithShort("Show config location"),
 		v5.WithNoArgs(),
 	)
-	if err != nil {
-		return err
-	}
+	b.Check(err)
 
-	configCmd, err := v5.NewParentCommand[AppConfig](
+	v5.AddParent(b,
 		"config",
 		"Configuration management",
 		v5.NoFlags{},
@@ -336,44 +306,30 @@ Use `+"`--force`"+` to skip confirmation prompts in **CI/CD** pipelines.`),
 		v5.WithShort("Configuration management"),
 		v5.WithGroupID("system"),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- version: VersionCommand ---
 	versionCmd, err := v5.VersionCommand[AppConfig](cli)
-	if err != nil {
-		return err
-	}
+	v5.Try(b, versionCmd, err)
 
 	// --- hidden command ---
-	hiddenCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"secret",
 		v5.NoFlags{},
 		printAndNil("You found the secret command!"),
 		v5.WithShort("Secret command"),
 		v5.WithHidden(true),
 	)
-	if err != nil {
-		return err
-	}
 
 	// --- deprecated command ---
-	deprecatedCmd, err := v5.NewCommand(
+	v5.Add(b,
 		"complete",
 		v5.NoFlags{},
 		printAndNil("Use 'done' instead."),
 		v5.WithShort("Deprecated: use done"),
 		v5.WithDeprecated("Use 'done' instead"),
 	)
-	if err != nil {
-		return err
-	}
 
-	return v5.AddCommands(cli,
-		listCmd, addCmd, doneCmd, statsCmd, inspectCmd,
-		dbCmd, doctorCmd, configCmd, versionCmd, hiddenCmd, deprecatedCmd,
-	)
+	return b.Build()
 }
 
 func resolveStore(scope *v5.Scope) (*TaskStore, error) {

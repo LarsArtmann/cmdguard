@@ -51,8 +51,8 @@ func TestBuilder_CollectsAndBuildsAtomically(t *testing.T) {
 
 		b := NewBuilder(cli)
 		Add(b, "fine", NoFlags{}, noOpHandler(), WithShort("fine"))
-		Add(b, "bad", NoFlags{}, noOpHandler())                       // missing short under strict
-		Add(b, "worse", NoFlags{}, nil, WithShort("worse"))           // missing handler
+		Add(b, "bad", NoFlags{}, noOpHandler())                        // missing short under strict
+		Add(b, "worse", NoFlags{}, nil, WithShort("worse"))            // missing handler
 		Try(b, Command[testConfig, NoFlags]{}, errors.New("pair err")) // pre-bound pair
 
 		err = b.Build()

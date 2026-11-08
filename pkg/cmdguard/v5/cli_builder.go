@@ -85,6 +85,23 @@ func AddParent[T, F any](
 	b.add(cmd, err)
 }
 
+// Check collects a construction error without queueing anything. Use it for
+// commands whose Command value is consumed by a later constructor (children
+// passed to WithSubcommands) so they must not be queued for attachment twice:
+//
+//	child, err := v5.NewCommand(...)
+//	b.Check(err)
+//	v5.AddParent(b, "db", "Database operations", flags, v5.WithSubcommands(child))
+func (b *Builder[T]) Check(err error) {
+	if b == nil {
+		return
+	}
+
+	if err != nil {
+		b.errs = append(b.errs, err)
+	}
+}
+
 // Try queues a (Command, error) pair the caller already holds: a nil error
 // queues the command, a non-nil error is collected and the zero command
 // dropped.
