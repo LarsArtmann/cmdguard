@@ -5,7 +5,7 @@
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v5.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)
-[![Coverage](https://img.shields.io/badge/coverage-90.4%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-89.3%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)**
@@ -18,7 +18,7 @@ cmdguard is the only Go CLI framework that unifies **type-safe flags**, **depend
 
 **Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v5` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
-> **API Stability:** v5.2.1 is the current release on the v4 major line. The legacy v2 line is in maintenance at v2.10.4. See the [v3→v4 Migration Guide](docs/MIGRATION_v3_v4.md) for the latest migration, or the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md) for the earlier migration. Full change history in [CHANGELOG.md](CHANGELOG.md).
+> **API Stability:** v5.0.0 is the current release. The v4 line is frozen at v4.2.1 (bug-fix only); the legacy v2 line is in maintenance at v2.10.4. Migrating from v4? See the [v4→v5 Migration Guide](docs/MIGRATION_v4_v5.md) (mechanical codemod included). Earlier migrations: [v3→v4](docs/MIGRATION_v3_v4.md), [v2→v3](docs/MIGRATION_v2_v3.md). Full change history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -173,8 +173,8 @@ type GreetFlags struct {
 func main() {
     cli, err := v5.NewApp("myapp", "My CLI application", AppConfig{},
         func(cli *v5.CLI[AppConfig]) error {
-            greet, err := v5.NewCommand("greet", &GreetFlags{},
-                func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+            greet, err := v5.NewCommand("greet", GreetFlags{},
+                func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
                     msg := fmt.Sprintf("Hello, %s!", flags.Name)
                     if flags.Shout {
                         msg = strings.ToUpper(msg)
@@ -190,7 +190,10 @@ func main() {
             return v5.AddCommands(cli, greet)
         },
         v5.WithCLIVersion("1.0.0"),
-        v5.WithBatteries(), // strict validation, signals, version/doctor, hints
+        // v5 note: batteries (strict validation, signals + graceful shutdown,
+        // strict config keys, version/doctor, hints) are ON by default —
+        // WithBatteries() is the explicit no-op kept for v4-flavored call sites.
+        v5.WithBatteries(),
     )
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
@@ -217,17 +220,17 @@ HELLO, CMDGUARD!
 | **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks                                                  |
 | **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                                                                |
 | **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more                                                        |
-| **Signal handling**        | `WithSignalHandling()` — Ctrl+C cancels context in all handlers                                                                                  |
+| **Signal handling**        | ON by default (v5) — Ctrl+C cancels the run; `WithoutSignalHandling()` opts out                                                                  |
 | **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                 |
 | **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                   |
 | **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                             |
-| **Batteries included**     | `WithBatteries()` — strict validation, signal handling, graceful shutdown, version/doctor commands, actionable hints, all opt-in                 |
+| **Batteries included**     | ON by default in v5: strict validation, signals + graceful shutdown, strict config keys, version/doctor commands, hints — `WithoutBatteries()` drops the set |
 | **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                                |
 | **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                    |
 | **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                    |
 | **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                      |
 | **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                          |
-| **Extensible types**       | `RegisterTypeHandler()` for custom flag types with full parse/validate support                                                                   |
+| **Extensible types**       | `RegisterTypeCodec()` for custom flag types with full parse/validate support                                                                    |
 | **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own; spinner/telemetry/flight-recorder available as [sub-modules](#optional-sub-modules) |
 | **Interactive prompts**    | `WithPromptOnMissing()` with `prompt:"Question?"` tag via huh                                                                                    |
 | **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                                         |
@@ -238,7 +241,7 @@ HELLO, CMDGUARD!
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                                          |
 | **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                                    |
 | **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                                               |
-| **1434 test runs**         | 90.4% coverage, race-detected, fuzz-tested                                                                                                       |
+| **Verified**               | 89.3% core coverage, race-detected, fuzz-tested; `check-all` gates every push                                                                   |
 
 ---
 
@@ -318,6 +321,21 @@ userCmd, _ := v5.NewParentCommand[AppConfig]("user",
     v5.WithShort("User management"),
 )
 v5.AddCommand(cli, userCmd)
+```
+
+Registering many commands? The v5 `Builder` collects constructor errors so you
+never write an error ladder, then attaches atomically:
+
+```go
+listCmd, err := v5.NewCommand("list", v5.NoFlags{}, listHandler, v5.WithShort("List users"))
+createCmd, err2 := v5.NewCommand("create", v5.NoFlags{}, createHandler, v5.WithShort("Create a user"))
+
+b := v5.NewBuilder(cli)
+b.Check(err)
+b.Check(err2)
+v5.AddParent(b, "user", "User management", v5.NoFlags{},
+    v5.WithSubcommands(listCmd, createCmd), v5.WithShort("User management"))
+err = b.Build() // first collected construction error, or nil after attaching all
 ```
 
 ---
@@ -477,13 +495,16 @@ cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 | `WithoutSilenceUsage()`                     | Re-enable usage-on-error (opt-in)                                 |
 | `WithFang(bool)`                            | Styled help output                                                |
 | `WithEnvPrefix(prefix)`                     | Prefix for env vars                                               |
-| `WithSignalHandling()`                      | Cancel context on SIGINT/SIGTERM                                  |
+| `WithSignalHandling()`                      | Cancel context on SIGINT/SIGTERM (**default ON in v5**; `WithoutSignalHandling()` opts out)                                       |
+| `WithGracefulShutdown()`                    | Additionally shut down DI services on the signal path (**default ON in v5**; `WithoutGracefulShutdown()` opts out)                ||
 | `WithMiddleware[T](mw...)`                  | Middleware for all commands                                       |
 | `WithGroup(id, title)`                      | Help group on root                                                |
 | `WithConfigValidation[T](fn)`               | Validate config after flag parsing                                |
 | `WithPostFlagParse[T](fn...)`               | Post-parse hook: DI init, session storage                         |
 | `WithCleanup[T](fn...)`                     | Post-RunE cleanup that fires even when RunE errors                |
-| `WithStrictValidation()`                    | Require `WithShort` on all commands                               |
+| `WithStrictValidation()`                    | Require `WithShort` on all commands (**default ON in v5**; `WithoutStrictValidation()` opts out)                                  |
+| `WithStrictConfigKeys()`                    | Reject unknown config-file keys (**default ON in v5**; `WithoutStrictConfigKeys()` opts out)                                      |
+| `WithoutBatteries()`                        | Drop the whole v5 production set (strict, signals, shutdown, strict keys, hints, doctor) in one call                               |
 | `WithDraconianValidation()`                 | Strict + require `WithExample` on leaf commands                   |
 | `WithConfigFile(paths...)`                  | Auto-load JSON config from first found path                       |
 | `WithConfigFileLoader(l, paths...)`         | Load config with custom loader (YAML/TOML)                        |
@@ -496,7 +517,7 @@ cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 ## Error Handling
 
 ```go
-// All v4 functions return errors — zero panics in library code
+// All v5 functions return errors — zero panics in library code
 cli, err := v5.NewCLI[Config]("app", "...", Config{})
 cmd, err := v5.NewCommand("test", NoFlags{}, handler)
 

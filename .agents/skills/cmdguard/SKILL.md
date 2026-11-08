@@ -54,14 +54,15 @@ unless the Source column says otherwise.
 ```go
 cli, err := cmdguard.NewCLI("app", "App description", AppConfig{}) // T = root config
 
-scan, err := cmdguard.NewCommand("scan", "Scan things", ScanFlags{}, // F = THIS command's flags
+scan, err := cmdguard.NewCommand("scan", ScanFlags{}, // F = THIS command's flags
     func(ctx context.Context, cfg *AppConfig, f ScanFlags) error { ... },
+    cmdguard.WithShort("Scan things"), // required under v5's default strict validation
 )
 b := cmdguard.NewBuilder(cli)
-cmdguard.Add(b, scan)
+cmdguard.Try(b, scan, err) // queue the (value, error) pair — no ladder
 err = b.Build()
 
-err = cli.ExecuteAndExit(ctx) // blessed entry point
+cli.ExecuteAndExit(ctx) // blessed entry point
 ```
 
 - `CLI[T]` — `T` is the root config struct; its fields become the root's flags.
