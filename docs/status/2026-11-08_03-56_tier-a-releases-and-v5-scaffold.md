@@ -72,7 +72,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
    `v5`/`v5_test` (166 files); every import path, alias (`v4 "…"` →
    `v5 "…"`), and qualified ref (`v4.X` → `v5.X`) rewritten repo-wide —
    **zero** `cmdguard/v4` references remain in any `.go` file; root module
-   path → `github.com/larsartmann/cmdguard/v5`; all 7 sub-module `go.mod`s
+   path → `github.com/larsartmann/cmdguard/v5`; all 7 sub-module `go.mod` files
    moved to `/v5` requires (v5-major pseudo-versions — Go rejects a v4
    pseudo-version under a /v5 path, caught and fixed); `lint` on the branch
    uses dev-shape (unversioned replace) until its v5-era release; CI
@@ -196,6 +196,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 1. Regenerate `docs/ERROR_REFERENCE.md` on the branch (fix b1).
 2. Diagnose + fix lint sub-module typecheck failure (b2).
 3. Rename `TestHuhRunner_*` → `TestHuhPrompter_*` (b3).
+   <!-- ✅ DONE 2026-11-08: renamed on v5-scaffold (TestHuhPrompter_*). -->
 4. Commit the scaffold as one reviewed commit (b4).
 5. Re-run full branch battery: root tests, sub-module tests, `-race`,
    golangci-lint, GOWORK=off per-module builds.
@@ -249,12 +250,14 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 36. D26 S2: re-check nixpkgs `go_1_27` ≥ 1.27.2; flip if available.
 37. D33 `gopls check` infertypeargs verdict; D34 git-town/library-policy
     values; record both.
+    <!-- ✅ DONE 2026-11-08: D33 — gopls check runs clean on go-composable-business-types (no infertypeargs findings); D34 — git-town.toml main="master" + github-connector=api; library-policy.yaml does not exist in that repo. -->
 38. D35 file the docs-gates routed-verdict divergence upstream (repro
     exists).
 39. D36 script to derive FEATURES/AGENTS dep tables + test counts from
     go.mod/go test.
 40. D39 archive the 2026-11-02_00-11 HTML with its .md siblings.
 41. D38 eyeball re-rendered `architecture.svg` + examples/README loop.
+    <!-- ✅ DONE 2026-11-08: svg re-rendered 2026-11-08 01:34 (fresh); examples/README.md documents the test loop (go test ./examples/taskctl/... -count=1 -race). -->
 42. D24 CT2 decision memo (schema sub-module release: ship v0.1.0 vs hold).
 43. D25 config-explain into README + website.
 44. D37 execute the §g1 thresholds decision (2026-10 batch archive vs keep).
@@ -264,6 +267,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 47. Tier D bundles: website ports ×8 (TUTORIAL first), marketing/infra
     (SECURITY.md first, 5 min), doc/CI guards (stale-ref guard first).
 48. L6 (only after an Analyzer-bridge spike — do not half-ship).
+    <!-- fresh:skip — pull-based by design; stays in ROADMAP until the Analyzer-bridge spike is scheduled. -->
 49. `go install` fix for cmdguard-lint (per g2 decision).
 50. Final battery + a docs/status closing report with before/after numbers.
 
