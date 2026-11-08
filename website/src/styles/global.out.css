@@ -295,8 +295,14 @@
   .isolate {
     isolation: isolate;
   }
+  .z-6 {
+    z-index: 6;
+  }
   .z-50 {
     z-index: 50;
+  }
+  .row-6 {
+    grid-row: 6;
   }
   .container {
     width: 100%;
@@ -452,6 +458,9 @@
   .cursor-pointer {
     cursor: pointer;
   }
+  .resize {
+    resize: both;
+  }
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -498,6 +507,11 @@
     --tw-space-y-reverse: 0;
     margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
     margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .overflow-hidden {
     overflow: hidden;
