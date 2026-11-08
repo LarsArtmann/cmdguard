@@ -69,21 +69,21 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 
 | #   | Task                                    | Category | Impact   | Effort | Files                           |
 | --- | --------------------------------------- | -------- | -------- | ------ | ------------------------------- |
-| M1  | Copy-on-write typeRegistry              | Code     | High     | 45m    | `type_handler.go`, `flags.go`   |
-| M2  | Copy-on-write validatorRegistry         | Code     | High     | 30m    | `flags_validate.go`, `flags.go` |
-| M3  | Cache os.UserHomeDir()                  | Code     | Medium   | 15m    | `config_file.go`                |
-| M4  | Document regex cache safety             | Doc      | Low      | 15m    | `flags_validate.go`             |
-| M5  | iter.Seq for Tags()/FlagNames()         | Code     | Low      | 30m    | `flags.go`, `flags_suggest.go`  |
-| M6  | iter.Seq for Path()/Children()          | Code     | Low      | 30m    | `flow_context.go`               |
-| M7  | Benchmark: COW registry savings         | Test     | Medium   | 30m    | `benchmarks/`                   |
-| M8  | Benchmark: home dir cache               | Test     | Low      | 15m    | `benchmarks/`                   |
-| M9  | Run full benchmarks + compare           | Test     | Medium   | 30m    | —                               |
-| M10 | Update PERFORMANCE.md                   | Doc      | Medium   | 30m    | `docs/PERFORMANCE.md`           |
-| M11 | Update AGENTS.md gotchas                | Doc      | Low      | 30m    | `AGENTS.md`                     |
-| M12 | Update perf HTML report                 | Doc      | Low      | 30m    | `docs/research/`                |
-| M13 | Full verification: race+lint+build+test | Verify   | Critical | 30m    | —                               |
-| M14 | Update TODO_LIST.md + FEATURES.md       | Doc      | Low      | 15m    | `TODO_LIST.md`, `FEATURES.md`   |
-| M15 | Final commit and push                   | Git      | —        | 15m    | —                               |
+| ~~M1~~  | ~~Copy-on-write typeRegistry~~ done at `ff0bd86` | ~~Code~~ | ~~High~~ | ~~45m~~ | ~~`type_handler.go`, `flags.go`~~ |
+| ~~M2~~  | ~~Copy-on-write validatorRegistry~~ done at `ff0bd86` | ~~Code~~ | ~~High~~ | ~~30m~~ | ~~`flags_validate.go`, `flags.go`~~ |
+| ~~M3~~  | ~~Cache os.UserHomeDir()~~ done at `ff0bd86` | ~~Code~~ | ~~Medium~~ | ~~15m~~ | ~~`config_file.go`~~ |
+| ~~M4~~  | ~~Document regex cache safety~~ done — regex-cache doc comment survives at flags_validate.go:417 | ~~Doc~~ | ~~Low~~ | ~~15m~~ | ~~`flags_validate.go`~~ |
+| ~~M5~~  | ~~iter.Seq for Tags()/FlagNames()~~ done at `ff0bd86` | ~~Code~~ | ~~Low~~ | ~~30m~~ | ~~`flags.go`, `flags_suggest.go`~~ |
+| ~~M6~~  | ~~iter.Seq for Path()/Children()~~ done at `ff0bd86` | ~~Code~~ | ~~Low~~ | ~~30m~~ | ~~`flow_context.go`~~ |
+| ~~M7~~  | ~~Benchmark: COW registry savings~~ done — BenchmarkFlagRegistryCOW benchmarks/guard_bench_test.go:205 | ~~Test~~ | ~~Medium~~ | ~~30m~~ | ~~`benchmarks/`~~ |
+| ~~M8~~  | ~~Benchmark: home dir cache~~ **Won't implement — no dedicated home-dir benchmark survives; cachedHomeDir covered by config_file_test.go:77.** | ~~Test~~ | ~~Low~~ | ~~15m~~ | ~~`benchmarks/`~~ |
+| ~~M9~~  | ~~Run full benchmarks + compare~~ done at `556f42c` | ~~Test~~ | ~~Medium~~ | ~~30m~~ | ~~—~~ |
+| ~~M10~~ | ~~Update PERFORMANCE.md~~ done — docs/PERFORMANCE.md survives with v4 numbers | ~~Doc~~ | ~~Medium~~ | ~~30m~~ | ~~`docs/PERFORMANCE.md`~~ |
+| ~~M11~~ | ~~Update AGENTS.md gotchas~~ done — COW gotcha documented AGENTS.md copy-on-write principles | ~~Doc~~ | ~~Low~~ | ~~30m~~ | ~~`AGENTS.md`~~ |
+| ~~M12~~ | ~~Update perf HTML report~~ done — performance-analysis.html updated in 556f42c | ~~Doc~~ | ~~Low~~ | ~~30m~~ | ~~`docs/research/`~~ |
+| ~~M13~~ | ~~Full verification: race+lint+build+test~~ done at `556f42c` | ~~Verify~~ | ~~Critical~~ | ~~30m~~ | ~~—~~ |
+| ~~M14~~ | ~~Update TODO_LIST.md + FEATURES.md~~ done at `556f42c` | ~~Doc~~ | ~~Low~~ | ~~15m~~ | ~~`TODO_LIST.md`, `FEATURES.md`~~ |
+| ~~M15~~ | ~~Final commit and push~~ done at `556f42c` | ~~Git~~ | ~~—~~ | ~~15m~~ | ~~—~~ |
 
 **Sort order:** Impact × Safety (highest first). M1–M2 are the Pareto 1%.
 
@@ -92,6 +92,9 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 ## Detailed Breakdown — Fine Granularity (max 15 min tasks)
 
 ### Phase 1: Copy-on-write typeRegistry (M1)
+
+
+<!-- check-rows:ledger -->
 
 | #  | Task                                                              | Est | Depends |
 | -- | ----------------------------------------------------------------- | --- | ------- |
@@ -102,7 +105,10 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 | F5 | Add test: COW isolation — instance write doesn't leak to global   | 10m | F4      |
 | F6 | Add test: COW isolation — global write doesn't leak to instance   | 10m | F4      |
 
+
 ### Phase 2: Copy-on-write validatorRegistry (M2)
+
+<!-- check-rows:ledger -->
 
 | #   | Task                                                            | Est | Depends |
 | --- | --------------------------------------------------------------- | --- | ------- |
@@ -111,17 +117,26 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 | F9  | Modify `clone()` to set `owned=true` on result                  | 5m  | F7      |
 | F10 | Change `NewFlagRegistry` to share global validator pointer      | 10m | F8, F9  |
 | F11 | Add test: COW isolation — validator instance write doesn't leak | 10m | F10     |
+
 | F12 | Add test: COW isolation — validator global write doesn't leak   | 10m | F10     |
 
 ### Phase 3: Cache os.UserHomeDir() (M3)
 
+<!-- check-rows:ledger -->
+
 | #   | Task                                             | Est | Depends |
 | --- | ------------------------------------------------ | --- | ------- |
+
+<!-- check-rows:ledger -->
+
 | F13 | Add `cachedHomeDir` sync.OnceValue helper        | 5m  | —       |
 | F14 | Modify `expandConfigPath` to use cached home dir | 10m | F13     |
 | F15 | Add test: expandConfigPath caches home dir       | 10m | F14     |
 
+
 ### Phase 4: Regex cache documentation (M4)
+
+<!-- check-rows:ledger -->
 
 | #   | Task                                                       | Est | Depends |
 | --- | ---------------------------------------------------------- | --- | ------- |
@@ -129,15 +144,21 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 
 ### Phase 5: Iterator variants (M5 + M6)
 
+
+<!-- check-rows:ledger -->
+
 | #   | Task                                                     | Est | Depends |
 | --- | -------------------------------------------------------- | --- | ------- |
 | F17 | Add `TagsSeq() iter.Seq[FlagTag]` to FlagRegistry        | 10m | —       |
 | F18 | Add `FlagNamesSeq() iter.Seq[string]` to FlagRegistry    | 10m | —       |
 | F19 | Add `PathSeq() iter.Seq[string]` to BranchingFlowContext | 10m | —       |
 | F20 | Add `ChildrenSeq() iter.Seq[*BranchingFlowContext]`      | 10m | —       |
+
 | F21 | Add tests for all 4 iterator methods                     | 15m | F17–F20 |
 
 ### Phase 6: Benchmarks (M7 + M8)
+
+<!-- check-rows:ledger -->
 
 | #   | Task                                            | Est | Depends  |
 | --- | ----------------------------------------------- | --- | -------- |
@@ -147,8 +168,15 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 
 ### Phase 7: Full comparison + documentation (M9–M14)
 
+<!-- check-rows:ledger -->
+
 | #   | Task                                                  | Est | Depends          |
+<!-- check-rows:ledger -->
+
 | --- | ----------------------------------------------------- | --- | ---------------- |
+
+<!-- check-rows:ledger -->
+
 | F25 | Run full benchmark suite (5×, -benchmem)              | 15m | All code changes |
 | F26 | Compare before/after, document deltas                 | 10m | F25              |
 | F27 | Update TL;DR + tables in PERFORMANCE.md               | 10m | F26              |
@@ -162,6 +190,8 @@ starting with `~/`. The home directory is immutable during a process lifetime. C
 | F35 | Add iter.Seq methods to FEATURES.md                   | 5m  | M5, M6           |
 
 ### Phase 8: Verification + ship (M13 + M15)
+
+<!-- check-rows:ledger -->
 
 | #   | Task                               | Est | Depends  |
 | --- | ---------------------------------- | --- | -------- |
@@ -228,6 +258,7 @@ graph TD
 
     M10 --> M13
     M11 --> M13
+
     M12 --> M13
     M14 --> M13
 
@@ -243,6 +274,8 @@ graph TD
 ---
 
 ## Risk Assessment
+
+<!-- check-rows:ledger -->
 
 | Risk                               | Likelihood | Mitigation                                                         |
 | ---------------------------------- | ---------- | ------------------------------------------------------------------ |

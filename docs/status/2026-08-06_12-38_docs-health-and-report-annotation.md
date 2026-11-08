@@ -134,49 +134,49 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 
 ### P2 — Quality & Polish
 
-11. Verify `.golangci.yml` exclusion count matches AGENTS.md claim
-12. Add flightrecorder to `examples/taskctl/` flagship example
-13. Restore lost flightrecorder godoc examples (`ExampleWithFlightRecorderRecorder`, `ExampleRecorder_CaptureToWriter`)
-14. Test `go tool trace` parseability of flightrecorder snapshots
-15. Fix `docs/MIGRATION_v2_v3.md` — add `manpage` removal note
-16. Audit `.github/workflows/` for stale `v3` references
-17. Run website build verification (`pnpm run build` in `website/`)
-18. Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0
+11. ~~Verify `.golangci.yml` exclusion count matches AGENTS.md claim~~ **Superseded — .golangci.yml restructured in the lint/v0.1.0 work (2026-10-04).**
+12. ~~Add flightrecorder to `examples/taskctl/` flagship example~~ done — taskctl wires flightrecorder (examples/taskctl/main.go)
+13. ~~Restore lost flightrecorder godoc examples (`ExampleWithFlightRecorderRecorder`, `ExampleRecorder_CaptureToWriter`)~~ done — examples restored — flightrecorder/example_test.go:62,95
+14. Test `go tool trace` parseability of flightrecorder snapshots **→ ROADMAP Flight Recorder Enhancements (`go tool trace` parse validation)**
+15. ~~Fix `docs/MIGRATION_v2_v3.md` — add `manpage` removal note~~ done — manpage removal note added (docs/MIGRATION_v2_v3.md)
+16. ~~Audit `.github/workflows/` for stale `v3` references~~ done — audit clean — no cmdguard/v3 references in .github/workflows
+17. ~~Run website build verification (`pnpm run build` in `website/`)~~ done — astro build clean (22 pages, 0 errors) per the 2026-08-06 closure sprint
+18. ~~Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0~~ done — PERFORMANCE.md corrected + re-run for v4.0.0 (2026-08-06)
 19. Audit `docs/COMPARISON.md` feature matrix for v4 accuracy
-20. Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API
-21. Audit website guide prose against v4 API (14 .mdx files)
-22. Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify
-23. Add flightrecorder to `docs/PERFORMANCE.md` benchmark section
-24. Verify `examples/taskctl/` code examples match v4 API patterns
-25. Run `golangci-lint run ./...` on each sub-module independently
+20. ~~Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API~~ done — DOMAIN_LANGUAGE terms match the v4 API (Command[T,F] command.go:87, CLI[T] cli.go:123)
+21. ~~Audit website guide prose against v4 API (14 .mdx files)~~ done — 6 website .mdx v4 API examples fixed in the closure sprint; no stale v3 patterns remain
+22. ~~Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify~~ done — example matches the current v4 signature (TimingMiddleware[T](log func(...)) middleware.go:116)
+23. ~~Add flightrecorder to `docs/PERFORMANCE.md` benchmark section~~ done — PERFORMANCE.md includes flightrecorder benchmarks
+24. ~~Verify `examples/taskctl/` code examples match v4 API patterns~~ done — taskctl imports v4 (commands.go:12)
+25. ~~Run `golangci-lint run ./...` on each sub-module independently~~ done — submodule-smoke.yml runs golangci-lint per sub-module
 
 ### P3 — Nice to Have
 
-26. Add `gofmt -s` and `go mod tidy -diff` check to `nix fmt` formatter
-27. Add pre-commit hook that runs `go mod tidy` and fails if it would change go.mod/go.sum
-28. Write contributor-facing note: "Why does this repo have so many sub-modules?"
-29. Add a Nix target for `check-all` (build + test + lint + format-check + dupl-check)
-30. Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove
-31. Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove
-32. Run `art-dupl --semantic -t 3` to confirm "0 clone groups" claim in AGENTS.md
-33. Verify `WithCleanup[T]` claim (covers raw cobra subcommands) with a test
-34. Run `govulncheck ./...` across the workspace
-35. Add `.trace` files to `.gitignore`
-36. Check `git-town.toml` main branch setting (`master` vs `main`)
-37. Verify `SECURITY.md` version table includes v4
+26. ~~Add `gofmt -s` and `go mod tidy -diff` check to `nix fmt` formatter~~ done — enforced — treefmt with gofumpt (flake.nix:38) + BuildFlow pre-commit (AGENTS.md)
+27. ~~Add pre-commit hook that runs `go mod tidy` and fails if it would change go.mod/go.sum~~ done — enforced — BuildFlow pre-commit + `nix run .#check-all` incl. go mod tidy
+28. ~~Write contributor-facing note: "Why does this repo have so many sub-modules?"~~ done — CONTRIBUTING.md "Sub-Modules: When to Extract" decision tree
+29. ~~Add a Nix target for `check-all` (build + test + lint + format-check + dupl-check)~~ done — flake.nix check-all target exists
+30. ~~Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove~~ done — WHAT_THIS_PROJECT_IS_ABOUT.md removed at 0fbdd4d (consolidated)
+31. ~~Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove~~ **Won't implement — WHAT_THIS_PROJECT_IS_NOT.md kept as a distinct doc; only _ABOUT was consolidated (0fbdd4d).**
+32. ~~Run `art-dupl --semantic -t 3` to confirm "0 clone groups" claim in AGENTS.md~~ done — art-dupl re-run 2026-11-07 — sibling-pattern groups only; matches the "intentional sibling pairs" note
+33. ~~Verify `WithCleanup[T]` claim (covers raw cobra subcommands) with a test~~ done — WithCleanup covered by cli_cleanup_test.go
+34. Run `govulncheck ./...` across the workspace **→ TODO_LIST Security (S2 — govulncheck findings tracked; toolchain bump blocked on nixpkgs)**
+35. ~~Add `.trace` files to `.gitignore`~~ done — *.trace ignored (.gitignore:14)
+36. ~~Check `git-town.toml` main branch setting (`master` vs `main`)~~ done — git-town.toml main = "master" — matches the repo default branch
+37. ~~Verify `SECURITY.md` version table includes v4~~ done — SECURITY.md supports v4.x
 38. Add v4.0.0 GitHub release notes (if not already done)
-39. Consider `v4.1.0` release once P0/P1 items are done
+39. ~~Consider `v4.1.0` release once P0/P1 items are done~~ done — v4.1.0 shipped 2026-10-04 (CHANGELOG [4.1.0]; tag v4.1.0)
 40. Add GitHub Action badge for `nix flake check` status
-41. Add a "what's new in v4" migration guide (one-pager)
-42. Add a `pkg.go.dev` badge
-43. Add a "Related projects" section linking to go-output, samber-do-auditlog
-44. Write a "design rationale" doc explaining why each sub-module exists
-45. Add a benchmark comparing cmdguard v4 to raw cobra
-46. Sponsor or contribute back to samber/do, fang, glamour, huh
-47. Add structured logging option to flightrecorder (`slog` handler)
-48. Add `MaxSnapshots` config field to flightrecorder (rate limiting)
-49. Add `CaptureReasonPanic` support to flightrecorder
-50. Add `Sync()` method to flightrecorder (flush pending captures)
+41. ~~Add a "what's new in v4" migration guide (one-pager)~~ done — covered by docs/MIGRATION_v3_v4.md
+42. ~~Add a `pkg.go.dev` badge~~ done — README carries the Go Reference badge
+43. ~~Add a "Related projects" section linking to go-output, samber-do-auditlog~~ done — README "Related Projects" section present
+44. ~~Write a "design rationale" doc explaining why each sub-module exists~~ done — rationale lives in CONTRIBUTING.md §Sub-Modules + website guides/sub-modules.mdx
+45. ~~Add a benchmark comparing cmdguard v4 to raw cobra~~ done (docs-health pass observation — PERFORMANCE.md documents cobra-parity overhead (line 109))
+46. ~~Sponsor or contribute back to samber/do, fang, glamour, huh~~ **NOT-DO — external sponsorship/contribution outside repo scope.**
+47. Add structured logging option to flightrecorder (`slog` handler) **→ ROADMAP Flight Recorder Enhancements (Structured logging)**
+48. Add `MaxSnapshots` config field to flightrecorder (rate limiting) **→ ROADMAP Flight Recorder Enhancements (`MaxSnapshots` config)**
+49. Add `CaptureReasonPanic` support to flightrecorder **→ ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)**
+50. Add `Sync()` method to flightrecorder (flush pending captures) **→ ROADMAP Flight Recorder Enhancements (`Sync()` method)**
 
 ---
 

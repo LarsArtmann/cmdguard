@@ -17,6 +17,7 @@ BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`,
 
 ## a) FULLY DONE
 
+<!-- check-rows:ledger -->
 | # | Item                                         | Details                                                                                                                                                                                 |
 | - | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **`config_file.go` migrated to json/v2**     | `encoding/json/v2` + `jsontext.Value`. Added `json.MatchCaseInsensitiveNames(true)` to preserve v1-compatible struct field matching (critical — user config structs lack `json:` tags). |
@@ -33,6 +34,7 @@ BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`,
 
 ## b) PARTIALLY DONE
 
+<!-- check-rows:ledger -->
 | # | Item                  | What's done                                 | What's missing                                                                                                   |
 | - | --------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | 1 | **AGENTS.md update**  | Versions, GOEXPERIMENT section, status line | Go directive note, test commands need `GOEXPERIMENT=jsonv2` prefix, Quick Start section doesn't mention the flag |
@@ -43,6 +45,7 @@ BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`,
 
 ## c) NOT STARTED
 
+<!-- check-rows:ledger -->
 | # | Item                                        | Why it matters                                                                                                                                                                                                                                                        |
 | - | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **Test files still use `encoding/json` v1** | 4 test files (`cli_errors_json_test.go`, `duration_test.go`, `enum_test.go`, `helpers_test.go`) import `"encoding/json"` (v1). For consistency, these should be migrated to v2. They work because v1 and v2 coexist under GOEXPERIMENT=jsonv2, but it's inconsistent. |
@@ -56,6 +59,7 @@ BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`,
 
 ## d) TOTALLY FUCKED UP
 
+<!-- check-rows:ledger -->
 | # | What                               | Impact                                                                                                                                                                                                                                                                                                      | Status                  |
 | - | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | 1 | **First attempt: fought the tool** | I reverted `go-auto-upgrade`'s changes TWICE instead of embracing the upgrade. The user had to tell me "THEN UPGRADE!" — I should have recognized immediately that the tool wants this migration and the correct path was enabling `GOEXPERIMENT=jsonv2`, not fighting it. **Wasted an entire round-trip.** | Fixed in second attempt |
@@ -164,9 +168,13 @@ This is a **philosophical/business decision**: anyone importing cmdguard v3 now 
 
 I chose (A) because the user said "THEN UPGRADE!" but this affects every downstream consumer.
 
+**Answered:** moot — Go 1.27 ships `encoding/json/v2` as standard; the GOEXPERIMENT requirement is gone (`go.mod`: `go 1.27`).
+
 ### 2. Should `MatchCaseInsensitiveNames(true)` be the permanent design, or should we require `json:` tags on config structs?
 
 The v2 default is case-sensitive matching. I added `MatchCaseInsensitiveNames(true)` to preserve v1 behavior, but this is explicitly called out in the json/v2 docs as a potential vector for duplicate name bugs. The alternative is requiring users to add `json:"fieldname"` tags to their config structs — cleaner but a breaking change for existing users. This is a design/architecture decision I can't make alone.
+
+**Answered:** moot — the config decode was rewritten in the 2026-11-02 config-truth work (`config_keys.go` + `schema` sub-module); case-insensitive matching is no longer part of the loading contract (AGENTS.md).
 
 ---
 
@@ -186,6 +194,7 @@ Sub-mods:  5/5 have pre-existing lint issues (14 total)
 
 ## Files Changed This Session
 
+<!-- check-rows:ledger -->
 | File                                    | Change                                                                   |
 | --------------------------------------- | ------------------------------------------------------------------------ |
 | `pkg/cmdguard/v3/config_file.go`        | Migrated to json/v2 + jsontext, added MatchCaseInsensitiveNames          |

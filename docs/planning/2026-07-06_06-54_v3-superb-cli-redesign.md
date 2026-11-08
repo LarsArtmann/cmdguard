@@ -23,12 +23,16 @@ The type parameter explosion is fixed (commit `4f9b0ea`). Now we tackle the real
 
 ### 1% → 51%: Restore type safety + finish ergonomics
 
+<!-- check-rows:ledger -->
+
 | ID | Task                                                                         | Impact   | Effort |
 | -- | ---------------------------------------------------------------------------- | -------- | ------ |
 | 1  | Restore compile-time safety on lifecycle hooks (sealed interface, not `any`) | Critical | 45min  |
 | 2  | Make CLIOption non-generic (eliminate `[T]` from 22 CLI options)             | Critical | 30min  |
 
 ### 4% → 64%: Mono-repo modularization
+
+<!-- check-rows:ledger -->
 
 | ID | Task                                      | Impact | Effort |
 | -- | ----------------------------------------- | ------ | ------ |
@@ -42,6 +46,8 @@ The type parameter explosion is fixed (commit `4f9b0ea`). Now we tackle the real
 | 10 | Verify GOWORK=off builds for every module | High   | 60min  |
 
 ### 20% → 80%: Config revolution + cleanup + audit deepening
+
+<!-- check-rows:ledger -->
 
 | ID | Task                                           | Impact | Effort |
 | -- | ---------------------------------------------- | ------ | ------ |
@@ -60,24 +66,24 @@ The type parameter explosion is fixed (commit `4f9b0ea`). Now we tackle the real
 
 | #  | Task                                                              | Priority | Impact | Effort | Status |
 | -- | ----------------------------------------------------------------- | -------- | ------ | ------ | ------ |
-| 1  | Restore lifecycle hook compile-time safety (sealed interface)     | P0       | 10     | 45min  | TODO   |
-| 2  | Make CLIOption non-generic                                        | P0       | 9      | 30min  | TODO   |
-| 3  | Create go.work workspace + verify existing build                  | P1       | 8      | 30min  | TODO   |
-| 4  | Extract core module: move cobra/do/fang/pflag deps to core go.mod | P1       | 10     | 90min  | TODO   |
-| 5  | Extract glamour to pkg/cmdguard/glamour/ module                   | P1       | 6      | 45min  | TODO   |
-| 6  | Extract prompts to pkg/cmdguard/prompts/ module                   | P1       | 6      | 45min  | TODO   |
-| 7  | Extract spinner to pkg/cmdguard/spinner/ module                   | P1       | 5      | 30min  | TODO   |
-| 8  | Extract telemetry to pkg/cmdguard/telemetry/ module               | P2       | 4      | 30min  | TODO   |
-| 9  | Extract manpage to pkg/cmdguard/manpage/ module                   | P2       | 4      | 30min  | TODO   |
-| 10 | Verify GOWORK=off builds for every module                         | P1       | 8      | 60min  | TODO   |
-| 11 | Remove go-output blank imports from core (output.go cleanup)      | P1       | 7      | 45min  | TODO   |
-| 12 | Cut result.go (sum types)                                         | P2       | 3      | 15min  | TODO   |
-| 13 | Cut editor.go                                                     | P2       | 3      | 15min  | TODO   |
-| 14 | Add command-level audit middleware (audit every command exec)     | P1       | 8      | 60min  | TODO   |
-| 15 | Add built-in audit-log export subcommand                          | P2       | 5      | 45min  | TODO   |
-| 16 | Update example/taskctl to showcase clean v3 API                   | P1       | 7      | 60min  | TODO   |
-| 17 | Update README + AGENTS.md + FEATURES.md for v3                    | P2       | 5      | 45min  | TODO   |
-| 18 | Final verification: build + test + lint + race                    | P0       | 9      | 30min  | TODO   |
+| ~~1~~  | ~~Restore lifecycle hook compile-time safety (sealed interface)~~ done — sealed typedHook survives in v4 (cli_command.go:155) | ~~P0~~ | ~~10~~ | ~~45min~~ | ~~TODO~~ |
+| ~~2~~  | ~~Make CLIOption non-generic~~ done at `9297257` | ~~P0~~ | ~~9~~ | ~~30min~~ | ~~TODO~~ |
+| ~~3~~  | ~~Create go.work workspace + verify existing build~~ done — go.work workspace exists at repo root | ~~P1~~ | ~~8~~ | ~~30min~~ | ~~TODO~~ |
+| ~~4~~  | ~~Extract core module: move cobra/do/fang/pflag deps to core go.mod~~ done at `548aaa4` | ~~P1~~ | ~~10~~ | ~~90min~~ | ~~TODO~~ |
+| ~~5~~  | ~~Extract glamour to pkg/cmdguard/glamour/ module~~ done at `9768db9` | ~~P1~~ | ~~6~~ | ~~45min~~ | ~~TODO~~ |
+| ~~6~~  | ~~Extract prompts to pkg/cmdguard/prompts/ module~~ done at `9768db9` | ~~P1~~ | ~~6~~ | ~~45min~~ | ~~TODO~~ |
+| ~~7~~  | ~~Extract spinner to pkg/cmdguard/spinner/ module~~ done at `548aaa4` | ~~P1~~ | ~~5~~ | ~~30min~~ | ~~TODO~~ |
+| ~~8~~  | ~~Extract telemetry to pkg/cmdguard/telemetry/ module~~ done at `9768db9` | ~~P2~~ | ~~4~~ | ~~30min~~ | ~~TODO~~ |
+| ~~9~~  | ~~Extract manpage to pkg/cmdguard/manpage/ module~~ done — manpage module shipped in v3 (9768db9); removed 34a0c6e (2026-07-23) | ~~P2~~ | ~~4~~ | ~~30min~~ | ~~TODO~~ |
+| ~~10~~ | ~~Verify GOWORK=off builds for every module~~ done — GOWORK=off builds verified in 548aaa4 | ~~P1~~ | ~~8~~ | ~~60min~~ | ~~TODO~~ |
+| ~~11~~ | ~~Remove go-output blank imports from core (output.go cleanup)~~ done at `548aaa4` | ~~P1~~ | ~~7~~ | ~~45min~~ | ~~TODO~~ |
+| ~~12~~ | ~~Cut result.go (sum types)~~ done at `548aaa4` | ~~P2~~ | ~~3~~ | ~~15min~~ | ~~TODO~~ |
+| ~~13~~ | ~~Cut editor.go~~ done at `548aaa4` | ~~P2~~ | ~~3~~ | ~~15min~~ | ~~TODO~~ |
+| ~~14~~ | ~~Add command-level audit middleware (audit every command exec)~~ done — WithCommandAudit + audit middleware survive (auditlog.go) | ~~P1~~ | ~~8~~ | ~~60min~~ | ~~TODO~~ |
+| ~~15~~ | ~~Add built-in audit-log export subcommand~~ done — subcommand shipped in v3 era; replaced by ExportAuditLog API (5a35c84, auditlog.go:154) | ~~P2~~ | ~~5~~ | ~~45min~~ | ~~TODO~~ |
+| ~~16~~ | ~~Update example/taskctl to showcase clean v3 API~~ done at `548aaa4` | ~~P1~~ | ~~7~~ | ~~60min~~ | ~~TODO~~ |
+| ~~17~~ | ~~Update README + AGENTS.md + FEATURES.md for v3~~ done at `f9a4d7c` | ~~P2~~ | ~~5~~ | ~~45min~~ | ~~TODO~~ |
+| ~~18~~ | ~~Final verification: build + test + lint + race~~ done — v3.0.0 shipped green (tag 2026-07-07, 87.1% coverage) | ~~P0~~ | ~~9~~ | ~~30min~~ | ~~TODO~~ |
 
 **Total estimated effort:** ~13 hours
 **Sorted by:** Priority (P0→P2), then Impact (desc), then Effort (asc)
@@ -145,6 +151,8 @@ graph TD
 
 ### Task 1: Restore lifecycle hook compile-time safety (8 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #   | Subtask                                           | Effort |
 | --- | ------------------------------------------------- | ------ |
 | 1.1 | Read current commandSpec + wireAllHandlers code   | 5min   |
@@ -158,6 +166,8 @@ graph TD
 
 ### Task 2: Make CLIOption non-generic (6 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #   | Subtask                                            | Effort |
 | --- | -------------------------------------------------- | ------ |
 | 2.1 | Create cliSpec struct (mirror commandSpec pattern) | 10min  |
@@ -169,6 +179,8 @@ graph TD
 
 ### Task 3: Create go.work workspace (5 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #   | Subtask                                  | Effort |
 | --- | ---------------------------------------- | ------ |
 | 3.1 | Run `go work init ./pkg/cmdguard/v2`     | 5min   |
@@ -178,6 +190,8 @@ graph TD
 | 3.5 | Commit workspace setup                   | 5min   |
 
 ### Task 4: Extract core module (12 subtasks)
+
+<!-- check-rows:ledger -->
 
 | #    | Subtask                                             | Effort |
 | ---- | --------------------------------------------------- | ------ |
@@ -198,6 +212,8 @@ graph TD
 
 For each module (glamour, prompts, spinner, telemetry, manpage):
 
+<!-- check-rows:ledger -->
+
 | #   | Subtask                                   | Effort |
 | --- | ----------------------------------------- | ------ |
 | X.1 | Create pkg/cmdguard/X/ directory + go.mod | 5min   |
@@ -207,6 +223,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 | X.5 | Commit                                    | 5min   |
 
 ### Task 10: Verify GOWORK=off builds (6 subtasks)
+
+<!-- check-rows:ledger -->
 
 | #    | Subtask                          | Effort |
 | ---- | -------------------------------- | ------ |
@@ -219,6 +237,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 
 ### Task 11: Remove go-output from core (5 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #    | Subtask                                        | Effort |
 | ---- | ---------------------------------------------- | ------ |
 | 11.1 | Remove blank imports from output.go            | 10min  |
@@ -229,6 +249,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 
 ### Task 12-13: Cut dead weight (4 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #    | Subtask                                  | Effort |
 | ---- | ---------------------------------------- | ------ |
 | 12.1 | Check result.go usage (grep for imports) | 5min   |
@@ -237,6 +259,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 | 13.2 | Remove editor.go + fix references        | 10min  |
 
 ### Task 14: Command-level audit middleware (7 subtasks)
+
+<!-- check-rows:ledger -->
 
 | #    | Subtask                                             | Effort |
 | ---- | --------------------------------------------------- | ------ |
@@ -250,6 +274,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 
 ### Task 15: Built-in audit-log subcommand (5 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #    | Subtask                                               | Effort |
 | ---- | ----------------------------------------------------- | ------ |
 | 15.1 | Design AuditLogCommand[T] helper (like DoctorCommand) | 10min  |
@@ -259,6 +285,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 | 15.5 | Commit                                                | 5min   |
 
 ### Task 16: Update example (6 subtasks)
+
+<!-- check-rows:ledger -->
 
 | #    | Subtask                                      | Effort |
 | ---- | -------------------------------------------- | ------ |
@@ -271,6 +299,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 
 ### Task 17: Update docs (5 subtasks)
 
+<!-- check-rows:ledger -->
+
 | #    | Subtask                                 | Effort |
 | ---- | --------------------------------------- | ------ |
 | 17.1 | Update AGENTS.md module structure       | 10min  |
@@ -280,6 +310,8 @@ For each module (glamour, prompts, spinner, telemetry, manpage):
 | 17.5 | Commit                                  | 5min   |
 
 ### Task 18: Final verification (5 subtasks)
+
+<!-- check-rows:ledger -->
 
 | #    | Subtask                                    | Effort |
 | ---- | ------------------------------------------ | ------ |
