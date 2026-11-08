@@ -4,11 +4,11 @@
 
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v4.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4)
+[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v5.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)
 [![Coverage](https://img.shields.io/badge/coverage-90.4%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4)**
+**[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)**
 
 ---
 
@@ -16,9 +16,9 @@
 
 cmdguard is the only Go CLI framework that unifies **type-safe flags**, **dependency injection with lifecycle management**, and a **zero-panic error contract** into a single system validated at construction. It wraps [Cobra](https://github.com/spf13/cobra) so you keep full compatibility while eliminating its footguns.
 
-**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v4` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
+**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v5` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
-> **API Stability:** v4.2.1 is the current release on the v4 major line. The legacy v2 line is in maintenance at v2.10.4. See the [v3→v4 Migration Guide](docs/MIGRATION_v3_v4.md) for the latest migration, or the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md) for the earlier migration. Full change history in [CHANGELOG.md](CHANGELOG.md).
+> **API Stability:** v5.2.1 is the current release on the v4 major line. The legacy v2 line is in maintenance at v2.10.4. See the [v3→v4 Migration Guide](docs/MIGRATION_v3_v4.md) for the latest migration, or the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md) for the earlier migration. Full change history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -47,25 +47,25 @@ Other Go CLI frameworks give you flags. cmdguard gives you flags **plus** everyt
 Register services, invoke them in handlers, and manage their entire lifecycle:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "My production CLI", AppConfig{},
-    v4.WithGracefulShutdown(), // SIGINT → reverse-order shutdown of all services
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My production CLI", AppConfig{},
+    v5.WithGracefulShutdown(), // SIGINT → reverse-order shutdown of all services
 )
 
 // Register a database service (lazy — created on first invoke)
-v4.Provide(cli.Scope(), func(i do.Injector) (*Database, error) {
+v5.Provide(cli.Scope(), func(i do.Injector) (*Database, error) {
     return &Database{DSN: "postgres://..."}, nil
 })
 
 // Use it in any command handler
-v4.NewCommand("query", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) error {
-        db, _ := v4.Invoke[*Database](cli.Scope())
+v5.NewCommand("query", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {
+        db, _ := v5.Invoke[*Database](cli.Scope())
         return db.Query(ctx)
     },
 )
 ```
 
-Services can implement `HealthCheck` (wired into `DoctorCommand`) and `Shutdown` (called on SIGINT/SIGTERM in reverse invocation order).
+
 
 ### Type-safe flags — validated at construction
 
@@ -135,7 +135,7 @@ down resources), use `ExitCode` instead of `ExecuteAndExit`:
 ```go
 err := cli.Execute(ctx)
 // ...flush / export audit log / teardown...
-os.Exit(v4.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
+os.Exit(v5.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
 ```
 
 > Pitfall to avoid: `if err := cli.Execute(ctx); err != nil { fmt.Fprintln(os.Stderr, err) }`
@@ -146,7 +146,7 @@ os.Exit(v4.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
 ## Quick Start
 
 ```bash
-go get github.com/larsartmann/cmdguard/v4
+go get github.com/larsartmann/cmdguard/v5
 ```
 
 ```go
@@ -158,7 +158,7 @@ import (
     "os"
     "strings"
 
-    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type AppConfig struct {
@@ -172,9 +172,9 @@ type GreetFlags struct {
 }
 
 func main() {
-    cli, err := v4.NewApp("myapp", "My CLI application", AppConfig{},
-        func(cli *v4.CLI[AppConfig]) error {
-            greet, err := v4.NewCommand("greet", &GreetFlags{},
+    cli, err := v5.NewApp("myapp", "My CLI application", AppConfig{},
+        func(cli *v5.CLI[AppConfig]) error {
+            greet, err := v5.NewCommand("greet", &GreetFlags{},
                 func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
                     msg := fmt.Sprintf("Hello, %s!", flags.Name)
                     if flags.Shout {
@@ -183,15 +183,15 @@ func main() {
                     fmt.Println(msg)
                     return nil
                 },
-                v4.WithShort("Greet someone"),
+                v5.WithShort("Greet someone"),
             )
             if err != nil {
                 return err
             }
-            return v4.AddCommands(cli, greet)
+            return v5.AddCommands(cli, greet)
         },
-        v4.WithCLIVersion("1.0.0"),
-        v4.WithBatteries(), // strict validation, signals, version/doctor, hints
+        v5.WithCLIVersion("1.0.0"),
+        v5.WithBatteries(), // strict validation, signals, version/doctor, hints
     )
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
@@ -248,18 +248,18 @@ HELLO, CMDGUARD!
 Register services on the CLI scope and invoke them in handlers:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{})
+cli, _ := v5.NewCLI[AppConfig]("myapp", "...", AppConfig{})
 scope := cli.Scope()
 
 // Register (lazy initialization)
-v4.Provide(scope, func(i do.Injector) (*Database, error) {
+v5.Provide(scope, func(i do.Injector) (*Database, error) {
     return &Database{DSN: "postgres://..."}, nil
 })
 
 // Invoke in handlers
-v4.NewCommand("query", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
-        db, _ := v4.Invoke[*Database](cli.Scope())
+v5.NewCommand("query", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
+        db, _ := v5.Invoke[*Database](cli.Scope())
         return db.Query(ctx)
     },
 )
@@ -278,8 +278,8 @@ type DBFlags struct {
     Password string `flag:"password" env:"DB_PASSWORD"                     help:"Database password"`
 }
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithEnvPrefix("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
+cli, _ := v5.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v5.WithEnvPrefix("MYAPP_"), // reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
 )
 ```
 
@@ -292,12 +292,12 @@ Priority chain: **explicit flag → env var → config file → default value**.
 ```go
 import "github.com/larsartmann/go-output"
 
-v4.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
-v4.OutputTable(output.FormatJSON, headers, rows)    // JSON array
-v4.OutputTable(output.FormatYAML, headers, rows)    // YAML
+v5.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
+v5.OutputTable(output.FormatJSON, headers, rows)    // JSON array
+v5.OutputTable(output.FormatYAML, headers, rows)    // YAML
 
 format, _ := output.ParseFormat("csv")
-v4.OutputTable(format, headers, rows)
+v5.OutputTable(format, headers, rows)
 ```
 
 All 16 formats: `table`, `json`, `csv`, `tsv`, `markdown`, `xml`, `yaml`, `html`, `d2`, `tree`, `mermaid`, `dot`, `jsonl`, `asciidoc`, `toml`, `plantuml`.
@@ -307,18 +307,18 @@ All 16 formats: `table`, `json`, `csv`, `tsv`, `markdown`, `xml`, `yaml`, `html`
 ## Subcommands
 
 ```go
-listCmd, _ := v4.NewCommand("list", v4.NoFlags{}, listHandler,
-    v4.WithShort("List users"),
+listCmd, _ := v5.NewCommand("list", v5.NoFlags{}, listHandler,
+    v5.WithShort("List users"),
 )
-createCmd, _ := v4.NewCommand("create", v4.NoFlags{}, createHandler,
-    v4.WithShort("Create a user"),
+createCmd, _ := v5.NewCommand("create", v5.NoFlags{}, createHandler,
+    v5.WithShort("Create a user"),
 )
-userCmd, _ := v4.NewParentCommand[AppConfig]("user",
-    "User management", v4.NoFlags{},
-    v4.WithSubcommands(listCmd, createCmd),
-    v4.WithShort("User management"),
+userCmd, _ := v5.NewParentCommand[AppConfig]("user",
+    "User management", v5.NoFlags{},
+    v5.WithSubcommands(listCmd, createCmd),
+    v5.WithShort("User management"),
 )
-v4.AddCommand(cli, userCmd)
+v5.AddCommand(cli, userCmd)
 ```
 
 ---
@@ -326,11 +326,11 @@ v4.AddCommand(cli, userCmd)
 ## Lifecycle Hooks
 
 ```go
-v4.NewCommand("deploy", &Flags{}, runHandler,
-    v4.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+v5.NewCommand("deploy", &Flags{}, runHandler,
+    v5.WithPreRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return validateConfig(flags)
     }),
-    v4.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
+    v5.WithPostRunE[AppConfig, *Flags](func(ctx context.Context, cfg *AppConfig, flags *Flags) error {
         return cleanup()
     }),
 )
@@ -355,14 +355,14 @@ cli.RootCommand().AddCommand(myRawCmd)
 
 // 2. Access resolved config from any cobra command context
 func(cmd *cobra.Command, _ []string) error {
-    cfg, ok := v4.ConfigFromContext[AppConfig](cmd.Context())
+    cfg, ok := v5.ConfigFromContext[AppConfig](cmd.Context())
     if !ok { return errors.New("config not initialized") }
     // use cfg.Field...
 }
 
 // 3. Run initialization (DI, logging, session) after flag parsing
-cli, _ := v4.NewCLI[AppConfig]("app", "...", AppConfig{},
-    v4.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
+cli, _ := v5.NewCLI[AppConfig]("app", "...", AppConfig{},
+    v5.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
         // Flags are parsed, config is resolved, context is stored.
         // Initialize DI, set up logging, store session for subcommands.
         return initDI(cfg)
@@ -392,9 +392,9 @@ that need the root's execution-flag group.
 Add your own with `RegisterTypeHandler()`:
 
 ```go
-v4.RegisterTypeHandler(reflect.TypeFor[MyType](), v4.TypeHandlerFunc{
-    ParseFunc:    func(value string, _ v4.FlagTag) (any, error) { return MyType{Value: value}, nil },
-    DefaultFunc:  func(_ v4.FlagTag) any { return MyType{} },
+v5.RegisterTypeHandler(reflect.TypeFor[MyType](), v5.TypeHandlerFunc{
+    ParseFunc:    func(value string, _ v5.FlagTag) (any, error) { return MyType{Value: value}, nil },
+    DefaultFunc:  func(_ v5.FlagTag) any { return MyType{} },
 })
 ```
 
@@ -457,15 +457,15 @@ type Flags struct {
 ## CLI Options
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v4.WithCLIVersion("1.0.0"),
-    v4.WithEnvPrefix("MYAPP_"),
-    v4.WithSignalHandling(),
-    v4.WithFang(true),                  // Styled help output
-    v4.WithMiddleware[AppConfig](myMiddleware),     // Wrap all handlers
-    v4.WithStrictValidation(),           // Require WithShort on commands
-    v4.WithConfigValidation[AppConfig](validateFn), // Validate config after parsing
-    v4.WithPostFlagParse[AppConfig](initFn),        // DI init / session storage after flags
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v5.WithCLIVersion("1.0.0"),
+    v5.WithEnvPrefix("MYAPP_"),
+    v5.WithSignalHandling(),
+    v5.WithFang(true),                  // Styled help output
+    v5.WithMiddleware[AppConfig](myMiddleware),     // Wrap all handlers
+    v5.WithStrictValidation(),           // Require WithShort on commands
+    v5.WithConfigValidation[AppConfig](validateFn), // Validate config after parsing
+    v5.WithPostFlagParse[AppConfig](initFn),        // DI init / session storage after flags
 )
 ```
 
@@ -498,22 +498,22 @@ cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 
 ```go
 // All v4 functions return errors — zero panics in library code
-cli, err := v4.NewCLI[Config]("app", "...", Config{})
-cmd, err := v4.NewCommand("test", NoFlags{}, handler)
+cli, err := v5.NewCLI[Config]("app", "...", Config{})
+cmd, err := v5.NewCommand("test", NoFlags{}, handler)
 
 // Sentinel errors for errors.Is()
-errors.Is(err, v4.ErrInvalidCommand)
-errors.Is(err, v4.ErrMissingHandler)
-errors.Is(err, v4.ErrDuplicateCommand)
+errors.Is(err, v5.ErrInvalidCommand)
+errors.Is(err, v5.ErrMissingHandler)
+errors.Is(err, v5.ErrDuplicateCommand)
 
 // Rich error types with context
-v4.NewCommandError(name, err)
-v4.NewFlagError(name, err)
-v4.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
-v4.NewExitError(code, err)                            // custom exit code
+v5.NewCommandError(name, err)
+v5.NewFlagError(name, err)
+v5.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
+v5.NewExitError(code, err)                            // custom exit code
 
 // ExitCoder interface — check with errors.As
-var exitCoder v4.ExitCoder
+var exitCoder v5.ExitCoder
 errors.As(err, &exitCoder)
 exitCoder.ExitCode() // returns custom exit code
 ```
@@ -525,8 +525,8 @@ exitCoder.ExitCode() // returns custom exit code
 `WithConfigFile` auto-detects JSON, YAML, and TOML by file extension. No extra imports needed.
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithConfigFile("~/.config/myapp/config.yaml", "/etc/myapp/config.json"),
+cli, _ := v5.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v5.WithConfigFile("~/.config/myapp/config.yaml", "/etc/myapp/config.json"),
 )
 ```
 
@@ -557,9 +557,9 @@ import (
     "github.com/larsartmann/cmdguard/telemetry"
 )
 
-cli, _ := v4.NewCLI[Config]("app", "...", Config{},
+cli, _ := v5.NewCLI[Config]("app", "...", Config{},
     telemetry.WithTelemetry[Config](tracer),
-    v4.WithMiddleware[Config](spinner.Middleware[Config]("Working...")),
+    v5.WithMiddleware[Config](spinner.Middleware[Config]("Working...")),
     flightrecorder.WithFlightRecorder[Config](flightrecorder.Config{
         CaptureOnSlow:  true,
         SlowThreshold:  200 * time.Millisecond,
@@ -576,7 +576,7 @@ Track the command execution path and share values across the hierarchy:
 
 ```go
 func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-    bfc, ok := v4.GetBranchingFlowContext(ctx)
+    bfc, ok := v5.GetBranchingFlowContext(ctx)
     if ok {
         fmt.Println("Path:", bfc.PathString()) // "myapp.resource.list"
         bfc.SetValue("key", "value")              // propagates to children
@@ -601,9 +601,9 @@ if cli.NoColor() {
 ```
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithFang(true),   // styled help (default)
-    v4.WithFang(false),  // plain text help
+cli, _ := v5.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v5.WithFang(true),   // styled help (default)
+    v5.WithFang(false),  // plain text help
 )
 ```
 
@@ -612,15 +612,15 @@ cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
 ## Version Command
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithCLIVersion("1.0.0"),
+cli, _ := v5.NewCLI[AppConfig]("myapp", "...", AppConfig{},
+    v5.WithCLIVersion("1.0.0"),
 )
 
-versionCmd, err := v4.VersionCommand[AppConfig](cli)
+versionCmd, err := v5.VersionCommand[AppConfig](cli)
 if err != nil {
     log.Fatal(err)
 }
-v4.AddCommand(cli, versionCmd)
+v5.AddCommand(cli, versionCmd)
 // $ myapp version
 ```
 
@@ -631,10 +631,10 @@ v4.AddCommand(cli, versionCmd)
 The `testutil` package provides panic and assertion helpers for testing cmdguard CLIs:
 
 ```go
-import "github.com/larsartmann/cmdguard/v4/pkg/testutil"
+import "github.com/larsartmann/cmdguard/v5/pkg/testutil"
 
 testutil.AssertNoError(t, err)
-testutil.AssertErrorIs(t, err, v4.ErrInvalidCommand)
+testutil.AssertErrorIs(t, err, v5.ErrInvalidCommand)
 testutil.AssertPanics(t, func() { /* ... */ })
 ```
 
@@ -684,7 +684,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 - [Error Handling](https://cmdguard.lars.software/guides/error-handling/) — Zero panics, exit codes, sentinel errors
 - [Audit Log](https://cmdguard.lars.software/guides/audit-log/) — DI audit trail in 11 export formats
 - [Migrating from Cobra](https://cmdguard.lars.software/guides/migrating-from-cobra/) — Step-by-step guide
-- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) — Full API on pkg.go.dev
+- [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5) — Full API on pkg.go.dev
 
 Local docs: [Tutorial](docs/TUTORIAL.md), [Quick Start](docs/QUICKSTART.md), [Framework Comparison](docs/COMPARISON.md), [Performance](docs/PERFORMANCE.md), [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md), [Domain Language](docs/DOMAIN_LANGUAGE.md), [Error Reference](docs/ERROR_REFERENCE.md).
 

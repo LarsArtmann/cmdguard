@@ -25,7 +25,7 @@ Create a new Go module:
 ```bash
 mkdir taskctl && cd taskctl
 go mod init taskctl
-go get github.com/larsartmann/cmdguard/v4
+go get github.com/larsartmann/cmdguard/v5
 ```
 
 Create `main.go`:
@@ -38,7 +38,7 @@ import (
     "fmt"
     "os"
 
-    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type AppConfig struct {
@@ -46,7 +46,7 @@ type AppConfig struct {
 }
 
 func main() {
-    cli, err := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
+    cli, err := v5.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
@@ -79,19 +79,19 @@ type AddFlags struct {
     Priority string `flag:"priority" short:"p" default:"medium" help:"low, medium, or high"`
 }
 
-addCmd, err := v4.NewCommand("add", &AddFlags{},
+addCmd, err := v5.NewCommand("add", &AddFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
         fmt.Printf("Adding task: %s [%s]\n", flags.Title, flags.Priority)
         return nil
     },
-    v4.WithShort("Add a new task"),
+    v5.WithShort("Add a new task"),
 )
 if err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
 }
 
-if err := v4.AddCommand(cli, addCmd); err != nil {
+if err := v5.AddCommand(cli, addCmd); err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
 }
@@ -127,9 +127,9 @@ type TaskStore struct {
     tasks []string
 }
 
-cli, _ := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
+cli, _ := v5.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{})
 
-v4.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
+v5.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
     fmt.Println("[store] initialized")
     return &TaskStore{tasks: []string{}}, nil
 })
@@ -138,9 +138,9 @@ v4.Provide(cli.Scope(), func(i do.Injector) (*TaskStore, error) {
 Now commands can access the store:
 
 ```go
-addCmd, _ := v4.NewCommand("add", &AddFlags{},
+addCmd, _ := v5.NewCommand("add", &AddFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
-        store, err := v4.Invoke[*TaskStore](cli.Scope())
+        store, err := v5.Invoke[*TaskStore](cli.Scope())
         if err != nil {
             return err
         }
@@ -148,7 +148,7 @@ addCmd, _ := v4.NewCommand("add", &AddFlags{},
         fmt.Printf("Added task #%d: %s\n", len(store.tasks), flags.Title)
         return nil
     },
-    v4.WithShort("Add a new task"),
+    v5.WithShort("Add a new task"),
 )
 ```
 
@@ -163,9 +163,9 @@ type ListFlags struct {
     Format string `flag:"format" short:"f" default:"table" help:"Output format (table, json, csv, yaml)"`
 }
 
-listCmd, _ := v4.NewCommand("list", &ListFlags{},
+listCmd, _ := v5.NewCommand("list", &ListFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *ListFlags) error {
-        store, _ := v4.Invoke[*TaskStore](cli.Scope())
+        store, _ := v5.Invoke[*TaskStore](cli.Scope())
 
         if len(store.tasks) == 0 {
             fmt.Println("No tasks found.")
@@ -180,9 +180,9 @@ listCmd, _ := v4.NewCommand("list", &ListFlags{},
             rows[i] = []string{fmt.Sprintf("%d", i+1), t}
         }
 
-        return v4.OutputTable(format, headers, rows)
+        return v5.OutputTable(format, headers, rows)
     },
-    v4.WithShort("List all tasks"),
+    v5.WithShort("List all tasks"),
 )
 ```
 
@@ -203,10 +203,10 @@ go run main.go list --format yaml  # YAML
 Validate input before the handler runs:
 
 ```go
-addCmd, _ := v4.NewCommand("add", &AddFlags{},
+addCmd, _ := v5.NewCommand("add", &AddFlags{},
     addHandler,
-    v4.WithShort("Add a new task"),
-    v4.WithPreRunE[AppConfig, *AddFlags](
+    v5.WithShort("Add a new task"),
+    v5.WithPreRunE[AppConfig, *AddFlags](
         func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
             if len(flags.Title) < 3 {
                 return fmt.Errorf("title must be at least 3 characters")
@@ -234,7 +234,7 @@ Note: `WithPreRunE` and `WithPostRunE` are generic functions that return a non-g
 ## Step 6: Add Cleanup with PostRunE
 
 ```go
-v4.WithPostRunE[AppConfig, *AddFlags](
+v5.WithPostRunE[AppConfig, *AddFlags](
     func(ctx context.Context, cfg *AppConfig, flags *AddFlags) error {
         fmt.Println("[cleanup] flushing to disk")
         return nil
@@ -250,12 +250,12 @@ v4.WithPostRunE[AppConfig, *AddFlags](
 Middleware wraps every command handler:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
-    v4.WithMiddleware[AppConfig](
-        v4.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+cli, _ := v5.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
+    v5.WithMiddleware[AppConfig](
+        v5.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
             fmt.Fprintf(os.Stderr, "[timing] %s took %v (err=%v)\n", name, d, err)
         }),
-        v4.RecoveryMiddleware[AppConfig](),
+        v5.RecoveryMiddleware[AppConfig](),
     ),
 )
 ```
@@ -267,8 +267,8 @@ Now every command is timed and panic-safe.
 ## Step 8: Add Signal Handling
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
-    v4.WithSignalHandling(),
+cli, _ := v5.NewCLI[AppConfig]("taskctl", "A task manager CLI", AppConfig{},
+    v5.WithSignalHandling(),
 )
 ```
 
@@ -302,8 +302,8 @@ type AppConfig struct {
 Or use `WithEnvPrefix` to prefix all env lookups:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
-    v4.WithEnvPrefix("TASKCTL_"),
+cli, _ := v5.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
+    v5.WithEnvPrefix("TASKCTL_"),
 )
 ```
 
@@ -316,13 +316,13 @@ Priority chain: **explicit flag → env var → default value**.
 Return typed errors with exit codes for CI/automation:
 
 ```go
-doneCmd, _ := v4.NewCommand("done", &DoneFlags{},
+doneCmd, _ := v5.NewCommand("done", &DoneFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *DoneFlags) error {
         // task not found? Exit with code 2
-        exitErr, _ := v4.NewExitError(2, fmt.Errorf("task %d not found", flags.ID))
+        exitErr, _ := v5.NewExitError(2, fmt.Errorf("task %d not found", flags.ID))
         return exitErr
     },
-    v4.WithShort("Mark a task as done"),
+    v5.WithShort("Mark a task as done"),
 )
 ```
 
@@ -336,8 +336,8 @@ When a value surprises you at runtime, `config explain` tells you which layer
 won. Opt in when building the CLI:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
-    v4.WithConfigExplainCommand(),
+cli, _ := v5.NewCLI[AppConfig]("taskctl", "...", AppConfig{},
+    v5.WithConfigExplainCommand(),
 )
 ```
 
@@ -350,14 +350,14 @@ log-level   flag       debug    info     TASKCTL_LOG_LEVEL
 
 Sources, in precedence order: `flag`, `environment`, `config-file`, `default`,
 `unset`. For machine consumption, build the CLI with
-`v4.WithOutputFormat(output.FormatJSON)` (importing
+`v5.WithOutputFormat(output.FormatJSON)` (importing
 `github.com/larsartmann/go-output`) and the same command emits the versioned
 JSON contract instead. Fields tagged `secret:"true"` (API keys, tokens,
 passwords) are redacted to `***` in every view while still reporting their
 source, so you can audit provenance without leaking credentials.
 
 `app doctor` pairs with this: it reports config file problems (missing file,
-parse failure, unknown keys when strict checking is on) alongside DI health.
+parse failure, unknown keys, which fail the load by default in v5) alongside DI health.
 
 ---
 
@@ -369,7 +369,7 @@ See [`examples/taskctl/`](../examples/taskctl/) for a fully working production-g
 
 ## Next Steps
 
-- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) for the full API
+- Read the [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5) for the full API
 - See the [Quick Start Guide](QUICKSTART.md) for a complete feature tour
 - Check [MIGRATION_FROM_COBRA.md](MIGRATION_FROM_COBRA.md) if you're migrating an existing Cobra app
 - Browse [examples/](../examples/) for more working demos

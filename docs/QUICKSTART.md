@@ -9,7 +9,7 @@ cmdguard is a Go library for building validated CLI applications with type-safe 
 ## Installation
 
 ```bash
-go get github.com/larsartmann/cmdguard/v4
+go get github.com/larsartmann/cmdguard/v5
 ```
 
 ---
@@ -26,31 +26,31 @@ import (
     "fmt"
     "os"
 
-    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type AppConfig struct{}
 
 func main() {
-    cli, err := v4.NewCLI[AppConfig]("hello", "A simple CLI", AppConfig{})
+    cli, err := v5.NewCLI[AppConfig]("hello", "A simple CLI", AppConfig{})
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
 
-    cmd, err := v4.NewCommand("greet", v4.NoFlags{},
-        func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+    cmd, err := v5.NewCommand("greet", v5.NoFlags{},
+        func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
             fmt.Println("Hello, World!")
             return nil
         },
-        v4.WithShort("Greet someone"),
+        v5.WithShort("Greet someone"),
     )
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
 
-    if err := v4.AddCommand(cli, cmd); err != nil {
+    if err := v5.AddCommand(cli, cmd); err != nil {
         fmt.Fprintf(os.Stderr, "Error: %v\n", err)
         os.Exit(1)
     }
@@ -85,7 +85,7 @@ type GreetFlags struct {
 ### 2. Use in Command
 
 ```go
-cmd, err := v4.NewCommand("greet", &GreetFlags{},
+cmd, err := v5.NewCommand("greet", &GreetFlags{},
     func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
         msg := fmt.Sprintf("Hello, %s!", flags.Name)
         if flags.Shout {
@@ -94,9 +94,9 @@ cmd, err := v4.NewCommand("greet", &GreetFlags{},
         fmt.Println(msg)
         return nil
     },
-    v4.WithShort("Greet someone"),
+    v5.WithShort("Greet someone"),
 )
-v4.AddCommand(cli, cmd)
+v5.AddCommand(cli, cmd)
 ```
 
 ### 3. Run It
@@ -117,27 +117,27 @@ go run main.go greet --help
 ## Subcommands (1 minute)
 
 ```go
-migrateCmd, _ := v4.NewCommand("migrate", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+migrateCmd, _ := v5.NewCommand("migrate", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
         fmt.Println("Running migrations...")
         return nil
     },
-    v4.WithShort("Run migrations"),
+    v5.WithShort("Run migrations"),
 )
 
-rollbackCmd, _ := v4.NewCommand("rollback", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
+rollbackCmd, _ := v5.NewCommand("rollback", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
         fmt.Println("Rolling back...")
         return nil
     },
-    v4.WithShort("Rollback last migration"),
+    v5.WithShort("Rollback last migration"),
 )
 
-dbCmd, _ := v4.NewParentCommand[AppConfig]("db", "Database operations", v4.NoFlags{},
-    v4.WithSubcommands(migrateCmd, rollbackCmd),
-    v4.WithShort("Database operations"),
+dbCmd, _ := v5.NewParentCommand[AppConfig]("db", "Database operations", v5.NoFlags{},
+    v5.WithSubcommands(migrateCmd, rollbackCmd),
+    v5.WithShort("Database operations"),
 )
-v4.AddCommand(cli, dbCmd)
+v5.AddCommand(cli, dbCmd)
 ```
 
 ```bash
@@ -164,8 +164,8 @@ Priority: explicit flag > env var > default.
 Add a prefix with `WithEnvPrefix`:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v4.WithEnvPrefix("MYAPP_"),
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v5.WithEnvPrefix("MYAPP_"),
 )
 // Now reads MYAPP_DB_HOST, MYAPP_DB_PORT, etc.
 ```
@@ -195,40 +195,113 @@ myapp run -vvv     # Verbose = 3
 ### 1. Register Services
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
 
-v4.ProvideValue(cli.Scope(), &Logger{Level: "info"})
+v5.ProvideValue(cli.Scope(), &Logger{Level: "info"})
 ```
 
 ### 2. Use in Handler
 
 ```go
-cmd, _ := v4.NewCommand("log", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
-        logger, err := v4.Invoke[*Logger](cli.Scope())
+cmd, _ := v5.NewCommand("log", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
+        logger, err := v5.Invoke[*Logger](cli.Scope())
         if err != nil {
             return err
         }
         logger.Log("Hello from DI!")
         return nil
     },
-    v4.WithShort("Log a message"),
+    v5.WithShort("Log a message"),
 )
-v4.AddCommand(cli, cmd)
+v5.AddCommand(cli, cmd)
 ```
 
 ---
 
-## Signal Handling
+## Signal Handling and Graceful Shutdown
 
-One-line opt-in for graceful shutdown:
+On by default in v5: SIGINT/SIGTERM cancel the context in handlers, and DI
+services implementing `do.ShutdownerWithError` shut down in reverse creation
+order. Ctrl+C just works:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v4.WithSignalHandling(),
-)
-// Ctrl+C cancels the context in handlers
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+// Ctrl+C cancels the context in handlers and shuts down DI services
 ```
+
+Opt out with `WithoutSignalHandling()` (drops both) or
+`WithoutGracefulShutdown()` (keeps cancellation, skips DI teardown). A
+normally completing run never tears down the scope, so repeated
+`ExecuteWithArgs` is safe.
+
+---
+
+## Batteries: The Production Defaults
+
+v5 ships opinionated defaults — no configuration needed for a serious CLI:
+
+| Default | What you get | Opt-out |
+| ------- | ------------ | ------- |
+| Strict validation | every command needs `WithShort` | `WithoutStrictValidation()` |
+| Signals + graceful shutdown | Ctrl+C handled, DI shut down | `WithoutSignalHandling()` |
+| Strict config keys | config typos fail loudly | `WithoutStrictConfigKeys()` |
+| Error hints | a `Hint:` line under every known error | `WithoutErrorHints()` |
+| `doctor` command | DI health + config diagnostics | `WithoutBatteries()` |
+| `version` command | when `WithCLIVersion` is set | consumer command wins |
+
+```go
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v5.WithCLIVersion("1.0.0"),
+)
+// app doctor   → health report
+// app version  → version output
+```
+
+---
+
+## The describe Contract and Error Hints
+
+Every v5 CLI exposes a machine-readable contract of its full command tree:
+
+```bash
+myapp describe   # JSON: commands, flags, env vars, defaults, required, hints
+```
+
+Agents and scripts use it to discover the CLI without reading help text. A
+consumer-defined `describe` command wins; `WithoutDescribeCommand()` opts
+out (`CLI.Describe()` always works).
+
+Known errors carry one actionable hint, printed under the message and
+emitted as `hint` in the JSON error envelope:
+
+```
+error: required flag not set
+Hint: pass the flag on the command line, or set its env var or config-file value
+```
+
+---
+
+## Runtime Tag Enforcement
+
+`required`, `values`, and `validate` tags are enforced after parsing — at
+run time, not just construction:
+
+```go
+type DeployFlags struct {
+	Env  string `flag:"env" required:"true"        help:"Target environment"`
+	Mode string `flag:"mode" values:"debug,release" help:"Build mode"`
+	Age  int    `flag:"age"  min:"1" max:"120"        help:"Age"`
+}
+```
+
+- `required` — satisfied by the flag OR its env var; missing fails with a hint
+- `values` — the value must be one of the listed options
+- `min`/`max` — numeric bounds (length bounds on strings)
+
+Invalid defaults fail at construction; invalid env/config values fail before
+the handler runs. Introspection commands (`describe`, `version`, `doctor`,
+`help`) skip required enforcement so discovery always works.
 
 ---
 
@@ -243,7 +316,7 @@ format := output.FormatJSON
 // Render table data
 headers := []string{"Name", "Age"}
 rows := [][]string{{"Alice", "30"}, {"Bob", "25"}}
-v4.OutputTable(format, headers, rows)
+v5.OutputTable(format, headers, rows)
 ```
 
 Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, mermaid, dot, jsonl, asciidoc, toml, plantuml.
@@ -253,9 +326,8 @@ Supported formats: table, json, csv, tsv, markdown, xml, d2, yaml, html, tree, m
 ## Config Files and Strict Keys
 
 ```go
-cli, err := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
-    v4.WithConfigFile("myapp.yaml", "$HOME/.config/myapp.yaml"),
-    v4.WithStrictConfigKeys(), // also enabled by v4.WithBatteries()
+cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v5.WithConfigFile("myapp.yaml", "$HOME/.config/myapp.yaml"),
 )
 ```
 
@@ -264,11 +336,12 @@ field name (`LogLevel`), the flag name (`log-level`), and case/hyphen/underscore
 variants (`loglevel`, `log_level`). Nested keys are dotted (`database.host`);
 arrays are indexed (`servers[0].port`).
 
-Unknown keys are silently ignored by default. Turn strict checking on to catch
-typos instead:
+Unknown keys **fail the load by default** (strict config keys) — a typo is
+caught at startup, not silently ignored. To accept unknown keys (a config
+file shared with other tools, for example):
 
 ```go
-v4.WithStrictConfigKeys(), // also enabled by v4.WithBatteries()
+v5.WithoutStrictConfigKeys(),
 ```
 
 A typo now fails with the key, the file path, and a suggestion:
@@ -290,15 +363,15 @@ All commands are created via constructors, not struct literals:
 
 ```go
 // Leaf command — flags passed positionally, options are non-generic
-cmd, err := v4.NewCommand("name", &Flags{}, handler, opts...)
+cmd, err := v5.NewCommand("name", &Flags{}, handler, opts...)
 
 // Parent command — subcommands added via WithSubcommands option
-parent, err := v4.NewParentCommand[T]("name", "long desc", v4.NoFlags{},
-    v4.WithSubcommands(childCmd1, childCmd2),
+parent, err := v5.NewParentCommand[T]("name", "long desc", v5.NoFlags{},
+    v5.WithSubcommands(childCmd1, childCmd2),
 )
 
 // Add to CLI
-v4.AddCommand(cli, cmd)
+v5.AddCommand(cli, cmd)
 ```
 
 ### Type Parameters
@@ -306,18 +379,18 @@ v4.AddCommand(cli, cmd)
 | Parameter | Description     | Example                     |
 | --------- | --------------- | --------------------------- |
 | `T`       | App config type | `AppConfig`                 |
-| `F`       | Flags type      | `*GreetFlags`, `v4.NoFlags` |
+| `F`       | Flags type      | `*GreetFlags`, `v5.NoFlags` |
 
 Type parameters are inferred from the flags argument — you rarely need to specify them explicitly.
 
 ### NoFlags
 
-Use `v4.NoFlags` for commands without flags:
+Use `v5.NoFlags` for commands without flags:
 
 ```go
-cmd, _ := v4.NewCommand("version", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
-        fmt.Println("v4.0.0")
+cmd, _ := v5.NewCommand("version", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
+        fmt.Println("v5.0.0")
         return nil
     },
 )
@@ -328,7 +401,7 @@ cmd, _ := v4.NewCommand("version", v4.NoFlags{},
 All functions return errors — no panics in library code:
 
 ```go
-cli, err := v4.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
+cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{})
 if err != nil {
     return err
 }
