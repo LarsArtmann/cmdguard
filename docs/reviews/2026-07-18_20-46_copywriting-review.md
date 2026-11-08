@@ -112,19 +112,21 @@ Score: **8.5/10**. Would be 9.5 with the two changes below.
 
 | # | Finding                                | Impact | Effort | Recommendation                              |
 | - | -------------------------------------- | ------ | ------ | ------------------------------------------- |
-| 1 | Hero subtitle → outcome-led (Option C) | High   | XS     | **Apply**                                   |
-| 2 | Add one-line CTA after tagline         | High   | XS     | **Apply**                                   |
-| 3 | "Trinity" framing                      | —      | —      | Keep                                        |
-| 4 | Comparison table sources for "Some"    | Med    | S      | Optional                                    |
-| 5 | Website hero code trim/highlight       | Med    | M      | Optional (frontend-design review owns this) |
-| 6 | Feature card descriptions              | —      | —      | Keep                                        |
-| 7 | "Zero panics" evidence                 | —      | —      | Keep                                        |
+| ~~1~~ | ~~Hero subtitle → outcome-led (Option C)~~ done at `Option C subtitle applied (README.md:15)` | ~~High~~ | ~~XS~~ | ~~**Apply**~~ |
+| ~~2~~ | ~~Add one-line CTA after tagline~~ done at `one-line CTA applied (README.md:19)` | ~~High~~ | ~~XS~~ | ~~**Apply**~~ |
+| ~~3~~ | ~~"Trinity" framing~~ **NOT-DO — review verdict keep — trinity framing still in README.md:29.** | ~~—~~ | ~~—~~ | ~~Keep~~ |
+| ~~4~~ | ~~Comparison table sources for "Some"~~ done at `Kong footnote applied (README.md:43)` | ~~Med~~ | ~~S~~ | ~~Optional~~ |
+| ~~5~~ | ~~Website hero code trim/highlight~~ done at `hero-code.ts trimmed to 23 lines` | ~~Med~~ | ~~M~~ | ~~Optional (frontend-design review owns this)~~ |
+| ~~6~~ | ~~Feature card descriptions~~ **NOT-DO — review verdict keep — no change needed.** | ~~—~~ | ~~—~~ | ~~Keep~~ |
+| ~~7~~ | ~~"Zero panics" evidence~~ **NOT-DO — review verdict keep — zero-panic claim still holds (no func Must in v4).** | ~~—~~ | ~~—~~ | ~~Keep~~ |
 
 **If only 2 changes are made:** #1 and #2. They are ~2 lines of README diff with outsized first-impression impact.
 
 ---
 
 ## Voice and tone assessment
+
+<!-- check-rows:ledger -->
 
 | Dimension           | Current state                                                   | Verdict                                 |
 | ------------------- | --------------------------------------------------------------- | --------------------------------------- |

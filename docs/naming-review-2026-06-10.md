@@ -13,22 +13,22 @@
 
 | # | File              | Line | Identifier         | Issue                                              | Better Name              |
 | - | ----------------- | ---- | ------------------ | -------------------------------------------------- | ------------------------ |
-| 1 | errors.go         | 192  | `labeledError()`   | Not an error, formatting helper                    | `formatLabeledMessage()` |
-| 2 | config_parsing.go | N/A  | `parseFieldFlag()` | Ambiguous: parses flag on field or field for flag? | `parseFlagTag()`         |
-| 3 | flag_helpers.go   | 39   | Giant `case` block | Enumerates all Kinds when `default` suffices       | Remove explicit listing  |
+| ~~1~~ | ~~errors.go~~ **Won't implement — name kept — labeledError survives unchanged (errors.go:65).** | ~~192~~ | ~~`labeledError()`~~ | ~~Not an error, formatting helper~~ | ~~`formatLabeledMessage()`~~ |
+| ~~2~~ | ~~config_parsing.go~~ **Won't implement — name kept — parseFieldFlag survives unchanged (config_parsing.go:124).** | ~~N/A~~ | ~~`parseFieldFlag()`~~ | ~~Ambiguous: parses flag on field or field for flag?~~ | ~~`parseFlagTag()`~~ |
+| ~~3~~ | ~~flag_helpers.go~~ **Won't implement — case listing still present in flag_helpers.go.** | ~~39~~ | ~~Giant `case` block~~ | ~~Enumerates all Kinds when `default` suffices~~ | ~~Remove explicit listing~~ |
 
 ## Domain Alignment Issues
 
 | # | Files                             | Concept                       | Current Names                                 | Canonical Name                          |
 | - | --------------------------------- | ----------------------------- | --------------------------------------------- | --------------------------------------- |
-| 1 | flags_validate.go, config_file.go | Convert field value to string | `formatFieldValue`, `fieldValueToString`      | `formatFieldValue` (one canonical impl) |
-| 2 | command.go, cli_command.go        | Does command have a handler?  | `HasHandler()`, `IsExecutable()` (deprecated) | `HasHandler()` — already canonical      |
+| ~~1~~ | ~~flags_validate.go, config_file.go~~ **Won't implement — never unified — fieldValueToString (config_file.go:123) + formatFieldValue both survive.** | ~~Convert field value to string~~ | ~~`formatFieldValue`, `fieldValueToString`~~ | ~~`formatFieldValue` (one canonical impl)~~ |
+| ~~2~~ | ~~command.go, cli_command.go~~ done at `IsExecutable removed in v2.6.0 (CHANGELOG); HasHandler canonical (command.go:174)` | ~~Does command have a handler?~~ | ~~`HasHandler()`, `IsExecutable()` (deprecated)~~ | ~~`HasHandler()` — already canonical~~ |
 
 ## Consistency Issues
 
 | # | Operation        | Files                                    | Current Verbs                                       | Standardize To                                                                |
 | - | ---------------- | ---------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------- |
-| 1 | Get flow context | flow_context_access.go, cli_accessors.go | `GetBranchingFlowContext(ctx)`, `cli.FlowContext()` | Document that `FlowContext()` returns nil before Execute; `Get*` from context |
+| ~~1~~ | ~~Get flow context~~ done — both accessors documented (flow_context_access.go:33) | ~~flow_context_access.go, cli_accessors.go~~ | ~~`GetBranchingFlowContext(ctx)`, `cli.FlowContext()`~~ | ~~Document that `FlowContext()` returns nil before Execute; `Get*` from context~~ |
 
 ## Strengths (Good Naming)
 

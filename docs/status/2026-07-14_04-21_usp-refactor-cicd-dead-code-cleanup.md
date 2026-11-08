@@ -152,17 +152,17 @@
 
 ### Architecture & Type Model
 
-1. **Website data model is anemic** — `ComparisonRow` could use a `Support` enum (`full` | `partial` | `none`) instead of free-text strings, enabling icon/styling per cell
-2. **`sections.ts` mixes concerns** — comparison data and use-case data in one file; should be `comparisons.ts` + `usecases.ts`
-3. **No shared `Framework` type** — framework names ("Cobra", "Kong", etc.) are repeated as column headers; a `Framework` type with display name + URL would enable linking to each framework
-4. **Hero code is hardcoded HTML string** — could use a syntax highlighter library (Shiki, Starlight already bundles it) instead of manual `<span>` wrapping
+1. **Website data model is anemic** — `ComparisonRow` could use a `Support` enum (`full` | `partial` | `none`) instead of free-text strings, enabling icon/styling per cell **→ ROADMAP raw ideas (launch marketing & infra)**
+2. **`sections.ts` mixes concerns** — comparison data and use-case data in one file; should be `comparisons.ts` + `usecases.ts` **→ ROADMAP raw ideas (launch marketing & infra)**
+3. **No shared `Framework` type** — framework names ("Cobra", "Kong", etc.) are repeated as column headers; a `Framework` type with display name + URL would enable linking to each framework **→ ROADMAP raw ideas (launch marketing & infra)**
+4. **Hero code is hardcoded HTML string** — could use a syntax highlighter library (Shiki, Starlight already bundles it) instead of manual `<span>` wrapping **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Process
 
-5. **Always `astro preview` before `firebase deploy`** — should be wired into the flake deploy app
-6. **Never copy-paste JS files** — the animations.js disaster was preventable by reading the source before writing
-7. **Lighthouse baseline** — should establish performance scores before iterating on design
-8. **Firebase preview channel** — deploy to a staging channel before production
+5. ~~**Always `astro preview` before `firebase deploy`** — should be wired into the flake deploy app~~ done (docs-health pass 2026-11-08)
+6. ~~**Never copy-paste JS files** — the animations.js disaster was preventable by reading the source before writing~~ done (docs-health pass 2026-11-08)
+7. **Lighthouse baseline** — should establish performance scores before iterating on design **→ ROADMAP raw ideas (launch marketing & infra)**
+8. **Firebase preview channel** — deploy to a staging channel before production **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ---
 
@@ -170,75 +170,75 @@
 
 ### Immediate Blockers (User Actions)
 
-1. **Apply Terraform DNS** — `cd domains && terraform apply` from whitelisted IP
-2. **Add `FIREBASE_SERVICE_ACCOUNT` secret** — GCP service account JSON with Firebase Hosting admin on `lars-software`
-3. **Connect custom domain in Firebase** — add `cmdguard.lars.software` to `cmdguard` hosting site
-4. **Verify SSL** — confirm `https://cmdguard.lars.software` works after DNS + custom domain
-5. **Verify website CI passes** — push to trigger `website.yml` build job
+1. **Apply Terraform DNS** — `cd domains && terraform apply` from whitelisted IP **→ ROADMAP raw ideas (launch marketing & infra)**
+2. **Add `FIREBASE_SERVICE_ACCOUNT` secret** — GCP service account JSON with Firebase Hosting admin on `lars-software` **→ ROADMAP raw ideas (launch marketing & infra)**
+3. **Connect custom domain in Firebase** — add `cmdguard.lars.software` to `cmdguard` hosting site **→ ROADMAP raw ideas (launch marketing & infra)**
+4. **Verify SSL** — confirm `https://cmdguard.lars.software` works after DNS + custom domain **→ ROADMAP raw ideas (launch marketing & infra)**
+5. ~~**Verify website CI passes** — push to trigger `website.yml` build job~~ done — website.yml CI runs — Website badge live (README.md:6)
 
 ### Type Model & Architecture (This Repo)
 
-6. **Add `Support` enum to `ComparisonRow`** — `full | partial | none | diy` instead of free-text
-7. **Split `sections.ts`** into `comparisons.ts` + `usecases.ts`
-8. **Add `Framework` type** with display name + URL for linking from comparison table
-9. **Use Shiki for hero code highlighting** — Starlight already bundles it, no manual `<span>` needed
-10. **Add `LandingPageData` aggregate type** — bundle config + features + comparisons + usecases into one import
+6. **Add `Support` enum to `ComparisonRow`** — `full | partial | none | diy` instead of free-text **→ ROADMAP raw ideas (launch marketing & infra)**
+7. **Split `sections.ts`** into `comparisons.ts` + `usecases.ts` **→ ROADMAP raw ideas (launch marketing & infra)**
+8. **Add `Framework` type** with display name + URL for linking from comparison table **→ ROADMAP raw ideas (launch marketing & infra)**
+9. **Use Shiki for hero code highlighting** — Starlight already bundles it, no manual `<span>` needed **→ ROADMAP raw ideas (launch marketing & infra)**
+10. **Add `LandingPageData` aggregate type** — bundle config + features + comparisons + usecases into one import **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Website Content Depth
 
-11. **Add BranchingFlowContext guide** — track command path + share values across hierarchy
-12. **Add Audit Log guide** — `WithAuditLog`, `ExportAuditLog`, 11 formats
-13. **Add Plugin System guide** — `Plugin` interface, `RegisterPlugin`, `WithPlugin`
-14. **Add Doctor/Version commands guide** — `DoctorCommand`, health checks, `VersionCommand`
-15. **Add Shell completion guide** — `WithCompletion`, dynamic completion
-16. **Add Signal handling guide** — `WithSignalHandling` vs `WithGracefulShutdown`
-17. **Add WithCleanup guide** — cleanup hooks that fire even when RunE errors
-18. **Port docs/TUTORIAL.md** to website as multi-page tutorial
-19. **Port docs/COMPARISON.md** to website (Kong, urfave/cli, go-flags, sflags)
-20. **Port docs/PERFORMANCE.md** to website benchmarks page
-21. **Port docs/CLI_DESIGN_PRINCIPLES.md** to website
-22. **Port docs/COBRA_FOOTGUNS.md** to website
-23. **Full changelog on website** — currently only v3.0.0 highlights
-24. **Port docs/MIGRATION_v2_v3.md** to website
+11. ~~**Add BranchingFlowContext guide** — track command path + share values across hierarchy~~ done — guides/flow-context.mdx ships (website docs)
+12. ~~**Add Audit Log guide** — `WithAuditLog`, `ExportAuditLog`, 11 formats~~ done — guides/audit-log.mdx ships (website docs)
+13. ~~**Add Plugin System guide** — `Plugin` interface, `RegisterPlugin`, `WithPlugin`~~ done — guides/plugins.mdx ships (website docs)
+14. **Add Doctor/Version commands guide** — `DoctorCommand`, health checks, `VersionCommand` **→ ROADMAP raw ideas (port Doctor/Version guide to website)**
+15. ~~**Add Shell completion guide** — `WithCompletion`, dynamic completion~~ done — guides/shell-completion.mdx ships (website docs)
+16. **Add Signal handling guide** — `WithSignalHandling` vs `WithGracefulShutdown` **→ ROADMAP raw ideas (port Signal-handling guide to website)**
+17. ~~**Add WithCleanup guide** — cleanup hooks that fire even when RunE errors~~ done — guides/lifecycle.mdx ships (website docs)
+18. **Port docs/TUTORIAL.md** to website as multi-page tutorial **→ ROADMAP raw ideas (port TUTORIAL to website)**
+19. **Port docs/COMPARISON.md** to website (Kong, urfave/cli, go-flags, sflags) **→ ROADMAP raw ideas (port COMPARISON to website)**
+20. **Port docs/PERFORMANCE.md** to website benchmarks page **→ ROADMAP raw ideas (port PERFORMANCE to website)**
+21. **Port docs/CLI_DESIGN_PRINCIPLES.md** to website **→ ROADMAP raw ideas (port CLI_DESIGN_PRINCIPLES to website)**
+22. **Port docs/COBRA_FOOTGUNS.md** to website **→ ROADMAP raw ideas (port COBRA_FOOTGUNS to website)**
+23. ~~**Full changelog on website** — currently only v3.0.0 highlights~~ done — website changelog.mdx ships
+24. **Port docs/MIGRATION_v2_v3.md** to website **→ ROADMAP raw ideas (port MIGRATION_v2_v3 to website)**
 
 ### Website Polish
 
-25. **Design proper logo/favicon** — current SVG is a placeholder
-26. **Add OG image generation** — `astro-og-canvas` integration
-27. **Upload GitHub social preview** image
-28. **Run Lighthouse audit** — verify performance/accessibility/SEO scores
-29. **Add Lighthouse CI workflow** — `lighthouse.yml` + `lighthouserc.json`
-30. **Mobile responsive audit** — verify on phone-width viewports
-31. **Verify Pagefind search** — confirm Starlight search works on deployed site
-32. **Verify 404 page styling** — built but never checked
-33. **Add `dedup.sh` script** — gogenfilter has jscpd code duplication check for website
-34. **Add `validate-docs` app** — gogenfilter uses `md-go-validator` to validate code blocks in docs
-35. **Add website README** — document build/deploy process inside `website/`
+25. **Design proper logo/favicon** — current SVG is a placeholder **→ ROADMAP raw ideas (launch marketing & infra)**
+26. **Add OG image generation** — `astro-og-canvas` integration **→ ROADMAP raw ideas (launch marketing & infra)**
+27. **Upload GitHub social preview** image **→ ROADMAP raw ideas (launch marketing & infra)**
+28. **Run Lighthouse audit** — verify performance/accessibility/SEO scores **→ ROADMAP raw ideas (launch marketing & infra)**
+29. **Add Lighthouse CI workflow** — `lighthouse.yml` + `lighthouserc.json` **→ ROADMAP raw ideas (launch marketing & infra)**
+30. **Mobile responsive audit** — verify on phone-width viewports **→ ROADMAP raw ideas (launch marketing & infra)**
+31. **Verify Pagefind search** — confirm Starlight search works on deployed site **→ ROADMAP raw ideas (launch marketing & infra)**
+32. **Verify 404 page styling** — built but never checked **→ ROADMAP raw ideas (launch marketing & infra)**
+33. **Add `dedup.sh` script** — gogenfilter has jscpd code duplication check for website **→ ROADMAP raw ideas (launch marketing & infra)**
+34. **Add `validate-docs` app** — gogenfilter uses `md-go-validator` to validate code blocks in docs **→ ROADMAP raw ideas (launch marketing & infra)**
+35. ~~**Add website README** — document build/deploy process inside `website/`~~ done — documented — AGENTS.md website build section (AGENTS.md:144)
 
 ### CI/CD & Operations
 
-36. **Verify website CI first run** — confirm build job passes on GitHub Actions
-37. **Add Firebase preview channels** — staging before production
-38. **Add `website/` to root AGENTS.md** — document build commands, deploy process, flake apps
-39. **Update root `flake.nix`** — consider convenience app for website deploy
-40. **Add sub-module docs pages** — dedicated pages for glamour, manpage, prompts, spinner, telemetry
-41. **Website CI: stale reference check** — gogenfilter checks for references to deleted files
-42. **Website CI: CHANGELOG sync** — gogenfilter verifies changelog.mdx matches CHANGELOG.md
+36. ~~**Verify website CI first run** — confirm build job passes on GitHub Actions~~ done — website.yml CI runs — Website badge live (README.md:6)
+37. **Add Firebase preview channels** — staging before production **→ ROADMAP raw ideas (launch marketing & infra)**
+38. ~~**Add `website/` to root AGENTS.md** — document build commands, deploy process, flake apps~~ done — AGENTS.md documents website dir + build (AGENTS.md:88,144)
+39. **Update root `flake.nix`** — consider convenience app for website deploy **→ ROADMAP raw ideas (launch marketing & infra)**
+40. ~~**Add sub-module docs pages** — dedicated pages for glamour, manpage, prompts, spinner, telemetry~~ done — guides/sub-modules.mdx ships (website docs)
+41. **Website CI: stale reference check** — gogenfilter checks for references to deleted files **→ ROADMAP raw ideas (launch marketing & infra)**
+42. **Website CI: CHANGELOG sync** — gogenfilter verifies changelog.mdx matches CHANGELOG.md **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Marketing & Discoverability
 
-43. **Write launch announcement** — content for r/golang, HN
-44. **Submit to Awesome Go** lists
-45. **Add `.github/FUNDING.yml`** — GitHub Sponsors
-46. **Add animated demo** to README — asciinema or GIF
-47. **Add "Who uses cmdguard?"** section once there are users
-48. **Add sub-module version badges** — show each is independently versioned
+43. **Write launch announcement** — content for r/golang, HN **→ ROADMAP raw ideas (launch marketing & infra)**
+44. **Submit to Awesome Go** lists **→ ROADMAP raw ideas (launch marketing & infra)**
+45. **Add `.github/FUNDING.yml`** — GitHub Sponsors **→ ROADMAP raw ideas (launch marketing & infra)**
+46. **Add animated demo** to README — asciinema or GIF **→ ROADMAP raw ideas (launch marketing & infra)**
+47. **Add "Who uses cmdguard?"** section once there are users **→ ROADMAP raw ideas (launch marketing & infra)**
+48. **Add sub-module version badges** — show each is independently versioned **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Code & Repo Hygiene
 
-49. **Clean up stale status reports** — `docs/status/` has 3 from today
-50. **Remove `docs/status/2026-07-14_02-14_jsonv2-migration-embraced.md`** if stale — it's pre-website
-51. **Update FEATURES.md** — add website as a feature entry
+49. ~~**Clean up stale status reports** — `docs/status/` has 3 from today~~ done (docs-health pass status reports remain as point-in-time snapshots (docs-health canon))
+50. ~~**Remove `docs/status/2026-07-14_02-14_jsonv2-migration-embraced.md`** if stale — it's pre-website~~ **Won't implement — kept — status reports are point-in-time snapshots per docs-health canon (annotated 2026-11-07).**
+51. ~~**Update FEATURES.md** — add website as a feature entry~~ done (docs-health pass reviewed — FEATURES documents the library; the website is repo meta, not a library feature)
 
 ---
 
@@ -248,9 +248,13 @@
 
 The 5-column comparison table mentions Cobra, Kong, and urfave/cli by name. Linking to their GitHub repos would be good etiquette and improve credibility. But it also means maintaining external links. **Should I add hyperlinks to each framework in the comparison table headers?**
 
+**Answered:** deferred — content polish is routed to ROADMAP raw ideas (launch marketing & infra).
+
 ### 2. Should we add `astro-og-canvas` now or defer?
 
 OG images significantly improve social media sharing appearance. gogenfilter uses `astro-og-canvas` for dynamic generation. But adding it now means another dependency, another build step, and design decisions about the image layout. **Should I add OG image generation now, or defer until we have a proper logo?**
+
+**Answered:** deferred — OG images are routed to ROADMAP raw ideas (launch marketing & infra); the 2026-07-23 Resolution lists the OG image as an outstanding blocker.
 
 ## Resolution (2026-07-23)
 

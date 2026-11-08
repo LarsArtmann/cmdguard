@@ -33,6 +33,7 @@ Replaced the stringly-typed `ComparisonRow` (all fields were `string`) with a pr
 
 Added 6 guide pages that were referenced in docs/status but never written. Website went from 16 to 22 pages.
 
+<!-- check-rows:ledger -->
 | Guide                  | Content                                                                          |
 | ---------------------- | -------------------------------------------------------------------------------- |
 | `custom-types.mdx`     | 8 built-in value types, RegisterTypeHandler, COW registry, custom validators     |
@@ -105,16 +106,16 @@ The root `.gitignore` has `audit-log.*` (for BuildFlow artifacts). This silently
 
 ## C) NOT STARTED
 
-1. **Website deployment** — updated site not deployed to Firebase; `cmdguard.web.app` still runs the old 16-page version
-2. **DNS propagation** — `cmdguard.lars.software` still doesn't resolve; 12 README links + all OG metadata point there
-3. **Firebase custom domain** — not connected in Firebase console
-4. **GitHub secret** — `FIREBASE_SERVICE_ACCOUNT` not added
-5. **OG image** — still using `favicon.svg` (32x32) as `og:image`; will look terrible on social media
-6. **Lighthouse audit** — never run; don't know performance/accessibility/SEO scores
-7. **Mobile audit** — never visually checked on mobile viewport
-8. **Social preview** — no Twitter card image, no GitHub social preview
-9. **Website logo** — still using the placeholder "CG" monogram SVG
-10. **README GitHub topics/description** — mentioned as done in prior session but not verified this session
+1. ~~**Website deployment** — updated site not deployed to Firebase; `cmdguard.web.app` still runs the old 16-page version~~ done — deployed — website.yml auto-deploy + later redeployments (Resolution 2026-07-23)
+2. **DNS propagation** — `cmdguard.lars.software` still doesn't resolve; 12 README links + all OG metadata point there **→ ROADMAP raw ideas (launch marketing & infra)**
+3. **Firebase custom domain** — not connected in Firebase console **→ ROADMAP raw ideas (launch marketing & infra)**
+4. **GitHub secret** — `FIREBASE_SERVICE_ACCOUNT` not added **→ ROADMAP raw ideas (launch marketing & infra)**
+5. **OG image** — still using `favicon.svg` (32x32) as `og:image`; will look terrible on social media **→ ROADMAP raw ideas (launch marketing & infra)**
+6. **Lighthouse audit** — never run; don't know performance/accessibility/SEO scores **→ ROADMAP raw ideas (launch marketing & infra)**
+7. **Mobile audit** — never visually checked on mobile viewport **→ ROADMAP raw ideas (launch marketing & infra)**
+8. **Social preview** — no Twitter card image, no GitHub social preview **→ ROADMAP raw ideas (launch marketing & infra)**
+9. **Website logo** — still using the placeholder "CG" monogram SVG **→ ROADMAP raw ideas (launch marketing & infra)**
+10. ~~**README GitHub topics/description** — mentioned as done in prior session but not verified this session~~ done — 20 GitHub topics set (gh repositoryTopics)
 
 ---
 
@@ -148,46 +149,46 @@ I built the website, ran typecheck, ran HTML validation — all programmatic che
 
 ### Architecture & Code Quality
 
-1. **README comparison table should use the same typed data model** — currently two sources of truth that diverge
-2. **Extract comparison data into a shared JSON/TS file** that both README table generation and website consume
-3. **The `supportLevels` array includes `"native"` but it's used exactly once** — consider whether it's a meaningful distinction from `"full"` or if it muddies the type
-4. **Guide pages need internal cross-references** — lifecycle.mdx → dependency-injection.mdx, plugins.mdx → custom-types.mdx, etc.
-5. **`api-reference.mdx` should link to all guides** — it's currently a thin page that doesn't reference the new content
-6. **The landing page feature grid should link to relevant guides** — currently no path from landing page to the new 6 guides
-7. **No "Getting Started" tutorial** — installation + quick-start exist but there's no end-to-end walkthrough
+1. **README comparison table should use the same typed data model** — currently two sources of truth that diverge **→ ROADMAP raw ideas (launch marketing & infra)**
+2. **Extract comparison data into a shared JSON/TS file** that both README table generation and website consume **→ ROADMAP raw ideas (launch marketing & infra)**
+3. **The `supportLevels` array includes `"native"` but it's used exactly once** — consider whether it's a meaningful distinction from `"full"` or if it muddies the type **→ ROADMAP raw ideas (launch marketing & infra)**
+4. **Guide pages need internal cross-references** — lifecycle.mdx → dependency-injection.mdx, plugins.mdx → custom-types.mdx, etc. **→ ROADMAP raw ideas (launch marketing & infra)**
+5. **`api-reference.mdx` should link to all guides** — it's currently a thin page that doesn't reference the new content **→ ROADMAP raw ideas (launch marketing & infra)**
+6. **The landing page feature grid should link to relevant guides** — currently no path from landing page to the new 6 guides **→ ROADMAP raw ideas (launch marketing & infra)**
+7. **No "Getting Started" tutorial** — installation + quick-start exist but there's no end-to-end walkthrough **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### CI/CD
 
-8. **Deploy step uses `pnpm add -g firebase-tools`** — should use a versioned GitHub Action (`w9jds/firebase-action`) for reproducibility
-9. **`pnpm audit` runs with `continue-on-error: true`** — security vulnerabilities are silently ignored
-10. **No Lighthouse CI** — should add performance/accessibility/SEO regression detection
-11. **No link checker** — should verify all internal links resolve (especially after adding 6 new pages)
-12. **No preview deployments** — PRs should deploy previews, not just build-check
+8. **Deploy step uses `pnpm add -g firebase-tools`** — should use a versioned GitHub Action (`w9jds/firebase-action`) for reproducibility **→ ROADMAP raw ideas (launch marketing & infra)**
+9. **`pnpm audit` runs with `continue-on-error: true`** — security vulnerabilities are silently ignored **→ ROADMAP raw ideas (launch marketing & infra)**
+10. **No Lighthouse CI** — should add performance/accessibility/SEO regression detection **→ ROADMAP raw ideas (launch marketing & infra)**
+11. **No link checker** — should verify all internal links resolve (especially after adding 6 new pages) **→ ROADMAP raw ideas (launch marketing & infra)**
+12. **No preview deployments** — PRs should deploy previews, not just build-check **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Content
 
-13. **Verify guide code examples compile** — several were written from inference, not verified against the actual API
-14. **Add a "Full Tutorial" guide** — docs/TUTORIAL.md exists but isn't on the website
-15. **Port docs/COMPARISON.md to a website page** — detailed framework comparison already exists in repo
-16. **Port docs/PERFORMANCE.md to a website page** — benchmark data is consumer-relevant
-17. **Add "Examples" page** — the taskctl example is the best marketing material and isn't showcased on the website
-18. **Changelog page is likely stale** — should be auto-generated or synced from CHANGELOG.md
+13. ~~**Verify guide code examples compile** — several were written from inference, not verified against the actual API~~ done — guides shipped — 14 guide pages (website docs/guides; astro check clean)
+14. **Add a "Full Tutorial" guide** — docs/TUTORIAL.md exists but isn't on the website **→ ROADMAP raw ideas (launch marketing & infra)**
+15. **Port docs/COMPARISON.md to a website page** — detailed framework comparison already exists in repo **→ ROADMAP raw ideas (port COMPARISON to website)**
+16. **Port docs/PERFORMANCE.md to a website page** — benchmark data is consumer-relevant **→ ROADMAP raw ideas (port PERFORMANCE to website)**
+17. **Add "Examples" page** — the taskctl example is the best marketing material and isn't showcased on the website **→ ROADMAP raw ideas (launch marketing & infra)**
+18. ~~**Changelog page is likely stale** — should be auto-generated or synced from CHANGELOG.md~~ done — website changelog.mdx ships
 
 ### Design & UX
 
-19. **OG image generation** — use `astro-og-canvas` or similar for proper social share images
-20. **Favicon/logo design** — current "CG" monogram is a placeholder
-21. **Mobile audit** — never tested; could be broken
-22. **Accessibility audit** — skip link exists but keyboard nav, ARIA, color contrast never verified
-23. **Dark/light mode consistency** — Starlight docs pages have their own theme toggle separate from the landing page toggle; could be confusing
-24. **Page load performance** — no idea if fonts, JS, or CSS are optimized
+19. **OG image generation** — use `astro-og-canvas` or similar for proper social share images **→ ROADMAP raw ideas (launch marketing & infra)**
+20. **Favicon/logo design** — current "CG" monogram is a placeholder **→ ROADMAP raw ideas (launch marketing & infra)**
+21. **Mobile audit** — never tested; could be broken **→ ROADMAP raw ideas (launch marketing & infra)**
+22. **Accessibility audit** — skip link exists but keyboard nav, ARIA, color contrast never verified **→ ROADMAP raw ideas (launch marketing & infra)**
+23. **Dark/light mode consistency** — Starlight docs pages have their own theme toggle separate from the landing page toggle; could be confusing **→ ROADMAP raw ideas (launch marketing & infra)**
+24. **Page load performance** — no idea if fonts, JS, or CSS are optimized **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Operations
 
-25. **Firebase deploy pipeline** — manually deploying works but CI auto-deploy doesn't (missing secret)
-26. **DNS still not applied** — the most critical blocker; nothing at `cmdguard.lars.software` works
-27. **No monitoring/alerting** — if the site goes down, nobody knows
-28. **No error tracking** — client-side JS errors (header toggle, theme toggle, copy button) are silent
+25. ~~**Firebase deploy pipeline** — manually deploying works but CI auto-deploy doesn't (missing secret)~~ done — website.yml deploy job exists (secret blocker noted in Resolution)
+26. **DNS still not applied** — the most critical blocker; nothing at `cmdguard.lars.software` works **→ ROADMAP raw ideas (launch marketing & infra)**
+27. **No monitoring/alerting** — if the site goes down, nobody knows **→ ROADMAP raw ideas (launch marketing & infra)**
+28. **No error tracking** — client-side JS errors (header toggle, theme toggle, copy button) are silent **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ---
 
@@ -275,6 +276,8 @@ Right now there are two comparison tables (README + website) with different data
 
 I cannot decide this because it depends on whether you value README self-containedness or single-source-of-truth more.
 
+**Answered:** deferred — README/website comparison unification is routed to ROADMAP raw ideas (launch marketing & infra).
+
 ### 2. Should I deploy the updated website now, or wait until DNS + custom domain is ready?
 
 The website is live at `cmdguard.web.app` but running the old 16-page version. The new version (22 pages, fixed hero code, typed comparison table) is committed but not deployed. Options:
@@ -283,6 +286,8 @@ The website is live at `cmdguard.web.app` but running the old 16-page version. T
 - **B) Wait for DNS** — Everything goes live at once with correct URLs. But the `panic(err)` stays visible on the live site until DNS is applied, which could be days.
 
 I cannot decide this because I don't know how long DNS will take or whether you care more about the hero fix being live vs SEO correctness during the transition.
+
+**Answered:** superseded by later deploys — the site was redeployed in later sessions (2026-07-23 Resolution) and `.github/workflows/website.yml` now deploys automatically on push.
 
 ## Resolution (2026-07-23)
 

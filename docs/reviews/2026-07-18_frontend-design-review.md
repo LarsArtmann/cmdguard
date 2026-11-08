@@ -31,6 +31,8 @@ Per the `frontend-design` skill, three looks cluster around AI-generated design 
 
 **Current:**
 
+<!-- check-rows:ledger -->
+
 | Token          | Hex                  | Tailwind name       |
 | -------------- | -------------------- | ------------------- |
 | bg-primary     | `#0c0a09`            | `stone-950`         |
@@ -148,12 +150,12 @@ The shield at 40% white opacity is barely visible — the "CG" monogram dominate
 
 | # | Finding                           | Change                                                                                                                                | Effort | Risk                  |
 | - | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------- |
-| 1 | Palette is Tailwind defaults      | Shift accent hue from `#818cf8` to a custom blend (e.g., `#6d8cef` — slightly warmer/more cyan) across `global.css` + `starlight.css` | S      | Low — single hue swap |
-| 2 | Gradient-text H1 is generic       | Replace the gradient-text span with an italic + accent-color treatment on "shutdown"                                                  | XS     | Low                   |
-| 3 | Logo shield invisible             | Increase shield stroke opacity from 0.4 to 0.85; shrink "CG" text to give the shield more presence                                    | XS     | Low                   |
-| 4 | Code preview is generic container | Replace traffic-light dots with a terminal prompt symbol (`$` or `❯`) in accent color; rename "main.go" to a more descriptive label   | S      | Low                   |
-| 5 | Centered everything               | Make the comparison section `width="wide"` instead of `narrow` so the table breathes                                                  | XS     | Low                   |
-| 6 | No display face                   | Add `font-style: italic` + tighter tracking on the H1 accent word as a lighter alternative to introducing a new face                  | XS     | Low                   |
+| ~~1~~ done at `accent swapped to custom #7c83f0 (website/src/styles/global.css:17`, ` eb8586a)` | ~~Palette is Tailwind defaults~~ | ~~Shift accent hue from `#818cf8` to a custom blend (e.g., `#6d8cef` — slightly warmer/more cyan) across `global.css` + `starlight.css`~~ | ~~S~~ | ~~Low — single hue swap~~ |
+| ~~2~~ done at `gradient span replaced with accent-color em (HeroSection.astro:55`, ` eb8586a)` | ~~Gradient-text H1 is generic~~ | ~~Replace the gradient-text span with an italic + accent-color treatment on "shutdown"~~ | ~~XS~~ | ~~Low~~ |
+| ~~3~~ done at `shield stroke raised to 0.85 (Logo.astro:13`, ` eb8586a)` | ~~Logo shield invisible~~ | ~~Increase shield stroke opacity from 0.4 to 0.85; shrink "CG" text to give the shield more presence~~ | ~~XS~~ | ~~Low~~ |
+| ~~4~~ done at `❯ terminal prompt symbol applied (HeroSection.astro:74`, ` eb8586a)` | ~~Code preview is generic container~~ | ~~Replace traffic-light dots with a terminal prompt symbol (`$` or `❯`) in accent color; rename "main.go" to a more descriptive label~~ | ~~S~~ | ~~Low~~ |
+| ~~5~~ **Won't implement — comparison section width left unchanged.** | ~~Centered everything~~ | ~~Make the comparison section `width="wide"` instead of `narrow` so the table breathes~~ | ~~XS~~ | ~~Low~~ |
+| ~~6~~ done at `accent word reworked (font-extrabold accent em`, ` HeroSection.astro:55)` | ~~No display face~~ | ~~Add `font-style: italic` + tighter tracking on the H1 accent word as a lighter alternative to introducing a new face~~ | ~~XS~~ | ~~Low~~ |
 
 **If only 3 changes:** #1 (accent hue), #2 (kill gradient text), #3 (shield visibility). These are the highest-impact, lowest-risk fixes.
 

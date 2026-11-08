@@ -4,11 +4,15 @@
 **Date:** 2026-02-15\
 **Goal:** Rebuild cmdguard with single source of truth, no panics, and DI scopes
 
+> **Superseded (2026-11-07 docs-health annotate pass):** this DRAFT design shipped as cmdguard v2 and evolved through v4 (module now `github.com/larsartmann/cmdguard/v4`, package `pkg/cmdguard/v4/`). Kept as a historical design record — every goal below landed; see inline verdicts.
+
 ---
 
 ## Problem Statement
 
 ### Current Issues (v1)
+
+<!-- check-rows:ledger -->
 
 | Issue               | Current                               | Impact                       |
 | ------------------- | ------------------------------------- | ---------------------------- |
@@ -20,11 +24,11 @@
 
 ### Design Goals
 
-1. **Single Source of Truth** - Define config once, derive everything else
-2. **No Panics** - All functions return errors
-3. **Type Safety** - Strong types, branded IDs, make invalid states unrepresentable
-4. **DI with Scopes** - samber/do/v2 for lifecycle management
-5. **Dynamic Registration** - Plugins can register their own config/commands
+1. ~~**Single Source of Truth** - Define config once, derive everything else~~ done — struct tags are the single source of truth (ADR-002)
+2. ~~**No Panics** - All functions return errors~~ done — no Must*/Run panics in v4 (zero-panic contract holds)
+3. ~~**Type Safety** - Strong types, branded IDs, make invalid states unrepresentable~~ done — typed parsers + branded types shipped (types_*.go)
+4. ~~**DI with Scopes** - samber/do/v2 for lifecycle management~~ done — samber/do scopes are the DI backbone (scope.go)
+5. ~~**Dynamic Registration** - Plugins can register their own config/commands~~ done — plugin.go ships dynamic registration (WithPlugin)
 
 ---
 
@@ -414,11 +418,11 @@ cmdguard/
 
 ## Open Questions
 
-1. **Flag prefix for plugins?** `--plugin-name-flag` or `--plugin.flag`?
-2. **Config file support?** YAML/JSON merging with flags?
-3. **Env var support?** `APP_LOG_LEVEL` auto-mapped to `--log-level`?
-4. **Validation framework?** `validate:"required,min=1"` tags?
-5. **Subcommand config inheritance?** How do child commands inherit parent config?
+1. ~~**Flag prefix for plugins?** `--plugin-name-flag` or `--plugin.flag`?~~ done — answered by implementation — nested structs + dotted flag names; no plugin-prefix mechanism
+2. ~~**Config file support?** YAML/JSON merging with flags?~~ done — shipped — WithConfigFile + KoanfLoader (YAML/JSON/TOML)
+3. ~~**Env var support?** `APP_LOG_LEVEL` auto-mapped to `--log-level`?~~ done — shipped — env tag + WithEnvPrefix (cli_options.go:161)
+4. ~~**Validation framework?** `validate:"required,min=1"` tags?~~ done — shipped — validate tag bounds (flags.go:377, flag_bounds.go)
+5. ~~**Subcommand config inheritance?** How do child commands inherit parent config?~~ done — shipped — nested struct config + BranchingFlowContext precedence
 
 ---
 

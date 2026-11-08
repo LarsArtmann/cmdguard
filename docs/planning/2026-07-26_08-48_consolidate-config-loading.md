@@ -20,6 +20,8 @@
 
 cmdguard currently has **three** config file loading mechanisms, all implementing the same `ConfigFileLoader` interface:
 
+<!-- check-rows:ledger -->
+
 | Loader                       | File                   | Formats                  | Nested?                                                    | Reads own files?               |
 | ---------------------------- | ---------------------- | ------------------------ | ---------------------------------------------------------- | ------------------------------ |
 | `jsonLoader` (core)          | `config_file.go`       | JSON only                | Yes (`collectKeysRecursive` + `MatchCaseInsensitiveNames`) | No — receives bytes            |
@@ -78,12 +80,16 @@ The interface `Load(data []byte, cfg any) (setFields []string, err error)` stays
 
 ### 1% that delivers 51%
 
+<!-- check-rows:ledger -->
+
 | Task                                                    | Why                                            |
 | ------------------------------------------------------- | ---------------------------------------------- |
 | Refactor KoanfLoader to use koanf→JSON→jsonLoader logic | Unifies behavior, preserves all existing tests |
 | Make `WithConfigFile` use KoanfLoader internally        | One entry point, auto-format-detection         |
 
 ### 4% that delivers 64%
+
+<!-- check-rows:ledger -->
 
 | Task                                                                                            | Why                              |
 | ----------------------------------------------------------------------------------------------- | -------------------------------- |
@@ -93,6 +99,8 @@ The interface `Load(data []byte, cfg any) (setFields []string, err error)` stays
 
 ### 20% that delivers 80%
 
+<!-- check-rows:ledger -->
+
 | Task                                                                                      | Why                         |
 | ----------------------------------------------------------------------------------------- | --------------------------- |
 | Add TOML parser to KoanfLoader                                                            | All 3 formats supported     |
@@ -100,6 +108,8 @@ The interface `Load(data []byte, cfg any) (setFields []string, err error)` stays
 | Update examples                                                                           | Consumer-facing correctness |
 
 ### Remaining 20% for 100%
+
+<!-- check-rows:ledger -->
 
 | Task                                                                              | Why                                     |
 | --------------------------------------------------------------------------------- | --------------------------------------- |
@@ -114,21 +124,23 @@ The interface `Load(data []byte, cfg any) (setFields []string, err error)` stays
 
 | # | Task                                                                                        | Est   | Impact   | Effort | Priority |
 | - | ------------------------------------------------------------------------------------------- | ----- | -------- | ------ | -------- |
-| 1 | Refactor KoanfLoader: koanf as parser → JSON → existing jsonLoader logic                    | 45min | Critical | Medium | P0       |
-| 2 | Make `WithConfigFile` use KoanfLoader; update `loadConfigFileOrSkip`                        | 30min | Critical | Low    | P0       |
-| 3 | Delete old loaders (`loader.go`, `loader_test.go`, `jsonLoader`, `NewJSONLoader`)           | 30min | High     | Low    | P1       |
-| 4 | Update tests (`config_file_test.go`, `config_nested_test.go`, `koanf_test.go`, integration) | 60min | Critical | Medium | P0       |
-| 5 | Update deps (`go.mod`: remove go-faster/yaml + pelletier/go-toml, add koanf/parsers/toml)   | 15min | Medium   | Low    | P1       |
-| 6 | Update examples (`taskctl/main.go`)                                                         | 15min | Low      | Low    | P2       |
-| 7 | Update lint config (`.golangci.yml` ireturn allow list)                                     | 15min | Low      | Low    | P2       |
-| 8 | Update documentation (README, FEATURES, AGENTS, CHANGELOG, API, TODO, website, ADR)         | 90min | Medium   | Low    | P2       |
-| 9 | Final verification (tests -race, lint, build, benchmarks)                                   | 30min | Critical | Low    | P0       |
+| ~~1~~ | ~~Refactor KoanfLoader: koanf as parser → JSON → existing jsonLoader logic~~ done at `e3e710c` | ~~45min~~ | ~~Critical~~ | ~~Medium~~ | ~~P0~~ |
+| ~~2~~ | ~~Make `WithConfigFile` use KoanfLoader; update `loadConfigFileOrSkip`~~ done at `e3e710c` | ~~30min~~ | ~~Critical~~ | ~~Low~~ | ~~P0~~ |
+| ~~3~~ | ~~Delete old loaders (`loader.go`, `loader_test.go`, `jsonLoader`, `NewJSONLoader`)~~ done at `e3e710c` | ~~30min~~ | ~~High~~ | ~~Low~~ | ~~P1~~ |
+| ~~4~~ | ~~Update tests (`config_file_test.go`, `config_nested_test.go`, `koanf_test.go`, integration)~~ done at `e3e710c` | ~~60min~~ | ~~Critical~~ | ~~Medium~~ | ~~P0~~ |
+| ~~5~~ | ~~Update deps (`go.mod`: remove go-faster/yaml + pelletier/go-toml, add koanf/parsers/toml)~~ done — go-faster/yaml + go-toml demoted to indirect, not fully removed (koanf pulls them transitively) | ~~15min~~ | ~~Medium~~ | ~~Low~~ | ~~P1~~ |
+| ~~6~~ | ~~Update examples (`taskctl/main.go`)~~ done at `e3e710c` | ~~15min~~ | ~~Low~~ | ~~Low~~ | ~~P2~~ |
+| ~~7~~ | ~~Update lint config (`.golangci.yml` ireturn allow list)~~ done at `e3e710c` | ~~15min~~ | ~~Low~~ | ~~Low~~ | ~~P2~~ |
+| ~~8~~ | ~~Update documentation (README, FEATURES, AGENTS, CHANGELOG, API, TODO, website, ADR)~~ done — PARTIAL in era — core docs updated; website + WHAT_THIS addressed by 2026-07-27 docs-health pass | ~~90min~~ | ~~Medium~~ | ~~Low~~ | ~~P2~~ |
+| ~~9~~ | ~~Final verification (tests -race, lint, build, benchmarks)~~ done at `e3e710c` | ~~30min~~ | ~~Critical~~ | ~~Low~~ | ~~P0~~ |
 
 **Total estimated: ~330min (5.5 hours)**
 
 ---
 
 ## Detailed Breakdown (max 12min per task)
+
+<!-- check-rows:ledger -->
 
 | #   | Subtask                                                                                                                                                                                              | Parent | Est   | Depends on    |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----- | ------------- |
@@ -263,6 +275,8 @@ graph TD
 
 ### Public API removals
 
+<!-- check-rows:ledger -->
+
 | Removed                          | Replacement                           | Migration                                                       |
 | -------------------------------- | ------------------------------------- | --------------------------------------------------------------- |
 | `configload.YAML()`              | `configload.NewKoanfLoader(paths...)` | `WithConfigFile("config.yaml")` (auto-detects)                  |
@@ -275,6 +289,8 @@ graph TD
 
 ### Behavioral changes
 
+<!-- check-rows:ledger -->
+
 | Change                                                                                          | Impact                                                                                                                                          | Severity                                            |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | KoanfLoader no longer uses `UnmarshalWithConf(Tag: "flag", FlatPaths: true)`                    | Dotted flag names (`flag:"server.port"`) on flat structs no longer match nested config keys. Use nested structs with simple flag names instead. | Medium — only affected koanf_test.go, no real users |
@@ -282,6 +298,8 @@ graph TD
 | TOML files now supported by KoanfLoader                                                         | `.toml` files are parsed instead of silently skipped                                                                                            | Positive — new feature                              |
 
 ### Non-breaking
+
+<!-- check-rows:ledger -->
 
 | Preserved                                                           | Why                                                  |
 | ------------------------------------------------------------------- | ---------------------------------------------------- |
@@ -341,13 +359,13 @@ cli, _ := cmdguard.NewCLI[Config]("app", "1.0", Config{},
 
 ## Known Limitations
 
-1. **Same-named flag tags in different nested structs**: `collectKeysRecursive` flattens all keys, so two fields with `flag:"port"` in different nested structs both match when either appears in the config file. Use unique flag names or dotted names (requires manual koanf configuration).
+1. ~~**Same-named flag tags in different nested structs**: `collectKeysRecursive` flattens all keys, so two fields with `flag:"port"` in different nested structs both match when either appears in the config file. Use unique flag names or dotted names (requires manual koanf configuration).~~ done — still true — collectKeysRecursive flattens all keys
 
-2. **`ConfigFileLoader.Load(data []byte, ...)` interface**: The `data` parameter is nil for KoanfLoader (it reads files itself). Custom loaders that need `data` should use `loadConfigFile()` (retained for backward compat) or read files themselves.
+2. ~~**`ConfigFileLoader.Load(data []byte, ...)` interface**: The `data` parameter is nil for KoanfLoader (it reads files itself). Custom loaders that need `data` should use `loadConfigFile()` (retained for backward compat) or read files themselves.~~ done — still true — KoanfLoader reads files itself; data param nil
 
-3. **KoanfLoader TOML**: Requires `github.com/knadh/koanf/parsers/toml` as a new dependency (replaces `pelletier/go-toml/v2`).
+3. ~~**KoanfLoader TOML**: Requires `github.com/knadh/koanf/parsers/toml` as a new dependency (replaces `pelletier/go-toml/v2`).~~ done — still true — koanf/parsers/toml is the TOML dependency
 
-4. **Sub-module extraction deferred → moot:** `configload` was deleted entirely (not extracted). KoanfLoader lives in `v3` (`koanf_loader.go`), so there is no sub-package left to extract. The original TODO #7 is closed.
+4. ~~**Sub-module extraction deferred → moot:** `configload` was deleted entirely (not extracted). KoanfLoader lives in `v3` (`koanf_loader.go`), so there is no sub-package left to extract. The original TODO #7 is closed.~~ done at `configload deleted entirely in e3e710c; TODO #7 closed`
 
 ---
 
@@ -356,6 +374,8 @@ cli, _ := cmdguard.NewCLI[Config]("app", "1.0", Config{},
 This plan was implemented across two sessions (2026-07-26 → 2026-07-27) and
 shipped in commit `e3e710c`. The implementation report lives at
 `docs/status/2026-07-27_01-37_config-loading-consolidation-implementation-complete-with-gaps.md`.
+
+<!-- check-rows:ledger -->
 
 | Plan task                             | Outcome                                                                                                                                                           |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |

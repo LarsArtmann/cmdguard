@@ -177,7 +177,7 @@
 
 16. ~~**More guides** — Could add guides for: BranchingFlowContext, Audit Log export, Plugin system, Doctor/Version commands, Shell completion, Typo suggestions, Signal handling patterns, WithCleanup lifecycle.~~ done — guides expanded — 14 guide pages ship (audit-log, flow-context, plugins, shell-completion, …)
 17. **API reference depth** — Current API reference is an overview table. Could have per-function documentation pages. **→ ROADMAP raw ideas (launch marketing & infra)**
-18. ~~**Migration guide** — The "Migrating from Cobra" guide is good but could include a full before/after code diff of a real app.~~ done — website changelog.mdx ships
+18. ~~**Migration guide** — The "Migrating from Cobra" guide is good but could include a full before/after code diff of a real app.~~ done — guides/migrating-from-cobra.mdx ships (website docs)
 19. **Changelog** — Only shows v3.0.0 highlights. Could include the full CHANGELOG.md content or more versions. **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ---
@@ -186,81 +186,81 @@
 
 ### Immediate (Blocks `cmdguard.lars.software`)
 
-1. **Apply Terraform DNS** — Run `terraform apply` in domains repo from whitelisted IP to create the CNAME record
-2. **Connect custom domain in Firebase** — Run `firebase hosting:channels:create` or console: add `cmdguard.lars.software` to the `cmdguard` hosting site
-3. **Verify DNS propagation** — `dig cmdguard.lars.software` after apply, verify it resolves to Firebase
-4. **Verify SSL** — Firebase auto-provisions SSL; verify `https://cmdguard.lars.software` works after DNS + custom domain connection
+1. **Apply Terraform DNS** — Run `terraform apply` in domains repo from whitelisted IP to create the CNAME record **→ ROADMAP raw ideas (launch marketing & infra)**
+2. **Connect custom domain in Firebase** — Run `firebase hosting:channels:create` or console: add `cmdguard.lars.software` to the `cmdguard` hosting site **→ ROADMAP raw ideas (launch marketing & infra)**
+3. **Verify DNS propagation** — `dig cmdguard.lars.software` after apply, verify it resolves to Firebase **→ ROADMAP raw ideas (launch marketing & infra)**
+4. **Verify SSL** — Firebase auto-provisions SSL; verify `https://cmdguard.lars.software` works after DNS + custom domain connection **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Website CI/CD
 
-5. **Create website deploy workflow** — GitHub Actions: build on push to `website/**`, deploy to Firebase hosting
-6. **Add Firebase token secret** — `FIREBASE_TOKEN` to GitHub Actions secrets for deploy
-7. **Add build status badge** — Link CI workflow badge in README and website
-8. **Add Lighthouse CI** — Performance/accessibility regression checks on the website
+5. ~~**Create website deploy workflow** — GitHub Actions: build on push to `website/**`, deploy to Firebase hosting~~ done — .github/workflows/website.yml exists
+6. ~~**Add Firebase token secret** — `FIREBASE_TOKEN` to GitHub Actions secrets for deploy~~ done — website.yml deploy job with Firebase auth (website.yml:108)
+7. ~~**Add build status badge** — Link CI workflow badge in README and website~~ done — README Website badge (README.md:6)
+8. **Add Lighthouse CI** — Performance/accessibility regression checks on the website **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Website Polish
 
-9. **Design a proper logo/favicon** — Commission or create a polished SVG logo for cmdguard
-10. **Generate OG images** — Add `astro-og-canvas` integration for dynamic social share images
-11. **Upload GitHub social preview** — Create and upload a social preview image to repo settings
-12. **Add `package-lock.json` to git** — Decide: track it (like gogenfilter) or add to .gitignore (like go-atomic-write)
-13. **Run Lighthouse audit** — Verify performance, accessibility, SEO, best practices scores
-14. **Verify Pagefind search** — Confirm Starlight search works on the deployed site
-15. **Add error page styling** — Verify the 404 page looks good (it was built but never checked)
-16. **Mobile responsive audit** — Test landing page on mobile viewport sizes
-17. **Add a "Why cmdguard?" section to the website** — The README has a great comparison table; the website landing page should echo it
-18. **Fix og:image fallback** — Currently uses favicon.svg; should use a proper OG image
+9. **Design a proper logo/favicon** — Commission or create a polished SVG logo for cmdguard **→ ROADMAP raw ideas (launch marketing & infra)**
+10. **Generate OG images** — Add `astro-og-canvas` integration for dynamic social share images **→ ROADMAP raw ideas (launch marketing & infra)**
+11. **Upload GitHub social preview** — Create and upload a social preview image to repo settings **→ ROADMAP raw ideas (launch marketing & infra)**
+12. ~~**Add `package-lock.json` to git** — Decide: track it (like gogenfilter) or add to .gitignore (like go-atomic-write)~~ **Superseded — superseded — the website moved to pnpm (pnpm-lock.yaml; AGENTS.md website build section).**
+13. **Run Lighthouse audit** — Verify performance, accessibility, SEO, best practices scores **→ ROADMAP raw ideas (launch marketing & infra)**
+14. **Verify Pagefind search** — Confirm Starlight search works on the deployed site **→ ROADMAP raw ideas (launch marketing & infra)**
+15. **Add error page styling** — Verify the 404 page looks good (it was built but never checked) **→ ROADMAP raw ideas (launch marketing & infra)**
+16. **Mobile responsive audit** — Test landing page on mobile viewport sizes **→ ROADMAP raw ideas (launch marketing & infra)**
+17. **Add a "Why cmdguard?" section to the website** — The README has a great comparison table; the website landing page should echo it **→ ROADMAP raw ideas (launch marketing & infra)**
+18. **Fix og:image fallback** — Currently uses favicon.svg; should use a proper OG image **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### README Improvements
 
-19. **Add website link badge** — Add a "Website" badge in the badge row for visibility
-20. **Add animated demo** — GIF or asciinema showing cmdguard in action
-21. **Add "Who uses cmdguard?" section** — Once there are users
-22. **Add Go Report Card dynamic badge** — Replace static coverage badge with a live one
-23. **Tighten Quick Start** — The Quick Start in README is good but long; could link to website for the full version
-24. **Add badges row for sub-module status** — Show the 5 sub-modules are independently versioned
+19. ~~**Add website link badge** — Add a "Website" badge in the badge row for visibility~~ done — README Website badge (README.md:6)
+20. **Add animated demo** — GIF or asciinema showing cmdguard in action **→ ROADMAP raw ideas (launch marketing & infra)**
+21. **Add "Who uses cmdguard?" section** — Once there are users **→ ROADMAP raw ideas (launch marketing & infra)**
+22. **Add Go Report Card dynamic badge** — Replace static coverage badge with a live one **→ ROADMAP raw ideas (launch marketing & infra)**
+23. **Tighten Quick Start** — The Quick Start in README is good but long; could link to website for the full version **→ ROADMAP raw ideas (launch marketing & infra)**
+24. **Add badges row for sub-module status** — Show the 5 sub-modules are independently versioned **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Documentation Content
 
-25. **Expand guides** — Add guides for BranchingFlowContext, Audit Log, Plugin system, Doctor command, Shell completion, WithCleanup
-26. **Add a full tutorial** — Port docs/TUTORIAL.md to the website as a multi-page guide
-27. **Add per-function API docs** — Expand the API reference into per-function pages
-28. **Port the framework comparison** — docs/COMPARISON.md content to a website page comparing Kong, urfave/cli, go-flags
-29. **Add benchmarks page** — Port docs/PERFORMANCE.md to the website
-30. **Add CLI design principles** — Port docs/CLI_DESIGN_PRINCIPLES.md to the website
-31. **Add full changelog** — Include more version history beyond v3.0.0
-32. **Add migration guide** — Port docs/MIGRATION_v2_v3.md to the website
-33. **Add Cobra footguns doc** — Port docs/COBRA_FOOTGUNS.md to the website
+25. ~~**Expand guides** — Add guides for BranchingFlowContext, Audit Log, Plugin system, Doctor command, Shell completion, WithCleanup~~ done — guides expanded — 14 guide pages ship (website docs/guides)
+26. **Add a full tutorial** — Port docs/TUTORIAL.md to the website as a multi-page guide **→ ROADMAP raw ideas (port TUTORIAL to website)**
+27. ~~**Add per-function API docs** — Expand the API reference into per-function pages~~ done — api-reference.mdx ships (website docs)
+28. **Port the framework comparison** — docs/COMPARISON.md content to a website page comparing Kong, urfave/cli, go-flags **→ ROADMAP raw ideas (port COMPARISON to website)**
+29. **Add benchmarks page** — Port docs/PERFORMANCE.md to the website **→ ROADMAP raw ideas (port PERFORMANCE to website)**
+30. **Add CLI design principles** — Port docs/CLI_DESIGN_PRINCIPLES.md to the website **→ ROADMAP raw ideas (port CLI_DESIGN_PRINCIPLES to website)**
+31. ~~**Add full changelog** — Include more version history beyond v3.0.0~~ done — website changelog.mdx ships
+32. **Add migration guide** — Port docs/MIGRATION_v2_v3.md to the website **→ ROADMAP raw ideas (port MIGRATION_v2_v3 to website)**
+33. **Add Cobra footguns doc** — Port docs/COBRA_FOOTGUNS.md to the website **→ ROADMAP raw ideas (port COBRA_FOOTGUNS to website)**
 
 ### Code & Repo
 
-34. **Add `website/` to `.buildflow.yml`** — If BuildFlow is configured, add website build/lint to the pipeline
-35. **Update AGENTS.md** — Document the website directory, build commands, and deploy process
-36. **Update root `flake.nix`** — Consider adding a `website` app to the root flake for convenience
-37. **Add `.github/workflows/website.yml`** — Separate CI for website builds
-38. **Remove stale docs** — `docs/status/` has the jsonv2 migration status doc; clean up or archive
-39. **Add `website/README.md`** — Document the website build/deploy process within the website directory itself
+34. ~~**Add `website/` to `.buildflow.yml`** — If BuildFlow is configured, add website build/lint to the pipeline~~ done (docs-health pass 2026-11-08)
+35. ~~**Update AGENTS.md** — Document the website directory, build commands, and deploy process~~ done — AGENTS.md documents website dir + build (AGENTS.md:88,144)
+36. **Update root `flake.nix`** — Consider adding a `website` app to the root flake for convenience **→ ROADMAP raw ideas (launch marketing & infra)**
+37. ~~**Add `.github/workflows/website.yml`** — Separate CI for website builds~~ done — .github/workflows/website.yml exists
+38. ~~**Remove stale docs** — `docs/status/` has the jsonv2 migration status doc; clean up or archive~~ done (docs-health pass status reports remain as point-in-time snapshots (docs-health canon))
+39. ~~**Add `website/README.md`** — Document the website build/deploy process within the website directory itself~~ done — documented — AGENTS.md website build section (AGENTS.md:144)
 
 ### Marketing & Discoverability
 
-40. **Write a launch blog post** — Content for Reddit r/golang, Hacker News, etc.
-41. **Add to Awesome Go lists** — Submit to cobra-awesome, awesome-go-cli
-42. **Create pkg.go.dev landing** — Ensure pkg.go.dev renders well (check module path, readme rendering)
-43. **Add to Go project wiki** — Submit to github.com/golang/go/wiki/Projects
-44. **Social media announcement** — Prepare Twitter/X/LinkedIn content
-45. **Add "Sponsor" button** — `.github/FUNDING.yml` for GitHub Sponsors
+40. **Write a launch blog post** — Content for Reddit r/golang, Hacker News, etc. **→ ROADMAP raw ideas (launch marketing & infra)**
+41. **Add to Awesome Go lists** — Submit to cobra-awesome, awesome-go-cli **→ ROADMAP raw ideas (launch marketing & infra)**
+42. ~~**Create pkg.go.dev landing** — Ensure pkg.go.dev renders well (check module path, readme rendering)~~ done — pkg.go.dev renders (README /v4 badge)
+43. **Add to Go project wiki** — Submit to github.com/golang/go/wiki/Projects **→ ROADMAP raw ideas (launch marketing & infra)**
+44. **Social media announcement** — Prepare Twitter/X/LinkedIn content **→ ROADMAP raw ideas (launch marketing & infra)**
+45. **Add "Sponsor" button** — `.github/FUNDING.yml` for GitHub Sponsors **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Sub-Modules
 
-46. **Sub-module docs pages** — Add dedicated docs pages for each sub-module (glamour, manpage, prompts, spinner, telemetry)
-47. **Sub-module version badges** — Show current version of each sub-module in the docs
-48. **Sub-module examples** — Add standalone example apps for each sub-module
+46. ~~**Sub-module docs pages** — Add dedicated docs pages for each sub-module (glamour, manpage, prompts, spinner, telemetry)~~ done — guides/sub-modules.mdx ships (website docs)
+47. **Sub-module version badges** — Show current version of each sub-module in the docs **→ ROADMAP raw ideas (launch marketing & infra)**
+48. **Sub-module examples** — Add standalone example apps for each sub-module **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Firebase & Infrastructure
 
-49. **Set up Firebase preview channels** — For staging deployments on PRs
-50. **Configure Firebase cache optimization** — Review cache headers for Starlight assets
-51. **Add `_acme-challenge.cmdguard` TXT record** — May be needed for Firebase SSL cert verification (Firebase will provide the value after custom domain connection)
+49. **Set up Firebase preview channels** — For staging deployments on PRs **→ ROADMAP raw ideas (launch marketing & infra)**
+50. ~~**Configure Firebase cache optimization** — Review cache headers for Starlight assets~~ done — cache rules configured (firebase.json)
+51. **Add `_acme-challenge.cmdguard` TXT record** — May be needed for Firebase SSL cert verification (Firebase will provide the value after custom domain connection) **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ---
 
@@ -270,9 +270,13 @@
 
 The current plan uses `cmdguard.lars.software` (consistent with gogenfilter, go-atomic-write). However, for a public open-source library aimed at wide adoption, a dedicated domain like `cmdguard.dev` might be more memorable and professional. **Do you want to register/use a separate domain, or stick with the `lars.software` subdomain pattern?**
 
+**Answered:** the `lars.software` subdomain pattern won — README navigation and docs link `cmdguard.lars.software`.
+
 ### 2. Should `package-lock.json` be committed?
 
 gogenfilter tracks it; go-atomic-write does not. Both approaches work. The pnpm docs recommend committing it for applications (which this is). **What's your preference?**
+
+**Answered:** moot — the website moved to pnpm (`pnpm-lock.yaml`); `package-lock.json` no longer exists (AGENTS.md website build section).
 
 ---
 
