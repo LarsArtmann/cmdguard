@@ -6,7 +6,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v4.2.1 - zero panics, 90.4% core coverage, 0 lint issues, 0 race conditions
+**Status:** v5.0.0 - zero panics, 89.3% core coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -48,11 +48,11 @@ nix run .#check-all
 
 | API | Package           | Use Case                         |
 | --- | ----------------- | -------------------------------- |
-| v4  | `pkg/cmdguard/v4` | Type-safe, DI-powered, no panics |
+| v5  | `pkg/cmdguard/v5` | Type-safe, DI-powered, no panics |
 
-**Module path:** `github.com/larsartmann/cmdguard/v4`
+**Module path:** `github.com/larsartmann/cmdguard/v5`
 
-**Current Status:** v4.2.1. 462 test functions in core (576 across the 8 workspace modules; +104 in examples/benchmarks/integration), 29 benchmarks, 8 fuzz targets, 90.4% core / 96.1% flightrecorder / 80.3% testutil / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
+**Current Status:** v5.0.0. 468 test functions in core (583 across the 8 workspace modules; +103 in taskctl/integration), 26 benchmarks, 7 fuzz targets, 89.3% core / 96.1% flightrecorder / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
 
 ---
 
@@ -61,17 +61,20 @@ nix run .#check-all
 ```
 cmdguard/
 ├── pkg/cmdguard/
-│   ├── v4/                   # v4 API (current). Entry points: cli.go (CLI[T], NewCLI, Execute),
+│   ├── v5/                   # v5 API (current; batteries ON by default). Entry points:
+│   │                         # cli.go (CLI[T], NewCLI, Execute, execCtx reuse invariants),
+│   │                         # cli_builder.go (Builder: NewBuilder + Add/AddParent/Try/Check/Build),
 │   │                         # command.go (Command[T,F]), flags.go (FlagRegistry). Supporting:
 │   │                         # cli_*.go (options, wiring, output, accessors), command_options.go,
 │   │                         # config*.go (files, parsing, SetField), errors*.go (typed errors +
 │   │                         # sentinels), flags_*.go (parse, suggest, validate), scope.go (DI),
-│   │                         # middleware.go, output.go, auditlog.go, plugin.go, completion.go,
-│   │                         # docgen.go, version.go, doctor.go, type_handler*.go (extensible
-│   │                         # type registry), types_*.go (Duration/Enum/URL/Email/Port/...),
+│   │                         # middleware.go (CommandMetadata), output.go, auditlog.go, plugin.go,
+│   │                         # completion.go, docgen.go, version.go, doctor.go, type_codec*.go
+│   │                         # (extensible type registry), types_*.go (Duration/Enum/URL/Email/Port/...),
 │   │                         # flow_context*.go (branching flow), describe.go (JSON contract +
 │   │                         # describe command), errors_hints.go (ErrorHint), flag_helpers.go, doc.go
-│   └── testutil/             # Shared test assertions
+│   └── testutil/             # Shared test assertions (at pkg/testutil, NOT under pkg/cmdguard/)
+├── pkg/version/              # Version helper used by pkg/version sanity checks
 ├── glamour/                  # SUB-MODULE: markdown help rendering (charm.land/glamour/v2)
 ├── prompts/                  # SUB-MODULE: huh/v2 interactive prompt runner
 ├── spinner/                  # SUB-MODULE: terminal spinner middleware (lipgloss/v2)
@@ -79,7 +82,7 @@ cmdguard/
 ├── flightrecorder/           # SUB-MODULE: Go runtime execution trace flight recorder (stdlib only)
 ├── lint/                     # SUB-MODULE: cmdguard usage linter (go-finding + toolsdk); provider/ + cmd/cmdguard-lint/
 ├── schema/                   # SUB-MODULE: JSON Schema emitter for config structs (2020-12 + x-cmdguard)
-├── examples/taskctl/         # Flagship example: production task manager CLI (87 test functions)
+├── examples/taskctl/         # Flagship example: production task manager CLI (86 test functions, Builder-based)
 ├── examples/docs-generator/  # Example: GenerateDocs usage
 ├── benchmarks/               # Performance benchmarks
 ├── tests/integration/        # Integration tests
@@ -102,7 +105,7 @@ cmdguard/
 
 | Package           | Purpose                             | Importable? | Coverage |
 | ----------------- | ----------------------------------- | ----------- | -------- |
-| `pkg/cmdguard/v4` | Type-safe API                       | Yes         | ~90.4%   |
+| `pkg/cmdguard/v5` | Type-safe API                       | Yes         | ~89.3%   |
 | `pkg/testutil`    | Test helpers                        | Yes         | —        |
 | `flightrecorder`  | Flight recorder middleware (stdlib) | Yes         | 96.1%    |
 
@@ -117,7 +120,7 @@ cmdguard/
 | `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
 | `github.com/larsartmann/go-output`          | Rich output formats  | v0.38.7 |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.11.0 |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.12.1 |
 
 ### Optional Sub-Module Dependencies
 
@@ -127,8 +130,8 @@ Each sub-module is independently importable — core has **zero** dependencies o
 | ---------------- | ----------------------------------------------------- | -------------------------- | ------------------------------------------------ |
 | `glamour`        | `charm.land/glamour/v2`                               | v2.0.1                     | Markdown help rendering                          |
 | `prompts`        | `charm.land/huh/v2`                                   | v2.0.3                     | Interactive prompts                              |
-| `spinner`        | `charm.land/lipgloss/v2`                              | v2.0.5                     | Terminal spinner                                 |
-| `telemetry`      | `go.opentelemetry.io/otel/trace`                      | v1.44.0                    | OpenTelemetry spans                              |
+| `spinner`        | `charm.land/lipgloss/v2`                              | v2.0.6                     | Terminal spinner                                 |
+| `telemetry`      | `go.opentelemetry.io/otel/trace`                      | v1.47.0                    | OpenTelemetry spans                              |
 | `flightrecorder` | _(stdlib `runtime/trace`)_                            | Go 1.25+                   | Execution trace flight recorder                  |
 | `lint`           | `go-finding` + `go-finding/toolsdk` + `go-linter-sdk` | v1.13.0 / v1.14.0 / v0.3.1 | cmdguard usage linter (BuildFlow provider + CLI) |
 
@@ -156,11 +159,11 @@ Without this, `pnpm install` prints `[ERR_PNPM_IGNORED_BUILDS] Ignored build scr
 
 ## API Reference
 
-Full reference: [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) godoc plus [docs/QUICKSTART.md](docs/QUICKSTART.md), [docs/TUTORIAL.md](docs/TUTORIAL.md), and [docs/ERROR_REFERENCE.md](docs/ERROR_REFERENCE.md). (A historical docs/API.md was removed in the flightrecorder docs refresh — do not link it.)
+Full reference: [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5) godoc plus [docs/QUICKSTART.md](docs/QUICKSTART.md), [docs/TUTORIAL.md](docs/TUTORIAL.md), and [docs/ERROR_REFERENCE.md](docs/ERROR_REFERENCE.md). (A historical docs/API.md was removed in the flightrecorder docs refresh — do not link it.)
 
 Consumer-facing AI sessions get the [`.agents/skills/cmdguard/SKILL.md`](.agents/skills/cmdguard/SKILL.md) skill (fan-out symlink, self-healed by the devShell shellHook). When public flag/command/scoping APIs change, update that skill in the same change — it documents the flag scoping model with source-line references that can rot.
 
-Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positionally), `NewParentCommand[T]`, `AddCommand`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) for godoc.
+Quick reference: `NewCLI[T]`, `NewBuilder[T]` + `Add`/`AddParent`/`Try`/`Check`/`Build` (error-ladder-free registration), `NewCommand` (non-generic, flags passed positionally), `NewParentCommand[T]`, `AddCommand`/`AddCommands`, `Execute`. All functions return errors — zero panics. See [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5) for godoc.
 
 ---
 
@@ -168,10 +171,10 @@ Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positional
 
 ### Go Conventions
 
-- **Go 1.26** - Use modern Go features
+- **Go 1.27** - Use modern Go features
 - **gofumpt** formatting (via `golangci-lint fmt`)
 - **Error handling** - Always check errors, wrap with `fmt.Errorf("context: %w", err)`
-- **No panics** in v4 library code
+- **No panics** in v5 library code
 - **Functional options** pattern for configuration
 - **Constructor pattern** - All Command creation via `NewCommand`/`NewParentCommand`, struct fields unexported
 
@@ -181,7 +184,7 @@ Quick reference: `NewCLI[T]`, `NewCommand` (non-generic, flags passed positional
 - `//nolint:paralleltest` for tests using `t.Setenv` or capturing `os.Stdout`
 - `//nolint:fatcontext` at file level for test files with context in closures
 - Table-driven tests: `tests := []struct{...}` pattern
-- Single internal test package (`v4`, accesses private helpers)
+- Single internal test package (`v5`, accesses private helpers)
 
 ### Test Commands
 
@@ -198,7 +201,7 @@ go build ./...                                   # Verify build
 
 ### Workspace module replaces (2026-11-02)
 
-Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `prompts/`, `glamour/`) must carry an **unversioned** `replace github.com/larsartmann/cmdguard/v4 => ../` plus the require pinned to the zero pseudo-version `v4.0.0-00010101000000-000000000000`, AND consumer-side replaces for the root module's internal siblings (`flightrecorder`, `glamour`, `spinner` => `../<name>`). Two failure modes fixed by this:
+Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `prompts/`, `glamour/`) must carry an **unversioned** `replace github.com/larsartmann/cmdguard/v5 => ../` plus the require pinned to the zero pseudo-version `v5.0.0-00010101000000-000000000000`, AND consumer-side replaces for the root module's internal siblings (`flightrecorder`, `glamour`, `spinner` => `../<name>`). Two failure modes fixed by this:
 
 - A **version-pinned** replace (`cmdguard/v4 v4.0.2 => ../`) goes silently inert the moment a require bumps past the pin — GOWORK=off builds then resolve the stale published tag instead of local source (`v4.AddCommands` existed only locally, tag `v4.1.0` predated it; go-mod-update's compile gate failed and blamed the bump). Workspace-mode builds never notice because `use .` always wins.
 - Replaces never propagate: when a submodule resolves the local root go.mod, root's zero-pseudo sibling requires are only valid with root as the MAIN module — without consumer-side replaces, `GOWORK=off go list -m all` fails with `unknown revision 000000000000` while `go build`/`tidy` pass via graph pruning (same trap as BuildFlow gotcha #241).
