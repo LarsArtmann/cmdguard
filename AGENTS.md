@@ -283,7 +283,7 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 - **Regex validation cache** — `validateRegex` caches compiled patterns in `sync.Map` (concurrency-safe; tests run in parallel)
 - **Integer overflow** — `int8`/`int16`/`int32`/`uint8`/`uint16` flag values are range-checked at parse time → `ErrValueOutOfRange`
 - **Iterator methods (`iter.Seq`)** — `TagsSeq()`, `FlagNamesSeq()`, `PathSeq()`, `ChildrenSeq()` are zero-allocation alternatives; the slice-returning methods return defensive copies
-- **Accepted clone groups** — `art-dupl --semantic -t 3` reports 0 groups (was 5 before 2026-07-20 dedup pass); `-t 2` reports trivial 2-line snippets only. The remaining intentional sibling pairs are:
+- **Accepted clone groups** — `art-dupl --semantic -t 3` reports only intentional sibling-pattern groups (3 as of the 2026-11-07 re-run: flags_validate/flag_helpers error-handling pairs; was 5 before the 2026-07-20 dedup pass); `-t 2` reports trivial 2-line snippets only. The remaining intentional sibling pairs are:
 
 #### Config Files
 

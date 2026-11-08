@@ -340,14 +340,6 @@ First stable release of the `lint` sub-module: a usage linter for cmdguard-based
 
 ---
 
-## [4.0.2] - 2026-08-06
-
-### Changed
-
-- Dependency alignment release: sub-module and core dependency bumps to align
-  with the v4.0.1 sub-module releases (no API changes).
-
----
 
 ## [4.0.1] - 2026-08-06
 

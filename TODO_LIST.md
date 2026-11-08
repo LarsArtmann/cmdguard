@@ -103,6 +103,26 @@ resolved (struck with evidence in the report itself) or routed to ROADMAP
 | H3 | koanf→JSON round-trip edge-case tests      | TOML datetimes, YAML anchors, int-vs-float64, empty/0-byte configs — none covered in `koanf_loader_test.go` (found by the 2026-11-07 sweep in the 07-26/07-27 consolidation reports) | Medium | 🔴 TODO |
 | H4 | Website hero-code sync guard               | `website/src/data/hero-code.ts` (raw string) vs the inline highlighted copy in `HeroSection.astro` — no test or derive step keeps them in sync | Low | 🔴 TODO |
 | H5 | Remove dead `pkg/cmdguard/v2` lint exclusions | `.golangci.yml` carries ~20 path rules pointing at `pkg/cmdguard/v2/...` paths that no longer exist (`pkg/cmdguard/` contains only `v4`) — found while closing the 2026-07-23 manpage report | Low | 🔴 TODO |
+| H6 | Audit `docs/COMPARISON.md` prose for v4 accuracy | Header still says "Last Updated: 2026-07-07" while claiming v4-era content; the full prose audit was left open by three 2026-08-06 reports | Low | 🔴 TODO |
+| H7 | Create GitHub release pages for v4.0.0 / v4.0.1 (+ v0.2.0 sub-modules) | Tags exist and resolve on the proxy, but no release pages (v4.1.0+ and lint/v0.1.0 have them) — recurs in five 2026-08-06 reports | Low | 🔴 TODO |
+| H8 | Include `examples/taskctl` in `check-all` | CI's `go test ./...` runs taskctl but the flake's check-all does not — local-green ≠ CI-green (found in the 2026-09-20 report) | Medium | 🔴 TODO |
+
+---
+
+## samber-linter HW-2 Follow-ups (2026-09-20 report)
+
+The context-aware healthcheck FIX shipped, but its follow-up cluster is
+genuinely open (verified 2026-11-07 by the docs-health sweep).
+
+| #   | Task                                                                                  | Notes                                                                                                                                                                                | Priority | Status  |
+| --- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------- |
+| W1  | CHANGELOG entry for the `CLI.HealthCheck(ctx)` signature change                       | The breaking change shipped silently in v4.1.0 — no entry through v4.2.1 (grep-verified). Add it to the next release's Breaking/Changed section, noting the v4.1.0 landing.           | High     | 🔴 TODO |
+| W2 | Deduplicate `CLI.HealthCheckWithContext` vs `CLI.HealthCheck`                          | `cli_accessors.go:60` is an exact duplicate of the v4.1.0 signature; mark one `// Deprecated:` with a `TODO(v5)` removal marker (T-section style).                                    | Medium   | 🔴 TODO |
+| W3 | Resolve the `Scope.HealthCheck()` / `HealthCheckWithContext` split-brain              | `scope.go:258` vs `:282` — one should delegate to the other (mirror the CLI-level fix).                                                                                              | Medium   | 🔴 TODO |
+| W4 | Add `var _ do.HealthcheckerWithContext = (*CLI)(nil)` conformance guards              | Compile-time proof that CLI and Scope satisfy the samber/do interface (prevents silent signature drift).                                                                              | Low      | 🔴 TODO |
+| W5 | Context-cancellation tests for the healthcheck path                                   | None exist; the HW-2 fix is about context awareness — test cancelled contexts.                                                                                                       | Medium   | 🔴 TODO |
+| W6 | Commit a samber-linter baseline + wire it into flake/CI                               | The linter flagged HW-2; without a committed baseline and CI wiring the next finding class ships silently again.                                                                      | Medium   | 🔴 TODO |
+| W7 | Refresh README/doc.go healthcheck docs                                                | README:68/268 + doc.go still describe the bare generic `HealthCheck` signature.                                                                                                      | Low      | 🔴 TODO |
 
 ---
 
