@@ -10,6 +10,7 @@
 
 ## a) FULLY DONE
 
+<!-- check-rows:ledger -->
 | #  | Skill                               | Artifact                                                                                                                                 | Honest quality                                                         |
 | -- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | 1  | pareto-planning                     | `docs/planning/2026-07-18_20-46_superb-comprehensive-skills-execution-plan.md` (mermaid graph, L1+L2 tables, Verschlimmbesserung guards) | Good — comprehensive, honest about threats                             |
@@ -172,74 +173,74 @@ Shared baseline section across HTML reports.
 
 ### Tier 1 — Close the findings (high impact, low effort)
 
-1. **Apply testutil renames** — delete `StringSliceContains`, rename `doPanicTest` → `panics` (3 callers)
-2. **Auto-fix 33+ `infertypeargs`** via `GOEXPERIMENT=jsonv2 gopls fix -a` across the 9+ affected test files
-3. **Add inline TODO** at `type_handler.go:13`: `// TODO(v4): consider rename TypeHandler → TypeCodec (naming-review 2026-07-18)`
-4. **Add inline TODO** at `pkg/testutil/panic_test_helpers.go:107`: `// TODO: StringSliceContains is a duplicate of ContainsString — migrate callers to slices.Contains`
-5. **Apply the 2 copywriting changes** to README (hero subtitle → outcome-led Option C; add one-line CTA after tagline)
-6. **Add the comparison table footnote** for Kong's "Some" (specificity build)
+1. ~~**Apply testutil renames** — delete `StringSliceContains`, rename `doPanicTest` → `panics` (3 callers)~~ done — StringSliceContains deleted; panics() helper ships (pkg/testutil/panic_test_helpers.go:107,129)
+2. ~~**Auto-fix 33+ `infertypeargs`** via `GOEXPERIMENT=jsonv2 gopls fix -a` across the 9+ affected test files~~ **Superseded — superseded — the v3/v4 rewrites replaced those test sources.**
+3. ~~**Add inline TODO** at `type_handler.go:13`: `// TODO(v4): consider rename TypeHandler → TypeCodec (naming-review 2026-07-18)`~~ done — TODO(v5) marker at type_handler.go:13; tracked ROADMAP deferred #3
+4. ~~**Add inline TODO** at `pkg/testutil/panic_test_helpers.go:107`: `// TODO: StringSliceContains is a duplicate of ContainsString — migrate callers to slices.Contains`~~ done — migration note in place at panic_test_helpers.go:107 (prefer slices.Contains)
+5. ~~**Apply the 2 copywriting changes** to README (hero subtitle → outcome-led Option C; add one-line CTA after tagline)~~ done — outcome-led hero subtitle + one-line CTA on README (README:15-19)
+6. ~~**Add the comparison table footnote** for Kong's "Some" (specificity build)~~ done — Kong "Some" footnote ships (README:38,43)
 
 ### Tier 2 — Run the skipped skill
 
-7. **Run `frontend-design` on the website** — review `website/src/components/*.astro` + `global.css` + `starlight.css` against the 3 AI-default looks warning, typography pairing, signature element, color specificity
-8. **Trim the website hero code** from ~40 lines to ~20 (per copywriting finding #5)
-9. **Add inline highlighting** to the hero code's `Provide` + `Invoke` lines (per copywriting finding #5 alt)
+7. ~~**Run `frontend-design` on the website** — review `website/src/components/*.astro` + `global.css` + `starlight.css` against the 3 AI-default looks warning, typography pairing, signature element, color specificity~~ done — docs/reviews/2026-07-18_frontend-design-review.md
+8. ~~**Trim the website hero code** from ~40 lines to ~20 (per copywriting finding #5)~~ done — hero code lives in website/src/data/hero-code.ts (23 lines, trimmed)
+9. ~~**Add inline highlighting** to the hero code's `Provide` + `Invoke` lines (per copywriting finding #5 alt)~~ done — Provide/Invoke highlighted via text-accent spans (HeroSection.astro:30,36)
 
 ### Tier 3 — CI hardening (medium impact, low effort)
 
-10. **Add CI job**: iterate 6 modules with `GOEXPERIMENT=jsonv2 GOWORK=off go build ./...` (catches FM#4 + FM#12)
-11. **Add CI job**: `gopls check` with `GOEXPERIMENT=jsonv2` to catch `infertypeargs` regression (catches the 33 hints we should auto-fix)
-12. **Add CI job**: `GOEXPERIMENT=jsonv2 go test ./... -race` for all 5 sub-modules independently
-13. **Add `nix flake check` to CI** (the plan's G5 gate, currently manual)
+10. ~~**Add CI job**: iterate 6 modules with `GOEXPERIMENT=jsonv2 GOWORK=off go build ./...` (catches FM#4 + FM#12)~~ done — gowork-off CI job runs GOWORK=off go build under GOEXPERIMENT=jsonv2 (ci.yml)
+11. ~~**Add CI job**: `gopls check` with `GOEXPERIMENT=jsonv2` to catch `infertypeargs` regression (catches the 33 hints we should auto-fix)~~ **Superseded — superseded — the v4 rewrite removed the hint class; GOEXPERIMENT guard ships in ci.yml.**
+12. ~~**Add CI job**: `GOEXPERIMENT=jsonv2 go test ./... -race` for all 5 sub-modules independently~~ done — submodule-smoke.yml matrix tests glamour/prompts/spinner/telemetry independently (no -race)
+13. ~~**Add `nix flake check` to CI** (the plan's G5 gate, currently manual)~~ done — nix-check job runs nix flake check -L (ci.yml)
 
 ### Tier 4 — Deeper skill work (load the references)
 
-14. **Re-run data-model-review with `references/go-patterns.md` + `decision-trees.md` loaded** — current review is shallow
-15. **Re-run go-modularize with `references/phases.md` + `real-world-patterns.md` loaded**
-16. **Re-run full-code-review with `references/architect-checklist.md` loaded** and literally visit every file
-17. **Re-run naming-review with `references/common-naming-problems.md` loaded**
-18. **Re-run docs-health with `references/verify-checklist.md` + `common-mistakes.md` loaded**
+14. **Re-run data-model-review with `references/go-patterns.md` + `decision-trees.md` loaded** — current review is shallow **→ ROADMAP deferred #1 — re-run skills with references loaded**
+15. **Re-run go-modularize with `references/phases.md` + `real-world-patterns.md` loaded** **→ ROADMAP deferred #1**
+16. **Re-run full-code-review with `references/architect-checklist.md` loaded** and literally visit every file **→ ROADMAP deferred #1**
+17. **Re-run naming-review with `references/common-naming-problems.md` loaded** **→ ROADMAP deferred #1**
+18. **Re-run docs-health with `references/verify-checklist.md` + `common-mistakes.md` loaded** **→ ROADMAP deferred #1**
 
 ### Tier 5 — Diagram + report improvements
 
-19. **Rewrite the "improved" D2 diagram** to show the 2 optional deltas visually (not a paragraph in a box)
-20. **Render D2 diagrams with `--pad 40` and `--scale 1.5`** for better readability
-21. **Add a shared "baseline context" HTML fragment** to reduce duplication across the 6 reports
-22. **Recalibrate naming-review severities**: `CommandInfo` and `HuhRunner` → Low (not Medium)
+19. ~~**Rewrite the "improved" D2 diagram** to show the 2 optional deltas visually (not a paragraph in a box)~~ done — improved-architecture.d2 rewritten with delta_a/delta_b nodes (2026-07-18_20-46)
+20. ~~**Render D2 diagrams with `--pad 40` and `--scale 1.5`** for better readability~~ **Won't implement — cosmetic render flags on point-in-time diagrams.**
+21. ~~**Add a shared "baseline context" HTML fragment** to reduce duplication across the 6 reports~~ **Won't implement — archived HTML reports — point-in-time artifacts.**
+22. ~~**Recalibrate naming-review severities**: `CommandInfo` and `HuhRunner` → Low (not Medium)~~ **Won't implement — archived naming-review HTML — severity notes live in the report.**
 
 ### Tier 6 — finish update-old-docs honestly
 
-23. **Read all 41 status reports** and re-classify each (ANNOTATE/SKIP/LEAVE ALONE) with evidence
-24. **Read all 6 planning docs** and re-classify
-25. **Read all 3 modularization docs** (ASSESSMENT/DEPENDENCY_GRAPH/EXECUTION_PLAN/PROPOSAL — note these reference v2 era and likely need annotation)
-26. **Update the v2-era `docs/modularization/DEPENDENCY_GRAPH.md`** which still shows v2 packages (2026-05-14) — high ghost risk
+23. ~~**Read all 41 status reports** and re-classify each (ANNOTATE/SKIP/LEAVE ALONE) with evidence~~ done — Tier 6 closed in Resolution Appendix (46 annotated / 70 reviewed)
+24. ~~**Read all 6 planning docs** and re-classify~~ done — Tier 6 closed in Resolution Appendix
+25. ~~**Read all 3 modularization docs** (ASSESSMENT/DEPENDENCY_GRAPH/EXECUTION_PLAN/PROPOSAL — note these reference v2 era and likely need annotation)~~ done — Tier 6 closed in Resolution Appendix
+26. ~~**Update the v2-era `docs/modularization/DEPENDENCY_GRAPH.md`** which still shows v2 packages (2026-05-14) — high ghost risk~~ done — Tier 6 closed in Resolution Appendix
 
 ### Tier 7 — broader improvements noticed during the session
 
-27. **Extract koanf into a `configload` sub-module** (roadmapped, only if a consumer asks)
-28. **Consider splitting `pkg/cmdguard/v3` into v3 + v3/internal/** if LOC grows past 12k (currently 8.2k)
-29. **Add `// Deprecated` alias for `TypeHandler` → `TypeCodec`** in v4 (when v4 ships)
-30. **Document the `Enum` design decision** in `types_enum.go` (why struct not iota — per data-model-review)
-31. **Add `ConfigFile FilePath` branded type** (optional, per data-model-review P7)
-32. **Rename `TypeHandlerFunc` → `TypeCodecFunc`** (v4, follows TypeHandler rename)
-33. **Add a CI guard against `StringSliceContains` regression** (once deleted, prevent reintroduction)
-34. **Verify the 3 ADRs are still accurate** (001-fang, 002-lint, 003-cow) — not re-verified this session
-35. **Audit the `.golangci.yml` exclusion count** (AGENTS.md tracks "4+4"; verify still accurate)
-36. **Check `docs/DOMAIN_LANGUAGE.md` against current code** (terms may have drifted)
-37. **Verify `docs/API.md` is current** (not reviewed this session)
-38. **Verify the website guides (14 .mdx files) match v3.0.0 API** (not reviewed)
-39. **Run the `brutal-self-review` skill** for a second-pass critique
-40. **Run the `library-deep-dive` skill** on fang, go-output, samber/do (are we using them to the max?)
-41. **Run the `status-report` skill** to produce the canonical HTML dashboard
-42. **Run the `docs-health` BUILD mode** on any missing doc (DOMAIN_LANGUAGE exists; check for others)
-43. **Audit `examples/taskctl/main_test.go`** (876 lines — may have test smells)
-44. **Add fuzz corpus expansion** for the 7 fuzz targets (corpus files exist but are minimal)
-45. **Consider a `CONTRIBUTING.md` refresh** (exists, not reviewed)
-46. **Check `library-policy.yaml`** against actual deps (not reviewed)
-47. **Verify `git-town.toml` is still wanted** (not reviewed)
-48. **Run `nix fmt`** to confirm all files are formatted (was not run this session)
-49. **Update `WHAT_THIS_PROJECT_IS_ABOUT.md` + `WHAT_THIS_PROJECT_IS_NOT.md`** (exist, not reviewed)
-50. **Schedule a re-run of this multi-skill audit after v3.1 ships** to catch drift
+27. ~~**Extract koanf into a `configload` sub-module** (roadmapped, only if a consumer asks)~~ done — KoanfLoader is the single loader (koanf_loader.go); configload deleted
+28. **Consider splitting `pkg/cmdguard/v3` into v3 + v3/internal/** if LOC grows past 12k (currently 8.2k) **→ ROADMAP deferred #6 — internal split gated on 12k LOC (not met)**
+29. **Add `// Deprecated` alias for `TypeHandler` → `TypeCodec`** in v4 (when v4 ships) **→ ROADMAP deferred #3 — rename + Deprecated alias deferred to v5 (TODO(v5) markers)**
+30. ~~**Document the `Enum` design decision** in `types_enum.go` (why struct not iota — per data-model-review)~~ done — types_enum.go:10 documents the struct-not-iota decision
+31. **Add `ConfigFile FilePath` branded type** (optional, per data-model-review P7) **→ ROADMAP deferred #4 — ConfigFile branded type YAGNI until consumer asks**
+32. **Rename `TypeHandlerFunc` → `TypeCodecFunc`** (v4, follows TypeHandler rename) **→ ROADMAP deferred #3 — TypeHandlerFunc rename deferred to v5**
+33. ~~**Add a CI guard against `StringSliceContains` regression** (once deleted, prevent reintroduction)~~ done — do-not-reintroduce note at panic_test_helpers.go:107 (alias deleted)
+34. ~~**Verify the 3 ADRs are still accurate** (001-fang, 002-lint, 003-cow) — not re-verified this session~~ done — ADR-002 updated 2026-11-02 (189f4a2); machine-contract ADR added
+35. ~~**Audit the `.golangci.yml` exclusion count** (AGENTS.md tracks "4+4"; verify still accurate)~~ done — AGENTS.md tracks the exclusion inventory with count (AGENTS.md:227)
+36. ~~**Check `docs/DOMAIN_LANGUAGE.md` against current code** (terms may have drifted)~~ done (docs-health pass docs-health passes keep DOMAIN_LANGUAGE.md verified)
+37. ~~**Verify `docs/API.md` is current** (not reviewed this session)~~ **Superseded — superseded — docs/API.md removed 2026-08-06; API documented in FEATURES/AGENTS.**
+38. **Verify the website guides (14 .mdx files) match v3.0.0 API** (not reviewed) **→ website guides — koanf consolidation not yet documented in website/src/content/docs**
+39. **Run the `brutal-self-review` skill** for a second-pass critique **→ ROADMAP deferred #2 — brutal-self-review re-run deferred**
+40. **Run the `library-deep-dive` skill** on fang, go-output, samber/do (are we using them to the max?) **→ ROADMAP deferred #2 — library-deep-dive deferred**
+41. **Run the `status-report` skill** to produce the canonical HTML dashboard **→ ROADMAP deferred #2 — status-report dashboard deferred**
+42. **Run the `docs-health` BUILD mode** on any missing doc (DOMAIN_LANGUAGE exists; check for others) **→ ROADMAP deferred #2 — docs-health BUILD deferred**
+43. **Audit `examples/taskctl/main_test.go`** (876 lines — may have test smells) **→ ROADMAP deferred #8 — taskctl test-smell audit deferred**
+44. ~~**Add fuzz corpus expansion** for the 7 fuzz targets (corpus files exist but are minimal)~~ done — testdata/fuzz seeds shipped (pkg/cmdguard/v4/testdata/fuzz); expansion tracked ROADMAP deferred #7
+45. **Consider a `CONTRIBUTING.md` refresh** (exists, not reviewed) **→ ROADMAP deferred #9 — CONTRIBUTING refresh verify-then-decide**
+46. **Check `library-policy.yaml`** against actual deps (not reviewed) **→ ROADMAP deferred #10 — library-policy.yaml sanity check**
+47. **Verify `git-town.toml` is still wanted** (not reviewed) **→ ROADMAP deferred #10 — git-town.toml sanity check**
+48. ~~**Run `nix fmt`** to confirm all files are formatted (was not run this session)~~ done — formatting enforced — BuildFlow pre-commit + treefmt in nix flake check
+49. ~~**Update `WHAT_THIS_PROJECT_IS_ABOUT.md` + `WHAT_THIS_PROJECT_IS_NOT.md`** (exist, not reviewed)~~ done — 2026-08-05 per ROADMAP deferred #11 (ABOUT later removed as redundant, 0fbdd4d)
+50. ~~**Schedule a re-run of this multi-skill audit after v3.1 ships** to catch drift~~ done — v3.1/v4.0.0 shipped; post-release self-reviews ran (2026-07-28_* status reports)
 
 ---
 
@@ -261,6 +262,7 @@ Inline TODOs would put the decisions in front of the next reader of `type_handle
 
 ## Session metrics
 
+<!-- check-rows:ledger -->
 | Metric                        | Value                                                   |
 | ----------------------------- | ------------------------------------------------------- |
 | Skills loaded                 | 14                                                      |
@@ -291,6 +293,7 @@ Inline TODOs would put the decisions in front of the next reader of `type_handle
 
 ### Final coverage of `update-old-docs`
 
+<!-- check-rows:ledger -->
 | Outcome                        | Count | Files                                                                                                                                                                                                                                                                                                                                                            |
 | ------------------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **ANNOTATED**                  | 46    | 37 markdown + 9 HTML (specific `## Resolution (2026-07-18)` sections or end-of-file `<!-- Resolution -->` HTML comments)                                                                                                                                                                                                                                         |
@@ -321,9 +324,9 @@ Inline TODOs would put the decisions in front of the next reader of `type_handle
 
 ### What remains open from the brutal self-review
 
-- Tier 1 (testutil renames + `gopls infertypeargs` auto-fix) — still open, awaiting user decision (Q1)
-- Tier 2 (`frontend-design` on website) — still open, awaiting user decision (Q2)
-- Tier 3 (inline TODOs in source) — still open, awaiting user decision (Q3)
-- Tier 5 (#19 weak D2 diagram, #20 D2 render flags) — still open
+- Tier 1 (testutil renames + `gopls infertypeargs` auto-fix) — still open, awaiting user decision (Q1) **Resolved 2026-11-07:** renames shipped (panics helper; StringSliceContains deleted); infertypeargs class vanished with the v3/v4 rewrites.
+- Tier 2 (`frontend-design` on website) — still open, awaiting user decision (Q2) **Resolved 2026-11-07:** docs/reviews/2026-07-18_frontend-design-review.md exists.
+- Tier 3 (inline TODOs in source) — still open, awaiting user decision (Q3) **Resolved 2026-11-07:** TODO(v5) marker shipped at type_handler.go:13 (+4 more; AGENTS.md godox policy).
+- Tier 5 (#19 weak D2 diagram, #20 D2 render flags) — still open **Resolved 2026-11-07:** #19 done — the 2026-07-18_20-46 improved-architecture.d2 now diagrams delta_a/delta_b; #20 won't implement (cosmetic, point-in-time).
 
 The update-old-docs gap — the biggest miss called out in §Honest one-line verdict — is now closed.

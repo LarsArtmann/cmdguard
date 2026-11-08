@@ -64,9 +64,9 @@ This session verified every dependency is at its latest tag, confirmed build + t
 
 | # | Improvement                                                                                                                                                               | Why                                                                                                          |
 | - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 1 | **Doc-drift is systemic.** Every dep bump should trigger a doc grep + update in the same commit.                                                                          | The v0.17.2→v0.23.3 gap proves manual doc sync doesn't happen reliably.                                      |
-| 2 | **Add a CI check (or pre-commit hook) that fails when go.mod versions don't match AGENTS.md/FEATURES.md.**                                                                | A 30-line script comparing `go list -m` output against the markdown tables would have caught this instantly. |
-| 3 | **The go-output sub-modules note in AGENTS.md is fragile and high-maintenance.** It enumerates exact module counts ("10 direct", "3 indirect") that change every release. | Replace with a principle ("all go-output sub-modules are pinned in lockstep") rather than a brittle count.   |
+| 1 | **Doc-drift is systemic.** Every dep bump should trigger a doc grep + update in the same commit. **→ ROADMAP raw ideas (dep-bump doc-sync discipline)** | The v0.17.2→v0.23.3 gap proves manual doc sync doesn't happen reliably.                                      |
+| 2 | **Add a CI check (or pre-commit hook) that fails when go.mod versions don't match AGENTS.md/FEATURES.md.** **→ ROADMAP raw ideas (dep/doc version drift CI guard)** | A 30-line script comparing `go list -m` output against the markdown tables would have caught this instantly. |
+| 3 | **The go-output sub-modules note in AGENTS.md is fragile and high-maintenance.** It enumerates exact module counts ("10 direct", "3 indirect") that change every release. **→ ROADMAP raw ideas (simplify go-output sub-modules note)** | Replace with a principle ("all go-output sub-modules are pinned in lockstep") rather than a brittle count.   |
 | ~~4~~ | ~~**`testutil` package shows 0.0% coverage** with no test files.~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04) | ~~Either it's tested elsewhere (then annotate) or it's untested helper code that should be covered.~~ |
 | ~~5~~ | ~~**examples/taskctl coverage is 67.7%** — lower than the core lib.~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04) | ~~The flagship example should lead by example; gaps here may hide integration bugs.~~ |
 | ~~6~~ | ~~**No automated "are deps latest?" check.**~~ done — .github/dependabot.yml exists | ~~A weekly `go list -m -u` sweep + PR would prevent drift.~~ |
@@ -93,9 +93,9 @@ Ranked by impact (Pareto: high impact first).
 
 ### Anti-Doc-Drift (prevent recurrence)
 
-8. **Write a `scripts/check-dep-versions.sh`** that greps AGENTS.md/FEATURES.md version numbers against `go list -m` output and exits non-zero on mismatch.
-9. **Add that script to `nix flake check`** so CI catches drift.
-10. **Simplify the go-output sub-modules note in AGENTS.md** — remove the brittle module count, state the principle.
+8. **Write a `scripts/check-dep-versions.sh`** that greps AGENTS.md/FEATURES.md version numbers against `go list -m` output and exits non-zero on mismatch. **→ ROADMAP raw ideas (check-dep-versions doc-drift guard script)**
+9. **Add that script to `nix flake check`** so CI catches drift. **→ ROADMAP raw ideas (check-dep-versions doc-drift guard script)**
+10. **Simplify the go-output sub-modules note in AGENTS.md** — remove the brittle module count, state the principle. **→ ROADMAP raw ideas (simplify go-output sub-modules note)**
 11. **Consider a single `VERSION` file or build-time const** so AGENTS.md/FEATURES.md/CHANGELOG.md header versions stay in sync automatically. **→ ROADMAP raw ideas (version embedding via ReadBuildInfo/-ldflags)**
 
 ### Coverage & Quality

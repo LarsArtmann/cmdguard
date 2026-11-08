@@ -53,6 +53,7 @@
 
 ### Coverage — 15 functions still at 0%
 
+<!-- check-rows:ledger -->
 | #  | Function                     | File                  | Why 0%                                                                                      | Effort |
 | -- | ---------------------------- | --------------------- | ------------------------------------------------------------------------------------------- | ------ |
 | 1  | `WithAuditLogGroupID`        | auditlog.go:43        | Simple option, no test yet                                                                  | 2min   |
@@ -98,21 +99,21 @@
 
 | #  | Task                                                          | Category | Impact | Effort |
 | -- | ------------------------------------------------------------- | -------- | ------ | ------ |
-| 8  | Add test for `WithAuditLogGroupID` (0%)                       | Coverage | LOW    | 2min   |
-| 9  | Add test for `WithDoctorLong` (0%)                            | Coverage | LOW    | 2min   |
-| 10 | Add test for `RegisterValidator` (0%)                         | Coverage | LOW    | 3min   |
-| 11 | Add test for `validateNonEmpty` via `validate:"nonempty"` tag | Coverage | LOW    | 3min   |
-| 12 | Add test for `NewManPage` standalone factory (0%)             | Coverage | LOW    | 5min   |
-| 13 | Add direct test for `WithConfigFileLoader` (0%)               | Coverage | LOW    | 5min   |
+| ~~8~~  | ~~Add test for `WithAuditLogGroupID` (0%)~~ **Superseded — symbol gone — auditlog options rewritten (WithAuditMiddleware in v4).** | ~~Coverage~~ | ~~LOW~~ | ~~2min~~ |
+| ~~9~~  | ~~Add test for `WithDoctorLong` (0%)~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor covered by doctor_test.go.** | ~~Coverage~~ | ~~LOW~~ | ~~2min~~ |
+| ~~10~~ | ~~Add test for `RegisterValidator` (0%)~~ done — flags_validate_test.go covers RegisterValidator | ~~Coverage~~ | ~~LOW~~ | ~~3min~~ |
+| ~~11~~ | ~~Add test for `validateNonEmpty` via `validate:"nonempty"` tag~~ **Superseded — rewritten through v3/v4 — validateNonEmpty now flags_validate.go:453 via tag validation.** | ~~Coverage~~ | ~~LOW~~ | ~~3min~~ |
+| ~~12~~ | ~~Add test for `NewManPage` standalone factory (0%)~~ **Superseded — man-page generation removed in v4.** | ~~Coverage~~ | ~~LOW~~ | ~~5min~~ |
+| ~~13~~ | ~~Add direct test for `WithConfigFileLoader` (0%)~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~Coverage~~ | ~~LOW~~ | ~~5min~~ |
 
 ### Documentation
 
 | #  | Task                                                                                                                 | Category | Impact | Effort |
 | -- | -------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------ |
-| 14 | ADR-001 gap: `WithFangErrorHandler` and `WithFangColorScheme` are integrated but ADR says "gaps remain" — update ADR | Docs     | LOW    | 3min   |
-| 15 | Add output format section to `docs/API.md` (16 formats with examples)                                                | Docs     | MEDIUM | 10min  |
-| 16 | Add Prompt API to `docs/API.md`                                                                                      | Docs     | MEDIUM | 5min   |
-| 17 | Add ManPage API to `docs/API.md`                                                                                     | Docs     | MEDIUM | 5min   |
+| ~~14~~ | ~~ADR-001 gap: `WithFangErrorHandler` and `WithFangColorScheme` are integrated but ADR says "gaps remain" — update ADR~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.** | ~~Docs~~ | ~~LOW~~ | ~~3min~~ |
+| ~~15~~ | ~~Add output format section to `docs/API.md` (16 formats with examples)~~ **Superseded — docs/API.md removed — FEATURES.md Rich Output section documents 16 formats.** | ~~Docs~~ | ~~MEDIUM~~ | ~~10min~~ |
+| ~~16~~ | ~~Add Prompt API to `docs/API.md`~~ **Superseded — docs/API.md removed — prompts documented in FEATURES.md sub-module table.** | ~~Docs~~ | ~~MEDIUM~~ | ~~5min~~ |
+| ~~17~~ | ~~Add ManPage API to `docs/API.md`~~ **Superseded — docs/API.md removed — man-page generation removed in v4.** | ~~Docs~~ | ~~MEDIUM~~ | ~~5min~~ |
 
 ---
 
@@ -167,31 +168,31 @@ Sorted by **Impact × (1/Effort)** — highest ROI first:
 
 | #  | Task                                                                       | Impact | Effort | Category     |
 | -- | -------------------------------------------------------------------------- | ------ | ------ | ------------ |
-| 1  | Fix validateEmail/validateURL double-wrapping                              | HIGH   | 3min   | Code quality |
-| 2  | Add test for `WithAuditLogGroupID`                                         | LOW    | 2min   | Coverage     |
-| 3  | Add test for `WithDoctorLong`                                              | LOW    | 2min   | Coverage     |
-| 4  | Add test for `RegisterValidator`                                           | LOW    | 3min   | Coverage     |
-| 5  | Add test for `validateNonEmpty` tag                                        | LOW    | 3min   | Coverage     |
-| 6  | Add test for `NewManPage`                                                  | LOW    | 5min   | Coverage     |
-| 7  | Add test for `WithConfigFileLoader` direct                                 | LOW    | 5min   | Coverage     |
-| 8  | Update ADR-001 (fang gaps are now closed)                                  | LOW    | 3min   | Docs         |
-| 9  | Add output formats section to docs/API.md                                  | MEDIUM | 10min  | Docs         |
-| 10 | Add Prompt API to docs/API.md                                              | MEDIUM | 5min   | Docs         |
-| 11 | Add ManPage API to docs/API.md                                             | MEDIUM | 5min   | Docs         |
-| 12 | Extract `Emptyable` interface                                              | MEDIUM | 15min  | Architecture |
-| 13 | Resolve `samber-do-auditlog` replace directive                             | MEDIUM | 15min  | Dependency   |
-| 14 | Consolidate LogLevel/LogFormat boilerplate                                 | MEDIUM | 20min  | DRY          |
-| 15 | Remove `IsExecutable()` deprecated method (v3)                             | LOW    | 5min   | Cleanup      |
-| 16 | Remove unused sentinels: `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs`   | LOW    | 5min   | Cleanup      |
-| 17 | Add `FormatRequiresTypedData` error test                                   | LOW    | 5min   | Coverage     |
-| 18 | Document `ValidationMode` enum in docs/API.md                              | MEDIUM | 5min   | Docs         |
-| 19 | Add `LoaderForPath` usage example to docs                                  | LOW    | 5min   | Docs         |
-| 20 | Consider extracting `go-output` format registration into a helper function | MEDIUM | 15min  | DRY          |
-| 21 | Add CI workflow for `govulncheck`                                          | HIGH   | 15min  | Security     |
-| 22 | Add CI workflow for `gosec`                                                | MEDIUM | 15min  | Security     |
-| 23 | Publish `samber-do-auditlog` properly (remove replace)                     | MEDIUM | 30min  | Dependency   |
-| 24 | Make Enum generic (v3 breaking)                                            | HIGH   | 30min  | Architecture |
-| 25 | Replace hand-rolled config loading with koanf                              | MEDIUM | 120min | Architecture |
+| ~~1~~  | ~~Fix validateEmail/validateURL double-wrapping~~ done — resolved — single-wrap delegation in v4 (flags_validate.go:238) | ~~HIGH~~ | ~~3min~~ | ~~Code quality~~ |
+| ~~2~~  | ~~Add test for `WithAuditLogGroupID`~~ **Superseded — symbol gone — auditlog options rewritten (WithAuditMiddleware in v4).** | ~~LOW~~ | ~~2min~~ | ~~Coverage~~ |
+| ~~3~~  | ~~Add test for `WithDoctorLong`~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor_test.go.** | ~~LOW~~ | ~~2min~~ | ~~Coverage~~ |
+| ~~4~~  | ~~Add test for `RegisterValidator`~~ done — flags_validate_test.go covers RegisterValidator | ~~LOW~~ | ~~3min~~ | ~~Coverage~~ |
+| ~~5~~  | ~~Add test for `validateNonEmpty` tag~~ **Superseded — rewritten through v3/v4 — validateNonEmpty at flags_validate.go:453.** | ~~LOW~~ | ~~3min~~ | ~~Coverage~~ |
+| ~~6~~  | ~~Add test for `NewManPage`~~ **Superseded — man-page generation removed in v4.** | ~~LOW~~ | ~~5min~~ | ~~Coverage~~ |
+| ~~7~~  | ~~Add test for `WithConfigFileLoader` direct~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~LOW~~ | ~~5min~~ | ~~Coverage~~ |
+| ~~8~~  | ~~Update ADR-001 (fang gaps are now closed)~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.** | ~~LOW~~ | ~~3min~~ | ~~Docs~~ |
+| ~~9~~  | ~~Add output formats section to docs/API.md~~ **Superseded — docs/API.md removed — FEATURES.md documents 16 formats.** | ~~MEDIUM~~ | ~~10min~~ | ~~Docs~~ |
+| ~~10~~ | ~~Add Prompt API to docs/API.md~~ **Superseded — docs/API.md removed — prompts in FEATURES.md.** | ~~MEDIUM~~ | ~~5min~~ | ~~Docs~~ |
+| ~~11~~ | ~~Add ManPage API to docs/API.md~~ **Superseded — docs/API.md removed — man-page generation removed in v4.** | ~~MEDIUM~~ | ~~5min~~ | ~~Docs~~ |
+| ~~12~~ | ~~Extract `Emptyable` interface~~ **Won't implement — never adopted — no shared Emptyable interface in v4.** | ~~MEDIUM~~ | ~~15min~~ | ~~Architecture~~ |
+| ~~13~~ | ~~Resolve `samber-do-auditlog` replace directive~~ done — resolved — published v0.12.1 from proxy; replace removed | ~~MEDIUM~~ | ~~15min~~ | ~~Dependency~~ |
+| ~~14~~ | ~~Consolidate LogLevel/LogFormat boilerplate~~ **Won't implement — never consolidated — per-type methods in v4 (types_log.go).** | ~~MEDIUM~~ | ~~20min~~ | ~~DRY~~ |
+| ~~15~~ | ~~Remove `IsExecutable()` deprecated method (v3)~~ done — removed — no IsExecutable in v4 | ~~LOW~~ | ~~5min~~ | ~~Cleanup~~ |
+| ~~16~~ | ~~Remove unused sentinels: `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs`~~ done — removed — CHANGELOG 3.0.0 (ErrNoFlags/ErrTooFewArgs/ErrTooManyArgs) | ~~LOW~~ | ~~5min~~ | ~~Cleanup~~ |
+| ~~17~~ | ~~Add `FormatRequiresTypedData` error test~~ done — ErrFormatRequiresTypedData ships (errors.go:40); tested (output_test.go:215) | ~~LOW~~ | ~~5min~~ | ~~Coverage~~ |
+| ~~18~~ | ~~Document `ValidationMode` enum in docs/API.md~~ done — ValidationMode ships (v4 cli.go:38); documented in FEATURES/AGENTS | ~~MEDIUM~~ | ~~5min~~ | ~~Docs~~ |
+| ~~19~~ | ~~Add `LoaderForPath` usage example to docs~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~LOW~~ | ~~5min~~ | ~~Docs~~ |
+| ~~20~~ | ~~Consider extracting `go-output` format registration into a helper function~~ **Superseded — superseded — output.go rewritten via go-output registries (2026-06-11_09-15).** | ~~MEDIUM~~ | ~~15min~~ | ~~DRY~~ |
+| ~~21~~ | ~~Add CI workflow for `govulncheck`~~ **Won't implement — never added — govulncheck run manually (TODO_LIST S2); CI has test/lint/nix.** | ~~HIGH~~ | ~~15min~~ | ~~Security~~ |
+| ~~22~~ | ~~Add CI workflow for `gosec`~~ **Won't implement — never added — CI has test/lint/nix-check/codecov only.** | ~~MEDIUM~~ | ~~15min~~ | ~~Security~~ |
+| ~~23~~ | ~~Publish `samber-do-auditlog` properly (remove replace)~~ done — published — samber-do-auditlog v0.12.1 from proxy | ~~MEDIUM~~ | ~~30min~~ | ~~Dependency~~ |
+| ~~24~~ | ~~Make Enum generic (v3 breaking)~~ **Won't implement — never adopted — Enum concrete in v4 (types_enum.go).** | ~~HIGH~~ | ~~30min~~ | ~~Architecture~~ |
+| ~~25~~ | ~~Replace hand-rolled config loading with koanf~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~MEDIUM~~ | ~~120min~~ | ~~Architecture~~ |
 
 ---
 
@@ -221,6 +222,7 @@ If we make it generic (`type Enum[T ~string] struct {...}`):
 
 ## Metrics Summary
 
+<!-- check-rows:ledger -->
 | Metric                | Value                                                                         |
 | --------------------- | ----------------------------------------------------------------------------- |
 | Tests                 | 395 passing                                                                   |

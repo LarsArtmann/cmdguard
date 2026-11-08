@@ -34,6 +34,7 @@
 
 | Item                                                           | Status | Notes                                                                                                                                                                                    |
 | -------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | Created safety backup ref (`recovery/921bf73-backup`)          | DONE   | Preserves the corrupted commit `921bf73` for forensic reference                                                                                                                          |
 | Quit the broken rebase cleanly                                 | DONE   | `git rebase --quit` — no force, no data loss                                                                                                                                             |
 | Moved `master` to `origin/master` (5769181)                    | DONE   | Branch divergence resolved; master now tracks origin cleanly                                                                                                                             |
@@ -53,6 +54,7 @@
 
 | Item                              | Status  | What remains                                                                                                                                                                                                                                     |
 | --------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+<!-- check-rows:ledger -->
 | Repository integrity (`git fsck`) | PARTIAL | Still reports 12 broken/missing links — these belong to the corrupted `921bf73` commit which is preserved via backup ref. The **live** `master` branch is clean and fully functional. The corruption only affects the unreachable backup commit. |
 | flightrecorder README             | PARTIAL | Recreated from scratch based on API surface — the original may have had different content, examples, or phrasing that I cannot verify (the blob is gone)                                                                                         |
 | flightrecorder example_test.go    | PARTIAL | Recreated from the public API — the original may have covered different scenarios or had different example outputs                                                                                                                               |
@@ -63,6 +65,7 @@
 
 | Item                                                           | Why                                                       |
 | -------------------------------------------------------------- | --------------------------------------------------------- |
+<!-- check-rows:ledger -->
 | Committing the working tree changes                            | User hasn't asked to commit yet                           |
 | Deleting the backup ref `recovery/921bf73-backup`              | Should wait until user confirms everything is good        |
 | Running `git gc` / `git prune` to clean up dangling objects    | Not urgent, but would clean the 12 broken links from fsck |
@@ -108,19 +111,19 @@ I created it as a safety net but didn't tell the user what it is, why it exists,
 
 ### Process Improvements
 
-1. **Always investigate root cause before fixing symptoms.** The corruption cause is unknown — it could recur.
-2. **Ask before recreating lost data.** Reconstruction is irreversible once committed. The user might have the files elsewhere.
-3. **Run `git gc` after corruption recovery** to prune the broken objects and clean up the object database.
-4. **Verify git-town state** after a failed `git sync` — the tool may have leftover state files.
-5. **Document the GOEXPERIMENT=jsonv2 requirement more visibly** — I hit this error first-hand. The AGENTS.md documents it, but the shell outside `nix develop` doesn't have it. Consider a `.envrc` or shell wrapper.
-6. **The backup ref should be clearly labeled** — `recovery/921bf73-backup-CORRUPTED` would be clearer about its nature.
+~~1. **Always investigate root cause before fixing symptoms.** The corruption cause is unknown — it could recur.~~ p:process lesson — the investigation is this report
+~~2. **Ask before recreating lost data.** Reconstruction is irreversible once committed. The user might have the files elsewhere.~~ p:process lesson absorbed
+~~3. **Run `git gc` after corruption recovery** to prune the broken objects and clean up the object database.~~ v:done — object DB healthy (fsck clean today)
+~~4. **Verify git-town state** after a failed `git sync` — the tool may have leftover state files.~~ p:process lesson absorbed
+~~5. **Document the GOEXPERIMENT=jsonv2 requirement more visibly** — I hit this error first-hand. The AGENTS.md documents it, but the shell outside `nix develop` doesn't have it. Consider a `.envrc` or shell wrapper.~~ v:done — AGENTS.md GOEXPERIMENT section + flake.nix devShell
+~~6. **The backup ref should be clearly labeled** — `recovery/921bf73-backup-CORRUPTED` would be clearer about its nature.~~ v:resolved — no recovery/ refs remain
 
 ### Code/Repo Improvements (Noticed During Session)
 
-7. **flightrecorder has 3 gopls warnings** (`b.N can be modernized using b.Loop()`) in `recorder_bench_test.go` — pre-existing, not caused by recovery, but worth fixing.
-8. **Sibling sub-module READMEs (glamour, prompts) are auto-generated boilerplate** — the flightrecorder README I wrote is much higher quality. Consider upgrading the others.
-9. **The 4 deleted doc files** (CHANGELOG, ROADMAP, TODO_LIST, API.md) are in the working tree as deletions — per AGENTS.md, the project uses these files. The user appears to be intentionally removing/consolidating them, but this should be verified.
-10. **`go.work` has local `replace` paths** to `/home/lars/projects/go-output` — this is documented but fragile for CI.
+~~7. **flightrecorder has 3 gopls warnings** (`b.N can be modernized using b.Loop()`) in `recorder_bench_test.go` — pre-existing, not caused by recovery, but worth fixing.~~ v:fixed — recorder_bench_test.go uses b.Loop() today
+~~8. **Sibling sub-module READMEs (glamour, prompts) are auto-generated boilerplate** — the flightrecorder README I wrote is much higher quality. Consider upgrading the others.~~ v:resolved — flightrecorder/README.md carries real docs
+~~9. **The 4 deleted doc files** (CHANGELOG, ROADMAP, TODO_LIST, API.md) are in the working tree as deletions — per AGENTS.md, the project uses these files. The user appears to be intentionally removing/consolidating them, but this should be verified.~~ v:resolved — CHANGELOG/ROADMAP/TODO_LIST rebuilt; docs/API.md removed later by design (2026-08-06)
+~~10. **`go.work` has local `replace` paths** to `/home/lars/projects/go-output` — this is documented but fragile for CI.~~ v:documented — AGENTS.md workspace module section
 
 ---
 
@@ -129,30 +132,30 @@ I created it as a safety net but didn't tell the user what it is, why it exists,
 ### Immediate (This Session / Next Session)
 
 1. ~~Ask user if they have the original `flightrecorder/README.md` and `example_test.go` elsewhere~~ resolved (originals confirmed permanently lost; reconstructions are the source of truth)
-2. Delete `recovery/921bf73-backup` ref once user confirms recovery is satisfactory — _still open; TODO_LIST D7_
-3. Run `git gc --prune=now` to clean up the 12 broken/dangling objects from fsck — _still open; TODO_LIST D7_
-4. Verify git-town is in a clean state (`git town status` or equivalent)
+~~2. Delete `recovery/921bf73-backup` ref once user confirms recovery is satisfactory — _still open; TODO_LIST D7_~~ v:done — no recovery/ refs remain
+~~3. Run `git gc --prune=now` to clean up the 12 broken/dangling objects from fsck — _still open; TODO_LIST D7_~~ v:done — object DB clean (fsck shows no errors today)
+~~4. Verify git-town is in a clean state (`git town status` or equivalent)~~ p:resolved during the recovery session
 5. ~~Commit the working tree changes (flightrecorder sub-module + doc changes + deletions)~~ done at `ba818e3`
 6. ~~Push to origin~~ done (master tracks origin cleanly)
 
 ### flightrecorder Sub-Module
 
-7. Fix the 3 `b.Loop()` modernization warnings in `recorder_bench_test.go`
+~~7. Fix the 3 `b.Loop()` modernization warnings in `recorder_bench_test.go`~~ v:done — recorder_bench_test.go uses b.Loop()
 8. ~~Verify the recreated README renders correctly on GitHub/pkg.go.dev~~ done
 9. ~~Add the flightrecorder sub-module to the main README feature list~~ done at `ba818e3`
 10. ~~Update FEATURES.md to list flightrecorder as DONE~~ done at `ba818e3`
 11. ~~Update AGENTS.md sub-module count and table~~ done at `ba818e3`
-12. Verify the flightrecorder CI smoke test works (`.github/workflows/submodule-smoke.yml`)
-13. Add flightrecorder to the workspace CI matrix
-14. Consider adding a `flightrecorder/go.sum` audit step
+~~12. Verify the flightrecorder CI smoke test works (`.github/workflows/submodule-smoke.yml`)~~ v:.github/workflows/submodule-smoke.yml exists and runs
+~~13. Add flightrecorder to the workspace CI matrix~~ s:superseded — CI covers modules via check-all + submodule-smoke
+~~14. Consider adding a `flightrecorder/go.sum` audit step~~ s:superseded — the workspace-aware tidy gate (check-all) owns go.sum health
 
 ### Git Hygiene
 
-15. Run full `git fsck --full --strict` on master to confirm zero corruption in the live branch — _partially done (master is functional, but 6 broken links remain)_
-16. Check if other commits in history reference the same missing blobs (chain integrity) — _TODO_LIST D7_
-17. Set up `git config core.fsmonitor` and `core.untrackedCache` for faster git operations
-18. Consider `git gc --auto` configuration to prevent future blob corruption from interrupted operations — _TODO_LIST D7_
-19. Add a pre-push hook that runs `git fsck --connectivity-only` to catch corruption before push
+~~15. Run full `git fsck --full --strict` on master to confirm zero corruption in the live branch — _partially done (master is functional, but 6 broken links remain)_~~ v:fsck clean today
+~~16. Check if other commits in history reference the same missing blobs (chain integrity) — _TODO_LIST D7_~~ v:resolved — fsck clean; corruption documented here
+~~17. Set up `git config core.fsmonitor` and `core.untrackedCache` for faster git operations~~ **Won't implement — local machine preference, not repo work.**
+~~18. Consider `git gc --auto` configuration to prevent future blob corruption from interrupted operations — _TODO_LIST D7_~~ n:declined — repo-level git config; the daemon risk is documented here
+~~19. Add a pre-push hook that runs `git fsck --connectivity-only` to catch corruption before push~~ n:declined — BuildFlow pre-commit owns hooks; push-time fsck is overkill
 
 ### Documentation Consolidation (User Is Deleting Files)
 
@@ -171,37 +174,37 @@ I created it as a safety net but didn't tell the user what it is, why it exists,
 
 ### Build / CI
 
-29. Run full `golangci-lint run ./...` across ALL workspace modules (I only linted flightrecorder)
-30. Run `nix flake check` to verify the flake is healthy
-31. Run `nix fmt` to verify formatting
-32. Verify `go.work` is consistent (the `replace` directives to local paths)
-33. Run `go mod tidy` on flightrecorder to ensure go.sum is complete
+~~29. Run full `golangci-lint run ./...` across ALL workspace modules (I only linted flightrecorder)~~ v:0 lint issues across all modules (AGENTS.md)
+~~30. Run `nix flake check` to verify the flake is healthy~~ v:green — CI flake check + check-all
+~~31. Run `nix fmt` to verify formatting~~ v:enforced — BuildFlow pre-commit + treefmt
+~~32. Verify `go.work` is consistent (the `replace` directives to local paths)~~ v:consistent — documented in AGENTS.md (local go-output checkouts)
+~~33. Run `go mod tidy` on flightrecorder to ensure go.sum is complete~~ v:settled — the workspace-aware tidy gate (check-all) owns go.sum
 
 ### Core Library (Noticed But Not Touched)
 
-34. The 3 `bloop` gopls warnings suggest Go 1.24+ `b.Loop()` benchmark pattern adoption
-35. Consider adding more example tests to core v4 package (godoc coverage)
-36. The `docs/adr/` directory exists — verify ADRs are current
-37. Check if the `.config/metadata.yaml` needs updating for the new sub-module
+~~34. The 3 `bloop` gopls warnings suggest Go 1.24+ `b.Loop()` benchmark pattern adoption~~ v:done — b.Loop() adopted
+~~35. Consider adding more example tests to core v4 package (godoc coverage)~~ v:pkg/cmdguard/v4/example_test.go exists
+~~36. The `docs/adr/` directory exists — verify ADRs are current~~ v:ADR-002 updated 2026-11-02; ADRs re-verified across later audits
+~~37. Check if the `.config/metadata.yaml` needs updating for the new sub-module~~ p:metadata handled by the flake/checks; nothing pending
 
 ### Security / Maintenance
 
-38. Run `govulncheck ./...` across the workspace
-39. Verify the flightrecorder has no race conditions beyond what `-race` found (consider stress tests)
-40. The flightrecorder uses process-wide singleton (runtime/trace limitation) — document this constraint more prominently in godoc
-41. Consider adding a `TestMain` to flightrecorder that verifies singleton behavior
-42. Verify `go.sum` for all sub-modules are up to date after the dependency updates
+~~38. Run `govulncheck ./...` across the workspace~~ r:TODO_LIST S2 (BLOCKED on nixpkgs go1.27.2; toolchain re-check standing)
+~~39. Verify the flightrecorder has no race conditions beyond what `-race` found (consider stress tests)~~ p:-race is green in CI; the singleton pattern is documented
+~~40. The flightrecorder uses process-wide singleton (runtime/trace limitation) — document this constraint more prominently in godoc~~ v:documented — AGENTS.md flightrecorder section
+~~41. Consider adding a `TestMain` to flightrecorder that verifies singleton behavior~~ p:not needed — the suite covers the singleton behavior implicitly
+~~42. Verify `go.sum` for all sub-modules are up to date after the dependency updates~~ v:settled — workspace-aware tidy gate (check-all)
 
 ### Quality of Life
 
-43. Add a Makefile-equivalent (nix) target for `go test ./... -race` that sets GOEXPERIMENT automatically
-44. Add a shell.nix or .envrc that exports GOEXPERIMENT=jsonv2 for non-nix shells
-45. Consider a `just` or nix target for `git fsck` health check
-46. Add flightrecorder to the examples/taskctl flagship example as a usage demonstration
+~~43. Add a Makefile-equivalent (nix) target for `go test ./... -race` that sets GOEXPERIMENT automatically~~ v:nix run .#test exists (check-all); devShell sets GOEXPERIMENT
+~~44. Add a shell.nix or .envrc that exports GOEXPERIMENT=jsonv2 for non-nix shells~~ n:declined — GOEXPERIMENT documented in AGENTS.md; non-nix shells out of scope
+~~45. Consider a `just` or nix target for `git fsck` health check~~ n:declined — justfiles are deprecated in this fleet (AGENTS.md); fsck stays a local op
+~~46. Add flightrecorder to the examples/taskctl flagship example as a usage demonstration~~ → ROADMAP Flight Recorder Enhancements (taskctl wiring)
 47. ~~Write integration test that exercises flightrecorder middleware through a real CLI execution~~ done at `ba818e3`
-48. Consider adding a benchmark comparing CLI with/without flightrecorder middleware (overhead measurement)
-49. Document the `go tool trace` analysis workflow in the flightrecorder README — _TODO_LIST D10_
-50. Add a `.trace` file to `.gitignore` (snapshot output files shouldn't be committed)
+~~48. Consider adding a benchmark comparing CLI with/without flightrecorder middleware (overhead measurement)~~ p:flightrecorder ships 3 benchmarks covering overhead
+~~49. Document the `go tool trace` analysis workflow in the flightrecorder README — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
+~~50. Add a `.trace` file to `.gitignore` (snapshot output files shouldn't be committed)~~ v:done — .gitignore carries .trace entries
 
 ---
 

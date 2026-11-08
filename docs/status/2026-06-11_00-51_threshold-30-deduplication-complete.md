@@ -94,22 +94,22 @@ Pre-existing observations (not introduced or worsened by this session):
 
 ### High-impact
 
-1. **Lock t=30 in CI** — Add `art-dupl` step to `nix flake check` / pre-push hook so the threshold doesn't regress silently. Currently the project has lint and format checks but no dedup enforcement.
-2. **Extract a public `dbFlags` test fixture in examples** — `taskctl/commands.go` still has a `dbStatusCmd` whose 6-line `NewCommand` body is similar (not identical) to migrate/seed. At t=22 it would likely be flagged. A `dbStatusHandler` closure completing the family would future-proof.
-3. **Add `nolintlint` directive audit** — Three files have pre-existing `//nolint` directives that may be stale. The auditlog.go case (just observed) shows the format checker is the canonical source of truth, not arbitrary directive placement.
+1. ~~**Lock t=30 in CI** — Add `art-dupl` step to `nix flake check` / pre-push hook so the threshold doesn't regress silently. Currently the project has lint and format checks but no dedup enforcement.~~ **Won't implement — never enforced — CI runs test/lint/nix-check; no art-dupl step.**
+2. ~~**Extract a public `dbFlags` test fixture in examples** — `taskctl/commands.go` still has a `dbStatusCmd` whose 6-line `NewCommand` body is similar (not identical) to migrate/seed. At t=22 it would likely be flagged. A `dbStatusHandler` closure completing the family would future-proof.~~ **Superseded — taskctl rewritten through v3/v4 (AddCommands batch registration).**
+3. ~~**Add `nolintlint` directive audit** — Three files have pre-existing `//nolint` directives that may be stale. The auditlog.go case (just observed) shows the format checker is the canonical source of truth, not arbitrary directive placement.~~ **Superseded — sources replaced in v3/v4; lint policy moved to lint/ sub-module (ADR-002).**
 
 ### Medium-impact
 
-4. **Coverage: 15 functions at 0% in main pkg** (per prior status report) — should be addressed in a dedicated coverage sprint.
-5. **`taskctl` example coverage at 70.5%** — the example is the project's showpiece; should target ≥90% to model best practices.
-6. **Add an `--exclude-pattern` audit for generated code** — Currently none. If connect-go or sqlc code lands later, we'll want patterns ready.
-7. **`ParallelSubtest` linter for subtests** — Many `t.Run` blocks could be parallel; check if `paralleltest` is configured but the code is not yet using it.
+4. ~~**Coverage: 15 functions at 0% in main pkg** (per prior status report) — should be addressed in a dedicated coverage sprint.~~ done — core at 90.4% (FEATURES.md)
+5. ~~**`taskctl` example coverage at 70.5%** — the example is the project's showpiece; should target ≥90% to model best practices.~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04)
+6. ~~**Add an `--exclude-pattern` audit for generated code** — Currently none. If connect-go or sqlc code lands later, we'll want patterns ready.~~ **Won't implement — never needed — no generated code landed.**
+7. ~~**`ParallelSubtest` linter for subtests** — Many `t.Run` blocks could be parallel; check if `paralleltest` is configured but the code is not yet using it.~~ **Won't implement — never pursued — paralleltest not adopted in the v4 lint config.**
 
 ### Low-impact
 
-8. **Replace `t.Setenv` + `Cleanup` pattern with `t.Setenv` only** — Skill gotcha #14 says regex validation cache is `sync.Map` (global). Audit any other global state that breaks parallel tests.
-9. **Run `treefmt` via `nix fmt`** — formatting drifted only in pre-existing files; CI should auto-format on commit.
-10. **Document the helper-extraction pattern in `docs/architecture-understanding/`** — what we just did is a reusable pattern worth teaching.
+8. ~~**Replace `t.Setenv` + `Cleanup` pattern with `t.Setenv` only** — Skill gotcha #14 says regex validation cache is `sync.Map` (global). Audit any other global state that breaks parallel tests.~~ **Superseded — validation-cache global reshaped in v3/v4.**
+9. ~~**Run `treefmt` via `nix fmt`** — formatting drifted only in pre-existing files; CI should auto-format on commit.~~ done — treefmt wired — checks.format in flake.nix:99
+10. ~~**Document the helper-extraction pattern in `docs/architecture-understanding/`** — what we just did is a reusable pattern worth teaching.~~ **Superseded — docs/architecture-understanding/ holds architecture analyses; test-design.md never created.**
 
 ---
 
@@ -119,31 +119,31 @@ Pre-existing observations (not introduced or worsened by this session):
 
 | #  | Task                                                                                             | Impact | Effort | Notes                                                                                 |
 | -- | ------------------------------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------------------------------------------------- |
-| 1  | Add `art-dupl -t 30 --semantic` step to `nix flake check`                                        | HIGH   | XS     | Locks the win                                                                         |
-| 2  | Add pre-push git hook for `golangci-lint run ./...` + `go test ./... -race`                      | HIGH   | S      | Already exists but with pre-existing errors per AGENTS.md                             |
-| 3  | Coverage sprint: lift main pkg from 85.1% → 90%+ (15 functions at 0%)                            | HIGH   | M      | Public API + internal helpers                                                         |
-| 4  | Lift `taskctl` example coverage from 70.5% → 90%+                                                | MED    | M      | Showpiece example, should model best practices                                        |
-| 5  | Audit all `//nolint:*` directives for staleness                                                  | MED    | S      | Some are pre-existing; run with newer golangci-lint                                   |
-| 6  | Fix `auditlog.go:14` long line OR move `nolint:golines` to a position `golangci-lint fmt` honors | MED    | XS     | Mechanical                                                                            |
-| 7  | Run `gofumpt -w` on `cli_auditlog_test.go` (pre-existing drift)                                  | LOW    | XS     | Mechanical                                                                            |
-| 8  | Convert `bdd_lifecycle_test.go` pre-existing subtests to table-driven where it improves clarity  | MED    | M      | BDD naming is intentional; selective                                                  |
-| 9  | Add a `taskctl` README section showing the test helper hierarchy                                 | LOW    | S      | Documentation for the example                                                         |
-| 10 | Add a `Makefile` or `just` alias for `nix develop -c go test ./... -count=1 -race`               | MED    | S      | Common workflow shortcut (note: project uses Nix flakes, not Make/just per AGENTS.md) |
-| 11 | Split `auditlog.go` (231 lines) into 3-4 files by responsibility                                 | LOW    | M      | Becomes a problem only if it grows further                                            |
-| 12 | Document the helper extraction pattern in `docs/architecture-understanding/test-design.md`       | MED    | S      | Reusable insight                                                                      |
-| 13 | Add benchmark comparison: t=30 vs t=50 vs t=22 clone detection runtime                           | LOW    | S      | Justify t=30 choice                                                                   |
-| 14 | Investigate why `gopls infertypeargs` reports 200+ "unnecessary type arguments" warnings         | LOW    | S      | All in tests; cosmetic but noisy                                                      |
-| 15 | Add an example: BDD-style test using Ginkgo (referenced in skill but not in project)             | LOW    | M      | If we adopt BDD broadly                                                               |
-| 16 | Add `nix run .#bench` integration so benchmarks are reproducible                                 | MED    | M      | Currently ad-hoc `go test -bench`                                                     |
-| 17 | Add `//go:build` tags for `testutil` to allow test-only consumers                                | LOW    | S      | Currently `pkg/testutil` has no build tags                                            |
-| 18 | Re-examine `taskctl/commands.go` for any further DB family consolidation                         | LOW    | S      | `dbStatusCmd` not in scope for t=30; would be at t=22                                 |
-| 19 | Add `WithMiddlewareGroup[T]` API for ordering middlewares by group name                          | MED    | L      | Currently order is positional                                                         |
-| 20 | Add OpenTelemetry span attribute for `FullPath` (currently empty outside cobra execution)        | MED    | S      | Gotcha #24 in AGENTS.md                                                               |
-| 21 | Investigate `taskctl` benchmark: does `dbActionHandler` add measurable overhead?                 | LOW    | XS     | Closure indirection vs inline                                                         |
-| 22 | Add a `cmdguard` CLI example: a sub-CLI that introspects its own commands                        | MED    | M      | Demonstrates `WithCommandInfo` usage in real code                                     |
-| 23 | Extend `WithGlamourHelp` to support per-command theme override (currently global)                | LOW    | M      | If requested                                                                          |
-| 24 | Add a public `cmdguard/v2/testing` package exporting the helpers used in v2 tests                | MED    | M      | Library users can't reuse our test helpers                                            |
-| 25 | Schedule a Phase 17 sprint: "Test infrastructure externalization" (helpers + golden files)       | MED    | L      | Long-term payoff                                                                      |
+| ~~1~~  | ~~Add `art-dupl -t 30 --semantic` step to `nix flake check`~~ **Won't implement — never enforced — flake has format check only (flake.nix:99).** | ~~HIGH~~ | ~~XS~~ | ~~Locks the win~~ |
+| ~~2~~  | ~~Add pre-push git hook for `golangci-lint run ./...` + `go test ./... -race`~~ done — CI gates lint+test (ci.yml); obsolete pre-commit hook removed (8618022) | ~~HIGH~~ | ~~S~~ | ~~Already exists but with pre-existing errors per AGENTS.md~~ |
+| ~~3~~  | ~~Coverage sprint: lift main pkg from 85.1% → 90%+ (15 functions at 0%)~~ done — core at 90.4% (FEATURES.md) | ~~HIGH~~ | ~~M~~ | ~~Public API + internal helpers~~ |
+| ~~4~~  | ~~Lift `taskctl` example coverage from 70.5% → 90%+~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04) | ~~MED~~ | ~~M~~ | ~~Showpiece example, should model best practices~~ |
+| ~~5~~  | ~~Audit all `//nolint:*` directives for staleness~~ **Superseded — sources replaced in v3/v4; lint/ sub-module (ADR-002).** | ~~MED~~ | ~~S~~ | ~~Some are pre-existing; run with newer golangci-lint~~ |
+| ~~6~~  | ~~Fix `auditlog.go:14` long line OR move `nolint:golines` to a position `golangci-lint fmt` honors~~ **Superseded — auditlog.go rewritten in v4 (delegates to samber-do-auditlog Plugin).** | ~~MED~~ | ~~XS~~ | ~~Mechanical~~ |
+| ~~7~~  | ~~Run `gofumpt -w` on `cli_auditlog_test.go` (pre-existing drift)~~ **Superseded — cli_auditlog_test.go rewritten in v4.** | ~~LOW~~ | ~~XS~~ | ~~Mechanical~~ |
+| ~~8~~  | ~~Convert `bdd_lifecycle_test.go` pre-existing subtests to table-driven where it improves clarity~~ **Superseded — v2 BDD tests replaced through v3/v4.** | ~~MED~~ | ~~M~~ | ~~BDD naming is intentional; selective~~ |
+| ~~9~~  | ~~Add a `taskctl` README section showing the test helper hierarchy~~ **Superseded — taskctl rewritten through v3/v4.** | ~~LOW~~ | ~~S~~ | ~~Documentation for the example~~ |
+| ~~10~~ | ~~Add a `Makefile` or `just` alias for `nix develop -c go test ./... -count=1 -race`~~ **NOT-DO — project uses Nix flakes, not Make/just (AGENTS.md).** | ~~MED~~ | ~~S~~ | ~~Common workflow shortcut (note: project uses Nix flakes, not Make/just per AGENTS.md)~~ |
+| ~~11~~ | ~~Split `auditlog.go` (231 lines) into 3-4 files by responsibility~~ **Superseded — auditlog rewritten in v4 (delegates to Plugin).** | ~~LOW~~ | ~~M~~ | ~~Becomes a problem only if it grows further~~ |
+| ~~12~~ | ~~Document the helper extraction pattern in `docs/architecture-understanding/test-design.md`~~ **Superseded — architecture-understanding/ holds architecture analyses; test-design.md never created.** | ~~MED~~ | ~~S~~ | ~~Reusable insight~~ |
+| ~~13~~ | ~~Add benchmark comparison: t=30 vs t=50 vs t=22 clone detection runtime~~ **Won't implement — never done — art-dupl benchmarking dropped with the dedup campaign.** | ~~LOW~~ | ~~S~~ | ~~Justify t=30 choice~~ |
+| ~~14~~ | ~~Investigate why `gopls infertypeargs` reports 200+ "unnecessary type arguments" warnings~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~LOW~~ | ~~S~~ | ~~All in tests; cosmetic but noisy~~ |
+| ~~15~~ | ~~Add an example: BDD-style test using Ginkgo (referenced in skill but not in project)~~ **Won't implement — never adopted — no Ginkgo in the repo.** | ~~LOW~~ | ~~M~~ | ~~If we adopt BDD broadly~~ |
+| ~~16~~ | ~~Add `nix run .#bench` integration so benchmarks are reproducible~~ **Won't implement — never added — flake has no bench app.** | ~~MED~~ | ~~M~~ | ~~Currently ad-hoc `go test -bench`~~ |
+| ~~17~~ | ~~Add `//go:build` tags for `testutil` to allow test-only consumers~~ **Superseded — pkg/testutil restructured (panic-test helpers; 80.3% cov FEATURES.md).** | ~~LOW~~ | ~~S~~ | ~~Currently `pkg/testutil` has no build tags~~ |
+| ~~18~~ | ~~Re-examine `taskctl/commands.go` for any further DB family consolidation~~ **Superseded — taskctl rewritten through v3/v4 (AddCommands).** | ~~LOW~~ | ~~S~~ | ~~`dbStatusCmd` not in scope for t=30; would be at t=22~~ |
+| ~~19~~ | ~~Add `WithMiddlewareGroup[T]` API for ordering middlewares by group name~~ **Won't implement — never added — middleware ordering stays positional in v4; ContextMiddleware shipped instead (ROADMAP).** | ~~MED~~ | ~~L~~ | ~~Currently order is positional~~ |
+| ~~20~~ | ~~Add OpenTelemetry span attribute for `FullPath` (currently empty outside cobra execution)~~ done — shipped — command.fullpath attribute (telemetry/telemetry.go:55) | ~~MED~~ | ~~S~~ | ~~Gotcha #24 in AGENTS.md~~ |
+| ~~21~~ | ~~Investigate `taskctl` benchmark: does `dbActionHandler` add measurable overhead?~~ **Superseded — taskctl rewritten through v3/v4.** | ~~LOW~~ | ~~XS~~ | ~~Closure indirection vs inline~~ |
+| ~~22~~ | ~~Add a `cmdguard` CLI example: a sub-CLI that introspects its own commands~~ done — examples/docs-generator introspects the command tree | ~~MED~~ | ~~M~~ | ~~Demonstrates `WithCommandInfo` usage in real code~~ |
+| ~~23~~ | ~~Extend `WithGlamourHelp` to support per-command theme override (currently global)~~ done — shipped — WithHelpTheme (glamour/glamour.go:39) | ~~LOW~~ | ~~M~~ | ~~If requested~~ |
+| ~~24~~ | ~~Add a public `cmdguard/v2/testing` package exporting the helpers used in v2 tests~~ **Superseded — v3/v4 restructure; pkg/testutil is the shared helper package (80.3% cov).** | ~~MED~~ | ~~M~~ | ~~Library users can't reuse our test helpers~~ |
+| ~~25~~ | ~~Schedule a Phase 17 sprint: "Test infrastructure externalization" (helpers + golden files)~~ **Superseded — v3 6-module restructure redefined test infrastructure.** | ~~MED~~ | ~~L~~ | ~~Long-term payoff~~ |
 
 ---
 
