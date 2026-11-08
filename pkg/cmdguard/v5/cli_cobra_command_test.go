@@ -57,7 +57,8 @@ func TestCLIToCobraCommand_PostRunEAfterSuccessfulRun(t *testing.T) {
 
 	cmd := Command[testAppConfig, NoFlags]{
 		spec: commandSpec{
-			use: "ok",
+			use:   "ok",
+			short: "run the ok command",
 			postRunE: &typedHook[testAppConfig, NoFlags]{
 				fn: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 					postRunCalled = true
@@ -94,6 +95,7 @@ func TestCLIToCobraCommand_AllHooks(t *testing.T) {
 	cmd := Command[testAppConfig, NoFlags]{
 		spec: commandSpec{
 			use:      "hooks",
+			short:    "exercise all hooks",
 			preRunE:  &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(&order, "pre")},
 			postRunE: &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(&order, "post")},
 		},

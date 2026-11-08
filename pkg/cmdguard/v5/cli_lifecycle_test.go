@@ -187,6 +187,7 @@ func TestCLIPreRunEWithFlags(t *testing.T) {
 			"test",
 			testFlags{},
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
+			v5.WithShort("run the test command"),
 			v5.WithPreRunE(
 				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 					receivedName = f.Name
@@ -235,6 +236,7 @@ func TestCLIPostRunEWithFlags(t *testing.T) {
 			"test",
 			testFlags{},
 			NoOpRunEWithFlags[testCLIConfig, testFlags](),
+			v5.WithShort("run the test command"),
 			v5.WithPostRunE(
 				func(_ context.Context, _ *testCLIConfig, f testFlags) error {
 					receivedValue = f.Value

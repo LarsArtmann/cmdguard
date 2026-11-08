@@ -482,6 +482,60 @@
       "commands": []
     },
     {
+      "name": "doctor",
+      "path": "fixture doctor",
+      "short": "Check system health",
+      "long": "Run health checks on all services and report diagnostic status.",
+      "example": "fixture doctor",
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for doctor"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
       "name": "remote",
       "path": "fixture remote",
       "short": "Remote operations",
@@ -587,6 +641,60 @@
           "commands": []
         }
       ]
+    },
+    {
+      "name": "version",
+      "path": "fixture version",
+      "short": "Print version information",
+      "long": "Print the version of fixture.",
+      "example": "fixture version",
+      "flags": [
+        {
+          "name": "api-token",
+          "type": "string",
+          "usage": "API token for authenticated calls",
+          "inherited": true
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Target environment",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for version"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "quiet",
+          "type": "bool",
+          "default": "false",
+          "usage": "Suppress non-error output",
+          "hidden": true,
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity level; repeat for more",
+          "inherited": true
+        }
+      ],
+      "commands": []
     }
   ]
 }

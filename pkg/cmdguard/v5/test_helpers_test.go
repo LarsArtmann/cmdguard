@@ -311,6 +311,7 @@ func runFlagCommand[T any](t *testing.T, cli *CLI[T], executed *bool) {
 
 			return nil
 		},
+		WithShort("run the test command"),
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))

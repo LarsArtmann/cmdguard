@@ -98,6 +98,7 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 			func(_ context.Context, _ *testConfig, _ NoFlags) error {
 				return errors.New("always fails")
 			},
+			WithShort("failing command"),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -125,6 +126,7 @@ func TestExecuteAndExit_ExitCodes(t *testing.T) {
 
 				return exitErr
 			},
+			WithShort("custom exit code command"),
 		)
 		testutil.AssertNoError(t, err)
 		testutil.AssertNoError(t, AddCommand(cli, cmd))
@@ -226,7 +228,7 @@ func TestWithStrictValidation(t *testing.T) {
 	t.Run("command without short passes without strict mode", func(t *testing.T) {
 		t.Parallel()
 
-		cli, err := NewCLI("test", "Test", testConfig{})
+		cli, err := NewCLI("test", "Test", testConfig{}, WithoutStrictValidation())
 		testutil.AssertNoError(t, err)
 
 		cmd := noShortCommand(t)
@@ -474,6 +476,7 @@ func TestWithExactArgs(t *testing.T) {
 
 				return nil
 			},
+			WithShort("run the test command"),
 			WithExactArgs(2),
 		)
 		testutil.AssertNoError(t, err)

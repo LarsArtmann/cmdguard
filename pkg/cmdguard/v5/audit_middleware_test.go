@@ -207,6 +207,7 @@ func TestWithAuditMiddleware(t *testing.T) {
 		cmd, err := v5.NewCommand(
 			"fails", v5.NoFlags{},
 			func(_ context.Context, _ *testCLIConfig, _ v5.NoFlags) error { return failing },
+			v5.WithShort("failing command"),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)
@@ -257,6 +258,7 @@ func TestWithAuditMiddleware(t *testing.T) {
 
 				return nil
 			},
+			v5.WithShort("deadline command"),
 		)
 		if err != nil {
 			t.Fatalf("NewCommand failed: %v", err)
