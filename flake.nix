@@ -158,6 +158,9 @@
                   echo "=== docs vs website guide sync ==="
                   bash scripts/check-guide-sync.sh
 
+                  echo "=== AGENTS.md dependency tables vs go.mod ==="
+                  bash scripts/check-dep-tables.sh
+
                   echo ""
                   echo "All checks passed!"
                 ''
