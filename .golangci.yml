@@ -180,8 +180,8 @@ linters:
         - anon
         - stdlib
         - generic
-        - github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4.ConfigFileLoader
-        - github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4.TypeHandler
+        - github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5.ConfigFileLoader
+        - github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5.TypeCodec
         - github.com/samber/do/v2.Injector
         - github.com/knadh/koanf/v2.Parser
     makezero:
@@ -254,9 +254,6 @@ linters:
       - legacy
       - std-error-handling
     rules:
-      - source: TODO\(v5\)
-        linters:
-          - godox
       - path: _test\.go$
         linters:
           - gocyclo
@@ -292,63 +289,22 @@ linters:
         linters:
           - err113
           - wrapcheck
-      - path: pkg/cmdguard/v2/flags_parse.go$
-        linters:
-          - cyclop
-      - path: pkg/cmdguard/v2/types_port.go$
-        linters:
-          - cyclop
-      - path: pkg/cmdguard/v2/cli.go$
-        linters:
-          - cyclop
-          - funlen
-      - path: pkg/cmdguard/v2/type_handler.go$
-        linters:
-          - funlen
-          - gochecknoglobals
-          - wrapcheck
-      - path: pkg/cmdguard/v2/type_handler_kinds.go$
-        linters:
-          - funlen
-          - wrapcheck
-      - path: pkg/cmdguard/v2/type_handler_custom.go$
-        linters:
-          - funlen
-      - path: pkg/cmdguard/v2/output.go$
+      - path: pkg/cmdguard/v5/type_codec.go$
         linters:
           - gochecknoglobals
-          - wrapcheck
-      - path: pkg/cmdguard/v4/type_handler.go$
+      - path: pkg/cmdguard/v5/flags_validate.go$
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/v4/flags_validate.go$
+      - path: pkg/cmdguard/v5/cli_command.go$
         linters:
           - gochecknoglobals
-      - path: pkg/cmdguard/v4/cli_command.go$
-        linters:
-          - gochecknoglobals
-      - path: pkg/cmdguard/v4/example_test.go$
+      - path: pkg/cmdguard/v5/example_test.go$
         linters:
           - forbidigo
-      - path: pkg/cmdguard/v2/editor.go$
-        linters:
-          - gosec
-      - path: pkg/cmdguard/v2/editor_test.go$
-        linters:
-          - paralleltest
-      - path: pkg/cmdguard/v2/env_tag_test.go$
-        linters:
-          - paralleltest
-      - path: pkg/cmdguard/v2/type_handler_test.go$
-        linters:
-          - paralleltest
-      - path: pkg/cmdguard/v2/cli_auditlog_test.go$
-        linters:
-          - paralleltest
       - path: flightrecorder/.*_test\.go$
         linters:
           - paralleltest
-      - path: pkg/cmdguard/v2/example_test.go$
+      - path: pkg/cmdguard/v5/example_test.go$
         linters:
           - forbidigo
       - path: pkg/cmdguard/
@@ -422,9 +378,6 @@ linters:
       - path: internal/
         linters:
           - goconst
-      - path: pkg/cmdguard/v2/
-        linters:
-          - ireturn
       - path: examples/
         linters:
           - gochecknoglobals
@@ -446,28 +399,11 @@ linters:
       - path: pkg/cmdguard/
         linters:
           - varnamelen
-      - path: pkg/cmdguard/v2/flags_validate.go
-        linters:
-          - nilerr
-          - err113
       - path: _test\.go$
         linters:
           - godoclint
           - noinlineerr
           - tagalign
-          - gochecknoglobals
-      - path: pkg/cmdguard/v2/
-        linters:
-          - noinlineerr
-          - tagalign
-      - path: pkg/cmdguard/v2/cli_command.go
-        linters:
-          - gochecknoglobals
-      - path: pkg/cmdguard/v2/flags_validate.go
-        linters:
-          - gochecknoglobals
-      - path: pkg/cmdguard/v2/flags_validate.go
-        linters:
           - gochecknoglobals
       - path: _test\.go$
         linters:
