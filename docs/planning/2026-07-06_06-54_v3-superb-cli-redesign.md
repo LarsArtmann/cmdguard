@@ -11,11 +11,11 @@
 cmdguard has 8,766 lines of non-test code, 30 direct dependencies, and 1,908 test runs.
 The type parameter explosion is fixed (commit `4f9b0ea`). Now we tackle the real problems:
 
-1. **Lifecycle hook regression** — I stored PreRunE/PostRunE as `any`, losing compile-time safety
-2. **30 direct deps** — glamour, huh, lipgloss, otel, mango, koanf, go-output sub-modules all in core
-3. **Flags aren't type-safe** — struct tags are uncompiled comments; global flags pollute subcommands
-4. **Audit logs are shallow** — only DI lifecycle, not command-level events
-5. **Dead weight** — result.go, editor.go, flow_context.go add complexity without CLI value
+1. ~~**Lifecycle hook regression** — I stored PreRunE/PostRunE as `any`, losing compile-time safety~~ done — typedHook sealed interface survives (cli_command.go:155)
+2. ~~**30 direct deps** — glamour, huh, lipgloss, otel, mango, koanf, go-output sub-modules all in core~~ done — core direct deps cut 30→13 (548aaa4)
+3. ~~**Flags aren't type-safe** — struct tags are uncompiled comments; global flags pollute subcommands~~ done — struct tags compiled at registration
+4. ~~**Audit logs are shallow** — only DI lifecycle, not command-level events~~ done — command-level audit middleware shipped (auditlog.go)
+5. ~~**Dead weight** — result.go, editor.go, flow_context.go add complexity without CLI value~~ done — result.go/editor.go cut (548aaa4); flow_context kept
 
 ---
 

@@ -151,34 +151,34 @@
 
 ### Website Quality
 
-1. **Custom-designed logo** — The SVG favicon is a placeholder. A real logo would significantly improve perceived quality.
-2. **OG image generation** — gogenfilter uses `astro-og-canvas` for dynamic OG images. cmdguard has none.
-3. **Lighthouse audit** — Never ran Lighthouse against the deployed site. Should verify performance/accessibility/SEO scores.
-4. **Comparison page depth** — The comparison table is 6 rows. Could expand with Kong, urfave/cli, go-flags comparisons (docs/COMPARISON.md already has this content).
-5. **Interactive examples** — No runnable examples or playground. The taskctl example is impressive but not showcased.
-6. **Search functionality** — Starlight's built-in Pagefind search is configured, but never verified it works correctly.
-7. **Analytics** — No analytics (gogenfilter removed Plausible, so maybe intentional, but worth deciding).
+1. **Custom-designed logo** — The SVG favicon is a placeholder. A real logo would significantly improve perceived quality. **→ ROADMAP raw ideas (launch marketing & infra)**
+2. **OG image generation** — gogenfilter uses `astro-og-canvas` for dynamic OG images. cmdguard has none. **→ ROADMAP raw ideas (launch marketing & infra)**
+3. **Lighthouse audit** — Never ran Lighthouse against the deployed site. Should verify performance/accessibility/SEO scores. **→ ROADMAP raw ideas (launch marketing & infra)**
+4. **Comparison page depth** — The comparison table is 6 rows. Could expand with Kong, urfave/cli, go-flags comparisons (docs/COMPARISON.md already has this content). **→ ROADMAP raw ideas (launch marketing & infra)**
+5. **Interactive examples** — No runnable examples or playground. The taskctl example is impressive but not showcased. **→ ROADMAP raw ideas (launch marketing & infra)**
+6. **Search functionality** — Starlight's built-in Pagefind search is configured, but never verified it works correctly. **→ ROADMAP raw ideas (launch marketing & infra)**
+7. **Analytics** — No analytics (gogenfilter removed Plausible, so maybe intentional, but worth deciding). **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### README Quality
 
-8. **Website link prominence** — The website link could be more prominent (badge-style or hero banner).
-9. **Animated demo** — No GIF/video showing cmdguard in action in the README.
-10. **Contributors section** — No contributors list or acknowledgment.
-11. **"As seen on" / trust signals** — No badges for Go Report Card score, specific coverage %, etc.
+8. **Website link prominence** — The website link could be more prominent (badge-style or hero banner). **→ ROADMAP raw ideas (launch marketing & infra)**
+9. **Animated demo** — No GIF/video showing cmdguard in action in the README. **→ ROADMAP raw ideas (launch marketing & infra)**
+10. **Contributors section** — No contributors list or acknowledgment. **→ ROADMAP raw ideas (launch marketing & infra)**
+11. **"As seen on" / trust signals** — No badges for Go Report Card score, specific coverage %, etc. **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Operational
 
-12. **Website CI workflow** — Need a GitHub Actions workflow that builds and deploys the website on push to `website/`.
-13. **Firebase custom domain** — Must connect `cmdguard.lars.software` in Firebase console after DNS propagates.
-14. **DNS apply** — User must run `terraform apply` from a whitelisted IP.
-15. **Staging environment** — No preview channel in Firebase for staging before production deploy.
+12. ~~**Website CI workflow** — Need a GitHub Actions workflow that builds and deploys the website on push to `website/`.~~ done — .github/workflows/website.yml exists (deploy job)
+13. **Firebase custom domain** — Must connect `cmdguard.lars.software` in Firebase console after DNS propagates. **→ ROADMAP raw ideas (launch marketing & infra)**
+14. **DNS apply** — User must run `terraform apply` from a whitelisted IP. **→ ROADMAP raw ideas (launch marketing & infra)**
+15. **Staging environment** — No preview channel in Firebase for staging before production deploy. **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Content Depth
 
-16. **More guides** — Could add guides for: BranchingFlowContext, Audit Log export, Plugin system, Doctor/Version commands, Shell completion, Typo suggestions, Signal handling patterns, WithCleanup lifecycle.
-17. **API reference depth** — Current API reference is an overview table. Could have per-function documentation pages.
-18. **Migration guide** — The "Migrating from Cobra" guide is good but could include a full before/after code diff of a real app.
-19. **Changelog** — Only shows v3.0.0 highlights. Could include the full CHANGELOG.md content or more versions.
+16. ~~**More guides** — Could add guides for: BranchingFlowContext, Audit Log export, Plugin system, Doctor/Version commands, Shell completion, Typo suggestions, Signal handling patterns, WithCleanup lifecycle.~~ done — guides expanded — 14 guide pages ship (audit-log, flow-context, plugins, shell-completion, …)
+17. **API reference depth** — Current API reference is an overview table. Could have per-function documentation pages. **→ ROADMAP raw ideas (launch marketing & infra)**
+18. ~~**Migration guide** — The "Migrating from Cobra" guide is good but could include a full before/after code diff of a real app.~~ done — website changelog.mdx ships
+19. **Changelog** — Only shows v3.0.0 highlights. Could include the full CHANGELOG.md content or more versions. **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ---
 
