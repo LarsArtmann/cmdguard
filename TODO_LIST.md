@@ -99,6 +99,10 @@ resolved (struck with evidence in the report itself) or routed to ROADMAP
 | #  | Task                                       | Notes                                                                                                        | Priority | Status  |
 | -- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | -------- | ------- |
 | H1 | Test all examples in CI                    | `examples/` compile via `go build ./...` but no CI job runs their tests; add an examples job to `ci.yml` (30m) | Low      | 🔴 TODO |
+| H2 | Rewrite or delete the no-op `PromptConfirm` test | `TestPromptConfirm` exercises no real logic (2026-07-14 hero-fix report, item 39); rewrite it against the `prompts` sub-module or delete it (5m) | Low | 🔴 TODO |
+| H3 | koanf→JSON round-trip edge-case tests      | TOML datetimes, YAML anchors, int-vs-float64, empty/0-byte configs — none covered in `koanf_loader_test.go` (found by the 2026-11-07 sweep in the 07-26/07-27 consolidation reports) | Medium | 🔴 TODO |
+| H4 | Website hero-code sync guard               | `website/src/data/hero-code.ts` (raw string) vs the inline highlighted copy in `HeroSection.astro` — no test or derive step keeps them in sync | Low | 🔴 TODO |
+| H5 | Remove dead `pkg/cmdguard/v2` lint exclusions | `.golangci.yml` carries ~20 path rules pointing at `pkg/cmdguard/v2/...` paths that no longer exist (`pkg/cmdguard/` contains only `v4`) — found while closing the 2026-07-23 manpage report | Low | 🔴 TODO |
 
 ---
 

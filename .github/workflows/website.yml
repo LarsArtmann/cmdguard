@@ -56,21 +56,21 @@ jobs:
       - name: HTML Validation
         run: pnpm dlx html-validate --config .htmlvalidate.json "dist/**/*.html"
 
-      - name: Verify import paths contain /v3
+      - name: Verify import paths contain /v4
         working-directory: ${{ github.workspace }}
         run: |
           ERRORS=""
           for file in $(grep -rl 'github.com/larsartmann/cmdguard' --include='*.md' --include='*.mdx' --include='*.ts' --include='*.astro' README.md website/src/ 2>/dev/null); do
-            BAD=$(grep -n 'github.com/larsartmann/cmdguard"[^/]' "$file" 2>/dev/null || true)
+            BAD=$(grep -n 'github.com/larsartmann/cmdguard"[^/]\|github.com/larsartmann/cmdguard/v3' "$file" 2>/dev/null || true)
             if [ -n "$BAD" ]; then
               ERRORS="$ERRORS\n$file:\n$BAD\n"
             fi
           done
           if [ -n "$ERRORS" ]; then
-            echo "::error::Import paths missing /v3 found:$ERRORS"
+            echo "::error::Import paths missing /v4 (or stale /v3) found:$ERRORS"
             exit 1
           fi
-          echo "All import paths correctly reference /v3"
+          echo "All import paths correctly reference /v4"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

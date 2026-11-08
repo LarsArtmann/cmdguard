@@ -92,7 +92,7 @@ cmdguard/
 ├── ROADMAP.md                # Long-term direction and raw ideas
 ├── CHANGELOG.md              # Change history per version
 ├── .golangci.yml             # Lint configuration
-├── go.work                   # Go workspace (8 modules: core + 7 sub-modules)
+├── go.work                   # Go workspace (8 modules) — LOCAL ONLY, not committed (untracked since d29bc4d)
 ├── flake.nix                 # Nix dev shell, formatter, checks
 ├── flake.lock                # Nix lock file
 └── README.md                 # User documentation
@@ -116,7 +116,7 @@ cmdguard/
 | `github.com/samber/do/v2`                   | Dependency injection | v2.1.0  |
 | `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
-| `github.com/larsartmann/go-output`          | Rich output formats  | v0.37.0 |
+| `github.com/larsartmann/go-output`          | Rich output formats  | v0.38.7 |
 | `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.11.0 |
 
 ### Optional Sub-Module Dependencies
@@ -239,7 +239,7 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 7. **Env tags** - `env:"VAR_NAME"` struct tag reads from environment
 8. **Counting flags** - `count:"true"` tag enables -v/-vv/-vvv pattern
 9. **Signal handling** — `WithSignalHandling()` cancels context on SIGINT/SIGTERM; `WithGracefulShutdown()` additionally triggers DI service shutdown (implies the former)
-10. **Rich output** - OutputTable/OutputResult with 16 formats via go-output v0.37.0 registries
+10. **Rich output** - OutputTable/OutputResult with 16 formats via go-output v0.38.7 registries
 11. **Copy-on-write registries** — `FlagRegistry` shares global type/validator registries via copy-on-write; reads use the shared maps, writes trigger a lazy clone. `RegisterTypeHandler()`/`RegisterValidator()` write to global defaults (visible to instances that haven't cloned); `FlagRegistry.RegisterTypeHandler()`/`FlagRegistry.RegisterFlagValidator()` trigger COW clone and write to instance-local maps
 12. **Typo suggestions** - `SuggestFlag`/`SuggestCommand` with Levenshtein
 13. **Full sentinel coverage** - All 40+ errors identifiable via `errors.Is()`
@@ -249,7 +249,7 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 17. **Plugin system** — `Plugin` interface bundles custom type handlers + validators; `RegisterPlugin()` applies globally, `WithPlugin()` / `FlagRegistry.RegisterPlugin()` apply per-instance
 18. **Nested config structs** — `ParseFlagTags` recurses into nested structs; `FieldTag.Index` tracks the reflect path for flattened flag registration
 19. **Docs generation** — `cli.GenerateDocs(w)` writes markdown documentation for the full command tree to any `io.Writer`. It renders from the SAME source as the machine contract (`flagsFor` in describe.go): an eight-column table (flag, type, env, default, values, required, secret, help) with inherited flags in their own section and cell-level table escaping. `docgen_drift_test.go` fails the build if a contract fact stops appearing in the markdown — do not reintroduce pflag's `FlagUsages` as the source
-20. **Go workspace** — `go.work` spans 8 modules (core + 7 sub-modules) for unified local builds; `go build ./...` compiles all modules
+20. **Go workspace** — `go.work` spans 8 modules (core + 7 sub-modules) for unified local builds; LOCAL ONLY — untracked since d29bc4d (a fresh clone builds the published module without it)
 21. **Machine-readable contract** — `Describe()` / `WriteDescription()` emit versioned JSON (`schema_version`) of the whole command tree, and a hidden `describe` command is auto-registered at `Execute` time (a consumer-defined `describe` wins; `WithoutDescribeCommand()` opts out). Flag metadata pflag cannot model (env, required, values, count, prompt, validate) is stored in cobra annotations at wiring time.
 22. **Atomic batch registration** — `AddCommands[T](cli, cmds...)` prepares and validates every command before attaching any, accepts heterogeneous flags types via the sealed `AddableCommand[T]` interface, and keys duplicate detection on the cobra command name (`"list [path]"` collides with `"list"`). `AddCommand` is now a thin wrapper over the same prepare/attach path.
 23. **Hints separate from messages** — error text stays stable for parsing and tests; `ErrorHint(err)` supplies one actionable fix per sentinel and is emitted as `hint` in the JSON error envelope, plus a `Hint:` line under human-readable errors (fang's default view and the plain cobra path; `WithoutErrorHints()` opts out). A coverage test fails when a classified sentinel lacks a hint.
@@ -301,8 +301,8 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 
 #### Output & Styling
 
-- **16 output formats** via go-output `v0.37.0` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `output.RegisteredTableMarshalFormats()`.
-- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. The main `go-output` module is at v0.37.0; indirect sub-modules (`d2/`, `markdown/`, `tree/`, `table/`, etc.) are at v0.36.0. The `enum` and `envdetect` sub-modules were absorbed into go-output core.
+- **16 output formats** via go-output `v0.38.7` registries — `RenderTableData` (all 16) and `RenderAnyData` (JSON/YAML/TOML) via thread-safe `formatRegistry[T]`. `OutputTable()` uses `AddRowChecked()` for fail-fast row validation. `--output` flag help is auto-generated from `output.RegisteredTableMarshalFormats()`.
+- **go-output sub-modules** — `markdown/` and `tree/` are standalone sub-modules (like `d2/`, `table/`, etc.); `output.go` imports them explicitly so `FormatMarkdown`/`FormatTree` stay available. The main `go-output` module is at v0.38.7; its indirect sub-modules ride the same version. The `enum` and `envdetect` sub-modules were absorbed into go-output core.
 - **fang styling** — styled output by default; `--no-color` persistent flag is registered by default and sets `NO_COLOR=1` for fang; `NO_COLOR` env var also respected automatically via fang's colorprofile. `cli.NoColor()` returns true if either is set.
 - **Help rendering hook** — `WithHelpTransform[T](fn)` is the core extension point for transforming command help text. The `glamour` sub-module provides a ready-made markdown transformer (see [Sub-Modules](#sub-modules) below); it is NOT imported by core.
 

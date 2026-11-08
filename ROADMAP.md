@@ -191,6 +191,70 @@ Harvested from the June-10/11 output-sprint reports (2026-11-07 sweep, second ba
 - **govulncheck/gosec in CI** — both are manual-only today (see TODO_LIST S2 for the toolchain blocker)
 - **art-dupl/dedup enforcement in CI** — clone-count regression protection existed only as a manual ritual
 
+Harvested from the July planning/review docs (2026-11-07 sweep, third batch):
+
+- **go.work portability** — the workspace pins 13 absolute `/home/lars/projects/go-output/*` paths, so the repo builds only on this machine; fine for local dev (AGENTS.md documents the workspace), but a fresh clone needs `go.work` trimming before it builds
+- **`cmdguard/lite` stripped sub-package** — <10 transitive modules, stdlib-`flag` compatible (from the 2026-07-16 upd evaluation)
+- **Single-command fast path `Run[T,F](...)`** — no `NewCLI` + `AddCommand` ceremony for one-command CLIs (upd evaluation)
+- **`PrintHelp(flagSet, ...)` incremental adoption** — render help for a plain `flag.FlagSet` as an entry point (upd evaluation)
+- **Website signature element** — the hero's identifying visual (before/after split, terminal-style error, construction animation), explicitly deferred to "a future design sprint" (2026-07-18 frontend-design review Finding 3)
+
+Harvested from the early-July website/USP reports (2026-11-07 sweep, routed as "port X to website" / "marketing&infra"):
+
+Website guide ports:
+
+- **Port docs/TUTORIAL.md to the website**
+- **Port docs/COMPARISON.md to the website**
+- **Port docs/PERFORMANCE.md to the website**
+- **Port docs/CLI_DESIGN_PRINCIPLES.md to the website**
+- **Port docs/MIGRATION_v2_v3.md to the website**
+- **Port docs/COBRA_FOOTGUNS.md to the website**
+- **Doctor-Version guide** on the website (`WithDoctorCheck` + `VersionCommand` patterns)
+- **Signal-handling guide** on the website (`WithSignalHandling`/`WithGracefulShutdown` patterns)
+
+Launch marketing & infra:
+
+- **Logo mark** for the project (shield-style, matches the hero)
+- **OG image generation** (`astro-og-canvas`) for social previews
+- **Lighthouse CI** (`lighthouse.yml` + `lighthouserc.json`)
+- **Firebase preview channels** on PRs
+- **DNS** for the appspot (`cmdguard.web.app` alias) and apex→www redirect
+- **`FIREBASE_SERVICE_ACCOUNT`** in GitHub secrets (replaces `firebase login` in CI)
+- **Uptime monitoring** for `cmdguard.web.app` and `cmdguard.lars.software`
+- **`SECURITY.md`**
+- **`.github/FUNDING.yml`** (GitHub Sponsors)
+- **`CITATION.cff`** for academic citations
+- **Sitemap `lastmod`** entries
+- **`getting-started/full-tutorial.mdx`** end-to-end walkthrough
+- **`dedup.sh`** (jscpd) duplication check for the website
+- **Launch blog post** + social announcements (r/golang, HN, X/LinkedIn)
+- **Awesome Go / awesome-go-cli submissions** + Go project wiki listing
+- **Sub-module badges** in README (version badges per sub-module)
+- **Website flake app** (`nix run .#website`) wrapping the pnpm build
+
+Documentation & CI guards (routed as "guards/note" and "stale-doc guard"):
+
+- **check-dep-versions guard** — CI script comparing docs' dependency tables against `go.mod`
+- **dep-bump doc-sync discipline** — every dependency PR updates FEATURES/AGENTS in the same change
+- **Derive dependency tables from go.mod** — single source instead of hand-maintained tables
+- **Simplify the go-output note** — the indirect-deps footnote in FEATURES is stale-prone; derive it
+- **Audit-log subcommand** — built-in opt-in `audit-log export` command (consumers hand-roll it today)
+- **Service-owned config ADR** — document why DI services (not the CLI config struct) own connection config
+- **Per-command flag scoping (`WithProvider`)** — scoped DI overrides per command tree
+- **Strict flag audit mode** — CI mode that fails on flags lacking env/default provenance
+- **Post-rewrite semantic doc audit** — a docs-health pass after every formatter rewrite (the 2026-11-05 table-strike lesson)
+- **Stale-doc-ref CI guard** — grep for references to deleted/moved docs in living docs
+- **Semver CI check** — enforce tag/CHANGELOG/module-path coherence before release
+- **godoclint** — godoc convention linting across exported symbols
+- **`docs/STATUS.md` index** — one-page pointer to current status reports (reports themselves stay historical)
+- **docs-health CI gate** — run `docs-gates` (or equivalent) on docs-touching PRs
+- **markdownlint + lychee** — markdown style + link checking in CI
+
+Other:
+
+- **musttag compliance evaluation** for sub-module config structs
+- **No-op `PromptConfirm` test** — rewrite or delete the identified no-op (TODO_LIST H2)
+
 ### Flight Recorder Enhancements
 
 - **`MaxSnapshots` config** — rate limiting / disk protection against runaway trace file creation

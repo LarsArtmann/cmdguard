@@ -181,7 +181,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 ---
 
-## Rich Output (go-output v0.37.0)
+## Rich Output (go-output v0.38.7)
 
 | Feature                 | Status              | Notes                                                                                |
 | ----------------------- | ------------------- | ------------------------------------------------------------------------------------ |

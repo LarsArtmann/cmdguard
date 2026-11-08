@@ -435,6 +435,14 @@ Corrects the v2.11.0 mis-release that put breaking changes on a `/v2` path.
 
 ---
 
+## [2.10.3] - 2026-07-07
+
+### Changed
+
+- go-output v0.30.1, samber-do-auditlog v0.4.0 (`d006757`). Entry added 2026-11-07 — the tag existed without a CHANGELOG entry (found by the docs-health sweep).
+
+---
+
 ## [2.10.0] - 2026-06-28
 
 ### Added — Cobra-Correctness Contract + Escape-Hatch APIs
