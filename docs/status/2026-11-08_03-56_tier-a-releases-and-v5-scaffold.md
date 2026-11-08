@@ -205,6 +205,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 7. B1.4 flip strict-validation default; fix fallout; opt-out test.
 8. B1.5 flip signals+graceful default; fix fallout.
 9. B1.6 flip batteries default; fix fallout.
+<!-- ✅ DONE 2026-11-08: shipped in v5.0.0 — the flip landed on the v5-scaffold branch, pinned by cli_defaults_matrix_test.go (Without* opt-outs shipped alongside); see the tagged v5.0.0 tree. -->
 10. B3.1/B3.2 flip test matrix (each `Without*` proves green; batteries-on
     suite green; race + lint).
 11. B1.3 Builder sketch (deferred-error Builder + NewApp integration).

@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	charm.land/huh/v2 v2.0.3
-	github.com/larsartmann/cmdguard/v5 v5.0.0
+	github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
 )
 
 require (
@@ -89,4 +89,4 @@ replace github.com/larsartmann/cmdguard/glamour => ../glamour
 
 replace github.com/larsartmann/cmdguard/spinner => ../spinner
 
-replace github.com/larsartmann/cmdguard/v5 v5.0.0 => ../
+replace github.com/larsartmann/cmdguard/v5 => ../

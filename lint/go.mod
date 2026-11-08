@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	github.com/dustin/go-humanize v1.1.0
-	github.com/larsartmann/cmdguard/v5 v5.0.0
+	github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
 	github.com/larsartmann/go-finding v1.15.1
 	github.com/larsartmann/go-finding/toolsdk v1.16.0
 	github.com/larsartmann/go-linter-sdk v0.4.0
@@ -84,4 +84,4 @@ replace github.com/larsartmann/cmdguard/glamour => ../glamour
 
 replace github.com/larsartmann/cmdguard/spinner => ../spinner
 
-replace github.com/larsartmann/cmdguard/v5 v5.0.0 => ../
+replace github.com/larsartmann/cmdguard/v5 => ../

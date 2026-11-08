@@ -194,6 +194,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 9. Decide the module path (`/v5` vs keep `/v4`) and scaffold it.
 10. Flip strict validation to the default.
+<!-- ✅ DONE 2026-11-08: shipped in v5.0.0 — the flip landed on the v5-scaffold branch, pinned by cli_defaults_matrix_test.go (Without* opt-outs shipped alongside); see the tagged v5.0.0 tree. -->
 11. Flip signal handling and graceful shutdown to the default.
 12. Implement the deferred-error `Builder`.
 13. Rename `CommandInfo` → `CommandMetadata`.
