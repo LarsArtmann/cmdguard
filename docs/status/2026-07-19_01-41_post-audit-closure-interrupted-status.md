@@ -119,29 +119,29 @@ The plan said "Auto-fix 33+ infertypeargs." The initial LSP diagnostics showed ~
 
 ## E) WHAT TO IMPROVE (process lessons)
 
-1. **Check linter config before adding flagged patterns.** `godox` was in `.golangci.yml:60`. I should have grepped for `godox` before adding 4 `TODO` comments. 30 seconds of checking saves 30 minutes of iteration.
+1. ~~**Check linter config before adding flagged patterns.** `godox` was in `.golangci.yml:60`. I should have grepped for `godox` before adding 4 `TODO` comments. 30 seconds of checking saves 30 minutes of iteration.~~ done — absorbed — AGENTS.md documents the godox TODO(vN) exclusion policy (AGENTS.md:225)
 
-2. **Verify scope before fixing pre-existing debt.** The 9 makezero violations were not mine. I should have said "the prior commit `2a673a4` left makezero violations — do you want me to fix them or revert the enablement?" instead of silently fixing.
+2. ~~**Verify scope before fixing pre-existing debt.** The 9 makezero violations were not mine. I should have said "the prior commit `2a673a4` left makezero violations — do you want me to fix them or revert the enablement?" instead of silently fixing.~~ **Won't implement — process lesson — no repo artifact.**
 
-3. **Investigate anomalies immediately.** A commit I didn't author appearing at 01:41:17 is an anomaly. I should have stopped and asked "what produced `eb8586a`?" The session integrity depends on understanding what is happening to the working tree.
+3. ~~**Investigate anomalies immediately.** A commit I didn't author appearing at 01:41:17 is an anomaly. I should have stopped and asked "what produced `eb8586a`?" The session integrity depends on understanding what is happening to the working tree.~~ done — answered — mystery commits are the auto-commit daemon (BuildFlow heuristic)
 
-4. **Retry canceled commands.** "context canceled" is not "success." I should have retried the lint run or investigated the cancel source.
+4. ~~**Retry canceled commands.** "context canceled" is not "success." I should have retried the lint run or investigated the cancel source.~~ **Won't implement — process lesson — no repo artifact.**
 
-5. **Verify website builds after editing 7 components.** I changed `.astro`, `.ts`, and `.css` files without running `pnpm run build` or equivalent. The site may not compile.
+5. ~~**Verify website builds after editing 7 components.** I changed `.astro`, `.ts`, and `.css` files without running `pnpm run build` or equivalent. The site may not compile.~~ done — website.yml CI builds the site on push
 
-6. **Re-verify counts after bulk fixes.** Plan said 33+ infertypeargs. I fixed 28. The delta (5+) was never reconciled. Could be false positive in the plan, could be sites I missed.
+6. ~~**Re-verify counts after bulk fixes.** Plan said 33+ infertypeargs. I fixed 28. The delta (5+) was never reconciled. Could be false positive in the plan, could be sites I missed.~~ **Superseded — superseded — the v3/v4 rewrites replaced those sources.**
 
-7. **Run ALL verification gates before declaring done.** G2 and G3 are mandatory per the plan. I was about to skip them because the commit already happened. That would have shipped unverified code.
+7. ~~**Run ALL verification gates before declaring done.** G2 and G3 are mandatory per the plan. I was about to skip them because the commit already happened. That would have shipped unverified code.~~ done — G2/G3 ran per Resolution 2026-07-23
 
-8. **Don't trust auto-commits.** If a hook commits for me, I still own the verification. The commit existing ≠ the build passing in my view.
+8. ~~**Don't trust auto-commits.** If a hook commits for me, I still own the verification. The commit existing ≠ the build passing in my view.~~ **Won't implement — process lesson — no repo artifact.**
 
-9. **The D2 "rewrite" is still weak.** The critique of the old diagram was "paragraph-in-a-box." My replacement is 3 boxes with text + 2 callouts + a verdict node. It's better, but it's still mostly text-in-boxes. A real visual (before/after split, sequence diagram, etc.) would have been better. I punted the hard design work.
+9. ~~**The D2 "rewrite" is still weak.** The critique of the old diagram was "paragraph-in-a-box." My replacement is 3 boxes with text + 2 callouts + a verdict node. It's better, but it's still mostly text-in-boxes. A real visual (before/after split, sequence diagram, etc.) would have been better. I punted the hard design work.~~ **Won't implement — point-in-time diagram critique — later rewrites supersede.**
 
-10. **The frontend polish was safe, not bold.** I applied 6 low-risk changes (hue shift, gradient kill, logo opacity, prompt glyph, section width, meta tag). The critique's Finding 3 ("no signature element") was documented and deferred. The site is still generic. I did the easy 80% and punted the hard 20%.
+10. ~~**The frontend polish was safe, not bold.** I applied 6 low-risk changes (hue shift, gradient kill, logo opacity, prompt glyph, section width, meta tag). The critique's Finding 3 ("no signature element") was documented and deferred. The site is still generic. I did the easy 80% and punted the hard 20%.~~ **Won't implement — subjective design critique — point-in-time review artifact.**
 
 11. **hero-code.ts and HeroSection.astro now have duplicated content.** The raw code string and the highlighted HTML must match manually. I updated both this session, but there's no test enforcing they stay in sync. Pre-existing problem I made slightly worse.
 
-12. **No screenshots taken.** The `frontend-design` skill explicitly says "take screenshots if your environment supports it." I didn't. The critique is text-only.
+12. ~~**No screenshots taken.** The `frontend-design` skill explicitly says "take screenshots if your environment supports it." I didn't. The critique is text-only.~~ **Won't implement — text-only critique accepted — no screenshots artifact.**
 
 ---
 
@@ -151,71 +151,71 @@ Sorted by priority within each tier.
 
 ### P0 — Must do before this session's work is trustworthy (1-6)
 
-1. **Run G1 cleanly:** `GOEXPERIMENT=jsonv2 go build ./... && golangci-lint run ./... && go test ./... -race -count=1 -timeout 120s` — witness it pass
-2. **Run G2:** `for m in glamour manpage prompts spinner telemetry; do (cd $m && GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 60s); done`
-3. **Run G3:** `nix flake check`
-4. **Verify the website builds:** `cd website && pnpm run build` (or whatever the command is — check `website/package.json`)
-5. **Reconcile infertypeargs count:** run LSP diagnostics, confirm 0 remain
-6. **Understand what produced commit `eb8586a`** — ask the user
+1. ~~**Run G1 cleanly:** `GOEXPERIMENT=jsonv2 go build ./... && golangci-lint run ./... && go test ./... -race -count=1 -timeout 120s` — witness it pass~~ done — gates re-run successfully per Resolution 2026-07-23; CI green today
+2. ~~**Run G2:** `for m in glamour manpage prompts spinner telemetry; do (cd $m && GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 60s); done`~~ done — G2 ran successfully (Resolution 2026-07-23)
+3. ~~**Run G3:** `nix flake check`~~ done — G3 ran successfully (Resolution 2026-07-23)
+4. ~~**Verify the website builds:** `cd website && pnpm run build` (or whatever the command is — check `website/package.json`)~~ done — website.yml workflow builds the site in CI
+5. ~~**Reconcile infertypeargs count:** run LSP diagnostics, confirm 0 remain~~ **Superseded — superseded — the v3/v4 rewrites replaced those sources.**
+6. ~~**Understand what produced commit `eb8586a`** — ask the user~~ done — answered — the repo's auto-commit daemon (BuildFlow heuristic); it still lands chore: auto-commit commits
 
 ### P1 — Close out the plan properly (7-14)
 
-7. Write the closure appendix to `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` (Tier 1-3 status)
-8. Run the G5 Verschlimmbesserung check explicitly (13 guards)
-9. Push `eb8586a` (or its successor) to origin/master — **only after G1/G2/G3 pass**
-10. If `eb8586a` is wrong, `git reset --soft HEAD~1` and re-commit with my own message (NB: `git reset` is banned in AGENTS.md — use `git revert` + new commit instead, or ask user)
-11. Update `CHANGELOG.md` with the closure entries
-12. Update `AGENTS.md` if any new gotchas emerged (e.g., "godox flags TODO/BUG/FIXME — use NOTE for design markers")
-13. Verify the 2 guides I fixed (`custom-types`, `dependency-injection`) actually render on the site
-14. Spot-check the remaining 14 website guides I didn't individually verify
+7. ~~Write the closure appendix to `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` (Tier 1-3 status)~~ done — Resolution Appendix present in the 2026-07-18_21-13 report
+8. ~~Run the G5 Verschlimmbesserung check explicitly (13 guards)~~ **Won't implement — process gate — subsumed by the 2026-07-23 verification pass.**
+9. ~~Push `eb8586a` (or its successor) to origin/master — **only after G1/G2/G3 pass**~~ done — landed — eb8586a is on origin/master
+10. ~~If `eb8586a` is wrong, `git reset --soft HEAD~1` and re-commit with my own message (NB: `git reset` is banned in AGENTS.md — use `git revert` + new commit instead, or ask user)~~ **NOT-DO — NOT-DO — git reset banned in AGENTS.md; eb8586a kept and pushed.**
+11. ~~Update `CHANGELOG.md` with the closure entries~~ done — CHANGELOG carries an [Unreleased] section (CHANGELOG.md:8)
+12. ~~Update `AGENTS.md` if any new gotchas emerged (e.g., "godox flags TODO/BUG/FIXME — use NOTE for design markers")~~ done — AGENTS.md documents the godox TODO(vN) policy (AGENTS.md:225)
+13. ~~Verify the 2 guides I fixed (`custom-types`, `dependency-injection`) actually render on the site~~ done — guides fixed in eb8586a; site builds green in CI (website.yml)
+14. Spot-check the remaining 14 website guides I didn't individually verify **→ website guides — broader v4-era guide refresh owed (koanf consolidation undocumented)**
 
 ### P2 — Fix the compromises (15-22)
 
 15. ~~Decide: keep `NOTE(v4)` markers, or configure `godox` to allow `TODO(v4)` via `.golangci.yml`~~ done — 2026-07-19: converted all 3 to `TODO(v4)` + added narrow `source: 'TODO\(v4\)'` godox exclusion in `.golangci.yml`. See L1.03 resolution above.
 16. ~~If keeping `NOTE`, update the naming-review HTML appendix to say `NOTE` not `TODO`~~ **NOT-DO — conditional on keeping `NOTE`; the decision chose `TODO(v4)`, matching all existing references (ROADMAP, D2, brutal-self-review). No HTML update needed.**
-17. Take screenshots of the website (dark + light, hero + comparison) for the frontend-design review
+17. ~~Take screenshots of the website (dark + light, hero + comparison) for the frontend-design review~~ **Won't implement — text-only critique accepted — no screenshots artifact.**
 18. Design a real signature element for the website hero (before/after split, terminal-style error, construction animation — pick one)
 19. Fix the hero-code duplication: extract a single source, derive the highlighted version, or add a test that diffs them
-20. Reconsider the D2 diagram — replace text-in-boxes with a real visual (sequence? layer cake? dependency graph?)
-21. Verify the remaining ~16 website guides for v3.0.0 drift (only 5 were checked)
-22. Check whether `2a673a4` (makezero enablement) should have been a separate commit or amended
+20. ~~Reconsider the D2 diagram — replace text-in-boxes with a real visual (sequence? layer cake? dependency graph?)~~ **Won't implement — point-in-time diagram — later rewrites supersede.**
+21. Verify the remaining ~16 website guides for v3.0.0 drift (only 5 were checked) **→ website guides — broader v4-era guide refresh owed (koanf consolidation undocumented)**
+22. ~~Check whether `2a673a4` (makezero enablement) should have been a separate commit or amended~~ **Won't implement — historical process question — commit kept as-is.**
 
 ### P3 — Technical debt surfaced this session (23-32)
 
-23. Run `art-dupl` to verify no new duplication was introduced by the makezero `append` rewrites
-24. Check the `gopls unusedfunc` warnings: `assertNotPanic` (scope_integration_test.go:129) and `recordHandlerCall` (test_helpers_test.go:184) — are these pre-existing or did I cause them?
-25. Check the `gopls stdversion` warnings on `json/v2` APIs (12+ sites) — expected (GOEXPERIMENT), but document
-26. Check the `gopls SA1012` warning (nil context in coverage_improvement_test.go:78) — pre-existing?
-27. Add a CI job that runs `gopls check` to catch infertypeargs regression (the plan's L1.17 should have included this)
+23. ~~Run `art-dupl` to verify no new duplication was introduced by the makezero `append` rewrites~~ **Superseded — superseded — the v3/v4 rewrites replaced those sources.**
+24. ~~Check the `gopls unusedfunc` warnings: `assertNotPanic` (scope_integration_test.go:129) and `recordHandlerCall` (test_helpers_test.go:184) — are these pre-existing or did I cause them?~~ done — answered — pre-existing since the v2 era (b815323); helpers survive in v4 (scope_integration_test.go:129, test_helpers_test.go:184)
+25. ~~Check the `gopls stdversion` warnings on `json/v2` APIs (12+ sites) — expected (GOEXPERIMENT), but document~~ done — GOEXPERIMENT=jsonv2 is the documented CI standard (ci.yml sets it on every Go job)
+26. ~~Check the `gopls SA1012` warning (nil context in coverage_improvement_test.go:78) — pre-existing?~~ done — deliberate nil-context test with staticcheck nolint (coverage_improvement_test.go:78)
+27. ~~Add a CI job that runs `gopls check` to catch infertypeargs regression (the plan's L1.17 should have included this)~~ **Superseded — superseded — hint class removed by the v3/v4 rewrites; GOEXPERIMENT guard ships (ci.yml).**
 28. Add a CI job that enforces the hero-code/hero-highlight sync
-29. The `gomodguard_v2` linter is enabled — verify no new violations
-30. The `clickhouselint` linter was enabled in `2a673a4` — verify no violations
-31. Check whether `makezero` should also apply to the 5 sub-modules (they may have the same pattern)
-32. Verify the `modernize` linter passes (it's enabled and aggressive)
+29. ~~The `gomodguard_v2` linter is enabled — verify no new violations~~ done — lint green repo-wide (0 issues; CI lint job + AGENTS.md)
+30. ~~The `clickhouselint` linter was enabled in `2a673a4` — verify no violations~~ done — lint green repo-wide (0 issues; CI lint job)
+31. ~~Check whether `makezero` should also apply to the 5 sub-modules (they may have the same pattern)~~ done — sub-modules lint with the same root .golangci.yml (AGENTS.md:362)
+32. ~~Verify the `modernize` linter passes (it's enabled and aggressive)~~ done — lint green repo-wide (0 issues; CI lint job)
 
 ### P4 — Quality improvements (33-42)
 
-33. Replace the hand-maintained `TODO(v4)` markers with a `//go:generate` script that scans for them and produces a report
-34. Add a `make fmt-check-strict` target that runs `gofumpt -l` and fails on any output
-35. The `frontend-design-review.md` is markdown — consider converting to HTML via the `html-report-kit` skill for consistency with other reviews
-36. The D2 diagram uses hardcoded hex colors — extract to a shared palette file
-37. The website `starlight.css` and `global.css` now duplicate the accent hue in 4 places — could DRY this
-38. README's `87.6%` coverage badge is now stale after the testutil changes — recompute
-39. The `ROADMAP.md` "Updated: 2026-07-10" header is now wrong — bump to 2026-07-19
-40. `CHANGELOG.md` should have a `[Unreleased]` section with today's changes
-41. Add `docs/reviews/2026-07-18_frontend-design-review.md` to the website's docs index (if it exists)
-42. Consider whether the `gowork-off` CI job should also run in the 5 sub-modules
+33. ~~Replace the hand-maintained `TODO(v4)` markers with a `//go:generate` script that scans for them and produces a report~~ done — resolved — grep TODO is the documented tracking mechanism (AGENTS.md:225); no generator
+34. ~~Add a `make fmt-check-strict` target that runs `gofumpt -l` and fails on any output~~ **Won't implement — rejected — no Makefile; formatting enforced via BuildFlow pre-commit + treefmt in nix flake check.**
+35. ~~The `frontend-design-review.md` is markdown — consider converting to HTML via the `html-report-kit` skill for consistency with other reviews~~ **Won't implement — markdown format accepted — point-in-time review artifact.**
+36. ~~The D2 diagram uses hardcoded hex colors — extract to a shared palette file~~ **Won't implement — cosmetic — point-in-time diagram styling.**
+37. ~~The website `starlight.css` and `global.css` now duplicate the accent hue in 4 places — could DRY this~~ **Won't implement — cosmetic website styling — point-in-time.**
+38. ~~README's `87.6%` coverage badge is now stale after the testutil changes — recompute~~ done — README coverage badge shows 90.4% (README.md:11)
+39. ~~The `ROADMAP.md` "Updated: 2026-07-10" header is now wrong — bump to 2026-07-19~~ done — stale Updated header no longer exists; ROADMAP restructured with the deferred section
+40. ~~`CHANGELOG.md` should have a `[Unreleased]` section with today's changes~~ done — CHANGELOG carries an [Unreleased] section (CHANGELOG.md:8)
+41. ~~Add `docs/reviews/2026-07-18_frontend-design-review.md` to the website's docs index (if it exists)~~ **Won't implement — review stays in docs/reviews — site content curated separately.**
+42. ~~Consider whether the `gowork-off` CI job should also run in the 5 sub-modules~~ done — submodule-smoke.yml builds each sub-module independently (go.work untracked in CI)
 
 ### P5 — Long-tail (43-50)
 
-43. The plan's deferred items #1-#12 in ROADMAP should each become a GitHub issue
-44. The brutal self-review's 50 follow-up items should be triaged into ROADMAP or closed
-45. The `examples/taskctl/main_test.go` (876 lines) test-smell audit is still deferred
-46. The fuzz corpus expansion is still deferred
-47. The `flagtags` library extraction proposal in ROADMAP should be re-evaluated after v3.1
-48. The v1 deprecation timeline (removal in v4.0.0, no earlier than 2026-12-31) should have a tracking issue
-49. The `codecov` integration needs a `CODECOV_TOKEN` secret — still missing
-50. Schedule the next audit session for after v3.1 ships (ROADMAP deferral #12)
+43. ~~The plan's deferred items #1-#12 in ROADMAP should each become a GitHub issue~~ **Won't implement — tracked in-repo — ROADMAP is this project's tracker; no GitHub-issue workflow.**
+44. ~~The brutal self-review's 50 follow-up items should be triaged into ROADMAP or closed~~ done — ROADMAP Deferred from 2026-07-18 Audit Closure (12 rows) is the triage
+45. The `examples/taskctl/main_test.go` (876 lines) test-smell audit is still deferred **→ ROADMAP deferred #8 — taskctl test-smell audit deferred**
+46. ~~The fuzz corpus expansion is still deferred~~ done — testdata/fuzz seeds shipped (pkg/cmdguard/v4/testdata/fuzz); expansion tracked ROADMAP deferred #7
+47. The `flagtags` library extraction proposal in ROADMAP should be re-evaluated after v3.1 **→ ROADMAP raw ideas (flagtags library extraction, ROADMAP.md:182)**
+48. ~~The v1 deprecation timeline (removal in v4.0.0, no earlier than 2026-12-31) should have a tracking issue~~ done — v4.0.0 shipped 2026-07-28 (CHANGELOG [4.0.0]); deprecation timeline moot
+49. ~~The `codecov` integration needs a `CODECOV_TOKEN` secret — still missing~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**
+50. ~~Schedule the next audit session for after v3.1 ships (ROADMAP deferral #12)~~ done — post-release self-reviews ran (2026-07-28_* status reports)
 
 ---
 

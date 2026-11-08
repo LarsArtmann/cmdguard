@@ -105,33 +105,33 @@ groups at t=22 are individually triaged and accepted as idiomatic.
 
 | # | Target                               | Duplication                               | Estimated Impact                                                                                                                                                         |
 | - | ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1 | `pkg/cmdguard/v2/output.go`          | 17-clone format-specific switch           | Strategy pattern with `Formatter` interface, one impl per format registered in a map. Would eliminate 17+ near-identical switch cases. Medium-high risk, large refactor. |
-| 2 | `pkg/cmdguard/v2/command_options.go` | Many similar `WithXxx` functional options | Could extract a generic `withString[T,F any](field *string) CommandOption[T,F]` helper. Currently 19 options follow the pattern manually. Medium risk.                   |
+| ~~1~~ | ~~`pkg/cmdguard/v2/output.go`~~ **Superseded — executed — FormatStrategy then go-output delegation (08-51/09-15); gone in v3.** | ~~17-clone format-specific switch~~ | ~~Strategy pattern with `Formatter` interface, one impl per format registered in a map. Would eliminate 17+ near-identical switch cases. Medium-high risk, large refactor.~~ |
+| ~~2~~ | ~~`pkg/cmdguard/v2/command_options.go`~~ **Superseded — rewritten through v3/v4 — v4 command options reshaped (no generic Setter).** | ~~Many similar `WithXxx` functional options~~ | ~~Could extract a generic `withString[T,F any](field *string) CommandOption[T,F]` helper. Currently 19 options follow the pattern manually. Medium risk.~~ |
 
 ### Architectural / Documentation
 
 | # | Item                                 | Notes                                                                                        |
 | - | ------------------------------------ | -------------------------------------------------------------------------------------------- |
-| 3 | `docs/adr/002-formatter-strategy.md` | Document the output strategy pattern decision (if pursued)                                   |
-| 4 | `docs/DOMAIN_LANGUAGE.md`            | Glossary doesn't exist yet — would help AI sessions interpret the v2 type system             |
-| 5 | `examples/` directory                | Only 1 example (`taskctl`). Could add minimal/single-command examples for each major feature |
+| ~~3~~ | ~~`docs/adr/002-formatter-strategy.md`~~ **Won't implement — never written — docs/adr/ went lint-strategy + machine-contract instead.** | ~~Document the output strategy pattern decision (if pursued)~~ |
+| ~~4~~ | ~~`docs/DOMAIN_LANGUAGE.md`~~ done — exists — docs/DOMAIN_LANGUAGE.md | ~~Glossary doesn't exist yet — would help AI sessions interpret the v2 type system~~ |
+| ~~5~~ | ~~`examples/` directory~~ done — examples/config-explain + docs-generator ship (examples/) | ~~Only 1 example (`taskctl`). Could add minimal/single-command examples for each major feature~~ |
 
 ### Test Coverage
 
 | # | Item                                | Current              | Notes                                                                       |
 | - | ----------------------------------- | -------------------- | --------------------------------------------------------------------------- |
-| 6 | `pkg/cmdguard/v2/testutil` coverage | 55.2%                | Helpers are tested implicitly by callers; explicit unit tests would be nice |
-| 7 | `pkg/testutil` coverage             | 0.0% (no test files) | No `_test.go` exists; package only consumed by v2 internal tests            |
-| 8 | `examples/taskctl` coverage         | 70.5%                | Has tests; could push toward 85% to match v2                                |
+| ~~6~~ | ~~`pkg/cmdguard/v2/testutil` coverage~~ **Superseded — pkg/cmdguard/v2/testutil deleted — pkg/testutil at 80.3% (FEATURES.md).** | ~~55.2%~~ | ~~Helpers are tested implicitly by callers; explicit unit tests would be nice~~ |
+| ~~7~~ | ~~`pkg/testutil` coverage~~ done — pkg/testutil has tests — failure_paths_test.go (80.3% cov FEATURES.md) | ~~0.0% (no test files)~~ | ~~No `_test.go` exists; package only consumed by v2 internal tests~~ |
+| ~~8~~ | ~~`examples/taskctl` coverage~~ done — taskctl at 85.9% (FEATURES.md) | ~~70.5%~~ | ~~Has tests; could push toward 85% to match v2~~ |
 
 ### Infrastructure
 
 | #  | Item                               | Notes                                                                                         |
 | -- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
-| 9  | `nix flake check` (full)           | Currently has devShell + formatter + format check; could add `buildGoModule`, `go vet`, tests |
-| 10 | CI workflow (`.github/workflows/`) | No CI observed; only local nix shell                                                          |
-| 11 | Pre-commit hook `gomod-check`      | Pre-existing failures documented in AGENTS.md; bypassed via `--no-verify`                     |
-| 12 | `go mod tidy`                      | Stale `go.sum` entries (23 reported in AGENTS.md) — could clean up                            |
+| ~~9~~  | ~~`nix flake check` (full)~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Currently has devShell + formatter + format check; could add `buildGoModule`, `go vet`, tests~~ |
+| ~~10~~ | ~~CI workflow (`.github/workflows/`)~~ done — .github/workflows/ci.yml (build+test+race+coverage+codecov+lint+nix-check) | ~~No CI observed; only local nix shell~~ |
+| ~~11~~ | ~~Pre-commit hook `gomod-check`~~ done — obsolete pre-commit hook removed (8618022) | ~~Pre-existing failures documented in AGENTS.md; bypassed via `--no-verify`~~ |
+| ~~12~~ | ~~`go mod tidy`~~ **Superseded — go.mod/go.sum rewritten through v3/v4 (proxy pins; CI-gated).** | ~~Stale `go.sum` entries (23 reported in AGENTS.md) — could clean up~~ |
 
 ---
 
@@ -158,39 +158,39 @@ documented in c) above (stale go.sum, missing CI, etc.).
 
 ### Process
 
-1. **Stop lowering the art-dupl threshold.** The 12 remaining groups at t=22 are idiomatic. Further
-   lowering yields only false positives (signature fragments) or patterns that are correctly
-   repeated. Diminishing returns reached.
-2. **Pivot to architectural refactors.** `output.go` 17-clone format switch is the next high-leverage
-   target. A `Formatter` interface + registry would replace 17+ switch cases with one map lookup per
-   format invocation. This is a real, valuable refactor — not a stylistic cleanup.
-3. **Add CI.** No automated quality gate exists. A `.github/workflows/ci.yml` running
-   `go test -race -cover` + `golangci-lint` + `nix flake check` would prevent regressions. Today the
-   only safety net is the developer's local environment.
-4. **Document the helper inventory.** There's no `docs/TEST_HELPERS.md`. Future maintainers (and AI
-   sessions) would benefit from a one-page reference of every helper, its signature, and example
-   usage. The data is scattered across 7+ files today.
+1. ~~**Stop lowering the art-dupl threshold.** The 12 remaining groups at t=22 are idiomatic. Further~~ done (docs-health pass campaign-closure decision — no artifact)
+   ~~lowering yields only false positives (signature fragments) or patterns that are correctly~~
+   ~~repeated. Diminishing returns reached.~~
+2. ~~**Pivot to architectural refactors.** `output.go` 17-clone format switch is the next high-leverage~~ **Superseded — executed same day — FormatStrategy (08-51) then go-output delegation (09-15).**
+   ~~target. A `Formatter` interface + registry would replace 17+ switch cases with one map lookup per~~
+   ~~format invocation. This is a real, valuable refactor — not a stylistic cleanup.~~
+3. ~~**Add CI.** No automated quality gate exists. A `.github/workflows/ci.yml` running~~ done — .github/workflows/ci.yml (build+test+race+coverage+codecov+lint+nix-check)
+   ~~`go test -race -cover` + `golangci-lint` + `nix flake check` would prevent regressions. Today the~~
+   ~~only safety net is the developer's local environment.~~
+4. ~~**Document the helper inventory.** There's no `docs/TEST_HELPERS.md`. Future maintainers (and AI~~ **Won't implement — never written — helper inventory lives in the test files.**
+   ~~sessions) would benefit from a one-page reference of every helper, its signature, and example~~
+   ~~usage. The data is scattered across 7+ files today.~~
 
 ### Code Quality
 
-5. **Generic options pattern in `command_options.go`.** 19 `WithXxx` options follow the pattern
-   `func WithXxx[T, F any](val T) CommandOption[T, F] { return func(c *Command[T, F]) { c.field = val } }`.
-   A generic `Setter[T, F, V any]` could eliminate boilerplate. Worth measuring LOC reduction before
-   committing.
-6. **Split `output.go`.** 17 format cases in one file is 600+ lines. Splitting by format group
-   (text formats, structured formats, graph formats) would improve navigability even if no strategy
-   pattern is introduced.
-7. **Add `WithXxxTest` helpers for command options.** The `flag.Value.String() != "X"` pattern that
-   Sprint 4 extracted in `prompts_test.go` likely has analogues in other test files at t=18-19 that
-   were not surfaced at t=21.
+5. ~~**Generic options pattern in `command_options.go`.** 19 `WithXxx` options follow the pattern~~ **Superseded — rewritten through v3/v4 — v4 options reshaped.**
+   ~~`func WithXxx[T, F any](val T) CommandOption[T, F] { return func(c *Command[T, F]) { c.field = val } }`.~~
+   ~~A generic `Setter[T, F, V any]` could eliminate boilerplate. Worth measuring LOC reduction before~~
+   ~~committing.~~
+6. ~~**Split `output.go`.** 17 format cases in one file is 600+ lines. Splitting by format group~~ **Superseded — output.go rewritten (09-15, 143 lines); v4 rewrote again.**
+   ~~(text formats, structured formats, graph formats) would improve navigability even if no strategy~~
+   ~~pattern is introduced.~~
+7. ~~**Add `WithXxxTest` helpers for command options.** The `flag.Value.String() != "X"` pattern that~~ **Superseded — test helpers replaced through v3/v4.**
+   ~~Sprint 4 extracted in `prompts_test.go` likely has analogues in other test files at t=18-19 that~~
+   ~~were not surfaced at t=21.~~
 
 ### Repository Hygiene
 
-8. **`nix develop` vs `go test` parity.** Verify the nix devShell produces the same test output as
-   the bare Go toolchain. Drift here would cause "works on my machine" issues.
-9. **`go mod tidy` cleanup.** 23 stale `go.sum` entries per AGENTS.md. Routine hygiene.
-10. **Commit message discipline.** Recent commits are exemplary (`refactor,test: <verb> <object>,
-<impact>`). Maintain this — it's the project's most visible quality signal.
+8. ~~**`nix develop` vs `go test` parity.** Verify the nix devShell produces the same test output as~~ done — CI runs bare Go (setup-go) + nix-check jobs — parity enforced green
+   ~~the bare Go toolchain. Drift here would cause "works on my machine" issues.~~
+9. ~~**`go mod tidy` cleanup.** 23 stale `go.sum` entries per AGENTS.md. Routine hygiene.~~ **Superseded — go.mod/go.sum rewritten through v3/v4.**
+10. ~~**Commit message discipline.** Recent commits are exemplary (`refactor,test: <verb> <object>,~~ done (docs-health pass ongoing practice — conventional commits throughout history)
+~~<impact>`). Maintain this — it's the project's most visible quality signal.~~
 
 ---
 
@@ -200,31 +200,31 @@ Priority-ordered by impact / effort ratio. Effort: L=Large, M=Medium, S=Small. I
 
 | #  | Task                                                                                                         | Effort | Impact | Notes                                                                  |
 | -- | ------------------------------------------------------------------------------------------------------------ | ------ | ------ | ---------------------------------------------------------------------- |
-| 1  | `output.go` Formatter strategy refactor                                                                      | L      | H      | 17-clone format switch → interface + registry. Real architectural win. |
-| 2  | Add GitHub Actions CI (test + lint + format check)                                                           | M      | H      | First automated quality gate.                                          |
-| 3  | Generic `Setter`/`WithXxx` helper for `command_options.go`                                                   | M      | M      | 19 options follow same pattern; could halve LOC.                       |
-| 4  | `docs/TEST_HELPERS.md` — inventory of all testutil helpers                                                   | S      | M      | Discoverability for future maintainers.                                |
-| 5  | Clean stale `go.sum` entries (`go mod tidy`)                                                                 | S      | M      | Pre-existing condition.                                                |
-| 6  | Test coverage: `pkg/cmdguard/v2/testutil` (55.2% → 80%+)                                                     | M      | M      | Helpers are tested implicitly; explicit unit tests would be nicer.     |
-| 7  | Split `output.go` by format group                                                                            | M      | L      | 600+ line file → 3-4 thematic files. Even without strategy pattern.    |
-| 8  | `docs/DOMAIN_LANGUAGE.md` — DDD glossary                                                                     | M      | M      | Bounded contexts, ubiquitous language, value objects.                  |
-| 9  | `docs/adr/002-formatter-strategy.md` (if #1 pursued)                                                         | S      | M      | Document decision.                                                     |
-| 10 | Test coverage: `examples/taskctl` (70.5% → 85%)                                                              | M      | L      | Example coverage is the user's first impression.                       |
-| 11 | Extract `WithXxxTest` test helpers (t=18-19 patterns)                                                        | M      | L      | Sprint 4 covered some; more likely exist below t=21.                   |
-| 12 | Extend `nix flake check` with `buildGoModule` + `go vet`                                                     | M      | M      | Stricter local gate before pushing.                                    |
-| 13 | Add `pkg/testutil` unit tests (currently 0% coverage)                                                        | S      | L      | Trivial assertions on trivial helpers.                                 |
-| 14 | Generic `withString[T,F]` refactor in `command_options.go`                                                   | S      | L      | Subset of #3.                                                          |
-| 15 | Improve pre-commit hook to skip `gomod-check` cleanly                                                        | S      | L      | Remove `--no-verify` workaround.                                       |
-| 16 | Sweep `gopls infertypeargs` info diagnostics (~330)                                                          | M      | L      | Mechanical, but low-priority cleanup.                                  |
-| 17 | Add second minimal `examples/` command                                                                       | M      | L      | Show minimum surface area; `taskctl` is large.                         |
-| 18 | Document the cross-package helper mirroring pattern in AGENTS.md                                             | S      | M      | Save future sessions the discovery cost.                               |
-| 19 | `go test -coverprofile` + badge in README                                                                    | S      | M      | Visible quality signal.                                                |
-| 20 | Investigate `nix fmt` vs `golangci-lint fmt` parity                                                          | S      | L      | Ensure they don't drift.                                               |
-| 21 | Add `WithGroup`/`WithFang`/`WithGlamour` to testutil helper for `NewCLI[testConfig]` (G7/G14 accept pattern) | S      | L      | Test boilerplate redux.                                                |
-| 22 | Benchmark: add `OutputTable` vs `OutputResult` perf data                                                     | M      | L      | Required for any future optimization claim.                            |
-| 23 | Consider publishing v2.5.1 patch (just helpers + cleanup, no behavior change)                                | S      | M      | Make the dedup work visible to consumers.                              |
-| 24 | Add `v2_test` package vs internal package split decision doc                                                 | S      | M      | Open question from Sprint 4 summary.                                   |
-| 25 | Add architecture diagram (D2) for v2 internal flow                                                           | M      | M      | Visual reference for new contributors.                                 |
+| ~~1~~  | ~~`output.go` Formatter strategy refactor~~ **Superseded — executed — 08-51/09-15; gone in v3 (go-output delegation).** | ~~L~~ | ~~H~~ | ~~17-clone format switch → interface + registry. Real architectural win.~~ |
+| ~~2~~  | ~~Add GitHub Actions CI (test + lint + format check)~~ done — .github/workflows/ci.yml | ~~M~~ | ~~H~~ | ~~First automated quality gate.~~ |
+| ~~3~~  | ~~Generic `Setter`/`WithXxx` helper for `command_options.go`~~ **Superseded — rewritten through v3/v4 (v4 options reshaped).** | ~~M~~ | ~~M~~ | ~~19 options follow same pattern; could halve LOC.~~ |
+| ~~4~~  | ~~`docs/TEST_HELPERS.md` — inventory of all testutil helpers~~ **Won't implement — never written — inventory lives in test files.** | ~~S~~ | ~~M~~ | ~~Discoverability for future maintainers.~~ |
+| ~~5~~  | ~~Clean stale `go.sum` entries (`go mod tidy`)~~ **Superseded — go.mod/go.sum rewritten through v3/v4.** | ~~S~~ | ~~M~~ | ~~Pre-existing condition.~~ |
+| ~~6~~  | ~~Test coverage: `pkg/cmdguard/v2/testutil` (55.2% → 80%+)~~ **Superseded — pkg/cmdguard/v2/testutil deleted; pkg/testutil at 80.3% (FEATURES.md).** | ~~M~~ | ~~M~~ | ~~Helpers are tested implicitly; explicit unit tests would be nicer.~~ |
+| ~~7~~  | ~~Split `output.go` by format group~~ **Superseded — output.go rewritten (09-15); v4 rewrite.** | ~~M~~ | ~~L~~ | ~~600+ line file → 3-4 thematic files. Even without strategy pattern.~~ |
+| ~~8~~  | ~~`docs/DOMAIN_LANGUAGE.md` — DDD glossary~~ done — exists — docs/DOMAIN_LANGUAGE.md | ~~M~~ | ~~M~~ | ~~Bounded contexts, ubiquitous language, value objects.~~ |
+| ~~9~~  | ~~`docs/adr/002-formatter-strategy.md` (if #1 pursued)~~ **Won't implement — never written — docs/adr/ went lint-strategy + machine-contract.** | ~~S~~ | ~~M~~ | ~~Document decision.~~ |
+| ~~10~~ | ~~Test coverage: `examples/taskctl` (70.5% → 85%)~~ done — taskctl at 85.9% (FEATURES.md) | ~~M~~ | ~~L~~ | ~~Example coverage is the user's first impression.~~ |
+| ~~11~~ | ~~Extract `WithXxxTest` test helpers (t=18-19 patterns)~~ **Superseded — test helpers replaced through v3/v4.** | ~~M~~ | ~~L~~ | ~~Sprint 4 covered some; more likely exist below t=21.~~ |
+| ~~12~~ | ~~Extend `nix flake check` with `buildGoModule` + `go vet`~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~M~~ | ~~M~~ | ~~Stricter local gate before pushing.~~ |
+| ~~13~~ | ~~Add `pkg/testutil` unit tests (currently 0% coverage)~~ done — failure_paths_test.go + panic_test_helpers_test.go (80.3% cov) | ~~S~~ | ~~L~~ | ~~Trivial assertions on trivial helpers.~~ |
+| ~~14~~ | ~~Generic `withString[T,F]` refactor in `command_options.go`~~ **Superseded — rewritten through v3/v4.** | ~~S~~ | ~~L~~ | ~~Subset of #3.~~ |
+| ~~15~~ | ~~Improve pre-commit hook to skip `gomod-check` cleanly~~ done — obsolete pre-commit hook removed (8618022) | ~~S~~ | ~~L~~ | ~~Remove `--no-verify` workaround.~~ |
+| ~~16~~ | ~~Sweep `gopls infertypeargs` info diagnostics (~330)~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~M~~ | ~~L~~ | ~~Mechanical, but low-priority cleanup.~~ |
+| ~~17~~ | ~~Add second minimal `examples/` command~~ done — examples/config-explain + docs-generator ship | ~~M~~ | ~~L~~ | ~~Show minimum surface area; `taskctl` is large.~~ |
+| ~~18~~ | ~~Document the cross-package helper mirroring pattern in AGENTS.md~~ **Superseded — AGENTS.md rewritten through v3/v4; pkg/testutil restructured.** | ~~S~~ | ~~M~~ | ~~Save future sessions the discovery cost.~~ |
+| ~~19~~ | ~~`go test -coverprofile` + badge in README~~ **Won't implement — never added — no codecov badge in README.** | ~~S~~ | ~~M~~ | ~~Visible quality signal.~~ |
+| ~~20~~ | ~~Investigate `nix fmt` vs `golangci-lint fmt` parity~~ **Won't implement — never pursued — treefmt is the canonical formatter (flake.nix).** | ~~S~~ | ~~L~~ | ~~Ensure they don't drift.~~ |
+| ~~21~~ | ~~Add `WithGroup`/`WithFang`/`WithGlamour` to testutil helper for `NewCLI[testConfig]` (G7/G14 accept pattern)~~ **Superseded — test helpers replaced through v3/v4.** | ~~S~~ | ~~L~~ | ~~Test boilerplate redux.~~ |
+| ~~22~~ | ~~Benchmark: add `OutputTable` vs `OutputResult` perf data~~ **Won't implement — never added — no such benchmark in benchmarks/.** | ~~M~~ | ~~L~~ | ~~Required for any future optimization claim.~~ |
+| ~~23~~ | ~~Consider publishing v2.5.1 patch (just helpers + cleanup, no behavior change)~~ **Superseded — release cadence moved on (v2.6.0…v2.10.4 within weeks).** | ~~S~~ | ~~M~~ | ~~Make the dedup work visible to consumers.~~ |
+| ~~24~~ | ~~Add `v2_test` package vs internal package split decision doc~~ **Superseded — v3/v4 restructure redefined test layout.** | ~~S~~ | ~~M~~ | ~~Open question from Sprint 4 summary.~~ |
+| ~~25~~ | ~~Add architecture diagram (D2) for v2 internal flow~~ done — docs/architecture.d2 + architecture.svg | ~~M~~ | ~~M~~ | ~~Visual reference for new contributors.~~ |
 
 ---
 

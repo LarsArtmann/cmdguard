@@ -100,20 +100,20 @@ README.md and main.go header comments reference deleted features (`WithGlamourHe
 
 ## c) NOT STARTED
 
-1. **Move koanf to configload module or make optional** — 4 direct deps in root
-2. **Cut or internalize flow_context** — 321 lines + 5 test files, used in 2 places
-3. **Update README.md** with v3 quickstart and clean API examples
-4. **Update AGENTS.md** module structure section for v3
-5. **Update FEATURES.md** with module status table
-6. **Update example/taskctl/README.md** — stale feature references
-7. **Command-level audit middleware** — audit every command execution
+1. **Move koanf to configload module or make optional** — 4 direct deps in root **→ ROADMAP deferred #5 (koanf extraction YAGNI)**
+2. ~~**Cut or internalize flow_context** — 321 lines + 5 test files, used in 2 places~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).**
+3. ~~**Update README.md** with v3 quickstart and clean API examples~~ done — README rewritten through v3/v4 releases
+4. ~~**Update AGENTS.md** module structure section for v3~~ done — AGENTS.md documents the 8-module workspace (2026-11-02)
+5. ~~**Update FEATURES.md** with module status table~~ done — FEATURES.md SUB-MODULE rows (maintained through v4)
+6. ~~**Update example/taskctl/README.md** — stale feature references~~ done — cleaned — examples maintained through v4
+7. ~~**Command-level audit middleware** — audit every command execution~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md)
 8. **Built-in audit-log subcommand** — `myapp audit-log --format d2`
-9. **Deepen audit log integration** — the user's explicit "I want deeper integration"
+9. ~~**Deepen audit log integration** — the user's explicit "I want deeper integration"~~ done — AuditMiddleware[T] + ExportAuditLog API shipped (FEATURES.md)
 10. **Service-owned config design** (ADR) — the big architectural vision from the conversation
-11. **Release v3.0.0-alpha tag** — current code is a breaking change, needs versioning
-12. **Update docs/API.md** — references old API
-13. **Update docs/QUICKSTART.md** — references old API
-14. **Update docs/MIGRATION_FROM_COBRA.md** — references old API
+11. ~~**Release v3.0.0-alpha tag** — current code is a breaking change, needs versioning~~ **Superseded — superseded — v3.0.0 released directly (2026-07-07).**
+12. ~~**Update docs/API.md** — references old API~~ **Superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the contract lives in FEATURES + the describe JSON.**
+13. ~~**Update docs/QUICKSTART.md** — references old API~~ done — doc rewritten for v4 (updated through v3/v4 releases)
+14. ~~**Update docs/MIGRATION_FROM_COBRA.md** — references old API~~ done — doc rewritten for v4 (updated through v3/v4 releases)
 
 ---
 
@@ -149,21 +149,21 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 
 1. **Service-owned config** — the biggest vision from this session. Services declare their typed config through the DI graph. Flags become optional per-command input, not the primary config mechanism. This would make cmdguard genuinely unique.
 
-2. **koanf as optional** — move to configload sub-module. Core only needs JSON (built into stdlib).
+2. **koanf as optional** — move to configload sub-module. Core only needs JSON (built into stdlib). **→ ROADMAP deferred #5 (koanf extraction YAGNI)**
 
-3. **Flow context evaluation** — is BranchingFlowContext earning its 900 lines? Consider cutting or making it internal.
+3. ~~**Flow context evaluation** — is BranchingFlowContext earning its 900 lines? Consider cutting or making it internal.~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).**
 
-4. **WithSilenceUsage fix** — either make it work (override the default) or remove it and document that usage is always silenced.
+4. ~~**WithSilenceUsage fix** — either make it work (override the default) or remove it and document that usage is always silenced.~~ done — usage silenced by default; WithoutSilenceUsage() opts out (FEATURES.md)
 
-5. **fang dependency** — fang pulls lipgloss + mango-cobra indirectly. Consider whether fang should be optional too (users who want styled output import fang module, core uses plain cobra).
+5. ~~**fang dependency** — fang pulls lipgloss + mango-cobra indirectly. Consider whether fang should be optional too (users who want styled output import fang module, core uses plain cobra).~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod)
 
 ### Code Quality
 
-6. **Test coverage for new cliSpec** — the sealed interface pattern needs direct tests for type mismatch behavior (wrong T, wrong F).
+6. ~~**Test coverage for new cliSpec** — the sealed interface pattern needs direct tests for type mismatch behavior (wrong T, wrong F).~~ done — typedHook exercised in cli_cobra_command_test.go
 
-7. **Integration tests for sub-modules** — verify that importing glamour/spinner/etc. actually works from external code, not just go.work.
+7. ~~**Integration tests for sub-modules** — verify that importing glamour/spinner/etc. actually works from external code, not just go.work.~~ done — .github/workflows/submodule-smoke.yml
 
-8. **gopls infertypeargs warnings** — 186 gopls info diagnostics about unnecessary type arguments in test files. These are cosmetic but noisy.
+8. ~~**gopls infertypeargs warnings** — 186 gopls info diagnostics about unnecessary type arguments in test files. These are cosmetic but noisy.~~ **Superseded — the v3/v4 rewrites replaced those sources.**
 
 ---
 
@@ -171,31 +171,31 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 
 | #  | Task                                                     | Impact | Effort |
 | -- | -------------------------------------------------------- | ------ | ------ |
-| 1  | Fix example/taskctl/README.md stale WithFlags ref        | 5      | 5min   |
-| 2  | Fix or remove WithSilenceUsage no-op                     | 6      | 10min  |
-| 3  | Move koanf to configload sub-module (4 deps from root)   | 7      | 30min  |
-| 4  | Update README.md with v3 quickstart                      | 8      | 30min  |
-| 5  | Update AGENTS.md module structure for v3                 | 7      | 20min  |
-| 6  | Update FEATURES.md with module status                    | 5      | 15min  |
-| 7  | Write v3 migration guide (MIGRATION_TO_V3.md)            | 8      | 30min  |
-| 8  | Evaluate and cut/internalize flow_context.go             | 5      | 30min  |
-| 9  | Add command-level audit middleware                       | 8      | 60min  |
-| 10 | Add built-in audit-log subcommand                        | 6      | 45min  |
-| 11 | Design service-owned config ADR                          | 10     | 60min  |
-| 12 | Update docs/API.md for v3                                | 4      | 20min  |
-| 13 | Update docs/QUICKSTART.md for v3                         | 4      | 15min  |
-| 14 | Clean up gopls infertypeargs warnings in tests           | 2      | 30min  |
-| 15 | Add integration test: import glamour from external       | 5      | 30min  |
-| 16 | Add integration test: import spinner from external       | 4      | 15min  |
-| 17 | Consider making fang optional (plain cobra fallback)     | 7      | 90min  |
-| 18 | Update docs/MIGRATION_FROM_COBRA.md for v3               | 3      | 20min  |
-| 19 | Tag v3.0.0-alpha                                         | 6      | 5min   |
-| 20 | Update TODO_LIST.md with v3 status                       | 3      | 10min  |
-| 21 | Update ROADMAP.md to reflect v3 direction                | 3      | 15min  |
-| 22 | Add CLI option to wire telemetry module (WithTelemetry)  | 4      | 15min  |
-| 23 | Consider cutting docgen.go if rarely used                | 2      | 10min  |
-| 24 | Audit all sentinel errors for completeness               | 4      | 30min  |
-| 25 | Performance: benchmark NewCLI with cliSpec vs old struct | 3      | 30min  |
+| ~~1~~  | ~~Fix example/taskctl/README.md stale WithFlags ref~~ done — cleaned — taskctl README has no WithFlags refs | ~~5~~ | ~~5min~~ |
+| ~~2~~  | ~~Fix or remove WithSilenceUsage no-op~~ done — usage silenced by default; WithoutSilenceUsage() opts out (FEATURES.md) | ~~6~~ | ~~10min~~ |
+| 3  | Move koanf to configload sub-module (4 deps from root) **→ ROADMAP deferred #5 (koanf extraction YAGNI)** | 7      | 30min  |
+| ~~4~~  | ~~Update README.md with v3 quickstart~~ done — README rewritten through v3/v4 releases | ~~8~~ | ~~30min~~ |
+| ~~5~~  | ~~Update AGENTS.md module structure for v3~~ done — AGENTS.md documents the 8-module workspace (2026-11-02) | ~~7~~ | ~~20min~~ |
+| ~~6~~  | ~~Update FEATURES.md with module status~~ done — FEATURES.md SUB-MODULE rows (maintained through v4) | ~~5~~ | ~~15min~~ |
+| ~~7~~  | ~~Write v3 migration guide (MIGRATION_TO_V3.md)~~ done — docs/MIGRATION_v2_v3.md exists | ~~8~~ | ~~30min~~ |
+| ~~8~~  | ~~Evaluate and cut/internalize flow_context.go~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).** | ~~5~~ | ~~30min~~ |
+| ~~9~~  | ~~Add command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md) | ~~8~~ | ~~60min~~ |
+| 10 | Add built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)** | 6      | 45min  |
+| 11 | Design service-owned config ADR **→ ROADMAP raw ideas (service-owned config ADR)** | 10     | 60min  |
+| ~~12~~ | ~~Update docs/API.md for v3~~ **Superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the contract lives in FEATURES + the describe JSON.** | ~~4~~ | ~~20min~~ |
+| ~~13~~ | ~~Update docs/QUICKSTART.md for v3~~ done — doc rewritten for v4 (updated through v3/v4 releases) | ~~4~~ | ~~15min~~ |
+| ~~14~~ | ~~Clean up gopls infertypeargs warnings in tests~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~2~~ | ~~30min~~ |
+| ~~15~~ | ~~Add integration test: import glamour from external~~ done — .github/workflows/submodule-smoke.yml | ~~5~~ | ~~30min~~ |
+| ~~16~~ | ~~Add integration test: import spinner from external~~ done — .github/workflows/submodule-smoke.yml | ~~4~~ | ~~15min~~ |
+| ~~17~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod) | ~~7~~ | ~~90min~~ |
+| ~~18~~ | ~~Update docs/MIGRATION_FROM_COBRA.md for v3~~ done — doc rewritten for v4 (updated through v3/v4 releases) | ~~3~~ | ~~20min~~ |
+| ~~19~~ | ~~Tag v3.0.0-alpha~~ **Superseded — superseded — v3.0.0 released directly (2026-07-07).** | ~~6~~ | ~~5min~~ |
+| ~~20~~ | ~~Update TODO_LIST.md with v3 status~~ done — TODO_LIST.md maintained (v5 sections, 2026-11-02) | ~~3~~ | ~~10min~~ |
+| ~~21~~ | ~~Update ROADMAP.md to reflect v3 direction~~ done — ROADMAP.md reflects v4/v5 direction (2026-11-02) | ~~3~~ | ~~15min~~ |
+| ~~22~~ | ~~Add CLI option to wire telemetry module (WithTelemetry)~~ done — WithTelemetry[T] ships in telemetry/ (telemetry.go:73) | ~~4~~ | ~~15min~~ |
+| ~~23~~ | ~~Consider cutting docgen.go if rarely used~~ done — kept — GenerateDocs/docgen.go + describe JSON contract ship (FEATURES.md) | ~~2~~ | ~~10min~~ |
+| ~~24~~ | ~~Audit all sentinel errors for completeness~~ done — sentinelFacts covers all sentinels (errors_facts.go) | ~~4~~ | ~~30min~~ |
+| ~~25~~ | ~~Performance: benchmark NewCLI with cliSpec vs old struct~~ **Superseded — superseded — the pre-cliSpec struct is gone in v4; perf tracked as ROADMAP raw ideas (Benchmark dashboard/CI gating).** | ~~3~~ | ~~30min~~ |
 
 ---
 
