@@ -265,6 +265,13 @@ whether to fold them into the historical sections (see §g of
   - DONE 2026-10-09: `RuleTableMarkdown()` + `rules --markdown` CLI flag + `rules_table_test.go` byte-exact drift guard over the marker-bracketed README section (mutation-verified: edit→FAIL, regenerate→PASS). "Adding a rule" now lists the regenerate step. L7 — DONE 2026-10-09: `RuleTableMarkdown()` + `rules --markdown` CLI flag + `rules_table_test.go` byte-exact drift guard over the marker-bracketed README section (mutation-verified: edit→FAIL, regenerate→PASS). "Adding a rule" now lists the regenerate step.
   - DONE 2026-10-09: all 25 lifetime alerts (incl. the 16 reported 2026-10-04) show state=fixed on GitHub — 22 auto-resolved 2026-10-04 21:07–21:10 UTC by the dependency bumps pushed that day, 3 earlier, 0 dismissed, 0 open (`gh api .../dependabot/alerts` + `pnpm audit` verified). Residual `postcss-selector-parser <7.1.6` (GHSA-rj75-hqrm-r3gf, moderate, via starlight→expressive-code→postcss-nested) fixed by `postcss-nested: ^8.0.1` override in `website/pnpm-workspace.yaml`; `pnpm audit` clean, `astro build` green (22 pages). S1 — DONE 2026-10-09: all 25 lifetime alerts (incl. the 16 reported 2026-10-04) show state=fixed on GitHub — 22 auto-resolved 2026-10-04 21:07–21:10 UTC by the dependency bumps pushed that day, 3 earlier, 0 dismissed, 0 open (`gh api .../dependabot/alerts` + `pnpm audit` verified). Residual `postcss-selector-parser <7.1.6` (GHSA-rj75-hqrm-r3gf, moderate, via starlight→expressive-code→postcss-nested) fixed by `postcss-nested: ^8.0.1` override in `website/pnpm-workspace.yaml`; `pnpm audit` clean, `astro build` green (22 pages).
 
+## [lint/v0.3.0] - 2026-11-08
+
+The cmdguard usage linter ships its v5 baseline: `CurrentMajor` is `"v5"`, so
+CG002 flags `cmdguard/v1`–`/v4` imports as stale majors and accepts `/v5`.
+Tracks `cmdguard/v5 v5.0.0` (release-shape go.mod). Mirrors
+`lint/CHANGELOG.md` `[0.3.0]`.
+
 ## [lint/v0.2.1] - 2026-11-08
 
 Patch release of the `lint` sub-module: rules now see through generic

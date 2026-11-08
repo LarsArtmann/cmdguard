@@ -12,6 +12,17 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 - Nothing yet.
 
+## [0.3.0] - 2026-11-08
+
+### Changed
+
+- **`CurrentMajor` bumped to `"v5"`** — CG002 (stale major) now flags
+  `github.com/larsartmann/cmdguard/v1`–`/v4` imports as stale and accepts
+  `/v5` as current. Shipping this to the BuildFlow fleet nudges every
+  consumer to the v5 module path at lint time.
+- Tracks `cmdguard/v5 v5.0.0` (release-shape go.mod: real pin +
+  version-scoped replace).
+
 ## [0.2.1] - 2026-11-08
 
 ### Fixed
