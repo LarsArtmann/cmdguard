@@ -1,6 +1,6 @@
 # cmdguard Examples
 
-A single, production-grade example demonstrating every cmdguard feature.
+Three examples: the flagship **taskctl** plus two focused demos.
 
 ## taskctl — Task Manager CLI
 

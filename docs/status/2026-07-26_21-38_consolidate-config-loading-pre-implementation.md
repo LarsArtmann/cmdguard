@@ -102,99 +102,99 @@
 
 ### Immediate (Block consolidation work)
 
-1. **Resolve the circular dependency** — Decide: move KoanfLoader into `v3` or export jsonLoader helpers. This blocks Task 1.3.
-2. **Revert go.work to remove go-output paths** — The 14 `use` directives for `/home/lars/projects/go-output/*` must not ship. Add `replace` directives in go.mod instead, or use `GOWORK=off`.
-3. **Verify `GOEXPERIMENT=jsonv2` is set in the dev shell** — All go commands need this flag. Confirm it's in `flake.nix` devShell.
-4. **Decide on go-output dependency strategy** — Can we pin to `v0.30.4` (which worked) instead of `v0.31.1` (which has broken pseudo-versions)? Or does go-output need to publish its sub-modules?
+1. ~~**Resolve the circular dependency** — Decide: move KoanfLoader into `v3` or export jsonLoader helpers. This blocks Task 1.3.~~ done — option (a): KoanfLoader moved into v3 (koanf_loader.go); configload deleted
+2. ~~**Revert go.work to remove go-output paths** — The 14 `use` directives for `/home/lars/projects/go-output/*` must not ship. Add `replace` directives in go.mod instead, or use `GOWORK=off`.~~ done — go.work unshipped (d29bc4d); machine-local workspace
+3. ~~**Verify `GOEXPERIMENT=jsonv2` is set in the dev shell** — All go commands need this flag. Confirm it's in `flake.nix` devShell.~~ done — flake.nix devShell exports GOEXPERIMENT=jsonv2 (flake.nix:108)
+4. ~~**Decide on go-output dependency strategy** — Can we pin to `v0.30.4` (which worked) instead of `v0.31.1` (which has broken pseudo-versions)? Or does go-output need to publish its sub-modules?~~ done — resolved — published go-output v0.38.7 pinned in go.mod; workspace use is machine-local
 
 ### Task 1: Refactor KoanfLoader
 
-5. **1.2** Add `.toml` case to `parserForPath` in `koanf.go`
-6. **1.3** Rewrite `KoanfLoader.Load` — koanf parse → `k.Marshal(json.Parser())` → `collectKeysRecursive` + `FilterSetFields` + `json.Unmarshal` with `MatchCaseInsensitiveNames`
-7. **1.4** Add `SetPaths(paths ...string)` method to KoanfLoader
-8. **1.5** Fix doc comment: remove non-existent `KoanfWithPaths` reference in koanf.go:27
-9. **1.6** Update `koanf_test.go` nested config tests: change from dotted flag names to nested structs (Approach 1)
-10. **1.7** Update `koanf_test.go` TOML test: change from "expect error" to "expect success"
-11. **1.8** Run koanf tests, fix failures
+5. ~~**1.2** Add `.toml` case to `parserForPath` in `koanf.go`~~ done — shipped in the consolidation (koanf_loader.go, e3e710c)
+6. ~~**1.3** Rewrite `KoanfLoader.Load` — koanf parse → `k.Marshal(json.Parser())` → `collectKeysRecursive` + `FilterSetFields` + `json.Unmarshal` with `MatchCaseInsensitiveNames`~~ done — KoanfLoader.Load rewritten (koanf_loader.go)
+7. ~~**1.4** Add `SetPaths(paths ...string)` method to KoanfLoader~~ done — SetPaths ships (koanf_loader.go:55)
+8. ~~**1.5** Fix doc comment: remove non-existent `KoanfWithPaths` reference in koanf.go:27~~ done — doc comment fixed (koanf_loader.go:20,48)
+9. ~~**1.6** Update `koanf_test.go` nested config tests: change from dotted flag names to nested structs (Approach 1)~~ done — nested-struct tests ship (koanf_loader_test.go)
+10. ~~**1.7** Update `koanf_test.go` TOML test: change from "expect error" to "expect success"~~ done — TOML test expects success (.toml parser at koanf_loader.go:144)
+11. ~~**1.8** Run koanf tests, fix failures~~ done — koanf tests green (CI)
 
 ### Task 2: Make WithConfigFile use KoanfLoader
 
-12. **2.1** Change `WithConfigFile` in `cli_options.go:195` to create `NewKoanfLoader(paths...)` instead of `&jsonLoader{}`
-13. **2.2** Update `loadConfigFileOrSkip` in `config_file.go:212` to handle KoanfLoader's path-based loading (type-check for `*KoanfLoader` → `SetPaths` + `Load(nil, cfg)`)
-14. **2.3** Update `WithConfigFile` doc comment (no longer JSON-only)
-15. **2.4** Run `config_file_integration_test.go`, fix failures
+12. ~~**2.1** Change `WithConfigFile` in `cli_options.go:195` to create `NewKoanfLoader(paths...)` instead of `&jsonLoader{}`~~ done — WithConfigFile creates NewKoanfLoader (cli_options.go:255)
+13. ~~**2.2** Update `loadConfigFileOrSkip` in `config_file.go:212` to handle KoanfLoader's path-based loading (type-check for `*KoanfLoader` → `SetPaths` + `Load(nil, cfg)`)~~ done — loadConfigFileOrSkip handles the KoanfLoader path-based loading (single loader shipped)
+14. ~~**2.3** Update `WithConfigFile` doc comment (no longer JSON-only)~~ done — WithConfigFile doc comment updated (cli_options.go)
+15. ~~**2.4** Run `config_file_integration_test.go`, fix failures~~ done — integration tests green (CI)
 
 ### Task 3: Delete old loaders
 
-16. **3.1** Delete `configload/loader.go` (genericLoader, autoLoader, YAML, TOML, JSON, Auto, LoaderForPath)
-17. **3.2** Delete `configload/loader_test.go`
-18. **3.3** Delete `jsonLoader` struct and `NewJSONLoader()` from `config_file.go`; keep helpers
-19. **3.4** Update `configload` package doc comment
+16. ~~**3.1** Delete `configload/loader.go` (genericLoader, autoLoader, YAML, TOML, JSON, Auto, LoaderForPath)~~ done — configload/loader.go deleted with the package
+17. ~~**3.2** Delete `configload/loader_test.go`~~ done — loader_test.go gone with the package
+18. ~~**3.3** Delete `jsonLoader` struct and `NewJSONLoader()` from `config_file.go`; keep helpers~~ done — jsonLoader/NewJSONLoader deleted (consolidation)
+19. ~~**3.4** Update `configload` package doc comment~~ done — package doc moot — configload package deleted
 
 ### Task 4: Update tests
 
-20. **4.1** Update `config_file_test.go`: replace `&jsonLoader{}` with KoanfLoader; keep helper tests
-21. **4.2** Update `config_nested_test.go`: replace `&jsonLoader{}` with KoanfLoader
-22. **4.3** Verify `config_file_integration_test.go` passes (koanf→JSON round-trip with `json:` tags)
-23. **4.4** Run full test suite with `-race -count=1`, fix failures
+20. ~~**4.1** Update `config_file_test.go`: replace `&jsonLoader{}` with KoanfLoader; keep helper tests~~ done — config tests updated (koanf_loader_test.go)
+21. ~~**4.2** Update `config_nested_test.go`: replace `&jsonLoader{}` with KoanfLoader~~ done — nested tests updated
+22. ~~**4.3** Verify `config_file_integration_test.go` passes (koanf→JSON round-trip with `json:` tags)~~ done — integration tests green (CI)
+23. ~~**4.4** Run full test suite with `-race -count=1`, fix failures~~ done — full suite green (CI -race)
 
 ### Task 5: Update deps
 
-24. **5.1** `go mod tidy` to remove `go-faster/yaml` and `pelletier/go-toml/v2`
-25. **5.2** Verify `go build ./...` succeeds
-26. **5.3** Verify sub-modules still build: `glamour`, `prompts`, `spinner`, `telemetry`
+24. ~~**5.1** `go mod tidy` to remove `go-faster/yaml` and `pelletier/go-toml/v2`~~ done — pelletier deps gone from go.mod; go-faster/yaml remains indirect (koanf parser chain)
+25. ~~**5.2** Verify `go build ./...` succeeds~~ done — build green (CI)
+26. ~~**5.3** Verify sub-modules still build: `glamour`, `prompts`, `spinner`, `telemetry`~~ done — sub-modules build (submodule-smoke.yml)
 
 ### Task 6: Update examples
 
-27. **6.1** Update `examples/taskctl/main.go` if needed
-28. **6.2** Run taskctl tests, fix failures
+27. ~~**6.1** Update `examples/taskctl/main.go` if needed~~ done — taskctl maintained through v4
+28. ~~**6.2** Run taskctl tests, fix failures~~ done — taskctl tests green (CI)
 
 ### Task 7: Update lint config
 
-29. **7.1** Check if `ConfigFileLoader` still needs ireturn allow-list entry in `.golangci.yml`
-30. **7.2** Run `golangci-lint run ./...`, fix issues
+29. ~~**7.1** Check if `ConfigFileLoader` still needs ireturn allow-list entry in `.golangci.yml`~~ done — AGENTS.md:218 documents the ConfigFileLoader ireturn allow-list decision
+30. ~~**7.2** Run `golangci-lint run ./...`, fix issues~~ done — lint green (CI)
 
 ### Task 8: Update documentation
 
-31. **8.1** Update `README.md`: config file section — one loader, auto-format detection, TOML support
-32. **8.2** Update `FEATURES.md`: remove old loader entries, update KoanfLoader status
-33. **8.3** Update `AGENTS.md`: config loading section — one loader, koanf as parser
-34. **8.4** Add `CHANGELOG.md` entry: breaking change, migration guide
-35. **8.5** Update `docs/API.md`: remove old loader functions, update WithConfigFile description
-36. **8.6** Update `TODO_LIST.md`: mark task #7 (koanf sub-module) as partially done
-37. **8.7** Update `website/src/content/docs/guides/config-files.mdx`
-38. **8.8** Update `website/src/content/docs/api-reference.mdx`
-39. **8.9** Update `docs/adr/002-lint-strategy-and-exclusion-policy.md`
+31. ~~**8.1** Update `README.md`: config file section — one loader, auto-format detection, TOML support~~ done — README Config Files section documents JSON/YAML/TOML auto-detect (README.md:523-525)
+32. ~~**8.2** Update `FEATURES.md`: remove old loader entries, update KoanfLoader status~~ done — FEATURES.md documents KoanfLoader (9 mentions)
+33. ~~**8.3** Update `AGENTS.md`: config loading section — one loader, koanf as parser~~ done — AGENTS.md documents koanf_loader.go as the single loader
+34. ~~**8.4** Add `CHANGELOG.md` entry: breaking change, migration guide~~ done — CHANGELOG carries the koanf consolidation
+35. ~~**8.5** Update `docs/API.md`: remove old loader functions, update WithConfigFile description~~ **Superseded — superseded — docs/API.md removed 2026-08-06.**
+36. ~~**8.6** Update `TODO_LIST.md`: mark task #7 (koanf sub-module) as partially done~~ done — TODO_LIST updated in-era (koanf task resolved)
+37. **8.7** Update `website/src/content/docs/guides/config-files.mdx` **→ website guides — config-files.mdx lacks koanf-consolidation content**
+38. **8.8** Update `website/src/content/docs/api-reference.mdx` **→ website guides — api-reference.mdx lacks koanf-consolidation content**
+39. ~~**8.9** Update `docs/adr/002-lint-strategy-and-exclusion-policy.md`~~ done — ADR-002 updated 2026-11-02
 
 ### Task 9: Final verification
 
-40. **9.1** Run `go test ./... -count=1 -timeout 120s -race`
-41. **9.2** Run `golangci-lint run ./...`
-42. **9.3** Run `go build ./...` + sub-module builds
-43. **9.4** Run benchmarks, verify no regression
-44. **9.5** Git commit with detailed message
-45. **9.6** Git push
+40. ~~**9.1** Run `go test ./... -count=1 -timeout 120s -race`~~ done — suite green (CI -race)
+41. ~~**9.2** Run `golangci-lint run ./...`~~ done — lint green (CI)
+42. ~~**9.3** Run `go build ./...` + sub-module builds~~ done — build green (CI + submodule-smoke)
+43. ~~**9.4** Run benchmarks, verify no regression~~ done — benchmarks run in CI (benchmark job)
+44. ~~**9.5** Git commit with detailed message~~ done at `e3e710c`
+45. ~~**9.6** Git push~~ done — landed — e3e710c is on origin/master
 
 ### Additional improvements identified
 
-46. **Fix go.work before pushing** — Remove go-output workspace entries, use `replace` directives in go.mod for local dev, or pin go-output to v0.30.4
-47. **Consider squashing the 3 auto-committed infrastructure commits** — `98e0730`, `2552a62`, `fc2108b` should be reviewed and possibly squashed before push
-48. **Update AGENTS.md with the go.work version fix** — Document that go.work must match the installed Go version (1.26.5)
-49. **Document the GOEXPERIMENT=jsonv2 requirement** — All `go build`/`go test` commands need this flag; it's in flake.nix but not documented in AGENTS.md for CLI usage
-50. **Consider whether `configload` package should survive at all** — If KoanfLoader moves to `v3`, the `configload` package may be entirely unnecessary. The plan keeps it for "backward compat" but if we're making breaking changes anyway, eliminating the package is cleaner.
+46. ~~**Fix go.work before pushing** — Remove go-output workspace entries, use `replace` directives in go.mod for local dev, or pin go-output to v0.30.4~~ done — go.work unshipped (d29bc4d)
+47. ~~**Consider squashing the 3 auto-committed infrastructure commits** — `98e0730`, `2552a62`, `fc2108b` should be reviewed and possibly squashed before push~~ **NOT-DO — NOT-DO — kept per Resolution (not squashed).**
+48. ~~**Update AGENTS.md with the go.work version fix** — Document that go.work must match the installed Go version (1.26.5)~~ done — AGENTS.md documents the go.work workspace (8 modules, AGENTS.md:95,252)
+49. ~~**Document the GOEXPERIMENT=jsonv2 requirement** — All `go build`/`go test` commands need this flag; it's in flake.nix but not documented in AGENTS.md for CLI usage~~ done — flake.nix devShell exports GOEXPERIMENT=jsonv2 (flake.nix:108)
+50. ~~**Consider whether `configload` package should survive at all** — If KoanfLoader moves to `v3`, the `configload` package may be entirely unnecessary. The plan keeps it for "backward compat" but if we're making breaking changes anyway, eliminating the package is cleaner.~~ done — configload deleted outright (koanf_loader.go single loader)
 
 ---
 
 ## g) Questions I Cannot Answer Myself
 
-1. **Should the go.work include go-output locally, or should we pin go-output to v0.30.4 (which works without workspace hacks)?** The v0.31.1 release has broken pseudo-version deps for sub-modules. I can't decide whether to downgrade (may lose features/fixes) or keep the workspace hack (breaks CI/other devs). You may have context on whether go-output v0.31.1 is required or if v0.30.4 suffices.
+1. ~~**Should the go.work include go-output locally, or should we pin go-output to v0.30.4 (which works without workspace hacks)?** The v0.31.1 release has broken pseudo-version deps for sub-modules. I can't decide whether to downgrade (may lose features/fixes) or keep the workspace hack (breaks CI/other devs). You may have context on whether go-output v0.31.1 is required or if v0.30.4 suffices.~~ done — resolved below — workspace hack kept then; go.work is now machine-local (unshipped, d29bc4d)
 
    > **Resolved 2026-07-27:** kept the workspace hack (now on go-output `v0.32.0`). The go-output sub-module pseudo-version problem persists, so the local `use` directives remain. **This is still the #1 open blocker** — the repo is unbuildable on any machine without a local `/home/lars/projects/go-output` clone. Tracked in `TODO_LIST.md`.
 
-2. **Should KoanfLoader move into the `v3` package (eliminating `configload`), or should we export jsonLoader helpers from `v3` so `configload` can use them?** Moving KoanfLoader to `v3` is cleaner but is a bigger breaking change (import path changes from `configload.NewKoanfLoader` to `v3.NewKoanfLoader`). Exporting helpers preserves the import path but adds public API surface. You may have opinions on which side of the breaking-change tradeoff to take.
+2. ~~**Should KoanfLoader move into the `v3` package (eliminating `configload`), or should we export jsonLoader helpers from `v3` so `configload` can use them?** Moving KoanfLoader to `v3` is cleaner but is a bigger breaking change (import path changes from `configload.NewKoanfLoader` to `v3.NewKoanfLoader`). Exporting helpers preserves the import path but adds public API surface. You may have opinions on which side of the breaking-change tradeoff to take.~~ done — resolved below — option (a) taken (koanf_loader.go; configload deleted)
 
    > **Resolved 2026-07-27:** option (a) — KoanfLoader moved into `v3` (`koanf_loader.go`); the entire `configload` package was deleted. This was the cleanest option and the breaking change was accepted.
 
-3. **Should the 3 auto-committed infrastructure commits (go.work fix, go-output workspace, koanf/parsers/toml) be kept, squashed, or reverted before the consolidation work?** They're currently ahead of origin/master. Keeping them means they ship as-is. Reverting means re-fixing the build. Squashing means interactive rebase (which I won't do without explicit instruction). You may want them handled a specific way.
+3. ~~**Should the 3 auto-committed infrastructure commits (go.work fix, go-output workspace, koanf/parsers/toml) be kept, squashed, or reverted before the consolidation work?** They're currently ahead of origin/master. Keeping them means they ship as-is. Reverting means re-fixing the build. Squashing means interactive rebase (which I won't do without explicit instruction). You may want them handled a specific way.~~ done — resolved below — infra commits kept as-is
 
    > **Resolved 2026-07-27:** kept as-is (not squashed). The work shipped in commit `e3e710c` on top of the infra commits. The history is noisy but functional; squashing remains a possible future cleanup.

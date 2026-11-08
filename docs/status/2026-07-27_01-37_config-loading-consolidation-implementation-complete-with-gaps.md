@@ -16,6 +16,8 @@
 > - **Stale doc refs (c: website, `WHAT_THIS_PROJECT_IS_NOT.md`, `ROADMAP.md`, planning doc):** **fixed this session** (docs-health pass). `docs/API.md` and `api-reference.mdx` were verified clean (no stale loader refs).
 > - **Dep versions have drifted since this report:** go-output is now `v0.32.0` (report context was v0.30.4/v0.31.1), `samber-do-auditlog` is `v0.8.0` (report said v0.5.0), `samber/do` is `v2.1.0` (report said v2.0.0). Living docs updated to match.
 > - **Still genuinely open** (routed to `TODO_LIST.md`): go.work fix; koanf→JSON edge-case tests; benchmark regression run; review whether `WithConfigFileLoader` and the `ConfigFileLoader` ireturn allow-list entry are now dead API/config.
+>
+> **Correction 2026-11-07:** the go.work blocker is resolved — `go.work` is no longer shipped at all (`d29bc4d` "fix(ci): stop shipping go.work"); the workspace is machine-local and CI runs a `GOWORK=off` build. Benchmarks ship in CI (benchmark job). `WithConfigFileLoader` is kept as the documented escape hatch (README.md:490) and the ireturn entry is documented as legitimate (AGENTS.md:218). The koanf→JSON edge-case tests remain open.
 
 ---
 
@@ -99,6 +101,8 @@
    ```
 
    **Impact:** The repository CANNOT be built on any machine other than this one. CI will fail. Other developers will fail. This MUST be fixed before pushing.
+
+   **Resolved 2026-11-07:** moot — `go.work` is no longer shipped at all (`d29bc4d`); the workspace is machine-local, go.mod pins published go-output `v0.38.7`, and a `GOWORK=off` CI job guards the no-workspace build.
 
 2. **CHANGELOG and FEATURES claim deps were "removed" but they weren't** — The CHANGELOG says "Removed direct deps: `go-faster/yaml`, `pelletier/go-toml/v2`". They were demoted to `// indirect` (still in go.mod, pulled by koanf). The FEATURES.md says the same. This is misleading documentation. The net dependency count did not decrease.
 

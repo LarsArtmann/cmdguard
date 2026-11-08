@@ -182,6 +182,15 @@ here instead of re-minted as TODO rows. Each bullet is the routing target its
 - **Extract a `flagtags` standalone library** — struct-tag parsing as its own module (~2000 LOC); revisit only with a real second consumer
 - **Test all examples in CI** — dedicated CI job building/testing `examples/` (harvested 2026-11-07 into TODO_LIST; this bullet is the long-term home)
 
+Harvested from the June-10/11 output-sprint reports (2026-11-07 sweep, second batch):
+
+- **`RenderOptions` passthrough** — `OutputConfig` is still `{Format, Writer}` (`pkg/cmdguard/v4/output.go`); Title/GraphID/ColorMode passthrough was proposed three times and never tracked
+- **Command-scoped middleware** — v4 ships only CLI-wide `Middleware[T]`/`ContextMiddleware[T]`; per-command chains (e.g. spinner on one command) remain impossible (`WithCommandMiddleware` existed in the v2 line and was not carried forward)
+- **`docs/TEST_HELPERS.md`** — inventory of test helpers spread across 7+ v4 test files
+- **Codecov badge in README** — coverage uploads tokenless; badge is a one-line README change
+- **govulncheck/gosec in CI** — both are manual-only today (see TODO_LIST S2 for the toolchain blocker)
+- **art-dupl/dedup enforcement in CI** — clone-count regression protection existed only as a manual ritual
+
 ### Flight Recorder Enhancements
 
 - **`MaxSnapshots` config** — rate limiting / disk protection against runaway trace file creation
