@@ -6,7 +6,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v4.2.0 - zero panics, 90.4% core coverage, 0 lint issues, 0 race conditions
+**Status:** v4.2.1 - zero panics, 90.4% core coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -52,7 +52,7 @@ nix run .#check-all
 
 **Module path:** `github.com/larsartmann/cmdguard/v4`
 
-**Current Status:** v4.2.0. 408 test functions in core (664 workspace-wide), 29 benchmarks, 8 fuzz targets, 90.4% core / 96.1% flightrecorder / 80.3% testutil / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
+**Current Status:** v4.2.1. 462 test functions in core (576 across the 8 workspace modules; +104 in examples/benchmarks/integration), 29 benchmarks, 8 fuzz targets, 90.4% core / 96.1% flightrecorder / 80.3% testutil / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
 
 ---
 

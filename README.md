@@ -18,7 +18,7 @@ cmdguard is the only Go CLI framework that unifies **type-safe flags**, **depend
 
 **Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v4` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
-> **API Stability:** v4.0.0 is the current release on the v4 major line. The legacy v2 line is in maintenance at v2.10.4. See the [v3→v4 Migration Guide](docs/MIGRATION_v3_v4.md) for the latest migration, or the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md) for the earlier migration. Full change history in [CHANGELOG.md](CHANGELOG.md).
+> **API Stability:** v4.2.1 is the current release on the v4 major line. The legacy v2 line is in maintenance at v2.10.4. See the [v3→v4 Migration Guide](docs/MIGRATION_v3_v4.md) for the latest migration, or the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md) for the earlier migration. Full change history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -421,6 +421,8 @@ type Flags struct {
 | `help`     | Help text                               | `help:"Name to greet"` |
 | `env`      | Environment variable                    | `env:"DB_HOST"`        |
 | `required` | Mark as required                        | `required:"true"`      |
+| `validate` | Runtime validation after parsing        | `validate:"email,min=5"` |
+| `values`   | Restrict to a fixed set of values       | `values:"a,b,c"`       |
 | `count`    | Counting flag                           | `count:"true"`         |
 | `local`    | Root-only, not inherited by subcommands | `local:"true"`         |
 | `hidden`   | Exclude from --help but stay functional | `hidden:"true"`        |
@@ -684,7 +686,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 - [Migrating from Cobra](https://cmdguard.lars.software/guides/migrating-from-cobra/) — Step-by-step guide
 - [API Reference](https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4) — Full API on pkg.go.dev
 
-Local docs: [Tutorial](docs/TUTORIAL.md), [Quick Start](docs/QUICKSTART.md), [Framework Comparison](docs/COMPARISON.md), [Performance](docs/PERFORMANCE.md), [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md).
+Local docs: [Tutorial](docs/TUTORIAL.md), [Quick Start](docs/QUICKSTART.md), [Framework Comparison](docs/COMPARISON.md), [Performance](docs/PERFORMANCE.md), [CLI Design Principles](docs/CLI_DESIGN_PRINCIPLES.md), [Domain Language](docs/DOMAIN_LANGUAGE.md), [Error Reference](docs/ERROR_REFERENCE.md).
 
 ---
 

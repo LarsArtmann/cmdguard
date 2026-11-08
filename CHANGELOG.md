@@ -144,6 +144,17 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ---
 
+## [4.2.1] - 2026-11-04
+
+### Changed
+
+- **Dependency updates across the workspace** (no API changes): koanf v2.4.1
+  (parsers json v1.0.1, yaml v1.1.1), go-output v0.38.7,
+  samber-do-auditlog v0.12.1, lipgloss v2.0.6, and matching sub-module bumps
+  (lint: go-finding v1.15.1, toolsdk v1.16.0, go-linter-sdk v0.4.0).
+
+---
+
 ## [4.2.0] - 2026-11-02
 
 **Behavior changes to review before upgrading:**

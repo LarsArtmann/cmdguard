@@ -52,6 +52,7 @@ After the initial de-genericization, PreRunE/PostRunE were stored as `any` — a
 
 **Commits:** `29b44a6`, `3541134`, `dea535a`, `11dc1a5`, `1c4fd65`
 
+<!-- check-rows:ledger -->
 | Module    | Path                      | Deps Removed                                             | Status      |
 | --------- | ------------------------- | -------------------------------------------------------- | ----------- |
 | telemetry | `pkg/cmdguard/telemetry/` | otel SDK + exporters                                     | ✅ Done     |
@@ -105,18 +106,18 @@ AGENTS.md, README.md, FEATURES.md, CHANGELOG.md all reflect v2 API, not the new 
 
 ## c) NOT STARTED
 
-1. **Remove go-output blank imports** (output.go — 10 sub-modules)
-2. **Extract spinner** to sub-module
-3. **Cut result.go** (sum types — not a CLI concern)
-4. **Cut editor.go** ($EDITOR support — marginal)
-5. **Command-level audit middleware** (auto-audit every command)
+1. ~~**Remove go-output blank imports** (output.go — 10 sub-modules)~~ done — shipped — direct go-output usage; only OutputFormat alias re-exported (AGENTS.md)
+2. ~~**Extract spinner** to sub-module~~ done — spinner/ sub-module ships (spinner/v0.2.0)
+3. ~~**Cut result.go** (sum types — not a CLI concern)~~ done — cut in the v3 slim-down (ROADMAP keeps a Result[T] revival idea)
+4. ~~**Cut editor.go** ($EDITOR support — marginal)~~ done — cut — editor.go no longer exists in v4
+5. ~~**Command-level audit middleware** (auto-audit every command)~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md)
 6. **Built-in audit-log subcommand** (`myapp audit-log --format d2`)
-7. **Update example** to showcase full v3 patterns (service-owned config, clean API)
-8. **Update README.md** with v3 quickstart
-9. **Update AGENTS.md** module structure section
-10. **Update FEATURES.md** with v3 changes
-11. **CHANGELOG.md** entry for v3 breaking changes
-12. **Lint fixes** (4 formatting issues in new code)
+7. ~~**Update example** to showcase full v3 patterns (service-owned config, clean API)~~ done — examples/ maintained through v4 (taskctl flagship)
+8. ~~**Update README.md** with v3 quickstart~~ done — README rewritten through v3/v4 releases
+9. ~~**Update AGENTS.md** module structure section~~ done — AGENTS.md documents the 8-module workspace (2026-11-02)
+10. ~~**Update FEATURES.md** with v3 changes~~ done — FEATURES.md maintained through v4
+11. ~~**CHANGELOG.md** entry for v3 breaking changes~~ done — CHANGELOG [3.0.0] section (2026-07-07)
+12. ~~**Lint fixes** (4 formatting issues in new code)~~ done — 0 lint issues (FEATURES.md; CI lint job)
 
 ---
 
@@ -154,25 +155,25 @@ We made **massive** breaking API changes (NewCommand signature changed, WithFlag
 
 1. **Service-owned config** — the biggest design discussion from this session. Services should own their typed config through the DI graph, not through flags. Flags become optional per-command input, not the primary config mechanism. This would make cmdguard genuinely unique.
 
-2. **CLIOption de-genericization** — apply the same sealed-interface pattern from lifecycle hooks. Eliminates `[T]` from all 22 CLI options.
+2. ~~**CLIOption de-genericization** — apply the same sealed-interface pattern from lifecycle hooks. Eliminates `[T]` from all 22 CLI options.~~ done — non-generic options in v4 (sealed-interface pattern)
 
 3. **Flag scope enforcement** — prevent global flags from polluting subcommands. Use the DI graph to determine which flags belong where.
 
 ### Code Quality
 
-4. **koanf still in core** (4 direct deps) — should move to configload sub-module or be made optional.
+4. **koanf still in core** (4 direct deps) — should move to configload sub-module or be made optional. **→ ROADMAP deferred #5 (koanf extraction YAGNI)**
 
-5. **flow_context.go** (253+68 lines) — rarely useful, adds complexity. Consider cutting or internalizing.
+5. ~~**flow_context.go** (253+68 lines) — rarely useful, adds complexity. Consider cutting or internalizing.~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).**
 
-6. **Dead weight** — result.go (147 lines, sum types not a CLI concern), editor.go (60 lines, marginal).
+6. ~~**Dead weight** — result.go (147 lines, sum types not a CLI concern), editor.go (60 lines, marginal).~~ done — cut — both removed in the v3 slim-down (editor.go gone in v4)
 
 ### Module Hygiene
 
-7. **Replace directives incomplete** — only glamour has a replace in root go.mod. manpage/telemetry/prompts rely on go.work only.
+7. ~~**Replace directives incomplete** — only glamour has a replace in root go.mod. manpage/telemetry/prompts rely on go.work only.~~ done — all sub-modules pinned in root go.mod (AGENTS.md publish-shape rule)
 
-8. **go.work.sum not committed** — checksum file missing.
+8. ~~**go.work.sum not committed** — checksum file missing.~~ done — go.work committed at repo root; workspace builds
 
-9. **GOWORK=off verification** — never ran `GOWORK=off go build` for each sub-module to verify they resolve independently.
+9. ~~**GOWORK=off verification** — never ran `GOWORK=off go build` for each sub-module to verify they resolve independently.~~ done — codified — AGENTS.md GOWORK=off publish-shape rule (2026-11-02)
 
 ---
 
@@ -180,31 +181,31 @@ We made **massive** breaking API changes (NewCommand signature changed, WithFlag
 
 | #  | Task                                                | Impact   | Effort |
 | -- | --------------------------------------------------- | -------- | ------ |
-| 1  | Fix doc.go stale WithFlags references               | High     | 5min   |
-| 2  | Fix 4 lint issues (gci/golines formatting)          | Medium   | 10min  |
-| 3  | Add CHANGELOG.md entry for v3 breaking changes      | High     | 15min  |
-| 4  | Commit go.work.sum + add missing replace directives | High     | 10min  |
-| 5  | Remove go-output blank imports from output.go       | High     | 30min  |
-| 6  | Cut result.go (sum types)                           | Medium   | 10min  |
-| 7  | Cut editor.go ($EDITOR)                             | Low      | 10min  |
-| 8  | Extract spinner to sub-module                       | Low      | 30min  |
-| 9  | Verify GOWORK=off builds for all 5 modules          | High     | 30min  |
-| 10 | Make CLIOption non-generic (sealed interface)       | High     | 45min  |
-| 11 | Add command-level audit middleware                  | High     | 60min  |
-| 12 | Add built-in audit-log subcommand                   | Medium   | 45min  |
-| 13 | Move koanf to configload or make optional           | Medium   | 30min  |
-| 14 | Cut or internalize flow_context.go                  | Low      | 20min  |
-| 15 | Update README.md with v3 quickstart                 | High     | 30min  |
-| 16 | Update AGENTS.md module structure                   | High     | 20min  |
-| 17 | Update FEATURES.md for v3                           | Medium   | 20min  |
-| 18 | Update example to showcase v3 patterns              | Medium   | 45min  |
-| 19 | Design service-owned config pattern (ADR)           | Critical | 60min  |
-| 20 | Implement WithProvider for flag scoping             | High     | 90min  |
-| 21 | Add strict flag audit mode                          | Medium   | 45min  |
-| 22 | Consider cutting go-toml/yaml from core             | Medium   | 30min  |
-| 23 | Update MIGRATION_FROM_COBRA.md for v3               | Low      | 20min  |
-| 24 | Add integration test for sub-module imports         | Medium   | 30min  |
-| 25 | Release v3.0.0-alpha tag                            | High     | 10min  |
+| ~~1~~  | ~~Fix doc.go stale WithFlags references~~ done — doc.go rewritten in v3 (WithFlags deleted) | ~~High~~ | ~~5min~~ |
+| ~~2~~  | ~~Fix 4 lint issues (gci/golines formatting)~~ done — 0 lint issues (FEATURES.md; CI lint job) | ~~Medium~~ | ~~10min~~ |
+| ~~3~~  | ~~Add CHANGELOG.md entry for v3 breaking changes~~ done — CHANGELOG [3.0.0] section (2026-07-07) | ~~High~~ | ~~15min~~ |
+| ~~4~~  | ~~Commit go.work.sum + add missing replace directives~~ done — resolved pre-release (Resolution 2026-07-18); replaces complete | ~~High~~ | ~~10min~~ |
+| ~~5~~  | ~~Remove go-output blank imports from output.go~~ done — direct go-output usage; alias re-export only (AGENTS.md) | ~~High~~ | ~~30min~~ |
+| ~~6~~  | ~~Cut result.go (sum types)~~ done — cut in the v3 slim-down (ROADMAP Result[T] revival idea) | ~~Medium~~ | ~~10min~~ |
+| ~~7~~  | ~~Cut editor.go ($EDITOR)~~ done — cut — editor.go no longer exists in v4 | ~~Low~~ | ~~10min~~ |
+| ~~8~~  | ~~Extract spinner to sub-module~~ done — spinner/ sub-module ships (spinner/v0.2.0) | ~~Low~~ | ~~30min~~ |
+| ~~9~~  | ~~Verify GOWORK=off builds for all 5 modules~~ done — codified — AGENTS.md GOWORK=off publish-shape rule | ~~High~~ | ~~30min~~ |
+| ~~10~~ | ~~Make CLIOption non-generic (sealed interface)~~ done — non-generic options in v4 (sealed-interface pattern) | ~~High~~ | ~~45min~~ |
+| ~~11~~ | ~~Add command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md) | ~~High~~ | ~~60min~~ |
+| 12 | Add built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)** | Medium   | 45min  |
+| 13 | Move koanf to configload or make optional **→ ROADMAP deferred #5 (koanf extraction YAGNI)** | Medium   | 30min  |
+| ~~14~~ | ~~Cut or internalize flow_context.go~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).** | ~~Low~~ | ~~20min~~ |
+| ~~15~~ | ~~Update README.md with v3 quickstart~~ done — README rewritten through v3/v4 releases | ~~High~~ | ~~30min~~ |
+| ~~16~~ | ~~Update AGENTS.md module structure~~ done — AGENTS.md documents the 8-module workspace (2026-11-02) | ~~High~~ | ~~20min~~ |
+| ~~17~~ | ~~Update FEATURES.md for v3~~ done — FEATURES.md maintained through v4 | ~~Medium~~ | ~~20min~~ |
+| ~~18~~ | ~~Update example to showcase v3 patterns~~ done — examples/ maintained through v4 (taskctl flagship) | ~~Medium~~ | ~~45min~~ |
+| 19 | Design service-owned config pattern (ADR) **→ ROADMAP raw ideas (service-owned config ADR)** | Critical | 60min  |
+| 20 | Implement WithProvider for flag scoping **→ ROADMAP raw ideas (flag scoping / WithProvider)** | High     | 90min  |
+| 21 | Add strict flag audit mode **→ ROADMAP raw ideas (strict flag audit mode)** | Medium   | 45min  |
+| 22 | Consider cutting go-toml/yaml from core **→ ROADMAP deferred #5 (koanf extraction YAGNI; toml/yaml are koanf parser deps)** | Medium   | 30min  |
+| ~~23~~ | ~~Update MIGRATION_FROM_COBRA.md for v3~~ done — docs/MIGRATION_FROM_COBRA.md exists | ~~Low~~ | ~~20min~~ |
+| ~~24~~ | ~~Add integration test for sub-module imports~~ done — .github/workflows/submodule-smoke.yml | ~~Medium~~ | ~~30min~~ |
+| ~~25~~ | ~~Release v3.0.0-alpha tag~~ **Superseded — superseded — v3.0.0 released directly (2026-07-07).** | ~~High~~ | ~~10min~~ |
 
 ---
 
@@ -231,6 +232,8 @@ But this is a fundamental API shape change that affects every consumer. I cannot
 - (C) Something else entirely
 
 This decision shapes the entire v3 API surface. **Which direction do you want?**
+
+**Answered:** (A) kept — v4 handlers still take `(ctx, cfg, flags)` (`cli_command.go:154`); context threading ships additively via `ContextMiddleware[T]` (2026-10-04, ROADMAP "Middleware Context Propagation"); signature unification is ROADMAP v5 candidate #8.
 
 ## Resolution (2026-07-18)
 

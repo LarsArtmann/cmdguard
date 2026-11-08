@@ -21,6 +21,7 @@ An honest accounting of the 23-task post-audit closure plan execution. Written b
 
 These 17 items are complete, verified, and in commit `eb8586a`:
 
+<!-- check-rows:ledger -->
 | #     | Task                                                                                                                             | Verification                                                   |
 | ----- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | L1.01 | Delete `StringSliceContains`, rename `doPanicTest` → `panics`                                                                    | `go test ./pkg/testutil/ -race` green                          |
@@ -59,6 +60,8 @@ These 17 items are complete, verified, and in commit `eb8586a`:
 
 ### L1.15 — Spot-check website guides → **only 2 of ~5 drifted guides fixed**
 
+**Update 2026-11-07:** the fixed guides ship (site builds green in CI); a broader v4-era guide refresh (koanf consolidation) is still owed — routed via §F items 14/21.
+
 The sub-agent audit found drift in 4 guides: `custom-types.mdx`, `dependency-injection.mdx`, `quick-start.mdx` (accurate), `audit-log.mdx` (accurate). I fixed the 2 critical ones (`custom-types`, `dependency-injection`) and stopped. The other ~16 guides were not individually verified.
 
 ### L1.20 (G1 gate) → **passed at commit time, but I never saw the green run**
@@ -75,12 +78,12 @@ The plan has 3 mandatory verification gates. I ran (partially) G1. **G2 and G3 w
 
 | #     | Task                                                              | Why                                                                                                                                                                               |
 | ----- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| L1.21 | **G2: Sub-module independence test loop**                         | Never ran                                                                                                                                                                         |
-| L1.22 | **G3: `nix flake check`**                                         | Never ran                                                                                                                                                                         |
-| L1.23 | **Final commit + push + closure appendix**                        | The commit was auto-authored by a hook; the push never happened; the closure appendix on `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` was never written |
-| —     | **Website build verification** (`pnpm run build` / `astro build`) | Never ran — 7 `.astro`/`.ts`/`.css` files changed, none verified to compile                                                                                                       |
-| —     | **Push to origin/master**                                         | Not done                                                                                                                                                                          |
-| —     | **G5 Verschlimmbesserung check**                                  | Never explicitly run (I followed the guards but didn't tick the boxes)                                                                                                            |
+| ~~L1.21~~ | ~~**G2: Sub-module independence test loop**~~ done — G2 ran successfully per Resolution 2026-07-23 | ~~Never ran~~ |
+| ~~L1.22~~ | ~~**G3: `nix flake check`**~~ done — G3 nix flake check ran per Resolution 2026-07-23 | ~~Never ran~~ |
+| ~~L1.23~~ | ~~**Final commit + push + closure appendix**~~ done — pushed (eb8586a on origin/master) and the closure appendix exists in the 2026-07-18_21-13 report | ~~The commit was auto-authored by a hook; the push never happened; the closure appendix on `docs/status/2026-07-18_21-13_multi-skill-audit-brutal-self-review.md` was never written~~ |
+| ~~—~~ done — website.yml workflow builds the site in CI | ~~**Website build verification** (`pnpm run build` / `astro build`)~~ | ~~Never ran — 7 `.astro`/`.ts`/`.css` files changed, none verified to compile~~ |
+| ~~—~~ done — landed — eb8586a is on origin/master | ~~**Push to origin/master**~~ | ~~Not done~~ |
+| ~~—~~ **Won't implement — process gate — subsumed by the 2026-07-23 verification pass.** | ~~**G5 Verschlimmbesserung check**~~ | ~~Never explicitly run (I followed the guards but didn't tick the boxes)~~ |
 
 ---
 
@@ -220,13 +223,19 @@ Sorted by priority within each tier.
 
 ### Q1. What produced commit `eb8586a` at 01:41:17?
 
+**Answered 2026-11-07:** the repo's auto-commit daemon (BuildFlow heuristic) — the same daemon still lands `chore: auto-commit N changed file(s)` commits today. Trust after CI.
+
 The commit has author `Lars Artmann <git@lars.software>`, a high-quality multi-paragraph message I did not write, and contains all 42 files I modified. Candidates: (a) a BuildFlow hook with AI commit-message generation, (b) a git auto-commit config I'm unaware of, (c) you ran a command in another terminal, (d) something else. **I need to know so I can trust or distrust this commit.** If it's a hook, I should verify the hook ran G2/G3 (it almost certainly did NOT — those aren't wired into pre-commit). If you ran it, tell me and I'll proceed on that basis.
 
 ### Q2. Should I `git push origin master` once G1/G2/G3 pass, or wait for your explicit go-ahead?
 
+**Answered 2026-11-07:** pushed — `eb8586a` is on `origin/master`; the closure era is ancestry of v3.1.0 and later releases.
+
 The plan's L1.23 says "Final commit + push" but the auto-commit already happened. The AGENTS.md global rules say "NEVER PUSH TO REMOTE unless explicitly asked." These conflict. The plan is explicit permission; the global rule is explicit prohibition. **Which wins?** I will not push until you confirm.
 
 ### Q3. The prior commit `2a673a4 chore: enable makezero + clickhouselint` left 9 makezero violations unfixed. I silently fixed them to pass G1. Was that right, or should I have reverted the linter enablement and filed a separate task?
+
+**Answered 2026-11-07:** kept — makezero remains enabled (`.golangci.yml:76`) and lint is green repo-wide; the process lesson stands in §E2.
 
 I chose to fix because (a) the violations were trivial (`make([]T, n)` → `make([]T, 0, n)` + `append`), (b) G1 would have failed otherwise, (c) the fix is strictly better code. But it was scope creep. **Do you want these makezero fixes kept, reverted, or split into a separate commit?**
 

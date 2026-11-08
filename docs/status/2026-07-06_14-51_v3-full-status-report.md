@@ -36,6 +36,7 @@ Sealed interface pattern: `lifecycleHook` + `typedHook[T,F]`. Unexported `isLife
 
 ### 3. Mono-Repo Modularization (5 Optional Modules Extracted)
 
+<!-- check-rows:ledger -->
 | Module    | Path                      | Deps Isolated              | Status |
 | --------- | ------------------------- | -------------------------- | ------ |
 | telemetry | `pkg/cmdguard/telemetry/` | OpenTelemetry SDK          | ✅     |
@@ -50,6 +51,7 @@ Extension hooks added to core: `WithHelpTransform`, `PromptRunner` interface + `
 
 ### 4. Dead Weight Cut
 
+<!-- check-rows:ledger -->
 | File                       | Lines | Reason                          | Status |
 | -------------------------- | ----- | ------------------------------- | ------ |
 | `result.go`                | 147   | Sum types — not a CLI concern   | ✅ Cut |
@@ -137,6 +139,8 @@ Lipgloss is in root go.mod because fang pulls it. This isn't really our fault �
 
 The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.SilenceUsage = true` is hardcoded in NewCLI. The option should either work or be removed.
 
+**Fixed:** v4 silences usage by default; `WithoutSilenceUsage()` opts out (FEATURES.md).
+
 ---
 
 ## e) WHAT WE SHOULD IMPROVE
@@ -202,6 +206,8 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 fang pulls lipgloss, mango-cobra, and ~15 transitive deps. If we made fang optional (core uses plain cobra, users who want styled output import the fang module), core direct deps would drop to ~8 (cobra, pflag, do, go-toml, go-yaml, go-output, samber-do-auditlog, x/term).
 
 But fang provides the core "superb CLI" experience — styled help, styled errors, automatic version. Making it optional undermines the "batteries included" promise. The question is: **is the dependency cost worth the UX benefit for users who don't want styled output?**
+
+**Answered:** kept — fang stays a direct core dependency in v4 (`charm.land/fang/v2 v2.0.1` in go.mod); the batteries-included direction won.
 
 ## Resolution (2026-07-23)
 

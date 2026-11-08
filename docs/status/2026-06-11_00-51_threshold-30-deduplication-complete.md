@@ -12,6 +12,7 @@
 
 Pushed dedup threshold from **t=50 → t=30**. Eliminated **all 10 clone groups** at the aggressive t=30 level through targeted helper extraction. Net code change: **−168 lines** (318 added, 486 deleted) across 10 files. All tests pass with `-race`, zero lint issues, zero clone groups at any threshold ≤30.
 
+<!-- check-rows:ledger -->
 | Metric                      | Before (t=50, end of prior sprint) | After (t=30, this session) |
 | --------------------------- | ---------------------------------- | -------------------------- |
 | Clone groups @ t=30         | 10                                 | **0**                      |
@@ -31,6 +32,7 @@ Pushed dedup threshold from **t=50 → t=30**. Eliminated **all 10 clone groups*
 
 ### Clone groups eliminated (all 10 at t=30)
 
+<!-- check-rows:ledger -->
 | #  | File(s)                                          | Pattern                                               | Fix                                                                  |
 | -- | ------------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------- |
 | 1  | `cli_superb_test.go` (3x @ 230, 255, 374)        | `NewCommand[testConfig, NoFlags]("noshort", …)`       | `noShortCommand(t)` helper in test_helpers_test.go                   |
