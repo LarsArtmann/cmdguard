@@ -208,6 +208,7 @@ a listed follow-up ("run `nix flake check`") turned out to be broken repo-wide.
 3. Wire `lint/provider` into BuildFlow (gated: g).
 4. Restore pre-commit hook: `buildflow precommit install` (gated: g).
 5. CHANGELOG.md entry for the lint sub-module.
+   <!-- ✅ DONE 2026-11-08: lint/CHANGELOG.md created (0.1.0, 0.2.0, 0.2.1 sections) with the lint/v0.2.x releases. -->
 6. Cross-file dataflow CG001 (RootCommand ident used in another file).
 7. Cross-file dataflow CG006 (Execute error printed elsewhere).
 8. Cross-file dataflow CG003/CG004 (constructor in one file, use in another).

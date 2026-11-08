@@ -140,6 +140,15 @@ These are unformed ideas that may or may not become features:
 
 ### Core Library
 
+- **NewApp-on-Builder** — evolve `NewApp`'s build callback to
+  `func(*Builder[T]) error` so the one-call entry point composes with the
+  deferred-error Builder (v5 API-review question; Builder currently composes
+  inside the existing `func(*CLI[T]) error` callback)
+- **Strict positional-args default** — cmdguard subcommands silently accept
+  unexpected positional args (a `--dir`-style flag command swallowed a
+  positional path and linted the wrong directory, found 2026-11-08 during
+  the CG002 fleet pass); default leaf commands to an exact/maximum-args
+  validator with `WithArgsPassthrough()` as the opt-out
 - **Config file watching** — hot-reload config on file change (inotify/fsnotify)
 - **CUE for the machine contract** — revisit only when a consumer needs to VALIDATE the contract itself (not config files) against a schema, AND cue's Go codegen round-trips cmdguard's struct tags losslessly, AND the build-time cost is measured. Analysis: `docs/status/2026-11-02_04-52_cue-adoption-analysis-and-self-review.md`; decision record: ADR-002 §6. The struct tags are the single declaration surface today — a parallel CUE schema would be a second source of truth until all three criteria hold.
 - **Plugin marketplace** — community-contributed type handlers and validators
