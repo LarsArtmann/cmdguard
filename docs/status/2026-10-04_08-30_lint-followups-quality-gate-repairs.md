@@ -85,7 +85,7 @@ a listed follow-up ("run `nix flake check`") turned out to be broken repo-wide.
       wiring, cross-file dataflow, baseline mode, provider options, plugin
       layer, README generation, CurrentMajor standing duty).
     - Prior status report §f items 1–11 annotated inline with
-      ✅ DONE / 🟡 AWAIT-USER / 🔴 TODO resolutions.
+      ✅ DONE / 🟡 AWAIT-USER / 🔴 TODO resolutions. <!-- routing:skip --> (legend line, not an item)
     - AGENTS.md: exclusion-rename gotcha recorded.
 
 ### Verification state at report time
@@ -218,9 +218,9 @@ a listed follow-up ("run `nix flake check`") turned out to be broken repo-wide.
 13. SARIF upload snippet (CI) in lint/README.
 14. Fuzz walker + suppression parser on arbitrary input.
 15. Benchmarks: scan time on the cmdguard repo as baseline.
-16. Coverage gaps: dot-import branch, `fangLocalName`, skipped-file path.
-17. Suppression via AST comments (directive-in-string-literal FP hardening).
-18. Suppression expiry (`ExpiresAt`).
+~~16. Coverage gaps: dot-import branch, `fangLocalName`, skipped-file path.~~ **Superseded — the L3/L4 lint test work (TODO_LIST L3/L4 DONE rows, 2026-10-09) absorbed the named gaps — fangLocalName at 100 percent coverage and the skipped-file path asserted in lint/walk_test.go (go tool cover, 2026-11-07); the dot-import and blank-import arms in lint/walk.go resolveImports are still uncovered — still open.**
+~~17. Suppression via AST comments (directive-in-string-literal FP hardening).~~ **→ routed — ROADMAP Harvested, cmdguard-lint suppression FP hardening**
+~~18. Suppression expiry (`ExpiresAt`).~~ **→ ROADMAP Harvested (Suppression expiry (`ExpiresAt`))**
 19. CG007–CG009 rule candidates (PostRunE-vs-Cleanup, ExecuteAndExit+printing,
     WithCommit duplicate).
 20. `CurrentMajor` from generated/versioned source instead of hand-bumped

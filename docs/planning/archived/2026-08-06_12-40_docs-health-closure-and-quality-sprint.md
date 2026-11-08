@@ -103,7 +103,7 @@ release prep, and nice-to-have enhancements. Important but not urgent.
 | ~~M24~~ | ~~**Release prep** — SECURITY.md version table, v4.0.0 GitHub release notes, pkg.go.dev badge, GitHub Action badge, "Related projects" section~~ done — pkg.go.dev badge live (README.md:7); no v4.0.x GitHub releases or Related projects section | ~~other 20%~~ | ~~Medium~~ | ~~45min~~ | ~~M8~~ | ~~Public-facing release artifacts are complete~~ |
 | ~~M25~~ | ~~**Write "Why so many sub-modules?" contributor note** — decision tree for when to add a new sub-module~~ **Won't implement — never written.** | ~~other 20%~~ | ~~Low~~ | ~~30min~~ | ~~—~~ | ~~Contributors understand the modular architecture~~ |
 | ~~M26~~ | ~~**Verify `git-town.toml` + check `master` vs `main`**~~ done (docs-health pass git-town.toml + library-policy.yaml verified present) | ~~other 20%~~ | ~~Low~~ | ~~10min~~ | ~~—~~ | ~~Git config sanity~~ |
-| ~~M27~~ | ~~**Annotate section e) in 6 status reports + add Resolution appendices**~~ done — all four 2026-08-01 status reports carry ~~ annotations | ~~other 20%~~ | ~~Low~~ | ~~45min~~ | ~~—~~ | ~~Historical reports fully resolved~~ |
+| ~~M27~~ | ~~**Annotate section e) in 6 status reports + add Resolution appendices**~~ done — all four 2026-08-01 status reports carry inline-strike annotations | ~~other 20%~~ | ~~Low~~ | ~~45min~~ | ~~—~~ | ~~Historical reports fully resolved~~ |
 
 **Total estimated effort: ~19 hours** (spanning multiple sessions)
 

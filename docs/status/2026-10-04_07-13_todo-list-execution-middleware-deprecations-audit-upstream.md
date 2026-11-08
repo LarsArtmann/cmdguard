@@ -17,6 +17,7 @@ concurrent session and the re-apply failed on a mid-air collision.
 
 All verified against source before removal — none were re-done blindly:
 
+<!-- check-rows:ledger -->
 | #   | Item                                       | Evidence                                                                                  |
 | --- | ------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | D3  | CONTRIBUTING.md v3→v4 drift                | Lines 101/115 already say v4; fixed in commit `ef694eb`                                   |
@@ -204,7 +205,7 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 19. Update AGENTS.md "6 modules" → current go.work truth (incl. go-output replaces).
 20. AGENTS.md size diet to ≤377 lines (move detail to docs/).
 21. Investigate nix-build-verify 6/6 failures (offline toolchain fetch).
-22. Install go-licenses in devShell/PATH so license-check can run locally.
+~~22. Install go-licenses in devShell/PATH so license-check can run locally.~~ done — superseded — BuildFlow auto-defers the go-licenses stdlib class since 2026-10-07 (AGENTS.md pre-commit note)
 23. Decide skip_steps for sandbox-hostile nix checks (or make them hermetic).
 24. taskctl: cover remaining buildCommands error branches via fault injection?
 25. taskctl: `db` parent + `env create --force` paths coverage.
@@ -218,9 +219,9 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 33. ExportAuditLog: consider Writer-based test instead of read-only-dir (portability).
 34. Flightrecorder: document Stop-ownership semantics in README (embedders).
 35. Flightrecorder: optional auto-stop middleware variant (owns lifecycle).
-36. Samber-do-auditlog: HTML viz "Command" color distinct from Registration (both --accent).
-37. Samber-do-auditlog: consider dedicated `command_name` field over ServiceRef overload (schema 0.4.0).
-38. Samber-do-auditlog: cmdguard-lint-style rule or doc forbidding ServiceName pollution?
+~~36. Samber-do-auditlog: HTML viz "Command" color distinct from Registration (both --accent).~~ done — auditlog viz colors are centralized per-type lookup tables now (samber-do-auditlog daghtml_adapter.go status and provider maps, metadata_test.go event colors), so Command and Registration no longer share one accent in the graph layer
+~~37. Samber-do-auditlog: consider dedicated `command_name` field over ServiceRef overload (schema 0.4.0).~~ **→ routed — ROADMAP Harvested, cmdguard-lint `command_name` field**
+~~38. Samber-do-auditlog: cmdguard-lint-style rule or doc forbidding ServiceName pollution?~~ **→ ROADMAP Harvested (cmdguard-lint ServiceName-pollution rule)**
 39. CHANGELOG entry for 4.0.2 should have existed at tag time — add release checklist item.
 40. Benchmarks for ContextMiddleware overhead vs plain (benchmarks/ dir).
 41. Table-driven test consolidation in middleware_context_test.go (minor).

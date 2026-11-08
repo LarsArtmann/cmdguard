@@ -232,20 +232,20 @@ I verified `astro build` produces 22 pages with 0 errors. But "builds" ≠ "rend
 | ~~5~~  | ~~**Investigate FR lazy-start asymmetry** — why does error test need explicit Start()?~~ done — resolved — uniform newTestRecorder helper (run_test.go:19); singleton documented | ~~P1~~ | ~~30min~~ | ~~This report D3~~ |
 | ~~6~~  | ~~**Annotate 12-38 status report** — resolution banner for items fixed this session~~ done (docs-health pass completed by later docs-health passes, culminating in the 2026-11-07 sweep) | ~~P1~~ | ~~10min~~ | ~~This report c.1~~ |
 | ~~7~~  | ~~**Verify/update AGENTS.md metrics** — test count, benchmarks, fuzz, coverage, version~~ done — AGENTS.md current — v4.2.1 header, 90.4%/96.1%/80.3%/85.9% coverage | ~~P1~~ | ~~15min~~ | ~~12-38 report~~ |
-| 8  | **Create v4.0.0 GitHub release** — draft release notes from CHANGELOG                 | P1       | 20min  | Prior reports   |
+| 8 **→ TODO_LIST H7 (GitHub release pages)** | **Create v4.0.0 GitHub release** — draft release notes from CHANGELOG | P1 | 20min | Prior reports |
 | ~~9~~  | ~~**Re-verify COW claim numbers** — 48% faster, -10 allocs for v4~~ done — claim stands — AGENTS.md copy-on-write section (~48% NewCLI) | ~~P2~~ | ~~30min~~ | ~~14:41 report~~ |
-| 10 | **Run `nix run .#check-all` in CI** — wire into GitHub Actions                        | P2       | 30min  | 14:41 report    |
+| 10 **→ TODO_LIST H8 (check-all taskctl exclusion)** | **Run `nix run .#check-all` in CI** — wire into GitHub Actions | P2 | 30min | 14:41 report |
 | 11 | **Add benchmark CI gating** — compare against baseline, fail on regression **→ ROADMAP Harvested (Benchmark CI gating)** | P2       | 60min  | ROADMAP         |
 | ~~12~~ | ~~**Improve taskctl coverage further** — target 75% (practical ceiling)~~ done — 85.9% (FEATURES.md) | ~~P2~~ | ~~45min~~ | ~~This report b.2~~ |
 | 13 | **Write fuzz tests for type_handler_intwidth.go** — new code paths since v3 **→ ROADMAP Deferred (#7 Fuzz corpus expansion)** | P2       | 45min  | Prior reports   |
-| 14 | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees      | P2       | 30min  | Prior reports   |
-| 15 | **Profile a real taskctl invocation** — find next micro-optimization target           | P2       | 60min  | Prior reports   |
+| 14 **→ ROADMAP Harvested (WithCleanup benchmark)** | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees | P2 | 30min | Prior reports |
+| 15 **→ ROADMAP Harvested (Profile examples/taskctl)** | **Profile a real taskctl invocation** — find next micro-optimization target | P2 | 60min | Prior reports |
 | 16 | **Add MaxSnapshots config to flightrecorder** — rate limiting / disk protection **→ ROADMAP Flight Recorder Enhancements (`MaxSnapshots` config)** | P2       | 45min  | ROADMAP         |
 | 17 | **Add CaptureReasonPanic to flightrecorder** — capture on panic recovery **→ ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)** | P2       | 30min  | ROADMAP         |
 | 18 | **Add Sync() method to flightrecorder** — flush pending captures **→ ROADMAP Flight Recorder Enhancements (`Sync()` method)** | P2       | 30min  | ROADMAP         |
 | 19 | **Add Recorder.Status() to flightrecorder** — snapshot stats **→ ROADMAP Flight Recorder Enhancements (`Recorder.Status()`)** | P2       | 30min  | ROADMAP         |
 | ~~20~~ | ~~**Write flightrecorder README** — usage example + go tool trace screenshot~~ done — flightrecorder/README.md exists with usage examples | ~~P2~~ | ~~30min~~ | ~~Prior reports~~ |
-| 21 | **Add website preview check to check-all** — `astro build` in CI                      | P2       | 15min  | 14:41 report    |
+| 21 **→ ROADMAP Harvested (Website flake app)** | **Add website preview check to check-all** — `astro build` in CI | P2 | 15min | 14:41 report |
 | ~~22~~ | ~~**Add `--output=json` error shape test** — verify structured error rendering~~ done — covered — cli_errors_json_test.go (TestJSONErrorIntegration:211) | ~~P2~~ | ~~30min~~ | ~~Prior reports~~ |
 | ~~23~~ | ~~**Test audit log export in taskctl** — 11-format export verification~~ done — taskctl export tests exist (run_test.go:64,75) | ~~P2~~ | ~~45min~~ | ~~Prior reports~~ |
 | ~~24~~ | ~~**Verify glamour v0.1.0 published = local source** — diff workspace vs tag~~ done — v0.2.0 sub-module release shipped 2026-08-06 (CHANGELOG glamour/v0.2.0) | ~~P2~~ | ~~15min~~ | ~~Prior reports~~ |
@@ -254,13 +254,13 @@ I verified `astro build` produces 22 pages with 0 errors. But "builds" ≠ "rend
 | ~~27~~ | ~~**Expose RenderAnyData directly** — non-table output API~~ done (docs-health pass observation — RenderAnyData not exposed; no consumer demand since) | ~~P3~~ | ~~30min~~ | ~~Prior reports~~ |
 | 28 | **Add structured logging (slog) to flightrecorder** — Log field as slog handler **→ ROADMAP Flight Recorder Enhancements (Structured logging)** | P3       | 45min  | Prior reports   |
 | ~~29~~ | ~~**Migrate from samber/do v2 to v3** — when released~~ done (docs-health pass observation — samber/do v2.1.0 current; v3 migration conditional on upstream release) | ~~P3~~ | ~~120min~~ | ~~Prior reports~~ |
-| 30 | **Add `goat` ASCII diagram of v4 command lifecycle** — docs                           | P3       | 60min  | Prior reports   |
+| 30 **→ ROADMAP Harvested (goat ASCII lifecycle diagram)** | **Add `goat` ASCII diagram of v4 command lifecycle** — docs | P3 | 60min | Prior reports |
 | ~~31~~ | ~~**Write blog post: "Why we built cmdguard v4"** — marketing~~ **Won't implement — out of repo scope — marketing content, untracked.** | ~~P3~~ | ~~120min~~ | ~~Prior reports~~ |
-| 32 | **Add GitHub Action badge for nix flake check** — README                              | P3       | 10min  | Prior reports   |
+| 32 **→ ROADMAP Harvested (nix-flake-check badge)** | **Add GitHub Action badge for nix flake check** — README | P3 | 10min | Prior reports |
 | ~~33~~ | ~~**Consider renaming v4 package to just `cmdguard`** — v3 as deprecation alias~~ **NOT-DO — the /v4 module path is the Go module-versioning convention (v4.0.0 shipped).** | ~~P3~~ | ~~120min~~ | ~~Prior reports~~ |
 | ~~34~~ | ~~**Sponsor/contribute back to samber/do, fang, glamour, huh** — ecosystem health~~ **NOT-DO — external sponsorship/contribution outside repo scope.** | ~~P3~~ | ~~—~~ | ~~Prior reports~~ |
 | 35 | **Add slog handler integration test** — verify structured logging works **→ ROADMAP Flight Recorder Enhancements (Structured logging)** | P3       | 30min  | Prior reports   |
-| 36 | **Write CONTRIBUTING.md section on testing patterns** — document GOCOVERDIR           | P3       | 20min  | This report D4  |
+| 36 **→ ROADMAP Harvested (CONTRIBUTING expansion)** | **Write CONTRIBUTING.md section on testing patterns** — document GOCOVERDIR | P3 | 20min | This report D4 |
 | ~~37~~ | ~~**Add `gofmt -s` check to check-all** — already in treefmt but explicit~~ done — treefmt runs gofumpt (flake.nix:38); check-all includes format check | ~~P3~~ | ~~5min~~ | ~~Prior reports~~ |
 | ~~38~~ | ~~**Document why each sub-module exists** — design rationale doc~~ done — CONTRIBUTING.md §Sub-Modules + website guides/sub-modules.mdx | ~~P3~~ | ~~60min~~ | ~~Prior reports~~ |
 | ~~39~~ | ~~**Add benchmark comparing v4 to raw cobra** — show overhead is minimal~~ done (docs-health pass observation — PERFORMANCE.md documents cobra-parity overhead (line 109)) | ~~P3~~ | ~~60min~~ | ~~Prior reports~~ |

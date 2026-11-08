@@ -12,3 +12,10 @@ Skill-generated review snapshots archived by the 2026-11-07 docs-health sweep.
 | 2026-07-18_20-46_full-code-review.html | ARCHIVE | findings resolved or deferred via the audit closure |
 
 HTML artifacts pre-date the `~~` marker canon; no inline markers apply.
+
+## 2026-11-07 docs-health sweep (.md reviews)
+
+| File | Classification | Reason |
+| ---- | -------------- | ------ |
+| 2026-07-18_20-46_copywriting-review.md | ARCHIVE | all 7 findings verdict-struck (4 applied, 3 kept-by-design) |
+| 2026-07-18_frontend-design-review.md | ARCHIVE | actions table struck (4 applied, 1 won't, 1 reworked); Finding 3 routed to ROADMAP |

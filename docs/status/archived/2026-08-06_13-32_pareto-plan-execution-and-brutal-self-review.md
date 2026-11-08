@@ -276,13 +276,13 @@ I marked M14 as "completed" in my todo list after running grep patterns instead 
 | ~~13~~ | ~~**Verify MIGRATION_v3_v4.md v3 API accuracy** — check git history or old docs for actual configload API~~ done — verified against v3.1.0 source — NewKoanfLoader(paths ...string) existed (koanf.go:53) | ~~P2~~ | ~~30min~~ | ~~This report~~ |
 | ~~14~~ | ~~**Test testutil failure-path branches** — bring coverage from 70.9% to >85% by testing error paths~~ done — resolved — 31 failure-path tests; testutil 80.3% (AGENTS.md) | ~~P2~~ | ~~45min~~ | ~~This report~~ |
 | ~~15~~ | ~~**Re-run benchmarks with `-count=5`** — get stable numbers for PERFORMANCE.md~~ done — PERFORMANCE.md documents -count=5 methodology | ~~P2~~ | ~~30min~~ | ~~This report~~ |
-| ~~16~~ | ~~**Add PERFORMANCE.md regression note** — if the ~2x slowdown is real, document why (v4 generics overhead?)~~ v:false alarm — no regression; resolution recorded 2026-08-06 | ~~P2~~       | ~~15min~~  | ~~**DONE**~~              |
+| ~~16~~ | ~~**Add PERFORMANCE.md regression note** — if the ~2x slowdown is real, document why (v4 generics overhead?)~~ done — false alarm, no regression; resolution recorded 2026-08-06 | ~~P2~~       | ~~15min~~  | ~~**DONE**~~              |
 | ~~17~~ | ~~**Complete M15: Add MIGRATION_v3_v4.md link to v2→v3 guide §6 checklist**~~ done — links added (docs/MIGRATION_v2_v3.md lines 4, 224) | ~~P2~~ | ~~5min~~ | ~~This report~~ |
 | ~~18~~ | ~~**Complete M27: Add resolution appendices to 3 flight-recorder reports**~~ done (docs-health pass observation — inline annotations adopted (2026-11-07 sweep)) | ~~P3~~ | ~~30min~~ | ~~This report~~ |
 | ~~19~~ | ~~**Investigate LSP go mod tidy errors** — restart gopls, verify go.mod is correct~~ done — resolved — expected transitive closure / replace false positives (2026-08-01_20-45 report) | ~~P3~~ | ~~10min~~ | ~~This report~~ |
 | ~~20~~ | ~~**Fix 2 stale v3 refs in docs/reviews/** — copywriting review has `go get .../v3`, frontend review has `v3.NewCLI`~~ done — grep clean — no stale v3 refs remain in docs/reviews | ~~P3~~ | ~~5min~~ | ~~This report~~ |
 | ~~21~~ | ~~**Add flightrecorder section to docs/PERFORMANCE.md benchmarks** — actually DONE but verify it's complete~~ done — present — PERFORMANCE.md flightrecorder benchmarks | ~~P3~~ | ~~5min~~ | ~~This report~~ |
-| 22 | **Write GitHub release notes for v4.0.0** — or verify they exist via `gh release view`                                                                     | P3       | 15min  | This report           |
+| 22 **→ TODO_LIST H7 (GitHub release pages)** | **Write GitHub release notes for v4.0.0** — or verify they exist via `gh release view` | P3 | 15min | This report |
 
 ---
 

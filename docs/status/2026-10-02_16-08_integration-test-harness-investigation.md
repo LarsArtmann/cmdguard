@@ -20,6 +20,7 @@ Nothing was implemented. This report captures the findings so they are not lost 
 
 ## Stat Cards
 
+<!-- check-rows:ledger -->
 | Category                              | Count |
 | ------------------------------------- | ----- |
 | a) Fully done (analysis deliverables) | 10    |
@@ -33,6 +34,7 @@ Nothing was implemented. This report captures the findings so they are not lost 
 
 These are **analysis deliverables** (investigation complete), not code. No code was shipped this session.
 
+<!-- check-rows:ledger -->
 | #  | Finding                                          | Evidence                                                                                                                                                                                                                                    |
 | -- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1  | v4 has **no** in-process CLI test harness.       | `ls pkg/cmdguard/` → only `v4`; no `testkit`/`harness`/`testutil` under `pkg/cmdguard/v4/`.                                                                                                                                                 |
@@ -50,6 +52,7 @@ These are **analysis deliverables** (investigation complete), not code. No code 
 
 ## b) PARTIALLY DONE
 
+<!-- check-rows:ledger -->
 | # | What works now                                              | What remains open                                                                              | Blocker                  | Effort |
 | - | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------ | ------ |
 | 1 | Harness API sketch (option A).                              | Capture-seam design unresolved (fd-level redirect vs. injectable writer through `CLI.spec`).   | Needs a design decision. | M      |
@@ -62,6 +65,7 @@ These are **analysis deliverables** (investigation complete), not code. No code 
 
 ## c) NOT STARTED
 
+<!-- check-rows:ledger -->
 | #  | Item                                                       | Why not started          | Still wanted? |
 | -- | ---------------------------------------------------------- | ------------------------ | ------------- |
 | 1  | Any `testkit` code.                                        | Design not approved.     | Yes           |
@@ -80,6 +84,7 @@ These are **analysis deliverables** (investigation complete), not code. No code 
 
 ## d) TOTALLY FUCKED UP
 
+<!-- check-rows:ledger -->
 | # | What is broken                                                                                                                              | Severity                                           | Root cause                                                                      | Mitigation                                                                        |
 | - | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | 1 | **Capability regression:** v4.0.1 ships with no in-process test harness while v2 had one. Consumers hand-roll integration scaffolding.      | **High** (consumer DX; every adopting app pays it) | Deleted as collateral in `fdd6dca` with no replacement.                         | None. Workaround is per-app boilerplate (`taskctl/main_test.go`).                 |
@@ -92,6 +97,7 @@ These are **analysis deliverables** (investigation complete), not code. No code 
 
 ## e) WHAT WE SHOULD IMPROVE
 
+<!-- check-rows:ledger -->
 | # | Suboptimal pattern                                      | Impact                                         | Suggested fix                                                                                  |
 | - | ------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | 1 | Consumer testing ergonomics treated as an afterthought. | Every consuming app re-invents the harness.    | Restore/evolve `testkit` as a maintained product surface.                                      |
@@ -107,6 +113,7 @@ These are **analysis deliverables** (investigation complete), not code. No code 
 
 Ranked by impact. Effort: S <30min / M 30min–2h / L >2h.
 
+<!-- check-rows:ledger -->
 | #  | Task                                                                                                                | Impact   | Effort | Category      |
 | -- | ------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
 | 1  | Design and implement the output capture seam (injectable writer through `CLI.spec`), covering fang/glamour/spinner. | Critical | M      | Feature       |

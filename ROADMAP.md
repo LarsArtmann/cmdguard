@@ -254,6 +254,21 @@ Other:
 
 - **musttag compliance evaluation** for sub-module config structs
 - **No-op `PromptConfirm` test** — rewrite or delete the identified no-op (TODO_LIST H2)
+- **CONTRIBUTING expansion** — doc-verification section, testing-patterns section, release-cutting section, GOCOVERDIR coverage notes
+- **goat ASCII lifecycle diagram** — ASCII sequence render of the CLI lifecycle (recurred in three 2026-08-06 reports)
+- **nix-flake-check badge** in README
+- **`WithCleanup` benchmark** — measure the cleanup-hook path
+- **Profile `examples/taskctl`** — pprof pass over the flagship
+- **QUICKSTART flightrecorder mention** — the quickstart never mentions the flightrecorder option
+- **cmdguard-lint ServiceName-pollution rule** — a rule (or doc) forbidding `samber-do-auditlog` ServiceName pollution
+- **Suppression expiry (`ExpiresAt`)** — cmdguard-lint suppressions with an expiry date
+- **Promote the HTML-report structural validator** into `scripts/validate-html-report.py`
+- **Consumer-skill drift guard test** — a test failing when `.agents/skills/cmdguard/SKILL.md` source-line references rot (AGENTS.md requires same-change updates)
+- **cmdguard-lint suppression FP hardening** — directive-in-string-literal false positives for AST-comment suppressions
+- **cmdguard-lint `command_name` field** — dedicated field over ServiceRef overload (upstream samber-do-auditlog schema 0.4.0)
+- **lint/go.mod `go-humanize` require audit** — direct vs indirect classification hygiene
+- **Document taskctl's manual option configuration** — why the flagship wires options by hand instead of helpers
+- **Headless browser in the dev shell** — availability check for HTML-report rendering tests
 
 ### Flight Recorder Enhancements
 

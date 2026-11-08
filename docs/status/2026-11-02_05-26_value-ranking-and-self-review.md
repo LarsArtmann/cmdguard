@@ -1,5 +1,6 @@
 # Value Ranking and Self-Review: Session Status Report
 
+<!-- check-rows:ledger -->
 | Field           | Value                                                                   |
 | --------------- | ----------------------------------------------------------------------- |
 | Date            | 2026-11-02 05:26 CET (Monday)                                           |
@@ -294,6 +295,7 @@ Nothing was broken, because nothing was built. Honest list of what was actually 
 
 ## 12. Evidence log
 
+<!-- check-rows:ledger -->
 | Check                                                      | Result                                              |
 | ---------------------------------------------------------- | --------------------------------------------------- |
 | `grep env\|Env\|Default` in `docgen.go`                    | no matches; docs come from pflag text               |

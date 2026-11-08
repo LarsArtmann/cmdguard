@@ -36,6 +36,7 @@ a migration note, or v5) before anyone tags it.
 
 ## a) FULLY DONE
 
+<!-- check-rows:ledger -->
 | #  | Item                                | Evidence                                                                                                                                                                                                                    | Verified by                                                                                   |
 | -- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | 1  | End goal added to README and AGENTS | `README.md:3`, `AGENTS.md:3`                                                                                                                                                                                                | Visual check                                                                                  |
@@ -65,6 +66,7 @@ a migration note, or v5) before anyone tags it.
 
 ## b) PARTIALLY DONE
 
+<!-- check-rows:ledger -->
 | # | Item                        | What exists                                                          | What is missing                                                                                                     |
 | - | --------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | 1 | W1 gate: "byte-stable JSON" | Structural tests and deterministic sorting                           | No golden fixture; no explicit test that two runs produce identical bytes                                           |
@@ -200,9 +202,9 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 16. Remove `SetConfig`.
 17. Replace `RegisterInScope` with a generic variant.
 18. Rename `Get[T]` → `GetService[T]`.
-19. Redesign `Package[T]`.
-20. Unify `Middleware[T]` and `ContextMiddleware[T]`.
-21. Write `docs/MIGRATION_v4_v5.md`.
+19. Redesign `Package[T]`. **→ routed — ROADMAP v5 candidates #7 (Package[T] redesign) — adopted into the v5 candidate table**
+~~20. Unify `Middleware[T]` and `ContextMiddleware[T]`.~~ **→ routed — ROADMAP v5 candidate #8 (middleware signature unification)**
+~~21. Write `docs/MIGRATION_v4_v5.md`.~~ → tracked in the v5 plan (TODO_LIST P9; docs/planning/2026-11-01_v5-end-goal-paved-road.md M13–M16)
 22. Write a codemod for the mechanical renames.
 23. Bump `lint.CurrentMajor` and re-verify CG002's message.
 24. Release `lint/v0.2.0` (CG007/CG008, baseline, provider options).
@@ -223,7 +225,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 32. Add `DescribeCommand(path)` for subtree discovery.
 33. Add a golden fixture for the describe schema and a stability test.
-34. Add a stable machine `code` per sentinel to the JSON envelope.
+~~34. Add a stable machine `code` per sentinel to the JSON envelope.~~ done — ErrorCode(err) + the additive error_code envelope (CHANGELOG [Unreleased], 2026-11-02)
 35. Generate `docs/ERROR_REFERENCE.md` from the sentinel + hint tables.
 36. Style the `Hint:` line with lipgloss to match fang's error view.
 37. Add hints for every exported sentinel, not only the classified ones.
@@ -232,15 +234,15 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 **Ergonomics**
 
-39. Migrate `examples/docs-generator` to `NewApp` + `AddCommands`.
-40. Document why taskctl still configures options manually instead of
+~~39. Migrate `examples/docs-generator` to `NewApp` + `AddCommands`.~~ **Superseded — the v5 defaults-flip plan — docs/planning/2026-11-01_v5-end-goal-paved-road.md W2 carries NewApp adoption with the v5 flip, examples migrate then.**
+~~40. Document why taskctl still configures options manually instead of~~ **→ routed — ROADMAP Harvested, Document taskctl's manual option configuration**
     `WithBatteries`.
-41. Update `docs/QUICKSTART.md` with batteries, describe, and hints.
+~~41. Update `docs/QUICKSTART.md` with batteries, describe, and hints.~~ **→ tracked as TODO_LIST P12 (QUICKSTART + TUTORIAL parity)**
 42. Update `docs/TUTORIAL.md` with runtime tag validation semantics.
 43. Update the website docs and landing page.
 44. Mark shipped workstreams in `ROADMAP.md`, not only in the plan.
 45. Add fang-on tests for hints and batteries.
-46. Add a batteries + `WithDraconianValidation` test.
+~~46. Add a batteries + `WithDraconianValidation` test.~~ done — cli_fang_on_test.go covers batteries×Draconian (2026-11-02 P3)
 47. Add a `WithoutErrorHints` + fang test.
 48. Add benchmarks for `Describe`, `AddCommands`, and validation.
 49. Build and test erraudit and timesheets against the modified library.
@@ -268,6 +270,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 ## Verification Log
 
+<!-- check-rows:ledger -->
 | Command                                                                  | Result                                                                                                            |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | `GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 300s -race`         | All core packages green                                                                                           |

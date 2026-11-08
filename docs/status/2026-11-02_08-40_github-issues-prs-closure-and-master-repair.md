@@ -55,7 +55,7 @@ Follow-up directive: "fix/git commit!" (repair the diverged/broken git state), t
 
 1. Push the /tmp/fix-master repair (re-verify under lower load or trust the 5-line revert + CI) and confirm master CI green.
 2. Reconcile local master (stash → rebase-skip → pop) and re-apply the parallel session's cli.go WIP as unstaged patch (see b2) so their session is whole.
-3. Remove /tmp/fix-master worktree.
+~~3. Remove /tmp/fix-master worktree.~~ **Won't implement — ephemeral /tmp state, nothing to do in the repo.**
 4. Cut v4.2.1 (CHANGELOG [4.2.1] from Unreleased Fixed; tag; proxy + scratch-consumer verify; GitHub release) per go-release skill.
 5. After v4.2.1: bump go-credentials-store, drop its max(ExitCode,1) workaround.
 6. Add CHANGELOG [Unreleased] entries for PR16/PR18 dependency bumps.

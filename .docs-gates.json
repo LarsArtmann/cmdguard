@@ -1,0 +1,6 @@
+{
+  "cadence": {
+    "max_unarchived": 20,
+    "oldest_days": 45
+  }
+}

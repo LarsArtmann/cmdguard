@@ -59,9 +59,9 @@ Replaced cmdguard's custom FormatStrategy registry (5 types, 16 entries, 2 free 
 
 ## New Public APIs
 
-- `SupportedFormats()` — returns all 16 OutputFormat values
-- `IsFormatSupported(f)` — checks if format is valid
-- `OutputStyledTable` — deprecated, use `OutputTable(FormatTable, ...)`
+- ~~`SupportedFormats()` — returns all 16 OutputFormat values~~ done in this session; removed in the v3.0.0 API cleanup (CHANGELOG [3.0.0])
+- ~~`IsFormatSupported(f)` — checks if format is valid~~ done in this session; removed in the v3.0.0 API cleanup (CHANGELOG [3.0.0])
+- ~~`OutputStyledTable` — deprecated, use `OutputTable(FormatTable, ...)`~~ done in this session; removed in the v3 line (Resolution below)
 
 ## Remaining go-mod Replace Directives
 

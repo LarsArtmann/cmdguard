@@ -62,7 +62,7 @@ cmdguard now has the four APIs BuildFlow needs, but BuildFlow still uses its wor
 
 ~~- `TODO_LIST.md` still says "v2.9.0, 430+ test functions" — now 473 tests and 4 new APIs not listed~~ done — rewritten since; refreshed 2026-11-07
 ~~- `FEATURES.md` doesn't mention scoped flags, hidden flags, ConfigFromContext, WithPostFlagParse~~ done — FEATURES lists all four APIs; refreshed 2026-11-07
-- `docs/API.md` CLI Options table missing `WithPostFlagParse`
+~~- `docs/API.md` CLI Options table missing `WithPostFlagParse`~~ done — superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the API lives in FEATURES + pkg.go.dev
 ~~- `CHANGELOG.md` has no v2.10.0 entry for this session's features~~ done — the [2.10.0] entry exists (cea25f2)
 
 ### Go version

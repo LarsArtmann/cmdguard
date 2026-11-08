@@ -270,13 +270,13 @@ I made 6 code-block edits across 5 `.mdx` files. One of them changed `[][]string
 | ~~5~~  | ~~**Write taskctl error-path tests** — improve from 68.2% to >80%~~ done — resolved — error-path tests added; taskctl 85.9% (FEATURES.md) | ~~P1~~ | ~~60min~~ | ~~This report D4~~ |
 | ~~6~~  | ~~**Add FR integration test in taskctl** — verify trace files generated on slow/error~~ done — written and passing (13-32 resolution banner) | ~~P1~~ | ~~30min~~ | ~~This report D4~~ |
 | ~~7~~  | ~~**Annotate prior status reports** — add resolution banners for bugs fixed this session~~ done (docs-health pass completed by later docs-health passes, culminating in the 2026-11-07 sweep) | ~~P1~~ | ~~15min~~ | ~~This report D4~~ |
-| 8  | **Create v4.0.0 GitHub release** — draft release notes highlighting v4 features          | P1       | 20min  | This report c.4 |
-| 9  | **Run `nix run .#check-all` in CI** — wire it into GitHub Actions                        | P2       | 30min  | This report     |
+| 8 **→ TODO_LIST H7 (GitHub release pages)** | **Create v4.0.0 GitHub release** — draft release notes highlighting v4 features | P1 | 20min | This report c.4 |
+| 9 **→ TODO_LIST H8 (check-all taskctl exclusion)** | **Run `nix run .#check-all` in CI** — wire it into GitHub Actions | P2 | 30min | This report |
 | 10 | **Add benchmark CI gating** — compare against baseline, fail on regression **→ ROADMAP Harvested (Benchmark CI gating)** | P2       | 60min  | ROADMAP         |
 | ~~11~~ | ~~**Improve taskctl coverage further** — target 87.8% to match core package~~ done — 85.9% (FEATURES.md) | ~~P2~~ | ~~90min~~ | ~~Prior reports~~ |
 | 12 | **Write fuzz tests for type_handler_intwidth.go** — new code paths since v3 **→ ROADMAP Deferred (#7 Fuzz corpus expansion)** | P2       | 45min  | Prior reports   |
-| 13 | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees         | P2       | 30min  | Prior reports   |
-| 14 | **Profile a real taskctl invocation** — find next micro-optimization target              | P2       | 60min  | Prior reports   |
+| 13 **→ ROADMAP Harvested (WithCleanup benchmark)** | **Add `WithCleanup[T]` benchmark** — verify tree-walk is not O(n²) on deep trees | P2 | 30min | Prior reports |
+| 14 **→ ROADMAP Harvested (Profile examples/taskctl)** | **Profile a real taskctl invocation** — find next micro-optimization target | P2 | 60min | Prior reports |
 | 15 | **Add MaxSnapshots config to flightrecorder** — rate limiting / disk protection **→ ROADMAP Flight Recorder Enhancements (`MaxSnapshots` config)** | P2       | 45min  | ROADMAP         |
 | 16 | **Add CaptureReasonPanic to flightrecorder** — capture on panic recovery **→ ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)** | P2       | 30min  | ROADMAP         |
 | 17 | **Add Sync() method to flightrecorder** — flush pending captures **→ ROADMAP Flight Recorder Enhancements (`Sync()` method)** | P2       | 30min  | ROADMAP         |
@@ -288,15 +288,15 @@ I made 6 code-block edits across 5 `.mdx` files. One of them changed `[][]string
 | ~~23~~ | ~~**Expose RenderAnyData directly** — non-table output API~~ done (docs-health pass observation — RenderAnyData not exposed; no consumer demand since) | ~~P3~~ | ~~30min~~ | ~~Prior reports~~ |
 | 24 | **Add structured logging (slog) to flightrecorder** — Log field as slog handler **→ ROADMAP Flight Recorder Enhancements (Structured logging)** | P3       | 45min  | Prior reports   |
 | ~~25~~ | ~~**Migrate from samber/do v2 to v3** — when released~~ done (docs-health pass observation — samber/do v2.1.0 current; v3 migration conditional on upstream release) | ~~P3~~ | ~~120min~~ | ~~Prior reports~~ |
-| 26 | **Add `goat` ASCII diagram of v4 command lifecycle** — docs                              | P3       | 60min  | Prior reports   |
+| 26 **→ ROADMAP Harvested (goat ASCII lifecycle diagram)** | **Add `goat` ASCII diagram of v4 command lifecycle** — docs | P3 | 60min | Prior reports |
 | ~~27~~ | ~~**Write blog post: "Why we built cmdguard v4"** — marketing~~ **Won't implement — out of repo scope — marketing content, untracked.** | ~~P3~~ | ~~120min~~ | ~~Prior reports~~ |
-| 28 | **Add GitHub Action badge for nix flake check** — README                                 | P3       | 10min  | Prior reports   |
+| 28 **→ ROADMAP Harvested (nix-flake-check badge)** | **Add GitHub Action badge for nix flake check** — README | P3 | 10min | Prior reports |
 | ~~29~~ | ~~**Consider renaming v4 package to just `cmdguard`** — v3 as deprecation alias~~ **NOT-DO — the /v4 module path is the Go module-versioning convention (v4.0.0 shipped).** | ~~P3~~ | ~~120min~~ | ~~Prior reports~~ |
 | ~~30~~ | ~~**Sponsor/contribute back to samber/do, fang, glamour, huh** — ecosystem health~~ **NOT-DO — external sponsorship/contribution outside repo scope.** | ~~P3~~ | ~~—~~ | ~~Prior reports~~ |
 | ~~31~~ | ~~**Investigate if COW claim numbers (48%, -10 allocs) still hold for v4** — re-verify~~ done — claim stands — AGENTS.md copy-on-write section (~48% NewCLI) | ~~P2~~ | ~~30min~~ | ~~This report~~ |
 | 32 | **Add slog handler integration test** — verify structured logging works **→ ROADMAP Flight Recorder Enhancements (Structured logging)** | P3       | 30min  | Prior reports   |
-| 33 | **Write CONTRIBUTING.md section on testing patterns** — document testableT               | P3       | 20min  | This report     |
-| 34 | **Add website preview check to check-all** — `astro build` in CI                         | P3       | 15min  | This report     |
+| 33 **→ ROADMAP Harvested (CONTRIBUTING expansion)** | **Write CONTRIBUTING.md section on testing patterns** — document testableT | P3 | 20min | This report |
+| 34 **→ ROADMAP Harvested (Website flake app)** | **Add website preview check to check-all** — `astro build` in CI | P3 | 15min | This report |
 | ~~35~~ | ~~**Add `--output=json` error shape test** — verify structured error rendering~~ done — covered — cli_errors_json_test.go (TestJSONErrorIntegration:211) | ~~P2~~ | ~~30min~~ | ~~Prior reports~~ |
 | ~~36~~ | ~~**Verify all .golangci.yml exclusions still justified** — quarterly audit~~ **Superseded — .golangci.yml restructured in the lint/v0.1.0 work (2026-10-04).** | ~~P3~~ | ~~15min~~ | ~~Prior reports~~ |
 | ~~37~~ | ~~**Consider v4.1.0 release** — once P0/P1 items done~~ done — v4.1.0 shipped 2026-10-04 (CHANGELOG [4.1.0]; tag v4.1.0) | ~~P3~~ | ~~30min~~ | ~~Prior reports~~ |

@@ -206,7 +206,7 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 
 | #  | Task                                                                                       | Priority | Effort |
 | -- | ------------------------------------------------------------------------------------------ | -------- | ------ |
-| ~~1~~  | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ h:a7aab73        | ~~P0~~       | ~~1min~~   |
+| ~~1~~  | ~~Commit the uncommitted `docs/MIGRATION_FROM_COBRA.md` changes~~ done at `a7aab73`        | ~~P0~~       | ~~1min~~   |
 | ~~2~~  | ~~Fix `CONTRIBUTING.md` — `v3` → `v4` (2 references) — _TODO_LIST D3_~~ done — CONTRIBUTING.md clean of v3 references (fixed in the 2026-08-06 docs passes) | ~~P0~~ | ~~5min~~ |
 | ~~3~~  | ~~Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_~~ done — ERROR_REFERENCE.md title is "Error Reference — cmdguard v4", drift-guarded by a test | ~~P0~~ | ~~2min~~ |
 | ~~4~~  | ~~Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_~~ done — docs/MIGRATION_v3_v4.md exists (created 2026-08-06) | ~~P1~~ | ~~30min~~ |
@@ -217,10 +217,10 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 | ~~9~~  | ~~Run `nix flake check` to verify format~~ done — nix flake check passed (verified at ba818e3 per the 2026-08-06 annotation) | ~~P1~~ | ~~5min~~ |
 | ~~10~~ | ~~Full audit of website guide prose against v4 API (14 .mdx files)~~ done — 6 website .mdx files with incorrect v4 API examples fixed in the 2026-08-06 closure sprint; no stale v3 API patterns remain | ~~P2~~ | ~~60min~~ |
 | ~~11~~ | ~~Re-run benchmarks for `docs/PERFORMANCE.md` against v4.0.0~~ done — PERFORMANCE.md corrected and re-run for v4.0.0 ("Last Updated" 2026-08-06, closure sprint) | ~~P2~~ | ~~30min~~ |
-| 12 | Audit `docs/COMPARISON.md` feature matrix for v4 accuracy                                  | P2       | 20min  |
+| 12 **→ TODO_LIST H6 (COMPARISON prose audit)** | Audit `docs/COMPARISON.md` feature matrix for v4 accuracy | P2 | 20min |
 | ~~13~~ | ~~Cross-check ROADMAP.md "Deferred" items against current codebase~~ done — ROADMAP deferred table carries per-item dispositions (item 11 marked done 2026-08-05) | ~~P2~~ | ~~20min~~ |
 | ~~14~~ | ~~Verify `docs/DOMAIN_LANGUAGE.md` terms still match v4 API~~ done — DOMAIN_LANGUAGE terms match the v4 API (Command[T,F] command.go:87, CLI[T] cli.go:123) | ~~P2~~ | ~~15min~~ |
-| 15 | Add CI check for referenced-files existence (AGENTS.md → TODO_LIST, ROADMAP, etc.)         | P3       | 30min  |
+| 15 **→ ROADMAP Harvested (Stale-doc-ref CI guard)** | Add CI check for referenced-files existence (AGENTS.md → TODO_LIST, ROADMAP, etc.) | P3 | 30min |
 | ~~16~~ | ~~Consolidate `WHAT_THIS_PROJECT_IS_ABOUT.md` into README or remove~~ done — WHAT_THIS_PROJECT_IS_ABOUT.md removed at 0fbdd4d (consolidated into supporting docs) | ~~P3~~ | ~~30min~~ |
 | ~~17~~ | ~~Consolidate `WHAT_THIS_PROJECT_IS_NOT.md` into CONTRIBUTING or remove~~ **Won't implement — WHAT_THIS_PROJECT_IS_NOT.md kept as a distinct doc; only _ABOUT was consolidated (0fbdd4d).** | ~~P3~~ | ~~30min~~ |
 | ~~18~~ | ~~Fix `docs/MIGRATION_FROM_COBRA.md` TimingMiddleware example — simplify~~ done — example matches the current v4 signature — TimingMiddleware[T](log func(...)) at pkg/cmdguard/v4/middleware.go:116; the callback is required | ~~P3~~ | ~~5min~~ |
@@ -233,14 +233,14 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 | ~~25~~ | ~~Update `docs/CLI_DESIGN_PRINCIPLES.md` if it references v3 patterns~~ done — CLI_DESIGN_PRINCIPLES.md has no v3 references | ~~P3~~ | ~~10min~~ |
 | ~~26~~ | ~~Verify `library-policy.yaml` references are still accurate for v4~~ done — library-policy.yaml exists at repo root; deeper verify-then-decide tracked in ROADMAP deferred #10 | ~~P3~~ | ~~10min~~ |
 | ~~27~~ | ~~Check `git-town.toml` main branch setting (`master` vs `main`)~~ done — git-town.toml sets main = "master" — matches the repo default branch | ~~P3~~ | ~~2min~~ |
-| 28 | Add flightrecorder to `docs/QUICKSTART.md` sub-modules section                             | P3       | 10min  |
+| 28 **→ ROADMAP Harvested (QUICKSTART flightrecorder mention)** | Add flightrecorder to `docs/QUICKSTART.md` sub-modules section | P3 | 10min |
 | ~~29~~ | ~~Verify `FEATURES.md` sub-module table includes flightrecorder~~ done — FEATURES.md flightrecorder rows present (middleware + sub-module tables) | ~~P2~~ | ~~5min~~ |
 | ~~30~~ | ~~Check if `docs/QUICKSTART.md` "12 output formats" → should be "16"~~ done — QUICKSTART says 16 output formats | ~~P3~~ | ~~2min~~ |
 | ~~31~~ | ~~Audit `docs/TUTORIAL.md` "Complete Example" section references~~ done — TUTORIAL uses the v4 API throughout (v4.NewCLI, taskctl walkthrough) | ~~P3~~ | ~~5min~~ |
 | ~~32~~ | ~~Verify website `related-tools.mdx` for v4 accuracy~~ done — related-tools.mdx has no v3 references | ~~P3~~ | ~~10min~~ |
 | ~~33~~ | ~~Check `AUTHORS` file for accuracy~~ done — AUTHORS exists (Lars Artmann) | ~~P3~~ | ~~2min~~ |
 | ~~34~~ | ~~Verify `SECURITY.md` version table includes v4~~ done — SECURITY.md supports v4.x | ~~P2~~ | ~~5min~~ |
-| 35 | Add v4.0.0 GitHub release notes (if not already done)                                      | P2       | 15min  |
+| 35 **→ TODO_LIST H7 (GitHub release pages)** | Add v4.0.0 GitHub release notes (if not already done) | P2 | 15min |
 | ~~36~~ | ~~Verify `pkg.go.dev` badge URL in README points to v4 (it does, but verify)~~ done — README Go Reference badge points to /v4 | ~~P3~~ | ~~2min~~ |
 | ~~37~~ | ~~Run `go mod tidy` on all modules to verify go.sum consistency~~ done — AGENTS.md check-all runs go mod tidy across the workspace modules | ~~P2~~ | ~~10min~~ |
 | ~~38~~ | ~~Check if `go.work` local replace directives need updating for external consumers~~ done — go.work `use` covers all workspace modules; no local replaces needed | ~~P3~~ | ~~10min~~ |
@@ -250,7 +250,7 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 | ~~42~~ | ~~Check if `docs/feedback/` files need v4 updates~~ done — docs/feedback has no v3 references | ~~P3~~ | ~~5min~~ |
 | ~~43~~ | ~~Verify `examples/docs-generator/` uses v4 API correctly~~ done — examples/docs-generator imports v4 (main.go:10) | ~~P3~~ | ~~10min~~ |
 | ~~44~~ | ~~Check if `benchmarks/` code uses v4 API correctly~~ done — benchmarks/guard_bench_test.go imports v4 | ~~P3~~ | ~~5min~~ |
-| 45 | Add a "Documentation Verification" section to CONTRIBUTING.md                              | P3       | 15min  |
+| 45 **→ ROADMAP Harvested (CONTRIBUTING expansion)** | Add a "Documentation Verification" section to CONTRIBUTING.md | P3 | 15min |
 | ~~46~~ | ~~Consider adding `docs/MIGRATION_v3_v4.md` to website sidebar~~ done (docs-health pass observation — the website sidebar is slug-based to website pages; the repo migration guides serve repo readers) | ~~P3~~ | ~~10min~~ |
 | ~~47~~ | ~~Verify all `//nolint:godox` TODO(v5) markers still have ROADMAP.md cross-references~~ done — TODO(v5) markers carry cross-references (pkg/cmdguard/v4/middleware.go:65 etc.) | ~~P3~~ | ~~10min~~ |
 | ~~48~~ | ~~Check if `docs/proposals/` files need v4 updates~~ done — docs/proposals has no cmdguard/v3 references | ~~P3~~ | ~~5min~~ |
