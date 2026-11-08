@@ -226,6 +226,8 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 
 **Exclusion count:** 4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion (`TODO(v5)`) + 1 `paralleltest` path exclusion for `flightrecorder/.*_test\.go$` (process-wide singleton) + 1 `schema/` path exclusion (`exhaustruct_v5` + `tagliatelle`, 2026-11-02: JSON Schema field names are fixed by the spec and Property/Hints literals are deliberately partial under `,omitzero`). Track this number — if it increases, investigate whether the new exclusion is a real fix or a shortcut.
 
+**Inline (per-line) nolints, tracked like exclusions (2026-11-08):** two in the sentinel-fact cluster — `sentinelFacts()` carries `//nolint:funlen,maintidx` (the canonical data table's length IS the sentinel count; splitting it by class risks the classification-precedence order where the generic `ErrFlagParseFailed` wrapper must stay last) and `referenceClassOrder` carries `//nolint:gochecknoglobals` (fixed section order keeps the generated reference byte-stable). Do not "fix" these by splitting the table or injecting the order — that churns a machine-contract file for a metric that guards logic, not data.
+
 **Exclusion linter names must match the enabled linter name.** The enable list uses `exhaustruct_v5`; the path exclusions for `pkg/cmdguard/`, `examples/`, `benchmarks/`, `tests/` must also say `exhaustruct_v5`. When the linter was renamed (v5 migration), the exclusion entries kept the dead name `exhaustruct` and silently matched nothing — 41 findings appeared repo-wide (fixed 2026-10-04). After any linter rename in the enable list, grep the exclusions for the old name.
 
 ### v4 Design Principles
