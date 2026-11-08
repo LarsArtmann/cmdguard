@@ -25,6 +25,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 				return Command[testAppConfig, NoFlags]{
 					spec: commandSpec{
 						use:     "test",
+						short:   "run the test command",
 						preRunE: &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(order, "pre")},
 					},
 					runE: makeHookRunE(order, "run"),
@@ -39,6 +40,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 				return Command[testAppConfig, NoFlags]{
 					spec: commandSpec{
 						use:      "test",
+						short:    "run the test command",
 						postRunE: &typedHook[testAppConfig, NoFlags]{fn: makeHookRunE(order, "post")},
 					},
 					runE: makeHookRunE(order, "run"),

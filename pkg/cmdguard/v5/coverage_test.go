@@ -59,6 +59,7 @@ func TestAddCommand(t *testing.T) {
 			"hello",
 			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
+			WithShort("Say hello"),
 		)
 		testutil.AssertNoError(t, err)
 
@@ -68,6 +69,7 @@ func TestAddCommand(t *testing.T) {
 			"hello",
 			NoFlags{},
 			func(ctx context.Context, cfg *struct{}, flags NoFlags) error { return nil },
+			WithShort("Say hello"),
 		)
 		err = AddCommand(cli, cmd2)
 		testutil.AssertExpectedError(t, err)

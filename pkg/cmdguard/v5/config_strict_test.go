@@ -181,11 +181,15 @@ func TestWithBatteries_EnablesStrictConfigKeys(t *testing.T) {
 
 	plain, err := NewCLI("app", "app", cfg{})
 	testutil.AssertNoError(t, err)
-	testutil.AssertBoolFalse(t, plain.StrictConfigKeys(), "default StrictConfigKeys")
+	testutil.AssertBoolTrue(t, plain.StrictConfigKeys(), "v5 default StrictConfigKeys")
 
 	batteries, err := NewCLI("app", "app", cfg{}, WithBatteries())
 	testutil.AssertNoError(t, err)
 	testutil.AssertBoolTrue(t, batteries.StrictConfigKeys(), "WithBatteries StrictConfigKeys")
+
+	optOut, err := NewCLI("app", "app", cfg{}, WithoutStrictConfigKeys())
+	testutil.AssertNoError(t, err)
+	testutil.AssertBoolFalse(t, optOut.StrictConfigKeys(), "WithoutStrictConfigKeys StrictConfigKeys")
 }
 
 func TestStrictConfigKeys_EndToEndFailsAtConstruction(t *testing.T) {

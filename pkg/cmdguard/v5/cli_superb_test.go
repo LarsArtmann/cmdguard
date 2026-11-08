@@ -21,7 +21,7 @@ func newTestCLIWithNoOpCmd(t *testing.T, opts ...CommandOption) *CLI[testConfig]
 		"cmd",
 		NoFlags{},
 		func(_ context.Context, _ *testConfig, _ NoFlags) error { return nil },
-		opts...,
+		append([]CommandOption{WithShort("run the test command")}, opts...)...,
 	)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, cmd))

@@ -36,6 +36,7 @@ func TestSliceFlagRepeatedOccurrencesParsesElements(t *testing.T) {
 
 			return nil
 		},
+		WithShort("collect documents"),
 	)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
