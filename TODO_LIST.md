@@ -106,6 +106,7 @@ resolved (struck with evidence in the report itself) or routed to ROADMAP
 | H6 | Audit `docs/COMPARISON.md` prose for v4 accuracy | Header still says "Last Updated: 2026-07-07" while claiming v4-era content; the full prose audit was left open by three 2026-08-06 reports | Low | 🔴 TODO |
 | H7 | Create GitHub release pages for v4.0.0 / v4.0.1 (+ v0.2.0 sub-modules) | Tags exist and resolve on the proxy, but no release pages (v4.1.0+ and lint/v0.1.0 have them) — recurs in five 2026-08-06 reports | Low | 🔴 TODO |
 | H8 | Include `examples/taskctl` in `check-all` | CI's `go test ./...` runs taskctl but the flake's check-all does not — local-green ≠ CI-green (found in the 2026-09-20 report) | Medium | 🔴 TODO |
+| H9 | Fixture test for lint resolveImports dot/blank arms | `lint/walk.go:240,242` arms have 0 coverage (go tool cover, 2026-11-07) — add a fixture with dot + blank imports | Low | 🔴 TODO |
 
 ---
 

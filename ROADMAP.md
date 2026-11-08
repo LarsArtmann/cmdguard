@@ -269,6 +269,18 @@ Other:
 - **lint/go.mod `go-humanize` require audit** — direct vs indirect classification hygiene
 - **Document taskctl's manual option configuration** — why the flagship wires options by hand instead of helpers
 - **Headless browser in the dev shell** — availability check for HTML-report rendering tests
+- **lint resolveImports fixture test** — dot-import and blank-import arms in `lint/walk.go` are uncovered; add a fixture
+- **taskctl fault-injection tests** — `db --force` and store-failure paths in the flagship example
+- **Prompt-tag coverage test** in taskctl
+- **`pkg/testutil` coverage 80.3% → 90%**
+- **Deprecated-API cmdguard-lint rule** — flag usage of `// Deprecated:` cmdguard APIs
+- **`ExportAuditLog` Writer-based test** — portability vs read-only-dir tempfiles
+- **ContextMiddleware benchmarks directory**
+- **`WithMiddlewareBoth` ergonomics helper** — plain + context middleware in one call
+- **SARIF upload snippet in `lint/README`**
+- **CG008 message mentions batteries** under `WithBatteries`
+- **Lipgloss-styled `Hint:` line**
+- **`--describe` / `--help=json` aliases**
 
 ### Flight Recorder Enhancements
 

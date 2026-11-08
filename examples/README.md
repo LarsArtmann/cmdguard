@@ -17,6 +17,23 @@ go run examples/taskctl/main.go stats --format json
 
 See [examples/taskctl/README.md](taskctl/README.md) for the full feature matrix and usage guide.
 
+## config-explain — Config Provenance Demo
+
+Shows the `config explain` command (`WithConfigExplainCommand()`): resolves every config field to its source (flag → env → config file → default) with `secret:"true"` redaction.
+
+```bash
+go run examples/config-explain/main.go config explain
+go run examples/config-explain/main.go config explain --output json
+```
+
+## docs-generator — GenerateDocs Demo
+
+Minimal CLI exercising `cli.GenerateDocs(w)` — markdown documentation for the full command tree.
+
+```bash
+go run examples/docs-generator/main.go
+```
+
 ## Running Tests
 
 ```bash

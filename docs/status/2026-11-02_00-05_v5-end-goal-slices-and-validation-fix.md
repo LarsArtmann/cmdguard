@@ -90,7 +90,7 @@ a migration note, or v5) before anyone tags it.
 5. Additional v5 candidates: `Get` → `GetService`, `Package` redesign, middleware unification.
 6. `docs/MIGRATION_v4_v5.md` and the rename codemod.
 7. `lint/v0.2.0` release and BuildFlow bump.
-8. Generated `docs/ERROR_REFERENCE.md` (from sentinels + hints).
+8. ~~Generated `docs/ERROR_REFERENCE.md` (from sentinels + hints).~~ done — shipped in the config-truth execution: `GenerateErrorReference()` renders from `sentinelFacts()` with a drift test (CHANGELOG [Unreleased], 2026-11-02; AGENTS.md error-reference section).
 9. Golden fixtures for help/describe/error/exit-code output.
 10. Benchmarks for `Describe`, `AddCommands`, and validation.
 11. `DescribeCommand(path)` subtree output and any `--help` JSON form.
@@ -166,7 +166,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 **Docs**
 
-- Generate `ERROR_REFERENCE.md` from the sentinel table and hints.
+- ~~Generate `ERROR_REFERENCE.md` from the sentinel table and hints.~~ done — shipped (see item 8 above).
 - Bring QUICKSTART, TUTORIAL, and the website to parity with README/skill.
 - Record shipped workstreams in ROADMAP, not just the plan and TODO list.
 
