@@ -7,6 +7,90 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Added
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [5.0.0] - 2026-11-08
+
+The paved-road major: the module path moves to `/v5`, production batteries
+become the defaults, the per-command error ladder is replaced by a Builder,
+and three identifiers get the names they should always have had.
+
+### Changed
+
+- **BREAKING: module path** — `github.com/larsartmann/cmdguard/v4` →
+  `github.com/larsartmann/cmdguard/v5` (package `pkg/cmdguard/v4` →
+  `pkg/cmdguard/v5`). For most consumers this is an import-path edit;
+  `docs/migration_v4_v5/codemod.sh` performs it mechanically.
+- **BREAKING: production batteries are ON by default.** `NewCLI` now enables:
+  strict command validation (every command needs a short description),
+  signal handling with graceful DI shutdown, strict config keys (unknown
+  config-file keys are errors), actionable error hints, and the
+  auto-registered `doctor` command (`version` appears when a CLI version is
+  set). Every flip has an opt-out — `WithoutStrictValidation()`,
+  `WithoutSignalHandling()`, `WithoutGracefulShutdown()`,
+  `WithoutStrictConfigKeys()`, and `WithoutBatteries()` (the master switch).
+  The full matrix is pinned by `cli_defaults_matrix_test.go`.
+- **BREAKING: renames** — `CommandInfo` → `CommandMetadata`,
+  `TypeHandler` → `TypeCodec` (and `TypeHandlerFunc` → `TypeCodecFunc`),
+  `HuhRunner` → `HuhPrompter` (prompts sub-module). `CLI.SetConfig` is
+  removed; `RegisterInScope` is the generic `RegisterInScope[T]`. The
+  codemod rewrites all of these.
+- **Graceful-shutdown semantics.** The automatic DI shutdown fires ONLY when
+  the execution context was cancelled (the SIGINT/SIGTERM path); a normally
+  completing `Execute` never tears down the scope, so repeated
+  `ExecuteWithArgs` on one CLI is safe under the defaults. Explicit teardown
+  is `CLI.Shutdown(ctx)`.
+- **Repeated-Execute invariants.** Every run rebuilds the flow context and
+  derives the command context from the current run (`execCtx`), fixing the
+  cobra stale-subcommand-context shadowing that made every command after the
+  first fail health checks with `context canceled`.
+- `docs/QUICKSTART.md` and `docs/TUTORIAL.md` teach the v5 defaults.
+
+### Added
+
+- **Builder registration** — `NewBuilder[T](cli)` with free functions
+  `Add`/`AddParent`/`Try` and methods `Check`/`Build`: constructor errors are
+  collected, `Build()` attaches atomically or reports the first error.
+  `AddCommand`/`AddCommands` remain for v4-style call sites.
+- **Migration kit** — `docs/MIGRATION_v4_v5.md` (human guide) plus the
+  additive-only codemod script; dry-run verified against erraudit (full
+  suite) and timesheets.
+- `cmdguard-lint` `CurrentMajor` is `v5`: CG002 now flags cmdguard v1–v4
+  imports as stale majors (ships fleet-wide with `lint/v0.3.0`).
+- samber-linter baseline ratchet (`.samber-linter-baseline.json`, 33% floor)
+  wired into `check-all`.
+
+### Fixed
+
+- **Empty config files no longer crash startup.** A zero-byte or
+  whitespace-only config file was parsed as an empty JSON document and failed
+  hard; it is now treated uniformly as "absent" (skipped, like a missing
+  file).
+- **Flightrecorder snapshots survive `Execute` returning.** Async capture now
+  runs on `context.WithoutCancel(ctx)` — under the v5 signal defaults the
+  original context is cancelled at Execute return, which previously raced
+  the in-flight snapshot write.
+- **`doctor` is idempotent across repeated Execute** (stale cached flow
+  context from run 1 leaked its cancelled NotifyContext into later runs).
+- `.golangci.yml`: dead `pkg/cmdguard/v2` exclusions removed, duplicate
+  `example_test.go` forbidigo entry removed, `TODO(v5)` godox exclusion
+  removed (all five markers resolved by the renames above).
+
+---
+
+## [Backfill] - notes never sectioned before v5 (pending owner §g2)
+
+The entries below landed across v4.1.0–v4.2.x but were never given a
+release section. They are preserved verbatim until the owner decides
+whether to fold them into the historical sections (see §g of
+`docs/status/2026-11-08_08-32_whole-run-audit-and-next-50.md`).
+
 ### Changed
 
 - **BREAKING (retrospective entry — the change landed in v4.1.0 without a
@@ -35,7 +119,7 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   sentinel table is rendered from the same canonical fact table via
   `GenerateErrorReference()`; a test fails when the committed doc stops
   matching the code. Regenerate with
-  `go test ./pkg/cmdguard/v4 -run TestErrorReferenceDoc -update-golden`.
+  `go test ./pkg/cmdguard/v5 -run TestErrorReferenceDoc -update-golden`.
 - **Strict config keys, opt in (`WithStrictConfigKeys()`).** Unknown keys in a
   config file are now an error instead of a silent no-op, with the offending
   dotted key, the loaded file path, and a "did you mean" suggestion for likely
@@ -180,6 +264,7 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   - DONE 2026-10-09: the blocker was stale — toolsdk v1.14.0 HAS the options surface. `lint.FilterByIDs` extracted (CLI + provider share semantics); provider declares `enable`/`disable` string options read via `OptionsFromContext`; ValidateOptions contract tested. Needs `lint/v0.2.0` release + BuildFlow `go get` bump to reach the fleet — release on user approval. L5 — DONE 2026-10-09: the blocker was stale — toolsdk v1.14.0 HAS the options surface. `lint.FilterByIDs` extracted (CLI + provider share semantics); provider declares `enable`/`disable` string options read via `OptionsFromContext`; ValidateOptions contract tested. Needs `lint/v0.2.0` release + BuildFlow `go get` bump to reach the fleet — release on user approval.
   - DONE 2026-10-09: `RuleTableMarkdown()` + `rules --markdown` CLI flag + `rules_table_test.go` byte-exact drift guard over the marker-bracketed README section (mutation-verified: edit→FAIL, regenerate→PASS). "Adding a rule" now lists the regenerate step. L7 — DONE 2026-10-09: `RuleTableMarkdown()` + `rules --markdown` CLI flag + `rules_table_test.go` byte-exact drift guard over the marker-bracketed README section (mutation-verified: edit→FAIL, regenerate→PASS). "Adding a rule" now lists the regenerate step.
   - DONE 2026-10-09: all 25 lifetime alerts (incl. the 16 reported 2026-10-04) show state=fixed on GitHub — 22 auto-resolved 2026-10-04 21:07–21:10 UTC by the dependency bumps pushed that day, 3 earlier, 0 dismissed, 0 open (`gh api .../dependabot/alerts` + `pnpm audit` verified). Residual `postcss-selector-parser <7.1.6` (GHSA-rj75-hqrm-r3gf, moderate, via starlight→expressive-code→postcss-nested) fixed by `postcss-nested: ^8.0.1` override in `website/pnpm-workspace.yaml`; `pnpm audit` clean, `astro build` green (22 pages). S1 — DONE 2026-10-09: all 25 lifetime alerts (incl. the 16 reported 2026-10-04) show state=fixed on GitHub — 22 auto-resolved 2026-10-04 21:07–21:10 UTC by the dependency bumps pushed that day, 3 earlier, 0 dismissed, 0 open (`gh api .../dependabot/alerts` + `pnpm audit` verified). Residual `postcss-selector-parser <7.1.6` (GHSA-rj75-hqrm-r3gf, moderate, via starlight→expressive-code→postcss-nested) fixed by `postcss-nested: ^8.0.1` override in `website/pnpm-workspace.yaml`; `pnpm audit` clean, `astro build` green (22 pages).
+
 ## [lint/v0.2.1] - 2026-11-08
 
 Patch release of the `lint` sub-module: rules now see through generic

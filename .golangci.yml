@@ -304,9 +304,6 @@ linters:
       - path: flightrecorder/.*_test\.go$
         linters:
           - paralleltest
-      - path: pkg/cmdguard/v5/example_test.go$
-        linters:
-          - forbidigo
       - path: pkg/cmdguard/
         linters:
           - exhaustruct_v5
