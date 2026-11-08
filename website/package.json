@@ -37,14 +37,14 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
-    "@astrojs/starlight": "^0.42.8",
-    "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.4.5",
-    "tailwindcss": "^4.3.3"
+    "@astrojs/starlight": "^0.42.10",
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "^7.4.7",
+    "tailwindcss": "^4.3.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
-    "html-validate": "^11.18.0",
+    "html-validate": "^11.19.0",
     "typescript": "^7.0.2"
   },
   "overrides": {

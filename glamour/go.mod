@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	charm.land/glamour/v2 v2.0.1
-	github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/v5 v5.0.0
 	github.com/spf13/cobra v1.10.2
 )
 

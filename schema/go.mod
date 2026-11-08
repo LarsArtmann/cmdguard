@@ -2,7 +2,7 @@ module github.com/larsartmann/cmdguard/schema
 
 go 1.27
 
-require github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
+require github.com/larsartmann/cmdguard/v5 v5.0.0
 
 require (
 	charm.land/fang/v2 v2.0.1 // indirect
