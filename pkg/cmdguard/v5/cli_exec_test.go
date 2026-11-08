@@ -41,7 +41,7 @@ func TestCLI_Execute(t *testing.T) {
 		}
 
 		cmd := Command[testAppConfig, NoFlags]{
-			spec: commandSpec{use: "greet"},
+			spec: commandSpec{use: "greet", short: "greet the user"},
 			runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 				executed = true
 
@@ -93,7 +93,7 @@ func TestCLI_Execute(t *testing.T) {
 		}
 
 		cmd := Command[testAppConfig, *greetFlags]{
-			spec:  commandSpec{use: "greet"},
+			spec:  commandSpec{use: "greet", short: "greet the user"},
 			flags: &greetFlags{},
 			runE: func(_ context.Context, _ *testAppConfig, flags *greetFlags) error {
 				receivedName = flags.Name

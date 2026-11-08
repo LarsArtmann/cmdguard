@@ -62,7 +62,7 @@ func newTestCmd(use string, err ...error) Command[testAppConfig, NoFlags] {
 	}
 
 	return Command[testAppConfig, NoFlags]{
-		spec: commandSpec{use: use},
+		spec: commandSpec{use: use, short: "run the " + use + " command"},
 		runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			return runErr
 		},

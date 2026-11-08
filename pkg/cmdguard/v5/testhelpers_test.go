@@ -12,7 +12,9 @@ import (
 func newTestCLICommand[C any](t *testing.T, use string) v5.Command[C, v5.NoFlags] {
 	t.Helper()
 
-	cmd, err := v5.NewCommand(use, v5.NoFlags{}, noOpRunE[C])
+	cmd, err := v5.NewCommand(use, v5.NoFlags{}, noOpRunE[C],
+		v5.WithShort("run the "+use+" command"),
+	)
 	if err != nil {
 		t.Fatal(err)
 	}

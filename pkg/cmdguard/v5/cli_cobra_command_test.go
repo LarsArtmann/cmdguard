@@ -16,7 +16,7 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 	var executedCmd string
 
 	leafCmd := Command[testAppConfig, NoFlags]{
-		spec: commandSpec{use: "leaf"},
+		spec: commandSpec{use: "leaf", short: "leaf command"},
 		runE: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 			executedCmd = "leaf"
 
@@ -25,12 +25,12 @@ func TestCLIToCobraCommand_DeeplyNested(t *testing.T) {
 	}
 
 	middleCmd := Command[testAppConfig, NoFlags]{
-		spec:     commandSpec{use: "middle", long: "Middle level command"},
+		spec:     commandSpec{use: "middle", short: "middle command", long: "Middle level command"},
 		commands: []Command[testAppConfig, NoFlags]{leafCmd},
 	}
 
 	topCmd := Command[testAppConfig, NoFlags]{
-		spec:     commandSpec{use: "top", long: "Top level command"},
+		spec:     commandSpec{use: "top", short: "top command", long: "Top level command"},
 		commands: []Command[testAppConfig, NoFlags]{middleCmd},
 	}
 
@@ -124,7 +124,7 @@ func TestCLIToCobraCommand_NilContextFallsBack(t *testing.T) {
 	}
 
 	cmd := Command[testAppConfig, NoFlags]{
-		spec: commandSpec{use: "ctxcheck"},
+		spec: commandSpec{use: "ctxcheck", short: "context check command"},
 		runE: func(ctx context.Context, _ *testAppConfig, _ NoFlags) error {
 			gotCtx = ctx
 
@@ -158,7 +158,7 @@ func TestCLIToCobraCommand_SubcommandError(t *testing.T) {
 	}
 
 	parent := Command[testAppConfig, NoFlags]{
-		spec:     commandSpec{use: "parent", long: "Parent command with invalid child"},
+		spec:     commandSpec{use: "parent", short: "parent command", long: "Parent command with invalid child"},
 		commands: []Command[testAppConfig, NoFlags]{invalidChild},
 	}
 

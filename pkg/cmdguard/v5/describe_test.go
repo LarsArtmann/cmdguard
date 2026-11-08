@@ -220,9 +220,15 @@ func TestDescribeCommand_OptOut(t *testing.T) {
 
 	cli.RootCommand().SetOut(&bytes.Buffer{})
 
-	// "describe" is not a registered command, so cobra treats it as an
-	// argument to the root (which prints help) rather than dispatching it.
-	testutil.AssertNoError(t, cli.ExecuteWithArgs(context.Background(), []string{"describe"}))
+	// "describe" is not registered, so dispatch fails. With batteries on, the
+	// root carries auto-registered commands (version/doctor), so cobra
+	// rejects the unknown name instead of treating it as a root argument.
+	err := cli.ExecuteWithArgs(context.Background(), []string{"describe"})
+	testutil.AssertExpectedError(t, err)
+
+	if !strings.Contains(err.Error(), `unknown command "describe"`) {
+		t.Errorf("error should report unknown command, got: %v", err)
+	}
 
 	for _, cmd := range cli.RootCommand().Commands() {
 		if cmd.Name() == describeCommandName {

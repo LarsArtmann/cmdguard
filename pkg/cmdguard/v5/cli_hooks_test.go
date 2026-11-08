@@ -90,6 +90,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 		cmd := Command[testAppConfig, NoFlags]{
 			spec: commandSpec{
 				use: "test",
+				short: "run the test command",
 				preRunE: &typedHook[testAppConfig, NoFlags]{
 					fn: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {
 						return errTest
@@ -168,6 +169,7 @@ func TestCLI_CommandOptions(t *testing.T) {
 			cmd := Command[testAppConfig, NoFlags]{
 				spec: commandSpec{
 					use:        tt.use,
+					short:      "table test command",
 					hidden:     tt.hidden,
 					deprecated: tt.deprecated,
 					aliases:    tt.aliases,
