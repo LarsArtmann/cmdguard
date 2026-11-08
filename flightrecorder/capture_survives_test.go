@@ -40,7 +40,7 @@ func TestMiddleware_ErrorCaptureSurvivesExecuteReturn(t *testing.T) {
 
 	b := v5.NewBuilder(cli)
 	v5.Add(b, "boom", v5.NoFlags{}, func(ctx context.Context, cfgPtr *struct{}, flags v5.NoFlags) error {
-		return errBoom{}
+		return boomError{}
 	}, v5.WithShort("Boom"))
 	if err := b.Build(); err != nil {
 		t.Fatalf("Build: %v", err)
@@ -72,9 +72,9 @@ func TestMiddleware_ErrorCaptureSurvivesExecuteReturn(t *testing.T) {
 		time.Sleep(20 * time.Millisecond)
 	}
 
-	t.Fatal("no .trace snapshot captured after an erroring run on a cancelled context — post-hoc capture did not survive Execute return")
+	t.Fatal("no .trace snapshot after erroring run on cancelled context: capture did not survive Execute return")
 }
 
-type errBoom struct{}
+type boomError struct{}
 
-func (errBoom) Error() string { return "boom" }
+func (boomError) Error() string { return "boom" }
