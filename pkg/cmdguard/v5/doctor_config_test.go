@@ -16,19 +16,27 @@ func newDoctorCLI(
 ) *CLI[strictFixtureConfig] {
 	t.Helper()
 
-	cliOpts := []CLIOption{WithFang(false)}
-	if configPath != "" {
-		cliOpts = append(cliOpts, WithConfigFile(configPath))
-	}
-
-	cli, err := NewCLI("app", "app", strictFixtureConfig{}, cliOpts...)
+	cli, err := NewCLI("app", "app", strictFixtureConfig{}, newDoctorCLIOpts(t, configPath)...)
 	testutil.AssertNoError(t, err)
-
 	doctor, err := DoctorCommand(cli, opts...)
 	testutil.AssertNoError(t, err)
 	testutil.AssertNoError(t, AddCommand(cli, doctor))
 
 	return cli
+}
+
+// newDoctorCLIOpts builds the CLI options for doctor tests: no fang, the given
+// config file, and lenient config keys so a bad key still reaches doctor
+// (strict-key startup failure is covered by its own tests).
+func newDoctorCLIOpts(t *testing.T, configPath string) []CLIOption {
+	t.Helper()
+
+	cliOpts := []CLIOption{WithFang(false), WithoutStrictConfigKeys()}
+	if configPath != "" {
+		cliOpts = append(cliOpts, WithConfigFile(configPath))
+	}
+
+	return cliOpts
 }
 
 // runDoctor executes the doctor command and returns its output and error.
@@ -77,8 +85,9 @@ func TestDoctor_UnknownConfigKeyFailsTheKeysCheck(t *testing.T) {
 
 	path := writeConfigFile(t, "config.yaml", "log-leve1: debug\n")
 
-	// Tolerant mode at startup: the typo is ignored, which is exactly the
-	// situation doctor has to surface.
+	// Tolerant mode at startup (WithoutStrictConfigKeys in the helper opts
+	// out of the v5 strict-key default): the typo is ignored, which is
+	// exactly the situation doctor has to surface.
 	cli := newDoctorCLI(t, path)
 
 	out, err := runDoctor(t, cli)

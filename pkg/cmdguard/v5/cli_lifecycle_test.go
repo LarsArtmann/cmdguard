@@ -397,7 +397,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig](t, "run")
+		cmd := newTestCLICommandWithShort[testCLIConfig](t, "run", "run the test command")
 		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"--no-color", "run"})
@@ -420,7 +420,7 @@ func TestCLINoColorRestoresEnvVar(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		cmd := newTestCLICommand[testCLIConfig](t, "run")
+		cmd := newTestCLICommandWithShort[testCLIConfig](t, "run", "run the test command")
 		addCommand(t, cli, cmd)
 
 		err = cli.ExecuteWithArgs(t.Context(), []string{"--no-color", "run"})
