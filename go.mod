@@ -2,6 +2,8 @@ module github.com/larsartmann/cmdguard/v5
 
 go 1.27
 
+toolchain go1.27.3
+
 require (
 	charm.land/glamour/v2 v2.0.1 // indirect
 	github.com/a-h/templ v0.3.1100 // indirect

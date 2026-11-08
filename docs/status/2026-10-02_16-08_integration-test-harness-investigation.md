@@ -6,6 +6,14 @@
 **Repo state at start:** `master`, clean (`git status --short` empty).
 **Author:** Crush (this session).
 
+> <!-- fresh:skip --> **2026-11-08 resolution note:** this research predates
+> v5. Under v5 the recommended integration-test harness IS the shipped API:
+> `ExecuteWithArgs` with per-run state reset (flag state + config snapshot),
+> the `describe` contract for assertions, and `WithoutSignalHandling()` +
+> `WithoutBatteries()` for deterministic fixtures. The harness-shaped helper
+> ideas here remain ROADMAP candidates; nothing in this report is an open
+> TODO.
+
 > **Format override:** This report is Markdown at the user's explicit request (skill canonical format is styled HTML). Flagged per the `status-report` skill contract; the override does not change the skill default.
 
 ---
