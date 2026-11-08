@@ -70,7 +70,7 @@ func TestEndGoal_MinimalSuperbCLI(t *testing.T) {
 
 	out.Reset()
 	testutil.AssertNoError(t, cli.ExecuteWithArgs(context.Background(), []string{"doctor"}))
-	assertStringContains(t, out.String(), "0 passed, 0 failed")
+	assertStringContains(t, out.String(), "2 passed, 0 failed")
 
 	// Missing root required flag fails with a hint.
 	errOut.Reset()

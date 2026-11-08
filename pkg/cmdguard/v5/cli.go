@@ -132,6 +132,11 @@ type CLI[T any] struct {
 	noColorFlag    *bool
 	cleanupWired   bool
 	describeWired  bool
+	// execCtx holds the context of the CURRENT Execute call. Cobra subcommand
+	// contexts persist across executions (PersistentPreRunE's SetContext
+	// shadows the root ctx), so every run must derive from this, not from
+	// a stale per-command ctx.
+	execCtx context.Context
 	// configExplainWired guards idempotent registration of the config command.
 	configExplainWired bool
 	// configSetFields holds the struct field names the config file supplied.
@@ -337,7 +342,12 @@ func (cli *CLI[T]) setupPersistentPreRun() {
 			}
 		}
 
-		c.SetContext(context.WithValue(c.Context(), configKey, cli.config))
+		base := c.Context()
+		if cli.execCtx != nil {
+			base = cli.execCtx
+		}
+
+		c.SetContext(context.WithValue(base, configKey, cli.config))
 
 		if cv, ok := s.configValidate.(*typedConfigValidator[T]); ok && cv != nil {
 			err := cv.fn(cli.config)
@@ -672,6 +682,7 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 
 	// Make flow context available to commands via context
 	flowCtx := WithBranchingFlowContext(ctx, cli.flowCtx)
+	cli.execCtx = flowCtx
 
 	if cli.rootCmd.Long == "" && cli.spec.long != "" {
 		cli.rootCmd.Long = cli.spec.long

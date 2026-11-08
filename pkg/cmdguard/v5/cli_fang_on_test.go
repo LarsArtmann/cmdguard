@@ -122,7 +122,7 @@ func TestExecuteFangOn_BatteriesVersionAndDoctorRun(t *testing.T) {
 		err = cli.ExecuteWithArgs(context.Background(), []string{"doctor"})
 	})
 	testutil.AssertNoError(t, err)
-	assertStringContains(t, stdout, "0 passed, 0 failed")
+	assertStringContains(t, stdout, "2 passed, 0 failed")
 }
 
 func TestExecuteFangOn_WithoutErrorHintsSuppressesHintLine(t *testing.T) {
