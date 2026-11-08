@@ -120,18 +120,14 @@ func TestBuilder_ConcurrentAdds_AreRaceFree(t *testing.T) {
 	var wg sync.WaitGroup
 
 	for range goroutines {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
+		wg.Go(func() {
 			for range perGoroutine {
 				Add(b, "cmd", NoFlags{}, func(ctx context.Context, cfg *struct{}, flags NoFlags) error {
 					return nil
 				}, WithShort("Racing"))
 				b.Check(nil)
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -166,17 +162,13 @@ func TestBuilder_ConcurrentAdds_UniqueNames_AllAttach(t *testing.T) {
 	var counter atomic.Int32
 
 	for range n {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
+		wg.Go(func() {
 			name := fmt.Sprintf("cmd-%d", counter.Add(1))
 
 			Add(b, name, NoFlags{}, func(ctx context.Context, cfg *struct{}, flags NoFlags) error {
 				return nil
 			}, WithShort("Unique"))
-		}()
+		})
 	}
 
 	wg.Wait()
