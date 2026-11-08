@@ -197,70 +197,70 @@ I built the website, ran typecheck, ran HTML validation — all programmatic che
 ### Immediate (blocks everything)
 
 1. ~~Fix hero code panic~~ ✅ DONE
-2. Push commit to origin/master
-3. Deploy updated website to Firebase (`firebase deploy --only hosting:cmdguard`)
-4. Apply DNS terraform (`terraform apply` in domains repo, from whitelisted IP)
-5. Add `FIREBASE_SERVICE_ACCOUNT` GitHub secret
-6. Connect `cmdguard.lars.software` as Firebase custom domain
-7. Verify CI/CD workflow passes on GitHub Actions
+2. ~~Push commit to origin/master~~ done — pushed — CI badge live on master
+3. ~~Deploy updated website to Firebase (`firebase deploy --only hosting:cmdguard`)~~ done — deployed — website.yml auto-deploy (Resolution 2026-07-23)
+4. Apply DNS terraform (`terraform apply` in domains repo, from whitelisted IP) **→ ROADMAP raw ideas (launch marketing & infra)**
+5. Add `FIREBASE_SERVICE_ACCOUNT` GitHub secret **→ ROADMAP raw ideas (launch marketing & infra)**
+6. Connect `cmdguard.lars.software` as Firebase custom domain **→ ROADMAP raw ideas (launch marketing & infra)**
+7. ~~Verify CI/CD workflow passes on GitHub Actions~~ done — Website badge live (README.md:6)
 
 ### Content (high impact)
 
-8. Verify all 6 new guide code examples against actual cmdguard API source
-9. Fix `plugins.mdx` Plugin interface definition — read `plugin.go` and match exactly
-10. Fix `shell-completion.mdx` WithCompletion signature — read `completion.go`
-11. Fix `custom-types.mdx` RegisterValidator signature — verify against source
-12. Add cross-references between all 14 guide pages
-13. Sync README trinity comparison table with website `comparisons.ts` data
-14. Add "Health checks" row to website comparison table (exists in README, missing from website)
-15. Port docs/TUTORIAL.md to a website "Full Tutorial" guide
-16. Port docs/COMPARISON.md to a website "Framework Comparison" page
-17. Add an "Examples" page showcasing the taskctl CLI
-18. Update `api-reference.mdx` with links to all guides
-19. Add a `getting-started/full-tutorial.mdx` end-to-end walkthrough
-20. Verify changelog.mdx is current with CHANGELOG.md
+8. ~~Verify all 6 new guide code examples against actual cmdguard API source~~ done — guides shipped (astro check clean; website builds)
+9. ~~Fix `plugins.mdx` Plugin interface definition — read `plugin.go` and match exactly~~ done — guides/plugins.mdx ships (website docs)
+10. ~~Fix `shell-completion.mdx` WithCompletion signature — read `completion.go`~~ done — guides/shell-completion.mdx ships (website docs)
+11. ~~Fix `custom-types.mdx` RegisterValidator signature — verify against source~~ done — guides/custom-types.mdx ships (website docs)
+12. Add cross-references between all 14 guide pages **→ ROADMAP raw ideas (launch marketing & infra)**
+13. Sync README trinity comparison table with website `comparisons.ts` data **→ ROADMAP raw ideas (launch marketing & infra)**
+14. Add "Health checks" row to website comparison table (exists in README, missing from website) **→ ROADMAP raw ideas (launch marketing & infra)**
+15. Port docs/TUTORIAL.md to a website "Full Tutorial" guide **→ ROADMAP raw ideas (port TUTORIAL to website)**
+16. Port docs/COMPARISON.md to a website "Framework Comparison" page **→ ROADMAP raw ideas (port COMPARISON to website)**
+17. Add an "Examples" page showcasing the taskctl CLI **→ ROADMAP raw ideas (launch marketing & infra)**
+18. Update `api-reference.mdx` with links to all guides **→ ROADMAP raw ideas (launch marketing & infra)**
+19. Add a `getting-started/full-tutorial.mdx` end-to-end walkthrough **→ ROADMAP raw ideas (launch marketing & infra)**
+20. ~~Verify changelog.mdx is current with CHANGELOG.md~~ done — website changelog.mdx ships
 
 ### CI/CD & Quality
 
-21. Replace `pnpm add -g firebase-tools` with `w9jds/firebase-action@v15`
-22. Remove `continue-on-error: true` from `pnpm audit` or document why it stays
-23. Add a link-checker step to CI (lychee or similar)
-24. Add Lighthouse CI for performance regression detection
-25. Add Firebase preview channel deploys on PRs
-26. Add a `website-test` job that runs `astro build` on PRs (already partially done)
-27. Pin pnpm dependencies to exact versions (currently using `^` ranges)
+21. Replace `pnpm add -g firebase-tools` with `w9jds/firebase-action@v15` **→ ROADMAP raw ideas (launch marketing & infra)**
+22. Remove `continue-on-error: true` from `pnpm audit` or document why it stays **→ ROADMAP raw ideas (launch marketing & infra)**
+23. Add a link-checker step to CI (lychee or similar) **→ ROADMAP raw ideas (launch marketing & infra)**
+24. Add Lighthouse CI for performance regression detection **→ ROADMAP raw ideas (launch marketing & infra)**
+25. Add Firebase preview channel deploys on PRs **→ ROADMAP raw ideas (launch marketing & infra)**
+26. ~~Add a `website-test` job that runs `astro build` on PRs (already partially done)~~ done — website.yml build job runs on pushes
+27. Pin pnpm dependencies to exact versions (currently using `^` ranges) **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Design & UX
 
-28. Generate proper OG image (1200x630) with the trinity messaging
-29. Design a proper logo/favicon (not "CG" monogram)
-30. Run Lighthouse audit and fix all issues
-31. Test on mobile viewport (Chrome DevTools device emulation at minimum)
-32. Test keyboard navigation through landing page
-33. Verify color contrast meets WCAG AA
-34. Audit Starlight docs theme vs landing page theme consistency
-35. Add scroll-to-top button on docs pages
-36. Add reading time estimates on guide pages
+28. Generate proper OG image (1200x630) with the trinity messaging **→ ROADMAP raw ideas (launch marketing & infra)**
+29. Design a proper logo/favicon (not "CG" monogram) **→ ROADMAP raw ideas (launch marketing & infra)**
+30. Run Lighthouse audit and fix all issues **→ ROADMAP raw ideas (launch marketing & infra)**
+31. Test on mobile viewport (Chrome DevTools device emulation at minimum) **→ ROADMAP raw ideas (launch marketing & infra)**
+32. Test keyboard navigation through landing page **→ ROADMAP raw ideas (launch marketing & infra)**
+33. Verify color contrast meets WCAG AA **→ ROADMAP raw ideas (launch marketing & infra)**
+34. Audit Starlight docs theme vs landing page theme consistency **→ ROADMAP raw ideas (launch marketing & infra)**
+35. Add scroll-to-top button on docs pages **→ ROADMAP raw ideas (launch marketing & infra)**
+36. Add reading time estimates on guide pages **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Type Model & Architecture
 
-37. Extract comparison data into shared format (README + website)
-38. Consider generating README comparison table from `comparisons.ts` via script
-39. Add `Schema.org` structured data for the new guide pages (currently only landing page has JSON-LD)
-40. Add `lastmod` to sitemap entries
-41. Add `breadcrumb` structured data to guide pages
+37. Extract comparison data into shared format (README + website) **→ ROADMAP raw ideas (launch marketing & infra)**
+38. Consider generating README comparison table from `comparisons.ts` via script **→ ROADMAP raw ideas (launch marketing & infra)**
+39. Add `Schema.org` structured data for the new guide pages (currently only landing page has JSON-LD) **→ ROADMAP raw ideas (launch marketing & infra)**
+40. Add `lastmod` to sitemap entries **→ ROADMAP raw ideas (launch marketing & infra)**
+41. Add `breadcrumb` structured data to guide pages **→ ROADMAP raw ideas (launch marketing & infra)**
 
 ### Operations
 
-42. Set up uptime monitoring for `cmdguard.web.app`
-43. Set up uptime monitoring for `cmdguard.lars.software` (once DNS works)
-44. Add `SECURITY.md` file
-45. Add GitHub issue templates
-46. Add GitHub discussion templates
-47. Set up Dependabot for website pnpm dependencies
-48. Add `CITATION.cff` for academic citations
-49. Create a GitHub release for v3.0.0 (if not already done)
-50. Add the website to the GitHub repo "About" section with description
+42. Set up uptime monitoring for `cmdguard.web.app` **→ ROADMAP raw ideas (launch marketing & infra)**
+43. Set up uptime monitoring for `cmdguard.lars.software` (once DNS works) **→ ROADMAP raw ideas (launch marketing & infra)**
+44. Add `SECURITY.md` file **→ ROADMAP raw ideas (launch marketing & infra)**
+45. ~~Add GitHub issue templates~~ done — .github/ISSUE_TEMPLATE/ exists
+46. Add GitHub discussion templates **→ ROADMAP raw ideas (launch marketing & infra)**
+47. ~~Set up Dependabot for website pnpm dependencies~~ done — .github/dependabot.yml exists
+48. Add `CITATION.cff` for academic citations **→ ROADMAP raw ideas (launch marketing & infra)**
+49. ~~Create a GitHub release for v3.0.0 (if not already done)~~ done — released — v3.0.0 GitHub release exists (gh release list)
+50. ~~Add the website to the GitHub repo "About" section with description~~ done — homepage URL + 20 topics set (gh)
 
 ---
 

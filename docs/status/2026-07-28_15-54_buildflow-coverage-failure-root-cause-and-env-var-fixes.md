@@ -189,56 +189,56 @@ I spent significant time (agent search, 15+ shuffle runs, race detection runs, r
 
 | #  | Task                                                                                                  | Priority  | Effort |
 | -- | ----------------------------------------------------------------------------------------------------- | --------- | ------ |
-| ~~1~~ **Won't implement — local untracked binaries — machine state.** | ~~Add `GOTMPDIR` to `.github/workflows/ci.yml` `env:` block~~ | ~~🔴 High~~ | ~~5m~~ |
-| ~~2~~ **Won't implement — machine-local preference.** | ~~Delete stale `cmdguard.test`, `configload.test`, `taskctl` from repo root~~ | ~~🔴 High~~ | ~~1m~~ |
-| ~~3~~ **Won't implement — machine-local preference — local /tmp hygiene.** | ~~Set `GOTMPDIR` globally (shell profile or `~/.config/environment.d/go.conf`)~~ | ~~🟡 Medium~~ | ~~5m~~ |
-| ~~4~~ **Won't implement — machine-local — cache already on disk (~/.cache).** | ~~Add systemd timer or cron job to clean stale `/tmp/go-build*` weekly~~ | ~~🟡 Medium~~ | ~~15m~~ |
-| ~~5~~ **Won't implement — not adopted.** | ~~Consider `go env -w GOCACHE=/path/on/disk` to move cache off tmpfs~~ | ~~🟡 Medium~~ | ~~5m~~ |
-| ~~6~~ **Won't implement — not adopted — no just/Makefile target layer.** | ~~Add `GOMAXPROCS` / resource limits to CI to prevent parallel `/tmp` explosion~~ | ~~🟢 Low~~ | ~~10m~~ |
-| ~~7~~ **Won't implement — not added — the gotcha lives in this status report.** | ~~Add a `just`/nix check for `/tmp` free space before running tests~~ | ~~🟢 Low~~ | ~~10m~~ |
-| ~~8~~ **Won't implement — cosmetic docs point.** | ~~Document the `/tmp` tmpfs constraint in AGENTS.md gotchas section~~ | ~~🟡 Medium~~ | ~~5m~~ |
-| ~~9~~ **Won't implement — not adopted — integration tests stay coverage-free; core coverage 90.4% from unit tests.** | ~~Add `GOTMPDIR` to the `devShells.ci` shellHook documentation~~ | ~~🟢 Low~~ | ~~2m~~ |
-| ~~10~~ **Won't implement — not adopted — same.** | ~~Investigate why `tests/integration` has `[no statements]` coverage~~ | ~~🟡 Medium~~ | ~~30m~~ |
-| ~~11~~ done — CI runs Go 1.27 (ci.yml:16) | ~~Add integration test coverage instrumentation (`-coverpkg=./...`)~~ | ~~🟡 Medium~~ | ~~15m~~ |
-| ~~12~~ done — toolchain on Go 1.27; the stdversion class is gone | ~~Consider Go 1.27 migration (json/v2 becomes default, removes GOEXPERIMENT flag)~~ | ~~🟢 Low~~ | ~~2h~~ |
-| ~~13~~ done — deliberate nil-context test with staticcheck nolint (coverage_improvement_test.go:78) | ~~Review the 26 gopls `stdversion` warnings (json/v2 APIs requiring go1.27)~~ | ~~🟡 Medium~~ | ~~30m~~ |
-| ~~14~~ **Won't implement — kept — test helpers retained; unusedfunc is advisory in test files.** | ~~Fix `gopls SA1012` warning in `coverage_improvement_test.go:78` (nil context)~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~15~~ **Won't implement — buildflow feature request — tooling outside this repo tree.** | ~~Remove unused functions flagged by gopls (`assertNotPanic`, `recordHandlerCall`)~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~16~~ **Won't implement — not adopted.** | ~~Add `go env GOCACHE` size to `buildflow doctor` output (feature request?)~~ | ~~🟢 Low~~ | ~~—~~ |
-| ~~17~~ **Won't implement — buildflow feature request.** | ~~Consider `GOGC` tuning for CI to reduce memory pressure~~ | ~~🟢 Low~~ | ~~10m~~ |
-| ~~18~~ done — LookupEnv is the established non-test pattern (flags_parse.go:58, cli.go:542, config_explain.go:175, flags.go:312) | ~~Add `/tmp` space check to BuildFlow pre-flight (feature request?)~~ | ~~🟡 Medium~~ | ~~—~~ |
-| ~~19~~ done — cli_lifecycle_test.go:386-407 covers the explicit-empty restore via LookupEnv assertions | ~~Audit all other `os.Getenv` calls for the same LookupEnv bug pattern~~ | ~~🔴 High~~ | ~~15m~~ |
-| ~~20~~ **Won't implement — cosmetic test-parallelism nit.** | ~~Add unit test for `applyNoColorIfSet` when `NO_COLOR=""` explicitly~~ | ~~🟡 Medium~~ | ~~10m~~ |
+| ~~1~~ **Won't implement — CI runners are ephemeral — no stale-dir accumulation.** | ~~Add `GOTMPDIR` to `.github/workflows/ci.yml` `env:` block~~ | ~~🔴 High~~ | ~~5m~~ |
+| ~~2~~ **Won't implement — local untracked binaries — machine state.** | ~~Delete stale `cmdguard.test`, `configload.test`, `taskctl` from repo root~~ | ~~🔴 High~~ | ~~1m~~ |
+| ~~3~~ **Won't implement — machine-local preference.** | ~~Set `GOTMPDIR` globally (shell profile or `~/.config/environment.d/go.conf`)~~ | ~~🟡 Medium~~ | ~~5m~~ |
+| ~~4~~ **Won't implement — machine-local preference — local /tmp hygiene.** | ~~Add systemd timer or cron job to clean stale `/tmp/go-build*` weekly~~ | ~~🟡 Medium~~ | ~~15m~~ |
+| ~~5~~ **Won't implement — machine-local — cache already on disk (~/.cache).** | ~~Consider `go env -w GOCACHE=/path/on/disk` to move cache off tmpfs~~ | ~~🟡 Medium~~ | ~~5m~~ |
+| ~~6~~ **Won't implement — not adopted.** | ~~Add `GOMAXPROCS` / resource limits to CI to prevent parallel `/tmp` explosion~~ | ~~🟢 Low~~ | ~~10m~~ |
+| ~~7~~ **Won't implement — not adopted — no just/Makefile target layer.** | ~~Add a `just`/nix check for `/tmp` free space before running tests~~ | ~~🟢 Low~~ | ~~10m~~ |
+| ~~8~~ **Won't implement — not added — the gotcha lives in this status report.** | ~~Document the `/tmp` tmpfs constraint in AGENTS.md gotchas section~~ | ~~🟡 Medium~~ | ~~5m~~ |
+| ~~9~~ **Won't implement — cosmetic docs point.** | ~~Add `GOTMPDIR` to the `devShells.ci` shellHook documentation~~ | ~~🟢 Low~~ | ~~2m~~ |
+| ~~10~~ **Won't implement — not adopted — integration tests stay coverage-free; core coverage 90.4% from unit tests.** | ~~Investigate why `tests/integration` has `[no statements]` coverage~~ | ~~🟡 Medium~~ | ~~30m~~ |
+| ~~11~~ **Won't implement — not adopted — same.** | ~~15m~~ |
+| ~~12~~ done — CI runs Go 1.27 (ci.yml:16) | ~~2h~~ |
+| ~~13~~ done — toolchain on Go 1.27; the stdversion class is gone | ~~30m~~ |
+| ~~14~~ done — deliberate nil-context test with staticcheck nolint (coverage_improvement_test.go:78) | ~~Fix `gopls SA1012` warning in `coverage_improvement_test.go:78` (nil context)~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~15~~ **Won't implement — kept — test helpers retained; unusedfunc is advisory in test files.** | ~~Remove unused functions flagged by gopls (`assertNotPanic`, `recordHandlerCall`)~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~16~~ **Won't implement — buildflow feature request — tooling outside this repo tree.** | ~~Add `go env GOCACHE` size to `buildflow doctor` output (feature request?)~~ | ~~🟢 Low~~ | ~~—~~ |
+| ~~17~~ **Won't implement — not adopted.** | ~~Consider `GOGC` tuning for CI to reduce memory pressure~~ | ~~🟢 Low~~ | ~~10m~~ |
+| ~~18~~ **Won't implement — buildflow feature request.** | ~~—~~ |
+| ~~19~~ done — LookupEnv is the established non-test pattern (flags_parse.go:58, cli.go:542, config_explain.go:175, flags.go:312) | ~~15m~~ |
+| ~~20~~ done — cli_lifecycle_test.go:386-407 covers the explicit-empty restore via LookupEnv assertions | ~~Add unit test for `applyNoColorIfSet` when `NO_COLOR=""` explicitly~~ | ~~🟡 Medium~~ | ~~10m~~ |
 | ~~21~~ **Won't implement — cosmetic test-parallelism nit.** | ~~Consider adding `t.Parallel()` back to `TestCLINoColorRestoresEnvVar` (now safe with t.Setenv)~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~22~~ **Won't implement — CI runners are ephemeral.** | ~~Review `cli_lifecycle_test.go:366` `TestCLINoColorEnvVar` — uses t.Setenv but not marked non-parallel~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~23~~ **Won't implement — not adopted.** | ~~Add a CI step to clean `/tmp` before test runs~~ | ~~🟡 Medium~~ | ~~5m~~ |
-| ~~24~~ **Won't implement — machine-local preference — GOTMPDIR docs are flake/devShell-local.** | ~~Pin Go cache size with `go env -w GOFLAGS=-trimpath` to reduce cache bloat~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~25~~ **Won't implement — buildflow feature request.** | ~~Document the GOTMPDIR fix in README "Troubleshooting" section~~ | ~~🟢 Low~~ | ~~10m~~ |
-| ~~26~~ **Won't implement — machine-local preference — reports dir is operator hygiene.** | ~~Add `df -h /tmp` to the `buildflow doctor` diagnostics output~~ | ~~🟢 Low~~ | ~~—~~ |
-| ~~27~~ done — .cache/ is gitignored (.gitignore:110) | ~~Consider moving `reports/` dir to `$XDG_CACHE_HOME/cmdguard/reports/`~~ | ~~🟢 Low~~ | ~~15m~~ |
-| ~~28~~ done — resolved — go.work is untracked today (unshipped via d29bc4d); the contradiction dissolved | ~~Add `.cache/` to `.gitignore` if not already (it is via buildflow-managed block)~~ | ~~🟢 Low~~ | ~~1m~~ |
-| ~~29~~ done — LookupEnv pattern audit clean (4 non-test sites use LookupEnv) | ~~Review if `go.work` should be gitignored (it is, but it's tracked — contradiction?)~~ | ~~🟡 Medium~~ | ~~10m~~ |
-| ~~30~~ **Won't implement — not adopted.** | ~~Audit all `os.Setenv`/`os.Unsetenv` in non-test code for the LookupEnv pattern~~ | ~~🔴 High~~ | ~~20m~~ |
-| ~~31~~ **Won't implement — not adopted — custom linter is overkill for the pattern.** | ~~Add integration test that verifies NO_COLOR save/restore under concurrent execution~~ | ~~🟡 Medium~~ | ~~30m~~ |
-| ~~32~~ **Won't implement — not investigated further — low value.** | ~~Consider a `golangci-lint` custom linter for `os.Getenv` in save/restore patterns~~ | ~~🟢 Low~~ | ~~2h~~ |
-| ~~33~~ **Won't implement — not adopted.** | ~~Review fang integration — does fang itself set NO_COLOR?~~ | ~~🟢 Low~~ | ~~15m~~ |
-| ~~34~~ **Won't implement — machine-local preference — GOTMPDIR docs are flake/devShell-local.** | ~~Check if the `--no-color` flag should also respect `CLICOLOR=0` and `CLICOLOR_FORCE=1`~~ | ~~🟢 Low~~ | ~~15m~~ |
-| ~~35~~ **Won't implement — buildflow feature request.** | ~~Add `GOTMPDIR` to the `devShells.default` documentation in AGENTS.md~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~36~~ **Won't implement — machine-local preference — reports dir is operator hygiene.** | ~~Consider nix `mkDerivation` for CI that sets GOTMPDIR declaratively~~ | ~~🟢 Low~~ | ~~30m~~ |
-| ~~37~~ **Won't implement — not adopted.** | ~~Add a pre-commit hook check for `/tmp` space~~ | ~~🟢 Low~~ | ~~10m~~ |
+| ~~22~~ **Won't implement — cosmetic test-parallelism nit.** | ~~Review `cli_lifecycle_test.go:366` `TestCLINoColorEnvVar` — uses t.Setenv but not marked non-parallel~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~23~~ **Won't implement — CI runners are ephemeral.** | ~~Add a CI step to clean `/tmp` before test runs~~ | ~~🟡 Medium~~ | ~~5m~~ |
+| ~~24~~ **Won't implement — not adopted.** | ~~Pin Go cache size with `go env -w GOFLAGS=-trimpath` to reduce cache bloat~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~25~~ **Won't implement — machine-local preference — GOTMPDIR docs are flake/devShell-local.** | ~~Document the GOTMPDIR fix in README "Troubleshooting" section~~ | ~~🟢 Low~~ | ~~10m~~ |
+| ~~26~~ **Won't implement — buildflow feature request.** | ~~Add `df -h /tmp` to the `buildflow doctor` diagnostics output~~ | ~~🟢 Low~~ | ~~—~~ |
+| ~~27~~ **Won't implement — machine-local preference — reports dir is operator hygiene.** | ~~15m~~ |
+| ~~28~~ done — .cache/ is gitignored (.gitignore:110) | ~~1m~~ |
+| ~~29~~ done — resolved — go.work is untracked today (unshipped via d29bc4d); the contradiction dissolved | ~~10m~~ |
+| ~~30~~ done — LookupEnv pattern audit clean (4 non-test sites use LookupEnv) | ~~Audit all `os.Setenv`/`os.Unsetenv` in non-test code for the LookupEnv pattern~~ | ~~🔴 High~~ | ~~20m~~ |
+| ~~31~~ **Won't implement — not adopted.** | ~~Add integration test that verifies NO_COLOR save/restore under concurrent execution~~ | ~~🟡 Medium~~ | ~~30m~~ |
+| ~~32~~ **Won't implement — not adopted — custom linter is overkill for the pattern.** | ~~Consider a `golangci-lint` custom linter for `os.Getenv` in save/restore patterns~~ | ~~🟢 Low~~ | ~~2h~~ |
+| ~~33~~ **Won't implement — not investigated further — low value.** | ~~Review fang integration — does fang itself set NO_COLOR?~~ | ~~🟢 Low~~ | ~~15m~~ |
+| ~~34~~ **Won't implement — not adopted.** | ~~Check if the `--no-color` flag should also respect `CLICOLOR=0` and `CLICOLOR_FORCE=1`~~ | ~~🟢 Low~~ | ~~15m~~ |
+| ~~35~~ **Won't implement — machine-local preference — GOTMPDIR docs are flake/devShell-local.** | ~~Add `GOTMPDIR` to the `devShells.default` documentation in AGENTS.md~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~36~~ **Won't implement — buildflow feature request.** | ~~Consider nix `mkDerivation` for CI that sets GOTMPDIR declaratively~~ | ~~🟢 Low~~ | ~~30m~~ |
+| ~~37~~ **Won't implement — machine-local preference — reports dir is operator hygiene.** | ~~Add a pre-commit hook check for `/tmp` space~~ | ~~🟢 Low~~ | ~~10m~~ |
 | ~~38~~ **Won't implement — not adopted.** | ~~Review `go test -parallel=32` default — may be too aggressive for tmpfs systems~~ | ~~🟡 Medium~~ | ~~10m~~ |
 | ~~39~~ **Won't implement — not adopted.** | ~~Add `GOFLAGS=-p=4` to limit parallel package compilation~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~40~~ **Won't implement — machine-local preference — CONTRIBUTING is contributor-facing, not env-facing.** | ~~Consider `go test -p=1` for CI to reduce peak `/tmp` usage~~ | ~~🟡 Medium~~ | ~~5m~~ |
-| ~~41~~ **Won't implement — machine-local preference — local /tmp hygiene target.** | ~~Document the `GOTMPDIR` fix in CONTRIBUTING.md~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~42~~ **Won't implement — machine-local preference.** | ~~Add a `Makefile`/nix target `clean-tmp` that cleans `/tmp/go-build*`~~ | ~~🟢 Low~~ | ~~5m~~ |
-| ~~43~~ done — flake devShell env audited (GOEXPERIMENT + GOTMPDIR set; flake.nix:68-71,90-93) | ~~Consider `go env -w GOTMPDIR=...` as a global setting (persistent)~~ | ~~🟡 Medium~~ | ~~2m~~ |
-| ~~44~~ done — answered — GOCACHE is on disk already (self-noted in the row) | ~~Audit all devShell env vars for completeness (GOWORK, GOEXPERIMENT, GOTMPDIR, GOCACHE?)~~ | ~~🟡 Medium~~ | ~~15m~~ |
-| ~~45~~ **Won't implement — not adopted.** | ~~Review if `GOCACHE` should also be moved off tmpfs (it's on disk already at ~/.cache)~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~40~~ **Won't implement — not adopted.** | ~~Consider `go test -p=1` for CI to reduce peak `/tmp` usage~~ | ~~🟡 Medium~~ | ~~5m~~ |
+| ~~41~~ **Won't implement — machine-local preference — CONTRIBUTING is contributor-facing, not env-facing.** | ~~Document the `GOTMPDIR` fix in CONTRIBUTING.md~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~42~~ **Won't implement — machine-local preference — local /tmp hygiene target.** | ~~Add a `Makefile`/nix target `clean-tmp` that cleans `/tmp/go-build*`~~ | ~~🟢 Low~~ | ~~5m~~ |
+| ~~43~~ **Won't implement — machine-local preference.** | ~~2m~~ |
+| ~~44~~ done — flake devShell env audited (GOEXPERIMENT + GOTMPDIR set; flake.nix:68-71,90-93) | ~~15m~~ |
+| ~~45~~ done — answered — GOCACHE is on disk already (self-noted in the row) | ~~Review if `GOCACHE` should also be moved off tmpfs (it's on disk already at ~/.cache)~~ | ~~🟢 Low~~ | ~~5m~~ |
 | ~~46~~ **Won't implement — not adopted.** | ~~Add a CI badge for disk space monitoring~~ | ~~🟢 Low~~ | ~~—~~ |
-| ~~47~~ done — answered — CI uses setup-go directly (self-noted; ci.yml confirms) | ~~Consider a `nix flake check` that validates GOTMPDIR is set~~ | ~~🟢 Low~~ | ~~15m~~ |
-| ~~48~~ **Won't implement — not adopted — the ci devShell retained for local parity.** | ~~Review the `ci` devShell — is it actually used by anyone? CI uses setup-go directly~~ | ~~🟡 Medium~~ | ~~10m~~ |
-| ~~49~~ **Won't implement — not added — the gotcha lives in this status report.** | ~~Remove the `ci` devShell if unused, or wire CI to use `nix develop .#ci`~~ | ~~🟡 Medium~~ | ~~30m~~ |
-| 50 | Add session learnings to AGENTS.md gotchas: "always check df -h /tmp first"                           | 🔴 High   | 5m     |
+| ~~47~~ **Won't implement — not adopted.** | ~~15m~~ |
+| ~~48~~ done — answered — CI uses setup-go directly (self-noted; ci.yml confirms) | ~~Review the `ci` devShell — is it actually used by anyone? CI uses setup-go directly~~ | ~~🟡 Medium~~ | ~~10m~~ |
+| ~~49~~ **Won't implement — not adopted — the ci devShell retained for local parity.** | ~~Remove the `ci` devShell if unused, or wire CI to use `nix develop .#ci`~~ | ~~🟡 Medium~~ | ~~30m~~ |
+| ~~50~~ **Won't implement — not added — the gotcha lives in this status report.** | ~~Add session learnings to AGENTS.md gotchas: "always check df -h /tmp first"~~ | ~~🔴 High~~ | ~~5m~~ |
 
 ---
 

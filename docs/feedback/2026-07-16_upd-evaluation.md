@@ -30,6 +30,8 @@ These features caught our attention and are genuinely valuable:
 
 ### 1. Dependency weight is the primary blocker
 
+<!-- check-rows:ledger -->
+
 | Metric                 | `upd` (current) | With `cmdguard` |
 | ---------------------- | --------------- | --------------- |
 | Direct dependencies    | 4               | ~14             |
