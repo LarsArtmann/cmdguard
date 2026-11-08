@@ -607,6 +607,11 @@ func (cli *CLI[T]) applyCleanupHooks() {
 func (cli *CLI[T]) Execute(ctx context.Context) error {
 	cli.resetFlagStateForReuse()
 
+	// Rebuild the flow context per execution: the previous execution's
+	// context is dead (its NotifyContext cancel ran), so a cached flowCtx
+	// would propagate a cancelled context into every later run.
+	cli.flowCtx = nil
+
 	err := cli.ensureDescribeCommand() //nolint:contextcheck // c.Context() is set only during cobra execution
 	if err != nil {
 		return err
