@@ -1,5 +1,10 @@
 # Status Report — Integration-Test Harness for cmdguard Consumers
 
+> **Live remainder:** archived 2026-11-08 (cadence). All open items are
+> struck/routed — resolutions annotated inline; superseding context lives in
+> docs/status/2026-11-08_12-00_pareto-v2-executed-v5-shipped.md and the
+> v5.0.0 release notes.
+
 **Date:** 2026-10-02 16:08 CEST (Friday)
 **Scope:** How to give apps a better, easier way to run integration tests — specifically for **the command surfaces cmdguard owns** (flag parsing, precedence, validation, error/exit codes, output formats, DI wiring, config loading).
 **Session type:** Research / design only. **Zero code written. Zero commits.**

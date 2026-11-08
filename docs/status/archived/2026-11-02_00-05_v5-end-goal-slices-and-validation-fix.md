@@ -1,5 +1,10 @@
 # Status Report: v5 End-Goal Plan, First Slices, and the Validation Bug
 
+> **Live remainder:** archived 2026-11-08 (cadence). All open items are
+> struck/routed — resolutions annotated inline; superseding context lives in
+> docs/status/2026-11-08_12-00_pareto-v2-executed-v5-shipped.md and the
+> v5.0.0 release notes.
+
 **Date:** 2026-11-02 00:05 CET
 **Branch:** master
 **HEAD at write time:** `3a987c8 chore: auto-commit 16 changed file(s) (heuristic)`

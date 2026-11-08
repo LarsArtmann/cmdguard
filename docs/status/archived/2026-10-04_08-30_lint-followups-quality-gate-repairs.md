@@ -1,5 +1,10 @@
 # Status Report: cmdguard-lint Follow-Ups + Repo Quality-Gate Repairs
 
+> **Live remainder:** archived 2026-11-08 (cadence). All open items are
+> struck/routed — resolutions annotated inline; superseding context lives in
+> docs/status/2026-11-08_12-00_pareto-v2-executed-v5-shipped.md and the
+> v5.0.0 release notes.
+
 **Session window:** 2026-10-04 ~07:26 → 08:30
 **Scope:** Execute the previous session's follow-up list for the `lint/`
 sub-module; everything else in this report was discovered and repaired because

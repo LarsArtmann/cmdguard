@@ -1,5 +1,10 @@
 # Status Report — Inert Sibling Replace Fix + Self-Review
 
+> **Live remainder:** archived 2026-11-08 (cadence). All open items are
+> struck/routed — resolutions annotated inline; superseding context lives in
+> docs/status/2026-11-08_12-00_pareto-v2-executed-v5-shipped.md and the
+> v5.0.0 release notes.
+
 **Date:** 2026-11-02 03:07 CET
 **Session scope:** Fix of the failing `buildflow -s go-mod-update` steps in THIS repo (cmdguard) — nothing else. Report is based solely on this session's run and what was noticed along the way.
 **Concurrent activity:** A parallel session committed `86f2d3e` (fang-on test coverage) and `e849ad7` (M01/M02 lock before v4.2.0) mid-session; `CHANGELOG.md` + `TODO_LIST.md` are modified in the working tree (foreign WIP — untouched by me).
