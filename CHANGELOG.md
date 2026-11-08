@@ -7,6 +7,17 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING (retrospective entry — the change landed in v4.1.0 without a
+  CHANGELOG note).** `CLI.HealthCheck` now takes a `context.Context`:
+  `HealthCheck(ctx context.Context) error` instead of `HealthCheck() error`,
+  so services implementing `do.HealthcheckerWithContext` can honour
+  cancellation. Callers must pass a context (usually `cmd.Context()`);
+  compile-time breakage only, no behavior change for zero-arg callers beyond
+  the signature. `CLI.HealthCheckResults` kept its no-context signature.
+  Recorded here because the v4.1.0 release notes omitted it.
+
 ### Added
 
 - **Stable machine error codes (`ErrorCode(err)`, envelope `error_code`).**
