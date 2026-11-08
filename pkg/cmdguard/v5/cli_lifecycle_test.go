@@ -127,6 +127,7 @@ func TestCLIPrePostRunE(t *testing.T) {
 			"test",
 			v5.NoFlags{},
 			noOpRunE[testCLIConfig],
+			v5.WithShort("run the test command"),
 			v5.WithPreRunE(
 				func(_ context.Context, _ *testCLIConfig, _ v5.NoFlags) error {
 					preRan = true
@@ -373,7 +374,7 @@ func TestCLINoColorEnvVar(t *testing.T) {
 		t.Fatalf("NewCLI failed: %v", err)
 	}
 
-	cmd := newTestCLICommand[testCLIConfig](t, "run")
+	cmd := newTestCLICommandWithShort[testCLIConfig](t, "run", "run the test command")
 	addCommand(t, cli, cmd)
 
 	err = cli.ExecuteWithArgs(t.Context(), []string{"run"})

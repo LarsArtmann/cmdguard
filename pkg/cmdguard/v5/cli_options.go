@@ -139,6 +139,15 @@ func WithBatteries() CLIOption {
 // on (their own opt-out is WithoutErrorHints). Individual opt-outs
 // (WithoutStrictValidation, WithoutSignalHandling, WithoutStrictConfigKeys)
 // keep the rest of the bundle.
+func WithoutBatteries() CLIOption {
+	return func(s *cliSpec) {
+		s.batteries = false
+		s.validationMode = Lenient
+		s.signalHandling = false
+		s.gracefulShutdown = false
+		s.strictConfigKeys = false
+	}
+}
 
 // WithFangColorScheme sets a custom color scheme for fang.
 func WithFangColorScheme(cs func(lightDark lipgloss.LightDarkFunc) fang.ColorScheme) CLIOption {
