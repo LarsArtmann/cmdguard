@@ -47,9 +47,8 @@ Other Go CLI frameworks give you flags. cmdguard gives you flags **plus** everyt
 Register services, invoke them in handlers, and manage their entire lifecycle:
 
 ```go
-cli, _ := v5.NewCLI[AppConfig]("myapp", "My production CLI", AppConfig{},
-    v5.WithGracefulShutdown(), // SIGINT → reverse-order shutdown of all services
-)
+cli, _ := v5.NewCLI[AppConfig]("myapp", "My production CLI", AppConfig{})
+// v5 default: SIGINT/SIGTERM cancels the run and shuts down DI services in reverse order
 
 // Register a database service (lazy — created on first invoke)
 v5.Provide(cli.Scope(), func(i do.Injector) (*Database, error) {
@@ -265,7 +264,7 @@ v5.NewCommand("query", v5.NoFlags{},
 )
 ```
 
-Services can implement `HealthCheck` and `Shutdown` for lifecycle management.
+Services can implement `HealthCheck(ctx context.Context)` (the `do.HealthcheckerWithContext` interface, wired into `DoctorCommand`) and `Shutdown` (called on the SIGINT/SIGTERM path, reverse invocation order).
 
 ---
 

@@ -77,7 +77,8 @@
 //	// In handler:
 //	db, err := v5.Invoke[*Database](scope)
 //
-// Services can implement HealthCheck and Shutdown for lifecycle management.
+// Services can implement HealthCheck(ctx) (the do.HealthcheckerWithContext
+// interface, wired into DoctorCommand) and Shutdown for lifecycle management.
 //
 // For testing, clone the scope and override services with mocks:
 //
