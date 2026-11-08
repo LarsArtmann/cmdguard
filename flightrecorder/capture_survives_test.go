@@ -10,23 +10,29 @@ import (
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-// R5.4: pins the WithoutCancel contract (2026-11-08 fix). Under v5's default
-// signal handling, the run context is cancelled when Execute returns; the
-// error-triggered snapshot is post-hoc telemetry and must still land.
-// Before the fix, the background capture raced Execute's return and wrote
-// nothing (context cancelled mid-write).
-
-func TestMiddleware_ErrorCaptureSurvivesExecuteReturn(t *testing.T) { //nolint:paralleltest // process-wide singleton recorder
+// TestMiddleware_ErrorCaptureSurvivesExecuteReturn pins the WithoutCancel
+// contract (2026-11-08 fix). Under v5's default signal handling, the run
+// context is cancelled as Execute returns; the error-triggered snapshot is
+// post-hoc telemetry and must still land. Before the fix, the background
+// capture raced Execute's return and wrote nothing (context cancelled
+// mid-write).
+func TestMiddleware_ErrorCaptureSurvivesExecuteReturn(t *testing.T) {
 	dir := t.TempDir()
 
-	cfg := Config{
+	rec := New(Config{
 		CaptureOnError: true,
 		OutputDir:      dir,
+	})
+
+	if err := rec.Start(); err != nil {
+		t.Fatalf("Start: %v", err)
 	}
+
+	defer rec.Stop() // waits for in-flight captures before tearing down
 
 	cli, err := v5.NewCLI("snap", "Snapshot app", struct{}{},
 		v5.WithoutSignalHandling(), // deterministic: no real signals; we cancel manually
-		WithFlightRecorder[v5.CLI[struct{}]](cfg),
+		WithFlightRecorderRecorder[struct{}](rec),
 	)
 	if err != nil {
 		t.Fatalf("NewCLI: %v", err)
@@ -40,13 +46,15 @@ func TestMiddleware_ErrorCaptureSurvivesExecuteReturn(t *testing.T) { //nolint:p
 		t.Fatalf("Build: %v", err)
 	}
 
-	// Cancelled parent context simulates the v5 signal path: NotifyContext
-	// wraps Execute and cancels at return, so the middleware sees a ctx that
-	// is (or is about to be) cancelled while the capture goroutine runs.
+	// The v5 signal path: the run context is LIVE while the command executes
+	// and cancelled as Execute returns (NotifyContext teardown). That is
+	// exactly the race the WithoutCancel fix addresses: the capture goroutine
+	// starts during the run and must survive Execute's teardown.
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel()
+	defer cancel()
 
 	_ = cli.ExecuteWithArgs(ctx, []string{"boom"})
+	cancel() // teardown fires before the async capture may have finished
 
 	// The capture goroutine is asynchronous: poll briefly for the snapshot.
 	deadline := time.Now().Add(3 * time.Second)
@@ -70,4 +78,3 @@ func TestMiddleware_ErrorCaptureSurvivesExecuteReturn(t *testing.T) { //nolint:p
 type errBoom struct{}
 
 func (errBoom) Error() string { return "boom" }
-
