@@ -13,6 +13,7 @@ import (
 	"os"
 
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	"github.com/larsartmann/cmdguard/v4/pkg/version"
 )
 
 type databaseConfig struct {
@@ -31,6 +32,7 @@ func main() {
 	cli, err := v4.NewCLI[config]("config-explain",
 		"Demo: config files, strict keys, and value provenance",
 		config{},
+		v4.WithCLIVersion(version.Version),
 		v4.WithConfigFile("config.example.yaml"),
 		v4.WithStrictConfigKeys(),
 		v4.WithConfigExplainCommand(),
