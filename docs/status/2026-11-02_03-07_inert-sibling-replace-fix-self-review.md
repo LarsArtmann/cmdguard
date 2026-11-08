@@ -111,6 +111,7 @@ _Sorted roughly by impact/effort. ~28 real items, not padded to 50._
 8. Verify root actually requires what it replaces: root replaces `prompts`/`telemetry` without requires — either add dev requires or drop the inert replaces (decision; see question 2).
 9. Consolidate each submodule's four single-line replaces into one `replace ( … )` block (style parity with root go.mod).
 10. CHANGELOG entry for the replace fix (after foreign WIP on CHANGELOG.md resolves).
+    <!-- ✅ DONE 2026-11-08: the near-miss is documented in CHANGELOG [Unreleased] → Housekeeping ("GOWORK=off tidy had poisoned sibling requires to pseudo-versions — root restored to real pins, gate made workspace-aware"); the durable contract lives in AGENTS.md "go.mod publish shape vs GOWORK=off tidy". -->
 11. Harvest this report's (f) into `TODO_LIST.md` (docs-health HARVEST).
 12. Confirm `go.sum` files no longer carry `cmdguard/v4 v4.1.0` tag hashes (tidy pruned them — spot-check).
 13. Check `go work sync` / go.work.sum consistency after the require rewrites (workspace builds passed, but sync was never run explicitly).
