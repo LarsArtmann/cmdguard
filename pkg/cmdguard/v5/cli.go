@@ -646,8 +646,18 @@ func (cli *CLI[T]) Execute(ctx context.Context) error {
 		defer cancel()
 
 		if cli.spec.gracefulShutdown {
-			shutdownCtx := context.WithoutCancel(ctx)
-			defer func() { _ = cli.spec.scope.Shutdown(shutdownCtx) }()
+			// Graceful DI shutdown fires on the SIGNAL path only: when the
+			// execution context was cancelled (SIGINT/SIGTERM). A normally
+			// completing Execute must NOT tear down the scope, so repeated
+			// ExecuteWithArgs stays viable under the v5 defaults; callers
+			// that want an explicit teardown use CLI.Shutdown.
+			defer func() {
+				if ctx.Err() != nil {
+					shutdownCtx := context.WithoutCancel(ctx)
+
+					_ = cli.spec.scope.Shutdown(shutdownCtx)
+				}
+			}()
 		}
 	}
 

@@ -89,7 +89,7 @@ func TestCLI_PreRunE_PostRunE(t *testing.T) {
 
 		cmd := Command[testAppConfig, NoFlags]{
 			spec: commandSpec{
-				use: "test",
+				use:   "test",
 				short: "run the test command",
 				preRunE: &typedHook[testAppConfig, NoFlags]{
 					fn: func(_ context.Context, _ *testAppConfig, _ NoFlags) error {

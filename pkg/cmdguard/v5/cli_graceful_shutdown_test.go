@@ -87,6 +87,56 @@ func TestGracefulShutdown_CallsShutdownerOnScope(t *testing.T) {
 			t.Fatalf("Shutdown failed: %v", err)
 		}
 	})
+
+	t.Run("shutdown fires only when the execution context was cancelled", func(t *testing.T) {
+		t.Parallel()
+
+		svc := &gracefulShutdownService{}
+
+		cli := newGracefulShutdownTestCLI(t)
+
+		err := v5.Provide(cli.Scope(), func(i do.Injector) (*gracefulShutdownService, error) {
+			return svc, nil
+		})
+		if err != nil {
+			t.Fatalf("Provide failed: %v", err)
+		}
+
+		cmd := newTestCLICommand[testCLIConfig](t, "run")
+		addCommand(t, cli, cmd)
+
+		_, err = v5.Invoke[*gracefulShutdownService](cli.Scope())
+		if err != nil {
+			t.Fatalf("Invoke failed: %v", err)
+		}
+
+		// Normal completion must NOT tear down the scope: repeated
+		// ExecuteWithArgs stays viable under the v5 defaults.
+		err = cli.ExecuteWithArgs(context.Background(), []string{"run"})
+		if err != nil {
+			t.Fatalf("first ExecuteWithArgs failed: %v", err)
+		}
+
+		if svc.shutdownCalled.Load() {
+			t.Error("Shutdown must not fire on a normally completing Execute")
+		}
+
+		_, err = v5.Invoke[*gracefulShutdownService](cli.Scope())
+		if err != nil {
+			t.Fatalf("scope must stay alive across executions: %v", err)
+		}
+
+		// A cancelled context (the SIGINT/SIGTERM path) triggers the
+		// graceful DI shutdown.
+		cancelled, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		_ = cli.ExecuteWithArgs(cancelled, []string{"run"})
+
+		if !svc.shutdownCalled.Load() {
+			t.Error("expected Shutdown on cancelled execution context")
+		}
+	})
 }
 
 func TestGracefulShutdown_ImpliesSignalHandling(t *testing.T) {

@@ -200,8 +200,9 @@ func TestAuditLogConvenienceHelpers(t *testing.T) {
 			t.Fatalf("expected to find service %q in audit log", name)
 		}
 
-		// v5 default: graceful shutdown runs after execution, so the service
-		// may legitimately already be shut down when queried.
+		// The service status after a normally completing execution is
+		// registered or active; "shutdown" is accepted for the
+		// signal-cancelled path (v5 graceful-shutdown semantics).
 		if svc.Status != "registered" && svc.Status != "active" && svc.Status != "shutdown" {
 			t.Errorf("Status = %q, want registered, active, or shutdown", svc.Status)
 		}
