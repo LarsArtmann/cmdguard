@@ -32,7 +32,7 @@ import (
 // Each phase (pre-run, run, post-run) gets a uniquely-named span so traces
 // are unambiguous: "deploy pre-run", "deploy run", "deploy post-run".
 func Middleware[T any](tracer trace.Tracer) v5.Middleware[T] {
-	return func(ctx context.Context, _ *T, info v5.CommandInfo, next func() error) error {
+	return func(ctx context.Context, _ *T, info v5.CommandMetadata, next func() error) error {
 		if tracer == nil {
 			return next()
 		}

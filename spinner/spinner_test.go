@@ -41,7 +41,7 @@ func TestMiddleware_NilTracerSkips(t *testing.T) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}
+	info := v5.CommandMetadata{Name: "test", Phase: v5.PhaseRun}
 
 	called := false
 	middleware := MiddlewareWithConfig[testConfig](Config{

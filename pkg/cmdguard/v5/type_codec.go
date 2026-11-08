@@ -9,9 +9,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// TypeHandler defines how a flag type is registered, parsed, defaulted, and set.
-// TODO(v5): consider renaming to TypeCodec for precision (see docs/reviews/2026-07-18_09-44_naming-review.html).
-type TypeHandler interface {
+// TypeCodec defines how a flag type is registered, parsed, defaulted, and set.
+type TypeCodec interface {
 	Register(flags *pflag.FlagSet, tag FlagTag) error
 	Parse(value string, tag FlagTag) (any, error)
 	Default(tag FlagTag) any
@@ -33,17 +32,17 @@ func registerStringFlagFromTag(flags *pflag.FlagSet, tag FlagTag) error {
 	return nil
 }
 
-// TypeHandlerFunc is a functional adapter for TypeHandler. A nil RegisterFunc
+// TypeCodecFunc is a functional adapter for TypeCodec. A nil RegisterFunc
 // is tolerated at the adapter level (for derived/internal handlers) but is
 // rejected by dispatchRegister: a handler that registers nothing makes the
 // flag silently vanish, surfacing later as "unknown flag" at invocation time.
-type TypeHandlerFunc struct {
+type TypeCodecFunc struct {
 	ParseFunc    func(value string, tag FlagTag) (any, error)
 	DefaultFunc  func(tag FlagTag) any
 	RegisterFunc func(flags *pflag.FlagSet, tag FlagTag) error
 }
 
-func (h TypeHandlerFunc) Register(flags *pflag.FlagSet, tag FlagTag) error {
+func (h TypeCodecFunc) Register(flags *pflag.FlagSet, tag FlagTag) error {
 	if h.RegisterFunc != nil {
 		return h.RegisterFunc(flags, tag)
 	}
@@ -51,15 +50,15 @@ func (h TypeHandlerFunc) Register(flags *pflag.FlagSet, tag FlagTag) error {
 	return nil
 }
 
-func (h TypeHandlerFunc) Parse(value string, tag FlagTag) (any, error) {
+func (h TypeCodecFunc) Parse(value string, tag FlagTag) (any, error) {
 	if h.ParseFunc == nil {
-		return nil, fmt.Errorf("%w: TypeHandlerFunc.ParseFunc is nil", ErrServiceRegistration)
+		return nil, fmt.Errorf("%w: TypeCodecFunc.ParseFunc is nil", ErrServiceRegistration)
 	}
 
 	return h.ParseFunc(value, tag)
 }
 
-func (h TypeHandlerFunc) Default(tag FlagTag) any {
+func (h TypeCodecFunc) Default(tag FlagTag) any {
 	if h.DefaultFunc == nil {
 		return nil
 	}
@@ -67,12 +66,12 @@ func (h TypeHandlerFunc) Default(tag FlagTag) any {
 	return h.DefaultFunc(tag)
 }
 
-// typeRegistry maps reflect.Type or reflect.Kind to TypeHandlers.
+// typeRegistry maps reflect.Type or reflect.Kind to TypeCodecs.
 type typeRegistry struct {
 	mu           sync.RWMutex
-	byType       map[reflect.Type]TypeHandler
-	byKind       map[reflect.Kind]TypeHandler
-	countHandler TypeHandler
+	byType       map[reflect.Type]TypeCodec
+	byKind       map[reflect.Kind]TypeCodec
+	countHandler TypeCodec
 	owned        bool          // true if this instance owns its maps (can mutate)
 	parent       *typeRegistry // nil when owned; shared source for COW reads
 }
@@ -98,8 +97,8 @@ var globalTypeRegistry = newTypeRegistry()
 
 func newTypeRegistry() *typeRegistry {
 	r := &typeRegistry{
-		byType: make(map[reflect.Type]TypeHandler),
-		byKind: make(map[reflect.Kind]TypeHandler),
+		byType: make(map[reflect.Type]TypeCodec),
+		byKind: make(map[reflect.Kind]TypeCodec),
 		owned:  true,
 	}
 
@@ -109,9 +108,9 @@ func newTypeRegistry() *typeRegistry {
 	return r
 }
 
-// lookupHandler finds the TypeHandler for a given reflect.Type.
+// lookupHandler finds the TypeCodec for a given reflect.Type.
 // For copy-on-write instances (owned=false), delegates to the parent registry.
-func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeHandler, bool) {
+func (r *typeRegistry) lookupHandler(typ reflect.Type) (TypeCodec, bool) {
 	r.mu.RLock()
 
 	if r.owned {
@@ -148,9 +147,9 @@ func (r *typeRegistry) share() *typeRegistry {
 	})
 }
 
-// register adds or replaces a TypeHandler for a specific reflect.Type.
+// register adds or replaces a TypeCodec for a specific reflect.Type.
 // For copy-on-write instances, triggers a lazy clone on first write.
-func (r *typeRegistry) register(typ reflect.Type, handler TypeHandler) {
+func (r *typeRegistry) register(typ reflect.Type, handler TypeCodec) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -166,11 +165,11 @@ func (r *typeRegistry) register(typ reflect.Type, handler TypeHandler) {
 	r.byType[typ] = handler
 }
 
-// RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type.
+// RegisterTypeCodec registers a custom TypeCodec for a specific reflect.Type.
 // This writes to the global defaults template; new FlagRegistries will include
-// this handler. For per-instance registration, use FlagRegistry.RegisterTypeHandler.
+// this handler. For per-instance registration, use FlagRegistry.RegisterTypeCodec.
 // Returns an error if typ or handler is nil.
-func RegisterTypeHandler(typ reflect.Type, handler TypeHandler) error {
+func RegisterTypeCodec(typ reflect.Type, handler TypeCodec) error {
 	if typ == nil {
 		return fmt.Errorf("%w: typ is nil", ErrServiceRegistration)
 	}
@@ -191,7 +190,7 @@ func handledByTypeRegistry(tr *typeRegistry, typ reflect.Type) bool {
 	return ok
 }
 
-// dispatchRegister dispatches flag registration to the TypeHandler registry.
+// dispatchRegister dispatches flag registration to the TypeCodec registry.
 func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error {
 	if tag.Count {
 		if tr.countHandler != nil {
@@ -211,7 +210,7 @@ func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error
 		return nil
 	}
 
-	if hf, isFunc := h.(TypeHandlerFunc); isFunc && hf.RegisterFunc == nil {
+	if hf, isFunc := h.(TypeCodecFunc); isFunc && hf.RegisterFunc == nil {
 		return fmt.Errorf(
 			"%w: type handler for %s has nil RegisterFunc; it would register nothing and the flag %q would silently vanish",
 			ErrServiceRegistration,
@@ -228,7 +227,7 @@ func dispatchRegister(tr *typeRegistry, flags *pflag.FlagSet, tag FlagTag) error
 	return nil
 }
 
-// dispatchParse dispatches value parsing to the TypeHandler registry.
+// dispatchParse dispatches value parsing to the TypeCodec registry.
 // Returns an error if the parsed value type doesn't match the target field type.
 func dispatchParse(tr *typeRegistry, value string, tag FlagTag) (any, error) {
 	h, ok := tr.lookupHandler(tag.Type)
@@ -251,7 +250,7 @@ func dispatchParse(tr *typeRegistry, value string, tag FlagTag) (any, error) {
 	return parsed, nil
 }
 
-// dispatchDefault dispatches default value computation to the TypeHandler registry.
+// dispatchDefault dispatches default value computation to the TypeCodec registry.
 func dispatchDefault(tr *typeRegistry, tag FlagTag) any {
 	if tag.Default == "" {
 		return reflect.Zero(tag.Type).Interface()

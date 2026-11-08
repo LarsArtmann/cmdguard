@@ -17,13 +17,13 @@ import (
 //
 // Example — timing middleware:
 //
-//	TimingMiddleware := func(ctx context.Context, cfg *MyConfig, info CommandInfo, next func() error) error {
+//	TimingMiddleware := func(ctx context.Context, cfg *MyConfig, info CommandMetadata, next func() error) error {
 //	    start := time.Now()
 //	    err := next()
 //	    fmt.Fprintf(os.Stderr, "%s took %v\n", info.Name, time.Since(start))
 //	    return err
 //	}
-type Middleware[T any] func(ctx context.Context, cfg *T, info CommandInfo, next func() error) error
+type Middleware[T any] func(ctx context.Context, cfg *T, info CommandMetadata, next func() error) error
 
 // ContextMiddleware is a context-aware variant of [Middleware]. The next
 // function accepts a context, so middleware that derives a new context
@@ -38,7 +38,7 @@ type Middleware[T any] func(ctx context.Context, cfg *T, info CommandInfo, next 
 // Example — timeout middleware:
 //
 //	TimeoutMiddleware := func(
-//		ctx context.Context, cfg *MyConfig, info CommandInfo,
+//		ctx context.Context, cfg *MyConfig, info CommandMetadata,
 //		next func(context.Context) error,
 //	) error {
 //	    ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -46,7 +46,7 @@ type Middleware[T any] func(ctx context.Context, cfg *T, info CommandInfo, next 
 //	    return next(ctx)
 //	}
 type ContextMiddleware[T any] func(
-	ctx context.Context, cfg *T, info CommandInfo, next func(context.Context) error,
+	ctx context.Context, cfg *T, info CommandMetadata, next func(context.Context) error,
 ) error
 
 // Phase identifies the execution stage of a command handler.
@@ -61,9 +61,8 @@ const (
 	PhasePostRun Phase = "post-run"
 )
 
-// CommandInfo provides command metadata to middleware.
-// TODO(v5): "Info" suffix is vague; consider CommandMetadata (see naming-review 2026-07-18).
-type CommandInfo struct {
+// CommandMetadata provides command metadata to middleware.
+type CommandMetadata struct {
 	Name     string
 	FullPath string
 	Phase    Phase
@@ -75,7 +74,7 @@ type CommandInfo struct {
 func buildChain[T any](
 	ctx context.Context,
 	cfg *T,
-	info CommandInfo,
+	info CommandMetadata,
 	middlewares []Middleware[T],
 	final func() error,
 ) func() error {
@@ -96,7 +95,7 @@ func buildChain[T any](
 func buildContextChain[T any](
 	ctx context.Context,
 	cfg *T,
-	info CommandInfo,
+	info CommandMetadata,
 	middlewares []ContextMiddleware[T],
 	final func(context.Context) error,
 ) func(context.Context) error {
@@ -114,7 +113,7 @@ func buildContextChain[T any](
 // TimingMiddleware returns a middleware that logs command execution duration.
 // The log function receives the command name, duration, and any error from execution.
 func TimingMiddleware[T any](log func(commandName string, d time.Duration, err error)) Middleware[T] {
-	return func(_ context.Context, _ *T, info CommandInfo, next func() error) error {
+	return func(_ context.Context, _ *T, info CommandMetadata, next func() error) error {
 		start := time.Now()
 		err := next()
 
@@ -135,7 +134,7 @@ func TimingMiddleware[T any](log func(commandName string, d time.Duration, err e
 // goroutine — so the middleware guarantees the derived context and the error
 // mapping, not forcible cancellation.
 func TimeoutMiddleware[T any](d time.Duration) ContextMiddleware[T] {
-	return func(ctx context.Context, _ *T, info CommandInfo, next func(context.Context) error) error {
+	return func(ctx context.Context, _ *T, info CommandMetadata, next func(context.Context) error) error {
 		if d <= 0 {
 			return next(ctx)
 		}
@@ -161,7 +160,7 @@ func TimeoutMiddleware[T any](d time.Duration) ContextMiddleware[T] {
 // RecoveryMiddleware returns a middleware that recovers from panics in command handlers,
 // converting them to errors with stack traces.
 func RecoveryMiddleware[T any]() Middleware[T] {
-	return func(_ context.Context, _ *T, info CommandInfo, next func() error) (err error) {
+	return func(_ context.Context, _ *T, info CommandMetadata, next func() error) (err error) {
 		defer func() {
 			if r := recover(); r != nil {
 				err = fmt.Errorf(

@@ -161,7 +161,7 @@
 //
 // Register custom flag types with full parse and validate support:
 //
-//	v5.RegisterTypeHandler(reflect.TypeFor[MyType](), v5.TypeHandlerFunc{
+//	v5.RegisterTypeCodec(reflect.TypeFor[MyType](), v5.TypeCodecFunc{
 //	    ParseFunc:   func(value string, _ v5.FlagTag) (any, error) { return MyType{value}, nil },
 //	    DefaultFunc: func(_ v5.FlagTag) any { return MyType{} },
 //	})

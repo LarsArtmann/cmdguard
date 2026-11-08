@@ -17,7 +17,7 @@ type colorPlugin struct{}
 func (colorPlugin) Name() string { return "color" }
 
 func (colorPlugin) Register(r PluginRegistrar) error {
-	r.TypeHandlerFunc(reflect.TypeFor[customColor](), TypeHandlerFunc{
+	r.TypeCodecFunc(reflect.TypeFor[customColor](), TypeCodecFunc{
 		RegisterFunc: registerStringFlagFromTag,
 		ParseFunc: func(value string, _ FlagTag) (any, error) {
 			return customColor(value), nil
@@ -44,7 +44,7 @@ type dashError string
 
 func (e dashError) Error() string { return string(e) }
 
-func TestPlugin_RegisterTypeHandlerAndValidator(t *testing.T) {
+func TestPlugin_RegisterTypeCodecAndValidator(t *testing.T) {
 	t.Parallel()
 
 	err := RegisterPlugin(colorPlugin{})

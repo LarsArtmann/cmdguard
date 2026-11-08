@@ -166,14 +166,14 @@ func sentinelFacts() []sentinelFact { //nolint:funlen,maintidx // canonical data
 			"ErrTypeConversion",
 			"flag",
 			"type_conversion",
-			"use a supported flag type or register a TypeHandler for this type",
+			"use a supported flag type or register a TypeCodec for this type",
 		},
 		{
 			ErrUnsupportedConversion,
 			"ErrUnsupportedConversion",
 			"flag",
 			"unsupported_conversion",
-			"use a supported flag type or register a TypeHandler for this type",
+			"use a supported flag type or register a TypeCodec for this type",
 		},
 		{ErrNilValue, "ErrNilValue", "flag", "nil_value", "provide a value; nil is not accepted here"},
 		{

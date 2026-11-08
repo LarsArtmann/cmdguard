@@ -33,7 +33,7 @@ func TestRegisterInScope(t *testing.T) {
 	t.Run("returns error for nil parent", func(t *testing.T) {
 		t.Parallel()
 
-		child, err := RegisterInScope(nil, "child")
+		child, err := RegisterInScope[string](nil, "child", nil)
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -45,12 +45,29 @@ func TestRegisterInScope(t *testing.T) {
 		}
 	})
 
-	t.Run("creates child scope with providers", func(t *testing.T) {
+	t.Run("returns error for nil provider", func(t *testing.T) {
 		t.Parallel()
 
 		parent := NewScope("parent")
 
-		provider := func(_ do.Injector) (any, error) {
+		child, err := RegisterInScope[string](parent, "child", nil)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+
+		assertErrorContains(t, err, "provider is nil")
+
+		if child != nil {
+			t.Errorf("expected child to be nil, got %v", child)
+		}
+	})
+
+	t.Run("registers a typed provider and resolves it", func(t *testing.T) {
+		t.Parallel()
+
+		parent := NewScope("parent")
+
+		provider := func(_ do.Injector) (string, error) {
 			return "service-value", nil
 		}
 
@@ -70,44 +87,14 @@ func TestRegisterInScope(t *testing.T) {
 		if child.Parent() != parent {
 			t.Error("expected parent to be the same")
 		}
-	})
 
-	t.Run("returns error for invalid provider type", func(t *testing.T) {
-		t.Parallel()
-
-		parent := NewScope("parent")
-
-		// Invalid provider - wrong signature
-		invalidProvider := "not-a-function"
-
-		child, err := RegisterInScope(parent, "child", invalidProvider)
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
-
-		assertErrorContains(t, err, "provider type=")
-
-		if child != nil {
-			t.Errorf("expected child to be nil, got %v", child)
-		}
-	})
-
-	t.Run("supports single provider", func(t *testing.T) {
-		t.Parallel()
-
-		parent := NewScope("parent")
-
-		provider := func(_ do.Injector) (any, error) {
-			return "single-value", nil
-		}
-
-		child, err := RegisterInScope(parent, "child", provider)
+		value, err := do.Invoke[string](child.Injector())
 		if err != nil {
-			t.Fatalf("expected no error, got: %v", err)
+			t.Fatalf("expected service to resolve, got: %v", err)
 		}
 
-		if child == nil {
-			t.Fatal("expected child to not be nil")
+		if value != "service-value" {
+			t.Errorf("expected value 'service-value', got %q", value)
 		}
 	})
 }

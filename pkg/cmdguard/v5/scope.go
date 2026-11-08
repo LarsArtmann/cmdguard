@@ -353,45 +353,41 @@ func ScopedProvider[T any](
 	}
 }
 
-// RegisterInScope registers providers in a child scope.
-// Returns the child scope for further operations.
+// RegisterInScope creates a child scope of parent and registers ONE typed
+// provider in it. Returns the child scope for further operations.
 //
-// Deprecated: RegisterInScope erases provider types — every provider is
-// registered as func(do.Injector) (any, error), so services resolve only via
-// do.Call[any] and two providers collide on the same any key. Create the
-// child scope yourself and register typed providers directly:
+// The provider keeps its concrete type T: the service is stored under T's
+// key, so it resolves via do.Invoke[T] and two services of different types
+// cannot collide (the pre-v5 any-key erasure is gone). Register multiple
+// services either by calling RegisterInScope once per type or by creating
+// the child scope yourself:
 //
 //	child := parent.Child(name)
 //	do.Provide(child.Injector(), func(i do.Injector) (*MyService, error) { ... })
-//
-// TODO(v5): replace with a generic RegisterInScope[T] (naming-review 2026-07-18 follow-up).
-func RegisterInScope(parent *Scope, name string, providers ...any) (*Scope, error) {
+func RegisterInScope[T any](
+	parent *Scope,
+	name string,
+	provider func(do.Injector) (T, error),
+) (*Scope, error) {
 	if parent == nil {
 		return nil, fmt.Errorf(
-			"%w: parent scope is nil, name=%q, providers=%d",
+			"%w: parent scope is nil, name=%q",
 			ErrInvalidScope,
 			name,
-			len(providers),
+		)
+	}
+
+	if provider == nil {
+		return nil, fmt.Errorf(
+			"%w: scope=%q, provider is nil",
+			ErrServiceRegistration,
+			name,
 		)
 	}
 
 	child := parent.Child(name)
 
-	for providerIndex, provider := range providers {
-		switch fn := provider.(type) {
-		case func(do.Injector) (any, error):
-			do.Provide(child.injector, fn)
-		default:
-			return nil, fmt.Errorf(
-				"%w: scope=%q, providers=%d, provider index=%d, provider type=%T",
-				ErrServiceRegistration,
-				name,
-				len(providers),
-				providerIndex,
-				provider,
-			)
-		}
-	}
+	do.Provide(child.injector, provider)
 
 	return child, nil
 }

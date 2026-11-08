@@ -19,7 +19,7 @@ func TestCOWTypeRegistry_InstanceWriteDoesNotLeakToGlobal(t *testing.T) {
 	}{})
 	testutil.AssertNoError(t, err)
 
-	registry.RegisterTypeHandler(reflect.TypeFor[cowTestType](), TypeHandlerFunc{
+	registry.RegisterTypeCodec(reflect.TypeFor[cowTestType](), TypeCodecFunc{
 		ParseFunc:   func(value string, _ FlagTag) (any, error) { return cowTestType{Value: value}, nil },
 		DefaultFunc: func(_ FlagTag) any { return cowTestType{} },
 	})
@@ -44,7 +44,7 @@ func TestCOWTypeRegistry_TwoInstancesAreIsolated(t *testing.T) {
 	}{})
 	testutil.AssertNoError(t, err)
 
-	reg1.RegisterTypeHandler(reflect.TypeFor[cowTestType](), TypeHandlerFunc{
+	reg1.RegisterTypeCodec(reflect.TypeFor[cowTestType](), TypeCodecFunc{
 		ParseFunc:   func(value string, _ FlagTag) (any, error) { return cowTestType{Value: "reg1"}, nil },
 		DefaultFunc: func(_ FlagTag) any { return cowTestType{} },
 	})

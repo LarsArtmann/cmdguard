@@ -175,7 +175,7 @@ func setStringFieldError(field reflect.Value, str string, err error) error {
 	return fmt.Errorf("setStringField: field=%s, str=%q: %w", field.Type(), str, err)
 }
 
-// setStringField handles string to custom type conversions via the TypeHandler registry.
+// setStringField handles string to custom type conversions via the TypeCodec registry.
 func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 	// Special handling for Enum (needs current allowed values from the field)
 	if field.Type() == reflect.TypeFor[Enum]() {
@@ -205,7 +205,7 @@ func setStringField(field reflect.Value, str string, tr *typeRegistry) error {
 		return nil
 	}
 
-	// Try the TypeHandler registry for all other types
+	// Try the TypeCodec registry for all other types
 	if handledByTypeRegistry(tr, field.Type()) {
 		parsed, err := dispatchParse(tr, str, FlagTag{Type: field.Type()})
 		if err != nil {

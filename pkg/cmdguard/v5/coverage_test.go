@@ -252,7 +252,7 @@ func TestRegisterFlagValidator(t *testing.T) {
 	})
 }
 
-func TestRegisterTypeHandlerOnFlagRegistry(t *testing.T) {
+func TestRegisterTypeCodecOnFlagRegistry(t *testing.T) {
 	t.Parallel()
 
 	t.Run("registers custom type on instance", func(t *testing.T) {
@@ -263,7 +263,7 @@ func TestRegisterTypeHandlerOnFlagRegistry(t *testing.T) {
 		}{})
 		testutil.AssertNoError(t, err)
 
-		registry.RegisterTypeHandler(reflect.TypeFor[string](), TypeHandlerFunc{
+		registry.RegisterTypeCodec(reflect.TypeFor[string](), TypeCodecFunc{
 			ParseFunc: func(value string, _ FlagTag) (any, error) { return "custom:" + value, nil },
 		})
 

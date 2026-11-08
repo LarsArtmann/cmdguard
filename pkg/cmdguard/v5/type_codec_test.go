@@ -58,7 +58,7 @@ func countFlagTestCases(t *testing.T, body func(short, help string), help string
 	}
 }
 
-func TestTypeHandler_RegisterCustomTypes(t *testing.T) {
+func TestTypeCodec_RegisterCustomTypes(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -155,7 +155,7 @@ func TestTypeHandler_RegisterCustomTypes(t *testing.T) {
 	}
 }
 
-func TestTypeHandler_RegisterCustomTypes_Parse(t *testing.T) {
+func TestTypeCodec_RegisterCustomTypes_Parse(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -259,7 +259,7 @@ func TestTypeHandler_RegisterCustomTypes_Parse(t *testing.T) {
 	}
 }
 
-func TestTypeHandler_RegisterCustomTypes_Default(t *testing.T) {
+func TestTypeCodec_RegisterCustomTypes_Default(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -314,7 +314,7 @@ func TestTypeHandler_RegisterCustomTypes_Default(t *testing.T) {
 	}
 }
 
-func TestTypeHandler_RegisterCountHandler(t *testing.T) {
+func TestTypeCodec_RegisterCountHandler(t *testing.T) {
 	t.Parallel()
 
 	t.Run("count handler is registered", func(t *testing.T) {
@@ -358,7 +358,7 @@ func TestTypeHandler_RegisterCountHandler(t *testing.T) {
 	})
 }
 
-func TestTypeHandler_DispatchRegister_WithCount(t *testing.T) {
+func TestTypeCodec_DispatchRegister_WithCount(t *testing.T) {
 	t.Parallel()
 
 	countFlagTestCases(t, func(short, help string) {
@@ -374,7 +374,7 @@ func TestTypeHandler_DispatchRegister_WithCount(t *testing.T) {
 	}, "verbosity")
 }
 
-func TestTypeHandler_LookupHandler_Fallback(t *testing.T) {
+func TestTypeCodec_LookupHandler_Fallback(t *testing.T) {
 	t.Parallel()
 
 	t.Run("exact type match takes priority", func(t *testing.T) {
@@ -428,14 +428,14 @@ func TestTypeHandler_LookupHandler_Fallback(t *testing.T) {
 	})
 }
 
-func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
+func TestTypeCodec_RegisterTypeCodec_PublicAPI(t *testing.T) {
 	t.Parallel()
 	t.Run("custom type can be registered and looked up", func(t *testing.T) {
 		t.Parallel()
 
 		type Widget struct{ Name string }
 
-		custom := TypeHandlerFunc{
+		custom := TypeCodecFunc{
 			ParseFunc: func(value string, _ FlagTag) (any, error) {
 				return Widget{Name: value}, nil
 			},
@@ -444,7 +444,7 @@ func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
 			},
 		}
 
-		testutil.AssertNoError(t, RegisterTypeHandler(reflect.TypeFor[Widget](), custom))
+		testutil.AssertNoError(t, RegisterTypeCodec(reflect.TypeFor[Widget](), custom))
 
 		h, ok := globalTypeRegistry.lookupHandler(reflect.TypeFor[Widget]())
 		testutil.AssertBoolTrue(t, ok, "custom type should be found after registration")
@@ -458,20 +458,20 @@ func TestTypeHandler_RegisterTypeHandler_PublicAPI(t *testing.T) {
 	})
 }
 
-func TestRegisterTypeHandler_NilReturnsError(t *testing.T) {
+func TestRegisterTypeCodec_NilReturnsError(t *testing.T) {
 	t.Parallel()
 
-	err := RegisterTypeHandler(nil, TypeHandlerFunc{
+	err := RegisterTypeCodec(nil, TypeCodecFunc{
 		ParseFunc: func(_ string, _ FlagTag) (any, error) { return "", nil },
 	})
 	testutil.AssertExpectedError(t, err)
 
-	var handler TypeHandler
-	err = RegisterTypeHandler(reflect.TypeFor[string](), handler)
+	var handler TypeCodec
+	err = RegisterTypeCodec(reflect.TypeFor[string](), handler)
 	testutil.AssertExpectedError(t, err)
 }
 
-func TestTypeHandler_DispatchDefault(t *testing.T) {
+func TestTypeCodec_DispatchDefault(t *testing.T) {
 	t.Parallel()
 
 	t.Run("dispatchDefault table", func(t *testing.T) {
@@ -524,7 +524,7 @@ func TestTypeHandler_DispatchDefault(t *testing.T) {
 	})
 }
 
-func TestTypeHandler_DispatchParse(t *testing.T) {
+func TestTypeCodec_DispatchParse(t *testing.T) {
 	t.Parallel()
 
 	t.Run("int parse returns int64", func(t *testing.T) {
@@ -577,7 +577,7 @@ func TestHandledByTypeRegistry(t *testing.T) {
 	}
 }
 
-func TestTypeHandler_KindHandlers(t *testing.T) {
+func TestTypeCodec_KindHandlers(t *testing.T) {
 	t.Parallel()
 
 	t.Run("string kind register and parse", func(t *testing.T) {
@@ -687,13 +687,13 @@ func TestTypeHandler_KindHandlers(t *testing.T) {
 	})
 }
 
-func TestTypeHandlerFunc_NilRegisterFunc(t *testing.T) {
+func TestTypeCodecFunc_NilRegisterFunc(t *testing.T) {
 	t.Parallel()
 
 	t.Run("nil RegisterFunc returns nil", func(t *testing.T) {
 		t.Parallel()
 
-		h := TypeHandlerFunc{
+		h := TypeCodecFunc{
 			ParseFunc:   func(_ string, _ FlagTag) (any, error) { return "x", nil },
 			DefaultFunc: func(_ FlagTag) any { return "y" },
 		}

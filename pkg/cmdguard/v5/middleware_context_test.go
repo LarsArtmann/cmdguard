@@ -19,7 +19,7 @@ type ctxKey struct{}
 // deriveContextMiddleware returns a ContextMiddleware[T] that attaches value
 // to the context under ctxKey before calling next with the derived context.
 func deriveContextMiddleware[T any](value string) ContextMiddleware[T] {
-	return func(ctx context.Context, _ *T, _ CommandInfo, next func(context.Context) error) error {
+	return func(ctx context.Context, _ *T, _ CommandMetadata, next func(context.Context) error) error {
 		return next(context.WithValue(ctx, ctxKey{}, value))
 	}
 }
@@ -62,7 +62,7 @@ func TestContextMiddleware_ReachesPlainMiddleware(t *testing.T) {
 	cli, err := NewCLI(
 		"test", "Test CLI", ctxMiddlewareConfig{},
 		WithContextMiddleware(deriveContextMiddleware[ctxMiddlewareConfig]("outer")),
-		WithMiddleware(func(_ context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func() error) error {
+		WithMiddleware(func(_ context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func() error) error {
 			plainValue = nil
 
 			return next()
@@ -96,13 +96,13 @@ func TestContextMiddleware_Chaining(t *testing.T) {
 
 	var callOrder []string
 
-	first := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
+	first := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func(context.Context) error) error {
 		callOrder = append(callOrder, "first-before")
 
 		return next(ctx)
 	}
 
-	second := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
+	second := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func(context.Context) error) error {
 		callOrder = append(callOrder, "second-before")
 
 		err := next(ctx)
@@ -153,7 +153,7 @@ func TestContextMiddleware_DerivedContextFlowsThroughWholeChain(t *testing.T) {
 		seenByFirst  any
 	)
 
-	first := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
+	first := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func(context.Context) error) error {
 		err := next(context.WithValue(ctx, ctxKey{}, "from-first"))
 
 		seenByFirst = ctx.Value(ctxKey{})
@@ -161,13 +161,13 @@ func TestContextMiddleware_DerivedContextFlowsThroughWholeChain(t *testing.T) {
 		return err
 	}
 
-	second := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
+	second := func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func(context.Context) error) error {
 		seenBySecond = ctx.Value(ctxKey{})
 
 		return next(ctx)
 	}
 
-	plain := func(_ context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func() error) error {
+	plain := func(_ context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func() error) error {
 		return next()
 	}
 
@@ -219,7 +219,7 @@ func TestContextMiddleware_ErrorPropagation(t *testing.T) {
 		"Test CLI",
 		ctxMiddlewareConfig{},
 		WithContextMiddleware(
-			func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandInfo, next func(context.Context) error) error {
+			func(ctx context.Context, _ *ctxMiddlewareConfig, _ CommandMetadata, next func(context.Context) error) error {
 				return next(ctx)
 			},
 		),
@@ -347,7 +347,7 @@ func TestWithContextMiddleware_TypeMismatchYieldsNoMiddleware(t *testing.T) {
 	// A context middleware registered with the wrong config type must be
 	// silently ignored (sealed-interface extraction yields nil), not panic.
 	mismatched := WithContextMiddleware(
-		func(_ context.Context, _ *otherConfig, _ CommandInfo, next func(context.Context) error) error {
+		func(_ context.Context, _ *otherConfig, _ CommandMetadata, next func(context.Context) error) error {
 			return errors.New("must not run")
 		},
 	)

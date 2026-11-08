@@ -227,10 +227,10 @@ func AuditLogFailedServices[T any](cli *CLI[T]) []auditlog.ServiceInfo {
 // stays safe when audit logging is conditionally disabled.
 //
 // Events are attributed to the plugin's root scope. Command names use
-// CommandInfo.FullPath when available (populated during cobra execution),
+// CommandMetadata.FullPath when available (populated during cobra execution),
 // falling back to Name.
 func AuditMiddleware[T any](plugin *auditlog.Plugin) Middleware[T] {
-	return func(ctx context.Context, cfg *T, info CommandInfo, next func() error) error {
+	return func(ctx context.Context, cfg *T, info CommandMetadata, next func() error) error {
 		if plugin == nil {
 			return next()
 		}

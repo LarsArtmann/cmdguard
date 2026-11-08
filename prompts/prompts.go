@@ -23,11 +23,10 @@ import (
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-// HuhRunner implements v5.PromptRunner using the huh/v2 TUI library.
-// TODO(v5): "Runner" suffix is generic; consider HuhPrompter (see naming-review 2026-07-18).
-type HuhRunner struct{}
+// HuhPrompter implements v5.PromptRunner using the huh/v2 TUI library.
+type HuhPrompter struct{}
 
-func (h *HuhRunner) PromptString(title, defaultValue string) (string, error) {
+func (h *HuhPrompter) PromptString(title, defaultValue string) (string, error) {
 	result := defaultValue
 
 	err := huh.NewInput().
@@ -41,7 +40,7 @@ func (h *HuhRunner) PromptString(title, defaultValue string) (string, error) {
 	return result, nil
 }
 
-func (h *HuhRunner) PromptSelect(title string, options []string) (string, error) {
+func (h *HuhPrompter) PromptSelect(title string, options []string) (string, error) {
 	var result string
 
 	opts := make([]huh.Option[string], 0, len(options))
@@ -61,7 +60,7 @@ func (h *HuhRunner) PromptSelect(title string, options []string) (string, error)
 	return result, nil
 }
 
-func (h *HuhRunner) PromptConfirm(title string) (bool, error) {
+func (h *HuhPrompter) PromptConfirm(title string) (bool, error) {
 	var result bool
 
 	err := huh.NewConfirm().
@@ -78,5 +77,5 @@ func (h *HuhRunner) PromptConfirm(title string) (bool, error) {
 // Register wires huh-based prompting into cmdguard. Call this once at startup
 // to enable interactive prompts for missing flags with the `prompt:"..."` tag.
 func Register() {
-	v5.SetPromptRunner(&HuhRunner{})
+	v5.SetPromptRunner(&HuhPrompter{})
 }

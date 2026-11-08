@@ -51,13 +51,13 @@ func uintBitSize(k reflect.Kind) int {
 	}
 }
 
-// makeIntKindHandler builds a TypeHandlerFunc for a signed integer kind that
+// makeIntKindHandler builds a TypeCodecFunc for a signed integer kind that
 // validates flag values against the field's actual bit-width. Values outside
 // the representable range produce an error instead of silently wrapping.
 // Previously every signed kind shared one handler parsing with bitSize 64, so a
 // value like 999 written into an int8 silently wrapped to -25.
-func makeIntKindHandler(bitSize int) TypeHandlerFunc { //nolint:dupl // mirrors makeUintKindHandler (signed vs unsigned)
-	return TypeHandlerFunc{
+func makeIntKindHandler(bitSize int) TypeCodecFunc { //nolint:dupl // mirrors makeUintKindHandler (signed vs unsigned)
+	return TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := parseIntDefault(tag.Default)
 			if err != nil {
@@ -88,10 +88,10 @@ func makeIntKindHandler(bitSize int) TypeHandlerFunc { //nolint:dupl // mirrors 
 	}
 }
 
-// makeUintKindHandler builds a TypeHandlerFunc for an unsigned integer kind that
+// makeUintKindHandler builds a TypeCodecFunc for an unsigned integer kind that
 // validates flag values against the field's actual bit-width.
-func makeUintKindHandler(bitSize int) TypeHandlerFunc { //nolint:dupl // mirrors makeIntKindHandler (signed vs unsigned)
-	return TypeHandlerFunc{
+func makeUintKindHandler(bitSize int) TypeCodecFunc { //nolint:dupl // mirrors makeIntKindHandler (signed vs unsigned)
+	return TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := parseUintDefault(tag.Default)
 			if err != nil {

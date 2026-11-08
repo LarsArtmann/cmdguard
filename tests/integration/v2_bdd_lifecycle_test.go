@@ -269,7 +269,7 @@ func TestCLI_Middleware_Chain(t *testing.T) {
 
 			trackingMW := func(name string) v5.Middleware[lifecycleConfig] {
 				return func(
-					_ context.Context, _ *lifecycleConfig, _ v5.CommandInfo, next func() error,
+					_ context.Context, _ *lifecycleConfig, _ v5.CommandMetadata, next func() error,
 				) error {
 					order = append(order, name+"-before")
 					err := next()

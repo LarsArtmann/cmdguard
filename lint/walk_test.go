@@ -120,13 +120,13 @@ func TestAnalyzeResolvesAliasesAndMajors(t *testing.T) {
 		t.Errorf("aliased major: got %q, want v3", aliased.cmdguardMajor)
 	}
 
-	// Unaliased v4 import resolves to the package name "v4" (last segment).
-	if got := plain.imports["v4"]; got != "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5" {
+	// Unaliased v5 import resolves to the package name "v5" (last segment).
+	if got := plain.imports["v5"]; got != "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5" {
 		t.Errorf("plain import resolution: got %q", got)
 	}
 
-	if plain.cmdguardMajor != "v4" {
-		t.Errorf("plain major: got %q, want v4", plain.cmdguardMajor)
+	if plain.cmdguardMajor != "v5" {
+		t.Errorf("plain major: got %q, want v5", plain.cmdguardMajor)
 	}
 }
 
@@ -139,7 +139,7 @@ func TestMajorOf(t *testing.T) {
 	}{
 		{"github.com/larsartmann/cmdguard", "v1"},
 		{"github.com/larsartmann/cmdguard/v3/pkg/cmdguard/v3", "v3"},
-		{"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5", "v4"},
+		{"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5", "v5"},
 		{"github.com/larsartmann/cmdguard/spinner", ""},
 		{"github.com/larsartmann/cmdguard/telemetry", ""},
 		{"example.com/other/v2", ""},

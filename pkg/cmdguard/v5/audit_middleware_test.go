@@ -20,7 +20,7 @@ func TestAuditMiddleware(t *testing.T) {
 		plugin := newTestPlugin(t)
 		mw := v5.AuditMiddleware[testCLIConfig](plugin)
 
-		err := mw(t.Context(), &testCLIConfig{}, v5.CommandInfo{Name: "run"}, func() error {
+		err := mw(t.Context(), &testCLIConfig{}, v5.CommandMetadata{Name: "run"}, func() error {
 			return nil
 		})
 		if err != nil {
@@ -71,7 +71,7 @@ func TestAuditMiddleware(t *testing.T) {
 
 		sentinel := errors.New("boom")
 
-		err := mw(t.Context(), &testCLIConfig{}, v5.CommandInfo{Name: "fail"}, func() error {
+		err := mw(t.Context(), &testCLIConfig{}, v5.CommandMetadata{Name: "fail"}, func() error {
 			return sentinel
 		})
 		if !errors.Is(err, sentinel) {
@@ -100,7 +100,7 @@ func TestAuditMiddleware(t *testing.T) {
 		mw := v5.AuditMiddleware[testCLIConfig](nil)
 
 		called := false
-		err := mw(t.Context(), &testCLIConfig{}, v5.CommandInfo{Name: "run"}, func() error {
+		err := mw(t.Context(), &testCLIConfig{}, v5.CommandMetadata{Name: "run"}, func() error {
 			called = true
 
 			return nil
@@ -120,7 +120,7 @@ func TestAuditMiddleware(t *testing.T) {
 		plugin := newTestPlugin(t)
 		mw := v5.AuditMiddleware[testCLIConfig](plugin)
 
-		info := v5.CommandInfo{Name: "cmd", FullPath: "root sub cmd"}
+		info := v5.CommandMetadata{Name: "cmd", FullPath: "root sub cmd"}
 
 		_ = mw(t.Context(), &testCLIConfig{}, info, func() error { return nil })
 

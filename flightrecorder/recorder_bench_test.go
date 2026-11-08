@@ -34,7 +34,7 @@ func BenchmarkMiddleware_Overhead(b *testing.B) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v5.CommandInfo{Name: "bench", Phase: v5.PhaseRun}
+	info := v5.CommandMetadata{Name: "bench", Phase: v5.PhaseRun}
 	middleware := Middleware[testConfig](rec)
 
 	next := func() error { return nil }

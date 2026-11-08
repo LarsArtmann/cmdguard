@@ -6,16 +6,16 @@ import (
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-func TestHuhRunner_ImplementsPromptRunner(t *testing.T) {
+func TestHuhPrompter_ImplementsPromptRunner(t *testing.T) {
 	t.Parallel()
 
-	var _ v5.PromptRunner = (*HuhRunner)(nil)
+	var _ v5.PromptRunner = (*HuhPrompter)(nil)
 }
 
-func TestHuhRunner_PromptConfirm(t *testing.T) {
+func TestHuhPrompter_PromptConfirm(t *testing.T) {
 	t.Parallel()
 
-	var runner v5.PromptRunner = &HuhRunner{}
+	var runner v5.PromptRunner = &HuhPrompter{}
 	_ = runner
 }
 

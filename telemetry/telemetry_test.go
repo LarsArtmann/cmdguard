@@ -27,7 +27,7 @@ func TestMiddleware_NilTracerCallsNext(t *testing.T) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}
+	info := v5.CommandMetadata{Name: "test", Phase: v5.PhaseRun}
 
 	called := false
 	mw := Middleware[testConfig](nil)
@@ -51,7 +51,7 @@ func TestMiddleware_NoopTracerCallsNext(t *testing.T) {
 
 	ctx := context.Background()
 	cfg := &testConfig{}
-	info := v5.CommandInfo{Name: "test", Phase: v5.PhaseRun}
+	info := v5.CommandMetadata{Name: "test", Phase: v5.PhaseRun}
 
 	called := false
 	tracer := noop.NewTracerProvider().Tracer("test")

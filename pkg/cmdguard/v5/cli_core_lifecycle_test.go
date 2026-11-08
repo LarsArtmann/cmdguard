@@ -6,33 +6,6 @@ import (
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-func TestCLISetConfig(t *testing.T) {
-	t.Parallel()
-	t.Run("updates config", func(t *testing.T) {
-		t.Parallel()
-
-		cli, err := v5.NewCLI("test", "Test", testCLIConfig{})
-		if err != nil {
-			t.Fatalf("NewCLI failed: %v", err)
-		}
-
-		cli.SetConfig(testCLIConfig{Verbose: true, Level: "debug"})
-
-		cfg := cli.Config()
-		if cfg == nil {
-			t.Fatal("Config() returned nil")
-		}
-
-		if !cfg.Verbose {
-			t.Error("Verbose not updated")
-		}
-
-		if cfg.Level != "debug" {
-			t.Errorf("Level = %q, want %q", cfg.Level, "debug")
-		}
-	})
-}
-
 func TestCLIShutdown(t *testing.T) {
 	t.Parallel()
 	t.Run("shutdown succeeds", func(t *testing.T) {

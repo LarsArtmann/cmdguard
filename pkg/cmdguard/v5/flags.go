@@ -91,9 +91,9 @@ func (r *FlagRegistry) RegisterFlagValidator(name string, validator FlagValidato
 	r.validators.register(name, validator)
 }
 
-// RegisterTypeHandler registers a custom TypeHandler for a specific reflect.Type
+// RegisterTypeCodec registers a custom TypeCodec for a specific reflect.Type
 // on this registry instance. New flags registered after this call will use the handler.
-func (r *FlagRegistry) RegisterTypeHandler(typ reflect.Type, handler TypeHandler) {
+func (r *FlagRegistry) RegisterTypeCodec(typ reflect.Type, handler TypeCodec) {
 	r.types.register(typ, handler)
 }
 
@@ -186,7 +186,7 @@ func (r *FlagRegistry) registerAllFlags(flagSet *pflag.FlagSet, cmd *cobra.Comma
 	return nil
 }
 
-// registerFlag adds a single flag to the given flag set via the TypeHandler registry.
+// registerFlag adds a single flag to the given flag set via the TypeCodec registry.
 func (r *FlagRegistry) registerFlag(flags *pflag.FlagSet, tag FlagTag) error {
 	err := dispatchRegister(r.types, flags, tag)
 	if err != nil {

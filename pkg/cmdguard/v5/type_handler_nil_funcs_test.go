@@ -11,16 +11,16 @@ import (
 )
 
 // nilHandlerProbeType is a field type no built-in handler claims, so a
-// test-registered TypeHandlerFunc is the only handler dispatch can find.
+// test-registered TypeCodecFunc is the only handler dispatch can find.
 type nilHandlerProbeType string
 
-// nilFuncsHandler returns a TypeHandlerFunc with every optional func nil.
-func nilFuncsHandler() TypeHandlerFunc {
-	return TypeHandlerFunc{}
+// nilFuncsHandler returns a TypeCodecFunc with every optional func nil.
+func nilFuncsHandler() TypeCodecFunc {
+	return TypeCodecFunc{}
 }
 
 // TestDispatchRegister_NilRegisterFuncRejected pins the footgun fix: a
-// TypeHandlerFunc without RegisterFunc must fail at dispatch (CLI build time)
+// TypeCodecFunc without RegisterFunc must fail at dispatch (CLI build time)
 // instead of silently registering nothing, which used to surface far from the
 // cause as "unknown flag" at invocation time.
 func TestDispatchRegister_NilRegisterFuncRejected(t *testing.T) {
@@ -40,9 +40,9 @@ func TestDispatchRegister_NilRegisterFuncRejected(t *testing.T) {
 	}
 }
 
-// TestTypeHandlerFunc_NilParseFuncErrors pins that Parse reports the missing
+// TestTypeCodecFunc_NilParseFuncErrors pins that Parse reports the missing
 // ParseFunc as an error instead of panicking on the nil call.
-func TestTypeHandlerFunc_NilParseFuncErrors(t *testing.T) {
+func TestTypeCodecFunc_NilParseFuncErrors(t *testing.T) {
 	t.Parallel()
 
 	tag := FlagTag{Name: "probe-flag", Type: reflect.TypeFor[nilHandlerProbeType]()}
@@ -63,9 +63,9 @@ func TestTypeHandlerFunc_NilParseFuncErrors(t *testing.T) {
 	testutil.AssertErrorContains(t, err, "ParseFunc", "nil")
 }
 
-// TestTypeHandlerFunc_NilDefaultFuncErrors pins that Default tolerates a nil
+// TestTypeCodecFunc_NilDefaultFuncErrors pins that Default tolerates a nil
 // DefaultFunc by yielding a nil default instead of panicking.
-func TestTypeHandlerFunc_NilDefaultFuncErrors(t *testing.T) {
+func TestTypeCodecFunc_NilDefaultFuncErrors(t *testing.T) {
 	t.Parallel()
 
 	tag := FlagTag{Name: "probe-flag", Type: reflect.TypeFor[nilHandlerProbeType]()}

@@ -36,7 +36,7 @@ func addNoOpCommand[T any](t *testing.T, cli *CLI[T], use, short string) {
 // invoking next() and "<name>-after" after, appending both to order. Used to verify
 // middleware chain ordering in tests.
 func beforeAfterMiddleware[T any](order *[]string, name string) Middleware[T] {
-	return func(_ context.Context, _ *T, _ CommandInfo, next func() error) error {
+	return func(_ context.Context, _ *T, _ CommandMetadata, next func() error) error {
 		*order = append(*order, name+"-before")
 
 		err := next()
@@ -47,10 +47,10 @@ func beforeAfterMiddleware[T any](order *[]string, name string) Middleware[T] {
 	}
 }
 
-// captureInfoMiddleware returns a Middleware[T] that captures the incoming CommandInfo
+// captureInfoMiddleware returns a Middleware[T] that captures the incoming CommandMetadata
 // into *captured before delegating to next(). Used to assert the info passed to middleware.
-func captureInfoMiddleware[T any](captured *CommandInfo) Middleware[T] {
-	return func(_ context.Context, _ *T, info CommandInfo, next func() error) error {
+func captureInfoMiddleware[T any](captured *CommandMetadata) Middleware[T] {
+	return func(_ context.Context, _ *T, info CommandMetadata, next func() error) error {
 		*captured = info
 
 		return next()
@@ -60,7 +60,7 @@ func captureInfoMiddleware[T any](captured *CommandInfo) Middleware[T] {
 // captureNameMiddleware returns a Middleware[T] that appends info.Name to *names
 // before delegating to next(). Used to verify which commands the chain visited.
 func captureNameMiddleware[T any](names *[]string) Middleware[T] {
-	return func(_ context.Context, _ *T, info CommandInfo, next func() error) error {
+	return func(_ context.Context, _ *T, info CommandMetadata, next func() error) error {
 		*names = append(*names, info.Name)
 
 		return next()
@@ -149,7 +149,7 @@ func TestMiddleware_ShortCircuit(t *testing.T) {
 	shortCircuitErr := errors.New("blocked")
 	handlerCalled := false
 
-	blockingMiddleware := func(_ context.Context, _ *testConfig, _ CommandInfo, _ func() error) error {
+	blockingMiddleware := func(_ context.Context, _ *testConfig, _ CommandMetadata, _ func() error) error {
 		return shortCircuitErr
 	}
 
@@ -178,7 +178,7 @@ func TestMiddleware_CommandInfo(t *testing.T) {
 
 	type testConfig struct{}
 
-	var capturedInfo CommandInfo
+	var capturedInfo CommandMetadata
 
 	cli, err := NewCLI(
 		"test", "Test CLI", testConfig{},
@@ -329,7 +329,7 @@ func TestChainMiddleware(t *testing.T) {
 	var order []string
 
 	chain := buildChain(
-		context.Background(), &testConfig{}, CommandInfo{Name: "test"},
+		context.Background(), &testConfig{}, CommandMetadata{Name: "test"},
 		[]Middleware[testConfig]{
 			beforeAfterMiddleware[testConfig](&order, "a"),
 			beforeAfterMiddleware[testConfig](&order, "b"),
@@ -371,7 +371,7 @@ func TestChainMiddleware_Empty(t *testing.T) {
 	chain := buildChain(
 		context.Background(),
 		&testConfig{},
-		CommandInfo{},
+		CommandMetadata{},
 		[]Middleware[testConfig]{},
 		func() error {
 			called = true

@@ -481,7 +481,7 @@ func BenchmarkFlagRegistryCOWWithWrite(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		registry.RegisterTypeHandler(reflect.TypeFor[string](), v5.TypeHandlerFunc{
+		registry.RegisterTypeCodec(reflect.TypeFor[string](), v5.TypeCodecFunc{
 			ParseFunc:   func(value string, _ v5.FlagTag) (any, error) { return value, nil },
 			DefaultFunc: func(_ v5.FlagTag) any { return "" },
 		})

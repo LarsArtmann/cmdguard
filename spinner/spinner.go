@@ -62,7 +62,7 @@ func Middleware[T any](title string) v5.Middleware[T] {
 
 // MiddlewareWithConfig returns spinner middleware using the provided configuration.
 func MiddlewareWithConfig[T any](cfg Config) v5.Middleware[T] {
-	return func(_ context.Context, _ *T, _ v5.CommandInfo, next func() error) error {
+	return func(_ context.Context, _ *T, _ v5.CommandMetadata, next func() error) error {
 		if cfg.Writer == nil || cfg.Interval <= 0 || len(cfg.Frames) == 0 {
 			return next()
 		}

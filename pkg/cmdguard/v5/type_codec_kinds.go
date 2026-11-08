@@ -20,7 +20,7 @@ func (r *typeRegistry) registerKinds() {
 }
 
 func (r *typeRegistry) registerCountHandler() {
-	r.countHandler = TypeHandlerFunc{
+	r.countHandler = TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			if tag.Short != "" {
 				flags.CountP(tag.Name, tag.Short, tag.Help)
@@ -40,7 +40,7 @@ func (r *typeRegistry) registerCountHandler() {
 }
 
 func (r *typeRegistry) registerStringKind() {
-	r.byKind[reflect.String] = TypeHandlerFunc{
+	r.byKind[reflect.String] = TypeCodecFunc{
 		RegisterFunc: registerStringFlagFromTag,
 		ParseFunc: func(value string, _ FlagTag) (any, error) {
 			return value, nil
@@ -52,7 +52,7 @@ func (r *typeRegistry) registerStringKind() {
 }
 
 func (r *typeRegistry) registerBoolKind() {
-	r.byKind[reflect.Bool] = TypeHandlerFunc{
+	r.byKind[reflect.Bool] = TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := parseBoolDefault(tag.Default)
 			if err != nil {
@@ -98,7 +98,7 @@ func (r *typeRegistry) registerUintKinds() {
 }
 
 func (r *typeRegistry) registerFloatKinds() {
-	floatHandler := TypeHandlerFunc{
+	floatHandler := TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := parseFloat64Default(tag.Default)
 			if err != nil {
@@ -128,7 +128,7 @@ func (r *typeRegistry) registerFloatKinds() {
 }
 
 func (r *typeRegistry) registerSliceKind() {
-	r.byKind[reflect.Slice] = TypeHandlerFunc{
+	r.byKind[reflect.Slice] = TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			var def []string
 			if tag.Default != "" {

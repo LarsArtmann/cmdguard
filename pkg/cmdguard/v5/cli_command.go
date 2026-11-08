@@ -137,7 +137,7 @@ func wireAllHandlers[T, F any](
 	flagRegistry *FlagRegistry, middlewares []Middleware[T], ctxMiddlewares []ContextMiddleware[T],
 ) {
 	s := cmd.spec
-	info := CommandInfo{Name: s.use, Phase: PhaseRun, HasRunE: cmd.runE != nil}
+	info := CommandMetadata{Name: s.use, Phase: PhaseRun, HasRunE: cmd.runE != nil}
 
 	wireHandlerWithMiddleware(handlerConfig[T, F]{
 		target: &cobraCmd.RunE, handler: cmd.runE, config: config,
@@ -229,7 +229,7 @@ type handlerConfig[T, F any] struct {
 	flags              F
 	registry           *FlagRegistry
 	phase              string
-	info               CommandInfo
+	info               CommandMetadata
 	middlewares        []Middleware[T]
 	contextMiddlewares []ContextMiddleware[T]
 	promptOnMissing    bool

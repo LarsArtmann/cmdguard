@@ -23,7 +23,7 @@ import (
 // The returned error from next is always passed through unchanged — the
 // middleware only adds observability, it never changes program behavior.
 func Middleware[T any](rec *Recorder) v5.Middleware[T] {
-	return func(ctx context.Context, _ *T, info v5.CommandInfo, next func() error) error {
+	return func(ctx context.Context, _ *T, info v5.CommandMetadata, next func() error) error {
 		if !rec.Enabled() {
 			if startErr := rec.Start(); startErr != nil {
 				rec.logf("flightrecorder: failed to start: %v", startErr)
@@ -53,7 +53,7 @@ func Middleware[T any](rec *Recorder) v5.Middleware[T] {
 // slow AND errors, error takes precedence over slow — the error reason is always
 // the primary concern for debugging.
 // The snapshot write runs in a background goroutine to avoid blocking.
-func evaluateCapture(ctx context.Context, rec *Recorder, info v5.CommandInfo, elapsed time.Duration, runErr error) {
+func evaluateCapture(ctx context.Context, rec *Recorder, info v5.CommandMetadata, elapsed time.Duration, runErr error) {
 	cfg := rec.Config()
 
 	var reason CaptureReason

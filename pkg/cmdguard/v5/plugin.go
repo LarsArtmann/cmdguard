@@ -22,13 +22,13 @@ type PluginRegistrar struct {
 	validators *validatorRegistry
 }
 
-// TypeHandler registers a custom type handler for a specific reflect.Type.
-func (r PluginRegistrar) TypeHandler(typ reflect.Type, handler TypeHandler) {
+// TypeCodec registers a custom type handler for a specific reflect.Type.
+func (r PluginRegistrar) TypeCodec(typ reflect.Type, handler TypeCodec) {
 	r.types.register(typ, handler)
 }
 
-// TypeHandlerFunc is a convenience wrapper for registering a TypeHandlerFunc.
-func (r PluginRegistrar) TypeHandlerFunc(typ reflect.Type, handler TypeHandlerFunc) {
+// TypeCodecFunc is a convenience wrapper for registering a TypeCodecFunc.
+func (r PluginRegistrar) TypeCodecFunc(typ reflect.Type, handler TypeCodecFunc) {
 	r.types.register(typ, handler)
 }
 

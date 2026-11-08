@@ -24,7 +24,7 @@ func (r *typeRegistry) registerEnumTypes() {
 		return tag.Help
 	}
 
-	enumHandler := TypeHandlerFunc{
+	enumHandler := TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			registerStringFlag(flags, tag.Name, tag.Short, tag.Default, enumHelp(tag))
 
@@ -42,8 +42,8 @@ func (r *typeRegistry) registerEnumTypes() {
 	makeEnumLikeHandler := func(
 		parseFunc func(string) (any, error),
 		defaultAllowed []string,
-	) TypeHandlerFunc {
-		return TypeHandlerFunc{
+	) TypeCodecFunc {
+		return TypeCodecFunc{
 			RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 				allowed := tag.Values
 				if len(allowed) == 0 {
@@ -95,7 +95,7 @@ func (r *typeRegistry) registerValueTypes() {
 		{reflect.TypeFor[HostPort](), func(v string) (any, error) { return ParseHostPort(v) }, stringDefault},
 	} {
 		typ, parse, def := entry.typ, entry.parse, entry.defaultVal
-		r.byType[typ] = TypeHandlerFunc{
+		r.byType[typ] = TypeCodecFunc{
 			RegisterFunc: registerStringFlagFromTag,
 			ParseFunc: func(value string, _ FlagTag) (any, error) {
 				return parse(value)
@@ -109,20 +109,20 @@ func stringDefault(tag FlagTag) any {
 	return tag.Default
 }
 
-// RegisterGoDurationHandler registers a TypeHandler for time.Duration fields
+// RegisterGoDurationHandler registers a TypeCodec for time.Duration fields
 // in the global defaults template. New FlagRegistries will include this handler.
 func RegisterGoDurationHandler() {
 	globalTypeRegistry.registerGoDurationHandler()
 }
 
-// RegisterGoDurationHandler registers a TypeHandler for time.Duration fields
+// RegisterGoDurationHandler registers a TypeCodec for time.Duration fields
 // on this registry instance.
 func (r *FlagRegistry) RegisterGoDurationHandler() {
 	r.types.registerGoDurationHandler()
 }
 
 func (r *typeRegistry) registerGoDurationHandler() {
-	r.register(reflect.TypeFor[time.Duration](), TypeHandlerFunc{
+	r.register(reflect.TypeFor[time.Duration](), TypeCodecFunc{
 		RegisterFunc: func(flags *pflag.FlagSet, tag FlagTag) error {
 			def, err := time.ParseDuration(tag.Default)
 			if err != nil && tag.Default != "" {

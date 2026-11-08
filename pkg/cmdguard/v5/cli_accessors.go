@@ -23,18 +23,6 @@ func (cli *CLI[T]) Config() *T {
 	return cli.config
 }
 
-// SetConfig updates the configuration.
-//
-// Deprecated: SetConfig mutates the CLI after construction without
-// re-initializing the FlagRegistry, so registered flags keep the defaults
-// captured at NewCLI time — the replaced config silently diverges from what
-// flag parsing will produce. Pass the desired defaults to NewCLI instead.
-// SetConfig will be removed in v5 (naming-review 2026-07-18 follow-up).
-// TODO(v5): remove SetConfig — unsafe post-construction mutation.
-func (cli *CLI[T]) SetConfig(cfg T) {
-	cli.config = &cfg
-}
-
 // RootCommand returns the underlying cobra root command.
 func (cli *CLI[T]) RootCommand() *cobra.Command {
 	return cli.rootCmd
