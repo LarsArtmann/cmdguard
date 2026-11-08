@@ -16,7 +16,7 @@ import (
     "os"
     "strings"
 
-    "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
 type AppConfig struct {
@@ -30,14 +30,14 @@ type GreetFlags struct {
 }
 
 func main() {
-    cli, err := v4.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
+    cli, err := v5.NewCLI[AppConfig]("myapp", "My CLI application", AppConfig{})
     if err != nil {
         fmt.Fprintf(os.Stderr, "Failed to create CLI: %v\n", err)
         os.Exit(1)
     }
 
-    greetCmd, err := v4.NewCommand("greet", &GreetFlags{},
-        func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
+    greetCmd, err := v5.NewCommand("greet", GreetFlags{},
+        func(ctx context.Context, cfg *AppConfig, flags GreetFlags) error {
             msg := fmt.Sprintf("Hello, %s!", flags.Name)
             if flags.Shout {
                 msg = strings.ToUpper(msg)
@@ -45,14 +45,16 @@ func main() {
             fmt.Println(msg)
             return nil
         },
-        v4.WithShort("Greet someone"),
+        v5.WithShort("Greet someone"),
     )
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Failed to create command: %v\n", err)
+
+    b := v5.NewBuilder(cli)
+    v5.Try(b, greetCmd, err)
+    if err := b.Build(); err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to register command: %v\n", err)
         os.Exit(1)
     }
 
-    v4.AddCommand(cli, greetCmd)
     cli.ExecuteAndExit(context.Background())
 }
 ```
@@ -66,9 +68,9 @@ HELLO, CMDGUARD!
 
 ## What Just Happened?
 
-1. **`NewCLI[AppConfig]`** — created the root CLI with your config struct as a type parameter
-2. **`NewCommand("greet", &GreetFlags{}, handler)`** — created a command with typed flags
-3. **`AddCommand(cli, greetCmd)`** — registered the command (validates at registration time)
+1. **`NewCLI[AppConfig]`** — created the root CLI with your config struct as a type parameter. In v5 the production batteries are ON by default: strict command validation, signal handling with graceful DI shutdown, strict config keys, actionable error hints, and auto-registered `doctor` (plus `version` when a CLI version is set). Each has a `Without*` opt-out.
+2. **`NewCommand("greet", GreetFlags{}, handler)`** — created a command with its own typed flag struct (by value, parsed into the handler's third parameter)
+3. **`NewBuilder` + `Try` + `Build()`** — the v5 registration path: constructor errors are collected (no error ladder) and `Build()` attaches atomically
 4. **`ExecuteAndExit(ctx)`** — ran the CLI and exited with the correct code
 
 ## Subcommands
@@ -76,19 +78,21 @@ HELLO, CMDGUARD!
 Group related commands under a parent:
 
 ```go
-listCmd, _ := v4.NewCommand("list", v4.NoFlags{}, listHandler,
-    v4.WithShort("List users"),
+listCmd, _ := v5.NewCommand("list", v5.NoFlags{}, listHandler,
+    v5.WithShort("List users"),
 )
-createCmd, _ := v4.NewCommand("create", v4.NoFlags{}, createHandler,
-    v4.WithShort("Create a user"),
+createCmd, _ := v5.NewCommand("create", v5.NoFlags{}, createHandler,
+    v5.WithShort("Create a user"),
 )
-userCmd, _ := v4.NewParentCommand[AppConfig]("user",
-    "User management", v4.NoFlags{},
-    v4.WithSubcommands(listCmd, createCmd),
-    v4.WithShort("User management"),
+userCmd, _ := v5.NewParentCommand[AppConfig]("user",
+    "User management", v5.NoFlags{},
+    v5.WithSubcommands(listCmd, createCmd),
+    v5.WithShort("User management"),
 )
-v4.AddCommand(cli, userCmd)
+v5.AddCommand(cli, userCmd)
 ```
+
+Migrating from v4? Run the [codemod](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md) — it rewrites module paths, import aliases, and the renames mechanically.
 
 ## Next Steps
 

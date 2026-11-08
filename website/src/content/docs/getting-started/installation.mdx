@@ -5,7 +5,7 @@ description: Install cmdguard in your Go project.
 
 ## Requirements
 
-- Go 1.26 or later (uses `GOEXPERIMENT=jsonv2`)
+- Go 1.27 or later
 - An active Go module (`go.mod`)
 
 ## Install
@@ -13,24 +13,24 @@ description: Install cmdguard in your Go project.
 Run this in your project directory:
 
 ```bash
-go get github.com/larsartmann/cmdguard/v4@latest
+go get github.com/larsartmann/cmdguard/v5@latest
 ```
 
 ## Import
 
 ```go
-import "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+import "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 ```
 
 For convenience, you can alias the import:
 
 ```go
-import v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+import v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 ```
 
 ## Optional Sub-Modules
 
-cmdguard's core stays lean. Five optional features live in standalone sub-modules so you import only what you need:
+cmdguard's core stays lean. Seven optional features live in standalone sub-modules so you import only what you need:
 
 | Sub-module         | Import path                                      | Provides                      |
 | ------------------ | ------------------------------------------------ | ----------------------------- |
@@ -39,6 +39,8 @@ cmdguard's core stays lean. Five optional features live in standalone sub-module
 | **spinner**        | `github.com/larsartmann/cmdguard/spinner`        | Terminal spinner middleware   |
 | **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`      | OpenTelemetry spans           |
 | **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder` | Runtime trace flight recorder |
+| **lint**           | `github.com/larsartmann/cmdguard/lint`           | cmdguard usage linter (CG001-CG008) |
+| **schema**         | `github.com/larsartmann/cmdguard/schema`         | JSON Schema emitter for config structs |
 
 ```bash
 go get github.com/larsartmann/cmdguard/glamour
@@ -47,7 +49,7 @@ go get github.com/larsartmann/cmdguard/glamour
 ## Verify Installation
 
 ```bash
-go list -m github.com/larsartmann/cmdguard/v4
+go list -m github.com/larsartmann/cmdguard/v5
 ```
 
 ## Next Steps
@@ -55,3 +57,4 @@ go list -m github.com/larsartmann/cmdguard/v4
 - Follow the [Quick Start](/getting-started/quick-start/) for a complete example
 - Learn about [Type-Safe Flags](/guides/type-safe-flags/) to define flags with struct tags
 - See [Migrating from Cobra](/guides/migrating-from-cobra/) if you have an existing Cobra app
+- Migrating from cmdguard v4? See the [v4→v5 Migration Guide](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md)
