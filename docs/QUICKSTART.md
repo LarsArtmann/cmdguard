@@ -145,6 +145,46 @@ go run main.go db migrate
 go run main.go db rollback
 ```
 
+## The Builder (no error ladder)
+
+Every `New*` constructor returns `(value, error)`. Instead of checking each
+error by hand, hand the pair to the `Builder`: it collects constructor errors,
+attaches atomically, and reports the first failure from `Build()`.
+
+```go
+b := v5.NewBuilder(cli)
+
+migrateCmd, err := v5.NewCommand("migrate", v5.NoFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
+        fmt.Println("Running migrations...")
+        return nil
+    },
+    v5.WithShort("Run migrations"),
+)
+b.Check(err) // fold in the constructor error, keep going
+
+v5.Add(b, "rollback", v5.NoFlags{}, // constructs AND queues in one call
+    func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
+        fmt.Println("Rolling back...")
+        return nil
+    },
+    v5.WithShort("Rollback last migration"),
+)
+
+v5.AddParent(b, "db", "Database operations", v5.NoFlags{},
+    v5.WithSubcommands(migrateCmd, rollbackCmd),
+    v5.WithShort("Database operations"),
+)
+
+if err := b.Build(); err != nil { // one check for the whole batch
+    return err
+}
+```
+
+`Try(b, cmd, err)` queues a `(value, error)` pair you already hold; `Add` and
+`AddParent` construct from your arguments directly. `AddCommand`/`AddCommands`
+still work if you prefer the v4 shape.
+
 ---
 
 ## Environment Variables
@@ -241,14 +281,14 @@ normally completing run never tears down the scope, so repeated
 
 v5 ships opinionated defaults — no configuration needed for a serious CLI:
 
-| Default | What you get | Opt-out |
-| ------- | ------------ | ------- |
-| Strict validation | every command needs `WithShort` | `WithoutStrictValidation()` |
-| Signals + graceful shutdown | Ctrl+C handled, DI shut down | `WithoutSignalHandling()` |
-| Strict config keys | config typos fail loudly | `WithoutStrictConfigKeys()` |
-| Error hints | a `Hint:` line under every known error | `WithoutErrorHints()` |
-| `doctor` command | DI health + config diagnostics | `WithoutBatteries()` |
-| `version` command | when `WithCLIVersion` is set | consumer command wins |
+| Default                     | What you get                           | Opt-out                     |
+| --------------------------- | -------------------------------------- | --------------------------- |
+| Strict validation           | every command needs `WithShort`        | `WithoutStrictValidation()` |
+| Signals + graceful shutdown | Ctrl+C handled, DI shut down           | `WithoutSignalHandling()`   |
+| Strict config keys          | config typos fail loudly               | `WithoutStrictConfigKeys()` |
+| Error hints                 | a `Hint:` line under every known error | `WithoutErrorHints()`       |
+| `doctor` command            | DI health + config diagnostics         | `WithoutBatteries()`        |
+| `version` command           | when `WithCLIVersion` is set           | consumer command wins       |
 
 ```go
 cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},

@@ -155,6 +155,9 @@
                     fi
                   done
 
+                  echo "=== docs vs website guide sync ==="
+                  bash scripts/check-guide-sync.sh
+
                   echo ""
                   echo "All checks passed!"
                 ''
