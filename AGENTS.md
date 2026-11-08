@@ -52,7 +52,7 @@ nix run .#check-all
 
 **Module path:** `github.com/larsartmann/cmdguard/v5`
 
-**Current Status:** v5.0.0. 468 test functions in core (583 across the 8 workspace modules; +103 in taskctl/integration), 26 benchmarks, 7 fuzz targets, 89.3% core / 96.1% flightrecorder / 85.9% taskctl coverage, 0 build errors, 0 lint issues.
+**Current Status:** v5.0.0. 468 test functions in core (583 across the 8 workspace modules; +103 in taskctl/integration), 26 benchmarks, 7 fuzz targets, 89.3% core / 97.6% flightrecorder / 93.9% taskctl coverage, 0 build errors, 0 lint issues.
 
 ---
 

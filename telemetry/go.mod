@@ -3,7 +3,7 @@ module github.com/larsartmann/cmdguard/telemetry
 go 1.27
 
 require (
-	github.com/larsartmann/cmdguard/v5 v5.0.0-00010101000000-000000000000
+	github.com/larsartmann/cmdguard/v5 v5.0.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
 )
@@ -76,10 +76,10 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
-replace github.com/larsartmann/cmdguard/v5 => ../
-
 replace github.com/larsartmann/cmdguard/flightrecorder => ../flightrecorder
 
 replace github.com/larsartmann/cmdguard/glamour => ../glamour
 
 replace github.com/larsartmann/cmdguard/spinner => ../spinner
+
+replace github.com/larsartmann/cmdguard/v5 v5.0.0 => ../
