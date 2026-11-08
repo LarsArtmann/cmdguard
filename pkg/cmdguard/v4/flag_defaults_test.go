@@ -123,9 +123,9 @@ func TestNewFlagRegistry_AcceptsValidDefaults(t *testing.T) {
 
 	type validDefaults struct {
 		Mode  string   `flag:"mode"  default:"dev"      values:"dev,prod"`
-		Port  int      `flag:"port"  default:"8080"     validate:"min=1,max=65535"`
-		ID    string   `flag:"id"    default:"123"      validate:"regex=^[0-9]+$"`
-		Wait  Duration `flag:"wait"  default:"30s"      validate:"min=10s,max=1m"`
+		Port  int      `flag:"port"  default:"8080"                       validate:"min=1,max=65535"`
+		ID    string   `flag:"id"    default:"123"                        validate:"regex=^[0-9]+$"`
+		Wait  Duration `flag:"wait"  default:"30s"                        validate:"min=10s,max=1m"`
 		Plain string   `flag:"plain" default:"anything"`
 	}
 

@@ -20,7 +20,7 @@ func TestErrorReferenceDoc(t *testing.T) { //nolint:paralleltest // rewrites a r
 	generated := GenerateErrorReference()
 
 	if *updateGolden {
-		spliced := content
+		var spliced string
 
 		start := strings.Index(content, errorRefBegin)
 		stop := strings.Index(content, errorRefEnd)
@@ -41,7 +41,13 @@ func TestErrorReferenceDoc(t *testing.T) { //nolint:paralleltest // rewrites a r
 	begin := strings.Count(content, errorRefBegin)
 	end := strings.Count(content, errorRefEnd)
 	if begin != 1 || end != 1 {
-		t.Fatalf("expected exactly one %s / %s marker pair in the doc, got %d/%d", errorRefBegin, errorRefEnd, begin, end)
+		t.Fatalf(
+			"expected exactly one %s / %s marker pair in the doc, got %d/%d",
+			errorRefBegin,
+			errorRefEnd,
+			begin,
+			end,
+		)
 	}
 
 	start := strings.Index(content, errorRefBegin)
