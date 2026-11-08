@@ -82,7 +82,7 @@ func buildCrossFileIndex(files []sourceFile) map[string]*crossFileIndex {
 
 			return file.selectorFrom(sel, cmdguardPath)
 		}, func(names []*ast.Ident, call *ast.CallExpr) {
-			sel, _ := call.Fun.(*ast.SelectorExpr)
+			sel := selectorExprOf(call)
 			if sel == nil || sel.Sel == nil {
 				return
 			}
@@ -204,8 +204,8 @@ func (f *sourceFile) topLevelVarCalls(
 					continue
 				}
 
-				sel, ok := call.Fun.(*ast.SelectorExpr)
-				if !ok || !match(sel) {
+				sel := selectorExprOf(call)
+				if sel == nil || !match(sel) {
 					continue
 				}
 

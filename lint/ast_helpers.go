@@ -5,6 +5,32 @@ import (
 	"go/token"
 )
 
+// selectorExprOf returns the selector expression naming the called
+// function, unwrapping generic instantiations: `pkg.NewCLI[T](...)`
+// (IndexExpr) and `pkg.NewCommand[T, F](...)` (IndexListExpr) wrap the
+// selector in type arguments. cmdguard's constructors are generic, so
+// every rule must see through them or generic call sites go unlinted.
+func selectorExprOf(call *ast.CallExpr) *ast.SelectorExpr {
+	if call == nil || call.Fun == nil {
+		return nil
+	}
+
+	switch fun := call.Fun.(type) {
+	case *ast.SelectorExpr:
+		return fun
+	case *ast.IndexExpr:
+		sel, _ := fun.X.(*ast.SelectorExpr)
+
+		return sel
+	case *ast.IndexListExpr:
+		sel, _ := fun.X.(*ast.SelectorExpr)
+
+		return sel
+	default:
+		return nil
+	}
+}
+
 // isSelectorCall reports whether call's function expression is a selector
 // `pkgName.Sel` where pkgName resolves to importPath in this file (a dot
 // import makes every selector match).
@@ -13,8 +39,8 @@ func (f *sourceFile) isSelectorCall(call *ast.CallExpr, importPath, symbol strin
 		return false
 	}
 
-	sel, ok := call.Fun.(*ast.SelectorExpr)
-	if !ok || sel.Sel == nil || sel.Sel.Name != symbol {
+	sel := selectorExprOf(call)
+	if sel == nil || sel.Sel == nil || sel.Sel.Name != symbol {
 		return false
 	}
 
@@ -229,8 +255,8 @@ func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[strin
 	}
 
 	visitCallAssignments(body, func(call *ast.CallExpr) bool {
-		sel, ok := call.Fun.(*ast.SelectorExpr)
-		if !ok || sel.Sel == nil || !constructorNames[sel.Sel.Name] {
+		sel := selectorExprOf(call)
+		if sel == nil || sel.Sel == nil || !constructorNames[sel.Sel.Name] {
 			return false
 		}
 
