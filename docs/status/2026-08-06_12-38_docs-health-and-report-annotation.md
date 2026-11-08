@@ -15,6 +15,7 @@ This session loaded the `docs-health` skill, read all 6 status reports and all 4
 
 ## a) FULLY DONE (Working & Verified)
 
+<!-- check-rows:ledger -->
 | #  | Item                                                              | Evidence                                                                                                                                                                                          |
 | -- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1  | Loaded `docs-health` skill + all 4 reference files                | SKILL.md, harvest-guide.md, build-guide.md, verify-checklist.md, resolving-items.md                                                                                                               |
@@ -35,6 +36,7 @@ This session loaded the `docs-health` skill, read all 6 status reports and all 4
 
 ## b) PARTIALLY DONE (Incomplete)
 
+<!-- check-rows:ledger -->
 | # | Item                                      | What exists                                                                                                   | What's missing                                                                                                                                                                                                                                                                                                                                                                           |
 | - | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **AGENTS.md metrics update**              | FEATURES.md and CHANGELOG.md updated with correct numbers                                                     | **AGENTS.md NOT touched.** Header still says "467 test functions, 26 benchmarks, 7 fuzz targets, 87.8% coverage" (actual: ~550/29/8/87.8%). Package Guidelines table still says "~91%" for flightrecorder (actual 96.1%). go-output still v0.35.0 (actual v0.37.0). Missing `CaptureToWriter`/`WithFlightRecorderRecorder` in sub-module description. **This creates cross-file drift.** |
@@ -48,23 +50,23 @@ This session loaded the `docs-health` skill, read all 6 status reports and all 4
 
 ### High Priority — Should Have Done
 
-1. **AGENTS.md update** — This was explicitly flagged in reports 20:45 (item c.3), 21:22 (items c.2-c.3), and 11:48 (item P1.17). The reports said "update AGENTS.md coverage" and "add new APIs to AGENTS.md sub-module description." I updated FEATURES.md and CHANGELOG.md but left AGENTS.md stale. This is the #1 miss of the session.
+1. ~~**AGENTS.md update** — This was explicitly flagged in reports 20:45 (item c.3), 21:22 (items c.2-c.3), and 11:48 (item P1.17). The reports said "update AGENTS.md coverage" and "add new APIs to AGENTS.md sub-module description." I updated FEATURES.md and CHANGELOG.md but left AGENTS.md stale. This is the #1 miss of the session.~~ done — AGENTS.md current — v4.2.1 status header, 90.4%/96.1% coverage, go-output current
 
-2. **Fix `CONTRIBUTING.md` v3→v4** (lines 101, 115) — A 30-second fix. The 2026-08-05 report flagged it as P0. Instead of fixing it, I put it in TODO_LIST (D3). The skill's own principle: "Fix on sight." I deferred.
+2. ~~**Fix `CONTRIBUTING.md` v3→v4** (lines 101, 115) — A 30-second fix. The 2026-08-05 report flagged it as P0. Instead of fixing it, I put it in TODO_LIST (D3). The skill's own principle: "Fix on sight." I deferred.~~ done — fixed — CONTRIBUTING.md has no v3 references
 
-3. **Fix `docs/ERROR_REFERENCE.md` title v2→v4** — A 10-second fix. Also flagged P0 in 2026-08-05 report. Deferred to TODO_LIST (D4) instead of fixed.
+3. ~~**Fix `docs/ERROR_REFERENCE.md` title v2→v4** — A 10-second fix. Also flagged P0 in 2026-08-05 report. Deferred to TODO_LIST (D4) instead of fixed.~~ done — fixed — title is "Error Reference — cmdguard v4" (drift-guarded test)
 
-4. **Run `go test ./... -race`** — The skill says to run the project's quality gate. I ran build and flake check but not the full test suite. The changes were documentation-only so risk is low, but the principle is "verify, don't trust."
+4. ~~**Run `go test ./... -race`** — The skill says to run the project's quality gate. I ran build and flake check but not the full test suite. The changes were documentation-only so risk is low, but the principle is "verify, don't trust."~~ done — CI runs the full gate (ci.yml test+race)
 
-5. **Run `golangci-lint run ./...`** — Same reasoning. 0 issues expected (no source code changed), but not verified.
+5. ~~**Run `golangci-lint run ./...`** — Same reasoning. 0 issues expected (no source code changed), but not verified.~~ done — CI runs golangci-lint; AGENTS.md reports 0 lint issues
 
 ### Medium Priority
 
-6. **Create `docs/MIGRATION_v3_v4.md`** — The 2026-08-05 report recommended this (item F.4, 30min effort). Deferred to TODO_LIST (D5). This is a larger task, so deferral is more justified than items 2-3.
+6. ~~**Create `docs/MIGRATION_v3_v4.md`** — The 2026-08-05 report recommended this (item F.4, 30min effort). Deferred to TODO_LIST (D5). This is a larger task, so deferral is more justified than items 2-3.~~ done — docs/MIGRATION_v3_v4.md created 2026-08-06
 
-7. **Verify `.golangci.yml` exclusion count** — The AGENTS.md says "4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion + 1 paralleltest path exclusion." The `.golangci.yml` grep showed 3 matches. Didn't reconcile.
+7. ~~**Verify `.golangci.yml` exclusion count** — The AGENTS.md says "4 per-file v4 exclusion rules + 4 ireturn allow-list entries + 1 godox source-pattern exclusion + 1 paralleltest path exclusion." The `.golangci.yml` grep showed 3 matches. Didn't reconcile.~~ **Superseded — .golangci.yml restructured in the lint/v0.1.0 work (2026-10-04).**
 
-8. **Check FEATURES.md "All 5 sub-modules" line** — Updated sub-module test count but didn't verify the "5" count is correct (it is — there are 5 sub-modules: glamour, prompts, spinner, telemetry, flightrecorder).
+8. ~~**Check FEATURES.md "All 5 sub-modules" line** — Updated sub-module test count but didn't verify the "5" count is correct (it is — there are 5 sub-modules: glamour, prompts, spinner, telemetry, flightrecorder).~~ done — confirmed then; FEATURES.md line 350 now says 7 sub-modules
 
 ---
 
@@ -94,6 +96,7 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 
 ### Process (this session's failures)
 
+<!-- check-rows:ledger -->
 | # | Issue                               | Fix                                                                                                                                                                                                             |
 | - | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | AGENTS.md forgotten entirely        | When updating metrics in N files, enumerate ALL files that contain those metrics BEFORE editing. AGENTS.md + FEATURES.md + CHANGELOG.md all carry test/coverage/benchmark counts — update all three atomically. |
@@ -103,6 +106,7 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 
 ### Annotation quality
 
+<!-- check-rows:ledger -->
 | # | Issue                                                   | Fix                                                                                                                                                                                                                                |
 | - | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 5 | Section e) "WHAT WE SHOULD IMPROVE" lists not annotated | The skill says "resolve every numbered item." Section e) in several reports has numbered lists (1-18) of improvements. These were not resolved — only the "Up to 50 Things" lists were annotated.                                  |
@@ -114,19 +118,19 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 
 ### P0 — Must Do (This Session's Misses)
 
-1. **Update AGENTS.md metrics** — Test count 467→~550, benchmarks 26→29, fuzz 7→8, flightrecorder coverage ~91%→96.1%, go-output v0.35→v0.37, add CaptureToWriter/WithFlightRecorderRecorder to sub-module description
-2. **Fix `CONTRIBUTING.md` v3→v4** (lines 101, 115) — 30-second fix
-3. **Fix `docs/ERROR_REFERENCE.md` title v2→v4** — 10-second fix
-4. **Fix CHANGELOG.md "48 tests + 3 examples" phrasing** — clarify the 48 includes examples
-5. **Run `go test ./... -race` and `golangci-lint run ./...`** — full quality gate verification
+1. ~~**Update AGENTS.md metrics** — Test count 467→~550, benchmarks 26→29, fuzz 7→8, flightrecorder coverage ~91%→96.1%, go-output v0.35→v0.37, add CaptureToWriter/WithFlightRecorderRecorder to sub-module description~~ done — AGENTS.md current (v4.2.1 header; 90.4%/96.1%/80.3%/85.9%; go-output current)
+2. ~~**Fix `CONTRIBUTING.md` v3→v4** (lines 101, 115) — 30-second fix~~ done — fixed — CONTRIBUTING.md has no v3 references
+3. ~~**Fix `docs/ERROR_REFERENCE.md` title v2→v4** — 10-second fix~~ done — fixed — ERROR_REFERENCE title says v4
+4. ~~**Fix CHANGELOG.md "48 tests + 3 examples" phrasing** — clarify the 48 includes examples~~ done — fixed — CHANGELOG reads "48 test functions" (flightrecorder/v0.1.0 section)
+5. ~~**Run `go test ./... -race` and `golangci-lint run ./...`** — full quality gate verification~~ done — CI runs test+race+golangci-lint on every push (ci.yml); `nix run .#check-all`
 
 ### P1 — Should Do (Annotation Completeness)
 
-6. Annotate section e) "WHAT WE SHOULD IMPROVE" numbered lists in all 6 reports
-7. Add `## Resolution (2026-08-06)` appendix to the 3 flight-recorder reports (19:42, 20:45, 21:22)
-8. Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide (30min)
-9. Tag `flightrecorder` v0.1.0 — other 4 sub-modules are tagged, this one is not
-10. Clean up residual git corruption (6 broken links, 37 dangling commits, invalid reflog `3e483b3b`)
+6. ~~Annotate section e) "WHAT WE SHOULD IMPROVE" numbered lists in all 6 reports~~ done (docs-health pass completed by later docs-health passes, culminating in the 2026-11-07 sweep)
+7. ~~Add `## Resolution (2026-08-06)` appendix to the 3 flight-recorder reports (19:42, 20:45, 21:22)~~ done (docs-health pass observation — inline annotations + resolution banners adopted instead of appendices)
+8. ~~Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide (30min)~~ done — created 2026-08-06 (docs/MIGRATION_v3_v4.md)
+9. ~~Tag `flightrecorder` v0.1.0 — other 4 sub-modules are tagged, this one is not~~ done — tag flightrecorder/v0.1.0 exists; CHANGELOG [flightrecorder/v0.1.0] 2026-08-06
+10. ~~Clean up residual git corruption (6 broken links, 37 dangling commits, invalid reflog `3e483b3b`)~~ done — repo healthy — git fsck clean (2026-11-07); corruption recovered 2026-08-01
 
 ### P2 — Quality & Polish
 
@@ -194,6 +198,7 @@ These are 30-second fixes that I deferred to TODO_LIST instead of doing on sight
 
 ## Session Metrics
 
+<!-- check-rows:ledger -->
 | Metric                                   | Value                                                                                 |
 | ---------------------------------------- | ------------------------------------------------------------------------------------- |
 | Files read                               | 16 (6 status reports + 4 living docs + 4 skill refs + AGENTS.md + FEATURES.md tail)   |

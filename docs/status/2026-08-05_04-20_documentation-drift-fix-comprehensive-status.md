@@ -211,7 +211,7 @@ I derived the 12 deferred items from the planning doc, but I should verify each 
 | ~~3~~  | ~~Fix `docs/ERROR_REFERENCE.md` title — "v2" → "v4" — _TODO_LIST D4_~~ done — ERROR_REFERENCE.md title is "Error Reference — cmdguard v4", drift-guarded by a test | ~~P0~~ | ~~2min~~ |
 | ~~4~~  | ~~Create `docs/MIGRATION_v3_v4.md` — dedicated v3→v4 migration guide — _TODO_LIST D5_~~ done — docs/MIGRATION_v3_v4.md exists (created 2026-08-06) | ~~P1~~ | ~~30min~~ |
 | ~~5~~  | ~~Add `manpage` removal note to `docs/MIGRATION_v2_v3.md` §3~~ done — manpage removal note added to docs/MIGRATION_v2_v3.md ("removed" note) | ~~P1~~ | ~~5min~~ |
-| ~~6~~  | ~~Fix CHANGELOG.md v3.0.0 section — note manpage later removed~~ **NOT-DO — NOT-DO — the v3.0.0 entry is historically accurate as shipped; the removal is documented in docs/MIGRATION_v2_v3.md instead.** | ~~P1~~ | ~~5min~~ |
+| ~~6~~  | ~~Fix CHANGELOG.md v3.0.0 section — note manpage later removed~~ **NOT-DO — the v3.0.0 entry is historically accurate as shipped; the removal is documented in docs/MIGRATION_v2_v3.md instead.** | ~~P1~~ | ~~5min~~ |
 | ~~7~~  | ~~Audit `.github/workflows/` for stale `cmdguard/v3` references~~ done — audit clean — no cmdguard/v3 references in .github/workflows (ci/release/submodule-smoke/website) | ~~P1~~ | ~~15min~~ |
 | ~~8~~  | ~~Run website build verification (`pnpm run build` in `website/`)~~ done — astro build runs clean (22 pages, 0 errors) per the 2026-08-06 closure sprint | ~~P1~~ | ~~10min~~ |
 | ~~9~~  | ~~Run `nix flake check` to verify format~~ done — nix flake check passed (verified at ba818e3 per the 2026-08-06 annotation) | ~~P1~~ | ~~5min~~ |

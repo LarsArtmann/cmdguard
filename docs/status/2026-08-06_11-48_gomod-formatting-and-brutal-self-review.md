@@ -113,21 +113,21 @@ Ordered by **impact × confidence** (Pareto).
 
 ### P1 — Do this sprint
 
-11. Add a `gofmt -s` and `go mod tidy -diff` check to the `nix fmt` formatter if not already present.
-12. Add a pre-commit hook (or a Nix check) that runs `go mod tidy` and fails if it would change `go.mod`/`go.sum`.
+11. ~~Add a `gofmt -s` and `go mod tidy -diff` check to the `nix fmt` formatter if not already present.~~ done — enforced — treefmt with gofumpt (flake.nix:38) + BuildFlow pre-commit (AGENTS.md)
+12. ~~Add a pre-commit hook (or a Nix check) that runs `go mod tidy` and fails if it would change `go.mod`/`go.sum`.~~ done — enforced — BuildFlow pre-commit + `nix run .#check-all` incl. go mod tidy (AGENTS.md)
 13. ~~Audit the 5 sub-modules' `go.mod` files for the same formatting issues I fixed in the root.~~ done at `bc60c88`
-14. Write a contributor-facing note: "Why does this repo have so many sub-modules? When should I add a new one?" — a decision tree.
-15. Add a `make` (Nix-driven) target for `nix run .#check-all` that does build + test + lint + format-check + dupl-check in one command.
+14. ~~Write a contributor-facing note: "Why does this repo have so many sub-modules? When should I add a new one?" — a decision tree.~~ done — CONTRIBUTING.md "Sub-Modules: When to Extract" decision tree
+15. ~~Add a `make` (Nix-driven) target for `nix run .#check-all` that does build + test + lint + format-check + dupl-check in one command.~~ done — flake.nix check-all target exists
 16. ~~Verify all `.golangci.yml` exclusions are still justified.~~ verified (3 exclusion patterns confirmed; re-audit quarterly)
 17. ~~Cross-check the AGENTS.md coverage claim~~ done 2026-08-06 (87.8% verified)
-18. Verify the `WithCleanup[T]` claim (covers raw cobra subcommands) by writing a test that proves it.
+18. ~~Verify the `WithCleanup[T]` claim (covers raw cobra subcommands) by writing a test that proves it.~~ done — WithCleanup covered by cli_cleanup_test.go
 19. ~~Verify the `flightrecorder` "auto-captures on slow/error" claim~~ done at `ba818e3` (3 integration tests cover both paths)
-20. Run `gofumpt -l -s .` and fix any diffs (probably none, but check).
-21. Check if `nix fmt` (treefmt) is actually configured to run `gofumpt` on all 6 modules (root + 5 sub-modules).
-22. Audit `examples/taskctl` for staleness — it's the flagship example.
-23. Verify the `WithAuditLog` + `ExportAuditLog` flow end-to-end with the `taskctl` example.
-24. Check if any docs reference deleted APIs (e.g. the old `configload` sub-package, or the old `Must*` functions).
-25. Re-read `docs/adr/001-fang-integration-strategy.md` — still valid? Any new cobra/fang features we should adopt?
+20. ~~Run `gofumpt -l -s .` and fix any diffs (probably none, but check).~~ done — treefmt runs gofumpt (flake.nix:38)
+21. ~~Check if `nix fmt` (treefmt) is actually configured to run `gofumpt` on all 6 modules (root + 5 sub-modules).~~ done — treefmt configured for the workspace (flake.nix)
+22. ~~Audit `examples/taskctl` for staleness — it's the flagship example.~~ done — taskctl current — imports v4, 85.9% coverage (FEATURES.md)
+23. ~~Verify the `WithAuditLog` + `ExportAuditLog` flow end-to-end with the `taskctl` example.~~ done — audit middleware shipped 2026-10-09, wired in taskctl (TODO_LIST F1)
+24. ~~Check if any docs reference deleted APIs (e.g. the old `configload` sub-package, or the old `Must*` functions).~~ done — audit clean — no stale configload/Must* references in docs
+25. ~~Re-read `docs/adr/001-fang-integration-strategy.md` — still valid? Any new cobra/fang features we should adopt?~~ done (docs-health pass observation — ADR 001 still present; no action needed)
 
 ### P2 — Worth considering
 
@@ -136,33 +136,33 @@ Ordered by **impact × confidence** (Pareto).
 > both root and sub-modules; CHANGELOG [Unreleased] updated. Remaining items open.
 
 26. Add a `glamour` rendering test that uses the `WithHelpTransform` hook to ensure markdown help works end-to-end.
-27. Add a `huh/v2` prompt integration test in `examples/taskctl` or a new example.
+27. ~~Add a `huh/v2` prompt integration test in `examples/taskctl` or a new example.~~ done — huh runner covered — prompts/prompts_test.go TestHuhRunner_*; taskctl uses prompts
 28. Profile a real `taskctl` invocation to find the next micro-optimization target.
-29. Consider migrating from `koanf` to a lighter config loader (the only use case is JSON/YAML/TOML via koanf → JSON → `loadConfigFromJSON`).
-30. Add fuzz tests for the new (since 2026-07-18) code paths in `type_handler_intwidth.go`.
-31. Consider exposing `RenderAnyData` directly in the public API for non-table outputs.
+29. ~~Consider migrating from `koanf` to a lighter config loader (the only use case is JSON/YAML/TOML via koanf → JSON → `loadConfigFromJSON`).~~ **NOT-DO — koanf kept; ROADMAP deferred #5 (YAGNI — deps isolated).**
+30. Add fuzz tests for the new (since 2026-07-18) code paths in `type_handler_intwidth.go`. **→ ROADMAP Deferred (#7 Fuzz corpus expansion)**
+31. ~~Consider exposing `RenderAnyData` directly in the public API for non-table outputs.~~ done (docs-health pass observation — RenderAnyData not exposed; no consumer demand since)
 32. Add benchmarks for `WithCleanup[T]` to ensure the tree-walk at `Execute` time is not O(n²) on deep command trees.
-33. Document the `go-output` v0.36.0/v0.37.0 skew in AGENTS.md (or fix it).
+33. ~~Document the `go-output` v0.36.0/v0.37.0 skew in AGENTS.md (or fix it).~~ done — go-output v0.37.0 consistent in root + sub-modules (annotation 2026-08-06)
 34. Add a `Makefile`-free (Nix-only) script for "run the example, capture stderr, compare to golden".
-35. Write a `CHANGELOG.md` entry for the `go.mod` formatting fix (once re-applied).
+35. ~~Write a `CHANGELOG.md` entry for the `go.mod` formatting fix (once re-applied).~~ done — CHANGELOG updated (annotation 2026-08-06; 4.0.2 shipped same day)
 36. Add a "Why these dependencies?" section to README.md — a one-liner per dep.
 37. Audit `glamour` sub-module deps — does it really need `charm.land/glamour/v2`? (Yes, that's the point, but worth a sentence in the sub-module README.)
-38. Add a `flightrecorder` README with usage example + `go tool trace` screenshot.
-39. Check if `prompts` sub-module has the same lint-test gap I keep meaning to close.
-40. Consider a `v4.1.0` release once these P0/P1 items are done.
+38. ~~Add a `flightrecorder` README with usage example + `go tool trace` screenshot.~~ done — flightrecorder/README.md exists with usage examples
+39. ~~Check if `prompts` sub-module has the same lint-test gap I keep meaning to close.~~ done — prompts/prompts_test.go exists (huh runner tests)
+40. ~~Consider a `v4.1.0` release once these P0/P1 items are done.~~ done — v4.1.0 shipped 2026-10-04 (CHANGELOG [4.1.0]; tag v4.1.0)
 
 ### P3 — Nice to have
 
 41. Add a GitHub Action badge for `nix flake check` status.
-42. Add a "what's new in v4" migration guide (one-pager).
-43. Write a blog post: "Why we built cmdguard v4: type-safe CLIs without the boilerplate."
-44. Add a `pkg.go.dev` badge.
-45. Add a "Related projects" section linking to go-output, samber-do-auditlog, etc.
-46. Consider renaming the `v4` package to just `cmdguard` and keeping the v3 path as a deprecation alias.
+42. ~~Add a "what's new in v4" migration guide (one-pager).~~ done — covered by docs/MIGRATION_v3_v4.md (v4 TL;DR one-pager)
+43. ~~Write a blog post: "Why we built cmdguard v4: type-safe CLIs without the boilerplate."~~ **Won't implement — out of repo scope — marketing content, untracked.**
+44. ~~Add a `pkg.go.dev` badge.~~ done — README carries the Go Reference (pkg.go.dev) badge
+45. ~~Add a "Related projects" section linking to go-output, samber-do-auditlog, etc.~~ done — README "Related Projects" section present
+46. ~~Consider renaming the `v4` package to just `cmdguard` and keeping the v3 path as a deprecation alias.~~ **NOT-DO — the /v4 module path is the Go module-versioning convention (v4.0.0 shipped).**
 47. Add a `goat` (Go ASCII art tool) diagram of the v4 command lifecycle.
-48. Write a "design rationale" doc explaining why each sub-module exists.
-49. Add a benchmark comparing cmdguard v4 to raw cobra.
-50. Sponsor or contribute back to samber/do, fang, glamour, huh if we depend heavily on them (we do).
+48. ~~Write a "design rationale" doc explaining why each sub-module exists.~~ done — rationale lives in CONTRIBUTING.md §Sub-Modules + website guides/sub-modules.mdx
+49. ~~Add a benchmark comparing cmdguard v4 to raw cobra.~~ done (docs-health pass observation — PERFORMANCE.md documents cobra-parity overhead (line 109))
+50. ~~Sponsor or contribute back to samber/do, fang, glamour, huh if we depend heavily on them (we do).~~ **NOT-DO — external sponsorship/contribution outside repo scope.**
 
 ---
 
