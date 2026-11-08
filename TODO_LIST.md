@@ -6,6 +6,25 @@
 
 ---
 
+## Delivery Follow-ups (harvested 2026-11-08 12:25 self-critique report)
+
+Top items from the Pareto v2 execution's next-50 list. The full 50-item
+list lives in `docs/status/2026-11-08_12-25_self-critique-status-v2-execution.md` §f.
+
+<!-- check-rows:ledger -->
+
+| #  | Task                                                                                     | Evidence / notes                                                                        | Status  |
+| -- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------- |
+| F1 | Check `gh run` CI status for cmdguard v5-scaffold pushes; fix any red legs               | all verification so far was local; CI legs unknown since the v5.0.0 tag push            | 🔴 TODO |
+| F2 | api-reference.mdx: sample-code audit (only the pkg.go.dev link was fixed)                | website/src/content/docs/api-reference.mdx — code samples may still teach v4 idioms     | 🔴 TODO |
+| F3 | Cut v5.1.0 carrying WithStrictPositionalArgs/WithArgsPassthrough + R3–R9 docs (untagged) | new public API landed after the v5.0.0 tag; publish shapes per the lint/v0.2.1 playbook | 🔴 TODO |
+| F4 | Document the two new options in SKILL.md + README options table + AGENTS.md Args gotcha  | public API currently undocumented in consumer docs                                      | 🔴 TODO |
+| F5 | Verify SKILL.md fan-out link resolves and serves the new content (check-skill-fanout.sh) | repo source rewritten; delivering layer not re-verified                                 | 🔴 TODO |
+| F6 | Feed CHANGELOG [Unreleased] with the R3–R9 entries                                       | CHANGELOG currently stops at [5.0.0]                                                    | 🔴 TODO |
+| F7 | Run cmdguard-lint v0.3.0 on the erraudit/timesheets PR branches; post real numbers       | PR bodies claim "0 findings" without an executed run on the branches                    | 🔴 TODO |
+| F8 | Extend `toolchain go1.27.3` to the 7 sub-module go.mods                                  | per-module govulncheck still scans under local 1.27.0 stdlib                            | 🔴 TODO |
+| F9 | Add the cmdguard-lint `lint --dir X` invocation gotcha to AGENTS.md lint section         | repeated the audit's confessed mistake this session (wasted pass in R2.3)               | 🔴 TODO |
+
 ## v5 Breaking Changes (Deferred)
 
 These items have `TODO(v5)` markers in source code. They are public API
