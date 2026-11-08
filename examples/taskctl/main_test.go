@@ -155,23 +155,13 @@ func TestDI_TaskStoreRegistration(t *testing.T) {
 	}
 }
 
-func TestDI_HealthCheck(t *testing.T) {
+func TestDI_HealthCheckCtx(t *testing.T) {
 	t.Parallel()
 
 	cli := newTestCLI(t)
 
 	if err := cli.HealthCheck(t.Context()); err != nil {
 		t.Errorf("HealthCheck: %v", err)
-	}
-}
-
-func TestDI_HealthCheckWithContext(t *testing.T) {
-	t.Parallel()
-
-	cli := newTestCLI(t)
-
-	if err := cli.HealthCheckWithContext(context.Background()); err != nil {
-		t.Errorf("HealthCheckWithContext: %v", err)
 	}
 }
 

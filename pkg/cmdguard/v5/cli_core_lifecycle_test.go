@@ -50,7 +50,7 @@ func TestCLIHealthCheckWithContext(t *testing.T) {
 			t.Fatalf("NewCLI failed: %v", err)
 		}
 
-		err = cli.HealthCheckWithContext(t.Context())
+		err = cli.HealthCheck(t.Context())
 		if err != nil {
 			t.Errorf("HealthCheckWithContext failed: %v", err)
 		}

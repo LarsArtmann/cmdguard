@@ -252,27 +252,18 @@ func firstHealthCheckError(results map[string]error, scopeName string) error {
 	return nil
 }
 
-// HealthCheck runs health checks on all services in this scope.
-// Returns the first error found, or nil if all services are healthy.
-// For per-service results, use HealthCheckResults instead.
+// HealthCheck runs health checks on all services in this scope. Services
+// implementing do.HealthcheckerWithContext receive context.Background (use
+// HealthCheckWithContext to pass a real one). Returns the first error found,
+// or nil if all services are healthy.
 func (s *Scope) HealthCheck() error {
-	if s.injector == nil {
-		return nil
-	}
-
-	results := s.injector.HealthCheck()
-
-	return firstHealthCheckError(results, s.name)
+	return s.HealthCheckWithContext(context.Background())
 }
 
 // HealthCheckResults runs health checks and returns per-service results.
 // The returned map keys are service names and values are their errors (nil = healthy).
 func (s *Scope) HealthCheckResults() map[string]error {
-	if s.injector == nil {
-		return map[string]error{}
-	}
-
-	return s.injector.HealthCheck()
+	return s.HealthCheckResultsWithContext(context.Background())
 }
 
 // HealthCheckWithContext runs health checks with context on all services.
