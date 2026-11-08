@@ -90,6 +90,12 @@ func (l *KoanfLoader) Load(_ []byte, cfg any) ([]string, error) {
 			return nil, fmt.Errorf("%w: reading %q: %w", ErrConfigFileRead, expanded, err)
 		}
 
+		// An empty file carries no keys; treat it like a missing file so a
+		// 0-byte config (any format) cannot fail startup.
+		if len(strings.TrimSpace(string(data))) == 0 {
+			continue
+		}
+
 		k := koanf.New(".")
 		if err := k.Load(&bytesProvider{data: data}, parser); err != nil {
 			return nil, fmt.Errorf("%w: parsing %q: %w", ErrConfigFileParse, expanded, err)

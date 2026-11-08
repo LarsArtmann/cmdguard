@@ -247,7 +247,9 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 
 **Tier D quick wins:**
 35. D19 rewrite/delete the no-op `TestPromptConfirm`.
+    <!-- ✅ DONE 2026-11-08: real tests exist (TestPromptConfirm_DelegatesToRunner + _WrapsError). -->
 36. D26 S2: re-check nixpkgs `go_1_27` ≥ 1.27.2; flip if available.
+    <!-- ✅ DONE 2026-11-08: nixpkgs go_1_27 = 1.27.3; flake already uses it — no flip needed. -->
 37. D33 `gopls check` infertypeargs verdict; D34 git-town/library-policy
     values; record both.
     <!-- ✅ DONE 2026-11-08: D33 — gopls check runs clean on go-composable-business-types (no infertypeargs findings); D34 — git-town.toml main="master" + github-connector=api; library-policy.yaml does not exist in that repo. -->

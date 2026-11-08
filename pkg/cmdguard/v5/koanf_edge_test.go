@@ -1,6 +1,7 @@
 package v5
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -178,8 +179,9 @@ func TestKoanfLoader_IntVersusFloat64(t *testing.T) {
 	})
 }
 
-// TestKoanfLoader_EmptyFile pins the 0-byte config file behavior: the load
-// succeeds, sets no fields, and claims no file-specific error.
+// TestKoanfLoader_EmptyFile pins the 0-byte config file behavior: every
+// format treats an empty file like a missing one (skipped, no fields, no
+// error), so an empty config cannot fail startup.
 func TestKoanfLoader_EmptyFile(t *testing.T) {
 	t.Parallel()
 
@@ -198,8 +200,8 @@ func TestKoanfLoader_EmptyFile(t *testing.T) {
 			loader := NewKoanfLoader(path)
 
 			setFields, err := loader.Load(nil, &cfg)
-			if err != nil {
-				t.Fatalf("Load(%s): %v", name, err)
+			if !errors.Is(err, ErrConfigFileNotFound) {
+				t.Fatalf("Load(%s) = %v, want ErrConfigFileNotFound (empty file is treated as absent)", name, err)
 			}
 
 			if len(setFields) != 0 {
