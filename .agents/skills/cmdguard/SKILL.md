@@ -142,7 +142,7 @@ strict config keys, actionable `Hint:` lines on errors, and the auto-registered
 opt-out: `WithoutStrictValidation()`, `WithoutSignalHandling()`,
 `WithoutGracefulShutdown()`, `WithoutStrictConfigKeys()`, and
 `WithoutBatteries()` (the master switch — drops the whole production set).
-`WithBatteries()` still exists as a no-op explicit opt-in for v4-flavored code.
+`WithBatteries()` re-enables the whole set explicitly (options apply in order), which is how v4-flavored call sites keep working.
 
 A consumer-defined command named `version`, `doctor`, or `describe` wins.
 `NewApp` combines construction with command registration and never returns a

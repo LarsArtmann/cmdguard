@@ -10,7 +10,7 @@
 //	)
 //
 //	cli, _ := v5.NewCLI[Config]("app", "My app", Config{},
-//	    glamour.WithHelp[T](),
+//	    glamour.WithHelp(),
 //	)
 package glamour
 

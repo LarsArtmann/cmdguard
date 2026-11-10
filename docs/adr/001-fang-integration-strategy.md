@@ -26,9 +26,9 @@ cmdguard uses `charm.land/fang/v2` for styled Cobra output (help, errors, versio
 
 **`fang.Execute`** — Always used when `WithFang(true)` (default). Provides styled help output, styled error display, auto-completion, and VT processing on Windows.
 
-**`fang.WithVersion`** — Auto-piped from `WithCLIVersion[T](v)`. A single cmdguard option controls both cmdguard's `VersionCommand` subcommand AND fang's `--version` flag. Users never call `fang.WithVersion` directly.
+**`fang.WithVersion`** — Auto-piped from `WithCLIVersion(v)`. A single cmdguard option controls both cmdguard's `VersionCommand` subcommand AND fang's `--version` flag. Users never call `fang.WithVersion` directly.
 
-**`fang.WithCommit`** — Auto-piped from `WithCLICommit[T](c)`. Same principle: one option, both systems.
+**`fang.WithCommit`** — Auto-piped from `WithCLICommit(c)`. Same principle: one option, both systems.
 
 ### INTENTIONALLY SKIPPED (cmdguard provides superior alternatives)
 
@@ -65,7 +65,7 @@ Reason for own implementation:
 ## Implementation Details
 
 ```
-WithCLIVersion[T]("1.0.0")
+WithCLIVersion("1.0.0")
   → cli.version = "1.0.0"           (cmdguard VersionCommand uses this)
   → cli.rootCmd.Version = "1.0.0"   (cobra --version uses this)
   → fangOpts += fang.WithVersion("1.0.0")  (fang --version uses this)

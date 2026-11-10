@@ -40,10 +40,20 @@ Commands are returned by value, not by pointer. Flags are passed by value too:
 
 ```go
 b := v5.NewBuilder(cli)
-v5.Add(b, listCmd)       // queue an already-built command
-v5.AddParent(b, dbCmd)
-v5.Try(b, queryCmd, err) // queue a (value, error) pair
-b.Check(anotherErr)      // fold in any other error
+
+// Add constructs the command from its parts.
+v5.Add(b, "list", ListFlags{}, listHandler, v5.WithShort("List things"))
+v5.AddParent(b, "db", "Database operations", v5.NoFlags{},
+	v5.WithSubcommands(migrateCmd, seedCmd),
+	v5.WithShort("Database operations"),
+)
+
+// Try queues an already-constructed (value, error) pair.
+v5.Try(b, queryCmd, err)
+
+// Check folds in any other error from setup code.
+b.Check(anotherErr)
+
 if err := b.Build(); err != nil {
 	return err
 }
@@ -189,9 +199,9 @@ Duplicate detection keys on the cobra command name.
 ## Value types
 
 `Duration`, `Port`, `Email`, `URL`, `HostPort`, `FilePath`, `Enum`, `LogLevel`,
-`LogFormat`, each with a `Parse*` constructor. `time.Duration` and `time.Time`
-are supported directly. These types stay atomic when nested in a config struct;
-other nested structs are flattened into flags.
+`LogFormat`, each with a `Parse*` constructor. `time.Duration` is supported
+directly. These types stay atomic when nested in a config struct; other nested
+structs are flattened into flags.
 
 ## Error types
 

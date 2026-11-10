@@ -20,8 +20,9 @@ has a named opt-out.
 | `version` command | Registered automatically when `WithCLIVersion` is set | `WithoutBatteries()` |
 | `describe` command | The machine-readable JSON contract, registered at `Execute` time | `WithoutDescribeCommand()` |
 
-`WithBatteries()` still exists as an explicit no-op, so v4-flavored call sites
-that already pass it keep compiling and keep the same behavior.
+`WithBatteries()` re-enables the whole set explicitly (options apply in order,
+so `WithoutBatteries(), WithBatteries()` turns it back on). v4-flavored call
+sites that pass it keep compiling.
 
 ## The batteries in one example
 

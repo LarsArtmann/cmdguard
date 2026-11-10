@@ -51,7 +51,11 @@ func WithDoctorGroupID[T any](groupID string) DoctorOption[T] {
 // struct), so cmdguard core cannot import it; wire it here instead:
 //
 //	cmdguard.WithDoctorSchemaValidator[Config](func(path string) error {
-//	    return schema.ValidateFile(path, Config{})
+//	    doc, err := schema.FromConfig(Config{})
+//	    if err != nil {
+//	        return err
+//	    }
+//	    return validateConfigFile(path, doc) // your JSON Schema validator
 //	})
 func WithDoctorSchemaValidator[T any](validate func(configPath string) error) DoctorOption[T] {
 	return func(cfg *doctorConfig[T]) {
@@ -74,7 +78,7 @@ func WithDoctorCheck[T any](name string, run func(ctx context.Context) error) Do
 // Usage:
 //
 //	cli, _ := v5.NewCLI[Config]("myapp", "My app", Config{},
-//	    v5.WithCLIVersion[Config]("1.0.0"),
+//	    v5.WithCLIVersion("1.0.0"),
 //	)
 //	docCmd, err := v5.DoctorCommand[Config](cli)
 //	if err != nil {

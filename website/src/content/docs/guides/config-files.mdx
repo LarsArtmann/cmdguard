@@ -112,7 +112,7 @@ Lower-level helpers are exported for tooling:
 
 ## Config Explain
 
-`WithConfigExplainCommand()` registers a hidden `config explain` command. It reports where each root value came from: `flag`, `environment`, `config-file`, `default`, or `unset`. Values tagged `secret:"true"` are always redacted to `***`, in the table and in JSON output. The same data is available programmatically:
+`WithConfigExplainCommand()` registers the `config explain` command at `Execute` time. It reports where each root value came from: `flag`, `environment`, `config-file`, `default`, or `unset`. Values tagged `secret:"true"` are always redacted to `***`, in the table and in JSON output. The same data is available programmatically:
 
 ```go
 explanation := cli.ExplainConfig()

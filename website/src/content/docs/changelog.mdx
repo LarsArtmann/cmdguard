@@ -1,34 +1,88 @@
 ---
 title: Changelog
-description: All notable changes to cmdguard.
+description: Notable changes to cmdguard, major by major.
 ---
 
-For the full changelog, see the [CHANGELOG.md on GitHub](https://github.com/larsartmann/cmdguard/blob/main/CHANGELOG.md).
+For the full, itemized change list see the
+[CHANGELOG.md on GitHub](https://github.com/larsartmann/cmdguard/blob/master/CHANGELOG.md).
 
-## v4.0.0 — 2026-07-28
+## v5.0.0, 2026-11-08
 
-### Breaking Changes
+The paved-road major: production batteries become the default, the error ladder
+is replaced by the Builder, and the naming debts are paid.
 
-- **Module path:** `github.com/larsartmann/cmdguard/v3` → `github.com/larsartmann/cmdguard/v4`
-- **Package directory:** `pkg/cmdguard/v3/` → `pkg/cmdguard/v4/`
-- **Config loading:** `configload` sub-package deleted; `WithConfigFile(paths...)` now auto-detects JSON/YAML/TOML via `KoanfLoader`
-- `NewJSONLoader` deleted
+### Breaking changes
+
+- **Module path:** `github.com/larsartmann/cmdguard/v4` becomes
+  `github.com/larsartmann/cmdguard/v5` (package `pkg/cmdguard/v4` becomes
+  `pkg/cmdguard/v5`). The [codemod](https://github.com/LarsArtmann/cmdguard/blob/master/docs/migration_v4_v5/codemod.sh)
+  rewrites it mechanically.
+- **Batteries are on by default.** `NewCLI` enables strict command validation,
+  signal handling with graceful DI shutdown, strict config keys, error hints,
+  and the auto-registered `doctor` command. `version` appears when
+  `WithCLIVersion` is set. Every flip has a `Without*` opt-out, and
+  `WithoutBatteries()` drops the set.
+- **Renames:** `CommandInfo` becomes `CommandMetadata`, `TypeHandler` becomes
+  `TypeCodec` (`TypeHandlerFunc` becomes `TypeCodecFunc`, `RegisterTypeHandler`
+  becomes `RegisterTypeCodec`), and `HuhRunner` becomes `HuhPrompter`.
+- **Removed:** `CLI.SetConfig`. Pass the values to `NewCLI` or validate them
+  with `WithConfigValidation[T]`.
+- **Graceful shutdown** fires only when the run was signal-cancelled. A
+  normally completing `Execute` no longer tears down the DI scope, which makes
+  repeated `ExecuteWithArgs` safe. Explicit teardown is `CLI.Shutdown(ctx)`.
+
+### Added
+
+- **Builder registration:** `NewBuilder`, `Add`, `AddParent`, `Try`, `Check`,
+  `Build`. Constructor errors are collected, and `Build()` attaches all
+  commands or none.
+- **Machine contract:** a hidden `describe` command and `CLI.Describe` /
+  `WriteDescription`, with a versioned `schema_version`.
+- **Error vocabulary:** `ErrorCode(err)` returns a stable snake_case code, and
+  `ErrorHint(err)` returns one actionable fix. Human output prints a `Hint:`
+  line; JSON envelopes carry `hint` and `error_code`. 62 sentinels are
+  catalogued in `docs/ERROR_REFERENCE.md`.
+- **Config introspection:** `config explain` (`WithConfigExplainCommand`)
+  reports where each value came from, with `secret:"true"` redaction.
+- **`NewApp`:** construction plus command registration that never returns a
+  half-built CLI.
+- **`schema` sub-module:** JSON Schema 2020-12 for config structs, derived
+  from `v5.ConfigKeys`.
+- **`lint` sub-module:** `cmdguard-lint` with rules CG001 to CG008 and a
+  baseline ratchet.
+
+### Sub-modules
+
+Seven independently versioned modules: `glamour`, `prompts`, `spinner`,
+`telemetry`, `flightrecorder`, `lint`, and `schema`.
+
+## v4.0.0, 2026-07-28
+
+### Breaking changes
+
+- **Module path:** `github.com/larsartmann/cmdguard/v3` becomes
+  `github.com/larsartmann/cmdguard/v4` (package `pkg/cmdguard/v3` becomes
+  `pkg/cmdguard/v4`).
+- **Config loading:** the `configload` sub-package is deleted.
+  `WithConfigFile(paths...)` auto-detects JSON, YAML, and TOML through
+  `KoanfLoader`, and `NewJSONLoader` is removed.
 
 ### Changed
 
-- go-output upgraded v0.31.1 → v0.35.0
-- samber-do-auditlog upgraded v0.7.0 → v0.8.1
-- 500 test functions, 29 benchmarks, 8 fuzz targets, 87.8% coverage, 0 lint issues
+- go-output upgraded from v0.31.1 to v0.35.0.
+- samber-do-auditlog upgraded from v0.7.0 to v0.8.1.
+- 500 test functions, 29 benchmarks, 8 fuzz targets, 87.8% coverage, 0 lint
+  issues.
 
-### Sub-Modules
+### Sub-modules
 
-5 optional sub-modules (each independently importable):
-`glamour`, `prompts`, `spinner`, `telemetry`, `flightrecorder`.
+Five independently importable modules: `glamour`, `prompts`, `spinner`,
+`telemetry`, and `flightrecorder`.
 
-### v2 Maintenance
+The v2 line continues at `v2.10.4`; see the
+[v2 to v3 migration guide](https://github.com/larsartmann/cmdguard/blob/master/docs/MIGRATION_v2_v3.md).
 
-The v2 line continues at `v2.10.4`. See the [v2 to v3 Migration Guide](https://github.com/larsartmann/cmdguard/blob/main/docs/MIGRATION_v2_v3.md).
+## Older versions
 
----
-
-For older versions and detailed change lists, see [CHANGELOG.md](https://github.com/larsartmann/cmdguard/blob/main/CHANGELOG.md).
+See [CHANGELOG.md](https://github.com/larsartmann/cmdguard/blob/master/CHANGELOG.md)
+for every release and the detailed change lists.

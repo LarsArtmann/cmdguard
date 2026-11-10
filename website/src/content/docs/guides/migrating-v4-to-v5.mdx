@@ -82,7 +82,7 @@ A bare `NewCLI` now means something different:
 | `version` command | only with `WithBatteries` | registered by the batteries bundle when `WithCLIVersion` is set | `WithoutBatteries()` |
 | `doctor` command | only with `WithBatteries` | registered by the batteries bundle | `WithoutBatteries()` |
 
-Error hints and `SilenceUsage` were already on in v4; v5 keeps both. `WithoutBatteries()` reverts to the v4-era leniency but leaves hints on, since hints have their own opt-out (`WithoutErrorHints()`). `WithBatteries()` still exists as an explicit no-op, so v4 call sites that pass it keep compiling. Consumer-defined `version`, `doctor`, and `describe` commands always win over the built-ins.
+Error hints and `SilenceUsage` were already on in v4; v5 keeps both. `WithoutBatteries()` reverts to the v4-era leniency but leaves hints on, since hints have their own opt-out (`WithoutErrorHints()`). `WithBatteries()` still exists and explicitly re-enables the set, so v4 call sites that pass it keep compiling. Consumer-defined `version`, `doctor`, and `describe` commands always win over the built-ins.
 
 A practical consequence: `cli.SetVersion(...)` at runtime is a lint finding (CG004). Pass `WithCLIVersion` at construction so the `version` command is registered.
 
