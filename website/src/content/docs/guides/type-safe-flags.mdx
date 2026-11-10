@@ -5,7 +5,7 @@ description: Define CLI flags with struct tags, with no string lookups and no ru
 
 ## Struct-Tag-Driven Flags
 
-cmdguard replaces Cobra's `Flags().GetString("name")` pattern with typed structs. A field becomes a flag when it carries a `flag` tag, and cmdguard handles registration, parsing, and validation. `NewCommand` takes the flags struct by value and hands it to the handler as the third parameter.
+cmdguard replaces Cobra's `Flags().GetString("name")` pattern with typed structs. A field becomes a flag when it carries a `flag` tag; `NewCommand` takes the flags struct by value and passes it to the handler as the third parameter. Root flags live in `T`, per-command flags in `F`.
 
 ```go
 package main
@@ -13,19 +13,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
+	"log"
 	"strings"
 
 	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-// AppConfig holds the root flags. Root flags are persistent by default.
 type AppConfig struct {
 	Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Enable verbose output"`
 	Config  string `flag:"config" help:"Path to the config file" local:"true"`
 }
 
-// GreetFlags holds flags that exist only on the greet command.
 type GreetFlags struct {
 	Name  string `flag:"name"  short:"n" default:"World" help:"Name to greet"`
 	Loud  bool   `flag:"loud"  default:"false" help:"Uppercase the greeting"`
@@ -35,8 +33,7 @@ type GreetFlags struct {
 func main() {
 	cli, err := v5.NewCLI[AppConfig]("demo", "A greeting CLI", AppConfig{})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	b := v5.NewBuilder(cli)
@@ -55,8 +52,7 @@ func main() {
 		v5.WithExample("demo greet --name Alice --times 2"),
 	)
 	if err := b.Build(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	cli.ExecuteAndExit(context.Background())
@@ -83,73 +79,40 @@ func main() {
 
 ## Flag Scopes
 
-A flag lives in exactly one of three scopes.
+| Where the field lives               | Scope                                     |
+| ----------------------------------- | ----------------------------------------- |
+| Root `T` struct, plain              | Persistent: inherited by every subcommand |
+| Root `T` struct with `local:"true"` | Root only, not inherited by subcommands   |
+| A command's own `F` struct          | That command only, rejected elsewhere     |
 
-| Where the field lives               | Scope                                                  |
-| ----------------------------------- | ------------------------------------------------------ |
-| Root `T` struct, plain              | Persistent: inherited by every subcommand              |
-| Root `T` struct with `local:"true"` | Root only, not inherited by subcommands                |
-| A command's own `F` struct          | That command only, never inherited, rejected elsewhere |
-
-F-struct flags are registered on the command's own flag set, so `demo greet --build` fails with "unknown flag" unless the `greet` struct declares `build`. That is the designed behavior, not a limitation. A subcommand that needs a root-local flag opts in with `cli.RegisterLocalCommandFlags(cobraCmd)`.
+F-struct flags are registered on the command's own flag set, so `demo greet --build` fails with "unknown flag" unless the `greet` struct declares `build`. That is the designed behavior. A subcommand that needs a root-local flag opts in with `cli.RegisterLocalCommandFlags(cobraCmd)`.
 
 ## Precedence
 
 An explicit flag beats an environment variable, which beats a config-file value, which beats the tag default. Config-file values are loaded before flags register and rewrite the tag defaults, which is what gives them their position in the chain.
 
-## Per-Command Flag Structs
-
-`Command[T, F]` has one type parameter for the root config and one for the command's own flags. Different commands can use entirely different flag structs:
-
-```go
-type DeployFlags struct {
-	Env     string        `flag:"env"     short:"e" required:"true" help:"Target environment"`
-	Timeout time.Duration `flag:"timeout" default:"5m" help:"Deployment timeout"`
-}
-
-deploy, err := v5.NewCommand("deploy", DeployFlags{},
-	func(ctx context.Context, cfg *AppConfig, f DeployFlags) error {
-		return runDeploy(ctx, cfg, f.Env, f.Timeout)
-	},
-	v5.WithShort("Deploy the application"),
-)
-```
-
-`NewCommand` returns a `Command[T, F]` value and an error, never a pointer and never a panic. A command with no own flags uses `v5.NoFlags{}`, and `cmdguard.ArgsFromContext(ctx)` returns its positional arguments.
-
 ## Counting Flags
 
-The `count:"true"` tag implements verbosity ladders. The field must be an `int`, and counting flags must not reuse a root config flag name.
-
-```go
-type Flags struct {
-	Verbose int `flag:"verbose" short:"v" count:"true" help:"Verbosity level"`
-}
-
-// $ demo -vvv  ->  f.Verbose == 3
-```
+The `count:"true"` tag turns a field into a verbosity ladder: `-v` sets it to 1, `-vvv` to 3. The field must be an `int`, and counting flags must not reuse a root config flag name.
 
 ## Validation Tags
 
 - `values:"a,b,c"` rejects anything outside the list with `ErrInvalidEnum`.
-- `validate:"min=1,max=100"` compares lengths on string fields and numeric bounds on numbers.
-- `validate:"minlen=3,maxlen=20"` is the explicit length form for strings.
-- `validate:"dmin=10s,dmax=1m"` compares durations on `Duration` and `time.Duration` fields.
+- `validate:"min=1,max=100"` compares lengths on strings and numeric bounds on numbers.
+- `validate:"minlen=3,maxlen=20"` is the explicit length form; `dmin`/`dmax` compare durations.
 - Built-in validators also include `email`, `url`, `nonempty`, and `regex=^pattern$`.
-- Register your own with `v5.RegisterValidator`; see [Custom Value Types](/guides/custom-types/).
 - Defaults are validated at construction: a `default` outside the `values` list or bounds fails `NewCLI` with `ErrInvalidFlagDefault`, so a bad default never reaches users.
 
-`required:"true"` runs after parsing. It is satisfied only by an explicit flag or a set environment variable, which keeps a default from silently masking a missing credential.
+`required:"true"` runs after parsing and is satisfied only by an explicit flag or a set environment variable, so a default cannot mask a missing credential.
 
 ## Environment Variables
 
-The `env` tag is the middle rung of the precedence chain. `WithEnvPrefix` prepends a prefix to every `env` tag lookup:
+`WithEnvPrefix` prepends a prefix to every `env` tag lookup. The prefix is applied to the tag value verbatim, so an already prefixed tag gets it twice.
 
 ```go
 type DBFlags struct {
-	Host     string `flag:"host"     env:"DB_HOST"     default:"localhost"`
-	Port     int    `flag:"port"     env:"DB_PORT"     default:"5432"`
-	Password string `flag:"password" env:"DB_PASSWORD" secret:"true"`
+	Host string `flag:"host" env:"DB_HOST" default:"localhost"`
+	Port int    `flag:"port" env:"DB_PORT" default:"5432"`
 }
 
 cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
@@ -157,29 +120,23 @@ cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 )
 ```
 
-If the `env` tag already names a prefixed variable, `WithEnvPrefix` prefixes it again: the prefix is applied to the tag value verbatim, not to the variable's base name.
-
 ## Built-in Value Types
 
-cmdguard ships validated field types that parse at flag time instead of at first use:
-
-| Type        | Parses                                     |
-| ----------- | ------------------------------------------ |
-| `Duration`  | `30s`, `5m`, `1h30m`                       |
-| `Enum`      | One value of an allowed list               |
-| `LogLevel`  | debug, info, warn, error                   |
-| `LogFormat` | text, json                                 |
-| `URL`       | Absolute URL with scheme and host          |
-| `Email`     | RFC 5322 address                           |
-| `Port`      | 1 to 65535, numeric or named               |
-| `HostPort`  | `host:port`                                |
-| `FilePath`  | Cleaned path, optional existence check     |
-
-`time.Duration` and `time.Time` are supported directly as well.
+| Type        | Parses                                 |
+| ----------- | -------------------------------------- |
+| `Duration`  | `30s`, `5m`, `1h30m`                   |
+| `Enum`      | One value of an allowed list           |
+| `LogLevel`  | debug, info, warn, error               |
+| `LogFormat` | text, json                             |
+| `URL`       | Absolute URL with scheme and host      |
+| `Email`     | RFC 5322 address                       |
+| `Port`      | 1 to 65535, numeric or named           |
+| `HostPort`  | `host:port`                            |
+| `FilePath`  | Cleaned path, optional existence check |
 
 ## Nested Config Structs
 
-`ParseFlagTags` recurses into nested structs, so flags can be organized into groups while keeping flat flag names. Nested fields without their own `flag` tag are walked; registered value types stay atomic and are never descended into.
+`ParseFlagTags` recurses into nested structs, so flags can be grouped while keeping flat flag names. Registered value types stay atomic and are never descended into.
 
 ```go
 type AppConfig struct {

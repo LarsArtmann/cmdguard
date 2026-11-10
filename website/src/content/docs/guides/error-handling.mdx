@@ -5,7 +5,7 @@ description: Zero panics, proper exit codes, and the error-print contract.
 
 ## Zero Panics
 
-Every cmdguard constructor returns `(value, error)`, for example `v5.NewCLI[AppConfig](...)` returns `(*v5.CLI[AppConfig], error)`. There are no `Must*` panic variants, and handlers are always `RunE`-shaped functions.
+Every constructor that can fail returns `(value, error)`, for example `v5.NewCLI[AppConfig](...)` returns `(*v5.CLI[AppConfig], error)`. There are no `Must*` panic variants, and handlers are always `RunE`-shaped functions.
 
 ## The Error-Print Contract
 
@@ -27,6 +27,10 @@ import (
 
     "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
+
+type AppConfig struct {
+    Verbose bool `flag:"verbose" short:"v" help:"Enable verbose output"`
+}
 
 func main() {
     cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{})
@@ -80,7 +84,7 @@ Human-readable output prints a `Hint:` line after the error. `WithoutErrorHints(
 
 ## Machine Error Codes
 
-`ErrorCode(err)` returns a stable lowercase snake_case code for every documented sentinel. With `--output json` the error becomes an envelope:
+`ErrorCode(err)` returns a stable lowercase snake_case code for every documented sentinel. With a structured output format (`--output json`, `jsonl`, `yaml`, or `toml`) the error is emitted as a JSON envelope:
 
 ```json
 {
@@ -96,7 +100,7 @@ Human-readable output prints a `Hint:` line after the error. `WithoutErrorHints(
 
 `type` is the error class, `message` the stable text, `hint` the fix, `error_code` the machine code, and `code` the process exit code.
 
-`v5.ErrorCode(err)` returns the same code directly, or `""` when the error wraps no sentinel.
+Call `v5.ErrorCode(err)` in custom handlers to switch on the same code; it returns `""` when the error wraps no sentinel.
 
 ## Sentinel Errors
 

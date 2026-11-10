@@ -1,56 +1,154 @@
 ---
 title: Rich Output
-description: 16 output formats via go-output — table, JSON, CSV, YAML, and more.
+description: "16 output formats via go-output: table, JSON, CSV, YAML, and more."
 ---
 
-## OutputTable
+## Two Entry Points
 
-Render structured data in any of 16 formats:
+cmdguard aliases go-output's `Format` as `OutputFormat` and wraps its renderers in two functions:
+
+| Symbol | Signature | Use |
+| --- | --- | --- |
+| `OutputTable` | `func(OutputFormat, []string, [][]string) error` | Tabular data with fixed headers |
+| `OutputResult` | `func(OutputConfig, any) error` | Tables or arbitrary structs |
+| `OutputConfig` | `struct { Format OutputFormat; Writer io.Writer }` | Format and destination |
+| `DefaultOutputConfig` | `func() OutputConfig` | Table format, stdout |
+| `RegisteredFormats` | `func() []OutputFormat` | Formats linked into the binary |
+
+Use `output.FormatTable`, `output.FormatJSON`, and the rest directly from `github.com/larsartmann/go-output`. cmdguard only aliases the type.
+
+## Rendering a Table
 
 ```go
-import "github.com/larsartmann/go-output"
+package main
 
-headers := []string{"Name", "Status", "Created"}
-rows := [][]string{{"api-server", "running", "2026-01-15"}}
+import (
+	"context"
+	"fmt"
+	"os"
 
-v4.OutputTable(output.FormatTable, headers, rows)  // Aligned terminal table
-v4.OutputTable(output.FormatJSON, headers, rows)    // JSON array
-v4.OutputTable(output.FormatCSV, headers, rows)     // CSV
-v4.OutputTable(output.FormatYAML, headers, rows)    // YAML
+	output "github.com/larsartmann/go-output"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
+type AppConfig struct{}
+
+func main() {
+	cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "create CLI: %v\n", err)
+		os.Exit(1)
+	}
+
+	listCmd, err := v5.NewCommand("list", v5.NoFlags{},
+		func(ctx context.Context, cfg *AppConfig, flags v5.NoFlags) error {
+			return v5.OutputTable(output.FormatTable,
+				[]string{"Name", "Status", "Created"},
+				[][]string{
+					{"api-server", "running", "2026-01-15"},
+					{"worker", "stopped", "2026-01-14"},
+				},
+			)
+		},
+		v5.WithShort("List services"),
+	)
+
+	b := v5.NewBuilder(cli)
+	v5.Try(b, listCmd, err)
+	if err := b.Build(); err != nil {
+		fmt.Fprintf(os.Stderr, "register command: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
+}
 ```
+
+Rows are validated against the header width; a mismatched row returns an error instead of a malformed table.
 
 ## All 16 Formats
 
-`table`, `json`, `csv`, `tsv`, `markdown`, `xml`, `yaml`, `html`, `d2`, `tree`, `mermaid`, `dot`, `jsonl`, `asciidoc`, `toml`, `plantuml`.
+| Format | Constant | Data shapes |
+| --- | --- | --- |
+| `table` | `output.FormatTable` | table |
+| `json` | `output.FormatJSON` | table, tree, graph |
+| `csv` | `output.FormatCSV` | table |
+| `tsv` | `output.FormatTSV` | table |
+| `markdown` | `output.FormatMarkdown` | table |
+| `xml` | `output.FormatXML` | table |
+| `d2` | `output.FormatD2` | table, tree, graph |
+| `yaml` | `output.FormatYAML` | table, tree, graph |
+| `html` | `output.FormatHTML` | table, tree |
+| `tree` | `output.FormatTree` | tree |
+| `mermaid` | `output.FormatMermaid` | table, tree, graph |
+| `dot` | `output.FormatDOT` | table, tree, graph |
+| `jsonl` | `output.FormatJSONL` | table |
+| `asciidoc` | `output.FormatAsciiDoc` | table |
+| `toml` | `output.FormatTOML` | table, tree, graph |
+| `plantuml` | `output.FormatPlantUML` | table, tree, graph |
 
-## Dynamic Format via Flag
+`RegisteredFormats()` returns the formats whose table marshalers are registered, so you can build help text without hard-coding this list.
 
-Wire the `--output` flag and let users choose:
+## Rendering Arbitrary Data
+
+Pass a struct to `OutputResult` for non-tabular output. Only formats with an arbitrary-data renderer succeed: `json`, `yaml`, and `toml`. Every other format returns `ErrFormatRequiresTypedData`.
 
 ```go
-type AppConfig struct {
-    Output string `flag:"output" short:"o" default:"text" help:"Output format"`
+cfg := v5.DefaultOutputConfig()
+cfg.Format = output.FormatJSON
+cfg.Writer = os.Stdout
+
+err := v5.OutputResult(cfg, report)
+if err != nil {
+	return fmt.Errorf("write report: %w", err)
 }
 ```
 
-cmdguard registers the `--output` flag automatically with help text listing all available formats.
+A `nil` `Writer` falls back to `os.Stdout`.
 
-## OutputResult
+## The --output Flag
 
-For non-tabular data:
+`WithOutputFormat(defaultFormat)` registers a persistent `--output` flag whose help text lists the linked formats:
 
 ```go
-v4.OutputResult(v4.OutputConfig{Format: output.FormatJSON}, myStruct)
+cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{},
+	v5.WithOutputFormat(output.FormatTable),
+)
+
+// After flag parsing:
+format := cli.OutputFormat()           // resolved format, defaults to table
+cli.SetOutputFormat(output.FormatJSON) // runtime override
 ```
 
-## Shape-Aware Errors
+`cli.OutputFormat()` returns the parsed flag value or `FormatTable` when `WithOutputFormat` was not used. An invalid value fails with `ErrUnsupportedFormat`.
 
-When `--output=json` is active, errors are rendered as structured JSON instead of plain text:
+## Errors and Discovery
+
+| Error | Meaning |
+| --- | --- |
+| `ErrUnsupportedFormat` | The requested format is unknown |
+| `ErrFormatRequiresTypedData` | `OutputResult` got arbitrary data for a table-only format |
+
+Reach both with `errors.Is`. Use `RegisteredFormats()` for discovery, not a hard-coded slice.
+
+## Machine-Readable Errors
+
+When the resolved format is `json`, `jsonl`, `yaml`, or `toml`, cmdguard writes an error envelope as JSON to stderr instead of plain text:
 
 ```json
 {
-	"error": "database connection failed",
-	"type": "ConnectionError",
-	"exit_code": 1
+  "error": {
+    "type": "unknown",
+    "message": "database connection failed",
+    "code": 1
+  }
 }
 ```
+
+`type` is the classified error class, `hint` and `error_code` appear when cmdguard knows them, and `code` is the exit code.
+
+## Where to go next
+
+- [Sub-Modules](/guides/sub-modules/)
+- [Error Handling](/guides/error-handling/)
+- [Middleware](/guides/middleware/)

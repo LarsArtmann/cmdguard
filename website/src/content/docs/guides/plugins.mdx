@@ -5,77 +5,144 @@ description: Bundle custom type handlers and validators into reusable plugins.
 
 ## Overview
 
-The `Plugin` interface bundles custom type handlers and validators into a single unit. Plugins provide one-step registration of domain-specific flag types and validation rules.
+A plugin bundles custom flag type codecs and named validators into one registration unit. It is the recommended way to share domain-specific flag types across CLIs and teams.
 
 ## Plugin Interface
 
 ```go
 type Plugin interface {
-    PluginName() string
-    RegisterTypeHandlers(r *v4.FlagRegistry)
-    RegisterValidators(r *v4.FlagRegistry)
+    Name() string
+    Register(r v5.PluginRegistrar) error
 }
 ```
 
+`PluginRegistrar` exposes three methods:
+
+| Method | Purpose |
+| --- | --- |
+| `TypeCodec(typ reflect.Type, codec TypeCodec)` | register a full `TypeCodec` implementation |
+| `TypeCodecFunc(typ reflect.Type, codec TypeCodecFunc)` | register the functional adapter |
+| `Validator(name string, fn FlagValidator)` | register a named validator for `validate:"name"` tags |
+
 ## Registering Plugins
 
-Three scopes, from broadest to narrowest:
-
 ```go
-// 1. Global — affects all CLI instances
-v4.RegisterPlugin(myPlugin)
+if err := v5.RegisterPlugin(DatabasePlugin{}); err != nil {
+    return err
+}
 
-// 2. CLI instance — affects this CLI only
-cli, _ := v4.NewCLI[Config]("app", "...", Config{},
-    v4.WithPlugin(myPlugin),
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+    v5.WithPlugin(DatabasePlugin{}),
 )
-
-// 3. FlagRegistry — most granular
-fr := cli.FlagRegistry()
-fr.RegisterPlugin(myPlugin)
 ```
 
-Global plugins are visible to all instances that haven't cloned their registry. Instance-level and FlagRegistry-level plugins trigger the copy-on-write clone, so they're isolated.
+Both entry points write the global type and validator registries. `RegisterPlugin` applies immediately; `WithPlugin` applies during `NewCLI`, before flags are registered, and a failed registration becomes the error returned by `NewCLI`. Register before constructing any CLI whose flags use the plugin's types.
 
 ## Writing a Plugin
 
 ```go
-package myplugin
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    "reflect"
+    "strings"
+
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+    "github.com/spf13/pflag"
+)
+
+type DSN string
 
 type DatabasePlugin struct{}
 
-func (p *DatabasePlugin) PluginName() string { return "database-types" }
+func (DatabasePlugin) Name() string { return "database-types" }
 
-func (p *DatabasePlugin) RegisterTypeHandlers(r *v4.FlagRegistry) {
-    r.RegisterTypeHandler(reflect.TypeFor[DSN](), v4.TypeHandlerFunc{
-        ParseFunc:   parseDSN,
-        DefaultFunc: func(_ v4.FlagTag) any { return DSN{} },
+func (DatabasePlugin) Register(r v5.PluginRegistrar) error {
+    r.TypeCodecFunc(reflect.TypeFor[DSN](), v5.TypeCodecFunc{
+        RegisterFunc: func(flags *pflag.FlagSet, tag v5.FlagTag) error {
+            flags.StringP(tag.Name, tag.Short, tag.Default, tag.Help)
+            return nil
+        },
+        ParseFunc: func(value string, _ v5.FlagTag) (any, error) {
+            return DSN(value), nil
+        },
+        DefaultFunc: func(tag v5.FlagTag) any {
+            return DSN(tag.Default)
+        },
     })
+
+    r.Validator("dsn-scheme", func(value string) error {
+        if !strings.Contains(value, "://") {
+            return fmt.Errorf("DSN %q must include a scheme", value)
+        }
+        return nil
+    })
+
+    return nil
 }
 
-func (p *DatabasePlugin) RegisterValidators(r *v4.FlagRegistry) {
-    r.RegisterFlagValidator("dsn-format", validateDSNFormat)
+type AppConfig struct {
+    Database DSN `flag:"database" default:"postgres://localhost/app" validate:"dsn-scheme" help:"Database DSN"`
 }
-```
-
-## Using a Plugin
-
-```go
-import "example.com/myplugin"
 
 func main() {
-    v4.RegisterPlugin(&myplugin.DatabasePlugin{})
+    if err := v5.RegisterPlugin(DatabasePlugin{}); err != nil {
+        fmt.Fprintf(os.Stderr, "registering plugin: %v\n", err)
+        os.Exit(1)
+    }
 
-    cli, _ := v4.NewCLI[Config]("app", "...", Config{})
+    cli, err := v5.NewCLI[AppConfig]("app", "Example app", AppConfig{})
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "creating CLI: %v\n", err)
+        os.Exit(1)
+    }
 
-    // Now DSN type is available as a flag type
-    cmd, _ := v4.NewCommand("connect", &ConnectFlags{
-        Database: myplugin.DSN{},
-    }, connectHandler)
+    connect, err := v5.NewCommand("connect", v5.NoFlags{},
+        func(_ context.Context, cfg *AppConfig, _ v5.NoFlags) error {
+            fmt.Printf("connecting to %s\n", cfg.Database)
+            return nil
+        },
+        v5.WithShort("Connect to the database"),
+    )
 
-    v4.AddCommand(cli, cmd)
+    b := v5.NewBuilder(cli)
+    v5.Try(b, connect, err)
+    if buildErr := b.Build(); buildErr != nil {
+        fmt.Fprintf(os.Stderr, "registering commands: %v\n", buildErr)
+        os.Exit(1)
+    }
+
     cli.ExecuteAndExit(context.Background())
 }
 ```
 
-Plugins are the recommended way to share custom flag types across multiple CLIs or teams.
+The `DSN` field now parses into the struct, and the `dsn-scheme` validator runs for both the declared default and an explicit `--database` value.
+
+## Type Codecs and Validators
+
+`TypeCodec` is the interface behind every flag type. It has `Register(flags *pflag.FlagSet, tag FlagTag) error`, `Parse(value string, tag FlagTag) (any, error)`, and `Default(tag FlagTag) any`. `TypeCodecFunc` adapts three functions through its `RegisterFunc`, `ParseFunc`, and `DefaultFunc` fields.
+
+Register a codec directly when no plugin wrapper is needed with `v5.RegisterTypeCodec(reflect.TypeFor[DSN](), codec)`, which wraps `ErrServiceRegistration` when the type or codec is nil.
+
+A validator is any `v5.FlagValidator`, that is `func(value string) error`. Register one globally with `v5.RegisterValidator(name, fn)`, then reference it from a tag such as `validate:"dsn-scheme"`. Unknown names fail with `ErrUnknownValidator`.
+
+## Renamed in v5
+
+| Older name | v5 name |
+| --- | --- |
+| `TypeHandler` | `TypeCodec` |
+| `TypeHandlerFunc` | `TypeCodecFunc` |
+| `RegisterTypeHandler` | `RegisterTypeCodec` |
+| `RegisterTypeHandlers` and `RegisterValidators` | `Plugin.Register(PluginRegistrar)` |
+
+The registry-level plugin API is gone; plugins register through `PluginRegistrar`, and per-CLI wiring goes through `WithPlugin`.
+
+## Where to go next
+
+- [Custom Types](/guides/custom-types/) for the built-in value types and their tags
+- [Type-Safe Flags](/guides/type-safe-flags/) for the full tag reference
+- [Error Handling](/guides/error-handling/) for the sentinels plugins return
+- [Dependency Injection](/guides/dependency-injection/) for wiring services around plugin types

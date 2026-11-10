@@ -22,7 +22,7 @@ v5 turns the production defaults on at `NewCLI`. Every one has an opt-out.
 
 ## Signal Handling
 
-`WithSignalHandling()` is on by default: SIGINT and SIGTERM cancel the execution context. Handlers observe cancellation through `ctx.Done()` or `ctx.Err()`.
+Signal handling is on by default (`WithSignalHandling()`): SIGINT and SIGTERM cancel the execution context. Handlers observe cancellation through `ctx.Done()` or `ctx.Err()`.
 
 ```go
 func(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {

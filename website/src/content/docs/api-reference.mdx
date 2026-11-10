@@ -1,84 +1,237 @@
 ---
 title: API Reference
-description: Overview of the cmdguard public API.
+description: The cmdguard v5 public API, types, constructors, options, and error contracts.
 ---
 
-## Core Types
+Every symbol below exists in `github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5`.
+The package is conventionally imported without an alias, so examples call
+`v5.NewCLI` after importing the package as `v5`.
 
-### CLI[T]
+## Core types
 
-The root CLI instance. `T` is your config struct type.
+| Type | Meaning |
+| --- | --- |
+| `CLI[T]` | The root CLI. `T` is the root config struct; its tagged fields become the root flags. |
+| `Command[T, F]` | One command. `F` is that command's own flag struct, passed by value to the handler. |
+| `NoFlags` | The explicit "this command has no flags of its own" type. It is a named type, not an alias. |
+| `Builder[T]` | Collects constructor errors and attaches commands atomically. |
+| `Scope` | The DI scope, wrapping `samber/do/v2`. |
+| `OutputFormat` | Alias of `go-output`'s `Format`. |
 
-```go
-cli, err := v4.NewCLI[T](name, description, defaultValue{}, options...)
-```
-
-Key methods:
-
-| Method                | Returns            | Purpose                         |
-| --------------------- | ------------------ | ------------------------------- |
-| `Execute(ctx)`        | `error`            | Run the CLI                     |
-| `ExecuteAndExit(ctx)` | (never returns)    | Run and exit with correct code  |
-| `Scope()`             | `*Scope`           | Access the DI scope             |
-| `RootCommand()`       | `*cobra.Command`   | Access the underlying cobra cmd |
-| `NoColor()`           | `bool`             | Check if color is disabled      |
-| `AuditLog()`          | `*auditlog.Plugin` | Access the audit log plugin     |
-
-### Command[T, F]
-
-A typed command with its own flag struct `F`.
-
-```go
-// skip-validate
-cmd, err := v4.NewCommand(use string, flags F, runE func(ctx, *T, F) error, opts...)
-```
-
-### Scope
-
-Wraps `samber/do/v2` injector for dependency injection.
-
-| Function                 | Purpose                          |
-| ------------------------ | -------------------------------- |
-| `NewScope(name)`         | Create a new scope               |
-| `Provide(scope, fn)`     | Register a lazy service          |
-| `Invoke[T](scope)`       | Get or create a service          |
-| `Override[T](scope, fn)` | Replace a service (for testing)  |
-| `CloneScope(scope)`      | Copy registrations without state |
+Handlers have the signature `func(ctx context.Context, cfg *T, flags F) error`.
+Positional arguments are read with `ArgsFromContext(ctx)`.
 
 ## Constructors
 
-| Function                          | Returns                        |
-| --------------------------------- | ------------------------------ |
-| `NewCLI[T](name, desc, cfg, ...)` | `(*CLI[T], error)`             |
-| `NewCommand(use, flags, runE)`    | `(*Command[T,F], error)`       |
-| `NewParentCommand[T](...)`        | `(*Command[T,NoFlags], error)` |
+| Function | Returns |
+| --- | --- |
+| `NewCLI[T](name, short string, defaults T, opts ...CLIOption)` | `(*CLI[T], error)` |
+| `NewApp[T](name, short string, defaults T, build func(*CLI[T]) error, opts ...CLIOption)` | `(*CLI[T], error)` |
+| `NewCommand[T, F](use string, flags F, runE func(context.Context, *T, F) error, opts ...CommandOption)` | `(Command[T, F], error)` |
+| `NewParentCommand[T, F](use, long string, flags F, opts ...CommandOption)` | `(Command[T, F], error)` |
+| `NewBuilder[T](cli *CLI[T])` | `*Builder[T]` |
+| `AddCommand[T, F](cli *CLI[T], cmd Command[T, F])` | `error` |
+| `AddCommands[T](cli *CLI[T], cmds ...AddableCommand[T])` | `error` |
 
-## Command Options
+Commands are returned by value, not by pointer. Flags are passed by value too:
+`NewCommand("scan", ScanFlags{}, handler)`.
 
-`WithShort`, `WithLong`, `WithExample`, `WithAliases`, `WithHidden`, `WithDeprecated`, `WithGroupID`, `WithExactArgs`, `WithMinimumArgs`, `WithMaximumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithValidArgs`, `WithSubcommands`, `WithCompletion`, `WithPreRunE[T,F]`, `WithPostRunE[T,F]`.
+## Registration
 
-## CLI Options
+```go
+b := v5.NewBuilder(cli)
+v5.Add(b, listCmd)       // queue an already-built command
+v5.AddParent(b, dbCmd)
+v5.Try(b, queryCmd, err) // queue a (value, error) pair
+b.Check(anotherErr)      // fold in any other error
+if err := b.Build(); err != nil {
+	return err
+}
+```
 
-`WithCLIVersion`, `WithCLILong`, `WithSilenceErrors`, `WithSilenceUsage`, `WithoutSilenceUsage`, `WithFang`, `WithEnvPrefix`, `WithSignalHandling`, `WithGracefulShutdown`, `WithMiddleware[T]`, `WithContextMiddleware[T]`, `WithGroup`, `WithConfigValidation[T]`, `WithPostFlagParse[T]`, `WithCleanup[T]`, `WithStrictValidation`, `WithDraconianValidation`, `WithConfigFile`, `WithConfigFileLoader`, `WithPlugin`, `WithAuditLog`, `WithAuditMiddleware[T]`, `WithDILogging[T]`.
+`Build()` attaches all queued commands or none, and reports the first error.
+Duplicate detection keys on the cobra command name.
 
-## Error Types
+## CLI methods
 
-| Type             | Constructor                       |
-| ---------------- | --------------------------------- |
-| `CommandError`   | `NewCommandError(name, err)`      |
-| `FlagError`      | `NewFlagError(name, err)`         |
-| `FlagError+Hint` | `NewFlagErrorWithSuggestion(...)` |
-| `ExitError`      | `NewExitError(code, err)`         |
+### Execution
 
-40+ sentinel errors: `ErrInvalidCommand`, `ErrMissingHandler`, `ErrDuplicateCommand`, `ErrConfigValidation`, etc.
+| Method | Purpose |
+| --- | --- |
+| `Execute(ctx) error` | Run the CLI |
+| `ExecuteWithArgs(ctx, args) error` | Run with explicit arguments; safe to call repeatedly |
+| `ExecuteAndExit(ctx)` | Run and exit with the mapped code |
+| `Shutdown(ctx) error` | Tear down the DI scope explicitly |
 
-## Built-in Commands
+### Introspection
 
-| Helper                   | Purpose                  |
-| ------------------------ | ------------------------ |
-| `VersionCommand[T](cli)` | `myapp version`          |
-| `DoctorCommand[T](cli)`  | Health check diagnostics |
+| Method | Purpose |
+| --- | --- |
+| `Describe() *CLIDescription` | Machine-readable contract |
+| `WriteDescription(w) error` | Write the contract as JSON |
+| `GenerateDocs(w) error` | Write Markdown documentation for the tree |
+| `ExplainConfig() ConfigExplanation` | Where each config value came from |
+| `ConfigDiagnostics() []ConfigDiagnostic` | Config problems for `doctor` |
+| `ConfigFilePath() string` | The config file that was loaded |
+| `StrictConfigKeys() bool` | Whether unknown keys are rejected |
+
+### Configuration and output
+
+| Method | Purpose |
+| --- | --- |
+| `Config() *T` | The resolved config |
+| `Name()`, `Short()`, `Long()` | Identity strings |
+| `SetLong(long)`, `SetVersion(version)` | Mutate identity |
+| `OutputFormat()`, `SetOutputFormat(f)` | Read or set the output format |
+| `NoColor() bool` | Whether color output is disabled |
+
+### DI and health
+
+| Method | Purpose |
+| --- | --- |
+| `Scope() *Scope` | The DI scope |
+| `Injector() do.Injector` | The underlying injector |
+| `HealthCheck(ctx) error` | First failing health check |
+| `HealthCheckResults() map[string]error` | All service results |
+| `HealthCheckResultsWithContext(ctx) map[string]error` | All results, context-aware |
+| `RecordAuditHealthCheck(ctx) map[string]error` | Results, also recorded in the audit log |
+
+### Audit and escape hatches
+
+| Method | Purpose |
+| --- | --- |
+| `AuditLog() *auditlog.Plugin` | The audit plugin, when enabled |
+| `AuditLogReport() *auditlog.Report` | A report snapshot |
+| `RootCommand() *cobra.Command` | The underlying cobra tree |
+| `FlowContext() *BranchingFlowContext` | The execution flow tree |
+| `RegisterLocalCommandFlags(cmd) error` | Opt a subcommand into root-local flags |
+| `AddGlobalFlag`, `AddGlobalBoolFlag` | Register untagged flags |
+
+## CLI options
+
+### Identity and version
+
+`WithCLIVersion`, `WithCLICommit`, `WithCLILong`, `WithGroup(groupID, title)`.
+
+### Batteries and validation
+
+`WithBatteries`, `WithoutBatteries`, `WithStrictValidation`,
+`WithoutStrictValidation`, `WithDraconianValidation`.
+
+### Signals and lifecycle
+
+`WithSignalHandling`, `WithoutSignalHandling`, `WithGracefulShutdown`,
+`WithoutGracefulShutdown`, `WithCleanup[T]`, `WithPostFlagParse[T]`.
+
+### Errors and display
+
+`WithSilenceErrors`, `WithSilenceUsage`, `WithoutSilenceUsage`,
+`WithoutErrorHints`, `WithOnError(fn)`.
+
+### Fang styling
+
+`WithFang(enabled)`, `WithFangOptions(...)`, `WithFangErrorHandler(...)`,
+`WithFangColorScheme(...)`.
+
+### Config
+
+`WithConfigFile(paths...)`, `WithConfigFileLoader(loader, paths...)`,
+`WithConfigValidation[T](fn)`, `WithStrictConfigKeys`,
+`WithoutStrictConfigKeys`, `WithConfigExplainCommand`, `WithEnvPrefix`.
+
+### DI and services
+
+`WithCLIScope(scope)`, `WithDILogging(logf)`, `WithAuditLog(plugin)`,
+`WithAuditMiddleware[T](plugin)`.
+
+### Execution and middleware
+
+`WithMiddleware[T](mw...)`, `WithContextMiddleware[T](mw...)`,
+`WithPlugin(plugin)`, `WithHelpTransform(fn)`, `WithOutputFormat(format)`.
+
+### Introspection
+
+`WithoutDescribeCommand`, `WithDoctorCheck[T]`,
+`WithDoctorSchemaValidator[T]`, `WithDoctorShort[T]`, `WithDoctorLong[T]`,
+`WithDoctorGroupID[T]`.
+
+## Command options
+
+`WithShort` (required under the default strict validation), `WithLong`,
+`WithExample`, `WithAliases`, `WithHidden`, `WithDeprecated`, `WithGroupID`,
+`WithSubcommands[T, F](...)`, `WithArgs`, `WithExactArgs`, `WithMinimumArgs`,
+`WithMaximumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithStrictPositionalArgs`,
+`WithArgsPassthrough`, `WithValidArgs`, `WithCompletion`, `WithPromptOnMissing`,
+`WithPreRunE[T, F]`, `WithPostRunE[T, F]`.
+
+## Package-level helpers
+
+| Function | Purpose |
+| --- | --- |
+| `ArgsFromContext(ctx) []string` | Positional arguments for the running command |
+| `ConfigFromContext[T](ctx) (*T, bool)` | Resolved config from a cobra context |
+| `ExitCode(err) int` | Map an error to an exit code |
+| `NewExitError(code, err) (*ExitError, error)` | Validated 0-255 exit error |
+| `ErrorHint(err) string` | One actionable fix sentence |
+| `ErrorCode(err) string` | Stable snake_case machine code |
+| `ValidateConfig(cfg) error` | Validate a config struct |
+| `ParseFlagTags(cfg) ([]FlagTag, error)` | The tag vocabulary |
+| `ConfigKeys(cfg) ([]ConfigKey, error)` | The config key vocabulary |
+| `MergeConfigs[T](...) *T` | Layer config structs |
+| `SetField(cfg, name, value) error` | Set one tagged field |
+| `RegisterTypeCodec(reflect.Type, TypeCodec) error` | Register a custom value type |
+| `RegisterValidator(name, FlagValidator) error` | Register a named validator |
+| `RegisterPlugin(Plugin) error` | Apply a plugin globally |
+| `SuggestFlag`, `SuggestCommand` | Levenshtein suggestions |
+| `TimingMiddleware[T]`, `TimeoutMiddleware[T]`, `RecoveryMiddleware[T]` | Built-in middleware |
+| `GenerateErrorReference() string` | The generated sentinel table |
+
+## Value types
+
+`Duration`, `Port`, `Email`, `URL`, `HostPort`, `FilePath`, `Enum`, `LogLevel`,
+`LogFormat`, each with a `Parse*` constructor. `time.Duration` and `time.Time`
+are supported directly. These types stay atomic when nested in a config struct;
+other nested structs are flattened into flags.
+
+## Error types
+
+| Type | Constructor |
+| --- | --- |
+| `CommandError` | `NewCommandError(name, err)` |
+| `FlagError` | `NewFlagError(name, err)`, `NewFlagErrorWithSuggestion(name, err, suggestion)` |
+| `ConfigError` | `NewConfigError(field, err)` |
+| `EnumError` | `NewEnumError(value, allowed)` |
+| `DurationError` | `NewDurationError(value, err)` |
+| `ServiceError` | `NewServiceError(serviceType, err)` |
+| `ExitError` | `NewExitError(code, err)` |
+
+All sentinels are wrapped with `fmt.Errorf("%w: ...", sentinel)` and reachable
+with `errors.Is`; typed errors are reachable with `errors.AsType[*T]` (Go 1.26+).
+The complete catalog, generated from the same table the runtime uses, lives in
+the repository's `docs/ERROR_REFERENCE.md`.
+
+## Built-in commands
+
+| Helper | Command |
+| --- | --- |
+| `VersionCommand[T](cli)` | `version` |
+| `DoctorCommand[T](cli, opts...)` | `doctor` |
+| `ConfigExplainCommand[T](cli)` | `config explain` |
+| auto-registered `describe` | Hidden JSON contract; opt out with `WithoutDescribeCommand` |
+
+## Sub-modules
+
+| Module | Purpose |
+| --- | --- |
+| `cmdguard/glamour` | Markdown help rendering |
+| `cmdguard/prompts` | huh/v2 interactive prompts |
+| `cmdguard/spinner` | Terminal spinner middleware |
+| `cmdguard/telemetry` | OpenTelemetry spans |
+| `cmdguard/flightrecorder` | `runtime/trace` flight recorder |
+| `cmdguard/lint` | Usage linter (CG001-CG008) |
+| `cmdguard/schema` | JSON Schema emitter |
 
 ## Full API
 
-See the complete API on [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5).
+The complete godoc, including every exported field and doc comment, is on
+[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5).

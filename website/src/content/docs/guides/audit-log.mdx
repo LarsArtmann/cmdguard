@@ -1,94 +1,173 @@
 ---
 title: Audit Log
-description: Trace DI service creation and export in 11 formats with samber-do-auditlog.
+description: Capture DI and command execution events with samber-do-auditlog, then export them in 11 formats.
 ---
 
 ## Overview
 
-cmdguard integrates [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) to capture a full audit trail of dependency injection — which services were created, in what order, whether they succeeded, and how long they took.
+cmdguard v5 bridges [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) into the CLI's DI scope. The plugin records service registration, invocation, shutdown, health checks, and command execution. cmdguard does not create the plugin for you: you construct it, pass it to `NewCLI` with `WithAuditLog`, and decide after execution what to do with the captured events.
 
-## Wiring the Audit Log
+The import path is `github.com/larsartmann/samber-do-auditlog`. It is a separate module, not a cmdguard sub-module.
+
+## Wiring the plugin
 
 ```go
-import auditlog "github.com/larsartmann/samber-do-auditlog"
+import (
+    auditlog "github.com/larsartmann/samber-do-auditlog"
+    v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
 
-plugin, _ := auditlog.New(auditlog.Config{
-    Enabled:    true,
+plugin, err := auditlog.New(auditlog.Config{
+    Enabled:     true,
     ContainerID: "myapp",
 })
+if err != nil {
+    return fmt.Errorf("creating audit log plugin: %w", err)
+}
 
-cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
-    v4.WithAuditLog(plugin),
+cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v5.WithAuditLog(plugin),
 )
 ```
 
-`WithAuditLog` hooks into the DI injector via `buildInjectorOpts()`. Every `Provide` and `Invoke` is recorded.
+- `WithAuditLog` must be passed to the constructor. The DI scope and its hooks are built inside `NewCLI`, where the plugin's registration, invocation, shutdown, and health-check hooks are merged into the injector options. A plugin handed over after construction is not wired.
+- A zero `auditlog.Config.Enabled` makes `auditlog.New` fall back to the `DO_AUDITLOG_ENABLED` environment variable, so capture can be switched on without a code change.
+- Capture must start before services register. Anything provided before `NewCLI` is not observed.
 
-## Command Execution Events
+## Command execution events
 
-`WithAuditMiddleware` records a `PhaseBefore` event when each command starts and a `PhaseAfter` event when it completes, carrying the wall-clock duration in milliseconds and the command's error (nil on success):
+`WithAuditMiddleware[T](plugin)` records a `PhaseBefore` event when a command starts and a `PhaseAfter` event when it finishes:
 
 ```go
-cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
-    v4.WithAuditLog(plugin),
-    v4.WithAuditMiddleware[Config](plugin),
+cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
+    v5.WithAuditLog(plugin),
+    v5.WithAuditMiddleware[AppConfig](plugin),
 )
 ```
 
-Use the same plugin for both options — `WithAuditMiddleware` records on the plugin that `WithAuditLog` captures and exports. Commands are not DI services: command events appear in `Report.Events` (and the NDJSON stream) only, never in `Report.Services`. Distinguish them with `Event.IsCommand()`; the event's `ServiceName` carries the command's full path (e.g. `myapp tasks list`). A nil plugin turns the middleware into a transparent passthrough.
-
-The middleware never alters execution — the handler's error is returned unchanged.
-
-## Programmatic Access
+The type parameter is explicit because the plugin argument does not mention `T`. To control where the middleware sits in the chain, add it yourself:
 
 ```go
-report := cli.AuditLogReport()       // *auditlog.Report snapshot
-plugin := cli.AuditLog()              // *auditlog.Plugin (nil if not configured)
+v5.WithMiddleware[AppConfig](
+    v5.AuditMiddleware[AppConfig](plugin),
+    spinner.Middleware[AppConfig]("Working..."),
+)
+```
 
-// Query individual services
-info := v4.AuditLogServiceByName(cli, "database")
+- The before event has no duration and no error; the after event carries the wall-clock duration in milliseconds and the handler error (nil on success).
+- Events are attributed to the plugin's root scope and named after `CommandMetadata.FullPath` (for example `myapp tasks list`), falling back to the command name.
+- Command events are not DI services. They appear in `Report.Events` and the NDJSON stream, never in `Report.Services`. Select them with `Event.IsCommand()`.
+- A nil plugin turns the middleware into a transparent passthrough, so conditional wiring stays safe. The middleware never changes the handler's error.
+
+Both options need the same plugin. `WithAuditMiddleware` only records; `WithAuditLog` captures and exports.
+
+## Recording health checks
+
+```go
+results := cli.RecordAuditHealthCheck(ctx) // map[string]error
+for name, err := range results {
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "%s: %v\n", name, err)
+    }
+}
+```
+
+This runs the scope's health checks with `ctx` and records each result as an audit event. It returns nil when audit logging is not configured.
+
+## Programmatic access
+
+| Call | Returns | Audit logging off |
+| ---- | ------- | ----------------- |
+| `cli.AuditLog()` | `*auditlog.Plugin` | nil |
+| `cli.AuditLogReport()` | `*auditlog.Report` snapshot | nil |
+| `v5.AuditLogServiceByName[T](cli, name)` | `*auditlog.ServiceInfo`, nil when absent | nil |
+| `v5.AuditLogFailedServices[T](cli)` | `[]auditlog.ServiceInfo` | nil |
+| `cli.RecordAuditHealthCheck(ctx)` | `map[string]error` | nil |
+
+```go
+info := v5.AuditLogServiceByName(cli, "database")
 if info != nil {
-    fmt.Printf("Status: %s, Duration: %v\n", info.Status, info.Duration)
+    fmt.Printf("%s: %s (invocations=%d)\n",
+        info.ServiceName, info.Status, info.InvocationCount)
 }
 
-// Find all failed services
-failed := v4.AuditLogFailedServices(cli)
-for _, svc := range failed {
-    log.Printf("FAILED: %s — %v", svc.Name, svc.Error)
+for _, svc := range v5.AuditLogFailedServices(cli) {
+    fmt.Fprintf(os.Stderr, "failed: %s\n", svc.ServiceName)
 }
 ```
+
+`AuditLogReport` returns a snapshot taken at call time, so later events do not appear in an earlier report. `FailedServices` selects services whose `Status.IsError()` is true, meaning an invocation error or a shutdown error. The status values are `registered`, `active`, `invocation_error`, `shutdown`, and `shutdown_error`.
 
 ## Exporting
 
-Export in 11 formats — HTML, JSON, NDJSON, CSV, TSV, Mermaid, DOT, D2, PlantUML, tree, HTML tree:
-
 ```go
-format, _ := v4.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
-if format == "" {
-    format = v4.AuditLogFormatHTML
+format, err := v5.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+if err != nil {
+    return err
 }
 
-err := v4.ExportAuditLog(cli, v4.AuditLogExportConfig{
+err = v5.ExportAuditLog(cli, v5.AuditLogExportConfig{
     Format: format,
     Path:   "audit-report." + format.String(),
 })
 ```
 
-`ParseAuditLogFormat` validates the input — invalid values return `ErrUnsupportedAuditLogFormat` instead of failing silently.
+- `ParseAuditLogFormat("")` returns `AuditLogFormatHTML`. Unknown input returns `ErrUnsupportedAuditLogFormat` naming every accepted value.
+- `Path` wins over `Writer`. With neither set, the export goes to `os.Stdout`.
+- `ExportAuditLog` is a no-op returning nil when the plugin is nil or no events were captured.
+- Export failures are wrapped with the format and the destination.
 
-## Consumer Pattern
+| Format | Output |
+| ------ | ------ |
+| `html` | self-contained HTML report |
+| `json` | report document |
+| `ndjson` | one JSON event per line |
+| `csv`, `tsv` | tabular event export |
+| `mermaid`, `dot`, `d2`, `plantuml` | dependency diagrams for Mermaid, Graphviz, D2, PlantUML |
+| `tree` | plain-text service tree |
+| `htmltree` | HTML tree view |
 
-cmdguard does not provide a built-in `audit-log` subcommand. Consumers export via their own flag/env pattern:
+## Consumer pattern
+
+cmdguard ships no built-in `audit-log` subcommand. Consumers own the flag or env wiring, normally exporting after `Execute` and exiting with the mapped code:
 
 ```go
-// After Execute, check if audit export is requested
-if os.Getenv("DO_AUDITLOG_ENABLED") != "" {
-    format, _ := v4.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
-    _ = v4.ExportAuditLog(cli, v4.AuditLogExportConfig{
+func main() {
+    cli, err := build() // your constructor, with WithAuditLog
+    if err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1)
+    }
+
+    execErr := cli.Execute(context.Background())
+    exportAuditLog(cli)
+    os.Exit(v5.ExitCode(execErr))
+}
+
+func exportAuditLog(cli *v5.CLI[AppConfig]) {
+    plugin := cli.AuditLog()
+    if plugin == nil || plugin.EventsCount() == 0 {
+        return
+    }
+
+    format, err := v5.ParseAuditLogFormat(os.Getenv("AUDIT_LOG_FORMAT"))
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "audit-log format invalid: %v\n", err)
+        return
+    }
+
+    _ = v5.ExportAuditLog(cli, v5.AuditLogExportConfig{
         Format: format,
-        Path:   "audit." + format.String(),
+        Path:   "app-audit." + format.String(),
     })
 }
 ```
 
-This keeps the core CLI clean while giving you full control over when and where audit logs are written.
+This keeps the CLI surface clean and gives you control over when and where the report is written. Do not print the error returned by `Execute`: cmdguard already printed it once, and `ExitCode` only maps it to a process code.
+
+## Where to go next
+
+- [Dependency Injection](/guides/dependency-injection/): the services the report describes.
+- [Middleware](/guides/middleware/): chain ordering around the audit middleware.
+- [Error Handling](/guides/error-handling/): the exit-code contract used after export.
+- [Lifecycle & Signals](/guides/lifecycle/): the shutdown events the plugin records.

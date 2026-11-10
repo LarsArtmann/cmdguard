@@ -3,76 +3,140 @@ title: Shell Completion
 description: Dynamic and static shell completion via WithCompletion.
 ---
 
-## Overview
+## Built-in Completion Command
 
-cmdguard supports dynamic shell completion through Cobra's completion infrastructure. Users get tab-completion for commands, flags, and flag values.
-
-## Enabling Completion
-
-Cobra generates completion scripts automatically. cmdguard inherits this:
+Cobra's `completion` command is available on every cmdguard CLI; cmdguard does not disable it. Generate a script for your shell:
 
 ```bash
-# Generate completion for your shell
-$ myapp completion bash > /etc/bash_completion.d/myapp
-$ myapp completion zsh > "${fpath[1]}/_myapp"
-$ myapp completion fish > ~/.config/fish/completions/myapp.fish
+myapp completion bash > /etc/bash_completion.d/myapp
+myapp completion zsh > "${fpath[1]}/_myapp"
+myapp completion fish > ~/.config/fish/completions/myapp.fish
+myapp completion powershell > myapp.ps1
 ```
 
-## Dynamic Flag Completion
+Users also get completion for command names, aliases, and flags from the generated script.
 
-Provide completion suggestions for flag values at runtime:
+## Dynamic Positional Completion
+
+`WithCompletion` sets the command's `ValidArgsFunction`. It is called while the shell completes positional arguments:
 
 ```go
-type TaskFlags struct {
-    ID string `flag:"id" help:"Task ID"`
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/spf13/cobra"
+)
+
+type AppConfig struct{}
+
+type DoneFlags struct {
+	ID string `flag:"id" help:"Task ID"`
 }
 
-cmd, _ := v4.NewCommand("done", &TaskFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags *TaskFlags) error {
-        return markDone(flags.ID)
-    },
-    v4.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-        // Query your task store for matching IDs
-        tasks := taskStore.Search(toComplete)
-        var ids []string
-        for _, t := range tasks {
-            ids = append(ids, fmt.Sprintf("%s\t%s", t.ID, t.Title))
-        }
-        return ids, cobra.ShellCompDirectiveNoFileComp
-    }),
+func main() {
+	cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "create CLI: %v\n", err)
+		os.Exit(1)
+	}
+
+	doneCmd, err := v5.NewCommand("done", DoneFlags{},
+		func(ctx context.Context, cfg *AppConfig, flags DoneFlags) error {
+			fmt.Printf("marking %s done\n", flags.ID)
+			return nil
+		},
+		v5.WithShort("Mark a task done"),
+		v5.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{
+				"build\tBuild the binary",
+				"test\tRun the tests",
+				"lint\tLint the code",
+			}, cobra.ShellCompDirectiveNoFileComp
+		}),
+	)
+
+	b := v5.NewBuilder(cli)
+	v5.Try(b, doneCmd, err)
+	if err := b.Build(); err != nil {
+		fmt.Fprintf(os.Stderr, "register command: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
+}
+```
+
+`CompletionFunc` is `func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective)`. Each candidate may carry a description after a tab. `cobra.ShellCompDirectiveNoFileComp` stops the shell from also offering filenames.
+
+## Reading Positional Arguments
+
+cmdguard's handler signature has no `args` parameter. Read them from the context:
+
+```go
+func handler(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {
+	args := v5.ArgsFromContext(ctx)
+	if len(args) == 0 {
+		return fmt.Errorf("missing path")
+	}
+	return process(args[0])
+}
+```
+
+## Static Candidates and Validation
+
+`WithValidArgs` supplies static completion candidates. It does not, by itself, reject other values: pair it with `WithArgs(cobra.OnlyValidArgs)` when the set must also be enforced.
+
+```go
+setCmd, err := v5.NewCommand("set", v5.NoFlags{}, setHandler,
+	v5.WithShort("Set the log level"),
+	v5.WithValidArgs("debug", "info", "warn", "error"),
+	v5.WithArgs(cobra.OnlyValidArgs),
 )
 ```
 
-When the user types `myapp done --id <TAB>`, cmdguard calls your completion function with `toComplete` set to whatever the user has typed so far.
+With both options, `myapp set de<TAB>` offers `debug`, and `myapp set trace` fails before the handler runs.
 
-## Static Argument Validation
+## Argument Validators
 
-Restrict positional arguments to a fixed set:
+| Option | Behavior |
+| --- | --- |
+| `WithArgs(fn)` | Custom `cobra.PositionalArgs` validator |
+| `WithExactArgs(n)` | Exactly `n` arguments |
+| `WithMinimumArgs(n)` | At least `n` arguments |
+| `WithMaximumArgs(n)` | At most `n` arguments |
+| `WithRangeArgs(min, max)` | Between `min` and `max` arguments, inclusive |
+| `WithNoArgs()` | Reject every positional argument |
+| `WithStrictPositionalArgs()` | Reject positionals when no other validator is set |
+| `WithArgsPassthrough()` | Accept any positionals and ignore extras |
+
+`WithStrictPositionalArgs` is opt-in today. It only applies when no other validator was configured; an explicit `WithExactArgs`, `WithNoArgs`, or `WithArgs` wins. `WithArgsPassthrough` pins the current permissive behavior and will be the opt-out if the strict default lands.
+
+## Flag Value Completion
+
+Flag value completion is a cobra hook, not a `WithCompletion` responsibility. After `Build`, find the command on the underlying root and register the function:
 
 ```go
-cmd, _ := v4.NewCommand("set", v4.NoFlags{},
-    setHandler,
-    v4.WithValidArgs("debug", "info", "warn", "error"),
-)
-// $ myapp set de<TAB> → debug
-```
-
-## Completion with Flag Values
-
-For flags that accept enums or known values:
-
-```go
-type LogFlags struct {
-    Level string `flag:"level" default:"info" help:"Log level"`
+doneCobra, _, err := cli.RootCommand().Find([]string{"done"})
+if err != nil {
+	return err
 }
 
-cmd, _ := v4.NewCommand("log", &LogFlags{},
-    logHandler,
-    v4.WithCompletion(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-        if cmd.Flags().Lookup("level") != nil && cmd.Flags().Changed("level") {
-            return []string{"debug", "info", "warn", "error"}, cobra.ShellCompDirectiveNoFileComp
-        }
-        return nil, cobra.ShellCompDirectiveDefault
-    }),
+err = doneCobra.RegisterFlagCompletionFunc("id",
+	func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"build", "test", "lint"}, cobra.ShellCompDirectiveNoFileComp
+	},
 )
 ```
+
+Now `myapp done --id <TAB>` completes task IDs. Use `cobra.ShellCompDirectiveDefault` when filenames are also valid.
+
+## Where to go next
+
+- [Type-Safe Flags](/guides/type-safe-flags/)
+- [Rich Output](/guides/rich-output/)
+- [Migrating from Cobra](/guides/migrating-from-cobra/)

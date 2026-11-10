@@ -148,7 +148,7 @@ cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
 )
 ```
 
-Both are plain middleware, so the span context is not propagated into the handler. Wire a `ContextMiddleware` when downstream code needs the derived context.
+`telemetry.Middleware` is a plain middleware, so its span context is not propagated into the handler. Wire a `ContextMiddleware` when downstream code needs the derived context.
 
 ## Where to go next
 

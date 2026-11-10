@@ -1,0 +1,163 @@
+---
+title: Migrating from v4 to v5
+description: Port a cmdguard v4 application to v5 with the codemod, a checklist, and the defaults that change runtime behaviour.
+---
+
+## What changes
+
+v5 executes the breaking changes v4 deferred: the production batteries become the default, four naming debts are paid, and the per-command error ladder is replaced by the Builder. Most of the port is mechanical. The rest is reviewing defaults and three removed or reshaped APIs.
+
+The authoritative source is [docs/MIGRATION_v4_v5.md](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md). This page is the short path.
+
+| Area | v4 | v5 |
+| ---- | -- | -- |
+| Module path | `github.com/larsartmann/cmdguard/v4` | `github.com/larsartmann/cmdguard/v5` |
+| Package path | `.../v4/pkg/cmdguard/v4` | `.../v5/pkg/cmdguard/v5` |
+| Import identifier | `v4` | `v5` |
+| Command metadata | `CommandInfo` | `CommandMetadata` |
+| Type codec interface | `TypeHandler` | `TypeCodec` |
+| Type codec adapter | `TypeHandlerFunc` | `TypeCodecFunc` |
+| Codec registration | `RegisterTypeHandler` | `RegisterTypeCodec` |
+| Prompt runner (`prompts` module) | `HuhRunner` | `HuhPrompter` |
+| Command registration | error ladder per command | `Builder`: `NewBuilder`, `Add`, `AddParent`, `Try`, `Check`, `Build` |
+| Defaults | batteries are opt-in (`WithBatteries`) | batteries on by default, `Without*` opt-outs |
+| Post-construction config | `cli.SetConfig(cfg)` | removed |
+| Scoped registration | `RegisterInScope(parent, name, providers ...any)` | `RegisterInScope[T](parent, name, provider func(do.Injector) (T, error))` |
+| Context-aware health check | `cli.HealthCheckWithContext(ctx)` | `cli.HealthCheck(ctx)` |
+| JSON error envelope | `type`, `message`, `hint`, `code` | adds `error_code`; `ErrorCode(err)` is public |
+
+Fields of `CommandMetadata` are unchanged from `CommandInfo`: `Name`, `FullPath`, `Phase`, `HasRunE`. Sub-module import paths stay unversioned, so `github.com/larsartmann/cmdguard/prompts` is unchanged.
+
+## Checklist
+
+1. Run the codemod from the consumer repository root.
+2. `go mod edit -require github.com/larsartmann/cmdguard/v5@latest && go mod tidy`.
+3. `go build ./...` and work through what the codemod could not rewrite.
+4. Replace `cli.SetConfig(cfg)`: put the values in the struct passed to `NewCLI`, or check them with `WithConfigValidation[T]`.
+5. Convert `RegisterInScope` call sites to the single typed provider form.
+6. Rename `cli.HealthCheckWithContext(ctx)` to `cli.HealthCheck(ctx)`.
+7. Add `WithShort(...)` to every command that lacks one, or opt out with `WithoutStrictValidation()`.
+8. Optionally replace the per-command error ladder with the `Builder`.
+9. Decide on opt-outs where v4 behaviour must be preserved (see the batteries table).
+10. Run `go test ./...` and `cmdguard-lint lint --dir .`; CG002 fires while any v4 import remains.
+
+## The codemod
+
+```bash
+bash /path/to/cmdguard/docs/migration_v4_v5/codemod.sh
+go mod edit -require github.com/larsartmann/cmdguard/v5@latest
+go mod tidy
+go build ./... && go test ./...
+```
+
+It rewrites, in every `.go` and `go.mod` file outside `.git` and `vendor`:
+
+| Rewrite | Before | After |
+| ------- | ------ | ----- |
+| Import path | `github.com/larsartmann/cmdguard/v4` | `github.com/larsartmann/cmdguard/v5` |
+| Package path | `.../v4/pkg/cmdguard/v4` | `.../v5/pkg/cmdguard/v5` |
+| Alias and qualifier | `v4 "..."`, `v4.NewCLI` | `v5 "..."`, `v5.NewCLI` |
+| Metadata type | `CommandInfo` | `CommandMetadata` |
+| Codec interface | `TypeHandler` | `TypeCodec` |
+| Codec adapter | `TypeHandlerFunc` | `TypeCodecFunc` |
+| Codec registration | `RegisterTypeHandler` | `RegisterTypeCodec` |
+| Prompt runner | `HuhRunner` | `HuhPrompter` |
+
+It prints, but does not change, three call patterns that need a human:
+
+- `cli.SetConfig(...)`: removed in v5.
+- `RegisterInScope(...)`: the provider shape changed.
+- `cli.HealthCheckWithContext(...)`: removed, `HealthCheck(ctx)` is the context-aware form.
+
+## Behaviour change: batteries
+
+A bare `NewCLI` now means something different:
+
+| Default | v4 | v5 | Opt out |
+| ------- | -- | -- | ------- |
+| Strict validation | lenient, only name and handler required | every command needs `WithShort` (`ErrMissingShort`) | `WithoutStrictValidation()` |
+| Signal handling | off | `SIGINT`/`SIGTERM` cancel the context | `WithoutSignalHandling()` |
+| Graceful DI shutdown | off; when on, ran on every `Execute` | on; runs only on the signal path | `WithoutGracefulShutdown()` |
+| Strict config keys | off | unknown keys fail with `ErrConfigUnknownKey` | `WithoutStrictConfigKeys()` |
+| `version` command | only with `WithBatteries` | registered when `WithCLIVersion` is set | `WithoutBatteries()` |
+| `doctor` command | only with `WithBatteries` | always registered | `WithoutBatteries()` |
+
+Error hints and `SilenceUsage` were already on in v4; v5 keeps both. `WithoutBatteries()` reverts to the v4-era leniency but leaves hints on, since hints have their own opt-out (`WithoutErrorHints()`). `WithBatteries()` still exists as an explicit no-op, so v4 call sites that pass it keep compiling. Consumer-defined `version`, `doctor`, and `describe` commands always win over the built-ins.
+
+A practical consequence: `cli.SetVersion(...)` at runtime is a lint finding (CG004). Pass `WithCLIVersion` at construction so the `version` command is registered.
+
+## Behaviour change: exit codes
+
+The mapping itself is unchanged:
+
+- `ExitCode(nil)` is 0.
+- A non-zero code from an `ExitCoder` in the chain wins.
+- A zero code from an `ExitCoder` means "no override" and falls back to 1, so a failed run never exits 0.
+- `NewExitError(code, err)` rejects codes outside 0 through 255 with `ErrInvalidExitCode`.
+- `ExecuteAndExit(ctx)` applies exactly this mapping.
+
+What is new is the machine-readable side. `ErrorCode(err)` returns a stable snake_case code (`required_flag`, `config_unknown_key`, `missing_short`, and so on) or an empty string for unclassified errors, and the JSON error envelope carries it:
+
+```json
+{"error":{"type":"config","message":"...","hint":"...","error_code":"config_unknown_key","code":1}}
+```
+
+Because `doctor` is now registered by default, a failing diagnostic exits 1 without any consumer code.
+
+## Behaviour change: executor
+
+- `ExecuteAndExit` remains the entry point. When you need work after execution, call `ExitCode(err)` and exit yourself. Do not print the error: cmdguard prints it once.
+- Graceful shutdown fires only when the run was signal-cancelled. A normally completing `Execute` leaves the scope alive, which makes repeated `ExecuteWithArgs` safe under the defaults. For explicit teardown, call `cli.Shutdown(ctx)`.
+- `PostRunE` still does not run when `RunE` fails. Teardown that must run on both paths goes through `WithCleanup[T]`, which joins cleanup errors with the original error via `errors.Join`.
+
+Replace the construction ladder with the `Builder`:
+
+```go
+// v4: one check per command
+listCmd, err := v5.NewCommand("list", ListFlags{}, listHandler, v5.WithShort("List tasks"))
+if err != nil {
+    return err
+}
+if err := v5.AddCommand(cli, listCmd); err != nil {
+    return err
+}
+
+// v5: errors collected, attached atomically
+b := v5.NewBuilder(cli)
+v5.Add(b, "list", ListFlags{}, listHandler, v5.WithShort("List tasks"))
+v5.AddParent(b, "db", "Database operations", v5.NoFlags{},
+    v5.WithSubcommands(migrateCmd, seedCmd), v5.WithShort("Database operations"))
+if err := b.Build(); err != nil {
+    return err
+}
+```
+
+`v5.Add` takes the `use` string, the flags value, and the handler, so it constructs `NewCommand` for you. `v5.Try(b, cmd, err)` queues a `(Command, error)` pair you already hold; `b.Check(err)` collects an error for a command consumed elsewhere, such as a child passed to `WithSubcommands`. `Build` reports every collected error joined and attaches nothing when anything fails. `AddCommands` remains available and returns the first error.
+
+`NewApp` combines construction and registration and discards a partially built CLI when registration fails:
+
+```go
+cli, err := v5.NewApp[AppConfig]("app", "My app", AppConfig{},
+    func(cli *v5.CLI[AppConfig]) error {
+        return v5.AddCommands(cli, listCmd, addCmd)
+    },
+    v5.WithCLIVersion(version.Version),
+)
+```
+
+## Verifying the port
+
+```bash
+go build ./... && go test ./...
+cmdguard-lint lint --dir .
+rg -n '\bv4\.' --glob '*.go' .
+```
+
+The last command should print nothing. If a test now fails on a command without a short description or on an unknown config key, that is the v5 default doing its job; add `WithShort` or fix the key rather than reaching for an opt-out.
+
+## Where to go next
+
+- [Migrating from Cobra](/guides/migrating-from-cobra/): the same paths for raw `*cobra.Command` code.
+- [Production Batteries](/guides/production-batteries/): every default and its opt-out in detail.
+- [Error Handling](/guides/error-handling/): hints, error codes, and the single-print contract.
+- [Lifecycle & Signals](/guides/lifecycle/): shutdown semantics for repeated runs.

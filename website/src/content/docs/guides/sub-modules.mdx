@@ -5,89 +5,156 @@ description: Optional features as independently versioned Go modules.
 
 ## Architecture
 
-cmdguard's core stays lean (13 direct deps). Five optional features live in standalone Go modules so you import only what you need. Each lives at the repo root for correct external resolution.
+cmdguard's core has zero dependencies on the optional modules. Each module has its own `go.mod` at the repository root, not under `pkg/`, and imports as `github.com/larsartmann/cmdguard/<name>`; moving one breaks external `go get` while local workspace builds still pass.
 
-| Sub-module         | Import path                                      | Provides                       |
-| ------------------ | ------------------------------------------------ | ------------------------------ |
-| **glamour**        | `github.com/larsartmann/cmdguard/glamour`        | Markdown help rendering        |
-| **prompts**        | `github.com/larsartmann/cmdguard/prompts`        | Interactive prompts via huh/v2 |
-| **spinner**        | `github.com/larsartmann/cmdguard/spinner`        | Terminal spinner middleware    |
-| **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`      | OpenTelemetry spans            |
-| **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder` | Runtime trace flight recorder  |
+| Sub-module | Import path | Provides |
+| --- | --- | --- |
+| **glamour** | `github.com/larsartmann/cmdguard/glamour` | Markdown help rendering |
+| **prompts** | `github.com/larsartmann/cmdguard/prompts` | Interactive prompts via huh/v2 |
+| **spinner** | `github.com/larsartmann/cmdguard/spinner` | Terminal spinner middleware |
+| **telemetry** | `github.com/larsartmann/cmdguard/telemetry` | OpenTelemetry spans |
+| **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder` | Runtime trace snapshots |
+| **lint** | `github.com/larsartmann/cmdguard/lint` | Usage linter and `cmdguard-lint` binary |
+| **schema** | `github.com/larsartmann/cmdguard/schema` | JSON Schema for config structs |
 
-## Glamour — Markdown Help
+## Glamour: Markdown Help
 
-Render command `Long` and `Example` text as styled markdown:
+`glamour.WithHelp()` returns a `v5.CLIOption` that renders every command's `Long` and `Example` text as styled markdown. It uses `v5.WithHelpTransform`, so the core does not import the rendering library.
 
 ```go
 import "github.com/larsartmann/cmdguard/glamour"
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    glamour.WithHelp[AppConfig](),
+cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{},
+	glamour.WithHelp(),
 )
 ```
 
-Uses `RenderWithEnvironmentConfig` (checks `GLAMOUR_STYLE` env var, defaults to `"dark"`).
+The theme comes from the `GLAMOUR_STYLE` environment variable and defaults to `dark`. Pin one with `glamour.WithHelpTheme("dracula")`; supported themes include `ascii`, `dark`, `dracula`, `light`, `notty`, `pink`, and `tokyo-night`. For ad-hoc rendering, use `glamour.RenderMarkdown(markdown)` or `glamour.RenderMarkdownWithTheme(markdown, theme)`.
 
-## Prompts — Interactive Input
+## Prompts: Interactive Input
 
-Enable interactive prompting for missing required flags:
+Call `prompts.Register()` once at startup. It wires the huh/v2 `HuhPrompter` into `v5.SetPromptRunner`. Add `prompt:"..."` tags and opt in per command with `WithPromptOnMissing()`:
 
 ```go
 import "github.com/larsartmann/cmdguard/prompts"
 
-// Register the huh/v2 prompt runner
-v4.SetPromptRunner(prompts.New())
+prompts.Register()
 
-type Flags struct {
-    Name string `flag:"name" prompt:"What is your name?"`
+type AddFlags struct {
+	Name  string `flag:"name" prompt:"Entry name?" help:"Entry name"`
+	Force bool   `flag:"force" prompt:"Overwrite existing entry?" help:"Overwrite"`
 }
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithPromptOnMissing(),
+addCmd, err := v5.NewCommand("add", AddFlags{}, addHandler,
+	v5.WithShort("Add an entry"),
+	v5.WithPromptOnMissing(),
 )
 ```
 
-The prompt type adapts to the flag type: `bool` becomes a confirm prompt, `Enum[T]` becomes a select, everything else becomes a text input.
+A `bool` field becomes a confirm, a field with `values:"..."` becomes a select, and everything else becomes a text input. Without registration, the core helpers `PromptString`, `PromptSelect`, and `PromptConfirm` return `ErrPromptNotRegistered`.
 
-## Spinner — Loading Indicator
+## Spinner: Loading Indicator
 
 ```go
 import "github.com/larsartmann/cmdguard/spinner"
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
+cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{},
+	v5.WithMiddleware(spinner.Middleware[AppConfig]("Working...")),
 )
 ```
 
-## Telemetry — OpenTelemetry
+`spinner.DefaultConfig(title)` returns a `Config{Title, Writer, Frames, Interval}`; adjust it and call `spinner.MiddlewareWithConfig[T](cfg)` for custom frames or timing. The spinner writes to stderr and silently skips when stderr is not a TTY.
+
+## Telemetry: OpenTelemetry
 
 ```go
 import "github.com/larsartmann/cmdguard/telemetry"
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    telemetry.WithTelemetry[AppConfig](tracer),
+cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{},
+	telemetry.WithTelemetry[AppConfig](tracer),
 )
 ```
 
-## Flight Recorder — Execution Trace Snapshots
+`telemetry.Middleware[T](tracer)` emits one span per phase (`pre-run`, `run`, `post-run`). Plain `Middleware` cannot propagate a derived context, so the handler does not receive the span context. When propagation matters, register a context middleware instead:
+
+```go
+ctxMw := func(
+	ctx context.Context, cfg *AppConfig, info v5.CommandMetadata, next func(context.Context) error,
+) error {
+	ctx, span := tracer.Start(ctx, info.FullPath)
+	defer span.End()
+	return next(ctx)
+}
+
+cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{},
+	v5.WithContextMiddleware[AppConfig](ctxMw),
+)
+```
+
+## Flight Recorder: Execution Trace Snapshots
 
 ```go
 import "github.com/larsartmann/cmdguard/flightrecorder"
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithMiddleware[AppConfig](flightrecorder.Middleware[AppConfig](
-        flightrecorder.WithCaptureOnSlow(5*time.Second),
-        flightrecorder.WithCaptureOnError(),
-    )),
+cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{},
+	flightrecorder.WithFlightRecorder[AppConfig](flightrecorder.Config{
+		CaptureOnSlow:  true,
+		SlowThreshold:  200 * time.Millisecond,
+		CaptureOnError: true,
+	}),
 )
 ```
 
-The flight recorder wraps Go 1.25+ `runtime/trace.FlightRecorder`. It continuously
-buffers execution traces in memory and auto-captures snapshots when commands are slow
-or error. Analyze snapshots with `go tool trace snapshot.trace`. Zero external
-dependencies (stdlib only).
+The recorder buffers Go runtime trace data in memory and writes a `.trace` snapshot on a slow command or an error. `flightrecorder.DefaultConfig()` sets `MinAge` to 5s, `MaxBytes` to 10 MiB, `CaptureOnSlow` on, `SlowThreshold` to 100ms, and `CaptureOnError` off. Other fields are `OutputDir`, `FilenamePrefix`, and `Log`. Read a snapshot with `go tool trace snapshot.trace`.
 
-## Directory Layout
+For explicit lifecycle control, use `flightrecorder.New(cfg)` plus `rec.Start()`, `rec.Stop()`, and `v5.WithMiddleware(flightrecorder.Middleware[AppConfig](rec))`. The recorder is a process-wide singleton: only one can be active, and a second `Start` fails. `Recorder` also exposes `Enabled()`, `Config()`, `WriteTo(io.Writer)`, `Capture(ctx, commandName, reason)`, and `CaptureToWriter(...)`.
 
-Each sub-module lives at the **repo root** (`<name>/`), NOT under `pkg/cmdguard/`. Go resolves module paths by finding `go.mod` at the matching directory. Moving them under `pkg/` would break external `go get` silently.
+## Lint: Usage Linter
+
+```bash
+go build ./lint/cmd/cmdguard-lint
+cmdguard-lint lint --dir . --output sarif
+cmdguard-lint rules --markdown
+```
+
+| Rule | Meaning |
+| --- | --- |
+| CG001 | Execute bypass |
+| CG002 | Stale major import |
+| CG003 | Panic on constructor error |
+| CG004 | Runtime `SetVersion` |
+| CG005 | Duplicate version options |
+| CG006 | Execute error reprint |
+| CG007 | Missing short description |
+| CG008 | Missing CLI version |
+
+`lint` accepts `--dir`, `--output text|json|sarif`, `--enable`, `--disable`, `--baseline`, and `--write-baseline`. Suppress a finding on the offending line or the line above with `//cmdguard-lint:ignore <ID> <reason>`.
+
+## Schema: JSON Schema for Configs
+
+```go
+func emitSchema(cli *v5.CLI[AppConfig]) error {
+	doc, err := schema.FromCLI(cli)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintln(os.Stdout, doc.Title)
+	return schema.Emit(os.Stdout, cli.Config())
+}
+```
+
+| Symbol | Signature |
+| --- | --- |
+| `FromConfig` / `FromCLI` | `func(any)` / `func(*v5.CLI[T])`, both returning `(*Document, error)` |
+| `Emit` | `func(io.Writer, any) error` |
+| `Marshal` | `func(any) ([]byte, error)` |
+| `CommandSchemas` | `func(*v5.CLIDescription) map[string]*Document` |
+
+Documents use the JSON Schema 2020-12 dialect, add cmdguard hints under `x-cmdguard`, and sort property keys through `PropertyMap` for reproducible output.
+
+## Where to go next
+
+- [Rich Output](/guides/rich-output/)
+- [Middleware](/guides/middleware/)
+- [Flow Context](/guides/flow-context/)
+- [Audit Log](/guides/audit-log/)

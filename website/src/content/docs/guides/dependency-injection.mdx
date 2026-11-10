@@ -5,117 +5,213 @@ description: Register services, invoke them in handlers, and manage lifecycle wi
 
 ## Overview
 
-cmdguard integrates [samber/do/v2](https://github.com/samber/do) for dependency injection. Register services on the CLI scope and invoke them in handlers — no global state, no manual wiring.
+cmdguard integrates [samber/do/v2](https://github.com/samber/do) for dependency injection. Every CLI owns a scope. Register services on it and invoke them in handlers; there is no global container and no manual wiring.
 
-## Register Services
+## The CLI Scope
+
+`NewCLI` creates the root scope and registers the resolved config as `*T`, so a provider can depend on the config without extra plumbing:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{})
-scope := cli.Scope()
-
-// Lazy initialization — service is created on first Invoke
-v4.Provide(scope, func(i do.Injector) (*Database, error) {
-    cfg, _ := v4.Invoke[*AppConfig](scope)
-    return &Database{DSN: cfg.DSN}, nil
-})
+scope := cli.Scope()      // *v5.Scope
+injector := cli.Injector() // the underlying do.Injector
 ```
 
-## Invoke in Handlers
+`cli.Injector()` is the escape hatch for samber/do calls that cmdguard does not wrap. `cli.Scope()` is the typed wrapper and what the helpers below take.
+
+## Registering Services
+
+Providers are lazy: the function runs on the first `Invoke` of that type, never at registration.
 
 ```go
-v4.NewCommand("query", v4.NoFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags v4.NoFlags) error {
-        db, _ := v4.Invoke[*Database](cli.Scope())
-        return db.Query(ctx)
-    },
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/samber/do/v2"
+)
+
+type AppConfig struct {
+	DSN string `flag:"dsn" env:"APP_DSN" default:"postgres://localhost/app" help:"Database DSN"`
+}
+
+type Database struct{ dsn string }
+
+func (db *Database) Query(_ context.Context, q string) (string, error) {
+	return db.dsn + " <- " + q, nil
+}
+
+// HealthCheck makes the service visible to "doctor" and cli.HealthCheck.
+func (db *Database) HealthCheck(_ context.Context) error { return nil }
+
+// Shutdown runs during graceful shutdown.
+func (db *Database) Shutdown() error { return nil }
+
+func main() {
+	cli, err := v5.NewCLI[AppConfig]("app", "DI example", AppConfig{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	err = v5.Provide(cli.Scope(), func(_ do.Injector) (*Database, error) {
+		cfg, err := v5.Invoke[*AppConfig](cli.Scope())
+		if err != nil {
+			return nil, err
+		}
+		return &Database{dsn: cfg.DSN}, nil
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	b := v5.NewBuilder(cli)
+	v5.Add(b, "query", v5.NoFlags{},
+		func(ctx context.Context, _ *AppConfig, _ v5.NoFlags) error {
+			db, err := v5.Invoke[*Database](cli.Scope())
+			if err != nil {
+				return err
+			}
+			out, err := db.Query(ctx, "select 1")
+			if err != nil {
+				return err
+			}
+			fmt.Println(out)
+			return nil
+		},
+		v5.WithShort("Run a query"),
+		v5.WithNoArgs(),
+	)
+	if err := b.Build(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
+}
+```
+
+| Helper          | Purpose                                                        |
+| --------------- | -------------------------------------------------------------- |
+| `Provide[T]`    | Lazy typed provider: `func(do.Injector) (T, error)`            |
+| `ProvideNamed[T]` | Same, registered under a name for multiple implementations   |
+| `ProvideValue[T]` | Register an already-constructed value                        |
+| `Invoke[T]`     | Resolve the type, constructing it on first use                 |
+| `InvokeNamed[T]` | Resolve a named registration                                  |
+
+Registration is panic-free. A duplicate registration or a nil provider comes back as an error wrapping `ErrServiceRegistration`.
+
+## Invoking in Handlers
+
+Handlers receive the resolved config as `*T`, so most commands read config directly and invoke only the services they need. `Invoke` returns `ErrServiceNotFound` in the error chain when the type was never registered, which is distinguishable with `errors.Is`.
+
+For raw cobra subcommands mixed into the tree, `cmdguard.ConfigFromContext[T](ctx)` returns the resolved config without an `Invoke`.
+
+## Service Lifecycle
+
+Two method sets are recognized automatically:
+
+```go
+type Database struct{ dsn string }
+
+// do.Healthchecker
+func (db *Database) HealthCheck() error { return nil }
+
+// do.HealthcheckerWithContext, preferred when the check can be cancelled
+func (db *Database) HealthCheck(ctx context.Context) error { return nil }
+
+// do.ShutdownerWithError
+func (db *Database) Shutdown() error { return nil }
+```
+
+Health checks surface in two places. The auto-registered `doctor` command runs every registered service's check plus any custom checks, and the programmatic API mirrors it:
+
+```go
+err := cli.HealthCheck(ctx)                                  // first failing check, or nil
+results := cli.HealthCheckResults()                          // map[string]error
+ctxResults := cli.HealthCheckResultsWithContext(ctx)         // context-aware variant
+```
+
+Graceful shutdown is ON by default in v5. On SIGINT or SIGTERM, cmdguard cancels the context and then shuts down every instantiated DI service in dependency-aware order: a service that nothing depends on is closed first, so dependents stop before their dependencies. A normally completing `Execute` never tears the scope down, which keeps repeated `ExecuteWithArgs` runs safe. To tear down explicitly, call `cli.Shutdown(ctx)`. `WithoutGracefulShutdown()` keeps signal handling but skips DI shutdown; `WithoutSignalHandling()` disables both.
+
+## Overriding Services in Tests
+
+Clone the scope, then override. Clone copies the registrations but not the instantiated state:
+
+```go
+func TestQuery(t *testing.T) {
+	cloned := v5.CloneScope(cli.Scope())
+
+	err := v5.OverrideValue(cloned, &Database{dsn: "test://mock"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	db, err := v5.Invoke[*Database](cloned)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = db
+}
+```
+
+`Override[T](scope, fn)` replaces a provider; `OverrideValue[T](scope, v)` replaces it with a value. Both return an error only for a nil scope, so `errors.Is` checks on the result stay simple.
+
+## Custom Scopes
+
+A scope can be built before the CLI and handed over with `WithCLIScope`:
+
+```go
+scope := v5.NewScope("app")
+
+// Custom injector options: DI logging, health check timeouts, parallelism.
+scope = v5.NewScopeWithOpts("app", &do.InjectorOpts{
+	Logf: func(format string, args ...any) {
+		log.Printf("DI: "+format, args...)
+	},
+})
+
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+	v5.WithCLIScope(scope),
 )
 ```
 
-## Lifecycle Management
+`NewScopeFromInjector(injector, name)` adopts an existing `do.Injector`, which is the bridge for applications that already build their own container. `v5.Package(scope, name, short, defaults, opts...)` binds a new CLI to a scope and registers the CLI itself in that scope, so services can depend on `*v5.CLI[T]`.
 
-Services can implement health check and shutdown interfaces:
-
-```go
-type Database struct { DSN string }
-
-// HealthCheck is called by the DoctorCommand
-func (db *Database) HealthCheck() error {
-    return db.Ping()
-}
-
-// Shutdown is called on SIGINT/SIGTERM (with WithGracefulShutdown)
-func (db *Database) Shutdown() error {
-    return db.Close()
-}
-```
-
-## Signal Handling
+Child scopes isolate plugins and subsystems:
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    // Cancel context on SIGINT/SIGTERM (handlers can check ctx.Done())
-    v4.WithSignalHandling(),
+child, err := v5.RegisterInScope(cli.Scope(), "workers",
+	func(_ do.Injector) (*WorkerPool, error) {
+		return NewWorkerPool(), nil
+	})
 
-    // Full graceful shutdown: cancels context AND triggers DI shutdown
-    // Services implementing do.ShutdownerWithError shut down in reverse order
-    v4.WithGracefulShutdown(),
-)
+wrapped := v5.ScopedProvider(cli.Scope(), "reports",
+	func(i do.Injector) (*ReportStore, error) {
+		return NewReportStore(i), nil
+	})
 ```
 
-`WithGracefulShutdown` implies `WithSignalHandling`.
-
-## Override for Testing
-
-Replace services in tests without touching production code:
-
-```go
-func TestHandler(t *testing.T) {
-    clone := v4.CloneScope(originalScope)
-    v4.OverrideValue(clone, &Database{DSN: "test://mock"})
-    // Now Invoke[*Database] returns the mock
-}
-```
-
-Pattern: clone -> override -> invoke.
-
-## NewScopeWithOpts
-
-Create scopes with custom injector options (logging, lifecycle hooks, health check timeouts):
-
-```go
-scope := v4.NewScopeWithOpts("custom", &do.InjectorOpts{
-    Logf: func(format string, args ...any) {
-        log.Printf("DI: "+format, args...)
-    },
-})
-
-cli, _ := v4.Package(scope, "myapp", "Description", AppConfig{})
-```
+`RegisterInScope` creates the child scope and registers one typed provider under its own type key; `ScopedProvider` wraps a provider so it resolves inside a named child scope.
 
 ## DI Logging
 
+`WithDILogging` records service construction and shutdown through the injector's `Logf`:
+
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithDILogging(func(format string, args ...any) {
-        log.Printf("DI: "+format, args...)
-    }),
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+	v5.WithDILogging(func(format string, args ...any) {
+		log.Printf("DI: "+format, args...)
+	}),
 )
 ```
 
-## Audit Log
+## Where to go next
 
-Wire [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) to trace service creation:
-
-```go
-import auditlog "github.com/larsartmann/samber-do-auditlog"
-
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithAuditLog(auditlog.NewDefaultPlugin()),
-)
-
-// Access programmatically
-report := cli.AuditLogReport()
-failed := v4.AuditLogFailedServices(cli)
-```
-
-Export in 11 formats: HTML, JSON, NDJSON, CSV, TSV, Mermaid, DOT, D2, PlantUML, tree, HTML tree.
+- [Lifecycle & Signal Handling](/guides/lifecycle/) for cleanup hooks and the `doctor` command.
+- [Config Files](/guides/config-files/) for feeding the resolved config into providers.
+- [Middleware](/guides/middleware/) for wrapping handlers that use injected services.

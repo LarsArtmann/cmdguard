@@ -5,59 +5,118 @@ description: Track command execution path and share values across the command hi
 
 ## Overview
 
-`BranchingFlowContext` tracks the full command execution path and provides a hierarchical key-value store that propagates values from parent commands to children.
+`BranchingFlowContext` embeds `context.Context`, records a tree of named branches, and carries a hierarchical key-value store. `Execute` creates a root context and injects it into every handler context. Retrieve it in a handler with `v5.GetBranchingFlowContext(ctx)` or from the CLI with `cli.FlowContext()`.
 
-## Accessing the Flow Context
+The root starts with an empty path. Each `Branch` call appends a name, so `Depth` is the number of branch names, not the number of commands.
 
 ```go
-func handler(ctx context.Context, cfg *AppConfig, flags *Flags) error {
-    bfc, ok := v4.GetBranchingFlowContext(ctx)
-    if !ok {
-        return nil // not available (e.g., in unit tests)
-    }
+package main
 
-    // Full path: "myapp.user.list"
-    fmt.Println("Path:", bfc.PathString())
+import (
+	"context"
+	"fmt"
+	"time"
 
-    return nil
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
+func main() {
+	root := v5.NewBranchingFlowContext(context.Background())
+	root.SetValue("requestID", "req-42")
+
+	db, cancelDB := root.Branch("db", v5.WithFlowContextValue("engine", "postgres"))
+	defer cancelDB()
+
+	migrate, cancelMigrate := db.BranchWithDuration("migrate", 30*time.Second)
+	defer cancelMigrate()
+
+	ctx := v5.WithBranchingFlowContext(context.Background(), migrate)
+
+	requestID, ok := v5.Get[string](ctx, "requestID")
+	fmt.Println(requestID, ok)       // req-42 true
+	fmt.Println(migrate.PathString()) // db.migrate
+	fmt.Println(migrate.Path())       // [db migrate]
+	fmt.Println(migrate.Depth())      // 2
+	fmt.Println(root.IsRoot(), migrate.IsLeaf()) // true true
 }
 ```
 
-The flow context is automatically created on `Execute` — no setup required.
+## Branching
 
-## Sharing Values Across Hierarchy
+| Method | Returns | Notes |
+| --- | --- | --- |
+| `Branch(name, opts...)` | `(*BranchingFlowContext, func())` | Child with its own cancel |
+| `BranchWithDuration(name, d, opts...)` | `(*BranchingFlowContext, func())` | Child with a timeout |
+| `BranchWithDeadlineTime(name, t, opts...)` | `(*BranchingFlowContext, func())` | Child with an absolute deadline |
+| `WithFlowContextValue(key, value)` | `FlowContextOption` | Set one value on the new branch |
+| `WithFlowContextValues(map[any]any)` | `FlowContextOption` | Set several values on the new branch |
+
+A child inherits all values from its parent and gets its own cancellation. Call the returned cancel function when the branch's work finishes.
+
+## Reading the Tree
+
+| Method | Returns | Notes |
+| --- | --- | --- |
+| `Path()` | `[]string` | Defensive copy from root to this branch |
+| `PathSeq()` | `iter.Seq[string]` | Zero-allocation iteration |
+| `PathString()` | `string` | Dot-separated path |
+| `Depth()` | `int` | Root is 0 |
+| `IsRoot()` | `bool` | No parent |
+| `IsLeaf()` | `bool` | No children |
+| `Parent()` | `*BranchingFlowContext` | Nil at the root |
+| `Children()` | `[]*BranchingFlowContext` | Defensive copy |
+| `ChildrenSeq()` | `iter.Seq[*BranchingFlowContext]` | Zero-allocation iteration |
+| `Root()` | `*BranchingFlowContext` | Walk to the top |
+
+## Sharing Values
+
+`SetValue` writes the value and propagates it to descendants that have not set the key locally. `SetValueLocal` writes only the current branch. `GetValue` checks the current branch first, then walks up through its ancestors. The package-level `v5.Get[T](ctx, key)` returns a typed value and a bool.
 
 ```go
-// In a parent command:
-func parentHandler(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) error {
-    bfc, _ := v4.GetBranchingFlowContext(ctx)
-    bfc.SetValue("requestID", generateRequestID())
-    return nil
-}
+func handler(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {
+	bfc, ok := v5.GetBranchingFlowContext(ctx)
+	if !ok {
+		return nil
+	}
 
-// In a child command:
-func childHandler(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) error {
-    bfc, _ := v4.GetBranchingFlowContext(ctx)
-    requestID, ok := bfc.GetValue("requestID")
-    if ok {
-        log.SetRequestID(requestID.(string))
-    }
-    return nil
+	bfc.SetValue("requestID", "req-42")
+
+	requestID, ok := v5.Get[string](ctx, "requestID")
+	if !ok {
+		return fmt.Errorf("request ID missing")
+	}
+
+	db, cancel := bfc.Branch("db", v5.WithFlowContextValue("engine", "postgres"))
+	defer cancel()
+
+	ctx = v5.WithBranchingFlowContext(ctx, db)
+	return runMigrations(ctx, requestID)
 }
 ```
 
-`GetValue` walks up the hierarchy — if a child sets a value, siblings won't see it, but the child's own descendants will.
+A value set on a sibling branch is invisible to this one. A value set on an ancestor is visible after `GetValue` walks up. A child that calls `SetValueLocal` keeps its own value even when the parent later calls `SetValue`.
 
-## Path Tracking
+## Cancellation
 
-```go
-bfc, _ := v4.GetBranchingFlowContext(ctx)
+| Method | Effect |
+| --- | --- |
+| `Cancel()` | Cancel this branch and all descendants |
+| `CancelChildren()` | Cancel direct and deeper children, not this branch |
+| `CancelSiblings()` | Cancel every sibling, not this branch |
 
-// For "myapp database migrate"
-bfc.PathString()           // "myapp.database.migrate"
-bfc.Path()                 // []string{"myapp", "database", "migrate"}
-bfc.Depth()                // 3
-bfc.Parent()               // parent context (database)
-```
+Each branch owns a `context.WithCancel` (or timeout/deadline) cancel function. `Cancel` also calls the stored self-cancel before walking children.
 
-Useful for logging, metrics, and conditional behavior based on where in the command tree you are.
+## Context Helpers
+
+| Symbol | Purpose |
+| --- | --- |
+| `WithBranchingFlowContext(ctx, bfc)` | Attach a flow context to a context |
+| `GetBranchingFlowContext(ctx)` | Retrieve the flow context |
+| `Get[T](ctx, key)` | Typed value lookup with a bool |
+| `cli.FlowContext()` | Root context created by `Execute` |
+
+## Where to go next
+
+- [Middleware](/guides/middleware/)
+- [Sub-Modules](/guides/sub-modules/)
+- [Dependency Injection](/guides/dependency-injection/)

@@ -1,101 +1,174 @@
 ---
 title: Migrating from Cobra
-description: Step-by-step guide to migrate existing Cobra applications to cmdguard.
+description: Move a Cobra application to cmdguard v5 one command at a time, or adopt only the flags, DI, and error handling you need.
 ---
 
-## Why Migrate?
+## Why migrate
 
-cmdguard wraps Cobra, so you keep all of Cobra's power while gaining:
+cmdguard v5 wraps Cobra, so raw `*cobra.Command` trees keep running inside a cmdguard root. You can adopt the root CLI first and convert commands one at a time. What you gain as you convert:
 
-- Type-safe flags via struct tags (no string lookups)
-- Zero panics (only error-returning handlers)
-- Proper error display (printed once, correct exit codes)
-- Constructor validation (catch errors at AddCommand, not runtime)
-- Built-in DI, config loading, and rich output
+- Typed flags from struct tags instead of `cmd.Flags().GetString(...)` calls.
+- Construction that returns errors instead of panicking, with validation at registration time.
+- Error display owned by the framework: printed once, usage suppressed, exit code mapped.
+- A DI scope, config-file loading, and production defaults without extra wiring.
 
-## Migration Strategies
+## Cobra and cmdguard side by side
 
-### Strategy 1: Full Migration (recommended for new projects)
+| Task | Cobra | cmdguard v5 |
+| ---- | ----- | ----------- |
+| Define a flag | `cmd.Flags().StringP("name", "n", "World", "Name")` | ``Name string `flag:"name" short:"n" default:"World" help:"Name"` `` |
+| Read a value | `cmd.Flags().GetString("name")` plus error check | `flags.Name`, typed |
+| Required flag | `MarkFlagRequired` plus your own check | `required:"true"` tag, enforced after parsing |
+| Enum or range check | hand-written | `values:"a,b,c"`, `validate:"min=1,max=100"` |
+| Add a subcommand | `parent.AddCommand(child)` | `NewParentCommand` plus `WithSubcommands(...)` |
+| Handler | `RunE(cmd, args)` | `func(ctx, *AppConfig, Flags) error` |
+| Positional args | the `args` parameter | `v5.ArgsFromContext(ctx)` |
+| Shared services | package globals | `v5.Provide` / `v5.Invoke` on `cli.Scope()` |
+| Env var fallback | `os.Getenv` in the handler | `env:"VAR_NAME"` tag |
+| Exit code | `os.Exit(1)` | `v5.ExitCode`, `v5.NewExitError`, `ExecuteAndExit` |
 
-Replace all `cobra.Command` definitions with `Command[T,F]`:
+## Strategy 1: cmdguard root, keep the Cobra tree
 
-```go
-// Before — raw Cobra
-var name string
-rootCmd := &cobra.Command{
-    Use: "greet",
-    RunE: func(cmd *cobra.Command, args []string) error {
-        fmt.Printf("Hello, %s!\n", name)
-        return nil
-    },
-}
-rootCmd.Flags().StringVarP(&name, "name", "n", "World", "Name to greet")
-
-// After — cmdguard
-type GreetFlags struct {
-    Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
-}
-greetCmd, _ := v4.NewCommand("greet", &GreetFlags{},
-    func(ctx context.Context, cfg *AppConfig, flags *GreetFlags) error {
-        fmt.Printf("Hello, %s!\n", flags.Name)
-        return nil
-    },
-)
-```
-
-### Strategy 2: Gradual Migration (for existing apps)
-
-cmdguard provides an escape hatch so you can migrate one command at a time:
-
-```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{})
-
-// Keep existing raw cobra commands
-cli.RootCommand().AddCommand(myLegacyCmd)
-
-// Add cmdguard-managed commands
-v4.AddCommand(cli, newTypedCmd)
-```
-
-### Strategy 3: Hybrid (escape hatch APIs)
-
-Use cmdguard's runtime with raw cobra commands:
-
-```go
-// Access resolved config from any cobra command
-func(cmd *cobra.Command, _ []string) error {
-    cfg, ok := v4.ConfigFromContext[AppConfig](cmd.Context())
-    if !ok { return errors.New("config not initialized") }
-    // use cfg...
-}
-
-// Run initialization after flag parsing
-cli, _ := v4.NewCLI[AppConfig]("app", "...", AppConfig{},
-    v4.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error {
-        return initDI(cfg)
-    }),
-)
-```
-
-## Key Differences
-
-| Cobra                             | cmdguard                            |
-| --------------------------------- | ----------------------------------- |
-| `cmd.Flags().GetString("name")`   | `flags.Name` (typed struct field)   |
-| `Run` (panics) / `RunE` (returns) | Only error-returning handlers exist |
-| `SilenceUsage: false` (default)   | `SilenceUsage: true` (default)      |
-| Manual `os.Exit(exitCode)`        | `ExecuteAndExit(ctx)`               |
-| No DI                             | Built-in samber/do/v2               |
-| Errors printed by cobra AND main  | Error printed exactly once          |
-
-## Scoped Flags
-
-If you had root-only flags that shouldn't appear on subcommands:
+Wrap the existing tree without rewriting it:
 
 ```go
 type AppConfig struct {
-    Build string `flag:"build" local:"true" default:"full" help:"Root-only"`
+    Verbose bool `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
+}
+
+func main() {
+    cli, err := v5.NewCLI[AppConfig]("myapp", "My application", AppConfig{})
+    if err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1)
+    }
+
+    // Existing Cobra commands keep working unchanged.
+    cli.RootCommand().AddCommand(greetCmd)
+
+    cli.ExecuteAndExit(context.Background())
 }
 ```
 
-The `local:"true"` tag prevents inheritance by subcommands. Use `cli.RegisterLocalCommandFlags(cmd)` to selectively register them on specific subcommands.
+`AddCommand` and `AddCommands` accept only cmdguard commands: `AddableCommand[T]` is sealed, so a raw `*cobra.Command` is not accepted there. `cli.RootCommand()` is the escape hatch for Cobra trees.
+
+Legacy commands added this way inherit the root's persistent flags, cmdguard's error printing, the exit-code mapping, and signal handling. They do not get typed flag parsing or DI injection.
+
+## Strategy 2: convert one command
+
+Before, in plain Cobra:
+
+```go
+var env string
+var dryRun bool
+
+deployCmd := &cobra.Command{
+    Use:   "deploy",
+    Short: "Deploy the application",
+    RunE: func(cmd *cobra.Command, args []string) error {
+        if env == "" {
+            return errors.New("--env is required")
+        }
+        fmt.Printf("deploying to %s (dry-run=%v)\n", env, dryRun)
+        return nil
+    },
+}
+deployCmd.Flags().StringVarP(&env, "env", "e", "", "Target environment")
+deployCmd.Flags().BoolVarP(&dryRun, "dry-run", "d", false, "Simulate the deployment")
+_ = deployCmd.MarkFlagRequired("env")
+```
+
+After, in cmdguard v5:
+
+```go
+type DeployFlags struct {
+    Env    string `flag:"env" short:"e" required:"true" help:"Target environment"`
+    DryRun bool   `flag:"dry-run" short:"d" default:"false" help:"Simulate the deployment"`
+}
+
+deployCmd, err := v5.NewCommand("deploy", DeployFlags{},
+    func(ctx context.Context, cfg *AppConfig, flags DeployFlags) error {
+        fmt.Printf("deploying to %s (dry-run=%v)\n", flags.Env, flags.DryRun)
+        return nil
+    },
+    v5.WithShort("Deploy the application"),
+)
+```
+
+The flag struct is passed and received by value. `required:"true"` replaces `MarkFlagRequired` and its manual check. Construction errors surface from `NewCommand`; registration errors surface from `AddCommand`, `AddCommands`, or `Builder.Build`.
+
+Register it with `v5.AddCommand(cli, deployCmd)`, or collect constructor errors with `v5.NewBuilder(cli)`, `v5.Try(b, deployCmd, err)`, and `b.Build()`.
+
+## Strategy 3: escape hatches around raw Cobra
+
+| Need | API |
+| ---- | --- |
+| Resolved root config inside a raw handler | `v5.ConfigFromContext[AppConfig](cmd.Context()) (*AppConfig, bool)` |
+| Positional args inside a typed handler | `v5.ArgsFromContext(ctx) []string` |
+| Work after flag parsing and config validation | `v5.WithPostFlagParse[AppConfig](func(cmd *cobra.Command, cfg *AppConfig) error)` |
+| Teardown that must run even when the handler fails | `v5.WithCleanup[AppConfig](func(cmd *cobra.Command, cfg *AppConfig, runErr error) error)` |
+| Root-only flags on a specific subcommand | `cli.RegisterLocalCommandFlags(cmd) error` |
+| The underlying root command | `cli.RootCommand() *cobra.Command` |
+
+```go
+func(cmd *cobra.Command, args []string) error {
+    cfg, ok := v5.ConfigFromContext[AppConfig](cmd.Context())
+    if !ok {
+        return errors.New("config not initialized")
+    }
+    return run(cmd.Context(), cfg, args)
+}
+```
+
+`ConfigFromContext` is populated by the root's `PersistentPreRunE`. A raw subcommand that defines its own `PersistentPreRunE` replaces the root's hook, because Cobra runs only the first persistent hook it finds, so `ConfigFromContext` returns false there. Use `WithPostFlagParse` instead when you need initialization on every command.
+
+## Flag scoping
+
+A flag's home decides its scope:
+
+| Where the field lives | Scope |
+| --------------------- | ----- |
+| Root `T` struct, plain field | Persistent, inherited by every subcommand |
+| Root `T` struct with `local:"true"` | Root only |
+| A command's own `F` struct | That command only, rejected elsewhere |
+
+```go
+type AppConfig struct {
+    Verbose bool   `flag:"verbose" short:"v" default:"false" help:"Verbose output"`
+    Build   string `flag:"build" default:"full" local:"true" help:"Root only"`
+}
+
+type ScanFlags struct {
+    Depth int `flag:"depth" default:"3" help:"Scan depth"`
+}
+```
+
+With those types, `scan --depth 5` works, `scan --build` fails with "unknown flag", and `--verbose` works everywhere. Migrating an old root-only flag means adding `local:"true"` and calling `cli.RegisterLocalCommandFlags(cmd)` on each command that still needs it.
+
+## Defaults you inherit on day one
+
+| Default | Effect | Opt out |
+| ------- | ------ | ------- |
+| Strict validation | Every cmdguard command needs `WithShort` (`ErrMissingShort`) | `WithoutStrictValidation()` |
+| Signal handling | `SIGINT`/`SIGTERM` cancel the execution context | `WithoutSignalHandling()` |
+| Graceful DI shutdown | Services shut down on the signal path | `WithoutGracefulShutdown()` |
+| Strict config keys | Unknown config keys fail with `ErrConfigUnknownKey` | `WithoutStrictConfigKeys()` |
+| Error hints | A `Hint:` line under classified errors | `WithoutErrorHints()` |
+| Auto commands | `doctor`, plus `version` when `WithCLIVersion` is set | `WithoutBatteries()` |
+
+`SilenceUsage` is also on by default, so a failed command prints its error without dumping the help text.
+
+## Gotchas
+
+- `PostRunE` does not run when `RunE` fails. Use `WithCleanup[T]`, which runs on both paths and joins cleanup errors with `errors.Join`.
+- Raw Cobra commands do not receive DI. Invoke services manually with `v5.Invoke[*Database](cli.Scope())`, or convert the command.
+- `NoFlags` is a distinct named type. Pass `v5.NoFlags{}` rather than `struct{}{}`.
+- Do not print the error returned by `Execute` or `ExecuteWithArgs`. cmdguard printed it once already.
+- A command with no handler fails at `NewCommand` with `ErrMissingHandler`; parent commands use `NewParentCommand` instead.
+
+## Where to go next
+
+- [Quick Start](/getting-started/quick-start/): the minimal v5 program.
+- [Type-Safe Flags](/guides/type-safe-flags/): every struct tag and its precedence.
+- [Dependency Injection](/guides/dependency-injection/): services for the commands you keep as raw Cobra.
+- [Migrating from v4 to v5](/guides/migrating-v4-to-v5/): if the project already uses cmdguard.
