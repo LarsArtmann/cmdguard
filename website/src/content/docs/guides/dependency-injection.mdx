@@ -9,14 +9,7 @@ cmdguard integrates [samber/do/v2](https://github.com/samber/do) for dependency 
 
 ## The CLI Scope
 
-`NewCLI` creates the root scope and registers the resolved config as `*T`, so a provider can depend on the config without extra plumbing:
-
-```go
-scope := cli.Scope()      // *v5.Scope
-injector := cli.Injector() // the underlying do.Injector
-```
-
-`cli.Injector()` is the escape hatch for samber/do calls that cmdguard does not wrap. `cli.Scope()` is the typed wrapper and what the helpers below take.
+`NewCLI` creates the root scope and registers the resolved config as `*T`, so a provider can depend on the config without extra plumbing. `cli.Scope()` returns the typed wrapper and `cli.Injector()` the underlying `do.Injector`, which is the escape hatch for samber/do calls that cmdguard does not wrap.
 
 ## Registering Services
 
@@ -28,7 +21,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 	"github.com/samber/do/v2"
@@ -40,21 +33,13 @@ type AppConfig struct {
 
 type Database struct{ dsn string }
 
-func (db *Database) Query(_ context.Context, q string) (string, error) {
-	return db.dsn + " <- " + q, nil
-}
-
-// HealthCheck makes the service visible to "doctor" and cli.HealthCheck.
 func (db *Database) HealthCheck(_ context.Context) error { return nil }
-
-// Shutdown runs during graceful shutdown.
-func (db *Database) Shutdown() error { return nil }
+func (db *Database) Shutdown() error                     { return nil }
 
 func main() {
 	cli, err := v5.NewCLI[AppConfig]("app", "DI example", AppConfig{})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	err = v5.Provide(cli.Scope(), func(_ do.Injector) (*Database, error) {
@@ -65,114 +50,84 @@ func main() {
 		return &Database{dsn: cfg.DSN}, nil
 	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	b := v5.NewBuilder(cli)
-	v5.Add(b, "query", v5.NoFlags{},
-		func(ctx context.Context, _ *AppConfig, _ v5.NoFlags) error {
+	v5.Add(b, "info", v5.NoFlags{},
+		func(_ context.Context, _ *AppConfig, _ v5.NoFlags) error {
 			db, err := v5.Invoke[*Database](cli.Scope())
 			if err != nil {
 				return err
 			}
-			out, err := db.Query(ctx, "select 1")
-			if err != nil {
-				return err
-			}
-			fmt.Println(out)
+			fmt.Println("dsn:", db.dsn)
 			return nil
 		},
-		v5.WithShort("Run a query"),
+		v5.WithShort("Show the resolved database DSN"),
 		v5.WithNoArgs(),
 	)
 	if err := b.Build(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	cli.ExecuteAndExit(context.Background())
 }
 ```
 
-| Helper          | Purpose                                                        |
-| --------------- | -------------------------------------------------------------- |
-| `Provide[T]`    | Lazy typed provider: `func(do.Injector) (T, error)`            |
-| `ProvideNamed[T]` | Same, registered under a name for multiple implementations   |
-| `ProvideValue[T]` | Register an already-constructed value                        |
-| `Invoke[T]`     | Resolve the type, constructing it on first use                 |
-| `InvokeNamed[T]` | Resolve a named registration                                  |
+| Helper            | Purpose                                                    |
+| ----------------- | ---------------------------------------------------------- |
+| `Provide[T]`      | Lazy typed provider: `func(do.Injector) (T, error)`        |
+| `ProvideNamed[T]` | Same, registered under a name for multiple implementations |
+| `ProvideValue[T]` | Register an already-constructed value                      |
+| `Invoke[T]`       | Resolve the type, constructing it on first use             |
+| `InvokeNamed[T]`  | Resolve a named registration                               |
 
-Registration is panic-free. A duplicate registration or a nil provider comes back as an error wrapping `ErrServiceRegistration`.
+Registration is panic-free: a duplicate registration comes back as an error wrapping `ErrServiceRegistration` instead of a panic.
 
 ## Invoking in Handlers
 
-Handlers receive the resolved config as `*T`, so most commands read config directly and invoke only the services they need. `Invoke` returns `ErrServiceNotFound` in the error chain when the type was never registered, which is distinguishable with `errors.Is`.
-
-For raw cobra subcommands mixed into the tree, `cmdguard.ConfigFromContext[T](ctx)` returns the resolved config without an `Invoke`.
+Handlers receive the resolved config as `*T`, so most commands read config directly and invoke only the services they need. `Invoke` puts `ErrServiceNotFound` in the error chain when the type was never registered, which is testable with `errors.Is`. For raw cobra subcommands mixed into the tree, `cmdguard.ConfigFromContext[T](ctx)` returns the resolved config without an `Invoke`.
 
 ## Service Lifecycle
 
-Two method sets are recognized automatically:
+Two method sets are recognized automatically: `HealthCheck() error` or `HealthCheck(context.Context) error` for health, and `Shutdown() error` for teardown.
+
+Health checks surface in two places. The auto-registered `doctor` command runs every service's check plus custom checks, and the programmatic API mirrors it:
 
 ```go
-type Database struct{ dsn string }
-
-// do.Healthchecker
-func (db *Database) HealthCheck() error { return nil }
-
-// do.HealthcheckerWithContext, preferred when the check can be cancelled
-func (db *Database) HealthCheck(ctx context.Context) error { return nil }
-
-// do.ShutdownerWithError
-func (db *Database) Shutdown() error { return nil }
+err := cli.HealthCheck(ctx)                          // first failing check, or nil
+results := cli.HealthCheckResults()                  // map[string]error
+ctxResults := cli.HealthCheckResultsWithContext(ctx) // context-aware variant
 ```
 
-Health checks surface in two places. The auto-registered `doctor` command runs every registered service's check plus any custom checks, and the programmatic API mirrors it:
-
-```go
-err := cli.HealthCheck(ctx)                                  // first failing check, or nil
-results := cli.HealthCheckResults()                          // map[string]error
-ctxResults := cli.HealthCheckResultsWithContext(ctx)         // context-aware variant
-```
-
-Graceful shutdown is ON by default in v5. On SIGINT or SIGTERM, cmdguard cancels the context and then shuts down every instantiated DI service in dependency-aware order: a service that nothing depends on is closed first, so dependents stop before their dependencies. A normally completing `Execute` never tears the scope down, which keeps repeated `ExecuteWithArgs` runs safe. To tear down explicitly, call `cli.Shutdown(ctx)`. `WithoutGracefulShutdown()` keeps signal handling but skips DI shutdown; `WithoutSignalHandling()` disables both.
+Graceful shutdown is ON by default in v5. On SIGINT or SIGTERM, cmdguard cancels the context and then shuts down every instantiated service in dependency-aware order: a service that nothing depends on is closed first, so dependents stop before their dependencies. A normally completing `Execute` never tears the scope down, which keeps repeated `ExecuteWithArgs` runs safe. For explicit teardown call `cli.Shutdown(ctx)`. `WithoutGracefulShutdown()` keeps signal handling but skips DI shutdown; `WithoutSignalHandling()` disables both.
 
 ## Overriding Services in Tests
 
 Clone the scope, then override. Clone copies the registrations but not the instantiated state:
 
 ```go
-func TestQuery(t *testing.T) {
+func TestInfo(t *testing.T) {
 	cloned := v5.CloneScope(cli.Scope())
-
-	err := v5.OverrideValue(cloned, &Database{dsn: "test://mock"})
-	if err != nil {
+	if err := v5.OverrideValue(cloned, &Database{dsn: "test://mock"}); err != nil {
 		t.Fatal(err)
 	}
 
-	db, err := v5.Invoke[*Database](cloned)
-	if err != nil {
+	if _, err := v5.Invoke[*Database](cloned); err != nil {
 		t.Fatal(err)
 	}
-	_ = db
 }
 ```
 
-`Override[T](scope, fn)` replaces a provider; `OverrideValue[T](scope, v)` replaces it with a value. Both return an error only for a nil scope, so `errors.Is` checks on the result stay simple.
+`Override[T](scope, fn)` replaces a provider and `OverrideValue[T](scope, v)` replaces it with a value. Both return an error only for a nil scope.
 
 ## Custom Scopes
 
 A scope can be built before the CLI and handed over with `WithCLIScope`:
 
 ```go
-scope := v5.NewScope("app")
-
-// Custom injector options: DI logging, health check timeouts, parallelism.
-scope = v5.NewScopeWithOpts("app", &do.InjectorOpts{
-	Logf: func(format string, args ...any) {
-		log.Printf("DI: "+format, args...)
-	},
+scope := v5.NewScopeWithOpts("app", &do.InjectorOpts{
+	Logf: func(format string, args ...any) { log.Printf("DI: "+format, args...) },
 })
 
 cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
@@ -180,35 +135,18 @@ cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
 )
 ```
 
-`NewScopeFromInjector(injector, name)` adopts an existing `do.Injector`, which is the bridge for applications that already build their own container. `v5.Package(scope, name, short, defaults, opts...)` binds a new CLI to a scope and registers the CLI itself in that scope, so services can depend on `*v5.CLI[T]`.
-
-Child scopes isolate plugins and subsystems:
+`NewScope(name)` makes a plain scope, `NewScopeFromInjector(injector, name)` adopts an existing `do.Injector`, and `v5.Package(scope, name, short, defaults)` binds a new CLI to a scope and registers the CLI itself in that scope. Child scopes isolate plugins and subsystems:
 
 ```go
 child, err := v5.RegisterInScope(cli.Scope(), "workers",
-	func(_ do.Injector) (*WorkerPool, error) {
-		return NewWorkerPool(), nil
-	})
+	func(_ do.Injector) (*WorkerPool, error) { return NewWorkerPool(), nil })
 
-wrapped := v5.ScopedProvider(cli.Scope(), "reports",
-	func(i do.Injector) (*ReportStore, error) {
-		return NewReportStore(i), nil
-	})
+wrapped := v5.ScopedProvider(cli.Scope(), "reports", func(i do.Injector) (*ReportStore, error) {
+	return NewReportStore(i), nil
+})
 ```
 
-`RegisterInScope` creates the child scope and registers one typed provider under its own type key; `ScopedProvider` wraps a provider so it resolves inside a named child scope.
-
-## DI Logging
-
-`WithDILogging` records service construction and shutdown through the injector's `Logf`:
-
-```go
-cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
-	v5.WithDILogging(func(format string, args ...any) {
-		log.Printf("DI: "+format, args...)
-	}),
-)
-```
+`RegisterInScope` creates the child scope and registers one typed provider under its own type key; `ScopedProvider` wraps a provider so it resolves inside a named child scope. To trace service construction and shutdown, pass `WithDILogging(logf)` to `NewCLI`; the injector's internal log lines then go to your logger.
 
 ## Where to go next
 

@@ -10,9 +10,9 @@ export const comparisons: ComparisonRow[] = [
   },
   {
     label: "Dependency injection",
-    cobra: { level: "none", note: "—" },
-    kong: { level: "none", note: "—" },
-    urfave: { level: "none", note: "—" },
+    cobra: { level: "none", note: "No" },
+    kong: { level: "none", note: "No" },
+    urfave: { level: "none", note: "No" },
     cmdguard: { level: "full", note: "Lazy services, lifecycle, health checks" },
   },
   {
@@ -35,6 +35,20 @@ export const comparisons: ComparisonRow[] = [
     kong: { level: "diy", note: "Manual" },
     urfave: { level: "diy", note: "Manual" },
     cmdguard: { level: "full", note: "Exactly once, correct exit code" },
+  },
+  {
+    label: "Error hints and codes",
+    cobra: { level: "none", note: "No" },
+    kong: { level: "none", note: "No" },
+    urfave: { level: "none", note: "No" },
+    cmdguard: { level: "full", note: "Hint line plus stable error_code" },
+  },
+  {
+    label: "Machine contract",
+    cobra: { level: "none", note: "No" },
+    kong: { level: "none", note: "No" },
+    urfave: { level: "none", note: "No" },
+    cmdguard: { level: "full", note: "describe JSON, versioned" },
   },
   {
     label: "Usage on error",

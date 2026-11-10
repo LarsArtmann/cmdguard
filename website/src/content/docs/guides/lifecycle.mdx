@@ -39,7 +39,7 @@ func(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {
 
 ## Graceful Shutdown
 
-Graceful shutdown fires only when the run was signal-cancelled. A normally completing `Execute` never tears down the DI scope. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order.
+Graceful shutdown fires only when the run was signal-cancelled. A normally completing `Execute` never tears down the DI scope. Services implementing `do.ShutdownerWithError` are stopped during scope shutdown; samber/do stops services with no dependents first, in parallel batches.
 
 ```go
 type Database struct{ conn *sql.DB }

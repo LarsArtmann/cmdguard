@@ -29,7 +29,7 @@ type ServerFlags struct {
 }
 ```
 
-`Enum` needs a `values` tag, because parsing checks the value against that list. `LogLevel` and `LogFormat` carry their own allowed sets. `time.Duration` and `time.Time` work directly as field types as well.
+`Enum` needs a `values` tag, because parsing checks the value against that list. `LogLevel` and `LogFormat` carry their own allowed sets. `time.Duration` works directly as a field type, and `time.Time` is treated as an atomic value in config structs.
 
 ## Registering a Custom Type
 

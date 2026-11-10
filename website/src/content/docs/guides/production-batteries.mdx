@@ -13,7 +13,7 @@ has a named opt-out.
 | --- | --- | --- |
 | Strict validation | Every command must carry `WithShort` (blank help lines fail at `AddCommand`/`Build` time) | `WithoutStrictValidation()` |
 | Signal handling | `SIGINT`/`SIGTERM` cancel the execution context | `WithoutSignalHandling()` |
-| Graceful DI shutdown | DI services shut down in reverse invocation order when the run is signal-cancelled | `WithoutGracefulShutdown()` |
+| Graceful DI shutdown | DI dependents shut down before their dependencies when the run is signal-cancelled | `WithoutGracefulShutdown()` |
 | Error hints | A `Hint:` line (and `hint` in JSON envelopes) tells users how to fix classified errors | `WithoutErrorHints()` |
 | Strict config keys | Unknown config-file keys fail with `ErrConfigUnknownKey` plus a "did you mean" suggestion | `WithoutStrictConfigKeys()` |
 | `doctor` command | Health checks for DI services and config diagnostics, registered automatically | `WithoutBatteries()` |
@@ -118,8 +118,8 @@ if err := cli.Shutdown(context.Background()); err != nil {
 }
 ```
 
-Services that implement `do.ShutdownerWithError` receive `Shutdown` in reverse
-invocation order during signal-triggered shutdown.
+Services that implement `do.ShutdownerWithError` receive `Shutdown` in dependency
+order during signal-triggered shutdown: dependents first, then what they use.
 
 ## Built-in commands yield to yours
 

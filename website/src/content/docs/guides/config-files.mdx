@@ -84,7 +84,7 @@ Strict key checking is ON by default in v5. A key that no field accepts fails th
 
 ```bash
 $ app status --config broken.yaml
-Error: failed to load config file: "/home/me/broken.yaml": unknown config key "db-hots" (did you mean "db-host"?)
+Error: failed to load config file: loading config file: "/home/me/broken.yaml": unknown config key "db-hots" (did you mean "db-host"?)
 ```
 
 Opt out with `WithoutStrictConfigKeys()` when the same file is shared with other tools and may carry extra keys. `cli.StrictConfigKeys()` reports the current mode. A key is accepted when it matches any of these spellings:

@@ -5,7 +5,7 @@ description: Port a cmdguard v4 application to v5 with the codemod, a checklist,
 
 ## What changes
 
-v5 executes the breaking changes v4 deferred: the production batteries become the default, four naming debts are paid, and the per-command error ladder is replaced by the Builder. Most of the port is mechanical. The rest is reviewing defaults and three removed or reshaped APIs.
+v5 executes the breaking changes v4 deferred: the production batteries become the default, the naming debts are paid, and the per-command error ladder is replaced by the Builder. Most of the port is mechanical. The rest is reviewing defaults and three removed or reshaped APIs.
 
 The authoritative source is [docs/MIGRATION_v4_v5.md](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md). This page is the short path.
 
@@ -79,8 +79,8 @@ A bare `NewCLI` now means something different:
 | Signal handling | off | `SIGINT`/`SIGTERM` cancel the context | `WithoutSignalHandling()` |
 | Graceful DI shutdown | off; when on, ran on every `Execute` | on; runs only on the signal path | `WithoutGracefulShutdown()` |
 | Strict config keys | off | unknown keys fail with `ErrConfigUnknownKey` | `WithoutStrictConfigKeys()` |
-| `version` command | only with `WithBatteries` | registered when `WithCLIVersion` is set | `WithoutBatteries()` |
-| `doctor` command | only with `WithBatteries` | always registered | `WithoutBatteries()` |
+| `version` command | only with `WithBatteries` | registered by the batteries bundle when `WithCLIVersion` is set | `WithoutBatteries()` |
+| `doctor` command | only with `WithBatteries` | registered by the batteries bundle | `WithoutBatteries()` |
 
 Error hints and `SilenceUsage` were already on in v4; v5 keeps both. `WithoutBatteries()` reverts to the v4-era leniency but leaves hints on, since hints have their own opt-out (`WithoutErrorHints()`). `WithBatteries()` still exists as an explicit no-op, so v4 call sites that pass it keep compiling. Consumer-defined `version`, `doctor`, and `describe` commands always win over the built-ins.
 
@@ -88,7 +88,7 @@ A practical consequence: `cli.SetVersion(...)` at runtime is a lint finding (CG0
 
 ## Behaviour change: exit codes
 
-The mapping itself is unchanged:
+### What is unchanged
 
 - `ExitCode(nil)` is 0.
 - A non-zero code from an `ExitCoder` in the chain wins.
@@ -96,7 +96,9 @@ The mapping itself is unchanged:
 - `NewExitError(code, err)` rejects codes outside 0 through 255 with `ErrInvalidExitCode`.
 - `ExecuteAndExit(ctx)` applies exactly this mapping.
 
-What is new is the machine-readable side. `ErrorCode(err)` returns a stable snake_case code (`required_flag`, `config_unknown_key`, `missing_short`, and so on) or an empty string for unclassified errors, and the JSON error envelope carries it:
+### What is new
+
+`ErrorCode(err)` returns a stable snake_case code (`required_flag`, `config_unknown_key`, `missing_short`, and so on) or an empty string for unclassified errors, and the JSON error envelope carries it:
 
 ```json
 {"error":{"type":"config","message":"...","hint":"...","error_code":"config_unknown_key","code":1}}
@@ -110,10 +112,12 @@ Because `doctor` is now registered by default, a failing diagnostic exits 1 with
 - Graceful shutdown fires only when the run was signal-cancelled. A normally completing `Execute` leaves the scope alive, which makes repeated `ExecuteWithArgs` safe under the defaults. For explicit teardown, call `cli.Shutdown(ctx)`.
 - `PostRunE` still does not run when `RunE` fails. Teardown that must run on both paths goes through `WithCleanup[T]`, which joins cleanup errors with the original error via `errors.Join`.
 
+### The Builder
+
 Replace the construction ladder with the `Builder`:
 
 ```go
-// v4: one check per command
+// before: one check per command, once the codemod has renamed the qualifier
 listCmd, err := v5.NewCommand("list", ListFlags{}, listHandler, v5.WithShort("List tasks"))
 if err != nil {
     return err
@@ -122,7 +126,7 @@ if err := v5.AddCommand(cli, listCmd); err != nil {
     return err
 }
 
-// v5: errors collected, attached atomically
+// after: errors collected, attached atomically
 b := v5.NewBuilder(cli)
 v5.Add(b, "list", ListFlags{}, listHandler, v5.WithShort("List tasks"))
 v5.AddParent(b, "db", "Database operations", v5.NoFlags{},

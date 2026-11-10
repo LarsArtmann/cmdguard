@@ -32,6 +32,10 @@ ALLOWED_V4 = {
     "website/src/content/docs/guides/migrating-v4-to-v5.mdx",
 }
 
+# APIs that existed in v4 and were removed or reshaped in v5. They may be named
+# only in the migration/changelog pages, where they are the subject.
+REMOVED_V4_API = {"SetConfig", "SetVersion", "HealthCheckWithContext"}
+
 SUBMODULES = {
     "schema": os.path.join(ROOT, "schema"),
     "glamour": os.path.join(ROOT, "glamour"),
@@ -143,6 +147,8 @@ def check_symbols() -> None:
                 line,
             ):
                 if qualifier == "cli" and symbol == "X":
+                    continue
+                if rel(path) in ALLOWED_V4 and symbol in REMOVED_V4_API:
                     continue
                 if symbol not in known[qualifier]:
                     fail(

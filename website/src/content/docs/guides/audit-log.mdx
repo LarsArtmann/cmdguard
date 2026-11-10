@@ -5,7 +5,7 @@ description: Capture DI and command execution events with samber-do-auditlog, th
 
 ## Overview
 
-cmdguard v5 bridges [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) into the CLI's DI scope. The plugin records service registration, invocation, shutdown, health checks, and command execution. cmdguard does not create the plugin for you: you construct it, pass it to `NewCLI` with `WithAuditLog`, and decide after execution what to do with the captured events.
+cmdguard v5 bridges [samber-do-auditlog](https://github.com/larsartmann/samber-do-auditlog) into the CLI's DI scope. The plugin records service registration, invocation, and shutdown, plus the health-check and command-execution events you ask it to record. cmdguard does not create the plugin for you: you construct it, pass it to `NewCLI` with `WithAuditLog`, and decide after execution what to do with the captured events.
 
 The import path is `github.com/larsartmann/samber-do-auditlog`. It is a separate module, not a cmdguard sub-module.
 
@@ -32,7 +32,7 @@ cli, err := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 
 - `WithAuditLog` must be passed to the constructor. The DI scope and its hooks are built inside `NewCLI`, where the plugin's registration, invocation, shutdown, and health-check hooks are merged into the injector options. A plugin handed over after construction is not wired.
 - A zero `auditlog.Config.Enabled` makes `auditlog.New` fall back to the `DO_AUDITLOG_ENABLED` environment variable, so capture can be switched on without a code change.
-- Capture must start before services register. Anything provided before `NewCLI` is not observed.
+- Capture must be on at construction. Events emitted before the plugin is attached to the scope cannot be recovered afterwards, which is why the option belongs on the `NewCLI` call that creates the scope.
 
 ## Command execution events
 
@@ -112,10 +112,14 @@ err = v5.ExportAuditLog(cli, v5.AuditLogExportConfig{
 })
 ```
 
+### Format selection
+
 - `ParseAuditLogFormat("")` returns `AuditLogFormatHTML`. Unknown input returns `ErrUnsupportedAuditLogFormat` naming every accepted value.
 - `Path` wins over `Writer`. With neither set, the export goes to `os.Stdout`.
 - `ExportAuditLog` is a no-op returning nil when the plugin is nil or no events were captured.
 - Export failures are wrapped with the format and the destination.
+
+### Supported formats
 
 | Format | Output |
 | ------ | ------ |

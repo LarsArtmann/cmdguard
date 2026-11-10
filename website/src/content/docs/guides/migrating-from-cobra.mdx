@@ -120,7 +120,7 @@ func(cmd *cobra.Command, args []string) error {
 }
 ```
 
-`ConfigFromContext` is populated by the root's `PersistentPreRunE`. A raw subcommand that defines its own `PersistentPreRunE` replaces the root's hook, because Cobra runs only the first persistent hook it finds, so `ConfigFromContext` returns false there. Use `WithPostFlagParse` instead when you need initialization on every command.
+`ConfigFromContext` is populated by the root's `PersistentPreRunE`. A raw subcommand that defines its own `PersistentPreRunE` replaces the root's hook, because Cobra runs only the first persistent hook it finds, so `ConfigFromContext` returns false there. `WithPostFlagParse` runs from the same root hook, so it is skipped in that case too. Convert the command, or do the initialization directly in its `RunE`.
 
 ## Flag scoping
 
