@@ -5,98 +5,204 @@ description: Zero panics, proper exit codes, and the error-print contract.
 
 ## Zero Panics
 
-Every function in cmdguard returns errors. No `Must*` panic variants exist. This is enforced by construction — there is no `Run` field, only `RunE`.
+Every cmdguard constructor returns an error. There are no `Must*` panic variants, and handlers are always `RunE`-shaped functions.
 
 ```go
-cli, err := v4.NewCLI[Config]("app", "...", Config{})
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{})
 if err != nil {
-    return err // never panics
+    return err
 }
 ```
 
 ## The Error-Print Contract
 
-cmdguard owns error display so you can't get it wrong:
+| Rule | Behavior |
+| --- | --- |
+| Printed once | fang renders the error when enabled (the default), plain Cobra when disabled |
+| No usage on error | `SilenceUsage` is true by default; `WithoutSilenceUsage()` re-enables it |
+| Never re-print | the error returned by `Execute` is for exit-code mapping only |
+| Hints | a `Hint:` line follows the error when cmdguard knows the fix |
 
-1. **The error is printed exactly once** — styled by [fang](https://github.com/charmbracelet/fang) when enabled (the default), or plain by Cobra when disabled.
-2. **Usage is never printed on error** (`SilenceUsage: true` by default). Use `WithoutSilenceUsage()` to re-enable usage-on-error.
-3. **The error returned by `Execute` is for exit-code mapping only** — do NOT re-print it.
-
-### Recommended — one line:
+`ExecuteAndExit` is the blessed entry point:
 
 ```go
 cli.ExecuteAndExit(context.Background())
 ```
 
-### When you need code before exiting:
+When you must run code before the process exits, map the error yourself:
 
 ```go
-err := cli.Execute(ctx)
-// ...flush logs / export audit log / teardown...
-os.Exit(v4.ExitCode(err)) // 0 on success, ExitCoder code or 1 on failure
-```
+package main
 
-### Pitfall to avoid
+import (
+    "context"
+    "os"
 
-```go
-// WRONG — re-prints the error that cmdguard already printed
-if err := cli.Execute(ctx); err != nil {
-    fmt.Fprintln(os.Stderr, err)
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
+type AppConfig struct {
+    Verbose bool `flag:"verbose" short:"v" help:"Enable verbose output"`
+}
+
+func main() {
+    cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{})
+    if err != nil {
+        os.Exit(1)
+    }
+
+    err = cli.Execute(context.Background())
+
+    // Flush logs, export audit data, or tear down here.
+
+    os.Exit(v5.ExitCode(err))
 }
 ```
 
+Do not print the returned error a second time; cmdguard already printed it.
+
 ## Exit Codes
 
-```go
-// Custom exit code
-err := v4.NewExitError(42, errors.New("config missing required field"))
-// ExecuteAndExit will exit with code 42
+| Situation | Exit code |
+| --- | --- |
+| `nil` error | 0 |
+| error without an `ExitCoder` | 1 |
+| `ExitCoder` with a non-zero code | that code |
+| `ExitCoder` with code 0 | 1 (zero means no override) |
 
-// Check programmatically
-code := v4.ExitCode(err) // returns 0 for nil, ExitCoder code, or 1
+`NewExitError` validates the range 0-255 and returns an error otherwise:
+
+```go
+exitErr, err := v5.NewExitError(42, errors.New("config missing required field"))
+if err != nil {
+    return err // ErrInvalidExitCode: code outside 0-255
+}
+
+return exitErr
 ```
+
+Domain errors can implement the interface instead:
+
+```go
+type QuotaError struct{ Used, Limit int }
+
+func (e *QuotaError) Error() string {
+    return fmt.Sprintf("quota exceeded: %d/%d", e.Used, e.Limit)
+}
+
+func (e *QuotaError) ExitCode() int { return 3 }
+```
+
+`v5.ExitCoder` requires exactly `Error() string` and `ExitCode() int`.
+
+## Hints
+
+`ErrorHint(err)` returns one actionable sentence, or an empty string when the error wraps no classified sentinel:
+
+```go
+if hint := v5.ErrorHint(err); hint != "" {
+    slog.Warn("command failed", "hint", hint)
+}
+```
+
+Human-readable output prints the hint as a `Hint:` line after the error. `WithoutErrorHints()` disables that line; machine-readable output keeps the `hint` field either way.
+
+## Machine Error Codes
+
+`ErrorCode(err)` returns a stable lowercase snake_case code for every documented sentinel:
+
+```go
+code := v5.ErrorCode(err) // "invalid_enum", or "" when unknown
+```
+
+With `--output json` the error becomes an envelope:
+
+```json
+{
+  "error": {
+    "type": "flag",
+    "message": "required flag not set: name",
+    "hint": "pass the flag on the command line, or set its env var or config-file value",
+    "error_code": "required_flag",
+    "code": 1
+  }
+}
+```
+
+`type` is the error class, `message` the stable text, `hint` the fix, `error_code` the machine code, and `code` the process exit code.
 
 ## Sentinel Errors
 
-All errors use `fmt.Errorf("%w: ...", sentinel)` for `errors.Is()` chainability:
+Sentinels are wrapped with `fmt.Errorf("%w: ...", sentinel)`, so `errors.Is` reaches them through any number of layers:
 
 ```go
-errors.Is(err, v4.ErrInvalidCommand)
-errors.Is(err, v4.ErrMissingHandler)
-errors.Is(err, v4.ErrDuplicateCommand)
-errors.Is(err, v4.ErrConfigValidation)
+switch {
+case errors.Is(err, v5.ErrInvalidCommand):
+case errors.Is(err, v5.ErrMissingHandler):
+case errors.Is(err, v5.ErrDuplicateCommand):
+case errors.Is(err, v5.ErrConfigValidation):
+}
 ```
 
-40+ sentinel errors cover every failure mode.
+`docs/ERROR_REFERENCE.md` documents 62 sentinels with their codes and hints. The most common groups:
 
-## Rich Error Types
+| Group | Examples |
+| --- | --- |
+| Command | `ErrInvalidCommand`, `ErrMissingHandler`, `ErrDuplicateCommand`, `ErrMissingShort` |
+| Flags | `ErrRequiredFlag`, `ErrInvalidEnum`, `ErrValueOutOfRange`, `ErrInvalidFlagDefault` |
+| Config | `ErrConfigValidation`, `ErrConfigUnknownKey`, `ErrConfigFileParse` |
+| Services | `ErrServiceRegistration`, `ErrServiceConstruction`, `ErrServiceNotFound` |
+
+## Typed Errors
+
+| Type | Constructor | Purpose |
+| --- | --- | --- |
+| `CommandError` | `NewCommandError(name, err)` | command name context |
+| `FlagError` | `NewFlagError(name, err)` | flag name context |
+| `FlagError` | `NewFlagErrorWithSuggestion(name, err, suggestion)` | flag context plus typo fix |
+| `ConfigError` | `NewConfigError(field, err)` | config field context |
+| `EnumError` | `NewEnumError(value, allowed)` | invalid enum value and allowed list |
+| `DurationError` | `NewDurationError(value, err)` | invalid duration |
+| `ServiceError` | `NewServiceError(serviceType, err)` | DI service failure |
+| `ExitError` | `NewExitError(code, err)` | custom exit code 0-255 |
+
+All of them implement `Unwrap()`, so `errors.Is` and `errors.AsType` work:
 
 ```go
-v4.NewCommandError(name, err)
-v4.NewFlagError(name, err)
-v4.NewFlagErrorWithSuggestion(name, err, suggestion) // includes typo fix
-v4.NewExitError(code, err)                           // custom exit code
+flagErr, ok := errors.AsType[*v5.FlagError](err)
+if ok {
+    log.Printf("flag %s: %s", flagErr.FlagName, flagErr.Suggestion)
+}
 ```
 
 ## Typo Suggestions
 
-When a user mistypes a flag or command, cmdguard suggests the closest match:
+`SuggestFlag` and `SuggestCommand` return the closest match within edit distance 3:
 
-```bash
-$ myapp greet --nmae "World"
-Error: unknown flag: --nmae
-Did you mean: --name?
+```go
+if suggestion, ok := v5.SuggestFlag([]string{"name", "output"}, "nmae"); ok {
+    fmt.Printf("did you mean --%s?\n", suggestion)
+}
+
+if suggestion, ok := v5.SuggestCommand([]string{"greet", "serve"}, "grete"); ok {
+    fmt.Printf("did you mean %s?\n", suggestion)
+}
 ```
 
 ## Error Aggregation
 
-Config validation uses `errors.Join` so individual errors are reachable:
+`ValidateConfig` joins every field failure under `ErrConfigValidation`, so one check covers the group while each individual error stays reachable:
 
 ```go
-err := v4.ValidateConfig(cfg)
-if err != nil {
-    if errors.Is(err, v4.ErrConfigValidation) {
-        // handle
-    }
+err := v5.ValidateConfig(cfg)
+if err != nil && errors.Is(err, v5.ErrConfigValidation) {
+    return err
 }
 ```
+
+## Where to go next
+
+- [Lifecycle and Signal Handling](/guides/lifecycle/) for exit paths and cleanup hooks
+- [Type-Safe Flags](/guides/type-safe-flags/) for the validation tags behind flag errors
+- [Middleware](/guides/middleware/) for recovery and timeout middleware
+- [API Reference](/api-reference/) for the full surface

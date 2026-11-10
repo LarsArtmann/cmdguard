@@ -4,7 +4,7 @@
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/src/**"],
     "cleanUrls": true,
-    "trailingSlash": false,
+    "trailingSlash": true,
     "redirects": [
       {
         "source": "/docs/:path*",

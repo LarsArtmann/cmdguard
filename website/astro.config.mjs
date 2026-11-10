@@ -18,6 +18,7 @@ export default defineConfig({
 	},
 
 	compressHTML: true,
+	trailingSlash: "always",
 
 	prefetch: {
 		prefetchAll: false,
@@ -51,6 +52,11 @@ export default defineConfig({
 			title: "cmdguard",
 			favicon: "/favicon.svg",
 			customCss: ["./src/styles/starlight.css"],
+			lastUpdated: true,
+			editLink: {
+				baseUrl:
+					"https://github.com/LarsArtmann/cmdguard/edit/master/website/src/content/docs/",
+			},
 			expressiveCode: {
 				themes: ["github-light", "github-dark"],
 				frames: {
@@ -66,22 +72,43 @@ export default defineConfig({
 					],
 				},
 				{
-					label: "Guides",
+					label: "Core Concepts",
 					items: [
 						{ label: "Type-Safe Flags", slug: "guides/type-safe-flags" },
 						{ label: "Custom Value Types", slug: "guides/custom-types" },
 						{ label: "Dependency Injection", slug: "guides/dependency-injection" },
+						{ label: "Lifecycle & Signals", slug: "guides/lifecycle" },
+						{ label: "Production Batteries", slug: "guides/production-batteries" },
+					],
+				},
+				{
+					label: "Guides",
+					items: [
 						{ label: "Error Handling", slug: "guides/error-handling" },
 						{ label: "Config Files", slug: "guides/config-files" },
 						{ label: "Rich Output", slug: "guides/rich-output" },
 						{ label: "Middleware", slug: "guides/middleware" },
-						{ label: "Lifecycle & Signals", slug: "guides/lifecycle" },
 						{ label: "Flow Context", slug: "guides/flow-context" },
 						{ label: "Plugin System", slug: "guides/plugins" },
 						{ label: "Audit Log", slug: "guides/audit-log" },
 						{ label: "Shell Completion", slug: "guides/shell-completion" },
+						{ label: "Machine Contract", slug: "guides/machine-contract" },
+					],
+				},
+				{
+					label: "Sub-Modules & Tooling",
+					items: [
 						{ label: "Sub-Modules", slug: "guides/sub-modules" },
+						{ label: "Schema Generation", slug: "guides/schema" },
+						{ label: "Usage Linter", slug: "guides/lint" },
+						{ label: "Doctor & Health Checks", slug: "guides/doctor" },
+					],
+				},
+				{
+					label: "Migration",
+					items: [
 						{ label: "Migrating from Cobra", slug: "guides/migrating-from-cobra" },
+						{ label: "Migrating v4 to v5", slug: "guides/migrating-v4-to-v5" },
 					],
 				},
 				{
@@ -90,7 +117,7 @@ export default defineConfig({
 						{ label: "Overview", slug: "api-reference" },
 						{
 							label: "Full API on pkg.go.dev",
-							link: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4",
+							link: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5",
 						},
 					],
 				},

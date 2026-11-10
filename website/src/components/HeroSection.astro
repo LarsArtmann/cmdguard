@@ -19,29 +19,52 @@ async function getGitHubStars(): Promise<number | null> {
 }
 
 const stars = await getGitHubStars();
-const starsText = stars !== null ? `${stars} Stars` : 'Star on GitHub';
+const starsText =
+  stars === null ? 'Star on GitHub' : stars === 1 ? '1 Star' : `${stars} Stars`;
 
-const highlightedCode = `<span class="text-text-muted">func</span> <span class="text-accent">main</span>() {
-    cli, _ := v4.<span class="text-accent">NewCLI</span>[AppConfig](<span class="text-amber">"myapp"</span>, <span class="text-amber">"My CLI"</span>, AppConfig{},
-        v4.<span class="text-accent">WithGracefulShutdown</span>(), <span class="text-code-comment">// SIGINT → reverse-order shutdown</span>
-    )
+const goKeywords = new Set([
+  'func', 'return', 'if', 'else', 'for', 'range', 'var', 'const', 'type',
+  'struct', 'interface', 'go', 'defer', 'select', 'switch', 'case', 'default',
+  'package', 'import', 'map', 'chan', 'nil', 'true', 'false', 'err',
+]);
 
-    <span class="text-code-comment">// Register a service (lazy, lifecycle-managed)</span>
-    v4.<span class="text-accent">Provide</span>(cli.Scope(), <span class="text-text-muted">func</span>(i do.Injector) (*Database, <span class="text-text-muted">error</span>) {
-        <span class="text-text-muted">return</span> &Database{DSN: <span class="text-amber">"postgres://..."</span>}, <span class="text-text-muted">nil</span>
-    })
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
-    cmd, _ := v4.<span class="text-accent">NewCommand</span>(<span class="text-amber">"query"</span>, v4.NoFlags{},
-        <span class="text-text-muted">func</span>(ctx context.Context, cfg *AppConfig, _ v4.NoFlags) <span class="text-text-muted">error</span> {
-            db, _ := v4.<span class="text-accent">Invoke</span>[*Database](cli.Scope())
-            <span class="text-text-muted">return</span> db.Query(ctx)
-        },
-        v4.<span class="text-accent">WithShort</span>(<span class="text-amber">"Query the database"</span>),
-    )
-    v4.<span class="text-accent">AddCommand</span>(cli, cmd)
+function highlightGo(source: string): string {
+  const token = /(\/\/[^\n]*)|("(?:[^"\\]|\\.)*")|\b([A-Za-z_]\w*)\b/g;
+  let out = '';
+  let last = 0;
 
-    cli.<span class="text-accent">ExecuteAndExit</span>(context.Background()) <span class="text-code-comment">// zero panics, correct exit code</span>
-}`;
+  for (const match of source.matchAll(token)) {
+    const index = match.index ?? 0;
+    out += escapeHtml(source.slice(last, index));
+
+    const [text, comment, str, word] = match;
+
+    if (comment) {
+      out += `<span class="text-code-comment">${escapeHtml(comment)}</span>`;
+    } else if (str) {
+      out += `<span class="text-amber">${escapeHtml(str)}</span>`;
+    } else if (word && goKeywords.has(word)) {
+      out += `<span class="text-text-muted">${escapeHtml(word)}</span>`;
+    } else if (word && /^[A-Z]/.test(word)) {
+      out += `<span class="text-accent">${escapeHtml(word)}</span>`;
+    } else {
+      out += escapeHtml(text);
+    }
+
+    last = index + text.length;
+  }
+
+  return out + escapeHtml(source.slice(last));
+}
+
+const highlightedCode = highlightGo(heroCode);
 ---
 
 <section class="relative flex items-center justify-center overflow-hidden pt-32 pb-16">
@@ -64,7 +87,7 @@ const highlightedCode = `<span class="text-text-muted">func</span> <span class="
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
       <a href="/getting-started/installation/" data-astro-prefetch class="px-6 py-3 bg-accent text-on-accent font-semibold rounded-lg text-sm hover:bg-accent-hover transition-colors duration-150 inline-flex items-center gap-2 border-none cursor-pointer">Get Started &rarr;</a>
-      <div class="flex items-center gap-2 py-2.5 px-4 rounded-lg bg-bg-card-solid border border-border font-mono text-sm text-text-primary select-all">$ go get github.com/larsartmann/cmdguard/v4</div>
+      <div class="flex items-center gap-2 py-2.5 px-4 rounded-lg bg-bg-card-solid border border-border font-mono text-sm text-text-primary select-all">$ go get github.com/larsartmann/cmdguard/v5</div>
     </div>
 
     <div class="relative max-w-xl mx-auto">
