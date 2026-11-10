@@ -1,0 +1,115 @@
+---
+title: Usage Linter
+description: Catch cmdguard misuse in your own repository with cmdguard-lint (CG001-CG008).
+---
+
+The `lint` sub-module is a linter for **consumers** of cmdguard. It does not
+check your Go style. It checks whether your CLI is using cmdguard's contracts
+correctly: the executor, the error display, constructors, versions, and help
+metadata.
+
+```bash
+go install github.com/larsartmann/cmdguard/lint/cmd/cmdguard-lint@latest
+
+cmdguard-lint lint --dir .
+cmdguard-lint rules
+```
+
+The binary is itself built with cmdguard v5, so the linter is dogfood for the
+library it audits.
+
+## Rules
+
+| ID | Severity | Rule | Why it matters |
+| --- | --- | --- | --- |
+| CG001 | critical | execute bypass | `fang.Execute` runs the raw cobra tree, bypassing `cli.Execute`, signal handling, graceful shutdown, cleanup hooks, and the single-error-display contract |
+| CG002 | error | stale cmdguard major | Importing a frozen major blocks fixes and sub-module features; migrate to the current major |
+| CG003 | error | panic on constructor error | Panicking on a constructor error re-introduces the panic cmdguard removed by design |
+| CG004 | warning | runtime SetVersion | `cli.SetVersion` mutates after construction; pass `WithCLIVersion` instead |
+| CG005 | error | duplicate version options | `WithCLIVersion` plus `WithFangOptions(fang.WithVersion(...))` passes duplicate fang options |
+| CG006 | warning | execute error reprinted | The error returned by `cli.Execute` is already displayed; printing it again double-reports |
+| CG007 | warning | missing short description | A command without `WithShort` renders as a blank line in `--help` and fails strict validation |
+| CG008 | warning | missing CLI version | A binary without `WithCLIVersion` cannot identify its build or answer `--version` |
+
+CG007 and CG008 are the v5 baseline: they encode the end-goal of a CLI whose
+help is readable and whose build identity is answerable. Test files are skipped,
+and calls with spread option lists (`opts...`) are skipped to keep false
+positives down.
+
+## Output formats
+
+```bash
+cmdguard-lint lint --dir ./cmd --output text
+cmdguard-lint lint --dir ./cmd --output json
+cmdguard-lint lint --dir ./cmd --output sarif > cmdguard-lint.sarif
+```
+
+SARIF uploads directly to GitHub code scanning. JSON is the format for custom
+dashboards.
+
+## Selecting rules
+
+```bash
+# Only the critical execution-contract rules.
+cmdguard-lint lint --enable CG001,CG006
+
+# Skip the advisory UX rules while migrating.
+cmdguard-lint lint --disable CG004,CG007,CG008
+```
+
+## Baseline ratchet
+
+Adopting the linter on an existing codebase is a ratchet, not a rewrite. Record
+the current findings once, then fail only on new ones:
+
+```bash
+cmdguard-lint lint --dir . --write-baseline      # writes .cmdguard-lint-baseline.json
+cmdguard-lint lint --dir . --baseline .cmdguard-lint-baseline.json
+```
+
+The baseline is keyed per rule and file, with line-drift tolerance, so moving
+code around does not resurrect old findings.
+
+## Suppressing a finding
+
+Suppression is inline and requires a reason:
+
+```go
+//cmdguard-lint:ignore CG008 version is injected at link time
+cli, err := v5.NewCLI[Config]("app", "App", Config{})
+```
+
+The comment may sit on the finding line or the line above. A missing reason is
+itself a finding: suppressions are documentation, not a mute button.
+
+## How it analyzes code
+
+All eight rules are syntactic. The linter parses with `go/parser` and walks the
+AST, so it needs no type information and no successful build. Cross-file name
+tracing (`crossfile.go`) follows package-level CLI variables, execute errors,
+and constructor errors per directory, keeping test and production scopes
+separate.
+
+Practically:
+
+- Fast enough to run in a pre-commit hook.
+- Works on a broken tree that does not compile.
+- Cannot resolve aliases or method sets: indirect wrappers around `Execute`
+  are invisible to it.
+
+The per-directory analysis cache lasts for the process lifetime. Long-lived
+consumers call `ClearCache()` after rewriting files.
+
+## BuildFlow integration
+
+`lint/provider/` registers the linter as a BuildFlow toolsdk provider
+(`cmdguard-lint`, `ModuleFanOut: true`). Projects using BuildFlow get the linter
+without a separate install; the provider passes `enable`/`disable` through
+`lint.FilterByIDs`.
+
+## Where to go next
+
+- [Error Handling](/guides/error-handling/): the contracts CG001 and CG006 enforce.
+- [Production Batteries](/guides/production-batteries/): what CG007 and CG008 expect you to set.
+- [Machine Contract](/guides/machine-contract/): the runtime companion to static checks.
+- [Migrating v4 to v5](/guides/migrating-v4-to-v5/): clear the findings in one pass.

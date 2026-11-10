@@ -5,44 +5,193 @@ description: Auto-load JSON, YAML, and TOML config files with flag and env overr
 
 ## Precedence
 
-**explicit flag > env var > config file > default value**
+An explicit flag beats an environment variable, which beats a config-file value, which beats the tag default.
 
-Config values become the new tag defaults after loading, so flags and env vars still override them.
+Config values are loaded before flags register and overwrite the tag defaults, so flags and environment variables still win. Config files feed the root config type `T` only: a command's own `F` struct is parsed from flags alone and has no config-file source.
 
-## Config Validation
+## Loading Config Files
 
-Run validation after parsing but before any command handler:
+`WithConfigFile(paths...)` enables loading. Paths are tried in order and the first existing file wins:
+
+- JSON, YAML, and TOML are detected by file extension (`.json`, `.yaml`/`.yml`, `.toml`).
+- `$VAR` and a leading `~/` are expanded in every path.
+- Missing files are skipped; an empty file counts as missing.
+- If no path exists, startup continues on defaults.
+
+Declare a `config` flag on the root struct so `--config path` is accepted; cmdguard uses that value as the single search path, replacing the configured list.
+
+```yaml
+# ~/.config/app/config.yaml
+log-level: info
+database:
+  host: db.internal
+  port: 5432
+  password: from-vault
+```
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithConfigValidation[AppConfig](func(cfg *AppConfig) error {
-        if cfg.Port < 1 || cfg.Port > 65535 {
-            return fmt.Errorf("port out of range: %d", cfg.Port)
-        }
-        return nil
-    }),
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
+type DatabaseConfig struct {
+	Host     string `flag:"db-host"     env:"APP_DB_HOST"     default:"localhost" help:"Database host"`
+	Port     int    `flag:"db-port"     default:"5432"        help:"Database port" validate:"min=1,max=65535"`
+	Password string `flag:"db-password" env:"APP_DB_PASSWORD" secret:"true"       help:"Database password"`
+}
+
+type AppConfig struct {
+	LogLevel string         `flag:"log-level" env:"APP_LOG_LEVEL" default:"info" help:"Log level"`
+	Database DatabaseConfig `help:"Database settings"`
+	Config   string         `flag:"config" help:"Path to the config file" local:"true"`
+}
+
+func main() {
+	cli, err := v5.NewCLI[AppConfig]("app", "Config file example", AppConfig{},
+		v5.WithConfigFile("$HOME/.config/app/config.yaml", "app.yaml"),
+		v5.WithConfigExplainCommand(),
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	b := v5.NewBuilder(cli)
+	v5.Add(b, "status", v5.NoFlags{},
+		func(_ context.Context, cfg *AppConfig, _ v5.NoFlags) error {
+			fmt.Printf("%s:%d at %s\n", cfg.Database.Host, cfg.Database.Port, cfg.LogLevel)
+			return nil
+		},
+		v5.WithShort("Show the resolved database endpoint"),
+	)
+	if err := b.Build(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
+}
+```
+
+Nested structs are walked, so `database.host` in the file feeds the `db-host` flag. The CLI still exposes flat flags: `--db-host`, not `--database.host`.
+
+## Strict Keys
+
+Strict key checking is ON by default in v5. A key that no field accepts fails the load with `ErrConfigUnknownKey`, naming the key and the file, plus a "did you mean" suggestion when the typo is close:
+
+```bash
+$ app status --config broken.yaml
+Error: failed to load config file: "/home/me/broken.yaml": unknown config key "db-hots" (did you mean "db-host"?)
+```
+
+Opt out with `WithoutStrictConfigKeys()` when the same file is shared with other tools and may carry extra keys. `cli.StrictConfigKeys()` reports the current mode.
+
+A key is accepted when it matches any of these spellings:
+
+| Spelling                     | Example for the `db-host` flag |
+| ---------------------------- | ------------------------------ |
+| Canonical key                | `Host` (Go field name) or the `json` tag name |
+| Flag name                    | `db-host`                      |
+| Case and separator folding   | `DB_HOST`, `db_host`, `DbHost` |
+
+Custom loaders that do not implement `StrictConfigKeyLoader` keep accepting unknown keys, because cmdguard cannot inspect their parse step.
+
+## Config Vocabulary
+
+`v5.ConfigKeys(cfg)` returns the public list of keys a config file accepts, derived from the same tags that drive flags. It is the source of truth for the strict check and for schema generation:
+
+```go
+keys, err := v5.ConfigKeys(AppConfig{})
+if err != nil {
+	return err
+}
+for _, key := range keys {
+	fmt.Printf("%s type=%s flag=%q env=%q\n", key.Key, key.Type, key.Flag, key.Env)
+}
+```
+
+Each `ConfigKey` carries `Key`, `Flag`, `Type`, `Format`, `Help`, `Values`, `Required`, `Default`, `Env`, `Secret`, and `Validate`; nested objects use `Properties` and arrays use `Items`.
+
+Lower-level helpers are exported for tooling:
+
+| Symbol                            | Purpose                                              |
+| --------------------------------- | ---------------------------------------------------- |
+| `v5.ParseFlagTags(cfg)`           | Returns the parsed `[]FlagTag` for a config struct   |
+| `v5.SetField(cfg, "LogLevel", v)` | Sets one field by Go field name                      |
+| `v5.MergeConfigs(cfgs...)`        | Deep-copies and merges configs, later values win     |
+| `v5.ValidateConfig(cfg)`          | Applies `values` and `validate` rules to a config    |
+
+## Config Explain
+
+`WithConfigExplainCommand()` registers a hidden `config explain` command. It reports where each root value came from:
+
+| Source         | Meaning                                   |
+| -------------- | ----------------------------------------- |
+| `flag`         | An explicit command-line flag             |
+| `environment`  | The flag's environment variable           |
+| `config-file`  | A value loaded from the config file       |
+| `default`      | The value declared in the struct tag      |
+| `unset`        | Nothing supplied a value                  |
+
+Values tagged `secret:"true"` are always redacted to `***`, in the table and in JSON output. The same data is available programmatically:
+
+```go
+explanation := cli.ExplainConfig()
+fmt.Println("config file:", explanation.ConfigFile)
+for _, flag := range explanation.Flags {
+	fmt.Println(flag.Name, flag.Source, flag.Value)
+}
+```
+
+Call `ExplainConfig` after `Execute` to describe that run, or before it to describe the constructor defaults plus the config file. Related accessors: `cli.ConfigFilePath()` returns the file the search order picked, and `cli.ConfigDiagnostics()` returns `[]ConfigDiagnostic` with `config-path`, `config-parse`, and `config-keys` results. The auto-registered `doctor` command runs those checks.
+
+## Custom Loaders
+
+`WithConfigFileLoader` takes anything implementing `ConfigFileLoader`:
+
+```go
+type ConfigFileLoader interface {
+	Load(data []byte, cfg any) (setFields []string, err error)
+}
+```
+
+The loader returns the Go field names it set. Those names are what lets cmdguard treat file values as the defaults that flags and env vars override, so a loader that returns an empty slice gets file values without the precedence behavior. `data` may be nil for loaders that read their own files.
+
+The built-in loader is exported, so you can construct one explicitly or point it at a different path set:
+
+```go
+loader := v5.NewKoanfLoader("$HOME/.config/app/config.toml", "/etc/app/config.toml")
+
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+	v5.WithConfigFileLoader(loader, "$HOME/.config/app/config.toml", "/etc/app/config.toml"),
 )
 ```
 
-## Nested Config
+## Programmatic Validation
 
-`ParseFlagTags` recurses into nested structs:
-
-```go
-type AppConfig struct {
-    DB DatabaseConfig
-}
-
-type DatabaseConfig struct {
-    Host string `flag:"db-host" env:"DB_HOST" default:"localhost"`
-    Port int    `flag:"db-port" env:"DB_PORT" default:"5432"`
-}
-```
-
-The `config` flag on your config struct overrides the default search paths:
+Tag rules (`values`, `validate`) run during flag parsing. For checks that span fields, add `WithConfigValidation`, which runs after root parsing and before any handler:
 
 ```go
-type AppConfig struct {
-    Config string `flag:"config" default:"" help:"Path to config file"`
-}
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+	v5.WithConfigValidation(func(cfg *AppConfig) error {
+		if cfg.Database.Port < 1024 {
+			return fmt.Errorf("db-port %d requires root privileges", cfg.Database.Port)
+		}
+		return nil
+	}),
+)
 ```
+
+Validation errors wrap `ErrConfigValidation`, so callers can test with `errors.Is`. `v5.ValidateConfig(cfg)` applies the tag rules to a config value you built yourself, which is useful in tests and in tooling.
+
+## Where to go next
+
+- [Type-Safe Flags](/guides/type-safe-flags/) for the tags that also define the config vocabulary.
+- [Custom Value Types](/guides/custom-types/) for the types that stay atomic inside nested config groups.
+- [Dependency Injection](/guides/dependency-injection/) for handing the resolved config to services.

@@ -5,14 +5,7 @@ description: Zero panics, proper exit codes, and the error-print contract.
 
 ## Zero Panics
 
-Every cmdguard constructor returns an error. There are no `Must*` panic variants, and handlers are always `RunE`-shaped functions.
-
-```go
-cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{})
-if err != nil {
-    return err
-}
-```
+Every cmdguard constructor returns `(value, error)`, for example `v5.NewCLI[AppConfig](...)` returns `(*v5.CLI[AppConfig], error)`. There are no `Must*` panic variants, and handlers are always `RunE`-shaped functions.
 
 ## The Error-Print Contract
 
@@ -23,13 +16,7 @@ if err != nil {
 | Never re-print | the error returned by `Execute` is for exit-code mapping only |
 | Hints | a `Hint:` line follows the error when cmdguard knows the fix |
 
-`ExecuteAndExit` is the blessed entry point:
-
-```go
-cli.ExecuteAndExit(context.Background())
-```
-
-When you must run code before the process exits, map the error yourself:
+`ExecuteAndExit` is the blessed entry point. When you must run code before the process exits, map the error yourself:
 
 ```go
 package main
@@ -40,10 +27,6 @@ import (
 
     "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
-
-type AppConfig struct {
-    Verbose bool `flag:"verbose" short:"v" help:"Enable verbose output"`
-}
 
 func main() {
     cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{})
@@ -81,19 +64,7 @@ if err != nil {
 return exitErr
 ```
 
-Domain errors can implement the interface instead:
-
-```go
-type QuotaError struct{ Used, Limit int }
-
-func (e *QuotaError) Error() string {
-    return fmt.Sprintf("quota exceeded: %d/%d", e.Used, e.Limit)
-}
-
-func (e *QuotaError) ExitCode() int { return 3 }
-```
-
-`v5.ExitCoder` requires exactly `Error() string` and `ExitCode() int`.
+Any error implementing `Error() string` and `ExitCode() int` satisfies `v5.ExitCoder`, so domain errors can carry their own code.
 
 ## Hints
 
@@ -105,17 +76,11 @@ if hint := v5.ErrorHint(err); hint != "" {
 }
 ```
 
-Human-readable output prints the hint as a `Hint:` line after the error. `WithoutErrorHints()` disables that line; machine-readable output keeps the `hint` field either way.
+Human-readable output prints a `Hint:` line after the error. `WithoutErrorHints()` disables that line; machine-readable output keeps the `hint` field.
 
 ## Machine Error Codes
 
-`ErrorCode(err)` returns a stable lowercase snake_case code for every documented sentinel:
-
-```go
-code := v5.ErrorCode(err) // "invalid_enum", or "" when unknown
-```
-
-With `--output json` the error becomes an envelope:
+`ErrorCode(err)` returns a stable lowercase snake_case code for every documented sentinel. With `--output json` the error becomes an envelope:
 
 ```json
 {
@@ -131,17 +96,17 @@ With `--output json` the error becomes an envelope:
 
 `type` is the error class, `message` the stable text, `hint` the fix, `error_code` the machine code, and `code` the process exit code.
 
+`v5.ErrorCode(err)` returns the same code directly, or `""` when the error wraps no sentinel.
+
 ## Sentinel Errors
 
 Sentinels are wrapped with `fmt.Errorf("%w: ...", sentinel)`, so `errors.Is` reaches them through any number of layers:
 
 ```go
-switch {
-case errors.Is(err, v5.ErrInvalidCommand):
-case errors.Is(err, v5.ErrMissingHandler):
-case errors.Is(err, v5.ErrDuplicateCommand):
-case errors.Is(err, v5.ErrConfigValidation):
-}
+errors.Is(err, v5.ErrInvalidCommand)
+errors.Is(err, v5.ErrMissingHandler)
+errors.Is(err, v5.ErrDuplicateCommand)
+errors.Is(err, v5.ErrConfigValidation)
 ```
 
 `docs/ERROR_REFERENCE.md` documents 62 sentinels with their codes and hints. The most common groups:
@@ -175,30 +140,13 @@ if ok {
 }
 ```
 
-## Typo Suggestions
+## Suggestions
 
-`SuggestFlag` and `SuggestCommand` return the closest match within edit distance 3:
-
-```go
-if suggestion, ok := v5.SuggestFlag([]string{"name", "output"}, "nmae"); ok {
-    fmt.Printf("did you mean --%s?\n", suggestion)
-}
-
-if suggestion, ok := v5.SuggestCommand([]string{"greet", "serve"}, "grete"); ok {
-    fmt.Printf("did you mean %s?\n", suggestion)
-}
-```
+`SuggestFlag(validNames, input)` and `SuggestCommand(validCommands, input)` return a closest match plus `true` when one is within edit distance 3. `NewFlagErrorWithSuggestion` embeds that suggestion in the error text.
 
 ## Error Aggregation
 
-`ValidateConfig` joins every field failure under `ErrConfigValidation`, so one check covers the group while each individual error stays reachable:
-
-```go
-err := v5.ValidateConfig(cfg)
-if err != nil && errors.Is(err, v5.ErrConfigValidation) {
-    return err
-}
-```
+`ValidateConfig(cfg)` joins every field failure under `ErrConfigValidation`, so one `errors.Is(err, v5.ErrConfigValidation)` check covers the group while each individual field error stays reachable.
 
 ## Where to go next
 

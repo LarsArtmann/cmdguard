@@ -1,0 +1,130 @@
+---
+title: Machine Contract
+description: Drive a cmdguard CLI from agents and tooling with the versioned describe JSON contract.
+---
+
+Prose `--help` is for humans. Agents, shell drivers, and test harnesses need a
+stable data shape, so every cmdguard CLI exposes `describe`: a versioned JSON
+document describing the whole command tree, including flag metadata that pflag
+cannot model.
+
+## The command
+
+`describe` is registered automatically at `Execute` time, not at `NewCLI`, so
+the contract always reflects the finished tree. It is hidden, and it never
+enforces required flags, so it works before the caller knows any business flags.
+
+```bash
+$ myapp describe
+{
+  "schema_version": "1",
+  "name": "myapp",
+  "short": "My CLI",
+  "version": "1.4.0",
+  "flags": [
+    {
+      "name": "api-token",
+      "type": "string",
+      "usage": "API token for authenticated calls",
+      "env": "MYAPP_API_TOKEN"
+    },
+    {
+      "name": "environment",
+      "shorthand": "e",
+      "type": "string",
+      "default": "dev",
+      "usage": "Target environment",
+      "env": "MYAPP_ENV",
+      "values": ["dev", "staging", "prod"]
+    }
+  ],
+  "commands": [
+    {
+      "name": "scan",
+      "path": "myapp scan",
+      "short": "Scan targets",
+      "flags": [
+        { "name": "depth", "type": "int", "default": "1", "usage": "Scan depth" }
+      ]
+    }
+  ]
+}
+```
+
+## What each flag carries
+
+Every entry is enough to construct a valid invocation without reading source:
+
+| Field | Meaning |
+| --- | --- |
+| `name`, `shorthand` | The spellings the parser accepts |
+| `type` | The pflag type (`string`, `int`, `bool`, `duration`, ...) |
+| `default`, `usage` | What `--help` shows, verbatim |
+| `env` | The environment variable, with `WithEnvPrefix` already applied |
+| `values` | The enum constraint from the `values` tag |
+| `required` | Whether a flag or env var must supply the value |
+| `count` | Counting flag (`-vvv`) |
+| `prompt`, `validate` | The tag text, so a driver can reproduce the rule |
+| `hidden`, `deprecated`, `inherited`, `secret` | Visibility and provenance |
+
+`secret:"true"` is reported as a boolean; the value itself is never part of the
+contract.
+
+## Programmatic access
+
+The same document is available without spawning the binary:
+
+```go
+description := cli.Describe()
+if description.SchemaVersion != "1" {
+	return fmt.Errorf("unsupported contract version %q", description.SchemaVersion)
+}
+
+// Or write it anywhere.
+if err := cli.WriteDescription(os.Stdout); err != nil {
+	return err
+}
+```
+
+`GenerateDocs(w)` renders the same facts as Markdown for a docs site, which is
+why the flag table in generated docs and the JSON contract cannot disagree.
+
+## Stability rules
+
+- `schema_version` only changes when the contract breaks compatibility.
+- Within a major version, fields may be **added**; existing names and meanings
+  never change.
+- Unknown fields must be ignored by consumers.
+- The exact bytes for a comprehensive fixture CLI are pinned by a golden test,
+  so accidental drift fails CI instead of reaching agents.
+
+## Opting out and overriding
+
+- A consumer command named `describe` wins; the built-in is skipped.
+- `WithoutDescribeCommand()` disables the built-in entirely. `Describe()` and
+  `WriteDescription()` keep working because they do not depend on the command.
+
+## Driving a CLI from an agent
+
+A reliable loop looks like this:
+
+```bash
+# 1. Learn the tree.
+myapp describe > contract.json
+
+# 2. Build an invocation from the contract, then run it.
+myapp scan --depth 3 --environment prod
+
+# 3. On failure, read error_code and hint instead of guessing.
+```
+
+The JSON error envelope carries the same machine vocabulary: `code` (the exit
+code), `error_code` (a stable snake_case identifier), and `hint` (one actionable
+fix). See [Error Handling](/guides/error-handling/).
+
+## Where to go next
+
+- [Error Handling](/guides/error-handling/): `error_code`, `hint`, and exit code mapping.
+- [Type-Safe Flags](/guides/type-safe-flags/): the tags that populate each flag entry.
+- [Production Batteries](/guides/production-batteries/): how `describe` gets registered.
+- [Schema Generation](/guides/schema/): the JSON Schema for config files, derived from the same tags.

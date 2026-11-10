@@ -1,0 +1,135 @@
+---
+title: Production Batteries
+description: The production defaults v5 turns on for every CLI, and how to opt out of each one.
+---
+
+`NewCLI` in v5 is not the v4 blank slate. It starts you on the paved road: the
+features every production CLI needs are already enabled, and every one of them
+has a named opt-out.
+
+## What is on by default
+
+| Battery | What it does | Opt out |
+| --- | --- | --- |
+| Strict validation | Every command must carry `WithShort` (blank help lines fail at `AddCommand`/`Build` time) | `WithoutStrictValidation()` |
+| Signal handling | `SIGINT`/`SIGTERM` cancel the execution context | `WithoutSignalHandling()` |
+| Graceful DI shutdown | DI services shut down in reverse invocation order when the run is signal-cancelled | `WithoutGracefulShutdown()` |
+| Error hints | A `Hint:` line (and `hint` in JSON envelopes) tells users how to fix classified errors | `WithoutErrorHints()` |
+| Strict config keys | Unknown config-file keys fail with `ErrConfigUnknownKey` plus a "did you mean" suggestion | `WithoutStrictConfigKeys()` |
+| `doctor` command | Health checks for DI services and config diagnostics, registered automatically | `WithoutBatteries()` |
+| `version` command | Registered automatically when `WithCLIVersion` is set | `WithoutBatteries()` |
+| `describe` command | The machine-readable JSON contract, registered at `Execute` time | `WithoutDescribeCommand()` |
+
+`WithBatteries()` still exists as an explicit no-op, so v4-flavored call sites
+that already pass it keep compiling and keep the same behavior.
+
+## The batteries in one example
+
+```go
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
+type Config struct {
+	Verbose bool `flag:"verbose" short:"v" help:"Verbose output"`
+}
+
+func main() {
+	cli, err := v5.NewCLI[Config]("myapp", "My CLI", Config{},
+		v5.WithCLIVersion("1.4.0"), // makes the auto-registered version command appear
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// myapp doctor, myapp version, and myapp describe now exist.
+	cli.ExecuteAndExit(context.Background())
+}
+```
+
+Without `WithCLIVersion`, `version` is not registered: a CLI that cannot state
+its own version should not pretend it can.
+
+## Turning the whole set off
+
+`WithoutBatteries()` drops strict validation, signal handling, graceful
+shutdown, and strict config keys together, and stops the automatic command
+registration. It is the right call for a test harness or an embedded CLI that
+manages its own process lifecycle.
+
+```go
+cli, err := v5.NewCLI[Config]("myapp", "My CLI", Config{},
+	v5.WithoutBatteries(),
+)
+```
+
+Individual opt-outs are more common than the master switch. For example, a CLI
+with intentionally blank command descriptions in a legacy fleet:
+
+```go
+cli, err := v5.NewCLI[Config]("myapp", "My CLI", Config{},
+	v5.WithoutStrictValidation(),
+)
+```
+
+## `NewApp`: construction plus registration
+
+`NewApp` runs a build function after `NewCLI` and returns nothing on error, so a
+half-built CLI can never escape:
+
+```go
+cli, err := v5.NewApp[Config]("myapp", "My CLI", Config{},
+	func(cli *v5.CLI[Config]) error {
+		return v5.AddCommands(cli, listCmd, showCmd)
+	},
+	v5.WithCLIVersion("1.4.0"),
+)
+if err != nil {
+	log.Fatal(err)
+}
+
+cli.ExecuteAndExit(context.Background())
+```
+
+The error is wrapped with `building CLI "myapp"`, which makes the failure
+obvious in logs without losing the cause.
+
+## Shutdown semantics
+
+Graceful shutdown fires **only** when the execution context was cancelled by a
+signal. A run that completes normally never tears the DI scope down, which is
+what makes repeated `ExecuteWithArgs` calls safe:
+
+```go
+for _, args := range [][]string{{"list"}, {"show", "42"}} {
+	if err := cli.ExecuteWithArgs(context.Background(), args); err != nil {
+		log.Printf("run %v failed: %v", args, err)
+	}
+}
+
+// Explicit teardown when the process is done with the scope.
+if err := cli.Shutdown(context.Background()); err != nil {
+	log.Printf("shutdown: %v", err)
+}
+```
+
+Services that implement `do.ShutdownerWithError` receive `Shutdown` in reverse
+invocation order during signal-triggered shutdown.
+
+## Built-in commands yield to yours
+
+If you register your own `doctor`, `version`, or `describe` command, the
+batteries stop: a consumer-defined command always wins. That keeps v4
+applications working unchanged when they upgrade.
+
+## Where to go next
+
+- [Lifecycle & Signals](/guides/lifecycle/): the mechanics behind signal handling and DI shutdown.
+- [Doctor & Health Checks](/guides/doctor/): what the auto-registered command actually checks.
+- [Machine Contract](/guides/machine-contract/): the `describe` JSON an agent can drive.
+- [Error Handling](/guides/error-handling/): hints, error codes, and the single-print contract.

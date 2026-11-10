@@ -1,0 +1,111 @@
+---
+title: Doctor & Health Checks
+description: The auto-registered doctor command, what it checks, and how to extend it.
+---
+
+`doctor` answers one question in one command: is this installation healthy? It
+is registered automatically by the v5 batteries, and it reports DI health,
+config problems, and any checks you add.
+
+## What the built-in command runs
+
+1. **DI health checks** for every service implementing `do.HealthcheckerWithContext`.
+2. **Config diagnostics** from `CLI.ConfigDiagnostics()`: `config-path`, `config-parse`, `config-keys`, `config-schema`.
+3. **Custom checks** registered with `WithDoctorCheck`.
+4. **Schema conformance**, when a validator is wired with `WithDoctorSchemaValidator`.
+
+Results are sorted, printed one line each, and the command exits non-zero when
+anything failed:
+
+```text
+$ myapp doctor
+✓ config-keys	ok
+✓ config-path	ok
+✓ database	ok
+✗ payment-api	connect: dial tcp 10.0.0.7:443: connection refused
+
+3 passed, 1 failed
+```
+
+A failed run returns `ErrDoctorFailed` wrapped in an exit code 1 error, so CI
+can gate on `myapp doctor` directly.
+
+## Adding checks
+
+```go
+cli, err := v5.NewCLI[Config]("myapp", "My CLI", Config{},
+	v5.WithCLIVersion("1.4.0"),
+)
+if err != nil {
+	log.Fatal(err)
+}
+
+doctor, err := v5.DoctorCommand[Config](cli,
+	v5.WithDoctorCheck[Config]("database", func(ctx context.Context) error {
+		return db.Ping(ctx)
+	}),
+	v5.WithDoctorCheck[Config]("disk-space", func(ctx context.Context) error {
+		return ensureFreeSpace(ctx, 500<<20)
+	}),
+	v5.WithDoctorShort[Config]("Verify this installation"),
+)
+if err != nil {
+	log.Fatal(err)
+}
+
+v5.AddCommand(cli, doctor)
+```
+
+Checks run after DI health checks. Returning an error marks the check failed;
+returning nil marks it passed. Keep checks fast and side-effect free: `doctor`
+is the first command a new user runs.
+
+## Config diagnostics
+
+`cli.ConfigDiagnostics()` returns named diagnostics, each with an error:
+
+| Name | Reports |
+| --- | --- |
+| `config-path` | Whether the config file search found a file |
+| `config-parse` | Whether the found file parses into the config struct |
+| `config-keys` | Config-file keys no field accepts (even in tolerant mode) |
+| `config-schema` | A consumer-supplied schema check |
+
+```go
+for _, diagnostic := range cli.ConfigDiagnostics() {
+	if diagnostic.Err != nil {
+		log.Printf("%s: %v", diagnostic.Name, diagnostic.Err)
+	}
+}
+```
+
+## Readings without the command
+
+Health checking is not locked inside `doctor`:
+
+| Call | Returns |
+| --- | --- |
+| `cli.HealthCheck(ctx) error` | The first failure, or nil |
+| `cli.HealthCheckResults() map[string]error` | All service results |
+| `cli.HealthCheckResultsWithContext(ctx) map[string]error` | All results, context-aware |
+| `cli.RecordAuditHealthCheck(ctx) map[string]error` | Results, also recorded in the audit log |
+
+```go
+if err := cli.HealthCheck(ctx); err != nil {
+	return fmt.Errorf("unhealthy: %w", err)
+}
+```
+
+## Turning it off
+
+`WithoutBatteries()` stops the automatic registration. To keep the other
+batteries but drop only `doctor`, register nothing: only the batteries bundle
+adds it, so a CLI that opts out of the bundle simply has no `doctor` unless you
+call `DoctorCommand` yourself.
+
+## Where to go next
+
+- [Production Batteries](/guides/production-batteries/): the defaults that register `doctor`.
+- [Lifecycle & Signals](/guides/lifecycle/): shutdown order for the services being checked.
+- [Dependency Injection](/guides/dependency-injection/): make a service health-checkable.
+- [Schema Generation](/guides/schema/): validate the config file that `doctor` inspects.

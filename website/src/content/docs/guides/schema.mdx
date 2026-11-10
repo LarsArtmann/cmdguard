@@ -1,0 +1,136 @@
+---
+title: Schema Generation
+description: Emit a JSON Schema for your config file from the same struct tags that drive flags.
+---
+
+Strict config loading rejects unknown keys at runtime. The `schema` sub-module
+moves that check earlier: it emits a JSON Schema 2020-12 document so editors and
+CI pipelines can catch a bad config before the binary runs.
+
+```bash
+go get github.com/larsartmann/cmdguard/schema
+```
+
+The module is build-time tooling, not runtime machinery. It imports only the
+core package and the standard library.
+
+## Why it cannot drift
+
+The schema is derived from `v5.ConfigKeys`, the same vocabulary that drives
+flags, `config explain`, and strict key checking. A key the loader rejects does
+not appear in the schema, and a key it accepts always does. Properties are
+emitted with `additionalProperties: false`, matching strict mode by
+construction.
+
+Property keys are sorted, so generated files are byte-for-byte reproducible:
+a schema regenerated on another machine produces the same bytes and does not
+create diff noise.
+
+## Emit a schema
+
+```go
+package main
+
+import (
+	"log"
+	"os"
+
+	"github.com/larsartmann/cmdguard/schema"
+)
+
+type Config struct {
+	LogLevel string `json:"log_level" flag:"log-level" default:"info" values:"debug,info,warn,error" help:"Log verbosity"`
+	Port     int    `json:"port" flag:"port" default:"8080" validate:"min=1,max=65535" help:"Listen port"`
+	Token    string `json:"token" flag:"token" env:"APP_TOKEN" secret:"true" help:"API token"`
+}
+
+func main() {
+	if err := schema.Emit(os.Stdout, Config{}); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "log_level": {
+      "type": "string",
+      "default": "info",
+      "enum": ["debug", "info", "warn", "error"],
+      "x-cmdguard": { "flag": "log-level" }
+    },
+    "port": {
+      "type": "integer",
+      "default": 8080,
+      "minimum": 1,
+      "maximum": 65535,
+      "x-cmdguard": { "flag": "port" }
+    },
+    "token": {
+      "type": "string",
+      "x-cmdguard": { "flag": "token", "env": "APP_TOKEN", "secret": true }
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}
+```
+
+## API
+
+| Call | Purpose |
+| --- | --- |
+| `schema.FromConfig(cfg any) (*Document, error)` | Schema for a config struct |
+| `schema.FromCLI[T](cli *v5.CLI[T]) (*Document, error)` | Schema titled from the CLI's name and short description |
+| `schema.Emit(w io.Writer, cfg any) error` | Write the document to any writer |
+| `schema.Marshal(cfg any) ([]byte, error)` | Get the document as bytes |
+| `schema.CommandSchemas(*v5.CLIDescription) map[string]*Document` | Per-command schemas derived from `describe` |
+| `schema.Dialect` | The JSON Schema dialect constant (2020-12) |
+| `schema.ExtensionKey` | The `x-cmdguard` extension key |
+
+`CommandSchemas` takes the machine contract and builds one schema per command,
+which is useful for a driver that wants to validate per-command input.
+
+## Wiring it into an editor
+
+Write the schema to a file and point your editor at it:
+
+```bash
+$ go run ./cmd/schema > cmdguard.schema.json
+```
+
+For YAML config files, the YAML language server picks it up from a comment:
+
+```yaml
+# yaml-language-server: $schema=./cmdguard.schema.json
+log_level: debug
+port: 8443
+```
+
+The same document works in CI with any JSON Schema validator (ajv,
+gojsonschema, check-jsonschema), which means config errors fail the pipeline
+instead of the first production run.
+
+## Extensions
+
+JSON Schema has no concept of an environment variable or a secret. Those facts
+ride in `x-cmdguard`:
+
+| Hint | Meaning |
+| --- | --- |
+| `flag` | The command-line flag that sets the same value |
+| `env` | The environment variable that can supply it |
+| `format` | A cmdguard type hint (`duration`, `hostport`, `path`) |
+| `secret` | The value must never be logged or committed |
+
+Validators ignore the extension; generated tooling reads it.
+
+## Where to go next
+
+- [Config Files](/guides/config-files/): precedence, strict keys, and `config explain`.
+- [Type-Safe Flags](/guides/type-safe-flags/): the tags the schema is derived from.
+- [Machine Contract](/guides/machine-contract/): the runtime JSON contract for commands.
+- [Doctor & Health Checks](/guides/doctor/): surface config problems at run time.

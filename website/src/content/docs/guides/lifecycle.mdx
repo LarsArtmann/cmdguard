@@ -3,99 +3,158 @@ title: Lifecycle & Signal Handling
 description: Graceful shutdown, signal handling, WithCleanup hooks, and the Doctor command.
 ---
 
+## Production Batteries by Default
+
+v5 turns the production defaults on at `NewCLI`. Every one has an opt-out.
+
+| Battery | Default | Opt-out |
+| --- | --- | --- |
+| Strict command validation | on | `WithoutStrictValidation()` |
+| Signal handling | on | `WithoutSignalHandling()` |
+| Graceful DI shutdown | on | `WithoutGracefulShutdown()` |
+| Strict config keys | on | `WithoutStrictConfigKeys()` |
+| Actionable error hints | on | `WithoutErrorHints()` |
+| Hidden `describe` command | on | `WithoutDescribeCommand()` |
+| Auto `doctor` command | on | `WithoutBatteries()` |
+| Auto `version` command | on when `WithCLIVersion` is set | `WithoutBatteries()` |
+
+`WithoutBatteries()` drops the whole production set. `WithBatteries()` remains as an explicit reinforcement that re-enables it after a `Without*` opt-out.
+
 ## Signal Handling
 
-`WithSignalHandling()` cancels the context on SIGINT/SIGTERM. Handlers can check `ctx.Done()`:
+`WithSignalHandling()` is on by default: SIGINT and SIGTERM cancel the execution context. Handlers observe cancellation through `ctx.Done()` or `ctx.Err()`.
 
 ```go
-cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
-    v4.WithSignalHandling(),
-)
-
-// In a handler:
-func(ctx context.Context, cfg *Config, _ v4.NoFlags) error {
+func(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {
     select {
     case <-ctx.Done():
-        return ctx.Err() // SIGINT received
+        return ctx.Err() // SIGINT or SIGTERM received
     case result := <-work:
         return process(result)
     }
 }
 ```
 
+`WithoutSignalHandling()` disables context cancellation and with it graceful shutdown. `WithoutGracefulShutdown()` keeps cancellation but skips DI teardown.
+
 ## Graceful Shutdown
 
-`WithGracefulShutdown()` implies `WithSignalHandling` and additionally triggers DI service shutdown. Services implementing `do.ShutdownerWithError` are shut down in **reverse invocation order**:
+Graceful shutdown fires only when the run was signal-cancelled. A normally completing `Execute` never tears down the DI scope. Services implementing `do.ShutdownerWithError` are shut down in reverse invocation order.
 
 ```go
-// skip-validate
-type Database struct{ DSN string }
+type Database struct{ conn *sql.DB }
 
 func (db *Database) Shutdown() error {
-    return db.Close() // called in reverse order on SIGINT/SIGTERM
+    return db.conn.Close() // runs on SIGINT/SIGTERM
+}
+```
+
+Register the service with `v5.Provide(cli.Scope(), func(i do.Injector) (*Database, error) { ... })`. For explicit teardown after normal completion, call `cli.Shutdown(ctx)`.
+
+## Repeated Execution
+
+`ExecuteWithArgs` can be called repeatedly on one CLI: every execution resets flag state and the typed config to the post-constructor snapshot, so values from an earlier run never leak into a later one. Because normal completion does not shut the scope down, tests and embedded runners are safe.
+
+## Hooks
+
+| Hook | Scope | Fires |
+| --- | --- | --- |
+| `WithPreRunE[T, F]` | per command | after flags are parsed, before `RunE` |
+| `WithPostRunE[T, F]` | per command | after a successful `RunE` only |
+| `WithCleanup[T]` | CLI-wide | after every `RunE`, success or error |
+| `WithPostFlagParse[T]` | CLI-wide | after flag parsing and config validation, before handlers |
+
+Cobra does not run `PostRunE` when `RunE` returns an error. `WithCleanup` covers that gap: it fires after every `RunE` including failures and also wraps raw cobra subcommands added to the tree. Cleanup errors join with `errors.Join` and never swallow the original run error.
+
+```go
+package main
+
+import (
+    "context"
+    "errors"
+    "fmt"
+    "os"
+    "time"
+
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+    "github.com/spf13/cobra"
+)
+
+type AppConfig struct {
+    Timeout time.Duration `flag:"timeout" default:"5s" help:"Work timeout"`
 }
 
-cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
-    v4.WithGracefulShutdown(),
-)
+func main() {
+    cli, err := v5.NewCLI[AppConfig]("worker", "Example worker", AppConfig{},
+        v5.WithCLIVersion("1.0.0"),
+        v5.WithCleanup[AppConfig](func(cmd *cobra.Command, cfg *AppConfig, runErr error) error {
+            fmt.Fprintf(os.Stderr, "cleanup %s: runErr=%v\n", cmd.Name(), runErr)
+            return nil
+        }),
+    )
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "creating CLI: %v\n", err)
+        os.Exit(1)
+    }
+
+    work, err := v5.NewCommand("work", v5.NoFlags{},
+        func(ctx context.Context, cfg *AppConfig, _ v5.NoFlags) error {
+            select {
+            case <-ctx.Done():
+                return ctx.Err()
+            case <-time.After(cfg.Timeout):
+                fmt.Println("work finished")
+                return nil
+            }
+        },
+        v5.WithShort("Do the work"),
+    )
+
+    b := v5.NewBuilder(cli)
+    v5.Try(b, work, err)
+    if buildErr := b.Build(); buildErr != nil {
+        fmt.Fprintf(os.Stderr, "registering commands: %v\n", buildErr)
+        os.Exit(1)
+    }
+
+    err = cli.Execute(context.Background())
+    err = errors.Join(err, cli.Shutdown(context.Background()))
+    os.Exit(v5.ExitCode(err))
+}
 ```
 
-This is the key differentiator: no other Go CLI framework manages service lifecycle for you.
+`WithPostFlagParse[T]` is the replacement for hand-wrapped `PersistentPreRunE`; it runs after parsing and config validation but before any handler.
 
-## WithCleanup — Fires Even on Error
+## Version and Doctor Commands
 
-Cobra's `PostRunE` does NOT fire when `RunE` errors. This means resources leak on failure. cmdguard's `WithCleanup` solves this:
+`version` is registered automatically when `WithCLIVersion` is set, and `doctor` is registered always. A consumer-defined command with either name wins over the built-in.
 
-```go
-cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
-    v4.WithCleanup[Config](func(cmd *cobra.Command, cfg *Config, runErr error) error {
-        // This fires after EVERY command's RunE — success or failure
-        // The original runErr is never swallowed
-        log.Close() // flush logs
-        return nil  // cleanup errors are joined, not swallowed
-    }),
-)
+```bash
+$ worker version
+worker 1.0.0
+
+$ worker doctor
+✓ database  ok
+✓ cache     ok
+
+2 passed, 0 failed
 ```
 
-`WithCleanup` hooks:
-
-- Fire after every command's `RunE` (including errors)
-- Cover both cmdguard-managed and raw cobra subcommands
-- Are idempotent (safe to call `Execute` twice)
-- Never swallow the original error (cleanup errors joined via `errors.Join`)
-
-## Doctor Command
-
-The `DoctorCommand` runs health checks on all DI services:
+`DoctorCommand` checks every DI service implementing `do.HealthcheckerWithContext` and accepts custom checks:
 
 ```go
-doctorCmd, _ := v4.DoctorCommand[Config](cli)
-v4.AddCommand(cli, doctorCmd)
-
-// $ myapp doctor
-// ✓ database — ok
-// ✓ cache — ok
-// ✗ queue — connection refused
-```
-
-Services implementing `do.HealthcheckerWithContext` are checked automatically. Add custom checks with `WithDoctorCheck`:
-
-```go
-doctorCmd, _ := v4.DoctorCommand[Config](cli,
-    v4.WithDoctorCheck("external-api", func(ctx context.Context) error {
+docCmd, err := v5.DoctorCommand(cli,
+    v5.WithDoctorCheck("external-api", func(ctx context.Context) error {
         return pingExternalAPI(ctx)
     }),
 )
 ```
 
-## Version Command
+Custom checks run after the DI health checks and appear as one report line each.
 
-```go
-cli, _ := v4.NewCLI[Config]("myapp", "My app", Config{},
-    v4.WithCLIVersion("1.0.0"),
-)
-versionCmd, _ := v4.VersionCommand[Config](cli)
-v4.AddCommand(cli, versionCmd)
-// $ myapp version
-// 1.0.0
-```
+## Where to go next
+
+- [Dependency Injection](/guides/dependency-injection/) for service registration and health checks
+- [Error Handling](/guides/error-handling/) for exit codes and cleanup error joining
+- [Middleware](/guides/middleware/) for timeout and recovery middleware
+- [Audit Log](/guides/audit-log/) for tracing service lifecycle

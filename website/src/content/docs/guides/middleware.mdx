@@ -3,76 +3,156 @@ title: Middleware
 description: Wrap all command handlers with cross-cutting concerns.
 ---
 
-## Core Middleware Chain
+## Middleware Types
 
-cmdguard provides a generic `Middleware[T]` type for wrapping command handlers. Wire middleware via `WithMiddleware`:
+| Type | Signature | Purpose |
+| --- | --- | --- |
+| `Middleware[T]` | `func(ctx context.Context, cfg *T, info CommandMetadata, next func() error) error` | wrap handler execution |
+| `ContextMiddleware[T]` | `func(ctx context.Context, cfg *T, info CommandMetadata, next func(context.Context) error) error` | derive a context for the inner chain |
+| `CommandMetadata` | `Name`, `FullPath`, `Phase`, `HasRunE` | identifies the command and phase |
+| `Phase` | `PhaseRun`, `PhasePreRun`, `PhasePostRun` | execution stage reported in metadata |
+
+Middleware must call `next` exactly once. To short-circuit, return before calling it.
+
+## Wiring and Order
 
 ```go
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithMiddleware[AppConfig](myMiddleware),
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+    v5.WithContextMiddleware[AppConfig](v5.TimeoutMiddleware[AppConfig](30*time.Second)),
+    v5.WithMiddleware[AppConfig](v5.RecoveryMiddleware[AppConfig]()),
 )
 ```
+
+Plain middleware run in registration order: the first registered is outermost. Context middleware wrap the entire chain, so a context derived by a `ContextMiddleware` reaches every plain middleware and the handler. That ordering is what makes timeout and request-scoped values work.
+
+## Writing Middleware
+
+```go
+func Audit(logger *slog.Logger) v5.Middleware[AppConfig] {
+    return func(ctx context.Context, cfg *AppConfig, info v5.CommandMetadata, next func() error) error {
+        logger.Info("command start", "command", info.FullPath, "phase", info.Phase)
+        err := next()
+        logger.Info("command end", "command", info.FullPath, "err", err)
+        return err
+    }
+}
+```
+
+`info.HasRunE` reports whether the command has a handler, and `info.FullPath` is the full command path such as `app tasks list`. A middleware that wants the config reads it from `cfg`.
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    "time"
+
+    "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
+type AppConfig struct {
+    Verbose bool `flag:"verbose" short:"v" help:"Verbose output"`
+}
+
+type GreetFlags struct {
+    Name string `flag:"name" short:"n" default:"World" help:"Name to greet"`
+}
+
+func main() {
+    cli, err := v5.NewCLI[AppConfig]("greeter", "Greet people", AppConfig{},
+        v5.WithMiddleware[AppConfig](
+            v5.RecoveryMiddleware[AppConfig](),
+            v5.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+                fmt.Fprintf(os.Stderr, "%s took %s (err=%v)\n", name, d, err)
+            }),
+        ),
+    )
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "creating CLI: %v\n", err)
+        os.Exit(1)
+    }
+
+    greet, err := v5.NewCommand("greet", GreetFlags{},
+        func(_ context.Context, cfg *AppConfig, flags GreetFlags) error {
+            fmt.Printf("Hello, %s! (verbose=%v)\n", flags.Name, cfg.Verbose)
+            return nil
+        },
+        v5.WithShort("Greet someone"),
+    )
+
+    b := v5.NewBuilder(cli)
+    v5.Try(b, greet, err)
+    if buildErr := b.Build(); buildErr != nil {
+        fmt.Fprintf(os.Stderr, "registering commands: %v\n", buildErr)
+        os.Exit(1)
+    }
+
+    cli.ExecuteAndExit(context.Background())
+}
+```
+
+## Context Middleware
+
+A context middleware can attach request-scoped values or deadlines that the handler sees:
+
+```go
+type requestIDKey struct{}
+
+func WithRequestID() v5.ContextMiddleware[AppConfig] {
+    return func(ctx context.Context, _ *AppConfig, _ v5.CommandMetadata, next func(context.Context) error) error {
+        return next(context.WithValue(ctx, requestIDKey{}, "req-123"))
+    }
+}
+```
+
+Inside a handler, read the value with `ctx.Value(requestIDKey{})`. This propagation is the reason `ContextMiddleware` exists: plain `Middleware` receives a `next func() error` bound to the original context.
 
 ## Built-in Middleware
 
-cmdguard ships with reference implementations. The spinner and telemetry middleware live in their sub-modules.
-
-### Timing Middleware
-
-Measure execution time for every command:
+| Constructor | Type | Behavior |
+| --- | --- | --- |
+| `TimingMiddleware[T](log)` | `Middleware[T]` | measures `next()` and reports name, duration, and error to `log` |
+| `TimeoutMiddleware[T](d)` | `ContextMiddleware[T]` | derives a deadline; maps `context.DeadlineExceeded` to `ErrCommandTimeout`; `d <= 0` disables the limit |
+| `RecoveryMiddleware[T]()` | `Middleware[T]` | converts panics into `ErrCommandPanic` errors with a stack trace |
 
 ```go
-func TimingMiddleware[T any]() v4.Middleware[T] {
-    return func(cmd string, next func() error) func() error {
-        return func() error {
-            start := time.Now()
-            err := next()
-            log.Printf("%s took %v", cmd, time.Since(start))
-            return err
-        }
-    }
-}
+timing := v5.TimingMiddleware[AppConfig](func(name string, d time.Duration, err error) {
+    slog.Info("command finished", "command", name, "duration", d, "err", err)
+})
+
+timeout := v5.TimeoutMiddleware[AppConfig](5 * time.Second)
 ```
 
-### Recovery Middleware
+`TimeoutMiddleware` guarantees the derived context and the error mapping, not forcible cancellation: a handler that ignores its context cannot be interrupted.
 
-Catch panics from handlers (though cmdguard itself never panics):
+## Sub-module Middleware
 
-```go
-func RecoveryMiddleware[T any]() v4.Middleware[T] {
-    return func(cmd string, next func() error) func() error {
-        return func() (err error) {
-            defer func() {
-                if r := recover(); r != nil {
-                    err = fmt.Errorf("panic in %s: %v", cmd, r)
-                }
-            }()
-            return next()
-        }
-    }
-}
-```
-
-## Spinner Middleware (sub-module)
+| Module | Constructor | Notes |
+| --- | --- | --- |
+| `cmdguard/spinner` | `spinner.Middleware[T](title)` or `spinner.MiddlewareWithConfig[T](cfg)` | writes to stderr, silently skipped when stderr is not a terminal |
+| `cmdguard/telemetry` | `telemetry.Middleware[T](tracer)` or `telemetry.WithTelemetry[T](tracer)` | one OpenTelemetry span per phase, recording errors |
 
 ```go
-import "github.com/larsartmann/cmdguard/spinner"
+import (
+    "github.com/larsartmann/cmdguard/spinner"
+    "github.com/larsartmann/cmdguard/telemetry"
+)
 
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    v4.WithMiddleware[AppConfig](spinner.Middleware[AppConfig]("Working...")),
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{},
+    v5.WithMiddleware[AppConfig](
+        spinner.Middleware[AppConfig]("Working..."),
+        telemetry.Middleware[AppConfig](tracer),
+    ),
 )
 ```
 
-Auto-skips when stderr is not a terminal. Override with `SpinnerConfig{Writer: ...}`.
+Both are plain middleware, so the span context is not propagated into the handler. Wire a `ContextMiddleware` when downstream code needs the derived context.
 
-## Telemetry Middleware (sub-module)
+## Where to go next
 
-```go
-import "github.com/larsartmann/cmdguard/telemetry"
-
-cli, _ := v4.NewCLI[AppConfig]("myapp", "...", AppConfig{},
-    telemetry.WithTelemetry[AppConfig](tracer),
-)
-```
-
-Starts an OpenTelemetry span per command. Note: the span context cannot be propagated to the handler due to the `next func() error` signature.
+- [Lifecycle and Signal Handling](/guides/lifecycle/) for hooks that run around handlers
+- [Error Handling](/guides/error-handling/) for the errors middleware produces
+- [Sub-modules](/guides/sub-modules/) for spinner, telemetry, and other optional modules
+- [Flow Context](/guides/flow-context/) for command path tracking

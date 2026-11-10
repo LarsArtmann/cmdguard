@@ -1,79 +1,242 @@
 ---
 title: Custom Value Types
-description: Built-in validated types and how to register your own with RegisterTypeHandler.
+description: Built-in validated types and how to register your own with TypeCodec.
 ---
 
 ## Built-in Value Types
 
-cmdguard ships with validated types that parse and validate at construction time — not at runtime when a user passes bad input.
+cmdguard ships with validated types that parse a flag the moment it is read. A bad value fails the command with a typed error; nothing panics and nothing waits until the handler touches the field.
 
-| Type       | Validation                         |
-| ---------- | ---------------------------------- |
-| `Duration` | Wraps `time.Duration`              |
-| `Enum`     | Validated against allowed values   |
-| `LogLevel` | debug / info / warn / error        |
-| `URL`      | Validated URL string               |
-| `Email`    | RFC 5322 email validation          |
-| `Port`     | 1–65535 range                      |
-| `FilePath` | Path cleaning and existence checks |
-| `HostPort` | `host:port` validation             |
+| Type        | Constructor                         | Validation                                  |
+| ----------- | ----------------------------------- | ------------------------------------------- |
+| `Duration`  | `v5.ParseDuration`, `v5.FromDuration` | `time.ParseDuration` syntax (`30s`, `1h30m`) |
+| `Enum`      | `v5.ParseEnum(value, allowed)`      | Membership in the allowed list              |
+| `URL`       | `v5.ParseURL`                       | Absolute URL with scheme and host           |
+| `Email`     | `v5.ParseEmail`                     | RFC 5322 address                            |
+| `Port`      | `v5.ParsePort`, `v5.PortFromInt`    | 1 to 65535, numeric or named                |
+| `HostPort`  | `v5.ParseHostPort`, `v5.NewHostPort` | `host:port`                                 |
+| `FilePath`  | `v5.ParseFilePath(s, checkExists)`  | Cleaned path, optional existence check      |
+| `LogLevel`  | `v5.ParseLogLevel`                  | debug, info, warn, error                    |
+| `LogFormat` | `v5.ParseLogFormat`                 | text, json                                  |
 
-Use them directly as flag types:
+The types are usable as plain flag fields:
 
 ```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+)
+
 type ServerFlags struct {
-    Port     v4.Port     `flag:"port"     default:"8080"   help:"Listen port"`
-    Log      v4.LogLevel `flag:"log"      default:"info"   help:"Log level"`
-    URL      v4.URL      `flag:"url"      required:"true"  help:"API endpoint"`
-    Mode     v4.Enum     `flag:"mode" default:"dev" enum:"dev,prod" help:"Run mode"`
+	Addr    v5.HostPort `flag:"addr"    default:"localhost:8080" help:"Listen address"`
+	Mode    v5.Enum     `flag:"mode"    default:"dev" values:"dev,staging,prod" help:"Run mode"`
+	Timeout v5.Duration `flag:"timeout" default:"30s" help:"Shutdown timeout"`
+	Log     v5.LogLevel `flag:"log"     default:"info" help:"Log level"`
+}
+
+type AppConfig struct{}
+
+func main() {
+	cli, err := v5.NewCLI[AppConfig]("serve", "Typed value example", AppConfig{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	b := v5.NewBuilder(cli)
+	v5.Add(b, "start", ServerFlags{},
+		func(_ context.Context, _ *AppConfig, f ServerFlags) error {
+			fmt.Printf("listen=%s mode=%s level=%s timeout=%s\n", f.Addr, f.Mode, f.Log, f.Timeout)
+			return nil
+		},
+		v5.WithShort("Start the server"),
+		v5.WithExample("serve start --mode prod --log json"),
+	)
+	if err := b.Build(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
 }
 ```
 
-Invalid values are caught at parse time with descriptive errors — no runtime panics.
+`Enum` needs a `values` tag: parsing checks the value against that list, so a bare `Enum` field with no allowed values cannot accept a default. `LogLevel` and `LogFormat` carry their own allowed sets and only need `values` when you want a narrower list. `time.Duration` and `time.Time` work directly as field types.
 
-## Register Custom Type Handlers
+## Registering a Custom Type
 
-Add your own types with `RegisterTypeHandler`:
-
-```go
-v4.RegisterTypeHandler(reflect.TypeFor[MyType](), v4.TypeHandlerFunc{
-    ParseFunc: func(value string, _ v4.FlagTag) (any, error) {
-        return MyType{Value: value}, nil
-    },
-    DefaultFunc: func(_ v4.FlagTag) any {
-        return MyType{}
-    },
-})
-```
-
-- `ParseFunc` — converts a string flag value to your type, returning an error on invalid input.
-- `DefaultFunc` — returns the zero value when no flag is provided.
-
-## Copy-on-Write Registry
-
-Package-level `RegisterTypeHandler` writes to the global registry (visible to all CLI instances). For instance-local handlers, use the `FlagRegistry` method:
+A custom type is wired in with a `TypeCodec`. The interface has three parts:
 
 ```go
-// Global — affects all CLI instances that haven't cloned yet
-v4.RegisterTypeHandler(reflect.TypeFor[MyType](), handler)
-
-// Instance-local — triggers a lazy clone, writes only to this CLI's registry
-fr := cli.FlagRegistry()
-fr.RegisterTypeHandler(reflect.TypeFor[MyType](), handler)
+type TypeCodec interface {
+	Register(flags *pflag.FlagSet, tag FlagTag) error
+	Parse(value string, tag FlagTag) (any, error)
+	Default(tag FlagTag) any
+}
 ```
 
-This copy-on-write pattern keeps `NewCLI` fast (~48% reduction) while allowing per-instance customization.
+Most codecs use the `TypeCodecFunc` adapter instead of a named struct. `RegisterFunc` is mandatory: a codec that registers nothing makes the flag vanish and surface later as "unknown flag", so cmdguard rejects it at registration time.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"reflect"
+	"strings"
+
+	"github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
+	"github.com/spf13/pflag"
+)
+
+// Env is a domain type that only accepts known environment names.
+type Env struct{ name string }
+
+func (e Env) String() string { return e.name }
+
+func ParseEnv(s string) (Env, error) {
+	switch v := strings.ToLower(s); v {
+	case "dev", "staging", "prod":
+		return Env{name: v}, nil
+	default:
+		return Env{}, fmt.Errorf("unknown environment %q", s)
+	}
+}
+
+type DeployFlags struct {
+	Target Env `flag:"target" default:"dev" help:"Deployment target"`
+}
+
+type AppConfig struct{}
+
+func main() {
+	err := v5.RegisterTypeCodec(reflect.TypeFor[Env](), v5.TypeCodecFunc{
+		RegisterFunc: func(flags *pflag.FlagSet, tag v5.FlagTag) error {
+			flags.StringP(tag.Name, tag.Short, tag.Default, tag.Help)
+			return nil
+		},
+		ParseFunc: func(value string, _ v5.FlagTag) (any, error) {
+			return ParseEnv(value)
+		},
+		DefaultFunc: func(tag v5.FlagTag) any {
+			if tag.Default == "" {
+				return Env{}
+			}
+			env, err := ParseEnv(tag.Default)
+			if err != nil {
+				return Env{}
+			}
+			return env
+		},
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli, err := v5.NewCLI[AppConfig]("deploy", "Custom type example", AppConfig{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	b := v5.NewBuilder(cli)
+	v5.Add(b, "plan", DeployFlags{},
+		func(_ context.Context, _ *AppConfig, f DeployFlags) error {
+			fmt.Println("target:", f.Target)
+			return nil
+		},
+		v5.WithShort("Plan a deployment"),
+	)
+	if err := b.Build(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	cli.ExecuteAndExit(context.Background())
+}
+```
+
+The three callbacks have distinct jobs:
+
+- `RegisterFunc` adds the pflag that stores the raw value. Use `tag.Name`, `tag.Short`, `tag.Default`, and `tag.Help` so the flag looks native.
+- `ParseFunc` converts the raw string to your type. Return a descriptive error for invalid input; it is wrapped with the flag name and value.
+- `DefaultFunc` returns the typed default when the tag declares one. Return the zero value when it does not.
+
+Register the codec before constructing the CLI or command that uses the type. Flags are registered once at construction, so a codec added later cannot retroactively register a flag.
+
+## Defaults Are Validated at Construction
+
+A tag default is checked against the same rules as user input. An impossible default fails `NewCLI` instead of shipping a broken flag:
+
+```go
+type AppConfig struct {
+	Mode string `flag:"mode" default:"staging" values:"dev,prod"`
+}
+
+cli, err := v5.NewCLI[AppConfig]("app", "My app", AppConfig{})
+if errors.Is(err, v5.ErrInvalidFlagDefault) {
+	// "staging" is not in values:"dev,prod"
+}
+```
+
+The check covers `values` lists and every resolvable `validate` rule, including numeric bounds and length limits.
+
+## Global and Instance Registries
+
+`RegisterTypeCodec` writes to the package-level defaults. Every registry created afterwards sees the codec through a shared, copy-on-write view, so registration stays cheap until a registry actually writes.
+
+```go
+// Global: affects registries created after this call.
+err := v5.RegisterTypeCodec(reflect.TypeFor[Env](), codec)
+
+// Instance-local: build your own registry (custom wiring, tests, tooling).
+registry, err := v5.NewFlagRegistry(DeployFlags{})
+if err != nil {
+	return err
+}
+registry.RegisterTypeCodec(reflect.TypeFor[Env](), codec)
+```
+
+`FlagRegistry.RegisterTypeCodec` and `FlagRegistry.RegisterFlagValidator` write only to that registry and trigger a lazy clone on first write, so two registries never share mutations. To ship a codec plus validators as one reusable unit, see [Plugin System](/guides/plugins/).
 
 ## Custom Validators
 
-Register validation functions that run on every flag value:
+`validate` tags resolve validator names. Built-ins cover `email`, `url`, `nonempty`, `regex`, `min`, `max`, `minlen`, `maxlen`, `dmin`, and `dmax`; add your own with `RegisterValidator`:
 
 ```go
-v4.RegisterValidator("alphanumeric", func(value string) error {
-    matched, _ := regexp.MatchString(`^[a-zA-Z0-9]+$`, value)
-    if !matched {
-        return fmt.Errorf("must be alphanumeric")
-    }
-    return nil
+err := v5.RegisterValidator("alphanumeric", func(value string) error {
+	matched, _ := regexp.MatchString(`^[a-zA-Z0-9]+$`, value)
+	if !matched {
+		return fmt.Errorf("must be alphanumeric")
+	}
+	return nil
 })
 ```
+
+The signature is `v5.FlagValidator`, a `func(string) error`. Once registered, the name works in any tag and is checked against the declared default at construction:
+
+```go
+type Flags struct {
+	Slug string `flag:"slug" validate:"alphanumeric,minlen=3,maxlen=32" help:"Identifier"`
+}
+```
+
+Rules are applied to the value the flag resolves to, so a value from an environment variable or a tag default is validated too, not only one typed on the command line.
+
+## Nested Structs Stay Atomic
+
+Registered value types are leaves. A struct field of type `v5.Duration`, `v5.Port`, `v5.Email`, `v5.URL`, `v5.HostPort`, `v5.Enum`, `v5.FilePath`, `v5.LogLevel`, `v5.LogFormat`, `time.Duration`, or `time.Time` is never walked as a nested config group, even though some of them wrap a struct internally. Every other struct is recursed into unless it carries its own `flag` tag.
+
+## Where to go next
+
+- [Type-Safe Flags](/guides/type-safe-flags/) for the full tag and scope reference.
+- [Plugin System](/guides/plugins/) for bundling codecs and validators into one registration.
+- [Config Files](/guides/config-files/) for the same types as config-file values.
