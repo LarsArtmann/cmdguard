@@ -48,7 +48,7 @@ type DatabaseConfig struct {
 type AppConfig struct {
 	LogLevel string         `flag:"log-level" env:"APP_LOG_LEVEL" default:"info" help:"Log level"`
 	Database DatabaseConfig `help:"Database settings"`
-	Config   string         `flag:"config" help:"Path to the config file" local:"true"`
+	Config   string         `flag:"config" help:"Path to the config file"`
 }
 
 func main() {
@@ -83,8 +83,8 @@ Nested structs are walked, so `database.host` in the file feeds the `db-host` fl
 Strict key checking is ON by default in v5. A key that no field accepts fails the load with `ErrConfigUnknownKey`, naming the key and the file, plus a "did you mean" suggestion when the typo is close:
 
 ```bash
-$ app status --config broken.yaml
-Error: failed to load config file: loading config file: "/home/me/broken.yaml": unknown config key "db-hots" (did you mean "db-host"?)
+$ app status --config /etc/app/broken.yaml
+Error: failed to load config file: loading config file: "/etc/app/broken.yaml": unknown config key "db-hots" (did you mean "db-host"?)
 ```
 
 Opt out with `WithoutStrictConfigKeys()` when the same file is shared with other tools and may carry extra keys. `cli.StrictConfigKeys()` reports the current mode. A key is accepted when it matches any of these spellings:
@@ -126,7 +126,7 @@ Call it after `Execute` to describe that run, or before it to describe the const
 
 ## Custom Loaders
 
-`WithConfigFileLoader` takes anything implementing `ConfigFileLoader`, whose single method is `Load(data []byte, cfg any) (setFields []string, err error)`. The returned field names are what lets cmdguard treat file values as defaults that flags and env vars override, so a loader that returns an empty slice gets file values without the precedence behavior. `data` may be nil for loaders that read their own files; the built-in loader is exported, so you can also construct one explicitly:
+`WithConfigFileLoader` takes anything implementing `ConfigFileLoader`, whose single method is `Load(data []byte, cfg any) (setFields []string, err error)`. The returned field names are what lets cmdguard treat file values as defaults that flags and env vars override, so a loader that returns an empty slice lets the flag defaults overwrite the file values at parse time. `data` may be nil for loaders that read their own files; the built-in loader is exported, so you can also construct one explicitly:
 
 ```go
 loader := v5.NewKoanfLoader("$HOME/.config/app/config.toml", "/etc/app/config.toml")
