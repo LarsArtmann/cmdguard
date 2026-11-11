@@ -126,16 +126,16 @@ def go_sources(directory: str, export: bool) -> set[str]:
             continue
         text = open(path, encoding="utf-8").read()
         if export:
-            names |= set(re.findall(r"^func ([A-Z]\w*)", text, re.M))
-            names |= set(re.findall(r"^type ([A-Z]\w*)", text, re.M))
-            names |= set(re.findall(r"^var ([A-Z]\w*)", text, re.M))
-            names |= set(re.findall(r"^const ([A-Z]\w*)", text, re.M))
+            names |= set(re.findall(r"^func ([A-Z]\w*)", text, re.MULTILINE))
+            names |= set(re.findall(r"^type ([A-Z]\w*)", text, re.MULTILINE))
+            names |= set(re.findall(r"^var ([A-Z]\w*)", text, re.MULTILINE))
+            names |= set(re.findall(r"^const ([A-Z]\w*)", text, re.MULTILINE))
             names |= set(
-                re.findall(r"^\t([A-Z]\w*)\s+[A-Za-z_][\w.\[\]*]*\s*=", text, re.M)
+                re.findall(r"^\t([A-Z]\w*)\s+[A-Za-z_][\w.\[\]*]*\s*=", text, re.MULTILINE)
             )
-            names |= set(re.findall(r"^\t([A-Z]\w*)\s*=", text, re.M))
+            names |= set(re.findall(r"^\t([A-Z]\w*)\s*=", text, re.MULTILINE))
         else:
-            names |= set(re.findall(r"^func \([^)]*\) ([A-Z]\w*)", text, re.M))
+            names |= set(re.findall(r"^func \([^)]*\) ([A-Z]\w*)", text, re.MULTILINE))
     return names
 
 
@@ -173,7 +173,7 @@ def go_blocks() -> list[tuple[str, int, str]]:
     blocks: list[tuple[str, int, str]] = []
     for path in glob.glob(os.path.join(DOCS, "**", "*.mdx"), recursive=True):
         text = open(path, encoding="utf-8").read()
-        for match in re.finditer(r"```go\n(.*?)```", text, re.S):
+        for match in re.finditer(r"```go\n(.*?)```", text, re.DOTALL):
             code = match.group(1)
             if not code.lstrip().startswith("package main"):
                 continue
@@ -209,11 +209,9 @@ def compile_samples() -> None:
 
         with open(module, "w", encoding="utf-8") as handle:
             handle.write("module docscheck\n\ngo 1.27\n\nrequire (\n")
-            for requirement in requires:
-                handle.write(f"\t{requirement}\n")
+            handle.writelines(f"\t{requirement}\n" for requirement in requires)
             handle.write(")\n\nreplace (\n")
-            for replacement in replaces:
-                handle.write(f"\t{replacement}\n")
+            handle.writelines(f"\t{replacement}\n" for replacement in replaces)
             handle.write(")\n")
 
         env = os.environ | {
