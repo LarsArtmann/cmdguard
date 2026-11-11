@@ -1,0 +1,113 @@
+{
+  "schema_version": "1",
+  "name": "docs-generator",
+  "short": "Generate CLI documentation with cmdguard",
+  "version": "dev",
+  "flags": [
+    {
+      "name": "help",
+      "shorthand": "h",
+      "type": "bool",
+      "default": "false",
+      "usage": "help for docs-generator"
+    },
+    {
+      "name": "no-color",
+      "type": "bool",
+      "default": "false",
+      "usage": "Disable colored output (also respected via NO_COLOR env var)"
+    },
+    {
+      "name": "output",
+      "shorthand": "o",
+      "type": "string",
+      "default": "markdown",
+      "usage": "Output format"
+    },
+    {
+      "name": "version",
+      "shorthand": "v",
+      "type": "bool",
+      "default": "false",
+      "usage": "version for docs-generator"
+    }
+  ],
+  "commands": [
+    {
+      "name": "deploy",
+      "path": "docs-generator deploy",
+      "short": "Deploy the application",
+      "long": "Deploy the application to a target environment with optional dry-run mode.",
+      "example": "docs-generator deploy -e staging --dry-run",
+      "flags": [
+        {
+          "name": "dry-run",
+          "type": "bool",
+          "default": "false",
+          "usage": "Print actions without executing"
+        },
+        {
+          "name": "environment",
+          "shorthand": "e",
+          "type": "string",
+          "default": "production",
+          "usage": "Target environment"
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for deploy"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "markdown",
+          "usage": "Output format",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "status",
+      "path": "docs-generator status",
+      "short": "Show deployment status",
+      "example": "docs-generator status",
+      "flags": [
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for status"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "markdown",
+          "usage": "Output format",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    }
+  ]
+}

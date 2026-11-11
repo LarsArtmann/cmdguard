@@ -20,7 +20,10 @@ type deployFlags struct {
 	DryRun      bool   `flag:"dry-run"                                    help:"Print actions without executing"`
 }
 
-func main() {
+// newContractCLI builds the full command tree. main() and the describe
+// contract snapshot test share it so the golden always matches the shipped
+// binary's contract.
+func newContractCLI() (*v5.CLI[config], error) {
 	cli, err := v5.NewCLI(
 		"docs-generator",
 		"Generate CLI documentation with cmdguard",
@@ -28,8 +31,7 @@ func main() {
 		v5.WithCLIVersion(version.Version),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	deployCmd, err := v5.NewCommand(
@@ -44,8 +46,7 @@ func main() {
 		v5.WithExample("docs-generator deploy -e staging --dry-run"),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	statusCmd, err := v5.NewCommand(
@@ -59,16 +60,23 @@ func main() {
 		v5.WithExample("docs-generator status"),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	if err := v5.AddCommand(cli, deployCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	if err := v5.AddCommand(cli, statusCmd); err != nil {
+		return nil, err
+	}
+
+	return cli, nil
+}
+
+func main() {
+	cli, err := newContractCLI()
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}

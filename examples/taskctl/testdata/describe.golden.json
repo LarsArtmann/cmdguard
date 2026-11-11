@@ -1,0 +1,1408 @@
+{
+  "schema_version": "1",
+  "name": "taskctl",
+  "short": "A production-grade task manager CLI",
+  "version": "1.0.0",
+  "flags": [
+    {
+      "name": "admin-email",
+      "type": "string",
+      "default": "admin@example.com",
+      "usage": "Admin contact email"
+    },
+    {
+      "name": "api-url",
+      "type": "string",
+      "default": "http://localhost:8080",
+      "usage": "API base URL"
+    },
+    {
+      "name": "data-dir",
+      "shorthand": "d",
+      "type": "string",
+      "default": "./data",
+      "usage": "Directory for task storage",
+      "env": "TASK_DATA_DIR"
+    },
+    {
+      "name": "help",
+      "shorthand": "h",
+      "type": "bool",
+      "default": "false",
+      "usage": "help for taskctl"
+    },
+    {
+      "name": "log-level",
+      "shorthand": "l",
+      "type": "string",
+      "default": "info",
+      "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+      "env": "TASK_LOG_LEVEL"
+    },
+    {
+      "name": "no-color",
+      "type": "bool",
+      "default": "false",
+      "usage": "Disable colored output (also respected via NO_COLOR env var)"
+    },
+    {
+      "name": "port",
+      "type": "string",
+      "default": "8080",
+      "usage": "API port"
+    },
+    {
+      "name": "timeout",
+      "type": "string",
+      "default": "30s",
+      "usage": "Default operation timeout"
+    },
+    {
+      "name": "verbose",
+      "shorthand": "v",
+      "type": "count",
+      "default": "0",
+      "usage": "Verbosity (-v, -vv, -vvv)",
+      "count": true
+    },
+    {
+      "name": "version",
+      "type": "bool",
+      "default": "false",
+      "usage": "version for taskctl"
+    }
+  ],
+  "commands": [
+    {
+      "name": "add",
+      "path": "taskctl add",
+      "short": "Add a new task",
+      "long": "# Add Task\n\nCreate a new task with a **title** and *priority*.\n\nThe `--title` flag is **required** and will prompt interactively if omitted.\n\nPriority must be one of: `low`, `medium`, `high` (default: `medium`).",
+      "example": "taskctl add --title \"Fix bug\" --priority high",
+      "group": "tasks",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for add"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "priority",
+          "shorthand": "P",
+          "type": "string",
+          "default": "medium",
+          "usage": "Priority",
+          "values": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "title",
+          "shorthand": "t",
+          "type": "string",
+          "usage": "Task title",
+          "required": true,
+          "prompt": "Task title?",
+          "validate": "min=3"
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "complete",
+      "path": "taskctl complete",
+      "short": "Deprecated: use done",
+      "deprecated": "Use 'done' instead",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for complete"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "config",
+      "path": "taskctl config",
+      "short": "Configuration management",
+      "long": "Configuration management",
+      "group": "system",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for config"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": [
+        {
+          "name": "edit",
+          "path": "taskctl config edit",
+          "short": "Show config location",
+          "flags": [
+            {
+              "name": "admin-email",
+              "type": "string",
+              "default": "admin@example.com",
+              "usage": "Admin contact email",
+              "inherited": true
+            },
+            {
+              "name": "api-url",
+              "type": "string",
+              "default": "http://localhost:8080",
+              "usage": "API base URL",
+              "inherited": true
+            },
+            {
+              "name": "data-dir",
+              "shorthand": "d",
+              "type": "string",
+              "default": "./data",
+              "usage": "Directory for task storage",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for edit"
+            },
+            {
+              "name": "log-level",
+              "shorthand": "l",
+              "type": "string",
+              "default": "info",
+              "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+              "inherited": true
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "port",
+              "type": "string",
+              "default": "8080",
+              "usage": "API port",
+              "inherited": true
+            },
+            {
+              "name": "timeout",
+              "type": "string",
+              "default": "30s",
+              "usage": "Default operation timeout",
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity (-v, -vv, -vvv)",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        },
+        {
+          "name": "show",
+          "path": "taskctl config show",
+          "short": "Show resolved configuration",
+          "flags": [
+            {
+              "name": "admin-email",
+              "type": "string",
+              "default": "admin@example.com",
+              "usage": "Admin contact email",
+              "inherited": true
+            },
+            {
+              "name": "api-url",
+              "type": "string",
+              "default": "http://localhost:8080",
+              "usage": "API base URL",
+              "inherited": true
+            },
+            {
+              "name": "data-dir",
+              "shorthand": "d",
+              "type": "string",
+              "default": "./data",
+              "usage": "Directory for task storage",
+              "inherited": true
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for show"
+            },
+            {
+              "name": "log-level",
+              "shorthand": "l",
+              "type": "string",
+              "default": "info",
+              "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+              "inherited": true
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "port",
+              "type": "string",
+              "default": "8080",
+              "usage": "API port",
+              "inherited": true
+            },
+            {
+              "name": "timeout",
+              "type": "string",
+              "default": "30s",
+              "usage": "Default operation timeout",
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity (-v, -vv, -vvv)",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        }
+      ]
+    },
+    {
+      "name": "db",
+      "path": "taskctl db",
+      "short": "Database operations",
+      "long": "Database operations",
+      "group": "system",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "env",
+          "shorthand": "e",
+          "type": "string",
+          "default": "dev",
+          "usage": "Environment (dev, staging, prod)"
+        },
+        {
+          "name": "force",
+          "shorthand": "f",
+          "type": "bool",
+          "default": "false",
+          "usage": "Skip confirmation prompts"
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for db"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": [
+        {
+          "name": "migrate",
+          "path": "taskctl db migrate",
+          "short": "Run database migrations",
+          "long": "# Database Migrations\n\nRun pending database migrations against the configured environment.\n\nUse `--force` to skip confirmation prompts in **CI/CD** pipelines.",
+          "flags": [
+            {
+              "name": "admin-email",
+              "type": "string",
+              "default": "admin@example.com",
+              "usage": "Admin contact email",
+              "inherited": true
+            },
+            {
+              "name": "api-url",
+              "type": "string",
+              "default": "http://localhost:8080",
+              "usage": "API base URL",
+              "inherited": true
+            },
+            {
+              "name": "data-dir",
+              "shorthand": "d",
+              "type": "string",
+              "default": "./data",
+              "usage": "Directory for task storage",
+              "inherited": true
+            },
+            {
+              "name": "env",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Environment (dev, staging, prod)"
+            },
+            {
+              "name": "force",
+              "shorthand": "f",
+              "type": "bool",
+              "default": "false",
+              "usage": "Skip confirmation prompts"
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for migrate"
+            },
+            {
+              "name": "log-level",
+              "shorthand": "l",
+              "type": "string",
+              "default": "info",
+              "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+              "inherited": true
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "port",
+              "type": "string",
+              "default": "8080",
+              "usage": "API port",
+              "inherited": true
+            },
+            {
+              "name": "timeout",
+              "type": "string",
+              "default": "30s",
+              "usage": "Default operation timeout",
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity (-v, -vv, -vvv)",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        },
+        {
+          "name": "seed",
+          "path": "taskctl db seed",
+          "short": "Seed the database",
+          "flags": [
+            {
+              "name": "admin-email",
+              "type": "string",
+              "default": "admin@example.com",
+              "usage": "Admin contact email",
+              "inherited": true
+            },
+            {
+              "name": "api-url",
+              "type": "string",
+              "default": "http://localhost:8080",
+              "usage": "API base URL",
+              "inherited": true
+            },
+            {
+              "name": "data-dir",
+              "shorthand": "d",
+              "type": "string",
+              "default": "./data",
+              "usage": "Directory for task storage",
+              "inherited": true
+            },
+            {
+              "name": "env",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Environment (dev, staging, prod)"
+            },
+            {
+              "name": "force",
+              "shorthand": "f",
+              "type": "bool",
+              "default": "false",
+              "usage": "Skip confirmation prompts"
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for seed"
+            },
+            {
+              "name": "log-level",
+              "shorthand": "l",
+              "type": "string",
+              "default": "info",
+              "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+              "inherited": true
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "port",
+              "type": "string",
+              "default": "8080",
+              "usage": "API port",
+              "inherited": true
+            },
+            {
+              "name": "timeout",
+              "type": "string",
+              "default": "30s",
+              "usage": "Default operation timeout",
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity (-v, -vv, -vvv)",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        },
+        {
+          "name": "status",
+          "path": "taskctl db status",
+          "short": "Check database status",
+          "flags": [
+            {
+              "name": "admin-email",
+              "type": "string",
+              "default": "admin@example.com",
+              "usage": "Admin contact email",
+              "inherited": true
+            },
+            {
+              "name": "api-url",
+              "type": "string",
+              "default": "http://localhost:8080",
+              "usage": "API base URL",
+              "inherited": true
+            },
+            {
+              "name": "data-dir",
+              "shorthand": "d",
+              "type": "string",
+              "default": "./data",
+              "usage": "Directory for task storage",
+              "inherited": true
+            },
+            {
+              "name": "env",
+              "shorthand": "e",
+              "type": "string",
+              "default": "dev",
+              "usage": "Environment (dev, staging, prod)"
+            },
+            {
+              "name": "force",
+              "shorthand": "f",
+              "type": "bool",
+              "default": "false",
+              "usage": "Skip confirmation prompts"
+            },
+            {
+              "name": "help",
+              "shorthand": "h",
+              "type": "bool",
+              "default": "false",
+              "usage": "help for status"
+            },
+            {
+              "name": "log-level",
+              "shorthand": "l",
+              "type": "string",
+              "default": "info",
+              "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+              "inherited": true
+            },
+            {
+              "name": "no-color",
+              "type": "bool",
+              "default": "false",
+              "usage": "Disable colored output (also respected via NO_COLOR env var)",
+              "inherited": true
+            },
+            {
+              "name": "port",
+              "type": "string",
+              "default": "8080",
+              "usage": "API port",
+              "inherited": true
+            },
+            {
+              "name": "timeout",
+              "type": "string",
+              "default": "30s",
+              "usage": "Default operation timeout",
+              "inherited": true
+            },
+            {
+              "name": "verbose",
+              "shorthand": "v",
+              "type": "count",
+              "default": "0",
+              "usage": "Verbosity (-v, -vv, -vvv)",
+              "inherited": true
+            }
+          ],
+          "commands": []
+        }
+      ]
+    },
+    {
+      "name": "doctor",
+      "path": "taskctl doctor",
+      "short": "Check system health",
+      "long": "Run health checks on all services and report diagnostic status.",
+      "example": "taskctl doctor",
+      "group": "system",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for doctor"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "done",
+      "path": "taskctl done",
+      "short": "Mark a task as done",
+      "example": "taskctl done --id 1",
+      "group": "tasks",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for done"
+        },
+        {
+          "name": "id",
+          "shorthand": "i",
+          "type": "uint",
+          "default": "0",
+          "usage": "Task ID to complete",
+          "required": true
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "inspect",
+      "path": "taskctl inspect",
+      "short": "Inspect a task in detail",
+      "example": "taskctl inspect 1",
+      "group": "tasks",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for inspect"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "metadata",
+          "shorthand": "m",
+          "type": "bool",
+          "default": "false",
+          "usage": "Show metadata"
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "list",
+      "path": "taskctl list",
+      "short": "List tasks",
+      "long": "# List Tasks\n\nDisplay all tasks with optional filtering by priority and completion status.\n\nSupports multiple **output formats** for scripting and automation:\n\n- `table` (default) — human-readable columnar output\n- `json` — structured JSON for piping into `jq`\n- `csv` — comma-separated for spreadsheet import\n- `yaml` — structured YAML for config files",
+      "example": "taskctl list --format json --all",
+      "aliases": [
+        "ls"
+      ],
+      "group": "tasks",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "all",
+          "shorthand": "a",
+          "type": "bool",
+          "default": "false",
+          "usage": "Show completed tasks too"
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "format",
+          "shorthand": "f",
+          "type": "string",
+          "default": "table",
+          "usage": "Output format (table, json, csv, yaml)"
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for list"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "priority",
+          "type": "string",
+          "usage": "Filter by priority (low, medium, high)"
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "secret",
+      "path": "taskctl secret",
+      "short": "Secret command",
+      "hidden": true,
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for secret"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "stats",
+      "path": "taskctl stats",
+      "short": "Show task statistics",
+      "example": "taskctl stats --format json",
+      "group": "tasks",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "format",
+          "shorthand": "f",
+          "type": "string",
+          "default": "table",
+          "usage": "Output format (table, json)"
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for stats"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    },
+    {
+      "name": "version",
+      "path": "taskctl version",
+      "short": "Print version information",
+      "long": "Print the version of taskctl.",
+      "example": "taskctl version",
+      "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        {
+          "name": "api-url",
+          "type": "string",
+          "default": "http://localhost:8080",
+          "usage": "API base URL",
+          "inherited": true
+        },
+        {
+          "name": "data-dir",
+          "shorthand": "d",
+          "type": "string",
+          "default": "./data",
+          "usage": "Directory for task storage",
+          "inherited": true
+        },
+        {
+          "name": "help",
+          "shorthand": "h",
+          "type": "bool",
+          "default": "false",
+          "usage": "help for version"
+        },
+        {
+          "name": "log-level",
+          "shorthand": "l",
+          "type": "string",
+          "default": "info",
+          "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+          "inherited": true
+        },
+        {
+          "name": "no-color",
+          "type": "bool",
+          "default": "false",
+          "usage": "Disable colored output (also respected via NO_COLOR env var)",
+          "inherited": true
+        },
+        {
+          "name": "port",
+          "type": "string",
+          "default": "8080",
+          "usage": "API port",
+          "inherited": true
+        },
+        {
+          "name": "timeout",
+          "type": "string",
+          "default": "30s",
+          "usage": "Default operation timeout",
+          "inherited": true
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "count",
+          "default": "0",
+          "usage": "Verbosity (-v, -vv, -vvv)",
+          "inherited": true
+        }
+      ],
+      "commands": []
+    }
+  ]
+}
