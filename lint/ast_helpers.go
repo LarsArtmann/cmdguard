@@ -256,7 +256,21 @@ func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[strin
 
 	visitCallAssignments(body, func(call *ast.CallExpr) bool {
 		sel := selectorExprOf(call)
-		if sel == nil || sel.Sel == nil || !constructorNames[sel.Sel.Name] {
+		if sel == nil || sel.Sel == nil {
+			// Dot import: constructors land in file scope as bare
+			// identifiers (`NewCLI(...)` under `. "…/v5/pkg/cmdguard/v5"`),
+			// so the call carries no selector to resolve. Match on the name
+			// only when THIS file dot-imports a cmdguard core package —
+			// a dot import makes every bare name unambiguous file scope.
+			if ident, ok := call.Fun.(*ast.Ident); ok && constructorNames[ident.Name] {
+				path, dot := f.imports["."]
+				return dot && majorOf(path) != ""
+			}
+
+			return false
+		}
+
+		if !constructorNames[sel.Sel.Name] {
 			return false
 		}
 

@@ -19,7 +19,7 @@ import (
 // documented pattern), which is why this is a recorded gap rather than a
 // release blocker.
 
-func TestDotImport_BareConstructorsAreUntraced_KnownGap(t *testing.T) {
+func TestDotImport_BareConstructorsAreTraced(t *testing.T) {
 	t.Parallel()
 
 	findings := detectOn(t, map[string]string{
@@ -41,12 +41,12 @@ func main() {
 `,
 	})
 
-	// Pins the CURRENT behavior: bare dot-imported NewCLI is not recognized,
-	// so no CG001 fires. If this test starts FAILING with a CG001 finding,
-	// the H9b gap was fixed — update this test to expect the finding and
-	// strike the TODO_LIST row.
-	if got := ruleIDsOf(t, findings); len(got) != 0 {
-		t.Errorf("rules=%v, want none (known gap: dot-imported constructors are untraced; H9b fixes this)", got)
+	// H9b closed (2026-11-11): a dot import puts cmdguard's symbols in file
+	// scope, so bare constructor calls are traced like qualified ones and
+	// the panic on the constructor error is flagged (CG003). Before the
+	// fix this pinned zero findings as a known gap.
+	if got := ruleIDsOf(t, findings); len(got) != 1 || got[0] != "CG003" {
+		t.Errorf("rules=%v, want exactly [CG003] (dot-imported bare constructors must be traced)", got)
 	}
 }
 
