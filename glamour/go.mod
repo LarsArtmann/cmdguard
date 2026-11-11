@@ -73,7 +73,7 @@ require (
 	github.com/samber/do/v2 v2.1.0 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
-	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/spf13/pflag v1.1.0 // indirect
 	github.com/xo/terminfo v1.3.1 // indirect
 	github.com/yuin/goldmark v1.8.7 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
