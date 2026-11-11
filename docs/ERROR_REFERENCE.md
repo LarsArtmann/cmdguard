@@ -100,109 +100,109 @@ All typed errors implement `Unwrap()` for `errors.Is()`/`errors.As()` chaining.
 
 ### flag errors
 
-| Code                      | Sentinel                   | Message                          | Hint                                                                                |
-| ------------------------- | -------------------------- | -------------------------------- | ----------------------------------------------------------------------------------- |
-| `flag_instance`           | `ErrFlagInstance`          | `failed to create flag instance` | the flags value could not be copied; use a struct or pointer to struct              |
-| `flag_not_found`          | `ErrFlagNotFound`          | `flag not found`                 | check the flag name against this command's --help output                            |
-| `flag_parse_failed`       | `ErrFlagParseFailed`       | `failed to parse flags`          | run this command with --help to see the accepted flags                              |
-| `invalid_duration`        | `ErrInvalidDuration`       | `invalid duration`               | use a duration like 30s, 5m, or 2h                                                  |
-| `invalid_email`           | `ErrInvalidEmail`          | `invalid email address`          | use an address like name@example.com                                                |
-| `invalid_enum`            | `ErrInvalidEnum`           | `invalid enum value`             | use one of the allowed values listed in this flag's --help text                     |
-| `invalid_file_path`       | `ErrInvalidFilePath`       | `invalid file path`              | check the path syntax and that the file exists                                      |
-| `invalid_flag_default`    | `ErrInvalidFlagDefault`    | `invalid flag default`           | fix the flag's default so it satisfies the same tag's values and validate rules     |
-| `invalid_flag_type`       | `ErrInvalidFlagType`       | `invalid flag type`              | use a struct (or pointer to struct) for the command's flags type                    |
-| `invalid_host_port`       | `ErrInvalidHostPort`       | `invalid host:port`              | use host:port, for example localhost:8080                                           |
-| `invalid_port`            | `ErrInvalidPort`           | `invalid port`                   | use a port between 1 and 65535                                                      |
-| `invalid_url`             | `ErrInvalidURL`            | `invalid URL`                    | use a full URL including scheme, for example https://example.com                    |
-| `invalid_validator_param` | `ErrInvalidValidatorParam` | `invalid validator parameter`    | fix the parameter syntax in the flag's validate tag                                 |
-| `log_format`              | `ErrLogFormat`             | `invalid log format`             | use one of: text, json                                                              |
-| `log_level`               | `ErrLogLevel`              | `invalid log level`              | use one of: debug, info, warn, error                                                |
-| `nil_value`               | `ErrNilValue`              | `value must not be nil`          | provide a value; nil is not accepted here                                           |
-| `required_flag`           | `ErrRequiredFlag`          | `required flag not set`          | pass the flag on the command line, or set its env var or config-file value          |
-| `type_conversion`         | `ErrTypeConversion`        | `type conversion failed`         | use a supported flag type or register a TypeCodec for this type                     |
-| `unknown_validator`       | `ErrUnknownValidator`      | `unknown validator`              | use a validator registered with RegisterValidator, or fix the validate tag spelling |
-| `unsupported_conversion`  | `ErrUnsupportedConversion` | `unsupported string conversion`  | use a supported flag type or register a TypeCodec for this type                     |
-| `value_empty`             | `ErrValueEmpty`            | `value is empty`                 | provide a non-empty value for this flag                                             |
-| `value_out_of_range`      | `ErrValueOutOfRange`       | `value out of range`             | choose a value that fits the flag's declared type                                   |
-| `value_pattern_mismatch`  | `ErrValuePatternMismatch`  | `value does not match pattern`   | match the pattern required by the flag's validate rule                              |
-| `value_too_large`         | `ErrValueTooLarge`         | `value too large`                | lower the value so it satisfies the flag's validate rule                            |
-| `value_too_long`          | `ErrValueTooLong`          | `value too long`                 | provide a shorter value that satisfies the flag's validate rule                     |
-| `value_too_short`         | `ErrValueTooShort`         | `value too short`                | provide a longer value that satisfies the flag's validate rule                      |
-| `value_too_small`         | `ErrValueTooSmall`         | `value too small`                | raise the value so it satisfies the flag's validate rule                            |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
+| `flag_instance` | `ErrFlagInstance` | `failed to create flag instance` | the flags value could not be copied; use a struct or pointer to struct |
+| `flag_not_found` | `ErrFlagNotFound` | `flag not found` | check the flag name against this command's --help output |
+| `flag_parse_failed` | `ErrFlagParseFailed` | `failed to parse flags` | run this command with --help to see the accepted flags |
+| `invalid_duration` | `ErrInvalidDuration` | `invalid duration` | use a duration like 30s, 5m, or 2h |
+| `invalid_email` | `ErrInvalidEmail` | `invalid email address` | use an address like name@example.com |
+| `invalid_enum` | `ErrInvalidEnum` | `invalid enum value` | use one of the allowed values listed in this flag's --help text |
+| `invalid_file_path` | `ErrInvalidFilePath` | `invalid file path` | check the path syntax and that the file exists |
+| `invalid_flag_default` | `ErrInvalidFlagDefault` | `invalid flag default` | fix the flag's default so it satisfies the same tag's values and validate rules |
+| `invalid_flag_type` | `ErrInvalidFlagType` | `invalid flag type` | use a struct (or pointer to struct) for the command's flags type |
+| `invalid_host_port` | `ErrInvalidHostPort` | `invalid host:port` | use host:port, for example localhost:8080 |
+| `invalid_port` | `ErrInvalidPort` | `invalid port` | use a port between 1 and 65535 |
+| `invalid_url` | `ErrInvalidURL` | `invalid URL` | use a full URL including scheme, for example https://example.com |
+| `invalid_validator_param` | `ErrInvalidValidatorParam` | `invalid validator parameter` | fix the parameter syntax in the flag's validate tag |
+| `log_format` | `ErrLogFormat` | `invalid log format` | use one of: text, json |
+| `log_level` | `ErrLogLevel` | `invalid log level` | use one of: debug, info, warn, error |
+| `nil_value` | `ErrNilValue` | `value must not be nil` | provide a value; nil is not accepted here |
+| `required_flag` | `ErrRequiredFlag` | `required flag not set` | pass the flag on the command line, or set its env var or config-file value |
+| `type_conversion` | `ErrTypeConversion` | `type conversion failed` | use a supported flag type or register a TypeCodec for this type |
+| `unknown_validator` | `ErrUnknownValidator` | `unknown validator` | use a validator registered with RegisterValidator, or fix the validate tag spelling |
+| `unsupported_conversion` | `ErrUnsupportedConversion` | `unsupported string conversion` | use a supported flag type or register a TypeCodec for this type |
+| `value_empty` | `ErrValueEmpty` | `value is empty` | provide a non-empty value for this flag |
+| `value_out_of_range` | `ErrValueOutOfRange` | `value out of range` | choose a value that fits the flag's declared type |
+| `value_pattern_mismatch` | `ErrValuePatternMismatch` | `value does not match pattern` | match the pattern required by the flag's validate rule |
+| `value_too_large` | `ErrValueTooLarge` | `value too large` | lower the value so it satisfies the flag's validate rule |
+| `value_too_long` | `ErrValueTooLong` | `value too long` | provide a shorter value that satisfies the flag's validate rule |
+| `value_too_short` | `ErrValueTooShort` | `value too short` | provide a longer value that satisfies the flag's validate rule |
+| `value_too_small` | `ErrValueTooSmall` | `value too small` | raise the value so it satisfies the flag's validate rule |
 
 ### config errors
 
-| Code                    | Sentinel                | Message                              | Hint                                                                                      |
-| ----------------------- | ----------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------- |
-| `config_file_load`      | `ErrConfigFileLoad`     | `failed to load config file`         | check the config file path, permissions, and syntax                                       |
-| `config_file_not_found` | `ErrConfigFileNotFound` | `config file not found`              | pass --config with an existing path, or rely on defaults by omitting the file             |
-| `config_file_parse`     | `ErrConfigFileParse`    | `failed to parse config file`        | check the config file's syntax and that its extension matches its JSON/YAML/TOML content  |
-| `config_file_read`      | `ErrConfigFileRead`     | `failed to read config file`         | check that the config file exists and is readable by this user                            |
-| `config_nil`            | `ErrConfigNil`          | `config must not be nil`             | pass the config value instead of nil                                                      |
-| `config_not_pointer`    | `ErrConfigNotPointer`   | `config must be a pointer to struct` | pass a pointer to a struct as the config type                                             |
-| `config_unknown_key`    | `ErrConfigUnknownKey`   | `unknown config key`                 | fix or remove the key; its spelling must match a struct field, a json tag, or a flag name |
-| `config_validation`     | `ErrConfigValidation`   | `config validation failed`           | fix the reported config fields at their source: flag, env var, or config file             |
-| `field_not_found`       | `ErrFieldNotFound`      | `field not found`                    | check the struct field name used by the flag tag                                          |
-| `field_not_settable`    | `ErrFieldNotSettable`   | `field is not settable`              | export the struct field so it can receive a parsed flag value                             |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
+| `config_file_load` | `ErrConfigFileLoad` | `failed to load config file` | check the config file path, permissions, and syntax |
+| `config_file_not_found` | `ErrConfigFileNotFound` | `config file not found` | pass --config with an existing path, or rely on defaults by omitting the file |
+| `config_file_parse` | `ErrConfigFileParse` | `failed to parse config file` | check the config file's syntax and that its extension matches its JSON/YAML/TOML content |
+| `config_file_read` | `ErrConfigFileRead` | `failed to read config file` | check that the config file exists and is readable by this user |
+| `config_nil` | `ErrConfigNil` | `config must not be nil` | pass the config value instead of nil |
+| `config_not_pointer` | `ErrConfigNotPointer` | `config must be a pointer to struct` | pass a pointer to a struct as the config type |
+| `config_unknown_key` | `ErrConfigUnknownKey` | `unknown config key` | fix or remove the key; its spelling must match a struct field, a json tag, or a flag name |
+| `config_validation` | `ErrConfigValidation` | `config validation failed` | fix the reported config fields at their source: flag, env var, or config file |
+| `field_not_found` | `ErrFieldNotFound` | `field not found` | check the struct field name used by the flag tag |
+| `field_not_settable` | `ErrFieldNotSettable` | `field is not settable` | export the struct field so it can receive a parsed flag value |
 
 ### command errors
 
-| Code                 | Sentinel              | Message                                          | Hint                                                                         |
-| -------------------- | --------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `command_panic`      | `ErrCommandPanic`     | `command panicked`                               | this is a bug in the CLI: inspect the handler that panicked                  |
-| `command_timeout`    | `ErrCommandTimeout`   | `command timed out`                              | raise the timeout or make the operation faster; the context deadline expired |
-| `duplicate_command`  | `ErrDuplicateCommand` | `duplicate command`                              | rename one command; the first word of Use must be unique in the CLI          |
-| `invalid_arg_range`  | `ErrInvalidArgRange`  | `minimum argument count must not exceed maximum` | fix the command registration: minimum args must not exceed maximum args      |
-| `invalid_command`    | `ErrInvalidCommand`   | `invalid command`                                | check the command definition for empty names or missing handlers             |
-| `missing_example`    | `ErrMissingExample`   | `command has no example`                         | add WithExample(...) or relax validation with WithStrictValidation           |
-| `missing_handler`    | `ErrMissingHandler`   | `command has no handler`                         | give the command a RunE handler or at least one subcommand                   |
-| `missing_long`       | `ErrMissingLong`      | `command has no long description`                | add WithLong(...) describing what this parent command groups                 |
-| `missing_name`       | `ErrMissingName`      | `command has no name`                            | pass a non-empty command name                                                |
-| `missing_short`      | `ErrMissingShort`     | `command has no short description`               | add WithShort(...) so this command is discoverable in --help                 |
-| `missing_version`    | `ErrMissingVersion`   | `version is required but not set`                | pass WithCLIVersion to NewCLI before registering VersionCommand              |
-| `negative_arg_count` | `ErrNegativeArgCount` | `argument count must not be negative`            | fix the command registration: argument counts cannot be negative             |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
+| `command_panic` | `ErrCommandPanic` | `command panicked` | this is a bug in the CLI: inspect the handler that panicked |
+| `command_timeout` | `ErrCommandTimeout` | `command timed out` | raise the timeout or make the operation faster; the context deadline expired |
+| `duplicate_command` | `ErrDuplicateCommand` | `duplicate command` | rename one command; the first word of Use must be unique in the CLI |
+| `invalid_arg_range` | `ErrInvalidArgRange` | `minimum argument count must not exceed maximum` | fix the command registration: minimum args must not exceed maximum args |
+| `invalid_command` | `ErrInvalidCommand` | `invalid command` | check the command definition for empty names or missing handlers |
+| `missing_example` | `ErrMissingExample` | `command has no example` | add WithExample(...) or relax validation with WithStrictValidation |
+| `missing_handler` | `ErrMissingHandler` | `command has no handler` | give the command a RunE handler or at least one subcommand |
+| `missing_long` | `ErrMissingLong` | `command has no long description` | add WithLong(...) describing what this parent command groups |
+| `missing_name` | `ErrMissingName` | `command has no name` | pass a non-empty command name |
+| `missing_short` | `ErrMissingShort` | `command has no short description` | add WithShort(...) so this command is discoverable in --help |
+| `missing_version` | `ErrMissingVersion` | `version is required but not set` | pass WithCLIVersion to NewCLI before registering VersionCommand |
+| `negative_arg_count` | `ErrNegativeArgCount` | `argument count must not be negative` | fix the command registration: argument counts cannot be negative |
 
 ### service errors
 
-| Code                   | Sentinel                 | Message                       | Hint                                                                   |
-| ---------------------- | ------------------------ | ----------------------------- | ---------------------------------------------------------------------- |
-| `invalid_scope`        | `ErrInvalidScope`        | `invalid scope`               | create the scope with NewScope before registering or invoking services |
-| `service_construction` | `ErrServiceConstruction` | `service construction failed` | fix the provider's error; the service could not be constructed         |
-| `service_not_found`    | `ErrServiceNotFound`     | `service not found`           | register the service with Provide or ProvideValue before invoking it   |
-| `service_registration` | `ErrServiceRegistration` | `service registration failed` | check the service type and provider signature passed to Provide        |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
+| `invalid_scope` | `ErrInvalidScope` | `invalid scope` | create the scope with NewScope before registering or invoking services |
+| `service_construction` | `ErrServiceConstruction` | `service construction failed` | fix the provider's error; the service could not be constructed |
+| `service_not_found` | `ErrServiceNotFound` | `service not found` | register the service with Provide or ProvideValue before invoking it |
+| `service_registration` | `ErrServiceRegistration` | `service registration failed` | check the service type and provider signature passed to Provide |
 
 ### output errors
 
-| Code                         | Sentinel                     | Message                      | Hint                                                       |
-| ---------------------------- | ---------------------------- | ---------------------------- | ---------------------------------------------------------- |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
 | `format_requires_typed_data` | `ErrFormatRequiresTypedData` | `format requires typed data` | emit typed rows or values, or choose a text format instead |
-| `unsupported_format`         | `ErrUnsupportedFormat`       | `unsupported output format`  | run with --help to see the supported output formats        |
+| `unsupported_format` | `ErrUnsupportedFormat` | `unsupported output format` | run with --help to see the supported output formats |
 
 ### audit errors
 
-| Code                           | Sentinel                       | Message                        | Hint                                                      |
-| ------------------------------ | ------------------------------ | ------------------------------ | --------------------------------------------------------- |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
 | `unsupported_audit_log_format` | `ErrUnsupportedAuditLogFormat` | `unsupported audit log format` | choose one of the formats accepted by ParseAuditLogFormat |
 
 ### exit_code errors
 
-| Code                | Sentinel             | Message                               | Hint                               |
-| ------------------- | -------------------- | ------------------------------------- | ---------------------------------- |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
 | `invalid_exit_code` | `ErrInvalidExitCode` | `exit code must be between 0 and 255` | use an exit code between 0 and 255 |
 
 ### doctor errors
 
-| Code            | Sentinel          | Message                | Hint                                                                     |
-| --------------- | ----------------- | ---------------------- | ------------------------------------------------------------------------ |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
 | `doctor_failed` | `ErrDoctorFailed` | `doctor checks failed` | run the failing checks individually to see which dependency is unhealthy |
 
 ### editor errors
 
-| Code               | Sentinel            | Message                                 | Hint                                               |
-| ------------------ | ------------------- | --------------------------------------- | -------------------------------------------------- |
-| `editor_read`      | `ErrEditorRead`     | `failed to read edited file`            | check the edited file is readable                  |
-| `editor_run`       | `ErrEditorRun`      | `editor execution failed`               | check that $EDITOR points to an executable program |
-| `editor_temp_file` | `ErrEditorTempFile` | `failed to create temp file for editor` | check the temp directory is writable               |
-| `editor_write`     | `ErrEditorWrite`    | `failed to write to temp file`          | check the temp file is writable                    |
+| Code | Sentinel | Message | Hint |
+| --- | --- | --- | --- |
+| `editor_read` | `ErrEditorRead` | `failed to read edited file` | check the edited file is readable |
+| `editor_run` | `ErrEditorRun` | `editor execution failed` | check that $EDITOR points to an executable program |
+| `editor_temp_file` | `ErrEditorTempFile` | `failed to create temp file for editor` | check the temp directory is writable |
+| `editor_write` | `ErrEditorWrite` | `failed to write to temp file` | check the temp file is writable |
 
 <!-- END GENERATED:SENTINEL-TABLE -->
