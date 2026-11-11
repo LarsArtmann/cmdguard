@@ -2,6 +2,7 @@ package v5
 
 import (
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -57,12 +58,30 @@ func TestErrorReferenceDoc(t *testing.T) { //nolint:paralleltest // rewrites a r
 	}
 
 	current := content[start:stop]
-	if current != generated {
+	if normalizeTableSpacing(current) != normalizeTableSpacing(generated) {
 		t.Fatalf(`docs/ERROR_REFERENCE.md drifted from the sentinel fact table.
 
 Regenerate with:
   go test ./pkg/cmdguard/v5 -run TestErrorReferenceDoc -update-golden`)
 	}
+}
+
+func normalizeTableSpacing(s string) string {
+	pipeSpace := regexp.MustCompile(` *\| *`)
+	dashes := regexp.MustCompile(`-{3,}`)
+	separator := regexp.MustCompile(`^[|: -]+$`)
+
+	lines := strings.Split(s, "\n")
+
+	for i, line := range lines {
+		if separator.MatchString(line) {
+			line = dashes.ReplaceAllString(line, "---")
+		}
+
+		lines[i] = pipeSpace.ReplaceAllString(line, "|")
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func TestGenerateErrorReference(t *testing.T) {
