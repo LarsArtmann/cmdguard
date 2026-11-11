@@ -6,51 +6,46 @@
 
 ---
 
-## v5 Major Release
+## v5 Major Release — SHIPPED
 
-The v5 thesis and full workstream plan (P1 inevitable quality, P2 zero-bug by
-construction, P3 fantastic UX, P4 minimum code): [docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
-Renames are the smallest part of v5, not the point of it.
+**v5.0.0 shipped 2026-11-08** at `github.com/larsartmann/cmdguard/v5` (marked
+GitHub Latest); the v4 line is retired at v4.3.1 on the frozen `release/v4`
+branch. The thesis plan and workstream record:
+[docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
+Renames were the smallest part of v5, not the point of it.
 
-**Owner decisions (2026-11-02):**
+**Owner decisions (2026-11-02) — all realized in v5.0.0:** enforced flag-tag
+validation shipped in v4.2.0 with a migration note; the module path is the
+standard `/v5`; strict validation, signals + graceful shutdown, and batteries
+all flipped ON by default with per-item `Without*` opt-outs.
 
-- **Release vehicle:** enforced flag-tag validation ships as **v4.2.0 with a
-  migration note** (documented behavior change); v5 stays reserved for the
-  defaults + renames major.
-- **Module path:** v5.0.0 lives at **`github.com/larsartmann/cmdguard/v5`**
-  (standard Go semver; consumers rewrite imports via codemod). Scaffold = plan
-  task M11.
-- **v5 defaults:** strict validation, signals + graceful shutdown, and
-  batteries all flip **on** by default; every individual opt-out
-  (`WithoutStrictValidation` etc.) remains available.
-
-The following breaking changes are tracked with `TODO(v5)` markers in source code:
+The v5 breaking changes are all landed (struck with evidence; details in
+CHANGELOG `[5.0.0]`):
 
 | # | Change                                                                | Rationale                                                              | Source Location      |
 | - | --------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------- |
-| 1 | Rename `CommandInfo` → `CommandMetadata`                              | "Info" suffix is vague; `Metadata` is precise                          | `middleware.go`      |
-| 2 | Rename `TypeHandler` → `TypeCodec`                                    | "Handler" is generic; `Codec` captures parse/default dual role         | `type_handler.go`    |
-| 3 | Rename `PromptRunner` → `HuhPrompter` (or similar)                    | "Runner" suffix is generic                                             | `prompts/prompts.go` |
-| 4 | Remove `SetConfig(cfg)` — now `// Deprecated:`                        | Unsafe post-construction mutation without re-initializing FlagRegistry | `cli_accessors.go`   |
-| 5 | Replace `RegisterInScope` with generic variant — now `// Deprecated:` | Erases provider types; use `Child` + `do.Provide` meanwhile            | `scope.go`           |
+| 1 | ~~Rename `CommandInfo` → `CommandMetadata`~~                          | "Info" suffix is vague; `Metadata` is precise                          | ~~`middleware.go`~~ done — v5.0.0 (`middleware.go:65`) |
+| 2 | ~~Rename `TypeHandler` → `TypeCodec`~~                                | "Handler" is generic; `Codec` captures parse/default dual role         | ~~`type_handler.go`~~ done — v5.0.0 (`type_codec.go:13`) |
+| 3 | ~~Rename `PromptRunner` → `HuhPrompter` (or similar)~~                | "Runner" suffix is generic                                             | ~~`prompts/prompts.go`~~ done — v5.0.0 (core keeps `PromptRunner`; huh impl is `HuhPrompter`, `prompts/prompts.go:27`) |
+| 4 | ~~Remove `SetConfig(cfg)` — now `// Deprecated:`~~                    | Unsafe post-construction mutation without re-initializing FlagRegistry | ~~`cli_accessors.go`~~ done — v5.0.0 removed it (zero references) |
+| 5 | ~~Replace `RegisterInScope` with generic variant~~                    | Erases provider types; use `Child` + `do.Provide` meanwhile            | ~~`scope.go`~~ done — v5.0.0 generic `RegisterInScope[T]` (`scope.go:358`) |
 
-Additional v5 candidates from partially functional items:
+### Remaining v6 candidates
 
-| # | Change                                           | Rationale                                                                                                                    |
-| - | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| 6 | Rename `Get[T]` → `GetService[T]`                | `Get` is too generic for a DI scope                                                                                          |
-| 7 | Redesign `Package[T](scope, ...)`                | Unusual API shape with pre-existing `*Scope` param                                                                           |
-| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]` | Two signatures coexist since v4 delivered context propagation additively; v5 can collapse to the context-threading signature |
+| # | Change                                           | Rationale                                                                                                                    | Status |
+| - | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 6 | ~~Rename `Get[T]` → `GetService[T]`~~            | ~~`Get` is too generic for a DI scope~~                                                                                      | MOOT — v5 has no `Get[T]`; the getters are `Invoke[T]`/`InvokeNamed[T]` (`scope.go:165,183`) |
+| 7 | Redesign `Package[T](scope, ...)`                | Unusual API shape with pre-existing `*Scope` param (`scope.go:416`)                                                          | open   |
+| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]` | Two signatures coexist; v5 kept both deliberately (unification rejected for v5.0.0)                                          | open — v6 |
 
-### Flag-representation consolidation (v5 scope, from ADR-002)
+### Flag-representation consolidation (NOT done in v5 — re-scoped to v6)
 
-A flag is described four times (`FlagTag` → `flagMetadata` → `FlagDescription`
-→ `pflag.Flag`); the inventory and the accepted gaps live in
+**v5 status (verified 2026-11-11):** the consolidation did NOT land in v5 — a
+flag is still described multiple times and `FlagTag.Type reflect.Type` is still
+public (`config.go:28`). The inventory and the accepted gaps live in
 [docs/design/2026-11-02_flag-representation-gap-matrix.md](docs/design/2026-11-02_flag-representation-gap-matrix.md).
-v4 tolerates the split because ADR-002 pins one producer per fact and the
-drift gate enforces the docgen hop. v5 collapses the plumbing:
-
-**Target model.**
+v4/v5 tolerate the split because ADR-002 pins one producer per fact and the
+drift gate enforces the docgen hop. Target model (unchanged):
 
 - One registration-time `flagMeta` value per flag, produced once from struct
   tags, stored in the cobra annotation as the single durable copy.
@@ -59,13 +54,13 @@ drift gate enforces the docgen hop. v5 collapses the plumbing:
 - `FlagTag` stays the parser's output type but stops being re-read after
   registration (today `config explain` and `ConfigKeys` re-parse tags from
   the struct; they would consume the same `flagMeta`).
-- The config-file vocabulary (`v4.ConfigKey`) remains a separate type — file
+- The config-file vocabulary (`ConfigKey`) remains a separate type — file
   shapes (nested objects, indexed arrays) are not flag shapes — but shares
   the canonical key.
 - The contract's `Type` field is revisited: pflag's value-type string today,
   with the JSON type exposed alongside so schema consumers stop guessing.
 
-**Breaking changes for v5.**
+**Breaking changes.**
 
 - `FlagTag.Type reflect.Type` leaves the public struct (leaky implementation
   detail; consumers use the string contract).
@@ -79,8 +74,29 @@ drift gate enforces the docgen hop. v5 collapses the plumbing:
 **Migration and effort.** Consumers of the JSON contract are unaffected
 (additive rule). Go-API consumers touching `FlagTag.Type` are rare (the lint
 corpus showed none); a codemod replaces it with the contract string.
-Estimate: 2–3 days including the strict-default flip, migration note, and
-consumer re-verification on erraudit + timesheets.
+Estimate: 2–3 days including the migration note and consumer re-verification
+on erraudit + timesheets.
+
+---
+
+## Open Questions (owner decisions pending)
+
+Carried from the 2026-11-11 reports' §g sections. These are decisions, not
+tasks — do not convert them to TODO rows without an owner answer.
+
+1. **Cut v5.1.0 now?** `master` carries 40+ commits past `v5.0.0` (Builder
+   mutex, `WithStrictPositionalArgs`/`WithArgsPassthrough`, doc fixes);
+   `[Unreleased]` is already written. Publishing is irreversible.
+2. **Branch policy:** delete `v5-scaffold` (it equals `master`) or repurpose
+   as `next`? Retire `release/v2.10` the way v4 was retired?
+3. **Staged worktrees:** decide the fate of `crm-stage-t13b`, `cv-stage-crmfix`,
+   `BuildFlow-pr44` (migrate to v5 or archive them).
+4. **Website scope:** fix only the stale `/v4` deploy guard, or also add a v4
+   retirement notice / make v5 the single documented line on the site?
+5. **Release notes policy:** keep `generate_release_notes` or switch to
+   CHANGELOG-driven notes?
+6. **v4 frozen-branch hygiene:** give `release/v4`'s sub-module `go.mod`
+   pseudo-pins a hygiene commit, or leave the frozen line untouched?
 
 ---
 
@@ -93,22 +109,17 @@ consumer re-verification on erraudit + timesheets.
 `WithContextMiddleware[T]`; context middleware run outside plain middleware so
 derived contexts (timeouts, cancellation, tracing scopes) reach every inner
 middleware and the handler. `TimeoutMiddleware[T]` ships as the reference
-implementation (`ErrCommandTimeout`). Remaining v5 work: unify `Middleware[T]`
-and `ContextMiddleware[T]` into one signature (breaking).
+implementation (`ErrCommandTimeout`). Remaining work: unify `Middleware[T]`
+and `ContextMiddleware[T]` into one signature — rejected for v5.0.0, tracked
+as v6 candidate #8 above.
 
-### Command-Level Audit Middleware
+### Command-Level Audit Middleware — SHIPPED
 
-The upstream recording API is implemented in ../samber-do-auditlog
-(`Plugin.RecordCommand` / `EventTypeCommand`, Unreleased). Blocked on that
-library being pushed + tagged (≥ v0.11.0); then bump cmdguard's go.mod and add
-`AuditMiddleware[T]` capturing command execution events (start, end, duration,
-error). See TODO_LIST.md "Blocked on Upstream".
-
-### Internal Package Split
-
-If `pkg/cmdguard/v4` grows beyond 12k LOC, consider splitting into `v4` +
-`v4/internal/` to separate public API surface from implementation. Current
-size is below the trigger threshold — this is YAGNI until growth demands it.
+The upstream recording API shipped in samber-do-auditlog v0.11.0
+(`Plugin.RecordCommand` / `EventTypeCommand`) and cmdguard consumed it:
+`AuditMiddleware[T]` + `WithAuditMiddleware[T]` record PhaseBefore/PhaseAfter
+events with duration + error (`auditlog.go:232,259`; pair `WithAuditMiddleware`
+with `WithAuditLog` using the same plugin). No roadmap work remains here.
 
 ---
 
@@ -121,7 +132,7 @@ the long tail from haunting the TODO list. Each has a rationale for deferral.
 | -- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | 1  | Re-run 4 skills with reference files loaded                                                       | More reports without action = more debt. Re-audit in a dedicated session after closure ships.         |
 | 2  | Run 4 additional skills (brutal-self-review, library-deep-dive, status-report, docs-health BUILD) | New audits, not closure of existing findings.                                                         |
-| 3  | `TypeHandler` / `TypeHandlerFunc` rename + `// Deprecated` alias                                  | Public API break — deferred to v5. See TODO(v5) markers above.                                        |
+| 3  | ~~`TypeHandler` / `TypeHandlerFunc` rename + `// Deprecated` alias~~ done — v5.0.0 (`TypeCodec`/`TypeCodecFunc`)                                  | ~~Public API break — deferred to v5. See TODO(v5) markers above.~~                                        |
 | 4  | `ConfigFile` branded type                                                                         | YAGNI until a consumer needs it.                                                                      |
 | 5  | Extract koanf into a sub-module                                                                   | YAGNI — no consumer has asked; 4 koanf deps are already isolated. LOC trigger not met.                |
 | 6  | Split `v4` into `v4` + `v4/internal/`                                                             | LOC trigger (12k) not met. Premature split adds boundary friction.                                    |
@@ -144,11 +155,10 @@ These are unformed ideas that may or may not become features:
   `func(*Builder[T]) error` so the one-call entry point composes with the
   deferred-error Builder (v5 API-review question; Builder currently composes
   inside the existing `func(*CLI[T]) error` callback)
-- **Strict positional-args default** — cmdguard subcommands silently accept
-  unexpected positional args (a `--dir`-style flag command swallowed a
-  positional path and linted the wrong directory, found 2026-11-08 during
-  the CG002 fleet pass); default leaf commands to an exact/maximum-args
-  validator with `WithArgsPassthrough()` as the opt-out
+- **~~Strict positional-args default~~ — SHIPPED (post-v5.0.0, untagged)** —
+  leaf commands silently accepting unexpected positionals (found 2026-11-08
+during the CG002 fleet pass) now have `WithStrictPositionalArgs()` +
+`WithArgsPassthrough()` (`command_options.go`); riding the v5.1.0 cut
 - **Config file watching** — hot-reload config on file change (inotify/fsnotify)
 - **CUE for the machine contract** — revisit only when a consumer needs to VALIDATE the contract itself (not config files) against a schema, AND cue's Go codegen round-trips cmdguard's struct tags losslessly, AND the build-time cost is measured. Analysis: `docs/status/2026-11-02_04-52_cue-adoption-analysis-and-self-review.md`; decision record: ADR-002 §6. The struct tags are the single declaration surface today — a parallel CUE schema would be a second source of truth until all three criteria hold.
 - **Plugin marketplace** — community-contributed type handlers and validators
