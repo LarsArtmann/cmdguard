@@ -84,7 +84,8 @@ golangci-lint run ./... || fail "release workflow lint failed"
 # 7. Workflow sanity grep: the pushed tag must still trigger a workflow that
 #    actually runs tests+lint before publishing (guards against silent workflow rot).
 grep -q "go test" .github/workflows/release.yml || fail "release.yml no longer runs tests"
-grep -q "golangci-lint" .github/workflows/release.yml || fail "release.yml no longer runs lint"
+grep -q "lint-reusable.yml" .github/workflows/release.yml || fail "release.yml no longer consumes the reusable lint workflow"
+grep -q "needs: call-lint" .github/workflows/release.yml || fail "release job no longer gated on lint"
 grep -q "v\*" .github/workflows/release.yml || fail "release.yml no longer triggers on v* tags"
 
 echo ""
