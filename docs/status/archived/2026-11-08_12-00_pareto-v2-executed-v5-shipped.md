@@ -1,5 +1,7 @@
 # Status Report — Pareto Plan v2 Executed: v5.0.0 Shipped, Delivery Loop Closed
 
+> **Live remainder:** none — every item is struck with evidence below. The owner-gated queue resolved in the 2026-11-11 v4-retirement/master-merge session; standing candidates live in ROADMAP.md (v6 candidates, Open questions).
+
 **Date:** 2026-11-08 (second session of the day, executing the 08:42 plan)
 **Branch:** `v5-scaffold` (pushed; v5.0.0 tagged on it)
 **Verdict:** R1–R9 of the Pareto plan EXECUTED AND VERIFIED; Tier D pulled 4 slices; 2 fleet PRs open.
@@ -104,15 +106,15 @@
 
 ## Owner-gated queue (D44 / §g)
 
-1. **BuildFlow push**: local commits with the v5 migration (through
-   789625788) are NOT pushed — awaiting the §g2 answer.
-2. **Branch policy**: v5-scaffold carries the v5.0.0 tag; whether master
-   fast-forwards to it (or v5 development continues on this branch) is the
-   §g1 answer.
-3. **Strict positional-args DEFAULT flip**: mechanism shipped
-   (`WithStrictPositionalArgs`), flip is one line + one matrix row after an
-   owner decision (guardrail #1).
-4. **CHANGELOG [Backfill]**: the orphaned v4.x notes section awaits the §g2
+1. ~~**BuildFlow push**: local commits with the v5 migration (through~~ done — pushed with the v5-scaffold→master fast-forward (2026-11-11, 359feb3 on origin/master)
+   ~~789625788) are NOT pushed — awaiting the §g2 answer.~~
+2. ~~**Branch policy**: v5-scaffold carries the v5.0.0 tag; whether master~~ done — master fast-forwarded to v5-scaffold (359feb3); residual branch-fate question moved to ROADMAP Open questions
+   ~~fast-forwards to it (or v5 development continues on this branch) is the~~
+   ~~§g1 answer.~~
+3. ~~**Strict positional-args DEFAULT flip**: mechanism shipped~~ done — shipped as opt-in WithStrictPositionalArgs/WithArgsPassthrough (command_options.go); the hard default flip remains a ROADMAP idea
+   ~~(`WithStrictPositionalArgs`), flip is one line + one matrix row after an~~
+   ~~owner decision (guardrail #1).~~
+4. **CHANGELOG [Backfill]**: the orphaned v4.x notes section awaits the §g2 **→ CHANGELOG [Backfill] section — the owner §g2 decision is still pending and tracked there**
    decision on folding into historical sections.
 
 ## Verschlimmbesserung guardrails honored

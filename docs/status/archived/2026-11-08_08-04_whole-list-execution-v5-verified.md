@@ -1,5 +1,7 @@
 # Whole-List Execution — v5 Scaffold to Verified Green (2026-11-08 08:04)
 
+> **Live remainder:** none — every item is struck with evidence below. §d residue and follow-on work live in TODO_LIST.md; open API-review questions live in ROADMAP.md.
+
 > **What this is.** Closing report for the "DO THE WHOLE TODO LIST" run
 > resuming from the 03:56 Tier A report. Tier A was already shipped (lint
 > v0.2.0/v0.2.1 + BuildFlow + W1). This session completed Tier B on the
@@ -28,19 +30,19 @@
 
 **Two REAL bugs surfaced by the flips, fixed at root cause**
 
-1. **Stale cobra subcommand context across executions.** `SetContext` in
-   PersistentPreRunE shadows the root ctx FOREVER: run 2+ inherited run 1's
-   cancelled context (`DI: health check timeout: context canceled` on every
-   command after the first doctor run). Fixed with `CLI.execCtx` (current
-   run's context, used as the derive base) + per-Execute `flowCtx` rebuild.
-   New contract test proves shutdown fires ONLY on the signal-cancelled path
-   and the scope stays alive across `ExecuteWithArgs`.
-2. **Graceful shutdown fired on EVERY execution** (v4 semantics: deferred
-   `scope.Shutdown` per Execute — fine one-shot, fatal for repeated runs
-   under defaults). Redesigned: shutdown fires only when the execution
-   context was cancelled (the documented SIGINT/SIGTERM semantics). Documented
-   in AGENTS.md (shutdown semantics + repeated-Execute gotchas + tracked
-   `execCtx //nolint:containedctx`).
+1. ~~**Stale cobra subcommand context across executions.** `SetContext` in~~ done — fixed in v5.0.0: execCtx + PersistentPreRunE derivation (CHANGELOG [5.0.0] Repeated-Execute invariants)
+   ~~PersistentPreRunE shadows the root ctx FOREVER: run 2+ inherited run 1's~~
+   ~~cancelled context (`DI: health check timeout: context canceled` on every~~
+   ~~command after the first doctor run). Fixed with `CLI.execCtx` (current~~
+   ~~run's context, used as the derive base) + per-Execute `flowCtx` rebuild.~~
+   ~~New contract test proves shutdown fires ONLY on the signal-cancelled path~~
+   ~~and the scope stays alive across `ExecuteWithArgs`.~~
+2. ~~**Graceful shutdown fired on EVERY execution** (v4 semantics: deferred~~ done — fixed in v5.0.0: auto-shutdown fires only when the execution context was cancelled (CHANGELOG [5.0.0] Graceful-shutdown semantics)
+   ~~`scope.Shutdown` per Execute — fine one-shot, fatal for repeated runs~~
+   ~~under defaults). Redesigned: shutdown fires only when the execution~~
+   ~~context was cancelled (the documented SIGINT/SIGTERM semantics). Documented~~
+   ~~in AGENTS.md (shutdown semantics + repeated-Execute gotchas + tracked~~
+   ~~`execCtx //nolint:containedctx`).~~
 
 **B1.3 — Builder (M12)**
 
@@ -125,16 +127,16 @@
 
 ## c. Decisions made (owner may override)
 
-1. **Scope keeps `HealthCheck()`/`HealthCheckWithContext(ctx)`** with the
-   no-arg forms delegating via `context.Background()`; `Scope` deliberately
-   does NOT implement `do.HealthcheckerWithContext` (that's CLI's contract).
-2. **Schema (CT2): hold workspace-local** until v5.0.0 ships, then tag
-   `schema/v0.1.0` per the lint playbook.
-3. **NewApp signature unchanged** (build callback stays `func(*CLI[T]) error`);
-   the Builder composes inside it. NewApp-on-Builder stays a v5 API-review
-   question (ROADMAP candidate).
-4. **Empty config file = absent** (uniform across YAML/TOML/JSON).
-5. **BuildFlow commit left unpushed** (needs owner permission, per 03:56 §g).
+1. ~~**Scope keeps `HealthCheck()`/`HealthCheckWithContext(ctx)`** with the~~ done — decision held in v5.0.0: the no-arg forms delegate via context.Background() (scope.go)
+   ~~no-arg forms delegating via `context.Background()`; `Scope` deliberately~~
+   ~~does NOT implement `do.HealthcheckerWithContext` (that's CLI's contract).~~
+2. ~~**Schema (CT2): hold workspace-local** until v5.0.0 ships, then tag~~ done — executed as decided: held through v5.0.0, then schema/v0.1.0 was tagged (tag exists)
+   ~~`schema/v0.1.0` per the lint playbook.~~
+3. ~~**NewApp signature unchanged** (build callback stays `func(*CLI[T]) error`);~~ done — held: NewApp's build callback is still func(*CLI[T]) error (cli_batteries.go); NewApp-on-Builder remains a ROADMAP raw idea
+   ~~the Builder composes inside it. NewApp-on-Builder stays a v5 API-review~~
+   ~~question (ROADMAP candidate).~~
+4. ~~**Empty config file = absent** (uniform across YAML/TOML/JSON).~~ done — shipped in v5.0.0 (CHANGELOG [5.0.0] Fixed: empty config files no longer crash startup)
+5. ~~**BuildFlow commit left unpushed** (needs owner permission, per 03:56 §g).~~ done — pushed with the master merge (2026-11-11)
 
 ## d. Open items (honest residue)
 
