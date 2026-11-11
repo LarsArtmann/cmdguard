@@ -1,5 +1,7 @@
 # Config Truth: Mid-Flight Execution Status
 
+> **Superseded by:** docs/status/2026-11-02_15-19_config-truth-plan-completion.md (the completion report resolved every §f item still open here).
+
 <!-- check-rows:ledger -->
 
 | Field         | Value                                                                              |

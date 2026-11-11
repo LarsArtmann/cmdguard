@@ -97,6 +97,9 @@ tasks — do not convert them to TODO rows without an owner answer.
    CHANGELOG-driven notes?
 6. **v4 frozen-branch hygiene:** give `release/v4`'s sub-module `go.mod`
    pseudo-pins a hygiene commit, or leave the frozen line untouched?
+7. **`cv` vs `CV`:** two GitHub repos carrying the same codebase — reconcile
+   (merge, redirect, or declare one canonical), per the 2026-11-11 fleet report
+   question 1.
 
 ---
 
@@ -209,6 +212,7 @@ Harvested from the June-10/11 output-sprint reports (2026-11-07 sweep, second ba
 - **Codecov badge in README** — coverage uploads tokenless; badge is a one-line README change
 - **govulncheck/gosec in CI** — both are manual-only today (see TODO_LIST S2 for the toolchain blocker)
 - **art-dupl/dedup enforcement in CI** — clone-count regression protection existed only as a manual ritual
+- **CI guard nudging examples toward `testkit`** — depguard/forbidigo rule from the 2026-10-02 integration-test-harness investigation (testkit itself was never built)
 
 Harvested from the July planning/review docs (2026-11-07 sweep, third batch):
 

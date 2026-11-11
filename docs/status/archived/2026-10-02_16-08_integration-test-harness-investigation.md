@@ -170,7 +170,7 @@ Ranked by impact. Effort: S <30min / M 30min–2h / L >2h.
 | 31 | Wire `testkit` into `docs/QUICKSTART.md` + `docs/TUTORIAL.md`.                                                      | Low      | S      | Documentation |
 | 32 | Measure boilerplate reduction in taskctl (LOC delta after migration).                                               | Low      | S      | Quality       |
 | 33 | Add `testkit` to `FEATURES.md` once implemented.                                                                    | Low      | S      | Documentation |
-| 34 | CI guard (depguard/forbidigo) nudging examples toward `testkit`.                                                    | Low      | S      | Quality       |
+| 34 | CI guard (depguard/forbidigo) nudging examples toward `testkit`. **→ ROADMAP Raw ideas — CI guard nudging examples toward testkit** | Low      | S      | Quality       |
 | 35 | Sub-module `go.mod` + `go.work` entry — only if option B chosen.                                                    | Medium   | S      | Feature       |
 
 > **Handoff:** Section (f) is HARVEST input. It must be pulled into `TODO_LIST.md` / `ROADMAP.md` by `docs-health` HARVEST, or it dies in this timestamped file.

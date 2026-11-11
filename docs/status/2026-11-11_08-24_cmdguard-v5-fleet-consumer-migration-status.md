@@ -361,10 +361,10 @@ All 30 modules pass `go build ./...`:
 15. Fix pma's health-probe panics (`Routes.Version` without `WithVersion`). **→ TODO_LIST Fleet follow-ups FM4 (repo: projects-management-automation)**
 16. Fix go-cqrs-lite `doc-check` path resolution (module lives at `cmd/…/v4`).
 17. Fix/skip the two hanging `cqrs-lint` `go/packages` tests in offline CI. **→ TODO_LIST Fleet follow-ups FM5 (repo: go-cqrs-lite)**
-18. Commit `cv`'s migration (20 files).
+18. Commit `cv`'s migration (20 files). **→ TODO_LIST FM7 (repo: cv) — commit the migration**
 19. Run `golangci-lint run ./...` in all 26 repos; triage findings.
-20. Run `go vet ./...` in all 26 repos.
-21. Run `go test -race ./...` in all 26 repos.
+20. Run `go vet ./...` in all 26 repos. **→ TODO_LIST FM8 (fleet-wide consumer sweep)**
+21. Run `go test -race ./...` in all 26 repos. **→ TODO_LIST FM8 (fleet-wide consumer sweep)**
 22. Add "Unreleased — cmdguard v5 migration" lines to each CHANGELOG.
 23. Add a short "cmdguard v5 notes" section to each consumer AGENTS.md
     (batteries defaults, runtime `required`, per-Execute flag reset, exit-code
@@ -384,7 +384,7 @@ All 30 modules pass `go build ./...`:
     `ci-siblings/go-cqrs-lite` or explicitly archive them.
 31. Decide the fate of staged worktrees: `crm-stage-t13b`, `cv-stage-crmfix`, **→ ROADMAP Open questions — staged-worktree fate is an owner decision**
     `BuildFlow-pr44`.
-32. Reconcile `cv` vs `CV` (two repos, same codebase) — see question 1.
+32. Reconcile `cv` vs `CV` (two repos, same codebase) — see question 1. **→ ROADMAP Open questions — cv vs CV reconcile is an owner decision**
 33. Add a `GOWORK=off go mod tidy` drift check to go-cqrs-lite CI (today's
     stale go.sums prove it is needed).
 34. Investigate why `go mod tidy` pulled auditlog 0.12.1 → 0.12.3 in crm and

@@ -260,7 +260,7 @@ plugins, migrating-from-cobra (14 pages, one slice each).
 25. COMPARISON.md pass 2: re-verify the claims table (stars, feature rows)
 against current upstreams.
 26. COMPARISON.md pass 3: add v5-defaults column notes (batteries ON).
-27. api-reference.mdx: sample-code audit (it was only link-fixed).
+27. ~~api-reference.mdx: sample-code audit (it was only link-fixed).~~ done — verified 2026-11-11: zero v4-era idioms in api-reference.mdx (254 lines; grep clean for v4/SetConfig/CommandInfo/TypeHandler)
 28. Website changelog.mdx: add the v5.0.0 section (currently ends at v4).
 29. Feed FEATURES.md: new v5 facts (Builder, flips, new options, guards).
 30. Docs: mark MIGRATION_v4_v5.md as also covered by MIGRATION_RUNBOOK.md

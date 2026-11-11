@@ -280,7 +280,7 @@ Ranked roughly by leverage; existing TODO IDs preserved.
    schema emitter).
 7. Update website content for the config-truth feature set.
 8. Link `examples/config-explain` from README + website (CT3).
-9. Annotate the 10:15 mid-flight report as superseded by this report.
+9. ~~Annotate the 10:15 mid-flight report as superseded by this report.~~ done — this pass: the 10:15 mid-flight report now carries the supersession banner
 10. Add schema emitter godoc examples (`ExampleFromConfig`, `ExampleEmit`).
 11. QUICKSTART/TUTORIAL parity sweep (P12): batteries, describe, hints,
     runtime tag semantics — verify every snippet compiles (extract-and-build

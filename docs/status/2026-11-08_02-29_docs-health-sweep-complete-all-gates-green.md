@@ -103,7 +103,7 @@ Ranked by impact × effort, drawing the live TODO_LIST + this session's discover
 | 10 | P8: v5 scaffold + Builder + default flips + renames (M11–M15)                                                                             | TODO P8      |
 | 11 | P9: codemod + `MIGRATION_v4_v5.md`                                                                                                        | TODO P9      |
 | 12 | P10: machine error codes — already shipped; verify ERROR_REFERENCE regeneration is wired into CI                                          | TODO P10     |
-| 13 | P11: validation-semantics hardening (M06–M08)                                                                                             | TODO P11     |
+| 13 | P11: validation-semantics hardening (M06–M08) **→ CHANGELOG — P11 shipped (validation-semantics hardening: env/default coverage, ErrInvalidFlagDefault, Duration bounds; carried in the v5 tree)** | TODO P11     |
 | 14 | P12: QUICKSTART + TUTORIAL parity (batteries, describe, hints — QUICKSTART currently has zero mentions)                                   | TODO P12     |
 | 15 | H2: rewrite or delete the no-op `TestPromptConfirm`                                                                                       | sweep        |
 | 16 | H4: hero-code sync guard (`hero-code.ts` vs `HeroSection.astro`)                                                                          | sweep        |

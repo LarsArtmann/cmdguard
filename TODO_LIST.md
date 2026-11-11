@@ -144,3 +144,12 @@ Harvested from `docs/status/2026-10-04_07-11_cmdguard-lint-sub-module-build.md` 
 Currently nothing. (The 2026-10 audit-middleware block resolved when
 samber-do-auditlog v0.11.0+ shipped `Plugin.RecordCommand`; `AuditMiddleware[T]`
 has been in core since — see FEATURES.md Audit Log table.)
+
+### FM addenda (2026-11-11 audit-all pass)
+
+<!-- check-rows:ledger -->
+
+| #   | Task                                          | Evidence / notes                                                                                    | Status  |
+| --- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------- |
+| FM7 | Commit `cv`'s v5 migration (20 files) (repo: cv) | the auto-commit daemon did not sweep that repo (2026-11-11 08:24 report §b.3); verify before committing — changes you didn't author | 🔴 TODO |
+| FM8 | Fleet-wide consumer sweep: `golangci-lint` + `go vet` + `go test -race` across the 26 migrated repos | report §f items 19–21; triage findings per repo afterwards | 🔴 TODO |

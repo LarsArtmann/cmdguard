@@ -196,7 +196,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 2. Diagnose + fix lint sub-module typecheck failure (b2).
 3. Rename `TestHuhRunner_*` → `TestHuhPrompter_*` (b3).
    <!-- ✅ DONE 2026-11-08: renamed on v5-scaffold (TestHuhPrompter_*). -->
-4. Commit the scaffold as one reviewed commit (b4).
+4. ~~Commit the scaffold as one reviewed commit (b4).~~ done — scaffold committed on v5-scaffold (bulk 9c7f05e + follow-ups); merged to master 359feb3
 5. Re-run full branch battery: root tests, sub-module tests, `-race`,
    golangci-lint, GOWORK=off per-module builds.
 6. CG002 corpus re-verify with `CurrentMajor = "v5"` (b5) + fix walk_test
