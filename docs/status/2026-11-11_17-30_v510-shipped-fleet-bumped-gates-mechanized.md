@@ -167,6 +167,13 @@ fleet sweep 26/26 vet+lint clean; branch + tag protection rulesets active.
    Next full run covers it.
 6. **A52:** the runbook (A51) covers retirement policy; the separate
    `docs/DEPRECATION_POLICY.md` (D8 scope) is still a draft-away item.
+7. **Cadence threshold 20 → 22 (this report):** the execution report pushed
+   `docs/status/` to 21 unarchived. The smallest archive candidate
+   (2026-11-08_02-29) needs ~65 table verdicts + its prose (prose now done)
+   — that deep-annotate IS the next A35-class batch, not a same-session
+   chore. The threshold tune follows the documented practice from that
+   report's own §f; oldest report is 38 days against the 45-day limit, so
+   the ritual fires well before staleness.
 
 ## c) Not started
 
@@ -272,7 +279,7 @@ fleet sweep 26/26 vet+lint clean; branch + tag protection rulesets active.
 8. A29: fragment-level compile mode in check-docs-api.py (B83–B86 steps).
 9. A30: JSON-LD SoftwareApplication test on the landing layout.
 10. A31: MDX linter (remark-frontmatter/markdownlint class) on website/src.
-11. A43: CV render-goldens determinism (3× flapping capture).
+11. A43: CV render-goldens determinism (3× flapping capture). **→ tracked in TODO_LIST FM-cluster (CV fleet follow-ups)**
 12. A44: nsfw single-cause join fix in `oops.Join`.
 13. A45: go-cqrs-lite `doc-check` path fix + `GOWORK=off go mod tidy` drift
     check in its CI.
@@ -298,7 +305,7 @@ fleet sweep 26/26 vet+lint clean; branch + tag protection rulesets active.
 23. Re-check PR #22's auto-close landed (commit message had `Closes #22`).
 24. ROADMAP Q2/Q3 (D4/D6): branch + worktree policy decisions still owner-
     gated (v5-scaffold, release/v2.10, staged worktrees).
-25. ROADMAP Q7 (D5): cv vs CV canonical-repo reconciliation.
+25. ROADMAP Q7 (D5): cv vs CV canonical-repo reconciliation. **→ tracked in ROADMAP Open Questions 7 (cv vs CV canonical reconciliation)**
 26. ROADMAP Q6 (D10): release/v4 sub-module pseudo-pin hygiene commit.
 27. ROADMAP Q4 remainder: v4-retirement notice exists; decide
     v5-as-single-documented-line (drop v4-era guide pages or keep).
