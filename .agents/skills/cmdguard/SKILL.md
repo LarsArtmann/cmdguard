@@ -73,6 +73,11 @@ cli.ExecuteAndExit(ctx) // blessed entry point
   cmdguard.WithSubcommands(migrate, seed))`. Subcommands must share T and F.
 - Handlers receive `(ctx, *T, F)` — no positional args. Get them with
   `cmdguard.ArgsFromContext(ctx)`; cmdguard stores them automatically.
+- Positional-args policy: a leaf command silently accepts unexpected positionals
+  unless it carries a validator. `WithStrictPositionalArgs()` rejects undeclared
+  ones (inert when an explicit validator like `WithExactArgs` is already set);
+  `WithArgsPassthrough()` explicitly accepts and ignores extras
+  (`command_options.go`; matrix pinned by `cli_args_strict_test.go`).
 
 ### The Builder — no error ladder
 

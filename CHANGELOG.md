@@ -9,11 +9,22 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ### Added
 
-- Nothing yet.
+- **Strict positional-args control.** `WithStrictPositionalArgs()` makes a
+  command reject undeclared positional args (inert when an explicit validator
+  like `WithExactArgs` is already set); `WithArgsPassthrough()` explicitly
+  accepts and ignores extras. Both land with the v5.1.0 cut — nothing is
+  published for them yet. Pinned by `cli_args_strict_test.go`.
 
 ### Fixed
 
-- Nothing yet.
+- **`Builder` is safe for concurrent use.** `Add`/`AddParent`/`Try`/`Check`/
+  `Build` serialize on a mutex, so queueing commands from multiple goroutines
+  followed by one `Build()` no longer races on the internal slices.
+- **`doctor`'s schema-validator doc example** referenced the removed
+  `schema.ValidateFile` shape; it now shows `schema.FromConfig` + `Emit`.
+- Release workflow lint invocation (`args: run ./...` → `./...`) — the action
+  already supplies `run`, so the duplicated subcommand made every `v*` release
+  check exit 7 since v4.1.0 (fixed on master and `release/v4`).
 
 ## [4.3.1] - 2026-11-11
 
