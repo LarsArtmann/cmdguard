@@ -1,0 +1,38 @@
+# cmdguard
+
+cmdguard is a Go library (module `github.com/larsartmann/cmdguard/v5`, requires Go 1.27) for building validated Cobra CLI applications with type-safe dependency injection. It wraps Cobra with typed struct-tag flags, per-command flag structs, samber/do DI, config files with strict key checking, and a batteries-on default set (strict validation, signal handling with graceful DI shutdown, error hints, auto `doctor` and `version` commands). Every function returns errors — there are zero panics anywhere in the library, and machine-readable error codes plus a JSON `describe` contract make CLIs agent-friendly.
+
+Core docs:
+
+- [Home](https://cmdguard.lars.software/): overview, install line, hero example
+- [Installation](https://cmdguard.lars.software/getting-started/installation/): module setup and requirements
+- [Quick start](https://cmdguard.lars.software/getting-started/quick-start/): first working CLI in minutes
+- [API reference](https://cmdguard.lars.software/api-reference/): every public symbol with signatures
+- [Changelog](https://cmdguard.lars.software/changelog/): release history; v4 retired at v4.3.1 on the frozen `release/v4` branch
+
+Guides:
+
+- [Production Batteries](https://cmdguard.lars.software/guides/production-batteries/): the default-on set and every opt-out
+- [Type-Safe Flags](https://cmdguard.lars.software/guides/type-safe-flags/): struct-tag flags, env, counting, typed values
+- [Config Files](https://cmdguard.lars.software/guides/config-files/): JSON/YAML/TOML loading, strict keys, provenance (`config explain`)
+- [Dependency Injection](https://cmdguard.lars.software/guides/dependency-injection/): samber/do scopes, overrides, graceful shutdown
+- [Error Handling](https://cmdguard.lars.software/guides/error-handling/): sentinel errors, exit codes, hints, the JSON error envelope
+- [Machine Contract](https://cmdguard.lars.software/guides/machine-contract/): the `describe` JSON command tree for agents
+- [Middleware](https://cmdguard.lars.software/guides/middleware/): plain and context-aware middleware chains
+- [Rich Output](https://cmdguard.lars.software/guides/rich-output/): 16 output formats via go-output
+- [Audit Log](https://cmdguard.lars.software/guides/audit-log/): DI audit logging and command execution events
+- [Sub-modules](https://cmdguard.lars.software/guides/sub-modules/): glamour, prompts, spinner, telemetry, flightrecorder, lint, schema
+- [Shell Completion](https://cmdguard.lars.software/guides/shell-completion/): completion plus the positional-args validators
+- [Lint](https://cmdguard.lars.software/guides/lint/): the cmdguard-lint usage linter rules
+- [Doctor](https://cmdguard.lars.software/guides/doctor/): health checks for the DI scope and custom checks
+- [Plugins](https://cmdguard.lars.software/guides/plugins/): bundling type handlers and validators
+- [Custom Types](https://cmdguard.lars.software/guides/custom-types/): registering typed flag codecs and validators
+- [Flow Context](https://cmdguard.lars.software/guides/flow-context/): branching command flows
+- [Lifecycle](https://cmdguard.lars.software/guides/lifecycle/): PreRun/PostRun/cleanup hook semantics
+- [Schema](https://cmdguard.lars.software/guides/schema/): JSON Schema emission for config structs
+- [Migrating from Cobra](https://cmdguard.lars.software/guides/migrating-from-cobra/): adopting cmdguard from raw Cobra
+- [Migrating v4 to v5](https://cmdguard.lars.software/guides/migrating-v4-to-v5/): the v4 retirement path
+
+Reference material in the repository: `docs/ERROR_REFERENCE.md` (all 65 sentinels with codes and hints), `docs/MIGRATION_v4_v5.md` (codemod + known traps), `docs/QUICKSTART.md`, `docs/TUTORIAL.md`.
+
+Source: <https://github.com/LarsArtmann/cmdguard>

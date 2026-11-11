@@ -59,7 +59,55 @@ Sub-module consumers: bump the submodule's `replace`/require pair the same
 way (the `/v5` core pseudo-version is `v5.0.0-00010101000000-000000000000`
 until the release tag lands).
 
-## 3. Review the new defaults
+## 3. Known traps (real incidents)
+
+These three cost real migration time across the fleet — read before
+`go build`, not after.
+
+### Templ version floor (MVS vs `replace`)
+
+cmdguard v5 transitively requires `github.com/a-h/templ` (via
+`samber-do-auditlog`). Two failure shapes:
+
+- **No pin:** MVS force-upgrades your templ to cmdguard's floor
+  (`v0.3.1100`). Regenerate templ components if the newer codegen rejects
+  them.
+- **Pinned with a `replace`:** `replace` WINS over MVS, so a too-old pin
+  silently downgrades templ below what auditlog needs — auditlog's generated
+  templ code fails to compile with no cmdguard code involved. Align the pin
+  with `go mod graph | grep a-h/templ`, and delete the `replace` once your
+  floor matches.
+
+### Nix builds need a lock step
+
+A Nix-built consumer must refresh vendored sources after the bump, or the
+build fails on stale `vendorHash`/flake lock checksums:
+
+```bash
+go mod tidy          # settle go.mod/go.sum first
+nix flake update     # then refresh the lock
+nix build            # vendorHash mismatch here means the order above was skipped
+```
+
+### Codemod renames are repo-wide, not import-scoped
+
+`codemod.sh` seds every `*.go` file in the repository — including files that
+never imported cmdguard. A consumer's OWN `TypeHandler` type, or a `v4 "..."`
+import alias for a different package, gets renamed too (this bit two fleet
+repos during the 2026-11 migrations). There is no `--dry-run` flag yet:
+
+```bash
+git status --short   # must be clean
+git switch -c chore/cmdguard-v5-codemod
+bash /path/to/cmdguard/docs/migration_v4_v5/codemod.sh
+git diff --stat      # review EVERY renamed file; revert non-cmdguard files
+git restore path/to/unrelated.go   # for any file the codemod touched wrongly
+```
+
+Run it on a branch, review the full diff, and restore any file that does not
+import cmdguard.
+
+## 4. Review the new defaults
 
 v5 ships with the batteries ON. A bare `NewCLI` now means:
 
@@ -84,13 +132,13 @@ re-enables the whole bundle after any opt-out.
 - **Doctor reports the scope's built-in services.** Expect
   `2 passed, 0 failed` (FlagRegistry + your config) on a bare healthy CLI.
 
-## 4. Commands without WithShort now fail
+## 5. Commands without WithShort now fail
 
 Strict validation is the default: `AddCommand` rejects commands without a
 short description (`ErrMissingShort`). Add `WithShort("...")` — or opt out
 with `WithoutStrictValidation()` while migrating.
 
-## 5. Kill the construction ladder (optional, recommended)
+## 6. Kill the construction ladder (optional, recommended)
 
 v5 adds `Builder[T]`: one line per command, errors collected and reported
 once at `Build`:
@@ -111,7 +159,7 @@ if err := b.Build(); err != nil {
 `examples/taskctl` migrated with this pattern — see its `buildCommands` for
 the full before/after.
 
-## 6. Worked example: taskctl
+## 7. Worked example: taskctl
 
 The flagship example moved from 14 `cmd, err := ...; if err != nil { return
 err }` stanzas to a single `Builder` sequence (359 → ~310 lines in
@@ -119,7 +167,7 @@ err }` stanzas to a single `Builder` sequence (359 → ~310 lines in
 test suite is unchanged — behavior parity is proven by the same tests
 passing.
 
-## 7. Verify
+## 8. Verify
 
 ```bash
 go build ./... && go test ./...
