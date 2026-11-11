@@ -86,7 +86,7 @@ require (
 	github.com/larsartmann/samber-do-auditlog v0.12.3
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 )
 
 replace (
