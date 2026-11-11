@@ -172,4 +172,15 @@
 //
 // See the examples/ directory for working demonstrations of each feature.
 // Visit https://pkg.go.dev/github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4 for the full API reference.
+//
+// # Retirement
+//
+// Deprecated: the v4 major line is retired. v4.3.0 is its final release; it
+// stays fetchable and documented but receives no further fixes, features, or
+// releases. New projects should start on
+// github.com/larsartmann/cmdguard/v5, which keeps the type-safe flags, DI, and
+// zero-panic contracts while turning the batteries (strict validation, signal
+// handling, hints, doctor, version) on by default. See
+// https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md
+// for the upgrade path.
 package v4

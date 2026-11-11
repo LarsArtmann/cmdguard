@@ -292,6 +292,10 @@ linters:
         linters:
           - err113
           - wrapcheck
+      - path: (benchmarks|examples|tests)/
+        linters:
+          - staticcheck
+        text: "is deprecated: the v4 major line is retired"
       - path: pkg/cmdguard/v2/flags_parse.go$
         linters:
           - cyclop

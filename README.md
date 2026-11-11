@@ -1,5 +1,12 @@
 # cmdguard
 
+> **Retired: v4 is the final v4 release.** cmdguard v4 receives no further fixes,
+> features, or releases. Use
+> [`github.com/larsartmann/cmdguard/v5`](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)
+> for new work; the upgrade path is
+> [docs/MIGRATION_v4_v5.md](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md).
+> The documentation below describes the frozen v4 API.
+
 > **End goal:** Make it IMPOSSIBLE to NOT create SUPERB CLI apps with near ZERO-BUGs and fantastic User Experience while keeping Code requirements developers and AI Agents need to write to an absolute minimum!
 
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
@@ -16,9 +23,9 @@
 
 cmdguard is the only Go CLI framework that unifies **type-safe flags**, **dependency injection with lifecycle management**, and a **zero-panic error contract** into a single system validated at construction. It wraps [Cobra](https://github.com/spf13/cobra) so you keep full compatibility while eliminating its footguns.
 
-**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v4` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
+**Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v5` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
-> **API Stability:** v4.2.1 is the current release on the v4 major line. The legacy v2 line is in maintenance at v2.10.4. See the [v3→v4 Migration Guide](docs/MIGRATION_v3_v4.md) for the latest migration, or the [v2→v3 Migration Guide](docs/MIGRATION_v2_v3.md) for the earlier migration. Full change history in [CHANGELOG.md](CHANGELOG.md).
+> **API Stability:** v4.3.0 is the final release of the retired v4 major line; v4.2.1 and earlier v4 tags remain fetchable, but new work belongs on v5. The legacy v2 line is in maintenance at v2.10.4. Upgrade guides: [v4→v5](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md), [v3→v4](docs/MIGRATION_v3_v4.md), [v2→v3](docs/MIGRATION_v2_v3.md). Full change history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -413,19 +420,19 @@ type Flags struct {
 }
 ```
 
-| Tag        | Purpose                                 | Example                |
-| ---------- | --------------------------------------- | ---------------------- |
-| `flag`     | Flag name (required)                    | `flag:"name"`          |
-| `short`    | Short flag                              | `short:"n"`            |
-| `default`  | Default value                           | `default:"World"`      |
-| `help`     | Help text                               | `help:"Name to greet"` |
-| `env`      | Environment variable                    | `env:"DB_HOST"`        |
-| `required` | Mark as required                        | `required:"true"`      |
+| Tag        | Purpose                                 | Example                  |
+| ---------- | --------------------------------------- | ------------------------ |
+| `flag`     | Flag name (required)                    | `flag:"name"`            |
+| `short`    | Short flag                              | `short:"n"`              |
+| `default`  | Default value                           | `default:"World"`        |
+| `help`     | Help text                               | `help:"Name to greet"`   |
+| `env`      | Environment variable                    | `env:"DB_HOST"`          |
+| `required` | Mark as required                        | `required:"true"`        |
 | `validate` | Runtime validation after parsing        | `validate:"email,min=5"` |
-| `values`   | Restrict to a fixed set of values       | `values:"a,b,c"`       |
-| `count`    | Counting flag                           | `count:"true"`         |
-| `local`    | Root-only, not inherited by subcommands | `local:"true"`         |
-| `hidden`   | Exclude from --help but stay functional | `hidden:"true"`        |
+| `values`   | Restrict to a fixed set of values       | `values:"a,b,c"`         |
+| `count`    | Counting flag                           | `count:"true"`           |
+| `local`    | Root-only, not inherited by subcommands | `local:"true"`           |
+| `hidden`   | Exclude from --help but stay functional | `hidden:"true"`          |
 
 ---
 

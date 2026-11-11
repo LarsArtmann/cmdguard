@@ -6,7 +6,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v4.2.1 - zero panics, 90.4% core coverage, 0 lint issues, 0 race conditions
+**Status:** v4.3.0 - FINAL v4 release. This line is retired: no further fixes, features, or releases. New work targets `github.com/larsartmann/cmdguard/v5` (see docs/MIGRATION_v4_v5.md on master). v4.3.0 itself: zero panics, 90.4% core coverage, 0 lint issues, 0 race conditions
 
 ---
 

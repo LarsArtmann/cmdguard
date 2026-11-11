@@ -7,6 +7,42 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Added
+
+- Nothing yet.
+
+### Changed
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+---
+
+## [4.3.0] - 2026-11-11
+
+v4.3.0 is the **final release of the v4 major line**. v4 is retired: the module
+stays fetchable and its documentation stays online, but no further fixes,
+features, or releases will land on this line. New projects should start on
+`github.com/larsartmann/cmdguard/v5`, and existing v4 users should follow
+[docs/MIGRATION_v4_v5.md](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md).
+
+### Deprecated
+
+- **The v4 major line is retired as of v4.3.0.** The package documentation
+  carries a `Deprecated:` notice and the README leads with the retirement
+  banner. `github.com/larsartmann/cmdguard/v5` is the supported line.
+- **The v4 module's own dependencies are pinned to published versions.** The
+  `require` block pointed at the zero pseudo-version
+  (`v0.0.0-00010101000000-000000000000`) for the `flightrecorder`, `glamour`,
+  and `spinner` sibling modules, which made `go get github.com/larsartmann/cmdguard/v4`
+  unresolvable for consumers (`unknown revision 000000000000`). The final
+  release pins `flightrecorder v0.1.0`, `glamour v0.2.0`, and
+  `spinner v0.2.0`; the local `replace` directives stay unversioned so
+  workspace builds keep working.
+
 ### Changed
 
 - **BREAKING (retrospective entry — the change landed in v4.1.0 without a
