@@ -98,9 +98,11 @@ func TestNormalizeTableSpacing(t *testing.T) {
 			want:  "",
 		},
 		{
-			name:  "aligned table collapses to unpadded cells and short separators",
-			input: "| Go name      | Code             |\n| ------------- | ---------------- |\n| `ErrRequired` | `required_flag`  |",
-			want:  "|Go name|Code|\n|---|---|\n|`ErrRequired`|`required_flag`|",
+			name: "aligned table collapses to unpadded cells and short separators",
+			input: "| Go name      | Code             |\n" +
+				"| ------------- | ---------------- |\n" +
+				"| `ErrRequired` | `required_flag`  |",
+			want: "|Go name|Code|\n|---|---|\n|`ErrRequired`|`required_flag`|",
 		},
 		{
 			name:  "unaligned table normalizes to the same shape as aligned",
@@ -147,8 +149,13 @@ func TestNormalizeTableSpacing(t *testing.T) {
 	t.Run("aligned and unaligned renderings compare equal", func(t *testing.T) {
 		t.Parallel()
 
-		aligned := normalizeTableSpacing("| Go name      | Code             |\n| ------------- | ---------------- |\n| `ErrRequired` | `required_flag`  |")
-		unaligned := normalizeTableSpacing("| Go name | Code |\n| --- | --- |\n| `ErrRequired` | `required_flag` |")
+		alignedInput := "| Go name      | Code             |\n" +
+			"| ------------- | ---------------- |\n" +
+			"| `ErrRequired` | `required_flag`  |"
+		unalignedInput := "| Go name | Code |\n| --- | --- |\n| `ErrRequired` | `required_flag` |"
+
+		aligned := normalizeTableSpacing(alignedInput)
+		unaligned := normalizeTableSpacing(unalignedInput)
 
 		if aligned != unaligned {
 			t.Fatalf("aligned vs unaligned normalized forms differ:\n%q\n%q", aligned, unaligned)
