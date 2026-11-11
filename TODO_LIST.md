@@ -1,91 +1,99 @@
 # TODO List
 
 > Short- and mid-term improvement tasks — actionable, bounded, with status.
-> Derived from FEATURES.md partially-functional items, TODO(v5) markers,
-> status report harvests, and code analysis. Updated as work completes.
+> Derived from FEATURES.md partially-functional items, status report harvests,
+> and code analysis. Updated as work completes. Done rows are struck with
+> evidence; the full history lives in CHANGELOG.md.
 
 ---
 
-## Delivery Follow-ups (harvested 2026-11-08 12:25 self-critique report)
+## Delivery Follow-ups (harvested 2026-11-08 12:25 + 2026-11-11 09:14 reports)
 
-Top items from the Pareto v2 execution's next-50 list. The full 50-item
-list lives in `docs/status/2026-11-08_12-25_self-critique-status-v2-execution.md` §f.
-
-<!-- check-rows:ledger -->
-
-| #  | Task                                                                                     | Evidence / notes                                                                        | Status  |
-| -- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------- |
-| F1 | Check `gh run` CI status for cmdguard v5-scaffold pushes; fix any red legs               | all verification so far was local; CI legs unknown since the v5.0.0 tag push            | 🔴 TODO |
-| F2 | api-reference.mdx: sample-code audit (only the pkg.go.dev link was fixed)                | website/src/content/docs/api-reference.mdx — code samples may still teach v4 idioms     | 🔴 TODO |
-| F3 | Cut v5.1.0 carrying WithStrictPositionalArgs/WithArgsPassthrough + R3–R9 docs (untagged) | new public API landed after the v5.0.0 tag; publish shapes per the lint/v0.2.1 playbook | 🔴 TODO |
-| F4 | Document the two new options in SKILL.md + README options table + AGENTS.md Args gotcha  | public API currently undocumented in consumer docs                                      | 🔴 TODO |
-| F5 | Verify SKILL.md fan-out link resolves and serves the new content (check-skill-fanout.sh) | repo source rewritten; delivering layer not re-verified                                 | 🔴 TODO |
-| F6 | Feed CHANGELOG [Unreleased] with the R3–R9 entries                                       | CHANGELOG currently stops at [5.0.0]                                                    | 🔴 TODO |
-| F7 | Run cmdguard-lint v0.3.0 on the erraudit/timesheets PR branches; post real numbers       | PR bodies claim "0 findings" without an executed run on the branches                    | 🔴 TODO |
-| F8 | Extend `toolchain go1.27.3` to the 7 sub-module go.mods                                  | per-module govulncheck still scans under local 1.27.0 stdlib                            | 🔴 TODO |
-| F9 | Add the cmdguard-lint `lint --dir X` invocation gotcha to AGENTS.md lint section         | repeated the audit's confessed mistake this session (wasted pass in R2.3)               | 🔴 TODO |
-
-## v5 Breaking Changes (Deferred)
-
-These items have `TODO(v5)` markers in source code. They are public API
-renames/removals from the 2026-07-18 naming review (plus follow-ups) that
-cannot ship in v4.x without breaking downstream consumers.
+Top items from the Pareto v2 execution's next-50 list plus the v4-retirement
+session. The full 50-item lists live in
+`docs/status/2026-11-08_12-25_self-critique-status-v2-execution.md` §f and
+`docs/status/2026-11-11_09-14_v4-retirement-and-v5-master-merge-status.md` §9.
 
 <!-- check-rows:ledger -->
 
-| # | Task | File | Status |
-| - | ---- | ---- | ------ |
-
-Further v5 candidates (Get[T] rename, Package[T] redesign) live in
-ROADMAP.md §"Additional v5 candidates" — keep them there, not here.
-
-> These must stay as `TODO` (not `NOTE`) so `grep TODO` finds them. The godox
-> linter exclusion for `TODO(v5)` is deliberately narrow.
+| #  | Task                                                                                      | Evidence / notes                                                                                                                                  | Status  |
+| -- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| F1 | Check `gh run` CI status for cmdguard v5 pushes; fix any red legs                         | all verification so far was local; `gh` could not reach api.github.com from the 2026-11-11 docs session — re-check when online                    | 🔴 TODO |
+| F3 | Cut v5.1.0 carrying WithStrictPositionalArgs/WithArgsPassthrough + Builder mutex fix (untagged) | 42+ commits past the v5.0.0 tag; `[Unreleased]` is already fed; publish shapes per the lint/v0.2.1 playbook. Owner sign-off required first (see ROADMAP Open questions) | 🔴 TODO |
+| F7 | Run cmdguard-lint v0.3.0 on the erraudit/timesheets PR branches; post real numbers        | PR bodies claim "0 findings" without an executed run on the branches                                                                              | 🔴 TODO |
 
 ---
 
-## Pareto Plan Tasks (2026-11-02)
+## Website Follow-ups (harvested 2026-11-11 01:33 launch report)
 
-Full ranked plan with fine-grained breakdown (123 tasks) and execution graph:
-[docs/planning/2026-11-02_00-38_pareto-v5-release-execution-plan.md](docs/planning/2026-11-02_00-38_pareto-v5-release-execution-plan.md).
-Only P0/P1 near-term items duplicated here; P2 lives in the plan.
+The v5 docs site launched; these are its own report's open improvements.
+Source: `docs/status/2026-11-11_01-33_website-v5-docs-launch-status.md` §f.
 
 <!-- check-rows:ledger -->
 
-| #       | Task                                                | Notes                                                                                                                                                                                                                                                              | Priority | Status  |
-| ------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------- |
-| ~~P6~~  | ~~lint/v0.2.0 + BuildFlow bump + fleet baseline~~   | ~~CG007/CG008, baseline, options reach the fleet.~~ DONE 2026-11-08: lint/v0.2.0 + v0.2.1 + v0.3.0 all tagged and proxy-served; BuildFlow bumped to lint v0.3.0 (input pinned lint/v0.3.0 ref); CG002 CurrentMajor=v5 baseline shipping fleet-wide.                | P1       | ✅ DONE |
-| ~~P10~~ | ~~Machine error codes + generated ERROR_REFERENCE~~ | ~~Stable `code` per sentinel; docs cannot drift.~~ DONE (shipped in v4.1.0/v4.2.x era — ErrorCode(err), envelope error_code, drift-guarded ERROR_REFERENCE regen; verified in the v5 tree 2026-11-08).                                                             | P1       | ✅ DONE |
-| ~~P11~~ | ~~Validation-semantics hardening (M06–M08)~~        | ~~Env/config e2e, registration-time defaults, Duration bounds.~~ DONE (shipped in v4.2.0: ValidateFlags wired for env/default values, ErrInvalidFlagDefault at construction, min/max domain resolution incl. Duration bounds; verified in the v5 tree 2026-11-08). | P1       | ✅ DONE |
+| #  | Task                                                                        | Evidence / notes                                                                                                                       | Priority | Status  |
+| -- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| W1 | Live-domain smoke-test script after deploy                                  | assert 200 for `/`, all sidebar routes, `/sitemap-index.xml`, `/robots.txt`, `/404.html`; today only static link checks exist (`scripts/check-website-links.py`) | Medium | 🔴 TODO |
+| W2 | Fragment-level type-check harness for docs snippets                          | complete Go programs already compile via `scripts/check-docs-api.py`; partial fragments are still not compiled                          | Medium   | 🔴 TODO |
+| W3 | Add `llms.txt` (links + one-paragraph product summary)                       | `website/public/llms.txt` does not exist                                                                                               | Low      | 🔴 TODO |
+| W4 | Validate JSON-LD (SoftwareApplication) with a structured-data test           | markup exists at `website/src/layouts/LandingLayout.astro:41`; nothing asserts its shape                                               | Low      | 🔴 TODO |
+| W5 | Decide `hreflang`/locale policy                                              | add only if a second language is planned; otherwise document English-only                                                              | Low      | 🔴 TODO |
+| W6 | Add a markdown/MDX linter                                                    | frontmatter required, heading order, code-fence languages; no remark/markdownlint config today                                         | Low      | 🔴 TODO |
 
 ---
 
-## v5 End-Goal Workstreams (pre-v5 slice)
+## Fleet v5 Migration Follow-ups (harvested 2026-11-11 08:24 report)
 
-Plan: [docs/planning/2026-11-01_v5-end-goal-paved-road.md](docs/planning/2026-11-01_v5-end-goal-paved-road.md).
-These are the additive, non-breaking pieces shipped before the major so
-consumers can adopt early and the v5 break stays small.
+Consumer-repo fixes discovered during the 25-repo v5 migration. Rows whose fix
+lands outside this repo carry a `repo:` tag — tick them merge-by-reference from
+that repo's history, not from greps here.
+Source: `docs/status/2026-11-11_08-24_cmdguard-v5-fleet-consumer-migration-status.md` §f.
 
 <!-- check-rows:ledger -->
 
-| # | Task | Notes | Status |
-| - | ---- | ----- | ------ |
+| #   | Task                                                                     | Evidence / notes                                                                                                                                                  | Status  |
+| --- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| FM1 | Bump the 25 consumers + `cv` to v5.0.1                                    | blocked on the v5.0.1 release (no tag yet; the v5.0.0 go.mod carries the leaked templ indirect floor) — see F3                                                    | 🔴 TODO |
+| FM2 | Fix `TestLoadIdentityPortalsSection` (repo: CV)                           | fails at CV HEAD (A/B-verified pre-existing)                                                                                                                       | 🔴 TODO |
+| FM3 | Fix `crm.checkpoint_path` missing defaultsYAML entry (repo: CV)           | `TestDefaultsYAMLContainsEveryConfigKey` fails at CV HEAD                                                                                                          | 🔴 TODO |
+| FM4 | Fix health-probe panics — `Routes.Version` without `WithVersion` (repo: projects-management-automation) | fails at pre-migration commit (A/B-verified)                                                                                        | 🔴 TODO |
+| FM5 | Fix/skip the two hanging `cqrs-lint` `go/packages` tests in offline CI (repo: go-cqrs-lite) | hang at pre-migration commit; network/toolchain-bound                                                                            | 🔴 TODO |
+| FM6 | Add a `describe`-contract snapshot test per consumer                      | agents depend on the contract; one golden per consumer CLI catches accidental flag/tree changes                                                                    | 🔴 TODO |
+
+---
+
+## Release & CI Hardening (harvested 2026-11-11 09:14 report)
+
+From the v4-retirement session's §7/§9. Source:
+`docs/status/2026-11-11_09-14_v4-retirement-and-v5-master-merge-status.md`.
+
+<!-- check-rows:ledger -->
+
+| #  | Task                                                                      | Evidence / notes                                                                                                                     | Priority | Status  |
+| -- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| R1 | Fix `website.yml` import-path guard + redeploy                             | hard-coded `/v4` guard trips on a historical `/v3` mention in `changelog.mdx`; Website RED since 2026-11-08 (user-facing regression)  | High     | 🔴 TODO |
+| R2 | Validate release branches in CI                                            | add `release/**` (or all branches) to `ci.yml` triggers — the root cause of the red-forever `v4.3.0` tag                              | Medium   | 🔴 TODO |
+| R3 | `workflow_dispatch` dry-run path in `release.yml`                          | run tests+lint without creating a release                                                                                            | Medium   | 🔴 TODO |
+| R4 | `scripts/pre-tag-check.sh`                                                 | read the release workflow, run `check-all` — the "read the workflow before tagging" lesson, mechanized                                 | Medium   | 🔴 TODO |
+| R5 | Add `go vet` (and `go mod verify`) to `check-all`                          | not in the gate today                                                                                                                 | Medium   | 🔴 TODO |
+| R6 | Raise samber-linter health coverage above 33%                              | or add an explicit `allow` rationale for the two eager DI services                                                                    | Low      | 🔴 TODO |
+| R7 | Unit test for `normalizeTableSpacing`                                      | aligned vs unaligned input; guards the drift-guard fix (`0ce8112`)                                                                    | Low      | 🔴 TODO |
+| R8 | Verify pkg.go.dev renders v4.3.1 + v5.0.0                                  | confirm the v4 deprecation banner visually; fetch from the proxy                                                                      | Low      | 🔴 TODO |
 
 ---
 
 ## Config-Truth Follow-ups (2026-11-02)
 
 From the config-truth execution (plan:
-[docs/planning/2026-11-02_05-36_config-truth-pareto-execution-plan.md](docs/planning/2026-11-02_05-36_config-truth-pareto-execution-plan.md);
-status report: `docs/status/2026-11-02_10-15_config-truth-execution-mid-flight.md`).
+[docs/planning/2026-11-02_05-36_config-truth-pareto-execution-plan.md](docs/planning/2026-11-02_05-36_config-truth-pareto-execution-plan.md)).
 
 <!-- check-rows:ledger -->
 
-| #   | Task                                                    | Notes                                                                                                                                                                                                                                                                                                                         | Priority | Status                                                                                                                                                    |
-| --- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CT1 | cmdguard-lint CG009 idea: example configs stay truthful | A rule that parses a repo's committed example configs (e.g. `config.example.yaml`) and rejects keys the CLI's config vocabulary does not accept. Needs cross-file type info (or a mode that shells `describe`/`ConfigKeys` from a built binary), so it is an IDEA, not a task — scope it in the lint backlog before building. | Low      | 💡 IDEA                                                                                                                                                   |
-| CT2 | Decide the `schema` sub-module release                  | Ship as `schema/v0.1.0` alongside v4.3.0, or keep workspace-local until the API settles. Tag shape per the release playbook (real pin + version-scoped replace); README marks the surface experimental.                                                                                                                       | Medium   | 📝 DECIDED 2026-11-08: hold workspace-local until v5.0.0 ships; tag schema/v0.1.0 after, per the lint/v0.2.x playbook (real pin + version-scoped replace) |
-| CT3 | Wire `examples/config-explain` into README + website    | The demo exists and runs; it is not linked from README.md or the website docs yet.                                                                                                                                                                                                                                            | Low      | 🔴 TODO                                                                                                                                                   |
+| #   | Task                                                    | Notes                                                                                                                                                                                                                                                         | Priority | Status    |
+| --- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
+| CT1 | cmdguard-lint CG009 idea: example configs stay truthful | A rule that parses a repo's committed example configs (e.g. `config.example.yaml`) and rejects keys the CLI's config vocabulary does not accept. Needs cross-file type info (or a mode that shells `describe`/`ConfigKeys` from a built binary), so it is an IDEA, not a task — scope it in the lint backlog before building. | Low      | 💡 IDEA   |
+| ~~CT2~~ | ~~Decide the `schema` sub-module release~~          | ~~Ship as `schema/v0.1.0` alongside v4.3.0, or keep workspace-local until the API settles.~~ DONE 2026-11-08-era: held workspace-local through v5.0.0, then tagged `schema/v0.1.0` (tag exists in the repo).                                               | Medium   | ✅ DONE   |
+| ~~CT3~~ | ~~Wire `examples/config-explain` into README + website~~ | ~~The demo exists and runs; it is not linked from README.md or the website docs yet.~~ DONE 2026-11-11: README Examples section now lists config-explain + docs-generator + taskctl (website page wiring rides the W-rows).                              | Low      | ✅ DONE   |
 
 ---
 
@@ -99,30 +107,11 @@ resolved (struck with evidence in the report itself) or routed to ROADMAP
 <!-- check-rows:ledger -->
 
 | #      | Task                                                    | Notes                                                                                                                                                                                                                                                                                                                                                                             | Priority | Status  |
-| ------ | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| H4     | Website hero-code sync guard                            | `website/src/data/hero-code.ts` (raw string) vs the inline highlighted copy in `HeroSection.astro` — no test or derive step keeps them in sync                                                                                                                                                                                                                                    | Low      | 🔴 TODO |
-| H6     | Audit `docs/COMPARISON.md` prose for v4 accuracy        | Header still says "Last Updated: 2026-07-07" while claiming v4-era content; the full prose audit was left open by three 2026-08-06 reports                                                                                                                                                                                                                                        | Low      | 🔴 TODO |
+| ------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| ~~H4~~ | ~~Website hero-code sync guard~~                        | ~~`website/src/data/hero-code.ts` (raw string) vs the inline highlighted copy in `HeroSection.astro` — no test or derive step keeps them in sync~~ DONE: obsolete premise — `HeroSection.astro` imports and renders `heroCode` (single source, no hand-written copy) and `scripts/check-docs-api.py:81` `check_hero_single_source()` gates it. Verified 2026-11-11.                 | Low      | ✅ DONE |
+| ~~H6~~ | ~~Audit `docs/COMPARISON.md` prose for v4 accuracy~~    | ~~Header still says "Last Updated: 2026-07-07" while claiming v4-era content; the full prose audit was left open by three 2026-08-06 reports~~ DONE: header now reads 2026-11-08 (v5.0.0 era, audit pass 1 of 3) and zero `v4.` matches remain (re-grepped 2026-11-11); remaining audit passes ride the website W-rows.                                                          | Low      | ✅ DONE |
 | ~~H9~~ | ~~Fixture test for lint resolveImports dot/blank arms~~ | ~~`lint/walk.go:240,242` arms have 0 coverage~~ DONE 2026-11-08: `lint/crossfile_imports_test.go` covers both arms; uncovered a REAL gap — dot-imported bare constructors (`NewCLI(...)` without a selector) are untraced, pinned as current behavior and tracked as follow-up H9b (trace bare constructor calls when the file dot-imports cmdguard; non-idiomatic pattern, Low). | Low      | ✅ DONE |
 | H9b    | Trace dot-imported bare constructors in cmdguard-lint   | `isSelectorCall` requires a selector, so `NewCLI(...)` under a dot import is invisible to CG003/CG004/CG006; pinned by `lint/crossfile_imports_test.go` (flips to expect findings when fixed). Non-idiomatic pattern; Low priority.                                                                                                                                               | Low      | 🔴 TODO |
-
----
-
-## samber-linter HW-2 Follow-ups (2026-09-20 report)
-
-The context-aware healthcheck FIX shipped, but its follow-up cluster is
-genuinely open (verified 2026-11-07 by the docs-health sweep).
-
-| # | Task | Notes | Priority | Status |
-| - | ---- | ----- | -------- | ------ |
-
----
-
-## Blocked on Upstream
-
-<!-- check-rows:ledger -->
-
-| # | Task | Blocker | Priority | Status |
-| - | ---- | ------- | -------- | ------ |
 
 ---
 
@@ -136,7 +125,7 @@ Harvested from `docs/status/2026-10-04_07-11_cmdguard-lint-sub-module-build.md` 
 | #  | Task                                                         | Notes                                                                                                                                                                                                                                                                                                                                                                                                                | Priority | Status      |
 | -- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
 | L6 | golangci-lint module-plugin distribution layer               | Scoped 2026-10-09: requires an `analysis.Analyzer` bridge (golangci/plugin-module-register, per go-humanize-linter pattern: `lint/plugin/` package + `.custom-gcl.yml` + `.golangci.custom.yml`). One pass = one package's files, so cross-file tracing carries over; checks need a pass.Files→project adapter. NOT a thin wiring task — do not half-ship. Also needs the custom-gcl build verified against corpora. | Low      | 🔴 TODO     |
-| L8 | Bump `CurrentMajor` in `lint/walk.go` when cmdguard v5 ships | Standing duty; CG002 tracks the constant. Rule IDs CG001–CG008 are load-bearing (suppressions key on them) — never renumber                                                                                                                                                                                                                                                                                          | —        | 🔵 STANDING |
+| ~~L8~~ | ~~Bump `CurrentMajor` in `lint/walk.go` when cmdguard v5 ships~~ | ~~Standing duty; CG002 tracks the constant. Rule IDs CG001–CG008 are load-bearing (suppressions key on them) — never renumber~~ DONE 2026-11-08: `CurrentMajor` is `"v5"`, shipped fleet-wide in `lint/v0.3.0` + the BuildFlow bump (CG002 flags v1–v4 imports).                                                                                                                                                     | —        | ✅ DONE     |
 
 ---
 
@@ -144,6 +133,14 @@ Harvested from `docs/status/2026-10-04_07-11_cmdguard-lint-sub-module-build.md` 
 
 <!-- check-rows:ledger -->
 
-| #  | Task                                        | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Priority | Status     |
-| -- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
-| S2 | Bump toolchain to go1.27.2 (6 stdlib vulns) | govulncheck (2026-10-09): GO-2026-6599/6600/6611/6613/6617/6603 reachable via stdlib `net/http`+`html/template` @go1.27.1; all fixed in go1.27.2. Module-side `x/net` already bumped to v0.60.0 (clears the x/net half of 6611/6617/6603). **Blocked:** nixpkgs `go_1_27` is still 1.27.1 on unstable — setting `toolchain go1.27.2` now breaks the sandboxed treefmt/nix checks (`GOTOOLCHAIN=local`, see AGENTS.md gotcha). Re-check `nix eval nixpkgs#go_1_27.version` periodically; when ≥1.27.2: set toolchain directive, run `nix flake check`. | Medium   | 🟡 BLOCKED |
+| #  | Task                                        | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Priority   | Status     |
+| -- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
+| ~~S2~~ | ~~Bump toolchain to go1.27.2+ (6 stdlib vulns)~~ | ~~govulncheck (2026-10-09): GO-2026-6599/6600/6611/6613/6617/6603 reachable via stdlib `net/http`+`html/template` @go1.27.1; all fixed in go1.27.2. Blocked: nixpkgs `go_1_27` was still 1.27.1.~~ DONE 2026-11-11: blocker gone — `nix eval nixpkgs#go_1_27.version` = 1.27.3; root go.mod already pins `toolchain go1.27.3`; the 7 sub-module go.mods now carry `toolchain go1.27.3` too (this pass). Residual: re-run govulncheck to confirm the stdlib findings clear. | Medium     | ✅ DONE    |
+
+---
+
+## Blocked on Upstream
+
+Currently nothing. (The 2026-10 audit-middleware block resolved when
+samber-do-auditlog v0.11.0+ shipped `Plugin.RecordCommand`; `AuditMiddleware[T]`
+has been in core since — see FEATURES.md Audit Log table.)
