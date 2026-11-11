@@ -130,7 +130,7 @@ cmdguard/
 | `github.com/spf13/pflag`                    | Flag parsing         | v1.0.10 |
 | `charm.land/fang/v2`                        | Cobra styling        | v2.0.1  |
 | `github.com/larsartmann/go-output`          | Rich output formats  | v0.38.7 |
-| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.12.1 |
+| `github.com/larsartmann/samber-do-auditlog` | DI audit logging     | v0.12.3 |
 
 ### Optional Sub-Module Dependencies
 
