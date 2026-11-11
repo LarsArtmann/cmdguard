@@ -15,6 +15,15 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 - Nothing yet.
 
+## [4.3.1] - 2026-11-11
+
+Final release of the retired v4 major line, cut on the `release/v4` branch.
+v4.3.0 pinned the root module's sibling requires to published versions (v4 had
+been unresolvable through `go get` since v4.2.1, whose go.mod pointed at
+unfetchable zero pseudo-versions) and marked the package deprecated; v4.3.1
+carries the same API with the release workflow's lint invocation fixed. `master`
+now tracks v5; v4 is frozen on `release/v4`.
+
 ## [5.0.0] - 2026-11-08
 
 The paved-road major: the module path moves to `/v5`, production batteries

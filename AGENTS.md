@@ -6,7 +6,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v5.0.0 - zero panics, 89.3% core coverage, 0 lint issues, 0 race conditions
+**Status:** v5.0.0 (master) - v4 retired at v4.3.1 on the frozen `release/v4` branch; zero panics, 89.3% core coverage, 0 lint issues, 0 race conditions
 
 ---
 
@@ -282,6 +282,7 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 - **Sandboxed treefmt vs toolchain download** — `flake.nix` pins `goPkg = pkgs.go_1_27` and wraps the treefmt `goimports` formatter with `GOTOOLCHAIN=local` + `goPkg` on PATH. goimports shells out to `go` for import resolution; in the sandboxed `nix flake check` there is no network, so if `goPkg` is older than the `go` directive in go.mod, the check fails on every Go file with `go: download goX.Y.Z: ... connection refused` under "formatting failures detected". Rule: `goPkg` major.minor must be ≥ the go directive. Symptom signature and fix pattern shared with httputil (2026-09-23 incident).
 - `flake.nix` provides devShell + formatter + format check only (no `buildGoModule` or vet checks)
 - **Pre-commit hook** — lives in the tracked `.githooks/pre-commit` (the GLOBAL `core.hooksPath=.githooks` convention makes `.git/hooks/` dead weight); runs `buildflow --build-mode pre-commit --staged-only` advisory (the old license-check Go 1.27 fleet blocker is gone: BuildFlow auto-defers the go-licenses stdlib class since 2026-10-07). Hard walls: `nix run .#check-all` and CI.
+- **Release workflow lint args** — `golangci-lint-action` already supplies the `run` subcommand, so `args` must be `./...`, never `run ./...` (the latter executes `golangci-lint run run ./...` and exits 7). This broke the v4.3.0 tag's release run; it is fixed on master and on `release/v4`.
 
 #### Cobra Behavior
 
