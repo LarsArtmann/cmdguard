@@ -19,7 +19,7 @@ export const features: Feature[] = [
   {
     icon: "syringe",
     title: "Dependency Injection",
-    desc: "Lazy services, lifecycle hooks, health checks, and reverse-order shutdown on a signal. Powered by samber/do/v2.",
+    desc: "Lazy services, lifecycle hooks, health checks, and dependency-order shutdown on a signal. Powered by samber/do/v2.",
   },
   {
     icon: "terminal",
