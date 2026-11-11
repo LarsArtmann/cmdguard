@@ -25,7 +25,7 @@ cmdguard is the only Go CLI framework that unifies **type-safe flags**, **depend
 
 **Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v5` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
-> **API Stability:** v4.3.0 is the final release of the retired v4 major line; v4.2.1 and earlier v4 tags remain fetchable, but new work belongs on v5. The legacy v2 line is in maintenance at v2.10.4. Upgrade guides: [v4→v5](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md), [v3→v4](docs/MIGRATION_v3_v4.md), [v2→v3](docs/MIGRATION_v2_v3.md). Full change history in [CHANGELOG.md](CHANGELOG.md).
+> **API Stability:** v4.3.1 is the final release of the retired v4 major line; v4.2.1 and earlier v4 tags remain fetchable, but new work belongs on v5. The legacy v2 line is in maintenance at v2.10.4. Upgrade guides: [v4→v5](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md), [v3→v4](docs/MIGRATION_v3_v4.md), [v2→v3](docs/MIGRATION_v2_v3.md). Full change history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 

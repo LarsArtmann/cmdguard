@@ -21,11 +21,27 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ---
 
+## [4.3.1] - 2026-11-11
+
+v4.3.1 is the **final published release of the v4 major line** and carries the
+same API as v4.3.0. The v4.3.0 tag's GitHub release workflow failed on its own
+lint invocation (`golangci-lint run run ./...`, exit 7); the workflow is fixed
+here so the final v4 tag records a green check. Module content, the deprecation
+notice, and the retirement are otherwise unchanged.
+
+### Fixed
+
+- The release workflow passed `args: run ./...` to golangci-lint-action, which
+  already supplies `run`, so the step ran `golangci-lint run run ./...` and
+  exited 7. It now passes `args: ./...`.
+
+---
+
 ## [4.3.0] - 2026-11-11
 
-v4.3.0 is the **final release of the v4 major line**. v4 is retired: the module
-stays fetchable and its documentation stays online, but no further fixes,
-features, or releases will land on this line. New projects should start on
+v4.3.0 retires the v4 major line: the module stays fetchable and its
+documentation stays online, but no further fixes, features, or releases will
+land on this line. New projects should start on
 `github.com/larsartmann/cmdguard/v5`, and existing v4 users should follow
 [docs/MIGRATION_v4_v5.md](https://github.com/LarsArtmann/cmdguard/blob/master/docs/MIGRATION_v4_v5.md).
 

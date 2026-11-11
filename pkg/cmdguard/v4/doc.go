@@ -175,7 +175,7 @@
 //
 // # Retirement
 //
-// Deprecated: the v4 major line is retired. v4.3.0 is its final release; it
+// Deprecated: the v4 major line is retired. v4.3.1 is its final release; it
 // stays fetchable and documented but receives no further fixes, features, or
 // releases. New projects should start on
 // github.com/larsartmann/cmdguard/v5, which keeps the type-safe flags, DI, and
