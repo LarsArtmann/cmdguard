@@ -99,11 +99,11 @@ Per repository:
 
 All 30 modules pass `go build ./...`:
 
-| Group | Count | Result |
-| --- | --- | --- |
-| Listed consumer repos | 24 | 24/24 build |
-| `cv` (lowercase, extra) | 1 | build |
-| go-cqrs-lite `cmd/*/v4` | 5 | 5/5 build |
+| Group                   | Count | Result      |
+| ----------------------- | ----- | ----------- |
+| Listed consumer repos   | 24    | 24/24 build |
+| `cv` (lowercase, extra) | 1     | build       |
+| go-cqrs-lite `cmd/*/v4` | 5     | 5/5 build   |
 
 ### a.3 Lint (migration-specific rule)
 
@@ -232,7 +232,7 @@ All 30 modules pass `go build ./...`:
 
 ## d) TOTALLY FUCKED UP (honest list)
 
-1. **Mis-scoped codemod run.** My per-repo script took a repository *name* and
+1. **Mis-scoped codemod run.** My per-repo script took a repository _name_ and
    did `cd /home/lars/projects/$repo`. When I invoked it with an empty argument
    for the cqrs sub-modules, it `cd`'d to `/home/lars/projects` and ran the
    codemod across the **entire projects tree** for ~20–25 seconds before I
@@ -251,8 +251,8 @@ All 30 modules pass `go build ./...`:
      outside cmdguard consumers; the only `CommandMetadata` hits were CV's own
      pre-existing domain type and media-atlas's regenerated vendor).
    - Not assessed: `BuildFlow.vendor.bak` (a non-git dead backup directory).
-   Root cause: no argument validation in my wrapper script. This was avoidable
-   and is the single worst thing in the session.
+     Root cause: no argument validation in my wrapper script. This was avoidable
+     and is the single worst thing in the session.
 2. **Codemod false positive inside a migrated repo.** Running the codemod over
    `go-cqrs-lite/cmd/cqrs-lint/v4` renamed that tool's **own**
    `analyzer.CommandInfo` type to `CommandMetadata`, which broke its API-surface
@@ -277,21 +277,21 @@ All 30 modules pass `go build ./...`:
 
 **Pre-existing breakage confirmed by A/B (not mine, left or fixed as noted):**
 
-| Repo | Failure | Baseline? | Status |
-| --- | --- | --- | --- |
-| CV | `TestLoadIdentityPortalsSection` | fails at HEAD | left (pre-existing) |
-| CV | render goldens (`seanthegeek` vs `crowdsecurity` order) | fails at HEAD | left (non-deterministic fixture order) |
-| CV | `TestDefaultsYAMLContainsEveryConfigKey` (`crm.checkpoint_path`) | fails at HEAD | left |
-| nsfw-classifier | `TestContainerHealthCheckJoinsAllFailures` (`oops.Join` single cause) | fails at pre-migration commit | left |
-| projects-management-automation | health-probe panics (`Routes.Version` without `WithVersion`) ×2 | fails at pre-migration commit | left |
-| go-cqrs-lite | `doc-check` path tests (README/recipes resolved from `cmd/`) | fails at pre-migration commit | left |
-| go-cqrs-lite | 2 `cqrs-lint` tests hang in `go/packages` (network/toolchain) | hangs at pre-migration commit | left |
-| crm | `internal/httpapi` test package: `undefined: createDeal` | helper never existed at HEAD | left |
-| code-duplicate-analyzer | templ/parse build failure | fails at HEAD | **fixed** |
-| Standup-Killer | broken `go.work` (39 paths) | fails at HEAD | **fixed** |
-| mr-sync | inconsistent vendoring | fails at HEAD | **fixed** |
-| Zlota44 | templ runtime/codegen mismatch + vendoring | fails at HEAD | **fixed** |
-| crm | stale go-cqrs-lite replaces (29) | fails at HEAD | **fixed** |
+| Repo                           | Failure                                                               | Baseline?                     | Status                                 |
+| ------------------------------ | --------------------------------------------------------------------- | ----------------------------- | -------------------------------------- |
+| CV                             | `TestLoadIdentityPortalsSection`                                      | fails at HEAD                 | left (pre-existing)                    |
+| CV                             | render goldens (`seanthegeek` vs `crowdsecurity` order)               | fails at HEAD                 | left (non-deterministic fixture order) |
+| CV                             | `TestDefaultsYAMLContainsEveryConfigKey` (`crm.checkpoint_path`)      | fails at HEAD                 | left                                   |
+| nsfw-classifier                | `TestContainerHealthCheckJoinsAllFailures` (`oops.Join` single cause) | fails at pre-migration commit | left                                   |
+| projects-management-automation | health-probe panics (`Routes.Version` without `WithVersion`) ×2       | fails at pre-migration commit | left                                   |
+| go-cqrs-lite                   | `doc-check` path tests (README/recipes resolved from `cmd/`)          | fails at pre-migration commit | left                                   |
+| go-cqrs-lite                   | 2 `cqrs-lint` tests hang in `go/packages` (network/toolchain)         | hangs at pre-migration commit | left                                   |
+| crm                            | `internal/httpapi` test package: `undefined: createDeal`              | helper never existed at HEAD  | left                                   |
+| code-duplicate-analyzer        | templ/parse build failure                                             | fails at HEAD                 | **fixed**                              |
+| Standup-Killer                 | broken `go.work` (39 paths)                                           | fails at HEAD                 | **fixed**                              |
+| mr-sync                        | inconsistent vendoring                                                | fails at HEAD                 | **fixed**                              |
+| Zlota44                        | templ runtime/codegen mismatch + vendoring                            | fails at HEAD                 | **fixed**                              |
+| crm                            | stale go-cqrs-lite replaces (29)                                      | fails at HEAD                 | **fixed**                              |
 
 ---
 

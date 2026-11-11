@@ -35,28 +35,28 @@ All four are fixed, `nix run .#check-all` is green, and CI plus Sub-module Smoke
 are green on `master`. One red check remains (website deploy, §4.1) and one
 permanently red tag exists (`v4.3.0`, §4.2).
 
-| Item | State |
-| --- | --- |
-| `master` on v5, pushed | DONE (`359feb3`) |
-| v4 retired with final release | DONE (`v4.3.1`) |
-| Full quality gate green | DONE (`check-all` → "All checks passed!") |
-| CI + Sub-module Smoke on master | DONE (both `success`) |
-| Website deploy | **RED** (pre-existing + stale guard, §4.1) |
-| `v4.3.0` tag release check | **RED forever** (own workflow bug, §4.2) |
-| v5.1.0 release | NOT STARTED (42 commits past `v5.0.0`) |
+| Item                            | State                                      |
+| ------------------------------- | ------------------------------------------ |
+| `master` on v5, pushed          | DONE (`359feb3`)                           |
+| v4 retired with final release   | DONE (`v4.3.1`)                            |
+| Full quality gate green         | DONE (`check-all` → "All checks passed!")  |
+| CI + Sub-module Smoke on master | DONE (both `success`)                      |
+| Website deploy                  | **RED** (pre-existing + stale guard, §4.1) |
+| `v4.3.0` tag release check      | **RED forever** (own workflow bug, §4.2)   |
+| v5.1.0 release                  | NOT STARTED (42 commits past `v5.0.0`)     |
 
 ---
 
 ## 1. Why the merge was safe (evidence)
 
-| Check | Result |
-| --- | --- |
-| Divergence | `v5-scaffold` 53 ahead, **0 behind** `master` → fast-forward, no merge commit |
-| Local `v5.0.0` tag | annotated, SSH-signed, identical object to remote (`79757cb` → `56fd69b`) |
-| Tag ancestry | `v5.0.0` is an ancestor of the branch |
+| Check               | Result                                                                                                |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| Divergence          | `v5-scaffold` 53 ahead, **0 behind** `master` → fast-forward, no merge commit                         |
+| Local `v5.0.0` tag  | annotated, SSH-signed, identical object to remote (`79757cb` → `56fd69b`)                             |
+| Tag ancestry        | `v5.0.0` is an ancestor of the branch                                                                 |
 | Root `go.mod` at v5 | real sibling pins (`flightrecorder v0.2.0`, `glamour v0.3.0`, `spinner v0.3.0`) → consumer-resolvable |
-| Consumer smoke | `go get .../v5@v5.0.0` resolved from the proxy |
-| Working tree | clean; only `go.work`/`go.work.sum` untracked-by-design (gitignored) |
+| Consumer smoke      | `go get .../v5@v5.0.0` resolved from the proxy                                                        |
+| Working tree        | clean; only `go.work`/`go.work.sum` untracked-by-design (gitignored)                                  |
 
 The decisive argument for landing it on `master`: `ci.yml` triggers only on
 `push`/`pull_request` to `master|main`, so **the branch had never run CI**. The
@@ -68,15 +68,15 @@ only place to get CI validation was `master` itself.
 
 ### 2.1 Topology after the session
 
-| Ref | Commit | Meaning |
-| --- | --- | --- |
+| Ref                        | Commit    | Meaning                                          |
+| -------------------------- | --------- | ------------------------------------------------ |
 | `master` / `origin/master` | `359feb3` | v5 trunk (72 commits, 417 files since `0ef84dd`) |
-| `v5-scaffold` | `359feb3` | fast-forwarded to `master` (kept, not deleted) |
-| `release/v4` | `d887363` | frozen v4 line (2 commits since `0ef84dd`) |
-| `v4.3.0` | `52c73af` | first installable v4 (superseded) |
-| `v4.3.1` | `d887363` | **final** v4 release, green release run |
-| `v5.0.0` | `56fd69b` | current v5 release, now GitHub "Latest" |
-| `release/v2.10` | `1c61a0d` | untouched legacy v2 maintenance |
+| `v5-scaffold`              | `359feb3` | fast-forwarded to `master` (kept, not deleted)   |
+| `release/v4`               | `d887363` | frozen v4 line (2 commits since `0ef84dd`)       |
+| `v4.3.0`                   | `52c73af` | first installable v4 (superseded)                |
+| `v4.3.1`                   | `d887363` | **final** v4 release, green release run          |
+| `v5.0.0`                   | `56fd69b` | current v5 release, now GitHub "Latest"          |
+| `release/v2.10`            | `1c61a0d` | untouched legacy v2 maintenance                  |
 
 ### 2.2 v4 retirement content (`release/v4`)
 
@@ -95,13 +95,13 @@ only place to get CI validation was `master` itself.
 
 ### 2.3 Pre-merge repairs on the v5 trunk
 
-| Fix | Why it was blocking | Commit |
-| --- | --- | --- |
-| `go.sum` restore (4 `/go.mod` lines) | `go build` failed: "missing go.sum entry" — CI would have been red on the merged master | `0ce8112` |
-| Drift guard normalization | formatter vs byte-equality split brain | `0ce8112` |
-| 7 sub-modules workspace-aware `go mod tidy` | "updates to go.mod needed" in the smoke job | `143d7fe` (+ daemon `8568abd`) |
-| `release.yml` lint args `run ./...` → `./...` | every `v*` tag since v4.1.0 had a red release run | `2218a19` |
-| Docs: retirement + topology + workflow trap | AGENTS.md/CHANGELOG had no record | `78354b2`, `359feb3` |
+| Fix                                           | Why it was blocking                                                                     | Commit                         |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------ |
+| `go.sum` restore (4 `/go.mod` lines)          | `go build` failed: "missing go.sum entry" — CI would have been red on the merged master | `0ce8112`                      |
+| Drift guard normalization                     | formatter vs byte-equality split brain                                                  | `0ce8112`                      |
+| 7 sub-modules workspace-aware `go mod tidy`   | "updates to go.mod needed" in the smoke job                                             | `143d7fe` (+ daemon `8568abd`) |
+| `release.yml` lint args `run ./...` → `./...` | every `v*` tag since v4.1.0 had a red release run                                       | `2218a19`                      |
+| Docs: retirement + topology + workflow trap   | AGENTS.md/CHANGELOG had no record                                                       | `78354b2`, `359feb3`           |
 
 ### 2.4 Commits the daemon made for this session
 
@@ -113,15 +113,15 @@ Everything else was committed deliberately with a message explaining the why.
 
 ### 2.5 Release / CI evidence
 
-| Run | Workflow | Commit/tag | Result |
-| --- | --- | --- | --- |
-| `42980794798` | Release | `v4.3.0` | **failure** (own `args` bug) |
-| `42981819212` | Release | `v4.3.1` | **success** |
-| `42981877056` | Website | master `2218a19` | **failure** (stale `/v4` guard) |
-| `42982137576` | CI | master `78354b2` | success |
-| `42982137501` | Sub-module Smoke | master `78354b2` | success |
-| `42982409522` | CI | master `359feb3` | success |
-| `42982409482` | Sub-module Smoke | master `359feb3` | success |
+| Run           | Workflow         | Commit/tag       | Result                          |
+| ------------- | ---------------- | ---------------- | ------------------------------- |
+| `42980794798` | Release          | `v4.3.0`         | **failure** (own `args` bug)    |
+| `42981819212` | Release          | `v4.3.1`         | **success**                     |
+| `42981877056` | Website          | master `2218a19` | **failure** (stale `/v4` guard) |
+| `42982137576` | CI               | master `78354b2` | success                         |
+| `42982137501` | Sub-module Smoke | master `78354b2` | success                         |
+| `42982409522` | CI               | master `359feb3` | success                         |
+| `42982409482` | Sub-module Smoke | master `359feb3` | success                         |
 
 `nix run .#check-all` on `359feb3`: build (8 modules), race tests (8 modules),
 lint (8 modules, 0 issues), format check, tidy check (8 modules), docs/guide
@@ -139,7 +139,7 @@ sync, dependency tables — **"All checks passed!"**.
 - v5 consumer: `go get .../v5@v5.0.0` resolved.
 - Retired-line lint: 0 issues after the scoped exclusion.
 - Sub-modules: build + tests green for all 7 with `GOWORK=off` (the CI shape).
-- GitHub: `v4.3.0` and `v4.3.1` release pages exist; `v5.0.0` marked *Latest*
+- GitHub: `v4.3.0` and `v4.3.1` release pages exist; `v5.0.0` marked _Latest_
   (it had been shadowed by the newly created v4.3.1).
 
 ---
@@ -208,7 +208,7 @@ release runs — I could have spotted the pattern earlier.
 12. `master` CI and Sub-module Smoke green on the final commit.
 13. `nix run .#check-all` green (build/test/lint/fmt/tidy/docs/dep-tables).
 14. GitHub releases: `v4.3.0` (backfilled, not latest), `v4.3.1`, `v5.0.0`
-    marked *Latest*.
+    marked _Latest_.
 15. Dependency table drift in AGENTS.md fixed (v0.12.3).
 16. AGENTS.md records the retirement topology and the workflow-args trap.
 17. Dependabot rebase requested on all three open PRs (#21, #22, #24).
@@ -370,7 +370,7 @@ nix run .#check-all                         # All checks passed!
 
 ## Appendix B — Known reds
 
-| Check | Since | Cause | Owner action |
-| --- | --- | --- | --- |
-| Website (master) | 2026-11-08 | hard-coded `/v4` guard trips on a historical `/v3` mention in `changelog.mdx` | fix guard, redeploy |
-| Release for tag `v4.3.0` | 2026-11-11 07:37Z | `golangci-lint run run ./...` (workflow `args`) | none — superseded by `v4.3.1` |
+| Check                    | Since             | Cause                                                                         | Owner action                  |
+| ------------------------ | ----------------- | ----------------------------------------------------------------------------- | ----------------------------- |
+| Website (master)         | 2026-11-08        | hard-coded `/v4` guard trips on a historical `/v3` mention in `changelog.mdx` | fix guard, redeploy           |
+| Release for tag `v4.3.0` | 2026-11-11 07:37Z | `golangci-lint run run ./...` (workflow `args`)                               | none — superseded by `v4.3.1` |
