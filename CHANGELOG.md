@@ -7,13 +7,14 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-11-11
+
 ### Added
 
 - **Strict positional-args control.** `WithStrictPositionalArgs()` makes a
   command reject undeclared positional args (inert when an explicit validator
   like `WithExactArgs` is already set); `WithArgsPassthrough()` explicitly
-  accepts and ignores extras. Both land with the v5.1.0 cut — nothing is
-  published for them yet. Pinned by `cli_args_strict_test.go`.
+  accepts and ignores extras. Pinned by `cli_args_strict_test.go`.
 
 ### Fixed
 

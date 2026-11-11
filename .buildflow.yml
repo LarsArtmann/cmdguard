@@ -1,0 +1,44 @@
+# BuildFlow Configuration
+# See: https://github.com/larsartmann/buildflow
+
+# Build mode: full, fast, ci, dev, pre-commit
+build_mode: full
+
+# Concurrency
+max_concurrency: 4
+
+# File settings
+# 900 (not the fleet-default 350): cmdguard is a batteries-included framework
+# whose intentional large units are protected by review, not by line counts —
+# errors_facts.go is the canonical sentinel table whose length IS the sentinel
+# count (splitting it churns the machine contract), cli.go carries the v5
+# Execute reuse invariants, and the BDD/table-driven test files are cohesive
+# by design (17 of the 32 findings at the 350 default were _test.go files).
+# Function-level complexity stays governed by funlen/maintidx in
+# .golangci.yml; 900 only catches NEW runaway files (~2.5x today's max).
+max_file_size: 900 # lines
+
+# TODO pattern minimum severity: info, warning, error, critical
+# info = all patterns, warning = skip TODO/NOTE/OPTIMIZE, error = only FIXME/XXX/BUG, critical = BUG only
+todo_min_severity: info
+
+# Findings baseline: accepted-noise findings (from --save-baseline) that the
+# severity gate ignores. Rule-level accepts go in the baseline's rule_accepts.
+# baseline: .buildflow-baseline.json
+
+# Patterns to exclude from checks
+exclude:
+  - vendor
+  - .git
+  - node_modules
+  - .next
+  - dist
+  - "*.pb.go"
+  - "*.gen.go"
+
+# Auto-fix settings
+auto_fix: false
+
+# Logging
+verbose: false
+log_level: info

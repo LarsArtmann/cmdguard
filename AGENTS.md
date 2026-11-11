@@ -216,6 +216,15 @@ Every submodule go.mod (`lint/`, `telemetry/`, `spinner/`, `flightrecorder/`, `p
 - A **version-pinned** replace (`cmdguard/v4 v4.0.2 => ../`) goes silently inert the moment a require bumps past the pin — GOWORK=off builds then resolve the stale published tag instead of local source (`v4.AddCommands` existed only locally, tag `v4.1.0` predated it; go-mod-update's compile gate failed and blamed the bump). Workspace-mode builds never notice because `use .` always wins.
 - Replaces never propagate: when a submodule resolves the local root go.mod, root's zero-pseudo sibling requires are only valid with root as the MAIN module — without consumer-side replaces, `GOWORK=off go list -m all` fails with `unknown revision 000000000000` while `go build`/`tidy` pass via graph pruning (same trap as BuildFlow gotcha #241).
 
+Note the asymmetry this creates: ROOT carries real sibling pins (release shape — published zips must be proxy-resolvable), while SUB-MODULES carry the zero pseudo-version for the cmdguard/v5 require. The BuildFlow `workspace/pseudo-version-hygiene` preflight therefore FAILs on the root's three sibling pins (flightrecorder v0.2.0, glamour v0.3.0, spinner v0.3.0) — **that finding is a deliberate, documented deviation (decision D12, 2026-11-11): do not "fix" it.** Normalizing the root to zero pseudo-versions poisons every downstream `go get` of the published module.
+
+### Owner decisions on docs & gates conventions (2026-11-11)
+
+- **D2 — struck-done TODO rows stay.** TODO_LIST rows are struck, never deleted: struck rows are the harvest ledger the docs-gates battery replays (deleting done rows broke the freshness audit with a 9-item regression the same day).
+- **D3 — archive by gate, not by calendar.** A status report moves to `docs/status/archived/` only when its annotation gates are green (`check-rows --strict` + `bare-rows` + `prose-items`), checked BEFORE the `git mv`. Mass-annotating the whole `docs/status/` backlog is scheduled only when the unarchived count nears the battery threshold (20).
+- **D13 — AGENTS.md stays load-bearing.** The fleet's 220-line warning is advisory and accepted: moving gotchas out of the auto-loaded file caused the lint `--dir` mistake twice. Trims come from prose, never from gotchas.
+- **D14 — file-size gate runs at 900 lines.** `.buildflow.yml` raises the fleet default (350) with rationale inline: the sentinel fact table's length IS the sentinel count, cli.go carries the Execute reuse invariants, and cohesive table-driven test files are by-design large (17 of 32 findings were `_test.go`). Function-level complexity stays governed by funlen/maintidx.
+
 ### Lint Strategy
 
 **Goal:** 0 lint issues via real code fixes, not silencing linters.
