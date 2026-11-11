@@ -38,7 +38,7 @@ nix flake check
 nix run .#check-all
 
 # Website docs truth gate (stale major, API symbols, compiled doc samples)
-python3 scripts/check-guide-sync.sh
+scripts/check-guide-sync.sh
 
 # Website build, typecheck, HTML validation, internal links
 (cd website && pnpm build && pnpm exec astro check && pnpm exec html-validate "dist/**/*.html")
