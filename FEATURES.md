@@ -22,63 +22,86 @@
 
 ---
 
-## CLI Core (`pkg/cmdguard/v4`)
+## CLI Core (`pkg/cmdguard/v5`)
 
 ### CLI[T] — Construction & Execution
 
-| Feature                                     | Status                  | Notes                                                                                                                                                                                     |
-| ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL     | Creates typed CLI, returns errors (`cli.go:130`)                                                                                                                                          |
-| `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL     | Adds typed subcommand, validates, returns error                                                                                                                                           |
-| `NewApp(name, short, defaults, build, ...)` | 🟢 FULLY_FUNCTIONAL     | Construct CLI, run the build callback, discard half-built app on error (`cli_batteries.go`)                                                                                               |
-| `AddCommands(cli, cmds...)`                 | 🟢 FULLY_FUNCTIONAL     | Atomic batch registration: every command is validated and converted before any is attached (`cli.go`)                                                                                     |
-| `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL     | Runs command tree with context                                                                                                                                                            |
-| `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL     | For testing with explicit args                                                                                                                                                            |
-| `ExecuteAndExit(ctx)`                       | 🟢 FULLY_FUNCTIONAL     | Run + `os.Exit` (respects `ExitCoder`) (`cli.go`)                                                                                                                                         |
-| `Scope()`                                   | 🟢 FULLY_FUNCTIONAL     | Returns DI scope (`cli_accessors.go`)                                                                                                                                                     |
-| `Config()`                                  | 🟢 FULLY_FUNCTIONAL     | Returns typed config `*T`                                                                                                                                                                 |
-| `Shutdown(ctx)`                             | 🟢 FULLY_FUNCTIONAL     | Graceful DI service shutdown                                                                                                                                                              |
-| `HealthCheck()` / `HealthCheckResults()`    | 🟢 FULLY_FUNCTIONAL     | Runs health checks via DI                                                                                                                                                                 |
-| `RootCommand()`                             | 🟢 FULLY_FUNCTIONAL     | Returns underlying `*cobra.Command`                                                                                                                                                       |
-| `Injector()`                                | 🟢 FULLY_FUNCTIONAL     | Returns `do.Injector` for raw DI access                                                                                                                                                   |
-| `SetConfig(cfg)`                            | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — mutates CLI config post-construction without re-initializing FlagRegistry (`cli_accessors.go:27`). Carries `TODO(v5)` removal marker; pass defaults to `NewCLI` instead. |
-| `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL     | Programmatic access to audit plugin + snapshot                                                                                                                                            |
-| `Describe()` / `WriteDescription(w)`        | 🟢 FULLY_FUNCTIONAL     | Machine-readable JSON contract (`schema_version`, commands, flags with env/required/values) (`describe.go`)                                                                               |
-| `describe` command                          | 🟢 FULLY_FUNCTIONAL     | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                            |
+| Feature                                     | Status              | Notes                                                                                                                                                                                     |
+| ------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NewCLI[T](name, short, defaults, opts...)` | 🟢 FULLY_FUNCTIONAL | Creates typed CLI, returns errors (`cli.go`)                                                                                                                                              |
+| `NewApp(name, short, defaults, build, ...)` | 🟢 FULLY_FUNCTIONAL | Construct CLI, run the build callback, discard half-built app on error (`cli_batteries.go`)                                                                                               |
+| `AddCommand(cli, cmd)`                      | 🟢 FULLY_FUNCTIONAL | Adds typed subcommand, validates, returns error                                                                                                                                           |
+| `AddCommands(cli, cmds...)`                 | 🟢 FULLY_FUNCTIONAL | Atomic batch registration: every command is validated and converted before any is attached; heterogeneous flag types via sealed `AddableCommand[T]`                                       |
+| `Builder[T]` (v5)                           | 🟢 FULLY_FUNCTIONAL | `NewBuilder[T](cli)` + free functions `Add`/`AddParent`/`Try` + `Check`/`Build`: constructor errors collected, `Build()` attaches atomically; safe for concurrent queueing (mutex) (`cli_builder.go`) |
+| `Execute(ctx)`                              | 🟢 FULLY_FUNCTIONAL | Runs command tree with context; repeatable (per-run flag/config/flow-context reset — `resetFlagStateForReuse`)                                                                            |
+| `ExecuteWithArgs(ctx, args)`                | 🟢 FULLY_FUNCTIONAL | For testing with explicit args                                                                                                                                                            |
+| `ExecuteAndExit(ctx)`                       | 🟢 FULLY_FUNCTIONAL | Run + `os.Exit` (respects `ExitCoder`)                                                                                                                                                    |
+| `ExitCode(err) int`                         | 🟢 FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1)                                                                                                                                  |
+| `Scope()`                                   | 🟢 FULLY_FUNCTIONAL | Returns DI scope (`cli_accessors.go`)                                                                                                                                                     |
+| `Config()`                                  | 🟢 FULLY_FUNCTIONAL | Returns typed config `*T`                                                                                                                                                                 |
+| `Shutdown(ctx)`                             | 🟢 FULLY_FUNCTIONAL | Explicit graceful DI service shutdown                                                                                                                                                     |
+| `HealthCheck(ctx)` / `HealthCheckResults()` | 🟢 FULLY_FUNCTIONAL | Runs health checks via DI; `HealthCheckResultsWithContext(ctx)` returns `map[string]error`                                                                                                |
+| `RootCommand()`                             | 🟢 FULLY_FUNCTIONAL | Returns underlying `*cobra.Command`                                                                                                                                                       |
+| `Injector()`                                | 🟢 FULLY_FUNCTIONAL | Returns `do.Injector` for raw DI access                                                                                                                                                   |
+| `AuditLog()` / `AuditLogReport()`           | 🟢 FULLY_FUNCTIONAL | Programmatic access to audit plugin + snapshot                                                                                                                                            |
+| `Describe()` / `WriteDescription(w)`        | 🟢 FULLY_FUNCTIONAL | Machine-readable JSON contract (`schema_version`, commands, flags with env/required/values) (`describe.go`)                                                                               |
+| `describe` command                          | 🟢 FULLY_FUNCTIONAL | Auto-registered hidden command printing that JSON; a consumer `describe` command wins; opt out with `WithoutDescribeCommand()`                                                            |
+| ~~`SetConfig(cfg)`~~                        | removed             | **Removed in v5.0.0** — unsafe post-construction mutation; pass defaults to `NewCLI` instead                                                                                              |
 
-### CLI Options (32 total — all non-generic except where noted)
+### Production batteries — ON by default (v5)
+
+`NewCLI` enables strict validation, signal handling + graceful DI shutdown,
+strict config keys, error hints, and the auto `doctor` command (`version`
+appears when a CLI version is set). The full matrix is pinned by
+`cli_defaults_matrix_test.go`; `WithoutBatteries()` drops the set wholesale.
+
+| Battery                  | Opt-out                        |
+| ------------------------ | ------------------------------ |
+| Strict command validation | `WithoutStrictValidation()`   |
+| Signals + graceful shutdown | `WithoutSignalHandling()` / `WithoutGracefulShutdown()` |
+| Strict config keys       | `WithoutStrictConfigKeys()`    |
+| Error hints              | `WithoutErrorHints()`          |
+| Auto `doctor`/`version`  | `WithoutBatteries()` (master switch) |
+
+### CLI Options (39 `With*` constructors in `cli_options.go`, grep-counted 2026-11-11)
 
 | Option                                         | Status              | Notes                                                                                                                  |
 | ---------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `WithCLIVersion(v)`                            | 🟢 FULLY_FUNCTIONAL | Set version string; auto-pipes to fang                                                                                 |
+| `WithCLIVersion(v)`                            | 🟢 FULLY_FUNCTIONAL | Set version string; auto-pipes to fang; auto-registers `version`                                                        |
 | `WithCLICommit(c)`                             | 🟢 FULLY_FUNCTIONAL | Git commit hash; auto-pipes to fang                                                                                    |
 | `WithCLILong(desc)`                            | 🟢 FULLY_FUNCTIONAL | Set long description                                                                                                   |
 | `WithCLIScope(scope)`                          | 🟢 FULLY_FUNCTIONAL | Custom DI scope                                                                                                        |
 | `WithSilenceErrors()`                          | 🟢 FULLY_FUNCTIONAL | Suppress cobra error printing                                                                                          |
-| `WithSilenceUsage()` / `WithoutSilenceUsage()` | 🟢 FULLY_FUNCTIONAL | Silenced by default; `WithoutSilenceUsage()` re-enables usage-on-error. Root + subcommands via AddCommand propagation. |
+| `WithSilenceUsage()` / `WithoutSilenceUsage()` | 🟢 FULLY_FUNCTIONAL | Silenced by default; `WithoutSilenceUsage()` re-enables usage-on-error                                                 |
 | `WithFang(bool)`                               | 🟢 FULLY_FUNCTIONAL | Enable/disable fang styling                                                                                            |
 | `WithFangOptions(opts...)`                     | 🟢 FULLY_FUNCTIONAL | Pass raw fang options                                                                                                  |
-| `WithFangErrorHandler(fn)`                     | 🟢 FULLY_FUNCTIONAL | Custom fang error display (`cli_options.go:97`)                                                                        |
-| `WithFangColorScheme(fn)`                      | 🟢 FULLY_FUNCTIONAL | Custom fang color theme (`cli_options.go:104`)                                                                         |
-| `WithGroup(id, title)`                         | 🟢 FULLY_FUNCTIONAL | Command groups in help (`cli_options.go:112`)                                                                          |
+| `WithFangErrorHandler(fn)`                     | 🟢 FULLY_FUNCTIONAL | Custom fang error display                                                                                              |
+| `WithFangColorScheme(fn)`                      | 🟢 FULLY_FUNCTIONAL | Custom fang color theme                                                                                                |
+| `WithGroup(id, title)`                         | 🟢 FULLY_FUNCTIONAL | Command groups in help                                                                                                 |
 | `WithEnvPrefix(pfx)`                           | 🟢 FULLY_FUNCTIONAL | Prefix for env var lookups (root + command level)                                                                      |
-| `WithSignalHandling()`                         | 🟢 FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation                                                                                   |
-| `WithGracefulShutdown()`                       | 🟢 FULLY_FUNCTIONAL | Graceful DI service shutdown on signals (implies above)                                                                |
+| `WithSignalHandling()`                         | 🟢 FULLY_FUNCTIONAL | Auto SIGINT/SIGTERM ctx cancellation (**default ON in v5**)                                                            |
+| `WithGracefulShutdown()`                       | 🟢 FULLY_FUNCTIONAL | DI shutdown on the signal path (**default ON in v5**); fires ONLY when the execution context was cancelled, never on normal completion |
 | `WithDILogging(logf)`                          | 🟢 FULLY_FUNCTIONAL | Internal DI container logging                                                                                          |
-| `WithStrictValidation()`                       | 🟢 FULLY_FUNCTIONAL | Require short desc on all commands                                                                                     |
+| `WithStrictValidation()`                       | 🟢 FULLY_FUNCTIONAL | Require short desc on all commands (**default ON in v5**)                                                              |
 | `WithDraconianValidation()`                    | 🟢 FULLY_FUNCTIONAL | Strict + examples on leaf commands                                                                                     |
 | `WithAuditLog(plugin)`                         | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                               |
-| `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection (`cli_options.go:169`)                                                      |
+| `WithOutputFormat(fmt)`                        | 🟢 FULLY_FUNCTIONAL | Auto `--output` flag with format selection                                                                             |
 | `WithConfigFile(paths...)`                     | 🟢 FULLY_FUNCTIONAL | KoanfLoader: auto-detects JSON/YAML/TOML by extension (`koanf_loader.go`)                                              |
 | `WithConfigFileLoader(loader, paths...)`       | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                     |
 | `WithConfigValidation[T](fn)`                  | 🟢 FULLY_FUNCTIONAL | Validate config after flag parsing (generic)                                                                           |
+| `WithConfigExplainCommand()`                   | 🟢 FULLY_FUNCTIONAL | Opt-in `config explain` provenance command (auto-registered at Execute)                                                |
+| `WithStrictConfigKeys()`                       | 🟢 FULLY_FUNCTIONAL | Reject unknown config-file keys (**default ON in v5**)                                                                 |
 | `WithMiddleware[T](mw...)`                     | 🟢 FULLY_FUNCTIONAL | Add command middleware chain (generic)                                                                                 |
+| `WithContextMiddleware[T](mw...)`              | 🟢 FULLY_FUNCTIONAL | Context-aware middleware; runs OUTSIDE plain middleware so derived contexts reach handlers                             |
 | `WithPostFlagParse[T](fns...)`                 | 🟢 FULLY_FUNCTIONAL | Post-parse hook: DI init, session storage (generic)                                                                    |
 | `WithCleanup[T](fns...)`                       | 🟢 FULLY_FUNCTIONAL | Post-RunE cleanup, fires even on RunE error (generic)                                                                  |
 | `WithHelpTransform(fn)`                        | 🟢 FULLY_FUNCTIONAL | Transform command help text (glamour injection point)                                                                  |
 | `WithPlugin(plugin)`                           | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr` and returned from NewCLI.                                                       |
-| `WithoutDescribeCommand()`                     | 🟢 FULLY_FUNCTIONAL | Disable the auto-registered JSON `describe` command (contract stays available via `Describe()`)                        |
-| `WithBatteries()`                              | 🟢 FULLY_FUNCTIONAL | Production defaults: strict validation, signals + graceful shutdown, hints, auto version/doctor commands               |
+| `WithDoctorCheck[T](name, run)`                | 🟢 FULLY_FUNCTIONAL | Add custom doctor diagnostic check                                                                                     |
+| `WithDoctorSchemaValidator[T](fn)`             | 🟢 FULLY_FUNCTIONAL | External JSON Schema check wired into doctor                                                                           |
+| `WithoutDescribeCommand()`                     | 🟢 FULLY_FUNCTIONAL | Disable the auto-registered JSON `describe` command                                                                    |
+| `WithBatteries()`                              | 🟢 FULLY_FUNCTIONAL | Explicit re-enable of the default battery set (no-op at defaults)                                                      |
+| `WithoutBatteries()`                           | 🟢 FULLY_FUNCTIONAL | Drop the whole production set in one call                                                                              |
 | `WithoutErrorHints()`                          | 🟢 FULLY_FUNCTIONAL | Disable the `Hint:` line under human-readable errors (JSON envelopes keep `hint`)                                      |
 
 ### Command[T, F]
@@ -89,13 +112,13 @@
 | `NewParentCommand(name, flags, opts...)` | 🟢 FULLY_FUNCTIONAL | Parent command with subcommands                            |
 | `Validate()`                             | 🟢 FULLY_FUNCTIONAL | Called by constructors + AddCommand (defense-in-depth)     |
 | `RunE`, `PreRunE`, `PostRunE`            | 🟢 FULLY_FUNCTIONAL | Type-safe handlers via sealed interface pattern            |
-| `SilenceUsage()`                         | 🟢 FULLY_FUNCTIONAL | Per-command accessor (`command.go:163`)                    |
+| `SilenceUsage()`                         | 🟢 FULLY_FUNCTIONAL | Per-command accessor                                       |
 
-### Command Options (19 total)
+### Command Options (21 `With*` constructors in `command_options.go`, grep-counted 2026-11-11)
 
 | Feature                         | Status              | Notes                                   |
 | ------------------------------- | ------------------- | --------------------------------------- |
-| `WithShort(desc)`               | 🟢 FULLY_FUNCTIONAL | Short description                       |
+| `WithShort(desc)`               | 🟢 FULLY_FUNCTIONAL | Short description (required under default strict validation) |
 | `WithLong(desc)`                | 🟢 FULLY_FUNCTIONAL | Long description                        |
 | `WithExample(ex)`               | 🟢 FULLY_FUNCTIONAL | Example code                            |
 | `WithAliases(names...)`         | 🟢 FULLY_FUNCTIONAL | Command aliases                         |
@@ -111,6 +134,8 @@
 | `WithMaximumArgs(n)`            | 🟢 FULLY_FUNCTIONAL | Allow at most n args                    |
 | `WithRangeArgs(min, max)`       | 🟢 FULLY_FUNCTIONAL | Require between min and max args        |
 | `WithNoArgs()`                  | 🟢 FULLY_FUNCTIONAL | Reject any positional args              |
+| `WithStrictPositionalArgs()`    | 🟢 FULLY_FUNCTIONAL | Reject undeclared positionals (v5.1.0-bound; inert when an explicit validator is set) |
+| `WithArgsPassthrough()`         | 🟢 FULLY_FUNCTIONAL | Accept any positionals, ignore extras (v5.1.0-bound) |
 | `WithArgs(fn)`                  | 🟢 FULLY_FUNCTIONAL | Custom `cobra.PositionalArgs`           |
 | `WithCompletion(fn)`            | 🟢 FULLY_FUNCTIONAL | Dynamic shell completion                |
 | `WithValidArgs(args...)`        | 🟢 FULLY_FUNCTIONAL | Static valid arguments                  |
@@ -125,21 +150,22 @@
 | `env:"VAR"` struct tag         | 🟢 FULLY_FUNCTIONAL | Environment variable binding (with optional prefix)                                             |
 | `count:"true"` struct tag      | 🟢 FULLY_FUNCTIONAL | Counting flags: -vvv → 3                                                                        |
 | Short flags                    | 🟢 FULLY_FUNCTIONAL | `short:"n"` for `-n`                                                                            |
-| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag, enforced after parsing; an explicit flag or its env var satisfies it     |
-| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL | Built-in + custom validators; `min`/`max` mean length on string fields                          |
+| Required flags                 | 🟢 FULLY_FUNCTIONAL | `required:"true"` tag, enforced after parsing; an explicit flag or its env var satisfies it; config-file defaults do NOT |
+| `validate:"email,min=5"` tag   | 🟢 FULLY_FUNCTIONAL | Built-in + custom validators; `min`/`max` resolve per type (length on strings, duration bounds on durations, numeric on numbers) |
 | Flag typo suggestions          | 🟢 FULLY_FUNCTIONAL | Levenshtein-based (`flags_suggest.go`)                                                          |
 | Subcommand typo suggestions    | 🟢 FULLY_FUNCTIONAL | "did you mean?" for unknown subcommands                                                         |
 | Instance-scoped validators     | 🟢 FULLY_FUNCTIONAL | `FlagRegistry.RegisterFlagValidator()` (COW)                                                    |
-| TypeHandler registry           | 🟢 FULLY_FUNCTIONAL | Extensible type dispatch system (COW)                                                           |
-| `RegisterTypeHandler()`        | 🟢 FULLY_FUNCTIONAL | Returns error on nil typ/handler (`type_handler.go`)                                            |
+| TypeCodec registry             | 🟢 FULLY_FUNCTIONAL | Extensible type dispatch system (COW); v5 name of v4's TypeHandler (`type_codec.go`)            |
+| `RegisterTypeCodec()`          | 🟢 FULLY_FUNCTIONAL | Returns error on nil typ/handler (`type_codec.go:172`)                                          |
 | `RegisterValidator()`          | 🟢 FULLY_FUNCTIONAL | Returns error on empty name/nil validator (`flags_validate.go`)                                 |
 | Iterator methods (`iter.Seq`)  | 🟢 FULLY_FUNCTIONAL | TagsSeq, FlagNamesSeq, PathSeq, ChildrenSeq (zero-alloc)                                        |
 | Integer overflow validation    | 🟢 FULLY_FUNCTIONAL | int8/16/32, uint8/16 range-checked → `ErrValueOutOfRange`                                       |
 | Runtime tag validation         | 🟢 FULLY_FUNCTIONAL | required/values/validate enforced for flag, env, and default values; meta commands exempt       |
+| Defaults die at construction  | 🟢 FULLY_FUNCTIONAL | tag defaults validated against `values`/`validate` at `NewFlagRegistry` → `ErrInvalidFlagDefault` |
 | Scoped flags (`local:"true"`)  | 🟢 FULLY_FUNCTIONAL | Root-only flags not inherited by subcommands                                                    |
 | Hidden flags (`hidden:"true"`) | 🟢 FULLY_FUNCTIONAL | Exclude from `--help`, stay functional                                                          |
 | Nested config structs          | 🟢 FULLY_FUNCTIONAL | `ParseFlagTags` recurses; `FieldTag.Index` tracks reflect path                                  |
-| Regex validation cache         | 🟢 FULLY_FUNCTIONAL | Bounded by unique `validate` tag patterns; typical usage <20 patterns (`flags_validate.go:356`) |
+| Regex validation cache         | 🟢 FULLY_FUNCTIONAL | Bounded by unique `validate` tag patterns (`flags_validate.go`)                                 |
 
 ---
 
@@ -168,16 +194,15 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `NewScope(name)`                        | 🟢 FULLY_FUNCTIONAL     | Creates DI scope wrapping samber/do/v2                                                                                                                             |
 | `NewScopeWithOpts(name, opts)`          | 🟢 FULLY_FUNCTIONAL     | Scope with custom `do.InjectorOpts`                                                                                                                                |
 | `Provide[T]`, `ProvideValue[T]`         | 🟢 FULLY_FUNCTIONAL     | Register services                                                                                                                                                  |
-| `Invoke[T]`, `InvokeNamed[T]`           | 🟢 FULLY_FUNCTIONAL     | Get services                                                                                                                                                       |
+| `Invoke[T]`, `InvokeNamed[T]`           | 🟢 FULLY_FUNCTIONAL     | Get services (`scope.go:165,183`) — note: v5 has no `Get[T]`; the v4-era `Get[T]` rename candidate is moot                                                          |
 | `Override[T]`, `OverrideValue[T]`       | 🟢 FULLY_FUNCTIONAL     | Replace services for testing                                                                                                                                       |
 | `CloneScope(scope)`                     | 🟢 FULLY_FUNCTIONAL     | Clone scope for test isolation                                                                                                                                     |
-| `Get[T]`                                | 🟡 PARTIALLY_FUNCTIONAL | Name too generic — roadmapped for rename to `GetService[T]`                                                                                                        |
-| `RegisterInScope(parent, name, ...any)` | 🟡 PARTIALLY_FUNCTIONAL | **Deprecated** — erases provider types (everything registers as `any`). Use `parent.Child(name)` + `do.Provide(child.Injector(), ...)`. Carries `TODO(v5)` marker. |
+| `RegisterInScope[T]`                    | 🟢 FULLY_FUNCTIONAL     | v5.0.0 made it GENERIC (erasing the old `any`-typed variant; `scope.go:358`)                                                                                       |
 | `Child(name)`                           | 🟢 FULLY_FUNCTIONAL     | Hierarchical scopes                                                                                                                                                |
 | `RootScope()`                           | 🟢 FULLY_FUNCTIONAL     | Navigate to root from any child                                                                                                                                    |
 | `Shutdown`, `ShutdownAll`               | 🟢 FULLY_FUNCTIONAL     | Graceful service shutdown (reverse invocation order)                                                                                                               |
 | `HealthCheck`, `HealthCheckWithContext` | 🟢 FULLY_FUNCTIONAL     | Lifecycle management                                                                                                                                               |
-| `Package[T](scope, ...)`                | 🟡 PARTIALLY_FUNCTIONAL | Unusual API shape (pre-existing `*Scope` param) — roadmapped for redesign                                                                                          |
+| `Package[T](scope, ...)`                | 🟡 PARTIALLY_FUNCTIONAL | Unusual API shape (pre-existing `*Scope` param, `scope.go:416`) — roadmapped for redesign (ROADMAP v6 candidate #7)                                                |
 
 ---
 
@@ -190,7 +215,7 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `RegisteredFormats()`   | 🟢 FULLY_FUNCTIONAL | Dynamic format discovery from registered marshalers                                  |
 | 16 output formats       | 🟢 FULLY_FUNCTIONAL | table/json/csv/tsv/md/xml/d2/yaml/html/tree/mermaid/dot/jsonl/asciidoc/toml/plantuml |
 | Dynamic `--output` help | 🟢 FULLY_FUNCTIONAL | Auto-generated from `output.RegisteredTableMarshalFormats()`                         |
-| Structured JSON errors  | 🟢 FULLY_FUNCTIONAL | `cli_errors_json.go` — structured error output for `--output=json`                   |
+| Structured JSON errors  | 🟢 FULLY_FUNCTIONAL | Structured error output for `--output=json` (envelope carries `error_code` + `hint`) |
 
 ---
 
@@ -198,15 +223,15 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 
 | Feature                        | Status              | Notes                                                                                                                                                                                   |
 | ------------------------------ | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TimingMiddleware[T]`          | 🟢 FULLY_FUNCTIONAL | Log command execution duration (`middleware.go:69`)                                                                                                                                     |
-| `RecoveryMiddleware[T]`        | 🟢 FULLY_FUNCTIONAL | Recover from panics in handlers (`middleware.go:82`)                                                                                                                                    |
+| `TimingMiddleware[T]`          | 🟢 FULLY_FUNCTIONAL | Log command execution duration (`middleware.go`)                                                                                                                                        |
+| `RecoveryMiddleware[T]`        | 🟢 FULLY_FUNCTIONAL | Recover from panics in handlers (`middleware.go`)                                                                                                                                       |
 | `ContextMiddleware[T]`         | 🟢 FULLY_FUNCTIONAL | Context-aware variant — `next func(context.Context) error` threads derived contexts through the chain (`middleware.go`)                                                                 |
 | `WithContextMiddleware[T](mw)` | 🟢 FULLY_FUNCTIONAL | Wire context middleware; runs OUTSIDE plain middleware (`cli_options.go`)                                                                                                               |
 | `TimeoutMiddleware[T](d)`      | 🟢 FULLY_FUNCTIONAL | Bounds execution to d; deadline errors match `ErrCommandTimeout` + `context.DeadlineExceeded` (`middleware.go`)                                                                         |
-| `CommandInfo.FullPath`         | 🟢 FULLY_FUNCTIONAL | Full command path for middleware context                                                                                                                                                |
-| Custom middleware              | 🟢 FULLY_FUNCTIONAL | `Middleware[T]` (`next func() error`) plus context-aware `ContextMiddleware[T]` (`next func(context.Context) error`) that propagates derived contexts to inner middleware and handlers. |
-| `spinner.Middleware[T]`        | 📦 SUB-MODULE       | Terminal spinner during execution (`spinner/spinner.go`)                                                                                                                                |
-| `telemetry.Middleware[T]`      | 📦 SUB-MODULE       | OpenTelemetry span per command (`telemetry/telemetry.go`)                                                                                                                               |
+| `CommandMetadata.FullPath`     | 🟢 FULLY_FUNCTIONAL | Full command path for middleware context (v5 rename of v4 `CommandInfo`; `middleware.go:65`)                                                                                            |
+| Custom middleware              | 🟢 FULLY_FUNCTIONAL | `Middleware[T]` (`next func() error`) plus context-aware `ContextMiddleware[T]`; v6 candidate unifies the two signatures (ROADMAP)                                                      |
+| `spinner.Middleware[T]`        | 📦 SUB-MODULE       | Terminal spinner during execution (`spinner/spinner.go`; auto-skips non-TTY stderr)                                                                                                     |
+| `telemetry.Middleware[T]`      | 📦 SUB-MODULE       | OpenTelemetry span per command (`telemetry/telemetry.go`; span-context propagation needs a custom ContextMiddleware)                                                                    |
 | `flightrecorder.Middleware[T]` | 📦 SUB-MODULE       | Runtime trace snapshots on slow/error (`flightrecorder/middleware.go`)                                                                                                                  |
 
 ---
@@ -228,13 +253,13 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | Feature                               | Status              | Notes                                                                                                                                                                                                                                                                         |
 | ------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `WithAuditLog(plugin)`                | 🟢 FULLY_FUNCTIONAL | Wire samber-do-auditlog into DI injector                                                                                                                                                                                                                                      |
-| `ExportAuditLog[T](cli, cfg)`         | 🟢 FULLY_FUNCTIONAL | Write audit snapshot to file or `io.Writer` (`auditlog.go:123`)                                                                                                                                                                                                               |
+| `ExportAuditLog[T](cli, cfg)`         | 🟢 FULLY_FUNCTIONAL | Write audit snapshot to file or `io.Writer` (`auditlog.go`)                                                                                                                                                                                                                   |
 | `AuditLogFormat` strong type          | 🟢 FULLY_FUNCTIONAL | Validated enum with `ParseAuditLogFormat()` + `Valid()`                                                                                                                                                                                                                       |
 | 11 export formats                     | 🟢 FULLY_FUNCTIONAL | html, json, ndjson, csv, tsv, mermaid, dot, d2, plantuml, tree, htmltree                                                                                                                                                                                                      |
-| `AuditLogServiceByName[T](cli)`       | 🟢 FULLY_FUNCTIONAL | Query a named service's audit info (`auditlog.go:171`)                                                                                                                                                                                                                        |
-| `AuditLogFailedServices[T](cli)`      | 🟢 FULLY_FUNCTIONAL | List services that failed to construct (`auditlog.go:181`)                                                                                                                                                                                                                    |
+| `AuditLogServiceByName[T](cli)`       | 🟢 FULLY_FUNCTIONAL | Query a named service's audit info (`auditlog.go`)                                                                                                                                                                                                                            |
+| `AuditLogFailedServices[T](cli)`      | 🟢 FULLY_FUNCTIONAL | List services that failed to construct (`auditlog.go`)                                                                                                                                                                                                                        |
 | `cli.AuditLog()` / `AuditLogReport()` | 🟢 FULLY_FUNCTIONAL | Programmatic access to the plugin + snapshot                                                                                                                                                                                                                                  |
-| Command-level audit middleware        | 🟢 FULLY_FUNCTIONAL | `AuditMiddleware[T]` + `WithAuditMiddleware[T]` (auditlog.go) record PhaseBefore/PhaseAfter command events with duration + error via upstream `Plugin.RecordCommand` (samber-do-auditlog v0.11.0); nil plugin = passthrough; taskctl wires it; 7 tests + live export verified |
+| Command-level audit middleware        | 🟢 FULLY_FUNCTIONAL | `AuditMiddleware[T]` + `WithAuditMiddleware[T]` (`auditlog.go:232,259`) record PhaseBefore/PhaseAfter command events with duration + error via upstream `Plugin.RecordCommand` (samber-do-auditlog v0.12.3); nil plugin = passthrough; taskctl wires it |
 
 ---
 
@@ -246,16 +271,16 @@ All 9 types have `Parse*`, `MarshalText`, `UnmarshalText`, and `IsEmpty`.
 | `WithConfigFileLoader(loader, ...)` | 🟢 FULLY_FUNCTIONAL | Custom loader (advanced use cases)                                                                                                                                   |
 | `$ENV` and `~` expansion            | 🟢 FULLY_FUNCTIONAL | Path expansion before loading (`cachedHomeDir` via `sync.OnceValue`)                                                                                                 |
 | `--config` flag override            | 🟢 FULLY_FUNCTIONAL | Overrides default search paths                                                                                                                                       |
-| Missing file = silent skip          | 🟢 FULLY_FUNCTIONAL | Not an error when default path missing                                                                                                                               |
+| Missing/empty file = silent skip    | 🟢 FULLY_FUNCTIONAL | Zero-byte/whitespace-only config files are treated as absent (fixed in v5.0.0)                                                                                       |
 | Nested struct config                | 🟢 FULLY_FUNCTIONAL | Inner structs flattened; `FieldTag.Index` tracks reflect path                                                                                                        |
-| `KoanfLoader` (single loader)       | 🟢 FULLY_FUNCTIONAL | Consolidated: koanf as format parser → JSON → `loadConfigFromJSON` (case-insensitive matching). `configload` package deleted.                                        |
-| Strict config keys                  | 🟢 FULLY_FUNCTIONAL | `WithStrictConfigKeys()` (opt-in, on inside `WithBatteries()`); unknown keys → `ErrConfigUnknownKey` with dotted path, file, and suggestion; tolerant mode unchanged |
+| `KoanfLoader` (single loader)       | 🟢 FULLY_FUNCTIONAL | koanf as format parser → JSON → `loadConfigFromJSON` (case-insensitive matching)                                                                                     |
+| Strict config keys                  | 🟢 FULLY_FUNCTIONAL | **Default ON in v5** (inside batteries); unknown keys → `ErrConfigUnknownKey` with dotted path, file, and suggestion; `WithoutStrictConfigKeys()` opts out           |
 | Key-spelling vocabulary             | 🟢 FULLY_FUNCTIONAL | Canonical key (json tag else field name) + flag name + case/hyphen/underscore foldings, all accepted everywhere (`config_keys.go`)                                   |
 | `config explain`                    | 🟢 FULLY_FUNCTIONAL | `WithConfigExplainCommand()`; table + JSON provenance (flag/env/config-file/default/unset) via `CLI.ExplainConfig()`                                                 |
-| `secret:"true"` tag                 | 🟢 FULLY_FUNCTIONAL | Redaction to `***` in explain/contract/docs/schema (`v4.RedactedValue` exported)                                                                                     |
+| `secret:"true"` tag                 | 🟢 FULLY_FUNCTIONAL | Redaction to `***` in explain/contract/docs/schema (`v5.RedactedValue` exported)                                                                                     |
 | `CLI.ConfigDiagnostics()`           | 🟢 FULLY_FUNCTIONAL | doctor reports config path, parse, unknown-key, and schema problems                                                                                                  |
-| `v4.ConfigKeys(cfg)`                | 🟢 FULLY_FUNCTIONAL | Public config vocabulary; single source for strict checking and schema emission                                                                                      |
-| `schema` sub-module                 | 📦 `SUB-MODULE`     | JSON Schema 2020-12 emitter (`FromConfig`/`FromCLI`/`Emit`/`Marshal`), `additionalProperties: false`, deterministic output; experimental surface                     |
+| `v5.ConfigKeys(cfg)`                | 🟢 FULLY_FUNCTIONAL | Public config vocabulary; single source for strict checking and schema emission                                                                                      |
+| `schema` sub-module                 | 📦 `SUB-MODULE`     | JSON Schema 2020-12 emitter (`FromConfig`/`FromCLI`/`Emit`/`Marshal`), `additionalProperties: false`, deterministic output; experimental surface; tagged `schema/v0.1.0` |
 
 ### Flag Priority Chain
 
@@ -269,10 +294,10 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 | Feature                         | Status              | Notes                                                                         |
 | ------------------------------- | ------------------- | ----------------------------------------------------------------------------- |
-| `Plugin` interface              | 🟢 FULLY_FUNCTIONAL | Bundle custom type handlers + validators                                      |
-| `PluginRegistrar`               | 🟢 FULLY_FUNCTIONAL | Scoped `TypeHandler()`/`Validator()` registration                             |
+| `Plugin` interface              | 🟢 FULLY_FUNCTIONAL | Bundle custom type codecs + validators                                        |
+| `PluginRegistrar`               | 🟢 FULLY_FUNCTIONAL | Scoped `TypeCodec()`/`Validator()` registration                               |
 | `RegisterPlugin(plugin)`        | 🟢 FULLY_FUNCTIONAL | Apply to global registries (returns error)                                    |
-| `WithPlugin(plugin)`            | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr`, returned from NewCLI (`plugin.go:64`) |
+| `WithPlugin(plugin)`            | 🟢 FULLY_FUNCTIONAL | Error captured via `cliSpec.pluginErr`, returned from NewCLI                  |
 | `FlagRegistry.RegisterPlugin()` | 🟢 FULLY_FUNCTIONAL | Apply per-FlagRegistry                                                        |
 
 ---
@@ -283,11 +308,11 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 | ------------------------------- | ------------------- | --------------------------------------------------------- |
 | `WithPromptOnMissing()`         | 🟢 FULLY_FUNCTIONAL | Prompt for missing `prompt`-tagged flags                  |
 | `prompt:"Question?"` struct tag | 🟢 FULLY_FUNCTIONAL | Marks field for interactive prompting                     |
-| `PromptString(title, default)`  | 🟢 FULLY_FUNCTIONAL | Text input (via PromptRunner interface)                   |
-| `PromptSelect(title, options)`  | 🟢 FULLY_FUNCTIONAL | Selection (via PromptRunner interface)                    |
-| `PromptConfirm(title)`          | 🟢 FULLY_FUNCTIONAL | Yes/no (via PromptRunner interface)                       |
+| `PromptString(title, default)`  | 🟢 FULLY_FUNCTIONAL | Text input (via `PromptRunner` interface)                 |
+| `PromptSelect(title, options)`  | 🟢 FULLY_FUNCTIONAL | Selection (via `PromptRunner` interface)                  |
+| `PromptConfirm(title)`          | 🟢 FULLY_FUNCTIONAL | Yes/no (via `PromptRunner` interface)                     |
 | Bool → confirm / Enum → select  | 🟢 FULLY_FUNCTIONAL | Automatic prompt type selection                           |
-| `prompts.HuhRunner`             | 📦 SUB-MODULE       | huh/v2 PromptRunner implementation (`prompts/prompts.go`) |
+| `prompts.HuhPrompter`           | 📦 SUB-MODULE       | huh/v2 `PromptRunner` implementation (`prompts/prompts.go:27`); v5 rename of v4 `HuhRunner` |
 
 ---
 
@@ -295,10 +320,11 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 | Feature                               | Status              | Notes                                                  |
 | ------------------------------------- | ------------------- | ------------------------------------------------------ |
-| `VersionCommand[T](cli)`              | 🟢 FULLY_FUNCTIONAL | Typed version subcommand (`version.go:20`)             |
-| `GenerateVersionCommand[T](cli, w)`   | 🟢 FULLY_FUNCTIONAL | Raw cobra command with custom writer (`version.go:49`) |
-| `DoctorCommand[T](cli, opts...)`      | 🟢 FULLY_FUNCTIONAL | Typed doctor subcommand (`doctor.go:77`)               |
-| `WithDoctorCheck[T](name, run)`       | 🟢 FULLY_FUNCTIONAL | Add custom diagnostic check (`doctor.go:50`)           |
+| `VersionCommand[T](cli)`              | 🟢 FULLY_FUNCTIONAL | Typed version subcommand; auto-registered when a CLI version is set |
+| `GenerateVersionCommand[T](cli, w)`   | 🟢 FULLY_FUNCTIONAL | Raw cobra command with custom writer                   |
+| `DoctorCommand[T](cli, opts...)`      | 🟢 FULLY_FUNCTIONAL | Typed doctor subcommand; DI health checks + custom checks + config diagnostics |
+| `WithDoctorCheck[T](name, run)`       | 🟢 FULLY_FUNCTIONAL | Add custom diagnostic check                            |
+| `WithDoctorSchemaValidator[T](fn)`    | 🟢 FULLY_FUNCTIONAL | External JSON Schema check via the `schema` sub-module |
 | `WithDoctorShort[T]`/`Long`/`GroupID` | 🟢 FULLY_FUNCTIONAL | Custom doctor command metadata                         |
 
 ---
@@ -307,7 +333,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 | Feature               | Status              | Notes                                                                        |
 | --------------------- | ------------------- | ---------------------------------------------------------------------------- |
-| `cli.GenerateDocs(w)` | 🟢 FULLY_FUNCTIONAL | Markdown docs for full command tree to `io.Writer` (`docgen.go:19`)          |
+| `cli.GenerateDocs(w)` | 🟢 FULLY_FUNCTIONAL | Markdown docs for full command tree to `io.Writer` (eight-column table from the same source as the machine contract; drift-guarded by `docgen_drift_test.go`) |
 | `describe` command    | 🟢 FULLY_FUNCTIONAL | JSON contract for agents/tooling (`describe.go`), auto-registered at Execute |
 
 ---
@@ -315,7 +341,7 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 ## Shell Completion
 
 | Feature                  | Status              | Notes                                     |
-| ------------------------ | ------------------- | ----------------------------------------- |
+| ------------------------- | ------------------- | ----------------------------------------- |
 | `WithCompletion(fn)`     | 🟢 FULLY_FUNCTIONAL | Dynamic shell completion                  |
 | `WithValidArgs(args...)` | 🟢 FULLY_FUNCTIONAL | Static valid arguments                    |
 | `CompletionFunc` type    | 🟢 FULLY_FUNCTIONAL | Compatible with cobra `ValidArgsFunction` |
@@ -326,12 +352,12 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 | Feature                    | Status              | Notes                                                                                                       |
 | -------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 60 sentinel errors         | 🟢 FULLY_FUNCTIONAL | 58 in `errors*.go` + 2 in `auditlog.go`/`prompts.go`                                                        |
+| 65 sentinel errors         | 🟢 FULLY_FUNCTIONAL | 61 in `errors*.go` + 1 each in `prompts.go`, `auditlog.go`, `type_helpers.go`, `koanf_loader.go` (regex-counted 2026-11-11) |
 | Typed errors               | 🟢 FULLY_FUNCTIONAL | `CommandError`, `FlagError`, `ServiceError`, etc.                                                           |
-| `ExitCoder` / `ExitError`  | 🟢 FULLY_FUNCTIONAL | Custom exit codes for `ExecuteAndExit`                                                                      |
-| `ExitCode(err) int`        | 🟢 FULLY_FUNCTIONAL | Public exit-code mapping (nil→0, ExitCoder→code, else→1)                                                    |
+| `ExitCoder` / `ExitError`  | 🟢 FULLY_FUNCTIONAL | Custom exit codes for `ExecuteAndExit`; `NewExitError` validates the 0–255 range                            |
+| `ErrorCode(err) string`    | 🟢 FULLY_FUNCTIONAL | Stable snake_case machine code per sentinel (`required_flag`, …); carried additively as `error_code` in the JSON envelope; single fact table in `errors_facts.go` |
 | `errors.Is()` chainability | 🟢 FULLY_FUNCTIONAL | All sentinels use `fmt.Errorf("%w: ...", sentinel)`                                                         |
-| `ErrorHint(err) string`    | 🟢 FULLY_FUNCTIONAL | Actionable fix sentence per sentinel; also emitted as `hint` in the JSON error envelope (`errors_hints.go`) |
+| `ErrorHint(err) string`    | 🟢 FULLY_FUNCTIONAL | Actionable fix sentence per sentinel; also emitted as `hint` in the JSON error envelope (`errors_hints.go`); coverage test fails when a sentinel lacks a hint |
 | `Hint:` line on errors     | 🟢 FULLY_FUNCTIONAL | Printed under human-readable errors (fang default view + plain cobra path); `WithoutErrorHints()` opts out  |
 
 ---
@@ -347,46 +373,46 @@ explicit flag → env:"VAR" (with optional prefix) → config file → default v
 
 ## Optional Sub-Modules
 
-All 7 sub-modules are independently importable. Core has **zero** dependencies on these.
-Each compiles cleanly with matching v4 API signatures. All have basic test coverage.
+All 7 sub-modules are independently importable. Core has **zero** dependencies on the
+niche ones (glamour/prompts/spinner/telemetry/flightrecorder/lint/schema are not
+imported by core); `flightrecorder` and `schema` have zero external deps.
 
-| Sub-module       | Key API                                                                                                           | Dependency                       | Version          | Status           |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------- | ---------------- | ---------------- |
-| `glamour`        | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`                                                               | `charm.land/glamour/v2`          | v2.0.1           | 🟢 📦 SUB-MODULE |
-| `prompts`        | `HuhRunner`, `Register()`                                                                                         | `charm.land/huh/v2`              | v2.0.3           | 🟢 📦 SUB-MODULE |
-| `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`                                                                    | `charm.land/lipgloss/v2`         | v2.0.5           | 🟢 📦 SUB-MODULE |
-| `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`                                                                           | `go.opentelemetry.io/otel/trace` | v1.44.0          | 🟢 📦 SUB-MODULE |
-| `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`, `WithFlightRecorderRecorder[T]()`, `Capture()`, `CaptureToWriter()` | _(stdlib `runtime/trace`)_       | Go 1.25+         | 🟢 📦 SUB-MODULE |
-| `lint`           | `Detect()`, `AllRules()`, `NewRegistry()`, `provider.Register()`                                                  | `go-finding` + `go-linter-sdk`   | v1.15.1 / v0.4.0 | 🟢 📦 SUB-MODULE |
-| `schema`         | `FromConfig`, `FromCLI`, `Emit`, `Marshal` (JSON Schema 2020-12)                                                  | _(stdlib + cmdguard core)_       | Go 1.27          | 🟢 📦 SUB-MODULE |
+| Sub-module       | Key API                                                                                                           | Dependency                       | Version                    | Status           |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------- | ---------------- |
+| `glamour`        | `WithHelp()`, `WithHelpTheme()`, `RenderMarkdown()`                                                               | `charm.land/glamour/v2`          | v2.0.1                     | 🟢 📦 SUB-MODULE |
+| `prompts`        | `HuhPrompter` (v5 rename of `HuhRunner`), `Register()`                                                            | `charm.land/huh/v2`              | v2.0.3                     | 🟢 📦 SUB-MODULE |
+| `spinner`        | `Middleware[T]()`, `MiddlewareWithConfig[T]()`                                                                    | `charm.land/lipgloss/v2`         | v2.0.6                     | 🟢 📦 SUB-MODULE |
+| `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`                                                                           | `go.opentelemetry.io/otel/trace` | v1.47.0                    | 🟢 📦 SUB-MODULE |
+| `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`, `WithFlightRecorderRecorder[T]()`, `Capture()`, `CaptureToWriter()` | _(stdlib `runtime/trace`)_       | Go 1.25+                   | 🟢 📦 SUB-MODULE |
+| `lint`           | `Detect()`, `AllRules()`, `NewRegistry()`, `provider.Register()`                                                  | `go-finding` + `toolsdk` + `go-linter-sdk` | v1.15.1 / v1.16.0 / v0.4.0 | 🟢 📦 SUB-MODULE |
+| `schema`         | `FromConfig`, `FromCLI`, `Emit`, `Marshal` (JSON Schema 2020-12)                                                  | _(stdlib + cmdguard core)_       | Go 1.27; tagged `schema/v0.1.0` | 🟢 📦 SUB-MODULE |
 
 ### Usage Linter (`lint`)
 
 Static analyzer for cmdguard anti-patterns, built on go-finding + go-linter-sdk.
 One detector core behind three distribution layers: library (`lint.Detect`),
 BuildFlow provider (`lint/provider`), and a dogfood CLI (`lint/cmd/cmdguard-lint`,
-built with cmdguard v4 itself).
+built with cmdguard v5 itself).
 
 | Capability                                                                                                                                                                    | Status     | Notes                                                                                                                                               |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Rules CG001–CG008 (execute bypass, stale major, constructor panic, runtime SetVersion, duplicate version opts, error reprint, missing short description, missing CLI version) | 🟢 DONE    | All syntactic (AST walk, no build needed); single source of truth in `allRuleDefs()`                                                                |
+| `CurrentMajor = "v5"` — CG002 flags cmdguard v1–v4 imports as stale                                                                                                           | 🟢 DONE    | Shipped in `lint/v0.3.0` + the BuildFlow bump; fleet-wide v5 baseline                                                                               |
 | In-source suppressions `//cmdguard-lint:ignore <ID> <reason>`                                                                                                                 | 🟢 DONE    | Reason required, rule-scoped, applies to finding line or line above                                                                                 |
 | text / JSON / SARIF output                                                                                                                                                    | 🟢 DONE    | SARIF round-trips via `finding.FindingsFromSARIF` (tested)                                                                                          |
-| `--enable` / `--disable` filtering                                                                                                                                            | 🟢 DONE    | `lint.FilterByIDs` shared by CLI flags and provider options (single semantics)                                                                      |
+| `--enable` / `--disable` filtering + provider options                                                                                                                         | 🟢 DONE    | `lint.FilterByIDs` shared by CLI flags and provider options; fleet-shipped since `lint/v0.2.0` + the BuildFlow bump                                 |
 | Corpus validation                                                                                                                                                             | 🟢 DONE    | timesheets 18/18 at hand-audited locations, CG002 15/15 exact vs `rg`, 0 FP on 4 negative corpora                                                   |
-| Published as `lint/v0.1.0`                                                                                                                                                    | 🟢 DONE    | 2026-10-04: CHANGELOG, annotated tag pushed, proxy-verified via scratch consumer, GitHub release                                                    |
-| Wired into BuildFlow                                                                                                                                                          | 🟢 DONE    | 2026-10-04: blank import in `sdk_imports.go` (fleet provider count 118), vendor + tests + `docs --check` green                                      |
-| Cross-file dataflow (CG003/CG004/CG006)                                                                                                                                       | 🟢 DONE    | 2026-10-09: per-directory-group index of package-level names (crossfile.go); test ⊥ prod; locals never leak; FP budget held                         |
-| Baseline / ratchet mode                                                                                                                                                       | 🟢 DONE    | 2026-10-09: `--write-baseline`/`--baseline`, per rule+file with line-drift tolerance, stale-entry reporting; `Load/Write/ApplyBaseline` library API |
-| Provider options (`enable`/`disable` via BuildFlow config)                                                                                                                    | 🟢 DONE    | 2026-10-09: toolsdk Option surface; needs `lint/v0.2.0` release + BuildFlow bump to reach the fleet                                                 |
-| Generated README rule table + drift guard                                                                                                                                     | 🟢 DONE    | 2026-10-09: `RuleTableMarkdown()`, `rules --markdown`, byte-exact `rules_table_test.go`                                                             |
+| Published tags `lint/v0.1.0` → `v0.3.0`                                                                                                                                       | 🟢 DONE    | v0.3.0 is proxy-served and consumed by BuildFlow (fleet provider count 118)                                                                         |
+| Cross-file dataflow (CG003/CG004/CG006)                                                                                                                                       | 🟢 DONE    | Per-directory-group index of package-level names (`crossfile.go`); test ⊥ prod; locals never leak                                                    |
+| Baseline / ratchet mode                                                                                                                                                       | 🟢 DONE    | `--write-baseline`/`--baseline`, per rule+file with line-drift tolerance, stale-entry reporting; `Load/Write/ApplyBaseline` library API              |
+| Generated README rule table + drift guard                                                                                                                                     | 🟢 DONE    | `RuleTableMarkdown()`, `rules --markdown`, byte-exact `rules_table_test.go`                                                                         |
 | golangci-lint module plugin                                                                                                                                                   | 🔴 PLANNED | TODO_LIST L6: needs `analysis.Analyzer` bridge per go-humanize-linter pattern                                                                       |
 
 ---
 
 ## Dependencies
 
-### Core (direct — 14 dependencies, incl. the 3 unversioned sibling pins)
+### Core (root go.mod — 14 direct requires, incl. 3 versioned sibling pins)
 
 | Dependency                                  | Version | Purpose                                        |
 | ------------------------------------------- | ------- | ---------------------------------------------- |
@@ -394,24 +420,21 @@ built with cmdguard v4 itself).
 | `github.com/samber/do/v2`                   | v2.1.0  | Dependency injection                           |
 | `github.com/spf13/pflag`                    | v1.0.10 | Flag parsing                                   |
 | `charm.land/fang/v2`                        | v2.0.1  | Cobra styling                                  |
-| `charm.land/lipgloss/v2`                    | v2.0.5  | Terminal styling (fang dep, but listed direct) |
+| `charm.land/lipgloss/v2`                    | v2.0.6  | Terminal styling (fang dep, but listed direct) |
 | `github.com/larsartmann/go-output`          | v0.38.7 | Rich output (16 formats)                       |
-| `github.com/larsartmann/samber-do-auditlog` | v0.12.1 | DI audit logging                               |
+| `github.com/larsartmann/samber-do-auditlog` | v0.12.3 | DI audit logging                               |
 | `github.com/knadh/koanf/v2`                 | v2.4.1  | Config loading (KoanfLoader)                   |
-| `github.com/knadh/koanf/parsers/json`       | v1.0.0  | Koanf JSON parser                              |
-| `github.com/knadh/koanf/parsers/yaml`       | v1.1.0  | Koanf YAML parser                              |
+| `github.com/knadh/koanf/parsers/json`       | v1.0.1  | Koanf JSON parser                              |
+| `github.com/knadh/koanf/parsers/yaml`       | v1.1.1  | Koanf YAML parser                              |
 | `github.com/knadh/koanf/parsers/toml`       | v0.1.0  | Koanf TOML parser                              |
+| `github.com/larsartmann/cmdguard/flightrecorder` | v0.2.0 | Sibling sub-module (versioned pin)        |
+| `github.com/larsartmann/cmdguard/glamour`   | v0.3.0  | Sibling sub-module (versioned pin)             |
+| `github.com/larsartmann/cmdguard/spinner`   | v0.3.0  | Sibling sub-module (versioned pin)             |
 
-> **Note:** `go-faster/yaml` and `pelletier/go-toml/v2` were demoted from direct
-> to `// indirect` dependencies (koanf still pulls them transitively, so the net
-> dependency count did not decrease). `koanf/providers/file` was eliminated in
-> favor of an in-repo `bytesProvider`. `pelletier/go-toml v1.9.5` (v1) was added
-> as an indirect dep via `koanf/parsers/toml`.
-
-> **Note:** 4 of the 14 direct deps are koanf. KoanfLoader now lives in core
-> (`koanf_loader.go`), so moving koanf to an optional sub-module is no longer
-> planned — see ROADMAP.md "Deferred from 2026-07-18 Audit Closure" item #5
-> (moot).
+> **Note:** 4 of the 14 direct deps are koanf. KoanfLoader lives in core
+> (`koanf_loader.go`); moving koanf to an optional sub-module is not planned —
+> see ROADMAP.md "Deferred from 2026-07-18 Audit Closure" item #5 (moot).
+> Root module pins `toolchain go1.27.3`; all 7 sub-module go.mods match.
 
 ---
 
@@ -419,23 +442,23 @@ built with cmdguard v4 itself).
 
 | Metric                      | Value            | Status  | Notes                                                                                                          |
 | --------------------------- | ---------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~90%             | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 90.4% verified                                                      |
-| Test functions              | ~680             | 🟢 Good | 462 v4-core + 114 sub-modules + 104 examples/benchmarks/tests + testutil                                       |
-| Benchmarks                  | 29               | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
-| Fuzz targets                | 8                | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
-| Sub-module tests            | 114 across all 7 | 🟢 Good | flightrecorder 42, lint 46, schema 9, glamour 6, spinner 4, telemetry 4, prompts 3 (2026-11-07 count)          |
-| Lint issues                 | **0**            | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 80.3%            | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                    |
-| `examples/taskctl` coverage | 85.9%            | 🟢 Good | Production composition (`run`/`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04) |
+| Core coverage               | ~89%             | 🟢 Good | `pkg/cmdguard/v5` — 89.3% (badge + AGENTS.md)                                                                  |
+| Test functions              | 479 core         | 🟢 Good | 597 across the 8 workspace modules; +103 in taskctl/integration (grep-counted 2026-11-11)                      |
+| Benchmarks                  | 29               | 🟢 Good | 26 in `benchmarks/` + 3 flightrecorder                                                                          |
+| Fuzz targets                | 8                | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                    |
+| Sub-module tests            | 118 across the 7 | 🟢 Good | flightrecorder 43, lint 49, schema 9, glamour 6, spinner 4, telemetry 4, prompts 3 (grep-counted 2026-11-11)    |
+| Lint issues                 | **0**            | 🟢 Good | `nix run .#check-all` green on master (2026-11-11 09:14 report)                                                 |
+| `pkg/testutil` coverage     | 80.3%            | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                     |
+| `examples/taskctl` coverage | 85.9%            | 🟢 Good | Production composition + store-failure paths covered (verified 2026-10-04)                                      |
 
 ---
 
 ## Architecture Notes
 
-### TypeHandler Registry
+### TypeCodec Registry
 
 ```
-TypeHandler interface {
+TypeCodec interface {
     Register(flags, tag) error       // Add flag to pflag.FlagSet
     Parse(value, tag) (any, error)   // Parse string → Go value
     Default(tag) any                 // Compute default value
@@ -443,14 +466,15 @@ TypeHandler interface {
 ```
 
 All type dispatch (primitives + 9 custom types) flows through a single registry
-with copy-on-write semantics. Custom types added via `RegisterTypeHandler()`.
+with copy-on-write semantics. Custom types added via `RegisterTypeCodec()`
+(v5 rename of v4's `TypeHandler`).
 
 ### Copy-on-Write Registries
 
-`FlagRegistry` shares global `typeRegistry`/`validatorRegistry` lazily via `share()`
+`FlagRegistry` shares global type/validator registries lazily via `share()`
 and clones only on first write via `register()`. Package-level writes go to global
-defaults; instance-level writes trigger COW clone. Reduces `NewCLI` by ~48%.
+defaults; instance-level writes trigger COW clone.
 
 ---
 
-**Last updated 2026-11-07 (docs-health pass). Every status verified against source code.**
+**Last updated 2026-11-11 (docs-health v5 rebuild). Every status verified against source code.**
