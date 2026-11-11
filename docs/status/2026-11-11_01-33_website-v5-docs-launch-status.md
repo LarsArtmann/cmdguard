@@ -101,7 +101,7 @@ Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visibl
 2. Add a GitHub Actions workflow for PR checks (build, astro check, html-validate, link check, docs gate).
 3. Add a deploy job on `master` using a Firebase service account secret.
 4. Record the current hosting release ID and drill `firebase hosting:rollback`.
-5. Smoke-test script: assert 200 for `/`, all sidebar routes, `/sitemap-index.xml`, `/robots.txt`, `/404.html`.
+5. Smoke-test script: assert 200 for `/`, all sidebar routes, `/sitemap-index.xml`, `/robots.txt`, `/404.html`. **→ TODO_LIST Website follow-ups — live-domain smoke-test script**
 6. Confirm `cert` reaches `CERT_ACTIVE`; then remove the temporary-cert caveat from reports.
 7. Run a full `terraform plan` on `~/projects/domains` and confirm the provider merge changed nothing else.
 8. Add an uptime check (or a scheduled smoke test) for `cmdguard.lars.software`.
@@ -110,7 +110,7 @@ Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visibl
 
 **Docs correctness**
 
-11. Add a snippet type-check harness so fragments are compiled too.
+11. Add a snippet type-check harness so fragments are compiled too. **→ TODO_LIST Website follow-ups — fragment-level type-check harness (complete programs already compile via check-docs-api.py)**
 12. Convert the most important fragments into full programs marked for compilation.
 13. Generate the error-reference page on the site from `sentinelFacts()`.
 14. Generate the flag-tag table and the option tables from source.
@@ -139,10 +139,10 @@ Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visibl
 **SEO and discovery**
 
 33. Submit the sitemap to Google Search Console and Bing.
-34. Add `llms.txt` with links and a one-paragraph product summary.
-35. Validate JSON-LD (SoftwareApplication) with a structured-data test.
+34. Add `llms.txt` with links and a one-paragraph product summary. **→ TODO_LIST Website follow-ups — llms.txt**
+35. Validate JSON-LD (SoftwareApplication) with a structured-data test. **→ TODO_LIST Website follow-ups — JSON-LD SoftwareApplication validation test (markup exists at LandingLayout.astro:41)**
 36. Add canonical checks to the link gate (every page's canonical must be the live domain).
-37. Add `hreflang`/locale only if a second language is planned; otherwise document English-only.
+37. Add `hreflang`/locale only if a second language is planned; otherwise document English-only. **→ TODO_LIST Website follow-ups — hreflang/locale or English-only note**
 38. Add a `humans.txt` or security.txt only if there is an actual reporting address.
 39. Check that 404 returns the custom page and a 404 status on the custom domain.
 40. Add external-link checking on a schedule (not per PR).
@@ -151,7 +151,7 @@ Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visibl
 
 41. Wire `astro check` and html-validate into `nix run .#check-website`.
 42. Add `pnpm install --frozen-lockfile` to CI to prevent lockfile drift.
-43. Add a markdown/MDX linter (frontmatter required, heading order, code fence language).
+43. Add a markdown/MDX linter (frontmatter required, heading order, code fence language). **→ TODO_LIST Website follow-ups — markdown/MDX linter**
 44. Add an accessibility gate (axe or pa11y) for the landing page and one guide.
 45. Add a Lighthouse budget for LCP/CLS on the landing page.
 46. Add a test for the hero highlighter (keywords, strings, comments, HTML escaping).

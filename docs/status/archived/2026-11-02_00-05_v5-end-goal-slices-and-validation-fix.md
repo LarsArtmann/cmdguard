@@ -200,7 +200,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 **v5 API**
 
 9. Decide the module path (`/v5` vs keep `/v4`) and scaffold it.
-10. Flip strict validation to the default.
+10. ~~Flip strict validation to the default.~~ done — v5.0.0 ships strict validation ON by default (batteries; CHANGELOG [5.0.0]; cli_defaults_matrix_test.go)
 
 <!-- ✅ DONE 2026-11-08: shipped in v5.0.0 — the flip landed on the v5-scaffold branch, pinned by cli_defaults_matrix_test.go (Without* opt-outs shipped alongside); see the tagged v5.0.0 tree. -->
 

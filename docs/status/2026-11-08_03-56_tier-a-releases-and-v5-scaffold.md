@@ -203,7 +203,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
    expectations if any.
 7. B1.4 flip strict-validation default; fix fallout; opt-out test.
 8. B1.5 flip signals+graceful default; fix fallout.
-9. B1.6 flip batteries default; fix fallout.
+9. ~~B1.6 flip batteries default; fix fallout.~~ done — v5.0.0 ships the production batteries ON by default (CHANGELOG [5.0.0]; cli_defaults_matrix_test.go pins the matrix)
 
 <!-- ✅ DONE 2026-11-08: shipped in v5.0.0 — the flip landed on the v5-scaffold branch, pinned by cli_defaults_matrix_test.go (Without* opt-outs shipped alongside); see the tagged v5.0.0 tree. -->
 
@@ -248,7 +248,7 @@ split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).
 34. W7 README/doc.go healthcheck docs refresh (D18).
 
 **Tier D quick wins:**
-35. D19 rewrite/delete the no-op `TestPromptConfirm`.
+35. ~~D19 rewrite/delete the no-op `TestPromptConfirm`.~~ done — the no-op is gone: real tests TestPromptConfirm_DelegatesToRunner/_WrapsError (coverage_improvement_test.go:281,297)
 
 <!-- ✅ DONE 2026-11-08: real tests exist (TestPromptConfirm_DelegatesToRunner + _WrapsError). -->
 
@@ -256,8 +256,8 @@ split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).
 
 <!-- ✅ DONE 2026-11-08: nixpkgs go_1_27 = 1.27.3; flake already uses it — no flip needed. -->
 
-37. D33 `gopls check` infertypeargs verdict; D34 git-town/library-policy
-    values; record both.
+37. ~~D33 `gopls check` infertypeargs verdict; D34 git-town/library-policy~~ done — gopls check clean on go-composable-business-types (no infertypeargs findings); git-town.toml main="master"; that repo carries no library-policy.yaml
+    ~~values; record both.~~
 
 <!-- ✅ DONE 2026-11-08: D33 — gopls check runs clean on go-composable-business-types (no infertypeargs findings); D34 — git-town.toml main="master" + github-connector=api; library-policy.yaml does not exist in that repo. -->
 
@@ -266,7 +266,7 @@ split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).
 39. D36 script to derive FEATURES/AGENTS dep tables + test counts from
     go.mod/go test.
 40. D39 archive the 2026-11-02_00-11 HTML with its .md siblings.
-41. D38 eyeball re-rendered `architecture.svg` + examples/README loop.
+41. ~~D38 eyeball re-rendered `architecture.svg` + examples/README loop.~~ done — docs/architecture.svg re-rendered 2026-11-08; examples/README covers taskctl/docs-generator/config-explain
 
 <!-- ✅ DONE 2026-11-08: svg re-rendered 2026-11-08 01:34 (fresh); examples/README.md documents the test loop (go test ./examples/taskctl/... -count=1 -race). -->
 
@@ -278,7 +278,7 @@ split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).
     D22 GH release pages v4.0.0/v4.0.1; D23 lint dot/blank-import fixtures.
 47. Tier D bundles: website ports ×8 (TUTORIAL first), marketing/infra
     (SECURITY.md first, 5 min), doc/CI guards (stale-ref guard first).
-48. L6 (only after an Analyzer-bridge spike — do not half-ship).
+48. L6 (only after an Analyzer-bridge spike — do not half-ship). **→ TODO_LIST L6 — the Analyzer-bridge spike gating lives there**
 
 <!-- fresh:skip — pull-based by design; stays in ROADMAP until the Analyzer-bridge spike is scheduled. -->
 

@@ -342,7 +342,7 @@ All 30 modules pass `go build ./...`:
 3. Run `nix flake check` in those repos.
 4. Release **cmdguard v5.0.1** with the leaked indirect requires removed from
    the root and all 7 sub-module go.mod files.
-5. Bump the 25 consumers + `cv` to v5.0.1.
+5. Bump the 25 consumers + `cv` to v5.0.1. **→ TODO_LIST Fleet follow-ups FM1 — blocked on the v5.0.1 release (no v5.0.1 tag exists yet)**
 6. Remove the four `replace github.com/a-h/templ => v0.3.1070` pins after v5.0.1.
 7. Decide the templ-components upgrade path (all to v1.27.0 + regenerate)
    instead of pinning templ forever.
@@ -352,15 +352,15 @@ All 30 modules pass `go build ./...`:
    compile.
 10. Verify the crm contact-notes fold nil-pointer after the concurrent
     workstream lands (its BDD suite is red for that reason).
-11. Fix CV `TestLoadIdentityPortalsSection`.
+11. Fix CV `TestLoadIdentityPortalsSection`. **→ TODO_LIST Fleet follow-ups FM2 (repo: CV)**
 12. Make CV's render goldens deterministic (fixture ordering) or regenerate them
     deliberately.
-13. Fix CV `crm.checkpoint_path` missing defaultsYAML entry.
+13. Fix CV `crm.checkpoint_path` missing defaultsYAML entry. **→ TODO_LIST Fleet follow-ups FM3 (repo: CV)**
 14. Fix nsfw `TestContainerHealthCheckJoinsAllFailures` (single-failure join
     shape).
-15. Fix pma's health-probe panics (`Routes.Version` without `WithVersion`).
+15. Fix pma's health-probe panics (`Routes.Version` without `WithVersion`). **→ TODO_LIST Fleet follow-ups FM4 (repo: projects-management-automation)**
 16. Fix go-cqrs-lite `doc-check` path resolution (module lives at `cmd/…/v4`).
-17. Fix/skip the two hanging `cqrs-lint` `go/packages` tests in offline CI.
+17. Fix/skip the two hanging `cqrs-lint` `go/packages` tests in offline CI. **→ TODO_LIST Fleet follow-ups FM5 (repo: go-cqrs-lite)**
 18. Commit `cv`'s migration (20 files).
 19. Run `golangci-lint run ./...` in all 26 repos; triage findings.
 20. Run `go vet ./...` in all 26 repos.
@@ -382,7 +382,7 @@ All 30 modules pass `go build ./...`:
     lint module's replace directives).
 30. Migrate `bank-sync`, `DiscordSync`, `Code-Quality-Agent`,
     `ci-siblings/go-cqrs-lite` or explicitly archive them.
-31. Decide the fate of staged worktrees: `crm-stage-t13b`, `cv-stage-crmfix`,
+31. Decide the fate of staged worktrees: `crm-stage-t13b`, `cv-stage-crmfix`, **→ ROADMAP Open questions — staged-worktree fate is an owner decision**
     `BuildFlow-pr44`.
 32. Reconcile `cv` vs `CV` (two repos, same codebase) — see question 1.
 33. Add a `GOWORK=off go mod tidy` drift check to go-cqrs-lite CI (today's
@@ -413,7 +413,7 @@ All 30 modules pass `go build ./...`:
     Nix lock as part of a flake change).
 48. Verify `cmdguard/schema` and other sub-modules are not similarly
     over-requireing after the v5.0.1 tidy.
-49. Add a `describe`-contract snapshot test per consumer (agents depend on it).
+49. Add a `describe`-contract snapshot test per consumer (agents depend on it). **→ TODO_LIST Fleet follow-ups FM6**
 50. Schedule a follow-up fleet status report after the Nix layer is finished so
     the "done" claim is backed by `nix build`, not only `go build`.
 
