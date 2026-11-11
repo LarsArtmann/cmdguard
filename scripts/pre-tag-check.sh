@@ -22,7 +22,10 @@ MODE="${2:-full}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-fail() { echo "PRE-TAG CHECK FAILED: $*" >&2; exit 1; }
+fail() {
+	echo "PRE-TAG CHECK FAILED: $*" >&2
+	exit 1
+}
 
 [ -n "$TAG" ] || fail "usage: pre-tag-check.sh <tag> [--fast]"
 [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || fail "tag '$TAG' is not a valid semver tag"
@@ -31,42 +34,43 @@ echo "=== pre-tag-check: $TAG (mode: $MODE) ==="
 
 # 1. Refuse a dirty tree — the tag must be cut from a committed state.
 if [ -n "$(git status --porcelain)" ]; then
-  git status --short | head -20 >&2
-  fail "dirty tree; commit or stash first (v4.3.0 lesson: tag only verified states)"
+	git status --short | head -20 >&2
+	fail "dirty tree; commit or stash first (v4.3.0 lesson: tag only verified states)"
 fi
 
 # 2. Refuse if the tag already exists anywhere.
 if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-  fail "tag '$TAG' already exists locally"
+	fail "tag '$TAG' already exists locally"
 fi
 git fetch --tags --quiet origin || fail "cannot reach origin"
 if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
-  fail "tag '$TAG' already exists on origin"
+	fail "tag '$TAG' already exists on origin"
 fi
 
 # 3. Refuse if HEAD is behind origin/master (tagging stale states poisons the range).
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 git fetch --quiet origin "$BRANCH"
 if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$BRANCH")" ]; then
-  if git merge-base --is-ancestor origin/"$BRANCH" HEAD; then
-    fail "HEAD has unpushed commits; push first so CI runs before the tag"
-  else
-    fail "HEAD diverged from or is behind origin/$BRANCH; pull/rebase first"
-  fi
+	if git merge-base --is-ancestor origin/"$BRANCH" HEAD; then
+		fail "HEAD has unpushed commits; push first so CI runs before the tag"
+	else
+		fail "HEAD diverged from or is behind origin/$BRANCH; pull/rebase first"
+	fi
 fi
 
 # 4. CHANGELOG must carry a section for the tag (release notes source of truth).
-if ! grep -q "^## \[$TAG\]" CHANGELOG.md; then
-  fail "CHANGELOG.md has no '## [$TAG]' section; draft it from [Unreleased] first"
+VERSION_NO_V="${TAG#v}"
+if ! grep -q "^## \[$VERSION_NO_V\]" CHANGELOG.md; then
+	fail "CHANGELOG.md has no '## [$VERSION_NO_V]' section; draft it from [Unreleased] first"
 fi
 
 # 5. Full battery (default) — build+test+lint+fmt+tidy across all 8 modules.
 if [ "$MODE" = "full" ]; then
-  echo "--- running nix run .#check-all (full battery) ---"
-  nix run .#check-all || fail "check-all battery failed"
+	echo "--- running nix run .#check-all (full battery) ---"
+	nix run .#check-all || fail "check-all battery failed"
 else
-  echo "--- --fast: skipping check-all (a green run must exist for HEAD $(git rev-parse --short HEAD)) ---"
-  echo "    evidence: A01 check-all green for this tree (see TODO_LIST F3 / status report)"
+	echo "--- --fast: skipping check-all (a green run must exist for HEAD $(git rev-parse --short HEAD)) ---"
+	echo "    evidence: A01 check-all green for this tree (see TODO_LIST F3 / status report)"
 fi
 
 # 6. The release workflow's own gates, re-run locally (GOEXPERIMENT matches ci.yml).
