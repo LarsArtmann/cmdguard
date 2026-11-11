@@ -299,7 +299,7 @@ guides (b.3).
 34. FM4: pma health-probe `Routes.Version`/`WithVersion` panics.
 35. FM5: go-cqrs-lite hanging `cqrs-lint` `go/packages` tests in offline CI.
 36. FM6: `describe`-contract snapshot test per consumer. **→ TODO_LIST FM6 (canonical row lives there)**
-37. FM7: commit `cv`'s migration (verify the 20 files first — not my work).
+37. FM7: commit `cv`'s migration (verify the 20 files first — not my work). **→ SUPERSEDED — see TODO_LIST FM7 verdict (cv origin/master carries the migration; fork preserved on local-fork-backup-20261111)**
 38. FM8: fleet-wide `golangci-lint` + `go vet` + `go test -race` sweep.
 39. Templ-pair biconditional into consumer bump tooling (08-24 item 8).
 40. Reconcile `cv` vs `CV` (ROADMAP OQ #7).
