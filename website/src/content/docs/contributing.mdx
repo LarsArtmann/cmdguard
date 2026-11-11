@@ -67,6 +67,13 @@ All pull requests must pass:
 - `go test -race ./...` — tests pass with race detection
 - `golangci-lint run` — no lint issues
 
+## Localization
+
+The site is English-only by decision: no `hreflang` alternates are emitted and
+none are planned until a second language actually ships. Do not add locale
+scaffolding (i18n routing, language pickers, `hreflang` link tags) without a
+real second-language content source.
+
 ## Pull Requests
 
 - Ensure all tests pass: `go test -race ./...`
