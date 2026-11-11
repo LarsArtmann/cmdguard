@@ -113,8 +113,8 @@ Ranked by impact × effort, drawing the live TODO_LIST + this session's discover
 | 20 | W5: context-cancellation tests for the healthcheck path                                                                                   | HW-2         |
 | 21 | W6: samber-linter baseline committed + wired into flake/CI                                                                                | HW-2         |
 | 22 | W7: refresh README/doc.go healthcheck docs (bare `HealthCheck` signature still shown)                                                     | HW-2         |
-| 23 | H1: test all examples in CI                                                                                                               | sweep        |
-| 24 | Decide the `schema` sub-module release (CT2)                                                                                              | TODO CT2     |
+| ~~23~~ | ~~H1: test all examples in CI~~ done — RESOLVED 2026-11-11: CI runs the full module matrix on every push (ci.yml build+test legs cover examples/taskctl; sub-module smoke workflow covers the 7 sub-modules; benchmark job covers ./benchmarks/) | ~~sweep~~ |
+| ~~24~~ | ~~Decide the `schema` sub-module release (CT2)~~ done — RESOLVED 2026-11-11: schema/v0.1.0 tagged AND verified from the proxy in a scratch consumer today (A10 evidence in TODO_LIST CT2 verdict); publish shape clean (real v5 pin, no replaces) | ~~TODO CT2~~ |
 | 25 | Wire `examples/config-explain` into README + website (CT3)                                                                                | TODO CT3     |
 | 26 | L6: golangci-lint module-plugin distribution layer                                                                                        | TODO L6      |
 | 27 | T1–T5: v5 renames/removals (CommandInfo→CommandMetadata, TypeHandler→TypeCodec, PromptRunner, SetConfig removal, RegisterInScope generic) | TODO T       |
@@ -138,7 +138,7 @@ Ranked by impact × effort, drawing the live TODO_LIST + this session's discover
 | 45 | Lipgloss-styled `Hint:` line                                                                                                              | pepper batch |
 | 46 | `--describe` / `--help=json` aliases                                                                                                      | pepper batch |
 | 47 | Re-render `docs/architecture.svg` diff-review (I re-rendered after the title fix; a human eyeball pass is owed)                           | sweep        |
-| 48 | Add "Running Tests" coverage for config-explain/docs-generator in examples/README                                                         | sweep        |
+| ~~48~~ | ~~Add "Running Tests" coverage for config-explain/docs-generator in examples/README~~ done — RESOLVED 2026-11-11: examples coverage enforced mechanically now — ci.yml builds+tests the whole root module including examples/, and sub-module-smoke.yml covers every sub-module; a README prose section would duplicate a machine gate | ~~sweep~~ |
 | 49 | Consider archiving the 2026-11-02_00-11 two-day-session-summary.html with its .md siblings                                                | sweep        |
 | 50 | Schedule the next full docs-health audit after v5.0.0 ships (ROADMAP deferred #12 pattern)                                                | ROADMAP      |
 

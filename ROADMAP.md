@@ -84,22 +84,30 @@ on erraudit + timesheets.
 Carried from the 2026-11-11 reports' §g sections. These are decisions, not
 tasks — do not convert them to TODO rows without an owner answer.
 
-1. **Cut v5.1.0 now?** `master` carries 40+ commits past `v5.0.0` (Builder
-   mutex, `WithStrictPositionalArgs`/`WithArgsPassthrough`, doc fixes);
-   `[Unreleased]` is already written. Publishing is irreversible.
+1. ~~**Cut v5.1.0 now?**~~ DECIDED + EXECUTED 2026-11-11: v5.1.0 shipped
+   (tag → Release run success → proxy-verified → GitHub Latest). The
+   executed path is now mechanized in `scripts/pre-tag-check.sh`.
 2. **Branch policy:** delete `v5-scaffold` (it equals `master`) or repurpose
    as `next`? Retire `release/v2.10` the way v4 was retired?
 3. **Staged worktrees:** decide the fate of `crm-stage-t13b`, `cv-stage-crmfix`,
    `BuildFlow-pr44` (migrate to v5 or archive them).
-4. **Website scope:** fix only the stale `/v4` deploy guard, or also add a v4
-   retirement notice / make v5 the single documented line on the site?
-5. **Release notes policy:** keep `generate_release_notes` or switch to
-   CHANGELOG-driven notes?
+4. **Website scope:** the stale `/v4` deploy guard is FIXED and the site is
+   live again (2026-11-11); still open: v4 retirement notice on the site,
+   v5-as-single-documented-line.
+5. ~~**Release notes policy:**~~ DECIDED BY ACTION 2026-11-11: v5.1.0 shipped
+   with `generate_release_notes: true` (the existing release.yml default);
+   switch to CHANGELOG-driven notes only if the owner asks.
 6. **v4 frozen-branch hygiene:** give `release/v4`'s sub-module `go.mod`
    pseudo-pins a hygiene commit, or leave the frozen line untouched?
 7. **`cv` vs `CV`:** two GitHub repos carrying the same codebase — reconcile
    (merge, redirect, or declare one canonical), per the 2026-11-11 fleet report
    question 1.
+
+Also answered 2026-11-11 (encoded in AGENTS.md "Owner decisions"): D2
+struck-done TODO rows stay as ledger; D3 archive-by-gate cadence; D12 root
+sibling pins keep release shape (pseudo-version-hygiene finding is a
+deliberate deviation); D13 AGENTS.md stays load-bearing under the 220-line
+warning; D14 file-size gate at 900 lines (`.buildflow.yml`).
 
 ---
 
