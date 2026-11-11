@@ -116,6 +116,17 @@ With both options, `myapp set de<TAB>` offers `debug`, and `myapp set trace` fai
 
 `WithStrictPositionalArgs` is opt-in today. It only applies when no other validator was configured; an explicit `WithExactArgs`, `WithNoArgs`, or `WithArgs` wins. `WithArgsPassthrough` pins the current permissive behavior and will be the opt-out if the strict default lands.
 
+Opt in per command when a zero-argument command must never silently swallow stray positionals:
+
+```go
+doneCmd, err := v5.NewCommand("done", v5.NoFlags{}, doneHandler,
+	v5.WithShort("Mark a task done"),
+	v5.WithStrictPositionalArgs(),
+)
+```
+
+With the strict option, `myapp done 1 extra` fails before the handler runs instead of dropping `extra`. To keep the old behavior for a command whose callers pipe extra tokens, pin it explicitly with `v5.WithArgsPassthrough()` — an explicit choice beats a silent default.
+
 ## Flag Value Completion
 
 Flag value completion is a cobra hook, not a `WithCompletion` responsibility. After `Build`, find the command on the underlying root and register the function:
