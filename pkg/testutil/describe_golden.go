@@ -11,15 +11,16 @@ import (
 )
 
 // updateDescribeGolden mirrors the -update-golden convention used by the
-// core drift tests: run
-//
-//	go test ./... -run TestDescribeContract -update-golden
-//
-// to regenerate the committed contract snapshots after an intentional
-// contract change. The describe JSON carries a schema_version, so a
-// consumer bumping majors can compare the old and new contracts
+// core drift tests: run `go test ./... -run TestDescribeContract
+// -update-golden` to regenerate the committed contract snapshots after an
+// intentional contract change. The describe JSON carries a schema_version,
+// so a consumer bumping majors can compare the old and new contracts
 // deliberately instead of discovering flag drift at runtime.
-var updateDescribeGolden = flag.Bool("update-golden", false, "rewrite the describe-contract goldens") //nolint:gochecknoglobals // flag registration is package-level by design (Go testing convention)
+var updateDescribeGolden = flag.Bool( //nolint:gochecknoglobals // flag registration is package-level by design (Go testing convention)
+	"update-golden",
+	false,
+	"rewrite the describe-contract goldens",
+)
 
 // DescribeDescriber is the slice of *v5.CLI[T] the harness needs. Structural
 // on purpose: consumers keep their concrete CLI[T] type at the call site.
@@ -52,7 +53,10 @@ func AssertDescribeContract(t *testing.T, cli DescribeDescriber, goldenPath stri
 		if mkErr := os.MkdirAll(filepath.Dir(goldenPath), goldenDirPerm); mkErr != nil {
 			t.Fatalf("creating golden dir: %v", mkErr)
 		}
-		if writeErr := os.WriteFile(goldenPath, []byte(got), 0o600); writeErr != nil { //nolint:gosec // committed test fixture, not a secret
+
+		const goldenFilePerm = 0o600
+
+		if writeErr := os.WriteFile(goldenPath, []byte(got), goldenFilePerm); writeErr != nil {
 			t.Fatalf("writing golden: %v", writeErr)
 		}
 
@@ -64,6 +68,7 @@ func AssertDescribeContract(t *testing.T, cli DescribeDescriber, goldenPath stri
 		if os.IsNotExist(err) {
 			t.Fatalf("golden %s missing; run with -update-golden to create it", goldenPath)
 		}
+
 		t.Fatalf("reading golden: %v", err)
 	}
 
