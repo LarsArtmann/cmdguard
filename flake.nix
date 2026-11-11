@@ -101,7 +101,7 @@
           apps = {
             check-all = {
               type = "app";
-              meta.description = "Run all quality gates: build, test (race), lint, format check, go mod tidy across all 8 modules";
+              meta.description = "Run all quality gates: build, test (race), lint, vet, format check, go mod tidy + verify across all 8 modules";
               program = toString (
                 pkgs.writeShellScript "check-all" ''
                   set -euo pipefail
@@ -123,6 +123,12 @@
                   ${pkgs.golangci-lint}/bin/golangci-lint run ./...
                   for mod in glamour prompts spinner telemetry flightrecorder lint schema; do
                     (cd "$mod" && ${pkgs.golangci-lint}/bin/golangci-lint run ./...)
+                  done
+
+                  echo "=== Vet ==="
+                  ${goPkg}/bin/go vet ./...
+                  for mod in glamour prompts spinner telemetry flightrecorder lint schema; do
+                    (cd "$mod" && ${goPkg}/bin/go vet ./...)
                   done
 
                   echo "=== samber-linter (health-washing ratchet) ==="
@@ -152,6 +158,14 @@
                         exit 1
                       fi
                       echo "  OK: $dir/go.mod tidy"
+                    fi
+                  done
+
+                  echo "=== go mod verify ==="
+                  for dir in . glamour prompts spinner telemetry flightrecorder lint schema; do
+                    if [ -f "$dir/go.mod" ]; then
+                      (cd "$dir" && ${goPkg}/bin/go mod verify >/dev/null)
+                      echo "  OK: $dir/go.mod verified"
                     fi
                   done
 
