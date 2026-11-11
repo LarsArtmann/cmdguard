@@ -44,7 +44,9 @@ scripts/check-guide-sync.sh
 (cd website && pnpm build && pnpm exec astro check && pnpm exec html-validate "dist/**/*.html")
 python3 scripts/check-website-links.py
 
-# Deploy (firebase CLI is not on PATH; use the nix store binary or nix shell)
+# Deploy: CI deploys automatically on every master push (FIREBASE_SERVICE_ACCOUNT
+# secret -> SA cmdguard-website-deploy@lars-software). Local path only for
+# emergency fixes: firebase CLI is not on PATH; use the nix store binary or nix shell
 (cd website && firebase deploy --only hosting:cmdguard --project lars-software)
 ```
 

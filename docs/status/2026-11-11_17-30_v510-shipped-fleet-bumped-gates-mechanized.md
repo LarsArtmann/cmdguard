@@ -258,12 +258,18 @@ fleet sweep 26/26 vet+lint clean; branch + tag protection rulesets active.
    recorded artifact (battery log with matching HEAD) instead of an echo.
 6. **Website deploys still depend on local Firebase auth** — until the
    secret lands (§g1), the site goes stale on every CI-only change.
+   **RESOLVED ~19:30 same day:** secret set, SA `cmdguard-website-deploy`
+   provisioned (`firebasehosting.admin` + `serviceusage.serviceUsageConsumer`),
+   one latent workflow bug fixed (`a66a97e`), deploy green on run
+   43086278951, site smoke 30/30 — see §g1 for the full trail.
 
 ## f) Next things, sorted by impact
 
-1. Set the `FIREBASE_SERVICE_ACCOUNT` secret on cmdguard so CI deploys the
+1. ~~Set the `FIREBASE_SERVICE_ACCOUNT` secret on cmdguard so CI deploys the
    website (§g1) — then re-run the Website workflow and confirm the deploy
-   step stops skipping.
+   step stops skipping.~~ DONE ~19:30 same day: owner said "do it"; secret
+   set, two IAM roles provisioned, one workflow quoting bug fixed en route
+   (`a66a97e`), deploy step green on run 43086278951 — see §g1.
 2. Land the staged pingen-spike v5.1.0 bump after its own docs-gates red is
    fixed in that repo.
 3. Bump cv to v5.1.0 once its concurrent session greens `internal/ui`
@@ -376,6 +382,28 @@ fleet sweep 26/26 vet+lint clean; branch + tag protection rulesets active.
    firebase binary + your gcloud ADC, which works). With the secret, the
    website workflow becomes self-sufficient and the 2026-11-08-class
    "site went stale behind a red workflow" failure mode dies.
+
+   **ANSWERED + EXECUTED 2026-11-11 ~19:30 (owner: "do it"):**
+   - SA `cmdguard-website-deploy@lars-software.iam.gserviceaccount.com`
+     created with `roles/firebasehosting.admin`; key JSON stored at
+     `~/.config/firebase/cmdguard-website-deploy@lars-software.json` (mode
+     600, outside the repo) and uploaded as the raw-JSON repo secret.
+   - First CI attempt FAILED auth: the workflow wrote the secret via
+     `echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"` — Actions substitutes
+     secrets literally into the script, so every double quote in the JSON
+     terminated the shell quoting and the key file lost its quote
+     characters (invalid JSON → "Failed to authenticate"). Confirmed by a
+     local byte-level simulation; fixed by passing the secret as step env
+     and writing it with `printf '%s'` (`a66a97e`, pushed).
+   - Second attempt FAILED with `403 Permission denied to get service
+     [firebasehosting.googleapis.com]`: firebase-tools' Service Usage
+     preflight needs `serviceusage.services.get` — granted
+     `roles/serviceusage.serviceUsageConsumer` to the SA.
+   - Third attempt GREEN: run 43086278951, `Deploy Website: success`;
+     smoke 30/30 routes 200 + 404 path correct (one transient 503/
+     timeout window ~60 s post-deploy, self-healed). The website workflow
+     is now self-sufficient on master pushes. Rotate/revoke via
+     `gcloud iam service-accounts keys delete` on the SA if ever needed.
 2. **cv is being actively rewritten by another session (+1302 commits,
    history rewrites; my bump was erased and the local clone was 1302 behind).
    Should I stay entirely out of cv until that session lands?** My local
