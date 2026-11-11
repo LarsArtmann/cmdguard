@@ -34,8 +34,18 @@ go test ./... -count=1 -timeout 120s -cover
 # Check everything (format check)
 nix flake check
 
-# Check everything (build + test + lint + format + go mod tidy — all 6 modules)
+# Check everything (build + test + lint + format + go mod tidy — all 8 modules)
 nix run .#check-all
+
+# Website docs truth gate (stale major, API symbols, compiled doc samples)
+python3 scripts/check-guide-sync.sh
+
+# Website build, typecheck, HTML validation, internal links
+(cd website && pnpm build && pnpm exec astro check && pnpm exec html-validate "dist/**/*.html")
+python3 scripts/check-website-links.py
+
+# Deploy (firebase CLI is not on PATH; use the nix store binary or nix shell)
+(cd website && firebase deploy --only hosting:cmdguard --project lars-software)
 ```
 
 **BuildFlow pre-commit hook:** runs golangci-lint + formatters on commit (auto-fixes applied automatically). Commits proceed normally — no `--no-verify` needed.
