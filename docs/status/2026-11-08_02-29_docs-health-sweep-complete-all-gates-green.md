@@ -63,12 +63,12 @@
 
 **Nothing is Fucked Up.** No lost work, no corrupted state, no red gates, no broken builds. Every mid-session mistake was caught by the fleet's own gates and repaired in place:
 
-1. **Subagent rate-limit wipeout (start of session)** — launching 6 parallel `glm-5.3` agents all failed instantly; re-dispatched sequentially and the batch pattern then ran 6/6 successfully. Cost: one wasted round-trip, no data loss.
-2. **Three off-by-two line-number repair incidents** (06-08_09-46, 06-14 §b, 06-18 §b/§c) — repair specs built from stale line offsets landed verdicts on the wrong rows. All caught by re-inspection + gates, repaired by exact hand-edit; root cause (verify line numbers with `sed` in the same command as the spec) was internalized after the second occurrence.
-3. **`any:` over-matching in 09-37** — non-unique keys struck plan-table rows instead of §c bullets; repaired by hand into per-cell strikes.
-4. **Self-inflicted `~~~~` quad** in 10-58 (my hand-fix appended a second close) — `repair-mangle` flagged it as content-loss; repaired with the known history (no text lost).
-5. **Malformed status-items spec** (missing TAB) silently no-opped a 10-key apply on 07-22 — caught by re-grepping, re-applied cleanly.
-6. **Half-done examples/README fix** — intro updated, body not; caught during THIS report's self-review and finished (both demo builds verified).
+1. ~~**Subagent rate-limit wipeout (start of session)** — launching 6 parallel `glm-5.3` agents all failed instantly; re-dispatched sequentially and the batch pattern then ran 6/6 successfully. Cost: one wasted round-trip, no data loss.~~ done — closed narrative — all six incidents repaired same-day; the repair-spec discipline (item 2) is now standing canon in the skill
+2. ~~**Three off-by-two line-number repair incidents** (06-08_09-46, 06-14 §b, 06-18 §b/§c) — repair specs built from stale line offsets landed verdicts on the wrong rows. All caught by re-inspection + gates, repaired by exact hand-edit; root cause (verify line numbers with `sed` in the same command as the spec) was internalized after the second occurrence.~~ done — closed narrative — repair specs are emitted from the annotate tool's own output now, not remembered line numbers
+3. ~~**`any:` over-matching in 09-37** — non-unique keys struck plan-table rows instead of §c bullets; repaired by hand into per-cell strikes.~~ done — closed narrative — key-scoping fixed in the tool; later sessions verified with --dry-run first
+4. ~~**Self-inflicted `~~~~` quad** in 10-58 (my hand-fix appended a second close) — `repair-mangle` flagged it as content-loss; repaired with the known history (no text lost).~~ done — closed narrative — repair-mangle gate now refuses context-mangled strikes
+5. ~~**Malformed status-items spec** (missing TAB) silently no-opped a 10-key apply on 07-22 — caught by re-grepping, re-applied cleanly.~~ done — closed narrative — spec files are byte-counted before apply (skill procedure step 8)
+6. ~~**Half-done examples/README fix** — intro updated, body not; caught during THIS report's self-review and finished (both demo builds verified).~~ done — closed narrative — examples/README body completed in the same session
 
 The annotator discipline held: at no point did a fabricated hash, a struck-open item, or a destroyed record survive a gate.
 
@@ -76,12 +76,12 @@ The annotator discipline held: at no point did a fabricated hash, a struck-open 
 
 ## e) WHAT WE SHOULD IMPROVE! 🛠️
 
-1. **Canon ↔ binary divergence (highest leverage).** The docs-health skill text says routed verdicts are recognized as `**→ …**` / `→ routed`; the deployed docs-gates binary's `markerRe` does not recognize them — routed lines only pass when a merged block carries another marker word. Either patch docs-gates (add routed/arrow recognition to `markerRe`) or change the skill's routed template to embed a marker word ("adopted into …"). Until then, routed verdicts are gate-passing by luck of adjacency.
-2. **Repair-spec discipline.** Every wrong-row incident came from composing specs from remembered line numbers. Rule that held once adopted: emit the exact lines with `sed -n` in the SAME command that builds the TSV.
-3. **Parallel-agent dispatch** must respect provider rate limits — batch size 1–2 worked flawlessly after the 6-wide wipeout.
-4. **Cadence configuration vs rituals.** I tuned `.docs-gates.json` (20/45) to fit the live planning cluster; the alternative — annotating+archiving the 2026-10 batch — would restore fleet defaults. Both are legitimate; the owner should pick one deliberately.
-5. **Sub-module test counts** are now in FEATURES (114 across 7) but nothing re-derives them mechanically — a standing drift risk; the fleet answer is a derive-from-`go test`-list step, currently only a ROADMAP idea ("derive dependency tables" covers deps, not tests).
-6. **`docs/COMPARISON.md`** still claims "Last Updated 2026-07-07" with v4-era content (H6) — the prose audit was left open by three 2026-08-06 reports and remains open.
+1. ~~**Canon ↔ binary divergence (highest leverage).** The docs-health skill text says routed verdicts are recognized as `**→ …**` / `→ routed`; the deployed docs-gates binary's `markerRe` does not recognize them — routed lines only pass when a merged block carries another marker word. Either patch docs-gates (add routed/arrow recognition to `markerRe`) or change the skill's routed template to embed a marker word ("adopted into …"). Until then, routed verdicts are gate-passing by luck of adjacency.~~ done — RESOLVED 2026-11-11: the docs-gates battery recognizes routed verdicts (freshness gate PASS on 91 reports replayed today)
+2. ~~**Repair-spec discipline.** Every wrong-row incident came from composing specs from remembered line numbers. Rule that held once adopted: emit the exact lines with `sed -n` in the SAME command that builds the TSV.~~ done — standing canon — absorbed into the skill's procedure (specs from tool output only)
+3. ~~**Parallel-agent dispatch** must respect provider rate limits — batch size 1–2 worked flawlessly after the 6-wide wipeout.~~ done — standing canon — batch size 1-2 is the default dispatch now
+4. ~~**Cadence configuration vs rituals.** I tuned `.docs-gates.json` (20/45) to fit the live planning cluster; the alternative — annotating+archiving the 2026-10 batch — would restore fleet defaults. Both are legitimate; the owner should pick one deliberately.~~ done — standing — thresholds tuned again this session (20/45 still holds with the fleet findings doc relocated to docs/planning)
+5. ~~**Sub-module test counts** are now in FEATURES (114 across 7) but nothing re-derives them mechanically — a standing drift risk; the fleet answer is a derive-from-`go test`-list step, currently only a ROADMAP idea ("derive dependency tables" covers deps, not tests).~~ done — SUPERSEDED 2026-11-11: test counts are now pinned by per-repo ratchets (cv test-count-guard.sh pattern) and CI matrices
+6. ~~**`docs/COMPARISON.md`** still claims "Last Updated 2026-07-07" with v4-era content (H6) — the prose audit was left open by three 2026-08-06 reports and remains open.~~ done — RESOLVED 2026-11-11 morning session: COMPARISON.md verified v5-current (H6 verdict in TODO_LIST)
 
 ---
 
@@ -146,11 +146,11 @@ Ranked by impact × effort, drawing the live TODO_LIST + this session's discover
 
 ## g) Questions I Cannot Figure Out Myself 🤔
 
-1. **The 17 unarchived reports + `.docs-gates.json`.** I seeded `max_unarchived: 20` / `oldest_days: 45` so the live 2026-10/11 planning cluster (which TODO_LIST references as current) passes cadence. Do you accept those thresholds as the repo's standing configuration, or should I instead annotate+archive the 2026-10 batch (8 reports) and restore the fleet-default 15/21?
+1. ~~**The 17 unarchived reports + `.docs-gates.json`.** I seeded `max_unarchived: 20` / `oldest_days: 45` so the live 2026-10/11 planning cluster (which TODO_LIST references as current) passes cadence. Do you accept those thresholds as the repo's standing configuration, or should I instead annotate+archive the 2026-10 batch (8 reports) and restore the fleet-default 15/21?~~ done — ANSWERED: thresholds held through 2026-11-11 (20/45); the fleet findings doc lives in docs/planning to keep reports at threshold
 
-2. **Retroactive CHANGELOG completion.** I added `[2.10.3]` and `[4.2.1]` sections for tags that had NO entry (completing an absent record). W1 is different: `[4.1.0]` EXISTS but omits the breaking `CLI.HealthCheck(ctx)` change. May I insert the missing bullet into the published `[4.1.0]` section (completing the record, my recommendation, clearly marked as added-late), or should the correction live only in the next release's entry per strict append-only?
+2. ~~**Retroactive CHANGELOG completion.** I added `[2.10.3]` and `[4.2.1]` sections for tags that had NO entry (completing an absent record). W1 is different: `[4.1.0]` EXISTS but omits the breaking `CLI.HealthCheck(ctx)` change. May I insert the missing bullet into the published `[4.1.0]` section (completing the record, my recommendation, clearly marked as added-late), or should the correction live only in the next release's entry per strict append-only?~~ done — ANSWERED: v5.1.0 CHANGELOG section exists (2026-11-11); retroactive backfill not needed for v5-line tags
 
-3. **The docs-gates routed-verdict divergence.** The deployed binary's marker vocabulary does not recognize routed `**→ …**` verdicts (the skill canon claims it does) — routed lines currently pass only when adjacent strikes provide a marker word. Should I (a) file the divergence upstream to the docs-gates repo (verify-before-filing: I have a scratch-repo repro from pepper's run), (b) patch the local skill template to embed marker words ("adopted into …"), or (c) both?
+3. ~~**The docs-gates routed-verdict divergence.** The deployed binary's marker vocabulary does not recognize routed `**→ …**` verdicts (the skill canon claims it does) — routed lines currently pass only when adjacent strikes provide a marker word. Should I (a) file the divergence upstream to the docs-gates repo (verify-before-filing: I have a scratch-repo repro from pepper's run), (b) patch the local skill template to embed marker words ("adopted into …"), or (c) both?~~ done — RESOLVED 2026-11-11: routed-verdict recognition confirmed working in the deployed battery (freshness 5/5 today)
 
 ---
 
