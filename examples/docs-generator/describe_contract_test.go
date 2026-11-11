@@ -7,6 +7,10 @@ import (
 	"github.com/larsartmann/cmdguard/v5/pkg/testutil"
 )
 
+func init() { //nolint:gochecknoinits // the convention flag must be registered before testing's flag.Parse
+	testutil.RegisterUpdateGoldensFlag()
+}
+
 // TestDescribeContract pins the machine contract (see taskctl's
 // TestDescribeContract for the rationale) for the docs-generator example —
 // the second pilot for the consumer describe-snapshot harness.

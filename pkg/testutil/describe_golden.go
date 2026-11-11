@@ -10,17 +10,32 @@ import (
 	"testing"
 )
 
-// updateDescribeGolden mirrors the -update-golden convention used by the
-// core drift tests: run `go test ./... -run TestDescribeContract
-// -update-golden` to regenerate the committed contract snapshots after an
-// intentional contract change. The describe JSON carries a schema_version,
-// so a consumer bumping majors can compare the old and new contracts
-// deliberately instead of discovering flag drift at runtime.
-var updateDescribeGolden = flag.Bool( //nolint:gochecknoglobals // flag registration is package-level by design (Go testing convention)
-	"update-golden",
-	false,
-	"rewrite the describe-contract goldens",
-)
+// RegisterUpdateGoldensFlag wires the -update-golden convention flag into a
+// test binary. It is a NO-OP when any package in the binary already
+// registered the flag (the core v5 drift tests own their own registration);
+// a double registration panics at init with "flag redefined", which is how
+// the 2026-11-11 CI red on a docs-only commit happened. Call it from an
+// init in the package whose goldens the harness guards:
+//
+//	func init() { testutil.RegisterUpdateGoldensFlag() }
+//
+// AssertDescribeContract always honors the flag whether this binary
+// registered it here or somewhere else.
+func RegisterUpdateGoldensFlag() {
+	if flag.Lookup("update-golden") != nil {
+		return
+	}
+
+	flag.Bool("update-golden", false, "rewrite the describe-contract goldens")
+}
+
+// updateGoldensRequested reports whether the binary's -update-golden flag is
+// set, regardless of which package registered it.
+func updateGoldensRequested() bool {
+	f := flag.Lookup("update-golden")
+
+	return f != nil && f.Value.String() == "true"
+}
 
 // DescribeDescriber is the slice of *v5.CLI[T] the harness needs. Structural
 // on purpose: consumers keep their concrete CLI[T] type at the call site.
@@ -47,7 +62,7 @@ func AssertDescribeContract(t *testing.T, cli DescribeDescriber, goldenPath stri
 
 	got := buf.String()
 
-	if *updateDescribeGolden {
+	if updateGoldensRequested() {
 		const goldenDirPerm = 0o755
 
 		if mkErr := os.MkdirAll(filepath.Dir(goldenPath), goldenDirPerm); mkErr != nil {

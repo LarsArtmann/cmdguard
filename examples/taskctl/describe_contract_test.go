@@ -7,6 +7,10 @@ import (
 	"github.com/larsartmann/cmdguard/v5/pkg/testutil"
 )
 
+func init() { //nolint:gochecknoinits // the convention flag must be registered before testing's flag.Parse
+	testutil.RegisterUpdateGoldensFlag()
+}
+
 // TestDescribeContract pins the machine contract (the hidden `describe`
 // command's JSON) against a committed golden. The contract is what agents
 // and tooling parse to discover commands, flags, env names, defaults, and
