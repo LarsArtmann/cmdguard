@@ -89,23 +89,24 @@ nix flake update     # then refresh the lock
 nix build            # vendorHash mismatch here means the order above was skipped
 ```
 
-### Codemod renames are repo-wide, not import-scoped
+### Codemod renames are scoped to cmdguard files, with a dry run
 
-`codemod.sh` seds every `*.go` file in the repository — including files that
-never imported cmdguard. A consumer's OWN `TypeHandler` type, or a `v4 "..."`
-import alias for a different package, gets renamed too (this bit two fleet
-repos during the 2026-11 migrations). There is no `--dry-run` flag yet:
+`codemod.sh` sed-rewrites every file's IMPORT PATHS repo-wide (a
+`cmdguard/v4` string anywhere IS cmdguard), but the identifier renames
+(`TypeHandler` → `TypeCodec`, …) apply ONLY to files that reference
+cmdguard — a consumer's OWN `TypeHandler` type, or a `v4 "..."` import
+alias for a different package, is left alone (this bit two fleet repos
+during the 2026-11 migrations; the scoping + `--dry-run` are the fix).
 
 ```bash
 git status --short   # must be clean
 git switch -c chore/cmdguard-v5-codemod
-bash /path/to/cmdguard/docs/migration_v4_v5/codemod.sh
-git diff --stat      # review EVERY renamed file; revert non-cmdguard files
-git restore path/to/unrelated.go   # for any file the codemod touched wrongly
+bash /path/to/cmdguard/docs/migration_v4_v5/codemod.sh --dry-run   # preview
+bash /path/to/cmdguard/docs/migration_v4_v5/codemod.sh             # apply
+git diff --stat      # review the diff; restore anything unexpected
 ```
 
-Run it on a branch, review the full diff, and restore any file that does not
-import cmdguard.
+Run it on a branch, preview with `--dry-run`, review the full diff.
 
 ## 4. Review the new defaults
 
