@@ -17,6 +17,7 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 ### Panic Elimination (This Session)
 
 <!-- check-rows:ledger -->
+
 | What                                              | Status      | Details                                                        |
 | ------------------------------------------------- | ----------- | -------------------------------------------------------------- |
 | `MustNewCommand` / `MustNewParentCommand`         | **Deleted** | Removed from `command.go`                                      |
@@ -44,6 +45,7 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 ### Previous Sprint (Committed Before Panic Work)
 
 <!-- check-rows:ledger -->
+
 | What                                                         | Commit    | Details                      |
 | ------------------------------------------------------------ | --------- | ---------------------------- |
 | `formatFieldValue` tests                                     | `b62aed4` | 10 subtests                  |
@@ -63,6 +65,7 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 ## B) PARTIALLY DONE
 
 <!-- check-rows:ledger -->
+
 | Area                          | Status             | What's Left                                                                                                                                                              |
 | ----------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | FEATURES.md                   | **Stale**          | Still lists `MustNewCommand`, `MustVersionCommand`, `MustDoctorCommand`, `MustParse[T]`, `MustParseEmail`, etc. as ✅ FULLY_FUNCTIONAL. These functions no longer exist. |
@@ -78,28 +81,28 @@ cmdguard v2 has achieved **zero panics in library code**. Every function that pr
 
 ## C) NOT STARTED
 
-| #  | Task                                                                    | Category    | Impact | Effort |
-| -- | ----------------------------------------------------------------------- | ----------- | ------ | ------ |
-| ~~1~~  | ~~Update FEATURES.md: remove all Must\* entries, add "Zero Panics" badge~~ done — FEATURES rewritten repeatedly; zero-panics canon lives in AGENTS.md | ~~Docs~~ | ~~High~~ | ~~30m~~ |
-| ~~2~~  | ~~Update TODO_LIST.md: reflect v2.5.0 state, mark P6 Must\* items as done~~ **Superseded — TODO_LIST rewritten; done items removed per policy.** | ~~Docs~~ | ~~Medium~~ | ~~15m~~ |
-| ~~3~~  | ~~Update ROADMAP.md: mark Package() redesign as done~~ **Superseded — current ROADMAP tracks Package[T] as v5 candidate #7.** | ~~Docs~~ | ~~Low~~ | ~~5m~~ |
-| ~~4~~  | ~~Audit README.md for Must\* references~~ done — README audited repeatedly; zero Must* (v4 has no Must* variants — AGENTS.md) | ~~Docs~~ | ~~High~~ | ~~15m~~ |
-| ~~5~~  | ~~Audit docs/_.md for Must_ references~~ done — docs audited in the 2026-06-22 doc-sync pass and later docs-health passes | ~~Docs~~ | ~~Medium~~ | ~~20m~~ |
-| ~~6~~  | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~CI~~ | ~~Medium~~ | ~~5m~~ |
-| ~~7~~  | ~~Nested struct config file support~~ done — nested config structs supported (AGENTS.md) | ~~Feature~~ | ~~High~~ | ~~3-5d~~ |
-| ~~8~~  | ~~Plugin system for validators/type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~Feature~~ | ~~High~~ | ~~3-5d~~ |
-| ~~9~~  | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go + the describe JSON contract | ~~Feature~~ | ~~Medium~~ | ~~2-3d~~ |
-| 10 | Advanced types: Result[T], Validated[T], branded IDs **→ ROADMAP raw ideas (Result[T]/Validated[T]; branded IDs via go-branded-id)** | Feature     | Medium | 3-5d   |
-| ~~11~~ | ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output | ~~Feature~~ | ~~Low~~ | ~~1-2d~~ |
-| 12 | Extract flagtags to standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Refactor    | Low    | 2-3d   |
-| ~~13~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).** | ~~Planning~~ | ~~High~~ | ~~2-3d~~ |
-| ~~14~~ | ~~v3.0 directory skeleton~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~Planning~~ | ~~Medium~~ | ~~1d~~ |
-| ~~15~~ | ~~`NoFlags` as distinct named type (not alias)~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha) | ~~v3 Breaking~~ | ~~High~~ | ~~2h~~ |
-| ~~16~~ | ~~Remove deprecated `WithColor` option~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.** | ~~v3 Breaking~~ | ~~Low~~ | ~~30m~~ |
-| ~~17~~ | ~~Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation~~ done — kept by design — --no-color sets NO_COLOR=1 for fang (AGENTS.md) | ~~v3 Breaking~~ | ~~Medium~~ | ~~2h~~ |
-| 18 | Remove `SetConfig` or make it safe **→ deprecated in v4 — removal tracked as TODO_LIST T4** | v3 Breaking | Medium | 2h     |
-| 19 | Fuzz testing expansion **→ ROADMAP deferred #7 (seeds shipped, corpus expansion tracked)** | Testing     | Medium | 1-2d   |
-| ~~20~~ | ~~Go module with `buildGoModule` in flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Nix~~ | ~~Low~~ | ~~2h~~ |
+| #      | Task                                                                                                                                                  | Category        | Impact     | Effort   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------- | -------- |
+| ~~1~~  | ~~Update FEATURES.md: remove all Must\* entries, add "Zero Panics" badge~~ done — FEATURES rewritten repeatedly; zero-panics canon lives in AGENTS.md | ~~Docs~~        | ~~High~~   | ~~30m~~  |
+| ~~2~~  | ~~Update TODO_LIST.md: reflect v2.5.0 state, mark P6 Must\* items as done~~ **Superseded — TODO_LIST rewritten; done items removed per policy.**      | ~~Docs~~        | ~~Medium~~ | ~~15m~~  |
+| ~~3~~  | ~~Update ROADMAP.md: mark Package() redesign as done~~ **Superseded — current ROADMAP tracks Package[T] as v5 candidate #7.**                         | ~~Docs~~        | ~~Low~~    | ~~5m~~   |
+| ~~4~~  | ~~Audit README.md for Must\* references~~ done — README audited repeatedly; zero Must* (v4 has no Must* variants — AGENTS.md)                         | ~~Docs~~        | ~~High~~   | ~~15m~~  |
+| ~~5~~  | ~~Audit docs/_.md for Must_ references~~ done — docs audited in the 2026-06-22 doc-sync pass and later docs-health passes                             | ~~Docs~~        | ~~Medium~~ | ~~20m~~  |
+| ~~6~~  | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                      | ~~CI~~          | ~~Medium~~ | ~~5m~~   |
+| ~~7~~  | ~~Nested struct config file support~~ done — nested config structs supported (AGENTS.md)                                                              | ~~Feature~~     | ~~High~~   | ~~3-5d~~ |
+| ~~8~~  | ~~Plugin system for validators/type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                                        | ~~Feature~~     | ~~High~~   | ~~3-5d~~ |
+| ~~9~~  | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go + the describe JSON contract                                                | ~~Feature~~     | ~~Medium~~ | ~~2-3d~~ |
+| 10     | Advanced types: Result[T], Validated[T], branded IDs **→ ROADMAP raw ideas (Result[T]/Validated[T]; branded IDs via go-branded-id)**                  | Feature         | Medium     | 3-5d     |
+| ~~11~~ | ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output                                                               | ~~Feature~~     | ~~Low~~    | ~~1-2d~~ |
+| 12     | Extract flagtags to standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)**                                                  | Refactor        | Low        | 2-3d     |
+| ~~13~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).**                                             | ~~Planning~~    | ~~High~~   | ~~2-3d~~ |
+| ~~14~~ | ~~v3.0 directory skeleton~~ **Superseded — v3.0.0 shipped 2026-07-07.**                                                                               | ~~Planning~~    | ~~Medium~~ | ~~1d~~   |
+| ~~15~~ | ~~`NoFlags` as distinct named type (not alias)~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha)                                     | ~~v3 Breaking~~ | ~~High~~   | ~~2h~~   |
+| ~~16~~ | ~~Remove deprecated `WithColor` option~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.**                                           | ~~v3 Breaking~~ | ~~Low~~    | ~~30m~~  |
+| ~~17~~ | ~~Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation~~ done — kept by design — --no-color sets NO_COLOR=1 for fang (AGENTS.md)                    | ~~v3 Breaking~~ | ~~Medium~~ | ~~2h~~   |
+| 18     | Remove `SetConfig` or make it safe **→ deprecated in v4 — removal tracked as TODO_LIST T4**                                                           | v3 Breaking     | Medium     | 2h       |
+| 19     | Fuzz testing expansion **→ ROADMAP deferred #7 (seeds shipped, corpus expansion tracked)**                                                            | Testing         | Medium     | 1-2d     |
+| ~~20~~ | ~~Go module with `buildGoModule` in flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**                                | ~~Nix~~         | ~~Low~~    | ~~2h~~   |
 
 ---
 
@@ -158,33 +161,33 @@ This is not a code problem — it's a documentation consistency problem. The cod
 
 Priority-ordered, impact-weighted:
 
-| #  | Task                                                      | Category | Impact   | Effort | Status      |
-| -- | --------------------------------------------------------- | -------- | -------- | ------ | ----------- |
-| ~~1~~  | ~~Update FEATURES.md: remove Must\* entries, update status~~ done — FEATURES rewritten repeatedly; zero-panics canon in AGENTS.md | ~~Docs~~ | ~~Critical~~ | ~~30m~~ | ~~Not started~~ |
-| ~~2~~  | ~~Update README.md: remove Must\* examples~~ done — README audited repeatedly; Must-free in v4 | ~~Docs~~ | ~~Critical~~ | ~~15m~~ | ~~Not started~~ |
-| ~~3~~  | ~~Update TODO_LIST.md: metrics, version, completed items~~ **Superseded — TODO_LIST rewritten; done items removed per policy.** | ~~Docs~~ | ~~High~~ | ~~15m~~ | ~~Not started~~ |
-| ~~4~~  | ~~Audit all docs/_.md for Must_ references~~ done — doc-sync pass 2026-06-22 + later docs-health passes | ~~Docs~~ | ~~High~~ | ~~20m~~ | ~~Not started~~ |
-| ~~5~~  | ~~Update ROADMAP.md: mark completed items~~ **Superseded — current ROADMAP is accurate.** | ~~Docs~~ | ~~Medium~~ | ~~5m~~ | ~~Not started~~ |
-| ~~6~~  | ~~Version bump to v2.5.0 in go.mod and doc.go~~ done — tag v2.5.0 exists; CHANGELOG [2.5.0] 2026-06-05 | ~~Release~~ | ~~High~~ | ~~5m~~ | ~~Not started~~ |
-| ~~7~~  | ~~Git tag v2.5.0~~ done — tag v2.5.0 exists | ~~Release~~ | ~~High~~ | ~~1m~~ | ~~Not started~~ |
-| ~~8~~  | ~~Write CHANGELOG.md entry for v2.5.0~~ done — CHANGELOG [2.5.0] entry exists | ~~Docs~~ | ~~Medium~~ | ~~15m~~ | ~~Not started~~ |
-| ~~9~~  | ~~Add `nix buildGoModule` to flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Nix~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
-| ~~10~~ | ~~Coverage gap analysis: identify uncovered paths~~ **Superseded — coverage is 90.4% today.** | ~~Testing~~ | ~~Medium~~ | ~~1h~~ | ~~Not started~~ |
-| ~~11~~ | ~~Add integration tests to tests/integration/~~ done — tests/integration/ exists | ~~Testing~~ | ~~Medium~~ | ~~1d~~ | ~~Not started~~ |
-| ~~12~~ | ~~Error reference doc: auto-generated table of 60 sentinels~~ done — ERROR_REFERENCE.md generated from sentinelFacts | ~~Docs~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
-| ~~13~~ | ~~Nested struct config file support (YAML/TOML/JSON)~~ done — nested config structs supported (AGENTS.md) | ~~Feature~~ | ~~High~~ | ~~3-5d~~ | ~~Not started~~ |
-| ~~14~~ | ~~Plugin system for validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~Feature~~ | ~~High~~ | ~~3-5d~~ | ~~Not started~~ |
-| ~~15~~ | ~~Fix os.Setenv("NO_COLOR") process-wide mutation~~ done — kept by design — --no-color sets NO_COLOR=1 for fang (AGENTS.md) | ~~v3 Prep~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
-| ~~16~~ | ~~Make NoFlags a distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha) | ~~v3 Prep~~ | ~~Medium~~ | ~~2h~~ | ~~Not started~~ |
-| ~~17~~ | ~~Remove deprecated WithColor option~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.** | ~~v3 Prep~~ | ~~Low~~ | ~~30m~~ | ~~Not started~~ |
-| ~~18~~ | ~~Add CODECOV_TOKEN to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~CI~~ | ~~Medium~~ | ~~5m~~ | ~~Not started~~ |
-| 19 | Expand fuzz test targets **→ ROADMAP deferred #7** | Testing  | Low      | 1-2d   | Not started |
-| ~~20~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~Planning~~ | ~~High~~ | ~~2-3d~~ | ~~Not started~~ |
-| ~~21~~ | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go ships (FEATURES.md) | ~~Feature~~ | ~~Medium~~ | ~~2-3d~~ | ~~Not started~~ |
-| ~~22~~ | ~~Structured JSON error output for --output=json~~ done — cli_errors_json.go structured JSON error output | ~~Feature~~ | ~~Low~~ | ~~1-2d~~ | ~~Not started~~ |
-| 23 | Advanced types: Result[T], Validated[T] **→ ROADMAP raw ideas (Result[T]/Validated[T])** | Feature  | Medium   | 3-5d   | Not started |
-| 24 | Extract flagtags to standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Refactor | Low      | 2-3d   | Not started |
-| ~~25~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Feature~~ | ~~Low~~ | ~~2-3d~~ | ~~Not started~~ |
+| #      | Task                                                                                                                              | Category     | Impact       | Effort   | Status          |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------ | -------- | --------------- |
+| ~~1~~  | ~~Update FEATURES.md: remove Must\* entries, update status~~ done — FEATURES rewritten repeatedly; zero-panics canon in AGENTS.md | ~~Docs~~     | ~~Critical~~ | ~~30m~~  | ~~Not started~~ |
+| ~~2~~  | ~~Update README.md: remove Must\* examples~~ done — README audited repeatedly; Must-free in v4                                    | ~~Docs~~     | ~~Critical~~ | ~~15m~~  | ~~Not started~~ |
+| ~~3~~  | ~~Update TODO_LIST.md: metrics, version, completed items~~ **Superseded — TODO_LIST rewritten; done items removed per policy.**   | ~~Docs~~     | ~~High~~     | ~~15m~~  | ~~Not started~~ |
+| ~~4~~  | ~~Audit all docs/_.md for Must_ references~~ done — doc-sync pass 2026-06-22 + later docs-health passes                           | ~~Docs~~     | ~~High~~     | ~~20m~~  | ~~Not started~~ |
+| ~~5~~  | ~~Update ROADMAP.md: mark completed items~~ **Superseded — current ROADMAP is accurate.**                                         | ~~Docs~~     | ~~Medium~~   | ~~5m~~   | ~~Not started~~ |
+| ~~6~~  | ~~Version bump to v2.5.0 in go.mod and doc.go~~ done — tag v2.5.0 exists; CHANGELOG [2.5.0] 2026-06-05                            | ~~Release~~  | ~~High~~     | ~~5m~~   | ~~Not started~~ |
+| ~~7~~  | ~~Git tag v2.5.0~~ done — tag v2.5.0 exists                                                                                       | ~~Release~~  | ~~High~~     | ~~1m~~   | ~~Not started~~ |
+| ~~8~~  | ~~Write CHANGELOG.md entry for v2.5.0~~ done — CHANGELOG [2.5.0] entry exists                                                     | ~~Docs~~     | ~~Medium~~   | ~~15m~~  | ~~Not started~~ |
+| ~~9~~  | ~~Add `nix buildGoModule` to flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**                   | ~~Nix~~      | ~~Medium~~   | ~~2h~~   | ~~Not started~~ |
+| ~~10~~ | ~~Coverage gap analysis: identify uncovered paths~~ **Superseded — coverage is 90.4% today.**                                     | ~~Testing~~  | ~~Medium~~   | ~~1h~~   | ~~Not started~~ |
+| ~~11~~ | ~~Add integration tests to tests/integration/~~ done — tests/integration/ exists                                                  | ~~Testing~~  | ~~Medium~~   | ~~1d~~   | ~~Not started~~ |
+| ~~12~~ | ~~Error reference doc: auto-generated table of 60 sentinels~~ done — ERROR_REFERENCE.md generated from sentinelFacts              | ~~Docs~~     | ~~Medium~~   | ~~2h~~   | ~~Not started~~ |
+| ~~13~~ | ~~Nested struct config file support (YAML/TOML/JSON)~~ done — nested config structs supported (AGENTS.md)                         | ~~Feature~~  | ~~High~~     | ~~3-5d~~ | ~~Not started~~ |
+| ~~14~~ | ~~Plugin system for validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                | ~~Feature~~  | ~~High~~     | ~~3-5d~~ | ~~Not started~~ |
+| ~~15~~ | ~~Fix os.Setenv("NO_COLOR") process-wide mutation~~ done — kept by design — --no-color sets NO_COLOR=1 for fang (AGENTS.md)       | ~~v3 Prep~~  | ~~Medium~~   | ~~2h~~   | ~~Not started~~ |
+| ~~16~~ | ~~Make NoFlags a distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha)                           | ~~v3 Prep~~  | ~~Medium~~   | ~~2h~~   | ~~Not started~~ |
+| ~~17~~ | ~~Remove deprecated WithColor option~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.**                         | ~~v3 Prep~~  | ~~Low~~      | ~~30m~~  | ~~Not started~~ |
+| ~~18~~ | ~~Add CODECOV_TOKEN to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                  | ~~CI~~       | ~~Medium~~   | ~~5m~~   | ~~Not started~~ |
+| 19     | Expand fuzz test targets **→ ROADMAP deferred #7**                                                                                | Testing      | Low          | 1-2d     | Not started     |
+| ~~20~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07.**                                                          | ~~Planning~~ | ~~High~~     | ~~2-3d~~ | ~~Not started~~ |
+| ~~21~~ | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go ships (FEATURES.md)                                     | ~~Feature~~  | ~~Medium~~   | ~~2-3d~~ | ~~Not started~~ |
+| ~~22~~ | ~~Structured JSON error output for --output=json~~ done — cli_errors_json.go structured JSON error output                         | ~~Feature~~  | ~~Low~~      | ~~1-2d~~ | ~~Not started~~ |
+| 23     | Advanced types: Result[T], Validated[T] **→ ROADMAP raw ideas (Result[T]/Validated[T])**                                          | Feature      | Medium       | 3-5d     | Not started     |
+| 24     | Extract flagtags to standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)**                              | Refactor     | Low          | 2-3d     | Not started     |
+| ~~25~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                                  | ~~Feature~~  | ~~Low~~      | ~~2-3d~~ | ~~Not started~~ |
 
 ---
 
@@ -207,6 +210,7 @@ This is a product/strategy decision I cannot make.
 ## Metrics Dashboard
 
 <!-- check-rows:ledger -->
+
 | Metric                     | Value  | Change                                        |
 | -------------------------- | ------ | --------------------------------------------- |
 | **Source files**           | 121    | Unchanged                                     |
@@ -227,6 +231,7 @@ This is a product/strategy decision I cannot make.
 ### Coverage By Package
 
 <!-- check-rows:ledger -->
+
 | Package                      | Coverage |
 | ---------------------------- | -------- |
 | `pkg/cmdguard/v2`            | 83.5%    |
@@ -237,6 +242,7 @@ This is a product/strategy decision I cannot make.
 ### Git History (Last 10 Commits)
 
 <!-- check-rows:ledger -->
+
 | Commit    | Description                                                                              |
 | --------- | ---------------------------------------------------------------------------------------- |
 | `c8d86c8` | fix(cmdguard): remove all panic-inducing functions — zero panics guaranteed              |

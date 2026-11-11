@@ -163,58 +163,58 @@ Instead I said "T13-T15: Verify existing tests for WithCleanup/doctor/version (a
 
 ## f) Up to 50 Things to Get Done Next
 
-| #  | Task                                                                       | Effort | Priority |
-| -- | -------------------------------------------------------------------------- | ------ | -------- |
-| ~~1~~  | ~~Commit the 5 uncommitted files (ADRs, DOMAIN_LANGUAGE, CONTRIBUTING, test)~~ done — files committed and tracked in git | ~~2m~~ | ~~P0~~ |
-| ~~2~~  | ~~Link ADR-002/003 from AGENTS.md and CONTRIBUTING.md~~ done — ADRs cross-referenced — ROADMAP cites ADR-002 §1/§6; re-verified 2026-11-02 | ~~5m~~ | ~~P0~~ |
-| ~~3~~  | ~~Fix tagliatelle nolint in config_file_integration_test.go~~ done — kept — nolint carries inline justification (config_file_integration_test.go:1); ADR-002 policy | ~~5m~~ | ~~P0~~ |
-| ~~4~~  | ~~Investigate nested config JSON key-matching: flag names vs field names~~ **Superseded — superseded — config decode rewritten (config_keys.go + schema sub-module, 2026-11-02).** | ~~30m~~ | ~~P0~~ |
-| ~~5~~  | ~~Document config file key-matching behavior in AGENTS.md gotchas~~ **Superseded — superseded — config decode rewritten (config_keys.go + schema sub-module, 2026-11-02).** | ~~10m~~ | ~~P0~~ |
-| ~~6~~  | ~~Deep nolint audit: check each of 42 directives for relevance~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy | ~~45m~~ | ~~P1~~ |
-| ~~7~~  | ~~Check `recvcheck` exclusions: are pointer receivers needed?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy | ~~15m~~ | ~~P1~~ |
-| ~~8~~  | ~~Check `exhaustive` exclusions: are all switch cases handled?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy | ~~10m~~ | ~~P1~~ |
-| ~~9~~  | ~~Check `dupl` exclusions in type_handler_intwidth.go: extract shared code?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy | ~~15m~~ | ~~P1~~ |
-| ~~10~~ | ~~Check `containedctx` in flow_context.go: is embedded context needed?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy | ~~15m~~ | ~~P1~~ |
-| ~~11~~ | ~~Write test: config file with 3-level nested structs~~ done — nested config structs supported (AGENTS.md) | ~~15m~~ | ~~P1~~ |
-| ~~12~~ | ~~Write test: config file with array/slice values~~ **Superseded — config decode rewritten (config_keys.go, 2026-11-02).** | ~~15m~~ | ~~P1~~ |
-| ~~13~~ | ~~Write test: config file with env var interpolation (`$HOME` in paths)~~ done — WithEnvPrefix ships (FEATURES.md:64) | ~~10m~~ | ~~P1~~ |
-| ~~14~~ | ~~Add `go vet` as a separate CI check~~ done — golangci-lint in CI runs govet (ci.yml lint job) | ~~5m~~ | ~~P1~~ |
-| ~~15~~ | ~~Run CI workflow via `act` or push trigger~~ done — CI green on every push (ci.yml, submodule-smoke.yml) | ~~15m~~ | ~~P1~~ |
-| ~~16~~ | ~~Add flake.nix sub-module build checks~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~20m~~ | ~~P1~~ |
-| 17 | Extract koanf to optional sub-module (removes 4 deps from core) **→ ROADMAP deferred #5 (koanf extraction YAGNI)** | 45m    | P2       |
-| ~~18~~ | ~~Write ADR-004: Config File Key-Matching Strategy~~ **Superseded — superseded — config decode rewritten (config_keys.go + schema sub-module, 2026-11-02).** | ~~20m~~ | ~~P2~~ |
-| 19 | Add doc-drift lint script (grep for deleted features in docs) **→ ROADMAP raw ideas (stale-doc-ref CI guard)** | 15m    | P2       |
-| ~~20~~ | ~~Add Dependabot/Renovate config for automated dep updates~~ done — .github/dependabot.yml exists | ~~15m~~ | ~~P2~~ |
-| ~~21~~ | ~~Write ADR-005: Sub-Module Isolation Strategy~~ done — documented — AGENTS.md dependency-budget + sub-module table serve the isolation role (2026-11-02) | ~~20m~~ | ~~P2~~ |
-| ~~22~~ | ~~Add integration test for plugin system end-to-end~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~20m~~ | ~~P2~~ |
-| ~~23~~ | ~~Add integration test for audit log export (11 formats)~~ done — 11 export formats ship (FEATURES.md) | ~~30m~~ | ~~P2~~ |
-| ~~24~~ | ~~Add integration test for signal handling + graceful shutdown~~ done — WithGracefulShutdown ships (FEATURES.md, signals) | ~~20m~~ | ~~P2~~ |
-| ~~25~~ | ~~Write test: doctor command with failing DI health check~~ done — DoctorCommand[T] + WithDoctorCheck[T] ship (doctor.go; FEATURES.md) | ~~10m~~ | ~~P2~~ |
-| ~~26~~ | ~~Write test: version command with commit hash~~ done — version_test.go exists | ~~10m~~ | ~~P2~~ |
-| ~~27~~ | ~~Add coverage badge to README (needs CI integration)~~ done — README coverage badge (90.4%) | ~~30m~~ | ~~P2~~ |
-| 28 | Add semver check to CI (ensures no breaking changes in patch) **→ ROADMAP raw ideas (semver breaking-change CI check)** | 30m    | P3       |
-| ~~29~~ | ~~Create second example app (different domain than taskctl)~~ done — examples/config-explain exists | ~~2h~~ | ~~P3~~ |
-| ~~30~~ | ~~Add Middleware context propagation (v3.1 breaking)~~ done — shipped additively — ContextMiddleware[T] (2026-10-04); unification tracked as ROADMAP v5 candidate #8 | ~~2h~~ | ~~P3~~ |
-| 31 | Rename Get[T] → GetService[T] (v3.1 breaking) **→ ROADMAP v5 candidate #6 (MustGet gone in v4)** | 1h     | P3       |
-| 32 | Make RegisterInScope generic (v3.1 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)** | 1h     | P3       |
-| 33 | Remove or redesign Package() (v3.1 breaking) **→ ROADMAP v5 candidate #7** | 1h     | P3       |
-| 34 | Remove SetConfig — mutating CLI config post-construction is unsafe **→ deprecated in v4 — removal tracked as TODO_LIST T4** | 30m    | P3       |
-| 35 | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)** | 30m    | P3       |
-| ~~36~~ | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job harvested into TODO_LIST (2026-11-07).** | ~~30m~~ | ~~P3~~ |
-| 37 | Extract flag-tags to github.com/larsartmann/flagtags **→ ROADMAP raw ideas (extract flagtags standalone library)** | 2h     | P4       |
-| 38 | Service-owned config design (ADR) **→ ROADMAP raw ideas (service-owned config ADR)** | 1h     | P4       |
-| ~~39~~ | ~~Command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md) | ~~2h~~ | ~~P4~~ |
-| 40 | Built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)** | 1h     | P4       |
-| ~~41~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod) | ~~2h~~ | ~~P4~~ |
-| 42 | FlagRegistry interface abstraction **→ ROADMAP v5 flag-representation consolidation (ADR-002)** | 1h     | P4       |
-| ~~43~~ | ~~Custom per-flag validation hooks~~ done — FlagValidator registration + typed TypeHandlers ship (flags_validate.go) | ~~1h~~ | ~~P4~~ |
-| ~~44~~ | ~~Enhanced flag validation enums~~ done — strong-typed flag types ship (types_port/email/url; FEATURES.md) | ~~1h~~ | ~~P4~~ |
-| 45 | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)** | 2h     | P4       |
-| 46 | Branded-ID example app **→ ROADMAP raw ideas (branded-ID example app)** | 1h     | P4       |
-| 47 | Add property-based testing for flag parsing **→ ROADMAP raw ideas (Property-based type-parser tests)** | 1h     | P3       |
-| ~~48~~ | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~5m~~ | ~~P3~~ |
-| 49 | Add godoclint compliance for all exported functions **→ ROADMAP raw ideas (godoclint compliance)** | 1h     | P2       |
-| ~~50~~ | ~~Add `go vet` + `golangci-lint` to CI for sub-modules~~ done — submodule-smoke.yml lint job | ~~15m~~ | ~~P1~~ |
+| #      | Task                                                                                                                                                                               | Effort  | Priority |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| ~~1~~  | ~~Commit the 5 uncommitted files (ADRs, DOMAIN_LANGUAGE, CONTRIBUTING, test)~~ done — files committed and tracked in git                                                           | ~~2m~~  | ~~P0~~   |
+| ~~2~~  | ~~Link ADR-002/003 from AGENTS.md and CONTRIBUTING.md~~ done — ADRs cross-referenced — ROADMAP cites ADR-002 §1/§6; re-verified 2026-11-02                                         | ~~5m~~  | ~~P0~~   |
+| ~~3~~  | ~~Fix tagliatelle nolint in config_file_integration_test.go~~ done — kept — nolint carries inline justification (config_file_integration_test.go:1); ADR-002 policy                | ~~5m~~  | ~~P0~~   |
+| ~~4~~  | ~~Investigate nested config JSON key-matching: flag names vs field names~~ **Superseded — superseded — config decode rewritten (config_keys.go + schema sub-module, 2026-11-02).** | ~~30m~~ | ~~P0~~   |
+| ~~5~~  | ~~Document config file key-matching behavior in AGENTS.md gotchas~~ **Superseded — superseded — config decode rewritten (config_keys.go + schema sub-module, 2026-11-02).**        | ~~10m~~ | ~~P0~~   |
+| ~~6~~  | ~~Deep nolint audit: check each of 42 directives for relevance~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy                                                    | ~~45m~~ | ~~P1~~   |
+| ~~7~~  | ~~Check `recvcheck` exclusions: are pointer receivers needed?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy                                                     | ~~15m~~ | ~~P1~~   |
+| ~~8~~  | ~~Check `exhaustive` exclusions: are all switch cases handled?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy                                                    | ~~10m~~ | ~~P1~~   |
+| ~~9~~  | ~~Check `dupl` exclusions in type_handler_intwidth.go: extract shared code?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy                                       | ~~15m~~ | ~~P1~~   |
+| ~~10~~ | ~~Check `containedctx` in flow_context.go: is embedded context needed?~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy                                            | ~~15m~~ | ~~P1~~   |
+| ~~11~~ | ~~Write test: config file with 3-level nested structs~~ done — nested config structs supported (AGENTS.md)                                                                         | ~~15m~~ | ~~P1~~   |
+| ~~12~~ | ~~Write test: config file with array/slice values~~ **Superseded — config decode rewritten (config_keys.go, 2026-11-02).**                                                         | ~~15m~~ | ~~P1~~   |
+| ~~13~~ | ~~Write test: config file with env var interpolation (`$HOME` in paths)~~ done — WithEnvPrefix ships (FEATURES.md:64)                                                              | ~~10m~~ | ~~P1~~   |
+| ~~14~~ | ~~Add `go vet` as a separate CI check~~ done — golangci-lint in CI runs govet (ci.yml lint job)                                                                                    | ~~5m~~  | ~~P1~~   |
+| ~~15~~ | ~~Run CI workflow via `act` or push trigger~~ done — CI green on every push (ci.yml, submodule-smoke.yml)                                                                          | ~~15m~~ | ~~P1~~   |
+| ~~16~~ | ~~Add flake.nix sub-module build checks~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**                                                                   | ~~20m~~ | ~~P1~~   |
+| 17     | Extract koanf to optional sub-module (removes 4 deps from core) **→ ROADMAP deferred #5 (koanf extraction YAGNI)**                                                                 | 45m     | P2       |
+| ~~18~~ | ~~Write ADR-004: Config File Key-Matching Strategy~~ **Superseded — superseded — config decode rewritten (config_keys.go + schema sub-module, 2026-11-02).**                       | ~~20m~~ | ~~P2~~   |
+| 19     | Add doc-drift lint script (grep for deleted features in docs) **→ ROADMAP raw ideas (stale-doc-ref CI guard)**                                                                     | 15m     | P2       |
+| ~~20~~ | ~~Add Dependabot/Renovate config for automated dep updates~~ done — .github/dependabot.yml exists                                                                                  | ~~15m~~ | ~~P2~~   |
+| ~~21~~ | ~~Write ADR-005: Sub-Module Isolation Strategy~~ done — documented — AGENTS.md dependency-budget + sub-module table serve the isolation role (2026-11-02)                          | ~~20m~~ | ~~P2~~   |
+| ~~22~~ | ~~Add integration test for plugin system end-to-end~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                                                              | ~~20m~~ | ~~P2~~   |
+| ~~23~~ | ~~Add integration test for audit log export (11 formats)~~ done — 11 export formats ship (FEATURES.md)                                                                             | ~~30m~~ | ~~P2~~   |
+| ~~24~~ | ~~Add integration test for signal handling + graceful shutdown~~ done — WithGracefulShutdown ships (FEATURES.md, signals)                                                          | ~~20m~~ | ~~P2~~   |
+| ~~25~~ | ~~Write test: doctor command with failing DI health check~~ done — DoctorCommand[T] + WithDoctorCheck[T] ship (doctor.go; FEATURES.md)                                             | ~~10m~~ | ~~P2~~   |
+| ~~26~~ | ~~Write test: version command with commit hash~~ done — version_test.go exists                                                                                                     | ~~10m~~ | ~~P2~~   |
+| ~~27~~ | ~~Add coverage badge to README (needs CI integration)~~ done — README coverage badge (90.4%)                                                                                       | ~~30m~~ | ~~P2~~   |
+| 28     | Add semver check to CI (ensures no breaking changes in patch) **→ ROADMAP raw ideas (semver breaking-change CI check)**                                                            | 30m     | P3       |
+| ~~29~~ | ~~Create second example app (different domain than taskctl)~~ done — examples/config-explain exists                                                                                | ~~2h~~  | ~~P3~~   |
+| ~~30~~ | ~~Add Middleware context propagation (v3.1 breaking)~~ done — shipped additively — ContextMiddleware[T] (2026-10-04); unification tracked as ROADMAP v5 candidate #8               | ~~2h~~  | ~~P3~~   |
+| 31     | Rename Get[T] → GetService[T] (v3.1 breaking) **→ ROADMAP v5 candidate #6 (MustGet gone in v4)**                                                                                   | 1h      | P3       |
+| 32     | Make RegisterInScope generic (v3.1 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)**                                                                                               | 1h      | P3       |
+| 33     | Remove or redesign Package() (v3.1 breaking) **→ ROADMAP v5 candidate #7**                                                                                                         | 1h      | P3       |
+| 34     | Remove SetConfig — mutating CLI config post-construction is unsafe **→ deprecated in v4 — removal tracked as TODO_LIST T4**                                                        | 30m     | P3       |
+| 35     | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)**                                                                                            | 30m     | P3       |
+| ~~36~~ | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job harvested into TODO_LIST (2026-11-07).**                                                                   | ~~30m~~ | ~~P3~~   |
+| 37     | Extract flag-tags to github.com/larsartmann/flagtags **→ ROADMAP raw ideas (extract flagtags standalone library)**                                                                 | 2h      | P4       |
+| 38     | Service-owned config design (ADR) **→ ROADMAP raw ideas (service-owned config ADR)**                                                                                               | 1h      | P4       |
+| ~~39~~ | ~~Command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md)                                                                                    | ~~2h~~  | ~~P4~~   |
+| 40     | Built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)**                                                                                              | 1h      | P4       |
+| ~~41~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod)                                                 | ~~2h~~  | ~~P4~~   |
+| 42     | FlagRegistry interface abstraction **→ ROADMAP v5 flag-representation consolidation (ADR-002)**                                                                                    | 1h      | P4       |
+| ~~43~~ | ~~Custom per-flag validation hooks~~ done — FlagValidator registration + typed TypeHandlers ship (flags_validate.go)                                                               | ~~1h~~  | ~~P4~~   |
+| ~~44~~ | ~~Enhanced flag validation enums~~ done — strong-typed flag types ship (types_port/email/url; FEATURES.md)                                                                         | ~~1h~~  | ~~P4~~   |
+| 45     | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)**                                                                                       | 2h      | P4       |
+| 46     | Branded-ID example app **→ ROADMAP raw ideas (branded-ID example app)**                                                                                                            | 1h      | P4       |
+| 47     | Add property-based testing for flag parsing **→ ROADMAP raw ideas (Property-based type-parser tests)**                                                                             | 1h      | P3       |
+| ~~48~~ | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                                     | ~~5m~~  | ~~P3~~   |
+| 49     | Add godoclint compliance for all exported functions **→ ROADMAP raw ideas (godoclint compliance)**                                                                                 | 1h      | P2       |
+| ~~50~~ | ~~Add `go vet` + `golangci-lint` to CI for sub-modules~~ done — submodule-smoke.yml lint job                                                                                       | ~~15m~~ | ~~P1~~   |
 
 ---
 
@@ -255,6 +255,7 @@ This is a project-wide convention decision I can't make unilaterally.
 ## Session Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                        | Before              | After                              |
 | ----------------------------- | ------------------- | ---------------------------------- |
 | Lint issues                   | 0 (8 per-file excl) | 0 (4 per-file excl + 4 allow-list) |

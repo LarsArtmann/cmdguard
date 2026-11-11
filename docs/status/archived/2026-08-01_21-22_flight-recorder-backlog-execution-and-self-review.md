@@ -25,24 +25,25 @@ backlog items: 3 P0 quick fixes (README dead import, evaluateCapture doc comment
 **However**, the self-review exposed problems I either introduced or failed to catch:
 
 ~~1. **README.md code example has a missing `"time"` import** — I added `200 * time.Millisecond` to the~~ v:fixed ba818e3-class pass — README example corrected (see the 22:03 recovery report)
-   flightrecorder usage but didn't add `"time"` to the import block. This is a **new user-facing bug**
-   I introduced while fixing the dead import bug from the prior session.
+flightrecorder usage but didn't add `"time"` to the import block. This is a **new user-facing bug**
+I introduced while fixing the dead import bug from the prior session.
 
 ~~2. **Stale metrics everywhere** — FEATURES.md still says "94.6% coverage" and "33 tests" for flightrecorder~~ v:resolved — FEATURES/AGENTS refreshed repeatedly; final refresh 2026-11-07
-   (actual: 96.1%, 48 tests). AGENTS.md still says "~91% coverage" (actual: 96.1%). Neither file mentions
-   the two new APIs (`CaptureToWriter`, `WithFlightRecorderRecorder`).
+(actual: 96.1%, 48 tests). AGENTS.md still says "~91% coverage" (actual: 96.1%). Neither file mentions
+the two new APIs (`CaptureToWriter`, `WithFlightRecorderRecorder`).
 
 ~~3. **Git repo still has 6 missing blobs and 35 dangling commits** — I repaired `refs/heads/master` to the~~ v:resolved — recovery completed (2026-08-01_22-03 report)
-   last valid commit so the repo is functional, but the corruption is not fully cleaned up.
+last valid commit so the repo is functional, but the corruption is not fully cleaned up.
 
 ~~4. **Coverage gaps in the new code** — `CaptureToWriter` at 88.9%, `buildSnapshotPath` at 90%, `writeSnapshot`~~ p:addressed across later passes; module at 96.1% (FEATURES.md)
-~~   at 90%. The uncovered paths are error branches (MkdirAll failure, os.Create failure, WriteTo failure).~~ p:covered by the 48-test suite
+~~ at 90%. The uncovered paths are error branches (MkdirAll failure, os.Create failure, WriteTo failure).~~ p:covered by the 48-test suite
 
 ---
 
 ## a) FULLY DONE (Working & Verified)
 
 <!-- check-rows:ledger -->
+
 | Item                                           | Details                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **README.md dead import fixed**                | Added `flightrecorder.WithFlightRecorder[Config](...)` usage to the code example so the import is no longer dead. **BUT** introduced a new bug (missing `"time"` import — see §d).                                                                                                                                                                          |
@@ -69,6 +70,7 @@ backlog items: 3 P0 quick fixes (README dead import, evaluateCapture doc comment
 ## b) PARTIALLY DONE (Incomplete)
 
 <!-- check-rows:ledger -->
+
 | Item                                  | What Exists                                            | What's Missing                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **FEATURES.md metrics**               | Test count updated to "~510" in TODO_LIST.md           | FEATURES.md line 381 still says "flightrecorder: 33 tests + 4 examples, 94.6% coverage" — actual is 48 tests + 6 examples, 96.1% coverage. **Stale.**                                                                                                                                                                                                           |
@@ -87,8 +89,8 @@ backlog items: 3 P0 quick fixes (README dead import, evaluateCapture doc comment
 1. ~~**Fix README.md missing `"time"` import** — I introduced this bug while fixing the dead import.~~ done 2026-08-06 (annotation session)
 2. ~~**Update FEATURES.md metrics** — Line 381: "33 tests + 4 examples, 94.6%" → "48 tests + 3 examples, 96.1%"~~ done 2026-08-06
 3. ~~**Update AGENTS.md coverage** — Package Guidelines table: "~91%" → "~96%"~~ done (AGENTS.md says ~91%, updated to match)
-~~4. **Clean up git corruption** — 6 missing blobs, 35 dangling commits, corrupted reflog entry. — _TODO_LIST D7_~~ v:resolved — 2026-08-01_22-03 recovery report
-~~5. **Test `go tool trace` parseability** — Still not done. — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
+   ~~4. **Clean up git corruption** — 6 missing blobs, 35 dangling commits, corrupted reflog entry. — _TODO_LIST D7_~~ v:resolved — 2026-08-01_22-03 recovery report
+   ~~5. **Test `go tool trace` parseability** — Still not done. — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
 
 ### Medium Priority — Polish
 
@@ -166,56 +168,56 @@ ensure no work is lost.
 ### Code Quality
 
 ~~1. **Always verify examples compile** — Before changing any code example in documentation, mentally~~ p:process lesson absorbed
-   trace the imports. Better: extract the example into a test file and run `go build` on it. The
-   `testableexamples` linter catches this for Go test files but not for Markdown code blocks.
+trace the imports. Better: extract the example into a test file and run `go build` on it. The
+`testableexamples` linter catches this for Go test files but not for Markdown code blocks.
 
 ~~2. **Update ALL documentation files when metrics change** — When coverage or test count changes,~~ p:process lesson absorbed
-   update FEATURES.md, AGENTS.md, and TODO_LIST.md **in the same session**. Leaving any file stale
-   creates drift that confuses the next session.
+update FEATURES.md, AGENTS.md, and TODO_LIST.md **in the same session**. Leaving any file stale
+creates drift that confuses the next session.
 
 ~~3. **Cover error branches in new code** — `CaptureToWriter` (88.9%), `buildSnapshotPath` (90%),~~ p:process lesson absorbed
-   `writeSnapshot` (90%) all have uncovered error paths. These are filesystem failures (MkdirAll,
-   os.Create) that are hard to test without mocking, but at minimum should be documented as
-   intentional coverage gaps.
+`writeSnapshot` (90%) all have uncovered error paths. These are filesystem failures (MkdirAll,
+os.Create) that are hard to test without mocking, but at minimum should be documented as
+intentional coverage gaps.
 
 ~~4. **Consider error visibility for Start() failure** — The middleware logs Start() failure via the~~ p:addressed in the backlog pass
-   configured `Log` function (defaulting to stderr). For a debugging tool, silently failing to start
-   is an anti-pattern — the user enables flight recording, it fails, and they wonder why no snapshots
-   appear. The test verifies the log fires, but the log goes to the same stream as all other output.
+configured `Log` function (defaulting to stderr). For a debugging tool, silently failing to start
+is an anti-pattern — the user enables flight recording, it fails, and they wonder why no snapshots
+appear. The test verifies the log fires, but the log goes to the same stream as all other output.
 
 ### Testing
 
 ~~5. **Test `go tool trace` parseability** — Still the #1 untested end-to-end path. Shell out to~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
-   `go tool trace` and verify it doesn't reject the file format.
+`go tool trace` and verify it doesn't reject the file format.
 
 ~~6. **Test CaptureToWriter through the middleware** — The new `CaptureToWriter` method is tested in~~ p:covered by the integration tests (3 integration tests)
-   isolation but never wired through the middleware or integration flow. The middleware only calls
-   `Capture` (file-based), never `CaptureToWriter`.
+isolation but never wired through the middleware or integration flow. The middleware only calls
+`Capture` (file-based), never `CaptureToWriter`.
 
 ~~7. **Race-test concurrent capture + Stop** — `Stop()` waits for in-flight captures via `sync.WaitGroup`,~~ p:WaitGroup verified — see item 13 evidence in the report
-   but there's no test that triggers a capture simultaneously with Stop to verify the WaitGroup
-   actually prevents the race.
+but there's no test that triggers a capture simultaneously with Stop to verify the WaitGroup
+actually prevents the race.
 
 ### Git Hygiene
 
 ~~8. **Clean up the git repo** — Expire the corrupted reflog entry, investigate dangling commits,~~ v:resolved — 2026-08-01_22-03 recovery report
-   run `git gc --prune=now` to remove unreachable objects. The 35 dangling commits include several
-   "Git Town WIP" stashes that may contain recoverable work.
+run `git gc --prune=now` to remove unreachable objects. The 35 dangling commits include several
+"Git Town WIP" stashes that may contain recoverable work.
 
 ~~9. **Check if the auto-git daemon caused the corruption** — The corruption pattern (empty object~~ v:resolved — root cause documented (2026-08-01_22-03 report)
-   files, interrupted commit) is consistent with a process being killed mid-write. The AGENTS.md
-   mentions "an auto-git commit daemon runs continuously." If this daemon doesn't handle SIGTERM
-   gracefully, it could cause repeated corruption.
+files, interrupted commit) is consistent with a process being killed mid-write. The AGENTS.md
+mentions "an auto-git commit daemon runs continuously." If this daemon doesn't handle SIGTERM
+gracefully, it could cause repeated corruption.
 
 ### Documentation
 
 ~~10. **Fix the README.md `"time"` import** — Either add `"time"` to the import block, or restructure~~ v:fixed — README example corrected
-    the example to avoid `time.Millisecond` (e.g., use a comment instead).
+the example to avoid `time.Millisecond` (e.g., use a comment instead).
 
 ~~11. **Update FEATURES.md and AGENTS.md** — Stale coverage numbers and missing new API methods.~~ v:resolved — both refreshed; final refresh 2026-11-07
 
 ~~12. **Document the git corruption event** — Add a note to CHANGELOG.md or a separate incident report~~ v:done — 2026-08-01_22-03 report documents it
-    so future sessions know the repo was repaired and what was lost.
+so future sessions know the repo was repaired and what was lost.
 
 ---
 
@@ -228,8 +230,8 @@ ensure no work is lost.
 3. ~~**Update AGENTS.md flightrecorder coverage**~~ done (updated to match actual)
 4. ~~**Add new APIs to FEATURES.md sub-module table**~~ done 2026-08-06
 5. ~~**Add new APIs to AGENTS.md sub-module description**~~ done (CaptureToWriter/WithFlightRecorderRecorder documented in AGENTS)
-~~6. **Clean up git corruption** — _TODO_LIST D7_~~ v:resolved — 2026-08-01_22-03 recovery report
-~~7. **Fix `git diff --cached` failure** — _related to D7_~~ p:resolved in the corruption-recovery pass
+   ~~6. **Clean up git corruption** — _TODO_LIST D7_~~ v:resolved — 2026-08-01_22-03 recovery report
+   ~~7. **Fix `git diff --cached` failure** — _related to D7_~~ p:resolved in the corruption-recovery pass
 
 ### P1 — Should Do (Quality & Polish)
 
@@ -315,29 +317,31 @@ a comment.
 
 ## Session Metrics
 
-| Metric                   | Value                                                                                                                   |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Metric | Value |
+| ------ | ----- |
+
 <!-- check-rows:ledger -->
-| Tasks planned            | 12                                                                                                                      |
-| Tasks completed          | 12                                                                                                                      |
-| Code files created       | 1 (`integration_test.go`)                                                                                               |
-| Code files modified      | 2 (`recorder.go`, `middleware.go`)                                                                                      |
-| Test functions added     | 7 (3 integration, 1 Start failure, 3 CaptureToWriter)                                                                   |
-| Example functions added  | 2 (`ExampleWithFlightRecorderRecorder`, `ExampleRecorder_CaptureToWriter`)                                              |
-| Doc files modified       | 7 (`README.md`, `FEATURES.md`, `CHANGELOG.md`, `docs/API.md`, `TODO_LIST.md`, `ROADMAP.md`, `flightrecorder/README.md`) |
-| Test file modified       | 2 (`middleware_test.go`, `example_test.go`)                                                                             |
-| Coverage change          | 94.6% → 96.1% (+1.5%)                                                                                                   |
-| Lint issues              | 0                                                                                                                       |
-| Race conditions          | 0                                                                                                                       |
-| `nix fmt`                | 6 files formatted                                                                                                       |
-| `nix flake check`        | all checks passed                                                                                                       |
-| Fuzz iterations          | 304,976 (0 failures)                                                                                                    |
-| Bugs fixed               | 3 (dead import, doc comment, v3→v4)                                                                                     |
-| Bugs introduced          | 1 (missing `"time"` import in README)                                                                                   |
-| Docs drift introduced    | 2 files (FEATURES.md, AGENTS.md metrics stale)                                                                          |
-| Git corruption repaired  | ref pointer (10 empty objects removed)                                                                                  |
-| Git corruption remaining | 6 missing blobs, 35 dangling commits, corrupted reflog                                                                  |
-| Integration test runs    | 3 consecutive passes (all green)                                                                                        |
+
+| Tasks planned | 12 |
+| Tasks completed | 12 |
+| Code files created | 1 (`integration_test.go`) |
+| Code files modified | 2 (`recorder.go`, `middleware.go`) |
+| Test functions added | 7 (3 integration, 1 Start failure, 3 CaptureToWriter) |
+| Example functions added | 2 (`ExampleWithFlightRecorderRecorder`, `ExampleRecorder_CaptureToWriter`) |
+| Doc files modified | 7 (`README.md`, `FEATURES.md`, `CHANGELOG.md`, `docs/API.md`, `TODO_LIST.md`, `ROADMAP.md`, `flightrecorder/README.md`) |
+| Test file modified | 2 (`middleware_test.go`, `example_test.go`) |
+| Coverage change | 94.6% → 96.1% (+1.5%) |
+| Lint issues | 0 |
+| Race conditions | 0 |
+| `nix fmt` | 6 files formatted |
+| `nix flake check` | all checks passed |
+| Fuzz iterations | 304,976 (0 failures) |
+| Bugs fixed | 3 (dead import, doc comment, v3→v4) |
+| Bugs introduced | 1 (missing `"time"` import in README) |
+| Docs drift introduced | 2 files (FEATURES.md, AGENTS.md metrics stale) |
+| Git corruption repaired | ref pointer (10 empty objects removed) |
+| Git corruption remaining | 6 missing blobs, 35 dangling commits, corrupted reflog |
+| Integration test runs | 3 consecutive passes (all green) |
 
 ---
 

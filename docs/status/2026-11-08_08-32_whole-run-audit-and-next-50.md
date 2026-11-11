@@ -158,6 +158,7 @@
 ## f) NEXT 50 (ranked, ≤12-min slices unless noted)
 
 **Release-critical (v5.0.0)**
+
 1. Fix CHANGELOG Unreleased stale regen path (`v4` → `v5`) (2m).
 2. AGENTS.md full v5 parity pass: paths, tree, counts, coverage %, module
    table (30m).
@@ -184,73 +185,73 @@
 
 **Correctness / hardening**
 15. Ticket + implement strict positional-args default for cmdguard
-    subcommands (the silent-ignore footgun) (30m).
+subcommands (the silent-ignore footgun) (30m).
 16. Race-stress test for `Builder` (parallel Add from goroutines) (20m).
 17. Race test for repeated `ExecuteWithArgs` + signal-cancel interleaving
-    (20m).
+(20m).
 18. `KoanfLoader.LoadedPath` after empty-file skip: assert it stays empty
-    (5m).
+(5m).
 19. Samber-linter: suppression/config for framework-internal services so the
-    baseline measures domain services, not `*T`/FlagRegistry (15m).
+baseline measures domain services, not `*T`/FlagRegistry (15m).
 20. Wire samber-linter into GitHub Actions (needs flake input or install
-    step) (30m).
+step) (30m).
 21. `describe` golden: review the FULL regenerated diff (I reviewed ~60 of
-    108 lines) (10m).
+108 lines) (10m).
 22. Add `WithConfigExplainCommand` mention to QUICKSTART config section
-    (10m).
+(10m).
 23. Codemod round-trip test: fixture tree → codemod → build+lint green
-    (30m).
+(30m).
 24. `codemod.sh`: `chmod +x` + shellcheck pass (5m).
 25. Bounded-args footgun in dogfood CLI: add arg validators to
-    `lint`/`rules` commands (10m).
+`lint`/`rules` commands (10m).
 
 **Docs / drift guards**
 26. Website QUICKSTART/TUTORIAL v5 rewrite (M16 first slices) (2×12m).
 27. Stale-ref guard: docs/ vs website/ same-name-guide sync check (30m).
 28. README full v5 sweep (I only touched 2 lines + samples in passing)
-    (30m).
+(30m).
 29. COMPARISON.md v4-claims audit (H6/D21) (30m).
 30. PERFORMANCE.md freshness check post-v5 (12m).
 31. `docs/QUICKSTART.md`: Builder section (the ladder-free shape) (15m).
 32. Annotate the 08-04 closing report §d residue into TODO_LIST rows
-    (10m).
+(10m).
 
 **Fleet / consumers**
 33. go-structure-linter + branching-flow: confirm they do NOT import
-    cmdguard (they showed no imports) — record the evidence in TODO_LIST
-    (10m).
+cmdguard (they showed no imports) — record the evidence in TODO_LIST
+(10m).
 34. erraudit PR with codemod applied once v5.0.0 is proxy-verified (30m).
 35. timesheets: hold until owner resolves `internal/parser` WIP; leave a
-    note in its TODO_LIST (5m).
+note in its TODO_LIST (5m).
 36. BuildFlow: decide lint/v0.3.0 tracking vs staying on v0.2.1 until v5
-    ships (decision memo, 10m).
+ships (decision memo, 10m).
 
 **Quality / coverage**
 37. `koanf_loader.go` empty-skip: unit test whitespace-only files (spaces/
-    newlines) explicitly (5m).
+newlines) explicitly (5m).
 38. Coverage: bring `lint` walk.go dot/blank-import arms to green (H9/D23
-    fixture) (30m).
+fixture) (30m).
 39. Flightrecorder: test that slow-capture survives Execute return
-    explicitly (the WithoutCancel fix) (15m).
+explicitly (the WithoutCancel fix) (15m).
 40. `describe` contract: fixture with `WithoutBatteries()` to pin the
-    reduced tree (10m).
+reduced tree (10m).
 41. Doctor: pin `0 passed, 0 failed` shape for a `WithoutBatteries` +
-    no-services CLI (10m).
+no-services CLI (10m).
 
 **Owner-gated / decisions**
 42. v4/v5 branch policy: does master stay v4-maintenance or fast-forward?
-    (docs/ROADMAP note, 5m)
+(docs/ROADMAP note, 5m)
 43. `go install …/cmdguard-lint@vX` impossibility: pick the fix path
-    (strip replaces at release vs install-script) (decision, 15m).
+(strip replaces at release vs install-script) (decision, 15m).
 44. Schema sub-module: re-confirm hold-until-v5.0.0 decision (5m).
 45. Purge cadence: archive the 2026-10-02 batch (37 days old, threshold 45)
-    proactively (20m).
+proactively (20m).
 46. ROADMAP quarterly trim calendar note (D40) (5m).
 47. CT3: link config-explain demo from README + website (20m).
 48. H4: website hero-code sync guard (30m).
 49. H6: COMPARISON.md header date + prose pass 1 of 3 (20m).
 50. Write the Fleet Migration runbook (consumers × codemod × lint ratchet)
-    as a single doc (30m).
+as a single doc (30m).
 
 ## g) THREE QUESTIONS I CANNOT ANSWER MYSELF
 
@@ -272,7 +273,7 @@
 
 ---
 
-*Run totals: ~2h active, 10/10 todo items closed, 2 real production bugs
+_Run totals: ~2h active, 10/10 todo items closed, 2 real production bugs
 found and fixed at root cause, 1 consumer-repo startup crash found and
 fixed, 6 forgotten/missed items confessed in §d. All gates green at close:
-tests (root+7), lint ×8, flake check, docs-gates 5/5.*
+tests (root+7), lint ×8, flake check, docs-gates 5/5._

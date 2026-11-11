@@ -13,6 +13,7 @@
 ## Project Metrics Snapshot
 
 <!-- check-rows:ledger -->
+
 | Metric                        | Value                    |
 | ----------------------------- | ------------------------ |
 | Version                       | 2.7.0-dev                |
@@ -107,13 +108,13 @@
 
 ## b) PARTIALLY DONE
 
-| Item              | Status                                      | What's Missing                                                                                                         |
-| ----------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| ~~Test coverage~~ done — core coverage is 90.4% today (README badge) | ~~85.6% (v2)~~ | ~~Target is 90%+. ~14.4% of statements uncovered, mostly error paths and edge cases~~ |
-| ~~Fuzz testing~~ done — 8 fuzz targets + testdata/fuzz seeds today (ROADMAP deferred #7 tracks expansion) | ~~2 fuzz targets exist~~ | ~~Missing `testdata/fuzz/` corpora for systematic fuzz testing~~ |
-| ~~Binary size~~ done — the v3 sub-module split moved heavy deps out of core (AGENTS.md dep budget) | ~~24 MB~~ | ~~Users who don't need all 16 output formats still pull in all go-output sub-modules via init() side-effect imports~~ |
-| ~~Pre-commit hooks~~ done — flake.nix carries meta now; the BuildFlow pre-commit hook passes cleanly | ~~BuildFlow runs but flake-meta-checker fails~~ | ~~Pre-existing: flake.nix missing `meta` attribute block. Requires `--no-verify` to commit~~ |
-| ~~koanf integration~~ done — KoanfLoader IS the single default loader with extension auto-detection (AGENTS.md) | ~~`configload/koanf.go` exists with loader~~ | ~~Not wired as default; users must opt-in via `WithConfigFileLoader`. Auto-detection from file extension not implemented~~ |
+| Item                                                                                                            | Status                                          | What's Missing                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| ~~Test coverage~~ done — core coverage is 90.4% today (README badge)                                            | ~~85.6% (v2)~~                                  | ~~Target is 90%+. ~14.4% of statements uncovered, mostly error paths and edge cases~~                                      |
+| ~~Fuzz testing~~ done — 8 fuzz targets + testdata/fuzz seeds today (ROADMAP deferred #7 tracks expansion)       | ~~2 fuzz targets exist~~                        | ~~Missing `testdata/fuzz/` corpora for systematic fuzz testing~~                                                           |
+| ~~Binary size~~ done — the v3 sub-module split moved heavy deps out of core (AGENTS.md dep budget)              | ~~24 MB~~                                       | ~~Users who don't need all 16 output formats still pull in all go-output sub-modules via init() side-effect imports~~      |
+| ~~Pre-commit hooks~~ done — flake.nix carries meta now; the BuildFlow pre-commit hook passes cleanly            | ~~BuildFlow runs but flake-meta-checker fails~~ | ~~Pre-existing: flake.nix missing `meta` attribute block. Requires `--no-verify` to commit~~                               |
+| ~~koanf integration~~ done — KoanfLoader IS the single default loader with extension auto-detection (AGENTS.md) | ~~`configload/koanf.go` exists with loader~~    | ~~Not wired as default; users must opt-in via `WithConfigFileLoader`. Auto-detection from file extension not implemented~~ |
 
 ---
 
@@ -205,33 +206,33 @@
 
 Sorted by impact × ease (highest impact/lowest effort first).
 
-| #  | Task                                                          | Impact | Effort | Category |
-| -- | ------------------------------------------------------------- | ------ | ------ | -------- |
-| ~~1~~  | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~High~~ | ~~5m~~ | ~~Infra~~ |
-| ~~2~~  | ~~Fix `flake.nix` meta attribute block~~ done — flake.nix carries meta/description today | ~~Medium~~ | ~~15m~~ | ~~Infra~~ |
-| 3  | Add snapshot tests for 16 output formats **→ ROADMAP raw ideas (output format snapshot tests)** | High   | 2h     | Testing  |
-| ~~4~~  | ~~Increase v2 coverage from 85.6% → 90%~~ done — core coverage is 90.4% today (README badge) | ~~Medium~~ | ~~3h~~ | ~~Testing~~ |
-| ~~5~~  | ~~Add fuzz test corpora in `testdata/fuzz/`~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~Medium~~ | ~~1h~~ | ~~Testing~~ |
-| 6  | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)** | Medium | 30m    | Infra    |
-| ~~7~~  | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~High~~ | ~~4h~~ | ~~Feature~~ |
-| ~~8~~  | ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output | ~~High~~ | ~~3h~~ | ~~Feature~~ |
-| ~~9~~  | ~~Config auto-loading with koanf (file extension detection)~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Medium~~ | ~~2h~~ | ~~Feature~~ |
-| ~~10~~ | ~~Documentation generation (`GenerateDocs()`, markdown)~~ done — GenerateDocs/docgen.go + the describe JSON contract | ~~Medium~~ | ~~4h~~ | ~~Feature~~ |
-| ~~11~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).** | ~~High~~ | ~~4h~~ | ~~Design~~ |
-| 12 | Fix telemetry context propagation (v3.0 middleware signature) **→ ContextMiddleware[T] shipped 2026-10-04; telemetry migration = future work (AGENTS.md)** | High   | 6h     | v3.0     |
-| 13 | Make FlagTag immutable (v3.0 builder pattern) **→ ROADMAP flag-representation consolidation (v5 scope)** | Medium | 4h     | v3.0     |
-| ~~14~~ | ~~Plugin system for custom validators~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~Medium~~ | ~~6h~~ | ~~Feature~~ |
-| 15 | Extract flagtags as standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Low    | 3h     | Refactor |
-| 16 | Add Result[T] type **→ ROADMAP raw ideas (Result[T] monad)** | Medium | 3h     | Feature  |
-| 17 | Add Validated[T] wrapper **→ ROADMAP raw ideas (Validated[T] wrapper)** | Low    | 2h     | Feature  |
-| 18 | Branded IDs example application **→ ROADMAP raw ideas (branded-ID example app)** | Low    | 2h     | Example  |
-| ~~19~~ | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).** | ~~Medium~~ | ~~1h~~ | ~~Infra~~ |
-| ~~20~~ | ~~Deprecate v1 API timeline~~ **Superseded — the v1 package no longer exists — pkg/ contains only v4 (v4.0.0 migration).** | ~~Low~~ | ~~30m~~ | ~~Process~~ |
-| 21 | Add property-based tests for type parsers **→ ROADMAP raw ideas (property-based type-parser tests)** | Medium | 2h     | Testing  |
-| ~~22~~ | ~~Conditional go-output format imports (reduce binary size)~~ **Superseded — superseded — go-output restructured; cmdguard imports explicitly.** | ~~Low~~ | ~~3h~~ | ~~Refactor~~ |
-| ~~23~~ | ~~Single-pass JSON config loading (eliminate double unmarshal)~~ **Superseded — superseded — KoanfLoader replaced the jsonLoader path.** | ~~Low~~ | ~~1h~~ | ~~Perf~~ |
-| ~~24~~ | ~~Add enhanced flag validation enums~~ done — v4 validation is richer — values/min/max/minlen/maxlen/dmin/dmax + custom validators | ~~Low~~ | ~~2h~~ | ~~Feature~~ |
-| 25 | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)** | Low    | 4h     | Feature  |
+| #      | Task                                                                                                                                                       | Impact     | Effort  | Category     |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------- | ------------ |
+| ~~1~~  | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                           | ~~High~~   | ~~5m~~  | ~~Infra~~    |
+| ~~2~~  | ~~Fix `flake.nix` meta attribute block~~ done — flake.nix carries meta/description today                                                                   | ~~Medium~~ | ~~15m~~ | ~~Infra~~    |
+| 3      | Add snapshot tests for 16 output formats **→ ROADMAP raw ideas (output format snapshot tests)**                                                            | High       | 2h      | Testing      |
+| ~~4~~  | ~~Increase v2 coverage from 85.6% → 90%~~ done — core coverage is 90.4% today (README badge)                                                               | ~~Medium~~ | ~~3h~~  | ~~Testing~~  |
+| ~~5~~  | ~~Add fuzz test corpora in `testdata/fuzz/`~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7                                 | ~~Medium~~ | ~~1h~~  | ~~Testing~~  |
+| 6      | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)**                                                                    | Medium     | 30m     | Infra        |
+| ~~7~~  | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                                                   | ~~High~~   | ~~4h~~  | ~~Feature~~  |
+| ~~8~~  | ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output                                                | ~~High~~   | ~~3h~~  | ~~Feature~~  |
+| ~~9~~  | ~~Config auto-loading with koanf (file extension detection)~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                                            | ~~Medium~~ | ~~2h~~  | ~~Feature~~  |
+| ~~10~~ | ~~Documentation generation (`GenerateDocs()`, markdown)~~ done — GenerateDocs/docgen.go + the describe JSON contract                                       | ~~Medium~~ | ~~4h~~  | ~~Feature~~  |
+| ~~11~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).**                                                  | ~~High~~   | ~~4h~~  | ~~Design~~   |
+| 12     | Fix telemetry context propagation (v3.0 middleware signature) **→ ContextMiddleware[T] shipped 2026-10-04; telemetry migration = future work (AGENTS.md)** | High       | 6h      | v3.0         |
+| 13     | Make FlagTag immutable (v3.0 builder pattern) **→ ROADMAP flag-representation consolidation (v5 scope)**                                                   | Medium     | 4h      | v3.0         |
+| ~~14~~ | ~~Plugin system for custom validators~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                                                    | ~~Medium~~ | ~~6h~~  | ~~Feature~~  |
+| 15     | Extract flagtags as standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)**                                                       | Low        | 3h      | Refactor     |
+| 16     | Add Result[T] type **→ ROADMAP raw ideas (Result[T] monad)**                                                                                               | Medium     | 3h      | Feature      |
+| 17     | Add Validated[T] wrapper **→ ROADMAP raw ideas (Validated[T] wrapper)**                                                                                    | Low        | 2h      | Feature      |
+| 18     | Branded IDs example application **→ ROADMAP raw ideas (branded-ID example app)**                                                                           | Low        | 2h      | Example      |
+| ~~19~~ | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).**                                    | ~~Medium~~ | ~~1h~~  | ~~Infra~~    |
+| ~~20~~ | ~~Deprecate v1 API timeline~~ **Superseded — the v1 package no longer exists — pkg/ contains only v4 (v4.0.0 migration).**                                 | ~~Low~~    | ~~30m~~ | ~~Process~~  |
+| 21     | Add property-based tests for type parsers **→ ROADMAP raw ideas (property-based type-parser tests)**                                                       | Medium     | 2h      | Testing      |
+| ~~22~~ | ~~Conditional go-output format imports (reduce binary size)~~ **Superseded — superseded — go-output restructured; cmdguard imports explicitly.**           | ~~Low~~    | ~~3h~~  | ~~Refactor~~ |
+| ~~23~~ | ~~Single-pass JSON config loading (eliminate double unmarshal)~~ **Superseded — superseded — KoanfLoader replaced the jsonLoader path.**                   | ~~Low~~    | ~~1h~~  | ~~Perf~~     |
+| ~~24~~ | ~~Add enhanced flag validation enums~~ done — v4 validation is richer — values/min/max/minlen/maxlen/dmin/dmax + custom validators                         | ~~Low~~    | ~~2h~~  | ~~Feature~~  |
+| 25     | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)**                                                               | Low        | 4h      | Feature      |
 
 ---
 

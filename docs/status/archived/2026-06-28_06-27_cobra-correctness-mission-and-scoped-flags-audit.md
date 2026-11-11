@@ -29,6 +29,7 @@ not wired into the execution path, is not committed, and is not documented anywh
 ### Today's fix — the Cobra-correctness contract (uncommitted, ready to commit)
 
 <!-- check-rows:ledger -->
+
 | # | Change                                                                                               | File                       | Verified                  |
 | - | ---------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------- |
 | 1 | **`SilenceUsage = true` by default**                                                                 | `cli.go`                   | ✅ test + runtime         |
@@ -77,20 +78,24 @@ A substantial feature addressing **another** Cobra footgun (global flags polluti
 is sitting **uncommitted** in the working tree. It introduces a `local:"true"` tag so root-config
 flags can be local to the root run and not inherited by subcommands.
 
-| Component                                   | Status                  | Evidence                                                                             |
-| ------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------ |
+| Component | Status | Evidence |
+| --------- | ------ | -------- |
+
 <!-- check-rows:ledger -->
-| `FlagTag.Local` field                       | ✅ done                 | `config.go`                                                                          |
-| `local:"true"` tag parsing                  | ✅ done                 | `config_parsing.go` (pushed `parseFieldFlag` cyclomatic complexity → lint FAIL)      |
-| `RegisterScopedFlags(cmd)`                  | ✅ done, **tests pass** | `flags.go`                                                                           |
+
+| `FlagTag.Local` field | ✅ done | `config.go` |
+| `local:"true"` tag parsing | ✅ done | `config_parsing.go` (pushed `parseFieldFlag` cyclomatic complexity → lint FAIL) |
+| `RegisterScopedFlags(cmd)` | ✅ done, **tests pass** | `flags.go` |
+
 <!-- check-rows:ledger -->
-| `RegisterLocalFlags(cmd)`                   | ✅ done, **tests pass** | `flags.go`                                                                           |
-| `ParseFlags` skips absent local flags       | ✅ done, **tests pass** | `flags_parse.go`                                                                     |
-| CLI accessor `RegisterLocalCommandFlags`    | ✅ exists               | `cli_accessors.go`                                                                   |
-| 6 tests (`flags_scoped_test.go`, untracked) | ✅ all pass             | isolated + full suite green                                                          |
-| **Wired into CLI execution path**           | ❌ **NO**               | `cli.go:initialize` still calls `RegisterPersistentFlags`, not `RegisterScopedFlags` |
-| **Committed**                               | ❌ **NO**               | 6 files modified + 1 untracked test, uncommitted                                     |
-| **Documented**                              | ❌ **NO**               | not in README/AGENTS/FEATURES/ROADMAP                                                |
+
+| `RegisterLocalFlags(cmd)` | ✅ done, **tests pass** | `flags.go` |
+| `ParseFlags` skips absent local flags | ✅ done, **tests pass** | `flags_parse.go` |
+| CLI accessor `RegisterLocalCommandFlags` | ✅ exists | `cli_accessors.go` |
+| 6 tests (`flags_scoped_test.go`, untracked) | ✅ all pass | isolated + full suite green |
+| **Wired into CLI execution path** | ❌ **NO** | `cli.go:initialize` still calls `RegisterPersistentFlags`, not `RegisterScopedFlags` |
+| **Committed** | ❌ **NO** | 6 files modified + 1 untracked test, uncommitted |
+| **Documented** | ❌ **NO** | not in README/AGENTS/FEATURES/ROADMAP |
 
 **Verdict:** The feature is _internally consistent and tested_ but **invisible to real consumers**
 (not wired) and **not persisted** (uncommitted). It is the highest-leverage unfinished work in the
@@ -144,6 +149,7 @@ A library whose entire purpose is "use Cobra correctly" demonstrated **both** wr
 **and** double-error-printing in its own showcase. **Fixed today** (uncommitted).
 
 <!-- routing:skip -->
+
 ### 🔴 #2 — Usage-on-error was the DEFAULT — FIXED same day (`03db723`: `SilenceUsage=true` is the v4 default; `WithoutSilenceUsage()` re-enables)
 
 `SilenceUsage` defaulted to `false`. Fang forces it `true` only when _it_ executes (`fang.go:135`),
@@ -156,6 +162,7 @@ single most-reported Cobra footgun, unguarded. **Fixed today** (uncommitted).
 into the broken `os.Exit(0)` pattern. **Fixed today** via public `ExitCode(err)`.
 
 <!-- routing:skip -->
+
 ### 🔴 #4 — Scoped-flags feature marooned in the working tree — FIXED (`c60f690`, wired before v2.10.0)
 
 A genuinely valuable, tested feature is uncommitted, unwired, and undocumented. It will be lost on
@@ -198,33 +205,33 @@ tracked the contract's correctness defaults.
 
 Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygiene → roadmap).
 
-| #  | Task                                                                                                               | Impact                   | Effort             |
-| -- | ------------------------------------------------------------------------------------------------------------------ | ------------------------ | ------------------ |
-| ~~1~~  | ~~**Commit today's cobra-correctness fix** (SilenceUsage default + `ExitCode` + example fix + docs)~~ done — committed as 03db723 (Resolution below) | ~~🔴 mission-critical~~ | ~~done (just commit)~~ |
-| ~~2~~  | ~~**Finish + wire scoped flags**: `cli.go` use `RegisterScopedFlags`; `WithLocalFlagGroup` command option; commit it~~ done — committed c60f690 + wired (Resolution below) | ~~🔴 closes a real footgun~~ | ~~M~~ |
-| ~~3~~  | ~~Extract `parseLocalTag` helper → fix `config_parsing.go` cyclomatic lint → `nix flake check` green~~ done — 0 lint issues today | ~~🔴 unblocks release~~ | ~~S~~ |
-| ~~4~~  | ~~Add **failure-cleanup hook** (`WithCleanup` / `OnRunError`) so teardown runs on RunE error too~~ done — WithCleanup[T] ships (AGENTS.md) | ~~🔴 mission~~ | ~~M~~ |
-| ~~5~~  | ~~**Audit every default** against a "Cobra footguns off by default" checklist; document in AGENTS~~ done — WithBatteries codifies the production defaults (AGENTS.md principle 24) | ~~🔴 mission~~ | ~~S~~ |
-| ~~6~~  | ~~Set `CODECOV_TOKEN` secret in GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~hygiene~~ | ~~5m~~ |
-| ~~7~~  | ~~Bump `go.mod` → `go 1.26.4` once nixpkgs ships it (CVEs GO-2026-5037/8/9)~~ **Superseded — superseded — the repo is on Go 1.27.** | ~~security~~ | ~~5m~~ |
-| ~~8~~  | ~~Update FEATURES.md / CHANGELOG.md / ROADMAP.md for: `ExitCode`, SilenceUsage default, scoped flags~~ done — docs maintained through v4.2.1 (CHANGELOG [2.10.0] entry exists) | ~~docs~~ | ~~S~~ |
-| ~~9~~  | ~~Add `examples/` execution to CI (run each example's tests)~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).** | ~~reliability~~ | ~~S~~ |
-| ~~10~~ | ~~Own error display uniformly (fang-off path prints via cobra; make cmdguard the single owner)~~ done — cmdguard owns error display, printed exactly once (AGENTS.md) | ~~mission~~ | ~~M~~ |
-| ~~11~~ | ~~Add a second example app focused on a different domain (e.g. server/devtool) to validate the contract~~ **Superseded — superseded — taskctl stays the flagship; the website serves onboarding.** | ~~adoption~~ | ~~M~~ |
-| ~~12~~ | ~~Reset-global-state audit: ensure parallel tests don't pollute the shared COW registries (`t.Cleanup`)~~ done — -race green in CI; COW registries documented concurrency-safe | ~~reliability~~ | ~~M~~ |
-| ~~13~~ | ~~Write `docs/COBRA_FOOTGUNS.md` — the explicit list of traps cmdguard closes (marketing + clarity)~~ done — docs/COBRA_FOOTGUNS.md exists | ~~adoption~~ | ~~S~~ |
-| ~~14~~ | ~~Add fuzz corpus under `testdata/fuzz/` for flag parsing~~ done — testdata/fuzz seeds shipped; ROADMAP deferred #7 | ~~robustness~~ | ~~S~~ |
-| ~~15~~ | ~~Add `FlagRegistry` interface abstraction (enables mocking / alt impls)~~ **Superseded — superseded — plugin system via Plugin interface.** | ~~extensibility~~ | ~~M~~ |
-| 16 | Branded-ID example (`types_enum.go` showcase) **→ ROADMAP raw ideas (branded-ID example app)** | adoption                 | S                  |
-| ~~17~~ | ~~`examples/docs-generator/` app exercising `GenerateDocs`~~ done — examples/docs-generator exists | ~~adoption~~ | ~~S~~ |
-| ~~18~~ | ~~Deprecation timeline for v1 API~~ **Superseded — the v1 package no longer exists (v4.0.0 migration).** | ~~clarity~~ | ~~S~~ |
-| ~~19~~ | ~~Custom validation hooks (per-flag, beyond `required`)~~ done — custom validators ship — RegisterValidator + validate tag (FEATURES.md) | ~~power~~ | ~~M~~ |
-| 20 | Metrics/hooks observability beyond OTel **→ ROADMAP raw ideas (metrics/hooks observability)** | ops                      | L                  |
-| ~~21~~ | ~~v3.0 API design document (scope before any code)~~ **Superseded — v3.0.0 shipped 2026-07-07.** | ~~strategic~~ | ~~L~~ |
-| 22 | `flagtags` library extraction (defer to v3; stabilize tag format first) **→ ROADMAP raw ideas (extract flagtags standalone library)** | strategic                | L                  |
-| 23 | Rename `Get[T]`→`GetService[T]` (v3 breaking) **→ ROADMAP v5 candidate #6** | clarity                  | M                  |
-| 24 | Generic `RegisterInScope[T]` (v3 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)** | type-safety              | M                  |
-| 25 | Remove `SetConfig` footgun (v3 breaking) **→ deprecated in v4 — removal tracked as TODO_LIST T4** | safety                   | S                  |
+| #      | Task                                                                                                                                                                                               | Impact                       | Effort                 |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ---------------------- |
+| ~~1~~  | ~~**Commit today's cobra-correctness fix** (SilenceUsage default + `ExitCode` + example fix + docs)~~ done — committed as 03db723 (Resolution below)                                               | ~~🔴 mission-critical~~      | ~~done (just commit)~~ |
+| ~~2~~  | ~~**Finish + wire scoped flags**: `cli.go` use `RegisterScopedFlags`; `WithLocalFlagGroup` command option; commit it~~ done — committed c60f690 + wired (Resolution below)                         | ~~🔴 closes a real footgun~~ | ~~M~~                  |
+| ~~3~~  | ~~Extract `parseLocalTag` helper → fix `config_parsing.go` cyclomatic lint → `nix flake check` green~~ done — 0 lint issues today                                                                  | ~~🔴 unblocks release~~      | ~~S~~                  |
+| ~~4~~  | ~~Add **failure-cleanup hook** (`WithCleanup` / `OnRunError`) so teardown runs on RunE error too~~ done — WithCleanup[T] ships (AGENTS.md)                                                         | ~~🔴 mission~~               | ~~M~~                  |
+| ~~5~~  | ~~**Audit every default** against a "Cobra footguns off by default" checklist; document in AGENTS~~ done — WithBatteries codifies the production defaults (AGENTS.md principle 24)                 | ~~🔴 mission~~               | ~~S~~                  |
+| ~~6~~  | ~~Set `CODECOV_TOKEN` secret in GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                                                          | ~~hygiene~~                  | ~~5m~~                 |
+| ~~7~~  | ~~Bump `go.mod` → `go 1.26.4` once nixpkgs ships it (CVEs GO-2026-5037/8/9)~~ **Superseded — superseded — the repo is on Go 1.27.**                                                                | ~~security~~                 | ~~5m~~                 |
+| ~~8~~  | ~~Update FEATURES.md / CHANGELOG.md / ROADMAP.md for: `ExitCode`, SilenceUsage default, scoped flags~~ done — docs maintained through v4.2.1 (CHANGELOG [2.10.0] entry exists)                     | ~~docs~~                     | ~~S~~                  |
+| ~~9~~  | ~~Add `examples/` execution to CI (run each example's tests)~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).**                                         | ~~reliability~~              | ~~S~~                  |
+| ~~10~~ | ~~Own error display uniformly (fang-off path prints via cobra; make cmdguard the single owner)~~ done — cmdguard owns error display, printed exactly once (AGENTS.md)                              | ~~mission~~                  | ~~M~~                  |
+| ~~11~~ | ~~Add a second example app focused on a different domain (e.g. server/devtool) to validate the contract~~ **Superseded — superseded — taskctl stays the flagship; the website serves onboarding.** | ~~adoption~~                 | ~~M~~                  |
+| ~~12~~ | ~~Reset-global-state audit: ensure parallel tests don't pollute the shared COW registries (`t.Cleanup`)~~ done — -race green in CI; COW registries documented concurrency-safe                     | ~~reliability~~              | ~~M~~                  |
+| ~~13~~ | ~~Write `docs/COBRA_FOOTGUNS.md` — the explicit list of traps cmdguard closes (marketing + clarity)~~ done — docs/COBRA_FOOTGUNS.md exists                                                         | ~~adoption~~                 | ~~S~~                  |
+| ~~14~~ | ~~Add fuzz corpus under `testdata/fuzz/` for flag parsing~~ done — testdata/fuzz seeds shipped; ROADMAP deferred #7                                                                                | ~~robustness~~               | ~~S~~                  |
+| ~~15~~ | ~~Add `FlagRegistry` interface abstraction (enables mocking / alt impls)~~ **Superseded — superseded — plugin system via Plugin interface.**                                                       | ~~extensibility~~            | ~~M~~                  |
+| 16     | Branded-ID example (`types_enum.go` showcase) **→ ROADMAP raw ideas (branded-ID example app)**                                                                                                     | adoption                     | S                      |
+| ~~17~~ | ~~`examples/docs-generator/` app exercising `GenerateDocs`~~ done — examples/docs-generator exists                                                                                                 | ~~adoption~~                 | ~~S~~                  |
+| ~~18~~ | ~~Deprecation timeline for v1 API~~ **Superseded — the v1 package no longer exists (v4.0.0 migration).**                                                                                           | ~~clarity~~                  | ~~S~~                  |
+| ~~19~~ | ~~Custom validation hooks (per-flag, beyond `required`)~~ done — custom validators ship — RegisterValidator + validate tag (FEATURES.md)                                                           | ~~power~~                    | ~~M~~                  |
+| 20     | Metrics/hooks observability beyond OTel **→ ROADMAP raw ideas (metrics/hooks observability)**                                                                                                      | ops                          | L                      |
+| ~~21~~ | ~~v3.0 API design document (scope before any code)~~ **Superseded — v3.0.0 shipped 2026-07-07.**                                                                                                   | ~~strategic~~                | ~~L~~                  |
+| 22     | `flagtags` library extraction (defer to v3; stabilize tag format first) **→ ROADMAP raw ideas (extract flagtags standalone library)**                                                              | strategic                    | L                      |
+| 23     | Rename `Get[T]`→`GetService[T]` (v3 breaking) **→ ROADMAP v5 candidate #6**                                                                                                                        | clarity                      | M                      |
+| 24     | Generic `RegisterInScope[T]` (v3 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)**                                                                                                                 | type-safety                  | M                      |
+| 25     | Remove `SetConfig` footgun (v3 breaking) **→ deprecated in v4 — removal tracked as TODO_LIST T4**                                                                                                  | safety                       | S                      |
 
 ---
 
@@ -248,6 +255,7 @@ Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygien
 ## Health Metrics (ground truth, this session)
 
 <!-- check-rows:ledger -->
+
 | Metric                 | Value                                                                              |
 | ---------------------- | ---------------------------------------------------------------------------------- |
 | Branch                 | `master` (up to date with origin)                                                  |
@@ -266,6 +274,7 @@ Sorted by **impact on the mission** (correctness → shipping-the-WIP → hygien
 ## Working-tree change ownership (critical for commit hygiene)
 
 <!-- check-rows:ledger -->
+
 | Files                                                                                                                                                  | Author                                          | Status                                   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ---------------------------------------- |
 | `cli.go`, `cli_errors_json.go`, `cli_errors_json_test.go`, `cli_core_new_test.go`, `examples/taskctl/main.go`, `README.md`, `AGENTS.md`, `docs/API.md` | **Crush (today)** — cobra-correctness fix       | working, tested, **commit these**        |

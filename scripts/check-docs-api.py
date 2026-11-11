@@ -86,7 +86,9 @@ def check_hero_single_source() -> None:
     data_text = open(data, encoding="utf-8").read()
 
     if "highlightGo(heroCode)" not in hero_text:
-        fail("HeroSection.astro does not render heroCode (snippet must have one source)")
+        fail(
+            "HeroSection.astro does not render heroCode (snippet must have one source)"
+        )
 
     if "v5.NewCLI" not in data_text:
         fail("hero-code.ts does not teach v5.NewCLI")
@@ -102,8 +104,16 @@ def check_quick_start() -> None:
     for path, needle, label in [
         (quick_start, "cmdguard/v5", "quick-start.mdx does not import cmdguard/v5"),
         (quick_start, "NewBuilder", "quick-start.mdx does not teach the v5 Builder"),
-        (quick_start, "ON by default", "quick-start.mdx does not mention the batteries default"),
-        (installation, "go get github.com/larsartmann/cmdguard/v5", "installation.mdx does not install cmdguard/v5"),
+        (
+            quick_start,
+            "ON by default",
+            "quick-start.mdx does not mention the batteries default",
+        ),
+        (
+            installation,
+            "go get github.com/larsartmann/cmdguard/v5",
+            "installation.mdx does not install cmdguard/v5",
+        ),
     ]:
         if needle not in open(path, encoding="utf-8").read():
             fail(label)
@@ -120,7 +130,9 @@ def go_sources(directory: str, export: bool) -> set[str]:
             names |= set(re.findall(r"^type ([A-Z]\w*)", text, re.M))
             names |= set(re.findall(r"^var ([A-Z]\w*)", text, re.M))
             names |= set(re.findall(r"^const ([A-Z]\w*)", text, re.M))
-            names |= set(re.findall(r"^\t([A-Z]\w*)\s+[A-Za-z_][\w.\[\]*]*\s*=", text, re.M))
+            names |= set(
+                re.findall(r"^\t([A-Z]\w*)\s+[A-Za-z_][\w.\[\]*]*\s*=", text, re.M)
+            )
             names |= set(re.findall(r"^\t([A-Z]\w*)\s*=", text, re.M))
         else:
             names |= set(re.findall(r"^func \([^)]*\) ([A-Z]\w*)", text, re.M))
@@ -204,7 +216,11 @@ def compile_samples() -> None:
                 handle.write(f"\t{replacement}\n")
             handle.write(")\n")
 
-        env = os.environ | {"GOWORK": "off", "GOEXPERIMENT": "jsonv2", "GOFLAGS": "-mod=mod"}
+        env = os.environ | {
+            "GOWORK": "off",
+            "GOEXPERIMENT": "jsonv2",
+            "GOFLAGS": "-mod=mod",
+        }
         tidy = subprocess.run(
             [go_bin, "mod", "tidy"], cwd=work, env=env, capture_output=True, text=True
         )
@@ -215,7 +231,9 @@ def compile_samples() -> None:
         for index, (path, line, code) in enumerate(blocks):
             sample_dir = os.path.join(work, f"sample{index}")
             os.makedirs(sample_dir, exist_ok=True)
-            with open(os.path.join(sample_dir, "main.go"), "w", encoding="utf-8") as handle:
+            with open(
+                os.path.join(sample_dir, "main.go"), "w", encoding="utf-8"
+            ) as handle:
                 handle.write(code)
 
             build = subprocess.run(

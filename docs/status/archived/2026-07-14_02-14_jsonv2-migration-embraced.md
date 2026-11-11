@@ -18,6 +18,7 @@ BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`,
 ## a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | # | Item                                         | Details                                                                                                                                                                                 |
 | - | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **`config_file.go` migrated to json/v2**     | `encoding/json/v2` + `jsontext.Value`. Added `json.MatchCaseInsensitiveNames(true)` to preserve v1-compatible struct field matching (critical — user config structs lack `json:` tags). |
@@ -34,30 +35,31 @@ BuildFlow's `go-auto-upgrade` kept migrating source files to `encoding/json/v2`,
 
 ## b) PARTIALLY DONE
 
-| # | Item                  | What's done                                 | What's missing                                                                                                   |
-| - | --------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**AGENTS.md update**~~ done — AGENTS.md rewritten through v4 (2026-11-02) | ~~Versions, GOEXPERIMENT section, status line~~ | ~~Go directive note, test commands need `GOEXPERIMENT=jsonv2` prefix, Quick Start section doesn't mention the flag~~ |
-| ~~2~~ | ~~**Test command docs**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).** | ~~flake.nix sets it for nix develop~~ | ~~AGENTS.md Quick Start commands still show bare `go test` without `GOEXPERIMENT=jsonv2`~~ |
-| ~~3~~ | ~~**CHANGELOG.md**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod); the GOEXPERIMENT era ended.** | ~~Not touched~~ | ~~Should have an entry for the json/v2 migration + dependency upgrades~~ |
+| #     | Item                                                                                                            | What's done                                     | What's missing                                                                                                       |
+| ----- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**AGENTS.md update**~~ done — AGENTS.md rewritten through v4 (2026-11-02)                                     | ~~Versions, GOEXPERIMENT section, status line~~ | ~~Go directive note, test commands need `GOEXPERIMENT=jsonv2` prefix, Quick Start section doesn't mention the flag~~ |
+| ~~2~~ | ~~**Test command docs**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).**                        | ~~flake.nix sets it for nix develop~~           | ~~AGENTS.md Quick Start commands still show bare `go test` without `GOEXPERIMENT=jsonv2`~~                           |
+| ~~3~~ | ~~**CHANGELOG.md**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod); the GOEXPERIMENT era ended.** | ~~Not touched~~                                 | ~~Should have an entry for the json/v2 migration + dependency upgrades~~                                             |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Item                                        | Why it matters                                                                                                                                                                                                                                                        |
-| - | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Test files still use `encoding/json` v1**~~ done — migrated to encoding/json/v2 (2a673a4; Resolution 2026-07-23) | ~~4 test files (`cli_errors_json_test.go`, `duration_test.go`, `enum_test.go`, `helpers_test.go`) import `"encoding/json"` (v1). For consistency, these should be migrated to v2. They work because v1 and v2 coexist under GOEXPERIMENT=jsonv2, but it's inconsistent.~~ |
-| ~~2~~ | ~~**`go.mod` go directive**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).** | ~~Currently `go 1.26`. The `GOEXPERIMENT=jsonv2` requirement should be documented somewhere consumers can see it (e.g. a `toolchain` directive or a comment).~~ |
-| ~~3~~ | ~~**Sub-module lint issues**~~ done — 0 lint issues (da3b454; CI lint job) | ~~Pre-existing lint issues in glamour (2 noinlineerr), manpage (3 exhaustruct/varnamelen/wrapcheck), prompts (2 staticcheck), spinner (4 issues), telemetry (3 staticcheck SA1019). These are NOT from this session but BuildFlow flagged them.~~ |
-| ~~4~~ | ~~**`.golangci.yml` GOEXPERIMENT awareness**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).** | ~~golangci-lint runs under GOEXPERIMENT=jsonv2 but the config doesn't document this requirement.~~ |
-| ~~5~~ | ~~**Consumer migration guide**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod); GOEXPERIMENT requirement gone.** | ~~Downstream consumers of cmdguard now need `GOEXPERIMENT=jsonv2` until Go 1.27. This is a **breaking change** for consumers — no README/CHANGELOG mention exists.~~ |
-| ~~6~~ | ~~**`go valid` / govalid-generate**~~ done (docs-health pass 2026-11-08) | ~~BuildFlow's `govalid-generate` step was failing due to cascading markers. Not re-verified after the fix.~~ |
+| #     | Item                                                                                                                           | Why it matters                                                                                                                                                                                                                                                            |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Test files still use `encoding/json` v1**~~ done — migrated to encoding/json/v2 (2a673a4; Resolution 2026-07-23)           | ~~4 test files (`cli_errors_json_test.go`, `duration_test.go`, `enum_test.go`, `helpers_test.go`) import `"encoding/json"` (v1). For consistency, these should be migrated to v2. They work because v1 and v2 coexist under GOEXPERIMENT=jsonv2, but it's inconsistent.~~ |
+| ~~2~~ | ~~**`go.mod` go directive**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).**                                   | ~~Currently `go 1.26`. The `GOEXPERIMENT=jsonv2` requirement should be documented somewhere consumers can see it (e.g. a `toolchain` directive or a comment).~~                                                                                                           |
+| ~~3~~ | ~~**Sub-module lint issues**~~ done — 0 lint issues (da3b454; CI lint job)                                                     | ~~Pre-existing lint issues in glamour (2 noinlineerr), manpage (3 exhaustruct/varnamelen/wrapcheck), prompts (2 staticcheck), spinner (4 issues), telemetry (3 staticcheck SA1019). These are NOT from this session but BuildFlow flagged them.~~                         |
+| ~~4~~ | ~~**`.golangci.yml` GOEXPERIMENT awareness**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod).**                  | ~~golangci-lint runs under GOEXPERIMENT=jsonv2 but the config doesn't document this requirement.~~                                                                                                                                                                        |
+| ~~5~~ | ~~**Consumer migration guide**~~ **Superseded — superseded — the repo is on Go 1.27 (go.mod); GOEXPERIMENT requirement gone.** | ~~Downstream consumers of cmdguard now need `GOEXPERIMENT=jsonv2` until Go 1.27. This is a **breaking change** for consumers — no README/CHANGELOG mention exists.~~                                                                                                      |
+| ~~6~~ | ~~**`go valid` / govalid-generate**~~ done (docs-health pass 2026-11-08)                                                       | ~~BuildFlow's `govalid-generate` step was failing due to cascading markers. Not re-verified after the fix.~~                                                                                                                                                              |
 
 ---
 
 ## d) TOTALLY FUCKED UP
 
 <!-- check-rows:ledger -->
+
 | # | What                               | Impact                                                                                                                                                                                                                                                                                                      | Status                  |
 | - | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | 1 | **First attempt: fought the tool** | I reverted `go-auto-upgrade`'s changes TWICE instead of embracing the upgrade. The user had to tell me "THEN UPGRADE!" — I should have recognized immediately that the tool wants this migration and the correct path was enabling `GOEXPERIMENT=jsonv2`, not fighting it. **Wasted an entire round-trip.** | Fixed in second attempt |
@@ -193,6 +195,7 @@ Sub-mods:  5/5 have pre-existing lint issues (14 total)
 ## Files Changed This Session
 
 <!-- check-rows:ledger -->
+
 | File                                    | Change                                                                   |
 | --------------------------------------- | ------------------------------------------------------------------------ |
 | `pkg/cmdguard/v3/config_file.go`        | Migrated to json/v2 + jsontext, added MatchCaseInsensitiveNames          |

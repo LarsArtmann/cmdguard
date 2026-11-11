@@ -22,8 +22,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
    CHANGELOG `## [lint/v0.2.0]` section cut (Unreleased lint bullets moved
    in). Full lint suite + dogfood green (8 rules load, 0 findings on
    cmdguard itself). Annotated tag → pushed → proxy-verified via scratch
-   consumer (`go get` OK) → [GH release
-   published](https://github.com/LarsArtmann/cmdguard/releases/tag/lint/v0.2.0).
+   consumer (`go get` OK) → [GH release published](https://github.com/LarsArtmann/cmdguard/releases/tag/lint/v0.2.0).
 2. **Master CI un-red BEFORE the tag push (go-release Phase 4.4).** Three red
    workflows found on master (pre-dating this session): (a) 8 lint issues in
    the new sentinel-reference files — fixed for real (`fmt.Fprintf`, dead
@@ -43,8 +42,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
    constructor union, non-generic forms). Dogfooding the fix immediately
    caught a real, previously invisible CG008 in `examples/config-explain`
    (fixed: `WithCLIVersion(version.Version)`). Tagged, pushed, proxy-verified
-   (`PROXY_V021_OK`), [GH release
-   published](https://github.com/LarsArtmann/cmdguard/releases/tag/lint/v0.2.1)
+   (`PROXY_V021_OK`), [GH release published](https://github.com/LarsArtmann/cmdguard/releases/tag/lint/v0.2.1)
    with an honest note about the `go install` limitation (see d1).
 4. **BuildFlow bumped to `lint/v0.2.1` and verified on the delivering
    layer.** `tools/go.mod` + root `go.mod` requires bumped; `execution` +
@@ -126,8 +124,8 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 - **B1.3** Builder type sketch (M12 deferred-error Builder + NewApp
   integration).
 - **B1.4–B1.6** the v5 default flips (strict, signals+graceful, batteries)
-  + fallout fixes; **B1.11** godox `TODO(v5)` exclusion removal in
-  `.golangci.yml` (markers are gone; the config exclusion remains).
+  - fallout fixes; **B1.11** godox `TODO(v5)` exclusion removal in
+    `.golangci.yml` (markers are gone; the config exclusion remains).
 - **B2** codemod (import + rename rewriters) + `MIGRATION_v4_v5.md` +
   dry-runs on erraudit/timesheets.
 - **B3** v5 flip test matrix (opt-outs green, batteries-on suite green).
@@ -193,6 +191,7 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 ## f) UP TO 50 THINGS TO DO NEXT (ranked)
 
 **Immediate (unblock the branch):**
+
 1. Regenerate `docs/ERROR_REFERENCE.md` on the branch (fix b1).
 2. Diagnose + fix lint sub-module typecheck failure (b2).
 3. Rename `TestHuhRunner_*` → `TestHuhPrompter_*` (b3).
@@ -205,7 +204,9 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 7. B1.4 flip strict-validation default; fix fallout; opt-out test.
 8. B1.5 flip signals+graceful default; fix fallout.
 9. B1.6 flip batteries default; fix fallout.
+
 <!-- ✅ DONE 2026-11-08: shipped in v5.0.0 — the flip landed on the v5-scaffold branch, pinned by cli_defaults_matrix_test.go (Without* opt-outs shipped alongside); see the tagged v5.0.0 tree. -->
+
 10. B3.1/B3.2 flip test matrix (each `Without*` proves green; batteries-on
     suite green; race + lint).
 11. B1.3 Builder sketch (deferred-error Builder + NewApp integration).
@@ -219,28 +220,28 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 **Tier B completion:**
 15. B2.1 codemod skeleton: import rewrite `/v4`→`/v5`.
 16. B2.2 codemod rename rewrites (CommandMetadata/TypeCodec/HuhPrompter,
-    SetConfig/RegisterInScope fixups).
+SetConfig/RegisterInScope fixups).
 17. B2.3 dry-run codemod on erraudit; diff review.
 18. B2.4 dry-run codemod on timesheets; diff review.
 19. B2.5 `MIGRATION_v4_v5.md`: flips + renames + codemod usage.
 20. B2.6 migration guide worked example (taskctl before/after).
 21. Docs sweep: the ~100 non-Go `cmdguard/v4` references (README, AGENTS,
-    docs/, website) — decide v4-vs-v5 split per file.
+docs/, website) — decide v4-vs-v5 split per file.
 22. Root CHANGELOG `[Unreleased]` → v5.0.0 section skeleton.
 23. Decide v5 lint release vehicle (lint/v0.3.0 with CurrentMajor=v5?) and
-    its BuildFlow bump.
+its BuildFlow bump.
 
 **Tier C (unblocked, v4-side — can land on master):**
 24. C2 QUICKSTART parity (batteries, describe, hints, runtime tag
-    semantics).
+semantics).
 25. C2b TUTORIAL parity pass.
 26. C3 koanf edge tests (TOML datetimes, YAML anchors, int-vs-float64,
-    empty file).
+empty file).
 27. C4 dead `pkg/cmdguard/v2` lint-exclusion cleanup + art-dupl re-run.
 28. C5/C6 taskctl + examples into `check-all` + CI leg.
 29. C7 samber-linter baseline committed + flake/CI wiring (W6).
 30. C8 HealthCheck cluster: dedupe `HealthCheckWithContext` (W2), Scope
-    split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).
+split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).
 31. C10/W5 cancellation tests for the healthcheck path.
 32. C9 ERROR_REFERENCE `-update-golden` verification wired into CI.
 33. C1 consumer proof: erraudit + timesheets full suites vs HEAD.
@@ -248,19 +249,27 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 
 **Tier D quick wins:**
 35. D19 rewrite/delete the no-op `TestPromptConfirm`.
-    <!-- ✅ DONE 2026-11-08: real tests exist (TestPromptConfirm_DelegatesToRunner + _WrapsError). -->
+
+<!-- ✅ DONE 2026-11-08: real tests exist (TestPromptConfirm_DelegatesToRunner + _WrapsError). -->
+
 36. D26 S2: re-check nixpkgs `go_1_27` ≥ 1.27.2; flip if available.
-    <!-- ✅ DONE 2026-11-08: nixpkgs go_1_27 = 1.27.3; flake already uses it — no flip needed. -->
+
+<!-- ✅ DONE 2026-11-08: nixpkgs go_1_27 = 1.27.3; flake already uses it — no flip needed. -->
+
 37. D33 `gopls check` infertypeargs verdict; D34 git-town/library-policy
     values; record both.
-    <!-- ✅ DONE 2026-11-08: D33 — gopls check runs clean on go-composable-business-types (no infertypeargs findings); D34 — git-town.toml main="master" + github-connector=api; library-policy.yaml does not exist in that repo. -->
+
+<!-- ✅ DONE 2026-11-08: D33 — gopls check runs clean on go-composable-business-types (no infertypeargs findings); D34 — git-town.toml main="master" + github-connector=api; library-policy.yaml does not exist in that repo. -->
+
 38. D35 file the docs-gates routed-verdict divergence upstream (repro
     exists).
 39. D36 script to derive FEATURES/AGENTS dep tables + test counts from
     go.mod/go test.
 40. D39 archive the 2026-11-02_00-11 HTML with its .md siblings.
 41. D38 eyeball re-rendered `architecture.svg` + examples/README loop.
-    <!-- ✅ DONE 2026-11-08: svg re-rendered 2026-11-08 01:34 (fresh); examples/README.md documents the test loop (go test ./examples/taskctl/... -count=1 -race). -->
+
+<!-- ✅ DONE 2026-11-08: svg re-rendered 2026-11-08 01:34 (fresh); examples/README.md documents the test loop (go test ./examples/taskctl/... -count=1 -race). -->
+
 42. D24 CT2 decision memo (schema sub-module release: ship v0.1.0 vs hold).
 43. D25 config-explain into README + website.
 44. D37 execute the §g1 thresholds decision (2026-10 batch archive vs keep).
@@ -270,7 +279,9 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 47. Tier D bundles: website ports ×8 (TUTORIAL first), marketing/infra
     (SECURITY.md first, 5 min), doc/CI guards (stale-ref guard first).
 48. L6 (only after an Analyzer-bridge spike — do not half-ship).
-    <!-- fresh:skip — pull-based by design; stays in ROADMAP until the Analyzer-bridge spike is scheduled. -->
+
+<!-- fresh:skip — pull-based by design; stays in ROADMAP until the Analyzer-bridge spike is scheduled. -->
+
 49. `go install` fix for cmdguard-lint (per g2 decision).
 50. Final battery + a docs/status closing report with before/after numbers.
 
@@ -298,5 +309,5 @@ edits uncommitted, 2 known red tests (both understood, fixes queued — see b).
 
 ---
 
-*Verification evidence inline above; all commands and exit codes were run
-live in this session. Nothing was tagged/pushed without its gate green.*
+_Verification evidence inline above; all commands and exit codes were run
+live in this session. Nothing was tagged/pushed without its gate green._

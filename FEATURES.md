@@ -358,7 +358,7 @@ Each compiles cleanly with matching v4 API signatures. All have basic test cover
 | `telemetry`      | `Middleware[T]()`, `WithTelemetry[T]()`                                                                           | `go.opentelemetry.io/otel/trace` | v1.44.0          | 🟢 📦 SUB-MODULE |
 | `flightrecorder` | `Middleware[T]()`, `WithFlightRecorder[T]()`, `WithFlightRecorderRecorder[T]()`, `Capture()`, `CaptureToWriter()` | _(stdlib `runtime/trace`)_       | Go 1.25+         | 🟢 📦 SUB-MODULE |
 | `lint`           | `Detect()`, `AllRules()`, `NewRegistry()`, `provider.Register()`                                                  | `go-finding` + `go-linter-sdk`   | v1.15.1 / v0.4.0 | 🟢 📦 SUB-MODULE |
-| `schema`         | `FromConfig`, `FromCLI`, `Emit`, `Marshal` (JSON Schema 2020-12)                                                   | _(stdlib + cmdguard core)_       | Go 1.27          | 🟢 📦 SUB-MODULE |
+| `schema`         | `FromConfig`, `FromCLI`, `Emit`, `Marshal` (JSON Schema 2020-12)                                                  | _(stdlib + cmdguard core)_       | Go 1.27          | 🟢 📦 SUB-MODULE |
 
 ### Usage Linter (`lint`)
 
@@ -417,16 +417,16 @@ built with cmdguard v4 itself).
 
 ## Testing & Quality
 
-| Metric                      | Value           | Status  | Notes                                                                                                          |
-| --------------------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| Core coverage               | ~90%            | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 90.4% verified                                                      |
-| Test functions              | ~680            | 🟢 Good | 462 v4-core + 114 sub-modules + 104 examples/benchmarks/tests + testutil                                                           |
-| Benchmarks                  | 29              | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
-| Fuzz targets                | 8               | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
+| Metric                      | Value            | Status  | Notes                                                                                                          |
+| --------------------------- | ---------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| Core coverage               | ~90%             | 🟢 Good | `pkg/cmdguard/v4` (includes KoanfLoader) — 90.4% verified                                                      |
+| Test functions              | ~680             | 🟢 Good | 462 v4-core + 114 sub-modules + 104 examples/benchmarks/tests + testutil                                       |
+| Benchmarks                  | 29               | 🟢 Good | 26 core + 3 flightrecorder                                                                                     |
+| Fuzz targets                | 8                | 🟢 Good | 7 core + 1 flightrecorder (sanitizeFilename)                                                                   |
 | Sub-module tests            | 114 across all 7 | 🟢 Good | flightrecorder 42, lint 46, schema 9, glamour 6, spinner 4, telemetry 4, prompts 3 (2026-11-07 count)          |
-| Lint issues                 | **0**           | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
-| `pkg/testutil` coverage     | 80.3%           | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                    |
-| `examples/taskctl` coverage | 85.9%           | 🟢 Good | Production composition (`run`/`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04) |
+| Lint issues                 | **0**            | 🟢 Good | All 38 prior issues fixed (noinlineerr, ireturn, wrapcheck, etc.) or excluded by design (matching v2 patterns) |
+| `pkg/testutil` coverage     | 80.3%            | 🟢 Good | Assertion helpers incl. failure paths (verified 2026-10-04)                                                    |
+| `examples/taskctl` coverage | 85.9%            | 🟢 Good | Production composition (`run`/`buildApp`/`exportAuditLog`) + store-failure paths covered (verified 2026-10-04) |
 
 ---
 

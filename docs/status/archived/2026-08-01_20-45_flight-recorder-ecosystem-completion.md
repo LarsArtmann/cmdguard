@@ -33,46 +33,50 @@ lines. Two planned API variants (`CaptureToWriter`, `WithFlightRecorderRecorder`
 
 ## a) FULLY DONE (Working & Verified)
 
-| Item                                | Details                                                                                                                                                                                                      |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Item | Details |
+| ---- | ------- |
+
 <!-- check-rows:ledger -->
-| **CHANGELOG.md**                    | `[Unreleased]` → `### Added` entry for flight recorder sub-module                                                                                                                                            |
-| **FEATURES.md — Middleware table**  | `flightrecorder.Middleware[T]` row added as `📦 SUB-MODULE`                                                                                                                                                  |
-| **FEATURES.md — Sub-Modules table** | `flightrecorder` row added with API, dependency, version, status                                                                                                                                             |
-| **FEATURES.md — Metrics**           | Test count 467→500, benchmarks 26→29, fuzz 7→8, sub-module tests updated                                                                                                                                     |
-| **FEATURES.md — Sub-module count**  | "All 4" → "All 5" in two places                                                                                                                                                                              |
-| **README.md — Sub-modules section** | Table row + count updated ("four" → "five")                                                                                                                                                                  |
-| **README.md — Options table**       | `flightrecorder.WithFlightRecorder[T](cfg)` row added                                                                                                                                                        |
-| **README.md — Feature description** | Middleware row updated to mention flight recorder                                                                                                                                                            |
-| **docs/API.md**                     | Flight recorder example added to Middleware section                                                                                                                                                          |
-| **AGENTS.md — Package Guidelines**  | `flightrecorder` row added to table                                                                                                                                                                          |
-| **AGENTS.md — go.work comment**     | "5 modules" → "6 modules"                                                                                                                                                                                    |
-| **AGENTS.md — Lint Strategy**       | Exclusion count bumped with `paralleltest` path exclusion documented                                                                                                                                         |
-| **flightrecorder/README.md**        | Quick-start guide with config table, manual control, constraints                                                                                                                                             |
-| **example_test.go**                 | 4 godoc examples: `ExampleNew`, `ExampleDefaultConfig`, `ExampleWithFlightRecorder`, `ExampleMiddleware`                                                                                                     |
-| **recorder_bench_test.go**          | 3 benchmarks: `BenchmarkNew`, `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`                                                                                                                             |
-| **fuzz_test.go**                    | `FuzzSanitizeFilename` with safe-char + rune-count invariants (359K iterations, 0 failures)                                                                                                                  |
-| **Edge case tests**                 | `ErrAlreadyStarted` sentinel assertion, WriteTo-after-Stop, empty command name fallback, concurrent capture safety (10 goroutines)                                                                           |
-| **Error precedence test**           | `TestMiddleware_ErrorTakesPrecedenceOverSlow` — verifies error reason wins over slow when both conditions met                                                                                                |
-| **Bug fix: evaluateCapture**        | Reversed logic so error takes precedence over slow (was: slow overwrote error reason). Added explanatory comment.                                                                                            |
-| **Bug fix: timestamp collision**    | Changed format from `20060102-150405` to `20060102-150405.000000000` (nanosecond precision) so concurrent captures don't clobber each other                                                                  |
-| **`waitForFile` cleanup**           | Removed unused `timeout` parameter (was always `500ms`), inlined constant — fixes `unparam` lint                                                                                                             |
-| **WaitGroup.Go**                    | Migrated concurrent test from `wg.Add(1)` + `go func() { defer wg.Done(); ... }()` to `wg.Go(func() { ... })` — fixes `modernize` lint                                                                       |
-| **All verification passed**         | `nix fmt` (7 files formatted), `nix flake check` (all checks passed), root lint (0 issues), flightrecorder lint (0 issues), root tests with `-race` (all pass), flightrecorder tests with `-race` (all pass) |
-| **Coverage**                        | 94.6% (up from 91.0% in prior session)                                                                                                                                                                       |
+
+| **CHANGELOG.md** | `[Unreleased]` → `### Added` entry for flight recorder sub-module |
+| **FEATURES.md — Middleware table** | `flightrecorder.Middleware[T]` row added as `📦 SUB-MODULE` |
+| **FEATURES.md — Sub-Modules table** | `flightrecorder` row added with API, dependency, version, status |
+| **FEATURES.md — Metrics** | Test count 467→500, benchmarks 26→29, fuzz 7→8, sub-module tests updated |
+| **FEATURES.md — Sub-module count** | "All 4" → "All 5" in two places |
+| **README.md — Sub-modules section** | Table row + count updated ("four" → "five") |
+| **README.md — Options table** | `flightrecorder.WithFlightRecorder[T](cfg)` row added |
+| **README.md — Feature description** | Middleware row updated to mention flight recorder |
+| **docs/API.md** | Flight recorder example added to Middleware section |
+| **AGENTS.md — Package Guidelines** | `flightrecorder` row added to table |
+| **AGENTS.md — go.work comment** | "5 modules" → "6 modules" |
+| **AGENTS.md — Lint Strategy** | Exclusion count bumped with `paralleltest` path exclusion documented |
+| **flightrecorder/README.md** | Quick-start guide with config table, manual control, constraints |
+| **example_test.go** | 4 godoc examples: `ExampleNew`, `ExampleDefaultConfig`, `ExampleWithFlightRecorder`, `ExampleMiddleware` |
+| **recorder_bench_test.go** | 3 benchmarks: `BenchmarkNew`, `BenchmarkMiddleware_Overhead`, `BenchmarkCapture` |
+| **fuzz_test.go** | `FuzzSanitizeFilename` with safe-char + rune-count invariants (359K iterations, 0 failures) |
+| **Edge case tests** | `ErrAlreadyStarted` sentinel assertion, WriteTo-after-Stop, empty command name fallback, concurrent capture safety (10 goroutines) |
+| **Error precedence test** | `TestMiddleware_ErrorTakesPrecedenceOverSlow` — verifies error reason wins over slow when both conditions met |
+| **Bug fix: evaluateCapture** | Reversed logic so error takes precedence over slow (was: slow overwrote error reason). Added explanatory comment. |
+| **Bug fix: timestamp collision** | Changed format from `20060102-150405` to `20060102-150405.000000000` (nanosecond precision) so concurrent captures don't clobber each other |
+| **`waitForFile` cleanup** | Removed unused `timeout` parameter (was always `500ms`), inlined constant — fixes `unparam` lint |
+| **WaitGroup.Go** | Migrated concurrent test from `wg.Add(1)` + `go func() { defer wg.Done(); ... }()` to `wg.Go(func() { ... })` — fixes `modernize` lint |
+| **All verification passed** | `nix fmt` (7 files formatted), `nix flake check` (all checks passed), root lint (0 issues), flightrecorder lint (0 issues), root tests with `-race` (all pass), flightrecorder tests with `-race` (all pass) |
+| **Coverage** | 94.6% (up from 91.0% in prior session) |
 
 ---
 
 ## b) PARTIALLY DONE (Incomplete)
 
-| Item                              | What Exists                                                                  | What's Missing                                                                                                                                                                                                                      |
-| --------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item | What Exists | What's Missing |
+| ---- | ----------- | -------------- |
+
 <!-- check-rows:ledger -->
-| **README.md code example**        | `flightrecorder` import added to the import block                            | **Dead import** — the code below doesn't use `flightrecorder`. If a user copy-pastes the example, it won't compile (unused import). Should either add a `flightrecorder.WithFlightRecorder[Config](...)` call or remove the import. |
-| **docs/API.md**                   | Middleware code example added                                                | **No API reference section** — the prior report called for documenting `Recorder`, `Middleware`, `WithFlightRecorder`, `Config`, `CaptureReason` types and methods. Only a usage example was added, not a full reference.           |
-| **AGENTS.md exclusion count**     | Count bumped from `+ 1 godox` to `+ 1 godox + 1 paralleltest path exclusion` | The phrasing is awkward — the `paralleltest` exclusion is a path-level rule, not the same category as the per-file v4 exclusions or ireturn allow-list. Could be clearer.                                                           |
-| **`evaluateCapture` doc comment** | Logic fixed (error takes precedence over slow)                               | **Comment not updated** — still says "checks capture conditions and triggers a snapshot if warranted" without documenting the precedence rule. A reader has to read the code to understand the behavior.                            |
-| **Fuzz test**                     | `FuzzSanitizeFilename` passes with 359K iterations                           | Seed corpus only has 5 entries. No `testdata/fuzz/` directory persisted. Not integrated into any CI automation.                                                                                                                     |
+
+| **README.md code example** | `flightrecorder` import added to the import block | **Dead import** — the code below doesn't use `flightrecorder`. If a user copy-pastes the example, it won't compile (unused import). Should either add a `flightrecorder.WithFlightRecorder[Config](...)` call or remove the import. |
+| **docs/API.md** | Middleware code example added | **No API reference section** — the prior report called for documenting `Recorder`, `Middleware`, `WithFlightRecorder`, `Config`, `CaptureReason` types and methods. Only a usage example was added, not a full reference. |
+| **AGENTS.md exclusion count** | Count bumped from `+ 1 godox` to `+ 1 godox + 1 paralleltest path exclusion` | The phrasing is awkward — the `paralleltest` exclusion is a path-level rule, not the same category as the per-file v4 exclusions or ireturn allow-list. Could be clearer. |
+| **`evaluateCapture` doc comment** | Logic fixed (error takes precedence over slow) | **Comment not updated** — still says "checks capture conditions and triggers a snapshot if warranted" without documenting the precedence rule. A reader has to read the code to understand the behavior. |
+| **Fuzz test** | `FuzzSanitizeFilename` passes with 359K iterations | Seed corpus only has 5 entries. No `testdata/fuzz/` directory persisted. Not integrated into any CI automation. |
 
 ---
 
@@ -90,7 +94,7 @@ lines. Two planned API variants (`CaptureToWriter`, `WithFlightRecorderRecorder`
 5. ~~**TODO_LIST.md** — Not updated. No entry for flight recorder as completed work.~~ done (tracked in CHANGELOG [Unreleased])
 6. ~~**ROADMAP.md** — Not updated. No mention of flight recorder as a shipped feature.~~ done (enhancement ideas in ROADMAP)
 7. ~~**FEATURES.md line 330** — Still says "matching v3 API signatures" — stale reference from the v3→v4 migration. Should say v4.~~ done at `ba818e3`
-~~8. **No `go tool trace` validation** — Trace files are verified to be non-empty but never confirmed parseable by `go tool trace`. — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation; its era's TODO_LIST D10 is gone)
+   ~~8. **No `go tool trace` validation** — Trace files are verified to be non-empty but never confirmed parseable by `go tool trace`. — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation; its era's TODO_LIST D10 is gone)
 
 ### Low Priority — Polish
 
@@ -218,12 +222,12 @@ mocking, but it means the "another flight recorder is already active" scenario i
 9. ~~**Add full API reference to `docs/API.md`** (all exported types, methods, errors)~~ done at `ba818e3`
 10. ~~**Update `TODO_LIST.md`** with completed work + deferred items~~ done
 11. ~~**Update `ROADMAP.md`** with flight recorder as shipped feature~~ done
-~~12. **Test `go tool trace` parseability** — Shell out and verify the trace format — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
-~~13. Add test for filename collision — Mock timestamps, verify behavior — _partially done (nanosecond timestamps reduce collision)_~~ p:covered by the sub-module test suite
-~~14. Add `Sync()` method — Flush pending captures without stopping — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
-~~15. Add seed corpus to `testdata/fuzz/` — Persist interesting fuzz inputs~~ v:done ba818e3 — FuzzSanitizeFilename seeds
-~~16. Cover the `Start()` runtime-error path — Test with a pre-started external recorder — _done at `ba818e3` (StartFailure test)_~~ p:covered by the 48-test suite (96.1% coverage)
-~~17. Improve middleware error visibility — Don't silently swallow `Start()` failures — _in ROADMAP_~~ p:addressed in the backlog pass
+    ~~12. **Test `go tool trace` parseability** — Shell out and verify the trace format — _TODO_LIST D10_~~ → ROADMAP Flight Recorder Enhancements (go tool trace parse validation)
+    ~~13. Add test for filename collision — Mock timestamps, verify behavior — _partially done (nanosecond timestamps reduce collision)_~~ p:covered by the sub-module test suite
+    ~~14. Add `Sync()` method — Flush pending captures without stopping — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
+    ~~15. Add seed corpus to `testdata/fuzz/` — Persist interesting fuzz inputs~~ v:done ba818e3 — FuzzSanitizeFilename seeds
+    ~~16. Cover the `Start()` runtime-error path — Test with a pre-started external recorder — _done at `ba818e3` (StartFailure test)_~~ p:covered by the 48-test suite (96.1% coverage)
+    ~~17. Improve middleware error visibility — Don't silently swallow `Start()` failures — _in ROADMAP_~~ p:addressed in the backlog pass
 
 ### P2 — Nice to Have (Enhancement)
 
@@ -298,24 +302,28 @@ these as indirect deps). Should I investigate whether the flightrecorder go.mod 
 
 ## Session Metrics
 
-| Metric                  | Value                                                                                                                                                |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Metric | Value |
+| ------ | ----- |
+
 <!-- check-rows:ledger -->
-| Files created           | 4 (`example_test.go`, `recorder_bench_test.go`, `fuzz_test.go`, `README.md`)                                                                         |
-| Files modified          | 7 (`CHANGELOG.md`, `FEATURES.md`, `README.md`, `docs/API.md`, `AGENTS.md`, `recorder.go`, `middleware.go`, `recorder_test.go`, `middleware_test.go`) |
-| Test functions added    | 5 (`ErrAlreadyStarted`, `WriteTo-after-Stop`, `EmptyCommandName`, `ConcurrentCapture`, `ErrorPrecedence`)                                            |
-| Example functions added | 4 (`ExampleNew`, `ExampleDefaultConfig`, `ExampleWithFlightRecorder`, `ExampleMiddleware`)                                                           |
-| Benchmarks added        | 3 (`BenchmarkNew`, `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`)                                                                               |
-| Fuzz targets added      | 1 (`FuzzSanitizeFilename`)                                                                                                                           |
-| Bugs fixed              | 2 (evaluateCapture precedence, timestamp collision)                                                                                                  |
-| Coverage change         | 91.0% → 94.6% (+3.6%)                                                                                                                                |
-| Lint issues             | 0                                                                                                                                                    |
-| Race conditions         | 0                                                                                                                                                    |
-| `nix fmt`               | 7 files formatted                                                                                                                                    |
-| `nix flake check`       | all checks passed                                                                                                                                    |
-| Fuzz iterations         | 359,091 (0 failures)                                                                                                                                 |
+
+| Files created | 4 (`example_test.go`, `recorder_bench_test.go`, `fuzz_test.go`, `README.md`) |
+| Files modified | 7 (`CHANGELOG.md`, `FEATURES.md`, `README.md`, `docs/API.md`, `AGENTS.md`, `recorder.go`, `middleware.go`, `recorder_test.go`, `middleware_test.go`) |
+| Test functions added | 5 (`ErrAlreadyStarted`, `WriteTo-after-Stop`, `EmptyCommandName`, `ConcurrentCapture`, `ErrorPrecedence`) |
+| Example functions added | 4 (`ExampleNew`, `ExampleDefaultConfig`, `ExampleWithFlightRecorder`, `ExampleMiddleware`) |
+| Benchmarks added | 3 (`BenchmarkNew`, `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`) |
+| Fuzz targets added | 1 (`FuzzSanitizeFilename`) |
+| Bugs fixed | 2 (evaluateCapture precedence, timestamp collision) |
+| Coverage change | 91.0% → 94.6% (+3.6%) |
+| Lint issues | 0 |
+| Race conditions | 0 |
+| `nix fmt` | 7 files formatted |
+| `nix flake check` | all checks passed |
+| Fuzz iterations | 359,091 (0 failures) |
+
 <!-- check-rows:ledger -->
-| Dead imports introduced | 1 (README.md code example)                                                                                                                           |
+
+| Dead imports introduced | 1 (README.md code example) |
 
 ---
 

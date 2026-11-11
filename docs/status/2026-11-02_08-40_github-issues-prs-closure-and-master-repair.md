@@ -55,22 +55,22 @@ Follow-up directive: "fix/git commit!" (repair the diverged/broken git state), t
 
 1. Push the /tmp/fix-master repair (re-verify under lower load or trust the 5-line revert + CI) and confirm master CI green.
 2. Reconcile local master (stash → rebase-skip → pop) and re-apply the parallel session's cli.go WIP as unstaged patch (see b2) so their session is whole.
-~~3. Remove /tmp/fix-master worktree.~~ **Won't implement — ephemeral /tmp state, nothing to do in the repo.**
-4. Cut v4.2.1 (CHANGELOG [4.2.1] from Unreleased Fixed; tag; proxy + scratch-consumer verify; GitHub release) per go-release skill.
-5. After v4.2.1: bump go-credentials-store, drop its max(ExitCode,1) workaround.
-6. Add CHANGELOG [Unreleased] entries for PR16/PR18 dependency bumps.
-7. lint/v0.2.0 release train (pre-existing P6: restore real pin + version-scoped replace before tagging).
-8. Pareto plan M09/M10/M11 scheduling (v5 scaffold at M11 per owner decision).
-9. Test: --output flag across repeated Executes (value + spec.outputFormat self-heal path).
-10. Test: hidden stringSlice flag reset preserves Hidden/Deprecated through the transplant.
-11. Close the documented caveat: extend transplant reset to other appending kinds (intSlice etc.) for raw cobra escape-hatch flags.
-12. Benchmark resetFlagStateForReuse overhead (tree walk per Execute).
-13. Check docs/ERROR_REFERENCE.md covers the ExitCode-zero rule; extend if not.
-14. Verify the parallel session's eventual commit of the config-truth workstream re-adds the cli.go hunks cleanly (no duplicate field declarations).
-15. Confirm the untracked release status report (docs/status/2026-11-02_04-15_*) lands via the daemon.
-16. Consider branch protection / required CI on master so direct pushes cannot skip verification (this session pushed to master from worktrees).
-17. Revisit Dependabot config: root + 4 sub-modules needed coordinated settles; consider a post-merge auto-tidy workflow so submodule-smoke does not gate on manual completion.
-18. Consider a tiny "shared-tree commit protocol" note in AGENTS.md (hunk-audit rule from e1) once the parallel session lands.
+   ~~3. Remove /tmp/fix-master worktree.~~ **Won't implement — ephemeral /tmp state, nothing to do in the repo.**
+3. Cut v4.2.1 (CHANGELOG [4.2.1] from Unreleased Fixed; tag; proxy + scratch-consumer verify; GitHub release) per go-release skill.
+4. After v4.2.1: bump go-credentials-store, drop its max(ExitCode,1) workaround.
+5. Add CHANGELOG [Unreleased] entries for PR16/PR18 dependency bumps.
+6. lint/v0.2.0 release train (pre-existing P6: restore real pin + version-scoped replace before tagging).
+7. Pareto plan M09/M10/M11 scheduling (v5 scaffold at M11 per owner decision).
+8. Test: --output flag across repeated Executes (value + spec.outputFormat self-heal path).
+9. Test: hidden stringSlice flag reset preserves Hidden/Deprecated through the transplant.
+10. Close the documented caveat: extend transplant reset to other appending kinds (intSlice etc.) for raw cobra escape-hatch flags.
+11. Benchmark resetFlagStateForReuse overhead (tree walk per Execute).
+12. Check docs/ERROR_REFERENCE.md covers the ExitCode-zero rule; extend if not.
+13. Verify the parallel session's eventual commit of the config-truth workstream re-adds the cli.go hunks cleanly (no duplicate field declarations).
+14. Confirm the untracked release status report (docs/status/2026-11-02_04-15_*) lands via the daemon.
+15. Consider branch protection / required CI on master so direct pushes cannot skip verification (this session pushed to master from worktrees).
+16. Revisit Dependabot config: root + 4 sub-modules needed coordinated settles; consider a post-merge auto-tidy workflow so submodule-smoke does not gate on manual completion.
+17. Consider a tiny "shared-tree commit protocol" note in AGENTS.md (hunk-audit rule from e1) once the parallel session lands.
 
 ## g) Questions I cannot answer myself
 

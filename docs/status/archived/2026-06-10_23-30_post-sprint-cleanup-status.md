@@ -54,6 +54,7 @@
 ### Coverage — 15 functions still at 0%
 
 <!-- check-rows:ledger -->
+
 | #  | Function                     | File                  | Why 0%                                                                                      | Effort |
 | -- | ---------------------------- | --------------------- | ------------------------------------------------------------------------------------------- | ------ |
 | 1  | `WithAuditLogGroupID`        | auditlog.go:43        | Simple option, no test yet                                                                  | 2min   |
@@ -80,40 +81,40 @@
 
 ### Type Model Architecture
 
-| # | Task                                                                                                  | Category     | Impact | Effort | Breaking? |
-| - | ----------------------------------------------------------------------------------------------------- | ------------ | ------ | ------ | --------- |
-| ~~1~~ | ~~Make `Enum` generic (`Enum[T ~string]`) — eliminates 4 method re-declarations per derived type~~ **Won't implement — never adopted — Enum remains concrete struct in v4 (types_enum.go).** | ~~Architecture~~ | ~~HIGH~~ | ~~30min~~ | ~~YES (v3)~~ |
-| ~~2~~ | ~~Extract `IsEmpty()` interface — `type Emptyable interface { IsEmpty() bool }` for generic constraints~~ **Won't implement — never adopted — no shared Emptyable interface in v4.** | ~~Architecture~~ | ~~MEDIUM~~ | ~~15min~~ | ~~No~~ |
-| ~~3~~ | ~~Extract `TextMarshalable` / `TextUnmarshalable` interfaces for type constraints~~ **Won't implement — never adopted — no TextMarshalable/TextUnmarshalable interfaces in v4.** | ~~Architecture~~ | ~~LOW~~ | ~~10min~~ | ~~No~~ |
-| ~~4~~ | ~~Consolidate LogLevel/LogFormat pattern — they share identical method boilerplate~~ **Won't implement — never consolidated — per-type methods remain in v4 (types_log.go).** | ~~DRY~~ | ~~MEDIUM~~ | ~~20min~~ | ~~No~~ |
+| #     | Task                                                                                                                                                                                         | Category         | Impact     | Effort    | Breaking?    |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ---------- | --------- | ------------ |
+| ~~1~~ | ~~Make `Enum` generic (`Enum[T ~string]`) — eliminates 4 method re-declarations per derived type~~ **Won't implement — never adopted — Enum remains concrete struct in v4 (types_enum.go).** | ~~Architecture~~ | ~~HIGH~~   | ~~30min~~ | ~~YES (v3)~~ |
+| ~~2~~ | ~~Extract `IsEmpty()` interface — `type Emptyable interface { IsEmpty() bool }` for generic constraints~~ **Won't implement — never adopted — no shared Emptyable interface in v4.**         | ~~Architecture~~ | ~~MEDIUM~~ | ~~15min~~ | ~~No~~       |
+| ~~3~~ | ~~Extract `TextMarshalable` / `TextUnmarshalable` interfaces for type constraints~~ **Won't implement — never adopted — no TextMarshalable/TextUnmarshalable interfaces in v4.**             | ~~Architecture~~ | ~~LOW~~    | ~~10min~~ | ~~No~~       |
+| ~~4~~ | ~~Consolidate LogLevel/LogFormat pattern — they share identical method boilerplate~~ **Won't implement — never consolidated — per-type methods remain in v4 (types_log.go).**                | ~~DRY~~          | ~~MEDIUM~~ | ~~20min~~ | ~~No~~       |
 
 ### Library Improvements
 
-| # | Task                                                                                | Category | Impact | Effort |
-| - | ----------------------------------------------------------------------------------- | -------- | ------ | ------ |
-| ~~5~~ | ~~Use `go-valid` or similar for validator registration pattern instead of hand-rolled~~ **Won't implement — never adopted — hand-rolled validator registry remains (flags_validate.go).** | ~~Library~~ | ~~LOW~~ | ~~60min~~ |
-| ~~6~~ | ~~Consider `koanf` for config file loading instead of hand-rolled loaders~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Library~~ | ~~MEDIUM~~ | ~~120min~~ |
-| ~~7~~ | ~~Replace `muesli/mango`+`muesli/roff` with a simpler man page solution (or remove)~~ **Superseded — man-page generation removed in v4 (mango indirect only).** | ~~Cleanup~~ | ~~LOW~~ | ~~30min~~ |
+| #     | Task                                                                                                                                                                                      | Category    | Impact     | Effort     |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------- | ---------- |
+| ~~5~~ | ~~Use `go-valid` or similar for validator registration pattern instead of hand-rolled~~ **Won't implement — never adopted — hand-rolled validator registry remains (flags_validate.go).** | ~~Library~~ | ~~LOW~~    | ~~60min~~  |
+| ~~6~~ | ~~Consider `koanf` for config file loading instead of hand-rolled loaders~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                                                             | ~~Library~~ | ~~MEDIUM~~ | ~~120min~~ |
+| ~~7~~ | ~~Replace `muesli/mango`+`muesli/roff` with a simpler man page solution (or remove)~~ **Superseded — man-page generation removed in v4 (mango indirect only).**                           | ~~Cleanup~~ | ~~LOW~~    | ~~30min~~  |
 
 ### Code Quality
 
-| #  | Task                                                          | Category | Impact | Effort |
-| -- | ------------------------------------------------------------- | -------- | ------ | ------ |
-| ~~8~~  | ~~Add test for `WithAuditLogGroupID` (0%)~~ **Superseded — symbol gone — auditlog options rewritten (WithAuditMiddleware in v4).** | ~~Coverage~~ | ~~LOW~~ | ~~2min~~ |
-| ~~9~~  | ~~Add test for `WithDoctorLong` (0%)~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor covered by doctor_test.go.** | ~~Coverage~~ | ~~LOW~~ | ~~2min~~ |
-| ~~10~~ | ~~Add test for `RegisterValidator` (0%)~~ done — flags_validate_test.go covers RegisterValidator | ~~Coverage~~ | ~~LOW~~ | ~~3min~~ |
+| #      | Task                                                                                                                                                                        | Category     | Impact  | Effort   |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------- | -------- |
+| ~~8~~  | ~~Add test for `WithAuditLogGroupID` (0%)~~ **Superseded — symbol gone — auditlog options rewritten (WithAuditMiddleware in v4).**                                          | ~~Coverage~~ | ~~LOW~~ | ~~2min~~ |
+| ~~9~~  | ~~Add test for `WithDoctorLong` (0%)~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor covered by doctor_test.go.**                                       | ~~Coverage~~ | ~~LOW~~ | ~~2min~~ |
+| ~~10~~ | ~~Add test for `RegisterValidator` (0%)~~ done — flags_validate_test.go covers RegisterValidator                                                                            | ~~Coverage~~ | ~~LOW~~ | ~~3min~~ |
 | ~~11~~ | ~~Add test for `validateNonEmpty` via `validate:"nonempty"` tag~~ **Superseded — rewritten through v3/v4 — validateNonEmpty now flags_validate.go:453 via tag validation.** | ~~Coverage~~ | ~~LOW~~ | ~~3min~~ |
-| ~~12~~ | ~~Add test for `NewManPage` standalone factory (0%)~~ **Superseded — man-page generation removed in v4.** | ~~Coverage~~ | ~~LOW~~ | ~~5min~~ |
-| ~~13~~ | ~~Add direct test for `WithConfigFileLoader` (0%)~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~Coverage~~ | ~~LOW~~ | ~~5min~~ |
+| ~~12~~ | ~~Add test for `NewManPage` standalone factory (0%)~~ **Superseded — man-page generation removed in v4.**                                                                   | ~~Coverage~~ | ~~LOW~~ | ~~5min~~ |
+| ~~13~~ | ~~Add direct test for `WithConfigFileLoader` (0%)~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**                                      | ~~Coverage~~ | ~~LOW~~ | ~~5min~~ |
 
 ### Documentation
 
-| #  | Task                                                                                                                 | Category | Impact | Effort |
-| -- | -------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------ |
-| ~~14~~ | ~~ADR-001 gap: `WithFangErrorHandler` and `WithFangColorScheme` are integrated but ADR says "gaps remain" — update ADR~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.** | ~~Docs~~ | ~~LOW~~ | ~~3min~~ |
-| ~~15~~ | ~~Add output format section to `docs/API.md` (16 formats with examples)~~ **Superseded — docs/API.md removed — FEATURES.md Rich Output section documents 16 formats.** | ~~Docs~~ | ~~MEDIUM~~ | ~~10min~~ |
-| ~~16~~ | ~~Add Prompt API to `docs/API.md`~~ **Superseded — docs/API.md removed — prompts documented in FEATURES.md sub-module table.** | ~~Docs~~ | ~~MEDIUM~~ | ~~5min~~ |
-| ~~17~~ | ~~Add ManPage API to `docs/API.md`~~ **Superseded — docs/API.md removed — man-page generation removed in v4.** | ~~Docs~~ | ~~MEDIUM~~ | ~~5min~~ |
+| #      | Task                                                                                                                                                                                                                 | Category | Impact     | Effort    |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- | --------- |
+| ~~14~~ | ~~ADR-001 gap: `WithFangErrorHandler` and `WithFangColorScheme` are integrated but ADR says "gaps remain" — update ADR~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.** | ~~Docs~~ | ~~LOW~~    | ~~3min~~  |
+| ~~15~~ | ~~Add output format section to `docs/API.md` (16 formats with examples)~~ **Superseded — docs/API.md removed — FEATURES.md Rich Output section documents 16 formats.**                                               | ~~Docs~~ | ~~MEDIUM~~ | ~~10min~~ |
+| ~~16~~ | ~~Add Prompt API to `docs/API.md`~~ **Superseded — docs/API.md removed — prompts documented in FEATURES.md sub-module table.**                                                                                       | ~~Docs~~ | ~~MEDIUM~~ | ~~5min~~  |
+| ~~17~~ | ~~Add ManPage API to `docs/API.md`~~ **Superseded — docs/API.md removed — man-page generation removed in v4.**                                                                                                       | ~~Docs~~ | ~~MEDIUM~~ | ~~5min~~  |
 
 ---
 
@@ -166,33 +167,33 @@
 
 Sorted by **Impact × (1/Effort)** — highest ROI first:
 
-| #  | Task                                                                       | Impact | Effort | Category     |
-| -- | -------------------------------------------------------------------------- | ------ | ------ | ------------ |
-| ~~1~~  | ~~Fix validateEmail/validateURL double-wrapping~~ done — resolved — single-wrap delegation in v4 (flags_validate.go:238) | ~~HIGH~~ | ~~3min~~ | ~~Code quality~~ |
-| ~~2~~  | ~~Add test for `WithAuditLogGroupID`~~ **Superseded — symbol gone — auditlog options rewritten (WithAuditMiddleware in v4).** | ~~LOW~~ | ~~2min~~ | ~~Coverage~~ |
-| ~~3~~  | ~~Add test for `WithDoctorLong`~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor_test.go.** | ~~LOW~~ | ~~2min~~ | ~~Coverage~~ |
-| ~~4~~  | ~~Add test for `RegisterValidator`~~ done — flags_validate_test.go covers RegisterValidator | ~~LOW~~ | ~~3min~~ | ~~Coverage~~ |
-| ~~5~~  | ~~Add test for `validateNonEmpty` tag~~ **Superseded — rewritten through v3/v4 — validateNonEmpty at flags_validate.go:453.** | ~~LOW~~ | ~~3min~~ | ~~Coverage~~ |
-| ~~6~~  | ~~Add test for `NewManPage`~~ **Superseded — man-page generation removed in v4.** | ~~LOW~~ | ~~5min~~ | ~~Coverage~~ |
-| ~~7~~  | ~~Add test for `WithConfigFileLoader` direct~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~LOW~~ | ~~5min~~ | ~~Coverage~~ |
-| ~~8~~  | ~~Update ADR-001 (fang gaps are now closed)~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.** | ~~LOW~~ | ~~3min~~ | ~~Docs~~ |
-| ~~9~~  | ~~Add output formats section to docs/API.md~~ **Superseded — docs/API.md removed — FEATURES.md documents 16 formats.** | ~~MEDIUM~~ | ~~10min~~ | ~~Docs~~ |
-| ~~10~~ | ~~Add Prompt API to docs/API.md~~ **Superseded — docs/API.md removed — prompts in FEATURES.md.** | ~~MEDIUM~~ | ~~5min~~ | ~~Docs~~ |
-| ~~11~~ | ~~Add ManPage API to docs/API.md~~ **Superseded — docs/API.md removed — man-page generation removed in v4.** | ~~MEDIUM~~ | ~~5min~~ | ~~Docs~~ |
-| ~~12~~ | ~~Extract `Emptyable` interface~~ **Won't implement — never adopted — no shared Emptyable interface in v4.** | ~~MEDIUM~~ | ~~15min~~ | ~~Architecture~~ |
-| ~~13~~ | ~~Resolve `samber-do-auditlog` replace directive~~ done — resolved — published v0.12.1 from proxy; replace removed | ~~MEDIUM~~ | ~~15min~~ | ~~Dependency~~ |
-| ~~14~~ | ~~Consolidate LogLevel/LogFormat boilerplate~~ **Won't implement — never consolidated — per-type methods in v4 (types_log.go).** | ~~MEDIUM~~ | ~~20min~~ | ~~DRY~~ |
-| ~~15~~ | ~~Remove `IsExecutable()` deprecated method (v3)~~ done — removed — no IsExecutable in v4 | ~~LOW~~ | ~~5min~~ | ~~Cleanup~~ |
-| ~~16~~ | ~~Remove unused sentinels: `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs`~~ done — removed — CHANGELOG 3.0.0 (ErrNoFlags/ErrTooFewArgs/ErrTooManyArgs) | ~~LOW~~ | ~~5min~~ | ~~Cleanup~~ |
-| ~~17~~ | ~~Add `FormatRequiresTypedData` error test~~ done — ErrFormatRequiresTypedData ships (errors.go:40); tested (output_test.go:215) | ~~LOW~~ | ~~5min~~ | ~~Coverage~~ |
-| ~~18~~ | ~~Document `ValidationMode` enum in docs/API.md~~ done — ValidationMode ships (v4 cli.go:38); documented in FEATURES/AGENTS | ~~MEDIUM~~ | ~~5min~~ | ~~Docs~~ |
-| ~~19~~ | ~~Add `LoaderForPath` usage example to docs~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~LOW~~ | ~~5min~~ | ~~Docs~~ |
-| ~~20~~ | ~~Consider extracting `go-output` format registration into a helper function~~ **Superseded — superseded — output.go rewritten via go-output registries (2026-06-11_09-15).** | ~~MEDIUM~~ | ~~15min~~ | ~~DRY~~ |
-| ~~21~~ | ~~Add CI workflow for `govulncheck`~~ **Won't implement — never added — govulncheck run manually (TODO_LIST S2); CI has test/lint/nix.** | ~~HIGH~~ | ~~15min~~ | ~~Security~~ |
-| ~~22~~ | ~~Add CI workflow for `gosec`~~ **Won't implement — never added — CI has test/lint/nix-check/codecov only.** | ~~MEDIUM~~ | ~~15min~~ | ~~Security~~ |
-| ~~23~~ | ~~Publish `samber-do-auditlog` properly (remove replace)~~ done — published — samber-do-auditlog v0.12.1 from proxy | ~~MEDIUM~~ | ~~30min~~ | ~~Dependency~~ |
-| ~~24~~ | ~~Make Enum generic (v3 breaking)~~ **Won't implement — never adopted — Enum concrete in v4 (types_enum.go).** | ~~HIGH~~ | ~~30min~~ | ~~Architecture~~ |
-| ~~25~~ | ~~Replace hand-rolled config loading with koanf~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~MEDIUM~~ | ~~120min~~ | ~~Architecture~~ |
+| #      | Task                                                                                                                                                                          | Impact     | Effort     | Category         |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- | ---------------- |
+| ~~1~~  | ~~Fix validateEmail/validateURL double-wrapping~~ done — resolved — single-wrap delegation in v4 (flags_validate.go:238)                                                      | ~~HIGH~~   | ~~3min~~   | ~~Code quality~~ |
+| ~~2~~  | ~~Add test for `WithAuditLogGroupID`~~ **Superseded — symbol gone — auditlog options rewritten (WithAuditMiddleware in v4).**                                                 | ~~LOW~~    | ~~2min~~   | ~~Coverage~~     |
+| ~~3~~  | ~~Add test for `WithDoctorLong`~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor_test.go.**                                                                | ~~LOW~~    | ~~2min~~   | ~~Coverage~~     |
+| ~~4~~  | ~~Add test for `RegisterValidator`~~ done — flags_validate_test.go covers RegisterValidator                                                                                   | ~~LOW~~    | ~~3min~~   | ~~Coverage~~     |
+| ~~5~~  | ~~Add test for `validateNonEmpty` tag~~ **Superseded — rewritten through v3/v4 — validateNonEmpty at flags_validate.go:453.**                                                 | ~~LOW~~    | ~~3min~~   | ~~Coverage~~     |
+| ~~6~~  | ~~Add test for `NewManPage`~~ **Superseded — man-page generation removed in v4.**                                                                                             | ~~LOW~~    | ~~5min~~   | ~~Coverage~~     |
+| ~~7~~  | ~~Add test for `WithConfigFileLoader` direct~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**                                             | ~~LOW~~    | ~~5min~~   | ~~Coverage~~     |
+| ~~8~~  | ~~Update ADR-001 (fang gaps are now closed)~~ **Superseded — fang options shipped (cli_options.go:96,146); ADR refreshed through v3/v4.**                                     | ~~LOW~~    | ~~3min~~   | ~~Docs~~         |
+| ~~9~~  | ~~Add output formats section to docs/API.md~~ **Superseded — docs/API.md removed — FEATURES.md documents 16 formats.**                                                        | ~~MEDIUM~~ | ~~10min~~  | ~~Docs~~         |
+| ~~10~~ | ~~Add Prompt API to docs/API.md~~ **Superseded — docs/API.md removed — prompts in FEATURES.md.**                                                                              | ~~MEDIUM~~ | ~~5min~~   | ~~Docs~~         |
+| ~~11~~ | ~~Add ManPage API to docs/API.md~~ **Superseded — docs/API.md removed — man-page generation removed in v4.**                                                                  | ~~MEDIUM~~ | ~~5min~~   | ~~Docs~~         |
+| ~~12~~ | ~~Extract `Emptyable` interface~~ **Won't implement — never adopted — no shared Emptyable interface in v4.**                                                                  | ~~MEDIUM~~ | ~~15min~~  | ~~Architecture~~ |
+| ~~13~~ | ~~Resolve `samber-do-auditlog` replace directive~~ done — resolved — published v0.12.1 from proxy; replace removed                                                            | ~~MEDIUM~~ | ~~15min~~  | ~~Dependency~~   |
+| ~~14~~ | ~~Consolidate LogLevel/LogFormat boilerplate~~ **Won't implement — never consolidated — per-type methods in v4 (types_log.go).**                                              | ~~MEDIUM~~ | ~~20min~~  | ~~DRY~~          |
+| ~~15~~ | ~~Remove `IsExecutable()` deprecated method (v3)~~ done — removed — no IsExecutable in v4                                                                                     | ~~LOW~~    | ~~5min~~   | ~~Cleanup~~      |
+| ~~16~~ | ~~Remove unused sentinels: `ErrNoFlags`, `ErrTooFewArgs`, `ErrTooManyArgs`~~ done — removed — CHANGELOG 3.0.0 (ErrNoFlags/ErrTooFewArgs/ErrTooManyArgs)                       | ~~LOW~~    | ~~5min~~   | ~~Cleanup~~      |
+| ~~17~~ | ~~Add `FormatRequiresTypedData` error test~~ done — ErrFormatRequiresTypedData ships (errors.go:40); tested (output_test.go:215)                                              | ~~LOW~~    | ~~5min~~   | ~~Coverage~~     |
+| ~~18~~ | ~~Document `ValidationMode` enum in docs/API.md~~ done — ValidationMode ships (v4 cli.go:38); documented in FEATURES/AGENTS                                                   | ~~MEDIUM~~ | ~~5min~~   | ~~Docs~~         |
+| ~~19~~ | ~~Add `LoaderForPath` usage example to docs~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**                                              | ~~LOW~~    | ~~5min~~   | ~~Docs~~         |
+| ~~20~~ | ~~Consider extracting `go-output` format registration into a helper function~~ **Superseded — superseded — output.go rewritten via go-output registries (2026-06-11_09-15).** | ~~MEDIUM~~ | ~~15min~~  | ~~DRY~~          |
+| ~~21~~ | ~~Add CI workflow for `govulncheck`~~ **Won't implement — never added — govulncheck run manually (TODO_LIST S2); CI has test/lint/nix.**                                      | ~~HIGH~~   | ~~15min~~  | ~~Security~~     |
+| ~~22~~ | ~~Add CI workflow for `gosec`~~ **Won't implement — never added — CI has test/lint/nix-check/codecov only.**                                                                  | ~~MEDIUM~~ | ~~15min~~  | ~~Security~~     |
+| ~~23~~ | ~~Publish `samber-do-auditlog` properly (remove replace)~~ done — published — samber-do-auditlog v0.12.1 from proxy                                                           | ~~MEDIUM~~ | ~~30min~~  | ~~Dependency~~   |
+| ~~24~~ | ~~Make Enum generic (v3 breaking)~~ **Won't implement — never adopted — Enum concrete in v4 (types_enum.go).**                                                                | ~~HIGH~~   | ~~30min~~  | ~~Architecture~~ |
+| ~~25~~ | ~~Replace hand-rolled config loading with koanf~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                                                                           | ~~MEDIUM~~ | ~~120min~~ | ~~Architecture~~ |
 
 ---
 
@@ -223,6 +224,7 @@ If we make it generic (`type Enum[T ~string] struct {...}`):
 ## Metrics Summary
 
 <!-- check-rows:ledger -->
+
 | Metric                | Value                                                                         |
 | --------------------- | ----------------------------------------------------------------------------- |
 | Tests                 | 395 passing                                                                   |

@@ -1,6 +1,7 @@
 # CUE Adoption Analysis: Session Status and Self-Review
 
 <!-- check-rows:ledger -->
+
 | Field        | Value                                                                   |
 | ------------ | ----------------------------------------------------------------------- |
 | Date         | 2026-11-02 04:52 CET (Monday)                                           |
@@ -306,6 +307,7 @@ Honest list of what was actually wrong:
 ## 12. Evidence log
 
 <!-- check-rows:ledger -->
+
 | Check                                                    | Result                                                               |
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
 | `grep -rni cue` over `how-to-golang/references`          | no matches, policy is silent                                         |

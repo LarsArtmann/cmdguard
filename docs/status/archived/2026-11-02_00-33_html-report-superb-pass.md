@@ -58,6 +58,7 @@ superb — and the pass itself surfaced lessons, listed below.**
 ## a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | #  | Item                                             | Evidence                                                      |
 | -- | ------------------------------------------------ | ------------------------------------------------------------- |
 | 1  | Kit skill + full guide read before acting        | `html-report-kit/SKILL.md`, `references/html-output-guide.md` |
@@ -77,6 +78,7 @@ superb — and the pass itself surfaced lessons, listed below.**
 ## b) PARTIALLY DONE
 
 <!-- check-rows:ledger -->
+
 | Item                                    | What remains                                                                                                                  |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | "Superb" verification of the report     | Structural + factual verification complete; **visual render verification missing** (never opened in a browser, no screenshot) |
@@ -86,6 +88,7 @@ superb — and the pass itself surfaced lessons, listed below.**
 ## c) NOT STARTED
 
 <!-- check-rows:ledger -->
+
 | Item                                          | Why it matters                                                                                                             |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Headless-browser render gate for HTML reports | Structural checks can't catch visual regressions (overflow, contrast, collapsed grids)                                     |
@@ -151,35 +154,35 @@ superb — and the pass itself surfaced lessons, listed below.**
 ## f) NEXT THINGS (17 real items, ordered)
 
 ~~1. Render the HTML report in a browser and confirm it looks right (P0, closes~~ **Superseded — the headless-browser availability decision (next item, routed to the ROADMAP headless-browser bullet) — the render check executes once that lands.**
-   the biggest honesty gap).
+the biggest honesty gap).
 ~~2. Check whether a headless browser is available in the dev shell; if not,~~ **→ routed — ROADMAP Harvested, Headless browser in the dev shell**
-   decide whether to add one (P0 — owner decision, see questions).
+decide whether to add one (P0 — owner decision, see questions).
 ~~3. Promote the Python structural validator into `scripts/validate-html-report.py`~~ **→ ROADMAP Harvested (Promote the HTML-report structural validator)**
-   (P1).
+(P1).
 4. Add the revision-marker rule to the html-report-kit skill (P1).
 5. Add the superb-pass audit checklist to the kit skill's guide (P1).
 6. Upstream `.table-note` into the kit's editorial template (P2).
 7. Restart/clean the stale golangci-lint LSP session (P1, one command).
 8. Confirm the daemon committed the final HTML + MD state; verify with
-   `git log -p -- docs/status/` (P1).
+`git log -p -- docs/status/` (P1).
 9. Carry-over P0s from the 00-05 report remain open: release vehicle for tag
-   enforcement; module path decision; `.golangci.yml` lll/max-issues fate (P0).
+enforcement; module path decision; `.golangci.yml` lll/max-issues fate (P0).
 10. Add a "rendered and inspected" line to the HTML report footer once step 1
-    is done (P1).
+is done (P1).
 11. Consider a `docs/status/` series convention file (naming, revision
-    markers, companion-MD cross-checks) (P2).
+markers, companion-MD cross-checks) (P2).
 12. Add the HTML validator to `nix run .#check-all` for `docs/status/*.html`
-    (P2).
+(P2).
 13. Screenshot-diff regression for future HTML reports if a browser lands in
-    the dev shell (P2).
+the dev shell (P2).
 14. Add "check tooling before skipping verification" to personal lessons
-    (P2).
+(P2).
 15. Re-verify the 00-05 MD report's remaining claims the same way counts were
-    verified (LOC, coverage, command counts) (P2).
+verified (LOC, coverage, command counts) (P2).
 16. Consider adding `taskctl-audit.html` (generated artifact) to `.gitignore`
-    or a regeneration test so live runs stop churning it (P2, carried).
+or a regeneration test so live runs stop churning it (P2, carried).
 17. Revisit whether "Session totals" numbers belong in the MD companion too,
-    so both reports stay in sync (P2).
+so both reports stay in sync (P2).
 
 ## g) THREE QUESTIONS
 

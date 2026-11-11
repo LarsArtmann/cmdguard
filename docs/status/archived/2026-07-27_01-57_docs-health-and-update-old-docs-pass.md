@@ -182,6 +182,7 @@
 ## Files Changed This Session
 
 <!-- check-rows:ledger -->
+
 | File                                  | Change                                                                    |
 | ------------------------------------- | ------------------------------------------------------------------------- |
 | `TODO_LIST.md`                        | Rebuilt: removed done items, deduped Future Ideas, added #43–#48          |

@@ -51,13 +51,13 @@ repo pins an older auditlog and compiles `auditlog/live`, bump to `v0.12.2+`
 
 Batteries are ON by default now. Check each against your CLI's intent:
 
-| Default (v5)                | Opt-out                       | Decide                                    |
-| --------------------------- | ----------------------------- | ----------------------------------------- |
-| strict validation (shorts)  | `WithoutStrictValidation()`   | usually keep — CG007 hygiene pays off     |
-| signals cancel the run      | `WithoutSignalHandling()`     | usually keep                              |
-| graceful DI shutdown        | `WithoutGracefulShutdown()`   | keep; fires ONLY on the signal path       |
-| strict config keys          | `WithoutStrictConfigKeys()`   | keep unless a shared config has extra keys|
-| hints + doctor (+ version)  | `WithoutBatteries()`          | master switch for the whole set           |
+| Default (v5)               | Opt-out                     | Decide                                     |
+| -------------------------- | --------------------------- | ------------------------------------------ |
+| strict validation (shorts) | `WithoutStrictValidation()` | usually keep — CG007 hygiene pays off      |
+| signals cancel the run     | `WithoutSignalHandling()`   | usually keep                               |
+| graceful DI shutdown       | `WithoutGracefulShutdown()` | keep; fires ONLY on the signal path        |
+| strict config keys         | `WithoutStrictConfigKeys()` | keep unless a shared config has extra keys |
+| hints + doctor (+ version) | `WithoutBatteries()`        | master switch for the whole set            |
 
 Two behavioral notes: graceful shutdown no longer fires on normal completion
 (repeated `ExecuteWithArgs` is safe; explicit teardown is `cli.Shutdown(ctx)`),

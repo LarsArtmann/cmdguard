@@ -6,16 +6,16 @@
 
 ## Evidence collected
 
-| Check | Result |
-| --- | --- |
-| `pnpm build` | 28 pages, sitemap + pagefind index, CSP patch 28/28 |
-| `pnpm exec astro check` | 0 errors, 0 warnings, 0 hints (30 files) |
-| `pnpm exec html-validate "dist/**/*.html"` | clean |
-| `python3 scripts/check-website-links.py` | 28 pages, 0 broken internal targets |
-| `bash scripts/check-guide-sync.sh` | 0 stale majors, 0 unknown symbols, all full doc programs compile |
-| `firebase deploy --only hosting:cmdguard` | release complete |
-| `https://cmdguard.lars.software` | 200 on every sampled route, cert `CN=cmdguard.lars.software` |
-| Domain record state | `HOST_ACTIVE`, `OWNERSHIP_ACTIVE`, `cert: CERT_PROPAGATING`, type `TEMPORARY` |
+| Check                                      | Result                                                                        |
+| ------------------------------------------ | ----------------------------------------------------------------------------- |
+| `pnpm build`                               | 28 pages, sitemap + pagefind index, CSP patch 28/28                           |
+| `pnpm exec astro check`                    | 0 errors, 0 warnings, 0 hints (30 files)                                      |
+| `pnpm exec html-validate "dist/**/*.html"` | clean                                                                         |
+| `python3 scripts/check-website-links.py`   | 28 pages, 0 broken internal targets                                           |
+| `bash scripts/check-guide-sync.sh`         | 0 stale majors, 0 unknown symbols, all full doc programs compile              |
+| `firebase deploy --only hosting:cmdguard`  | release complete                                                              |
+| `https://cmdguard.lars.software`           | 200 on every sampled route, cert `CN=cmdguard.lars.software`                  |
+| Domain record state                        | `HOST_ACTIVE`, `OWNERSHIP_ACTIVE`, `cert: CERT_PROPAGATING`, type `TEMPORARY` |
 
 Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visible hero snippet was hand-written v4 while its Copy button served v5, every internal link and sitemap URL 301'd, the domain returned 404 "Site Not Found" with a `firebaseapp.com` certificate, and the docs guard passed green over all of it.
 

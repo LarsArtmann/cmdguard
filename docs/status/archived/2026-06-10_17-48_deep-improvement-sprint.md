@@ -18,6 +18,7 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 ## Metrics Dashboard
 
 <!-- check-rows:ledger -->
+
 | Metric                            | Before Sprint | After Sprint | Delta |
 | --------------------------------- | ------------- | ------------ | ----- |
 | Tests                             | 367           | 374          | +7    |
@@ -37,6 +38,7 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 ### Bugs Fixed
 
 <!-- check-rows:ledger -->
+
 | # | Bug                                                                  | Root Cause                                                                                            | Fix                                                     | Commit    |
 | - | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | --------- |
 | 1 | `configload.Auto()` always used JSON                                 | `autoLoader.Load()` delegated to `JSON()` unconditionally                                             | Try YAML → TOML → JSON sequentially                     | `6d832e3` |
@@ -48,6 +50,7 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 ### Features Added
 
 <!-- check-rows:ledger -->
+
 | # | Feature                                                                           | Commit    |
 | - | --------------------------------------------------------------------------------- | --------- |
 | 1 | `MustParseDuration`, `MustParseLogLevel`, `MustParseLogFormat`                    | `7fe2940` |
@@ -57,6 +60,7 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 ### Architecture Improvements
 
 <!-- check-rows:ledger -->
+
 | # | Improvement                                                                                                 | Commit    |
 | - | ----------------------------------------------------------------------------------------------------------- | --------- |
 | 1 | `validatorRegistry` threaded through `ValidateConfig` path (internal functions accept `*validatorRegistry`) | `37d994c` |
@@ -66,6 +70,7 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 ### Test Coverage Added
 
 <!-- check-rows:ledger -->
+
 | File                        | Tests Added | What's Covered                                                            |
 | --------------------------- | ----------- | ------------------------------------------------------------------------- |
 | `flag_helpers_test.go`      | 10 subtests | `formatFieldValue` for all kinds, pointers, fmt.Stringer                  |
@@ -103,26 +108,26 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 
 ### Known Gaps (from audit, sorted by impact)
 
-| #  | Gap                                                                               | Impact                                                                           | Effort                          |
-| -- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------- |
-| 1  | `RegisterInScope` can't accept typed providers (`func(do.Injector) (*T, error)`) **→ TODO_LIST T5 (TODO(v5), scope.go)** | High — function is essentially unusable with the library's own `Provide` pattern | 2h (needs Go generics redesign) |
-| ~~2~~  | ~~`Package()` panics on CLI creation failure~~ done — panic fix shipped (Resolution below); Package[T] redesign tracked as ROADMAP v5 candidate #7 | ~~Medium — contradicts "no panics" principle~~ | ~~30min~~ |
-| 3  | Slice handler only supports `[]string` **→ ROADMAP raw ideas (typed slice flag handlers)** | Medium — `[]int`, `[]Port`, etc. are common                                      | 4h                              |
-| ~~4~~  | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~Medium — flat-only is limiting~~ | ~~1d~~ |
-| ~~5~~  | ~~`validateTagRules` has 16.7% coverage~~ **Superseded — validation engine rewritten (flag_bounds.go); runtime tag enforcement ships in v4.** | ~~Low~~ | ~~1h~~ |
-| ~~6~~  | ~~`completion.go` has 0% coverage (thin cobra wiring)~~ done — TestWithCompletion_SetsCompletionFunc (coverage_improvement_test.go:162) | ~~Low~~ | ~~30min~~ |
-| ~~7~~  | ~~`RegisterValidator()` public API has 0% coverage~~ done — flags_validate_test.go covers RegisterValidator | ~~Low~~ | ~~30min~~ |
-| ~~8~~  | ~~`manpage.go` — `GenerateManPageCommand` at 14.3%, `NewManPage` at 0%~~ **Superseded — the manpage sub-module was removed entirely (2026-07-23_13-22 report).** | ~~Low~~ | ~~1h~~ |
-| ~~9~~  | ~~`flow_context_access.go` — `Get[T]` and `MustGet[T]` at 0%~~ done — flow_context_*_test.go cover the accessors; MustGet no longer exists in v4 | ~~Low~~ | ~~30min~~ |
-| ~~10~~ | ~~`prompts.go` — `PromptString`/`PromptSelect`/`PromptConfirm` at 0% (requires TTY)~~ done — prompts/prompts_test.go exists in the prompts sub-module | ~~Low~~ | ~~2h~~ |
+| #      | Gap                                                                                                                                                              | Impact                                                                           | Effort                          |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------- |
+| 1      | `RegisterInScope` can't accept typed providers (`func(do.Injector) (*T, error)`) **→ TODO_LIST T5 (TODO(v5), scope.go)**                                         | High — function is essentially unusable with the library's own `Provide` pattern | 2h (needs Go generics redesign) |
+| ~~2~~  | ~~`Package()` panics on CLI creation failure~~ done — panic fix shipped (Resolution below); Package[T] redesign tracked as ROADMAP v5 candidate #7               | ~~Medium — contradicts "no panics" principle~~                                   | ~~30min~~                       |
+| 3      | Slice handler only supports `[]string` **→ ROADMAP raw ideas (typed slice flag handlers)**                                                                       | Medium — `[]int`, `[]Port`, etc. are common                                      | 4h                              |
+| ~~4~~  | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                                                         | ~~Medium — flat-only is limiting~~                                               | ~~1d~~                          |
+| ~~5~~  | ~~`validateTagRules` has 16.7% coverage~~ **Superseded — validation engine rewritten (flag_bounds.go); runtime tag enforcement ships in v4.**                    | ~~Low~~                                                                          | ~~1h~~                          |
+| ~~6~~  | ~~`completion.go` has 0% coverage (thin cobra wiring)~~ done — TestWithCompletion_SetsCompletionFunc (coverage_improvement_test.go:162)                          | ~~Low~~                                                                          | ~~30min~~                       |
+| ~~7~~  | ~~`RegisterValidator()` public API has 0% coverage~~ done — flags_validate_test.go covers RegisterValidator                                                      | ~~Low~~                                                                          | ~~30min~~                       |
+| ~~8~~  | ~~`manpage.go` — `GenerateManPageCommand` at 14.3%, `NewManPage` at 0%~~ **Superseded — the manpage sub-module was removed entirely (2026-07-23_13-22 report).** | ~~Low~~                                                                          | ~~1h~~                          |
+| ~~9~~  | ~~`flow_context_access.go` — `Get[T]` and `MustGet[T]` at 0%~~ done — flow_context_*_test.go cover the accessors; MustGet no longer exists in v4                 | ~~Low~~                                                                          | ~~30min~~                       |
+| ~~10~~ | ~~`prompts.go` — `PromptString`/`PromptSelect`/`PromptConfirm` at 0% (requires TTY)~~ done — prompts/prompts_test.go exists in the prompts sub-module            | ~~Low~~                                                                          | ~~2h~~                          |
 
 ### Future Work (from TODO_LIST.md)
 
-| #     | Task                                                                                                                                        | Priority |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| ~~20~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~Add `CODECOV_TOKEN` secret to GitHub repo settings~~ | ~~P4~~ |
-| ~~21-28~~ **Superseded — shipped in v3/v4 (plugin, nested configs, doc gen, koanf, JSON errors); flagtags + go-output extraction never done — tracked in ROADMAP raw ideas.** | ~~Plugin system, nested configs, doc gen, advanced types, koanf, JSON errors, extract flagtags, extract go-output~~ | ~~P5~~ |
-| ~~29-35~~ **Superseded — shipped across v3.0.0/v4.0.0 (NoFlags distinct, RegisterInScope+SetConfig deprecated, WithColor removed, NO_COLOR kept by design).** | ~~NoFlags distinct type, rename Get/MustGet, generic RegisterInScope, remove Package, safe SetConfig, remove WithColor, fix NO_COLOR mutation~~ | ~~P6~~ |
+| #                                                                                                                                                                             | Task                                                                                                                                            | Priority |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| ~~20~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                                                                       | ~~Add `CODECOV_TOKEN` secret to GitHub repo settings~~                                                                                          | ~~P4~~   |
+| ~~21-28~~ **Superseded — shipped in v3/v4 (plugin, nested configs, doc gen, koanf, JSON errors); flagtags + go-output extraction never done — tracked in ROADMAP raw ideas.** | ~~Plugin system, nested configs, doc gen, advanced types, koanf, JSON errors, extract flagtags, extract go-output~~                             | ~~P5~~   |
+| ~~29-35~~ **Superseded — shipped across v3.0.0/v4.0.0 (NoFlags distinct, RegisterInScope+SetConfig deprecated, WithColor removed, NO_COLOR kept by design).**                 | ~~NoFlags distinct type, rename Get/MustGet, generic RegisterInScope, remove Package, safe SetConfig, remove WithColor, fix NO_COLOR mutation~~ | ~~P6~~   |
 
 ---
 
@@ -174,44 +179,44 @@ The most impactful finding was `configload.Auto()` being completely broken — i
 
 ### Tier 1: High Impact, Low Effort (Do Now)
 
-| # | Task                                                       | Effort | Impact               |
-| - | ---------------------------------------------------------- | ------ | -------------------- |
-| ~~1~~ | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~5min~~ | ~~CI coverage tracking~~ |
-| ~~2~~ | ~~Add tests for `RegisterValidator()` public API~~ done — flags_validate_test.go covers RegisterValidator | ~~30min~~ | ~~Coverage gap~~ |
-| ~~3~~ | ~~Add tests for `Get[T]`/`MustGet[T]` flow context accessors~~ done — flow_context_*_test.go cover the accessors; MustGet removed in v4 | ~~30min~~ | ~~Coverage gap~~ |
-| ~~4~~ | ~~Add tests for `WithCompletion`/`WithValidArgs`~~ done — coverage_improvement_test.go | ~~30min~~ | ~~Coverage gap~~ |
-| ~~5~~ | ~~Document `validate` tag in README.md~~ **Superseded — superseded — the validate tag is documented in README.md by the 2026-11-07 docs-health pass.** | ~~30min~~ | ~~Discoverability~~ |
-| ~~6~~ | ~~Add `WithArgs` test (currently 0% coverage)~~ done — coverage_improvement_test.go | ~~20min~~ | ~~Coverage gap~~ |
+| #     | Task                                                                                                                                                   | Effort    | Impact                   |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------ |
+| ~~1~~ | ~~Add `CODECOV_TOKEN` to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                       | ~~5min~~  | ~~CI coverage tracking~~ |
+| ~~2~~ | ~~Add tests for `RegisterValidator()` public API~~ done — flags_validate_test.go covers RegisterValidator                                              | ~~30min~~ | ~~Coverage gap~~         |
+| ~~3~~ | ~~Add tests for `Get[T]`/`MustGet[T]` flow context accessors~~ done — flow_context_*_test.go cover the accessors; MustGet removed in v4                | ~~30min~~ | ~~Coverage gap~~         |
+| ~~4~~ | ~~Add tests for `WithCompletion`/`WithValidArgs`~~ done — coverage_improvement_test.go                                                                 | ~~30min~~ | ~~Coverage gap~~         |
+| ~~5~~ | ~~Document `validate` tag in README.md~~ **Superseded — superseded — the validate tag is documented in README.md by the 2026-11-07 docs-health pass.** | ~~30min~~ | ~~Discoverability~~      |
+| ~~6~~ | ~~Add `WithArgs` test (currently 0% coverage)~~ done — coverage_improvement_test.go                                                                    | ~~20min~~ | ~~Coverage gap~~         |
 
 ### Tier 2: Medium Impact, Medium Effort (Do Soon)
 
-| #  | Task                                                         | Effort | Impact                   |
-| -- | ------------------------------------------------------------ | ------ | ------------------------ |
-| ~~7~~  | ~~Wire instance-scoped validators through `ValidateFlags` path~~ done — runtime tag validation wired into root + command parsing (AGENTS.md; v4 D6) | ~~2h~~ | ~~Architecture correctness~~ |
-| ~~8~~  | ~~Add `validateTagRules` tests (16.7% → 80%+)~~ **Superseded — validation engine rewritten (flag_bounds.go); runtime enforcement ships in v4.** | ~~1h~~ | ~~Validation coverage~~ |
-| ~~9~~  | ~~Add manpage tests (`GenerateManPageCommand`, `NewManPage`)~~ **Superseded — the manpage sub-module was removed entirely (2026-07-23_13-22 report).** | ~~1h~~ | ~~Coverage gap~~ |
-| ~~10~~ | ~~Add `renderAndWrite` output tests~~ **Superseded — the renderAndWrite helper no longer exists (v3/v4 output rewrite).** | ~~1h~~ | ~~Coverage gap~~ |
-| ~~11~~ | ~~Add `WithDoctorLong` test~~ done — doctor_test.go | ~~20min~~ | ~~Coverage gap~~ |
-| ~~12~~ | ~~Add `WithConfigFileLoader` test~~ done — koanf_loader_test.go | ~~30min~~ | ~~Coverage gap~~ |
-| ~~13~~ | ~~Add `HealthCheckResults` (Scope) test~~ done — coverage_improvement_test.go (HealthCheckResults) | ~~20min~~ | ~~Coverage gap~~ |
-| ~~14~~ | ~~Fix `Package()` to return error instead of panic~~ done — panic fix shipped (Resolution below); redesign tracked as ROADMAP v5 candidate #7 | ~~30min~~ | ~~API correctness~~ |
+| #      | Task                                                                                                                                                   | Effort    | Impact                       |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ---------------------------- |
+| ~~7~~  | ~~Wire instance-scoped validators through `ValidateFlags` path~~ done — runtime tag validation wired into root + command parsing (AGENTS.md; v4 D6)    | ~~2h~~    | ~~Architecture correctness~~ |
+| ~~8~~  | ~~Add `validateTagRules` tests (16.7% → 80%+)~~ **Superseded — validation engine rewritten (flag_bounds.go); runtime enforcement ships in v4.**        | ~~1h~~    | ~~Validation coverage~~      |
+| ~~9~~  | ~~Add manpage tests (`GenerateManPageCommand`, `NewManPage`)~~ **Superseded — the manpage sub-module was removed entirely (2026-07-23_13-22 report).** | ~~1h~~    | ~~Coverage gap~~             |
+| ~~10~~ | ~~Add `renderAndWrite` output tests~~ **Superseded — the renderAndWrite helper no longer exists (v3/v4 output rewrite).**                              | ~~1h~~    | ~~Coverage gap~~             |
+| ~~11~~ | ~~Add `WithDoctorLong` test~~ done — doctor_test.go                                                                                                    | ~~20min~~ | ~~Coverage gap~~             |
+| ~~12~~ | ~~Add `WithConfigFileLoader` test~~ done — koanf_loader_test.go                                                                                        | ~~30min~~ | ~~Coverage gap~~             |
+| ~~13~~ | ~~Add `HealthCheckResults` (Scope) test~~ done — coverage_improvement_test.go (HealthCheckResults)                                                     | ~~20min~~ | ~~Coverage gap~~             |
+| ~~14~~ | ~~Fix `Package()` to return error instead of panic~~ done — panic fix shipped (Resolution below); redesign tracked as ROADMAP v5 candidate #7          | ~~30min~~ | ~~API correctness~~          |
 
 ### Tier 3: High Impact, High Effort (Plan for v3)
 
-| #  | Task                                                        | Effort | Impact                  |
-| -- | ----------------------------------------------------------- | ------ | ----------------------- |
-| 15 | Generic `RegisterInScope[T]` redesign **→ TODO_LIST T5 (TODO(v5), scope.go)** | 2h     | API usability           |
-| 16 | Slice handler: support `[]int`, `[]Port`, etc. **→ ROADMAP raw ideas (typed slice flag handlers)** | 4h     | Common feature request  |
-| ~~17~~ | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~1d~~ | ~~Major feature gap~~ |
-| ~~18~~ **Superseded — configload deleted; KoanfLoader detects format by extension (koanf_loader.go).** | ~~`ConfigFileLoader` path-aware interface~~ | ~~2h~~ | ~~Better auto-detection~~ |
-| 18 **→ deprecated in v4 — removal tracked as TODO_LIST T4** | Remove `SetConfig` or make it safe | 2h | API correctness |
-| ~~19~~ | ~~Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation~~ done — NO_COLOR handling kept by design — `--no-color` sets NO_COLOR=1 for fang (AGENTS.md) | ~~1h~~ | ~~Side-effect elimination~~ |
-| ~~20~~ | ~~Make `NoFlags` distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha) | ~~1h~~ | ~~Type safety~~ |
-| ~~21~~ | ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output | ~~4h~~ | ~~CLI best practice~~ |
-| ~~22~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~4h~~ | ~~Ecosystem integration~~ |
-| 23 | Extract flag-related code to standalone `flagtags` library **→ ROADMAP raw ideas (extract flagtags standalone library)** | 1d     | Reusability             |
-| ~~24~~ | ~~Plugin system for custom validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~2d~~ | ~~Extensibility~~ |
-| ~~25~~ | ~~Documentation generation (GenerateDocs, markdown, API docs)~~ done — GenerateDocs/docgen.go + the describe JSON contract | ~~2d~~ | ~~Discoverability~~ |
+| #                                                                                                      | Task                                                                                                                                                   | Effort | Impact                      |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | --------------------------- |
+| 15                                                                                                     | Generic `RegisterInScope[T]` redesign **→ TODO_LIST T5 (TODO(v5), scope.go)**                                                                          | 2h     | API usability               |
+| 16                                                                                                     | Slice handler: support `[]int`, `[]Port`, etc. **→ ROADMAP raw ideas (typed slice flag handlers)**                                                     | 4h     | Common feature request      |
+| ~~17~~                                                                                                 | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                                               | ~~1d~~ | ~~Major feature gap~~       |
+| ~~18~~ **Superseded — configload deleted; KoanfLoader detects format by extension (koanf_loader.go).** | ~~`ConfigFileLoader` path-aware interface~~                                                                                                            | ~~2h~~ | ~~Better auto-detection~~   |
+| 18 **→ deprecated in v4 — removal tracked as TODO_LIST T4**                                            | Remove `SetConfig` or make it safe                                                                                                                     | 2h     | API correctness             |
+| ~~19~~                                                                                                 | ~~Fix `os.Setenv("NO_COLOR", "1")` process-wide mutation~~ done — NO_COLOR handling kept by design — `--no-color` sets NO_COLOR=1 for fang (AGENTS.md) | ~~1h~~ | ~~Side-effect elimination~~ |
+| ~~20~~                                                                                                 | ~~Make `NoFlags` distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha)                                                | ~~1h~~ | ~~Type safety~~             |
+| ~~21~~                                                                                                 | ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output                                            | ~~4h~~ | ~~CLI best practice~~       |
+| ~~22~~                                                                                                 | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                                                       | ~~4h~~ | ~~Ecosystem integration~~   |
+| 23                                                                                                     | Extract flag-related code to standalone `flagtags` library **→ ROADMAP raw ideas (extract flagtags standalone library)**                               | 1d     | Reusability                 |
+| ~~24~~                                                                                                 | ~~Plugin system for custom validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                              | ~~2d~~ | ~~Extensibility~~           |
+| ~~25~~                                                                                                 | ~~Documentation generation (GenerateDocs, markdown, API docs)~~ done — GenerateDocs/docgen.go + the describe JSON contract                             | ~~2d~~ | ~~Discoverability~~         |
 
 ---
 

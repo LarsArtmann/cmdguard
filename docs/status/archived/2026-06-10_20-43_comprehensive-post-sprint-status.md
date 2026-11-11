@@ -67,6 +67,7 @@ cmdguard is in **excellent shape**. After a deep improvement sprint spanning 10 
 ### Quality Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                | Value   |
 | --------------------- | ------- |
 | Source files          | 48      |
@@ -98,6 +99,7 @@ cmdguard is in **excellent shape**. After a deep improvement sprint spanning 10 
 ### Sprint Commits (This Session)
 
 <!-- check-rows:ledger -->
+
 | Commit    | Description                                                 |
 | --------- | ----------------------------------------------------------- |
 | `e53c8e6` | Fix NO_COLOR env var restore after execution                |
@@ -118,6 +120,7 @@ cmdguard is in **excellent shape**. After a deep improvement sprint spanning 10 
 These functions exist but have no direct test coverage:
 
 <!-- check-rows:ledger -->
+
 | Function                        | File                  | Why                                                                   |
 | ------------------------------- | --------------------- | --------------------------------------------------------------------- |
 | `huhPromptRunner.PromptString`  | prompts.go:23         | Requires interactive terminal; tested via `promptMissingCommandFlags` |
@@ -143,6 +146,7 @@ Most of these are thin wrappers, interactive-terminal functions, or `IsEmpty()` 
 ### Partially-Covered Functions (50-90%)
 
 <!-- check-rows:ledger -->
+
 | Function                      | Coverage | File                   |
 | ----------------------------- | -------- | ---------------------- |
 | `NewCLI`                      | 90%      | cli.go:51              |
@@ -247,33 +251,33 @@ Nothing is truly fucked. The codebase is solid. But there are annoyances:
 
 Sorted by impact/effort ratio:
 
-| #  | Task                                                                                | Impact | Effort | Category |
-| -- | ----------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| ~~1~~  | ~~Fix nix pre-commit hooks (nixfmt/deadnix/vulnix)~~ done — obsolete pre-commit hook removed (8618022) | ~~High~~ | ~~30m~~ | ~~Infra~~ |
-| ~~2~~  | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~High~~ | ~~5m~~ | ~~CI/CD~~ |
-| ~~3~~  | ~~Test IsEmpty() methods (Duration, LogLevel, LogFormat, Port)~~ done — IsEmpty tests shipped — duration_test.go:123, types_port_test.go:94, helpers_test.go:64 | ~~Low~~ | ~~15m~~ | ~~Coverage~~ |
-| ~~4~~  | ~~Test validators (validateEmail, validateURL, validateNonEmpty, validateFieldByKind)~~ done — validators delegate to ParseEmail/ParseURL (flags_validate.go:238) | ~~Medium~~ | ~~30m~~ | ~~Coverage~~ |
-| ~~5~~  | ~~Test RegisterValidator global function~~ done — flags_validate_test.go covers RegisterValidator | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
-| ~~6~~  | ~~Test WithDoctorLong option~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor covered by doctor_test.go.** | ~~Low~~ | ~~5m~~ | ~~Coverage~~ |
-| ~~7~~  | ~~Test renderAndWrite directly~~ **Superseded — symbol gone — output.go rewritten via go-output registries.** | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
-| ~~8~~  | ~~Test WithConfigFileLoader integration via CLI Execute~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~Medium~~ | ~~30m~~ | ~~Coverage~~ |
-| ~~9~~  | ~~Cover WithExactArgs/WithMinimumArgs/WithMaximumArgs error paths~~ **Superseded — rewritten through v3/v4 — ErrTooFewArgs/ErrTooManyArgs removed (CHANGELOG 3.0.0).** | ~~Low~~ | ~~20m~~ | ~~Coverage~~ |
-| ~~10~~ | ~~Cover WithRangeArgs error paths (negative min, min>max)~~ **Superseded — rewritten through v3/v4 — WithRangeArgs(minArgs, maxArgs) reshaped.** | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
-| ~~11~~ | ~~Add fuzz tests for ParseDuration, ParseEmail, ParseURL, ParsePort~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~High~~ | ~~1h~~ | ~~Quality~~ |
-| ~~12~~ | ~~Add CONTRIBUTING.md~~ done — CONTRIBUTING.md exists at repo root | ~~Medium~~ | ~~30m~~ | ~~Docs~~ |
-| ~~13~~ | ~~Add GitHub issue/PR templates~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist | ~~Medium~~ | ~~20m~~ | ~~Docs~~ |
-| ~~14~~ | ~~Update TODO_LIST.md — mark #29 (NoFlags), #34 (WithColor), #35 (NO_COLOR) as DONE~~ **Superseded — rewritten repeatedly since; TODO_LIST refreshed through v4 (2026-11).** | ~~Low~~ | ~~10m~~ | ~~Docs~~ |
-| ~~15~~ | ~~Add buildGoModule to flake.nix for proper Nix packaging~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~Medium~~ | ~~1h~~ | ~~Infra~~ |
-| ~~16~~ | ~~Add Scope.HealthCheckResults test (currently 0% at scope.go:212)~~ done — coverage_improvement_test.go covers HealthCheckResults | ~~Low~~ | ~~10m~~ | ~~Coverage~~ |
-| ~~17~~ | ~~Add ArgsFromContext full coverage (currently 60%)~~ done — cli_superb_test.go covers ArgsFromContext | ~~Low~~ | ~~15m~~ | ~~Coverage~~ |
-| ~~18~~ | ~~Structured JSON error output for --output=json~~ done — cli_errors_json.go structured JSON error output | ~~High~~ | ~~2h~~ | ~~Feature~~ |
-| ~~19~~ | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~High~~ | ~~4h~~ | ~~Feature~~ |
-| ~~20~~ | ~~Plugin system for custom validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~High~~ | ~~4h~~ | ~~Feature~~ |
-| ~~21~~ | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go | ~~Medium~~ | ~~3h~~ | ~~Feature~~ |
-| ~~22~~ | ~~Extract flag-related code to standalone flagtags library~~ **Won't implement — idea dropped — not in 2026-11-02 ROADMAP restructure.** | ~~Medium~~ | ~~4h~~ | ~~Refactor~~ |
-| ~~23~~ | ~~Advanced types: Result[T], Validated[T], branded IDs~~ **Superseded — Result/Validated removed in v3.0.0; branded IDs via go-branded-id dep.** | ~~Medium~~ | ~~4h~~ | ~~Feature~~ |
-| ~~24~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~Medium~~ | ~~3h~~ | ~~Feature~~ |
-| ~~25~~ | ~~Shared test config type (reduce 44+ testConfig definitions)~~ **NOT-DO — accepted Go test idiom — helpers shared via pkg/testutil instead.** | ~~Low~~ | ~~1h~~ | ~~Cleanup~~ |
+| #      | Task                                                                                                                                                                         | Impact     | Effort  | Category     |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------- | ------------ |
+| ~~1~~  | ~~Fix nix pre-commit hooks (nixfmt/deadnix/vulnix)~~ done — obsolete pre-commit hook removed (8618022)                                                                       | ~~High~~   | ~~30m~~ | ~~Infra~~    |
+| ~~2~~  | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                               | ~~High~~   | ~~5m~~  | ~~CI/CD~~    |
+| ~~3~~  | ~~Test IsEmpty() methods (Duration, LogLevel, LogFormat, Port)~~ done — IsEmpty tests shipped — duration_test.go:123, types_port_test.go:94, helpers_test.go:64              | ~~Low~~    | ~~15m~~ | ~~Coverage~~ |
+| ~~4~~  | ~~Test validators (validateEmail, validateURL, validateNonEmpty, validateFieldByKind)~~ done — validators delegate to ParseEmail/ParseURL (flags_validate.go:238)            | ~~Medium~~ | ~~30m~~ | ~~Coverage~~ |
+| ~~5~~  | ~~Test RegisterValidator global function~~ done — flags_validate_test.go covers RegisterValidator                                                                            | ~~Low~~    | ~~10m~~ | ~~Coverage~~ |
+| ~~6~~  | ~~Test WithDoctorLong option~~ **Superseded — symbol rewritten in v4 (WithDoctorLong[T]); doctor covered by doctor_test.go.**                                                | ~~Low~~    | ~~5m~~  | ~~Coverage~~ |
+| ~~7~~  | ~~Test renderAndWrite directly~~ **Superseded — symbol gone — output.go rewritten via go-output registries.**                                                                | ~~Low~~    | ~~10m~~ | ~~Coverage~~ |
+| ~~8~~  | ~~Test WithConfigFileLoader integration via CLI Execute~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**                                 | ~~Medium~~ | ~~30m~~ | ~~Coverage~~ |
+| ~~9~~  | ~~Cover WithExactArgs/WithMinimumArgs/WithMaximumArgs error paths~~ **Superseded — rewritten through v3/v4 — ErrTooFewArgs/ErrTooManyArgs removed (CHANGELOG 3.0.0).**       | ~~Low~~    | ~~20m~~ | ~~Coverage~~ |
+| ~~10~~ | ~~Cover WithRangeArgs error paths (negative min, min>max)~~ **Superseded — rewritten through v3/v4 — WithRangeArgs(minArgs, maxArgs) reshaped.**                             | ~~Low~~    | ~~10m~~ | ~~Coverage~~ |
+| ~~11~~ | ~~Add fuzz tests for ParseDuration, ParseEmail, ParseURL, ParsePort~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7                           | ~~High~~   | ~~1h~~  | ~~Quality~~  |
+| ~~12~~ | ~~Add CONTRIBUTING.md~~ done — CONTRIBUTING.md exists at repo root                                                                                                           | ~~Medium~~ | ~~30m~~ | ~~Docs~~     |
+| ~~13~~ | ~~Add GitHub issue/PR templates~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist                                                                            | ~~Medium~~ | ~~20m~~ | ~~Docs~~     |
+| ~~14~~ | ~~Update TODO_LIST.md — mark #29 (NoFlags), #34 (WithColor), #35 (NO_COLOR) as DONE~~ **Superseded — rewritten repeatedly since; TODO_LIST refreshed through v4 (2026-11).** | ~~Low~~    | ~~10m~~ | ~~Docs~~     |
+| ~~15~~ | ~~Add buildGoModule to flake.nix for proper Nix packaging~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**                                           | ~~Medium~~ | ~~1h~~  | ~~Infra~~    |
+| ~~16~~ | ~~Add Scope.HealthCheckResults test (currently 0% at scope.go:212)~~ done — coverage_improvement_test.go covers HealthCheckResults                                           | ~~Low~~    | ~~10m~~ | ~~Coverage~~ |
+| ~~17~~ | ~~Add ArgsFromContext full coverage (currently 60%)~~ done — cli_superb_test.go covers ArgsFromContext                                                                       | ~~Low~~    | ~~15m~~ | ~~Coverage~~ |
+| ~~18~~ | ~~Structured JSON error output for --output=json~~ done — cli_errors_json.go structured JSON error output                                                                    | ~~High~~   | ~~2h~~  | ~~Feature~~  |
+| ~~19~~ | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                                                                     | ~~High~~   | ~~4h~~  | ~~Feature~~  |
+| ~~20~~ | ~~Plugin system for custom validators and type handlers~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                                                    | ~~High~~   | ~~4h~~  | ~~Feature~~  |
+| ~~21~~ | ~~Documentation generation (GenerateDocs)~~ done — GenerateDocs/docgen.go                                                                                                    | ~~Medium~~ | ~~3h~~  | ~~Feature~~  |
+| ~~22~~ | ~~Extract flag-related code to standalone flagtags library~~ **Won't implement — idea dropped — not in 2026-11-02 ROADMAP restructure.**                                     | ~~Medium~~ | ~~4h~~  | ~~Refactor~~ |
+| ~~23~~ | ~~Advanced types: Result[T], Validated[T], branded IDs~~ **Superseded — Result/Validated removed in v3.0.0; branded IDs via go-branded-id dep.**                             | ~~Medium~~ | ~~4h~~  | ~~Feature~~  |
+| ~~24~~ | ~~Config auto-loading with koanf integration~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                                                                             | ~~Medium~~ | ~~3h~~  | ~~Feature~~  |
+| ~~25~~ | ~~Shared test config type (reduce 44+ testConfig definitions)~~ **NOT-DO — accepted Go test idiom — helpers shared via pkg/testutil instead.**                               | ~~Low~~    | ~~1h~~  | ~~Cleanup~~  |
 
 ---
 
@@ -294,6 +298,7 @@ Starting v3 would allow breaking changes (NoFlags already done, could also clean
 ## Metrics Dashboard
 
 <!-- check-rows:ledger -->
+
 | Metric               | Value         | Trend                       |
 | -------------------- | ------------- | --------------------------- |
 | Coverage             | 84.8%         | ↑ from 83.5% (sprint start) |

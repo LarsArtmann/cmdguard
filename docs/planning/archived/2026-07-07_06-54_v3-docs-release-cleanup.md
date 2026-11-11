@@ -47,22 +47,22 @@ This plan makes every doc honestly reflect the shipped v3.0.0 code.
 
 ## Medium-Granularity Plan (14 tasks)
 
-| #   | Task                           | Fine    | Impact   | Effort |
-| --- | ------------------------------ | ------- | -------- | ------ |
-| ~~M1~~  | ~~Rewrite AGENTS.md~~ done at `07b9fbb` | ~~F1–F15~~ | ~~Critical~~ | ~~90m~~ |
-| ~~M2~~  | ~~Correct FEATURES.md~~ done at `07b9fbb` | ~~F16–F25~~ | ~~Critical~~ | ~~45m~~ |
-| ~~M3~~  | ~~CHANGELOG v2.10.3 + v2.10.4~~ done — v2.10.4 entry added (CHANGELOG.md); no separate v2.10.3 entry exists | ~~F26–F27~~ | ~~High~~ | ~~20m~~ |
-| ~~M4~~  | ~~Create docs/MIGRATION_v2_v3.md~~ done — docs/MIGRATION_v2_v3.md exists | ~~F28–F33~~ | ~~High~~ | ~~60m~~ |
-| ~~M5~~  | ~~GitHub Release v3.0.0~~ done — gh release v3.0.0 created 2026-07-07 | ~~F34~~ | ~~High~~ | ~~10m~~ |
-| ~~M6~~  | ~~GitHub Release v2.10.4~~ done — gh release v2.10.4 created 2026-07-07 | ~~F35~~ | ~~High~~ | ~~10m~~ |
-| ~~M7~~  | ~~Refresh TODO_LIST.md~~ done (docs-health pass TODO_LIST refreshed in era; living doc since) | ~~F36–F37~~ | ~~Med~~ | ~~15m~~ |
-| ~~M8~~  | ~~Note migration in ROADMAP.md~~ done (docs-health pass ROADMAP migration note added in era) | ~~F38~~ | ~~Med~~ | ~~15m~~ |
-| ~~M9~~  | ~~Remove `/v3` from .gitignore~~ done — .gitignore has no /v3 entry | ~~F39~~ | ~~Med~~ | ~~2m~~ |
-| ~~M10~~ | ~~Audit & fix docs/API.md~~ done — API.md audited in era (07b9fbb); file later removed by ba818e3 | ~~F40~~ | ~~Med~~ | ~~30m~~ |
-| ~~M11~~ | ~~Audit QUICKSTART + TUTORIAL~~ done — docs/QUICKSTART.md + docs/TUTORIAL.md exist and maintained | ~~F41–F42~~ | ~~Med~~ | ~~20m~~ |
-| ~~M12~~ | ~~External smoke test~~ done (docs-health pass external resolution verified via published releases) | ~~F43–F45~~ | ~~High~~ | ~~25m~~ |
-| ~~M13~~ | ~~Full verification~~ done (docs-health pass build/vet/test/lint gates ran in era) | ~~F46–F49~~ | ~~Gate~~ | ~~15m~~ |
-| ~~M14~~ | ~~Plan doc + commit~~ done at `a9d2035` | ~~F50–F51~~ | ~~Pro~~ | ~~20m~~ |
+| #       | Task                                                                                                        | Fine        | Impact       | Effort  |
+| ------- | ----------------------------------------------------------------------------------------------------------- | ----------- | ------------ | ------- |
+| ~~M1~~  | ~~Rewrite AGENTS.md~~ done at `07b9fbb`                                                                     | ~~F1–F15~~  | ~~Critical~~ | ~~90m~~ |
+| ~~M2~~  | ~~Correct FEATURES.md~~ done at `07b9fbb`                                                                   | ~~F16–F25~~ | ~~Critical~~ | ~~45m~~ |
+| ~~M3~~  | ~~CHANGELOG v2.10.3 + v2.10.4~~ done — v2.10.4 entry added (CHANGELOG.md); no separate v2.10.3 entry exists | ~~F26–F27~~ | ~~High~~     | ~~20m~~ |
+| ~~M4~~  | ~~Create docs/MIGRATION_v2_v3.md~~ done — docs/MIGRATION_v2_v3.md exists                                    | ~~F28–F33~~ | ~~High~~     | ~~60m~~ |
+| ~~M5~~  | ~~GitHub Release v3.0.0~~ done — gh release v3.0.0 created 2026-07-07                                       | ~~F34~~     | ~~High~~     | ~~10m~~ |
+| ~~M6~~  | ~~GitHub Release v2.10.4~~ done — gh release v2.10.4 created 2026-07-07                                     | ~~F35~~     | ~~High~~     | ~~10m~~ |
+| ~~M7~~  | ~~Refresh TODO_LIST.md~~ done (docs-health pass TODO_LIST refreshed in era; living doc since)               | ~~F36–F37~~ | ~~Med~~      | ~~15m~~ |
+| ~~M8~~  | ~~Note migration in ROADMAP.md~~ done (docs-health pass ROADMAP migration note added in era)                | ~~F38~~     | ~~Med~~      | ~~15m~~ |
+| ~~M9~~  | ~~Remove `/v3` from .gitignore~~ done — .gitignore has no /v3 entry                                         | ~~F39~~     | ~~Med~~      | ~~2m~~  |
+| ~~M10~~ | ~~Audit & fix docs/API.md~~ done — API.md audited in era (07b9fbb); file later removed by ba818e3           | ~~F40~~     | ~~Med~~      | ~~30m~~ |
+| ~~M11~~ | ~~Audit QUICKSTART + TUTORIAL~~ done — docs/QUICKSTART.md + docs/TUTORIAL.md exist and maintained           | ~~F41–F42~~ | ~~Med~~      | ~~20m~~ |
+| ~~M12~~ | ~~External smoke test~~ done (docs-health pass external resolution verified via published releases)         | ~~F43–F45~~ | ~~High~~     | ~~25m~~ |
+| ~~M13~~ | ~~Full verification~~ done (docs-health pass build/vet/test/lint gates ran in era)                          | ~~F46–F49~~ | ~~Gate~~     | ~~15m~~ |
+| ~~M14~~ | ~~Plan doc + commit~~ done at `a9d2035`                                                                     | ~~F50–F51~~ | ~~Pro~~      | ~~20m~~ |
 
 ## Fine-Granularity Breakdown (51 tasks, ≤15 min each)
 

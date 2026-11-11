@@ -46,6 +46,7 @@ The ParseFlagTags allocation count increase (9→11) is from the nested struct r
 The DI benchmark numbers were **genuinely wrong** — 30-60% too pessimistic — because they were measured alongside `BenchmarkExecute`, which renders help text to stdout on every iteration, causing massive I/O contention.
 
 <!-- check-rows:ledger -->
+
 | Benchmark        | Old (wrong) | Corrected | Error |
 | ---------------- | ----------- | --------- | ----- |
 | Invoke           | 352 ns      | 235 ns    | +50%  |
@@ -152,28 +153,28 @@ The `recorder_bench_test.go` file has 3 LSP warnings for `for range b.N` → `fo
 
 ## f) THINGS TO GET DONE NEXT
 
-| #                                                                                                      | Task                                                                                                                 | Priority | Effort |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | -------- | ------ |
-| ~~1~~                                                                                                      | ~~**Fix TL;DR** — "<2 µs for CLI creation" is 6x wrong. `NewCLI` is ~12.8µs. Either correct or clarify the claim~~ done — fixed — TL;DR says ~6.9 µs for full CLI creation (PERFORMANCE.md:10) | ~~P0~~ | ~~10min~~ |
-| ~~2~~  | ~~**Add `NewCLI` row to CLI Lifecycle table** — ~12.8µs, 77 allocs, 6.9 KB. Currently missing entirely~~ v:fixed — NewCLI has its own row (PERFORMANCE.md:33) | ~~P0~~       | ~~2min~~   |
-| ~~3~~                                                                                                      | ~~**Fix Startup Overhead section** — Uses NewScope time (700ns) labeled as "NewCLI + ScopeCreation." NewCLI is ~12.8µs~~ done — fixed — Startup Overhead states NewCLI ~6.9 µs incl. scope+flags+CLIOption (PERFORMANCE.md:95) | ~~P0~~ | ~~10min~~ |
-| ~~4~~                                                                                                      | ~~**Fix BenchmarkExecute stdout spam** — redirect to `io.Discard` in benchmark body~~ done — fixed — stdout redirected to /dev/null (benchmarks/guard_bench_test.go:110-118) | ~~P0~~ | ~~10min~~ |
-| ~~5~~                                                                                                      | ~~**Fix BenchmarkCapture stdout spam** — redirect log output in benchmark body~~ done — fixed — Capture benchmark sets Log no-op (recorder_bench_test.go:56) | ~~P0~~ | ~~10min~~ |
-| ~~6~~                                                                                                      | ~~**Fix `recorder_bench_test.go` b.Loop()** — 3 instances, Go 1.24+ modernization~~ done — file uses b.Loop() today | ~~P1~~ | ~~2min~~ |
-| ~~7~~                                                                                                      | ~~**Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → 41+3=44, not 48~~ done — fixed — CHANGELOG reads "48 test functions, 3 benchmarks, 1 fuzz target" (CHANGELOG:381) | ~~P0~~ | ~~2min~~ |
-| ~~8~~                                                                                                      | ~~**Run `nix flake check`** — the canonical format quality gate, never run~~ done — `nix flake check` passes clean (2026-08-06 continuation sprint) | ~~P0~~ | ~~5min~~ |
-| ~~9~~                                                                                                      | ~~**Push flightrecorder/v0.1.0 tag** — exists locally, not on origin (requires user permission)~~ done — pushed — flightrecorder/v0.1.0 is on origin | ~~P0~~ | ~~1min~~ |
-| ~~10~~                                                                                                     | ~~**Fix ExampleRecorder_CaptureToWriter noise** — set Config.Log to no-op~~ done — fixed — example sets no-op Log (example_test.go:66) | ~~P1~~ | ~~5min~~ |
-| ~~11~~                                                                                                     | ~~**Complete M17: Add `go mod tidy -diff` check to Nix** — prevent go.mod drift in CI~~ done — enforced — check-all includes go mod tidy drift detection | ~~P1~~ | ~~30min~~ |
-| ~~12~~                                                                                                     | ~~**Complete M17: Add Nix `check-all` target** — build + test + lint + format-check in one command~~ done — flake.nix check-all target exists | ~~P1~~ | ~~30min~~ |
-| ~~13~~                                                                                                     | ~~**Actually READ the 14 website .mdx files** — verify v4 semantics, not just grep patterns~~ done — closure sprint audited + fixed 6 website .mdx files | ~~P1~~ | ~~60min~~ |
-| ~~14~~                                                                                                     | ~~**Improve taskctl coverage** — currently 68.2%, plan wanted closer to 87.8%~~ done — 85.9% (FEATURES.md) | ~~P2~~ | ~~100min~~ |
-| 15                                                                                                     | **Add automated `go tool trace` validation test** — make M10 repeatable in CI **→ ROADMAP Flight Recorder Enhancements (`go tool trace` parse validation)** | P2       | 30min  |
-| ~~16~~                                                                                                     | ~~**Add integration test for flightrecorder in taskctl** — verify trace files are generated~~ done — written and passing (13-32 resolution banner) | ~~P2~~ | ~~30min~~ |
-| ~~17~~                                                                                                     | ~~**Investigate ParseFlagTags +2 allocs** — 9→11 allocs from v2→v4. Is the nested struct recursion path optimal?~~ done (docs-health pass observation — alloc growth documented as v4 nested-struct recursion cost (13-32 §a)) | ~~P2~~ | ~~60min~~ |
-| ~~18~~                                                                                                     | ~~**Add `NewCLI` to BenchmarkAddCommand table** — currently shows ~17µs for NewCLI+AddCommand combined~~ **Superseded — tables restructured in the 2026-08-06 re-measure; NewCLI has its own row (PERFORMANCE.md:33).** | ~~P2~~ | ~~10min~~ |
-| ~~19~~                                                                                                     | ~~**Verify COW claim numbers** — "48% faster NewCLI" and "-10 allocs per command" are from v2. Re-verify for v4.~~ done — claim stands — AGENTS.md copy-on-write section (~48% NewCLI) | ~~P2~~ | ~~30min~~ |
-| 20                                                                                                     | **Add benchmark CI gating** — detect real regressions automatically (ROADMAP item) **→ ROADMAP Harvested (Benchmark CI gating)** | P3       | 60min  |
+| #      | Task                                                                                                                                                                                                                           | Priority | Effort     |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------- |
+| ~~1~~  | ~~**Fix TL;DR** — "<2 µs for CLI creation" is 6x wrong. `NewCLI` is ~12.8µs. Either correct or clarify the claim~~ done — fixed — TL;DR says ~6.9 µs for full CLI creation (PERFORMANCE.md:10)                                 | ~~P0~~   | ~~10min~~  |
+| ~~2~~  | ~~**Add `NewCLI` row to CLI Lifecycle table** — ~12.8µs, 77 allocs, 6.9 KB. Currently missing entirely~~ v:fixed — NewCLI has its own row (PERFORMANCE.md:33)                                                                  | ~~P0~~   | ~~2min~~   |
+| ~~3~~  | ~~**Fix Startup Overhead section** — Uses NewScope time (700ns) labeled as "NewCLI + ScopeCreation." NewCLI is ~12.8µs~~ done — fixed — Startup Overhead states NewCLI ~6.9 µs incl. scope+flags+CLIOption (PERFORMANCE.md:95) | ~~P0~~   | ~~10min~~  |
+| ~~4~~  | ~~**Fix BenchmarkExecute stdout spam** — redirect to `io.Discard` in benchmark body~~ done — fixed — stdout redirected to /dev/null (benchmarks/guard_bench_test.go:110-118)                                                   | ~~P0~~   | ~~10min~~  |
+| ~~5~~  | ~~**Fix BenchmarkCapture stdout spam** — redirect log output in benchmark body~~ done — fixed — Capture benchmark sets Log no-op (recorder_bench_test.go:56)                                                                   | ~~P0~~   | ~~10min~~  |
+| ~~6~~  | ~~**Fix `recorder_bench_test.go` b.Loop()** — 3 instances, Go 1.24+ modernization~~ done — file uses b.Loop() today                                                                                                            | ~~P1~~   | ~~2min~~   |
+| ~~7~~  | ~~**Fix CHANGELOG.md math error** — "48 test functions (41 tests + 3 godoc examples)" → 41+3=44, not 48~~ done — fixed — CHANGELOG reads "48 test functions, 3 benchmarks, 1 fuzz target" (CHANGELOG:381)                      | ~~P0~~   | ~~2min~~   |
+| ~~8~~  | ~~**Run `nix flake check`** — the canonical format quality gate, never run~~ done — `nix flake check` passes clean (2026-08-06 continuation sprint)                                                                            | ~~P0~~   | ~~5min~~   |
+| ~~9~~  | ~~**Push flightrecorder/v0.1.0 tag** — exists locally, not on origin (requires user permission)~~ done — pushed — flightrecorder/v0.1.0 is on origin                                                                           | ~~P0~~   | ~~1min~~   |
+| ~~10~~ | ~~**Fix ExampleRecorder_CaptureToWriter noise** — set Config.Log to no-op~~ done — fixed — example sets no-op Log (example_test.go:66)                                                                                         | ~~P1~~   | ~~5min~~   |
+| ~~11~~ | ~~**Complete M17: Add `go mod tidy -diff` check to Nix** — prevent go.mod drift in CI~~ done — enforced — check-all includes go mod tidy drift detection                                                                       | ~~P1~~   | ~~30min~~  |
+| ~~12~~ | ~~**Complete M17: Add Nix `check-all` target** — build + test + lint + format-check in one command~~ done — flake.nix check-all target exists                                                                                  | ~~P1~~   | ~~30min~~  |
+| ~~13~~ | ~~**Actually READ the 14 website .mdx files** — verify v4 semantics, not just grep patterns~~ done — closure sprint audited + fixed 6 website .mdx files                                                                       | ~~P1~~   | ~~60min~~  |
+| ~~14~~ | ~~**Improve taskctl coverage** — currently 68.2%, plan wanted closer to 87.8%~~ done — 85.9% (FEATURES.md)                                                                                                                     | ~~P2~~   | ~~100min~~ |
+| 15     | **Add automated `go tool trace` validation test** — make M10 repeatable in CI **→ ROADMAP Flight Recorder Enhancements (`go tool trace` parse validation)**                                                                    | P2       | 30min      |
+| ~~16~~ | ~~**Add integration test for flightrecorder in taskctl** — verify trace files are generated~~ done — written and passing (13-32 resolution banner)                                                                             | ~~P2~~   | ~~30min~~  |
+| ~~17~~ | ~~**Investigate ParseFlagTags +2 allocs** — 9→11 allocs from v2→v4. Is the nested struct recursion path optimal?~~ done (docs-health pass observation — alloc growth documented as v4 nested-struct recursion cost (13-32 §a)) | ~~P2~~   | ~~60min~~  |
+| ~~18~~ | ~~**Add `NewCLI` to BenchmarkAddCommand table** — currently shows ~17µs for NewCLI+AddCommand combined~~ **Superseded — tables restructured in the 2026-08-06 re-measure; NewCLI has its own row (PERFORMANCE.md:33).**        | ~~P2~~   | ~~10min~~  |
+| ~~19~~ | ~~**Verify COW claim numbers** — "48% faster NewCLI" and "-10 allocs per command" are from v2. Re-verify for v4.~~ done — claim stands — AGENTS.md copy-on-write section (~48% NewCLI)                                         | ~~P2~~   | ~~30min~~  |
+| 20     | **Add benchmark CI gating** — detect real regressions automatically (ROADMAP item) **→ ROADMAP Harvested (Benchmark CI gating)**                                                                                               | P3       | 60min      |
 
 ---
 
@@ -198,6 +199,7 @@ The TL;DR says "<2 µs for CLI creation" but `NewCLI` takes ~12.8µs. The "<2 µ
 ## Session Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                 | Value |
 | ---------------------- | ----- |
 | Commits this session   | 1     |

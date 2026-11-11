@@ -42,6 +42,7 @@ a migration note, or v5) before anyone tags it.
 ## a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | #  | Item                                | Evidence                                                                                                                                                                                                                    | Verified by                                                                                   |
 | -- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | 1  | End goal added to README and AGENTS | `README.md:3`, `AGENTS.md:3`                                                                                                                                                                                                | Visual check                                                                                  |
@@ -72,6 +73,7 @@ a migration note, or v5) before anyone tags it.
 ## b) PARTIALLY DONE
 
 <!-- check-rows:ledger -->
+
 | # | Item                        | What exists                                                          | What is missing                                                                                                     |
 | - | --------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | 1 | W1 gate: "byte-stable JSON" | Structural tests and deterministic sorting                           | No golden fixture; no explicit test that two runs produce identical bytes                                           |
@@ -199,7 +201,9 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 9. Decide the module path (`/v5` vs keep `/v4`) and scaffold it.
 10. Flip strict validation to the default.
+
 <!-- ✅ DONE 2026-11-08: shipped in v5.0.0 — the flip landed on the v5-scaffold branch, pinned by cli_defaults_matrix_test.go (Without* opt-outs shipped alongside); see the tagged v5.0.0 tree. -->
+
 11. Flip signal handling and graceful shutdown to the default.
 12. Implement the deferred-error `Builder`.
 13. Rename `CommandInfo` → `CommandMetadata`.
@@ -209,13 +213,13 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 17. Replace `RegisterInScope` with a generic variant.
 18. Rename `Get[T]` → `GetService[T]`.
 19. Redesign `Package[T]`. **→ routed — ROADMAP v5 candidates #7 (Package[T] redesign) — adopted into the v5 candidate table**
-~~20. Unify `Middleware[T]` and `ContextMiddleware[T]`.~~ **→ routed — ROADMAP v5 candidate #8 (middleware signature unification)**
-~~21. Write `docs/MIGRATION_v4_v5.md`.~~ → tracked in the v5 plan (TODO_LIST P9; docs/planning/2026-11-01_v5-end-goal-paved-road.md M13–M16)
-22. Write a codemod for the mechanical renames.
-23. Bump `lint.CurrentMajor` and re-verify CG002's message.
-24. Release `lint/v0.2.0` (CG007/CG008, baseline, provider options).
-25. Bump BuildFlow to the new linter release.
-26. Commit a reviewed lint baseline for the consumer corpus.
+    ~~20. Unify `Middleware[T]` and `ContextMiddleware[T]`.~~ **→ routed — ROADMAP v5 candidate #8 (middleware signature unification)**
+    ~~21. Write `docs/MIGRATION_v4_v5.md`.~~ → tracked in the v5 plan (TODO_LIST P9; docs/planning/2026-11-01_v5-end-goal-paved-road.md M13–M16)
+20. Write a codemod for the mechanical renames.
+21. Bump `lint.CurrentMajor` and re-verify CG002's message.
+22. Release `lint/v0.2.0` (CG007/CG008, baseline, provider options).
+23. Bump BuildFlow to the new linter release.
+24. Commit a reviewed lint baseline for the consumer corpus.
 
 **Guardrails and lint**
 
@@ -231,18 +235,18 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 
 32. Add `DescribeCommand(path)` for subtree discovery.
 33. Add a golden fixture for the describe schema and a stability test.
-~~34. Add a stable machine `code` per sentinel to the JSON envelope.~~ done — ErrorCode(err) + the additive error_code envelope (CHANGELOG [Unreleased], 2026-11-02)
-35. Generate `docs/ERROR_REFERENCE.md` from the sentinel + hint tables.
-36. Style the `Hint:` line with lipgloss to match fang's error view.
-37. Add hints for every exported sentinel, not only the classified ones.
-38. Consider a `--help=json` or `--describe` flag alias for agents that do not
+    ~~34. Add a stable machine `code` per sentinel to the JSON envelope.~~ done — ErrorCode(err) + the additive error_code envelope (CHANGELOG [Unreleased], 2026-11-02)
+34. Generate `docs/ERROR_REFERENCE.md` from the sentinel + hint tables.
+35. Style the `Hint:` line with lipgloss to match fang's error view.
+36. Add hints for every exported sentinel, not only the classified ones.
+37. Consider a `--help=json` or `--describe` flag alias for agents that do not
     discover subcommands.
 
 **Ergonomics**
 
 ~~39. Migrate `examples/docs-generator` to `NewApp` + `AddCommands`.~~ **Superseded — the v5 defaults-flip plan — docs/planning/2026-11-01_v5-end-goal-paved-road.md W2 carries NewApp adoption with the v5 flip, examples migrate then.**
 ~~40. Document why taskctl still configures options manually instead of~~ **→ routed — ROADMAP Harvested, Document taskctl's manual option configuration**
-    `WithBatteries`.
+`WithBatteries`.
 ~~41. Update `docs/QUICKSTART.md` with batteries, describe, and hints.~~ **→ tracked as TODO_LIST P12 (QUICKSTART + TUTORIAL parity)**
 42. Update `docs/TUTORIAL.md` with runtime tag validation semantics.
 43. Update the website docs and landing page.
@@ -253,7 +257,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 48. Add benchmarks for `Describe`, `AddCommands`, and validation.
 49. Build and test erraudit and timesheets against the modified library.
 50. When releasing, cut a proper CHANGELOG version section and status update with
-    the measured deltas.
+the measured deltas.
 
 ---
 
@@ -277,6 +281,7 @@ Honest list. None of these are unrecoverable, but each is a lesson.
 ## Verification Log
 
 <!-- check-rows:ledger -->
+
 | Command                                                                  | Result                                                                                                            |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | `GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 300s -race`         | All core packages green                                                                                           |

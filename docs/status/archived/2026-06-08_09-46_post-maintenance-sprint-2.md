@@ -20,6 +20,7 @@ Since the last status report (2026-06-08 05:53), one full sprint was executed: 1
 ### Infrastructure
 
 <!-- check-rows:ledger -->
+
 | Item                                                          | Status              |
 | ------------------------------------------------------------- | ------------------- |
 | `flake.nix` infinite recursion fixed (`goPkg = pkgs.go_1_26`) | ✅ Commit `c6ee9c2` |
@@ -29,6 +30,7 @@ Since the last status report (2026-06-08 05:53), one full sprint was executed: 1
 ### New Features
 
 <!-- check-rows:ledger -->
+
 | Item                                                                                                                         | Status              |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------------------- |
 | `Scope.HealthCheckResults()` / `HealthCheckResultsWithContext(ctx)` returning `map[string]error`                             | ✅ Commit `7bf23b3` |
@@ -39,6 +41,7 @@ Since the last status report (2026-06-08 05:53), one full sprint was executed: 1
 ### Refactoring
 
 <!-- check-rows:ledger -->
+
 | Item                                                      | Status              |
 | --------------------------------------------------------- | ------------------- |
 | configload: 3 files → 1 `loader.go` with `genericLoader`  | ✅ Commit `2785467` |
@@ -47,6 +50,7 @@ Since the last status report (2026-06-08 05:53), one full sprint was executed: 1
 ### Testing
 
 <!-- check-rows:ledger -->
+
 | Package                      | Tests        | Coverage |
 | ---------------------------- | ------------ | -------- |
 | `pkg/cmdguard/v2`            | 364 total    | 82.9%    |
@@ -58,6 +62,7 @@ Since the last status report (2026-06-08 05:53), one full sprint was executed: 1
 ### Documentation
 
 <!-- check-rows:ledger -->
+
 | Document                                                                           | Status |
 | ---------------------------------------------------------------------------------- | ------ |
 | All test counts updated (357/356 → 364)                                            | ✅     |
@@ -81,18 +86,18 @@ Nothing is partially done. All items are either fully complete or not started.
 
 ## c) NOT STARTED 📝
 
-| Item                                                                       | Priority   | Notes                           |
-| -------------------------------------------------------------------------- | ---------- | ------------------------------- |
-| ~~Add `CODECOV_TOKEN` secret to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~CI blocker~~ | ~~Requires repo admin access~~ |
-| ~~Plugin system for custom validators/type handlers~~ done — shipped — plugin.go, RegisterPlugin/WithPlugin (FEATURES.md) | ~~v3.0+~~ | ~~Future~~ |
-| ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~v3.0+~~ | ~~Future~~ |
-| ~~v3.0 API-breaking cleanup (NoFlags, Get/MustGet, RegisterInScope, Package)~~ **Superseded — shipped — v3.0.0 (2026-07-07) + v4.0.0 (2026-07-28) breaking cleanups.** | ~~v3.0+~~ | ~~Future~~ |
-| ~~Fuzz test seed corpus in `testdata/fuzz/`~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~Medium~~ | ~~7 fuzz targets exist, no corpus~~ |
-| ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output | ~~Medium~~ | ~~Feature enhancement~~ |
-| ~~Contribution guide (`CONTRIBUTING.md`)~~ done — CONTRIBUTING.md exists at repo root | ~~Low~~ | ~~Community~~ |
-| ~~Issue/PR templates (`.github/`)~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist | ~~Low~~ | ~~Community~~ |
-| charmbracelet/log integration **→ ROADMAP raw ideas (charmbracelet/log integration)** | Low | Logging |
-| Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)** | Low | Observability |
+| Item                                                                                                                                                                   | Priority       | Notes                               |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ----------------------------------- |
+| ~~Add `CODECOV_TOKEN` secret to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                              | ~~CI blocker~~ | ~~Requires repo admin access~~      |
+| ~~Plugin system for custom validators/type handlers~~ done — shipped — plugin.go, RegisterPlugin/WithPlugin (FEATURES.md)                                              | ~~v3.0+~~      | ~~Future~~                          |
+| ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                                                               | ~~v3.0+~~      | ~~Future~~                          |
+| ~~v3.0 API-breaking cleanup (NoFlags, Get/MustGet, RegisterInScope, Package)~~ **Superseded — shipped — v3.0.0 (2026-07-07) + v4.0.0 (2026-07-28) breaking cleanups.** | ~~v3.0+~~      | ~~Future~~                          |
+| ~~Fuzz test seed corpus in `testdata/fuzz/`~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7                                             | ~~Medium~~     | ~~7 fuzz targets exist, no corpus~~ |
+| ~~Structured JSON error output for `--output=json`~~ done — cli_errors_json.go structured JSON error output                                                            | ~~Medium~~     | ~~Feature enhancement~~             |
+| ~~Contribution guide (`CONTRIBUTING.md`)~~ done — CONTRIBUTING.md exists at repo root                                                                                  | ~~Low~~        | ~~Community~~                       |
+| ~~Issue/PR templates (`.github/`)~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist                                                                    | ~~Low~~        | ~~Community~~                       |
+| charmbracelet/log integration **→ ROADMAP raw ideas (charmbracelet/log integration)**                                                                                  | Low            | Logging                             |
+| Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)**                                                                           | Low            | Observability                       |
 
 ---
 
@@ -133,33 +138,33 @@ The only pre-existing issue is in `pkg/testutil/panic_test_helpers.go` (type ass
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #  | Item                                            | Impact                 | Effort  | Tier         |
-| -- | ----------------------------------------------- | ---------------------- | ------- | ------------ |
-| ~~1~~  | ~~Add `CODECOV_TOKEN` to repo~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~CI completeness~~ | ~~2min~~ | ~~Now~~ |
-| ~~2~~  | ~~Fuzz test corpus for 7 targets~~ done — testdata/fuzz seeds shipped; corpus expansion tracked in ROADMAP deferred #7 | ~~Robustness~~ | ~~Medium~~ | ~~This week~~ |
-| ~~3~~  | ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output | ~~Feature polish~~ | ~~Medium~~ | ~~This week~~ |
-| ~~4~~  | ~~Smoke test for benchmarks package~~ **NOT-DO — benchmark packages carry no unit tests by design; benchmarks run in CI via -bench.** | ~~Testing gap~~ | ~~Small~~ | ~~This week~~ |
-| ~~5~~  | ~~`checks.build` via `buildGoModule` in flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~CI completeness~~ | ~~Medium~~ | ~~This month~~ |
-| 6  | charmbracelet/log integration **→ ROADMAP raw ideas (charmbracelet/log integration)** | Modern logging         | Small   | This month   |
-| ~~7~~  | ~~CONTRIBUTING.md~~ done — CONTRIBUTING.md exists at repo root | ~~Community~~ | ~~Small~~ | ~~This month~~ |
-| ~~8~~  | ~~Issue/PR templates~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist | ~~Community~~ | ~~Small~~ | ~~This month~~ |
-| ~~9~~  | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).** | ~~CI reliability~~ | ~~Small~~ | ~~This week~~ |
-| 10 | `Result[T]` type for error handling **→ ROADMAP raw ideas (Result[T] monad)** | Type safety            | Medium  | Next quarter |
-| 11 | `Validated[T]` wrapper with validation **→ ROADMAP raw ideas (Validated[T] wrapper)** | Type safety            | Medium  | Next quarter |
-| ~~12~~ | ~~Plugin system design document~~ **Superseded — plugin system shipped directly (plugin.go), no separate design doc.** | ~~Architecture~~ | ~~Large~~ | ~~v3.0~~ |
-| ~~13~~ | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~Most requested~~ | ~~Large~~ | ~~v3.0~~ |
-| ~~14~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).** | ~~Foundation~~ | ~~Large~~ | ~~v3.0~~ |
-| ~~15~~ | ~~Make NoFlags distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha) | ~~Type safety (breaking)~~ | ~~Medium~~ | ~~v3.0~~ |
-| 16 | Rename Get[T]/MustGet[T] **→ ROADMAP v5 candidate #6; MustGet no longer exists in v4** | Clarity (breaking)     | Medium  | v3.0         |
-| 17 | Make RegisterInScope generic **→ TODO_LIST T5 (TODO(v5), scope.go)** | Type safety (breaking) | Medium  | v3.0         |
-| ~~18~~ | ~~Remove WithColor deprecation~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.** | ~~Cleanup (breaking)~~ | ~~Trivial~~ | ~~v3.0~~ |
-| ~~19~~ | ~~Remove IsExecutable deprecation~~ **Superseded — IsExecutable removed in the v3.0.0 breaking cleanup.** | ~~Cleanup (breaking)~~ | ~~Trivial~~ | ~~v3.0~~ |
-| 20 | Extract flagtags standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)** | Reusability            | Large   | Future       |
-| ~~21~~ | ~~go-output as optional sub-package~~ **Superseded — heavy deps moved to sub-modules in v3; go-output stayed core by design.** | ~~Dependency hygiene~~ | ~~Large~~ | ~~v3.0~~ |
-| ~~22~~ | ~~Documentation generation from CLI~~ done — GenerateDocs/docgen.go ships (FEATURES.md) | ~~Self-documenting~~ | ~~Large~~ | ~~Future~~ |
-| 23 | Metrics/hooks for observability **→ ROADMAP raw ideas (metrics/hooks observability)** | Production readiness   | Medium  | Future       |
-| ~~24~~ | ~~BDD tests with ginkgo~~ **NOT-DO — decided against — cmdguard standardizes on table-driven stdlib tests (AGENTS.md Testing).** | ~~Test quality~~ | ~~Medium~~ | ~~Future~~ |
-| ~~25~~ | ~~Deprecate v1 API timeline~~ **Superseded — the v1 package no longer exists — pkg/ contains only v4 (v4.0.0 module migration).** | ~~Process~~ | ~~Trivial~~ | ~~v3.0~~ |
+| #      | Item                                                                                                                                  | Impact                     | Effort      | Tier           |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ----------- | -------------- |
+| ~~1~~  | ~~Add `CODECOV_TOKEN` to repo~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                      | ~~CI completeness~~        | ~~2min~~    | ~~Now~~        |
+| ~~2~~  | ~~Fuzz test corpus for 7 targets~~ done — testdata/fuzz seeds shipped; corpus expansion tracked in ROADMAP deferred #7                | ~~Robustness~~             | ~~Medium~~  | ~~This week~~  |
+| ~~3~~  | ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output                                               | ~~Feature polish~~         | ~~Medium~~  | ~~This week~~  |
+| ~~4~~  | ~~Smoke test for benchmarks package~~ **NOT-DO — benchmark packages carry no unit tests by design; benchmarks run in CI via -bench.** | ~~Testing gap~~            | ~~Small~~   | ~~This week~~  |
+| ~~5~~  | ~~`checks.build` via `buildGoModule` in flake.nix~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**            | ~~CI completeness~~        | ~~Medium~~  | ~~This month~~ |
+| 6      | charmbracelet/log integration **→ ROADMAP raw ideas (charmbracelet/log integration)**                                                 | Modern logging             | Small       | This month     |
+| ~~7~~  | ~~CONTRIBUTING.md~~ done — CONTRIBUTING.md exists at repo root                                                                        | ~~Community~~              | ~~Small~~   | ~~This month~~ |
+| ~~8~~  | ~~Issue/PR templates~~ done — .github/ISSUE_TEMPLATE/ + PULL_REQUEST_TEMPLATE.md exist                                                | ~~Community~~              | ~~Small~~   | ~~This month~~ |
+| ~~9~~  | ~~Test all examples in CI~~ **Superseded — superseded — CI examples job re-tracked in TODO_LIST (2026-11-07 harvest).**               | ~~CI reliability~~         | ~~Small~~   | ~~This week~~  |
+| 10     | `Result[T]` type for error handling **→ ROADMAP raw ideas (Result[T] monad)**                                                         | Type safety                | Medium      | Next quarter   |
+| 11     | `Validated[T]` wrapper with validation **→ ROADMAP raw ideas (Validated[T] wrapper)**                                                 | Type safety                | Medium      | Next quarter   |
+| ~~12~~ | ~~Plugin system design document~~ **Superseded — plugin system shipped directly (plugin.go), no separate design doc.**                | ~~Architecture~~           | ~~Large~~   | ~~v3.0~~       |
+| ~~13~~ | ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                              | ~~Most requested~~         | ~~Large~~   | ~~v3.0~~       |
+| ~~14~~ | ~~v3.0 API design document~~ **Superseded — v3.0.0 shipped 2026-07-07 (docs/planning/2026-07-06_06-54).**                             | ~~Foundation~~             | ~~Large~~   | ~~v3.0~~       |
+| ~~15~~ | ~~Make NoFlags distinct named type~~ done — NoFlags is a distinct named type in v4 (AGENTS.md gotcha)                                 | ~~Type safety (breaking)~~ | ~~Medium~~  | ~~v3.0~~       |
+| 16     | Rename Get[T]/MustGet[T] **→ ROADMAP v5 candidate #6; MustGet no longer exists in v4**                                                | Clarity (breaking)         | Medium      | v3.0           |
+| 17     | Make RegisterInScope generic **→ TODO_LIST T5 (TODO(v5), scope.go)**                                                                  | Type safety (breaking)     | Medium      | v3.0           |
+| ~~18~~ | ~~Remove WithColor deprecation~~ **Superseded — WithColor removed in the v3.0.0 breaking cleanup.**                                   | ~~Cleanup (breaking)~~     | ~~Trivial~~ | ~~v3.0~~       |
+| ~~19~~ | ~~Remove IsExecutable deprecation~~ **Superseded — IsExecutable removed in the v3.0.0 breaking cleanup.**                             | ~~Cleanup (breaking)~~     | ~~Trivial~~ | ~~v3.0~~       |
+| 20     | Extract flagtags standalone library **→ ROADMAP raw ideas (extract flagtags standalone library)**                                     | Reusability                | Large       | Future         |
+| ~~21~~ | ~~go-output as optional sub-package~~ **Superseded — heavy deps moved to sub-modules in v3; go-output stayed core by design.**        | ~~Dependency hygiene~~     | ~~Large~~   | ~~v3.0~~       |
+| ~~22~~ | ~~Documentation generation from CLI~~ done — GenerateDocs/docgen.go ships (FEATURES.md)                                               | ~~Self-documenting~~       | ~~Large~~   | ~~Future~~     |
+| 23     | Metrics/hooks for observability **→ ROADMAP raw ideas (metrics/hooks observability)**                                                 | Production readiness       | Medium      | Future         |
+| ~~24~~ | ~~BDD tests with ginkgo~~ **NOT-DO — decided against — cmdguard standardizes on table-driven stdlib tests (AGENTS.md Testing).**      | ~~Test quality~~           | ~~Medium~~  | ~~Future~~     |
+| ~~25~~ | ~~Deprecate v1 API timeline~~ **Superseded — the v1 package no longer exists — pkg/ contains only v4 (v4.0.0 module migration).**     | ~~Process~~                | ~~Trivial~~ | ~~v3.0~~       |
 
 ---
 
@@ -178,6 +183,7 @@ The tradeoff: this would couple the doctor command to the output system (which b
 ## Metrics Summary
 
 <!-- check-rows:ledger -->
+
 | Metric                        | Value                                              |
 | ----------------------------- | -------------------------------------------------- |
 | **Version**                   | v2.4.0                                             |

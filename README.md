@@ -64,8 +64,6 @@ v5.NewCommand("query", v5.NoFlags{},
 )
 ```
 
-
-
 ### Type-safe flags — validated at construction
 
 **Raw Cobra — flags are strings, validated at runtime:**
@@ -213,35 +211,35 @@ HELLO, CMDGUARD!
 
 ## Features
 
-| Category                   | Highlights                                                                                                                                       |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups                                                 |
-| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                                                         |
-| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks                                                  |
-| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                                                                |
-| **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more                                                        |
-| **Signal handling**        | ON by default (v5) — Ctrl+C cancels the run; `WithoutSignalHandling()` opts out                                                                  |
-| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                 |
-| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                   |
-| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                             |
+| Category                   | Highlights                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups                                                             |
+| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                                                                     |
+| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks                                                              |
+| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                                                                            |
+| **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more                                                                    |
+| **Signal handling**        | ON by default (v5) — Ctrl+C cancels the run; `WithoutSignalHandling()` opts out                                                                              |
+| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                             |
+| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                               |
+| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                                         |
 | **Batteries included**     | ON by default in v5: strict validation, signals + graceful shutdown, strict config keys, version/doctor commands, hints — `WithoutBatteries()` drops the set |
-| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                                |
-| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                    |
-| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                    |
-| **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                      |
-| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                          |
-| **Extensible types**       | `RegisterTypeCodec()` for custom flag types with full parse/validate support                                                                    |
-| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own; spinner/telemetry/flight-recorder available as [sub-modules](#optional-sub-modules) |
-| **Interactive prompts**    | `WithPromptOnMissing()` with `prompt:"Question?"` tag via huh                                                                                    |
-| **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                                         |
-| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                                                                |
-| **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                                                                      |
-| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                                                                     |
-| **Zero panics**            | All functions return errors; no Must\* panic variants                                                                                            |
-| **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                                          |
-| **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                                    |
-| **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                                               |
-| **Verified**               | 89.3% core coverage, race-detected, fuzz-tested; `check-all` gates every push                                                                   |
+| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                                            |
+| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                                |
+| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                                |
+| **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                                  |
+| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                                      |
+| **Extensible types**       | `RegisterTypeCodec()` for custom flag types with full parse/validate support                                                                                 |
+| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own; spinner/telemetry/flight-recorder available as [sub-modules](#optional-sub-modules)             |
+| **Interactive prompts**    | `WithPromptOnMissing()` with `prompt:"Question?"` tag via huh                                                                                                |
+| **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                                                     |
+| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                                                                            |
+| **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                                                                                  |
+| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                                                                                 |
+| **Zero panics**            | All functions return errors; no Must\* panic variants                                                                                                        |
+| **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                                                      |
+| **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                                                |
+| **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                                                           |
+| **Verified**               | 89.3% core coverage, race-detected, fuzz-tested; `check-all` gates every push                                                                                |
 
 ---
 
@@ -430,19 +428,19 @@ type Flags struct {
 }
 ```
 
-| Tag        | Purpose                                 | Example                |
-| ---------- | --------------------------------------- | ---------------------- |
-| `flag`     | Flag name (required)                    | `flag:"name"`          |
-| `short`    | Short flag                              | `short:"n"`            |
-| `default`  | Default value                           | `default:"World"`      |
-| `help`     | Help text                               | `help:"Name to greet"` |
-| `env`      | Environment variable                    | `env:"DB_HOST"`        |
-| `required` | Mark as required                        | `required:"true"`      |
+| Tag        | Purpose                                 | Example                  |
+| ---------- | --------------------------------------- | ------------------------ |
+| `flag`     | Flag name (required)                    | `flag:"name"`            |
+| `short`    | Short flag                              | `short:"n"`              |
+| `default`  | Default value                           | `default:"World"`        |
+| `help`     | Help text                               | `help:"Name to greet"`   |
+| `env`      | Environment variable                    | `env:"DB_HOST"`          |
+| `required` | Mark as required                        | `required:"true"`        |
 | `validate` | Runtime validation after parsing        | `validate:"email,min=5"` |
-| `values`   | Restrict to a fixed set of values       | `values:"a,b,c"`       |
-| `count`    | Counting flag                           | `count:"true"`         |
-| `local`    | Root-only, not inherited by subcommands | `local:"true"`         |
-| `hidden`   | Exclude from --help but stay functional | `hidden:"true"`        |
+| `values`   | Restrict to a fixed set of values       | `values:"a,b,c"`         |
+| `count`    | Counting flag                           | `count:"true"`           |
+| `local`    | Root-only, not inherited by subcommands | `local:"true"`           |
+| `hidden`   | Exclude from --help but stay functional | `hidden:"true"`          |
 
 ---
 
@@ -486,31 +484,31 @@ cli, _ := v5.NewCLI[AppConfig]("myapp", "My app", AppConfig{},
 )
 ```
 
-| Option                                      | Purpose                                                           |
-| ------------------------------------------- | ----------------------------------------------------------------- |
-| `WithCLIVersion(v)`                         | Version string                                                    |
-| `WithCLILong(desc)`                         | Long description                                                  |
-| `WithSilenceErrors()`                       | Suppress error printing (advanced; fang handles this)             |
-| `WithSilenceUsage()`                        | Suppress usage on error (**default**; kept for compatibility)     |
-| `WithoutSilenceUsage()`                     | Re-enable usage-on-error (opt-in)                                 |
-| `WithFang(bool)`                            | Styled help output                                                |
-| `WithEnvPrefix(prefix)`                     | Prefix for env vars                                               |
-| `WithSignalHandling()`                      | Cancel context on SIGINT/SIGTERM (**default ON in v5**; `WithoutSignalHandling()` opts out)                                       |
-| `WithGracefulShutdown()`                    | Additionally shut down DI services on the signal path (**default ON in v5**; `WithoutGracefulShutdown()` opts out)                ||
-| `WithMiddleware[T](mw...)`                  | Middleware for all commands                                       |
-| `WithGroup(id, title)`                      | Help group on root                                                |
-| `WithConfigValidation[T](fn)`               | Validate config after flag parsing                                |
-| `WithPostFlagParse[T](fn...)`               | Post-parse hook: DI init, session storage                         |
-| `WithCleanup[T](fn...)`                     | Post-RunE cleanup that fires even when RunE errors                |
-| `WithStrictValidation()`                    | Require `WithShort` on all commands (**default ON in v5**; `WithoutStrictValidation()` opts out)                                  |
-| `WithStrictConfigKeys()`                    | Reject unknown config-file keys (**default ON in v5**; `WithoutStrictConfigKeys()` opts out)                                      |
-| `WithoutBatteries()`                        | Drop the whole v5 production set (strict, signals, shutdown, strict keys, hints, doctor) in one call                               |
-| `WithDraconianValidation()`                 | Strict + require `WithExample` on leaf commands                   |
-| `WithConfigFile(paths...)`                  | Auto-load JSON config from first found path                       |
-| `WithConfigFileLoader(l, paths...)`         | Load config with custom loader (YAML/TOML)                        |
-| `glamour.WithHelp()`                        | Render markdown in command help text (glamour sub-module)         |
-| `telemetry.WithTelemetry[T](tracer)`        | OpenTelemetry spans for all commands (telemetry sub-module)       |
-| `flightrecorder.WithFlightRecorder[T](cfg)` | Runtime trace snapshots on slow/error (flightrecorder sub-module) |
+| Option                                      | Purpose                                                                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `WithCLIVersion(v)`                         | Version string                                                                                                     |
+| `WithCLILong(desc)`                         | Long description                                                                                                   |
+| `WithSilenceErrors()`                       | Suppress error printing (advanced; fang handles this)                                                              |
+| `WithSilenceUsage()`                        | Suppress usage on error (**default**; kept for compatibility)                                                      |
+| `WithoutSilenceUsage()`                     | Re-enable usage-on-error (opt-in)                                                                                  |
+| `WithFang(bool)`                            | Styled help output                                                                                                 |
+| `WithEnvPrefix(prefix)`                     | Prefix for env vars                                                                                                |
+| `WithSignalHandling()`                      | Cancel context on SIGINT/SIGTERM (**default ON in v5**; `WithoutSignalHandling()` opts out)                        |
+| `WithGracefulShutdown()`                    | Additionally shut down DI services on the signal path (**default ON in v5**; `WithoutGracefulShutdown()` opts out) |
+| `WithMiddleware[T](mw...)`                  | Middleware for all commands                                                                                        |
+| `WithGroup(id, title)`                      | Help group on root                                                                                                 |
+| `WithConfigValidation[T](fn)`               | Validate config after flag parsing                                                                                 |
+| `WithPostFlagParse[T](fn...)`               | Post-parse hook: DI init, session storage                                                                          |
+| `WithCleanup[T](fn...)`                     | Post-RunE cleanup that fires even when RunE errors                                                                 |
+| `WithStrictValidation()`                    | Require `WithShort` on all commands (**default ON in v5**; `WithoutStrictValidation()` opts out)                   |
+| `WithStrictConfigKeys()`                    | Reject unknown config-file keys (**default ON in v5**; `WithoutStrictConfigKeys()` opts out)                       |
+| `WithoutBatteries()`                        | Drop the whole v5 production set (strict, signals, shutdown, strict keys, hints, doctor) in one call               |
+| `WithDraconianValidation()`                 | Strict + require `WithExample` on leaf commands                                                                    |
+| `WithConfigFile(paths...)`                  | Auto-load JSON config from first found path                                                                        |
+| `WithConfigFileLoader(l, paths...)`         | Load config with custom loader (YAML/TOML)                                                                         |
+| `glamour.WithHelp()`                        | Render markdown in command help text (glamour sub-module)                                                          |
+| `telemetry.WithTelemetry[T](tracer)`        | OpenTelemetry spans for all commands (telemetry sub-module)                                                        |
+| `flightrecorder.WithFlightRecorder[T](cfg)` | Runtime trace snapshots on slow/error (flightrecorder sub-module)                                                  |
 
 ---
 
@@ -562,15 +560,15 @@ Paths are tried in order; missing files are silently skipped. Supports `$ENV` an
 
 cmdguard's core stays lean — seven optional features live in standalone sub-modules so you import only what you need:
 
-| Sub-module         | Import path                                      | Provides                                                                   |
-| ------------------ | ------------------------------------------------ | -------------------------------------------------------------------------- |
-| **glamour**        | `github.com/larsartmann/cmdguard/glamour`        | Markdown help rendering (`WithHelp`, `RenderMarkdown`)                     |
-| **prompts**        | `github.com/larsartmann/cmdguard/prompts`        | Interactive prompts via huh (`Register`)                                   |
-| **spinner**        | `github.com/larsartmann/cmdguard/spinner`        | Terminal spinner middleware (`Middleware`)                                 |
-| **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`      | OpenTelemetry spans (`WithTelemetry`, `Middleware`)                        |
-| **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder` | Runtime trace snapshots on slow/error (`WithFlightRecorder`, `Middleware`) |
+| Sub-module         | Import path                                      | Provides                                                                     |
+| ------------------ | ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| **glamour**        | `github.com/larsartmann/cmdguard/glamour`        | Markdown help rendering (`WithHelp`, `RenderMarkdown`)                       |
+| **prompts**        | `github.com/larsartmann/cmdguard/prompts`        | Interactive prompts via huh (`Register`)                                     |
+| **spinner**        | `github.com/larsartmann/cmdguard/spinner`        | Terminal spinner middleware (`Middleware`)                                   |
+| **telemetry**      | `github.com/larsartmann/cmdguard/telemetry`      | OpenTelemetry spans (`WithTelemetry`, `Middleware`)                          |
+| **flightrecorder** | `github.com/larsartmann/cmdguard/flightrecorder` | Runtime trace snapshots on slow/error (`WithFlightRecorder`, `Middleware`)   |
 | **lint**           | `github.com/larsartmann/cmdguard/lint`           | cmdguard usage linter CG001-CG008 (`cmdguard-lint` CLI + BuildFlow provider) |
-| **schema**         | `github.com/larsartmann/cmdguard/schema`         | JSON Schema 2020-12 emitter for config structs (`FromConfig`, `FromCLI`)   |
+| **schema**         | `github.com/larsartmann/cmdguard/schema`         | JSON Schema 2020-12 emitter for config structs (`FromConfig`, `FromCLI`)     |
 
 ```go
 import (

@@ -27,31 +27,35 @@ benchmarks, examples, go.sum auditing — was **not done**.
 
 ## a) FULLY DONE (Working & Verified)
 
-| Item                                | Details                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item | Details |
+| ---- | ------- |
+
 <!-- check-rows:ledger -->
-| **`flightrecorder/recorder.go`**    | `Config` (8 fields with defaults), `Recorder` (Start/Stop/Enabled/WriteTo/Capture), sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), `sanitizeFilename`, `logf`. Thread-safe with `sync.Mutex` + `sync.WaitGroup`.                                                                                                                                      |
-| **`flightrecorder/middleware.go`**  | `Middleware[T]` (lazy start, run-phase-only capture, async snapshot), `WithFlightRecorder[T]` (convenience CLIOption), `evaluateCapture` (slow/error trigger logic).                                                                                                                                                                                           |
-| **Race condition fix**              | Identified and fixed data race between async `Capture` goroutine and `Stop()` — added `inflight sync.WaitGroup` so `Stop()` waits for in-flight `WriteTo`/`Capture` operations before calling `fr.Stop()`.                                                                                                                                                     |
-| **31 tests passing**                | `recorder_test.go` (15 tests): lifecycle, defaults, capture, filenames, cancelled context, custom log func, sentinel errors, sanitize table-driven. `middleware_test.go` (10 tests): non-nil, next passthrough, non-run-phase skip, slow capture, error capture, no-capture-when-clean, full path, lazy start, convenience options. Plus `waitForFile` helper. |
-| **91% coverage**                    | Verified with `-cover` flag.                                                                                                                                                                                                                                                                                                                                   |
-| **0 lint issues**                   | Passed `golangci-lint run ./...` with the project's strict `.golangci.yml` (100+ linters enabled).                                                                                                                                                                                                                                                             |
-| **0 race conditions**               | Passed `-race` flag.                                                                                                                                                                                                                                                                                                                                           |
-| **Workspace wired**                 | `go.work` updated, root `go.mod` has `replace` directive.                                                                                                                                                                                                                                                                                                      |
-| **AGENTS.md updated**               | Project structure tree, sub-module table, design principles #15 + #20, sub-modules gotchas section, middleware section — all updated with `flightrecorder` references.                                                                                                                                                                                         |
-| **`.golangci.yml` exclusion added** | `flightrecorder/.*_test\.go$` excluded from `paralleltest` (process-wide singleton prevents parallel test execution).                                                                                                                                                                                                                                          |
-| **`go mod tidy` run**               | Module has valid `go.mod` and `go.sum`.                                                                                                                                                                                                                                                                                                                        |
-| **Zero external dependencies**      | Uses only Go stdlib `runtime/trace` — the leanest sub-module in the project.                                                                                                                                                                                                                                                                                   |
+
+| **`flightrecorder/recorder.go`** | `Config` (8 fields with defaults), `Recorder` (Start/Stop/Enabled/WriteTo/Capture), sentinel errors (`ErrAlreadyStarted`, `ErrNotEnabled`), `sanitizeFilename`, `logf`. Thread-safe with `sync.Mutex` + `sync.WaitGroup`. |
+| **`flightrecorder/middleware.go`** | `Middleware[T]` (lazy start, run-phase-only capture, async snapshot), `WithFlightRecorder[T]` (convenience CLIOption), `evaluateCapture` (slow/error trigger logic). |
+| **Race condition fix** | Identified and fixed data race between async `Capture` goroutine and `Stop()` — added `inflight sync.WaitGroup` so `Stop()` waits for in-flight `WriteTo`/`Capture` operations before calling `fr.Stop()`. |
+| **31 tests passing** | `recorder_test.go` (15 tests): lifecycle, defaults, capture, filenames, cancelled context, custom log func, sentinel errors, sanitize table-driven. `middleware_test.go` (10 tests): non-nil, next passthrough, non-run-phase skip, slow capture, error capture, no-capture-when-clean, full path, lazy start, convenience options. Plus `waitForFile` helper. |
+| **91% coverage** | Verified with `-cover` flag. |
+| **0 lint issues** | Passed `golangci-lint run ./...` with the project's strict `.golangci.yml` (100+ linters enabled). |
+| **0 race conditions** | Passed `-race` flag. |
+| **Workspace wired** | `go.work` updated, root `go.mod` has `replace` directive. |
+| **AGENTS.md updated** | Project structure tree, sub-module table, design principles #15 + #20, sub-modules gotchas section, middleware section — all updated with `flightrecorder` references. |
+| **`.golangci.yml` exclusion added** | `flightrecorder/.*_test\.go$` excluded from `paralleltest` (process-wide singleton prevents parallel test execution). |
+| **`go mod tidy` run** | Module has valid `go.mod` and `go.sum`. |
+| **Zero external dependencies** | Uses only Go stdlib `runtime/trace` — the leanest sub-module in the project. |
 
 ---
 
 ## b) PARTIALLY DONE (Incomplete)
 
-| Item                        | What Exists                                          | What's Missing                                                                                                                                                                                                                                                                                                        |
-| --------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item | What Exists | What's Missing |
+| ---- | ----------- | -------------- |
+
 <!-- check-rows:ledger -->
-| **AGENTS.md documentation** | Sub-module table, gotchas, design principles updated | Package Guidelines table (line ~139) NOT updated — doesn't list `flightrecorder` as a package. Lint strategy section not updated with the new `paralleltest` exclusion. Exclusion count comment not bumped.                                                                                                           |
-| **go.sum hygiene**          | `go mod tidy` ran successfully                       | go.sum has 155 lines — suspiciously large for a module whose only dependency is `cmdguard/v4` (which itself is a local replace). The transitive dependency closure from `replace => ../` pulls in cobra/fang/lipgloss/etc as indirect deps. **Not investigated** whether this is correct or a `go mod tidy` artifact. |
+
+| **AGENTS.md documentation** | Sub-module table, gotchas, design principles updated | Package Guidelines table (line ~139) NOT updated — doesn't list `flightrecorder` as a package. Lint strategy section not updated with the new `paralleltest` exclusion. Exclusion count comment not bumped. |
+| **go.sum hygiene** | `go mod tidy` ran successfully | go.sum has 155 lines — suspiciously large for a module whose only dependency is `cmdguard/v4` (which itself is a local replace). The transitive dependency closure from `replace => ../` pulls in cobra/fang/lipgloss/etc as indirect deps. **Not investigated** whether this is correct or a `go mod tidy` artifact. |
 
 ---
 
@@ -157,18 +161,18 @@ If `CaptureOnError=true` AND `CaptureOnSlow=true` AND a command is both slow AND
 10. ~~Add `ExampleMiddleware` and `ExampleWithFlightRecorder` functions (`example_test.go`)~~ partially done at `ba818e3` (3 examples exist; 2 more lost in git corruption — TODO_LIST D9)
 11. ~~Add benchmarks: `BenchmarkMiddleware_Overhead`, `BenchmarkCapture`, `BenchmarkNew`~~ done at `ba818e3`
 12. ~~Add fuzz test for `sanitizeFilename`~~ done at `ba818e3`
-~~13. Add fuzz test for `Capture` filename construction~~ v:done ba818e3 — FuzzSanitizeFilename added
-14. ~~Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method~~ done at `ba818e3`
-15. ~~Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant~~ done at `ba818e3`
-16. ~~Add test asserting `errors.Is(err, ErrAlreadyStarted)` on double-Start~~ done at `ba818e3`
-17. ~~Add test for concurrent `Capture` calls from multiple goroutines~~ done at `ba818e3`
-18. ~~Add test for `WriteTo` after `Stop` (should return `ErrNotEnabled`)~~ done at `ba818e3`
-19. ~~Add test for empty command name fallback to "command"~~ done at `ba818e3`
-20. ~~Add test for filename collision (same-second captures)~~ done at `ba818e3`
-21. ~~Add integration test: wire through real `CLI[T]` + `Execute`~~ done at `ba818e3` (3 integration tests)
-~~22. Add `CaptureReasonPanic` support (capture on panic recovery) — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)
-23. ~~Split `Capture` method into `buildSnapshotPath` + `writeSnapshot`~~ done at `ba818e3`
-~~24. Add `Sync()` method for flushing pending captures without stopping — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
+    ~~13. Add fuzz test for `Capture` filename construction~~ v:done ba818e3 — FuzzSanitizeFilename added
+13. ~~Add `CaptureToWriter(writer io.Writer, ...) (int64, error)` method~~ done at `ba818e3`
+14. ~~Add `WithFlightRecorderRecorder[T](rec *Recorder)` CLIOption variant~~ done at `ba818e3`
+15. ~~Add test asserting `errors.Is(err, ErrAlreadyStarted)` on double-Start~~ done at `ba818e3`
+16. ~~Add test for concurrent `Capture` calls from multiple goroutines~~ done at `ba818e3`
+17. ~~Add test for `WriteTo` after `Stop` (should return `ErrNotEnabled`)~~ done at `ba818e3`
+18. ~~Add test for empty command name fallback to "command"~~ done at `ba818e3`
+19. ~~Add test for filename collision (same-second captures)~~ done at `ba818e3`
+20. ~~Add integration test: wire through real `CLI[T]` + `Execute`~~ done at `ba818e3` (3 integration tests)
+    ~~22. Add `CaptureReasonPanic` support (capture on panic recovery) — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (CaptureReasonPanic)
+21. ~~Split `Capture` method into `buildSnapshotPath` + `writeSnapshot`~~ done at `ba818e3`
+    ~~24. Add `Sync()` method for flushing pending captures without stopping — _in ROADMAP_~~ → ROADMAP Flight Recorder Enhancements (Sync() method)
 
 ### P2 — Nice to Have (Enhancement)
 
@@ -243,22 +247,24 @@ for modules that only need the core types?**
 
 ## Session Metrics
 
-| Metric                      | Value                                                                        |
-| --------------------------- | ---------------------------------------------------------------------------- |
+| Metric | Value |
+| ------ | ----- |
+
 <!-- check-rows:ledger -->
-| Files created               | 4 (`recorder.go`, `middleware.go`, `recorder_test.go`, `middleware_test.go`) |
-| Files modified              | 3 (`go.work`, `go.mod`, `.golangci.yml`, `AGENTS.md`)                        |
-| Lines of code (source)      | ~300                                                                         |
-| Lines of code (tests)       | ~500                                                                         |
-| Test functions              | 31 (38 including subtests)                                                   |
-| Coverage                    | 91.0%                                                                        |
-| Lint issues                 | 0                                                                            |
-| Race conditions             | 0 (after fix)                                                                |
-| Build errors                | 0                                                                            |
-| External dependencies added | 0 (stdlib only)                                                              |
-| Time to implement           | ~1 hour                                                                      |
-| Iterations on lint          | 3 (initial write → 72 issues → format → 3 issues → fix → 0)                  |
-| Race condition fixes        | 1 (async capture vs Stop — added WaitGroup)                                  |
+
+| Files created | 4 (`recorder.go`, `middleware.go`, `recorder_test.go`, `middleware_test.go`) |
+| Files modified | 3 (`go.work`, `go.mod`, `.golangci.yml`, `AGENTS.md`) |
+| Lines of code (source) | ~300 |
+| Lines of code (tests) | ~500 |
+| Test functions | 31 (38 including subtests) |
+| Coverage | 91.0% |
+| Lint issues | 0 |
+| Race conditions | 0 (after fix) |
+| Build errors | 0 |
+| External dependencies added | 0 (stdlib only) |
+| Time to implement | ~1 hour |
+| Iterations on lint | 3 (initial write → 72 issues → format → 3 issues → fix → 0) |
+| Race condition fixes | 1 (async capture vs Stop — added WaitGroup) |
 
 ---
 

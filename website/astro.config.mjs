@@ -54,8 +54,7 @@ export default defineConfig({
 			customCss: ["./src/styles/starlight.css"],
 			lastUpdated: true,
 			editLink: {
-				baseUrl:
-					"https://github.com/LarsArtmann/cmdguard/edit/master/website/src/content/docs/",
+				baseUrl: "https://github.com/LarsArtmann/cmdguard/edit/master/website/src/content/docs/",
 			},
 			expressiveCode: {
 				themes: ["github-light", "github-dark"],

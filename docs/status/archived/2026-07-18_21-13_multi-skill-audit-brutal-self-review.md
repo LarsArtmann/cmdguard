@@ -11,6 +11,7 @@
 ## a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | #  | Skill                               | Artifact                                                                                                                                 | Honest quality                                                         |
 | -- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | 1  | pareto-planning                     | `docs/planning/2026-07-18_20-46_superb-comprehensive-skills-execution-plan.md` (mermaid graph, L1+L2 tables, Verschlimmbesserung guards) | Good — comprehensive, honest about threats                             |
@@ -263,6 +264,7 @@ Inline TODOs would put the decisions in front of the next reader of `type_handle
 ## Session metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                        | Value                                                   |
 | ----------------------------- | ------------------------------------------------------- |
 | Skills loaded                 | 14                                                      |
@@ -294,6 +296,7 @@ Inline TODOs would put the decisions in front of the next reader of `type_handle
 ### Final coverage of `update-old-docs`
 
 <!-- check-rows:ledger -->
+
 | Outcome                        | Count | Files                                                                                                                                                                                                                                                                                                                                                            |
 | ------------------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **ANNOTATED**                  | 46    | 37 markdown + 9 HTML (specific `## Resolution (2026-07-18)` sections or end-of-file `<!-- Resolution -->` HTML comments)                                                                                                                                                                                                                                         |

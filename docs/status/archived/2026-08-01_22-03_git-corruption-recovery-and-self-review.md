@@ -32,45 +32,51 @@
 
 ## a) FULLY DONE
 
-| Item                                                           | Status | Notes                                                                                                                                                                                    |
-| -------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item | Status | Notes |
+| ---- | ------ | ----- |
+
 <!-- check-rows:ledger -->
-| Created safety backup ref (`recovery/921bf73-backup`)          | DONE   | Preserves the corrupted commit `921bf73` for forensic reference                                                                                                                          |
-| Quit the broken rebase cleanly                                 | DONE   | `git rebase --quit` — no force, no data loss                                                                                                                                             |
-| Moved `master` to `origin/master` (5769181)                    | DONE   | Branch divergence resolved; master now tracks origin cleanly                                                                                                                             |
-| Verified all 9 on-disk flightrecorder files match commit blobs | DONE   | Byte-for-byte hash verification: recorder.go, middleware.go, recorder_test.go, middleware_test.go, integration_test.go, fuzz_test.go, recorder_bench_test.go, go.mod, go.sum — all match |
-| Recreated `flightrecorder/README.md`                           | DONE   | Full docs: config table, quick-start, manual lifecycle, constraints                                                                                                                      |
-| Recreated `flightrecorder/example_test.go`                     | DONE   | 3 godoc examples (DefaultConfig, New, CaptureReason) — all pass                                                                                                                          |
-| Build all workspace modules                                    | DONE   | `GOEXPERIMENT=jsonv2 go build ./...` — 0 errors                                                                                                                                          |
-| All flightrecorder tests pass with race detection              | DONE   | `-race` clean                                                                                                                                                                            |
-| All core module tests pass                                     | DONE   | taskctl examples, integration, v4, testutil — all green                                                                                                                                  |
-| Lint flightrecorder sub-module                                 | DONE   | 0 issues                                                                                                                                                                                 |
-| All 3 example tests pass                                       | DONE   | Verified individually with `-run Example -v`                                                                                                                                             |
-| Working tree fully preserved                                   | DONE   | All user's uncommitted changes intact (doc edits, file deletions, new files)                                                                                                             |
+
+| Created safety backup ref (`recovery/921bf73-backup`) | DONE | Preserves the corrupted commit `921bf73` for forensic reference |
+| Quit the broken rebase cleanly | DONE | `git rebase --quit` — no force, no data loss |
+| Moved `master` to `origin/master` (5769181) | DONE | Branch divergence resolved; master now tracks origin cleanly |
+| Verified all 9 on-disk flightrecorder files match commit blobs | DONE | Byte-for-byte hash verification: recorder.go, middleware.go, recorder_test.go, middleware_test.go, integration_test.go, fuzz_test.go, recorder_bench_test.go, go.mod, go.sum — all match |
+| Recreated `flightrecorder/README.md` | DONE | Full docs: config table, quick-start, manual lifecycle, constraints |
+| Recreated `flightrecorder/example_test.go` | DONE | 3 godoc examples (DefaultConfig, New, CaptureReason) — all pass |
+| Build all workspace modules | DONE | `GOEXPERIMENT=jsonv2 go build ./...` — 0 errors |
+| All flightrecorder tests pass with race detection | DONE | `-race` clean |
+| All core module tests pass | DONE | taskctl examples, integration, v4, testutil — all green |
+| Lint flightrecorder sub-module | DONE | 0 issues |
+| All 3 example tests pass | DONE | Verified individually with `-run Example -v` |
+| Working tree fully preserved | DONE | All user's uncommitted changes intact (doc edits, file deletions, new files) |
 
 ---
 
 ## b) PARTIALLY DONE
 
-| Item                              | Status  | What remains                                                                                                                                                                                                                                     |
-| --------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Item | Status | What remains |
+| ---- | ------ | ------------ |
+
 <!-- check-rows:ledger -->
+
 | Repository integrity (`git fsck`) | PARTIAL | Still reports 12 broken/missing links — these belong to the corrupted `921bf73` commit which is preserved via backup ref. The **live** `master` branch is clean and fully functional. The corruption only affects the unreachable backup commit. |
-| flightrecorder README             | PARTIAL | Recreated from scratch based on API surface — the original may have had different content, examples, or phrasing that I cannot verify (the blob is gone)                                                                                         |
-| flightrecorder example_test.go    | PARTIAL | Recreated from the public API — the original may have covered different scenarios or had different example outputs                                                                                                                               |
+| flightrecorder README | PARTIAL | Recreated from scratch based on API surface — the original may have had different content, examples, or phrasing that I cannot verify (the blob is gone) |
+| flightrecorder example_test.go | PARTIAL | Recreated from the public API — the original may have covered different scenarios or had different example outputs |
 
 ---
 
 ## c) NOT STARTED
 
-| Item                                                           | Why                                                       |
-| -------------------------------------------------------------- | --------------------------------------------------------- |
+| Item | Why |
+| ---- | --- |
+
 <!-- check-rows:ledger -->
-| Committing the working tree changes                            | User hasn't asked to commit yet                           |
-| Deleting the backup ref `recovery/921bf73-backup`              | Should wait until user confirms everything is good        |
-| Running `git gc` / `git prune` to clean up dangling objects    | Not urgent, but would clean the 12 broken links from fsck |
-| Pushing to origin                                              | User diverged intentionally; push not requested           |
-| Linting ALL workspace modules (only flightrecorder was linted) | Time-boxed to the sub-module I touched                    |
+
+| Committing the working tree changes | User hasn't asked to commit yet |
+| Deleting the backup ref `recovery/921bf73-backup` | Should wait until user confirms everything is good |
+| Running `git gc` / `git prune` to clean up dangling objects | Not urgent, but would clean the 12 broken links from fsck |
+| Pushing to origin | User diverged intentionally; push not requested |
+| Linting ALL workspace modules (only flightrecorder was linted) | Time-boxed to the sub-module I touched |
 
 ---
 
@@ -132,11 +138,11 @@ I created it as a safety net but didn't tell the user what it is, why it exists,
 ### Immediate (This Session / Next Session)
 
 1. ~~Ask user if they have the original `flightrecorder/README.md` and `example_test.go` elsewhere~~ resolved (originals confirmed permanently lost; reconstructions are the source of truth)
-~~2. Delete `recovery/921bf73-backup` ref once user confirms recovery is satisfactory — _still open; TODO_LIST D7_~~ v:done — no recovery/ refs remain
-~~3. Run `git gc --prune=now` to clean up the 12 broken/dangling objects from fsck — _still open; TODO_LIST D7_~~ v:done — object DB clean (fsck shows no errors today)
-~~4. Verify git-town is in a clean state (`git town status` or equivalent)~~ p:resolved during the recovery session
-5. ~~Commit the working tree changes (flightrecorder sub-module + doc changes + deletions)~~ done at `ba818e3`
-6. ~~Push to origin~~ done (master tracks origin cleanly)
+   ~~2. Delete `recovery/921bf73-backup` ref once user confirms recovery is satisfactory — _still open; TODO_LIST D7_~~ v:done — no recovery/ refs remain
+   ~~3. Run `git gc --prune=now` to clean up the 12 broken/dangling objects from fsck — _still open; TODO_LIST D7_~~ v:done — object DB clean (fsck shows no errors today)
+   ~~4. Verify git-town is in a clean state (`git town status` or equivalent)~~ p:resolved during the recovery session
+2. ~~Commit the working tree changes (flightrecorder sub-module + doc changes + deletions)~~ done at `ba818e3`
+3. ~~Push to origin~~ done (master tracks origin cleanly)
 
 ### flightrecorder Sub-Module
 

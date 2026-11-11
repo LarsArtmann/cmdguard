@@ -67,6 +67,7 @@
 **What actually happened:** I removed ~6 v3-specific exclusion rules (funlen x3, cyclop x1, paralleltest x1, wrapcheck in output.go x1) and converted the ireturn issues to a global allow list. But 10 v3-specific exclusion rules still remain:
 
 <!-- check-rows:ledger -->
+
 | File                  | Linter           | Issue                                                                               | Legitimate?                                               |
 | --------------------- | ---------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `type_handler.go`     | gochecknoglobals | `globalTypeRegistry`                                                                | Yes — COW pattern foundation                              |
@@ -165,58 +166,58 @@ I took the lazy way out and excluded instead of fixing.
 
 ## f) Up to 50 Things to Get Done Next
 
-| #  | Task                                                               | Effort | Priority |
-| -- | ------------------------------------------------------------------ | ------ | -------- |
-| ~~1~~  | ~~Fix 2 wrapcheck in type_handler.go (wrap dispatchRegister returns)~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy (wrapcheck exclusions stand) | ~~10m~~ | ~~P0~~ |
-| ~~2~~  | ~~Remove redundant config_file.go ireturn exclusion~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~2m~~ | ~~P0~~ |
-| ~~3~~  | ~~Correct exclusion count in AGENTS.md lint strategy~~ done — AGENTS.md lint exclusions documented (2026-11-02) | ~~5m~~ | ~~P0~~ |
-| ~~4~~  | ~~Verify fuzz corpus with `-fuzz` flag~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~5m~~ | ~~P0~~ |
-| ~~5~~  | ~~infertypeargs sweep (143 mechanical fixes in test files)~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~30m~~ | ~~P1~~ |
-| ~~6~~  | ~~Create examples/docs-generator/main.go~~ done — examples/docs-generator exists | ~~15m~~ | ~~P1~~ |
-| ~~7~~  | ~~Add `do.Injector` to ireturn allow list (removes 2 exclusions)~~ done — do.Injector in the global ireturn allow list (.golangci.yml:185) | ~~5m~~ | ~~P1~~ |
-| ~~8~~  | ~~Add `koanf` interface to ireturn allow list (removes 1 exclusion)~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).** | ~~5m~~ | ~~P1~~ |
-| ~~9~~  | ~~Run CI workflow via `act` or push trigger~~ done — CI green on every push (ci.yml, submodule-smoke.yml) | ~~15m~~ | ~~P1~~ |
-| ~~10~~ | ~~Track exclusion count as a metric (add to AGENTS.md)~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy is the standing inventory | ~~5m~~ | ~~P1~~ |
-| ~~11~~ | ~~Add more fuzz seeds for FuzzParseFlagTags and FuzzSetField~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7 | ~~10m~~ | ~~P2~~ |
-| ~~12~~ | ~~Expand DOMAIN_LANGUAGE.md with bounded contexts~~ done — docs/DOMAIN_LANGUAGE.md maintained (v4) | ~~20m~~ | ~~P2~~ |
-| 13 | Extract koanf behind build tag (removes direct dep from core) **→ ROADMAP deferred #5 (koanf extraction YAGNI)** | 45m    | P2       |
-| ~~14~~ | ~~Add flake.nix sub-module build checks~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~20m~~ | ~~P2~~ |
-| ~~15~~ | ~~Create second example app (different domain)~~ done — examples/config-explain exists | ~~2h~~ | ~~P3~~ |
-| ~~16~~ | ~~Add Middleware context propagation (v3.1 breaking)~~ done — shipped additively — ContextMiddleware[T] (2026-10-04); unification tracked as ROADMAP v5 candidate #8 | ~~2h~~ | ~~P3~~ |
-| 17 | Rename Get[T] → GetService[T] (v3.1 breaking) **→ ROADMAP v5 candidate #6 (MustGet gone in v4)** | 1h     | P3       |
-| 18 | Make RegisterInScope generic (v3.1 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)** | 1h     | P3       |
-| 19 | Remove or redesign Package() (v3.1 breaking) **→ ROADMAP v5 candidate #7** | 1h     | P3       |
-| 20 | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)** | 30m    | P3       |
-| ~~21~~ | ~~Add test-all-examples-in-CI~~ **Superseded — superseded — CI examples job harvested into TODO_LIST (2026-11-07).** | ~~30m~~ | ~~P3~~ |
-| 22 | Extract flag-tags to github.com/larsartmann/flagtags **→ ROADMAP raw ideas (extract flagtags standalone library)** | 2h     | P4       |
-| 23 | Service-owned config design (ADR) **→ ROADMAP raw ideas (service-owned config ADR)** | 1h     | P4       |
-| ~~24~~ | ~~Command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md) | ~~2h~~ | ~~P4~~ |
-| 25 | Built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)** | 1h     | P4       |
-| ~~26~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod) | ~~2h~~ | ~~P4~~ |
-| 27 | FlagRegistry interface abstraction **→ ROADMAP v5 flag-representation consolidation (ADR-002)** | 1h     | P4       |
-| ~~28~~ | ~~Custom per-flag validation hooks~~ done — FlagValidator registration + typed TypeHandlers ship (flags_validate.go) | ~~1h~~ | ~~P4~~ |
-| ~~29~~ | ~~Enhanced flag validation enums~~ done — strong-typed flag types ship (types_port/email/url; FEATURES.md) | ~~1h~~ | ~~P4~~ |
-| 30 | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)** | 2h     | P4       |
-| 31 | Branded-ID example app **→ ROADMAP raw ideas (branded-ID example app)** | 1h     | P4       |
-| ~~32~~ | ~~Add coverage badge to README (needs CI integration)~~ done — README coverage badge (90.4%) | ~~30m~~ | ~~P3~~ |
-| ~~33~~ | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~5m~~ | ~~P3~~ |
-| 34 | Add `godoclint` compliance for all exported functions **→ ROADMAP raw ideas (godoclint compliance)** | 1h     | P2       |
-| ~~35~~ | ~~Audit all `//nolint:` directives for relevance~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy (nolint inventory) | ~~30m~~ | ~~P2~~ |
-| ~~36~~ | ~~Add integration test for WithConfigFile + nested structs~~ done — nested config structs supported (AGENTS.md) | ~~30m~~ | ~~P2~~ |
-| ~~37~~ | ~~Add test for WithCleanup firing on RunE error~~ done — WithCleanup ships (FEATURES.md, fires on RunE error) | ~~20m~~ | ~~P2~~ |
-| ~~38~~ | ~~Add test for WithGracefulShutdown signal handling~~ done — WithGracefulShutdown ships (FEATURES.md, signals) | ~~30m~~ | ~~P2~~ |
-| ~~39~~ | ~~Add test for doctor command with custom checks~~ done — DoctorCommand[T] + WithDoctorCheck[T] ship (doctor.go; FEATURES.md) | ~~20m~~ | ~~P2~~ |
-| ~~40~~ | ~~Add test for version command output format~~ done — version_test.go exists | ~~15m~~ | ~~P2~~ |
-| ~~41~~ | ~~Document the COW registry pattern in an ADR~~ done — docs/adr/003-cow-registry-pattern.md exists | ~~30m~~ | ~~P2~~ |
-| ~~42~~ | ~~Add `go vet` to CI workflow~~ done — golangci-lint in CI runs govet (ci.yml lint job) | ~~5m~~ | ~~P1~~ |
-| ~~43~~ | ~~Add `golangci-lint` to CI workflow for sub-modules~~ done — submodule-smoke.yml lint job | ~~15m~~ | ~~P1~~ |
-| 44 | Add semver check to CI (ensures no breaking changes in patch) **→ ROADMAP raw ideas (semver breaking-change CI check)** | 30m    | P3       |
-| ~~45~~ | ~~Add Dependabot/Renovate config~~ done — .github/dependabot.yml exists | ~~15m~~ | ~~P3~~ |
-| ~~46~~ | ~~Create CONTRIBUTING.md section on testing patterns~~ done — CONTRIBUTING.md exists at repo root | ~~30m~~ | ~~P2~~ |
-| ~~47~~ | ~~Add `WithoutSilenceUsage` to README quick start~~ done — README documents v4 (maintained through releases) | ~~10m~~ | ~~P2~~ |
-| ~~48~~ | ~~Review all error sentinel names for consistency~~ done — sentinelFacts covers all sentinels (errors_facts.go) | ~~30m~~ | ~~P2~~ |
-| 49 | Add Property-based testing for flag parsing **→ ROADMAP raw ideas (Property-based type-parser tests)** | 1h     | P3       |
-| ~~50~~ | ~~Write ADR-002: Lint Strategy and Exclusion Policy~~ done — docs/adr/002-lint-strategy-and-exclusion-policy.md exists | ~~30m~~ | ~~P2~~ |
+| #      | Task                                                                                                                                                                 | Effort  | Priority |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| ~~1~~  | ~~Fix 2 wrapcheck in type_handler.go (wrap dispatchRegister returns)~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy (wrapcheck exclusions stand)   | ~~10m~~ | ~~P0~~   |
+| ~~2~~  | ~~Remove redundant config_file.go ireturn exclusion~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**                             | ~~2m~~  | ~~P0~~   |
+| ~~3~~  | ~~Correct exclusion count in AGENTS.md lint strategy~~ done — AGENTS.md lint exclusions documented (2026-11-02)                                                      | ~~5m~~  | ~~P0~~   |
+| ~~4~~  | ~~Verify fuzz corpus with `-fuzz` flag~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7                                                | ~~5m~~  | ~~P0~~   |
+| ~~5~~  | ~~infertypeargs sweep (143 mechanical fixes in test files)~~ **Superseded — the v3/v4 rewrites replaced those sources.**                                             | ~~30m~~ | ~~P1~~   |
+| ~~6~~  | ~~Create examples/docs-generator/main.go~~ done — examples/docs-generator exists                                                                                     | ~~15m~~ | ~~P1~~   |
+| ~~7~~  | ~~Add `do.Injector` to ireturn allow list (removes 2 exclusions)~~ done — do.Injector in the global ireturn allow list (.golangci.yml:185)                           | ~~5m~~  | ~~P1~~   |
+| ~~8~~  | ~~Add `koanf` interface to ireturn allow list (removes 1 exclusion)~~ **Superseded — configload deleted; KoanfLoader is the single loader (AGENTS.md).**             | ~~5m~~  | ~~P1~~   |
+| ~~9~~  | ~~Run CI workflow via `act` or push trigger~~ done — CI green on every push (ci.yml, submodule-smoke.yml)                                                            | ~~15m~~ | ~~P1~~   |
+| ~~10~~ | ~~Track exclusion count as a metric (add to AGENTS.md)~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy is the standing inventory                    | ~~5m~~  | ~~P1~~   |
+| ~~11~~ | ~~Add more fuzz seeds for FuzzParseFlagTags and FuzzSetField~~ done — testdata/fuzz seeds shipped; expansion tracked in ROADMAP deferred #7                          | ~~10m~~ | ~~P2~~   |
+| ~~12~~ | ~~Expand DOMAIN_LANGUAGE.md with bounded contexts~~ done — docs/DOMAIN_LANGUAGE.md maintained (v4)                                                                   | ~~20m~~ | ~~P2~~   |
+| 13     | Extract koanf behind build tag (removes direct dep from core) **→ ROADMAP deferred #5 (koanf extraction YAGNI)**                                                     | 45m     | P2       |
+| ~~14~~ | ~~Add flake.nix sub-module build checks~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.**                                                     | ~~20m~~ | ~~P2~~   |
+| ~~15~~ | ~~Create second example app (different domain)~~ done — examples/config-explain exists                                                                               | ~~2h~~  | ~~P3~~   |
+| ~~16~~ | ~~Add Middleware context propagation (v3.1 breaking)~~ done — shipped additively — ContextMiddleware[T] (2026-10-04); unification tracked as ROADMAP v5 candidate #8 | ~~2h~~  | ~~P3~~   |
+| 17     | Rename Get[T] → GetService[T] (v3.1 breaking) **→ ROADMAP v5 candidate #6 (MustGet gone in v4)**                                                                     | 1h      | P3       |
+| 18     | Make RegisterInScope generic (v3.1 breaking) **→ TODO_LIST T5 (TODO(v5), scope.go)**                                                                                 | 1h      | P3       |
+| 19     | Remove or redesign Package() (v3.1 breaking) **→ ROADMAP v5 candidate #7**                                                                                           | 1h      | P3       |
+| 20     | Add benchmark regression thresholds in CI **→ ROADMAP raw ideas (Benchmark CI gating)**                                                                              | 30m     | P3       |
+| ~~21~~ | ~~Add test-all-examples-in-CI~~ **Superseded — superseded — CI examples job harvested into TODO_LIST (2026-11-07).**                                                 | ~~30m~~ | ~~P3~~   |
+| 22     | Extract flag-tags to github.com/larsartmann/flagtags **→ ROADMAP raw ideas (extract flagtags standalone library)**                                                   | 2h      | P4       |
+| 23     | Service-owned config design (ADR) **→ ROADMAP raw ideas (service-owned config ADR)**                                                                                 | 1h      | P4       |
+| ~~24~~ | ~~Command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md)                                                                      | ~~2h~~  | ~~P4~~   |
+| 25     | Built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)**                                                                                | 1h      | P4       |
+| ~~26~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod)                                   | ~~2h~~  | ~~P4~~   |
+| 27     | FlagRegistry interface abstraction **→ ROADMAP v5 flag-representation consolidation (ADR-002)**                                                                      | 1h      | P4       |
+| ~~28~~ | ~~Custom per-flag validation hooks~~ done — FlagValidator registration + typed TypeHandlers ship (flags_validate.go)                                                 | ~~1h~~  | ~~P4~~   |
+| ~~29~~ | ~~Enhanced flag validation enums~~ done — strong-typed flag types ship (types_port/email/url; FEATURES.md)                                                           | ~~1h~~  | ~~P4~~   |
+| 30     | Metrics/hooks for custom observability **→ ROADMAP raw ideas (metrics/hooks observability)**                                                                         | 2h      | P4       |
+| 31     | Branded-ID example app **→ ROADMAP raw ideas (branded-ID example app)**                                                                                              | 1h      | P4       |
+| ~~32~~ | ~~Add coverage badge to README (needs CI integration)~~ done — README coverage badge (90.4%)                                                                         | ~~30m~~ | ~~P3~~   |
+| ~~33~~ | ~~Add CODECOV_TOKEN to GitHub repo settings~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                       | ~~5m~~  | ~~P3~~   |
+| 34     | Add `godoclint` compliance for all exported functions **→ ROADMAP raw ideas (godoclint compliance)**                                                                 | 1h      | P2       |
+| ~~35~~ | ~~Audit all `//nolint:` directives for relevance~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy (nolint inventory)                                 | ~~30m~~ | ~~P2~~   |
+| ~~36~~ | ~~Add integration test for WithConfigFile + nested structs~~ done — nested config structs supported (AGENTS.md)                                                      | ~~30m~~ | ~~P2~~   |
+| ~~37~~ | ~~Add test for WithCleanup firing on RunE error~~ done — WithCleanup ships (FEATURES.md, fires on RunE error)                                                        | ~~20m~~ | ~~P2~~   |
+| ~~38~~ | ~~Add test for WithGracefulShutdown signal handling~~ done — WithGracefulShutdown ships (FEATURES.md, signals)                                                       | ~~30m~~ | ~~P2~~   |
+| ~~39~~ | ~~Add test for doctor command with custom checks~~ done — DoctorCommand[T] + WithDoctorCheck[T] ship (doctor.go; FEATURES.md)                                        | ~~20m~~ | ~~P2~~   |
+| ~~40~~ | ~~Add test for version command output format~~ done — version_test.go exists                                                                                         | ~~15m~~ | ~~P2~~   |
+| ~~41~~ | ~~Document the COW registry pattern in an ADR~~ done — docs/adr/003-cow-registry-pattern.md exists                                                                   | ~~30m~~ | ~~P2~~   |
+| ~~42~~ | ~~Add `go vet` to CI workflow~~ done — golangci-lint in CI runs govet (ci.yml lint job)                                                                              | ~~5m~~  | ~~P1~~   |
+| ~~43~~ | ~~Add `golangci-lint` to CI workflow for sub-modules~~ done — submodule-smoke.yml lint job                                                                           | ~~15m~~ | ~~P1~~   |
+| 44     | Add semver check to CI (ensures no breaking changes in patch) **→ ROADMAP raw ideas (semver breaking-change CI check)**                                              | 30m     | P3       |
+| ~~45~~ | ~~Add Dependabot/Renovate config~~ done — .github/dependabot.yml exists                                                                                              | ~~15m~~ | ~~P3~~   |
+| ~~46~~ | ~~Create CONTRIBUTING.md section on testing patterns~~ done — CONTRIBUTING.md exists at repo root                                                                    | ~~30m~~ | ~~P2~~   |
+| ~~47~~ | ~~Add `WithoutSilenceUsage` to README quick start~~ done — README documents v4 (maintained through releases)                                                         | ~~10m~~ | ~~P2~~   |
+| ~~48~~ | ~~Review all error sentinel names for consistency~~ done — sentinelFacts covers all sentinels (errors_facts.go)                                                      | ~~30m~~ | ~~P2~~   |
+| 49     | Add Property-based testing for flag parsing **→ ROADMAP raw ideas (Property-based type-parser tests)**                                                               | 1h      | P3       |
+| ~~50~~ | ~~Write ADR-002: Lint Strategy and Exclusion Policy~~ done — docs/adr/002-lint-strategy-and-exclusion-policy.md exists                                               | ~~30m~~ | ~~P2~~   |
 
 ---
 
@@ -239,6 +240,7 @@ Currently `scope.go` and `cli_accessors.go` have per-file ireturn exclusions for
 ## Session Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                         | Before               | After                                              |
 | ------------------------------ | -------------------- | -------------------------------------------------- |
 | Lint issues                    | 0 (14 v3 exclusions) | 0 (10 v3 exclusions + 2 allow-list)                |

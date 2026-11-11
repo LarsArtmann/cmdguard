@@ -15,6 +15,7 @@ Replaced cmdguard's custom FormatStrategy registry (5 types, 16 entries, 2 free 
 ### go-output (upstream)
 
 <!-- check-rows:ledger -->
+
 | File                        | Change                                                                                                                          |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `render_tabledata.go`       | Added `AnyDataMarshaler`, `RegisterAnyDataMarshaler`, `RenderAnyData`, `RegisteredTableDataFormats`, `RegisteredAnyDataFormats` |
@@ -31,6 +32,7 @@ Replaced cmdguard's custom FormatStrategy registry (5 types, 16 entries, 2 free 
 ### cmdguard
 
 <!-- check-rows:ledger -->
+
 | File                           | Change                                                                                               |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | `output.go`                    | 309→143 lines (54% reduction). Delegates to go-output registries. Blank imports for all sub-modules. |
@@ -43,6 +45,7 @@ Replaced cmdguard's custom FormatStrategy registry (5 types, 16 entries, 2 free 
 ## Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                       | Before             | After                |
 | ---------------------------- | ------------------ | -------------------- |
 | output.go lines              | 309                | 143                  |

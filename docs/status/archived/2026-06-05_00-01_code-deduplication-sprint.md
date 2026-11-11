@@ -18,6 +18,7 @@ Ran `art-dupl --semantic` at threshold 30 and 50, analyzed all 16 clone groups, 
 ### Deduplication Refactoring (7 files, 7 clone groups eliminated)
 
 <!-- check-rows:ledger -->
+
 | File                                              | Change                                                         | Clones Eliminated                |
 | ------------------------------------------------- | -------------------------------------------------------------- | -------------------------------- |
 | `pkg/cmdguard/v2/type_handler.go`                 | Extracted `registerStringFlagFromTag()` helper                 | 3 production-code clones         |
@@ -31,6 +32,7 @@ Ran `art-dupl --semantic` at threshold 30 and 50, analyzed all 16 clone groups, 
 ### Quality Gates — ALL PASSING
 
 <!-- check-rows:ledger -->
+
 | Metric                   | Value                     | Status           |
 | ------------------------ | ------------------------- | ---------------- |
 | Build                    | `go build ./...`          | ✅ 0 errors      |
@@ -62,17 +64,17 @@ Ran `art-dupl --semantic` at threshold 30 and 50, analyzed all 16 clone groups, 
 
 Items from TODO_LIST.md and ROADMAP.md that were NOT in scope for this session:
 
-| Item                                       | Source            | Priority        |
-| ------------------------------------------ | ----------------- | --------------- |
-| ~~Add `CODECOV_TOKEN` secret to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~TODO_LIST~~ | ~~Low (CI config)~~ |
-| ~~Plugin system for custom validators~~ done — shipped — plugin.go, RegisterPlugin/WithPlugin (FEATURES.md) | ~~TODO_LIST~~ | ~~v3.0~~ |
-| ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md) | ~~TODO_LIST~~ | ~~v3.0~~ |
-| ~~v3.0 API-breaking cleanup (4 items)~~ **Superseded — v4.0.0 shipped the breaking cleanup (2026-07-28).** | ~~TODO_LIST/ROADMAP~~ | ~~v3.0~~ |
-| ~~Fuzz testing (flags_parse, config_parsing)~~ done — 8 fuzz targets with testdata/fuzz seeds (AGENTS.md) | ~~ROADMAP~~ | ~~Medium~~ |
-| ~~Documentation generator~~ done — GenerateDocs/docgen.go ships (FEATURES.md Documentation Generation) | ~~ROADMAP~~ | ~~Low~~ |
-| ~~koanf integration for config auto-loading~~ done — KoanfLoader in koanf_loader.go (AGENTS.md) | ~~ROADMAP~~ | ~~Low~~ |
-| ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output | ~~ROADMAP~~ | ~~Low~~ |
-| ~~Contribution guide~~ done — CONTRIBUTING.md exists at repo root | ~~ROADMAP~~ | ~~Low~~ |
+| Item                                                                                                                      | Source                | Priority            |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------------------- |
+| ~~Add `CODECOV_TOKEN` secret to GitHub~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~TODO_LIST~~         | ~~Low (CI config)~~ |
+| ~~Plugin system for custom validators~~ done — shipped — plugin.go, RegisterPlugin/WithPlugin (FEATURES.md)               | ~~TODO_LIST~~         | ~~v3.0~~            |
+| ~~Config file nested struct support~~ done — nested config structs supported (AGENTS.md)                                  | ~~TODO_LIST~~         | ~~v3.0~~            |
+| ~~v3.0 API-breaking cleanup (4 items)~~ **Superseded — v4.0.0 shipped the breaking cleanup (2026-07-28).**                | ~~TODO_LIST/ROADMAP~~ | ~~v3.0~~            |
+| ~~Fuzz testing (flags_parse, config_parsing)~~ done — 8 fuzz targets with testdata/fuzz seeds (AGENTS.md)                 | ~~ROADMAP~~           | ~~Medium~~          |
+| ~~Documentation generator~~ done — GenerateDocs/docgen.go ships (FEATURES.md Documentation Generation)                    | ~~ROADMAP~~           | ~~Low~~             |
+| ~~koanf integration for config auto-loading~~ done — KoanfLoader in koanf_loader.go (AGENTS.md)                           | ~~ROADMAP~~           | ~~Low~~             |
+| ~~Structured JSON error output~~ done — cli_errors_json.go structured JSON error output                                   | ~~ROADMAP~~           | ~~Low~~             |
+| ~~Contribution guide~~ done — CONTRIBUTING.md exists at repo root                                                         | ~~ROADMAP~~           | ~~Low~~             |
 
 ---
 

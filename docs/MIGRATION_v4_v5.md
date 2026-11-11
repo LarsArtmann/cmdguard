@@ -24,14 +24,14 @@ bash /path/to/cmdguard/docs/migration_v4_v5/codemod.sh
 
 The codemod rewrites mechanically:
 
-| Change | Before | After |
-| ------ | ------ | ----- |
-| Module path | `github.com/larsartmann/cmdguard/v4` | `github.com/larsartmann/cmdguard/v5` |
-| Package path | `.../v4/pkg/cmdguard/v4` | `.../v5/pkg/cmdguard/v5` |
-| Import alias | `v4 "..."` / `v4.NewCLI` | `v5 "..."` / `v5.NewCLI` |
-| Metadata type | `CommandInfo` | `CommandMetadata` |
-| Codec family | `TypeHandler`, `RegisterTypeHandler`, `TypeHandlerFunc` | `TypeCodec`, `RegisterTypeCodec`, `TypeCodecFunc` |
-| Prompts type | `HuhRunner` | `HuhPrompter` |
+| Change        | Before                                                  | After                                             |
+| ------------- | ------------------------------------------------------- | ------------------------------------------------- |
+| Module path   | `github.com/larsartmann/cmdguard/v4`                    | `github.com/larsartmann/cmdguard/v5`              |
+| Package path  | `.../v4/pkg/cmdguard/v4`                                | `.../v5/pkg/cmdguard/v5`                          |
+| Import alias  | `v4 "..."` / `v4.NewCLI`                                | `v5 "..."` / `v5.NewCLI`                          |
+| Metadata type | `CommandInfo`                                           | `CommandMetadata`                                 |
+| Codec family  | `TypeHandler`, `RegisterTypeHandler`, `TypeHandlerFunc` | `TypeCodec`, `RegisterTypeCodec`, `TypeCodecFunc` |
+| Prompts type  | `HuhRunner`                                             | `HuhPrompter`                                     |
 
 It prints (but does not change) every call site that needs a human:
 
@@ -63,14 +63,14 @@ until the release tag lands).
 
 v5 ships with the batteries ON. A bare `NewCLI` now means:
 
-| Default | Effect | Opt-out |
-| ------- | ------ | ------- |
-| Strict validation | every command needs `WithShort` | `WithoutStrictValidation()` |
-| Signal handling | SIGINT/SIGTERM cancel the run | `WithoutSignalHandling()` |
-| Graceful DI shutdown | services shut down on the signal path | `WithoutGracefulShutdown()` (keeps signals) |
-| Strict config keys | unknown config keys fail the load | `WithoutStrictConfigKeys()` |
-| Error hints | `Hint:` line under errors | `WithoutErrorHints()` |
-| Batteries bundle | auto-registered `doctor` (+`version` when set) | `WithoutBatteries()` |
+| Default              | Effect                                         | Opt-out                                     |
+| -------------------- | ---------------------------------------------- | ------------------------------------------- |
+| Strict validation    | every command needs `WithShort`                | `WithoutStrictValidation()`                 |
+| Signal handling      | SIGINT/SIGTERM cancel the run                  | `WithoutSignalHandling()`                   |
+| Graceful DI shutdown | services shut down on the signal path          | `WithoutGracefulShutdown()` (keeps signals) |
+| Strict config keys   | unknown config keys fail the load              | `WithoutStrictConfigKeys()`                 |
+| Error hints          | `Hint:` line under errors                      | `WithoutErrorHints()`                       |
+| Batteries bundle     | auto-registered `doctor` (+`version` when set) | `WithoutBatteries()`                        |
 
 Everything above stays individually opt-in/out-able; `WithBatteries()`
 re-enables the whole bundle after any opt-out.

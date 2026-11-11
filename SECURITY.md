@@ -2,13 +2,13 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| v5.x    | :white_check_mark: |
+| Version | Supported                                            |
+| ------- | ---------------------------------------------------- |
+| v5.x    | :white_check_mark:                                   |
 | v4.x    | :white_check_mark: (frozen at v4.2.1 — bug-fix only) |
-| v3.x    | :x:                |
-| v2.x    | :white_check_mark: (maintenance) |
-| v1.x    | :x:                |
+| v3.x    | :x:                                                  |
+| v2.x    | :white_check_mark: (maintenance)                     |
+| v1.x    | :x:                                                  |
 
 ## Reporting a Vulnerability
 

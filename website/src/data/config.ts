@@ -9,8 +9,7 @@ export const siteConfig = {
   name: "cmdguard",
   ogDescription:
     "Type-safe flags + dependency injection + zero panics. The only Go CLI framework that unifies all three. Wraps Cobra.",
-  pkgGoDev:
-    "https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5",
+  pkgGoDev: "https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5",
   siteUrl: "https://cmdguard.lars.software",
   title: "cmdguard: From Flags to Shutdown, Type-Safe",
 } as const;

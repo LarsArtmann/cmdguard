@@ -64,26 +64,26 @@ The type parameter explosion is fixed (commit `4f9b0ea`). Now we tackle the real
 
 ## Comprehensive Plan (Medium Granularity — 18 tasks, 30-90min each)
 
-| #  | Task                                                              | Priority | Impact | Effort | Status |
-| -- | ----------------------------------------------------------------- | -------- | ------ | ------ | ------ |
-| ~~1~~  | ~~Restore lifecycle hook compile-time safety (sealed interface)~~ done — sealed typedHook survives in v4 (cli_command.go:155) | ~~P0~~ | ~~10~~ | ~~45min~~ | ~~TODO~~ |
-| ~~2~~  | ~~Make CLIOption non-generic~~ done at `9297257` | ~~P0~~ | ~~9~~ | ~~30min~~ | ~~TODO~~ |
-| ~~3~~  | ~~Create go.work workspace + verify existing build~~ done — go.work workspace exists at repo root | ~~P1~~ | ~~8~~ | ~~30min~~ | ~~TODO~~ |
-| ~~4~~  | ~~Extract core module: move cobra/do/fang/pflag deps to core go.mod~~ done at `548aaa4` | ~~P1~~ | ~~10~~ | ~~90min~~ | ~~TODO~~ |
-| ~~5~~  | ~~Extract glamour to pkg/cmdguard/glamour/ module~~ done at `9768db9` | ~~P1~~ | ~~6~~ | ~~45min~~ | ~~TODO~~ |
-| ~~6~~  | ~~Extract prompts to pkg/cmdguard/prompts/ module~~ done at `9768db9` | ~~P1~~ | ~~6~~ | ~~45min~~ | ~~TODO~~ |
-| ~~7~~  | ~~Extract spinner to pkg/cmdguard/spinner/ module~~ done at `548aaa4` | ~~P1~~ | ~~5~~ | ~~30min~~ | ~~TODO~~ |
-| ~~8~~  | ~~Extract telemetry to pkg/cmdguard/telemetry/ module~~ done at `9768db9` | ~~P2~~ | ~~4~~ | ~~30min~~ | ~~TODO~~ |
-| ~~9~~  | ~~Extract manpage to pkg/cmdguard/manpage/ module~~ done — manpage module shipped in v3 (9768db9); removed 34a0c6e (2026-07-23) | ~~P2~~ | ~~4~~ | ~~30min~~ | ~~TODO~~ |
-| ~~10~~ | ~~Verify GOWORK=off builds for every module~~ done — GOWORK=off builds verified in 548aaa4 | ~~P1~~ | ~~8~~ | ~~60min~~ | ~~TODO~~ |
-| ~~11~~ | ~~Remove go-output blank imports from core (output.go cleanup)~~ done at `548aaa4` | ~~P1~~ | ~~7~~ | ~~45min~~ | ~~TODO~~ |
-| ~~12~~ | ~~Cut result.go (sum types)~~ done at `548aaa4` | ~~P2~~ | ~~3~~ | ~~15min~~ | ~~TODO~~ |
-| ~~13~~ | ~~Cut editor.go~~ done at `548aaa4` | ~~P2~~ | ~~3~~ | ~~15min~~ | ~~TODO~~ |
-| ~~14~~ | ~~Add command-level audit middleware (audit every command exec)~~ done — WithCommandAudit + audit middleware survive (auditlog.go) | ~~P1~~ | ~~8~~ | ~~60min~~ | ~~TODO~~ |
-| ~~15~~ | ~~Add built-in audit-log export subcommand~~ done — subcommand shipped in v3 era; replaced by ExportAuditLog API (5a35c84, auditlog.go:154) | ~~P2~~ | ~~5~~ | ~~45min~~ | ~~TODO~~ |
-| ~~16~~ | ~~Update example/taskctl to showcase clean v3 API~~ done at `548aaa4` | ~~P1~~ | ~~7~~ | ~~60min~~ | ~~TODO~~ |
-| ~~17~~ | ~~Update README + AGENTS.md + FEATURES.md for v3~~ done at `f9a4d7c` | ~~P2~~ | ~~5~~ | ~~45min~~ | ~~TODO~~ |
-| ~~18~~ | ~~Final verification: build + test + lint + race~~ done — v3.0.0 shipped green (tag 2026-07-07, 87.1% coverage) | ~~P0~~ | ~~9~~ | ~~30min~~ | ~~TODO~~ |
+| #      | Task                                                                                                                                        | Priority | Impact | Effort    | Status   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------- | -------- |
+| ~~1~~  | ~~Restore lifecycle hook compile-time safety (sealed interface)~~ done — sealed typedHook survives in v4 (cli_command.go:155)               | ~~P0~~   | ~~10~~ | ~~45min~~ | ~~TODO~~ |
+| ~~2~~  | ~~Make CLIOption non-generic~~ done at `9297257`                                                                                            | ~~P0~~   | ~~9~~  | ~~30min~~ | ~~TODO~~ |
+| ~~3~~  | ~~Create go.work workspace + verify existing build~~ done — go.work workspace exists at repo root                                           | ~~P1~~   | ~~8~~  | ~~30min~~ | ~~TODO~~ |
+| ~~4~~  | ~~Extract core module: move cobra/do/fang/pflag deps to core go.mod~~ done at `548aaa4`                                                     | ~~P1~~   | ~~10~~ | ~~90min~~ | ~~TODO~~ |
+| ~~5~~  | ~~Extract glamour to pkg/cmdguard/glamour/ module~~ done at `9768db9`                                                                       | ~~P1~~   | ~~6~~  | ~~45min~~ | ~~TODO~~ |
+| ~~6~~  | ~~Extract prompts to pkg/cmdguard/prompts/ module~~ done at `9768db9`                                                                       | ~~P1~~   | ~~6~~  | ~~45min~~ | ~~TODO~~ |
+| ~~7~~  | ~~Extract spinner to pkg/cmdguard/spinner/ module~~ done at `548aaa4`                                                                       | ~~P1~~   | ~~5~~  | ~~30min~~ | ~~TODO~~ |
+| ~~8~~  | ~~Extract telemetry to pkg/cmdguard/telemetry/ module~~ done at `9768db9`                                                                   | ~~P2~~   | ~~4~~  | ~~30min~~ | ~~TODO~~ |
+| ~~9~~  | ~~Extract manpage to pkg/cmdguard/manpage/ module~~ done — manpage module shipped in v3 (9768db9); removed 34a0c6e (2026-07-23)             | ~~P2~~   | ~~4~~  | ~~30min~~ | ~~TODO~~ |
+| ~~10~~ | ~~Verify GOWORK=off builds for every module~~ done — GOWORK=off builds verified in 548aaa4                                                  | ~~P1~~   | ~~8~~  | ~~60min~~ | ~~TODO~~ |
+| ~~11~~ | ~~Remove go-output blank imports from core (output.go cleanup)~~ done at `548aaa4`                                                          | ~~P1~~   | ~~7~~  | ~~45min~~ | ~~TODO~~ |
+| ~~12~~ | ~~Cut result.go (sum types)~~ done at `548aaa4`                                                                                             | ~~P2~~   | ~~3~~  | ~~15min~~ | ~~TODO~~ |
+| ~~13~~ | ~~Cut editor.go~~ done at `548aaa4`                                                                                                         | ~~P2~~   | ~~3~~  | ~~15min~~ | ~~TODO~~ |
+| ~~14~~ | ~~Add command-level audit middleware (audit every command exec)~~ done — WithCommandAudit + audit middleware survive (auditlog.go)          | ~~P1~~   | ~~8~~  | ~~60min~~ | ~~TODO~~ |
+| ~~15~~ | ~~Add built-in audit-log export subcommand~~ done — subcommand shipped in v3 era; replaced by ExportAuditLog API (5a35c84, auditlog.go:154) | ~~P2~~   | ~~5~~  | ~~45min~~ | ~~TODO~~ |
+| ~~16~~ | ~~Update example/taskctl to showcase clean v3 API~~ done at `548aaa4`                                                                       | ~~P1~~   | ~~7~~  | ~~60min~~ | ~~TODO~~ |
+| ~~17~~ | ~~Update README + AGENTS.md + FEATURES.md for v3~~ done at `f9a4d7c`                                                                        | ~~P2~~   | ~~5~~  | ~~45min~~ | ~~TODO~~ |
+| ~~18~~ | ~~Final verification: build + test + lint + race~~ done — v3.0.0 shipped green (tag 2026-07-07, 87.1% coverage)                             | ~~P0~~   | ~~9~~  | ~~30min~~ | ~~TODO~~ |
 
 **Total estimated effort:** ~13 hours
 **Sorted by:** Priority (P0→P2), then Impact (desc), then Effort (asc)

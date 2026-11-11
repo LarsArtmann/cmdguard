@@ -34,6 +34,7 @@ Replaced the stringly-typed `ComparisonRow` (all fields were `string`) with a pr
 Added 6 guide pages that were referenced in docs/status but never written. Website went from 16 to 22 pages.
 
 <!-- check-rows:ledger -->
+
 | Guide                  | Content                                                                          |
 | ---------------------- | -------------------------------------------------------------------------------- |
 | `custom-types.mdx`     | 8 built-in value types, RegisterTypeHandler, COW registry, custom validators     |

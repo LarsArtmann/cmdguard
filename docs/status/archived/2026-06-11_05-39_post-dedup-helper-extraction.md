@@ -27,6 +27,7 @@ through thin wrappers.
 ### Refactors (all behavior-preserving, all tests pass with -race)
 
 <!-- check-rows:ledger -->
+
 | # | Refactor                                                    | Files Changed                                                                                                                                          | Net Lines Saved |
 | - | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
 | 1 | `addCommand` (v2_test) → delegate to `testutil.AddCommand`  | `pkg/cmdguard/v2/testhelpers_test.go`                                                                                                                  | -3              |
@@ -65,6 +66,7 @@ func AddCommand[T, F any](t *testing.T, cli *v2.CLI[T], cmd v2.Command[T, F])
 ### Quality Gates — All Green
 
 <!-- check-rows:ledger -->
+
 | Gate                      | Result                                                  |
 | ------------------------- | ------------------------------------------------------- |
 | `go build ./...`          | ✅ 0 errors                                             |
@@ -89,6 +91,7 @@ commit.
 ### Remaining Clone Groups (art-dupl threshold 15)
 
 <!-- check-rows:ledger -->
+
 | Group                                                                 | Size      | Status      | Rationale for deferral                                                                                                                |
 | --------------------------------------------------------------------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `pkg/cmdguard/v2/output.go` registerXFormat calls                     | 17        | NOT STARTED | Idiomatic builder pattern for output format registration — different format per call, extracting adds parameters without saving lines |
@@ -105,6 +108,7 @@ commit.
 ### Feature Work Deferred
 
 <!-- check-rows:ledger -->
+
 | Item                                        | Priority | Notes                                                                 |
 | ------------------------------------------- | -------- | --------------------------------------------------------------------- |
 | Add `CODECOV_TOKEN` to GitHub repo settings | P0       | 5-minute admin task; can't be done from local env                     |
@@ -181,16 +185,16 @@ boundary forces duplication"). Documented as a known constraint.
 
 7. ~~**The `output.go` 17-clone `registerXFormat` group is the largest remaining duplication.**~~ **Superseded — output.go rewritten via go-output registries same day (2026-06-11_09-15).**
    ~~Each call follows the pattern:~~
-   ~~```go~~
+   ~~`go~~
    ~~output.RegisterFormat("table", tableFormat, tableHeader)~~
    ~~output.RegisterFormat("json", jsonFormat, jsonHeader)~~
-   ~~```~~
+   ~~`~~
    ~~Could be data-driven via a slice:~~
-   ~~```go~~
+   ~~`go~~
    ~~for _, f := range []struct{name, fn, header string}{...} {~~
        ~~output.RegisterFormat(f.name, f.fn, f.header)~~
    ~~}~~
-   ~~```~~
+   ~~`~~
    ~~Saves ~14 lines, no behavior change. Worth a follow-up sprint.~~
 
 ### Documentation Improvements
@@ -210,33 +214,33 @@ boundary forces duplication"). Documented as a known constraint.
 Sorted by (impact × feasibility) descending. Items 1-5 are quick wins; 6-15 are quality
 investments; 16-25 are larger architectural/defer-to-v3 items.
 
-| #  | Task                                                                                  | Impact | Effort | Est.   | Rationale                                                                                |
-| -- | ------------------------------------------------------------------------------------- | ------ | ------ | ------ | ---------------------------------------------------------------------------------------- |
-| ~~1~~  | ~~**Commit current 7-file dedup change set** (status report + helpers + sites)~~ done — committed — helper commits landed (efab861, 9cc2a94) | ~~HIGH~~ | ~~XS~~ | ~~5m~~ | ~~Uncommitted work-in-progress; risk of merge conflicts or loss~~ |
-| ~~2~~  | ~~Add "Test helpers" subsection to AGENTS.md (document `testutil.AddCommand` etc.)~~ **Superseded — AGENTS.md rewritten through v3/v4; helper section not carried.** | ~~HIGH~~ | ~~XS~~ | ~~10m~~ | ~~Prevents regression — future contributors will know the canonical helpers~~ |
-| ~~3~~  | ~~Refactor `output.go` 17-clone `registerXFormat` to data-driven registration~~ **Superseded — output.go rewritten via go-output registries (2026-06-11_09-15).** | ~~HIGH~~ | ~~S~~ | ~~30m~~ | ~~Largest remaining clone group; clean extraction with zero behavior change~~ |
-| ~~4~~  | ~~Add `noOpCmdHandler[T,F]()` builder in testhelpers_test.go (eliminate BDD 11-clone)~~ **Superseded — v2 BDD tests replaced through v3/v4.** | ~~MED~~ | ~~S~~ | ~~20m~~ | ~~Returns a `func(ctx, *T, F) error` so BDD handler signatures collapse to 1 line~~ |
-| ~~5~~  | ~~Add test-helper index comment block at top of `testhelpers_test.go`~~ **Superseded — testhelpers_test.go rewritten through v3/v4.** | ~~MED~~ | ~~XS~~ | ~~10m~~ | ~~Self-documenting; reduces "which helper?" cognitive load~~ |
-| ~~6~~  | ~~Add `v2.NewTestCLI[T]()` exported constructor in `testutil`~~ **Superseded — pkg/cmdguard/v2/testutil deleted; pkg/testutil shared (v4).** | ~~MED~~ | ~~S~~ | ~~30m~~ | ~~Open question from 04-10 status — finish the public test API~~ |
-| ~~7~~  | ~~Split `testutil` into `v2test` (setup) + `testutil` (execution)~~ **Superseded — pkg/cmdguard/v2/testutil deleted in the consolidation (Task 17).** | ~~MED~~ | ~~M~~ | ~~1h~~ | ~~Cleaner public API; addresses the 04-10 open question~~ |
-| ~~8~~  | ~~Split BDD integration test file (940+ lines) into lifecycle/middleware/validation~~ **Superseded — v2 BDD tests replaced through v3/v4.** | ~~MED~~ | ~~M~~ | ~~1.5h~~ | ~~Makes the file navigable; reduces art-dupl noise from one mega-file~~ |
-| ~~9~~  | ~~Run art-dupl at threshold 10 to find any remaining micro-duplication~~ **Won't implement — never run — dedup campaign ended at the t=21/22 idiomatic floor.** | ~~LOW~~ | ~~XS~~ | ~~5m~~ | ~~Sanity check; threshold 10 is too aggressive but a quick scan reveals idiomatic patterns~~ |
-| ~~10~~ | ~~Add `pkg/cmdguard/v2/v2test/v2test.go` package (canonical public test API)~~ **Superseded — v3/v4 restructure; pkg/testutil is the shared helper package.** | ~~MED~~ | ~~M~~ | ~~2h~~ | ~~Consolidates `testutil.AddCommand`, future helpers, exports for library users~~ |
-| ~~11~~ | ~~Add `WithEnvPrefix[T](prefix)` test coverage (currently under-tested)~~ done — env_tag_test.go covers env tags (v4); WithEnvPrefix ships (cli_options.go:161) | ~~MED~~ | ~~S~~ | ~~30m~~ | ~~Env var prefix propagation is a v2.2 fix; test coverage lags~~ |
-| ~~12~~ | ~~Add CODECOV_TOKEN to GitHub repo settings (P0 admin)~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.** | ~~HIGH~~ | ~~XS~~ | ~~5m~~ | ~~Cannot be done from CLI; needs repo admin~~ |
-| ~~13~~ | ~~Add benchmarks for `registerFlags` / `addCommand` to confirm zero overhead~~ **Won't implement — never added — no helper benchmarks in v4.** | ~~LOW~~ | ~~S~~ | ~~20m~~ | ~~Optional — these are test helpers, perf is rarely critical~~ |
-| ~~14~~ | ~~Add `name:` tag to art-dupl `output.go` 17-clone group as "accepted" in `docs/adr/`~~ **Won't implement — never written — no ADR for the dedup triage; campaign closed.** | ~~LOW~~ | ~~S~~ | ~~20m~~ | ~~Documents the decision so future scans don't re-surface it~~ |
-| ~~15~~ | ~~Add `naming-review` for new helpers (`newTestCLI` vs `buildTestCLI` vs `makeTestCLI`)~~ **Superseded — helpers replaced through v3/v4 rewrites.** | ~~LOW~~ | ~~S~~ | ~~20m~~ | ~~Verify the helpers follow naming conventions; runs the naming-review skill~~ |
-| ~~16~~ | ~~Refactor BDD test to use `bdd` skill (Ginkgo) — proper BDD structure~~ **Won't implement — never adopted — no Ginkgo in the repo.** | ~~MED~~ | ~~L~~ | ~~4h~~ | ~~Currently uses string-based scenario names in `t.Run`; Ginkgo is more idiomatic BDD~~ |
-| ~~17~~ | ~~Implement plugin system for custom validators / type handlers (P1, v3)~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin | ~~HIGH~~ | ~~XL~~ | ~~2 days~~ | ~~Architectural — needs ADR; requires API design~~ |
-| ~~18~~ | ~~Config file nested struct support (P1, v3)~~ done — nested config structs supported (AGENTS.md) | ~~HIGH~~ | ~~L~~ | ~~1 day~~ | ~~v1 limitation per AGENTS.md gotcha #33; needs breaking schema change~~ |
-| ~~19~~ | ~~Documentation generation (`GenerateDocs`, markdown, API docs) — P1, v3~~ done — GenerateDocs/docgen.go | ~~MED~~ | ~~L~~ | ~~2 days~~ | ~~Separate concern; would be its own library~~ |
-| ~~20~~ | ~~`flagtags` standalone library extraction (P1, v3)~~ **Won't implement — idea dropped — not in 2026-11-02 ROADMAP restructure.** | ~~MED~~ | ~~XL~~ | ~~3 days~~ | ~~Refactor only; would not change cmdguard API~~ |
-| 21 | Rename `Get[T]`/`MustGet[T]` to more specific names (P2, v3) **→ ROADMAP v5 candidate #6 (MustGet gone in v4)** | MED    | M      | 1 day  | v3 API-breaking                                                                          |
-| 22 | Make `RegisterInScope` generic instead of `...any` (P2, v3) **→ TODO_LIST T5 (TODO(v5) scope.go:367)** | MED    | M      | 4h     | v3 API-breaking                                                                          |
-| 23 | Remove or redesign `Package()` for error-safe DI integration (P2, v3) **→ ROADMAP v5 candidate #7 (panic-safe via safeProvide, scope.go:107)** | HIGH   | L      | 1 day  | Current `Package()` is footgun-prone (no error return)                                   |
-| 24 | Remove `SetConfig` or make it safe (reinitialize FlagRegistry) — P2, v3 **→ ROADMAP v5 candidate #4 (Deprecated; TODO(v5) cli_accessors.go)** | MED    | M      | 4h     | Current `SetConfig` mutates state without rebuilding the registry                        |
-| ~~25~~ | ~~`go-output` standalone library extraction (P1, v3)~~ **Superseded — go-output is an external published dep (v0.30.4), not a sub-package.** | ~~MED~~ | ~~XL~~ | ~~2 days~~ | ~~Could be split from cmdguard to enable wider adoption~~ |
+| #      | Task                                                                                                                                                                        | Impact   | Effort | Est.       | Rationale                                                                                    |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ---------- | -------------------------------------------------------------------------------------------- |
+| ~~1~~  | ~~**Commit current 7-file dedup change set** (status report + helpers + sites)~~ done — committed — helper commits landed (efab861, 9cc2a94)                                | ~~HIGH~~ | ~~XS~~ | ~~5m~~     | ~~Uncommitted work-in-progress; risk of merge conflicts or loss~~                            |
+| ~~2~~  | ~~Add "Test helpers" subsection to AGENTS.md (document `testutil.AddCommand` etc.)~~ **Superseded — AGENTS.md rewritten through v3/v4; helper section not carried.**        | ~~HIGH~~ | ~~XS~~ | ~~10m~~    | ~~Prevents regression — future contributors will know the canonical helpers~~                |
+| ~~3~~  | ~~Refactor `output.go` 17-clone `registerXFormat` to data-driven registration~~ **Superseded — output.go rewritten via go-output registries (2026-06-11_09-15).**           | ~~HIGH~~ | ~~S~~  | ~~30m~~    | ~~Largest remaining clone group; clean extraction with zero behavior change~~                |
+| ~~4~~  | ~~Add `noOpCmdHandler[T,F]()` builder in testhelpers_test.go (eliminate BDD 11-clone)~~ **Superseded — v2 BDD tests replaced through v3/v4.**                               | ~~MED~~  | ~~S~~  | ~~20m~~    | ~~Returns a `func(ctx, *T, F) error` so BDD handler signatures collapse to 1 line~~          |
+| ~~5~~  | ~~Add test-helper index comment block at top of `testhelpers_test.go`~~ **Superseded — testhelpers_test.go rewritten through v3/v4.**                                       | ~~MED~~  | ~~XS~~ | ~~10m~~    | ~~Self-documenting; reduces "which helper?" cognitive load~~                                 |
+| ~~6~~  | ~~Add `v2.NewTestCLI[T]()` exported constructor in `testutil`~~ **Superseded — pkg/cmdguard/v2/testutil deleted; pkg/testutil shared (v4).**                                | ~~MED~~  | ~~S~~  | ~~30m~~    | ~~Open question from 04-10 status — finish the public test API~~                             |
+| ~~7~~  | ~~Split `testutil` into `v2test` (setup) + `testutil` (execution)~~ **Superseded — pkg/cmdguard/v2/testutil deleted in the consolidation (Task 17).**                       | ~~MED~~  | ~~M~~  | ~~1h~~     | ~~Cleaner public API; addresses the 04-10 open question~~                                    |
+| ~~8~~  | ~~Split BDD integration test file (940+ lines) into lifecycle/middleware/validation~~ **Superseded — v2 BDD tests replaced through v3/v4.**                                 | ~~MED~~  | ~~M~~  | ~~1.5h~~   | ~~Makes the file navigable; reduces art-dupl noise from one mega-file~~                      |
+| ~~9~~  | ~~Run art-dupl at threshold 10 to find any remaining micro-duplication~~ **Won't implement — never run — dedup campaign ended at the t=21/22 idiomatic floor.**             | ~~LOW~~  | ~~XS~~ | ~~5m~~     | ~~Sanity check; threshold 10 is too aggressive but a quick scan reveals idiomatic patterns~~ |
+| ~~10~~ | ~~Add `pkg/cmdguard/v2/v2test/v2test.go` package (canonical public test API)~~ **Superseded — v3/v4 restructure; pkg/testutil is the shared helper package.**               | ~~MED~~  | ~~M~~  | ~~2h~~     | ~~Consolidates `testutil.AddCommand`, future helpers, exports for library users~~            |
+| ~~11~~ | ~~Add `WithEnvPrefix[T](prefix)` test coverage (currently under-tested)~~ done — env_tag_test.go covers env tags (v4); WithEnvPrefix ships (cli_options.go:161)             | ~~MED~~  | ~~S~~  | ~~30m~~    | ~~Env var prefix propagation is a v2.2 fix; test coverage lags~~                             |
+| ~~12~~ | ~~Add CODECOV_TOKEN to GitHub repo settings (P0 admin)~~ **Won't implement — tokenless Codecov upload works; CI coverage step is green.**                                   | ~~HIGH~~ | ~~XS~~ | ~~5m~~     | ~~Cannot be done from CLI; needs repo admin~~                                                |
+| ~~13~~ | ~~Add benchmarks for `registerFlags` / `addCommand` to confirm zero overhead~~ **Won't implement — never added — no helper benchmarks in v4.**                              | ~~LOW~~  | ~~S~~  | ~~20m~~    | ~~Optional — these are test helpers, perf is rarely critical~~                               |
+| ~~14~~ | ~~Add `name:` tag to art-dupl `output.go` 17-clone group as "accepted" in `docs/adr/`~~ **Won't implement — never written — no ADR for the dedup triage; campaign closed.** | ~~LOW~~  | ~~S~~  | ~~20m~~    | ~~Documents the decision so future scans don't re-surface it~~                               |
+| ~~15~~ | ~~Add `naming-review` for new helpers (`newTestCLI` vs `buildTestCLI` vs `makeTestCLI`)~~ **Superseded — helpers replaced through v3/v4 rewrites.**                         | ~~LOW~~  | ~~S~~  | ~~20m~~    | ~~Verify the helpers follow naming conventions; runs the naming-review skill~~               |
+| ~~16~~ | ~~Refactor BDD test to use `bdd` skill (Ginkgo) — proper BDD structure~~ **Won't implement — never adopted — no Ginkgo in the repo.**                                       | ~~MED~~  | ~~L~~  | ~~4h~~     | ~~Currently uses string-based scenario names in `t.Run`; Ginkgo is more idiomatic BDD~~      |
+| ~~17~~ | ~~Implement plugin system for custom validators / type handlers (P1, v3)~~ done — plugin.go — Plugin interface + RegisterPlugin/WithPlugin                                  | ~~HIGH~~ | ~~XL~~ | ~~2 days~~ | ~~Architectural — needs ADR; requires API design~~                                           |
+| ~~18~~ | ~~Config file nested struct support (P1, v3)~~ done — nested config structs supported (AGENTS.md)                                                                           | ~~HIGH~~ | ~~L~~  | ~~1 day~~  | ~~v1 limitation per AGENTS.md gotcha #33; needs breaking schema change~~                     |
+| ~~19~~ | ~~Documentation generation (`GenerateDocs`, markdown, API docs) — P1, v3~~ done — GenerateDocs/docgen.go                                                                    | ~~MED~~  | ~~L~~  | ~~2 days~~ | ~~Separate concern; would be its own library~~                                               |
+| ~~20~~ | ~~`flagtags` standalone library extraction (P1, v3)~~ **Won't implement — idea dropped — not in 2026-11-02 ROADMAP restructure.**                                           | ~~MED~~  | ~~XL~~ | ~~3 days~~ | ~~Refactor only; would not change cmdguard API~~                                             |
+| 21     | Rename `Get[T]`/`MustGet[T]` to more specific names (P2, v3) **→ ROADMAP v5 candidate #6 (MustGet gone in v4)**                                                             | MED      | M      | 1 day      | v3 API-breaking                                                                              |
+| 22     | Make `RegisterInScope` generic instead of `...any` (P2, v3) **→ TODO_LIST T5 (TODO(v5) scope.go:367)**                                                                      | MED      | M      | 4h         | v3 API-breaking                                                                              |
+| 23     | Remove or redesign `Package()` for error-safe DI integration (P2, v3) **→ ROADMAP v5 candidate #7 (panic-safe via safeProvide, scope.go:107)**                              | HIGH     | L      | 1 day      | Current `Package()` is footgun-prone (no error return)                                       |
+| 24     | Remove `SetConfig` or make it safe (reinitialize FlagRegistry) — P2, v3 **→ ROADMAP v5 candidate #4 (Deprecated; TODO(v5) cli_accessors.go)**                               | MED      | M      | 4h         | Current `SetConfig` mutates state without rebuilding the registry                            |
+| ~~25~~ | ~~`go-output` standalone library extraction (P1, v3)~~ **Superseded — go-output is an external published dep (v0.30.4), not a sub-package.**                                | ~~MED~~  | ~~XL~~ | ~~2 days~~ | ~~Could be split from cmdguard to enable wider adoption~~                                    |
 
 **Pareto analysis:** Items 1-7 (≈ 2.5 hours total) capture the highest leverage — committing
 work, documenting decisions, finishing the public test API. Items 8-15 (≈ 3 hours) are quality

@@ -115,6 +115,7 @@ None for this task.
 ## Files Changed
 
 <!-- check-rows:ledger -->
+
 | File                                    | Nature of Change                                                      |
 | --------------------------------------- | --------------------------------------------------------------------- |
 | `manpage/`                              | DELETED (4 files)                                                     |

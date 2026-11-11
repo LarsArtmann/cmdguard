@@ -16,6 +16,7 @@ This session loaded the `docs-health` skill, read all 6 status reports and all 4
 ## a) FULLY DONE (Working & Verified)
 
 <!-- check-rows:ledger -->
+
 | #  | Item                                                              | Evidence                                                                                                                                                                                          |
 | -- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1  | Loaded `docs-health` skill + all 4 reference files                | SKILL.md, harvest-guide.md, build-guide.md, verify-checklist.md, resolving-items.md                                                                                                               |
@@ -37,6 +38,7 @@ This session loaded the `docs-health` skill, read all 6 status reports and all 4
 ## b) PARTIALLY DONE (Incomplete)
 
 <!-- check-rows:ledger -->
+
 | # | Item                                      | What exists                                                                                                   | What's missing                                                                                                                                                                                                                                                                                                                                                                           |
 | - | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **AGENTS.md metrics update**              | FEATURES.md and CHANGELOG.md updated with correct numbers                                                     | **AGENTS.md NOT touched.** Header still says "467 test functions, 26 benchmarks, 7 fuzz targets, 87.8% coverage" (actual: ~550/29/8/87.8%). Package Guidelines table still says "~91%" for flightrecorder (actual 96.1%). go-output still v0.35.0 (actual v0.37.0). Missing `CaptureToWriter`/`WithFlightRecorderRecorder` in sub-module description. **This creates cross-file drift.** |
@@ -97,6 +99,7 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 ### Process (this session's failures)
 
 <!-- check-rows:ledger -->
+
 | # | Issue                               | Fix                                                                                                                                                                                                             |
 | - | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | AGENTS.md forgotten entirely        | When updating metrics in N files, enumerate ALL files that contain those metrics BEFORE editing. AGENTS.md + FEATURES.md + CHANGELOG.md all carry test/coverage/benchmark counts — update all three atomically. |
@@ -107,6 +110,7 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 ### Annotation quality
 
 <!-- check-rows:ledger -->
+
 | # | Issue                                                   | Fix                                                                                                                                                                                                                                |
 | - | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 5 | Section e) "WHAT WE SHOULD IMPROVE" lists not annotated | The skill says "resolve every numbered item." Section e) in several reports has numbered lists (1-18) of improvements. These were not resolved — only the "Up to 50 Things" lists were annotated.                                  |
@@ -199,6 +203,7 @@ These are 30-second fixes that I deferred to TODO_LIST instead of doing on sight
 ## Session Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                                   | Value                                                                                 |
 | ---------------------------------------- | ------------------------------------------------------------------------------------- |
 | Files read                               | 16 (6 status reports + 4 living docs + 4 skill refs + AGENTS.md + FEATURES.md tail)   |

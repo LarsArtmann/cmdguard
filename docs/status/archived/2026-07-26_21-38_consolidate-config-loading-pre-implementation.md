@@ -50,6 +50,7 @@
 ## c) NOT STARTED
 
 <!-- check-rows:ledger -->
+
 | Task             | Description                                                                                            | Status      |
 | ---------------- | ------------------------------------------------------------------------------------------------------ | ----------- |
 | Task 1 (1.2-1.8) | Rewrite KoanfLoader.Load, add TOML to parserForPath, add SetPaths, fix doc comment, update koanf tests | Not started |

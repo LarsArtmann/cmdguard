@@ -38,6 +38,7 @@ named-type exclusion list (worked only because its fields are unexported).
 ## Final verification evidence (plan §6, per workstream)
 
 <!-- check-rows:ledger -->
+
 | Workstream | Required verification                                    | Evidence                                                                                                                                                                                                                                                                                 |
 | ---------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A          | `-race` + manual typo repro with error text reviewed     | `-race` green (core 3.2 s); live repro via `examples/config-explain` with `bad.json`: `unknown config key "log-leve1" (did you mean "LogLevel"?` — text captured, format fixed in QUICKSTART to match reality                                                                            |

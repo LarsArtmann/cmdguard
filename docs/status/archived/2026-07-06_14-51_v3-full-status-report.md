@@ -37,6 +37,7 @@ Sealed interface pattern: `lifecycleHook` + `typedHook[T,F]`. Unexported `isLife
 ### 3. Mono-Repo Modularization (5 Optional Modules Extracted)
 
 <!-- check-rows:ledger -->
+
 | Module    | Path                      | Deps Isolated              | Status |
 | --------- | ------------------------- | -------------------------- | ------ |
 | telemetry | `pkg/cmdguard/telemetry/` | OpenTelemetry SDK          | ✅     |
@@ -52,6 +53,7 @@ Extension hooks added to core: `WithHelpTransform`, `PromptRunner` interface + `
 ### 4. Dead Weight Cut
 
 <!-- check-rows:ledger -->
+
 | File                       | Lines | Reason                          | Status |
 | -------------------------- | ----- | ------------------------------- | ------ |
 | `result.go`                | 147   | Sum types — not a CLI concern   | ✅ Cut |
@@ -101,7 +103,7 @@ README.md and main.go header comments reference deleted features (`WithGlamourHe
 ## c) NOT STARTED
 
 1. **Move koanf to configload module or make optional** — 4 direct deps in root **→ ROADMAP deferred #5 (koanf extraction YAGNI)**
-2. ~~**Cut or internalize flow_context** — 321 lines + 5 test files, used in 2 places~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).**
+2. ~~**Cut or internalize flow_context** — 321 lines + 5 test files, used in 2 places~~ __NOT-DO — decided to keep — flow_context_.go ships as the branching-flow feature (AGENTS.md)._*
 3. ~~**Update README.md** with v3 quickstart and clean API examples~~ done — README rewritten through v3/v4 releases
 4. ~~**Update AGENTS.md** module structure section for v3~~ done — AGENTS.md documents the 8-module workspace (2026-11-02)
 5. ~~**Update FEATURES.md** with module status table~~ done — FEATURES.md SUB-MODULE rows (maintained through v4)
@@ -151,7 +153,7 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 
 2. **koanf as optional** — move to configload sub-module. Core only needs JSON (built into stdlib). **→ ROADMAP deferred #5 (koanf extraction YAGNI)**
 
-3. ~~**Flow context evaluation** — is BranchingFlowContext earning its 900 lines? Consider cutting or making it internal.~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).**
+3. ~~**Flow context evaluation** — is BranchingFlowContext earning its 900 lines? Consider cutting or making it internal.~~ __NOT-DO — decided to keep — flow_context_.go ships as the branching-flow feature (AGENTS.md)._*
 
 4. ~~**WithSilenceUsage fix** — either make it work (override the default) or remove it and document that usage is always silenced.~~ done — usage silenced by default; WithoutSilenceUsage() opts out (FEATURES.md)
 
@@ -169,33 +171,33 @@ The `WithSilenceUsage()` option exists but does nothing — `cli.rootCmd.Silence
 
 ## f) Next 25 Tasks (Sorted by Impact/Effort)
 
-| #  | Task                                                     | Impact | Effort |
-| -- | -------------------------------------------------------- | ------ | ------ |
-| ~~1~~  | ~~Fix example/taskctl/README.md stale WithFlags ref~~ done — cleaned — taskctl README has no WithFlags refs | ~~5~~ | ~~5min~~ |
-| ~~2~~  | ~~Fix or remove WithSilenceUsage no-op~~ done — usage silenced by default; WithoutSilenceUsage() opts out (FEATURES.md) | ~~6~~ | ~~10min~~ |
-| 3  | Move koanf to configload sub-module (4 deps from root) **→ ROADMAP deferred #5 (koanf extraction YAGNI)** | 7      | 30min  |
-| ~~4~~  | ~~Update README.md with v3 quickstart~~ done — README rewritten through v3/v4 releases | ~~8~~ | ~~30min~~ |
-| ~~5~~  | ~~Update AGENTS.md module structure for v3~~ done — AGENTS.md documents the 8-module workspace (2026-11-02) | ~~7~~ | ~~20min~~ |
-| ~~6~~  | ~~Update FEATURES.md with module status~~ done — FEATURES.md SUB-MODULE rows (maintained through v4) | ~~5~~ | ~~15min~~ |
-| ~~7~~  | ~~Write v3 migration guide (MIGRATION_TO_V3.md)~~ done — docs/MIGRATION_v2_v3.md exists | ~~8~~ | ~~30min~~ |
-| ~~8~~  | ~~Evaluate and cut/internalize flow_context.go~~ **NOT-DO — decided to keep — flow_context*.go ships as the branching-flow feature (AGENTS.md).** | ~~5~~ | ~~30min~~ |
-| ~~9~~  | ~~Add command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md) | ~~8~~ | ~~60min~~ |
-| 10 | Add built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)** | 6      | 45min  |
-| 11 | Design service-owned config ADR **→ ROADMAP raw ideas (service-owned config ADR)** | 10     | 60min  |
-| ~~12~~ | ~~Update docs/API.md for v3~~ **Superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the contract lives in FEATURES + the describe JSON.** | ~~4~~ | ~~20min~~ |
-| ~~13~~ | ~~Update docs/QUICKSTART.md for v3~~ done — doc rewritten for v4 (updated through v3/v4 releases) | ~~4~~ | ~~15min~~ |
-| ~~14~~ | ~~Clean up gopls infertypeargs warnings in tests~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~2~~ | ~~30min~~ |
-| ~~15~~ | ~~Add integration test: import glamour from external~~ done — .github/workflows/submodule-smoke.yml | ~~5~~ | ~~30min~~ |
-| ~~16~~ | ~~Add integration test: import spinner from external~~ done — .github/workflows/submodule-smoke.yml | ~~4~~ | ~~15min~~ |
-| ~~17~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod) | ~~7~~ | ~~90min~~ |
-| ~~18~~ | ~~Update docs/MIGRATION_FROM_COBRA.md for v3~~ done — doc rewritten for v4 (updated through v3/v4 releases) | ~~3~~ | ~~20min~~ |
-| ~~19~~ | ~~Tag v3.0.0-alpha~~ **Superseded — superseded — v3.0.0 released directly (2026-07-07).** | ~~6~~ | ~~5min~~ |
-| ~~20~~ | ~~Update TODO_LIST.md with v3 status~~ done — TODO_LIST.md maintained (v5 sections, 2026-11-02) | ~~3~~ | ~~10min~~ |
-| ~~21~~ | ~~Update ROADMAP.md to reflect v3 direction~~ done — ROADMAP.md reflects v4/v5 direction (2026-11-02) | ~~3~~ | ~~15min~~ |
-| ~~22~~ | ~~Add CLI option to wire telemetry module (WithTelemetry)~~ done — WithTelemetry[T] ships in telemetry/ (telemetry.go:73) | ~~4~~ | ~~15min~~ |
-| ~~23~~ | ~~Consider cutting docgen.go if rarely used~~ done — kept — GenerateDocs/docgen.go + describe JSON contract ship (FEATURES.md) | ~~2~~ | ~~10min~~ |
-| ~~24~~ | ~~Audit all sentinel errors for completeness~~ done — sentinelFacts covers all sentinels (errors_facts.go) | ~~4~~ | ~~30min~~ |
-| ~~25~~ | ~~Performance: benchmark NewCLI with cliSpec vs old struct~~ **Superseded — superseded — the pre-cliSpec struct is gone in v4; perf tracked as ROADMAP raw ideas (Benchmark dashboard/CI gating).** | ~~3~~ | ~~30min~~ |
+| #      | Task                                                                                                                                                                                                | Impact | Effort    |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
+| ~~1~~  | ~~Fix example/taskctl/README.md stale WithFlags ref~~ done — cleaned — taskctl README has no WithFlags refs                                                                                         | ~~5~~  | ~~5min~~  |
+| ~~2~~  | ~~Fix or remove WithSilenceUsage no-op~~ done — usage silenced by default; WithoutSilenceUsage() opts out (FEATURES.md)                                                                             | ~~6~~  | ~~10min~~ |
+| 3      | Move koanf to configload sub-module (4 deps from root) **→ ROADMAP deferred #5 (koanf extraction YAGNI)**                                                                                           | 7      | 30min     |
+| ~~4~~  | ~~Update README.md with v3 quickstart~~ done — README rewritten through v3/v4 releases                                                                                                              | ~~8~~  | ~~30min~~ |
+| ~~5~~  | ~~Update AGENTS.md module structure for v3~~ done — AGENTS.md documents the 8-module workspace (2026-11-02)                                                                                         | ~~7~~  | ~~20min~~ |
+| ~~6~~  | ~~Update FEATURES.md with module status~~ done — FEATURES.md SUB-MODULE rows (maintained through v4)                                                                                                | ~~5~~  | ~~15min~~ |
+| ~~7~~  | ~~Write v3 migration guide (MIGRATION_TO_V3.md)~~ done — docs/MIGRATION_v2_v3.md exists                                                                                                             | ~~8~~  | ~~30min~~ |
+| ~~8~~  | ~~Evaluate and cut/internalize flow_context.go~~ __NOT-DO — decided to keep — flow_context_.go ships as the branching-flow feature (AGENTS.md)._*                                                   | ~~5~~  | ~~30min~~ |
+| ~~9~~  | ~~Add command-level audit middleware~~ done — AuditMiddleware[T] shipped (auditlog.go; FEATURES.md)                                                                                                 | ~~8~~  | ~~60min~~ |
+| 10     | Add built-in audit-log subcommand **→ ROADMAP raw ideas (built-in audit-log subcommand)**                                                                                                           | 6      | 45min     |
+| 11     | Design service-owned config ADR **→ ROADMAP raw ideas (service-owned config ADR)**                                                                                                                  | 10     | 60min     |
+| ~~12~~ | ~~Update docs/API.md for v3~~ **Superseded — docs/API.md was removed in the 2026-08-06 docs refresh; the contract lives in FEATURES + the describe JSON.**                                          | ~~4~~  | ~~20min~~ |
+| ~~13~~ | ~~Update docs/QUICKSTART.md for v3~~ done — doc rewritten for v4 (updated through v3/v4 releases)                                                                                                   | ~~4~~  | ~~15min~~ |
+| ~~14~~ | ~~Clean up gopls infertypeargs warnings in tests~~ **Superseded — the v3/v4 rewrites replaced those sources.**                                                                                      | ~~2~~  | ~~30min~~ |
+| ~~15~~ | ~~Add integration test: import glamour from external~~ done — .github/workflows/submodule-smoke.yml                                                                                                 | ~~5~~  | ~~30min~~ |
+| ~~16~~ | ~~Add integration test: import spinner from external~~ done — .github/workflows/submodule-smoke.yml                                                                                                 | ~~4~~  | ~~15min~~ |
+| ~~17~~ | ~~Consider making fang optional (plain cobra fallback)~~ done — kept — fang stays a direct core dep (charm.land/fang/v2 in go.mod)                                                                  | ~~7~~  | ~~90min~~ |
+| ~~18~~ | ~~Update docs/MIGRATION_FROM_COBRA.md for v3~~ done — doc rewritten for v4 (updated through v3/v4 releases)                                                                                         | ~~3~~  | ~~20min~~ |
+| ~~19~~ | ~~Tag v3.0.0-alpha~~ **Superseded — superseded — v3.0.0 released directly (2026-07-07).**                                                                                                           | ~~6~~  | ~~5min~~  |
+| ~~20~~ | ~~Update TODO_LIST.md with v3 status~~ done — TODO_LIST.md maintained (v5 sections, 2026-11-02)                                                                                                     | ~~3~~  | ~~10min~~ |
+| ~~21~~ | ~~Update ROADMAP.md to reflect v3 direction~~ done — ROADMAP.md reflects v4/v5 direction (2026-11-02)                                                                                               | ~~3~~  | ~~15min~~ |
+| ~~22~~ | ~~Add CLI option to wire telemetry module (WithTelemetry)~~ done — WithTelemetry[T] ships in telemetry/ (telemetry.go:73)                                                                           | ~~4~~  | ~~15min~~ |
+| ~~23~~ | ~~Consider cutting docgen.go if rarely used~~ done — kept — GenerateDocs/docgen.go + describe JSON contract ship (FEATURES.md)                                                                      | ~~2~~  | ~~10min~~ |
+| ~~24~~ | ~~Audit all sentinel errors for completeness~~ done — sentinelFacts covers all sentinels (errors_facts.go)                                                                                          | ~~4~~  | ~~30min~~ |
+| ~~25~~ | ~~Performance: benchmark NewCLI with cliSpec vs old struct~~ **Superseded — superseded — the pre-cliSpec struct is gone in v4; perf tracked as ROADMAP raw ideas (Benchmark dashboard/CI gating).** | ~~3~~  | ~~30min~~ |
 
 ---
 

@@ -16,6 +16,7 @@ This session verified every dependency is at its latest tag, confirmed build + t
 ## a) FULLY DONE ✅
 
 <!-- check-rows:ledger -->
+
 | # | Item                                      | Evidence                                                                                                                                                                                                                                                                                                      |
 | - | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **All deps verified at latest tag**       | Checked `go list -m -versions` for every direct + key indirect dep. go-output v0.23.3, samber-do-auditlog v0.3.1, cobra v1.10.2, pflag v1.0.10, fang v2.0.1, lipgloss v2.0.5, huh v2.0.3, glamour v2.0.1, samber/do v2.0.0, go-toml v2.4.3, otel v1.44.0 — all confirmed latest.                              |
@@ -31,6 +32,7 @@ This session verified every dependency is at its latest tag, confirmed build + t
 ## b) PARTIALLY DONE 🟡
 
 <!-- check-rows:ledger -->
+
 | # | Item                                  | Status                                                                                                                                                                                                                    | Gap                                              |
 | - | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | 1 | **Dependency bump is uncommitted**    | `go.mod`, `go.sum`, `flake.lock`, and all 3 docs are modified but **nothing is staged or committed**. The work exists only in the working tree.                                                                           | Needs a commit (`chore: bump deps + sync docs`). |
@@ -42,6 +44,7 @@ This session verified every dependency is at its latest tag, confirmed build + t
 ## c) NOT STARTED ⬜
 
 <!-- check-rows:ledger -->
+
 | # | Item                                                  | Notes                                                                                                                                                                        |
 | - | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **Lint run not executed this session**                | AGENTS.md claims "0 lint issues" but I did not run `golangci-lint run ./...` to re-confirm after the dep bumps.                                                              |
@@ -62,15 +65,15 @@ This session verified every dependency is at its latest tag, confirmed build + t
 
 ## e) WHAT WE SHOULD IMPROVE 🎯
 
-| # | Improvement                                                                                                                                                               | Why                                                                                                          |
-| - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 1 | **Doc-drift is systemic.** Every dep bump should trigger a doc grep + update in the same commit. **→ ROADMAP raw ideas (dep-bump doc-sync discipline)** | The v0.17.2→v0.23.3 gap proves manual doc sync doesn't happen reliably.                                      |
-| 2 | **Add a CI check (or pre-commit hook) that fails when go.mod versions don't match AGENTS.md/FEATURES.md.** **→ ROADMAP raw ideas (dep/doc version drift CI guard)** | A 30-line script comparing `go list -m` output against the markdown tables would have caught this instantly. |
-| 3 | **The go-output sub-modules note in AGENTS.md is fragile and high-maintenance.** It enumerates exact module counts ("10 direct", "3 indirect") that change every release. **→ ROADMAP raw ideas (simplify go-output sub-modules note)** | Replace with a principle ("all go-output sub-modules are pinned in lockstep") rather than a brittle count.   |
-| ~~4~~ | ~~**`testutil` package shows 0.0% coverage** with no test files.~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04) | ~~Either it's tested elsewhere (then annotate) or it's untested helper code that should be covered.~~ |
-| ~~5~~ | ~~**examples/taskctl coverage is 67.7%** — lower than the core lib.~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04) | ~~The flagship example should lead by example; gaps here may hide integration bugs.~~ |
-| ~~6~~ | ~~**No automated "are deps latest?" check.**~~ done — .github/dependabot.yml exists | ~~A weekly `go list -m -u` sweep + PR would prevent drift.~~ |
-| 7 | **Version string v2.10.0 still in AGENTS.md header** was fixed this session, but the pattern (header version lags real version) is recurring. **→ ROADMAP raw ideas (version embedding via ReadBuildInfo/-ldflags)** | Single source of truth for version (e.g. read from git tag at build time into a const).                      |
+| #     | Improvement                                                                                                                                                                                                                             | Why                                                                                                          |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 1     | **Doc-drift is systemic.** Every dep bump should trigger a doc grep + update in the same commit. **→ ROADMAP raw ideas (dep-bump doc-sync discipline)**                                                                                 | The v0.17.2→v0.23.3 gap proves manual doc sync doesn't happen reliably.                                      |
+| 2     | **Add a CI check (or pre-commit hook) that fails when go.mod versions don't match AGENTS.md/FEATURES.md.** **→ ROADMAP raw ideas (dep/doc version drift CI guard)**                                                                     | A 30-line script comparing `go list -m` output against the markdown tables would have caught this instantly. |
+| 3     | **The go-output sub-modules note in AGENTS.md is fragile and high-maintenance.** It enumerates exact module counts ("10 direct", "3 indirect") that change every release. **→ ROADMAP raw ideas (simplify go-output sub-modules note)** | Replace with a principle ("all go-output sub-modules are pinned in lockstep") rather than a brittle count.   |
+| ~~4~~ | ~~**`testutil` package shows 0.0% coverage** with no test files.~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04)                                                                                                          | ~~Either it's tested elsewhere (then annotate) or it's untested helper code that should be covered.~~        |
+| ~~5~~ | ~~**examples/taskctl coverage is 67.7%** — lower than the core lib.~~ done — taskctl at 85.9% (FEATURES.md, verified 2026-10-04)                                                                                                        | ~~The flagship example should lead by example; gaps here may hide integration bugs.~~                        |
+| ~~6~~ | ~~**No automated "are deps latest?" check.**~~ done — .github/dependabot.yml exists                                                                                                                                                     | ~~A weekly `go list -m -u` sweep + PR would prevent drift.~~                                                 |
+| 7     | **Version string v2.10.0 still in AGENTS.md header** was fixed this session, but the pattern (header version lags real version) is recurring. **→ ROADMAP raw ideas (version embedding via ReadBuildInfo/-ldflags)**                    | Single source of truth for version (e.g. read from git tag at build time into a const).                      |
 
 ---
 

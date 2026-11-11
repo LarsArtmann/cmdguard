@@ -1,6 +1,7 @@
 # Config Truth: Mid-Flight Execution Status
 
 <!-- check-rows:ledger -->
+
 | Field         | Value                                                                              |
 | ------------- | ---------------------------------------------------------------------------------- |
 | Date          | 2026-11-02 10:15 CET (Monday)                                                      |
@@ -517,6 +518,7 @@ data={"log_level":"debug"}      err=<nil> fields=[]          cfg={LogLevel:debug
 ### Files created this session
 
 <!-- check-rows:ledger -->
+
 | File                                                         | Lines (approx) |
 | ------------------------------------------------------------ | -------------- |
 | `pkg/cmdguard/v4/config_keys.go`                             | 610            |
@@ -544,6 +546,7 @@ provenance fields, config wire-up, execute hook), `cli_options.go` (`WithStrictC
 ### Verification status
 
 <!-- check-rows:ledger -->
+
 | Gate                         | Status                    |
 | ---------------------------- | ------------------------- |
 | `go build ./pkg/cmdguard/v4` | pass                      |

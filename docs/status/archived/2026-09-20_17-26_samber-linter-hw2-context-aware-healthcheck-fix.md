@@ -17,6 +17,7 @@ Baseline scan found exactly 1 finding: **HW-2 ×1** — `*CLI[T]` implements bar
 ## 2. a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | Item                                                                                                                                                                                                                                  | Evidence                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Baseline scan run first, per member (`go.work` → 6 in-repo members scanned separately)                                                                                                                                                | 1 finding (HW-2), exit 1; other 5 members exit 0                   |
@@ -109,6 +110,7 @@ _(30 grounded items; stopping there rather than padding to 50 with unverified sp
 ## Appendix A — Change Set (exact)
 
 <!-- check-rows:ledger -->
+
 | File                                         | Change                                                                                                                                             |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pkg/cmdguard/v4/cli_accessors.go`           | `HealthCheck()` → `HealthCheck(ctx context.Context) error`; body delegates to `scope.HealthCheckWithContext(ctx)`; doc comment states ctx contract |
@@ -120,6 +122,7 @@ Commit: `580dfa6 chore: auto-commit 3 changed file(s) (heuristic)` (auto-commit 
 ## Appendix B — Verification Matrix
 
 <!-- check-rows:ledger -->
+
 | Gate                                         | Command                                                                                                                                           | Result                                                                             |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | Scanner (baseline)                           | `go run github.com/larsartmann/samber-linter/cmd/samber-linter@v0.2.2 ./...` per member, `GOTOOLCHAIN=go1.27.1 GOEXPERIMENT=jsonv2 CGO_ENABLED=0` | 1 finding (HW-2), exit 1                                                           |

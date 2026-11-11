@@ -12,6 +12,7 @@
 ## a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | #  | Task                                                            | File(s)                            | Verification                                                           |
 | -- | --------------------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------- |
 | 1  | Removed `EditInEditor()` feature table row                      | `README.md`                        | grep confirms 0 matches in active docs                                 |
@@ -34,29 +35,30 @@
 
 ## b) PARTIALLY DONE
 
-| # | What                              | Status              | What's Missing                                                                                                                                                                             |
-| - | --------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ~~1~~ | ~~**CHANGELOG entry for doc fixes**~~ **Won't implement — doc-only fixes aren't changelog entries per repo practice (CHANGELOG tracks API/behavior changes).** | ~~NOT ADDED~~ | ~~The `## [Unreleased]` section exists but I did not add an entry for the stale-reference cleanup commit. This is a process failure — every user-visible change should get a changelog line.~~ |
-| ~~2~~ | ~~**COMPARISON.md full audit**~~ done — docs/COMPARISON.md maintained for v4 | ~~Lines 1-200 checked~~ | ~~Lines 200+ not reviewed for additional stale refs (the "When to Choose Each" section may have outdated framing).~~ |
+| #     | What                                                                                                                                                           | Status                  | What's Missing                                                                                                                                                                                 |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**CHANGELOG entry for doc fixes**~~ **Won't implement — doc-only fixes aren't changelog entries per repo practice (CHANGELOG tracks API/behavior changes).** | ~~NOT ADDED~~           | ~~The `## [Unreleased]` section exists but I did not add an entry for the stale-reference cleanup commit. This is a process failure — every user-visible change should get a changelog line.~~ |
+| ~~2~~ | ~~**COMPARISON.md full audit**~~ done — docs/COMPARISON.md maintained for v4                                                                                   | ~~Lines 1-200 checked~~ | ~~Lines 200+ not reviewed for additional stale refs (the "When to Choose Each" section may have outdated framing).~~                                                                           |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Task                                                | Why It Matters                                                                                                                                                    |
-| - | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**CI sub-module smoke test** (GitHub Actions)~~ done — .github/workflows/submodule-smoke.yml | ~~Without automated external-resolution testing, the sub-module path/directory mismatch bug could silently return. The previous session proved this is a real risk.~~ |
-| ~~2~~ | ~~**Sub-module test coverage**~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~All 5 sub-modules (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) have `[no test files]`. Zero coverage. Any refactor will be flying blind.~~ |
-| ~~3~~ | ~~**57 pre-existing golangci-lint issues in v3 core**~~ done — 0 lint issues (FEATURES.md; CI lint job) | ~~Known debt from prior sessions. Not introduced by this session but blocks `nix flake check` / clean lint.~~ |
-| ~~4~~ | ~~**pkg.go.dev indexing refresh**~~ done — indexed — README badge links pkg.go.dev/v4 | ~~`https://pkg.go.dev/github.com/larsartmann/cmdguard/v3` may still show old docs. Needs a manual visit to trigger re-indexing.~~ |
-| ~~5~~ | ~~**Go proxy verification for v2@latest**~~ done — verified 2026-07-07 (§a.12 external smoke tests) | ~~Cannot verify from inside the repo whether `go get .../v2@latest` serves v2.10.4 (with retract) globally.~~ |
-| ~~6~~ | ~~**flake.nix `buildGoModule` for sub-modules**~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~`nix flake check` does not build/vet sub-modules. Only `go build ./...` + manual loop covers them.~~ |
+| #     | Task                                                                                                                     | Why It Matters                                                                                                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**CI sub-module smoke test** (GitHub Actions)~~ done — .github/workflows/submodule-smoke.yml                           | ~~Without automated external-resolution testing, the sub-module path/directory mismatch bug could silently return. The previous session proved this is a real risk.~~ |
+| ~~2~~ | ~~**Sub-module test coverage**~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04)          | ~~All 5 sub-modules (`glamour`, `manpage`, `prompts`, `spinner`, `telemetry`) have `[no test files]`. Zero coverage. Any refactor will be flying blind.~~             |
+| ~~3~~ | ~~**57 pre-existing golangci-lint issues in v3 core**~~ done — 0 lint issues (FEATURES.md; CI lint job)                  | ~~Known debt from prior sessions. Not introduced by this session but blocks `nix flake check` / clean lint.~~                                                         |
+| ~~4~~ | ~~**pkg.go.dev indexing refresh**~~ done — indexed — README badge links pkg.go.dev/v4                                    | ~~`https://pkg.go.dev/github.com/larsartmann/cmdguard/v3` may still show old docs. Needs a manual visit to trigger re-indexing.~~                                     |
+| ~~5~~ | ~~**Go proxy verification for v2@latest**~~ done — verified 2026-07-07 (§a.12 external smoke tests)                      | ~~Cannot verify from inside the repo whether `go get .../v2@latest` serves v2.10.4 (with retract) globally.~~                                                         |
+| ~~6~~ | ~~**flake.nix `buildGoModule` for sub-modules**~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~`nix flake check` does not build/vet sub-modules. Only `go build ./...` + manual loop covers them.~~                                                                |
 
 ---
 
 ## d) TOTALLY FUCKED UP
 
 <!-- check-rows:ledger -->
+
 | # | What | Impact | Root Cause |
 | --- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | **COMPARISON.md table alignment broken** | The "Zero panics" row I edited has **fewer padding spaces** than surrounding rows — visible as misaligned in rendered markdown. The `cat -A` output confirmed: `| **Zero panics**                                                                                                                                                                                                                                                                                                          |`has 14 spaces instead of the 29 that`| **Minimal panics** |` had. | I used `multiedit` to replace the cell text but didn't match the exact padding of the original. The new text "Zero panics" is shorter than "Minimal panics" so the column padding is now inconsistent. **I did not check the rendered output before committing.** |
@@ -66,13 +68,13 @@
 
 ## e) WHAT WE SHOULD IMPROVE
 
-| # | Lesson                                                           | Action                                                                                                                                                                                                                                                                                |
-| - | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Check rendered markdown tables before committing**~~ done (docs-health pass 2026-11-08) | ~~Table cell padding is load-bearing in markdown. Always verify alignment after editing table cells. A quick `sed -n 'Np'` plus `cat -A` catches this.~~ |
-| ~~2~~ | ~~**Add CHANGELOG entries for every user-visible change**~~ **Won't implement — doc-only fixes aren't changelog entries per repo practice.** | ~~Doc fixes that change what consumers see ARE user-visible. The Unreleased section exists — use it.~~ |
-| ~~3~~ | ~~**Don't trust cached context for operational decisions**~~ done (docs-health pass 2026-11-08) | ~~The project_context AGENTS.md said `--no-verify` is required. The ACTUAL file says it's not. Same root cause as the README stale refs: **cached context rots.** When making operational decisions (commit flags, build commands), re-read the actual file.~~ |
-| ~~4~~ | ~~**The doc audit grep pattern was incomplete**~~ done (docs-health pass 2026-11-08) | ~~I grepped for feature NAMES (`EditInEditor`, `SpinnerMiddleware`) but not for API signature patterns (`v2.NewCommand[`, `WithFlags[`). The COMPARISON.md v2 API example was caught only because I read the file manually. A signature-pattern grep would have caught it mechanically.~~ |
-| ~~5~~ | ~~**Sub-modules section should cross-reference AGENTS.md gotchas**~~ done — README Optional Sub-Modules section ships (README.md:539) | ~~The new README sub-modules section lists import paths but doesn't mention the "directory layout is load-bearing" gotcha. A one-line link would help.~~ |
+| #     | Lesson                                                                                                                                       | Action                                                                                                                                                                                                                                                                                    |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Check rendered markdown tables before committing**~~ done (docs-health pass 2026-11-08)                                                  | ~~Table cell padding is load-bearing in markdown. Always verify alignment after editing table cells. A quick `sed -n 'Np'` plus `cat -A` catches this.~~                                                                                                                                  |
+| ~~2~~ | ~~**Add CHANGELOG entries for every user-visible change**~~ **Won't implement — doc-only fixes aren't changelog entries per repo practice.** | ~~Doc fixes that change what consumers see ARE user-visible. The Unreleased section exists — use it.~~                                                                                                                                                                                    |
+| ~~3~~ | ~~**Don't trust cached context for operational decisions**~~ done (docs-health pass 2026-11-08)                                              | ~~The project_context AGENTS.md said `--no-verify` is required. The ACTUAL file says it's not. Same root cause as the README stale refs: **cached context rots.** When making operational decisions (commit flags, build commands), re-read the actual file.~~                            |
+| ~~4~~ | ~~**The doc audit grep pattern was incomplete**~~ done (docs-health pass 2026-11-08)                                                         | ~~I grepped for feature NAMES (`EditInEditor`, `SpinnerMiddleware`) but not for API signature patterns (`v2.NewCommand[`, `WithFlags[`). The COMPARISON.md v2 API example was caught only because I read the file manually. A signature-pattern grep would have caught it mechanically.~~ |
+| ~~5~~ | ~~**Sub-modules section should cross-reference AGENTS.md gotchas**~~ done — README Optional Sub-Modules section ships (README.md:539)        | ~~The new README sub-modules section lists import paths but doesn't mention the "directory layout is load-bearing" gotcha. A one-line link would help.~~                                                                                                                                  |
 
 ---
 
@@ -80,53 +82,53 @@
 
 ### Critical (consumer trust — do first)
 
-| # | Task                                                                                | Impact                                    | Effort |
-| - | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------ |
-| ~~1~~ | ~~**Fix COMPARISON.md table alignment** — pad "Zero panics" row to match column width~~ done — fixed — COMPARISON table aligned (COMPARISON.md:103) | ~~Misaligned table in consumer-facing doc~~ | ~~2m~~ |
+| #     | Task                                                                                                                                                           | Impact                                        | Effort |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------ |
+| ~~1~~ | ~~**Fix COMPARISON.md table alignment** — pad "Zero panics" row to match column width~~ done — fixed — COMPARISON table aligned (COMPARISON.md:103)            | ~~Misaligned table in consumer-facing doc~~   | ~~2m~~ |
 | ~~2~~ | ~~**Add CHANGELOG Unreleased entry** for the stale-reference cleanup commit~~ **Won't implement — doc-only fixes aren't changelog entries per repo practice.** | ~~Missing changelog for user-visible change~~ | ~~3m~~ |
-| ~~3~~ | ~~**Audit COMPARISON.md lines 200+** for additional stale framing~~ done — docs/COMPARISON.md maintained for v4 | ~~Only first 200 lines reviewed~~ | ~~5m~~ |
-| ~~4~~ | ~~**Trigger pkg.go.dev re-indexing** — visit the URL to request refresh~~ done — indexed — README badge links pkg.go.dev/v4 | ~~External docs may be stale~~ | ~~1m~~ |
+| ~~3~~ | ~~**Audit COMPARISON.md lines 200+** for additional stale framing~~ done — docs/COMPARISON.md maintained for v4                                                | ~~Only first 200 lines reviewed~~             | ~~5m~~ |
+| ~~4~~ | ~~**Trigger pkg.go.dev re-indexing** — visit the URL to request refresh~~ done — indexed — README badge links pkg.go.dev/v4                                    | ~~External docs may be stale~~                | ~~1m~~ |
 
 ### High (prevent regression)
 
-| # | Task                                                                                                | Impact                                      | Effort |
-| - | --------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------ |
-| ~~5~~ | ~~**Add GitHub Actions CI smoke test** — `go get .../v3@v3.0.0` from fresh module + all 5 sub-modules~~ done — .github/workflows/submodule-smoke.yml | ~~Prevents sub-module resolution regression~~ | ~~30m~~ |
-| 6 | **Add lint check to CI** that greps for deleted feature names in `*.md` **→ ROADMAP raw ideas (stale-doc-ref CI guard)** | Catches stale doc refs before merge         | 15m    |
+| #     | Task                                                                                                                                                   | Impact                                          | Effort  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ------- |
+| ~~5~~ | ~~**Add GitHub Actions CI smoke test** — `go get .../v3@v3.0.0` from fresh module + all 5 sub-modules~~ done — .github/workflows/submodule-smoke.yml   | ~~Prevents sub-module resolution regression~~   | ~~30m~~ |
+| 6     | **Add lint check to CI** that greps for deleted feature names in `*.md` **→ ROADMAP raw ideas (stale-doc-ref CI guard)**                               | Catches stale doc refs before merge             | 15m     |
 | ~~7~~ | ~~**Add `buildGoModule` for sub-modules to flake.nix** or a `justfile`/script~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake.** | ~~`nix flake check` doesn't cover sub-modules~~ | ~~20m~~ |
 
 ### Medium (test coverage)
 
-| #  | Task                                                     | Impact        | Effort |
-| -- | -------------------------------------------------------- | ------------- | ------ |
-| ~~8~~  | ~~**Write tests for `glamour` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~Untested code~~ | ~~30m~~ |
+| #      | Task                                                                                                                                                   | Impact            | Effort  |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ------- |
+| ~~8~~  | ~~**Write tests for `glamour` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04)              | ~~Untested code~~ | ~~30m~~ |
 | ~~9~~  | ~~**Write tests for `manpage` sub-module** (0% coverage)~~ **Superseded — superseded — the manpage sub-module was removed (2026-07-23_13-22 report).** | ~~Untested code~~ | ~~30m~~ |
-| ~~10~~ | ~~**Write tests for `prompts` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~Untested code~~ | ~~30m~~ |
-| ~~11~~ | ~~**Write tests for `spinner` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~Untested code~~ | ~~30m~~ |
-| ~~12~~ | ~~**Write tests for `telemetry` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04) | ~~Untested code~~ | ~~30m~~ |
+| ~~10~~ | ~~**Write tests for `prompts` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04)              | ~~Untested code~~ | ~~30m~~ |
+| ~~11~~ | ~~**Write tests for `spinner` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04)              | ~~Untested code~~ | ~~30m~~ |
+| ~~12~~ | ~~**Write tests for `telemetry` sub-module** (0% coverage)~~ done — 65 sub-module tests across 5 modules (FEATURES.md, verified 2026-10-04)            | ~~Untested code~~ | ~~30m~~ |
 
 ### Medium (debt paydown)
 
-| #  | Task                                                     | Impact                                | Effort |
-| -- | -------------------------------------------------------- | ------------------------------------- | ------ |
-| ~~13~~ | ~~**Fix 57 pre-existing golangci-lint issues in v3 core**~~ done — 0 lint issues (FEATURES.md; CI lint job) | ~~Blocks clean lint / `nix flake check`~~ | ~~2h~~ |
-| ~~14~~ | ~~**Fix 2 `noinlineerr` warnings in `command.go:290,338`**~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~Lint hygiene~~ | ~~10m~~ |
-| ~~15~~ | ~~**`pkg/testutil` has 0% coverage**~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04) | ~~Public package with no tests~~ | ~~30m~~ |
+| #      | Task                                                                                                                     | Impact                                    | Effort  |
+| ------ | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- | ------- |
+| ~~13~~ | ~~**Fix 57 pre-existing golangci-lint issues in v3 core**~~ done — 0 lint issues (FEATURES.md; CI lint job)              | ~~Blocks clean lint / `nix flake check`~~ | ~~2h~~  |
+| ~~14~~ | ~~**Fix 2 `noinlineerr` warnings in `command.go:290,338`**~~ **Superseded — the v3/v4 rewrites replaced those sources.** | ~~Lint hygiene~~                          | ~~10m~~ |
+| ~~15~~ | ~~**`pkg/testutil` has 0% coverage**~~ done — testutil at 80.3% (FEATURES.md, verified 2026-10-04)                       | ~~Public package with no tests~~          | ~~30m~~ |
 
 ### Lower (polish)
 
-| #  | Task                                                                                                          | Impact                                        | Effort |
-| -- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------ |
-| ~~16~~ | ~~**Add sub-module cross-links in README** — link to AGENTS.md gotchas section~~ done — README documents the sub-modules (SUB-MODULE rows in FEATURES; README links) | ~~Discoverability~~ | ~~5m~~ |
-| ~~17~~ | ~~**Verify v2@latest serves v2.10.4** via proxy.golang.org API~~ done — verified 2026-07-07 (§a.12 external smoke tests) | ~~Retract directive verification~~ | ~~5m~~ |
-| ~~18~~ | ~~**Add `CONTRIBUTING.md`** — README references it (`See CONTRIBUTING.md`) but file may not exist~~ done — exists at repo root | ~~Dead link check~~ | ~~10m~~ |
-| ~~19~~ | ~~**Audit `docs/PERFORMANCE.md`** for stale feature references~~ done — docs/PERFORMANCE.md maintained (v4) | ~~Not checked this session~~ | ~~5m~~ |
-| ~~20~~ | ~~**Audit `docs/DOMAIN_LANGUAGE.md`** for v2 terms~~ done — docs/DOMAIN_LANGUAGE.md maintained (v4) | ~~Not checked~~ | ~~5m~~ |
-| ~~21~~ | ~~**Audit `docs/architecture.d2`** for stale module references~~ done — docs/architecture.d2 current (2026-07-18 architecture-understanding renders) | ~~Not checked~~ | ~~5m~~ |
-| ~~22~~ | ~~**Add godoc `Example*` functions** for key API constructors~~ done — Example funcs ship (example_types_test.go) | ~~Discoverability on pkg.go.dev~~ | ~~1h~~ |
-| ~~23~~ | ~~**Consolidate `docs/modularization/`** — references `pkg/cmdguard/v2` extensively (historical, but confusing)~~ **Superseded — superseded — point-in-time modularization history; v3/v4 shipped.** | ~~Clarity~~ | ~~15m~~ |
-| ~~24~~ | ~~**Add a `make submodules` or `flake.nix` check** that builds all 6 modules~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake; per-module build loop documented.** | ~~Prevents "build passes but sub-module broken"~~ | ~~20m~~ |
-| ~~25~~ | ~~**Verify `examples/taskctl/main_test.go`** still references correct API (66 tests)~~ done — examples/taskctl maintained through v4 (85.9% coverage) | ~~Example is the showcase~~ | ~~10m~~ |
+| #      | Task                                                                                                                                                                                                 | Impact                                            | Effort  |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ------- |
+| ~~16~~ | ~~**Add sub-module cross-links in README** — link to AGENTS.md gotchas section~~ done — README documents the sub-modules (SUB-MODULE rows in FEATURES; README links)                                 | ~~Discoverability~~                               | ~~5m~~  |
+| ~~17~~ | ~~**Verify v2@latest serves v2.10.4** via proxy.golang.org API~~ done — verified 2026-07-07 (§a.12 external smoke tests)                                                                             | ~~Retract directive verification~~                | ~~5m~~  |
+| ~~18~~ | ~~**Add `CONTRIBUTING.md`** — README references it (`See CONTRIBUTING.md`) but file may not exist~~ done — exists at repo root                                                                       | ~~Dead link check~~                               | ~~10m~~ |
+| ~~19~~ | ~~**Audit `docs/PERFORMANCE.md`** for stale feature references~~ done — docs/PERFORMANCE.md maintained (v4)                                                                                          | ~~Not checked this session~~                      | ~~5m~~  |
+| ~~20~~ | ~~**Audit `docs/DOMAIN_LANGUAGE.md`** for v2 terms~~ done — docs/DOMAIN_LANGUAGE.md maintained (v4)                                                                                                  | ~~Not checked~~                                   | ~~5m~~  |
+| ~~21~~ | ~~**Audit `docs/architecture.d2`** for stale module references~~ done — docs/architecture.d2 current (2026-07-18 architecture-understanding renders)                                                 | ~~Not checked~~                                   | ~~5m~~  |
+| ~~22~~ | ~~**Add godoc `Example*` functions** for key API constructors~~ done — Example funcs ship (example_types_test.go)                                                                                    | ~~Discoverability on pkg.go.dev~~                 | ~~1h~~  |
+| ~~23~~ | ~~**Consolidate `docs/modularization/`** — references `pkg/cmdguard/v2` extensively (historical, but confusing)~~ **Superseded — superseded — point-in-time modularization history; v3/v4 shipped.** | ~~Clarity~~                                       | ~~15m~~ |
+| ~~24~~ | ~~**Add a `make submodules` or `flake.nix` check** that builds all 6 modules~~ **NOT-DO — AGENTS.md design decision — no build/vet checks in flake; per-module build loop documented.**              | ~~Prevents "build passes but sub-module broken"~~ | ~~20m~~ |
+| ~~25~~ | ~~**Verify `examples/taskctl/main_test.go`** still references correct API (66 tests)~~ done — examples/taskctl maintained through v4 (85.9% coverage)                                                | ~~Example is the showcase~~                       | ~~10m~~ |
 
 ---
 
@@ -149,6 +151,7 @@ The deeper question: **which version of AGENTS.md is authoritative — the one l
 ## Session Metrics
 
 <!-- check-rows:ledger -->
+
 | Metric                       | Value                                                                                                                                                                                                            |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Files changed                | 4 (`README.md`, `docs/COMPARISON.md`, `examples/taskctl/main.go`, `examples/taskctl/README.md`)                                                                                                                  |

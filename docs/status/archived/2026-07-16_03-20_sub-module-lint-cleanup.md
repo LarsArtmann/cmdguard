@@ -11,6 +11,7 @@
 ## a) FULLY DONE
 
 <!-- check-rows:ledger -->
+
 | Module              | What was fixed                                                                                                                                                        | Verified                |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | **core** (`/`)      | Was already 0 issues — no changes needed                                                                                                                              | `golangci-lint` clean   |
@@ -82,16 +83,16 @@ I added `github.com/spf13/cobra.Command` to the **global** exhaustruct exclude l
 
 ## e) WHAT WE SHOULD IMPROVE
 
-| # | Issue                                             | Fix                                                                         |
-| - | ------------------------------------------------- | --------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Restore `#### Audit Log` heading** in AGENTS.md~~ done — restored in c02ca92 (Resolution 2026-07-23) | ~~Re-insert the heading between the lint note and the audit log bullets~~ |
-| 2 | **Fix or delete `TestHuhRunner_PromptConfirm`** **→ TODO_LIST harvested section (rewrite-or-delete the no-op PromptConfirm test)** | Write a real test or remove it                                              |
+| #     | Issue                                                                                                                                                       | Fix                                                                             |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Restore `#### Audit Log` heading** in AGENTS.md~~ done — restored in c02ca92 (Resolution 2026-07-23)                                                    | ~~Re-insert the heading between the lint note and the audit log bullets~~       |
+| 2     | **Fix or delete `TestHuhRunner_PromptConfirm`** **→ TODO_LIST harvested section (rewrite-or-delete the no-op PromptConfirm test)**                          | Write a real test or remove it                                                  |
 | ~~3~~ | ~~**Scope the `cobra.Command` exhaustruct exclude**~~ done — kept — cobra.Command in global exhaustruct ignore-patterns (.golangci.yml:152); ADR-002 policy | ~~Replace global exclude with per-file `//nolint:exhaustruct` in `manpage.go`~~ |
-| ~~4~~ | ~~**Update exclusion count in AGENTS.md**~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy | ~~Reflect the new exhaustruct type exclude in the tracking note~~ |
-| ~~5~~ | ~~**Run core tests + workspace build**~~ done — CI green (ci.yml) | ~~Verify nothing broke from `.golangci.yml` changes~~ |
-| ~~6~~ | ~~**Run `nix flake check`**~~ done — formatting enforced — BuildFlow pre-commit + treefmt in nix flake check | ~~Verify format and checks pass~~ |
-| ~~7~~ | ~~**Add CHANGELOG entry**~~ **Superseded — superseded — release notes live in the root CHANGELOG per-module sections (2026-08-06+).** | ~~Document the sub-module lint fixes~~ |
-| ~~8~~ | ~~**Commit the work**~~ done — committed — files tracked in git | ~~Changes are uncommitted (8 files modified, not staged)~~ |
+| ~~4~~ | ~~**Update exclusion count in AGENTS.md**~~ done — documented — ADR-002 lint-strategy-and-exclusion-policy                                                  | ~~Reflect the new exhaustruct type exclude in the tracking note~~               |
+| ~~5~~ | ~~**Run core tests + workspace build**~~ done — CI green (ci.yml)                                                                                           | ~~Verify nothing broke from `.golangci.yml` changes~~                           |
+| ~~6~~ | ~~**Run `nix flake check`**~~ done — formatting enforced — BuildFlow pre-commit + treefmt in nix flake check                                                | ~~Verify format and checks pass~~                                               |
+| ~~7~~ | ~~**Add CHANGELOG entry**~~ **Superseded — superseded — release notes live in the root CHANGELOG per-module sections (2026-08-06+).**                       | ~~Document the sub-module lint fixes~~                                          |
+| ~~8~~ | ~~**Commit the work**~~ done — committed — files tracked in git                                                                                             | ~~Changes are uncommitted (8 files modified, not staged)~~                      |
 
 ---
 
