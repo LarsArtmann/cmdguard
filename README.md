@@ -18,7 +18,7 @@ cmdguard is the only Go CLI framework that unifies **type-safe flags**, **depend
 
 **Get started in 30 seconds:** `go get github.com/larsartmann/cmdguard/v5` · [Quick Start](#quick-start) · [Full Docs](https://cmdguard.lars.software)
 
-> **API Stability:** v5.0.0 is the current release. The v4 line is frozen at v4.2.1 (bug-fix only); the legacy v2 line is in maintenance at v2.10.4. Migrating from v4? See the [v4→v5 Migration Guide](docs/MIGRATION_v4_v5.md) (mechanical codemod included). Earlier migrations: [v3→v4](docs/MIGRATION_v3_v4.md), [v2→v3](docs/MIGRATION_v2_v3.md). Full change history in [CHANGELOG.md](CHANGELOG.md).
+> **API Stability:** v5.0.0 is the current release. The v4 line is retired — final release v4.3.1, frozen on the [`release/v4`](https://github.com/larsartmann/cmdguard/tree/release/v4) branch (bug-fix only); the legacy v2 line is in maintenance at v2.10.4. Migrating from v4? See the [v4→v5 Migration Guide](docs/MIGRATION_v4_v5.md) (mechanical codemod included). Earlier migrations: [v3→v4](docs/MIGRATION_v3_v4.md), [v2→v3](docs/MIGRATION_v2_v3.md). Full change history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -404,10 +404,10 @@ that need the root's execution-flag group.
 | `FilePath` | Path cleaning and existence checks |
 | `HostPort` | `host:port` validation             |
 
-Add your own with `RegisterTypeHandler()`:
+Add your own with `RegisterTypeCodec()`:
 
 ```go
-v5.RegisterTypeHandler(reflect.TypeFor[MyType](), v5.TypeHandlerFunc{
+v5.RegisterTypeCodec(reflect.TypeFor[MyType](), v5.TypeCodecFunc{
     ParseFunc:    func(value string, _ v5.FlagTag) (any, error) { return MyType{Value: value}, nil },
     DefaultFunc:  func(_ v5.FlagTag) any { return MyType{} },
 })
@@ -465,6 +465,10 @@ type Flags struct {
 | `WithSubcommands(cmds...)`                    | Attach child commands (parent)     |
 | `WithRangeArgs(min, max)`                     | Require between min and max args   |
 | `WithNoArgs()`                                | Reject any positional args         |
+| `WithStrictPositionalArgs()`                  | Reject undeclared positional args (inert when an explicit validator like `WithExactArgs` is set) |
+| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras |
+| `WithArgs(fn)`                                | Custom `cobra.PositionalArgs`       |
+| `WithPromptOnMissing()`                       | Interactive prompting for missing flags |
 | `WithCompletion(fn)`                          | Dynamic shell completion           |
 
 ---
@@ -666,14 +670,16 @@ See [`examples/taskctl/main_test.go`](examples/taskctl/main_test.go) for integra
 
 ## Examples
 
-See [`examples/taskctl/`](examples/taskctl/) — a production-grade task manager CLI demonstrating all features: DI, typed flags, middleware, subcommands, config files, rich output, and more.
+- [`examples/taskctl/`](examples/taskctl/) — a production-grade task manager CLI demonstrating all features: DI, typed flags, middleware, subcommands, config files, rich output, and more.
+- [`examples/config-explain/`](examples/config-explain/) — the opt-in `config explain` provenance command with a sample YAML config.
+- [`examples/docs-generator/`](examples/docs-generator/) — `GenerateDocs` usage for publishing command-tree markdown.
 
 ---
 
 ## Development
 
 ```bash
-# Enter dev shell (Go 1.26, gopls, golangci-lint)
+# Enter dev shell (Go 1.27, gopls, golangci-lint)
 nix develop
 
 # Run tests
@@ -700,7 +706,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 - [Installation](https://cmdguard.lars.software/getting-started/installation/) — Get started in 30 seconds
 - [Quick Start](https://cmdguard.lars.software/getting-started/quick-start/) — Build a CLI in under a minute
 - [Type-Safe Flags](https://cmdguard.lars.software/guides/type-safe-flags/) — Struct tags reference
-- [Custom Value Types](https://cmdguard.lars.software/guides/custom-types/) — Built-in types and RegisterTypeHandler
+- [Custom Value Types](https://cmdguard.lars.software/guides/custom-types/) — Built-in types and RegisterTypeCodec
 - [Dependency Injection](https://cmdguard.lars.software/guides/dependency-injection/) — samber/do/v2 integration
 - [Lifecycle & Signals](https://cmdguard.lars.software/guides/lifecycle/) — Graceful shutdown, WithCleanup, Doctor
 - [Error Handling](https://cmdguard.lars.software/guides/error-handling/) — Zero panics, exit codes, sentinel errors
