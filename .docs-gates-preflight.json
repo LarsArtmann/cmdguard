@@ -1,0 +1,6 @@
+{
+  "recorded": "2026-11-14T10:54:08Z",
+  "lines": [
+    "- ~~**docs-health CI gate** — run `docs-gates` (or equivalent) on docs-touching PRs~~ LANDED 2026-11-14: ci.yml `dogfood` job runs the pinned battery on every push/PR"
+  ]
+}

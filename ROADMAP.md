@@ -278,7 +278,7 @@ Documentation & CI guards (routed as "guards/note" and "stale-doc guard"):
 - **Semver CI check** — enforce tag/CHANGELOG/module-path coherence before release
 - **godoclint** — godoc convention linting across exported symbols
 - **`docs/STATUS.md` index** — one-page pointer to current status reports (reports themselves stay historical)
-- **docs-health CI gate** — run `docs-gates` (or equivalent) on docs-touching PRs
+- ~~**docs-health CI gate** — run `docs-gates` (or equivalent) on docs-touching PRs~~ LANDED 2026-11-14: ci.yml `dogfood` job runs the pinned battery on every push/PR
 - **markdownlint + lychee** — markdown style + link checking in CI
 
 Other:

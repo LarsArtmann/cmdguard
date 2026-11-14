@@ -93,3 +93,28 @@ jobs:
       - name: Verify build without workspace
         run: GOWORK=off go build ./...
         working-directory: ${{ github.workspace }}
+
+  # The docs-health battery over this repo on every push/PR: the five
+  # gates (freshness, audit-all, annotate, routing, cadence) judge the
+  # living docs and the docs/status corpus. A red here is the docs
+  # ritual coming due (harvest, archive, strike) — fix the docs, never
+  # loosen the gate. docs-gates is public and stdlib-only, so a pinned
+  # `go run` needs no credentials; bump the tag manually when a new
+  # docs-gates release lands (dependabot does not see go run pins).
+  dogfood:
+    runs-on: ubuntu-latest
+    steps:
+      # Full history: the annotate gate resolves `done at <hash>` verdicts
+      # against the real commit graph — a depth-1 checkout makes every
+      # non-HEAD hash unresolvable and the gate false-fails.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27"
+
+      - name: docs battery
+        run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.0 run .

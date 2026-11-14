@@ -37,6 +37,9 @@ nix flake check
 # Check everything (build + test + lint + format + go mod tidy — all 8 modules)
 nix run .#check-all
 
+# Docs-health battery over this repo (same gates the CI dogfood job runs)
+docs-gates run .
+
 # Website docs truth gate (stale major, API symbols, compiled doc samples)
 scripts/check-guide-sync.sh
 
@@ -226,6 +229,15 @@ Note the asymmetry this creates: ROOT carries real sibling pins (release shape �
 - **D3 — archive by gate, not by calendar.** A status report moves to `docs/status/archived/` only when its annotation gates are green (`check-rows --strict` + `bare-rows` + `prose-items`), checked BEFORE the `git mv`. Mass-annotating the whole `docs/status/` backlog is scheduled only when the unarchived count nears the battery threshold (20).
 - **D13 — AGENTS.md stays load-bearing.** The fleet's 220-line warning is advisory and accepted: moving gotchas out of the auto-loaded file caused the lint `--dir` mistake twice. Trims come from prose, never from gotchas.
 - **D14 — file-size gate runs at 900 lines.** `.buildflow.yml` raises the fleet default (350) with rationale inline: the sentinel fact table's length IS the sentinel count, cli.go carries the Execute reuse invariants, and cohesive table-driven test files are by-design large (17 of 32 findings were `_test.go`). Function-level complexity stays governed by funlen/maintidx.
+
+### docs-gates adoption (2026-11-14)
+
+The docs-health battery gates this repo's living docs and `docs/status/` corpus. `.docs-gates.json` pins only cadence — everything else rides the fleet defaults (report dir `docs/status`, planning extra globs, strict ratchets).
+
+- **Surfaces.** CI `dogfood` job runs the battery via pinned `go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.0 run .` — bump the tag when a new docs-gates release lands (dependabot cannot see `go run @version` pins). BuildFlow's compiled-in docs-gates provider rides the default pipeline AND pre-commit mode (`buildflow -s docs-gates` for the step alone); it execs the `docs-gates` binary from PATH, so hosts without the fleet-installed binary fail the step with the install hint.
+- **Deliberately NO flake input.** docs-gates' flake carries a PRIVATE erraudit input (git+ssh); consuming any of its outputs would force a private fetch on CI and public clones. The system binary + the pinned `go run` are the only surfaces.
+- **Near-bar cadence is intentional.** `max_unarchived: 23` holds exactly one report of headroom until TODO SU22 (the 2026-11-08_02-29 archive batch) lands and returns it to 20. Expect a CI dogfood red when a report ages past `oldest_days: 45` or a 24th report lands: run the archive ritual (D3), never pin the gate further.
+- **Living-doc edit ritual.** Before any TODO_LIST/ROADMAP/CHANGELOG edit, run `docs-freshness --pre-flight` (stdin the candidate lines; rewrite only on SAFE), then the battery (`docs-gates run .`) BEFORE the commit, never after (the ungated-train lesson). Strikes ride `scripts/safe-strike.sh` from the docs-gates checkout — unique-text anchors, `[^|]*`-bounded cells, never row-number seds.
 
 ### Lint Strategy
 
