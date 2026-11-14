@@ -22,21 +22,21 @@ all flipped ON by default with per-item `Without*` opt-outs.
 The v5 breaking changes are all landed (struck with evidence; details in
 CHANGELOG `[5.0.0]`):
 
-| # | Change                                                                | Rationale                                                              | Source Location      |
-| - | --------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------- |
-| 1 | ~~Rename `CommandInfo` → `CommandMetadata`~~                          | "Info" suffix is vague; `Metadata` is precise                          | ~~`middleware.go`~~ done — v5.0.0 (`middleware.go:65`) |
-| 2 | ~~Rename `TypeHandler` → `TypeCodec`~~                                | "Handler" is generic; `Codec` captures parse/default dual role         | ~~`type_handler.go`~~ done — v5.0.0 (`type_codec.go:13`) |
-| 3 | ~~Rename `PromptRunner` → `HuhPrompter` (or similar)~~                | "Runner" suffix is generic                                             | ~~`prompts/prompts.go`~~ done — v5.0.0 (core keeps `PromptRunner`; huh impl is `HuhPrompter`, `prompts/prompts.go:27`) |
-| 4 | ~~Remove `SetConfig(cfg)` — now `// Deprecated:`~~                    | Unsafe post-construction mutation without re-initializing FlagRegistry | ~~`cli_accessors.go`~~ done — v5.0.0 removed it (zero references) |
-| 5 | ~~Replace `RegisterInScope` with generic variant~~                    | Erases provider types; use `Child` + `do.Provide` meanwhile            | ~~`scope.go`~~ done — v5.0.0 generic `RegisterInScope[T]` (`scope.go:358`) |
+| # | Change                                                 | Rationale                                                              | Source Location                                                                                                        |
+| - | ------------------------------------------------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 1 | ~~Rename `CommandInfo` → `CommandMetadata`~~           | "Info" suffix is vague; `Metadata` is precise                          | ~~`middleware.go`~~ done — v5.0.0 (`middleware.go:65`)                                                                 |
+| 2 | ~~Rename `TypeHandler` → `TypeCodec`~~                 | "Handler" is generic; `Codec` captures parse/default dual role         | ~~`type_handler.go`~~ done — v5.0.0 (`type_codec.go:13`)                                                               |
+| 3 | ~~Rename `PromptRunner` → `HuhPrompter` (or similar)~~ | "Runner" suffix is generic                                             | ~~`prompts/prompts.go`~~ done — v5.0.0 (core keeps `PromptRunner`; huh impl is `HuhPrompter`, `prompts/prompts.go:27`) |
+| 4 | ~~Remove `SetConfig(cfg)` — now `// Deprecated:`~~     | Unsafe post-construction mutation without re-initializing FlagRegistry | ~~`cli_accessors.go`~~ done — v5.0.0 removed it (zero references)                                                      |
+| 5 | ~~Replace `RegisterInScope` with generic variant~~     | Erases provider types; use `Child` + `do.Provide` meanwhile            | ~~`scope.go`~~ done — v5.0.0 generic `RegisterInScope[T]` (`scope.go:358`)                                             |
 
 ### Remaining v6 candidates
 
-| # | Change                                           | Rationale                                                                                                                    | Status |
-| - | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------ |
-| 6 | ~~Rename `Get[T]` → `GetService[T]`~~            | ~~`Get` is too generic for a DI scope~~                                                                                      | MOOT — v5 has no `Get[T]`; the getters are `Invoke[T]`/`InvokeNamed[T]` (`scope.go:165,183`) |
-| 7 | Redesign `Package[T](scope, ...)`                | Unusual API shape with pre-existing `*Scope` param (`scope.go:416`)                                                          | open   |
-| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]` | Two signatures coexist; v5 kept both deliberately (unification rejected for v5.0.0)                                          | open — v6 |
+| # | Change                                           | Rationale                                                                           | Status                                                                                       |
+| - | ------------------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| 6 | ~~Rename `Get[T]` → `GetService[T]`~~            | ~~`Get` is too generic for a DI scope~~                                             | MOOT — v5 has no `Get[T]`; the getters are `Invoke[T]`/`InvokeNamed[T]` (`scope.go:165,183`) |
+| 7 | Redesign `Package[T](scope, ...)`                | Unusual API shape with pre-existing `*Scope` param (`scope.go:416`)                 | open                                                                                         |
+| 8 | Unify `Middleware[T]` and `ContextMiddleware[T]` | Two signatures coexist; v5 kept both deliberately (unification rejected for v5.0.0) | open — v6                                                                                    |
 
 ### Flag-representation consolidation (NOT done in v5 — re-scoped to v6)
 
@@ -139,20 +139,20 @@ with `WithAuditLog` using the same plugin). No roadmap work remains here.
 These items were explicitly deferred during the post-audit closure to prevent
 the long tail from haunting the TODO list. Each has a rationale for deferral.
 
-| #  | Item                                                                                              | Rationale                                                                                             |
-| -- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| 1  | Re-run 4 skills with reference files loaded                                                       | More reports without action = more debt. Re-audit in a dedicated session after closure ships.         |
-| 2  | Run 4 additional skills (brutal-self-review, library-deep-dive, status-report, docs-health BUILD) | New audits, not closure of existing findings.                                                         |
-| 3  | ~~`TypeHandler` / `TypeHandlerFunc` rename + `// Deprecated` alias~~ done — v5.0.0 (`TypeCodec`/`TypeCodecFunc`)                                  | ~~Public API break — deferred to v5. See TODO(v5) markers above.~~                                        |
-| 4  | `ConfigFile` branded type                                                                         | YAGNI until a consumer needs it.                                                                      |
-| 5  | Extract koanf into a sub-module                                                                   | YAGNI — no consumer has asked; 4 koanf deps are already isolated. LOC trigger not met.                |
-| 6  | Split `v4` into `v4` + `v4/internal/`                                                             | LOC trigger (12k) not met. Premature split adds boundary friction.                                    |
-| 7  | Fuzz corpus expansion                                                                             | Existing 8 targets have minimal corpus; valuable but not blocking.                                    |
-| 8  | Audit `examples/taskctl/main_test.go` (876 lines)                                                 | Test-smell audit is a separate concern.                                                               |
-| 9  | `CONTRIBUTING.md` refresh                                                                         | Not blocking; verify-then-decide in a future pass.                                                    |
-| 10 | Verify `git-town.toml` + `library-policy.yaml`                                                    | Config sanity, not closure.                                                                           |
-| 11 | ~~Update `WHAT_THIS_PROJECT_IS_ABOUT.md` + `_NOT.md`~~                                            | ✅ Done 2026-08-05 — updated to v4 API.                                                               |
-| 12 | Schedule re-run after v3.1 ships                                                                  | v3.1 has shipped; v4.0.0 has shipped. Next re-audit window: after v5 or when feature growth warrants. |
+| #  | Item                                                                                                             | Rationale                                                                                             |
+| -- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1  | Re-run 4 skills with reference files loaded                                                                      | More reports without action = more debt. Re-audit in a dedicated session after closure ships.         |
+| 2  | Run 4 additional skills (brutal-self-review, library-deep-dive, status-report, docs-health BUILD)                | New audits, not closure of existing findings.                                                         |
+| 3  | ~~`TypeHandler` / `TypeHandlerFunc` rename + `// Deprecated` alias~~ done — v5.0.0 (`TypeCodec`/`TypeCodecFunc`) | ~~Public API break — deferred to v5. See TODO(v5) markers above.~~                                    |
+| 4  | `ConfigFile` branded type                                                                                        | YAGNI until a consumer needs it.                                                                      |
+| 5  | Extract koanf into a sub-module                                                                                  | YAGNI — no consumer has asked; 4 koanf deps are already isolated. LOC trigger not met.                |
+| 6  | Split `v4` into `v4` + `v4/internal/`                                                                            | LOC trigger (12k) not met. Premature split adds boundary friction.                                    |
+| 7  | Fuzz corpus expansion                                                                                            | Existing 8 targets have minimal corpus; valuable but not blocking.                                    |
+| 8  | Audit `examples/taskctl/main_test.go` (876 lines)                                                                | Test-smell audit is a separate concern.                                                               |
+| 9  | `CONTRIBUTING.md` refresh                                                                                        | Not blocking; verify-then-decide in a future pass.                                                    |
+| 10 | Verify `git-town.toml` + `library-policy.yaml`                                                                   | Config sanity, not closure.                                                                           |
+| 11 | ~~Update `WHAT_THIS_PROJECT_IS_ABOUT.md` + `_NOT.md`~~                                                           | ✅ Done 2026-08-05 — updated to v4 API.                                                               |
+| 12 | Schedule re-run after v3.1 ships                                                                                 | v3.1 has shipped; v4.0.0 has shipped. Next re-audit window: after v5 or when feature growth warrants. |
 
 ---
 
@@ -168,8 +168,8 @@ These are unformed ideas that may or may not become features:
   inside the existing `func(*CLI[T]) error` callback)
 - **~~Strict positional-args default~~ — SHIPPED (post-v5.0.0, untagged)** —
   leaf commands silently accepting unexpected positionals (found 2026-11-08
-during the CG002 fleet pass) now have `WithStrictPositionalArgs()` +
-`WithArgsPassthrough()` (`command_options.go`); riding the v5.1.0 cut
+  during the CG002 fleet pass) now have `WithStrictPositionalArgs()` +
+  `WithArgsPassthrough()` (`command_options.go`); riding the v5.1.0 cut
 - **Config file watching** — hot-reload config on file change (inotify/fsnotify)
 - **CUE for the machine contract** — revisit only when a consumer needs to VALIDATE the contract itself (not config files) against a schema, AND cue's Go codegen round-trips cmdguard's struct tags losslessly, AND the build-time cost is measured. Analysis: `docs/status/2026-11-02_04-52_cue-adoption-analysis-and-self-review.md`; decision record: ADR-002 §6. The struct tags are the single declaration surface today — a parallel CUE schema would be a second source of truth until all three criteria hold.
 - **Plugin marketplace** — community-contributed type handlers and validators
