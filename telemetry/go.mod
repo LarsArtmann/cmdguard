@@ -2,10 +2,8 @@ module github.com/larsartmann/cmdguard/telemetry
 
 go 1.27
 
-toolchain go1.27.3
-
 require (
-	github.com/larsartmann/cmdguard/v5 v5.0.0
+	github.com/larsartmann/cmdguard/v5 v5.1.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
 )

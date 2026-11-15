@@ -131,7 +131,9 @@ def go_sources(directory: str, export: bool) -> set[str]:
             names |= set(re.findall(r"^var ([A-Z]\w*)", text, re.MULTILINE))
             names |= set(re.findall(r"^const ([A-Z]\w*)", text, re.MULTILINE))
             names |= set(
-                re.findall(r"^\t([A-Z]\w*)\s+[A-Za-z_][\w.\[\]*]*\s*=", text, re.MULTILINE)
+                re.findall(
+                    r"^\t([A-Z]\w*)\s+[A-Za-z_][\w.\[\]*]*\s*=", text, re.MULTILINE
+                )
             )
             names |= set(re.findall(r"^\t([A-Z]\w*)\s*=", text, re.MULTILINE))
         else:

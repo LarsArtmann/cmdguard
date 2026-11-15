@@ -446,30 +446,30 @@ type Flags struct {
 
 ## Command Options
 
-| Option                                        | Purpose                            |
-| --------------------------------------------- | ---------------------------------- |
-| `WithShort(short)`                            | Short description                  |
-| `WithLong(long)`                              | Long description                   |
-| `WithExample(example)`                        | Example usage                      |
-| `WithAliases(aliases...)`                     | Alternative names                  |
-| _(flags passed positionally to `NewCommand`)_ | —                                  |
-| `WithPreRunE[T, F](fn)`                       | Pre-validation hook                |
-| `WithPostRunE[T, F](fn)`                      | Post-success cleanup               |
-| `WithHidden(bool)`                            | Hide from help                     |
-| `WithDeprecated(msg)`                         | Deprecation message                |
-| `WithGroupID(id)`                             | Help group name                    |
-| `WithExactArgs(n)`                            | Require exactly n positional args  |
-| `WithMinimumArgs(n)`                          | Require at least n positional args |
-| `WithMaximumArgs(n)`                          | Allow at most n positional args    |
-| `WithValidArgs(args...)`                      | Restrict args to allowed values    |
-| `WithSubcommands(cmds...)`                    | Attach child commands (parent)     |
-| `WithRangeArgs(min, max)`                     | Require between min and max args   |
-| `WithNoArgs()`                                | Reject any positional args         |
+| Option                                        | Purpose                                                                                          |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `WithShort(short)`                            | Short description                                                                                |
+| `WithLong(long)`                              | Long description                                                                                 |
+| `WithExample(example)`                        | Example usage                                                                                    |
+| `WithAliases(aliases...)`                     | Alternative names                                                                                |
+| _(flags passed positionally to `NewCommand`)_ | —                                                                                                |
+| `WithPreRunE[T, F](fn)`                       | Pre-validation hook                                                                              |
+| `WithPostRunE[T, F](fn)`                      | Post-success cleanup                                                                             |
+| `WithHidden(bool)`                            | Hide from help                                                                                   |
+| `WithDeprecated(msg)`                         | Deprecation message                                                                              |
+| `WithGroupID(id)`                             | Help group name                                                                                  |
+| `WithExactArgs(n)`                            | Require exactly n positional args                                                                |
+| `WithMinimumArgs(n)`                          | Require at least n positional args                                                               |
+| `WithMaximumArgs(n)`                          | Allow at most n positional args                                                                  |
+| `WithValidArgs(args...)`                      | Restrict args to allowed values                                                                  |
+| `WithSubcommands(cmds...)`                    | Attach child commands (parent)                                                                   |
+| `WithRangeArgs(min, max)`                     | Require between min and max args                                                                 |
+| `WithNoArgs()`                                | Reject any positional args                                                                       |
 | `WithStrictPositionalArgs()`                  | Reject undeclared positional args (inert when an explicit validator like `WithExactArgs` is set) |
-| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras |
-| `WithArgs(fn)`                                | Custom `cobra.PositionalArgs`       |
-| `WithPromptOnMissing()`                       | Interactive prompting for missing flags |
-| `WithCompletion(fn)`                          | Dynamic shell completion           |
+| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras                                                            |
+| `WithArgs(fn)`                                | Custom `cobra.PositionalArgs`                                                                    |
+| `WithPromptOnMissing()`                       | Interactive prompting for missing flags                                                          |
+| `WithCompletion(fn)`                          | Dynamic shell completion                                                                         |
 
 ---
 

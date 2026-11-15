@@ -264,6 +264,7 @@ func (f *sourceFile) cmdguardConstructorErrIdents(body *ast.BlockStmt) map[strin
 			// a dot import makes every bare name unambiguous file scope.
 			if ident, ok := call.Fun.(*ast.Ident); ok && constructorNames[ident.Name] {
 				path, dot := f.imports["."]
+
 				return dot && majorOf(path) != ""
 			}
 

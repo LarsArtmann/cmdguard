@@ -98,7 +98,7 @@ the cadence threshold (21 > 20). Both gate-clean before the move
 (`check-rows --strict`, `bare-rows`, `prose-items` = 0 findings each) and carry
 a `> **Live remainder:**` banner.
 
-| File                                          | Classification | Reason                                                                                      |
-| --------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------- |
-| 2026-11-08_12-00_pareto-v2-executed-v5-shipped.md | ARCHIVE       | v5.0.0 ship report; owner-gated queue fully resolved by the 2026-11-11 master-merge session (inline verdicts this sweep) |
-| 2026-11-08_08-04_whole-list-execution-v5-verified.md | ARCHIVE      | Tier B/C/D closure report; both repeated-Execute bugs shipped in v5.0.0, §c decisions executed (inline verdicts this sweep) |
+| File                                                 | Classification | Reason                                                                                                                      |
+| ---------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-08_12-00_pareto-v2-executed-v5-shipped.md    | ARCHIVE        | v5.0.0 ship report; owner-gated queue fully resolved by the 2026-11-11 master-merge session (inline verdicts this sweep)    |
+| 2026-11-08_08-04_whole-list-execution-v5-verified.md | ARCHIVE        | Tier B/C/D closure report; both repeated-Execute bugs shipped in v5.0.0, §c decisions executed (inline verdicts this sweep) |

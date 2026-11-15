@@ -15,8 +15,8 @@ means the deployment is verifiably alive.
 from __future__ import annotations
 
 import sys
-import urllib.request
 import urllib.error
+import urllib.request
 
 BASE = "https://cmdguard.lars.software"
 

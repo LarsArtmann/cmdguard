@@ -2,11 +2,9 @@ module github.com/larsartmann/cmdguard/spinner
 
 go 1.27
 
-toolchain go1.27.3
-
 require (
 	charm.land/lipgloss/v2 v2.0.6
-	github.com/larsartmann/cmdguard/v5 v5.0.0
+	github.com/larsartmann/cmdguard/v5 v5.1.0
 	golang.org/x/term v0.47.0
 )
 
