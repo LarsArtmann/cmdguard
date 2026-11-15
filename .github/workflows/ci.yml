@@ -117,4 +117,4 @@ jobs:
           go-version: "1.27"
 
       - name: docs battery
-        run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.0 run .
+        run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.1 run .
