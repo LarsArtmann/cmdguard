@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Title</title>
+    <title>cmdguard — Fleet Feedback: Docs, Marketing &amp; AI Skill</title>
     <style>
       /* =========================================================================
          BAUHAUS LIGHT — Editorial template
@@ -848,228 +848,673 @@
     </style>
   </head>
   <body>
-    <!-- Full-bleed top bar (optional — remove for quieter reports) -->
+    <!-- Full-bleed top bar -->
     <div class="top-bar">
-      <span>REPORT TYPE</span>
-      <span>YYYY-MM-DD</span>
-      <span>AUTHOR / TEAM</span>
+      <span>FLEET FEEDBACK SYNTHESIS</span>
+      <span>2026-11-17</span>
+      <span>cmdguard &middot; docs / marketing / AI skill</span>
     </div>
 
     <div class="layout">
-      <!-- Sidebar TOC (hidden below 1024px; use inline .toc if you prefer) -->
       <aside class="sidebar" data-nav>
         <nav>
           <div class="label">Contents</div>
           <a href="#summary">Summary</a>
-          <a href="#scorecard">Scorecard</a>
-          <a href="#strengths">Strengths</a>
-          <a href="#findings">Findings</a>
-          <a href="#proposal">Proposal</a>
+          <a href="#strengths">Praise</a>
+          <a href="#docs">Docs</a>
+          <a href="#marketing">Marketing</a>
+          <a href="#skill">AI Skill</a>
+          <a href="#actions">Actions</a>
           <a href="#appendix">Appendix</a>
         </nav>
       </aside>
 
-      <!-- Main content -->
       <main class="main">
-        <!-- Hero -->
         <header class="hero">
-          <!-- Optional Bauhaus signature: geometric shape cluster. Remove for quieter hero. -->
           <div class="hero-shapes">
             <div class="bar"></div>
             <div class="circle"></div>
             <div class="square"></div>
             <div class="tri"></div>
           </div>
-          <div class="eyebrow">REPORT TYPE &middot; YYYY-MM-DD</div>
-          <h1>Report Title</h1>
+          <div class="eyebrow">FLEET FEEDBACK SYNTHESIS &middot; 2026-11-17</div>
+          <h1>cmdguard: What 18 Fleet Reviews Say We Must Improve</h1>
           <p class="subtitle">
-            One or two sentences that set the frame: who this is for, what was
-            reviewed, and what the reader will take away.
+            Every consumer project wrote a point-in-time review of cmdguard
+            (docs/review/libs/cmdguard.md). This report reads all 18 and
+            distills them into concrete fixes for the documentation, the
+            positioning, and the consumer-facing AI skill &mdash; so the next
+            adoption decision takes hours, not days.
           </p>
           <div class="meta">
-            <span class="tag amber">Scope: example</span>
-            <span class="tag">Version: 1.0.0</span>
-            <span class="tag teal">Status: draft</span>
+            <span class="tag amber">Scope: 18 fleet reviews</span>
+            <span class="tag">Baseline: v5.1.0 (2026-11-11)</span>
+            <span class="tag teal">Adoption: 6 of 18 direct</span>
           </div>
         </header>
 
-        <!-- Scorecard -->
-        <section id="scorecard" class="scorecard">
+        <section class="scorecard" aria-label="Headline numbers">
           <div class="score-card score-good">
-            <div class="score">8</div>
-            <div class="label">Items passing</div>
-          </div>
-          <div class="score-card score-warn">
-            <div class="score">3</div>
-            <div class="label">Warnings</div>
-          </div>
-          <div class="score-card score-bad">
-            <div class="score">1</div>
-            <div class="label">Blockers</div>
+            <div class="score">18</div>
+            <div class="label">Reviews read</div>
           </div>
           <div class="score-card">
-            <div class="score">12</div>
-            <div class="label">Total reviewed</div>
+            <div class="score">6</div>
+            <div class="label">Direct adopters</div>
+          </div>
+          <div class="score-card score-warn">
+            <div class="score">19</div>
+            <div class="label">Findings raised</div>
+          </div>
+          <div class="score-card score-bad">
+            <div class="score">3</div>
+            <div class="label">Critical</div>
           </div>
         </section>
 
-        <!-- Summary -->
         <section id="summary">
           <h2><span class="num">00</span>Summary</h2>
           <p>
-            Replace this with the bottom-line verdict. A good summary tells the
-            reader whether the subject is ready, what the biggest risk is, and
-            what one action would unlock the most value.
+            The library itself is winning: adopters leverage it hard (io-surface
+            scored 100/100, CV kept every v5 battery), the migration codemod and
+            batteries-on defaults landed well, and twelve non-adoptions are
+            mostly <em>correct</em> rejections with recorded flip triggers. The
+            gap is not the product &mdash; it is that nearly every review had to
+            verify the same handful of facts <strong>from source</strong> because
+            the docs, the README positioning, and the AI skill do not carry them.
           </p>
           <div class="callout callout-amber">
             <strong>The bottom line</strong>
-            State the verdict plainly. If the report is blocking, say so. If
-            it's mostly positive, lead with that.
+            Three facts block or slow almost every review: (1) the
+            <strong>dependency weight</strong> (80 net-new modules measured) has
+            no documented answer; (2) the <strong>composition story</strong>
+            (fang interop, go-error-family exit codes) is undocumented work
+            reviewers redo per project; (3) the <strong>godoc understates the
+            tag set</strong> &mdash; doc.go omits 6 of 13 tags. Fix those three,
+            then harvest the reviews' source-verified facts into the AI skill.
+          </div>
+          <div class="toc">
+            <h3>Reading map</h3>
+            <ul>
+              <li><a href="#strengths">What the reviews already praise</a> &mdash; keep doing this</li>
+              <li><a href="#docs">01 Docs</a> &mdash; 8 findings, 2 critical</li>
+              <li><a href="#marketing">02 Marketing</a> &mdash; 6 findings</li>
+              <li><a href="#skill">03 AI Skill</a> &mdash; 5 findings, 1 critical</li>
+              <li><a href="#actions">04 Priority actions</a> &mdash; 8, ranked</li>
+              <li><a href="#appendix">05 Appendix</a> &mdash; verdict table + evidence index</li>
+            </ul>
           </div>
         </section>
 
-        <!-- Strengths -->
         <section id="strengths">
-          <h2><span class="num">&#9670;</span>What's already excellent</h2>
+          <h2><span class="num">&#9670;</span>What the reviews already praise</h2>
           <p>
-            Before the criticism: acknowledge what works. This builds trust and
-            keeps the report from reading like a pure complaint list.
+            This is working. Protect it while fixing the findings below.
           </p>
-
           <div class="strengths">
             <div class="strength">
               <div class="check">+</div>
               <div class="text">
-                <strong>Specific strength one</strong>
-                <span>Explain why it matters and what it enables.</span>
+                <strong>The "not at 2am" positioning lands verbatim</strong>
+                <span>Ten-plus reviews quote the README hook ("catches missing
+                handlers, duplicate commands, and invalid flags at construction
+                &mdash; not at 2am in production") as their definition of the
+                library. pbx-lens independently coined "the trinity no other Go
+                CLI framework ships together": typed flags + DI + zero-panic
+                contract.</span>
               </div>
             </div>
             <div class="strength">
               <div class="check">+</div>
               <div class="text">
-                <strong>Specific strength two</strong>
-                <span
-                  >Reference files, metrics, or patterns where possible.</span
-                >
+                <strong>The AI skill is load-bearing and source-cited</strong>
+                <span>audiblesync and go-taskqueue reviewed the library largely
+                by reading the skill, citing its line numbers. Consumers trust
+                it &mdash; which is exactly why stale claims in it would be
+                expensive.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>v5 defaults converted the flagship consumers</strong>
+                <span>CV "kept every battery, zero opt-outs" and deleted its
+                manual exit-code floor because of the v5 non-nil&rArr;non-zero
+                guarantee. google-domain-detector leverages 8 of 16 applicable
+                capabilities with zero misuse found.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Honest rejections are recorded, with triggers</strong>
+                <span>Nearly every non-adoption carries falsifiable flip
+                triggers ("second binary", "15th subcommand", "config file
+                lands"). That is the docs doing their job &mdash; the next
+                review re-runs cheaply instead of re-litigating.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>The incremental pattern is proven in production</strong>
+                <span>journal's M8 pilot mounts a cmdguard-built command under a
+                raw cobra parent "surface byte-identical"; GFL executed its full
+                migration blueprint in one session. The mechanism works &mdash;
+                it is just not documented as the recommended path.</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Findings -->
-        <section id="findings">
-          <h2><span class="num">01</span>Findings</h2>
-          <p>These are the issues that need attention, ordered by impact.</p>
-
-          <!-- Issue 1 -->
-          <div class="issue issue-critical" id="issue-1">
-            <span class="severity severity-critical"
-              >Blocking &middot; High impact</span
-            >
-            <h3>Critical issue title</h3>
-            <div class="where">
-              path/to/file.go:42-58 &middot; short context
-            </div>
-            <p>
-              Describe the problem, cite the code or behavior, and explain why
-              it matters to the reader's goals.
-            </p>
-            <pre><code>// Example of the problematic pattern
-func BadExample() {}</code></pre>
-            <div class="callout callout-teal">
-              <strong>Fix: recommended action</strong>
-              State the concrete fix, including file names, function names, or
-              configuration changes.
-            </div>
-          </div>
-
-          <!-- Issue 2 -->
-          <div class="issue issue-important" id="issue-2">
-            <span class="severity severity-important"
-              >Important &middot; Medium impact</span
-            >
-            <h3>Important issue title</h3>
-            <div class="where">path/to/another.go:12-19</div>
-            <p>
-              Explain the risk. Important issues are not blockers but would make
-              a careful reviewer hesitate before shipping.
-            </p>
-          </div>
-
-          <!-- Issue 3 -->
-          <div class="issue issue-nice" id="issue-3">
-            <span class="severity severity-nice"
-              >Nice to have &middot; Low impact</span
-            >
-            <h3>Nice-to-have improvement</h3>
-            <div class="where">docs/ or config</div>
-            <p>
-              Minor polish, documentation gaps, or future-proofing suggestions
-              go here.
-            </p>
-          </div>
-        </section>
-
-        <!-- Proposal -->
-        <section id="proposal">
-          <h2><span class="num">02</span>What the solution could look like</h2>
+        <section id="docs">
+          <h2><span class="num">01</span>Docs findings</h2>
           <p>
-            If the findings were fixed, what would the new state be? Show the
-            target API, structure, or workflow.
+            Ordered by impact. Every finding cites the project(s) that hit it.
           </p>
-          <pre><code>// Target state after the recommended changes
-type BetterAPI struct {
-    Field string
-}</code></pre>
-          <div class="callout callout-teal">
-            <strong>This is the target</strong>
-            Summarize why this state is better and what it unlocks.
+
+          <div class="issue issue-critical" id="d1">
+            <span class="severity severity-critical">Critical &middot; Blocks adoption &amp; re-measured per review</span>
+            <h3>D1 &mdash; The dependency-weight story has no documented answer</h3>
+            <div class="where">graph-features-language &middot; business-networking &middot; Cyberdom &middot; go-taskqueue &middot; dnsblockd</div>
+            <p>
+              GFL measured <strong>80 net-new modules (36% graph growth)</strong>
+              into a 220-module graph &mdash; identical with every lean switch
+              on, because "the lean options are runtime switches, not
+              import-graph prunes: the root module unconditionally imports
+              charm.land/fang/v2 (cli.go:14)". business-networking counted 64
+              indirect requires against its zero-dep identity. Cyberdom and
+              go-taskqueue list dep cost as a blocker. Every review re-measured
+              this from scratch; none found the numbers in our docs.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Publish a measured "cost of adoption" page: module-graph delta for
+              default vs slim profiles, why <code>WithFang(false)</code> does not
+              prune imports today, and the tracked plan for a slim root profile
+              (upstream proposal <code>cmdguard#25</code>). Keep the numbers in
+              the AI skill so reviewers stop re-measuring.
+            </div>
+          </div>
+
+          <div class="issue issue-critical" id="d2">
+            <span class="severity severity-critical">Critical &middot; Wrong first impression in godoc</span>
+            <h3>D2 &mdash; doc.go understates the tag set</h3>
+            <div class="where">pkg/cmdguard/v5/doc.go:65 &middot; found by google-domain-detector</div>
+            <p>
+              The package doc omits <code>values</code>, <code>validate</code>,
+              <code>local</code>, <code>hidden</code>, <code>prompt</code>, and
+              <code>secret</code> &mdash; 6 of the 13 tags the runtime actually
+              enforces. The review's words: "cmdguard's own docs understate its
+              tag set &mdash; library-side doc gap, not consumer misuse." A
+              consumer skimming godoc concludes the validation layer is half the
+              size it is.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Sync doc.go to the 13-tag table and add a drift guard (same
+              pattern as <code>scripts/check-guide-sync.sh</code> or the
+              docgen drift test) that fails when a parsed tag name is missing
+              from the package doc.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="d3">
+            <span class="severity severity-important">Important &middot; Undocumented composition work, redone everywhere</span>
+            <h3>D3 &mdash; No composition guides: fang and go-error-family</h3>
+            <div class="where">browser-history &middot; Cyberdom &middot; invoices &middot; CV &middot; Code-To-CV-Agent &middot; journal</div>
+            <p>
+              The single most repeated blocker: "who owns error printing and
+              exit codes?" browser-history and Cyberdom both wrote "wiring them
+              together is undocumented work". Meanwhile the facts that dissolve
+              the conflict exist only in source: dispatch goes through
+              <code>fang.Execute</code> (cli.go:670-674) with
+              <code>WithFangOptions</code>/<code>WithFangErrorHandler</code> so
+              adoption keeps an existing fang UX; <code>ExitCode(err)</code>
+              honors a chained <code>ExitCoder</code> treating 0 as "no
+              override" &mdash; byte-for-byte the go-error-family convention.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              One guide: "cmdguard alongside fang and go-error-family" &mdash;
+              the print-once contract, the 0-as-no-override semantics, the
+              decision table (framework prints vs your classifier prints), and
+              a worked example of mounting cmdguard under an existing
+              <code>HandleError</code> boundary.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="d4">
+            <span class="severity severity-important">Important &middot; The fleet's actual adoption path is buried</span>
+            <h3>D4 &mdash; Incremental adoption is a README section, not a guide</h3>
+            <div class="where">journal (M8 pilot) &middot; invoices (trial plan) &middot; graph-features-language (executed blueprint)</div>
+            <p>
+              Three projects independently discovered the same migration
+              pattern from source: cmdguard commands expose their underlying
+              cobra command, so a typed command mounts under an existing raw
+              root "surface byte-identical" (journal's pilot, 2026-11-08). Invoices
+              designed a half-day trial around it; GFL's blueprint executed
+              as written. This is the strongest adoption promise we have
+              &mdash; "one command at a time, no big-bang rewrite" &mdash; and
+              it deserves a first-class guide with the mount recipe.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              A guide titled "Adopt one command at a time": the mount recipe
+              (typed command &rarr; its cobra command &rarr; existing root's
+              AddCommand), journal M8 as the worked example, and the success
+              criteria invoices drafted (delete-a-tag &rarr; flag disappears,
+              env tag overrides, help unchanged, exit codes asserted).
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="d5">
+            <span class="severity severity-important">Important &middot; Mental-model surprise</span>
+            <h3>D5 &mdash; Positional args are not flag fields; say it early</h3>
+            <div class="where">graph-features-language (needed source anchors to write its migration)</div>
+            <p>
+              GFL's migration had to verify from source that positionals are
+              read via <code>cmdguard.ArgsFromContext(ctx)</code> with
+              <code>WithExactArgs(n)</code> as the arity guard &mdash; they are
+              not fields of the flags struct. This belongs in the QUICKSTART
+              flags section, not in a reviewer's grep history.
+            </p>
+          </div>
+
+          <div class="issue issue-important" id="d6">
+            <span class="severity severity-important">Important &middot; Undocumented limits cause rejections</span>
+            <h3>D6 &mdash; Document what the config layer does NOT do</h3>
+            <div class="where">dnsblockd &middot; audiblesync &middot; business-networking</div>
+            <p>
+              dnsblockd rejected adoption partly because it had to discover
+              from source that "v5's config layer is still a file-only
+              KoanfLoader plus flat per-flag env tags" &mdash; no hierarchical
+              <code>PREFIX__NESTED__KEY</code> env provider, no external loader
+              returning raw bytes. Those are real limits; consumers with
+              deployed hierarchical env contracts will reject on them. Stating
+              the limits (and the extension-hook roadmap) in the config docs
+              converts a discovered rejection into a documented boundary.
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="d7">
+            <span class="severity severity-nice">Nice to have &middot; Missing recipes</span>
+            <h3>D7 &mdash; Four capabilities lack "how to actually use this" recipes</h3>
+            <div class="where">cv / CV &middot; google-domain-detector &middot; Code-To-CV-Agent</div>
+            <p>
+              Consumers leave value on the table because the recipe is not
+              written: (a) <code>describe</code> is emitted everywhere but no
+              docs show how to <em>consume</em> the JSON (agent tooling is the
+              named consumer in three reviews); (b) <code>WithDoctorCheck</code>
+              &mdash; google-domain-detector runs a doctor with "zero real
+              checks" on a network tool; (c) exit-code differentiation via
+              <code>NewExitError(2, ...)</code> for usage-vs-failure; (d)
+              <code>RecoveryMiddleware</code> &mdash; CV noted "a crashed
+              handler today takes the process down ungracefully" before wiring
+              it. Each is an S-effort docs example.
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="d8">
+            <span class="severity severity-nice">Nice to have &middot; Version + toolchain facts</span>
+            <h3>D8 &mdash; Make the Go 1.27 floor and the v4 retirement loud</h3>
+            <div class="where">business-networking &middot; Cyberdom &middot; go-taskqueue</div>
+            <p>
+              business-networking's hard blocker: "cmdguard's go.mod declares
+              go 1.27; bn literally cannot import it without a toolchain bump."
+              go-taskqueue flagged "v4 had been uninstallable via go get since
+              v4.2.1" as a trust question. QUICKSTART should state the minimum
+              Go version in the first code block, and the version page should
+              carry the clean retirement story: v4 frozen final at v4.3.1 on
+              release/v4, master on v5.
+            </p>
           </div>
         </section>
 
-        <!-- Appendix -->
-        <section id="appendix">
-          <h2><span class="num">03</span>Appendix</h2>
+        <section id="marketing">
+          <h2><span class="num">02</span>Marketing findings</h2>
           <p>
-            Methodology, links to related files, or a priority matrix can live
-            here.
+            The README hook works; what is missing is the honesty layer that
+            converts readers into <em>right-fit</em> adopters.
+          </p>
+
+          <div class="issue issue-important" id="m1">
+            <span class="severity severity-important">Important &middot; Prevents wrong-fit adoption</span>
+            <h3>M1 &mdash; Publish the "when to adopt" size guide</h3>
+            <div class="where">Cyberdom &middot; Code-To-CV-Agent &middot; audiblesync &middot; pbx-lens &middot; webphone</div>
+            <p>
+              The reviews independently converge on thresholds: "cmdguard's
+              value shows up at five-plus commands" (Cyberdom), a ~15-subcommand
+              revisit trigger (Code-To-CV-Agent), "two verbs is the threshold
+              where a command table beats argv archaeology" (audiblesync),
+              "a second binary joins the module" (pbx-lens, webphone). Publishing
+              these as an explicit adopt/defer decision table makes correct
+              rejections a <em>success</em> of our positioning rather than
+              evidence of overreach &mdash; and arms every future review with
+              the same rubric.
+            </p>
+          </div>
+
+          <div class="issue issue-important" id="m2">
+            <span class="severity severity-important">Important &middot; Steering</span>
+            <h3>M2 &mdash; State the anti-fit contexts up front</h3>
+            <div class="where">cqrs-htmx &middot; webphone &middot; browser-history &middot; pbx-lens</div>
+            <p>
+              Four review archetypes should never reach the adopt stage: library
+              repos with no CLI (cqrs-htmx: "a CLI framework in a library
+              repo"), systemd-managed servers whose front is journald not a
+              terminal (webphone: styled help has "no terminal to render to"),
+              owner-maintenance toolsets ("it presumes a CLI that is a product"),
+              and fleets with a recorded no-Cobra policy (pbx-lens). A short
+              "cmdguard is for product CLIs driven by humans or agents in a
+              terminal" boundary statement on README and website saves every
+              one of these reviews a cycle.
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="m3">
+            <span class="severity severity-nice">Nice to have &middot; Social proof invisible</span>
+            <h3>M3 &mdash; Surface the fleet adoption numbers</h3>
+            <div class="where">profileagent census &middot; io-surface &middot; go-credentials-store</div>
+            <p>
+              The proof exists but is scattered: "40 repos carry a go.mod
+              require" (checkout census, 2026-11-17), io-surface's 100/100
+              utilization audit, credentials-store as first production v5
+              consumer (bumped the day v5.1.0 landed). README/website should
+              carry one adopters line with these numbers.
+            </p>
+          </div>
+
+          <div class="issue issue-important" id="m4">
+            <span class="severity severity-important">Important &middot; Trust</span>
+            <h3>M4 &mdash; Manage the churn narrative with a release policy</h3>
+            <div class="where">go-taskqueue</div>
+            <p>
+              The harshest marketing line in the corpus: "the 3-day tag cadence
+              + same-day major retirement is churn, not maturity." The facts are
+              on our side &mdash; v5.0.0&rarr;v5.1.0 was additive-only, +101
+              non-test lines, verified diffable &mdash; but we never say so.
+              Publish a release policy: what belongs in a minor, the additive-only
+              guarantee observed in practice, and the frozen-line policy (v4 at
+              v4.3.1).
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="m5">
+            <span class="severity severity-nice">Nice to have &middot; Quotable proof unused</span>
+            <h3>M5 &mdash; Market with the deletions the reviews measured</h3>
+            <div class="where">business-networking &middot; invoices &middot; graph-features-language</div>
+            <p>
+              The reviews hand us concrete "what cmdguard deletes" numbers:
+              97 lines of hand-maintained help whose doc comment lists 7 of 14
+              commands (business-networking), 69 manual flag registrations plus
+              decorative tags duplicated by hand and a root/solcom
+              <code>--verbose</code> shadow bug (invoices), 7 swallowed
+              flag-read errors and os.Exit inside Run funcs (GFL). A
+              "real code this replaces" section with these measured cases is
+              stronger than any feature list.
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="m6">
+            <span class="severity severity-nice">Nice to have &middot; Audience segmentation</span>
+            <h3>M6 &mdash; Segment fleet vs third-party messaging</h3>
+            <div class="where">graph-features-language (owner directive)</div>
+            <p>
+              GFL's review records the owner directive: fleet projects use the
+              owner's libraries regardless of the ~15-module gate &mdash; but
+              the same review keeps the slim-profile proposal valuable "for
+              third-party consumers." Marketing should say this openly: fleet
+              adoption is the default, the slim profile is the path for external
+              users with tight graphs. It converts the weight objection from a
+              contradiction into a stated policy.
+            </p>
+          </div>
+        </section>
+
+        <section id="skill">
+          <h2><span class="num">03</span>AI skill findings</h2>
+          <p>
+            The skill (<code>.agents/skills/cmdguard/SKILL.md</code>, fan-out
+            symlinked) is the most-trusted artifact in the corpus &mdash;
+            reviews cite it by line number. That trust is exactly why its gaps
+            matter: whatever is missing from it, every AI session re-derives
+            from source.
+          </p>
+
+          <div class="issue issue-critical" id="s1">
+            <span class="severity severity-critical">Critical &middot; Multiplied work across every session</span>
+            <h3>S1 &mdash; Harvest the source-verified facts into the skill</h3>
+            <div class="where">findings D1, D3, D4, D5 all resurface here</div>
+            <p>
+              Six facts were verified from cmdguard source by multiple
+              independent reviews and belong in the skill's gotchas:
+            </p>
+            <ul>
+              <li><code>ExitCode(err)</code> honors <code>ExitCoder</code> with 0 as "no override" (go-error-family compatible; CV deleted its max(&middot;,1) floor on v5's non-nil&rArr;non-zero guarantee).</li>
+              <li>Dispatch goes through <code>fang.Execute</code>; <code>WithFang(false)</code>/<code>WithFangOptions</code> compose, adoption does not lose an existing fang UX.</li>
+              <li>Typed commands mount under a raw cobra root, surface byte-identical (the incremental path).</li>
+              <li>Positionals come from <code>ArgsFromContext(ctx)</code>, never flag-struct fields.</li>
+              <li>Lean switches (<code>WithoutBatteries</code>, <code>WithFang(false)</code>) are runtime-only; the import graph is unchanged (80 net-new modules measured).</li>
+              <li><code>Describe()</code> before <code>Execute</code> omits the auto-registered commands (registered at Execute time).</li>
+            </ul>
+          </div>
+
+          <div class="issue issue-important" id="s2">
+            <span class="severity severity-important">Important &middot; Wrong recommendations</span>
+            <h3>S2 &mdash; Add a "when NOT to use cmdguard" decision block</h3>
+            <div class="where">pbx-lens &middot; cqrs-htmx &middot; webphone &middot; audiblesync archetypes</div>
+            <p>
+              The skill should encode M1/M2 so AI assistants stop pushing
+              adoption into library repos, no-terminal server binaries, and
+              sub-threshold CLIs &mdash; and instead produce correct rejection
+              rationales with flip triggers, which is what the fleet's best
+              reviews do.
+            </p>
+          </div>
+
+          <div class="issue issue-important" id="s3">
+            <span class="severity severity-important">Important &middot; Rot risk</span>
+            <h3>S3 &mdash; Guard the skill against source drift</h3>
+            <div class="where">AGENTS.md already warns: "source-line references that can rot"</div>
+            <p>
+              The skill cites source lines that move; the website already has a
+              truth gate (<code>scripts/check-guide-sync.sh</code>) but the
+              skill has none. Add a check that the skill's tag table, API names,
+              and cited symbols still exist in source &mdash; ideally fed by the
+              same fact table docgen uses (D2's guard), so doc.go, the skill,
+              and the website cannot disagree.
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="s4">
+            <span class="severity severity-nice">Nice to have &middot; Reviewer ergonomics</span>
+            <h3>S4 &mdash; Ship standard verification recipes in the skill</h3>
+            <div class="where">every review's "How to verify" section</div>
+            <p>
+              All 18 reviews end with grep/git verification blocks; they
+              re-invent the same commands each time. A canonical "verify a
+              consumer's usage" recipe in the skill (pin check, symbol census,
+              tag-count greps) makes every future audit cheaper and uniform.
+            </p>
+          </div>
+
+          <div class="issue issue-nice" id="s5">
+            <span class="severity severity-nice">Nice to have &middot; Repeat evaluations</span>
+            <h3>S5 &mdash; Encode when cmdguard-lint is worth wiring</h3>
+            <div class="where">CV (evaluated, not wired) &middot; google-domain-detector (free miss)</div>
+            <p>
+              CV correctly declined the lint submodule (its stale-major target
+              class is empty) while google-domain-detector listed "cmdguard-lint
+              in CI (free)" as a missed item. The skill should carry the
+              decision rule &mdash; wire it when a graph spans multiple cmdguard
+              majors or adoption is growing &mdash; so consumers stop
+              re-evaluating it per project.
+            </p>
+          </div>
+        </section>
+
+        <section id="actions">
+          <h2><span class="num">04</span>Priority actions</h2>
+          <p>
+            Eight actions, ranked by impact &times; effort. The first three
+            dissolve every critical finding.
+          </p>
+
+          <div class="migration-step">
+            <div class="migration-num">1</div>
+            <div class="migration-content">
+              <h4>Publish the cost-of-adoption page (fixes D1, feeds S1)</h4>
+              <p>Measured module-graph deltas (80 net-new on a 220-module
+              graph), why lean switches are runtime-only, slim-profile status
+              (cmdguard#25). Effort: M &mdash; the measurements already exist in
+              the GFL and business-networking reviews.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">2</div>
+            <div class="migration-content">
+              <h4>Write the composition guide (fixes D3)</h4>
+              <p>"cmdguard alongside fang and go-error-family": print-once
+              contract, 0-as-no-override exit semantics, decision table, worked
+              <code>HandleError</code> mount. Effort: M.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">3</div>
+            <div class="migration-content">
+              <h4>Sync doc.go to the real tag table + drift guard (fixes D2, enables S3)</h4>
+              <p>All 13 tags in the package doc; a test fails when a parsed tag
+              is missing from it. The same fact table then feeds the skill and
+              website so they cannot disagree. Effort: S.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">4</div>
+            <div class="migration-content">
+              <h4>Promote incremental adoption to a first-class guide (fixes D4)</h4>
+              <p>The mount-under-raw-cobra recipe, journal M8 as the worked
+              example, "one command at a time" as the headline adoption promise.
+              Effort: M.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">5</div>
+            <div class="migration-content">
+              <h4>Update SKILL.md: harvested facts + when-NOT-to-adopt block (fixes S1, S2, S5)</h4>
+              <p>The six facts from S1, the anti-fit decision table from
+              M1/M2, and the lint-wiring rule from S5. Effort: M.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">6</div>
+            <div class="migration-content">
+              <h4>QUICKSTART additions (fixes D5, D8)</h4>
+              <p>ArgsFromContext mental model next to the flags example; Go 1.27
+              floor in the first code block; v4-retirement note linked from the
+              version docs. Effort: S.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">7</div>
+            <div class="migration-content">
+              <h4>README/website: size guide + anti-fit statement + social proof (fixes M1, M2, M3)</h4>
+              <p>Adopt/defer threshold table, the product-CLI boundary sentence,
+              one adopters line (40+ repos, 100/100 audit, first v5 consumer).
+              Effort: S.</p>
+            </div>
+          </div>
+          <div class="migration-step">
+            <div class="migration-num">8</div>
+            <div class="migration-content">
+              <h4>Recipe pack + release policy (fixes D7, M4, S4)</h4>
+              <p>Four S-effort examples (consume describe, WithDoctorCheck,
+              NewExitError(2), RecoveryMiddleware), the release-policy page, and
+              the skill's verification recipes. Effort: S each, batch as one
+              pass.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="appendix">
+          <h2><span class="num">05</span>Appendix</h2>
+          <h3>A. The 18 reviews</h3>
+          <p>
+            All files at <code>~/projects/&lt;project&gt;/docs/review/libs/cmdguard.md</code>.
+            Review dates 2026-11-07 through 2026-11-17.
           </p>
           <table class="compare">
             <thead>
               <tr>
-                <th>Issue</th>
-                <th>Severity</th>
-                <th>Effort</th>
-                <th>Status</th>
+                <th>Project</th>
+                <th>Verdict</th>
+                <th>Pin</th>
+                <th>Score</th>
+                <th>Headline reason</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Issue one</td>
-                <td class="no">Critical</td>
-                <td>Low</td>
-                <td class="no">Open</td>
-              </tr>
-              <tr>
-                <td>Issue two</td>
-                <td class="no">Important</td>
-                <td>Medium</td>
-                <td class="yes">In progress</td>
-              </tr>
+              <tr><td>io-surface</td><td class="yes">USED</td><td>v4.2.1</td><td class="yes">100/100</td><td>Construction plane fully leveraged; stale major is the only gap</td></tr>
+              <tr><td>CV</td><td class="yes">USED</td><td>v5.1.0</td><td>69/100</td><td>Every v5 battery kept; Recovery wired; describe unconsumed</td></tr>
+              <tr><td>cv</td><td class="yes">USED</td><td>v4.2.0</td><td>62/100</td><td>43 commands, full flag discipline; patch lag blocked on templ floor</td></tr>
+              <tr><td>google-domain-detector</td><td class="yes">USED</td><td>v5.1.0</td><td>56/100</td><td>Core right; shelf of S-effort features unturned; found the doc.go gap</td></tr>
+              <tr><td>journal</td><td class="yes">USED (pilot)</td><td>v5.0.0</td><td>20/100</td><td>M8 exceptions-list pilot live; 44 commands still raw cobra</td></tr>
+              <tr><td>graph-features-language</td><td class="yes">ADOPTED</td><td>v5.1.0</td><td>&mdash;</td><td>Owner directive; measured 80-module weight; slim-profile ask upstream</td></tr>
+              <tr><td>invoices</td><td>TRIAL</td><td>&mdash;</td><td>&mdash;</td><td>Decorative tags + 69 manual registrations; trial next new command</td></tr>
+              <tr><td>Code-To-CV-Agent</td><td>ABSENT (correct)</td><td>&mdash;</td><td>&mdash;</td><td>11 subcommands below the ~15 trigger; describe is the one real gap</td></tr>
+              <tr><td>Cyberdom</td><td>DEFER</td><td>&mdash;</td><td>&mdash;</td><td>One subcommand; error-family owns exit codes; dep cost high</td></tr>
+              <tr><td>profileagent</td><td>DEFER</td><td>&mdash;</td><td>&mdash;</td><td>Verbs live in CV; trigger = a future cmd/profilectl module</td></tr>
+              <tr><td>audiblesync</td><td>HOLD</td><td>&mdash;</td><td>&mdash;</td><td>4 flags, 0 subcommands; STACK.md exclusion stands</td></tr>
+              <tr><td>business-networking</td><td>ADOPT-LATER</td><td>&mdash;</td><td>&mdash;</td><td>Go 1.27 toolchain floor + 64 indirect deps vs zero-dep identity</td></tr>
+              <tr><td>go-taskqueue</td><td class="no">KEEP OUT</td><td>&mdash;</td><td>&mdash;</td><td>ADR-pinned installability; churn risk noted (3-day cadence)</td></tr>
+              <tr><td>browser-history</td><td class="no">SHOULD NOT</td><td>&mdash;</td><td>0/100</td><td>Owner toolset; error-printing conflict with errorfamily adapter</td></tr>
+              <tr><td>dnsblockd</td><td class="no">SHOULD NOT</td><td>&mdash;</td><td>N/A</td><td>Deployed hierarchical env contract; ADR-0010 no-DI</td></tr>
+              <tr><td>webphone</td><td class="no">NO-GO</td><td>&mdash;</td><td>&mdash;</td><td>Designed operator surface; no terminal; single-container doctrine</td></tr>
+              <tr><td>pbx-lens</td><td class="no">REJECT</td><td>&mdash;</td><td>&mdash;</td><td>Fleet policy bans Cobra; CLI too small to clear the bar</td></tr>
+              <tr><td>cqrs-htmx</td><td class="no">NOT ADOPTED</td><td>&mdash;</td><td>&mdash;</td><td>Category error: CLI framework in a library repo</td></tr>
             </tbody>
           </table>
+
+          <h3>B. Evidence index</h3>
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Finding</th>
+                <th>Primary source</th>
+                <th>Quote / fact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>D1</td><td>graph-features-language</td><td>"80 net-new modules &hellip; identical with every lean switch on" + cmdguard#25</td></tr>
+              <tr><td>D2</td><td>google-domain-detector</td><td>"doc.go:65 omits values/validate/local/hidden/prompt/secret"</td></tr>
+              <tr><td>D3</td><td>browser-history, Cyberdom</td><td>"wiring them together is undocumented work"</td></tr>
+              <tr><td>D4</td><td>journal</td><td>"mounts under the raw parent &mdash; surface byte-identical"</td></tr>
+              <tr><td>D6</td><td>dnsblockd</td><td>"file-only KoanfLoader plus flat per-flag env tags"</td></tr>
+              <tr><td>M1</td><td>Cyberdom, cvagent, audiblesync</td><td>"5-plus commands" / "~15 trigger" / "two verbs threshold"</td></tr>
+              <tr><td>M4</td><td>go-taskqueue</td><td>"3-day tag cadence + same-day major retirement is churn"</td></tr>
+              <tr><td>M5</td><td>business-networking, invoices, GFL</td><td>97-line drifting help / 69 registrations + verbose shadow / 7 swallowed reads</td></tr>
+              <tr><td>S1</td><td>invoices, CV, GFL</td><td>ExitCoder 0-as-no-override; fang dispatch; ArgsFromContext</td></tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-amber">
+            <strong>Meta-observation</strong>
+            This report exists because 18 reviews re-derived the same facts. If
+            actions 1&ndash;5 land, the <em>next</em> synthesis of fleet feedback
+            should be a few paragraphs, not a survey.
+          </div>
         </section>
 
-        <!-- Footer -->
         <footer class="footer">
           <p>
-            Generated YYYY-MM-DD &middot; Reviewed against version X.Y.Z
-            &middot; All claims verified against source code where noted
+            Generated 2026-11-17 &middot; Synthesized from 18 fleet reviews
+            (docs/review/libs/cmdguard.md per project) against cmdguard v5.1.0
+            &middot; All quoted claims carried verbatim from the reviews; verify
+            against source before acting on single-review findings
           </p>
         </footer>
       </main>
     </div>
-
     <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
     <script>
       (function () {
