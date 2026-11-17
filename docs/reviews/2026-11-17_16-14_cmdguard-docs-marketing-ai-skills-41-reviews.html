@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Title</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS LIGHT — Editorial template
+         Design language: form follows function. Primary colors on warm paper.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Light) --- */
+        --color-paper: #f4f4f0;
+        --color-paper-2: #ffffff;
+        --color-paper-3: #e8e8e2;
+        --color-ink: #111111;
+        --color-red: #e63946;
+        --color-blue: #1d3557;
+        --color-yellow: #f4d35e;
+        --color-hairline: rgba(17, 17, 17, 0.14);
+        --color-hairline-strong: rgba(17, 17, 17, 0.3);
+
+        /* --- Semantic layer (shared vocabulary with dark template) --- */
+        --surface: var(--color-paper);
+        --surface-raised: var(--color-paper-2);
+        --surface-sunken: var(--color-paper-3);
+        --text: var(--color-ink);
+        --text-muted: rgba(17, 17, 17, 0.72);
+        --text-faint: rgba(17, 17, 17, 0.5);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-red);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber: var(--warning);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 22%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 12%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 12%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px;
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Accessibility: keyboard focus --- */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--text);
+      }
+      .sidebar a {
+        font-size: 0.86rem;
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-left: 4px solid transparent;
+        font-weight: 600;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+        color: var(--accent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      h1 {
+        font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+        line-height: 1.05;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 3px solid var(--text);
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      h3 {
+        font-size: 1.15rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 1rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 2rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid var(--text);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+        margin-bottom: 0.9rem;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0 0 1rem;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 0.25rem 0.6rem;
+        background: var(--surface-sunken);
+        color: var(--text);
+        border: 1px solid var(--border-strong);
+      }
+      .tag.amber {
+        background: var(--warning);
+        border-color: var(--warning);
+        color: var(--text);
+      }
+      .tag.teal {
+        background: var(--solution);
+        border-color: var(--solution);
+        color: var(--surface);
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 90px;
+        margin-bottom: 1.2rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        right: 180px;
+        width: 64px;
+        height: 64px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 26px;
+        right: 90px;
+        width: 56px;
+        height: 56px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 32px solid transparent;
+        border-right: 32px solid transparent;
+        border-bottom: 56px solid var(--warning);
+      }
+      .hero-shapes .bar {
+        position: absolute;
+        bottom: 0;
+        right: 230px;
+        width: 100px;
+        height: 14px;
+        background: var(--text);
+      }
+
+      /* --- Scorecard / stat cards --- */
+      .scorecard,
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0;
+        margin: 1.5rem 0 2rem;
+        border: 3px solid var(--text);
+      }
+      .score-card,
+      .stat-card {
+        padding: 1.3rem 1rem;
+        text-align: center;
+        border-right: 3px solid var(--text);
+        background: var(--surface-raised);
+      }
+      .score-card:last-child,
+      .stat-card:last-child {
+        border-right: none;
+      }
+
+      .score,
+      .stat-value {
+        font-family: var(--font-heading);
+        font-size: 2.6rem;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .score-card .label,
+      .stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-top: 0.5rem;
+      }
+      /* Semantic state classes — no nth-child decoration, no !important */
+      .score-good,
+      .stat-good {
+        background: var(--solution);
+        color: var(--surface);
+      }
+      .score-warn,
+      .stat-warn {
+        background: var(--warning);
+        color: var(--text);
+      }
+      .score-bad,
+      .stat-bad {
+        background: var(--problem);
+        color: var(--surface);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border-left: 8px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border-left: 8px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.22rem 0.6rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+        color: var(--text);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        border: 1px solid var(--text);
+        color: var(--text);
+      }
+      .badge-critical {
+        background: var(--problem);
+        color: var(--surface);
+      }
+      .badge-high {
+        background: var(--warning);
+      }
+      .badge-medium {
+        background: var(--surface-sunken);
+      }
+      .badge-low {
+        background: var(--surface-raised);
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        background: var(--solution);
+        color: var(--surface);
+      }
+
+      /* --- Callouts --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--border-strong);
+        border-left: 4px solid var(--border-strong);
+        background: var(--surface-sunken);
+        font-size: 0.92rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-teal,
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(
+          in srgb,
+          var(--solution) 10%,
+          var(--surface-raised)
+        );
+      }
+      .callout-amber,
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(
+          in srgb,
+          var(--warning) 18%,
+          var(--surface-raised)
+        );
+      }
+
+      /* --- Strengths --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.9rem;
+        padding: 0.75rem 0;
+        border-bottom: 2px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 900;
+        color: var(--solution);
+        font-size: 1.3rem;
+        line-height: 1.3;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Tables --- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.92rem;
+        border: 2px solid var(--text);
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--text);
+        color: var(--surface);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-right: 1px solid var(--border-strong);
+      }
+      th:last-child {
+        border-right: none;
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-top: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+      }
+      td:last-child {
+        border-right: none;
+      }
+      tr:nth-child(even) td {
+        background: var(--surface-sunken);
+      }
+      table.compare td.yes {
+        color: var(--solution);
+        font-weight: 700;
+      }
+      table.compare td.no {
+        color: var(--problem);
+        font-weight: 700;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--text);
+        color: var(--surface);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+        border: 2px solid var(--text);
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--warning);
+      }
+      .tok-type {
+        color: var(--warning);
+      }
+      .tok-string {
+        color: #95e1d3;
+      }
+      .tok-comment {
+        color: rgba(244, 244, 240, 0.45);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #6eb5ff;
+      }
+      .tok-number {
+        color: var(--warning);
+      }
+      .tok-generic {
+        color: var(--problem);
+      }
+      .tok-builtin {
+        color: #6eb5ff;
+      }
+      .tok-punct {
+        color: rgba(244, 244, 240, 0.7);
+      }
+      .tok-attr {
+        color: var(--warning);
+      }
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 2px solid var(--text);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.4rem 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: var(--surface-sunken);
+        border: 1px solid var(--text);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        border-left: 6px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1.1rem;
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        border-left: 6px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 900;
+        font-size: 1.8rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.94rem;
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 3px solid var(--text);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .scorecard,
+        .stat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .score-card:nth-child(2),
+        .stat-card:nth-child(2) {
+          border-right: none;
+        }
+        .score-card:nth-child(1),
+        .stat-card:nth-child(1),
+        .score-card:nth-child(2),
+        .stat-card:nth-child(2) {
+          border-bottom: 3px solid var(--text);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+        .hero-shapes {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+<body>
+    <!-- Full-bleed top bar -->
+    <div class="top-bar">
+      <span>FLEET SURFACE AUDIT</span>
+      <span>2026-11-17</span>
+      <span>cmdguard &middot; docs / marketing / AI-skills</span>
+    </div>
+
+    <div class="layout">
+      <!-- Sidebar TOC -->
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#scorecard">Scorecard</a>
+          <a href="#strengths">Strengths</a>
+          <a href="#findings">Findings</a>
+          <a href="#proposal">Proposal</a>
+          <a href="#appendix">Appendix</a>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+        <!-- Hero -->
+        <header class="hero">
+          <div class="hero-shapes">
+            <div class="bar"></div>
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="eyebrow">LIBRARY SURFACE AUDIT &middot; 2026-11-17</div>
+          <h1>cmdguard: the fleet&rsquo;s verdict on docs, marketing, and the AI skill</h1>
+          <p class="subtitle">
+            41 consumer reviews from the LarsArtmann fleet &mdash; 23 covering sibling
+            <code>go-appkit</code>, 18 covering <code>cmdguard</code> itself &mdash; read in
+            full by six parallel readers, then cross-checked against cmdguard&rsquo;s README,
+            website source, and SKILL.md at source level. This report is the resulting
+            improvement list for the three surfaces that decide adoption.
+          </p>
+          <div class="meta">
+            <span class="tag amber">Evidence: 41 fleet reviews</span>
+            <span class="tag">Subject: cmdguard v5.1.0 (7c55062)</span>
+            <span class="tag teal">Method: corpus read + direct source verification</span>
+          </div>
+        </header>
+
+        <!-- Scorecard -->
+        <section id="scorecard" class="scorecard">
+          <div class="score-card score-good">
+            <div class="score">41</div>
+            <div class="label">Reviews read in full</div>
+          </div>
+          <div class="score-card">
+            <div class="score">18</div>
+            <div class="label">cmdguard fleet verdicts</div>
+          </div>
+          <div class="score-card score-warn">
+            <div class="score">3</div>
+            <div class="label">Verified doc-drift sites</div>
+          </div>
+          <div class="score-card score-good">
+            <div class="score">10/0</div>
+            <div class="label">Findings / adoption blockers</div>
+          </div>
+        </section>
+
+        <!-- Summary -->
+        <section id="summary">
+          <h2><span class="num">00</span>Summary</h2>
+          <p>
+            cmdguard&rsquo;s adoption surfaces are already the most mature in the fleet. The
+            corpus records evaluation-by-docs working exactly as designed: one consumer ran
+            its entire cmdguard audit from README and SKILL.md line citations alone and never
+            opened library source; no review reports a hallucinated cmdguard API name. The
+            remaining work is <em>convergence, not construction</em>: three verified places
+            where README, SKILL.md, and source tell different stories about the same fact;
+            the recurring &ldquo;capability invisible &rarr; consumer hand-rolls it&rdquo;
+            pattern; an agent story that is marketed but never walked end-to-end; and
+            near-zero cross-skill pollination across the 54-skill fleet.
+          </p>
+          <div class="callout callout-amber">
+            <strong>The bottom line</strong>
+            The surfaces that exist are good &mdash; the declines recorded in the corpus are
+            fit-based (audiblesync: &ldquo;4 flags, 0 subcommands, 0 config files&rdquo;),
+            not doc-based. The work left is: one reference per fact (validate rules, tag
+            vocabulary, sentinel counts), capabilities sold as one-line wins, skill numbers
+            derived instead of hand-counted, and the agent loop demonstrated once in public.
+            Every finding below is Low-to-Medium effort; several are under an hour.
+          </div>
+        </section>
+
+        <!-- Strengths -->
+        <section id="strengths">
+          <h2><span class="num">&#9670;</span>What the fleet already rates</h2>
+          <p>
+            Evidence first, because the improvement list only lands if it starts from what
+            demonstrably works.
+          </p>
+
+          <div class="strengths">
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Docs-as-spec is real, not aspirational</strong>
+                <span>audiblesync&rsquo;s cmdguard review (v5.1.0, verdict HOLD) cites SKILL.md
+                by line ranges (6&ndash;10, 29&ndash;36, 52&ndash;75, 82&ndash;99,
+                101&ndash;122, 141&ndash;150) and README ranges (60&ndash;79, 91&ndash;123,
+                535&ndash;559) &mdash; zero source reads, and the decision (&ldquo;4 flags, 0
+                subcommands, 0 config files&rdquo;) is reachable purely from docs. That is the
+                same consumer whose go-appkit audit set the line-citable gold standard.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>The claims table is the fleet&rsquo;s anti-hallucination device</strong>
+                <span>SKILL.md&rsquo;s Verification-status table (claim / status / source+date
+                per row) is precisely the discipline the go-appkit corpus demanded after its
+                one API-name hallucination (&ldquo;CORRECTION OF RECORD:
+                <code>WithEvaluationHook</code> does NOT exist in the library&rdquo;). No
+                cmdguard review needed a correction of record &mdash; the device shipped
+                before the failure mode could.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>The error reference cannot drift</strong>
+                <span>docs/ERROR_REFERENCE.md states its own guarantee in line 3: &ldquo;The
+                sentinel table is generated from source and drift-guarded by a test.&rdquo;
+                Generated references are the endgame the rest of this report pushes the other
+                surfaces toward.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Migration is a product, not a page</strong>
+                <span>Four migration documents (from Cobra, v2&rarr;v3, v3&rarr;v4,
+                v4&rarr;v5) plus a mechanical codemod
+                (<code>docs/migration_v4_v5/codemod.sh</code>) and an explicit retired-line
+                policy (v4 frozen at v4.3.1 on <code>release/v4</code>). No sibling library
+                ships a codemod; the corpus treats this as a stated differentiator.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Marketing surfaces exist and agree</strong>
+                <span>A real Astro website (21 guides, quick-start, installation), a README
+                trinity comparison table, and feature data that carries the same claim on
+                every surface: type-safe flags + DI + zero-panic error contract, batteries on
+                by default. MIT license stated plainly &mdash; which matters, because the
+                corpus shows evaluators flag license unprompted.</span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>The agent contract is real and documented</strong>
+                <span><code>describe</code> prints a versioned JSON contract (types, defaults,
+                env vars, enums, required flags, inheritance),
+                <code>Describe()</code> / <code>WriteDescription()</code> expose it
+                programmatically, the machine-contract guide exists, and the
+                <code>schema</code> sub-module emits JSON Schema 2020-12. The pieces are
+                shipped &mdash; finding 9 is about assembling them into one demonstrated
+                loop.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Findings -->
+        <section id="findings">
+          <h2><span class="num">01</span>Findings</h2>
+          <p>
+            Ten findings in three groups &mdash; Docs, Marketing, AI-Skills &mdash; ordered by
+            impact. Each names the exact files and lines so every claim is replayable.
+          </p>
+
+          <!-- F1 -->
+          <div class="issue issue-critical" id="f1">
+            <span class="severity severity-critical">Docs &middot; High impact</span>
+            <h3>1. The validate-rule registry is documented nowhere consumer-facing</h3>
+            <div class="where">
+              pkg/cmdguard/v5/flags_validate.go:58-67 &middot; README.md:439 &middot;
+              .agents/skills/cmdguard/SKILL.md:250
+            </div>
+            <p>
+              The source registers <strong>ten named rules</strong>: <code>email</code>,
+              <code>url</code>, <code>minlen</code>, <code>maxlen</code>, <code>min</code>,
+              <code>max</code>, <code>dmin</code>, <code>dmax</code>, <code>regex</code>,
+              <code>nonempty</code>. The README shows a single example
+              (<code>validate:"email,min=5"</code>) and no rule list. The SKILL.md tag table
+              documents different syntax (<code>validate:"min=1,max=100"</code>) and describes
+              <code>min</code>/<code>max</code> as &ldquo;length on strings, numeric
+              otherwise&rdquo; &mdash; but the source splits string length into separate
+              <code>minlen</code>/<code>maxlen</code> rules. Two surfaces, two half-stories;
+              the only complete registry lives in unexported source. This is the quotaboard
+              lesson verbatim: when docs do not carry the capability surface, evaluators read
+              source and lose trust in the docs they did read.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              One canonical table &mdash; rule / parameter / applies-to / resulting error
+              &mdash; in the README tag section and the website type-safe-flags guide; SKILL.md
+              links to it instead of restating. Under an hour.
+            </div>
+          </div>
+
+          <!-- F2 -->
+          <div class="issue issue-critical" id="f2">
+            <span class="severity severity-critical">AI-Skills &middot; High impact</span>
+            <h3>2. The skill&rsquo;s own verification table contradicts itself</h3>
+            <div class="where">
+              .agents/skills/cmdguard/SKILL.md:43 vs SKILL.md:288
+            </div>
+            <p>
+              Line 43: &ldquo;59 exported sentinel error vars.&rdquo; Line 288: &ldquo;62
+              documented sentinel errors.&rdquo; Both hand-written, mutually exclusive, both in
+              the same file whose crown jewel is a table whose entire purpose is that
+              <em>every claim carries a source</em>. An agent quoting the skill inherits
+              whichever number it reads first &mdash; and the ChastityAPI incident in the
+              go-appkit corpus shows exactly how a single unverified number in an otherwise
+              excellent document becomes the citation that propagates.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Never hand-count. Derive sentinel counts from
+              <code>docs/ERROR_REFERENCE.md</code> (already source-generated) or a one-line
+              <code>rg</code> at write time, and only write a count row when the Source column
+              carries the runnable command that produced it.
+            </div>
+          </div>
+
+          <!-- F3 -->
+          <div class="issue issue-important" id="f3">
+            <span class="severity severity-important">Docs &middot; Medium impact</span>
+            <h3>3. README and SKILL.md disagree on the tag vocabulary</h3>
+            <div class="where">
+              README.md:431-443 (11 tags) vs SKILL.md:239-253 (13 tags)
+            </div>
+            <p>
+              The README&rsquo;s Flag Tags Reference lists 11 tags. The SKILL.md lists 13
+              &mdash; adding <code>prompt:"Question?"</code> (which the README&rsquo;s own
+              Features table sells at line 233) and <code>secret:"true"</code> (sold in the
+              config-explain prose at line 559). A consumer building a prompt or a redacted
+              field from the README reference table concludes the tags do not exist. The
+              fleet&rsquo;s contract-string rule is explicit: when two surfaces carry the same
+              reference, they drift, and the drift surfaces in a consumer audit.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Make the README table the 13-tag superset and have every other surface (SKILL.md,
+              website guides, schema docs) point at it as the single reference.
+            </div>
+          </div>
+
+          <!-- F4 -->
+          <div class="issue issue-important" id="f4">
+            <span class="severity severity-important">Docs &middot; Medium impact</span>
+            <h3>4. Released-vs-pinned gating is left for the consumer to reconstruct</h3>
+            <div class="where">
+              io-surface review (v4.2.1 pin) &middot; CHANGELOG.md:8 ([Unreleased])
+            </div>
+            <p>
+              io-surface&rsquo;s reviewer had to flag which features were unreleased <em>at
+              their pin</em> &mdash; strict config keys, <code>config explain</code>, the
+              stable <code>error_code</code> envelope &mdash; and did it by reading the repo,
+              because no doc says &ldquo;since vX&rdquo;. The go-appkit corpus shows this tax
+              compounding: quotaboard burned an audit on an unreleased default-stack change,
+              PapDashboard could not adopt master-only submodule features at all, and three
+              reviews needed mid-audit refresh banners when a new tag landed. cmdguard&rsquo;s
+              CHANGELOG discipline is right; the README sells HEAD unversioned.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Version-annotate capabilities that post-date the widely-pinned baseline (v5.0.0)
+              &mdash; a &ldquo;since&rdquo; column in the features table, or a changelog link
+              per feature row.
+            </div>
+          </div>
+
+          <!-- F5 -->
+          <div class="issue issue-important" id="f5">
+            <span class="severity severity-important">Docs &middot; Medium impact</span>
+            <h3>5. Coverage claims are hand-maintained in two places</h3>
+            <div class="where">README.md:8 (static badge) &middot; README.md:242 (feature row)</div>
+            <p>
+              A static &ldquo;coverage-89.3%&rdquo; badge plus a &ldquo;Verified&hellip; 89.3%
+              core coverage&rdquo; feature row, both hand-synced. The stale-claim pattern the
+              corpus keeps catching (quotaboard&rsquo;s &ldquo;field does not exist at the
+              pinned version&rdquo;, the 59-vs-62 split above) starts exactly here: a number in
+              prose that no test guards.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Generate the badge from the CI coverage workflow, and let the Verified feature
+              row link the CI run instead of restating a number.
+            </div>
+          </div>
+
+          <!-- F6 -->
+          <div class="issue issue-important" id="f6">
+            <span class="severity severity-important">Marketing &middot; High impact</span>
+            <h3>6. The one-line-wins section that converts does not exist</h3>
+            <div class="where">
+              README.md (no such section) &middot; pattern evidence: io-surface, PapDashboard,
+              quotaboard, media-atlas reviews
+            </div>
+            <p>
+              The single most repeated conversion pitch in the 41-review corpus: consumers
+              hand-roll exactly what the library already owns, one capability at a time, and
+              every fix is &ldquo;one line&rdquo;. io-surface &mdash; a 100/100 cmdguard
+              adopter &mdash; hand-rolled its exit-code contract (0/1/2) and a custom
+              <code>version</code> command that overrides cmdguard&rsquo;s auto-registered one;
+              both are shipped features. PapDashboard&rsquo;s go-appkit audit found ~400 lines
+              of hand-rolled security middleware duplicating a submodule; quotaboard and
+              media-atlas list the same one-liners audit after audit. cmdguard&rsquo;s README
+              lists features as a table; it never says <em>&ldquo;delete your hand-rolled
+              X&rdquo;</em>.
+            </p>
+            <pre><code>## Replace your hand-rolled...
+- Error printing + exit code  -> cli.ExecuteAndExit(ctx)      # was: fmt.Fprintln + os.Exit ladder
+- version command             -> automatic (WithCLIVersion)   # was: a hand-rolled cobra command
+- doctor / health checks      -> automatic (batteries)        # was: ad-hoc self-check command
+- "did you mean?" suggestions -> automatic                    # was: nothing, or a TODO</code></pre>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              A &ldquo;Replace your hand-rolled&rdquo; README section: each row a 3-line
+              before/after, ordered by lines-deleted. This is the highest-conversion section
+              the corpus knows how to ask for.
+            </div>
+          </div>
+
+          <!-- F7 -->
+          <div class="issue issue-important" id="f7">
+            <span class="severity severity-important">Marketing &middot; Medium impact</span>
+            <h3>7. Claims are strong but ship without verification recipes</h3>
+            <div class="where">
+              README.md:17 (&ldquo;the only Go CLI framework that unifies&hellip;&rdquo;)
+              &middot; README.md:29-43 (trinity table)
+            </div>
+            <p>
+              &ldquo;The only framework that&hellip;&rdquo; and a nine-row comparison table are
+              exactly the claims an agent consumer re-verifies before trusting the rest. The
+              go-appkit corpus rewarded library claims that arrive with their proof
+              (go-taskqueue&rsquo;s audit accepted the README because every row replayed in one
+              command), and its one API-name hallucination shows what an unreplayable claim
+              costs. All 18 cmdguard reviews contradict none of the claims &mdash; the gap is
+              that the proof lives in tests an evaluator must find unaided.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              A &ldquo;How to verify&rdquo; block under the trinity table: one runnable line
+              per row (constructor validation = the duplicate-name probe; zero-panics =
+              <code>rg "Must|panic" pkg/</code>; describe = the taskctl <code>describe</code>
+              output). Marketing that ships its own replay commands gets cited as a spec.
+            </div>
+          </div>
+
+          <!-- F8 -->
+          <div class="issue issue-important" id="f8">
+            <span class="severity severity-important">AI-Skills &middot; High impact</span>
+            <h3>8. Cross-skill pollination is where adoption happens &mdash; cmdguard is barely in the graph</h3>
+            <div class="where">/home/lars/projects/SKILLS/*/SKILL.md &mdash; 3 of 54 mention cmdguard</div>
+            <p>
+              The cleanest funnel evidence in the whole corpus is profileagent&rsquo;s
+              go-appkit review: a skeleton repo that never opened a README adopted a mental
+              model, a trigger condition, and a named recipe purely because a sibling skill
+              carried them (&ldquo;the go-cqrs-lite skill points at its cqrs EventService
+              recipe&rdquo;). audiblesync ranked a sibling skill&rsquo;s option
+              <em>before</em> appkit&rsquo;s own docs. Today exactly three fleet skills mention
+              cmdguard &mdash; stack-selection, buildflow, nix-private-go-repos &mdash; as
+              tooling facts, not adoption recipes. No sibling skill hands a CLI question to
+              cmdguard the way go-cqrs-lite&rsquo;s skill hands a lifecycle question to cqrs.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              A reciprocity pass: add named cmdguard entries to sibling skills&rsquo;
+              related-tools/recipe sections (&ldquo;need a CLI for the admin tool? cmdguard
+              <code>NewApp</code> recipe&rdquo;), and give cmdguard&rsquo;s own SKILL.md a
+              works-with section pairing it with the service stack (go-appkit service +
+              cmdguard ops CLI; taskctl as the flagship pattern). Recipes with names travel.
+            </div>
+          </div>
+
+          <!-- F9 -->
+          <div class="issue issue-important" id="f9">
+            <span class="severity severity-important">AI-Skills &middot; Medium impact</span>
+            <h3>9. The agent loop is marketed but never walked end-to-end</h3>
+            <div class="where">
+              website guides/machine-contract.mdx &middot; docs/ERROR_REFERENCE.md (Machine
+              error codes)
+            </div>
+            <p>
+              Every piece is shipped and documented separately: the versioned
+              <code>describe</code> JSON, stable <code>error_code</code>, actionable
+              <code>hint</code>, human <code>Hint:</code> lines, the JSON Schema emitter. No
+              single document walks the loop an agent actually runs: <em>discover the CLI via
+              describe &rarr; invoke &rarr; hit a classified error &rarr; read error_code +
+              hint &rarr; recover</em>. The corpus&rsquo;s marketing lesson says the
+              walkthrough IS the feature &mdash; cqrs-htmx&rsquo;s mechanical sweep surfaced
+              &ldquo;godoc examples&rdquo; as a capability unprompted, and profileagent
+              converted on a named recipe.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              One end-to-end walkthrough in machine-contract.mdx: describe output &rarr;
+              invoke &rarr; JSON error envelope with error_code+hint &rarr; recovery decision;
+              cross-link <code>schema.FromCLI</code> as the tooling path. Optionally an
+              MCP-facing recipe &mdash; &ldquo;agents drive your CLI without scraping
+              --help&rdquo; deserves its demonstration.
+            </div>
+          </div>
+
+          <!-- F10 -->
+          <div class="issue issue-nice" id="f10">
+            <span class="severity severity-nice">Marketing &middot; Low impact</span>
+            <h3>10. Two surfaces lead with two headlines</h3>
+            <div class="where">README.md:15 vs website HeroSection.astro:77-84</div>
+            <p>
+              The README leads with construction-time catches (&ldquo;catches missing
+              handlers, duplicate commands, and invalid flags at construction &mdash; not at
+              2am in production&rdquo;); the website hero leads with breadth (&ldquo;From
+              flags to shutdown, type-safe.&rdquo;). Both true, trinity subtitle matches
+              &mdash; but an evaluator gets a different &ldquo;what is this&rdquo; on the
+              first line of each surface, and the corpus shows evaluators quote the first line
+              as the positioning when they record a verdict.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix</strong>
+              Tier deliberately: README = why-switch (the 2am construction argument), website
+              = what-it-is (type-safe to shutdown), each linking the other. Decide once, write
+              it down, don&rsquo;t drift.
+            </div>
+          </div>
+        </section>
+
+        <!-- Proposal -->
+        <section id="proposal">
+          <h2><span class="num">02</span>What the converged state looks like</h2>
+          <p>
+            Every finding reduces to one rule the fleet already learned from go-appkit&rsquo;s
+            audits: <strong>one fact, one home; every other surface points at it.</strong>
+          </p>
+          <pre><code>Single-source targets
+  tag vocabulary        -> README Flag Tags Reference (13-tag superset)
+  validate rules        -> new canonical table (10 rules, one row each)
+  sentinel error count  -> docs/ERROR_REFERENCE.md (already generated; derive, never hand-count)
+  coverage number       -> CI badge artifact (README links, never restates)
+  feature versions      -> "since" column sourced from CHANGELOG sections
+  positioning lines     -> one tiering decision, recorded once
+
+Cross-surface plumbing
+  SKILL.md              -> links the references above; claims-table rows keep runnable Sources
+  website guides        -> mirror the references via build-time include, not copy-paste
+  sibling skills        -> named cmdguard recipes (the profileagent funnel, pointed at cmdguard)
+  machine-contract.mdx  -> one walked agent loop: describe -> invoke -> error_code -> recover</code></pre>
+          <div class="callout callout-teal">
+            <strong>Sequencing</strong>
+            Week one: findings 1, 2, 3, 5 (all Low effort &mdash; they close every verified
+            drift site). Week two: findings 6 and 7 (the README conversion sections). Then
+            findings 8 and 9 (the skill graph and the agent walkthrough). Finding 10 is a
+            decision, not a task &mdash; make it whenever, write it down.
+          </div>
+        </section>
+
+        <!-- Appendix -->
+        <section id="appendix">
+          <h2><span class="num">03</span>Appendix &mdash; method, evidence, replay</h2>
+          <p>
+            Six parallel readers read the full corpus (23 <code>go-appkit.md</code> reviews
+            across 23 consumer repos; 18 <code>cmdguard.md</code> reviews across 18 consumer
+            repos). The cmdguard surface was then verified directly against the v5.1.0 tree:
+            README (739 lines), the in-repo AI skill (356 lines), website source (hero,
+            features data, machine-contract guide), and the named source files. Every code
+            claim in this report was checked at the cited path before publication.
+          </p>
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Finding</th>
+                <th>Group</th>
+                <th>Severity</th>
+                <th>Effort</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1. Validate-rule registry undocumented</td><td>Docs</td><td class="no">Critical</td><td>Low</td><td class="no">Open</td></tr>
+              <tr><td>2. Skill self-contradicting counts</td><td>AI-Skills</td><td class="no">Critical</td><td>Low</td><td class="no">Open</td></tr>
+              <tr><td>3. Tag-vocabulary drift (11 vs 13)</td><td>Docs</td><td class="no">Important</td><td>Low</td><td class="no">Open</td></tr>
+              <tr><td>4. No released-vs-pinned gating</td><td>Docs</td><td class="no">Important</td><td>Medium</td><td class="no">Open</td></tr>
+              <tr><td>5. Hand-maintained coverage claims</td><td>Docs</td><td class="no">Important</td><td>Low</td><td class="no">Open</td></tr>
+              <tr><td>6. Missing one-line-wins section</td><td>Marketing</td><td class="no">Important</td><td>Medium</td><td class="no">Open</td></tr>
+              <tr><td>7. No claim verification recipes</td><td>Marketing</td><td class="no">Important</td><td>Low</td><td class="no">Open</td></tr>
+              <tr><td>8. Cross-skill pollination (3/54)</td><td>AI-Skills</td><td class="no">Important</td><td>Medium</td><td class="no">Open</td></tr>
+              <tr><td>9. Agent loop not walked</td><td>AI-Skills</td><td class="no">Important</td><td>Medium</td><td class="no">Open</td></tr>
+              <tr><td>10. Headline tiering decision</td><td>Marketing</td><td>Nice</td><td>Low</td><td class="no">Open</td></tr>
+            </tbody>
+          </table>
+          <p>How to verify (run as written, from the cmdguard repo root):</p>
+          <pre><code>rg -n 'validators\[' pkg/cmdguard/v5/flags_validate.go    # the 10-rule registry (F1)
+rg -n '59 exported|62 documented' .agents/skills/cmdguard/SKILL.md   # the split counts (F2)
+rg -c 'Err[A-Z]' docs/ERROR_REFERENCE.md                  # generated count to derive from
+sed -n '431,443p' README.md                               # README tag table, 11 rows (F3)
+sed -n '239,253p' .agents/skills/cmdguard/SKILL.md        # SKILL tag table, 13 rows
+ls /home/lars/projects/*/docs/review/libs/go-appkit.md | wc -l   # 23
+ls /home/lars/projects/*/docs/review/libs/cmdguard.md  | wc -l   # 18
+rg -il cmdguard /home/lars/projects/SKILLS/*/SKILL.md | wc -l    # 3 of 54 (F8)</code></pre>
+          <p>
+            Corpus evidence directly quoted in this report: audiblesync
+            (<code>docs/review/libs/cmdguard.md</code>, HOLD, docs-only audit) and io-surface
+            (<code>docs/review/libs/cmdguard.md</code>, ADOPTED v4.2.1, 100/100, hand-rolled
+            exit-code + version command); the go-appkit corpus supplies the patterns
+            (quotaboard, PapDashboard, ChastityAPI, profileagent, media-atlas, go-taskqueue,
+            cqrs-htmx, CV). The remaining cmdguard reviews recorded fit-based verdicts with no
+            doc-driven blockers &mdash; the strengths above are drawn from the full set of 41.
+          </p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <p>
+            Generated 2026-11-17 &middot; Reviewed against cmdguard v5.1.0 (7c55062) &middot;
+            All code claims verified against source at the cited paths &middot; Evidence: 41
+            fleet reviews read in full
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+</body>
+</html>
