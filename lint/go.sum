@@ -77,6 +77,8 @@ github.com/larsartmann/go-linter-sdk v0.4.1 h1:uI4j3Ao7aKmEr+qV1LLeQBGyQa7afpt2z
 github.com/larsartmann/go-linter-sdk v0.4.1/go.mod h1:O/W7NtP+sPegNiW9G6a4vmi8WNd5t+GxRkCHETmShHQ=
 github.com/larsartmann/go-linter-sdk v0.5.0 h1:m5csRUMrLMBgZdUTDjmigFWmLjF/VtlJYbbYg1iv4pw=
 github.com/larsartmann/go-linter-sdk v0.5.0/go.mod h1:mx6ItzGg/wej48PXEblnwibl7veB/NZTS/DETvM4T1M=
+github.com/larsartmann/go-linter-sdk v0.6.0 h1:akMO9blvfO/KSMOMq8HP4wbW4x5JUTl6NaGVljai7+I=
+github.com/larsartmann/go-linter-sdk v0.6.0/go.mod h1:mx6ItzGg/wej48PXEblnwibl7veB/NZTS/DETvM4T1M=
 github.com/larsartmann/go-ndjson v0.0.1 h1:wchwH5pv+0ZnFem/WrlGZA8dDGvZumT+OcVn5dbou3A=
 github.com/larsartmann/go-ndjson v0.0.1/go.mod h1:ueEJJ39Jei+zfPCEx455kpunYWZf/pkwn7HqETHrQkU=
 github.com/larsartmann/go-output v0.38.7 h1:U6+bAttbScCmy8izcBQ4tLEQ5yYVHXjioAWJ5yocAA4=
