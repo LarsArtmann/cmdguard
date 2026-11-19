@@ -171,13 +171,18 @@ func uxBaselineRuleDefs() []ruleDef {
 
 // AllRules returns every rule in table order. Filter with linter.FilterRules
 // for --enable/--disable semantics.
+//
+// The values are plain RuleFuncs: coverage evidence cannot ride a RuleFunc
+// value (the SDK's CoverageReporter lookup needs the addressable wrapper, the
+// same reason OptIn rules stay coverage-silent), so registry runs that should
+// report filesScanned must register via NewRegistry.
 func AllRules() []linter.RuleFunc {
 	defs := allRuleDefs()
 
 	rules := make([]linter.RuleFunc, 0, len(defs))
 
 	for _, def := range defs {
-		rules = append(rules, ruleFor(def.meta, def.check))
+		rules = append(rules, ruleFor(def.meta, def.check).RuleFunc)
 	}
 
 	return rules
@@ -185,12 +190,14 @@ func AllRules() []linter.RuleFunc {
 
 // NewRegistry builds a registry with every rule registered, stamped with the
 // cmdguard-lint tool name. This is the entry point for the go-linter-sdk
-// execution paths (Registry.Run, DetectorFromRegistry).
+// execution paths (Registry.Run, DetectorFromRegistry); rules are registered
+// as addressable pointers so the SDK's CoverageReporter lookup succeeds and
+// reports carry real filesScanned evidence.
 func NewRegistry() *linter.Registry {
 	registry := linter.NewRegistry(linter.WithToolName(ToolName))
 
-	for _, rule := range AllRules() {
-		registry.Register(rule)
+	for _, def := range allRuleDefs() {
+		registry.Register(ruleFor(def.meta, def.check))
 	}
 
 	return registry
@@ -254,11 +261,39 @@ func idSet(value string) map[string]bool {
 	return set
 }
 
-// ruleFor wraps a check into a go-linter-sdk RuleFunc with stable identity.
+// treeWalkingRule pairs a RuleFunc with the file count from its most recent
+// scan, implementing the SDK's optional linter.CoverageReporter interface so
+// registry reports carry real filesScanned evidence instead of a meaningless
+// zero — fleet dashboards cannot otherwise tell "clean tree" from "scanned
+// nothing". All rules share the analyze walker (walk.go), so scanned is the
+// number of files that pass actually parsed: clean files included, generated
+// and unparseable files excluded because they were deliberately not examined.
+// SkippedModules stays nil: the walk descends every directory except
+// vendor/testdata/hidden ones and tracks no nested go.mod roots.
+//
+// Coverage cannot ride a linter.RuleFunc value (see AllRules) — NewRegistry
+// registers the addressable pointer so the SDK's CoverageReporter lookup
+// succeeds.
+type treeWalkingRule struct {
+	linter.RuleFunc
+
+	scanned int
+}
+
+// Coverage reports scan evidence for the most recent analyze pass: the parsed
+// file count, and no skipped modules (the walker never stops at nested module
+// roots).
+func (r *treeWalkingRule) Coverage(_ context.Context, _ string) (int, []string) {
+	return r.scanned, nil
+}
+
+// ruleFor wraps a check into a coverage-reporting rule with stable identity.
 // Checks build findings via newFinding (not the rule variable) to avoid Go
-// initialization cycles.
-func ruleFor(meta linter.RuleMeta, check func(*project, linter.RuleMeta) []finding.Finding) linter.RuleFunc {
-	return linter.RuleFunc{
+// initialization cycles. The Run closure records the walked file count on the
+// rule so Coverage can report it after Check.
+func ruleFor(meta linter.RuleMeta, check func(*project, linter.RuleMeta) []finding.Finding) *treeWalkingRule {
+	rule := &treeWalkingRule{}
+	rule.RuleFunc = linter.RuleFunc{
 		Meta: meta,
 		Run: func(ctx context.Context, dir string) ([]finding.Finding, error) {
 			proj, err := analyze(ctx, dir)
@@ -266,9 +301,13 @@ func ruleFor(meta linter.RuleMeta, check func(*project, linter.RuleMeta) []findi
 				return nil, fmt.Errorf("cmdguard-lint: analyzing %s: %w", dir, err)
 			}
 
+			rule.scanned = len(proj.files)
+
 			return applySuppressions(proj, check(proj, meta)), nil
 		},
 	}
+
+	return rule
 }
 
 // newFinding builds a finding builder pre-stamped with the rule's identity.
