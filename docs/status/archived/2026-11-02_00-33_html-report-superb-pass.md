@@ -159,7 +159,7 @@ the biggest honesty gap).
 decide whether to add one (P0 — owner decision, see questions).
 ~~3. Promote the Python structural validator into `scripts/validate-html-report.py`~~ **→ ROADMAP Harvested (Promote the HTML-report structural validator)**
 (P1).
-4. Add the revision-marker rule to the html-report-kit skill (P1).
+~~4. Add the revision-marker rule to the html-report-kit skill (P1).~~ **Won't implement — lives in the html-report-kit repo's own queue; no cmdguard action.**
 5. Add the superb-pass audit checklist to the kit skill's guide (P1).
 6. Upstream `.table-note` into the kit's editorial template (P2).
 7. Restart/clean the stale golangci-lint LSP session (P1, one command).
@@ -171,7 +171,7 @@ enforcement; module path decision; `.golangci.yml` lll/max-issues fate (P0).
 is done (P1).
 11. Consider a `docs/status/` series convention file (naming, revision
 markers, companion-MD cross-checks) (P2).
-12. Add the HTML validator to `nix run .#check-all` for `docs/status/*.html`
+~~12. Add the HTML validator to `nix run .#check-all` for `docs/status/*.html`~~ **Won't implement — never added; HTML validation lives in the Website CI lane (html-validate), check-all stays Go-focused.**
 (P2).
 13. Screenshot-diff regression for future HTML reports if a browser lands in
 the dev shell (P2).

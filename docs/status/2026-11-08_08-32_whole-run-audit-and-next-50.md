@@ -243,7 +243,7 @@ no-services CLI (10m).
 (docs/ROADMAP note, 5m)
 43. `go install …/cmdguard-lint@vX` impossibility: pick the fix path
 (strip replaces at release vs install-script) (decision, 15m).
-44. Schema sub-module: re-confirm hold-until-v5.0.0 decision (5m).
+~~44. Schema sub-module: re-confirm hold-until-v5.0.0 decision (5m).~~ done — overtaken: the schema/ sub-module shipped in the v5 era (AGENTS.md sub-module table); the hold decision is moot
 45. Purge cadence: archive the 2026-10-02 batch (37 days old, threshold 45)
 proactively (20m).
 46. ROADMAP quarterly trim calendar note (D40) (5m).

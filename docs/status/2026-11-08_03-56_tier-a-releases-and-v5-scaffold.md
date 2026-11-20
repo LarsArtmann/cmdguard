@@ -238,7 +238,7 @@ semantics).
 26. C3 koanf edge tests (TOML datetimes, YAML anchors, int-vs-float64,
 empty file).
 27. C4 dead `pkg/cmdguard/v2` lint-exclusion cleanup + art-dupl re-run.
-28. C5/C6 taskctl + examples into `check-all` + CI leg.
+~~28. C5/C6 taskctl + examples into `check-all` + CI leg.~~ done — examples are root-module packages (go list ./...), covered by check-all and ci.yml go test ./... -race
 29. C7 samber-linter baseline committed + flake/CI wiring (W6).
 30. C8 HealthCheck cluster: dedupe `HealthCheckWithContext` (W2), Scope
 split-brain (W3), `var _ do.HealthcheckerWithContext` guards (W4).

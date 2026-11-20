@@ -174,7 +174,7 @@ FM8's stale path repaired.
 10. SU10 merge Dependabot #21.
 11. Set `FIREBASE_SERVICE_ACCOUNT` (owner) → CI deploy stops skipping.
 12. cv bump once the concurrent session greens `internal/ui`.
-13. journal/pim-sync push decision (§g3).
+~~13. journal/pim-sync push decision (§g3).~~ **Won't implement — owner decision on external repos (journal/pim-sync); not actionable in cmdguard; question aged.**
 14. A29 fragment compile mode in check-docs-api.py.
 15. A30 JSON-LD validation test.
 16. A31 MDX linter on website/src.

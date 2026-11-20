@@ -142,6 +142,9 @@ AI agents and tooling can discover and drive your CLI without scraping
 `--help`. The same contract is available programmatically:
 `cli.Describe()` / `cli.WriteDescription(w)`.
 
+AI assistants get a consumer skill covering the full API surface:
+`.agents/skills/cmdguard/SKILL.md` (loaded via the Crush skill fan-out).
+
 ---
 
 ## Error handling & exit codes

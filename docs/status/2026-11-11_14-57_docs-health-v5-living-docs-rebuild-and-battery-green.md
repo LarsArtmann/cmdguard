@@ -271,7 +271,7 @@ the fixes, not the score, are the deliverable).
 11. Add `release/**` (or all branches) to `ci.yml` triggers (R2).
 12. `workflow_dispatch` dry-run path in `release.yml` (R3).
 13. `scripts/pre-tag-check.sh` (R4).
-14. `go vet` + `go mod verify` in `check-all` (R5).
+~~14. `go vet` + `go mod verify` in `check-all` (R5).~~ done — flake.nix check-all runs go vet per module (lines 129-131) and go mod verify (line 164)
 15. Unit test for `normalizeTableSpacing` (R7).
 16. Branch protection for `master` (required checks) (09-14 item 32).
 17. Tag protection — no force-update, no deletion (09-14 item 33).

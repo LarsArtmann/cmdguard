@@ -179,7 +179,7 @@ command, keyed on `cmd.Flags().Changed`, never config/env values.
 16. Add `references/` layer for deep content (DI/middleware/auditlog/output formats)
 if the body grows past ~400 lines.
 17. Add a worked "migrate a persistent flag into an F struct" recipe to the skill.
-18. Cross-link the skill from cmdguard README (consumers browsing GitHub).
+~~18. Cross-link the skill from cmdguard README (consumers browsing GitHub).~~ done — 2026-11-20: README now links .agents/skills/cmdguard/SKILL.md in the AI-agents paragraph
 19. Document the skill in FEATURES.md (WORTH CONSIDERING → DONE after first trigger).
 20. Re-verify the skill's source-line references each release (they rot); the
 AGENTS.md sync rule now says so — make it a release-checklist item.
