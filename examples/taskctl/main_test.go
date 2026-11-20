@@ -578,8 +578,8 @@ func TestTaskStore_AddAndList(t *testing.T) {
 	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 
 	task := store.Add("Test task", PriorityHigh)
-	if task.ID != 1 {
-		t.Errorf("task.ID = %d, want 1", task.ID)
+	if task.ID.Get() != 1 {
+		t.Errorf("task.ID = %d, want 1", task.ID.Get())
 	}
 	if task.Title != "Test task" {
 		t.Errorf("task.Title = %q, want %q", task.Title, "Test task")
@@ -600,7 +600,7 @@ func TestTaskStore_Done(t *testing.T) {
 	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	store.Add("Task 1", PriorityMedium)
 
-	task, err := store.Done(1)
+	task, err := store.Done(NewTaskID(1))
 	if err != nil {
 		t.Fatalf("Done: %v", err)
 	}
@@ -613,7 +613,7 @@ func TestTaskStore_DoneNotFound(t *testing.T) {
 	t.Parallel()
 
 	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
-	_, err := store.Done(999)
+	_, err := store.Done(NewTaskID(999))
 	if err == nil {
 		t.Fatal("expected error for not-found task")
 	}
@@ -643,7 +643,7 @@ func TestTaskStore_Stats(t *testing.T) {
 	store := &TaskStore{mu: sync.Mutex{}, tasks: []Task{}, next: 1}
 	store.Add("Task 1", PriorityHigh)
 	store.Add("Task 2", PriorityLow)
-	_, _ = store.Done(1)
+	_, _ = store.Done(NewTaskID(1))
 
 	total, pending, done, byPriority := store.Stats()
 	if total != 2 {
@@ -842,7 +842,7 @@ func TestCloneAndOverride(t *testing.T) {
 		clonedScope := v5.CloneScope(cli.Scope())
 
 		overrideStore := &TaskStore{tasks: []Task{
-			{ID: 99, Title: "mocked task", Priority: "high", Done: true, CreatedAt: time.Now()},
+			{ID: NewTaskID(99), Title: "mocked task", Priority: "high", Done: true, CreatedAt: time.Now()},
 		}, next: 100}
 
 		if err := v5.OverrideValue(clonedScope, overrideStore); err != nil {

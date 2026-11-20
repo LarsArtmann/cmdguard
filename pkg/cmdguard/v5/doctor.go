@@ -16,7 +16,7 @@ type DoctorCheck struct {
 type doctorConfig[T any] struct {
 	short           string
 	long            string
-	groupID         string
+	groupID         string //brandid-lint:ignore(BD003) cobra.Group.ID interop: help-section label
 	checks          []DoctorCheck
 	schemaValidator func(configPath string) error
 }
@@ -39,7 +39,7 @@ func WithDoctorLong[T any](long string) DoctorOption[T] {
 }
 
 // WithDoctorGroupID sets the command group ID for the doctor command.
-func WithDoctorGroupID[T any](groupID string) DoctorOption[T] {
+func WithDoctorGroupID[T any](groupID string) DoctorOption[T] { //brandid-lint:ignore(BD003) help-section label
 	return func(cfg *doctorConfig[T]) {
 		cfg.groupID = groupID
 	}
@@ -178,7 +178,7 @@ func doctorRun[T any](cli *CLI[T], cfg doctorConfig[T]) func(context.Context, *T
 }
 
 // withDoctorGroupID conditionally adds WithGroupID if non-empty.
-func withDoctorGroupID(groupID string) CommandOption {
+func withDoctorGroupID(groupID string) CommandOption { //brandid-lint:ignore(BD003) cobra.Group.ID interop label
 	return func(s *commandSpec) {
 		if groupID != "" {
 			s.group = groupID

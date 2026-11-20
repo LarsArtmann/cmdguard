@@ -59,7 +59,7 @@ type cliSpec struct {
 }
 
 type cobraGroup struct {
-	id    string
+	id    string //brandid-lint:ignore(BD003) cobra.Group.ID interop: help-section label, not an entity ID
 	title string
 }
 

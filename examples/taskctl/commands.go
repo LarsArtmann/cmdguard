@@ -87,7 +87,7 @@ Supports multiple **output formats** for scripting and automation:
 			}
 
 			task := store.Add(flags.Title, flags.Priority)
-			fmt.Printf("Created task #%d: %s [%s]\n", task.ID, task.Title, task.Priority)
+			fmt.Printf("Created task #%d: %s [%s]\n", task.ID.Get(), task.Title, task.Priority)
 			return nil
 		},
 		v5.WithShort("Add a new task"),
@@ -119,13 +119,13 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 				return err
 			}
 
-			task, err := store.Done(flags.ID)
+			task, err := store.Done(NewTaskID(flags.ID))
 			if err != nil {
 				exitErr, _ := v5.NewExitError(2, v5.NewCommandError("done", err))
 				return exitErr
 			}
 
-			fmt.Printf("Completed task #%d: %s\n", task.ID, task.Title)
+			fmt.Printf("Completed task #%d: %s\n", task.ID.Get(), task.Title)
 			return nil
 		},
 		v5.WithShort("Mark a task as done"),
@@ -191,19 +191,19 @@ Priority must be one of: `+"`low`"+`, `+"`medium`"+`, `+"`high`"+` (default: `+"
 				return err
 			}
 
-			task, found := store.Get(1)
+			task, found := store.Get(NewTaskID(1))
 			if !found {
 				fmt.Println("No task found at ID")
 				return nil
 			}
 
-			fmt.Printf("Task #%d: %s\n", task.ID, task.Title)
+			fmt.Printf("Task #%d: %s\n", task.ID.Get(), task.Title)
 			fmt.Printf("  Priority: %s\n", task.Priority)
 			fmt.Printf("  Status:   %s\n", taskStatusLabel(task.Done))
 			fmt.Printf("  Created:  %s\n", task.CreatedAt.Format("2006-01-02 15:04:05"))
 
 			if flags.ShowMetadata {
-				fmt.Printf("  ID (raw): %d\n", task.ID)
+				fmt.Printf("  ID (raw): %d\n", task.ID.Get())
 			}
 
 			return nil

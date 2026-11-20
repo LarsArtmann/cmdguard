@@ -28,7 +28,7 @@ func TestTaskStatusLabel(t *testing.T) {
 func TestTaskRow_DoneTrue(t *testing.T) {
 	t.Parallel()
 
-	task := Task{ID: 5, Title: "Done task", Priority: "high", Done: true}
+	task := Task{ID: NewTaskID(5), Title: "Done task", Priority: "high", Done: true}
 	row := task.Row()
 	if row[3] != "done" {
 		t.Errorf("Row()[3] = %q, want %q for done task", row[3], "done")
@@ -41,7 +41,7 @@ func TestTaskStore_GetNotFound(t *testing.T) {
 	store := &TaskStore{tasks: []Task{}, next: 1}
 	store.Add("Task 1", "low")
 
-	if _, ok := store.Get(999); ok {
+	if _, ok := store.Get(NewTaskID(999)); ok {
 		t.Error("Get(999) should return false for non-existent task")
 	}
 }
@@ -52,7 +52,7 @@ func TestTaskStore_GetFound(t *testing.T) {
 	store := &TaskStore{tasks: []Task{}, next: 1}
 	store.Add("Task 1", "low")
 
-	if task, ok := store.Get(1); !ok {
+	if task, ok := store.Get(NewTaskID(1)); !ok {
 		t.Error("Get(1) should return true for existing task")
 	} else if task.Title != "Task 1" {
 		t.Errorf("Get(1).Title = %q, want %q", task.Title, "Task 1")
@@ -65,7 +65,7 @@ func TestTaskStore_ListHideDone(t *testing.T) {
 	store := &TaskStore{tasks: []Task{}, next: 1}
 	store.Add("Pending task", "low")
 	store.Add("Done task", "low")
-	_, _ = store.Done(2)
+	_, _ = store.Done(NewTaskID(2))
 
 	visible := store.List("", false)
 	if len(visible) != 1 {
@@ -83,7 +83,7 @@ func TestTaskStore_ListFilterPriorityAndHideDone(t *testing.T) {
 	store.Add("Pending high", "high")
 	store.Add("Done high", "high")
 	store.Add("Pending low", "low")
-	_, _ = store.Done(2)
+	_, _ = store.Done(NewTaskID(2))
 
 	highVisible := store.List("high", false)
 	if len(highVisible) != 1 {

@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	id "github.com/larsartmann/go-branded-id"
 	"github.com/samber/do/v2"
 
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
@@ -43,8 +44,21 @@ const (
 	taskStatusDone    = "done"
 )
 
+// TaskBrand brands task identifiers so they cannot be confused with other
+// uint-shaped values at compile time.
+type TaskBrand struct{}
+
+// Name implements the branded-id naming interface ("Task:3").
+func (TaskBrand) Name() string { return "Task" }
+
+// TaskID identifies one task in the store; the zero value means "unset".
+type TaskID = id.ID[TaskBrand, uint]
+
+// NewTaskID brands a raw numeric task identifier (e.g. from a flag).
+func NewTaskID(raw uint) TaskID { return id.NewID[TaskBrand](raw) }
+
 type Task struct {
-	ID        uint
+	ID        TaskID
 	Title     string
 	Priority  string
 	Done      bool
@@ -57,7 +71,7 @@ func (t Task) Row() []string {
 		status = taskStatusDone
 	}
 	return []string{
-		strconv.FormatUint(uint64(t.ID), 10),
+		strconv.FormatUint(uint64(t.ID.Get()), 10),
 		t.Title,
 		t.Priority,
 		status,
@@ -79,7 +93,7 @@ type AddFlags struct {
 }
 
 type DoneFlags struct {
-	ID uint `flag:"id" short:"i" required:"true" help:"Task ID to complete"`
+	ID uint `flag:"id" short:"i" required:"true" help:"Task ID to complete"` //brandid-lint:ignore(BD003) cmdguard binds flag fields by reflection over primitives; NewTaskID brands at the action boundary
 }
 
 type StatsFlags struct {
@@ -131,13 +145,13 @@ func (s *TaskStore) Add(title, priority string) Task {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	t := Task{ID: s.next, Title: title, Priority: priority, Done: false, CreatedAt: time.Now()}
+	t := Task{ID: NewTaskID(s.next), Title: title, Priority: priority, Done: false, CreatedAt: time.Now()}
 	s.tasks = append(s.tasks, t)
 	s.next++
 	return t
 }
 
-func (s *TaskStore) Done(id uint) (Task, error) {
+func (s *TaskStore) Done(id TaskID) (Task, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -147,7 +161,7 @@ func (s *TaskStore) Done(id uint) (Task, error) {
 			return s.tasks[i], nil
 		}
 	}
-	return Task{}, fmt.Errorf("task %d not found", id)
+	return Task{}, fmt.Errorf("task %d not found", id.Get())
 }
 
 func (s *TaskStore) List(filterPriority string, showAll bool) []Task {
@@ -167,7 +181,7 @@ func (s *TaskStore) List(filterPriority string, showAll bool) []Task {
 	return result
 }
 
-func (s *TaskStore) Get(id uint) (Task, bool) {
+func (s *TaskStore) Get(id TaskID) (Task, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -185,7 +199,7 @@ func (s *TaskStore) IDs() []string {
 
 	ids := make([]string, 0, len(s.tasks))
 	for _, t := range s.tasks {
-		ids = append(ids, strconv.FormatUint(uint64(t.ID), 10))
+		ids = append(ids, strconv.FormatUint(uint64(t.ID.Get()), 10))
 	}
 	return ids
 }

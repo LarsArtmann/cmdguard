@@ -158,7 +158,7 @@ func WithFangColorScheme(cs func(lightDark lipgloss.LightDarkFunc) fang.ColorSch
 
 // WithGroup registers a command group on the root command.
 // Groups organize commands in help output under titled sections.
-func WithGroup(groupID, title string) CLIOption {
+func WithGroup(groupID, title string) CLIOption { //brandid-lint:ignore(BD003) help-section label, not an entity ID
 	return func(s *cliSpec) {
 		s.groups = append(s.groups, cobraGroup{id: groupID, title: title})
 	}
