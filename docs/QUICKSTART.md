@@ -414,6 +414,8 @@ parent, err := v5.NewParentCommand[T]("name", "long desc", v5.NoFlags{},
 v5.AddCommand(cli, cmd)
 ```
 
+> **Positional args (since v5.1.0):** by default a leaf command silently accepts unexpected positional arguments. `v5.WithStrictPositionalArgs()` rejects undeclared ones (inert when an explicit validator like `WithExactArgs` is already set), and `v5.WithArgsPassthrough()` re-accepts them explicitly.
+
 ### Type Parameters
 
 | Parameter | Description     | Example                     |

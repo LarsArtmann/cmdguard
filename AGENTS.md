@@ -6,7 +6,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v5.0.0 (master) - v4 retired at v4.3.1 on the frozen `release/v4` branch; zero panics, 89.3% core coverage, 0 lint issues, 0 race conditions
+**Status:** v5.0.0 (master) - v4 retired at v4.3.1 on the frozen `release/v4` branch; zero panics, 89.3% core coverage (as-of 2026-11-20; live number is the CI-generated `.github/badges/coverage.svg` badge), 0 lint issues, 0 race conditions
 
 ---
 
@@ -67,7 +67,7 @@ python3 scripts/check-website-links.py
 
 **Module path:** `github.com/larsartmann/cmdguard/v5`
 
-**Current Status:** v5.0.0. 479 test functions in core (597 across the 8 workspace modules; +103 in taskctl/integration), 29 benchmarks, 8 fuzz targets, 89.3% core / 97.6% flightrecorder / 93.9% taskctl coverage, 0 build errors, 0 lint issues.
+**Current Status:** v5.0.0. 479 test functions in core (597 across the 8 workspace modules; +103 in taskctl/integration), 29 benchmarks, 8 fuzz targets, 89.3% core / 97.6% flightrecorder / 93.9% taskctl coverage (as-of 2026-11-20; the core number's live source is the CI-generated badge), 0 build errors, 0 lint issues.
 
 ---
 

@@ -73,6 +73,8 @@ You now have a CLI with auto-generated help, version flag, and styled output.
 
 Commands in cmdguard are created with `NewCommand` — flags are passed positionally and options are non-generic:
 
+> **Positional args (since v5.1.0):** by default a leaf command silently accepts unexpected positional arguments. `v5.WithStrictPositionalArgs()` rejects undeclared ones, and `v5.WithArgsPassthrough()` re-accepts them explicitly.
+
 ```go
 type AddFlags struct {
     Title    string `flag:"title"    short:"t" required:"true"  help:"Task title"`
