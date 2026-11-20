@@ -234,10 +234,17 @@ Note the asymmetry this creates: ROOT carries real sibling pins (release shape �
 
 The docs-health battery gates this repo's living docs and `docs/status/` corpus. `.docs-gates.json` pins only cadence — everything else rides the fleet defaults (report dir `docs/status`, planning extra globs, strict ratchets).
 
-- **Surfaces.** CI `dogfood` job runs the battery via pinned `go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.0 run .` — bump the tag when a new docs-gates release lands (dependabot cannot see `go run @version` pins). BuildFlow's compiled-in docs-gates provider rides the default pipeline AND pre-commit mode (`buildflow -s docs-gates` for the step alone); it execs the `docs-gates` binary from PATH, so hosts without the fleet-installed binary fail the step with the install hint.
+- **Surfaces.** CI `dogfood` job runs the battery via pinned `go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.1 run .` — bump the tag when a new docs-gates release lands (dependabot cannot see `go run @version` pins). BuildFlow's compiled-in docs-gates provider rides the default pipeline AND pre-commit mode (`buildflow -s docs-gates` for the step alone); it execs the `docs-gates` binary from PATH, so hosts without the fleet-installed binary fail the step with the install hint.
 - **Deliberately NO flake input.** docs-gates' flake carries a PRIVATE erraudit input (git+ssh); consuming any of its outputs would force a private fetch on CI and public clones. The system binary + the pinned `go run` are the only surfaces.
 - **Near-bar cadence is intentional.** `max_unarchived: 23` holds exactly one report of headroom until TODO SU22 (the 2026-11-08_02-29 archive batch) lands and returns it to 20. Expect a CI dogfood red when a report ages past `oldest_days: 45` or a 24th report lands: run the archive ritual (D3), never pin the gate further.
 - **Living-doc edit ritual.** Before any TODO_LIST/ROADMAP/CHANGELOG edit, run `docs-freshness --pre-flight` (stdin the candidate lines; rewrite only on SAFE), then the battery (`docs-gates run .`) BEFORE the commit, never after (the ungated-train lesson). Strikes ride `scripts/safe-strike.sh` from the docs-gates checkout — unique-text anchors, `[^|]*`-bounded cells, never row-number seds.
+
+### Adoption-surface conventions (2026-11-20, from the 41-review fleet audit)
+
+The `docs/reviews/2026-11-17_16-14_cmdguard-docs-marketing-ai-skills-41-reviews.html` audit (10 findings, all resolved) left standing rules:
+
+- **D15 — headline tiering.** README leads with WHY-SWITCH ("catches missing handlers, duplicate commands, and invalid flags at construction — not at 2am in production"); the website hero leads with WHAT-IT-IS ("From flags to shutdown, type-safe."). Each surface links the other (README header → cmdguard.lars.software; website hero → this repo). Do NOT converge the two lines — the tiering is deliberate.
+- **One fact, one home.** Canonical surfaces: tag vocabulary → README "Flag Tags Reference" (13-tag superset); validate rules → README "Validate rules" table + website type-safe-flags guide (same 10-rule registry, `flags_validate.go:57-67` is the source); sentinel counts → `docs/ERROR_REFERENCE.md` only (generated — derive counts with `rg`, never hand-count); coverage number → the CI-generated badge `.github/badges/coverage.svg` (committed by ci.yml on every master push, never hand-edited; Codecov is not activated for this repo and its badge stays "unknown"); feature availability → "(since vX.Y.Z)" annotations at each mention (CHANGELOG is the version source). SKILL.md, website guides, and AGENTS.md point at these homes instead of restating.
 
 ### Lint Strategy
 
