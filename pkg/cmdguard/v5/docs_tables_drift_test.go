@@ -49,6 +49,7 @@ func readRepoDoc(t *testing.T, rel string) string {
 	if err != nil {
 		t.Fatalf("reading %s: %v", rel, err)
 	}
+
 	return string(content)
 }
 
@@ -63,19 +64,25 @@ func TestFlagTagFieldsTrackedInDocs(t *testing.T) {
 
 	typ := reflect.TypeFor[FlagTag]()
 	seen := map[string]bool{}
-	for i := 0; i < typ.NumField(); i++ {
-		name := typ.Field(i).Name
+	for field := range typ.Fields() {
+		name := field.Name
 		seen[name] = true
 		if plumbingTagFields[name] {
 			continue
 		}
 		if _, ok := documentedTagFields[name]; !ok {
-			t.Errorf("FlagTag gained a doc-facing field %q: add its struct-tag spelling to documentedTagFields and to the README/SKILL tag tables", name)
+			t.Errorf(
+				"FlagTag gained doc-facing field %q: add its tag spelling to documentedTagFields + the doc tables",
+				name,
+			)
 		}
 	}
 	for name := range documentedTagFields {
 		if !seen[name] {
-			t.Errorf("documentedTagFields lists %q but FlagTag has no such field: remove it from the map and the doc tables", name)
+			t.Errorf(
+				"documentedTagFields lists %q but FlagTag has no such field: remove it from the map and the doc tables",
+				name,
+			)
 		}
 	}
 
@@ -105,17 +112,27 @@ func TestValidateRulesTrackedInDocs(t *testing.T) {
 
 	const wantCount = 10
 	if len(names) != wantCount {
-		t.Errorf("builtin validator count is %d, docs say %d: update the README + website validate tables (and this constant) together", len(names), wantCount)
+		t.Errorf(
+			"builtin validator count is %d, docs say %d: update the README + website validate tables (and this constant) together",
+			len(names),
+			wantCount,
+		)
 	}
 
 	readme := readRepoDoc(t, "README.md")
 	site := readRepoDoc(t, "website/src/content/docs/guides/type-safe-flags.mdx")
 	for _, rule := range names {
 		if !rowHasRule(readme, rule) {
-			t.Errorf("README validate table lost the %q row (source of truth: registerBuiltins in flags_validate.go)", rule)
+			t.Errorf(
+				"README validate table lost the %q row (source of truth: registerBuiltins in flags_validate.go)",
+				rule,
+			)
 		}
 		if !rowHasRule(site, rule) {
-			t.Errorf("website type-safe-flags.mdx validate table lost the %q row — the site copy must track the same registry", rule)
+			t.Errorf(
+				"website type-safe-flags.mdx validate table lost the %q row — the site copy must track the same registry",
+				rule,
+			)
 		}
 	}
 }
