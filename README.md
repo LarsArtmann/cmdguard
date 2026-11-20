@@ -5,7 +5,7 @@
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v5.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)
-[![Coverage](https://img.shields.io/badge/coverage-89.3%25-brightgreen)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
+[![Coverage](https://raw.githubusercontent.com/LarsArtmann/cmdguard/master/.github/badges/coverage.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)**
@@ -41,6 +41,38 @@ Other Go CLI frameworks give you flags. cmdguard gives you flags **plus** everyt
 | Gradual migration (raw cobra + typed runtime)     | —     | —                   | —          | **Yes**      |
 
 <sup>[1]</sup> Kong validates struct tags at parse time but does not validate command structure (missing handlers, duplicates) at registration.
+
+**Every row above is replayable — verify before trusting:**
+
+```bash
+# Zero panics: no Must* constructors exist in library code
+rg -n 'func Must' pkg/ --glob '!*_test.go'   # prints nothing
+
+# Duplicate commands rejected at registration (constructor validation)
+go test ./pkg/cmdguard/v5 -run 'TestAddCommands_AtomicOnDuplicate' -count=1
+
+# DI underneath: samber/do/v2 in the module graph
+rg -n 'samber/do' go.mod
+
+# The machine contract, live from the flagship example
+(cd examples/taskctl && go run . describe | head -8)
+```
+
+### Replace your hand-rolled…
+
+Even a 100/100 cmdguard adopter still hand-rolled its exit-code ladder and a
+`version` command — both shipped features. If a CLI concern has you writing
+plumbing, delete it:
+
+| You are maintaining…                             | Delete it, use…                                                                  |
+| ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `fmt.Fprintln(os.Stderr, …)` + `os.Exit(1)` ladder | `cli.ExecuteAndExit(ctx)` — error printed exactly once, exit code mapped         |
+| A hand-rolled `version` cobra command              | `WithCLIVersion("1.0.0")` — the command registers itself                         |
+| An ad-hoc "is the DB up?" self-check               | auto-registered `doctor` + `do.HealthcheckerWithContext` services                |
+| "did you mean?" typo handling (or a TODO about it) | automatic — flag and command suggestions ship by default (`lst` suggests `list`) |
+| Manual SIGINT handling and service teardown        | `WithGracefulShutdown()` — ON by default in v5, reverse invocation order         |
+| A config loader with precedence bugs               | `WithConfigFile(paths…)` — flag → env → file → default, strict keys on           |
+| Usage dump on every error (cobra's default)        | `SilenceUsage` is true by default; `WithoutSilenceUsage()` opts back in          |
 
 ### Dependency injection — the real differentiator
 
@@ -234,12 +266,12 @@ HELLO, CMDGUARD!
 | **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                                                     |
 | **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                                                                            |
 | **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                                                                                  |
-| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, or custom                                                                                 |
+| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithStrictPositionalArgs`/`WithArgsPassthrough` (since v5.1.0), or custom                 |
 | **Zero panics**            | All functions return errors; no Must\* panic variants                                                                                                        |
 | **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                                                      |
 | **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                                                |
 | **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                                                           |
-| **Verified**               | 89.3% core coverage, race-detected, fuzz-tested; `check-all` gates every push                                                                                |
+| **Verified**               | [CI-measured coverage badge](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml) — generated on every push, never hand-edited — plus race detection, fuzzing, and `check-all` gates |
 
 ---
 
@@ -441,6 +473,37 @@ type Flags struct {
 | `count`    | Counting flag                           | `count:"true"`           |
 | `local`    | Root-only, not inherited by subcommands | `local:"true"`           |
 | `hidden`   | Exclude from --help but stay functional | `hidden:"true"`          |
+| `prompt`   | Interactive prompt when a flag is missing (`WithPromptOnMissing()` + the prompts sub-module) | `prompt:"Your name?"`    |
+| `secret`   | Redact the value to `***` in `config explain`, `describe`, docs, and schemas | `secret:"true"`          |
+
+#### Validate rules — the complete registry
+
+Ten rules ship built in; this is the whole registry (source of truth:
+`pkg/cmdguard/v5/flags_validate.go:57-67`). Combine any of them comma-separated
+in one `validate` tag. An unknown rule name fails with `ErrUnknownValidator`;
+a malformed parameter with `ErrInvalidValidatorParam`.
+
+| Rule       | Parameter             | Checks                                    | Failure sentinel          |
+| ---------- | --------------------- | ----------------------------------------- | ------------------------- |
+| `email`    | —                     | RFC 5322 address (empty value passes)     | `ErrInvalidEmail`         |
+| `url`      | —                     | Absolute URL with scheme (empty passes)   | `ErrInvalidURL`           |
+| `minlen=N` | integer (rune count)  | string length ≥ N                         | `ErrValueTooShort`        |
+| `maxlen=N` | integer (rune count)  | string length ≤ N                         | `ErrValueTooLong`         |
+| `min=N`    | number                | numeric value ≥ N                         | `ErrValueTooSmall`        |
+| `max=N`    | number                | numeric value ≤ N                         | `ErrValueTooLarge`        |
+| `dmin=D`   | duration (e.g. `10s`) | duration value ≥ D                        | `ErrValueTooSmall`        |
+| `dmax=D`   | duration              | duration value ≤ D                        | `ErrValueTooLarge`        |
+| `regex=R`  | Go regexp (RE2)       | value matches R                           | `ErrValuePatternMismatch` |
+| `nonempty` | —                     | value not empty                           | `ErrValueEmpty`           |
+
+`min`/`max` are type-aware: on string kinds (and `URL`/`Email`/`HostPort`/`FilePath`)
+they rewrite to length bounds; on durations (`Duration`, `time.Duration`) to
+duration bounds; on everything else they stay numeric. Prefer the explicit
+`minlen`/`maxlen`/`dmin`/`dmax` forms when you want the domain spelled out.
+
+Rules run against whatever the flag resolves to (flag → env → default), and tag
+defaults are re-checked at construction — an impossible default fails
+`NewCLI` with `ErrInvalidFlagDefault` before the program ever runs.
 
 ---
 
@@ -465,8 +528,8 @@ type Flags struct {
 | `WithSubcommands(cmds...)`                    | Attach child commands (parent)                                                                   |
 | `WithRangeArgs(min, max)`                     | Require between min and max args                                                                 |
 | `WithNoArgs()`                                | Reject any positional args                                                                       |
-| `WithStrictPositionalArgs()`                  | Reject undeclared positional args (inert when an explicit validator like `WithExactArgs` is set) |
-| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras                                                            |
+| `WithStrictPositionalArgs()`                  | Reject undeclared positional args (inert when an explicit validator like `WithExactArgs` is set) — since v5.1.0 |
+| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras — since v5.1.0                                             |
 | `WithArgs(fn)`                                | Custom `cobra.PositionalArgs`                                                                    |
 | `WithPromptOnMissing()`                       | Interactive prompting for missing flags                                                          |
 | `WithCompletion(fn)`                          | Dynamic shell completion                                                                         |
