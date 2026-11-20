@@ -11,3 +11,9 @@ minimumReleaseAgeExclude:
 overrides:
   http-cache-semantics: ^4.2.1
   postcss-nested: ^8.0.1
+  # Pin the emnapi family to the stable 1.x line: a fresh 2026-11-20 lockfile
+  # re-resolution pulled @emnapi/runtime@2.0.0-beta.2 next to @emnapi/core
+  # 1.11.3, and the 1.x core / 2.x beta runtime bridge mismatch crashed
+  # `astro check` on boot ("this.bridge.setLastError is not a function").
+  "@emnapi/core": 1.11.3
+  "@emnapi/runtime": 1.11.3

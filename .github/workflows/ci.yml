@@ -47,17 +47,12 @@ jobs:
           go test ./... -count=1 -timeout 120s -coverprofile=coverage.out -covermode=atomic
           go tool cover -func=coverage.out
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
-        with:
-          files: coverage.out
-          fail_ci_if_error: false
-
       # The README coverage badge is GENERATED here and committed, so the
       # number can never drift from a measured run (fleet review finding 5:
-      # no hand-maintained coverage claims). Codecov uploads succeed but the
-      # project is not activated on the Codecov side, so its badge stays
-      # "unknown" — this committed SVG is the source of truth instead.
+      # no hand-maintained coverage claims). Codecov was REMOVED (2026-11-20):
+      # the repo is not activated on the Codecov side, so uploads landed on a
+      # dead endpoint ("Token required - not valid tokenless upload") and its
+      # badge served "unknown" — this committed SVG is the source of truth.
       - name: Generate coverage badge
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
@@ -84,6 +79,11 @@ jobs:
             </g>
           </svg>
           EOF
+          # Sanity gate: refuse to commit a malformed or empty badge (the
+          # heredoc above interpolates ${total}; a failed awk would emit a
+          # broken SVG silently).
+          grep -q '<svg' .github/badges/coverage.svg
+          grep -qE '>[0-9]+(\\.[0-9]+)?%</text>' .github/badges/coverage.svg
 
       - name: Commit coverage badge
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -94,9 +94,14 @@ jobs:
           if git diff --cached --quiet; then
             echo "coverage badge unchanged"
           else
-            git pull --rebase origin master
+            # Autostash: concurrent steps may leave unrelated working-tree
+            # changes; without it `pull --rebase` aborts (exit 128, seen in
+            # run 44768346938). Retry once for the push race with other bots.
+            git pull --rebase --autostash origin master || \
+              { sleep 5 && git pull --rebase --autostash origin master; }
+            git add .github/badges/coverage.svg
             git commit -m "chore: refresh coverage badge from CI run [skip ci]"
-            git push
+            git push || { sleep 5 && git pull --rebase --autostash origin master && git add .github/badges/coverage.svg && git commit -m "chore: refresh coverage badge from CI run [skip ci]" && git push; }
           fi
 
   lint:
@@ -183,4 +188,4 @@ jobs:
       - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: "1.27"
-      - run: go run github.com/larsartmann/go-branded-id/linter/cmd/brandid-lint@linter/v0.5.1 -rules BD003 .
+      - run: go run github.com/larsartmann/go-branded-id/linter/cmd/brandid-lint@v0.5.1 -rules BD003 .
