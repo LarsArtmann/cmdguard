@@ -158,6 +158,39 @@ With those types, `scan --depth 5` works, `scan --build` fails with "unknown fla
 
 `SilenceUsage` is also on by default, so a failed command prints its error without dumping the help text.
 
+## Replace your hand-rolled…
+
+Even a 100/100 cmdguard adopter still hand-rolled its exit-code ladder and a
+`version` command — both shipped features. If a CLI concern has you writing
+plumbing, delete it:
+
+| You are maintaining…                               | Delete it, use…                                                                  |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `fmt.Fprintln(os.Stderr, …)` + `os.Exit(1)` ladder | `cli.ExecuteAndExit(ctx)` — error printed exactly once, exit code mapped         |
+| A hand-rolled `version` cobra command              | `WithCLIVersion("1.0.0")` — the command registers itself                         |
+| An ad-hoc "is the DB up?" self-check               | auto-registered `doctor` + `do.HealthcheckerWithContext` services                |
+| "did you mean?" typo handling (or a TODO about it) | automatic — flag and command suggestions ship by default (`lst` suggests `list`) |
+| Manual SIGINT handling and service teardown        | `WithGracefulShutdown()` — ON by default in v5, reverse invocation order         |
+| A config loader with precedence bugs               | `WithConfigFile(paths…)` — flag → env → file → default, strict keys on           |
+| Usage dump on every error (cobra's default)        | `SilenceUsage` is true by default; `WithoutSilenceUsage()` opts back in          |
+
+**Every claim above is replayable — verify before trusting.** In a checkout of
+the [cmdguard repo](https://github.com/larsartmann/cmdguard):
+
+```bash
+# Zero panics: no Must* constructors exist in library code
+rg -n 'func Must' pkg/ --glob '!*_test.go'   # prints nothing
+
+# Duplicate commands rejected at registration (constructor validation)
+GOEXPERIMENT=jsonv2 go test ./pkg/cmdguard/v5 -run 'TestAddCommands_AtomicOnDuplicate' -count=1
+
+# DI underneath: samber/do/v2 in the module graph
+rg -n 'samber/do' go.mod
+
+# The machine contract, live from the flagship example
+(cd examples/taskctl && GOEXPERIMENT=jsonv2 go run . describe | head -8)
+```
+
 ## Gotchas
 
 - `PostRunE` does not run when `RunE` fails. Use `WithCleanup[T]`, which runs on both paths and joins cleanup errors with `errors.Join`.

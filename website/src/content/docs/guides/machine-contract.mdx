@@ -14,42 +14,79 @@ cannot model.
 the contract always reflects the finished tree. It is hidden, and it never
 enforces required flags, so it works before the caller knows any business flags.
 
+Real bytes from the flagship example (excerpt — `examples/taskctl`, command
+`taskctl describe`; the full document lists every command and inherited flag):
+
 ```bash
-$ myapp describe
+$ taskctl describe
 {
   "schema_version": "1",
-  "name": "myapp",
-  "short": "My CLI",
-  "version": "1.4.0",
+  "name": "taskctl",
+  "short": "A production-grade task manager CLI",
+  "version": "dev",
   "flags": [
     {
-      "name": "api-token",
+      "name": "data-dir",
+      "shorthand": "d",
       "type": "string",
-      "usage": "API token for authenticated calls",
-      "env": "MYAPP_API_TOKEN"
+      "default": "./data",
+      "usage": "Directory for task storage",
+      "env": "TASKCTL_TASK_DATA_DIR"
     },
     {
-      "name": "environment",
-      "shorthand": "e",
+      "name": "log-level",
+      "shorthand": "l",
       "type": "string",
-      "default": "dev",
-      "usage": "Target environment",
-      "env": "MYAPP_ENV",
-      "values": ["dev", "staging", "prod"]
+      "default": "info",
+      "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
+      "env": "TASKCTL_TASK_LOG_LEVEL"
+    },
+    {
+      "name": "verbose",
+      "shorthand": "v",
+      "type": "count",
+      "default": "0",
+      "usage": "Verbosity (-v, -vv, -vvv)",
+      "count": true
     }
+    /* … 8 more root flags … */
   ],
   "commands": [
     {
-      "name": "scan",
-      "path": "myapp scan",
-      "short": "Scan targets",
+      "name": "add",
+      "path": "taskctl add",
+      "short": "Add a new task",
+      "group": "tasks",
       "flags": [
-        { "name": "depth", "type": "int", "default": "1", "usage": "Scan depth" }
+        {
+          "name": "priority",
+          "shorthand": "P",
+          "type": "string",
+          "default": "medium",
+          "usage": "Priority",
+          "values": ["low", "medium", "high"]
+        },
+        {
+          "name": "title",
+          "shorthand": "t",
+          "type": "string",
+          "usage": "Task title",
+          "required": true,
+          "prompt": "Task title?",
+          "validate": "min=3"
+        }
+        /* … root flags repeat here, each marked "inherited": true … */
       ]
     }
+    /* … complete, completion, config, db, describe, doctor, done, inspect,
+       list, man, secret, stats, version … */
   ]
 }
 ```
+
+(The `/* … */` elisions above are the only non-verbatim part; `long`/`example`
+fields carry each command's help text verbatim and are omitted here for
+brevity.)
 
 ## What each flag carries
 
@@ -158,6 +195,32 @@ callers.
 
 Human-readable output stays useful too: the same failure prints one `Hint:`
 line, and typos get suggestions (`taskctl lst` → `Did you mean this? list`).
+
+### MCP recipe: one tool per command, generated from the contract
+
+cmdguard does not ship an MCP server; the contract makes one almost mechanical
+to write. An MCP wrapper for a cmdguard CLI needs exactly three moving parts:
+
+1. **At server startup**, run `describe` once and hold the parsed contract.
+   For each entry in `commands` (skip hidden ones — they carry `"hidden": true`),
+   declare an MCP tool whose `name` is the command's `path` joined with dashes
+   (`taskctl-add`) and whose `inputSchema` is derived from `flags`:
+   `string` → `{"type": "string"}` (+ `"enum"` from `values`), `int` →
+   `{"type": "integer"}`, `bool` → `{"type": "boolean"}`, `count` →
+   `{"type": "integer", "minimum": 0}`, plus `"required": [flags with
+   "required": true]`. Flags with `secret: true` stay out of tool
+   descriptions; they are supplied per-call, never logged.
+2. **Per tool call**, assemble argv from the arguments — `--flag value` per
+   key, repeated keys for count flags — and append `--output json` when the
+   CLI registered the output flag, so every failure comes back as the
+   envelope above.
+3. **On non-zero exit**, parse the JSON error envelope from stderr and return
+   `{ error_code, hint }` to the model as the tool's `isError` content. The
+   recovery table above turns a failed call into the model's next attempt
+   without any message-text parsing.
+
+Because `schema_version` only moves on a compatibility break, the wrapper can
+cache the contract across restarts and re-derive tools only when it changes.
 
 ## For tooling: schemas, not scraping
 

@@ -41,4 +41,9 @@ export const features: Feature[] = [
     title: "Cobra Escape Hatch",
     desc: "Keep raw cobra.Command subcommands beside typed ones. Gradual migration, no rewrite, no lock-in.",
   },
+  {
+    icon: "terminal",
+    title: "Strict Positional Args",
+    desc: "Since v5.1.0: WithStrictPositionalArgs rejects undeclared positional arguments, and WithArgsPassthrough re-accepts them explicitly. No more silent extras.",
+  },
 ];
