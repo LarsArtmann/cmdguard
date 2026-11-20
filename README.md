@@ -49,13 +49,13 @@ Other Go CLI frameworks give you flags. cmdguard gives you flags **plus** everyt
 rg -n 'func Must' pkg/ --glob '!*_test.go'   # prints nothing
 
 # Duplicate commands rejected at registration (constructor validation)
-go test ./pkg/cmdguard/v5 -run 'TestAddCommands_AtomicOnDuplicate' -count=1
+GOEXPERIMENT=jsonv2 go test ./pkg/cmdguard/v5 -run 'TestAddCommands_AtomicOnDuplicate' -count=1
 
 # DI underneath: samber/do/v2 in the module graph
 rg -n 'samber/do' go.mod
 
 # The machine contract, live from the flagship example
-(cd examples/taskctl && go run . describe | head -8)
+(cd examples/taskctl && GOEXPERIMENT=jsonv2 go run . describe | head -8)
 ```
 
 ### Replace your hand-rolled…
