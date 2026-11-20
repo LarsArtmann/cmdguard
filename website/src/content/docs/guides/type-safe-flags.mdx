@@ -95,13 +95,28 @@ An explicit flag beats an environment variable, which beats a config-file value,
 
 The `count:"true"` tag turns a field into a verbosity ladder: `-v` sets it to 1, `-vvv` to 3. The field must be an `int`, and counting flags must not reuse a root config flag name.
 
-## Validation Tags
+## Validation Rules
 
-- `values:"a,b,c"` rejects anything outside the list with `ErrInvalidEnum`.
-- `validate:"min=1,max=100"` compares lengths on strings and numeric bounds on numbers.
-- `validate:"minlen=3,maxlen=20"` is the explicit length form; `dmin`/`dmax` compare durations.
-- Built-in validators also include `email`, `url`, `nonempty`, and `regex=^pattern$`.
-- Defaults are validated at construction: a `default` outside the `values` list or bounds fails `NewCLI` with `ErrInvalidFlagDefault`, so a bad default never reaches users.
+Ten rules ship built in; this is the whole registry (source of truth: `flags_validate.go`). Combine any of them comma-separated in one `validate` tag. An unknown rule name fails with `ErrUnknownValidator`; a malformed parameter with `ErrInvalidValidatorParam`.
+
+| Rule | Parameter | Checks | Failure sentinel |
+| --- | --- | --- | --- |
+| `email` | — | RFC 5322 address (empty value passes) | `ErrInvalidEmail` |
+| `url` | — | Absolute URL with scheme (empty passes) | `ErrInvalidURL` |
+| `minlen=N` | integer (rune count) | string length ≥ N | `ErrValueTooShort` |
+| `maxlen=N` | integer (rune count) | string length ≤ N | `ErrValueTooLong` |
+| `min=N` | number | numeric value ≥ N | `ErrValueTooSmall` |
+| `max=N` | number | numeric value ≤ N | `ErrValueTooLarge` |
+| `dmin=D` | duration (e.g. `10s`) | duration value ≥ D | `ErrValueTooSmall` |
+| `dmax=D` | duration | duration value ≤ D | `ErrValueTooLarge` |
+| `regex=R` | Go regexp (RE2) | value matches R | `ErrValuePatternMismatch` |
+| `nonempty` | — | value not empty | `ErrValueEmpty` |
+
+`min`/`max` are type-aware: on string kinds (and `URL`/`Email`/`HostPort`/`FilePath`) they rewrite to length bounds; on durations (`Duration`, `time.Duration`) to duration bounds; on everything else they stay numeric. Prefer the explicit `minlen`/`maxlen`/`dmin`/`dmax` forms when you want the domain spelled out.
+
+`values:"a,b,c"` rejects anything outside the list with `ErrInvalidEnum`.
+
+Rules run against whatever the flag resolves to (flag → env → default), and tag defaults are re-checked at construction — an impossible default fails `NewCLI` with `ErrInvalidFlagDefault`, so a bad default never reaches users.
 
 `required:"true"` runs after parsing and is satisfied only by an explicit flag or a set environment variable, so a default cannot mask a missing credential.
 

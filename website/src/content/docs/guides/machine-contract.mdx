@@ -106,21 +106,66 @@ why the flag table in generated docs and the JSON contract cannot disagree.
 
 ## Driving a CLI from an agent
 
-A reliable loop looks like this:
+The whole loop, walked end-to-end — every output below is what a cmdguard CLI
+actually prints:
+
+**1. Discover the tree** (never scrape `--help`):
 
 ```bash
-# 1. Learn the tree.
 myapp describe > contract.json
-
-# 2. Build an invocation from the contract, then run it.
-myapp scan --depth 3 --environment prod
-
-# 3. On failure, read error_code and hint instead of guessing.
 ```
 
-The JSON error envelope carries the same machine vocabulary: `code` (the exit
-code), `error_code` (a stable snake_case identifier), and `hint` (one actionable
-fix). See [Error Handling](/guides/error-handling/).
+**2. Build the invocation from the contract and run it.** If the app wires a
+machine-readable output format (the app opts in with
+`WithOutputFormat(output.FormatJSON)`, which registers a `--output` flag), pass
+`--output json` so every failure comes back structured:
+
+```bash
+$ myapp add --output json
+```
+
+**3. Read the JSON error envelope** (printed to stderr — `type` is the error
+class, `message` the stable text, `hint` the actionable fix, `error_code` the
+stable machine identifier, `code` the process exit code):
+
+```json
+{
+  "error": {
+    "type": "flag",
+    "message": "command \"add\": required flag not set: \"name\" is missing",
+    "hint": "pass the flag on the command line, or set its env var or config-file value",
+    "error_code": "required_flag",
+    "code": 1
+  }
+}
+```
+
+**4. Decide the recovery from `error_code`, never from message text** — codes
+are stable across releases even when messages change:
+
+| `error_code`         | The agent's recovery                                          |
+| -------------------- | ------------------------------------------------------------- |
+| `required_flag`      | Supply the flag (or its env var) named in the message          |
+| `flag_not_found`     | Fix the spelling — the contract lists the accepted names       |
+| `value_out_of_range` | Re-read the flag's `type`/bounds in the contract and retry     |
+| `config_unknown_key` | Drop or rename the config key (the message suggests the fix)   |
+| `command_timeout`    | Retry with a longer deadline or check the underlying operation |
+
+The full table of all 62 codes with hints lives in the generated
+[Error Reference](https://github.com/larsartmann/cmdguard/blob/master/docs/ERROR_REFERENCE.md);
+`ErrorCode(err)` / `ErrorHint(err)` expose the same vocabulary to programmatic
+callers.
+
+Human-readable output stays useful too: the same failure prints one `Hint:`
+line, and typos get suggestions (`taskctl lst` → `Did you mean this? list`).
+
+## For tooling: schemas, not scraping
+
+- [Schema Generation](/guides/schema/) — `schema.FromCLI` and `schema.FromConfig`
+  turn the same tags into a JSON Schema 2020-12 document, so config-file
+  validation for your CLI's users is generated, not hand-written.
+- `cli.Describe()` / `cli.WriteDescription(w)` give tests and harnesses the
+  contract in-process, no subprocess needed.
 
 ## Where to go next
 

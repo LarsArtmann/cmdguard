@@ -111,10 +111,10 @@ With both options, `myapp set de<TAB>` offers `debug`, and `myapp set trace` fai
 | `WithMaximumArgs(n)` | At most `n` arguments |
 | `WithRangeArgs(min, max)` | Between `min` and `max` arguments, inclusive |
 | `WithNoArgs()` | Reject every positional argument |
-| `WithStrictPositionalArgs()` | Reject positionals when no other validator is set |
-| `WithArgsPassthrough()` | Accept any positionals and ignore extras |
+| `WithStrictPositionalArgs()` | Reject positionals when no other validator is set (since v5.1.0) |
+| `WithArgsPassthrough()` | Accept any positionals and ignore extras (since v5.1.0) |
 
-`WithStrictPositionalArgs` is opt-in today. It only applies when no other validator was configured; an explicit `WithExactArgs`, `WithNoArgs`, or `WithArgs` wins. `WithArgsPassthrough` pins the current permissive behavior and will be the opt-out if the strict default lands.
+`WithStrictPositionalArgs` is opt-in today (both flags ship since v5.1.0 — they do not exist at a v5.0.0 pin). It only applies when no other validator was configured; an explicit `WithExactArgs`, `WithNoArgs`, or `WithArgs` wins. `WithArgsPassthrough` pins the current permissive behavior and will be the opt-out if the strict default lands.
 
 Opt in per command when a zero-argument command must never silently swallow stray positionals:
 
