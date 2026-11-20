@@ -344,3 +344,7 @@ Other:
 - **Exported `SanitizeFilename`** — useful for other modules
 - **`Start()` returning a cleanup `func()`** — defer ergonomics
 - **`WithFlightRecorderAutoStop`** — stop the recorder after the first capture
+
+## Adoption-surface candidates (2026-11-20)
+
+- Items 17-45 of docs/status/2026-11-20_12-29_fleet-audit-findings-execution-status.md §f — refine into bounded TODO_LIST rows when picked up
