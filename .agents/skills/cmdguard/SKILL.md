@@ -366,5 +366,11 @@ missing `WithCLIVersion`. Suppress with `//cmdguard-lint:ignore <ID> <reason>`.
 - **go-aichat** — a chat back-end deserves a cmdguard-driven CLI for probing and
   ops: typed flags for model/temperature, `Enum`/`LogLevel` value types, config
   files for per-provider defaults, and `describe` so agents can drive the probe.
+- **samber-do-best-practices skill** — cmdguard's `Scope` IS samber/do/v2, so the
+  DO-1 → DO-6 rules apply to every service a CLI registers: audit `v5.Provide`
+  registrations and their shutdown/health-checker interfaces with that skill.
+- **templ-components** — a templ-components web app renders the UI; cmdguard is
+  its operational twin: a `NewApp`-built admin CLI over the same DI scope, with
+  `doctor` surfacing the web app's health checks.
 - **stack-selection skill** — when a new project needs a CLI, its inventory
   routes to cmdguard for anything user-facing.
