@@ -167,44 +167,44 @@ Session task: execute all 10 findings from
 ## f) NEXT — prioritized, each routed (harvest + ROADMAP umbrella)
 
 1. Watch the first master CI run after push: badge Generate/Commit steps green, push lands, README badge image resolves → TODO_LIST SU24
-2. Drift-guard test: README validate-rules table must match the `flags_validate.go` registry (docgen_drift_test pattern) → TODO_LIST SU25
-3. Drift-guard test: 13-tag Flag Tags Reference must match the `FlagTag` struct → TODO_LIST SU26
-4. Build-time include: README + website type-safe-flags share one validate-rules source → TODO_LIST SU27
-5. Website mirrors: "Replace your hand-rolled", "How to verify", features.ts since-parity → TODO_LIST SU28
-6. machine-contract.mdx: paste real taskctl describe bytes; add MCP-facing recipe → TODO_LIST SU29
-7. Reciprocity pass 2: samber-do-best-practices / templ-components / remaining skills + sibling README mentions → TODO_LIST SU30
-8. CI badge hardening: in-step SVG XML check; `pull --rebase --autostash` + retry-once → TODO_LIST SU31
-9. SKILL.md: re-verify CG001-CG008 row against lint/rules.go (📖→✅); derive-or-drop the rotting taskctl-87 count → TODO_LIST SU32
-10. Audit docs/QUICKSTART.md + docs/TUTORIAL.md for v5.1.0 since-gaps → TODO_LIST SU33
-11. Non-destructive resolution banner on docs/reviews/2026-11-17 report (all 10 findings resolved 2026-11-20) → TODO_LIST SU34
-12. Run the full buildflow battery (build + test + lint, all modules) — this session ran fmt + targeted tests only → TODO_LIST SU35
-13. Decide AGENTS.md's hand-stamped 89.3% coverage mentions: date-stamp or link the badge → TODO_LIST SU36
-14. Resolve Codecov: activate larsartmann/cmdguard there, or delete the now-redundant CI upload step → TODO_LIST SU37 (blocked on §g Q1)
-15. Land SU22 (2026-11-08_02-29 archive batch, ~65 verdicts) → TODO_LIST SU22 (existing)
-16. Land SU23 (2026-10-04 pair, 125 prose items) — greens the cadence gate → TODO_LIST SU23 (existing)
-17. Wire `WithOutputFormat(output.FormatJSON)` into examples/taskctl so the flagship demonstrates the JSON error envelope live → ROADMAP candidates (SU38 umbrella)
-18. Add the coverage badge to the website (hero strip or features data) → ROADMAP candidates
-19. Mark `.github/badges/coverage.svg` linguist-generated in .gitattributes → ROADMAP candidates
-20. README length watch: 801/900-line gate — split Flag Tags Reference + Validate rules into docs/FLAGS_REFERENCE.md when crossed → ROADMAP candidates
-21. Add `nix run .#check-all` as the umbrella verify line in the README verify-block → ROADMAP candidates
-22. Website recovery table: link each error_code row to its ERROR_REFERENCE anchor → ROADMAP candidates
-23. Mirror the recovery-decision table into error-handling.mdx → ROADMAP candidates
-24. External-link HEAD checker in CI (link checker is internal-only today; badge URL 404s until first CI run) → ROADMAP candidates
-25. website changelog.mdx re-sync check at the next release cut → ROADMAP candidates
-26. DOMAIN_LANGUAGE.md: add ValidateRule / coverage-badge domain terms → ROADMAP candidates
-27. Scripted parity check: README trinity table vs website comparisons.ts → ROADMAP candidates
-28. Re-baseline fleet-review corpus counts (audit said 23/18; filesystem has 28/23) at the next audit → ROADMAP candidates
-29. SKILL.md deeper-truth: link the website guides (currently repo-docs only) → ROADMAP candidates
-30. Website "Works with" section mirroring SKILL.md fleet pairings → ROADMAP candidates
-31. CI: shellcheck the workflow run-blocks (badge heredoc) → ROADMAP candidates
-32. Reference the describe golden-test fixture from machine-contract.mdx so doc bytes are pinned → ROADMAP candidates
-33. FEATURES.md: since-column concept for versioned entries → ROADMAP candidates
-34. Evaluate a cmdguard-lint doc-rule (CG009?) flagging new public options without since-annotations → ROADMAP candidates
-35. Fleet-share the CI-committed-badge pattern to sibling repos → ROADMAP candidates
-36. Fold CHANGELOG [Unreleased] into the next version cut (v5.1.1/v5.2.0) → ROADMAP candidates
-37. Re-run check-guide-sync + link check against the LIVE site post-deploy (smoke exists; add guide-sync) → ROADMAP candidates
-38. config-explain example README since-check → ROADMAP candidates
-39. CI badge on release/**: currently master-only by design — confirm that stays intended → ROADMAP candidates
+~~2. Drift-guard test: README validate-rules table must match the `flags_validate.go` registry (docgen_drift_test pattern) → TODO_LIST SU25~~ done — 2026-11-20: docs_tables_drift_test.go pins the README validate table to registerBuiltins
+~~3. Drift-guard test: 13-tag Flag Tags Reference must match the `FlagTag` struct → TODO_LIST SU26~~ done — 2026-11-20: same test reflects FlagTag fields and pins the README 13-tag table + the .agents tag-set line
+~~4. Build-time include: README + website type-safe-flags share one validate-rules source → TODO_LIST SU27~~ done — 2026-11-20: same test also pins the website type-safe-flags.mdx copy to the one registry
+~~5. Website mirrors: "Replace your hand-rolled", "How to verify", features.ts since-parity → TODO_LIST SU28~~ done — 2026-11-20: migrating-from-cobra.mdx gained hand-rolled + verify sections; features.ts gained the since-v5.1.0 card
+~~6. machine-contract.mdx: paste real taskctl describe bytes; add MCP-facing recipe → TODO_LIST SU29~~ done — 2026-11-20: real taskctl describe excerpt + MCP recipe landed in machine-contract.mdx
+~~7. Reciprocity pass 2: samber-do-best-practices / templ-components / remaining skills + sibling README mentions → TODO_LIST SU30~~ done — 2026-11-20: SKILL entries + sibling pairings committed (SKILLS 7d14347, templ-components bc369053)
+~~8. CI badge hardening: in-step SVG XML check; `pull --rebase --autostash` + retry-once → TODO_LIST SU31~~ done — 2026-11-20: ci.yml badge step carries SVG sanity greps + pull --rebase --autostash + retry-once
+~~9. SKILL.md: re-verify CG001-CG008 row against lint/rules.go (📖→✅); derive-or-drop the rotting taskctl-87 count → TODO_LIST SU32~~ done — 2026-11-20: row flipped Verified against lint/rules.go:17-24; 87 re-derived from grep -c 'func Test'
+~~10. Audit docs/QUICKSTART.md + docs/TUTORIAL.md for v5.1.0 since-gaps → TODO_LIST SU33~~ done — 2026-11-20: since-v5.1.0 positional-args notes added to both walkthroughs
+~~11. Non-destructive resolution banner on docs/reviews/2026-11-17 report (all 10 findings resolved 2026-11-20) → TODO_LIST SU34~~ done — 2026-11-20: resolution banner added to the fleet report HTML
+~~12. Run the full buildflow battery (build + test + lint, all modules) — this session ran fmt + targeted tests only → TODO_LIST SU35~~ done — 2026-11-20: nix run .#check-all green across all 16 packages + full golangci-lint run ./... 0 issues
+~~13. Decide AGENTS.md's hand-stamped 89.3% coverage mentions: date-stamp or link the badge → TODO_LIST SU36~~ done — 2026-11-20: AGENTS.md coverage mentions date-stamped, badge named as live source
+~~14. Resolve Codecov: activate larsartmann/cmdguard there, or delete the now-redundant CI upload step → TODO_LIST SU37 (blocked on §g Q1)~~ done — 2026-11-20: Codecov upload removed from ci.yml; the CI-committed SVG stays the source of truth
+~~15. Land SU22 (2026-11-08_02-29 archive batch, ~65 verdicts) → TODO_LIST SU22 (existing)~~ done — 2026-11-20: 2026-11-08_02-29 annotated (68 verdicts) and archived
+~~16. Land SU23 (2026-10-04 pair, 125 prose items) — greens the cadence gate → TODO_LIST SU23 (existing)~~ done — 2026-11-20: both 2026-10-04 reports annotated (60+65) and archived; cadence additionally needed the 2026-10-04_12-21 batch
+17. Wire `WithOutputFormat(output.FormatJSON)` into examples/taskctl so the flagship demonstrates the JSON error envelope live → ROADMAP candidates (SU38 umbrella) **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+18. Add the coverage badge to the website (hero strip or features data) → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+19. Mark `.github/badges/coverage.svg` linguist-generated in .gitattributes → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+20. README length watch: 801/900-line gate — split Flag Tags Reference + Validate rules into docs/FLAGS_REFERENCE.md when crossed → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+21. Add `nix run .#check-all` as the umbrella verify line in the README verify-block → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+22. Website recovery table: link each error_code row to its ERROR_REFERENCE anchor → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+23. Mirror the recovery-decision table into error-handling.mdx → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+24. External-link HEAD checker in CI (link checker is internal-only today; badge URL 404s until first CI run) → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+25. website changelog.mdx re-sync check at the next release cut → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+26. DOMAIN_LANGUAGE.md: add ValidateRule / coverage-badge domain terms → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+27. Scripted parity check: README trinity table vs website comparisons.ts → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+28. Re-baseline fleet-review corpus counts (audit said 23/18; filesystem has 28/23) at the next audit → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+29. SKILL.md deeper-truth: link the website guides (currently repo-docs only) → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+30. Website "Works with" section mirroring SKILL.md fleet pairings → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+31. CI: shellcheck the workflow run-blocks (badge heredoc) → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+32. Reference the describe golden-test fixture from machine-contract.mdx so doc bytes are pinned → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+33. FEATURES.md: since-column concept for versioned entries → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+34. Evaluate a cmdguard-lint doc-rule (CG009?) flagging new public options without since-annotations → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+35. Fleet-share the CI-committed-badge pattern to sibling repos → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+36. Fold CHANGELOG [Unreleased] into the next version cut (v5.1.1/v5.2.0) → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+37. Re-run check-guide-sync + link check against the LIVE site post-deploy (smoke exists; add guide-sync) → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+38. config-explain example README since-check → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
+39. CI badge on release/**: currently master-only by design — confirm that stays intended → ROADMAP candidates **→ ROADMAP.md Adoption-surface candidates (2026-11-20)**
 40. SKILL.md verification-table refresh cadence: quarterly date-stamp sweep → ROADMAP candidates
 41. docs/CLI_DESIGN_PRINCIPLES.md staleness sweep (untouched this session) → ROADMAP candidates
 42. Consider shields-style JSON endpoint badge later; today the committed SVG wins (recorded decision) → ROADMAP candidates
