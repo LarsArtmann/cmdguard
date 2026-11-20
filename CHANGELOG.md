@@ -7,6 +7,20 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Changed
+
+- **Adoption-surface overhaul** from the 41-review fleet audit
+  (`docs/reviews/2026-11-17_16-14_cmdguard-docs-marketing-ai-skills-41-reviews.html`,
+  all 10 findings resolved): README gains a "Replace your hand-rolled"
+  conversion table, a replayable "verify before trusting" block, the 13-tag
+  Flag Tags Reference (adds `prompt`/`secret`), and the complete 10-rule
+  validate registry; SKILL.md sentinel counts derive from the generated
+  ERROR_REFERENCE (62, closing the 59-vs-62 split); v5.1.0-only flags carry
+  since-annotations across README, website, and SKILL.md; the machine contract
+  document walks the full agent loop with real output; CI generates and
+  commits the README coverage badge (`.github/badges/coverage.svg`), retiring
+  the hand-maintained static badge.
+
 ## [5.1.0] - 2026-11-11
 
 ### Added

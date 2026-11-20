@@ -5,7 +5,7 @@
 [![CI](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![Website](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml/badge.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/website.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/cmdguard/v5.svg)](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)
-[![Coverage](https://raw.githubusercontent.com/LarsArtmann/cmdguard/master/.github/badges/coverage.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
+[![Coverage](https://raw.githubusercontent.com/larsartmann/cmdguard/master/.github/badges/coverage.svg)](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **[Website](https://cmdguard.lars.software)** · **[Docs](https://cmdguard.lars.software/getting-started/installation/)** · **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5)**
