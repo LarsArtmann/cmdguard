@@ -33,14 +33,14 @@ unless the Source column says otherwise.
 | Local-flag default + env still apply on commands lacking the flag                                       | ✅ Verified        | `flags_parse.go:46-58`                                                                                 |
 | Precedence: flag → env → default (default pre-updated by config file)                                   | ✅ Verified        | `flags_parse.go:46-71` + `cli.go:278` (`updateTagDefaultsFromConfig`)                                  |
 | `cli.RegisterLocalCommandFlags(cmd)` opts a subcommand into root-local flags                            | ✅ Verified        | `cli_accessors.go:108`, `flags.go:148` (subcommand's own flag definition wins)                         |
-| Full tag set: flag, short, default, help, values, required, count, local, hidden, validate, env, prompt | ✅ Verified        | `config_parsing.go:120-302`, `FlagTag` struct at `config.go:20-36`                                     |
+| Full tag set: flag, short, default, help, values, required, count, local, hidden, validate, env, prompt, secret | ✅ Verified        | `config_parsing.go:120-302`, `FlagTag` struct at `config.go:20-36`                                     |
 | Nested config structs recurse (except registered value types)                                           | ✅ Verified        | `config_parsing.go:78`                                                                                 |
 | `ArgsFromContext(ctx)` retrieves positional args                                                        | ✅ Verified        | `cli_command.go:19`                                                                                    |
 | v5 defaults: batteries, strict validation, signal handling, graceful shutdown, strict config keys ON     | ✅ Verified        | `cli.go:175-179` + `cli_defaults_matrix_test.go`                                                       |
 | `Builder` API: `NewBuilder` + `Add`/`AddParent`/`Try`/`Check`/`Build`                                   | ✅ Verified        | `cli_builder.go` + `cli_builder_test.go`                                                               |
 | Renames: `CommandMetadata` (was CommandInfo), `TypeCodec` (was TypeHandler), `HuhPrompter` (was HuhRunner) | ✅ Verified     | `middleware.go:65`, `type_codec.go:13`, `prompts/prompts.go:27`                                        |
 | pkg.go.dev page for the package exists (v4.1.0)                                                         | ✅ Verified        | Fetched live 2026-10-16 (v4 predecessor); v5.0.0 verified at release                                   |
-| 59 exported sentinel error vars; 86 test funcs in `examples/taskctl`                                    | ✅ Verified        | `rg` over `errors*.go` / taskctl tests, 2026-11-08                                                     |
+| 62 documented sentinel errors (generated from the canonical fact table); 87 test funcs in `examples/taskctl`  | ✅ Verified        | Derived, never hand-counted (2026-11-20): `rg -c '^\\| `' docs/ERROR_REFERENCE.md` sentinel rows = 62 via the generated table header; `grep -c 'func Test' examples/taskctl/*.go` = 87 |
 | CG001-CG008 lint rule semantics                                                                         | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                                      |
 | `Describe()` / hidden `describe` command contract                                                       | ✅ Verified        | `pkg/cmdguard/v5/describe.go` + `describe_test.go`, 2026-11-01                                         |
 | `AddCommands` atomic batch registration                                                                 | ✅ Verified        | `pkg/cmdguard/v5/cli.go` + `describe_test.go` (atomicity, mixed F, name-keyed duplicates), 2026-11-01  |
@@ -77,7 +77,8 @@ cli.ExecuteAndExit(ctx) // blessed entry point
   unless it carries a validator. `WithStrictPositionalArgs()` rejects undeclared
   ones (inert when an explicit validator like `WithExactArgs` is already set);
   `WithArgsPassthrough()` explicitly accepts and ignores extras
-  (`command_options.go`; matrix pinned by `cli_args_strict_test.go`).
+  (`command_options.go`; matrix pinned by `cli_args_strict_test.go`). Both
+  flags ship since v5.1.0 (2026-11-11) — they do not exist at a v5.0.0 pin.
 
 ### The Builder — no error ladder
 
@@ -247,7 +248,7 @@ A field becomes a flag only when it has a `flag` tag (`flag:"-"` skips it).
 | `count:"true"`             | Counting flag (`-vvv` → 3); field must be `int` (bool tag)                                 |
 | `local:"true"`             | Owning command only, not inherited (bool tag)                                              |
 | `hidden:"true"`            | Excluded from `--help`, fully functional (bool tag)                                        |
-| `validate:"min=1,max=100"` | Rule-based validation; `min`/`max` = length on strings, numeric otherwise                  |
+| `validate:"email,min=5"`   | Rule list enforced after parsing (and against defaults at construction); the canonical rule table lives in the README “Validate Rules” section and [Type-Safe Flags guide](https://cmdguard.lars.software/guides/type-safe-flags/) — never restate counts or rule lists here | `validate:"minlen=3"`      |
 | `env:"VAR_NAME"`           | Environment fallback (prefixable via `WithEnvPrefix`)                                      |
 | `prompt:"Question?"`       | Interactive prompt when missing (needs `WithPromptOnMissing` + the `prompts` sub-module)   |
 | `secret:"true"`            | Value is redacted to `***` in `config explain`, the contract, docs, and schemas (bool tag) |
