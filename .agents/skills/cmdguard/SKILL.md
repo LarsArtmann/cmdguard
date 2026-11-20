@@ -40,7 +40,7 @@ unless the Source column says otherwise.
 | `Builder` API: `NewBuilder` + `Add`/`AddParent`/`Try`/`Check`/`Build`                                   | ✅ Verified        | `cli_builder.go` + `cli_builder_test.go`                                                               |
 | Renames: `CommandMetadata` (was CommandInfo), `TypeCodec` (was TypeHandler), `HuhPrompter` (was HuhRunner) | ✅ Verified     | `middleware.go:65`, `type_codec.go:13`, `prompts/prompts.go:27`                                        |
 | pkg.go.dev page for the package exists (v4.1.0)                                                         | ✅ Verified        | Fetched live 2026-10-16 (v4 predecessor); v5.0.0 verified at release                                   |
-| 62 documented sentinel errors (generated from the canonical fact table); 87 test funcs in `examples/taskctl`  | ✅ Verified        | Derived, never hand-counted (2026-11-20): `rg -c '^\\| `' docs/ERROR_REFERENCE.md` sentinel rows = 62 via the generated table header; `grep -c 'func Test' examples/taskctl/*.go` = 87 |
+| 62 documented sentinel errors (generated from the canonical fact table); 87 test funcs in `examples/taskctl`  | ✅ Verified        | Derived, never hand-counted (2026-11-20): `rg -c '^\| `[a-z_]+`\ +\| `Err' docs/ERROR_REFERENCE.md` = 62 (matches the generated "62 sentinels" header); `grep -c 'func Test' examples/taskctl/*.go` = 87 |
 | CG001-CG008 lint rule semantics                                                                         | 📖 Repo-documented | cmdguard AGENTS.md (lint section) — not independently re-verified                                      |
 | `Describe()` / hidden `describe` command contract                                                       | ✅ Verified        | `pkg/cmdguard/v5/describe.go` + `describe_test.go`, 2026-11-01                                         |
 | `AddCommands` atomic batch registration                                                                 | ✅ Verified        | `pkg/cmdguard/v5/cli.go` + `describe_test.go` (atomicity, mixed F, name-keyed duplicates), 2026-11-01  |
@@ -346,11 +346,25 @@ missing `WithCLIVersion`. Suppress with `//cmdguard-lint:ignore <ID> <reason>`.
 - `docs/QUICKSTART.md`, `docs/TUTORIAL.md` — guided walkthroughs (v5-current)
 - `docs/MIGRATION_v4_v5.md` + `docs/migration_v4_v5/codemod.sh` — the v4→v5 path
 - `docs/ERROR_REFERENCE.md` — the sentinel error catalog
+- `README.md` — the Flag Tags Reference (13-tag superset) and Validate Rules table (all 10 rules): the canonical surfaces other docs point at
 - `docs/MIGRATION_FROM_COBRA.md`, `docs/MIGRATION_v3_v4.md` — older migration paths
 - `docs/COBRA_FOOTGUNS.md` — cobra behaviors cmdguard neutralizes
 - `pkg/cmdguard/v5/flags.go`, `cli_command.go`, `cli.go`, `flags_parse.go` — flag
   scoping and precedence source of truth
 - `pkg/cmdguard/v5/cli_flag_scoping_test.go`, `flags_scoped_test.go` — scoping
   regression tests (end-to-end and registry-level)
-- `examples/taskctl/` — flagship example (86 test functions)
+- `examples/taskctl/` — flagship example (87 test functions)
 - pkg.go.dev/github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5 — godoc
+
+## Works with (fleet pairings)
+
+- **go-cqrs-lite / cqrs-htmx service + cmdguard ops CLI** — the service stack owns
+  the domain; a cmdguard CLI (`NewApp` + `Builder`) is the ops/admin surface over
+  it: one subcommand per use case, DI-provided clients via `v5.Provide`, DI
+  health checks surfaced by the auto `doctor` command. taskctl
+  (`examples/taskctl/`) is the flagship pattern to copy.
+- **go-aichat** — a chat back-end deserves a cmdguard-driven CLI for probing and
+  ops: typed flags for model/temperature, `Enum`/`LogLevel` value types, config
+  files for per-provider defaults, and `describe` so agents can drive the probe.
+- **stack-selection skill** — when a new project needs a CLI, its inventory
+  routes to cmdguard for anything user-facing.
