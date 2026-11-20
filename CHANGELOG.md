@@ -7,6 +7,14 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 ## [Unreleased]
 
+### Added
+
+- **Doc-table drift tripwires.** `docs_tables_drift_test.go` pins the root
+  validate-verb table to the live `registerBuiltins()` registry, the 13-tag
+  table and the `.agents` tag-set line to the `FlagTag` fields, and the
+  website's validate-table copy to the same registry — hand-kept copies can no
+  longer drift from code.
+
 ### Changed
 
 - **Adoption-surface overhaul** from the 41-review fleet audit
@@ -20,6 +28,20 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   document walks the full agent loop with real output; CI generates and
   commits the README coverage badge (`.github/badges/coverage.svg`), retiring
   the hand-maintained static badge.
+
+### Fixed
+
+- **Master CI red trio from 2026-11-20.** The coverage-stamp commit step
+  aborts no more on a dirty index (`git pull --rebase --autostash` + one
+  retry + an SVG sanity grep gate); the branded-ID gate pin
+  `@linter/v0.5.1` was an invalid `go run` version string and now resolves
+  as `@v0.5.1`; the Codecov upload was REMOVED (repo not activated there:
+  tokenless uploads rejected, its external SVG served "unknown" — the
+  CI-committed SVG stays the source of truth).
+- **Website builds again.** A dependency-bump re-resolution paired
+  `@emnapi/runtime@2.0.0-beta.2` with `@emnapi/core@1.11.3`, crashing
+  astro's typechecker on boot ("this.bridge.setLastError is not a function");
+  pnpm-workspace.yaml overrides now pin the emnapi family to 1.11.3.
 
 ## [5.1.0] - 2026-11-11
 
