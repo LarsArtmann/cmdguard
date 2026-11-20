@@ -16,7 +16,7 @@ server-side. Report written 2026-11-20 12:29 CET; session ran ~10:55-12:35 CET.
 Session task: execute all 10 findings from
 `docs/reviews/2026-11-17_16-14_cmdguard-docs-marketing-ai-skills-41-reviews.html`.
 
-## §a FULLY DONE
+## a) FULLY DONE
 
 1. **F1 — validate-rule registry documented.** Canonical 10-rule table (rule /
    parameter / checks / failure sentinel) plus the type-aware `min`/`max`
@@ -81,7 +81,7 @@ Session task: execute all 10 findings from
     TODO_LIST SU23 (cadence-archive routing, pre-flighted SAFE); AGENTS.md
     decision block; docs-gates battery re-run green on all living-doc gates.
 
-## §b PARTIALLY DONE
+## b) PARTIALLY DONE
 
 1. **F8 breadth.** 3 sibling skills done; sibling READMEs untouched; other
    plausible skills (samber-do-best-practices, templ-components, …) not
@@ -104,7 +104,7 @@ Session task: execute all 10 findings from
    build/test/lint battery did not (docs + one workflow file were the only
    functional changes — SU35).
 
-## §c NOT STARTED
+## c) NOT STARTED
 
 1. Drift guards for the new tables: nothing fails CI if someone edits the
    README validate-rules table or tag table away from source (SU25/SU26).
@@ -120,7 +120,7 @@ Session task: execute all 10 findings from
    (SU33-SU36).
 5. Everything in §f items 15+ (ROADMAP umbrella — candidates, not commitments).
 
-## §d TOTALLY FUCKED UP
+## d) TOTALLY FUCKED UP
 
 1. **README multiedit double-anchor bug (worst of session).** Two edits in one
    multiedit anchored the same `hidden` tag row: the row was consumed and a
@@ -144,7 +144,7 @@ Session task: execute all 10 findings from
    set machine-wide by the dev environment; a fresh clone would have failed.
    Fixed this session (prefixes added), but it shipped broken for a window.
 
-## §e WHAT WE SHOULD IMPROVE
+## e) WHAT WE SHOULD IMPROVE
 
 1. **Multiedit anchor discipline:** never batch two edits that anchor the same
    line; verify anchor uniqueness first; grep the whole region immediately
@@ -164,7 +164,7 @@ Session task: execute all 10 findings from
 6. **Fleet review corpus counts rot:** the audit says 23/18 reviews; the
    filesystem holds 28/23 today — next audit should re-baseline (noted §f).
 
-## §f NEXT — prioritized, each routed (harvest + ROADMAP umbrella)
+## f) NEXT — prioritized, each routed (harvest + ROADMAP umbrella)
 
 1. Watch the first master CI run after push: badge Generate/Commit steps green, push lands, README badge image resolves → TODO_LIST SU24
 2. Drift-guard test: README validate-rules table must match the `flags_validate.go` registry (docgen_drift_test pattern) → TODO_LIST SU25
@@ -212,7 +212,7 @@ Session task: execute all 10 findings from
 44. docs-generator example: show GenerateDocs/describe parity → ROADMAP candidates
 45. README Documentation list: link the machine-contract guide explicitly (agent story is README-absent today) → ROADMAP candidates
 
-## §g QUESTIONS (cannot resolve myself)
+## g) QUESTIONS (cannot resolve myself)
 
 1. **Codecov:** do you want larsartmann/cmdguard activated on Codecov (owner
    dashboard action — uploads already succeed via OIDC), or should I delete

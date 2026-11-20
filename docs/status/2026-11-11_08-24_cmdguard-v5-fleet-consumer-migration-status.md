@@ -361,7 +361,7 @@ All 30 modules pass `go build ./...`:
 15. Fix pma's health-probe panics (`Routes.Version` without `WithVersion`). **→ TODO_LIST Fleet follow-ups FM4 (repo: projects-management-automation)**
 16. Fix go-cqrs-lite `doc-check` path resolution (module lives at `cmd/…/v4`).
 17. Fix/skip the two hanging `cqrs-lint` `go/packages` tests in offline CI. **→ TODO_LIST Fleet follow-ups FM5 (repo: go-cqrs-lite)**
-18. Commit `cv`'s migration (20 files). **→ TODO_LIST FM7 (repo: cv) — commit the migration**
+18. ~~Commit `cv`'s migration (20 files). **→ TODO_LIST FM7 (repo: cv) — commit the migration**~~ done — cv origin/master carries the migration; local fork preserved on branch local-fork-backup-20261111 (FM7 struck 2026-11-11: SUPERSEDED, another active session landed it)
 19. Run `golangci-lint run ./...` in all 26 repos; triage findings.
 20. Run `go vet ./...` in all 26 repos. **→ TODO_LIST FM8 (fleet-wide consumer sweep)**
 21. Run `go test -race ./...` in all 26 repos. **→ TODO_LIST FM8 (fleet-wide consumer sweep)**
