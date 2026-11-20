@@ -555,15 +555,28 @@ func TestRegistryCoverageReportsWalkedFiles(t *testing.T) {
 
 		files, skipped := cov.Coverage(context.Background(), dir)
 		if files != 3 {
-			t.Errorf("coverage of %s = %d files, want 3 (one.go, two.go, sub/three.go; the generated and broken files were not examined)", rule.ID(), files)
+			t.Errorf(
+				"coverage of %s = %d files, want 3 (one.go, two.go, sub/three.go; the generated and broken files were not examined)",
+				rule.ID(),
+				files,
+			)
 		}
 
 		if skipped != nil {
-			t.Errorf("skipped modules of %s = %v, want nil (the walker tracks no nested go.mod roots)", rule.ID(), skipped)
+			t.Errorf(
+				"skipped modules of %s = %v, want nil (the walker tracks no nested go.mod roots)",
+				rule.ID(),
+				skipped,
+			)
 		}
 	}
 
 	if want := 3 * len(rules); report.Summary.FilesScanned != want {
-		t.Errorf("summary filesScanned = %d, want %d (%d rules x 3 files)", report.Summary.FilesScanned, want, len(rules))
+		t.Errorf(
+			"summary filesScanned = %d, want %d (%d rules x 3 files)",
+			report.Summary.FilesScanned,
+			want,
+			len(rules),
+		)
 	}
 }

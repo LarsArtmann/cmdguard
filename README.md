@@ -64,8 +64,8 @@ Even a 100/100 cmdguard adopter still hand-rolled its exit-code ladder and a
 `version` command — both shipped features. If a CLI concern has you writing
 plumbing, delete it:
 
-| You are maintaining…                             | Delete it, use…                                                                  |
-| ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| You are maintaining…                               | Delete it, use…                                                                  |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `fmt.Fprintln(os.Stderr, …)` + `os.Exit(1)` ladder | `cli.ExecuteAndExit(ctx)` — error printed exactly once, exit code mapped         |
 | A hand-rolled `version` cobra command              | `WithCLIVersion("1.0.0")` — the command registers itself                         |
 | An ad-hoc "is the DB up?" self-check               | auto-registered `doctor` + `do.HealthcheckerWithContext` services                |
@@ -243,34 +243,34 @@ HELLO, CMDGUARD!
 
 ## Features
 
-| Category                   | Highlights                                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups                                                             |
-| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                                                                     |
-| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks                                                              |
-| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                                                                            |
-| **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more                                                                    |
-| **Signal handling**        | ON by default (v5) — Ctrl+C cancels the run; `WithoutSignalHandling()` opts out                                                                              |
-| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                             |
-| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                               |
-| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                                         |
-| **Batteries included**     | ON by default in v5: strict validation, signals + graceful shutdown, strict config keys, version/doctor commands, hints — `WithoutBatteries()` drops the set |
-| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                                            |
-| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                                |
-| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                                |
-| **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                                  |
-| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                                      |
-| **Extensible types**       | `RegisterTypeCodec()` for custom flag types with full parse/validate support                                                                                 |
-| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own; spinner/telemetry/flight-recorder available as [sub-modules](#optional-sub-modules)             |
-| **Interactive prompts**    | `WithPromptOnMissing()` with `prompt:"Question?"` tag via huh                                                                                                |
-| **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                                                     |
-| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                                                                            |
-| **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                                                                                  |
-| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithStrictPositionalArgs`/`WithArgsPassthrough` (since v5.1.0), or custom                 |
-| **Zero panics**            | All functions return errors; no Must\* panic variants                                                                                                        |
-| **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                                                      |
-| **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                                                |
-| **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                                                           |
+| Category                   | Highlights                                                                                                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type-safe flags**        | Struct tags (`flag`, `short`, `default`, `help`, `env`, `required`, `count`) — no string lookups                                                                                                  |
+| **Per-command flag types** | Each `Command[T, F]` has its own `F` — mix different flag structs freely                                                                                                                          |
+| **Dependency injection**   | Built-in [samber/do/v2](https://github.com/samber/do) with `Provide`, `Invoke`, lifecycle hooks                                                                                                   |
+| **Environment variables**  | `env:"DB_HOST"` tag with `WithEnvPrefix("MYAPP_")` prefix support                                                                                                                                 |
+| **16 output formats**      | table, JSON, CSV, YAML, Markdown, XML, HTML, D2, Mermaid, JSONL, TOML, PlantUML, and more                                                                                                         |
+| **Signal handling**        | ON by default (v5) — Ctrl+C cancels the run; `WithoutSignalHandling()` opts out                                                                                                                   |
+| **Typo suggestions**       | "did you mean?" for flags and subcommands (Levenshtein distance)                                                                                                                                  |
+| **Constructor validation** | Missing handlers, duplicate names, invalid flags — caught at `AddCommand` time                                                                                                                    |
+| **Runtime validation**     | `required`, `values`, and `validate` tags enforced for flag, env, and default values; string `min`/`max` mean length                                                                              |
+| **Batteries included**     | ON by default in v5: strict validation, signals + graceful shutdown, strict config keys, version/doctor commands, hints — `WithoutBatteries()` drops the set                                      |
+| **Machine-readable**       | `myapp describe` prints a versioned JSON contract of every command and flag; `Describe()` for programmatic access                                                                                 |
+| **Errors that teach**      | Every known failure gets an actionable `Hint:` line (and a `hint` field in JSON error output)                                                                                                     |
+| **Flow context**           | `BranchingFlowContext` — track command path and share values across hierarchy                                                                                                                     |
+| **Config files**           | `WithConfigFile(paths...)` — JSON/YAML/TOML auto-loading with flag override                                                                                                                       |
+| **Counting flags**         | `count:"true"` for `-v`/`-vv`/`-vvv` verbosity patterns                                                                                                                                           |
+| **Extensible types**       | `RegisterTypeCodec()` for custom flag types with full parse/validate support                                                                                                                      |
+| **Middleware**             | `TimingMiddleware`, `RecoveryMiddleware`, or write your own; spinner/telemetry/flight-recorder available as [sub-modules](#optional-sub-modules)                                                  |
+| **Interactive prompts**    | `WithPromptOnMissing()` with `prompt:"Question?"` tag via huh                                                                                                                                     |
+| **Markdown help**          | `glamour.WithHelp()` renders Long/Example as styled markdown via glamour                                                                                                                          |
+| **Color control**          | `--no-color` flag + `NO_COLOR` env var + `cli.NoColor()` accessor                                                                                                                                 |
+| **Shell completion**       | Dynamic completion via `WithCompletion(fn)`                                                                                                                                                       |
+| **Positional args**        | `WithExactArgs`, `WithMinimumArgs`, `WithRangeArgs`, `WithNoArgs`, `WithStrictPositionalArgs`/`WithArgsPassthrough` (since v5.1.0), or custom                                                     |
+| **Zero panics**            | All functions return errors; no Must\* panic variants                                                                                                                                             |
+| **Cobra escape hatch**     | `ConfigFromContext[T]`, `WithPostFlagParse`, `RegisterLocalCommandFlags` — raw cobra + cmdguard runtime                                                                                           |
+| **Scoped flags**           | `local:"true"` — root-only flags not inherited by subcommands                                                                                                                                     |
+| **Hidden flags**           | `hidden:"true"` — exclude from --help without losing functionality                                                                                                                                |
 | **Verified**               | [CI-measured coverage badge](https://github.com/larsartmann/cmdguard/actions/workflows/ci.yml) — generated on every push, never hand-edited — plus race detection, fuzzing, and `check-all` gates |
 
 ---
@@ -460,21 +460,21 @@ type Flags struct {
 }
 ```
 
-| Tag        | Purpose                                 | Example                  |
-| ---------- | --------------------------------------- | ------------------------ |
-| `flag`     | Flag name (required)                    | `flag:"name"`            |
-| `short`    | Short flag                              | `short:"n"`              |
-| `default`  | Default value                           | `default:"World"`        |
-| `help`     | Help text                               | `help:"Name to greet"`   |
-| `env`      | Environment variable                    | `env:"DB_HOST"`          |
-| `required` | Mark as required                        | `required:"true"`        |
-| `validate` | Runtime validation after parsing        | `validate:"email,min=5"` |
-| `values`   | Restrict to a fixed set of values       | `values:"a,b,c"`         |
-| `count`    | Counting flag                           | `count:"true"`           |
-| `local`    | Root-only, not inherited by subcommands | `local:"true"`           |
-| `hidden`   | Exclude from --help but stay functional | `hidden:"true"`          |
+| Tag        | Purpose                                                                                      | Example                  |
+| ---------- | -------------------------------------------------------------------------------------------- | ------------------------ |
+| `flag`     | Flag name (required)                                                                         | `flag:"name"`            |
+| `short`    | Short flag                                                                                   | `short:"n"`              |
+| `default`  | Default value                                                                                | `default:"World"`        |
+| `help`     | Help text                                                                                    | `help:"Name to greet"`   |
+| `env`      | Environment variable                                                                         | `env:"DB_HOST"`          |
+| `required` | Mark as required                                                                             | `required:"true"`        |
+| `validate` | Runtime validation after parsing                                                             | `validate:"email,min=5"` |
+| `values`   | Restrict to a fixed set of values                                                            | `values:"a,b,c"`         |
+| `count`    | Counting flag                                                                                | `count:"true"`           |
+| `local`    | Root-only, not inherited by subcommands                                                      | `local:"true"`           |
+| `hidden`   | Exclude from --help but stay functional                                                      | `hidden:"true"`          |
 | `prompt`   | Interactive prompt when a flag is missing (`WithPromptOnMissing()` + the prompts sub-module) | `prompt:"Your name?"`    |
-| `secret`   | Redact the value to `***` in `config explain`, `describe`, docs, and schemas | `secret:"true"`          |
+| `secret`   | Redact the value to `***` in `config explain`, `describe`, docs, and schemas                 | `secret:"true"`          |
 
 #### Validate rules — the complete registry
 
@@ -483,18 +483,18 @@ Ten rules ship built in; this is the whole registry (source of truth:
 in one `validate` tag. An unknown rule name fails with `ErrUnknownValidator`;
 a malformed parameter with `ErrInvalidValidatorParam`.
 
-| Rule       | Parameter             | Checks                                    | Failure sentinel          |
-| ---------- | --------------------- | ----------------------------------------- | ------------------------- |
-| `email`    | —                     | RFC 5322 address (empty value passes)     | `ErrInvalidEmail`         |
-| `url`      | —                     | Absolute URL with scheme (empty passes)   | `ErrInvalidURL`           |
-| `minlen=N` | integer (rune count)  | string length ≥ N                         | `ErrValueTooShort`        |
-| `maxlen=N` | integer (rune count)  | string length ≤ N                         | `ErrValueTooLong`         |
-| `min=N`    | number                | numeric value ≥ N                         | `ErrValueTooSmall`        |
-| `max=N`    | number                | numeric value ≤ N                         | `ErrValueTooLarge`        |
-| `dmin=D`   | duration (e.g. `10s`) | duration value ≥ D                        | `ErrValueTooSmall`        |
-| `dmax=D`   | duration              | duration value ≤ D                        | `ErrValueTooLarge`        |
-| `regex=R`  | Go regexp (RE2)       | value matches R                           | `ErrValuePatternMismatch` |
-| `nonempty` | —                     | value not empty                           | `ErrValueEmpty`           |
+| Rule       | Parameter             | Checks                                  | Failure sentinel          |
+| ---------- | --------------------- | --------------------------------------- | ------------------------- |
+| `email`    | —                     | RFC 5322 address (empty value passes)   | `ErrInvalidEmail`         |
+| `url`      | —                     | Absolute URL with scheme (empty passes) | `ErrInvalidURL`           |
+| `minlen=N` | integer (rune count)  | string length ≥ N                       | `ErrValueTooShort`        |
+| `maxlen=N` | integer (rune count)  | string length ≤ N                       | `ErrValueTooLong`         |
+| `min=N`    | number                | numeric value ≥ N                       | `ErrValueTooSmall`        |
+| `max=N`    | number                | numeric value ≤ N                       | `ErrValueTooLarge`        |
+| `dmin=D`   | duration (e.g. `10s`) | duration value ≥ D                      | `ErrValueTooSmall`        |
+| `dmax=D`   | duration              | duration value ≤ D                      | `ErrValueTooLarge`        |
+| `regex=R`  | Go regexp (RE2)       | value matches R                         | `ErrValuePatternMismatch` |
+| `nonempty` | —                     | value not empty                         | `ErrValueEmpty`           |
 
 `min`/`max` are type-aware: on string kinds (and `URL`/`Email`/`HostPort`/`FilePath`)
 they rewrite to length bounds; on durations (`Duration`, `time.Duration`) to
@@ -509,30 +509,30 @@ defaults are re-checked at construction — an impossible default fails
 
 ## Command Options
 
-| Option                                        | Purpose                                                                                          |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `WithShort(short)`                            | Short description                                                                                |
-| `WithLong(long)`                              | Long description                                                                                 |
-| `WithExample(example)`                        | Example usage                                                                                    |
-| `WithAliases(aliases...)`                     | Alternative names                                                                                |
-| _(flags passed positionally to `NewCommand`)_ | —                                                                                                |
-| `WithPreRunE[T, F](fn)`                       | Pre-validation hook                                                                              |
-| `WithPostRunE[T, F](fn)`                      | Post-success cleanup                                                                             |
-| `WithHidden(bool)`                            | Hide from help                                                                                   |
-| `WithDeprecated(msg)`                         | Deprecation message                                                                              |
-| `WithGroupID(id)`                             | Help group name                                                                                  |
-| `WithExactArgs(n)`                            | Require exactly n positional args                                                                |
-| `WithMinimumArgs(n)`                          | Require at least n positional args                                                               |
-| `WithMaximumArgs(n)`                          | Allow at most n positional args                                                                  |
-| `WithValidArgs(args...)`                      | Restrict args to allowed values                                                                  |
-| `WithSubcommands(cmds...)`                    | Attach child commands (parent)                                                                   |
-| `WithRangeArgs(min, max)`                     | Require between min and max args                                                                 |
-| `WithNoArgs()`                                | Reject any positional args                                                                       |
+| Option                                        | Purpose                                                                                                         |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `WithShort(short)`                            | Short description                                                                                               |
+| `WithLong(long)`                              | Long description                                                                                                |
+| `WithExample(example)`                        | Example usage                                                                                                   |
+| `WithAliases(aliases...)`                     | Alternative names                                                                                               |
+| _(flags passed positionally to `NewCommand`)_ | —                                                                                                               |
+| `WithPreRunE[T, F](fn)`                       | Pre-validation hook                                                                                             |
+| `WithPostRunE[T, F](fn)`                      | Post-success cleanup                                                                                            |
+| `WithHidden(bool)`                            | Hide from help                                                                                                  |
+| `WithDeprecated(msg)`                         | Deprecation message                                                                                             |
+| `WithGroupID(id)`                             | Help group name                                                                                                 |
+| `WithExactArgs(n)`                            | Require exactly n positional args                                                                               |
+| `WithMinimumArgs(n)`                          | Require at least n positional args                                                                              |
+| `WithMaximumArgs(n)`                          | Allow at most n positional args                                                                                 |
+| `WithValidArgs(args...)`                      | Restrict args to allowed values                                                                                 |
+| `WithSubcommands(cmds...)`                    | Attach child commands (parent)                                                                                  |
+| `WithRangeArgs(min, max)`                     | Require between min and max args                                                                                |
+| `WithNoArgs()`                                | Reject any positional args                                                                                      |
 | `WithStrictPositionalArgs()`                  | Reject undeclared positional args (inert when an explicit validator like `WithExactArgs` is set) — since v5.1.0 |
-| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras — since v5.1.0                                             |
-| `WithArgs(fn)`                                | Custom `cobra.PositionalArgs`                                                                    |
-| `WithPromptOnMissing()`                       | Interactive prompting for missing flags                                                          |
-| `WithCompletion(fn)`                          | Dynamic shell completion                                                                         |
+| `WithArgsPassthrough()`                       | Accept any positionals, ignore extras — since v5.1.0                                                            |
+| `WithArgs(fn)`                                | Custom `cobra.PositionalArgs`                                                                                   |
+| `WithPromptOnMissing()`                       | Interactive prompting for missing flags                                                                         |
+| `WithCompletion(fn)`                          | Dynamic shell completion                                                                                        |
 
 ---
 
