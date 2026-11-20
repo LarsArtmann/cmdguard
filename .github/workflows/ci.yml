@@ -168,3 +168,19 @@ jobs:
 
       - name: docs battery
         run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.1 run .
+
+  # Branded-ID gate (BD003): identifier-typed params/returns/fields must use
+  # strong ID types or carry a reasoned //brandid-lint:ignore(BD003)
+  # directive. Same rules as the local BuildFlow step (tool_options in
+  # .buildflow.yml); pinned `go run` needs no credentials. Bump the tag
+  # manually when a new linter release lands.
+  brandid-lint:
+    name: branded-ID gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27"
+      - run: go run github.com/larsartmann/go-branded-id/linter/cmd/brandid-lint@linter/v0.5.1 -rules BD003 .

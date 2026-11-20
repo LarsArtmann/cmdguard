@@ -1,6 +1,13 @@
 # BuildFlow Configuration
 # See: https://github.com/larsartmann/buildflow
 
+# Opt into the branded-ID linter's primitive-ID rule (BD003): unbranded
+# identifier params/returns/fields must be branded or carry a reasoned
+# //brandid-lint:ignore(BD003) directive.
+tool_options:
+  brandid-lint:
+    rules: BD003
+
 # Build mode: full, fast, ci, dev, pre-commit
 build_mode: full
 

@@ -250,6 +250,18 @@ The `docs/reviews/2026-11-17_16-14_cmdguard-docs-marketing-ai-skills-41-reviews.
 
 **Goal:** 0 lint issues via real code fixes, not silencing linters.
 
+**Branded-ID gate (brandid-lint BD003, adopted 2026-11-20):** identifier-typed
+params/returns/fields use strong types (`TaskID = id.ID[TaskBrand, uint]` in
+examples/taskctl; go-branded-id is a direct root-module dep) or carry a
+reasoned `//brandid-lint:ignore(BD003)` directive — flag-struct fields stay
+primitive (cmdguard binds flags by reflection; brand at the action boundary)
+and group IDs stay `string` (cobra `Group.ID` interop: help-section labels,
+not entity identifiers). Gate runs via BuildFlow (`tool_options` in
+`.buildflow.yml`) and the CI `branded-ID gate` job (pinned `linter/v0.5.1` —
+bump manually on new linter tags). Keep suppression directives trailing the
+declaration line and the whole line ≤ 120 chars: golines must not rewrap a
+directive away from its declaration.
+
 **What was fixed (code refactored):**
 
 - `wrapcheck` in `output.go` — external errors now wrapped via `wrapIfError` helper (nil-safe)
