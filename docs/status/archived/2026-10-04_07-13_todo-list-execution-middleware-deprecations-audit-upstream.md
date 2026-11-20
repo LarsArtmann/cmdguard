@@ -1,5 +1,7 @@
 # Status Report: TODO-List Execution — Context Middleware, Deprecations, Audit Upstream, Coverage
 
+> **Live remainder:** none — every item carries an inline verdict; the v4-era work was retired at v4.3.1 and superseded by v5 (CHANGELOG.md).
+
 **Date:** 2026-10-04 07:13
 **Session scope:** Execute the cmdguard TODO_LIST.md (all sections), verify each
 item against source, implement what is real, sync all living docs.

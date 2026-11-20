@@ -1,5 +1,7 @@
 # cmdguard-lint — New Sub-Module Build Status
 
+> **Live remainder:** none — every §f item carries an inline verdict below; the linter shipped as lint/v0.1.0-v0.3.0 with CG001-CG008 and fleet activation (AGENTS.md lint section).
+
 **Date:** 2026-10-04 07:11 CEST
 **Scope of this session:** Build a linter for the anti-patterns found in the timesheets cmdguard deep-dive (`timesheets/docs/research/2026-10-04_cmdguard-deep-dive.html`), on top of `go-finding` + `go-finding/toolsdk` + `go-linter-sdk`, as a new sub-module of this repo.
 **Skills loaded:** linter-building, buildflow.

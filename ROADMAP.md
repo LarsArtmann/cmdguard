@@ -348,3 +348,4 @@ Other:
 ## Adoption-surface candidates (2026-11-20)
 
 - Items 17-45 of docs/status/2026-11-20_12-29_fleet-audit-findings-execution-status.md §f — refine into bounded TODO_LIST rows when picked up
+- Derive sub-module test counts mechanically (from `go test`/coverage output) instead of hand-counts in AGENTS.md — refine into a bounded TODO row when picked up
