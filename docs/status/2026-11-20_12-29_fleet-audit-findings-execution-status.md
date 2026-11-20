@@ -26,7 +26,7 @@ Session task: execute all 10 findings from
    SKILL.md tag row now points at both instead of restating.
 2. **F2 — sentinel-count contradiction closed.** SKILL.md:43 ("59 exported
    sentinel error vars") → "62 documented sentinel errors" with the derivation
-   command in the Source column (`rg -c '^\| `[a-z_]+`\ +\| `Err'
+   command in the Source column (`rg -c '^\|`[a-z_]+`\ +\|`Err'
    docs/ERROR_REFERENCE.md` = 62, matching the generated header); taskctl count
    corrected 86→87. Both SKILL.md mentions now agree (verified by rg).
 3. **F3 — tag-vocabulary drift closed.** README Flag Tags Reference is the
@@ -67,9 +67,9 @@ Session task: execute all 10 findings from
    from an agent" now shows: discover (describe) → invoke with `--output json`
    (`WithOutputFormat(output.FormatJSON)` wiring documented) → the REAL JSON
    envelope (captured bytes from a scratch CLI: `required_flag` + hint + code
-   1) → an `error_code` recovery-decision table (all 5 codes verified present
-   in the generated ERROR_REFERENCE) → human `Hint:` line + verified
-   suggestion → `schema.FromCLI` tooling cross-link.
+   1. → an `error_code` recovery-decision table (all 5 codes verified present
+      in the generated ERROR_REFERENCE) → human `Hint:` line + verified
+      suggestion → `schema.FromCLI` tooling cross-link.
 10. **F10 — headline tiering decision recorded.** AGENTS.md "Adoption-surface
     conventions (2026-11-20)": D15 (README=why-switch, website=what-it-is, do
     not converge) + the one-fact-one-home surface map (tags/validate rules →
