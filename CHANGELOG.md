@@ -14,6 +14,17 @@ Dates are in YYYY-MM-DD format (ISO 8601).
   table and the `.agents` tag-set line to the `FlagTag` fields, and the
   website's validate-table copy to the same registry — hand-kept copies can no
   longer drift from code.
+- **Release-readiness gate.** `scripts/pre-tag-check.sh` runs the
+  release-blocking battery (build, tests, lint, contract, docs, website legs)
+  in one command so a tag never ships unverified.
+- **Website truth guards.** `scripts/check-guide-sync.sh` (stale-major scan,
+  docs-symbol existence, compiled doc samples, per-guide "Where to go next",
+  and describe-excerpt byte pinning against a real `taskctl describe` run),
+  `scripts/check-website-links.py`, `scripts/check-website-smoke.py`, the
+  v4 `RetirementBanner`, and agent-consumable `website/public/llms.txt`.
+- **Fleet tooling.** `scripts/fleet-bump.sh <version>` (parameterized
+  consumer-bump sweep with build+vet verification per repo) and
+  `scripts/fleet-sweep.sh` (fleet evidence collection).
 
 ### Changed
 

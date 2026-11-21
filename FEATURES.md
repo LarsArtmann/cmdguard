@@ -453,6 +453,20 @@ built with cmdguard v5 itself).
 
 ---
 
+## Repository Tooling (`scripts/`, `website/`)
+
+| Feature                          | Status              | Notes                                                                                                                                        |
+| -------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pre-tag gate                     | 🟢 FULLY_FUNCTIONAL | `scripts/pre-tag-check.sh`: build, tests, lint, contract, docs, and website legs in one release-blocking run                                  |
+| Guide-sync truth gate            | 🟢 FULLY_FUNCTIONAL | `scripts/check-guide-sync.sh` → `check-docs-api.py`: stale-major scan, docs-symbol existence, compiled doc samples, "Where to go next" per guide, describe-excerpt byte pinning against a real `taskctl describe` run |
+| Website link check               | 🟢 FULLY_FUNCTIONAL | `scripts/check-website-links.py`: internal-link validation over the built site                                                                |
+| Website smoke                    | 🟢 FULLY_FUNCTIONAL | `scripts/check-website-smoke.py`: served-page checks against the deployed site                                                                |
+| Fleet bump                       | 🟢 FULLY_FUNCTIONAL | `scripts/fleet-bump.sh <version>`: bump clean consumer repos with per-repo build+vet verification; parameterized (was v5.1.0-hardcoded)       |
+| Fleet sweep                      | 🟢 FULLY_FUNCTIONAL | `scripts/fleet-sweep.sh`: fleet-wide evidence collection                                                                                      |
+| Agent docs surface               | 🟢 FULLY_FUNCTIONAL | `website/public/llms.txt` + v4 `RetirementBanner` (`website/src/components/RetirementBanner.astro`, wired in `LandingLayout.astro`)           |
+
+---
+
 ## Architecture Notes
 
 ### TypeCodec Registry
