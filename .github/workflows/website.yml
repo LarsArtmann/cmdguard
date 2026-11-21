@@ -87,12 +87,22 @@ jobs:
     needs: build-website
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     # The secrets context is not allowed in `if:`; mirror it through job
-    # env so the step can skip when the key is not configured yet.
+    # env so the step can skip when WIF is not configured yet.
     env:
-      HAS_FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+      HAS_WIF_PROVIDER: ${{ secrets.WIF_PROVIDER != '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Authenticate via Workload Identity Federation
+        if: env.HAS_WIF_PROVIDER == 'true'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: cmdguard-website-deploy@lars-software.iam.gserviceaccount.com
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -109,10 +119,10 @@ jobs:
 
       - name: Deploy to Firebase Hosting
         working-directory: website
-        # Skip cleanly until the repo has the FIREBASE_SERVICE_ACCOUNT
-        # secret: an empty key would only fail the deploy with an auth
+        # Skip cleanly until the repo has the WIF_PROVIDER secret: an
+        # empty provider path would only fail the deploy with an auth
         # error instead.
-        if: env.HAS_FIREBASE_KEY == 'true'
+        if: env.HAS_WIF_PROVIDER == 'true'
         run: |
           # pnpm refuses global installs unless its global bin is already
           # on PATH, and $GITHUB_PATH only affects LATER steps - export it
@@ -120,11 +130,7 @@ jobs:
           export PNPM_HOME="$HOME/.local/share/pnpm"
           export PATH="$PNPM_HOME/bin:$PATH"
           pnpm add -g firebase-tools@15.37.0
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/gcp-key.json"
           firebase deploy --only hosting:cmdguard --project lars-software
           # Freshness: the CDN must serve THIS deploy within the bounded
           # window, not the previous release riding out propagation.
           python3 ../scripts/check-website-smoke.py --expect-commit "$GITHUB_SHA"
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-key.json
