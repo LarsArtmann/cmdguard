@@ -21,6 +21,8 @@ Inspired by Domain-Driven Design (DDD) Ubiquitous Language.
 | BranchingFlowContext | Tracks command execution path and branch state                      | Used by middleware and hooks         |
 | CommandInfo          | Metadata struct passed to middleware (name, path, phase, hasRunE)   | Middleware context                   |
 | SilenceUsage         | Suppresses cobra's usage-on-error footgun                           | True by default                      |
+| CoverageStamp        | CI-generated SVG committed to the repo on every master push         | The live coverage number; hand-maintained copies only date-stamp it |
+| ValidateRule         | One of the ten built-in validator names resolvable at parse time    | Registry source: `registerBuiltins()` in flags_validate.go |
 
 ## Entities
 
