@@ -103,8 +103,20 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 - TODO_LIST purge (2026-11-21): | SU14 | Parameterize `scripts/fleet-bump-v5.1.0.sh` → `scripts/fleet-bump.sh <version>` for future cycles | one-release name today; add vendor + dirty-tree handling while at it (the two-pass discovery this cycle) | 🔴 TODO | — done (2026-11-21: git mv to scripts/fleet-bump.sh <version>, arg validation; commit f5602ee)
 - TODO_LIST purge (2026-11-21): | SU15 | Pin firebase-tools in `website.yml` deploy step (exact version or nix binary) | CI ran 15.35.0 vs locally proven 15.28.1; unpinned `pnpm add -g` = repro + supply-chain gap (20-43 report §b1) | 🔴 TODO | — done (2026-11-21: firebase-tools@15.37.0 in website.yml deploy; commit f5602ee)
 
+- TODO_LIST purge (2026-11-21): | SU48 | taskctl: store plain `Long`/`Example` text and style at help-render time — describe currently embeds ANSI-escaped styled help in the machine contract (found while pinning the SU44 excerpt to live bytes) | the contract `long` field carries raw `\u001b[38;5;…` escape sequences plus lipgloss padding; hostile for contract-driving agents (2026-11-21 excerpt repair) | 🔴 TODO | — done (2026-11-21: core fix instead of the row taskctl-side premise — glamour styles even plain prose, so plain text could not clean the contract; v5 now snapshots pristine Long/Example into the cmdguard.io/pristine-help annotation before transforms run and describe/GenerateDocs serve that text, terminal help unchanged; taskctl contract 5728 to 211 bytes on add, zero ANSI; pristine_help_test.go covers transform, repeat-Execute, docgen, passthrough)
+
 ### Fixed
 
+- **Machine contract and generated docs no longer carry ANSI-styled help.**
+  Help transforms (e.g. the glamour sub-module's markdown renderer) overwrite
+  the live cobra `Long`/`Example` fields with terminal-styled bytes, and
+  `describe`/`GenerateDocs` read those same fields — so the JSON contract
+  embedded raw `\u001b[38;5;…` escapes and lipgloss padding (taskctl's
+  `list` entry: 7151 styled bytes for 353 characters of source). Core now
+  snapshots the author's original text into a cobra annotation before any
+  transform runs and serves that pristine text from the contract and docs;
+  terminal help rendering is unchanged. Repeated `Execute` calls never
+  re-stash styled text.
 - **Master CI red trio from 2026-11-20.** The coverage-stamp commit step
   aborts no more on a dirty index (`git pull --rebase --autostash` + one
   retry + an SVG sanity grep gate); the branded-ID gate pin

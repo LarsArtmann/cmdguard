@@ -119,6 +119,9 @@ app describe
 - v5 defaults include the batteries, so `describe`'s tree also carries the
   auto-registered `doctor` (and `version` when a CLI version is set);
   `WithoutBatteries()` gives you the lean tree.
+- `long`/`example` in the contract are the PRE-TRANSFORM text: help transforms
+  (glamour markdown rendering) style the live cobra fields for terminals, but
+  the contract serves the original text — agents never see ANSI escapes.
 
 Prefer this over scraping `--help` when driving a CLI from an agent or a test.
 
