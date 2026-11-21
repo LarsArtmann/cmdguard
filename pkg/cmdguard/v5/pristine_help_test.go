@@ -37,7 +37,7 @@ type pristineConfig struct {
 func newPristineCLI(t *testing.T, opts ...CLIOption) (*CLI[pristineConfig], string, string) {
 	t.Helper()
 
-	const wantLong = "# Scan\n\nScan the system."
+	const wantLong = "# Scan\n\nSweep every registered host."
 	const wantExample = "app scan --mode fast"
 
 	cliOpts := append([]CLIOption{

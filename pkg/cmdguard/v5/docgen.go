@@ -61,6 +61,7 @@ func writeCommandDocs(b *strings.Builder, cmd *cobra.Command, depth int) error {
 
 	synopsis := cmd.Short
 	long, example := pristineHelpFor(cmd)
+
 	if long != "" {
 		synopsis = long
 	}
