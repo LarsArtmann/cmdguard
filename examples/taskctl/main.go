@@ -44,6 +44,7 @@ import (
 	"github.com/larsartmann/cmdguard/flightrecorder"
 	"github.com/larsartmann/cmdguard/glamour"
 	"github.com/larsartmann/cmdguard/spinner"
+	output "github.com/larsartmann/go-output"
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 	"github.com/larsartmann/cmdguard/v5/pkg/version"
 )
@@ -109,6 +110,11 @@ func buildApp(rec *flightrecorder.Recorder) (*v5.CLI[AppConfig], error) {
 		"taskctl", "A production-grade task manager CLI", AppConfig{},
 		v5.WithCLIVersion(version.Version),
 		v5.WithEnvPrefix("TASKCTL_"),
+		// Machine-readable output (the agent-driving loop in
+		// docs/guides/machine-contract.mdx): Table stays the human default;
+		// this option REGISTERS the `--output` flag so agents can pass
+		// `--output json` and get the structured error envelope.
+		v5.WithOutputFormat(output.FormatTable),
 		v5.WithAuditLog(auditPlugin),
 		v5.WithAuditMiddleware[AppConfig](auditPlugin),
 		v5.WithConfigFile("$HOME/.config/taskctl/config.json"),

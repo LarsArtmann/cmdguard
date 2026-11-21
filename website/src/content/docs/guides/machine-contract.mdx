@@ -149,27 +149,28 @@ actually prints:
 **1. Discover the tree** (never scrape `--help`):
 
 ```bash
-myapp describe > contract.json
+taskctl describe > contract.json
 ```
 
-**2. Build the invocation from the contract and run it.** If the app wires a
-machine-readable output format (the app opts in with
-`WithOutputFormat(output.FormatJSON)`, which registers a `--output` flag), pass
-`--output json` so every failure comes back structured:
+**2. Build the invocation from the contract and run it.** The flagship
+example wires `WithOutputFormat(output.FormatTable)` — Table stays the human
+default and the option REGISTERS the `--output` flag — so pass `--output json`
+and every failure comes back structured:
 
 ```bash
-$ myapp add --output json
+$ taskctl add --output json
 ```
 
 **3. Read the JSON error envelope** (printed to stderr — `type` is the error
 class, `message` the stable text, `hint` the actionable fix, `error_code` the
-stable machine identifier, `code` the process exit code):
+stable machine identifier, `code` the process exit code). Real bytes from the
+flagship, walked 2026-11-21:
 
 ```json
 {
   "error": {
     "type": "flag",
-    "message": "command \"add\": required flag not set: \"name\" is missing",
+    "message": "command \"add\": required flag not set: \"title\" is missing",
     "hint": "pass the flag on the command line, or set its env var or config-file value",
     "error_code": "required_flag",
     "code": 1
