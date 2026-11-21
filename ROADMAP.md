@@ -349,3 +349,5 @@ Other:
 
 - Items 17-45 of docs/status/2026-11-20_12-29_fleet-audit-findings-execution-status.md §f — refine into bounded TODO_LIST rows when picked up
 - Derive sub-module test counts mechanically (from `go test`/coverage output) instead of hand-counts in AGENTS.md — refine into a bounded TODO row when picked up
+- README FLAGS_REFERENCE split plan: extract the tag tables into docs/FLAGS_REFERENCE.md when the 900-line gate nears
+- Live-site truth smoke: re-run the deployed-site parity script after each push (scheduled-workflow candidate)
