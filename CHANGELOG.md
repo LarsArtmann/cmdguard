@@ -107,6 +107,8 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 - TODO_LIST purge (2026-11-21): | SU42 | annotate.go: per-row TSV validation (kind enum + raw-value rule) with row-numbered errors, extending adf2e80 (repo: docs-gates)                                              | a spec with kind `done` failed full-file and late (2026-11-20_20-15 §f5)                                                                               | 🔴 TODO | — done (2026-11-21: SKILLS/docs-health/assets/annotate.go c337064 — parse loop validates every row up front via validateRepairSpec, kind vocabulary h/v/p/w/n/r/s plus per-kind value requirements, errors carry the spec line number and fire before any target file is touched; f5 shape pinned in self-test, negative probe prints repair: spec line 3: bad kind done; docs-gates parity suite green)
 
+- TODO_LIST purge (2026-11-21): | SU4  | Release the lint module (next tag) carrying the dot-import constructor tracing fix                                                                                           | behavior change is on master + the locally built binary; no published tag carries it yet; BuildFlow provider pin follows the tag                       | 🔴 TODO | — done (2026-11-21: lint/v0.4.0 tagged at ff6913d, 14/14 CI checks green on the release commit; proxy indexed, clean-dir go get resolves v0.4.0 with zero pseudo-versions; delta = dot-import constructor tracing + CoverageReporter filesScanned evidence + go-linter-sdk v0.6.1 + cmdguard/v5 v5.1.0 pin; lint/CHANGELOG.md carries the section; dev-shape replace restored at de05f31)
+
 ### Fixed
 
 - **Machine contract and generated docs no longer carry ANSI-styled help.**
