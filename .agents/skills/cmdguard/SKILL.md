@@ -122,6 +122,18 @@ app describe
 
 Prefer this over scraping `--help` when driving a CLI from an agent or a test.
 
+Pin the contract in your own tests via the `pkg/testutil` describe harness:
+
+- `testutil.AssertDescribeContract(t, cli, "testdata/describe.json")` — golden-pins
+  the full JSON; regenerate with `go test -update-golden` (call
+  `testutil.RegisterUpdateGoldensFlag()` from a test-package `init` so the shared
+  flag registers once).
+- `testutil.DescribeContractFromBinary(t, binary)` — process capture: runs the built
+  executable's `describe` and returns the JSON, for consumers that test the CLI as a
+  process rather than a library.
+- The repo's own release gate (`scripts/pre-tag-check.sh`) runs the contract, docs,
+  and website legs together — run it before tagging any cmdguard release.
+
 ## Registering many commands
 
 `AddCommands(cli, a, b, c)` collapses the per-command error ladder into one check
