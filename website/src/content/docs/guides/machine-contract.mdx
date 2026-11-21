@@ -26,21 +26,21 @@ $ taskctl describe
   "version": "dev",
   "flags": [
     {
+      "name": "admin-email",
+      "type": "string",
+      "default": "admin@example.com",
+      "usage": "Admin contact email"
+    },
+    /* … api-url … */
+    {
       "name": "data-dir",
       "shorthand": "d",
       "type": "string",
       "default": "./data",
-      "usage": "Directory for task storage",
+      "usage": "Directory for task storage!",
       "env": "TASKCTL_TASK_DATA_DIR"
     },
-    {
-      "name": "log-level",
-      "shorthand": "l",
-      "type": "string",
-      "default": "info",
-      "usage": "Log level (debug, info, warn, error) (one of: debug, info, warn, error)",
-      "env": "TASKCTL_TASK_LOG_LEVEL"
-    },
+    /* … debug, help, log-level, no-color, output, port, timeout … */
     {
       "name": "verbose",
       "shorthand": "v",
@@ -48,24 +48,43 @@ $ taskctl describe
       "default": "0",
       "usage": "Verbosity (-v, -vv, -vvv)",
       "count": true
+    },
+    {
+      "name": "version",
+      "type": "bool",
+      "default": "false",
+      "usage": "version for taskctl"
     }
-    /* … 8 more root flags … */
   ],
   "commands": [
     {
       "name": "add",
       "path": "taskctl add",
       "short": "Add a new task",
+      /* … long, example: the styled help text fang renders … */
       "group": "tasks",
       "flags": [
+        {
+          "name": "admin-email",
+          "type": "string",
+          "default": "admin@example.com",
+          "usage": "Admin contact email",
+          "inherited": true
+        },
+        /* … api-url … port: the other inherited root flags … */
         {
           "name": "priority",
           "shorthand": "P",
           "type": "string",
           "default": "medium",
           "usage": "Priority",
-          "values": ["low", "medium", "high"]
+          "values": [
+            "low",
+            "medium",
+            "high"
+          ]
         },
+        /* … timeout (inherited) … */
         {
           "name": "title",
           "shorthand": "t",
@@ -74,10 +93,11 @@ $ taskctl describe
           "required": true,
           "prompt": "Task title?",
           "validate": "min=3"
-        }
-        /* … root flags repeat here, each marked "inherited": true … */
-      ]
-    }
+        },
+        /* … verbose (inherited) … */
+      ],
+      "commands": []
+    },
     /* … complete, completion, config, db, describe, doctor, done, inspect,
        list, man, secret, stats, version … */
   ]
