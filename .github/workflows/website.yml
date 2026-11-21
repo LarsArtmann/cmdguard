@@ -85,7 +85,10 @@ jobs:
   deploy-website:
     name: Deploy Website
     needs: build-website
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # Push-to-master is the release path; workflow_dispatch lets a deploy
+    # be re-verified on demand (fire drills, IAM changes) without a
+    # no-op commit.
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
