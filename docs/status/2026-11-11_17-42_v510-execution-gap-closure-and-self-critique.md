@@ -37,10 +37,10 @@ FM8's stale path repaired.
    the locally built binary — but no published tag carries it, and the
    BuildFlow provider pin (fleet-wide, 118 providers) consumes tags. A
    fleet consumer could run the old blind linter for months. → **SU4**.
-5. **AGENTS.md Quick Start documents check-guide-sync but not the two NEW
-   standing gates** (`scripts/pre-tag-check.sh`,
-   `scripts/check-website-smoke.py`). The auto-loaded context teaches the
-   old ritual, not the current one. → **SU5**.
+5. ~~**AGENTS.md Quick Start documents check-guide-sync but not the two NEW~~ done — at f5602ee (both scripts documented in Quick Start)
+   ~~standing gates** (`scripts/pre-tag-check.sh`,~~
+   ~~`scripts/check-website-smoke.py`). The auto-loaded context teaches the~~
+   ~~old ritual, not the current one. → **SU5**.~~
 6. **`DescribeContractFromBinary` shipped with zero tests** (the two pilots
    exercise only the library path). → **SU7**.
 7. **No full `check-all` has run since the flake gained the vet/mod-verify
@@ -166,7 +166,7 @@ FM8's stale path repaired.
 2. SU2 FEATURES.md tooling rows.
 3. SU3 SKILL.md updates + B148 fan-out re-verification.
 4. SU4 lint module release carrying dot-import tracing + BuildFlow pin bump.
-5. SU5 AGENTS.md Quick Start: pre-tag + smoke script entries.
+5. ~~SU5 AGENTS.md Quick Start: pre-tag + smoke script entries.~~ done — at f5602ee (Quick Start carries both standing gates now)
 6. SU6 full check-all with the new legs.
 7. SU7 `DescribeContractFromBinary` unit test.
 8. SU8 gitignore audit (`.crush/shell-output/`, `global.out.css`).
