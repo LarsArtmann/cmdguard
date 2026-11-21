@@ -53,9 +53,13 @@ scripts/pre-tag-check.sh
 # Live-site smoke: served pages respond and carry the expected content
 python3 scripts/check-website-smoke.py
 
-# Deploy: CI deploys automatically on every master push (FIREBASE_SERVICE_ACCOUNT
-# secret -> SA cmdguard-website-deploy@lars-software). Local path only for
-# emergency fixes: firebase CLI is not on PATH; use the nix store binary or nix shell
+# Deploy: CI deploys automatically on every master push (WIF: WIF_PROVIDER
+# secret -> GitHub OIDC -> impersonates SA cmdguard-website-deploy@lars-software,
+# which carries the custom projects/lars-software/roles/cmdguardHostingDeployer
+# role — NOT firebasehosting.admin, and Firebase Hosting has NO per-site IAM
+# scope, so the role is capability-narrowed: no sites.create/sites.delete).
+# Local path only for emergency fixes: firebase CLI is not on PATH; use the nix
+# store binary or nix shell, then authenticate via gcloud ADC
 (cd website && firebase deploy --only hosting:cmdguard --project lars-software)
 ```
 
@@ -175,6 +179,14 @@ allowBuilds:
 ```
 
 Without this, `pnpm install` prints `[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild` and `astro build` fails on a missing esbuild binary. (A prior iteration of this file carried the scaffold placeholder `esbuild: set this to true or false`, which pnpm silently ignores — the value must be a real `true`.) Machine-local `pnpm config set verify-deps-before-run false` is NOT a substitute: it does not travel with the repo or CI.
+
+### Website deploy auth (WIF, since 2026-11-21)
+
+- GitHub OIDC → WIF pool `github` / provider `cmdguard` in `lars-software` (project number 132045829579). The provider REQUIRES an attribute condition (`assertion.repository == 'LarsArtmann/cmdguard'`): creation without one fails with "The attribute condition must reference one of the provider's claims" even when NO condition was sent (org-enforced; observed on gcloud 593.0.0).
+- The impersonation chain needs BOTH `iamcredentials.googleapis.com` and `sts.googleapis.com` enabled on the project. Without `iamcredentials`, the deploy fails in ~2s with a generic error.
+- firebase-tools swallows the real ADC error behind "Failed to authenticate, have you run firebase login?" — run `firebase deploy --debug` to surface the actual cause above the generic line.
+- `google-github-actions/auth` (hook-pinned v3 SHA) writes the credentials file into `$GITHUB_WORKSPACE` and exports `GOOGLE_APPLICATION_CREDENTIALS` to later steps automatically; the deploy job carries `id-token: write` and may also run via `workflow_dispatch` for on-demand verification (IAM changes, fire drills).
+- IAM least-privilege shape: SA carries `projects/lars-software/roles/cmdguardHostingDeployer` (custom: deploy to existing sites, NO `sites.create`/`sites.delete`) + `roles/serviceusage.serviceUsageConsumer`. Firebase Hosting has NO per-site IAM scope and NO predefined deployer role (only admin/viewer) — do not try a `resource.name` condition; firebasehosting is absent from Google's IAM condition resource-attributes table, so such a condition can never match.
 
 ---
 
