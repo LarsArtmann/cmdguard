@@ -142,3 +142,6 @@ examples/taskctl/taskctl
 # Session + build scratch (SU8 gitignore audit)
 .crush/shell-output/
 website/src/styles/global.out.css
+
+# Deploy freshness stamp (build output, regenerated per build)
+website/public/deploy-meta.json

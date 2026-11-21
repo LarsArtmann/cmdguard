@@ -145,7 +145,9 @@ def check_freshness(expect_commit: str, failures: list[str]) -> None:
             if served == expect_commit:
                 print(f"ok  freshness: served commit matches {expect_commit}")
                 return
-            print(f"wait freshness: serving {served or 'unknown'}, expecting {expect_commit}")
+            print(
+                f"wait freshness: serving {served or 'unknown'}, expecting {expect_commit}"
+            )
         else:
             print(f"wait freshness: deploy-meta.json -> {code}")
 

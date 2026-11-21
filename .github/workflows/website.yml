@@ -122,6 +122,9 @@ jobs:
           pnpm add -g firebase-tools@15.37.0
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/gcp-key.json"
           firebase deploy --only hosting:cmdguard --project lars-software
+          # Freshness: the CDN must serve THIS deploy within the bounded
+          # window, not the previous release riding out propagation.
+          python3 ../scripts/check-website-smoke.py --expect-commit "$GITHUB_SHA"
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-key.json
