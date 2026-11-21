@@ -170,7 +170,7 @@ I wrote "48 tests + 3 examples" in CHANGELOG.md, but the 48 count already includ
 37. ~~Verify `SECURITY.md` version table includes v4~~ done — SECURITY.md supports v4.x
 38. Add v4.0.0 GitHub release notes (if not already done)
 39. ~~Consider `v4.1.0` release once P0/P1 items are done~~ done — v4.1.0 shipped 2026-10-04 (CHANGELOG [4.1.0]; tag v4.1.0)
-40. Add GitHub Action badge for `nix flake check` status
+40. ~~Add GitHub Action badge for `nix flake check` status~~ done — covered by the CI workflow badge (README:5); nix flake check runs as ci.yml's nix-check job, so the CI badge goes red when it fails and a separate nix badge would duplicate the same workflow file
 41. ~~Add a "what's new in v4" migration guide (one-pager)~~ done — covered by docs/MIGRATION_v3_v4.md
 42. ~~Add a `pkg.go.dev` badge~~ done — README carries the Go Reference badge
 43. ~~Add a "Related projects" section linking to go-output, samber-do-auditlog~~ done — README "Related Projects" section present
