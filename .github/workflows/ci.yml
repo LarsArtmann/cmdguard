@@ -12,6 +12,11 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # The badge commit step pushes to master with the workflow token
+    # (run 44845752228: default read-only token got a 403 from
+    # github-actions[bot]); everything else in this workflow only reads.
+    permissions:
+      contents: write
     env:
       GOEXPERIMENT: jsonv2
     strategy:
@@ -100,8 +105,9 @@ jobs:
             git pull --rebase --autostash origin master || \
               { sleep 5 && git pull --rebase --autostash origin master; }
             git add .github/badges/coverage.svg
-            git commit -m "chore: refresh coverage badge from CI run [skip ci]"
-            git push || { sleep 5 && git pull --rebase --autostash origin master && git add .github/badges/coverage.svg && git commit -m "chore: refresh coverage badge from CI run [skip ci]" && git push; }
+            git diff --cached --quiet || \
+              git commit -m "chore: refresh coverage badge from CI run [skip ci]"
+            git push || { sleep 5 && git pull --rebase --autostash origin master && git add .github/badges/coverage.svg && { git diff --cached --quiet || git commit -m "chore: refresh coverage badge from CI run [skip ci]"; } && git push; }
           fi
 
   lint:
