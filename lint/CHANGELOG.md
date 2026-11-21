@@ -12,6 +12,35 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 
 - Nothing yet.
 
+## [0.4.0] - 2026-11-21
+
+### Fixed
+
+- **Dot-imported cmdguard constructors are now traced.** Under a dot import
+  of a cmdguard core package, constructor calls carry no selector
+  (`NewCLI(...)` is a bare identifier in file scope), so the constructor
+  tracing behind CG003 (panic on a cmdguard constructor error) saw none of
+  them. A bare-identifier call now matches when THIS file dot-imports a
+  cmdguard core package (a dot import makes every bare name unambiguous
+  file scope); files without such an import are unaffected, and blank
+  imports are skipped without crashing. Covered by
+  `TestDotImport_BareConstructorsAreTraced` and
+  `TestBlankImport_IsSkippedWithoutCrash`.
+
+### Changed
+
+- **Registry rules now report coverage evidence.** `treeWalkingRule`
+  implements the go-linter-sdk `CoverageReporter` interface, so registry
+  reports carry real `filesScanned` (the parsed-file count from the shared
+  analyze walk — clean files included, generated and unparseable excluded)
+  instead of a meaningless zero that fleet dashboards cannot distinguish
+  from "scanned nothing". `NewRegistry` registers the addressable wrappers;
+  `AllRules` returns plain `linter.RuleFunc` values built from them (a
+  coverage lookup needs the addressable wrapper, so a bare `RuleFunc` value
+  can never carry it).
+- Tracks `cmdguard/v5 v5.1.0` and `go-linter-sdk v0.6.1` (release-shape
+  go.mod: real pin + version-scoped replace, the v0.3.0 pattern).
+
 ## [0.3.0] - 2026-11-08
 
 ### Changed
