@@ -58,6 +58,8 @@ rg -n 'samber/do' go.mod
 (cd examples/taskctl && GOEXPERIMENT=jsonv2 go run . describe | head -8)
 ```
 
+Everything above in one command: `nix run .#check-all` — build, race, lint, vet, format, tidy, and go mod verify in one shot.
+
 ### Replace your hand-rolled…
 
 Even a 100/100 cmdguard adopter still hand-rolled its exit-code ladder and a
