@@ -117,6 +117,8 @@
 2. **Ratchet semantics preference:** current baseline absorbs a _replaced_ finding (1 fixed + 1 new in the same rule+file nets zero, exit 0). Keep count-based absorption, or should replaced findings also fail (strict identity mode with an explicit `--strict-baseline`)? This is an adoption-UX product call.
 3. **S2 tradeoff:** set `toolchain go1.27.2` now to close 6 reachable stdlib vulns and accept temporarily-red sandboxed nix/treefmt checks until nixpkgs ships 1.27.2 — or keep checks green and wait for nixpkgs (current choice)?
 
+> **Live remainder:** §f items 14+ were harvest candidates consumed by later TODO batches (SU/FSU rows, since purged into CHANGELOG); §g questions answered by history — lint shipped past v0.2.0 through v0.5.x, the baseline ratchet kept count-based absorption, and the toolchain moved to nix-pinned 1.27. The command-audit middleware shipped in v4-era and is re-documented for v5 (AGENTS.md principle #16).
+
 ---
 
-_Point-in-time snapshot. TODO_LIST.md/FEATURES.md/AGENTS.md/CHANGELOG were updated live during the session; items f.14+ are harvest candidates, not yet routed._
+_Point-in-time snapshot. TODO_LIST.md/FEATURES.md/AGENTS.md/CHANGELOG were updated live during the session._
