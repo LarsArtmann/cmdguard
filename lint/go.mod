@@ -84,4 +84,4 @@ replace github.com/larsartmann/cmdguard/glamour => ../glamour
 
 replace github.com/larsartmann/cmdguard/spinner => ../spinner
 
-replace github.com/larsartmann/cmdguard/v5 v5.1.0 => ../
+replace github.com/larsartmann/cmdguard/v5 => ../
