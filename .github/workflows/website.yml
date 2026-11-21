@@ -119,7 +119,7 @@ jobs:
           # inline. pnpm's configured global bin is PNPM_HOME/bin on Linux.
           export PNPM_HOME="$HOME/.local/share/pnpm"
           export PATH="$PNPM_HOME/bin:$PATH"
-          pnpm add -g firebase-tools
+          pnpm add -g firebase-tools@15.37.0
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/gcp-key.json"
           firebase deploy --only hosting:cmdguard --project lars-software
         env:

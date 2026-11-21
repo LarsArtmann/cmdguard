@@ -138,3 +138,7 @@ examples/taskctl/taskctl
 # docs-gates land-parity ledger: the last SAFE --pre-flight batch
 # (local editor state, never shared; same entry the docs-gates repo carries)
 .docs-gates-preflight.json
+
+# Session + build scratch (SU8 gitignore audit)
+.crush/shell-output/
+website/src/styles/global.out.css

@@ -47,6 +47,12 @@ scripts/check-guide-sync.sh
 (cd website && pnpm build && pnpm exec astro check && pnpm exec html-validate "dist/**/*.html")
 python3 scripts/check-website-links.py
 
+# Pre-tag gate: release readiness (contract, docs, website, lint legs in one run)
+scripts/pre-tag-check.sh
+
+# Live-site smoke: served pages respond and carry the expected content
+python3 scripts/check-website-smoke.py
+
 # Deploy: CI deploys automatically on every master push (FIREBASE_SERVICE_ACCOUNT
 # secret -> SA cmdguard-website-deploy@lars-software). Local path only for
 # emergency fixes: firebase CLI is not on PATH; use the nix store binary or nix shell
