@@ -133,7 +133,8 @@ jobs:
           export PNPM_HOME="$HOME/.local/share/pnpm"
           export PATH="$PNPM_HOME/bin:$PATH"
           pnpm add -g firebase-tools@15.37.0
-          firebase deploy --only hosting:cmdguard --project lars-software
+          echo "GAC=${GOOGLE_APPLICATION_CREDENTIALS:-UNSET} type=$(grep -o '"type": *"[^"]*"' "$GOOGLE_APPLICATION_CREDENTIALS" 2>/dev/null | head -1)"
+          firebase deploy --debug --only hosting:cmdguard --project lars-software
           # Freshness: the CDN must serve THIS deploy within the bounded
           # window, not the previous release riding out propagation.
           python3 ../scripts/check-website-smoke.py --expect-commit "$GITHUB_SHA"
