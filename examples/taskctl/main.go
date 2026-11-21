@@ -39,12 +39,12 @@ import (
 	"os"
 	"time"
 
+	output "github.com/larsartmann/go-output"
 	auditlog "github.com/larsartmann/samber-do-auditlog"
 
 	"github.com/larsartmann/cmdguard/flightrecorder"
 	"github.com/larsartmann/cmdguard/glamour"
 	"github.com/larsartmann/cmdguard/spinner"
-	output "github.com/larsartmann/go-output"
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 	"github.com/larsartmann/cmdguard/v5/pkg/version"
 )
