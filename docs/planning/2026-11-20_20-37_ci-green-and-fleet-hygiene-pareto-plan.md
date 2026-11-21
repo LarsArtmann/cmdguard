@@ -208,3 +208,9 @@ flowchart TD
 3. **No linter/exclusion growth in cmdguard** — the fleet counts exclusions; T5's baseline lives in templ-components, where the findings are.
 4. **No hand-edited generated artifacts** — the badge, ERROR_REFERENCE, and (after T7) the machine-contract excerpt stay generated-or-verified.
 5. **No pushes to release/** branches, no force pushes, no `--no-verify` anywhere except templ-components' documented case until T5 fixes its gate.
+
+## 6. Added during execution (2026-11-20 ~22:00)
+
+| ID | Task | ≤min | Why |
+| --- | --- | --- | --- |
+| T27 | cue-policy: exempt reusable-call jobs (`uses:` at job level) from the required runs-on/steps schema in ci_workflow.cue + release_workflow.cue, then re-vet cmdguard's workflows (repo: cue-policy) | 60 | The policy wrongly blocks every commit that stages a workflow with a `uses:` job (GitHub Actions forbids runs-on/steps on call jobs); found 2026-11-20 when the pre-commit findings gate blocked the sanity-grep fix |
