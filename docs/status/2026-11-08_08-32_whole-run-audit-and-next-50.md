@@ -248,7 +248,7 @@ no-services CLI (10m).
 proactively (20m).
 46. ROADMAP quarterly trim calendar note (D40) (5m).
 47. CT3: link config-explain demo from README + website (20m).
-48. H4: website hero-code sync guard (30m).
+48. ~~H4: website hero-code sync guard (30m).~~ done — implemented as check_hero_single_source in scripts/check-docs-api.py (hero renders heroCode from src/data/hero-code.ts; guide-sync gate leg)
 49. H6: COMPARISON.md header date + prose pass 1 of 3 (20m).
 50. Write the Fleet Migration runbook (consumers × codemod × lint ratchet)
 as a single doc (30m).
