@@ -86,6 +86,7 @@ def fetch_once(path: str) -> tuple[int | None, str]:
         headers={"User-Agent": "cmdguard-website-smoke/1"},
     )
     try:
+        # nosec B310 -- scheme is the fixed https BASE constant, never user input
         with urllib.request.urlopen(req, timeout=ROUTE_TIMEOUT_S) as resp:
             return resp.status, resp.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as err:
