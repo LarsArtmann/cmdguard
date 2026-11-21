@@ -88,5 +88,9 @@ grep -q "lint-reusable.yml" .github/workflows/release.yml || fail "release.yml n
 grep -q "needs: call-lint" .github/workflows/release.yml || fail "release job no longer gated on lint"
 grep -q "v\*" .github/workflows/release.yml || fail "release.yml no longer triggers on v* tags"
 
+# 7b. Bounded workflow smoke: go-run pins resolve + pushing jobs carry explicit
+#     permissions (the SU46 promotion of the ad-hoc pre-push smoke).
+scripts/check-workflow-smoke.sh || fail "workflow smoke failed"
+
 echo ""
 echo "ALL PRE-TAG CHECKS PASSED for $TAG. Safe to: git tag -a $TAG && git push origin $TAG"
