@@ -252,12 +252,24 @@ def compile_samples() -> None:
         shutil.rmtree(work, ignore_errors=True)
 
 
+def check_guide_next_sections() -> None:
+    guides_dir = os.path.join(SITE_SRC, "content", "docs", "guides")
+    for name in sorted(os.listdir(guides_dir)):
+        if not name.endswith(".mdx"):
+            continue
+        path = os.path.join(guides_dir, name)
+        text = open(path, encoding="utf-8").read()
+        if "## Where to go next" not in text:
+            fail(f"{rel(path)}: guide is missing a '## Where to go next' section")
+
+
 def main() -> int:
     check_stale_major()
     check_hero_single_source()
     check_quick_start()
     check_symbols()
     compile_samples()
+    check_guide_next_sections()
 
     if failures:
         print()

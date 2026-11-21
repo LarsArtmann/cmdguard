@@ -125,7 +125,7 @@ Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visibl
 
 21. Add "Who is this for?" and "When NOT to use cmdguard" to the landing page or quick start.
 22. Produce the HyperFrames demo video and embed it above the fold.
-23. Add a "Show me the machine contract" live example with real `describe` output.
+23. ~~Add a "Show me the machine contract" live example with real `describe` output.~~ done — the machine-contract guide carries a REAL taskctl describe excerpt (86-test/14-command tree, verified bytes against live output 2026-11-20; website/guides/machine-contract.mdx) plus the MCP recipe
 24. Add a cookbook page: config + env + flags precedence in one runnable program.
 25. Add a "production checklist" page (version, doctor, signals, hints, lint).
 26. Add an FAQ (module path, v4 vs v5, Cobra compatibility, DI scope lifetime).
