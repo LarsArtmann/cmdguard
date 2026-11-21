@@ -60,14 +60,15 @@ func writeCommandDocs(b *strings.Builder, cmd *cobra.Command, depth int) error {
 	heading := strings.Repeat("#", clampDepth(depth))
 
 	synopsis := cmd.Short
-	if cmd.Long != "" {
-		synopsis = cmd.Long
+	long, example := pristineHelpFor(cmd)
+	if long != "" {
+		synopsis = long
 	}
 
 	fmt.Fprintf(b, "%s %s\n\n%s\n\n", heading, cmd.CommandPath(), synopsis)
 
-	if cmd.Example != "" {
-		fmt.Fprintf(b, "### Examples\n\n```\n%s\n```\n\n", cmd.Example)
+	if example != "" {
+		fmt.Fprintf(b, "### Examples\n\n```\n%s\n```\n\n", example)
 	}
 
 	fmt.Fprintf(b, "### Usage\n\n```\n%s\n```\n\n", cmd.UseLine())

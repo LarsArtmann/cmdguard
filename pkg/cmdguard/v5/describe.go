@@ -25,6 +25,14 @@ const descriptionSchemaVersion = "1"
 // carries everything a caller needs to construct a valid invocation.
 const flagMetadataAnnotation = "cmdguard.io/flag-metadata"
 
+// pristineHelpAnnotation stores a command's Long and Example text as written
+// by the author, snapshotted before any help transform runs. Help transforms
+// (e.g. the glamour sub-module's markdown renderer) overwrite the live cobra
+// fields with terminal-styled bytes; the machine contract and generated docs
+// must serve the original text instead — ANSI escapes and lipgloss padding
+// are hostile to the agents and tools that consume them.
+const pristineHelpAnnotation = "cmdguard.io/pristine-help"
+
 // describeCommandName is the reserved command name for the auto-registered
 // JSON description command. A consumer-defined command with this name wins.
 const describeCommandName = "describe"
@@ -270,12 +278,13 @@ func subcommandDescriptions(cmd *cobra.Command) []CommandDescription {
 func commandDescription(cmd *cobra.Command) CommandDescription {
 	cmd.InitDefaultHelpFlag()
 
+	long, example := pristineHelpFor(cmd)
 	desc := CommandDescription{
 		Name:       cmd.Name(),
 		Path:       cmd.CommandPath(),
 		Short:      cmd.Short,
-		Long:       cmd.Long,
-		Example:    cmd.Example,
+		Long:       long,
+		Example:    example,
 		Aliases:    slices.Clone(cmd.Aliases),
 		Group:      cmd.GroupID,
 		Hidden:     cmd.Hidden,

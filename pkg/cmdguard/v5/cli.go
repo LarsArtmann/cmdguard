@@ -541,6 +541,8 @@ func (cli *CLI[T]) extractCleanupHooks() []func(*cobra.Command, *T, error) error
 }
 
 func (cli *CLI[T]) applyHelpTransforms() {
+	stashPristineHelpText(cli.rootCmd)
+
 	for _, fn := range cli.spec.helpTransforms {
 		fn(cli.rootCmd)
 	}
